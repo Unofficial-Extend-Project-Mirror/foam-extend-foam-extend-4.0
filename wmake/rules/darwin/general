@@ -1,0 +1,9 @@
+CPP        = cpp $(WM_CPP_OPTIONS)
+LD         = ld 
+GLIBS      = -L$(FOAM_LIBBIN)/dummy -lPstream
+
+include $(GENERAL_RULES)/standard
+
+include $(RULES)/X
+include $(RULES)/c
+include $(RULES)/c++

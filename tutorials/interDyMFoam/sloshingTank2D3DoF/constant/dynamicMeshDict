@@ -1,0 +1,60 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  dev                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      motionProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dynamicFvMesh solidBodyMotionFvMesh;
+
+solidBodyMotionFvMeshCoeffs
+{
+    solidBodyMotionFunction SDA;
+
+    SDACoeffs
+    {
+        // Centre of gravity
+        CofG        (0 0 0);
+
+        // Model scale ratio
+        lamda       50;
+
+        // Max roll amplitude [rad]
+        rollAmax    0.2;
+
+        // Min roll amplitude [rad]
+        rollAmin    0.1;
+
+        // Heave amplitude [m]
+        heaveA      4;
+
+        // Sway amplitude [m]
+        swayA       2.4;
+
+        // Damping Coefficient [-]
+        Q           2;
+
+        // Time Period for liquid [sec]
+        Tp          14;
+
+        // Natural Period of Ship [sec]
+        Tpn         12;
+
+        // Reference time step [sec]
+        dTi         0.06;
+
+        // Incr. in Tp/unit 'dTi'[-]
+        dTp         -0.001;
+    }
+}
+
+// ************************************************************************* //

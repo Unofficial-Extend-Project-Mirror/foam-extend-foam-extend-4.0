@@ -1,0 +1,5 @@
+contactProblem.C
+contactPatchPair.C
+newContactStressFoam.C
+
+EXE = $(FOAM_APPBIN)/newContactStressFoam

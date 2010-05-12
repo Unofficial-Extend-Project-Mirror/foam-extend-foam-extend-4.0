@@ -1,0 +1,57 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      sampleDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+interpolationScheme cellPointFace;
+
+writeFormat     raw;
+
+sampleSets      
+(
+    face 
+    {
+        name            cone25;
+        axis            x;
+        start           ( 0.0 0.0 0.0);
+        end             ( 92.08087e-03  42.939e-03 0.0);
+        nPoints         92;
+    }
+
+    face
+    {
+        name            cone55;
+        axis            x;
+        start           ( 92.08087e-03  42.939e-03 0.0);
+        end             ( 153.6830e-03 130.92e-03 0.0);
+        nPoints         61;
+    }
+
+    face
+    {
+        name            base;
+        axis            x;
+        start           ( 153.6830e-03 130.92e-03 0.0);
+        end             ( 193.6750e-03 130.92e-03 0.0);
+        nPoints         40;
+    }
+);
+
+fields          
+(
+    p
+    wallHeatTransRate
+);
+
+// ************************************************************************* //

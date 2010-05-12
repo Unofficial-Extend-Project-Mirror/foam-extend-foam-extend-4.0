@@ -1,0 +1,4 @@
+sixDOFSolver.C
+
+EXE = $(FOAM_APPBIN)/sixDOFSolver
+

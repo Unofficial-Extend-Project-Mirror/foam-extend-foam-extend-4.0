@@ -1,0 +1,3 @@
+calcPTot.C
+
+EXE = $(FOAM_APPBIN)/calcPTot

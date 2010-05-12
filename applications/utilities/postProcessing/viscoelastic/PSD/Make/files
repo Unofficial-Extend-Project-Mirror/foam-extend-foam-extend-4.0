@@ -1,0 +1,3 @@
+PSD.C
+
+EXE = $(FOAM_APPBIN)/PSD

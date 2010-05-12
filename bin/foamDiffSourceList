@@ -1,0 +1,135 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#-------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation; either version 2 of the License, or (at your
+#     option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM; if not, write to the Free Software Foundation,
+#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Script
+#     foamDiffSourceList <oldDir> <newDir> <tarFile>
+#
+# Description
+#     Packs and compresses files that have changed (diff -uw) between
+#     oldDir newDir
+#
+#------------------------------------------------------------------------------
+tmpFile=${TMPDIR:-/tmp}/foamDiffList.$$
+
+if [ $# -ne 3 ]; then
+   echo "Usage : ${0##*/} oldDir newDir tarFile"
+   echo ""
+   echo "Find the files that changed (diff -uw) between <oldDir> and <newDir>"
+   echo "and pack them into <tarFile>"
+   echo ""
+   exit 1
+fi
+
+# canonical form (no double and no trailing dashes)
+oldDir=$(echo "$1" | sed -e 's@//*@/@g' -e 's@/$@@')
+newDir=$(echo "$2" | sed -e 's@//*@/@g' -e 's@/$@@')
+packFile=$3
+
+if [ ! -d $oldDir ]; then
+   echo "Error: directory $oldDir does not exist"
+   exit 1
+fi
+
+if [ ! -d $newDir ]; then
+   echo "Error: directory $newDir does not exist"
+   exit 1
+fi
+
+if [ -f $packFile ]; then
+   echo "Error: $packFile already exists"
+   exit 1
+fi
+
+# Clean up on termination and on Ctrl-C
+trap 'rm -f $tmpFile 2>/dev/null; exit 0' EXIT TERM INT
+
+fileCount=0
+cat /dev/null > $tmpFile
+
+find -H $newDir                \
+    ! -type d -type f          \
+    ! -name "*~"               \
+ -a ! -name ".*~"              \
+ -a ! -name ".#*"              \
+ -a ! -name "*.orig"           \
+ -a ! -name "*.dep"            \
+ -a ! -name "*.o"              \
+ -a ! -name "*.so"             \
+ -a ! -name "*.a"              \
+ -a ! -name "*.tgz"            \
+ -a ! -name "core"             \
+ -a ! -name "core.[1-9]*"      \
+ -a ! -name "log[0-9]*"        \
+| sed                          \
+ -e "\@$newDir/.git/@d"        \
+ -e "\@$newDir/lib/@d"         \
+ -e '\@applications/bin/@d'      \
+ -e '\@/t/@d'                    \
+ -e '\@Make[.A-Za-z]*/[^/]*/@d'  \
+ -e '\@[Dd]oxygen/html@d'        \
+ -e '\@[Dd]oxygen/latex@d'       \
+ -e '\@[Dd]oxygen/man@d'         \
+ -e "s@$newDir/*@@"              \
+ | \
+ (
+    while read file
+    do
+       (( fileCount=$fileCount + 1))
+
+       if [ -f "$oldDir/$file" ]
+       then
+          diff -uw $oldDir/$file $newDir/$file >/dev/null 2>&1
+          if [ $? = 1 ]
+          then
+             echo "[DIFF]" $file
+             echo $newDir/$file >> $tmpFile
+             continue
+          fi
+       else
+          echo "[NEW]" $file
+          echo $newDir/$file >> $tmpFile
+          continue
+       fi
+       echo $fileCount $file
+    done
+ )
+
+# file fileCount
+fileCount=$(cat $tmpFile | wc -l)
+echo "----------------------------------------------------------------------"
+echo "pack $fileCount changed/new files"
+
+tar -czpf $packFile --files-from $tmpFile
+
+if [ $? = 0 ]
+then
+   echo "Finished packing changed files from $newDir into $packFile"
+else
+   echo "Error: failure packing changed files from $newDir into $packFile"
+   rm -f $packFile 2>/dev/null
+fi
+echo "----------------------------------------------------------------------"
+
+# ----------------------------------------------------------------------------

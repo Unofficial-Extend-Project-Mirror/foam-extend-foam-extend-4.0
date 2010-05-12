@@ -1,0 +1,118 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          fvSolution;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    rho PCG
+    {
+        preconditioner   DIC;
+        tolerance        1e-6;
+        relTol           0;
+    };
+//    pd PCG
+//    {
+//        preconditioner   DIC;
+//        tolerance        1e-6;
+//        relTol           0.1;
+//    };
+//    pdFinal PCG
+//    {
+//        preconditioner   DIC;
+//        tolerance        1e-08;
+//        relTol           0;
+//    };
+    pd GAMG
+    {
+        tolerance        1e-6;
+        relTol           0.1;
+
+        smoother         GaussSeidel;
+
+        cacheAgglomeration true;
+        nCellsInCoarsestLevel 10;
+        agglomerator     faceAreaPair;
+        mergeLevels      1;
+    };
+    pdFinal GAMG
+    {
+        tolerance        1e-6;
+        relTol           0;
+
+        smoother         GaussSeidel;
+
+        cacheAgglomeration true;
+        nCellsInCoarsestLevel 10;
+        agglomerator     faceAreaPair;
+        mergeLevels      1;
+    };
+    U PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-08;
+        relTol           0;
+    };
+    h PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-06;
+        relTol           0;
+    };
+    k PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-06;
+        relTol           0;
+    };
+    epsilon PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-06;
+        relTol           0;
+    };
+    R PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-06;
+        relTol           0;
+    };
+}
+
+PISO
+{
+    momentumPredictor   off;
+    nOuterCorrectors     1;
+    nCorrectors     2;
+    nNonOrthogonalCorrectors 1;
+    pdRefCell        0;
+    pdRefValue       0;
+}
+
+//relaxationFactors
+//{
+////    h               0.9;
+//    U               0.9;
+//}
+
+
+// ************************************************************************* //

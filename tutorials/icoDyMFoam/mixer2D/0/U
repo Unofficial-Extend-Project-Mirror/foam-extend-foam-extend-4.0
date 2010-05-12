@@ -1,0 +1,63 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           volVectorField;
+    object          U;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    impellerWall    
+    {
+        type            movingWallVelocity;
+        value           uniform (0 0 0);
+    }
+
+    baffleWall      
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+
+    insideSlider    
+    {
+        type            movingWallVelocity;
+        value           uniform (0 0 0);
+    }
+
+    outsideSlider   
+    {
+        type            movingWallVelocity;
+        value           uniform (0 0 0);
+    }
+
+    defaultFaces    
+    {
+        type            empty;
+    }
+}
+
+
+// ************************************************************************* //

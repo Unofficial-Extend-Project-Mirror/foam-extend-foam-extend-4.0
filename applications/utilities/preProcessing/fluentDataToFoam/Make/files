@@ -1,0 +1,4 @@
+fluentDataConverter.C
+fluentDataToFoam.L
+
+EXE = $(FOAM_APPBIN)/fluentDataToFoam

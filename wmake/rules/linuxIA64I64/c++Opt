@@ -1,0 +1,6 @@
+c++DBUG     = 
+##c++OPT      = -DICC_IA64_PREFETCH -ansi-alias -O3 -ftz -mP3OPT_ecg_swp_control=0x400000 -fno-alias -mtune=itanium2-p9000
+c++OPT      = -DICC_IA64_PREFETCH -ansi-alias -O3 -ftz -mP3OPT_ecg_swp_control=0x400000 -fno-alias -mtune=itanium2 \
+              -fargument-noalias-global \
+              -unroll0
+#             -opt-mem-bandwidth1 \

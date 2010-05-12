@@ -1,0 +1,29 @@
+binaryNode = binaryNode
+binaryTree = binaryTree
+chemPoint = chemPoint
+chemistryModel = chemistryModel
+chemistrySolver = chemistrySolver
+chemistryOnlineLibrary = chemistryOnlineLibrary
+
+$(binaryNode)/binaryNode.C
+
+$(binaryTree)/binaryTreeAdd.C
+$(binaryTree)/binaryTree.C
+$(binaryTree)/binaryTreeClean.C
+$(binaryTree)/binaryTreeInsert.C
+$(binaryTree)/binaryTreeScan.C
+$(binaryTree)/binaryTreeSearch.C
+
+$(chemPoint)/chemPoint.C
+
+$(chemistryModel)/chemistryModel.C
+
+$(chemistrySolver)/chemistrySolver/chemistrySolver.C
+$(chemistrySolver)/chemistrySolver/newChemistrySolver.C
+$(chemistrySolver)/sequential/sequential.C
+$(chemistrySolver)/EulerImplicit/EulerImplicit.C
+$(chemistrySolver)/ode/ode.C
+
+$(chemistryOnlineLibrary)/chemistryOnlineLibrary.C
+
+LIB = $(FOAM_LIBBIN)/libchemistryModel

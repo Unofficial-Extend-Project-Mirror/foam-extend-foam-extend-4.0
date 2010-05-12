@@ -1,0 +1,7 @@
+#!/bin/sh
+set -x
+
+wmake libso incompressible
+wmake libso interfaceProperties
+wmake libso viscoelastic
+#wmake libso compressible

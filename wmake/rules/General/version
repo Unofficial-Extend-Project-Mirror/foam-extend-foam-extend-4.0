@@ -1,0 +1,6 @@
+.SUFFIXES: .Cver
+
+Cvertoo = sed s/WM_PROJECT_VERSION/\"$(WM_PROJECT_VERSION)\"/ $$SOURCE > $*.C ; $(CC) $(c++FLAGS) -c $*.C -o $@ 
+
+.Cver.dep:
+	$(MAKE_DEP)

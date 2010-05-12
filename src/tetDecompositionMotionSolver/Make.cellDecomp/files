@@ -1,0 +1,17 @@
+tetDecompositionMotionSolver/tetDecompositionMotionSolver.C
+tetDecompositionMotionSolver/laplace/laplaceTetDecompositionMotionSolver.C
+tetDecompositionMotionSolver/pseudoSolid/pseudoSolidTetDecompositionMotionSolver.C
+
+cellQuality/cellQuality.C
+
+motionDiffs/motionDiff/motionDiff.C
+motionDiffs/uniform/uniformDiff.C
+motionDiffs/deformationEnergy/deformationEnergyDiff.C
+motionDiffs/distortionEnergy/distortionEnergyDiff.C
+motionDiffs/linear/linearDiff.C
+motionDiffs/quadratic/quadraticDiff.C
+motionDiffs/exponential/exponentialDiff.C
+motionDiffs/patchEnhanced/patchEnhancedDiff.C
+motionDiffs/file/fileDiff.C
+
+LIB = $(FOAM_LIBBIN)/libcellDecompositionMotionSolver

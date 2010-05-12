@@ -1,0 +1,138 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
+
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+Class
+    Foam::BICCG
+
+Description
+    Diagonal incomplete LU preconditioned BiCG solver derived from the general
+    preconditioned BiCG solver PBiCG but with the choice of preconditioner
+    pre-selected.
+
+Deprecated
+    This solver is present for backward-compatibility and the PBiCG solver
+    should be used for preference.
+
+SourceFiles
+    BICCG.C
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef BICCG_H
+#define BICCG_H
+
+#include "PBiCG.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+/*---------------------------------------------------------------------------*\
+                           Class BICCG Declaration
+\*---------------------------------------------------------------------------*/
+
+class BICCG
+:
+    public PBiCG
+{
+    // Private Member Functions
+
+        //- Disallow default bitwise copy construct
+        BICCG(const BICCG&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const BICCG&);
+
+        //- Return the dictionary data-stream constructed from the components.
+        //  Needed for backward compatibility
+        IStringStream solverDataStream
+        (
+            const scalar tolerance,
+            const scalar relTol
+        ) const;
+
+        //- Return the dictionary data-stream constructed from the old-style
+        //  data-stream.  Needed for backward compatibility
+        IStringStream solverDataStream
+        (
+            const word& solverName,
+            Istream& solverData
+        ) const;
+
+
+public:
+
+    //- Runtime type information
+    TypeName("BICCG");
+
+
+    // Constructors
+
+        //- Construct from matrix components and tolerances
+        BICCG
+        (
+            const word& fieldName,
+            const lduMatrix& matrix,
+            const FieldField<Field, scalar>& coupleBouCoeffs,
+            const FieldField<Field, scalar>& coupleIntCoeffs,
+            const lduInterfaceFieldPtrsList& interfaces,
+            const scalar tolerance,
+            const scalar relTol = 0.0
+        );
+
+        //- Construct from matrix components and solver data stream
+        BICCG
+        (
+            const word& fieldName,
+            const lduMatrix& matrix,
+            const FieldField<Field, scalar>& coupleBouCoeffs,
+            const FieldField<Field, scalar>& coupleIntCoeffs,
+            const lduInterfaceFieldPtrsList& interfaces,
+            Istream& solverData
+        );
+
+
+    // Destructor
+
+        virtual ~BICCG()
+        {}
+
+
+    // Member Functions
+
+        //- Read and reset the solver parameters from the given stream
+        void read(Istream& solverData);
+};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

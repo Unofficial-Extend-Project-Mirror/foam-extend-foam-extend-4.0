@@ -1,0 +1,4 @@
+viscoelasticFluidFoam.C
+
+EXE = $(FOAM_APPBIN)/viscoelasticFluidFoam
+

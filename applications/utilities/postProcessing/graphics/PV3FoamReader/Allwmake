@@ -1,0 +1,23 @@
+#!/bin/sh
+set -x
+
+if [ -d "$ParaView_DIR" -a -r "$ParaView_DIR" ]
+then
+   case "$ParaView_VERSION" in
+   3*)
+      wmake libso vtkPV3Foam
+      (
+         cd PV3FoamReader
+         mkdir -p Make/$WM_OPTIONS > /dev/null 2>&1
+         cd Make/$WM_OPTIONS
+         cmake ../..
+	 if [ $WM_ARCH = "darwinPpc" -o $WM_ARCH = "darwinIntel" ]
+	 then
+	     sed -i bak -e 's/-dynamiclib /& -undefined dynamic_lookup /' CMakeFiles/PV3FoamReader.dir/link.txt	 
+	     sed -i bak -e 's/-dynamiclib /& -undefined dynamic_lookup /' CMakeFiles/PV3FoamReader_SM.dir/link.txt	 
+	 fi
+         make
+      )
+      ;;
+   esac
+fi

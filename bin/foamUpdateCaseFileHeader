@@ -1,0 +1,117 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation; either version 2 of the License, or (at your
+#     option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM; if not, write to the Free Software Foundation,
+#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Script
+#     foamUpdateCaseFileHeader
+#
+# Description
+#     Updates the header of application files.
+#     By default, writes current version in the header.
+#     Alternatively version can be specified with -v option.
+#     Also removes consecutive blank lines from file.
+#
+#------------------------------------------------------------------------------
+
+#
+# FUNCTIONS
+#
+printUsage () {
+cat <<EOF
+Usage: $0 <file>
+    Updates the header of application files
+    By default, writes current version in the header
+    Alternatively version can be specified with -v option
+    Also removes consecutive blank lines from file
+
+Options are:
+-v "<version>" specifies the version to be written in the header
+-h         help
+EOF
+}
+
+printOpenFOAMheader () {
+cat<<EOF
+/*--------------------------------*- C++ -*----------------------------------*\\
+| =========                 |                                                 |
+| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\\\    /   O peration     | Version:  ${1}                                   |
+|   \\\\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\\\/     M anipulation  |                                                 |
+\\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ${2};
+    class       ${3};
+    object      ${4};
+}
+EOF
+}
+
+FoamFileAttribute () {
+    grep $1 $2 | tr -s " " | cut -d" " -f3 | cut -d\; -f1
+}
+
+VERSION=$WM_PROJECT_VERSION
+#
+# OPTIONS
+#
+OPTS=`getopt hv: $*`
+if [ $? -ne 0 ] ; then
+    echo "Aborting due to invalid option"
+    printUsage
+    exit 1
+fi
+eval set -- '$OPTS'
+while [ "$1" != "--" ]; do
+    case $1 in
+        -v) VERSION=$2; shift;;
+        -h) printUsage; exit 1;;
+    esac
+    shift
+done
+shift
+
+#
+# MAIN
+#
+CASE_FILE=$1
+if [ "`grep FoamFile $CASE_FILE`" ] ; then
+    echo "Updating case file:" $CASE_FILE
+    sed -n '/FoamFile/,/}/p' $CASE_FILE > FoamFile
+    CLASS=`FoamFileAttribute class FoamFile`
+    OBJECT=`FoamFileAttribute object FoamFile`
+    FORMAT=`FoamFileAttribute format FoamFile`
+    printOpenFOAMheader $VERSION $FORMAT $CLASS $OBJECT > temp
+    sed '1,/}/d' $CASE_FILE | sed '/./,/^$/!d' >> temp
+    mv temp $1
+    rm FoamFile
+else
+    echo "The following file does not appear to be a case file:"
+    echo "    " $CASE_FILE
+fi
+
+
+#------------------------------------------------------------------------------

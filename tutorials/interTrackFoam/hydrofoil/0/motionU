@@ -1,0 +1,62 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.0                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+    class           tetPointVectorField;
+    object          motionU;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+dimensions          [ 0 1 0 0 0 0 0 ];
+
+internalField       uniform (0 0 0);
+
+referenceLevel      (0 0 0);
+
+boundaryField
+{
+    bottom
+    {
+        type fixedValue;
+        value uniform (0 0 0);
+    }
+
+    hydrofoil
+    {
+        type fixedValue;
+        value uniform (0 0 0);
+    }
+
+    freeSurface
+    {
+        type fixedValue;
+        value uniform (0 0 0);
+    }
+
+    outlet
+    {
+        type slip;
+    }
+
+    inlet
+    {
+        type slip;
+    }
+
+    frontAndBackPlanes
+    {
+        type empty;
+    }   
+}
+
+// ************************************************************************* //

@@ -1,0 +1,19 @@
+EXE_INC = \
+    -I$(LIB_SRC)/engine/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/sampling/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/combustion/lnInclude \
+    -I$(LIB_SRC)/turbulenceModels/RAS \
+    -I$(LIB_SRC)/thermophysicalModels/laminarFlameSpeed/lnInclude
+
+EXE_LIBS = \
+    -lengine \
+    -lfiniteVolume \
+    -lmeshTools \
+    -lcompressibleRASModels \
+    -lbasicThermophysicalModels \
+    -lcombustionThermophysicalModels \
+    -lspecie \
+    -llaminarFlameSpeedModels

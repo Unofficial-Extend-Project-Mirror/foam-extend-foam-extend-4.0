@@ -1,0 +1,3 @@
+#!/bin/sh
+#find . \( -name '*~' -o -name '.*~'  \) -exec ls -l {} \; -exec rm {} \;
+find . \( -name '*~' -o -name '.*~' \) -print | xargs -t rm

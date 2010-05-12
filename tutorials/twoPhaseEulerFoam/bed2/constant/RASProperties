@@ -1,0 +1,46 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      RASProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Switch turbulence model on or off
+
+turbulence          on;
+
+printCoeffs         on;
+
+// Standard k-epsilon model coefficients
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+kEpsilonCoeffs
+{
+    Cmu                     0.09;
+    C1                      1.44;
+    C2                      1.92;
+    C3                     -0.375;
+
+    alphak                  1.0;
+    alphaEps                0.82142;
+}
+
+// Wall function coefficients
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+wallFunctionCoeffs
+{
+    kappa                   0.4187;
+    E                       9.0;
+}
+
+// ************************************************************************* //

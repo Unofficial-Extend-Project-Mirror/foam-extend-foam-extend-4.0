@@ -1,0 +1,4 @@
+EXE_INC = \
+
+LIB_LIBS = \
+    -lpthread

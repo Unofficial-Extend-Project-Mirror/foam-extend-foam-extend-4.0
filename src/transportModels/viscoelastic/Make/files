@@ -1,0 +1,25 @@
+viscoelasticModel/viscoelasticModel.C
+
+viscoelasticLaws/viscoelasticLaw/viscoelasticLaw.C
+viscoelasticLaws/viscoelasticLaw/newViscoelasticLaw.C
+
+viscoelasticLaws/LPTT/LPTT.C
+viscoelasticLaws/EPTT/EPTT.C
+viscoelasticLaws/Oldroyd-B/Oldroyd_B.C
+viscoelasticLaws/Maxwell/Maxwell.C
+viscoelasticLaws/Giesekus/Giesekus.C
+viscoelasticLaws/FENE-CR/FENE_CR.C
+viscoelasticLaws/FENE-P/FENE_P.C
+viscoelasticLaws/XPP_SE/XPP_SE.C
+viscoelasticLaws/XPP_DE/XPP_DE.C
+viscoelasticLaws/PP/PP.C
+viscoelasticLaws/DCPP/DCPP.C
+viscoelasticLaws/Feta-PTT/Feta_PTT.C
+viscoelasticLaws/Leonov/Leonov.C
+viscoelasticLaws/White-Metzner/White-Metzner_Larson/White_Metzner_Larson.C
+viscoelasticLaws/White-Metzner/White-Metzner_CM/White_Metzner_CM.C
+viscoelasticLaws/White-Metzner/White-Metzner_CY/White_Metzner_CY.C
+
+viscoelasticLaws/multiMode/multiMode.C
+
+LIB = $(FOAM_LIBBIN)/libviscoelasticTransportModels

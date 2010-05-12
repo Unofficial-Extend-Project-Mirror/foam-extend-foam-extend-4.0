@@ -1,0 +1,310 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          turbulenceProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Turbulence model selection
+turbulenceModel kEpsilon;
+
+// Do you wish to calculate turbulence?
+turbulence      on;
+
+// Laminar model coefficients
+laminarCoeffs
+{
+}
+
+// Standard k-epsilon model coefficients
+kEpsilonCoeffs
+{
+    // Cmu
+    Cmu             Cmu [0 0 0 0 0 0 0] 0.09;
+    // C1
+    C1              C1 [0 0 0 0 0 0 0] 1.44;
+    // C2
+    C2              C2 [0 0 0 0 0 0 0] 1.92;
+    // alphaEps
+    alphaEps        alphaEps [0 0 0 0 0 0 0] 0.76923;
+}
+
+// RNG k-epsilon model coefficients
+RNGkEpsilonCoeffs
+{
+    // Cmu
+    Cmu             Cmu [0 0 0 0 0 0 0] 0.0845;
+    // C1
+    C1              C1 [0 0 0 0 0 0 0] 1.42;
+    // C2
+    C2              C2 [0 0 0 0 0 0 0] 1.68;
+    // alphak
+    alphak          alphaK [0 0 0 0 0 0 0] 1.39;
+    // alphaEps
+    alphaEps        alphaEps [0 0 0 0 0 0 0] 1.39;
+    // eta0
+    eta0            eta0 [0 0 0 0 0 0 0] 4.38;
+    // beta
+    beta            beta [0 0 0 0 0 0 0] 0.012;
+}
+
+// k-omega-SST model coefficients
+kOmegaSSTCoeffs
+{
+    alphaK1         alphaK1     [0 0 0 0 0 0 0] 0.85034;
+    alphaK2         alphaK1     [0 0 0 0 0 0 0] 1.0;
+    alphaOmega1     alphaOmega1 [0 0 0 0 0 0 0] 0.5;
+    alphaOmega2     alphaOmega2 [0 0 0 0 0 0 0] 0.85616;
+    gamma1          gamma1      [0 0 0 0 0 0 0] 0.5532;
+    gamma2          gamma2      [0 0 0 0 0 0 0] 0.4403;
+    beta1           beta1       [0 0 0 0 0 0 0] 0.0750;
+    beta2           beta2       [0 0 0 0 0 0 0] 0.0828;
+    betaStar        betaStar    [0 0 0 0 0 0 0] 0.09;
+    a1              a1          [0 0 0 0 0 0 0] 0.31;
+    c1              c1          [0 0 0 0 0 0 0] 10;
+
+    Cmu             Cmu         [0 0 0 0 0 0 0] 0.09;
+}
+
+// Shih non-Linear k-epsilon model coefficients
+NonlinearKEShihCoeffs
+{
+    // Cmu
+    Cmu             Cmu [0 0 0 0 0 0 0] 0.09;
+    // C1
+    C1              C1 [0 0 0 0 0 0 0] 1.44;
+    // C2
+    C2              C2 [0 0 0 0 0 0 0] 1.92;
+    // alphak
+    alphak          alphak [0 0 0 0 0 0 0] 1;
+    // alphaEps
+    alphaEps        alphaEps [0 0 0 0 0 0 0] 0.76932;
+    // A1
+    A1              A1 [0 0 0 0 0 0 0] 1.25;
+    // A2
+    A2              A2 [0 0 0 0 0 0 0] 1000;
+    // Ctau1
+    Ctau1           Ctau1 [0 0 0 0 0 0 0] -4;
+    // Ctau2
+    Ctau2           Ctau2 [0 0 0 0 0 0 0] 13;
+    // Ctau3
+    Ctau3           Ctau3 [0 0 0 0 0 0 0] -2;
+    // alphaKsi
+    alphaKsi        alphaKsi [0 0 0 0 0 0 0] 0.9;
+}
+
+// Lien non-Linear cubic k-epsilon model coefficients
+LienCubicKECoeffs
+{
+    // C1
+    C1              C1 [0 0 0 0 0 0 0] 1.44;
+    // C2
+    C2              C2 [0 0 0 0 0 0 0] 1.92;
+    // alphak
+    alphak          alphak [0 0 0 0 0 0 0] 1;
+    // alphaEps
+    alphaEps        alphaEps [0 0 0 0 0 0 0] 0.76923;
+    // A1
+    A1              A1 [0 0 0 0 0 0 0] 1.25;
+    // A2
+    A2              A2 [0 0 0 0 0 0 0] 1000;
+    // Ctau1
+    Ctau1           Ctau1 [0 0 0 0 0 0 0] -4;
+    // Ctau2
+    Ctau2           Ctau2 [0 0 0 0 0 0 0] 13;
+    // Ctau3
+    Ctau3           Ctau3 [0 0 0 0 0 0 0] -2;
+    // alphaKsi
+    alphaKsi        alphaKsi [0 0 0 0 0 0 0] 0.9;
+}
+
+// Gibson's q-zeta low Reynolds number k-epsilon model coefficients
+QZetaCoeffs
+{
+    // Cmu
+    Cmu             Cmu [0 0 0 0 0 0 0] 0.09;
+    // C1
+    C1              C1 [0 0 0 0 0 0 0] 1.44;
+    // C2
+    C2              C2 [0 0 0 0 0 0 0] 1.92;
+    // alphaZeta
+    alphaZeta       alphaZeta [0 0 0 0 0 0 0] 0.76923;
+    // anisotropic?
+    anisotropic     no;
+}
+
+// Launder-Sharma low Reynolds number k-epsilon model coefficients
+LaunderSharmaKECoeffs
+{
+    // Cmu
+    Cmu             Cmu [0 0 0 0 0 0 0] 0.09;
+    // C1
+    C1              C1 [0 0 0 0 0 0 0] 1.44;
+    // C2
+    C2              C2 [0 0 0 0 0 0 0] 1.92;
+    // alphaEps
+    alphaEps        alphaEps [0 0 0 0 0 0 0] 0.76923;
+}
+
+// Lam-Bremhorst low Reynolds number k-Epsilon model coefficients
+LamBremhorstKECoeffs
+{
+    // Cmu
+    Cmu             Cmu [0 0 0 0 0 0 0] 0.09;
+    // C1
+    C1              C1 [0 0 0 0 0 0 0] 1.44;
+    // C2
+    C2              C2 [0 0 0 0 0 0 0] 1.92;
+    // alphaEps
+    alphaEps        alphaEps [0 0 0 0 0 0 0] 0.76923;
+}
+
+// Lien-Leschziner low Reynolds number cubic k-epsilon model coefficients
+LienCubicKELowReCoeffs
+{
+    // Cmu
+    Cmu             Cmu [0 0 0 0 0 0 0] 0.09;
+    // C1
+    C1              C1 [0 0 0 0 0 0 0] 1.44;
+    // C2
+    C2              C2 [0 0 0 0 0 0 0] 1.92;
+    // alphak
+    alphak          alphak [0 0 0 0 0 0 0] 1;
+    // alphaEps
+    alphaEps        alphaEps [0 0 0 0 0 0 0] 0.76923;
+    // A1
+    A1              A1 [0 0 0 0 0 0 0] 1.25;
+    // A2
+    A2              A2 [0 0 0 0 0 0 0] 1000;
+    // Ctau1
+    Ctau1           Ctau1 [0 0 0 0 0 0 0] -4;
+    // Ctau2
+    Ctau2           Ctau2 [0 0 0 0 0 0 0] 13;
+    // Ctau3
+    Ctau3           Ctau3 [0 0 0 0 0 0 0] -2;
+    // alphaKsi
+    alphaKsi        alphaKsi [0 0 0 0 0 0 0] 0.9;
+    // Am
+    Am              Am [0 0 0 0 0 0 0] 0.016;
+    // Aepsilon
+    Aepsilon        Aepsilon [0 0 0 0 0 0 0] 0.263;
+    // Amu
+    Amu             Amu [0 0 0 0 0 0 0] 0.00222;
+}
+
+// Lien-Leschziner low Reynolds number cubic k-epsilon model coefficients
+LienLeschzinerLowReCoeffs
+{
+    // Cmu
+    Cmu             Cmu [0 0 0 0 0 0 0] 0.09;
+    // C1
+    C1              C1 [0 0 0 0 0 0 0] 1.44;
+    // C2
+    C2              C2 [0 0 0 0 0 0 0] 1.92;
+    // alphak
+    alphak          alphak [0 0 0 0 0 0 0] 1;
+    // alphaEps
+    alphaEps        alphaEps [0 0 0 0 0 0 0] 0.76923;
+    // Am
+    Am              Am [0 0 0 0 0 0 0] 0.016;
+    // Aepsilon
+    Aepsilon        Aepsilon [0 0 0 0 0 0 0] 0.263;
+    // Amu
+    Amu             Amu [0 0 0 0 0 0 0] 0.00222;
+}
+
+// Launder-Reece-Rodi RSTM with wall functions model coefficients
+LRRCoeffs
+{
+    // Cmu
+    Cmu             Cmu [0 0 0 0 0 0 0] 0.09;
+    // Clrr1
+    Clrr1           Clrr1 [0 0 0 0 0 0 0] 1.8;
+    // Clrr2
+    Clrr2           Clrr2 [0 0 0 0 0 0 0] 0.6;
+    // C1
+    C1              C1 [0 0 0 0 0 0 0] 1.44;
+    // C2
+    C2              C2 [0 0 0 0 0 0 0] 1.92;
+    // Cs
+    Cs              Cs [0 0 0 0 0 0 0] 0.25;
+    // Ceps
+    Ceps            Ceps [0 0 0 0 0 0 0] 0.15;
+    // alphaEps
+    alphaEps        alphaEps [0 0 0 0 0 0 0] 0.76923;
+}
+
+// Launder-Gibson RSTM with wall reflection and wall functions model coefficients
+LaunderGibsonRSTMCoeffs
+{
+    // Cmu
+    Cmu             Cmu [0 0 0 0 0 0 0] 0.09;
+    // Clg1
+    Clg1            Clg1 [0 0 0 0 0 0 0] 1.8;
+    // Clg2
+    Clg2            Clg2 [0 0 0 0 0 0 0] 0.6;
+    // C1
+    C1              C1 [0 0 0 0 0 0 0] 1.44;
+    // C2
+    C2              C2 [0 0 0 0 0 0 0] 1.92;
+    // C1Ref
+    C1Ref           C1Ref [0 0 0 0 0 0 0] 0.5;
+    // C2Ref
+    C2Ref           C2Ref [0 0 0 0 0 0 0] 0.3;
+    // Cs
+    Cs              Cs [0 0 0 0 0 0 0] 0.25;
+    // Ceps
+    Ceps            Ceps [0 0 0 0 0 0 0] 0.15;
+    // alphaEps
+    alphaEps        alphaEps [0 0 0 0 0 0 0] 0.76923;
+    // alphaR
+    alphaR          alphaR [0 0 0 0 0 0 0] 1.22;
+}
+
+// Standard Spalart-Allmaras model coefficients
+SpalartAllmarasCoeffs
+{
+    // alphaNut
+    alphaNut        alphaNut [0 0 0 0 0 0 0] 1.5;
+    // Cb1
+    Cb1             Cb1 [0 0 0 0 0 0 0] 0.1355;
+    // Cb2
+    Cb2             Cb2 [0 0 0 0 0 0 0] 0.622;
+    // Cw2
+    Cw2             Cw2 [0 0 0 0 0 0 0] 0.3;
+    // Cw3
+    Cw3             Cw3 [0 0 0 0 0 0 0] 2;
+    // Cv1
+    Cv1             Cv1 [0 0 0 0 0 0 0] 7.1;
+    Cv2             Cv2 [0 0 0 0 0 0 0] 5.0;
+}
+
+// Wall function coefficients
+wallFunctionCoeffs
+{
+    // kappa
+    kappa           kappa [0 0 0 0 0 0 0] 0.4187;
+    // E
+    E               E [0 0 0 0 0 0 0] 9;
+}
+
+
+// ************************************************************************* //

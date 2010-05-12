@@ -1,0 +1,11 @@
+interfaceProperties.C
+interfaceCompression/interfaceCompression.C
+
+gammaContactAngle/gammaContactAngle/gammaContactAngleFvPatchScalarField.C
+gammaContactAngle/constantGammaContactAngle/constantGammaContactAngleFvPatchScalarField.C
+gammaContactAngle/dynamicGammaContactAngle/dynamicGammaContactAngleFvPatchScalarField.C
+gammaContactAngle/timeVaryingGammaContactAngle/timeVaryingGammaContactAngleFvPatchScalarField.C
+
+gammaFixedPressure/gammaFixedPressureFvPatchScalarField.C
+
+LIB = $(FOAM_LIBBIN)/libinterfaceProperties

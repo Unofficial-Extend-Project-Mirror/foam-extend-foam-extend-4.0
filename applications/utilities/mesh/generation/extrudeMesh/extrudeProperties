@@ -1,0 +1,50 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      extrudeProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+extrudeModel        wedge;
+//extrudeModel        linearNormal;
+//extrudeModel        linearRadial;
+//extrudeModel        sigmaRadial;
+
+nLayers             1;
+
+wedgeCoeffs
+{
+    axisPt          (0 0 0);
+    axisNormal      (0 -1 0);
+    angle           2.0;
+}
+
+linearNormalCoeffs
+{
+    thickness       0.1;
+}
+
+linearRadialCoeffs
+{
+     R              0.1;
+}
+
+sigmaRadialCoeffs
+{
+    RTbyg           1;
+    pRef            1;
+    pStrat          1;
+}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+

@@ -1,0 +1,5 @@
+freeSurface.C
+makeFreeSurfaceData.C
+freeSurfacePointDisplacement.C
+
+LIB = $(FOAM_LIBBIN)/libfreeSurface

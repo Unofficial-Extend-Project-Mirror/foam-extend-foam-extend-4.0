@@ -1,0 +1,104 @@
+polyMeshModifiers = polyMeshModifiers
+
+$(polyMeshModifiers)/polyMeshModifier/polyMeshModifier.C
+$(polyMeshModifiers)/polyMeshModifier/newPolyMeshModifier.C
+
+attachDetach = $(polyMeshModifiers)/attachDetach
+$(attachDetach)/attachDetach.C
+$(attachDetach)/attachInterface.C
+$(attachDetach)/detachInterface.C
+$(attachDetach)/attachDetachPointMatchMap.C
+
+layerAdditionRemoval = $(polyMeshModifiers)/layerAdditionRemoval
+$(layerAdditionRemoval)/layerAdditionRemoval.C
+$(layerAdditionRemoval)/setLayerPairing.C
+$(layerAdditionRemoval)/addCellLayer.C
+$(layerAdditionRemoval)/removeCellLayer.C
+
+$(polyMeshModifiers)/perfectInterface/perfectInterface.C
+$(polyMeshModifiers)/setUpdater/setUpdater.C
+
+slidingInterface = $(polyMeshModifiers)/slidingInterface
+enrichedPatch = $(slidingInterface)/enrichedPatch
+$(enrichedPatch)/enrichedPatch.C
+$(enrichedPatch)/enrichedPatchPointMap.C
+$(enrichedPatch)/enrichedPatchFaces.C
+$(enrichedPatch)/enrichedPatchPointPoints.C
+$(enrichedPatch)/enrichedPatchCutFaces.C
+$(enrichedPatch)/enrichedPatchMasterPoints.C
+
+$(slidingInterface)/slidingInterface.C
+$(slidingInterface)/slidingInterfaceProjectPoints.C
+$(slidingInterface)/coupleSlidingInterface.C
+$(slidingInterface)/slidingInterfaceAttachedAddressing.C
+$(slidingInterface)/slidingInterfaceClearCouple.C
+$(slidingInterface)/decoupleSlidingInterface.C
+
+polyTopoChange/polyTopoChange/polyTopoChange.C
+polyTopoChange/polyTopoChange/actions/topoAction/topoActions.C
+
+polyTopoChange/polyTopoChanger/polyTopoChanger.C
+polyTopoChange/polyTopoChanger/polyTopoChangerChangeMesh.C
+
+meshMotion = meshMotion
+$(meshMotion)/motionSmoother/motionSmoother.C
+$(meshMotion)/motionSmoother/motionSmootherCheck.C
+$(meshMotion)/motionSmoother/polyMeshGeometry/polyMeshGeometry.C
+
+$(meshMotion)/motionSolver/motionSolver.C
+$(meshMotion)/RBFMotionSolver/RBFMotionSolver.C
+
+refinementData/refinementData.C
+refinementData/refinementDistanceData.C
+refinementData/refinementHistory.C
+
+directTopoChange/directTopoChange/directTopoChange.C
+
+directActions = directTopoChange/directTopoChange/directActions
+$(directActions)/addPatchCellLayer.C
+$(directActions)/edgeCollapser.C
+$(directActions)/faceCollapser.C
+$(directActions)/hexRef8.C
+$(directActions)/removeCells.C
+$(directActions)/removeFaces.C
+$(directActions)/removePoints.C
+$(directActions)/combineFaces.C
+$(directActions)/localPointRegion.C
+$(directActions)/duplicatePoints.C
+
+meshCut = directTopoChange/meshCut
+$(meshCut)/cellLooper/cellLooper.C
+$(meshCut)/cellLooper/topoCellLooper.C
+$(meshCut)/cellLooper/geomCellLooper.C
+$(meshCut)/cellLooper/hexCellLooper.C
+$(meshCut)/directions/directions.C
+$(meshCut)/directions/directionInfo/directionInfo.C
+$(meshCut)/edgeVertex/edgeVertex.C
+$(meshCut)/cellCuts/cellCuts.C
+$(meshCut)/splitCell/splitCell.C
+$(meshCut)/refineCell/refineCell.C
+$(meshCut)/wallLayerCells/wallLayerCells.C
+$(meshCut)/wallLayerCells/wallNormalInfo/wallNormalInfo.C
+
+modifiers = $(meshCut)/modifiers
+$(modifiers)/boundaryCutter/boundaryCutter.C
+$(modifiers)/meshCutter/meshCutter.C
+$(modifiers)/meshCutAndRemove/meshCutAndRemove.C
+$(modifiers)/undoableMeshCutter/undoableMeshCutter.C
+$(modifiers)/refinementIterator/refinementIterator.C
+$(modifiers)/multiDirRefinement/multiDirRefinement.C
+
+meshAdder = directTopoChange/meshAdder
+$(meshAdder)/polyMeshAdder/faceCoupleInfo.C
+$(meshAdder)/polyMeshAdder/polyMeshAdder.C
+$(meshAdder)/fvMeshAdder/fvMeshAdder.C
+
+directTopoChange/boundaryMesh/octreeDataFaceList.C
+directTopoChange/boundaryMesh/boundaryPatch.C
+directTopoChange/boundaryMesh/boundaryMesh.C
+directTopoChange/fvMeshDistribute/fvMeshDistribute.C
+
+
+directTopoChange/repatch/repatch.C
+
+LIB = $(FOAM_LIBBIN)/libdynamicMesh

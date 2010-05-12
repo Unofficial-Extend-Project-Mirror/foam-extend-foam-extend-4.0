@@ -1,0 +1,3 @@
+barotropicCavitatingFoam.C
+
+EXE = $(FOAM_APPBIN)/barotropicCavitatingFoam

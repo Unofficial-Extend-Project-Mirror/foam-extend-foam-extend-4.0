@@ -1,0 +1,3 @@
+rasInterFoam.C
+
+EXE = $(FOAM_APPBIN)/rasInterFoam

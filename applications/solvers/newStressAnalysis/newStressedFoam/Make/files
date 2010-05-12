@@ -1,0 +1,3 @@
+newStressedFoam.C
+
+EXE = $(FOAM_APPBIN)/newStressedFoam

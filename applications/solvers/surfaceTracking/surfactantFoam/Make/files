@@ -1,0 +1,3 @@
+surfactantFoam.C
+
+EXE = $(FOAM_APPBIN)/surfactantFoam

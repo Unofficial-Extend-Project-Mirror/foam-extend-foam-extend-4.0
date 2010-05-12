@@ -1,0 +1,26 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      filterProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+filter                 off;
+
+// filterNormal has to be in the direction of trapped particles
+filterNormal           (0 0 1);
+
+filterPosition         filterPosition      [0 1 0 0 0]     (0 0 0.02);
+
+filterThickness        filterThickness     [0 1 0 0 0]     1.0e-6;
+
+// ************************************************************************* //

@@ -1,0 +1,105 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#-------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation; either version 2 of the License, or (at your
+#     option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM; if not, write to the Free Software Foundation,
+#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Script
+#     foamPackChanged <directory> <tarFile>
+#
+# Description
+#     Packs and compresses files that have a corresponding .orig file
+#
+#------------------------------------------------------------------------------
+tmpFile=${TMPDIR:-/tmp}/foamPackChanged.$$
+
+if [ $# -ne 2 ]; then
+   echo "Usage : ${0##*/} directory tarFile"
+   echo ""
+   echo "Packs and compresses files that have a corresponding .orig file"
+   echo ""
+   exit 1
+fi
+
+# canonical form (no double and no trailing dashes)
+packDir=$(echo "$1" | sed -e 's@//*@/@g' -e 's@/$@@')
+packFile=$2
+
+if [ ! -d $packDir ]; then
+   echo "Error: directory $packDir does not exist"
+   exit 1
+fi
+
+# Clean up on termination and on Ctrl-C
+trap 'rm -f $tmpFile 2>/dev/null; exit 0' EXIT TERM INT
+
+fileCount=0
+cat /dev/null > $tmpFile
+
+find -H $packDir               \
+    ! -type d                  \
+    -type f                    \
+    -name "*.orig"             \
+| sed                          \
+ -e "\@$packDir/lib/@d"        \
+ -e '\@applications/bin/@d'      \
+ -e '\@/t/@d'                    \
+ -e '\@Make[.A-Za-z]*/[^/]*/@d'  \
+ -e '\@[Dd]oxygen/html@d'        \
+ -e '\@[Dd]oxygen/latex@d'       \
+ -e '\@[Dd]oxygen/man@d'         \
+ -e "s@$packDir/*@@"             \
+ | \
+ (
+    while read file
+    do
+       (( fileCount=$fileCount + 1 ))
+
+       file=${file%%.orig}
+
+       if [ -f "$packDir/$file" ]
+       then
+          echo $fileCount $file
+          echo $packDir/$file >> $tmpFile
+       else
+          echo "[MISSING]" $file
+       fi
+    done
+ )
+
+# file fileCount
+fileCount=$(cat $tmpFile | wc -l)
+echo "----------------------------------------------------------------------"
+echo "pack $fileCount updated (non-.orig) files"
+
+tar -czpf $packFile --files-from $tmpFile
+
+if [ $? = 0 ]
+then
+   echo "Finished packing changed files from $packDir into $packFile"
+else
+   echo "Error: failure packing changed files from $packDir into $packFile"
+   rm -f $packFile 2>/dev/null
+fi
+echo "----------------------------------------------------------------------"
+
+# ----------------------------------------------------------------------------

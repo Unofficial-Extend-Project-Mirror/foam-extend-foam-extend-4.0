@@ -1,0 +1,131 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#-------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation; either version 2 of the License, or (at your
+#     option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM; if not, write to the Free Software Foundation,
+#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Script
+#     foamPackThirdPartyBin <archOptions> [outputDir]
+#
+# Description
+#     Packs and compresses binary version of OpenFOAM ThirdParty for release
+#
+#------------------------------------------------------------------------------
+tmpDir=${TMPDIR:-/tmp}/foamPackDir.$$
+
+#
+# FUNCTIONS
+#
+printUsage () {
+cat <<EOF
+   Usage : ${0##*/} [-l] <archOptions> [outputDir]"
+EOF
+}
+
+timeStamp=$(date +%Y-%m-%d)
+packDir=$WM_PROJECT-$WM_PROJECT_VERSION
+packFile=${packDir}.${arch}_${timeStamp}.tgz
+
+#
+# OPTIONS
+#
+OPTS=`getopt hl $*`
+if [ $? -ne 0 ] ; then
+    echo "Aborting due to invalid option"
+    printUsage
+    exit 1
+fi
+
+eval set -- '$OPTS'
+while [ "$1" != "--" ]; do
+    case $1 in
+        -l) LZM=1;;
+        -h) printUsage; exit 1;;
+    esac
+    shift
+done
+shift
+
+if [ $# = 0 ]; then
+   printUsage;
+   exit 1
+fi
+archOptions=$1
+arch=${archOptions%%G*}
+arch3264=$(echo "$arch" | sed 's@64@-64@')
+
+echo "archOptions=$archOptions"
+echo "arch=$arch"
+echo "arch3264=$arch3264"
+
+timeStamp=$(date +%Y-%m-%d)
+packDir=ThirdParty
+
+if [ $LZM ]; then
+   packFile=${packDir}.${arch}_${timeStamp}.lzm
+else
+   packFile=${packDir}.${arch}_${timeStamp}.tgz
+fi
+
+# add optional output directory
+if [ -d "$2" ]
+then
+   packFile="$2/$packFile"
+fi
+
+if [ -f $packFile ]
+then
+   echo "Error: $packFile already exists"
+   exit 1
+fi
+
+# get list of directories
+dirList=`find $packDir -type d -name $arch -o -type d -name $archOptions'*' -o -type l -name $arch3264`
+echo
+echo "Packing $archOptions port of $packDir into $packFile"
+echo
+
+if [ $LZM ]; then
+
+   # Clean up on termination and on Ctrl-C
+   trap 'rm -rf $tmpDir 2>/dev/null; exit 0' EXIT TERM INT
+
+   mkdir $tmpDir $tmpDir/OpenFOAM
+   cp -arl --parents $dirList $tmpDir/OpenFOAM
+   foamDir2lzm $tmpDir $packFile
+   echo; echo
+
+else
+
+   tar czpf $packFile $dirList
+
+fi
+
+if [ $? = 0 ]
+then
+   echo "Finished packing and compressing file $packFile"
+else
+   echo "Error: failure packing $packFile"
+   rm -f $packFile 2>/dev/null
+fi
+
+#------------------------------------------------------------------------------

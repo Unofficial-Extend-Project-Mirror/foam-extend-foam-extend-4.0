@@ -1,0 +1,17 @@
+physicalConstants/physicalConstants.C
+
+basicMixture = mixtures/basicMixture
+basicThermo = basicThermo
+
+$(basicMixture)/basicMixture.C
+$(basicThermo)/basicThermo.C
+$(basicThermo)/newBasicThermo.C
+$(basicThermo)/basicThermos.C
+
+derivedFvPatchFields/fixedEnthalpy/fixedEnthalpyFvPatchScalarField.C
+derivedFvPatchFields/gradientEnthalpy/gradientEnthalpyFvPatchScalarField.C
+derivedFvPatchFields/mixedEnthalpy/mixedEnthalpyFvPatchScalarField.C
+
+derivedFvPatchFields/wallHeatTransfer/wallHeatTransferFvPatchScalarField.C
+
+LIB = $(FOAM_LIBBIN)/libbasicThermophysicalModels

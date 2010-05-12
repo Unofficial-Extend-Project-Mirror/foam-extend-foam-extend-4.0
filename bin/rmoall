@@ -1,0 +1,2 @@
+#!/bin/sh
+find . \( -name '*.o' \) -print | xargs -t rm

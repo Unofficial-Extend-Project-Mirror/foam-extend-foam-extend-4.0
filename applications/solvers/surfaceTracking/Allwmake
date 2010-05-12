@@ -1,0 +1,10 @@
+#!/bin/sh
+set -x
+
+wmake surfactantFoam
+
+wmake libso freeSurface
+
+wmake sloshingInterTrackFoam
+wmake interTrackFoam
+wmake bubbleInterTrackFoam

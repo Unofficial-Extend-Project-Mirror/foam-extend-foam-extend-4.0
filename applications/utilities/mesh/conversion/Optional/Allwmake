@@ -1,0 +1,28 @@
+#!/bin/sh
+# Build optional components (eg, may depend on third-party libraries)
+set -x
+
+# run from this directory only
+cd ${0%/*} || exit 1
+
+if [ "`uname -s`" == Darwin ]; then
+    WM_SHARED_SUFFIX=dylib
+else
+    WM_SHARED_SUFFIX=so
+fi 
+
+# build libccmio if required
+if [ ! -e $FOAM_LIBBIN/libccmio.$WM_SHARED_SUFFIX ]
+then
+(
+   cd $WM_THIRD_PARTY_DIR && ./AllwmakeLibccmio
+)
+fi
+
+# if the library built okay, the headers must exist too
+if [ -e $FOAM_LIBBIN/libccmio.$WM_SHARED_SUFFIX ]
+then
+   wmake ccm26ToFoam
+fi
+
+# end

@@ -1,0 +1,2 @@
+#!/bin/sh
+find . \( -name '*.class' \) -print | xargs -t rm

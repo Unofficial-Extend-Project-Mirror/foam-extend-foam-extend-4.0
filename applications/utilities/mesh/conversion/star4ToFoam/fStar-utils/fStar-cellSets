@@ -1,0 +1,318 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+use Data::Dumper;
+use POSIX qw( );
+use Getopt::Std qw( getopts );
+
+( my $Script = $0 ) =~ s{^.*/}{};
+
+our ( $VERSION, $DATE ) = do {
+    my ( $ver, $date ) =
+      q{$Id: fStar-cellSets,v 1.0 2006-10-04 09:39:34 cfdadmin Exp $} =~
+      m{\s+(\d+\.\d+).*?\s+(\d{4}[-/]\d{2}[-/]\d{2})\s*};
+    $date =~ s{/}{-}g;    # ISO-formatted
+
+    ( $ver, $date );
+};
+
+# for simplicity - use '..' as rootDir and pwd as caseDir
+my %config = (
+    rootDir => "..",
+    caseDir => do { ( my $x = POSIX::getcwd ) =~ s{^.*/}{}; $x },
+);
+
+# -----------------------------------------------------------------------------
+sub usage {
+    $! = 0;    # clean exit status
+    warn "@_\n" if @_;
+    die <<"USAGE";
+usage:
+    $Script [OPTION]    [property1 .. propertyN]
+
+options:
+  -a        automatic generation
+  -h        usage
+  -l        list (dump) properties
+
+create OpenFOAM cellSets constant/polyMesh/sets/...
+* default is to split on Id (the cellTableId)
+
+The requested property names are reformatted for correct capitalization
+and to end with 'Id'.
+eg,
+    porosity => PorosityId
+
+version $VERSION ($DATE)
+copyright (c) 2006 Mark Olesen <Mark.Olesen\@ArvinMeritor.com>
+USAGE
+}
+
+# -----------------------------------------------------------------------------
+my %opt;
+getopts( "hal", \%opt ) or usage();
+$opt{h} and usage();
+
+sub FoamDivider {
+    "// " . ( "* " x 37 ) . "//\n";
+}
+
+#
+# scan header first
+#
+sub get_foamheader {
+    my @lines;
+    my $internalField = shift;
+
+    while (<>) {
+	m{/\*} .. m{\*/} and next;    # skip C comments
+	m{^\s*//}        and next;    # skip C++ comments
+	if ( m{^FoamFile\s*$} .. m{^\}} ) {    # ignore header
+	    push @lines, $_;
+	    last if m{^\}};
+	}
+    }
+
+    if ( grep { /binary/ } @lines ) {
+	die "file '$ARGV' is binary - we do not do binary\n";
+    }
+
+    ## cue to internalField ...
+    if ($internalField) {
+	while (<>) {
+	    last if /\(/;
+	}
+    }
+
+    ## warn Dumper( \@lines );
+    return @lines;
+}
+
+sub read_cellTableDict {
+    my $file     = join "/" => qw( constant cellTable );
+    my $fullpath = join "/" => ( $config{rootDir}, $config{caseDir}, $file );
+
+    ## open and auto-process gzip files
+    local @ARGV =
+      map { /\.gz$/ ? qq{gzip -dc "$_" |} : $_ }
+      map { ( -f $_ or -f ( $_ .= ".gz" ) ) ? $_ : () } $fullpath;
+
+    @ARGV or die "no $file or $file.gz\n";
+
+    my @header = get_foamheader();
+
+    my ( %dict, %subdict );
+    while (<>) {
+	m{/\*} .. m{\*/} and next;    # skip C comments
+	m{^\s*//}        and next;    # skip C++ comments
+	if ( m{^\w+\s*$} .. m{^\}} ) {    # subDict entry
+	    if (s{\s*;\s*}{}) {
+		unless (/\"/) {           # we don't do strings
+		    my ( $k, $v ) = split;
+		    $subdict{$k} = $v;
+		}
+	    }
+	    elsif (/^\}/) {               # done - add to hash
+
+		# create meta-entries '-fluid' and '-solid', etc.
+		# from MaterialType/MaterialId
+		if (    exists $subdict{MaterialType}
+		    and exists $subdict{MaterialId} )
+		{
+		    $subdict{ lc "-$subdict{MaterialType}" } =
+		      $subdict{MaterialId};
+		}
+
+		if ( my $id = delete $subdict{Id} ) {
+		    %{ $dict{$id} } = %subdict;
+		}
+
+		%subdict = ();
+	    }
+	}
+    }
+
+    return %dict;
+
+}
+
+my %cellTableDict = read_cellTableDict();
+
+{
+    my $cellSet_header = do { local $/; <DATA> };
+
+    # return an anonymous file handle
+    sub init_cellSet {
+	my $object   = shift;
+	my $dir      = join "/" => qw( constant polyMesh sets );
+	my $fullpath =
+	  join "/" => ( $config{rootDir}, $config{caseDir}, $dir, $object );
+
+	mkdir join "/" => ( $config{rootDir}, $config{caseDir}, $dir );
+
+	# remove old junk
+	unlink( $fullpath, "$fullpath.gz" );
+
+	local *ANON_FH;
+	open ANON_FH, ">$fullpath" or die "cannot write $fullpath\n";
+
+	warn qq{creating "$fullpath"\n};
+
+	#
+	# create header -  simple substitutions
+	#
+	my %var = ( CASE => $config{caseDir}, OBJECT => $object );
+
+	( my $header = $cellSet_header ) =~
+	  s/%{\s*([_A-Z]+)\s*}/ $var{$1} || '' /eg;
+
+	print ANON_FH $header;
+	print ANON_FH "(\n";    # start list
+
+	return *ANON_FH;
+    }
+}
+
+sub create_cellSet {
+    my %map = @_;
+    my ( $dir, $object ) = qw( 0 cellTableId );
+    my $file = join "/" => ( $dir, $object );
+    my $fullpath = join "/" => ( $config{rootDir}, $config{caseDir}, $file );
+
+    ## open and auto-process gzip files
+    local @ARGV =
+      map { /\.gz$/ ? qq{gzip -dc "$_" |} : $_ }
+      map { ( -f $_ or -f ( $_ .= ".gz" ) ) ? $_ : () } $fullpath;
+
+    @ARGV or die "no $file or $file.gz\n";
+
+    get_foamheader( -internalField );
+
+    my ( $cellId, %opened ) = 0;
+
+    while (<>) {
+	my ($tableId) = /^\s*(\d+)\s*$/ or last;
+
+	#
+	# cell set corresponds to the cellTableId
+	# - no need for auxiliary file information
+	#
+	if ( $map{-Id} ) {
+	    my $entry = "cellTableId_$tableId";
+	    my $fh = $opened{$entry} ||= init_cellSet($entry);
+	    print $fh $cellId, "\n";
+	}
+
+	if ( $map{$tableId} ) {
+	    for my $entry ( @{ $map{$tableId} } ) {
+		my $fh = $opened{$entry} ||= init_cellSet($entry);
+		print $fh $cellId, "\n";
+	    }
+	}
+	$cellId++;
+    }
+
+    # flush list for each file
+    for my $fh ( values %opened ) {
+	print $fh ");\n\n", FoamDivider;
+    }
+}
+
+sub make_cellSet {
+    my @list = @_;
+    my %nomod = map { $_ => 1 } qw( fluid solid );
+    my %map;
+
+    if ( grep { /^Id/i } @list ) {
+	@list = grep { not /^Id/i } @list;
+	$map{-Id}++;    # trigger specialized version
+    }
+
+    for (@list) {
+	my ( $prop, $ignore ) = map { lc } split /:/;
+	$ignore ||= 0;
+
+	unless ( exists $nomod{$prop} ) {
+	    ( $prop = ucfirst $prop ) =~ s/id$/Id/;
+	    $prop =~ /Id$/ or $prop .= "Id";
+	}
+
+	for my $tableId ( keys %cellTableDict ) {
+	    my %dict   = %{ $cellTableDict{$tableId} };
+	    my $propid = $dict{$prop} or next;
+
+	    if ( $propid > $ignore ) {
+		push @{ $map{$tableId} ||= [] }, "${prop}_$propid";
+	    }
+	}
+    }
+
+    if (%map) {
+	create_cellSet(%map);
+    }
+    elsif (@list) {
+	warn "no property '@list' found\n";
+    }
+}
+
+if ( $opt{l} ) {
+    local $Data::Dumper::Sortkeys = 1;
+    die Data::Dumper->Dump( [\%cellTableDict], [qw(*cellTableDict)] );
+}
+
+if ( $opt{a} ) {
+    my ( $hasSolid, %hash );
+
+    for ( values %cellTableDict ) {
+	my $href = $_;
+
+	if ( $href->{MaterialType} and $href->{MaterialType} =~ /solid/i ) {
+	    $hasSolid++;
+	}
+
+	for my $k ( grep { /Id$/ } keys %$href ) {
+	    my $v = $href->{$k};
+	    $hash{$k}{$v}++;
+	}
+    }
+
+    # discard entries that only appear once
+    delete @hash{ grep { keys %{ $hash{$_} } < 2 } keys %hash };
+
+    $hash{solid}++ if $hasSolid;
+
+    @ARGV = ( "Id", keys %hash );
+
+    warn "auto-extracting: @ARGV\n\n";
+}
+else {
+    @ARGV or @ARGV = ("Id");
+}
+
+make_cellSet(@ARGV);
+
+__DATA__
+/*------------------------------*- c-mode -*---------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.3                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version 2.0;
+    format ascii;
+
+    root "..";
+    case "%{CASE}";
+    instance "constant";
+    local "polyMesh/sets";
+
+    class cellSet;
+    object %{OBJECT};
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+

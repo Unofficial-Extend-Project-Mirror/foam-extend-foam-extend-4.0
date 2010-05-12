@@ -1,0 +1,3 @@
+turbDyMEngineFoam.C
+
+EXE = $(FOAM_APPBIN)/turbDyMEngineFoam

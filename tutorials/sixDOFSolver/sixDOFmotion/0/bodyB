@@ -1,0 +1,46 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.3                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          bodyB;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+mass                m           [1 0 0 0 0 0 0]      1;
+momentOfInertia     J           [1 2 0 0 0 0 0]      (1 1 1);
+
+equilibriumPosition Xeq         [0 1 0 0 0 0 0]      (-1 0 0);
+linearSpring        k           [1 0 -2 0 0 0 0]     (1 1 1);
+linearDamping       d           [1 0 -1 0 0 0 0]     (0 0 0);
+
+// Xabs = Xeq + Xrel
+Xrel                Xrel        [0 1 0 0 0 0 0]      (0 0 0);
+U                   U           [0 1 -1 0 0 0 0]     (0 0 0);
+Uold                Uold        [0 1 -1 0 0 0 0]     (0 0 0);
+rotationVector                                       (0 0 1);
+rotationAngle       rA          [0 0 0 0 0 0 0]      0;
+omega               rotU        [0 0 -1 0 0 0 0]     (0 -1 0);
+
+force               f           [1 1 -2 0 0 0 0]     (0 0 0);
+moment              m           [1 2 -2 0 0 0 0]     (0 0 0);
+
+forceRelative       fRel        [1 1 -2 0 0 0 0]     (0 0 0);
+momentRelative      mRel        [1 2 -2 0 0 0 0]     (0 0 10);
+
+// ************************************************************************* //

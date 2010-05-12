@@ -1,0 +1,81 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           volScalarField;
+    object          p;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+dimensions      [0 2 -2 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    movingWall      
+    {
+        type            zeroGradient;
+    }
+
+    farFieldMoving  
+    {
+        type            zeroGradient;
+    }
+
+    fixedWall       
+    {
+        type            zeroGradient;
+    }
+
+    axis            
+    {
+        type            empty;
+    }
+
+    left            
+    {
+        type            totalPressure;
+        p0              uniform 0;
+        U               U;
+        phi             phi;
+        rho             none;
+        psi             none;
+        gamma           1.0;
+        value           uniform 0;
+    }
+
+    farField        
+    {
+        type            zeroGradient;
+    }
+
+    back            
+    {
+        type            wedge;
+    }
+
+    front           
+    {
+        type            wedge;
+    }
+}
+
+
+// ************************************************************************* //

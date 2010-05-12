@@ -1,0 +1,88 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    p GAMG
+    {
+        tolerance        1e-8;
+        relTol           0;
+
+        smoother         DIC; //GaussSeidel;
+        nPreSweeps       0;
+        nPostSweeps      2;
+        nFinestSweeps    2;
+
+        cacheAgglomeration true;
+        nCellsInCoarsestLevel 10;
+        agglomerator     faceAreaPair;
+        mergeLevels      1;
+    };
+    Ua PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-05;
+        relTol           0;
+    };
+    Ub PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-05;
+        relTol           0;
+    };
+    alpha PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-10;
+        relTol           0;
+    };
+    beta PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-10;
+        relTol           0;
+    };
+    Theta PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-05;
+        relTol           0;
+    };
+    k PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-05;
+        relTol           0;
+    };
+    epsilon PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-05;
+        relTol           0;
+    };
+}
+
+PISO
+{
+    nCorrectors     2;
+    nNonOrthogonalCorrectors 0;
+    nAlphaCorr      2;
+    correctAlpha    yes;
+    pRefCell        0;
+    pRefValue       0;
+}
+
+// ************************************************************************* //

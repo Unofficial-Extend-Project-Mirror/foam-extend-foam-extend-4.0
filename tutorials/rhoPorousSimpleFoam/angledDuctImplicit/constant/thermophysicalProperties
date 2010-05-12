@@ -1,0 +1,28 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      thermophysicalProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+thermoType      hThermo<pureMixture<sutherlandTransport<specieThermo<hConstThermo<perfectGas>>>>>;
+
+mixture
+    air 1 28.9      // specieThermo
+    1007 0          // hConstThermo
+//  1.84766e-05 0.7    // constTransport - 300K
+//  2.68477e-05 0.7    // constTransport - 500K
+//  3.93094e-05 0.7    // constTransport - 900K
+    1.4792e-06 116     // sutherlandTransport (Star-CD)
+//  1.4584e-06 110.33  // sutherlandTransport (European Space Agency)
+;
+
+// ************************************************************************* //

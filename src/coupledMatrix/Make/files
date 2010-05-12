@@ -1,0 +1,25 @@
+coupledLduMatrix/coupledLduMatrix.C
+
+coupledLduPrecon/coupledLduPrecon/coupledLduPrecon.C
+coupledLduPrecon/noPrecon/coupledNoPrecon.C
+coupledLduPrecon/diagonalPrecon/coupledDiagonalPrecon.C
+coupledLduPrecon/GaussSeidelPrecon/coupledGaussSeidelPrecon.C
+coupledLduPrecon/CholeskyPrecon/coupledCholeskyPrecon.C
+
+coupledLduSmoother/coupledLduSmoother/coupledLduSmoother.C
+coupledLduSmoother/GaussSeidelSmoother/coupledGaussSeidelSmoother.C
+coupledLduSmoother/iluSmoother/coupledIluSmoother.C
+
+coupledLduSolver/coupledSolverPerformance/coupledSolverPerformance.C
+coupledLduSolver/coupledLduSolver/coupledLduSolver.C
+coupledLduSolver/iterativeSolver/coupledIterativeSolver.C
+coupledLduSolver/diagonalSolver/coupledDiagonalSolver.C
+coupledLduSolver/smoothSolver/coupledSmoothSolver.C
+coupledLduSolver/cgSolver/coupledCgSolver.C
+coupledLduSolver/bicgSolver/coupledBicgSolver.C
+coupledLduSolver/bicgStabSolver/coupledBicgStabSolver.C
+
+coupledFvMatrices/coupledFvMatrices.C
+coupledFvMatrices/coupledFvScalarMatrix/coupledFvScalarMatrix.C
+
+LIB = $(FOAM_LIBBIN)/libcoupledLduMatrix

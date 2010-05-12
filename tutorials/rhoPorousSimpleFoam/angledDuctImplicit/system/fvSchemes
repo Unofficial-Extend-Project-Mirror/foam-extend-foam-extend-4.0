@@ -1,0 +1,87 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default             steadyState;
+}
+
+gradSchemes
+{
+    default             Gauss linear;
+    // UEqn
+    grad(U)             Gauss linear;
+    grad(p)             Gauss linear;
+}
+
+divSchemes
+{
+    //- default         Gauss upwind;
+    // UEqn
+    div(phi,U)          Gauss upwind;
+    div((muEff*dev2(grad(U).T())))      Gauss linear;
+    // hEqn
+    div(phi,h)          Gauss upwind;
+    // epsilonEqn
+    div(phi,epsilon)    Gauss upwind;
+    // kEqn
+    div(phi,k)          Gauss upwind;
+
+    // experimental
+    div(phid,p)         Gauss linear;
+}
+
+laplacianSchemes
+{
+    //- default             Gauss linear corrected;
+    // UEqn
+    laplacian(muEff,U)      Gauss linear corrected;
+
+    // hEqn
+    laplacian(alphaEff,h)   Gauss linear corrected;
+
+    // pCorrect
+    laplacian((rho*rAU),p) Gauss linear corrected;
+
+    // epsilonEqn
+    laplacian(DepsilonEff,epsilon)  Gauss linear corrected;
+
+    // kEqn
+    laplacian(DkEff,k)      Gauss linear corrected;
+
+    // potential
+    laplacian(1,p)          Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default                 linear;
+    // default              upwind phi;
+    div(U,p)                upwind phi;
+}
+
+snGradSchemes
+{
+    default                 corrected;
+}
+
+fluxRequired
+{
+    default                 no;
+    p;
+}
+
+// ************************************************************************* //

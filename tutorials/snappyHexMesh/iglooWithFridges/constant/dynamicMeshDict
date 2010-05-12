@@ -1,0 +1,52 @@
+// The FOAM Project // File: motionProperties
+/*
+
+-------------------------------------------------------------------------------
+ =========         | dictionary
+ \\      /         |
+  \\    /          | Name:   motionProperties
+   \\  /           | Family: FoamX configuration file
+    \\/            |
+    F ield         | FOAM version: 2.1
+    O peration     | Product of Nabla Ltd.
+    A and          |
+    M anipulation  | Email: Enquiries@Nabla.co.uk
+-------------------------------------------------------------------------------
+*/
+// FoamX Case Dictionary.
+
+version             1.0;
+format              ascii;
+
+root                "/home/warhol/chris/foam/chris2.1/run/Test";
+case                "movingCone";
+instance            "constant";
+local               "";
+
+class               dictionary;
+form                dictionary;
+object              motionProperties;
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//motionSolverLibs ("libfvMotionSolvers.so");
+solver laplacian;
+//solver componentLaplacian x;
+
+twoDMotion          no;
+
+diffusivity  uniform;
+
+//motionPlaneNormal   (0 0 1);
+//
+//movingSurface       yes;
+//
+//twoFluids           no;
+//
+//normalMotionDir     no;
+//
+//motionURF           1.0;
+//
+//boundaryCorrection  yes;
+
+// ************************************************************************* //

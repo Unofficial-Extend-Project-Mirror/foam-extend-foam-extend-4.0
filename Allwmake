@@ -1,0 +1,19 @@
+#!/bin/sh
+set -x
+
+# run from this directory only
+cd ${0%/*} || exit 1
+
+# wmake is required for subsequent targets
+(cd wmake/src && make)
+
+(cd $WM_THIRD_PARTY_DIR && ./Allwmake)
+
+(cd src && ./Allwmake)
+
+(cd applications && ./Allwmake)
+
+if [ "$1" = doc ]
+then
+   (cd doc && ./Allwmake)
+fi

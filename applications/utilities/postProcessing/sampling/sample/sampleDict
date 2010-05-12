@@ -1,0 +1,176 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  dev                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+    class           dictionary;
+    location        system;
+    object          sampleDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Set output format : choice of
+//      xmgr
+//      jplot
+//      gnuplot
+//      raw
+setFormat raw;
+
+// Surface output format. Choice of
+//      null        : suppress output
+//      foamFile    : separate points, faces and values file
+//      dx          : DX scalar or vector format
+//      vtk         : VTK ascii format
+//      raw         : x y z value format for use with e.g. gnuplot 'splot'.
+//      stl         : ascii stl. Does not contain values!
+surfaceFormat vtk;
+
+// interpolationScheme. choice of
+//	cell          : use cell-centre value only; constant over cells (default)
+//	cellPoint     : use cell-centre and vertex values
+//	cellPointFace : use cell-centre, vertex and face values.
+// 1] vertex values determined from neighbouring cell-centre values
+// 2] face values determined using the current face interpolation scheme
+//    for the field (linear, gamma, etc.)
+interpolationScheme cellPointFace;
+
+// Fields to sample.
+fields
+(
+    p
+    U
+);
+
+
+// Set sampling definition: choice of
+//      uniform             evenly distributed points on line
+//      face                one point per face intersection
+//      midPoint            one point per cell, inbetween two face intersections
+//      midPointAndFace     combination of face and midPoint
+//
+//      curve               specified points, not nessecary on line, uses
+//                          tracking
+//      cloud               specified points, uses findCell
+//
+// axis: how to write point coordinate. Choice of
+// - x/y/z: x/y/z coordinate only
+// - xyz: three columns
+//  (probably does not make sense for anything but raw)
+// - distance: distance from start of sampling line (if uses line) or
+//             distance from first specified sampling point
+//
+// type specific:
+//      uniform, face, midPoint, midPointAndFace : start and end coordinate
+//      uniform: extra number of sampling points
+//      curve, cloud: list of coordinates
+sets
+(
+    lineX1
+    {
+        type        uniform;
+        axis        distance;
+
+        //- cavity
+        start       (0.02 0.051 0.005);
+        end         (0.06 0.051 0.005);
+        nPoints     10;
+    }
+
+    lineX2
+    {
+        type        face;
+        axis        x;
+
+        //- flangeHex
+        //start       (0 20  -20);
+        //end         (0 20   10);
+
+        //- nablaCavity
+        //start       (-1 0.05 0.005);
+        //end         ( 1 0.05 0.005);
+
+        //- cavity
+        start       (0.0 0.51  0.005);
+        end         (2 0.51  0.005);
+        nPoints     10;
+    }
+);
+
+
+// Surface sampling definition: choice of
+//      plane : values on plane defined by point, normal.
+//      patch : values on patch.
+//
+// 1] planes are triangulated by default
+// 2] patches are not triangulated by default
+surfaces
+(
+    constantPlane
+    {
+        type            plane;
+        basePoint       (0.0501 0.0501 0.005);
+        normalVector    (0.1 0.1 1);
+
+        //- Optional: restrict to a particular zone
+        // zoneName        zone1;
+
+        // Optional: whether to leave as faces or triangulate (=default)
+        triangulate     false;
+    }
+
+    interpolatedPlane
+    {
+        type            plane;
+        // make plane relative to the coordinateSystem (Cartesian)
+        coordinateSystem
+        {
+            origin      (0.0501 0.0501 0.005);
+        }
+        basePoint       (0 0 0);
+        normalVector    (0.1 0.1 1);
+        triangulate     false;
+        interpolate     true;
+    }
+
+    movingWall_constant
+    {
+        type            patch;
+        patchName       movingWall;
+        // Optional: whether to leave as faces (=default) or triangulate
+    }
+
+    movingWall_interpolated
+    {
+        type            patch;
+        patchName       movingWall;
+        interpolate     true;
+        // Optional: whether to leave as faces (=default) or triangulate
+    }
+
+/* not yet (re)implemented --
+    constantIso
+    {
+        name            iso;
+        field           rho;
+        value           0.5;
+    }
+    someIso
+    {
+        type            iso;
+        field           rho;
+        value           0.5;
+        interpolate     true;
+    }
+ */
+);
+
+
+// *********************************************************************** //

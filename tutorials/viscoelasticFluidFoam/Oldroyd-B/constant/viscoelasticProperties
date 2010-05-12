@@ -1,0 +1,57 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "Oldroyd-B";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          viscoelasticProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+/*
+From:
+L.M. Quinzani, R.C. Amstrong, R.A. Brown, Birefringence and laser-Doppler velocimetry (LDV) studies of
+viscoelastic flow through a planar contraction, J. Non-Newtonian Fluid Mech. 52 (1994) 1-36.
+
+5.0 wt.% solution of polyisobutylene in tetradecane
+
+Model        lambda   etaS    etaP
+Oldroyd-B     0.06     0.002   1.424
+
+*/
+
+rheology
+{
+
+        type multiMode;
+
+        models
+        (
+                first
+                {
+                type Oldroyd-B;
+                rho              rho [1 -3 0 0 0 0 0] 803.87097;
+                etaS             etaS [1 -1 -1 0 0 0 0] 0.002;
+                etaP             etaP [1 -1 -1 0 0 0 0] 1.424;
+                lambda           lambda [0 0 1 0 0 0 0] 0.06;
+                }
+        );
+
+}
+
+
+// ************************************************************************* //

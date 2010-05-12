@@ -1,0 +1,3 @@
+makeFaMesh.C
+
+EXE = $(FOAM_APPBIN)/makeFaMesh

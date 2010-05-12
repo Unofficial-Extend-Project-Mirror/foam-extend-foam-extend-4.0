@@ -1,0 +1,3 @@
+transientSimpleOodles.C
+
+EXE = $(FOAM_APPBIN)/transientSimpleOodles

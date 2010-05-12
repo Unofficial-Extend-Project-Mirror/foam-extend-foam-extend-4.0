@@ -1,0 +1,58 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "PTT-Linear";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          viscoelasticProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+/*
+From:
+AZAIEZ, J.; GUÉNETTE, R.; AiT-KADI, A. Numerical simulation of viscoelastic
+flows through a planar contraction. Journal of Non-Newtonian Fluid
+Mechanics, v. 62, n. 2-3, p. 253 - 277, 1996.
+
+Table 1
+Model        Model parameter      lambda   etaS    etaP
+PTT Linear   epsilon = 0.25       0.03     0.002   1.422
+
+*/
+
+rheology
+{
+    type multiMode;
+
+    models
+    (
+        first
+        {
+            type             PTT-Linear;
+            rho              rho [1 -3 0 0 0 0 0] 803.87097;
+            etaS             etaS [1 -1 -1 0 0 0 0] 0.002;
+            etaP             etaP [1 -1 -1 0 0 0 0] 1.422;
+            lambda           lambda [0 0 1 0 0 0 0] 0.03;
+            epsilon          epsilon [0 0 0 0 0 0 0] 0.25;
+            zeta             zeta [0 0 0 0 0 0 0] 0.0;
+        }
+    );
+}
+
+
+
+// ************************************************************************* //

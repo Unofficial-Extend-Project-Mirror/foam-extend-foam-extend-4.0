@@ -1,0 +1,109 @@
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "/home/warhol/chris/foam/chris2.1/run/tutorials/interFoam";
+    case            "damBreak";
+    instance        "system";
+    local           "";
+
+    class           dictionary;
+    object          changePatchTypeDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+dictionaryReplacement
+{
+    T
+    {
+        internalField   uniform 300;
+
+        boundaryField
+        {
+            minY
+            {
+                type            fixedValue;
+                value           uniform 500;
+            }
+
+            minZ
+            {
+                type            zeroGradient;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+            }
+        }
+    }
+
+    rho
+    {
+        internalField   uniform 8000;
+
+        boundaryField
+        {
+            minY
+            {
+                type            zeroGradient;
+            }
+            minZ
+            {
+                type            zeroGradient;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+            }
+        }
+    }
+
+
+    K
+    {
+        internalField   uniform 80;
+
+        boundaryField
+        {
+            minY
+            {
+                type            zeroGradient;
+            }
+            minZ
+            {
+                type            zeroGradient;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+            }
+        }
+    }
+
+
+    cp
+    {
+        internalField   uniform 450;
+
+        boundaryField
+        {
+            minY
+            {
+                type            zeroGradient;
+            }
+            minZ
+            {
+                type            zeroGradient;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+            }
+        }
+    }
+}
+
+// ************************************************************************* //

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+currDir=`pwd`
+application=`basename $currDir`
+cases="heatedCavity"
+
+tutorialPath=`dirname $0`/..
+. $WM_PROJECT_DIR/bin/tools/CleanFunctions
+
+for case in $cases
+do
+    (cd $case; cleanCase) 
+done
+    

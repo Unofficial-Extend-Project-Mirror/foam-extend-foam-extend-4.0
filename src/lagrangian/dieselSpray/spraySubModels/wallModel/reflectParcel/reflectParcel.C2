@@ -1,0 +1,211 @@
+// The FOAM Project // File: reflectParcel.C
+/*
+-------------------------------------------------------------------------------
+ =========         | Class Implementation
+ \\      /         |
+  \\    /          | Name:   reflectParcel
+   \\  /           | Family: wallModel
+    \\/            |
+    F ield         | FOAM version: 2.3
+    O peration     |
+    A and          | Copyright held by original author
+    M anipulation  |          All Rights Reserved.
+-------------------------------------------------------------------------------
+DESCRIPTION
+
+AUTHOR
+    Henry G Weller.
+
+-------------------------------------------------------------------------------
+*/
+
+#include "reflectParcel.H"
+#include "addToRunTimeSelectionTable.H"
+#include "wallPolyPatch.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+defineTypeNameAndDebug(reflectParcel, 0);
+
+addToRunTimeSelectionTable
+(
+    wallModel,
+    reflectParcel,
+    dictionary
+);
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+// Construct from components
+reflectParcel::reflectParcel
+(
+    const dictionary& dict,
+    const fvMesh& mesh,
+    spray& sm
+)
+:
+    wallModel(dict, mesh, sm),
+    coeffsDict_(dict.subDict(typeName + "Coeffs")),
+    elasticity_(readScalar(coeffsDict_.lookup("elasticity")))
+{}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+reflectParcel::~reflectParcel()
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+// Return 'keepParcel'
+bool reflectParcel::wallTreatment
+(
+    parcel& p
+) const
+{
+    label patchi = p.patch();
+    label facei = p.patchFace(patchi);
+
+    const polyMesh& mesh = spray_.mesh();
+
+    if (typeid(mesh_.boundaryMesh()[patchi]) == typeid(wallPolyPatch))
+    {
+        // wallNormal defined to point outwards of domain
+        vector Sf = mesh_.Sf().boundaryField()[patchi][facei];
+        Sf /= mag(Sf);
+
+        // adjust velocity when wall is moving
+        if (!mesh.moving())
+        {
+            scalar Un = p.U() & Sf;
+            
+            if (Un > 0)
+            {
+                p.U() -= (1.0 + elasticity_)*Un*Sf;
+            }
+
+        }
+        else
+        {
+            label facep = p.face();
+
+            scalar dt = spray_.runTime().deltaT().value();
+            scalar fraction = p.t0()/dt;
+            const vectorField& oldPoints = mesh.oldPoints();
+            const vector& Cf1 = mesh.faceCentres()[facep];
+
+            vector Cf0 = mesh.faces()[facep].centre(oldPoints);
+            vector Cf = Cf0 + fraction*(Cf1 - Cf0);
+            vector Sf0 = mesh.faces()[facep].normal(oldPoints);
+            Sf0 /= mag(Sf0);
+
+            scalar magSfDiff = mag(Sf - Sf0);
+
+            if (magSfDiff > SMALL)
+            {
+                bool pureRotation = false;
+
+                if (pureRotation)
+                {
+                    // rotation
+                    
+                    // find center of rotation
+                    vector omega = Sf0 ^ Sf;
+                    scalar magOmega = mag(omega);
+                    omega /= magOmega+SMALL;
+                    vector n0 = omega ^ Sf0;
+                    scalar lam = ((Cf1 - Cf0) & Sf)/(n0 & Sf);
+                    vector r0 = Cf0 + lam*n0;
+                    
+                    scalar phiVel = ::asin(magOmega)/dt;
+                    
+                    vector pos = p.position() - r0;
+                    vector v = phiVel*(omega ^ pos);
+
+                    vector Sfp = Sf0 + fraction*(Sf - Sf0);
+                    //vector Sfp = Sf;
+
+                    vector Ur = p.U() - v;
+                    scalar Urn = Ur & Sfp;
+                    /*
+                    scalar dd = (p.position() - r0) & Sfp;
+                    Info << "Urn = " << Urn
+                        << ", dd = " << dd
+                        << ", pos = " << p.position()
+                        << ", Sfp = " << Sfp
+                        << ", omega = " << omega
+                        << ", r0 = " << r0
+                        << endl;
+                        */
+                    if (Urn > 0.0)
+                    {
+                        p.U() -= (1.0 + elasticity_)*Urn*Sfp;
+                    }
+                }
+                else
+                {
+                    vector Sfp = Sf0 + fraction*(Sf - Sf0);
+                    //vector Sfp = Sf;
+                    vector omega = Sf0 ^ Sf;
+                    scalar magOmega = mag(omega);
+                    omega /= magOmega+SMALL;
+                    
+                    scalar phiVel = ::asin(magOmega)/dt;
+                    
+                    scalar dist = (p.position() - Cf) & Sfp;
+                    vector pos = p.position() - dist*Sfp;
+                    vector vrot = phiVel*(omega ^ (pos - Cf));
+                    vector vtrans = (Cf1 - Cf0)/dt;
+                    vector v = vtrans + vrot;
+
+                    scalar Un = ((p.U() - v) & Sfp);
+                    
+                    if (Un > 0.0)
+                    {
+                        p.U() -= (1.0 + elasticity_)*Un*Sfp;
+                    }
+                }
+            }
+            else
+            {
+                // translation
+
+                vector v = (Cf1 - Cf0)/dt;
+                vector Ur = p.U() - v;
+                scalar Urn = Ur & Sf;
+
+                if (Urn > 0.0)
+                {
+                    Ur -= (1.0 + elasticity_)*Urn*Sf;
+                    p.U() = Ur + v;
+                }
+
+
+            }
+        }
+
+    }
+    else
+    {
+        FatalError
+            << "bool reflectParcel::wallTreatment(parcel& parcel) const "
+                << " parcel has hit a boundary " 
+                << mesh_.boundary()[patchi].type()
+                << " which not yet has been implemented."
+            << abort(FatalError);
+    }
+    return true;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// ************************************************************************* //

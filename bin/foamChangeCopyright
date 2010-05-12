@@ -1,0 +1,1 @@
+sed -i -e 's!Copyright (C) .* OpenCFD Ltd.!Copyright held by original author!g' $1

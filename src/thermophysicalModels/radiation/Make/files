@@ -1,0 +1,31 @@
+/* Radiation constants */
+radiationConstants/radiationConstants.C
+
+
+/* Radiation model */
+radiationModel/radiationModel/radiationModel.C
+radiationModel/radiationModel/newRadiationModel.C
+radiationModel/noRadiation/noRadiation.C
+radiationModel/P1/P1.C
+
+
+/* Scatter model */
+submodels/scatterModel/scatterModel/scatterModel.C
+submodels/scatterModel/scatterModel/newScatterModel.C
+submodels/scatterModel/constantScatter/constantScatter.C
+
+
+/* Absorption/Emission model */
+submodels/absorptionEmissionModel/absorptionEmissionModel/absorptionEmissionModel.C
+submodels/absorptionEmissionModel/absorptionEmissionModel/newAbsorptionEmissionModel.C
+submodels/absorptionEmissionModel/noAbsorptionEmission/noAbsorptionEmission.C
+submodels/absorptionEmissionModel/constantAbsorptionEmission/constantAbsorptionEmission.C
+submodels/absorptionEmissionModel/binaryAbsorptionEmission/binaryAbsorptionEmission.C
+
+
+/* Boundary conditions */
+derivedFvPatchFields/MarshakRadiation/MarshakRadiationMixedFvPatchScalarField.C
+derivedFvPatchFields/MarshakRadiationFixedT/MarshakRadiationFixedTMixedFvPatchScalarField.C
+
+
+LIB = $(FOAM_LIBBIN)/libradiation

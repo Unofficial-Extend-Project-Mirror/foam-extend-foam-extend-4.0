@@ -1,0 +1,88 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version 2.0;
+    format ascii;
+
+    root "simpleFoam";
+    case "pitzDaily3Blocks";
+    instance ""constant"";
+    local "polyMesh";
+
+    class polyBoundaryMesh;
+    object boundary;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+8
+(
+inlet
+{
+    type patch;
+    nFaces 30;
+    startFace 26013;
+}
+
+outlet
+{
+    type patch;
+    nFaces 60;
+    startFace 26043;
+}
+
+upperWall
+{
+    type wall;
+    physicalType wallFunctions;
+    nFaces 228;
+    startFace 26103;
+}
+
+lowerWall
+{
+    type wall;
+    physicalType wallFunctions;
+    nFaces 210;
+    startFace 26331;
+}
+
+lowerWallInterface
+{
+    type wall;
+    physicalType wallFunctions;
+    nFaces 36;
+    startFace 26541;
+}
+
+lowerWallInlet
+{
+    type wall;
+    physicalType wallFunctions;
+    nFaces 18;
+    startFace 26577;
+}
+
+interface
+{
+    type patch;
+    nFaces 0;
+    startFace 26595;
+}
+
+defaultFaces
+{
+    type empty;
+    nFaces 26280;
+    startFace 26595;
+}
+)
+
+// ************************************************************************* //

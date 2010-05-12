@@ -1,0 +1,3 @@
+PFLAGS     = 
+PINC       = -I$(LAM_ARCH_PATH)/include
+PLIBS      = -L$(LAM_ARCH_PATH)/lib -lmpi -llam -lpthread -lutil

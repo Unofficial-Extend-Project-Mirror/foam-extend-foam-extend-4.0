@@ -1,0 +1,3 @@
+foamMeshToStar.C
+
+EXE = $(FOAM_APPBIN)/foamMeshToStar

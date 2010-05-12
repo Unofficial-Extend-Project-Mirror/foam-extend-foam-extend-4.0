@@ -1,0 +1,16 @@
+EXE_INC = \
+    -I../engineFoam \
+    -I../XiFoam \
+    -I$(LIB_SRC)/engine/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/combustion/lnInclude \
+    -I$(LIB_SRC)/turbulenceModels/RAS/compressible/lnInclude
+
+EXE_LIBS = \
+    -lengine \
+    -lfiniteVolume \
+    -lcompressibleRASModels \
+    -lbasicThermophysicalModels \
+    -lspecie

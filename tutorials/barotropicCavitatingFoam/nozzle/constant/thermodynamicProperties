@@ -1,0 +1,31 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          thermodynamicProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+rhogSat                       rhogSat    [1 -3 0 0 0]     0.345;
+rholSat                       rholSat    [1 -3 0 0 0]     1000;
+pSat                          pSat       [1 -1 -2 0 0]    3000;
+psig                          psig       [0 -2 2 0 0]     2.5e-5;
+psil                          psil       [0 -2 2 0 0]     5.5775e-7;
+
+// ************************************************************************* //

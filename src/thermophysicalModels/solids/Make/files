@@ -1,0 +1,5 @@
+solid/solid.C
+ash/ash.C
+Cs/Cs.C
+
+LIB = $(FOAM_LIBBIN)/libsolids

@@ -1,0 +1,19 @@
+EXE_INC = \
+    -I$(LIB_SRC)/engine/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/dynamicMesh/lnInclude \
+    -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/turbulenceModels/RAS
+
+EXE_LIBS = \
+    -lengine \
+    -ldynamicFvMesh \
+    -ldynamicMesh \
+    -ltopoChangerFvMesh \
+    -lcompressibleRASModels \
+    -lbasicThermophysicalModels \
+    -lspecie \
+    -lmeshTools \
+    -lfiniteVolume \
+    $(WM_DECOMP_LIBS)

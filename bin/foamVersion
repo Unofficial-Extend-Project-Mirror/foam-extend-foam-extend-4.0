@@ -1,0 +1,112 @@
+#!/bin/bash
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#-------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation; either version 2 of the License, or (at your
+#     option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM; if not, write to the Free Software Foundation,
+#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Script
+#     foamVersion
+#
+# Description
+#     Report on OpenFOAM version, and source code revision number.
+#     This implementation is using the Subversion revision control system
+#     for retrieving the revision number.
+#
+# Author: 
+#     Martin Beaudoin, Hydro-Quebec, (2009)
+#
+#------------------------------------------------------------------------------
+Script=${0##*/}
+
+usage() {
+    while [ "$#" -ge 1 ]; do echo "$1"; shift; done
+    cat<<USAGE
+
+Usage: $Script [-revision] [-help]
+
+ Report on the version of OpenFOAM, and if available, the source code revision number.
+
+ If the source code revision number is not directly available, then the string 
+ "exported" will be reported for the revision number.
+
+ Options: 
+     -revision : Report only the revision number
+     -help     : this help
+
+USAGE
+    exit 1
+}
+
+
+# Initialize the SVN client command
+SVN_CMD='svn'
+
+# initialize the Revision number to "exported" by default.
+# This is the expected information reported by svnversion when the source code is not from a
+# svn working copy
+FOAM_DEV_SVN_REVISION_NUMBER="exported"
+
+if [ -e $WM_PROJECT_DIR/.svn ]
+then
+  # Check if a svn client in available
+  status=`$SVN_CMD --version --quiet >& /dev/null`
+
+  if [ "$?" -eq 0 ]
+  then
+     # We are not using svnversion here because it is recursive, and this can take a while.
+     #
+     # We are forcing LC_ALL=C in order to get rid of any locale variations in the ouput of
+     # the command $SVN_CMD
+     #
+     # We are grabbing the revision number associated to "Last Changed Rev:" for the svn repository
+     # branch associated with $WM_PROJECT_DIR. That way, we will not pickup changes in revision number
+     # coming from other parts of the Subversion repository.
+     #
+     FOAM_DEV_SVN_REVISION_NUMBER=`LC_ALL=C $SVN_CMD info $WM_PROJECT_DIR | grep "Last Changed Rev:" | awk '{print $4}'`;
+  fi
+fi
+
+case "$1" in
+    -revision)
+        shift
+	# Only output the svn version number. Handy when called from Makefiles or scripts
+        echo $FOAM_DEV_SVN_REVISION_NUMBER
+        ;;
+    -help)
+        shift
+        usage
+        ;;
+*)
+
+	if [ $FOAM_DEV_SVN_REVISION_NUMBER ]
+	then
+	    echo "OpenFOAM version $WM_PROJECT_VERSION, revision $FOAM_DEV_SVN_REVISION_NUMBER"
+	else
+	    echo "OpenFOAM version $WM_PROJECT_VERSION"
+	fi
+	;;
+esac
+
+
+
+
+#------------------------------------------------------------------------------

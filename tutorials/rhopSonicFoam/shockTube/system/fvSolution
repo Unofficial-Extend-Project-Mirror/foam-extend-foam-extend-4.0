@@ -1,0 +1,58 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    p PCG
+    {
+        preconditioner   DIC;
+        tolerance        1e-15;
+        relTol           0;
+    };
+    rho PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-15;
+        relTol           0;
+    };
+    rhoU PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-15;
+        relTol           0;
+    };
+    rhoE PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-15;
+        relTol           0;
+    };
+    rhoH PBiCG
+    {
+        preconditioner   DILU;
+        tolerance        1e-15;
+        relTol           0;
+    };
+}
+
+PISO
+{
+    nOuterCorrectors 3;
+    nCorrectors      1;
+    HbyAblend        0.0;
+}
+
+// ************************************************************************* //

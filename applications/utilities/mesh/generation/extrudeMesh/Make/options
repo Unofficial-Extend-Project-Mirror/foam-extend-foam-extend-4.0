@@ -1,0 +1,11 @@
+EXE_INC = \
+    -IextrudedMesh \
+    -IextrudeModel/lnInclude \
+    -I$(FOAM_SRC)/meshTools/lnInclude \
+    -I$(FOAM_SRC)/dynamicMesh/lnInclude 
+
+EXE_LIBS = \
+    -lmeshTools \
+    -ldynamicMesh \
+    -lextrudeModel
+

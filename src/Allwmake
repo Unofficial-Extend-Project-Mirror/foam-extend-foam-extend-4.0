@@ -1,0 +1,48 @@
+#!/bin/sh
+set -x
+
+( cd OpenFOAM && wmakeLnInclude . )
+( cd finiteVolume && wmakeLnInclude . )
+( cd Pstream && ./Allwmake )
+wmake libo OSspecific/$WM_OS
+wmake libso OpenFOAM
+
+( cd decompositionAgglomeration && ./Allwmake )
+
+wmake libso lagrangian/basic
+
+wmake libso triSurface
+wmake libso edgeMesh
+wmake libso meshTools
+wmake libso finiteVolume
+wmake libso finiteArea
+
+wmake libso lduSolvers
+wmake libso dynamicMesh
+
+( cd tetDecompositionFiniteElement ; ./Allwmake )
+
+wmake libso fvMotionSolver
+( cd  tetDecompositionMotionSolver; ./Allwmake )
+
+wmake libso coupledMatrix
+wmake libso sampling
+
+wmake libso dynamicFvMesh
+wmake libso topoChangerFvMesh
+wmake libso engine
+
+wmake libso ODE
+wmake libso randomProcesses
+
+( cd thermophysicalModels && ./Allwmake )
+( cd transportModels && ./Allwmake )
+( cd turbulenceModels && ./Allwmake )
+( cd lagrangian && ./Allwmake )
+( cd postProcessing && ./Allwmake )
+( cd conversion && ./Allwmake )
+
+wmake libso autoMesh
+wmake libso errorEstimation
+
+# ----------------------------------------------------------------- end-of-file

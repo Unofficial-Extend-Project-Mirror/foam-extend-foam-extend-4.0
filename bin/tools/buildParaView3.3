@@ -1,0 +1,192 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation; either version 2 of the License, or (at your
+#     option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM; if not, write to the Free Software Foundation,
+#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Script
+#     buildParaView3.3-cvs
+#
+# Description
+#     Build and install ParaView
+#     - run from folder above ParaView source folder or place the
+#       ParaView source under $WM_THIRD_PARTY_DIR
+#
+#------------------------------------------------------------------------------
+. ./buildParaViewFunctions
+
+PARAVIEW_SRC=ParaView3.3-cvs
+PARAVIEW_MAJOR_VERSION=3.3
+
+# User options:
+# ~~~~~~~~~~~~~
+
+# MPI support:
+WITH_MPI=OFF
+MPI_MAX_PROCS=32
+
+# Python support:
+# note: script will try to determine the appropriate python library.
+#       If it fails, specify the path using the PYTHON_LIBRARY variable
+WITH_PYTHON=OFF
+PYTHON_LIBRARY=""
+# PYTHON_LIBRARY="/usr/lib64/libpython2.5.so.1.0"
+
+# MESA graphics support:
+WITH_MESA=OFF
+
+#
+# No further editing below this line
+#------------------------------------------------------------------------------
+Script=${0##*/}
+
+usage() {
+    while [ "$#" -ge 1 ]; do echo "$1"; shift; done
+    cat<<USAGE
+
+usage: ${0##*/} [OPTION]
+options:
+  -fast      for repeated builds (-make -install) *use with caution*
+  -mpi       with mpi (if not already enabled)
+  -python    with python (if not already enabled)
+  -mesa      with mesa (if not already enabled)
+  -verbose   verbose output in Makefiles
+  -help
+
+For finer control, the build stages can be also selected individually
+(mutually exclusive)
+  -config
+  -make
+  -makedoc
+  -install
+  [-envpath]    alter absolute paths in CMake files to use env variables
+
+Build and install $PARAVIEW_SRC
+  - run from folder above the ParaView source folder or place the
+    ParaView source under \$WM_THIRD_PARTY_DIR
+
+USAGE
+   exit 1
+}
+
+# add options based on script name:
+case "$Script" in *-mpi*)    WITH_MPI=ON;; esac
+case "$Script" in *-python*) WITH_PYTHON=ON;; esac
+case "$Script" in *-mesa*)   WITH_MESA=ON;; esac
+
+runCONFIG=true
+runMAKE=true
+runMAKEDOC=true
+runINSTALL=true
+runENVPATH=false
+
+# parse options
+while [ "$#" -gt 0 ]
+do
+    case "$1" in
+    -h | -help)
+        usage
+        ;;
+    -config)             # stage 1: config only
+        runCONFIG=true
+        runMAKE=false
+        runMAKEDOC=false
+        runINSTALL=false
+        shift
+        ;;
+    -make)               # stage 2: make only
+        runCONFIG=false
+        runMAKE=true
+        runMAKEDOC=false
+        runINSTALL=false
+        shift
+        ;;
+    -makedoc)            # stage 3: generate html documentation
+        runCONFIG=false
+        runMAKE=false
+        runMAKEDOC=true
+        runINSTALL=false
+        shift
+        ;;
+    -install)            # stage 4: install only
+        runCONFIG=false
+        runMAKE=false
+        runMAKEDOC=false
+        runINSTALL=true
+        shift
+        ;;
+    -envpath)            # optional: change cmake files to use env variables
+        runCONFIG=false
+        runMAKE=false
+        runMAKEDOC=false
+        runINSTALL=false
+        runENVPATH=true
+        shift
+        ;;
+    -fast)               # shortcut for rebuild
+        runCONFIG=false
+        runMAKE=true
+        runMAKEDOC=false
+        runINSTALL=true
+        shift
+        ;;
+    -mpi)
+        WITH_MPI=ON
+        shift
+        ;;
+    -python)
+        WITH_PYTHON=ON
+        shift
+        ;;
+    -mesa)
+        WITH_MESA=ON
+        shift
+        ;;
+    -verbose)
+        VERBOSE=ON
+        shift
+        ;;
+    *)
+        usage "unknown option/argument: '$*'"
+        ;;
+    esac
+done
+
+# Set configure options
+#~~~~~~~~~~~~~~~~~~~~~~
+addVerbosity        # verbose makefiles
+addMpiSupport       # set MPI-specific options
+addPythonSupport    # set Python-specific options
+addMesaSupport      # set MESA-specific options
+
+getPaths            # discover where things are or should be put
+
+# Build and install
+# ~~~~~~~~~~~~~~~~~
+[ $runCONFIG  = true ] && configParaView
+[ $runMAKE    = true ] && makeParaView
+[ $runENVPATH = true ] && fixCMakeFiles
+[ $runMAKEDOC = true ] && makeDocs
+[ $runINSTALL = true ] && installParaView
+
+echo "done"
+#------------------------------------------------------------------------------

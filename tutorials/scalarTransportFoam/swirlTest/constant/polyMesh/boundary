@@ -1,0 +1,56 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version 2.0;
+    format ascii;
+
+    root "..";
+    case "swirlTest";
+    instance "constant";
+    local "polyMesh";
+
+    class polyBoundaryMesh;
+    object boundary;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+4
+(
+inlet
+{
+    type patch;
+    nFaces 20;
+    startFace 1540;
+}
+
+outlet
+{
+    type patch;
+    nFaces 20;
+    startFace 1560;
+}
+
+fixedWalls
+{
+    type wall;
+    nFaces 80;
+    startFace 1580;
+}
+
+defaultFaces
+{
+    type empty;
+    nFaces 1600;
+    startFace 1660;
+}
+)
+
+// ************************************************************************* //

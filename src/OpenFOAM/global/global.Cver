@@ -1,0 +1,89 @@
+/*-------------------------------*- C++ -*-----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
+
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+Description
+    Define the globals used in the FOAM library.  It is important that these
+    are constructed in the appropriate order to avoid the use of unconstructed
+    data in the global namespace.
+
+    This file has the extension .ver to force it to be parsed by the script
+    which converts WM_PROJECT_VERSION into the appropriate version number
+    string.
+
+\*---------------------------------------------------------------------------*/
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "foamVersion.H"
+
+#define STRINGIFY(s) #s
+#define STR_FOAM_DEV_REVISION_NUMBER(s) STRINGIFY(s)
+
+const char* const Foam::FOAMversion           = WM_PROJECT_VERSION;
+const char* const Foam::FOAMDevRevisionNumber = STR_FOAM_DEV_REVISION_NUMBER(FOAM_DEV_REVISION_NUMBER);
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Static initializers for string::null, word::null and fileName::null
+
+#include "stringsGlobals.C"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Setup an error handler for the global new operator
+
+#include "new.C"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Global IO streams
+
+#include "IOstreams.C"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "JobInfo.H"
+bool Foam::JobInfo::constructed = false;
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Global error definitions (initialised by construction)
+
+#include "messageStream.C"
+#include "error.C"
+#include "IOerror.C"
+#include "token.C"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Read the debug and info switches
+
+#include "debug.C"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Read and set cell models
+
+#include "globalCellModeller.C"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Create the jobInfo file in the $FOAM_JOB_DIR/runningJobs directory
+
+#include "JobInfo.C"
+
+// ************************************************************************* //

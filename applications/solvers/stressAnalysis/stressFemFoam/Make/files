@@ -1,0 +1,4 @@
+femStress/tractionTetPolyPatchVectorField.C
+stressFemFoam.C
+
+EXE = $(FOAM_APPBIN)/stressFemFoam

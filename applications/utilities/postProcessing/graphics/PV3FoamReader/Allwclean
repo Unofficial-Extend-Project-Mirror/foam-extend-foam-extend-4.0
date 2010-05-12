@@ -1,0 +1,7 @@
+#!/bin/sh
+set -x
+
+rm -r PV3FoamReader/Make
+
+wclean libso vtkPV3Foam
+

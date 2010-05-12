@@ -1,0 +1,3 @@
+#!/bin/sh
+
+touch $FOAM_APPBIN/*

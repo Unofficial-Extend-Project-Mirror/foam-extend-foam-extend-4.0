@@ -1,0 +1,14 @@
+#!/bin/sh
+
+currDir=`pwd`
+application=`basename $currDir`
+cases="heatedCavity"
+
+tutorialPath=`dirname $0`/..
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+for case in $cases
+do
+    (cd $case; runApplication blockMesh)
+    (cd $case; runApplication $application) 
+done

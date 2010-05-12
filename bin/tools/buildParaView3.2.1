@@ -1,0 +1,71 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation; either version 2 of the License, or (at your
+#     option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM; if not, write to the Free Software Foundation,
+#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Script
+#     buildParaView
+#
+# Description
+#     Build and install ParaView
+#     - run from folder above ParaView source folder or place the
+#       ParaView source under $WM_PROJECT_INST_DIR
+#
+#------------------------------------------------------------------------------
+. $WM_PROJECT_DIR/bin/tools/buildParaViewFunctions
+
+# set -x
+
+PARAVIEW_SRC="ParaView3.2.1"
+PARAVIEW_MAJOR_VERSION="3.2"
+
+VERBOSE=OFF
+INCLUDE_MPI=ON
+MPI_MAX_PROCS=32
+INCLUDE_PYTHON=ON
+PYTHON_LIBRARY=""
+INCLUDE_MESA=OFF
+
+set +x
+
+# provide a shortcut for repeated builds - use with caution
+if [ "$#" -gt 0 ]
+then
+   CMAKE_SKIP=YES
+fi
+
+# set paraview environment
+PARAVIEW_SRC_DIR=$PWD/$PARAVIEW_SRC
+#PARAVIEW_OBJ_DIR=$PARAVIEW_SRC_DIR/platforms/$WM_OPTIONS/obj$OBJ_ADD
+PARAVIEW_OBJ_DIR=$PARAVIEW_SRC_DIR/platforms/$WM_ARCH$WM_COMPILER
+
+addMpiSupport       # set MPI specific options
+addPythonSupport    # set python specific options
+addMesaSupport      # set MESA specific options
+
+buildParaView
+installParaView
+
+echo "done"
+
+#------------------------------------------------------------------------------

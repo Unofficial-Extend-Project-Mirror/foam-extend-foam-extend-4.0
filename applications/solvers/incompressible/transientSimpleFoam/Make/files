@@ -1,0 +1,3 @@
+transientSimpleFoam.C
+
+EXE = $(FOAM_APPBIN)/transientSimpleFoam

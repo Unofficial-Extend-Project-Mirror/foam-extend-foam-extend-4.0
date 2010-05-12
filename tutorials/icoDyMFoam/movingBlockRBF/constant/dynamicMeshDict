@@ -1,0 +1,56 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+    class           dictionary;
+    object          motionProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dynamicFvMesh dynamicMotionSolverFvMesh;
+
+solver RBFMotionSolver;
+
+movingPatches ( block );
+
+staticPatches ( left right top bottom );
+
+coarseningRatio 5;
+
+interpolation
+{
+    RBF  IMQB;
+    focalPoint (0 0 0);
+    innerRadius 2.5;//5.0
+    outerRadius 12.5;
+    polynomials true;
+
+    W2Coeffs
+    {
+        radius     1.0;
+    }
+    TPSCoeffs
+    {
+        radius     5.0;
+    }
+    GaussCoeffs
+    {
+        radius     0.1;
+    }
+    IMQBCoeffs
+    {
+        radius     0.001;
+    }
+}
+
+
+// ************************************************************************* //

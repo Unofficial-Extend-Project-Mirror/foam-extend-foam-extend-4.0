@@ -1,0 +1,88 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation; either version 2 of the License, or (at your
+#     option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM; if not, write to the Free Software Foundation,
+#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Script
+#     foamUpgradeTurbulenceProperties
+#
+# Description
+#     Upgrade the turbulenceProperties dictionary to the new format employed
+#     in OpenFOAM version 1.5-dev
+#     - RAS turbulence models now defined by the RASProperties dictionary,
+#       and RASModel keyword, and
+#     - LES turbulence models now defined by the LESProperties dictionary,
+#       and LESModel keyword.
+#
+#------------------------------------------------------------------------------
+
+printUsage()
+{
+    echo "Usage: `basename $0` <turbulenceProperties>"
+    echo "    Where <turbulenceProperties> is the full path to the"
+    echo "    turbulenceProperties dictionary"
+}
+
+convertDict()
+{
+    echo "    Identified $1 turbulence model"
+
+    sed -e "s/turbulenceProperties/$1Properties/" \
+        -e "s/$2/$1Model/" \
+        -e "s/[a-zA-Z0-9]* [ ]*\[[0-9 ]*\]//" \
+        $3 > "$outputPath/$1Properties"
+
+    echo "    written $1Properties to $outputPath/"
+}
+
+outputPath=`dirname $1`
+
+if [ $# -ne 1 ]; then
+    printUsage
+    exit 1
+elif [ ! -e $1 ]; then
+    echo "    Error: file $1 does not exist"
+    echo ""
+    printUsage
+    exit 1
+fi
+
+# Identify type of turbulence model
+RAS=`grep turbulenceModel $1`
+LES=`grep LESmodel $1`
+
+if [ -n "$RAS" ]; then
+    convertDict "RAS" "turbulenceModel" $1
+elif [ -n "$LES" ]; then
+    convertDict "LES" "LESmodel" $1
+else
+    echo "Unable to determine turbulence model type - nothing changed"
+    exit 1
+fi
+
+echo "done."
+
+exit 0
+
+
+#------------------------------------------------------------------------------

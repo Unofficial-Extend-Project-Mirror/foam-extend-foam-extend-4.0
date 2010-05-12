@@ -1,0 +1,3 @@
+oodles.C
+
+EXE = $(FOAM_APPBIN)/oodles

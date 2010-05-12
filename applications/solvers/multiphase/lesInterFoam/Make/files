@@ -1,0 +1,3 @@
+lesInterFoam.C
+
+EXE = $(FOAM_APPBIN)/lesInterFoam

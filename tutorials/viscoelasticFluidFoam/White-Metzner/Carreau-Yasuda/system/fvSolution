@@ -1,0 +1,100 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4.1                                 |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version 2.0;
+    format ascii;
+
+    root "/opt/OpenFOAM/jovani-1.4.1/run/tutorials/viscoelasticFluidFoam";
+    case "WM";
+    instance "system";
+    local "";
+
+    class           dictionary;
+    object          fvSolution;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+
+    p CG
+    {
+        preconditioner
+        {
+//          type           Cholesky;
+            type            AMG;
+            cycle           W-cycle;
+            policy          AAMG;
+            nPreSweeps      0;
+            nPostSweeps     2;
+            groupSize       4;
+            minCoarseEqns   20;
+            nMaxLevels      100;
+            scale           off;
+            smoother        ILU;
+        }
+
+
+        tolerance        1e-07;
+        relTol           0.0;
+        minIter          0;
+        maxIter          800;
+    };
+
+
+    U BiCGStab
+    {
+        preconditioner
+        {
+            type          Cholesky;
+        }
+
+        minIter           0;
+        maxIter           1000;
+        tolerance         1e-6;
+        relTol            0.0;
+    };
+
+    taufirst BiCGStab
+    {
+        preconditioner
+        {
+            type          Cholesky;
+        }
+
+        minIter           0;
+        maxIter           1000;
+        tolerance         1e-6;
+        relTol            0.0;
+
+    };
+
+}
+
+PISO
+{
+    momentumPredictor yes;
+    nCorrectors    2;
+    nNonOrthogonalCorrectors 0;
+    pRefCell        0;
+    pRefValue       0;
+}
+
+relaxationFactors
+{
+    p               0.3;
+    U               0.5;
+    taufirst        0.3;
+}
+
+
+
+// ************************************************************************* //

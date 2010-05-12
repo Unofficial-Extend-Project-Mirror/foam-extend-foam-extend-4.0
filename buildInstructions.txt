@@ -1,0 +1,169 @@
+1) Download files
+
+Get all files from the sources directory on the web site and put them into the linuxSrc directory
+
+2) Unpack OpenFOAM and set up the dot-files
+
+cd ~/OpenFOAM
+tar xzf linuxSrc/OpenFOAM-1.4.1-dev_22_11_05.tgz
+cp -r OpenFOAM-1.4.1-dev/.OpenFOAM-1.4.1-dev ~
+
+set up dot files:
+
+put:
+
+source ~/.OpenFOAM-1.4.1-dev/cshrc
+
+into your .cshrc file.  If you are using bash, add
+
+. ~/.OpenFOAM-1.4.1-dev/bashrc
+
+into ~/.bashrc
+
+Do:
+
+source ~/.cshrc
+
+For bash users, do
+
+. ~/.bashrc
+
+instead.
+
+
+3) Build utilities
+
+3.1) gcc
+tar xzf gcc-4.2.2.tgz
+mkdir gcc-4.2.2-obj
+cd gcc-4.2.2-obj
+
+../gcc-4.2.2/configure --prefix=/usr/tmp/gcc-4.2.2 --exec-prefix=/usr/tmp/gcc-4.2.2 --enable-languages=c,c++ --enable-shared
+
+gmake bootstrap
+gmake
+gmake install
+
+cd /usr/tmp/
+tar cvzf ~/OpenFOAM/linux/gcc-4.2.2.bin.tgz gcc-4.2.2
+cd ~/OpenFOAM/linux
+tar xzf gcc-4.2.2.bin.tgz
+
+3.2) gdb
+
+cd ~/OpenFOAM/linuxSrc
+tar xzf gdb-6.4.tar.gz
+cd gdb-6.4
+./configure --prefix=~/OpenFOAM/linux/gdb-6.4
+gmake
+gmake install
+
+3.3 cmake
+
+cd ~/OpenFOAM/linuxSrc
+tar xzf cmake-2.4.7.tar.gz
+cd cmake-2.4.7
+./configure --prefix=~/OpenFOAM/linux/cmake-2.4.7
+gmake
+gmake install
+
+3.4 dx
+cd ~/OpenFOAM/linuxSrc
+tar xzf dx-4.4.4.tgz
+cd dx-4.4.4
+./configure --prefix=~/OpenFOAM/linux/dx-4.4.4 --enable-shared
+gmake
+gmake install
+
+3.5 paraview
+cd ~/OpenFOAM/linuxSrc
+tar xvzf paraview-2.4.4.tgz
+mkdir paraview-2.4.4-obj
+cmake -i ../paraview-2.4.4
+
+Change options:
+
+enable shared library: YES
+prefix: ~/OpenFOAM/linux/paraview-2.4.4
+
+gmake
+gmake install
+
+
+cd ~/OpenFOAM/linuxSrc
+
+mkdir ~/OpenFOAM/linux/paraview-2.4.4/include
+cp ./paraview-2.4.4/VTK/Common/vtk* ~/OpenFOAM/linux/paraview-2.4.4/include/
+cp ./paraview-2.4.4/VTK/Filtering/vtk* ~/OpenFOAM/linux/paraview-2.4.4/include/
+cp ./paraview-2.4.4-obj/VTK/vtk* ~/OpenFOAM/linux/paraview-2.4.4/include/
+cp ./paraview-2.4.4-obj/ParaViewConfig.cmake ~/OpenFOAM/linux/paraview-2.4.4/lib/paraview-2.4/ 
+
+linux64 copy commands
+
+mkdir ~/OpenFOAM/linux64/paraview-2.4.4/include
+cp ./paraview-2.4.4/VTK/Common/vtk* ~/OpenFOAM/linux64/paraview-2.4.4/include/
+cp ./paraview-2.4.4/VTK/Filtering/vtk* ~/OpenFOAM/linux64/paraview-2.4.4/include/
+cp ./paraview-2.4.4-obj/VTK/vtk* ~/OpenFOAM/linux64/paraview-2.4.4/include/
+cp ./paraview-2.4.4-obj/ParaViewConfig.cmake ~/OpenFOAM/linux64/paraview-2.4.4/lib/paraview-2.4/ 
+
+
+4) build OpenFOAM
+
+foam
+(this should take you to the ~/OpenFOAM/OpenFOAM-1.4.1-dev directory)
+
+./Allwmake
+
+This will build foam.
+
+5) check build
+
+source ~/.cshrc
+icoFoam
+
+(this should run and report something like)
+
+wooster*101-> icoFoam
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4.1-dev                             |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+Exec   : icoFoam
+Date   : Mar 06 2008
+Time   : 17:25:53
+Host   : wooster
+PID    : 8238
+
+Usage: icoFoam <root> <case> [-parallel]
+
+
+--> FOAM FATAL ERROR : Wrong number of arguments, expected 2 found 0
+
+
+FOAM exiting
+
+
+SVN check-out command
+
+svn co https://openfoam-extend.svn.sourceforge.net/svnroot/openfoam-extend/trunk/Core/OpenFOAM-1.4.1-dev
+
+
+SVK setup
+
+svk depotmap --init
+svk mirror https://openfoam-extend.svn.sourceforge.net/svnroot/openfoam-extend/trunk/Core/OpenFOAM-1.4.1-dev //OpenFOAM-1.4.1-dev
+svk sync //OpenFOAM-1.4.1-dev
+
+Ready to check-out
+
+Additional source packages:
+
+
+http://www.lam-mpi.org/7.1/download.php
+http://www.open-mpi.org/
+http://www.mico.org/
+http://www.zlib.net/

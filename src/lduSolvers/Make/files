@@ -1,0 +1,35 @@
+crMatrix/crAddressing.C
+crMatrix/crMatrix.C
+
+lduPrecon = lduPrecon
+$(lduPrecon)/CholeskyPrecon/CholeskyPrecon.C
+$(lduPrecon)/symGaussSeidelPrecon/symGaussSeidelPrecon.C
+$(lduPrecon)/amgPrecon/amgPrecon.C
+
+lduSmoother = lduSmoother
+$(lduSmoother)/symGaussSeidelSmoother/symGaussSeidelSmoother.C
+$(lduSmoother)/iluSmoother/iluSmoother.C
+
+lduSolver = lduSolver
+$(lduSolver)/cgSolver/cgSolver.C
+$(lduSolver)/bicgSolver/bicgSolver.C
+$(lduSolver)/bicgStabSolver/bicgStabSolver.C
+$(lduSolver)/gmresSolver/gmresSolver.C
+$(lduSolver)/amgSolver/amgSolver.C
+$(lduSolver)/fpeAmgSolver/fpeAmgSolver.C
+$(lduSolver)/mpeAmgSolver/mpeAmgSolver.C
+$(lduSolver)/rreAmgSolver/rreAmgSolver.C
+$(lduSolver)/deflationSolver/deflationSolver.C
+
+amg = amg
+$(amg)/amgCycle.C
+$(amg)/fineAmgLevel.C
+$(amg)/coarseAmgLevel.C
+
+amgPolicy = $(amg)/amgPolicy
+$(amgPolicy)/amgPolicy.C
+$(amgPolicy)/pamgPolicy.C
+$(amgPolicy)/aamgPolicy.C
+$(amgPolicy)/samgPolicy.C
+
+LIB = $(FOAM_LIBBIN)/liblduSolvers

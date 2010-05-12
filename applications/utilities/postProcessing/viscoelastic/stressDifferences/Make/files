@@ -1,0 +1,3 @@
+stressDifferences.C
+
+EXE = $(FOAM_APPBIN)/stressDifferences

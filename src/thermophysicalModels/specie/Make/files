@@ -1,0 +1,14 @@
+atomicWeights = atomicWeights
+specie = specie
+speciesTable = speciesTable
+perfectGas = equationOfState/perfectGas
+reactions = reaction/reactions
+
+$(atomicWeights)/atomicWeights.C
+$(specie)/specie.C
+$(speciesTable)/speciesTable.C
+$(perfectGas)/perfectGas.C
+$(reactions)/makeChemkinReactions.C
+$(reactions)/makeLangmuirHinshelwoodReactions.C
+
+LIB = $(FOAM_LIBBIN)/libspecie

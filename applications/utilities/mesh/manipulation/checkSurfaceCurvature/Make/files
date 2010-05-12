@@ -1,0 +1,3 @@
+checkSurfaceCurvature.C
+
+EXE = $(FOAM_APPBIN)/checkSurfaceCurvature

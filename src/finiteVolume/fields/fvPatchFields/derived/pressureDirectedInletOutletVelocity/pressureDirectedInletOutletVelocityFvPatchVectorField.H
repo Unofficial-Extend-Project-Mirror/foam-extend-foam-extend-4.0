@@ -1,0 +1,183 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
+
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+Class
+    Foam::pressureDirectedInletOutletVelocityFvPatchVectorField
+
+Description
+    Foam::pressureDirectedInletOutletVelocityFvPatchVectorField
+
+SourceFiles
+    pressureDirectedInletOutletVelocityFvPatchVectorField.C
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef pressureDirectedInletOutletVelocityFvPatchVectorField_H
+#define pressureDirectedInletOutletVelocityFvPatchVectorField_H
+
+#include "fvPatchFields.H"
+#include "mixedFvPatchFields.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+/*---------------------------------------------------------------------------*\
+          Class pressureDirectedInletOutletVelocityFvPatch Declaration
+\*---------------------------------------------------------------------------*/
+
+class pressureDirectedInletOutletVelocityFvPatchVectorField
+:
+    public mixedFvPatchVectorField
+{
+    // Private data
+    
+        //- Name of flux field
+        word phiName_;
+
+        //- Inlet direction
+        vectorField inletDir_;
+
+
+public:
+
+    //- Runtime type information
+    TypeName("pressureDirectedInletOutletVelocity");
+
+
+    // Constructors
+
+        //- Construct from patch and internal field
+        pressureDirectedInletOutletVelocityFvPatchVectorField
+        (
+            const fvPatch&,
+            const DimensionedField<vector, volMesh>&
+        );
+
+        //- Construct from patch, internal field and dictionary
+        pressureDirectedInletOutletVelocityFvPatchVectorField
+        (
+            const fvPatch&,
+            const DimensionedField<vector, volMesh>&,
+            const dictionary&
+        );
+
+        //- Construct by mapping given
+        //  pressureDirectedInletOutletVelocityFvPatchVectorField
+        //  onto a new patch
+        pressureDirectedInletOutletVelocityFvPatchVectorField
+        (
+            const pressureDirectedInletOutletVelocityFvPatchVectorField&,
+            const fvPatch&,
+            const DimensionedField<vector, volMesh>&,
+            const fvPatchFieldMapper&
+        );
+
+        //- Construct as copy
+        pressureDirectedInletOutletVelocityFvPatchVectorField
+        (
+            const pressureDirectedInletOutletVelocityFvPatchVectorField&
+        );
+
+        //- Construct and return a clone
+        virtual tmp<fvPatchVectorField> clone() const
+        {
+            return tmp<fvPatchVectorField>
+            (
+                new pressureDirectedInletOutletVelocityFvPatchVectorField
+                (
+                    *this
+                )
+            );
+        }
+
+        //- Construct as copy setting internal field reference
+        pressureDirectedInletOutletVelocityFvPatchVectorField
+        (
+            const pressureDirectedInletOutletVelocityFvPatchVectorField&,
+            const DimensionedField<vector, volMesh>&
+        );
+
+        //- Construct and return a clone setting internal field reference
+        virtual tmp<fvPatchVectorField> clone
+        (
+            const DimensionedField<vector, volMesh>& iF
+        ) const
+        {
+            return tmp<fvPatchVectorField>
+            (
+                new pressureDirectedInletOutletVelocityFvPatchVectorField
+                (
+                    *this,
+                    iF
+                )
+            );
+        }
+
+
+    // Member functions
+
+        // Access
+
+            //- Return the name of phi
+            const word& phiName() const
+            {
+                return phiName_;
+            }
+
+
+        // Mapping functions
+
+            //- Map (and resize as needed) from self given a mapping object
+            virtual void autoMap
+            (
+                const fvPatchFieldMapper&
+            );
+
+            //- Reverse map the given fvPatchField onto this fvPatchField
+            virtual void rmap
+            (
+                const fvPatchVectorField&,
+                const labelList&
+            );
+
+
+        //- Update the coefficients associated with the patch field
+        virtual void updateCoeffs();
+
+        //- Write
+        virtual void write(Ostream&) const;
+};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

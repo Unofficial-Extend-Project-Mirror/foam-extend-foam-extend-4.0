@@ -1,0 +1,3 @@
+stressSymmComponents.C
+
+EXE = $(FOAM_APPBIN)/stressSymmComponents

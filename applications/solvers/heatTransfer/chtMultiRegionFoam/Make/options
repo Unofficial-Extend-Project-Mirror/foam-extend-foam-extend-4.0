@@ -1,0 +1,16 @@
+EXE_INC = \
+    -Ifluid \
+    -Isolid \
+    -IregionProperties \
+    -IcoupleManager \
+    -IderivedFvPatchFields/solidWallTemperatureCoupled \
+    -IderivedFvPatchFields/solidWallHeatFluxTemperatureCoupled \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/turbulenceModels/RAS
+
+EXE_LIBS = \
+    -lfiniteVolume \
+    -lbasicThermophysicalModels \
+    -lspecie \
+    -lcompressibleRASModels

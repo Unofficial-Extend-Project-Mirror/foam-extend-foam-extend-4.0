@@ -1,0 +1,204 @@
+#!/usr/bin/perl -w
+use strict;
+use POSIX qw( );
+use Getopt::Std qw( getopts );
+
+( my $Script = $0 ) =~ s{^.*/}{};
+
+our ( $VERSION, $DATE ) = do {
+    my ( $ver, $date ) =
+      q{$Id: fStar-cellTable,v 1.0 2006-10-06 09:39:34 cfdadmin Exp $} =~
+      m{\s+(\d+\.\d+).*?\s+(\d{4}[-/]\d{2}[-/]\d{2})\s*};
+    $date =~ s{/}{-}g;    # ISO-formatted
+
+    ( $ver, $date );
+};
+
+# for simplicity - use '..' as rootDir and pwd as caseDir
+my %config = (
+    rootDir => "..",
+    caseDir => do { ( my $x = POSIX::getcwd ) =~ s{^.*/}{}; $x },
+    output  => "constant/cellTable",
+);
+
+
+# alternative method
+# if (0) {
+#     @ARGV >= 2 or usage();
+#     ( $rootDir = shift @ARGV ) =~ s{/+$}{};
+#     ( $caseDir = shift @ARGV ) =~ s{/+$}{};
+# 
+#     $caseDir = $rootDir . "/" . $caseDir;
+# 
+#     -d $rootDir or die qq{cannot open root directory "$rootDir"\n};
+#     -d $caseDir or die qq{cannot open case directory "$caseDir"\n};
+# }
+
+# -----------------------------------------------------------------------------
+sub usage {
+    $! = 0;               # clean exit status
+    warn "@_\n" if @_;
+    die <<"USAGE";
+usage:
+    $Script [OPTION] <file1.inp> ... <fileN.inp>
+
+options:
+  -h        usage
+  -w        write to $config{output}
+
+Extract Star-CD cell table information from the input files
+and print in a form suitable for OpenFOAM
+
+version $VERSION ($DATE)
+copyright (c) 2006 Mark Olesen <Mark.Olesen\@ArvinMeritor.com>
+USAGE
+}
+# -----------------------------------------------------------------------------
+
+my %opt;
+getopts( "hw", \%opt ) or usage();
+$opt{h} and usage();
+@ARGV or usage();
+
+sub FoamDivider {
+    "// " . ("* " x 37) . "//\n";
+}
+
+if ( $opt{w} ) {
+    my $output = $config{output};
+    ( my $dir = $output ) =~ s{/[^/]+$}{};
+    -d $dir or mkdir $dir;
+
+    warn "writing $output\n";
+    open STDOUT, "> $output", or die "cannot open '$output'\n";
+}
+
+my %cellTableInfo;
+
+# scan input file for CTABLE and CTNAME entries
+while (<>) {
+    s/^\s+//;
+    length $_ or next;
+
+    my ( $tag, $id ) = /^(CTAB\w*|CTNA\w*)[\s,]+(\d+)/i or next;
+
+    if (/,/) {
+	warn "missing support for comma-delimited fields\n";
+	next;
+    }
+
+    my %extract;
+
+    if ( $tag =~ /CTAB/i ) {
+	$_ = lc;
+
+	(
+	    $tag,                     $id,
+	    $extract{MaterialType}, undef,
+	    $extract{PorosityId},   $extract{MaterialId},
+	    $extract{SpinId},       $extract{GroupId}
+	  )
+	  = split;
+
+	for ( $extract{MaterialType} ||= "" ) {
+	    s/^flui.*$/fluid/
+	      or s/^soli.*$/solid/
+	      or delete $extract{MaterialType};
+	}
+
+	for ( keys %extract ) {
+	    if ( defined $extract{$_} ) {
+		$cellTableInfo{$id}{$_} = $extract{$_};
+	    }
+	}
+    }
+    else {
+	( $tag, $id, $extract{Label} ) = split;
+	for ( $extract{Label} ||= "" ) {
+	    s{[,./]}{}g;
+	    $extract{Label} or delete $extract{Label};
+	}
+    }
+
+    # add extracted information into cellTableInfo
+    for ( keys %extract ) {
+	if ( defined $extract{$_} and length $extract{$_} ) {
+	    $cellTableInfo{$id}{$_} = $extract{$_};
+	}
+    }
+}
+
+# -------------------------------------------------------------------------
+# output formatted key/value pairs
+# remove any spaces, supress output for empty values
+sub output_entry {
+    my ($k, $v) = @_;
+    
+    $v =~ s/\s+//g;
+    if (length $v) {
+	printf "    %-16s", $k;
+	print $v, ";\n";
+    }
+}
+
+# -------------------------------------------------------------------------
+#
+# create header -  simple substitutions
+#
+my $header = do { local $/; <DATA> };
+{
+    my %var = ( CASE => $config{caseDir} || "", OBJECT => "cellTable" );
+    ( my $text = $header ) =~ s/%{\s*([_A-Z]+)\s*}/ $var{$1} || '' /eg;
+    
+    print $text;
+}
+
+# -------------------------------------------------------------------------
+
+for my $id ( sort { $a <=> $b } keys %cellTableInfo) {
+    my $subDict = $cellTableInfo{$id};
+
+    $subDict->{Id} = $id;
+
+    my %seen;
+    my @keys = grep { exists $subDict->{$_} } qw( Id Label );
+    @keys = grep { not $seen{$_}++ } ( @keys, sort keys %$subDict );
+
+    print "cellTableId_$id\n";
+    print "{\n";
+    
+    for my $k (@keys) {
+	output_entry( $k, $subDict->{$k} );
+    }
+
+    print "}\n\n";
+}
+
+print FoamDivider;
+
+__DATA__
+/*------------------------------*- c-mode -*---------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.3                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version 2.0;
+    format ascii;
+
+    root "..";
+    case "%{CASE}";
+    instance ""constant"";
+    local "";
+
+    note "persistent data for pro-STAR <-> OpenFOAM translation";
+    class dictionary;
+    object %{OBJECT};
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+

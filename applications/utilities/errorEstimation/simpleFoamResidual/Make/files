@@ -1,0 +1,3 @@
+simpleFoamResidual.C
+
+EXE = $(FOAM_APPBIN)/simpleFoamResidual

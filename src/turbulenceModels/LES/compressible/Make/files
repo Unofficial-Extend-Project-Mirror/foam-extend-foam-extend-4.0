@@ -1,0 +1,15 @@
+wallFunc/muSgsWallFunction/muSgsWallFunctionFvPatchScalarField.C
+
+LESModel/LESModel.C
+LESModel/newLESModel.C
+GenEddyVisc/GenEddyVisc.C
+GenSGSStress/GenSGSStress.C
+
+Smagorinsky/Smagorinsky.C
+oneEqEddy/oneEqEddy.C
+lowReOneEqEddy/lowReOneEqEddy.C
+dynOneEqEddy/dynOneEqEddy.C
+DeardorffDiffStress/DeardorffDiffStress.C
+SpalartAllmaras/SpalartAllmaras.C
+
+LIB = $(FOAM_LIBBIN)/libcompressibleLESModels

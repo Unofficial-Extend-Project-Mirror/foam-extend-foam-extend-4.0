@@ -1,0 +1,11 @@
+CPP        = cpp-4.2 $(WM_CPP_OPTIONS)
+LD         = ld 
+
+PROJECT_LIBS = -l$(WM_PROJECT)
+
+include $(GENERAL_RULES)/standard
+
+include $(RULES)/X
+include $(RULES)/c
+include $(RULES)/c++
+include $(GENERAL_RULES)/cint

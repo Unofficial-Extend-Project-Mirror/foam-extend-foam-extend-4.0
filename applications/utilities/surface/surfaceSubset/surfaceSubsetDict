@@ -1,0 +1,51 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.0                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "/home/penfold/mattijs/foam/mattijs2.2/run/icoFoam";
+    case            "cavityTut";
+    instance        "system";
+    local           "";
+
+    class           dictionary;
+    object          surfaceSubsetDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Select triangles by label
+faces ();
+
+// Select triangles using given points (local point numbering)
+localPoints ( );
+
+// Select triangles using given edges
+edges ();
+
+// Select triangles (with face centre) inside box
+zone (
+(0      -10000  125)
+(10000   10000  10000)
+);
+
+// Select triangles (with face centre) inside or outside of another surface.
+// (always selects triangles that are 'on' other surface)
+surface
+{
+    name "sphere.stl";
+    outside yes;
+}
+
+// Extend selection with edge neighbours
+addFaceNeighbours no;
+
+// ************************************************************************* //

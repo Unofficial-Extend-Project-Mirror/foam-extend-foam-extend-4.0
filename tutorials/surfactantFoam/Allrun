@@ -1,0 +1,14 @@
+#!/bin/sh
+
+currDir=`pwd`
+application=`basename $currDir`
+cases="sphereTransport"
+
+tutorialPath=`dirname $0`/..
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+for case in $cases
+do
+    (cd $case; runApplication makeFaMesh)
+    (cd $case; runApplication $application)
+done

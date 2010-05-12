@@ -1,0 +1,10 @@
+forces/forces.C
+forces/forcesFunctionObject.C
+
+forceCoeffs/forceCoeffs.C
+forceCoeffs/forceCoeffsFunctionObject.C
+
+forcesFiltered/forcesFiltered.C
+forcesFiltered/forcesFilteredFunctionObject.C
+
+LIB = $(FOAM_LIBBIN)/libforces

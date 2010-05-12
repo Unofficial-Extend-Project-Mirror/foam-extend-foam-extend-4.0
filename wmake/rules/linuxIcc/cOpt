@@ -1,0 +1,9 @@
+cDBUG       = 
+# Intel processor optimization: -x<codes>
+#    K  Intel Pentium III and compatible Intel processors
+#    W  Intel Pentium 4 and compatible Intel processors
+#    N  Intel Pentium 4 and compatible Intel processors.  Enables new
+#       optimizations in addition to Intel processor-specific optimizations
+#    P  Intel Pentium 4 processors with SSE3 extensions
+#    B  Intel Pentium M and compatible Intel processors
+cOPT        = -O3 -xN -no-prec-div

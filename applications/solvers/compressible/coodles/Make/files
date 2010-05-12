@@ -1,0 +1,3 @@
+coodles.C
+
+EXE = $(FOAM_APPBIN)/coodles

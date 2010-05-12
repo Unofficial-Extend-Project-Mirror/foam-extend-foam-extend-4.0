@@ -1,0 +1,72 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+    class           tetPointVectorField;
+    object          motionU;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    movingWall      
+    {
+        type            fixedValue;
+        value           uniform (1 0 0);
+    }
+
+    farFieldMoving  
+    {
+        type            fixedValue;
+        value           uniform (1 0 0);
+    }
+
+    fixedWall       
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+
+    axis            
+    {
+        type            empty;
+    }
+
+    left            
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+
+    farField        
+    {
+        type            slip;
+    }
+
+    back            
+    {
+        type            wedge;
+    }
+
+    front           
+    {
+        type            wedge;
+    }
+}
+
+
+// ************************************************************************* //

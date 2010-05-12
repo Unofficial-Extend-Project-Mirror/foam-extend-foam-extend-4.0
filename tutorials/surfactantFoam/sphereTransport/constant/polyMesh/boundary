@@ -1,0 +1,42 @@
+// The FOAM Project // File: boundary
+/*
+-------------------------------------------------------------------------------
+ =========         | polyBoundaryMesh
+ \\      /         | 
+  \\    /          | Name:   boundary
+   \\  /           | Family: Data file
+    \\/            | 
+    F ield         | FOAM version: 2.2
+    O peration     | Product of Nabla Ltd.
+    A and          | 
+    M anipulation  | Email: Enquiries@Nabla.co.uk
+-------------------------------------------------------------------------------
+*/
+
+FoamFile
+{
+    version 2.0;
+    format ascii;
+
+    root ".";
+    case "sphereDense";
+    instance "constant";
+    local "polyMesh";
+
+    class polyBoundaryMesh;
+    object boundary;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+1
+(
+outer
+{
+    type patch;
+    nFaces 600;
+    startFace 4500;
+}
+)
+
+// ************************************************************************* //

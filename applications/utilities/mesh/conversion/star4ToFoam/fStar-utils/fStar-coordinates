@@ -1,0 +1,171 @@
+#!/usr/bin/perl -w
+use strict;
+use Data::Dumper;
+use POSIX qw( );
+use Getopt::Std qw( getopts );
+
+( my $Script = $0 ) =~ s{^.*/}{};
+
+our ( $VERSION, $DATE ) = do {
+    my ( $ver, $date ) =
+      q{$Id: fStar-coordinates,v 1.0 2006-10-06 cfdadmin Exp $} =~
+      m{\s+(\d+\.\d+).*?\s+(\d{4}[-/]\d{2}[-/]\d{2})\s*};
+    $date =~ s{/}{-}g;    # ISO-formatted
+
+    ( $ver, $date );
+};
+
+# for simplicity - use '..' as rootDir and pwd as caseDir
+my %config = (
+    rootDir => "..",
+    caseDir => do { ( my $x = POSIX::getcwd ) =~ s{^.*/}{}; $x },
+    output  => "constant/coordinateSystems",
+);
+
+# -------------------------------------------------------------------------
+sub usage {
+    $! = 0;               # clean exit
+
+    warn "@_\n" if @_;
+    die <<"USAGE";
+usage:
+    $Script [OPTION] <file1.inp> ... <fileN.inp>
+
+options:
+  -h        usage
+  -w        write to $config{output}
+
+Extract Star-CD coordinate system information from the input files
+and print in a form suitable for OpenFOAM
+
+version $VERSION ($DATE)
+copyright (c) 2006 Mark Olesen <Mark.Olesen\@ArvinMeritor.com>
+USAGE
+}
+
+# -------------------------------------------------------------------------
+my %opt;
+getopts( "hw", \%opt ) or usage();
+$opt{h} and usage();
+@ARGV or usage();
+
+# degrees -> rad (PI/4)
+use constant PI => 4 * atan2( 1, 1 );
+
+sub deg2rad {
+    map { $_ * ( PI / 180 ) } @_;
+}
+
+sub millimeter2meter {
+    map { $_ * 0.001 } @_;
+}
+
+sub FoamDivider {
+    "// " . ( "* " x 37 ) . "//\n";
+}
+
+if ( $opt{w} ) {
+    my $output = $config{output};
+    ( my $dir = $output ) =~ s{/[^/]+$}{};
+    -d $dir or mkdir $dir;
+
+    warn "writing $output\n";
+    open STDOUT, "> $output", or die "cannot open '$output'\n";
+}
+
+# -------------------------------------------------------------------------
+#
+# create header -  simple substitutions
+#
+my $header = do { local $/; <DATA> };
+{
+    my %var = ( CASE => $config{caseDir} || "", OBJECT => "coordinateSystems" );
+    ( my $text = $header ) =~ s/%{\s*([_A-Z]+)\s*}/ $var{$1} || '' /eg;
+
+    print $text;
+}
+
+# -------------------------------------------------------------------------
+
+# handle lines with
+# LOCAL csysId csysType originX originY originZ rotXY rotYZ rotZY
+#
+while (<>) {
+    s/^\s*loca\w*\s+(\d+)\s+\w+//i or next;
+    my $csysId = $1;
+    my @a = map { $_ + 0 } split;
+
+    @a >= 6 or next;	# require 6 fields
+    my ( $origx, $origy, $origz, $rotxy, $rotyz, $rotzy ) = @a;
+
+    # origin: mm -> m
+    my @origin = millimeter2meter( $origx, $origy, $origz );
+
+    # rotation: deg -> rad
+    my ( $rotZ, $rotX, $rotY ) = deg2rad( $rotxy, $rotyz, $rotzy );
+
+    # z axis
+    my @axis = (
+	sin($rotX) * cos($rotY) * sin($rotZ) + sin($rotY) * cos($rotZ),
+	sin($rotY) * sin($rotZ) - sin($rotX) * cos($rotY) * cos($rotZ),
+	cos($rotX) * cos($rotY),
+    );
+
+    my @dir = (
+	cos($rotY) * cos($rotZ) - sin($rotX) * sin($rotY) * sin($rotZ),
+	cos($rotY) * sin($rotZ) + sin($rotX) * sin($rotY) * cos($rotZ),
+	-cos($rotX) * sin($rotY),
+    );
+
+    for ( @axis, @dir ) {
+	if ( abs($_) <= 1e-8 ) {
+	    $_ = 0;
+	}
+	else {
+	    $_ = sprintf "%.8f", $_;
+	    s{\.?0+$}{};
+	}
+    }
+
+    print << "PRINT";
+
+coordinateSystem_$csysId
+{
+    type Cartesian;
+    origin (@origin);
+    axis (@axis);
+    direction (@dir);
+    // starcdRotation ($rotxy $rotyz $rotzy);
+}
+PRINT
+}
+
+print "\n", FoamDivider;
+
+# -------------------------------------------------------------------------
+
+__DATA__
+/*------------------------------*- c-mode -*---------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.3                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version 2.0;
+    format ascii;
+
+    root "..";
+    case "%{CASE}";
+    instance "constant";
+    local "";
+
+    note "persistent data for pro-STAR <-> OpenFOAM translation";
+    class dictionary;
+    object %{OBJECT};
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

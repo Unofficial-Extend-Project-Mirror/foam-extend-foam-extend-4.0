@@ -1,0 +1,11 @@
+meshReader.C
+meshReaderAux.C
+starMeshReader.C
+
+calcPointCells.C
+createPolyCells.C
+createPolyBoundary.C
+
+star4ToFoam.C
+
+EXE = $(FOAM_APPBIN)/star4ToFoam

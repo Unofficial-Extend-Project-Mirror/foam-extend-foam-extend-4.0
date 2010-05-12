@@ -1,0 +1,9 @@
+CPP        += -D$(WM_ARCH)
+
+GLIBS      = -liberty -lexecinfo
+
+include $(GENERAL_RULES)/standard
+
+include $(RULES)/X
+include $(RULES)/c
+include $(RULES)/c++

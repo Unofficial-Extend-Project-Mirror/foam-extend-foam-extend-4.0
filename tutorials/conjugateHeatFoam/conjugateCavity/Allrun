@@ -1,0 +1,14 @@
+#!/bin/sh
+
+currDir=`pwd`
+application=`basename $currDir`
+cases="conjugateCavity"
+
+tutorialPath=`dirname $0`/..
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+for case in $cases
+do
+    runApplication $application
+done 
+

@@ -1,0 +1,94 @@
+{
+
+const faceZoneMesh& fZones = faceZones();
+const pointZoneMesh& pZones = pointZones();
+const cellZoneMesh& cZones = cellZones();
+
+label constraintSize = 0;
+
+forAll(valves_, valveI)
+{
+    
+    vector valveVel =
+        valves_[valveI].curVelocity()*valves_[valveI].cs().axis();
+
+    {
+    
+        label movingPtsIndex = pZones.findZoneID("movingPointsV"+Foam::name(valveI + 1));
+        const labelList& movingPointsV = pZones[movingPtsIndex];
+    
+        forAll(movingPointsV, mpI)
+        {
+            constrainedPoints.append(movingPointsV[mpI]);
+            constrainedVelocity.append(valveVel);
+           
+            constraintSize++;
+        }
+    
+    }
+
+    {
+    
+        label movingInternalPtsIndex = pZones.findZoneID("movingInternalPointsV"+Foam::name(valveI + 1));
+        const labelList& movingInternalPointsV = pZones[movingInternalPtsIndex];
+    
+        forAll(movingInternalPointsV, mipI)
+        {
+            constrainedPoints.append(movingInternalPointsV[mipI]);
+            constrainedVelocity.append(valveVel);
+            
+            constraintSize++;
+        }
+    
+    }
+
+    {
+
+        label staticPtsIndex = pZones.findZoneID("staticPointsV"+Foam::name(valveI + 1));
+        const labelList& staticPointsV = pZones[staticPtsIndex];
+    
+        forAll(staticPointsV, spI)
+        {
+            constrainedPoints.append(staticPointsV[spI]);
+            constrainedVelocity.append(vector::zero);
+            constraintSize++;
+
+        }
+
+    }
+
+    /*
+    {
+    
+        label movingCellsIndex = cZones.findZoneID("movingCellsZoneV"+Foam::name(valveI + 1));
+        const labelList& movingCellsV = pZones[movingCellsIndex];
+    
+        forAll(movingCellsV, mcI)
+        {
+            constrainedPoints.append(movingCellsV[mcI]+points().size());
+            constrainedVelocity.append(valveVel);
+            constraintSize++;
+        }
+
+    }
+
+    Info << "movingFacesIndex" << endl;
+    
+    {
+    
+        label staticCellsIndex = cZones.findZoneID("staticCellsZoneV"+Foam::name(valveI + 1));
+        const labelList& staticCellsV = pZones[staticCellsIndex];
+    
+        forAll(staticCellsV, scI)
+        {
+            constrainedPoints.append(staticCellsV[scI]+points().size());
+            constrainedVelocity.append(vector::zero);
+            constraintSize++;
+        }
+
+    }
+*/
+
+}
+
+}

@@ -1,0 +1,18 @@
+#!/bin/sh
+set -x
+
+wmake libso specie
+wmake libso thermophysicalFunctions
+wmake libso liquids
+wmake libso liquidMixture
+wmake libso solids
+wmake libso solidMixture
+
+wmake libso basic
+wmake libso combustion
+wmake libso laminarFlameSpeed
+wmake libso chemistryModel
+wmake libso pdfs
+wmake libso radiation
+wmake libso barotropicCompressibilityModel
+

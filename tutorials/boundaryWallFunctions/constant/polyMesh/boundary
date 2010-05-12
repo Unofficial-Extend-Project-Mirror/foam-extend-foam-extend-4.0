@@ -1,0 +1,51 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version 2.0;
+    format ascii;
+
+    root "/home/hjasak/OpenFOAM/OpenFOAM-1.3/tutorials/boundaryFoam";
+    case "boundaryWallFunctions";
+    instance ""constant"";
+    local "polyMesh";
+
+    class polyBoundaryMesh;
+    object boundary;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+3
+(
+lowerWall
+{
+    type wall;
+    physicalType wallFunctions;
+    nFaces 1;
+    startFace 79;
+}
+
+upperWall
+{
+    type wall;
+    physicalType wallFunctions;
+    nFaces 1;
+    startFace 80;
+}
+
+defaultFaces
+{
+    type empty;
+    nFaces 320;
+    startFace 81;
+}
+)
+
+// ************************************************************************* //

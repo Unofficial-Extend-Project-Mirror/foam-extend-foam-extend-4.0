@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+application="gnemdFoam"
+
+cd constrictedChannel
+   runApplication blockMesh
+   runApplication molConfig
+   runApplication $application
+cd ..
+
+cd nanoNozzle
+    runApplication blockMesh
+
+    runApplication decomposePar
+    hostname > system/machines
+
+    runParallel molConfig 4 system/machines
+    runParallel $application 4 system/machines
+
+    runApplication reconstructPar
+cd ..
+

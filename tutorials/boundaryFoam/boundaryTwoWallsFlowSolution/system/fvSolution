@@ -1,0 +1,68 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+// FoamX Case Dictionary.
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "boundaryFoam";
+    case            "boundaryWallFunctions";
+    instance        "system";
+    local           "";
+
+    class           dictionary;
+    object          fvSolution;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    // Solver for the U equation
+    U               ICCG 1e-12 0;
+    // Solver for the k equation
+    k               BICCG 1e-06 0;
+    // Solver for the epsilon equation
+    epsilon         BICCG 1e-06 0;
+    // Solver for the R equation
+    R               BICCG 1e-06 0;
+    // Solver for the nuTilda equation
+    nuTilda         BICCG 1e-06 0;
+}
+
+PISO
+{
+    // Number of PISO correctors
+    nCorrectors     2;
+    // Number of non-orthogonal correctors
+    nNonOrthogonalCorrectors 0;
+    // momentumPredictor?
+    momentumPredictor yes;
+    // fluxGradp?
+    fluxGradp       no;
+}
+
+relaxationFactors
+{
+    // U
+    U               0.1;
+    // k
+    k               0.7;
+    // epsilon
+    epsilon         0.7;
+    // R
+    R               0.7;
+    // nuTilda
+    nuTilda         0.7;
+}
+
+
+// ************************************************************************* //

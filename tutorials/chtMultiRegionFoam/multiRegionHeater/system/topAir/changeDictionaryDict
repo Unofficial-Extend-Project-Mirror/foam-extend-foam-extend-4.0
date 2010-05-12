@@ -1,0 +1,325 @@
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "/home/warhol/chris/foam/chris2.1/run/tutorials/interFoam";
+    case            "damBreak";
+    instance        "system";
+    local           "";
+
+    class           dictionary;
+    object          changePatchTypeDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+dictionaryReplacement
+{
+    U
+    {
+        internalField   uniform ( 0.01 0 0 );
+        boundaryField
+        {
+            minX
+            {
+                type            fixedValue;
+                value           uniform (0.01 0 0);
+            }
+            maxX
+            {
+                type            inletOutlet;
+                inletValue      uniform (0 0 0);
+            }
+
+
+            topAir_to_leftSolid
+            {
+                type            fixedValue;
+                value           uniform (0 0 0);
+
+            }
+            topAir_to_heater
+            {
+                type            fixedValue;
+                value           uniform (0 0 0);
+            }
+            topAir_to_rightSolid
+            {
+                type            fixedValue;
+                value           uniform (0 0 0);
+            }
+        }
+    }
+
+
+
+    T
+    {
+        boundaryField
+        {
+            minX
+            {
+                type            fixedValue;
+                value           uniform 300;
+            }
+            topAir_to_leftSolid
+            {
+                type            solidWallMixedTemperatureCoupled;
+                neighbourRegionName leftSolid;
+                neighbourPatchName leftSolid_to_topAir;
+                neighbourFieldName T;
+                K               K;
+                value           uniform 300;
+
+            }
+            topAir_to_heater
+            {
+                type            solidWallMixedTemperatureCoupled;
+                neighbourRegionName heater;
+                neighbourPatchName heater_to_topAir;
+                neighbourFieldName T;
+                K               K;
+                value           uniform 300;
+            }
+            topAir_to_rightSolid
+            {
+                type            solidWallMixedTemperatureCoupled;
+                neighbourRegionName rightSolid;
+                neighbourPatchName rightSolid_to_topAir;
+                neighbourFieldName T;
+                K               K;
+                value           uniform 300;
+            }
+        }
+    }
+
+
+    epsilon
+    {
+        // Set the value on all bc to non-zero. Not used in simulation
+        // since zeroGradient; only used in initialisation.
+        boundaryField
+        {
+            minX
+            {
+                type            fixedValue;
+                value           uniform 0.01;
+            }
+            maxX
+            {
+                type            zeroGradient;
+                value           uniform 0.01;
+            }
+
+            minY
+            {
+                type            zeroGradient;
+                value           uniform 0.01;
+            }
+            maxY
+            {
+                type            zeroGradient;
+                value           uniform 0.01;
+            }
+
+            minZ
+            {
+                type            zeroGradient;
+                value           uniform 0.01;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+                value           uniform 0.01;
+            }
+            topAir_to_leftSolid
+            {
+                type            zeroGradient;
+                value           uniform 0.01;
+            }
+            topAir_to_heater
+            {
+                type            zeroGradient;
+                value           uniform 0.01;
+            }
+            topAir_to_rightSolid
+            {
+                type            zeroGradient;
+                value           uniform 0.01;
+            }
+        }
+    }
+
+
+    k
+    {
+        internalField   uniform 0.1;
+        boundaryField
+        {
+            minX
+            {
+                type            fixedValue;
+                value           uniform 0.1;
+            }
+
+            maxX
+            {
+                type            zeroGradient;
+                value           uniform 0.1;
+            }
+
+            minY
+            {
+                type            zeroGradient;
+                value           uniform 0.1;
+            }
+            maxY
+            {
+                type            zeroGradient;
+                value           uniform 0.1;
+            }
+
+            minZ
+            {
+                type            zeroGradient;
+                value           uniform 0.1;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+                value           uniform 0.1;
+            }
+
+            topAir_to_leftSolid
+            {
+                type            zeroGradient;
+                value           uniform 0.1;
+            }
+            topAir_to_heater
+            {
+                type            zeroGradient;
+                value           uniform 0.1;
+            }
+            topAir_to_rightSolid
+            {
+                type            zeroGradient;
+                value           uniform 0.1;
+            }
+        }
+    }
+
+
+    pd
+    {
+        boundaryField
+        {
+            minX
+            {
+                type            fixedFluxBuoyantPressure;
+                value           0;
+            }
+            maxX
+            {
+                type            waveTransmissive;
+                field           pd;
+                U               U;
+                phi             phi;
+                rho             rho;
+                psi             psi;
+                gamma           1.4;    // cp/cv
+                fieldInf        0;
+                lInf            0.40;   // double length of domain
+                inletOutlet     off;
+                correctSupercritical off;
+                value           uniform 0;
+            }
+
+            minY
+            {
+                type            fixedFluxBuoyantPressure;
+                value           0;
+            }
+
+            minZ
+            {
+                type            fixedFluxBuoyantPressure;
+                value           0;
+            }
+            maxZ
+            {
+                type            fixedFluxBuoyantPressure;
+                value           0;
+            }
+
+            topAir_to_leftSolid
+            {
+                type            fixedFluxBuoyantPressure;
+                value           0;
+            }
+            topAir_to_heater
+            {
+                type            fixedFluxBuoyantPressure;
+                value           0;
+            }
+            topAir_to_rightSolid
+            {
+                type            fixedFluxBuoyantPressure;
+                value           0;
+            }
+        }
+    }
+
+    p
+    {
+        internalField   uniform 100000;
+
+        boundaryField
+        {
+            minX
+            {
+                type            calculated;
+                value           uniform 100000;
+            }
+            maxX
+            {
+                type            calculated;
+                value           uniform 100000;
+            }
+            maxY
+            {
+                type            calculated;
+                value           uniform 100000;
+            }
+            minZ
+            {
+                type            calculated;
+                value           uniform 100000;
+            }
+            maxZ
+            {
+                type            calculated;
+                value           uniform 100000;
+            }
+
+            topAir_to_leftSolid
+            {
+                type            calculated;
+                value           uniform 100000;
+            }
+            topAir_to_heater
+            {
+                type            calculated;
+                value           uniform 100000;
+            }
+            topAir_to_rightSolid
+            {
+                type            calculated;
+                value           uniform 100000;
+            }
+        }
+    }
+}
+
+// ************************************************************************* //

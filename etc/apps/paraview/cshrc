@@ -1,0 +1,65 @@
+#----------------------------------*-sh-*--------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation; either version 2 of the License, or (at your
+#     option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM; if not, write to the Free Software Foundation,
+#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Script
+#     paraview/cshrc
+#
+# Description
+#     Startup File for Paraview.
+#     Sourced from OpenFOAM-?.?/etc/cshrc
+#
+#------------------------------------------------------------------------------
+
+setenv CMAKE_HOME $WM_THIRD_PARTY_DIR/cmake-2.4.6/platforms/$WM_ARCH
+
+if ( -r $CMAKE_HOME ) then
+    set path=($CMAKE_HOME/bin $path)
+else
+    unsetenv CMAKE_HOME
+endif
+
+setenv ParaView_VERSION 2.4.4
+
+setenv ParaView_INST_DIR $WM_THIRD_PARTY_DIR/paraview-$ParaView_VERSION
+setenv ParaView_DIR $ParaView_INST_DIR/platforms/$WM_ARCH$WM_COMPILER
+
+if ($?PYTHONPATH) then
+    setenv PYTHONPATH ${PYTHONPATH}:$ParaView_DIR/bin:$ParaView_DIR/Utilities/VTKPythonWrapping
+else
+    setenv PYTHONPATH $ParaView_DIR/bin:$ParaView_DIR/Utilities/VTKPythonWrapping
+endif
+
+if ( -r $ParaView_INST_DIR ) then
+    setenv PV_INTERFACE_PATH $FOAM_UTILITIES/postProcessing/graphics/PVFoamReader/PVFoamReader/Make
+
+    set path=($ParaView_DIR/bin $path)
+    setenv LD_LIBRARY_PATH ${ParaView_DIR}/lib:${ParaView_DIR}/lib/vtk:${LD_LIBRARY_PATH}
+    setenv PV_PLUGIN_PATH $FOAM_LIBBIN
+endif
+
+if ( -r $ParaView_DIR ) then
+    setenv VTK_DIR $ParaView_DIR/VTK
+endif
+
+# -----------------------------------------------------------------------------

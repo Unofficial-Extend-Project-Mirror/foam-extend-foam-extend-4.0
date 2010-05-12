@@ -1,0 +1,182 @@
+#!/bin/sh
+#
+# Driver script to run mpi jobs with the processes in separate
+# windows or to separate log files.
+# Requires bash on all processors.
+
+
+PROGNAME=`basename $0`
+PROGDIR=`dirname $0`
+
+if [ `uname -s` = 'Linux' ]; then
+   ECHO='echo -e'
+else
+   ECHO='echo'
+fi
+
+
+printUsage() {
+  echo ""
+  echo "Usage: $PROGNAME -np <dd> <executable> <args>"
+  echo ""
+  echo "This will run like mpirun but with each process in an xterm"
+}
+
+nProcs=''
+exec=''
+args=''
+
+while [ "$1" != "" ]; do
+    echo "$1"
+    case $1 in
+      -np)
+        nProcs=$2;shift
+        ;;
+      *)
+        if [ ! "$exec" ]; then
+            exec=$1
+        elif [ ! "$args" ]; then
+            args="\"$1\""
+        else
+            args="$args \"$1\""
+        fi
+        ;;
+
+    esac
+    shift
+done
+
+echo "nProcs=$nProcs"
+echo "exec=$exec"
+echo "args=$args"
+
+if [ ! "$nProcs" ]; then
+    printUsage
+    exit 1
+fi
+if [ ! "$args" ]; then
+    printUsage
+    exit 1
+fi
+if [ ! "$exec" ]; then
+    printUsage
+    exit 1
+fi
+
+exec=`which $exec`
+if [ ! -x "$exec" ]; then
+    echo "Cannot find executable $exec or is not executable"
+    printUsage
+    exit 1
+fi
+
+
+
+echo "run $args" > $HOME/gdbCommands
+echo "where" >> $HOME/gdbCommands
+echo "Constructed gdb initialization file $HOME/gdbCommands"
+
+$ECHO "Choose running method: 1)gdb+xterm  2)gdb  3)log  4)xterm+valgrind: \c"
+read method
+if [ "$method" -ne 1 -a "$method" -ne 2 -a "$method" -ne 3 -a "$method" -ne 4 ]; then
+    printUsage
+    exit 1
+fi
+
+$ECHO "Run all processes local or distributed? 1)local  2)remote: \c"
+read spawn
+if [ "$spawn" -ne 1 -a "$spawn" -ne 2 ]; then
+    printUsage
+    exit 1
+fi
+
+# check ~/.$WM_PROJECT/$WM_PROJECT_VERSION/
+# check ~/.$WM_PROJECT/
+# check <installedProject>/etc/
+if [ "$WM_PROJECT" ]; then
+
+   for i in \
+      $HOME/.WM_PROJECT/$WM_PROJECT_VERSION \
+      $HOME/.WM_PROJECT \
+      $WM_PROJECT_DIR/etc \
+      ;
+   do
+      if [ -f "$i/bashrc" ]; then
+         sourceFoam="$i/bashrc"
+         break
+      fi
+   done
+fi
+
+# Construct test string for remote execution.
+# Source OpenFOAM settings if OpenFOAM environment not set.
+# attempt to preserve the installation directory 'FOAM_INST_DIR'
+if [ "$FOAM_INST_DIR" ]; then
+   sourceFoam='[ "$WM_PROJECT" ] || '"FOAM_INST_DIR=$FOAM_INST_DIR . $sourceFoam"
+else
+   sourceFoam='[ "$WM_PROJECT" ] || '". $sourceFoam"
+fi
+
+echo "**sourceFoam:$sourceFoam"
+
+rm -f $HOME/mpirun.schema
+touch $HOME/mpirun.schema
+
+proc=0
+xpos=0
+ypos=0
+for ((proc=0; proc<$nProcs; proc++))
+do
+    procCmdFile="$HOME/processor${proc}.sh"
+    procLog="processor${proc}.log"
+    geom="-geometry 120x20+$xpos+$ypos"
+    node=""
+
+    if [ .$WM_MPLIB = .OPENMPI ]; then
+        node="-np 1 "
+    elif [ .$WM_MPLIB = .LAM ]; then
+        if [ "$spawn" -eq 2 ]; then
+            node="c${proc} "
+        fi
+    fi
+
+    echo "#!/bin/sh" > $procCmdFile
+    if [ "$method" -eq 1 ]; then
+        echo "$sourceFoam; cd $PWD; gdb -command $HOME/gdbCommands $exec 2>&1 | tee $procLog; read dummy" >> $procCmdFile
+        #echo "$sourceFoam; cd $PWD; $exec $args; read dummy" >> $procCmdFile
+        echo "${node}xterm -font fixed -title 'processor'$proc $geom -e $procCmdFile" >> $HOME/mpirun.schema
+    elif [ "$method" -eq 2 ]; then
+        echo "$sourceFoam; cd $PWD; gdb -command $HOME/gdbCommands >& $procLog" >> $procCmdFile
+        echo "${node}$procCmdFile" >> $HOME/mpirun.schema
+    elif [ "$method" -eq 3 ]; then
+        echo "$sourceFoam; cd $PWD; $exec $args >& $procLog" >> $procCmdFile
+        echo "${node}$procCmdFile" >> $HOME/mpirun.schema
+    elif [ "$method" -eq 4 ]; then
+        echo "$sourceFoam; cd $PWD; valgrind $exec $args; read dummy" >> $procCmdFile
+        echo "${node}xterm -font fixed -title 'processor'$proc $geom -e $procCmdFile" >> $HOME/mpirun.schema
+    fi
+
+    chmod +x $procCmdFile
+
+    let column=proc%6
+    if [ $proc -ne 0 -a $column -eq 0 ]; then
+        ((xpos+=600))
+        ((ypos=0))
+    else
+        ((ypos+=200))
+    fi
+done
+
+for ((proc=0; proc<$nProcs; proc++))
+do
+    procLog="processor${proc}.log"
+    echo "    tail -f $procLog"
+done
+
+$ECHO "Constructed $HOME/mpirun.schema file. Press return to execute.\c"
+read dummy
+if [ .$WM_MPLIB = .OPENMPI ]; then
+    mpirun -app $HOME/mpirun.schema </dev/null
+elif [ .$WM_MPLIB = .LAM ]; then
+    mpirun $HOME/mpirun.schema </dev/null
+fi

@@ -1,0 +1,152 @@
+tetPolyMeshFaceDecomp           = tetPolyMeshFaceDecomp
+tetPolyBoundaryMeshFaceDecomp   = $(tetPolyMeshFaceDecomp)/tetPolyBoundaryMesh
+tetPolyPatchesFaceDecomp        = $(tetPolyMeshFaceDecomp)/tetPolyPatches
+tetPolyPatchFaceDecomp          = $(tetPolyPatchesFaceDecomp)/tetPolyPatch
+faceTetPolyPatchFaceDecomp      = $(tetPolyPatchesFaceDecomp)/faceTetPolyPatch
+basicTetPolyPatchesFaceDecomp   = $(tetPolyPatchesFaceDecomp)/basic
+constraintTetPolyPatchesFaceDecomp = $(tetPolyPatchesFaceDecomp)/constraint
+derivedTetPolyPatchesFaceDecomp = $(tetPolyPatchesFaceDecomp)/derived
+coupledTetPolyPatchFaceDecomp   = $(basicTetPolyPatchesFaceDecomp)/coupled
+coupledFaceTetPolyPatchFaceDecomp = $(basicTetPolyPatchesFaceDecomp)/coupledFace
+emptyTetPolyPatchFaceDecomp     = $(constraintTetPolyPatchesFaceDecomp)/empty
+symmetryTetPolyPatchFaceDecomp  = $(constraintTetPolyPatchesFaceDecomp)/symmetry
+wedgeTetPolyPatchFaceDecomp     = $(constraintTetPolyPatchesFaceDecomp)/wedge
+processorTetPolyPatchFaceDecomp = $(constraintTetPolyPatchesFaceDecomp)/processor
+globalTetPolyPatchFaceDecomp    = $(constraintTetPolyPatchesFaceDecomp)/global
+wallTetPolyPatchFaceDecomp      = $(derivedTetPolyPatchesFaceDecomp)/wall
+ggiTetPolyPatchFaceDecomp      = $(derivedTetPolyPatchesFaceDecomp)/ggi
+
+MapTetFemFieldsFaceDecomp       = $(tetPolyMeshFaceDecomp)/MapTetFemFieldsFaceDecomp
+
+tetPolyMeshCellDecomp           = tetPolyMeshCellDecomp
+tetPolyBoundaryMeshCellDecomp   = $(tetPolyMeshCellDecomp)/tetPolyBoundaryMesh
+tetPolyPatchesCellDecomp        = $(tetPolyMeshCellDecomp)/tetPolyPatches
+tetPolyPatchCellDecomp          = $(tetPolyPatchesCellDecomp)/tetPolyPatch
+faceTetPolyPatchCellDecomp      = $(tetPolyPatchesCellDecomp)/faceTetPolyPatch
+basicTetPolyPatchesCellDecomp   = $(tetPolyPatchesCellDecomp)/basic
+constraintTetPolyPatchesCellDecomp = $(tetPolyPatchesCellDecomp)/constraint
+derivedTetPolyPatchesCellDecomp = $(tetPolyPatchesCellDecomp)/derived
+coupledTetPolyPatchCellDecomp   = $(basicTetPolyPatchesCellDecomp)/coupled
+coupledFaceTetPolyPatchCellDecomp = $(basicTetPolyPatchesCellDecomp)/coupledFace
+emptyTetPolyPatchCellDecomp     = $(constraintTetPolyPatchesCellDecomp)/empty
+symmetryTetPolyPatchCellDecomp  = $(constraintTetPolyPatchesCellDecomp)/symmetry
+wedgeTetPolyPatchCellDecomp     = $(constraintTetPolyPatchesCellDecomp)/wedge
+processorTetPolyPatchCellDecomp = $(constraintTetPolyPatchesCellDecomp)/processor
+globalTetPolyPatchCellDecomp    = $(constraintTetPolyPatchesCellDecomp)/global
+wallTetPolyPatchCellDecomp      = $(derivedTetPolyPatchesCellDecomp)/wall
+ggiTetPolyPatchCellDecomp      = $(derivedTetPolyPatchesCellDecomp)/ggi
+
+MapTetFemFieldsCellDecomp       = $(tetPolyMeshCellDecomp)/MapTetFemFieldsCellDecomp
+
+tetPolyPatchInterpolation       = tetPolyPatchInterpolation
+tetPolyPatchInterpolationFaceDecomp = $(tetPolyPatchInterpolation)/tetPolyPatchInterpolationFaceDecomp
+tetPolyPatchInterpolationCellDecomp = $(tetPolyPatchInterpolation)/tetPolyPatchInterpolationCellDecomp
+
+
+/* Face decomposition mesh
+$(tetPolyPatchFaceDecomp)/tetPolyPatchFaceDecomp.C
+$(faceTetPolyPatchFaceDecomp)/faceTetPolyPatchFaceDecomp.C
+$(faceTetPolyPatchFaceDecomp)/newFaceTetPolyPatchFaceDecomp.C
+$(coupledTetPolyPatchFaceDecomp)/coupledTetPolyPatchFaceDecomp.C
+$(emptyTetPolyPatchFaceDecomp)/emptyTetPolyPatchFaceDecomp.C
+$(symmetryTetPolyPatchFaceDecomp)/symmetryTetPolyPatchFaceDecomp.C
+$(wedgeTetPolyPatchFaceDecomp)/wedgeTetPolyPatchFaceDecomp.C
+$(coupledFaceTetPolyPatchFaceDecomp)/coupledFaceTetPolyPatchFaceDecomp.C
+$(processorTetPolyPatchFaceDecomp)/processorTetPolyPatchFaceDecompM.C
+$(processorTetPolyPatchFaceDecomp)/calcProcessorTetPolyPatchFaceDecompAddr.C
+$(processorTetPolyPatchFaceDecomp)/calcProcessorTetPolyPatchFaceDecompPointAddr.C
+$(globalTetPolyPatchFaceDecomp)/globalTetPolyPatchFaceDecomp.C
+$(globalTetPolyPatchFaceDecomp)/calcGlobalTetPolyPatchFaceDecompAddr.C
+$(wallTetPolyPatchFaceDecomp)/wallTetPolyPatchFaceDecomp.C
+$(ggiTetPolyPatchFaceDecomp)/ggiTetPolyPatchFaceDecomp.C
+$(tetPolyBoundaryMeshFaceDecomp)/tetPolyBoundaryMeshFaceDecomp.C
+$(tetPolyMeshFaceDecomp)/tetPolyMeshLduAddressingFaceDecomp.C
+$(tetPolyMeshFaceDecomp)/tetPolyMeshFaceDecomp.C
+$(tetPolyMeshFaceDecomp)/calcTetPolyMeshFaceDecompGeometry.C
+$(tetPolyMeshFaceDecomp)/calcTetPolyMeshFaceDecompAddressing.C
+$(tetPolyMeshFaceDecomp)/addParallelPointPatchFaceDecomp.C
+$(tetPolyMeshFaceDecomp)/calcTetPolyMeshFaceDecompParPointData.C
+
+$(MapTetFemFieldsFaceDecomp)/tetPointMapperFaceDecomp.C
+$(MapTetFemFieldsFaceDecomp)/tetPolyPatchMapperFaceDecomp.C
+$(tetPolyPatchInterpolationFaceDecomp)/tetPolyPatchInterpolationFaceDecomp.C
+*/
+
+$(tetPolyPatchCellDecomp)/tetPolyPatchCellDecomp.C
+$(faceTetPolyPatchCellDecomp)/faceTetPolyPatchCellDecomp.C
+$(faceTetPolyPatchCellDecomp)/newFaceTetPolyPatchCellDecomp.C
+$(coupledTetPolyPatchCellDecomp)/coupledTetPolyPatchCellDecomp.C
+$(emptyTetPolyPatchCellDecomp)/emptyTetPolyPatchCellDecomp.C
+$(symmetryTetPolyPatchCellDecomp)/symmetryTetPolyPatchCellDecomp.C
+$(wedgeTetPolyPatchCellDecomp)/wedgeTetPolyPatchCellDecomp.C
+$(coupledFaceTetPolyPatchCellDecomp)/coupledFaceTetPolyPatchCellDecomp.C
+$(processorTetPolyPatchCellDecomp)/processorTetPolyPatchCellDecompM.C
+$(processorTetPolyPatchCellDecomp)/calcProcessorTetPolyPatchCellDecompAddr.C
+$(processorTetPolyPatchCellDecomp)/calcProcessorTetPolyPatchCellDecompPointAddr.C
+$(globalTetPolyPatchCellDecomp)/globalTetPolyPatchCellDecomp.C
+$(globalTetPolyPatchCellDecomp)/calcGlobalTetPolyPatchCellDecompAddr.C
+$(wallTetPolyPatchCellDecomp)/wallTetPolyPatchCellDecomp.C
+$(ggiTetPolyPatchCellDecomp)/ggiTetPolyPatchCellDecomp.C
+$(tetPolyBoundaryMeshCellDecomp)/tetPolyBoundaryMeshCellDecomp.C
+$(tetPolyMeshCellDecomp)/tetPolyMeshLduAddressingCellDecomp.C
+$(tetPolyMeshCellDecomp)/tetPolyMeshCellDecomp.C
+$(tetPolyMeshCellDecomp)/calcTetPolyMeshCellDecompGeometry.C
+$(tetPolyMeshCellDecomp)/calcTetPolyMeshCellDecompAddressing.C
+$(tetPolyMeshCellDecomp)/addParallelPointPatchCellDecomp.C
+$(tetPolyMeshCellDecomp)/calcTetPolyMeshCellDecompParPointData.C
+
+$(MapTetFemFieldsCellDecomp)/tetPointMapperCellDecomp.C
+$(MapTetFemFieldsCellDecomp)/tetPolyPatchMapperCellDecomp.C
+$(tetPolyPatchInterpolationCellDecomp)/tetPolyPatchInterpolationCellDecomp.C
+
+
+tetPolyPatchFields = fields/tetPolyPatchFields
+$(tetPolyPatchFields)/tetPolyPatchField/tetPolyPatchFields.C
+
+basicTetPolyPatchFields = $(tetPolyPatchFields)/basic
+$(basicTetPolyPatchFields)/calculated/calculatedTetPolyPatchFields.C
+$(basicTetPolyPatchFields)/coupled/coupledTetPolyPatchFields.C
+$(basicTetPolyPatchFields)/coupledFace/coupledFaceTetPolyPatchFields.C
+$(basicTetPolyPatchFields)/generic/genericTetPolyPatchFields.C
+$(basicTetPolyPatchFields)/value/valueTetPolyPatchFields.C
+$(basicTetPolyPatchFields)/fixedValue/fixedValueTetPolyPatchFields.C
+$(basicTetPolyPatchFields)/mixed/mixedTetPolyPatchFields.C
+$(basicTetPolyPatchFields)/zeroGradient/zeroGradientTetPolyPatchFields.C
+
+constraintTetPolyPatchFields = $(tetPolyPatchFields)/constraint
+$(constraintTetPolyPatchFields)/empty/emptyTetPolyPatchFields.C
+$(constraintTetPolyPatchFields)/wedge/wedgeTetPolyPatchFields.C
+$(constraintTetPolyPatchFields)/symmetry/symmetryTetPolyPatchFields.C
+$(constraintTetPolyPatchFields)/processor/processorTetPolyPatchFields.C
+
+derivedTetPolyPatchFields = $(tetPolyPatchFields)/derived
+$(derivedTetPolyPatchFields)/global/globalTetPolyPatchFields.C
+$(derivedTetPolyPatchFields)/componentMixed/componentMixedTetPolyPatchVectorField.C
+$(derivedTetPolyPatchFields)/oscillatingFixedValue/oscillatingFixedValueTetPolyPatchFields.C
+$(derivedTetPolyPatchFields)/timeVaryingUniformFixedValue/timeVaryingUniformFixedValueTetPolyPatchFields.C
+$(derivedTetPolyPatchFields)/slip/slipTetPolyPatchFields.C
+
+elementPatchFields = fields/elementPatchFields
+$(elementPatchFields)/elementPatchField/elementPatchFields.C
+
+basicElementPatchFields = $(elementPatchFields)/basic
+$(basicElementPatchFields)/calculated/calculatedElementPatchFields.C
+$(basicElementPatchFields)/coupled/coupledElementPatchFields.C
+$(basicElementPatchFields)/coupledFace/coupledFaceElementPatchFields.C
+$(basicElementPatchFields)/value/valueElementPatchFields.C
+
+constraintElementPatchFields = $(elementPatchFields)/constraint
+$(constraintElementPatchFields)/empty/emptyElementPatchFields.C
+$(constraintElementPatchFields)/wedge/wedgeElementPatchFields.C
+$(constraintElementPatchFields)/symmetry/symmetryElementPatchFields.C
+$(constraintElementPatchFields)/processor/processorElementPatchFields.C
+$(constraintElementPatchFields)/global/globalElementPatchFields.C
+
+
+fields/tetPointFields/tetPointFields.C
+fields/elementFields/elementFields.C
+
+tetFemMatrix/tetFemScalarMatrix.C
+tetFemMatrix/tetFemMatrices.C
+
+LIB = $(FOAM_LIBBIN)/libcellDecompFiniteElement

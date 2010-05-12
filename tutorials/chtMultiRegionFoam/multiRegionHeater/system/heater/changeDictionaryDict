@@ -1,0 +1,195 @@
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "/home/warhol/chris/foam/chris2.1/run/tutorials/interFoam";
+    case            "damBreak";
+    instance        "system";
+    local           "";
+
+    class           dictionary;
+    object          changePatchTypeDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+dictionaryReplacement
+{
+    T
+    {
+        internalField   uniform 300;
+
+        boundaryField
+        {
+            minY
+            {
+                type            fixedValue;
+                value           uniform 500;
+            }
+
+            minZ
+            {
+                type            zeroGradient;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+            }
+
+            heater_to_bottomAir
+            {
+                type            solidWallMixedTemperatureCoupled;
+                neighbourRegionName bottomAir;
+                neighbourPatchName bottomAir_to_heater;
+                neighbourFieldName T;
+                K               K;
+                value           uniform 300;
+
+            }
+            heater_to_leftSolid
+            {
+                type            solidWallMixedTemperatureCoupled;
+                neighbourRegionName leftSolid;
+                neighbourPatchName leftSolid_to_heater;
+                neighbourFieldName T;
+                K               K;
+                value           uniform 300;
+            }
+            heater_to_rightSolid
+            {
+                type            solidWallMixedTemperatureCoupled;
+                neighbourRegionName rightSolid;
+                neighbourPatchName rightSolid_to_heater;
+                neighbourFieldName T;
+                K               K;
+                value           uniform 300;
+            }
+            heater_to_topAir
+            {
+                type            solidWallMixedTemperatureCoupled;
+                neighbourRegionName topAir;
+                neighbourPatchName topAir_to_heater;
+                neighbourFieldName T;
+                K               K;
+                value           uniform 300;
+            }
+        }
+    }
+
+    rho
+    {
+        internalField   uniform 8000;
+
+        boundaryField
+        {
+            minY
+            {
+                type            zeroGradient;
+            }
+            minZ
+            {
+                type            zeroGradient;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+            }
+            heater_to_bottomAir
+            {
+                type            zeroGradient;
+            }
+            heater_to_leftSolid
+            {
+                type            zeroGradient;
+            }
+            heater_to_rightSolid
+            {
+                type            zeroGradient;
+            }
+            heater_to_topAir
+            {
+                type            zeroGradient;
+            }
+        }
+    }
+
+
+    K
+    {
+        internalField   uniform 80;
+
+        boundaryField
+        {
+            minY
+            {
+                type            zeroGradient;
+            }
+            minZ
+            {
+                type            zeroGradient;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+            }
+            heater_to_bottomAir
+            {
+                type            zeroGradient;
+            }
+            heater_to_leftSolid
+            {
+                type            zeroGradient;
+            }
+            heater_to_rightSolid
+            {
+                type            zeroGradient;
+            }
+            heater_to_topAir
+            {
+                type            zeroGradient;
+            }
+        }
+    }
+
+
+    cp
+    {
+        internalField   uniform 450;
+
+        boundaryField
+        {
+            minY
+            {
+                type            zeroGradient;
+            }
+            minZ
+            {
+                type            zeroGradient;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+            }
+            heater_to_bottomAir
+            {
+                type            zeroGradient;
+            }
+            heater_to_leftSolid
+            {
+                type            zeroGradient;
+            }
+            heater_to_rightSolid
+            {
+                type            zeroGradient;
+            }
+            heater_to_topAir
+            {
+                type            zeroGradient;
+            }
+        }
+    }
+}
+
+// ************************************************************************* //

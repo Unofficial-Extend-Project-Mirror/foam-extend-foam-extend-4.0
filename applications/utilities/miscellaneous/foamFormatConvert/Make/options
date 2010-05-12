@@ -1,0 +1,11 @@
+EXE_INC = \
+    -I$(FOAM_SRC)/finiteVolume/lnInclude \
+    -I$(FOAM_SRC)/meshTools/lnInclude \
+    -I$(FOAM_SRC)/lagrangian/basic/lnInclude \
+
+
+EXE_LIBS = \
+    -lmeshTools \
+    -lfiniteVolume \
+    -llagrangian
+

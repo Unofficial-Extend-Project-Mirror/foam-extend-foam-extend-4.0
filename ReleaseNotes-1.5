@@ -1,0 +1,176 @@
+#                            -*- mode: org; -*-
+#
+#+TITLE:          *OpenFOAM release notes for version 1.5*
+#+AUTHOR:                      Hrvoje Jasak.
+#+DATE:                       19 August 2008
+#+LINK:                  http://www.wikki.co.uk
+#+OPTIONS: author:nil
+
+* Overview
+  OpenFOAM-1.5 is is a significant upgrade to version 1.4 in ways which are
+  outlined below.  This release passes all our standard tests and the tutorials
+  have been broadly checked.  If there are any bugs, please report them using
+  the instructions set out in: http://www.openfoam.org/bugs.html.
+
+  Most of the developments for this release are in: new applications, e.g. for
+  multiphase flow and cavitation, buoyancy-flow and heat transfer, high speed
+  flows and even molecular dynamics; new utilities, e.g. for meshing and case
+  monitoring; and, new modelling, e.g. in Lagrangian particle tracking,
+  radiation and rotating frames of reference.  With these new applications come
+  numerous new example cases.
+
+* GNU/Linux version
+  The 64bit binary packs of the OpenFOAM release were compiled on a machine
+  running SuSE GNU/Linux version 10.3 and the 32bit on a machine running Ubuntu
+  GNU/Linux version 7.1 and also tested on Ubuntu 8.04.  We recommend that
+  users run OpenFOAM on one of these or a similar recent version of GNU/Linux.
+  This release has also been successfully compiled and tested on older GNU/Linux
+  releases but this requires the installation of Qt 4.3.? for ParaView-3 to run.
+
+* C++ Compiler version
+  + Released compiled with GCC 4.3.1, the latest version.
+  + Built in support for the Intel C++ 10.? compiler (untested).
+  + The choice of the compiler is controlled by the setting of the $WM\_COMPILER
+    and $WM\_COMPILER\_ARCH environment variables in the OpenFOAM-1.5/etc/bashrc
+    (or cshrc) file.
+  + The location of the installation of the compiler is controlled by the
+    $WM\_COMPILER\_INST environment variable in the OpenFOAM-1.5/etc/settings.sh
+    (or settings.csh) file.
+
+* Developments to solvers (applications)
+  + New rhoCentralFoam solver for high-speed, viscous, compressible flows using
+    non-oscillatory, central-upwind schemes.
+  + New interDyMFoam solver for 2 incompressible, isothermal, immiscible fluids
+    using a VoF phase-fraction based interface capturing approach, with optional
+    mesh motion and mesh topology changes including adaptive mesh
+    (un)refinement.  Useful for simulations such as tank filling, sloshing ---
+    using solid body motion e.g. SDA or SKA (6DoF) --- and slamming (using the
+    mesh motion solver) and other large-scale applications that benefit from the
+    efficiency gain of adaptive mesh (un)refinement of the interface.
+  + New compressibleInterFoam solver for 2 compressible, isothermal, immiscible
+    fluids using a volume of fluid (VoF) phase-fraction approach for
+    interface-capturing.  The momentum and other fluid properties are of the
+    "mixture" and a single momentum equation is solved.  Turbulence is modelled
+    using a run-time selectable incompressible LES model.
+  + New interPhaseChangeFoam solver for 2 incompressible, isothermal, immiscible
+    fluids with phase-change, e.g. cavitation.  Uses VoF interface capturing,
+    with momentum and other fluid properties described for the ``mixture'' and a
+    single momentum equation is solved.  The set of phase-change models provided
+    are designed to simulate cavitation but other mechanisms of phase-change are
+    supported within this solver framework.
+  + New rasCavitatingFoam solver for transient cavitation using a barotropic
+    compressibility model, with RAS turbulence.
+  + New lesCavitatingFoam solver for transient cavitation using a barotropic
+    compressibility model, with LES turbulence.
+  + New chtMultiRegionFoam solver that couples conjugate heat transfer in a
+    solid to a buoyancy-driven flow simulation.
+  + New PDRFoam solver for compressible premixed/partially-premixed turbulent
+    combustion that includes porosity/distributed resistance (PDR) modelling to
+    handle regions containing solid blockages which cannot be resolved by the
+    mesh.  Requires the PDR fields.
+  + New lesBuoyantFoam solver for transient, buoyant, turbulent flow of
+    compressible fluids for ventilation and heat-transfer. Turbulence is
+    modelled using a run-time selectable compressible LES model.
+  + New rhoPimpleFoam solver for transient, turbulent flow of compressible
+    fluids for ventilation and heat-transfer. Uses the flexible PIMPLE
+    (PISO-SIMPLE) solution for time-resolved and pseudo-transient simulations.
+  + New buoyantSimpleRadiationFoam solver for steady-state, buoyant, turbulent
+    flow of compressible fluids with radiation, for ventilation and
+    heat-transfer.
+  + New rhoTurbTwinParcelFoam solver for transient for compressible, turbulent
+    flow with two thermo-clouds.
+  + New gnemdFOAM solver for general purpose molecular dynamics that simulates
+    atoms in arbitrary shaped domains and average atomic/molecular quantities to
+    the mesh to create field data.
+  + New mdEqulibrationFoam solver to equilibrates and/or preconditions molecular
+    dynamics systems.
+  + Demonstration SRFSimpleFoam solver based on simpleFoam that incorporates the
+    SRF extensions (see below) for rotating flows.
+
+* Automatic mesher
+  New snappyHexMesh utility that generates split-hex meshes automatically from
+  triangulated (STL) surface geometries.  The mesh approximately conforms to
+  the surface by iteratively refining a starting mesh and morphing the
+  resulting split-hex mesh to the surface.  An optional phase will shrink back
+  the resulting mesh and insert cell layers.  It has a flexible specification
+  of mesh refinement level and robust surface handling with a pre-specified
+  final mesh quality.  It runs in parallel with a load balancing step every
+  iteration.
+
+* Developments to utilities
+  + New extrude2DMesh utility that extrudes 2D meshes into a 3D mesh.  2D meshes
+    are described by faces with 2 points, so can be used in combination with 2D
+    meshes converted with ccm26ToFoam.
+  + New couplePatches functionality integrated into createPatch, which
+    optionally synchronises ("couples") points and faces of coupled (cyclic,
+    processor) patches.
+  + New applyBoundaryLayer pre-processing utility to apply 1/7th power-law
+    boundary layers at walls, starting from uniform or potential flow solutions.
+  + New execFlowFunctionObjects utility executes functionObjects as a
+    post-processing activity, e.g. probes, sampling, force calculation.
+  + New changeDictionary utility makes batch changes to OpenFOAM input files,
+    e.g. to change boundary conditions of field files.
+  + New foamCalc utility, a generic post-processing field calculator tool
+  + New molConfig pre-processing utility for molecular dynamics cases.  Fills
+    zones of a mesh with single crystal lattices of specified structure,
+    density, orientation, alignment and temperature.
+  + Extended splitMeshRegions utility to split multi-zone meshes, e.g. defined
+    through cellZones, into separate meshes.
+  + Extended the foamToVTK, decomposePar, reconstructPar and mapFields utilities
+    to include support for multiple particle clouds in parallel processing.
+
+* Migration from ParaView 2.4 to ParaView 3.x
+  + Rewritten OpenFOAM Reader Module for version 3, a major redesign of
+    ParaView.
+  + New features include viewing patch names, reading of Lagrangian data,
+    handling of cell, face and point sets, multiple views.
+
+* Model development
+  + Overhauled the lagrangian library to support multiple clouds.
+  + New lagrangianIntermediate library incorporating a hierarchy of parcel and
+    cloud types, accommodating kinematic, thermodynamic and reacting
+    applications, including coupling to the new radiation library. Sub-models
+    are added at the relevant level of physics, e.g.:
+	- kinematic: injection, wall interaction, drag, dispersion;
+	- thermo: heat transfer;
+	- reacting: reacting composition, mass transfer, surface reactions.
+  + New single rotating frame of reference (SRF) library for rotating flow
+    applications, e.g. turbo-machinery.
+  + New radiation library including the P1 model and associated Marshak boundary
+    conditions for incident radiation.
+  + New displacementInterpolation motion solver for flexible mesh scaling.
+  + New molecularDynamics Lagrangian library to calculate intermolecular forces
+    between spherically symmetrical monatomic species in arbitrary geometries.
+
+* New functionObjects
+  To aid common monitoring and post-processing activities.
+  + forces: calculate the force and moment on a patch or set of patches, e.g. to
+    calculate the lift, drag and moment of an object in the flow.
+  + forceCoeffs: calculate the normalised force and moment on a patch or set of
+    patches, e.g. to calculate the lift, drag and moment coefficients of an
+    object in the flow.
+  + fieldAverage: calculate field arithmetic mean and prime-squared averages for
+    a list of fields.
+  + foamCalcFunctions: calculate field components, div, mag, magGrad or magSqr.
+
+* Improvements to boundary conditions
+  + Generalised jumpCyclic type: cyclic condition with an additional prescribed
+    jump in value.
+  + fan type: specialisation of jumpCyclic, applying a prescribed jump in
+    pressure to simulate a fan within a mesh.
+  + Generalised advective outflow boundary condition based on solving D/Dt(psi,
+    U) = 0 at the boundary.
+  + Additional turbulent flow inlet to specify mixing length and frequency.
+  + Generalisation of time varying set of boundary conditions.
+
+* Other
+  + New argument-free command execution, e.g typing "icoFoam" without root and
+    case directory arguments.
+  + Extended time command line options.
+  + Many enhancements to dictionary including macro substitution, optional
+    merging and default/overwrite behaviour, enhanced "#include" file handling
+    and the framework to support function evaluation.
+  + Cross-links between applications and Doxygen documentation with the "-doc"
+    argument.
+  + Non-blocking, non-buffered, parallel transfers with potential scaling
+    benefits for larger number of processors.

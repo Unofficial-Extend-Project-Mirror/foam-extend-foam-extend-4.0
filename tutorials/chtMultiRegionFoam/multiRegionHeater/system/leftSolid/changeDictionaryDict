@@ -1,0 +1,171 @@
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "/home/warhol/chris/foam/chris2.1/run/tutorials/interFoam";
+    case            "damBreak";
+    instance        "system";
+    local           "";
+
+    class           dictionary;
+    object          changePatchTypeDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+dictionaryReplacement
+{
+    T
+    {
+        internalField   uniform 300;
+
+        boundaryField
+        {
+            minX
+            {
+                type            zeroGradient;
+            }
+            minZ
+            {
+                type            zeroGradient;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+            }
+            leftSolid_to_bottomAir
+            {
+                type            solidWallMixedTemperatureCoupled;
+                neighbourRegionName bottomAir;
+                neighbourPatchName bottomAir_to_leftSolid;
+                neighbourFieldName T;
+                K               K;
+                value           uniform 300;
+
+            }
+            leftSolid_to_heater
+            {
+                type            solidWallMixedTemperatureCoupled;
+                neighbourRegionName heater;
+                neighbourPatchName heater_to_leftSolid;
+                neighbourFieldName T;
+                K               K;
+                value           uniform 300;
+            }
+            leftSolid_to_topAir
+            {
+                type            solidWallMixedTemperatureCoupled;
+                neighbourRegionName topAir;
+                neighbourPatchName topAir_to_leftSolid;
+                neighbourFieldName T;
+                K               K;
+                value           uniform 300;
+            }
+        }
+    }
+
+    rho
+    {
+        internalField   uniform 8000;
+
+        boundaryField
+        {
+            minX
+            {
+                type            zeroGradient;
+            }
+            minZ
+            {
+                type            zeroGradient;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+            }
+            leftSolid_to_bottomAir
+            {
+                type            zeroGradient;
+            }
+            leftSolid_to_heater
+            {
+                type            zeroGradient;
+            }
+            leftSolid_to_topAir
+            {
+                type            zeroGradient;
+            }
+        }
+    }
+
+
+    K
+    {
+        internalField   uniform 80;
+
+        boundaryField
+        {
+            minX
+            {
+                type            zeroGradient;
+            }
+            minZ
+            {
+                type            zeroGradient;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+            }
+            leftSolid_to_bottomAir
+            {
+                type            zeroGradient;
+            }
+            leftSolid_to_heater
+            {
+                type            zeroGradient;
+            }
+            leftSolid_to_topAir
+            {
+                type            zeroGradient;
+            }
+        }
+    }
+
+
+    cp
+    {
+        internalField   uniform 450;
+
+        boundaryField
+        {
+            minX
+            {
+                type            zeroGradient;
+            }
+            minZ
+            {
+                type            zeroGradient;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+            }
+            leftSolid_to_bottomAir
+            {
+                type            zeroGradient;
+            }
+            leftSolid_to_heater
+            {
+                type            zeroGradient;
+            }
+            leftSolid_to_topAir
+            {
+                type            zeroGradient;
+            }
+        }
+    }
+}
+
+// ************************************************************************* //

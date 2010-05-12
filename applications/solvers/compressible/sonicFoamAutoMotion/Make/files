@@ -1,0 +1,3 @@
+sonicFoamAutoMotion.C
+
+EXE = $(FOAM_APPBIN)/sonicFoamAutoMotion

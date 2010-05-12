@@ -1,0 +1,49 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          dynamicMeshDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dynamicFvMesh      mixerFvMesh;
+
+mixerFvMeshCoeffs
+{
+    coordinateSystem
+    {
+        type            cylindrical;
+        origin          (0 0 0);
+        axis            (0 0 1);
+        direction       (1 0 0);
+    }
+
+    rpm             10;
+    attachDetach    false;
+    rotatingRegionMarkerPoint   (0 0 0);
+
+    slider
+    {
+        moving      insideSlider;
+        static      outsideSlider;
+    }
+}
+
+
+// ************************************************************************* //

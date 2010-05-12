@@ -1,0 +1,41 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+    class           dictionary;
+    object          tetFemSolution;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    motionU amgSolver
+    {
+        cycle           W-cycle;
+        policy          AAMG;
+        nPreSweeps      0;
+        nPostSweeps     2;
+        groupSize       4;
+        minCoarseEqns   30;
+        nMaxLevels      100;
+        scale           on;
+        smoother        GaussSeidel;
+
+        minIter         0;
+        maxIter         500;
+        tolerance       1e-8;
+        relTol          0.0;
+    };
+}
+
+
+// ************************************************************************* //

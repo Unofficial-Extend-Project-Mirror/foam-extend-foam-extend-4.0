@@ -1,0 +1,205 @@
+#                            -*- mode: org; -*-
+#
+#+TITLE:             *OpenFOAM README for version 1.5*
+#+AUTHOR:                      Hrvoje Jasak.
+#+DATE:                       19 August 2008
+#+LINK:                    http://www.wikki.co.uk
+#+OPTIONS: author:nil
+
+* Copyright
+  OpenFOAM is free software; you can redistribute it and/or modify it under the
+  terms of the GNU General Public License as published by the Free Software
+  Foundation; either version 2 of the License, or (at your option) any later
+  version.  See the file COPYING in this directory, for a description of the GNU
+  General Public License terms under which you can copy the files.
+
+* System requirements
+  OpenFOAM is developed and tested on Linux, but should work with other Unix
+  style systems.  To check your system setup, execute the foamSystemCheck script
+  in the bin/ directory of the OpenFOAM installation. If no problems are
+  reported, proceed to "3. Installation"; otherwise contact your system
+  administrator.
+
+  If the user wishes to run OpenFOAM in 32/64-bit mode they should consult the
+  section "Running OpenFOAM in 32-bit mode".
+
+*** Qt (from http://trolltech.com/products/qt)
+  	The ParaView 3.3 visualisation package requires that Qt version 4.3.x MUST
+    be installed on the system.  Earlier or more recent versions (4.2.x or
+    4.4.x) will NOT work.  To check whether Qt4 is installed, and the version,
+    type:
+  	+ qmake --version
+
+  	The ParaView binary executables in the ThirdParty distribution will only
+    work with PRECISELY the same version of Qt with which it was compiled.  The
+    64-bit version of ParaView was compiled with Qt-4.3.1 (with openSuSE-10.3)
+    and the 32-bit version of ParaView was compiled with Qt-4.3.2 (with
+    ubuntu-7.10).  If the user finds that a ParaView binary fails to run, then
+    it is almost certainly due to a conflict in compiled and installed Qt
+    versions and they will need to consult the section below on "Compiling
+    ParaView and the PV3FoamReader module."
+
+    The default versions of Qt used by some GNU/Linux releases are as follows.
+    + ubuntu-7.10:   Version 4.3.2
+    + ubuntu-8.04:   Version 4.3.4
+    + openSuSE-10.2: Version 4.2.1 - too old
+    + openSuSE-10.3: Version 4.3.1
+    + openSuSE-11.0: Version 4.4.0 - too new
+
+	For openSuSE 10.2, 10.3 and 11.0, Qt version 4.3.5 can be downloaded from:
+    http://download.opensuse.org/repositories/KDE:/Qt43
+
+    Compilation and running of ParaView has been successful using the libraries
+    downloaded in the "libqt4-dev" package on ubuntu.
+
+* Installation
+  Download and unpack the files in the $HOME/OpenFOAM directory as described in:
+  http://www.OpenFOAM.org/download.html
+
+  The environment variable settings are contained in files in an etc/ directory
+  in the OpenFOAM release. e.g. in
+
+  + $HOME/OpenFOAM/OpenFOAM-<VERSION>/etc/
+  + where <VERSION> corresponds to the version 1.4, 1.5, ...
+
+  1) EITHER, if running bash or ksh (if in doubt type 'echo $SHELL'), source the
+    etc/bashrc file by adding the following line to the end of your
+    $HOME/.bashrc file:
+
+    + . $HOME/OpenFOAM/OpenFOAM-<VERSION>/etc/bashrc
+
+    Then update the environment variables by sourcing the $HOME/.bashrc file by
+    typing in the terminal:
+
+	+ . $HOME/.bashrc
+
+  2) OR, if running tcsh or csh, source the etc/cshrc file by adding the
+    following line to the end of your $HOME/.cshrc file:
+
+    + source $HOME/OpenFOAM/OpenFOAM-<VERSION>/etc/cshrc
+
+    Then update the environment variables by sourcing the $HOME/.cshrc file by
+    typing in the terminal:
+
+	+ source $HOME/.cshrc
+
+*** Installation in alternative locations
+    OpenFOAM may also be installed in alternative locations. However, the
+    installation directory should be network available (e.g., NFS) if parallel
+    calculations are planned.
+
+    The environment variable 'FOAM_INST_DIR' can be used to find and source the
+    appropriate resource file. Here is a bash/ksh/sh example:
+
+	+ export FOAM_INST_DIR=/data/app/OpenFOAM
+    + foamDotFile=$FOAM_INST_DIR/OpenFOAM-<VERSION>/etc/bashrc
+    + [ -f $foamDotFile ] && . $foamDotFile
+
+    and a csh/tcsh example:
+
+	+ setenv FOAM_INST_DIR /data/app/OpenFOAM
+    + foamDotFile=$FOAM_INST_DIR/OpenFOAM-<VERSION>/etc/bashrc
+    + if ( -f $foamDotFile ) source $foamDotFile
+
+    The value set in '$FOAM_INST_DIR' will be used to locate the remaining parts
+    of the OpenFOAM installation.
+
+* Building from Sources (Optional)
+  If you cannot find an appropriate binary pack for your platform, you can build
+  the complete OpenFOAM from the source-pack.  You will first need to compile or
+  obtain a recent version of gcc (we recomend gcc-4.3.?) for your platform,
+  which may be obtained from http://gcc.gnu.org/.
+
+  Install the compiler in
+  $WM_PROJECT_INST_DIR/ThirdParty/gcc-<GCC_VERSION>/platforms/$WM_ARCH$WM_COMPILER_ARCH/
+  and change the gcc version number in $WM_PROJECT_DIR/etc/settings.sh and
+  $WM_PROJECT_DIR/etc/settings.csh appropriately and finally update the
+  environment variables as in section 3.
+
+  Now go to the top-level source directory $WM_PROJECT_DIR and execute the
+  top-level build script './Allwmake'.  In principle this will build everything,
+  but if problems occur with the build order it may be necessary to update the
+  environment variables and re-execute 'Allwmake'. If you experience
+  difficulties with building the source-pack, or your platform is not currently
+  supported, please contact <enquiries@wikki.co.uk> to negotiate a support
+  contract and we will do the port and maintain it for future releases.
+
+* Testing the installation
+  To check your installation setup, execute the 'foamInstallationTest' script
+  (in the bin/ directory of the OpenFOAM installation). If no problems are
+  reported, proceed to getting started with OpenFOAM; otherwise, go back and
+  check you have installed the software correctly and/or contact your system
+  administrator.
+
+* Getting Started
+  Create a project directory within the $HOME/OpenFOAM directory named
+  <USER>-<VERSION> (e.g. 'chris-1.5' for user chris and OpenFOAM version 1.5)
+  and create a directory named 'run' within it, e.g. by typing:
+
+  + mkdir -p $HOME/OpenFOAM/${USER}-${WM_PROJECT_VERSION}/run
+
+  Copy the 'tutorial' examples directory in the OpenFOAM distribution to the
+  'run' directory.  If the OpenFOAM environment variables are set correctly,
+  then the following command will be correct:
+
+  + cp -r $WM_PROJECT_DIR/tutorials
+    $HOME/OpenFOAM/${USER}-${WM_PROJECT_VERSION}/run
+
+  Run the first example case of incompressible laminar flow in a cavity:
+
+  + cd $HOME/OpenFOAM/${USER}-${WM_PROJECT_VERSION}/run/tutorials/icoFoam/cavity
+  + blockMesh
+  + icoFoam
+  + paraFoam
+
+* Compiling Paraview 3.3 and the PV3FoamReader module
+  A version of Qt 4.3.x must be installed to compile ParaView.  The compilation
+  is a fairly simple process using the supplied buildParaView3.3-cvs script that
+  has worked is our tests with other packages supplied in the ThirdParty
+  directory, namely cmake-2.4.6 and gcc-4.3.1.  Execute the following:
+  + cd $FOAM_INST_DIR/ThirdParty
+  + rm -rf ParaView3.3-cvs/platforms
+  + buildParaView3.3-cvs
+
+  The PV3FoamReader module is an OpenFOAM utility that can be compiled in the
+  usual manner as follows:
+  + cd $FOAM_UTILITIES/postProcessing/graphics/PV3FoamReader
+  + ./Allwclean
+  + ./Allwmake
+
+* Documentation
+  http://www.OpenFOAM.org/doc
+
+* Help
+  http://www.OpenFOAM.org http://www.OpenFOAM.org/discussion.html
+
+* Reporting Bugs in OpenFOAM
+  http://www.OpenFOAM.org/bugs.html
+* Running OpenFOAM in 32-bit mode on 64-bit machines
+  Linux users with a 64-bit machine may install either the OpenFOAM 32-bit
+  version (linux) or the OpenFOAM 64-bit version (linux64), or both.  The 64-bit
+  is the default mode on a 64-bit machine.  To use an installed 32-bit version,
+  the user must set the environment variable $WM_32 (to anything, e.g. "on")
+  before sourcing the etc/bashrc (or etc/cshrc) file.
+
+* List of Contributors
+    Henry Weller
+    Hrvoje Jasak
+    Mattijs Janssens
+    Zeljko Tukovic
+    Tommaso Lucchini
+    Niklas Nordin
+    Martin Beaudoin
+    Eugene De Villiers
+    Henrik Rusche
+    Bernhard Gschaider
+    Chris Greenshields
+    Mark Olesen
+    Gavin Tabor
+    Jovani Favero
+    Frank Bos
+    David Hill
+    Niklas Wikstrom
+    Dubravko Matijasevic
+    Hilary Spencer
+    Andy Heather

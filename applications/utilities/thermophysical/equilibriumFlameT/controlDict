@@ -1,0 +1,30 @@
+P    1e5;
+
+fuel H2;
+n    0;
+m    2;
+
+/*
+fuel CH4ANHARMONIC;
+n    1;
+m    4;
+*/
+/*
+fuel ETHYLENE;
+n    2;
+m    4;
+*/
+
+/*
+fuel PROPANE;
+n    3;
+m    8;
+*/
+
+/*
+fuel ISOOCTANE;
+n    8;
+m    18;
+*/
+
+end;

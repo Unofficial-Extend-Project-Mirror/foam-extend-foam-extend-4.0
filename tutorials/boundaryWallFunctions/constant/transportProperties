@@ -1,0 +1,63 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+// FoamX Case Dictionary.
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "boundaryFoam";
+    case            "boundaryWallFunctions";
+    instance        "constant";
+    local           "";
+
+    class           dictionary;
+    object          transportProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Ubar
+Ubar            Ubar [0 1 -1 0 0 0 0] (10 0 0);
+
+// Laminar incompressible transport model
+transportModel  Newtonian;
+
+// nu
+nu              nu [0 2 -1 0 0 0 0] 1e-05;
+
+// Coefficients for Cross's Power Law
+CrossPowerLawCoeffs
+{
+    // nu0
+    nu0             nu0 [0 2 -1 0 0 0 0] 1e-06;
+    // nuInf
+    nuInf           nuInf [0 2 -1 0 0 0 0] 1e-06;
+    // m
+    m               m [0 0 1 0 0 0 0] 1;
+    // n
+    n               n [0 0 0 0 0 0 0] 1;
+}
+
+// Coefficients for Bird-Carreau Law
+BirdCarreauCoeffs
+{
+    // nu0
+    nu0             nu0 [0 2 -1 0 0 0 0] 1e-06;
+    // nuInf
+    nuInf           nuInf [0 2 -1 0 0 0 0] 1e-06;
+    // k
+    k               k [0 0 1 0 0 0 0] 0;
+    // n
+    n               n [0 0 0 0 0 0 0] 1;
+}
+
+
+// ************************************************************************* //

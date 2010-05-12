@@ -1,0 +1,128 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "XPP_DE";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          viscoelasticProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+/*
+From:
+VERBEETEN,W. M. H.; PETERS, G.W. M.; BAAIJENS, F. P. T. Differential constitutive
+equations for polymer melts: The extended pom-pom model. Journal of Rheology,
+SOR, v. 45, n. 4, p. 823-843, 2001.
+
+BASF Lupolen 1810H LDPE melt
+
+TABLE III. XPP parameters for fitting of the Lupolen 1810H melt.
+Tr = 150 °C, ni = 2/q, Activation energy: E0 = 58.6 kJ/mol.
+
+Maxwell parameters       XPP model
+i G0i (Pa)    l0bi(s)    qi  l0bi/l0si ai
+1 2.1662e4    1.0000e-1  1     3.5     0.350
+2 9.9545e3    6.3096e-1  2     3.0     0.300
+3 3.7775e3    3.9811e0   3     2.8     0.250
+4 9.6955e2    2.5119e1   7     2.8     0.200
+5 1.1834e2    1.5849e2   8     1.5     0.100
+6 4.1614e0    1.0000e3   37    1.5     0.005
+*/
+
+rheology
+{
+    type multiMode;
+
+    models
+    (
+
+        first
+        {
+            type XPP-DE;
+            rho              rho [1 -3 0 0 0 0 0] 850;
+            etaS             etaS [1 -1 -1 0 0 0 0] 0.0;
+            etaP             etaP [1 -1 -1 0 0 0 0] 2166.2;
+            lambdaOb         lambdaOb [0 0 1 0 0 0 0] 1.0e-1;
+            lambdaOs         lambdaOs [0 0 1 0 0 0 0] 0.0285714;
+            alpha            alpha [0 0 0 0 0 0 0] 0.35;
+            q                q [0 0 0 0 0 0 0] 1;
+        }
+
+        second
+        {
+            type XPP-DE;
+            rho              rho [1 -3 0 0 0 0 0] 850;
+            etaS             etaS [1 -1 -1 0 0 0 0] 0.0;
+            etaP             etaP [1 -1 -1 0 0 0 0] 6280.8913;
+            lambdaOb         lambdaOb [0 0 1 0 0 0 0] 6.3096e-1;
+            lambdaOs         lambdaOs [0 0 1 0 0 0 0] 0.21032;
+            alpha            alpha [0 0 0 0 0 0 0] 0.3;
+            q                q [0 0 0 0 0 0 0] 2;
+        }
+
+        third
+        {
+            type XPP-DE;
+            rho              rho [1 -3 0 0 0 0 0] 850;
+            etaS             etaS [1 -1 -1 0 0 0 0] 0.0;
+            etaP             etaP [1 -1 -1 0 0 0 0] 15038.605;
+            lambdaOb         lambdaOb [0 0 1 0 0 0 0] 3.9811e0;
+            lambdaOs         lambdaOs [0 0 1 0 0 0 0] 1.4218214;
+            alpha            alpha [0 0 0 0 0 0 0] 0.25;
+            q                q [0 0 0 0 0 0 0] 3;
+        }
+
+        fourth
+        {
+            type XPP-DE;
+            rho              rho [1 -3 0 0 0 0 0] 850;
+            etaS             etaS [1 -1 -1 0 0 0 0] 0.0;
+            etaP             etaP [1 -1 -1 0 0 0 0] 24354.126;
+            lambdaOb         lambdaOb [0 0 1 0 0 0 0] 2.5119e1;
+            lambdaOs         lambdaOs [0 0 1 0 0 0 0] 8.9710714;
+            alpha            alpha [0 0 0 0 0 0 0] 0.2;
+            q                q [0 0 0 0 0 0 0] 7;
+        }
+
+        fifth
+        {
+            type XPP-DE;
+            rho              rho [1 -3 0 0 0 0 0] 850;
+            etaS             etaS [1 -1 -1 0 0 0 0] 0.0;
+            etaP             etaP [1 -1 -1 0 0 0 0] 18755.707;
+            lambdaOb         lambdaOb [0 0 1 0 0 0 0] 1.5849e2;
+            lambdaOs         lambdaOs [0 0 1 0 0 0 0] 105.66;
+            alpha            alpha [0 0 0 0 0 0 0] 0.1;
+            q                q [0 0 0 0 0 0 0] 8;
+        }
+
+        sixth
+        {
+            type XPP-DE;
+            rho              rho [1 -3 0 0 0 0 0] 850;
+            etaS             etaS [1 -1 -1 0 0 0 0] 0.0;
+            etaP             etaP [1 -1 -1 0 0 0 0] 4161.4;
+            lambdaOb         lambdaOb [0 0 1 0 0 0 0] 1.0e3;
+            lambdaOs         lambdaOs [0 0 1 0 0 0 0] 666.66667;
+            alpha            alpha [0 0 0 0 0 0 0] 0.005;
+            q                q [0 0 0 0 0 0 0] 37;
+        }
+    );
+}
+
+
+// ************************************************************************* //

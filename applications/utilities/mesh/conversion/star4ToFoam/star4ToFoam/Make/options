@@ -1,0 +1,12 @@
+EXE_INC = \
+    /* -DDEBUG_BAFFLES */ \
+    /* -DDEBUG_BOUNDARY */ \
+    /* -DDEBUG_CELLPOLY */ \
+    /* -DDEBUG_FACE_ORDERING */ \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude
+
+EXE_LIBS = \
+    -lfiniteVolume \
+    -lmeshTools
+

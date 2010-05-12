@@ -1,0 +1,47 @@
+correlationFunction = correlationFunction
+
+distribution = distribution
+
+molecule = molecule
+moleculeCloud = moleculeCloud
+
+reducedUnits = reducedUnits
+
+referredMolecule = referredMolecule
+referredCellList = referredCellList
+referredCell = referredCell
+referralLists = referralLists
+$(distribution)/distribution.C
+
+$(reducedUnits)/reducedUnits.C
+$(reducedUnits)/reducedUnitsIO.C
+
+$(molecule)/molecule.C
+$(molecule)/moleculeIO.C
+
+$(moleculeCloud)/moleculeCloud.C
+$(moleculeCloud)/moleculeCloudBuildCellOccupancy.C
+$(moleculeCloud)/moleculeCloudBuildCellInteractionLists.C
+$(moleculeCloud)/moleculeCloudBuildCellReferralLists.C
+
+$(moleculeCloud)/moleculeCloudTestEdgeEdgeDistance.C
+$(moleculeCloud)/moleculeCloudTestPointFaceDistance.C
+$(moleculeCloud)/moleculeCloudRealCellsInRangeOfSegment.C
+$(moleculeCloud)/moleculeCloudReferredCellsInRangeOfSegment.C
+
+$(moleculeCloud)/moleculeCloudCalculateForce.C
+$(moleculeCloud)/moleculeCloudCalculatePairForce.C
+$(moleculeCloud)/moleculeCloudCalculateTetherForce.C
+$(moleculeCloud)/moleculeCloudCalculateExternalForce.C
+$(moleculeCloud)/moleculeCloudIntegrateEquationsOfMotion.C
+$(moleculeCloud)/moleculeCloudRemoveHighEnergyOverlaps.C
+$(moleculeCloud)/moleculeCloudApplyConstraintsAndThermostats.C
+
+$(referralLists)/receivingReferralList.C
+$(referralLists)/sendingReferralList.C
+$(referredCellList)/referredCellList.C
+$(referredCell)/referredCell.C
+$(referredMolecule)/referredMolecule.C
+
+LIB = $(FOAM_LIBBIN)/libmolecule
+

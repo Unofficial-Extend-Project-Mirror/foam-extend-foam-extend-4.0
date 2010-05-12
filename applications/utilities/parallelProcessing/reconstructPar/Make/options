@@ -1,0 +1,13 @@
+EXE_INC = \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/finiteArea/lnInclude \
+    -I$(LIB_SRC)/lagrangian/basic/lnInclude \
+    -I$(LIB_SRC)/tetDecompositionFiniteElement/lnInclude \
+    $(WM_DECOMP_INC)
+
+EXE_LIBS = \
+    -lfiniteVolume \
+    -lfiniteArea \
+    -llagrangian \
+    -lmeshTools \
+    $(WM_DECOMP_LIBS)

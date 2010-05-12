@@ -1,0 +1,397 @@
+#---------------------------------*- sh -*-------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation; either version 2 of the License, or (at your
+#     option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM; if not, write to the Free Software Foundation,
+#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Script
+#     buildParaViewFunctions
+#
+# Description
+#     ParaView build/install helper functions
+#
+#------------------------------------------------------------------------------
+
+# ParaView_INST_DIR  : location of the original sources
+# ParaView_DIR       : location of the build (for the ParaViewConfig.cmake)
+#                      and the installed program
+
+
+#
+# set CMake cache variables
+#
+addCMakeVariable()
+{
+    while [ -n "$1" ]
+    do
+        CMAKE_VARIABLES="$CMAKE_VARIABLES -D$1"
+        shift
+    done
+}
+
+
+#
+# verbose makefiles
+#
+addVerbosity()
+{
+    [ "$VERBOSE" = ON ] && addCMakeVariable  CMAKE_VERBOSE_MAKEFILE=TRUE
+}
+
+
+#
+# define options for mpi support
+#
+addMpiSupport()
+{
+    [ "$WITH_MPI" = ON ] || return
+    OBJ_ADD="$OBJ_ADD-mpi"
+
+    addCMakeVariable  PARAVIEW_USE_MPI=ON VTK_USE_MPI=ON
+    addCMakeVariable  MPI_INCLUDE_PATH=$MPI_ARCH_PATH/include
+    addCMakeVariable  MPI_LIBRARY=$MPI_ARCH_PATH/lib/libmpi.so
+    addCMakeVariable  VTK_MPIRUN_EXE=$MPI_ARCH_PATH/bin/mpirun
+    addCMakeVariable  VTK_MPI_MAX_NUMPROCS=$MPI_MAX_PROCS
+}
+
+
+#
+# define options for python support
+#
+addPythonSupport()
+{
+    [ "$WITH_PYTHON" = ON ] || return
+    OBJ_ADD="$OBJ_ADD-py"
+
+    if pythonBin=$(which python 2>/dev/null)
+    then
+        if [ -n "$PYTHON_LIBRARY" ]
+        then
+            # check $PYTHON_LIBRARY if it has been set
+            if [ ! -e "$PYTHON_LIBRARY" ]
+            then
+                echo "*** Error: libpython not found at location specified " \
+                     "by PYTHON_LIBRARY=$PYTHON_LIBRARY"
+            fi
+        else
+            # Try to get $PYTHON_LIBRARY from dynamically linked binary
+            PYTHON_LIBRARY=$(ldd $pythonBin | \
+                sed -ne '/libpython/s/.* => \(.*\) (.*/\1/p')
+
+           if [ ! -e "$PYTHON_LIBRARY" ]
+           then
+               echo "*** Error: Unable to determine path to python library."
+           fi
+        fi
+
+        [ -e "$PYTHON_LIBRARY" ] || {
+            echo "    Please set the variable PYTHON_LIBRARY to the full"
+            echo "    path to (and including) libpython, or deactivate"
+            echo "    python support by setting WITH_PYTHON=OFF"
+            exit 1
+        }
+
+        pythonMajor=$(echo $PYTHON_LIBRARY | sed 's/.*libpython\(.*\)\.so.*/\1/')
+        pythonInclude=/usr/include/python$pythonMajor
+
+        [ -e "$PYTHON_LIBRARY" ] || {
+            echo "    Please set the variable PYTHON_LIBRARY to the full"
+            echo "    path to (and including) libpython, or deactivate"
+            echo "    python support by setting WITH_PYTHON=OFF"
+            exit 1
+        }
+
+        # note - we could also allow for a PYTHON_INCLUDE variable ...
+        [ -e "$pythonInclude" ] || {
+            echo "    No python include headers found"
+            echo "    Please install python headers or deactivate "
+            echo "    python support by setting WITH_PYTHON=OFF"
+            exit 1
+        }
+
+        addCMakeVariable  PARAVIEW_ENABLE_PYTHON=ON
+        addCMakeVariable  PYTHON_INCLUDE_PATH=$pythonInclude
+        addCMakeVariable  PYTHON_LIBRARY=$PYTHON_LIBRARY
+
+        echo "----"
+        echo "Python information:"
+        echo "    executable     : $pythonBin"
+        echo "    version        : $pythonMajor"
+        echo "    include path   : $pythonInclude"
+        echo "    library        : $PYTHON_LIBRARY"
+
+        unset pythonBin pythonInclude pythonMajor
+    else
+        echo "*** Error: python not installed"
+        echo "***        Deactivate python support by setting WITH_PYTHON=OFF"
+        exit 1
+    fi
+}
+
+
+#
+# define options for mesa support
+#
+addMesaSupport()
+{
+    [ "$WITH_MESA" = ON ] || return
+
+    if [ -d "$MESA_INCLUDE_DIR" -a -f "$MESA_LIBRARY" ]
+    then
+        OBJ_ADD="$OBJ_ADD-mesa"
+
+        addCMakeVariable  VTK_OPENGL_HAS_OSMESA=ON
+        addCMakeVariable  OSMESA_INCLUDE_DIR=$MESA_INCLUDE_DIR
+        addCMakeVariable  OSMESA_LIBRARY=$MESA_LIBRARY
+
+    else
+       echo "*** Error: no MESA information found"
+       echo "***        Deactivate MESA support by setting WITH_MESA=OFF, or"
+       echo "***        correct paths given by:"
+       echo "***        - MESA_INCLUDE_DIR ($MESA_INCLUDE_DIR)"
+       echo "***        - MESA_LIBRARY ($MESA_LIBRARY)"
+       exit 1
+    fi
+}
+
+
+#
+# discover where things are or should be put
+#
+getPaths()
+{
+    # set paraview environment
+    for i in $PWD $WM_THIRD_PARTY_DIR
+    do
+        ParaView_INST_DIR=$i/$PARAVIEW_SRC
+        [ -d $ParaView_INST_DIR ] && break
+    done
+
+    if [ ! -d "$ParaView_INST_DIR" ]
+    then
+        # last chance: maybe already in the paraview directory
+        [ "${PWD##*/}" = $PARAVIEW_SRC ] && ParaView_INST_DIR=$PWD
+
+        [ -d "$ParaView_INST_DIR" ] || {
+            echo "did not find $PARAVIEW_SRC in these directories:"
+            echo "  PWD=$PWD"
+            echo "  WM_THIRD_PARTY_DIR=$WM_THIRD_PARTY_DIR"
+            echo "abort build"
+            exit 1
+        }
+    fi
+
+    # ParaView_DIR=$ParaView_INST_DIR/platforms/$WM_ARCH$WM_COMPILER$OBJ_ADD
+    ParaView_DIR=$ParaView_INST_DIR/platforms/$WM_ARCH$WM_COMPILER
+    echo "ParaView_DIR=$ParaView_DIR"
+}
+
+
+#
+# configure via cmake, but don't actually build anything
+#
+configParaView()
+{
+    # remove any existing build folder and recreate
+    if [ -d $ParaView_DIR ]
+    then
+        echo "removing old build/install directory"
+        rm -rf $ParaView_DIR
+    fi
+    mkdir -p $ParaView_DIR
+
+    cd $ParaView_DIR
+
+    echo "----"
+    echo "Configuring $PARAVIEW_SRC"
+    echo "    MPI support    : $WITH_MPI"
+    echo "    Python support : $WITH_PYTHON"
+    echo "    MESA support   : $WITH_MESA"
+    echo "    Source         : $ParaView_INST_DIR"
+    echo "    Target         : $ParaView_DIR"
+    echo "----"
+    echo
+    echo cmake \
+        -DCMAKE_INSTALL_PREFIX:PATH=$ParaView_DIR \
+        $CMAKE_VARIABLES \
+        ../..
+    echo
+    echo "----"
+    echo
+
+    # run cmake to create Makefiles
+    cmake \
+        -DCMAKE_INSTALL_PREFIX:PATH=$ParaView_DIR \
+        $CMAKE_VARIABLES \
+        ../..
+
+}
+
+
+#
+# invoke make
+# also link bin/ to lib/paraview-* for development without installation
+#
+makeParaView()
+{
+    cd $ParaView_DIR || exit 1  # change to build folder
+    echo "    Starting make"
+
+    if [ -r /proc/cpuinfo ]
+    then
+        WM_NCOMPPROCS=$(egrep "^processor" /proc/cpuinfo | wc -l)
+        [ $WM_NCOMPPROCS -le 8 ] || WM_NCOMPPROCS=8
+
+        time make -j $WM_NCOMPPROCS
+    else
+        time make
+    fi
+    echo "    Done make"
+
+    echo "    For quicker development, linking lib/paraview-$PARAVIEW_MAJOR_VERSION/ -> bin/"
+    rm -rf lib/paraview-$PARAVIEW_MAJOR_VERSION
+    mkdir lib 2>/dev/null
+    ( cd lib && ln -s ../bin paraview-$PARAVIEW_MAJOR_VERSION )
+}
+
+
+#
+# adjust hard-links (internal function)
+# Note: use loop with grep to avoid touching too many files
+#
+fixHardLinks()
+{
+    envName=$1
+    string=$2
+    shift 2
+
+    echo "-- Replacing path hard links for \$$envName"
+
+    for fileSpec
+    do
+        echo -n "   $fileSpec: "
+        for i in $(find . -type f -iname "$fileSpec")
+        do
+            if grep -q "$string" $i
+            then
+                echo -n "#"
+                sed -i "s,$string,\$ENV{$envName},g" $i
+            fi
+        done
+        echo
+    done
+}
+
+
+#
+# replace absolute paths with environment variables
+# This triggers a partial (or even a full) rebuild, but might let us
+# find our files later if we relocate the build
+#
+fixCMakeFiles()
+{
+    cd $ParaView_DIR || exit 1  # change to build folder
+
+    # Replace path with env variable: ParaView_DIR
+    fixHardLinks ParaView_DIR "$ParaView_DIR" '*.cmake'
+
+    # Replace path with env variable: ParaView_INST_DIR
+    fixHardLinks ParaView_INST_DIR "$ParaView_INST_DIR" '*.cmake'
+
+    # Replace path with env variable: MPI_ARCH_PATH
+    if [ "$WITH_MPI" = ON ]
+    then
+        fixHardLinks MPI_ARCH_PATH "$MPI_ARCH_PATH" '*.cmake'
+    fi
+
+    # Replace path with env variable: CMAKE_HOME
+    if [ -r "$CMAKE_HOME" ]
+    then
+        fixHardLinks CMAKE_HOME "$CMAKE_HOME" '*cmake*'
+    fi
+
+    # Replace path with env variable: WM_COMPILER_DIR
+    # (include cmake.check_cache)
+    # This triggers a complete rebuild (with cmake-2.6.2), but is likely
+    # needed when redistributing files
+    fixHardLinks WM_COMPILER_DIR "$WM_COMPILER_DIR" '*cmake*'
+}
+
+
+#
+# make html documentation (mostly just for the readers/writers)
+#
+makeDocs()
+{
+    cd $ParaView_DIR || exit 1  # change to build folder
+    echo "    Creating html documentation"
+
+    make HTMLDocumentation
+}
+
+
+#
+# actually install the program
+#
+installParaView()
+{
+    cd $ParaView_DIR || exit 1  # change to build folder
+    echo "    Installing ParaView to $ParaView_DIR"
+
+    echo "disabled 'make install' for now, just use links"
+
+    # about.txt may be missing
+    paraviewLibDir="$ParaView_DIR/lib/paraview-$PARAVIEW_MAJOR_VERSION"
+    if [ -d "$paraviewLibDir" -a ! -e "$paraviewLibDir/about.txt" ]
+    then
+        echo "paraview-$PARAVIEW_MAJOR_VERSION installed - $(date)" > $paraviewLibDir/about.txt
+    fi
+
+cat<< INFO
+    ---
+    Installation complete
+    Set environment variables:
+
+        export ParaView_INST_DIR=$ParaView_INST_DIR
+        export ParaView_DIR=$ParaView_DIR
+        export PV_PLUGIN_PATH=$FOAM_LIBBIN
+        export PATH=\$ParaView_DIR/bin:\$PATH
+    ---
+INFO
+}
+
+
+# clear all the variables used before using any of the functions
+unset VERBOSE
+unset WITH_MPI WITH_MESA
+unset WITH_PYTHON PYTHON_LIBRARY
+unset CMAKE_VARIABLES
+unset OBJ_ADD
+
+# start with these general settings
+addCMakeVariable  VTK_USE_TK=FALSE
+addCMakeVariable  BUILD_SHARED_LIBS:BOOL=ON VTK_USE_RPATH:BOOL=OFF
+addCMakeVariable  CMAKE_BUILD_TYPE:STRING=Release
+
+# include development files in "make install"
+addCMakeVariable  PARAVIEW_INSTALL_DEVELOPMENT:BOOL=ON
+
+# ----------------------------------------------------------------- end-of-file

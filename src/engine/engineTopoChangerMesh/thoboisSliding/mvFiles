@@ -1,0 +1,18 @@
+mv addAttachDetachFacesGambitNew.H   addAttachDetachFacesThoboisSliding.H
+mv addMeshModifiersGambitNew.H  addMeshModifiersThoboisSliding.H                
+mv addPistonFacesPointZonesGambitNew.H  addPistonFacesPointZonesThoboisSliding.H        
+mv addValvePistonCellZonesGambitNew.H   addValvePistonCellZonesThoboisSliding.H        
+mv addValvesFacesPointZonesGambitNew.H  addValvesFacesPointZonesThoboisSliding.H        
+mv moveAllTogetherGambitNew.H   moveAllTogetherThoboisSliding.H                
+mv movePistonPointsGambitNew.H   movePistonPointsThoboisSliding.H               
+mv moveTopOfTheValvesGambitNew.H  moveTopOfTheValvesThoboisSliding.H              
+mv moveValvePointsGambitNew.H   moveValvePointsThoboisSliding.H                
+mv poppetDeformationGambitNew.H poppetDeformationThoboisSliding.H                
+mv verticalValvesGambitNew.H   verticalValvesThoboisSliding.H                 
+mv verticalValvesGambitNewI.H  verticalValvesThoboisSliding.H                 
+
+mv addVerticalValvesGambitMeshModifiersNew.C  addVerticalValvesThoboisSlidingMeshModifiers.C      
+mv verticalValvesGambitCalculateNew.C  verticalValvesThoboisSlidingCalculate.C             
+mv verticalValvesGambitInitializeNew.C   verticalValvesThoboisSlidingInitialize.C           
+mv verticalValvesGambitMoveNew.C  verticalValvesThoboisSlidingMove.C                  
+mv verticalValvesGambitNew.C  verticalValvesThoboisSliding.C                      

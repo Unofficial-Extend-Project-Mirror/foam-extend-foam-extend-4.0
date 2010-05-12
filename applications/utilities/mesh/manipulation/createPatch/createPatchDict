@@ -1,0 +1,67 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.0                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "/home/penfold/mattijs/foam/mattijs2.1/run/icoFoam";
+    case            "cavity";
+    instance        "system";
+    local           "";
+
+    class           dictionary;
+    object          createPatcheDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Tolerance used in matching faces. Absolute tolerance is span of
+// face times this factor.
+matchTolerance 1E-3;
+
+// Do a synchronisation of coupled points.
+pointSync true;
+
+
+// Patches to create.
+// If no patches does a coupled point and face synchronisation anyway.
+patches
+(
+    {
+        // Name of new patch
+        name leftRight0;
+
+        // Type of new patch
+        type cyclic;
+
+        // How to construct: either 'patches' or 'set'
+        constructFrom patches;
+
+        // If constructFrom = patches : names of patches
+        patches (half0 half1);
+
+        // If constructFrom = set : name of faceSet
+        set f0;
+    }
+
+    {
+        name bottom;
+        type patch;
+
+        constructFrom set;
+
+        patches (half0 half1);
+
+        set bottomFaces;
+    }
+
+);
+
+// ************************************************************************* //

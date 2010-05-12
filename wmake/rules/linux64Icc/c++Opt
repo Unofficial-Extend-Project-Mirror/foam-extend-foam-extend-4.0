@@ -1,0 +1,3 @@
+c++DBUG     = 
+#c++OPT      = -O3 -xP -no-prec-div
+c++OPT      = -ansi-alias -O3 -fno-alias -fargument-noalias-global -unroll0

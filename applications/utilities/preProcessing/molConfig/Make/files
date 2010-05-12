@@ -1,0 +1,8 @@
+latticeStructures = latticeStructures
+velocityDistributions = velocityDistributions
+
+createMolecules.C
+molConfig.C
+genMolConfig.C
+
+EXE = $(FOAM_APPBIN)/molConfig

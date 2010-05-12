@@ -1,0 +1,62 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+    class           dictionary;
+    object          sampleDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+interpolationScheme cellPointFace;
+
+setFormat     xmgr;
+
+sets
+(
+    PSD_0
+    {
+        type            uniform;
+        axis            distance;
+        start           (0.076  0.0000001  0.00005);
+        end             (0.084  0.0000001  0.00005);
+        nPoints         200;
+    }
+
+    PSD_04
+    {
+        type            uniform;
+        axis            distance;
+        start           (0.076  0.0004  0.00005);
+        end             (0.084  0.0004  0.00005);
+        nPoints         200;
+    }
+
+    PSD_049
+    {
+        type            uniform;
+        axis            distance;
+        start           (0.076  0.00049  0.00005);
+        end             (0.084  0.00049  0.00005);
+        nPoints         200;
+    }
+);
+
+surfaces
+();
+
+fields
+(
+    PSD
+);
+
+
+// ************************************************************************* //

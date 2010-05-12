@@ -1,0 +1,8 @@
+#!/bin/sh
+set -x
+
+wmake libso LESfilters
+wmakeLnInclude incompressible
+wmake libso LESdeltas
+wmake libso incompressible
+wmake libso compressible
