@@ -29,26 +29,50 @@
 #     Setup file for ParaView3.
 #     Sourced from OpenFOAM-?.?/etc/bashrc
 #
+# Note
+#     The env. variable 'ParaView_DIR' is required for building plugins
 #------------------------------------------------------------------------------
 
 export CMAKE_HOME=$WM_THIRD_PARTY_DIR/cmake-2.4.6/platforms/$WM_ARCH
 
 if [ -r $CMAKE_HOME ]; then
-    export PATH=$CMAKE_HOME/bin:$PATH
+# determine the cmake to be used
+unset CMAKE_HOME
+for cmake in cmake-2.6.4 cmake-2.6.2 cmake-2.4.6
+do
+    cmake=$WM_THIRD_PARTY_DIR/$cmake/platforms/$WM_ARCH
+    if [ -r $cmake ]
+    then
+        export CMAKE_HOME=$cmake
+        export PATH=$CMAKE_HOME/bin:$PATH
 else
     unset CMAKE_HOME
-fi
+        break
+    fi
+done
 
 export ParaView_VERSION="3.3-cvs"
 # export ParaView_VERSION="3.4.0"
+# set MAJOR and VERSION variables if not already set
+[ -z "$ParaView_MAJOR" ] && export ParaView_MAJOR=paraview-3.6
+[ -z "$ParaView_VERSION" ] && export ParaView_VERSION=3.6.1
 
 export ParaView_INST_DIR=$WM_THIRD_PARTY_DIR/ParaView-$ParaView_VERSION
+export ParaView_INST_DIR=$WM_THIRD_PARTY_DIR/paraview-$ParaView_VERSION
 export ParaView_DIR=$ParaView_INST_DIR/platforms/$WM_ARCH$WM_COMPILER
 
 if [ "$PYTHONPATH" ]; then
     export PYTHONPATH=$PYTHONPATH:$ParaView_DIR/Utilities/VTKPythonWrapping
+# add in python libraries if required
+paraviewPython=$ParaView_DIR/Utilities/VTKPythonWrapping
+if [ -r $paraviewPython ]
+then
+    if [ "$PYTHONPATH" ]
+    then
+        export PYTHONPATH=$PYTHONPATH:$paraviewPython:$ParaView_DIR/lib/$ParaView_MAJOR
 else
     export PYTHONPATH=$ParaView_DIR/Utilities/VTKPythonWrapping
+        export PYTHONPATH=$paraviewPython:$ParaView_DIR/lib/$ParaView_MAJOR
 fi
 if [ $WM_ARCH == "darwinPpc" -o $WM_ARCH == "darwinIntel" ]	    
 then
@@ -56,6 +80,8 @@ then
 fi
 
 if [ -r $ParaView_DIR ]; then
+if [ -r $ParaView_DIR ]
+then
     export PATH=$ParaView_DIR/bin:$PATH
     export LD_LIBRARY_PATH=$ParaView_DIR/bin:$LD_LIBRARY_PATH
     if [ $WM_ARCH == "darwinPpc" -o $WM_ARCH == "darwinIntel" ]	    
@@ -73,4 +99,5 @@ if [ -r $ParaView_DIR ]; then
     fi
 fi
 
+unset cmake paraviewPython
 # -----------------------------------------------------------------------------

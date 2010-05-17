@@ -35,8 +35,6 @@
 alias _foamAddPath 'set path=(\!* $path)'
 # prefix to LD_LIBRARY_PATH
 alias _foamAddLib 'setenv LD_LIBRARY_PATH \!*\:${LD_LIBRARY_PATH}'
-# make directory if it doesn't already exist
-alias _foamMkDir 'if ( ! -d \!* ) mkdir -p \!*'
 
 # location of the jobControl directory
 setenv FOAM_JOB_DIR $WM_PROJECT_INST_DIR/jobControl
@@ -53,15 +51,19 @@ setenv WM_DECOMP_INC -DFACE_DECOMP
 setenv WM_DECOMP_LIBS "-lfaceDecompFiniteElement -lfaceDecompositionMotionSolver"
 
 # base configuration
-setenv FOAM_SRC $WM_PROJECT_DIR/src
-setenv FOAM_LIB $WM_PROJECT_DIR/lib
-setenv FOAM_LIBBIN $WM_PROJECT_DIR/lib/$WM_OPTIONS
 setenv FOAM_APP $WM_PROJECT_DIR/applications
 setenv FOAM_APPBIN $WM_PROJECT_DIR/applications/bin/$WM_OPTIONS
+setenv FOAM_LIB $WM_PROJECT_DIR/lib
+setenv FOAM_LIBBIN $WM_PROJECT_DIR/lib/$WM_OPTIONS
+setenv FOAM_SRC $WM_PROJECT_DIR/src
+
+# shared site configuration - similar naming convention as ~OpenFOAM expansion
+setenv FOAM_SITE_APPBIN $WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/bin/$WM_OPTIONS
+setenv FOAM_SITE_LIBBIN $WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/lib/$WM_OPTIONS
 
 # user configuration
-setenv FOAM_USER_LIBBIN $WM_PROJECT_USER_DIR/lib/$WM_OPTIONS
 setenv FOAM_USER_APPBIN $WM_PROJECT_USER_DIR/applications/bin/$WM_OPTIONS
+setenv FOAM_USER_LIBBIN $WM_PROJECT_USER_DIR/lib/$WM_OPTIONS
 
 # convenience
 setenv FOAM_TUTORIALS $WM_PROJECT_DIR/tutorials
@@ -73,15 +75,13 @@ setenv FOAM_RUN $WM_PROJECT_USER_DIR/run
 set path=($WM_DIR $WM_PROJECT_DIR/bin $path)
 
 _foamAddPath $FOAM_APPBIN
+_foamAddPath $FOAM_SITE_APPBIN
 _foamAddPath $FOAM_USER_APPBIN
+ # Make sure to pick up dummy versions of external libraries last
+_foamAddLib  $FOAM_LIBBIN/dummy
 _foamAddLib  $FOAM_LIBBIN
+_foamAddLib  $FOAM_SITE_LIBBIN
 _foamAddLib  $FOAM_USER_LIBBIN
-
-# create these directories if necessary:
-_foamMkDir $FOAM_LIBBIN
-_foamMkDir $FOAM_APPBIN
-_foamMkDir $FOAM_USER_LIBBIN
-_foamMkDir $FOAM_USER_APPBIN
 
 
 # Select compiler installation
@@ -94,7 +94,14 @@ switch ("$compilerInstall")
 case OpenFOAM:
     switch ("$WM_COMPILER")
     case Gcc:
-        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/gcc-4.3.1/platforms/$WM_ARCH$WM_COMPILER_ARCH
+        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/gcc-4.3.3/platforms/$WM_ARCH$WM_COMPILER_ARCH
+        _foamAddLib $WM_THIRD_PARTY_DIR/mpfr-2.4.1/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
+        _foamAddLib $WM_THIRD_PARTY_DIR/gmp-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
+    breaksw
+    case Gcc43:
+        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/gcc-4.3.3/platforms/$WM_ARCH$WM_COMPILER_ARCH
+        _foamAddLib $WM_THIRD_PARTY_DIR/mpfr-2.4.1/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
+        _foamAddLib $WM_THIRD_PARTY_DIR/gmp-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
     breaksw
     case Gcc42:
         setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/gcc-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH
@@ -126,7 +133,7 @@ unset MPI_ARCH_PATH
 
 switch ("$WM_MPLIB")
 case OPENMPI:
-    set mpi_version=openmpi-1.2.6
+    set mpi_version=openmpi-1.3.3
     setenv MPI_HOME $WM_THIRD_PARTY_DIR/$mpi_version
     setenv MPI_ARCH_PATH $MPI_HOME/platforms/$WM_OPTIONS
 
@@ -140,18 +147,28 @@ case OPENMPI:
     unset mpi_version
     breaksw
 
-case LAM:
-    set mpi_version=lam-7.1.4
-    setenv MPI_HOME $WM_THIRD_PARTY_DIR/$mpi_version
-    setenv MPI_ARCH_PATH $MPI_HOME/platforms/$WM_OPTIONS
-    setenv LAMHOME $WM_THIRD_PARTY_DIR/$mpi_version
-    # note: LAMHOME is deprecated, should probably point to MPI_ARCH_PATH too
+case SYSTEMOPENMPI:
 
-    _foamAddPath $MPI_ARCH_PATH/bin
-    _foamAddLib  $MPI_ARCH_PATH/lib
+    # This uses the installed openmpi. It needs mpicc installed!
+
+    set mpi_version=openmpi-system
+
+    # Set compilation flags here instead of in wmake/rules/../mplibSYSTEMOPENMPI
+    setenv PINC `mpicc --showme:compile` 
+    setenv PLIBS `mpicc --showme:link`
+    set libDir=`echo "$PLIBS" | sed -e 's/.*-L\([^ ]*\).*/\1/'`
+
+    if ($?FOAM_VERBOSE && $?prompt) then
+        echo "Using system installed MPI:"
+        echo "    compile flags : $PINC"
+        echo "    link flags    : $PLIBS"
+        echo "    libmpi dir    : $libDir"
+    endif
+
+    _foamAddLib $libDir
 
     setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/$mpi_version
-    unset mpi_version
+    unset mpi_version libDir
     breaksw
 
 case MPICH:
@@ -272,7 +289,6 @@ endif
 # ~~~~~~~~~~~~~~~~~~~~
 unalias _foamAddPath
 unalias _foamAddLib
-unalias _foamMkDir
 unset minBufferSize
 
 # -----------------------------------------------------------------------------

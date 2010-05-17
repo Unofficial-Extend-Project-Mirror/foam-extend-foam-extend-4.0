@@ -33,14 +33,15 @@
 #------------------------------------------------------------------------------
 
 export WM_PROJECT=OpenFOAM
-export WM_PROJECT_VERSION=1.5-dev
-#: ${WM_PROJECT_VERSION:=dev}; export WM_PROJECT_VERSION
+export WM_PROJECT_VERSION=1.6-ext
 
 # helps to easily write #ifdefs to detect a dev-version
 export FOAM_DEV=1
 
-#!!User:
-#    either set $FOAM_INST_DIR before sourcing this file or set
+################################################################################
+# USER EDITABLE PART
+#
+# either set $FOAM_INST_DIR before sourcing this file or set
 #    $foamInstall below to where OpenFOAM is installed
 #
 # Location of FOAM installation
@@ -49,8 +50,21 @@ foamInstall=$HOME/$WM_PROJECT
 # foamInstall=~$WM_PROJECT
 # foamInstall=/usr/local/$WM_PROJECT
 # foamInstall=/opt/$WM_PROJECT
+#
+# END OF (NORMAL) USER EDITABLE PART
+################################################################################
 
+# note the location for later use (eg, in job scripts)
 : ${FOAM_INST_DIR:=$foamInstall}; export FOAM_INST_DIR
+
+# The old dirs to be cleaned from the various environment variables
+# - remove anything under top-level directory.
+# NB: the WM_PROJECT_INST_DIR might not be identical between versions
+foamOldDirs="$FOAM_INST_DIR $HOME/$WM_PROJECT/$USER"
+if [ "$WM_PROJECT_INST_DIR" != "$FOAM_INST_DIR" ]
+then
+    foamOldDirs="$WM_PROJECT_INST_DIR $foamOldDirs"
+fi
 
 
 # Location of site/user files
@@ -62,13 +76,13 @@ export WM_PROJECT_USER_DIR=$HOME/$WM_PROJECT/$USER-$WM_PROJECT_VERSION
 
 # Location of third-party software
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-export WM_THIRD_PARTY_DIR=$WM_PROJECT_INST_DIR/ThirdParty
+export WM_THIRD_PARTY_DIR=$WM_PROJECT_INST_DIR/ThirdParty-$WM_PROJECT_VERSION
 
 
-# Operating System/Platform from Unix or MSWindows
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# WM_OS = Unix | MSWindows
-: ${WM_OS:=Unix}; export WM_OS
+# Operating System/Platform
+# ~~~~~~~~~~~~~~~~~~~~~~~~~
+# WM_OSTYPE = POSIX | ????
+: ${WM_OSTYPE:=POSIX}; export WM_OSTYPE
 
 
 # Compiler: set to Gcc, Gcc43 or Icc (for Intel's icc)
@@ -91,12 +105,8 @@ export WM_NCOMPPROCS=2
 
 # WM_COMPILE_OPTION = Opt | Debug | Prof
 : ${WM_COMPILE_OPTION:=Opt}; export WM_COMPILE_OPTION
-#: ${WM_COMPILE_OPTION:=Debug}; export WM_COMPILE_OPTION
 
-# WM_JAVAC_OPTION = Opt | Debug
-: ${WM_JAVAC_OPTION:=Opt}; export WM_JAVAC_OPTION
-
-# WM_MPLIB = | OPENMPI| LAM | MPICH | MPICH-GM | HPMPI | GAMMA | MPI | QSMPI
+# WM_MPLIB = | OPENMPI | MPICH | MPICH-GM | HPMPI | GAMMA | MPI | QSMPI
 : ${WM_MPLIB:=OPENMPI}; export WM_MPLIB
 
 
@@ -137,9 +147,6 @@ Linux)
             export WM_CFLAGS='-m64 -fPIC'
             export WM_CXXFLAGS='-m64 -fPIC'
             export WM_LDFLAGS='-m64'
-            #export WM_COMPILER=Icc
-            #export WM_CC='icc'
-            #export WM_CXX='icpc'
             ;;
         *)
             echo Unknown WM_ARCH_OPTION $WM_ARCH_OPTION, should be 32 or 64
@@ -216,21 +223,18 @@ USAGE
 esac
 
 
-# Clean standard environment variables (PATH, MANPATH, LD_LIBRARY_PATH)
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Clean standard environment variables (PATH, LD_LIBRARY_PATH, MANPATH)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cleanProg=$WM_PROJECT_DIR/bin/foamCleanPath
 
-# Remove anything under top-level foam directory
-wildCards="$WM_PROJECT_INST_DIR $HOME/$WM_PROJECT/$USER"
-
-#- Clean path/PATH
-cleanPath=`$cleanProg "$PATH" "$wildCards"` && PATH="$cleanPath"
+#- Clean PATH
+cleanEnv=`$cleanProg "$PATH" "$foamOldDirs"` && PATH="$cleanEnv"
 
 #- Clean LD_LIBRARY_PATH
-cleanPath=`$cleanProg "$LD_LIBRARY_PATH" "$wildCards"` && LD_LIBRARY_PATH="$cleanPath"
+cleanEnv=`$cleanProg "$LD_LIBRARY_PATH" "$foamOldDirs"` && LD_LIBRARY_PATH="$cleanEnv"
 
 #- Clean MANPATH
-cleanPath=`$cleanProg "$MANPATH" "$wildCards"` && MANPATH="$cleanPath"
+cleanEnv=`$cleanProg "$MANPATH" "$foamCleanDirs"` && MANPATH="$cleanEnv"
 
 export PATH LD_LIBRARY_PATH MANPATH
 
@@ -255,33 +259,33 @@ _foamSource $WM_PROJECT_DIR/etc/aliases.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # _foamSource $WM_PROJECT_DIR/etc/apps/paraview/bashrc
 _foamSource $WM_PROJECT_DIR/etc/apps/paraview3/bashrc
-_foamSource $WM_PROJECT_DIR/etc/apps/ensightFoam/bashrc
-# _foamSource $WM_PROJECT_DIR/etc/apps/cint/bashrc
+_foamSource $WM_PROJECT_DIR/etc/apps/ensight/bashrc
 
 
-# Again clean environment (path, PATH, MANPATH, LD_LIBRARY_PATH)
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#- Clean path/PATH. Only remove duplicates
-cleanPath=`$cleanProg "$PATH"` && PATH="$cleanPath"
+# Clean environment paths again. Only remove duplicates
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#- Clean PATH
+cleanEnv=`$cleanProg "$PATH"` && PATH="$cleanEnv"
 
 #- Clean LD_LIBRARY_PATH
-cleanPath=`$cleanProg "$LD_LIBRARY_PATH"` && LD_LIBRARY_PATH="$cleanPath"
+cleanEnv=`$cleanProg "$LD_LIBRARY_PATH"` && LD_LIBRARY_PATH="$cleanEnv"
 
 #- Clean MANPATH
-cleanPath=`$cleanProg "$MANPATH"` && MANPATH="$cleanPath:"
+cleanEnv=`$cleanProg "$MANPATH"` && MANPATH="$cleanEnv:"
 
 export PATH LD_LIBRARY_PATH MANPATH
 
 #- Clean LD_PRELOAD
-if [ "$LD_PRELOAD" != "" ]; then
-    cleanPath=`$cleanProg "$LD_PRELOAD"` && LD_PRELOAD="$cleanPath"
+if [ "$LD_PRELOAD" != "" ]
+then
+    cleanEnv=`$cleanProg "$LD_PRELOAD"` && LD_PRELOAD="$cleanEnv"
     export LD_PRELOAD
 fi
 
 
 # cleanup environment:
 # ~~~~~~~~~~~~~~~~~~~~
-unset cleanPath cleanProg foamInstall
+unset cleanEnv cleanProg foamInstall foamOldDirs
 unset _foamSource
 
 # -----------------------------------------------------------------------------

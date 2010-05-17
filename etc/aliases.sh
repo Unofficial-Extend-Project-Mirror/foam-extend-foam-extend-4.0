@@ -56,5 +56,6 @@ alias app='cd $FOAM_APP'
 alias util='cd $FOAM_UTILITIES'
 alias sol='cd $FOAM_SOLVERS'
 alias tut='cd $FOAM_TUTORIALS'
+alias foam3rdParty='cd $WM_THIRD_PARTY_DIR'
 
 # -----------------------------------------------------------------------------

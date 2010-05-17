@@ -34,32 +34,21 @@
 # prefix to PATH
 _foamAddPath()
 {
-   while [ $# -ge 1 ]
-   do
-      export PATH=$1:$PATH
-      shift
-   done
+    while [ $# -ge 1 ]
+    do
+        export PATH=$1:$PATH
+        shift
+    done
 }
 
 # prefix to LD_LIBRARY_PATH
 _foamAddLib()
 {
-   while [ $# -ge 1 ]
-   do
-      export LD_LIBRARY_PATH=$1:$LD_LIBRARY_PATH
-      shift
-   done
-}
-
-
-# make directories if they don't already exist
-_foamMkDir()
-{
-   while [ $# -ge 1 ]
-   do
-      [ -d $1 ] || mkdir -p $1
-      shift
-   done
+    while [ $# -ge 1 ]
+    do
+        export LD_LIBRARY_PATH=$1:$LD_LIBRARY_PATH
+        shift
+    done
 }
 
 
@@ -78,15 +67,19 @@ export WM_DECOMP_INC=-DFACE_DECOMP
 export WM_DECOMP_LIBS="-lfaceDecompFiniteElement -lfaceDecompositionMotionSolver"
 
 # base configuration
-export FOAM_SRC=$WM_PROJECT_DIR/src
-export FOAM_LIB=$WM_PROJECT_DIR/lib
-export FOAM_LIBBIN=$WM_PROJECT_DIR/lib/$WM_OPTIONS
 export FOAM_APP=$WM_PROJECT_DIR/applications
 export FOAM_APPBIN=$WM_PROJECT_DIR/applications/bin/$WM_OPTIONS
+export FOAM_LIB=$WM_PROJECT_DIR/lib
+export FOAM_LIBBIN=$WM_PROJECT_DIR/lib/$WM_OPTIONS
+export FOAM_SRC=$WM_PROJECT_DIR/src
+
+# shared site configuration - similar naming convention as ~OpenFOAM expansion
+export FOAM_SITE_APPBIN=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/bin/$WM_OPTIONS
+export FOAM_SITE_LIBBIN=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/lib/$WM_OPTIONS
 
 # user configuration
-export FOAM_USER_LIBBIN=$WM_PROJECT_USER_DIR/lib/$WM_OPTIONS
 export FOAM_USER_APPBIN=$WM_PROJECT_USER_DIR/applications/bin/$WM_OPTIONS
+export FOAM_USER_LIBBIN=$WM_PROJECT_USER_DIR/lib/$WM_OPTIONS
 
 # convenience
 export FOAM_TUTORIALS=$WM_PROJECT_DIR/tutorials
@@ -97,11 +90,10 @@ export FOAM_RUN=$WM_PROJECT_USER_DIR/run
 # add OpenFOAM scripts and wmake to the path
 export PATH=$WM_DIR:$WM_PROJECT_DIR/bin:$PATH
 
-_foamAddPath $FOAM_APPBIN $FOAM_USER_APPBIN
-_foamAddLib  $FOAM_LIBBIN $FOAM_USER_LIBBIN
-
-# create these directories if necessary:
-_foamMkDir $FOAM_LIBBIN $FOAM_USER_LIBBIN $FOAM_APPBIN $FOAM_USER_APPBIN
+_foamAddPath $FOAM_APPBIN $FOAM_SITE_APPBIN $FOAM_USER_APPBIN
+ # Make sure to pick up dummy versions of external libraries last
+_foamAddLib  $FOAM_LIBBIN/dummy
+_foamAddLib  $FOAM_LIBBIN $FOAM_SITE_LIBBIN $FOAM_USER_LIBBIN
 
 
 # Compiler settings
@@ -114,11 +106,18 @@ unset compilerBin compilerLib
 #compilerInstall=OpenFOAM
 compilerInstall=System
 
-case "$compilerInstall" in
+case "${compilerInstall:-OpenFOAM}" in
 OpenFOAM)
     case "$WM_COMPILER" in
     Gcc)
-        export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/gcc-4.3.1/platforms/$WM_ARCH$WM_COMPILER_ARCH
+        export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/gcc-4.3.3/platforms/$WM_ARCH$WM_COMPILER_ARCH
+        _foamAddLib $WM_THIRD_PARTY_DIR/mpfr-2.4.1/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
+        _foamAddLib $WM_THIRD_PARTY_DIR/gmp-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
+        ;;
+    Gcc43)
+        export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/gcc-4.3.3/platforms/$WM_ARCH$WM_COMPILER_ARCH
+        _foamAddLib $WM_THIRD_PARTY_DIR/mpfr-2.4.1/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
+        _foamAddLib $WM_THIRD_PARTY_DIR/gmp-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
         ;;
     Gcc42)
         export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/gcc-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH
@@ -156,7 +155,7 @@ unset MPI_ARCH_PATH
 
 case "$WM_MPLIB" in
 OPENMPI)
-    mpi_version=openmpi-1.2.6
+    mpi_version=openmpi-1.3.3
     export MPI_HOME=$WM_THIRD_PARTY_DIR/$mpi_version
     export MPI_ARCH_PATH=$MPI_HOME/platforms/$WM_OPTIONS
 
@@ -170,15 +169,24 @@ OPENMPI)
     unset mpi_version
     ;;
 
-LAM)
-    mpi_version=lam-7.1.4
-    export MPI_HOME=$WM_THIRD_PARTY_DIR/$mpi_version
-    export MPI_ARCH_PATH=$MPI_HOME/platforms/$WM_OPTIONS
-    export LAMHOME=$WM_THIRD_PARTY_DIR/$mpi_version
-    # note: LAMHOME is deprecated, should probably point to MPI_ARCH_PATH too
+SYSTEMOPENMPI)
+    mpi_version=openmpi-system
 
-    _foamAddPath $MPI_ARCH_PATH/bin
-    _foamAddLib  $MPI_ARCH_PATH/lib
+    # Set compilation flags here instead of in wmake/rules/../mplibSYSTEMOPENMPI
+    export PINC=`mpicc --showme:compile` 
+    export PLIBS=`mpicc --showme:link`
+    libDir=`echo "$PLIBS" | sed -e 's/.*-L\([^ ]*\).*/\1/'`
+
+    if [ "$FOAM_VERBOSE" -a "$PS1" ]
+    then
+        echo "Using system installed MPI:"
+        echo "    compile flags : $PINC"
+        echo "    link flags    : $PLIBS"
+        echo "    libmpi dir    : $libDir"
+    fi
+
+    _foamAddLib $libDir
+
 
     export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
     unset mpi_version
@@ -291,13 +299,14 @@ export MPI_BUFFER_SIZE
 
 # Switch on the hoard memory allocator if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#if [ -f $FOAM_LIBBIN/libhoard.so ]; then
+#if [ -f $FOAM_LIBBIN/libhoard.so ]
+#then
 #    export LD_PRELOAD=$FOAM_LIBBIN/libhoard.so:$LD_PRELOAD
 #fi
 
 
 # cleanup environment:
 # ~~~~~~~~~~~~~~~~~~~~
-unset _foamAddPath _foamAddLib _foamMkDir minBufferSize
+unset _foamAddPath _foamAddLib minBufferSize
 
 # -----------------------------------------------------------------------------
