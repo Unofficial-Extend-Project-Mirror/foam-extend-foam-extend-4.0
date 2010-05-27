@@ -32,6 +32,9 @@ template<TemplateClassArgument>
 const dataType Foam::ClassName<TemplateArgument>::staticData();
 
 
+// * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * * //
+
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 
@@ -84,10 +87,13 @@ Foam::ClassName<TemplateArgument>::~ClassName()
 {}
 
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
 
-// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+
+// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
 
 template<TemplateClassArgument>
 void Foam::ClassName<TemplateArgument>::operator=
@@ -108,10 +114,10 @@ void Foam::ClassName<TemplateArgument>::operator=
 }
 
 
-// * * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * * //
 
 
-// * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Friend Operators * * * * * * * * * * * * * * //
 
 
 // ************************************************************************* //

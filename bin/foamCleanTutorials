@@ -42,26 +42,23 @@ then
 fi
 
 # If an argument is supplied do not execute ./Allclean to avoid recursion
-if [ $# = 0 -a -f "./Allclean" ]
+if [ $# = 0 -a -f Allclean ]
 then
     # Specialised script.
     ./Allclean
-elif [ -d "./system" ]
+elif [ -d system ]
 then
     # Normal case.
     cleanCase
-elif [ -d "./Make" ]
+elif [ -d Make ]
 then
     # Normal application.
     cleanApplication
 else
     # Recurse to subdirectories
-    for case in *
+    for caseDir in *
     do
-        if [ -d $case ]
-        then
-            (cd $case && $thisScript)
-        fi
+        ( cd $caseDir 2>/dev/null && $thisScript )
     done
 fi
 

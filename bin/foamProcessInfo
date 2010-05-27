@@ -43,14 +43,16 @@ PROGNAME=`basename $0`
 TMPFILE=/tmp/${PROGNAME}$$.tmp
 AWKFILE=/tmp/${PROGNAME}$$.awk
 
-if [ `uname -s` = 'Linux' ]; then
-   ECHO='echo -e'
+if [ `uname -s` = Linux ]
+then
+    ECHO='echo -e'
 else
-   ECHO='echo'
+    ECHO='echo'
 fi
 
 
-if [ $# -ne 1 ]; then
+if [ $# -ne 1 ]
+then
     echo "Error : $PROGNAME : insufficient arguments" 1>&2
     exit 1
 fi

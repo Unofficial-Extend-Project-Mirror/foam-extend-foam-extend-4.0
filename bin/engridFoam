@@ -24,47 +24,43 @@
 #     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 # Script
-#     buildParaView
+#     engridFoam
 #
 # Description
-#     Build and install ParaView
-#     - run from folder above ParaView source folder or place the
-#       ParaView source under $WM_PROJECT_INST_DIR
+#     start engrid using the paraview libraries from OpenFOAM
 #
 #------------------------------------------------------------------------------
-. $WM_PROJECT_DIR/bin/tools/buildParaViewFunctions
+usage() {
+    while [ "$#" -ge 1 ]; do echo "$1"; shift; done
+    cat<<USAGE
 
-# set -x
+usage: ${0##*/} [OPTION]
+options:
+  -help
 
-PARAVIEW_SRC="ParaView3.3-cvs"
-PARAVIEW_MAJOR_VERSION="3.3"
+* start engrid using the paraview-$ParaView_VERSION libraries
+  passes through engrid options unmodified
 
-VERBOSE=OFF
-INCLUDE_MPI=OFF
-MPI_MAX_PROCS=32
-#INCLUDE_PYTHON=OFF
-INCLUDE_PYTHON=ON
-PYTHON_LIBRARY="/usr/lib64/libpython2.5.so.1.0"
-PYTHON_LIBRARY=""
-INCLUDE_MESA=OFF
+USAGE
+    exit 1
+}
 
-set +x
+# report usage
+[ "$1" = "-h" -o "$1" = "-help" ] && usage
 
-# provide a shortcut for repeated builds - use with caution
-if [ "$#" -gt 0 ]
-then
-   CMAKE_SKIP=YES
-fi
+# set the major version "<digits>.<digits>"
+ParaView_MAJOR_VERSION=$(echo $ParaView_VERSION | \
+    sed -e 's/^\([0-9][0-9]*\.[0-9][0-9]*\).*$/\1/')
 
-initialiseVariables
 
-addMpiSupport       # set MPI specific options
-addPythonSupport    # set python specific options
-addMesaSupport      # set MESA specific options
+bindir=$WM_THIRD_PARTY_DIR/engrid/platforms/$WM_ARCH
+libdir="$ParaView_DIR/lib/paraview-$ParaView_MAJOR_VERSION"
 
-buildParaView
-installParaView
+[ -x $bindir/engrid ] || usage "engrid executable not found in $bindir"
+[ -d $libdir ] || usage "paraview libraries not found"
 
-echo "done"
+export LD_LIBRARY_PATH=$libdir:$LD_LIBRARY_PATH
+echo "starting $bindir/engrid $@"
+eval "exec $bindir/engrid $@ &"
 
 #------------------------------------------------------------------------------

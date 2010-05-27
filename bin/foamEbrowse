@@ -27,26 +27,27 @@
 #     foamEbrowse
 #
 # Description
-#     Build the Ebrowse dadbase for all the .C and .H files
+#     Build the Ebrowse database for all the .H and .C files
 #
 #------------------------------------------------------------------------------
-headersFile=${TMPDIR:-/tmp}/headersFile.$$
 sourcesFile=${TMPDIR:-/tmp}/sourcesFile.$$
 
 if [ $# -ne 0 ]; then
    echo "Usage : ${0##*/}"
    echo ""
-   echo "Build the Ebrowse dadbase for all the .C and .H files"
+   echo "Build the Ebrowse dadbase for all the .H and .C files"
    echo ""
    exit 1
 fi
 
-cd $WM_PROJECT_DIR
-find -H . -name "*.H" | fgrep -v "lnInclude" > $headersFile
-find -H . -name "*.C" | fgrep -v "lnInclude" > $sourcesFile
-ebrowse --files=$headersFile --files=$sourcesFile --output-file=.ebrowse
-
 # Clean up on termination and on Ctrl-C
-trap 'rm -f $headersFile $sourcesFile 2>/dev/null; exit 0' EXIT TERM INT
+trap 'rm -f $sourcesFile 2>/dev/null; exit 0' EXIT TERM INT
+
+cd $WM_PROJECT_DIR
+mkdir .tags 2>/dev/null
+cd .tags
+
+find -H .. \( -name "*.[HC]" -o -name lnInclude -prune -o -name Doxygen -prune \) -print > $sourcesFile
+ebrowse --files=$sourcesFile --output-file=ebrowse
 
 #------------------------------------------------------------------------------

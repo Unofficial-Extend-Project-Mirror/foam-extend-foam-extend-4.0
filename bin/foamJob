@@ -29,13 +29,11 @@
 # Description
 #
 #------------------------------------------------------------------------------
-Script=${0##*/}
-
 usage() {
    while [ "$#" -ge 1 ]; do echo "$1"; shift; done
    cat<<USAGE
 
-usage: $Script [OPTION] <application> ...
+usage: ${0##*/} [OPTION] <application> ...
 
 options:
   -case dir     specify case directory
@@ -108,9 +106,9 @@ do
       usage
       ;;
    -case)
-      shift
-      caseDir=$1
-      [ "$#" -ge 1 ] || usage "'-case' option requires an argument"
+      [ "$#" -ge 2 ] || usage "'-case' option requires an argument"
+      caseDir=$2
+      shift 2
       cd "$caseDir" 2>/dev/null || usage "directory does not exist:  '$caseDir'"
       ;;
    -s)
@@ -206,24 +204,6 @@ else
 #
    echo "Parallel processing using $WM_MPLIB with $NPROCS processors"
    case "$WM_MPLIB" in
-   LAM)
-      lamPid=`getPID lamd`
-      if [ ! "$lamPid" ] ; then
-         echo "No LAM daemon running."
-         if [ -r system/machines ] ; then
-            echo "system/machines file exists"
-            echo "Try starting the LAM multicomputer with \"lamboot -v system/machines\""
-            exit 1
-         else
-            echo "Cannot find a 'machines' file for LAM in system/"
-            echo "required to start a LAM multicomputer"
-            consultGuide
-            exit 1
-         fi
-      else
-         echo "LAM daemon running (PID $lamPid).  Proceeding with MPI run."
-      fi
-      ;;
    OPENMPI)
       # add hostfile info
       for hostfile in \

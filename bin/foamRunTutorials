@@ -50,7 +50,7 @@ elif [ -d "./system" ]
 then
     # Normal case.
     parentDir=`dirname $PWD`
-    application=`basename $parentDir`
+    application=`getApplication`
     runApplication blockMesh
     runApplication $application
 else

@@ -30,75 +30,104 @@
 #     start paraview with the OpenFOAM libraries
 #
 #------------------------------------------------------------------------------
-Script=${0##*/}
-
 usage() {
-   while [ "$#" -ge 1 ]; do echo "$1"; shift; done
-   cat<<USAGE
+    while [ "$#" -ge 1 ]; do echo "$1"; shift; done
+    cat<<USAGE
 
-usage: $Script [-case dir]
+usage: ${0##*/} [OPTION]
+options:
+  -case   dir    specify alternative case directory
+  -region name   specify mesh region name
+  -touch         only create the .OpenFOAM file
 
 * start paraview $ParaView_VERSION with the OpenFOAM libraries
 
 USAGE
-   exit 1
+    exit 1
 }
 
+unset regionName touchOnly
+
 # parse options
-if [ "$#" -gt 0 ]; then
-   case "$1" in
-   -h | -help)
-      usage
-      ;;
-   -case)
-      shift
-      caseDir=$1
-      [ "$#" -ge 1 ] || usage "'-case' option requires an argument"
-      cd "$caseDir" 2>/dev/null || usage "directory does not exist:  '$caseDir'"
-      ;;
-   *)
-      usage "unknown option/argument: '$*'"
-      ;;
-   esac
-fi
+while [ "$#" -gt 0 ]
+do
+    case "$1" in
+    -h | -help)
+        usage
+        ;;
+    -case)
+        [ "$#" -ge 2 ] || usage "'$1' option requires an argument"
+        cd "$2" 2>/dev/null || usage "directory does not exist:  '$2'"
+        shift 2
+        ;;
+    -region)
+        [ "$#" -ge 2 ] || usage "'$1' option requires an argument"
+        regionName=$2
+        shift 2
+        ;;
+    -touch)
+        touchOnly=true
+        shift
+        ;;
+    *)
+        usage "unknown option/argument: '$*'"
+        ;;
+    esac
+done
 
 # get a sensible caseName
 caseName=${PWD##*/}
+caseFile="$caseName.OpenFOAM"
+fvControls="system"
+
+if [ -n "$regionName" ]
+then
+    caseFile="$caseName{$regionName}.OpenFOAM"
+    fvControls="$fvControls/$regionName"
+fi
+
+if [ -n "$touchOnly" ]
+then
+    touch "$caseFile"
+    echo "created '$caseFile'"
+    exit 0
+fi
 
 # parent directory for normal or parallel results
 case "$caseName" in
-   processor*) parentDir=".." ;;
-   *)          parentDir="."  ;;
+    processor*) parentDir=".." ;;
+    *)          parentDir="."  ;;
 esac
 
 # check existence of essential files
-for check in system/controlDict system/fvSchemes system/fvSolution
+for check in system/controlDict $fvControls/fvSchemes $fvControls/fvSolution
 do
-   [ -s "$parentDir/$check" ] || usage "file does not exist:  '$parentDir/$check'"
+    [ -s "$parentDir/$check" ] || usage "file does not exist:  '$parentDir/$check'"
 done
 
-#caseFile="$caseName.foam"
-caseFile="$caseName.OpenFOAM"
 
 case "$ParaView_VERSION" in
 2*)
-   # Clean up on termination and on Ctrl-C
-   trap "rm -f paraFoam.pvs $caseFile 2>/dev/null; exit 0" EXIT TERM INT
-   touch $caseFile
+    trap "rm -f paraFoam.pvs $caseFile 2>/dev/null; exit 0" EXIT TERM INT
+    touch "$caseFile"
 
-   # since we are now in the cwd, %CASE% is '$PWD/$caseFile'
-   sed -e s%CASE%$PWD/$caseFile%g \
-       $WM_PROJECT_DIR/bin/paraFoam.pvs > paraFoam.pvs
+    # since we are now in the cwd, %CASE% is '$PWD/$caseFile'
+    sed -e s@%CASE%@$PWD/$caseFile@g \
+        $WM_PROJECT_DIR/bin/tools/paraFoam.pvs > paraFoam.pvs
 
-   paraview paraFoam.pvs
-   ;;
+    paraview paraFoam.pvs
+    ;;
 
 *)
-   # Clean up on termination and on Ctrl-C
-   trap "rm -f $caseFile 2>/dev/null; exit 0" EXIT TERM INT
-   touch $caseFile
-   paraview --data=$caseFile
-   ;;
+    # only create/remove caseFile if it didn't already exist
+    [ -e $caseFile ] || {
+        trap "rm -f $caseFile 2>/dev/null; exit 0" EXIT TERM INT
+        touch "$caseFile"
+        echo "created temporary '$caseFile'"
+    }
+
+    paraview --data="$caseFile"
+    ;;
 
 esac
 #------------------------------------------------------------------------------

@@ -24,48 +24,42 @@
 #     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 # Script
-#     buildParaView
+#     foamTags
 #
 # Description
-#     Build and install ParaView
-#     - run from folder above ParaView source folder or place the
-#       ParaView source under $WM_PROJECT_INST_DIR
+#     Build the tags files for all the .C and .H files
 #
 #------------------------------------------------------------------------------
-. $WM_PROJECT_DIR/bin/tools/buildParaViewFunctions
 
-# set -x
-
-PARAVIEW_SRC="paraview-2.4.4"
-PARAVIEW_MAJOR_VERSION="2.4"
-
-VERBOSE=OFF
-INCLUDE_MPI=OFF
-MPI_MAX_PROCS=32
-INCLUDE_PYTHON=OFF
-PYTHON_LIBRARY=""
-INCLUDE_MESA=OFF
-
-set +x
-
-# provide a shortcut for repeated builds - use with caution
-if [ "$#" -gt 0 ]
-then
-   CMAKE_SKIP=YES
+if [ $# -ne 0 ]; then
+   echo "Usage : ${0##*/}"
+   echo ""
+   echo "Build the tags files for all the .C and .H files"
+   echo ""
+   exit 1
 fi
 
-# set paraview environment
-PARAVIEW_SRC_DIR=$PWD/$PARAVIEW_SRC
-#PARAVIEW_OBJ_DIR=$PARAVIEW_SRC_DIR/platforms/$WM_OPTIONS/obj$OBJ_ADD
-PARAVIEW_OBJ_DIR=$PARAVIEW_SRC_DIR/platforms/$WM_ARCH$WM_COMPILER
+cd $WM_PROJECT_DIR
+mkdir .tags 2>/dev/null
 
-addMpiSupport       # set MPI specific options
-addPythonSupport    # set python specific options
-addMesaSupport      # set MESA specific options
+etagsCmd="etags --declarations -l c++ -o .tags/etags -"
+#etagsDefCmd="etags -l c++ -o .tags/etagsDef -"
+#etagsDecCmd="etags --declarations -l c++ -o .tags/etagsDec -"
 
-buildParaView
-installParaView
+etagsCmd="ectags -e --extra=+fq --file-scope=no --c-kinds=+p -o .tags/etags -L -"
+etagsDefCmd="ectags -e --extra=+fq --file-scope=no -o .tags/etagsDef -L -"
+etagsDecCmd="ectags -e --extra=+fq --file-scope=no --c-kinds=+p -o .tags/etagsDec -L -"
 
-echo "done"
+ectagsDecCmd="ectags -o .tags/ectagsDec --file-scope=no --c-kinds=+p --excmd=n --extra=+fq --fields=+afiKmnsSzt -L -"
+
+find -H $WM_PROJECT_DIR \( -name "*.[HC]" -o -name lnInclude -prune -o -name Doxygen -prune \) | $etagsCmd
+find -H $WM_PROJECT_DIR \( -name "*.[HC]" -o -name lnInclude -prune -o -name Doxygen -prune \) | $etagsDefCmd
+find -H $WM_PROJECT_DIR \( -name "*.H" -o -name lnInclude -prune -o -name Doxygen -prune \) | $etagsDecCmd
+find -H $WM_PROJECT_DIR \( -name "*.H" -o -name lnInclude -prune -o -name Doxygen -prune \) | $ectagsDecCmd
+
+gtags -i --gtagsconf bin/tools/gtagsrc .tags
+
+foamEbrowse
+
 
 #------------------------------------------------------------------------------

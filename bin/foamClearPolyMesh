@@ -27,20 +27,128 @@
 #     foamClearPolyMesh
 #
 # Description
-#     
+#    Remove the contents of the constant/polyMesh directory
+#    as per the Foam::polyMesh::removeFiles() method.
+#
 #------------------------------------------------------------------------------
+usage() {
+    while [ "$#" -ge 1 ]; do echo "$1" 1>&2; shift; done
+    cat <<USAGE 1>&2
 
-if [ -d constant/polyMesh ]; then
-    echo "there is constant/polyMesh";
-    cd constant/polyMesh
+usage: ${0##*/} [-case dir] [-region name]
 
-elif [ -d polyMesh ]; then
-    echo "there is polyMesh";
-    cd polyMesh
+    Remove the contents of the constant/polyMesh directory
+    as per the Foam::polyMesh::removeFiles() method.
+
+USAGE
+   exit 1
+}
+
+unset caseDir regionName
+
+# parse a single option
+while [ "$#" -gt 0 ]
+do
+    case "$1" in
+    -h | -help)
+        usage
+        ;;
+    -case)
+        [ "$#" -ge 2 ] || usage "'$1' option requires an argument"
+        cd "$2" 2>/dev/null || usage "directory does not exist:  '$2'"
+        caseDir=$2
+        shift 2
+        ;;
+    -region)
+        [ "$#" -ge 2 ] || usage "'$1' option requires an argument"
+        regionName=$2
+        shift 2
+        ;;
+    *)
+        usage "unknown option/argument: '$*'"
+        ;;
+    esac
+done
+
+if [ -n "$regionName" ]
+then
+    meshDir=$regionName/polyMesh
 else
-    echo "in polyMesh directory";
+    meshDir=polyMesh
 fi
 
-rm -f pointFaces pointEdges pointCells faceEdges edges edgeFaces edgeCells cellEdges cellCells owner neighbour losort faceCentres faceAreas cellVolumes cellCentres
+# if -case was specified: insist upon 'constant/polyMesh'
+if [ -n "$caseDir" ]
+then
+    if [ -d constant/$meshDir ]
+    then
+        # use constant/polyMesh
+        meshDir=constant/$meshDir
+    else
+       echo "Error: no 'constant/$meshDir' in $caseDir" 1>&2
+       exit 1
+    fi
+else
+    if [ -d constant/$meshDir ]
+    then
+        # use constant/polyMesh
+        meshDir=constant/$meshDir
+    elif [ -d $meshDir ]
+    then
+        # likely already in constant/ - do not adjust anything
+        :
+    elif [ "${PWD##*/}" = polyMesh -a -z "$regionName" ]
+    then
+        # apparently already within polyMesh/
+        meshDir=.
+    else
+        echo "Error: no appropriate 'polyMesh/' directory found" 1>&2
+        exit 1
+    fi
+fi
+
+
+#
+# remove files (mesh itself, modifiers, snappyHexMesh ones) and subdirectories
+#
+echo "Clearing ${caseDir:-.}/$meshDir" 1>&2
+
+for i in \
+    points \
+    faces \
+    owner \
+    neighbour \
+    cells \
+    boundary \
+    pointZones \
+    faceZones \
+    cellZones \
+    meshModifiers \
+    parallelData \
+    sets \
+    cellLevel \
+    pointLevel \
+    refinementHistory \
+    surfaceIndex \
+    points.gz \
+    faces.gz \
+    owner.gz \
+    neighbour.gz \
+    cells.gz \
+    boundary.gz \
+    pointZones.gz \
+    faceZones.gz \
+    cellZones.gz \
+    meshModifiers.gz \
+    parallelData.gz \
+    sets.gz \
+    cellLevel.gz \
+    pointLevel.gz \
+    refinementHistory.gz \
+    surfaceIndex.gz \
+;
+do
+    rm -rf $meshDir/$i
+done
 
 #------------------------------------------------------------------------------

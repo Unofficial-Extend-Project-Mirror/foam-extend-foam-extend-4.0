@@ -40,10 +40,10 @@
 Script=${0##*/}
 
 usage() {
-   while [ "$#" -ge 1 ]; do echo "$1"; shift; done
-   cat<<USAGE
+    while [ "$#" -ge 1 ]; do echo "$1"; shift; done
+    cat<<USAGE
 
-usage: $Script [OPTION] <application> ...
+usage: ${0##*/} [OPTION] <application> ...
 
 options:
   -v ver        specify OpenFOAM version
@@ -52,16 +52,17 @@ options:
 * run a particular OpenFOAM version of <application>
 
 USAGE
-   exit 1
+    exit 1
 }
+
 
 # This script should exist in <foamInstall>/OpenFOAM-<VERSION>/bin/
 # extract the <foamInstall> and <version> elements
 # using a function preserves the command args
 getDefaults() {
-   set -- $(echo $0 | sed -e 's@/OpenFOAM-\([^/]*\)/bin/[^/]*$@ \1@')
-   foamInstall=$1
-   version=$2
+    set -- $(echo $0 | sed -e 's@/OpenFOAM-\([^/]*\)/bin/[^/]*$@ \1@')
+    foamInstall=$1
+    version=$2
 }
 
 getDefaults
@@ -69,72 +70,60 @@ getDefaults
 # parse options
 while [ "$#" -gt 0 ]
 do
-   case "$1" in
-   -h | -help)
-      usage
-      ;;
-   -v)
-      shift
-      version=$1
-      shift
-      ;;
-   --)
-      shift
-      break
-      ;;
-   -*)
-      usage "invalid option '$1'"
-      ;;
-   *)
-      break
-      ;;
-   esac
+    case "$1" in
+    -h | -help)
+        usage
+        ;;
+    -v)
+        shift
+        version=$1
+        shift
+        ;;
+    --)
+        shift
+        break
+        ;;
+    -*)
+        usage "invalid option '$1'"
+        ;;
+    *)
+        break
+        ;;
+    esac
 done
 
-if [ "$#" -lt 1 ]; then
-   usage "no application specified"
+if [ "$#" -lt 1 ]
+then
+    usage "no application specified"
 fi
 
 unset foamDotFile
 
 # Check user-specific OpenFOAM bashrc file
-for subDir in \
-   $HOME/.OpenFOAM-$version \
-   $HOME/.OpenFOAM/$version \
-;
-do
-   foamDotFile="$subDir/bashrc"
-   if [ -f $foamDotFile ]; then
-      . $foamDotFile
-      foamDotFile=okay
-      break
-   fi
-done
-
-# Use the FOAM_INST_DIR variable for locating the installed version
-if [ "$foamDotFile" != okay ]
+foamDotFile="$HOME/.OpenFOAM/$version/bashrc"
+if [ -f $foamDotFile ]
 then
-   for FOAM_INST_DIR in $foamInstall $WM_PROJECT_INST_DIR
-   do
-      for subDir in \
-         OpenFOAM-$version/etc \
-         OpenFOAM-$version/.OpenFOAM-$version \
-      ;
-      do
-        foamDotFile="$FOAM_INST_DIR/$subDir/bashrc"
-        if [ -f $foamDotFile ]; then
-           . $foamDotFile
-           foamDotFile=okay
-           break 2
+    . $foamDotFile
+    foamDotFile=okay
+else
+    # Use the FOAM_INST_DIR variable for locating the installed version
+    for FOAM_INST_DIR in $foamInstall $WM_PROJECT_INST_DIR
+    do
+        foamDotFile="$FOAM_INST_DIR/OpenFOAM-$version/etc/bashrc"
+        if [ -f $foamDotFile ]
+        then
+            . $foamDotFile
+            foamDotFile=okay
+            break
         fi
-     done
-   done
+    done
 fi
 
-if [ "$foamDotFile" != okay ];
+
+if [ "$foamDotFile" != okay ]
 then
-   echo "Error : bashrc file could not be found for OpenFOAM-$version" 1>&2
-   exit 1
+    echo "Error : bashrc file could not be found for OpenFOAM-$version" 1>&2
+    exit 1
 fi
 
 # Pass on the rest of the arguments

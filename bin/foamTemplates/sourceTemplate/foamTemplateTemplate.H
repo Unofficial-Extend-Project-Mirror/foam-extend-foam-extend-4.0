@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    ClassName
+    Foam::ClassName
 
 Description
 
@@ -114,8 +114,7 @@ public:
         static autoPtr<ClassName<TemplateArgument> > New();
 
 
-    // Destructor
-
+    //- Destructor
         ~ClassName();
 
 
@@ -132,16 +131,10 @@ public:
 
     // IOstream Operators
 
-        friend Istream& operator>>
-        #ifndef __CINT__
-        <TemplateArgument>
-        #endif
+        friend Istream& operator>> <TemplateArgument>
         (Istream&, ClassName<TemplateArgument>&);
 
-        friend Ostream& operator<<
-        #ifndef __CINT__
-        <TemplateArgument>
-        #endif
+        friend Ostream& operator<< <TemplateArgument>
         (Ostream&, const ClassName<TemplateArgument>&);
 };
 

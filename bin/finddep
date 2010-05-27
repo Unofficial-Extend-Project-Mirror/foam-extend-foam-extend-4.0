@@ -5,7 +5,7 @@
 #  \\    /   O peration     |
 #   \\  /    A nd           | Copyright held by original author
 #    \\/     M anipulation  |
-#------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # License
 #     This file is part of OpenFOAM.
 #
@@ -24,48 +24,51 @@
 #     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 # Script
-#     buildParaView
+#     finddep
 #
 # Description
-#     Build and install ParaView
-#     - run from folder above ParaView source folder or place the
-#       ParaView source under $WM_PROJECT_INST_DIR
+#     find all .dep files referring to any of <file1> ... <fileN>
 #
 #------------------------------------------------------------------------------
-. $WM_PROJECT_DIR/bin/tools/buildParaViewFunctions
+usage() {
+    while [ "$#" -ge 1 ]; do echo "$1"; shift; done
+    cat<<USAGE
 
-# set -x
+usage: ${0##*/} <file1> ... <fileN>
 
-PARAVIEW_SRC="ParaView3.2.1"
-PARAVIEW_MAJOR_VERSION="3.2"
+* find all .dep files referring to any of <file1> ... <fileN>
 
-VERBOSE=OFF
-INCLUDE_MPI=ON
-MPI_MAX_PROCS=32
-INCLUDE_PYTHON=ON
-PYTHON_LIBRARY=""
-INCLUDE_MESA=OFF
+USAGE
+    exit 1
+}
 
-set +x
 
-# provide a shortcut for repeated builds - use with caution
-if [ "$#" -gt 0 ]
-then
-   CMAKE_SKIP=YES
-fi
+# parse options
+while [ "$#" -gt 0 ]
+do
+    case "$1" in
+    -h | -help)
+        usage
+        ;;
+    -*)
+        usage "unknown option: '$*'"
+        ;;
+    *)
+        break
+        ;;
+    esac
+done
 
-# set paraview environment
-PARAVIEW_SRC_DIR=$PWD/$PARAVIEW_SRC
-#PARAVIEW_OBJ_DIR=$PARAVIEW_SRC_DIR/platforms/$WM_OPTIONS/obj$OBJ_ADD
-PARAVIEW_OBJ_DIR=$PARAVIEW_SRC_DIR/platforms/$WM_ARCH$WM_COMPILER
+[ "$#" -gt 0 ] || usage
 
-addMpiSupport       # set MPI specific options
-addPythonSupport    # set python specific options
-addMesaSupport      # set MESA specific options
 
-buildParaView
-installParaView
-
-echo "done"
+find . -name '*.dep' -print | \
+    while read src
+    do
+        for file in $@
+        do
+            grep -l "$file" $src && break
+        done
+    done
 
 #------------------------------------------------------------------------------

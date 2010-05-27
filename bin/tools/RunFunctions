@@ -29,15 +29,21 @@
 #
 #------------------------------------------------------------------------------
 
+getApplication ()
+{
+    grep application system/controlDict | sed "s/application *\([a-zA-Z]*\);/\1/"
+}
+
 runApplication ()
 {
     APP_RUN=$1; shift
+    APP_NAME=${APP_RUN##*/}
 
-    if [ -f log.$APP_RUN ] ; then
-        echo "$APP_RUN already run on $PWD: remove log file to run"
+    if [ -f log.$APP_NAME ] ; then
+        echo "$APP_NAME already run on $PWD: remove log file to run"
     else
         echo "Running $APP_RUN on $PWD"
-        $APP_RUN $* > log.$APP_RUN 2>&1
+        $APP_RUN $* > log.$APP_NAME 2>&1
     fi
 }
 
@@ -48,18 +54,8 @@ runParallel ()
     if [ -f $log.$APP_RUN ] ; then
         echo "$APP_RUN already run on $PWD: remove log file to run"
     else
-        if [ "$WM_MPLIB" = LAM ]
-        then
-            echo "Starting LAM using $2 machines file"
-            lamboot -v $2
-        fi
         echo "Running $APP_RUN in parallel on $PWD using $1 processes"
         ( mpirun -np $1 $APP_RUN -parallel < /dev/null > log.$APP_RUN 2>&1 )
-        if [ "$WM_MPLIB" = LAM ]
-        then
-            echo "Stopping LAM"
-            lamclean
-        fi
     fi
 }
 
@@ -67,12 +63,6 @@ compileApplication ()
 {
     echo "Compiling $1 application"
     wmake $1
-}
-
-compileLibrary ()
-{
-    echo "Compiling $1 application"
-    wmake libso $1
 }
 
 cloneCase ()

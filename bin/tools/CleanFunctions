@@ -40,7 +40,7 @@
 #            rm -rf ${T} > /dev/null 2>&1
 #        fi
 #    done
-#    rm -rf {log,log.*,log-*,logSummary.*,.fxLock,*.xml,ParaView*,paraFoam*,*.foam} > /dev/null 2>&1
+#    rm -rf {log,log.*,log-*,logSummary.*,.fxLock,*.xml,ParaView*,paraFoam*,*.OpenFOAM} > /dev/null 2>&1
 #}
 
 cleanTimeDirectories ()
@@ -55,15 +55,23 @@ cleanTimeDirectories ()
         zeros=`printf %0${nZeros}d 0`
         nZeros=$(($nZeros + 1))
     done
-    rm -rf ./{[1-9]*,-[1-9]*,log,log.*,log-*,logSummary.*,.fxLock,*.xml,ParaView*,paraFoam*,*.foam} > /dev/null 2>&1
+    rm -rf ./{[1-9]*,-[1-9]*,log,log.*,log-*,logSummary.*,.fxLock,*.xml,ParaView*,paraFoam*,*.OpenFOAM} > /dev/null 2>&1
 }
 
 cleanCase ()
 {
     cleanTimeDirectories
+    rm -rf processor* > /dev/null 2>&1
+    rm -rf probes* > /dev/null 2>&1
+    rm -rf forces* > /dev/null 2>&1
 
-    rm -rf constant/polyMesh/{allOwner*,cell*,face*,meshModifiers*} \
+    rm -rf system/machines \
+           constant/polyMesh/{allOwner*,cell*,face*,meshModifiers*} \
            constant/polyMesh/{owner*,neighbour*,point*,edge*} \
+           constant/polyMesh/{cellLevel*,pointLevel*,refinementHistory*,surfaceIndex*} \
+           constant/{cellToRegion,cellLevel*,pointLevel*} \
+           constant/polyMesh/sets/ \
+           VTK \
            > /dev/null 2>&1
 
     for f in `find . -name "*Dict"`
@@ -71,13 +79,6 @@ cleanCase ()
         sed -e /arguments/d $f > temp.$$
         mv temp.$$ $f
     done
-}
-
-cleanParallelCase ()
-{
-    cleanCase
-
-    rm -rf processor* > /dev/null 2>&1
 }
 
 removeCase ()

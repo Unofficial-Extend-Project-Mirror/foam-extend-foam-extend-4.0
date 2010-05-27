@@ -32,56 +32,31 @@
 #
 #------------------------------------------------------------------------------
 tmpFile=${TMPDIR:-/tmp}/foamPackFiles.$$
-tmpDir=${TMPDIR:-/tmp}/foamPackDir.$$
 
-#
-# FUNCTIONS
-#
-printUsage () {
-cat <<EOF
-   Usage : ${0##*/} directory tarFile
-
-   Packs all .C and .H files and Make/options and Make/files into <tarFile>
-EOF
-}
-
-#
-# OPTIONS
-#
-OPTS=`getopt hl $*`
-if [ $? -ne 0 ] ; then
-    echo "Error: Aborting due to invalid option"
-    printUsage;
+if [ $# -ne 2 ]
+then
+    echo "Usage : ${0##*/} directory tarFile"
+    echo ""
+    echo "Packs all .C and .H files and Make/options and Make/files into"
+    echo "<tarFile>"
+    echo ""
     exit 1
-fi
-
-eval set -- '$OPTS'
-while [ "$1" != "--" ]; do
-    case $1 in
-        -l) LZM=1;;
-        -h) printUsage; exit 1;;
-    esac
-    shift
-done
-shift
-
-if [ $# -ne 2 ]; then
-   printUsage;
-   exit 1
 fi
 
 # canonical form (no double and no trailing dashes)
 packDir=$(echo "$1" | sed -e 's@//*@/@g' -e 's@/$@@')
 packFile=$2
 
-if [ ! -d $packDir ]; then
-   echo "Error: directory $packDir does not exist"
-   exit 1
+if [ ! -d $packDir ]
+then
+    echo "Error: directory $packDir does not exist"
+    exit 1
 fi
 
-if [ -f $packFile ]; then
-   echo "Error: $packFile already exists"
-   exit 1
+if [ -f $packFile ]
+then
+    echo "Error: $packFile already exists"
+    exit 1
 fi
 
 # Clean up on termination and on Ctrl-C
@@ -107,36 +82,29 @@ find -H $packDir               \
  -e "\@$packDir/.git/@d"       \
  -e "\@.svn/@d"                \
  -e "\@$packDir/lib/@d"        \
+ -e '\@/\.git/@d'              \
+ -e '\@/\.tags/@d'             \
  -e '\@applications/bin/@d'    \
+ -e '\@wmake/bin/@d'           \
  -e '\@/t/@d'                  \
  -e '\@/Make[.A-Za-z]*/[^/]*/@d'\
  -e '\@/platforms/@d'          \
+ -e '\@libccmio.*/@d'          \
  -e '\@/.svn/@d'               \
  > $tmpFile
 
-if [ $LZM ]; then
 
-   # Clean up on termination and on Ctrl-C
-   trap 'rm -f $tmpFile 2>/dev/null; rm -rf $tmpDir 2>/dev/null; exit 0' EXIT TERM INT
+# provide some feedback
+wc $tmpFile | awk '{print "Packing",$1,"files - this could take some time ..."}'
 
-   mkdir $tmpDir $tmpDir/OpenFOAM
-   xargs -i -a $tmpFile cp -al --parents {} $tmpDir/OpenFOAM
+tar czpf $packFile --files-from $tmpFile
 
-   chmod -R a+rX $tmpDir/OpenFOAM
-   foamDir2lzm $tmpDir $packFile
-   echo; echo
-
-else
-
-   tar czpf $packFile --files-from $tmpFile
-
-fi
-
-if [ $? = 0 ]; then
+if [ $? -eq 0 ]
+then
    echo "Finished packing and compressing $packDir into file $packFile"
 else
-   echo "Error: failure packing $packDir into file $packFile"
-   rm -f $packFile 2>/dev/null
+    echo "Error: failure packing $packDir into file $packFile"
+    rm -f $packFile 2>/dev/null
 fi
 
 #------------------------------------------------------------------------------

@@ -1,25 +1,50 @@
-#!/bin/sh
+#!/bin/bash
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#-------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
 #
-# Driver script to run mpi jobs with the processes in separate
-# windows or to separate log files.
-# Requires bash on all processors.
+#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation; either version 2 of the License, or (at your
+#     option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM; if not, write to the Free Software Foundation,
+#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Script
+#     mpirunDebug
+#
+# Description
+#     Driver script to run mpi jobs with the processes in separate
+#     windows or to separate log files.
+#     Requires bash on all processors.
+#------------------------------------------------------------------------------
 
-
-PROGNAME=`basename $0`
-PROGDIR=`dirname $0`
-
-if [ `uname -s` = 'Linux' ]; then
-   ECHO='echo -e'
+if [ `uname -s` = Linux ]
+then
+    ECHO='echo -e'
 else
-   ECHO='echo'
+    ECHO='echo'
 fi
 
 
 printUsage() {
-  echo ""
-  echo "Usage: $PROGNAME -np <dd> <executable> <args>"
-  echo ""
-  echo "This will run like mpirun but with each process in an xterm"
+    echo ""
+    echo "Usage: ${0##*/} -np <dd> <executable> <args>"
+    echo ""
+    echo "This will run like mpirun but with each process in an xterm"
 }
 
 nProcs=''
@@ -30,7 +55,8 @@ while [ "$1" != "" ]; do
     echo "$1"
     case $1 in
       -np)
-        nProcs=$2;shift
+        nProcs=$2
+        shift
         ;;
       *)
         if [ ! "$exec" ]; then
@@ -70,15 +96,17 @@ if [ ! -x "$exec" ]; then
     exit 1
 fi
 
+if [ ! "$PWD" ]; then
+    PWD=`pwd`
+fi
 
+echo "run $args" > $PWD/gdbCommands
+echo "where" >> $PWD/gdbCommands
+echo "Constructed gdb initialization file $PWD/gdbCommands"
 
-echo "run $args" > $HOME/gdbCommands
-echo "where" >> $HOME/gdbCommands
-echo "Constructed gdb initialization file $HOME/gdbCommands"
-
-$ECHO "Choose running method: 1)gdb+xterm  2)gdb  3)log  4)xterm+valgrind: \c"
+$ECHO "Choose running method: 0)normal  1)gdb+xterm  2)gdb  3)log  4)log+xterm  5)xterm+valgrind: \c"
 read method
-if [ "$method" -ne 1 -a "$method" -ne 2 -a "$method" -ne 3 -a "$method" -ne 4 ]; then
+if [ "$method" -ne 0 -a "$method" -ne 1 -a "$method" -ne 2 -a "$method" -ne 3 -a "$method" -ne 4 -a "$method" -ne 5 ]; then
     printUsage
     exit 1
 fi
@@ -119,41 +147,43 @@ fi
 
 echo "**sourceFoam:$sourceFoam"
 
-rm -f $HOME/mpirun.schema
-touch $HOME/mpirun.schema
+rm -f $PWD/mpirun.schema
+touch $PWD/mpirun.schema
 
 proc=0
 xpos=0
 ypos=0
 for ((proc=0; proc<$nProcs; proc++))
 do
-    procCmdFile="$HOME/processor${proc}.sh"
+    procCmdFile="$PWD/processor${proc}.sh"
     procLog="processor${proc}.log"
     geom="-geometry 120x20+$xpos+$ypos"
     node=""
 
     if [ .$WM_MPLIB = .OPENMPI ]; then
         node="-np 1 "
-    elif [ .$WM_MPLIB = .LAM ]; then
-        if [ "$spawn" -eq 2 ]; then
-            node="c${proc} "
-        fi
     fi
 
     echo "#!/bin/sh" > $procCmdFile
-    if [ "$method" -eq 1 ]; then
-        echo "$sourceFoam; cd $PWD; gdb -command $HOME/gdbCommands $exec 2>&1 | tee $procLog; read dummy" >> $procCmdFile
+    if [ "$method" -eq 0 ]; then
+        echo "$sourceFoam; cd $PWD; $exec $args | tee $procLog" >> $procCmdFile
+        echo "${node}$procCmdFile" >> $PWD/mpirun.schema
+    elif [ "$method" -eq 1 ]; then
+        echo "$sourceFoam; cd $PWD; gdb -command $PWD/gdbCommands $exec 2>&1 | tee $procLog; read dummy" >> $procCmdFile
         #echo "$sourceFoam; cd $PWD; $exec $args; read dummy" >> $procCmdFile
-        echo "${node}xterm -font fixed -title 'processor'$proc $geom -e $procCmdFile" >> $HOME/mpirun.schema
+        echo "${node}xterm -font fixed -title 'processor'$proc $geom -e $procCmdFile" >> $PWD/mpirun.schema
     elif [ "$method" -eq 2 ]; then
-        echo "$sourceFoam; cd $PWD; gdb -command $HOME/gdbCommands >& $procLog" >> $procCmdFile
-        echo "${node}$procCmdFile" >> $HOME/mpirun.schema
+        echo "$sourceFoam; cd $PWD; gdb -command $PWD/gdbCommands >& $procLog" >> $procCmdFile
+        echo "${node}$procCmdFile" >> $PWD/mpirun.schema
     elif [ "$method" -eq 3 ]; then
         echo "$sourceFoam; cd $PWD; $exec $args >& $procLog" >> $procCmdFile
-        echo "${node}$procCmdFile" >> $HOME/mpirun.schema
+        echo "${node}$procCmdFile" >> $PWD/mpirun.schema
     elif [ "$method" -eq 4 ]; then
+        echo "$sourceFoam; cd $PWD; $exec $args 2>&1 | tee $procLog; read dummy" >> $procCmdFile
+        echo "${node}xterm -font fixed -title 'processor'$proc $geom -e $procCmdFile" >> $PWD/mpirun.schema
+    elif [ "$method" -eq 5 ]; then
         echo "$sourceFoam; cd $PWD; valgrind $exec $args; read dummy" >> $procCmdFile
-        echo "${node}xterm -font fixed -title 'processor'$proc $geom -e $procCmdFile" >> $HOME/mpirun.schema
+        echo "${node}xterm -font fixed -title 'processor'$proc $geom -e $procCmdFile" >> $PWD/mpirun.schema
     fi
 
     chmod +x $procCmdFile
@@ -173,10 +203,32 @@ do
     echo "    tail -f $procLog"
 done
 
-$ECHO "Constructed $HOME/mpirun.schema file. Press return to execute.\c"
-read dummy
+cmd=""
 if [ .$WM_MPLIB = .OPENMPI ]; then
-    mpirun -app $HOME/mpirun.schema </dev/null
-elif [ .$WM_MPLIB = .LAM ]; then
-    mpirun $HOME/mpirun.schema </dev/null
+    cmd="mpirun -app $PWD/mpirun.schema </dev/null"
+elif [ .$WM_MPLIB = .MPICH ]; then
+    cmd="mpiexec"
+    for ((proc=0; proc<$nProcs; proc++))
+    do
+        read procCmd
+
+        procXtermCmdFile="$PWD/processor${proc}Xterm.sh"
+        echo "#!/bin/sh" > $procXtermCmdFile
+        echo "$procCmd" >> $procXtermCmdFile
+        chmod +x $procXtermCmdFile
+        if [ $proc -ne 0 ]; then
+            cmd="${cmd} :"
+        fi
+        cmd="${cmd} -n 1 ${procXtermCmdFile}"
+    done < $PWD/mpirun.schema
 fi
+
+echo "Constructed $PWD/mpirun.schema file."
+echo ""
+echo "    $cmd"
+echo ""
+$ECHO "Press return to execute.\c"
+read dummy
+exec $cmd
+
+#------------------------------------------------------------------------------

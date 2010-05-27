@@ -33,9 +33,9 @@
 #------------------------------------------------------------------------------
 
 # Base settings
-FOAM_VERSION=1.5-dev
-SUPPLIED_VERSION_GCC=4.3.1
-MIN_VERSION_GCC=4.2.0
+FOAM_VERSION=1.6-ext
+SUPPLIED_VERSION_GCC=4.3.3
+MIN_VERSION_GCC=4.3.1
 
 # General
 WIDTH=20
@@ -46,10 +46,8 @@ CRITICALERROR=0
 SSHRSHOK=0
 
 # System variables
-USER_SHELL=`basename $SHELL`
 HOST_NAME=`uname -n`
 OS=`uname -s`
-OS_VERSION=`uname -r`
 USER_NAME=$LOGNAME
 if [ ! -n $USER_NAME ]; then
     USER_NAME=$USER
@@ -92,7 +90,7 @@ length () {
 
 
 stringLength () {
-echo $1 | wc -m | tr -d " "
+    echo $1 | wc -m | tr -d " "
 }
 
 
@@ -125,7 +123,7 @@ reportEnv () {
         SunOS)
             if /usr/bin/test -e $EXP_ENV ; then
                 EXISTS=" yes "
-                if  [ "$2" != "noPath" ]; then
+                if  [ "$2" != noPath ]; then
                     ON_PATH=" no "
                     OLD_IFS=$IFS
                     IFS=':'
@@ -152,7 +150,7 @@ reportEnv () {
         *)
             if [ -e "$EXP_ENV" ] ; then
                 EXISTS=" yes "
-                if  [ "$2" != "noPath" ]; then
+                if  [ "$2" != noPath ]; then
                     ON_PATH=" no "
                     OLD_IFS=$IFS
                     IFS=':'
@@ -182,10 +180,10 @@ reportEnv () {
     fi
 
     ERROR="false"
-    if [ "$EXISTS" = "no" ] || [ "$ON_PATH" = "no" ]; then
+    if [ "$EXISTS" = no ] || [ "$ON_PATH" = no ]; then
         ERROR="true"
     fi
-    if [ "$3" = "yes" ] && [ "$ERROR" = "true" ]; then
+    if [ "$3" = yes ] && [ "$ERROR" = true ]; then
         CRITICALERROR=`expr $CRITICALERROR + 1`
         echo "WARNING: CRITICAL ERROR"
         echo
@@ -254,7 +252,7 @@ reportExecutable () {
             ;;
         gcc)
             VERSION=`$1 -v 2>&1                  \
-                | grep 'version'                 \
+                | grep 'gcc version'                 \
                 | cut -d" " -f3`
             if [ ! "$VERSION" = "$SUPPLIED_VERSION_GCC" ]; then
                 echo "WARNING: gcc version does not match gcc supplied" \
@@ -312,9 +310,9 @@ pingTest () {
     case $OS in
         SunOS)
             PINGTEST=`/usr/sbin/ping $1 2>&1`
-            if  [ "`echo $PINGTEST | grep "alive"`" != "" ] ; then
+            if  [ "`echo $PINGTEST | grep alive`" != "" ] ; then
                 RESULT="Successful"
-            elif  [ "`echo $PINGTEST | grep "unknown host"`" != "" ] ; then
+            elif  [ "`echo $PINGTEST | grep 'unknown host'`" != "" ] ; then
                 RESULT="No_entry_for_\"$1\"_in_/etc/hosts"
             else
                 RESULT="Networking_cannot_reach_$1"
@@ -322,9 +320,9 @@ pingTest () {
             ;;
         *)
             PINGTEST=`/bin/ping -w 3 -c 1 $1 2>&1`
-            if  [ "`echo $PINGTEST | grep "1 received"`" != "" ] ; then
+            if  [ "`echo $PINGTEST | grep '1 received'`" != "" ] ; then
                 RESULT="Successful"
-            elif  [ "`echo $PINGTEST | grep "unknown host"`" != "" ] ; then
+            elif  [ "`echo $PINGTEST | grep 'unknown host'`" != "" ] ; then
                 RESULT="No_entry_for_\"$1\"_in_/etc/hosts"
             else
                 RESULT="Networking_cannot_reach_$1"
@@ -334,7 +332,7 @@ pingTest () {
 
     echo "`fixlen "Pinging_$1" 25` `fixlen "$RESULT" 45` `fixlen "$2" 5`"
 
-    if [ "$2" = "yes" ] && [  "$RESULT" != "Successful" ]; then
+    if [ "$2" = yes ] && [  "$RESULT" != Successful ]; then
         CRITICALERROR=`expr $CRITICALERROR + 1`
         echo "WARNING: CRITICAL ERROR"
         echo
@@ -351,7 +349,7 @@ EOF
 
 
 checkTelnetPort () {
-    if  [ -x "/usr/bin/telnet" ] || [ -x "/bin/telnet" ] ; then
+    if [ -x "/usr/bin/telnet" ] || [ -x "/bin/telnet" ] ; then
         RESULT=`telnetPortTest $1 $2 2>&1 | egrep "onnect.* [t|r]"`
         if [ "`echo $RESULT | grep 'Connected to'`" ] ; then
             RESULT='Successful'
@@ -361,7 +359,7 @@ checkTelnetPort () {
             RESULT="Not_active*"
         fi
     else
-        RESULT='No_telnet_running:_cannot_check*'
+        RESULT='No_telnet_installed:_cannot_check*'
     fi
 }
 
@@ -369,7 +367,7 @@ checkTelnetPort () {
 checkRsh () {
     checkTelnetPort $HOST_NAME 222
     echo "`fixlen "Test_rsh:" 25` `fixlen "$RESULT" 45` "yes""
-    if [ "$RESULT" != 'Successful' ]; then
+    if [ "$RESULT" != Successful ]; then
         SSHRSHOK=`expr $SSHRSHOK + 1`
     fi
 }
@@ -378,14 +376,14 @@ checkRsh () {
 checkSsh () {
     checkTelnetPort $HOST_NAME 22
     echo "`fixlen "Test_ssh:" 25` `fixlen "$RESULT" 45` "yes""
-    if [ "$RESULT" != 'Successful' ]; then
+    if [ "$RESULT" != Successful ]; then
         SSHRSHOK=`expr $SSHRSHOK + 1`
     fi
 }
 
 
 checkOpenFOAMEnvironment() {
-    if [ ! -d "$WM_PROJECT_INST_DIR" -o ! -d "$WM_THIRD_PARTY_DIR" ]; then
+    [ -d "$WM_PROJECT_INST_DIR" ] && [ -d "$WM_THIRD_PARTY_DIR" ] || {
         echo ""
         echo "FATAL ERROR: OpenFOAM environment not configured."
         echo ""
@@ -394,22 +392,23 @@ checkOpenFOAMEnvironment() {
         echo "    to source the OpenFOAM environment."
         echo ""
         exit 1
-    fi
+    }
 }
 
 
 checkUserShell() {
-    case $USER_SHELL in
-        csh | tcsh)
-            USER_CONFIG_TYPE="cshrc"
-            echo "`fixlen "Shell:" $WIDTH` ${USER_SHELL}"
+    case $SHELL in
+        */csh | */tcsh)
+            # USER_CONFIG_TYPE="cshrc"
+            echo "`fixlen "Shell:" $WIDTH` ${SHELL##*/}"
             ;;
-        bash | ksh)
-            USER_CONFIG_TYPE="bashrc"
-            echo "`fixlen "Shell:" $WIDTH` ${USER_SHELL}"
+        */bash | */ksh)
+            # USER_CONFIG_TYPE="bashrc"
+            echo "`fixlen "Shell:" $WIDTH` ${SHELL##*/}"
             ;;
-        *) USER_CONFIG_TYPE=""
-            echo "`fixlen "Shell:" $WIDTH` ${USER_SHELL}"
+        *)
+            # USER_CONFIG_TYPE=""
+            echo "`fixlen "Shell:" $WIDTH` ${SHELL##*/}"
             echo "FATAL ERROR: Cannot identify the shell you are running."
             echo "             OpenFOAM ${FOAM_VERSION} is compatible with "
             echo "             csh, tcsh, ksh and bash."
@@ -435,15 +434,18 @@ checkHostName() {
 
 
 checkOS () {
-    if [ "$OS" = "Linux" ] || [ "$OS" = "LinuxAMD64" ] || [ "$OS" = "SunOS" ]; then
-        echo "`fixlen "OS:" $WIDTH` ${OS} version ${OS_VERSION}"
-    else
+    case "$OS" in
+    Linux | LinuxAMD64 | SunOS )
+        echo "`fixlen "OS:" $WIDTH` ${OS} version $(uname -r)"
+        ;;
+    *)
         echo "FATAL ERROR: Incompatible operating system \"$OS\"."
         echo "             OpenFOAM ${FOAM_VERSION} is currently "
         echo "             available for Linux and SunOS only."
         echo
         FATALERROR=`expr $FATALERROR + 1`
-    fi
+        ;;
+    esac
 }
 
 
@@ -485,6 +487,7 @@ hline
 reportEnv '$WM_PROJECT_DIR'   '$PATH' "yes"
 echo ""
 reportEnv '$FOAM_APPBIN'      '$PATH' "yes"
+reportEnv '$FOAM_SITE_APPBIN' '$PATH' "no"
 reportEnv '$FOAM_USER_APPBIN' '$PATH' "no"
 reportEnv '$WM_DIR'           '$PATH' "yes"
 hline
@@ -495,6 +498,7 @@ hline
 echo "$COL1 $COL2 $COL3 $COL4 $COL5"
 hline
 reportEnv '$FOAM_LIBBIN'      '$LD_LIBRARY_PATH' "yes"
+reportEnv '$FOAM_SITE_LIBBIN' '$LD_LIBRARY_PATH' "no"
 reportEnv '$FOAM_USER_LIBBIN' '$LD_LIBRARY_PATH' "no"
 reportEnv '$MPI_ARCH_PATH'    '$LD_LIBRARY_PATH' "yes"
 hline
@@ -509,7 +513,7 @@ echo "$COL1 $COL2 $COL3"
 hline
 reportExecutable gcc "${WM_COMPILER_DIR}/bin/gcc"
 reportExecutable gzip
-if [ "$OS" = "Linux" ]  ; then
+if [ "$OS" = Linux ]  ; then
     reportExecutable tar
 else
     reportExecutable gtar
@@ -519,32 +523,9 @@ reportExecutable icoFoam "${FOAM_APPBIN}/icoFoam"
 hline
 
 #------------------------------------------------------------------------------
-heading "Checking networking..."
-COL1=`fixlen "Action" 25`
-COL2=`fixlen "Result" 45`
-COL3=`fixlen "Crit" 5`
-
-hline
-echo "$COL1 $COL2 $COL3"
+heading "Summary"
 hline
 
-pingTest "$HOST_NAME" "yes"
-pingTest "localHost" "yes"
-checkRsh
-checkSsh
-
-if [ $SSHRSHOK -eq 1 ]; then
-    echo "(*) Only one of rsh or ssh is required by the OpenFOAM enviroment."
-elif [ $SSHRSHOK -gt 1  ]; then
-    echo "FATAL ERROR: No remote shell available."
-    echo "             OpenFOAM ${FOAM_VERSION} enviroment requires either ssh and/or rsh."
-    echo "             Contact your system administrator."
-    echo ""
-    FATALERROR=`expr $FATALERROR + 1`
-fi
-echo ""
-hline
-echo ""
 if [ $FATALERROR -gt 0 ] ; then
     echo "The system test has evoked $FATALERROR fatal error(s)."
 else

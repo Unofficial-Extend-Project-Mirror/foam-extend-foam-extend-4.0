@@ -33,85 +33,111 @@
 #     Also removes consecutive blank lines from file.
 #
 #------------------------------------------------------------------------------
+foamVersion=$WM_PROJECT_VERSION
 
-#
-# FUNCTIONS
-#
-printUsage () {
-cat <<EOF
-Usage: $0 <file>
-    Updates the header of application files
-    By default, writes current version in the header
-    Alternatively version can be specified with -v option
-    Also removes consecutive blank lines from file
+usage() {
+    cat<<USAGE
 
-Options are:
--v "<version>" specifies the version to be written in the header
--h         help
-EOF
+Usage: ${0##*/} [OPTION] <file1> ... <fileN>
+
+options:
+  -v VER  specifies the version to be written in the header
+  -h      help
+
+  Updates the header of application files and removes consecutive blank lines.
+  By default, writes current OpenFOAM version in the header.
+  An alternative version can be specified with the -v option.
+
+USAGE
+    exit 1
 }
 
-printOpenFOAMheader () {
-cat<<EOF
+
+printHeader() {
+    cat<<HEADER
 /*--------------------------------*- C++ -*----------------------------------*\\
 | =========                 |                                                 |
 | \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\\\    /   O peration     | Version:  ${1}                                   |
-|   \\\\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|  \\\\    /   O peration     | Version:  ${foamVersion}  |
+|   \\\\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\\\/     M anipulation  |                                                 |
 \\*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
-    format      ${2};
-    class       ${3};
-    object      ${4};
+    format      ${1};
+    class       ${2};
+    object      ${3};
 }
-EOF
-}
-
-FoamFileAttribute () {
-    grep $1 $2 | tr -s " " | cut -d" " -f3 | cut -d\; -f1
+HEADER
 }
 
-VERSION=$WM_PROJECT_VERSION
+
+#
+# extract attribute '$1' from file '$2'
+#
+FoamFileAttribute() {
+    sed -n -e 's/[ ;]*$//' -e "s/^ *$1 *//p" $2
+}
+
+
 #
 # OPTIONS
 #
-OPTS=`getopt hv: $*`
-if [ $? -ne 0 ] ; then
+opts=$(getopt hv: $*)
+if [ $? -ne 0 ]
+then
     echo "Aborting due to invalid option"
-    printUsage
-    exit 1
+    usage
 fi
-eval set -- '$OPTS'
-while [ "$1" != "--" ]; do
+eval set -- '$opts'
+while [ "$1" != "--" ]
+do
     case $1 in
-        -v) VERSION=$2; shift;;
-        -h) printUsage; exit 1;;
+    -v)
+        foamVersion=$2
+        shift
+        ;;
+    -h)
+        usage
+        ;;
     esac
     shift
 done
 shift
 
+[ $# -ge 1 ] || usage
+
+
+# constant width for version
+foamVersion=$(printf %-36s $foamVersion)
+
 #
 # MAIN
 #
-CASE_FILE=$1
-if [ "`grep FoamFile $CASE_FILE`" ] ; then
-    echo "Updating case file:" $CASE_FILE
-    sed -n '/FoamFile/,/}/p' $CASE_FILE > FoamFile
-    CLASS=`FoamFileAttribute class FoamFile`
-    OBJECT=`FoamFileAttribute object FoamFile`
-    FORMAT=`FoamFileAttribute format FoamFile`
-    printOpenFOAMheader $VERSION $FORMAT $CLASS $OBJECT > temp
-    sed '1,/}/d' $CASE_FILE | sed '/./,/^$/!d' >> temp
-    mv temp $1
-    rm FoamFile
-else
-    echo "The following file does not appear to be a case file:"
-    echo "    " $CASE_FILE
-fi
+unset NOTE
 
+for caseFile
+do
+    if grep FoamFile $caseFile >/dev/null 2>&1
+    then
+        echo "Updating case file: $caseFile"
+        sed -n '/FoamFile/,/}/p' $caseFile > FoamFile.tmp
+
+        FORMAT=$(FoamFileAttribute format FoamFile.tmp)
+        CLASS=$(FoamFileAttribute  class  FoamFile.tmp)
+        OBJECT=$(FoamFileAttribute object FoamFile.tmp)
+        # extract NOTE?
+
+        printHeader $FORMAT $CLASS $OBJECT $NOTE > FoamFile.tmp
+        sed '1,/}/d' $caseFile | sed '/./,/^$/!d' >> FoamFile.tmp
+
+        # use cat to avoid removing/replace soft-links
+        [ -s FoamFile.tmp ] && cat FoamFile.tmp >| $caseFile
+        rm -f FoamFile.tmp 2>/dev/null
+    else
+        echo " Invalid case file: $caseFile" 1>&2
+    fi
+done
 
 #------------------------------------------------------------------------------

@@ -27,20 +27,21 @@
 #     foamPackBinAll [outputDir]
 #
 # Description
-#     Packs and compresses all binary version of foam for release
+#     Packs and compresses all binary versions of foam for release
 #
 #------------------------------------------------------------------------------
 packDir=$WM_PROJECT-$WM_PROJECT_VERSION
 
 if [ ! -d $packDir ]
 then
-   echo "Error: directory $packDir does not exist"
-   exit 1
+    echo "Error: directory $packDir does not exist"
+    exit 1
 fi
 
+# obtain arch types from lib/
 for bin in $packDir/lib/*
 do
-   foamPackBin ${bin##*/} $@
+    foamPackBin ${bin##*/} $@
 done
 
 #------------------------------------------------------------------------------

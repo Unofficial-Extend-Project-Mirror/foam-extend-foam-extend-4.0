@@ -40,7 +40,7 @@ usage: $Script <type> <class name>
 
 * create a new standard OpenFOAM source file
 
-type: (C|H|I|IO|App|cfg)
+type: (C|H|I|IO|App)
 
 USAGE
     exit 1
@@ -73,10 +73,6 @@ app|App)
        echo "foamNew: Creating Make/files and Make/options"
        wmakeFilesAndOptions
    fi
-   ;;
-cfg)
-   template=foamUtilTemplate
-   fileType=$1
    ;;
 *)
    usage "unknown type"

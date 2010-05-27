@@ -54,10 +54,11 @@ MACHDIR=$HOME/.OpenFOAM/${PROGNAME}
 DEFSTATEFILE=$HOME/.OpenFOAM/foamCheckJobs.out
 
 
-if [ `uname -s` = 'Linux' ]; then
-   ECHO='echo -e'
+if [ `uname -s` = Linux ]
+then
+    ECHO='echo -e'
 else
-   ECHO='echo'
+    ECHO='echo'
 fi
 
 
