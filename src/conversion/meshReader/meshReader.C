@@ -142,9 +142,9 @@ Foam::autoPtr<Foam::polyMesh> Foam::meshReader::mesh
                 "constant",
                 registry
             ),
-            points(),
-            meshFaces_,
-            cellPolys_
+            xferMove(points_),
+            xferMove(meshFaces_),
+            xferMove(cellPolys_)
         )
     );
 
@@ -166,14 +166,7 @@ void Foam::meshReader::writeMesh
     IOstream::streamFormat fmt
 ) const
 {
-    fileName meshDir = mesh.objectRegistry::path()/mesh.meshDir();
-
-    // remove some directories and files - this should be easier
-    mesh.removeFiles(mesh.instance());
-    if (dir(meshDir/"sets"))
-    {
-        rmDir(meshDir/"sets");
-    }
+    mesh.removeFiles();
 
     Info<< "Writing polyMesh" << endl;
     mesh.writeObject

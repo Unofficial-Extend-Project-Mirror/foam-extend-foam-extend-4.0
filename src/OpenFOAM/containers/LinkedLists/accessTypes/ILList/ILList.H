@@ -71,7 +71,7 @@ class ILList
 
         //- Read from Istream using given Istream constructor class
         template<class INew>
-        void read(Istream&, const INew& inewt);
+        void read(Istream&, const INew&);
 
 
 public:
@@ -96,7 +96,7 @@ public:
 
         //- Copy constructor with additional argument for clone
         template<class CloneArg>
-        ILList(const ILList<LListBase, T>& slpl, const CloneArg& cloneArg)
+        ILList(const ILList<LListBase, T>& lst, const CloneArg& cloneArg)
         #ifdef __INTEL_COMPILER
         :
             UILList<LListBase, T>()
@@ -104,8 +104,8 @@ public:
             for
             (
                 typename UILList<LListBase, T>::const_iterator iter =
-                    slpl.begin();
-                iter != slpl.end();
+                    lst.begin();
+                iter != lst.end();
                 ++iter
             )
             {
@@ -118,7 +118,7 @@ public:
 
         //- Construct from Istream using given Istream constructor class
         template<class INew>
-        ILList(Istream&, const INew& inewt);
+        ILList(Istream&, const INew&);
 
 
     // Destructor
@@ -139,6 +139,10 @@ public:
             //- Clear the contents of the list
             void clear();
 
+            //- Transfer the contents of the argument into this List
+            //  and annull the argument list.
+            void transfer(ILList<LListBase, T>&);
+
 
     // Member operators
 
@@ -148,10 +152,7 @@ public:
     // Istream operator
 
         //- Read List from Istream, discarding contents of existing List.
-        friend Istream& operator>>
-        #ifndef __CINT__
-        <LListBase, T>
-        #endif
+        friend Istream& operator>> <LListBase, T>
         (
             Istream&,
             ILList<LListBase, T>&

@@ -25,7 +25,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "SIBS.H"
-#include "simpleMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -35,7 +34,7 @@ void Foam::SIBS::SIMPR
     const scalarField& y,
     const scalarField& dydx,
     const scalarField& dfdx,
-    const Matrix<scalar>& dfdy,
+    const scalarSquareMatrix& dfdy,
     const scalar deltaX,
     const label nSteps,
     scalarField& yEnd

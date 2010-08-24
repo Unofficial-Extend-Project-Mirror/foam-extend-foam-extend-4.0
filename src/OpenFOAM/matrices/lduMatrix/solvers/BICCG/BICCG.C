@@ -32,46 +32,39 @@ namespace Foam
 {
     defineTypeNameAndDebug(BICCG, 0);
 
-    lduMatrix::solver::addsymMatrixConstructorToTable<BICCG>
+    lduSolver::addsymMatrixConstructorToTable<BICCG>
         addBICCGSymMatrixConstructorToTable_;
 
-    lduMatrix::solver::addasymMatrixConstructorToTable<BICCG>
+    lduSolver::addasymMatrixConstructorToTable<BICCG>
         addBICCGAsymMatrixConstructorToTable_;
 }
 
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
 
-Foam::IStringStream Foam::BICCG::solverDataStream
+Foam::dictionary Foam::BICCG::solverDict
 (
-    const scalar tolerance,
+    const scalar tol,
     const scalar relTol
-) const
+)
 {
-    return IStringStream
-    (
-        "{ preconditioner { type DILU; }"
-        "  minIter 0; maxIter 1000; "
-        "  tolerance " + name(tolerance) + "; relTol " + name(relTol) + "; }"
-    );
+    dictionary dict(IStringStream("solver PBiCG; preconditioner DILU;")());
+    dict.add("tolerance", tol);
+    dict.add("relTol", relTol);
+
+    return dict;
 }
 
 
-Foam::IStringStream Foam::BICCG::solverDataStream
+Foam::dictionary Foam::BICCG::solverDict
 (
-    const word& solverName,
-    Istream& solverData
-) const
+    Istream& is
+)
 {
-    scalar tolerance(readScalar(solverData));
-    scalar relTol(readScalar(solverData));
+    scalar tol(readScalar(is));
+    scalar relTol(readScalar(is));
 
-    return IStringStream
-    (
-        solverName + "{ preconditioner { type DILU; }"
-        "  minIter 0; maxIter 1000; "
-        "  tolerance " + name(tolerance) + "; relTol " + name(relTol) + "; }"
-    );
+    return solverDict(tol, relTol);
 }
 
 
@@ -84,8 +77,7 @@ Foam::BICCG::BICCG
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    const scalar tolerance,
-    const scalar relTol
+    const dictionary& dict
 )
 :
     PBiCG
@@ -95,7 +87,7 @@ Foam::BICCG::BICCG
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverDataStream(tolerance, relTol)()
+        dict
     )
 {}
 
@@ -107,7 +99,8 @@ Foam::BICCG::BICCG
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    Istream& solverData
+    const scalar tolerance,
+    const scalar relTol
 )
 :
     PBiCG
@@ -117,18 +110,8 @@ Foam::BICCG::BICCG
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverDataStream(word::null, solverData)()
+        solverDict(tolerance, relTol)
     )
 {}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-void Foam::BICCG::read(Istream& solverData)
-{
-    word solverName(solverData);
-    PBiCG::read(solverDataStream(solverName, solverData)());
-}
-
 
 // ************************************************************************* //

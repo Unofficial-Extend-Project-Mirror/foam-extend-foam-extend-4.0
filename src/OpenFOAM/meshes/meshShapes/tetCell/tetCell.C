@@ -30,14 +30,10 @@ Description
 #include "cellShape.H"
 #include "cellModeller.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-cellShape tetCell::tetCellShape() const
+Foam::cellShape Foam::tetCell::tetCellShape() const
 {
     static const cellModel* tetModelPtr_ = NULL;
 
@@ -51,9 +47,5 @@ cellShape tetCell::tetCellShape() const
     return cellShape(tet, *this);
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

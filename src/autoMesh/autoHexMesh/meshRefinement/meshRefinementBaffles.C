@@ -646,7 +646,7 @@ Foam::List<Foam::labelPair> Foam::meshRefinement::filterDuplicateFaces
 
             forAll(pp, i)
             {
-                const labelList& fEdges = mesh_.faceEdges()[faceI];
+                const labelList& fEdges = mesh_.faceEdges(faceI);
 
                 forAll(fEdges, fEdgeI)
                 {
@@ -658,8 +658,8 @@ Foam::List<Foam::labelPair> Foam::meshRefinement::filterDuplicateFaces
     }
 
 
-   // DynamicList<label> fe0;
-   // DynamicList<label> fe1;
+    DynamicList<label> fe0;
+    DynamicList<label> fe1;
 
 
     // Count number of duplicate boundary faces per edge
@@ -667,14 +667,14 @@ Foam::List<Foam::labelPair> Foam::meshRefinement::filterDuplicateFaces
 
     forAll(couples, i)
     {
-        const labelList& fEdges0 = mesh_.faceEdges()[couples[i].first()]; //, fe0];
+        const labelList& fEdges0 = mesh_.faceEdges(couples[i].first(), fe0);
 
         forAll(fEdges0, fEdgeI)
         {
             nBafflesPerEdge[fEdges0[fEdgeI]] += 1000000;
         }
 
-        const labelList& fEdges1 = mesh_.faceEdges()[couples[i].second()]; //, fe1];
+        const labelList& fEdges1 = mesh_.faceEdges(couples[i].second(), fe1);
 
         forAll(fEdges1, fEdgeI)
         {
@@ -709,7 +709,7 @@ Foam::List<Foam::labelPair> Foam::meshRefinement::filterDuplicateFaces
          == patches.whichPatch(couple.second())
         )
         {
-            const labelList& fEdges = mesh_.faceEdges()[couples[i].first()];
+            const labelList& fEdges = mesh_.faceEdges(couples[i].first());
 
             forAll(fEdges, fEdgeI)
             {
@@ -2032,7 +2032,8 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::meshRefinement::dupNonManifoldPoints()
 // Zoning
 Foam::autoPtr<Foam::mapPolyMesh> Foam::meshRefinement::zonify
 (
-    const point& keepPoint
+    const point& keepPoint,
+    const bool allowFreeStandingZoneFaces
 )
 {
     const wordList& cellZoneNames = surfaces_.cellZoneNames();
@@ -2344,9 +2345,11 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::meshRefinement::zonify
     }
 
 
-    //// Make sure namedSurfaceIndex is unset inbetween same cell cell zones.
-    //makeConsistentFaceIndex(cellToZone, namedSurfaceIndex);
-
+    // Make sure namedSurfaceIndex is unset inbetween same cell cell zones.
+    if (!allowFreeStandingZoneFaces)
+    {
+        makeConsistentFaceIndex(cellToZone, namedSurfaceIndex);
+    }
 
     // Topochange container
     directTopoChange meshMod(mesh_);
@@ -2411,6 +2414,9 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::meshRefinement::zonify
     }
     syncTools::swapBoundaryFaceList(mesh_, neiCellZone, false);
 
+    // Get per face whether is it master (of a coupled set of faces)
+    PackedBoolList isMasterFace(syncTools::getMasterFaces(mesh_));
+
     // Set owner as no-flip
     forAll(patches, patchI)
     {
@@ -2428,13 +2434,26 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::meshRefinement::zonify
                 label neiZone = neiCellZone[faceI-mesh_.nInternalFaces()];
 
                 bool flip;
-                if (ownZone == max(ownZone, neiZone))
+
+                label maxZone = max(ownZone, neiZone);
+
+                if (maxZone == -1)
                 {
                     flip = false;
                 }
-                else
+                else if (ownZone == neiZone)
+                {
+                    // Free-standing zone face or coupled boundary. Keep master
+                    // face unflipped.
+                    flip = !isMasterFace[faceI];
+                }
+                else if (neiZone == maxZone)
                 {
                     flip = true;
+                }
+                else
+                {
+                    flip = false;
                 }
 
                 meshMod.setAction

@@ -43,6 +43,30 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
+Foam::radiation::radiationModel::radiationModel(const volScalarField& T)
+:
+    IOdictionary
+    (
+        IOobject
+        (
+            "radiationProperties",
+            T.time().constant(),
+            T.mesh(),
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
+        )
+    ),
+    mesh_(T.mesh()),
+    time_(T.time()),
+    T_(T),
+    radiation_(false),
+    coeffs_(dictionary::null),
+    solverFreq_(0),
+    absorptionEmission_(NULL),
+    scatter_(NULL)
+{}
+
+
 Foam::radiation::radiationModel::radiationModel
 (
     const word& type,
@@ -54,19 +78,23 @@ Foam::radiation::radiationModel::radiationModel
         IOobject
         (
             "radiationProperties",
-            T.mesh().time().constant(),
-            T.mesh().db(),
+            T.time().constant(),
+            T.mesh(),
             IOobject::MUST_READ,
             IOobject::NO_WRITE
         )
     ),
-    T_(T),
     mesh_(T.mesh()),
+    time_(T.time()),
+    T_(T),
     radiation_(lookup("radiation")),
-    radiationModelCoeffs_(subDict(type + "Coeffs")),
+    coeffs_(subDict(type + "Coeffs")),
+    solverFreq_(readLabel(lookup("solverFreq"))),
     absorptionEmission_(absorptionEmissionModel::New(*this, mesh_)),
     scatter_(scatterModel::New(*this, mesh_))
-{}
+{
+    solverFreq_ = max(1, solverFreq_);
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor    * * * * * * * * * * * * * * //
@@ -82,13 +110,27 @@ bool Foam::radiation::radiationModel::read()
     if (regIOobject::read())
     {
         lookup("radiation") >> radiation_;
-        radiationModelCoeffs_ = subDict(type() + "Coeffs");
+        coeffs_ = subDict(type() + "Coeffs");
 
         return true;
     }
     else
     {
         return false;
+    }
+}
+
+
+void Foam::radiation::radiationModel::correct()
+{
+    if (!radiation_)
+    {
+        return;
+    }
+
+    if (time_.timeIndex() % solverFreq_ == 0)
+    {
+        calculate();
     }
 }
 
@@ -110,5 +152,21 @@ Foam::tmp<Foam::fvScalarMatrix> Foam::radiation::radiationModel::Sh
     );
 }
 
+Foam::tmp<Foam::fvScalarMatrix> Foam::radiation::radiationModel::Shs
+(
+    basicThermo& thermo
+) const
+{
+    volScalarField& hs = thermo.hs();
+    const volScalarField cp = thermo.Cp();
+    const volScalarField T3 = pow3(T_);
+
+    return
+    (
+        Ru()
+      - fvm::Sp(4.0*Rp()*T3/cp, hs)
+      - Rp()*T3*(T_ - 4.0*hs/cp)
+    );
+}
 
 // ************************************************************************* //

@@ -40,7 +40,7 @@ Description
 
 defineTypeNameAndDebug(Foam::octreeDataTriSurface, 0);
 
-Foam::scalar Foam::octreeDataTriSurface::tol = 1E-6;
+Foam::scalar Foam::octreeDataTriSurface::tol = 1e-6;
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -181,9 +181,9 @@ void Foam::octreeDataTriSurface::nearestCoords
     // with points very close to one of the triangle vertices.
     // (seen up to -9e-15). Alternatively add some small value.
 
-    //const scalar f = D & D;
-    //return a*s*s + 2*b*s*t + c*t*t + 2*d*s + 2*e*t + f + SMALL;
-    //return Foam::mag(a*s*s + 2*b*s*t + c*t*t + 2*d*s + 2*e*t + f);
+    // const scalar f = D & D;
+    // return a*s*s + 2*b*s*t + c*t*t + 2*d*s + 2*e*t + f + SMALL;
+    // return Foam::mag(a*s*s + 2*b*s*t + c*t*t + 2*d*s + 2*e*t + f);
 }
 
 
@@ -219,13 +219,7 @@ Foam::treeBoundBoxList Foam::octreeDataTriSurface::calcBb
     const triSurface& surf
 )
 {
-    treeBoundBox illegalBb
-    (
-        vector(GREAT, GREAT, GREAT),
-        vector(-GREAT, -GREAT, -GREAT)
-    );
-
-    treeBoundBoxList allBb(surf.size(), illegalBb);
+    treeBoundBoxList allBb(surf.size(), treeBoundBox::invertedBox);
 
     const labelListList& pointFcs = surf.pointFaces();
     const pointField& localPts = surf.localPoints();
@@ -245,7 +239,7 @@ Foam::treeBoundBoxList Foam::octreeDataTriSurface::calcBb
             bb.min() = min(bb.min(), vertCoord);
             bb.max() = max(bb.max(), vertCoord);
         }
-    }    
+    }
 
     return allBb;
 }
@@ -274,7 +268,7 @@ Foam::octreeDataTriSurface::octreeDataTriSurface(const triSurface& surface)
 
         // Calculate base and spanning vectors of triangles
         base_[faceI] = points[f[1]];
-        E0_[faceI] = points[f[0]] - points[f[1]]; 
+        E0_[faceI] = points[f[0]] - points[f[1]];
         E1_[faceI] = points[f[2]] - points[f[1]];
 
         a_[faceI] = E0_[faceI] & E0_[faceI];
@@ -308,7 +302,7 @@ Foam::octreeDataTriSurface::octreeDataTriSurface
 
         // Calculate base and spanning vectors of triangles
         base_[faceI] = points[f[1]];
-        E0_[faceI] = points[f[0]] - points[f[1]]; 
+        E0_[faceI] = points[f[0]] - points[f[1]];
         E1_[faceI] = points[f[2]] - points[f[1]];
 
         a_[faceI] = E0_[faceI] & E0_[faceI];
@@ -326,11 +320,10 @@ Foam::label Foam::octreeDataTriSurface::getSampleType
     const point& sample
 ) const
 {
-    // Find nearest face to sample
     treeBoundBox tightest(treeBoundBox::greatBox);
+    scalar tightestDist(treeBoundBox::great);
 
-    scalar tightestDist = GREAT;
-
+    // Find nearest face to sample
     label faceI = oc.findNearest(sample, tightest, tightestDist);
 
     if (debug & 2)
@@ -350,16 +343,14 @@ Foam::label Foam::octreeDataTriSurface::getSampleType
     }
 
     const pointField& pts = surface_.points();
-
     const labelledTri& f = surface_[faceI];
 
-    pointHit curHit =
-        triPointRef
-        (
-            pts[f[0]],
-            pts[f[1]],
-            pts[f[2]]
-        ).nearestPoint(sample);
+    pointHit curHit = triPointRef
+    (
+        pts[f[0]],
+        pts[f[1]],
+        pts[f[2]]
+    ).nearestPoint(sample);
 
     // Get normal according to position on face. On point -> pointNormal,
     // on edge-> edge normal, face normal on interior.
@@ -385,12 +376,12 @@ bool Foam::octreeDataTriSurface::overlaps
     const treeBoundBox& cubeBb
 ) const
 {
-    //return cubeBb.intersects(allBb_[index]);
+    //return cubeBb.overlaps(allBb_[index]);
 
     //- Exact test of triangle intersecting bb
 
     // Quick rejection.
-    if (!cubeBb.intersects(allBb_[index]))
+    if (!cubeBb.overlaps(allBb_[index]))
     {
         return false;
     }
@@ -503,7 +494,7 @@ bool Foam::octreeDataTriSurface::findTightest
     else
     {
         // Construct bb around sample and myFar
-        const point dist2(fabs(dist.x()), fabs(dist.y()), fabs(dist.z())); 
+        const point dist2(fabs(dist.x()), fabs(dist.y()), fabs(dist.z()));
 
         tightest.min() = sample - dist2;
         tightest.max() = sample + dist2;
@@ -557,12 +548,12 @@ Foam::scalar Foam::octreeDataTriSurface::calcNearest
 {
     notImplemented
     (
-        "octreeDataTriSurface::calcNearest(const label, const linePointRef&"
-        ", point& linePt, point&)"
+        "octreeDataTriSurface::calcNearest"
+        "(const label, const linePointRef&, point& linePt, point&)"
     );
     return GREAT;
 }
-    
+
 
 void Foam::octreeDataTriSurface::write
 (

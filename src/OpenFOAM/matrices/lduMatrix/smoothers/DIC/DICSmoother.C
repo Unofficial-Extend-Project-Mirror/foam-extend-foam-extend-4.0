@@ -26,7 +26,6 @@ License
 
 #include "DICSmoother.H"
 #include "DICPreconditioner.H"
-#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -34,7 +33,8 @@ namespace Foam
 {
     defineTypeNameAndDebug(DICSmoother, 0);
 
-    addToRunTimeSelectionTable(lduSmoother, DICSmoother, word);
+    lduSmoother::addsymMatrixConstructorToTable<DICSmoother>
+        addDICSmootherSymMatrixConstructorToTable_;
 }
 
 

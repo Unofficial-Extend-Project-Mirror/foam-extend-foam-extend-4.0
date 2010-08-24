@@ -44,10 +44,34 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::ellipticCylindricalCS::ellipticCylindricalCS()
+Foam::ellipticCylindricalCS::ellipticCylindricalCS(const bool inDegrees)
 :
     coordinateSystem(),
-    a_(0)
+    a_(0),
+    inDegrees_(inDegrees)
+{}
+
+
+Foam::ellipticCylindricalCS::ellipticCylindricalCS
+(
+    const coordinateSystem& cs,
+    const bool inDegrees
+)
+:
+    coordinateSystem(cs),
+    inDegrees_(inDegrees)
+{}
+
+
+Foam::ellipticCylindricalCS::ellipticCylindricalCS
+(
+    const word& name,
+    const coordinateSystem& cs,
+    const bool inDegrees
+)
+:
+    coordinateSystem(name, cs),
+    inDegrees_(inDegrees)
 {}
 
 
@@ -57,11 +81,13 @@ Foam::ellipticCylindricalCS::ellipticCylindricalCS
     const point& origin,
     const vector& axis,
     const vector& direction,
-    const scalar a
+    const scalar a,
+    const bool inDegrees
 )
 :
     coordinateSystem(name, origin, axis, direction),
-    a_(a)
+    a_(a),
+    inDegrees_(inDegrees)
 {}
 
 
@@ -70,11 +96,13 @@ Foam::ellipticCylindricalCS::ellipticCylindricalCS
     const word& name,
     const point& origin,
     const coordinateRotation& cr,
-    const scalar a
+    const scalar a,
+    const bool inDegrees
 )
 :
     coordinateSystem(name, origin, cr),
-    a_(a)
+    a_(a),
+    inDegrees_(inDegrees)
 {}
 
 
@@ -85,7 +113,8 @@ Foam::ellipticCylindricalCS::ellipticCylindricalCS
 )
 :
     coordinateSystem(name, dict),
-    a_(readScalar(dict.lookup("a")))
+    a_(readScalar(dict.lookup("a"))),
+    inDegrees_(dict.lookupOrDefault<Switch>("degrees", true))
 {}
 
 
@@ -99,7 +128,8 @@ Foam::vector Foam::ellipticCylindricalCS::localToGlobal
 {
     // Notation: u = local.x() v = local.y() z = local.z();
     scalar theta =
-        local.y()*mathematicalConstant::pi/180.0;
+        local.y()
+       *( inDegrees_ ? mathematicalConstant::pi/180.0 : 1.0 )
 
     return coordinateSystem::localToGlobal
     (
@@ -120,7 +150,8 @@ Foam::tmp<Foam::vectorField> Foam::ellipticCylindricalCS::localToGlobal
 ) const
 {
     scalarField theta =
-        local.component(vector::Y)*mathematicalConstant::pi/180.0;
+        local.component(vector::Y)
+       *( inDegrees_ ? mathematicalConstant::pi/180.0 : 1.0 )
 
     vectorField lc(local.size());
     lc.replace

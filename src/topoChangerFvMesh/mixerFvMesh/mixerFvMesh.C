@@ -417,7 +417,7 @@ bool Foam::mixerFvMesh::update()
 
     if (topoChangeMap->morphing())
     {
-        Info << "Attaching rotolrs" << endl;
+        Info << "Attaching rotors" << endl;
 
         deleteDemandDrivenData(movingPointsMaskPtr_);
 

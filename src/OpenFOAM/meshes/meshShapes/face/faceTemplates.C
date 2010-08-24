@@ -25,16 +25,34 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "face.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
+#include "DynamicList.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+template<unsigned SizeInc, unsigned SizeMult, unsigned SizeDiv>
+Foam::label Foam::face::triangles
+(
+    const pointField& points,
+    DynamicList<face, SizeInc, SizeMult, SizeDiv>& triFaces
+) const
+{
+    label triI = triFaces.size();
+    label quadI = 0;
+    faceList quadFaces;
+
+    // adjust the addressable size (and allocate space if needed)
+    triFaces.setSize(triI + nTriangles());
+
+    return split(SPLITTRIANGLE, points, triI, quadI, triFaces, quadFaces);
+}
+
+
 template<class Type>
-Type face::average(const pointField& meshPoints, const Field<Type>& f) const
+Type Foam::face::average
+(
+    const pointField& meshPoints,
+    const Field<Type>& f
+) const
 {
     // Calculate the average by breaking the face into triangles and
     // area-weighted averaging their averages
@@ -42,7 +60,7 @@ Type face::average(const pointField& meshPoints, const Field<Type>& f) const
     // If the face is a triangle, do a direct calculation
     if (size() == 3)
     {
-        return 
+        return
             (1.0/3.0)
            *(
                f[operator[](0)]
@@ -71,7 +89,7 @@ Type face::average(const pointField& meshPoints, const Field<Type>& f) const
     for (register label pI=0; pI<nPoints; pI++)
     {
         // Calculate 3*triangle centre field value
-        Type ttcf  = 
+        Type ttcf =
         (
             f[operator[](pI)]
           + f[operator[]((pI + 1) % nPoints)]
@@ -98,10 +116,5 @@ Type face::average(const pointField& meshPoints, const Field<Type>& f) const
         return cf;
     }
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

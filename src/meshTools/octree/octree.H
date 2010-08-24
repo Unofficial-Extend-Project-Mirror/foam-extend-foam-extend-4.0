@@ -445,10 +445,6 @@ public:
             //- Construct for a given octree and index
             const_iterator(const octree&, label);
 
-            // Member functions
-
-                const_iterator begin() const;
-
             // Member operators
 
                 void operator=(const const_iterator&);
@@ -465,9 +461,11 @@ public:
 
         //- const_iterator set to the begining of the octree
         inline const_iterator begin() const;
+        inline const_iterator cbegin() const;
 
         //- const_iterator set to beyond the end of the octree
         inline const const_iterator& end() const;
+        inline const const_iterator& cend() const;
 
 
     // IOstream Operators

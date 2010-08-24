@@ -90,12 +90,6 @@ void Foam::lduMatrix::AmulCore
         register const label nCells = diag().size();
         for (register label cell=0; cell<nCells; cell++)
         {
-            #ifdef ICC_IA64_PREFETCH
-            __builtin_prefetch (&xPtr[cell+96],0,1);
-            __builtin_prefetch (&diagPtr[cell+96],0,1);
-            __builtin_prefetch (&AxPtr[cell+96],1,1);
-            #endif
-
             // AmulCore must be additive to account for initialisation step
             // in ldu interfaces.  HJ, 6/Nov/2007
             AxPtr[cell] += diagPtr[cell]*xPtr[cell];
@@ -113,27 +107,10 @@ void Foam::lduMatrix::AmulCore
         const scalar* const __restrict__ lowerPtr = lower().begin();
 
         register const label nFaces = upper().size();
-        #ifdef ICC_IA64_PREFETCH
-        #pragma swp
-        #endif
+
         for (register label face=0; face<nFaces; face++)
         {
-            #ifdef ICC_IA64_PREFETCH
-            __builtin_prefetch (&uPtr[face+32],0,0);
-            __builtin_prefetch (&lPtr[face+32],0,0);
-            __builtin_prefetch (&lowerPtr[face+32],0,1);
-            __builtin_prefetch (&xPtr[lPtr[face+32]],0,1);
-            __builtin_prefetch (&AxPtr[uPtr[face+32]],0,1);
-            #endif
-
             AxPtr[uPtr[face]] += lowerPtr[face]*xPtr[lPtr[face]];
-
-            #ifdef ICC_IA64_PREFETCH
-            __builtin_prefetch (&upperPtr[face+32],0,1);
-            __builtin_prefetch (&xPtr[uPtr[face+32]],0,1);
-            __builtin_prefetch (&AxPtr[lPtr[face+32]],0,1);
-            #endif
-
             AxPtr[lPtr[face]] += upperPtr[face]*xPtr[uPtr[face]];
         }
     }
@@ -198,12 +175,6 @@ void Foam::lduMatrix::TmulCore
         register const label nCells = diag().size();
         for (register label cell=0; cell<nCells; cell++)
         {
-            #ifdef ICC_IA64_PREFETCH
-            __builtin_prefetch (&xPtr[cell+96],0,1);
-            __builtin_prefetch (&diagPtr[cell+96],0,1);
-            __builtin_prefetch (&TxPtr[cell+96],1,1);
-            #endif
-
             // TmulCore must be additive to account for initialisation step
             // in ldu interfaces.  HJ, 6/Nov/2007
             TxPtr[cell] += diagPtr[cell]*xPtr[cell];
@@ -223,22 +194,7 @@ void Foam::lduMatrix::TmulCore
         register const label nFaces = upper().size();
         for (register label face=0; face<nFaces; face++)
         {
-            #ifdef ICC_IA64_PREFETCH
-            __builtin_prefetch (&uPtr[face+32],0,0);
-            __builtin_prefetch (&lPtr[face+32],0,0);
-            __builtin_prefetch (&upperPtr[face+32],0,1);
-            __builtin_prefetch (&xPtr[lPtr[face+32]],0,1);
-            __builtin_prefetch (&TxPtr[uPtr[face+32]],0,1);
-            #endif
-
             TxPtr[uPtr[face]] += upperPtr[face]*xPtr[lPtr[face]];
-
-            #ifdef ICC_IA64_PREFETCH
-            __builtin_prefetch (&lowerPtr[face+32],0,1);
-            __builtin_prefetch (&xPtr[uPtr[face+32]],0,1);
-            __builtin_prefetch (&TxPtr[lPtr[face+32]],0,1);
-            #endif
-
             TxPtr[lPtr[face]] += lowerPtr[face]*xPtr[uPtr[face]];
         }
     }
@@ -267,34 +223,12 @@ void Foam::lduMatrix::sumA
 
     for (register label cell=0; cell<nCells; cell++)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&diagPtr[cell+96],0,1);
-        __builtin_prefetch (&sumAPtr[cell+96],1,1);
-        #endif
-
         sumAPtr[cell] = diagPtr[cell];
     }
 
-    #ifdef ICC_IA64_PREFETCH
-    #pragma swp  
-    #endif
-
     for (register label face=0; face<nFaces; face++)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&uPtr[face+32],0,0);
-        __builtin_prefetch (&lPtr[face+32],0,0);
-        __builtin_prefetch (&lowerPtr[face+32],0,1);
-        __builtin_prefetch (&sumAPtr[uPtr[face+32]],0,1);
-        #endif
-
         sumAPtr[uPtr[face]] += lowerPtr[face];
-
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&upperPtr[face+32],0,1);
-        __builtin_prefetch (&sumAPtr[lPtr[face+32]],0,1);
-        #endif
-
         sumAPtr[lPtr[face]] += upperPtr[face];
     }
 
@@ -338,109 +272,8 @@ void Foam::lduMatrix::residual
 
     forAll (rA, cell)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&bPtr[cell+96],0,1);
-        __builtin_prefetch (&rAPtr[cell+96],1,1);
-        #endif
-
         rAPtr[cell] = bPtr[cell] - rAPtr[cell];
     }
-
-    // Optimised access.  Obsolete, since AMul is fully optimised.
-    // HJ, 5-6/Nov/2007
-//     scalar* __restrict__ rAPtr = rA.begin();
-
-//     const scalar* const __restrict__ xPtr = x.begin();
-//     const scalar* const __restrict__ diagPtr = diag().begin();
-//     const scalar* const __restrict__ bPtr = b.begin();
-
-//     const label* const __restrict__ uPtr = lduAddr().upperAddr().begin();
-//     const label* const __restrict__ lPtr = lduAddr().lowerAddr().begin();
-
-//     const scalar* const __restrict__ upperPtr = upper().begin();
-//     const scalar* const __restrict__ lowerPtr = lower().begin();
-
-//     // Parallel boundary initialisation.
-//     // Note: there is a change of sign in the coupled
-//     // interface update.  The reason for this is that the
-//     // internal coefficients are all located at the l.h.s. of
-//     // the matrix whereas the "implicit" coefficients on the
-//     // coupled boundaries are all created as if the
-//     // coefficient contribution is of a b-kind (i.e. they
-//     // have a sign as if they are on the r.h.s. of the matrix.
-//     // To compensate for this, it is necessary to turn the
-//     // sign of the contribution.
-
-//     FieldField<Field, scalar> mBouCoeffs(coupleBouCoeffs.size());
-
-//     forAll(mBouCoeffs, patchi)
-//     {
-//         if (interfaces.set(patchi))
-//         {
-//             mBouCoeffs.set(patchi, -coupleBouCoeffs[patchi]);
-//         }
-//     }
-
-//     // Initialise the update of coupled interfaces
-//     initMatrixInterfaces
-//     (
-//         mBouCoeffs,
-//         interfaces,
-//         x,
-//         rA, 
-//         cmpt
-//     );
-
-//     register const label nCells = diag().size();
-//     for (register label cell=0; cell<nCells; cell++)
-//     {
-//         #ifdef ICC_IA64_PREFETCH
-//         __builtin_prefetch (&xPtr[cell+96],0,1);
-//         __builtin_prefetch (&diagPtr[cell+96],0,1);
-//         __builtin_prefetch (&bPtr[cell+96],0,1);
-//         __builtin_prefetch (&rAPtr[cell+96],1,1);
-//         #endif
-
-//         rAPtr[cell] = bPtr[cell] - diagPtr[cell]*xPtr[cell];
-//     }
-
-
-//     register const label nFaces = upper().size();
-//     #ifdef ICC_IA64_PREFETCH
-//     #pragma swp  
-//     #endif
-
-//     for (register label face=0; face<nFaces; face++)
-//     {
-//         #ifdef ICC_IA64_PREFETCH
-//         __builtin_prefetch (&uPtr[face+32],0,0);
-//         __builtin_prefetch (&lPtr[face+32],0,0);
-//         __builtin_prefetch (&lowerPtr[face+32],0,1);
-//         __builtin_prefetch (&xPtr[lPtr[face+32]],0,1);
-//         __builtin_prefetch (&rAPtr[uPtr[face+32]],0,1);
-//         #endif
-
-//         rAPtr[uPtr[face]] -= lowerPtr[face]*xPtr[lPtr[face]];
-
-//         #ifdef ICC_IA64_PREFETCH
-//         __builtin_prefetch (&upperPtr[face+32],0,1);
-//         __builtin_prefetch (&xPtr[uPtr[face+32]],0,1);
-//         __builtin_prefetch (&rAPtr[lPtr[face+32]],0,1);
-//         #endif
-
-//         rAPtr[lPtr[face]] -= upperPtr[face]*xPtr[uPtr[face]];
-//     }
-
-//     // Update coupled interfaces
-//     updateMatrixInterfaces
-//     (
-//         mBouCoeffs,
-//         interfaces,
-//         x,
-//         rA,
-//         cmpt
-//     );
-//     Info << "res: " << gSumMag(rA) << endl;
 }
 
 

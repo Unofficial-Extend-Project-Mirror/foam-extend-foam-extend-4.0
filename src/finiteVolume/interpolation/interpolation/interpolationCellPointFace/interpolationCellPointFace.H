@@ -51,8 +51,11 @@ class interpolationCellPointFace
 {
     // Private data
 
-        GeometricField<Type, pointPatchField, pointMesh> psip_;
-        GeometricField<Type, fvsPatchField, surfaceMesh> psis_;
+        //- Interpolated volfield
+        const GeometricField<Type, pointPatchField, pointMesh> psip_;
+
+        //- Linearly interpolated volfield
+        const GeometricField<Type, fvsPatchField, surfaceMesh> psis_;
 
         bool findTet
         (
@@ -87,7 +90,6 @@ public:
         //- Construct from components
         interpolationCellPointFace
         (
-            const volPointInterpolation& pInterp,
             const GeometricField<Type, fvPatchField, volMesh>& psi
         );
 

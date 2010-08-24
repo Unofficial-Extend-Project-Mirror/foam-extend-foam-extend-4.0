@@ -67,7 +67,7 @@ bool triSurface::readTRI(const fileName& TRIfileName)
     {
         string line = getLineNoComment(TRIfile);
 
-        if (line.size() == 0)
+        if (line.empty())
         {
             break;
         }

@@ -31,10 +31,6 @@ Description
 #include "triPointRef.H"
 #include "scalarField.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -45,7 +41,7 @@ namespace Foam
 // - triangle circumcentre
 // - edge mids
 template<class Point, class PointRef>
-pointHit tetrahedron<Point, PointRef>::containmentSphere
+Foam::pointHit Foam::tetrahedron<Point, PointRef>::containmentSphere
 (
     const scalar tol
 ) const
@@ -250,14 +246,17 @@ pointHit tetrahedron<Point, PointRef>::containmentSphere
 
 
 template<class Point, class PointRef>
-void tetrahedron<Point, PointRef>::gradNiSquared(scalarField& buffer) const
+void Foam::tetrahedron<Point, PointRef>::gradNiSquared
+(
+    scalarField& buffer
+) const
 {
     // Change of sign between face area vector and gradient
     // does not matter because of square
 
     // Warning: Added a mag to produce positive coefficients even if
     // the tetrahedron is twisted inside out.  This is pretty
-    // dangerous, but essential for mesh motion.  
+    // dangerous, but essential for mesh motion.  HJ, date deleted
     scalar magVol = Foam::mag(mag());
 
     buffer[0] = (1.0/9.0)*magSqr(Sa())/magVol;
@@ -268,14 +267,17 @@ void tetrahedron<Point, PointRef>::gradNiSquared(scalarField& buffer) const
 
 
 template<class Point, class PointRef>
-void tetrahedron<Point, PointRef>::gradNiDotGradNj(scalarField& buffer) const
+void Foam::tetrahedron<Point, PointRef>::gradNiDotGradNj
+(
+    scalarField& buffer
+) const
 {
     // Warning. Ordering of edges needs to be the same for a tetrahedron
     // class, a tetrahedron cell shape model and a tetCell
 
     // Warning: Added a mag to produce positive coefficients even if
     // the tetrahedron is twisted inside out.  This is pretty
-    // dangerous, but essential for mesh motion.  
+    // dangerous, but essential for mesh motion.  HJ, date deleted
 
     // Double change of sign between face area vector and gradient
 
@@ -295,7 +297,10 @@ void tetrahedron<Point, PointRef>::gradNiDotGradNj(scalarField& buffer) const
 
 
 template<class Point, class PointRef>
-void tetrahedron<Point, PointRef>::gradNiGradNi(tensorField& buffer) const
+void Foam::tetrahedron<Point, PointRef>::gradNiGradNi
+(
+    tensorField& buffer
+) const
 {
     // Change of sign between face area vector and gradient
     // does not matter because of square
@@ -310,7 +315,10 @@ void tetrahedron<Point, PointRef>::gradNiGradNi(tensorField& buffer) const
 
 
 template<class Point, class PointRef>
-void tetrahedron<Point, PointRef>::gradNiGradNj(tensorField& buffer) const
+void Foam::tetrahedron<Point, PointRef>::gradNiGradNj
+(
+    tensorField& buffer
+) const
 {
     // Warning. Ordering of edges needs to be the same for a tetrahedron
     // class, a tetrahedron cell shape model and a tetCell
@@ -331,8 +339,5 @@ void tetrahedron<Point, PointRef>::gradNiGradNj(tensorField& buffer) const
     buffer[5] = (1.0/9.0)*(sd*sc)/magVol;
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

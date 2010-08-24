@@ -28,6 +28,10 @@ Class
 Description
     Provides a centralized coordinateSystem collection.
 
+Note
+    Mixing normal constructors and the coordinateSystems::New constructor
+    may yield unexpected results.
+
 SourceFiles
     coordinateSystems.C
 
@@ -36,7 +40,7 @@ SourceFiles
 #define coordinateSystems_H
 
 #include "coordinateSystem.H"
-#include "PtrList.H"
+#include "IOPtrList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -49,44 +53,49 @@ namespace Foam
 
 class coordinateSystems
 :
-    public PtrList<coordinateSystem>
+    public IOPtrList<coordinateSystem>
 {
 
     // Private Member Functions
+
+        //- Disallow default bitwise copy construct
+        coordinateSystems(const coordinateSystems&);
 
         //- Disallow default bitwise assignment
         void operator=(const coordinateSystems&);
 
 public:
 
-    // Static data members
-
-        //- Type name of list contents
-        static const word dataType;
-
-    // Public Member Functions
-
+    //- Runtime type information
+    TypeName("coordinateSystems");
 
     // Constructors
 
-        //- Construct null
-        coordinateSystems();
+        //- Read construct from IOobject
+        explicit coordinateSystems(const IOobject&);
 
-        //- Read construct from registry, name. instance
+        //- Construct from IOobject and a PtrList
         coordinateSystems
         (
-            const objectRegistry& registry,
-            const word& name = "coordinateSystems",
-            const fileName& instance = "constant"
+            const IOobject&,
+            const PtrList<coordinateSystem>&
         );
 
-        //- Read construct from IOobject
-        coordinateSystems(const IOobject&);
+        //- Construct from IOobject and transferring the PtrList contents
+        coordinateSystems
+        (
+            const IOobject&,
+            const Xfer<PtrList<coordinateSystem> >&
+        );
+
+    // Selectors
+
+        //- Return previously registered or read construct from "constant"
+        static const coordinateSystems& New(const objectRegistry&);
 
     // Member Functions
 
-
-        //- Find and return index for a given keyword,  returns -1 if not found
+        //- Find and return index for a given keyword, returns -1 if not found
         label find(const word& key) const;
 
         //- Search for given keyword
@@ -95,47 +104,8 @@ public:
         //- Return the table of contents (list of all keywords)
         wordList toc() const;
 
-        //- Rewrite coordinateSystem entry with appropriate dictionary entry
-        //
-        //  This replaces coordinateSystems entries with their contents.
-        //  For example,
-        //  @verbatim
-        //  cat1
-        //  {
-        //      coordinateSystem    system_10;
-        //      porosity        0.781;
-        //      Darcy
-        //      {
-        //          d   d [0 -2 0 0 0]  (-1000 -1000 0.50753e+08);
-        //          f   f [0 -1 0 0 0]  (-1000 -1000 12.83);
-        //      }
-        //  }
-        //  @endverbatim
-        //  might get re-written as the following (depending on the value of
-        //  @c system_10 in the @c constant/coordinateSystems file):
-        //  @verbatim
-        //  cat1
-        //  {
-        //      coordinateSystem
-        //      {
-        //          origin  (0 0 0);
-        //          e3      (1 0 0);
-        //          e1      (0 0 -1);
-        //      }
-        //      porosity        0.781;
-        //      Darcy
-        //      {
-        //          d   d [0 -2 0 0 0]  (-1000 -1000 0.50753e+08);
-        //          f   f [0 -1 0 0 0]  (-1000 -1000 12.83);
-        //      }
-        //  }
-        //  @endverbatim
-        //  When this form of re-writing is used, the coordinateRotation is
-        //  reduced to the axes specification.
-        bool rewriteDict(dictionary& dict, bool noType = false) const;
-
         //- write data
-        bool writeData(Ostream&, bool subDict = true) const;
+        bool writeData(Ostream&, bool subDict=true) const;
 };
 
 

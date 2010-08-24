@@ -62,7 +62,7 @@ class specie
         //- Number of moles of this component in the mixture
         scalar nMoles_;
 
-        //- Molecular weight of specie
+        //- Molecular weight of specie [kg/kmol]
         scalar molWeight_;
 
 

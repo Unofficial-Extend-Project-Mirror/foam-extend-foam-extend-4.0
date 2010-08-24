@@ -14,7 +14,6 @@
                 pointZones()
             )
         );
-        
-        nPointZones++;        
-               
+
+        nPointZones++;
     }

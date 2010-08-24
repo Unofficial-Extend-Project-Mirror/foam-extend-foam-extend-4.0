@@ -156,6 +156,20 @@ Field<Type>::Field(Field<Type>& f, bool reUse)
 
 
 template<class Type>
+Field<Type>::Field(const Xfer<List<Type> >& f)
+:
+    List<Type>(f)
+{}
+
+
+template<class Type>
+Field<Type>::Field(const Xfer<Field<Type> >& f)
+:
+    List<Type>(f)
+{}
+
+
+template<class Type>
 Field<Type>::Field(const typename Field<Type>::subField& sf)
 :
     List<Type>(sf)
@@ -163,9 +177,9 @@ Field<Type>::Field(const typename Field<Type>::subField& sf)
 
 
 template<class Type>
-Field<Type>::Field(const UList<Type>& tl)
+Field<Type>::Field(const UList<Type>& list)
 :
-    List<Type>(tl)
+    List<Type>(list)
 {}
 
 
@@ -218,8 +232,7 @@ Field<Type>::Field
                     FatalIOErrorIn
                     (
                         "Field<Type>::Field"
-                        "(const word& keyword, "
-                        "const dictionary& dict, const label s)",
+                        "(const word& keyword, const dictionary&, const label)",
                         dict
                     )   << "size " << this->size()
                         << " is not equal to the given value of " << s
@@ -231,8 +244,7 @@ Field<Type>::Field
                 FatalIOErrorIn
                 (
                     "Field<Type>::Field"
-                    "(const word& keyword, "
-                    "const dictionary& dict, const label s)",
+                    "(const word& keyword, const dictionary&, const label)",
                     dict
                 )   << "expected keyword 'uniform' or 'nonuniform', found "
                     << firstToken.wordToken()
@@ -246,8 +258,7 @@ Field<Type>::Field
                 IOWarningIn
                 (
                     "Field<Type>::Field"
-                    "(const word& keyword, const dictionary& dict, "
-                    "const label s)",
+                    "(const word& keyword, const dictionary&, const label)",
                     dict
                 )   << "expected keyword 'uniform' or 'nonuniform', "
                        "assuming deprecated Field format from "
@@ -263,10 +274,9 @@ Field<Type>::Field
                 FatalIOErrorIn
                 (
                     "Field<Type>::Field"
-                    "(const word& keyword, "
-                    "const dictionary& dict, const label s)",
+                    "(const word& keyword, const dictionary&, const label)",
                     dict
-                )   << "extected keyword 'uniform' or 'nonuniform', found "
+                )   << "expected keyword 'uniform' or 'nonuniform', found "
                     << firstToken.info()
                     << exit(FatalIOError);
             }
@@ -283,14 +293,6 @@ tmp<Field<Type> > Field<Type>::clone() const
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-template<class Type>
-const Field<Type>& Field<Type>::null()
-{
-    Field<Type>* nullPtr = reinterpret_cast<Field<Type>*>(NULL);
-    return *nullPtr;
-}
-
 
 template<class Type>
 void Field<Type>::map
@@ -629,37 +631,37 @@ void Field<Type>::writeEntry(const word& keyword, Ostream& os) const
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class Type>
-void Field<Type>::operator=(const Field<Type>& f)
+void Field<Type>::operator=(const Field<Type>& rhs)
 {
-    if (this == &f)
+    if (this == &rhs)
     {
         FatalErrorIn("Field<Type>::operator=(const Field<Type>&)")
             << "attempted assignment to self"
             << abort(FatalError);
     }
 
-    List<Type>::operator=(f);
+    List<Type>::operator=(rhs);
 }
 
 
 template<class Type>
-void Field<Type>::operator=(const SubField<Type>& sf)
+void Field<Type>::operator=(const SubField<Type>& rhs)
 {
-    List<Type>::operator=(sf);
+    List<Type>::operator=(rhs);
 }
 
 
 template<class Type>
-void Field<Type>::operator=(const UList<Type>& ul)
+void Field<Type>::operator=(const UList<Type>& rhs)
 {
-    List<Type>::operator=(ul);
+    List<Type>::operator=(rhs);
 }
 
 
 template<class Type>
-void Field<Type>::operator=(const tmp<Field>& tf)
+void Field<Type>::operator=(const tmp<Field>& rhs)
 {
-    if (this == &(tf()))
+    if (this == &(rhs()))
     {
         FatalErrorIn("Field<Type>::operator=(const tmp<Field>&)")
             << "attempted assignment to self"
@@ -667,7 +669,7 @@ void Field<Type>::operator=(const tmp<Field>& tf)
     }
 
     // This is dodgy stuff, don't try it at home.
-    Field* fieldPtr = tf.ptr();
+    Field* fieldPtr = rhs.ptr();
     List<Type>::transfer(*fieldPtr);
     delete fieldPtr;
 }

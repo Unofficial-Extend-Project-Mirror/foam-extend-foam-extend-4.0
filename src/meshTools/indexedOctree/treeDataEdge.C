@@ -22,15 +22,14 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "treeDataEdge.H"
 #include "indexedOctree.H"
-#include "polyMesh.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+defineTypeNameAndDebug(Foam::treeDataEdge, 0);
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -110,11 +109,11 @@ bool Foam::treeDataEdge::overlaps
 {
     if (cacheBb_)
     {
-        return cubeBb.intersects(bbs_[index]);
+        return cubeBb.overlaps(bbs_[index]);
     }
     else
     {
-        return cubeBb.intersects(calcBb(edgeLabels_[index]));
+        return cubeBb.overlaps(calcBb(edgeLabels_[index]));
     }
 }
 

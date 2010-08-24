@@ -53,65 +53,65 @@ class rawSurfaceWriter
 {
     // Private Member Functions
 
-        void writeGeometry
+        static void writeGeometry
         (
             const pointField& points,
-            const label& pointI,
+            const label pointI,
             Ostream& os
-        ) const;
+        );
 
-        void writeGeometry
+        static void writeGeometry
         (
             const pointField& points,
             const faceList& faces,
-            const label& faceI,
+            const label faceI,
             Ostream& os
-        ) const;
+        );
 
-        void writeData
+        static void writeData
         (
             const fileName& fieldName,
             const pointField& points,
             const faceList& faces,
             const scalarField& values,
             Ostream& os
-        ) const;
+        );
 
-        void writeData
+        static void writeData
         (
             const fileName& fieldName,
             const pointField& points,
             const faceList& faces,
             const vectorField& values,
             Ostream& os
-        ) const;
+        );
 
-        void writeData
+        static void writeData
         (
             const fileName& fieldName,
             const pointField& points,
             const faceList& faces,
             const sphericalTensorField& values,
             Ostream& os
-        ) const;
+        );
 
-        void writeData
+        static void writeData
         (
             const fileName& fieldName,
             const pointField& points,
             const faceList& faces,
             const symmTensorField& values,
             Ostream& os
-        ) const;
+        );
 
-        void writeData
+        static void writeData
         (
             const fileName& fieldName,
             const pointField& points,
             const faceList& faces,
             const tensorField& values,
             Ostream& os
-        ) const;
+        );
 
 
 public:
@@ -135,11 +135,20 @@ public:
 
         // Write
 
+        //- Write geometry to file.
+        virtual void write
+        (
+            const fileName& outputDir,
+            const fileName& surfaceName,
+            const pointField& points,
+            const faceList& faces,
+            const bool verbose = false
+        ) const;
+
         //- Writes single surface to file.
         virtual void write
         (
-            const fileName& samplePath,
-            const fileName& timeDir,
+            const fileName& outputDir,
             const fileName& surfaceName,
             const pointField& points,
             const faceList& faces,

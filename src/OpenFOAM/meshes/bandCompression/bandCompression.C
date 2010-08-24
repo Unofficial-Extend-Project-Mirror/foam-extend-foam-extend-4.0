@@ -35,11 +35,8 @@ Description
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
 // Constructor from components
-labelList bandCompression(const labelListList& cellCellAddressing)
+Foam::labelList Foam::bandCompression(const labelListList& cellCellAddressing)
 {
     labelList newOrder(cellCellAddressing.size());
 
@@ -73,7 +70,7 @@ labelList bandCompression(const labelListList& cellCellAddressing)
             // neighbours. If the neighbour in question has not been visited,
             // add it to the end of the nextCell list
 
-            while (nextCell.size() > 0)
+            while (nextCell.size())
             {
                 currentCell = nextCell.removeHead();
 
@@ -105,9 +102,5 @@ labelList bandCompression(const labelListList& cellCellAddressing)
     return newOrder;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

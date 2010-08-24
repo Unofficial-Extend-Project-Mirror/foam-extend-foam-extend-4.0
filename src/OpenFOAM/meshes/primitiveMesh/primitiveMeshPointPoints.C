@@ -26,20 +26,23 @@ License
 
 #include "primitiveMesh.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void primitiveMesh::calcPointPoints() const
+void Foam::primitiveMesh::calcPointPoints() const
 {
     if (debug)
     {
         Pout<< "primitiveMesh::calcPointPoints() : "
             << "calculating pointPoints"
             << endl;
+
+        if (debug == -1)
+        {
+            // For checking calls:abort so we can quickly hunt down
+            // origin of call
+            FatalErrorIn("primitiveMesh::calcPointPoints()")
+                << abort(FatalError);
+        }
     }
 
     // It is an error to attempt to recalculate pointPoints
@@ -86,7 +89,7 @@ void primitiveMesh::calcPointPoints() const
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const labelListList& primitiveMesh::pointPoints() const
+const Foam::labelListList& Foam::primitiveMesh::pointPoints() const
 {
     if (!ppPtr_)
     {
@@ -97,9 +100,47 @@ const labelListList& primitiveMesh::pointPoints() const
 }
 
 
+const Foam::labelList& Foam::primitiveMesh::pointPoints
+(
+    const label pointI,
+    DynamicList<label>& storage
+) const
+{
+    if (hasPointPoints())
+    {
+        return pointPoints()[pointI];
+    }
+    else
+    {
+        const edgeList& edges = this->edges();
+        const labelList& pEdges = pointEdges()[pointI];
+
+        storage.clear();
+
+        if (pEdges.size() > storage.capacity())
+        {
+            storage.setCapacity(pEdges.size());
+        }
+
+        forAll(pEdges, i)
+        {
+            storage.append(edges[pEdges[i]].otherVertex(pointI));
+        }
+
+        return storage;
+    }
+}
+
+
+const Foam::labelList& Foam::primitiveMesh::pointPoints
+(
+    const label pointI
+) const
+{
+    return pointPoints(pointI, labels_);
+}
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

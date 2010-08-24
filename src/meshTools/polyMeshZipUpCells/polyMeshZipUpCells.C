@@ -438,7 +438,7 @@ bool Foam::polyMeshZipUpCells(polyMesh& mesh)
                 // Warning: the ordering must be parametric, because in
                 // the case of multiple point insertion onto the same edge
                 // it is possible to get non-cyclic loops
-                // 
+                //
 
                 const labelList& unorderedEdge = edgesToInsert[edgeToInsertI];
 
@@ -720,7 +720,7 @@ bool Foam::polyMeshZipUpCells(polyMesh& mesh)
             }
         }
 
-        if (problemCells.size() > 0)
+        if (problemCells.size())
         {
             // This cycle has failed.  Print out the problem cells
             labelList toc(problemCells.toc());
@@ -754,20 +754,21 @@ bool Foam::polyMeshZipUpCells(polyMesh& mesh)
 
         // Reset the mesh. Number of active faces is one beyond the last patch
         // (patches guaranteed to be in increasing order)
+        // 1.6.x merge change.  Reconsider.  HJ, 22/Aug/2010
         mesh.resetPrimitives
         (
-            patchStarts[bMesh.size()-1] + patchSizes[bMesh.size()-1],
-            mesh.allPoints(),
-            newFaces,
-            mesh.faceOwner(),
-            mesh.faceNeighbour(),
+            Xfer<pointField>::null(),
+            xferMove(newFaces),
+            Xfer<labelList>::null(),
+            Xfer<labelList>::null(),
             patchSizes,
             patchStarts,
             true                // boundary forms valid boundary mesh.
         );
 
         // Reset any addressing on face zones.
-        mesh.faceZones().updateMesh();
+        // 1.6.x merge change.  Reconsider.  HJ, 22/Aug/2010
+        mesh.faceZones().clearAddressing();
 
         // Clear the addressing
         mesh.clearOut();

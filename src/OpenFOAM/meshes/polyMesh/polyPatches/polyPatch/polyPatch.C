@@ -33,7 +33,6 @@ License
 #include "entry.H"
 #include "dictionary.H"
 #include "pointPatchField.H"
-#include "OFstream.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -515,6 +514,17 @@ const Foam::labelList& Foam::polyPatch::meshEdges() const
                     faceCells()
                 )
             );
+
+        // 1.6.x merge.  Reconsider.  HJ, 19/Aug/2010
+//         mePtr_ =
+//             new labelList
+//             (
+//                 primitivePatch::meshEdges
+//                 (
+//                     boundaryMesh().mesh().edges(),
+//                     boundaryMesh().mesh().pointEdges()
+//                 )
+//             );
     }
 
     return *mePtr_;

@@ -29,11 +29,22 @@ License
 template<class Type>
 inline Foam::SubField<Type>::SubField
 (
-    const SubList<Type>& slist
+    const SubList<Type>& list
 )
 :
-    SubList<Type>(slist)
+    SubList<Type>(list)
 {}
+
+
+template<class Type>
+inline Foam::SubField<Type>::SubField
+(
+    const UList<Type>& list
+)
+:
+q    SubList<Type>(list, list.size())
+{}
+
 
 template<class Type>
 inline Foam::SubField<Type>::SubField
@@ -109,7 +120,7 @@ inline void Foam::SubField<Type>::operator=(const SubField<Type>& rhs)
 template<class Type>
 inline Foam::SubField<Type>::operator const Foam::Field<Type>&() const
 {
-    return *(reinterpret_cast<const Field<Type>*>(this));
+    return *reinterpret_cast< const Field<Type>* >(this);
 }
 
 

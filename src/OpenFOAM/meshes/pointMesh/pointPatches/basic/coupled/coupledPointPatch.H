@@ -51,7 +51,6 @@ class pointBoundaryMesh;
                       Class coupledPointPatch Declaration
 \*---------------------------------------------------------------------------*/
 
-
 class coupledPointPatch
 :
     // Bug fix: coupled patch must be derived from lduInterface

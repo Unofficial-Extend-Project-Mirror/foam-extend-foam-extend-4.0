@@ -34,18 +34,19 @@ T Foam::dictionary::lookupOrDefault
 (
     const word& keyword,
     const T& deflt,
-    bool recursive
+    bool recursive,
+    bool patternMatch
 ) const
 {
-    const entry* entryPtr = lookupEntryPtr(keyword, recursive);
+    const entry* entryPtr = lookupEntryPtr(keyword, recursive, patternMatch);
 
-    if (entryPtr == NULL)
+    if (entryPtr)
     {
-        return deflt;
+        return pTraits<T>(entryPtr->stream());
     }
     else
     {
-        return pTraits<T>(entryPtr->stream());
+        return deflt;
     }
 }
 
@@ -55,19 +56,20 @@ T Foam::dictionary::lookupOrAddDefault
 (
     const word& keyword,
     const T& deflt,
-    bool recursive
+    bool recursive,
+    bool patternMatch
 )
 {
-    const entry* entryPtr = lookupEntryPtr(keyword, recursive);
+    const entry* entryPtr = lookupEntryPtr(keyword, recursive, patternMatch);
 
-    if (entryPtr == NULL)
+    if (entryPtr)
     {
-        add(new primitiveEntry(keyword, deflt));
-        return deflt;
+        return pTraits<T>(entryPtr->stream());
     }
     else
     {
-        return pTraits<T>(entryPtr->stream());
+        add(new primitiveEntry(keyword, deflt));
+        return deflt;
     }
 }
 
@@ -77,34 +79,36 @@ bool Foam::dictionary::readIfPresent
 (
     const word& k,
     T& val,
-    bool recursive
+    bool recursive,
+    bool patternMatch
 ) const
 {
-    const entry* entryPtr = lookupEntryPtr(k, recursive);
+    const entry* entryPtr = lookupEntryPtr(k, recursive, patternMatch);
 
-    if (entryPtr == NULL)
-    {
-        return false;
-    }
-    else
+    if (entryPtr)
     {
         entryPtr->stream() >> val;
         return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
 
 template<class T>
-void Foam::dictionary::add(const word& k, const T& t, bool overwrite)
+void Foam::dictionary::add(const keyType& k, const T& t, bool overwrite)
 {
     add(new primitiveEntry(k, t), overwrite);
 }
 
 
 template<class T>
-void Foam::dictionary::set(const word& k, const T& t)
+void Foam::dictionary::set(const keyType& k, const T& t)
 {
     set(new primitiveEntry(k, t));
 }
+
 
 // ************************************************************************* //

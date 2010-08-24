@@ -97,9 +97,10 @@ public:
             dictionary,
             (
                 const dictionary& compressibilityProperties,
-                const volScalarField& gamma
+                const volScalarField& gamma,
+                const word& psiName
             ),
-            (compressibilityProperties, gamma)
+            (compressibilityProperties, gamma, psiName)
         );
 
 
@@ -109,7 +110,8 @@ public:
         static autoPtr<barotropicCompressibilityModel> New
         (
             const dictionary& compressibilityProperties,
-            const volScalarField& gamma
+            const volScalarField& gamma,
+            const word& psiName = "psi"
         );
 
 
@@ -119,7 +121,8 @@ public:
         barotropicCompressibilityModel
         (
             const dictionary& compressibilityProperties,
-            const volScalarField& gamma
+            const volScalarField& gamma,
+            const word& psiName = "psi"
         );
 
 

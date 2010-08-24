@@ -59,7 +59,7 @@ public:
 
     // Constructors
 
-        //- Construct from bb
+        //- Construct from bounding box
         treeElem(const treeBoundBox& bb)
         :
             bb_(bb)
@@ -70,11 +70,13 @@ public:
 
         // Access
 
+            //- Bounding box of this node
             const treeBoundBox& bb() const
             {
                 return bb_;
             }
 
+            //- Bounding box of this node
             treeBoundBox& bb()
             {
                 return bb_;

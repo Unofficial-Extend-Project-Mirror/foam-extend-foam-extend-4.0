@@ -169,7 +169,7 @@ bool triSurface::readNAS(const fileName& fName)
         }
 
 
-        if (line.size() == 0 || line[0] == '$')
+        if (line.empty() || line[0] == '$')
         {
             // Skip empty or comment
             continue;
@@ -353,14 +353,11 @@ bool triSurface::readNAS(const fileName& fName)
 
     Info<< "patches:" << patches << endl;
 
-
     // Transfer DynamicLists to straight ones.
-    pointField allPoints;
-    allPoints.transfer(points);
-    points.clear();
+    pointField allPoints(points.xfer());
 
     // Create triSurface
-    *this = triSurface(faces, patches, allPoints);
+    *this = triSurface(faces, patches, allPoints, true);
 
     return true;
 }

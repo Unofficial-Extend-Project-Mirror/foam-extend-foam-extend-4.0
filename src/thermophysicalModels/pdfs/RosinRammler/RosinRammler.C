@@ -24,33 +24,21 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-
 #include "RosinRammler.H"
 #include "addToRunTimeSelectionTable.H"
 
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(RosinRammler, 0);
+namespace Foam
+{
+    defineTypeNameAndDebug(RosinRammler, 0);
 
-addToRunTimeSelectionTable
-(
-    pdf,
-    RosinRammler,
-    dictionary
-);
+    addToRunTimeSelectionTable(pdf, RosinRammler, dictionary);
+}
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-
-// Construct from components
-RosinRammler::RosinRammler
-(
-    const dictionary& dict,
-    Random& rndGen
-)
+Foam::RosinRammler::RosinRammler(const dictionary& dict, Random& rndGen)
 :
     pdf(dict, rndGen),
     pdfDict_(dict.subDict(typeName + "PDF")),
@@ -80,10 +68,10 @@ RosinRammler::RosinRammler
     // find max value so that it can be normalized to 1.0
     scalar sMax = 0;
     label n = d_.size();
-    for(label i=0; i<n; i++)
+    for (label i=0; i<n; i++)
     {
         scalar s = exp(-1.0);
-        for(label j=0; j<n; j++)
+        for (label j=0; j<n; j++)
         {
             if (i!=j)
             {
@@ -96,11 +84,10 @@ RosinRammler::RosinRammler
         sMax = max(sMax, s);
     }
 
-    for(label i=0; i<n; i++)
+    for (label i=0; i<n; i++)
     {
         ls_[i] /= sMax;
     }
-
 }
 
 
@@ -112,20 +99,20 @@ Foam::RosinRammler::~RosinRammler()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-scalar RosinRammler::sample() const
+Foam::scalar Foam::RosinRammler::sample() const
 {
     scalar y = 0;
     scalar x = 0;
     label n = d_.size();
     bool success = false;
 
-    while(!success)
+    while (!success)
     {
         x = minValue_ + range_*rndGen_.scalar01();
         y = rndGen_.scalar01();
         scalar p = 0.0;
 
-        for(label i=0; i<n; i++)
+        for (label i=0; i<n; i++)
         {
             scalar xx = pow(x/d_[i], n_[i]);
             p += ls_[i]*xx*exp(-xx);
@@ -140,16 +127,17 @@ scalar RosinRammler::sample() const
     return x;
 }
 
-scalar RosinRammler::minValue() const
+
+Foam::scalar Foam::RosinRammler::minValue() const
 {
     return minValue_;
 }
 
-scalar RosinRammler::maxValue() const
+
+Foam::scalar Foam::RosinRammler::maxValue() const
 {
     return maxValue_;
 }
 
-// ************************************************************************* //
 
-}
+// ************************************************************************* //

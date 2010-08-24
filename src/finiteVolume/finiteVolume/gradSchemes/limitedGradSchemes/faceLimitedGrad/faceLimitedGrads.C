@@ -52,9 +52,9 @@ template<class Type>
 inline void faceLimitedGrad<Type>::limitFace
 (
     scalar& limiter,
-    const scalar& maxDelta,
-    const scalar& minDelta,
-    const scalar& extrapolate
+    const scalar maxDelta,
+    const scalar minDelta,
+    const scalar extrapolate
 ) const
 {
     if (extrapolate > maxDelta + VSMALL)

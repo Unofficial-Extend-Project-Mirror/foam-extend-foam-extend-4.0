@@ -37,6 +37,7 @@ SourceFiles
 #define NamedEnum_H
 
 #include "HashTable.H"
+#include "StaticAssert.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,7 +45,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class NamedEnum Declaration
+                          Class NamedEnum Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Enum, int nEnum>
@@ -52,6 +53,9 @@ class NamedEnum
 :
     public HashTable<int>
 {
+    //- nEnum must be positive (non-zero)
+    StaticAssert(nEnum > 0);
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -79,10 +83,10 @@ public:
 
         //- Read a word from Istream and return the corresponding
         //  enumeration element
-        Enum read(Istream& is) const;
+        Enum read(Istream&) const;
 
         //- Write the name representation of the enumeration to an Ostream
-        void write(const Enum e, Ostream& os) const;
+        void write(const Enum e, Ostream&) const;
 
 
     // Member Operators
@@ -99,7 +103,7 @@ public:
             return Enum(HashTable<int>::operator[](name));
         }
 
-        //- Return the name or the given enumeration element
+        //- Return the name of the given enumeration element
         const char* operator[](const Enum e) const
         {
             return names[e];

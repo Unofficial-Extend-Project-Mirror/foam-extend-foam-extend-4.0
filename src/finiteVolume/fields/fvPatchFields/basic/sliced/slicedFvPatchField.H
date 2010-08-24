@@ -75,7 +75,7 @@ public:
             const Field<Type>&
         );
 
-        //- Construct from patch and internal field
+        //- Construct from patch and internal field. Assign value later.
         slicedFvPatchField
         (
             const fvPatch&,

@@ -1,6 +1,6 @@
 .SUFFIXES: .C .cxx .cc .cpp
 
-c++WARN     = -Wall -W -Wno-unused-parameter -Wold-style-cast
+c++WARN     = -Wall -Wno-strict-aliasing -Wextra -Wno-unused-parameter -Wold-style-cast
 
 CC          = g++
 

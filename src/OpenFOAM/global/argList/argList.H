@@ -54,12 +54,14 @@ Description
 
     The environment variable @b FOAM_CASE is set to the path of the
     global case (same for serial and parallel jobs).
+    The environment variable @b FOAM_CASENAME is set to the name of the
+    global case.
 
 Note
-    - Adjustment of the valid (mandatory) arguments by directly manipulating
-      the static member argList::validArgs.
-    - Adjustment of the valid options by directly manipulating
-      the static member argList::validOptions.
+    - Adjustment of the valid (mandatory) arguments
+      by directly manipulating the static member argList::validArgs.
+    - Adjustment of the valid options
+      by directly manipulating the static member argList::validOptions.
 
 SourceFiles
     argList.C
@@ -76,6 +78,7 @@ SourceFiles
 #include "word.H"
 #include "fileName.H"
 #include "parRun.H"
+#include "IStringStream.H"
 
 #include "sigFpe.H"
 #include "sigInt.H"
@@ -92,6 +95,7 @@ namespace Foam
 class argList
 {
     // Private data
+        static bool bannerEnabled;
 
         stringList args_;
         HashTable<string> options_;
@@ -164,22 +168,6 @@ public:
 
         // Access
 
-            //- Return arguments
-            const stringList& args() const
-            {
-                return args_;
-            }
-
-            //- Return additionl arguments,
-            //  i.e. those additional to the executable itself
-            stringList::subList additionalArgs() const;
-
-            //- Return options
-            const Foam::HashTable<string>& options() const
-            {
-                return options_;
-            }
-
             //- Name of executable
             const word& executable() const
             {
@@ -190,12 +178,6 @@ public:
             const fileName& rootPath() const
             {
                 return rootPath_;
-            }
-
-            //- Return true if the named option is found
-            bool optionFound(const word& opt) const
-            {
-                return options_.found(opt);
             }
 
             //- Return case name
@@ -216,8 +198,77 @@ public:
                 return rootPath()/caseName();
             }
 
+            //- Return arguments
+            const stringList& args() const
+            {
+                return args_;
+            }
+
+            //- Return additionl arguments,
+            //  i.e. those additional to the executable itself
+            stringList::subList additionalArgs() const;
+
+            //- Return options
+            const Foam::HashTable<string>& options() const
+            {
+                return options_;
+            }
+
+            //- Return the argument string associated with the named option
+            const string& option(const word& opt) const
+            {
+                return options_.operator[](opt);
+            }
+
+            //- Return true if the named option is found
+            bool optionFound(const word& opt) const
+            {
+                return options_.found(opt);
+            }
+
+            //- Return an IStringStream to the named option
+            IStringStream optionLookup(const word& opt) const
+            {
+                return IStringStream(option(opt));
+            }
+
+            //- Read a value from the named option
+            template<class T>
+            T optionRead(const word& opt) const
+            {
+                T val;
+                optionLookup(opt)() >> val;
+                return val;
+            }
+
+            //- Read a value from the named option if present.
+            //  Return true if the named option was found.
+            template<class T>
+            bool optionReadIfPresent(const word& opt, T& val) const
+            {
+                if (optionFound(opt))
+                {
+                    optionLookup(opt)() >> val;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            //- Read a List of values from the named option
+            template<class T>
+            List<T> optionReadList(const word& opt) const
+            {
+                return readList<T>(optionLookup(opt)());
+            }
+
 
         // Edit
+
+            //- Disable emitting the banner information
+            static void noBanner();
 
             //- Remove the parallel options
             static void noParallel();

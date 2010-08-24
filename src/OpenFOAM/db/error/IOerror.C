@@ -155,7 +155,13 @@ void Foam::IOerror::exit(const int)
     {
         if (throwExceptions_)
         {
-            throw *this;
+            // Make a copy of the error to throw
+            IOerror errorException(*this);
+
+            // Rewind the message buffer for the next error message
+            messageStreamPtr_->rewind();
+
+            throw errorException;
         }
         else
         {
@@ -194,7 +200,13 @@ void Foam::IOerror::abort()
     {
         if (throwExceptions_)
         {
-            throw *this;
+            // Make a copy of the error to throw
+            IOerror errorException(*this);
+
+            // Rewind the message buffer for the next error message
+            messageStreamPtr_->rewind();
+
+            throw errorException;
         }
         else
         {
@@ -209,7 +221,9 @@ void Foam::IOerror::abort()
 
 Foam::Ostream& Foam::operator<<(Ostream& os, const IOerror& ioErr)
 {
-    os  << endl << ioErr.message().c_str() << endl << endl;
+    os  << endl
+        << ioErr.title().c_str() << endl
+        << ioErr.message().c_str() << endl << endl;
 
     os  << "file: " << ioErr.ioFileName().c_str();
 
@@ -238,6 +252,6 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const IOerror& ioErr)
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Global error definitions
 
-Foam::IOerror Foam::FatalIOError("--> FOAM FATAL IO ERROR : ");
+Foam::IOerror Foam::FatalIOError("--> FOAM FATAL IO ERROR: ");
 
 // ************************************************************************* //

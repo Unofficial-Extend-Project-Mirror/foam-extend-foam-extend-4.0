@@ -62,7 +62,6 @@ class directMappedFixedValueFvPatchField
         //  setAverage_ is set true
         Type average_;
 
-
 public:
 
     //- Runtime type information

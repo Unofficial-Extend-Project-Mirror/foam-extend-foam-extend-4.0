@@ -36,9 +36,9 @@ SourceFiles
 #ifndef dlLibraryTable_H
 #define dlLibraryTable_H
 
-#include "HashTable.H"
 #include "label.H"
-#include "pTraits.H"
+#include "Hash.H"
+#include "HashTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,7 +46,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class dlLibraryTable Declaration
+                       Class dlLibraryTable Declaration
 \*---------------------------------------------------------------------------*/
 
 //- A means of hashing pointer addresses

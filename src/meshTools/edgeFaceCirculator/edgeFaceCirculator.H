@@ -192,9 +192,11 @@ public:
         //  the current face. For boundary edges this is the first boundary face
         //  reached from walking back (i.e. in opposite direction to ++)
         inline edgeFaceCirculator begin() const;
+        inline edgeFaceCirculator cbegin() const;
 
         //- iterator set to beyond the end of the walk.
         inline const edgeFaceCirculator& end() const;
+        inline const edgeFaceCirculator& cend() const;
 };
 
 

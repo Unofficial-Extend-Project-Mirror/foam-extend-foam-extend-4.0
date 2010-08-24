@@ -32,9 +32,9 @@ inline Foam::string::string()
 {}
 
 
-inline Foam::string::string(const std::string& stdStr)
+inline Foam::string::string(const std::string& str)
 :
-    std::string(stdStr)
+    std::string(str)
 {}
 
 
@@ -62,35 +62,31 @@ inline Foam::string::string(const char c)
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class String>
-inline bool Foam::string::valid(const string& s)
+inline bool Foam::string::valid(const string& str)
 {
-    bool iv = false;
-
-    for (const_iterator iter = s.begin(); iter != s.end(); iter++)
+    for (const_iterator iter = str.begin(); iter != str.end(); iter++)
     {
         if (!String::valid(*iter))
         {
-            iv = true;
-            break;
+            return false;
         }
     }
-
-    return !iv;
+    return true;
 }
 
 
 template<class String>
-inline bool Foam::string::stripInvalid(string& s)
+inline bool Foam::string::stripInvalid(string& str)
 {
-    if (!valid<String>(s))
+    if (!valid<String>(str))
     {
-        register size_type nValid=0;
-        iterator iter2 = s.begin();
+        register size_type nValid = 0;
+        iterator iter2 = str.begin();
 
         for
         (
             const_iterator iter1 = iter2;
-            iter1 != const_cast<const string&>(s).end();
+            iter1 != const_cast<const string&>(str).end();
             iter1++
         )
         {
@@ -104,7 +100,7 @@ inline bool Foam::string::stripInvalid(string& s)
             }
         }
 
-        s.resize(nValid);
+        str.resize(nValid);
 
         return true;
     }
@@ -114,9 +110,69 @@ inline bool Foam::string::stripInvalid(string& s)
 
 
 template<class String>
-inline String Foam::string::validate(const string& s)
+inline bool Foam::string::meta(const string& str, const char quote)
 {
-    string ss = s;
+    int escaped = 0;
+    for (const_iterator iter = str.begin(); iter != str.end(); iter++)
+    {
+        if (quote && *iter == quote)
+        {
+            escaped ^= 1;  // toggle state
+        }
+        else if (escaped)
+        {
+            escaped = false;
+        }
+        else if (String::meta(*iter))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+template<class String>
+inline Foam::string
+Foam::string::quotemeta(const string& str, const char quote)
+{
+    if (!quote)
+    {
+        return str;
+    }
+
+    string sQuoted;
+    sQuoted.reserve(2*str.length());
+
+    int escaped = 0;
+    for (const_iterator iter = str.begin(); iter != str.end(); iter++)
+    {
+        if (*iter == quote)
+        {
+            escaped ^= 1;  // toggle state
+        }
+        else if (escaped)
+        {
+            escaped = 0;
+        }
+        else if (String::meta(*iter))
+        {
+            sQuoted += quote;
+        }
+
+        sQuoted += *iter;
+    }
+
+    sQuoted.resize(sQuoted.length());
+
+    return sQuoted;
+}
+
+
+template<class String>
+inline String Foam::string::validate(const string& str)
+{
+    string ss = str;
     stripInvalid<String>(ss);
     return ss;
 }
@@ -140,34 +196,13 @@ inline Foam::string Foam::string::operator()(const size_type n) const
 }
 
 
-inline Foam::string::hash::hash()
-{}
-
-
-inline Foam::string::size_type Foam::string::hash::operator()
-(
-    const string& key
-) const
-{
-    register size_type hashVal = 0;
-
-    for (string::const_iterator iter=key.begin(); iter!=key.end(); ++iter)
-    {
-        hashVal = hashVal<<1 ^ *iter;
-    }
-
-    return hashVal;
-}
-
-
-inline Foam::string::size_type Foam::string::hash::operator()
+inline unsigned Foam::string::hash::operator()
 (
     const string& key,
-    const size_type tableSize
+    unsigned seed
 ) const
 {
-    return ::abs(operator()(key)) % tableSize;
+    return Hasher(key.data(), key.size(), seed);
 }
-
 
 // ************************************************************************* //

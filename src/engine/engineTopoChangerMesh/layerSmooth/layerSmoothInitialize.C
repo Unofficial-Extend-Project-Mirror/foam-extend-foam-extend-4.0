@@ -1,22 +1,28 @@
-// The FOAM Project // File: layerSmooth.C
-/*
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
- =========         | Class Implementation
- \\      /         |
-  \\    /          | Name:   layerSmooth
-   \\  /           | Family: engine
-    \\/            |
-    F ield         | FOAM version: 2.3
-    O peration     |
-    A and          | Copyright (C) 1991-2004 Nabla Ltd.
-    M anipulation  |          All Rights Reserved.
--------------------------------------------------------------------------------
-DESCRIPTION
+License
+    This file is part of OpenFOAM.
 
-AUTHOR
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
 
--------------------------------------------------------------------------------
-*/
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+\*---------------------------------------------------------------------------*/
 
 #include "layerSmooth.H"
 #include "slidingInterface.H"
@@ -28,7 +34,6 @@ AUTHOR
 
 void Foam::layerSmooth::checkAndCalculate()
 {
-    
     label pistonIndex = -1;
     bool foundPiston = false;
 
@@ -37,8 +42,8 @@ void Foam::layerSmooth::checkAndCalculate()
 
     label cylinderHeadIndex = -1;
     bool foundCylinderHead = false;
-    
-    
+
+
     forAll(boundary(), i)
     {
         if (boundary()[i].name() == "piston")
@@ -57,7 +62,7 @@ void Foam::layerSmooth::checkAndCalculate()
             foundCylinderHead = true;
         }
     }
-    
+
     reduce(foundPiston, orOp<bool>());
     reduce(foundLiner, orOp<bool>());
     reduce(foundCylinderHead, orOp<bool>());
@@ -70,14 +75,14 @@ void Foam::layerSmooth::checkAndCalculate()
     }
 
     if (!foundLiner)
-    { 
+    {
         FatalErrorIn("Foam::layerSmooth::checkAndCalculate()")
             << " : cannot find liner patch"
             << abort(FatalError);
     }
 
     if (!foundCylinderHead)
-    { 
+    {
         FatalErrorIn("Foam::layerSmooth::checkAndCalculate()")
             << " : cannot find cylinderHead patch"
             << exit(FatalError);
@@ -98,55 +103,52 @@ void Foam::layerSmooth::checkAndCalculate()
                 boundary()[cylinderHeadIndex].patch().localPoints()
             ).z();
 
- /*        
+ /*
            deckHeight() = max
             (
                 boundary()[linerIndex].patch().localPoints()
             ).z();
-*/                        
+*/
         }
         reduce(deckHeight(), minOp<scalar>());
 
         Info<< "deckHeight: " << deckHeight() << nl
             << "piston position: " << pistonPosition() << endl;
     }
-        
-    
-} 
+}
 
 void Foam::layerSmooth::setVirtualPositions()
 {
-
     {
         virtualPistonPosition() = -GREAT;
 
         label pistonFaceIndex = faceZones().findZoneID("pistonLayerFaces");
-         
+
         bool foundPistonFace = (pistonFaceIndex != -1);
-        
+
         if(!foundPistonFace)
         {
             FatalErrorIn("Foam::layerSmooth::setVirtualPistonPosition()")
                 << " : cannot find the pistonLayerFaces"
                 << exit(FatalError);
-    
         }
-        
+
         const labelList& pistonFaces = faceZones()[pistonFaceIndex];
         forAll(pistonFaces, i)
         {
             const face& f = faces()[pistonFaces[i]];
-        
+
             // should loop over facepoints...
             forAll(f, j)
             {
-                virtualPistonPosition() = max(virtualPistonPosition(), points()[f[j]].z());
+                virtualPistonPosition() =
+                    max(virtualPistonPosition(), points()[f[j]].z());
             }
         }
-    
-        reduce(virtualPistonPosition(), maxOp<scalar>());
-    
-    }
-    
 
+        reduce(virtualPistonPosition(), maxOp<scalar>());
+    }
 }
+
+
+// ************************************************************************* //

@@ -30,43 +30,52 @@ License
 #include "OFstream.H"
 #include "Pstream.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-bool JobInfo::writeJobInfo(debug::infoSwitch("writeJobInfo", 0));
+bool Foam::JobInfo::writeJobInfo(Foam::debug::infoSwitch("writeJobInfo", 0));
+Foam::JobInfo Foam::jobInfo;
 
-JobInfo jobInfo;
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Null constructor
-JobInfo::JobInfo()
+Foam::JobInfo::JobInfo()
 :
-    runningJobsDir_(getEnv("FOAM_JOB_DIR")/"runningJobs"),
-    finishedJobsDir_(getEnv("FOAM_JOB_DIR")/"finishedJobs"),
-    jobFileName_(hostName() + '.' + Foam::name(pid())),
-    runningJobPath_(runningJobsDir_/jobFileName_),
-    finishedJobPath_(finishedJobsDir_/jobFileName_)
+    runningJobPath_(),
+    finishedJobPath_(),
+    cpuTime_()
 {
     name() = "JobInfo";
 
     if (writeJobInfo && Pstream::master())
     {
-        if (!dir(runningJobsDir_) && !mkDir(runningJobsDir_))
+        string baseDir = getEnv("FOAM_JOB_DIR");
+        string jobFile = hostName() + '.' + Foam::name(pid());
+
+        fileName runningDir(baseDir/"runningJobs");
+        fileName finishedDir(baseDir/"finishedJobs");
+
+        runningJobPath_  = runningDir/jobFile;
+        finishedJobPath_ = finishedDir/jobFile;
+
+        if (baseDir.empty())
         {
             FatalErrorIn("JobInfo::JobInfo()")
-                << "Cannot make JobInfo directory " << runningJobsDir_
+                << "Cannot get JobInfo directory $FOAM_JOB_DIR"
                 << Foam::exit(FatalError);
         }
 
-        if (!dir(finishedJobsDir_) && !mkDir(finishedJobsDir_))
+        if (!isDir(runningDir) && !mkDir(runningDir))
         {
             FatalErrorIn("JobInfo::JobInfo()")
-                << "Cannot make JobInfo directory " << finishedJobsDir_
+                << "Cannot make JobInfo directory " << runningDir
+                << Foam::exit(FatalError);
+        }
+
+        if (!isDir(finishedDir) && !mkDir(finishedDir))
+        {
+            FatalErrorIn("JobInfo::JobInfo()")
+                << "Cannot make JobInfo directory " << finishedDir
                 << Foam::exit(FatalError);
         }
     }
@@ -77,7 +86,7 @@ JobInfo::JobInfo()
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-JobInfo::~JobInfo()
+Foam::JobInfo::~JobInfo()
 {
     if (writeJobInfo && constructed && Pstream::master())
     {
@@ -90,13 +99,13 @@ JobInfo::~JobInfo()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-bool JobInfo::write(Ostream& JobInfoFile) const
+bool Foam::JobInfo::write(Ostream& os) const
 {
     if (writeJobInfo && Pstream::master())
     {
-        if (JobInfoFile.good())
+        if (os.good())
         {
-            dictionary::write(JobInfoFile, false);
+            dictionary::write(os, false);
             return true;
         }
         else
@@ -111,7 +120,7 @@ bool JobInfo::write(Ostream& JobInfoFile) const
 }
 
 
-void JobInfo::write() const
+void Foam::JobInfo::write() const
 {
     if (writeJobInfo && Pstream::master())
     {
@@ -126,7 +135,7 @@ void JobInfo::write() const
 }
 
 
-void JobInfo::end(const word& terminationType)
+void Foam::JobInfo::end(const word& terminationType)
 {
     if (writeJobInfo && constructed && Pstream::master())
     {
@@ -147,25 +156,25 @@ void JobInfo::end(const word& terminationType)
 }
 
 
-void JobInfo::end()
+void Foam::JobInfo::end()
 {
     end("normal");
 }
 
 
-void JobInfo::exit()
+void Foam::JobInfo::exit()
 {
     end("exit");
 }
 
 
-void JobInfo::abort()
+void Foam::JobInfo::abort()
 {
     end("abort");
 }
 
 
-void JobInfo::signalEnd() const
+void Foam::JobInfo::signalEnd() const
 {
     if (writeJobInfo && constructed && Pstream::master())
     {
@@ -175,9 +184,5 @@ void JobInfo::signalEnd() const
     constructed = false;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

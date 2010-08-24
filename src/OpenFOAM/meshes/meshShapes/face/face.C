@@ -25,6 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "face.H"
+#include "triFace.H"
 #include "triPointRef.H"
 #include "mathematicalConstants.H"
 
@@ -118,7 +119,7 @@ Foam::label Foam::face::mostConcaveAngle
 }
 
 
-void Foam::face::split
+Foam::label Foam::face::split
 (
     const face::splitMode mode,
     const pointField& points,
@@ -128,6 +129,8 @@ void Foam::face::split
     faceList& quadFaces
 ) const
 {
+    label oldIndices = (triI + quadI);
+
     if (size() <= 2)
     {
         FatalErrorIn
@@ -142,7 +145,7 @@ void Foam::face::split
     if (size() == 3)
     {
         // Triangle. Just copy.
-        if ((mode == COUNTQUAD) || (mode == COUNTTRIANGLE))
+        if (mode == COUNTTRIANGLE || mode == COUNTQUAD)
         {
             triI++;
         }
@@ -249,7 +252,7 @@ void Foam::face::split
         }
         else
         {
-            // folded round
+            // folded around
             diff = minIndex + size() - startIndex;
         }
 
@@ -280,7 +283,17 @@ void Foam::face::split
         face1.split(mode, points, triI, quadI, triFaces, quadFaces);
         face2.split(mode, points, triI, quadI, triFaces, quadFaces);
     }
+
+    return (triI + quadI - oldIndices);
 }
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::face::face(const triFace& f)
+:
+    labelList(f)
+{}
 
 
 // * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
@@ -526,7 +539,7 @@ Foam::point Foam::face::centre(const pointField& meshPoints) const
 }
 
 
-Foam::vector Foam::face::normal(const pointField& meshPoints) const
+Foam::vector Foam::face::normal(const pointField& p) const
 {
     // Calculate the normal by summing the face triangle normals.
     // Changed to deal with small concavity by using a central decomposition
@@ -539,38 +552,43 @@ Foam::vector Foam::face::normal(const pointField& meshPoints) const
     {
         return triPointRef
         (
-            meshPoints[operator[](0)],
-            meshPoints[operator[](1)],
-            meshPoints[operator[](2)]
+            p[operator[](0)],
+            p[operator[](1)],
+            p[operator[](2)]
         ).normal();
     }
 
-    vector n = vector::zero;
-
-    point centrePoint = Foam::average(points(meshPoints));
-
     label nPoints = size();
 
-    point nextPoint = centrePoint;
-
     register label pI;
+
+    point centrePoint = vector::zero;
+    for (pI = 0; pI < nPoints; pI++)
+    {
+        centrePoint += p[operator[](pI)];
+    }
+    centrePoint /= nPoints;
+
+    vector n = vector::zero;
+
+    point nextPoint = centrePoint;
 
     for (pI = 0; pI < nPoints; pI++)
     {
         if (pI < nPoints - 1)
         {
-            nextPoint = meshPoints[operator[](pI + 1)];
+            nextPoint = p[operator[](pI + 1)];
         }
         else
         {
-            nextPoint = meshPoints[operator[](0)];
+            nextPoint = p[operator[](0)];
         }
 
         // Note: for best accuracy, centre point always comes last
         //
         n += triPointRef
         (
-            meshPoints[operator[](pI)],
+            p[operator[](pI)],
             nextPoint,
             centrePoint
         ).normal();
@@ -583,22 +601,19 @@ Foam::vector Foam::face::normal(const pointField& meshPoints) const
 Foam::face Foam::face::reverseFace() const
 {
     // reverse the label list and return
-    // Changed to make sure that the starting point of the original
-    // and the reverse face is identical.
-    //
+    // The starting points of the original and reverse face are identical.
 
-    const labelList& myList = *this;
-
+    const labelList& f = *this;
     labelList newList(size());
 
-    newList[0] = myList[0];
+    newList[0] = f[0];
 
     for (label pointI = 1; pointI < newList.size(); pointI++)
     {
-        newList[pointI] = myList[size() - pointI];
+        newList[pointI] = f[size() - pointI];
     }
 
-    return face(newList);
+    return face(xferMove(newList));
 }
 
 
@@ -638,7 +653,6 @@ Foam::scalar Foam::face::sweptVol
     label nPoints = size();
 
     point nextOldPoint = centreOldPoint;
-
     point nextNewPoint = centreNewPoint;
 
     register label pI;
@@ -699,70 +713,69 @@ Foam::edgeList Foam::face::edges() const
 
 int Foam::face::edgeDirection(const edge& e) const
 {
-    if (size() > 2)
+    forAll (*this, i)
     {
-        edge found(-1,-1);
-
-        // find start/end points - this breaks down for degenerate faces
-        forAll (*this, i)
+        if (operator[](i) == e.start())
         {
-            if (operator[](i) == e.start())
+            if (operator[](rcIndex(i)) == e.end())
             {
-                found.start() = i;
+                // reverse direction
+                return -1;
             }
-            else if (operator[](i) == e.end())
+            else if (operator[](fcIndex(i)) == e.end())
             {
-                found.end() = i;
+                // forward direction
+                return 1;
             }
-        }
 
-        label diff = found.end() - found.start();
-        if (!diff || found.start() < 0 || found.end() < 0)
-        {
+            // no match
             return 0;
         }
+        else if (operator[](i) == e.end())
+        {
+            if (operator[](rcIndex(i)) == e.start())
+            {
+                // forward direction
+                return 1;
+            }
+            else if (operator[](fcIndex(i)) == e.start())
+            {
+                // reverse direction
+                return -1;
+            }
 
-        // forward direction
-        if (diff == 1 || diff == 1 - size())
-        {
-            return 1;
-        }
-        // reverse direction
-        if (diff ==  -1 || diff == -1 + size())
-        {
-            return -1;
+            // no match
+            return 0;
         }
     }
 
+    // not found
     return 0;
 }
 
 
 // Number of triangles directly known from number of vertices
-Foam::label Foam::face::nTriangles
-(
-    const pointField&
-) const
+Foam::label Foam::face::nTriangles(const pointField&) const
 {
-    return size() - 2;
+    return nTriangles();
 }
 
 
-void Foam::face::triangles
+Foam::label Foam::face::triangles
 (
     const pointField& points,
     label& triI,
     faceList& triFaces
 ) const
 {
-    faceList quadFaces;
     label quadI = 0;
+    faceList quadFaces;
 
-    split(SPLITTRIANGLE, points, triI, quadI, triFaces, quadFaces);
+    return split(SPLITTRIANGLE, points, triI, quadI, triFaces, quadFaces);
 }
 
 
-void Foam::face::nTrianglesQuads
+Foam::label Foam::face::nTrianglesQuads
 (
     const pointField& points,
     label& triI,
@@ -772,11 +785,11 @@ void Foam::face::nTrianglesQuads
     faceList triFaces;
     faceList quadFaces;
 
-    split(COUNTQUAD, points, triI, quadI, triFaces, quadFaces);
+    return split(COUNTQUAD, points, triI, quadI, triFaces, quadFaces);
 }
 
 
-void Foam::face::trianglesQuads
+Foam::label Foam::face::trianglesQuads
 (
     const pointField& points,
     label& triI,
@@ -785,7 +798,7 @@ void Foam::face::trianglesQuads
     faceList& quadFaces
 ) const
 {
-    split(SPLITQUAD, points, triI, quadI, triFaces, quadFaces);
+    return split(SPLITQUAD, points, triI, quadI, triFaces, quadFaces);
 }
 
 

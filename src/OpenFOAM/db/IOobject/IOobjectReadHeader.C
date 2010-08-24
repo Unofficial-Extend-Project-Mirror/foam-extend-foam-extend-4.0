@@ -83,10 +83,7 @@ bool Foam::IOobject::readHeader(Istream& is)
         }
 
         // The note entry is optional
-        if (headerDict.found("note"))
-        {
-            note_ = string(headerDict.lookup("note"));
-        }
+        headerDict.readIfPresent("note", note_);
     }
     else
     {

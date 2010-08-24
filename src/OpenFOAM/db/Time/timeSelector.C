@@ -56,22 +56,12 @@ Foam::List<bool> Foam::timeSelector::selected(const List<instant>& Times) const
 {
     List<bool> lst(Times.size(), false);
 
-    // check ranges
-    forAll(Times, i)
+    // check ranges, avoid false positive on constant/
+    forAll(Times, timeI)
     {
-        if (selected(Times[i]))
+        if (Times[timeI].name() != "constant" && selected(Times[timeI]))
         {
-            lst[i] = true;
-        }
-    }
-
-    // avoid false positive on "constant"
-    forAll(Times, i)
-    {
-        if (Times[i].name() == "constant")
-        {
-            lst[i] = false;
-            break;
+            lst[timeI] = true;
         }
     }
 
@@ -85,15 +75,15 @@ Foam::List<bool> Foam::timeSelector::selected(const List<instant>& Times) const
             int nearestIndex = -1;
             scalar nearestDiff = Foam::GREAT;
 
-            forAll(Times, timeIndex)
+            forAll(Times, timeI)
             {
-                if (Times[timeIndex].name() == "constant") continue;
+                if (Times[timeI].name() == "constant") continue;
 
-                scalar diff = fabs(Times[timeIndex].value() - target);
+                scalar diff = fabs(Times[timeI].value() - target);
                 if (diff < nearestDiff)
                 {
                     nearestDiff = diff;
-                    nearestIndex = timeIndex;
+                    nearestIndex = timeI;
                 }
             }
 
@@ -113,7 +103,7 @@ Foam::List<Foam::instant> Foam::timeSelector::select
     const List<instant>& Times
 ) const
 {
-    return subset(selected(Times), true, Times);
+    return subset(selected(Times), Times);
 }
 
 
@@ -122,7 +112,7 @@ void Foam::timeSelector::inplaceSelect
     List<instant>& Times
 ) const
 {
-    inplaceSubset(selected(Times), true, Times);
+    inplaceSubset(selected(Times), Times);
 }
 
 
@@ -141,7 +131,7 @@ void Foam::timeSelector::addOptions
         argList::validOptions.insert("zeroTime", "");
     }
     argList::validOptions.insert("noZero", "");
-    argList::validOptions.insert("time", "time");
+    argList::validOptions.insert("time", "ranges");
     argList::validOptions.insert("latestTime", "");
 }
 
@@ -156,39 +146,80 @@ Foam::List<Foam::instant> Foam::timeSelector::select
     {
         List<bool> selectTimes(timeDirs.size(), true);
 
-        if (args.options().found("time"))
-        {
-            selectTimes = timeSelector
-            (
-                IStringStream(args.options()["time"])()
-            ).selected(timeDirs);
-        }
-        else if (args.options().found("latestTime"))
-        {
-            selectTimes = false;
+        // determine locations of constant/ and 0/ directories
+        label constantIdx = -1;
+        label zeroIdx = -1;
 
-            // avoid false match on constant/ or 0/
-            if (timeDirs.size() > 2)
+        forAll(timeDirs, timeI)
+        {
+            if (timeDirs[timeI].name() == "constant")
             {
-                selectTimes[timeDirs.size() - 1] = true;
+                constantIdx = timeI;
+            }
+            else if (timeDirs[timeI].value() == 0)
+            {
+                zeroIdx = timeI;
+            }
+
+            if (constantIdx >= 0 && zeroIdx >= 0)
+            {
+                break;
             }
         }
 
-        if (timeDirs.size() > 1)
+        // determine latestTime selection (if any)
+        // this must appear before the -time option processing
+        label latestIdx = -1;
+        if (args.optionFound("latestTime"))
         {
-            selectTimes[0] = args.options().found("constant");
+            selectTimes = false;
+            latestIdx = timeDirs.size() - 1;
 
-            if (args.options().found("noZero"))
+            // avoid false match on constant/
+            if (latestIdx == constantIdx)
             {
-                selectTimes[1] = false;
+                latestIdx = -1;
+            }
+        }
+
+        if (args.optionFound("time"))
+        {
+            // can match 0/, but can never match constant/
+            selectTimes = timeSelector
+            (
+                args.optionLookup("time")()
+            ).selected(timeDirs);
+        }
+
+
+        // add in latestTime (if selected)
+        if (latestIdx >= 0)
+        {
+            selectTimes[latestIdx] = true;
+        }
+
+        if (constantIdx >= 0)
+        {
+            // only add constant/ if specifically requested
+            selectTimes[constantIdx] = args.optionFound("constant");
+        }
+
+        // special treatment for 0/
+        if (zeroIdx >= 0)
+        {
+            if (args.optionFound("noZero"))
+            {
+                // exclude 0/ if specifically requested
+                selectTimes[zeroIdx] = false;
             }
             else if (argList::validOptions.found("zeroTime"))
             {
-                selectTimes[1] = args.options().found("zeroTime");
+                // with -zeroTime enabled, drop 0/ unless specifically requested
+                selectTimes[zeroIdx] = args.optionFound("zeroTime");
             }
         }
 
-        return subset(selectTimes, true, timeDirs);
+        return subset(selectTimes, timeDirs);
     }
     else
     {
@@ -205,7 +236,7 @@ Foam::List<Foam::instant> Foam::timeSelector::select0
 {
     instantList timeDirs = timeSelector::select(runTime.times(), args);
 
-    if (!timeDirs.size())
+    if (timeDirs.empty())
     {
         FatalErrorIn(args.executable())
             << "No times selected"

@@ -78,9 +78,9 @@ inline Foam::triFace::triFace
 }
 
 
-inline Foam::triFace::triFace(const UList<label>& l)
+inline Foam::triFace::triFace(const UList<label>& lst)
 :
-    FixedList<label, 3>(l)
+    FixedList<label, 3>(lst)
 {}
 
 
@@ -96,7 +96,7 @@ inline Foam::label Foam::triFace::collapse()
 {
     // we cannot resize a FixedList, so mark duplicates with '-1'
     // (the lower vertex is retained)
-    // catch any '-1' - ie, if called twice
+    // catch any '-1' (eg, if called twice)
 
     label n = 3;
     if (operator[](0) == operator[](1) || operator[](1) == -1)
@@ -213,7 +213,7 @@ inline Foam::scalar Foam::triFace::mag(const pointField& points) const
     return ::Foam::mag(normal(points));
 }
 
-
+// could also delegate to triPointRef(...).normal()
 inline Foam::vector Foam::triFace::normal(const pointField& points) const
 {
     return 0.5*
@@ -221,6 +221,19 @@ inline Foam::vector Foam::triFace::normal(const pointField& points) const
         (points[operator[](1)] - points[operator[](0)])
        ^(points[operator[](2)] - points[operator[](0)])
     );
+}
+
+
+inline Foam::label Foam::triFace::nTriangles() const
+{
+    return 1;
+}
+
+
+inline Foam::triFace Foam::triFace::reverseFace() const
+{
+    // The starting points of the original and reverse face are identical.
+    return triFace(operator[](0), operator[](2), operator[](1));
 }
 
 

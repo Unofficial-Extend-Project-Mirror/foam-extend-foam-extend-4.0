@@ -47,13 +47,6 @@ tmp<surfaceInterpolationScheme<Type> > surfaceInterpolationScheme<Type>::New
     Istream& schemeData
 )
 {
-    if (surfaceInterpolation::debug)
-    {
-        Info<< "surfaceInterpolationScheme<Type>::New(const fvMesh&, Istream&)"
-               " : constructing surfaceInterpolationScheme<Type>"
-            << endl;
-    }
-
     if (schemeData.eof())
     {
         FatalIOErrorIn
@@ -68,6 +61,15 @@ tmp<surfaceInterpolationScheme<Type> > surfaceInterpolationScheme<Type>::New
     }
 
     word schemeName(schemeData);
+
+    if (surfaceInterpolation::debug || surfaceInterpolationScheme<Type>::debug)
+    {
+        Info<< "surfaceInterpolationScheme<Type>::New"
+               "(const fvMesh&, Istream&)"
+               " : discretisation scheme = "
+            << schemeName
+            << endl;
+    }
 
     typename MeshConstructorTable::iterator constructorIter =
         MeshConstructorTablePtr_->find(schemeName);
@@ -98,14 +100,6 @@ tmp<surfaceInterpolationScheme<Type> > surfaceInterpolationScheme<Type>::New
     Istream& schemeData
 )
 {
-    if (surfaceInterpolation::debug)
-    {
-        Info<< "surfaceInterpolationScheme<Type>::New"
-               "(const fvMesh&, const surfaceScalarField&, Istream&) : "
-               "constructing surfaceInterpolationScheme<Type>"
-            << endl;
-    }
-
     if (schemeData.eof())
     {
         FatalIOErrorIn
@@ -121,6 +115,15 @@ tmp<surfaceInterpolationScheme<Type> > surfaceInterpolationScheme<Type>::New
     }
 
     word schemeName(schemeData);
+
+    if (surfaceInterpolation::debug || surfaceInterpolationScheme<Type>::debug)
+    {
+        Info<< "surfaceInterpolationScheme<Type>::New"
+               "(const fvMesh&, const surfaceScalarField&, Istream&)"
+               " : discretisation scheme = "
+            << schemeName
+            << endl;
+    }
 
     typename MeshFluxConstructorTable::iterator constructorIter =
         MeshFluxConstructorTablePtr_->find(schemeName);

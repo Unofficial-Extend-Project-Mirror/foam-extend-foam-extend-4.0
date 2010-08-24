@@ -107,9 +107,10 @@ Foam::Map<Foam::label> Foam::autoSnapDriver::getZoneBafflePatches
                             FatalErrorIn("getZoneBafflePatches(const bool)")
                                 << "Face " << faceI
                                 << " fc:" << mesh.faceCentres()[faceI]
-                                << " is in faceZone "
+                                << " in zone " << fZone.name()
+                                << " is in patch "
                                 << mesh.boundaryMesh()[oldPatchI].name()
-                                << " and in faceZone "
+                                << " and in patch "
                                 << mesh.boundaryMesh()[patchI].name()
                                 << abort(FatalError);
                         }
@@ -128,7 +129,7 @@ Foam::label Foam::autoSnapDriver::getCollocatedPoints
 (
     const scalar tol,
     const pointField& points,
-    PackedList<1>& isCollocatedPoint
+    PackedBoolList& isCollocatedPoint
 )
 {
     labelList pointMap;
@@ -195,7 +196,7 @@ Foam::pointField Foam::autoSnapDriver::smoothPatchDisplacement
     const indirectPrimitivePatch& pp = meshMover.patch();
 
     // Calculate geometrically non-manifold points on the patch to be moved.
-    PackedList<1> nonManifoldPoint(pp.nPoints());
+    PackedBoolList nonManifoldPoint(pp.nPoints());
     label nNonManifoldPoints = getCollocatedPoints
     (
         SMALL,
@@ -225,7 +226,7 @@ Foam::pointField Foam::autoSnapDriver::smoothPatchDisplacement
     const polyMesh& mesh = meshMover.mesh();
 
     // Get labels of faces to count (master of coupled faces and baffle pairs)
-    PackedList<1> isMasterFace(syncTools::getMasterFaces(mesh));
+    PackedBoolList isMasterFace(syncTools::getMasterFaces(mesh));
 
     {
         forAll(baffles, i)
@@ -531,7 +532,7 @@ Foam::tmp<Foam::scalarField> Foam::autoSnapDriver::edgePatchDist
 
     PointEdgeWave<pointEdgePoint> wallCalc
     (
-        pMesh,
+        mesh,
         pp.meshPoints(),
         wallInfo,
 
@@ -1308,7 +1309,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::autoSnapDriver::repatchToSurface
 
 
     // Faces that do not move
-    PackedList<1> isZonedFace(mesh.nFaces(), 0);
+    PackedBoolList isZonedFace(mesh.nFaces(), 0);
     {
         // 1. All faces on zoned surfaces
         const wordList& faceZoneNames = surfaces.faceZoneNames();
@@ -1474,7 +1475,7 @@ void Foam::autoSnapDriver::doSnap
         Info<< "Constructing mesh displacer ..." << endl;
         Info<< "Using mesh parameters " << motionDict << nl << endl;
 
-        pointMesh pMesh(mesh); //const pointMesh& pMesh = pointMesh::New(mesh);
+        const pointMesh& pMesh = pointMesh::New(mesh);
 
         motionSmoother meshMover
         (
@@ -1511,12 +1512,12 @@ void Foam::autoSnapDriver::doSnap
         // meshMover.
         calcNearestSurface(snapDist, meshMover);
 
-         //// Get smoothly varying internal displacement field.
-         //- 2009-12-16 : was not found to be beneficial. Keeping internal
-         // fields fixed slightly increases skewness (on boundary)
-         // but lowers non-orthogonality quite a bit (e.g. 65->59 degrees).
-         // Maybe if better smoother?
-         //smoothDisplacement(snapParams, meshMover);
+        //// Get smoothly varying internal displacement field.
+        //- 2009-12-16 : was not found to be beneficial. Keeping internal
+        // fields fixed slightly increases skewness (on boundary)
+        // but lowers non-orthogonality quite a bit (e.g. 65->59 degrees).
+        // Maybe if better smoother?
+        //smoothDisplacement(snapParams, meshMover);
 
         // Apply internal displacement to mesh.
         scaleMesh(snapParams, nInitErrors, baffles, meshMover);

@@ -29,27 +29,20 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(coupledPointPatch, 0);
+defineTypeNameAndDebug(Foam::coupledPointPatch, 0);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-coupledPointPatch::coupledPointPatch(const pointBoundaryMesh& bm)
+Foam::coupledPointPatch::coupledPointPatch(const pointBoundaryMesh& bm)
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-coupledPointPatch::~coupledPointPatch()
+Foam::coupledPointPatch::~coupledPointPatch()
 {}
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

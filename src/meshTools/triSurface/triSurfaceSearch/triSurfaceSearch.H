@@ -36,7 +36,6 @@ SourceFiles
 #ifndef triSurfaceSearch_H
 #define triSurfaceSearch_H
 
-#include "DynamicList.H"
 #include "pointField.H"
 #include "boolList.H"
 #include "pointIndexHit.H"

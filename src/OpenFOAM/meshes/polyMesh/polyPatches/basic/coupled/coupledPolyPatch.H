@@ -174,7 +174,7 @@ public:
             //- Are the cyclic planes parallel
             bool parallel() const
             {
-                return forwardT_.size() == 0;
+                return forwardT_.empty();
             }
 
             //- Return face transformation tensor

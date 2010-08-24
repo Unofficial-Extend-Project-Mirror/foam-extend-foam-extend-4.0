@@ -26,14 +26,10 @@ License
 
 #include "primitiveMesh.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void primitiveMesh::calcCellCells() const
+void Foam::primitiveMesh::calcCellCells() const
 {
     // Loop through faceCells and mark up neighbours
 
@@ -41,6 +37,14 @@ void primitiveMesh::calcCellCells() const
     {
         Pout<< "primitiveMesh::calcCellCells() : calculating cellCells"
             << endl;
+
+        if (debug == -1)
+        {
+            // For checking calls:abort so we can quickly hunt down
+            // origin of call
+            FatalErrorIn("primitiveMesh::calcCellCells()")
+                << abort(FatalError);
+        }
     }
 
     // It is an error to attempt to recalculate cellCells
@@ -94,7 +98,7 @@ void primitiveMesh::calcCellCells() const
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const labelListList& primitiveMesh::cellCells() const
+const Foam::labelListList& Foam::primitiveMesh::cellCells() const
 {
     if (!ccPtr_)
     {
@@ -105,8 +109,50 @@ const labelListList& primitiveMesh::cellCells() const
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+const Foam::labelList& Foam::primitiveMesh::cellCells
+(
+    const label cellI,
+    DynamicList<label>& storage
+) const
+{
+    if (hasCellCells())
+    {
+        return cellCells()[cellI];
+    }
+    else
+    {
+        const labelList& own = faceOwner();
+        const labelList& nei = faceNeighbour();
+        const cell& cFaces = cells()[cellI];
 
-} // End namespace Foam
+        storage.clear();
+
+        forAll(cFaces, i)
+        {
+            label faceI = cFaces[i];
+
+            if (faceI < nInternalFaces())
+            {
+                if (own[faceI] == cellI)
+                {
+                    storage.append(nei[faceI]);
+                }
+                else
+                {
+                    storage.append(own[faceI]);
+                }
+            }
+        }
+
+        return storage;
+    }
+}
+
+
+const Foam::labelList& Foam::primitiveMesh::cellCells(const label cellI) const
+{
+    return cellCells(cellI, labels_);
+}
+
 
 // ************************************************************************* //

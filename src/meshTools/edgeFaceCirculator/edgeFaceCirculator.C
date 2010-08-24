@@ -31,7 +31,7 @@ License
 
 const Foam::edgeFaceCirculator Foam::edgeFaceCirculator::endConstIter
 (
-    *reinterpret_cast<primitiveMesh*>(NULL),    // primitiveMesh
+    *reinterpret_cast<primitiveMesh*>(0),       // primitiveMesh
     -1,                                         // faceLabel
     false,                                      // ownerSide
     -1,                                         // index

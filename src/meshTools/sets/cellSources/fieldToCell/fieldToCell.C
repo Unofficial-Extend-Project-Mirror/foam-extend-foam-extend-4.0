@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "fieldToCell.H"
@@ -206,10 +204,7 @@ void Foam::fieldToCell::applyToSet
     }
     else if (fieldObject.headerClassName() == "volScalarField")
     {
-        IFstream str
-        (
-            mesh().time().path()/mesh().time().timeName()/fieldName_
-        );
+        IFstream str(fieldObject.filePath());
 
         // Read dictionary
         dictionary fieldDict(str);
@@ -220,10 +215,7 @@ void Foam::fieldToCell::applyToSet
     }
     else if (fieldObject.headerClassName() == "volVectorField")
     {
-        IFstream str
-        (
-            mesh().time().path()/mesh().time().timeName()/fieldName_
-        );
+        IFstream str(fieldObject.filePath());
 
         // Read dictionary
         dictionary fieldDict(str);

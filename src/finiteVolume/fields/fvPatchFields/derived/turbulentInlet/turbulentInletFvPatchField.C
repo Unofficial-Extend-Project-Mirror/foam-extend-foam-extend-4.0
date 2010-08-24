@@ -206,6 +206,7 @@ void turbulentInletFvPatchField<Type>::write(Ostream& os) const
     os.writeKeyword("fluctuationScale")
         << fluctuationScale_ << token::END_STATEMENT << nl;
     referenceField_.writeEntry("referenceField", os);
+    os.writeKeyword("alpha") << alpha_ << token::END_STATEMENT << nl;
     this->writeEntry("value", os);
 }
 

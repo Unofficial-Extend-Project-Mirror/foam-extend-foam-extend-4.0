@@ -1,11 +1,6 @@
 probes/probes.C
 probes/probesFunctionObject.C
 
-minMaxField/minMaxField.C
-boundField/boundField.C
-ggiCheckFunctionObject/ggiCheckFunctionObject.C
-meshCheckFunctionObject/meshCheckFunctionObject.C
-
 sampledSet/coordSet/coordSet.C
 sampledSet/sampledSet/sampledSet.C
 sampledSet/cloud/cloudSet.C
@@ -17,27 +12,40 @@ sampledSet/midPointAndFace/midPointAndFaceSet.C
 sampledSet/sampledSets/sampledSets.C
 sampledSet/sampledSetsFunctionObject/sampledSetsFunctionObject.C
 
-sampledSet/writers/writer/writers.C
-sampledSet/writers/xmgr/xmgrWriters.C
-sampledSet/writers/gnuplot/gnuplotWriters.C
-sampledSet/writers/jplot/jplotWriters.C
-sampledSet/writers/raw/rawWriters.C
+setWriters = sampledSet/writers
+
+$(setWriters)/writers.C
+$(setWriters)/gnuplot/gnuplotSetWriterRunTime.C
+$(setWriters)/jplot/jplotSetWriterRunTime.C
+$(setWriters)/raw/rawSetWriterRunTime.C
+$(setWriters)/xmgrace/xmgraceSetWriterRunTime.C
 
 cuttingPlane/cuttingPlane.C
 
-sampledSurface/patch/sampledPatch.C
-sampledSurface/plane/sampledPlane.C
+sampledSurface/sampledPatch/sampledPatch.C
+sampledSurface/sampledPlane/sampledPlane.C
+sampledSurface/isoSurface/isoSurface.C
+sampledSurface/isoSurface/sampledIsoSurface.C
+sampledSurface/isoSurface/isoSurfaceCell.C
+sampledSurface/isoSurface/sampledIsoSurfaceCell.C
+sampledSurface/distanceSurface/distanceSurface.C
+sampledSurface/sampledCuttingPlane/sampledCuttingPlane.C
 sampledSurface/sampledSurface/sampledSurface.C
 sampledSurface/sampledSurfaces/sampledSurfaces.C
 sampledSurface/sampledSurfacesFunctionObject/sampledSurfacesFunctionObject.C
+sampledSurface/sampledTriSurfaceMesh/sampledTriSurfaceMesh.C
+sampledSurface/thresholdCellFaces/thresholdCellFaces.C
+sampledSurface/thresholdCellFaces/sampledThresholdCellFaces.C
 
-sampledSurface/writers/surfaceWriters.C
-sampledSurface/writers/foamFile/foamFileWriters.C
-sampledSurface/writers/dx/dxWriters.C
-sampledSurface/writers/raw/rawSurfaceWriters.C
-sampledSurface/writers/vtk/vtkWriters.C
-sampledSurface/writers/stl/stlWriters.C
-sampledSurface/writers/null/nullWriters.C
+surfWriters = sampledSurface/writers
+
+$(surfWriters)/surfaceWriters.C
+$(surfWriters)/dx/dxSurfaceWriterRunTime.C
+$(surfWriters)/foamFile/foamFileSurfaceWriterRunTime.C
+$(surfWriters)/null/nullSurfaceWriterRunTime.C
+$(surfWriters)/proxy/proxySurfaceWriterRunTime.C
+$(surfWriters)/raw/rawSurfaceWriterRunTime.C
+$(surfWriters)/vtk/vtkSurfaceWriterRunTime.C
 
 graphField/writePatchGraph.C
 graphField/writeCellGraph.C

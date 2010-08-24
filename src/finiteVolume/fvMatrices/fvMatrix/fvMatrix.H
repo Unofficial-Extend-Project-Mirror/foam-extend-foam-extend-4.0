@@ -199,8 +199,8 @@ public:
         // Member functions
 
             //- Solve returning the solution statistics.
-            //  Solver controls read from Istream
-            lduSolverPerformance solve(Istream&);
+            //  Use the given solver controls
+            lduSolverPerformance solve(const dictionary&);
 
             //- Solve returning the solution statistics.
             //  Solver controls read from fvSolution
@@ -347,17 +347,24 @@ public:
             //  alpha is read from controlDict
             void relax();
 
+            //- Manipulate based on a boundary field
+            void boundaryManipulate
+            (
+                typename GeometricField<Type, fvPatchField, volMesh>::
+                    GeometricBoundaryField& values
+            );
+
             //- Construct and return the solver
-            //  Solver controls read from Istream
-            autoPtr<fvSolver> solver(Istream&);
+            //  Use the given solver controls
+            autoPtr<fvSolver> solver(const dictionary&);
 
             //- Construct and return the solver
             //  Solver controls read from fvSolution
             autoPtr<fvSolver> solver();
 
             //- Solve returning the solution statistics.
-            //  Solver controls read from Istream
-            lduSolverPerformance solve(Istream&);
+            //  Use the given solver controls
+            lduMatrix::solverPerformance solve(const dictionary&);
 
             //- Solve returning the solution statistics.
             //  Solver controls read from fvSolution
@@ -507,16 +514,20 @@ void checkMethod
 
 
 //- Solve returning the solution statistics given convergence tolerance
-//  Solver controls read from Istream
+//  Use the given solver controls
 template<class Type>
-lduMatrix::solverPerformance solve(fvMatrix<Type>&, Istream&);
+lduSolverPerformance solve(fvMatrix<Type>&, const dictionary&);
 
 
 //- Solve returning the solution statistics given convergence tolerance,
 //  deleting temporary matrix after solution.
-//  Solver controls read from Istream
+//  Use the given solver controls
 template<class Type>
-lduSolverPerformance solve(const tmp<fvMatrix<Type> >&, Istream&);
+lduSolverPerformance solve
+(
+    const tmp<fvMatrix<Type> >&,
+    const dictionary&
+);
 
 
 //- Solve returning the solution statistics given convergence tolerance
@@ -530,6 +541,18 @@ lduSolverPerformance solve(fvMatrix<Type>&);
 //  Solver controls read fvSolution
 template<class Type>
 lduSolverPerformance solve(const tmp<fvMatrix<Type> >&);
+
+
+//- Return the correction form of the given matrix
+//  by subtracting the matrix multiplied by the current field
+template<class Type>
+tmp<fvMatrix<Type> > correction(const fvMatrix<Type>&);
+
+
+//- Return the correction form of the given temporary matrix
+//  by subtracting the matrix multiplied by the current field
+template<class Type>
+tmp<fvMatrix<Type> > correction(const tmp<fvMatrix<Type> >&);
 
 
 // * * * * * * * * * * * * * * * Global operators  * * * * * * * * * * * * * //

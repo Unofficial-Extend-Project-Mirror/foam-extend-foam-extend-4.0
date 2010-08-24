@@ -61,6 +61,7 @@ static const doubleScalar doubleScalarROOTVSMALL = 1.0e-150;
 
 
 #define Scalar doubleScalar
+#define ScalarVGREAT doubleScalarVGREAT
 #define ScalarVSMALL doubleScalarVSMALL
 #define readScalar readDoubleScalar
 
@@ -98,6 +99,7 @@ inline Scalar yn(const int n, const Scalar s)
 }
 
 #undef Scalar
+#undef ScalarVGREAT
 #undef ScalarVSMALL
 #undef readScalar
 #undef transFunc

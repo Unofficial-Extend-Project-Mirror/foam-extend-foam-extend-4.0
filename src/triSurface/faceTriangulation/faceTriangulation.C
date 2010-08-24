@@ -33,17 +33,17 @@ License
 const Foam::scalar Foam::faceTriangulation::edgeRelTol = 1E-6;
 
 
-//- Edge to the right of face vertex i
+// Edge to the right of face vertex i
 Foam::label Foam::faceTriangulation::right(const label, label i)
 {
     return i;
 }
 
 
-//- Edge to the left of face vertex i
+// Edge to the left of face vertex i
 Foam::label Foam::faceTriangulation::left(const label size, label i)
 {
-    return i == 0 ? size - 1 : (i - 1);
+    return i ? i-1 : size-1;
 }
 
 
@@ -60,10 +60,8 @@ Foam::tmp<Foam::vectorField> Foam::faceTriangulation::calcEdges
 
     forAll(f, i)
     {
-        label ni = f.fcIndex(i);
-
         point thisPt = points[f[i]];
-        point nextPt = points[f[ni]];
+        point nextPt = points[f[f.fcIndex(i)]];
 
         vector vec(nextPt - thisPt);
         vec /= mag(vec) + VSMALL;
@@ -90,7 +88,7 @@ void Foam::faceTriangulation::calcHalfAngle
 
     scalar sin = (e0 ^ e1) & normal;
 
-    if (sin < -SMALL)
+    if (sin < -ROOTVSMALL)
     {
         // 3rd or 4th quadrant
         cosHalfAngle = - Foam::sqrt(0.5*(1 + cos));
@@ -109,7 +107,7 @@ void Foam::faceTriangulation::calcHalfAngle
 // Return true and intersection point if intersection between p1 and p2.
 Foam::pointHit Foam::faceTriangulation::rayEdgeIntersect
 (
-    const vector& normal, 
+    const vector& normal,
     const point& rayOrigin,
     const vector& rayDir,
     const point& p1,
@@ -225,10 +223,10 @@ void Foam::faceTriangulation::findDiagonal
     label minIndex = -1;
     scalar minPosOnEdge = GREAT;
 
-    for(label i = 0; i < f.size() - 2; i++)
+    for (label i = 0; i < f.size() - 2; i++)
     {
         scalar posOnEdge;
-        pointHit inter = 
+        pointHit inter =
             rayEdgeIntersect
             (
                 normal,
@@ -258,7 +256,7 @@ void Foam::faceTriangulation::findDiagonal
 
         index1 = -1;
         index2 = -1;
-        return;   
+        return;
     }
 
     const label leftIndex = minIndex;
@@ -299,7 +297,7 @@ void Foam::faceTriangulation::findDiagonal
 
     // all vertices except for startIndex and ones to left and right of it.
     faceVertI = f.fcIndex(f.fcIndex(startIndex));
-    for(label i = 0; i < f.size() - 3; i++)
+    for (label i = 0; i < f.size() - 3; i++)
     {
         const point& pt = points[f[faceVertI]];
 
@@ -368,7 +366,7 @@ Foam::label Foam::faceTriangulation::findStart
         const vector& rightEdge = edges[right(size, fp)];
         const vector leftEdge = -edges[left(size, fp)];
 
-        if (((rightEdge ^ leftEdge) & normal) < SMALL)
+        if (((rightEdge ^ leftEdge) & normal) < ROOTVSMALL)
         {
             scalar cos = rightEdge & leftEdge;
             if (cos < minCos)
@@ -400,7 +398,7 @@ Foam::label Foam::faceTriangulation::findStart
 
     return minIndex;
 }
-            
+
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -424,7 +422,7 @@ bool Foam::faceTriangulation::split
             "split(const bool, const pointField&, const face&"
             ", const vector&, label&)"
         )   << "Illegal face:" << f
-            << " with points " << IndirectList<point>(points, f)()
+            << " with points " << UIndirectList<point>(points, f)()
             << endl;
 
         return false;
@@ -503,7 +501,8 @@ bool Foam::faceTriangulation::split
                     "split(const bool, const pointField&, const face&"
                     ", const vector&, label&)"
                 )   << "Cannot find valid diagonal on face " << f
-                    << " with points " << IndirectList<point>(points, f)() << nl
+                    << " with points " << UIndirectList<point>(points, f)()
+                    << nl
                     << "Returning naive triangulation starting from "
                     << f[maxIndex] << " which might not be correct for a"
                     << " concave or warped face" << endl;
@@ -532,7 +531,8 @@ bool Foam::faceTriangulation::split
                     "split(const bool, const pointField&, const face&"
                     ", const vector&, label&)"
                 )   << "Cannot find valid diagonal on face " << f
-                    << " with points " << IndirectList<point>(points, f)() << nl
+                    << " with points " << UIndirectList<point>(points, f)()
+                    << nl
                     << "Returning empty triFaceList" << endl;
 
                 return false;
@@ -566,7 +566,7 @@ bool Foam::faceTriangulation::split
                 "split(const bool, const pointField&, const face&"
                 ", const vector&, label&)"
             )   << "Illegal split of face:" << f
-                << " with points " << IndirectList<point>(points, f)()
+                << " with points " << UIndirectList<point>(points, f)()
                 << " at indices " << index1 << " and " << index2
                 << abort(FatalError);
         }

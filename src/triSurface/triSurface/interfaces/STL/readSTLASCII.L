@@ -1,4 +1,4 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
@@ -40,6 +40,7 @@ License
 using namespace Foam;
 
 // Dummy yyFlexLexer::yylex() to keep the linker happy. It is not called
+//! @cond dummy
 int yyFlexLexer::yylex()
 {
     FatalErrorIn("yyFlexLexer::yylex()")
@@ -47,10 +48,12 @@ int yyFlexLexer::yylex()
         << abort(FatalError);
     return 0;
 }
+//! @endcond dummy
 
 // Dummy yywrap to keep yylex happy at compile time.
 // It is called by yylex but is not used as the mechanism to change file.
 // See <<EOF>>
+//! @cond dummy
 #if YY_FLEX_SUBMINOR_VERSION < 34
 extern "C" int yywrap()
 #else
@@ -59,6 +62,7 @@ int yyFlexLexer::yywrap()
 {
     return 1;
 }
+//! @endcond dummy
 
 
 class STLLexer
@@ -394,7 +398,7 @@ bool triSurface::readSTLASCII(const fileName& STLfileName)
 
     // Create the lexer obtaining the approximate number of vertices in the STL
     // from the file size
-    STLLexer lexer(&STLstream.stdStream(), Foam::size(STLfileName)/400);
+    STLLexer lexer(&STLstream.stdStream(), Foam::fileSize(STLfileName)/400);
     while(lexer.lex() != 0)
     {}
 
@@ -455,6 +459,7 @@ bool triSurface::readSTLASCII(const fileName& STLfileName)
         patches_[iter()].name() = iter.key();
     }
 
+    // Fill in the missing information in the patches
     setDefaultPatches();
 
     return true;

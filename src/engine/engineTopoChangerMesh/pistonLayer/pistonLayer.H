@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2005-2007 Tommaso Lucchini
+    \\  /    A nd           | Copyright (C) 2005-2010 Tommaso Lucchini
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,22 +24,17 @@ License
 
 Class
 
-DESCRIPTION
-    Engine mesh class with dynamic layering on the piston patch. 
+Description
+    Engine mesh class with dynamic layering on the piston patch.
 
-C++
-    listOfSourceFiles
-        addpistonLayerModifiers.C
-        pistonLayer.C
-    endListOfSourceFiles
-
-AUTHOR
-    
+Author
     Tommaso Lucchini, Politecnico di Milano.
-	
-    
-*/
-// ------------------------------------------------------------------------- //
+
+SourceFiles
+    addpistonLayerModifiers.C
+    pistonLayer.C
+
+\*---------------------------------------------------------------------------*/
 
 #ifndef pistonLayer_H
 #define pistonLayer_H

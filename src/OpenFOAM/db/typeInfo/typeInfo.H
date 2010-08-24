@@ -60,21 +60,28 @@ Description
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
+// declarations (for use in header files)
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+//- Declare a ClassNameNoDebug() with extra virtual type info
+#define TypeNameNoDebug(TypeNameString)                                       \
+    ClassNameNoDebug(TypeNameString);                                         \
+    virtual const word& type() const { return typeName; }
 
-#define TypeName(TypeNameString)                              \
-    ClassName(TypeNameString);                                \
+//- Declare a ClassName() with extra virtual type info
+#define TypeName(TypeNameString)                                              \
+    ClassName(TypeNameString);                                                \
     virtual const word& type() const { return typeName; }
 
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
-// Reference type cast template function wraps dynamic_cast to handle the
-// bad_cast exception and generate a FatalError.
-
+//- Reference type cast template function,
+//  wraps dynamic_cast to handle bad_cast exception and generate a FatalError.
 template<class To, class From>
 inline To& dynamicCast(From& r)
 {
@@ -94,6 +101,8 @@ inline To& dynamicCast(From& r)
 }
 
 
+//- Reference type cast template function.
+//  As per dynamicCast, but handles type names via the virtual type() method.
 template<class To, class From>
 inline To& refCast(From& r)
 {
@@ -113,6 +122,7 @@ inline To& refCast(From& r)
 }
 
 
+//- Check the typeid
 template<class TestType, class Type>
 inline bool isType(const Type& t)
 {
@@ -120,6 +130,7 @@ inline bool isType(const Type& t)
 }
 
 
+//- Check if a dynamic_cast to typeid is possible
 template<class TestType, class Type>
 inline bool isA(const Type& t)
 {

@@ -1,3 +1,0 @@
-PFLAGS     = 
-PINC       = -I$(PVM_ROOT)/include
-PLIBS      = -L$(PVM_ROOT)/lib/$(PVM_ARCH) -lgpvm3 -lpvm3s

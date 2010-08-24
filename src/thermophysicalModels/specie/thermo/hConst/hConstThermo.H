@@ -94,8 +94,8 @@ class hConstThermo
 {
     // Private data
 
-        scalar CP;
-        scalar Hf;
+        scalar Cp_;
+        scalar Hf_;
 
 
     // Private member functions
@@ -107,6 +107,7 @@ class hConstThermo
             const scalar cp,
             const scalar hf
         );
+
 
 public:
 
@@ -121,13 +122,13 @@ public:
         //- Construct and return a clone
         inline autoPtr<hConstThermo> clone() const;
 
-        // Selector from Istream
+        //- Selector from Istream
         inline static autoPtr<hConstThermo> New(Istream& is);
 
 
     // Member Functions
 
-        // Fundamental properties
+        // Fundamaental properties
 
             //- Heat capacity at constant pressure [J/(kmol K)]
             inline scalar cp(const scalar T) const;
@@ -135,16 +136,20 @@ public:
             //- Enthalpy [J/kmol]
             inline scalar h(const scalar T) const;
 
+            //- Sensible enthalpy [J/kmol]
+            inline scalar hs(const scalar T) const;
+
+            //- Chemical enthalpy [J/kmol]
+            inline scalar hc() const;
+
             //- Entropy [J/(kmol K)]
             inline scalar s(const scalar T) const;
 
 
     // Member operators
 
-        inline hConstThermo& operator=
-        (
-            const hConstThermo&
-        );
+        inline void operator+=(const hConstThermo&);
+        inline void operator-=(const hConstThermo&);
 
 
     // Friend operators

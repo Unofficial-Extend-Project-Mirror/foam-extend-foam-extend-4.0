@@ -57,8 +57,8 @@ Foam::calcTypes::div::~div()
 
 void Foam::calcTypes::div::init()
 {
-    Foam::argList::validArgs.append("div");
-    argList::validArgs.append("fieldName1 .. fieldNameN");
+    argList::validArgs.append("div");
+    argList::validArgs.append("fieldName");
 }
 
 
@@ -68,14 +68,7 @@ void Foam::calcTypes::div::preCalc
     const Time& runTime,
     const fvMesh& mesh
 )
-{
-    if (args.additionalArgs().size() < 2)
-    {
-        Info<< nl << "must specify one or more fields" << nl;
-        args.printUsage();
-        FatalError.exit();
-    }
-}
+{}
 
 
 void Foam::calcTypes::div::calc
@@ -85,41 +78,36 @@ void Foam::calcTypes::div::calc
     const fvMesh& mesh
 )
 {
-    const stringList& params = args.additionalArgs();
+    const word& fieldName = args.additionalArgs()[1];
 
-    for (label fieldi=1; fieldi<params.size(); fieldi++)
+    IOobject fieldHeader
+    (
+        fieldName,
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ
+    );
+
+    // Check field exists
+    if (fieldHeader.headerOk())
     {
-        const word fieldName(params[fieldi]);
+        bool processed = false;
 
-        IOobject fieldHeader
-        (
-            fieldName,
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ
-        );
+        writeDivField<surfaceScalarField>(fieldHeader, mesh, processed);
+        writeDivField<volVectorField>(fieldHeader, mesh, processed);
 
-        // Check field exists
-        if (fieldHeader.headerOk())
+        if (!processed)
         {
-            bool processed = false;
-
-            writeDivField<surfaceScalarField>(fieldHeader, mesh, processed);
-            writeDivField<volVectorField>(fieldHeader, mesh, processed);
-
-            if (!processed)
-            {
-                 FatalError
-                     << "Unable to process " << fieldName << nl
-                     << "No call to div for fields of type "
-                     << fieldHeader.headerClassName() << nl << nl
-                     << exit(FatalError);
-            }
+                FatalError
+                    << "Unable to process " << fieldName << nl
+                    << "No call to div for fields of type "
+                    << fieldHeader.headerClassName() << nl << nl
+                    << exit(FatalError);
         }
-        else
-        {
-            Info<< "    No " << fieldName << endl;
-        }
+    }
+    else
+    {
+        Info<< "    No " << fieldName << endl;
     }
 }
 

@@ -31,79 +31,6 @@ License
 
 Foam::autoPtr<Foam::coordinateSystem> Foam::coordinateSystem::New
 (
-    const word& coordType,
-    const word& name,
-    const point& origin,
-    const vector& axis,
-    const vector& dir
-)
-{
-    if (debug)
-    {
-        Pout<< "coordinateSystem::New(const word&, const word&, "
-            << "const vector&, const vector&, const vector&) : "
-               "constructing coordinateSystem"
-            << endl;
-    }
-
-    origAxisDirConstructorTable::iterator cstrIter =
-        origAxisDirConstructorTablePtr_->find(coordType);
-
-    if (cstrIter == origAxisDirConstructorTablePtr_->end())
-    {
-        FatalErrorIn
-        (
-            "coordinateSystem::New(const word&, const word&, "
-            "const vector&, const vector&, const vector&) : "
-            "constructing coordinateSystem"
-        )   << "Unknown coordinateSystem type " << coordType << nl << nl
-            << "Valid coordinateSystem types are :" << nl
-            << origAxisDirConstructorTablePtr_->toc()
-            << exit(FatalError);
-    }
-
-    return autoPtr<coordinateSystem>(cstrIter()(name, origin, axis, dir));
-}
-
-
-Foam::autoPtr<Foam::coordinateSystem> Foam::coordinateSystem::New
-(
-    const word& coordType,
-    const word& name,
-    const point& origin,
-    const coordinateRotation& cr
-)
-{
-    if (debug)
-    {
-        Pout<< "coordinateSystem::New(const word&, const word&, "
-            << "const vector&, const coordinateRotation&) : "
-               "constructing coordinateSystem"
-            << endl;
-    }
-
-    origRotationConstructorTable::iterator cstrIter =
-        origRotationConstructorTablePtr_->find(coordType);
-
-    if (cstrIter == origRotationConstructorTablePtr_->end())
-    {
-        FatalErrorIn
-        (
-            "coordinateSystem::New(const word&, const word&, "
-            "const vector&, const coordinateRotation&) : "
-            "constructing coordinateSystem"
-        )   << "Unknown coordinateSystem type " << coordType << nl << nl
-            << "Valid coordinateSystem types are :" << nl
-            << origRotationConstructorTablePtr_->toc()
-            << exit(FatalError);
-    }
-
-    return autoPtr<coordinateSystem>(cstrIter()(name, origin, cr));
-}
-
-
-Foam::autoPtr<Foam::coordinateSystem> Foam::coordinateSystem::New
-(
     const word& name,
     const dictionary& dict
 )
@@ -115,15 +42,14 @@ Foam::autoPtr<Foam::coordinateSystem> Foam::coordinateSystem::New
             << endl;
     }
 
-    // default type is self
+    // construct base class directly, also allow 'cartesian' as an alias
     word coordType(typeName_());
-    if (dict.found("type"))
-    {
-	dict.lookup("type") >> coordType;
-    }
-
-    // can (must) construct base class directly
-    if (coordType == typeName_())
+    if
+    (
+        !dict.readIfPresent("type", coordType)
+     || coordType == typeName_()
+     || coordType == "cartesian"
+    )
     {
         return autoPtr<coordinateSystem>(new coordinateSystem(name, dict));
     }
@@ -145,6 +71,42 @@ Foam::autoPtr<Foam::coordinateSystem> Foam::coordinateSystem::New
     }
 
     return autoPtr<coordinateSystem>(cstrIter()(name, dict));
+}
+
+
+Foam::autoPtr<Foam::coordinateSystem> Foam::coordinateSystem::New
+(
+    const word& coordType,
+    const word& name,
+    const point& origin,
+    const coordinateRotation& cr
+)
+{
+    if (debug)
+    {
+        Pout<< "coordinateSystem::New(const word&, const word&, "
+            << "const point&, const coordinateRotation&) : "
+               "constructing coordinateSystem"
+            << endl;
+    }
+
+    origRotationConstructorTable::iterator cstrIter =
+        origRotationConstructorTablePtr_->find(coordType);
+
+    if (cstrIter == origRotationConstructorTablePtr_->end())
+    {
+        FatalErrorIn
+        (
+            "coordinateSystem::New(const word&, const word&, "
+            "const point&, const coordinateRotation&) : "
+            "constructing coordinateSystem"
+        )   << "Unknown coordinateSystem type " << coordType << nl << nl
+            << "Valid coordinateSystem types are :" << nl
+            << origRotationConstructorTablePtr_->toc()
+            << exit(FatalError);
+    }
+
+    return autoPtr<coordinateSystem>(cstrIter()(name, origin, cr));
 }
 
 

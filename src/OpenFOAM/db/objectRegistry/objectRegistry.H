@@ -45,7 +45,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class objectRegistry Declaration
+                           Class objectRegistry Declaration
 \*---------------------------------------------------------------------------*/
 
 class objectRegistry
@@ -63,6 +63,9 @@ class objectRegistry
 
         //- Local directory path of this objectRegistry relative to time
         fileName dbDir_;
+
+        //- Current event
+        mutable label event_;
 
 
     // Private Member Functions
@@ -87,7 +90,7 @@ public:
         explicit objectRegistry
         (
             const Time& db,
-            const label nIoObjects = 100
+            const label nIoObjects = 128
         );
 
         //- Construct a sub-registry given an IObject to describe the registry
@@ -95,7 +98,7 @@ public:
         explicit objectRegistry
         (
             const IOobject& io,
-            const label nIoObjects = 100
+            const label nIoObjects = 128
         );
 
 
@@ -151,8 +154,14 @@ public:
             template<class Type>
             const Type& lookupObject(const word& name) const;
 
+            //- Return new event number.
+            label getEvent() const;
+
 
         // Edit
+
+            //- Rename
+            virtual void rename(const word& newName);
 
             //- Add an regIOobject to registry
             bool checkIn(regIOobject&) const;

@@ -70,8 +70,8 @@ advectiveFvPatchField<Type>::advectiveFvPatchField
 )
 :
     mixedFvPatchField<Type>(p, iF),
-    phiName_(dict.lookup("phi")),
-    rhoName_("Undefined"),
+    phiName_(dict.lookupOrDefault<word>("phi", "phi")),
+    rhoName_(dict.lookupOrDefault<word>("rho", "rho")),
     fieldInf_(pTraits<Type>::zero),
     lInf_(0.0),
     inletOutlet_(dict.lookup("inletOutlet")),
@@ -93,15 +93,9 @@ advectiveFvPatchField<Type>::advectiveFvPatchField
     this->refGrad() = pTraits<Type>::zero;
     this->valueFraction() = 0.0;
 
-    if (dict.found("rho"))
-    {
-        dict.lookup("rho") >> rhoName_;
-    }
-
-    if (dict.found("lInf"))
+    if (dict.readIfPresent("lInf", lInf_))
     {
         dict.lookup("fieldInf") >> fieldInf_;
-        dict.lookup("lInf") >> lInf_;
 
         if (lInf_ < 0.0)
         {
@@ -111,8 +105,8 @@ advectiveFvPatchField<Type>::advectiveFvPatchField
                 "advectiveFvPatchField"
                 "(const fvPatch&, const Field<Type>&, const dictionary&)",
                 dict
-            )   << "unphysical lInf_ specified (lInf_ < 0)"
-                << "\n    on patch " << this->patch().name()
+            )   << "unphysical lInf specified (lInf < 0)\n"
+                << "    on patch " << this->patch().name()
                 << " of field " << this->dimensionedInternalField().name()
                 << " in file " << this->dimensionedInternalField().objectPath()
                 << exit(FatalIOError);
@@ -431,24 +425,29 @@ template<class Type>
 void advectiveFvPatchField<Type>::write(Ostream& os) const
 {
     fvPatchField<Type>::write(os);
-    os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
 
-    if (rhoName_ != "Undefined")
+    if (phiName_ != "phi")
+    {
+    os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
+    }
+    if (rhoName_ != "rho")
     {
         os.writeKeyword("rho") << rhoName_ << token::END_STATEMENT << nl;
     }
 
-    os.writeKeyword("fieldInf") << fieldInf_
-        << token::END_STATEMENT << endl;
-
-    os.writeKeyword("lInf") << lInf_
+    if (lInf_ > SMALL)
+    {
+        os.writeKeyword("fieldInf") << fieldInf_
+            << token::END_STATEMENT << nl;
+        os.writeKeyword("lInf") << lInf_
         << token::END_STATEMENT << endl;
 
     os.writeKeyword("inletOutlet") << inletOutlet_
         << token::END_STATEMENT << nl;
 
     os.writeKeyword("correctSupercritical") << correctSupercritical_
-        << token::END_STATEMENT << nl;
+            << token::END_STATEMENT << nl;
+    }
 
     this->writeEntry("value", os);
 }

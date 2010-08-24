@@ -70,8 +70,14 @@ public:
         //- Construct from IOobject
         IOPtrList(const IOobject&);
 
+        //- Construct from IOobject with given size
+        IOPtrList(const IOobject&, const label);
+
         //- Construct from IOobject and a PtrList
         IOPtrList(const IOobject&, const PtrList<T>&);
+
+        //- Construct by transferring the PtrList contents
+        IOPtrList(const IOobject&, const Xfer<PtrList<T> >&);
 
 
     // Destructor

@@ -28,22 +28,15 @@ Description
 
 #include "Dictionary.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Null constructor
 template<class T>
-Dictionary<T>::Dictionary()
+Foam::Dictionary<T>::Dictionary()
 {}
 
 
-// Copy constructor
 template<class T>
-Dictionary<T>::Dictionary(const Dictionary& dict)
+Foam::Dictionary<T>::Dictionary(const Dictionary& dict)
 :
     DictionaryBase<IDLList<T>, T>(dict)
 {}
@@ -52,10 +45,10 @@ Dictionary<T>::Dictionary(const Dictionary& dict)
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class T>
-bool Dictionary<T>::erase(const word& Keyword)
+bool Foam::Dictionary<T>::erase(const word& keyword)
 {
     T* tPtr;
-    if ((tPtr = this->remove(Keyword)))
+    if (tPtr = this->remove(keyword))
     {
         delete tPtr;
         return true;
@@ -68,7 +61,5 @@ bool Dictionary<T>::erase(const word& Keyword)
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

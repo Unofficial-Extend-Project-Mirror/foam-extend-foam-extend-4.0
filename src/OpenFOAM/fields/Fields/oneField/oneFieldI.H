@@ -33,15 +33,5 @@ inline Foam::scalar Foam::oneField::operator[](const label) const
     return scalar(1);
 }
 
-inline Foam::oneField Foam::oneField::field() const
-{
-    return oneField();
-}
-
-inline Foam::oneField Foam::oneField::oldTime() const
-{
-    return oneField();
-}
-
 
 // ************************************************************************* //

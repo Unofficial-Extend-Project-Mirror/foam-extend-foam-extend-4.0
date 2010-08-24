@@ -32,12 +32,9 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-inletOutletTotalTemperatureFvPatchScalarField::
+Foam::inletOutletTotalTemperatureFvPatchScalarField::
 inletOutletTotalTemperatureFvPatchScalarField
 (
     const fvPatch& p,
@@ -45,9 +42,9 @@ inletOutletTotalTemperatureFvPatchScalarField
 )
 :
     mixedFvPatchScalarField(p, iF),
-    UName_(),
-    phiName_(),
-    psiName_(),
+    UName_("U"),
+    phiName_("phi"),
+    psiName_("psi"),
     gamma_(0.0),
     T0_(p.size(), 0.0)
 {
@@ -57,7 +54,7 @@ inletOutletTotalTemperatureFvPatchScalarField
 }
 
 
-inletOutletTotalTemperatureFvPatchScalarField::
+Foam::inletOutletTotalTemperatureFvPatchScalarField::
 inletOutletTotalTemperatureFvPatchScalarField
 (
     const inletOutletTotalTemperatureFvPatchScalarField& ptf,
@@ -75,7 +72,7 @@ inletOutletTotalTemperatureFvPatchScalarField
 {}
 
 
-inletOutletTotalTemperatureFvPatchScalarField::
+Foam::inletOutletTotalTemperatureFvPatchScalarField::
 inletOutletTotalTemperatureFvPatchScalarField
 (
     const fvPatch& p,
@@ -84,9 +81,9 @@ inletOutletTotalTemperatureFvPatchScalarField
 )
 :
     mixedFvPatchScalarField(p, iF),
-    UName_(dict.lookup("U")),
-    phiName_(dict.lookup("phi")),
-    psiName_(dict.lookup("psi")),
+    UName_(dict.lookupOrDefault<word>("U", "U")),
+    phiName_(dict.lookupOrDefault<word>("phi", "phi")),
+    psiName_(dict.lookupOrDefault<word>("psi", "psi")),
     gamma_(readScalar(dict.lookup("gamma"))),
     T0_("T0", dict, p.size())
 {
@@ -108,7 +105,7 @@ inletOutletTotalTemperatureFvPatchScalarField
 }
 
 
-inletOutletTotalTemperatureFvPatchScalarField::
+Foam::inletOutletTotalTemperatureFvPatchScalarField::
 inletOutletTotalTemperatureFvPatchScalarField
 (
     const inletOutletTotalTemperatureFvPatchScalarField& tppsf
@@ -123,7 +120,7 @@ inletOutletTotalTemperatureFvPatchScalarField
 {}
 
 
-inletOutletTotalTemperatureFvPatchScalarField::
+Foam::inletOutletTotalTemperatureFvPatchScalarField::
 inletOutletTotalTemperatureFvPatchScalarField
 (
     const inletOutletTotalTemperatureFvPatchScalarField& tppsf,
@@ -141,7 +138,7 @@ inletOutletTotalTemperatureFvPatchScalarField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void inletOutletTotalTemperatureFvPatchScalarField::autoMap
+void Foam::inletOutletTotalTemperatureFvPatchScalarField::autoMap
 (
     const fvPatchFieldMapper& m
 )
@@ -151,7 +148,7 @@ void inletOutletTotalTemperatureFvPatchScalarField::autoMap
 }
 
 
-void inletOutletTotalTemperatureFvPatchScalarField::rmap
+void Foam::inletOutletTotalTemperatureFvPatchScalarField::rmap
 (
     const fvPatchScalarField& ptf,
     const labelList& addr
@@ -166,7 +163,7 @@ void inletOutletTotalTemperatureFvPatchScalarField::rmap
 }
 
 
-void inletOutletTotalTemperatureFvPatchScalarField::updateCoeffs()
+void Foam::inletOutletTotalTemperatureFvPatchScalarField::updateCoeffs()
 {
     if (updated())
     {
@@ -192,13 +189,23 @@ void inletOutletTotalTemperatureFvPatchScalarField::updateCoeffs()
 }
 
 
-void inletOutletTotalTemperatureFvPatchScalarField::write(Ostream& os) const
+void Foam::inletOutletTotalTemperatureFvPatchScalarField::write(Ostream& os)
+const
 {
     fvPatchScalarField::write(os);
-    os.writeKeyword("U") << UName_ << token::END_STATEMENT << nl;
-    os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
-    os.writeKeyword("psi") << psiName_ << token::END_STATEMENT << nl;
-    os.writeKeyword("gamma") << gamma_ << token::END_STATEMENT << endl;
+    if (UName_ != "U")
+    {
+        os.writeKeyword("U") << UName_ << token::END_STATEMENT << nl;
+    }
+    if (phiName_ != "phi")
+    {
+        os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
+    }
+    if (phiName_ != "psi")
+    {
+        os.writeKeyword("psi") << psiName_ << token::END_STATEMENT << nl;
+    }
+    os.writeKeyword("gamma") << gamma_ << token::END_STATEMENT << nl;
     T0_.writeEntry("T0", os);
     writeEntry("value", os);
 }
@@ -206,14 +213,13 @@ void inletOutletTotalTemperatureFvPatchScalarField::write(Ostream& os) const
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField
-(
-    fvPatchScalarField,
-    inletOutletTotalTemperatureFvPatchScalarField
-);
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
+namespace Foam
+{
+    makePatchTypeField
+    (
+        fvPatchScalarField,
+        inletOutletTotalTemperatureFvPatchScalarField
+    );
+}
 
 // ************************************************************************* //

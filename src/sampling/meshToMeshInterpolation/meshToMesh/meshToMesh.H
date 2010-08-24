@@ -40,7 +40,6 @@ SourceFiles
 #define meshtoMesh_H
 
 #include "fvMesh.H"
-#include "pointMesh.H"
 #include "HashTable.H"
 #include "fvPatchMapper.H"
 #include "scalarList.H"
@@ -80,9 +79,6 @@ class meshToMesh
 
         //- toMesh patch labels which cut the from-mesh
         HashTable<label> cuttingPatches_;
-
-        //- Point mesh used for interpolation
-        pointMesh fromPointMesh_;
 
         //- Cell addressing
         labelList cellAddressing_;

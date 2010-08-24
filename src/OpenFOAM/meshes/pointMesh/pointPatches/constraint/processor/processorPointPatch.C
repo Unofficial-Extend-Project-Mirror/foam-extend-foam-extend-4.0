@@ -236,6 +236,7 @@ void processorPointPatch::initPatchPatchPoints()
     );
 
     toNeighbProc
+        << ppmp.size()              // number of points for checking
         << patchPatchPoints
         << patchPatchPointNormals;
 
@@ -257,12 +258,32 @@ void Foam::processorPointPatch::calcPatchPatchPoints()
         neighbProcNo()
     );
 
+    label nbrNPoints(readLabel(fromNeighbProc));
     labelListList patchPatchPoints(fromNeighbProc);
     List<List<vector> > patchPatchPointNormals(fromNeighbProc);
 
     pointBoundaryMesh& pbm = const_cast<pointBoundaryMesh&>(boundaryMesh());
-
     const labelList& ppmp = meshPoints();
+
+    // Simple check for the very rare situation when not the same number
+    // of points on both sides. This can happen with decomposed cyclics.
+    // If on one side the cyclic shares a point with proc faces coming from
+    // internal faces it will have a different number of points from
+    // the situation where the cyclic and the 'normal' proc faces are fully
+    // separate.
+    if (nbrNPoints != ppmp.size())
+    {
+        WarningIn("processorPointPatch::calcPatchPatchPoints()")
+            << "Processor patch " << name()
+            << " has " << ppmp.size() << " points; coupled patch has "
+            << nbrNPoints << " points." << endl
+            << "   (usually due to decomposed cyclics)."
+            << " This might give problems" << endl
+            << "    when using point fields (interpolation, mesh motion)."
+            << endl;
+    }
+
+
 
     // Loop over the patches looking for other patches that share points
     forAll(patchPatchPoints, patchi)

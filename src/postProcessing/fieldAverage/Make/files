@@ -1,6 +1,0 @@
-fieldAverage/fieldAverage.C
-fieldAverageItem/fieldAverageItem.C
-fieldAverageItem/fieldAverageItemIO.C
-fieldAverageFunctionObject/fieldAverageFunctionObject.C
-
-LIB = $(FOAM_LIBBIN)/libfieldAverage

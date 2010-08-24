@@ -31,7 +31,6 @@ Description
 #include "labelPairLookup.H"
 #include "OFstream.H"
 #include "HashSet.H"
-#include "labelHashSet.H"
 #include "triSurface.H"
 #include "pointIndexHit.H"
 #include "octreeDataTriSurface.H"
@@ -292,7 +291,7 @@ void Foam::surfaceIntersection::writeIntersectedEdges
     {
         const labelList& extraVerts = edgeCutVerts[edgeI];
 
-        if (extraVerts.size() != 0)
+        if (extraVerts.size())
         {
             const edge& e = surf.edges()[edgeI];
 

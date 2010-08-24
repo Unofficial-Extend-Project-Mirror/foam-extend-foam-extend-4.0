@@ -51,9 +51,10 @@ public:
         enum
         {
             dim = 3,         // Dimensionality of space
-            rank = 0,        // Rank od Scalar is 0
+            rank = 0,        // Rank of Scalar is 0
             nComponents = 1  // Number of components in Scalar is 1
         };
+
 
     // Static data members
 
@@ -61,15 +62,30 @@ public:
         static const char* componentNames[];
         static const Scalar zero;
         static const Scalar one;
+        static const Scalar max;
+        static const Scalar min;
+
 
     // Constructors
 
-        //- Construct from Istream
-        pTraits(Istream& is);
+        //- Construct from Scalar
+        pTraits(const Scalar s)
+        {
+            p_ = s;
+        }
 
-    // Member Functions
+        //- Construct from Istream
+        pTraits(Istream&);
+
+
+    // Member operators
 
         operator Scalar() const
+        {
+            return p_;
+        }
+
+        operator Scalar&()
         {
             return p_;
         }
@@ -78,8 +94,8 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Return a string representation of a Scalar
-word name(const Scalar s);
+//- Return a string representation of a Scalar
+word name(const Scalar);
 
 
 inline Scalar& setComponent(Scalar& s, const direction)
@@ -192,12 +208,6 @@ inline Scalar cmptDivide(const Scalar s1, const Scalar s2)
     return s1/s2;
 }
 
-inline Scalar cmptSumMultiply(const Scalar s1, const Scalar s2)
-{
-    return s1*s2;
-}
-
-
 inline Scalar cmptMax(const Scalar s)
 {
     return s;
@@ -265,27 +275,9 @@ inline Scalar stabilise(const Scalar s, const Scalar small)
 }
 
 
-inline Scalar cmptStabilise
-(
-    const Scalar s,
-    const Scalar small,
-    const Scalar value
-)
-{
-    if (mag(s) < small)
-    {
-        return sign(s)*value;
-    }
-    else
-    {
-        return s;
-    }
-}
-
-
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
-Scalar readScalar(Istream& is);
+Scalar readScalar(Istream&);
 Istream& operator>>(Istream&, Scalar&);
 Ostream& operator<<(Ostream&, const Scalar);
 

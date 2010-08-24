@@ -32,31 +32,26 @@ Description
 #include "specieThermo.H"
 #include "IOstreams.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 /* * * * * * * * * * * * * * * Private static data * * * * * * * * * * * * * */
 
 template<class thermo>
-const scalar specieThermo<thermo>::tol_
+const Foam::scalar Foam::specieThermo<thermo>::tol_
 (
-    debug::tolerances("cyclicMatchTol", 1e-4)
+    debug::tolerances("speciesThermoTol", 1e-4)
 );
 
 
 template<class thermo>
 const int specieThermo<thermo>::maxIter_
 (
-    debug::optimisationSwitch("cyclicMatchTol", 100)
+    debug::optimisationSwitch("speciesThermoMaxIter", 100)
 );
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class thermo>
-specieThermo<thermo>::specieThermo(Istream& is)
+Foam::specieThermo<thermo>::specieThermo(Istream& is)
 :
     thermo(is)
 {
@@ -67,7 +62,7 @@ specieThermo<thermo>::specieThermo(Istream& is)
 // * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
 
 template<class thermo>
-Ostream& operator<<(Ostream& os, const specieThermo<thermo>& st)
+Foam::Ostream& Foam::operator<<(Ostream& os, const specieThermo<thermo>& st)
 {
     os  << static_cast<const thermo&>(st);
 
@@ -75,9 +70,5 @@ Ostream& operator<<(Ostream& os, const specieThermo<thermo>& st)
     return os;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

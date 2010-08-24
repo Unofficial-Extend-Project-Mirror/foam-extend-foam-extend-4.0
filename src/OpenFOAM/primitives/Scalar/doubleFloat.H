@@ -22,16 +22,13 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Typedef
-    Foam::double and float
-
 \*---------------------------------------------------------------------------*/
 
 #ifndef doubleFloat_H
 #define doubleFloat_H
 
-#include "products.H"
 #include "label.H"
+#include "products.H"
 
 #include <cmath>
 

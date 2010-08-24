@@ -59,21 +59,22 @@ bool Foam::primitiveMesh::checkPointNearness
 
             if (magSqr(points[pti] - points[prevPtI]) < reportDistSqr)
             {
-                // Check if unconnected.
-                const labelList& pEdges = pointEdges()[pti];
-
-                bool connected = false;
-
-                forAll(pEdges, pEdgei)
-                {
-                    if (edges()[pEdges[pEdgei]].otherVertex(prevPtI) != -1)
-                    {
-                        connected = true;
-                        break;
-                    }
-                }
-
-                if (!connected)
+                // Commented out in 1.6.x.  HJ, 17/Aug/2010
+                //// Check if unconnected.
+                //const labelList& pEdges = pointEdges()[pti];
+                //
+                //bool connected = false;
+                //
+                //forAll(pEdges, pEdgei)
+                //{
+                //    if (edges()[pEdges[pEdgei]].otherVertex(prevPtI) != -1)
+                //    {
+                //        connected = true;
+                //        break;
+                //    }
+                //}
+                //
+                //if (!connected)
                 {
                     nClose++;
 

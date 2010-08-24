@@ -29,14 +29,10 @@ License
 #include "Time.H"
 #include "PstreamReduceOps.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Istream& regIOobject::readStream()
+Foam::Istream& Foam::regIOobject::readStream()
 {
     if (IFstream::debug)
     {
@@ -48,7 +44,7 @@ Istream& regIOobject::readStream()
 
     if (readOpt() == NO_READ)
     {
-        FatalErrorIn("regIOobject::readStream(const word&)")
+        FatalErrorIn("regIOobject::readStream()")
             << "NO_READ specified for read-constructor of object " << name()
             << " of class " << headerClassName()
             << abort(FatalError);
@@ -61,7 +57,7 @@ Istream& regIOobject::readStream()
         {
             FatalIOError
             (
-                "regIOobject::readStream(const word&)",
+                "regIOobject::readStream()",
                 __FILE__,
                 __LINE__,
                 objectPath(),
@@ -71,7 +67,7 @@ Istream& regIOobject::readStream()
         }
         else if (!readHeader(*isPtr_))
         {
-            FatalIOErrorIn("regIOobject::readStream(const word&)", *isPtr_)
+            FatalIOErrorIn("regIOobject::readStream()", *isPtr_)
                 << "problem while reading header for object " << name()
                 << exit(FatalIOError);
         }
@@ -86,7 +82,7 @@ Istream& regIOobject::readStream()
 }
 
 
-Istream& regIOobject::readStream(const word& aType)
+Foam::Istream& Foam::regIOobject::readStream(const word& expectName)
 {
     if (IFstream::debug)
     {
@@ -106,14 +102,14 @@ Istream& regIOobject::readStream(const word& aType)
         // instantiated is a dictionary
         if
         (
-            aType != word::null
-         && headerClassName() != aType
+            expectName.size()
+         && headerClassName() != expectName
          && headerClassName() != "dictionary"
         )
         {
             FatalIOErrorIn("regIOobject::readStream(const word&)", *isPtr_)
                 << "unexpected class name " << headerClassName()
-                << " expected " << aType << endl
+                << " expected " << expectName << endl
                 << "    while reading object " << name()
                 << exit(FatalIOError);
         }
@@ -123,7 +119,7 @@ Istream& regIOobject::readStream(const word& aType)
 }
 
 
-void regIOobject::close()
+void Foam::regIOobject::close()
 {
     if (IFstream::debug)
     {
@@ -140,13 +136,13 @@ void regIOobject::close()
 }
 
 
-bool regIOobject::readData(Istream&)
+bool Foam::regIOobject::readData(Istream&)
 {
     return false;
 }
 
 
-bool regIOobject::read()
+bool Foam::regIOobject::read()
 {
     bool ok = readData(readStream(type()));
     close();
@@ -154,7 +150,7 @@ bool regIOobject::read()
 }
 
 
-bool regIOobject::modified() const
+bool Foam::regIOobject::modified() const
 {
     return
     (
@@ -164,7 +160,7 @@ bool regIOobject::modified() const
 }
 
 
-bool regIOobject::readIfModified()
+bool Foam::regIOobject::readIfModified()
 {
     if (lastModified_)
     {
@@ -212,9 +208,5 @@ bool regIOobject::readIfModified()
     }
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

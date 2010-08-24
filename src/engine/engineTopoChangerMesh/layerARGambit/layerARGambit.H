@@ -1,35 +1,28 @@
-// The FOAM Project // File: layerARGambit.H
-/*
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
- =========         | Class Interface
- \\      /         |
-  \\    /          | Name:   layerARGambit
-   \\  /           | Family: engine
-    \\/            |
-    F ield         | FOAM version: 2.3
-    O peration     |
-    A and          | Copyright (C) 1991-2004 Nabla Ltd.
-    M anipulation  |          All Rights Reserved.
--------------------------------------------------------------------------------
-CLASS
-    layerARGambit
+License
+    This file is part of OpenFOAM.
 
-DESCRIPTION
-    Engine mesh class with dynamic layering on the piston patch. It can be used 
-    also with *.neu or *.msh files, since it creates the pistonLayer faces 
-    differently.
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
 
-C++
-    listOfSourceFiles
-        addlayerARGambitModifiers.C
-        layerARGambit.C
-    endListOfSourceFiles
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
-AUTHOR
-	Tommaso Lucchini
-	
-*/
-// ------------------------------------------------------------------------- //
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+\*---------------------------------------------------------------------------*/
 
 #ifndef layerARGambit_H
 #define layerARGambit_H

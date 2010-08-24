@@ -81,7 +81,7 @@ void meshToMesh::calcAddressing()
     {
         // get reference to cells next to the boundary
         const unallocLabelList& bCells = patchesFrom[patchI].faceCells();
-        
+
         forAll (bCells, faceI)
         {
             boundaryCell[bCells[faceI]] = true;
@@ -160,7 +160,7 @@ void meshToMesh::calcAddressing()
                 fromMeshPatches_.find(patchMap_.find(toPatch.name())())()
             ];
 
-            if (fromPatch.size() == 0)
+            if (fromPatch.empty())
             {
                 WarningIn("meshToMesh::calcAddressing()")
                     << "Source patch " << fromPatch.name()
@@ -171,7 +171,7 @@ void meshToMesh::calcAddressing()
             else
             {
                 treeBoundBox wallBb(fromPatch.localPoints());
-                scalar typDim = 
+                scalar typDim =
                     wallBb.avgDim()/(2.0*sqrt(scalar(fromPatch.size())));
 
                 treeBoundBox shiftedBb
@@ -193,7 +193,7 @@ void meshToMesh::calcAddressing()
                 );
 
 
-                const vectorField::subField centresToBoundary = 
+                const vectorField::subField centresToBoundary =
                     toPatch.faceCentres();
 
                 boundaryAddressing_[patchi].setSize(toPatch.size());
@@ -268,7 +268,7 @@ void meshToMesh::cellAddresses
 
             forAll (neighbours, nI)
             {
-                scalar curDistSqr = 
+                scalar curDistSqr =
                     magSqr(p - centresFrom[neighbours[nI]]);
 
                 // search through all the neighbours.

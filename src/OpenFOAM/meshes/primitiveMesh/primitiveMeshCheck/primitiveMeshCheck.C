@@ -30,39 +30,35 @@ License
 #include "mathematicalConstants.H"
 #include "SortableList.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-scalar primitiveMesh::closedThreshold_
+Foam::scalar Foam::primitiveMesh::closedThreshold_
 (
     debug::tolerances("primitiveMeshClosedThreshold", 1e-6)
 );
 
-scalar primitiveMesh::aspectThreshold_
+Foam::scalar Foam::primitiveMesh::aspectThreshold_
 (
     debug::tolerances("primitiveMeshAspectThreshold", 1000)
 );
 
-scalar primitiveMesh::nonOrthThreshold_ // deg
+Foam::scalar Foam::primitiveMesh::nonOrthThreshold_ // deg
 (
     debug::tolerances("primitiveMeshNonOrthThreshold", 70)
 );
 
-scalar primitiveMesh::skewThreshold_
+Foam::scalar Foam::primitiveMesh::skewThreshold_
 (
     debug::tolerances("primitiveMeshSkewThreshold", 4)
 );
 
-scalar primitiveMesh::faceAngleThreshold_
+Foam::scalar Foam::primitiveMesh::faceAngleThreshold_
 (
     debug::tolerances("primitiveMeshFaceAngleThreshold", 10)
 );
 
-scalar primitiveMesh::faceFlatnessThreshold_
+Foam::scalar Foam::primitiveMesh::faceFlatnessThreshold_
 (
     debug::tolerances("primitiveMeshFaceFlatnessThreshold", 0.8)
 );
@@ -70,7 +66,7 @@ scalar primitiveMesh::faceFlatnessThreshold_
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-bool primitiveMesh::checkClosedBoundary(const bool report) const
+bool Foam::primitiveMesh::checkClosedBoundary(const bool report) const
 {
     if (debug)
     {
@@ -125,7 +121,7 @@ bool primitiveMesh::checkClosedBoundary(const bool report) const
 }
 
 
-bool primitiveMesh::checkClosedCells
+bool Foam::primitiveMesh::checkClosedCells
 (
     const bool report,
     labelHashSet* setPtr,
@@ -297,7 +293,7 @@ bool primitiveMesh::checkClosedCells
 }
 
 
-bool primitiveMesh::checkFaceAreas
+bool Foam::primitiveMesh::checkFaceAreas
 (
     const bool report,
     labelHashSet* setPtr
@@ -356,7 +352,7 @@ bool primitiveMesh::checkFaceAreas
 }
 
 
-bool primitiveMesh::checkCellVolumes
+bool Foam::primitiveMesh::checkCellVolumes
 (
     const bool report,
     labelHashSet* setPtr
@@ -423,7 +419,7 @@ bool primitiveMesh::checkCellVolumes
 }
 
 
-bool primitiveMesh::checkFaceOrthogonality
+bool Foam::primitiveMesh::checkFaceOrthogonality
 (
     const bool report,
     labelHashSet* setPtr
@@ -544,7 +540,7 @@ bool primitiveMesh::checkFaceOrthogonality
 }
 
 
-bool primitiveMesh::checkFacePyramids
+bool Foam::primitiveMesh::checkFacePyramids
 (
     const bool report,
     const scalar minPyrVol,
@@ -628,7 +624,7 @@ bool primitiveMesh::checkFacePyramids
 }
 
 
-bool primitiveMesh::checkFaceSkewness
+bool Foam::primitiveMesh::checkFaceSkewness
 (
     const bool report,
     labelHashSet* setPtr
@@ -774,7 +770,7 @@ bool primitiveMesh::checkFaceSkewness
 }
 
 
-bool primitiveMesh::checkPoints
+bool Foam::primitiveMesh::checkPoints
 (
     const bool report,
     labelHashSet* setPtr
@@ -794,7 +790,7 @@ bool primitiveMesh::checkPoints
 
     forAll (pf, pointI)
     {
-        if (pf[pointI].size() == 0)
+        if (pf[pointI].empty())
         {
             if (setPtr)
             {
@@ -805,11 +801,12 @@ bool primitiveMesh::checkPoints
         }
     }
 
-    const labelListList& pc = pointCells();
 
-    forAll (pc, pointI)
+    forAll (pf, pointI)
     {
-        if (pc[pointI].size() == 0)
+        const labelList& pc = pointCells(pointI);
+
+        if (pc.empty())
         {
             if (setPtr)
             {
@@ -851,7 +848,7 @@ bool primitiveMesh::checkPoints
 // E.g. maxDeg = 10 allows for angles < 190 (or 10 degrees concavity)
 // (if truly concave and points not visible from face centre the face-pyramid
 //  check in checkMesh will fail)
-bool primitiveMesh::checkFaceAngles
+bool Foam::primitiveMesh::checkFaceAngles
 (
     const bool report,
     labelHashSet* setPtr
@@ -900,7 +897,7 @@ bool primitiveMesh::checkFaceAngles
         forAll(f, fp0)
         {
             // Get vertex after fp
-            label fp1 = (fp0 + 1) % f.size();
+            label fp1 = f.fcIndex(fp0);
 
             // Normalized vector between two consecutive points
             vector e10(p[f[fp1]] - p[f[fp0]]);
@@ -979,7 +976,7 @@ bool primitiveMesh::checkFaceAngles
 // Check warpage of faces. Is calculated as the difference between areas of
 // individual triangles and the overall area of the face (which ifself is
 // is the average of the areas of the individual triangles).
-bool primitiveMesh::checkFaceFlatness
+bool Foam::primitiveMesh::checkFaceFlatness
 (
     const bool report,
     labelHashSet* setPtr
@@ -1109,7 +1106,7 @@ bool primitiveMesh::checkFaceFlatness
 // - are only in a singe non-empty direction.
 // Empty direction info is passed in as a vector of labels (synchronised)
 // which are 1 if the direction is non-empty, 0 if it is.
-bool primitiveMesh::checkEdgeAlignment
+bool Foam::primitiveMesh::checkEdgeAlignment
 (
     const bool report,
     const Vector<label>& directions,
@@ -1244,7 +1241,7 @@ bool primitiveMesh::checkEdgeAlignment
 }
 
 
-bool primitiveMesh::checkUpperTriangular
+bool Foam::primitiveMesh::checkUpperTriangular
 (
     const bool report,
     labelHashSet* setPtr
@@ -1408,7 +1405,7 @@ bool primitiveMesh::checkUpperTriangular
 }
 
 
-bool primitiveMesh::checkCellsZipUp
+bool Foam::primitiveMesh::checkCellsZipUp
 (
     const bool report,
     labelHashSet* setPtr
@@ -1509,7 +1506,7 @@ bool primitiveMesh::checkCellsZipUp
 
 
 // Vertices of face within point range and unique.
-bool primitiveMesh::checkFaceVertices
+bool Foam::primitiveMesh::checkFaceVertices
 (
     const bool report,
     labelHashSet* setPtr
@@ -1585,7 +1582,7 @@ bool primitiveMesh::checkFaceVertices
 
 
 // Check if all points on face are shared between faces.
-bool primitiveMesh::checkDuplicateFaces
+bool Foam::primitiveMesh::checkDuplicateFaces
 (
     const label faceI,
     const Map<label>& nCommonPoints,
@@ -1627,7 +1624,7 @@ bool primitiveMesh::checkDuplicateFaces
 
 
 // Check that shared points are in consecutive order.
-bool primitiveMesh::checkCommonOrder
+bool Foam::primitiveMesh::checkCommonOrder
 (
     const label faceI,
     const Map<label>& nCommonPoints,
@@ -1668,12 +1665,12 @@ bool primitiveMesh::checkCommonOrder
 
 
                     // Vertices before and after on curFace
-                    label fpPlus1 = (fp+1) % curFace.size();
-                    label fpMin1 = (fp == 0 ? curFace.size()-1 : fp-1);
+                    label fpPlus1 = curFace.fcIndex(fp);
+                    label fpMin1  = curFace.rcIndex(fp);
 
                     // Vertices before and after on nbFace
-                    label nbPlus1 = (nb+1) % nbFace.size();
-                    label nbMin1 = (nb == 0 ? nbFace.size()-1 : nb-1);
+                    label nbPlus1 = nbFace.fcIndex(nb);
+                    label nbMin1  = nbFace.rcIndex(nb);
 
                     // Find order of walking by comparing next points on both
                     // faces.
@@ -1790,7 +1787,7 @@ bool primitiveMesh::checkCommonOrder
 
 // Checks common vertices between faces. If more than 2 they should be
 // consecutive on both faces.
-bool primitiveMesh::checkFaceFaces
+bool Foam::primitiveMesh::checkFaceFaces
 (
     const bool report,
     labelHashSet* setPtr
@@ -1900,7 +1897,7 @@ bool primitiveMesh::checkFaceFaces
 
 
 // Checks cells with 1 or less internal faces. Give numerical problems.
-bool primitiveMesh::checkCellDeterminant
+bool Foam::primitiveMesh::checkCellDeterminant
 (
     const bool report,    // report,
     labelHashSet* setPtr  // setPtr
@@ -2022,7 +2019,7 @@ bool primitiveMesh::checkCellDeterminant
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-bool primitiveMesh::checkTopology(const bool report) const
+bool Foam::primitiveMesh::checkTopology(const bool report) const
 {
     label noFailedChecks = 0;
 
@@ -2055,7 +2052,7 @@ bool primitiveMesh::checkTopology(const bool report) const
 }
 
 
-bool primitiveMesh::checkGeometry(const bool report) const
+bool Foam::primitiveMesh::checkGeometry(const bool report) const
 {
     label noFailedChecks = 0;
 
@@ -2088,7 +2085,7 @@ bool primitiveMesh::checkGeometry(const bool report) const
 }
 
 
-bool primitiveMesh::checkMesh(const bool report) const
+bool Foam::primitiveMesh::checkMesh(const bool report) const
 {
     if (debug)
     {
@@ -2120,44 +2117,7 @@ bool primitiveMesh::checkMesh(const bool report) const
 }
 
 
-scalar primitiveMesh::setClosedThreshold(const scalar ct)
-{
-    scalar oldClosedThreshold = closedThreshold_;
-    closedThreshold_ = ct;
-
-    return oldClosedThreshold;
-}
-
-
-scalar primitiveMesh::setAspectThreshold(const scalar at)
-{
-    scalar oldAspectThreshold = aspectThreshold_;
-    aspectThreshold_ = at;
-
-    return oldAspectThreshold;
-}
-
-
-scalar primitiveMesh::setNonOrthThreshold(const scalar nt)
-{
-    scalar oldNonOrthThreshold = nonOrthThreshold_;
-    nonOrthThreshold_ = nt;
-
-    return oldNonOrthThreshold;
-}
-
-
-scalar primitiveMesh::setSkewThreshold(const scalar st)
-{
-    scalar oldSkewThreshold = skewThreshold_;
-    skewThreshold_ = st;
-
-    return oldSkewThreshold;
-}
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace Foam
 
 // ************************************************************************* //

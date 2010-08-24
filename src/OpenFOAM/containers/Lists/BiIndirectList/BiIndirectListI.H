@@ -31,7 +31,7 @@ inline Foam::BiIndirectList<T>::BiIndirectList
 (
     const UList<T>& posList,
     const UList<T>& negList,
-    const List<label>& addr
+    const UList<label>& addr
 )
 :
     posList_(const_cast<UList<T>&>(posList)),
@@ -46,6 +46,13 @@ template<class T>
 inline Foam::label Foam::BiIndirectList<T>::size() const
 {
     return addressing_.size();
+}
+
+
+template<class T>
+inline bool Foam::BiIndirectList<T>::empty() const
+{
+    return addressing_.empty();
 }
 
 

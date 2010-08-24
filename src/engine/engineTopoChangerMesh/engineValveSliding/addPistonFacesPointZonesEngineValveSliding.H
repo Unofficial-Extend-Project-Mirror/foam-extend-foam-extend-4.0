@@ -1,37 +1,34 @@
-
-    // Add the piston points zone
-    if (piston().patchID().active())
-    {
+// Add the piston points zone
+if (piston().patchID().active())
+{
 /*
-        pointSet movingPistonPoints(*this, piston().pistonPointSetName());
+    pointSet movingPistonPoints(*this, piston().pistonPointSetName());
 
-        pz.append
+    pz.append
+    (
+        new pointZone
         (
-            new pointZone
-            (
-                "movingPistonPoints",
-                movingPistonPoints.toc(),
-                nPointZones,
-                pointZones()
-            )
-        );
-        
-        nPointZones++;        
+            "movingPistonPoints",
+            movingPistonPoints.toc(),
+            nPointZones,
+            pointZones()
+        )
+    );
+    nPointZones++;
 */
 
-        cellSet movingPistonCells(*this, piston().pistonCellSetName());
+    cellSet movingPistonCells(*this, piston().pistonCellSetName());
 
-        cz.append
+    cz.append
+    (
+        new cellZone
         (
-            new cellZone
-            (
-                "movingPistonCells",
-                movingPistonCells.toc(),
-                nCellZones,
-                cellZones()
-            )
-        );
-        
-        nCellZones++;        
-               
-    }
+            "movingPistonCells",
+            movingPistonCells.toc(),
+            nCellZones,
+            cellZones()
+        )
+    );
+
+    nCellZones++;
+}

@@ -37,23 +37,33 @@ SourceFiles
 
 #include "Field.H"
 #include "typeInfo.H"
-#include "runTimeSelectionTables.H"
 #include "autoPtr.H"
 #include "pointField.H"
 #include "faceList.H"
+#include "fileName.H"
+
+#include "runTimeSelectionTables.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+
+template<class Type> class surfaceWriter;
+template<class Type> class nullSurfaceWriter;
+template<class Type> class proxySurfaceWriter;
+
 /*---------------------------------------------------------------------------*\
-                           Class surfaceWriter Declaration
+                        Class surfaceWriter Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
 class surfaceWriter
 {
+    //- friendship between writer data types
+    template<class Type2> friend class surfaceWriter;
 
 public:
 
@@ -91,12 +101,30 @@ public:
 
     // Member Functions
 
+        //- Return true if the surface format supports separate files
+        virtual bool separateFiles()
+        {
+            return false;
+        }
+
+
+        //- Writes single surface geometry to file.
+        virtual void write
+        (
+            const fileName& outputDir,      // <root>/<case>/surface/TIME
+            const fileName& surfaceName,    // name of surface
+            const pointField& points,
+            const faceList& faces,
+            const bool verbose = false
+        ) const
+        {}
+
+
         //- Writes single surface to file. Either one value per vertex or
         //  one value per face (detected by values.size()==faces.size())
         virtual void write
         (
-            const fileName& samplePath,     // <root>/<case>/sampleSurfaces
-            const fileName& timeDir,        // time directory
+            const fileName& outputDir,      // <root>/<case>/surface/TIME
             const fileName& surfaceName,    // name of surface
             const pointField& points,
             const faceList& faces,
@@ -116,41 +144,6 @@ public:
 #ifdef NoRepository
 #   include "surfaceWriter.C"
 #endif
-
-// Only used internally
-#define makeTypeSurfaceWritersTypeName(type)                                 \
-                                                                             \
-defineNamedTemplateTypeNameAndDebug(type, 0);
-
-// Used externally sometimes
-#define makeSurfaceWritersTypeName(typeWriter)                               \
-                                                                             \
-makeTypeSurfaceWritersTypeName(typeWriter##ScalarWriter);                    \
-makeTypeSurfaceWritersTypeName(typeWriter##VectorWriter);                    \
-makeTypeSurfaceWritersTypeName(typeWriter##SphericalTensorWriter);           \
-makeTypeSurfaceWritersTypeName(typeWriter##SymmTensorWriter);                \
-makeTypeSurfaceWritersTypeName(typeWriter##TensorWriter);
-
-// Define type info for single template instantiation (e.g. vector)
-#define makeSurfaceWriterTypes(WriterType, type)                             \
-                                                                             \
-defineNamedTemplateTypeNameAndDebug(type, 0);                                \
-                                                                             \
-addToRunTimeSelectionTable                                                   \
-(                                                                            \
-    WriterType, type, word                                                   \
-);
-
-
-// Define type info info for scalar, vector etc. instantiations
-#define makeSurfaceWriters(typeWriter)                                       \
-                                                                             \
-makeSurfaceWriterTypes(scalarWriter, typeWriter##ScalarWriter);              \
-makeSurfaceWriterTypes(vectorWriter, typeWriter##VectorWriter);              \
-makeSurfaceWriterTypes(sphericalTensorWriter, typeWriter##SphericalTensorWriter);\
-makeSurfaceWriterTypes(symmTensorWriter, typeWriter##SymmTensorWriter);      \
-makeSurfaceWriterTypes(tensorWriter, typeWriter##TensorWriter);
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -159,7 +159,7 @@ inline septernion inv(const septernion& tr);
 word name(const septernion&);
 
 
-//- Specify data associated with septernion type is contiguous
+//- Data associated with septernion type are contiguous
 template<>
 inline bool contiguous<septernion>() {return true;}
 

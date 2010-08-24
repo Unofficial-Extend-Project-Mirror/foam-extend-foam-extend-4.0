@@ -86,26 +86,9 @@ public:
     // Constructors
 
         //- Construct null
-        C8H10()
-        :
-            liquid(106.167, 617.17, 3.6094e+6, 0.37381, 0.263, 178.15, 4.038e-3, 409.35, 1.9680e-30, 0.3036, 1.8043e+4),
-            rho_(76.3765398, 0.26438, 617.17, 0.2921),
-            pv_(88.246, -7691.1, -9.797, 5.931e-06, 2),
-            hl_(617.17, 516167.924119547, 0.3882, 0, 0, 0),
-            cp_(818.521762883005, 6.66873887366131, -0.0248005500767658, 4.23860521631015e-05, 0, 0),
-            // NN: enthalpy, h_, is not used in the sprayModel.
-            // For consistency, the enthalpy is derived from hlat and hl.
-            // It is, however, convenient to have it available.
-            h_(-524002.612929508, 818.521762883005, 3.33436943683065, -0.00826685002558862, 1.05965130407754e-05, 0),
-            cpg_(738.835984816374, 3201.5598067196, 1559, 2285.07916772632, -702),
-            B_(0.00165776559571242, -2.77958310962917, -388067.855359952, -5.86905535618412e+18, 1.58052878954854e+21),
-            mu_(-10.452, 1048.4, -0.0715, 0, 0),
-            mug_(1.2e-06, 0.4518, 439, 0),
-            K_(0.20149, -0.00023988, 0, 0, 0, 0),
-            Kg_(1.708e-05, 1.319, 565.6, 0),
-            sigma_(617.17, 0.066, 1.268, 0, 0, 0),
-            D_(147.18, 20.1, 106.167, 28) // NN: Same as nHeptane
-        {}
+        C8H10();
+
+        // Construct from components
         C8H10
         (
             const liquid& l,
@@ -122,124 +105,58 @@ public:
             const NSRDSfunc2& vapourThermalConductivity,
             const NSRDSfunc6& surfaceTension,
             const APIdiffCoefFunc& vapourDiffussivity
-        )
-        :
-            liquid(l),
-            rho_(density),
-            pv_(vapourPressure),
-            hl_(heatOfVapourisation),
-            cp_(heatCapacity),
-            h_(enthalpy),
-            cpg_(idealGasHeatCapacity),
-            B_(secondVirialCoeff),
-            mu_(dynamicViscosity),
-            mug_(vapourDynamicViscosity),
-            K_(thermalConductivity),
-            Kg_(vapourThermalConductivity),
-            sigma_(surfaceTension),
-            D_(vapourDiffussivity)
-        {}
+        );
 
         //- Construct from Istream
-        C8H10(Istream& is)
-        :
-            liquid(is),
-            rho_(is),
-            pv_(is),
-            hl_(is),
-            cp_(is),
-            h_(is),
-            cpg_(is),
-            B_(is),
-            mu_(is),
-            mug_(is),
-            K_(is),
-            Kg_(is),
-            sigma_(is),
-            D_(is)
-        {}
+        C8H10(Istream& is);
 
 
     // Member Functions
 
         //- Liquid density [kg/m^3]
-        scalar rho(scalar p, scalar T) const
-        {
-            return rho_.f(p, T);
-        }
+        inline scalar rho(scalar p, scalar T) const;
 
         //- Vapour pressure [Pa]
-        scalar pv(scalar p, scalar T) const
-        {
-            return pv_.f(p, T);
-        }
+        inline scalar pv(scalar p, scalar T) const;
 
         //- Heat of vapourisation [J/kg]
-        scalar hl(scalar p, scalar T) const
-        {
-            return hl_.f(p, T);
-        }
+        inline scalar hl(scalar p, scalar T) const;
 
         //- Liquid heat capacity [J/(kg K)]
-        scalar cp(scalar p, scalar T) const
-        {
-            return cp_.f(p, T);
-        }
+        inline scalar cp(scalar p, scalar T) const;
 
         //- Liquid Enthalpy [J/(kg)]
-        scalar h(scalar p, scalar T) const
-        {
-            return h_.f(p, T);
-        }
+        inline scalar h(scalar p, scalar T) const;
 
         //- Ideal gas heat capacity [J/(kg K)]
-        scalar cpg(scalar p, scalar T) const
-        {
-            return cpg_.f(p, T);
-        }
+        inline scalar cpg(scalar p, scalar T) const;
 
         //- Second Virial Coefficient [m^3/kg]
-        scalar B(scalar p, scalar T) const
-        {
-            return B_.f(p, T);
-        }
+        inline scalar B(scalar p, scalar T) const;
 
         //- Liquid viscosity [Pa s]
-        scalar mu(scalar p, scalar T) const
-        {
-            return mu_.f(p, T);
-        }
+        inline scalar mu(scalar p, scalar T) const;
 
         //- Vapour viscosity [Pa s]
-        scalar mug(scalar p, scalar T) const
-        {
-            return mug_.f(p, T);
-        }
+        inline scalar mug(scalar p, scalar T) const;
 
         //- Liquid thermal conductivity  [W/(m K)]
-        scalar K(scalar p, scalar T) const
-        {
-            return K_.f(p, T);
-        }
+        inline scalar K(scalar p, scalar T) const;
 
         //- Vapour thermal conductivity  [W/(m K)]
-        scalar Kg(scalar p, scalar T) const
-        {
-            return Kg_.f(p, T);
-        }
+        inline scalar Kg(scalar p, scalar T) const;
 
         //- Surface tension [N/m]
-        scalar sigma(scalar p, scalar T) const
-        {
-            return sigma_.f(p, T);
-        }
+        inline scalar sigma(scalar p, scalar T) const;
 
         //- Vapour diffussivity [m2/s]
-        scalar D(scalar p, scalar T) const
-        {
-            return D_.f(p, T);
-        }
+        inline scalar D(scalar p, scalar T) const;
 
+        //- Vapour diffussivity [m2/s] with specified binary pair
+        inline scalar D(scalar p, scalar T, scalar Wb) const;
+
+
+    // I-O
 
         //- Write the function coefficients
         void writeData(Ostream& os) const
@@ -259,9 +176,7 @@ public:
             D_.writeData(os); os << endl;
         }
 
-
-    // Ostream Operator
-
+        //- Ostream Operator
         friend Ostream& operator<<(Ostream& os, const C8H10& l)
         {
             l.writeData(os);
@@ -273,6 +188,10 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "C8H10I.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

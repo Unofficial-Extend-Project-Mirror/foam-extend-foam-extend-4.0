@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    KRR4
+    Foam::KRR4
 
 Description
     Fourth-order Kaps-Rentrop scheme with adjustive time-step size
@@ -63,8 +63,8 @@ class KRR4
         mutable scalarField g4_;
         mutable scalarField yErr_;
         mutable scalarField dfdx_;
-        mutable Matrix<scalar> dfdy_;
-        mutable Matrix<scalar> a_;
+        mutable scalarSquareMatrix dfdy_;
+        mutable scalarSquareMatrix a_;
         mutable labelList pivotIndices_;
 
         static const int maxtry = 40;

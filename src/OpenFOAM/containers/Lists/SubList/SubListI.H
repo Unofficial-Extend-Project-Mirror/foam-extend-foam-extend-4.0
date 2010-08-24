@@ -53,9 +53,9 @@ inline Foam::SubList<T>::SubList
 {
 #   ifdef FULLDEBUG
 
-    // Artificially allowing the start of a zero-sized subList to be
-    // one past the end of the original list.  
-    if (subSize > 0)
+    // Artificially allow the start of a zero-sized subList to be
+    // one past the end of the original list.
+    if (subSize)
     {
         list.checkStart(startIndex);
         list.checkSize(startIndex + subSize);
@@ -73,54 +73,9 @@ inline Foam::SubList<T>::SubList
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class T>
-inline void Foam::SubList<T>::reset
-(
-    const UList<T>& list,
-    const label subSize
-)
+inline const Foam::SubList<T>& Foam::SubList<T>::null()
 {
-    UList<T>::reset(list.v_, subSize);
-
-#   ifdef FULLDEBUG
-    list.checkSize(subSize);
-#   endif
-}
-
-
-template<class T>
-inline void Foam::SubList<T>::reset
-(
-    const UList<T>& list,
-    const label subSize,
-    const label startIndex
-)
-{
-    UList<T>::reset(&(list.v_[startIndex]), subSize);
-
-#   ifdef FULLDEBUG
-
-    // Artificially allowing the start of a zero-sized subList to be
-    // one past the end of the original list.  
-    if (subSize > 0)
-    {
-        list.checkStart(startIndex);
-        list.checkSize(startIndex + subSize);
-    }
-    else
-    {
-        // Start index needs to fall between 0 and size.  One position
-        // behind the last element is allowed
-        list.checkSize(startIndex);
-    }
-#   endif
-}
-
-
-template<class T>
-const Foam::SubList<T>& Foam::SubList<T>::null()
-{
-    SubList<T>* nullPtr = reinterpret_cast<SubList<T>*>(NULL);
-    return *nullPtr;
+    return *reinterpret_cast< SubList<T>* >(0);
 }
 
 
@@ -129,7 +84,14 @@ const Foam::SubList<T>& Foam::SubList<T>::null()
 template<class T>
 inline Foam::SubList<T>::operator const Foam::List<T>&() const
 {
-    return *reinterpret_cast<const List<T>*>(this);
+    return *reinterpret_cast< const List<T>* >(this);
+}
+
+
+template<class T>
+inline void Foam::SubList<T>::operator=(const T& t)
+{
+    UList<T>::operator=(t);
 }
 
 

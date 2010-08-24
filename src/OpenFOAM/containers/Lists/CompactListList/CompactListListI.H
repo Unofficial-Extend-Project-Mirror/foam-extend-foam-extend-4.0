@@ -24,20 +24,20 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class T>
-inline CompactListList<T>::CompactListList()
+inline Foam::CompactListList<T>::CompactListList()
 {}
 
 
 template<class T>
-inline CompactListList<T>::CompactListList(const label nRows, const label nData)
+inline Foam::CompactListList<T>::CompactListList
+(
+    const label nRows,
+    const label nData
+)
 :
     offsets_(nRows, 0),
     m_(nData)
@@ -45,7 +45,7 @@ inline CompactListList<T>::CompactListList(const label nRows, const label nData)
 
 
 template<class T>
-inline CompactListList<T>::CompactListList
+inline Foam::CompactListList<T>::CompactListList
 (
     const label nRows,
     const label nData,
@@ -58,7 +58,8 @@ inline CompactListList<T>::CompactListList
 
 
 template<class T>
-inline autoPtr<CompactListList<T> > CompactListList<T>::clone() const
+inline Foam::autoPtr<Foam::CompactListList<T> >
+Foam::CompactListList<T>::clone() const
 {
     return autoPtr<CompactListList<T> >(new CompactListList<T>(*this));
 }
@@ -67,38 +68,60 @@ inline autoPtr<CompactListList<T> > CompactListList<T>::clone() const
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class T>
-inline label CompactListList<T>::size() const
+inline const Foam::CompactListList<T>& Foam::CompactListList<T>::null()
+{
+    return *reinterpret_cast< CompactListList<T>* >(0);
+}
+
+
+template<class T>
+inline Foam::label Foam::CompactListList<T>::size() const
 {
     return offsets_.size();
 }
 
+
 template<class T>
-inline const List<label>& CompactListList<T>::offsets() const
+inline bool Foam::CompactListList<T>::empty() const
+{
+    return offsets_.empty();
+}
+
+
+template<class T>
+inline const Foam::List<Foam::label>& Foam::CompactListList<T>::offsets() const
 {
     return offsets_;
 }
 
+
 template<class T>
-inline List<label>& CompactListList<T>::offsets()
+inline Foam::List<Foam::label>& Foam::CompactListList<T>::offsets()
 {
     return offsets_;
 }
 
-template<class T>
-inline const List<T>& CompactListList<T>::m() const
-{
-    return m_;
-}
 
 template<class T>
-inline List<T>& CompactListList<T>::m()
+inline const Foam::List<T>& Foam::CompactListList<T>::m() const
 {
     return m_;
 }
 
 
 template<class T>
-inline label CompactListList<T>::index(const label i, const label j) const
+inline Foam::List<T>& Foam::CompactListList<T>::m()
+{
+    return m_;
+}
+
+
+template<class T>
+inline Foam::label Foam::CompactListList<T>::index
+(
+    const label i,
+    const label j
+) const
 {
     if (i == 0)
     {
@@ -110,14 +133,15 @@ inline label CompactListList<T>::index(const label i, const label j) const
     }
 }
 
+
 template<class T>
-inline label CompactListList<T>::whichRow(const label i) const
+inline Foam::label Foam::CompactListList<T>::whichRow(const label i) const
 {
     if (i < 0 || i >= m_.size())
     {
         FatalErrorIn
         (
-            "CompactListList<T>::whichRow(const label i) const"
+            "CompactListList<T>::whichRow(const label) const"
         )   << "Index " << i << " outside 0.." << m_.size()
             << abort(FatalError);
     }
@@ -133,30 +157,69 @@ inline label CompactListList<T>::whichRow(const label i) const
     return -1;
 }
 
+
 template<class T>
-inline label CompactListList<T>::whichColumn(const label row, const label i)
- const
+inline Foam::label Foam::CompactListList<T>::whichColumn
+(
+    const label row,
+    const label i
+) const
 {
     return i - index(row, 0);
 }
 
+
+template<class T>
+inline Foam::Xfer<Foam::CompactListList<T> > Foam::CompactListList<T>::xfer()
+{
+    return xferMove(*this);
+}
+
+
+template<class T>
+inline void Foam::CompactListList<T>::resize(const label nRows)
+{
+    this->setSize(nRows);
+}
+
+
+template<class T>
+inline void Foam::CompactListList<T>::resize
+(
+    const label nRows,
+    const label nData
+)
+{
+    this->setSize(nRows, nData);
+}
+
+
+template<class T>
+inline void Foam::CompactListList<T>::resize
+(
+    const label nRows,
+    const label nData,
+    const T& t
+)
+{
+    this->setSize(nRows, nData, t);
+}
+
+
+template<class T>
+inline void Foam::CompactListList<T>::resize(const UList<label>& rowSizes)
+{
+    this->setSize(rowSizes);
+}
+
+
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class T>
-inline UList<T> CompactListList<T>::operator[](const label i)
-{
-    if (i == 0)
-    {
-        return UList<T>(m_.begin(), offsets_[i]);
-    }
-    else
-    {
-        return UList<T>(&m_[offsets_[i-1]], offsets_[i] - offsets_[i-1]);
-    }
-}
-
-template<class T>
-inline const UList<T> CompactListList<T>::operator[](const label i) const
+inline Foam::UList<T> Foam::CompactListList<T>::operator[]
+(
+    const label i
+)
 {
     if (i == 0)
     {
@@ -170,13 +233,35 @@ inline const UList<T> CompactListList<T>::operator[](const label i) const
 
 
 template<class T>
-inline T& CompactListList<T>::operator()(const label i, const label j)
+inline const Foam::UList<T> Foam::CompactListList<T>::operator[]
+(
+    const label i
+) const
+{
+    if (i == 0)
+    {
+        return UList<T>(m_.begin(), offsets_[i]);
+    }
+    else
+    {
+        return UList<T>(&m_[offsets_[i-1]], offsets_[i] - offsets_[i-1]);
+    }
+}
+
+
+template<class T>
+inline T& Foam::CompactListList<T>::operator()
+(
+    const label i,
+    const label j
+)
 {
     return m_[index(i, j)];
 }
 
+
 template<class T>
-inline const T& CompactListList<T>::operator()
+inline const T& Foam::CompactListList<T>::operator()
 (
     const label i,
     const label j
@@ -187,14 +272,10 @@ inline const T& CompactListList<T>::operator()
 
 
 template<class T>
-inline void CompactListList<T>::operator=(const T& t)
+inline void Foam::CompactListList<T>::operator=(const T& t)
 {
     m_ = t;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

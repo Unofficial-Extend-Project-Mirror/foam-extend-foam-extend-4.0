@@ -28,13 +28,16 @@ Class
 Description
     Remove a dictionary entry.
 
-    The @c \#remove directive takes a word or a list of words. For example,
+    The @c \#remove directive takes a list or a single wordRe.
+    For example,
     @verbatim
         #remove entry0
-        #remove ( entry1 entry2 entry3 )
+        #remove ( entry1 entry2 entry3 otherEntry )
+        #remove "entry[1-3]"
+        #remove ( "entry[1-3]" otherEntry )
     @endverbatim
 
-    The removable only occurs in the current context.
+    The removal only occurs in the current context.
     Removing sub-entries or parent entries is not supported.
 
 SourceFiles
@@ -74,17 +77,13 @@ class removeEntry
 public:
 
     //- Runtime type information
-    TypeName("remove");
+    ClassName("remove");
 
 
     // Member Functions
 
         //- Execute the functionEntry in a sub-dict context
-        static bool execute
-        (
-            dictionary& parentDict,
-            Istream& is
-        );
+        static bool execute(dictionary& parentDict, Istream&);
 };
 
 

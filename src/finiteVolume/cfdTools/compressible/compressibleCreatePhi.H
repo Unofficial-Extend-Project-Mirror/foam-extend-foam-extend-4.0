@@ -30,8 +30,8 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef createPhi_H
-#define createPhi_H
+#ifndef compressibleCreatePhi_H
+#define compressibleCreatePhi_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -38,6 +38,7 @@ SourceFiles
 #define LList_H
 
 #include "label.H"
+#include "uLabel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -67,7 +68,7 @@ Ostream& operator<<
 
 
 /*---------------------------------------------------------------------------*\
-                           Class LList Declaration
+                            Class LList Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class LListBase, class T>
@@ -200,6 +201,9 @@ public:
             //- Delete contents of list
             void clear();
 
+            //- Transfer the contents of the argument into this List
+            //  and annull the argument list.
+            void transfer(LList<LListBase, T>&);
 
     // Member operators
 
@@ -323,19 +327,13 @@ public:
 
     // IOstream operators
 
-        friend Istream& operator>>
-        #ifndef __CINT__
-        <LListBase, T>
-        #endif
+        friend Istream& operator>> <LListBase, T>
         (
             Istream&,
             LList<LListBase, T>&
         );
 
-        friend Ostream& operator<<
-        #ifndef __CINT__
-        <LListBase, T>
-        #endif
+        friend Ostream& operator<< <LListBase, T>
         (
             Ostream&,
             const LList<LListBase, T>&

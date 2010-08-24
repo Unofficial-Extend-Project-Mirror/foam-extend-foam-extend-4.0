@@ -197,9 +197,8 @@ void Foam::surfaceFeatures::calcFeatPoints(const List<edgeStatus>& edgeStat)
             featurePoints.append(pointI);
         }
     }
-    featurePoints.shrink();
+
     featurePoints_.transfer(featurePoints);
-    featurePoints.clear();
 }
 
 
@@ -248,7 +247,7 @@ Foam::label Foam::surfaceFeatures::nextFeatEdge
 // prevPointI. Marks feature edges visited in featVisited by assigning them
 // the current feature line number. Returns cumulative length of edges walked.
 // Works in one of two modes:
-// - mark : step to edges with featVisited = -1. 
+// - mark : step to edges with featVisited = -1.
 //          Mark edges visited with currentFeatI.
 // - clear : step to edges with featVisited = currentFeatI
 //           Mark edges visited with -2 and erase from feature edges.
@@ -258,7 +257,7 @@ Foam::surfaceFeatures::labelScalar Foam::surfaceFeatures::walkSegment
     const List<edgeStatus>& edgeStat,
     const label startEdgeI,
     const label startPointI,
-    const label currentFeatI,     
+    const label currentFeatI,
     labelList& featVisited
 )
 {
@@ -361,7 +360,7 @@ Foam::surfaceFeatures::surfaceFeatures
     const labelList& featureEdges,
     const label externalStart,
     const label internalStart
-)    
+)
 :
     surf_(surf),
     featurePoints_(featurePoints),
@@ -458,7 +457,7 @@ Foam::labelList Foam::surfaceFeatures::selectFeatureEdges
 
     if (regionEdges)
     {
-        selectedEdges.setSize(selectedEdges.size() + nRegionEdges());
+        selectedEdges.setCapacity(selectedEdges.size() + nRegionEdges());
 
         for (label i = 0; i < externalStart_; i++)
         {
@@ -468,7 +467,7 @@ Foam::labelList Foam::surfaceFeatures::selectFeatureEdges
 
     if (externalEdges)
     {
-        selectedEdges.setSize(selectedEdges.size() + nExternalEdges());
+        selectedEdges.setCapacity(selectedEdges.size() + nExternalEdges());
 
         for (label i = externalStart_; i < internalStart_; i++)
         {
@@ -478,7 +477,7 @@ Foam::labelList Foam::surfaceFeatures::selectFeatureEdges
 
     if (internalEdges)
     {
-        selectedEdges.setSize(selectedEdges.size() + nInternalEdges());
+        selectedEdges.setCapacity(selectedEdges.size() + nInternalEdges());
 
         for (label i = internalStart_; i < featureEdges_.size(); i++)
         {
@@ -531,8 +530,8 @@ void Foam::surfaceFeatures::findFeatures(const scalar includedAngle)
 
                     // Check if convex or concave by looking at angle
                     // between face centres and normal
-                    vector f0Tof1 = 
-                        surf_[face1].centre(points) 
+                    vector f0Tof1 =
+                        surf_[face1].centre(points)
                         - surf_[face0].centre(points);
 
                     if ((f0Tof1 & faceNormals[face0]) > 0.0)
@@ -684,11 +683,11 @@ void Foam::surfaceFeatures::writeDict(Ostream& writeFile) const
 {
 
     dictionary featInfoDict;
-    featInfoDict.add("externalStart", externalStart_); 
+    featInfoDict.add("externalStart", externalStart_);
     featInfoDict.add("internalStart", internalStart_);
     featInfoDict.add("featureEdges", featureEdges_);
     featInfoDict.add("featurePoints", featurePoints_);
-    
+
     featInfoDict.write(writeFile);
 }
 
@@ -764,10 +763,17 @@ Foam::Map<Foam::label> Foam::surfaceFeatures::nearestSamples
 ) const
 {
     // Build tree out of all samples.
+
+    //Note: cannot be done one the fly - gcc4.4 compiler bug.
+    // Not a compiler bug: octree takes references.
+    // HJ, 24/Aug/2010
+    treeBoundBox bb(samples);
+    octreeDataPoint odp(samples)
+
     octree<octreeDataPoint> ppTree
     (
-        treeBoundBox(static_cast<const UList<point>&>(samples)),
-        octreeDataPoint(samples),   // all information needed to do checks
+        bb,         // overall search domain
+        odp,        // all information needed to do checks
         1,          // min levels
         20.0,       // maximum ratio of cubes v.s. cells
         100.0       // max. duplicity; n/a since no bounding boxes.
@@ -864,12 +870,16 @@ Foam::Map<Foam::label> Foam::surfaceFeatures::nearestSamples
     scalar maxSearch = max(maxDist);
     vector span(maxSearch, maxSearch, maxSearch);
 
-    // octree.shapes holds reference!
+    //Note: cannot be done one the fly - gcc4.4 compiler bug.
+    // Not a compiler bug: octree takes references.
+    // HJ, 24/Aug/2010
+    treeBoundBox bb(samples);
+    octreeDataPoint odp(samples);
+
     octree<octreeDataPoint> ppTree
     (
-        // overall search domain
-        treeBoundBox(static_cast<const UList<point>&>(samples)),
-        octreeDataPoint(samples),   // all information needed to do checks
+        bb,         // overall search domain
+        odp,        // all information needed to do checks
         1,          // min levels
         20.0,       // maximum ratio of cubes v.s. cells
         100.0       // max. duplicity; n/a since no bounding boxes.
@@ -1003,18 +1013,23 @@ Foam::Map<Foam::pointIndexHit> Foam::surfaceFeatures::nearestEdges
 ) const
 {
     // Build tree out of selected sample edges.
+
+    // 1.6.x merge fix.  HJ, 24/Aug/2010
+    treeBoundBox bb(samplePoints);
+    octreeDataEdges ode
+    (
+        sampleEdges,
+        samplePoints,
+        selectedSampleEdges
+    )
+
     octree<octreeDataEdges> ppTree
     (
-        treeBoundBox(static_cast<const UList<point>&>(samplePoints)),
-        octreeDataEdges
-        (
-            sampleEdges,
-            samplePoints,
-            selectedSampleEdges
-        ),                          // geometric info container for edges
-        1,                          // min levels
-        20.0,                       // maximum ratio of cubes v.s. cells
-        10.0                        // max. duplicity
+        bb,        // overall search domain
+        ode,       // geometric info container for edges
+        1,         // min levels
+        20.0,      // maximum ratio of cubes v.s. cells
+        10.0       // max. duplicity
     );
 
     const pointField& surfPoints = surf_.localPoints();
@@ -1154,7 +1169,7 @@ void Foam::surfaceFeatures::nearestSurfEdge
 (
     const labelList& selectedEdges,
     const pointField& samples,
-    const vector& searchSpan,   // Search span 
+    const vector& searchSpan,   // Search span
     labelList& edgeLabel,
     labelList& edgeEndPoint,
     pointField& edgePoint
@@ -1165,19 +1180,23 @@ void Foam::surfaceFeatures::nearestSurfEdge
     edgePoint.setSize(samples.size());
 
     const pointField& localPoints = surf_.localPoints();
-    
+
+    // 1.6.x merge fix.  HJ, 24/Aug/2010
+    treeBoundBox bb(localPoints);
+    octreeDataEdges ode
+    (
+        surf_.edges(),
+        localPoints,
+        selectedEdges
+    );
+
     octree<octreeDataEdges> ppTree
     (
-        treeBoundBox(localPoints),  // overall search domain
-        octreeDataEdges
-        (
-            surf_.edges(),
-            localPoints,
-            selectedEdges
-        ),          // all information needed to do geometric checks
-        1,          // min levels
-        20.0,       // maximum ratio of cubes v.s. cells
-        10.0        // max. duplicity
+        bb,        // overall search domain
+        ode,       // all information needed to do geometric checks
+        1,         // min levels
+        20.0,      // maximum ratio of cubes v.s. cells
+        10.0       // max. duplicity
     );
 
 
@@ -1234,7 +1253,7 @@ void Foam::surfaceFeatures::nearestSurfEdge
     const labelList& selectedSampleEdges,
     const pointField& samplePoints,
 
-    const vector& searchSpan,   // Search span 
+    const vector& searchSpan,   // Search span
     labelList& edgeLabel,       // label of surface edge or -1
     pointField& pointOnEdge,    // point on above edge
     pointField& pointOnFeature  // point on sample edge
@@ -1244,17 +1263,19 @@ void Foam::surfaceFeatures::nearestSurfEdge
     pointOnEdge.setSize(selectedSampleEdges.size());
     pointOnFeature.setSize(selectedSampleEdges.size());
 
-    
+    // 1.6.x merge fix.  HJ, 24/Aug/2010
+    treeBoundBox bb(surf_.localPoints());
+    octreeDataEdges ode
+    (
+        surf_.edges(),
+        surf_.localPoints(),
+        selectedEdges
+    );
 
     octree<octreeDataEdges> ppTree
     (
-        treeBoundBox(surf_.localPoints()),  // overall search domain
-        octreeDataEdges
-        (
-            surf_.edges(),
-            surf_.localPoints(),
-            selectedEdges
-        ),          // all information needed to do geometric checks
+        bb,         // overall search domain
+        ode,        // all information needed to do geometric checks
         1,          // min levels
         10.0,       // maximum ratio of cubes v.s. cells
         10.0        // max. duplicity

@@ -43,6 +43,42 @@ fvMeshMapper = fvMesh/fvMeshMapper
 $(fvMeshMapper)/fvPatchMapper.C
 $(fvMeshMapper)/fvSurfaceMapper.C
 
+
+extendedStencil = fvMesh/extendedStencil
+
+cellToCell = $(extendedStencil)/cellToCell
+$(cellToCell)/fullStencils/cellToCellStencil.C
+$(cellToCell)/fullStencils/CFCCellToCellStencil.C
+$(cellToCell)/fullStencils/CPCCellToCellStencil.C
+$(cellToCell)/fullStencils/CECCellToCellStencil.C
+
+cellToFace = $(extendedStencil)/cellToFace
+$(cellToFace)/fullStencils/cellToFaceStencil.C
+$(cellToFace)/fullStencils/CFCCellToFaceStencil.C
+$(cellToFace)/fullStencils/CECCellToFaceStencil.C
+$(cellToFace)/fullStencils/CPCCellToFaceStencil.C
+$(cellToFace)/fullStencils/FECCellToFaceStencil.C
+$(cellToFace)/extendedCellToFaceStencil.C
+$(cellToFace)/extendedCentredCellToFaceStencil.C
+$(cellToFace)/extendedUpwindCellToFaceStencil.C
+$(cellToFace)/MeshObjects/centredCECCellToFaceStencilObject.C
+$(cellToFace)/MeshObjects/centredCFCCellToFaceStencilObject.C
+$(cellToFace)/MeshObjects/centredCPCCellToFaceStencilObject.C
+$(cellToFace)/MeshObjects/centredFECCellToFaceStencilObject.C
+$(cellToFace)/MeshObjects/upwindCECCellToFaceStencilObject.C
+$(cellToFace)/MeshObjects/upwindCFCCellToFaceStencilObject.C
+$(cellToFace)/MeshObjects/upwindCPCCellToFaceStencilObject.C
+$(cellToFace)/MeshObjects/upwindFECCellToFaceStencilObject.C
+$(cellToFace)/MeshObjects/pureUpwindCFCCellToFaceStencilObject.C
+
+faceToCell = $(extendedStencil)/faceToCell
+$(faceToCell)/fullStencils/faceToCellStencil.C
+$(faceToCell)/fullStencils/CFCFaceToCellStencil.C
+$(faceToCell)/extendedFaceToCellStencil.C
+$(faceToCell)/extendedCentredFaceToCellStencil.C
+$(faceToCell)/MeshObjects/centredCFCFaceToCellStencilObject.C
+
+
 fvPatchFields = fields/fvPatchFields
 $(fvPatchFields)/fvPatchField/fvPatchFields.C
 
@@ -76,12 +112,16 @@ $(constraintFvPatchFields)/overlapGgi/overlapGgiFvPatchFields.C
 $(constraintFvPatchFields)/regionCouple/regionCoupleFvPatchFields.C
 
 derivedFvPatchFields = $(fvPatchFields)/derived
+$(derivedFvPatchFields)/activeBaffleVelocity/activeBaffleVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/advective/advectiveFvPatchFields.C
 $(derivedFvPatchFields)/directMappedFixedValue/directMappedFixedValueFvPatchFields.C
+$(derivedFvPatchFields)/directMappedVelocityFluxFixedValue/directMappedVelocityFluxFixedValueFvPatchField.C
 $(derivedFvPatchFields)/fan/fanFvPatchFields.C
-$(derivedFvPatchFields)/fixedFluxBuoyantPressure/fixedFluxBuoyantPressureFvPatchScalarField.C
+$(derivedFvPatchFields)/buoyantPressure/buoyantPressureFvPatchScalarField.C
 $(derivedFvPatchFields)/fixedFluxPressure/fixedFluxPressureFvPatchScalarField.C
+$(derivedFvPatchFields)/fixedInternalValueFvPatchField/fixedInternalValueFvPatchFields.C
 $(derivedFvPatchFields)/fixedNormalSlip/fixedNormalSlipFvPatchFields.C
+$(derivedFvPatchFields)/fixedPressureCompressibleDensity/fixedPressureCompressibleDensityFvPatchScalarField.C
 $(derivedFvPatchFields)/fluxCorrectedVelocity/fluxCorrectedVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/flux/fluxFvPatchFields.C
 $(derivedFvPatchFields)/freestream/freestreamFvPatchFields.C
@@ -90,6 +130,8 @@ $(derivedFvPatchFields)/inletOutlet/inletOutletFvPatchFields.C
 $(derivedFvPatchFields)/inletOutletTotalTemperature/inletOutletTotalTemperatureFvPatchScalarField.C
 $(derivedFvPatchFields)/flowRateInletVelocity/flowRateInletVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/movingWallVelocity/movingWallVelocityFvPatchVectorField.C
+$(derivedFvPatchFields)/translatingWallVelocity/translatingWallVelocityFvPatchVectorField.C
+$(derivedFvPatchFields)/rotatingWallVelocity/rotatingWallVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/movingRotatingWallVelocity/movingRotatingWallVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/activeBaffleVelocity/activeBaffleVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/oscillatingFixedValue/oscillatingFixedValueFvPatchFields.C
@@ -97,7 +139,9 @@ $(derivedFvPatchFields)/fixedMeanValue/fixedMeanValueFvPatchFields.C
 $(derivedFvPatchFields)/outletInlet/outletInletFvPatchFields.C
 $(derivedFvPatchFields)/partialSlip/partialSlipFvPatchFields.C
 $(derivedFvPatchFields)/pressureDirectedInletOutletVelocity/pressureDirectedInletOutletVelocityFvPatchVectorField.C
+$(derivedFvPatchFields)/pressureNormalInletOutletVelocity/pressureNormalInletOutletVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/pressureDirectedInletVelocity/pressureDirectedInletVelocityFvPatchVectorField.C
+$(derivedFvPatchFields)/timeVaryingMappedPressureDirectedInletVelocity/timeVaryingMappedPressureDirectedInletVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/pressureInletOutletVelocity/pressureInletOutletVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/pressureInletUniformVelocity/pressureInletUniformVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/pressureInletVelocity/pressureInletVelocityFvPatchVectorField.C
@@ -112,13 +156,16 @@ $(derivedFvPatchFields)/timeVaryingMappedFixedValue/AverageIOFields.C
 $(derivedFvPatchFields)/timeVaryingMappedFixedValue/timeVaryingMappedFixedValueFvPatchFields.C
 $(derivedFvPatchFields)/timeVaryingFlowRateInletVelocity/timeVaryingFlowRateInletVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/timeVaryingUniformFixedValue/timeVaryingUniformFixedValueFvPatchFields.C
+$(derivedFvPatchFields)/timeVaryingUniformInletOutlet/timeVaryingUniformInletOutletFvPatchFields.C
 $(derivedFvPatchFields)/totalPressure/totalPressureFvPatchScalarField.C
+$(derivedFvPatchFields)/timeVaryingMappedTotalPressure/timeVaryingMappedTotalPressureFvPatchScalarField.C
 $(derivedFvPatchFields)/timeVaryingUniformTotalPressure/timeVaryingUniformTotalPressureFvPatchScalarField.C
 $(derivedFvPatchFields)/totalTemperature/totalTemperatureFvPatchScalarField.C
 $(derivedFvPatchFields)/turbulentInlet/turbulentInletFvPatchFields.C
 $(derivedFvPatchFields)/turbulentIntensityKineticEnergyInlet/turbulentIntensityKineticEnergyInletFvPatchScalarField.C
 $(derivedFvPatchFields)/uniformFixedValue/uniformFixedValueFvPatchFields.C
 $(derivedFvPatchFields)/waveTransmissive/waveTransmissiveFvPatchFields.C
+$(derivedFvPatchFields)/uniformDensityHydrostaticPressure/uniformDensityHydrostaticPressureFvPatchScalarField.C
 
 fvsPatchFields = fields/fvsPatchFields
 $(fvsPatchFields)/fvsPatchField/fvsPatchFields.C
@@ -156,6 +203,8 @@ $(interpolation)/interpolationCell/makeInterpolationCell.C
 $(interpolation)/interpolationCellPoint/cellPointWeight/cellPointWeight.C
 $(interpolation)/interpolationCellPoint/makeInterpolationCellPoint.C
 $(interpolation)/interpolationCellPointFace/makeInterpolationCellPointFace.C
+$(interpolation)/interpolationCellPointWallModified/cellPointWeightWallModified/cellPointWeightWallModified.C
+$(interpolation)/interpolationCellPointWallModified/makeInterpolationCellPointWallModified.C
 
 volPointInterpolation = interpolation/volPointInterpolation
 $(volPointInterpolation)/pointPatchInterpolation/pointPatchInterpolation.C
@@ -177,9 +226,23 @@ $(schemes)/outletStabilised/outletStabilised.C
 $(schemes)/reverseLinear/reverseLinear.C
 $(schemes)/clippedLinear/clippedLinear.C
 $(schemes)/harmonic/harmonic.C
+$(schemes)/fixedBlended/fixedBlended.C
 $(schemes)/localBlended/localBlended.C
 $(schemes)/localMax/localMax.C
 $(schemes)/localMin/localMin.C
+
+$(schemes)/linearFit/linearFit.C
+$(schemes)/biLinearFit/biLinearFit.C
+$(schemes)/quadraticLinearFit/quadraticLinearFit.C
+$(schemes)/quadraticFit/quadraticFit.C
+
+$(schemes)/quadraticLinearUpwindFit/quadraticLinearUpwindFit.C
+$(schemes)/quadraticUpwindFit/quadraticUpwindFit.C
+$(schemes)/cubicUpwindFit/cubicUpwindFit.C
+/*
+$(schemes)/quadraticLinearPureUpwindFit/quadraticLinearPureUpwindFit.C
+*/
+$(schemes)/linearPureUpwindFit/linearPureUpwindFit.C
 
 limitedSchemes = $(surfaceInterpolation)/limitedSchemes
 $(limitedSchemes)/limitedSurfaceInterpolationScheme/limitedSurfaceInterpolationSchemes.C
@@ -200,10 +263,11 @@ $(limitedSchemes)/SuperBee/SuperBee.C
 $(limitedSchemes)/QUICK/QUICK.C
 $(limitedSchemes)/MUSCL/MUSCL.C
 $(limitedSchemes)/UMIST/UMIST.C
-$(limitedSchemes)/MC/MC.C
 $(limitedSchemes)/Phi/Phi.C
 $(limitedSchemes)/filteredLinear/filteredLinear.C
 $(limitedSchemes)/filteredLinear2/filteredLinear2.C
+$(limitedSchemes)/filteredLinear3/filteredLinear3.C
+$(limitedSchemes)/limitWith/limitWith.C
 
 multivariateSchemes = $(surfaceInterpolation)/multivariateSchemes
 $(multivariateSchemes)/multivariateSurfaceInterpolationScheme/multivariateSurfaceInterpolationSchemes.C
@@ -262,6 +326,10 @@ $(snGradSchemes)/correctedSnGrad/correctedSnGrads.C
 $(snGradSchemes)/limitedSnGrad/limitedSnGrads.C
 $(snGradSchemes)/uncorrectedSnGrad/uncorrectedSnGrads.C
 $(snGradSchemes)/fourthSnGrad/fourthSnGrads.C
+/*
+$(snGradSchemes)/quadraticFitSnGrad/quadraticFitSnGradData.C
+$(snGradSchemes)/quadraticFitSnGrad/quadraticFitSnGrads.C
+*/
 
 convectionSchemes = finiteVolume/convectionSchemes
 $(convectionSchemes)/convectionScheme/convectionSchemes.C
@@ -277,28 +345,27 @@ $(laplacianSchemes)/noLaplacianScheme/noLaplacianSchemes.C
 
 finiteVolume/fvc/fvcMeshPhi.C
 
-cfdTools/general/findRefCell/findRefCell.C
-cfdTools/general/adjustPhi/adjustPhi.C
-cfdTools/general/bound/bound.C
-cfdTools/general/porousMedia/porousZone.C
-cfdTools/general/porousMedia/porousZones.C
-cfdTools/general/MRF/MRFZone.C
-cfdTools/general/MRF/MRFZones.C
-cfdTools/general/fieldSources/timeActivatedExplicitSource/timeActivatedExplicitSource.C
-cfdTools/general/SRF/SRFModel/SRFModel/SRFModel.C
-cfdTools/general/SRF/SRFModel/SRFModel/newSRFModel.C
-cfdTools/general/SRF/SRFModel/rpm/rpm.C
-cfdTools/general/SRF/derivedFvPatchFields/SRFVelocityFvPatchVectorField/SRFVelocityFvPatchVectorField.C
+general = cfdTools/general
+$(general)/findRefCell/findRefCell.C
+$(general)/adjustPhi/adjustPhi.C
+$(general)/bound/bound.C
 
-fvMeshCutSurface = fvMesh/fvMeshCutSurface
+porousMedia = $(general)/porousMedia
+$(porousMedia)/porousZone.C
+$(porousMedia)/porousZones.C
 
-meshCut = $(fvMeshCutSurface)/meshCut
-$(meshCut)/meshCutSurface.C
-$(meshCut)/cellAddressing.C
+MRF = $(general)/MRF
+$(MRF)/MRFZone.C
+$(MRF)/MRFZones.C
 
-edgeCuts = $(fvMeshCutSurface)/edgeCuts
-$(edgeCuts)/meshEdgeCuts.C
-$(edgeCuts)/faceDecompIsoSurfaceCuts.C
-$(edgeCuts)/cellDecompIsoSurfaceCuts.C
+SRF = $(general)/SRF
+$(SRF)/SRFModel/SRFModel/SRFModel.C
+$(SRF)/SRFModel/SRFModel/newSRFModel.C
+$(SRF)/SRFModel/rpm/rpm.C
+$(SRF)/derivedFvPatchFields/SRFVelocityFvPatchVectorField/SRFVelocityFvPatchVectorField.C
+
+fieldSources = $(general)/fieldSources
+$(fieldSources)/pressureGradientExplicitSource/pressureGradientExplicitSource.C
+$(fieldSources)/timeActivatedExplicitSource/timeActivatedExplicitSource.C
 
 LIB = $(FOAM_LIBBIN)/libfiniteVolume

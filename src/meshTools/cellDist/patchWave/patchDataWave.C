@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "patchDataWave.H"
@@ -50,8 +48,7 @@ void Foam::patchDataWave<TransferType>::setChangedFaces
         {
             const polyPatch& patch = mesh.boundaryMesh()[patchI];
 
-            const Field<Type>& patchField =
-                *initialPatchValuePtrs_[patchI];
+            const Field<Type>& patchField = initialPatchValuePtrs_[patchI];
 
             forAll(patch.faceCentres(), patchFaceI)
             {
@@ -176,7 +173,7 @@ Foam::patchDataWave<TransferType>::patchDataWave
 (
     const polyMesh& mesh,
     const labelHashSet& patchIDs,
-    const List<Field<Type>*>& initialPatchValuePtrs,
+    const UPtrList<Field<Type> >& initialPatchValuePtrs,
     const bool correctWalls
 )
 :
@@ -229,7 +226,7 @@ void Foam::patchDataWave<TransferType>::correct()
         mesh(),
         changedFaces,
         faceDist,
-        mesh().nCells() // max iterations
+        mesh().globalData().nTotalCells() // max iterations
     );
 
 

@@ -57,22 +57,7 @@ Foam::tmp<Foam::Field<Type> > Foam::lduMatrix::H(const Field<Type>& psi) const
 
         for (register label face=0; face<nFaces; face++)
         {
-            #ifdef ICC_IA64_PREFETCH
-            __builtin_prefetch (&uPtr[face+32],0,0);
-            __builtin_prefetch (&lPtr[face+32],0,0);
-            __builtin_prefetch (&lowerPtr[face+32],0,1);
-            __builtin_prefetch (&psiPtr[lPtr[face+32]],0,1);
-            __builtin_prefetch (&HpsiPtr[uPtr[face+32]],0,1);
-            #endif
-
             HpsiPtr[uPtr[face]] -= lowerPtr[face]*psiPtr[lPtr[face]];
-        
-            #ifdef ICC_IA64_PREFETCH
-            __builtin_prefetch (&upperPtr[face+32],0,1);
-            __builtin_prefetch (&psiPtr[uPtr[face+32]],0,1);
-            __builtin_prefetch (&HpsiPtr[lPtr[face+32]],0,1);
-            #endif
-
             HpsiPtr[lPtr[face]] -= upperPtr[face]*psiPtr[uPtr[face]];
         }
     }
@@ -102,7 +87,6 @@ Foam::lduMatrix::faceH(const Field<Type>& psi) const
         const scalarField& Lower = const_cast<const lduMatrix&>(*this).lower();
         const scalarField& Upper = const_cast<const lduMatrix&>(*this).upper();
 
-        // Take refereces to addressing
         const unallocLabelList& l = lduAddr().lowerAddr();
         const unallocLabelList& u = lduAddr().upperAddr();
 

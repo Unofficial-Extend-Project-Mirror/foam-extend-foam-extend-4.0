@@ -423,6 +423,14 @@ inline scalar triangle<Point, PointRef>::quality() const
 template<class Point, class PointRef>
 inline scalar triangle<Point, PointRef>::sweptVol(const triangle& t) const
 {
+    // Original implementation (foam2.3.2).  HJ, 20/Aug/2010
+//     return (1.0/6.0)*
+//     (
+//         ((t.a_ - a_) & ((b_ - a_)^(c_ - a_)))
+//       + ((t.b_ - b_) & ((c_ - b_)^(t.a_ - b_)))
+//       + ((c_ - t.c_) & ((t.b_ - t.c_)^(t.a_ - t.c_)))
+//     );
+
     scalar V1 =
     (
         ((t.a_ - a_) & ((b_ - a_)^(c_ - a_)))
@@ -583,7 +591,8 @@ inline pointHit triangle<Point, PointRef>::fastIntersection
 (
     const Point& orig,
     const vector& dir,
-    const intersection::algorithm alg
+    const intersection::algorithm alg,
+    const scalar tol
 ) const
 {
     const vector edge1 = b_ - a_;
@@ -601,88 +610,60 @@ inline pointHit triangle<Point, PointRef>::fastIntersection
     if (alg == intersection::VISIBLE)
     {
         // Culling branch
-        if (det < SMALL)
+        if (det < ROOTVSMALL)
         {
-            // return miss
+            // Ray on wrong side of triangle. Return miss
             return intersection;
         }
-        /* calculate distance from a_ to ray origin */
-        const vector tVec = orig-a_;
-
-        /* calculate U parameter and test bounds */
-        scalar u = tVec & pVec;
-
-        if (u < 0.0 || u > det)
-        {
-            // return miss
-            return intersection;
-        }
-
-        /* prepare to test V parameter */
-        const vector qVec = tVec ^ edge1;
-
-        /* calculate V parameter and test bounds */
-        scalar v = dir & qVec;
-
-        if (v < 0.0 || u + v > det)
-        {
-            // return miss
-            return intersection;
-        }
-
-        /* calculate t, scale parameters, ray intersects triangle */
-        scalar t = edge2 & qVec;
-        scalar inv_det = 1.0 / det;
-        t *= inv_det;
-        u *= inv_det;
-        v *= inv_det;
-
-        intersection.setHit();
-        intersection.setPoint(a_ + u*edge1 + v*edge2);
-        intersection.setDistance(t);
     }
     else if (alg == intersection::HALF_RAY || alg == intersection::FULL_RAY)
     {
         // Non-culling branch
-        if (det > -SMALL && det < SMALL)
+        if (det > -ROOTVSMALL && det < ROOTVSMALL)
         {
-            // return miss
+            // Ray parallel to triangle. Return miss
             return intersection;
         }
-        const scalar inv_det = 1.0 / det;
+    }
+
+    const scalar inv_det = 1/det;
 
         /* calculate distance from a_ to ray origin */
         const vector tVec = orig - a_;
-        /* calculate U parameter and test bounds */
-        const scalar u = (tVec & pVec)*inv_det;
 
-        if (u < 0.0 || u > 1.0)
-        {
-            // return miss
-            return intersection;
-        }
-        /* prepare to test V parameter */
-        const vector qVec = tVec ^ edge1;
-        /* calculate V parameter and test bounds */
-        const scalar v = (dir & qVec) * inv_det;
+    /* calculate U parameter and test bounds */
+    const scalar u = (tVec & pVec)*inv_det;
 
-        if (v < 0.0 || u + v > 1.0)
-        {
-            // return miss
-            return intersection;
-        }
-        /* calculate t, ray intersects triangle */
-        const scalar t = (edge2 & qVec) * inv_det;
+    if (u < -tol || u > 1.0 + tol)
+    {
+        // return miss
+        return intersection;
+    }
 
-        if (alg == intersection::HALF_RAY && t < 0)
-        {
-            // return miss
-            return intersection;
-        }
+    /* prepare to test V parameter */
+    const vector qVec = tVec ^ edge1;
 
-        intersection.setHit();
-        intersection.setPoint(a_ + u*edge1 + v*edge2);
-        intersection.setDistance(t);
+    /* calculate V parameter and test bounds */
+    const scalar v = (dir & qVec) * inv_det;
+
+    if (v < -tol || u + v > 1.0 + tol)
+    {
+        // return miss
+        return intersection;
+    }
+
+    /* calculate t, scale parameters, ray intersects triangle */
+    const scalar t = (edge2 & qVec)*inv_det;
+
+    if (alg == intersection::HALF_RAY && t < -tol)
+    {
+        // Wrong side of orig. Return miss
+        return intersection;
+    }
+
+    intersection.setHit();
+    intersection.setPoint(a_ + u*edge1 + v*edge2);
+    intersection.setDistance(t);
     }
     else
     {
@@ -766,7 +747,7 @@ inline bool triangle<Point, PointRef>::classify
 
     bool hit = false;
 
-    if (Foam::mag(u1) < SMALL)
+    if (Foam::mag(u1) < ROOTVSMALL)
     {
         beta = u0/u2;
 
@@ -788,19 +769,31 @@ inline bool triangle<Point, PointRef>::classify
     // system E0, E1
     //
 
+    //Pout<< "alpha:" << alpha << endl;
+    //Pout<< "beta:" << beta << endl;
+    //Pout<< "hit:" << hit << endl;
+    //Pout<< "tol:" << tol << endl;
+
+    if (hit)
+    {
+        // alpha,beta might get negative due to precision errors
+        alpha = max(0.0, min(1.0, alpha));
+        beta = max(0.0, min(1.0, beta));
+    }
+
     nearType = NONE;
     nearLabel = -1;
 
-    if (Foam::mag(alpha+beta-1) < tol)
+    if (Foam::mag(alpha + beta - 1) <= tol)
     {
         // On edge between vert 1-2 (=edge 1)
 
-        if (Foam::mag(alpha) < tol)
+        if (Foam::mag(alpha) <= tol)
         {
             nearType = POINT;
             nearLabel = 2;
         }
-        else if (Foam::mag(beta) < tol)
+        else if (Foam::mag(beta) <= tol)
         {
             nearType = POINT;
             nearLabel = 1;
@@ -811,16 +804,16 @@ inline bool triangle<Point, PointRef>::classify
             nearLabel = 1;
         }
     }
-    else if (Foam::mag(alpha) < tol)
+    else if (Foam::mag(alpha) <= tol)
     {
         // On edge between vert 2-0 (=edge 2)
 
-        if (Foam::mag(beta) < tol)
+        if (Foam::mag(beta) <= tol)
         {
             nearType = POINT;
             nearLabel = 0;
         }
-        else if (Foam::mag(beta-1) < tol)
+        else if (Foam::mag(beta-1) <= tol)
         {
             nearType = POINT;
             nearLabel = 2;
@@ -831,16 +824,16 @@ inline bool triangle<Point, PointRef>::classify
             nearLabel = 2;
         }
     }
-    else if (Foam::mag(beta) < tol)
+    else if (Foam::mag(beta) <= tol)
     {
         // On edge between vert 0-1 (= edge 0)
 
-        if (Foam::mag(alpha) < tol)
+        if (Foam::mag(alpha) <= tol)
         {
             nearType = POINT;
             nearLabel = 0;
         }
-        else if (Foam::mag(alpha-1) < tol)
+        else if (Foam::mag(alpha - 1) <= tol)
         {
             nearType = POINT;
             nearLabel = 1;

@@ -33,27 +33,26 @@ Description
 
 Foam::label Foam::readHexLabel(ISstream& is)
 {
-    register label result = 0;
-
-    char c = 0;
-
+    // Takes into account that 'a' (or 'A') is 10
+    static const label alphaOffset = toupper('A') - 10;
+    // Takes into account that '0' is 0
     static const label zeroOffset = int('0');
 
-    // This takes into account that a is 10
-    static const label alphaOffset = toupper('A') - 10;
+    char c = 0;
 
     // Get next non-whitespace character
     while (is.get(c) && isspace(c))
     {}
 
+    register label result = 0;
     do
     {
         if (isspace(c) || c == 0) break;
 
         if (!isxdigit(c))
         {
-            FatalIOErrorIn("readHexLabel(ISstream& is)", is)
-                << "Illegal hex digit: \"" << c << "\""
+            FatalIOErrorIn("readHexLabel(ISstream&)", is)
+                << "Illegal hex digit: '" << c << "'"
                 << exit(FatalIOError);
         }
 

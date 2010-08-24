@@ -44,59 +44,87 @@ SourceFiles
 namespace Foam
 {
 
-//- Renumber the values (not the indices) of a list. List elements <= 0 are
-//  left as is.
-template<class List>
-List renumber(const labelList& oldToNew, const List&);
+//- Renumber the values (not the indices) of a list.
+//  Negative ListType elements are left as is.
+template<class ListType>
+ListType renumber(const UList<label>& oldToNew, const ListType&);
 
-//- Inplace renumber the values of a list. List elements <= 0 are
-//  left as is.
-template<class List>
-void inplaceRenumber(const labelList& oldToNew, List&);
+//- Inplace renumber the values of a list.
+//  Negative ListType elements are left as is.
+template<class ListType>
+void inplaceRenumber(const UList<label>& oldToNew, ListType&);
 
 
 //- Reorder the elements (indices, not values) of a list.
-//  List elements <= 0 are left as is.
-template<class List>
-List reorder(const labelList& oldToNew, const List&);
+//  Negative ListType elements are left as is.
+template<class ListType>
+ListType reorder(const UList<label>& oldToNew, const ListType&);
 
 //- Inplace reorder the elements of a list.
-//  List elements <= 0 are left as is.
-template<class List>
-void inplaceReorder(const labelList& oldToNew, List&);
+//  Negative ListType elements are left as is.
+template<class ListType>
+void inplaceReorder(const UList<label>& oldToNew, ListType&);
 
 
-// Variants to work with iterators and sparse tables. Need to have iterators
-// and insert()
+// Variants to work with iterators and sparse tables.
+// Need to have iterators and insert()
 
 //- Map values. Do not map negative values.
 template<class Container>
-void inplaceMapValue(const labelList& oldToNew, Container&);
-//- Recreate with mapped keys. Remove elements with negative key.
+void inplaceMapValue(const UList<label>& oldToNew, Container&);
+
+//- Recreate with mapped keys. Do not map elements with negative key.
 template<class Container>
-void inplaceMapKey(const labelList& oldToNew, Container&);
+void inplaceMapKey(const UList<label>& oldToNew, Container&);
 
 
-//- Extract elements of List whose region is certain value. Use e.g.
-//  to extract all selected elements:
-//  subset<boolList, labelList>(selectedElems, true, lst);
-template<class T, class List>
-List subset(const UList<T>& regions, const T& region, const List&);
+//- Generate the (stable) sort order for the list
+template<class T>
+void sortedOrder(const UList<T>&, labelList& order);
 
-//- Inplace extract elements of List whose region is certain value. Use e.g.
-//  to extract all selected elements:
-//  inplaceSubset<boolList, labelList>(selectedElems, true, lst);
-template<class T, class List>
-void inplaceSubset(const UList<T>& regions, const T& region, List&);
+//- Generate (sorted) indices corresponding to duplicate list values
+template<class T>
+void duplicateOrder(const UList<T>&, labelList& order);
+
+//- Generate (sorted) indices corresponding to unique list values
+template<class T>
+void uniqueOrder(const UList<T>&, labelList& order);
+
+//- Extract elements of List when select is a certain value.
+//  eg, to extract all selected elements:
+//    subset<bool, labelList>(selectedElems, true, lst);
+template<class T, class ListType>
+ListType subset(const UList<T>& select, const T& value, const ListType&);
+
+//- Inplace extract elements of List when select is a certain value.
+//  eg, to extract all selected elements:
+//    inplaceSubset<bool, labelList>(selectedElems, true, lst);
+template<class T, class ListType>
+void inplaceSubset(const UList<T>& select, const T& value, ListType&);
+
+//- Extract elements of List when select is true
+//  eg, to extract all selected elements:
+//    subset<boolList, labelList>(selectedElems, lst);
+//  Note a labelHashSet could also be used for the bool-list
+template<class BoolListType, class ListType>
+ListType subset(const BoolListType& select, const ListType&);
+
+//- Inplace extract elements of List when select is true
+//  eg, to extract all selected elements:
+//    inplaceSubset<boolList, labelList>(selectedElems, lst);
+//  Note a labelHashSet could also be used for the bool-list
+template<class BoolListType, class ListType>
+void inplaceSubset(const BoolListType& select, ListType&);
 
 //- Invert one-to-one map. Unmapped elements will be -1.
-labelList invert(const label len, const labelList& oldToNew);
+labelList invert(const label len, const UList<label>&);
 
 //- Invert one-to-many map. Unmapped elements will be size 0.
-labelListList invertOneToMany(const label len, const labelList&);
+labelListList invertOneToMany(const label len, const UList<label>&);
 
-//- Invert many-to-many. Input and output types need to be inherited
-//  from List. E.g. faces to pointFaces.
+//- Invert many-to-many.
+//  Input and output types need to be inherited from List.
+//  eg, faces to pointFaces.
 template<class InList, class OutList>
 void invertManyToMany(const label len, const UList<InList>&, List<OutList>&);
 
@@ -113,72 +141,72 @@ labelList identity(const label len);
 
 //- Find first occurence of given element and return index,
 //  return -1 if not found. Linear search.
-template<class List>
+template<class ListType>
 label findIndex
 (
-    const List&,
-    typename List::const_reference,
+    const ListType&,
+    typename ListType::const_reference,
     const label start=0
 );
 
 //- Find all occurences of given element. Linear search.
-template<class List>
+template<class ListType>
 labelList findIndices
 (
-    const List&,
-    typename List::const_reference,
+    const ListType&,
+    typename ListType::const_reference,
     const label start=0
 );
 
 //- Opposite of findIndices: set values at indices to given value
-template<class List>
+template<class ListType>
 void setValues
 (
-    List&,
-    const labelList& indices,
-    typename List::const_reference
+    ListType&,
+    const UList<label>& indices,
+    typename ListType::const_reference
 );
 
 //- Opposite of findIndices: set values at indices to given value
-template<class List>
-List createWithValues
+template<class ListType>
+ListType createWithValues
 (
     const label sz,
-    typename List::const_reference initValue,
-    const labelList& indices,
-    typename List::const_reference setValue
+    typename ListType::const_reference initValue,
+    const UList<label>& indices,
+    typename ListType::const_reference setValue
 );
 
 //- Find index of max element (and larger than given element).
 //  return -1 if not found. Linear search.
-template<class List>
-label findMax(const List&, const label start=0);
+template<class ListType>
+label findMax(const ListType&, const label start=0);
 
 
 //- Find index of min element (and less than given element).
 //  return -1 if not found. Linear search.
-template<class List>
-label findMin(const List&, const label start=0);
+template<class ListType>
+label findMin(const ListType&, const label start=0);
 
 
 //- Find first occurence of given element in sorted list and return index,
 //  return -1 if not found. Binary search.
-template<class List>
+template<class ListType>
 label findSortedIndex
 (
-    const List&,
-    typename List::const_reference,
+    const ListType&,
+    typename ListType::const_reference,
     const label start=0
 );
 
 
 //- Find last element < given value in sorted list and return index,
 //  return -1 if not found. Binary search.
-template<class List>
+template<class ListType>
 label findLower
 (
-    const List&,
-    typename List::const_reference,
+    const ListType&,
+    typename ListType::const_reference,
     const label start=0
 );
 

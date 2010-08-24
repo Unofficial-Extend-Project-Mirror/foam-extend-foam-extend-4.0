@@ -29,7 +29,7 @@ License
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Stream>
-inline void Foam::IOobject::writeBanner(Stream& os, bool noHint)
+inline Stream& Foam::IOobject::writeBanner(Stream& os, bool noHint)
 {
     static bool spacesSet = false;
     static char spaces[40];
@@ -62,16 +62,29 @@ inline void Foam::IOobject::writeBanner(Stream& os, bool noHint)
         "| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n"
         "|  \\\\    /   O peration     | Version:  " << FOAMversion           << spaces << "|\n"
         "|   \\\\  /    A nd           | Revision: " << FOAMDevRevisionNumber << spacesRev << "|\n"
-        "|    \\\\/     M anipulation  | Web:      http://www.OpenFOAM.org               |\n"
+        "|    \\\\/     M anipulation  | Web:             www.OpenFOAM.org               |\n"
         "\\*---------------------------------------------------------------------------*/\n";
+
+    return os;
 }
 
 
 template<class Stream>
-inline void Foam::IOobject::writeDivider(Stream& os)
+inline Stream& Foam::IOobject::writeDivider(Stream& os)
 {
     os  <<
         "// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n";
+
+    return os;
+}
+
+template<class Stream>
+inline Stream& Foam::IOobject::writeEndDivider(Stream& os)
+{
+    os  << "\n\n"
+        "// ************************************************************************* //\n";
+
+    return os;
 }
 
 

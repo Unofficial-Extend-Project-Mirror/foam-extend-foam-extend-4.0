@@ -38,7 +38,7 @@ SourceFiles
 
 #include "volFieldsFwd.H"
 #include "fvMatrix.H"
-#include "oneField.H"
+#include "geometricOneField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -60,7 +60,7 @@ namespace fvm
     template<class Type>
     tmp<fvMatrix<Type> > ddt
     (
-        const oneField&,
+        const geometricOneField&,
         GeometricField<Type, fvPatchField, volMesh>&
     );
 

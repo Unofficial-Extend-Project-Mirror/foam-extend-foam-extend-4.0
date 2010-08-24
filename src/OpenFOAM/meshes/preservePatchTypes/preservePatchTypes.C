@@ -77,19 +77,14 @@ void Foam::preservePatchTypes
                 const dictionary& patchDict = 
                     patchDictionary.subDict(patchNames[patchi]);
 
-                patchTypes[patchi] = word(patchDict.lookup("type"));
+                patchDict.lookup("type") >> patchTypes[patchi];
 
-                if (patchDict.found("geometricType"))
-                {
-                    patchTypes[patchi] =
-                        word(patchDict.lookup("geometricType"));
-                }
-
-                if (patchDict.found("physicalType"))
-                {
-                    patchPhysicalTypes[patchi] =
-                        word(patchDict.lookup("physicalType"));
-                }
+                patchDict.readIfPresent("geometricType", patchTypes[patchi]);
+                patchDict.readIfPresent
+                (
+                    "physicalType",
+                    patchPhysicalTypes[patchi]
+                );
             }
         }
 
@@ -98,10 +93,7 @@ void Foam::preservePatchTypes
             const dictionary& patchDict = 
                 patchDictionary.subDict(defaultFacesName);
 
-            if (patchDict.found("geometricType"))
-            {
-                defaultFacesType = word(patchDict.lookup("geometricType"));
-            }
+            patchDict.readIfPresent("geometricType", defaultFacesType);
         }
     }
 

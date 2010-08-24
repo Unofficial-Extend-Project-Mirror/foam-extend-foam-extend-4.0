@@ -33,14 +33,10 @@ Description
 
 #include "primitiveMesh.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void primitiveMesh::calcFaceCentresAndAreas() const
+void Foam::primitiveMesh::calcFaceCentresAndAreas() const
 {
     if (debug)
     {
@@ -75,7 +71,7 @@ void primitiveMesh::calcFaceCentresAndAreas() const
 }
 
 
-void primitiveMesh::makeFaceCentresAndAreas
+void Foam::primitiveMesh::makeFaceCentresAndAreas
 (
     const pointField& p,
     vectorField& fCtrs,
@@ -132,7 +128,7 @@ void primitiveMesh::makeFaceCentresAndAreas
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const vectorField& primitiveMesh::faceCentres() const
+const Foam::vectorField& Foam::primitiveMesh::faceCentres() const
 {
     if (!faceCentresPtr_)
     {
@@ -143,7 +139,7 @@ const vectorField& primitiveMesh::faceCentres() const
 }
 
 
-const vectorField& primitiveMesh::faceAreas() const
+const Foam::vectorField& Foam::primitiveMesh::faceAreas() const
 {
     if (!faceAreasPtr_)
     {
@@ -153,9 +149,5 @@ const vectorField& primitiveMesh::faceAreas() const
     return *faceAreasPtr_;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

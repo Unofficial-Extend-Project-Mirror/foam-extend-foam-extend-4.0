@@ -25,146 +25,21 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "timeActivatedExplicitSource.H"
-#include "volFields.H"
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Foam::timeActivatedExplicitSource::timeActivatedExplicitSource
-(
-    const word& sourceName,
-    const fvMesh& mesh
-)
-:
-    dict_
-    (
-        IOobject
-        (
-            sourceName + "Properties",
-            mesh.time().constant(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::NO_WRITE
-        )
-    ),
-    mesh_(mesh),
-    runTime_(mesh.time()),
-    cellSource_(dict_.lookup("cellSource")),
-    timeStart_(dimensionedScalar(dict_.lookup("timeStart")).value()),
-    duration_(dimensionedScalar(dict_.lookup("duration")).value()),
-    onValue_(dict_.lookup("onValue")),
-    offValue_(dict_.lookup("offValue")),
-    currentValue_(dimensionedScalar("zero", onValue_.dimensions(), 0.0)),
-    cellSelector_
-    (
-        topoSetSource::New
-        (
-            cellSource_,
-            mesh,
-            dict_.subDict(cellSource_ + "Coeffs")
-        )
-    ),
-    selectedCellSet_
-    (
-        mesh,
-        "timeActivatedExplicitSourceCellSet",
-        mesh.nCells()/10 + 1  // Reasonable size estimate.
-    )
+namespace Foam
 {
-    // Check dimensions of on/off values are consistent
-    if (onValue_.dimensions() != offValue_.dimensions())
-    {
-        FatalErrorIn
-        (
-            "Foam::timeActivatedExplicitSource::timeActivatedExplicitSource"
-        )<< "Dimensions of on and off values must be equal" << nl
-         << "onValue = " << onValue_ << nl
-         << "offValue = " << offValue_ << exit(FatalError);
-    }
-
-    // Create the cell set
-    cellSelector_->applyToSet
+    defineTemplateTypeNameAndDebug
     (
-        topoSetSource::NEW,
-        selectedCellSet_
+        IOPtrList<scalarTimeActivatedExplicitSource>,
+        0
     );
-
-    // Give some feedback
-    Info<< "timeVaryingExplitSource(" << sourceName << ")" << nl
-        << "Selected " << returnReduce(selectedCellSet_.size(), sumOp<label>())
-        << " cells." << endl;
-
-    // Initialise the value
-    update();
-}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-Foam::scalar Foam::timeActivatedExplicitSource::timeStart() const
-{
-    return timeStart_;
-}
-
-
-Foam::scalar Foam::timeActivatedExplicitSource::duration() const
-{
-    return duration_;
-}
-
-
-const Foam::dimensionedScalar&
-Foam::timeActivatedExplicitSource::currentValue() const
-{
-    return currentValue_;
-}
-
-
-Foam::tmp<Foam::DimensionedField<Foam::scalar, Foam::volMesh> >
-Foam::timeActivatedExplicitSource::Su() const
-{
-    tmp<DimensionedField<scalar, volMesh> > tSource
+    defineTemplateTypeNameAndDebug
     (
-        new DimensionedField<scalar, volMesh>
-        (
-            IOobject
-            (
-                "timeActivatedExplicitSource",
-                runTime_.timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            mesh_,
-            dimensionedScalar("zero", onValue_.dimensions(), 0.0)
-        )
+        IOPtrList<vectorTimeActivatedExplicitSource>,
+         0
     );
-
-    DimensionedField<scalar, volMesh>& sourceField = tSource();
-
-    forAllConstIter(cellSet, selectedCellSet_, iter)
-    {
-        sourceField[iter.key()] = currentValue_.value();
-    }
-
-    return tSource;
 }
-
-
-void Foam::timeActivatedExplicitSource::update()
-{
-    if
-    (
-        (runTime_.time().value() >= timeStart_)
-     && (runTime_.time().value() <= timeStart_ + duration_)
-    )
-    {
-        currentValue_ = onValue_;
-    }
-    else
-    {
-        currentValue_ = offValue_;
-    }
-}
-
 
 // ************************************************************************* //

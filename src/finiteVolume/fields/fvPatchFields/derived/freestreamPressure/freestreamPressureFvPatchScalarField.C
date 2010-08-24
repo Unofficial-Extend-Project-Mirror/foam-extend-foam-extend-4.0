@@ -99,13 +99,13 @@ void freestreamPressureFvPatchScalarField::updateCoeffs()
         return;
     }
 
-    const freestreamFvPatchVectorField& Up =
+    const freestreamFvPatchVectorField& Up = 
         refCast<const freestreamFvPatchVectorField>
         (
             patch().lookupPatchField<volVectorField, vector>("U")
         );
 
-    const surfaceScalarField& phi =
+    const surfaceScalarField& phi = 
         db().lookupObject<surfaceScalarField>("phi");
 
     fvsPatchField<scalar>& phip =

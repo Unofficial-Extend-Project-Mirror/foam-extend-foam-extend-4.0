@@ -51,13 +51,13 @@ namespace Foam
 
 class complex;
 
-inline scalar magSqr(const complex& c);
-inline complex sqr(const complex& c);
-inline scalar mag(const complex& c);
-inline const complex& max(const complex& c1, const complex& c2);
-inline const complex& min(const complex& c1, const complex& c2);
-inline complex limit(const complex& c1, const complex& c2);
-inline const complex& sum(const complex& c);
+inline scalar magSqr(const complex&);
+inline complex sqr(const complex&);
+inline scalar mag(const complex&);
+inline const complex& max(const complex&, const complex&);
+inline const complex& min(const complex&, const complex&);
+inline complex limit(const complex&, const complex&);
+inline const complex& sum(const complex&);
 inline complex operator+(const complex&, const complex&);
 inline complex operator-(const complex&);
 inline complex operator-(const complex&, const complex&);
@@ -67,8 +67,8 @@ inline complex operator*(const scalar, const complex&);
 inline complex operator*(const complex&, const scalar);
 inline complex operator/(const complex&, const scalar);
 inline complex operator/(const scalar, const complex&);
-Istream& operator>>(Istream& is, complex&);
-Ostream& operator<<(Ostream& os, const complex& C);
+Istream& operator>>(Istream&, complex&);
+Ostream& operator<<(Ostream&, const complex&);
 
 
 /*---------------------------------------------------------------------------*\
@@ -127,13 +127,13 @@ public:
 
     // Member operators
 
-        inline void operator=(const complex&);
+        inline const complex& operator=(const complex&);
         inline void operator+=(const complex&);
         inline void operator-=(const complex&);
         inline void operator*=(const complex&);
         inline void operator/=(const complex&);
 
-        inline void operator=(const scalar);
+        inline const complex& operator=(const scalar);
         inline void operator+=(const scalar);
         inline void operator-=(const scalar);
         inline void operator*=(const scalar);
@@ -150,12 +150,12 @@ public:
         friend scalar magSqr(const complex& c);
         friend complex sqr(const complex& c);
         friend scalar mag(const complex& c);
-        friend const complex& max(const complex& c1, const complex& c2);
-        friend const complex& min(const complex& c1, const complex& c2);
+        friend const complex& max(const complex&, const complex&);
+        friend const complex& min(const complex&, const complex&);
 
-        friend complex limit(const complex& c1, const complex& c2);
+        friend complex limit(const complex&, const complex&);
 
-        friend const complex& sum(const complex& c);
+        friend const complex& sum(const complex&);
 
 
     // Friend operators
@@ -174,8 +174,8 @@ public:
 
     // IOstream operators
 
-        friend Istream& operator>>(Istream& is, complex&);
-        friend Ostream& operator<<(Ostream& os, const complex& C);
+        friend Istream& operator>>(Istream&, complex&);
+        friend Ostream& operator<<(Ostream&, const complex&);
 
 };
 
@@ -186,7 +186,7 @@ public:
 word name(const complex&);
 
 
-//- Specify data associated with complex type is contiguous
+//- Data associated with complex type are contiguous
 template<>
 inline bool contiguous<complex>() {return true;}
 

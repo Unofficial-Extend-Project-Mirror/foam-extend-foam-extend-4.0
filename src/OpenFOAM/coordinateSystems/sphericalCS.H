@@ -44,13 +44,18 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class sphericalCS Declaration
+                         Class sphericalCS Declaration
 \*---------------------------------------------------------------------------*/
 
 class sphericalCS
 :
     public coordinateSystem
 {
+    // Private data members
+
+        //- Are angles in degrees? (default = true)
+        bool inDegrees_;
+
 
 protected:
 
@@ -89,34 +94,55 @@ public:
     // Constructors
 
         //- Construct null
-        sphericalCS();
+        sphericalCS(const bool inDegrees = true);
 
-        //- Construct from components
+        //- Construct copy
+        sphericalCS
+        (
+            const coordinateSystem&,
+            const bool inDegrees = true
+        );
+
+        //- Construct copy with a different name
+        sphericalCS
+        (
+            const word& name,
+            const coordinateSystem&,
+            const bool inDegrees = true
+        );
+
+        //- Construct from origin and rotation
+        sphericalCS
+        (
+            const word& name,
+            const point& origin,
+            const coordinateRotation&,
+            const bool inDegrees = true
+        );
+
+        //- Construct from origin and 2 axes
         sphericalCS
         (
             const word& name,
             const point& origin,
             const vector& axis,
-            const vector& direction
+            const vector& dirn,
+            const bool inDegrees = true
         );
-
-        //- Construct from origin and rotation angles
-        sphericalCS
-        (
-            const word& name,
-            const point& origin,
-            const coordinateRotation& cr
-        );
-
 
         //- Construct from dictionary
-        sphericalCS(const word& name, const dictionary& dict);
+        sphericalCS(const word& name, const dictionary&);
 
 
     // Member Functions
 
-};
+        //- Are angles in degrees?
+        bool  inDegrees() const;
 
+        //- Non-const access to inDegrees
+        bool& inDegrees();
+
+};
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

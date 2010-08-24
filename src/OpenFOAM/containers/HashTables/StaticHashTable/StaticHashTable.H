@@ -28,10 +28,10 @@ Class
 Description
     STL conforming hash table.
 
+Note
     Uses straight lists as underlying type.
     Is slower to insert than the standard HashTable, but should be more
     memory efficient and faster to access.
-    Explicitly does not have default size.
 
 SourceFiles
     StaticHashTableI.H
@@ -44,7 +44,9 @@ SourceFiles
 #define StaticHashTable_H
 
 #include "label.H"
+#include "uLabel.H"
 #include "word.H"
+#include "Xfer.H"
 #include "className.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -54,9 +56,7 @@ namespace Foam
 
 // Forward declaration of friend functions and operators
 
-template<class T>
-class List;
-
+template<class T> class List;
 template<class T, class Key, class Hash> class StaticHashTable;
 
 template<class T, class Key, class Hash> Istream& operator>>
@@ -73,14 +73,14 @@ template<class T, class Key, class Hash> Ostream& operator<<
 
 
 /*---------------------------------------------------------------------------*\
-                        Class StaticHashTableName Declaration
+                     Class StaticHashTableName Declaration
 \*---------------------------------------------------------------------------*/
 
 TemplateName(StaticHashTable);
 
 
 /*---------------------------------------------------------------------------*\
-                          Class StaticHashTable Declaration
+                       Class StaticHashTable Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class T, class Key=word, class Hash=string::hash>
@@ -98,6 +98,16 @@ class StaticHashTable
 
         //- The current number of elements in table
         label nElmts_;
+
+        //- Return a canonical (power-of-two) size
+        static label canonicalSize(const label);
+
+        //- Return the hash index of the Key within the current table size.
+        //  No checks for zero-sized tables.
+        inline label hashKeyIndex(const Key&) const;
+
+        //- Assign a new hashed entry to a possibly already existing key
+        bool set(const Key&, const T& newElmt, bool protect);
 
 public:
 
@@ -138,14 +148,16 @@ public:
     // Constructors
 
         //- Construct given initial table size
-        StaticHashTable(const label size = 100);
+        StaticHashTable(const label size = 128);
 
         //- Construct from Istream
-        StaticHashTable(Istream&, const label size = 100);
+        StaticHashTable(Istream&, const label size = 128);
 
         //- Construct as copy
         StaticHashTable(const StaticHashTable<T, Key, Hash>&);
 
+        //- Construct by transferring the parameter contents
+        StaticHashTable(const Xfer< StaticHashTable<T, Key, Hash> >&);
 
     // Destructor
 
@@ -159,54 +171,83 @@ public:
             //- Return number of elements in table.
             inline label size() const;
 
-            //- Return true if hashedEntry is found in table
+            //- Return true if the hash table is empty
+            inline bool empty() const;
+
+            //- Return true if hashed entry is found in table
             bool found(const Key& key) const;
 
-            //- Find and return an iterator set at the hashedEntry
+            //- Find and return an iterator set at the hashed entry
             //  If not found iterator = end()
             iterator find(const Key& key);
 
-            //- Find and return an const_iterator set at the hashedEntry
+            //- Find and return an const_iterator set at the hashed entry
             //  If not found iterator = end()
             const_iterator find(const Key& key) const;
 
             //- Return the table of contents
             List<Key> toc() const;
 
+            //- Print information
+            Ostream& printInfo(Ostream&) const;
+
 
         // Edit
 
-            //- Insert a new hashedEntry
+            //- Insert a new hashed entry
             bool insert(const Key& key, const T& newElmt);
 
-            //- Erase an hashedEntry specified by given iterator
+            //- Assign a new hashed entry, overwriting existing entries
+            inline bool set(const Key&, const T& newElmt);
+
+            //- Erase an hashed entry specified by given iterator
             bool erase(const iterator& it);
 
-            //- Erase an hashedEntry specified by given key if in table
+            //- Erase an hashed entry specified by given key if in table
             bool erase(const Key& key);
 
             //- Resize the hash table for efficiency
             void resize(const label newSize);
 
+            //- Remove entries in the given hash table from this hash table
+            //  Return the number of elements removed
+            label erase(const StaticHashTable<T, Key, Hash>&);
+
             //- Clear all entries from table
             void clear();
+
+            //- Clear the table entries and the table itself.
+            //  Equivalent to clear() followed by resize(1)
+            void clearStorage();
 
             //- Transfer the contents of the argument table into this table
             //  and annull the argument table.
             void transfer(StaticHashTable<T, Key, Hash>&);
 
+            //- Transfer contents to the Xfer container
+            inline Xfer< StaticHashTable<T, Key, Hash> > xfer();
+
 
     // Member Operators
 
-        //- Find and return an hashedEntry
-        inline T& operator[](const Key& key);
+        //- Find and return an hashed entry
+        inline T& operator[](const Key&);
 
-        //- Find and return an hashedEntry
-        inline const T& operator[](const Key& key) const;
+        //- Find and return an hashed entry
+        inline const T& operator[](const Key&) const;
+
+        //- Find and return an hashed entry, create it null if not present.
+        inline T& operator()(const Key&);
 
         //- Assignment
         void operator=(const StaticHashTable<T, Key, Hash>&);
 
+        //- Equality. Two hash tables are equal if all contents of first are
+        //  also in second and vice versa.
+        bool operator==(const StaticHashTable<T, Key, Hash>&) const;
+
+        //- The opposite of the equality operation.
+        bool operator!=(const StaticHashTable<T, Key, Hash>&) const;
 
     // STL type definitions
 
@@ -242,24 +283,24 @@ public:
             // Private data
 
                 //- Reference to the StaticHashTable this is an iterator for
-                TableRef curStaticHashTable_;
+                TableRef hashTable_;
 
                 //- Current hash index
                 label hashIndex_;
 
                 //- Index of current element at hashIndex
-                label elementIndex_;
+                label elemIndex_;
 
         public:
 
             // Constructors
 
-                //- Construct from hash table, element and hash index
+                //- Construct from hash table, hash index and element index
                 inline Iterator
                 (
-                    TableRef curStaticHashTable,
+                    TableRef,
                     label hashIndex_,
-                    label elementIndex_
+                    label elemIndex_
                 );
 
                 //- Construct from the non-const iterator
@@ -268,13 +309,13 @@ public:
 
             // Member operators
 
-                inline void operator=(const iterator& iter);
+                inline void operator=(const iterator&);
 
-                inline bool operator==(const iterator& iter) const;
-                inline bool operator==(const const_iterator& iter) const;
+                inline bool operator==(const iterator&) const;
+                inline bool operator==(const const_iterator&) const;
 
-                inline bool operator!=(const iterator& iter) const;
-                inline bool operator!=(const const_iterator& iter) const;
+                inline bool operator!=(const iterator&) const;
+                inline bool operator!=(const const_iterator&) const;
 
                 inline TRef operator*();
                 inline TRef operator()();
@@ -282,22 +323,27 @@ public:
                 inline Iterator& operator++();
                 inline Iterator operator++(int);
 
-                inline const Key& key();
+                inline const Key& key() const;
         };
 
 
-        //- iterator set to the begining of the StaticHashTable
+        //- iterator set to the beginning of the StaticHashTable
         inline iterator begin();
 
         //- iterator set to beyond the end of the StaticHashTable
         inline const iterator& end();
 
-        //- const_iterator set to the begining of the StaticHashTable
+        //- const_iterator set to the beginning of the StaticHashTable
+        inline const_iterator cbegin() const;
+
+        //- const_iterator set to beyond the end of the StaticHashTable
+        inline const const_iterator& cend() const;
+
+        //- const_iterator set to the beginning of the StaticHashTable
         inline const_iterator begin() const;
 
         //- const_iterator set to beyond the end of the StaticHashTable
         inline const const_iterator& end() const;
-
 
     // IOstream Operator
 

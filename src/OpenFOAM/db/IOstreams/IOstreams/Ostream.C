@@ -22,16 +22,17 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
+#include "word.H"
 #include "Ostream.H"
 #include "token.H"
+#include "keyType.H"
+#include "IOstreams.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-//- Decrememt the indent level
+// Decrement the indent level
 void Foam::Ostream::decrIndent()
 {
     if (indentLevel_ == 0)
@@ -46,15 +47,36 @@ void Foam::Ostream::decrIndent()
 }
 
 
-// Write the keyword to the Ostream followed by appropriate indentation
-Foam::Ostream& Foam::Ostream::writeKeyword(const Foam::word& keyword)
+// Write keyType
+// write regular expression as quoted string
+// write plain word as word (unquoted)
+Foam::Ostream& Foam::Ostream::write(const keyType& kw)
+{
+    return writeQuoted(kw, kw.isPattern());
+}
+
+
+// Write the keyword followed by appropriate indentation
+Foam::Ostream& Foam::Ostream::writeKeyword(const keyType& kw)
 {
     indent();
-    write(keyword);
+    write(kw);
 
-    label nSpaces = max(entryIndentation_ - label(keyword.size()), 1);
+    label nSpaces = entryIndentation_ - label(kw.size());
 
-    for (label i=0; i<nSpaces; i++)
+    // pattern is surrounded by quotes
+    if (kw.isPattern())
+    {
+        nSpaces -= 2;
+    }
+
+    // could also increment by indentSize_ ...
+    if (nSpaces < 1)
+    {
+        nSpaces = 1;
+    }
+
+    while (nSpaces--)
     {
         write(char(token::SPACE));
     }

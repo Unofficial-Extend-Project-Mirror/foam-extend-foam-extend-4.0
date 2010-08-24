@@ -39,29 +39,6 @@ namespace Foam
 
 Foam::porousZones::porousZones
 (
-    const fvMesh& mesh,
-    const coordinateSystems& cs
-)
-:
-    IOPtrList<porousZone>
-    (
-        IOobject
-        (
-            "porousZones",
-            mesh.time().constant(),
-            mesh,
-            IOobject::READ_IF_PRESENT,
-            IOobject::NO_WRITE
-        ),
-        porousZone::iNew(mesh)
-    ),
-    mesh_(mesh),
-    csList_(cs)
-{}
-
-
-Foam::porousZones::porousZones
-(
     const fvMesh& mesh
 )
 :
@@ -72,32 +49,14 @@ Foam::porousZones::porousZones
             "porousZones",
             mesh.time().constant(),
             mesh,
-            IOobject::NO_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         ),
         porousZone::iNew(mesh)
     ),
-    mesh_(mesh),
-    csList_(mesh)
-{
-    clear();
+    mesh_(mesh)
+{}
 
-    IOPtrList<porousZone> newList
-    (
-        IOobject
-        (
-            "porousZones",
-            mesh_.time().constant(),
-            mesh_,
-            IOobject::READ_IF_PRESENT,
-            IOobject::NO_WRITE,
-            false     // Don't register new zones with objectRegistry
-        ),
-        porousZone::iNew(mesh_, csList_)
-    );
-
-    transfer(newList);
-}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -134,7 +93,7 @@ bool Foam::porousZones::readData(Istream& is)
 {
     clear();
 
-    IOPtrList<porousZone> newList
+    IOPtrList<porousZone> newLst
     (
         IOobject
         (
@@ -143,12 +102,12 @@ bool Foam::porousZones::readData(Istream& is)
             mesh_,
             IOobject::MUST_READ,
             IOobject::NO_WRITE,
-            false     // Don't register new zones with objectRegistry
+            false     // Don't re-register new zones with objectRegistry
         ),
-        porousZone::iNew(mesh_, csList_)
+        porousZone::iNew(mesh_)
     );
 
-    transfer(newList);
+    transfer(newLst);
 
     return is.good();
 }

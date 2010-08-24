@@ -95,6 +95,12 @@ class processorPointPatch
         virtual void updateMesh();
 
 
+        //- Disallow default construct as copy
+        processorPointPatch(const processorPointPatch&);
+
+        //- Disallow default assignment
+        void operator=(const processorPointPatch&);
+
 public:
 
     typedef coupledPointPatch CoupledPointPatch;

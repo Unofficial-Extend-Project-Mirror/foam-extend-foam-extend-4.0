@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    noPreconditioner
+    Foam::noPreconditioner
 
 Description
     Null preconditioner for both symmetric and asymmetric matrices.
@@ -68,7 +68,7 @@ public:
 
     // Constructors
 
-        //- Construct from matrix components and preconditioner data stream
+        //- Construct from matrix components and preconditioner solver controls
         noPreconditioner
         (
             const lduMatrix& matrix,

@@ -39,7 +39,7 @@ SourceFiles
 #define faceMapper_H
 
 #include "morphFieldMapper.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

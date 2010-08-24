@@ -32,27 +32,24 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
+Foam::totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
 )
 :
     fixedValueFvPatchScalarField(p, iF),
-    UName_("Undefined"),
-    phiName_("Undefined"),
-    psiName_("Undefined"),
+    UName_("U"),
+    phiName_("phi"),
+    psiName_("psi"),
     gamma_(0.0),
     T0_(p.size(), 0.0)
 {}
 
 
-totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
+Foam::totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
 (
     const totalTemperatureFvPatchScalarField& ptf,
     const fvPatch& p,
@@ -69,7 +66,7 @@ totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
 {}
 
 
-totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
+Foam::totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -77,9 +74,9 @@ totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
 )
 :
     fixedValueFvPatchScalarField(p, iF),
-    UName_(dict.lookup("U")),
-    phiName_(dict.lookup("phi")),
-    psiName_(dict.lookup("psi")),
+    UName_(dict.lookupOrDefault<word>("U", "U")),
+    phiName_(dict.lookupOrDefault<word>("phi", "phi")),
+    psiName_(dict.lookupOrDefault<word>("psi", "psi")),
     gamma_(readScalar(dict.lookup("gamma"))),
     T0_("T0", dict, p.size())
 {
@@ -97,7 +94,7 @@ totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
 }
 
 
-totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
+Foam::totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
 (
     const totalTemperatureFvPatchScalarField& tppsf
 )
@@ -111,7 +108,7 @@ totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
 {}
 
 
-totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
+Foam::totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
 (
     const totalTemperatureFvPatchScalarField& tppsf,
     const DimensionedField<scalar, volMesh>& iF
@@ -128,7 +125,7 @@ totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void totalTemperatureFvPatchScalarField::autoMap
+void Foam::totalTemperatureFvPatchScalarField::autoMap
 (
     const fvPatchFieldMapper& m
 )
@@ -138,7 +135,7 @@ void totalTemperatureFvPatchScalarField::autoMap
 }
 
 
-void totalTemperatureFvPatchScalarField::rmap
+void Foam::totalTemperatureFvPatchScalarField::rmap
 (
     const fvPatchScalarField& ptf,
     const labelList& addr
@@ -153,12 +150,16 @@ void totalTemperatureFvPatchScalarField::rmap
 }
 
 
-void totalTemperatureFvPatchScalarField::updateCoeffs(const vectorField& Up)
+void Foam::totalTemperatureFvPatchScalarField::updateCoeffs()
 {
     if (updated())
     {
         return;
     }
+
+    const fvPatchVectorField& Up =
+        patch().lookupPatchField<volVectorField, vector>(UName_);
+
     const fvsPatchField<scalar>& phip =
         patch().lookupPatchField<surfaceScalarField, scalar>(phiName_);
 
@@ -175,19 +176,23 @@ void totalTemperatureFvPatchScalarField::updateCoeffs(const vectorField& Up)
     fixedValueFvPatchScalarField::updateCoeffs();
 }
 
-void totalTemperatureFvPatchScalarField::updateCoeffs()
-{
-    updateCoeffs(patch().lookupPatchField<volVectorField, vector>(UName_));
-}
 
-
-void totalTemperatureFvPatchScalarField::write(Ostream& os) const
+void Foam::totalTemperatureFvPatchScalarField::write(Ostream& os) const
 {
     fvPatchScalarField::write(os);
-    os.writeKeyword("U") << UName_ << token::END_STATEMENT << nl;
-    os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
-    os.writeKeyword("psi") << psiName_ << token::END_STATEMENT << nl;
-    os.writeKeyword("gamma") << gamma_ << token::END_STATEMENT << endl;
+    if (UName_ != "U")
+    {
+        os.writeKeyword("U") << UName_ << token::END_STATEMENT << nl;
+    }
+    if (phiName_ != "phi")
+    {
+        os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
+    }
+    if (psiName_ != "psi")
+    {
+        os.writeKeyword("psi") << psiName_ << token::END_STATEMENT << nl;
+    }
+    os.writeKeyword("gamma") << gamma_ << token::END_STATEMENT << nl;
     T0_.writeEntry("T0", os);
     writeEntry("value", os);
 }
@@ -195,10 +200,13 @@ void totalTemperatureFvPatchScalarField::write(Ostream& os) const
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField(fvPatchScalarField, totalTemperatureFvPatchScalarField);
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
+namespace Foam
+{
+    makePatchTypeField
+    (
+        fvPatchScalarField, 
+        totalTemperatureFvPatchScalarField
+    );
+}
 
 // ************************************************************************* //

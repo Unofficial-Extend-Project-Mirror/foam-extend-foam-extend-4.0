@@ -42,7 +42,8 @@ namespace Foam
 Foam::barotropicCompressibilityModel::barotropicCompressibilityModel
 (
     const dictionary& compressibilityProperties,
-    const volScalarField& gamma
+    const volScalarField& gamma,
+    const word& psiName
 )
 :
     compressibilityProperties_(compressibilityProperties),
@@ -50,12 +51,12 @@ Foam::barotropicCompressibilityModel::barotropicCompressibilityModel
     (
         IOobject
         (
-            "psi",
+            psiName,
             gamma.mesh().time().timeName(),
             gamma.mesh()
         ),
         gamma.mesh(),
-        dimensionedScalar("psi", dimensionSet(0, -2, 2, 0, 0), 0)
+        dimensionedScalar(psiName, dimensionSet(0, -2, 2, 0, 0), 0)
     ),
     gamma_(gamma)
 {}

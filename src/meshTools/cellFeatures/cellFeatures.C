@@ -28,7 +28,7 @@ Description
 
 #include "cellFeatures.H"
 #include "primitiveMesh.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "Map.H"
 #include "demandDrivenData.H"
 #include "ListOps.H"
@@ -50,7 +50,7 @@ bool Foam::cellFeatures::faceAlignedEdge(const label faceI, const label edgeI)
     {
         if (f[fp] == e.start())
         {
-            label fp1 = (fp + 1) % f.size();
+            label fp1 = f.fcIndex(fp);
 
             return f[fp1] == e.end();
         }
@@ -112,7 +112,7 @@ Foam::label Foam::cellFeatures::nextEdge
         << thisEdgeI << " at vertex " << thisVertI << endl
         << "This might mean that the externalEdges do not form a closed loop"
         << abort(FatalError);
-    
+
     return -1;
 }
 
@@ -146,12 +146,12 @@ bool Foam::cellFeatures::isCellFeatureEdge
     const face& f0 = mesh_.faces()[face0];
 
     label face0Start = findIndex(f0, e.start());
-    label face0End = (face0Start + 1) % f0.size();
+    label face0End   = f0.fcIndex(face0Start);
 
     const face& f1 = mesh_.faces()[face1];
 
     label face1Start = findIndex(f1, e.start());
-    label face1End = (face1Start + 1) % f1.size();
+    label face1End   = f1.fcIndex(face1Start);
 
     if
     (
@@ -268,7 +268,7 @@ void Foam::cellFeatures::calcSuperFaces() const
     {
         faceMap_[superI].shrink();
     }
-        
+
 
     // Construct superFaces
 
@@ -282,7 +282,7 @@ void Foam::cellFeatures::calcSuperFaces() const
 
         label superFaceI = toSuperFace[faceI];
 
-        if (faces[superFaceI].size() == 0)
+        if (faces[superFaceI].empty())
         {
             // Superface not yet constructed.
 
@@ -369,9 +369,7 @@ void Foam::cellFeatures::calcSuperFaces() const
                 }
                 else
                 {
-                    superFace.shrink();
-
-                    faces[superFaceI] = face(superFace);
+                    faces[superFaceI].transfer(superFace);
                 }
             }
         }

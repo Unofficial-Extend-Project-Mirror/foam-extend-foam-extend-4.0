@@ -1,8 +1,14 @@
+//
+// checkConstantOption.H
+// ~~~~~~~~~~~~~~~~~~~~~
+// unless -constant is present, skip startTime if it is "constant"
+
     if
     (
-        !args.options().found("constant")
-     && Times.size() > 1
+        !args.optionFound("constant")
+     && (startTime < Times.size()-1)
+     && (Times[startTime].name() == "constant")
     )
-    {    
-        startTime = 1;
+    {
+        startTime++;
     }

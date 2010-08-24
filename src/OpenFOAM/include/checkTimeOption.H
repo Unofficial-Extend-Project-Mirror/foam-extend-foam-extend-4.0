@@ -1,7 +1,17 @@
-    if (args.options().found("time"))
-    {
-        scalar timeValue(readScalar(IStringStream(args.options()["time"])()));
+//
+// checkTimeOption.H
+// ~~~~~~~~~~~~~~~~~
+// check -time and -latestTime options
 
-        startTime = Time::findClosestTimeIndex(Times, timeValue);
+    if (args.optionFound("time"))
+    {
+        Foam::scalar timeValue = args.optionRead<scalar>("time");
+
+        startTime = Foam::Time::findClosestTimeIndex(Times, timeValue);
         endTime = startTime + 1;
+    }
+
+    if (args.optionFound("latestTime"))
+    {
+        startTime = Times.size() - 1;
     }

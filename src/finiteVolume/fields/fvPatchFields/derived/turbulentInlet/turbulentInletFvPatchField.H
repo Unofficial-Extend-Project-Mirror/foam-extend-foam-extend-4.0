@@ -63,7 +63,6 @@ class turbulentInletFvPatchField
 :
     public fixedValueFvPatchField<Type>
 {
-
     // Private data
 
         Random ranGen_;

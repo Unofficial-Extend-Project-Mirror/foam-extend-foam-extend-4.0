@@ -62,16 +62,18 @@ class general
         List<pair> xy_;
 
         label nEntries_;
+
         //- min and max values of the distribution
         scalar minValue_;
         scalar maxValue_;
 
         scalar range_;
 
+
 public:
 
     //- Runtime type information
-        TypeName("general");
+    TypeName("general");
 
 
     // Constructors
@@ -85,27 +87,25 @@ public:
 
 
     // Destructor
-
-        ~general();
+    virtual ~general();
 
 
     // Member Functions
 
-    scalar sample() const;
+        //- Sample the pdf
+        virtual scalar sample() const;
 
-    scalar minValue() const;
-    scalar maxValue() const;
+        //- Return the minimum value
+        virtual scalar minValue() const;
 
+        //- Return the maximum value
+        virtual scalar maxValue() const;
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-//#include "generalI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

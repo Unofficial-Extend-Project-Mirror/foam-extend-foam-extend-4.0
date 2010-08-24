@@ -70,7 +70,7 @@ leastSquaresGrad<Type>::grad
             (
                 "grad("+vsf.name()+')',
                 vsf.instance(),
-                vsf.db(),
+                mesh,
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

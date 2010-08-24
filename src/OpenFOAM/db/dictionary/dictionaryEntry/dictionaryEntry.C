@@ -30,7 +30,7 @@ License
 
 Foam::dictionaryEntry::dictionaryEntry
 (
-    const word& key,
+    const keyType& key,
     const dictionary& parentDict,
     const dictionary& dict
 )

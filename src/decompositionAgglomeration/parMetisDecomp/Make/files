@@ -1,3 +1,0 @@
-parMetisDecomp.C
-
-LIB = $(FOAM_MPI_LIBBIN)/libparMetisDecompositionMethod

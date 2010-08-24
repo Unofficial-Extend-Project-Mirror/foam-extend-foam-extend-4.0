@@ -31,8 +31,6 @@ Description
 #ifndef ListLoop_H
 #define ListLoop_H
 
-#include "undefListLoopM.H"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef vectorMachine
@@ -48,8 +46,11 @@ Description
 
 #define List_ELEM(f, fp, i)  (fp[i])
 
-#define List_ACCESS(type, f, fp) type* __restrict__ fp = (f).begin()
-#define List_CONST_ACCESS(type, f, fp) const type* __restrict__ fp = (f).begin()
+#define List_ACCESS(type, f, fp) \
+    type* const __restrict__ fp = (f).begin()
+
+#define List_CONST_ACCESS(type, f, fp) \
+    const type* const __restrict__ fp = (f).begin()
 
 #else
 
@@ -64,8 +65,11 @@ Description
 
 #define List_ELEM(f, fp, i)  (*fp++)
 
-#define List_ACCESS(type, f, fp)  register type* __restrict__ fp = (f).begin()
-#define List_CONST_ACCESS(type, f, fp)  register const type* __restrict__ fp = (f).begin()
+#define List_ACCESS(type, f, fp) \
+    register type* __restrict__ fp = (f).begin()
+
+#define List_CONST_ACCESS(type, f, fp) \
+    register const type* __restrict__ fp = (f).begin()
 
 #endif
 

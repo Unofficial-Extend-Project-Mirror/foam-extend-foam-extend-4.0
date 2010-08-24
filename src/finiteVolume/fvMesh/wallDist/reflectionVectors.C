@@ -60,7 +60,7 @@ void Foam::reflectionVectors::correct()
     forAll(patches, patchi)
     {
         // find the nearest face for every cell
-        if (patches[patchi].type() == wallFvPatch::typeName)
+        if (isA<wallFvPatch>(patches[patchi]))
         {
             n_.boundaryField()[patchi] =
                 mesh.Sf().boundaryField()[patchi]

@@ -78,7 +78,6 @@ SourceFiles
 #ifndef cellMatcher_H
 #define cellMatcher_H
 
-#include "label.H"
 #include "labelList.H"
 #include "faceList.H"
 #include "boolList.H"

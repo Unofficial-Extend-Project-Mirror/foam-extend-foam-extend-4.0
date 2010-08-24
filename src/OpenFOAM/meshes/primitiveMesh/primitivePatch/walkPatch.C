@@ -29,22 +29,14 @@ Description
 #include "walkPatch.H"
 #include "ListOps.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-
-namespace Foam
-{
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(walkPatch, 0);
-
-
+defineTypeNameAndDebug(Foam::walkPatch, 0);
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 // Get other face using v0, v1 (in localFaces numbering). Or -1.
-label walkPatch::getNeighbour
+Foam::label Foam::walkPatch::getNeighbour
 (
     const label faceI,
     const label fp,
@@ -104,19 +96,11 @@ label walkPatch::getNeighbour
 
     const labelList& eFaces = pp_.edgeFaces()[nbrEdgeI];
 
-    if (eFaces.size() > 2 || eFaces.size() <= 0)
-    {
-        FatalErrorIn("getNeighbour")
-            << "Illegal surface on patch. Face " << faceI
-            << " at vertices " << v0 << ',' << v1 << " has more than 2"
-            << " or less than 1 neighbours" << abort(FatalError);
-        return -1;
-    }
-    else if (eFaces.size() == 1)
+    if (eFaces.size() == 1)
     {
         return -1;
     }
-    else
+    else if (eFaces.size() == 2)
     {
         label nbrFaceI = eFaces[0];
 
@@ -127,12 +111,21 @@ label walkPatch::getNeighbour
 
         return nbrFaceI;
     }
+    else
+    {
+        FatalErrorIn("getNeighbour")
+            << "Illegal surface on patch. Face " << faceI
+            << " at vertices " << v0 << ',' << v1
+            << " has fewer than 1 or more than 2 neighbours"
+            << abort(FatalError);
+        return -1;
+    }
 }
 
 
 // Gets labels of changed faces and enterVertices on faces.
 // Returns labels of faces changed and enterVertices on them.
-void walkPatch::faceToFace
+void Foam::walkPatch::faceToFace
 (
     const labelList& changedFaces,
     const labelList& enterVerts,
@@ -149,7 +142,7 @@ void walkPatch::faceToFace
     {
         label faceI = changedFaces[i];
         label enterVertI = enterVerts[i];
- 
+
         if (!visited_[faceI])
         {
             // Do this face
@@ -162,20 +155,10 @@ void walkPatch::faceToFace
 
             indexInFace_.append(fp);
 
-
             // Visit neighbouring faces in order, starting at fp.
             for (label i = 0; i < f.size(); i++)
             {
-                label fp1;
-                if (reverse_)
-                {
-                    fp1 = (fp == 0 ? f.size()-1 : fp-1);
-                }
-                else
-                {
-                    fp1 = (fp + 1) % f.size();
-                }
-
+                label fp1 = reverse_ ? f.rcIndex(fp) : f.fcIndex(fp);
                 label nbr = getNeighbour(faceI, fp, f[fp], f[fp1]);
 
                 if
@@ -225,7 +208,7 @@ Foam::walkPatch::walkPatch
     // Corresponding list of entry vertices
     labelList enterVerts(1, enterVertI);
 
-    while(1)
+    while (true)
     {
         labelList nbrFaces;
         labelList nbrEnterVerts;
@@ -240,7 +223,7 @@ Foam::walkPatch::walkPatch
         );
 
 
-        if (nbrFaces.size() == 0)
+        if (nbrFaces.empty())
         {
             break;
         }
@@ -253,9 +236,5 @@ Foam::walkPatch::walkPatch
     indexInFace_.shrink();
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

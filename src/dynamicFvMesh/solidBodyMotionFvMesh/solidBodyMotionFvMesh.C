@@ -92,10 +92,7 @@ bool Foam::solidBodyMotionFvMesh::update()
         undisplacedPoints_)
     );
 
-    const_cast<volVectorField&>(lookupObject<volVectorField>("U"))
-        .correctBoundaryConditions();
-
-    return true;
+    return false;
 }
 
 

@@ -75,6 +75,8 @@ public:
         static const char* componentNames[];
         static const SphericalTensor zero;
         static const SphericalTensor one;
+        static const SphericalTensor max;
+        static const SphericalTensor min;
         static const SphericalTensor I;
         static const SphericalTensor oneThirdI;
         static const SphericalTensor twoThirdsI;

@@ -36,8 +36,7 @@ Description
     sequence one can read token by token, and then analyse.
 
 SourceFiles
-    IOprint.C
-    IOcheck.C
+    IOstream.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -47,6 +46,7 @@ SourceFiles
 #include "char.H"
 #include "bool.H"
 #include "label.H"
+#include "uLabel.H"
 #include "scalar.H"
 #include "fileName.H"
 #include "InfoProxy.H"
@@ -73,8 +73,6 @@ namespace Foam
 /*---------------------------------------------------------------------------*\
                            Class IOstream Declaration
 \*---------------------------------------------------------------------------*/
-
-#include "CintDefs.H"
 
 class IOstream
 {
@@ -193,9 +191,7 @@ public:
 
 
             //- Ostream operator
-            #ifndef __MAKECINT__
             friend Ostream& operator<<(Ostream& os, const versionNumber& vn);
-            #endif
         };
 
 
@@ -421,7 +417,7 @@ public:
             }
 
             //- Return compression of given compression name
-            static compressionType compressionEnum(const word&); 
+            static compressionType compressionEnum(const word&);
 
             //- Return the stream compression
             compressionType compression() const
@@ -545,7 +541,6 @@ public:
             }
 };
 
-#include "CintUndefs.H"
 
 Ostream& operator<<(Ostream& os, const IOstream::streamFormat& sf);
 Ostream& operator<<(Ostream& os, const IOstream::versionNumber& vn);
@@ -554,7 +549,6 @@ Ostream& operator<<(Ostream& os, const IOstream::versionNumber& vn);
 // --------------------------------------------------------------------
 // ------ Manipulators (not taking arguments)
 // --------------------------------------------------------------------
-#ifndef __CINT__
 
 typedef IOstream& (*IOstreamManip)(IOstream&);
 
@@ -594,8 +588,6 @@ inline IOstream& scientific(IOstream& io)
     io.setf(ios_base::scientific, ios_base::floatfield);
     return io;
 }
-
-#endif
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

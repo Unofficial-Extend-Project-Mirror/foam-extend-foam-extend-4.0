@@ -96,7 +96,7 @@ void Foam::cellMapper::calcAddressing() const
 
             label cellI = cfp[cfpI].index();
 
-            if (addr[cellI].size() > 0)
+            if (addr[cellI].size())
             {
                 FatalErrorIn("void cellMapper::calcAddressing() const")
                     << "Master cell " << cellI
@@ -118,7 +118,7 @@ void Foam::cellMapper::calcAddressing() const
 
             label cellI = cfe[cfeI].index();
 
-            if (addr[cellI].size() > 0)
+            if (addr[cellI].size())
             {
                 FatalErrorIn("void cellMapper::calcAddressing() const")
                     << "Master cell " << cellI
@@ -140,7 +140,7 @@ void Foam::cellMapper::calcAddressing() const
 
             label cellI = cff[cffI].index();
 
-            if (addr[cellI].size() > 0)
+            if (addr[cellI].size())
             {
                 FatalErrorIn("void cellMapper::calcAddressing() const")
                     << "Master cell " << cellI
@@ -162,7 +162,7 @@ void Foam::cellMapper::calcAddressing() const
 
             label cellI = cfc[cfcI].index();
 
-            if (addr[cellI].size() > 0)
+            if (addr[cellI].size())
             {
                 FatalErrorIn("void cellMapper::calcAddressing() const")
                     << "Master cell " << cellI
@@ -183,7 +183,7 @@ void Foam::cellMapper::calcAddressing() const
 
         forAll (cm, cellI)
         {
-            if (cm[cellI] > -1 && addr[cellI].size() == 0)
+            if (cm[cellI] > -1 && addr[cellI].empty())
             {
                 // Mapped from a single cell
                 addr[cellI] = labelList(1, cm[cellI]);
@@ -200,7 +200,7 @@ void Foam::cellMapper::calcAddressing() const
 
         forAll (addr, cellI)
         {
-            if (addr[cellI].size() == 0)
+            if (addr[cellI].empty())
             {
                 // Mapped from a dummy cell
                 addr[cellI] = labelList(1, 0);
@@ -242,10 +242,10 @@ Foam::cellMapper::cellMapper(const mapPolyMesh& mpm)
     // Check for possibility of direct mapping
     if
     (
-        mpm_.cellsFromPointsMap().size() == 0
-     && mpm_.cellsFromEdgesMap().size() == 0
-     && mpm_.cellsFromFacesMap().size() == 0
-     && mpm_.cellsFromCellsMap().size() == 0
+        mpm_.cellsFromPointsMap().empty()
+     && mpm_.cellsFromEdgesMap().empty()
+     && mpm_.cellsFromFacesMap().empty()
+     && mpm_.cellsFromCellsMap().empty()
     )
     {
         direct_ = true;

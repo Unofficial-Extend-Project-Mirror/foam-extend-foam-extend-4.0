@@ -46,9 +46,9 @@ Foam::quaternion::quaternion(Istream& is)
 
 Foam::word Foam::name(const quaternion& q)
 {
-    OStringStream osBuffer;
-    osBuffer << '(' << q.w() << ',' << q.v() << ')';
-    return osBuffer.str();
+    OStringStream buf;
+    buf << '(' << q.w() << ',' << q.v() << ')';
+    return buf.str();
 }
 
 

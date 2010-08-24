@@ -27,16 +27,16 @@ Application
     wmkdep
 
 Description
-     A fast dependency list generator which emulates the behaviour and
-     output of cpp -M. However, the output contains no duplications and 
-     is ~40% faster than cpp.
+    A fast dependency list generator that emulates the behaviour and
+    output of cpp -M. However, the output contains no duplications and
+    is ~40% faster than cpp.
 
-     The algorithm uses flex to scan for includes and searches the files
-     found.  Each file is entererd into a hash table so that files are
-     scaned only once.  This is why this program is faster than cpp.
+    The algorithm uses flex to scan for includes and searches the files
+    found.  Each file is entered into a hash table so that files are scanned
+    only once.  This is why this program is faster than cpp.
 
 Usage
-    wmkdep [ -Idirectory ... -Idirectory] filename
+    wmkdep [ -Idirectory ... -Idirectory ] filename
 
 \*---------------------------------------------------------------------------*/
 
@@ -107,9 +107,9 @@ int main(int argc, char* argv[])
 
     sourceFile = (char*)malloc(strlen(argv[argc-1]) + 1);
     strcpy(sourceFile, argv[argc-1]);
-    fprintf(stderr,"Making dependency list for source file %s\n", sourceFile);
-    
-    
+    fprintf(stderr, "Making dependency list for source file %s\n", sourceFile);
+
+
     /* Get list of -I directories. */
     nDirectories = 0;
 
@@ -314,7 +314,7 @@ void nextFile(const char* fileName)
             pathName = addDirectoryName(directories[d], fileName);
 
             if ((newyyin = fopen(pathName, "r")))
-            { 
+            {
                 printf("%s: %s\n", depFile, pathName);
                 buffers[currentBuffer++] = YY_CURRENT_BUFFER;
                 yy_switch_to_buffer(yy_create_buffer(newyyin, YY_BUF_SIZE));
@@ -329,8 +329,8 @@ void nextFile(const char* fileName)
 
         fprintf
         (
-            stderr, 
-            "could not open file %s for source file %s\n", 
+            stderr,
+            "could not open file %s for source file %s\n",
             fileName, sourceFile
         );
 
@@ -396,8 +396,8 @@ void importDirectory(const char* dirName)
     {
         fprintf
         (
-            stderr, 
-            "could not open directory %s\n", 
+            stderr,
+            "could not open directory %s\n",
             uDirName
         );
         free(uDirName);

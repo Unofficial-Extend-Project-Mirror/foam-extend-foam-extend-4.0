@@ -101,6 +101,68 @@ slicedBoundaryField
 }
 
 
+template
+<
+    class Type,
+    template<class> class PatchField,
+    template<class> class SlicedPatchField,
+    class GeoMesh
+>
+Foam::tmp<Foam::FieldField<PatchField, Type> >
+Foam::SlicedGeometricField<Type, PatchField, SlicedPatchField, GeoMesh>::
+slicedBoundaryField
+(
+    const Mesh& mesh,
+    const FieldField<PatchField, Type>& bField,
+    const bool preserveCouples
+)
+{
+    tmp<FieldField<PatchField, Type> > tbf
+    (
+        new FieldField<PatchField, Type>(mesh.boundary().size())
+    );
+
+    FieldField<PatchField, Type>& bf = tbf();
+
+    forAll (mesh.boundary(), patchi)
+    {
+        if (preserveCouples && mesh.boundary()[patchi].coupled())
+        {
+            // For coupled patched construct the correct patch field type
+            bf.set
+            (
+                patchi,
+                PatchField<Type>::New
+                (
+                    mesh.boundary()[patchi].type(),
+                    mesh.boundary()[patchi],
+                    *this
+                )
+            );
+
+            // Assign field
+            bf[patchi] == bField[patchi];
+        }
+        else
+        {
+            // Create unallocated copy of patch field
+            bf.set
+            (
+                patchi,
+                new SlicedPatchField<Type>
+                (
+                    mesh.boundary()[patchi],
+                    DimensionedField<Type, GeoMesh>::null()
+                )
+            );
+            bf[patchi].UList<Type>::operator=(bField[patchi]);
+        }
+    }
+
+    return tbf;
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template
@@ -205,6 +267,64 @@ SlicedGeometricField
     );
 
     correctBoundaryConditions();
+}
+
+
+template
+<
+    class Type,
+    template<class> class PatchField,
+    template<class> class SlicedPatchField,
+    class GeoMesh
+>
+Foam::SlicedGeometricField<Type, PatchField, SlicedPatchField, GeoMesh>::
+SlicedGeometricField
+(
+    const IOobject& io,
+    const GeometricField<Type, PatchField, GeoMesh>& gf,
+    const bool preserveCouples
+)
+:
+    GeometricField<Type, PatchField, GeoMesh>
+    (
+        io,
+        gf.mesh(),
+        gf.dimensions(),
+        Field<Type>(),
+        slicedBoundaryField(gf.mesh(), gf.boundaryField(), preserveCouples)
+    )
+{
+    // Set the internalField to the supplied internal field
+    UList<Type>::operator=(gf.internalField());
+
+    correctBoundaryConditions();
+}
+
+
+template
+<
+    class Type,
+    template<class> class PatchField,
+    template<class> class SlicedPatchField,
+    class GeoMesh
+>
+Foam::SlicedGeometricField<Type, PatchField, SlicedPatchField, GeoMesh>::
+SlicedGeometricField
+(
+    const SlicedGeometricField<Type, PatchField, SlicedPatchField, GeoMesh>& gf
+)
+:
+    GeometricField<Type, PatchField, GeoMesh>
+    (
+        gf,
+        gf.mesh(),
+        gf.dimensions(),
+        Field<Type>(),
+        slicedBoundaryField(gf.mesh(), gf.boundaryField(), true)
+    )
+{
+    // Set the internalField to the supplied internal field
+    UList<Type>::operator=(gf.internalField());
 }
 
 

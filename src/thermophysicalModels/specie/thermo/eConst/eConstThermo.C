@@ -31,18 +31,14 @@ Description
 #include "eConstThermo.H"
 #include "IOstreams.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-eConstThermo::eConstThermo(Istream& is)
+template<class equationOfState>
+Foam::eConstThermo<equationOfState>::eConstThermo(Istream& is)
 :
-    specieThermo(is),
-    CV(readScalar(is)),
-    Hf(readScalar(is))
+    equationOfState(is),
+    Cv_(readScalar(is)),
+    Hf_(readScalar(is))
 {
     is.check("eConstThermo::eConstThermo(Istream& is)");
 }
@@ -50,17 +46,19 @@ eConstThermo::eConstThermo(Istream& is)
 
 // * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
 
-Ostream& operator<<(Ostream& os, const eConstThermo& ct)
+template<class equationOfState>
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const eConstThermo<equationOfState>& ct
+)
 {
-    os << (const specieThermo&)ct << tab << ct.CV << tab << ct.Hf;
+    os  << static_cast<const equationOfState&>(ct) << tab
+        << ct.Cv_ << tab << ct.Hf_;
 
     os.check("Ostream& operator<<(Ostream& os, const eConstThermo& ct)");
     return os;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

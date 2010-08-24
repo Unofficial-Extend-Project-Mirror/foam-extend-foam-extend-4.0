@@ -28,9 +28,6 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-namespace Foam
-{
-    defineTypeNameAndDebug(pointPatch, 0);
-}
+defineTypeNameAndDebug(Foam::pointPatch, 0);
 
 // ************************************************************************* //

@@ -81,6 +81,11 @@ class CompactListList
 
 public:
 
+    // Static Member Functions
+
+        //- Return a null CompactListList
+        inline static const CompactListList<T>& null();
+
     // Constructors
 
         //- Null constructor.
@@ -103,6 +108,9 @@ public:
         //- Construct given list of row-sizes
         CompactListList(const UList<label>& rowSizes, const T&);
 
+        //- Construct by transferring the parameter contents
+        CompactListList(const Xfer<CompactListList<T> >&);
+
         //- Construct as copy or re-use as specified.
         CompactListList(CompactListList<T>&, bool reUse);
 
@@ -113,15 +121,15 @@ public:
         inline autoPtr<CompactListList<T> > clone() const;
 
 
-    // Member functions
-
-        //- Return a null CompactListList
-        static const CompactListList<T>& null();
+    // Member Functions
 
         // Access
 
             //- Return the primary size, i.e. the number of rows
             inline label size() const;
+
+            //- Return true if the number of rows is zero
+            inline bool empty() const;
 
             //- Return the offset table
             inline const List<label>& offsets() const;
@@ -148,19 +156,34 @@ public:
             //- Reset sizes of CompactListList and value for new elements.
             void setSize(const label nRows, const label nData, const T&);
 
-            //- Return sizes (to be used e.g. for construction)
-            labelList sizes() const;
-
             //- Reset size of CompactListList.
             void setSize(const UList<label>& rowSizes);
 
+            //- Reset size of CompactListList.
+            //  This form only allows contraction of the CompactListList.
+            inline void resize(const label nRows);
+
+            //- Reset size of CompactListList.
+            inline void resize(const label nRows, const label nData);
+
+            //- Reset sizes of CompactListList and value for new elements.
+            inline void resize(const label nRows, const label nData, const T&);
+
+            //- Reset size of CompactListList.
+            inline void resize(const UList<label>& rowSizes);
+
             //- Clear the CompactListList, i.e. set sizes to zero.
             void clear();
+
+            //- Return sizes (to be used e.g. for construction)
+            labelList sizes() const;
 
             //- Transfer the contents of the argument CompactListList
             //  into this CompactListList and annull the argument list.
             void transfer(CompactListList<T>&);
 
+            //- Transfer the contents to the Xfer container
+            inline Xfer<CompactListList<T> > xfer();
 
         // Other
 

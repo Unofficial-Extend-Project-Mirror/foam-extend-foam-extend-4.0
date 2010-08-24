@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "treeDataTriSurface.H"
@@ -220,13 +218,13 @@ Foam::label Foam::treeDataTriSurface::getVolumeType
         max
         (
             Foam::sqr(GREAT),
-            Foam::magSqr(treeBb.max() - treeBb.min())
+            Foam::magSqr(treeBb.span())
         )
     );
 
     if (!pHit.hit())
     {
-        FatalErrorIn("treeDataTriSurface::getVolumeType")
+        FatalErrorIn("treeDataTriSurface::getVolumeType(..)")
             << "treeBb:" << treeBb
             << " sample:" << sample
             << " pHit:" << pHit
@@ -238,7 +236,8 @@ Foam::label Foam::treeDataTriSurface::getVolumeType
         surface_,
         sample,
         pHit.index(),
-        pHit.hitPoint()
+        pHit.hitPoint(),
+        indexedOctree<treeDataTriSurface>::perturbTol()
     );
 
     if (t == triSurfaceTools::UNKNOWN)
@@ -255,11 +254,12 @@ Foam::label Foam::treeDataTriSurface::getVolumeType
     }
     else
     {
-        FatalErrorIn("treeDataTriSurface::getVolumeType")
+        FatalErrorIn("treeDataTriSurface::getVolumeType(..)")
             << "problem" << abort(FatalError);
         return indexedOctree<treeDataTriSurface>::UNKNOWN;
     }
 }
+
 
 // Check if any point on triangle is inside cubeBb.
 bool Foam::treeDataTriSurface::overlaps
@@ -276,7 +276,7 @@ bool Foam::treeDataTriSurface::overlaps
     const point& p1 = points[f[1]];
     const point& p2 = points[f[2]];
 
-    boundBox triBb(p0, p0);
+    treeBoundBox triBb(p0, p0);
     triBb.min() = min(triBb.min(), p1);
     triBb.min() = min(triBb.min(), p2);
 
@@ -284,13 +284,13 @@ bool Foam::treeDataTriSurface::overlaps
     triBb.max() = max(triBb.max(), p2);
 
     //- For testing: robust one
-    //return cubeBb.intersects(triBb);
+    //return cubeBb.overlaps(triBb);
 
     //- Exact test of triangle intersecting bb
 
     // Quick rejection. If whole bounding box of tri is outside cubeBb then
     // there will be no intersection.
-    if (!cubeBb.intersects(triBb))
+    if (!cubeBb.overlaps(triBb))
     {
         return false;
     }
@@ -305,6 +305,7 @@ bool Foam::treeDataTriSurface::overlaps
     // Now we have the difficult case: all points are outside but connecting
     // edges might go through cube. Use fast intersection of bounding box.
 
+    //return triangleFuncs::intersectBbExact(p0, p1, p2, cubeBb);
     return triangleFuncs::intersectBb(p0, p1, p2, cubeBb);
 }
 
@@ -459,6 +460,16 @@ bool Foam::treeDataTriSurface::intersects
     {
         return false;
     }
+
+
+    //- Using exact intersections
+    //pointHit info = f.tri(points).intersectionExact(start, end);
+    //
+    //if (info.hit())
+    //{
+    //    intersectionPoint = info.hitPoint();
+    //}
+    //return info.hit();
 }
 
 

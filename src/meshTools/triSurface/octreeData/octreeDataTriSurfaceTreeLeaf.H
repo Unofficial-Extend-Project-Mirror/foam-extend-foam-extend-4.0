@@ -52,7 +52,7 @@ bool treeLeaf<octreeDataTriSurface>::findNearest
     const octreeDataTriSurface& shapes,
     const point& sample,
     treeBoundBox& tightest,
-    label& tightesti,
+    label& tightestI,
     scalar& tightestDist
 ) const;
 

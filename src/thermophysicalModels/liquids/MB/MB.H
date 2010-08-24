@@ -31,8 +31,7 @@ Description
 SourceFiles
     MB.C
 
-*/
-// ------------------------------------------------------------------------- //
+\*---------------------------------------------------------------------------*/
 
 #ifndef MB_H
 #define MB_H
@@ -88,26 +87,9 @@ public:
     // Constructors
 
         //- Construct null
-        MB()
-        :
-            liquid(102.133, 554.5, 3.4734e+6, 0.34, 0.256, 187.35, 1.0102e-1, 375.90, 5.7373e-30, 0.3807, 1.7713e+4),
-            rho_(76.6099633, 0.257, 554.5, 0.2772),
-            pv_(107.51, -8112.9, -12.77, 9.2919e-06, 2),
-            hl_(554.5, 508307.794738233, 0.392, 0, 0, 0),
-            cp_(1135.77394182096, 2.89818178257762, 0, 0, 0, 0),
-            // NN: enthalpy, h_, is not used in the sprayModel.
-            // For consistency, the enthalpy is derived from hlat and hl.
-            // It is, however, convenient to have it available.
-            h_(-5255966.14542938, 1135.77394182096, 1.44909089128881, 0, 0, 0),
-            cpg_(875.329227575808, 2849.22600922327, 1570, 2029.70636327142, 678.3),
-            B_(0.00220496803188, -2.42184210783978, -401045.695318849, -2.85079259397061e+17, -3.57377145486767e+19),
-            mu_(-12.206, 1141.7, 0.15014, 0, 0),
-            mug_(3.733e-07, 0.6177, 256.5, 0),
-            K_(0.2298, -0.0003002, 0, 0, 0, 0),
-            Kg_(1333.1, 0.9962, 12317000000.0, 0),
-            sigma_(554.5, 0.064084, 1.2418, 0, 0, 0),
-            D_(147.18, 20.1, 102.133, 28) // NN: Same as nHeptane
-        {}
+        MB();
+
+        //- Construct from components
         MB
         (
             const liquid& l,
@@ -124,124 +106,58 @@ public:
             const NSRDSfunc2& vapourThermalConductivity,
             const NSRDSfunc6& surfaceTension,
             const APIdiffCoefFunc& vapourDiffussivity
-        )
-        :
-            liquid(l),
-            rho_(density),
-            pv_(vapourPressure),
-            hl_(heatOfVapourisation),
-            cp_(heatCapacity),
-            h_(enthalpy),
-            cpg_(idealGasHeatCapacity),
-            B_(secondVirialCoeff),
-            mu_(dynamicViscosity),
-            mug_(vapourDynamicViscosity),
-            K_(thermalConductivity),
-            Kg_(vapourThermalConductivity),
-            sigma_(surfaceTension),
-            D_(vapourDiffussivity)
-        {}
+        );
 
         //- Construct from Istream
-        MB(Istream& is)
-        :
-            liquid(is),
-            rho_(is),
-            pv_(is),
-            hl_(is),
-            cp_(is),
-            h_(is),
-            cpg_(is),
-            B_(is),
-            mu_(is),
-            mug_(is),
-            K_(is),
-            Kg_(is),
-            sigma_(is),
-            D_(is)
-        {}
+        MB(Istream& is);
 
 
     // Member Functions
 
         //- Liquid density [kg/m^3]
-        scalar rho(scalar p, scalar T) const
-        {
-            return rho_.f(p, T);
-        }
+        inline scalar rho(scalar p, scalar T) const;
 
         //- Vapour pressure [Pa]
-        scalar pv(scalar p, scalar T) const
-        {
-            return pv_.f(p, T);
-        }
+        inline scalar pv(scalar p, scalar T) const;
 
         //- Heat of vapourisation [J/kg]
-        scalar hl(scalar p, scalar T) const
-        {
-            return hl_.f(p, T);
-        }
+        inline scalar hl(scalar p, scalar T) const;
 
         //- Liquid heat capacity [J/(kg K)]
-        scalar cp(scalar p, scalar T) const
-        {
-            return cp_.f(p, T);
-        }
+        inline scalar cp(scalar p, scalar T) const;
 
         //- Liquid Enthalpy [J/(kg)]
-        scalar h(scalar p, scalar T) const
-        {
-            return h_.f(p, T);
-        }
+        inline scalar h(scalar p, scalar T) const;
 
         //- Ideal gas heat capacity [J/(kg K)]
-        scalar cpg(scalar p, scalar T) const
-        {
-            return cpg_.f(p, T);
-        }
+        inline scalar cpg(scalar p, scalar T) const;
 
         //- Second Virial Coefficient [m^3/kg]
-        scalar B(scalar p, scalar T) const
-        {
-            return B_.f(p, T);
-        }
+        inline scalar B(scalar p, scalar T) const;
 
         //- Liquid viscosity [Pa s]
-        scalar mu(scalar p, scalar T) const
-        {
-            return mu_.f(p, T);
-        }
+        inline scalar mu(scalar p, scalar T) const;
 
         //- Vapour viscosity [Pa s]
-        scalar mug(scalar p, scalar T) const
-        {
-            return mug_.f(p, T);
-        }
+        inline scalar mug(scalar p, scalar T) const;
 
         //- Liquid thermal conductivity  [W/(m K)]
-        scalar K(scalar p, scalar T) const
-        {
-            return K_.f(p, T);
-        }
+        inline scalar K(scalar p, scalar T) const;
 
         //- Vapour thermal conductivity  [W/(m K)]
-        scalar Kg(scalar p, scalar T) const
-        {
-            return Kg_.f(p, T);
-        }
+        inline scalar Kg(scalar p, scalar T) const;
 
         //- Surface tension [N/m]
-        scalar sigma(scalar p, scalar T) const
-        {
-            return sigma_.f(p, T);
-        }
+        inline scalar sigma(scalar p, scalar T) const;
 
         //- Vapour diffussivity [m2/s]
-        scalar D(scalar p, scalar T) const
-        {
-            return D_.f(p, T);
-        }
+        inline scalar D(scalar p, scalar T) const;
 
+        //- Vapour diffussivity [m2/s] with specified binary pair
+        inline scalar D(scalar p, scalar T, scalar Wb) const;
+
+
+    // I-O
 
         //- Write the function coefficients
         void writeData(Ostream& os) const
@@ -261,9 +177,7 @@ public:
             D_.writeData(os); os << endl;
         }
 
-
-    // Ostream Operator
-
+        //- Ostream Operator
         friend Ostream& operator<<(Ostream& os, const MB& l)
         {
             l.writeData(os);
@@ -275,6 +189,10 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "MBI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

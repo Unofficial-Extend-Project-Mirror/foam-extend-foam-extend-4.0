@@ -36,6 +36,9 @@ Description
     were reading a stream on unknown data sequence one can read token by
     token, and then analyse.
 
+SourceFiles
+    Istream.C
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef Istream_H
@@ -149,7 +152,6 @@ public:
 // --------------------------------------------------------------------
 // ------ Manipulators (not taking arguments)
 // --------------------------------------------------------------------
-#ifndef __CINT__
 
 typedef Istream& (*IstreamManip)(Istream&);
 
@@ -165,8 +167,6 @@ inline Istream& operator>>(Istream& is, IOstreamManip f)
     f(is);
     return is;
 }
-
-#endif
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

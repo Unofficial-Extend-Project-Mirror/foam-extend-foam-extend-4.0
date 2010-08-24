@@ -26,7 +26,9 @@ Class
     Foam::pressureInletUniformVelocityFvPatchVectorField
 
 Description
-    Foam::pressureInletUniformVelocityFvPatchVectorField
+    Velocity inlet boundary condition for patches where the pressure is
+    specified. The uniform inflow velocity is obtained by averaging the flux
+    over the patch and apply it in the direction normal to the patch faces.
 
 SourceFiles
     pressureInletUniformVelocityFvPatchVectorField.C
@@ -124,6 +126,11 @@ public:
 
         //- Update the coefficients associated with the patch field
         virtual void updateCoeffs();
+
+
+    // Member operators
+
+        virtual void operator=(const fvPatchField<vector>& pvf);
 };
 
 

@@ -24,33 +24,20 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-
 #include "general.H"
 #include "addToRunTimeSelectionTable.H"
 
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(general, 0);
-
-addToRunTimeSelectionTable
-(
-    pdf,
-    general,
-    dictionary
-);
+namespace Foam
+{
+    defineTypeNameAndDebug(general, 0);
+    addToRunTimeSelectionTable(pdf, general, dictionary);
+}
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-
-// Construct from components
-general::general
-(
-    const dictionary& dict,
-    Random& rndGen
-)
+Foam::general::general(const dictionary& dict, Random& rndGen)
 :
     pdf(dict, rndGen),
     pdfDict_(dict.subDict(typeName + "PDF")),
@@ -63,16 +50,15 @@ general::general
     // normalize the pdf
     scalar yMax = 0;
 
-    for(label i=0; i<nEntries_; i++)
+    for (label i=0; i<nEntries_; i++)
     {
         yMax = max(yMax, xy_[i][1]);
     }
 
-    for(label i=0; i<nEntries_; i++)
+    for (label i=0; i<nEntries_; i++)
     {
         xy_[i][1] /= yMax;
     }
-
 }
 
 
@@ -84,21 +70,21 @@ Foam::general::~general()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-scalar general::sample() const
+Foam::scalar Foam::general::sample() const
 {
     scalar y = 0;
     scalar x = 0;
 
     bool success = false;
 
-    while(!success)
+    while (!success)
     {
         x = minValue_ + range_*rndGen_.scalar01();
         y = rndGen_.scalar01();
-        
+
         bool intervalFound = false;
         label i = -1;
-        while(!intervalFound)
+        while (!intervalFound)
         {
             i++;
             if ( (x>xy_[i][0]) && (x<xy_[i+1][0]) )
@@ -106,27 +92,33 @@ scalar general::sample() const
                 intervalFound = true;
             }
         }
-        
-        scalar p = xy_[i][1] + (x-xy_[i][0])*(xy_[i+1][1]-xy_[i][1])/(xy_[i+1][0]-xy_[i][0]);
-        if (y<p) 
+
+        scalar p =
+            xy_[i][1]
+          + (x-xy_[i][0])
+           *(xy_[i+1][1]-xy_[i][1])
+           /(xy_[i+1][0]-xy_[i][0]);
+
+        if (y<p)
         {
             success = true;
         }
     }
-    
+
     return x;
 }
 
-scalar general::minValue() const
+
+Foam::scalar Foam::general::minValue() const
 {
     return minValue_;
 }
 
-scalar general::maxValue() const
+
+Foam::scalar Foam::general::maxValue() const
 {
     return maxValue_;
 }
 
-// ************************************************************************* //
 
-}
+// ************************************************************************* //

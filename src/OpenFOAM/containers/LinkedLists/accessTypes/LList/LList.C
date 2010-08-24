@@ -27,22 +27,16 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
 #include "LList.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class LListBase, class T>
-LList<LListBase, T>::LList(const LList<LListBase, T>& slpl)
+Foam::LList<LListBase, T>::LList(const LList<LListBase, T>& lst)
 :
     LListBase()
 {
-    for (const_iterator iter = slpl.begin(); iter != slpl.end(); ++iter)
+    for (const_iterator iter = lst.begin(); iter != lst.end(); ++iter)
     {
         append(iter());
     }
@@ -50,7 +44,7 @@ LList<LListBase, T>::LList(const LList<LListBase, T>& slpl)
 
 
 template<class LListBase, class T>
-LList<LListBase, T>::~LList()
+Foam::LList<LListBase, T>::~LList()
 {
     this->clear();
 }
@@ -59,7 +53,7 @@ LList<LListBase, T>::~LList()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class LListBase, class T>
-void LList<LListBase, T>::clear()
+void Foam::LList<LListBase, T>::clear()
 {
     label oldSize = this->size();
     for (label i=0; i<oldSize; i++)
@@ -71,23 +65,27 @@ void LList<LListBase, T>::clear()
 }
 
 
+template<class LListBase, class T>
+void Foam::LList<LListBase, T>::transfer(LList<LListBase, T>& lst)
+{
+    clear();
+    LListBase::transfer(lst);
+}
+
+
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class LListBase, class T>
-void LList<LListBase, T>::operator=(const LList<LListBase, T>& slpl)
+void Foam::LList<LListBase, T>::operator=(const LList<LListBase, T>& lst)
 {
     this->clear();
 
-    for (const_iterator iter = slpl.begin(); iter != slpl.end(); ++iter)
+    for (const_iterator iter = lst.begin(); iter != lst.end(); ++iter)
     {
         append(iter());
     }
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 

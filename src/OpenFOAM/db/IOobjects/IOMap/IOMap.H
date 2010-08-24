@@ -66,11 +66,14 @@ public:
         //- Construct from IOobject
         IOMap(const IOobject&);
 
+        //- Construct from IOobject and size of Map
+        IOMap(const IOobject&, const label);
+
         //- Construct from IOobject and a Map
         IOMap(const IOobject&, const Map<T>&);
 
-        //- Construct from IOobject and size of Map
-        IOMap(const IOobject&, const label);
+        //- Construct by transferring the Map contents
+        IOMap(const IOobject&, const Xfer<Map<T> >&);
 
 
     // Destructor

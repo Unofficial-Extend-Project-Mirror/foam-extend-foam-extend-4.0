@@ -48,18 +48,18 @@ Foam::IOobjectList::IOobjectList
 {
     word newInstance = instance;
 
-    if (!dir(db.path(instance)))
+    if (!isDir(db.path(instance)))
     {
         newInstance = db.time().findInstancePath(instant(instance));
 
-        if (!newInstance.size())
+        if (newInstance.empty())
         {
             return;
         }
     }
 
     // Create list file names in directory
-    fileNameList ObjectNames = 
+    fileNameList ObjectNames =
         readDir(db.path(newInstance, db.dbDir()/local), fileName::FILE);
 
     forAll(ObjectNames, i)
@@ -181,7 +181,7 @@ Foam::wordList Foam::IOobjectList::names() const
 {
     wordList objectNames(size());
 
-    label count=0;
+    label count = 0;
     for
     (
         HashPtrTable<IOobject>::const_iterator iter = begin();
@@ -200,7 +200,7 @@ Foam::wordList Foam::IOobjectList::names(const word& ClassName) const
 {
     wordList objectNames(size());
 
-    label count=0;
+    label count = 0;
     for
     (
         HashPtrTable<IOobject>::const_iterator iter = begin();

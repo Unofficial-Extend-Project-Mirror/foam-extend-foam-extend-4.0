@@ -25,7 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "PointEdgeWave.H"
-#include "pointMesh.H"
+#include "polyMesh.H"
 #include "processorPolyPatch.H"
 #include "cyclicPolyPatch.H"
 #include "OPstream.H"
@@ -33,7 +33,6 @@ License
 #include "PstreamCombineReduceOps.H"
 #include "debug.H"
 #include "typeInfo.H"
-#include "ListOps.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -61,13 +60,11 @@ void Foam::PointEdgeWave<Type>::offset(const label val, labelList& elems)
 template <class Type>
 void Foam::PointEdgeWave<Type>::calcCyclicAddressing()
 {
-    const polyMesh& mesh = pMesh_();
-
     label cycHalf = 0;
 
-    forAll(mesh.boundaryMesh(), patchI)
+    forAll(mesh_.boundaryMesh(), patchI)
     {
-        const polyPatch& patch = mesh.boundaryMesh()[patchI];
+        const polyPatch& patch = mesh_.boundaryMesh()[patchI];
 
         if (isA<cyclicPolyPatch>(patch))
         {
@@ -75,7 +72,7 @@ void Foam::PointEdgeWave<Type>::calcCyclicAddressing()
 
             SubList<face> halfAFaces
             (
-                mesh.faces(),
+                mesh_.faces(),
                 halfSize,
                 patch.start()
             );
@@ -83,12 +80,12 @@ void Foam::PointEdgeWave<Type>::calcCyclicAddressing()
             cycHalves_.set
             (
                 cycHalf++,
-                new primitivePatch(halfAFaces, mesh.points())
+                new primitivePatch(halfAFaces, mesh_.points())
             );
 
             SubList<face> halfBFaces
             (
-                mesh.faces(),
+                mesh_.faces(),
                 halfSize,
                 patch.start() + halfSize
             );
@@ -96,7 +93,7 @@ void Foam::PointEdgeWave<Type>::calcCyclicAddressing()
             cycHalves_.set
             (
                 cycHalf++,
-                new primitivePatch(halfBFaces, mesh.points())
+                new primitivePatch(halfBFaces, mesh_.points())
             );
         }
     }
@@ -203,7 +200,7 @@ bool Foam::PointEdgeWave<Type>::updatePoint
     bool propagate =
         pointInfo.updatePoint
         (
-            pMesh_(),
+            mesh_,
             pointI,
             neighbourEdgeI,
             neighbourInfo,
@@ -249,7 +246,7 @@ bool Foam::PointEdgeWave<Type>::updatePoint
     bool propagate =
         pointInfo.updatePoint
         (
-            pMesh_(),
+            mesh_,
             pointI,
             neighbourInfo,
             tol
@@ -295,7 +292,7 @@ bool Foam::PointEdgeWave<Type>::updateEdge
     bool propagate =
         edgeInfo.updateEdge
         (
-            pMesh_(),
+            mesh_,
             edgeI,
             neighbourPointI,
             neighbourInfo,
@@ -327,9 +324,9 @@ Foam::label Foam::PointEdgeWave<Type>::countPatchType() const
 {
     label nPatches = 0;
 
-    forAll(pMesh_().boundaryMesh(), patchI)
+    forAll(mesh_.boundaryMesh(), patchI)
     {
-        if (isA<PatchType>(pMesh_().boundaryMesh()[patchI]))
+        if (isA<PatchType>(mesh_.boundaryMesh()[patchI]))
         {
             nPatches++;
         }
@@ -433,15 +430,12 @@ void Foam::PointEdgeWave<Type>::updateFromPatchInfo
 template <class Type>
 void Foam::PointEdgeWave<Type>::handleProcPatches()
 {
-    const polyMesh& mesh = pMesh_();
-
-
     // 1. Send all point info on processor patches. Send as
     // face label + offset in face.
 
-    forAll(mesh.boundaryMesh(), patchI)
+    forAll(mesh_.boundaryMesh(), patchI)
     {
-        const polyPatch& patch = mesh.boundaryMesh()[patchI];
+        const polyPatch& patch = mesh_.boundaryMesh()[patchI];
 
         if (isA<processorPolyPatch>(patch))
         {
@@ -491,9 +485,9 @@ void Foam::PointEdgeWave<Type>::handleProcPatches()
     // 2. Receive all point info on processor patches.
     //
 
-    forAll(mesh.boundaryMesh(), patchI)
+    forAll(mesh_.boundaryMesh(), patchI)
     {
-        const polyPatch& patch = mesh.boundaryMesh()[patchI];
+        const polyPatch& patch = mesh_.boundaryMesh()[patchI];
 
         if (isA<processorPolyPatch>(patch))
         {
@@ -544,7 +538,7 @@ void Foam::PointEdgeWave<Type>::handleProcPatches()
     //    (Note:irrespective if changed or not for now)
     //
 
-    const globalMeshData& pd = mesh.globalData();
+    const globalMeshData& pd = mesh_.globalData();
 
     List<Type> sharedData(pd.nGlobalPoints());
 
@@ -579,16 +573,14 @@ void Foam::PointEdgeWave<Type>::handleProcPatches()
 template <class Type>
 void Foam::PointEdgeWave<Type>::handleCyclicPatches()
 {
-    const polyMesh& mesh = pMesh_();
-
     // 1. Send all point info on cyclic patches. Send as
     // face label + offset in face.
 
     label cycHalf = 0;
 
-    forAll(mesh.boundaryMesh(), patchI)
+    forAll(mesh_.boundaryMesh(), patchI)
     {
-        const polyPatch& patch = mesh.boundaryMesh()[patchI];
+        const polyPatch& patch = mesh_.boundaryMesh()[patchI];
 
         if (isA<cyclicPolyPatch>(patch))
         {
@@ -692,7 +684,7 @@ void Foam::PointEdgeWave<Type>::handleCyclicPatches()
 template <class Type>
 Foam::PointEdgeWave<Type>::PointEdgeWave
 (
-    const pointMesh& pMesh,
+    const polyMesh& mesh,
     const labelList& changedPoints,
     const List<Type>& changedPointsInfo,
 
@@ -702,45 +694,45 @@ Foam::PointEdgeWave<Type>::PointEdgeWave
     const label maxIter
 )
 :
-    pMesh_(pMesh),
+    mesh_(mesh),
     allPointInfo_(allPointInfo),
     allEdgeInfo_(allEdgeInfo),
-    changedPoint_(pMesh_().nPoints(), false),
-    changedPoints_(pMesh_().nPoints()),
+    changedPoint_(mesh_.nPoints(), false),
+    changedPoints_(mesh_.nPoints()),
     nChangedPoints_(0),
-    changedEdge_(pMesh_().nEdges(), false),
-    changedEdges_(pMesh_().nEdges()),
+    changedEdge_(mesh_.nEdges(), false),
+    changedEdges_(mesh_.nEdges()),
     nChangedEdges_(0),
     nCyclicPatches_(countPatchType<cyclicPolyPatch>()),
     cycHalves_(2*nCyclicPatches_),
     nEvals_(0),
-    nUnvisitedPoints_(pMesh_().nPoints()),
-    nUnvisitedEdges_(pMesh_().nEdges())
+    nUnvisitedPoints_(mesh_.nPoints()),
+    nUnvisitedEdges_(mesh_.nEdges())
 {
-    if (allPointInfo_.size() != pMesh_().nPoints())
+    if (allPointInfo_.size() != mesh_.nPoints())
     {
         FatalErrorIn
         (
             "PointEdgeWave<Type>::PointEdgeWave"
-            "(const pointMesh&, const labelList&, const List<Type>,"
+            "(const polyMesh&, const labelList&, const List<Type>,"
             " List<Type>&, List<Type>&, const label maxIter)"
         )   << "size of pointInfo work array is not equal to the number"
             << " of points in the mesh" << endl
             << "    pointInfo   :" << allPointInfo_.size() << endl
-            << "    mesh.nPoints:" << pMesh_().nPoints()
+            << "    mesh.nPoints:" << mesh_.nPoints()
             << exit(FatalError);
     }
-    if (allEdgeInfo_.size() != pMesh_().nEdges())
+    if (allEdgeInfo_.size() != mesh_.nEdges())
     {
         FatalErrorIn
         (
             "PointEdgeWave<Type>::PointEdgeWave"
-            "(const pointMesh&, const labelList&, const List<Type>,"
+            "(const polyMesh&, const labelList&, const List<Type>,"
             " List<Type>&, List<Type>&, const label maxIter)"
         )   << "size of edgeInfo work array is not equal to the number"
             << " of edges in the mesh" << endl
             << "    edgeInfo   :" << allEdgeInfo_.size() << endl
-            << "    mesh.nEdges:" << pMesh_().nEdges()
+            << "    mesh.nEdges:" << mesh_.nEdges()
             << exit(FatalError);
     }
 
@@ -768,7 +760,7 @@ Foam::PointEdgeWave<Type>::PointEdgeWave
         FatalErrorIn
         (
             "PointEdgeWave<Type>::PointEdgeWave"
-            "(const pointMesh&, const labelList&, const List<Type>,"
+            "(const polyMesh&, const labelList&, const List<Type>,"
             " List<Type>&, List<Type>&, const label maxIter)"
         )   << "Maximum number of iterations reached. Increase maxIter." << endl
             << "    maxIter:" << maxIter << endl
@@ -863,7 +855,7 @@ Foam::label Foam::PointEdgeWave<Type>::edgeToPoint()
         const Type& neighbourWallInfo = allEdgeInfo_[edgeI];
 
         // Evaluate all connected points (= edge endpoints)
-        const edge& e = pMesh_().edges()[edgeI];
+        const edge& e = mesh_.edges()[edgeI];
 
         forAll(e, eI)
         {
@@ -918,7 +910,7 @@ Foam::label Foam::PointEdgeWave<Type>::edgeToPoint()
 template <class Type>
 Foam::label Foam::PointEdgeWave<Type>::pointToEdge()
 {
-    const labelListList& pointEdges = pMesh_().pointEdges();
+    const labelListList& pointEdges = mesh_.pointEdges();
 
     for
     (

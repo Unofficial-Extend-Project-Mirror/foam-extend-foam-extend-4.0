@@ -67,7 +67,7 @@ class faceMDLimitedGrad
         tmp<fv::gradScheme<Type> > basicGradScheme_;
 
         //- Limiter coefficient
-        scalar k_;
+        const scalar k_;
 
 
     // Private Member Functions
@@ -107,7 +107,7 @@ public:
             {
                 FatalIOErrorIn
                 (
-                    "faceMDLimitedGrad(const fvMesh& mesh, Istream& schemeData)",
+                    "faceMDLimitedGrad(const fvMesh&, Istream& schemeData)",
                     schemeData
                 )   << "coefficient = " << k_
                     << " should be >= 0 and <= 1"

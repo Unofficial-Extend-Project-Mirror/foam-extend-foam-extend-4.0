@@ -268,7 +268,12 @@ Foam::polyMesh::readUpdateState Foam::polyMesh::readUpdate()
         // Calculate the geometry for the patches (transformation tensors etc.)
         boundary_.calcGeometry();
 
+        // Derived info
+        bounds_ = boundBox(allPoints_);
+        geometricD_ = Vector<label>::zero;
+        solutionD_ = Vector<label>::zero;
 
+        // Zones
         pointZoneMesh newPointZones
         (
             IOobject
@@ -427,6 +432,13 @@ Foam::polyMesh::readUpdateState Foam::polyMesh::readUpdate()
 
         // Reset points, mesh is not moved
         points_ = pointField::subField(allPoints_, nPoints());
+        
+        // Derived info
+        bounds_ = boundBox(allPoints_);
+
+        // Rotation can cause direction vector to change
+        geometricD_ = Vector<label>::zero;
+        solutionD_ = Vector<label>::zero;
         
         return polyMesh::POINTS_MOVED;
     }

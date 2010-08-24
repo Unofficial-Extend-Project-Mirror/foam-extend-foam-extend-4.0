@@ -26,7 +26,7 @@ Class
     Foam::skewCorrected
 
 Description
-    Skewness-corrected interpolation scheme which applies an explicit
+    Skewness-corrected interpolation scheme that applies an explicit
     correction to given scheme.
 
 SourceFiles
@@ -123,7 +123,7 @@ public:
         //- Return true if this scheme uses an explicit correction
         virtual bool corrected() const
         {
-            return
+            return 
                 tScheme_().corrected()
              || skewCorrectionVectors::New(this->mesh()).skew();
         }
@@ -208,7 +208,7 @@ public:
             }
             else
             {
-                return
+                return 
                     tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >(NULL);
             }
         }

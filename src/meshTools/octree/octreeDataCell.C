@@ -58,11 +58,7 @@ Foam::octreeDataCell::octreeDataCell
     bbs_
     (
         mesh_.nCells(),
-        treeBoundBox
-        (
-            vector(GREAT, GREAT, GREAT),
-            vector(-GREAT, -GREAT, -GREAT)
-        )
+        treeBoundBox::invertedBox
     )
 {
     // Set one-one indexing
@@ -113,7 +109,7 @@ bool Foam::octreeDataCell::overlaps
     const treeBoundBox& cubeBb
 ) const
 {
-    return cubeBb.intersects(bbs_[index]);
+    return cubeBb.overlaps(bbs_[index]);
 }
 
 

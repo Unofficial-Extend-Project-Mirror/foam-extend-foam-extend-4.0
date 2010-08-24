@@ -37,6 +37,7 @@ SourceFiles
 #define zoneToCell_H
 
 #include "topoSetSource.H"
+#include "wordRe.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,8 +58,8 @@ class zoneToCell
         //- Add usage string
         static addToUsageTable usage_;
 
-        //- Name of cellZone
-        word zoneName_;
+        //- Name/regular expression of cellZone
+        wordRe zoneName_;
 
 
     // Private Member Functions

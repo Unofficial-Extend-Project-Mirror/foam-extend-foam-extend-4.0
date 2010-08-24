@@ -96,7 +96,7 @@ void Foam::faceMapper::calcAddressing() const
 
             label faceI = ffp[ffpI].index();
 
-            if (addr[faceI].size() > 0)
+            if (addr[faceI].size())
             {
                 FatalErrorIn("void faceMapper::calcAddressing() const")
                     << "Master face " << faceI
@@ -118,7 +118,7 @@ void Foam::faceMapper::calcAddressing() const
 
             label faceI = ffe[ffeI].index();
 
-            if (addr[faceI].size() > 0)
+            if (addr[faceI].size())
             {
                 FatalErrorIn("void faceMapper::calcAddressing() const")
                     << "Master face " << faceI
@@ -140,7 +140,7 @@ void Foam::faceMapper::calcAddressing() const
 
             label faceI = fff[fffI].index();
 
-            if (addr[faceI].size() > 0)
+            if (addr[faceI].size())
             {
                 FatalErrorIn("void faceMapper::calcAddressing() const")
                     << "Master face " << faceI
@@ -160,7 +160,7 @@ void Foam::faceMapper::calcAddressing() const
 
         forAll (fm, faceI)
         {
-            if (fm[faceI] > -1 && addr[faceI].size() == 0)
+            if (fm[faceI] > -1 && addr[faceI].empty())
             {
                 // Mapped from a single face
                 addr[faceI] = labelList(1, fm[faceI]);
@@ -178,7 +178,7 @@ void Foam::faceMapper::calcAddressing() const
 
         forAll (addr, faceI)
         {
-            if (addr[faceI].size() == 0)
+            if (addr[faceI].empty())
             {
                 // Mapped from a dummy face
                 addr[faceI] = labelList(1, 0);
@@ -220,9 +220,9 @@ Foam::faceMapper::faceMapper(const mapPolyMesh& mpm)
     // Check for possibility of direct mapping
     if
     (
-        mpm_.facesFromPointsMap().size() == 0
-     && mpm_.facesFromEdgesMap().size() == 0
-     && mpm_.facesFromFacesMap().size() == 0
+        mpm_.facesFromPointsMap().empty() 
+     && mpm_.facesFromEdgesMap().empty()
+     && mpm_.facesFromFacesMap().empty()
     )
     {
         direct_ = true;

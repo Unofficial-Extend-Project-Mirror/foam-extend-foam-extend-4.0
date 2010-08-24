@@ -184,17 +184,16 @@ void Foam::curveSet::calcSamples
 
 
             // Get all boundary intersections
-            List<pointIndexHit> bHits =
-                searchEngine().intersections
-                (
-                    sampleCoords_[sampleI],
-                    sampleCoords_[sampleI+1]
-                );
+            List<pointIndexHit> bHits = searchEngine().intersections
+            (
+                sampleCoords_[sampleI],
+                sampleCoords_[sampleI + 1]
+            );
 
             point bPoint(GREAT, GREAT, GREAT);
             label bFaceI = -1;
 
-            if (bHits.size() > 0)
+            if (bHits.size())
             {
                 bPoint = bHits[0].hitPoint();
                 bFaceI = bHits[0].index();
@@ -400,7 +399,7 @@ Foam::curveSet::~curveSet()
 
 Foam::point Foam::curveSet::getRefPoint(const List<point>& pts) const
 {
-    if (pts.size() > 0)
+    if (pts.size())
     {
         // Use first samplePt as starting point
         return pts[0];

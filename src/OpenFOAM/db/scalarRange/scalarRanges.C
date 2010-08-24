@@ -51,7 +51,6 @@ Foam::scalarRanges::scalarRanges(Istream& is)
         }
     }
 
-    lst.shrink();
     transfer(lst);
 }
 
@@ -124,7 +123,7 @@ Foam::List<Foam::scalar> Foam::scalarRanges::select
     const List<scalar>& values
 ) const
 {
-    return subset(selected(values), true, values);
+    return subset(selected(values), values);
 }
 
 
@@ -133,7 +132,7 @@ void Foam::scalarRanges::inplaceSelect
     List<scalar>& values
 ) const
 {
-    inplaceSubset(selected(values), true, values);
+    inplaceSubset(selected(values), values);
 }
 
 

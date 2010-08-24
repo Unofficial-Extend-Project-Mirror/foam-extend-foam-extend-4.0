@@ -26,7 +26,7 @@ Class
     Foam::dynamicFvMesh
 
 Description
-    The dynamicFvMesh is ..
+    Abstract base class for geometry and/or topology changing fvMesh.
 
 SourceFiles
     dynamicFvMesh.C
@@ -89,7 +89,7 @@ public:
 
         //- Construct from components without boundary.
         //  Boundary is added using addPatches() member function
-        explicit dynamicFvMesh
+        dynamicFvMesh
         (
             const IOobject& io,
             const pointField& points,
@@ -103,7 +103,7 @@ public:
         //- Construct from components with cells rather than owner
         //  and neighbour without boundary.
         //  Boundary is added using addPatches() member function
-        explicit dynamicFvMesh
+        dynamicFvMesh
         (
             const IOobject& io,
             const pointField& points,

@@ -58,7 +58,7 @@ Foam::calcTypes::magSqr::~magSqr()
 void Foam::calcTypes::magSqr::init()
 {
     Foam::argList::validArgs.append("magSqr");
-    argList::validArgs.append("fieldName1 .. fieldNameN");
+    argList::validArgs.append("fieldName");
 }
 
 
@@ -68,14 +68,7 @@ void Foam::calcTypes::magSqr::preCalc
     const Time& runTime,
     const fvMesh& mesh
 )
-{
-    if (args.additionalArgs().size() < 2)
-    {
-        Info<< nl << "must specify one or more fields" << nl;
-        args.printUsage();
-        FatalError.exit();
-    }
-}
+{}
 
 
 void Foam::calcTypes::magSqr::calc
@@ -85,46 +78,42 @@ void Foam::calcTypes::magSqr::calc
     const fvMesh& mesh
 )
 {
-    const stringList& params = args.additionalArgs();
+    const word& fieldName = args.additionalArgs()[1];
 
-    for (label fieldi=1; fieldi<params.size(); fieldi++)
+    IOobject fieldHeader
+    (
+        fieldName,
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ
+    );
+
+    // Check field exists
+    if (fieldHeader.headerOk())
     {
-        const word fieldName(params[fieldi]);
+        bool processed = false;
 
-        IOobject fieldHeader
-        (
-            fieldName,
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ
-        );
+        writeMagSqrField<scalar>(fieldHeader, mesh, processed);
+        writeMagSqrField<vector>(fieldHeader, mesh, processed);
+        writeMagSqrField<sphericalTensor>(fieldHeader, mesh, processed);
+        writeMagSqrField<symmTensor>(fieldHeader, mesh, processed);
+        writeMagSqrField<tensor>(fieldHeader, mesh, processed);
 
-        // Check field exists
-        if (fieldHeader.headerOk())
+        if (!processed)
         {
-            bool processed = false;
-
-            writeMagSqrField<scalar>(fieldHeader, mesh, processed);
-            writeMagSqrField<vector>(fieldHeader, mesh, processed);
-            writeMagSqrField<sphericalTensor>(fieldHeader, mesh, processed);
-            writeMagSqrField<symmTensor>(fieldHeader, mesh, processed);
-            writeMagSqrField<tensor>(fieldHeader, mesh, processed);
-
-            if (!processed)
-            {
-                 FatalError
-                     << "Unable to process " << fieldName << nl
-                     << "No call to magSqr for fields of type "
-                     << fieldHeader.headerClassName() << nl << nl
-                     << exit(FatalError);
-            }
-        }
-        else
-        {
-            Info<< "    No " << fieldName << endl;
+            FatalError
+                << "Unable to process " << fieldName << nl
+                << "No call to magSqr for fields of type "
+                << fieldHeader.headerClassName() << nl << nl
+               << exit(FatalError);
         }
     }
+    else
+    {
+        Info<< "    No " << fieldName << endl;
+    }
 }
+
 
 
 // ************************************************************************* //

@@ -32,7 +32,7 @@ Description
     The first level of derivation is to basic patchFields which cover
     zero-gradient, fixed-gradient, fixed-value and mixed conditions.
 
-    The next level of derivation covers all the specialised typed with
+    The next level of derivation covers all the specialised types with
     specific evaluation proceedures, particularly with respect to specific
     fields.
 
@@ -65,6 +65,9 @@ class volMesh;
 
 template<class Type>
 class fvPatchField;
+
+template<class Type>
+class fvMatrix;
 
 template<class Type>
 Ostream& operator<<(Ostream&, const fvPatchField<Type>&);
@@ -407,8 +410,25 @@ public:
             }
 
 
-        //- Write
-        virtual void write(Ostream&) const;
+            //- Manipulate matrix
+            virtual void manipulateMatrix(fvMatrix<Type>& matrix);
+
+
+        // I-O
+
+            //- Write
+            virtual void write(Ostream&) const;
+
+            //- Helper function to write the keyword and entry only if the
+            //  values are not equal. The value is then output as value2
+            template<class EntryType>
+            void writeEntryIfDifferent
+            (
+                Ostream& os,
+                const word& entryName,
+                const EntryType& value1,
+                const EntryType& value2
+            ) const;
 
 
         // Check

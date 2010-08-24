@@ -75,8 +75,6 @@ class dictionary;
                            Class Field Declaration
 \*---------------------------------------------------------------------------*/
 
-#include "CintDefs.H"
-
 template<class Type>
 class Field
 :
@@ -98,6 +96,15 @@ public:
         static const char* const typeName;
 
 
+    // Static Member Functions
+
+        //- Return a null field
+        inline static const Field<Type>& null()
+        {
+            return *reinterpret_cast< Field<Type>* >(0);
+        }
+
+
     // Constructors
 
         //- Construct null
@@ -111,8 +118,11 @@ public:
         //- Construct given size and initial value
         Field(const label, const Type&);
 
-        //- Construct as copy of a UList<Type>
+        //- Construct as copy of a UList\<Type\>
         explicit Field(const UList<Type>&);
+
+        //- Construct by transferring the List contents
+        explicit Field(const Xfer<List<Type> >&);
 
         //- Construct by 1 to 1 mapping from the given field
         Field
@@ -164,6 +174,9 @@ public:
         //- Construct as copy or re-use as specified.
         Field(Field<Type>&, bool reUse);
 
+        //- Construct by transferring the Field contents
+        Field(const Xfer<Field<Type> >&);
+
         //- Construct as copy of subField
         Field(const typename Field<Type>::subField&);
 
@@ -181,28 +194,16 @@ public:
         //- Clone
         tmp<Field<Type> > clone() const;
 
-        //- Return a pointer to a new Field created on freestore
-        static autoPtr<Field<Type> > New(Istream& is)
-        {
-            return autoPtr<Field<Type> >(new Field<Type>(is));
-        }
-
         //- Return a pointer to a new calculatedFvPatchFieldField created on
         //  freestore without setting patchField values
-        #ifndef __CINT__
         template<class Type2>
         static tmp<Field<Type> > NewCalculatedType(const Field<Type2>& f)
         {
             return tmp<Field<Type> >(new Field<Type>(f.size()));
         }
-        #endif
 
 
-    // Member functions
-
-        //- Return a null Field
-        static const Field<Type>& null();
-
+    // Member Functions
 
         //- 1 to 1 map from the given field
         void map
@@ -338,20 +339,13 @@ public:
 
     // IOstream operators
 
-        friend Ostream& operator<<
-        #ifndef __CINT__
-        <Type>
-        #endif
+        friend Ostream& operator<< <Type>
         (Ostream&, const Field<Type>&);
 
-        friend Ostream& operator<<
-        #ifndef __CINT__
-        <Type>
-        #endif
+        friend Ostream& operator<< <Type>
         (Ostream&, const tmp<Field<Type> >&);
 };
 
-#include "CintUndefs.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

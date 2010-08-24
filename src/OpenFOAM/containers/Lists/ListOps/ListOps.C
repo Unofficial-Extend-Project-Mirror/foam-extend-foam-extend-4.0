@@ -28,7 +28,11 @@ License
 
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
-Foam::labelList Foam::invert(const label len, const labelList& map)
+Foam::labelList Foam::invert
+(
+    const label len,
+    const UList<label>& map
+)
 {
     labelList inverse(len, -1);
 
@@ -40,8 +44,8 @@ Foam::labelList Foam::invert(const label len, const labelList& map)
         {
             if (inverse[newPos] >= 0)
             {
-                FatalErrorIn("invert(const label, const labelList&)")
-                    << "Map is not one to one. At index " << i
+                FatalErrorIn("invert(const label, const UList<label>&)")
+                    << "Map is not one-to-one. At index " << i
                     << " element " << newPos << " has already occurred before"
                     << nl << "Please use invertOneToMany instead"
                     << abort(FatalError);
@@ -54,7 +58,11 @@ Foam::labelList Foam::invert(const label len, const labelList& map)
 }
 
 
-Foam::labelListList Foam::invertOneToMany(const label len, const labelList& map)
+Foam::labelListList Foam::invertOneToMany
+(
+    const label len,
+    const UList<label>& map
+)
 {
     labelList nElems(len, 0);
 

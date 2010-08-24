@@ -25,7 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "meshTools.H"
-#include "primitiveMesh.H"
+#include "polyMesh.H"
 #include "hexMatcher.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -46,7 +46,7 @@ bool Foam::meshTools::visNormal
             return false;
         }
     }
-    
+
     return true;
 }
 
@@ -63,7 +63,7 @@ Foam::vectorField Foam::meshTools::calcBoxPointNormals(const primitivePatch& pp)
     octantNormal[pXmYpZ] = vector(1, -1, 1);
     octantNormal[mXpYpZ] = vector(-1, 1, 1);
     octantNormal[pXpYpZ] = vector(1, 1, 1);
-    
+
     octantNormal /= mag(octantNormal);
 
 
@@ -182,7 +182,7 @@ Foam::vectorField Foam::meshTools::calcBoxPointNormals(const primitivePatch& pp)
                     "Foam::meshTools::calcBoxPointNormals"
                     "(const primitivePatch& pp)"
                 )   << "No visible octant for point:" << pp.meshPoints()[pointI]
-                    << " cooord:" << pp.localPoints()[pointI] << nl
+                    << " cooord:" << pp.points()[pp.meshPoints()[pointI]] << nl
                     << "Normal set to " << pn[pointI] << endl;
             }
         }
@@ -299,8 +299,8 @@ bool Foam::meshTools::edgeOnCell
     const label edgeI
 )
 {
-    return findIndex(mesh.edgeCells()[edgeI], cellI) != -1;
-}        
+    return findIndex(mesh.edgeCells(edgeI), cellI) != -1;
+}
 
 
 bool Foam::meshTools::edgeOnFace
@@ -310,8 +310,8 @@ bool Foam::meshTools::edgeOnFace
     const label edgeI
 )
 {
-    return findIndex(mesh.faceEdges()[faceI], edgeI) != -1;
-}        
+    return findIndex(mesh.faceEdges(faceI), edgeI) != -1;
+}
 
 
 // Return true if faceI part of cellI
@@ -403,7 +403,6 @@ Foam::label Foam::meshTools::getSharedEdge
     const labelList& f0Edges = mesh.faceEdges()[f0];
     const labelList& f1Edges = mesh.faceEdges()[f1];
 
-
     forAll(f0Edges, f0EdgeI)
     {
         label edge0 = f0Edges[f0EdgeI];
@@ -481,7 +480,7 @@ void Foam::meshTools::getEdgeFaces
     label& face1
 )
 {
-    const labelList& eFaces = mesh.edgeFaces()[edgeI];
+    const labelList& eFaces = mesh.edgeFaces(edgeI);
 
     face0 = -1;
     face1 = -1;
@@ -546,7 +545,7 @@ Foam::label Foam::meshTools::otherEdge
         "meshTools::otherEdge(const primitiveMesh&, const labelList&"
         ", const label, const label)"
     )   << "Can not find edge in "
-        << IndirectList<edge>(mesh.edges(), edgeLabels)()
+        << UIndirectList<edge>(mesh.edges(), edgeLabels)()
         << " connected to edge "
         << thisEdgeI << " with vertices " << mesh.edges()[thisEdgeI]
         << " on side " << thisVertI << abort(FatalError);
@@ -619,7 +618,7 @@ Foam::label Foam::meshTools::walkFace
     const label nEdges
 )
 {
-    const labelList& fEdges = mesh.faceEdges()[faceI];
+    const labelList& fEdges = mesh.faceEdges(faceI);
 
     label edgeI = startEdgeI;
 
@@ -633,6 +632,115 @@ Foam::label Foam::meshTools::walkFace
     }
 
     return edgeI;
+}
+
+
+void Foam::meshTools::constrainToMeshCentre
+(
+    const polyMesh& mesh,
+    point& pt
+)
+{
+    const Vector<label>& dirs = mesh.geometricD();
+
+    const point& min = mesh.bounds().min();
+    const point& max = mesh.bounds().max();
+
+    for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
+    {
+        if (dirs[cmpt] == -1)
+        {
+            pt[cmpt] = 0.5*(min[cmpt] + max[cmpt]);
+        }
+    }
+}
+
+
+void Foam::meshTools::constrainToMeshCentre
+(
+    const polyMesh& mesh,
+    pointField& pts
+)
+{
+    const Vector<label>& dirs = mesh.geometricD();
+
+    const point& min = mesh.bounds().min();
+    const point& max = mesh.bounds().max();
+
+    bool isConstrained = false;
+    for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
+    {
+        if (dirs[cmpt] == -1)
+        {
+            isConstrained = true;
+            break;
+        }
+    }
+
+    if (isConstrained)
+    {
+        forAll(pts, i)
+        {
+            for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
+            {
+                if (dirs[cmpt] == -1)
+                {
+                    pts[i][cmpt] = 0.5*(min[cmpt] + max[cmpt]);
+                }
+            }
+        }
+    }
+}
+
+
+//- Set the constrained components of directions/velocity to zero
+void Foam::meshTools::constrainDirection
+(
+    const polyMesh& mesh,
+    const Vector<label>& dirs,
+    vector& d
+)
+{
+    for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
+    {
+        if (dirs[cmpt] == -1)
+        {
+            d[cmpt] = 0.0;
+        }
+    }
+}
+
+
+void Foam::meshTools::constrainDirection
+(
+    const polyMesh& mesh,
+    const Vector<label>& dirs,
+    vectorField& d
+)
+{
+    bool isConstrained = false;
+    for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
+    {
+        if (dirs[cmpt] == -1)
+        {
+            isConstrained = true;
+            break;
+        }
+    }
+
+    if (isConstrained)
+    {
+        forAll(d, i)
+        {
+            for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
+            {
+                if (dirs[cmpt] == -1)
+                {
+                    d[i][cmpt] = 0.0;
+                }
+            }
+        }
+    }
 }
 
 
@@ -761,7 +869,7 @@ Foam::label Foam::meshTools::cutDirToEdge
                 doneEdges.insert(e2);
                 doneEdges.insert(e3);
             }
-        }       
+        }
     }
 
     forAll(cEdges, cEdgeI)
@@ -788,15 +896,6 @@ Foam::label Foam::meshTools::cutDirToEdge
 
     return maxEdgeI;
 }
-
-
-// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
 
 // ************************************************************************* //

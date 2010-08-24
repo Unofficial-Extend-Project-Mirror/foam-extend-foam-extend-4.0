@@ -26,6 +26,7 @@ InClass
     Foam::fvScalarMatrix
 
 Description
+    A scalar instance of fvMatrix
 
 SourceFiles
     fvScalarMatrix.C
@@ -56,13 +57,22 @@ void fvMatrix<scalar>::setComponentReference
 );
 
 template<>
-autoPtr<fvMatrix<scalar>::fvSolver> fvMatrix<scalar>::solver(Istream&);
+autoPtr<fvMatrix<scalar>::fvSolver> fvMatrix<scalar>::solver
+(
+    const dictionary&
+);
 
 template<>
-lduSolverPerformance fvMatrix<scalar>::fvSolver::solve(Istream&);
+lduMatrix::solverPerformance fvMatrix<scalar>::fvSolver::solve
+(
+    const dictionary&
+);
 
 template<>
-lduSolverPerformance fvMatrix<scalar>::solve(Istream&);
+lduMatrix::solverPerformance fvMatrix<scalar>::solve
+(
+    const dictionary&
+);
 
 template<>
 tmp<scalarField> fvMatrix<scalar>::residual() const;

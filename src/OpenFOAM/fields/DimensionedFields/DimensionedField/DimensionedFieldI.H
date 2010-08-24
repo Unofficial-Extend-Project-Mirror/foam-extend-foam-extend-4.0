@@ -32,6 +32,14 @@ namespace Foam
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type, class GeoMesh>
+inline const DimensionedField<Type, GeoMesh>&
+DimensionedField<Type, GeoMesh>::null()
+{
+    return *reinterpret_cast< DimensionedField<Type, GeoMesh>* >(0);
+}
+
+
+template<class Type, class GeoMesh>
 inline const typename GeoMesh::Mesh&
 DimensionedField<Type, GeoMesh>::mesh() const
 {

@@ -26,14 +26,9 @@ License
 
 #include "primitiveMesh.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void primitiveMesh::calcCells
+void Foam::primitiveMesh::calcCells
 (
     cellList& cellFaceAddr,
     const unallocLabelList& own,
@@ -102,7 +97,7 @@ void primitiveMesh::calcCells
 }
 
 
-void primitiveMesh::calcCells() const
+void Foam::primitiveMesh::calcCells() const
 {
     // Loop through faceCells and mark up neighbours
 
@@ -139,7 +134,7 @@ void primitiveMesh::calcCells() const
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const cellList& primitiveMesh::cells() const
+const Foam::cellList& Foam::primitiveMesh::cells() const
 {
     if (!cfPtr_)
     {
@@ -149,9 +144,5 @@ const cellList& primitiveMesh::cells() const
     return *cfPtr_;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

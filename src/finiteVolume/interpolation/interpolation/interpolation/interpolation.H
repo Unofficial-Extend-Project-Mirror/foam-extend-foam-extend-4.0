@@ -46,7 +46,6 @@ namespace Foam
 {
 
 class polyMesh;
-class volPointInterpolation;
 
 /*---------------------------------------------------------------------------*\
                            Class interpolation Declaration
@@ -83,10 +82,9 @@ public:
             interpolation,
             dictionary,
             (
-                const volPointInterpolation& pInterp,
                 const GeometricField<Type, fvPatchField, volMesh>& psi
             ),
-            (pInterp, psi)
+            (psi)
         );
 
 
@@ -96,7 +94,6 @@ public:
         static autoPtr<interpolation<Type> > New
         (
             const word& interpolationType,
-            const volPointInterpolation& pInterp,
             const GeometricField<Type, fvPatchField, volMesh>& psi
         );
 
@@ -104,7 +101,6 @@ public:
         static autoPtr<interpolation<Type> > New
         (
             const dictionary& interpolationSchemes,
-            const volPointInterpolation& pInterp,
             const GeometricField<Type, fvPatchField, volMesh>& psi
         );
 

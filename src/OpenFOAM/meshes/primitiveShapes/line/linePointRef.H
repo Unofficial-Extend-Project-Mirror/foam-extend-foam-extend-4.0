@@ -26,6 +26,7 @@ Typedef
     Foam::linePointRef
 
 Description
+    Line using referred points
 
 \*---------------------------------------------------------------------------*/
 

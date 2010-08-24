@@ -39,11 +39,6 @@ Description
 #include "DynamicList.H"
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template
@@ -54,7 +49,8 @@ template
     class PointType
 >
 void
-PrimitivePatch<Face, FaceList, PointField, PointType>::calcAddressing() const
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+calcAddressing() const
 {
     if (debug)
     {
@@ -224,7 +220,7 @@ PrimitivePatch<Face, FaceList, PointField, PointType>::calcAddressing() const
 
             forAll (neiFaces, nfI)
             {
-                if (neiFaces[nfI].size() > 0 && neiFaces[nfI][0] < minNei)
+                if (neiFaces[nfI].size() && neiFaces[nfI][0] < minNei)
                 {
                     nextNei = nfI;
                     minNei = neiFaces[nfI][0];
@@ -311,7 +307,7 @@ PrimitivePatch<Face, FaceList, PointField, PointType>::calcAddressing() const
 
     forAll (faceFaces, faceI)
     {
-        faceFaces[faceI].transfer(ff[faceI].shrink());
+        faceFaces[faceI].transfer(ff[faceI]);
     }
 
 
@@ -323,9 +319,5 @@ PrimitivePatch<Face, FaceList, PointField, PointType>::calcAddressing() const
     }
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

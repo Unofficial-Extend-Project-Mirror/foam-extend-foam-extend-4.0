@@ -36,7 +36,7 @@ SourceFiles
 #ifndef LUscalarMatrix_H
 #define LUscalarMatrix_H
 
-#include "scalarMatrix.H"
+#include "scalarMatrices.H"
 #include "labelList.H"
 #include "FieldField.H"
 #include "lduInterfaceFieldPtrsList.H"
@@ -55,7 +55,7 @@ class procLduMatrix;
 
 class LUscalarMatrix
 :
-    public scalarMatrix
+    public scalarSquareMatrix
 {
     // Private data
 
@@ -78,7 +78,7 @@ class LUscalarMatrix
         void convert(const PtrList<procLduMatrix>& lduMatrices);
 
 
-        //- Print the ratio of the mag-sum of the off-diagonal coefficients 
+        //- Print the ratio of the mag-sum of the off-diagonal coefficients
         //  to the mag-diagonal
         void printDiagonalDominance() const;
 
@@ -87,8 +87,8 @@ public:
 
     // Constructors
 
-        //- Construct from Matrix<scalar> and perform LU decomposition
-        LUscalarMatrix(const Matrix<scalar>&);
+        //- Construct from scalarSquareMatrix and perform LU decomposition
+        LUscalarMatrix(const scalarSquareMatrix&);
 
         //- Construct from lduMatrix and perform LU decomposition
         LUscalarMatrix

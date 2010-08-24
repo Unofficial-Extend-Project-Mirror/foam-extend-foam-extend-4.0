@@ -69,8 +69,10 @@ void Foam::polyMesh::updateMesh(const mapPolyMesh& mpm)
             oldPointsPtr_->reset(*oldAllPointsPtr_, nPoints());
         }
     }
-}
 
+    // Reset valid directions (could change by faces put into empty patches)
+    geometricD_ = Vector<label>::zero;
+    solutionD_ = Vector<label>::zero;
 
 // Sync mesh update with changes on other processors
 void Foam::polyMesh::syncUpdateMesh()
@@ -87,6 +89,10 @@ void Foam::polyMesh::syncUpdateMesh()
     deleteDemandDrivenData(globalMeshDataPtr_);
 
     setInstance(time().timeName());
+    
+    // Reset valid directions (could change by faces put into empty patches)
+    geometricD_ = Vector<label>::zero;
+    solutionD_ = Vector<label>::zero;
 }
 
 

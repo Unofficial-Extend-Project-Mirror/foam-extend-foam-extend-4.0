@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "nbrToCell.H"
@@ -58,22 +56,46 @@ Foam::topoSetSource::addToUsageTable Foam::nbrToCell::usage_
 void Foam::nbrToCell::combine(topoSet& set, const bool add) const
 {
     const cellList& cells = mesh().cells();
+    const polyBoundaryMesh& patches = mesh_.boundaryMesh();
+
+    boolList isCoupled(mesh_.nFaces()-mesh_.nInternalFaces(), false);
+
+    forAll(patches, patchI)
+    {
+        const polyPatch& pp = patches[patchI];
+
+        if (pp.coupled())
+        {
+            label faceI = pp.start();
+            forAll(pp, i)
+            {
+                isCoupled[faceI-mesh_.nInternalFaces()] = true;
+                faceI++;
+            }
+        }
+    }
 
     forAll(cells, cellI)
     {
-        const cell& cll = cells[cellI];
+        const cell& cFaces = cells[cellI];
 
-        label nInternalFaces = 0;
+        label nNbrCells = 0;
 
-        forAll(cll, i)
+        forAll(cFaces, i)
         {
-            if (mesh().isInternalFace(cll[i]))
+            label faceI = cFaces[i];
+
+            if (mesh_.isInternalFace(faceI))
             {
-                nInternalFaces++;
+                nNbrCells++;
+            }
+            else if (isCoupled[faceI-mesh_.nInternalFaces()])
+            {
+                nNbrCells++;
             }
         }
 
-        if (nInternalFaces <= minNbrs_)
+        if (nNbrCells <= minNbrs_)
         {
             addOrDelete(set, cellI, add);
         }

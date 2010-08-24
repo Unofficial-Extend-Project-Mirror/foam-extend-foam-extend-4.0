@@ -97,7 +97,7 @@ const Foam::GAMGAgglomeration& Foam::GAMGAgglomeration::New
 {
     if
     (
-        !mesh.db().objectRegistry::foundObject<GAMGAgglomeration>
+        !mesh.thisDb().foundObject<GAMGAgglomeration>
         (
             GAMGAgglomeration::typeName
         )
@@ -134,7 +134,7 @@ const Foam::GAMGAgglomeration& Foam::GAMGAgglomeration::New
     }
     else
     {
-        return mesh.db().objectRegistry::lookupObject<GAMGAgglomeration>
+        return mesh.thisDb().lookupObject<GAMGAgglomeration>
         (
             GAMGAgglomeration::typeName
         );
@@ -152,7 +152,7 @@ const Foam::GAMGAgglomeration& Foam::GAMGAgglomeration::New
 
     if
     (
-        !mesh.db().objectRegistry::foundObject<GAMGAgglomeration>
+        !mesh.thisDb().foundObject<GAMGAgglomeration>
         (
             GAMGAgglomeration::typeName
         )
@@ -185,7 +185,7 @@ const Foam::GAMGAgglomeration& Foam::GAMGAgglomeration::New
     }
     else
     {
-        return mesh.db().objectRegistry::lookupObject<GAMGAgglomeration>
+        return mesh.thisDb().lookupObject<GAMGAgglomeration>
         (
             GAMGAgglomeration::typeName
         );

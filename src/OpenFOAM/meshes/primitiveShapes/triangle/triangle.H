@@ -191,7 +191,8 @@ public:
             (
                 const Point& p,
                 const vector& q,
-                const intersection::algorithm alg
+                const intersection::algorithm alg,
+                const scalar tol = 0.0
             ) const;
 
             //- Return nearest point to p on triangle

@@ -24,112 +24,154 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "OSspecific.H"
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+template<class T>
+void Foam::SortableList<T>::sortIndices(List<label>& order) const
+{
+    // list lengths must be identical
+    if (order.size() != this->size())
+    {
+        // avoid copying any elements, they are overwritten anyhow
+        order.clear();
+        order.setSize(this->size());
+    }
+
+    forAll(order, elemI)
+    {
+        order[elemI] = elemI;
+    }
+    Foam::stableSort(order, typename UList<T>::less(*this));
+}
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from List
-template <class Type>
-Foam::SortableList<Type>::SortableList(const List<Type>& values)
+template<class T>
+Foam::SortableList<T>::SortableList()
+{}
+
+
+template<class T>
+Foam::SortableList<T>::SortableList(const UList<T>& values)
 :
-    List<Type>(values),
-    indices_(values.size())
+    List<T>(values)
 {
     sort();
 }
 
 
-// Construct given size. Sort later on.
-template <class Type>
-Foam::SortableList<Type>::SortableList(const label size)
+template<class T>
+Foam::SortableList<T>::SortableList(const Xfer<List<T> >& values)
 :
-    List<Type>(size),
-    indices_(size)
+    List<T>(values)
+{
+    sort();
+}
+
+
+template<class T>
+Foam::SortableList<T>::SortableList(const label size)
+:
+    List<T>(size)
 {}
 
 
-// Construct given size and initial value. Sort later on.
-template <class Type>
-Foam::SortableList<Type>::SortableList(const label size, const Type& val)
+template<class T>
+Foam::SortableList<T>::SortableList(const label size, const T& val)
 :
-    List<Type>(size, val),
-    indices_(size)
+    List<T>(size, val)
 {}
 
 
-// Construct as copy.
-template <class Type>
-Foam::SortableList<Type>::SortableList(const SortableList<Type>& lst)
+template<class T>
+Foam::SortableList<T>::SortableList(const SortableList<T>& lst)
 :
-    List<Type>(lst),
+    List<T>(lst),
     indices_(lst.indices())
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-template <class Type>
-void Foam::SortableList<Type>::setSize(const label newSize)
+
+template<class T>
+void Foam::SortableList<T>::clear()
 {
-    List<Type>::setSize(newSize);
-    indices_.setSize(newSize);
+    List<T>::clear();
+    indices_.clear();
 }
 
 
-template <class Type>
-void Foam::SortableList<Type>::sort()
+template<class T>
+Foam::List<T>& Foam::SortableList<T>::shrink()
 {
-    forAll(indices_, i)
-    {
-        indices_[i] = i;
-    }
-
-    Foam::sort(indices_, less(*this));
-
-    List<Type> tmpValues(this->size());
-
-    forAll(indices_, i)
-    {
-        tmpValues[i] = this->operator[](indices_[i]);
-    }
-
-    List<Type>::transfer(tmpValues);
+    indices_.clear();
+    return static_cast<List<T>&>(*this);
 }
 
 
-
-template <class Type>
-void Foam::SortableList<Type>::stableSort()
+template<class T>
+void Foam::SortableList<T>::sort()
 {
+    sortIndices(indices_);
+
+    List<T> lst(this->size());
     forAll(indices_, i)
     {
-        indices_[i] = i;
+        lst[i] = this->operator[](indices_[i]);
     }
 
-    Foam::stableSort(indices_, less(*this));
+    List<T>::transfer(lst);
+}
 
-    List<Type> tmpValues(this->size());
 
+template<class T>
+void Foam::SortableList<T>::reverseSort()
+{
+    sortIndices(indices_);
+
+    List<T> lst(this->size());
+    label endI = indices_.size();
     forAll(indices_, i)
     {
-        tmpValues[i] = this->operator[](indices_[i]);
+        lst[--endI] = this->operator[](indices_[i]);
     }
 
-    List<Type>::transfer(tmpValues);
+    List<T>::transfer(lst);
+}
+
+
+template<class T>
+Foam::Xfer<Foam::List<T> > Foam::SortableList<T>::xfer()
+{
+    return xferMoveTo<List<T> >(*this);
 }
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
-template <class Type>
-void Foam::SortableList<Type>::operator=(const SortableList<Type>& rhs)
+template<class T>
+inline void Foam::SortableList<T>::operator=(const T& t)
 {
-    List<Type>::operator=(rhs);
-    indices_ = rhs.indices();
+    UList<T>::operator=(t);
 }
 
+
+template<class T>
+inline void Foam::SortableList<T>::operator=(const UList<T>& rhs)
+{
+    List<T>::operator=(rhs);
+    indices_.clear();
+}
+
+
+template<class T>
+inline void Foam::SortableList<T>::operator=(const SortableList<T>& rhs)
+{
+    List<T>::operator=(rhs);
+    indices_ = rhs.indices();
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

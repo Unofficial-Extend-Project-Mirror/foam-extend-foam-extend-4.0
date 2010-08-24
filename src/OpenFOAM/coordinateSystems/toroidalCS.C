@@ -36,21 +36,7 @@ namespace Foam
     addToRunTimeSelectionTable(coordinateSystem, toroidalCS, dictionary);
 }
 
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-Foam::toroidalCS::toroidalCS
-(
-    const word& name,
-    const point& origin,
-    const vector& axis,
-    const vector& direction,
-    const scalar radius
-)
-:
-    coordinateSystem(name, origin, axis, direction),
-    radius_(radius)
-{}
 
 
 Foam::toroidalCS::toroidalCS
@@ -105,6 +91,7 @@ Foam::vector Foam::toroidalCS::localToGlobal
     );
 }
 
+
 Foam::tmp<Foam::vectorField> Foam::toroidalCS::localToGlobal
 (
     const vectorField& local,
@@ -129,6 +116,7 @@ Foam::tmp<Foam::vectorField> Foam::toroidalCS::localToGlobal
     return coordinateSystem::localToGlobal(lc, translate);
 }
 
+
 Foam::vector Foam::toroidalCS::globalToLocal
 (
     const vector& global,
@@ -142,6 +130,7 @@ Foam::vector Foam::toroidalCS::globalToLocal
 
     return vector::zero;
 }
+
 
 Foam::tmp<Foam::vectorField> Foam::toroidalCS::globalToLocal
 (
@@ -169,8 +158,8 @@ void Foam::toroidalCS::writeDict(Ostream& os, bool subDict) const
 {
     if (subDict)
     {
-	os  << indent << name() << nl
-	    << indent << token::BEGIN_BLOCK << incrIndent << nl;
+        os  << indent << name() << nl
+            << indent << token::BEGIN_BLOCK << incrIndent << nl;
     }
 
     coordinateSystem::writeDict(os, false);
@@ -178,9 +167,8 @@ void Foam::toroidalCS::writeDict(Ostream& os, bool subDict) const
 
     if (subDict)
     {
-	os << decrIndent << indent << token::END_BLOCK << endl;
+        os << decrIndent << indent << token::END_BLOCK << endl;
     }
 }
-
 
 // ************************************************************************* //

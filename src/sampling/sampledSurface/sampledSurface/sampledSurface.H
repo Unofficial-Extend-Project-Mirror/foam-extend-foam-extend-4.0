@@ -28,6 +28,19 @@ Class
 Description
     An abstract class for surfaces with sampling.
 
+    The constructors for the derived classes should generally start in a
+    'expired' condition (ie, needsUpdate() == true) and rely on a
+    subsequent call to the update() method to complete the initialization.
+    Delaying the final construction as late as possible allows the
+    construction of surfaces that may depend on intermediate calculation
+    results (eg, iso-surfaces) and also avoids the unnecessary
+    reconstruction of surfaces between sampling intervals.
+
+    It is the responsibility of the caller to ensure that the surface
+    update() is called before the surface is used.  The update() method
+    implementation should do nothing when the surface is already
+    up-to-date.
+
 SourceFiles
     sampledSurface.C
     sampledSurfaceTemplates.C
@@ -67,9 +80,6 @@ class sampledSurface
 
         //- Reference to mesh
         const polyMesh& mesh_;
-
-        //- Triangulate faces or keep faces as it
-        bool triangulate_;
 
         //- Do we intend to interpolate the information?
         bool interpolate_;
@@ -132,12 +142,6 @@ protected:
 
         virtual void clearGeom() const;
 
-        //- Non-const access to triangulation
-        bool& triangulate()
-        {
-            return triangulate_;
-        }
-
 public:
 
     //- Runtime type information
@@ -161,10 +165,7 @@ public:
 
 
         //- Class used for the PtrLists read-construction
-        //  Has the ability to rewrite coordinate systems as required
         class iNew
-        :
-            public coordinateSystems
         {
             //- Reference to the volume mesh
             const polyMesh& mesh_;
@@ -173,17 +174,6 @@ public:
 
             iNew(const polyMesh& mesh)
             :
-                coordinateSystems(mesh),
-                mesh_(mesh)
-            {}
-
-            iNew
-            (
-                const polyMesh& mesh,
-                const coordinateSystems& cs
-            )
-            :
-                coordinateSystems(cs),
                 mesh_(mesh)
             {}
 
@@ -191,7 +181,6 @@ public:
             {
                 word name(is);
                 dictionary dict(is);
-                rewriteDict(dict, true);
 
                 return sampledSurface::New(name, mesh_, dict);
             }
@@ -204,16 +193,15 @@ public:
         sampledSurface
         (
             const word& name,
-            const polyMesh& mesh,
-            const bool triangulate = true
+            const polyMesh&
         );
 
         //- Construct from dictionary
         sampledSurface
         (
             const word& name,
-            const polyMesh& mesh,
-            const dictionary& dict
+            const polyMesh&,
+            const dictionary&
         );
 
         //- Clone
@@ -229,9 +217,9 @@ public:
         //- Return a reference to the selected surface
         static autoPtr<sampledSurface> New
         (
-            const word& sampleType,
-            const polyMesh& mesh,
-            const dictionary& dict
+            const word& name,
+            const polyMesh&,
+            const dictionary&
         );
 
 
@@ -262,20 +250,24 @@ public:
             return interpolate_;
         }
 
-        //- triangulation requested for surface
-        bool triangulate() const
-        {
-            return triangulate_;
-        }
+        //- Does the surface need an update?
+        virtual bool needsUpdate() const = 0;
+
+        //- Mark the surface as needing an update.
+        //  May also free up unneeded data.
+        //  Return false if surface was already marked as expired.
+        virtual bool expire() = 0;
+
+        //- Update the surface as required.
+        //  Do nothing (and return false) if no update was required
+        virtual bool update() = 0;
+
 
         //- Points of surface
         virtual const pointField& points() const = 0;
 
         //- Faces of surface
         virtual const faceList& faces() const = 0;
-
-        //- Correct for mesh movement and/or field changes
-        virtual void correct(const bool meshChanged) = 0;
 
         //- Return face area vectors
         virtual const vectorField& Sf() const;

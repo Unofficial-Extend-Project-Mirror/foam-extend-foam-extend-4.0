@@ -31,7 +31,6 @@ Description
 #include "labelPairLookup.H"
 #include "OFstream.H"
 #include "HashSet.H"
-#include "labelHashSet.H"
 #include "triSurface.H"
 #include "pointIndexHit.H"
 #include "treeDataTriSurface.H"
@@ -60,7 +59,7 @@ void Foam::edgeIntersections::checkEdges(const triSurface& surf)
 
     treeBoundBox bb(localPoints);
 
-    scalar minSize = SMALL*bb.minDim();
+    scalar minSize = SMALL * bb.minDim();
 
     forAll(edges, edgeI)
     {
@@ -219,14 +218,8 @@ void Foam::edgeIntersections::intersectEdges
 
 
         // Done current edge. Transfer all data into *this
-        currentIntersections.shrink();
-        currentIntersectionTypes.shrink();
-
         operator[](edgeI).transfer(currentIntersections);
         classification_[edgeI].transfer(currentIntersectionTypes);
-
-        currentIntersections.clear();
-        currentIntersectionTypes.clear();
     }
 
     if (debug)
@@ -262,7 +255,7 @@ bool Foam::edgeIntersections::inlinePerturb
 
     const labelList& edgeEnds = classification_[edgeI];
 
-    if (edgeEnds.size() > 0)
+    if (edgeEnds.size())
     {
         bool perturbStart = false;
         bool perturbEnd = false;
@@ -652,7 +645,7 @@ Foam::label Foam::edgeIntersections::removeDegenerates
                             offsetPerturb
                             (
                                 surf1,
-                                surf2,  
+                                surf2,
                                 edgeI,
                                 rndGen,
                                 points1,
@@ -708,7 +701,7 @@ Foam::label Foam::edgeIntersections::removeDegenerates
         // Transfer and test.
         edgesToTest.transfer(newEdgesToTest);
 
-        if (edgesToTest.size() == 0)
+        if (edgesToTest.empty())
         {
             FatalErrorIn("perturb") << "oops" << abort(FatalError);
         }

@@ -36,6 +36,20 @@ namespace Foam
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template <class Type>
+dimensioned<Type> dimensioned<Type>::lookupOrDefault
+(
+    const word& name,
+    const dictionary& dict,
+    const Type& defaultValue,
+    const dimensionSet& dims
+)
+{
+    Type value = dict.lookupOrDefault<Type>(name, defaultValue);
+    return dimensioned<Type>(name, dims, value);
+}
+
+
+template <class Type>
 dimensioned<Type> dimensioned<Type>::lookupOrAddToDict
 (
     const word& name,

@@ -54,6 +54,7 @@ SourceFiles
 #ifndef primitiveMesh_H
 #define primitiveMesh_H
 
+#include "DynamicList.H"
 #include "edgeList.H"
 #include "pointField.H"
 #include "SubField.H"
@@ -63,7 +64,7 @@ SourceFiles
 #include "cellShapeList.H"
 #include "labelList.H"
 #include "boolList.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "Map.H"
 #include "EdgeMap.H"
 
@@ -82,20 +83,8 @@ class primitiveMesh
 
         // Primitive size data
 
-            //- Number of internal points (or -1 if points not sorted)
-            label nInternalPoints_;
-
             //- Number of points
             label nPoints_;
-
-            //- Number of internal edges using 0 boundary points
-            mutable label nInternal0Edges_;
-
-            //- Number of internal edges using 0 or 1 boundary points
-            mutable label nInternal1Edges_;
-
-            //- Number of internal edges using 0,1 or 2boundary points
-            mutable label nInternalEdges_;
 
             //- Number of edges
             mutable label nEdges_;
@@ -115,11 +104,11 @@ class primitiveMesh
             //- Cell shapes
             mutable cellShapeList* cellShapesPtr_;
 
-            //- Edges.  Sorted to separate internal and boundary edges
+            //- Edges are ordered in upper triangular order
+            //  Note: inconsistency with 1.6.x to re-instate
+            //  parallelisation of point-based operations
+            // HJ, 9/Jul/2010
             mutable edgeList* edgesPtr_;
-
-            //- Edges ordered in upper triangular order
-            mutable edgeList* orderedEdgesPtr_;
 
 
         // Connectivity
@@ -156,6 +145,15 @@ class primitiveMesh
 
             //- Cell-points
             mutable labelListList* cpPtr_;
+
+
+        // On-the-fly edge addresing storage
+
+            //- Temporary storage for addressing.
+            mutable DynamicList<label> labels_;
+
+            //- Temporary storage for addressing
+            mutable labelHashSet labelSet_;
 
 
         // Geometric data
@@ -206,20 +204,21 @@ class primitiveMesh
             //  During edge calculation, a larger set of data is assembled.
             //  Create and destroy as a set, using clearOutEdges()
             void calcEdges(const bool doFaceEdges) const;
-
             void clearOutEdges();
             //- Helper: return (after optional creation) edge between two points
             static label getEdge
             (
                 List<DynamicList<label> >&,
                 DynamicList<edge>&,
-                const label pA,
-                const label pB
+                const label,
+                const label
             );
-
-            //- Calculated ordered edges
-            //  HJ, 6/Jan/2009
-            void calcOrderedEdges() const;
+            //- For on-the-fly addressing calculation
+            static label findFirstCommonElementFromSortedLists
+            ( 
+                const labelList&,
+                const labelList&
+            );
 
 
         // Geometrical calculations
@@ -374,6 +373,17 @@ public:
         );
 
 
+        //- Reset this primitiveMesh given the primitive array sizes and cells
+        void reset
+        (
+            const label nPoints,
+            const label nInternalFaces,
+            const label nFaces,
+            const label nCells,
+            const Xfer<cellList>& cells
+        );
+
+
         // Access
 
             // Mesh size parameters
@@ -383,19 +393,6 @@ public:
                 inline label nInternalFaces() const;
                 inline label nFaces() const;
                 inline label nCells() const;
-
-                // If points are ordered (nInternalPoints != -1):
-
-                    //- Points not on boundary
-                    inline label nInternalPoints() const;
-
-                    //- Internal edges (i.e. not on boundary face) using
-                    //  no boundary point
-                    inline label nInternal0Edges() const;
-                    //- Internal edges using 0 or 1 boundary point
-                    inline label nInternal1Edges() const;
-                    //- Internal edges using 0,1 or 2 boundary points
-                    inline label nInternalEdges() const;
 
 
             // Primitive mesh data
@@ -423,9 +420,6 @@ public:
 
                 //- Return mesh edges. Uses calcEdges.
                 const edgeList& edges() const;
-
-                //- Return mesh edges ordered in upper triangular order
-                const edgeList& orderedEdges() const;
 
                 //- Helper function to calculate cell-face addressing from
                 //  face-cell addressing. If nCells is not provided it will
@@ -633,7 +627,7 @@ public:
             //  Returns false for no error.
             bool checkTopology(const bool report = false) const;
 
-            //- Check mesh geometry (& implicitly topology) for correctness. 
+            //- Check mesh geometry (& implicitly topology) for correctness.
             //  Returns false for no error.
             bool checkGeometry(const bool report = false) const;
 
@@ -646,20 +640,6 @@ public:
                 const pointField& newPoints,
                 const bool report = false
             ) const;
-
-
-            //- Set the closedness ratio warning threshold
-            static scalar setClosedThreshold(const scalar);
-
-            //- Set the aspect ratio warning threshold
-            static scalar setAspectThreshold(const scalar);
-
-            //- Set the non-orthogonality warning threshold in degrees
-            static scalar setNonOrthThreshold(const scalar);
-
-            //- Set the skewness warning threshold as percentage
-            //  of the face area vector
-            static scalar setSkewThreshold(const scalar);
 
 
         // Useful derived info
@@ -681,6 +661,104 @@ public:
 
             //- Print a list of all the currently allocated mesh data
             void printAllocated() const;
+
+            // Per storage whether allocated
+            inline bool hasCellShapes() const;
+            inline bool hasEdges() const;
+            inline bool hasCellCells() const;
+            inline bool hasEdgeCells() const;
+            inline bool hasPointCells() const;
+            inline bool hasCells() const;
+            inline bool hasEdgeFaces() const;
+            inline bool hasPointFaces() const;
+            inline bool hasCellEdges() const;
+            inline bool hasFaceEdges() const;
+            inline bool hasPointEdges() const;
+            inline bool hasPointPoints() const;
+            inline bool hasCellPoints() const;
+            inline bool hasCellCentres() const;
+            inline bool hasFaceCentres() const;
+            inline bool hasCellVolumes() const;
+            inline bool hasFaceAreas() const;
+
+            // On-the-fly addressing calculation. These functions return either
+            // a reference to the full addressing (if already calculated) or
+            // a reference to the supplied storage. The one-argument ones
+            // use member DynamicList labels_ so be careful when not storing
+            // result.
+
+            //- cellCells using cells.
+            const labelList& cellCells
+            (
+                const label cellI,
+                DynamicList<label>&
+            ) const;
+
+            const labelList& cellCells(const label cellI) const;
+
+            //- cellPoints using cells
+            const labelList& cellPoints
+            (
+                const label cellI,
+                DynamicList<label>&
+            ) const;
+
+            const labelList& cellPoints(const label cellI) const;
+
+            //- pointCells using pointFaces
+            const labelList& pointCells
+            (
+                const label pointI,
+                DynamicList<label>&
+            ) const;
+
+            const labelList& pointCells(const label pointI) const;
+
+            //- pointPoints using edges, pointEdges
+            const labelList& pointPoints
+            (
+                const label pointI,
+                DynamicList<label>&
+            ) const;
+
+            const labelList& pointPoints(const label pointI) const;
+
+            //- faceEdges using pointFaces, edges, pointEdges
+            const labelList& faceEdges
+            (
+                const label faceI,
+                DynamicList<label>&
+            ) const;
+
+            const labelList& faceEdges(const label faceI) const;
+
+            //- edgeFaces using pointFaces, edges, pointEdges
+            const labelList& edgeFaces
+            (
+                const label edgeI,
+                DynamicList<label>&
+            ) const;
+
+            const labelList& edgeFaces(const label edgeI) const;
+
+            //- edgeCells using pointFaces, edges, pointEdges
+            const labelList& edgeCells
+            (
+                const label edgeI,
+                DynamicList<label>&
+            ) const;
+
+            const labelList& edgeCells(const label edgeI) const;
+
+            //- cellEdges using cells, pointFaces, edges, pointEdges
+            const labelList& cellEdges
+            (
+                const label cellI,
+                DynamicList<label>&
+            ) const;
+
+            const labelList& cellEdges(const label cellI) const;
+
 
             //- Clear geometry
             void clearGeom();

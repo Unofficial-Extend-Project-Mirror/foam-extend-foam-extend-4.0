@@ -36,9 +36,9 @@ SourceFiles
 #ifndef triSurface_H
 #define triSurface_H
 
+#include "PrimitivePatch.H"
 #include "pointField.H"
 #include "labelledTri.H"
-#include "PrimitivePatch.H"
 #include "boolList.H"
 #include "geometricSurfacePatchList.H"
 #include "surfacePatchList.H"
@@ -58,8 +58,22 @@ class IFstream;
 
 class triSurface
 :
-    public PrimitivePatch<labelledTri, List, pointField>
+    public PrimitivePatch<labelledTri, ::Foam::List, pointField, point>
 {
+    // Private typedefs
+
+    //- Typedefs for convenience
+        typedef labelledTri Face;
+        typedef PrimitivePatch
+        <
+            labelledTri,
+            ::Foam::List,
+            pointField,
+            point
+        >
+        ParentType;
+
+
     // Private data
 
         //- The number of bytes in the STL header
@@ -131,7 +145,7 @@ class triSurface
         void writeSTLBINARY(std::ostream&) const;
 
         //- Write to Ostream in GTS (Gnu Tri Surface library)
-        //  format. 
+        //  format.
         void writeGTS(const bool writeSorted, Ostream&) const;
 
         //- Write to Ostream in OBJ (Lightwave) format.
@@ -181,16 +195,38 @@ class triSurface
         //- helper function to print triangle info
         static void printTriangle
         (
-            Ostream& os,
+            Ostream&,
             const Foam::string& pre,
-            const labelledTri& f,
-            const pointField& points
+            const labelledTri&,
+            const pointField&
         );
 
         //- read non-comment line
         static string getLineNoComment(IFstream&);
 
+protected:
+
+    // Protected Member Functions
+
+        //- Non-const access to global points
+        pointField& storedPoints()
+        {
+            return const_cast<pointField&>(ParentType::points());
+        }
+
+        //- Non-const access to the faces
+        List<Face>& storedFaces()
+        {
+            return static_cast<List<Face>&>(*this);
+        }
+
 public:
+
+    // Public typedefs
+
+        //- Placeholder only, but do not remove - it is needed for GeoMesh
+        typedef bool BoundaryMesh;
+
 
         //- Runtime type information
         ClassName("triSurface");
@@ -290,16 +326,11 @@ public:
             //- Scale points. A non-positive factor is ignored
             virtual void scalePoints(const scalar&);
 
-            //- Check/fix duplicate/degenerate triangles
+            //- Check/remove duplicate/degenerate triangles
             void checkTriangles(const bool verbose);
 
-            //- Check triply (or more) connected edges. Return list of faces
-            //  sharing these edges.
+            //- Check triply (or more) connected edges.
             void checkEdges(const bool verbose);
-
-            //- Check orientation (normals) and normals of neighbouring
-            //  triangles
-            boolList checkOrientation(const bool verbose);
 
             //- Remove non-valid triangles
             void cleanup(const bool verbose);
@@ -335,7 +366,7 @@ public:
                 labelList& faceMap
             ) const;
 
-            //- Return new surface. Returns pointMap, faceMap from 
+            //- Return new surface. Returns pointMap, faceMap from
             //  subsetMeshMap
             triSurface subsetMesh
             (

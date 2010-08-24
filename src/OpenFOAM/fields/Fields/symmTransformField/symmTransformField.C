@@ -50,7 +50,7 @@ void transform
     {
         TFOR_ALL_F_OP_FUNC_F_F
         (
-            Type, rtf, =, transform, tensor, trf, Type, tf
+            Type, rtf, =, transform, symmTensor, trf, Type, tf
         )
     }
 }

@@ -41,6 +41,27 @@ inline Foam::autoPtr<Foam::List<T> > Foam::List<T>::clone() const
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class T>
+inline const Foam::List<T>& Foam::List<T>::null()
+{
+    return *reinterpret_cast< List<T>* >(0);
+}
+
+
+template<class T>
+inline void Foam::List<T>::resize(const label newSize)
+{
+    this->setSize(newSize);
+}
+
+
+template<class T>
+inline void Foam::List<T>::resize(const label newSize, const T& a)
+{
+    this->setSize(newSize, a);
+}
+
+
+template<class T>
 inline T& Foam::List<T>::newElmt(const label i)
 {
     if (i >= this->size())
@@ -49,6 +70,61 @@ inline T& Foam::List<T>::newElmt(const label i)
     }
 
     return UList<T>::operator[](i);
+}
+
+
+template<class T>
+inline void Foam::List<T>::size(const label n)
+{
+    UList<T>::size_ = n;
+}
+
+
+template<class T>
+inline Foam::label Foam::List<T>::size() const
+{
+    return UList<T>::size_;
+}
+
+
+template<class T>
+inline Foam::Xfer< Foam::List<T> > Foam::List<T>::xfer()
+{
+    return xferMove(*this);
+}
+
+
+template<class T>
+inline void Foam::List<T>::append(const UList<T>& lst)
+{
+    if (this == &lst)
+    {
+        FatalErrorIn
+        (
+            "List<T>::append(const UList<T>&)"
+        )   << "attempted appending to self" << abort(FatalError);
+    }
+
+    label nextFree = this->size();
+    setSize(nextFree + lst.size());
+
+    forAll(lst, elemI)
+    {
+        this->operator[](nextFree++) = lst[elemI];
+    }
+}
+
+
+template<class T>
+inline void Foam::List<T>::append(const UIndirectList<T>& lst)
+{
+    label nextFree = this->size();
+    setSize(nextFree + lst.size());
+
+    forAll(lst, elemI)
+    {
+        this->operator[](nextFree++) = lst[elemI];
+    }
 }
 
 

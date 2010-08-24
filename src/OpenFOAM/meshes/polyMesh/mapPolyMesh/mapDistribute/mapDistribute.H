@@ -36,6 +36,8 @@ Note:
     Schedule is a list of processor pairs (one send, one receive. One of
     them will be myself) which forms a scheduled (i.e. non-buffered) exchange.
     See distribute on how to use it.
+    Note2: number of items send on one processor have to equal the number
+    of items received on the other processor.
 
 
 SourceFiles
@@ -49,6 +51,7 @@ SourceFiles
 #include "labelList.H"
 #include "labelPair.H"
 #include "Pstream.H"
+#include "boolList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -76,18 +79,6 @@ class mapDistribute
 
         //- Schedule
         mutable autoPtr<List<labelPair> > schedulePtr_;
-
-
-    // Private Member Functions
-
-        void calcSchedule() const;
-
-        //- Disallow default bitwise copy construct
-        mapDistribute(const mapDistribute&);
-
-        //- Disallow default bitwise assignment
-        void operator=(const mapDistribute&);
-
 
 
 public:
@@ -119,6 +110,9 @@ public:
             const labelList& recvProcs
         );
 
+        //- Construct copy
+        mapDistribute(const mapDistribute&);
+
 
     // Member Functions
 
@@ -130,8 +124,20 @@ public:
                 return constructSize_;
             }
 
+            //- Constructed data size
+            label& constructSize()
+            {
+                return constructSize_;
+            }
+
             //- From subsetted data back to original data
             const labelListList& subMap() const
+            {
+                return subMap_;
+            }
+
+            //- From subsetted data back to original data
+            labelListList& subMap()
             {
                 return subMap_;
             }
@@ -142,18 +148,30 @@ public:
                 return constructMap_;
             }
 
-            //- Return a schedule. Demand driven. See above.
-            const List<labelPair>& schedule() const
+            //- From subsetted data to new reconstructed data
+            labelListList& constructMap()
             {
-                if (!schedulePtr_.valid())
-                {
-                    calcSchedule();
-                }
-                return schedulePtr_();
+                return constructMap_;
             }
+
+            //- Calculate a schedule. See above.
+            static List<labelPair> schedule
+            (
+                const labelListList& subMap,
+                const labelListList& constructMap
+            );
+
+            //- Return a schedule. Demand driven. See above.
+            const List<labelPair>& schedule() const;
 
 
         // Other
+
+            //- Compact maps. Gets per field a bool whether it is used (locally)
+            //  and works out itself what this side and sender side can remove
+            //  from maps.
+            void compact(const boolList& elemIsUsed);
+
 
             //- Distribute data. Note:schedule only used for Pstream::scheduled
             //  for now, all others just use send-to-all, receive-from-all.
@@ -168,19 +186,65 @@ public:
                 List<T>&
             );
 
-            //- Distribute data using scheduling.
+            //- Distribute data. If multiple processors writing to same
+            //  position adds contributions using cop.
+            template<class T, class CombineOp>
+            static void distribute
+            (
+                const Pstream::commsTypes commsType,
+                const List<labelPair>& schedule,
+                const label constructSize,
+                const labelListList& subMap,
+                const labelListList& constructMap,
+                List<T>&,
+                const CombineOp& cop,
+                const T& nullValue
+            );
+
+            //- Distribute data using default commsType.
             template<class T>
             void distribute(List<T>& fld) const
             {
-                distribute
+                if
                 (
-                    Pstream::scheduled,
-                    schedule(),
-                    constructSize_,
-                    subMap_,
-                    constructMap_,
-                    fld
-                );
+                    Pstream::defaultCommsType == Pstream::nonBlocking
+                 && contiguous<T>()
+                )
+                {
+                    distribute
+                    (
+                        Pstream::nonBlocking,
+                        List<labelPair>(),
+                        constructSize_,
+                        subMap_,
+                        constructMap_,
+                        fld
+                    );
+                }
+                else if (Pstream::defaultCommsType == Pstream::scheduled)
+                {
+                    distribute
+                    (
+                        Pstream::scheduled,
+                        schedule(),
+                        constructSize_,
+                        subMap_,
+                        constructMap_,
+                        fld
+                    );
+                }
+                else
+                {
+                    distribute
+                    (
+                        Pstream::blocking,
+                        List<labelPair>(),
+                        constructSize_,
+                        subMap_,
+                        constructMap_,
+                        fld
+                    );
+                }
             }
 
             //- Correct for topo change.
@@ -191,6 +255,11 @@ public:
                     "mapDistribute::updateMesh(const mapPolyMesh&)"
                 );
             }
+
+    // Member Operators
+
+        void operator=(const mapDistribute&);
+
 };
 
 

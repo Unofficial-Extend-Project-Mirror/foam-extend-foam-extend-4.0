@@ -58,18 +58,13 @@ class JobInfo
     public dictionary
 {
     // Private data
-
-        fileName runningJobsDir_;
-        fileName finishedJobsDir_;
-        fileName jobFileName_;
         fileName runningJobPath_;
         fileName finishedJobPath_;
-
-        cpuTime cpuTime_;
+        cpuTime  cpuTime_;
 
     // Private member functions
 
-        bool write(Ostream& JobInfoFile) const;
+        bool write(Ostream&) const;
         void end(const word& terminationType);
 
 

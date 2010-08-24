@@ -38,9 +38,12 @@ SourceFiles
 #ifndef FixedList_H
 #define FixedList_H
 
+#include "bool.H"
 #include "label.H"
+#include "uLabel.H"
 #include "Hash.H"
 #include "autoPtr.H"
+#include "StaticAssert.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -49,12 +52,12 @@ namespace Foam
 
 // Forward declaration of friend functions and operators
 
-template<class T, label Size> class FixedList;
+template<class T, unsigned Size> class FixedList;
 
-template<class T, label Size>
+template<class T, unsigned Size>
 Istream& operator>>(Istream&, FixedList<T, Size>&);
 
-template<class T, label Size>
+template<class T, unsigned Size>
 Ostream& operator<<(Ostream&, const FixedList<T, Size>&);
 
 template<class T> class UList;
@@ -65,9 +68,12 @@ template<class T> class SLList;
                            Class FixedList Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class T, label Size>
+template<class T, unsigned Size>
 class FixedList
 {
+    //- Size must be positive (non-zero) and also fit as a signed value
+    StaticAssert(Size && Size <= INT_MAX);
+
     // Private data
 
         //- Vector of values of type T of size Size.
@@ -76,26 +82,26 @@ class FixedList
 
 public:
 
-    //- Hashing function class
-    template<class HashT=Hash<T> >
+    //- Hashing function class.
+    //  Use Hasher directly for contiguous data. Otherwise hash incrementally.
+    template< class HashT=Hash<T> >
     class Hash
-    :
-        public Foam::Hash<FixedList<T, Size> >
     {
-
     public:
+        Hash()
+        {}
 
-        inline Hash();
-
-        //- Rotating Hash. From http://burtleburtle.net/bob/hash/doobs.html.
-        label operator()(const FixedList<T, Size>& fl) const;
-
-        label operator()
+        inline unsigned operator()
         (
-            const FixedList<T, Size>& fl,
-            const label tableSize
+            const FixedList<T, Size>&,
+            unsigned seed = 0
         ) const;
     };
+
+    // Static Member Functions
+
+        //- Return a null FixedList
+        inline static const FixedList<T, Size>& null();
 
 
     // Constructors
@@ -122,14 +128,10 @@ public:
         FixedList(Istream&);
 
         //- Clone
-        inline autoPtr<FixedList<T, Size> > clone() const;
+        inline autoPtr< FixedList<T, Size> > clone() const;
 
 
-    // Member functions
-
-        //- Return a null FixedList
-        static const FixedList<T, Size>& null();
-
+    // Member Functions
 
         // Access
 
@@ -138,8 +140,19 @@ public:
             inline label fcIndex(const label i) const;
 
             //- Return the reverse circular index, i.e. the previous index
-            //  which returns to the last at the begining of the list
+            //  which returns to the last at the beginning of the list
             inline label rcIndex(const label i) const;
+
+
+            //- Return a const pointer to the first data element,
+            //  similar to the STL front() method and the string::data() method
+            //  This can be used (with caution) when interfacing with C code.
+            inline const T* cdata() const;
+
+            //- Return a pointer to the first data element,
+            //  similar to the STL front() method and the string::data() method
+            //  This can be used (with caution) when interfacing with C code.
+            inline T* data();
 
 
         // Check
@@ -156,24 +169,31 @@ public:
 
         // Edit
 
+            //- Dummy resize function
+            //  needed to make FixedList consistent with List
+            inline void resize(const label);
+
             //- Dummy setSize function
             //  needed to make FixedList consistent with List
             inline void setSize(const label);
 
+            //- Copy (not transfer) the argument contents
+            //  needed to make FixedList consistent with List
+            void transfer(const FixedList<T, Size>&);
 
         //- Write the FixedList as a dictionary entry
-        void writeEntry(Ostream& os) const;
+        void writeEntry(Ostream&) const;
 
         //- Write the FixedList as a dictionary entry with keyword
-        void writeEntry(const word& keyword, Ostream& os) const;
+        void writeEntry(const word& keyword, Ostream&) const;
 
 
     // Member operators
 
-        //- Return subscript-checked element of FixedList.
+        //- Return element of FixedList.
         inline T& operator[](const label);
 
-        //- Return subscript-checked element of constant FixedList.
+        //- Return element of constant FixedList.
         inline const T& operator[](const label) const;
 
         //- Assignment from array operator. Takes linear time.
@@ -227,12 +247,16 @@ public:
         //- Random access iterator for traversing FixedList.
         typedef const T* const_iterator;
 
-        //- Return a const_iterator to begin traversing the
-        //  constant FixedList.
+        //- Return const_iterator to begin traversing the constant FixedList.
+        inline const_iterator cbegin() const;
+
+        //- Return const_iterator to end traversing the constant FixedList.
+        inline const_iterator cend() const;
+
+        //- Return const_iterator to begin traversing the constant FixedList.
         inline const_iterator begin() const;
 
-        //- Return a const_iterator to end traversing the
-        //  constant FixedList.
+        //- Return const_iterator to end traversing the constant FixedList.
         inline const_iterator end() const;
 
 
@@ -241,12 +265,10 @@ public:
         //- Reverse iterator for reverse traversal of FixedList.
         typedef T* reverse_iterator;
 
-        //- Return a reverse_iterator to begin reverse traversing the
-        //  FixedList.
+        //- Return reverse_iterator to begin reverse traversing the FixedList.
         inline reverse_iterator rbegin();
 
-        //- Return a reverse_iterator to end reverse traversing the
-        //  FixedList.
+        //- Return reverse_iterator to end reverse traversing the FixedList.
         inline reverse_iterator rend();
 
 
@@ -255,12 +277,16 @@ public:
         //- Reverse iterator for reverse traversal of constant FixedList.
         typedef const T* const_reverse_iterator;
 
-        //- Return a const_reverse_iterator to begin reverse traversing the
-        //  FixedList.
+        //- Return const_reverse_iterator to begin reverse traversing FixedList.
+        inline const_reverse_iterator crbegin() const;
+
+        //- Return const_reverse_iterator to end reverse traversing FixedList.
+        inline const_reverse_iterator crend() const;
+
+        //- Return const_reverse_iterator to begin reverse traversing FixedList.
         inline const_reverse_iterator rbegin() const;
 
-        //- Return a const_reverse_iterator to end reverse traversing the
-        //  FixedList.
+        //- Return const_reverse_iterator to end reverse traversing FixedList.
         inline const_reverse_iterator rend() const;
 
 
@@ -272,7 +298,7 @@ public:
         //- Return size of the largest possible FixedList.
         inline label max_size() const;
 
-        //- Return true if the FixedList is empty (i.e., if size() == 0).
+        //- Return true if the FixedList is empty (ie, size() is zero).
         inline bool empty() const;
 
         //- Swap two FixedLists of the same type in constant time.
@@ -305,17 +331,11 @@ public:
     // IOstream operators
 
         //- Read List from Istream, discarding contents of existing List.
-        friend Istream& operator>>
-        #ifndef __CINT__
-        <T, Size>
-        #endif
+        friend Istream& operator>> <T, Size>
         (Istream&, FixedList<T, Size>&);
 
         // Write FixedList to Ostream.
-        friend Ostream& operator<<
-        #ifndef __CINT__
-        <T, Size>
-        #endif
+        friend Ostream& operator<< <T, Size>
         (
             Ostream&,
             const FixedList<T, Size>&

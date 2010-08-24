@@ -25,31 +25,25 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
 #include "SLListBase.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-SLListBase::iterator SLListBase::endIter
+Foam::SLListBase::iterator Foam::SLListBase::endIter_
 (
     const_cast<SLListBase&>(static_cast<const SLListBase&>(SLListBase()))
 );
 
-SLListBase::const_iterator SLListBase::endConstIter
+Foam::SLListBase::const_iterator Foam::SLListBase::endConstIter_
 (
     static_cast<const SLListBase&>(SLListBase()),
-    reinterpret_cast<const link*>(NULL)
+    reinterpret_cast<const link*>(0)
 );
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void SLListBase::insert(SLListBase::link* a)
+void Foam::SLListBase::insert(SLListBase::link* a)
 {
     nElmts_++;
 
@@ -66,7 +60,7 @@ void SLListBase::insert(SLListBase::link* a)
 }
 
 
-void SLListBase::append(SLListBase::link* a)
+void Foam::SLListBase::append(SLListBase::link* a)
 {
     nElmts_++;
 
@@ -82,7 +76,7 @@ void SLListBase::append(SLListBase::link* a)
 }
 
 
-SLListBase::link* SLListBase::removeHead()
+Foam::SLListBase::link* Foam::SLListBase::removeHead()
 {
     nElmts_--;
 
@@ -108,7 +102,7 @@ SLListBase::link* SLListBase::removeHead()
 }
 
 
-SLListBase::link* SLListBase::remove(SLListBase::link* it)
+Foam::SLListBase::link* Foam::SLListBase::remove(SLListBase::link* it)
 {
     SLListBase::iterator iter = begin();
     SLListBase::link *prev = &(*iter);
@@ -142,9 +136,5 @@ SLListBase::link* SLListBase::remove(SLListBase::link* it)
     return 0;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

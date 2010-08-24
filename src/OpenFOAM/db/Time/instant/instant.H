@@ -50,8 +50,8 @@ class instant;
 
 // Friend Operators
 
-int operator==(const instant&, const instant&);
-int operator!=(const instant&, const instant&);
+bool operator==(const instant&, const instant&);
+bool operator!=(const instant&, const instant&);
 
 // IOstream Operators
 
@@ -79,9 +79,9 @@ public:
         {
         public:
 
-            bool operator()(const instant& one, const instant& two) const
+            bool operator()(const instant& a, const instant& b) const
             {
-                return one.value() < two.value();
+                return a.value() < b.value();
             }
         };
 
@@ -137,8 +137,8 @@ public:
 
     // Friend Operators
 
-        friend int operator==(const instant&, const instant&);
-        friend int operator!=(const instant&, const instant&);
+        friend bool operator==(const instant&, const instant&);
+        friend bool operator!=(const instant&, const instant&);
 
 
     // IOstream Operators

@@ -402,7 +402,7 @@ inline SymmTensor<Cmpt> symm(const Tensor<Cmpt>& t)
 }
 
 
-//- Return the twice the symmetric part of a tensor
+//- Return twice the symmetric part of a tensor
 template <class Cmpt>
 inline SymmTensor<Cmpt> twoSymm(const Tensor<Cmpt>& t)
 {
@@ -486,7 +486,7 @@ inline Tensor<Cmpt> cof(const Tensor<Cmpt>& t)
 }
 
 
-//- Return the inverse of a tensor given the determinant
+//- Return the inverse of a tensor give the determinant
 template <class Cmpt>
 inline Tensor<Cmpt> inv(const Tensor<Cmpt>& t, const Cmpt dett)
 {
@@ -663,7 +663,6 @@ operator&&(const Tensor<Cmpt>& t1, const SphericalTensor<Cmpt>& st2)
     return(t1.xx()*st2.ii() + t1.yy()*st2.ii() + t1.zz()*st2.ii());
 }
 
-#ifndef __CINT__
 template<class Cmpt>
 class typeOfSum<SphericalTensor<Cmpt>, Tensor<Cmpt> >
 {
@@ -695,7 +694,7 @@ public:
 
     typedef Tensor<Cmpt> type;
 };
-#endif
+
 
 // * * * * * * * * * * Mixed Tensor SymmTensor Operators * * * * * * * * * * //
 
@@ -822,7 +821,6 @@ operator&&(const Tensor<Cmpt>& t1, const SymmTensor<Cmpt>& st2)
     );
 }
 
-#ifndef __CINT__
 template<class Cmpt>
 class typeOfSum<SymmTensor<Cmpt>, Tensor<Cmpt> >
 {
@@ -855,7 +853,6 @@ public:
 
     typedef Tensor<Cmpt> type;
 };
-#endif
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

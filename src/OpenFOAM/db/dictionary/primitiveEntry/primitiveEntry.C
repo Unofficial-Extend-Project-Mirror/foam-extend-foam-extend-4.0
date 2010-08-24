@@ -29,7 +29,7 @@ License
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::primitiveEntry::primitiveEntry(const word& key, const ITstream& tokens)
+Foam::primitiveEntry::primitiveEntry(const keyType& key, const ITstream& tokens)
 :
     entry(key),
     ITstream(tokens)
@@ -38,7 +38,7 @@ Foam::primitiveEntry::primitiveEntry(const word& key, const ITstream& tokens)
 }
 
 
-Foam::primitiveEntry::primitiveEntry(const word& keyword, const token& t)
+Foam::primitiveEntry::primitiveEntry(const keyType& keyword, const token& t)
 :
     entry(keyword),
     ITstream(keyword, tokenList(1, t))
@@ -47,7 +47,7 @@ Foam::primitiveEntry::primitiveEntry(const word& keyword, const token& t)
 
 Foam::primitiveEntry::primitiveEntry
 (
-    const word& keyword,
+    const keyType& keyword,
     const tokenList& tokens
 )
 :
@@ -113,15 +113,19 @@ Foam::dictionary& Foam::primitiveEntry::dict()
 }
 
 
-void Foam::primitiveEntry::insert(const tokenList& varTokens, const label i)
+void Foam::primitiveEntry::insert
+(
+    const tokenList& varTokens,
+    const label posI
+)
 {
     tokenList& tokens = *this;
 
-    if (!varTokens.size())
+    if (varTokens.empty())
     {
         label end = tokens.size() - 1;
 
-        for(label j=i; j<end; j++)
+        for (label j=posI; j<end; j++)
         {
             tokens[j] = tokens[j+1];
         }
@@ -135,7 +139,7 @@ void Foam::primitiveEntry::insert(const tokenList& varTokens, const label i)
         label end = tokens.size() - 1;
         label offset = varTokens.size() - 1;
 
-        for(label j=end; j>i; j--)
+        for (label j=end; j>posI; j--)
         {
             tokens[j] = tokens[j-offset];
         }
@@ -143,7 +147,7 @@ void Foam::primitiveEntry::insert(const tokenList& varTokens, const label i)
 
     forAll(varTokens, j)
     {
-        tokens[i + j] = varTokens[j];
+        tokens[posI + j] = varTokens[j];
     }
 }
 

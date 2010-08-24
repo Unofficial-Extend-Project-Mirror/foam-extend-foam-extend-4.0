@@ -256,7 +256,7 @@ inline Cmpt magSqr(const SymmTensor<Cmpt>& st)
 }
 
 
-//- Return the strace of a symmetric tensor
+//- Return the trace of a symmetric tensor
 template <class Cmpt>
 inline Cmpt tr(const SymmTensor<Cmpt>& st)
 {
@@ -280,7 +280,7 @@ inline const SymmTensor<Cmpt>& symm(const SymmTensor<Cmpt>& st)
 }
 
 
-//- Return the stwice the symmetric part of a symmetric tensor
+//- Return twice the symmetric part of a symmetric tensor
 template <class Cmpt>
 inline SymmTensor<Cmpt> twoSymm(const SymmTensor<Cmpt>& st)
 {
@@ -361,7 +361,7 @@ inline SymmTensor<Cmpt> inv(const SymmTensor<Cmpt>& st)
 }
 
 
-//- Return the 1spt invariant of a symmetric tensor
+//- Return the 1st invariant of a symmetric tensor
 template <class Cmpt>
 inline Cmpt invariantI(const SymmTensor<Cmpt>& st)
 {
@@ -530,7 +530,6 @@ public:
     typedef SymmTensor<Cmpt> type;
 };
 
-#ifndef __CINT__
 template<class Cmpt>
 class innerProduct<SymmTensor<Cmpt>, SymmTensor<Cmpt> >
 {
@@ -538,7 +537,6 @@ public:
 
     typedef SymmTensor<Cmpt> type;
 };
-
 
 template<class Cmpt>
 class innerProduct<SymmTensor<Cmpt>, Vector<Cmpt> >
@@ -588,7 +586,7 @@ public:
 
     typedef SymmTensor<Cmpt> type;
 };
-#endif
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -52,7 +52,7 @@ class polyMesh;
 template<class Type> class octree;
 
 /*---------------------------------------------------------------------------*\
-                           Class octreeDataCell Declaration
+                       Class octreeDataCell Declaration
 \*---------------------------------------------------------------------------*/
 
 class octreeDataCell
@@ -73,16 +73,13 @@ public:
         //- Construct from components.
         octreeDataCell
         (
-            const polyMesh& mesh,
+            const polyMesh&,
             const labelList& cellLabels,
             const treeBoundBoxList& bbs
         );
 
         //- Construct from mesh. Uses all cells in mesh.
-        octreeDataCell
-        (
-            const polyMesh& mesh
-        );
+        octreeDataCell(const polyMesh&);
 
 
     // Member Functions
@@ -149,10 +146,10 @@ public:
                 treeBoundBox& tightest
             ) const;
 
-            //- Given index get unit normal and calculate (numerical) sign 
+            //- Given index get unit normal and calculate (numerical) sign
             //  of sample.
             //  Used to determine accuracy of calcNearest or inside/outside.
-            //Note: always returns GREAT since no inside/outside.
+            //  Note: always returns GREAT since no inside/outside.
             scalar calcSign
             (
                 const label index,

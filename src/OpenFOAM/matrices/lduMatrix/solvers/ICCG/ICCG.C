@@ -36,41 +36,32 @@ namespace Foam
         addICCGSymMatrixConstructorToTable_;
 }
 
+// * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-Foam::IStringStream Foam::ICCG::solverDataStream
+Foam::dictionary Foam::ICCG::solverDict
 (
-    const scalar tolerance,
+    const scalar tol,
     const scalar relTol
-) const
+)
 {
-    return IStringStream
-    (
-        "{ preconditioner { type DIC; }"
-        "  minIter 0; maxIter 5000; "
-        "  tolerance " + name(tolerance) + "; relTol " + name(relTol) + "; }"
-    );
+    dictionary dict(IStringStream("solver PCG; preconditioner DIC;")());
+    dict.add("tolerance", tol);
+    dict.add("relTol", relTol);
+
+    return dict;
 }
 
 
-Foam::IStringStream Foam::ICCG::solverDataStream
+Foam::dictionary Foam::ICCG::solverDict
 (
-    const word& solverName,
-    Istream& solverData
-) const
+    Istream& is
+)
 {
-    scalar tolerance(readScalar(solverData));
-    scalar relTol(readScalar(solverData));
+    scalar tol(readScalar(is));
+    scalar relTol(readScalar(is));
 
-    return IStringStream
-    (
-        solverName + "{ preconditioner { type DIC; }"
-        "  minIter 0; maxIter 5000; "
-        "  tolerance " + name(tolerance) + "; relTol " + name(relTol) + "; }"
-    );
+    return solverDict(tol, relTol);
 }
-
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -81,8 +72,7 @@ Foam::ICCG::ICCG
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    const scalar tolerance,
-    const scalar relTol
+    const dictionary& solverControls
 )
 :
     PCG
@@ -92,7 +82,7 @@ Foam::ICCG::ICCG
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverDataStream(tolerance, relTol)()
+        solverControls
     )
 {}
 
@@ -104,7 +94,8 @@ Foam::ICCG::ICCG
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    Istream& solverData
+    const scalar tolerance,
+    const scalar relTol
 )
 :
     PCG
@@ -114,18 +105,8 @@ Foam::ICCG::ICCG
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverDataStream(word::null, solverData)()
+        solverDict(tolerance, relTol)
     )
 {}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-void Foam::ICCG::read(Istream& solverData)
-{
-    word solverName(solverData);
-    PCG::read(solverDataStream(solverName, solverData)());
-}
-
 
 // ************************************************************************* //

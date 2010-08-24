@@ -27,16 +27,11 @@ License
 #include "octreeLine.H"
 #include "octree.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 // Calculate sorted list of intersections
 template <class Type>
-void octreeLine<Type>::calcSortedIntersections()
+void Foam::octreeLine<Type>::calcSortedIntersections()
 {
     // Determine intersections and sort acc. to distance to start
 
@@ -45,35 +40,33 @@ void octreeLine<Type>::calcSortedIntersections()
     sortedIntersections_.setSize(indices.size());
 
     const vector direction = endPoint_ - realStartPoint_;
-    
+
     label nHits = 0;
 
     forAll(indices, elemI)
     {
         point pt;
-        bool hit = 
-            tree_.shapes().intersects
-            (
-                indices[elemI],
-                realStartPoint_,
-                direction,
-                pt
-            );
+        bool hit = tree_.shapes().intersects
+        (
+            indices[elemI],
+            realStartPoint_,
+            direction,
+            pt
+        );
 
         if (hit && (indices[elemI] != lastElem_))
         {
-           sortedIntersections_[nHits++] =
-                pointHitSort
+           sortedIntersections_[nHits++] = pointHitSort
+            (
+                pointHit
                 (
-                    pointHit
-                    (
-                        true,
-                        pt,
-                        Foam::magSqr(pt - leafExitPoint_),
-                        false
-                    ),
-                    indices[elemI]
-                );
+                    true,
+                    pt,
+                    Foam::magSqr(pt - leafExitPoint_),
+                    false
+                ),
+                indices[elemI]
+            );
         }
     }
 
@@ -108,7 +101,7 @@ void octreeLine<Type>::calcSortedIntersections()
 // Searches for leaf with intersected elements. Return true if found; false
 // otherwise. Sets currentLeaf_ and sortedIntersections_.
 template <class Type>
-bool octreeLine<Type>::getNextLeaf()
+bool Foam::octreeLine<Type>::getNextLeaf()
 {
     do
     {
@@ -127,7 +120,7 @@ bool octreeLine<Type>::getNextLeaf()
         // Get intersections and sort.
         calcSortedIntersections();
     }
-    while (sortedIntersections_.size() == 0);
+    while (sortedIntersections_.empty());
 
     return true;
 }
@@ -136,7 +129,7 @@ bool octreeLine<Type>::getNextLeaf()
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template <class Type>
-octreeLine<Type>::octreeLine
+Foam::octreeLine<Type>::octreeLine
 (
     const octree<Type>& tree,
     const point& startPoint,
@@ -158,14 +151,14 @@ octreeLine<Type>::octreeLine
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template <class Type>
-octreeLine<Type>::~octreeLine()
+Foam::octreeLine<Type>::~octreeLine()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template <class Type>
-bool octreeLine<Type>::getIntersection()
+bool Foam::octreeLine<Type>::getIntersection()
 {
     // Go to next element in sortedIntersections
 
@@ -184,10 +177,5 @@ bool octreeLine<Type>::getIntersection()
 
     return true;
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

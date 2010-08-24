@@ -28,15 +28,17 @@ Description
 
 #include "IOstream.H"
 #include "error.H"
+#include <sstream>
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-namespace Foam
-{
+Foam::fileName Foam::IOstream::name_("IOstream");
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-IOstream::streamFormat IOstream::formatEnum(const word& format)
+// * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * * //
+
+Foam::IOstream::streamFormat
+Foam::IOstream::formatEnum(const word& format)
 {
     if (format == "ascii")
     {
@@ -49,8 +51,7 @@ IOstream::streamFormat IOstream::formatEnum(const word& format)
     else
     {
         WarningIn("IOstream::formatEnum(const word&)")
-            << "bad format specifier "
-            << format << " using ASCII"
+            << "bad format specifier '" << format << "', using 'ascii'"
             << endl;
 
         return IOstream::ASCII;
@@ -58,7 +59,8 @@ IOstream::streamFormat IOstream::formatEnum(const word& format)
 }
 
 
-IOstream::compressionType IOstream::compressionEnum(const word& compression)
+Foam::IOstream::compressionType
+Foam::IOstream::compressionEnum(const word& compression)
 {
     if (compression == "uncompressed")
     {
@@ -71,10 +73,8 @@ IOstream::compressionType IOstream::compressionEnum(const word& compression)
     else
     {
         WarningIn("IOstream::compressionEnum(const word&)")
-            << "bad compression specifier "
-            << '\'' << compression << '\''
-            << ", use 'compressed' or 'uncompressed'.  "
-               "Defaulting to uncompressed"
+            << "bad compression specifier '" << compression
+            << "', using 'uncompressed'"
             << endl;
 
         return IOstream::UNCOMPRESSED;
@@ -82,9 +82,125 @@ IOstream::compressionType IOstream::compressionEnum(const word& compression)
 }
 
 
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+bool Foam::IOstream::check(const char* operation) const
+{
+    if (bad())
+    {
+        FatalIOErrorIn
+        (
+            "IOstream::check(const char*) const", *this
+        )   << "error in IOstream " << name() << " for operation " << operation
+            << exit(FatalIOError);
+    }
+
+    return !bad();
+}
+
+
+void Foam::IOstream::fatalCheck(const char* operation) const
+{
+    if (bad())
+    {
+        FatalIOErrorIn
+        (
+            "IOstream::fatalCheck(const char*) const", *this
+        )   << "error in IOstream " << name() << " for operation " << operation
+            << exit(FatalIOError);
+    }
+}
+
+
+Foam::string Foam::IOstream::versionNumber::str() const
+{
+    std::ostringstream os;
+    os.precision(1);
+    os.setf(ios_base::fixed, ios_base::floatfield);
+    os << versionNumber_;
+    return os.str();
+}
+
+
+void Foam::IOstream::print(Ostream& os) const
+{
+    os  << "IOstream: " << "Version "  << version_ << ", format ";
+
+    switch (format_)
+    {
+        case ASCII:
+            os  << "ASCII";
+        break;
+
+        case BINARY:
+            os  << "BINARY";
+        break;
+    }
+
+    os  << ", line "       << lineNumber();
+
+    if (opened())
+    {
+        os  << ", OPENED";
+    }
+
+    if (closed())
+    {
+        os  << ", CLOSED";
+    }
+
+    if (good())
+    {
+        os  << ", GOOD";
+    }
+
+    if (eof())
+    {
+        os  << ", EOF";
+    }
+
+    if (fail())
+    {
+        os  << ", FAIL";
+    }
+
+    if (bad())
+    {
+        os  << ", BAD";
+    }
+
+    os  << endl;
+}
+
+
+void Foam::IOstream::print(Ostream& os, const int streamState) const
+{
+    if (streamState == ios_base::goodbit)
+    {
+        os  << "ios_base::goodbit set : the last operation on stream succeeded"
+            << endl;
+    }
+    else if (streamState & ios_base::badbit)
+    {
+        os  << "ios_base::badbit set : characters possibly lost"
+            << endl;
+    }
+    else if (streamState & ios_base::failbit)
+    {
+        os  << "ios_base::failbit set : some type of formatting error"
+            << endl;
+    }
+    else if (streamState & ios_base::eofbit)
+    {
+        os  << "ios_base::eofbit set : at end of stream"
+            << endl;
+    }
+}
+
+
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
-Ostream& operator<<(Ostream& os, const IOstream::streamFormat& sf)
+Foam::Ostream& Foam::operator<<(Ostream& os, const IOstream::streamFormat& sf)
 {
     if (sf == IOstream::ASCII)
     {
@@ -99,18 +215,27 @@ Ostream& operator<<(Ostream& os, const IOstream::streamFormat& sf)
 }
 
 
-#if defined (__GNUC__)
-template<>
-#endif
-Ostream& operator<<(Ostream& os, const InfoProxy<IOstream>& iostr)
+Foam::Ostream& Foam::operator<<(Ostream& os, const IOstream::versionNumber& vn)
 {
-    iostr.t_.print(os);
+    os << vn.str().c_str();
     return os;
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace Foam
+namespace Foam
+{
+
+#  if defined (__GNUC__)
+   template<>
+#  endif
+   Ostream& operator<<(Ostream& os, const InfoProxy<IOstream>& ip)
+   {
+       ip.t_.print(os);
+       return os;
+   }
+
+}  // end namespace
+
 
 // ************************************************************************* //

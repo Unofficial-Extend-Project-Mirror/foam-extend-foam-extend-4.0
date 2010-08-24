@@ -211,7 +211,7 @@ void Foam::processorPolyPatch::calcGeometry()
                     << endl
                     << "Mesh face: " << start()+facei
                     << " vertices: "
-                    << IndirectList<point>(points(), operator[](facei))()
+                    << UIndirectList<point>(points(), operator[](facei))()
                     << endl
                     << "Rerun with processor debug flag set for"
                     << " more information." << exit(FatalError);
@@ -737,7 +737,7 @@ bool Foam::processorPolyPatch::order
                     << " : "
                     << "Cannot find point on face " << pp[oldFaceI]
                     << " with vertices "
-                    << IndirectList<point>(pp.points(), pp[oldFaceI])()
+                    << UIndirectList<point>(pp.points(), pp[oldFaceI])()
                     << " that matches point " << wantedAnchor
                     << " when matching the halves of processor patch "
                     << name()

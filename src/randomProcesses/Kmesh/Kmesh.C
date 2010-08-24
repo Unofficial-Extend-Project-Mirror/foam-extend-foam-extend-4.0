@@ -33,23 +33,26 @@ License
 
 namespace Foam
 {
+   //! @cond fileScope
+   inline label rep
+   (
+       const label i,
+       const label j,
+       const label k,
+       const labelList& nn
+   )
+   {
+       return (k + j*nn[2] + i*nn[1]*nn[2]);
+   }
+   //! @endcond fileScope
+
+} // End namespace Foam
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-inline label rep
-(
-    const label i,
-    const label j,
-    const label k,
-    const labelList& nn
-)
-{
-    return (k + j*nn[2] + i*nn[1]*nn[2]);
-}
-
-
 // from fvMesh
-Kmesh::Kmesh(const fvMesh& mesh)
+Foam::Kmesh::Kmesh(const fvMesh& mesh)
 :
     vectorField(mesh.V().size()),
     NN(vector::dim)
@@ -58,10 +61,10 @@ Kmesh::Kmesh(const fvMesh& mesh)
     const scalar twoPi = 2.0*pi;
 
     boundBox box = mesh.bounds();
-    L = box.max() - box.min();
+    L = box.span();
 
     vector cornerCellCentre = ::Foam::max(mesh.C().internalField());
-    vector cellL = 2*(box.max() - cornerCellCentre);
+    vector cellL = 2 * (box.max() - cornerCellCentre);
 
     vector rdeltaByL;
     label nTot = 1;
@@ -107,9 +110,5 @@ Kmesh::Kmesh(const fvMesh& mesh)
     Kmax = mag((*this)[rep(NN[0]-1, NN[1]-1, NN[2]-1, NN)]);
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

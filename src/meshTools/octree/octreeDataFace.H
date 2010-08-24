@@ -56,7 +56,7 @@ template<class Type> class octree;
 class polyPatch;
 
 /*---------------------------------------------------------------------------*\
-                           Class octreeDataFace Declaration
+                       Class octreeDataFace Declaration
 \*---------------------------------------------------------------------------*/
 
 class octreeDataFace
@@ -111,20 +111,20 @@ public:
         octreeDataFace
         (
             const primitiveMesh&,
-            const List<const labelList*>&,
-            const List<const treeBoundBoxList*>&
+            const UList<const labelList*>&,
+            const UList<const treeBoundBoxList*>&
         );
 
-        //- Construct from selected mesh faces. Tight fitting bounding boxes
-        //  generated internally.
-        octreeDataFace(const primitiveMesh&, const List<const labelList*>&);
+        //- Construct from selected mesh faces.
+        //  Tight-fitting bounding boxes generated internally.
+        octreeDataFace(const primitiveMesh&, const UList<const labelList*>&);
 
-        //- Construct from alll faces in patch. Tight fitting bounding boxes
-        //  generated internally.
-        octreeDataFace(const polyPatch& patch);
+        //- Construct from all faces in patch.
+        //  Tight-fitting bounding boxes generated internally.
+        octreeDataFace(const polyPatch&);
 
-        //- Construct from all boundary faces. Tight fitting bounding boxes
-        //  generated internally.
+        //- Construct from all boundary faces.
+        //  Tight-fitting bounding boxes generated internally.
         octreeDataFace(const primitiveMesh&);
 
         //- Construct as copy
@@ -200,7 +200,7 @@ public:
                 treeBoundBox& tightest
             ) const;
 
-            //- Given index get unit normal and calculate (numerical) sign 
+            //- Given index get unit normal and calculate (numerical) sign
             //  of sample.
             //  Used to determine accuracy of calcNearest or inside/outside.
             scalar calcSign

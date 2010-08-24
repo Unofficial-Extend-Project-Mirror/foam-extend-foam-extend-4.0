@@ -1,0 +1,8 @@
+EXE_INC =
+
+LIB_LIBS = \
+    -L$(FOAM_LIBBIN)/dummy \
+    -L$(FOAM_MPI_LIBBIN) \
+    -lscotchDecomp \
+    -lmetisDecomp \
+    -lparMetisDecomp

@@ -177,11 +177,11 @@ inline Cmpt det(const SphericalTensor<Cmpt>& st)
 }
 
 
-//- Return the inverse of a symmetric tensor
+//- Return the inverse of a spherical tensor
 template <class Cmpt>
 inline SphericalTensor<Cmpt> inv(const SphericalTensor<Cmpt>& st)
 {
-    return SphericalTensor<Cmpt>(1.0/st.ii()); 
+    return SphericalTensor<Cmpt>(1.0/st.ii());
 }
 
 
@@ -202,7 +202,6 @@ public:
 };
 
 
-#ifndef __CINT__
 template<class Cmpt>
 class innerProduct<SphericalTensor<Cmpt>, SphericalTensor<Cmpt> >
 {
@@ -227,7 +226,6 @@ public:
 
     typedef Vector<Cmpt> type;
 };
-#endif
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

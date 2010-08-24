@@ -29,18 +29,16 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(primitiveMesh, 0);
+defineTypeNameAndDebug(Foam::primitiveMesh, 0);
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-primitiveMesh::primitiveMesh()
+Foam::primitiveMesh::primitiveMesh()
 :
-    nInternalPoints_(0),   // note: points are considered ordered on empty mesh
+    nInternalPoints_(0),    // note: points are considered ordered on empty mesh
     nPoints_(0),
     nInternal0Edges_(-1),
     nInternal1Edges_(-1),
@@ -52,7 +50,6 @@ primitiveMesh::primitiveMesh()
 
     cellShapesPtr_(NULL),
     edgesPtr_(NULL),
-    orderedEdgesPtr_(NULL),
     ccPtr_(NULL),
     ecPtr_(NULL),
     pcPtr_(NULL),
@@ -67,6 +64,8 @@ primitiveMesh::primitiveMesh()
     ppPtr_(NULL),
     cpPtr_(NULL),
 
+    labels_(0),
+
     cellCentresPtr_(NULL),
     faceCentresPtr_(NULL),
     cellVolumesPtr_(NULL),
@@ -75,8 +74,8 @@ primitiveMesh::primitiveMesh()
 
 
 // Construct from components
-// WARNING: ASSUMES CORRECT ORDERING OF DATA. 
-primitiveMesh::primitiveMesh
+// WARNING: ASSUMES CORRECT ORDERING OF DATA.
+Foam::primitiveMesh::primitiveMesh
 (
     const label nPoints,
     const label nInternalFaces,
@@ -93,7 +92,6 @@ primitiveMesh::primitiveMesh
 
     cellShapesPtr_(NULL),
     edgesPtr_(NULL),
-    orderedEdgesPtr_(NULL),
     ccPtr_(NULL),
     ecPtr_(NULL),
     pcPtr_(NULL),
@@ -108,18 +106,18 @@ primitiveMesh::primitiveMesh
     ppPtr_(NULL),
     cpPtr_(NULL),
 
+    labels_(0),
+
     cellCentresPtr_(NULL),
     faceCentresPtr_(NULL),
     cellVolumesPtr_(NULL),
     faceAreasPtr_(NULL)
-{
-    
-}
+{}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-primitiveMesh::~primitiveMesh()
+Foam::primitiveMesh::~primitiveMesh()
 {
     clearOut();
 }
@@ -127,7 +125,7 @@ primitiveMesh::~primitiveMesh()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-bool primitiveMesh::calcPointOrder
+bool Foam::primitiveMesh::calcPointOrder
 (
     label& nInternalPoints,
     labelList& oldToNew,
@@ -206,7 +204,7 @@ bool primitiveMesh::calcPointOrder
 }
 
 
-void primitiveMesh::reset
+void Foam::primitiveMesh::reset
 (
     const label nPoints,
     const label nInternalFaces,
@@ -262,13 +260,13 @@ void primitiveMesh::reset
 }
 
 
-void primitiveMesh::reset
+void Foam::primitiveMesh::reset
 (
     const label nPoints,
     const label nInternalFaces,
     const label nFaces,
     const label nCells,
-    cellList& c
+    cellList& clst
 )
 {
     reset
@@ -279,17 +277,38 @@ void primitiveMesh::reset
         nCells
     );
 
-    cfPtr_ = new cellList(c, true);
+    cfPtr_ = new cellList(clst, true);
 }
 
 
-tmp<scalarField> primitiveMesh::movePoints
+void Foam::primitiveMesh::reset
+(
+    const label nPoints,
+    const label nInternalFaces,
+    const label nFaces,
+    const label nCells,
+    const Xfer<cellList>& clst
+)
+{
+    reset
+    (
+        nPoints,
+        nInternalFaces,
+        nFaces,
+        nCells
+    );
+
+    cfPtr_ = new cellList(clst);
+}
+
+
+Foam::tmp<Foam::scalarField> Foam::primitiveMesh::movePoints
 (
     const pointField& newPoints,
     const pointField& oldPoints
 )
 {
-    if (newPoints.size() < nPoints() || oldPoints.size() < nPoints())
+    if (newPoints.size() <  nPoints() || oldPoints.size() < nPoints())
     {
         FatalErrorIn
         (
@@ -321,7 +340,7 @@ tmp<scalarField> primitiveMesh::movePoints
 }
 
 
-const cellShapeList& primitiveMesh::cellShapes() const
+const Foam::cellShapeList& Foam::primitiveMesh::cellShapes() const
 {
     if (!cellShapesPtr_)
     {
@@ -331,9 +350,5 @@ const cellShapeList& primitiveMesh::cellShapes() const
     return *cellShapesPtr_;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

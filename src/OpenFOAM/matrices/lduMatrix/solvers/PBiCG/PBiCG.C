@@ -46,7 +46,7 @@ Foam::PBiCG::PBiCG
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    Istream& solverData
+    const dictionary& solverControls
 )
 :
     lduSolver
@@ -56,7 +56,7 @@ Foam::PBiCG::PBiCG
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverData
+        solverControls
     )
 {}
 
@@ -70,9 +70,13 @@ Foam::lduSolverPerformance Foam::PBiCG::solve
     const direction cmpt
 ) const
 {
+    // --- Setup class containing solver performance data
+    lduMatrix::solverPerformance solverPerf
+    (
+        lduMatrix::preconditioner::getName(controlDict_) + typeName,
+        fieldName_
+    );
 
-    // Setup class containing solver performance data
-    lduSolverPerformance solverPerf(typeName, fieldName());
 
     register label nCells = x.size();
 
@@ -167,19 +171,8 @@ Foam::lduSolverPerformance Foam::PBiCG::solve
 
             if (solverPerf.nIterations() == 0)
             {
-                #ifdef ICC_IA64_PREFETCH
-                #pragma ivdep
-                #endif
-
                 for (register label cell=0; cell<nCells; cell++)
                 {
-                    #ifdef ICC_IA64_PREFETCH
-                    __builtin_prefetch (&pAPtr[cell+96],0,1);
-                    __builtin_prefetch (&pTPtr[cell+96],0,1);
-                    __builtin_prefetch (&wAPtr[cell+96],0,1);
-                    __builtin_prefetch (&wTPtr[cell+96],0,1);
-                    #endif
-
                     pAPtr[cell] = wAPtr[cell];
                     pTPtr[cell] = wTPtr[cell];
                 }
@@ -188,19 +181,8 @@ Foam::lduSolverPerformance Foam::PBiCG::solve
             {
                 scalar beta = wArT/wArTold;
 
-                #ifdef ICC_IA64_PREFETCH
-                #pragma ivdep
-                #endif
-
                 for (register label cell=0; cell<nCells; cell++)
                 {
-                    #ifdef ICC_IA64_PREFETCH
-                    __builtin_prefetch (&pAPtr[cell+96],0,1);
-                    __builtin_prefetch (&pTPtr[cell+96],0,1);
-                    __builtin_prefetch (&wAPtr[cell+96],0,1);
-                    __builtin_prefetch (&wTPtr[cell+96],0,1);
-                    #endif
-
                     pAPtr[cell] = wAPtr[cell] + beta*pAPtr[cell];
                     pTPtr[cell] = wTPtr[cell] + beta*pTPtr[cell];
                 }
@@ -222,22 +204,9 @@ Foam::lduSolverPerformance Foam::PBiCG::solve
 
             scalar alpha = wArT/wApT;
 
-            #ifdef ICC_IA64_PREFETCH
-            #pragma ivdep
-            #endif
-
             for (register label cell=0; cell<nCells; cell++)
             {
-                #ifdef ICC_IA64_PREFETCH
-                __builtin_prefetch (&pAPtr[cell+96],0,1);
-                __builtin_prefetch (&wAPtr[cell+96],0,1);
-                __builtin_prefetch (&wTPtr[cell+96],0,1);
-                __builtin_prefetch (&xPtr[cell+96],0,1);
-                __builtin_prefetch (&rAPtr[cell+96],0,1);
-                __builtin_prefetch (&rTPtr[cell+96],0,1);
-                #endif
-
-                xPtr[cell] += alpha*pAPtr[cell];
+                psiPtr[cell] += alpha*pAPtr[cell];
                 rAPtr[cell] -= alpha*wAPtr[cell];
                 rTPtr[cell] -= alpha*wTPtr[cell];
             }

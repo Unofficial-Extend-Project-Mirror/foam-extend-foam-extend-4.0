@@ -27,8 +27,9 @@ Class
 
 Description
     Simplified diagonal-based incomplete LU smoother for asymmetric matrices.
-    In order to improve efficiency the residual is evaluated after every
-    nSweeps sweeps.
+
+    To improve efficiency, the residual is evaluated after every nSweeps
+    sweeps.
 
 SourceFiles
     DILUSmoother.C
@@ -46,7 +47,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class DILUSmoother Declaration
+                        Class DILUSmoother Declaration
 \*---------------------------------------------------------------------------*/
 
 class DILUSmoother

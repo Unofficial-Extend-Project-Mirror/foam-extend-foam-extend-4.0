@@ -73,7 +73,7 @@ inletOutletFvPatchField<Type>::inletOutletFvPatchField
 )
 :
     mixedFvPatchField<Type>(p, iF),
-    phiName_("phi")
+    phiName_(dict.lookupOrDefault<word>("phi", "phi"))
 {
     this->refValue() = Field<Type>("inletValue", dict, p.size());
 
@@ -91,11 +91,6 @@ inletOutletFvPatchField<Type>::inletOutletFvPatchField
 
     this->refGrad() = pTraits<Type>::zero;
     this->valueFraction() = 0.0;
-
-    if (dict.found("phi"))
-    {
-        dict.lookup("phi") >> phiName_;
-    }
 }
 
 
@@ -156,6 +151,22 @@ void inletOutletFvPatchField<Type>::write(Ostream& os) const
     }
     this->refValue().writeEntry("inletValue", os);
     this->writeEntry("value", os);
+}
+
+
+// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
+
+template<class Type>
+void inletOutletFvPatchField<Type>::operator=
+(
+    const fvPatchField<Type>& ptf
+)
+{
+    fvPatchField<Type>::operator=
+    (
+        this->valueFraction()*this->refValue()
+        + (1 - this->valueFraction())*ptf
+    );
 }
 
 

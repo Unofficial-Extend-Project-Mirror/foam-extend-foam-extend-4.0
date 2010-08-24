@@ -259,6 +259,13 @@ template<class ZoneType, class MeshType>
 void ZoneMesh<ZoneType, MeshType>::clearAddressing()
 {
     deleteDemandDrivenData(zoneMapPtr_);
+
+    PtrList<ZoneType>& zones = *this;
+
+    forAll (zones, zoneI)
+    {
+        zones[zoneI].clearAddressing();
+    }
 }
 
 
@@ -327,14 +334,14 @@ bool ZoneMesh<ZoneType, MeshType>::writeData(Ostream& os) const
 template<class ZoneType, class MeshType>
 Ostream& operator<<(Ostream& os, const ZoneMesh<ZoneType, MeshType>& zones)
 {
-    os  << zones.size() << nl << token::BEGIN_LIST << incrIndent << nl;
+    os  << zones.size() << nl << token::BEGIN_LIST;
 
     forAll(zones, zoneI)
     {
         zones[zoneI].writeDict(os);
     }
 
-    os  << decrIndent << token::END_LIST;
+    os  << token::END_LIST;
 
     return os;
 }

@@ -336,8 +336,8 @@ Foam::fvMatrix<Type>::fvMatrix
 {
     if (debug)
     {
-        Info<< "fvMatrix<Type>(GeometricField<Type, fvPatchField, volMesh>&,"
-               " Istream&) : "
+        Info<< "fvMatrix<Type>"
+               "(GeometricField<Type, fvPatchField, volMesh>&, Istream&) : "
                "constructing fvMatrix<Type> for field " << psi_.name()
             << endl;
     }
@@ -614,6 +614,20 @@ void Foam::fvMatrix<Type>::relax()
 
 
 template<class Type>
+void Foam::fvMatrix<Type>::boundaryManipulate
+(
+    typename GeometricField<Type, fvPatchField, volMesh>::
+        GeometricBoundaryField& bFields
+)
+{
+    forAll(bFields, patchI)
+    {
+        bFields[patchI].manipulateMatrix(*this);
+    }
+}
+
+
+template<class Type>
 Foam::tmp<Foam::scalarField> Foam::fvMatrix<Type>::D() const
 {
     tmp<scalarField> tdiag(new scalarField(diag()));
@@ -720,7 +734,7 @@ Foam::fvMatrix<Type>::H() const
     (
         pow
         (
-            psi_.mesh().directions(),
+            psi_.mesh().solutionD(),
             pTraits<typename powProduct<Vector<label>, Type::rank>::type>::zero
         )
     );
@@ -1175,7 +1189,7 @@ void Foam::fvMatrix<Type>::operator*=
 }
 
 
-// * * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
 template<class Type>
 void Foam::checkMethod
@@ -1264,7 +1278,7 @@ template<class Type>
 Foam::lduMatrix::solverPerformance Foam::solve
 (
     fvMatrix<Type>& fvm,
-    Istream& solverControls
+    const dictionary& solverControls
 )
 {
     return fvm.solve(solverControls);
@@ -1274,7 +1288,7 @@ template<class Type>
 Foam::lduMatrix::solverPerformance Foam::solve
 (
     const tmp<fvMatrix<Type> >& tfvm,
-    Istream& solverControls
+    const dictionary& solverControls
 )
 {
     lduMatrix::solverPerformance solverPerf =
@@ -1304,7 +1318,52 @@ Foam::lduMatrix::solverPerformance Foam::solve(const tmp<fvMatrix<Type> >& tfvm)
 }
 
 
-// * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
+template<class Type>
+Foam::tmp<Foam::fvMatrix<Type> > Foam::correction
+(
+    const fvMatrix<Type>& A
+)
+{
+    tmp<Foam::fvMatrix<Type> > tAcorr = A - (A & A.psi());
+
+    if
+    (
+        (A.hasUpper() || A.hasLower())
+     && A.psi().mesh().fluxRequired(A.psi().name())
+    )
+    {
+        tAcorr().faceFluxCorrectionPtr() = (-A.flux()).ptr();
+    }
+
+    return tAcorr;
+}
+
+
+template<class Type>
+Foam::tmp<Foam::fvMatrix<Type> > Foam::correction
+(
+    const tmp<fvMatrix<Type> >& tA
+)
+{
+    tmp<Foam::fvMatrix<Type> > tAcorr = tA - (tA() & tA().psi());
+
+    // Note the matrix coefficients are still that of matrix A
+    const fvMatrix<Type>& A = tAcorr();
+
+    if
+    (
+        (A.hasUpper() || A.hasLower())
+     && A.psi().mesh().fluxRequired(A.psi().name())
+    )
+    {
+        tAcorr().faceFluxCorrectionPtr() = (-A.flux()).ptr();
+    }
+
+    return tAcorr;
+}
+
+
+// * * * * * * * * * * * * * * * Global Operators  * * * * * * * * * * * * * //
 
 template<class Type>
 Foam::tmp<Foam::fvMatrix<Type> > Foam::operator==

@@ -27,14 +27,9 @@ License
 #include "cellModel.H"
 #include "pyramid.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-vector cellModel::centre
+Foam::vector Foam::cellModel::centre
 (
     const labelList& pointLabels,
     const pointField& points
@@ -91,7 +86,7 @@ vector cellModel::centre
 }
 
 
-scalar cellModel::mag
+Foam::scalar Foam::cellModel::mag
 (
     const labelList& pointLabels,
     const pointField& points
@@ -142,10 +137,5 @@ scalar cellModel::mag
 
     return v;
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

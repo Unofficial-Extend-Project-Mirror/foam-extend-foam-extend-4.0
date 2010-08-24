@@ -28,20 +28,15 @@ License
 #include "bool.H"
 #include "token.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Set t to the put back token if there is one and return true, 
+// Set t to the put back token if there is one and return true,
 // otherwise return false
-bool Istream::getBack(token& t)
+bool Foam::Istream::getBack(token& t)
 {
     if (bad())
     {
-        FatalIOErrorIn("void Istream::getBack(token& t)", *this)
+        FatalIOErrorIn("void Istream::getBack(token&)", *this)
             << "Attempt to get back from bad stream"
             << exit(FatalIOError);
 
@@ -53,25 +48,23 @@ bool Istream::getBack(token& t)
         putBack_ = false;
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 
 // Keep the put back token
-void Istream::putBack(const token& t)
+void Foam::Istream::putBack(const token& t)
 {
     if (bad())
     {
-        FatalIOErrorIn("void Istream::putBack(const token& t)", *this)
+        FatalIOErrorIn("void Istream::putBack(const token&)", *this)
             << "Attempt to put back onto bad stream"
             << exit(FatalIOError);
     }
     else if (putBack_)
     {
-        FatalIOErrorIn("void Istream::putBack(const token& t)", *this)
+        FatalIOErrorIn("void Istream::putBack(const token&)", *this)
             << "Attempt to put back another token"
             << exit(FatalIOError);
     }
@@ -85,15 +78,15 @@ void Istream::putBack(const token& t)
 
 // Functions for reading object delimiters ( ... )
 
-Istream& Istream::readBegin(const char* funcName)
+Foam::Istream& Foam::Istream::readBegin(const char* funcName)
 {
     token delimiter(*this);
     if (delimiter != token::BEGIN_LIST)
     {
         setBad();
         FatalIOErrorIn("Istream::readBegin(const char*)", *this)
-            << "Expected a " << '\'' << token:: BEGIN_LIST << '\''
-            << " while reading " << funcName
+            << "Expected a '" << token::BEGIN_LIST
+            << "' while reading " << funcName
             << ", found " << delimiter.info()
             << exit(FatalIOError);
     }
@@ -102,15 +95,15 @@ Istream& Istream::readBegin(const char* funcName)
 }
 
 
-Istream& Istream::readEnd(const char* funcName)
+Foam::Istream& Foam::Istream::readEnd(const char* funcName)
 {
     token delimiter(*this);
     if (delimiter != token::END_LIST)
     {
         setBad();
         FatalIOErrorIn("Istream::readEnd(const char*)", *this)
-            << "Expected a " << '\'' << token::END_LIST << '\''
-            << " while reading " << funcName
+            << "Expected a '" << token::END_LIST
+            << "' while reading " << funcName
             << ", found " << delimiter.info()
             << exit(FatalIOError);
     }
@@ -119,7 +112,7 @@ Istream& Istream::readEnd(const char* funcName)
 }
 
 
-Istream& Istream::readEndBegin(const char* funcName)
+Foam::Istream& Foam::Istream::readEndBegin(const char* funcName)
 {
     readEnd(funcName);
     return readBegin(funcName);
@@ -128,17 +121,17 @@ Istream& Istream::readEndBegin(const char* funcName)
 
 // Functions for reading List delimiters ( ... ) or { ... }
 
-char Istream::readBeginList(const char* funcName)
+char Foam::Istream::readBeginList(const char* funcName)
 {
     token delimiter(*this);
 
     if (delimiter != token::BEGIN_LIST && delimiter != token::BEGIN_BLOCK)
     {
         setBad();
-        FatalIOErrorIn("Istream::readBeginList(const char*)", *this) 
-            << "Expected a " << '\'' << token::BEGIN_LIST << '\''
-            << " or a " << '\'' << token::BEGIN_BLOCK << '\''
-            << " while reading " << funcName
+        FatalIOErrorIn("Istream::readBeginList(const char*)", *this)
+            << "Expected a '" << token::BEGIN_LIST
+            << "' or a '" << token::BEGIN_BLOCK
+            << "' while reading " << funcName
             << ", found " << delimiter.info()
             << exit(FatalIOError);
 
@@ -149,7 +142,7 @@ char Istream::readBeginList(const char* funcName)
 }
 
 
-char Istream::readEndList(const char* funcName)
+char Foam::Istream::readEndList(const char* funcName)
 {
     token delimiter(*this);
 
@@ -157,9 +150,9 @@ char Istream::readEndList(const char* funcName)
     {
         setBad();
         FatalIOErrorIn("Istream::readEndList(const char*)", *this)
-            << "Expected a " << '\'' << token::END_LIST << '\''
-            << " or a " << '\'' << token::END_BLOCK << '\''
-            << " while reading " << funcName
+            << "Expected a '" << token::END_LIST
+            << "' or a '" << token::END_BLOCK
+            << "' while reading " << funcName
             << ", found " << delimiter.info()
             << exit(FatalIOError);
 
@@ -170,10 +163,7 @@ char Istream::readEndList(const char* funcName)
 }
 
 
-//- Return a non-const reference to const Istream
-//  Needed for read-constructors where the stream argument is temporary:
-//  e.g. thing thisThing(IFstream("thingFileName")());
-Istream& Istream::operator()() const
+Foam::Istream& Foam::Istream::operator()() const
 {
     if (!good())
     {
@@ -184,9 +174,5 @@ Istream& Istream::operator()() const
     return const_cast<Istream&>(*this);
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

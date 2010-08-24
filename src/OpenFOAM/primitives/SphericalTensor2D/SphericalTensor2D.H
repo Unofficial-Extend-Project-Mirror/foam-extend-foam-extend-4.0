@@ -71,6 +71,8 @@ public:
         static const char* componentNames[];
         static const SphericalTensor2D zero;
         static const SphericalTensor2D one;
+        static const SphericalTensor2D max;
+        static const SphericalTensor2D min;
         static const SphericalTensor2D I;
         static const SphericalTensor2D oneThirdI;
         static const SphericalTensor2D twoThirdsI;

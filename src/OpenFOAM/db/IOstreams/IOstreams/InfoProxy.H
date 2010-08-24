@@ -52,19 +52,14 @@ class InfoProxy
 {
 public:
 
-    #ifndef __MAKECINT__
     const T& t_;
-    #endif
 
     InfoProxy(const T& t)
     :
         t_(t)
     {}
-    
-    friend Ostream& operator<<
-    #ifndef __CINT__
-    <T>
-    #endif
+
+    friend Ostream& operator<< <T>
     (Ostream&, const InfoProxy<T>&);
 };
 

@@ -58,7 +58,7 @@ public:
     // Constructors
 
         //- Construct given initial map size
-        PtrMap(label size = 100)
+        PtrMap(const label size = 128)
         :
             HashPtrTable<T, label, Hash<label> >(size)
         {}

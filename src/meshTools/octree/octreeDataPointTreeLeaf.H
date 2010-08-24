@@ -60,7 +60,7 @@ bool treeLeaf<octreeDataPoint>::findNearest
     const octreeDataPoint& shapes,
     const point& sample,
     treeBoundBox& tightest,
-    label& tightesti,
+    label& tightestI,
     scalar& tightestDist
 ) const;
 

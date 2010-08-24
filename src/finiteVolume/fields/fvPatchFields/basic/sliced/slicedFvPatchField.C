@@ -55,14 +55,8 @@ slicedFvPatchField<Type>::slicedFvPatchField
     const DimensionedField<Type, volMesh>& iF
 )
 :
-    fvPatchField<Type>(p, iF)
-{
-    notImplemented
-    (
-        "slicedFvPatchField<Type>::"
-        "slicedFvPatchField(const fvPatch&, const Field<Type>&)"
-    );
-}
+    fvPatchField<Type>(p, iF, Field<Type>())
+{}
 
 
 template<class Type>

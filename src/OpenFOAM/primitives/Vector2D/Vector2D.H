@@ -71,6 +71,8 @@ public:
         static const char* componentNames[];
         static const Vector2D zero;
         static const Vector2D one;
+        static const Vector2D max;
+        static const Vector2D min;
 
 
     //- Component labeling enumeration

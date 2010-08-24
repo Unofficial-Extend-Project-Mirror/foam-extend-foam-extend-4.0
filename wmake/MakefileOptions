@@ -4,7 +4,7 @@
 #  \\    /   O peration     |
 #   \\  /    A nd           | Copyright held by original author
 #    \\/     M anipulation  |
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # License
 #     This file is part of OpenFOAM.
 #
@@ -23,7 +23,7 @@
 #     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 # Script
-#     MakefileFiles
+#     MakefileOptions
 #
 # Description
 #     General, easy to use make system for multi-platform development.
@@ -43,7 +43,7 @@ include $(RULES)/general
 OPTIONS = $(WM_OPTIONS)/options
 
 #------------------------------------------------------------------------------
-# Declare dependecy of all make system files on FILE
+# Declare dependency of all make system files on FILE
 # Causes all derived files to be remade if any are changed or missing
 #------------------------------------------------------------------------------
 

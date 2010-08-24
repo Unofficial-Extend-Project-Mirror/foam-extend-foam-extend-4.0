@@ -30,12 +30,9 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void edgeMesh::calcPointEdges() const
+void Foam::edgeMesh::calcPointEdges() const
 {
     if (pointEdgesPtr_.valid())
     {
@@ -81,7 +78,7 @@ void edgeMesh::calcPointEdges() const
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // construct from components
-edgeMesh::edgeMesh(const pointField& points, const edgeList& edges)
+Foam::edgeMesh::edgeMesh(const pointField& points, const edgeList& edges)
 :
     points_(points),
     edges_(edges)
@@ -89,7 +86,7 @@ edgeMesh::edgeMesh(const pointField& points, const edgeList& edges)
 
 
 // construct as copy
-edgeMesh::edgeMesh(const edgeMesh& em)
+Foam::edgeMesh::edgeMesh(const edgeMesh& em)
 :
     points_(em.points_),
     edges_(em.edges_),
@@ -99,7 +96,7 @@ edgeMesh::edgeMesh(const edgeMesh& em)
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-label edgeMesh::regions(labelList& edgeRegion) const
+Foam::label Foam::edgeMesh::regions(labelList& edgeRegion) const
 {
     edgeRegion.setSize(edges_.size());
     edgeRegion = -1;
@@ -126,7 +123,7 @@ label edgeMesh::regions(labelList& edgeRegion) const
         edgeRegion[startEdgeI] = currentRegion;
         labelList edgesToVisit(1, startEdgeI);
 
-        while (edgesToVisit.size() > 0)
+        while (edgesToVisit.size())
         {
             // neighbours of current edgesToVisit
             DynamicList<label> newEdgesToVisit(edgesToVisit.size());
@@ -156,7 +153,7 @@ label edgeMesh::regions(labelList& edgeRegion) const
                 }
             }
 
-            edgesToVisit.transfer(newEdgesToVisit.shrink());
+            edgesToVisit.transfer(newEdgesToVisit);
         }
 
         currentRegion++;
@@ -165,7 +162,7 @@ label edgeMesh::regions(labelList& edgeRegion) const
 }
 
 
-void edgeMesh::mergePoints(const scalar mergeDist)
+void Foam::edgeMesh::mergePoints(const scalar mergeDist)
 {
     pointField newPoints;
     labelList pointMap;
@@ -245,16 +242,12 @@ void edgeMesh::mergePoints(const scalar mergeDist)
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
-void edgeMesh::operator=(const edgeMesh& rhs)
+void Foam::edgeMesh::operator=(const edgeMesh& rhs)
 {
     points_ = rhs.points_;
     edges_ = rhs.edges_;
     pointEdgesPtr_.reset(NULL);
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

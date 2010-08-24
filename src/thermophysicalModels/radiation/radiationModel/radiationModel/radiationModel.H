@@ -28,7 +28,6 @@ Namespace
 Description
     Namespace for radiation modelling
 
-
 Class
     Foam::radiation::radiationModel
 
@@ -49,6 +48,7 @@ SourceFiles
 #include "volFields.H"
 #include "basicThermo.H"
 #include "fvMatrices.H"
+#include "blackBodyEmission.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,33 +57,40 @@ namespace Foam
 namespace radiation
 {
 
+// Forward declaration of classes
 class absorptionEmissionModel;
 class scatterModel;
 
 /*---------------------------------------------------------------------------*\
-                           Class radiationModel Declaration
+                       Class radiationModel Declaration
 \*---------------------------------------------------------------------------*/
 
 class radiationModel
 :
     public IOdictionary
 {
-
 protected:
 
     // Protected data
 
+        //- Reference to the mesh database
+        const fvMesh& mesh_;
+
+        //- Reference to the time database
+        const Time& time_;
+
         //- Reference to the temperature field
         const volScalarField& T_;
-
-        //- Reference to the mesh
-        const fvMesh& mesh_;
 
         //- Model specific dictionary input parameters
         Switch radiation_;
 
         //- Radiation model dictionary
-        dictionary radiationModelCoeffs_;
+        dictionary coeffs_;
+
+        //- Radiation solver frequency - number flow solver iterations per
+        //  radiation solver iteration
+        label solverFreq_;
 
 
         // References to the radiation sub-models
@@ -128,34 +135,32 @@ public:
 
     // Constructors
 
+        //- Null constructor
+        radiationModel(const volScalarField& T);
+
         //- Construct from components
-        radiationModel
-        (
-            const word& type,
-            const volScalarField& T
-        );
+        radiationModel(const word& type, const volScalarField& T);
 
 
     // Selectors
 
          //- Return a reference to the selected radiation model
-         static autoPtr<radiationModel> New
-         (
-             const volScalarField& T
-         );
+         static autoPtr<radiationModel> New(const volScalarField& T);
 
 
-    // Destructor
-
-        virtual ~radiationModel();
+    //- Destructor
+    virtual ~radiationModel();
 
 
     // Member Functions
 
         // Edit
 
+            //- Main update/correction routine
+            virtual void correct();
+
             //- Solve radiation equation(s)
-            virtual void correct() = 0;
+            virtual void calculate() = 0;
 
             //- Read radiationProperties dictionary
             virtual bool read() = 0;
@@ -170,10 +175,10 @@ public:
             virtual tmp<DimensionedField<scalar, volMesh> > Ru() const = 0;
 
             //- Enthalpy source term
-            virtual tmp<fvScalarMatrix> Sh
-            (
-                basicThermo& thermo
-            ) const;
+            virtual tmp<fvScalarMatrix> Sh(basicThermo& thermo) const;
+
+            //- Sensible enthalpy source term
+            virtual tmp<fvScalarMatrix> Shs(basicThermo& thermo) const;
 };
 
 
@@ -187,4 +192,3 @@ public:
 #endif
 
 // ************************************************************************* //
-

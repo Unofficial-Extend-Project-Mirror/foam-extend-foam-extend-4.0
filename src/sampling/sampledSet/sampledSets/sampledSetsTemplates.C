@@ -26,7 +26,6 @@ License
 
 #include "sampledSets.H"
 #include "volFields.H"
-#include "volPointInterpolation.H"
 #include "ListListOps.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -34,7 +33,6 @@ License
 template <class Type>
 Foam::sampledSets::volFieldSampler<Type>::volFieldSampler
 (
-    const volPointInterpolation& pInterp,
     const word& interpolationScheme,
     const GeometricField<Type, fvPatchField, volMesh>& field,
     const PtrList<sampledSet>& samplers
@@ -45,7 +43,7 @@ Foam::sampledSets::volFieldSampler<Type>::volFieldSampler
 {
     autoPtr<interpolation<Type> > interpolator
     (
-        interpolation<Type>::New(interpolationScheme, pInterp, field)
+        interpolation<Type>::New(interpolationScheme, field)
     );
 
     forAll(samplers, seti)
@@ -200,8 +198,11 @@ void Foam::sampledSets::combineSampledValues
                     )
                 );
 
-                masterValues[seti] =
-                    IndirectList<T>(allData, indexSets[seti])();
+                masterValues[seti] = UIndirectList<T>
+                (
+                    allData,
+                    indexSets[seti]
+                )();
             }
         }
 
@@ -228,15 +229,8 @@ void Foam::sampledSets::sampleAndWrite
     {
         bool interpolate = interpolationScheme_ != "cell";
 
-        if (interpolate && (!pMeshPtr_.valid() || !pInterpPtr_.valid()))
-        {
-            // set up interpolation
-            pMeshPtr_.reset(new pointMesh(mesh_));
-            pInterpPtr_.reset(new volPointInterpolation(mesh_, pMeshPtr_()));
-        }
-
         // Create or use existing writer
-        if (!fields.formatter.valid())
+        if (fields.formatter.empty())
         {
             fields.formatter = writer<Type>::New(writeFormat_);
         }
@@ -275,7 +269,6 @@ void Foam::sampledSets::sampleAndWrite
                         fieldi,
                         new volFieldSampler<Type>
                         (
-                            pInterpPtr_(),
                             interpolationScheme_,
                             vf,
                             *this
@@ -300,7 +293,6 @@ void Foam::sampledSets::sampleAndWrite
                         fieldi,
                         new volFieldSampler<Type>
                         (
-                            pInterpPtr_(),
                             interpolationScheme_,
                             mesh_.lookupObject
                             <GeometricField<Type, fvPatchField, volMesh> >

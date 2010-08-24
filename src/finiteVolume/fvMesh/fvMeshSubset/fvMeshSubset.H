@@ -407,7 +407,6 @@ public:
             (
                 const GeometricField<Type, pointPatchField, pointMesh>&,
                 const pointMesh& sMesh,
-                const objectRegistry& reg,
                 const labelList& patchMap,
                 const labelList& pointMap
             );

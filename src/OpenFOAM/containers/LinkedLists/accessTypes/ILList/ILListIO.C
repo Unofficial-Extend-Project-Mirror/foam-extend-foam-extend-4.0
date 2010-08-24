@@ -30,24 +30,19 @@ Description
 #include "Istream.H"
 #include "INew.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class LListBase, class T>
 template<class INew>
-void ILList<LListBase, T>::read(Istream& is, const INew& inewt)
+void Foam::ILList<LListBase, T>::read(Istream& is, const INew& iNew)
 {
-    is.fatalCheck("operator>>(Istream& is, ILList<LListBase, T>& L)");
+    is.fatalCheck("operator>>(Istream&, ILList<LListBase, T>&)");
 
     token firstToken(is);
 
     is.fatalCheck
     (
-        "operator>>(Istream& is, ILList<LListBase, T>& L) : reading first token"
+        "operator>>(Istream&, ILList<LListBase, T>&) : reading first token"
     );
 
     if (firstToken.isLabel())
@@ -55,34 +50,34 @@ void ILList<LListBase, T>::read(Istream& is, const INew& inewt)
         label s = firstToken.labelToken();
 
         // Read beginning of contents
-        char listDelimiter = is.readBeginList("ILList<LListBase, T>");
+        char delimiter = is.readBeginList("ILList<LListBase, T>");
 
         if (s)
         {
-            if (listDelimiter == token::BEGIN_LIST)
+            if (delimiter == token::BEGIN_LIST)
             {
                 for (label i=0; i<s; i++)
                 {
-                    append(inewt(is).ptr());
-                
+                    append(iNew(is).ptr());
+
                     is.fatalCheck
                     (
-                        "operator>>(Istream& is, ILList<LListBase, T>& L) : "
+                        "operator>>(Istream&, ILList<LListBase, T>&) : "
                         "reading entry"
                     );
                 }
             }
             else
             {
-                T* tPtr = inewt(is).ptr();
+                T* tPtr = iNew(is).ptr();
                 append(tPtr);
 
                 is.fatalCheck
                 (
-                    "operator>>(Istream& is, ILList<LListBase, T>& L) : "
+                    "operator>>(Istream&, ILList<LListBase, T>&) : "
                     "reading entry"
                 );
-                
+
                 for (label i=1; i<s; i++)
                 {
                     append(new T(*tPtr));
@@ -99,14 +94,14 @@ void ILList<LListBase, T>::read(Istream& is, const INew& inewt)
         {
             FatalIOErrorIn
             (
-                "operator>>(Istream& is, ILList<LListBase, T>& L)",
+                "operator>>(Istream&, ILList<LListBase, T>&)",
                 is
             )   << "incorrect first token, '(', found " << firstToken.info()
                 << exit(FatalIOError);
         }
 
         token lastToken(is);
-        is.fatalCheck("operator>>(Istream& is, ILList<LListBase, T>& L)");
+        is.fatalCheck("operator>>(Istream&, ILList<LListBase, T>&)");
 
         while
         (
@@ -117,36 +112,34 @@ void ILList<LListBase, T>::read(Istream& is, const INew& inewt)
         )
         {
             is.putBack(lastToken);
-            append(inewt(is).ptr());
+            append(iNew(is).ptr());
 
             is >> lastToken;
-            is.fatalCheck("operator>>(Istream& is, ILList<LListBase, T>& L)");
+            is.fatalCheck("operator>>(Istream&, ILList<LListBase, T>&)");
         }
     }
     else
     {
-        FatalIOErrorIn("operator>>(Istream& is, ILList<LListBase, T>& L)", is)
+        FatalIOErrorIn("operator>>(Istream&, ILList<LListBase, T>&)", is)
             << "incorrect first token, expected <int> or '(', found "
             << firstToken.info()
             << exit(FatalIOError);
     }
 
-    is.fatalCheck("operator>>(Istream& is, ILList<LListBase, T>& L)");
+    is.fatalCheck("operator>>(Istream&, ILList<LListBase, T>&)");
 }
 
 
-//- Construct from Istream using given Istream constructor class
 template<class LListBase, class T>
 template<class INew>
-ILList<LListBase, T>::ILList(Istream& is, const INew& inewt)
+Foam::ILList<LListBase, T>::ILList(Istream& is, const INew& iNew)
 {
-    read(is, inewt);
+    read(is, iNew);
 }
 
 
-// Construct from Istream
 template<class LListBase, class T>
-ILList<LListBase, T>::ILList(Istream& is)
+Foam::ILList<LListBase, T>::ILList(Istream& is)
 {
     read(is, INew<T>());
 }
@@ -155,7 +148,7 @@ ILList<LListBase, T>::ILList(Istream& is)
 // * * * * * * * * * * * * * * * Istream Operator  * * * * * * * * * * * * * //
 
 template<class LListBase, class T>
-Istream& operator>>(Istream& is, ILList<LListBase, T>& L)
+Foam::Istream& Foam::operator>>(Istream& is, ILList<LListBase, T>& L)
 {
     L.clear();
     L.read(is, INew<T>());
@@ -165,7 +158,5 @@ Istream& operator>>(Istream& is, ILList<LListBase, T>& L)
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

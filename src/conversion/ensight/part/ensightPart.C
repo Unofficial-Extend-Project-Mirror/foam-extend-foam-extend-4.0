@@ -175,14 +175,10 @@ void Foam::ensightPart::reconstruct(Istream& is)
     forAll(elementTypes(), elemI)
     {
         word key(elementTypes()[elemI]);
-        if (dict.found(key))
-        {
-            dict.lookup(key) >> elemLists_[elemI];
-        }
-        else
-        {
-            elemLists_[elemI].clear();
-        }
+
+        elemLists_[elemI].clear();
+        dict.readIfPresent(key, elemLists_[elemI]);
+
         size_ += elemLists_[elemI].size();
     }
 

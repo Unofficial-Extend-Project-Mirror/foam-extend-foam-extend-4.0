@@ -31,8 +31,8 @@ License
 
 namespace Foam
 {
-    defineRunTimeSelectionTable(lduMatrix::solver, symMatrix);
-    defineRunTimeSelectionTable(lduMatrix::solver, asymMatrix);
+    defineRunTimeSelectionTable(lduSolver, symMatrix);
+    defineRunTimeSelectionTable(lduSolver, asymMatrix);
 }
 
 
@@ -45,14 +45,14 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    Istream& solverData
+    const dictionary& dict
 )
 {
-    word solverName(solverData);
+    word name(dict.lookup("solver"));
 
     if (matrix.diagonal())
     {
-        return autoPtr<lduMatrix::solver>
+        return autoPtr<lduSolver>
         (
             new diagonalSolver
             (
@@ -61,18 +61,12 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
                 coupleBouCoeffs,
                 coupleIntCoeffs,
                 interfaces,
-                solverData
+                dict
             )
         );
     }
     else if (matrix.symmetric())
     {
-        if (!symMatrixConstructorTablePtr_)
-        {
-            FatalErrorIn("lduMatrix::solver::New")
-                << "Initialization problem." << endl;
-        }
-
         symMatrixConstructorTable::iterator constructorIter =
             symMatrixConstructorTablePtr_->find(solverName);
 
@@ -80,15 +74,14 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
         {
             FatalIOErrorIn
             (
-                "lduMatrix::solver::New", solverData
-            )   << "Unknown symmetric matrix solver " << solverName
-                << endl << endl
+                "lduSolver::New", dict
+            )   << "Unknown symmetric matrix solver " << solverName << nl << nl
                 << "Valid symmetric matrix solvers are :" << endl
                 << symMatrixConstructorTablePtr_->toc()
                 << exit(FatalIOError);
         }
 
-        return autoPtr<lduMatrix::solver>
+        return autoPtr<lduSolver>
         (
             constructorIter()
             (
@@ -97,18 +90,12 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
                 coupleBouCoeffs,
                 coupleIntCoeffs,
                 interfaces,
-                solverData
+                dict
             )
         );
     }
     else if (matrix.asymmetric())
     {
-        if (!asymMatrixConstructorTablePtr_)
-        {
-            FatalErrorIn("lduMatrix::solver::New")
-                << "Initialization problem." << endl;
-        }
-
         asymMatrixConstructorTable::iterator constructorIter =
             asymMatrixConstructorTablePtr_->find(solverName);
 
@@ -116,15 +103,14 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
         {
             FatalIOErrorIn
             (
-                "lduMatrix::solver::New", solverData
-            )   << "Unknown asymmetric matrix solver " << solverName
-                << endl << endl
+                "lduSolver::New", dict
+            )   << "Unknown asymmetric matrix solver " << solverName << nl << nl
                 << "Valid asymmetric matrix solvers are :" << endl
                 << asymMatrixConstructorTablePtr_->toc()
                 << exit(FatalIOError);
         }
 
-        return autoPtr<lduMatrix::solver>
+        return autoPtr<lduSolver>
         (
             constructorIter()
             (
@@ -133,7 +119,7 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
                 coupleBouCoeffs,
                 coupleIntCoeffs,
                 interfaces,
-                solverData
+                dict
             )
         );
     }
@@ -141,12 +127,12 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
     {
         FatalIOErrorIn
         (
-            "lduMatrix::solver::New", solverData
+            "lduSolver::New", dict
         )   << "cannot solve incomplete matrix, "
                "no diagonal or off-diagonal coefficient"
             << exit(FatalIOError);
 
-        return autoPtr<lduMatrix::solver>(NULL);
+        return autoPtr<lduSolver>(NULL);
     }
 }
 
@@ -235,40 +221,15 @@ Foam::lduMatrix::solver::solver
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    Istream& solverData
-)
-:
-    fieldName_(fieldName),
-    dict_(solverData),
-    tolerance_(1e-6),
-    relTolerance_(0),
-    minIter_(0),
-    maxIter_(1000),
-    matrix_(matrix),
-    coupleBouCoeffs_(coupleBouCoeffs),
-    coupleIntCoeffs_(coupleIntCoeffs),
-    interfaces_(interfaces)
-{
-    readControls();
-}
-
-
-Foam::lduMatrix::solver::solver
-(
-    const word& fieldName,
-    const lduMatrix& matrix,
-    const FieldField<Field, scalar>& coupleBouCoeffs,
-    const FieldField<Field, scalar>& coupleIntCoeffs,
-    const lduInterfaceFieldPtrsList& interfaces,
     const dictionary& dict
 )
 :
     fieldName_(fieldName),
     dict_(dict),
-    tolerance_(1e-6),
+    tolerance_(0),
     relTolerance_(0),
     minIter_(0),
-    maxIter_(1000),
+    maxIter_(0),
     matrix_(matrix),
     coupleBouCoeffs_(coupleBouCoeffs),
     coupleIntCoeffs_(coupleIntCoeffs),
@@ -282,17 +243,16 @@ Foam::lduMatrix::solver::solver
 
 void Foam::lduMatrix::solver::readControls()
 {
-    dict_.readIfPresent("minIter", minIter_);
-    dict_.readIfPresent("maxIter", maxIter_);
-    dict_.readIfPresent("tolerance", tolerance_);
-    dict_.readIfPresent("relTol", relTolerance_);
+    minIter_   = dict_.lookupOrDefault<label>("minIter", 0);
+    maxIter_   = dict_.lookupOrDefault<label>("maxIter", 1000);
+    tolerance_ = dict_.lookupOrDefault<scalar>("tolerance", 1e-6);
+    relTol_    = dict_.lookupOrDefault<scalar>("relTol", 0);
 }
 
 
-void Foam::lduMatrix::solver::read(Istream& solverData)
+void Foam::lduMatrix::solver::read(const dictionary& dict)
 {
-    word solverName(solverData);
-    solverData >> dict_;
+    dict_ = dict;
     readControls();
 }
 

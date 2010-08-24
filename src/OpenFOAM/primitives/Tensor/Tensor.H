@@ -79,6 +79,8 @@ public:
 
         static const Tensor zero;
         static const Tensor one;
+        static const Tensor max;
+        static const Tensor min;
 
 
     //- Component labeling enumeration

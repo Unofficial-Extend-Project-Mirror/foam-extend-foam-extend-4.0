@@ -28,20 +28,14 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
+#include "token.H"
 
 #include "IOstreams.H"
 #include "scalar.H"
-#include "HashTable.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from Istream
-token::token(Istream& is)
+Foam::token::token(Istream& is)
 :
     type_(UNDEFINED)
 {
@@ -51,20 +45,20 @@ token::token(Istream& is)
 
 // * * * * * * * * * * * * IOstream operators  * * * * * * * * * * * * * * * //
 
-Istream& operator>>(Istream& is, token& t)
+Foam::Istream& Foam::operator>>(Istream& is, token& t)
 {
     t.clear();
     return is.read(t);
 }
 
 
-Ostream& operator<<(Ostream& os, const token& t)
+Foam::Ostream& Foam::operator<<(Ostream& os, const token& t)
 {
     switch (t.type_)
     {
         case token::UNDEFINED:
             os << "UNDEFINED";
-            WarningIn("Ostream& operator<< (Ostream&, const token&)")
+            WarningIn("Ostream& operator<<(Ostream&, const token&)")
                 << "Undefined token" << endl;
         break;
 
@@ -98,13 +92,13 @@ Ostream& operator<<(Ostream& os, const token& t)
 
         case token::ERROR:
             os << "ERROR";
-            WarningIn("Ostream& operator<< (Ostream&, const token&)")
+            WarningIn("Ostream& operator<<(Ostream&, const token&)")
                 << "Error token" << endl;
         break;
 
         default:
             os << "UNKNOWN";
-            SeriousErrorIn("Ostream& operator<< (Ostream&, const token&)")
+            SeriousErrorIn("Ostream& operator<<(Ostream&, const token&)")
                 << "Unknown token"
                 << endl;
     }
@@ -116,84 +110,30 @@ Ostream& operator<<(Ostream& os, const token& t)
 }
 
 
-Ostream& operator<<(Ostream& os, const token::punctuationToken& pt)
-{
-    return os << char(pt);
-}
-
-ostream& operator<<(ostream& os, const token::punctuationToken& pt)
+ostream& Foam::operator<<(ostream& os, const token::punctuationToken& pt)
 {
     return os << char(pt);
 }
 
 
-#if defined (__GNUC__)
-template<>
-#endif
-Ostream& operator<<(Ostream& os, const InfoProxy<token>& ip)
+Foam::Ostream& Foam::operator<<(Ostream& os, const token::punctuationToken& pt)
 {
-    const token& t = ip.t_;
+    return os << char(pt);
+}
 
-    os  << "on line " << t.lineNumber();
 
-    switch (t.type())
-    {
-        case token::UNDEFINED:
-            os  << " an undefined token";
-        break;
-
-        case token::PUNCTUATION:
-            os  << " the punctuation token " << '\'' << t.pToken() << '\'';
-        break;
-
-        case token::WORD:
-            os  << " the word " << '\'' << t.wordToken() << '\'';
-        break;
-
-        case token::STRING:
-            os  << " the string " << t.stringToken();
-        break;
-
-        case token::LABEL:
-            os  << " the label " << t.labelToken();
-        break;
-
-        case token::FLOAT_SCALAR:
-            os  << " the floatScalar " << t.floatScalarToken();
-        break;
-
-        case token::DOUBLE_SCALAR:
-            os  << " the doubleScalar " << t.doubleScalarToken();
-        break;
-
-        case token::COMPOUND:
-        {
-            if (t.compoundToken().empty())
-            {
-                os  << " the empty compound of type "
-                    << t.compoundToken().type();
-            }
-            else
-            {
-                os  << " the compound of type "
-                    << t.compoundToken().type();
-            }
-        }
-        break;
-
-        case token::ERROR:
-            os  << " an error";
-        break;
-
-        default:
-            os  << " an unknown token type "  << '\'' << int(t.type()) << '\'';
-    }
+Foam::Ostream& Foam::operator<<(Ostream& os, const token::compound& ct)
+{
+    os << ct.type() << token::SPACE;
+    ct.write(os);
 
     return os;
 }
 
 
-ostream& operator<<(ostream& os, const InfoProxy<token>& ip)
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ostream& Foam::operator<<(ostream& os, const InfoProxy<token>& ip)
 {
     const token& t = ip.t_;
 
@@ -256,10 +196,71 @@ ostream& operator<<(ostream& os, const InfoProxy<token>& ip)
 }
 
 
-Ostream& operator<<(Ostream& os, const token::compound& ct)
+// template specialization
+namespace Foam
 {
-    os << ct.type() << token::SPACE;
-    ct.write(os);
+
+#if defined (__GNUC__)
+template<>
+#endif
+Ostream& operator<<(Ostream& os, const InfoProxy<token>& ip)
+{
+    const token& t = ip.t_;
+
+    os  << "on line " << t.lineNumber();
+
+    switch (t.type())
+    {
+        case token::UNDEFINED:
+            os  << " an undefined token";
+        break;
+
+        case token::PUNCTUATION:
+            os  << " the punctuation token " << '\'' << t.pToken() << '\'';
+        break;
+
+        case token::WORD:
+            os  << " the word " << '\'' << t.wordToken() << '\'';
+        break;
+
+        case token::STRING:
+            os  << " the string " << t.stringToken();
+        break;
+
+        case token::LABEL:
+            os  << " the label " << t.labelToken();
+        break;
+
+        case token::FLOAT_SCALAR:
+            os  << " the floatScalar " << t.floatScalarToken();
+        break;
+
+        case token::DOUBLE_SCALAR:
+            os  << " the doubleScalar " << t.doubleScalarToken();
+        break;
+
+        case token::COMPOUND:
+        {
+            if (t.compoundToken().empty())
+            {
+                os  << " the empty compound of type "
+                    << t.compoundToken().type();
+            }
+            else
+            {
+                os  << " the compound of type "
+                    << t.compoundToken().type();
+            }
+        }
+        break;
+
+        case token::ERROR:
+            os  << " an error";
+        break;
+
+        default:
+            os  << " an unknown token type "  << '\'' << int(t.type()) << '\'';
+    }
 
     return os;
 }

@@ -27,7 +27,6 @@ License
 #include "error.H"
 
 #include "PtrList.H"
-#include "PtrListLoopM.H"
 #include "SLPtrList.H"
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
@@ -42,7 +41,7 @@ Foam::PtrList<T>::PtrList()
 template<class T>
 Foam::PtrList<T>::PtrList(const label s)
 :
-    ptrs_(s, reinterpret_cast<T*>(NULL))
+    ptrs_(s, reinterpret_cast<T*>(0))
 {}
 
 
@@ -68,6 +67,13 @@ Foam::PtrList<T>::PtrList(const PtrList<T>& a, const CloneArg& cloneArg)
     {
         ptrs_[i] = (a[i]).clone(cloneArg).ptr();
     }
+}
+
+
+template<class T>
+Foam::PtrList<T>::PtrList(const Xfer<PtrList<T> >& lst)
+{
+    transfer(lst());
 }
 
 
@@ -209,7 +215,7 @@ void Foam::PtrList<T>::reorder(const UList<label>& oldToNew)
             << ")." << abort(FatalError);
     }
 
-    List<T*> newPtrs_(ptrs_.size(), reinterpret_cast<T*>(NULL));
+    List<T*> newPtrs_(ptrs_.size(), reinterpret_cast<T*>(0));
 
     forAll(*this, i)
     {

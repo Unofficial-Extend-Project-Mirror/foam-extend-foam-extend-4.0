@@ -1,6 +1,6 @@
-.SUFFIXES: .c .cc .cxx .cpp .C .java .F .f .dep
+.SUFFIXES: .c .cc .cxx .cpp .C .F .f .dep
 
-MKDEP       = $(RULES)/wmkdep -I$(*D) $(LIB_HEADER_DIRS)
+MKDEP       = $(BIN)/wmkdep -I$(*D) $(LIB_HEADER_DIRS)
 
 .c.dep:
 	$(MAKE_DEP)
@@ -15,9 +15,6 @@ MKDEP       = $(RULES)/wmkdep -I$(*D) $(LIB_HEADER_DIRS)
 	$(MAKE_DEP)
 
 .C.dep:
-	$(MAKE_DEP)
-
-.java.dep:
 	$(MAKE_DEP)
 
 .F.dep:

@@ -26,42 +26,37 @@ License
 
 #include "AverageIOField.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-AverageIOField<Type>::AverageIOField
+Foam::AverageIOField<Type>::AverageIOField
 (
     const IOobject& io
 )
 :
-    regIOobject(io),
-    pTraits<Type>(readStream(typeName)),
-    Field<Type>(readStream(typeName))
+    regIOobject(io)
 {
+    readStream(typeName) >> average_;
+    readStream(typeName) >> static_cast<Field<Type>&>(*this);
     close();
 }
 
 
 template<class Type>
-AverageIOField<Type>::AverageIOField
+Foam::AverageIOField<Type>::AverageIOField
 (
     const IOobject& io,
     const label size
 )
 :
     regIOobject(io),
-    pTraits<Type>(pTraits<Type>::zero),
-    Field<Type>(size)
+    Field<Type>(size),
+    average_(pTraits<Type>::zero)
 {}
 
 
 template<class Type>
-AverageIOField<Type>::AverageIOField
+Foam::AverageIOField<Type>::AverageIOField
 (
     const IOobject& io,
     const Type& average,
@@ -69,21 +64,28 @@ AverageIOField<Type>::AverageIOField
 )
 :
     regIOobject(io),
-    pTraits<Type>(average),
-    Field<Type>(f)
+    Field<Type>(f),
+    average_(average)
 {
     if (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
     {
         readStream(typeName)
-            >> static_cast<Type&>(*this)
+            >> average_
             >> static_cast<Field<Type>&>(*this);
         close();
     }
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+template<class Type>
+bool Foam::AverageIOField<Type>::writeData(Ostream& os) const
+{
+    os  << average_
+        << token::NL
+        << static_cast<const Field<Type>&>(*this);
 
-} // End namespace Foam
+    return os.good();
+}
+
 
 // ************************************************************************* //

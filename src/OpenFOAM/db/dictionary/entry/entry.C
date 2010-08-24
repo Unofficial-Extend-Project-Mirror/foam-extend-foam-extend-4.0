@@ -30,7 +30,7 @@ License
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::entry::entry(const word& keyword)
+Foam::entry::entry(const keyType& keyword)
 :
     keyword_(keyword)
 {}
@@ -38,7 +38,6 @@ Foam::entry::entry(const word& keyword)
 
 Foam::entry::entry(const entry& e)
 :
-    IDLList<entry>::link(),
     keyword_(e.keyword_)
 {}
 

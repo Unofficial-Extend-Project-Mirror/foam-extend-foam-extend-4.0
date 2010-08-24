@@ -27,14 +27,9 @@ License
 #include "polyPatch.H"
 #include "dictionary.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-autoPtr<polyPatch> polyPatch::New
+Foam::autoPtr<Foam::polyPatch> Foam::polyPatch::New
 (
     const word& patchType,
     const word& name,
@@ -72,7 +67,7 @@ autoPtr<polyPatch> polyPatch::New
 }
 
 
-autoPtr<polyPatch> polyPatch::New
+Foam::autoPtr<Foam::polyPatch> Foam::polyPatch::New
 (
     const word& name,
     const dictionary& dict,
@@ -89,10 +84,7 @@ autoPtr<polyPatch> polyPatch::New
 
     word patchType(dict.lookup("type"));
 
-    if (dict.found("geometricType"))
-    {
-        dict.lookup("geometricType") >> patchType;
-    }
+    dict.readIfPresent("geometricType", patchType);
 
     dictionaryConstructorTable::iterator cstrIter =
         dictionaryConstructorTablePtr_->find(patchType);
@@ -123,9 +115,5 @@ autoPtr<polyPatch> polyPatch::New
     return autoPtr<polyPatch>(cstrIter()(name, dict, index, bm));
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

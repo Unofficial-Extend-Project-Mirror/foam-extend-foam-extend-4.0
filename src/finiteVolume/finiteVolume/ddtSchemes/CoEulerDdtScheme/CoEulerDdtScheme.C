@@ -69,10 +69,10 @@ tmp<volScalarField> CoEulerDdtScheme<Type>::CorDeltaT() const
 
     forAll(owner, faceI)
     {
-        corDeltaT[owner[faceI]] =
+        corDeltaT[owner[faceI]] = 
             max(corDeltaT[owner[faceI]], cofrDeltaT[faceI]);
 
-        corDeltaT[neighbour[faceI]] =
+        corDeltaT[neighbour[faceI]] = 
             max(corDeltaT[neighbour[faceI]], cofrDeltaT[faceI]);
     }
 

@@ -50,19 +50,21 @@ triSurfaceSearch::triSurfaceSearch(const triSurface& surface)
     surface_(surface),
     treePtr_(NULL)
 {
-    treeBoundBox treeBb(surface_.points(), surface_.meshPoints());
+    // Random number generator. Bit dodgy since not exactly random ;-)
+    Random rndGen(65431);
 
-    scalar tol = 1E-6*treeBb.avgDim();
-
-    point& bbMin = treeBb.min();
-    bbMin.x() -= tol;
-    bbMin.y() -= tol;
-    bbMin.z() -= tol;
-
-    point& bbMax = treeBb.max();
-    bbMax.x() += 2*tol;
-    bbMax.y() += 2*tol;
-    bbMax.z() += 2*tol;
+    // Slightly extended bb. Slightly off-centred just so on symmetric
+    // geometry there are less face/edge aligned items.
+    treeBoundBox treeBb
+    (
+        treeBoundBox(surface_.points(), surface_.meshPoints()).extend
+        (
+            rndGen,
+            1E-4
+        )
+    );
+    treeBb.min() -= point(ROOTVSMALL, ROOTVSMALL, ROOTVSMALL);
+    treeBb.max() += point(ROOTVSMALL, ROOTVSMALL, ROOTVSMALL);
 
     treePtr_.reset
     (

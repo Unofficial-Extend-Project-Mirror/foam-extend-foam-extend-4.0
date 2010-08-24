@@ -32,12 +32,11 @@ License
 template<class Type>
 Foam::interpolationCellPoint<Type>::interpolationCellPoint
 (
-    const volPointInterpolation& pInterp,
     const GeometricField<Type, fvPatchField, volMesh>& psi
 )
 :
     interpolation<Type>(psi),
-    psip_(pInterp.interpolate(psi))
+    psip_(volPointInterpolation::New(psi.mesh()).interpolate(psi))
 {}
 
 

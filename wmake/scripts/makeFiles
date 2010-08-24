@@ -5,7 +5,7 @@
 #  \\    /   O peration     |
 #   \\  /    A nd           | Copyright held by original author
 #    \\/     M anipulation  |
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # License
 #     This file is part of OpenFOAM.
 #
@@ -28,43 +28,36 @@
 #
 # Description
 #     Scan the current directory for source files and construct Make/files
-#     It has to be written in the C-shell rather than the Bourne shell
-#     because it uses file name manipulators.
 #
 #     Usage : makeFiles
 #
 #------------------------------------------------------------------------------
 
-if [ -r "Make/files" ]
+if [ -r Make/files ]
 then
     echo "makeFiles: Make/files already exists, exiting"
     exit 1
 fi
 
+bin=$WM_DIR/bin/$WM_ARCH$WM_COMPILER
 
-if [ ! -d "Make" ]
-then
-    mkdir Make
-fi
-
-rulesPath=$WM_DIR/rules/$WM_ARCH$WM_COMPILER
-
+[ -d Make ] || mkdir Make
 rm -f Make/files
 
 dirs=`find . -name "*" -type d -print`
 
 for dir in $dirs
 do
-	if [ $dir != "." ]
-	then
-        baseDirName=`echo $dir | sed 's%^\./%%' | $rulesPath/dirToString`
+    if [ $dir != . ]
+    then
         baseDir=`echo $dir | sed 's%^\./%%'`
+        baseDirName=`echo $baseDir | $bin/dirToString`
 
-        if [ $baseDirName != "Make" ]
+        if [ $baseDirName != Make ]
         then
             echo $baseDirName " = " $baseDir >> Make/files
         fi
-	fi
+    fi
 done
 
 echo >> Make/files
@@ -73,12 +66,12 @@ files=`find . -name "*.[cCylfF]" -type f  -print`
 
 for file in $files
 do
-    pathName=`echo ${file%/*} | sed 's%^\.%%' | sed 's%^/%%' | $rulesPath/dirToString`
+    pathName=`echo ${file%/*} | sed 's%^\.%%' | sed 's%^/%%' | $bin/dirToString`
     fileName=`echo ${file##*/}`
 
     if [ "$pathName" != "" ]
     then
-        echo '$('$pathName")/"$fileName >> Make/files
+        echo '$('$pathName')/'$fileName >> Make/files
     else
         echo $fileName >> Make/files
     fi
@@ -86,7 +79,6 @@ done
 
 echo >> Make/files
 
-pwd=`pwd`
-echo 'EXE = $(FOAM_APPBIN)/'${pwd##*/} >> Make/files
+echo 'EXE = $(FOAM_APPBIN)/'${PWD##*/} >> Make/files
 
 #------------------------------------------------------------------------------

@@ -36,8 +36,6 @@ SourceFiles
 #ifndef treeDataEdge_H
 #define treeDataEdge_H
 
-#include "treeBoundBox.H"
-#include "pointField.H"
 #include "treeBoundBoxList.H"
 #include "linePointRef.H"
 

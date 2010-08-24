@@ -55,7 +55,7 @@ USAGE
     exit 1
 }
 
-# provide immediate help
+# provide immediate help, even if none of the environment is set
 if [ "$1" = "-h" -o "$1" = "-help" ]
 then
     usage
@@ -73,7 +73,7 @@ do
     }
 done
 
-# when compiling anything but a standalone exe,
+# when compiling anything but a standalone exe:
 # WM_PROJECT and WM_PROJECT_DIR must be set
 [ "$1" = exe -o \( "$WM_PROJECT" -a "$WM_PROJECT_DIR" \) ] || {
     echo "$Script error:" 1>&2
@@ -163,25 +163,10 @@ then
         exit $?
     elif [ ! -d $MakeDir ]
     then
-	if [ $WM_ARCH = "darwinPpc" -o $WM_ARCH = "darwinIntel" ]
-	then
-	    # MacOS X find doesn't have a -printf
-	    liste=""
-	    for name in *
-	    do
-		if [ -d $name ]
-		then
-		    if [ $name != "Make" ]
-		    then
-			liste="$liste $name"
-		    fi
-		fi
-	    done
-	    $make -k -f $WM_DIR/MakefileApps FOAM_APPS="$liste"
-	else
-	    $make -k -f $WM_DIR/MakefileApps \
-		FOAM_APPS="`find . -maxdepth 1 \( -type d -a ! -name "." -a ! -name "Optional" -a ! -name "Make" \)  -printf "%f "`"
-	fi
+        # FOAM_APPS=$(find . -maxdepth 1 \( -type d -a ! -name "." -a ! -name Optional -a ! -name Make \)  -printf "%f ")
+        # avoid 'find' with '-printf' ... not entirely portable
+        FOAM_APPS=$(for d in *; do [ -d "$d" -a "$d" != Optional -a "$d" != Make ] && echo "$d"; done | xargs)
+        $make -k -f $WM_DIR/MakefileApps FOAM_APPS="$FOAM_APPS"
         exit $?
     fi
 
@@ -193,7 +178,7 @@ fi
 
 #------------------------------------------------------------------------------
 # Check the existance of the Make directory and files file
-# If both exist make the wmake derived files
+# If both exist, make the wmake derived files
 #------------------------------------------------------------------------------
 
 [ -d $MakeDir ] || {
@@ -255,7 +240,7 @@ fi
 #------------------------------------------------------------------------------
 
 cmd="$make -f $WM_DIR/Makefile MAKE_DIR=$MakeDir INCLUDE_DEPS=$OBJECTS_DIR/includeDeps $makeOption"
-#echo "cmd=$cmd"
+# echo "cmd=$cmd"
 exec $cmd
 
 #------------------------------------------------------------------------------

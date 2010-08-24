@@ -28,20 +28,13 @@ Description
 
 #include "IOstreams.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-//- Construct null
-inline tetCell::tetCell()
+inline Foam::tetCell::tetCell()
 {}
 
 
-//- Construct from components
-inline tetCell::tetCell
+inline Foam::tetCell::tetCell
 (
     const label a,
     const label b,
@@ -56,7 +49,13 @@ inline tetCell::tetCell
 }
 
 
-inline tetCell::tetCell(Istream& is)
+inline Foam::tetCell::tetCell(const FixedList<label, 4>& lst)
+:
+    FixedList<label, 4>(lst)
+{}
+
+
+inline Foam::tetCell::tetCell(Istream& is)
 :
     FixedList<label, 4>(is)
 {}
@@ -64,7 +63,7 @@ inline tetCell::tetCell(Istream& is)
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline triFace tetCell::face(const label facei) const
+inline Foam::triFace Foam::tetCell::face(const label faceI) const
 {
     // Warning. Ordering of faces needs to be the same for a tetrahedron
     // class, a tetrahedron cell shape model and a tetCell
@@ -73,24 +72,24 @@ inline triFace tetCell::face(const label facei) const
     static const label c[] = {3, 2, 3, 1};
 
 #   ifdef FULLDEBUG
-    if (facei >= 4)
+    if (faceI >= 4)
     {
-        FatalErrorIn("tetCell::tetEdge(const label facei) const")
-            << "index out of range 0 -> 3. facei = " << facei
+        FatalErrorIn("tetCell::tetEdge(const label faceI) const")
+            << "index out of range 0 -> 3. faceI = " << faceI
             << abort(FatalError);
     }
 #   endif
 
     return triFace
     (
-        operator[](a[facei]),
-        operator[](b[facei]),
-        operator[](c[facei])
+        operator[](a[faceI]),
+        operator[](b[faceI]),
+        operator[](c[faceI])
     );
 }
 
 
-inline label tetCell::edgeFace(const label edgei) const
+inline Foam::label Foam::tetCell::edgeFace(const label edgeI) const
 {
     // Warning. Ordering of faces needs to be the same for a tetrahedron
     // class, a tetrahedron cell shape model and a tetCell
@@ -98,25 +97,25 @@ inline label tetCell::edgeFace(const label edgei) const
     static const label edgeFaces[6] = {2, 3, 1, 0, 0, 1};
 
 #   ifdef FULLDEBUG
-    if (edgei >= 6)
+    if (edgeI >= 6)
     {
         FatalErrorIn
         (
-            "tetCell::edgeFace(const label edgei, const label facei)"
+            "tetCell::edgeFace(const label edgeI)"
             "const"
-        )   << "edge index out of range 0 -> 5. edgei = " << edgei
+        )   << "edge index out of range 0 -> 5. edgeI = " << edgeI
             << abort(FatalError);
     }
 #   endif
 
-    return edgeFaces[edgei];
+    return edgeFaces[edgeI];
 }
 
 
-inline label tetCell::edgeAdjacentFace
+inline Foam::label Foam::tetCell::edgeAdjacentFace
 (
-    const label edgei,
-    const label facei
+    const label edgeI,
+    const label faceI
 ) const
 {
     // Warning. Ordering of faces needs to be the same for a tetrahedron
@@ -130,55 +129,55 @@ inline label tetCell::edgeAdjacentFace
         {3, -1, -1, 0},
         {1, 0, -1, -1}
     };
-    
+
 #   ifdef FULLDEBUG
-    if (facei >= 4)
+    if (faceI >= 4)
     {
         FatalErrorIn
         (
-            "tetCell::edgeAdjacentFace(const label edgei, const label facei)"
+            "tetCell::edgeAdjacentFace(const label edgeI, const label faceI)"
             "const"
-        )   << "face index out of range 0 -> 3. facei = " << facei
+        )   << "face index out of range 0 -> 3. faceI = " << faceI
             << abort(FatalError);
     }
 
-    if (edgei >= 6)
+    if (edgeI >= 6)
     {
         FatalErrorIn
         (
-            "tetCell::edgeAdjacentFace(const label edgei, const label facei)"
+            "tetCell::edgeAdjacentFace(const label edgeI, const label faceI)"
             "const"
-        )   << "edge index out of range 0 -> 5. edgei = " << edgei
+        )   << "edge index out of range 0 -> 5. edgeI = " << edgeI
             << abort(FatalError);
     }
 #   endif
 
-    return adjacentFace[edgei][facei];
+    return adjacentFace[edgeI][faceI];
 }
 
 
-inline edge tetCell::tetEdge(const label edgei) const
+inline Foam::edge Foam::tetCell::tetEdge(const label edgeI) const
 {
     // Warning. Ordering of edges needs to be the same for a tetrahedron
     // class, a tetrahedron cell shape model and a tetCell
-    // 
+    //
     static const label start[] = {0, 0, 0, 3, 1, 3};
     static const label end[] = {1, 2, 3, 1, 2, 2};
 
 #   ifdef FULLDEBUG
-    if (edgei >= 6)
+    if (edgeI >= 6)
     {
-        FatalErrorIn("tetCell::tetEdge(const label edgei) const")
-            << "index out of range 0 -> 5. edgei = " << edgei
+        FatalErrorIn("tetCell::tetEdge(const label edgeI) const")
+            << "index out of range 0 -> 5. edgeI = " << edgeI
             << abort(FatalError);
     }
 #   endif
 
-    return edge(operator[](start[edgei]), operator[](end[edgei]));
+    return edge(operator[](start[edgeI]), operator[](end[edgeI]));
 }
 
 
-inline tetPointRef tetCell::tet(const pointField& points) const
+inline Foam::tetPointRef Foam::tetCell::tet(const pointField& points) const
 {
     return tetPointRef
     (
@@ -189,9 +188,5 @@ inline tetPointRef tetCell::tet(const pointField& points) const
     );
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

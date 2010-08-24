@@ -33,7 +33,6 @@ Description
 #include "polyMesh.H"
 #include "wedgePolyPatch.H"
 #include "emptyPolyPatch.H"
-#include "transformField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -42,7 +41,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-const scalar twoDPointCorrector::edgeOrthogonalityTol = 1.0 - 1e-5;
+const scalar twoDPointCorrector::edgeOrthogonalityTol = 1.0 - 1e-4;
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -85,11 +84,7 @@ void twoDPointCorrector::calcAddressing() const
     {
         forAll (patches, patchI)
         {
-            if
-            (
-                isA<emptyPolyPatch>(patches[patchI])
-             && patches[patchI].size() > 0
-            )
+            if (isA<emptyPolyPatch>(patches[patchI]) && patches[patchI].size())
             {
                 pn = patches[patchI].faceAreas()[0];
 
@@ -151,8 +146,7 @@ void twoDPointCorrector::calcAddressing() const
     // Construction check: number of points in a read 2-D or wedge geometry
     // should be odd and the number of edges normal to the plane should be
     // exactly half the number of points
-//     if (!isWedge)
-    if (true)
+    if (!isWedge)
     {
         if (meshPoints.size() % 2 != 0)
         {
@@ -293,41 +287,6 @@ void twoDPointCorrector::correctPoints(pointField& p) const
         // correct point locations
         pStart = A + pn*(pn & (pStart - A));
         pEnd = A + pn*(pn & (pEnd - A));
-    }
-
-
-    // Return points to the wedge planes
-    const polyBoundaryMesh& patches = mesh_.boundaryMesh();
-
-    forAll (patches, patchI)
-    {
-        if (isA<wedgePolyPatch>(patches[patchI]))
-        {
-            const wedgePolyPatch& wedgePatch 
-                = refCast<const wedgePolyPatch>(patches[patchI]);
-
-            const labelList& wedgeMeshPoints = wedgePatch.meshPoints();
-
-            // Wedge plane normal
-            vector n = transform
-                (
-                    wedgePatch.faceT(),
-                    wedgePatch.centreNormal()
-                );
-            n /= mag(n);
-
-            // Wedge plane point
-            vector P = wedgePatch.localPoints()[0];
-
-            scalar cos = (pn&n);
-
-            forAll(wedgeMeshPoints, pointI)
-            {
-                scalar L = (n&(P-p[wedgeMeshPoints[pointI]]))/cos;
-
-                p[wedgeMeshPoints[pointI]] += L*pn;
-            }
-        }
     }
 }
 

@@ -73,11 +73,10 @@ void Foam::syncTools::checkTransform
 
 
 // Determines for every point whether it is coupled and if so sets only one.
-Foam::PackedList<1> Foam::syncTools::getMasterPoints(const polyMesh& mesh)
+Foam::PackedBoolList Foam::syncTools::getMasterPoints(const polyMesh& mesh)
 {
-    PackedList<1> isMasterPoint(mesh.nPoints(), 0);
-
-    PackedList<1> donePoint(mesh.nPoints(), 0);
+    PackedBoolList isMasterPoint(mesh.nPoints(), 0);
+    PackedBoolList donePoint(mesh.nPoints(), 0);
 
 
     // Do multiple shared points. Min. proc is master
@@ -88,8 +87,7 @@ Foam::PackedList<1> Foam::syncTools::getMasterPoints(const polyMesh& mesh)
 
     labelList minProc(mesh.globalData().nGlobalPoints(), labelMax);
 
-    IndirectList<label>(minProc, sharedPointAddr) =
-        Pstream::myProcNo();
+    UIndirectList<label>(minProc, sharedPointAddr) = Pstream::myProcNo();
 
     Pstream::listCombineGather(minProc, minEqOp<label>());
     Pstream::listCombineScatter(minProc);
@@ -169,7 +167,7 @@ Foam::PackedList<1> Foam::syncTools::getMasterPoints(const polyMesh& mesh)
             else
             {
                 FatalErrorIn("syncTools::getMasterPoints(const polyMesh&)")
-                    << "Cannot handle patch " << patches[patchI].name()
+                    << "Cannot handle coupled patch " << patches[patchI].name()
                     << " of type " <<  patches[patchI].type()
                     << abort(FatalError);
             }
@@ -194,11 +192,10 @@ Foam::PackedList<1> Foam::syncTools::getMasterPoints(const polyMesh& mesh)
 
 
 // Determines for every edge whether it is coupled and if so sets only one.
-Foam::PackedList<1> Foam::syncTools::getMasterEdges(const polyMesh& mesh)
+Foam::PackedBoolList Foam::syncTools::getMasterEdges(const polyMesh& mesh)
 {
-    PackedList<1> isMasterEdge(mesh.nEdges(), 0);
-
-    PackedList<1> doneEdge(mesh.nEdges(), 0);
+    PackedBoolList isMasterEdge(mesh.nEdges(), 0);
+    PackedBoolList doneEdge(mesh.nEdges(), 0);
 
 
     // Do multiple shared edges. Min. proc is master
@@ -209,8 +206,7 @@ Foam::PackedList<1> Foam::syncTools::getMasterEdges(const polyMesh& mesh)
 
     labelList minProc(mesh.globalData().nGlobalEdges(), labelMax);
 
-    IndirectList<label>(minProc, sharedEdgeAddr) =
-        Pstream::myProcNo();
+    UIndirectList<label>(minProc, sharedEdgeAddr) = Pstream::myProcNo();
 
     Pstream::listCombineGather(minProc, minEqOp<label>());
     Pstream::listCombineScatter(minProc);
@@ -290,7 +286,7 @@ Foam::PackedList<1> Foam::syncTools::getMasterEdges(const polyMesh& mesh)
             else
             {
                 FatalErrorIn("syncTools::getMasterEdges(const polyMesh&)")
-                    << "Cannot handle patch " << patches[patchI].name()
+                    << "Cannot handle coupled patch " << patches[patchI].name()
                     << " of type " <<  patches[patchI].type()
                     << abort(FatalError);
             }
@@ -314,9 +310,10 @@ Foam::PackedList<1> Foam::syncTools::getMasterEdges(const polyMesh& mesh)
 }
 
 
-Foam::PackedList<1> Foam::syncTools::getMasterFaces(const polyMesh& mesh)
+// Determines for every face whether it is coupled and if so sets only one.
+Foam::PackedBoolList Foam::syncTools::getMasterFaces(const polyMesh& mesh)
 {
-    PackedList<1> isMasterFace(mesh.nFaces(), 1);
+    PackedBoolList isMasterFace(mesh.nFaces(), 1);
 
     const polyBoundaryMesh& patches = mesh.boundaryMesh();
 
@@ -356,11 +353,12 @@ Foam::PackedList<1> Foam::syncTools::getMasterFaces(const polyMesh& mesh)
             }
         }
     }
+
     return isMasterFace;
 }
 
 
-template<>
+template <>
 void Foam::syncTools::separateList
 (
     const vectorField& separation,
@@ -395,7 +393,7 @@ void Foam::syncTools::separateList
 }
 
 
-template<>
+template <>
 void Foam::syncTools::separateList
 (
     const vectorField& separation,
@@ -429,7 +427,7 @@ void Foam::syncTools::separateList
 }
 
 
-template<>
+template <>
 void Foam::syncTools::separateList
 (
     const vectorField& separation,

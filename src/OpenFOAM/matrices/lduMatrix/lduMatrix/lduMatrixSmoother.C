@@ -30,46 +30,149 @@ License
 
 namespace Foam
 {
-    defineRunTimeSelectionTable(lduSmoother, word);
+    defineRunTimeSelectionTable(lduSmoother, symMatrix);
+    defineRunTimeSelectionTable(lduSmoother, asymMatrix);
 }
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+Foam::word Foam::lduMatrix::smoother::getName
+(
+    const dictionary& dict
+)
+{
+    word name;
+
+    // handle primitive or dictionary entry
+    const entry& e = dict.lookupEntry("smoother", false, false);
+    if (e.isDict())
+    {
+        e.dict().lookup("smoother") >> name;
+    }
+    else
+    {
+        e.stream() >> name;
+    }
+
+    return name;
+}
+
+
 Foam::autoPtr<Foam::lduMatrix::smoother> Foam::lduMatrix::smoother::New
 (
-    const word& smootherName,
     const lduMatrix& matrix,
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
-    const lduInterfaceFieldPtrsList& interfaces
+    const lduInterfaceFieldPtrsList& interfaces,
+    const dictionary& dict
 )
 {
-    wordConstructorTable::iterator constructorIter =
-        wordConstructorTablePtr_->find(smootherName);
+    word smootherName;
 
-    if (constructorIter == wordConstructorTablePtr_->end())
+    // Handle primitive or dictionary entry
+    const entry& e = dict.lookupEntry("smoother", false, false);
+    if (e.isDict())
     {
-        FatalErrorIn
-        (
-            "lduMatrix::smoother::New"
-        )   << "Unknown symmetric matrix smoother " << smootherName
-            << endl << endl
-            << "Valid matrix smoothers are :" << endl
-            << wordConstructorTablePtr_->toc()
-            << exit(FatalError);
+        e.dict().lookup("smoother") >> smootherName;
+    }
+    else
+    {
+        e.stream() >> smootherName;
     }
 
-    return autoPtr<lduMatrix::smoother>
-    (
-        constructorIter()
+    // Not (yet?) needed:
+    // const dictionary& controls = e.isDict() ? e.dict() : dictionary::null;
+
+    if (matrix.symmetric())
+    {
+        symMatrixConstructorTable::iterator constructorIter =
+            symMatrixConstructorTablePtr_->find(smootherName);
+
+        if (constructorIter == symMatrixConstructorTablePtr_->end())
+        {
+            FatalIOErrorIn
+            (
+                "lduMatrix::smoother::New\n"
+                "(\n"
+                "    const lduMatrix& matrix,\n"
+                "    const FieldField<Field, scalar>& coupleBouCoeffs,\n"
+                "    const FieldField<Field, scalar>& coupleIntCoeffs,\n"
+                "    const lduInterfaceFieldPtrsList& interfaces,\n"
+                "    const dictionary& dict\n"
+                ")",
+                dict
+            )   << "Unknown symmetric matrix smoother " << smootherName
+                << endl << endl
+                << "Valid symmetric matrix smoothers are :" << endl
+                << symMatrixConstructorTablePtr_->toc()
+                << exit(FatalIOError);
+        }
+
+        return autoPtr<lduSmoother>
         (
-            matrix,
-            coupleBouCoeffs,
-            coupleIntCoeffs,
-            interfaces
-        )
-    );
+            constructorIter()
+            (
+                matrix,
+                coupleBouCoeffs,
+                coupleIntCoeffs,
+                interfaces
+            )
+        );
+    }
+    else if (matrix.asymmetric())
+    {
+        asymMatrixConstructorTable::iterator constructorIter =
+            asymMatrixConstructorTablePtr_->find(smootherName);
+
+        if (constructorIter == asymMatrixConstructorTablePtr_->end())
+        {
+            FatalIOErrorIn
+            (
+                "lduMatrix::smoother::New\n"
+                "(\n"
+                "    const lduMatrix& matrix,\n"
+                "    const FieldField<Field, scalar>& coupleBouCoeffs,\n"
+                "    const FieldField<Field, scalar>& coupleIntCoeffs,\n"
+                "    const lduInterfaceFieldPtrsList& interfaces,\n"
+                "    const dictionary& dict\n"
+                ")",
+                dict
+            )   << "Unknown asymmetric matrix smoother " << smootherName
+                << endl << endl
+                << "Valid asymmetric matrix smoothers are :" << endl
+                << asymMatrixConstructorTablePtr_->toc()
+                << exit(FatalIOError);
+        }
+
+        return autoPtr<lduSmoother>
+        (
+            constructorIter()
+            (
+                matrix,
+                coupleBouCoeffs,
+                coupleIntCoeffs,
+                interfaces
+            )
+        );
+    }
+    else
+    {
+        FatalIOErrorIn
+        (
+            "lduMatrix::smoother::New\n"
+            "(\n"
+            "    const lduMatrix& matrix,\n"
+            "    const FieldField<Field, scalar>& coupleBouCoeffs,\n"
+            "    const FieldField<Field, scalar>& coupleIntCoeffs,\n"
+            "    const lduInterfaceFieldPtrsList& interfaces,\n"
+            "    const dictionary& dict\n"
+            ")",
+            dict
+        )   << "cannot solve incomplete matrix, "
+               "no diagonal or off-diagonal coefficient"
+            << exit(FatalIOError);
+    }
 }
 
 

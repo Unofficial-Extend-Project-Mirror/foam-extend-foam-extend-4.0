@@ -25,17 +25,16 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "coupledPolyPatch.H"
-#include "SortableList.H"
 #include "ListOps.H"
 #include "transform.H"
 #include "OFstream.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-    defineTypeNameAndDebug(coupledPolyPatch, 0);
-}
+defineTypeNameAndDebug(Foam::coupledPolyPatch, 0);
+
+Foam::scalar Foam::coupledPolyPatch::matchTol = 1E-3;
+
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
@@ -107,6 +106,13 @@ void Foam::coupledPolyPatch::calcTransformTensors
             {
                 forwardT_.setSize(1);
                 reverseT_.setSize(1);
+
+                if (debug)
+                {
+                    Pout<< "    difference in rotation less than"
+                        << " local tolerance "
+                        << error << ". Assuming uniform rotation." << endl;
+                }
             }
         }
         else
@@ -175,7 +181,7 @@ void Foam::coupledPolyPatch::calcTransformTensors
 
     if (debug)
     {
-        Pout<< "    separation_:" << separation_ << nl
+        Pout<< "    separation_:" << separation_.size() << nl
             << "    forwardT size:" << forwardT_.size() << endl;
     }
 }

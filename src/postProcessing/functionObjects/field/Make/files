@@ -1,0 +1,23 @@
+fieldAverage/fieldAverage/fieldAverage.C
+fieldAverage/fieldAverageItem/fieldAverageItem.C
+fieldAverage/fieldAverageItem/fieldAverageItemIO.C
+fieldAverage/fieldAverageFunctionObject/fieldAverageFunctionObject.C
+
+fieldMinMax/fieldMinMax.C
+fieldMinMax/fieldMinMaxFunctionObject.C
+
+minMaxField/minMaxField.C
+
+fieldValues/fieldValue/fieldValue.C
+fieldValues/faceSource/faceSource.C
+fieldValues/faceSource/faceSourceFunctionObject.C
+fieldValues/cellSource/cellSource.C
+fieldValues/cellSource/cellSourceFunctionObject.C
+
+readFields/readFields.C
+readFields/readFieldsFunctionObject.C
+
+surfaceInterpolateFields/surfaceInterpolateFieldsFunctionObject.C
+surfaceInterpolateFields/surfaceInterpolateFields.C
+
+LIB = $(FOAM_LIBBIN)/libfieldFunctionObjects

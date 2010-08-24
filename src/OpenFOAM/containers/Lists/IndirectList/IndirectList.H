@@ -61,7 +61,7 @@ public:
     // Constructors
 
         //- Construct given the complete list and the addressing array
-        inline IndirectList(const UList<T>&, const List<label>&);
+        inline IndirectList(const UList<T>&, const UList<label>&);
 
 
     // Member Functions
@@ -69,13 +69,15 @@ public:
         // Access
 
             inline label size() const;
+            inline bool  empty() const;
+
             inline const UList<T>& completeList() const;
             inline const List<label>& addressing() const;
 
         // Edit
 
             //- Reset addressing
-            void resetAddressing(const List<label>& addr);
+            void resetAddressing(const UList<label>&);
 
 
         // Member Operators

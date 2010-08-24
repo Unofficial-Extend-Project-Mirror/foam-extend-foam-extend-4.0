@@ -36,10 +36,8 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-namespace Foam
-{
-    defineTypeNameAndDebug(polyMesh, 0);
-}
+defineTypeNameAndDebug(Foam::polyMesh, 0);
+
 
 Foam::word Foam::polyMesh::defaultRegion = "region0";
 Foam::word Foam::polyMesh::meshSubDir = "polyMesh";
@@ -51,40 +49,79 @@ void Foam::polyMesh::calcDirections() const
 {
     for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
     {
-        directions_[cmpt] = 1;
+        solutionD_[cmpt] = 1;
     }
 
-    label nEmptyPatches = 0;
+    // Knock out empty and wedge directions. Note:they will be present on all
+    // domains.
 
-    vector dirVec = vector::zero;
+    label nEmptyPatches = 0;
+    label nWedgePatches = 0;
+
+    vector emptyDirVec = vector::zero;
+    vector wedgeDirVec = vector::zero;
 
     forAll(boundaryMesh(), patchi)
     {
-        if (isA<emptyPolyPatch>(boundaryMesh()[patchi]))
+        if (boundaryMesh()[patchi].size())
         {
-            if (boundaryMesh()[patchi].size())
+            if (isA<emptyPolyPatch>(boundaryMesh()[patchi]))
             {
                 nEmptyPatches++;
-                dirVec += sum(cmptMag(boundaryMesh()[patchi].faceAreas()));
+                emptyDirVec += sum(cmptMag(boundaryMesh()[patchi].faceAreas()));
+            }
+            else if (isA<wedgePolyPatch>(boundaryMesh()[patchi]))
+            {
+                const wedgePolyPatch& wpp = refCast<const wedgePolyPatch>
+                (
+                    boundaryMesh()[patchi]
+                );
+
+                nWedgePatches++;
+                wedgeDirVec += cmptMag(wpp.centreNormal());
             }
         }
     }
 
     if (nEmptyPatches)
     {
-        reduce(dirVec, sumOp<vector>());
+        reduce(emptyDirVec, sumOp<vector>());
 
-        dirVec /= mag(dirVec);
+        emptyDirVec /= mag(emptyDirVec);
 
         for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
         {
-            if (dirVec[cmpt] > 1e-6)
+            if (emptyDirVec[cmpt] > 1e-6)
             {
-                directions_[cmpt] = -1;
+                solutionD_[cmpt] = -1;
             }
             else
             {
-                directions_[cmpt] = 1;
+                solutionD_[cmpt] = 1;
+            }
+        }
+    }
+
+
+    // Knock out wedge directions
+
+    geometricD_ = solutionD_;
+
+    if (nWedgePatches)
+    {
+        reduce(wedgeDirVec, sumOp<vector>());
+
+        wedgeDirVec /= mag(wedgeDirVec);
+
+        for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
+        {
+            if (wedgeDirVec[cmpt] > 1e-6)
+            {
+                geometricD_[cmpt] = -1;
+            }
+            else
+            {
+                geometricD_[cmpt] = 1;
             }
         }
     }
@@ -164,7 +201,8 @@ Foam::polyMesh::polyMesh(const IOobject& io)
         *this
     ),
     bounds_(allPoints_),
-    directions_(Vector<label>::zero),
+    geometricD_(Vector<label>::zero),
+    solutionD_(Vector<label>::zero),
     pointZones_
     (
         IOobject
@@ -232,7 +270,7 @@ Foam::polyMesh::polyMesh(const IOobject& io)
     }
     else
     {
-        cellIOList c
+        cellIOList cLst
         (
             IOobject
             (
@@ -250,7 +288,7 @@ Foam::polyMesh::polyMesh(const IOobject& io)
 
 
         // Set the primitive mesh
-        initMesh(c);
+        initMesh(cLst);
 
         owner_.write();
         neighbour_.write();
@@ -279,10 +317,10 @@ Foam::polyMesh::polyMesh(const IOobject& io)
 Foam::polyMesh::polyMesh
 (
     const IOobject& io,
-    const pointField& points,
-    const faceList& faces,
-    const labelList& owner,
-    const labelList& neighbour,
+    const Xfer<pointField>& points,
+    const Xfer<faceList>& faces,
+    const Xfer<labelList>& owner,
+    const Xfer<labelList>& neighbour,
     const bool syncPar
 )
 :
@@ -360,7 +398,8 @@ Foam::polyMesh::polyMesh
         0
     ),
     bounds_(allPoints_, syncPar),
-    directions_(Vector<label>::zero),
+    geometricD_(Vector<label>::zero),
+    solutionD_(Vector<label>::zero),
     pointZones_
     (
         IOobject
@@ -440,9 +479,9 @@ Foam::polyMesh::polyMesh
 Foam::polyMesh::polyMesh
 (
     const IOobject& io,
-    const pointField& points,
-    const faceList& faces,
-    const cellList& cells,
+    const Xfer<pointField>& points,
+    const Xfer<faceList>& faces,
+    const Xfer<cellList>& cells,
     const bool syncPar
 )
 :
@@ -519,7 +558,8 @@ Foam::polyMesh::polyMesh
         0
     ),
     bounds_(allPoints_, syncPar),
-    directions_(Vector<label>::zero),
+    geometricD_(Vector<label>::zero),
+    solutionD_(Vector<label>::zero),
     pointZones_
     (
         IOobject
@@ -580,10 +620,10 @@ Foam::polyMesh::polyMesh
             (
                 "polyMesh::polyMesh\n"
                 "(\n"
-                "    const IOobject& io,\n"
-                "    const pointField& points,\n"
-                "    const faceList& faces,\n"
-                "    const cellList& cells\n"
+                "    const IOobject&,\n"
+                "    const Xfer<pointField>&,\n"
+                "    const Xfer<faceList>&,\n"
+                "    const Xfer<cellList>&\n"
                 ")\n"
             )   << "Face " << faceI << "contains vertex labels out of range: "
                 << curFace << " Max point index = " << allPoints_.size()
@@ -591,10 +631,13 @@ Foam::polyMesh::polyMesh
         }
     }
 
-    // Check if the faces and cells are valid
-    forAll (cells, cellI)
+    // transfer in cell list
+    cellList cLst(cells);
+
+    // Check if cells are valid
+    forAll (cLst, cellI)
     {
-        const cell& curCell = cells[cellI];
+        const cell& curCell = cLst[cellI];
 
         if (min(curCell) < 0 || max(curCell) > allFaces_.size())
         {
@@ -602,10 +645,10 @@ Foam::polyMesh::polyMesh
             (
                 "polyMesh::polyMesh\n"
                 "(\n"
-                "    const IOobject& io,\n"
-                "    const pointField& points,\n"
-                "    const faceList& faces,\n"
-                "    const cellList& cells\n"
+                "    const IOobject&,\n"
+                "    const Xfer<pointField>&,\n"
+                "    const Xfer<faceList>&,\n"
+                "    const Xfer<cellList>&\n"
                 ")\n"
             )   << "Cell " << cellI << "contains face labels out of range: "
                 << curCell << " Max face index = " << allFaces_.size()
@@ -614,17 +657,17 @@ Foam::polyMesh::polyMesh
     }
 
     // Set the primitive mesh
-    initMesh(const_cast<cellList&>(cells));
+    initMesh(cLst);
 }
 
 
 void Foam::polyMesh::resetPrimitives
 (
     const label nUsedFaces,
-    const pointField& points,
-    const faceList& faces,
-    const labelList& owner,
-    const labelList& neighbour,
+    const Xfer<pointField>& pts,
+    const Xfer<faceList>& fcs,
+    const Xfer<labelList>& own,
+    const Xfer<labelList>& nei,
     const labelList& patchSizes,
     const labelList& patchStarts,
     const bool validBoundary
@@ -633,27 +676,32 @@ void Foam::polyMesh::resetPrimitives
     // Clear addressing. Keep geometric props for mapping.
     clearAddressing();
 
-    // Take over new primitive data. Note extra optimization to prevent
-    // assignment to self.
-    if (&allPoints_ != &points)
+    // Take over new primitive data.
+    // Optimized to avoid overwriting data at all
+    if (&pts)
     {
-        allPoints_ = points;
-        // Points will be reset in initMesh()
+        allPoints_.transfer(pts());
+
+         // Recalculate bounds with all points.  HJ, 17/Oct/2008
+         // ... if  points have change.  HJ, 19/Aug/2010
+        bounds_ = boundBox(allPoints_, validBoundary);
     }
-    if (&allFaces_ != &faces)
+
+    if (&fcs)
     {
-        allFaces_ = faces;
-        // Faces will be reset in initMesh()
-//         faces_.reset(allFaces_, owner.size());
+        allGaces_.transfer(fcs());
     }
-    if (&owner_ != &owner)
+
+    if (&own)
     {
-        owner_ = owner;
+        owner_.transfer(own());
     }
-    if (&neighbour_ != &neighbour)
+
+    if (&nei)
     {
-        neighbour_ = neighbour;
+        neighbour_.transfer(nei());
     }
+
 
     // Reset patch sizes and starts
     forAll(boundary_, patchI)
@@ -684,10 +732,10 @@ void Foam::polyMesh::resetPrimitives
                 "polyMesh::polyMesh::resetPrimitives\n"
                 "(\n"
                 "    const label nUsedFaces,\n"
-                "    const pointField& points,\n"
-                "    const faceList& faces,\n"
-                "    const labelList& owner,\n"
-                "    const labelList& neighbour,\n"
+                "    const Xfer<pointField>& points,\n"
+                "    const Xfer<faceList>& faces,\n"
+                "    const Xfer<labelList>& owner,\n"
+                "    const Xfer<labelList>& neighbour,\n"
                 "    const labelList& patchSizes,\n"
                 "    const labelList& patchStarts\n"
                 ")\n"
@@ -701,10 +749,10 @@ void Foam::polyMesh::resetPrimitives
                 "polyMesh::polyMesh::resetPrimitives\n"
                 "(\n"
                 "    const label nUsedFaces,\n"
-                "    const pointField& points,\n"
-                "    const faceList& faces,\n"
-                "    const labelList& owner,\n"
-                "    const labelList& neighbour,\n"
+                "    const Xfer<pointField>& points,\n"
+                "    const Xfer<faceList>& faces,\n"
+                "    const Xfer<labelList>& owner,\n"
+                "    const Xfer<labelList>& neighbour,\n"
                 "    const labelList& patchSizes,\n"
                 "    const labelList& patchStarts\n"
                 ")\n"
@@ -715,12 +763,10 @@ void Foam::polyMesh::resetPrimitives
     }
 
 
-    // Set the primitive mesh from the owner_, neighbour_. Works
-    // out from patch end where the active faces stop.
+    // Set the primitive mesh from the owner_, neighbour_.
+    // Works out from patch end where the active faces stop.
     initMesh();
 
-    // Recalculate bounds with all points.  HJ, 17/Oct/2008
-    bounds_ = boundBox(allPoints_, validBoundary);
 
     if (validBoundary)
     {
@@ -746,10 +792,10 @@ void Foam::polyMesh::resetPrimitives
                 "polyMesh::polyMesh::resetPrimitives\n"
                 "(\n"
                 "    const label nUsedFaces,\n"
-                "    const pointField& points,\n"
-                "    const faceList& faces,\n"
-                "    const labelList& owner,\n"
-                "    const labelList& neighbour,\n"
+                "    const Xfer<pointField>&,\n"
+                "    const Xfer<faceList>&,\n"
+                "    const Xfer<labelList>& owner,\n"
+                "    const Xfer<labelList>& neighbour,\n"
                 "    const labelList& patchSizes,\n"
                 "    const labelList& patchStarts\n"
                 ")\n"
@@ -802,44 +848,37 @@ const Foam::fileName& Foam::polyMesh::facesInstance() const
 }
 
 
-const Foam::Vector<Foam::label>& Foam::polyMesh::directions() const
+const Foam::Vector<Foam::label>& Foam::polyMesh::geometricD() const
 {
-    if (directions_.x() == 0)
+    if (geometricD_.x() == 0)
     {
         calcDirections();
     }
 
-    return directions_;
+    return geometricD_;
 }
 
 
 Foam::label Foam::polyMesh::nGeometricD() const
 {
-    label nWedges = 0;
+    return cmptSum(geometricD() + Vector<label>::one)/2;
+}
 
-    forAll(boundary_, patchi)
+
+const Foam::Vector<Foam::label>& Foam::polyMesh::solutionD() const
+{
+    if (solutionD_.x() == 0)
     {
-        if (isA<wedgePolyPatch>(boundary_[patchi]))
-        {
-            nWedges++;
-        }
+        calcDirections();
     }
 
-    if (nWedges != 0 && nWedges != 2 && nWedges != 4)
-    {
-        FatalErrorIn("label polyMesh::nGeometricD() const")
-            << "Number of wedge patches " << nWedges << " is incorrect, "
-               "should be 0, 2 or 4"
-            << exit(FatalError);
-    }
-
-    return nSolutionD() - nWedges/2;
+    return solutionD_;
 }
 
 
 Foam::label Foam::polyMesh::nSolutionD() const
 {
-    return cmptSum(directions() + Vector<label>::one)/2;
+    return cmptSum(solutionD() + Vector<label>::one)/2;
 }
 
 
@@ -850,7 +889,7 @@ void Foam::polyMesh::addPatches
     const bool validBoundary
 )
 {
-    if (boundaryMesh().size() > 0)
+    if (boundaryMesh().size())
     {
         FatalErrorIn
         (
@@ -858,6 +897,10 @@ void Foam::polyMesh::addPatches
         )   << "boundary already exists"
             << abort(FatalError);
     }
+
+    // Reset valid directions
+    geometricD_ = Vector<label>::zero;
+    solutionD_ = Vector<label>::zero;
 
     boundary_.setSize(p.size());
 
@@ -905,9 +948,9 @@ void Foam::polyMesh::addZones
         (
             "void addZones\n"
             "(\n"
-            "    const List<pointZone*>& pz,\n"
-            "    const List<faceZone*>& fz,\n"
-            "    const List<cellZone*>& cz\n"
+            "    const List<pointZone*>&,\n"
+            "    const List<faceZone*>&,\n"
+            "    const List<cellZone*>&\n"
             ")"
         )   << "point, face or cell zone already exists"
             << abort(FatalError);
@@ -1013,7 +1056,7 @@ const Foam::faceList& Foam::polyMesh::faces() const
     if (clearedPrimitives_)
     {
         FatalErrorIn("const faceList& polyMesh::faces() const")
-            << "allFaces deallocated"
+            << "faces deallocated"
             << abort(FatalError);
     }
 
@@ -1130,6 +1173,10 @@ Foam::tmp<Foam::scalarField> Foam::polyMesh::movePoints
     faceZones_.movePoints(allPoints_);
     cellZones_.movePoints(allPoints_);
 
+    // Reset valid directions (could change with rotation)
+    geometricD_ = Vector<label>::zero;
+    solutionD_ = Vector<label>::zero;
+
     return sweptVols;
 }
 
@@ -1140,6 +1187,39 @@ void Foam::polyMesh::resetMotion() const
     curMotionTimeIndex_ = 0;
     deleteDemandDrivenData(oldAllPointsPtr_);
     deleteDemandDrivenData(oldPointsPtr_);
+}
+
+// Reset motion by deleting old points
+void Foam::polyMesh::setOldPoints
+(
+    const pointField& setPoints
+) 
+{
+
+    if(setPoints.size() != allPoints_.size())
+    {
+            FatalErrorIn
+            (
+                "polyMesh::setOldPoints\n"
+                "(\n"
+                "    const pointField& setPoints\n"
+                ")\n"
+            )   << "setPoints size " << setPoints.size() << "different from the mesh points size "
+                << allPoints_.size()
+                << abort(FatalError);
+    }
+
+    moving(false);
+
+    // Mesh motion in the new time step
+    deleteDemandDrivenData(oldAllPointsPtr_);
+    deleteDemandDrivenData(oldPointsPtr_);
+    allPoints_ = setPoints;
+    oldAllPointsPtr_ = new pointField(allPoints_);    
+    oldPointsPtr_ = new pointField::subField(oldAllPoints(), nPoints());
+    curMotionTimeIndex_ = 0;
+    primitiveMesh::clearGeom();
+
 }
 
 
@@ -1222,7 +1302,7 @@ const Foam::globalMeshData& Foam::polyMesh::globalData() const
 // Remove all files and some subdirs (eg, sets)
 void Foam::polyMesh::removeFiles(const fileName& instanceDir) const
 {
-    fileName meshFilesPath = db().path()/instanceDir/meshSubDir;
+    fileName meshFilesPath = thisDb().path()/instanceDir/meshDir();
 
     rm(meshFilesPath/"points");
     rm(meshFilesPath/"faces");
@@ -1237,7 +1317,7 @@ void Foam::polyMesh::removeFiles(const fileName& instanceDir) const
     rm(meshFilesPath/"parallelData");
 
     // remove subdirectories
-    if (dir(meshFilesPath/"sets"))
+    if (isDir(meshFilesPath/"sets"))
     {
         rmDir(meshFilesPath/"sets");
     }

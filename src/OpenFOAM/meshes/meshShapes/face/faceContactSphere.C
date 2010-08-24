@@ -24,17 +24,14 @@ License
 
 Description
     Return location of contact sphere on the face
-    
+
 \*---------------------------------------------------------------------------*/
 
 #include "face.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
-scalar face::contactSphereDiameter
+Foam::scalar Foam::face::contactSphereDiameter
 (
     const point& p,
     const vector& n,
@@ -44,15 +41,12 @@ scalar face::contactSphereDiameter
     scalar magN = Foam::mag(n);
 
     vector n1 = n/(magN + SMALL);
-
     vector n2 = normal(meshPoints);
+
     n2 /= Foam::mag(n2) + SMALL;
 
     return 2*((centre(meshPoints) - p) & n2)/((n1 & n2) - 1.0);
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

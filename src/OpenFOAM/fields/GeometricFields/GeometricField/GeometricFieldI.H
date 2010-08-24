@@ -27,14 +27,23 @@ License
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type, template<class> class PatchField, class GeoMesh>
-inline 
-const typename 
+inline const Foam::GeometricField<Type, PatchField, GeoMesh>&
+Foam::GeometricField<Type, PatchField, GeoMesh>::null()
+{
+    return *reinterpret_cast< GeometricField<Type, PatchField, GeoMesh>* >(0);
+}
+
+
+template<class Type, template<class> class PatchField, class GeoMesh>
+inline
+const typename
 Foam::GeometricField<Type, PatchField, GeoMesh>::DimensionedInternalField&
 Foam::GeometricField<Type, PatchField, GeoMesh>::
 dimensionedInternalField() const
 {
     return *this;
 }
+
 
 template<class Type, template<class> class PatchField, class GeoMesh>
 inline

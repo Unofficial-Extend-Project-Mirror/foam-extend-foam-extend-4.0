@@ -467,10 +467,8 @@ void Foam::globalPoints::remove(const Map<label>& directNeighbours)
     Map<label> oldMeshToProcPoint(meshToProcPoint_);
     meshToProcPoint_.clear();
 
-    procPoints_.shrink();
     List<procPointList> oldProcPoints;
     oldProcPoints.transfer(procPoints_);
-    procPoints_.clear();
 
     // Go through all equivalences
     for
@@ -535,7 +533,7 @@ void Foam::globalPoints::remove(const Map<label>& directNeighbours)
         {
             // This happens for 'wedge' like cyclics where the two halves
             // come together in the same point so share the same meshPoint.
-            // So this meshPoint will have info of size one only. 
+            // So this meshPoint will have info of size one only.
             if
             (
                 pointInfo[0][0] != Pstream::myProcNo()
@@ -655,8 +653,8 @@ void Foam::globalPoints::sendSharedPoints(const labelList& changedIndices) const
             }
 
             toNeighbour
-                << IndirectList<label>(sharedPointAddr_, changedIndices)()
-                << IndirectList<label>(sharedPointLabels_, changedIndices)();
+                << UIndirectList<label>(sharedPointAddr_, changedIndices)()
+                << UIndirectList<label>(sharedPointLabels_, changedIndices)();
         }
     }
 }
@@ -968,7 +966,7 @@ Foam::globalPoints::globalPoints(const polyMesh& mesh)
     //        Pout<< "    pointI:" << meshPointI << ' '
     //            << mesh.points()[meshPointI]
     //            << " connected to proc " << pointInfo[i][0]
-    //            << " point:" << pointInfo[i][1] 
+    //            << " point:" << pointInfo[i][1]
     //        << endl;
     //    }
     //}

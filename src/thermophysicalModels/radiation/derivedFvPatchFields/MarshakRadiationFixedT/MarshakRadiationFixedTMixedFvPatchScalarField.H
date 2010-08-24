@@ -26,7 +26,8 @@ Class
     Foam::MarshakRadiationFixedTMixedFvPatchScalarField
 
 Description
-    Radiation temperature specified
+    Marshak boundary for radiation G field
+    - radiation temperature specified
 
 SourceFiles
     MarshakRadiationFixedTMixedFvPatchScalarField.C

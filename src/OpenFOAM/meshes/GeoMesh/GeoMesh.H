@@ -76,7 +76,7 @@ public:
     // Member Functions
 
         //- Return the object registry
-        const objectRegistry& db() const
+        const objectRegistry& thisDb() const
         {
             return mesh_;
         }

@@ -76,10 +76,11 @@ inline complex complex::conjugate() const
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
-inline void complex::operator=(const complex& c)
+inline const complex& complex::operator=(const complex& c)
 {
     re = c.re;
     im = c.im;
+    return *this;
 }
 
 
@@ -109,10 +110,11 @@ inline void complex::operator/=(const complex& c)
 }
 
 
-inline void complex::operator=(const scalar s)
+inline const complex& complex::operator=(const scalar s)
 {
     re = s;
     im = 0.0;
+    return *this;
 }
 
 
@@ -234,8 +236,8 @@ inline complex operator+(const complex& c1, const complex& c2)
 {
     return complex
     (
-        c1.re+c2.re,
-        c1.im+c2.im
+        c1.re + c2.re,
+        c1.im + c2.im
     );
 }
 
@@ -254,8 +256,8 @@ inline complex operator-(const complex& c1, const complex& c2)
 {
     return complex
     (
-        c1.re-c2.re,
-        c1.im-c2.im
+        c1.re - c2.re,
+        c1.im - c2.im
     );
 }
 

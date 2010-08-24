@@ -105,6 +105,10 @@ public:
 };
 
 
+template<>
+inline bool contiguous<labelledTri>()  {return true;}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

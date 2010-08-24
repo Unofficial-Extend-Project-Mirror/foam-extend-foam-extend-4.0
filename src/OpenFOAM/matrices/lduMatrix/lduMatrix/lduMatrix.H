@@ -23,13 +23,14 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    lduMatrix
+    Foam::lduMatrix
 
 Description
     lduMatrix is a general matrix class in which the coefficients are
     stored as three arrays, one for the upper triangle, one for the
-    lower triangle and a third for the diagonal.  Addressing arrays must
-    be supplied for the upper and lower triangles.
+    lower triangle and a third for the diagonal.
+
+    Addressing arrays must be supplied for the upper and lower triangles.
 
     It might be better if this class were organised as a hierachy starting
     from an empty matrix, then deriving diagonal, symmetric and asymmetric
@@ -64,15 +65,21 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+
+class lduMatrix;
+Ostream& operator<<(Ostream&, const lduMatrix&);
+
+
 /*---------------------------------------------------------------------------*\
                            Class lduMatrix Declaration
 \*---------------------------------------------------------------------------*/
 
 class lduMatrix
 {
-    // private data
+    // Private data
 
-        // LDU mesh reference
+        //- LDU mesh reference
         const lduMesh& lduMesh_;
 
         //- Coefficients (not including interfaces)
@@ -81,23 +88,38 @@ class lduMatrix
 
 public:
 
-    //- Class returned by the solver
-    //  containing performance statistics
+    //- Class returned by the solver, containing performance statistics
     class solverPerformance
     {
-        word   solverName_;
-        word   fieldName_;
-        scalar initialResidual_;
-        scalar finalResidual_;
-        label  noIterations_;
-        bool   converged_;
-        bool   singular_;
+        // Private Data
+
+            //- Name of solver
+            word solverName_;
+
+            //- Name of field
+            word fieldName_;
+
+            //- Initial residual
+            scalar initialResidual_;
+
+            //- Final residual
+            scalar finalResidual_;
+
+            //- Number of iterations
+            label noIterations_;
+
+            //- Has the solver converged?
+            bool converged_;
+
+            //- Has the solver indicated a singular matrix?
+            bool singular_;
 
 
     public:
 
         // Constructors
 
+            //- Construct null
             solverPerformance()
             :
                 initialResidual_(0),
@@ -108,15 +130,16 @@ public:
             {}
 
 
+            //- Construct from components
             solverPerformance
             (
-                const word&  solverName,
-                const word&  fieldName,
+                const word& solverName,
+                const word& fieldName,
                 const scalar iRes = 0,
                 const scalar fRes = 0,
-                const label  nIter = 0,
-                const bool   converged = false,
-                const bool   singular = false
+                const label nIter = 0,
+                const bool converged = false,
+                const bool singular = false
             )
             :
                 solverName_(solverName),
@@ -227,11 +250,6 @@ public:
             //- Maximum number of iterations
             label maxIter_;
 
-
-    protected:
-
-        // Protected data
-
             //- Matrix reference
             const lduMatrix& matrix_;
 
@@ -298,7 +316,7 @@ public:
                     const FieldField<Field, scalar>& coupleBouCoeffs,
                     const FieldField<Field, scalar>& coupleIntCoeffs,
                     const lduInterfaceFieldPtrsList& interfaces,
-                    Istream& solverData
+                    const dictionary& dict
                 ),
                 (
                     fieldName,
@@ -306,7 +324,7 @@ public:
                     coupleBouCoeffs,
                     coupleIntCoeffs,
                     interfaces,
-                    solverData
+                    dict
                 )
             );
 
@@ -321,7 +339,7 @@ public:
                     const FieldField<Field, scalar>& coupleBouCoeffs,
                     const FieldField<Field, scalar>& coupleIntCoeffs,
                     const lduInterfaceFieldPtrsList& interfaces,
-                    Istream& solverData
+                    const dictionary& dict
                 ),
                 (
                     fieldName,
@@ -329,23 +347,12 @@ public:
                     coupleBouCoeffs,
                     coupleIntCoeffs,
                     interfaces,
-                    solverData
+                    dict
                 )
             );
 
 
         // Constructors
-
-            //- Construct from Istream
-            solver
-            (
-                const word& fieldName,
-                const lduMatrix& matrix,
-                const FieldField<Field, scalar>& coupleBouCoeffs,
-                const FieldField<Field, scalar>& coupleIntCoeffs,
-                const lduInterfaceFieldPtrsList& interfaces,
-                Istream& solverData
-            );
 
             //- Construct from a dictionary
             solver
@@ -369,7 +376,7 @@ public:
                 const FieldField<Field, scalar>& coupleBouCoeffs,
                 const FieldField<Field, scalar>& coupleIntCoeffs,
                 const lduInterfaceFieldPtrsList& interfaces,
-                Istream& solverData
+                const dictionary& dict
             );
 
 
@@ -430,7 +437,7 @@ public:
 
 
             //- Read and reset the solver parameters from the given stream
-            virtual void read(Istream& solverData);
+            virtual void read(const dictionary&);
 
             virtual solverPerformance solve
             (
@@ -444,9 +451,7 @@ public:
     //- Abstract base-class for lduMatrix smoothers
     class smoother
     {
-    protected:
-
-        // Protected data
+        // Private data
 
             //- Matrix reference
             const lduMatrix& matrix_;
@@ -463,6 +468,9 @@ public:
 
     public:
 
+        //- Find the smoother name (directly or from a sub-dictionary)
+        static word getName(const dictionary&);
+
         //- Runtime type information
         virtual const word& type() const = 0;
 
@@ -473,7 +481,26 @@ public:
             (
                 autoPtr,
                 smoother,
-                word,
+                symMatrix,
+                (
+                    const lduMatrix& matrix,
+                    const FieldField<Field, scalar>& coupleBouCoeffs,
+                    const FieldField<Field, scalar>& coupleIntCoeffs,
+                    const lduInterfaceFieldPtrsList& interfaces
+                ),
+                (
+                    matrix,
+                    coupleBouCoeffs,
+                    coupleIntCoeffs,
+                    interfaces
+                )
+            );
+
+            declareRunTimeSelectionTable
+            (
+                autoPtr,
+                smoother,
+                asymMatrix,
                 (
                     const lduMatrix& matrix,
                     const FieldField<Field, scalar>& coupleBouCoeffs,
@@ -505,11 +532,11 @@ public:
             //- Return a new smoother
             static autoPtr<smoother> New
             (
-                const word& smootherName,
                 const lduMatrix& matrix,
                 const FieldField<Field, scalar>& coupleBouCoeffs,
                 const FieldField<Field, scalar>& coupleIntCoeffs,
-                const lduInterfaceFieldPtrsList& interfaces
+                const lduInterfaceFieldPtrsList& interfaces,
+                const dictionary& dict
             );
 
 
@@ -558,9 +585,7 @@ public:
     //- Abstract base-class for lduMatrix preconditioners
     class preconditioner
     {
-    protected:
-
-        // Protected data
+        // Private data
 
             //- Matrix reference
             const lduMatrix& matrix_;
@@ -577,6 +602,9 @@ public:
 
     public:
 
+        //- Find the preconditioner name (directly or from a sub-dictionary)
+        static word getName(const dictionary&);
+
         //- Runtime type information
         virtual const word& type() const = 0;
 
@@ -587,7 +615,28 @@ public:
             (
                 autoPtr,
                 preconditioner,
-                dictionary,
+                symMatrix,
+                (
+                    const lduMatrix& matrix,
+                    const FieldField<Field, scalar>& coupleBouCoeffs,
+                    const FieldField<Field, scalar>& coupleIntCoeffs,
+                    const lduInterfaceFieldPtrsList& interfaces,
+                    const dictionary& dict
+                ),
+                (
+                    matrix,
+                    coupleBouCoeffs,
+                    coupleIntCoeffs,
+                    interfaces,
+                    dict
+                )
+            );
+
+            declareRunTimeSelectionTable
+            (
+                autoPtr,
+                preconditioner,
+                asymMatrix,
                 (
                     const lduMatrix& matrix,
                     const FieldField<Field, scalar>& coupleBouCoeffs,
@@ -636,6 +685,11 @@ public:
 
 
         // Member functions
+
+            //- Read and reset the preconditioner parameters
+            //  from the given stream
+            virtual void read(const dictionary&)
+            {}
 
             //- Return wA the preconditioned form of residual rA
             virtual void precondition
@@ -798,7 +852,7 @@ public:
                 const direction cmpt
             ) const;
 
-            //- Matrix transpose multiplication with updated coupled interfaces.
+            //- Matrix transpose multiplication with updated coupled interfaces
             //  Result will be added to Tx
             void TmulCore
             (

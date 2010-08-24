@@ -30,7 +30,7 @@ License
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class T>
-Foam::primitiveEntry::primitiveEntry(const word& keyword, const T& t)
+Foam::primitiveEntry::primitiveEntry(const keyType& keyword, const T& t)
 :
     entry(keyword),
     ITstream(keyword, tokenList(10))

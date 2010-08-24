@@ -25,27 +25,22 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "string.H"
-#include "debug.H"
 #include "OSspecific.H"
 
 /* * * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * * */
 
 const char* const Foam::string::typeName = "string";
 int Foam::string::debug(debug::debugSwitch(string::typeName, 0));
+const Foam::string Foam::string::null;
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 // Count and return the number of a given character in the string
 Foam::string::size_type Foam::string::count(const char c) const
 {
-    register size_type cCount=0;
+    register size_type cCount = 0;
 
-    for
-    (
-        const_iterator iter = begin();
-        iter != end();
-        ++iter
-    )
+    for (const_iterator iter = begin(); iter != end(); ++iter)
     {
         if (*iter == c)
         {
@@ -201,7 +196,7 @@ Foam::string& Foam::string::expand()
             // otherwise add extra test
             if (user == "OpenFOAM")
             {
-                *this = dotFoam(file);
+                *this = findEtcFile(file);
             }
             else
             {
@@ -268,9 +263,9 @@ bool Foam::string::removeRepeated(const char character)
 // Return string with repeated characters removed
 Foam::string Foam::string::removeRepeated(const char character) const
 {
-    string s(*this);
-    s.removeRepeated(character);
-    return s;
+    string str(*this);
+    str.removeRepeated(character);
+    return str;
 }
 
 
@@ -293,9 +288,9 @@ bool Foam::string::removeTrailing(const char character)
 // Return string with trailing character removed
 Foam::string Foam::string::removeTrailing(const char character) const
 {
-    string s(*this);
-    s.removeTrailing(character);
-    return s;
+    string str(*this);
+    str.removeTrailing(character);
+    return str;
 }
 
 

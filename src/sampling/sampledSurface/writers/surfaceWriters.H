@@ -36,21 +36,39 @@ Description
 #include "fieldTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Only used internally
+#define makeTypeSurfaceWritersTypeName(typeWriter, dataType)                 \
+                                                                             \
+    defineNamedTemplateTypeNameAndDebug(typeWriter< dataType >, 0)
 
-namespace Foam
-{
+// Sometimes used externally
+#define makeSurfaceWritersTypeName(typeWriter)                               \
+                                                                             \
+    makeTypeSurfaceWritersTypeName(typeWriter, scalar);                      \
+    makeTypeSurfaceWritersTypeName(typeWriter, vector);                      \
+    makeTypeSurfaceWritersTypeName(typeWriter, sphericalTensor);             \
+    makeTypeSurfaceWritersTypeName(typeWriter, symmTensor);                  \
+    makeTypeSurfaceWritersTypeName(typeWriter, tensor)
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Define type info for single dataType template instantiation (eg, vector)
+#define makeSurfaceWriterType(typeWriter, dataType)                          \
+                                                                             \
+    defineNamedTemplateTypeNameAndDebug(typeWriter< dataType >, 0);          \
+    addTemplatedToRunTimeSelectionTable                                      \
+    (                                                                        \
+        surfaceWriter, typeWriter, dataType, word                            \
+    )
 
-typedef surfaceWriter<scalar> scalarWriter;
-typedef surfaceWriter<vector> vectorWriter;
-typedef surfaceWriter<sphericalTensor> sphericalTensorWriter;
-typedef surfaceWriter<symmTensor> symmTensorWriter;
-typedef surfaceWriter<tensor> tensorWriter;
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Define type info for scalar, vector etc. instantiations
+#define makeSurfaceWriters(typeWriter)                                       \
+                                                                             \
+    makeSurfaceWriterType(typeWriter, scalar);                               \
+    makeSurfaceWriterType(typeWriter, vector);                               \
+    makeSurfaceWriterType(typeWriter, sphericalTensor);                      \
+    makeSurfaceWriterType(typeWriter, symmTensor);                           \
+    makeSurfaceWriterType(typeWriter, tensor)
 
-} // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

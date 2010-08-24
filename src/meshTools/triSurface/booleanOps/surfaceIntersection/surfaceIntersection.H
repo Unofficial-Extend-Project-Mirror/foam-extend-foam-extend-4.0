@@ -120,10 +120,6 @@ class surfaceIntersection
             Ostream&
         );
 
-        //- Transfer contents of DynamicList to straight List
-        template<class T>
-        static void transfer(DynamicList<T>&, List<T>&);
-
         //- Transfer contents of List<DynamicList<..> > to List<List<..>>
         template<class T>
         static void transfer(List<DynamicList<T> >&,  List<List<T> >&);

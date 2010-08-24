@@ -65,30 +65,37 @@ class ICCG
         //- Disallow default bitwise assignment
         void operator=(const ICCG&);
 
-        //- Return the dictionary data-stream constructed from the components.
-        //  Needed for backward compatibility
-        IStringStream solverDataStream
-        (
-            const scalar tolerance,
-            const scalar relTol
-        ) const;
-
-        //- Return the dictionary data-stream constructed from the old-style
-        //  data-stream.  Needed for backward compatibility
-        IStringStream solverDataStream
-        (
-            const word& solverName,
-            Istream& solverData
-        ) const;
-
-
 public:
+
+        //- Return the dictionary constructed from the components.
+        //  Needed for backward compatibility
+        static dictionary solverDict
+        (
+            const scalar tol,
+            const scalar relTol
+        );
+
+        //- Return the dictionary constructed from the old-style data-stream.
+        //  Needed for backward compatibility
+        static dictionary solverDict(Istream&);
+
 
     //- Runtime type information
     TypeName("ICCG");
 
 
     // Constructors
+
+        //- Construct from matrix components and solver data stream
+        ICCG
+        (
+            const word& fieldName,
+            const lduMatrix& matrix,
+            const FieldField<Field, scalar>& coupleBouCoeffs,
+            const FieldField<Field, scalar>& coupleIntCoeffs,
+            const lduInterfaceFieldPtrsList& interfaces,
+            const dictionary& solverControls
+        );
 
         //- Construct from matrix components and tolerances
         ICCG
@@ -102,28 +109,11 @@ public:
             const scalar relTol = 0.0
         );
 
-        //- Construct from matrix components and solver data stream
-        ICCG
-        (
-            const word& fieldName,
-            const lduMatrix& matrix,
-            const FieldField<Field, scalar>& coupleBouCoeffs,
-            const FieldField<Field, scalar>& coupleIntCoeffs,
-            const lduInterfaceFieldPtrsList& interfaces,
-            Istream& solverData
-        );
-
-
     // Destructor
 
         virtual ~ICCG()
         {}
 
-
-    // Member Functions
-
-        //- Read and reset the solver parameters from the given stream
-        void read(Istream& solverData);
 };
 
 

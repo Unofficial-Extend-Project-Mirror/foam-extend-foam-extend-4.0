@@ -120,6 +120,22 @@ Foam::cellZone::cellZone
 {}
 
 
+Foam::cellZone::cellZone
+(
+    const word& name,
+    const Xfer<labelList>& addr,
+    const label index,
+    const cellZoneMesh& zm
+)
+:
+    labelList(addr),
+    name_(name),
+    index_(index),
+    zoneMesh_(zm),
+    cellLookupMapPtr_(NULL)
+{}
+
+
 // Construct from dictionary
 Foam::cellZone::cellZone
 (
@@ -143,6 +159,21 @@ Foam::cellZone::cellZone
 (
     const cellZone& cz,
     const labelList& addr,
+    const label index,
+    const cellZoneMesh& zm
+)
+:
+    labelList(addr),
+    name_(cz.name()),
+    index_(index),
+    zoneMesh_(zm),
+    cellLookupMapPtr_(NULL)
+{}
+
+Foam::cellZone::cellZone
+(
+    const cellZone& cz,
+    const Xfer<labelList>& addr,
     const label index,
     const cellZoneMesh& zm
 )
@@ -232,15 +263,12 @@ void Foam::cellZone::write(Ostream& os) const
 
 void Foam::cellZone::writeDict(Ostream& os) const
 {
-    os  << indent << name() << nl
-        << indent << token::BEGIN_BLOCK << nl
-        << incrIndent
-        << indent << "type " << type() << token::END_STATEMENT << nl;
+    os  << nl << name() << nl << token::BEGIN_BLOCK << nl
+        << "    type " << type() << token::END_STATEMENT << nl;
 
     writeEntry("cellLabels", os);
 
-    os  << decrIndent
-        << indent << token::END_BLOCK << endl;
+    os  << token::END_BLOCK << endl;
 }
 
 

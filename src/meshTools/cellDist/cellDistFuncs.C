@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "cellDistFuncs.H"
@@ -98,27 +96,6 @@ Foam::labelHashSet Foam::cellDistFuncs::getPatchIDs
         const polyPatch& patch = bMesh[patchI];
 
         if (patchNamesHash.found(patch.name()))
-        {
-            patchIDs.insert(patchI);
-        }
-    }
-    return patchIDs;
-}
-
-
-// Get patch ids of patches of certain type (e.g. 'polyProcessorPatch')
-Foam::labelHashSet Foam::cellDistFuncs::getPatchIDs(const word& wantedType)
- const
-{
-    const polyBoundaryMesh& bMesh = mesh().boundaryMesh();
-
-    labelHashSet patchIDs(bMesh.size());
-
-    forAll(bMesh, patchI)
-    {
-        const polyPatch& patch = bMesh[patchI];
-
-        if (patch.type() == wantedType)
         {
             patchIDs.insert(patchI);
         }
@@ -263,7 +240,7 @@ Foam::label Foam::cellDistFuncs::getPointNeighbours
             nbs.erase(nb);
         }
 
-        if (nbs.size() != 0)
+        if (nbs.size())
         {
             FatalErrorIn("getPointNeighbours")
                 << "Problem: fast pointNeighbours routine did not find "

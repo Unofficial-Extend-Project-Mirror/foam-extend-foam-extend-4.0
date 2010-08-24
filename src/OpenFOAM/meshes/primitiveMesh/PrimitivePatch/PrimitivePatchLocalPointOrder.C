@@ -30,11 +30,6 @@ Description
 #include "SLList.H"
 #include "boolList.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template
@@ -45,12 +40,12 @@ template
     class PointType
 >
 void
-PrimitivePatch<Face, FaceList, PointField, PointType>::
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
 calcLocalPointOrder() const
 {
     // Note: Cannot use bandCompressing as point-point addressing does
     // not exist and is not considered generally useful.
-    //  
+    //
 
     if (debug)
     {
@@ -128,7 +123,7 @@ calcLocalPointOrder() const
                         }
                     }
                 }
-            } while (faceOrder.size() > 0);
+            } while (faceOrder.size());
         }
     }
 
@@ -141,9 +136,5 @@ calcLocalPointOrder() const
     }
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

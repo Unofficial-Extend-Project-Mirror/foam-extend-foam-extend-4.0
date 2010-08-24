@@ -27,31 +27,32 @@ License
 #include "error.H"
 
 #include "UPtrList.H"
-#include "PtrListLoopM.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
 template<class T>
-UPtrList<T>::UPtrList()
+Foam::UPtrList<T>::UPtrList()
 :
     ptrs_()
 {}
 
 
 template<class T>
-UPtrList<T>::UPtrList(const label s)
+Foam::UPtrList<T>::UPtrList(const label s)
 :
-    ptrs_(s, reinterpret_cast<T*>(NULL))
+    ptrs_(s, reinterpret_cast<T*>(0))
 {}
 
 
 template<class T>
-UPtrList<T>::UPtrList(UPtrList<T>& a, bool reUse)
+Foam::UPtrList<T>::UPtrList(const Xfer<UPtrList<T> >& lst)
+{
+    transfer(lst());
+}
+
+
+template<class T>
+Foam::UPtrList<T>::UPtrList(UPtrList<T>& a, bool reUse)
 :
     ptrs_(a.ptrs_, reUse)
 {}
@@ -60,11 +61,11 @@ UPtrList<T>::UPtrList(UPtrList<T>& a, bool reUse)
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class T>
-void UPtrList<T>::setSize(const label newSize)
+void Foam::UPtrList<T>::setSize(const label newSize)
 {
     label oldSize = size();
 
-    if (newSize == 0)
+    if (newSize <= 0)
     {
         clear();
     }
@@ -76,8 +77,8 @@ void UPtrList<T>::setSize(const label newSize)
     {
         ptrs_.setSize(newSize);
 
-        register label i;
-        for (i=oldSize; i<newSize; i++)
+        // set new elements to NULL
+        for (register label i=oldSize; i<newSize; i++)
         {
             ptrs_[i] = NULL;
         }
@@ -86,7 +87,7 @@ void UPtrList<T>::setSize(const label newSize)
 
 
 template<class T>
-void UPtrList<T>::clear()
+void Foam::UPtrList<T>::clear()
 {
     ptrs_.clear();
 }
@@ -95,14 +96,14 @@ void UPtrList<T>::clear()
 // Transfer the contents of the argument List into this List
 // and anull the argument list
 template<class T>
-void UPtrList<T>::transfer(UPtrList<T>& a)
+void Foam::UPtrList<T>::transfer(UPtrList<T>& a)
 {
     ptrs_.transfer(a.ptrs_);
 }
 
 
 template<class T>
-void UPtrList<T>::reorder(const UList<label>& oldToNew)
+void Foam::UPtrList<T>::reorder(const UList<label>& oldToNew)
 {
     if (oldToNew.size() != size())
     {
@@ -112,7 +113,7 @@ void UPtrList<T>::reorder(const UList<label>& oldToNew)
             << ")." << abort(FatalError);
     }
 
-    List<T*> newPtrs_(ptrs_.size(), reinterpret_cast<T*>(NULL));
+    List<T*> newPtrs_(ptrs_.size(), reinterpret_cast<T*>(0));
 
     forAll(*this, i)
     {
@@ -148,10 +149,6 @@ void UPtrList<T>::reorder(const UList<label>& oldToNew)
     ptrs_.transfer(newPtrs_);
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

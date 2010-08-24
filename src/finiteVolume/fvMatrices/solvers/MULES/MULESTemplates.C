@@ -108,7 +108,7 @@ void Foam::MULES::explicitSolve
     {
         psiIf =
         (
-            mesh.V0()*rho.oldTime()*psi0/(deltaT*mesh.V())
+            mesh.Vsc0()*rho.oldTime()*psi0/(deltaT*mesh.Vsc())
           + Su.field()
           - psiIf
         )/(rho/deltaT - Sp.field());
@@ -142,8 +142,7 @@ void Foam::MULES::implicitSolve
 {
     const fvMesh& mesh = psi.mesh();
 
-    dictionary MULESSolver(mesh.solver(psi.name()));
-    const dictionary& MULEScontrols = MULESSolver.subDict("MULESImplicit");
+    const dictionary& MULEScontrols = mesh.solverDict(psi.name());
 
     label maxIter
     (
@@ -255,7 +254,7 @@ void Foam::MULES::implicitSolve
         solve
         (
             psiConvectionDiffusion + fvc::div(lambda*phiCorr),
-            MULEScontrols.lookup("solver")
+            MULEScontrols
         );
 
         scalar maxPsiM1 = gMax(psi.internalField()) - 1.0;
@@ -269,8 +268,8 @@ void Foam::MULES::implicitSolve
         }
         else
         {
-            Info<< "max(" + psi.name() + " - 1 = " << maxPsiM1 << endl;
-            Info<< "min(" + psi.name() + ") = " << minPsi << endl;
+            Info<< "MULES: max(" << psi.name() << " - 1) = " << maxPsiM1
+                << " min(" << psi.name() << ") = " << minPsi << endl;
 
             phiBD = psiConvectionDiffusion.flux();
 
@@ -327,7 +326,8 @@ void Foam::MULES::limiter
 
     const unallocLabelList& owner = mesh.owner();
     const unallocLabelList& neighb = mesh.neighbour();
-    const scalarField& V = mesh.V();
+    tmp<volScalarField::DimensionedInternalField> tVsc = mesh.Vsc();
+    const scalarField& V = tVsc();
     const scalar deltaT = mesh.time().deltaT().value();
 
     const scalarField& phiBDIf = phiBD;
@@ -454,14 +454,16 @@ void Foam::MULES::limiter
 
     if (mesh.moving())
     {
+        tmp<volScalarField::DimensionedInternalField> V0 = mesh.Vsc0();
+
         psiMaxn =
             V*((rho/deltaT - Sp)*psiMaxn - Su)
-          - (mesh.V0()/deltaT)*rho.oldTime()*psi0
+          - (V0()/deltaT)*rho.oldTime()*psi0
           + sumPhiBD;
 
         psiMinn =
             V*(Su - (rho/deltaT - Sp)*psiMinn)
-          + (mesh.V0()/deltaT)*rho.oldTime()*psi0
+          + (V0/deltaT)*rho.oldTime()*psi0
           - sumPhiBD;
     }
     else

@@ -110,6 +110,9 @@ public:
         //- Construct with length specified.
         explicit UPtrList(const label);
 
+        //- Construct by transferring the parameter contents
+        UPtrList(const Xfer<UPtrList<T> >&);
+
         //- Construct as copy or re-use as specified.
         UPtrList(UPtrList<T>&, bool reUse);
 
@@ -121,6 +124,9 @@ public:
             //- Return the number of elements in the UPtrList
             inline label size() const;
 
+            //- Return true if the UPtrList is empty (ie, size() is zero).
+            inline bool empty() const;
+
 
         // Edit
 
@@ -129,12 +135,20 @@ public:
             //  the end of a UPtrList.
             void setSize(const label);
 
+            //- Reset size of UPtrList.  This can only be used to set the size
+            //  of an empty UPtrList, extend a UPtrList, remove entries from
+            //  the end of a UPtrList.
+            inline void resize(const label);
+
             //- Clear the UPtrList, i.e. set size to zero
             void clear();
 
             //- Transfer the contents of the argument UPtrList into this
             //  UPtrList and annull the argument list.
             void transfer(UPtrList<T>&);
+
+            //- Transfer contents to the Xfer container
+            inline Xfer<UPtrList<T> > xfer();
 
             //- Is element set
             inline bool set(const label) const;

@@ -31,9 +31,9 @@ License
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::LUscalarMatrix::LUscalarMatrix(const Matrix<scalar>& matrix)
+Foam::LUscalarMatrix::LUscalarMatrix(const scalarSquareMatrix& matrix)
 :
-    scalarMatrix(matrix),
+    scalarSquareMatrix(matrix),
     pivotIndices_(n())
 {
     LUDecompose(*this, pivotIndices_);
@@ -101,7 +101,7 @@ Foam::LUscalarMatrix::LUscalarMatrix
                 nCells += lduMatrices[i].size();
             }
 
-            Matrix<scalar> m(nCells, nCells, 0.0);
+            scalarSquareMatrix m(nCells, nCells, 0.0);
             transfer(m);
             convert(lduMatrices);
         }
@@ -109,7 +109,7 @@ Foam::LUscalarMatrix::LUscalarMatrix
     else
     {
         label nCells = ldum.lduAddr().size();
-        Matrix<scalar> m(nCells, nCells, 0.0);
+        scalarSquareMatrix m(nCells, nCells, 0.0);
         transfer(m);
         convert(ldum, interfaceCoeffs, interfaces);
     }

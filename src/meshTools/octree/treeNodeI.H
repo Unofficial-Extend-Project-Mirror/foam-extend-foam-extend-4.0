@@ -26,45 +26,44 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 // Get type of octant
 template <class Type>
-inline label treeNode<Type>::getVolType(const label octant) const
+inline Foam::label Foam::treeNode<Type>::getVolType(const label octant) const
 {
     return (volType_ >> 2*octant) & 0x3;
 }
 
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
 template <class Type>
-inline const point& treeNode<Type>::mid() const
+inline const Foam::point& Foam::treeNode<Type>::midpoint() const
 {
     return mid_;
 }
 
+
 template <class Type>
-inline treeElem<Type>* const* treeNode<Type>::subNodes() const
+inline Foam::treeElem<Type>* const* Foam::treeNode<Type>::subNodes() const
 {
     return subNodes_;
 }
 
+
 // octant contains pointer to treeNode(1) or treeLeaf(0)
 template <class Type>
-inline label treeNode<Type>::isNode(const label octant) const
+inline Foam::label Foam::treeNode<Type>::isNode(const label octant) const
 {
     return subNodeTypes_ & (0x1 << octant);
 }
 
+
 // Get pointer to sub node
 template <class Type>
-inline treeNode<Type>* treeNode<Type>::getNodePtr(const label octant) const
+inline Foam::treeNode<Type>* Foam::treeNode<Type>::getNodePtr
+(
+    const label octant
+) const
 {
 #   ifdef FULLDEBUG
     if (!isNode(octant))
@@ -81,7 +80,10 @@ inline treeNode<Type>* treeNode<Type>::getNodePtr(const label octant) const
 
 // Get pointer to sub leaf
 template <class Type>
-inline treeLeaf<Type>* treeNode<Type>::getLeafPtr(const label octant) const
+inline Foam::treeLeaf<Type>* Foam::treeNode<Type>::getLeafPtr
+(
+    const label octant
+) const
 {
 #   ifdef FULLDEBUG
     if (isNode(octant))
@@ -95,8 +97,5 @@ inline treeLeaf<Type>* treeNode<Type>::getLeafPtr(const label octant) const
     return static_cast<treeLeaf<Type>*>(subNodes_[octant]);
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

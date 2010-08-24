@@ -23,30 +23,22 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    Define the globals used in the FOAM library.  It is important that these
-    are constructed in the appropriate order to avoid the use of unconstructed
-    data in the global namespace.
+    Define the globals used in the OpenFOAM library.
+    It is important that these are constructed in the appropriate order to
+    avoid the use of unconstructed data in the global namespace.
 
-    This file has the extension .ver to force it to be parsed by the script
-    which converts WM_PROJECT_VERSION into the appropriate version number
-    string.
+    This file has the extension .Cver to trigger a Makefile rule that converts
+    'VERSION\_STRING' and 'BUILD\_STRING' into the appropriate strings.
 
 \*---------------------------------------------------------------------------*/
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 #include "foamVersion.H"
 
-#define STRINGIFY(s) #s
-#define STR_FOAM_DEV_REVISION_NUMBER(s) STRINGIFY(s)
-
-const char* const Foam::FOAMversion           = WM_PROJECT_VERSION;
+const char* const Foam::FOAMversion = "VERSION_STRING";
+const char* const Foam::FOAMbuild = "BUILD_STRING";
 const char* const Foam::FOAMDevRevisionNumber = STR_FOAM_DEV_REVISION_NUMBER(FOAM_DEV_REVISION_NUMBER);
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// Static initializers for string::null, word::null and fileName::null
-
-#include "stringsGlobals.C"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Setup an error handler for the global new operator

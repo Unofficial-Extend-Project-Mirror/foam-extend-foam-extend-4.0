@@ -92,6 +92,7 @@ void Foam::setRefCell
                     dict
                 )   << "Unable to set reference cell for field " << field.name()
                     << nl << "    Reference point " << refPointName
+                    << " " << refPointi
                     << " found on " << sumHasRef << " domains (should be one)"
                     << nl << exit(FatalIOError);
             }
@@ -108,7 +109,7 @@ void Foam::setRefCell
                  "    bool\n"
                  ")",
                 dict
-            )   << "Unable to set reference cell for field" << field.name()
+            )   << "Unable to set reference cell for field " << field.name()
                 << nl
                 << "    Please supply either " << refCellName
                 << " or " << refPointName << nl << exit(FatalIOError);

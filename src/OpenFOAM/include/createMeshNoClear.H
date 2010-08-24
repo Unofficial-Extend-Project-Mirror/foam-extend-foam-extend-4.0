@@ -1,13 +1,19 @@
-    Info<< "Create mesh, no clear-out for time = "
-        << runTime.timeName() << nl << endl;
+//
+// createMeshNoClear.H
+// ~~~~~~~~~~~~~~~~~~~
+// currently identical to createMesh.H
 
-    fvMesh mesh
+    Foam::Info
+        << "Create mesh, no clear-out for time = "
+        << runTime.timeName() << Foam::nl << Foam::endl;
+
+    Foam::fvMesh mesh
     (
-        IOobject
+        Foam::IOobject
         (
-            fvMesh::defaultRegion,
+            Foam::fvMesh::defaultRegion,
             runTime.timeName(),
             runTime,
-            IOobject::MUST_READ
+            Foam::IOobject::MUST_READ
         )
     );

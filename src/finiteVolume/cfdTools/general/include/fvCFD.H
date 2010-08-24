@@ -9,6 +9,7 @@
 #include "fvMatrices.H"
 #include "fvm.H"
 #include "linear.H"
+#include "uniformDimensionedFields.H"
 #include "calculatedFvPatchFields.H"
 #include "fixedValueFvPatchFields.H"
 #include "adjustPhi.H"

@@ -31,13 +31,16 @@ License
 
 namespace Foam
 {
-namespace compressibilityModels
-{
-
-defineTypeNameAndDebug(Chung, 0);
-addToRunTimeSelectionTable(barotropicCompressibilityModel, Chung, dictionary);
-
-}
+    namespace compressibilityModels
+    {
+        defineTypeNameAndDebug(Chung, 0);
+        addToRunTimeSelectionTable
+        (
+            barotropicCompressibilityModel,
+            Chung,
+            dictionary
+        );
+    }
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -45,10 +48,11 @@ addToRunTimeSelectionTable(barotropicCompressibilityModel, Chung, dictionary);
 Foam::compressibilityModels::Chung::Chung
 (
     const dictionary& compressibilityProperties,
-    const volScalarField& gamma
+    const volScalarField& gamma,
+    const word& psiName
 )
 :
-    barotropicCompressibilityModel(compressibilityProperties, gamma),
+    barotropicCompressibilityModel(compressibilityProperties, gamma, psiName),
     psiv_(compressibilityProperties_.lookup("psiv")),
     psil_(compressibilityProperties_.lookup("psil")),
     rhovSat_(compressibilityProperties_.lookup("rhovSat")),

@@ -26,11 +26,11 @@ InNamespace
     Foam
 
 Description
-    Functions used by OpenFOAM which are specific to the UNIX operating system
-    and need to be replaced or emulated on other systems.
+    Functions used by OpenFOAM that are specific to POSIX compliant
+    operating systems and need to be replaced or emulated on other systems.
 
 SourceFiles
-    Unix.C
+    POSIX.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -62,8 +62,8 @@ pid_t pgid();
 bool env(const word&);
 
 //- Return environment variable of given name
-//  Return string::null if the environment is undefined
-string getEnv(const word& name);
+//  Return string() if the environment is undefined
+string getEnv(const word&);
 
 //- Set an environment variable
 bool setEnv(const word& name, const string& value, const bool overwrite);
@@ -101,33 +101,36 @@ bool chDir(const fileName& dir);
 //  -# shipped settings:
 //    - $WM_PROJECT_DIR/etc/
 //
-//  @return the full path name or fileName::null if the name cannot be found
-fileName dotFoam(const fileName& name);
+//  @return the full path name or fileName() if the name cannot be found
+//  Optionally abort if the file cannot be found
+fileName findEtcFile(const fileName&, bool mandatory=false);
 
 //- Make a directory and return an error if it could not be created
 //  and does not already exist
 bool mkDir(const fileName&, mode_t=0777);
 
 //- Set the file mode
-bool chmod(const fileName&, const mode_t);
+bool chMod(const fileName&, const mode_t);
 
 //- Return the file mode
 mode_t mode(const fileName&);
 
-//- Return the file type: FILE or DIRECTORY
+//- Return the file type: DIRECTORY or FILE
 fileName::Type type(const fileName&);
 
-//- Does the name exist in the filing system?
-bool exists(const fileName& name);
+//- Does the name exist (as DIRECTORY or FILE) in the file system?
+//  Optionally enable/disable check for gzip file.
+bool exists(const fileName&, const bool checkGzip=true);
 
-//- Does the file exist?
-bool file(const fileName&);
+//- Does the name exist as a DIRECTORY in the file system?
+bool isDir(const fileName&);
 
-//- Does the directory exist?
-bool dir(const fileName&);
+//- Does the name exist as a FILE in the file system?
+//  Optionally enable/disable check for gzip file.
+bool isFile(const fileName&, const bool checkGzip=true);
 
 //- Return size of file
-off_t size(const fileName&);
+off_t fileSize(const fileName&);
 
 //- Return time of last file modification
 time_t lastModified(const fileName&);
@@ -141,15 +144,19 @@ fileNameList readDir
 );
 
 //- Copy, recursively if necessary, the source to the destination
-bool cp(const fileName& srcFile, const fileName& destFile);
+bool cp(const fileName& src, const fileName& dst);
 
-//- Create a softlink. destFile should not exist. Returns true if successful.
-bool ln(const fileName& srcFile, const fileName& destFile);
+//- Create a softlink. dst should not exist. Returns true if successful.
+bool ln(const fileName& src, const fileName& dst);
 
-//- Rename srcFile destFile
-bool mv(const fileName& srcFile, const fileName& destFile);
+//- Rename src to dst
+bool mv(const fileName& src, const fileName& dst);
 
-//- Remove a file returning true if successful otherwise false
+//- Rename to a corresponding backup file
+//  If the backup file already exists, attempt with "01" .. "99" suffix
+bool mvBak(const fileName&, const std::string& ext = "bak");
+
+//- Remove a file, returning true if successful otherwise false
 bool rm(const fileName&);
 
 //- Remove a dirctory and its contents
@@ -164,10 +171,10 @@ void fdClose(const int);
 //- Check if machine is up by pinging given port
 bool ping(const word&, const label port, const label timeOut);
 
-//- Check if machine is up by ping port 22 = ssh and 222 = rsh
+//- Check if machine is up by pinging port 22 (ssh) and 222 (rsh)
 bool ping(const word&, const label timeOut=10);
 
-//- Executes a command specified in command
+//- Execute the specified command
 int system(const string& command);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

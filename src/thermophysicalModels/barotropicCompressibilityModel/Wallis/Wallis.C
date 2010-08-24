@@ -31,13 +31,16 @@ License
 
 namespace Foam
 {
-namespace compressibilityModels
-{
-
-defineTypeNameAndDebug(Wallis, 0);
-addToRunTimeSelectionTable(barotropicCompressibilityModel, Wallis, dictionary);
-
-}
+    namespace compressibilityModels
+    {
+        defineTypeNameAndDebug(Wallis, 0);
+        addToRunTimeSelectionTable
+        (
+            barotropicCompressibilityModel,
+            Wallis,
+            dictionary
+        );
+    }
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -45,10 +48,11 @@ addToRunTimeSelectionTable(barotropicCompressibilityModel, Wallis, dictionary);
 Foam::compressibilityModels::Wallis::Wallis
 (
     const dictionary& compressibilityProperties,
-    const volScalarField& gamma
+    const volScalarField& gamma,
+    const word& psiName
 )
 :
-    barotropicCompressibilityModel(compressibilityProperties, gamma),
+    barotropicCompressibilityModel(compressibilityProperties, gamma, psiName),
     psiv_(compressibilityProperties_.lookup("psiv")),
     psil_(compressibilityProperties_.lookup("psil")),
     rhovSat_(compressibilityProperties_.lookup("rhovSat")),
@@ -62,8 +66,9 @@ Foam::compressibilityModels::Wallis::Wallis
 
 void Foam::compressibilityModels::Wallis::correct()
 {
-    psi_ = (gamma_*rhovSat_ + (scalar(1) - gamma_)*rholSat_)
-         *(gamma_*psiv_/rhovSat_ + (scalar(1) - gamma_)*psil_/rholSat_);
+    psi_ =
+        (gamma_*rhovSat_ + (scalar(1) - gamma_)*rholSat_)
+       *(gamma_*psiv_/rhovSat_ + (scalar(1) - gamma_)*psil_/rholSat_);
 }
 
 

@@ -63,7 +63,7 @@ public:
     // Constructors
 
         //- Construct given an initial estimate for the number of entries
-        explicit IOobjectList(const label nIoObjects = 100);
+        explicit IOobjectList(const label nIoObjects = 128);
 
         //- Construct from objectRegistry and instance path
         IOobjectList

@@ -1,18 +1,21 @@
-    {
-        word cylinderOutputName(engTime().engineDict().lookup("cylinderSetName"));
+{
+    word cylinderOutputName
+    (
+        engTime().engineDict().lookup("cylinderSetName")
+    );
 
-        cellSet outputCellSet(*this, cylinderOutputName);
+    cellSet outputCellSet(*this, cylinderOutputName);
 
-        cz.append
+    cz.append
+    (
+        new cellZone
         (
-            new cellZone
-            (
-                "cylinderOutputCells",
-                outputCellSet.toc(),
-                nCellZones,
-                cellZones()
-            )
-        );
-        
-        nCellZones++;        
+            "cylinderOutputCells",
+            outputCellSet.toc(),
+            nCellZones,
+            cellZones()
+        )
+    );
+
+    nCellZones++;
 }

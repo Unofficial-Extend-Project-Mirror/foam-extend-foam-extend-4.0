@@ -46,7 +46,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class exponential Declaration
+                        Class exponential Declaration
 \*---------------------------------------------------------------------------*/
 
 class exponential
@@ -69,7 +69,7 @@ class exponential
 public:
 
     //- Runtime type information
-        TypeName("exponential");
+    TypeName("exponential");
 
 
     // Constructors
@@ -82,18 +82,20 @@ public:
         );
 
 
-    // Destructor
-
-        ~exponential();
+    //- Destructor
+    virtual ~exponential();
 
 
     // Member Functions
 
-    scalar sample() const;
+         //- Sample the pdf
+        virtual scalar sample() const;
 
-    scalar minValue() const;
-    scalar maxValue() const;
+        //- Return the minimum value
+        virtual scalar minValue() const;
 
+        //- Return the maximum value
+        virtual scalar maxValue() const;
 };
 
 

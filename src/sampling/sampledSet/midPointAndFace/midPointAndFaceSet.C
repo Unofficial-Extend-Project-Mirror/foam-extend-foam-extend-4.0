@@ -25,7 +25,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "midPointAndFaceSet.H"
-#include "DynamicList.H"
 #include "polyMesh.H"
 #include "addToRunTimeSelectionTable.H"
 

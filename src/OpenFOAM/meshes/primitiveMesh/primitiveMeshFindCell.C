@@ -27,15 +27,11 @@ License
 #include "primitiveMesh.H"
 #include "cell.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 // Is the point in the cell bounding box
-bool primitiveMesh::pointInCellBB(const point& p, label celli) const
+bool Foam::primitiveMesh::pointInCellBB(const point& p, label celli) const
 {
     const pointField& points = this->points();
     const faceList& f = faces();
@@ -67,7 +63,7 @@ bool primitiveMesh::pointInCellBB(const point& p, label celli) const
 
 
 // Is the point in the cell
-bool primitiveMesh::pointInCell(const point& p, label celli) const
+bool Foam::primitiveMesh::pointInCell(const point& p, label celli) const
 {
     const labelList& f = cells()[celli];
     const labelList& owner = this->faceOwner();
@@ -93,7 +89,7 @@ bool primitiveMesh::pointInCell(const point& p, label celli) const
 
 
 // Find the cell with the nearest cell centre
-label primitiveMesh::findNearestCell(const point& location) const
+Foam::label Foam::primitiveMesh::findNearestCell(const point& location) const
 {
     const vectorField& centres = cellCentres();
 
@@ -116,7 +112,7 @@ label primitiveMesh::findNearestCell(const point& location) const
 
 
 // Find cell enclosing this location
-label primitiveMesh::findCell(const point& location) const
+Foam::label Foam::primitiveMesh::findCell(const point& location) const
 {
     if (nCells() == 0)
     {
@@ -159,9 +155,5 @@ label primitiveMesh::findCell(const point& location) const
     }
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

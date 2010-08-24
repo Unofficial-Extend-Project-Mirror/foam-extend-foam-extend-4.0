@@ -81,6 +81,8 @@ public:
         static const char* componentNames[];
         static const Vector zero;
         static const Vector one;
+        static const Vector max;
+        static const Vector min;
 
 
     //- Component labeling enumeration

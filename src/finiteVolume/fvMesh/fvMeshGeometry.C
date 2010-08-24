@@ -146,6 +146,28 @@ void fvMesh::makeC() const
         cellCentres(),
         faceCentres()
     );
+
+/* HJ, I think this is wrong.  HJ, 6/Jul/2010
+    // Need to correct for cyclics transformation since absolute quantity.
+    // Ok on processor patches since hold opposite cell centre (no
+    // transformation)
+    slicedVolVectorField& C = *CPtr_;
+
+    forAll(C.boundaryField(), patchi)
+    {
+        if (isA<cyclicFvPatchVectorField>(C.boundaryField()[patchi]))
+        {
+            // Note: cyclic is not slice but proper field
+            C.boundaryField()[patchi] == static_cast<const vectorField&>
+            (
+                static_cast<const List<vector>&>
+                (
+                    boundary_[patchi].patchSlice(faceCentres())
+                )
+            );
+        }
+    }
+*/
 }
 
 
@@ -403,6 +425,63 @@ const volScalarField::DimensionedInternalField& fvMesh::V00() const
     }
 
     return *V00Ptr_;
+}
+
+
+tmp<volScalarField::DimensionedInternalField> fvMesh::Vsc() const
+{
+    if (moving() && time().subCycling())
+    {
+        const TimeState& ts = time();
+        const TimeState& ts0 = time().prevTimeState();
+
+        scalar tFrac =
+        (
+            ts.value() - (ts0.value() - ts0.deltaTValue())
+        )/ts0.deltaTValue();
+
+        if (tFrac < (1 - SMALL))
+        {
+            return V0() + tFrac*(V() - V0());
+        }
+        else
+        {
+            return V();
+        }
+    }
+    else
+    {
+        return V();
+    }
+}
+
+
+tmp<volScalarField::DimensionedInternalField> fvMesh::Vsc0() const
+{
+    if (moving() && time().subCycling())
+    {
+        const TimeState& ts = time();
+        const TimeState& ts0 = time().prevTimeState();
+
+        scalar t0Frac =
+        (
+            (ts.value() - ts.deltaTValue())
+          - (ts0.value() - ts0.deltaTValue())
+        )/ts0.deltaTValue();
+
+        if (t0Frac > SMALL)
+        {
+            return V0() + t0Frac*(V() - V0());
+        }
+        else
+        {
+            return V0();
+        }
+    }
+    else
+    {
+        return V0();
+    }
 }
 
 

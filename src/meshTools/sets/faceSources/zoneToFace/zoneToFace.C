@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "zoneToFace.H"
@@ -49,7 +47,8 @@ Foam::topoSetSource::addToUsageTable Foam::zoneToFace::usage_
 (
     zoneToFace::typeName,
     "\n    Usage: zoneToFace zone\n\n"
-    "    Select all faces in the faceZone\n\n"
+    "    Select all faces in the faceZone."
+    " Note:accepts wildcards for zone.\n\n"
 );
 
 
@@ -57,26 +56,37 @@ Foam::topoSetSource::addToUsageTable Foam::zoneToFace::usage_
 
 void Foam::zoneToFace::combine(topoSet& set, const bool add) const
 {
-    label zoneI = mesh_.faceZones().findZoneID(zoneName_);
+    bool hasMatched = false;
 
-    if (zoneI != -1)
+    forAll(mesh_.faceZones(), i)
     {
-        const labelList& faceLabels = mesh_.faceZones()[zoneI];
+        const faceZone& zone = mesh_.faceZones()[i];
 
-        forAll(faceLabels, i)
+        if (zoneName_.match(zone.name()))
         {
-            // Only do active faces
-            if (faceLabels[i] < mesh_.nFaces())
+            const labelList& faceLabels = mesh_.faceZones()[i];
+
+            Info<< "    Found matching zone " << zone.name()
+                << " with " << faceLabels.size() << " faces." << endl;
+
+            hasMatched = true;
+
+            forAll(faceLabels, i)
             {
-                addOrDelete(set, faceLabels[i], add);
+                // Only do active faces
+                if (faceLabels[i] < mesh_.nFaces())
+                {
+                    addOrDelete(set, faceLabels[i], add);
+                }
             }
         }
     }
-    else
+
+    if (!hasMatched)
     {
         WarningIn("zoneToFace::combine(topoSet&, const bool)")
-            << "Cannot find zone named " << zoneName_ << endl
-            << "Valid zones are " << mesh_.faceZones().names() << endl;
+            << "Cannot find any faceZone named " << zoneName_ << endl
+            << "Valid names are " << mesh_.faceZones().names() << endl;
     }
 }
 

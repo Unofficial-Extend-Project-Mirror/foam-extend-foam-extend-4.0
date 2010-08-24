@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "patchToFace.H"
@@ -49,7 +47,7 @@ Foam::topoSetSource::addToUsageTable Foam::patchToFace::usage_
 (
     patchToFace::typeName,
     "\n    Usage: patchToFace patch\n\n"
-    "    Select all faces in the patch\n\n"
+    "    Select all faces in the patch. Note:accepts wildcards for patch.\n\n"
 );
 
 
@@ -57,21 +55,36 @@ Foam::topoSetSource::addToUsageTable Foam::patchToFace::usage_
 
 void Foam::patchToFace::combine(topoSet& set, const bool add) const
 {
-    label patchI = mesh_.boundaryMesh().findPatchID(patchName_);
+    bool hasMatched = false;
 
-    if (patchI != -1)
+    forAll(mesh_.boundaryMesh(), patchI)
     {
         const polyPatch& pp = mesh_.boundaryMesh()[patchI];
 
-        for (label faceI = pp.start(); faceI < pp.start() + pp.size(); faceI++)
+        if (patchName_.match(pp.name()))
         {
-            addOrDelete(set, faceI, add);
+            Info<< "    Found matching patch " << pp.name()
+                << " with " << pp.size() << " faces." << endl;
+
+            hasMatched = true;
+
+
+            for
+            (
+                label faceI = pp.start();
+                faceI < pp.start() + pp.size();
+                faceI++
+            )
+            {
+                addOrDelete(set, faceI, add);
+            }
         }
     }
-    else
+
+    if (!hasMatched)
     {
         WarningIn("patchToFace::combine(topoSet&, const bool)")
-            << "Cannot find patch named " << patchName_ << endl
+            << "Cannot find any patch named " << patchName_ << endl
             << "Valid names are " << mesh_.boundaryMesh().names() << endl;
     }
 }

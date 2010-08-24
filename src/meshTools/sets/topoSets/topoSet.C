@@ -39,6 +39,7 @@ namespace Foam
 defineTypeNameAndDebug(topoSet, 0);
 defineRunTimeSelectionTable(topoSet, word);
 defineRunTimeSelectionTable(topoSet, size);
+defineRunTimeSelectionTable(topoSet, set);
 
 
 // Construct named object from existing set.
@@ -100,6 +101,37 @@ autoPtr<topoSet> topoSet::New
     }
 
     return autoPtr<topoSet>(cstrIter()(mesh, name, size, w));
+}
+
+
+// Construct named object from existing set.
+autoPtr<topoSet> topoSet::New
+(
+    const word& setType,
+    const polyMesh& mesh,
+    const word& name,
+    const topoSet& set,
+    writeOption w
+)
+{
+    setConstructorTable::iterator cstrIter =
+        setConstructorTablePtr_
+            ->find(setType);
+
+    if (cstrIter == setConstructorTablePtr_->end())
+    {
+        FatalErrorIn
+        (
+            "topoSet::New(const word&, "
+            "const polyMesh&, const word&, const topoSet&, writeOption)"
+        )   << "Unknown set type " << setType
+            << endl << endl
+            << "Valid set types : " << endl
+            << setConstructorTablePtr_->toc()
+            << exit(FatalError);
+    }
+
+    return autoPtr<topoSet>(cstrIter()(mesh, name, set, w));
 }
 
 
@@ -204,7 +236,7 @@ void topoSet::writeDebug
     topoSet::const_iterator& iter,
     label& elemI
 ) const
-{    
+{
     label n = 0;
 
     for (; (iter != end()) && (n < maxElem); ++iter)
@@ -230,7 +262,7 @@ void topoSet::writeDebug
     topoSet::const_iterator& iter,
     label& elemI
 ) const
-{    
+{
     label n = 0;
 
     for (; (iter != end()) && (n < maxElem); ++iter)
@@ -255,12 +287,9 @@ void topoSet::writeDebug
 ) const
 {
     // Bounding box of contents.
-    boundBox bb
-    (
-        pointField(IndirectList<point>(coords, toc())())
-    );
+    boundBox bb(pointField(coords, toc()), true);
 
-    Pout<< "Set bounding box: min = "
+    os  << "Set bounding box: min = "
         << bb.min() << "    max = " << bb.max() << " meters. " << endl << endl;
 
     label n = 0;
@@ -300,7 +329,7 @@ topoSet::topoSet(const IOobject& obj, const word& wantedType)
 :
     regIOobject(obj)
 {
-    if 
+    if
     (
         readOpt() == IOobject::MUST_READ
      || (
@@ -341,7 +370,7 @@ topoSet::topoSet
         )
     )
 {
-    if 
+    if
     (
         readOpt() == IOobject::MUST_READ
      || (
@@ -446,7 +475,7 @@ void topoSet::invert(const label maxLen)
             insert(cellI);
         }
     }
-    
+
 }
 
 

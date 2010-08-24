@@ -25,7 +25,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "DILUGaussSeidelSmoother.H"
-#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -33,7 +32,9 @@ namespace Foam
 {
     defineTypeNameAndDebug(DILUGaussSeidelSmoother, 0);
 
-    addToRunTimeSelectionTable(lduSmoother, DILUGaussSeidelSmoother, word);
+    lduSmoother::
+        addasymMatrixConstructorToTable<DILUGaussSeidelSmoother>
+        addDILUGaussSeidelSmootherAsymMatrixConstructorToTable_;
 }
 
 

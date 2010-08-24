@@ -33,31 +33,23 @@ Description
 #include "long.H"
 #include "linePointRef.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template <class Type>
-const label treeNode<Type>::leafOffset = 100;
-
-template <class Type>
-const labelList treeNode<Type>::dummy(1);
+const Foam::label Foam::treeNode<Type>::leafOffset =100;
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template <class Type>
-void treeNode<Type>::setAsNode(const label octant)
+void Foam::treeNode<Type>::setAsNode(const label octant)
 {
     subNodeTypes_ |= (0x1 << octant);
 }
 
 
 template <class Type>
-void treeNode<Type>::setAsLeaf(const label octant)
+void Foam::treeNode<Type>::setAsLeaf(const label octant)
 {
     subNodeTypes_ &= ~(0x1 << octant);
 }
@@ -65,7 +57,11 @@ void treeNode<Type>::setAsLeaf(const label octant)
 
 // Set pointer to sub node
 template <class Type>
-void treeNode<Type>::setNodePtr(const label octant, treeElem<Type>* treeNodePtr)
+void Foam::treeNode<Type>::setNodePtr
+(
+    const label octant,
+    treeElem<Type>* treeNodePtr
+)
 {
     setAsNode(octant);
     subNodes_[octant] = treeNodePtr;
@@ -74,7 +70,11 @@ void treeNode<Type>::setNodePtr(const label octant, treeElem<Type>* treeNodePtr)
 
 // Set pointer to sub leaf
 template <class Type>
-void treeNode<Type>::setLeafPtr(const label octant, treeElem<Type>* treeLeafPtr)
+void Foam::treeNode<Type>::setLeafPtr
+(
+    const label octant,
+    treeElem<Type>* treeLeafPtr
+)
 {
     setAsLeaf(octant);
     subNodes_[octant] = treeLeafPtr;
@@ -82,7 +82,11 @@ void treeNode<Type>::setLeafPtr(const label octant, treeElem<Type>* treeLeafPtr)
 
 
 template <class Type>
-void treeNode<Type>::setVolType(const label octant, const label type)
+void Foam::treeNode<Type>::setVolType
+(
+    const label octant,
+    const label type
+)
 {
     if ((type < 0) || (type > 3))
     {
@@ -99,9 +103,9 @@ void treeNode<Type>::setVolType(const label octant, const label type)
 
 
 template <class Type>
-void treeNode<Type>::space(Ostream& os, const label n)
+void Foam::treeNode<Type>::space(Ostream& os, const label n)
 {
-    for(label i=0; i<n; i++)
+    for (label i=0; i<n; i++)
     {
         os<< ' ';
     }
@@ -110,7 +114,7 @@ void treeNode<Type>::space(Ostream& os, const label n)
 
 // look in single octant starting from <start>
 template <class Type>
-const treeLeaf<Type>* treeNode<Type>::findLeafLineOctant
+const Foam::treeLeaf<Type>* Foam::treeNode<Type>::findLeafLineOctant
 (
     const int level,
     const Type& shapes,
@@ -131,7 +135,7 @@ const treeLeaf<Type>* treeNode<Type>::findLeafLineOctant
         Pout<< "findLeafLineOctant : bb:" << this->bb()
             << "  start:" << start
             << "  end:" << end
-            << "  mid:" << mid()
+            << "  mid:" << midpoint()
             << " Searching octant:" << octant
             << endl;
     }
@@ -146,14 +150,13 @@ const treeLeaf<Type>* treeNode<Type>::findLeafLineOctant
             if (subNodePtr->bb().contains(direction, start))
             {
                 // Search on lower level
-                const treeLeaf<Type>* subLeafPtr =
-                    subNodePtr->findLeafLine
-                    (
-                        level + 1,
-                        shapes,
-                        start,
-                        end
-                    );
+                const treeLeaf<Type>* subLeafPtr = subNodePtr->findLeafLine
+                (
+                    level + 1,
+                    shapes,
+                    start,
+                    end
+                );
 
                 if (debug & 2)
                 {
@@ -184,9 +187,9 @@ const treeLeaf<Type>* treeNode<Type>::findLeafLineOctant
             {
                 // Step to end of subleaf bb
                 point tmp;
-                if 
+                if
                 (
-                   !subLeafPtr->bb().intersects
+                    !subLeafPtr->bb().intersects
                     (
                         end,
                         start,
@@ -226,7 +229,7 @@ const treeLeaf<Type>* treeNode<Type>::findLeafLineOctant
     else
     {
         // Empty subNode. Transfer across.
-        const treeBoundBox emptyBb = this->bb().subBbox(mid(), octant);
+        const treeBoundBox emptyBb = this->bb().subBbox(midpoint(), octant);
 
         if (emptyBb.contains(direction, start))
         {
@@ -241,9 +244,9 @@ const treeLeaf<Type>* treeNode<Type>::findLeafLineOctant
 
             // Update start by clipping to emptyBb
             point tmp;
-            if 
+            if
             (
-               !emptyBb.intersects
+                !emptyBb.intersects
                 (
                     end,
                     start,
@@ -293,28 +296,25 @@ const treeLeaf<Type>* treeNode<Type>::findLeafLineOctant
 
 // Construct from components
 template <class Type>
-treeNode<Type>::treeNode(const treeBoundBox& bb)
+Foam::treeNode<Type>::treeNode(const treeBoundBox& bb)
 :
     treeElem<Type>(bb),
     treeNodeName(),
-    mid_(bb.mid()),
+    mid_(bb.midpoint()),
     subNodeTypes_(0),
     volType_(0)
 {
-    for(label octant=0; octant<8; octant++)
+    for (label octantI=0; octantI<8; octantI++)
     {
-        subNodes_[octant] = NULL;
-        setVolType(octant, octree<Type>::UNKNOWN);
+        subNodes_[octantI] = NULL;
+        setVolType(octantI, octree<Type>::UNKNOWN);
     }
 }
 
 
 // Construct from Istream
 template <class Type>
-treeNode<Type>::treeNode
-(
-    Istream& is
-)
+Foam::treeNode<Type>::treeNode(Istream& is)
 {
     is >> *this;
 }
@@ -323,9 +323,9 @@ treeNode<Type>::treeNode
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template <class Type>
-treeNode<Type>::~treeNode()
+Foam::treeNode<Type>::~treeNode()
 {
-    for(int octant=0; octant<8; octant++)
+    for (int octant=0; octant<8; octant++)
     {
         if (subNodes()[octant])
         {
@@ -346,7 +346,7 @@ treeNode<Type>::~treeNode()
 
 // Distributes cells to subLeaves
 template <class Type>
-void treeNode<Type>::distribute
+void Foam::treeNode<Type>::distribute
 (
     const label level,
     octree<Type>& top,
@@ -360,8 +360,8 @@ void treeNode<Type>::distribute
         Pout<< "treeNode::distributing " << indices.size() << endl;
     }
 
-    // Create subLeaves if nessecary
-    for(label octant=0; octant<8; octant++)
+    // Create subLeaves if necessary
+    for (label octant=0; octant<8; octant++)
     {
         if (subNodes()[octant])
         {
@@ -371,16 +371,15 @@ void treeNode<Type>::distribute
                 "treeNode<Type>::distribute(const label, octree<Type>&, "
                 "const Type&, const labelList&)"
             )   << "subNode already available at octant:" << octant
-                << abort(FatalError);                
+                << abort(FatalError);
         }
         else
         {
-            treeLeaf<Type>* subLeafPtr =
-                new treeLeaf<Type>
-                (
-                    this->bb().subBbox(mid(), octant),
-                    indices.size()
-                );
+            treeLeaf<Type>* subLeafPtr = new treeLeaf<Type>
+            (
+                this->bb().subBbox(midpoint(), octant),
+                indices.size()
+            );
 
             top.setLeaves(top.nLeaves() + 1);
             setLeafPtr(octant, subLeafPtr);
@@ -393,7 +392,7 @@ void treeNode<Type>::distribute
     {
         const label shapei = indices[i];
 
-        for(label octant=0; octant<8; octant++)
+        for (label octant=0; octant<8; octant++)
         {
             treeLeaf<Type>* leafPtr = getLeafPtr(octant);
 
@@ -413,7 +412,7 @@ void treeNode<Type>::distribute
     }
 
     // Trim size of subLeaves
-    for(label octant=0; octant<8; octant++)
+    for (label octant=0; octant<8; octant++)
     {
         treeLeaf<Type>* subLeafPtr = getLeafPtr(octant);
 
@@ -441,7 +440,7 @@ void treeNode<Type>::distribute
 
 // Descends to refineLevel and checks the subLeaves for redistribution
 template <class Type>
-void treeNode<Type>::redistribute
+void Foam::treeNode<Type>::redistribute
 (
     const label level,
     octree<Type>& top,
@@ -459,7 +458,7 @@ void treeNode<Type>::redistribute
     // Descend to correct level
     if (level < refineLevel)
     {
-        for(label octant=0; octant<8; octant++)
+        for (label octant=0; octant<8; octant++)
         {
             if (subNodes()[octant])
             {
@@ -486,7 +485,7 @@ void treeNode<Type>::redistribute
         }
 
         // handle redistribution of sub leaves
-        for(label octant=0; octant<8; octant++)
+        for (label octant=0; octant<8; octant++)
         {
             if (subNodes()[octant])
             {
@@ -549,7 +548,7 @@ void treeNode<Type>::redistribute
 
 // Set type of node.
 template <class Type>
-label treeNode<Type>::setSubNodeType
+Foam::label Foam::treeNode<Type>::setSubNodeType
 (
     const label level,
     octree<Type>& top,
@@ -565,7 +564,7 @@ label treeNode<Type>::setSubNodeType
 
     label myType = -1;
 
-    for(label octant=0; octant<8; octant++)
+    for (label octant=0; octant<8; octant++)
     {
         label subType = -1;
 
@@ -594,16 +593,16 @@ label treeNode<Type>::setSubNodeType
         {
             // No data in this one. Set type for octant acc. to its bounding
             // box.
-            const treeBoundBox subBb = this->bb().subBbox(mid(), octant);
+            const treeBoundBox subBb = this->bb().subBbox(midpoint(), octant);
 
-            subType = shapes.getSampleType(top, subBb.mid());
+            subType = shapes.getSampleType(top, subBb.midpoint());
         }
 
         if (debug & 4)
         {
             space(Pout, level);
             Pout<< "treeNode::setSubNodeType : setting octant with bb:"
-                << this->bb().subBbox(mid(), octant)
+                << this->bb().subBbox(midpoint(), octant)
                 << "  to type:" << octree<Type>::volType(subType) << endl;
         }
         setVolType(octant, subType);
@@ -634,7 +633,7 @@ label treeNode<Type>::setSubNodeType
 
 // Get type of node.
 template <class Type>
-label treeNode<Type>::getSampleType
+Foam::label Foam::treeNode<Type>::getSampleType
 (
     const label level,
     const octree<Type>& top,
@@ -652,7 +651,7 @@ label treeNode<Type>::getSampleType
     // Determine octant of bb. If on edge just use whichever octant.
     bool onEdge = false;
 
-    label octant = this->bb().subOctant(mid(), sample, onEdge);
+    label octant = this->bb().subOctant(midpoint(), sample, onEdge);
 
     label type = getVolType(octant);
 
@@ -691,7 +690,7 @@ label treeNode<Type>::getSampleType
             (
                 "treeNode<Type>::getSampleType"
                 "(const label, octree<Type>&, const Type&, const point&)"
-            )   << "Empty node bb:" << this->bb().subBbox(mid(), octant)
+            )   << "Empty node bb:" << this->bb().subBbox(midpoint(), octant)
                 << " has non-mixed type:"
                 << octree<Type>::volType(type)
                 << abort(FatalError);
@@ -723,7 +722,7 @@ label treeNode<Type>::getSampleType
 
 
 template <class Type>
-label treeNode<Type>::find
+Foam::label Foam::treeNode<Type>::find
 (
     const Type& shapes,
     const point& sample
@@ -733,18 +732,14 @@ label treeNode<Type>::find
     // will have been inserted in both subcubes)
     bool onEdge = false;
 
-    label octant = this->bb().subOctant(mid(), sample, onEdge);
+    label octant = this->bb().subOctant(midpoint(), sample, onEdge);
 
     if (subNodes()[octant])
     {
         if (isNode(octant))
         {
             // Node: recurse into subnodes
-            return getNodePtr(octant)->find
-            (
-                shapes,
-                sample
-            );
+            return getNodePtr(octant)->find(shapes, sample);
         }
         else
         {
@@ -757,7 +752,7 @@ label treeNode<Type>::find
 
 
 template <class Type>
-bool treeNode<Type>::findTightest
+bool Foam::treeNode<Type>::findTightest
 (
     const Type& shapes,
     const point& sample,
@@ -765,30 +760,28 @@ bool treeNode<Type>::findTightest
 ) const
 {
     bool changed = false;
-
-    // Get best guess for starting octant
     bool onEdge = false;
-
-    label sampleOctant = this->bb().subOctant(mid(), sample, onEdge);
+    // Estimate for best place to start searching
+    label sampleOctant = this->bb().subOctant(midpoint(), sample, onEdge);
 
     // Go into all suboctants (one containing sample first) and update tightest.
     // Order of visiting is if e.g. sampleOctant = 5:
     //  5 1 2 3 4 0 6 7
-    for(label octanti=0; octanti<8; octanti++)
+    for (label octantI=0; octantI<8; octantI++)
     {
         label octant;
-        if (octanti == 0)
+        if (octantI == 0)
         {
             // Use sampleOctant first
             octant = sampleOctant;
         }
-        else if (octanti == sampleOctant)
+        else if (octantI == sampleOctant)
         {
             octant = 0;
         }
         else
         {
-            octant = octanti;
+            octant = octantI;
         }
 
         if (subNodes()[octant])
@@ -798,16 +791,15 @@ bool treeNode<Type>::findTightest
                 // Node: recurse into subnodes
                 const treeNode<Type>* subNodePtr = getNodePtr(octant);
 
-                if (subNodePtr->bb().intersects(tightest))
+                if (subNodePtr->bb().overlaps(tightest))
                 {
                     // there might be a better fit inside this subNode
-                    changed |=
-                        subNodePtr->findTightest
-                        (
-                            shapes,
-                            sample,
-                            tightest
-                        );
+                    changed |= subNodePtr->findTightest
+                    (
+                        shapes,
+                        sample,
+                        tightest
+                    );
                 }
             }
             else
@@ -815,16 +807,15 @@ bool treeNode<Type>::findTightest
                 // Leaf: let leaf::find handle this
                 const treeLeaf<Type>* subLeafPtr = getLeafPtr(octant);
 
-                if (subLeafPtr->bb().intersects(tightest))
+                if (subLeafPtr->bb().overlaps(tightest))
                 {
                     // there might be a better fit inside this subLeaf
-                    changed |=
-                        subLeafPtr->findTightest
-                        (
-                            shapes,
-                            sample,
-                            tightest
-                        );
+                    changed |= subLeafPtr->findTightest
+                    (
+                        shapes,
+                        sample,
+                        tightest
+                    );
                 }
             }
         }
@@ -835,46 +826,44 @@ bool treeNode<Type>::findTightest
 
 
 template <class Type>
-bool treeNode<Type>::findNearest
+bool Foam::treeNode<Type>::findNearest
 (
     const Type& shapes,
     const point& sample,
     treeBoundBox& tightest,
-    label& tightesti,
+    label& tightestI,
     scalar& tightestDist
 ) const
 {
-    bool changed = false;
-
-
     if (debug & 8)
     {
         Pout<< "In findNearest with sample:" << sample << " cube:"
             << this->bb() << " tightest:" << tightest << endl;
     }
 
+    bool changed = false;
     bool onEdge = false;
+    // Estimate for best place to start searching
+    label sampleOctant = this->bb().subOctant(midpoint(), sample, onEdge);
 
-    label sampleOctant = this->bb().subOctant(mid(), sample, onEdge);
-    
     // Go into all suboctants (one containing sample first) and update tightest.
     // Order of visiting is if e.g. sampleOctant = 5:
     //  5 1 2 3 4 0 6 7
-    for(label octanti=0; octanti<8; octanti++)
+    for (label octantI=0; octantI<8; octantI++)
     {
         label octant;
-        if (octanti == 0)
+        if (octantI == 0)
         {
             // Use sampleOctant first
             octant = sampleOctant;
         }
-        else if (octanti == sampleOctant)
+        else if (octantI == sampleOctant)
         {
             octant = 0;
         }
         else
         {
-            octant = octanti;
+            octant = octantI;
         }
 
         if (subNodes()[octant])
@@ -884,18 +873,17 @@ bool treeNode<Type>::findNearest
                 // Node
                 const treeNode<Type>* subNodePtr = getNodePtr(octant);
 
-                if (subNodePtr->bb().intersects(tightest))
+                if (subNodePtr->bb().overlaps(tightest))
                 {
                     // there might be a better fit inside this subNode
-                    changed |=
-                        subNodePtr->findNearest
-                        (
-                            shapes,
-                            sample,
-                            tightest,
-                            tightesti,
-                            tightestDist
-                        );
+                    changed |= subNodePtr->findNearest
+                    (
+                        shapes,
+                        sample,
+                        tightest,
+                        tightestI,
+                        tightestDist
+                    );
                 }
             }
             else
@@ -903,18 +891,17 @@ bool treeNode<Type>::findNearest
                 // Leaf: let leaf::find handle this
                 const treeLeaf<Type>* subLeafPtr = getLeafPtr(octant);
 
-                if (subLeafPtr->bb().intersects(tightest))
+                if (subLeafPtr->bb().overlaps(tightest))
                 {
                     // there might be a better fit inside this subNode
-                    changed |=
-                        subLeafPtr->findNearest
-                        (
-                            shapes,
-                            sample,
-                            tightest,
-                            tightesti,
-                            tightestDist
-                        );
+                    changed |= subLeafPtr->findNearest
+                    (
+                        shapes,
+                        sample,
+                        tightest,
+                        tightestI,
+                        tightestDist
+                    );
                 }
             }
         }
@@ -923,7 +910,7 @@ bool treeNode<Type>::findNearest
     if (debug & 8)
     {
         Pout<< "Exiting findNearest for sample:" << sample << " cube:"
-            << this->bb() << " tightesti:" << tightesti << endl;
+            << this->bb() << " tightestI:" << tightestI << endl;
     }
 
     return changed;
@@ -931,41 +918,39 @@ bool treeNode<Type>::findNearest
 
 
 template <class Type>
-bool treeNode<Type>::findNearest
+bool Foam::treeNode<Type>::findNearest
 (
     const Type& shapes,
     const linePointRef& ln,
     treeBoundBox& tightest,
-    label& tightesti,
+    label& tightestI,
     point& linePoint,   // nearest point on line
     point& shapePoint   // nearest point on shape
 ) const
 {
     bool changed = false;
-
     bool onEdge = false;
+    // Estimate for best place to start searching
+    label sampleOctant = this->bb().subOctant(midpoint(), ln.centre(), onEdge);
 
-    // Estimate for where best to start searching
-    label sampleOctant = this->bb().subOctant(mid(), ln.centre(), onEdge);
-    
     // Go into all suboctants (one containing sample first) and update tightest.
     // Order of visiting is if e.g. sampleOctant = 5:
     //  5 1 2 3 4 0 6 7
-    for(label octanti=0; octanti<8; octanti++)
+    for (label octantI=0; octantI<8; octantI++)
     {
         label octant;
-        if (octanti == 0)
+        if (octantI == 0)
         {
             // Use sampleOctant first
             octant = sampleOctant;
         }
-        else if (octanti == sampleOctant)
+        else if (octantI == sampleOctant)
         {
             octant = 0;
         }
         else
         {
-            octant = octanti;
+            octant = octantI;
         }
 
         if (subNodes()[octant])
@@ -975,19 +960,18 @@ bool treeNode<Type>::findNearest
                 // Node
                 const treeNode<Type>* subNodePtr = getNodePtr(octant);
 
-                if (subNodePtr->bb().intersects(tightest))
+                if (subNodePtr->bb().overlaps(tightest))
                 {
                     // there might be a better fit inside this subNode
-                    changed |=
-                        subNodePtr->findNearest
-                        (
-                            shapes,
-                            ln,
-                            tightest,
-                            tightesti,
-                            linePoint,
-                            shapePoint
-                        );
+                    changed |= subNodePtr->findNearest
+                    (
+                        shapes,
+                        ln,
+                        tightest,
+                        tightestI,
+                        linePoint,
+                        shapePoint
+                    );
                 }
             }
             else
@@ -995,19 +979,18 @@ bool treeNode<Type>::findNearest
                 // Leaf: let leaf::find handle this
                 const treeLeaf<Type>* subLeafPtr = getLeafPtr(octant);
 
-                if (subLeafPtr->bb().intersects(tightest))
+                if (subLeafPtr->bb().overlaps(tightest))
                 {
                     // there might be a better fit inside this subNode
-                    changed |=
-                        subLeafPtr->findNearest
-                        (
-                            shapes,
-                            ln,
-                            tightest,
-                            tightesti,
-                            linePoint,
-                            shapePoint
-                        );
+                    changed |= subLeafPtr->findNearest
+                    (
+                        shapes,
+                        ln,
+                        tightest,
+                        tightestI,
+                        linePoint,
+                        shapePoint
+                    );
                 }
             }
         }
@@ -1018,7 +1001,7 @@ bool treeNode<Type>::findNearest
 
 
 template <class Type>
-bool treeNode<Type>::findBox
+bool Foam::treeNode<Type>::findBox
 (
     const Type& shapes,
     const boundBox& box,
@@ -1026,31 +1009,33 @@ bool treeNode<Type>::findBox
 ) const
 {
     bool changed = false;
-
     bool onEdge = false;
+    // Estimate for best place to start searching
+    label sampleOctant = this->bb().subOctant
+    (
+        midpoint(),
+        box.midpoint(),
+        onEdge
+    );
 
-    // Estimate for where best to start searching
-    point boxMid(0.5*(box.min() + box.max()));
-    label sampleOctant = this->bb().subOctant(mid(), boxMid, onEdge);
-    
     // Go into all suboctants (one containing sample first) and update tightest.
     // Order of visiting is if e.g. sampleOctant = 5:
     //  5 1 2 3 4 0 6 7
-    for(label octanti=0; octanti<8; octanti++)
+    for (label octantI=0; octantI<8; octantI++)
     {
         label octant;
-        if (octanti == 0)
+        if (octantI == 0)
         {
             // Use sampleOctant first
             octant = sampleOctant;
         }
-        else if (octanti == sampleOctant)
+        else if (octantI == sampleOctant)
         {
             octant = 0;
         }
         else
         {
-            octant = octanti;
+            octant = octantI;
         }
 
         if (subNodes()[octant])
@@ -1060,7 +1045,7 @@ bool treeNode<Type>::findBox
                 // Node
                 const treeNode<Type>* subNodePtr = getNodePtr(octant);
 
-                if (subNodePtr->bb().intersects(box))
+                if (subNodePtr->bb().overlaps(box))
                 {
                     // Visit sub node.
                     changed |= subNodePtr->findBox(shapes, box, elements);
@@ -1071,7 +1056,7 @@ bool treeNode<Type>::findBox
                 // Leaf: let leaf::find handle this
                 const treeLeaf<Type>* subLeafPtr = getLeafPtr(octant);
 
-                if (subLeafPtr->bb().intersects(box))
+                if (subLeafPtr->bb().overlaps(box))
                 {
                     // Visit sub leaf.
                     changed |= subLeafPtr->findBox(shapes, box, elements);
@@ -1086,7 +1071,7 @@ bool treeNode<Type>::findBox
 
 // look from <start> in current cube (given by this->bb()).
 template <class Type>
-const treeLeaf<Type>* treeNode<Type>::findLeafLine
+const Foam::treeLeaf<Type>* Foam::treeNode<Type>::findLeafLine
 (
     const int level,
     const Type& shapes,
@@ -1097,7 +1082,7 @@ const treeLeaf<Type>* treeNode<Type>::findLeafLine
     if (debug & 2)
     {
         space(Pout, 2*level);
-        Pout<< "findLeafLine : bb:" << this->bb() << "  mid:" << mid()
+        Pout<< "findLeafLine : bb:" << this->bb() << "  mid:" << midpoint()
             << "  start:" << start << endl;
     }
 
@@ -1111,7 +1096,7 @@ const treeLeaf<Type>* treeNode<Type>::findLeafLine
 
     label iter = 0;
 
-    while(true)
+    while (true)
     {
         if (!this->bb().contains(direction, start))
         {
@@ -1145,19 +1130,21 @@ const treeLeaf<Type>* treeNode<Type>::findLeafLine
         }
 
         bool onEdge = false;
-        label octant = this->bb().subOctant(mid(), direction, start, onEdge);
+        label octant = this->bb().subOctant
+        (
+            midpoint(), direction, start, onEdge
+        );
 
         // Try finding non-empty treeleaf in octant
-        const treeLeaf<Type>* leafPtr =
-            findLeafLineOctant
-            (
-                level,
-                shapes,
-                octant,
-                direction,
-                start,
-                end
-            );
+        const treeLeaf<Type>* leafPtr = findLeafLineOctant
+        (
+            level,
+            shapes,
+            octant,
+            direction,
+            start,
+            end
+        );
 
         if (leafPtr)
         {
@@ -1193,14 +1180,14 @@ const treeLeaf<Type>* treeNode<Type>::findLeafLine
 
 
 template <class Type>
-void treeNode<Type>::findLeaves
+void Foam::treeNode<Type>::findLeaves
 (
     List<treeLeaf<Type>*>& leafArray,
     label& leafIndex
 ) const
 {
     // Go into all sub boxes
-    for(label octant=0; octant<8; octant++)
+    for (label octant=0; octant<8; octant++)
     {
         if (subNodes()[octant])
         {
@@ -1222,14 +1209,14 @@ void treeNode<Type>::findLeaves
 
 
 template <class Type>
-void treeNode<Type>::findLeaves
+void Foam::treeNode<Type>::findLeaves
 (
     List<const treeLeaf<Type>*>& leafArray,
     label& leafIndex
 ) const
 {
     // Go into all sub boxes
-    for(label octant=0; octant<8; octant++)
+    for (label octant=0; octant<8; octant++)
     {
         if (subNodes()[octant])
         {
@@ -1251,7 +1238,7 @@ void treeNode<Type>::findLeaves
 
 
 template <class Type>
-void treeNode<Type>::printNode
+void Foam::treeNode<Type>::printNode
 (
     Ostream& os,
     const label level
@@ -1261,7 +1248,7 @@ void treeNode<Type>::printNode
 
     os << "node:" << this->bb() << endl;
 
-    for(label octant=0; octant<8; octant++)
+    for (label octant=0; octant<8; octant++)
     {
         label type = getVolType(octant);
 
@@ -1273,7 +1260,7 @@ void treeNode<Type>::printNode
             os << octant << ":" << typeString << " : null" << endl;
         }
         else if (isNode(octant))
-        {            
+        {
             space(os, level);
             os << octant << ":" << typeString << " : node" << endl;
             getNodePtr(octant)->printNode(os, level+1);
@@ -1291,21 +1278,21 @@ void treeNode<Type>::printNode
 
 
 template <class Type>
-void treeNode<Type>::writeOBJ
+void Foam::treeNode<Type>::writeOBJ
 (
     Ostream& os,
     const label level,
     label& vertNo
 ) const
 {
-    point midPoint(this->bb().mid());
+    point midPoint(this->bb().midpoint());
 
     label midVertNo = vertNo;
     os << "v " << midPoint.x() << " " << midPoint.y() << " "
        << midPoint.z() << endl;
     vertNo++;
 
-    for(label octant=0; octant<8; octant++)
+    for (label octant=0; octant<8; octant++)
     {
         if (subNodes_[octant])
         {
@@ -1313,7 +1300,7 @@ void treeNode<Type>::writeOBJ
             {
                 treeNode<Type>* nodePtr = getNodePtr(octant);
 
-                point subMidPoint(nodePtr->bb().mid());
+                point subMidPoint(nodePtr->bb().midpoint());
                 os << "v " << subMidPoint.x() << " " << subMidPoint.y() << " "
                    << subMidPoint.z() << endl;
                 os << "l " << midVertNo + 1<< " " << vertNo + 1 << endl;
@@ -1325,7 +1312,7 @@ void treeNode<Type>::writeOBJ
             {
                 treeLeaf<Type>* leafPtr = getLeafPtr(octant);
 
-                point subMidPoint(leafPtr->bb().mid());
+                point subMidPoint(leafPtr->bb().midpoint());
                 os << "v " << subMidPoint.x() << " " << subMidPoint.y() << " "
                    << subMidPoint.z() << endl;
                 os << "l " << midVertNo + 1<< " " << vertNo + 1 << endl;
@@ -1337,13 +1324,13 @@ void treeNode<Type>::writeOBJ
     }
 }
 
- 
+
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
 template <class Type>
-Istream& operator>>(Istream& is, treeNode<Type>& oc)
+Foam::Istream& Foam::operator>>(Istream& is, treeNode<Type>& oc)
 {
-    for(label octant = 0; octant < 8; octant++)
+    for (label octant = 0; octant < 8; octant++)
     {
         oc.subNodes_[octant] = NULL;
     }
@@ -1384,7 +1371,7 @@ Istream& operator>>(Istream& is, treeNode<Type>& oc)
 
 
 template <class Type>
-Ostream& operator<<(Ostream& os, const treeNode<Type>& tn)
+Foam::Ostream& Foam::operator<<(Ostream& os, const treeNode<Type>& tn)
 {
     // Count valid subnodes:
     //   - treeNode
@@ -1394,11 +1381,7 @@ Ostream& operator<<(Ostream& os, const treeNode<Type>& tn)
     {
         if (tn.subNodes_[octant])
         {
-            if
-            (
-                tn.isNode(octant)
-             || (tn.getLeafPtr(octant)->indices().size() != 0)
-            )
+            if (tn.isNode(octant) || tn.getLeafPtr(octant)->indices().size())
             {
                 nPtrs++;
             }
@@ -1422,7 +1405,7 @@ Ostream& operator<<(Ostream& os, const treeNode<Type>& tn)
                 os  << token::SPACE << octant << token::SPACE << *subNodePtr
                     << token::NL;
             }
-            else if (tn.getLeafPtr(octant)->indices().size() != 0)
+            else if (tn.getLeafPtr(octant)->indices().size())
             {
                 // treeLeaf: mark by putting index invalid
                 const treeLeaf<Type>* subLeafPtr = tn.getLeafPtr(octant);
@@ -1434,14 +1417,10 @@ Ostream& operator<<(Ostream& os, const treeNode<Type>& tn)
         }
     }
 
-    os << token::SPACE << token::END_LIST;
+    os  << token::SPACE << token::END_LIST;
 
     return os;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

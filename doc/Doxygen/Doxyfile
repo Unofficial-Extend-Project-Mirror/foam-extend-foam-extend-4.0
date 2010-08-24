@@ -788,7 +788,7 @@ TREEVIEW_WIDTH         = 250
 # configuration options related to the LaTeX output
 #---------------------------------------------------------------------------
 
-# Path for OpenFOAM LaTeX macros
+# Path for OpenCFD LaTeX macros
 
 @INCLUDE_PATH = $(WM_PROJECT_DIR)/doc/Doxygen/Macros/
 

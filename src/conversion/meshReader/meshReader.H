@@ -291,13 +291,6 @@ protected:
         //- Subclasses are required to supply this information
         virtual bool readGeometry(const scalar scaleFactor = 1.0) = 0;
 
-        //- Return mesh points
-        pointField& points() const
-        {
-            return const_cast<pointField&>(points_);
-        }
-
-
 public:
 
     // Static Members

@@ -34,9 +34,9 @@ License
 #include <cstdlib>
 #include <csignal>
 
-#if defined(SP)
+#if defined(WM_SP)
 #   define MPI_SCALAR MPI_FLOAT
-#elif defined(DP)
+#elif defined(WM_DP)
 #   define MPI_SCALAR MPI_DOUBLE
 #endif
 
@@ -157,8 +157,6 @@ void Foam::reduce(scalar& Value, const sumOp<scalar>& bop)
 
     if (Pstream::nProcs() <= Pstream::nProcsSimpleSum)
     {
-        MPI_Status status;
-
         if (Pstream::master())
         {
             for
@@ -180,7 +178,7 @@ void Foam::reduce(scalar& Value, const sumOp<scalar>& bop)
                         Pstream::procID(slave),
                         Pstream::msgType(),
                         MPI_COMM_WORLD,
-                        &status
+                        MPI_STATUS_IGNORE
                     )
                 )
                 {
@@ -260,7 +258,7 @@ void Foam::reduce(scalar& Value, const sumOp<scalar>& bop)
                     Pstream::procID(Pstream::masterNo()),
                     Pstream::msgType(),
                     MPI_COMM_WORLD,
-                    &status
+                    MPI_STATUS_IGNORE
                 )
             )
             {
@@ -279,8 +277,6 @@ void Foam::reduce(scalar& Value, const sumOp<scalar>& bop)
         Value = sum;
 
         /*
-        MPI_Status status;
-
         int myProcNo = Pstream::myProcNo();
         int nProcs = Pstream::nProcs();
 
@@ -314,7 +310,7 @@ void Foam::reduce(scalar& Value, const sumOp<scalar>& bop)
                         Pstream::procID(childProcId),
                         Pstream::msgType(),
                         MPI_COMM_WORLD,
-                        &status
+                        MPI_STATUS_IGNORE
                     )
                 )
                 {
@@ -370,7 +366,7 @@ void Foam::reduce(scalar& Value, const sumOp<scalar>& bop)
                     Pstream::procID(parentId),
                     Pstream::msgType(),
                     MPI_COMM_WORLD,
-                    &status
+                    MPI_STATUS_IGNORE
                 )
             )
             {

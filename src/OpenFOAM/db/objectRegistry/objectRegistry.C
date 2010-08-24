@@ -29,10 +29,7 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-namespace Foam
-{
-    defineTypeNameAndDebug(objectRegistry, 0);
-}
+defineTypeNameAndDebug(Foam::objectRegistry, 0);
 
 
 // * * * * * * * * * * * * * * * * Constructors *  * * * * * * * * * * * * * //
@@ -53,12 +50,14 @@ Foam::objectRegistry::objectRegistry
             IOobject::NO_READ,
             IOobject::AUTO_WRITE,
             false
-        )
+        ),
+        true    // to flag that this is the top-level regIOobject
     ),
     HashTable<regIOobject*>(nIoObjects),
     time_(t),
     parent_(t),
-    dbDir_(name())
+    dbDir_(name()),
+    event_(1)
 {}
 
 
@@ -72,7 +71,8 @@ Foam::objectRegistry::objectRegistry
     HashTable<regIOobject*>(nIoObjects),
     time_(io.time()),
     parent_(io.db()),
-    dbDir_(parent_.dbDir()/local()/name())
+    dbDir_(parent_.dbDir()/local()/name()),
+    event_(1)
 {
     writeOpt() = IOobject::AUTO_WRITE;
 }
@@ -82,14 +82,20 @@ Foam::objectRegistry::objectRegistry
 
 Foam::objectRegistry::~objectRegistry()
 {
+    List<regIOobject*> myObjects(size());
+    label nMyObjects = 0;
+
     for (iterator iter = begin(); iter != end(); ++iter)
     {
         if (iter()->ownedByRegistry())
         {
-            regIOobject* elemPtr = iter();
-            erase(iter);
-            delete elemPtr;
+            myObjects[nMyObjects++] = iter();
         }
+    }
+
+    for (label i=0; i<nMyObjects; i++)
+    {
+        checkOut(*myObjects[i]);
     }
 }
 
@@ -101,7 +107,7 @@ Foam::wordList Foam::objectRegistry::names() const
     wordList objectNames(size());
 
     label count=0;
-    for (const_iterator iter = begin(); iter != end(); ++iter)
+    for (const_iterator iter = cbegin(); iter != cend(); ++iter)
     {
         objectNames[count++] = iter()->name();
     }
@@ -115,7 +121,7 @@ Foam::wordList Foam::objectRegistry::names(const word& ClassName) const
     wordList objectNames(size());
 
     label count=0;
-    for (const_iterator iter = begin(); iter != end(); ++iter)
+    for (const_iterator iter = cbegin(); iter != cend(); ++iter)
     {
         if (iter()->type() == ClassName)
         {
@@ -135,6 +141,42 @@ const Foam::objectRegistry& Foam::objectRegistry::subRegistry
 ) const
 {
     return lookupObject<objectRegistry>(name);
+}
+
+
+Foam::label Foam::objectRegistry::getEvent() const
+{
+    label curEvent = event_++;
+
+    if (event_ == labelMax)
+    {
+        WarningIn("objectRegistry::getEvent() const")
+            << "Event counter has overflowed. Resetting counter on all"
+            << " dependent objects." << endl
+            << "This might cause extra evaluations." << endl;
+
+        // Reset event counter
+        curEvent = 1;
+        event_ = 2;
+
+        for (const_iterator iter = begin(); iter != end(); ++iter)
+        {
+            const regIOobject& io = *iter();
+
+            if (objectRegistry::debug)
+            {
+                Pout<< "objectRegistry::getEvent() : "
+                    << "resetting count on " << iter.key() << endl;
+            }
+
+            if (io.eventNo() != 0)
+            {
+                const_cast<regIOobject&>(io).eventNo() = curEvent;
+            }
+        }
+    }
+
+    return curEvent;
 }
 
 
@@ -177,12 +219,16 @@ bool Foam::objectRegistry::checkOut(regIOobject& io) const
         }
         else
         {
+            regIOobject* object = iter();
+
+            bool hasErased = const_cast<objectRegistry&>(*this).erase(iter);
+
             if (io.ownedByRegistry())
             {
-                delete iter();
+                delete object;
             }
 
-            return const_cast<objectRegistry&>(*this).erase(iter);
+            return hasErased;
         }
     }
     else
@@ -194,26 +240,41 @@ bool Foam::objectRegistry::checkOut(regIOobject& io) const
                 << " in registry " << name()
                 << endl;
         }
+    }
 
-        return false;
+    return false;
+}
+
+
+void Foam::objectRegistry::rename(const word& newName)
+{
+    regIOobject::rename(newName);
+
+    // adjust dbDir_ as well
+    string::size_type i = dbDir_.rfind('/');
+
+    if (i == string::npos)
+    {
+        dbDir_ = newName;
+    }
+    else
+    {
+        dbDir_.replace(i+1, string::npos, newName);
     }
 }
 
 
 bool Foam::objectRegistry::modified() const
 {
-    bool anyModified = false;
-
-    for (const_iterator iter = begin(); iter != end(); ++iter)
+    for (const_iterator iter = cbegin(); iter != cend(); ++iter)
     {
         if (iter()->modified())
         {
-            anyModified = true;
-            break;
+            return true;
         }
     }
 
-    return anyModified;
+    return false;
 }
 
 
@@ -250,7 +311,7 @@ bool Foam::objectRegistry::writeObject
 {
     bool ok = true;
 
-    for (const_iterator iter = begin(); iter != end(); ++iter)
+    for (const_iterator iter = cbegin(); iter != cend(); ++iter)
     {
         if (objectRegistry::debug)
         {

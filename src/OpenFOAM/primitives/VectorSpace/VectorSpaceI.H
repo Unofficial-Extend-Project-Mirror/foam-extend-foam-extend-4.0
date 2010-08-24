@@ -263,7 +263,6 @@ inline const Cmpt& component
 
 // Powers of a Form
 // Equivalent to outer-products between the Form and itself
-#ifndef __CINT__
 // Form^0 = 1.0
 template<class Form, class Cmpt, int nCmpt>
 inline typename powProduct<Form, 0>::type pow
@@ -300,7 +299,7 @@ inline typename powProduct<Form, 2>::type pow
 {
     return sqr(static_cast<const Form&>(v));
 }
-#endif
+
 
 template<class Form, class Cmpt, int nCmpt>
 inline scalar magSqr

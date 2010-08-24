@@ -149,8 +149,6 @@ class fvMesh
         void operator=(const fvMesh&);
 
 
-    // Protected Member Functions
-
         // Storage management
 
             //- Clear geometry but not the old-time cell volumes
@@ -185,22 +183,21 @@ public:
         fvMesh
         (
             const IOobject& io,
-            const pointField& points,
-            const faceList& faces,
-            const labelList& allOwner,
-            const labelList& allNeighbour,
+            const Xfer<pointField>& points,
+            const Xfer<faceList>& faces,
+            const Xfer<labelList>& allOwner,
+            const Xfer<labelList>& allNeighbour,
             const bool syncPar = true
         );
 
-        //- Construct from components with cells rather than owner
-        //  and neighbour without boundary.
+        //- Construct without boundary from cells rather than owner/neighbour.
         //  Boundary is added using addPatches() member function
         fvMesh
         (
             const IOobject& io,
-            const pointField& points,
-            const faceList& faces,
-            const cellList& cells,
+            const Xfer<pointField>& points,
+            const Xfer<faceList>& faces,
+            const Xfer<cellList>& cells,
             const bool syncPar = true
         );
 
@@ -234,10 +231,10 @@ public:
                 return polyMesh::time();
             }
 
-            //- Return the object registry
-            virtual const objectRegistry& db() const
+            //- Return the object registry - resolve conflict polyMesh/lduMesh
+            virtual const objectRegistry& thisDb() const
             {
-                return *this;
+                return polyMesh::thisDb();
             }
 
             //- Return reference to name
@@ -283,6 +280,12 @@ public:
             //- Return old-old-time cell volumes
             const DimensionedField<scalar, volMesh>& V00() const;
 
+            //- Return sub-cycle cell volumes
+            tmp<DimensionedField<scalar, volMesh> > Vsc() const;
+
+            //- Return sub-cycl old-time cell volumes
+            tmp<DimensionedField<scalar, volMesh> > Vsc0() const;
+
             //- Return cell face area vectors
             const surfaceVectorField& Sf() const;
 
@@ -312,7 +315,7 @@ public:
             virtual void syncUpdateMesh();
 
             //- Move points, returns volumes swept by faces in motion
-            virtual tmp<scalarField> movePoints(const vectorField&);
+            virtual tmp<scalarField> movePoints(const pointField&);
 
             //- Map all fields in time using given map.
             virtual void mapFields(const mapPolyMesh& mpm);

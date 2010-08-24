@@ -27,14 +27,9 @@ License
 #include "primitiveMesh.H"
 #include "cell.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void primitiveMesh::calcPointCells() const
+void Foam::primitiveMesh::calcPointCells() const
 {
     // Loop through cells and mark up points
 
@@ -43,6 +38,14 @@ void primitiveMesh::calcPointCells() const
         Pout<< "primitiveMesh::calcPointCells() : "
             << "calculating pointCells"
             << endl;
+
+        if (debug == -1)
+        {
+            // For checking calls:abort so we can quickly hunt down
+            // origin of call
+            FatalErrorIn("primitiveMesh::calcPointCells()")
+                << abort(FatalError);
+        }
     }
 
     // It is an error to attempt to recalculate pointCells
@@ -103,7 +106,7 @@ void primitiveMesh::calcPointCells() const
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const labelListList& primitiveMesh::pointCells() const
+const Foam::labelListList& Foam::primitiveMesh::pointCells() const
 {
     if (!pcPtr_)
     {
@@ -114,8 +117,67 @@ const labelListList& primitiveMesh::pointCells() const
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+const Foam::labelList& Foam::primitiveMesh::pointCells
+(
+    const label pointI,
+    DynamicList<label>& storage
+) const
+{
+    if (hasPointCells())
+    {
+        return pointCells()[pointI];
+    }
+    else
+    {
+        const labelList& own = faceOwner();
+        const labelList& nei = faceNeighbour();
+        const labelList& pFaces = pointFaces()[pointI];
 
-} // End namespace Foam
+        storage.clear();
+
+        forAll(pFaces, i)
+        {
+            const label faceI = pFaces[i];
+
+            // Append owner
+            storage.append(own[faceI]);
+
+            // Append neighbour
+            if (faceI < nInternalFaces())
+            {
+                storage.append(nei[faceI]);
+            }
+        }
+
+        // Filter duplicates
+        if (storage.size() > 1)
+        {
+            sort(storage);
+
+            label n = 1;
+            for (label i = 1; i < storage.size(); i++)
+            {
+                if (storage[i-1] != storage[i])
+                {
+                    storage[n++] = storage[i];
+                }
+            }
+
+            // truncate addressed list
+            storage.setSize(n);
+        }
+
+        return storage;
+    }
+}
+
+
+const Foam::labelList& Foam::primitiveMesh::pointCells(const label pointI) const
+{
+    return pointCells(pointI, labels_);
+}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // ************************************************************************* //

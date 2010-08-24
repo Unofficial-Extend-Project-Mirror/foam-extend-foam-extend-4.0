@@ -41,7 +41,6 @@ SourceFiles
 #include "sampledSurface.H"
 #include "surfaceWriter.H"
 #include "volFieldsFwd.H"
-#include "volPointInterpolation.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -65,37 +64,45 @@ class sampledSurfaces
         template<class Type>
         class fieldGroup
         :
-            public wordList
+            public DynamicList<word>
         {
         public:
 
             //- Surface formatter
-            autoPtr<surfaceWriter<Type> > formatter;
+            autoPtr< surfaceWriter<Type> > formatter;
 
             //- Construct null
             fieldGroup()
             :
-                wordList(0),
+                DynamicList<word>(0),
                 formatter(NULL)
             {}
 
             //- Construct for a particular surface format
             fieldGroup(const word& writeFormat)
             :
-                wordList(0),
+                DynamicList<word>(0),
                 formatter(surfaceWriter<Type>::New(writeFormat))
             {}
 
-            //- Construct for a particular surface format and a list of field names
+            //- Construct for a particular surface format and a list of field
+            //  names
             fieldGroup
             (
                 const word& writeFormat,
                 const wordList& fieldNames
             )
             :
-                wordList(fieldNames),
+                DynamicList<word>(fieldNames),
                 formatter(surfaceWriter<Type>::New(writeFormat))
             {}
+
+            void reset(const label nElem)
+            {
+                formatter.clear();
+                DynamicList<word>::setCapacity(nElem);
+                DynamicList<word>::clear(); 
+            }
 
             void operator=(const word& writeFormat)
             {
@@ -104,7 +111,7 @@ class sampledSurfaces
 
             void operator=(const wordList& fieldNames)
             {
-                wordList::operator=(fieldNames);
+                DynamicList<word>::operator=(fieldNames);
             }
         };
 
@@ -116,6 +123,14 @@ class sampledSurfaces
             pointField points;
             faceList   faces;
             labelList  pointsMap;
+
+            //- Clear all storage
+            void clear()
+            {
+                points.clear();
+                faces.clear();
+                pointsMap.clear();
+            }
         };
 
 
@@ -124,27 +139,23 @@ class sampledSurfaces
         //- output verbosity
         static bool verbose_;
 
+        //- Tolerance for merging points (fraction of mesh bounding box)
+        static scalar mergeTol_;
 
     // Private data
 
         //- Name of this set of surfaces,
         //  Also used as the name of the sampledSurfaces directory.
-        word name_;
+        const word name_;
 
         //- Const reference to fvMesh
         const fvMesh& mesh_;
 
         //- Load fields from files (not from objectRegistry)
-        bool loadFromFiles_;
+        const bool loadFromFiles_;
 
         //- output path
         fileName outputPath_;
-
-        //- pointMesh for interpolation
-        autoPtr<pointMesh> pMeshPtr_;
-
-        //- volPointInterpolation for interpolation
-        autoPtr<volPointInterpolation> pInterpPtr_;
 
 
         // Read from dictonary
@@ -167,6 +178,9 @@ class sampledSurfaces
 
         // Calculated
 
+            //- Generic surface formatter
+            autoPtr< surfaceWriter<bool> > genericFormatter_;
+
             //- Categorized scalar/vector/tensor fields
             fieldGroup<scalar> scalarFields_;
             fieldGroup<vector> vectorFields_;
@@ -177,26 +191,11 @@ class sampledSurfaces
 
     // Private Member Functions
 
-        //- Classify field types, return true if nFields > 0
-        bool checkFieldTypes();
+        //- Classify field types, returns the number of fields
+        label classifyFieldTypes();
 
-        //- Merge points on surfaces
-        void mergeSurfaces();
-
-        //- Find the fields in the list of the given type, return count
-        template<class Type>
-        label grep
-        (
-            fieldGroup<Type>& fieldList,
-            const wordList& fieldTypes
-        ) const;
-
-        //- Set interpolator for the field
-        template<class Type>
-        autoPtr<interpolation<Type> > setInterpolator
-        (
-            const GeometricField<Type, fvPatchField, volMesh>&
-        );
+        //- Write geometry only
+        void writeGeometry() const;
 
         //- Sample and write a particular volume field
         template<class Type>
@@ -241,7 +240,20 @@ public:
 
     // Member Functions
 
-        //- Return name of the set of probes
+        //- Does any of the surfaces need an update?
+        virtual bool needsUpdate() const;
+
+        //- Mark the surfaces as needing an update.
+        //  May also free up unneeded data.
+        //  Return false if all surfaces were already marked as expired.
+        virtual bool expire();
+
+        //- Update the surfaces as required and merge surface points (parallel).
+        //  Return false if no surfaces required an update.
+        virtual bool update();
+
+
+        //- Return name of the set of surfaces
         virtual const word& name() const
         {
             return name_;
@@ -250,23 +262,27 @@ public:
         //- set verbosity level
         void verbose(const bool verbosity = true);
 
+        //- Execute, currently does nothing
+        virtual void execute();
+
+        //- Execute at the final time-loop, currently does nothing
+        virtual void end();
+
         //- Sample and write
         virtual void write();
 
-        //- Read the sampledSurfaces
+        //- Read the sampledSurfaces dictionary
         virtual void read(const dictionary&);
 
-        //- Correct for mesh changes
-        void correct();
-
-        //- Update for changes of mesh
+        //- Update for changes of mesh - expires the surfaces
         virtual void updateMesh(const mapPolyMesh&);
 
-        //- Update for mesh point-motion
+        //- Update for mesh point-motion - expires the surfaces
         virtual void movePoints(const pointField&);
 
-        //- Update for changes of mesh due to readUpdate
+        //- Update for changes of mesh due to readUpdate - expires the surfaces
         virtual void readUpdate(const polyMesh::readUpdateState state);
+
 };
 
 

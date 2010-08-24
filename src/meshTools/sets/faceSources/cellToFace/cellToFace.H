@@ -30,6 +30,7 @@ Description
 
     Either all faces of cell or some other criterion.
     See implementation.
+    Note: when picking up coupled faces uses cells on neighbouring processors.
 
 SourceFiles
     cellToFace.C

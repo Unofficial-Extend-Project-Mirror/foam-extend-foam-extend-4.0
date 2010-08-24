@@ -23,14 +23,15 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::genericPolyPatch.C
+    Foam::genericPolyPatch
 
 Description
     Determines a mapping between patch face centres and mesh cell centres and
     processors they're on.
 
-    Note: storage is not optimal. It stores all face centres and cells on
-    all processors to keep the addressing calculation simple.
+Note
+    Storage is not optimal. It stores all face centres and cells on all
+    processors to keep the addressing calculation simple.
 
 SourceFiles
     genericPolyPatch.C

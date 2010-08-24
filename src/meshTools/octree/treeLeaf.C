@@ -30,19 +30,14 @@ Description
 #include "treeNode.H"
 #include "treeBoundBox.H"
 #include "octree.H"
-#include "labelHashSet.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
+#include "HashSet.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template <class Type>
-void treeLeaf<Type>::space(Ostream& os, const label n)
+void Foam::treeLeaf<Type>::space(Ostream& os, const label n)
 {
-    for(label i=0; i<n; i++)
+    for (label i=0; i<n; i++)
     {
         os<< ' ';
     }
@@ -53,7 +48,7 @@ void treeLeaf<Type>::space(Ostream& os, const label n)
 
 // Construct with given size
 template <class Type>
-treeLeaf<Type>::treeLeaf(const treeBoundBox& bb, const label size)
+Foam::treeLeaf<Type>::treeLeaf(const treeBoundBox& bb, const label size)
 :
     treeElem<Type>(bb), size_(0), indices_(size)
 {}
@@ -61,7 +56,7 @@ treeLeaf<Type>::treeLeaf(const treeBoundBox& bb, const label size)
 
 // Construct from list
 template <class Type>
-treeLeaf<Type>::treeLeaf(const treeBoundBox& bb, const labelList& indices)
+Foam::treeLeaf<Type>::treeLeaf(const treeBoundBox& bb, const labelList& indices)
 :
     treeElem<Type>(bb), size_(indices.size()), indices_(indices)
 {
@@ -70,7 +65,7 @@ treeLeaf<Type>::treeLeaf(const treeBoundBox& bb, const labelList& indices)
 
 // Construct from Istream
 template <class Type>
-treeLeaf<Type>::treeLeaf(Istream& is)
+Foam::treeLeaf<Type>::treeLeaf(Istream& is)
 {
     is >> *this;
 }
@@ -79,7 +74,7 @@ treeLeaf<Type>::treeLeaf(Istream& is)
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template <class Type>
-treeLeaf<Type>::~treeLeaf()
+Foam::treeLeaf<Type>::~treeLeaf()
 {}
 
 
@@ -87,7 +82,7 @@ treeLeaf<Type>::~treeLeaf()
 
 // Take cells at this level and distribute them to lower levels
 template <class Type>
-treeLeaf<Type>* treeLeaf<Type>::redistribute
+Foam::treeLeaf<Type>* Foam::treeLeaf<Type>::redistribute
 (
     const label level,
     octree<Type>& top,
@@ -140,7 +135,7 @@ treeLeaf<Type>* treeLeaf<Type>::redistribute
 
 // Set type of subnodes. Since contains elements return mixed type always.
 template <class Type>
-Foam::label treeLeaf<Type>::setSubNodeType
+Foam::label Foam::treeLeaf<Type>::setSubNodeType
 (
     const label level,
     octree<Type>& top,
@@ -154,14 +149,14 @@ Foam::label treeLeaf<Type>::setSubNodeType
             "treeLeaf<Type>::setSubNodeType(const label, octree<Type>&, "
             "const Type&)"
         )   << "empty leaf. bb:" << this->bb()
-            << abort(FatalError);                
+            << abort(FatalError);
     }
     return octree<Type>::MIXED;
 }
 
 
 template <class Type>
-Foam::label treeLeaf<Type>::getSampleType
+Foam::label Foam::treeLeaf<Type>::getSampleType
 (
     const label level,
     const octree<Type>& top,
@@ -174,7 +169,7 @@ Foam::label treeLeaf<Type>::getSampleType
 
 
 template <class Type>
-label treeLeaf<Type>::find
+Foam::label Foam::treeLeaf<Type>::find
 (
     const Type& shapes,
     const point& sample
@@ -193,7 +188,7 @@ label treeLeaf<Type>::find
 
 
 template <class Type>
-bool treeLeaf<Type>::findTightest
+bool Foam::treeLeaf<Type>::findTightest
 (
     const Type& shapes,
     const point& sample,
@@ -204,13 +199,12 @@ bool treeLeaf<Type>::findTightest
 
     forAll(indices_, i)
     {
-        changed |=
-            shapes.findTightest
-            (
-                indices_[i],
-                sample,
-                tightest
-            );
+        changed |= shapes.findTightest
+        (
+            indices_[i],
+            sample,
+            tightest
+        );
     }
 
     return changed;
@@ -218,12 +212,12 @@ bool treeLeaf<Type>::findTightest
 
 
 template <class Type>
-bool treeLeaf<Type>::findNearest
+bool Foam::treeLeaf<Type>::findNearest
 (
     const Type& shapes,
     const point& sample,
     treeBoundBox& tightest,
-    label& tightesti,
+    label& tightestI,
     scalar& tightestDist
 ) const
 {
@@ -252,7 +246,7 @@ bool treeLeaf<Type>::findNearest
                 tightest.max() = sample + dist;
 
                 // Update other return values
-                tightesti = indices_[i];
+                tightestI = indices_[i];
 
                 tightestDist = thisDist;
 
@@ -262,7 +256,7 @@ bool treeLeaf<Type>::findNearest
                 {
                     //space(Pout, level);
                     Pout<< "treeLeaf<Type>::findNearest : Found nearer : shape:"
-                        << tightesti << "  distance:" << tightestDist
+                        << tightestI << "  distance:" << tightestDist
                         << " to sample:" << sample << endl;
                 }
             }
@@ -284,12 +278,12 @@ bool treeLeaf<Type>::findNearest
 
 
 template <class Type>
-bool treeLeaf<Type>::findNearest
+bool Foam::treeLeaf<Type>::findNearest
 (
     const Type& shapes,
     const linePointRef& ln,
     treeBoundBox& tightest,
-    label& tightesti,
+    label& tightestI,
     point& linePoint,   // nearest point on line
     point& shapePoint   // nearest point on shape
 ) const
@@ -317,7 +311,7 @@ bool treeLeaf<Type>::findNearest
             {
                 // Found nearer. Use.
                 tightestDist = thisDist;
-                tightesti = indices_[i];
+                tightestI = indices_[i];
                 linePoint = linePt;
                 shapePoint = shapePt;
                 // Construct new tightest Bb. Nearest point can never be further
@@ -337,7 +331,7 @@ bool treeLeaf<Type>::findNearest
 
 
 template <class Type>
-bool treeLeaf<Type>::findBox
+bool Foam::treeLeaf<Type>::findBox
 (
     const Type& shapes,
     const boundBox& box,
@@ -361,7 +355,7 @@ bool treeLeaf<Type>::findBox
 
 
 template <class Type>
-void treeLeaf<Type>::printLeaf
+void Foam::treeLeaf<Type>::printLeaf
 (
     Ostream& os,
     const label level
@@ -380,7 +374,7 @@ void treeLeaf<Type>::printLeaf
 
 // Dump cube coordinates in OBJ format
 template <class Type>
-void treeLeaf<Type>::writeOBJ
+void Foam::treeLeaf<Type>::writeOBJ
 (
     Ostream& os,
     const label level,
@@ -420,7 +414,7 @@ void treeLeaf<Type>::writeOBJ
 
 
 template <class Type>
-label treeLeaf<Type>::countLeaf
+Foam::label Foam::treeLeaf<Type>::countLeaf
 (
     Ostream& os,
     const label level
@@ -439,7 +433,7 @@ label treeLeaf<Type>::countLeaf
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
 template <class Type>
-Istream& operator>> (Istream& is, treeLeaf<Type>& leaf)
+Foam::Istream& Foam::operator>> (Istream& is, treeLeaf<Type>& leaf)
 {
     is >> leaf.bb() >> leaf.indices_;
 
@@ -450,7 +444,7 @@ Istream& operator>> (Istream& is, treeLeaf<Type>& leaf)
 
 
 template <class Type>
-Ostream& operator<< (Ostream& os, const treeLeaf<Type>& leaf)
+Foam::Ostream& Foam::operator<< (Ostream& os, const treeLeaf<Type>& leaf)
 {
     os << leaf.bb();
 
@@ -471,10 +465,5 @@ Ostream& operator<< (Ostream& os, const treeLeaf<Type>& leaf)
     return os;
 }
 
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

@@ -53,11 +53,6 @@ class MRFZones
 :
     public IOPtrList<MRFZone>
 {
-    // Private data
-
-        //- Mesh reference
-        const fvMesh& mesh_;
-
 
     // Private Member Functions
 
@@ -77,41 +72,54 @@ public:
 
 
     // Member Functions
-
+    
         //- Return raw correction flux
         tmp<surfaceScalarField> fluxCorrection() const;
 
+        //- Add the Coriolis force contribution to the momentum equation
+        void addCoriolis(fvVectorMatrix& UEqn) const;
+
+        //- Add the Coriolis force contribution to the momentum equation
+        void addCoriolis(const volScalarField& rho, fvVectorMatrix& UEqn) const;
+        //- Return raw correction flux
+        tmp<surfaceScalarField> fluxCorrection() const;
+
+        //- Make the given absolute velocity relative within the MRF region
+        void relativeVelocity(volVectorField& U) const;
         // Incompressible MRF
 
+        //- Make the given relative velocity absolute within the MRF region
+        void absoluteVelocity(volVectorField& U) const;
             //- Add the Coriolis force contribution to the momentum equation
             void addCoriolis(fvVectorMatrix& UEqn) const;
 
-            //- Make the given absolute flux relative within the MRF region
-            void relativeFlux(surfaceScalarField& phi) const;
+        //- Make the given absolute flux relative within the MRF region
+        void relativeFlux(surfaceScalarField& phi) const;
 
-
-        // Compressible MRF
-
-            //- Add the Coriolis force contribution to the momentum equation
-            //  Use for equations with prefactor fields, eg. density.
-            //  This is typically visible in the ddt term
-            //  HJ, 12/Dec/2009
-            void addCoriolis
-            (
+        //- Make the given absolute mass-flux relative within the MRF region
+        void relativeFlux
+        (
+            const surfaceScalarField& rho,
+            surfaceScalarField& phi
                 const volScalarField& rho,
                 fvVectorMatrix& UEqn
-            ) const;
+        ) const;
 
+        //- Make the given relative flux absolute within the MRF region
+        void absoluteFlux(surfaceScalarField& phi) const;
+
+        //- Make the given relative mass-flux absolute within the MRF region
+        void absoluteFlux
             //- Make the given absolute flux relative within the MRF region
             //  Use for fluxes with prefactor fields, eg. density.
             //  For consistency, requires face-interpolated prefactor
             //  HJ. 12/Dec/2009
             void relativeFlux
-            (
+        (
+            const surfaceScalarField& rho,
                 const surfaceScalarField& rhof,
-                surfaceScalarField& phi
-            ) const;
-
+            surfaceScalarField& phi
+        ) const;
 
         //- Correct the boundary velocity for the roation of the MRF region
         void correctBoundaryVelocity(volVectorField& U) const;

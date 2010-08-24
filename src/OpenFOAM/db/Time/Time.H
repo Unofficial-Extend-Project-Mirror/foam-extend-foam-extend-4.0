@@ -26,7 +26,7 @@ Class
     Foam::Time
 
 Description
-    Class to control time during FOAM simulations which is also the
+    Class to control time during OpenFOAM simulations that is also the
     top-level objectRegistry.
 
 SourceFiles
@@ -75,7 +75,6 @@ class Time
         //- The controlDict
         IOdictionary controlDict_;
 
-
 public:
 
         //- Write control options
@@ -110,7 +109,7 @@ protected:
 
     // Protected data
 
-        label startTimeIndex_;
+        label  startTimeIndex_;
         scalar startTime_;
         scalar endTime_;
 
@@ -122,11 +121,14 @@ protected:
 
         scalar writeInterval_;
 
-        label purgeWrite_;
+        label  purgeWrite_;
         mutable FIFOStack<word> previousOutputTimes_;
 
-        //- Is the time currently being sub-cycled
+        //- Is the time currently being sub-cycled?
         bool subCycling_;
+
+        //- If time is being sub-cycled this is the previous TimeState
+        autoPtr<TimeState> prevTimeState_;
 
         //- Time directory name format
         static fmtflags format_;
@@ -158,21 +160,21 @@ private:
         //- Default graph format
         word graphFormat_;
 
-        //- Is runtim modification of dictionaries allowed
+        //- Is runtime modification of dictionaries allowed?
         Switch runTimeModifiable_;
 
         //- Instantiate a dummy class to cause the reading of dynamic libraries
         dlLibraryTable::readDlLibrary readLibs_;
 
         //- Function objects executed at start and on ++, +=
-        functionObjectList functionObjects_;
+        mutable functionObjectList functionObjects_;
 
 
 public:
 
     TypeName("time");
 
-    //- The default control dictionary name
+    //- The default control dictionary name (normally "controlDict")
     static word controlDictName;
 
 
@@ -236,12 +238,6 @@ public:
                 return rootPath()/caseName();
             }
 
-            //- Return access to controlDict for editing
-            IOdictionary& controlDict()
-            {
-                return controlDict_;
-            }
-
             const dictionary& controlDict() const
             {
                 return controlDict_;
@@ -289,15 +285,16 @@ public:
             void readModifiedObjects();
 
             //- Return the location of "dir" containing the file "name".
-            //  (Used in reading mesh data)
+            //  (eg, used in reading mesh data)
+            //  If name is null, search for the directory "dir" only
             word findInstance
             (
                 const fileName& dir,
-                const word& name,
+                const word& name = word::null,
                 const IOobject::readOption rOpt = IOobject::MUST_READ
             ) const;
 
-            //- Search tha case for valid time directories
+            //- Search the case for valid time directories
             instantList times() const;
 
             //- Search the case for the time directory path
@@ -313,9 +310,9 @@ public:
             //- Write using given format, version and compression
             virtual bool writeObject
             (
-                IOstream::streamFormat fmt,
-                IOstream::versionNumber ver,
-                IOstream::compressionType cmp
+                IOstream::streamFormat,
+                IOstream::versionNumber,
+                IOstream::compressionType
             ) const;
 
             //- Write the objects now and continue the run
@@ -351,13 +348,58 @@ public:
                 return functionObjects_;
             }
 
+            //- Return true if time currently being sub-cycled, otherwise false
+            bool subCycling() const
+            {
+                return subCycling_;
+            }
+
+            //- Return previous TimeState if time is being sub-cycled
+            const TimeState& prevTimeState() const
+            {
+                return prevTimeState_();
+            }
+
 
         // Check
 
-            //- Return true if run should continue
+            //- Return true if run should continue,
+            //  also invokes the functionObjectList::end() method
+            //  when the time goes out of range
+            //  @note
+            //  For correct behaviour, the following style of time-loop
+            //  is recommended:
+            //  @code
+            //      while (runTime.run())
+            //      {
+            //          runTime++;
+            //          solve;
+            //          runTime.write();
+            //      }
+            //  @endcode
             virtual bool run() const;
 
-            //- Return true if end of run
+            //- Return true if run should continue and if so increment time
+            //  also invokes the functionObjectList::end() method
+            //  when the time goes out of range
+            //  @note
+            //  For correct behaviour, the following style of time-loop
+            //  is recommended:
+            //  @code
+            //      while (runTime.loop())
+            //      {
+            //          solve;
+            //          runTime.write();
+            //      }
+            //  @endcode
+            virtual bool loop();
+
+            //- Return true if end of run,
+            //  does not invoke any functionObject methods
+            //  @note
+            //      The rounding heuristics near endTime mean that
+            //      @code run() @endcode and @code !end() @endcode may
+            //      not yield the same result
             virtual bool end() const;
 
 
@@ -379,9 +421,6 @@ public:
             //- Reset the time and time-index
             virtual void setTime(const scalar, const label newIndex);
 
-            //- Reset stop-run control
-            virtual void setStopAt(const stopAtControls&);
-
             //- Reset end time
             virtual void setEndTime(const dimensionedScalar&);
 
@@ -391,20 +430,14 @@ public:
             //- Reset time step
             virtual void setDeltaT(const dimensionedScalar&);
 
-            //- Reset write control
-            virtual void setWriteControl(const writeControls&);
-
-            //- Reset write interval
-            virtual void setWriteInterval(const scalar);
-
             //- Reset time step
             virtual void setDeltaT(const scalar);
 
             //- Set time to sub-cycle for the given number of steps
             virtual TimeState subCycle(const label nSubCycles);
 
-            //- Reset time after sub-cycling back to given TimeState
-            virtual void endSubCycle(const TimeState&);
+            //- Reset time after sub-cycling back to previous TimeState
+            virtual void endSubCycle();
 
             //- Return non-const access to the list of function objects
             functionObjectList& functionObjects()
@@ -415,16 +448,18 @@ public:
 
     // Member operators
 
-        //- Set deltaT to that specified and increment time
+        //- Set deltaT to that specified and increment time via operator++()
         virtual Time& operator+=(const dimensionedScalar&);
 
-        //- Set deltaT to that specified and increment time
+        //- Set deltaT to that specified and increment time via operator++()
         virtual Time& operator+=(const scalar);
 
-        //- Prefix increment
+        //- Prefix increment,
+        //  also invokes the functionObjectList::start() or
+        //  functionObjectList::execute() method, depending on the time-index
         virtual Time& operator++();
 
-        //- Postfix increment
+        //- Postfix increment, this is identical to the prefix increment
         virtual Time& operator++(int);
 };
 

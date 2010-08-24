@@ -37,7 +37,7 @@ Foam::patchIdentifier::patchIdentifier
 )
 :
     name_(name),
-    boundaryIndex_(index),
+    index_(index),
     physicalType_(physicalType)
 {}
 
@@ -50,12 +50,9 @@ Foam::patchIdentifier::patchIdentifier
 )
 :
     name_(name),
-    boundaryIndex_(index)
+    index_(index)
 {
-    if (dict.found("physicalType"))
-    {
-        dict.lookup("physicalType") >> physicalType_;
-    }
+    dict.readIfPresent("physicalType", physicalType_);
 }
 
 
@@ -66,7 +63,7 @@ Foam::patchIdentifier::patchIdentifier
 )
 :
     name_(p.name_),
-    boundaryIndex_(index),
+    index_(index),
     physicalType_(p.physicalType_)
 {}
 

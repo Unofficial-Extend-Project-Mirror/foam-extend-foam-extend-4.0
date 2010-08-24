@@ -26,7 +26,6 @@ License
 
 #include "DILUSmoother.H"
 #include "DILUPreconditioner.H"
-#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -34,7 +33,8 @@ namespace Foam
 {
     defineTypeNameAndDebug(DILUSmoother, 0);
 
-    addToRunTimeSelectionTable(lduSmoother, DILUSmoother, word);
+    lduSmoother::addasymMatrixConstructorToTable<DILUSmoother>
+        addDILUSmootherAsymMatrixConstructorToTable_;
 }
 
 

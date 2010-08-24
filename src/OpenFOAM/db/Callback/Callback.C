@@ -26,15 +26,10 @@ License
 
 #include "Callback.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class CallbackType>
-Callback<CallbackType>::Callback(CallbackRegistry<CallbackType>& cbr)
+Foam::Callback<CallbackType>::Callback(CallbackRegistry<CallbackType>& cbr)
 :
     cbr_(cbr)
 {
@@ -43,7 +38,7 @@ Callback<CallbackType>::Callback(CallbackRegistry<CallbackType>& cbr)
 
 
 template<class CallbackType>
-Callback<CallbackType>::Callback(const Callback<CallbackType>& cb)
+Foam::Callback<CallbackType>::Callback(const Callback<CallbackType>& cb)
 :
     cbr_(cb.cbr_)
 {
@@ -54,7 +49,7 @@ Callback<CallbackType>::Callback(const Callback<CallbackType>& cb)
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class CallbackType>
-Callback<CallbackType>::~Callback()
+Foam::Callback<CallbackType>::~Callback()
 {
     checkOut();
 }
@@ -63,7 +58,7 @@ Callback<CallbackType>::~Callback()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class CallbackType>
-bool Callback<CallbackType>::checkIn()
+bool Foam::Callback<CallbackType>::checkIn()
 {
     if (!Callback<CallbackType>::link::registered())
     {
@@ -78,7 +73,7 @@ bool Callback<CallbackType>::checkIn()
 
 
 template<class CallbackType>
-bool Callback<CallbackType>::checkOut()
+bool Foam::Callback<CallbackType>::checkOut()
 {
     if (Callback<CallbackType>::link::registered())
     {
@@ -99,9 +94,5 @@ bool Callback<CallbackType>::checkOut()
     }
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

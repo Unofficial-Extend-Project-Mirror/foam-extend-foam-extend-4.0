@@ -27,14 +27,10 @@ License
 #include "primitiveMesh.H"
 #include "demandDrivenData.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void primitiveMesh::printAllocated() const
+void Foam::primitiveMesh::printAllocated() const
 {
     Pout<< "primitiveMesh allocated :" << endl;
 
@@ -128,7 +124,7 @@ void primitiveMesh::printAllocated() const
 }
 
 
-void primitiveMesh::clearGeom()
+void Foam::primitiveMesh::clearGeom()
 {
     if (debug)
     {
@@ -144,7 +140,7 @@ void primitiveMesh::clearGeom()
 }
 
 
-void primitiveMesh::clearAddressing()
+void Foam::primitiveMesh::clearAddressing()
 {
     if (debug)
     {
@@ -173,15 +169,11 @@ void primitiveMesh::clearAddressing()
 }
 
 
-void primitiveMesh::clearOut()
+void Foam::primitiveMesh::clearOut()
 {
     clearGeom();
     clearAddressing();
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

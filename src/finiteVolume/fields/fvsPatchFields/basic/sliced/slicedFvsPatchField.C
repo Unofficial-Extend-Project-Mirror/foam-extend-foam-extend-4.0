@@ -56,13 +56,7 @@ slicedFvsPatchField<Type>::slicedFvsPatchField
 )
 :
     fvsPatchField<Type>(p, iF)
-{
-    notImplemented
-    (
-        "slicedFvsPatchField<Type>::"
-        "slicedFvsPatchField(const fvPatch&, const Field<Type>&)"
-    );
-}
+{}
 
 
 template<class Type>

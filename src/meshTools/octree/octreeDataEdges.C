@@ -36,7 +36,7 @@ License
 
 defineTypeNameAndDebug(Foam::octreeDataEdges, 0);
 
-Foam::scalar Foam::octreeDataEdges::tol = 1E-6;
+Foam::scalar Foam::octreeDataEdges::tol = 1e-6;
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

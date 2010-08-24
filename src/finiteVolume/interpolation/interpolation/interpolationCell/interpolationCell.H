@@ -63,7 +63,6 @@ public:
         //- Construct from components
         interpolationCell
         (
-            const volPointInterpolation& pInterp,
             const GeometricField<Type, fvPatchField, volMesh>& psi
         );
 

@@ -1,38 +1,46 @@
-// The FOAM Project // File: layerSmooth.H
-/*  
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
- =========         | Class Interface
- \\      /         |
-  \\    /          | Name:   lateralValves
-   \\  /           | Family: engine
-    \\/            |
-    F ield         | FOAM version: 2.3
-    O peration     |
-    A and          | Copyright (C) 1991-2004 Nabla Ltd.
-    M anipulation  |          All Rights Reserved.
--------------------------------------------------------------------------------
-CLASS
-    layerSmooth
+License
+    This file is part of OpenFOAM.
 
-DESCRIPTION
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+Class
+    Foam::layerSmooth
+
+Description
     Engine mesh class for canted valves engine. Layers are added/removed on the
     piston, while mesh is deformed close to the valves. Attach/detach boundary
     is used. There are no sliding interfaces.
 
-C++
-    listOfSourceFiles
+Author
+	Tommaso Lucchini
+
+SourceFiles
         addLayerSmoothMeshModifiers.C
         layerSmooth.C
         layerSmoothCalculate.C
         layerSmoothInitialize.C
         layerSmoothMove.C
-    endListOfSourceFiles
 
-AUTHOR
-	Tommaso Lucchini
-
-*/
-// ------------------------------------------------------------------------- //
+\*---------------------------------------------------------------------------*/
 
 #ifndef layerSmooth_H
 #define layerSmooth_H
@@ -88,11 +96,10 @@ class layerSmooth
 
         //- Motion solver
         autoPtr<motionSolver> msPtr_;
-               
+
         //- tolerance for attach/detach in the valve plane
         scalar valvePlaneTol_;
-        
-        
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -103,7 +110,7 @@ class layerSmooth
 
         //- Make layering modifiers live
         void makeLayersLive();
-        
+
         //- Prepare valve attach/detach
         void valveDetach();
 
@@ -113,19 +120,24 @@ class layerSmooth
         //- Prepare valve attach/detach
         void prepareValveDetach();
 
-        //- Check if all patches exist, then calculate virtualPistonPosition, 
+        //- Check if all patches exist, then calculate virtualPistonPosition,
         //- pistonPosition and deckHeight for the first time
         void checkAndCalculate();
-        
-        //- Calculate the virtualPistonPosition, 
+
+        //- Calculate the virtualPistonPosition,
         void setVirtualPositions();
-                
+
         bool realDeformation() const;
-                        
+
         bool inCantedValve(const point& p, const label& i) const;
 
-        bool isACylinderHeadFace(const labelList& cylHeadFaces, const label face);
-                        
+        bool isACylinderHeadFace
+        (
+            const labelList& cylHeadFaces,
+            const label face
+        );
+
+
 public:
 
     //- Runtime type information
@@ -180,7 +192,8 @@ public:
         void setBoundaryVelocity(volVectorField& U);
 
         //- Generate the mesh from a series of square blocks
-        void generateMesh(){};
+        void generateMesh()
+        {}
 };
 
 
@@ -189,6 +202,7 @@ public:
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #include "layerSmoothI.H"
 
 #endif

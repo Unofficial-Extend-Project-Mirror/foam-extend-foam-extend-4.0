@@ -29,41 +29,76 @@ License
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::IOField<Type>::IOField
-(
-    const IOobject& io
-)
+Foam::IOField<Type>::IOField(const IOobject& io)
 :
-    regIOobject(io),
-    Field<Type>(readStream(typeName))
+    regIOobject(io)
 {
-    close();
+    if
+    (
+        io.readOpt() == IOobject::MUST_READ
+     || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+    )
+    {
+        readStream(typeName) >> *this;
+        close();
+    }
 }
 
 
 template<class Type>
-Foam::IOField<Type>::IOField
-(
-    const IOobject& io,
-    const label size
-)
+Foam::IOField<Type>::IOField(const IOobject& io, const label size)
 :
-    regIOobject(io),
-    Field<Type>(size)
-{}
+    regIOobject(io)
+{
+    if
+    (
+        io.readOpt() == IOobject::MUST_READ
+     || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+    )
+    {
+        readStream(typeName) >> *this;
+        close();
+    }
+    else
+    {
+        Field<Type>::setSize(size);
+    }
+}
 
 
 template<class Type>
-Foam::IOField<Type>::IOField
-(
-    const IOobject& io,
-    const Field<Type>& f
-)
+Foam::IOField<Type>::IOField(const IOobject& io, const Field<Type>& f)
 :
-    regIOobject(io),
-    Field<Type>(f)
+    regIOobject(io)
 {
-    if (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+    if
+    (
+        io.readOpt() == IOobject::MUST_READ
+     || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+    )
+    {
+        readStream(typeName) >> *this;
+        close();
+    }
+    else
+    {
+        Field<Type>::operator=(f);
+    }
+}
+
+
+template<class Type>
+Foam::IOField<Type>::IOField(const IOobject& io, const Xfer<Field<Type> >& f)
+:
+    regIOobject(io)
+{
+    Field<Type>::transfer(f());
+
+    if
+    (
+        io.readOpt() == IOobject::MUST_READ
+     || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+    )
     {
         readStream(typeName) >> *this;
         close();
@@ -73,9 +108,33 @@ Foam::IOField<Type>::IOField
 
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
 
-template<class T>
-Foam::IOField<T>::~IOField()
+template<class Type>
+Foam::IOField<Type>::~IOField()
 {}
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+bool Foam::IOField<Type>::writeData(Ostream& os) const
+{
+    return (os << static_cast<const Field<Type>&>(*this)).good();
+}
+
+
+// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
+
+template<class Type>
+void Foam::IOField<Type>::operator=(const IOField<Type>& rhs)
+{
+    Field<Type>::operator=(rhs);
+}
+
+
+template<class Type>
+void Foam::IOField<Type>::operator=(const Field<Type>& rhs)
+{
+    Field<Type>::operator=(rhs);
+}
 
 
 // ************************************************************************* //

@@ -30,7 +30,7 @@ License
 #include "EdgeMap.H"
 #include "triSurfaceFields.H"
 #include "Time.H"
-#include "PackedList.H"
+#include "PackedBoolList.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -289,7 +289,7 @@ void Foam::triSurfaceMesh::calcBounds(boundBox& bb, label& nPoints) const
 
     const triSurface& s = static_cast<const triSurface&>(*this);
 
-    PackedList<1> pointIsUsed(points().size());
+    PackedBoolList pointIsUsed(points().size());
 
     nPoints = 0;
     bb = boundBox::invertedBox;
@@ -495,7 +495,7 @@ void Foam::triSurfaceMesh::movePoints(const pointField& newPoints)
 const Foam::indexedOctree<Foam::treeDataTriSurface>&
     Foam::triSurfaceMesh::tree() const
 {
-    if (!tree_.valid())
+    if (tree_.empty())
     {
         // Calculate bb without constructing local point numbering.
         treeBoundBox bb;
@@ -547,7 +547,7 @@ const Foam::indexedOctree<Foam::treeDataTriSurface>&
 const Foam::indexedOctree<Foam::treeDataEdge>&
  Foam::triSurfaceMesh::edgeTree() const
 {
-    if (!edgeTree_.valid())
+    if (edgeTree_.empty())
     {
         // Boundary edges
         labelList bEdges
@@ -915,7 +915,7 @@ bool Foam::triSurfaceMesh::writeObject
 
     triSurface::write(fullPath);
 
-    if (!file(fullPath))
+    if (!isFile(fullPath))
     {
         return false;
     }

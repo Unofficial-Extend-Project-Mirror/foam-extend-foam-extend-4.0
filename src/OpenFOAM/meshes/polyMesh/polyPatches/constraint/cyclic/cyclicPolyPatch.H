@@ -60,8 +60,6 @@ SourceFiles
 namespace Foam
 {
 
-class patchZones;
-
 /*---------------------------------------------------------------------------*\
                       Class cyclicPolyPatch Declaration
 \*---------------------------------------------------------------------------*/
@@ -101,14 +99,22 @@ private:
         //- Type of transformation - rotational or translational
         transformType transform_;
 
-        //- Axis of rotation for rotational cyclics
-        vector rotationAxis_;
+        // For rotation
 
-        //- Point on axis of rotation for rotational cyclics
-        point rotationCentre_;
+            //- Axis of rotation for rotational cyclics
+            vector rotationAxis_;
 
-        //- Angle of rotation for rotational cyclics
-        scalar rotationAngle_;
+            //- Point on axis of rotation for rotational cyclics
+            point rotationCentre_;
+
+            //- Angle of rotation for rotational cyclics
+            scalar rotationAngle_;
+
+
+        // For translation
+
+            //- Translation vector
+            vector separationVector_;
 
 
     // Private member functions
@@ -136,7 +142,7 @@ private:
                 const primitivePatch&,
                 const faceList& half0Faces,
                 const faceList& half1Faces,
-
+                pointField& ppPoints,
                 pointField& half0Ctrs,
                 pointField& half1Ctrs,
                 pointField& anchors0,
@@ -280,6 +286,9 @@ public:
         const edgeList& coupledEdges() const;
 
 
+
+        // Transformation
+
         vector separation(const label facei) const
         {
             if (facei < size()/2)
@@ -329,17 +338,42 @@ public:
             }
         }
 
-        label transformGlobalFace(const label facei) const
-        {
-            if (facei - start() < size()/2)
+            label transformGlobalFace(const label facei) const
             {
-                return facei + size()/2;
+                if (facei - start() < size()/2)
+                {
+                    return facei + size()/2;
+                }
+                else
+                {
+                    return facei - size()/2;
+                }
             }
-            else
+
+            //- Type of transform
+            transformType transform() const
             {
-                return facei - size()/2;
+                return transform_;
             }
-        }
+
+            //- Axis of rotation for rotational cyclics
+            const vector& rotationAxis() const
+            {
+                return rotationAxis_;
+            }
+
+            //- point on axis of rotation for rotational cyclics
+            const point& rotationCentre() const
+            {
+                return rotationCentre_;
+            }
+
+            //- Translation vector for translational cyclics
+            const vector& separationVector() const
+            {
+                return separationVector_;
+            }
+
 
 
         //- Initialize ordering for primitivePatch. Does not

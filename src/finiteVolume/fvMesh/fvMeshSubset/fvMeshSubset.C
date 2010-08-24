@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright 2000-2007 H. Jasak. All rights reserved
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -48,7 +48,7 @@ namespace Foam
 
 bool Foam::fvMeshSubset::checkCellSubset() const
 {
-    if (!fvMeshSubsetPtr_)
+    if (fvMeshSubsetPtr_.empty())
     {
         FatalErrorIn("bool fvMeshSubset::checkCellSubset() const")
             << "Mesh subset not set.  Please set the cell map using "
@@ -111,7 +111,7 @@ void Foam::fvMeshSubset::doCoupledPatches
         {
             const polyPatch& pp = oldPatches[oldPatchI];
 
-            if (typeid(pp) == typeid(processorPolyPatch))
+            if (isA<processorPolyPatch>(pp))
             {
                 const processorPolyPatch& procPatch =
                     refCast<const processorPolyPatch>(pp);
@@ -133,7 +133,7 @@ void Foam::fvMeshSubset::doCoupledPatches
         {
             const polyPatch& pp = oldPatches[oldPatchI];
 
-            if (typeid(pp) == typeid(processorPolyPatch))
+            if (isA<processorPolyPatch>(pp))
             {
                 const processorPolyPatch& procPatch =
                     refCast<const processorPolyPatch>(pp);
@@ -171,7 +171,7 @@ void Foam::fvMeshSubset::doCoupledPatches
     {
         const polyPatch& pp = oldPatches[oldPatchI];
 
-        if (typeid(pp) == typeid(cyclicPolyPatch))
+        if (isA<cyclicPolyPatch>(pp))
         {
             const cyclicPolyPatch& cycPatch =
                 refCast<const cyclicPolyPatch>(pp);
@@ -773,9 +773,9 @@ void Foam::fvMeshSubset::setCellSubset
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        newPoints,
-        newFaces,
-        newCells
+        xferMove(newPoints),
+        xferMove(newFaces),
+        xferMove(newCells)
     );
 
     // Clear point mesh
@@ -1269,9 +1269,9 @@ void Foam::fvMeshSubset::setLargeCellSubset
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        newPoints,
-        newFaces,
-        newCells,
+        xferMove(newPoints),
+        xferMove(newFaces),
+        xferMove(newCells),
         syncPar           // parallel synchronisation
     );
 

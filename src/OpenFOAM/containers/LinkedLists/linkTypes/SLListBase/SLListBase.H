@@ -38,6 +38,7 @@ SourceFiles
 
 #include "bool.H"
 #include "label.H"
+#include "uLabel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -119,6 +120,9 @@ public:
             //- Return number of elements in list
             inline label size() const;
 
+            //- Return true if the list is empty
+            inline bool empty() const;
+
             //- Return first entry
             inline link* first();
 
@@ -152,6 +156,9 @@ public:
             //- Clear the list
             inline void clear();
 
+            //- Transfer the contents of the argument into this List
+            //  and annull the argument list.
+            inline void transfer(SLListBase&);
 
     // STL iterator
 
@@ -172,16 +179,16 @@ public:
                 //- Copy of the link
                 link curLink_;
 
+            // Private Member Functions
+
+            //- Construct for a given SLListBase with NULL element and link.
+            //  Only used to create endIter
+            inline iterator(SLListBase&);
+
         public:
 
             //- Construct for a given SLListBase and link
             inline iterator(SLListBase&, link*);
-
-            //- Construct for a given SLListBase
-            //  setting element and link to NULL.
-            //  Only used to create endIter
-            inline iterator(SLListBase&);
-
 
             // Member operators
 
@@ -197,10 +204,6 @@ public:
         };
 
         inline iterator begin();
-
-        //- iterator returned by end()
-        static iterator endIter;
-
         inline const iterator& end();
 
 
@@ -239,12 +242,20 @@ public:
                 inline const_iterator operator++(int);
         };
 
+        inline const_iterator cbegin() const;
+        inline const const_iterator& cend() const;
+
         inline const_iterator begin() const;
+        inline const const_iterator& end() const;
+
+
+private:
+
+        //- iterator returned by end()
+        static iterator endIter_;
 
         //- const_iterator returned by end()
-        static const_iterator endConstIter;
-
-        inline const const_iterator& end() const;
+        static const_iterator endConstIter_;
 };
 
 

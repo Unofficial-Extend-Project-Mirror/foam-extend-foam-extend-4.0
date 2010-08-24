@@ -100,6 +100,11 @@ public:
     //- Runtime type information
     TypeName("DimensionedField");
 
+    // Static Member Functions
+
+        //- Return a null DimensionedField
+        inline static const DimensionedField<Type, GeoMesh>& null();
+
 
     // Constructors
 
@@ -156,6 +161,12 @@ public:
             bool reUse
         );
 
+        //- Construct by transferring the DimensionedField
+        DimensionedField
+        (
+            const Xfer<DimensionedField<Type, GeoMesh> >&
+        );
+
         //- Construct as copy of tmp<DimensionedField> deleting argument
 #       ifdef ConstructFromTmp
         DimensionedField
@@ -186,6 +197,13 @@ public:
             bool reUse
         );
 
+        //- Construct by transferring the DimensionedField with a new name
+        DimensionedField
+        (
+            const word& newName,
+            const Xfer<DimensionedField<Type, GeoMesh> >&
+        );
+
         //- Construct as copy resetting name
 #       ifdef ConstructFromTmp
         DimensionedField
@@ -199,9 +217,8 @@ public:
         tmp<DimensionedField<Type, GeoMesh> > clone() const;
 
 
-    // Destructor
-
-        ~DimensionedField();
+    //- Destructor
+    virtual ~DimensionedField();
 
 
     // Member Functions
@@ -218,9 +235,6 @@ public:
         inline const Field<Type>& field() const;
 
         inline Field<Type>& field();
-
-        //- Return a null DimensionedField
-        static const DimensionedField<Type, GeoMesh>& null();
 
         //- Return a component field of the field
         tmp<DimensionedField<cmptType, GeoMesh> > component

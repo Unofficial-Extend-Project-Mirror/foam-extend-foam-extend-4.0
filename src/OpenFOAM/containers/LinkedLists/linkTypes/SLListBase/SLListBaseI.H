@@ -29,33 +29,28 @@ Description
 
 #include "error.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-inline SLListBase::link::link()
+inline Foam::SLListBase::link::link()
 :
     next_(0)
 {}
 
 
-inline SLListBase::link::link(link* p)
+inline Foam::SLListBase::link::link(link* p)
 :
     next_(p)
 {}
 
 
-inline SLListBase::SLListBase()
+inline Foam::SLListBase::SLListBase()
 :
     last_(0),
     nElmts_(0)
 {}
 
 
-inline SLListBase::SLListBase(link* a)
+inline Foam::SLListBase::SLListBase(link* a)
 :
     last_(a->next_ = a),
     nElmts_(1)
@@ -64,19 +59,26 @@ inline SLListBase::SLListBase(link* a)
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-inline SLListBase::~SLListBase()
+inline Foam::SLListBase::~SLListBase()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline label SLListBase::size() const
+inline Foam::label Foam::SLListBase::size() const
 {
     return nElmts_;
 }
 
 
-inline SLListBase::link* SLListBase::first()
+inline bool Foam::SLListBase::empty() const
+{
+    return !nElmts_;
+}
+
+
+inline Foam::SLListBase::link*
+Foam::SLListBase::first()
 {
     if (!nElmts_)
     {
@@ -88,7 +90,8 @@ inline SLListBase::link* SLListBase::first()
 }
 
 
-inline const SLListBase::link* SLListBase::first() const
+inline const Foam::SLListBase::link*
+Foam::SLListBase::first() const
 {
     if (!nElmts_)
     {
@@ -100,7 +103,8 @@ inline const SLListBase::link* SLListBase::first() const
 }
 
 
-inline SLListBase::link* SLListBase::last()
+inline Foam::SLListBase::link*
+Foam::SLListBase::last()
 {
     if (!nElmts_)
     {
@@ -112,7 +116,8 @@ inline SLListBase::link* SLListBase::last()
 }
 
 
-inline const SLListBase::link* SLListBase::last() const
+inline const Foam::SLListBase::link*
+Foam::SLListBase::last() const
 {
     if (!nElmts_)
     {
@@ -124,14 +129,26 @@ inline const SLListBase::link* SLListBase::last() const
 }
 
 
-inline void SLListBase::clear()
+inline void Foam::SLListBase::clear()
 {
-    nElmts_ = 0;
     last_ = 0;
+    nElmts_ = 0;
 }
 
 
-inline SLListBase::link* SLListBase::remove(SLListBase::iterator& it)
+inline void Foam::SLListBase::transfer(SLListBase& lst)
+{
+    last_   = lst.last_;
+    nElmts_ = lst.nElmts_;
+
+    lst.clear();
+}
+
+
+inline Foam::SLListBase::link* Foam::SLListBase::remove
+(
+    SLListBase::iterator& it
+)
 {
     return remove(it.curElmt_);
 }
@@ -139,7 +156,7 @@ inline SLListBase::link* SLListBase::remove(SLListBase::iterator& it)
 
 // * * * * * * * * * * * * * * * STL iterator  * * * * * * * * * * * * * * * //
 
-inline SLListBase::iterator::iterator(SLListBase& s, link* elmt)
+inline Foam::SLListBase::iterator::iterator(SLListBase& s, link* elmt)
 :
     curList_(s),
     curElmt_(elmt),
@@ -147,7 +164,7 @@ inline SLListBase::iterator::iterator(SLListBase& s, link* elmt)
 {}
 
 
-inline SLListBase::iterator::iterator(SLListBase& s)
+inline Foam::SLListBase::iterator::iterator(SLListBase& s)
 :
     curList_(s),
     curElmt_(NULL),
@@ -155,32 +172,32 @@ inline SLListBase::iterator::iterator(SLListBase& s)
 {}
 
 
-inline void SLListBase::iterator::operator=(const iterator& iter)
+inline void Foam::SLListBase::iterator::operator=(const iterator& iter)
 {
     curElmt_ = iter.curElmt_;
     curLink_ = iter.curLink_;
 }
 
 
-inline bool SLListBase::iterator::operator==(const iterator& iter) const
+inline bool Foam::SLListBase::iterator::operator==(const iterator& iter) const
 {
     return curElmt_ == iter.curElmt_;
 }
 
 
-inline bool SLListBase::iterator::operator!=(const iterator& iter) const
+inline bool Foam::SLListBase::iterator::operator!=(const iterator& iter) const
 {
     return curElmt_ != iter.curElmt_;
 }
 
 
-inline SLListBase::link& SLListBase::iterator::operator*()
+inline Foam::SLListBase::link& Foam::SLListBase::iterator::operator*()
 {
     return *curElmt_;
 }
 
 
-inline SLListBase::iterator& SLListBase::iterator::operator++()
+inline Foam::SLListBase::iterator& Foam::SLListBase::iterator::operator++()
 {
     if (curElmt_ == curList_.last_ || curList_.last_ == 0)
     {
@@ -196,7 +213,8 @@ inline SLListBase::iterator& SLListBase::iterator::operator++()
 }
 
 
-inline SLListBase::iterator SLListBase::iterator::operator++(int)
+inline Foam::SLListBase::iterator
+Foam::SLListBase::iterator::operator++(int)
 {
     iterator tmp = *this;
     ++*this;
@@ -204,7 +222,8 @@ inline SLListBase::iterator SLListBase::iterator::operator++(int)
 }
 
 
-inline SLListBase::iterator SLListBase::begin()
+inline Foam::SLListBase::iterator
+Foam::SLListBase::begin()
 {
     if (size())
     {
@@ -212,20 +231,21 @@ inline SLListBase::iterator SLListBase::begin()
     }
     else
     {
-        return endIter;
+        return endIter_;
     }
 }
 
 
-inline const SLListBase::iterator& SLListBase::end()
+inline const Foam::SLListBase::iterator&
+Foam::SLListBase::end()
 {
-    return endIter;
+    return endIter_;
 }
 
 
 // * * * * * * * * * * * * * * STL const_iterator  * * * * * * * * * * * * * //
 
-inline SLListBase::const_iterator::const_iterator
+inline Foam::SLListBase::const_iterator::const_iterator
 (
     const SLListBase& s,
     const link* elmt
@@ -236,20 +256,23 @@ inline SLListBase::const_iterator::const_iterator
 {}
 
 
-inline SLListBase::const_iterator::const_iterator(const iterator& iter)
+inline Foam::SLListBase::const_iterator::const_iterator(const iterator& iter)
 :
     curList_(iter.curList_),
     curElmt_(iter.curElmt_)
 {}
 
 
-inline void SLListBase::const_iterator::operator=(const const_iterator& iter)
+inline void Foam::SLListBase::const_iterator::operator=
+(
+    const const_iterator& iter
+)
 {
     curElmt_ = iter.curElmt_;
 }
 
 
-inline bool SLListBase::const_iterator::operator==
+inline bool Foam::SLListBase::const_iterator::operator==
 (
     const const_iterator& iter
 ) const
@@ -258,7 +281,7 @@ inline bool SLListBase::const_iterator::operator==
 }
 
 
-inline bool SLListBase::const_iterator::operator!=
+inline bool Foam::SLListBase::const_iterator::operator!=
 (
     const const_iterator& iter
 ) const
@@ -267,13 +290,15 @@ inline bool SLListBase::const_iterator::operator!=
 }
 
 
-inline const SLListBase::link& SLListBase::const_iterator::operator*()
+inline const Foam::SLListBase::link&
+Foam::SLListBase::const_iterator::operator*()
 {
     return *curElmt_;
 }
 
 
-inline SLListBase::const_iterator& SLListBase::const_iterator::operator++()
+inline Foam::SLListBase::const_iterator&
+Foam::SLListBase::const_iterator::operator++()
 {
     if (curElmt_ == curList_.last_)
     {
@@ -288,7 +313,8 @@ inline SLListBase::const_iterator& SLListBase::const_iterator::operator++()
 }
 
 
-inline SLListBase::const_iterator SLListBase::const_iterator::operator++(int)
+inline Foam::SLListBase::const_iterator
+Foam::SLListBase::const_iterator::operator++(int)
 {
     const_iterator tmp = *this;
     ++*this;
@@ -296,7 +322,8 @@ inline SLListBase::const_iterator SLListBase::const_iterator::operator++(int)
 }
 
 
-inline SLListBase::const_iterator SLListBase::begin() const
+inline Foam::SLListBase::const_iterator
+Foam::SLListBase::cbegin() const
 {
     if (size())
     {
@@ -304,19 +331,30 @@ inline SLListBase::const_iterator SLListBase::begin() const
     }
     else
     {
-        return endConstIter;
+        return endConstIter_;
     }
 }
 
 
-inline const SLListBase::const_iterator& SLListBase::end() const
+inline const Foam::SLListBase::const_iterator&
+Foam::SLListBase::cend() const
 {
-    return endConstIter;
+    return endConstIter_;
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+inline Foam::SLListBase::const_iterator
+Foam::SLListBase::begin() const
+{
+    return this->cbegin();
+}
 
-} // End namespace Foam
+
+inline const Foam::SLListBase::const_iterator&
+Foam::SLListBase::end() const
+{
+    return endConstIter_;
+}
+
 
 // ************************************************************************* //

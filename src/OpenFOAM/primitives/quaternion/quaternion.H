@@ -194,7 +194,7 @@ inline quaternion inv(const quaternion& q);
 //- Return a string representation of a quaternion
 word name(const quaternion&);
 
-//- Specify data associated with quaternion type is contiguous
+//- Data associated with quaternion type are contiguous
 template<>
 inline bool contiguous<quaternion>() {return true;}
 

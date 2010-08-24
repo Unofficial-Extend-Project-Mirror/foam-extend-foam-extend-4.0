@@ -102,8 +102,16 @@ public:
         //- Construct null
         interpolationTable();
 
+        //- Construct from components
+        interpolationTable
+        (
+            const List<Tuple2<scalar, Type> >& values,
+            const boundsHandling bounds,
+            const fileName& fName
+        );
+
         //- Construct given the name of the file containing the table of data
-        interpolationTable(const fileName& fn);
+        interpolationTable(const fileName& fName);
 
         //- Construct by reading the fileName and boundsHandling from dictionary
         //  and read the table from that file.

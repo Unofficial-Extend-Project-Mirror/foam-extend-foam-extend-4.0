@@ -26,79 +26,63 @@ License
 
 #include "solid.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(solid, 0);
-defineRunTimeSelectionTable(solid,);
-defineRunTimeSelectionTable(solid, Istream);
+    defineTypeNameAndDebug(solid, 0);
+    defineRunTimeSelectionTable(solid,);
+    defineRunTimeSelectionTable(solid, Istream);
+}
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-autoPtr<solid> solid::New(Istream& is)
+Foam::solid::solid
+(
+    scalar rho,
+    scalar cp,
+    scalar K,
+    scalar Hf,
+    scalar emissivity
+)
+:
+    rho_(rho),
+    cp_(cp),
+    K_(K),
+    Hf_(Hf),
+    emissivity_(emissivity)
+{}
+
+
+Foam::solid::solid(Istream& is)
+:
+    rho_(readScalar(is)),
+    cp_(readScalar(is)),
+    K_(readScalar(is)),
+    Hf_(readScalar(is)),
+    emissivity_(readScalar(is))
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void Foam::solid::writeData(Ostream& os) const
 {
-    if (debug)
-    {
-        Info<< "solid::New(Istream&): "
-            << "constructing solid"
-            << endl;
-    }
-
-    word solidType(is);
-
-    word coeffs(is);
-
-    if (coeffs == "defaultCoeffs")
-    {
-        ConstructorTable::iterator cstrIter =
-            ConstructorTablePtr_->find(solidType);
-
-        if (cstrIter == ConstructorTablePtr_->end())
-        {
-            FatalErrorIn("solid::New(Istream&)")
-                << "Unknown solid type " << solidType << nl << nl
-                << "Valid solid types are :" << endl
-                << ConstructorTablePtr_->toc()
-                << exit(FatalError);
-        }
-
-        return autoPtr<solid>(cstrIter()());
-    }
-    else if (coeffs == "coeffs")
-    {
-        IstreamConstructorTable::iterator cstrIter =
-            IstreamConstructorTablePtr_->find(solidType);
-
-        if (cstrIter == IstreamConstructorTablePtr_->end())
-        {
-            FatalErrorIn("solid::New(Istream&)")
-                << "Unknown solid type " << solidType << nl << nl
-                << "Valid solid types are :" << endl
-                << IstreamConstructorTablePtr_->toc()
-                << exit(FatalError);
-        }
-
-        return autoPtr<solid>(cstrIter()(is));
-    }
-    else
-    {
-        FatalErrorIn("solid::New(Istream&)")
-            << "solid type " << solidType
-            << ", option " << coeffs << " given"
-            << ", should be coeffs or defaultCoeffs"
-            << exit(FatalError);
-
-        return autoPtr<solid>(NULL);
-    }
+    os  << rho_ << token::SPACE
+        << cp_ << token::SPACE
+        << K_ << token::SPACE
+        << Hf_ << token::SPACE
+        << emissivity_;
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * IOStream operators  * * * * * * * * * * * * * //
 
-} // End namespace Foam
+Foam::Ostream& Foam::operator<<(Ostream& os, const solid& s)
+{
+    s.writeData(os);
+    return os;
+}
+
 
 // ************************************************************************* //

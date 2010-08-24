@@ -30,9 +30,8 @@ Description
 
 SourceFiles
     Pstream.C
-    IPread.C
-    OPwrite.C
-    Pprint.C
+    PstreamsPrint.C
+    PstreamCommsStruct.C
     gatherScatter.C
     combineGatherScatter.C
     gatherScatterList.C
@@ -152,9 +151,7 @@ public:
 
          // Ostream Operator
 
-            #ifndef __CINT__
             friend Ostream& operator<<(Ostream&, const commsStruct&);
-            #endif
     };
 
 
@@ -412,7 +409,6 @@ public:
             template <class T>
             static void combineScatter(T& Value);
 
-
         // Combine variants working on whole List at a time.
 
             template <class T, class CombineOp>
@@ -469,6 +465,7 @@ public:
             //- Like above but switches between linear/tree communication
             template <class Container>
             static void mapCombineScatter(Container& Values);
+
 
 
         // Gather/scatter keeping the individual processor data separate.

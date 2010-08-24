@@ -23,10 +23,14 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-     Foam::pressureDirectedInletVelocityFvPatchVectorField
+    Foam::pressureDirectedInletVelocityFvPatchVectorField
 
 Description
-    Foam::pressureDirectedInletOutletVelocityFvPatchVectorField
+    Velocity inlet boundary condition for patches where the pressure is
+    specified. The inflow velocity is obtained from the flux with the
+    specified "inletDirection" direction.  If reverse flow is possible or
+    expected use the "pressureDirectedInletOutletVelocityFvPatchVectorField"
+    BC instead.
 
 SourceFiles
     pressureDirectedInletVelocityFvPatchVectorField.C
@@ -54,7 +58,8 @@ class pressureDirectedInletVelocityFvPatchVectorField
 {
     // Private data
 
-        //- Inlet direction
+        word phiName_;
+        word rhoName_;
         vectorField inletDir_;
 
 
@@ -131,8 +136,34 @@ public:
         }
 
 
-
     // Member functions
+
+        // Access
+
+            //- Return the name of rho
+            const word& rhoName() const
+            {
+                return rhoName_;
+            }
+
+            //- Return reference to the name of rho to allow adjustment
+            word& rhoName()
+            {
+                return rhoName_;
+            }
+
+            //- Return the name of phi
+            const word& phiName() const
+            {
+                return phiName_;
+            }
+
+            //- Return reference to the name of phi to allow adjustment
+            word& phiName()
+            {
+                return phiName_;
+            }
+
 
         // Mapping functions
 
@@ -155,6 +186,11 @@ public:
 
         //- Write
         virtual void write(Ostream&) const;
+q
+
+    // Member operators
+
+        virtual void operator=(const fvPatchField<vector>& pvf);
 };
 
 

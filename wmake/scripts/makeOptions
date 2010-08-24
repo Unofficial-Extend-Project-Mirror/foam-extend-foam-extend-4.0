@@ -5,7 +5,7 @@
 #  \\    /   O peration     |
 #   \\  /    A nd           | Copyright held by original author
 #    \\/     M anipulation  |
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # License
 #     This file is part of OpenFOAM.
 #
@@ -28,26 +28,18 @@
 #
 # Description
 #     Scan the current directory for options and construct Make/options
-#     It has to be written in the C-shell rather than the Bourne shell
-#     because it uses file name manipulators.
 #
 #     Usage : makeOptions
 #
 #------------------------------------------------------------------------------
 
-if [ -r "Make/options" ]
+if [ -r Make/options ]
 then
-    echo "makeOptions: Make/options already exists, exiting"
-    exit 1
+   echo "makeOptions: Make/options already exists, exiting"
+   exit 1
 fi
 
-
-if [ ! -d "Make" ]
-then
-    mkdir Make
-fi
-
-rulesPath=$WM_DIR/rules/$WM_ARCH
+[ -d Make ] || mkdir Make
 
 rm -f Make/options
 

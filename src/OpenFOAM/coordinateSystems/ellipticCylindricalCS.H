@@ -59,8 +59,14 @@ class ellipticCylindricalCS
 :
     public coordinateSystem
 {
+    // Private data members
+
         // Distance of the foci from the origin
         const scalar a_;
+
+        //- Are angles in degrees? (default = true)
+        bool inDegrees_;
+
 
 protected:
 
@@ -99,25 +105,31 @@ public:
     // Constructors
 
         //- Construct null
-        ellipticCylindricalCS();
+        ellipticCylindricalCS(const bool inDegrees = true);
 
-        //- Construct from components
-        ellipticCylindricalCS
+        //- Construct copy
+        sphericalCS
         (
-            const word& name,
-            const point& origin,
-            const vector& axis,
-            const vector& direction,
-            const scalar a
+            const coordinateSystem&,
+            const bool inDegrees = true
         );
 
-        //- Construct from origin, rotation angles and
+        //- Construct copy with a different name
+        sphericalCS
+        (
+            const word& name,
+            const coordinateSystem&,
+            const bool inDegrees = true
+        );
+
+        //- Construct from origin, and rotation
         ellipticCylindricalCS
         (
             const word& name,
             const point& origin,
             const coordinateRotation& cr,
-            const scalar a
+            const scalar a,
+            const bool inDegrees = true
         );
 
         //- Construct from dictionary

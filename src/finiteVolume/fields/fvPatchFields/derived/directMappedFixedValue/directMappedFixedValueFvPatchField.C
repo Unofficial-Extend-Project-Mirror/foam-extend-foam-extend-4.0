@@ -25,8 +25,8 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "directMappedFixedValueFvPatchField.H"
-#include "directMappedFvPatch.H"
-#include "fvBoundaryMesh.H"
+#include "directMappedPatchBase.H"
+#include "volFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -61,7 +61,7 @@ directMappedFixedValueFvPatchField<Type>::directMappedFixedValueFvPatchField
     setAverage_(ptf.setAverage_),
     average_(ptf.average_)
 {
-    if (!isType<directMappedFvPatch>(this->patch()))
+    if (!isA<directMappedPatchBase>(this->patch().patch()))
     {
         FatalErrorIn
         (
@@ -74,7 +74,7 @@ directMappedFixedValueFvPatchField<Type>::directMappedFixedValueFvPatchField
             "    const fvPatchFieldMapper&\n"
             ")\n"
         )   << "\n    patch type '" << p.type()
-            << "' not type '" << typeName << "'"
+            << "' not type '" << directMappedPatchBase::typeName << "'"
             << "\n    for patch " << p.name()
             << " of field " << this->dimensionedInternalField().name()
             << " in file " << this->dimensionedInternalField().objectPath()
@@ -95,7 +95,7 @@ directMappedFixedValueFvPatchField<Type>::directMappedFixedValueFvPatchField
     setAverage_(readBool(dict.lookup("setAverage"))),
     average_(pTraits<Type>(dict.lookup("average")))
 {
-    if (!isType<directMappedFvPatch>(this->patch()))
+    if (!isA<directMappedPatchBase>(this->patch().patch()))
     {
         FatalErrorIn
         (
@@ -107,7 +107,7 @@ directMappedFixedValueFvPatchField<Type>::directMappedFixedValueFvPatchField
             "    const dictionary& dict\n"
             ")\n"
         )   << "\n    patch type '" << p.type()
-            << "' not type '" << typeName << "'"
+            << "' not type '" << directMappedPatchBase::typeName << "'"
             << "\n    for patch " << p.name()
             << " of field " << this->dimensionedInternalField().name()
             << " in file " << this->dimensionedInternalField().objectPath()
@@ -151,76 +151,137 @@ void directMappedFixedValueFvPatchField<Type>::updateCoeffs()
         return;
     }
 
-    // Get the directMappedPolyPatch
-    const directMappedPolyPatch& mpp = refCast<const directMappedPolyPatch>
+    typedef GeometricField<Type, fvPatchField, volMesh> fieldType;
+
+    // Get the scheduling information from the directMappedPatchBase
+    const directMappedPatchBase& mpp = refCast<const directMappedPatchBase>
     (
         directMappedFixedValueFvPatchField<Type>::patch().patch()
     );
+    const mapDistribute& distMap = mpp.map();
 
     // Get the scheduling information
     const List<labelPair>& schedule = mpp.schedule();
     const labelListList& sendCellLabels = mpp.sendCellLabels();
     const labelListList& receiveFaceLabels = mpp.receiveFaceLabels();
+    // Force recalculation of schedule
+    distMap.schedule();
 
+    const fvMesh& nbrMesh = refCast<const fvMesh>(mpp.sampleMesh());
+    const word& fldName = this->dimensionedInternalField().name();
 
-    Field<Type> newValues(this->size());
+    // Result of obtaining remote values
+    Field<Type> newValues;
 
-    forAll(schedule, i)
+    switch (mpp.mode())
     {
-        const labelPair& twoProcs = schedule[i];
-        label sendProc = twoProcs[0];
-        label recvProc = twoProcs[1];
-
-        if (Pstream::myProcNo() == sendProc)
+        case directMappedPatchBase::NEARESTCELL:
         {
-            OPstream toProc(Pstream::blocking, recvProc);
-            toProc<< IndirectList<Type>
-            (
-                this->internalField(),
-                sendCellLabels[recvProc]
-            )();
-        }
-        else
-        {
-            // I am receiver. Receive from sendProc.
-            IPstream fromProc(Pstream::blocking, sendProc);
-
-            Field<Type> fromFld(fromProc);
-
-            // Destination faces
-            const labelList& faceLabels = receiveFaceLabels[sendProc];
-
-            forAll(fromFld, i)
+            if (mpp.sameRegion())
             {
-                label patchFaceI = faceLabels[i];
-
-                newValues[patchFaceI] = fromFld[i];
+                newValues = this->internalField();
             }
+            else
+            {
+                newValues = nbrMesh.lookupObject<fieldType>
+                (
+                    fldName
+                ).internalField();
+            }
+            mapDistribute::distribute
+            (
+                Pstream::defaultCommsType,
+                distMap.schedule(),
+                distMap.constructSize(),
+                distMap.subMap(),
+                distMap.constructMap(),
+                newValues
+            );
+
+            break;
         }
-    }
-
-    // Do data from myself
-    {
-        IndirectList<Type> fromFld
-        (
-            this->internalField(),
-            sendCellLabels[Pstream::myProcNo()]
-        );
-    
-        // Destination faces
-        const labelList& faceLabels = receiveFaceLabels[Pstream::myProcNo()];
-
-        forAll(fromFld, i)
+        case directMappedPatchBase::NEARESTPATCHFACE:
         {
-            label patchFaceI = faceLabels[i];
+            const label nbrPatchID = nbrMesh.boundaryMesh().findPatchID
+            (
+                mpp.samplePatch()
+            );
+            if (nbrPatchID < 0)
+            {
+                FatalErrorIn
+                (
+                    "void directMappedFixedValueFvPatchField<Type>::"
+                    "updateCoeffs()"
+                )<< "Unable to find sample patch " << mpp.samplePatch()
+                 << " in region " << mpp.sampleRegion()
+                 << " for patch " << this->patch().name() << nl
+                 << abort(FatalError);
+            }
 
-            newValues[patchFaceI] = fromFld[i];
+            const fieldType& nbrField = nbrMesh.lookupObject<fieldType>
+            (
+                fldName
+            );
+            newValues = nbrField.boundaryField()[nbrPatchID];
+            mapDistribute::distribute
+            (
+                Pstream::defaultCommsType,
+                distMap.schedule(),
+                distMap.constructSize(),
+                distMap.subMap(),
+                distMap.constructMap(),
+                newValues
+            );
+
+            break;
+        }
+        case directMappedPatchBase::NEARESTFACE:
+        {
+            Field<Type> allValues(nbrMesh.nFaces(), pTraits<Type>::zero);
+
+            const fieldType& nbrField = nbrMesh.lookupObject<fieldType>
+            (
+                fldName
+            );
+            forAll(nbrField.boundaryField(), patchI)
+            {
+                const fvPatchField<Type>& pf =
+                    nbrField.boundaryField()[patchI];
+                label faceStart = pf.patch().patch().start();
+
+                forAll(pf, faceI)
+                {
+                    allValues[faceStart++] = pf[faceI];
+                }
+            }
+
+            mapDistribute::distribute
+            (
+                Pstream::defaultCommsType,
+                distMap.schedule(),
+                distMap.constructSize(),
+                distMap.subMap(),
+                distMap.constructMap(),
+                allValues
+            );
+
+            newValues = this->patch().patchSlice(allValues);
+
+            break;
+        }
+        default:
+        {
+            FatalErrorIn
+            (
+                "directMappedFixedValueFvPatchField<Type>::updateCoeffs()"
+            )<< "Unknown sampling mode: " << mpp.mode()
+             << nl << abort(FatalError);
         }
     }
 
     if (setAverage_)
     {
-        Type averagePsi = 
+        Type averagePsi =
             gSum(this->patch().magSf()*newValues)
            /gSum(this->patch().magSf());
 
@@ -235,6 +296,16 @@ void directMappedFixedValueFvPatchField<Type>::updateCoeffs()
     }
 
     this->operator==(newValues);
+
+    if (debug)
+    {
+        Info<< "directMapped on field:" << fldName
+            << " patch:" << this->patch().name()
+            << "  avg:" << gAverage(*this)
+            << "  min:" << gMin(*this)
+            << "  max:" << gMax(*this)
+            << endl;
+    }
 
     fixedValueFvPatchField<Type>::updateCoeffs();
 }

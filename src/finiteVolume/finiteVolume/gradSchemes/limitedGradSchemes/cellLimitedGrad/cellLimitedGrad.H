@@ -67,7 +67,7 @@ class cellLimitedGrad
         tmp<fv::gradScheme<Type> > basicGradScheme_;
 
         //- Limiter coefficient
-        scalar k_;
+        const scalar k_;
 
 
     // Private Member Functions

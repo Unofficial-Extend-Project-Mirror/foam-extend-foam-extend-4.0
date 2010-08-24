@@ -34,15 +34,10 @@ Description
 #include "linePointRef.H"
 #include "pointIndexHit.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template <class Type>
-string octree<Type>::volType(const label type)
+Foam::string Foam::octree<Type>::volType(const label type)
 {
     if (type == UNKNOWN)
     {
@@ -70,10 +65,13 @@ string octree<Type>::volType(const label type)
 }
 
 
-// Determine inside/outside status of vector compared to geometry based
-// normal
+// Determine inside/outside status of vector compared to geometry-based normal
 template <class Type>
-label octree<Type>::getVolType(const vector& geomNormal, const vector& vec)
+Foam::label Foam::octree<Type>::getVolType
+(
+    const vector& geomNormal,
+    const vector& vec
+)
 {
     scalar sign = geomNormal & vec;
 
@@ -91,7 +89,7 @@ label octree<Type>::getVolType(const vector& geomNormal, const vector& vec)
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template <class Type>
-octree<Type>::octree
+Foam::octree<Type>::octree
 (
     const treeBoundBox& octreeBb,
     const Type& shapes,
@@ -141,7 +139,7 @@ octree<Type>::octree
     }
 
     // Breadth first creation of tree
-    // Stop if: - level above minlevel and 
+    // Stop if: - level above minlevel and
     //                - less than so many cells per endpoint
     //                  (so bottom level is fine enough)
     //                - every shape mentioned in only so many
@@ -233,7 +231,7 @@ octree<Type>::octree
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template <class Type>
-octree<Type>::~octree()
+Foam::octree<Type>::~octree()
 {
     delete topNode_;
 }
@@ -242,45 +240,44 @@ octree<Type>::~octree()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template <class Type>
-label octree<Type>::getSampleType(const point& sample) const
+Foam::label Foam::octree<Type>::getSampleType(const point& sample) const
 {
     return topNode_->getSampleType(0, *this, shapes_, sample);
 }
 
 
 template <class Type>
-label octree<Type>::find(const point& sample) const
+Foam::label Foam::octree<Type>::find(const point& sample) const
 {
     return topNode_->find(shapes_, sample);
 }
 
 
 template <class Type>
-bool octree<Type>::findTightest(const point& sample, treeBoundBox& tightest)
-    const
+bool Foam::octree<Type>::findTightest
+(
+    const point& sample,
+    treeBoundBox& tightest
+) const
 {
-    label tightesti = -1;
-    scalar tightestDist = GREAT;
-
-    return 
-        topNode_->findTightest
-        (
-            shapes_,
-            sample,
-            tightest
-        );
+    return topNode_->findTightest
+    (
+        shapes_,
+        sample,
+        tightest
+    );
 }
 
 
 template <class Type>
-label octree<Type>::findNearest
+Foam::label Foam::octree<Type>::findNearest
 (
     const point& sample,
     treeBoundBox& tightest,
     scalar& tightestDist
 ) const
 {
-    label tightesti = -1;
+    label tightestI = -1;
 
     if (debug & 4)
     {
@@ -294,7 +291,7 @@ label octree<Type>::findNearest
         shapes_,
         sample,
         tightest,
-        tightesti,
+        tightestI,
         tightestDist
     );
 
@@ -302,18 +299,18 @@ label octree<Type>::findNearest
     {
         Pout<< "octree::findNearest : found nearest for "
             << "sample:" << sample << " with "
-            << "  tightesti:" << tightesti
+            << "  tightestI:" << tightestI
             << "  tightest:" << tightest
             << "  tightestDist:" << tightestDist
             << endl;
     }
 
-    return tightesti;
+    return tightestI;
 }
 
 
 template <class Type>
-label octree<Type>::findNearest
+Foam::label Foam::octree<Type>::findNearest
 (
     const linePointRef& ln,
     treeBoundBox& tightest,
@@ -322,7 +319,7 @@ label octree<Type>::findNearest
 ) const
 {
     // Start off from miss with points at large distance apart.
-    label tightesti = -1;
+    label tightestI = -1;
     linePoint = point(-GREAT, -GREAT, -GREAT);
     shapePoint = point(GREAT, GREAT, GREAT);
 
@@ -331,17 +328,17 @@ label octree<Type>::findNearest
         shapes_,
         ln,
         tightest,
-        tightesti,
+        tightestI,
         linePoint,
         shapePoint
     );
 
-    return tightesti;
+    return tightestI;
 }
 
 
 template <class Type>
-labelList octree<Type>::findBox(const boundBox& bb) const
+Foam::labelList Foam::octree<Type>::findBox(const boundBox& bb) const
 {
     // Storage for labels of shapes inside bb. Size estimate.
     labelHashSet elements(100);
@@ -353,7 +350,7 @@ labelList octree<Type>::findBox(const boundBox& bb) const
 
 
 template <class Type>
-pointIndexHit octree<Type>::findLine
+Foam::pointIndexHit Foam::octree<Type>::findLine
 (
     const point& treeStart,
     const point& treeEnd
@@ -368,18 +365,17 @@ pointIndexHit octree<Type>::findLine
     point start(treeStart);
     point end(treeEnd);
 
-    while(true)
+    while (true)
     {
         // Find nearest treeLeaf intersected by line
         point leafIntPoint;
 
-        const treeLeaf<Type>* leafPtr =
-            findLeafLine
-            (
-                start,
-                end,
-                leafIntPoint
-            );
+        const treeLeaf<Type>* leafPtr = findLeafLine
+        (
+            start,
+            end,
+            leafIntPoint
+        );
 
         if (!leafPtr)
         {
@@ -389,7 +385,7 @@ pointIndexHit octree<Type>::findLine
         }
 
         // Inside treeLeaf find nearest intersection
-        scalar minS = GREAT;    
+        scalar minS = GREAT;
 
         const labelList& indices = leafPtr->indices();
 
@@ -435,15 +431,18 @@ pointIndexHit octree<Type>::findLine
 
 
 template <class Type>
-pointIndexHit octree<Type>::findLineAny(const point& start, const point& end)
- const
+Foam::pointIndexHit Foam::octree<Type>::findLineAny
+(
+    const point& start,
+    const point& end
+) const
 {
     // Initialize to a miss
     pointIndexHit hitInfo(false, start, -1);
 
     // Start of segment in current treeNode.
     point p(start);
-    while(true)
+    while (true)
     {
         // Find treeLeaf intersected by line
         point leafIntPoint;
@@ -469,14 +468,13 @@ pointIndexHit octree<Type>::findLineAny(const point& start, const point& end)
             label index = indices[elemI];
 
             point pt;
-            bool hit =
-                shapes().intersects
-                (
-                    index,
-                    p,
-                    end,
-                    pt
-                );
+            bool hit = shapes().intersects
+            (
+                index,
+                p,
+                end,
+                pt
+            );
 
             if (hit)
             {
@@ -503,7 +501,7 @@ pointIndexHit octree<Type>::findLineAny(const point& start, const point& end)
 
 
 template <class Type>
-const treeLeaf<Type>* octree<Type>::findLeafLine
+const Foam::treeLeaf<Type>* Foam::octree<Type>::findLeafLine
 (
     const point& start,
     const point& end,
@@ -518,7 +516,7 @@ const treeLeaf<Type>* octree<Type>::findLeafLine
             << "start:" << start
             << "  end:" << end << endl;
     }
-    
+
     // If start is outside project onto top cube
     if (octreeBb_.contains(start))
     {
@@ -546,14 +544,13 @@ const treeLeaf<Type>* octree<Type>::findLeafLine
     }
 
     // Normal action: find next intersection along line
-    const treeLeaf<Type>* leafPtr = 
-        topNode_->findLeafLine
-        (
-            0,
-            shapes_,
-            leafIntPoint,
-            end
-        );
+    const treeLeaf<Type>* leafPtr = topNode_->findLeafLine
+    (
+        0,
+        shapes_,
+        leafIntPoint,
+        end
+    );
 
     if (debug & 2)
     {
@@ -567,7 +564,11 @@ const treeLeaf<Type>* octree<Type>::findLeafLine
 
 
 template <class Type>
-void octree<Type>::writeOBJ(Ostream& os, label& vertNo) const
+void Foam::octree<Type>::writeOBJ
+(
+    Ostream& os,
+    label& vertNo
+) const
 {
     scalar minx = octreeBb_.min().x();
     scalar miny = octreeBb_.min().y();
@@ -587,7 +588,7 @@ void octree<Type>::writeOBJ(Ostream& os, label& vertNo) const
     os << "v " << maxx << " " << maxy << " " << maxz << endl;
     os << "v " << minx << " " << maxy << " " << maxz << endl;
 
-    // Botttom face
+    // Bottom face
     os << "l " << vertNo + 1 << " " << vertNo + 2 << endl;
     os << "l " << vertNo + 2 << " " << vertNo + 3 << endl;
     os << "l " << vertNo + 3 << " " << vertNo + 4 << endl;
@@ -612,7 +613,7 @@ void octree<Type>::writeOBJ(Ostream& os, label& vertNo) const
 
 
 template <class Type>
-void octree<Type>::printStats(Ostream& os) const
+void Foam::octree<Type>::printStats(Ostream& os) const
 {
     os  << "Statistics after iteration " << deepestLevel() << ':' << endl
         << "  nShapes  :" << shapes().size() << endl
@@ -620,12 +621,12 @@ void octree<Type>::printStats(Ostream& os) const
         << "  nLeaves  :" << nLeaves() << endl
         << "  nEntries :" << nEntries() << endl;
 
-    if (nLeaves() > 0 && shapes().size() > 0)
+    if (nLeaves() && shapes().size())
     {
         os
             << "  Cells per leaf :"
             << scalar(nEntries())/nLeaves()
-            << endl
+            << nl
             << "  Every cell in  :"
             << scalar(nEntries())/shapes().size() << " cubes"
             << endl;
@@ -637,7 +638,7 @@ void octree<Type>::printStats(Ostream& os) const
 
 // Construct from a octree. Set index at end.
 template <class Type>
-octree<Type>::iterator::iterator(octree<Type>& oc)
+Foam::octree<Type>::iterator::iterator(octree<Type>& oc)
 :
     octree_(oc),
     curLeaf_(oc.nLeaves())
@@ -648,7 +649,7 @@ octree<Type>::iterator::iterator(octree<Type>& oc)
 
 // Construct from octree. Set index.
 template <class Type>
-octree<Type>::iterator::iterator(octree<Type>& oc, label index)
+Foam::octree<Type>::iterator::iterator(octree<Type>& oc, label index)
 :
     octree_(oc),
     curLeaf_(index)
@@ -676,7 +677,7 @@ octree<Type>::iterator::iterator(octree<Type>& oc, label index)
 
 
 template <class Type>
-void octree<Type>::iterator::operator=(const iterator& iter)
+void Foam::octree<Type>::iterator::operator=(const iterator& iter)
 {
     if ((curLeaf_ < 0) && (iter.curLeaf_ >= 0))
     {
@@ -694,7 +695,7 @@ void octree<Type>::iterator::operator=(const iterator& iter)
 
 
 template <class Type>
-bool octree<Type>::iterator::operator==(const iterator& iter) const
+bool Foam::octree<Type>::iterator::operator==(const iterator& iter) const
 {
     label index1 =
         (curLeaf_ >= 0 ? curLeaf_ : octree_.nLeaves());
@@ -706,21 +707,22 @@ bool octree<Type>::iterator::operator==(const iterator& iter) const
 
 
 template <class Type>
-bool octree<Type>::iterator::operator!=(const iterator& iter) const
+bool Foam::octree<Type>::iterator::operator!=(const iterator& iter) const
 {
     return !(iterator::operator==(iter));
 }
 
 
 template <class Type>
-treeLeaf<Type>& octree<Type>::iterator::operator*()
+Foam::treeLeaf<Type>& Foam::octree<Type>::iterator::operator*()
 {
     return *leaves_[curLeaf_];
 }
 
 
 template <class Type>
-typename octree<Type>::iterator& octree<Type>::iterator::operator++()
+typename Foam::octree<Type>::iterator&
+Foam::octree<Type>::iterator::operator++()
 {
     curLeaf_++;
     return *this;
@@ -728,7 +730,8 @@ typename octree<Type>::iterator& octree<Type>::iterator::operator++()
 
 
 template <class Type>
-typename octree<Type>::iterator octree<Type>::iterator::operator++(int)
+typename Foam::octree<Type>::iterator
+Foam::octree<Type>::iterator::operator++(int)
 {
     iterator tmp = *this;
     ++*this;
@@ -737,14 +740,16 @@ typename octree<Type>::iterator octree<Type>::iterator::operator++(int)
 
 
 template <class Type>
-typename octree<Type>::iterator octree<Type>::begin()
+typename Foam::octree<Type>::iterator
+Foam::octree<Type>::begin()
 {
     return iterator(*this, 0);
 }
 
 
 template <class Type>
-const typename octree<Type>::iterator& octree<Type>::end()
+const typename Foam::octree<Type>::iterator&
+Foam::octree<Type>::end()
 {
     return octree<Type>::endIter_;
 }
@@ -754,7 +759,7 @@ const typename octree<Type>::iterator& octree<Type>::end()
 
 // Construct for a given octree
 template <class Type>
-octree<Type>::const_iterator::const_iterator(const octree<Type>& oc)
+Foam::octree<Type>::const_iterator::const_iterator(const octree<Type>& oc)
 :
     octree_(oc),
     curLeaf_(oc.nLeaves())
@@ -765,7 +770,7 @@ octree<Type>::const_iterator::const_iterator(const octree<Type>& oc)
 
 // Construct for a given octree
 template <class Type>
-octree<Type>::const_iterator::const_iterator
+Foam::octree<Type>::const_iterator::const_iterator
 (
     const octree<Type>& oc,
     label index
@@ -797,7 +802,7 @@ octree<Type>::const_iterator::const_iterator
 
 
 template <class Type>
-void octree<Type>::const_iterator::operator=(const const_iterator& iter)
+void Foam::octree<Type>::const_iterator::operator=(const const_iterator& iter)
 {
     if ((curLeaf_ < 0) && (iter.curLeaf_ >= 0))
     {
@@ -816,7 +821,7 @@ void octree<Type>::const_iterator::operator=(const const_iterator& iter)
 
 
 template <class Type>
-bool octree<Type>::const_iterator::operator==
+bool Foam::octree<Type>::const_iterator::operator==
 (
     const const_iterator& iter
 ) const
@@ -831,7 +836,7 @@ bool octree<Type>::const_iterator::operator==
 
 
 template <class Type>
-bool octree<Type>::const_iterator::operator!=
+bool Foam::octree<Type>::const_iterator::operator!=
 (
     const const_iterator& iter
 ) const
@@ -841,15 +846,15 @@ bool octree<Type>::const_iterator::operator!=
 
 
 template <class Type>
-const treeLeaf<Type>& octree<Type>::const_iterator::operator*()
+const Foam::treeLeaf<Type>& Foam::octree<Type>::const_iterator::operator*()
 {
     return *leaves_[curLeaf_];
 }
 
 
 template <class Type>
-typename octree<Type>::const_iterator&
-octree<Type>::const_iterator::operator++()
+typename Foam::octree<Type>::const_iterator&
+Foam::octree<Type>::const_iterator::operator++()
 {
     curLeaf_++;
     return *this;
@@ -857,8 +862,8 @@ octree<Type>::const_iterator::operator++()
 
 
 template <class Type>
-typename octree<Type>::const_iterator
-octree<Type>::const_iterator::operator++(int)
+typename Foam::octree<Type>::const_iterator
+Foam::octree<Type>::const_iterator::operator++(int)
 {
     const_iterator tmp = *this;
     ++*this;
@@ -867,14 +872,32 @@ octree<Type>::const_iterator::operator++(int)
 
 
 template <class Type>
-typename octree<Type>::const_iterator octree<Type>::begin() const
+typename Foam::octree<Type>::const_iterator
+Foam::octree<Type>::begin() const
 {
     return const_iterator(*this, 0);
 }
 
 
 template <class Type>
-const typename octree<Type>::const_iterator& octree<Type>::end() const
+typename Foam::octree<Type>::const_iterator
+Foam::octree<Type>::cbegin() const
+{
+    return const_iterator(*this, 0);
+}
+
+
+template <class Type>
+const typename Foam::octree<Type>::const_iterator&
+Foam::octree<Type>::end() const
+{
+    return octree<Type>::endConstIter_;
+}
+
+
+template <class Type>
+const typename Foam::octree<Type>::const_iterator&
+Foam::octree<Type>::cend() const
 {
     return octree<Type>::endConstIter_;
 }
@@ -883,10 +906,10 @@ const typename octree<Type>::const_iterator& octree<Type>::end() const
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
 template <class Type>
-Ostream& operator<<(Ostream& os, const octree<Type>& oc)
+Foam::Ostream& Foam::operator<<(Ostream& os, const octree<Type>& oc)
 {
     return os << token::BEGIN_LIST
-      //<< token::SPACE << oc.shapes_
+        //<< token::SPACE << oc.shapes_
         << token::SPACE << oc.octreeBb_
         << token::SPACE << oc.maxLeafRatio_
         << token::SPACE << oc.maxShapeRatio_
@@ -899,8 +922,5 @@ Ostream& operator<<(Ostream& os, const octree<Type>& oc)
         << token::SPACE << token::END_LIST;
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

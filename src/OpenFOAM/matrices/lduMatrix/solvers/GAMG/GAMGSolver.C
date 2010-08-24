@@ -87,46 +87,6 @@ Foam::GAMGSolver::GAMGSolver
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    Istream& solverData
-)
-:
-    lduMatrix::solver
-    (
-        fieldName,
-        matrix,
-        coupleBouCoeffs,
-        coupleIntCoeffs,
-        interfaces,
-        solverData
-    ),
-
-    // Default values for all controls
-    // which may be overridden by those in dict
-    cacheAgglomeration_(false),
-    nPreSweeps_(0),
-    nPostSweeps_(2),
-    nFinestSweeps_(2),
-    scaleCorrection_(matrix.symmetric()),
-    directSolveCoarsest_(false),
-    agglomeration_(GAMGAgglomeration::New(matrix_, dict())),
-
-    matrixLevels_(agglomeration_.size()),
-    interfaceLevels_(agglomeration_.size()),
-    coupleLevelsBouCoeffs_(agglomeration_.size()),
-    coupleLevelsIntCoeffs_(agglomeration_.size())
-{
-    readControls();
-    makeAgglomeration();
-}
-
-
-Foam::GAMGSolver::GAMGSolver
-(
-    const word& fieldName,
-    const lduMatrix& matrix,
-    const FieldField<Field, scalar>& coupleBouCoeffs,
-    const FieldField<Field, scalar>& coupleIntCoeffs,
-    const lduInterfaceFieldPtrsList& interfaces,
     const dictionary& dict
 )
 :
@@ -148,7 +108,7 @@ Foam::GAMGSolver::GAMGSolver
     nFinestSweeps_(2),
     scaleCorrection_(matrix.symmetric()),
     directSolveCoarsest_(false),
-    agglomeration_(GAMGAgglomeration::New(matrix_, this->dict())),
+    agglomeration_(GAMGAgglomeration::New(matrix_, dict())),
 
     matrixLevels_(agglomeration_.size()),
     interfaceLevels_(agglomeration_.size()),
@@ -158,6 +118,7 @@ Foam::GAMGSolver::GAMGSolver
     readControls();
     makeAgglomeration();
 }
+
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

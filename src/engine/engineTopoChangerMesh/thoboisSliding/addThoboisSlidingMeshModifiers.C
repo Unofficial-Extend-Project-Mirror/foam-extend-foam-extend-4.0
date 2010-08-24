@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2005-2007 Tommaso Lucchini
+    \\  /    A nd           | Copyright (C) 2005-2010 Tommaso Lucchini
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License

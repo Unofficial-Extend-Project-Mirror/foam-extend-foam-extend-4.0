@@ -44,12 +44,11 @@ namespace Foam
 template<class Type>
 interpolationCellPointFace<Type>::interpolationCellPointFace
 (
-    const volPointInterpolation& pInterp,
     const GeometricField<Type, fvPatchField, volMesh>& psi
 )
 :
     interpolation<Type>(psi),
-    psip_(pInterp.interpolate(psi)),
+    psip_(volPointInterpolation::New(psi.mesh()).interpolate(psi)),
     psis_(linearInterpolate(psi))
 {}
 

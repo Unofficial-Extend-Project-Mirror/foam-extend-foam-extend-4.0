@@ -233,7 +233,6 @@ void Foam::polyMesh::initMesh(cellList& c)
             {
                 // First visit: owner
                 owner_[cellfaces[faceI]] = cellI;
-
                 markedFaces[cellfaces[faceI]] = true;
             }
             else

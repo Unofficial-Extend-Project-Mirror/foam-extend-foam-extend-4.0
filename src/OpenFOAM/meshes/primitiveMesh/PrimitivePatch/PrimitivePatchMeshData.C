@@ -27,11 +27,6 @@ License
 #include "PrimitivePatch.H"
 #include "Map.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template
@@ -41,7 +36,9 @@ template
     class PointField,
     class PointType
 >
-void PrimitivePatch<Face, FaceList, PointField, PointType>::calcMeshData() const
+void
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+calcMeshData() const
 {
     if (debug)
     {
@@ -77,9 +74,48 @@ void PrimitivePatch<Face, FaceList, PointField, PointType>::calcMeshData() const
     // number of faces in the patch
     Map<label> markedPoints(4*this->size());
 
-    // if the point is used, set the mark to 1
-    forAll (*this, faceI)
+
+    // Important:
+    // ~~~~~~~~~~
+    // In <= 1.5 the meshPoints would be in increasing order but this gives
+    // problems in processor point synchronisation where we have to find out
+    // how the opposite side would have allocated points.
+    
+    // Note:
+    // ~~~~~
+    // This is all garbage.  All -ext versions will preserve strong ordering
+    // HJ, 17/Aug/2010
+
+    //- 1.5 code:
+    // If the point is used, set the mark to 1
+    forAll(*this, facei)
     {
+        const Face& curPoints = this->operator[](facei);
+    
+        forAll(curPoints, pointi)
+        {
+            markedPoints.insert(curPoints[pointi], -1);
+        }
+    }
+ 
+    // Create the storage and store the meshPoints.  Mesh points are
+    // the ones marked by the usage loop above
+    meshPointsPtr_ = new labelList(markedPoints.toc());
+    labelList& pointPatch = *meshPointsPtr_;
+    
+    // Sort the list to preserve compatibility with the old ordering
+    sort(pointPatch);
+    
+    // For every point in map give it its label in mesh points
+    forAll(pointPatch, pointi)
+    {
+        markedPoints.find(pointPatch[pointi])() = pointi;
+    }
+
+    //- Unsorted version:
+    //DynamicList<label> meshPoints(2*this->size());
+    //forAll(*this, facei)
+    //{
         const Face& curPoints = this->operator[](faceI);
 
         forAll (curPoints, pointI)
@@ -137,7 +173,8 @@ template
     class PointType
 >
 void
-PrimitivePatch<Face, FaceList, PointField, PointType>::calcMeshPointMap() const
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+calcMeshPointMap() const
 {
     if (debug)
     {
@@ -187,7 +224,8 @@ template
     class PointType
 >
 void
-PrimitivePatch<Face, FaceList, PointField, PointType>::calcLocalPoints() const
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+calcLocalPoints() const
 {
     if (debug)
     {
@@ -238,7 +276,8 @@ template
     class PointType
 >
 void
-PrimitivePatch<Face, FaceList, PointField, PointType>::calcPointNormals() const
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+calcPointNormals() const
 {
     if (debug)
     {
@@ -303,7 +342,8 @@ template
     class PointType
 >
 void
-PrimitivePatch<Face, FaceList, PointField, PointType>::calcFaceCentres() const
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+calcFaceCentres() const
 {
     if (debug)
     {
@@ -326,6 +366,7 @@ PrimitivePatch<Face, FaceList, PointField, PointType>::calcFaceCentres() const
     }
 
     faceCentresPtr_ = new Field<PointType>(this->size());
+
     Field<PointType>& c = *faceCentresPtr_;
 
     forAll(c, facei)
@@ -342,6 +383,7 @@ PrimitivePatch<Face, FaceList, PointField, PointType>::calcFaceCentres() const
     }
 }
 
+
 template
 <
     class Face,
@@ -350,7 +392,8 @@ template
     class PointType
 >
 void
-PrimitivePatch<Face, FaceList, PointField, PointType>::calcFaceNormals() const
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+calcFaceNormals() const
 {
     if (debug)
     {
@@ -391,9 +434,5 @@ PrimitivePatch<Face, FaceList, PointField, PointType>::calcFaceNormals() const
     }
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

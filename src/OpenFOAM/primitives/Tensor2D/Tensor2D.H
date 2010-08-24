@@ -74,6 +74,9 @@ public:
 
         static const Tensor2D zero;
         static const Tensor2D one;
+        static const Tensor2D max;
+        static const Tensor2D min;
+
 
     //- Component labeling enumeration
     enum components { XX, XY, YX, YY };

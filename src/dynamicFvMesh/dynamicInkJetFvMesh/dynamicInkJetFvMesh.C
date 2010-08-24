@@ -65,7 +65,8 @@ Foam::dynamicInkJetFvMesh::dynamicInkJetFvMesh(const IOobject& io)
         IOobject
         (
             "points",
-            io.time().constant()/defaultRegion,
+            io.time().constant(),
+            meshSubDir,
             *this,
             IOobject::MUST_READ,
             IOobject::NO_WRITE
@@ -115,9 +116,6 @@ bool Foam::dynamicInkJetFvMesh::update()
     // Mesh motion only - return false
     return false;
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
 // ************************************************************************* //

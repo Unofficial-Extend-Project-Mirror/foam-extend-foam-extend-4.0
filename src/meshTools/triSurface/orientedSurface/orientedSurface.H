@@ -94,6 +94,15 @@ class orientedSurface
             labelList& flip
         );
 
+        //- Walk from face across connected faces. Change orientation to be
+        //  consistent with startFaceI.
+        static void walkSurface
+        (
+            const triSurface& s,
+            const label startFaceI,
+            labelList& flipState
+        );
+
         //- Given nearest point and face check orientation to nearest face
         //  and flip if nessecary (only marked in flipState) and propagate.
         static void propagateOrientation

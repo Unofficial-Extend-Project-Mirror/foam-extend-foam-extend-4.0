@@ -63,24 +63,16 @@ public:
     // Constructors
 
         //- Construct from IOobject
-        IOField
-        (
-            const IOobject&
-        );
-
-        //- Construct from components
-        IOField
-        (
-            const IOobject&,
-            const Field<Type>&
-        );
+        IOField(const IOobject&);
 
         //- Construct from IOobject and size (does not set values)
-        IOField
-        (
-            const IOobject&,
-            const label size
-        );
+        IOField(const IOobject&, const label size);
+
+        //- Construct from components
+        IOField(const IOobject&, const Field<Type>&);
+
+        //- Construct by transferring the Field contents
+        IOField(const IOobject&, const Xfer<Field<Type> >&);
 
 
     // Destructor
@@ -90,23 +82,14 @@ public:
 
     // Member functions
 
-        bool writeData(Ostream& os) const
-        {
-            return (os << static_cast<const Field<Type>&>(*this)).good();
-        }
+        bool writeData(Ostream&) const;
 
 
     // Member operators
 
-        void operator=(const IOField<Type>& iof)
-        {
-            Field<Type>::operator=(iof);
-        }
+        void operator=(const IOField<Type>&);
 
-        void operator=(const Field<Type>& f)
-        {
-            Field<Type>::operator=(f);
-        }
+        void operator=(const Field<Type>&);
 };
 
 

@@ -22,11 +22,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
@@ -41,7 +37,7 @@ inline const verticalValveBank& layerSmooth::valves() const
 {
     return valves_;
 }
-                 
+
 inline const scalar& layerSmooth::deformSwitch() const
 {
     return deformSwitch_;

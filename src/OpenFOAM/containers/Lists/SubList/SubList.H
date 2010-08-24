@@ -59,51 +59,37 @@ class SubList
 
 public:
 
-    // Constructors
-
-        //- Construct from UList and SubList size
-        inline SubList
-        (
-            const UList<T>& list,
-            const label subSize
-        );
-
-        //- Construct from UList, start and end indices
-        inline SubList
-        (
-            const UList<T>& list,
-            const label subSize,
-            const label startIndex
-        );
-
-
-    // Member functions
-
-        //- Reset the SubList
-        //- Construct from UList and SubList size
-        inline void reset
-        (
-            const UList<T>& list,
-            const label subSize
-        );
-
-        //- Construct from UList, start and end indices
-        inline void reset
-        (
-            const UList<T>& list,
-            const label subSize,
-            const label startIndex
-        );
-
+    // Static Member Functions
 
         //- Return a null SubList
-        static inline const SubList<T>& null();
+        inline static const SubList<T>& null();
+
+
+    // Constructors
+
+        //- Construct from UList and sub-list size
+        inline SubList
+        (
+            const UList<T>& list,
+            const label subSize
+        );
+
+        //- Construct from UList, sub-list size and start index
+        inline SubList
+        (
+            const UList<T>& list,
+            const label subSize,
+            const label startIndex
+        );
 
 
     // Member operators
 
         //- Allow cast to a const List<T>&
         inline operator const Foam::List<T>&() const;
+
+        //- Assignment of all entries to the given value
+        inline void operator=(const T&);
 };
 
 

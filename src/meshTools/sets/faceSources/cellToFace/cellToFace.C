@@ -22,14 +22,13 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "cellToFace.H"
 #include "polyMesh.H"
 #include "cellSet.H"
 #include "Time.H"
+#include "syncTools.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -75,7 +74,7 @@ void Foam::cellToFace::combine(topoSet& set, const bool add) const
         SeriousError<< "Cannot load set "
             << setName_ << endl;
     }
-    
+
     cellSet loadedSet(mesh_, setName_);
 
     if (option_ == ALL)
@@ -102,48 +101,58 @@ void Foam::cellToFace::combine(topoSet& set, const bool add) const
     {
         // Add all faces whose both neighbours are in set.
 
-        // Count number of cells using face.
-        Map<label> numCells(loadedSet.size());
+        label nInt = mesh_.nInternalFaces();
+        const labelList& own = mesh_.faceOwner();
+        const labelList& nei = mesh_.faceNeighbour();
+        const polyBoundaryMesh& patches = mesh_.boundaryMesh();
 
-        for
-        (
-            cellSet::const_iterator iter = loadedSet.begin();
-            iter != loadedSet.end();
-            ++iter
-        )
+
+        // Check all internal faces
+        for (label faceI = 0; faceI < nInt; faceI++)
         {
-            label cellI = iter.key();
-
-            const labelList& cFaces = mesh_.cells()[cellI];
-
-            forAll(cFaces, cFaceI)
+            if (loadedSet.found(own[faceI]) && loadedSet.found(nei[faceI]))
             {
-                label faceI = cFaces[cFaceI];
-
-                Map<label>::iterator fndFace = numCells.find(faceI);
-
-                if (fndFace == numCells.end())
-                {
-                    numCells.insert(faceI, 1);
-                }
-                else
-                {
-                    fndFace()++;
-                }
+                addOrDelete(set, faceI, add);
             }
         }
 
-        // Include faces that are referenced twice
-        for
-        (
-            Map<label>::const_iterator iter = numCells.begin();
-            iter != numCells.end();
-            ++iter
-        )
+
+        // Get coupled cell status
+        boolList neiInSet(mesh_.nFaces()-nInt, false);
+
+        forAll(patches, patchI)
         {
-            if (iter() == 2)
+            const polyPatch& pp = patches[patchI];
+
+            if (pp.coupled())
             {
-                addOrDelete(set, iter.key(), add);
+                label faceI = pp.start();
+                forAll(pp, i)
+                {
+                    neiInSet[faceI-nInt] = loadedSet.found(own[faceI]);
+                    faceI++;
+                }
+            }
+        }
+        syncTools::swapBoundaryFaceList(mesh_, neiInSet, false);
+
+
+        // Check all boundary faces
+        forAll(patches, patchI)
+        {
+            const polyPatch& pp = patches[patchI];
+
+            if (pp.coupled())
+            {
+                label faceI = pp.start();
+                forAll(pp, i)
+                {
+                    if (loadedSet.found(own[faceI]) && neiInSet[faceI-nInt])
+                    {
+                        addOrDelete(set, faceI, add);
+                    }
+                    faceI++;
+                }
             }
         }
     }
@@ -170,7 +179,7 @@ Foam::cellToFace::cellToFace
 Foam::cellToFace::cellToFace
 (
     const polyMesh& mesh,
-    const dictionary& dict          
+    const dictionary& dict
 )
 :
     topoSetSource(mesh),
@@ -208,14 +217,14 @@ void Foam::cellToFace::applyToSet
 {
     if ((action == topoSetSource::NEW) || (action == topoSetSource::ADD))
     {
-        Pout<< "    Adding faces according to cellSet " << setName_
+        Info<< "    Adding faces according to cellSet " << setName_
             << " ..." << endl;
 
         combine(set, true);
     }
     else if (action == topoSetSource::DELETE)
     {
-        Pout<< "    Removing faces according to cellSet " << setName_
+        Info<< "    Removing faces according to cellSet " << setName_
             << " ..." << endl;
 
         combine(set, false);

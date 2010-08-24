@@ -43,12 +43,13 @@ namespace Foam
 // Forward declaration of friend functions and operators
 
 class boundBox;
+template<class T> class tmp;
 
 Ostream& operator<<(Ostream& os, const boundBox& b);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class boundBox Declaration
+                          Class boundBox Declaration
 \*---------------------------------------------------------------------------*/
 
 class boundBox
@@ -58,8 +59,14 @@ class boundBox
         //- Minimum and maximum describing the bounding box
         point min_, max_;
 
+    // Private Member Functions
+
+        //- Calculate the bounding box from the given pointField.
+        //  Does parallel communication (doReduce = true)
+        void calculate(const pointField&, const bool doReduce = true);
 
 public:
+
     // Static data members
 
         //- The great value used for greatBox and invertedBox
@@ -71,13 +78,14 @@ public:
         //- A very large inverted boundBox: min/max == +/- VGREAT
         static const boundBox invertedBox;
 
+
     // Constructors
 
-        //- Construct null setting points to zero
+        //- Construct null, setting points to zero
         boundBox()
         :
-            min_(vector::zero),
-            max_(vector::zero)
+            min_(point::zero),
+            max_(point::zero)
         {}
 
         //- Construct from components
@@ -87,9 +95,13 @@ public:
             max_(max)
         {}
 
-        //- Construct as the bounding box of the given pointField. Does
-        //  parallel communication (doReduce = true)
-        boundBox(const pointField& points, const bool doReduce = true);
+        //- Construct as the bounding box of the given pointField.
+        //  Does parallel communication (doReduce = true)
+        boundBox(const pointField&, const bool doReduce = true);
+
+        //- Construct as the bounding box of the given temporary pointField.
+        //  Does parallel communication (doReduce = true)
+        boundBox(const tmp<pointField>&, const bool doReduce = true);
 
         //- Construct from Istream
         boundBox(Istream&);
@@ -99,21 +111,25 @@ public:
 
         // Access
 
+            //- Minimum describing the bounding box
             const point& min() const
             {
                 return min_;
             }
 
+            //- Maximum describing the bounding box
             const point& max() const
             {
                 return max_;
             }
 
+            //- Minimum describing the bounding box, non-const access
             point& min()
             {
                 return min_;
             }
 
+            //- Maximum describing the bounding box, non-const access
             point& max()
             {
                 return max_;
@@ -131,14 +147,34 @@ public:
                 return (max_ - min_);
             }
 
+            //- The magnitude of the bounding box span
             scalar mag() const
             {
                 return ::Foam::mag(max_ - min_);
             }
 
+            //- Smallest length/height/width dimension
+            scalar minDim() const
+            {
+                return cmptMin(span());
+            }
+
+            //- Largest length/height/width dimension
+            scalar maxDim() const
+            {
+                return cmptMax(span());
+            }
+
+            //- Average length/height/width dimension
+            scalar avgDim() const
+            {
+                return cmptAv(span());
+            }
+
 
         // Query
-             //- Overlaps/touches boundingBox?
+
+            //- Overlaps/touches boundingBox?
             bool overlaps(const boundBox& bb) const
             {
                 return
@@ -149,47 +185,52 @@ public:
                 );
             }
 
-
-            //- Intersects other boundingbox?
-            bool intersects(const boundBox& bb) const
-            {
-                if
-                (
-                    (min_.x() <= bb.max().x()) &&
-                    (min_.y() <= bb.max().y()) &&
-                    (min_.z() <= bb.max().z()) &&
-
-                    (max_.x() >= bb.min().x()) &&
-                    (max_.y() >= bb.min().y()) &&
-                    (max_.z() >= bb.min().z())
-                )
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-
-            //- Contains a point?
+            //- Contains point? (inside or on edge)
             bool contains(const point& pt) const
             {
                 return
-                    pt.x() >= min().x()
-                 && pt.y() >= min().y()
-                 && pt.z() >= min().z()
-                 && pt.x() <= max().x()
-                 && pt.y() <= max().y()
-                 && pt.z() <= max().z();
+                (
+                    pt.x() >= min_.x() && pt.x() <= max_.x()
+                 && pt.y() >= min_.y() && pt.y() <= max_.y()
+                 && pt.z() >= min_.z() && pt.z() <= max_.z()
+                );
+            }
+
+            //- Contains point? (inside only)
+            bool containsInside(const point& pt) const
+            {
+                return
+                (
+                    pt.x() > min_.x() && pt.x() < max_.x()
+                 && pt.y() > min_.y() && pt.y() < max_.y()
+                 && pt.z() > min_.z() && pt.z() < max_.z()
+                );
             }
 
 
-    // Ostream operator
+    // Friend Operators
 
-        friend Ostream& operator<<(Ostream& os, const boundBox& b);
+        friend bool operator==(const boundBox& a, const boundBox& b)
+        {
+            return (a.min_ == b.min_) && (a.max_ == b.max_);
+        }
+
+        friend bool operator!=(const boundBox& a, const boundBox& b)
+        {
+            return !(a == b);
+        }
+
+
+    // IOstream operator
+
+        friend Istream& operator>>(Istream& is, boundBox&);
+        friend Ostream& operator<<(Ostream& os, const boundBox&);
 };
+
+
+//- Data associated with boundBox type are contiguous
+template<>
+inline bool contiguous<boundBox>() {return contiguous<point>();}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

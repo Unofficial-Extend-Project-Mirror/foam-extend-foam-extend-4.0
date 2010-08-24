@@ -28,12 +28,13 @@ Class
 Description
     Class to implement octree.
 
-    Holds the pointers to subcubes. These are either other treeNodes or
-    treeLeafs. treeLeafs hold the actual data as a list of indices into
+    Holds the pointers to sub-octants. These are either other treeNodes or
+    treeLeafs. The treeLeafs hold the actual data as a list of indices into
     octreeData.
 
-    To prevent calculation errors all bb's used in octrees are calculated 
-    only once.
+Note
+    To prevent calculation errors all bounding boxes used in octrees are
+    calculated only once.
 
     The pointers to either treeNode/treeLeaf are implemented 'by hand'
     (explicitly marking type) instead of using a proper virtual mechanism
@@ -50,7 +51,7 @@ SourceFiles
 #include "treeBoundBoxList.H"
 #include "treeElem.H"
 #include "linePointRef.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -69,7 +70,6 @@ template<class Type> Istream& operator>>(Istream&, treeNode<Type>&);
 template<class Type> Ostream& operator<<(Ostream&, const treeNode<Type>&);
 
 
-
 /*---------------------------------------------------------------------------*\
                         Class treeNodeName Declaration
 \*---------------------------------------------------------------------------*/
@@ -78,7 +78,7 @@ TemplateName(treeNode);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class treeNode Declaration
+                          Class treeNode Declaration
 \*---------------------------------------------------------------------------*/
 
 template <class Type>
@@ -89,7 +89,7 @@ class treeNode
 {
     // Private data
 
-        //- position of midPoint
+        //- Position of the midpoint
         const point mid_;
 
         //- Type stored in subNodes_
@@ -102,9 +102,6 @@ class treeNode
         label volType_;
 
     // Static data members
-
-        //- empty labelList to satisfy compiler
-        static const labelList dummy;
 
         //- leaf offset for octant index
         static const label leafOffset;
@@ -157,7 +154,7 @@ public:
     // Constructors
 
         //- Construct from components
-        treeNode(const treeBoundBox& bb);
+        treeNode(const treeBoundBox&);
 
         //- Construct from Istream
         treeNode(Istream&);
@@ -172,8 +169,8 @@ public:
 
         // Access
 
-            //- position of midPoint
-            const point& mid() const;
+            //- The midpoint position
+            inline const point& midpoint() const;
 
             //- array of 8 subNodes/leaves
             inline treeElem<Type>* const* subNodes() const;
@@ -227,7 +224,7 @@ public:
                 const point& sample
             ) const;
 
-            //- Find index of shape containing sample. 
+            //- Find index of shape containing sample.
             label find
             (
                 const Type& shapes,
@@ -236,7 +233,7 @@ public:
 
             //- Find tightest bounding box around sample which is guaranteed
             //  to hold at least one cell.
-            //  Current best bb in tightest, 
+            //  Current best bb in tightest,
             //  returns true if newTightest has changed, 0 otherwise.
             bool findTightest
             (
@@ -244,16 +241,16 @@ public:
                 const point& sample,
                 treeBoundBox& tightest
             ) const;
-                
+
             //- Find nearest shape to sample
             //  Returns true if found nearer shape and updates
-            //  tightest, tightesti, tightestDist
+            //  tightest, tightestI, tightestDist
             bool findNearest
             (
                 const Type& shapes,
                 const point& sample,
                 treeBoundBox& tightest,
-                label& tightesti,
+                label& tightestI,
                 scalar& tightestDist
             ) const;
 
@@ -265,7 +262,7 @@ public:
                 const Type& shapes,
                 const linePointRef& ln,
                 treeBoundBox& tightest,
-                label& tightesti,   // index of nearest shape
+                label& tightestI,   // index of nearest shape
                 point& linePoint,   // nearest point on line
                 point& shapePoint   // nearest point on shape
             ) const;

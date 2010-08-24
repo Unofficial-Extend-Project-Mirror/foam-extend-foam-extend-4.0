@@ -26,8 +26,8 @@ Class
     Foam::coordinateSystem
 
 Description
-    A cartesian coordinate system and the base class for
-    other coordinate system specifications
+    A cartesian coordinate system and the base class for other coordinate
+    system specifications.
 
     All systems are defined by an origin point and a coordinateRotation.
     For convenience, the dictionary constructor forms allow a few shortcuts:
@@ -38,7 +38,6 @@ Description
     @verbatim
         flipped
         {
-            type    cartesian;
             origin  (0 0 0);
             coordinateRotation
             {
@@ -54,7 +53,6 @@ Description
     @verbatim
         flipped     // the same, specified as axes
         {
-            type    cartesian;
             origin  (0 0 0);
             coordinateRotation
             {
@@ -71,7 +69,7 @@ Description
     @endverbatim
 
     - if a sub-dictionary coordinateSystem is found within the dictionary, it
-      will be used. This provides a convenient means of embedding the
+      will be used. This provides a convenient means of embedding
       coordinateSystem information in another dictionary.
       This is used, for example, in the porousZones:
 
@@ -98,6 +96,30 @@ Description
         }
         )
     @endverbatim
+
+    - additionally, if the coordinateSystem points to a plain entry,
+      it can be used to reference one of the global coordinateSystems
+
+    @verbatim
+        1
+        (
+        cat1
+        {
+            coordinateSystem  system_10;
+            porosity        0.781;
+            Darcy
+            {
+                d   d [0 -2 0 0 0]  (-1000 -1000 0.50753e+08);
+                f   f [0 -1 0 0 0]  (-1000 -1000 12.83);
+            }
+        }
+        )
+    @endverbatim
+    For this to work correctly, the coordinateSystem constructor must be
+    supplied with both a dictionary and an objectRegistry.
+
+See Also
+    coordinateSystems and coordinateSystems::New
 
 SourceFiles
     coordinateSystem.C
@@ -131,6 +153,9 @@ class coordinateSystem
 
         //- Name of coordinate system
         mutable word name_;
+
+        //- Optional note
+        mutable string note_;
 
         //- Origin
         mutable point origin_;
@@ -169,7 +194,6 @@ protected:
             bool translate
         ) const;
 
-
 public:
 
     //- Runtime type information
@@ -178,19 +202,17 @@ public:
 
     // Constructors
 
-        //- Construct null
+        //- Construct null. This is equivalent to an identity coordinateSystem
         coordinateSystem();
 
-        //- Construct from origin and 2 axes
+        //- Construct copy with a different name
         coordinateSystem
         (
             const word& name,
-            const point& origin,
-            const vector& axis,
-            const vector& dir
+            const coordinateSystem&
         );
 
-        //- Construct from origin and rotation angles
+        //- Construct from origin and rotation
         coordinateSystem
         (
             const word& name,
@@ -198,11 +220,24 @@ public:
             const coordinateRotation&
         );
 
+        //- Construct from origin and 2 axes
+        coordinateSystem
+        (
+            const word& name,
+            const point& origin,
+            const vector& axis,
+            const vector& dirn
+        );
+
+        //- Construct from dictionary with a given name
+        coordinateSystem(const word& name, const dictionary&);
+
         //- Construct from dictionary with default name
         coordinateSystem(const dictionary&);
 
-        //- Construct from dictionary
-        coordinateSystem(const word& name, const dictionary&);
+        //- Construct from dictionary (default name)
+        //  With the ability to reference global coordinateSystems
+        coordinateSystem(const dictionary&, const objectRegistry&);
 
         //- Construct from Istream
         //  The Istream contains a word followed by a dictionary
@@ -211,15 +246,7 @@ public:
         //- Return clone
         autoPtr<coordinateSystem> clone() const
         {
-            return autoPtr<coordinateSystem>
-            (
-                new coordinateSystem
-                (
-                    name(),
-                    origin(),
-                    rotation()
-                )
-            );
+            return autoPtr<coordinateSystem>(new coordinateSystem(*this));
         }
 
     // Declare run-time constructor selection table
@@ -228,14 +255,12 @@ public:
         (
             autoPtr,
             coordinateSystem,
-            origAxisDir,
+            dictionary,
             (
                 const word& name,
-                const point& origin,
-                const vector& axis,
-                const vector& dir
+                const dictionary& dict
             ),
-            (name, origin, axis, dir)
+            (name, dict)
         );
 
         declareRunTimeSelectionTable
@@ -251,29 +276,13 @@ public:
             (name, origin, cr)
         );
 
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            coordinateSystem,
-            dictionary,
-            (
-                const word& name,
-                const dictionary& dict
-            ),
-            (name, dict)
-        );
-
-
     // Selectors
 
-        //- Select constructed from origin and 2 axes
+        //- Select constructed from dictionary
         static autoPtr<coordinateSystem> New
         (
-            const word& coordType,
             const word& name,
-            const point& origin,
-            const vector& axis,
-            const vector& dir
+            const dictionary&
         );
 
         //- Select constructed from origin and rotation
@@ -282,14 +291,7 @@ public:
             const word& coordType,
             const word& name,
             const point& origin,
-            const coordinateRotation& cr
-        );
-
-        //- Select constructed from dictionary
-        static autoPtr<coordinateSystem> New
-        (
-            const word& name,
-            const dictionary& dict
+            const coordinateRotation&
         );
 
         //- Select constructed from Istream
@@ -308,6 +310,18 @@ public:
         const word& name() const
         {
             return name_;
+        }
+
+        //- Return non-constant access to the optional note
+        string& note()
+        {
+            return note_;
+        }
+
+        //- Return the optional note
+        const string& note() const
+        {
+            return note_;
         }
 
         //- Return origin

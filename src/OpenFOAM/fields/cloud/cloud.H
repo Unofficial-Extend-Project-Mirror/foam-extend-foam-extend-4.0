@@ -47,7 +47,7 @@ namespace Foam
 class mapPolyMesh;
 
 /*---------------------------------------------------------------------------*\
-                           Class cloud Declaration
+                            Class cloud Declaration
 \*---------------------------------------------------------------------------*/
 
 class cloud
@@ -69,19 +69,20 @@ public:
     //- Runtime type information
     TypeName("cloud");
 
+        //- The prefix to local: %lagrangian
+        static const word prefix;
+
+        //- The default cloud name: %defaultCloud
+        static word defaultName;
+
 
     // Constructors
 
         //- Construct for the given objectRegistry and named cloud instance
-        cloud
-        (
-            const objectRegistry& obr,
-            const word& cloudName = "defaultCloud"
-        );
+        cloud(const objectRegistry&, const word& cloudName = "");
 
 
-    // Destructor
-
+    //- Destructor
         virtual ~cloud();
 
 

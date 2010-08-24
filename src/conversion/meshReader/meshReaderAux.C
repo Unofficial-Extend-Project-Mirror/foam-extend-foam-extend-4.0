@@ -97,10 +97,8 @@ void Foam::meshReader::writeInterfaces(const objectRegistry& registry) const
     OFstream os(ioObj.objectPath());
     ioObj.writeHeader(os);
 
-    os  << interfaces_
-        << "// *************************************"
-        << "************************************ //"
-        << endl;
+    os << interfaces_;
+    ioObj.writeEndDivider(os);
 }
 
 

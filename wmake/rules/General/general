@@ -6,6 +6,6 @@ LD         = ld
 FOAM_DEV_REVISION_NUMBER = $(shell foamVersion -revision)
 
 GFLAGS     = -D$(WM_ARCH) -D$(WM_PRECISION_OPTION) -DFOAM_DEV_REVISION_NUMBER=$(FOAM_DEV_REVISION_NUMBER)
-GINC       = 
+GINC       =
 GLIBS      = -lm
-GLIB_LIBS  = 
+GLIB_LIBS  =

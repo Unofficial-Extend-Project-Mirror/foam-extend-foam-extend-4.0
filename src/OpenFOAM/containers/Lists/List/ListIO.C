@@ -30,16 +30,11 @@ License
 #include "SLList.H"
 #include "contiguous.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
 // Construct from Istream
 template<class T>
-List<T>::List(Istream& is)
+Foam::List<T>::List(Istream& is)
 :
     UList<T>(NULL, 0)
 {
@@ -48,7 +43,7 @@ List<T>::List(Istream& is)
 
 
 template<class T>
-Istream& operator>>(Istream& is, List<T>& L)
+Foam::Istream& Foam::operator>>(Istream& is, List<T>& L)
 {
     // Anull list
     L.setSize(0);
@@ -81,11 +76,11 @@ Istream& operator>>(Istream& is, List<T>& L)
         if (is.format() == IOstream::ASCII || !contiguous<T>())
         {
             // Read beginning of contents
-            char listDelimiter = is.readBeginList("List");
+            char delimiter = is.readBeginList("List");
 
             if (s)
             {
-                if (listDelimiter == token::BEGIN_LIST)
+                if (delimiter == token::BEGIN_LIST)
                 {
                     for (register label i=0; i<s; i++)
                     {
@@ -122,7 +117,7 @@ Istream& operator>>(Istream& is, List<T>& L)
         {
             if (s)
             {
-                is.read(reinterpret_cast<char*>(L.begin()), s*sizeof(T));
+                is.read(reinterpret_cast<char*>(L.data()), s*sizeof(T));
 
                 is.fatalCheck
                 (
@@ -136,7 +131,7 @@ Istream& operator>>(Istream& is, List<T>& L)
         if (firstToken.pToken() != token::BEGIN_LIST)
         {
             FatalIOErrorIn("operator>>(Istream&, List<T>&)", is)
-                << "incorrect first token, expected '(' or '{', found "
+                << "incorrect first token, expected '(', found "
                 << firstToken.info()
                 << exit(FatalIOError);
         }
@@ -162,8 +157,36 @@ Istream& operator>>(Istream& is, List<T>& L)
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+template<class T>
+Foam::List<T> Foam::readList(Istream& is)
+{
+    List<T> L;
+    token firstToken(is);
+    is.putBack(firstToken);
 
-} // End namespace Foam
+    if (firstToken.isPunctuation())
+    {
+        if (firstToken.pToken() != token::BEGIN_LIST)
+        {
+            FatalIOErrorIn("readList<T>(Istream&)", is)
+                << "incorrect first token, expected '(', found "
+                << firstToken.info()
+                << exit(FatalIOError);
+        }
+
+        // read via a singly-linked list
+        L = SLList<T>(is);
+    }
+    else
+    {
+        // create list with a single item
+        L.setSize(1);
+
+        is >> L[0];
+    }
+
+    return L;
+}
+
 
 // ************************************************************************* //

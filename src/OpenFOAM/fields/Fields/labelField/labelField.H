@@ -36,8 +36,8 @@ SourceFiles
 #ifndef labelField_H
 #define labelField_H
 
-#include "Field.H"
 #include "label.H"
+#include "Field.H"
 
 #define TEMPLATE
 #include "FieldFunctionsM.H"

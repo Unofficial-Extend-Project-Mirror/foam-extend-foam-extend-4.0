@@ -35,8 +35,8 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef janafThermo2_H
-#define janafThermo2_H
+#ifndef janafThermo_H
+#define janafThermo_H
 
 #include "scalar.H"
 
@@ -85,11 +85,6 @@ Ostream& operator<<
 );
 
 
-#ifdef __GNUC__
-typedef scalar coeffArray2[7];
-#endif
-
-
 /*---------------------------------------------------------------------------*\
                            Class janafThermo Declaration
 \*---------------------------------------------------------------------------*/
@@ -122,13 +117,7 @@ private:
         inline void checkT(const scalar T) const;
 
         //- Return the coefficients corresponding to the given temperature
-        inline const 
-#       ifdef __GNUC__
-        coeffArray2&
-#       else
-        coeffArray&
-#       endif
-        coeffs(const scalar T) const;
+        inline const coeffArray& coeffs(const scalar T) const;
 
 
 public:
@@ -161,6 +150,12 @@ public:
         //- Enthalpy [J/kmol]
         inline scalar h(const scalar T) const;
 
+        //- Sensible enthalpy [J/kmol]
+        inline scalar hs(const scalar T) const;
+
+        //- Chemical enthalpy [J/kmol]
+        inline scalar hc() const;
+
         //- Entropy [J/(kmol K)]
         inline scalar s(const scalar T) const;
 
@@ -169,8 +164,6 @@ public:
 
         inline void operator+=(const janafThermo&);
         inline void operator-=(const janafThermo&);
-
-        inline void operator*=(const scalar);
 
 
     // Friend operators

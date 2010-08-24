@@ -25,7 +25,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "FDICPreconditioner.H"
-#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -33,12 +32,9 @@ namespace Foam
 {
     defineTypeNameAndDebug(FDICPreconditioner, 0);
 
-    addToRunTimeSelectionTable
-    (
-        lduPreconditioner,
-        FDICPreconditioner,
-        dictionary
-    );
+    lduMatrix::preconditioner::
+        addsymMatrixConstructorToTable<FDICPreconditioner>
+        addFDICPreconditionerSymMatrixConstructorToTable_;
 }
 
 
@@ -79,47 +75,17 @@ Foam::FDICPreconditioner::FDICPreconditioner
 
     for (register label face=0; face<nFaces; face++)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&uPtr[face+96],0,0);
-        __builtin_prefetch (&lPtr[face+96],0,0);
-        __builtin_prefetch (&upperPtr[face+96],0,1);
-        __builtin_prefetch (&rDPtr[lPtr[face+24]],0,1);
-        __builtin_prefetch (&rDPtr[uPtr[face+24]],1,1);
-        #endif
-
         rDPtr[uPtr[face]] -= sqr(upperPtr[face])/rDPtr[lPtr[face]];
     }
-
-    #ifdef ICC_IA64_PREFETCH
-    #pragma ivdep
-    #endif
 
     // Generate reciprocal FDIC
     for (register label cell=0; cell<nCells; cell++)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&rDPtr[cell+96],0,1);
-        #endif
-
         rDPtr[cell] = 1.0/rDPtr[cell];
     }
 
-    #ifdef ICC_IA64_PREFETCH
-    #pragma ivdep
-    #endif
-
     for (register label face=0; face<nFaces; face++)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&uPtr[face+96],0,0);
-        __builtin_prefetch (&lPtr[face+96],0,0);
-        __builtin_prefetch (&upperPtr[face+96],0,0);
-        __builtin_prefetch (&rDuUpperPtr[face+96],0,0);
-        __builtin_prefetch (&rDlUpperPtr[face+96],0,0);
-        __builtin_prefetch (&rDPtr[uPtr[face+32]],0,1);
-        __builtin_prefetch (&rDPtr[lPtr[face+32]],0,1);
-        #endif
-
         rDuUpperPtr[face] = rDPtr[uPtr[face]]*upperPtr[face];
         rDlUpperPtr[face] = rDPtr[lPtr[face]]*upperPtr[face];
     }
@@ -151,58 +117,18 @@ void Foam::FDICPreconditioner::precondition
     register label nFaces = matrix_.upper().size();
     register label nFacesM1 = nFaces - 1;
 
-    #ifdef ICC_IA64_PREFETCH
-    #pragma ivdep
-    #endif
-
     for (register label cell=0; cell<nCells; cell++)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&wAPtr[cell+96],0,1);
-        __builtin_prefetch (&rDPtr[cell+96],0,1);
-        __builtin_prefetch (&rAPtr[cell+96],0,1);
-        #endif
-
         wAPtr[cell] = rDPtr[cell]*rAPtr[cell];
     }
 
-    #ifdef ICC_IA64_PREFETCH
-    #pragma noprefetch uPtr,lPtr,rDuUpperPtr,wAPtr
-    #pragma nounroll
-    #endif
-
     for (register label face=0; face<nFaces; face++)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&uPtr[face+96],0,0);
-        __builtin_prefetch (&lPtr[face+96],0,0);
-        __builtin_prefetch (&rDuUpperPtr[face+96],0,0);
-        __builtin_prefetch (&wAPtr[uPtr[face+32]],0,1); 
-        __builtin_prefetch (&wAPtr[lPtr[face+32]],0,1);
-        #endif
-
         wAPtr[uPtr[face]] -= rDuUpperPtr[face]*wAPtr[lPtr[face]];
     }
 
-    #ifdef ICC_IA64_PREFETCH
-    #pragma noprefetch uPtr,lPtr,rDlUpperPtr,wAPtr
-    #pragma nounroll
-    #endif
-
     for (register label face=nFacesM1; face>=0; face--)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&uPtr[face-95],0,0);
-        __builtin_prefetch (&lPtr[face-95],0,0);
-        __builtin_prefetch (&rDlUpperPtr[face-95],0,0);
-        __builtin_prefetch (&wAPtr[lPtr[face-16]],0,1);
-        __builtin_prefetch (&wAPtr[uPtr[face-16]],0,1);
-        __builtin_prefetch (&wAPtr[lPtr[face-24]],0,1);
-        __builtin_prefetch (&wAPtr[uPtr[face-24]],0,1);
-        __builtin_prefetch (&wAPtr[lPtr[face-32]],0,1);
-        __builtin_prefetch (&wAPtr[uPtr[face-32]],0,1);
-        #endif
-
         wAPtr[lPtr[face]] -= rDlUpperPtr[face]*wAPtr[uPtr[face]];
     }
 }

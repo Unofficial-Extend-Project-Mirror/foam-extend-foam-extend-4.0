@@ -39,6 +39,9 @@ const Foam::word Foam::functionEntries::inputModeEntry::typeName
 // might include inputModeEntries
 int Foam::functionEntries::inputModeEntry::debug(0);
 
+Foam::functionEntries::inputModeEntry::inputMode
+    Foam::functionEntries::inputModeEntry::mode_(MERGE);
+
 namespace Foam
 {
 namespace functionEntries
@@ -53,10 +56,6 @@ namespace functionEntries
 }
 }
 
-// * * * * * * * * * * * * * * * * Private Data  * * * * * * * * * * * * * * //
-
-Foam::label Foam::functionEntries::inputModeEntry::mode_ = imError;
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 // we could combine this into execute() directly, but leave it here for now
@@ -65,22 +64,31 @@ void Foam::functionEntries::inputModeEntry::setMode(Istream& is)
     clear();
 
     word mode(is);
-    if (mode == "merge")
+    if (mode == "merge" || mode == "default")
     {
-        mode_ = imMerge;
+        mode_ = MERGE;
     }
     else if (mode == "overwrite")
     {
-        mode_ = imOverwrite;
+        mode_ = OVERWRITE;
     }
-    else if (mode == "error" || mode == "default")
+    else if (mode == "protect")
     {
-        mode_ = imError;
+        mode_ = PROTECT;
+    }
+    else if (mode == "warn")
+    {
+        mode_ = WARN;
+    }
+    else if (mode == "error")
+    {
+        mode_ = ERROR;
     }
     else
     {
         WarningIn("Foam::functionEntries::inputModeEntry::setMode(Istream&)")
-            << "unsupported input mode " << mode
+            << "unsupported input mode '" << mode
+            << "' ... defaulting to 'merge'"
             << endl;
     }
 }
@@ -101,33 +109,30 @@ bool Foam::functionEntries::inputModeEntry::execute
 
 void Foam::functionEntries::inputModeEntry::clear()
 {
-    mode_ = imError;
+    mode_ = MERGE;
 }
 
 
 bool Foam::functionEntries::inputModeEntry::merge()
 {
-    if (mode_ & imMerge)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return mode_ == MERGE;
 }
 
 
 bool Foam::functionEntries::inputModeEntry::overwrite()
 {
-    if (mode_ & imOverwrite)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return mode_ == OVERWRITE;
+}
+
+
+bool Foam::functionEntries::inputModeEntry::protect()
+{
+    return mode_ == PROTECT;
+}
+
+bool Foam::functionEntries::inputModeEntry::error()
+{
+    return mode_ == ERROR;
 }
 
 

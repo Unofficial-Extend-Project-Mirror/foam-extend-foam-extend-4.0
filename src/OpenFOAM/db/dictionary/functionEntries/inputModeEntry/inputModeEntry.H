@@ -37,8 +37,10 @@ Description
     The possible input modes:
     @param merge      merge sub-dictionaries when possible
     @param overwrite  keep last entry and silently remove previous ones
-    @param error      flag duplicate entry as an error
-    @param default    currently the same as error
+    @param protect    keep initial entry and silently ignore subsequent ones
+    @param warn       keep initial entry and warn about subsequent ones
+    @param error      issue a FatalError for duplicate entries
+    @param default    currently identical to merge
 
 SourceFiles
     inputModeEntry.C
@@ -65,16 +67,18 @@ class inputModeEntry
 :
     public functionEntry
 {
-        //- input mode options
+        //- The input mode options
         enum inputMode
         {
-            imError = 0,
-            imMerge = 0x1,
-            imOverwrite = 0x2
+            MERGE,
+            OVERWRITE,
+            PROTECT,
+            WARN,
+            ERROR
         };
 
-        //- current input mode
-        static label mode_;
+        //- The current input mode
+        static inputMode mode_;
 
 
     // Private Member Functions
@@ -92,27 +96,28 @@ class inputModeEntry
 public:
 
     //- Runtime type information
-    TypeName("inputMode");
+    ClassName("inputMode");
 
 
     // Member Functions
 
         //- Execute the functionEntry in a sub-dict context
-        static bool execute
-        (
-            dictionary& parentDict,
-            Istream&
-        );
+        static bool execute(dictionary& parentDict, Istream&);
 
-        //- Reset the inputMode to 'default'
+        //- Reset the inputMode to %default (ie, %merge)
         static void clear();
 
-        //- Return true if the inputMode is 'merge'
+        //- Return true if the inputMode is %merge
         static bool merge();
 
-        //- Return true if the inputMode is 'overwrite'
+        //- Return true if the inputMode is %overwrite
         static bool overwrite();
 
+        //- Return true if the inputMode is %protect
+        static bool protect();
+
+        //- Return true if the inputMode is %error
+        static bool error();
 };
 
 

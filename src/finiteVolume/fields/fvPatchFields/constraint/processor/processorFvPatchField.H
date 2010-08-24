@@ -156,8 +156,8 @@ public:
             }
 
             //- Return neighbour field given internal field
-            //  This is a dummy function: returning patch values 
-            //  due to scheduling issues.  HJ, 11/May/2009
+            // Returning patch values, which stores neighbour
+            // data after update due to scheduling issues.  HJ, 11/May/2009
             virtual tmp<Field<Type> > patchNeighbourField() const;
 
 

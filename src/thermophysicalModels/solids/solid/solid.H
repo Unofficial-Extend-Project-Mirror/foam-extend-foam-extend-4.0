@@ -45,6 +45,15 @@ SourceFiles
 namespace Foam
 {
 
+class solid;
+
+Ostream& operator<<
+(
+     Ostream&,
+     const solid&
+);
+
+
 /*---------------------------------------------------------------------------*\
                             Class solid Declaration
 \*---------------------------------------------------------------------------*/
@@ -107,24 +116,10 @@ public:
             scalar K,
             scalar Hf,
             scalar emissivity
-        )
-        :
-            rho_(rho),
-            cp_(cp),
-            K_(K),
-            Hf_(Hf),
-            emissivity_(emissivity)
-        {}
+        );
 
         //- Construct from Istream
-        solid(Istream& is)
-        :
-            rho_(readScalar(is)),
-            cp_(readScalar(is)),
-            K_(readScalar(is)),
-            Hf_(readScalar(is)),
-            emissivity_(readScalar(is))
-        {}
+        solid(Istream& is);
 
         //- Return a pointer to a new solid created from input
         static autoPtr<solid> New(Istream& is);
@@ -141,58 +136,36 @@ public:
         // Phisical constants which define the solid
 
             //- Density [kg/m3]
-            scalar rho() const
-            {
-                return rho_;
-            }
+            inline scalar rho() const;
 
             //- Specific heat capacity [J/(kg.K)]
-            scalar cp() const
-            {
-                return cp_;
-            }
+            inline scalar cp() const;
 
             //- Thermal conductivity [W/(m.K)]
-            scalar K() const
-            {
-                return K_;
-            }
+            inline scalar K() const;
 
             //- Heat of formation [J/kg]
-            scalar Hf() const
-            {
-                return Hf_;
-            }
+            inline scalar Hf() const;
 
-            //- emissivity
-            scalar emissivity() const
-            {
-                return emissivity_;
-            }
+            //- Emissivity []
+            inline scalar emissivity() const;
 
 
         // I-O
 
             //- Write the solid properties
-            virtual void writeData(Ostream& os) const
-            {
-                os<< rho_ << token::SPACE
-                  << cp_ << token::SPACE
-                  << K_ << token::SPACE
-                  << Hf_ << token::SPACE
-                  << emissivity_;
-            }
+            virtual void writeData(Ostream& os) const;
 
 
         // Ostream Operator
 
-        friend Ostream& operator<<(Ostream& os, const solid& s)
-        {
-            s.writeData(os);
-            return os;
-        }
+        friend Ostream& operator<<(Ostream& os, const solid& s);
 };
 
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "solidI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

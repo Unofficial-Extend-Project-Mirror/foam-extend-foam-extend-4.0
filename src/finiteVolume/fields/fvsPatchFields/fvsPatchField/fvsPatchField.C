@@ -98,7 +98,7 @@ fvsPatchField<Type>::fvsPatchField
             Field<Type>("value", dict, p.size())
         );
     }
-    else if (!valueRequired)
+    else
     {
         fvsPatchField<Type>::operator=(pTraits<Type>::zero);
     }

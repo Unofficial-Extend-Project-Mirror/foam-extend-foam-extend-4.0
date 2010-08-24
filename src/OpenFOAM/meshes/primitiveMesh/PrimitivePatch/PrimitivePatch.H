@@ -28,10 +28,10 @@ Class
 Description
     A list of faces which address into the list of points.
 
-    The class is templated on the form of the face (e.g. triangle, polygon
-    etc.) and on the form of list for faces and points so that it can
-    refer to existing lists using UList and const pointField& or hold the
-    storage using List and pointField.
+    The class is templated on the face type (e.g. triangle, polygon etc.)
+    and on the list type of faces and points so that it can refer to
+    existing lists using UList and const pointField& or hold the storage
+    using List and pointField.
 
 SourceFiles
     PrimitivePatchAddressing.C
@@ -57,7 +57,7 @@ SourceFiles
 #include "edgeList.H"
 #include "point.H"
 #include "intersection.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -219,9 +219,12 @@ private:
         //- Calculate unit point normals
         void calcPointNormals() const;
 
+        //- Calculate edge owner
+        void calcEdgeOwner() const;
+
 
         //- Face-edge-face walk while remaining on a patch point.
-        // Used to determine if surface multiply connected through point.
+        //  Used to determine if surface multiply connected through point.
         void visitPointRegion
         (
             const label pointI,
@@ -242,7 +245,7 @@ public:
             const FaceList<Face>& faces,
             const Field<PointType>& points
         );
-        
+
         //- Construct from components, reuse storage
         PrimitivePatch
         (
@@ -356,12 +359,21 @@ public:
                 //  index in the edge list.  If the edge is not found, return -1
                 label whichEdge(const edge& e) const;
 
-                //- Return labels of patch edges in the global edge list
+                //- Return labels of patch edges in the global edge list using
+                //  cell addressing
                 labelList meshEdges
                 (
                     const edgeList& allEdges,
                     const labelListList& cellEdges,
                     const labelList& faceCells
+                ) const;
+
+                //- Return labels of patch edges in the global edge list using
+                //  basic edge addressing.
+                labelList meshEdges
+                (
+                    const edgeList& allEdges,
+                    const labelListList& pointEdges
                 ) const;
 
                 //- Return face centres for patch
@@ -411,8 +423,8 @@ public:
             surfaceTopo surfaceType() const;
 
             //- Check surface formed by patch for manifoldness (see above).
-            //  Insert vertices of incorrect
-            //  edges set. Return true if any incorrect edge found.
+            //  Return true if any incorrect edges are found.
+            //  Insert vertices of incorrect edges into set.
             bool checkTopology
             (
                 const bool report = false,

@@ -98,7 +98,7 @@ bool OPstream::write
             << Foam::abort(FatalError);
     }
 
-    if (maxSendSize.size() == 0)
+    if (maxSendSize.empty())
     {
         // Intialize maxSendSize to the initial size of the receive buffers.
         maxSendSize.setSize(Pstream::nProcs());

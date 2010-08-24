@@ -40,13 +40,13 @@ timeVaryingUniformTotalPressureFvPatchScalarField
 )
 :
     fixedValueFvPatchScalarField(p, iF),
-    UName_("undefined"),
-    phiName_("undefined"),
-    rhoName_("undefined"),
-    psiName_("undefined"),
+    UName_("U"),
+    phiName_("phi"),
+    rhoName_("none"),
+    psiName_("none"),
     gamma_(0.0),
     p0_(0.0),
-    totalPressureTimeSeries_()
+    timeSeries_()
 {}
 
 
@@ -59,13 +59,13 @@ timeVaryingUniformTotalPressureFvPatchScalarField
 )
 :
     fixedValueFvPatchScalarField(p, iF),
-    UName_(dict.lookup("U")),
-    phiName_(dict.lookup("phi")),
-    rhoName_(dict.lookup("rho")),
-    psiName_(dict.lookup("psi")),
+    UName_(dict.lookupOrDefault<word>("U", "U")),
+    phiName_(dict.lookupOrDefault<word>("phi", "phi")),
+    rhoName_(dict.lookupOrDefault<word>("rho", "none")),
+    psiName_(dict.lookupOrDefault<word>("psi", "none")),
     gamma_(readScalar(dict.lookup("gamma"))),
     p0_(readScalar(dict.lookup("p0"))),
-    totalPressureTimeSeries_(dict)
+    timeSeries_(dict)
 {
     if (dict.found("value"))
     {
@@ -97,7 +97,7 @@ timeVaryingUniformTotalPressureFvPatchScalarField
     psiName_(ptf.psiName_),
     gamma_(ptf.gamma_),
     p0_(ptf.p0_),
-    totalPressureTimeSeries_(ptf.totalPressureTimeSeries_)
+    timeSeries_(ptf.timeSeries_)
 {}
 
 
@@ -114,7 +114,7 @@ timeVaryingUniformTotalPressureFvPatchScalarField
     psiName_(tppsf.psiName_),
     gamma_(tppsf.gamma_),
     p0_(tppsf.p0_),
-    totalPressureTimeSeries_(tppsf.totalPressureTimeSeries_)
+    timeSeries_(tppsf.timeSeries_)
 {}
 
 
@@ -132,7 +132,7 @@ timeVaryingUniformTotalPressureFvPatchScalarField
     psiName_(tppsf.psiName_),
     gamma_(tppsf.gamma_),
     p0_(tppsf.p0_),
-    totalPressureTimeSeries_(tppsf.totalPressureTimeSeries_)
+    timeSeries_(tppsf.timeSeries_)
 {}
 
 
@@ -148,7 +148,7 @@ void Foam::timeVaryingUniformTotalPressureFvPatchScalarField::updateCoeffs
         return;
     }
 
-    p0_ = totalPressureTimeSeries_(this->db().time().timeOutputValue());
+    p0_ = timeSeries_(this->db().time().timeOutputValue());
 
     const fvsPatchField<scalar>& phip =
         patch().lookupPatchField<surfaceScalarField, scalar>(phiName_);
@@ -194,11 +194,11 @@ void Foam::timeVaryingUniformTotalPressureFvPatchScalarField::updateCoeffs
         (
             "timeVaryingUniformTotalPressureFvPatchScalarField::updateCoeffs()"
         )   << " rho or psi set inconsitently, rho = " << rhoName_
-            << ", psi = " << psiName_ << '.' << nl
+            << ", psi = " << psiName_ << ".\n"
             << "    Set either rho or psi or neither depending on the "
-               "definition of total pressure." << nl
-            << "    Set the unused variables to 'none'."
-            << "\n    on patch " << this->patch().name()
+               "definition of total pressure.\n"
+            << "    Set the unused variables to 'none'.\n"
+            << "    on patch " << this->patch().name()
             << " of field " << this->dimensionedInternalField().name()
             << " in file " << this->dimensionedInternalField().objectPath()
             << exit(FatalError);
@@ -218,13 +218,19 @@ void Foam::timeVaryingUniformTotalPressureFvPatchScalarField::
 write(Ostream& os) const
 {
     fvPatchScalarField::write(os);
-    os.writeKeyword("U") << UName_ << token::END_STATEMENT << nl;
-    os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
+    if (UName_ != "U")
+    {
+        os.writeKeyword("U") << UName_ << token::END_STATEMENT << nl;
+    }
+    if (phiName_ != "phi")
+    {
+        os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
+    }
     os.writeKeyword("rho") << rhoName_ << token::END_STATEMENT << nl;
     os.writeKeyword("psi") << psiName_ << token::END_STATEMENT << nl;
     os.writeKeyword("gamma") << gamma_ << token::END_STATEMENT << nl;
-    os.writeKeyword("p0") << p0_ << token::END_STATEMENT << endl;
-    totalPressureTimeSeries_.write(os);
+    os.writeKeyword("p0") << p0_ << token::END_STATEMENT << nl;
+    timeSeries_.write(os);
     writeEntry("value", os);
 }
 

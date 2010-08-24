@@ -47,7 +47,8 @@ Foam::topoSetSource::addToUsageTable Foam::zoneToPoint::usage_
 (
     zoneToPoint::typeName,
     "\n    Usage: zoneToPoint zone\n\n"
-    "    Select all points in the pointZone\n\n"
+    "    Select all points in the pointZone."
+    " Note:accepts wildcards for zone.\n\n"
 );
 
 
@@ -55,26 +56,37 @@ Foam::topoSetSource::addToUsageTable Foam::zoneToPoint::usage_
 
 void Foam::zoneToPoint::combine(topoSet& set, const bool add) const
 {
-    label zoneI = mesh_.pointZones().findZoneID(zoneName_);
+    bool hasMatched = false;
 
-    if (zoneI != -1)
+    forAll(mesh_.pointZones(), i)
     {
-        const labelList& pointLabels = mesh_.pointZones()[zoneI];
+        const pointZone& zone = mesh_.pointZones()[i];
 
-        forAll(pointLabels, i)
+        if (zoneName_.match(zone.name()))
         {
-            // Only do active cells
-            if (pointLabels[i] < mesh_.nPoints())
+            const labelList& pointLabels = mesh_.pointZones()[i];
+
+            Info<< "    Found matching zone " << zone.name()
+                << " with " << pointLabels.size() << " points." << endl;
+
+            hasMatched = true;
+
+            forAll(pointLabels, i)
             {
-                addOrDelete(set, pointLabels[i], add);
+                // Only do active points
+                if (pointLabels[i] < mesh_.nPoints())
+                {
+                    addOrDelete(set, pointLabels[i], add);
+                }
             }
         }
     }
-    else
+
+    if (!hasMatched)
     {
         WarningIn("zoneToPoint::combine(topoSet&, const bool)")
-            << "Cannot find zone named " << zoneName_ << endl
-            << "Valid zones are " << mesh_.pointZones().names() << endl;
+            << "Cannot find any pointZone named " << zoneName_ << endl
+            << "Valid names are " << mesh_.pointZones().names() << endl;
     }
 }
 

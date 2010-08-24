@@ -143,7 +143,7 @@ SourceFiles
 #include "labelList.H"
 #include "objectMap.H"
 #include "pointField.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "Map.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

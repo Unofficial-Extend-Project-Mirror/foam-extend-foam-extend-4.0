@@ -36,11 +36,11 @@ SourceFiles
 #ifndef indexedOctree_H
 #define indexedOctree_H
 
+#include "treeBoundBox.H"
 #include "pointIndexHit.H"
 #include "FixedList.H"
-#include "treeBoundBox.H"
 #include "Ostream.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "labelBits.H"
 #include "PackedList.H"
 
@@ -136,6 +136,7 @@ private:
         //  node.
         static scalar perturbTol_;
 
+
     // Private data
 
         //- Underlying shapes for geometric queries.
@@ -152,9 +153,10 @@ private:
 
     // Private Member Functions
 
-        //- Like above but now bb is implicitly provided as parent bb + mid
-        //  + octant
-        static bool intersects
+        //- Helper: does bb intersect a sphere around sample? Or is any
+        //  corner point of bb closer than nearestDistSqr to sample.
+        //  (bb is implicitly provided as parent bb + octant)
+        static bool overlaps
         (
             const treeBoundBox& parentBb,
             const direction octant,
@@ -223,6 +225,60 @@ private:
                 point& nearestPoint
             ) const;
 
+            //- Return bbox of octant
+            treeBoundBox subBbox
+            (
+                const label parentNodeI,
+                const direction octant
+            ) const;
+
+            //- Helper: take a point on/close to face of bb and push it
+            //  inside or outside of bb.
+            static point pushPoint
+            (
+                const treeBoundBox&,
+                const point&,
+                const bool pushInside
+            );
+
+            //- Helper: take a point on face of bb and push it
+            //  inside or outside of bb.
+            static point pushPoint
+            (
+                const treeBoundBox&,
+                const direction,
+                const point&,
+                const bool pushInside
+            );
+
+            //- Helper: take point on face(s) of bb and push it away from
+            //  edges of face.
+            static point pushPointIntoFace
+            (
+                const treeBoundBox& bb,
+                const vector& dir,          // end-start
+                const point& pt
+            );
+
+            ////- Push point on multiple faces away from any corner/edge.
+            //static void checkMultipleFaces
+            //(
+            //    const treeBoundBox& bb,
+            //    const vector& dir,          // end-start
+            //    pointIndexHit& faceHitInfo,
+            //    direction& faceID
+            //);
+
+            //- Walk to parent of node+octant.
+            bool walkToParent
+            (
+                const label nodeI,
+                const direction octant,
+
+                label& parentNodeI,
+                label& parentOctant
+            ) const;
+
             //- Walk tree to neighbouring node. Return false if edge of tree
             //  hit.
             bool walkToNeighbour
@@ -233,8 +289,8 @@ private:
                 direction& octant
             ) const;
 
-            //- Categorize point on bounding box.
-            static direction getFace(const treeBoundBox&, const point&);
+            //- Debug: return verbose the bounding box faces
+            static word faceString(const direction faceID);
 
             //- Traverse a node. If intersects a triangle return first
             // intersection point.
@@ -243,9 +299,11 @@ private:
             void traverseNode
             (
                 const bool findAny,
+                const point& treeStart,
+                const vector& treeVec,
+
                 const point& start,
                 const point& end,
-                const vector& dir,
                 const label nodeI,
                 const direction octantI,
 
@@ -260,7 +318,8 @@ private:
                 const point& treeStart,
                 const point& treeEnd,
                 const label startNodeI,
-                const direction startOctantI
+                const direction startOctantI,
+                const bool verbose = false
             ) const;
 
             //- Find any or nearest intersection of line between start and end.
@@ -317,8 +376,10 @@ private:
             }
 
 public:
-    //- Get the perturbation tolerance
+
+        //- Get the perturbation tolerance
         static scalar& perturbTol();
+
 
     // Constructors
 
@@ -382,7 +443,7 @@ public:
             //- Top bounding box
             const treeBoundBox& bb() const
             {
-                if (nodes_.size() == 0)
+                if (nodes_.empty())
                 {
                     FatalErrorIn("indexedOctree<Type>::bb() const")
                         << "Tree is empty" << abort(FatalError);
@@ -486,7 +547,7 @@ public:
 
             //- Find (in no particular order) indices of all shapes inside or
             //  overlapping bounding box (i.e. all shapes not outside box)
-            labelList findBox(const boundBox& bb) const;
+            labelList findBox(const treeBoundBox& bb) const;
 
             //- Find deepest node (as parent+octant) containing point. Starts
             //  off from starting index in nodes_ (use 0 to start from top)
@@ -507,13 +568,14 @@ public:
 
             //- Helper: does bb intersect a sphere around sample? Or is any
             //  corner point of bb closer than nearestDistSqr to sample.
-            static bool intersects
+            static bool overlaps
             (
                 const point& bbMin,
                 const point& bbMax,
                 const scalar nearestDistSqr,
                 const point& sample
             );
+
 
         // Write
 

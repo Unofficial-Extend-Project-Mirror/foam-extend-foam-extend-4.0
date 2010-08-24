@@ -36,8 +36,8 @@ SourceFiles
 #ifndef readHexLabel_H
 #define readHexLabel_H
 
-#include "ISstream.H"
 #include "label.H"
+#include "ISstream.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,7 +45,7 @@ namespace Foam
 {
 
 //- Read a hex label from an input stream
-label readHexLabel(ISstream& is);
+label readHexLabel(ISstream&);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

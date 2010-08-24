@@ -940,17 +940,7 @@ void Foam::syncTools::syncPointList
                     fromNbr >> nbrPatchInfo;
                 }
                 // Null any value which is not on neighbouring processor
-                label nbrSize = nbrPatchInfo.size();
-                nbrPatchInfo.setSize(procPatch.nPoints());
-                for
-                (
-                    label i = nbrSize;
-                    i < procPatch.nPoints();
-                    i++
-                )
-                {
-                    nbrPatchInfo[i] = nullValue;
-                }
+                nbrPatchInfo.setSize(procPatch.nPoints(), nullValue);
 
                 if (!procPatch.parallel())
                 {
@@ -1213,7 +1203,7 @@ void Foam::syncTools::syncEdgeList
                 const labelList& meshEdges = procPatch.meshEdges();
 
                 // Receive from neighbour. Is per patch edge the region of the
-                // neighbouring patch edge. 
+                // neighbouring patch edge.
                 List<T> nbrPatchInfo(procPatch.nEdges());
 
                 {
@@ -1225,18 +1215,7 @@ void Foam::syncTools::syncEdgeList
                     fromNeighb >> nbrPatchInfo;
                 }
                 // Null any value which is not on neighbouring processor
-                label nbrSize = nbrPatchInfo.size();
-                nbrPatchInfo.setSize(procPatch.nEdges());
-                for
-                (
-                    label i = nbrSize;
-                    i < procPatch.nEdges();
-                    i++
-                )
-                {
-                    nbrPatchInfo[i] = nullValue;
-                }
-
+                nbrPatchInfo.setSize(procPatch.nEdges(), nullValue);
 
                 if (!procPatch.parallel())
                 {
@@ -1423,7 +1402,7 @@ void Foam::syncTools::syncBoundaryFaceList
                 else
                 {
                     OPstream toNbr(Pstream::blocking, procPatch.neighbProcNo());
-                    toNbr << 
+                    toNbr <<
                         SubList<T>(faceValues, procPatch.size(), patchStart);
                 }
             }
@@ -1588,6 +1567,471 @@ void Foam::syncTools::swapFaceList
 )
 {
     syncFaceList(mesh, faceValues, eqOp<T>(), applySeparation);
+}
+
+
+template <unsigned nBits, class CombineOp>
+void Foam::syncTools::syncFaceList
+(
+    const polyMesh& mesh,
+    PackedList<nBits>& faceValues,
+    const CombineOp& cop
+)
+{
+    if (faceValues.size() != mesh.nFaces())
+    {
+        FatalErrorIn
+        (
+            "syncTools<unsigned nBits, class CombineOp>::syncFaceList"
+            "(const polyMesh&, PackedList<nBits>&, const CombineOp&)"
+        )   << "Number of values " << faceValues.size()
+            << " is not equal to the number of faces in the mesh "
+            << mesh.nFaces() << abort(FatalError);
+    }
+
+    const polyBoundaryMesh& patches = mesh.boundaryMesh();
+
+    if (!hasCouples(patches))
+    {
+        return;
+    }
+
+    // Patch data (proc patches only).
+    List<List<unsigned int> > patchValues(patches.size());
+
+    if (Pstream::parRun())
+    {
+        // Send
+
+        forAll(patches, patchI)
+        {
+            if
+            (
+                isA<processorPolyPatch>(patches[patchI])
+             && patches[patchI].size() > 0
+            )
+            {
+                const processorPolyPatch& procPatch =
+                    refCast<const processorPolyPatch>(patches[patchI]);
+
+                patchValues[patchI].setSize(procPatch.size());
+                forAll(procPatch, i)
+                {
+                    patchValues[patchI][i] =
+                        faceValues.get(procPatch.start()+i);
+                }
+
+                OPstream toNbr(Pstream::blocking, procPatch.neighbProcNo());
+                toNbr << patchValues[patchI];
+            }
+        }
+
+
+        // Receive and combine.
+
+        forAll(patches, patchI)
+        {
+            if
+            (
+                isA<processorPolyPatch>(patches[patchI])
+             && patches[patchI].size() > 0
+            )
+            {
+                const processorPolyPatch& procPatch =
+                    refCast<const processorPolyPatch>(patches[patchI]);
+
+                {
+                    IPstream fromNbr
+                    (
+                        Pstream::blocking,
+                        procPatch.neighbProcNo()
+                    );
+                    fromNbr >> patchValues[patchI];
+                }
+
+                // Combine (bitwise)
+                forAll(procPatch, i)
+                {
+                    unsigned int patchVal = patchValues[patchI][i];
+                    label meshFaceI = procPatch.start()+i;
+                    unsigned int faceVal = faceValues.get(meshFaceI);
+                    cop(faceVal, patchVal);
+                    faceValues.set(meshFaceI, faceVal);
+                }
+            }
+        }
+    }
+
+    // Do the cyclics.
+    forAll(patches, patchI)
+    {
+        if (isA<cyclicPolyPatch>(patches[patchI]))
+        {
+            const cyclicPolyPatch& cycPatch =
+                refCast<const cyclicPolyPatch>(patches[patchI]);
+
+            label half = cycPatch.size()/2;
+
+            for (label i = 0; i < half; i++)
+            {
+                label meshFace0 = cycPatch.start()+i;
+                unsigned int val0 = faceValues.get(meshFace0);
+                label meshFace1 = meshFace0 + half;
+                unsigned int val1 = faceValues.get(meshFace1);
+
+                unsigned int t = val0;
+                cop(t, val1);
+                faceValues.set(meshFace0, t);
+
+                cop(val1, val0);
+                faceValues.set(meshFace1, val1);
+            }
+        }
+    }
+}
+
+
+template <unsigned nBits>
+void Foam::syncTools::swapFaceList
+(
+    const polyMesh& mesh,
+    PackedList<nBits>& faceValues
+)
+{
+    syncFaceList(mesh, faceValues, eqOp<unsigned int>());
+}
+
+
+template <unsigned nBits, class CombineOp>
+void Foam::syncTools::syncPointList
+(
+    const polyMesh& mesh,
+    PackedList<nBits>& pointValues,
+    const CombineOp& cop,
+    const unsigned int nullValue
+)
+{
+    if (pointValues.size() != mesh.nPoints())
+    {
+        FatalErrorIn
+        (
+            "syncTools<unsigned nBits, class CombineOp>::syncPointList"
+            "(const polyMesh&, PackedList<nBits>&, const CombineOp&"
+            ", const unsigned int&)"
+        )   << "Number of values " << pointValues.size()
+            << " is not equal to the number of points in the mesh "
+            << mesh.nPoints() << abort(FatalError);
+    }
+
+    const polyBoundaryMesh& patches = mesh.boundaryMesh();
+
+    if (!hasCouples(patches))
+    {
+        return;
+    }
+
+    // Patch data (proc patches only).
+    List<List<unsigned int> > patchValues(patches.size());
+
+    if (Pstream::parRun())
+    {
+        // Send
+
+        forAll(patches, patchI)
+        {
+            if
+            (
+                isA<processorPolyPatch>(patches[patchI])
+             && patches[patchI].nPoints() > 0
+            )
+            {
+                const processorPolyPatch& procPatch =
+                    refCast<const processorPolyPatch>(patches[patchI]);
+
+                patchValues[patchI].setSize(procPatch.nPoints());
+                patchValues[patchI] = nullValue;
+
+                const labelList& meshPts = procPatch.meshPoints();
+                const labelList& nbrPts = procPatch.neighbPoints();
+
+                forAll(nbrPts, pointI)
+                {
+                    label nbrPointI = nbrPts[pointI];
+                    if (nbrPointI >= 0 && nbrPointI < procPatch.nPoints())
+                    {
+                        patchValues[patchI][nbrPointI] =
+                            pointValues.get(meshPts[pointI]);
+                    }
+                }
+
+                OPstream toNbr(Pstream::blocking, procPatch.neighbProcNo());
+                toNbr << patchValues[patchI];
+            }
+        }
+
+
+        // Receive and combine.
+
+        forAll(patches, patchI)
+        {
+            if
+            (
+                isA<processorPolyPatch>(patches[patchI])
+             && patches[patchI].nPoints() > 0
+            )
+            {
+                const processorPolyPatch& procPatch =
+                    refCast<const processorPolyPatch>(patches[patchI]);
+
+                {
+                    // We do not know the number of points on the other side
+                    // so cannot use Pstream::read.
+                    IPstream fromNbr
+                    (
+                        Pstream::blocking,
+                        procPatch.neighbProcNo()
+                    );
+                    fromNbr >> patchValues[patchI];
+                }
+
+                // Null any value which is not on neighbouring processor
+                patchValues[patchI].setSize(procPatch.nPoints(), nullValue);
+
+                const labelList& meshPts = procPatch.meshPoints();
+
+                forAll(meshPts, pointI)
+                {
+                    label meshPointI = meshPts[pointI];
+                    unsigned int pointVal = pointValues.get(meshPointI);
+                    cop(pointVal, patchValues[patchI][pointI]);
+                    pointValues.set(meshPointI, pointVal);
+                }
+            }
+        }
+    }
+
+    // Do the cyclics.
+    forAll(patches, patchI)
+    {
+        if (isA<cyclicPolyPatch>(patches[patchI]))
+        {
+            const cyclicPolyPatch& cycPatch =
+                refCast<const cyclicPolyPatch>(patches[patchI]);
+
+            const edgeList& coupledPoints = cycPatch.coupledPoints();
+            const labelList& meshPts = cycPatch.meshPoints();
+
+            forAll(coupledPoints, i)
+            {
+                const edge& e = coupledPoints[i];
+
+                label point0 = meshPts[e[0]];
+                label point1 = meshPts[e[1]];
+
+                unsigned int val0 = pointValues.get(point0);
+                unsigned int t = val0;
+                unsigned int val1 = pointValues.get(point1);
+
+                cop(t, val1);
+                pointValues.set(point0, t);
+                cop(val1, val0);
+                pointValues.set(point1, val1);
+            }
+        }
+    }
+
+    // Synchronize multiple shared points.
+    const globalMeshData& pd = mesh.globalData();
+
+    if (pd.nGlobalPoints() > 0)
+    {
+        // Values on shared points. Use unpacked storage for ease!
+        List<unsigned int> sharedPts(pd.nGlobalPoints(), nullValue);
+
+        forAll(pd.sharedPointLabels(), i)
+        {
+            label meshPointI = pd.sharedPointLabels()[i];
+            // Fill my entries in the shared points
+            sharedPts[pd.sharedPointAddr()[i]] = pointValues.get(meshPointI);
+        }
+
+        // Combine on master.
+        Pstream::listCombineGather(sharedPts, cop);
+        Pstream::listCombineScatter(sharedPts);
+
+        // Now we will all have the same information. Merge it back with
+        // my local information.
+        forAll(pd.sharedPointLabels(), i)
+        {
+            label meshPointI = pd.sharedPointLabels()[i];
+            pointValues.set(meshPointI, sharedPts[pd.sharedPointAddr()[i]]);
+        }
+    }
+}
+
+
+template <unsigned nBits, class CombineOp>
+void Foam::syncTools::syncEdgeList
+(
+    const polyMesh& mesh,
+    PackedList<nBits>& edgeValues,
+    const CombineOp& cop,
+    const unsigned int nullValue
+)
+{
+    if (edgeValues.size() != mesh.nEdges())
+    {
+        FatalErrorIn
+        (
+            "syncTools<unsigned nBits, class CombineOp>::syncEdgeList"
+            "(const polyMesh&, PackedList<nBits>&, const CombineOp&"
+            ", const unsigned int&)"
+        )   << "Number of values " << edgeValues.size()
+            << " is not equal to the number of edges in the mesh "
+            << mesh.nEdges() << abort(FatalError);
+    }
+
+    const polyBoundaryMesh& patches = mesh.boundaryMesh();
+
+    if (!hasCouples(patches))
+    {
+        return;
+    }
+
+    // Patch data (proc patches only).
+    List<List<unsigned int> > patchValues(patches.size());
+
+    if (Pstream::parRun())
+    {
+        // Send
+
+        forAll(patches, patchI)
+        {
+            if
+            (
+                isA<processorPolyPatch>(patches[patchI])
+             && patches[patchI].nEdges() > 0
+            )
+            {
+                const processorPolyPatch& procPatch =
+                    refCast<const processorPolyPatch>(patches[patchI]);
+
+                patchValues[patchI].setSize(procPatch.nEdges(), nullValue);
+
+                const labelList& meshEdges = procPatch.meshEdges();
+                const labelList& neighbEdges = procPatch.neighbEdges();
+
+                forAll(neighbEdges, edgeI)
+                {
+                    label nbrEdgeI = neighbEdges[edgeI];
+                    if (nbrEdgeI >= 0 && nbrEdgeI < procPatch.nEdges())
+                    {
+                        patchValues[patchI][nbrEdgeI] =
+                            edgeValues.get(meshEdges[edgeI]);
+                    }
+                }
+
+                OPstream toNbr(Pstream::blocking, procPatch.neighbProcNo());
+                toNbr << patchValues[patchI];
+            }
+        }
+
+
+        // Receive and combine.
+
+        forAll(patches, patchI)
+        {
+            if
+            (
+                isA<processorPolyPatch>(patches[patchI])
+             && patches[patchI].nEdges() > 0
+            )
+            {
+                const processorPolyPatch& procPatch =
+                    refCast<const processorPolyPatch>(patches[patchI]);
+
+                {
+                    IPstream fromNeighb
+                    (
+                        Pstream::blocking,
+                        procPatch.neighbProcNo()
+                    );
+                    fromNeighb >> patchValues[patchI];
+                }
+
+                patchValues[patchI].setSize(procPatch.nEdges(), nullValue);
+
+                const labelList& meshEdges = procPatch.meshEdges();
+
+                forAll(meshEdges, edgeI)
+                {
+                    unsigned int patchVal = patchValues[patchI][edgeI];
+                    label meshEdgeI = meshEdges[edgeI];
+                    unsigned int edgeVal = edgeValues.get(meshEdgeI);
+                    cop(edgeVal, patchVal);
+                    edgeValues.set(meshEdgeI, edgeVal);
+                }
+            }
+        }
+    }
+
+    // Do the cyclics.
+    forAll(patches, patchI)
+    {
+        if (isA<cyclicPolyPatch>(patches[patchI]))
+        {
+            const cyclicPolyPatch& cycPatch =
+                refCast<const cyclicPolyPatch>(patches[patchI]);
+
+            const edgeList& coupledEdges = cycPatch.coupledEdges();
+            const labelList& meshEdges = cycPatch.meshEdges();
+
+            forAll(coupledEdges, i)
+            {
+                const edge& e = coupledEdges[i];
+
+                label edge0 = meshEdges[e[0]];
+                label edge1 = meshEdges[e[1]];
+
+                unsigned int val0 = edgeValues.get(edge0);
+                unsigned int t = val0;
+                unsigned int val1 = edgeValues.get(edge1);
+
+                cop(t, val1);
+                edgeValues.set(edge0, t);
+                cop(val1, val0);
+                edgeValues.set(edge1, val1);
+            }
+        }
+    }
+
+    // Synchronize multiple shared edges.
+    const globalMeshData& pd = mesh.globalData();
+
+    if (pd.nGlobalEdges() > 0)
+    {
+        // Values on shared edges. Use unpacked storage for ease!
+        List<unsigned int> sharedPts(pd.nGlobalEdges(), nullValue);
+
+        forAll(pd.sharedEdgeLabels(), i)
+        {
+            label meshEdgeI = pd.sharedEdgeLabels()[i];
+            // Fill my entries in the shared edges
+            sharedPts[pd.sharedEdgeAddr()[i]] = edgeValues.get(meshEdgeI);
+        }
+
+        // Combine on master.
+        Pstream::listCombineGather(sharedPts, cop);
+        Pstream::listCombineScatter(sharedPts);
+
+        // Now we will all have the same information. Merge it back with
+        // my local information.
+        forAll(pd.sharedEdgeLabels(), i)
+        {
+            label meshEdgeI = pd.sharedEdgeLabels()[i];
+            edgeValues.set(meshEdgeI, sharedPts[pd.sharedEdgeAddr()[i]]);
+        }
+    }
 }
 
 

@@ -25,7 +25,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "diagonalPreconditioner.H"
-#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -33,12 +32,13 @@ namespace Foam
 {
     defineTypeNameAndDebug(diagonalPreconditioner, 0);
 
-    addToRunTimeSelectionTable
-    (
-        lduPreconditioner,
-        diagonalPreconditioner,
-        dictionary
-    );
+    lduPreconditioner::
+        addsymMatrixConstructorToTable<diagonalPreconditioner>
+        adddiagonalPreconditionerSymMatrixConstructorToTable_;
+
+    lduPreconditioner::
+        addasymMatrixConstructorToTable<diagonalPreconditioner>
+        adddiagonalPreconditionerAsymMatrixConstructorToTable_;
 }
 
 
@@ -67,18 +67,9 @@ Foam::diagonalPreconditioner::diagonalPreconditioner
 
     register label nCells = rD.size();
 
-    #ifdef ICC_IA64_PREFETCH
-    #pragma ivdep
-    #endif
-
     // Generate reciprocal diagonal
     for (register label cell=0; cell<nCells; cell++)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&rDPtr[cell+96],0,1);
-        __builtin_prefetch (&DPtr[cell+96],0,1);
-        #endif
-
         rDPtr[cell] = 1.0/DPtr[cell];
     }
 }
@@ -99,18 +90,8 @@ void Foam::diagonalPreconditioner::precondition
 
     register label nCells = wA.size();
 
-    #ifdef ICC_IA64_PREFETCH
-    #pragma ivdep
-    #endif
-
     for (register label cell=0; cell<nCells; cell++)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&wAPtr[cell+96],0,1);
-        __builtin_prefetch (&rDPtr[cell+96],0,1);
-        __builtin_prefetch (&rAPtr[cell+96],0,1);
-        #endif
-
         wAPtr[cell] = rDPtr[cell]*rAPtr[cell];
     }
 }

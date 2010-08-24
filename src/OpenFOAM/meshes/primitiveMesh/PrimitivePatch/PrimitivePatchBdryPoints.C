@@ -22,17 +22,11 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "PrimitivePatch.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -44,7 +38,8 @@ template
     class PointType
 >
 void
-PrimitivePatch<Face, FaceList, PointField, PointType>::calcBdryPoints() const
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+calcBdryPoints() const
 {
     if (debug)
     {
@@ -90,9 +85,5 @@ PrimitivePatch<Face, FaceList, PointField, PointType>::calcBdryPoints() const
     }
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

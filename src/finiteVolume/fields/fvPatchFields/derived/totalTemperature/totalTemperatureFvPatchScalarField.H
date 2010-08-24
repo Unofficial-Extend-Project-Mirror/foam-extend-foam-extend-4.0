@@ -92,7 +92,7 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given totalTemperatureFvPatchScalarField
+        //- Construct by mapping given totalTemperatureFvPatchScalarField 
         //  onto a new patch
         totalTemperatureFvPatchScalarField
         (
@@ -177,10 +177,6 @@ public:
 
 
         // Evaluation functions
-
-            //- Update the coefficients associated with the patch field
-            //  using the given patch velocity field
-            virtual void updateCoeffs(const vectorField& Up);
 
             //- Update the coefficients associated with the patch field
             virtual void updateCoeffs();

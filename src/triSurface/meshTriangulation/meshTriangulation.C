@@ -364,7 +364,7 @@ Foam::meshTriangulation::meshTriangulation
                 // Triangulate face. Fall back to naive triangulation if failed.
                 faceTriangulation faceTris(points, faces[faceI], true);
 
-                if (faceTris.size() == 0)
+                if (faceTris.empty())
                 {
                     WarningIn("meshTriangulation::meshTriangulation")
                         << "Could not find triangulation for face " << faceI
@@ -427,7 +427,7 @@ Foam::meshTriangulation::meshTriangulation
                 // Triangulate face
                 faceTriangulation faceTris(points, faces[faceI], true);
 
-                if (faceTris.size() == 0)
+                if (faceTris.empty())
                 {
                     WarningIn("meshTriangulation::meshTriangulation")
                         << "Could not find triangulation for face " << faceI

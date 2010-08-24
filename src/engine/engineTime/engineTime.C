@@ -29,10 +29,7 @@ License
 
 // * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-    defineTypeNameAndDebug(engineTime, 0);
-}
+defineTypeNameAndDebug(Foam::engineTime, 0);
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -153,13 +150,15 @@ Foam::scalar Foam::engineTime::degToRad(const scalar deg) const
 
 Foam::scalar Foam::engineTime::degToTime(const scalar theta) const
 {
-    return theta/(360.0*rpm_.value()/60.0);
+    // 6 * rpm => deg/s
+    return theta/(6.0*rpm_.value());
 }
 
 
 Foam::scalar Foam::engineTime::timeToDeg(const scalar t) const
 {
-    return t*(360.0*rpm_.value()/60.0);
+    // 6 * rpm => deg/s
+    return t*(6.0*rpm_.value());
 }
 
 

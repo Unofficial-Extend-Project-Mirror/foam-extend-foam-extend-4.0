@@ -29,8 +29,7 @@ Description
     Input token stream.
 
 SourceFiles
-    ITread.C
-    ITprint.C
+    ITstream.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -99,6 +98,12 @@ public:
         }
 
 
+    // Destructor
+
+        virtual ~ITstream()
+        {}
+
+
     // Member functions
 
         // Inquiry
@@ -143,31 +148,31 @@ public:
         // Read functions
 
             //- Return next token from stream
-            Istream& read(token&);
+            virtual Istream& read(token&);
 
             //- Read a character
-            Istream& read(char&);
+            virtual Istream& read(char&);
 
             //- Read a word
-            Istream& read(word&);
+            virtual Istream& read(word&);
 
             // Read a string (including enclosing double-quotes)
-            Istream& read(string&);
+            virtual Istream& read(string&);
 
             //- Read a label
-            Istream& read(label&);
+            virtual Istream& read(label&);
 
             //- Read a floatScalar
-            Istream& read(floatScalar&);
+            virtual Istream& read(floatScalar&);
 
             //- Read a doubleScalar
-            Istream& read(doubleScalar&);
+            virtual Istream& read(doubleScalar&);
 
             //- Read binary block
-            Istream& read(char*, std::streamsize);
+            virtual Istream& read(char*, std::streamsize);
 
             //- Rewind and return the stream so that it may be read again
-            Istream& rewind();
+            virtual Istream& rewind();
 
 
         // Edit

@@ -108,8 +108,17 @@ public:
         //- Construct from an Istream with a given name and dimensions
         dimensioned(const word&, const dimensionSet&, Istream&);
 
-        //- Construct from dictionary, supplying default value so that if the
-        //  value is not found, it is added into the dictionary.
+        //- Construct from dictionary, with default value.
+        static dimensioned<Type> lookupOrDefault
+        (
+            const word&,
+            const dictionary&,
+            const Type& defaultValue = pTraits<Type>::zero,
+            const dimensionSet& dims = dimless
+        );
+
+        //- Construct from dictionary, with default value.
+        //  If the value is not found, it is added into the dictionary.
         static dimensioned<Type> lookupOrAddToDict
         (
             const word&,
@@ -148,8 +157,7 @@ public:
         //- Return transpose.
         dimensioned<Type> T() const;
 
-        //- Update the value of the dimensioned<Type> if it is found in the
-        //  dictionary
+        //- Update the value of dimensioned<Type> if found in the dictionary.
         bool readIfPresent(const dictionary&);
 
 
@@ -166,16 +174,10 @@ public:
 
     // IOstream operators
 
-        friend Istream& operator>>
-        #ifndef __CINT__
-        <Type>
-        #endif
+        friend Istream& operator>> <Type>
         (Istream&, dimensioned<Type>&);
 
-        friend Ostream& operator<<
-        #ifndef __CINT__
-        <Type>
-        #endif
+        friend Ostream& operator<< <Type>
         (Ostream&, const dimensioned<Type>&);
 };
 

@@ -36,20 +36,15 @@ Description
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-Istream& operator>>(Istream& is, char& c)
+Foam::Istream& Foam::operator>>(Istream& is, char& c)
 {
     is.read(c);
-    is.check("Istream& operator>>(Istream& is, char& c)");
+    is.check("Istream& operator>>(Istream&, char&)");
     return is;
 }
 
 
-Ostream& operator<<(Ostream& os, const char c)
+Foam::Ostream& Foam::operator<<(Ostream& os, const char c)
 {
     os.write(c);
     os.check("Ostream& operator<<(Ostream&, const char)");
@@ -57,7 +52,7 @@ Ostream& operator<<(Ostream& os, const char c)
 }
 
 
-char readChar(Istream& is)
+char Foam::readChar(Istream& is)
 {
    char c;
    is.read(c);
@@ -65,16 +60,12 @@ char readChar(Istream& is)
 }
 
 
-Ostream& operator<<(Ostream& os, const char* s)
+Foam::Ostream& Foam::operator<<(Ostream& os, const char* s)
 {
     os.write(s);
     os.check("Ostream& operator<<(Ostream&, const char*)");
     return os;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

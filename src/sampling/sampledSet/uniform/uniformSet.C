@@ -238,17 +238,16 @@ void Foam::uniformSet::calcSamples
     const scalar smallDist = mag(smallVec);
 
     // Get all boundary intersections
-    List<pointIndexHit> bHits =
-        searchEngine().intersections
-        (
-            start_ - smallVec,
-            end_ + smallVec
-        );
+    List<pointIndexHit> bHits = searchEngine().intersections
+    (
+        start_ - smallVec,
+        end_ + smallVec
+    );
 
     point bPoint(GREAT, GREAT, GREAT);
     label bFaceI = -1;
 
-    if (bHits.size() > 0)
+    if (bHits.size())
     {
         bPoint = bHits[0].hitPoint();
         bFaceI = bHits[0].index();

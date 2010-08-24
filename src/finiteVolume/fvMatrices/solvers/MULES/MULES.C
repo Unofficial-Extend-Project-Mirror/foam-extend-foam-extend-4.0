@@ -50,7 +50,7 @@ void Foam::MULES::explicitSolve
 {
     explicitSolve
     (
-        oneField(),
+        geometricOneField(),
         psi,
         phi,
         phiPsi,
@@ -71,7 +71,7 @@ void Foam::MULES::implicitSolve
 {
     implicitSolve
     (
-        oneField(),
+        geometricOneField(),
         psi,
         phi,
         phiPsi,

@@ -26,26 +26,31 @@ Typedef
     Foam::labelPairLookup
 
 Description
-    Hash for two labels to other label. Used for e.g. for face1, face2 to
-    shared edge.
+    A HashTable for two labels to another label.
+    Used for e.g. for face1, face2 to shared edge.
 
-    Note: do NOT use edge! Our two faces are non commutative, first face is
-    from surface1, second face is from surface2.
+Note
+    The hash table is based on a FixedList and not edge, since an edge
+    hashes commutatively!
 
 \*---------------------------------------------------------------------------*/
 
 #ifndef labelPairLookup_H
 #define labelPairLookup_H
 
+#include "FixedList.H"
 #include "HashTable.H"
-#include "edge.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    typedef HashTable<label, FixedList<label, 2>, FixedList<label, 2>::Hash<> >
-        labelPairLookup;
+    typedef HashTable
+    <
+       label,
+       FixedList<label, 2>,
+       FixedList<label, 2>::Hash<>
+    > labelPairLookup;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

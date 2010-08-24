@@ -43,13 +43,12 @@ bool Foam::IOobject::writeHeader(Ostream& os) const
         return false;
     }
 
-    writeBanner(os);
-    os  << "FoamFile\n{\n"
+    writeBanner(os)
+        << "FoamFile\n{\n"
         << "    version     " << os.version() << ";\n"
         << "    format      " << os.format() << ";\n"
         << "    class       " << type() << ";\n";
 
-    // outdent for visibility and more space
     if (note().size())
     {
         os  << "    note        " << note() << ";\n";
@@ -59,8 +58,7 @@ bool Foam::IOobject::writeHeader(Ostream& os) const
         << "    object      " << name() << ";\n"
         << "}" << nl;
 
-    writeDivider(os);
-    os  << endl;
+    writeDivider(os) << endl;
 
     return true;
 }

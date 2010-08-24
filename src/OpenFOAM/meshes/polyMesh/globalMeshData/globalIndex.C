@@ -26,12 +26,6 @@ License
 
 #include "globalIndex.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::globalIndex::globalIndex(const label localSize)
@@ -66,15 +60,6 @@ Foam::globalIndex::globalIndex(Istream& is)
 {
     is >> offsets_;
 }
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * //
 
 
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //

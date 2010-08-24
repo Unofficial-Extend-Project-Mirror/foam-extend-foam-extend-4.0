@@ -49,7 +49,7 @@ Foam::smoothSolver::smoothSolver
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    Istream& solverData
+    const dictionary& solverControls
 )
 :
     lduSolver
@@ -59,9 +59,8 @@ Foam::smoothSolver::smoothSolver
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverData
-    ),
-    nSweeps_(1)
+        solverControls
+    )
 {
     readControls();
 }
@@ -72,7 +71,7 @@ Foam::smoothSolver::smoothSolver
 void Foam::smoothSolver::readControls()
 {
     lduSolver::readControls();
-    dict().readIfPresent("nSweeps", nSweeps_);
+    nSweeps_ = controlDict_.lookupOrDefault<label>("nSweeps", 1);
 }
 
 
@@ -86,17 +85,15 @@ Foam::lduSolverPerformance Foam::smoothSolver::solve
     // Setup class containing solver performance data
     lduSolverPerformance solverPerf(typeName, fieldName());
 
-    // Do a minimum number of sweeps
-    // HJ, 19/Jan/2009
-    if (minIter() > 0)
+    // If the nSweeps_ is negative do a fixed number of sweeps
+    if (nSweeps_ < 0)
     {
         autoPtr<lduMatrix::smoother> smootherPtr = lduMatrix::smoother::New
         (
-            word(dict().lookup("smoother")),
             matrix_,
             coupleBouCoeffs_,
             coupleIntCoeffs_,
-            interfaces_
+            dict()
         );
 
         smootherPtr->smooth
@@ -140,11 +137,10 @@ Foam::lduSolverPerformance Foam::smoothSolver::solve
         autoPtr<lduMatrix::smoother> smootherPtr =
             lduMatrix::smoother::New
             (
-                word(dict().lookup("smoother")),
                 matrix_,
                 coupleBouCoeffs_,
                 coupleIntCoeffs_,
-                interfaces_
+                dict()
             );
 
         // Smoothing loop

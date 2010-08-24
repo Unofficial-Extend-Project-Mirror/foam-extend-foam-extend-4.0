@@ -99,6 +99,9 @@ noConvectionScheme<Type>::fvmDiv
         )
     );
 
+    // Touch diagonal for consistency
+    tfvm().diag() = 0;
+
     return tfvm;
 }
 

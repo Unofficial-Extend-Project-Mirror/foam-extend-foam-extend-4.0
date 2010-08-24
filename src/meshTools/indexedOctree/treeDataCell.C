@@ -26,7 +26,7 @@ License
 
 #include "treeDataCell.H"
 #include "indexedOctree.H"
-#include "polyMesh.H"
+#include "primitiveMesh.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -71,7 +71,7 @@ Foam::treeBoundBox Foam::treeDataCell::calcCellBb(const label cellI) const
 Foam::treeDataCell::treeDataCell
 (
     const bool cacheBb,
-    const polyMesh& mesh,
+    const primitiveMesh& mesh,
     const labelList& cellLabels
 )
 :
@@ -94,7 +94,7 @@ Foam::treeDataCell::treeDataCell
 Foam::treeDataCell::treeDataCell
 (
     const bool cacheBb,
-    const polyMesh& mesh
+    const primitiveMesh& mesh
 )
 :
     mesh_(mesh),
@@ -137,11 +137,11 @@ bool Foam::treeDataCell::overlaps
 {
     if (cacheBb_)
     {
-        return cubeBb.intersects(bbs_[index]);
+        return cubeBb.overlaps(bbs_[index]);
     }
     else
     {
-        return cubeBb.intersects(calcCellBb(cellLabels_[index]));
+        return cubeBb.overlaps(calcCellBb(cellLabels_[index]));
     }
 }
 

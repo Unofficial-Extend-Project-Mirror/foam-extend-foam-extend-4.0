@@ -22,28 +22,19 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-    Constant properties thermodynamics package
-    templated ito the equationOfState.
-
 \*---------------------------------------------------------------------------*/
 
 #include "hConstThermo.H"
 #include "IOstreams.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class equationOfState>
-hConstThermo<equationOfState>::hConstThermo(Istream& is)
+Foam::hConstThermo<equationOfState>::hConstThermo(Istream& is)
 :
     equationOfState(is),
-    CP(readScalar(is)),
-    Hf(readScalar(is))
+    Cp_(readScalar(is)),
+    Hf_(readScalar(is))
 {
     is.check("hConstThermo::hConstThermo(Istream& is)");
 }
@@ -52,18 +43,18 @@ hConstThermo<equationOfState>::hConstThermo(Istream& is)
 // * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
 
 template<class equationOfState>
-Ostream& operator<<(Ostream& os, const hConstThermo<equationOfState>& ct)
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const hConstThermo<equationOfState>& ct
+)
 {
     os  << static_cast<const equationOfState&>(ct) << tab
-        << ct.CP << tab << ct.Hf;
+        << ct.Cp_ << tab << ct.Hf_;
 
     os.check("Ostream& operator<<(Ostream& os, const hConstThermo& ct)");
     return os;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

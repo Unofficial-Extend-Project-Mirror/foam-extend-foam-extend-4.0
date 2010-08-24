@@ -27,6 +27,7 @@ License
 #include "boundaryRegion.H"
 #include "IOMap.H"
 #include "OFstream.H"
+#include "stringListOps.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -79,10 +80,40 @@ Foam::Map<Foam::word> Foam::boundaryRegion::names() const
 
     forAllConstIter(Map<dictionary>, *this, iter)
     {
-        word value = "boundaryRegion_" + Foam::name(iter.key());
-        iter().readIfPresent("Label", value);
+        lookup.insert
+        (
+            iter.key(),
+            iter().lookupOrDefault<word>
+            (
+                "Label",
+                "boundaryRegion_" + Foam::name(iter.key())
+            )
+        );
+    }
 
-        lookup.insert(iter.key(), value);
+    return lookup;
+}
+
+
+Foam::Map<Foam::word> Foam::boundaryRegion::names
+(
+    const List<wordRe>& patterns
+) const
+{
+    Map<word> lookup;
+
+    forAllConstIter(Map<dictionary>, *this, iter)
+    {
+        word lookupName = iter().lookupOrDefault<word>
+        (
+            "Label",
+            "boundaryRegion_" + Foam::name(iter.key())
+        );
+
+        if (findStrings(patterns, lookupName))
+        {
+            lookup.insert(iter.key(), lookupName);
+        }
     }
 
     return lookup;
@@ -95,9 +126,11 @@ Foam::Map<Foam::word> Foam::boundaryRegion::boundaryTypes() const
 
     forAllConstIter(Map<dictionary>, *this, iter)
     {
-        word value = "patch";
-        iter().readIfPresent("BoundaryType", value);
-        lookup.insert(iter.key(), value);
+        lookup.insert
+        (
+            iter.key(),
+            iter().lookupOrDefault<word>("BoundaryType", "patch")
+        );
     }
 
     return lookup;
@@ -106,15 +139,16 @@ Foam::Map<Foam::word> Foam::boundaryRegion::boundaryTypes() const
 
 Foam::label Foam::boundaryRegion::findIndex(const word& name) const
 {
+    if (name.empty())
+    {
+        return -1;
+    }
+
     forAllConstIter(Map<dictionary>, *this, iter)
     {
-        word theName;
-        if (iter().readIfPresent("Label", theName))
+        if (iter().lookupOrDefault<word>("Label", word::null) == name)
         {
-            if (theName == name)
-            {
-                return iter.key();
-            }
+            return iter.key();
         }
     }
 
@@ -124,13 +158,12 @@ Foam::label Foam::boundaryRegion::findIndex(const word& name) const
 
 Foam::word Foam::boundaryRegion::boundaryType(const word& name) const
 {
-    word bndType = "patch";
+    word bndType("patch");
 
     label id = this->findIndex(name);
     if (id >= 0)
     {
-        const dictionary& dict = operator[](id);
-        dict.readIfPresent("BoundaryType", bndType);
+        operator[](id).readIfPresent<word>("BoundaryType", bndType);
     }
 
     return bndType;
@@ -192,7 +225,8 @@ void Foam::boundaryRegion::writeDict
         )
     );
 
-    ioObj.note() = "persistent data for thirdParty mesh <-> OpenFOAM translation";
+    ioObj.note() =
+        "persistent data for thirdParty mesh <-> OpenFOAM translation";
 
     Info<< "Writing " << ioObj.name() << " to " << ioObj.objectPath() << endl;
 
@@ -218,16 +252,19 @@ void Foam::boundaryRegion::operator=(const Map<dictionary>& rhs)
 
 // * * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * //
 
-void Foam::boundaryRegion::rename(const dictionary& dict)
+void Foam::boundaryRegion::rename(const dictionary& mapDict)
 {
-    if (!dict.size())
+    if (mapDict.empty())
     {
         return;
     }
 
-    Map<word> mapping;
+    // Use 1st pass to collect all the regions to be changed
+    // and 2nd pass to relabel regions.
+    // This avoid re-matching any renamed regions
 
-    forAllConstIter(dictionary, dict, iter)
+    Map<word> mapping;
+    forAllConstIter(dictionary, mapDict, iter)
     {
         word oldName(iter().stream());
 
@@ -238,21 +275,14 @@ void Foam::boundaryRegion::rename(const dictionary& dict)
         }
     }
 
-    if (mapping.size())
+    forAllConstIter(Map<word>, mapping, iter)
     {
-        forAllConstIter(Map<word>, mapping, iter)
-        {
-            label id = iter.key();
-            word oldName(operator[](id).lookup("Label"));
-            word newName(iter());
+        dictionary& dict = operator[](iter.key());
 
-            dictionary newDict(operator[](id));
-            newDict.remove("Label");
-            newDict.add("Label", newName);
+        Info<< "rename patch: " << iter()
+            << " <- " << word(dict.lookup("Label")) << nl;
 
-            this->set(id, newDict);
-            Info<< "rename patch: " << newName << " <- " << oldName << endl;
-        }
+        dict.set("Label", iter());
     }
 }
 

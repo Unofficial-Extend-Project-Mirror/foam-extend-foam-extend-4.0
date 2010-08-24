@@ -43,6 +43,15 @@ SourceFiles
 namespace Foam
 {
 
+class ash;
+
+Ostream& operator<<
+(
+     Ostream&,
+     const ash&
+);
+
+
 /*---------------------------------------------------------------------------*\
                               Class ash Declaration
 \*---------------------------------------------------------------------------*/
@@ -61,45 +70,24 @@ public:
     // Constructors
 
         //- Construct null
-        ash()
-        :
-//   rho       Cp          K        Hf      e
-// [kg/m3] [J/(kg.K)] [W/(m.K)]   [J/kg]   [-]
-            solid(2010, 710, 0.04, 0.0, 1.0) // TODO
-        {
-            WarningIn("ash::ash()")
-                << "Properties of ash need to be checked!!!"
-                << endl;
-        }
+        ash();
 
-        ash
-        (
-            const solid& s
-        )
-        :
-            solid(s)
-        {}
+        //- Construct from solid
+        ash(const solid& s);
 
         //- Construct from Istream
-        ash(Istream& is)
-        :
-            solid(is)
-        {}
+        ash(Istream& is);
+
+
+    // I-O
 
         //- Write the function coefficients
-        void writeData(Ostream& os) const
-        {
-            solid::writeData(os);
-        }
+        void writeData(Ostream& os) const;
 
 
     // Ostream Operator
 
-        friend Ostream& operator<<(Ostream& os, const ash& s)
-        {
-            s.writeData(os);
-            return os;
-        }
+        friend Ostream& operator<<(Ostream& os, const ash& s);
 };
 
 

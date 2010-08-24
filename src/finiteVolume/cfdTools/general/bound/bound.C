@@ -37,8 +37,8 @@ void Foam::bound(volScalarField& vsf, const dimensionedScalar& vsf0)
     if (minVsf < vsf0.value())
     {
         Info<< "bounding " << vsf.name()
-            << ", min: " << gMin(vsf.internalField())
-            << " max: " << gMax(vsf.internalField())
+            << ", min: " << minVsf
+            << " max: " << max(vsf).value()
             << " average: " << gAverage(vsf.internalField())
             << endl;
 

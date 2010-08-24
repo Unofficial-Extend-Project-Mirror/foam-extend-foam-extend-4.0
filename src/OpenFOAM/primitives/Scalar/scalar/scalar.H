@@ -27,7 +27,7 @@ Typedef
 
 Description
     Single floating point number identical to float or double depending on
-    whether SP or DP is defined.
+    whether WM_SP or WM_DP is defined.
 
 SourceFiles
     scalar.C
@@ -42,7 +42,7 @@ SourceFiles
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#if defined(SP)
+#if defined(WM_SP)
 
 // Define scalar as a float
 
@@ -60,7 +60,7 @@ namespace Foam
     scalar readScalar(Istream& is);
 }
 
-#elif defined(DP)
+#elif defined(WM_DP)
 
 // Define scalar as a double
 

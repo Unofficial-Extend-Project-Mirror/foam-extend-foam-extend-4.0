@@ -521,9 +521,7 @@ void Foam::searchableBox::findLineAll
                 pt = inter.hitPoint() + smallVec[pointI];
             }
 
-            hits.shrink();
             info[pointI].transfer(hits);
-            hits.clear();
         }
         else
         {

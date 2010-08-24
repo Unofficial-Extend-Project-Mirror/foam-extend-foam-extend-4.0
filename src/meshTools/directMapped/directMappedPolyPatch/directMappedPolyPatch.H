@@ -23,14 +23,15 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::directMappedPolyPatch.C
+    Foam::directMappedPolyPatch
 
 Description
-    Determines a mapping between patch face centres and mesh cell centres and
-    processors they're on.
+    Determines a mapping between patch face centres and mesh cell or face
+    centres and processors they're on.
 
-    Note: storage is not optimal. It stores all face centres and cells on
-    all processors to keep the addressing calculation simple.
+Note
+    Storage is not optimal. It stores all face centres and cells on all
+    processors to keep the addressing calculation simple.
 
 SourceFiles
     directMappedPolyPatch.C
@@ -41,12 +42,15 @@ SourceFiles
 #define directMappedPolyPatch_H
 
 #include "polyPatch.H"
-#include "labelPair.H"
+#include "directMappedPatchBase.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+
+class polyMesh;
 
 /*---------------------------------------------------------------------------*\
                       Class directMappedPolyPatch Declaration
@@ -54,87 +58,29 @@ namespace Foam
 
 class directMappedPolyPatch
 :
-    public polyPatch
+    public polyPatch,
+    public directMappedPatchBase
 {
-    // Private data
-
-        //- Offset vector
-        const vector offset_;
-
-
-        // Derived information
-
-            //- Communication schedule.
-            mutable autoPtr<List<labelPair> > schedulePtr_;
-
-            //- Cells to sample per processor
-            mutable autoPtr<labelListList> sendCellLabelsPtr_;
-
-            //- Patch faces to receive per processor
-            mutable autoPtr<labelListList> receiveFaceLabelsPtr_;
-
-
-    // Private Member Functions
-
-        //- Collect single list of samples and originating processor+face.
-        void collectSamples
-        (
-            pointField&,
-            labelList& patchFaceProcs,
-            labelList& patchFaces
-        ) const;
-
-        //- Find cells containing samples
-        void findSamples
-        (
-            const pointField&,
-            labelList& sampleCellProcs,
-            labelList& sampleCells
-        ) const;
-
-        //- Calculate matching
-        void calcMapping() const;
-
 
 protected:
 
-        void clearOut();
-
         //- Initialise the calculation of the patch geometry
-        virtual void initGeometry()
-        {
-            clearOut();
-        }
+        virtual void initGeometry();
 
         //- Calculate the patch geometry
-        virtual void calcGeometry()
-        {
-            clearOut();
-        }
+        virtual void calcGeometry();
 
         //- Initialise the patches for moving points
-        virtual void initMovePoints(const pointField&)
-        {
-            clearOut();
-        }
+        virtual void initMovePoints(const pointField&);
 
         //- Correct patches after moving points
-        virtual void movePoints(const pointField& p)
-        {
-            clearOut();
-        }
+        virtual void movePoints(const pointField&);
 
         //- Initialise the update of the patch topology
-        virtual void initUpdateMesh()
-        {
-            clearOut();
-        }
+        virtual void initUpdateMesh();
 
         //- Update of the patch topology
-        virtual void updateMesh()
-        {
-            clearOut();
-        }
+        virtual void updateMesh();
 
 
 public:
@@ -152,6 +98,34 @@ public:
             const label size,
             const label start,
             const label index,
+            const polyBoundaryMesh& bm
+        );
+
+        //- Construct from components
+        directMappedPolyPatch
+        (
+            const word& name,
+            const label size,
+            const label start,
+            const label index,
+            const word& sampleRegion,
+            const directMappedPatchBase::sampleMode mode,
+            const word& samplePatch,
+            const vectorField& offset,
+            const polyBoundaryMesh& bm
+        );
+
+        //- Construct from components. Uniform offset.
+        directMappedPolyPatch
+        (
+            const word& name,
+            const label size,
+            const label start,
+            const label index,
+            const word& sampleRegion,
+            const directMappedPatchBase::sampleMode mode,
+            const word& samplePatch,
+            const vector& offset,
             const polyBoundaryMesh& bm
         );
 
@@ -205,48 +179,11 @@ public:
         }
 
 
-    // Destructor
-
-        ~directMappedPolyPatch();
+    //- Destructor
+    virtual ~directMappedPolyPatch();
 
 
     // Member functions
-
-        //- Offset vector (from patch faces to internal cells)
-        const vector& offset() const
-        {
-            return offset_;
-        }
-
-        //- Access to communication.
-        const List<labelPair>& schedule() const
-        {
-            if (!schedulePtr_.valid())
-            {
-                calcMapping();
-            }
-            return schedulePtr_();
-        }
-
-        //- Cells to sample per processor
-        const labelListList& sendCellLabels() const
-        {
-            if (!sendCellLabelsPtr_.valid())
-            {
-                calcMapping();
-            }
-            return sendCellLabelsPtr_();
-        }
-
-        //- Patch faces to receive per processor
-        const labelListList& receiveFaceLabels() const
-        {
-            if (!receiveFaceLabelsPtr_.valid())
-            {
-                calcMapping();
-            }
-            return receiveFaceLabelsPtr_();
-        }
 
         //- Write the polyPatch data as a dictionary
         virtual void write(Ostream&) const;

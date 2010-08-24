@@ -34,27 +34,17 @@ Description
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-bool IOdictionary::readData(Istream& is)
+bool Foam::IOdictionary::readData(Istream& is)
 {
     is >> *this;
     return !is.bad();
 }
 
 
-bool IOdictionary::writeData(Ostream& os) const
+bool Foam::IOdictionary::writeData(Ostream& os) const
 {
     dictionary::write(os, false);
     return os.good();
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

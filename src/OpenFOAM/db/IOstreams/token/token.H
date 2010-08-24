@@ -30,8 +30,8 @@ Description
 
 SourceFiles
     tokenI.H
+    token.C
     tokenIO.C
-    printToken.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -39,6 +39,7 @@ SourceFiles
 #define token_H
 
 #include "label.H"
+#include "uLabel.H"
 #include "scalar.H"
 #include "word.H"
 #include "InfoProxy.H"
@@ -65,8 +66,6 @@ Ostream& operator<<(Ostream&, const token&);
                            Class token Declaration
 \*---------------------------------------------------------------------------*/
 
-#include "CintDefs.H"
-
 class token
 {
 
@@ -92,28 +91,29 @@ public:
     //- Standard punctuation tokens
     enum punctuationToken
     {
-        NULL_TOKEN    = '\0',
-        SPACE         = ' ',
-        TAB           = '\t',
-        NL            = '\n',
+        NULL_TOKEN     = '\0',
+        SPACE          = ' ',
+        TAB            = '\t',
+        NL             = '\n',
 
-        END_STATEMENT = ';',
-        BEGIN_LIST    = '(',
-        END_LIST      = ')',
-        BEGIN_SQR     = '[',
-        END_SQR       = ']',
-        BEGIN_BLOCK   = '{',
-        END_BLOCK     = '}',
-        COLON         = ':',
-        COMMA         = ',',
-        BEGIN_STRING  = '"',
-        END_STRING    = '"',
+        END_STATEMENT  = ';',
+        BEGIN_LIST     = '(',
+        END_LIST       = ')',
+        BEGIN_SQR      = '[',
+        END_SQR        = ']',
+        BEGIN_BLOCK    = '{',
+        END_BLOCK      = '}',
+        COLON          = ':',
+        COMMA          = ',',
 
-        ASSIGN        = '=',
-        ADD           = '+',
-        SUBTRACT      = '-',
-        MULTIPLY      = '*',
-        DIVIDE        = '/'
+        BEGIN_STRING   = '"',
+        END_STRING     = BEGIN_STRING,
+
+        ASSIGN         = '=',
+        ADD            = '+',
+        SUBTRACT       = '-',
+        MULTIPLY       = '*',
+        DIVIDE         = '/'
     };
 
 
@@ -165,7 +165,7 @@ public:
         // Selectors
 
             //- Select null constructed
-            static autoPtr<compound> New(const word& type, Istream& is);
+            static autoPtr<compound> New(const word& type, Istream&);
 
 
         // Destructor
@@ -204,9 +204,7 @@ public:
 
         // IOstream Operators
 
-            #ifndef __MAKECINT__
             friend Ostream& operator<<(Ostream&, const compound&);
-            #endif
     };
 
 
@@ -291,22 +289,22 @@ public:
         inline token(const token&);
 
         //- Construct punctuation character token
-        inline token(punctuationToken p, label lineNumber=0);
+        inline token(punctuationToken, label lineNumber=0);
 
         //- Construct word token
-        inline token(const word& w, label lineNumber=0);
+        inline token(const word&, label lineNumber=0);
 
         //- Construct string token
-        inline token(const string& s, label lineNumber=0);
+        inline token(const string&, label lineNumber=0);
 
         //- Construct label token
         inline token(const label, label lineNumber=0);
 
         //- Construct floatScalar token
-        inline token(const floatScalar s, label lineNumber=0);
+        inline token(const floatScalar, label lineNumber=0);
 
         //- Construct doubleScalar token
-        inline token(const doubleScalar s, label lineNumber=0);
+        inline token(const doubleScalar, label lineNumber=0);
 
         //- Construct from Istream
         token(Istream&);
@@ -429,7 +427,6 @@ public:
         friend ostream& operator<<(ostream&, const InfoProxy<token>&);
 };
 
-#include "CintUndefs.H"
 
 Ostream& operator<<(Ostream&, const token::punctuationToken&);
 ostream& operator<<(ostream&, const token::punctuationToken&);

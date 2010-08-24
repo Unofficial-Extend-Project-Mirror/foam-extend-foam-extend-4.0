@@ -241,14 +241,14 @@ void Foam::booleanSurface::propagateEdgeSide
     {
         // Edge (and hence eFaces) in same order as prevVert0.
         // Take next face from sorted list
-        nextInd = (ind + 1) % eFaces.size();
-        prevInd = (ind > 0 ? ind - 1 : eFaces.size()-1);
+        nextInd = eFaces.fcIndex(ind);
+        prevInd = eFaces.rcIndex(ind);
     }
     else
     {
         // Take previous face from sorted neighbours
-        nextInd = (ind > 0 ? ind - 1 : eFaces.size()-1);
-        prevInd = (ind + 1) % eFaces.size();
+        nextInd = eFaces.rcIndex(ind);
+        prevInd = eFaces.fcIndex(ind);
     }
 
 
@@ -637,7 +637,7 @@ Foam::booleanSurface::booleanSurface
             combinedPoints[combinedPointI++] = subSurf2.points()[pointI];
         }
     }
-    
+
 
     //
     // patches
@@ -895,7 +895,7 @@ Foam::booleanSurface::booleanSurface
             }
             else
             {
-                // Is intersection. 
+                // Is intersection.
                 combinedTri[fp] =
                     tri[fp]
                   - cutSurf2.nSurfacePoints()
@@ -905,7 +905,7 @@ Foam::booleanSurface::booleanSurface
         combinedTri.region() = patchMap2[tri.region()];
     }
 
-  
+
     // Now we have surface in combinedFaces and combinedPoints. Use
     // booleanOp to determine which part of what to keep.
 
@@ -931,7 +931,7 @@ Foam::booleanSurface::booleanSurface
     if (booleanOp == booleanSurface::ALL)
     {
         // Special case: leave surface multiply connected
-        
+
         faceMap_.setSize(combinedSurf.size());
 
         label combinedFaceI = 0;
@@ -952,11 +952,7 @@ Foam::booleanSurface::booleanSurface
 
 
     // Get outside point.
-
-    treeBoundBox bb(combinedSurf.localPoints());
-
-    point outsidePoint = 2 * bb.max() - bb.min();
-
+    point outsidePoint = 2*treeBoundBox(combinedSurf.localPoints()).span();
 
     //
     // Linear search for nearest point on surface.
@@ -978,7 +974,7 @@ Foam::booleanSurface::booleanSurface
                 pts[f[1]],
                 pts[f[2]]
             ).nearestPoint(outsidePoint);
-    
+
         if (curHit.distance() < minHit.distance())
         {
             minHit = curHit;

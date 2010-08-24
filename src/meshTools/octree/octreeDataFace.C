@@ -36,7 +36,7 @@ License
 
 defineTypeNameAndDebug(Foam::octreeDataFace, 0);
 
-Foam::scalar Foam::octreeDataFace::tol = 1E-6;
+Foam::scalar Foam::octreeDataFace::tol = 1e-6;
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -44,11 +44,7 @@ Foam::scalar Foam::octreeDataFace::tol = 1E-6;
 void Foam::octreeDataFace::calcBb()
 {
     allBb_.setSize(meshFaces_.size());
-    allBb_ = treeBoundBox
-    (
-        vector(GREAT, GREAT, GREAT),
-        vector(-GREAT, -GREAT, -GREAT)
-    );
+    allBb_ = treeBoundBox::invertedBox;
 
     forAll (meshFaces_, i)
     {
@@ -104,8 +100,8 @@ Foam::octreeDataFace::octreeDataFace
 Foam::octreeDataFace::octreeDataFace
 (
     const primitiveMesh& mesh,
-    const List<const labelList*>& meshFaceListPtrs,
-    const List<const treeBoundBoxList*>& bbListPtrs
+    const UList<const labelList*>& meshFaceListPtrs,
+    const UList<const treeBoundBoxList*>& bbListPtrs
 )
 :
     mesh_(mesh),
@@ -122,7 +118,7 @@ Foam::octreeDataFace::octreeDataFace
     meshFaces_.setSize(faceI);
     allBb_.setSize(faceI);
 
-    faceI = 0; 
+    faceI = 0;
 
     forAll(meshFaceListPtrs, listI)
     {
@@ -143,7 +139,7 @@ Foam::octreeDataFace::octreeDataFace
 Foam::octreeDataFace::octreeDataFace
 (
     const primitiveMesh& mesh,
-    const List<const labelList*>& meshFaceListPtrs
+    const UList<const labelList*>& meshFaceListPtrs
 )
 :
     mesh_(mesh),
@@ -158,7 +154,7 @@ Foam::octreeDataFace::octreeDataFace
 
     meshFaces_.setSize(faceI);
 
-    faceI = 0; 
+    faceI = 0;
 
     forAll(meshFaceListPtrs, listI)
     {
@@ -204,7 +200,7 @@ Foam::octreeDataFace::octreeDataFace(const primitiveMesh& mesh)
     // Set info for all boundary faces.
     label boundaryFaceI = 0;
 
-    for(label faceI = mesh_.nInternalFaces(); faceI < mesh_.nFaces(); faceI++)
+    for (label faceI = mesh_.nInternalFaces(); faceI < mesh_.nFaces(); faceI++)
     {
         meshFaces_[boundaryFaceI++] = faceI;
     }
@@ -247,12 +243,9 @@ Foam::label Foam::octreeDataFace::getSampleType
     // or where on the face it has hit so we have to recreate all that
     // information.
 
-
-    // Find nearest face to sample
     treeBoundBox tightest(treeBoundBox::greatBox);
-
-    scalar tightestDist = GREAT;
-
+    scalar tightestDist(treeBoundBox::great);
+    // Find nearest face to sample
     label index = oc.findNearest(sample, tightest, tightestDist);
 
     if (index == -1)
@@ -383,12 +376,11 @@ Foam::label Foam::octreeDataFace::getSampleType
     {
         const edge& e = mesh_.edges()[myEdges[myEdgeI]];
 
-        pointHit edgeHit =
-            line<point, const point&>
-            (
-                points[e.start()],
-                points[e.end()]
-            ).nearestDist(sample);
+        pointHit edgeHit = line<point, const point&>
+        (
+            points[e.start()],
+            points[e.end()]
+        ).nearestDist(sample);
 
 
         if ((mag(edgeHit.rawPoint() - curHit.missPoint())/typDim) < tol)
@@ -448,8 +440,8 @@ Foam::label Foam::octreeDataFace::getSampleType
             // Face intersection point lies on edge between two face triangles
 
             // Calculate edge normal as average of the two triangle normals
-            label fpPrev = (fp == 0 ? f.size()-1 : fp-1);
-            label fpNext = (fp + 1) % f.size();
+            const label fpPrev = f.rcIndex(fp);
+            const label fpNext = f.fcIndex(fp);
 
             vector e = points[f[fp]] - mesh_.faceCentres()[faceI];
             vector ePrev = points[f[fpPrev]] - mesh_.faceCentres()[faceI];
@@ -507,12 +499,12 @@ bool Foam::octreeDataFace::overlaps
     const treeBoundBox& sampleBb
 ) const
 {
-    //return sampleBb.intersects(allBb_[index]);
+    //return sampleBb.overlaps(allBb_[index]);
 
     //- Exact test of face intersecting bb
 
     // 1. Quick rejection: bb does not intersect face bb at all
-    if (!sampleBb.intersects(allBb_[index]))
+    if (!sampleBb.overlaps(allBb_[index]))
     {
         return false;
     }
@@ -538,16 +530,15 @@ bool Foam::octreeDataFace::overlaps
 
     forAll(f, fp)
     {
-        label fp1 = (fp == f.size()-1 ? 0 : fp+1);
+        const label fp1 = f.fcIndex(fp);
 
-        bool triIntersects =
-            triangleFuncs::intersectBb
-            (
-                points[f[fp]],
-                points[f[fp1]],
-                fc,
-                sampleBb
-            );
+        bool triIntersects = triangleFuncs::intersectBb
+        (
+            points[f[fp]],
+            points[f[fp1]],
+            fc,
+            sampleBb
+        );
 
         if (triIntersects)
         {
@@ -585,15 +576,14 @@ bool Foam::octreeDataFace::intersects
     // Disable picking up intersections behind us.
     scalar oldTol = intersection::setPlanarTol(0.0);
 
-    pointHit inter = 
-        f.ray
-        (
-            start,
-            dir,
-            mesh_.points(),
-            intersection::HALF_RAY,
-            intersection::VECTOR
-        );
+    pointHit inter = f.ray
+    (
+        start,
+        dir,
+        mesh_.points(),
+        intersection::HALF_RAY,
+        intersection::VECTOR
+    );
 
     intersection::setPlanarTol(oldTol);
 
@@ -637,7 +627,7 @@ bool Foam::octreeDataFace::findTightest
     else
     {
         // Construct bb around sample and myFar
-        const point dist2(fabs(dist.x()), fabs(dist.y()), fabs(dist.z())); 
+        const point dist2(fabs(dist.x()), fabs(dist.y()), fabs(dist.z()));
 
         tightest.min() = sample - dist2;
         tightest.max() = sample + dist2;

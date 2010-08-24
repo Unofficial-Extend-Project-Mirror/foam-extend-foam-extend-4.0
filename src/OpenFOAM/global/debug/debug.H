@@ -41,52 +41,46 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 class dictionary;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace debug
 {
+    //- The central control dictionary.
+    //  Located in ~/.OpenFOAM/VERSION or $WM_PROJECT_DIR/etc
+    //  @sa Foam::findEtcFile()
     dictionary& controlDict();
 
-
-    dictionary& switchSet(const char* switchSetName, dictionary* switchSetPtr);
-
-
+    //- The DebugSwitches sub-dictionary in the central controlDict.
     dictionary& debugSwitches();
 
-    int debugSwitch
-    (
-        const char* switchName,
-        const int defaultValue = 0
-    );
-
-
+    //- The InfoSwitches sub-dictionary in the central controlDict.
     dictionary& infoSwitches();
 
-    int infoSwitch
-    (
-        const char* switchName,
-        const int defaultValue = 0
-    );
-
-
+    //- The OptimisationSwitches sub-dictionary in the central controlDict.
     dictionary& optimisationSwitches();
 
-    int optimisationSwitch
-    (
-        const char* switchName,
-        const int defaultValue = 0
-    );
-
+    //- The Tolerances sub-dictionary in the central controlDict.
     dictionary& tolerances();
 
-    double tolerances
-    (
-        const char* switchName,
-        const double defaultValue = 0
-    );
-}
+    //- Lookup debug switch or add default value.
+    int debugSwitch(const char* name, const int defaultValue = 0);
+
+    //- Lookup info switch or add default value.
+    int infoSwitch(const char* name, const int defaultValue = 0);
+
+    //- Lookup optimisation switch or add default value.
+    int optimisationSwitch(const char* name, const int defaultValue = 0);
+
+    //- Lookup tolerances switch or add default value.
+    double optimisationSwitch(const char* name, const double defaultValue = 0);
+
+    //- Internal function to lookup a sub-dictionary from controlDict.
+    dictionary& switchSet(const char* subDictName, dictionary*& subDictPtr);
+
+} // End namespace debug
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

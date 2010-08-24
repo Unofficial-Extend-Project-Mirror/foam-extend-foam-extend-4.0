@@ -195,7 +195,7 @@ void Foam::sampledSets::combineSampledSets
         // Get reference point (note: only master has all points)
         point refPt;
 
-        if (allPts.size() > 0)
+        if (allPts.size())
         {
             refPt = samplePts.getRefPoint(allPts);
         }
@@ -212,7 +212,7 @@ void Foam::sampledSets::combineSampledSets
             (
                 samplePts.name(),
                 samplePts.axis(),
-                IndirectList<point>(allPts, indexSets[seti]),
+                UIndirectList<point>(allPts, indexSets[seti]),
                 refPt
             )
         );
@@ -236,8 +236,6 @@ Foam::sampledSets::sampledSets
     loadFromFiles_(loadFromFiles),
     outputPath_(fileName::null),
     searchEngine_(mesh_, true),
-    pMeshPtr_(NULL),
-    pInterpPtr_(NULL),
     fieldNames_(),
     interpolationScheme_(word::null),
     writeFormat_(word::null)
@@ -249,6 +247,10 @@ Foam::sampledSets::sampledSets
     else
     {
         outputPath_ = mesh_.time().path()/name_;
+    }
+    if (mesh_.name() != fvMesh::defaultRegion)
+    {
+        outputPath_ = outputPath_/mesh_.name();
     }
 
     read(dict);
@@ -266,6 +268,18 @@ Foam::sampledSets::~sampledSets()
 void Foam::sampledSets::verbose(const bool verbosity)
 {
     verbose_ = verbosity;
+}
+
+
+void Foam::sampledSets::execute()
+{
+    // Do nothing - only valid on write
+}
+
+
+void Foam::sampledSets::end()
+{
+    // Do nothing - only valid on write
 }
 
 
@@ -291,8 +305,7 @@ void Foam::sampledSets::read(const dictionary& dict)
     interpolationScheme_ = "cell";
     dict_.readIfPresent("interpolationScheme", interpolationScheme_);
 
-    writeFormat_ = "null";
-    dict_.readIfPresent("setFormat", writeFormat_);
+    dict_.lookup("setFormat") >> writeFormat_;
 
     scalarFields_.clear();
     vectorFields_.clear();
@@ -324,8 +337,10 @@ void Foam::sampledSets::read(const dictionary& dict)
 
 void Foam::sampledSets::correct()
 {
-    pMeshPtr_.clear();
-    pInterpPtr_.clear();
+    // reset interpolation
+    pointMesh::Delete(mesh_);
+    volPointInterpolation::Delete(mesh_);
+
     searchEngine_.correct();
 
     PtrList<sampledSet> newList

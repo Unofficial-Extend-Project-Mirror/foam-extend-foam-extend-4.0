@@ -32,21 +32,17 @@ namespace Foam
 {
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+#define defineSurfaceWriterType(dataType)                                     \
+    defineNamedTemplateTypeNameAndDebug(surfaceWriter< dataType >, 0);        \
+    defineTemplatedRunTimeSelectionTable(surfaceWriter, word, dataType)
 
-defineNamedTemplateTypeNameAndDebug(scalarWriter, 0);
-defineTemplateRunTimeSelectionTable(scalarWriter, word);
+defineSurfaceWriterType(bool);
 
-defineNamedTemplateTypeNameAndDebug(vectorWriter, 0);
-defineTemplateRunTimeSelectionTable(vectorWriter, word);
-
-defineNamedTemplateTypeNameAndDebug(sphericalTensorWriter, 0);
-defineTemplateRunTimeSelectionTable(sphericalTensorWriter, word);
-
-defineNamedTemplateTypeNameAndDebug(symmTensorWriter, 0);
-defineTemplateRunTimeSelectionTable(symmTensorWriter, word);
-
-defineNamedTemplateTypeNameAndDebug(tensorWriter, 0);
-defineTemplateRunTimeSelectionTable(tensorWriter, word);
+defineSurfaceWriterType(scalar);
+defineSurfaceWriterType(vector);
+defineSurfaceWriterType(sphericalTensor);
+defineSurfaceWriterType(symmTensor);
+defineSurfaceWriterType(tensor);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

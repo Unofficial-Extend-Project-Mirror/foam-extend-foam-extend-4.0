@@ -87,16 +87,21 @@ public:
         inline word(const word&);
 
         //- Construct as copy of character array
-        inline word(const char*);
+        inline word(const char*, const bool doStripInvalid = true);
 
         //- Construct as copy with a maximum number of characters
-        inline word(const char*, const size_type);
+        inline word
+        (
+            const char*,
+            const size_type,
+            const bool doStripInvalid
+        );
 
         //- Construct as copy of string
-        inline word(const string&);
+        inline word(const string&, const bool doStripInvalid = true);
 
         //- Construct as copy of std::string
-        inline word(const std::string&);
+        inline word(const std::string&, const bool doStripInvalid = true);
 
         //- Construct from Istream
         word(Istream&);
@@ -112,10 +117,10 @@ public:
 
         // Assignment
 
-            inline void operator=(const word&);
-            inline void operator=(const string&);
-            inline void operator=(const std::string&);
-            inline void operator=(const char*);
+            inline const word& operator=(const word&);
+            inline const word& operator=(const string&);
+            inline const word& operator=(const std::string&);
+            inline const word& operator=(const char*);
 
 
     // Friend Operators

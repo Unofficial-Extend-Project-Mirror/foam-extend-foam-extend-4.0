@@ -27,6 +27,7 @@ License
 #include "dictionary.H"
 #include "IFstream.H"
 #include "inputModeEntry.H"
+#include "regExp.H"
 
 // * * * * * * * * * * * * * Private Member Functions * * * * * * * * * * * //
 
@@ -70,22 +71,17 @@ bool Foam::dictionary::substituteKeyword(const word& keyword)
 {
     word varName = keyword(1, keyword.size()-1);
 
-    // lookup the variable name in the given dictionary....
-    const entry* ePtr = lookupEntryPtr(varName, true);
+    // lookup the variable name in the given dictionary
+    const entry* ePtr = lookupEntryPtr(varName, true, true);
 
-    // ...if defined insert its entries into this dictionary...
+    // if defined insert its entries into this dictionary
     if (ePtr != NULL)
     {
         const dictionary& addDict = ePtr->dict();
 
-        for
-        (
-            IDLList<entry>::const_iterator addIter = addDict.begin();
-            addIter != addDict.end();
-            ++addIter
-        )
+        forAllConstIter(IDLList<entry>, addDict, iter)
         {
-            add(addIter());
+            add(iter());
         }
 
         return true;
@@ -99,11 +95,12 @@ bool Foam::dictionary::substituteKeyword(const word& keyword)
 
 Foam::dictionary::dictionary
 (
+    const fileName& name,
     const dictionary& parentDict,
     Istream& is
 )
 :
-    name_(is.name()),
+    dictionaryName(parentDict.name() + "::" + name),
     parent_(parentDict)
 {
     read(is);
@@ -112,7 +109,7 @@ Foam::dictionary::dictionary
 
 Foam::dictionary::dictionary(Istream& is)
 :
-    name_(is.name()),
+    dictionaryName(is.name()),
     parent_(dictionary::null)
 {
     // Reset input mode as this is a "top-level" dictionary
@@ -136,7 +133,7 @@ Foam::Istream& Foam::operator>>(Istream& is, dictionary& dict)
     functionEntries::inputModeEntry::clear();
 
     dict.clear();
-    dict.hashedEntries_.clear();
+    dict.name() = is.name();
     dict.read(is);
 
     return is;
@@ -152,20 +149,23 @@ void Foam::dictionary::write(Ostream& os, bool subDict) const
         os << nl << indent << token::BEGIN_BLOCK << incrIndent << nl;
     }
 
-    for
-    (
-        IDLList<entry>::const_iterator iter = begin();
-        iter != end();
-        ++iter
-    )
+    forAllConstIter(IDLList<entry>, *this, iter)
     {
-        // Write entry & follow with carriage return.
-        os << *iter;
+        const entry& e = *iter;
+
+        // Write entry
+        os << e;
+
+        // Add extra new line between entries for "top-level" dictionaries
+        if (!subDict && parent() == dictionary::null && e != *last())
+        {
+            os << nl;
+        }
 
         // Check stream before going to next entry.
         if (!os.good())
         {
-            WarningIn("dictionary::write(Ostream& os, bool subDict)")
+            WarningIn("dictionary::write(Ostream&, bool subDict)")
                 << "Can't write entry " << iter().keyword()
                 << " for dictionary " << name()
                 << endl;

@@ -28,7 +28,12 @@ Class
 Description
     Constructs plane through mesh.
 
-    No attempt at resolving degenerate cases.
+    No attempt at resolving degenerate cases. Since the cut faces are
+    usually quite ugly, they will always be triangulated.
+
+Note
+    When the cutting plane coincides with a mesh face, the cell edge on the
+    positive side of the plane is taken.
 
 SourceFiles
     cuttingPlane.C
@@ -41,6 +46,7 @@ SourceFiles
 #include "plane.H"
 #include "pointField.H"
 #include "faceList.H"
+#include "MeshedSurface.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,24 +56,21 @@ namespace Foam
 class primitiveMesh;
 
 /*---------------------------------------------------------------------------*\
-                           Class cuttingPlane Declaration
+                       Class cuttingPlane Declaration
 \*---------------------------------------------------------------------------*/
 
 class cuttingPlane
 :
-    public plane
+    public plane,
+    public MeshedSurface<face>
 {
+    //- Private typedefs for convenience
+        typedef MeshedSurface<face> MeshStorage;
+
     // Private data
 
         //- List of cells cut by the plane
         labelList cutCells_;
-
-        //- Intersection points
-        pointField cutPoints_;
-
-        //- Cut faces in terms of intersection points
-        faceList cutFaces_;
-
 
     // Private Member Functions
 
@@ -76,22 +79,23 @@ class cuttingPlane
         (
             const primitiveMesh&,
             const scalarField& dotProducts,
-            const labelList& cellIdLabels = labelList::null()
+            const UList<label>& cellIdLabels = UList<label>::null()
         );
 
-        //- Determine intersection points (cutPoints_).
-        labelList intersectEdges
+        //- Determine intersection points (cutPoints).
+        void intersectEdges
         (
             const primitiveMesh&,
-            const scalarField& dotProducts
+            const scalarField& dotProducts,
+            List<label>& edgePoint
         );
 
-        //- Walk around circumference of cell starting from startEdgeI crossing
+        //- Walk circumference of cell, starting from startEdgeI crossing
         //  only cut edges. Record cutPoint labels in faceVerts.
         static bool walkCell
         (
             const primitiveMesh&,
-            const labelList& edgePoint,
+            const UList<label>& edgePoint,
             const label cellI,
             const label startEdgeI,
             DynamicList<label>& faceVerts
@@ -101,7 +105,7 @@ class cuttingPlane
         void walkCellCuts
         (
             const primitiveMesh& mesh,
-            const labelList& edgePoint
+            const UList<label>& edgePoint
         );
 
 
@@ -112,53 +116,51 @@ protected:
         //- Construct plane description without cutting
         cuttingPlane(const plane&);
 
-
     // Protected Member Functions
-
-        //- recut mesh with existing planeDesc
-        void reCut(const primitiveMesh&);
 
         //- recut mesh with existing planeDesc, restricted to a list of cells
         void reCut
         (
             const primitiveMesh&,
-            const labelList& cellIdLabels
+            const UList<label>& cellIdLabels = UList<label>::null()
         );
 
+        //- remap action on triangulation or cleanup
+        virtual void remapFaces(const UList<label>& faceMap);
 
 public:
 
     // Constructors
 
-        //- Construct from components: Mesh reference and plane
-        cuttingPlane(const primitiveMesh&, const plane&);
-
-        //- Construct from mesh reference and plane,
-        //  restricted to a list of cells
+        //- Construct from plane and mesh reference,
+        //  possibly restricted to a list of cells
         cuttingPlane
         (
-            const primitiveMesh&,
             const plane&,
-            const labelList& cellIdLabels
+            const primitiveMesh&,
+            const UList<label>& cellIdLabels = UList<label>::null()
         );
 
 
     // Member Functions
 
         //- Return plane used
-        const plane& planeDesc() const;
+        const plane& planeDesc() const
+        {
+            return static_cast<const plane&>(*this);
+        }
 
-        //- Return pointField of cutting points
-        const pointField& points() const;
-
-        //- Return faceList of points in cells
-        const faceList& faces() const;
-
-        //- Return labelList of cut cells
-        const labelList& cells() const;
+        //- Return List of cells cut by the plane
+        const labelList& cutCells() const
+        {
+            return cutCells_;
+        }
 
         //- Return true or false to question: have any cells been cut?
-        bool cut();
+        bool cut() const
+        {
+            return cutCells_.size();
+        }
 
         //- Sample the cell field
         template<class Type>
@@ -181,7 +183,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "cuttingPlaneSample.C"
+#   include "cuttingPlaneTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

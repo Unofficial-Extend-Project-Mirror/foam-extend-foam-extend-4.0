@@ -71,7 +71,7 @@ public:
         // Access
 
             //- Return the object registry
-            virtual const objectRegistry& db() const;
+            virtual const objectRegistry& thisDb() const;
 
             //- Return ldu addressing
             virtual const lduAddressing& lduAddr() const = 0;

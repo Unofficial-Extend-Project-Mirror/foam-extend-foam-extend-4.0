@@ -51,7 +51,7 @@ namespace Foam
 template<class Type> class octree;
 
 /*---------------------------------------------------------------------------*\
-                           Class octreeDataEdges Declaration
+                       Class octreeDataEdges Declaration
 \*---------------------------------------------------------------------------*/
 
 class octreeDataEdges
@@ -154,8 +154,8 @@ public:
                 const point& sample
             ) const;
 
-            //- Segment (from start to end) intersection with shape
-            //  at index. If intersects returns true and sets intersectionPoint
+            //- Segment (from start to end) intersection with shape at index.
+            //  If intersects returns true and sets intersectionPoint
             bool intersects
             (
                 const label index,
@@ -174,7 +174,7 @@ public:
                 treeBoundBox& tightest
             ) const;
 
-            //- Given index get unit normal and calculate (numerical) sign 
+            //- Given index get unit normal and calculate (numerical) sign
             //  of sample.
             //  Used to determine accuracy of calcNearest or inside/outside.
             scalar calcSign

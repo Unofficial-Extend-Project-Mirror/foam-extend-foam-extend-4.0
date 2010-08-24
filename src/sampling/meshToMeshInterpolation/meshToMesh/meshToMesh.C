@@ -52,7 +52,6 @@ meshToMesh::meshToMesh
     fromMesh_(meshFrom),
     toMesh_(meshTo),
     patchMap_(patchMap),
-    fromPointMesh_(meshFrom),
     cellAddressing_(toMesh_.nCells()),
     boundaryAddressing_(toMesh_.boundaryMesh().size()),
     inverseDistanceWeightsPtr_(NULL)
@@ -101,7 +100,7 @@ meshToMesh::meshToMesh
     forAll (toMesh_.boundaryMesh(), patchi)
     {
         // Add the processor patches in the toMesh to the cuttingPatches list
-        if (toMesh_.boundaryMesh()[patchi].type() == processorFvPatch::typeName)
+        if (isA<processorPolyPatch>(toMesh_.boundaryMesh()[patchi]))
         {
             cuttingPatches_.insert
             (
@@ -123,7 +122,6 @@ meshToMesh::meshToMesh
 :
     fromMesh_(meshFrom),
     toMesh_(meshTo),
-    fromPointMesh_(meshFrom),
     cellAddressing_(toMesh_.nCells()),
     boundaryAddressing_(toMesh_.boundaryMesh().size()),
     inverseDistanceWeightsPtr_(NULL)

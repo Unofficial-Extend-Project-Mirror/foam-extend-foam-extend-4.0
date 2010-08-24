@@ -100,7 +100,7 @@ public:
                     << abort(FatalError);
             }
 
-            // Ugly violence to allow tolerance to remain a scalar
+            // Ugly violence to allow tolerance to remain a const scalar
             // HJ, 7/Sep/2008
             scalar oldTol = planarTol_;
             scalar* ptPtr = const_cast<scalar*>(&planarTol_);

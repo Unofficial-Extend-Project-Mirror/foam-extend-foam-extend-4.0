@@ -1,2 +1,2 @@
 cDBUG       = 
-cOPT        = -O3 -fno-gcse
+cOPT        = -O3

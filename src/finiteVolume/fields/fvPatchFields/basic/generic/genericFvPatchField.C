@@ -352,6 +352,96 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                             << exit(FatalIOError);
                     }
                 }
+                else if
+                (
+                    firstToken.isWord()
+                 && firstToken.wordToken() == "uniform"
+                )
+                {
+                    token fieldToken(is);
+
+                    if (!fieldToken.isPunctuation())
+                    {
+                        scalarFields_.insert
+                        (
+                            iter().keyword(),
+                            new scalarField
+                            (
+                                this->size(),
+                                fieldToken.number()
+                            )
+                        );
+                    }
+                    else
+                    {
+                        // Read as scalarList.
+                        is.putBack(fieldToken);
+
+                        scalarList l(is);
+
+                        if (l.size() == vector::nComponents)
+                        {
+                            vector vs(l[0], l[1], l[2]);
+
+                            vectorFields_.insert
+                            (
+                                iter().keyword(),
+                                new vectorField(this->size(), vs)
+                            );
+                        }
+                        else if (l.size() == sphericalTensor::nComponents)
+                        {
+                            sphericalTensor vs(l[0]);
+
+                            sphericalTensorFields_.insert
+                            (
+                                iter().keyword(),
+                                new sphericalTensorField(this->size(), vs)
+                            );
+                        }
+                        else if (l.size() == symmTensor::nComponents)
+                        {
+                            symmTensor vs(l[0], l[1], l[2], l[3], l[4], l[5]);
+
+                            symmTensorFields_.insert
+                            (
+                                iter().keyword(),
+                                new symmTensorField(this->size(), vs)
+                            );
+                        }
+                        else if (l.size() == tensor::nComponents)
+                        {
+                            tensor vs
+                            (
+                                l[0], l[1], l[2],
+                                l[3], l[4], l[5],
+                                l[6], l[7], l[8]
+                            );
+
+                            tensorFields_.insert
+                            (
+                                iter().keyword(),
+                                new tensorField(this->size(), vs)
+                            );
+                        }
+                        else
+                        {
+                            FatalIOErrorIn
+                            (
+                                "genericFvPatchField<Type>::genericFvPatchField"
+                                "(const fvPatch&, const Field<Type>&, "
+                                "const dictionary&)",
+                                dict
+                            )   << "\n    unrecognised native type " << l
+                                << "\n    on patch " << this->patch().name()
+                                << " of field "
+                                << this->dimensionedInternalField().name()
+                                << " in file "
+                                << this->dimensionedInternalField().objectPath()
+                                << exit(FatalIOError);
+                        }
+                    }
+                }
             }
         }
     }
@@ -557,7 +647,7 @@ void Foam::genericFvPatchField<Type>::rmap
         HashPtrTable<scalarField>::const_iterator dptfIter =
             dptf.scalarFields_.find(iter.key());
 
-        if (dptfIter != scalarFields_.end())
+        if (dptfIter != dptf.scalarFields_.end())
         {
             iter()->rmap(*dptfIter(), addr);
         }
@@ -573,7 +663,7 @@ void Foam::genericFvPatchField<Type>::rmap
         HashPtrTable<vectorField>::const_iterator dptfIter =
             dptf.vectorFields_.find(iter.key());
 
-        if (dptfIter != vectorFields_.end())
+        if (dptfIter != dptf.vectorFields_.end())
         {
             iter()->rmap(*dptfIter(), addr);
         }
@@ -590,7 +680,7 @@ void Foam::genericFvPatchField<Type>::rmap
         HashPtrTable<sphericalTensorField>::const_iterator dptfIter =
             dptf.sphericalTensorFields_.find(iter.key());
 
-        if (dptfIter != sphericalTensorFields_.end())
+        if (dptfIter != dptf.sphericalTensorFields_.end())
         {
             iter()->rmap(*dptfIter(), addr);
         }
@@ -607,7 +697,7 @@ void Foam::genericFvPatchField<Type>::rmap
         HashPtrTable<symmTensorField>::const_iterator dptfIter =
             dptf.symmTensorFields_.find(iter.key());
 
-        if (dptfIter != symmTensorFields_.end())
+        if (dptfIter != dptf.symmTensorFields_.end())
         {
             iter()->rmap(*dptfIter(), addr);
         }
@@ -623,7 +713,7 @@ void Foam::genericFvPatchField<Type>::rmap
         HashPtrTable<tensorField>::const_iterator dptfIter =
             dptf.tensorFields_.find(iter.key());
 
-        if (dptfIter != tensorFields_.end())
+        if (dptfIter != dptf.tensorFields_.end())
         {
             iter()->rmap(*dptfIter(), addr);
         }

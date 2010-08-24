@@ -33,7 +33,7 @@ template<class Type>
 void Foam::autoLayerDriver::averageNeighbours
 (
     const polyMesh& mesh,
-    const PackedList<1>& isMasterEdge,
+    const PackedBoolList& isMasterEdge,
     const labelList& meshEdges,
     const labelList& meshPoints,
     const edgeList& edges,

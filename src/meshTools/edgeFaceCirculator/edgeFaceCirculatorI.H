@@ -353,8 +353,7 @@ bool Foam::edgeFaceCirculator::operator!=(const edgeFaceCirculator& circ) const
 
 
 //- Step to next face.
-Foam::edgeFaceCirculator::edgeFaceCirculator&
- Foam::edgeFaceCirculator::operator++()
+Foam::edgeFaceCirculator& Foam::edgeFaceCirculator::operator++()
 {
     if (faceLabel_ == -1)
     {
@@ -419,7 +418,31 @@ Foam::edgeFaceCirculator Foam::edgeFaceCirculator::begin() const
 }
 
 
+Foam::edgeFaceCirculator Foam::edgeFaceCirculator::cbegin() const
+{
+    edgeFaceCirculator iter
+    (
+        mesh_,
+        faceLabel_,
+        ownerSide_,
+        index_,
+        isBoundaryEdge_
+    );
+
+    if (isBoundaryEdge_)
+    {
+        iter.setCanonical();
+    }
+    return iter;
+}
+
+
 const Foam::edgeFaceCirculator& Foam::edgeFaceCirculator::end() const
+{
+    return endConstIter;
+}
+
+const Foam::edgeFaceCirculator& Foam::edgeFaceCirculator::cend() const
 {
     return endConstIter;
 }

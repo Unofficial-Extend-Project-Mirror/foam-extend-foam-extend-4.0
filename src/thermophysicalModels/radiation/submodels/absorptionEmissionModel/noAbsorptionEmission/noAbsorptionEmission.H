@@ -71,8 +71,7 @@ public:
 
 
     // Destructor
-
-        ~noAbsorptionEmission();
+    virtual ~noAbsorptionEmission();
 };
 
 

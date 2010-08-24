@@ -29,38 +29,33 @@ License
 
 #include <sstream>
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-const char* const complex::typeName = "complex";
-const complex complex::zero(0, 0);
-const complex complex::one(1, 1);
+const char* const Foam::complex::typeName = "complex";
+const Foam::complex Foam::complex::zero(0, 0);
+const Foam::complex Foam::complex::one(1, 1);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-complex::complex(Istream& is)
+Foam::complex::complex(Istream& is)
 {
-    operator>>(is, *this);
+    is >> *this;
 }
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-word name(const complex& c)
+Foam::word Foam::name(const complex& c)
 {
-    std::ostringstream osBuffer;
-    osBuffer << '(' << c.Re() << ',' << c.Im() << ')';
-    return osBuffer.str();
+    std::ostringstream buf;
+    buf << '(' << c.Re() << ',' << c.Im() << ')';
+    return buf.str();
 }
 
 
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
-Istream& operator>>(Istream& is, complex& c)
+Foam::Istream& Foam::operator>>(Istream& is, complex& c)
 {
     // Read beginning of complex
     is.readBegin("complex");
@@ -77,7 +72,7 @@ Istream& operator>>(Istream& is, complex& c)
 }
 
 
-Ostream& operator<<(Ostream& os, const complex& c)
+Foam::Ostream& Foam::operator<<(Ostream& os, const complex& c)
 {
     os  << token::BEGIN_LIST
         << c.re << token::SPACE << c.im
@@ -86,9 +81,5 @@ Ostream& operator<<(Ostream& os, const complex& c)
     return os;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

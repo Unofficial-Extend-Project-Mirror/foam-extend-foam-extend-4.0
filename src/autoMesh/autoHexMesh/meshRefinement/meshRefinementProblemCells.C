@@ -50,7 +50,7 @@ void Foam::meshRefinement::markBoundaryFace
 {
     isBoundaryFace[faceI] = true;
 
-    const labelList& fEdges = mesh_.faceEdges()[faceI];
+    const labelList& fEdges = mesh_.faceEdges(faceI);
 
     forAll(fEdges, fp)
     {
@@ -608,7 +608,7 @@ Foam::labelList Foam::meshRefinement::markFacesOnProblemCells
 
 
     // Does cell have exactly 7 of its 8 anchor points on the boundary?
-    PackedList<1> hasSevenBoundaryAnchorPoints(mesh_.nCells());
+    PackedBoolList hasSevenBoundaryAnchorPoints(mesh_.nCells());
     // If so what is the remaining non-boundary anchor point?
     labelHashSet nonBoundaryAnchors(mesh_.nCells()/10000);
 
@@ -618,7 +618,8 @@ Foam::labelList Foam::meshRefinement::markFacesOnProblemCells
 
     forAll(cellLevel, cellI)
     {
-        const labelList& cPoints = mesh_.cellPoints()[cellI];
+        const labelList& cPoints = mesh_.cellPoints(cellI, dynCPoints);
+
         // Get number of anchor points (pointLevel <= cellLevel)
 
         label nBoundaryAnchors = 0;
@@ -732,8 +733,7 @@ Foam::labelList Foam::meshRefinement::markFacesOnProblemCells
     {
         label pointI = iter.key();
 
-        const labelList& pCells = mesh_.pointCells()[pointI];
-       // const labelList& pCells = mesh_.pointCells(pointI, dynPCells);
+        const labelList& pCells = mesh_.pointCells(pointI, dynPCells);
 
         // Count number of 'hasSevenBoundaryAnchorPoints' cells.
         label n = 0;
@@ -844,8 +844,7 @@ Foam::labelList Foam::meshRefinement::markFacesOnProblemCells
     {
         if (facePatch[faceI] == -1)
         {
-            //const labelList& fEdges = mesh_.faceEdges(faceI, dynFEdges);
-            const labelList& fEdges = mesh_.faceEdges()[faceI];
+            const labelList& fEdges = mesh_.faceEdges(faceI, dynFEdges);
             label nFaceBoundaryEdges = 0;
 
             forAll(fEdges, fe)
@@ -901,8 +900,7 @@ Foam::labelList Foam::meshRefinement::markFacesOnProblemCells
             {
                 if (facePatch[faceI] == -1)
                 {
-                    //const labelList& fEdges = mesh_.faceEdges(faceI, dynFEdges);
-                    const labelList& fEdges = mesh_.faceEdges()[faceI];
+                    const labelList& fEdges = mesh_.faceEdges(faceI, dynFEdges);
                     label nFaceBoundaryEdges = 0;
 
                     forAll(fEdges, fe)

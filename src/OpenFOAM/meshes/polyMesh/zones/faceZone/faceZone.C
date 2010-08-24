@@ -274,6 +274,30 @@ Foam::faceZone::faceZone
 }
 
 
+Foam::faceZone::faceZone
+(
+    const word& name,
+    const Xfer<labelList>& addr,
+    const Xfer<boolList>& fm,
+    const label index,
+    const faceZoneMesh& zm
+)
+:
+    labelList(addr),
+    name_(name),
+    flipMap_(fm),
+    index_(index),
+    zoneMesh_(zm),
+    patchPtr_(NULL),
+    masterCellsPtr_(NULL),
+    slaveCellsPtr_(NULL),
+    mePtr_(NULL),
+    faceLookupMapPtr_(NULL)
+{
+    checkAddressing();
+}
+
+
 // Construct from dictionary
 Foam::faceZone::faceZone
 (
@@ -305,6 +329,30 @@ Foam::faceZone::faceZone
     const faceZone& fz,
     const labelList& addr,
     const boolList& fm,
+    const label index,
+    const faceZoneMesh& zm
+)
+:
+    labelList(addr),
+    name_(fz.name()),
+    flipMap_(fm),
+    index_(index),
+    zoneMesh_(zm),
+    patchPtr_(NULL),
+    masterCellsPtr_(NULL),
+    slaveCellsPtr_(NULL),
+    mePtr_(NULL),
+    faceLookupMapPtr_(NULL)
+{
+    checkAddressing();
+}
+
+
+Foam::faceZone::faceZone
+(
+    const faceZone& fz,
+    const Xfer<labelList>& addr,
+    const Xfer<boolList>& fm,
     const label index,
     const faceZoneMesh& zm
 )
@@ -394,16 +442,28 @@ const Foam::labelList& Foam::faceZone::meshEdges() const
 {
     if (!mePtr_)
     {
-        labelList faceCells(size());
-
-        const labelList& own = zoneMesh().mesh().faceOwner();
-
-        const labelList& faceLabels = *this;
-
-        forAll (faceCells, faceI)
-        {
-            faceCells[faceI] = own[faceLabels[faceI]];
-        }
+        // Old form.  Under testing: merge, HJ, 17/Aug/2010
+        //labelList faceCells(size());
+        //
+        //const labelList& own = zoneMesh().mesh().faceOwner();
+        //
+        //const labelList& faceLabels = *this;
+        //
+        //forAll (faceCells, faceI)
+        //{
+        //    faceCells[faceI] = own[faceLabels[faceI]];
+        //}
+        //
+        //mePtr_ =
+        //    new labelList
+        //    (
+        //        operator()().meshEdges
+        //        (
+        //            zoneMesh().mesh().edges(),
+        //            zoneMesh().mesh().cellEdges(),
+        //            faceCells
+        //        )
+        //    );
 
         mePtr_ =
             new labelList
@@ -411,8 +471,7 @@ const Foam::labelList& Foam::faceZone::meshEdges() const
                 operator()().meshEdges
                 (
                     zoneMesh().mesh().edges(),
-                    zoneMesh().mesh().cellEdges(),
-                    faceCells
+                    zoneMesh().mesh().pointEdges()
                 )
             );
     }
@@ -460,12 +519,92 @@ bool Foam::faceZone::checkDefinition(const bool report) const
                 )   << "Zone " << name()
                     << " contains invalid face label " << addr[i] << nl
                     << "Valid face labels are 0.."
-                    << zoneMesh().mesh().allFaces().size() << endl;
+                    << zoneMesh().mesh().allFaces().size() - 1 << endl;
+            }
+        }
+    }
+    return boundaryError;
+}
+
+
+bool Foam::faceZone::checkParallelSync(const bool report) const
+{
+    const polyMesh& mesh = zoneMesh().mesh();
+    const polyBoundaryMesh& bm = mesh.boundaryMesh();
+
+    bool boundaryError = false;
+
+
+    // Check that zone faces are synced
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    {
+        boolList neiZoneFace(mesh.nFaces()-mesh.nInternalFaces(), false);
+        boolList neiZoneFlip(mesh.nFaces()-mesh.nInternalFaces(), false);
+        forAll(*this, i)
+        {
+            label faceI = operator[](i);
+
+            if (!mesh.isInternalFace(faceI))
+            {
+                neiZoneFace[faceI-mesh.nInternalFaces()] = true;
+                neiZoneFlip[faceI-mesh.nInternalFaces()] = flipMap()[i];
+            }
+        }
+        boolList myZoneFace(neiZoneFace);
+        syncTools::swapBoundaryFaceList(mesh, neiZoneFace, false);
+        boolList myZoneFlip(neiZoneFlip);
+        syncTools::swapBoundaryFaceList(mesh, neiZoneFlip, false);
+
+        forAll(*this, i)
+        {
+            label faceI = operator[](i);
+
+            label patchI = bm.whichPatch(faceI);
+
+            if (patchI != -1 && bm[patchI].coupled())
+            {
+                label bFaceI = faceI-mesh.nInternalFaces();
+
+                // Check face in zone on both sides
+                if (myZoneFace[bFaceI] != neiZoneFace[bFaceI])
+                {
+                    boundaryError = true;
+
+                    if (report)
+                    {
+                        Pout<< " ***Problem with faceZone " << index()
+                            << " named " << name()
+                            << ". Face " << faceI
+                            << " on coupled patch "
+                            << bm[patchI].name()
+                            << " is not consistent with its coupled neighbour."
+                            << endl;
+                    }
+                }
+
+                // Flip state should be opposite.
+                if (myZoneFlip[bFaceI] == neiZoneFlip[bFaceI])
+                {
+                    boundaryError = true;
+
+                    if (report)
+                    {
+                        Pout<< " ***Problem with faceZone " << index()
+                            << " named " << name()
+                            << ". Face " << faceI
+                            << " on coupled patch "
+                            << bm[patchI].name()
+                            << " does not have consistent flipMap"
+                            << " across coupled faces."
+                            << endl;
+                    }
+                }
             }
         }
     }
 
-    return boundaryError;
+    return returnReduce(boundaryError, orOp<bool>());
 }
 
 
@@ -487,17 +626,13 @@ void Foam::faceZone::write(Ostream& os) const
 
 void Foam::faceZone::writeDict(Ostream& os) const
 {
-    os  << indent << name() << nl
-        << indent << token::BEGIN_BLOCK << nl
-        << incrIndent
-        << indent << "type " << type() << token::END_STATEMENT << nl;
+    os  << nl << name() << nl << token::BEGIN_BLOCK << nl
+        << "    type " << type() << token::END_STATEMENT << nl;
 
     writeEntry("faceLabels", os);
-
     flipMap().writeEntry("flipMap", os);
 
-    os  << decrIndent
-        << indent << token::END_BLOCK << endl;
+    os  << token::END_BLOCK << endl;
 }
 
 

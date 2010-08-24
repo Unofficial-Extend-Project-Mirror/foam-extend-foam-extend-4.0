@@ -22,17 +22,11 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "PrimitivePatch.H"
 #include "demandDrivenData.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -43,7 +37,9 @@ template
     class PointField,
     class PointType
 >
-void PrimitivePatch<Face, FaceList, PointField, PointType>::clearGeom()
+void
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+clearGeom()
 {
     if (debug)
     {
@@ -66,7 +62,9 @@ template
     class PointField,
     class PointType
 >
-void PrimitivePatch<Face, FaceList, PointField, PointType>::clearTopology()
+void
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+clearTopology()
 {
     if (debug)
     {
@@ -92,10 +90,8 @@ void PrimitivePatch<Face, FaceList, PointField, PointType>::clearTopology()
     }
 
     deleteDemandDrivenData(boundaryPointsPtr_);
-
     deleteDemandDrivenData(pointEdgesPtr_);
     deleteDemandDrivenData(pointFacesPtr_);
-
     deleteDemandDrivenData(edgeLoopsPtr_);
     deleteDemandDrivenData(localPointOrderPtr_);
 }
@@ -108,7 +104,9 @@ template
     class PointField,
     class PointType
 >
-void PrimitivePatch<Face, FaceList, PointField, PointType>::clearPatchMeshAddr()
+void
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+clearPatchMeshAddr()
 {
     if (debug)
     {
@@ -131,16 +129,14 @@ template
     class PointField,
     class PointType
 >
-void PrimitivePatch<Face, FaceList, PointField, PointType>::clearOut()
+void
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+clearOut()
 {
     clearGeom();
     clearTopology();
     clearPatchMeshAddr();
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

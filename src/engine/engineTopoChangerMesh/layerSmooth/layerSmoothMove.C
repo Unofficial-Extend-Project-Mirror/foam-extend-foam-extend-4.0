@@ -1,22 +1,28 @@
-// The FOAM Project // File: layerSmoothPiston.C
-/*
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
- =========         | Class Implementation
- \\      /         |
-  \\    /          | Name:   layerSmoothPiston
-   \\  /           | Family: engine
-    \\/            |
-    F ield         | FOAM version: 2.3
-    O peration     |
-    A and          | Copyright (C) 1991-2004 Nabla Ltd.
-    M anipulation  |          All Rights Reserved.
--------------------------------------------------------------------------------
-DESCRIPTION
+License
+    This file is part of OpenFOAM.
 
-AUTHOR
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
 
--------------------------------------------------------------------------------
-*/
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+\*---------------------------------------------------------------------------*/
 
 #include "layerSmooth.H"
 #include "slidingInterface.H"
@@ -46,11 +52,10 @@ AUTHOR
 #include "slipTetPolyPatchFields.H"
 #include "zeroGradientTetPolyPatchFields.H"
 
-
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
 void Foam::layerSmooth::makeLayersLive()
-{ 
+{
     // Enable layering
     forAll (topoChanger_, modI)
     {
@@ -119,10 +124,10 @@ void Foam::layerSmooth::valveDetach()
             }
 
             ad.setDetach();
-            
         }
     }
 }
+
 
 void Foam::layerSmooth::valveAttach()
 {
@@ -170,11 +175,10 @@ void Foam::layerSmooth::valveAttach()
             }
 
             ad.setAttach();
-            
         }
     }
- 
 }
+
 
 void Foam::layerSmooth::prepareValveDetach()
 {
@@ -238,20 +242,19 @@ bool Foam::layerSmooth::update()
 {
 
     Info << "bool Foam::layerSmooth::update()" << endl;
-    
+
     tetDecompositionMotionSolver& mSolver =
         refCast<tetDecompositionMotionSolver>(msPtr_());
 
     tetPointVectorField& motionU = mSolver.motionU();
-    
+
 //    motionU.internalField() = (vector::zero);
-    
+
 //    Info << motionU << endl;
 
 
     // Find piston mesh modifier
-    const label pistonLayerID =
-        topoChanger_.findModifierID("pistonLayer");    
+    const label pistonLayerID = topoChanger_.findModifierID("pistonLayer");
 
     {
         valveDetach();

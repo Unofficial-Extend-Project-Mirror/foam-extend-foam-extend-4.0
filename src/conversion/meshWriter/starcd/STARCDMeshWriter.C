@@ -92,7 +92,7 @@ void Foam::meshWriters::STARCD::getCellTable()
         {
             cellTableId_.transfer(ioList);
 
-            if (!cellTable_.size())
+            if (cellTable_.empty())
             {
                 Info<< "no cellTable information available" << endl;
             }
@@ -116,7 +116,7 @@ void Foam::meshWriters::STARCD::getCellTable()
 
     if (useCellZones)
     {
-        if (!cellTable_.size())
+        if (cellTable_.empty())
         {
             Info<< "created cellTable from cellZones" << endl;
             cellTable_ = mesh_;
@@ -500,7 +500,7 @@ bool Foam::meshWriters::STARCD::write(const fileName& meshName) const
 {
     fileName baseName(meshName);
 
-    if (!baseName.size())
+    if (baseName.empty())
     {
         baseName = meshWriter::defaultMeshName;
 
@@ -535,7 +535,7 @@ bool Foam::meshWriters::STARCD::writeSurface
 {
     fileName baseName(meshName);
 
-    if (!baseName.size())
+    if (baseName.empty())
     {
         baseName = meshWriter::defaultSurfaceName;
 
@@ -705,6 +705,7 @@ bool Foam::meshWriters::STARCD::writeSurface
         }
     }
     toc.sort();
+    toc.shrink();
     pointHash.clear();
 
     // write points in sorted order

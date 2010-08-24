@@ -136,8 +136,8 @@ Foam::sampledSurface::New
     {
         FatalErrorIn
         (
-            "sampledSurface::New(const word&, "
-            "const polyMesh&, const dictionary&)"
+            "sampledSurface::New"
+            "(const word&, const polyMesh&, const dictionary&)"
         )   << "Unknown sample type " << sampleType
             << endl << endl
             << "Valid sample types : " << endl
@@ -145,10 +145,7 @@ Foam::sampledSurface::New
             << exit(FatalError);
     }
 
-    return autoPtr<sampledSurface>
-    (
-        cstrIter()(name, mesh, dict)
-    );
+    return autoPtr<sampledSurface>(cstrIter()(name, mesh, dict));
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -156,13 +153,11 @@ Foam::sampledSurface::New
 Foam::sampledSurface::sampledSurface
 (
     const word& name,
-    const polyMesh& mesh,
-    const bool triangulate
+    const polyMesh& mesh
 )
 :
     name_(name),
     mesh_(mesh),
-    triangulate_(triangulate),
     interpolate_(false),
     SfPtr_(NULL),
     magSfPtr_(NULL),
@@ -181,17 +176,13 @@ Foam::sampledSurface::sampledSurface
 :
     name_(name),
     mesh_(mesh),
-    triangulate_(dict.lookupOrDefault("triangulate", true)),
     interpolate_(dict.lookupOrDefault("interpolate", false)),
     SfPtr_(NULL),
     magSfPtr_(NULL),
     CfPtr_(NULL),
     area_(-1)
 {
-    if (dict.found("name"))
-    {
-        dict.lookup("name") >> name_;
-    }
+    dict.readIfPresent("name", name_);
 }
 
 

@@ -60,7 +60,7 @@ template<class Type>
 tmp<fvMatrix<Type> >
 ddt
 (
-    const oneField&,
+    const geometricOneField&,
     GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {

@@ -29,14 +29,9 @@ License
 #include "facePointPatch.H"
 #include "globalPointPatch.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-pointBoundaryMesh::pointBoundaryMesh
+Foam::pointBoundaryMesh::pointBoundaryMesh
 (
     const pointMesh& m,
     const polyBoundaryMesh& basicBdry
@@ -61,7 +56,7 @@ pointBoundaryMesh::pointBoundaryMesh
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void pointBoundaryMesh::calcGeometry()
+void Foam::pointBoundaryMesh::calcGeometry()
 {
     forAll(*this, patchi)
     {
@@ -75,7 +70,8 @@ void pointBoundaryMesh::calcGeometry()
 }
 
 
-const globalPointPatch& pointBoundaryMesh::globalPatch() const
+const Foam::globalPointPatch&
+Foam::pointBoundaryMesh::globalPatch() const
 {
     const pointPatchList& patches = *this;
 
@@ -99,7 +95,7 @@ const globalPointPatch& pointBoundaryMesh::globalPatch() const
 }
 
 
-void pointBoundaryMesh::movePoints(const pointField& p)
+void Foam::pointBoundaryMesh::movePoints(const pointField& p)
 {
     pointPatchList& patches = *this;
 
@@ -115,7 +111,7 @@ void pointBoundaryMesh::movePoints(const pointField& p)
 }
 
 
-void pointBoundaryMesh::updateMesh()
+void Foam::pointBoundaryMesh::updateMesh()
 {
     pointPatchList& patches = *this;
 
@@ -130,9 +126,5 @@ void pointBoundaryMesh::updateMesh()
     }
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

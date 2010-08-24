@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,7 +26,7 @@ Class
     Foam::activeBaffleVelocityFvPatchVectorField
 
 Description
-    Foam::activeBaffleVelocityFvPatchVectorField
+    Boundary condition that modifies mesh areas based on velocity.
 
 SourceFiles
     activeBaffleVelocityFvPatchVectorField.C

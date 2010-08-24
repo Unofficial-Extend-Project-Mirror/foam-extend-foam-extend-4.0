@@ -23,12 +23,12 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    FDICPreconditioner
+    Foam::FDICPreconditioner
 
 Description
     Faster version of the DICPreconditioner diagonal-based incomplete
     Cholesky preconditioner for symmetric matrices
-    (symmetric equivalent of DILU) in which the reciprocal of the
+    (symmetric equivalent of DILU) in which the the reciprocal of the
     preconditioned diagonal and the upper coefficients divided by the diagonal
     are calculated and stored.
 
@@ -80,7 +80,7 @@ public:
 
     // Constructors
 
-        //- Construct from matrix components and preconditioner data stream
+        //- Construct from matrix components and preconditioner solver controls
         FDICPreconditioner
         (
             const lduMatrix& matrix,

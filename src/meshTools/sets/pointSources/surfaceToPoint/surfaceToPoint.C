@@ -22,16 +22,12 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "surfaceToPoint.H"
 #include "polyMesh.H"
 #include "meshSearch.H"
 #include "triSurfaceSearch.H"
-#include "octree.H"
-#include "octreeDataTriSurface.H"
 
 #include "addToRunTimeSelectionTable.H"
 
@@ -87,7 +83,7 @@ void Foam::surfaceToPoint::combine(topoSet& set, const bool add) const
             if ((isInside && includeInside_) || (!isInside && includeOutside_))
             {
                 addOrDelete(set, pointI, add);
-            }   
+            }
         }
     }
 
@@ -153,7 +149,7 @@ Foam::surfaceToPoint::surfaceToPoint
 Foam::surfaceToPoint::surfaceToPoint
 (
     const polyMesh& mesh,
-    const dictionary& dict          
+    const dictionary& dict
 )
 :
     topoSetSource(mesh),

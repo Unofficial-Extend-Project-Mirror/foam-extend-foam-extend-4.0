@@ -91,44 +91,35 @@ protected:
 public:
 
     //-Runtime type information
-        TypeName("pdf");
+    TypeName("pdf");
 
-    // Declare runtime constructor selection table
 
-        declareRunTimeSelectionTable
+    //- Declare runtime constructor selection table
+    declareRunTimeSelectionTable
+    (
+        autoPtr,
+        pdf,
+        dictionary,
         (
-            autoPtr,
-            pdf,
-            dictionary,
-            (
-                const dictionary& dict,
-                Random& rndGen
-            ),
-            (dict, rndGen)
-        );
+            const dictionary& dict,
+            Random& rndGen
+        ),
+        (dict, rndGen)
+    );
 
 
     // Constructors
-    
+
         //- Construct from dictionary
-        pdf
-        (
-            const dictionary& dict,
-            Random& rndGen
-        );
-
-    // Selectors
-
-        static autoPtr<pdf> New
-        (
-            const dictionary& dict,
-            Random& rndGen
-        );
+        pdf(const dictionary& dict, Random& rndGen);
 
 
-    // Destructor
+    //- Selector
+    static autoPtr<pdf> New(const dictionary& dict, Random& rndGen);
 
-        virtual ~pdf();
+
+    //- Destructor
+    virtual ~pdf();
 
 
     // Member Functions
@@ -136,7 +127,10 @@ public:
         //- Sample the pdf
         virtual scalar sample() const = 0;
 
+        //- Return the minimum value
         virtual scalar minValue() const = 0;
+
+        //- Return the maximum value
         virtual scalar maxValue() const = 0;
 };
 
@@ -144,10 +138,6 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-//#include "pdfI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

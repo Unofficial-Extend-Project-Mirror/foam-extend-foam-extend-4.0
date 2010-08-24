@@ -27,7 +27,7 @@ Class
 
 Description
     Preconditioned conjugate gradient solver for symmetric lduMatrices
-    using a run-time selectable preconditiioner.
+    using a run-time selectable preconditioner.
 
 SourceFiles
     PCG.C
@@ -69,7 +69,7 @@ public:
 
     // Constructors
 
-        //- Construct from matrix components and solver data stream
+        //- Construct from matrix components and solver controls
         PCG
         (
             const word& fieldName,
@@ -77,7 +77,7 @@ public:
             const FieldField<Field, scalar>& coupleBouCoeffs,
             const FieldField<Field, scalar>& coupleIntCoeffs,
             const lduInterfaceFieldPtrsList& interfaces,
-            Istream& solverData
+            const dictionary& solverControls
         );
 
 

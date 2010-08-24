@@ -74,7 +74,34 @@ fluxFvPatchField<Type>::fluxFvPatchField
     fixedGradientFvPatchField<Type>(p, iF),
     reactivity_(readScalar(dict.lookup("reactivity"))),
     gammaName_(dict.lookup("gamma"))
-{}
+{
+    // Set dummy gradient
+    this->gradient() = pTraits<Type>::zero;
+
+    // Read the value entry from the dictionary
+    if (dict.found("value"))
+    {
+        fvPatchField<Type>::operator=
+        (
+            Field<Type>("value", dict, p.size())
+        );
+    }
+    else
+    {
+        FatalIOErrorIn
+        (
+            "fluxFvPatchField<Type>::fluxFvPatchField"
+            "("
+            "const fvPatch& p,"
+            "const DimensionedField<Type, volMesh>& iF,"
+            "const dictionary& dict,"
+            "const bool valueRequired"
+            ")",
+            dict
+        )   << "Essential entry 'value' missing"
+            << exit(FatalIOError);
+    }
+}
 
 
 template<class Type>
@@ -136,6 +163,7 @@ void fluxFvPatchField<Type>::write(Ostream& os) const
         << reactivity_ << token::END_STATEMENT << nl;
     os.writeKeyword("gamma")
         << gammaName_ << token::END_STATEMENT << nl;
+    this->writeEntry("value", os);
 }
 
 

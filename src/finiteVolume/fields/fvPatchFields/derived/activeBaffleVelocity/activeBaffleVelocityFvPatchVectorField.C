@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -153,8 +153,19 @@ void Foam::activeBaffleVelocityFvPatchVectorField::autoMap
 )
 {
     fixedValueFvPatchVectorField::autoMap(m);
-    initWallSf_.autoMap(m);
-    initCyclicSf_.autoMap(m);
+
+    //- Note: cannot map field from cyclic patch anyway so just recalculate
+    //  Areas should be consistent when doing autoMap except in case of
+    //  topo changes.
+    //- Note: we don't want to use Sf here since triggers rebuilding of
+    //  fvMesh::S() which will give problems when mapped (since already
+    //  on new mesh)
+    const vectorField& areas = patch().boundaryMesh().mesh().faceAreas();
+    initWallSf_ = patch().patchSlice(areas);
+    initCyclicSf_ = patch().boundaryMesh()
+    [
+        cyclicPatchLabel_
+    ].patchSlice(areas);
 }
 
 void Foam::activeBaffleVelocityFvPatchVectorField::rmap
@@ -165,11 +176,13 @@ void Foam::activeBaffleVelocityFvPatchVectorField::rmap
 {
     fixedValueFvPatchVectorField::rmap(ptf, addr);
 
-    const activeBaffleVelocityFvPatchVectorField& tiptf =
-        refCast<const activeBaffleVelocityFvPatchVectorField>(ptf);
-
-    initWallSf_.rmap(tiptf.initWallSf_, addr);
-    initCyclicSf_.rmap(tiptf.initCyclicSf_, addr);
+    // See autoMap.
+    const vectorField& areas = patch().boundaryMesh().mesh().faceAreas();
+    initWallSf_ = patch().patchSlice(areas);
+    initCyclicSf_ = patch().boundaryMesh()
+    [
+        cyclicPatchLabel_
+    ].patchSlice(areas);
 }
 
 

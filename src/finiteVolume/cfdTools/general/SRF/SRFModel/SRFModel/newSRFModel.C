@@ -53,8 +53,8 @@ autoPtr<SRFModel> SRFModel::New
             IOobject
             (
                 "SRFProperties",
-                Urel.mesh().time().constant(),
-                Urel.mesh().db(),
+                Urel.time().constant(),
+                Urel.db(),
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE
             )

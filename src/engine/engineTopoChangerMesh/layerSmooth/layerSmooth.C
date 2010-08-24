@@ -1,22 +1,28 @@
-// The FOAM Project // File: layerSmooth.C
-/*
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
- =========         | Class Implementation
- \\      /         |
-  \\    /          | Name:   layerSmooth
-   \\  /           | Family: engine
-    \\/            |
-    F ield         | FOAM version: 2.3
-    O peration     |
-    A and          | Copyright (C) 1991-2004 Nabla Ltd.
-    M anipulation  |          All Rights Reserved.
--------------------------------------------------------------------------------
-DESCRIPTION
+License
+    This file is part of OpenFOAM.
 
-AUTHOR
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
 
--------------------------------------------------------------------------------
-*/
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+\*---------------------------------------------------------------------------*/
 
 #include "layerSmooth.H"
 #include "layerAdditionRemoval.H"
@@ -34,22 +40,26 @@ AUTHOR
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-namespace Foam
-{
-    defineTypeNameAndDebug(layerSmooth, 0);
-    addToRunTimeSelectionTable(engineTopoChangerMesh, layerSmooth, IOobject);
-}
+defineTypeNameAndDebug(Foam::layerSmooth, 0);
+
+addToRunTimeSelectionTable
+(
+    Foam::engineTopoChangerMesh,
+    Foam::layerSmooth,
+    IOobject
+);
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-
-
-    
 bool Foam::layerSmooth::realDeformation() const
 {
 
-    if (virtualPistonPosition() + engTime().pistonDisplacement().value() > deckHeight_ - SMALL)
+    if
+    (
+        virtualPistonPosition() + engTime().pistonDisplacement().value()
+      > deckHeight_ - SMALL
+    )
     {
         return true;
     }
@@ -58,6 +68,7 @@ bool Foam::layerSmooth::realDeformation() const
         return deformation();
     }
 }
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -77,8 +88,7 @@ Foam::layerSmooth::layerSmooth
     virtualPistonPosition_(-GREAT),
     deckHeight_(GREAT),
     msPtr_(motionSolver::New(*this)),
-    valvePlaneTol_(readScalar(engTime().engineDict().lookup("valvePlaneTol")))   
-
+    valvePlaneTol_(readScalar(engTime().engineDict().lookup("valvePlaneTol")))
 {
 
 
@@ -86,12 +96,10 @@ Foam::layerSmooth::layerSmooth
     {
         if
         (
-            valves()[valveI].stemPatchID().active() 
-            &&
-            valves()[valveI].bottomPatchID().active() 
+            valves()[valveI].stemPatchID().active()
+         && valves()[valveI].bottomPatchID().active()
         )
         {
-            
             label bottomIndex = valves()[valveI].bottomPatchID().index();
             label stemIndex = valves()[valveI].stemPatchID().index();
 
@@ -103,39 +111,55 @@ Foam::layerSmooth::layerSmooth
 
             point bottomPatchCentre = vector::zero;
             point stemPatchCentre = vector::zero;
-            
+
             scalar bottomArea = 0;
             scalar stemArea = 0;
-            
-        Switch halfGeometry = (engTime().engineDict().lookup("halfGeometry"));
-        
+
+            Switch halfGeometry(engTime().engineDict().lookup("halfGeometry"));
+
             forAll(stemPatch, i)
             {
-                stemPatchCentre += stemPatch.faceCentres()[i]*mag(stemPatch.faceAreas()[i]);
+                stemPatchCentre +=
+                    stemPatch.faceCentres()[i]*mag(stemPatch.faceAreas()[i]);
+
                 stemArea += mag(stemPatch.faceAreas()[i]);
             }
 
             forAll(bottomPatch, i)
             {
-                bottomPatchCentre += bottomPatch.faceCentres()[i]*mag(bottomPatch.faceAreas()[i]);
+                bottomPatchCentre +=bottomPatch.faceCentres()[i]*
+                    mag(bottomPatch.faceAreas()[i]);
+
                 bottomArea += mag(bottomPatch.faceAreas()[i]);
             }
-            
-        if(halfGeometry)
-        {
-            Info << "half Geometry active" << endl; 
-            forAll(stemPatch, i)
+
+            if (halfGeometry)
+            {
+                Info << "half Geometry active" << endl;
+
+                forAll(stemPatch, i)
                 {
-            stemPatchCentre += vector(stemPatch.faceCentres()[i].x(), -1.0*stemPatch.faceCentres()[i].y(), stemPatch.faceCentres()[i].z())*mag(stemPatch.faceAreas()[i]);
-//             stemPatchCentre += vector(0.0, -1.0*stemPatch.faceCentres()[i].y(), 0.0)*mag(stemPatch.faceAreas()[i]);
-                       stemArea += mag(stemPatch.faceAreas()[i]);
+                    stemPatchCentre +=
+                        vector
+                        (
+                            stemPatch.faceCentres()[i].x(),
+                            -1.0*stemPatch.faceCentres()[i].y(),
+                            stemPatch.faceCentres()[i].z()
+                        )*mag(stemPatch.faceAreas()[i]);
+
+                    stemArea += mag(stemPatch.faceAreas()[i]);
                 }
 
                 forAll(bottomPatch, i)
                 {
-                    
-//            bottomPatchCentre += vector(0.0, -1.0*bottomPatch.faceCentres()[i].y(), 0.0)*mag(stemPatch.faceAreas()[i]);
-            bottomPatchCentre += vector(bottomPatch.faceCentres()[i].x(), -1.0*bottomPatch.faceCentres()[i].y(), bottomPatch.faceCentres()[i].z())*mag(bottomPatch.faceAreas()[i]);
+                    bottomPatchCentre +=
+                        vector
+                        (
+                            bottomPatch.faceCentres()[i].x(),
+                            -1.0*bottomPatch.faceCentres()[i].y(),
+                            bottomPatch.faceCentres()[i].z()
+                        )*mag(bottomPatch.faceAreas()[i]);
+
                     bottomArea += mag(bottomPatch.faceAreas()[i]);
                 }
             }
@@ -144,18 +168,16 @@ Foam::layerSmooth::layerSmooth
             bottomPatchCentre /= bottomArea;
 
 
-            Info << "Foam::layerSmooth::layerSmooth"
-            << " calculated origin for valve n. " << valveI
-            << " is "
-            <<  (stemPatchCentre)
-            << endl;
+            Info<< "Foam::layerSmooth::layerSmooth"
+                << " calculated origin for valve n. " << valveI
+                << " is " <<  (stemPatchCentre) << endl;
 
-            Info << "Foam::layerSmooth::layerSmooth"
-            << " calculated axis for valve n. " << valveI
-            << " is " 
-            << (stemPatchCentre - bottomPatchCentre)/
+            Info<< "Foam::layerSmooth::layerSmooth"
+                << " calculated axis for valve n. " << valveI
+                << " is "
+                << (stemPatchCentre - bottomPatchCentre)/
                 mag(stemPatchCentre-bottomPatchCentre)
-            << endl;
+                << endl;
         }
     }
 
@@ -182,18 +204,19 @@ void Foam::layerSmooth::setBoundaryVelocity(volVectorField& U)
         if (valves()[valveI].curtainInPortPatchID().active())
         {
             // Bottom of the valve moves with given velocity
-            U.boundaryField()[valves()[valveI].curtainInPortPatchID().index()] ==
-                valveVel;
+            U.boundaryField()
+                [valves()[valveI].curtainInPortPatchID().index()] == valveVel;
         }
 
         // If valve is present in geometry, set the motion
         if (valves()[valveI].curtainInCylinderPatchID().active())
         {
             // Bottom of the valve moves with given velocity
-            U.boundaryField()[valves()[valveI].curtainInCylinderPatchID().index()] ==
+            U.boundaryField()
+                [valves()[valveI].curtainInCylinderPatchID().index()] ==
                 valveVel;
         }
-        
+
         // If valve is present in geometry, set the motion
         if (valves()[valveI].stemPatchID().active())
         {
@@ -206,9 +229,12 @@ void Foam::layerSmooth::setBoundaryVelocity(volVectorField& U)
         if (valves()[valveI].detachInPortPatchID().active())
         {
             // Bottom of the valve moves with given velocity
-            U.boundaryField()[valves()[valveI].detachInPortPatchID().index()] ==
+            U.boundaryField()
+                [valves()[valveI].detachInPortPatchID().index()] ==
                 vector::zero;
-            U.oldTime().boundaryField()[valves()[valveI].detachInPortPatchID().index()] ==
+
+            U.oldTime().boundaryField()
+                [valves()[valveI].detachInPortPatchID().index()] ==
                 vector::zero;
         }
 
@@ -216,24 +242,24 @@ void Foam::layerSmooth::setBoundaryVelocity(volVectorField& U)
         if (valves()[valveI].detachInCylinderPatchID().active())
         {
             // Bottom of the valve moves with given velocity
-            U.boundaryField()[valves()[valveI].detachInCylinderPatchID().index()] ==
+            U.boundaryField()
+                [valves()[valveI].detachInCylinderPatchID().index()] ==
                vector::zero;
-            U.oldTime().boundaryField()[valves()[valveI].detachInCylinderPatchID().index()] ==
+
+            U.oldTime().boundaryField()
+                [valves()[valveI].detachInCylinderPatchID().index()] ==
                vector::zero;
         }
-     
     }
-
 }
 
 
 bool Foam::layerSmooth::isACylinderHeadFace
 (
-    const labelList& cylHeadFaces, 
+    const labelList& cylHeadFaces,
     const label face
 )
 {
-    
     if(face >= cylHeadFaces[0] && face <= cylHeadFaces[cylHeadFaces.size()-1])
     {
         return true;
@@ -247,7 +273,8 @@ bool Foam::layerSmooth::isACylinderHeadFace
             return true;
         }
     }
-*/    
+*/
+
     return false;
 }
 

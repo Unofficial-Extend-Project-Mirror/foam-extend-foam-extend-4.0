@@ -55,7 +55,7 @@ UNARY_FUNCTION(tensor, tensor, hinv)
 // HJ, 24/Oct/2009
 void inv(Field<tensor>& tf, const UList<tensor>& tf1)
 {
-    if (!tf.size())
+    if (tf.empty())
     {
         return;
     }

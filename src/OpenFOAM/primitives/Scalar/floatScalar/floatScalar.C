@@ -32,10 +32,12 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #define Scalar floatScalar
+#define ScalarVGREAT floatScalarVGREAT
 #define ScalarVSMALL floatScalarVSMALL
 #define readScalar readFloatScalar
 #include "Scalar.C"
 #undef Scalar
+#undef ScalarVSMALL
 #undef ScalarVSMALL
 #undef readScalar
 

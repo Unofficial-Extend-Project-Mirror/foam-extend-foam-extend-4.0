@@ -75,7 +75,8 @@ public:
         Chung
         (
             const dictionary& compressibilityProperties,
-            const volScalarField& gamma
+            const volScalarField& gamma,
+            const word& psiName = "psi"
         );
 
 

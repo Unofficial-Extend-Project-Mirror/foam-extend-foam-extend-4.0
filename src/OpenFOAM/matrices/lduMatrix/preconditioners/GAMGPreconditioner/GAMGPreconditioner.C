@@ -25,7 +25,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "GAMGPreconditioner.H"
-#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -33,12 +32,11 @@ namespace Foam
 {
     defineTypeNameAndDebug(GAMGPreconditioner, 0);
 
-    addToRunTimeSelectionTable
-    (
-        lduPreconditioner,
-        GAMGPreconditioner,
-        dictionary
-    );
+    lduPreconditioner::addsymMatrixConstructorToTable
+    <GAMGPreconditioner> addGAMGPreconditionerSymMatrixConstructorToTable_;
+
+    lduPreconditioner::addasymMatrixConstructorToTable
+    <GAMGPreconditioner> addGAMGPreconditionerAsymMatrixConstructorToTable_;
 }
 
 
@@ -86,7 +84,7 @@ Foam::GAMGPreconditioner::~GAMGPreconditioner()
 void Foam::GAMGPreconditioner::readControls()
 {
     GAMG_.readControls();
-    GAMG_.dict().readIfPresent("nVcycles", nVcycles_);
+    nVcycles_ = controlDict_.lookupOrDefault<label>("nVcycles", 2);
 }
 
 

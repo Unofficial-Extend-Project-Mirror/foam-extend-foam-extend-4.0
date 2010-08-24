@@ -29,7 +29,7 @@ License
 template<class Type>
 bool Foam::sampledSurface::checkFieldSize(const Field<Type>& field) const
 {
-    if (faces().size() == 0 || field.size() == 0)
+    if (faces().empty() || field.empty())
     {
         return false;
     }

@@ -30,7 +30,7 @@ License
 #include "wallPolyPatch.H"
 #include "symmetryPolyPatch.H"
 #include "cellModeller.H"
-#include "SortableList.H"
+#include "ListOps.H"
 #include "IFstream.H"
 #include "IOMap.H"
 
@@ -745,17 +745,17 @@ void Foam::meshReaders::STARCD::readBoundary(const fileName& inputName)
             iter != boundaryRegion_.end()
         )
         {
-            if (iter().found("BoundaryType"))
-            {
-                iter().lookup("BoundaryType") >> patchTypes_[patchI];
-                foundType = true;
-            }
+            foundType = iter().readIfPresent
+            (
+                "BoundaryType",
+                patchTypes_[patchI]
+            );
 
-            if (iter().found("Label"))
-            {
-                iter().lookup("Label") >> patchNames_[patchI];
-                foundName = true;
-            }
+            foundName = iter().readIfPresent
+            (
+                "Label",
+                patchNames_[patchI]
+            );
         }
 
         // consistent names, in long form and in lowercase
@@ -797,14 +797,15 @@ void Foam::meshReaders::STARCD::readBoundary(const fileName& inputName)
     patchNames_[nPatches-1] = defaultBoundaryName;
 
     // sort according to ascending region numbers, but leave
-    // Default_Boundary_Region as the last patch
+    // Default_Boundary_Region as the final patch
     {
-        SortableList<label> sortedOrder(SubList<label>(origRegion, nPatches-1));
+        labelList sortedIndices;
+        sortedOrder(SubList<label>(origRegion, nPatches-1), sortedIndices);
 
         labelList oldToNew = identity(nPatches);
-        forAll(sortedOrder, i)
+        forAll(sortedIndices, i)
         {
-            oldToNew[sortedOrder.indices()[i]] = i;
+            oldToNew[sortedIndices[i]] = i;
         }
 
         inplaceReorder(oldToNew, origRegion);

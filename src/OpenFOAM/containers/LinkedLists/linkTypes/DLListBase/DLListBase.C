@@ -30,28 +30,23 @@ License
 #include "IOstreams.H"
 #include "long.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-DLListBase::iterator DLListBase::endIter
+Foam::DLListBase::iterator Foam::DLListBase::endIter_
 (
     const_cast<DLListBase&>(static_cast<const DLListBase&>(DLListBase()))
 );
 
-DLListBase::const_iterator DLListBase::endConstIter
+Foam::DLListBase::const_iterator Foam::DLListBase::endConstIter_
 (
     static_cast<const DLListBase&>(DLListBase()),
-    reinterpret_cast<const link*>(NULL)
+    reinterpret_cast<const link*>(0)
 );
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void DLListBase::insert(DLListBase::link* a)
+void Foam::DLListBase::insert(DLListBase::link* a)
 {
     nElmts_++;
 
@@ -71,7 +66,7 @@ void DLListBase::insert(DLListBase::link* a)
 }
 
 
-void DLListBase::append(DLListBase::link* a)
+void Foam::DLListBase::append(DLListBase::link* a)
 {
     nElmts_++;
 
@@ -91,7 +86,7 @@ void DLListBase::append(DLListBase::link* a)
 }
 
 
-bool DLListBase::swapUp(DLListBase::link* a)
+bool Foam::DLListBase::swapUp(DLListBase::link* a)
 {
     if (first_ != a)
     {
@@ -132,7 +127,7 @@ bool DLListBase::swapUp(DLListBase::link* a)
 }
 
 
-bool DLListBase::swapDown(DLListBase::link* a)
+bool Foam::DLListBase::swapDown(DLListBase::link* a)
 {
     if (last_ != a)
     {
@@ -173,7 +168,7 @@ bool DLListBase::swapDown(DLListBase::link* a)
 }
 
 
-DLListBase::link* DLListBase::removeHead()
+Foam::DLListBase::link* Foam::DLListBase::removeHead()
 {
     nElmts_--;
 
@@ -197,7 +192,7 @@ DLListBase::link* DLListBase::removeHead()
 }
 
 
-DLListBase::link* DLListBase::remove(DLListBase::link* l)
+Foam::DLListBase::link* Foam::DLListBase::remove(DLListBase::link* l)
 {
     nElmts_--;
 
@@ -229,7 +224,7 @@ DLListBase::link* DLListBase::remove(DLListBase::link* l)
 }
 
 
-DLListBase::link* DLListBase::replace
+Foam::DLListBase::link* Foam::DLListBase::replace
 (
     DLListBase::link* oldLink,
     DLListBase::link* newLink
@@ -265,9 +260,5 @@ DLListBase::link* DLListBase::replace
     return ret;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

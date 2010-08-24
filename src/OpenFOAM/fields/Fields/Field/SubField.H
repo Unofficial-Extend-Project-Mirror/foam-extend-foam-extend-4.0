@@ -40,7 +40,6 @@ SourceFiles
 #ifndef SubField_H
 #define SubField_H
 
-#include "Field.H"
 #include "SubList.H"
 #include "Field.H"
 
@@ -48,6 +47,10 @@ SourceFiles
 
 namespace Foam
 {
+
+//- Pre-declare SubField and related Field type
+template<class Type> class Field;
+template<class Type> class SubField;
 
 /*---------------------------------------------------------------------------*\
                            Class SubField Declaration
@@ -68,20 +71,20 @@ public:
 
     // Constructors
 
-        //- Construct from UnallocatedField and SubField size
-        inline SubField
-        (
-            const SubList<Type>& slist
-        );
+        //- Construct from a SubList
+        inline SubField(const SubList<Type>&);
 
-        //- Construct from UnallocatedField and SubField size
+        //- Construct from a UList\<Type\>, using the entire size
+        explicit inline SubField(const UList<Type>&);
+
+        //- Construct from a UList\<Type\> with a given size
         inline SubField
         (
             const UList<Type>& list,
             const label subSize
         );
 
-        //- Construct from UnallocatedField, start and end indices
+        //- Construct from a UList\<Type\> with a given size and start index
         inline SubField
         (
             const UList<Type>& list,
@@ -90,10 +93,7 @@ public:
         );
 
         //- Construct as copy
-        inline SubField
-        (
-            const SubField<Type>& sfield
-        );
+        inline SubField(const SubField<Type>&);
 
 
     // Member functions
@@ -110,10 +110,10 @@ public:
 
     // Member operators
 
-        //- Assignment from UList operator. Takes linear time.
+        //- Assignment via UList operator. Takes linear time.
         inline void operator=(const SubField<Type>&);
 
-        //- Allow cast to a const Field<Type>&
+        //- Allow cast to a const Field\<Type\>&
         inline operator const Field<Type>&() const;
 };
 

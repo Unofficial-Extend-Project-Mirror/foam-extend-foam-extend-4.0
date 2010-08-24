@@ -62,12 +62,8 @@ class GAMGPreconditioner
         //- Number of V-cycles to perform
         label nVcycles_;
 
-
-    // Private member functions
-
-        //- Read control parameters from the control dictionary
-        void readControls();
-
+        //- Read the control parameters from the controlDict_
+        virtual void readControls();
 
 public:
 
@@ -77,7 +73,7 @@ public:
 
     // Constructors
 
-        //- Construct for given solver and preconditioner data stream
+        //- Construct from matrix components and preconditioner solver controls
         GAMGPreconditioner
         (
             const lduMatrix& matrix,

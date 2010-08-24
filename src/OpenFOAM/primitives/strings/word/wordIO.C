@@ -61,7 +61,7 @@ Foam::Istream& Foam::operator>>(Istream& is, word& w)
         string::stripInvalid<word>(w);
 
         // flag empty strings and bad chars as an error
-        if (!w.size() || w.size() != t.stringToken().size())
+        if (w.empty() || w.size() != t.stringToken().size())
         {
             is.setBad();
             FatalIOErrorIn("operator>>(Istream&, word&)", is)

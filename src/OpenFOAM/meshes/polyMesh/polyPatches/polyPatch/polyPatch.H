@@ -26,8 +26,9 @@ Class
     Foam::polyPatch
 
 Description
-    A patch is a list of labels, which address the faces in the global face
-    list. Based on the global faces, the patch can calculate its own edge.
+    A patch is a list of labels that address the faces in the global face list.
+
+    The patch can calculate its own edges based on the global faces.
     Patch also contains all addressing between the faces.
 
 SourceFiles
@@ -59,10 +60,9 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-class polyBoundaryMesh;
-
 // Forward declaration of friend functions and operators
 
+class polyBoundaryMesh;
 class polyPatch;
 
 Ostream& operator<<(Ostream&, const polyPatch&);

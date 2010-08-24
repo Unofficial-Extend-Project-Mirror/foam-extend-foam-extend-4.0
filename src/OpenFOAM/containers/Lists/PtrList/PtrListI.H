@@ -29,29 +29,38 @@ License
 #include "autoPtr.H"
 #include "tmp.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class T>
-inline label PtrList<T>::size() const
+inline Foam::label Foam::PtrList<T>::size() const
 {
     return ptrs_.size();
 }
 
 
 template<class T>
-inline bool PtrList<T>::set(const label i) const
+inline bool Foam::PtrList<T>::empty() const
+{
+    return ptrs_.empty();
+}
+
+
+template<class T>
+inline void Foam::PtrList<T>::resize(const label newSize)
+{
+    this->setSize(newSize);
+}
+
+
+template<class T>
+inline bool Foam::PtrList<T>::set(const label i) const
 {
     return ptrs_[i] != NULL;
 }
 
 
 template<class T>
-inline autoPtr<T> PtrList<T>::set(const label i, T* ptr)
+inline Foam::autoPtr<T> Foam::PtrList<T>::set(const label i, T* ptr)
 {
     autoPtr<T> old(ptrs_[i]);
 
@@ -62,23 +71,38 @@ inline autoPtr<T> PtrList<T>::set(const label i, T* ptr)
 
 
 template<class T>
-inline autoPtr<T> PtrList<T>::set(const label i, const autoPtr<T>& aptr)
+inline Foam::autoPtr<T> Foam::PtrList<T>::set
+(
+    const label i,
+    const autoPtr<T>& aptr
+)
 {
     return set(i, const_cast<autoPtr<T>&>(aptr).ptr());
 }
 
 
 template<class T>
-inline autoPtr<T> PtrList<T>::set(const label i, const tmp<T>& t)
+inline Foam::autoPtr<T> Foam::PtrList<T>::set
+(
+    const label i,
+    const tmp<T>& t
+)
 {
     return set(i, const_cast<tmp<T>&>(t).ptr());
+}
+
+
+template<class T>
+inline Foam::Xfer<Foam::PtrList<T> > Foam::PtrList<T>::xfer()
+{
+    return xferMove(*this);
 }
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class T>
-const T& PtrList<T>::operator[](const label i) const
+const T& Foam::PtrList<T>::operator[](const label i) const
 {
     if (!ptrs_[i])
     {
@@ -92,7 +116,7 @@ const T& PtrList<T>::operator[](const label i) const
 
 
 template<class T>
-T& PtrList<T>::operator[](const label i)
+T& Foam::PtrList<T>::operator[](const label i)
 {
     if (!ptrs_[i])
     {
@@ -106,7 +130,7 @@ T& PtrList<T>::operator[](const label i)
 
 
 template<class T>
-const T* PtrList<T>::operator()(const label i) const
+const T* Foam::PtrList<T>::operator()(const label i) const
 {
     return ptrs_[i];
 }
@@ -115,46 +139,46 @@ const T* PtrList<T>::operator()(const label i) const
 // * * * * * * * * * * * * * * * * STL iterator  * * * * * * * * * * * * * * //
 
 template<class T>
-inline PtrList<T>::iterator::iterator(T** ptr)
+inline Foam::PtrList<T>::iterator::iterator(T** ptr)
 :
     ptr_(ptr)
 {}
 
 template<class T>
-inline bool PtrList<T>::iterator::operator==(const iterator& iter) const
+inline bool Foam::PtrList<T>::iterator::operator==(const iterator& iter) const
 {
     return ptr_ == iter.ptr_;
 }
 
 template<class T>
-inline bool PtrList<T>::iterator::operator!=(const iterator& iter) const
+inline bool Foam::PtrList<T>::iterator::operator!=(const iterator& iter) const
 {
     return ptr_ != iter.ptr_;
 }
 
 template<class T>
-inline T& PtrList<T>::iterator::operator*()
+inline T& Foam::PtrList<T>::iterator::operator*()
 {
     return **ptr_;
 }
 
 template<class T>
-inline T& PtrList<T>::iterator::operator()()
+inline T& Foam::PtrList<T>::iterator::operator()()
 {
     return operator*();
 }
 
 template<class T>
-inline typename PtrList<T>::iterator
-PtrList<T>::iterator::operator++()
+inline typename Foam::PtrList<T>::iterator
+Foam::PtrList<T>::iterator::operator++()
 {
     ++ptr_;
     return *this;
 }
 
 template<class T>
-inline typename PtrList<T>::iterator
-PtrList<T>::iterator::operator++(int)
+inline typename Foam::PtrList<T>::iterator
+Foam::PtrList<T>::iterator::operator++(int)
 {
     iterator tmp = *this;
     ++ptr_;
@@ -162,16 +186,16 @@ PtrList<T>::iterator::operator++(int)
 }
 
 template<class T>
-inline typename PtrList<T>::iterator
-PtrList<T>::iterator::operator--()
+inline typename Foam::PtrList<T>::iterator
+Foam::PtrList<T>::iterator::operator--()
 {
     --ptr_;
     return *this;
 }
 
 template<class T>
-inline typename PtrList<T>::iterator
-PtrList<T>::iterator::operator--(int)
+inline typename Foam::PtrList<T>::iterator
+Foam::PtrList<T>::iterator::operator--(int)
 {
     iterator tmp = *this;
     --ptr_;
@@ -179,47 +203,47 @@ PtrList<T>::iterator::operator--(int)
 }
 
 template<class T>
-inline typename PtrList<T>::iterator
-PtrList<T>::iterator::operator+=(label n)
+inline typename Foam::PtrList<T>::iterator
+Foam::PtrList<T>::iterator::operator+=(label n)
 {
     ptr_ += n;
     return *this;
 }
 
 template<class T>
-inline typename PtrList<T>::iterator
-operator+(const typename PtrList<T>::iterator& iter, label n)
+inline typename Foam::PtrList<T>::iterator
+Foam::operator+(const typename PtrList<T>::iterator& iter, label n)
 {
     typename PtrList<T>::iterator tmp = iter;
     return tmp += n;
 }
 
 template<class T>
-inline typename PtrList<T>::iterator
-operator+(label n, const typename PtrList<T>::iterator& iter)
+inline typename Foam::PtrList<T>::iterator
+Foam::operator+(label n, const typename PtrList<T>::iterator& iter)
 {
     typename PtrList<T>::iterator tmp = iter;
     return tmp += n;
 }
 
 template<class T>
-inline typename PtrList<T>::iterator
-PtrList<T>::iterator::operator-=(label n)
+inline typename Foam::PtrList<T>::iterator
+Foam::PtrList<T>::iterator::operator-=(label n)
 {
     ptr_ -= n;
     return *this;
 }
 
 template<class T>
-inline typename PtrList<T>::iterator
-operator-(const typename PtrList<T>::iterator& iter, label n)
+inline typename Foam::PtrList<T>::iterator
+Foam::operator-(const typename PtrList<T>::iterator& iter, label n)
 {
     typename PtrList<T>::iterator tmp = iter;
     return tmp -= n;
 }
 
 template<class T>
-inline label operator-
+inline Foam::label Foam::operator-
 (
     const typename PtrList<T>::iterator& iter1,
     const typename PtrList<T>::iterator& iter2
@@ -229,50 +253,49 @@ inline label operator-
 }
 
 template<class T>
-inline T& PtrList<T>::iterator::operator[](label n)
+inline T& Foam::PtrList<T>::iterator::operator[](label n)
 {
     return *(*this + n);
 }
 
 template<class T>
-inline bool PtrList<T>::iterator::operator<(const iterator& iter) const
+inline bool Foam::PtrList<T>::iterator::operator<(const iterator& iter) const
 {
     return ptr_ < iter.ptr_;
 }
 
 template<class T>
-inline bool PtrList<T>::iterator::operator>(const iterator& iter) const
+inline bool Foam::PtrList<T>::iterator::operator>(const iterator& iter) const
 {
     return ptr_ > iter.ptr_;
 }
 
 template<class T>
-inline bool PtrList<T>::iterator::operator<=(const iterator& iter) const
+inline bool Foam::PtrList<T>::iterator::operator<=(const iterator& iter) const
 {
     return ptr_ <= iter.ptr_;
 }
 
 template<class T>
-inline bool PtrList<T>::iterator::operator>=(const iterator& iter) const
+inline bool Foam::PtrList<T>::iterator::operator>=(const iterator& iter) const
 {
     return ptr_ >= iter.ptr_;
 }
 
 template<class T>
-inline typename PtrList<T>::iterator PtrList<T>::begin()
+inline typename Foam::PtrList<T>::iterator
+Foam::PtrList<T>::begin()
 {
     return ptrs_.begin();
 }
 
 template<class T>
-inline typename PtrList<T>::iterator PtrList<T>::end()
+inline typename Foam::PtrList<T>::iterator
+Foam::PtrList<T>::end()
 {
     return ptrs_.end();
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

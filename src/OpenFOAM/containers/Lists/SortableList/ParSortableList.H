@@ -173,7 +173,7 @@ public:
     // Constructors
 
         //- Construct from List, sorting the elements.
-        ParSortableList(const List<Type>&);
+        ParSortableList(const UList<Type>&);
 
         //- Construct given size. Sort later on.
         ParSortableList(const label size);
@@ -181,9 +181,8 @@ public:
 
     // Member Functions
 
-        //- Sort the list (if changed after construction time)
+        //- (stable) sort the list (if changed after construction time)
         void sort();
-
 
         //- Return the list of sorted point indices
         const labelList& indices() const

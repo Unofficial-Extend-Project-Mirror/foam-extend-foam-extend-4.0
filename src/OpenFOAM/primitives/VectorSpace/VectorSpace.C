@@ -29,16 +29,11 @@ License
 
 #include <sstream>
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from Istream
 template<class Form, class Cmpt, int nCmpt>
-VectorSpace<Form, Cmpt, nCmpt>::VectorSpace
+Foam::VectorSpace<Form, Cmpt, nCmpt>::VectorSpace
 (
     Istream& is
 )
@@ -55,36 +50,36 @@ VectorSpace<Form, Cmpt, nCmpt>::VectorSpace
     is.readEnd("VectorSpace<Form, Cmpt, nCmpt>");
 
     // Check state of Istream
-    is.check("VectorSpace<Form, Cmpt, nCmpt>::VectorSpace(Istream& is)");
+    is.check("VectorSpace<Form, Cmpt, nCmpt>::VectorSpace(Istream&)");
 }
 
 
-//- Return a string representation
+// Return a string representation
 template<class Form, class Cmpt, int nCmpt>
-word name
+Foam::word Foam::name
 (
     const VectorSpace<Form, Cmpt, nCmpt>& vs
 )
 {
-    std::ostringstream osBuffer;
+    std::ostringstream buf;
 
-    osBuffer << '(';
+    buf << '(';
 
     for (int i=0; i<nCmpt-1; i++)
     {
-        osBuffer << vs.v_[i] << ',';
+        buf << vs.v_[i] << ',';
     }
 
-    osBuffer << vs.v_[nCmpt-1] << ')';
+    buf << vs.v_[nCmpt-1] << ')';
 
-    return osBuffer.str();
+    return buf.str();
 }
 
 
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
 template<class Form, class Cmpt, int nCmpt>
-Istream& operator>>
+Foam::Istream& Foam::operator>>
 (
     Istream& is,
     VectorSpace<Form, Cmpt, nCmpt>& vs
@@ -109,7 +104,7 @@ Istream& operator>>
 
 
 template<class Form, class Cmpt, int nCmpt>
-Ostream& operator<<
+Foam::Ostream& Foam::operator<<
 (
     Ostream& os,
     const VectorSpace<Form, Cmpt, nCmpt>& vs
@@ -130,9 +125,5 @@ Ostream& operator<<
     return os;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

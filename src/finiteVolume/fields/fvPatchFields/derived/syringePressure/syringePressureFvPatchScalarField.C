@@ -198,10 +198,8 @@ void syringePressureFvPatchScalarField::updateCoeffs()
     scalar t = db().time().value();
     scalar deltaT = db().time().deltaT().value();
 
-    const surfaceScalarField& phi = db().lookupObject<surfaceScalarField>
-    (
-        "phi"
-    );
+    const surfaceScalarField& phi =
+        db().lookupObject<surfaceScalarField>("phi");
 
     const fvsPatchField<scalar>& phip =
         patch().patchField<surfaceScalarField, scalar>(phi);

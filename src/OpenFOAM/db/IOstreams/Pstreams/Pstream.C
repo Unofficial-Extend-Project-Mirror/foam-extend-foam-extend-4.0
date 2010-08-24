@@ -76,7 +76,7 @@ void Foam::Pstream::calcLinearComm(const label nProcs)
     );
 
     // Slaves. Have no below processors, only communicate up to master
-    for(label procID = 1; procID < nProcs; procID++)
+    for (label procID = 1; procID < nProcs; procID++)
     {
         linearCommunication_[procID] = commsStruct
         (
@@ -122,7 +122,7 @@ void Foam::Pstream::collectReceives
 //
 // The sends/receives for all levels are collected per processor (one send per
 // processor; multiple receives possible) creating a table:
-// 
+//
 // So per processor:
 // proc     receives from   sends to
 // ----     -------------   --------
@@ -137,7 +137,7 @@ void Foam::Pstream::collectReceives
 void Foam::Pstream::calcTreeComm(label nProcs)
 {
     label nLevels = 1;
-    while((1 << nLevels) < nProcs)
+    while ((1 << nLevels) < nProcs)
     {
         nLevels++;
     }
@@ -145,15 +145,15 @@ void Foam::Pstream::calcTreeComm(label nProcs)
     List<DynamicList<label> > receives(nProcs);
     labelList sends(nProcs, -1);
 
-    //Info<< "Using " << nLevels << " communication levels" << endl;
+    // Info<< "Using " << nLevels << " communication levels" << endl;
 
     label offset = 2;
     label childOffset = offset/2;
 
-    for(label level = 0; level < nLevels; level++)
+    for (label level = 0; level < nLevels; level++)
     {
         label receiveID = 0;
-        while(receiveID < nProcs)
+        while (receiveID < nProcs)
         {
             // Determine processor that sends and we receive from
             label sendID = receiveID + childOffset;
@@ -166,6 +166,7 @@ void Foam::Pstream::calcTreeComm(label nProcs)
 
             receiveID += offset;
         }
+
         offset <<= 1;
         childOffset <<= 1;
     }
@@ -173,15 +174,15 @@ void Foam::Pstream::calcTreeComm(label nProcs)
     // For all processors find the processors it receives data from
     // (and the processors they receive data from etc.)
     List<DynamicList<label> > allReceives(nProcs);
-    for(label procID = 0; procID < nProcs; procID++)
+    for (label procID = 0; procID < nProcs; procID++)
     {
         collectReceives(procID, receives, allReceives[procID]);
     }
 
-    
+
     treeCommunication_.setSize(nProcs);
 
-    for(label procID = 0; procID < nProcs; procID++)
+    for (label procID = 0; procID < nProcs; procID++)
     {
         treeCommunication_[procID] = commsStruct
         (
@@ -229,7 +230,7 @@ Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::treeCommunication_(0);
 // in accuracy
 bool Foam::Pstream::floatTransfer
 (
-    debug::optimisationSwitch("floatTransfer", 1)
+    debug::optimisationSwitch("floatTransfer", 0)
 );
 
 // Number of processors at which the reduce algorithm changes from linear to

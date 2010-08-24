@@ -26,6 +26,7 @@ Class
     Foam::simpleMatrix
 
 Description
+    A simple square matrix solver with scalar coefficients.
     Simple dense matrix class with direct solvers.
 
 Author
@@ -39,7 +40,7 @@ SourceFiles
 #ifndef simpleMatrix_H
 #define simpleMatrix_H
 
-#include "scalarMatrix.H"
+#include "scalarMatrices.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,35 +49,35 @@ namespace Foam
 
 // Forward declaration of friend functions and operators
 
-template<class T>
+template<class Type>
 class simpleMatrix;
 
-template<class T>
-simpleMatrix<T> operator+
+template<class Type>
+simpleMatrix<Type> operator+
 (
-    const simpleMatrix<T>&,
-    const simpleMatrix<T>&
+    const simpleMatrix<Type>&,
+    const simpleMatrix<Type>&
 );
 
-template<class T>
-simpleMatrix<T> operator-
+template<class Type>
+simpleMatrix<Type> operator-
 (
-    const simpleMatrix<T>&,
-    const simpleMatrix<T>&
+    const simpleMatrix<Type>&,
+    const simpleMatrix<Type>&
 );
 
-template<class T>
-simpleMatrix<T> operator*
+template<class Type>
+simpleMatrix<Type> operator*
 (
     const scalar,
-    const simpleMatrix<T>&
+    const simpleMatrix<Type>&
 );
 
-template<class T>
+template<class Type>
 Ostream& operator<<
 (
     Ostream&,
-    const simpleMatrix<T>&
+    const simpleMatrix<Type>&
 );
 
 
@@ -84,14 +85,14 @@ Ostream& operator<<
                            Class simpleMatrix Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class T>
+template<class Type>
 class simpleMatrix
 :
-    public scalarMatrix
+    public scalarSquareMatrix
 {
     // Private data
 
-        Field<T> source_;
+        Field<Type> source_;
 
 
 public:
@@ -99,28 +100,35 @@ public:
     // Constructors
 
         //- Construct given size
+        //  Note: this does not initialise the coefficients or the source.
         simpleMatrix(const label);
 
+        //- Construct given size and initial values for the
+        //  coefficients and source
+        simpleMatrix(const label, const scalar, const Type&);
+
         //- Construct from components
-        simpleMatrix(const scalarMatrix&, const Field<T>&);
+        simpleMatrix(const scalarSquareMatrix&, const Field<Type>&);
 
         //- Construct from Istream
         simpleMatrix(Istream&);
 
         //- Construct as copy
-        simpleMatrix(const simpleMatrix<T>&);
+        simpleMatrix(const simpleMatrix<Type>&);
 
 
     // Member Functions
 
         // Access
 
-            Field<T>& source()
+            //- Return access to the source
+            Field<Type>& source()
             {
                 return source_;
             }
 
-            const Field<T>& source() const
+            //- Return const-access to the source
+            const Field<Type>& source() const
             {
                 return source_;
             }
@@ -128,47 +136,54 @@ public:
 
         //- Solve the matrix using Gaussian elimination with pivoting
         //  and return the solution
-        Field<T> solve() const;
+        Field<Type> solve() const;
 
         //- Solve the matrix using LU decomposition with pivoting
         //  and return the solution
-        Field<T> LUsolve() const;
+        Field<Type> LUsolve() const;
 
 
     // Member Operators
 
-        void operator=(const simpleMatrix<T>&);
+        void operator=(const simpleMatrix<Type>&);
 
 
     // Friend Operators
-
-        friend simpleMatrix<T> operator+ <T>
-        (
-            const simpleMatrix<T>&,
-            const simpleMatrix<T>&
-        );
-
-        friend simpleMatrix<T> operator- <T>
-        (
-            const simpleMatrix<T>&,
-            const simpleMatrix<T>&
-        );
-
-        friend simpleMatrix<T> operator* <T>
-        (
-            const scalar,
-            const simpleMatrix<T>&
-        );
-
-
     // Ostream Operator
 
-        friend Ostream& operator<< <T>
+        friend simpleMatrix<T> operator+ <T>
+        friend Ostream& operator<< <Type>
         (
-            Ostream&,
+            const simpleMatrix<T>&,
             const simpleMatrix<T>&
+            Ostream&,
+            const simpleMatrix<Type>&
         );
 };
+
+
+// Global operators
+
+template<class Type>
+simpleMatrix<Type> operator+
+(
+    const simpleMatrix<Type>&,
+    const simpleMatrix<Type>&
+);
+
+template<class Type>
+simpleMatrix<Type> operator-
+(
+    const simpleMatrix<Type>&,
+    const simpleMatrix<Type>&
+);
+
+template<class Type>
+simpleMatrix<Type> operator*
+(
+    const scalar,
+    const simpleMatrix<Type>&
+);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

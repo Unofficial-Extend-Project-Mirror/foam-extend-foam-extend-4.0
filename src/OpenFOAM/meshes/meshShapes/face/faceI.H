@@ -24,48 +24,53 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 // Edge to the right of face vertex i
-inline label face::right(const label i) const
+inline Foam::label Foam::face::right(const label i) const
 {
     return i;
 }
 
 
 // Edge to the left of face vertex i
-inline label face::left(const label i) const
+inline Foam::label Foam::face::left(const label i) const
 {
-    return i == 0 ? size() - 1 : (i - 1);
+    return i ? i-1 : size() - 1;
 }
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct NULL
-inline face::face()
+inline Foam::face::face()
 {}
 
 
-// Construct given size
-inline face::face(label s)
+inline Foam::face::face(label s)
 :
     labelList(s, -1)
 {}
 
 
-// Construct from components
-inline face::face(const labelList& l)
+inline Foam::face::face(const UList<label>& lst)
 :
-    labelList(l)
+    labelList(lst)
 {}
 
 
-// Construct from Istream
-inline face::face(Istream& is)
+inline Foam::face::face(const labelList& lst)
+:
+    labelList(lst)
+{}
+
+
+inline Foam::face::face(const Xfer<labelList>& lst)
+:
+    labelList(lst)
+{}
+
+
+inline Foam::face::face(Istream& is)
 {
     is >> *this;
 }
@@ -73,7 +78,7 @@ inline face::face(Istream& is)
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline pointField face::points(const pointField& meshPoints) const
+inline Foam::pointField Foam::face::points(const pointField& meshPoints) const
 {
     // There are as many points as there labels for them
     pointField p(size());
@@ -90,48 +95,53 @@ inline pointField face::points(const pointField& meshPoints) const
 }
 
 
-inline scalar face::mag(const pointField& p) const
+inline Foam::scalar Foam::face::mag(const pointField& p) const
 {
     return ::Foam::mag(normal(p));
 }
 
 
-inline label face::nEdges() const
+inline Foam::label Foam::face::nEdges() const
 {
     // for a closed polygon a number of edges is the same as number of points
     return size();
 }
 
 
-inline edge face::faceEdge(const label n) const
+inline Foam::edge Foam::face::faceEdge(const label n) const
 {
     return edge(operator[](n), operator[](fcIndex(n)));
 }
 
 
 // Next vertex on face
-inline label face::nextLabel(const label i) const
+inline Foam::label Foam::face::nextLabel(const label i) const
 {
     return operator[](fcIndex(i));
 }
 
 
 // Previous vertex on face
-inline label face::prevLabel(const label i) const
+inline Foam::label Foam::face::prevLabel(const label i) const
 {
     return operator[](rcIndex(i));
 }
 
+// Number of triangles directly known from number of vertices
+inline Foam::label Foam::face::nTriangles() const
+{
+    return size() - 2;
+}
 
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
-inline bool operator==(const face& a, const face& b)
+inline bool Foam::operator==(const face& a, const face& b)
 {
     return face::compare(a,b) != 0;
 }
 
 
-inline bool operator!=(const face& a, const face& b)
+inline bool Foam::operator!=(const face& a, const face& b)
 {
     return face::compare(a,b) == 0;
 }
@@ -139,7 +149,7 @@ inline bool operator!=(const face& a, const face& b)
 
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
-inline Istream& operator>>(Istream& is, face& f)
+inline Foam::Istream& Foam::operator>>(Istream& is, face& f)
 {
     if (is.version() == IOstream::originalVersion)
     {
@@ -165,10 +175,5 @@ inline Istream& operator>>(Istream& is, face& f)
 
     return is;
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

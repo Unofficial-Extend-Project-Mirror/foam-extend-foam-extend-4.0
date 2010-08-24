@@ -47,7 +47,7 @@ SourceFiles
 #include "surfaceFieldsFwd.H"
 #include "primitiveFieldsFwd.H"
 #include "zeroField.H"
-#include "oneField.H"
+#include "geometricOneField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

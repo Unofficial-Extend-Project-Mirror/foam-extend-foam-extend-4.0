@@ -94,6 +94,18 @@ public:
             //- Return current time index
             virtual label timeIndex() const;
 
+            //- Return time step value
+            inline scalar deltaTValue() const
+            {
+                return deltaT_;
+            }
+
+            //- Return old time step value
+            inline scalar deltaT0Value() const
+            {
+                return deltaT0_;
+            }
+
             //- Return time step
             virtual dimensionedScalar deltaT() const;
 

@@ -28,32 +28,28 @@ License
 #include "globalMeshData.H"
 #include "triFace.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(globalPointPatch, 0);
+defineTypeNameAndDebug(Foam::globalPointPatch, 0);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-globalPointPatch::globalPointPatch
+Foam::globalPointPatch::globalPointPatch
 (
     const pointBoundaryMesh& bm,
-    const label bi
+    const label index
 )
 :
     pointPatch(bm),
     coupledPointPatch(bm),
-    boundaryIndex_(bi)
+    index_(index)
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-globalPointPatch::~globalPointPatch()
+Foam::globalPointPatch::~globalPointPatch()
 {}
 
 
@@ -175,7 +171,5 @@ const scalarField& globalPointPatch::ownNeiDoubleMask() const
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

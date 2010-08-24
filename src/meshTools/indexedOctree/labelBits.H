@@ -26,7 +26,7 @@ Class
     Foam::labelBits
 
 Description
-    A 29bits label and 3bits packed into single label
+    A 29bits label and 3bits direction packed into single label
 
 SourceFiles
 
@@ -36,6 +36,7 @@ SourceFiles
 #define labelBits_H
 
 #include "label.H"
+#include "uLabel.H"
 #include "direction.H"
 #include "error.H"
 
@@ -134,7 +135,7 @@ public:
         {
             return is >> lb.data_;
         }
-        
+
         friend inline Ostream& operator<<(Ostream& os, const labelBits& lb)
         {
             return os << lb.data_;

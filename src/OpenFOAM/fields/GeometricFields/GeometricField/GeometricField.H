@@ -184,7 +184,7 @@ public:
             //- Return a list of the patch types
             wordList types() const;
 
-            //- Return BoundaryField of the cell values neighbouring 
+            //- Return BoundaryField of the cell values neighbouring
             //  the boundary
             GeometricBoundaryField boundaryInternalField() const;
 
@@ -208,7 +208,7 @@ public:
             void operator=(const Type&);
 
 
-            //- Forced assignment to 
+            //- Forced assignment to
             //  BoundaryField<Type, PatchField, BoundaryMesh>
             void operator==(const GeometricBoundaryField&);
 
@@ -240,6 +240,9 @@ private:
 
     // Private member functions
 
+        //- Read the field from the dictionary
+        tmp<GeometricBoundaryField> readField(const dictionary&);
+
         //- Read the field from the given stream
         tmp<GeometricBoundaryField> readField(Istream& is);
 
@@ -253,6 +256,11 @@ public:
     // Public typedefs
 
         typedef typename Field<Type>::cmptType cmptType;
+
+    // Static Member Functions
+
+        //- Return a null geometric field
+        inline static const GeometricField<Type, PatchField, GeoMesh>& null();
 
 
     // Constructors
@@ -322,6 +330,14 @@ public:
             Istream&
         );
 
+        //- Construct from dictionary
+        GeometricField
+        (
+            const IOobject&,
+            const Mesh&,
+            const dictionary&
+        );
+
         //- Construct as copy
         GeometricField
         (
@@ -329,12 +345,12 @@ public:
         );
 
         //- Construct as copy of tmp<GeometricField> deleting argument
-#       ifdef ConstructFromTmp
+        #ifdef ConstructFromTmp
         GeometricField
         (
             const tmp<GeometricField<Type, PatchField, GeoMesh> >&
         );
-#       endif
+        #endif
 
         //- Construct as copy resetting IO parameters
         GeometricField
@@ -351,13 +367,13 @@ public:
         );
 
         //- Construct as copy resetting name
-#       ifdef ConstructFromTmp
+        #ifdef ConstructFromTmp
         GeometricField
         (
             const word& newName,
             const tmp<GeometricField<Type, PatchField, GeoMesh> >&
         );
-#       endif
+        #endif
 
         //- Construct as copy resetting IO parameters and patch type
         GeometricField
@@ -376,12 +392,11 @@ public:
         );
 
 
-    // Destructor
-
+    //- Destructor
         virtual ~GeometricField();
 
 
-    // Member functions
+    // Member Functions
 
         //- Return dimensioned internal field
         DimensionedInternalField& dimensionedInternalField();
@@ -435,9 +450,6 @@ public:
         //- Does the field need a reference level for solution
         bool needReference() const;
 
-        //- Return a null geometric field
-        static const GeometricField<Type, PatchField, GeoMesh>& null();
-
         //- Return a component of the field
         tmp<GeometricField<cmptType, PatchField, GeoMesh> > component
         (
@@ -479,6 +491,30 @@ public:
 
         void max(const dimensioned<Type>&);
         void min(const dimensioned<Type>&);
+
+        void max
+        (
+            const GeometricField<Type, PatchField, GeoMesh>&,
+            const dimensioned<Type>&
+        );
+
+        void min
+        (
+            const GeometricField<Type, PatchField, GeoMesh>&,
+            const dimensioned<Type>&
+        );
+
+        void scale
+        (
+            const GeometricField<Type, PatchField, GeoMesh>&,
+            const GeometricField<Type, PatchField, GeoMesh>&
+        );
+
+        void scale
+        (
+            const GeometricField<Type, PatchField, GeoMesh>&,
+            const dimensioned<Type>&
+        );
 
 
     // Member operators

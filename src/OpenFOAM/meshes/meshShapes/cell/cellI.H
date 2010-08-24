@@ -26,34 +26,35 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-//- Construct null
-inline cell::cell()
+// Construct null
+inline Foam::cell::cell()
 {}
 
 
 // Construct given size
-inline cell::cell(label s)
+inline Foam::cell::cell(label s)
 :
     labelList(s, -1)
 {}
 
 
-//- Construct from components
-inline cell::cell(const labelList& f)
+// Construct from components
+inline Foam::cell::cell(const UList<label>& lst)
 :
-    labelList(f)
+    labelList(lst)
+{}
+
+
+inline Foam::cell::cell(const Xfer<labelList>& lst)
+:
+    labelList(lst)
 {}
 
 
 // Construct from Istream
-inline cell::cell(Istream& is)
+inline Foam::cell::cell(Istream& is)
 :
     labelList(is)
 {}
@@ -61,21 +62,16 @@ inline cell::cell(Istream& is)
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-//- Number of faces
-inline label cell::nFaces() const
+// Number of faces
+inline Foam::label Foam::cell::nFaces() const
 {
     return size();
 }
 
 
-inline bool operator!=(const cell& a, const cell& b)
+inline bool Foam::operator!=(const cell& a, const cell& b)
 {
     return (!(a == b));
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

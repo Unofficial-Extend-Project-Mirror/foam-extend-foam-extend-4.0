@@ -39,7 +39,6 @@ namespace Foam
 template<class Type>
 interpolationCell<Type>::interpolationCell
 (
-    const volPointInterpolation&,
     const GeometricField<Type, fvPatchField, volMesh>& psi
 )
 :

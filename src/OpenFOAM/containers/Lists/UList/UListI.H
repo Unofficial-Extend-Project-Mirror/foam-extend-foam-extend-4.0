@@ -25,6 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
+#include "pTraits.H"
 #include "Swap.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -47,6 +48,13 @@ inline Foam::UList<T>::UList(T* __restrict__ v, label size)
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+template<class T>
+inline const Foam::UList<T>& Foam::UList<T>::null()
+{
+    return *reinterpret_cast< UList<T>* >(0);
+}
+
+
 // Reset in slicing.  HJ. 19/Oct/2008
 template<class T>
 inline void Foam::UList<T>::reset(T* __restrict__ v, label size)
@@ -59,14 +67,14 @@ inline void Foam::UList<T>::reset(T* __restrict__ v, label size)
 template<class T>
 inline Foam::label Foam::UList<T>::fcIndex(const label i) const
 {
-    return (i == size()-1 ? 0 : i+1); 
+    return (i == size()-1 ? 0 : i+1);
 }
 
 
 template<class T>
 inline Foam::label Foam::UList<T>::rcIndex(const label i) const
 {
-    return (i == 0 ? size()-1 : i-1); 
+    return (i ? i-1 : size()-1);
 }
 
 
@@ -115,9 +123,24 @@ inline void Foam::UList<T>::checkIndex(const label i) const
 }
 
 
+template<class T>
+inline const T* Foam::UList<T>::cdata() const
+{
+    return v_;
+}
+
+
+template<class T>
+inline T* Foam::UList<T>::data()
+{
+    return v_;
+}
+
+
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
-// Return subscript-checked element access
+
+// element access
 template<class T>
 inline T& Foam::UList<T>::operator[](const label i)
 {
@@ -128,7 +151,28 @@ inline T& Foam::UList<T>::operator[](const label i)
 }
 
 
-// Return subscript-checked const element access
+namespace Foam
+{
+
+    // Template specialization for bool
+    template<>
+    inline const bool& Foam::UList<bool>::operator[](const label i) const
+    {
+        // lazy evaluation - return false for out-of-range
+        if (i < size_)
+        {
+            return v_[i];
+        }
+        else
+        {
+            return Foam::pTraits<bool>::zero;
+        }
+    }
+
+} // end of namespace Foam
+
+
+// const element access
 template<class T>
 inline const T& Foam::UList<T>::operator[](const label i) const
 {
@@ -164,6 +208,13 @@ Foam::UList<T>::begin() const
 }
 
 template<class T>
+inline typename Foam::UList<T>::const_iterator
+Foam::UList<T>::cbegin() const
+{
+    return v_;
+}
+
+template<class T>
 inline typename Foam::UList<T>::iterator
 Foam::UList<T>::end()
 {
@@ -173,6 +224,13 @@ Foam::UList<T>::end()
 template<class T>
 inline typename Foam::UList<T>::const_iterator
 Foam::UList<T>::end() const
+{
+    return &v_[size_];
+}
+
+template<class T>
+inline typename Foam::UList<T>::const_iterator
+Foam::UList<T>::cend() const
 {
     return &v_[size_];
 }
@@ -192,6 +250,13 @@ Foam::UList<T>::rbegin() const
 }
 
 template<class T>
+inline typename Foam::UList<T>::const_iterator
+Foam::UList<T>::crbegin() const
+{
+    return &v_[size_-1];
+}
+
+template<class T>
 inline typename Foam::UList<T>::iterator
 Foam::UList<T>::rend()
 {
@@ -201,6 +266,13 @@ Foam::UList<T>::rend()
 template<class T>
 inline typename Foam::UList<T>::const_iterator
 Foam::UList<T>::rend() const
+{
+    return &v_[-1];
+}
+
+template<class T>
+inline typename Foam::UList<T>::const_iterator
+Foam::UList<T>::crend() const
 {
     return &v_[-1];
 }
@@ -222,7 +294,7 @@ inline Foam::label Foam::UList<T>::max_size() const
 template<class T>
 inline bool Foam::UList<T>::empty() const
 {
-    return (size_ == 0);
+    return !size_;
 }
 
 

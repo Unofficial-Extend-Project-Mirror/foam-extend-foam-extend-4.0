@@ -41,7 +41,6 @@ SourceFiles
 #include "typeInfo.H"
 #include "autoPtr.H"
 #include "runTimeSelectionTables.H"
-//#include "eos.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -73,23 +72,22 @@ class liquid
 
         //- Triple point temperature [K]
         scalar Tt_;
-    
+
         //- Triple point pressure [Pa]
         scalar Pt_;
 
         //- Normal boiling temperature [K]
         scalar Tb_;
- 
+
         //- Dipole moment []
         scalar dipm_;
 
-        //- Pitzer's acentric factor []
+        //- Pitzer's accentric factor []
         scalar omega_;
 
         //- Solubility parameter [(J/m^3)^0.5]
         scalar delta_;
 
-    //eos state_;
 
 public:
 
@@ -164,81 +162,47 @@ public:
         static autoPtr<liquid> New(Istream& is);
 
 
-    // Destructor
-
-        virtual ~liquid()
-        {}
+    //- Destructor
+    virtual ~liquid()
+    {}
 
 
     // Member Functions
 
-        // Phisical constants which define the specie
+        // Physical constants which define the specie
 
             //- Molecular weight [kg/kmol]
-            scalar W() const
-            {
-                return W_;
-            }
+            inline scalar W() const;
 
             //- Critical temperature [K]
-            scalar Tc() const
-            {
-                return Tc_;
-            }
+            inline scalar Tc() const;
 
             //- Critical pressure [Pa]
-            scalar Pc() const
-            {
-                return Pc_;
-            }
+            inline scalar Pc() const;
 
             //- Critical volume [m^3/mol]
-            scalar Vc() const
-            {
-                return Vc_;
-            }
+            inline scalar Vc() const;
 
             //- Critical compressibilty factor
-            scalar Zc() const
-            {
-                return Zc_;
-            }
+            inline scalar Zc() const;
 
             //- Triple point temperature [K]
-            scalar Tt() const
-            {
-                return Tt_;
-            }
+            inline scalar Tt() const;
 
             //- Triple point pressure [Pa]
-            scalar Pt() const
-            {
-                return Pt_;
-            }
+            inline scalar Pt() const;
 
             //- Normal boiling temperature [K]
-            scalar Tb() const
-            {
-                return Tb_;
-            }
+            inline scalar Tb() const;
 
             //- Dipole moment []
-            scalar dipm() const
-            {
-                return dipm_;
-            }
+            inline scalar dipm() const;
 
             //- Pitzer's ascentric factor []
-            scalar omega() const
-            {
-                return omega_;
-            }
+            inline scalar omega() const;
 
             //- Solubility parameter [(J/m^3)^(1/2)]
-            scalar delta() const
-            {
-                return delta_;
-            }
+            inline scalar delta() const;
 
 
         // Physical property pure virtual functions
@@ -255,7 +219,7 @@ public:
             //- Liquid heat capacity [J/(kg K)]
             virtual scalar cp(scalar p, scalar T) const = 0;
 
-            //- Liquid h [J/kg]
+            //- Liquid enthalpy [J/kg] - reference to 298.15 K
             virtual scalar h(scalar p, scalar T) const = 0;
 
             //- Ideal gas heat capacity [J/(kg K)]
@@ -279,6 +243,11 @@ public:
             //- Vapour diffussivity [m2/s]
             virtual scalar D(scalar p, scalar T) const = 0;
 
+            //- Vapour diffussivity [m2/s] with specified binary pair
+            virtual scalar D(scalar p, scalar T, scalar Wb) const = 0;
+
+
+    // I-O
 
         //- Write the function coefficients
         virtual void writeData(Ostream& os) const
@@ -292,9 +261,7 @@ public:
                 << delta_;
         }
 
-
-    // Ostream Operator
-
+        //- Ostream Operator
         friend Ostream& operator<<(Ostream& os, const liquid& l)
         {
             l.writeData(os);
@@ -306,6 +273,10 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "liquidI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

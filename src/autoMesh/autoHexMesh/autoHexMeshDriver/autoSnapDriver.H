@@ -92,7 +92,7 @@ class autoSnapDriver
             (
                 const scalar tol,
                 const pointField&,
-                PackedList<1>&
+                PackedBoolList&
             );
 
             //- Calculate displacement per patch point to smooth out patch.

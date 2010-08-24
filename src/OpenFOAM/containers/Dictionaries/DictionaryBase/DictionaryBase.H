@@ -29,12 +29,12 @@ Description
     Base dictionary class templated on both the form of doubly-linked list
     it uses as well as the type it holds.
 
-    The double templating allows for the instantiation of forms with and
+    The double templating allows for the instantiation of forms with or
     without storage management.
 
 Note
     The IDLListType parameter should itself be a template but this confused
-    gcc 2.95.2 so it has to be instantiated for T when an intantiation of
+    gcc 2.95.2 so it has to be instantiated for T when an instantiation of
     DictionaryBase is requested
 
 See Also
@@ -67,7 +67,7 @@ Ostream& operator<<(Ostream&, const DictionaryBase<IDLListType, T>&);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class DictionaryBase Declaration
+                      Class DictionaryBase Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class IDLListType, class T>
@@ -77,7 +77,7 @@ class DictionaryBase
 {
     // Private data
 
-        //- HashTable of the enries held on the DL-list for quick lookup
+        //- HashTable of the entries held on the IDLListType for quick lookup
         HashTable<T*> hashedTs_;
 
 
@@ -99,10 +99,10 @@ public:
 
         //- Construct from Istream using given Istream constructor class
         template<class INew>
-        DictionaryBase(Istream& is, const INew& inewt);
+        DictionaryBase(Istream&, const INew&);
 
-        //- Construct from Istream
-        DictionaryBase(Istream& is);
+        //- Construct from Istream using default Istream constructor class
+        DictionaryBase(Istream&);
 
 
     // Member functions
@@ -110,7 +110,13 @@ public:
         // Search and lookup
 
             //- Search DictionaryBase for given keyword
-            bool found(const word& keyword) const;
+            bool found(const word&) const;
+
+            //- Find and return an entry if present, otherwise return NULL
+            const T* lookupPtr(const word&) const;
+
+            //- Find and return an entry if present, otherwise return NULL
+            T* lookupPtr(const word&);
 
             //- Find and return entry
             const T* lookup(const word&) const;
@@ -125,17 +131,21 @@ public:
         // Editing
 
             //- Add at head of dictionary
-            void insert(const word& keyword, T*);
+            void insert(const word&, T*);
 
             //- Add at tail of dictionary
-            void append(const word& keyword, T*);
+            void append(const word&, T*);
 
-            //- Remove and return entry specified by keyword
-            T* remove(const word& keyword);
+            //- Remove and return entry specified by keyword.
+            //  Return NULL if the keyword was not found.
+            T* remove(const word&);
 
             //- Clear the dictionary
             void clear();
 
+            //- Transfer the contents of the argument into this DictionaryBase
+            //  and annull the argument.
+            void transfer(DictionaryBase<IDLListType, T>&);
 
     // Member operators
 

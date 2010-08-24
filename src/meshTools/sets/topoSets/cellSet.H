@@ -88,6 +88,15 @@ public:
             writeOption w=NO_WRITE
         );
 
+        //- Construct from existing set
+        cellSet
+        (
+            const polyMesh& mesh,
+            const word& name,
+            const topoSet&,
+            writeOption w = NO_WRITE
+        );
+
         //- Construct from labelHashSet
         cellSet
         (

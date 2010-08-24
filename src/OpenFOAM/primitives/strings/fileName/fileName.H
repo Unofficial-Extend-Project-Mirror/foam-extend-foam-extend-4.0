@@ -64,7 +64,7 @@ Ostream& operator<<(Ostream&, const fileName&);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class fileName Declaration
+                          Class fileName Declaration
 \*---------------------------------------------------------------------------*/
 
 class fileName
@@ -73,7 +73,7 @@ class fileName
 {
     // Private member functions
 
-        //- Strip invalid characters from this word
+        //- Strip invalid characters
         inline void stripInvalid();
 
 
@@ -102,16 +102,16 @@ public:
         inline fileName();
 
         //- Construct as copy
-        inline fileName(const fileName& fn);
+        inline fileName(const fileName&);
 
         //- Construct as copy of word
-        inline fileName(const word& w);
+        inline fileName(const word&);
 
         //- Construct as copy of string
-        inline fileName(const string& s);
+        inline fileName(const string&);
 
         //- Construct as copy of std::string
-        inline fileName(const std::string& s);
+        inline fileName(const std::string&);
 
         //- Construct as copy of character array
         inline fileName(const char*);
@@ -125,9 +125,21 @@ public:
 
     // Member functions
 
-        //- Is this character valid for a fileName
+        //- Is this character valid for a fileName?
         inline static bool valid(char);
 
+        //- Cleanup file name
+        //  eg, remove repeated slashes, etc.
+        bool clean();
+
+        //- Cleanup file name
+        //  eg, remove repeated slashes, etc.
+        fileName clean() const;
+
+        // Interogation
+
+            //- Return the file type: FILE, DIRECTORY or UNDEFINED
+            Type type() const;
 
         // Decomposition
 
@@ -146,25 +158,18 @@ public:
             //- Return path components as wordList
             wordList components(const char delimiter='/') const;
 
-            //- Return a component of the path
-            word component(const size_t, const char delimiter='/') const;
-
-
-        // Interogation
-
-            //- Return file type
-            Type type() const;
-
+            //- Return a single component of the path
+            word component(const size_type, const char delimiter='/') const;
 
     // Member operators
 
         // Assignment
 
-            void operator=(const fileName&);
-            void operator=(const word&);
-            void operator=(const string&);
-            void operator=(const std::string&);
-            void operator=(const char*);
+            const fileName& operator=(const fileName&);
+            const fileName& operator=(const word&);
+            const fileName& operator=(const string&);
+            const fileName& operator=(const std::string&);
+            const fileName& operator=(const char*);
 
 
     // IOstream operators

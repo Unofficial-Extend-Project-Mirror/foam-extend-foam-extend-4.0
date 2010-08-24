@@ -29,16 +29,11 @@ License
 #include "Ostream.H"
 #include "INew.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
 template<class LListBase, class T>
 template<class INew>
-void LPtrList<LListBase, T>::read(Istream& is, const INew& inewt)
+void Foam::LPtrList<LListBase, T>::read(Istream& is, const INew& iNew)
 {
     is.fatalCheck
     (
@@ -58,16 +53,16 @@ void LPtrList<LListBase, T>::read(Istream& is, const INew& inewt)
         label s = firstToken.labelToken();
 
         // Read beginning of contents
-        char listDelimiter = is.readBeginList("LPtrList<LListBase, T>");
+        char delimiter = is.readBeginList("LPtrList<LListBase, T>");
 
         if (s)
         {
-            if (listDelimiter == token::BEGIN_LIST)
+            if (delimiter == token::BEGIN_LIST)
             {
                 for (label i=0; i<s; i++)
                 {
-                    append(inewt(is).ptr());
-                
+                    append(iNew(is).ptr());
+
                     is.fatalCheck
                     (
                         "LPtrList<LListBase, T>::read(Istream&, const INew&) : "
@@ -77,7 +72,7 @@ void LPtrList<LListBase, T>::read(Istream& is, const INew& inewt)
             }
             else
             {
-                T* tPtr = inewt(is).ptr();
+                T* tPtr = iNew(is).ptr();
                 append(tPtr);
 
                 is.fatalCheck
@@ -85,7 +80,7 @@ void LPtrList<LListBase, T>::read(Istream& is, const INew& inewt)
                     "LPtrList<LListBase, T>::read(Istream&, const INew&) : "
                     "reading entry"
                 );
-                
+
                 for (label i=1; i<s; i++)
                 {
                     append(tPtr->clone().ptr());
@@ -120,7 +115,7 @@ void LPtrList<LListBase, T>::read(Istream& is, const INew& inewt)
         )
         {
             is.putBack(lastToken);
-            append(inewt(is).ptr());
+            append(iNew(is).ptr());
 
             is >> lastToken;
             is.fatalCheck
@@ -148,14 +143,14 @@ void LPtrList<LListBase, T>::read(Istream& is, const INew& inewt)
 
 template<class LListBase, class T>
 template<class INew>
-LPtrList<LListBase, T>::LPtrList(Istream& is, const INew& inewt)
+Foam::LPtrList<LListBase, T>::LPtrList(Istream& is, const INew& iNew)
 {
-    read(is, inewt);
+    read(is, iNew);
 }
 
 
 template<class LListBase, class T>
-LPtrList<LListBase, T>::LPtrList(Istream& is)
+Foam::LPtrList<LListBase, T>::LPtrList(Istream& is)
 {
     read(is, INew<T>());
 }
@@ -164,11 +159,10 @@ LPtrList<LListBase, T>::LPtrList(Istream& is)
 // * * * * * * * * * * * * * * * Istream Operator  * * * * * * * * * * * * * //
 
 template<class LListBase, class T>
-Istream& operator>>(Istream& is, LPtrList<LListBase, T>& L)
+Foam::Istream& Foam::operator>>(Istream& is, LPtrList<LListBase, T>& L)
 {
-    // Anull list
     L.clear();
-
+    L.read(is, INew<T>());
 
     return is;
 }
@@ -177,19 +171,19 @@ Istream& operator>>(Istream& is, LPtrList<LListBase, T>& L)
 // * * * * * * * * * * * * * * * Ostream Operators * * * * * * * * * * * * * //
 
 template<class LListBase, class T>
-Ostream& operator<<(Ostream& os, const LPtrList<LListBase, T>& slpl)
+Foam::Ostream& Foam::operator<<(Ostream& os, const LPtrList<LListBase, T>& lst)
 {
-    // Write size of LPtrList
-    os << nl << slpl.size();
+    // Write size
+    os << nl << lst.size();
 
     // Write beginning of contents
     os << nl << token::BEGIN_LIST << nl;
 
-    // Write LPtrList contents
+    // Write contents
     for
     (
-        typename LPtrList<LListBase, T>::const_iterator iter = slpl.begin();
-        iter != slpl.end();
+        typename LPtrList<LListBase, T>::const_iterator iter = lst.begin();
+        iter != lst.end();
         ++iter
     )
     {
@@ -200,14 +194,9 @@ Ostream& operator<<(Ostream& os, const LPtrList<LListBase, T>& slpl)
     os << token::END_LIST;
 
     // Check state of IOstream
-    os.check("Ostream& operator<<(Ostream&, const LPtrList&)");
+    os.check("Ostream& operator<<(Ostream&, const LPtrList<LListBase, T>&)");
 
     return os;
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

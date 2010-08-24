@@ -25,7 +25,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "GaussSeidelSmoother.H"
-#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -33,7 +32,11 @@ namespace Foam
 {
     defineTypeNameAndDebug(GaussSeidelSmoother, 0);
 
-    addToRunTimeSelectionTable(lduSmoother, GaussSeidelSmoother, word);
+    lduSmoother::addsymMatrixConstructorToTable<GaussSeidelSmoother>
+        addGaussSeidelSmootherSymMatrixConstructorToTable_;
+
+    lduSmoother::addasymMatrixConstructorToTable<GaussSeidelSmoother>
+        addGaussSeidelSmootherAsymMatrixConstructorToTable_;
 }
 
 
@@ -80,7 +83,6 @@ void Foam::GaussSeidelSmoother::smooth
     register const scalar* const __restrict__ diagPtr = matrix_.diag().begin();
     register const scalar* const __restrict__ upperPtr =
         matrix_.upper().begin();
-
     register const scalar* const __restrict__ lowerPtr =
         matrix_.lower().begin();
 
@@ -141,19 +143,6 @@ void Foam::GaussSeidelSmoother::smooth
 
         for (register label cellI=0; cellI<nCells; cellI++)
         {
-            #ifdef ICC_IA64_PREFETCH
-            __builtin_prefetch (&xPtr[cellI+64],0,1);
-            __builtin_prefetch (&bPrimePtr[cellI+64],0,1);
-            __builtin_prefetch (&ownStartPtr[cellI+64],0,1);
-            __builtin_prefetch (&diagPtr[cellI+64],0,1);
-            __builtin_prefetch (&uPtr[ownStartPtr[cellI+24]],0,1);
-            __builtin_prefetch (&uPtr[ownStartPtr[cellI+25]],0,1);
-            __builtin_prefetch (&uPtr[ownStartPtr[cellI+26]],0,1);
-            __builtin_prefetch (&uPtr[ownStartPtr[cellI+27]],0,1);
-            __builtin_prefetch (&upperPtr[ownStartPtr[cellI+24]],0,1);
-            __builtin_prefetch (&lowerPtr[ownStartPtr[cellI+24]],0,1);
-            #endif
-
             // Start and end of this row
             fStart = fEnd;
             fEnd = ownStartPtr[cellI + 1];

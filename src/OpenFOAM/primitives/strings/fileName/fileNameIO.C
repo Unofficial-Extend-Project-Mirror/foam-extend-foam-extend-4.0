@@ -53,9 +53,9 @@ Foam::Istream& Foam::operator>>(Istream& is, fileName& fn)
 }
 
 
-Foam::Ostream& Foam::operator<<(Ostream& os, const fileName& s)
+Foam::Ostream& Foam::operator<<(Ostream& os, const fileName& fn)
 {
-    os.write(s);
+    os.write(fn);
     os.check("Ostream& operator<<(Ostream&, const fileName&)");
     return os;
 }

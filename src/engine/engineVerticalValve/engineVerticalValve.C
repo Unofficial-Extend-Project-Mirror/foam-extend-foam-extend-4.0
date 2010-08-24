@@ -29,11 +29,8 @@ License
 #include "polyMesh.H"
 #include "interpolateXY.H"
 
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from components
 Foam::engineVerticalValve::engineVerticalValve
 (
     const word& name,
@@ -112,16 +109,16 @@ Foam::engineVerticalValve::engineVerticalValve
     ),
     valveHeadPatch_
     (
-        dict.lookup("valveHeadPatch"), 
+        dict.lookup("valveHeadPatch"),
         mesh.boundaryMesh()
     ),
     topLayerOffset_(readScalar(dict.lookup("topLayerOffset"))),
-    topLayerTol_(readScalar(dict.lookup("topLayerTol"))),    
+    topLayerTol_(readScalar(dict.lookup("topLayerTol"))),
     bottomLayerOffset_(readScalar(dict.lookup("bottomLayerOffset"))),
-    bottomLayerTol_(readScalar(dict.lookup("bottomLayerTol"))),   
+    bottomLayerTol_(readScalar(dict.lookup("bottomLayerTol"))),
     detachDistance_(readScalar(dict.lookup("detachDistance"))),
-    detachTol_(readScalar(dict.lookup("detachTol"))),    
-    deformationLift_(readScalar(dict.lookup("deformationLift")))    
+    detachTol_(readScalar(dict.lookup("detachTol"))),
+    deformationLift_(readScalar(dict.lookup("deformationLift")))
 {}
 
 
@@ -134,8 +131,10 @@ void Foam::engineVerticalValve::writeDict(Ostream& os) const
 
 
     os  << "headPatch " << valveHeadPatch_.name() << token::END_STATEMENT << nl
-        << "bottomLayerOffset " << bottomLayerOffset_ << token::END_STATEMENT << nl
-        << "bottomLayerOffsetayerTol " << bottomLayerTol_ << token::END_STATEMENT << nl
+        << "bottomLayerOffset " << bottomLayerOffset_
+        << token::END_STATEMENT << nl
+        << "bottomLayerOffsetayerTol " << bottomLayerTol_
+       << token::END_STATEMENT << nl
         << "topLayerOffset " << topLayerOffset_ << token::END_STATEMENT << nl
         << "topLayerTol " << topLayerTol_ << token::END_STATEMENT << nl
         << "detachDistance " << detachDistance_ << token::END_STATEMENT << nl

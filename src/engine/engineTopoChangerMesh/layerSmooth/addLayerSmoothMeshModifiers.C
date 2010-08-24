@@ -1,22 +1,28 @@
-// The FOAM Project // File: layerSmooth.C
-/* 
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
- =========         | Class Implementation
- \\      /         |
-  \\    /          | Name:   layerSmooth
-   \\  /           | Family: engine
-    \\/            |
-    F ield         | FOAM version: 2.3
-    O peration     |
-    A and          | Copyright (C) 1991-2004 Nabla Ltd.
-    M anipulation  |          All Rights Reserved.
--------------------------------------------------------------------------------
-DESCRIPTION
+License
+    This file is part of OpenFOAM.
 
-AUTHOR
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
 
--------------------------------------------------------------------------------
-*/
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+\*---------------------------------------------------------------------------*/
 
 #include "layerSmooth.H"
 #include "slidingInterface.H"
@@ -41,23 +47,21 @@ void Foam::layerSmooth::addZonesAndModifiers()
         pointZones().size() > 0
      && faceZones().size() > 0
      && topoChanger_.size() > 0
-
-    ) 
+    )
     {
         Info<< "Time = " << engTime().theta() << endl;
         Info<< "void Foam::layerSmooth::addZonesAndModifiers() : "
             << "Zones and modifiers already present.  Skipping."
             << endl;
-        
+
         setVirtualPositions();
         checkAndCalculate();
 
         Info << "Point zones found = " << pointZones().size() << endl;
         Info << "Face zones found = " << faceZones().size() << endl;
         Info << "Cell zones found = " << cellZones().size() << endl;
-        
-        return;
 
+        return;
     }
     else
     {
@@ -67,23 +71,33 @@ void Foam::layerSmooth::addZonesAndModifiers()
         topoChanger_.setSize(0);
     }
 
-    
-    
-    
-    if(engTime().engineDict().found("zOffsetGambit") && engTime().engineDict().found("zDisplGambit"))
+    if
+    (
+        engTime().engineDict().found("zOffsetGambit")
+     && engTime().engineDict().found("zDisplGambit")
+    )
     {
-        
         Info << "Assembling the cylinder mesh" << endl;
-        
-        scalar zOffset(readScalar(engTime().engineDict().lookup("zOffsetGambit")));
-        scalar zDispl(readScalar(engTime().engineDict().lookup("zDisplGambit")));
-        
-        pointField pDispl = points();
 
-        forAll(points(), pointI)
+        scalar zOffset
+        (
+            readScalar(engTime().engineDict().lookup("zOffsetGambit"))
+        );
+
+        scalar zDispl
+        (
+            readScalar(engTime().engineDict().lookup("zDisplGambit"))
+        );
+
+        const pointField& ap = allPoints();
+
+        pointField pDispl = allPoints();
+
+        forAll(ap, pointI)
         {
-            const point p = points()[pointI];
-            if(p.z() >= zOffset)
+            const point p = ap[pointI];
+
+            if (p.z() >= zOffset)
             {
                 pDispl[pointI].z() -= zDispl;
             }
@@ -95,7 +109,7 @@ void Foam::layerSmooth::addZonesAndModifiers()
         resetMotion();
 
         Info << "Cylinder mesh assembled" << endl;
-    }  
+    }
 
 
 
@@ -109,9 +123,9 @@ void Foam::layerSmooth::addZonesAndModifiers()
     Point zones
     1) Piston points
 */
-    
+
     DynamicList<pointZone*> pz;
- 
+
 /*
     Face zones
     1) Piston layer faces
@@ -143,8 +157,9 @@ void Foam::layerSmooth::addZonesAndModifiers()
 
 #   include "addAttachDetachFacesLayerSmooth.H"
 
-    Info<< "Adding " << nPointZones << " point, "
-        << nFaceZones << " face zones and " << nCellZones << " cell zones" << endl;
+    Info<< "Adding " << nPointZones << " point zones, "
+        << nFaceZones << " face zones and "
+        << nCellZones << " cell zones" << endl;
 
     pz.setSize(nPointZones);
     Info << "setSize pz" << endl;

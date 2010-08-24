@@ -25,7 +25,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "DICPreconditioner.H"
-#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -33,16 +32,28 @@ namespace Foam
 {
     defineTypeNameAndDebug(DICPreconditioner, 0);
 
-    addToRunTimeSelectionTable
-    (
-        lduPreconditioner,
-        DICPreconditioner,
-        dictionary
-    );
+    lduMatrix::preconditioner::
+        addsymMatrixConstructorToTable<DICPreconditioner>
+        addDICPreconditionerSymMatrixConstructorToTable_;
 }
 
 
-// * * * * * * * * * * * * Static Member Functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::DICPreconditioner::DICPreconditioner
+(
+    const lduMatrix::solver& sol,
+    const dictionary&
+)
+:
+    lduMatrix::preconditioner(sol),
+    rD_(sol.matrix().diag())
+{
+    calcReciprocalD(rD_, sol.matrix());
+}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void Foam::DICPreconditioner::calcReciprocalD
 (
@@ -60,29 +71,15 @@ void Foam::DICPreconditioner::calcReciprocalD
     register const label nFaces = matrix.upper().size();
     for (register label face=0; face<nFaces; face++)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&uPtr[face+96],0,0);
-        __builtin_prefetch (&lPtr[face+96],0,0);
-        __builtin_prefetch (&upperPtr[face+96],0,1);
-        __builtin_prefetch (&rDPtr[lPtr[face+24]],0,1);
-        __builtin_prefetch (&rDPtr[uPtr[face+24]],1,1);
-        #endif
-
         rDPtr[uPtr[face]] -= upperPtr[face]*upperPtr[face]/rDPtr[lPtr[face]];
     }
 
 
     // Calculate the reciprocal of the preconditioned diagonal
     register const label nCells = rD.size();
-    #ifdef ICC_IA64_PREFETCH
-    #pragma ivdep
-    #endif
+
     for (register label cell=0; cell<nCells; cell++)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&rDPtr[cell+96],0,1);
-        #endif
-
         rDPtr[cell] = 1.0/rDPtr[cell];
     }
 }
@@ -135,61 +132,18 @@ void Foam::DICPreconditioner::precondition
     register label nFaces = matrix_.upper().size();
     register label nFacesM1 = nFaces - 1;
 
-    #ifdef ICC_IA64_PREFETCH
-    #pragma ivdep
-    #endif
-
     for (register label cell=0; cell<nCells; cell++)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&wAPtr[cell+96],0,1);
-        __builtin_prefetch (&rDPtr[cell+96],0,1);
-        __builtin_prefetch (&rAPtr[cell+96],0,1);
-        #endif
-
         wAPtr[cell] = rDPtr[cell]*rAPtr[cell];
     }
 
-    #ifdef ICC_IA64_PREFETCH
-    #pragma noprefetch uPtr,lPtr,upperPtr,rDPtr,wAPtr
-    #pragma nounroll
-    #endif
-
     for (register label face=0; face<nFaces; face++)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&uPtr[face+96],0,0);
-        __builtin_prefetch (&lPtr[face+96],0,0);
-        __builtin_prefetch (&upperPtr[face+96],0,0);
-        __builtin_prefetch (&rDPtr[uPtr[face+32]],0,1);
-        __builtin_prefetch (&wAPtr[uPtr[face+32]],0,1); 
-        __builtin_prefetch (&wAPtr[lPtr[face+32]],0,1);
-        #endif
-
         wAPtr[uPtr[face]] -= rDPtr[uPtr[face]]*upperPtr[face]*wAPtr[lPtr[face]];
     }
 
-    #ifdef ICC_IA64_PREFETCH
-    #pragma noprefetch uPtr,lPtr,rDPtr,wAPtr
-    #pragma nounroll
-    #endif
-
     for (register label face=nFacesM1; face>=0; face--)
     {
-        #ifdef ICC_IA64_PREFETCH
-        __builtin_prefetch (&uPtr[face-95],0,0);
-        __builtin_prefetch (&lPtr[face-95],0,0);
-        __builtin_prefetch (&rDPtr[lPtr[face-16]],0,1);
-        __builtin_prefetch (&wAPtr[lPtr[face-16]],0,1);
-        __builtin_prefetch (&wAPtr[uPtr[face-16]],0,1);
-        __builtin_prefetch (&rDPtr[lPtr[face-24]],0,1);
-        __builtin_prefetch (&wAPtr[lPtr[face-24]],0,1);
-        __builtin_prefetch (&wAPtr[uPtr[face-24]],0,1);
-        __builtin_prefetch (&rDPtr[lPtr[face-32]],0,1);
-        __builtin_prefetch (&wAPtr[lPtr[face-32]],0,1);
-        __builtin_prefetch (&wAPtr[uPtr[face-32]],0,1);
-        #endif
-
         wAPtr[lPtr[face]] -= rDPtr[lPtr[face]]*upperPtr[face]*wAPtr[uPtr[face]];
     }
 }

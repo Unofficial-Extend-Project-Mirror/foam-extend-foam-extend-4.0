@@ -56,8 +56,8 @@ Foam::SRF::SRFModel::SRFModel
         IOobject
         (
             "SRFProperties",
-            Urel.mesh().time().constant(),
-            Urel.mesh().db(),
+            Urel.time().constant(),
+            Urel.db(),
             IOobject::MUST_READ,
             IOobject::NO_WRITE
         )

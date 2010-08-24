@@ -40,7 +40,7 @@ SourceFiles
 
 #include "dynamicFvMesh.H"
 #include "hexRef8.H"
-#include "PackedList.H"
+#include "PackedBoolList.H"
 #include "Switch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -71,17 +71,17 @@ protected:
         label nRefinementIterations_;
 
         //- Protected cells (usually since not hexes)
-        PackedList<1> protectedCell_;
+        PackedBoolList protectedCell_;
 
 
     // Private Member Functions
 
         //- Count set/unset elements in packedlist.
-        static label count(const PackedList<1>&, const unsigned int);
+        static label count(const PackedBoolList&, const unsigned int);
 
         //- Calculate cells that cannot be refined since would trigger
         //  refinement of protectedCell_ (since 2:1 refinement cascade)
-        void calculateProtectedCells(PackedList<1>& unrefineableCell) const;
+        void calculateProtectedCells(PackedBoolList& unrefineableCell) const;
 
         //- Read the projection parameters from dictionary
         void readDict();
@@ -127,7 +127,7 @@ protected:
                 const scalar lowerRefineLevel,
                 const scalar upperRefineLevel,
                 const scalarField& vFld,
-                PackedList<1>& candidateCell
+                PackedBoolList& candidateCell
             ) const;
 
             //- Subset candidate cells for refinement
@@ -135,19 +135,19 @@ protected:
             (
                 const label maxCells,
                 const label maxRefinement,
-                const PackedList<1>& candidateCell
+                const PackedBoolList& candidateCell
             ) const;
 
             //- Select points that can be unrefined.
             virtual labelList selectUnrefinePoints
             (
                 const scalar unrefineLevel,
-                const PackedList<1>& markedCell,
+                const PackedBoolList& markedCell,
                 const scalarField& pFld
             ) const;
 
             //- Extend markedCell with cell-face-cell.
-            void extendMarkedCells(PackedList<1>& markedCell) const;
+            void extendMarkedCells(PackedBoolList& markedCell) const;
 
 
 private:
@@ -184,13 +184,13 @@ public:
         }
 
         //- Cells which should not be refined/unrefined
-        const PackedList<1>& protectedCell() const
+        const PackedBoolList& protectedCell() const
         {
             return protectedCell_;
         }
 
         //- Cells which should not be refined/unrefined
-        PackedList<1>& protectedCell()
+        PackedBoolList& protectedCell()
         {
             return protectedCell_;
         }

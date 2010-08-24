@@ -94,6 +94,12 @@ public:
             index_(-1)
         {}
 
+        //- Construct from Istream
+        PointIndexHit(Istream& is)
+        {
+            is >> *this;
+        }
+
 
     // Member Functions
 
@@ -193,13 +199,45 @@ public:
 
         friend Ostream& operator<< (Ostream& os, const PointIndexHit& pHit)
         {
-            return os << pHit.hit_ << token::SPACE << pHit.hitPoint_
-                << token::SPACE << pHit.index_;
+            if (os.format() == IOstream::ASCII)
+            {
+                os  << pHit.hit_ << token::SPACE << pHit.hitPoint_
+                    << token::SPACE << pHit.index_;
+            }
+            else
+            {
+                os.write
+                (
+                    reinterpret_cast<const char*>(&pHit),
+                    sizeof(PointIndexHit)
+                );
+            }
+
+            // Check state of Ostream
+            os.check("Ostream& operator<<(Ostream&, const PointIndexHit&)");
+
+            return os;
         }
 
         friend Istream& operator>>(Istream& is, PointIndexHit& pHit)
         {
-            return is >> pHit.hit_ >> pHit.hitPoint_ >> pHit.index_;
+            if (is.format() == IOstream::ASCII)
+            {
+                return is >> pHit.hit_ >> pHit.hitPoint_ >> pHit.index_;
+            }
+            else
+            {
+                is.read
+                (
+                    reinterpret_cast<char*>(&pHit),
+                    sizeof(PointIndexHit)
+                );
+            }
+
+            // Check state of Istream
+            is.check("Istream& operator>>(Istream&, PointIndexHit&)");
+
+            return is;
         }
 
 };

@@ -140,6 +140,12 @@ public:
             // Enthalpy [J/kmol]
             //scalar h(const scalar) const;
 
+            // Sensible enthalpy [J/kmol]
+            //scalar hs(const scalar) const;
+
+            // Chemical enthalpy [J/kmol]
+            //scalar hc(const scalar) const;
+
             // Entropy [J/(kmol K)]
             //scalar s(const scalar) const;
 
@@ -158,6 +164,9 @@ public:
                 //- Internal energy [J/kmol]
                 inline scalar e(const scalar T) const;
 
+                //- Sensible internal energy [J/kmol]
+                inline scalar es(const scalar T) const;
+
                 //- Gibbs free energy [J/kmol]
                 inline scalar g(const scalar T) const;
 
@@ -175,7 +184,7 @@ public:
 
                 //- Enthalpy [J/kg]
                 inline scalar H(const scalar T) const;
-
+                
                 //- Entropy [J/(kg K)]
                 inline scalar S(const scalar T) const;
 
@@ -226,6 +235,9 @@ public:
 
             //- Temperature from Enthalpy given an initial temperature T0
             inline scalar TH(const scalar H, const scalar T0) const;
+
+            //- Temperature from sensible Enthalpy given an initial T0
+            inline scalar THs(const scalar Hs, const scalar T0) const;
 
             //- Temperature from internal energy given an initial temperature T0
             inline scalar TE(const scalar E, const scalar T0) const;

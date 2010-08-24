@@ -27,7 +27,9 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+#include "keyType.H"
 #include "dictionaryEntry.H"
+#include "IOstreams.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -37,33 +39,31 @@ Foam::dictionaryEntry::dictionaryEntry
     Istream& is
 )
 :
-    entry(is),
+    entry(keyType(is)),
     dictionary(parentDict, is)
 {
     is.fatalCheck
     (
         "dictionaryEntry::dictionaryEntry"
-        "(Istream& is, const dictionary& parentDict)"
+        "(const dictionary& parentDict, Istream&)"
     );
 }
 
 
 Foam::dictionaryEntry::dictionaryEntry
 (
-    const word& key,
+    const keyType& key,
     const dictionary& parentDict,
     Istream& is
 )
 :
     entry(key),
-    dictionary(parentDict, is)
+    dictionary(key, parentDict, is)
 {
-    name() += "::" + key;
-
     is.fatalCheck
     (
         "dictionaryEntry::dictionaryEntry"
-        "(const word& keyword, const dictionary& parentDict, Istream& is)"
+        "(const keyType&, const dictionary& parentDict, Istream&)"
     );
 }
 
@@ -72,7 +72,9 @@ Foam::dictionaryEntry::dictionaryEntry
 
 void Foam::dictionaryEntry::write(Ostream& os) const
 {
-    os.writeKeyword(keyword());
+    // write keyword with indent but without trailing spaces
+    os.indent();
+    os.write(keyword());
     dictionary::write(os);
 }
 

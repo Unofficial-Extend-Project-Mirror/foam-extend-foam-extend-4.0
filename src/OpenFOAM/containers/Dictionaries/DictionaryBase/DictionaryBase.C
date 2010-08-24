@@ -26,15 +26,10 @@ License
 
 #include "DictionaryBase.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class IDLListType, class T>
-void DictionaryBase<IDLListType, T>::addEntries()
+void Foam::DictionaryBase<IDLListType, T>::addEntries()
 {
     for
     (
@@ -51,12 +46,15 @@ void DictionaryBase<IDLListType, T>::addEntries()
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class IDLListType, class T>
-DictionaryBase<IDLListType, T>::DictionaryBase()
+Foam::DictionaryBase<IDLListType, T>::DictionaryBase()
 {}
 
 
 template<class IDLListType, class T>
-DictionaryBase<IDLListType, T>::DictionaryBase(const DictionaryBase& dict)
+Foam::DictionaryBase<IDLListType, T>::DictionaryBase
+(
+    const DictionaryBase& dict
+)
 :
     IDLListType(dict)
 {
@@ -66,17 +64,20 @@ DictionaryBase<IDLListType, T>::DictionaryBase(const DictionaryBase& dict)
 
 template<class IDLListType, class T>
 template<class INew>
-DictionaryBase<IDLListType, T>::DictionaryBase(Istream& is, const INew& inewt)
+Foam::DictionaryBase<IDLListType, T>::DictionaryBase
+(
+    Istream& is,
+    const INew& iNew
+)
 :
-    IDLListType(is, inewt)
+    IDLListType(is, iNew)
 {
     addEntries();
 }
 
 
-// Istream constructor
 template<class IDLListType, class T>
-DictionaryBase<IDLListType, T>::DictionaryBase(Istream& is)
+Foam::DictionaryBase<IDLListType, T>::DictionaryBase(Istream& is)
 :
     IDLListType(is)
 {
@@ -88,25 +89,60 @@ DictionaryBase<IDLListType, T>::DictionaryBase(Istream& is)
 
 // Find and return T
 template<class IDLListType, class T>
-bool DictionaryBase<IDLListType, T>::found(const word& keyword) const
+bool Foam::DictionaryBase<IDLListType, T>::found(const word& keyword) const
 {
     return hashedTs_.found(keyword);
 }
 
 
-// Find and return T*
+// Find and return T*, return NULL if not found
 template<class IDLListType, class T>
-const T* DictionaryBase<IDLListType, T>::lookup(const word& keyword) const
+const T* Foam::DictionaryBase<IDLListType, T>::lookupPtr
+(
+    const word& keyword
+) const
+{
+    typename HashTable<T*>::const_iterator iter = hashedTs_.find(keyword);
+
+    if (iter != hashedTs_.end())
+    {
+        return *iter;
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+
+// Find and return T*, return NULL if not found
+template<class IDLListType, class T>
+T* Foam::DictionaryBase<IDLListType, T>::lookupPtr(const word& keyword)
+{
+    typename HashTable<T*>::iterator iter = hashedTs_.find(keyword);
+
+    if (iter != hashedTs_.end())
+    {
+        return *iter;
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+
+// Find and return T*, FatalError if keyword not found
+template<class IDLListType, class T>
+const T* Foam::DictionaryBase<IDLListType, T>::lookup(const word& keyword) const
 {
     typename HashTable<T*>::const_iterator iter = hashedTs_.find(keyword);
 
     if (iter == hashedTs_.end())
     {
-        // If keyword not found print error message ...
         FatalErrorIn
         (
-            "DictionaryBase<IDLListType, T>::"
-            "lookup(const word& keyword) const"
+            "DictionaryBase<IDLListType, T>::lookup(const word&) const"
         )   << keyword << " is undefined"
             << exit(FatalError);
     }
@@ -115,18 +151,17 @@ const T* DictionaryBase<IDLListType, T>::lookup(const word& keyword) const
 }
 
 
-// Find and return T*
+// Find and return T*, FatalError if keyword not found
 template<class IDLListType, class T>
-T* DictionaryBase<IDLListType, T>::lookup(const word& keyword)
+T* Foam::DictionaryBase<IDLListType, T>::lookup(const word& keyword)
 {
     typename HashTable<T*>::iterator iter = hashedTs_.find(keyword);
 
     if (iter == hashedTs_.end())
     {
-        // If keyword not found print error message ...
         FatalErrorIn
         (
-            "DictionaryBase<IDLListType, T>::lookup(const word& keyword)"
+            "DictionaryBase<IDLListType, T>::lookup(const word&)"
         )   << keyword << " is undefined"
             << exit(FatalError);
     }
@@ -137,7 +172,7 @@ T* DictionaryBase<IDLListType, T>::lookup(const word& keyword)
 
 // Return the table of contents
 template<class IDLListType, class T>
-wordList DictionaryBase<IDLListType, T>::toc() const
+Foam::wordList Foam::DictionaryBase<IDLListType, T>::toc() const
 {
     wordList keywords(this->size());
 
@@ -158,26 +193,28 @@ wordList DictionaryBase<IDLListType, T>::toc() const
 
 // Add at head of dictionary
 template<class IDLListType, class T>
-void DictionaryBase<IDLListType, T>::insert(const word& keyword, T* tPtr)
+void Foam::DictionaryBase<IDLListType, T>::insert(const word& keyword, T* tPtr)
 {
-    IDLListType::insert(tPtr);
+    // NOTE: we should probably check that HashTable::insert actually worked
     hashedTs_.insert(keyword, tPtr);
+    IDLListType::insert(tPtr);
 }
 
 
 // Add at tail of dictionary
 template<class IDLListType, class T>
-void DictionaryBase<IDLListType, T>::append(const word& keyword, T* tPtr)
+void Foam::DictionaryBase<IDLListType, T>::append(const word& keyword, T* tPtr)
 {
-    IDLListType::append(tPtr);
+    // NOTE: we should probably check that HashTable::insert actually worked
     hashedTs_.insert(keyword, tPtr);
+    IDLListType::append(tPtr);
 }
 
 
 template<class IDLListType, class T>
-T* DictionaryBase<IDLListType, T>::remove(const word& Keyword)
+T* Foam::DictionaryBase<IDLListType, T>::remove(const word& keyword)
 {
-    typename HashTable<T*>::iterator iter = hashedTs_.find(Keyword);
+    typename HashTable<T*>::iterator iter = hashedTs_.find(keyword);
 
     if (iter != hashedTs_.end())
     {
@@ -192,19 +229,29 @@ T* DictionaryBase<IDLListType, T>::remove(const word& Keyword)
 }
 
 
-//- Clear the dictionary
 template<class IDLListType, class T>
-void DictionaryBase<IDLListType, T>::clear()
+void Foam::DictionaryBase<IDLListType, T>::clear()
 {
     IDLListType::clear();
     hashedTs_.clear();
 }
 
 
+template<class IDLListType, class T>
+void Foam::DictionaryBase<IDLListType, T>::transfer
+(
+    DictionaryBase<IDLListType, T>& dict
+)
+{
+    IDLListType::transfer(dict);
+    hashedTs_.transfer(dict.hashedTs_);
+}
+
+
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class IDLListType, class T>
-void DictionaryBase<IDLListType, T>::operator=
+void Foam::DictionaryBase<IDLListType, T>::operator=
 (
     const DictionaryBase<IDLListType, T>& dict
 )
@@ -218,24 +265,10 @@ void DictionaryBase<IDLListType, T>::operator=
     }
 
     IDLListType::operator=(dict);
-
     this->hashedTs_.clear();
-
-    for
-    (
-        typename IDLListType::iterator iter = this->begin();
-        iter != this->end();
-        ++iter
-    )
-    {
-        this->hashedTs_.insert((*iter).keyword(), &(*iter));
-    }
+    this->addEntries();
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

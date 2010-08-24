@@ -25,7 +25,7 @@ License
 \*----------------------------------------------------------------------------*/
 
 #include "searchableSurfacesQueries.H"
-#include "SortableList.H"
+#include "ListOps.H"
 #include "OFstream.H"
 #include "meshTools.H"
 
@@ -143,10 +143,11 @@ bool Foam::searchableSurfacesQueries::morphTet
         // Get the indices of lowest, highest and second-highest values.
         label ilo, ihi, inhi;
         {
-            SortableList<scalar> sortedY(y);
-            ilo = sortedY.indices()[0];
-            ihi = sortedY.indices()[sortedY.size()-1];
-            inhi = sortedY.indices()[sortedY.size()-2];
+            labelList sortedIndices;
+            sortedOrder(y, sortedIndices);
+            ilo  = sortedIndices[0];
+            ihi  = sortedIndices[sortedIndices.size()-1];
+            inhi = sortedIndices[sortedIndices.size()-2];
         }
 
         if (debug)

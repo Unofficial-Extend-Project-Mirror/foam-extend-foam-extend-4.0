@@ -83,7 +83,7 @@ public:
 
         //- Construct from components without boundary.
         //  Boundary is added using addPatches() member function
-        explicit topoChangerFvMesh
+        topoChangerFvMesh
         (
             const IOobject& io,
             const pointField& points,
@@ -97,7 +97,7 @@ public:
         //- Construct from components with cells rather than owner
         //  and neighbour without boundary.
         //  Boundary is added using addPatches() member function
-        explicit topoChangerFvMesh
+        topoChangerFvMesh
         (
             const IOobject& io,
             const pointField& points,

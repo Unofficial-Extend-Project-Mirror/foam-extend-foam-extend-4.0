@@ -32,14 +32,9 @@ License
 #include "OStringStream.H"
 #include "Pstream.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
-defineTypeNameAndDebug(commSchedule, 0);
-
-}
+defineTypeNameAndDebug(Foam::commSchedule, 0);
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

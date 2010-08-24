@@ -8,7 +8,7 @@ include $(RULES)/c++$(WM_COMPILE_OPTION)
 
 ptFLAGS     = -DNoRepository -ftemplate-depth-40
 
-c++FLAGS    = $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) $(LIB_HEADER_DIRS) -fPIC -pthread
+c++FLAGS    = $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) $(LIB_HEADER_DIRS) -fPIC
 
 Ctoo        = $(WM_SCHEDULER) $(CC) $(c++FLAGS) -c $$SOURCE -o $@
 cxxtoo      = $(Ctoo)

@@ -33,11 +33,6 @@ Description
 #include "objectHit.H"
 #include "bandCompression.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template
@@ -48,7 +43,8 @@ template
     class PointType
 >
 template <class ToPatch>
-List<objectHit> PrimitivePatch<Face, FaceList, PointField, PointType>::
+Foam::List<Foam::objectHit>
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
 projectPoints
 (
     const ToPatch& targetPatch,
@@ -58,7 +54,6 @@ projectPoints
 ) const
 {
     // The current patch is slave, i.e. it is being projected onto the target
-    // 
 
     if (projectionDirection.size() != nPoints())
     {
@@ -188,7 +183,7 @@ projectPoints
                     // Calculate the miss point on the plane of the
                     // face.  This is cooked (illogical!) for fastest
                     // surface walk.
-                    // 
+                    //
                     PointType missPlanePoint =
                         curPoint + curProjectionDir*curHit.distance();
 
@@ -317,7 +312,8 @@ template
     class PointType
 >
 template <class ToPatch>
-List<objectHit> PrimitivePatch<Face, FaceList, PointField, PointType>::
+Foam::List<Foam::objectHit>
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
 projectFaceCentres
 (
     const ToPatch& targetPatch,
@@ -327,7 +323,6 @@ projectFaceCentres
 ) const
 {
     // The current patch is slave, i.e. it is being projected onto the target
-    // 
 
     if (projectionDirection.size() != this->size())
     {
@@ -351,7 +346,7 @@ projectFaceCentres
 
     const ToPatch& masterFaces = targetPatch;
 
-    const Field<PointType>& masterPoints = targetPatch.points();
+    const typename ToPatch::PointFieldType& masterPoints = targetPatch.points();
 
     forAll (masterFaceCentres, faceI)
     {
@@ -569,9 +564,5 @@ projectFaceCentres
     return result;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

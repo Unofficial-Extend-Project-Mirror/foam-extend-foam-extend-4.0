@@ -73,7 +73,6 @@ void Foam::pistonLayer::makeLayersLive()
 
 void Foam::pistonLayer::checkAndCalculate()
 {
-    
     label pistonIndex = -1;
     bool foundPiston = false;
 
@@ -82,8 +81,7 @@ void Foam::pistonLayer::checkAndCalculate()
 
     label cylinderHeadIndex = -1;
     bool foundCylinderHead = false;
-    
-    
+
     forAll(boundary(), i)
     {
         Info << boundary()[i].name() << endl;
@@ -103,7 +101,7 @@ void Foam::pistonLayer::checkAndCalculate()
             foundCylinderHead = true;
         }
     }
-    
+
     reduce(foundPiston, orOp<bool>());
     reduce(foundLiner, orOp<bool>());
     reduce(foundCylinderHead, orOp<bool>());
@@ -116,14 +114,14 @@ void Foam::pistonLayer::checkAndCalculate()
     }
 
     if (!foundLiner)
-    { 
+    {
         FatalErrorIn("Foam::pistonLayer::checkAndCalculate()")
             << " : cannot find liner patch"
             << abort(FatalError);
     }
 
     if (!foundCylinderHead)
-    { 
+    {
         FatalErrorIn("Foam::pistonLayer::checkAndCalculate()")
             << " : cannot find cylinderHead patch"
             << exit(FatalError);
@@ -149,43 +147,41 @@ void Foam::pistonLayer::checkAndCalculate()
         Info<< "deckHeight: " << deckHeight() << nl
             << "piston position: " << pistonPosition() << endl;
     }
-    
-
 }
 
 void Foam::pistonLayer::setVirtualPistonPosition()
 {
 
     label pistonFaceIndex = faceZones().findZoneID("pistonLayerFaces");
-         
+
     bool foundPistonFace = (pistonFaceIndex != -1);
-    
-    Info << "piston face index = " << pistonFaceIndex << endl; 
-    
-    if(!foundPistonFace)
+
+    Info << "piston face index = " << pistonFaceIndex << endl;
+
+    if (!foundPistonFace)
     {
         FatalErrorIn("Foam::pistonLayer::setVirtualPistonPosition()")
             << " : cannot find the pistonLayerFaces"
             << exit(FatalError);
-    
     }
-        
+
     const labelList& pistonFaces = faceZones()[pistonFaceIndex];
     forAll(pistonFaces, i)
     {
         const face& f = faces()[pistonFaces[i]];
-        
+
         // should loop over facepoints...
         forAll(f, j)
         {
-            virtualPistonPosition() = max(virtualPistonPosition(), points()[f[j]].z());
+            virtualPistonPosition() =
+                max(virtualPistonPosition(), points()[f[j]].z());
         }
     }
-    
+
     reduce(virtualPistonPosition(), maxOp<scalar>());
 
 }
-    
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -207,7 +203,8 @@ Foam::pistonLayer::pistonLayer
 {
     if(engTime().engineDict().found("movePointsBelowPiston"))
     {
-        movePointsBelowPiston_ = engTime().engineDict().lookup("movePointsBelowPiston");
+        movePointsBelowPiston_ =
+            engTime().engineDict().lookup("movePointsBelowPiston");
     }
     // Add zones and modifiers if not already there.
     addZonesAndModifiers();
@@ -231,10 +228,10 @@ bool Foam::pistonLayer::update()
 
     // Find piston mesh modifier
     const label pistonLayerID =
-        topoChanger_.findModifierID("pistonLayer");    
+        topoChanger_.findModifierID("pistonLayer");
 
     Info << "pistonLayerID: " << pistonLayerID << endl;
-    
+
     const layerAdditionRemoval& pistonLayers =
         dynamicCast<const layerAdditionRemoval>
         (
@@ -248,8 +245,8 @@ bool Foam::pistonLayer::update()
     {
         realDeformation = true;
     }
-*/    
-    
+*/
+
     if (realDeformation)
     {
         // Disable layer addition
@@ -263,14 +260,14 @@ bool Foam::pistonLayer::update()
         topoChanger_[pistonLayerID].enable();
     }
 
-    scalar minLayerThickness = pistonLayers.minLayerThickness();    
-        
+    scalar minLayerThickness = pistonLayers.minLayerThickness();
+
     autoPtr<mapPolyMesh> topoChangeMap = topoChanger_.changeMesh();
-    
+
     pointField newPoints = points();
 
-    bool meshChanged = topoChangeMap.valid();
-    
+    bool meshChanged = topoChangeMap->morphing();
+
     if (topoChangeMap->morphing())
     {
         if (topoChangeMap().hasMotionPoints())
@@ -281,7 +278,7 @@ bool Foam::pistonLayer::update()
         setV0();
         resetMotion();
     }
-    
+
 
     Info << "virtualPistonPosition = " << virtualPistonPosition()
     << ", deckHeight = " << deckHeight() << endl;
@@ -289,7 +286,7 @@ bool Foam::pistonLayer::update()
     // Mesh in three parts:
     // - pistonPoints - move with deltaZ
     // - headPoints - do not move
-    
+
     const pointZoneMesh& pZones = pointZones();
     label headPtsIndex = pZones.findZoneID("headPoints");
     label pistonPtsIndex = pZones.findZoneID("pistonPoints");
@@ -303,13 +300,13 @@ bool Foam::pistonLayer::update()
     List<bool> pistonPoint(newPoints.size(), false);
     List<bool> headPoint(newPoints.size(), false);
     List<bool> pistonBelowPoint(newPoints.size(), false);
-    
+
     forAll(pistonPoints, i)
     {
         label pointI = pistonPoints[i];
         pistonPoint[pointI] = true;
         point& p = newPoints[pointI];
-                
+
         if (p.z() < pistonPosition() - 1.0e-6)
         {
             scaleDisp[pointI] = false;
@@ -333,9 +330,6 @@ bool Foam::pistonLayer::update()
         }
     }
 
-    
-
-    
     if (realDeformation && scalePoints_)
     {
 
@@ -344,8 +338,8 @@ bool Foam::pistonLayer::update()
             point& p = newPoints[pointI];
 
             if (scaleDisp[pointI])
-            {                
-                p.z() += 
+            {
+                p.z() +=
                     deltaZ
                   * (deckHeight() - p.z())/(deckHeight() - pistonPosition());
             }
@@ -357,17 +351,22 @@ bool Foam::pistonLayer::update()
                 }
             }
         }
-        
+
         // TOMMASO, 9/12/2008, mesh refinement
-        
+
         forAll(points(), i)
         {
-            if(!pistonPoint[i] && movePointsBelowPiston_ && newPoints[i].z() < pistonPosition())
+            if
+            (
+                !pistonPoint[i]
+             && movePointsBelowPiston_
+             && newPoints[i].z() < pistonPosition()
+            )
             {
                 point& p = newPoints[i];
                 p.z() += deltaZ;
             }
-        }   
+        }
     }
     else
     {
@@ -378,20 +377,23 @@ bool Foam::pistonLayer::update()
         {
             point& p = newPoints[pistonPoints[i]];
             p.z() += deltaZ;
-            pistonTopZ = max(pistonTopZ, p.z());            
+            pistonTopZ = max(pistonTopZ, p.z());
         }
         // TOMMASO, 9/12/2008, mesh refinement
         forAll(points(), i)
         {
-            if(!pistonPoint[i] && movePointsBelowPiston_ && newPoints[i].z() < pistonPosition())
+            if
+            (
+                !pistonPoint[i]
+             && movePointsBelowPiston_
+             && newPoints[i].z() < pistonPosition()
+            )
             {
                 point& p = newPoints[i];
                 p.z() += deltaZ;
                 pistonBelowPoint[i] = true;
             }
-        }   
-
-
+        }
 
         // NN! fix. only needed for compression
         if (deltaZ > 0.0 && scalePoints_)
@@ -408,35 +410,32 @@ bool Foam::pistonLayer::update()
                     }
                 }
             }
-            
         }
 
     }
 
     movePoints(newPoints);
-            
+
     pistonPosition() += deltaZ;
     scalar pistonSpeed = deltaZ/engTime().deltaT().value();
 
     Info<< "clearance: " << deckHeight() - pistonPosition() << nl
         << "Piston speed = " << pistonSpeed << " m/s" << endl;
-        
-    Info << "Total cylinder volume at CA " << engTime().timeName() << " = " <<
-    sum(V()) << 
-    endl;
-    
-    return meshChanged;
 
+    Info << "Total cylinder volume at CA " << engTime().timeName() << " = " <<
+    sum(V()) << endl;
+
+    return meshChanged;
 }
+
 
 void Foam::pistonLayer::setBoundaryVelocity(volVectorField& U)
 {
-// Does nothing, using the movingWallVelocity boundary condition for U in the piston patch...
+    // Does nothing, using the movingWallVelocity boundary condition for U
+    // in the piston patch...
 
-
-    
 //    vector pistonVel = piston().cs().axis()*engTime().pistonSpeed().value();
-    
+
     //mean piston velocityy
 /*
     vector pistonVel = 0.5 * piston().cs().axis()*

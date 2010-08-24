@@ -68,7 +68,8 @@ class OFstreamAllocator
         (
             const fileName& pathname,
             ios_base::openmode mode,
-            IOstream::compressionType compression
+            IOstream::compressionType compression = IOstream::UNCOMPRESSED
+
         );
 
     // Destructor
@@ -150,9 +151,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Global predefined null output stream
 
-#ifndef __CINT__
 extern OFstream Snull;
-#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

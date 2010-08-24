@@ -37,6 +37,7 @@ SourceFiles
 #define zoneToFace_H
 
 #include "topoSetSource.H"
+#include "wordRe.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,8 +58,8 @@ class zoneToFace
         //- Add usage string
         static addToUsageTable usage_;
 
-        //- Name of faceZone
-        word zoneName_;
+        //- Name/regular expression of cellZone
+        wordRe zoneName_;
 
 
     // Private Member Functions

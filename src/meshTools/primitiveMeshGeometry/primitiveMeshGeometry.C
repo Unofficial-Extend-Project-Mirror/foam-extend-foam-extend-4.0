@@ -102,8 +102,8 @@ void Foam::primitiveMeshGeometry::updateCellCentresAndVols
 )
 {
     // Clear the fields for accumulation
-    IndirectList<vector>(cellCentres_, changedCells) = vector::zero;
-    IndirectList<scalar>(cellVolumes_, changedCells) = 0.0;
+    UIndirectList<vector>(cellCentres_, changedCells) = vector::zero;
+    UIndirectList<scalar>(cellVolumes_, changedCells) = 0.0;
 
     const labelList& own = mesh_.faceOwner();
     const labelList& nei = mesh_.faceNeighbour();
@@ -111,9 +111,9 @@ void Foam::primitiveMeshGeometry::updateCellCentresAndVols
     // first estimate the approximate cell centre as the average of face centres
 
     vectorField cEst(mesh_.nCells());
-    IndirectList<vector>(cEst, changedCells) = vector::zero;
+    UIndirectList<vector>(cEst, changedCells) = vector::zero;
     scalarField nCellFaces(mesh_.nCells());
-    IndirectList<scalar>(nCellFaces, changedCells) = 0.0;
+    UIndirectList<scalar>(nCellFaces, changedCells) = 0.0;
 
     forAll(changedFaces, i)
     {
@@ -808,7 +808,7 @@ bool Foam::primitiveMeshGeometry::checkFaceAngles
         forAll(f, fp0)
         {
             // Get vertex after fp
-            label fp1 = (fp0 + 1) % f.size();
+            label fp1 = f.fcIndex(fp0);
 
             // Normalized vector between two consecutive points
             vector e10(p[f[fp1]] - p[f[fp0]]);

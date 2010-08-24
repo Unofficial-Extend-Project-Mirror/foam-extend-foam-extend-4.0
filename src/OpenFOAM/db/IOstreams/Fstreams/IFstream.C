@@ -28,44 +28,36 @@ License
 #include "OSspecific.H"
 #include "gzstream.h"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(IFstream, 0);
+defineTypeNameAndDebug(Foam::IFstream, 0);
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-IFstreamAllocator::IFstreamAllocator(const fileName& pathname)
+Foam::IFstreamAllocator::IFstreamAllocator(const fileName& pathname)
 :
     ifPtr_(NULL),
     compression_(IOstream::UNCOMPRESSED)
 {
-    if (!pathname.size())
+    if (pathname.empty())
     {
         if (IFstream::debug)
         {
-            Info<< "IFstreamAllocator::IFstreamAllocator"
-                   "(const fileName& pathname) : "
-                   "can't open null file "
-                << endl;
+            Info<< "IFstreamAllocator::IFstreamAllocator(const fileName&) : "
+                    "cannot open null file " << endl;
         }
     }
 
     ifPtr_ = new ifstream(pathname.c_str());
 
     // If the file is compressed, decompress it before reading.
-    if (!ifPtr_->good() && file(pathname + ".gz"))
+    if (!ifPtr_->good() && isFile(pathname + ".gz", false))
     {
         if (IFstream::debug)
         {
-            Info<< "IFstreamAllocator::IFstreamAllocator"
-                   "(const fileName& pathname) : "
-                   "decompressing " << pathname + ".gz"
-                << endl;
+            Info<< "IFstreamAllocator::IFstreamAllocator(const fileName&) : "
+                    "decompressing " << pathname + ".gz" << endl;
         }
 
         delete ifPtr_;
@@ -80,18 +72,18 @@ IFstreamAllocator::IFstreamAllocator(const fileName& pathname)
 }
 
 
-IFstreamAllocator::~IFstreamAllocator()
+Foam::IFstreamAllocator::~IFstreamAllocator()
 {
     delete ifPtr_;
 }
 
 
-istream& IFstreamAllocator::stdStream()
+std::istream& Foam::IFstreamAllocator::stdStream()
 {
     if (!ifPtr_)
     {
         FatalErrorIn("IFstreamAllocator::stdStream()")
-            << "No stream allocated." << abort(FatalError);
+            << "No stream allocated" << abort(FatalError);
     }
     return *ifPtr_;
 }
@@ -99,7 +91,7 @@ istream& IFstreamAllocator::stdStream()
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-IFstream::IFstream
+Foam::IFstream::IFstream
 (
     const fileName& pathname,
     streamFormat format,
@@ -120,15 +112,15 @@ IFstream::IFstream
     setClosed();
 
     setState(ifPtr_->rdstate());
-                
+
     if (!good())
     {
         if (debug)
         {
-            Info<< "IFstream::IFstream(const fileName& pathname,"
-                   "streamFormat format=ASCII,"
-                   "versionNumber version=currentVersion) : "
-                   "couldn't open File for input"
+            Info<< "IFstream::IFstream(const fileName&,"
+                   "streamFormat=ASCII,"
+                   "versionNumber=currentVersion) : "
+                   "could not open file for input"
                 << endl << info() << endl;
         }
 
@@ -138,20 +130,20 @@ IFstream::IFstream
     {
         setOpened();
     }
-    
+
     lineNumber_ = 1;
 }
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-IFstream::~IFstream()
+Foam::IFstream::~IFstream()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void IFstream::print(Ostream& os) const
+void Foam::IFstream::print(Ostream& os) const
 {
     // Print File data
     os  << "IFstream: ";
@@ -159,32 +151,28 @@ void IFstream::print(Ostream& os) const
 }
 
 
-//- Return a non-const reference to const Istream
-//  Needed for read-constructors where the stream argument is temporary:
-//  e.g. thing thisThing(IFstream("thingFileName")());
-IFstream& IFstream::operator()() const
+// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
+
+Foam::IFstream& Foam::IFstream::operator()() const
 {
     if (!good())
     {
-        if (!file(pathname_) && !file(pathname_ + ".gz"))
+        // also checks .gz file
+        if (isFile(pathname_, true))
+        {
+            check("IFstream::operator()");
+            FatalIOError.exit();
+        }
+        else
         {
             FatalIOErrorIn("IFstream::operator()", *this)
                 << "file " << pathname_ << " does not exist"
                 << exit(FatalIOError);
-        }
-        else
-        {
-            check("IFstream::operator()");
-            FatalIOError.exit();
         }
     }
 
     return const_cast<IFstream&>(*this);
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

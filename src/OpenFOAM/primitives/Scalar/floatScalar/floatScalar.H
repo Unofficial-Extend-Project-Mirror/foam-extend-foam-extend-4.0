@@ -61,6 +61,7 @@ static const floatScalar floatScalarROOTVSMALL = 1.0e-18;
 
 
 #define Scalar floatScalar
+#define ScalarVGREAT floatScalarVGREAT
 #define ScalarVSMALL floatScalarVSMALL
 #define readScalar readFloatScalar
 
@@ -98,6 +99,7 @@ inline Scalar yn(const int n, const Scalar s)
 }
 
 #undef Scalar
+#undef ScalarVGREAT
 #undef ScalarVSMALL
 #undef readScalar
 #undef transFunc

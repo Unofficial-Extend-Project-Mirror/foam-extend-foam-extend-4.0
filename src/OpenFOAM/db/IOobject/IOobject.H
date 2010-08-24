@@ -83,8 +83,6 @@ class objectRegistry;
                            Class IOobject Declaration
 \*---------------------------------------------------------------------------*/
 
-#include "CintDefs.H"
-
 class IOobject
 {
 
@@ -149,13 +147,12 @@ private:
         //- IOobject state
         objectState objState_;
 
-
 protected:
 
     // Protected member functions
 
         //- Construct and return an IFstream for the object.
-        //  The results is NULL if the stream constuction failed
+        //  The results is NULL if the stream construction failed
         Istream* objectStream();
 
         //- Set the object state to bad
@@ -166,6 +163,18 @@ public:
 
     //- Runtime type information
     TypeName("IOobject");
+
+
+    // Static Member Functions
+
+        //- Split path into instance, local, name components
+        static bool fileNameComponents
+        (
+            const fileName& path,
+            fileName& instance,
+            fileName& local,
+            word& name
+        );
 
 
     // Constructors
@@ -193,6 +202,17 @@ public:
             bool registerObject=true
         );
 
+        //- Construct from path, registry, io options
+        //  Uses fileNameComponents() to split path into components.
+        IOobject
+        (
+            const fileName& path,
+            const objectRegistry& registry,
+            readOption r=NO_READ,
+            writeOption w=NO_WRITE,
+            bool registerObject=true
+        );
+
         //- Clone
         Foam::autoPtr<IOobject> clone() const
         {
@@ -205,7 +225,7 @@ public:
         virtual ~IOobject();
 
 
-    // Member functions
+    // Member Functions
 
         // General access
 
@@ -331,11 +351,15 @@ public:
             //- Write the standard OpenFOAM file/dictionary banner
             //  Optionally without -*- C++ -*- editor hint (eg, for logs)
             template<class Stream>
-            static inline void writeBanner(Stream& os, bool noHint=false);
+            static inline Stream& writeBanner(Stream& os, bool noHint=false);
 
             //- Write the standard file section divider
             template<class Stream>
-            static inline void writeDivider(Stream& os);
+            static inline Stream& writeDivider(Stream& os);
+
+            //- Write the standard end file divider
+            template<class Stream>
+            static inline Stream& writeEndDivider(Stream& os);
 
             //- Write header
             bool writeHeader(Ostream&) const;
@@ -369,7 +393,6 @@ public:
         void operator=(const IOobject&);
 };
 
-#include "CintUndefs.H"
 
 #if defined (__GNUC__)
 template<>

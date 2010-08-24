@@ -26,7 +26,10 @@ Class
     Foam::pressureInletVelocityFvPatchVectorField
 
 Description
-    Foam::pressureInletVelocityFvPatchVectorField
+    Velocity inlet boundary condition for patches where the pressure is
+    specified. The inflow velocity is obtained from the flux with a direction
+    normal to the patch faces.  If reverse flow is possible or expected use
+    the "pressureInletOutletVelocityFvPatchVectorField" BC instead.
 
 SourceFiles
     pressureInletVelocityFvPatchVectorField.C
@@ -56,6 +59,7 @@ class pressureInletVelocityFvPatchVectorField
 
         word phiName_;
         word rhoName_;
+
 
 public:
 
@@ -127,6 +131,33 @@ public:
 
     // Member functions
 
+        // Access
+
+            //- Return the name of rho
+            const word& rhoName() const
+            {
+                return rhoName_;
+            }
+
+            //- Return reference to the name of rho to allow adjustment
+            word& rhoName()
+            {
+                return rhoName_;
+            }
+
+            //- Return the name of phi
+            const word& phiName() const
+            {
+                return phiName_;
+            }
+
+            //- Return reference to the name of phi to allow adjustment
+            word& phiName()
+            {
+                return phiName_;
+            }
+
+
         //- Update the coefficients associated with the patch field
         virtual void updateCoeffs();
 
@@ -136,10 +167,7 @@ public:
 
     // Member operators
 
-        virtual void operator=(const fvPatchField<vector>& pvf)
-        {
-            fvPatchField<vector>::operator=(pvf);
-        }
+        virtual void operator=(const fvPatchField<vector>& pvf);
 };
 
 

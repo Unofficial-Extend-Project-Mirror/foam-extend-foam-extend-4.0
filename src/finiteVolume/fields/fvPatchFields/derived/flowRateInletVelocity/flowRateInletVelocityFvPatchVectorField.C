@@ -75,19 +75,9 @@ flowRateInletVelocityFvPatchVectorField
 :
     fixedValueFvPatchField<vector>(p, iF, dict),
     flowRate_(readScalar(dict.lookup("flowRate"))),
-    phiName_("phi"),
-    rhoName_("rho")
-{
-    if (dict.found("phi"))
-    {
-        dict.lookup("phi") >> phiName_;
-    }
-
-    if (dict.found("rho"))
-    {
-        dict.lookup("rho") >> rhoName_;
-    }
-}
+    phiName_(dict.lookupOrDefault<word>("phi", "phi")),
+    rhoName_(dict.lookupOrDefault<word>("rho", "rho"))
+{}
 
 
 Foam::
@@ -133,10 +123,8 @@ void Foam::flowRateInletVelocityFvPatchVectorField::updateCoeffs()
 
     vectorField n = patch().nf();
 
-    const surfaceScalarField& phi = db().lookupObject<surfaceScalarField>
-    (
-        phiName_
-    );
+    const surfaceScalarField& phi =
+        db().lookupObject<surfaceScalarField>(phiName_);
 
     if (phi.dimensions() == dimVelocity*dimArea)
     {
@@ -170,20 +158,15 @@ void Foam::flowRateInletVelocityFvPatchVectorField::updateCoeffs()
 void Foam::flowRateInletVelocityFvPatchVectorField::write(Ostream& os) const
 {
     fvPatchField<vector>::write(os);
-
-    os.writeKeyword("flowRate") << flowRate_
-        << token::END_STATEMENT << nl;
-
+    os.writeKeyword("flowRate") << flowRate_ << token::END_STATEMENT << nl;
     if (phiName_ != "phi")
     {
         os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
     }
-
     if (rhoName_ != "rho")
     {
         os.writeKeyword("rho") << rhoName_ << token::END_STATEMENT << nl;
     }
-
     writeEntry("value", os);
 }
 

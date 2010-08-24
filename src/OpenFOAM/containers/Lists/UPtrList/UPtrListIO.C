@@ -27,29 +27,21 @@ License
 #include "UPtrList.H"
 #include "Ostream.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * Ostream Operators * * * * * * * * * * * * * //
 
 template<class T>
-Ostream& operator<<(Ostream& os, const UPtrList<T>& pL)
+Foam::Ostream& Foam::operator<<(Ostream& os, const UPtrList<T>& L)
 {
-    // Write size of list
-    os << nl << pL.size();
+    // Write size and start delimiter
+    os << nl << L.size() << nl << token::BEGIN_LIST;
 
-    // Write beginning of contents
-    os << nl << token::BEGIN_LIST;
-
-    // Write list contents
-    forAll(pL, i)
+    // Write contents
+    forAll(L, i)
     {
-        os << nl << pL[i];
+        os << nl << L[i];
     }
 
-    // Write end of contents
+    // Write end delimiter
     os << nl << token::END_LIST << nl;
 
     // Check state of IOstream
@@ -58,9 +50,5 @@ Ostream& operator<<(Ostream& os, const UPtrList<T>& pL)
     return os;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

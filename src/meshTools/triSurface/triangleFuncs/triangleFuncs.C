@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "triangleFuncs.H"
@@ -31,8 +29,6 @@ Description
 #include "treeBoundBox.H"
 #include "SortableList.H"
 #include "boolList.H"
-#include "scalar.H"
-
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -101,8 +97,6 @@ bool Foam::triangleFuncs::intersectAxesBundle
     // Since direction is coordinate axis there is no need to do projection,
     // we can directly check u,v components for inclusion in triangle.
 
-    scalar localScale = max(max(magSqr(V10), magSqr(V20)), 1.0);
-
     // Get other components
     label i1 = (i0 + 1) % 3;
     label i2 = (i1 + 1) % 3;
@@ -113,13 +107,15 @@ bool Foam::triangleFuncs::intersectAxesBundle
     scalar u2 = V20[i1];
     scalar v2 = V20[i2];
 
+    scalar localScale = mag(u1)+mag(v1)+mag(u2)+mag(v2);
+
     scalar det = v2*u1 - u2*v1;
 
     // Fix for  V0:(-31.71428 0 -15.10714)
     //          V10:(-1.285715 8.99165e-16 -1.142858)
     //          V20:(0 0 -1.678573)
     //          i0:0
-    if (Foam::mag(det)/localScale < SMALL)
+    if (localScale < VSMALL || Foam::mag(det)/localScale < SMALL)
     {
         // Triangle parallel to dir
         return false;
@@ -168,7 +164,6 @@ bool Foam::triangleFuncs::intersectAxesBundle
     }
     return false;
 }
-
 
 
 // Intersect triangle with bounding box. Return true if
@@ -260,6 +255,272 @@ bool Foam::triangleFuncs::intersectBb
 
     return false;
 }
+
+
+//// Intersect triangle with bounding box. Return true if
+//// any of the faces of bb intersect triangle.
+//// Note: so returns false if triangle inside bb.
+//bool Foam::triangleFuncs::intersectBbExact
+//(
+//    const point& p0,
+//    const point& p1,
+//    const point& p2,
+//    const treeBoundBox& cubeBb
+//)
+//{
+//    const point& min = cubeBb.min();
+//    const point& max = cubeBb.max();
+//
+//    const point& cube0 = min;
+//    const point  cube1(min.x(), min.y(), max.z());
+//    const point  cube2(max.x(), min.y(), max.z());
+//    const point  cube3(max.x(), min.y(), min.z());
+//
+//    const point  cube4(min.x(), max.y(), min.z());
+//    const point  cube5(min.x(), max.y(), max.z());
+//    const point& cube6 = max;
+//    const point  cube7(max.x(), max.y(), min.z());
+//
+//    // Test intersection of triangle with twelve edges of box.
+//    {
+//        triPointRef tri(p0, p1, p2);
+//        if (tri.intersectionExact(cube0, cube1).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(cube1, cube2).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(cube2, cube3).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(cube3, cube0).hit())
+//        {   
+//            return true;
+//        }
+//
+//        if (tri.intersectionExact(cube4, cube5).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(cube5, cube6).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(cube6, cube7).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(cube7, cube4).hit())
+//        {
+//            return true;
+//        }
+//
+//        if (tri.intersectionExact(cube0, cube4).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(cube1, cube5).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(cube2, cube6).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(cube3, cube7).hit())
+//        {
+//            return true;
+//        }
+//    }
+//    // Test intersection of triangle edges with bounding box
+//    {
+//        triPointRef tri(cube0, cube1, cube2);
+//        if (tri.intersectionExact(p0, p1).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p1, p2).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p2, p0).hit())
+//        {
+//            return true;
+//        }
+//    }
+//    {
+//        triPointRef tri(cube2, cube3, cube0);
+//        if (tri.intersectionExact(p0, p1).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p1, p2).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p2, p0).hit())
+//        {
+//            return true;
+//        }
+//    }
+//    {
+//        triPointRef tri(cube4, cube5, cube6);
+//        if (tri.intersectionExact(p0, p1).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p1, p2).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p2, p0).hit())
+//        {
+//            return true;
+//        }
+//    }
+//    {
+//        triPointRef tri(cube6, cube7, cube4);
+//        if (tri.intersectionExact(p0, p1).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p1, p2).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p2, p0).hit())
+//        {
+//            return true;
+//        }
+//    }
+//
+//
+//    {
+//        triPointRef tri(cube4, cube5, cube1);
+//        if (tri.intersectionExact(p0, p1).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p1, p2).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p2, p0).hit())
+//        {
+//            return true;
+//        }
+//    }
+//    {
+//        triPointRef tri(cube1, cube0, cube4);
+//        if (tri.intersectionExact(p0, p1).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p1, p2).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p2, p0).hit())
+//        {
+//            return true;
+//        }
+//    }
+//    {
+//        triPointRef tri(cube7, cube6, cube2);
+//        if (tri.intersectionExact(p0, p1).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p1, p2).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p2, p0).hit())
+//        {
+//            return true;
+//        }
+//    }
+//    {
+//        triPointRef tri(cube2, cube3, cube7);
+//        if (tri.intersectionExact(p0, p1).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p1, p2).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p2, p0).hit())
+//        {
+//            return true;
+//        }
+//    }
+//
+//    {
+//        triPointRef tri(cube0, cube4, cube7);
+//        if (tri.intersectionExact(p0, p1).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p1, p2).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p2, p0).hit())
+//        {
+//            return true;
+//        }
+//    }
+//    {
+//        triPointRef tri(cube7, cube3, cube0);
+//        if (tri.intersectionExact(p0, p1).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p1, p2).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p2, p0).hit())
+//        {
+//            return true;
+//        }
+//    }
+//    {
+//        triPointRef tri(cube1, cube5, cube6);
+//        if (tri.intersectionExact(p0, p1).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p1, p2).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p2, p0).hit())
+//        {
+//            return true;
+//        }
+//    }
+//    {
+//        triPointRef tri(cube6, cube2, cube1);
+//        if (tri.intersectionExact(p0, p1).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p1, p2).hit())
+//        {
+//            return true;
+//        }
+//        if (tri.intersectionExact(p2, p0).hit())
+//        {
+//            return true;
+//        }
+//    }
+//    return false;
+//}
 
 
 bool Foam::triangleFuncs::intersect
@@ -467,147 +728,6 @@ bool Foam::triangleFuncs::intersect
 
         return true;
     }
-}
-
-
-bool Foam::triangleFuncs::classify
-(
-    const point& baseVertex,
-    const vector& E0,
-    const vector& E1,
-    const vector& n,
-    const point& pInter,
-    const scalar tol,
-    label& nearType,
-    label& nearLabel
-)
-{
-    // Get largest component of normal
-    scalar magX = Foam::mag(n.x());
-    scalar magY = Foam::mag(n.y());
-    scalar magZ = Foam::mag(n.z());
-
-    label i0 = -1;
-    if ((magX >= magY) && (magX >= magZ))
-    {
-        i0 = 0;
-    }
-    else if ((magY >= magX) && (magY >= magZ))
-    {
-        i0 = 1;
-    }
-    else
-    {
-        i0 = 2;
-    }
-
-    // Get other components
-    label i1 = (i0 + 1) % 3;
-    label i2 = (i1 + 1) % 3;
-
-    scalar u1 = E0[i1];
-    scalar v1 = E0[i2];
-
-    scalar u2 = E1[i1];
-    scalar v2 = E1[i2];
-
-    scalar det = v2*u1 - u2*v1;
-
-    scalar u0 = pInter[i1] - baseVertex[i1];
-    scalar v0 = pInter[i2] - baseVertex[i2];
-
-    scalar alpha = 0;
-    scalar beta = 0;
-
-    bool hit = false;
-
-    if (Foam::mag(u1) < ROOTVSMALL)
-    {
-        beta = u0/u2;
-
-        alpha = (v0 - beta*v2)/v1;
-
-        hit = ((alpha >= 0) && ((alpha + beta) <= 1));
-    }
-    else
-    {
-        beta = (v0*u1 - u0*v1)/det;
-
-        alpha = (u0 - beta*u2)/u1;
-
-        hit = ((alpha >= 0) && ((alpha + beta) <= 1));
-    }
-
-    //
-    // Now alpha, beta are the coordinates in the triangle local coordinate
-    // system E0, E1
-    //
-
-    nearType = NONE;
-    nearLabel = -1;
-
-    if (mag(alpha+beta-1) < tol)
-    {
-        // On edge between vert 1-2 (=edge 1)
-
-        if (mag(alpha) < tol)
-        {
-            nearType = POINT;
-            nearLabel = 2;
-        }
-        else if (mag(beta) < tol)
-        {
-            nearType = POINT;
-            nearLabel = 1;
-        }
-        else if ((alpha >= 0) && (alpha <= 1) && (beta >= 0) && (beta <= 1))
-        {
-            nearType = EDGE;
-            nearLabel = 1;
-        }
-    }
-    else if (mag(alpha) < tol)
-    {
-        // On edge between vert 2-0 (=edge 2)
-
-        if (mag(beta) < tol)
-        {
-            nearType = POINT;
-            nearLabel = 0;
-        }
-        else if (mag(beta-1) < tol)
-        {
-            nearType = POINT;
-            nearLabel = 2;
-        }
-        else if ((beta >= 0) && (beta <= 1))
-        {
-            nearType = EDGE;
-            nearLabel = 2;
-        }
-    }
-    else if (mag(beta) < tol)
-    {
-        // On edge between vert 0-1 (= edge 0)
-
-        if (mag(alpha) < tol)
-        {
-            nearType = POINT;
-            nearLabel = 0;
-        }
-        else if (mag(alpha-1) < tol)
-        {
-            nearType = POINT;
-            nearLabel = 1;
-        }
-        else if ((alpha >= 0) && (alpha <= 1))
-        {
-            nearType = EDGE;
-            nearLabel = 0;
-        }
-    }
-
-    return hit;
 }
 
 

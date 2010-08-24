@@ -28,22 +28,17 @@ Description
 
 #include "patchZones.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(patchZones, 0);
+defineTypeNameAndDebug(Foam::patchZones, 0);
 
 
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
 // Gets labels of changed faces and propagates them to the edges. Returns
 // labels of edges changed.
-labelList patchZones::faceToEdge
+Foam::labelList Foam::patchZones::faceToEdge
 (
     const labelList& changedFaces,
     labelList& edgeRegion
@@ -78,7 +73,7 @@ labelList patchZones::faceToEdge
 
 
 // Reverse of faceToEdge: gets edges and returns faces
-labelList patchZones::edgeToFace(const labelList& changedEdges)
+Foam::labelList Foam::patchZones::edgeToFace(const labelList& changedEdges)
 {
     labelList changedFaces(pp_.size(), -1);
     label changedI = 0;
@@ -109,7 +104,7 @@ labelList patchZones::edgeToFace(const labelList& changedEdges)
 
 
 // Finds area, starting at faceI, delimited by borderEdge
-void patchZones::markZone(label faceI)
+void Foam::patchZones::markZone(label faceI)
 {
     // List of faces whose faceZone has been set.
     labelList changedFaces(1, faceI);
@@ -130,7 +125,7 @@ void patchZones::markZone(label faceI)
                 << endl;
         }
 
-        if (changedEdges.size() == 0)
+        if (changedEdges.empty())
         {
             break;
         }
@@ -144,7 +139,7 @@ void patchZones::markZone(label faceI)
                 << endl;
         }
 
-        if (changedFaces.size() == 0)
+        if (changedEdges.empty())
         {
             break;
         }
@@ -155,7 +150,11 @@ void patchZones::markZone(label faceI)
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-Foam::patchZones::patchZones(const primitivePatch& pp, const boolList& borderEdge)
+Foam::patchZones::patchZones
+(
+    const primitivePatch& pp,
+    const boolList& borderEdge
+)
 :
     labelList(pp.size(), -1),
     pp_(pp),
@@ -178,7 +177,7 @@ Foam::patchZones::patchZones(const primitivePatch& pp, const boolList& borderEdg
 
     label faceI = 0;
 
-    while(true)
+    while (true)
     {
         // Find first non-visited face
         for (; faceI < pp_.size(); faceI++)
@@ -203,9 +202,5 @@ Foam::patchZones::patchZones(const primitivePatch& pp, const boolList& borderEdg
     }
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

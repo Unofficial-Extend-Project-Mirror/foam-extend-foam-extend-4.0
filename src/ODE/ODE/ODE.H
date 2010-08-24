@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    ODE
+    Foam::ODE
 
 Description
     Abstract base class for the ODE solvers.
@@ -34,7 +34,7 @@ Description
 #define ODE_H
 
 #include "scalarField.H"
-#include "Matrix.H"
+#include "scalarMatrices.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -87,7 +87,7 @@ public:
             const scalar x,
             const scalarField& y,
             scalarField& dfdx,
-            Matrix<scalar>& dfdy
+            scalarSquareMatrix& dfdy
         ) const = 0;
 
         //- Update ODE after the solution, advancing by delta

@@ -30,10 +30,6 @@ Description
 
 #include "PrimitivePatch.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -45,7 +41,8 @@ template
     class PointType
 >
 void
-PrimitivePatch<Face, FaceList, PointField, PointType>::calcEdgeLoops() const
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+calcEdgeLoops() const
 {
     if (debug)
     {
@@ -95,7 +92,7 @@ PrimitivePatch<Face, FaceList, PointField, PointType>::calcEdgeLoops() const
     // Current loop number.
     label loopI = 0;
 
-    for (;;)
+    while (true)
     {
         // Find edge not yet given a loop number.
         label currentEdgeI = -1;
@@ -151,8 +148,6 @@ PrimitivePatch<Face, FaceList, PointField, PointType>::calcEdgeLoops() const
         while (currentEdgeI != -1);
 
         // Done all for current loop. Transfer to edgeLoops.
-        loop.shrink();
-
         edgeLoops[loopI].transfer(loop);
 
         loopI++;
@@ -177,8 +172,9 @@ template
     class PointField,
     class PointType
 >
-const labelListList&
-PrimitivePatch<Face, FaceList, PointField, PointType>::edgeLoops() const
+const Foam::labelListList&
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+edgeLoops() const
 {
     if (!edgeLoopsPtr_)
     {
@@ -188,8 +184,5 @@ PrimitivePatch<Face, FaceList, PointField, PointType>::edgeLoops() const
     return *edgeLoopsPtr_;
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

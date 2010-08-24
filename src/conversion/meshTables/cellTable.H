@@ -65,6 +65,7 @@ SourceFiles
 #include "Map.H"
 #include "dictionary.H"
 #include "labelList.H"
+#include "wordReList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -86,8 +87,8 @@ class cellTable
 
     // Private Member Functions
 
-        //- Map from cellTable ID => zone number (unmapped = -1)
-        labelList zoneMap() const;
+        //- Map from cellTable ID => zone number
+        Map<label> zoneMap() const;
 
         //- A contiguous list of cellTable names
         List<word> namesList() const;
@@ -136,6 +137,9 @@ public:
 
         //- Return a Map of (id => name)
         Map<word> names() const;
+
+        //- Return a Map of (id => names) selected by patterns
+        Map<word> names(const List<wordRe>& patterns) const;
 
         //- Return a Map of (id => name) for materialType (fluid | solid | shell)
         Map<word> selectType(const word& materialType) const;

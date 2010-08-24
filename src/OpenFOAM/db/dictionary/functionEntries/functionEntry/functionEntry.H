@@ -95,7 +95,7 @@ public:
         (
             const word& functionName,
             dictionary& parentDict,
-            Istream& is
+            Istream&
         );
 
         declareMemberFunctionSelectionTable
@@ -117,8 +117,8 @@ public:
         (
             const word& functionName,
             const dictionary& parentDict,
-            primitiveEntry& entry,
-            Istream& is
+            primitiveEntry&,
+            Istream&
         );
 
 

@@ -56,7 +56,7 @@ public:
     // Constructors
 
         //- Construct given initial map size
-        EdgeMap(label size = 100)
+        EdgeMap(const label size = 128)
         :
             HashTable<T, edge, Hash<edge> >(size)
         {}

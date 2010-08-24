@@ -59,7 +59,6 @@ class P1
 :
     public radiationModel
 {
-
     // Private data
 
         //- Incident radiation / [W/m2]
@@ -97,18 +96,17 @@ public:
 
 
     // Destructor
-
-        ~P1();
+    virtual ~P1();
 
 
     // Member functions
 
         // Edit
 
-            //- Update radiationSource varible
-            void correct();
+            //- Solve radiation equation(s)
+            void calculate();
 
-            //- Read radiationProperties dictionary
+            //- Read radiation properties dictionary
             bool read();
 
 

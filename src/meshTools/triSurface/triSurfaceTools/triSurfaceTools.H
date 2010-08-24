@@ -39,7 +39,7 @@ SourceFiles
 #include "boolList.H"
 #include "pointField.H"
 #include "DynamicList.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "FixedList.H"
 #include "vector2D.H"
 #include "triPointRef.H"
@@ -454,13 +454,14 @@ public:
 
         //- Given nearest point (to sample) on surface determines which side
         //  sample is. Uses either face normal, edge normal or point normal
-        //  (non-trivial). Feed in output of e.g. triangle::classify.
+        //  (non-trivial). Uses triangle::classify.
         static sideType surfaceSide
         (
             const triSurface& surf,
             const point& sample,
             const label nearestFaceI,   // nearest face
-            const point& nearestPt      // nearest point on nearest face
+            const point& nearestPt,     // nearest point on nearest face
+            const scalar tol            // tolerance for nearness test.
         );
 
     // Triangulation of faces

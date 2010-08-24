@@ -25,46 +25,78 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "sphericalCS.H"
-#include "addToRunTimeSelectionTable.H"
+
+#include "one.H"
+#include "Switch.H"
 #include "mathematicalConstants.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
     defineTypeNameAndDebug(sphericalCS, 0);
-    addToRunTimeSelectionTable(coordinateSystem, sphericalCS, origAxisDir);
-    addToRunTimeSelectionTable(coordinateSystem, sphericalCS, origRotation);
     addToRunTimeSelectionTable(coordinateSystem, sphericalCS, dictionary);
+    addToRunTimeSelectionTable(coordinateSystem, sphericalCS, origRotation);
 }
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::sphericalCS::sphericalCS()
+Foam::sphericalCS::sphericalCS(const bool inDegrees)
 :
-    coordinateSystem()
+    coordinateSystem(),
+    inDegrees_(inDegrees)
 {}
+
+
+Foam::sphericalCS::sphericalCS
+(
+    const coordinateSystem& cs,
+    const bool inDegrees
+)
+:
+    coordinateSystem(cs),
+    inDegrees_(inDegrees)
+{}
+
+
+Foam::sphericalCS::sphericalCS
+(
+    const word& name,
+    const coordinateSystem& cs,
+    const bool inDegrees
+)
+:
+    coordinateSystem(name, cs),
+    inDegrees_(inDegrees)
+{}
+
+
+Foam::sphericalCS::sphericalCS
+(
+    const word& name,
+    const point& origin,
+    const coordinateRotation& cr,
+    const bool inDegrees
+)
+:
+    coordinateSystem(name, origin, cr),
+    inDegrees_(inDegrees)
+{}
+
 
 Foam::sphericalCS::sphericalCS
 (
     const word& name,
     const point& origin,
     const vector& axis,
-    const vector& direction
+    const vector& dirn,
+    const bool inDegrees
 )
 :
-    coordinateSystem(name, origin, axis, direction)
-{}
-
-
-Foam::sphericalCS::sphericalCS
-(
-    const word& name,
-    const point& origin,
-    const coordinateRotation& cr
-)
-:
-    coordinateSystem(name, origin, cr)
+    coordinateSystem(name, origin, axis, dirn),
+    inDegrees_(inDegrees)
 {}
 
 
@@ -74,11 +106,25 @@ Foam::sphericalCS::sphericalCS
     const dictionary& dict
 )
 :
-    coordinateSystem(name, dict)
+    coordinateSystem(name, dict),
+    inDegrees_(dict.lookupOrDefault<Switch>("degrees", true))
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+bool Foam::sphericalCS::inDegrees() const
+{
+    return inDegrees_;
+}
+
+
+bool& Foam::sphericalCS::inDegrees()
+{
+    return inDegrees_;
+}
+
+
 Foam::vector Foam::sphericalCS::localToGlobal
 (
     const vector& local,
@@ -86,8 +132,16 @@ Foam::vector Foam::sphericalCS::localToGlobal
 ) const
 {
     scalar r = local.x();
-    scalar theta = local.y()*mathematicalConstant::pi/180.0;
-    scalar phi = local.z()*mathematicalConstant::pi/180.0;
+    const scalar theta
+    (
+        local.y()
+       *( inDegrees_ ? mathematicalConstant::pi/180.0 : 1.0 )
+    );
+    const scalar phi
+    (
+        local.z()
+       *( inDegrees_ ? mathematicalConstant::pi/180.0 : 1.0 )
+    );
 
     return coordinateSystem::localToGlobal
     (
@@ -96,6 +150,7 @@ Foam::vector Foam::sphericalCS::localToGlobal
     );
 }
 
+
 Foam::tmp<Foam::vectorField> Foam::sphericalCS::localToGlobal
 (
     const vectorField& local,
@@ -103,12 +158,16 @@ Foam::tmp<Foam::vectorField> Foam::sphericalCS::localToGlobal
 ) const
 {
     const scalarField r = local.component(vector::X);
-
-    const scalarField theta =
-        local.component(vector::Y)*mathematicalConstant::pi/180.0;
-
-    const scalarField phi =
-        local.component(vector::Z)*mathematicalConstant::pi/180.0;
+    const scalarField theta
+    (
+        local.component(vector::Y)
+      * ( inDegrees_ ? mathematicalConstant::pi/180.0 : 1.0 )
+    );
+    const scalarField phi
+    (
+        local.component(vector::Z)
+      * ( inDegrees_ ? mathematicalConstant::pi/180.0 : 1.0 )
+    );
 
     vectorField lc(local.size());
     lc.replace(vector::X, r*cos(theta)*sin(phi));
@@ -131,8 +190,14 @@ Foam::vector Foam::sphericalCS::globalToLocal
     return vector
     (
         r,
-        atan2(lc.y(), lc.x())*180.0/mathematicalConstant::pi,
-        acos(lc.z()/(r + SMALL))*180.0/mathematicalConstant::pi
+        atan2
+        (
+            lc.y(), lc.x()
+        ) * ( inDegrees_ ? 180.0/mathematicalConstant::pi : 1.0 ),
+        acos
+        (
+            lc.z()/(r + SMALL)
+        ) * ( inDegrees_ ? 180.0/mathematicalConstant::pi : 1.0 )
     );
 }
 
@@ -162,13 +227,16 @@ Foam::tmp<Foam::vectorField> Foam::sphericalCS::globalToLocal
         (
             lc.component(vector::Y),
             lc.component(vector::X)
-        )*180.0/mathematicalConstant::pi
+        ) * ( inDegrees_ ? 180.0/mathematicalConstant::pi : 1.0 )
     );
 
     result.replace
     (
         vector::Z,
-        acos(lc.component(vector::Z)/(r + SMALL))*180.0/mathematicalConstant::pi
+        acos
+        (
+            lc.component(vector::Z)/(r + SMALL)
+        ) * ( inDegrees_ ? 180.0/mathematicalConstant::pi : 1.0 )
     );
 
     return tresult;

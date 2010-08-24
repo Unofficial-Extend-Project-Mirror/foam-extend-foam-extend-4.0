@@ -33,38 +33,82 @@ License
 template<class T, class Key, class Hash>
 Foam::HashTable<T, Key, Hash>::HashTable(Istream& is, const label size)
 :
-    tableSize_(size),
-    table_(new hashedEntry*[tableSize_]),
+    HashTableName(),
     nElmts_(0),
+    tableSize_(canonicalSize(size)),
+    table_(new hashedEntry*[tableSize_]),
     endIter_(*this, NULL, 0),
     endConstIter_(*this, NULL, 0)
 {
-    for (label i=0; i<tableSize_; i++)
+    for (label hashIdx = 0; hashIdx < tableSize_; hashIdx++)
     {
-        table_[i] = 0;
+        table_[hashIdx] = 0;
     }
 
     operator>>(is, *this);
 }
 
 
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+template<class T, class Key, class Hash>
+Foam::Ostream&
+Foam::HashTable<T, Key, Hash>::printInfo(Ostream& os) const
+{
+    label used = 0;
+    label maxChain = 0;
+    unsigned avgChain = 0;
+
+    for (label hashIdx = 0; hashIdx < tableSize_; ++hashIdx)
+    {
+        label count = 0;
+        for (hashedEntry* ep = table_[hashIdx]; ep; ep = ep->next_)
+        {
+            ++count;
+        }
+
+        if (count)
+        {
+            ++used;
+            avgChain += count;
+
+            if (maxChain < count)
+            {
+                maxChain = count;
+            }
+        }
+    }
+
+    os  << "HashTable<T,Key,Hash>"
+        << " elements:" << size() << " slots:" << used << "/" << tableSize_
+        << " chaining(avg/max):" << (used ? (float(avgChain)/used) : 0)
+        << "/" << maxChain << endl;
+
+    return os;
+}
+
+
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
 template<class T, class Key, class Hash>
-Foam::Istream& Foam::operator>>(Istream& is, HashTable<T, Key, Hash>& L)
+Foam::Istream& Foam::operator>>
+(
+    Istream& is,
+    HashTable<T, Key, Hash>& L
+)
 {
     is.fatalCheck("operator>>(Istream&, HashTable<T, Key, Hash>&)");
 
     // Anull list
     L.clear();
 
-    is.fatalCheck("operator>>(Istream& is, HashTable<T, Key, Hash>& L)");
+    is.fatalCheck("operator>>(Istream&, HashTable<T, Key, Hash>&)");
 
     token firstToken(is);
 
     is.fatalCheck
     (
-        "operator>>(Istream& is, HashTable<T, Key, Hash>& L) : "
+        "operator>>(Istream&, HashTable<T, Key, Hash>&) : "
         "reading first token"
     );
 
@@ -73,7 +117,7 @@ Foam::Istream& Foam::operator>>(Istream& is, HashTable<T, Key, Hash>& L)
         label s = firstToken.labelToken();
 
         // Read beginning of contents
-        char listDelimiter = is.readBeginList("HashTable<T, Key, Hash>");
+        char delimiter = is.readBeginList("HashTable<T, Key, Hash>");
 
         if (s)
         {
@@ -82,7 +126,7 @@ Foam::Istream& Foam::operator>>(Istream& is, HashTable<T, Key, Hash>& L)
                 L.resize(2*s);
             }
 
-            if (listDelimiter == token::BEGIN_LIST)
+            if (delimiter == token::BEGIN_LIST)
             {
                 for (label i=0; i<s; i++)
                 {
@@ -101,7 +145,7 @@ Foam::Istream& Foam::operator>>(Istream& is, HashTable<T, Key, Hash>& L)
             {
                 FatalIOErrorIn
                 (
-                    "operator>>(Istream& is, HashTable<T, Key, Hash>& L)",
+                    "operator>>(Istream&, HashTable<T, Key, Hash>&)",
                     is
                 )   << "incorrect first token, '(', found " << firstToken.info()
                     << exit(FatalIOError);
@@ -117,7 +161,7 @@ Foam::Istream& Foam::operator>>(Istream& is, HashTable<T, Key, Hash>& L)
         {
             FatalIOErrorIn
             (
-                "operator>>(Istream& is, HashTable<T, Key, Hash>& L)",
+                "operator>>(Istream&, HashTable<T, Key, Hash>&)",
                 is
             )   << "incorrect first token, '(', found " << firstToken.info()
                 << exit(FatalIOError);
@@ -133,10 +177,13 @@ Foam::Istream& Foam::operator>>(Istream& is, HashTable<T, Key, Hash>& L)
         )
         {
             is.putBack(lastToken);
+
             Key key;
             is >> key;
+
             T element;
             is >> element;
+
             L.insert(key, element);
 
             is.fatalCheck
@@ -152,7 +199,7 @@ Foam::Istream& Foam::operator>>(Istream& is, HashTable<T, Key, Hash>& L)
     {
         FatalIOErrorIn
         (
-            "operator>>(Istream& is, HashTable<T, Key, Hash>& L)",
+            "operator>>(Istream&, HashTable<T, Key, Hash>&)",
             is
         )   << "incorrect first token, expected <int> or '(', found "
             << firstToken.info()
@@ -166,26 +213,27 @@ Foam::Istream& Foam::operator>>(Istream& is, HashTable<T, Key, Hash>& L)
 
 
 template<class T, class Key, class Hash>
-Foam::Ostream& Foam::operator<<(Ostream& os, const HashTable<T, Key, Hash>& L)
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const HashTable<T, Key, Hash>& L
+)
 {
-    // Write size of HashTable
-    os << nl << L.size();
+    // Write size and start delimiter
+    os << nl << L.size() << nl << token::BEGIN_LIST << nl;
 
-    // Write beginning of contents
-    os << nl << token::BEGIN_LIST << nl;
-
-    // Write HashTable contents
+    // Write contents
     for
     (
-        typename HashTable<T, Key, Hash>::const_iterator iter = L.begin();
-        iter != L.end();
+        typename HashTable<T, Key, Hash>::const_iterator iter = L.cbegin();
+        iter != L.cend();
         ++iter
     )
     {
         os << iter.key() << token::SPACE << iter() << nl;
     }
 
-    // Write end of contents
+    // Write end delimiter
     os << token::END_LIST;
 
     // Check state of IOstream

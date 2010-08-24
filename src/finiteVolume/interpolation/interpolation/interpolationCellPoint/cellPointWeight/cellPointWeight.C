@@ -164,12 +164,12 @@ void Foam::cellPointWeight::findTetrahedron
         }
     }
 
-    WarningIn
-    (
-        "cellPointWeight::findTetrahedron"
-        "(const polyMesh&, const vector&, const label, const label)"
-    )   << "Tetrahedron search failed; using closest tet values to point "
-        << nl << "    cell: " << cellIndex << endl;
+    if (debug)
+    {
+        Pout<< "cellPointWeight::findTetrahedron" << nl
+            << "    Tetrahedron search failed; using closest tet values to "
+            << "point " << nl << "    cell: " << cellIndex << nl << endl;
+    }
 
     const labelList& facePointsClose = mesh.faces()[cellFaces[faceClose]];
     faceVertices_[0] = facePointsClose[0];
@@ -284,13 +284,12 @@ void Foam::cellPointWeight::findTriangle
         pointI++;
     }
 
-    WarningIn
-    (
-        "Foam::cellPointWeight::findTriangle"
-        "(const polyMesh&, const vector&, const label)"
-    )   << "Triangle search failed; using closest triangle to "
-        << "point" << nl
-        << "    cell face: " << faceIndex << endl;
+    if (debug)
+    {
+        Pout<< "Foam::cellPointWeight::findTriangle"
+            << "Triangle search failed; using closest triangle to point" << nl
+            << "    cell face: " << faceIndex << nl << endl;
+    }
 
     // Indices of the cell vertices making up the triangle
     faceVertices_[0] = facePoints[0];

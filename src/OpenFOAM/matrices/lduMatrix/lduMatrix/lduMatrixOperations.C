@@ -40,10 +40,10 @@ void Foam::lduMatrix::sumDiag()
     const unallocLabelList& l = lduAddr().lowerAddr();
     const unallocLabelList& u = lduAddr().upperAddr();
 
-    for (register label face=0; face<l.size(); face++)
+    for (register label odcI = 0; odcI < l.size(); odcI++)
     {
-        Diag[l[face]] += Lower[face];
-        Diag[u[face]] += Upper[face];
+        Diag[l[odcI]] += Lower[odcI];
+        Diag[u[odcI]] += Upper[odcI];
     }
 }
 
@@ -57,10 +57,10 @@ void Foam::lduMatrix::negSumDiag()
     const unallocLabelList& l = lduAddr().lowerAddr();
     const unallocLabelList& u = lduAddr().upperAddr();
 
-    for (register label face=0; face<l.size(); face++)
+    for (register label odcI = 0; odcI < l.size(); odcI++)
     {
-        Diag[l[face]] -= Lower[face];
-        Diag[u[face]] -= Upper[face];
+        Diag[l[odcI]] -= Lower[odcI];
+        Diag[u[odcI]] -= Upper[odcI];
     }
 }
 
@@ -76,10 +76,10 @@ void Foam::lduMatrix::sumMagOffDiag
     const unallocLabelList& l = lduAddr().lowerAddr();
     const unallocLabelList& u = lduAddr().upperAddr();
 
-    for (register label face = 0; face < l.size(); face++)
+    for (register label odcI = 0; odcI < l.size(); odcI++)
     {
-        sumOff[u[face]] += mag(Lower[face]);
-        sumOff[l[face]] += mag(Upper[face]);
+        sumOff[u[odcI]] += mag(Lower[odcI]);
+        sumOff[l[odcI]] += mag(Upper[odcI]);
     }
 }
 
@@ -291,9 +291,9 @@ void Foam::lduMatrix::operator*=(const scalarField& sf)
 
         const unallocLabelList& l = lduAddr().lowerAddr();
 
-        for (register label face=0; face<upper.size(); face++)
+        for (register label odcI = 0; odcI < upper.size(); odcI++)
         {
-            upper[face] *= sf[l[face]];
+            upper[odcI] *= sf[l[odcI]];
         }
     }
 
@@ -303,9 +303,9 @@ void Foam::lduMatrix::operator*=(const scalarField& sf)
 
         const unallocLabelList& u = lduAddr().upperAddr();
 
-        for (register label face=0; face<lower.size(); face++)
+        for (register label odcI = 0; odcI < lower.size(); odcI++)
         {
-            lower[face] *= sf[u[face]];
+            lower[odcI] *= sf[u[odcI]];
         }
     }
 }
@@ -349,25 +349,12 @@ Foam::tmp<Foam::scalarField > Foam::lduMatrix::H1() const
         const scalar* __restrict__ lowerPtr = lower().begin();
         const scalar* __restrict__ upperPtr = upper().begin();
 
-        register const label nFaces = upper().size();
+        register const label nOdcIs = upper().size();
 
-        for (register label face=0; face<nFaces; face++)
+        for (register label odcI = 0; odcI < nOdcIs; odcI++)
         {
-            #ifdef ICC_IA64_PREFETCH
-            __builtin_prefetch (&uPtr[face+32],0,0);
-            __builtin_prefetch (&lPtr[face+32],0,0);
-            __builtin_prefetch (&lowerPtr[face+32],0,1);
-            __builtin_prefetch (&H1Ptr[uPtr[face+32]],0,1);
-            #endif
-
-            H1Ptr[uPtr[face]] -= lowerPtr[face];
-        
-            #ifdef ICC_IA64_PREFETCH
-            __builtin_prefetch (&upperPtr[face+32],0,1);
-            __builtin_prefetch (&H1Ptr[lPtr[face+32]],0,1);
-            #endif
-
-            H1Ptr[lPtr[face]] -= upperPtr[face];
+            H1Ptr[uPtr[odcI]] -= lowerPtr[odcI];
+            H1Ptr[lPtr[odcI]] -= upperPtr[odcI];
         }
     }
 

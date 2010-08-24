@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    RK
+    Foam::RK
 
 Description
     Fifth-order Cash-Karp embedded Runge-Kutta scheme with error control and

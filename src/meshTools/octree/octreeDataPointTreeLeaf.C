@@ -56,7 +56,7 @@ bool Foam::treeLeaf<Foam::octreeDataPoint>::findNearest
     const octreeDataPoint& shapes,
     const point& sample,
     treeBoundBox& tightest,
-    label& tightesti,
+    label& tightestI,
     scalar& tightestDist
 ) const
 {
@@ -93,7 +93,7 @@ bool Foam::treeLeaf<Foam::octreeDataPoint>::findNearest
         tMax.y() = sample.y() + tightestDist;
         tMax.z() = sample.z() + tightestDist;
 
-        tightesti = minIndex;
+        tightestI = minIndex;
 
         return true;
     }

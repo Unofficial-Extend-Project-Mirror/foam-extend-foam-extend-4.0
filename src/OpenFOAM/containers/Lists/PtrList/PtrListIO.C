@@ -30,24 +30,19 @@ License
 #include "Ostream.H"
 #include "INew.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
 template<class T>
 template<class INew>
-void PtrList<T>::read(Istream& is, const INew& inewt)
+void Foam::PtrList<T>::read(Istream& is, const INew& inewt)
 {
-    is.fatalCheck("PtrList<T>::read(Istream& is, const INew& inewt)");
+    is.fatalCheck("PtrList<T>::read(Istream&, const INew&)");
 
     token firstToken(is);
 
     is.fatalCheck
     (
-        "PtrList<T>::read(Istream& is, const INew& inewt) : "
+        "PtrList<T>::read(Istream&, const INew&) : "
         "reading first token"
     );
 
@@ -59,19 +54,19 @@ void PtrList<T>::read(Istream& is, const INew& inewt)
         setSize(s);
 
         // Read beginning of contents
-        char listDelimiter = is.readBeginList("PtrList");
+        char delimiter = is.readBeginList("PtrList");
 
         if (s)
         {
-            if (listDelimiter == token::BEGIN_LIST)
+            if (delimiter == token::BEGIN_LIST)
             {
                 forAll(*this, i)
                 {
                     set(i, inewt(is));
-                
+
                     is.fatalCheck
                     (
-                        "PtrList<T>::read(Istream& is, const INew& inewt) : "
+                        "PtrList<T>::read(Istream&, const INew&) : "
                         "reading entry"
                     );
                 }
@@ -83,7 +78,7 @@ void PtrList<T>::read(Istream& is, const INew& inewt)
 
                 is.fatalCheck
                 (
-                    "PtrList<T>::read(Istream& is, const INew& inewt) : "
+                    "PtrList<T>::read(Istream&, const INew&) : "
                     "reading the single entry"
                 );
 
@@ -103,7 +98,7 @@ void PtrList<T>::read(Istream& is, const INew& inewt)
         {
             FatalIOErrorIn
             (
-                "PtrList<T>::read(Istream& is, const INew& inewt)",
+                "PtrList<T>::read(Istream&, const INew&)",
                 is
             )   << "incorrect first token, '(', found " << firstToken.info()
                 << exit(FatalIOError);
@@ -142,7 +137,7 @@ void PtrList<T>::read(Istream& is, const INew& inewt)
     {
         FatalIOErrorIn
         (
-            "PtrList<T>::read(Istream& is, const INew& inewt)",
+            "PtrList<T>::read(Istream&, const INew&)",
             is
         )   << "incorrect first token, expected <int> or '(', found "
             << firstToken.info()
@@ -155,14 +150,14 @@ void PtrList<T>::read(Istream& is, const INew& inewt)
 
 template<class T>
 template<class INew>
-PtrList<T>::PtrList(Istream& is, const INew& inewt)
+Foam::PtrList<T>::PtrList(Istream& is, const INew& inewt)
 {
     read(is, inewt);
 }
 
 
 template<class T>
-PtrList<T>::PtrList(Istream& is)
+Foam::PtrList<T>::PtrList(Istream& is)
 {
     read(is, INew<T>());
 }
@@ -171,7 +166,7 @@ PtrList<T>::PtrList(Istream& is)
 // * * * * * * * * * * * * * * * Istream Operator  * * * * * * * * * * * * * //
 
 template<class T>
-Istream& operator>>(Istream& is, PtrList<T>& L)
+Foam::Istream& Foam::operator>>(Istream& is, PtrList<T>& L)
 {
     L.clear();
     L.read(is, INew<T>());
@@ -183,21 +178,18 @@ Istream& operator>>(Istream& is, PtrList<T>& L)
 // * * * * * * * * * * * * * * * Ostream Operators * * * * * * * * * * * * * //
 
 template<class T>
-Ostream& operator<<(Ostream& os, const PtrList<T>& pL)
+Foam::Ostream& Foam::operator<<(Ostream& os, const PtrList<T>& L)
 {
-    // Write size of list
-    os << nl << pL.size();
+    // Write size and start delimiter
+    os << nl << L.size() << nl << token::BEGIN_LIST;
 
-    // Write beginning of contents
-    os << nl << token::BEGIN_LIST;
-
-    // Write list contents
-    forAll(pL, i)
+    // Write contents
+    forAll(L, i)
     {
-        os << nl << pL[i];
+        os << nl << L[i];
     }
 
-    // Write end of contents
+    // Write end delimiter
     os << nl << token::END_LIST << nl;
 
     // Check state of IOstream
@@ -206,9 +198,5 @@ Ostream& operator<<(Ostream& os, const PtrList<T>& pL)
     return os;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

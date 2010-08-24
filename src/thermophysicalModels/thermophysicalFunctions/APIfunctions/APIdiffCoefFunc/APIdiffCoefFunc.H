@@ -47,7 +47,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class APIdiffCoefFunc Declaration
+                      Class APIdiffCoefFunc Declaration
 \*---------------------------------------------------------------------------*/
 
 class APIdiffCoefFunc
@@ -58,6 +58,9 @@ class APIdiffCoefFunc
 
         // API vapour mass diffusivity function coefficients
         scalar a_, b_, wf_, wa_;
+
+        // Helper variables
+        scalar alpha_, beta_;
 
 
 public:
@@ -74,7 +77,9 @@ public:
             a_(a),
             b_(b),
             wf_(wf),
-            wa_(wa)
+            wa_(wa),
+            alpha_(sqrt(1/wf_ + 1/wa_)),
+            beta_(sqr(cbrt(a_) + cbrt(b_)))
         {}
 
         //- Construct from Istream
@@ -83,20 +88,28 @@ public:
             a_(readScalar(is)),
             b_(readScalar(is)),
             wf_(readScalar(is)),
-            wa_(readScalar(is))
+            wa_(readScalar(is)),
+            alpha_(sqrt(1/wf_ + 1/wa_)),
+            beta_(sqr((cbrt(a_) + cbrt(b_))))
         {}
 
 
     // Member Functions
 
-        //- API vapour mass diffusivity function
+        //- API vapour mass diffusivity function using properties from
+        //  construction
         scalar f(scalar p, scalar T) const
         {
-            return
-               3.6059e-3*(pow(1.8*T, 1.75))*sqrt(1/wf_ + 1/wa_)
-               /(p*sqr((cbrt(a_) + cbrt(b_))));
+            return 3.6059e-3*(pow(1.8*T, 1.75))*alpha_/(p*beta_);
         }
 
+        //- API vapour mass diffusivity function using properties from
+        //  construction - with specified binary pair
+        scalar f(scalar p, scalar T, scalar  Wa) const
+        {
+            const scalar alphaBinary = sqrt(1/wf_ + 1/Wa);
+            return 3.6059e-3*(pow(1.8*T, 1.75))*alphaBinary/(p*beta_);
+        }
 
         //- Write the function coefficients
         void writeData(Ostream& os) const

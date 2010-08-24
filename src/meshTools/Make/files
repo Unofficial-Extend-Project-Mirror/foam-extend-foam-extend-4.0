@@ -60,6 +60,9 @@ $(topoSets)/cellSet.C
 $(topoSets)/topoSet.C
 $(topoSets)/faceSet.C
 $(topoSets)/pointSet.C
+$(topoSets)/cellZoneSet.C
+$(topoSets)/faceZoneSet.C
+$(topoSets)/pointZoneSet.C
 
 sets/topoSetSource/topoSetSource.C
 
@@ -79,6 +82,8 @@ $(cellSources)/nbrToCell/nbrToCell.C
 $(cellSources)/zoneToCell/zoneToCell.C
 $(cellSources)/setToCell/setToCell.C
 $(cellSources)/sphereToCell/sphereToCell.C
+$(cellSources)/cylinderToCell/cylinderToCell.C
+$(cellSources)/faceZoneToCell/faceZoneToCell.C
 
 faceSources = sets/faceSources
 $(faceSources)/faceToFace/faceToFace.C
@@ -101,6 +106,19 @@ $(pointSources)/boxToPoint/boxToPoint.C
 $(pointSources)/surfaceToPoint/surfaceToPoint.C
 $(pointSources)/zoneToPoint/zoneToPoint.C
 $(pointSources)/setToPoint/setToPoint.C
+$(pointSources)/nearestToPoint/nearestToPoint.C
+
+faceZoneSources = sets/faceZoneSources
+$(faceZoneSources)/faceZoneToFaceZone/faceZoneToFaceZone.C
+$(faceZoneSources)/setsToFaceZone/setsToFaceZone.C
+$(faceZoneSources)/setToFaceZone/setToFaceZone.C
+
+cellZoneSources = sets/cellZoneSources
+$(cellZoneSources)/setToCellZone/setToCellZone.C
+
+pointZoneSources = sets/pointZoneSources
+$(pointZoneSources)/setToPointZone/setToPointZone.C
+
 
 surfaceSets/surfaceSets.C
 
@@ -131,7 +149,10 @@ triSurface/triSurfaceTools/geompack/geompack.C
 
 twoDPointCorrector/twoDPointCorrector.C
 
+directMapped/directMappedPolyPatch/directMappedPatchBase.C
 directMapped/directMappedPolyPatch/directMappedPolyPatch.C
+directMapped/directMappedPolyPatch/directMappedWallPolyPatch.C
 directMapped/directMappedPointPatch/directMappedPointPatch.C
+directMapped/directMappedPointPatch/directMappedWallPointPatch.C
 
 LIB = $(FOAM_LIBBIN)/libmeshTools

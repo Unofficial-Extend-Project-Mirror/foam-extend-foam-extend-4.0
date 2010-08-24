@@ -53,31 +53,32 @@ waveTransmissiveFvPatchField<Type>::waveTransmissiveFvPatchField
 template<class Type>
 waveTransmissiveFvPatchField<Type>::waveTransmissiveFvPatchField
 (
+    const waveTransmissiveFvPatchField& ptf,
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
     const dictionary& dict
+    const fvPatchFieldMapper& mapper
 )
 :
-    advectiveFvPatchField<Type>(p, iF, dict),
-    psiName_(dict.lookup("psi")),
-    UName_(dict.lookup("U")),
-    gamma_(readScalar(dict.lookup("gamma")))
+    advectiveFvPatchField<Type>(ptf, p, iF, mapper),
+    psiName_(ptf.psiName_),
+    psiName_(ptf.UName_),
+    gamma_(ptf.gamma_)
 {}
 
 
 template<class Type>
 waveTransmissiveFvPatchField<Type>::waveTransmissiveFvPatchField
 (
-    const waveTransmissiveFvPatchField& ptf,
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
-    const fvPatchFieldMapper& mapper
+    const dictionary& dict
 )
 :
-    advectiveFvPatchField<Type>(ptf, p, iF, mapper),
-    psiName_(ptf.psiName_),
-    UName_(ptf.UName_),
-    gamma_(ptf.gamma_)
+    advectiveFvPatchField<Type>(p, iF, dict),
+    psiName_(dict.lookupOrDefault<word>("psi", "psi")),
+    UName_(dict.lookupOrDefault<word>("U", "U")),
+    gamma_(readScalar(dict.lookup("gamma")))
 {}
 
 
@@ -185,10 +186,36 @@ template<class Type>
 void waveTransmissiveFvPatchField<Type>::write(Ostream& os) const
 {
     advectiveFvPatchField<Type>::write(os);
+    if (this->phiName_ != "phi")
+    {
+        os.writeKeyword("phi") << this->phiName_ << token::END_STATEMENT << nl;
+    }
+    if (this->rhoName_ != "rho")
+    {
+        os.writeKeyword("rho") << this->rhoName_ << token::END_STATEMENT << nl;
+    }
+    if (this->UName_ != "U")
+    {
+        os.writeKeyword("U") << this->UName_ << token::END_STATEMENT << nl;
+    }
+    if (psiName_ != "psi")
+    {
+        os.writeKeyword("psi") << psiName_ << token::END_STATEMENT << nl;
+    }
+    
+    os.writeKeyword("gamma") << gamma_ << token::END_STATEMENT << nl;
 
-    os.writeKeyword("psi") << psiName_ << token::END_STATEMENT << nl;
-    os.writeKeyword("U") << UName_ << token::END_STATEMENT << nl;
-    os.writeKeyword("gamma") << gamma_ << token::END_STATEMENT << endl;
+    if (this->lInf_ > SMALL)
+    {
+        os.writeKeyword("fieldInf") << this->fieldInf_
+            << token::END_STATEMENT << nl;
+        os.writeKeyword("lInf") << this->lInf_
+            << token::END_STATEMENT << nl;
+    }
+
+    this->writeEntry("value", os);
+
+    
 }
 
 

@@ -70,7 +70,7 @@ void meshToMesh::calculateInverseDistanceWeights() const
             if
             (
                 m < directHitTol                            // Direct hit
-             || neighbours.size() == 0
+             || neighbours.empty()
             )
             {
                 invDistCoeffs[celli].setSize(1);

@@ -36,16 +36,16 @@ const char* const Foam::instant::typeName = "instant";
 Foam::instant::instant()
 {}
 
-Foam::instant::instant(const scalar tval, const word& tname)
+Foam::instant::instant(const scalar val, const word& tname)
 :
-    value_(tval),
+    value_(val),
     name_(tname)
 {}
 
-Foam::instant::instant(const scalar tval)
+Foam::instant::instant(const scalar val)
 :
-    value_(tval),
-    name_(Time::timeName(tval))
+    value_(val),
+    name_(Time::timeName(val))
 {}
 
 Foam::instant::instant(const word& tname)
@@ -57,20 +57,19 @@ Foam::instant::instant(const word& tname)
 
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
-int Foam::operator==(const instant& I1, const instant& I2)
+bool Foam::operator==(const instant& a, const instant& b)
 {
     return
     (
-        I1.value_ < I2.value_ + SMALL
-     && I1.value_ > I2.value_ - SMALL
+        a.value_ < b.value_ + SMALL
+     && a.value_ > b.value_ - SMALL
     );
 }
 
 
-int Foam::operator != (const instant& I1, const instant& I2)
+bool Foam::operator!=(const instant& a, const instant& b)
 {
-    // Invert the '==' operator ('0'='false')
-    return I1 == I2 ? 0 : 1;
+    return !operator==(a, b);
 }
 
 

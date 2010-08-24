@@ -23,9 +23,10 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    ODESolver
+    Foam::ODESolver
 
 Description
+    Selection for ODE solver
 
 SourceFiles
     ODESolver.C

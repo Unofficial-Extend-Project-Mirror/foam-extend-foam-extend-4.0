@@ -37,6 +37,7 @@ SourceFiles
 #define zoneToPoint_H
 
 #include "topoSetSource.H"
+#include "wordRe.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,8 +58,8 @@ class zoneToPoint
         //- Add usage string
         static addToUsageTable usage_;
 
-        //- Name of pointZone
-        word zoneName_;
+        //- Name/regular expression of zone
+        wordRe zoneName_;
 
 
     // Private Member Functions

@@ -33,8 +33,8 @@ Description
     inlet
     {
         type            timeVaryingUniformFixedValue;
-        fileName        "time-series";
-        outOfBounds      clamp;           // (error|warn|clamp|repeat)
+        fileName        "$FOAM_CASE/time-series";
+        outOfBounds     clamp;           // (error|warn|clamp|repeat)
     }
     @endverbatim
 

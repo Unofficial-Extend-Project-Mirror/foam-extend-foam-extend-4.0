@@ -60,8 +60,9 @@ Description
     @endverbatim
 
     The first argument avoids adding the @b -constant option. The second
-    argument adds an additional @b -zeroTime option and prevents the @c 0/
-    directory from being included in the default time range.
+    argument adds an additional @b -zeroTime option and also prevents the
+    @c 0/ directory from being included in the default time range and in the
+    @b -latestTime selection.
 
 SourceFiles
     timeSelector.C
@@ -84,7 +85,7 @@ class argList;
 class Time;
 
 /*---------------------------------------------------------------------------*\
-                       Class timeSelector Declaration
+                        Class timeSelector Declaration
 \*---------------------------------------------------------------------------*/
 
 class timeSelector
@@ -121,18 +122,21 @@ public:
         //
         // @param constant
         //   Add the @b -constant option to include the @c constant/ directory
+        //
         // @param zeroTime
-        //   Additional to the @b -noZero option (explicitly exclude the
-        //   @c 0/ directory), add the @b -zeroTime option to include the
-        //   @c 0/ directory. The @b -noZero option has precedence.
+        //   Enable the @b -zeroTime option and alter the normal time selection
+        //   behaviour (and @b -latestTime behaviour) to exclude the @c 0/
+        //   directory. The @c 0/ directory will only be included when
+        //   @b -zeroTime is specified.
+        //   The @b -noZero option has precedence over the @b -zeroTime option.
         static void addOptions
         (
-            const bool constant = true,
-            const bool zeroTime = false
+            const bool constant=true,
+            const bool zeroTime=false
         );
 
         //- Return the set of times selected based on the argList options
-        static List<Foam::instant> select
+        static List<instant> select
         (
             const List<instant>&,
             const argList& args
@@ -140,7 +144,7 @@ public:
 
         //- Return the set of times selected based on the argList options
         //  also set the runTime to the first instance
-        static List<Foam::instant> select0
+        static List<instant> select0
         (
             Time& runTime,
             const argList& args

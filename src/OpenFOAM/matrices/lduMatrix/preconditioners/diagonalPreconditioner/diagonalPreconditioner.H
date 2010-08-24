@@ -77,7 +77,7 @@ public:
 
     // Constructors
 
-        //- Construct from matrix components and preconditioner data stream
+        //- Construct from matrix components and preconditioner solver controls
         diagonalPreconditioner
         (
             const lduMatrix& matrix,

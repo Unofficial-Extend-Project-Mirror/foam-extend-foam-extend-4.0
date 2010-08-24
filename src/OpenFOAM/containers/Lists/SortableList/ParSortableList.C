@@ -114,7 +114,7 @@ void Foam::ParSortableList<Type>::checkAndSend
         }
 
         {
-            OPstream toSlave(Pstream::blocking, destProcI);
+            OPstream toSlave(destProcI);
             toSlave << values << indices;
         }
     }
@@ -125,7 +125,7 @@ void Foam::ParSortableList<Type>::checkAndSend
 
 // Construct from List, sorting the elements
 template <class Type>
-Foam::ParSortableList<Type>::ParSortableList(const List<Type>& values)
+Foam::ParSortableList<Type>::ParSortableList(const UList<Type>& values)
 :
     List<Type>(values),
     indices_(0),
@@ -311,7 +311,7 @@ void Foam::ParSortableList<Type>::sort()
                     Pout<< "Receiving from " << procI << endl;
                 }
 
-                IPstream fromSlave(Pstream::blocking, procI);
+                IPstream fromSlave(procI);
 
                 fromSlave >> recValues >> recIndices;
 

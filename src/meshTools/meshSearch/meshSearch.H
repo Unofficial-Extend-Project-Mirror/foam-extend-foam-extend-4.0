@@ -26,7 +26,8 @@ Class
     Foam::meshSearch
 
 Description
-    Various searches on polyMesh; uses (demand driven) octree to search.
+    Various (local, not parallel) searches on polyMesh;
+    uses (demand driven) octree to search.
 
 SourceFiles
     meshSearch.C
@@ -36,11 +37,7 @@ SourceFiles
 #ifndef meshSearch_H
 #define meshSearch_H
 
-#include "octreeDataCell.H"
-#include "octreeDataFace.H"
-#include "octreeDataPoint.H"
 #include "pointIndexHit.H"
-#include "className.H"
 #include "Cloud.H"
 #include "passiveParticle.H"
 
@@ -51,6 +48,10 @@ namespace Foam
 
 // Forward declaration of classes
 class polyMesh;
+class treeDataCell;
+class treeDataFace;
+class treeDataPoint;
+template<class Type> class indexedOctree;
 
 /*---------------------------------------------------------------------------*\
                            Class meshSearch Declaration
@@ -71,46 +72,77 @@ class meshSearch
 
         //- demand driven octrees
 
-        mutable octree<octreeDataFace>* boundaryTreePtr_;
-        mutable octree<octreeDataCell>* cellTreePtr_;
-        mutable octree<octreeDataPoint>* cellCentreTreePtr_;
+        mutable indexedOctree<treeDataFace>* boundaryTreePtr_;
+        mutable indexedOctree<treeDataCell>* cellTreePtr_;
+        mutable indexedOctree<treeDataPoint>* cellCentreTreePtr_;
 
 
     // Private Member Functions
 
-        //- nearest cell centre using octree
-        label findNearestCellTree(const point& location) const;
-
-        //- nearest cell centre going through all cells
-        label findNearestCellLinear(const point& location) const;
-
-        //- walk from seed. Does not 'go around' boundary, just returns
-        //  last cell before boundary.
-        label findNearestCellWalk
+        //- Updates nearestI, nearestDistSqr from any closer ones.
+        static bool findNearer
         (
-            const point& location,
-            const label seedCellI
-        ) const;
+            const point& sample,
+            const pointField& points,
+            label& nearestI,
+            scalar& nearestDistSqr
+        );
 
-        //- cell containing location. Linear search.
-        label findCellLinear(const point& location) const;
-
-        //- walk from seed to find nearest boundary face. Gets stuck in
-        //  local minimum.
-        label findNearestBoundaryFaceWalk
+        //- Updates nearestI, nearestDistSqr from any selected closer ones.
+        static bool findNearer
         (
-            const point& location,
-            const label seedFaceI
-        ) const;
+            const point& sample,
+            const pointField& points,
+            const labelList& indices,
+            label& nearestI,
+            scalar& nearestDistSqr
+        );
 
-        //- Calculate offset vector in direction dir with as length a fraction
-        //  of the cell size (of the cell straddling boundary face)
-        vector offset
-        (
-            const point& bPoint,
-            const label bFaceI,
-            const vector& dir
-        ) const;
+
+        // Cells
+
+            //- Nearest cell centre using octree
+            label findNearestCellTree(const point&) const;
+
+            //- Nearest cell centre going through all cells
+            label findNearestCellLinear(const point&) const;
+
+            //- Walk from seed. Does not 'go around' boundary, just returns
+            //  last cell before boundary.
+            label findNearestCellWalk(const point&, const label) const;
+
+            //- Cell containing location. Linear search.
+            label findCellLinear(const point&) const;
+
+
+        // Cells
+
+            label findNearestFaceTree(const point&) const;
+
+            label findNearestFaceLinear(const point&) const;
+
+            label findNearestFaceWalk(const point&, const label) const;
+
+
+
+        // Boundary faces
+
+            //- Walk from seed to find nearest boundary face. Gets stuck in
+            //  local minimum.
+            label findNearestBoundaryFaceWalk
+            (
+                const point& location,
+                const label seedFaceI
+            ) const;
+
+            //- Calculate offset vector in direction dir with as length a
+            //  fraction of the cell size (of the cell straddling boundary face)
+            vector offset
+            (
+                const point& bPoint,
+                const label bFaceI,
+                const vector& dir
+            ) const;
 
 
         //- Disallow default bitwise copy construct
@@ -154,13 +186,13 @@ public:
 
             //- Get (demand driven) reference to octree holding all
             //  boundary faces
-            const octree<octreeDataFace>& boundaryTree() const;
+            const indexedOctree<treeDataFace>& boundaryTree() const;
 
             //- Get (demand driven) reference to octree holding all cells
-            const octree<octreeDataCell>& cellTree() const;
+            const indexedOctree<treeDataCell>& cellTree() const;
 
             //- Get (demand driven) reference to octree holding all cell centres
-            const octree<octreeDataPoint>& cellCentreTree() const;
+            const indexedOctree<treeDataPoint>& cellCentreTree() const;
 
 
         // Queries
@@ -178,6 +210,13 @@ public:
             (
                 const point& location,
                 const label seedCellI = -1,
+                const bool useTreeSearch = true
+            ) const;
+
+            label findNearestFace
+            (
+                const point& location,
+                const label seedFaceI = -1,
                 const bool useTreeSearch = true
             ) const;
 
@@ -205,8 +244,11 @@ public:
 
             //- Find first intersection of boundary in segment [pStart, pEnd]
             //  (so inclusive of endpoints). Always octree for now
-            pointIndexHit intersection(const point& pStart, const point& pEnd)
-                const;
+            pointIndexHit intersection
+            (
+                const point& pStart,
+                const point& pEnd
+            ) const;
 
             //- Find all intersections of boundary within segment pStart .. pEnd
             //  Always octree for now

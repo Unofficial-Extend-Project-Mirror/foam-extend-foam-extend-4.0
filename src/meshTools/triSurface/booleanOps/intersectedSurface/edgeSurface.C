@@ -181,7 +181,7 @@ Foam::edgeSurface::edgeSurface
         // Store current top of allEdges.
         label freeNewEdgeI = allEdges.size();
 
-        if (extraVerts.size() == 0)
+        if (extraVerts.empty())
         {
             // No cuts across this edge. Note that vertices do not need to be
             // renumbered.
@@ -287,21 +287,12 @@ Foam::edgeSurface::edgeSurface
     }
 
     // Transfer.
-    allEdges.shrink();
-    allEdges.clear();
     edges_.transfer(allEdges);
-
-    allParentEdges.shrink();
-    allParentEdges.clear();
     parentEdges_.transfer(allParentEdges);
 
     forAll(allFaceEdges, faceI)
     {
-        DynamicList<label>& allFEdges = allFaceEdges[faceI];
-
-        allFEdges.shrink();
-        allFEdges.clear();
-        faceEdges_[faceI].transfer(allFEdges);
+        faceEdges_[faceI].transfer(allFaceEdges[faceI]);
     }
 
 

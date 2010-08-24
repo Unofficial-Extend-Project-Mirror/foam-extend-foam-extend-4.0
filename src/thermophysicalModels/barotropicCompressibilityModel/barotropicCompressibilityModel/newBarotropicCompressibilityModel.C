@@ -32,7 +32,8 @@ Foam::autoPtr<Foam::barotropicCompressibilityModel>
 Foam::barotropicCompressibilityModel::New
 (
     const dictionary& compressibilityProperties,
-    const volScalarField& gamma
+    const volScalarField& gamma,
+    const word& psiName
 )
 {
     word bcModelTypeName
@@ -60,7 +61,7 @@ Foam::barotropicCompressibilityModel::New
 
     return autoPtr<barotropicCompressibilityModel>
     (
-        cstrIter()(compressibilityProperties, gamma)
+        cstrIter()(compressibilityProperties, gamma, psiName)
     );
 }
 

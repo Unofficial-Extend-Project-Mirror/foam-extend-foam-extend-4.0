@@ -118,6 +118,22 @@ Foam::pointZone::pointZone
 {}
 
 
+Foam::pointZone::pointZone
+(
+    const word& name,
+    const Xfer<labelList>& addr,
+    const label index,
+    const pointZoneMesh& zm
+)
+:
+    labelList(addr),
+    name_(name),
+    index_(index),
+    zoneMesh_(zm),
+    pointLookupMapPtr_(NULL)
+{}
+
+
 // Construct from dictionary
 Foam::pointZone::pointZone
 (
@@ -141,6 +157,22 @@ Foam::pointZone::pointZone
 (
     const pointZone& pz,
     const labelList& addr,
+    const label index,
+    const pointZoneMesh& zm
+)
+:
+    labelList(addr),
+    name_(pz.name()),
+    index_(index),
+    zoneMesh_(zm),
+    pointLookupMapPtr_(NULL)
+{}
+
+
+Foam::pointZone::pointZone
+(
+    const pointZone& pz,
+    const Xfer<labelList>& addr,
     const label index,
     const pointZoneMesh& zm
 )
@@ -230,15 +262,12 @@ void Foam::pointZone::write(Ostream& os) const
 
 void Foam::pointZone::writeDict(Ostream& os) const
 {
-    os  << indent << name() << nl
-        << indent << token::BEGIN_BLOCK << nl
-        << incrIndent
-        << indent << "type " << type() << token::END_STATEMENT << nl;
+    os  << nl << name() << nl << token::BEGIN_BLOCK << nl
+        << "    type " << type() << token::END_STATEMENT << nl;
 
     writeEntry("pointLabels", os);
 
-    os  << decrIndent
-        << indent << token::END_BLOCK << endl;
+    os  << token::END_BLOCK << endl;
 }
 
 

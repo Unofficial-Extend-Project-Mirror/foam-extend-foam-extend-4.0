@@ -50,8 +50,7 @@ Foam::MRFZones::MRFZones(const fvMesh& mesh)
             IOobject::NO_WRITE
         ),
         MRFZone::iNew(mesh)
-    ),
-    mesh_(mesh)
+    )
 {}
 
 
@@ -62,15 +61,6 @@ void Foam::MRFZones::addCoriolis(fvVectorMatrix& UEqn) const
     forAll(*this, i)
     {
         operator[](i).addCoriolis(UEqn);
-    }
-}
-
-
-void Foam::MRFZones::relativeFlux(surfaceScalarField& phi) const
-{
-    forAll(*this, i)
-    {
-        operator[](i).relativeFlux(phi);
     }
 }
 
@@ -88,45 +78,65 @@ void Foam::MRFZones::addCoriolis
 }
 
 
+void Foam::MRFZones::relativeVelocity(volVectorField& U) const
+{
+    forAll(*this, i)
+    {
+        operator[](i).relativeVelocity(U);
+    }
+}
+
+
+void Foam::MRFZones::absoluteVelocity(volVectorField& U) const
+{
+    forAll(*this, i)
+    {
+        operator[](i).absoluteVelocity(U);
+    }
+}
+
+
+void Foam::MRFZones::relativeFlux(surfaceScalarField& phi) const
+{
+    forAll(*this, i)
+    {
+        operator[](i).relativeFlux(phi);
+    }
+}
+
+
 void Foam::MRFZones::relativeFlux
 (
-    const surfaceScalarField& rhof,
+    const surfaceScalarField& rho,
     surfaceScalarField& phi
 ) const
 {
     forAll(*this, i)
     {
-        operator[](i).relativeFlux(rhof, phi);
+        operator[](i).relativeFlux(rho, phi);
     }
 }
 
 
-Foam::tmp<Foam::surfaceScalarField> Foam::MRFZones::fluxCorrection() const
+void Foam::MRFZones::absoluteFlux(surfaceScalarField& phi) const
 {
-    tmp<surfaceScalarField> tMRFZonesPhiCorr
-    (
-        new surfaceScalarField
-        (
-            IOobject
-            (
-                "MRFZonesPhiCorr",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            mesh_,
-            dimensionedScalar("zero", dimVelocity*dimArea, 0)
-        )
-    );
-    surfaceScalarField& MRFZonesPhiCorr = tMRFZonesPhiCorr();
-
     forAll(*this, i)
     {
-        operator[](i).relativeFlux(MRFZonesPhiCorr);
+        operator[](i).absoluteFlux(phi);
     }
+}
 
-    return tMRFZonesPhiCorr;
+
+void Foam::MRFZones::absoluteFlux
+(
+    const surfaceScalarField& rho,
+    surfaceScalarField& phi
+) const
+{
+    forAll(*this, i)
+    {
+        operator[](i).absoluteFlux(rho, phi);
+    }
 }
 
 

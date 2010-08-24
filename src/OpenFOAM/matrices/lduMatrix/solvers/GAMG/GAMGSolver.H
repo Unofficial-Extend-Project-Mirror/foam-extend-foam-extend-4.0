@@ -215,18 +215,7 @@ public:
 
     // Constructors
 
-        //- Construct from lduMatrix and solver data stream
-        GAMGSolver
-        (
-            const word& fieldName,
-            const lduMatrix& matrix,
-            const FieldField<Field, scalar>& coupleBouCoeffs,
-            const FieldField<Field, scalar>& coupleIntCoeffs,
-            const lduInterfaceFieldPtrsList& interfaces,
-            Istream& solverData
-        );
-
-        //- Construct from lduMatrix and dictionary
+        //- Construct from lduMatrix and solver controls
         GAMGSolver
         (
             const word& fieldName,

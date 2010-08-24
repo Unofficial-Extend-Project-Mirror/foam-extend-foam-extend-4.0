@@ -3,20 +3,11 @@
     int nOuterCorr(readInt(pimple.lookup("nOuterCorrectors")));
     int nCorr(readInt(pimple.lookup("nCorrectors")));
 
-    int nNonOrthCorr = 0;
-    if (pimple.found("nNonOrthogonalCorrectors"))
-    {
-        nNonOrthCorr = readInt(pimple.lookup("nNonOrthogonalCorrectors"));
-    }
+    int nNonOrthCorr =
+        pimple.lookupOrDefault<int>("nNonOrthogonalCorrectors", 0);
 
-    bool momentumPredictor = true;
-    if (pimple.found("momentumPredictor"))
-    {
-        momentumPredictor = Switch(pimple.lookup("momentumPredictor"));
-    }
+    bool momentumPredictor =
+        pimple.lookupOrDefault<Switch>("momentumPredictor", true);
 
-    bool transonic = false;
-    if (pimple.found("transonic"))
-    {
-        transonic = Switch(pimple.lookup("transonic"));
-    }
+    bool transonic =
+        pimple.lookupOrDefault<Switch>("transonic", false);

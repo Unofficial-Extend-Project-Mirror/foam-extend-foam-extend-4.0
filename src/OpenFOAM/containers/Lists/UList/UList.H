@@ -27,7 +27,7 @@ Class
 
 Description
     A 1D vector of objects of type \<T\>, where the size of the vector is
-    known and used for subscript bounds checking, etc.
+    known and can be used for subscript bounds checking, etc.
 
     Storage is not allocated during construction or use but is supplied to
     the constructor as an argument.  This type of list is particularly useful
@@ -43,26 +43,21 @@ SourceFiles
 #ifndef UList_H
 #define UList_H
 
-#include "label.H"
 #include "bool.H"
+#include "label.H"
+#include "uLabel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-//- Pre-declare related List type
-template<class T>
-class List;
-
-//- Pre-declare related SubList type
-template<class T>
-class SubList;
+// Forward declaration of friend classes
+template<class T> class List;
+template<class T> class SubList;
 
 // Forward declaration of friend functions and operators
-
 template<class T> class UList;
-
 template<class T> Ostream& operator<<(Ostream&, const UList<T>&);
 
 
@@ -100,6 +95,31 @@ public:
         //- Declare friendship with the SubList class
         friend class SubList<T>;
 
+    // Static Member Functions
+
+        //- Return a null UList
+        inline static const UList<T>& null();
+
+    // Public classes
+
+        //- Less function class that can be used for sorting
+        class less
+        {
+            const UList<T>& values_;
+
+        public:
+
+            less(const UList<T>& values)
+            :
+                values_(values)
+            {}
+
+            bool operator()(const label a, const label b)
+            {
+                return values_[a] < values_[b];
+            }
+        };
+
 
     // Constructors
 
@@ -110,10 +130,7 @@ public:
         inline UList(T* __restrict__ v, label size);
 
 
-    // Member functions
-
-        //- Return a null UList
-        static const UList<T>& null();
+    // Member Functions
 
 
         // Access
@@ -132,6 +149,17 @@ public:
             label byteSize() const;
 
 
+            //- Return a const pointer to the first data element,
+            //  similar to the STL front() method and the string::data() method
+            //  This can be used (with caution) when interfacing with C code.
+            inline const T* cdata() const;
+
+            //- Return a pointer to the first data element,
+            //  similar to the STL front() method and the string::data() method
+            //  This can be used (with caution) when interfacing with C code.
+            inline T* data();
+
+
         // Check
 
             //- Check start is within valid range (0 ... size-1).
@@ -145,10 +173,10 @@ public:
 
 
         //- Write the UList as a dictionary entry.
-        void writeEntry(Ostream& os) const;
+        void writeEntry(Ostream&) const;
 
         //- Write the UList as a dictionary entry with keyword.
-        void writeEntry(const word& keyword, Ostream& os) const;
+        void writeEntry(const word& keyword, Ostream&) const;
 
         //- Assign elements to those from UList.
         void assign(const UList<T>&);
@@ -156,10 +184,12 @@ public:
 
     // Member operators
 
-        //- Return subscript-checked element of UList.
+        //- Return (subscript-checked on debug) element of UList.
         inline T& operator[](const label);
 
-        //- Return subscript-checked element of constant UList.
+        //- Return (subscript-checked on debug) element of constant UList.
+        //  Note that the bool specialization adds lazy evaluation so reading
+        //  an out-of-range element returns false without any ill-effects
         inline const T& operator[](const label) const;
 
         //- Allow cast to a const List<T>&
@@ -207,12 +237,16 @@ public:
         //- Random access iterator for traversing UList.
         typedef const T* const_iterator;
 
-        //- Return a const_iterator to begin traversing the
-        //  constant UList.
+        //- Return const_iterator to begin traversing the constant UList.
+        inline const_iterator cbegin() const;
+
+        //- Return const_iterator to end traversing the constant UList.
+        inline const_iterator cend() const;
+
+        //- Return const_iterator to begin traversing the constant UList.
         inline const_iterator begin() const;
 
-        //- Return a const_iterator to end traversing the
-        //  constant UList.
+        //- Return const_iterator to end traversing the constant UList.
         inline const_iterator end() const;
 
 
@@ -221,12 +255,10 @@ public:
         //- Reverse iterator for reverse traversal of UList.
         typedef T* reverse_iterator;
 
-        //- Return a reverse_iterator to begin reverse traversing the
-        //  UList.
+        //- Return reverse_iterator to begin reverse traversing the UList.
         inline reverse_iterator rbegin();
 
-        //- Return a reverse_iterator to end reverse traversing the
-        //  UList.
+        //- Return reverse_iterator to end reverse traversing the UList.
         inline reverse_iterator rend();
 
 
@@ -235,12 +267,16 @@ public:
         //- Reverse iterator for reverse traversal of constant UList.
         typedef const T* const_reverse_iterator;
 
-        //- Return a const_reverse_iterator to begin reverse traversing the
-        //  UList.
+        //- Return const_reverse_iterator to begin reverse traversing the UList.
+        inline const_reverse_iterator crbegin() const;
+
+        //- Return const_reverse_iterator to end reverse traversing the UList.
+        inline const_reverse_iterator crend() const;
+
+        //- Return const_reverse_iterator to begin reverse traversing the UList.
         inline const_reverse_iterator rbegin() const;
 
-        //- Return a const_reverse_iterator to end reverse traversing the
-        //  UList.
+        //- Return const_reverse_iterator to end reverse traversing the UList.
         inline const_reverse_iterator rend() const;
 
 
@@ -252,7 +288,7 @@ public:
         //- Return size of the largest possible UList.
         inline label max_size() const;
 
-        //- Return true if the UList is empty (i.e., if size() == 0).
+        //- Return true if the UList is empty (ie, size() is zero).
         inline bool empty() const;
 
         //- Swap two ULists of the same type in constant time.
@@ -285,20 +321,32 @@ public:
     // Ostream operator
 
         // Write UList to Ostream.
-        friend Ostream& operator<<
-        #ifndef __CINT__
-        <T>
-        #endif
-        (Ostream&, const UList<T>&);
+        friend Ostream& operator<< <T>
+        (
+            Ostream&,
+            const UList<T>&
+        );
 };
+
+template<class T>
+void sort(UList<T>&);
+
+template<class T, class Cmp>
+void sort(UList<T>&, const Cmp&);
+
+template<class T>
+void stableSort(UList<T>&);
+
+template<class T, class Cmp>
+void stableSort(UList<T>&, const Cmp&);
 
 // Reverse the first n elements of the list
 template<class T>
-inline void reverse(UList<T>& ul, const label n);
+inline void reverse(UList<T>&, const label n);
 
 // Reverse all the elements of the list
 template<class T>
-inline void reverse(UList<T>& ul);
+inline void reverse(UList<T>&);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

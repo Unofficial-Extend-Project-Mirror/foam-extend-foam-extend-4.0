@@ -62,11 +62,16 @@ Foam::pointMesh::pointMesh
     bool alwaysConstructGlobalPatch
 )
 :
+    MeshObject<polyMesh, pointMesh>(pMesh),
     GeoMesh<polyMesh>(pMesh),
     boundary_(*this, pMesh.boundaryMesh())
 {
     // Add the globalPointPatch if there are global points
-    if (alwaysConstructGlobalPatch || mesh_.globalData().nGlobalPoints())
+    if
+    (
+        alwaysConstructGlobalPatch
+     || GeoMesh<polyMesh>::mesh_.globalData().nGlobalPoints()
+    )
     {
         boundary_.setSize(boundary_.size() + 1);
 

@@ -30,27 +30,22 @@ Description
 #include "Ostream.H"
 #include "token.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
 
 template<class LListBase, class T>
-Ostream& operator<<(Ostream& os, const UILList<LListBase, T>& ill)
+Foam::Ostream& Foam::operator<<(Ostream& os, const UILList<LListBase, T>& lst)
 {
-    // Write size of UILList
-    os << nl << ill.size();
+    // Write size
+    os << nl << lst.size();
 
     // Write beginning of contents
     os << nl << token::BEGIN_LIST << nl;
 
-    // Write UILList contents
+    // Write contents
     for
     (
-        typename UILList<LListBase, T>::const_iterator iter = ill.begin();
-        iter != ill.end();
+        typename UILList<LListBase, T>::const_iterator iter = lst.begin();
+        iter != lst.end();
         ++iter
     )
     {
@@ -61,14 +56,9 @@ Ostream& operator<<(Ostream& os, const UILList<LListBase, T>& ill)
     os << token::END_LIST;
 
     // Check state of IOstream
-    os.check("Ostream& operator<<(Ostream&, const UILList&)");
+    os.check("Ostream& operator<<(Ostream&, const UILList<LListBase, T>&)");
 
     return os;
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

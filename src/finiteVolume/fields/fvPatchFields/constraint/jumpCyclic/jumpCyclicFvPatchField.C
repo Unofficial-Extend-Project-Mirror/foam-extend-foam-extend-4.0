@@ -154,7 +154,7 @@ void jumpCyclicFvPatchField<Type>::updateInterfaceMatrix
     label sizeby2 = this->size()/2;
     const unallocLabelList& faceCells = this->cyclicPatch().faceCells();
 
-    if (long(&psiInternal) == long(&this->internalField()))
+    if (&psiInternal == &this->internalField())
     {
         // Get component of jump.  HJ, 11/Aug/2009
         const Field<scalar> jf = jump()().component(cmpt);

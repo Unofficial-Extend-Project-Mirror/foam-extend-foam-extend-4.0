@@ -1,5 +1,0 @@
-OPwrite.C
-IPread.C
-Pstream.C
-
-LIB = $(FOAM_LIBBIN)/pvm-$(LAM_VERSION)/libPstream

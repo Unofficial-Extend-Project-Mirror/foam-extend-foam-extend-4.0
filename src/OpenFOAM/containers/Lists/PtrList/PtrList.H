@@ -129,6 +129,9 @@ public:
         template<class CloneArg>
         PtrList(const PtrList<T>&, const CloneArg&);
 
+        //- Construct by transferring the parameter contents
+        PtrList(const Xfer<PtrList<T> >&);
+
         //- Construct as copy or re-use as specified.
         PtrList(PtrList<T>&, bool reUse);
 
@@ -155,6 +158,9 @@ public:
             //- Return the number of elements in the PtrList
             inline label size() const;
 
+            //- Return true if the PtrList is empty (ie, size() is zero).
+            inline bool empty() const;
+
 
         // Edit
 
@@ -164,6 +170,12 @@ public:
             //  deleted.
             void setSize(const label);
 
+            //- Reset size of PtrList.  This can only be used to set the size
+            //  of an empty PtrList, extend a PtrList, remove entries from
+            //  the end of a PtrList. If the entries are non-empty they are
+            //  deleted.
+            inline void resize(const label);
+
             //- Clear the PtrList, i.e. set size to zero deleting all the
             //  allocated entries.
             void clear();
@@ -171,6 +183,9 @@ public:
             //- Transfer the contents of the argument PtrList into this PtrList
             //  and annull the argument list.
             void transfer(PtrList<T>&);
+
+            //- Transfer contents to the Xfer container
+            inline Xfer<PtrList<T> > xfer();
 
             //- Is element set
             inline bool set(const label) const;

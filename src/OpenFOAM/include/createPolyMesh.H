@@ -1,13 +1,18 @@
-    Info<< "Create polyMesh for time = "
-        << runTime.timeName() << nl << endl;
+//
+// createPolyMesh.H
+// ~~~~~~~~~~~~~~~~
 
-    polyMesh mesh
+    Foam::Info
+        << "Create polyMesh for time = "
+        << runTime.timeName() << Foam::nl << Foam::endl;
+
+    Foam::polyMesh mesh
     (
-        IOobject
+        Foam::IOobject
         (
-            polyMesh::defaultRegion,
+            Foam::polyMesh::defaultRegion,
             runTime.timeName(),
             runTime,
-            IOobject::MUST_READ
+            Foam::IOobject::MUST_READ
         )
     );

@@ -123,7 +123,7 @@ public:
         enum dimensionType
         {
             MASS,               // kilogram   kg
-            LENGTH,             // meter      m
+            LENGTH,             // metre      m
             TIME,               // second     s
             TEMPERATURE,        // Kelvin     K
             MOLES,              // mole       mol

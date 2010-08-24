@@ -68,7 +68,7 @@ public:
 
     // Constructors
 
-        //- Construct from matrix
+        //- Construct from matrix and solver controls
         diagonalSolver
         (
             const word& fieldName,
@@ -76,14 +76,15 @@ public:
             const FieldField<Field, scalar>& coupleBouCoeffs,
             const FieldField<Field, scalar>& coupleIntCoeffs,
             const lduInterfaceFieldPtrsList& interfaces,
-            Istream& solverData
+            const dictionary& solverControls
         );
 
 
     // Member Functions
 
         //- Read and reset the solver parameters from the given stream
-        void read(Istream& solverData);
+        void read(const dictionary&)
+        {}
 
         //- Solve the matrix with this solver
         lduSolverPerformance solve

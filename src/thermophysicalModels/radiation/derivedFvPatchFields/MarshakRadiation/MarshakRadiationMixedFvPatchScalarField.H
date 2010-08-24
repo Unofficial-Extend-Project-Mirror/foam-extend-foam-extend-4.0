@@ -26,7 +26,8 @@ Class
     Foam::MarshakRadiationFvPatchScalarField
 
 Description
-    Radiation temperature taken from calculated temperaure
+    Marshak boundary for radiation G field
+    - radiation temperature taken from patch value
 
 SourceFiles
     MarshakRadiationFvPatchScalarField.C

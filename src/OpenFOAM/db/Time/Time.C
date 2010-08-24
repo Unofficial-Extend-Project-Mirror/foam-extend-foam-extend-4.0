@@ -31,11 +31,7 @@ License
 
 // * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-    defineTypeNameAndDebug(Time, 0);
-}
-
+defineTypeNameAndDebug(Foam::Time, 0);
 
 template<>
 const char* Foam::NamedEnum<Foam::Time::stopAtControls, 4>::names[] =
@@ -100,9 +96,11 @@ void Foam::Time::adjustDeltaT()
 void Foam::Time::setControls()
 {
     // default is to resume calculation from "latestTime"
-    word startFrom("latestTime");
-
-    controlDict_.readIfPresent("startFrom", startFrom);
+    word startFrom = controlDict_.lookupOrDefault<word>
+    (
+        "startFrom",
+        "latestTime"
+    );
 
     if (startFrom == "startTime")
     {
@@ -111,29 +109,28 @@ void Foam::Time::setControls()
     else
     {
         // Search directory for valid time directories
-        instantList Times = findTimes(path());
+        instantList timeDirs = findTimes(path());
 
         if (startFrom == "firstTime")
         {
-            if (Times.size())
+            if (timeDirs.size())
             {
-                startTime_ = Times[0].value();
+                startTime_ = timeDirs[0].value();
             }
         }
         else if (startFrom == "latestTime")
         {
-            if (Times.size())
+            if (timeDirs.size())
             {
-                startTime_ = Times[Times.size()-1].value();
+                startTime_ = timeDirs[timeDirs.size()-1].value();
             }
         }
         else
         {
-            WarningIn("Time::setControls()")
-                << "    expected startTime, firstTime or latestTime"
-                << " found '" << startFrom
-                << "' in dictionary " << controlDict_.name() << nl
-                << "    Setting time to " << startTime_ << endl;
+            FatalIOErrorIn("Time::setControls()", controlDict_)
+                << "expected startTime, firstTime or latestTime"
+                << " found '" << startFrom << "'"
+                << exit(FatalIOError);
         }
     }
 
@@ -153,10 +150,10 @@ void Foam::Time::setControls()
           > Pstream::nProcs()*deltaT_/10.0
         )
         {
-            FatalErrorIn("Time::setControls()")
+            FatalIOErrorIn("Time::setControls()", controlDict_)
                 << "Start time is not the same for all processors" << nl
                 << "processor " << Pstream::myProcNo() << " has startTime "
-                << startTime_ << exit(FatalError);
+                << startTime_ << exit(FatalIOError);
         }
     }
 
@@ -354,25 +351,27 @@ Foam::Time::Time
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::Time::~Time()
-{}
+{
+    // destroy function objects first
+    functionObjects_.clear();
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 Foam::word Foam::Time::timeName(const scalar t)
 {
-    std::ostringstream osBuffer;
-    osBuffer.setf(ios_base::fmtflags(format_), ios_base::floatfield);
-    osBuffer.precision(precision_);
-    osBuffer << t;
-    return osBuffer.str();
+    std::ostringstream buf;
+    buf.setf(ios_base::fmtflags(format_), ios_base::floatfield);
+    buf.precision(precision_);
+    buf << t;
+    return buf.str();
 }
 
 
 Foam::word Foam::Time::timeName() const
 {
     return dimensionedScalar::name();
-    //return timeName(timeOutputValue());
 }
 
 
@@ -385,13 +384,13 @@ Foam::instantList Foam::Time::times() const
 
 Foam::word Foam::Time::findInstancePath(const instant& t) const
 {
-    instantList times = Time::findTimes(path());
+    instantList timeDirs = findTimes(path());
 
-    forAllReverse(times, i)
+    forAllReverse(timeDirs, timeI)
     {
-        if (times[i] == t)
+        if (timeDirs[timeI] == t)
         {
-            return times[i].name();
+            return timeDirs[timeI].name();
         }
     }
 
@@ -401,68 +400,68 @@ Foam::word Foam::Time::findInstancePath(const instant& t) const
 
 Foam::instant Foam::Time::findClosestTime(const scalar t) const
 {
-    instantList times = Time::findTimes(path());
+    instantList timeDirs = findTimes(path());
 
-    // If there is only one time it is "constant" so return it
-    if (times.size() == 1)
+    // there is only one time (likely "constant") so return it
+    if (timeDirs.size() == 1)
     {
-        return times[0];
+        return timeDirs[0];
     }
 
-    if (t < times[1].value())
+    if (t < timeDirs[1].value())
     {
-        return times[1];
+        return timeDirs[1];
     }
-    else if (t > times[times.size() - 1].value())
+    else if (t > timeDirs[timeDirs.size()-1].value())
     {
-        return times[times.size() - 1];
+        return timeDirs[timeDirs.size()-1];
     }
 
     label nearestIndex = -1;
     scalar deltaT = GREAT;
 
-    for (label i=1; i<times.size(); i++)
+    for (label timeI=1; timeI < timeDirs.size(); ++timeI)
     {
-        scalar diff = mag(times[i].value() - t);
+        scalar diff = mag(timeDirs[timeI].value() - t);
         if (diff < deltaT)
         {
             deltaT = diff;
-            nearestIndex = i;
+            nearestIndex = timeI;
         }
     }
 
-    return times[nearestIndex];
+    return timeDirs[nearestIndex];
 }
 
-//
+
 // This should work too,
 // if we don't worry about checking "constant" explicitly
 //
 // Foam::instant Foam::Time::findClosestTime(const scalar t) const
 // {
-//     instantList times = Time::findTimes(path());
-//     label timeIndex = min(findClosestTimeIndex(times, t), 0);
-//     return times[timeIndex];
+//     instantList timeDirs = findTimes(path());
+//     label timeIndex = min(findClosestTimeIndex(timeDirs, t), 0);
+//     return timeDirs[timeIndex];
 // }
 
 Foam::label Foam::Time::findClosestTimeIndex
 (
-    const instantList& times,
+    const instantList& timeDirs,
     const scalar t
 )
 {
     label nearestIndex = -1;
     scalar deltaT = GREAT;
 
-    forAll (times, i)
+    forAll(timeDirs, timeI)
     {
-        if (times[i].name() == "constant") continue;
+        if (timeDirs[timeI].name() == "constant") continue;
 
-        scalar diff = fabs(times[i].value() - t);
+        scalar diff = mag(timeDirs[timeI].value() - t);
         if (diff < deltaT)
         {
             deltaT = diff;
-            nearestIndex = i;
+            nearestIndex = timeI;
         }
     }
 
@@ -492,9 +491,28 @@ bool Foam::Time::run() const
 {
     bool running = value() < (endTime_ - 0.5*deltaT_);
 
-    if (!subCycling_ && !running && timeIndex_ != startTimeIndex_)
+    if (!subCycling_)
     {
-        const_cast<functionObjectList&>(functionObjects_).execute();
+        // only execute when the condition is no longer true
+        // ie, when exiting the control loop
+        if (!running && timeIndex_ != startTimeIndex_)
+        {
+            // Note, end() also calls an indirect start() as required
+            functionObjects_.end();
+        }
+    }
+
+    return running;
+}
+
+
+bool Foam::Time::loop()
+{
+    bool running = run();
+
+    if (running)
+    {
+        operator++();
     }
 
     return running;
@@ -503,7 +521,7 @@ bool Foam::Time::run() const
 
 bool Foam::Time::end() const
 {
-    return (value() > (endTime_ + 0.5*deltaT_));
+    return value() > (endTime_ + 0.5*deltaT_);
 }
 
 
@@ -555,12 +573,6 @@ void Foam::Time::setTime(const scalar newTime, const label newIndex)
 }
 
 
-void Foam::Time::setStopAt(const stopAtControls& sa)
-{
-    stopAt_ = sa;
-}
-
-
 void Foam::Time::setEndTime(const dimensionedScalar& endTime)
 {
     setEndTime(endTime.value());
@@ -587,36 +599,28 @@ void Foam::Time::setDeltaT(const scalar deltaT)
 }
 
 
-void Foam::Time::setWriteControl(const writeControls& wc)
-{
-    writeControl_ = wc;
-}
-
-
-void Foam::Time::setWriteInterval(const scalar writeInterval)
-{
-    writeInterval_ = writeInterval;
-}
-
-
 Foam::TimeState Foam::Time::subCycle(const label nSubCycles)
 {
     subCycling_ = true;
+    prevTimeState_.set(new TimeState(*this));
 
-    TimeState ts = *this;
     setTime(*this - deltaT(), (timeIndex() - 1)*nSubCycles);
     deltaT_ /= nSubCycles;
     deltaT0_ /= nSubCycles;
     deltaTSave_ = deltaT0_;
 
-    return ts;
+    return prevTimeState();
 }
 
 
-void Foam::Time::endSubCycle(const TimeState& ts)
+void Foam::Time::endSubCycle()
 {
-    subCycling_ = false;
-    TimeState::operator=(ts);
+    if (subCycling_)
+    {
+        subCycling_ = false;
+        TimeState::operator=(prevTimeState());
+        prevTimeState_.clear();
+    }
 }
 
 
@@ -630,24 +634,8 @@ Foam::Time& Foam::Time::operator+=(const dimensionedScalar& deltaT)
 
 Foam::Time& Foam::Time::operator+=(const scalar deltaT)
 {
-    readModifiedObjects();
-
-    if (!subCycling_)
-    {
-        if (timeIndex_ == startTimeIndex_)
-        {
-            functionObjects_.start();
-        }
-        else
-        {
-            functionObjects_.execute();
-        }
-    }
-
     setDeltaT(deltaT);
-    operator++();
-
-    return *this;
+    return operator++();
 }
 
 
@@ -669,6 +657,9 @@ Foam::Time& Foam::Time::operator++()
 
     deltaT0_ = deltaTSave_;
     deltaTSave_ = deltaT_;
+
+    const word oldTimeName = dimensionedScalar::name();
+
     setTime(value() + deltaT_, timeIndex_ + 1);
 
     // If the time is very close to zero reset to zero
@@ -677,22 +668,40 @@ Foam::Time& Foam::Time::operator++()
         setTime(0.0, timeIndex_);
     }
 
-    switch(writeControl_)
+    // Check that new time representation differs from old one
+    if (dimensionedScalar::name() == oldTimeName)
+    {
+        int oldPrecision = precision_;
+        do
+        {
+            precision_++;
+            setTime(value(), timeIndex());
+        }
+        while (precision_ < 100 && dimensionedScalar::name() == oldTimeName);
+
+        WarningIn("Time::operator++()")
+            << "Increased the timePrecision from " << oldPrecision
+            << " to " << precision_
+            << " to distinguish between timeNames at time " << value()
+            << endl;
+    }
+
+    switch (writeControl_)
     {
         case wcTimeStep:
-            outputTime_ = !(timeIndex_%label(writeInterval_));
+            outputTime_ = !(timeIndex_ % label(writeInterval_));
         break;
 
         case wcRunTime:
         case wcAdjustableRunTime:
         {
-            label outputTimeIndex =
+            label outputIndex =
                 label(((value() - startTime_) + 0.5*deltaT_)/writeInterval_);
 
-            if (outputTimeIndex > outputTimeIndex_)
+            if (outputIndex > outputTimeIndex_)
             {
                 outputTime_ = true;
-                outputTimeIndex_ = outputTimeIndex;
+                outputTimeIndex_ = outputIndex;
             }
             else
             {
@@ -703,13 +712,11 @@ Foam::Time& Foam::Time::operator++()
 
         case wcCpuTime:
         {
-            label outputTimeIndex =
-                label(elapsedCpuTime()/writeInterval_);
-
-            if (outputTimeIndex > outputTimeIndex_)
+            label outputIndex = label(elapsedCpuTime()/writeInterval_);
+            if (outputIndex > outputTimeIndex_)
             {
                 outputTime_ = true;
-                outputTimeIndex_ = outputTimeIndex;
+                outputTimeIndex_ = outputIndex;
             }
             else
             {
@@ -720,11 +727,11 @@ Foam::Time& Foam::Time::operator++()
 
         case wcClockTime:
         {
-            label outputTimeIndex = label(elapsedClockTime()/writeInterval_);
-            if (outputTimeIndex > outputTimeIndex_)
+            label outputIndex = label(elapsedClockTime()/writeInterval_);
+            if (outputIndex > outputTimeIndex_)
             {
                 outputTime_ = true;
-                outputTimeIndex_ = outputTimeIndex;
+                outputTimeIndex_ = outputIndex;
             }
             else
             {
@@ -732,8 +739,9 @@ Foam::Time& Foam::Time::operator++()
             }
         }
         break;
-    };
+    }
 
+    // see if endTime needs adjustment to stop at the next run()/end() check
     if (!end())
     {
         if (stopAt_ == saNoWriteNow)

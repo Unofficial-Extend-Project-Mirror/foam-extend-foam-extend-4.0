@@ -40,6 +40,14 @@ void Foam::primitiveMesh::calcCellEdges() const
         Pout<< "primitiveMesh::calcCellEdges() : "
             << "calculating cellEdges"
             << endl;
+
+        if (debug == -1)
+        {
+            // For checking calls:abort so we can quickly hunt down
+            // origin of call
+            FatalErrorIn("primitiveMesh::calcCellEdges()")
+                << abort(FatalError);
+        }
     }
 
     // It is an error to attempt to recalculate cellEdges
@@ -100,7 +108,7 @@ void Foam::primitiveMesh::calcCellEdges() const
         // reset the size
         forAll (ce, cellI)
         {
-            cellEdgeAddr[cellI].transfer(ce[cellI].shrink());
+            cellEdgeAddr[cellI].transfer(ce[cellI]);
         }
     }
 }

@@ -30,10 +30,6 @@ Description
 #include "PrimitivePatch.H"
 #include "SLList.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -45,7 +41,8 @@ template
     class PointType
 >
 void
-PrimitivePatch<Face, FaceList, PointField, PointType>::calcPointEdges() const
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+calcPointEdges() const
 {
     if (debug)
     {
@@ -115,7 +112,8 @@ template
     class PointType
 >
 void
-PrimitivePatch<Face, FaceList, PointField, PointType>::calcPointFaces() const
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+calcPointFaces() const
 {
     if (debug)
     {
@@ -180,9 +178,5 @@ PrimitivePatch<Face, FaceList, PointField, PointType>::calcPointFaces() const
     }
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

@@ -36,7 +36,6 @@ SourceFiles
 #ifndef walkPatch_H
 #define walkPatch_H
 
-#include "label.H"
 #include "labelList.H"
 #include "primitivePatch.H"
 

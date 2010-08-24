@@ -29,7 +29,7 @@ License
 #include "mathematicalConstants.H"
 #include "refinementSurfaces.H"
 #include "searchableSurfaces.H"
-//#include "regExp.H"
+#include "regExp.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -344,7 +344,6 @@ Foam::layerParameters::layerParameters
     }
 
 
-/*Norman
     // Check whether layer specification matches any patches
     const List<keyType> wildCards = layersDict.keys(true);
 
@@ -380,7 +379,6 @@ Foam::layerParameters::layerParameters
                 << " does not match any patch." << endl;
         }
     }
-*/
 }
 
 

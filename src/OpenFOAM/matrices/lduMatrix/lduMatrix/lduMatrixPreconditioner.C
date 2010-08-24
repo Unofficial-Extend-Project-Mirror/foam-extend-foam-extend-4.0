@@ -30,12 +30,34 @@ License
 
 namespace Foam
 {
-    typedef lduPreconditioner lduPreconditioner;
-    defineRunTimeSelectionTable(lduPreconditioner, dictionary);
+    defineRunTimeSelectionTable(lduPreconditioner, symMatrix);
+    defineRunTimeSelectionTable(lduPreconditioner, asymMatrix);
 }
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+Foam::word Foam::lduMatrix::preconditioner::getName
+(
+    const dictionary& dict
+)
+{
+    word name;
+
+    // handle primitive or dictionary entry
+    const entry& e = dict.lookupEntry("preconditioner", false, false);
+    if (e.isDict())
+    {
+        e.dict().lookup("preconditioner") >> name;
+    }
+    else
+    {
+        e.stream() >> name;
+    }
+
+    return name;
+}
+
 
 Foam::autoPtr<Foam::lduPreconditioner>
 Foam::lduPreconditioner::New
@@ -47,34 +69,114 @@ Foam::lduPreconditioner::New
     const dictionary& dict
 )
 {
-    word preconName(dict.lookup("type"));
+    word preconName;
 
-    dictionaryConstructorTable::iterator constructorIter =
-        dictionaryConstructorTablePtr_->find(preconName);
-
-    if (constructorIter == dictionaryConstructorTablePtr_->end())
+    // handle primitive or dictionary entry
+    const entry& e = dict.lookupEntry("preconditioner", false, false);
+    if (e.isDict())
     {
-        FatalErrorIn
-        (
-            "lduPreconditioner::New(const solver&, Istream&)"
-        )   << "Unknown matrix preconditioner "
-            << preconName << endl << endl
-            << "Valid matrix preconditioners are :" << endl
-            << dictionaryConstructorTablePtr_->toc()
-            << exit(FatalError);
+        e.dict().lookup("preconditioner") >> preconName;
+    }
+    else
+    {
+        e.stream() >> preconName;
     }
 
-    return autoPtr<lduPreconditioner>
-    (
-        constructorIter()
+    const dictionary& controls = e.isDict() ? e.dict() : dictionary::null;
+
+    if (sol.matrix().symmetric())
+    {
+        symMatrixConstructorTable::iterator constructorIter =
+            symMatrixConstructorTablePtr_->find(preconName);
+
+        if (constructorIter == symMatrixConstructorTablePtr_->end())
+        {
+            FatalIOErrorIn
+            (
+                "lduPreconditioner::New\n"
+                "(\n"
+                "    const lduMatrix& matrix,\n"
+                "    const FieldField<Field, scalar>& coupleBouCoeffs,\n"
+                "    const FieldField<Field, scalar>& coupleIntCoeffs,\n"
+                "    const lduInterfaceFieldPtrsList& interfaces,\n"
+                "    const dictionary& dict\n"
+                ")",
+                dict
+            )   << "Unknown symmetric matrix preconditioner "
+                << preconName << endl << endl
+                << "Valid symmetric matrix preconditioners are :" << endl
+                << symMatrixConstructorTablePtr_->toc()
+                << exit(FatalIOError);
+        }
+
+        return autoPtr<lduPreconditioner>
         (
-            matrix,
-            coupleBouCoeffs,
-            coupleIntCoeffs,
-            interfaces,
+            constructorIter()
+            (
+                matrix,
+                coupleBouCoeffs,
+                coupleIntCoeffs,
+                interfaces,
+                controls
+            )
+        );
+    }
+    else if (sol.matrix().asymmetric())
+    {
+        asymMatrixConstructorTable::iterator constructorIter =
+            asymMatrixConstructorTablePtr_->find(preconName);
+
+        if (constructorIter == asymMatrixConstructorTablePtr_->end())
+        {
+            FatalIOErrorIn
+            (
+                "lduPreconditioner::New\n"
+                "(\n"
+                "    const lduMatrix& matrix,\n"
+                "    const FieldField<Field, scalar>& coupleBouCoeffs,\n"
+                "    const FieldField<Field, scalar>& coupleIntCoeffs,\n"
+                "    const lduInterfaceFieldPtrsList& interfaces,\n"
+                "    const dictionary& dict\n"
+                ")",
+                dict
+            )   << "Unknown asymmetric matrix preconditioner "
+                << preconName << endl << endl
+                << "Valid asymmetric matrix preconditioners are :" << endl
+                << asymMatrixConstructorTablePtr_->toc()
+                << exit(FatalIOError);
+        }
+
+        return autoPtr<lduPreconditioner>
+        (
+            constructorIter()
+            (
+                matrix,
+                coupleBouCoeffs,
+                coupleIntCoeffs,
+                interfaces,
+                controls
+            )
+        );
+    }
+    else
+    {
+        FatalIOErrorIn
+        (
+            "lduPreconditioner::New\n"
+            "(\n"
+            "    const lduMatrix& matrix,\n"
+            "    const FieldField<Field, scalar>& coupleBouCoeffs,\n"
+            "    const FieldField<Field, scalar>& coupleIntCoeffs,\n"
+            "    const lduInterfaceFieldPtrsList& interfaces,\n"
+            "    const dictionary& dict\n"
+            ")",
             dict
-        )
-    );
+        )   << "cannot solve incomplete matrix, "
+               "no diagonal or off-diagonal coefficient"
+            << exit(FatalIOError);
+
+        return autoPtr<lduPreconditioner>(NULL);
+    }
 }
 
 

@@ -40,11 +40,7 @@ scalar maxCo
     readScalar(runTime.controlDict().lookup("maxCo"))
 );
 
-scalar maxDeltaT = GREAT;
-
-if (runTime.controlDict().found("maxDeltaT"))
-(
-    maxDeltaT = readScalar(runTime.controlDict().lookup("maxDeltaT"))
-);
+scalar maxDeltaT =
+    runTime.controlDict().lookupOrDefault<scalar>("maxDeltaT", GREAT);
 
 // ************************************************************************* //

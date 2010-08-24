@@ -75,7 +75,7 @@ void MapGeometricFields
 {
     HashTable<const GeometricField<Type, PatchField, GeoMesh>*> fields
     (
-        mapper.db().objectRegistry::lookupClass
+        mapper.thisDb().objectRegistry::lookupClass
             <GeometricField<Type, PatchField, GeoMesh> >()
     );
 
@@ -98,7 +98,7 @@ void MapGeometricFields
 
         //Note: check can be removed once pointFields are actually stored on
         //      the pointMesh instead of now on the polyMesh!
-        if (field.mesh() == mapper.mesh())
+        if (&field.mesh() == &mapper.mesh())
         {
             field.storeOldTimes();
         }
@@ -116,7 +116,7 @@ void MapGeometricFields
             const_cast<GeometricField<Type, PatchField, GeoMesh>&>
             (*fieldIter());
 
-        if (field.mesh() == mapper.mesh())
+        if (&field.mesh() == &mapper.mesh())
         {
             if (polyMesh::debug)
             {
@@ -145,7 +145,7 @@ void MapGeometricFields
                 );
             }
 
-            field.instance() = field.mesh().db().time().timeName();
+            field.instance() = field.time().timeName();
         }
         else if (polyMesh::debug)
         {

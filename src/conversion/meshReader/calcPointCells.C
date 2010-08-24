@@ -30,9 +30,6 @@ Description
 
 #include "meshReader.H"
 
-// for transition - in case someone really relied on the old behaviour
-#undef LEAVE_UNUSED_POINTS
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 void Foam::meshReader::calcPointCells() const
@@ -46,7 +43,7 @@ void Foam::meshReader::calcPointCells() const
             << abort(FatalError);
     }
 
-    label nPoints = points().size();
+    label nPoints = points_.size();
 
     pointCellsPtr_ = new labelListList(nPoints);
     labelListList& ptCells = *pointCellsPtr_;
@@ -132,19 +129,15 @@ void Foam::meshReader::calcPointCells() const
     // report unused points
     if (nPoints > pointI)
     {
-#ifdef LEAVE_UNUSED_POINTS
-        FatalErrorIn("meshReader::calcPointCells() const")
-            << "mesh has " << (nPoints - pointI)
-            << " points that were declared but not used" << endl;
-#else
-
         Info<< "removing " << (nPoints - pointI) << " unused points" << endl;
 
         nPoints = pointI;
 
-        // adjust points and truncate
-        inplaceReorder(oldToNew, points());
-        points().setSize(nPoints);
+        // adjust points and truncate - bend const-ness
+        pointField& adjustedPoints = const_cast<pointField&>(points_);
+
+        inplaceReorder(oldToNew, adjustedPoints);
+        adjustedPoints.setSize(nPoints);
 
         // adjust pointCells and truncate
         inplaceReorder(oldToNew, ptCells);
@@ -162,7 +155,6 @@ void Foam::meshReader::calcPointCells() const
                 inplaceRenumber(oldToNew, faces[i]);
             }
         }
-#endif
     }
 }
 

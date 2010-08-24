@@ -32,6 +32,11 @@ Description
 #include "polyMesh.H"
 #include "triangleFuncs.H"
 
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+defineTypeNameAndDebug(Foam::treeDataPoint, 0);
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components

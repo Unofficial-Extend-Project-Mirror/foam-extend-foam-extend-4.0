@@ -12,12 +12,11 @@
          && valves_[valveI].curtainInPortPatchID().active()
         )
         {
-            
             Info << "Adding a sliding interface mesh modifier to the valve " <<
             valveI + 1 << endl;
-            
+
             topoChanger_.setSize(nMods+1);
-            
+
             topoChanger_.set
             (
                 nMods,
@@ -35,23 +34,23 @@
                     slidingInterface::INTEGRAL, // always integral
                     true,  // attach-detach action
                     intersection::VISIBLE
-                )    
+                )
             );
             nMods++;
-            
-            Info << "valveSlider" + Foam::name(valveI + 1) << endl;
-            Info << nMods << endl;            
+
+            Info<< "valveSlider" + Foam::name(valveI + 1) << nl
+                << nMods << endl;
         }
-        
+
         // Add valve poppet layer addition
         if (valves_[valveI].poppetPatchID().active())
         {
 
-            Info << "Adding a layer addition/removal mesh modifier to the poppet of the valve " <<
-            valveI + 1 << endl;
-        
+            Info<< "Adding a layer addition/removal mesh modifier "
+                << "to the poppet of the valve " << valveI + 1 << endl;
+
             topoChanger_.setSize(nMods+1);
-            
+
             topoChanger_.set
             (
                 nMods,
@@ -63,23 +62,22 @@
                     "layeringFacesTopZoneV" + Foam::name(valveI + 1),
                     valves_[valveI].minTopLayer(),
                     valves_[valveI].maxTopLayer()
-                )    
+                )
             );
+
             nMods++;
-            Info << "valvePoppetLayer" + Foam::name(valveI + 1) << endl;
-            Info << nMods << endl;            
-            
+            Info<< "valvePoppetLayer" + Foam::name(valveI + 1) << nl
+                << nMods << endl;
         }
 
         // Add valve bottom layer addition
         if (valves_[valveI].bottomPatchID().active())
         {
-        
-            Info << "Adding a layer addition/removal mesh modifier to the bottom of the valve " <<
-            valveI + 1 << endl;
-        
+            Info<< "Adding a layer addition/removal mesh modifier "
+                << "to the bottom of the valve " << valveI + 1 << endl;
+
             topoChanger_.setSize(nMods+1);
-            
+
             topoChanger_.set
             (
                 nMods,
@@ -91,21 +89,20 @@
                     "layeringFacesBottomZoneV" + Foam::name(valveI + 1),
                     valves_[valveI].minBottomLayer(),
                     valves_[valveI].maxBottomLayer()
-                )    
+                )
             );
+
             nMods++;
-            Info << "valveBottomLayer" + Foam::name(valveI + 1) << endl;
-            Info << nMods << endl;            
-            
+            Info<< "valveBottomLayer" + Foam::name(valveI + 1) << nl
+                << nMods << endl;
         }
-        
 /*        {
 
-            Info << "Adding a layer addition/removal mesh modifier to the piston-valve " <<
-            valveI + 1 << endl;
-        
+            Info<< "Adding a layer addition/removal mesh modifier
+                << "to the piston-valve " << valveI + 1 << endl;
+
             topoChanger_.setSize(nMods+1);
-            
+
             topoChanger_.hook
             (
                 new layerAdditionRemoval
@@ -116,13 +113,13 @@
                     "pistonLayerFacesV" + Foam::name(valveI + 1),
                     piston().minLayer(),
                     piston().maxLayer()
-                )    
+                )
             );
             nMods++;
             Info << "valvePistonLayer" + Foam::name(valveI + 1) << endl;
-            Info << nMods << endl; 
-        }   
-        
+            Info << nMods << endl;
+        }
+
         // Add attach-detach for valve
         if
         (
@@ -131,11 +128,11 @@
         )
         {
 
-            Info << "Adding a attach/detach boundary mesh modifier to the valve " <<
-            valveI + 1 << endl;
-        
+            Info<< "Adding a attach/detach boundary mesh modifier :
+                << "to the valve " << valveI + 1 << endl;
+
             topoChanger_.setSize(nMods+1);
-            
+
             topoChanger_.hook
             (
                 new attachDetach
@@ -148,24 +145,23 @@
                     valves_[valveI].detachInPortPatchID().name(),
                     scalarField(0),
                     true                // Manual triggering
-                )    
+                )
             );
+
             nMods++;
             Info << "Attach detach" << endl;
         }
-                
-            
-        
     }
 
     // Add piston layer addition
     if (piston().patchID().active())
     {
 
-        Info << "Adding a layer addition/removal mesh modifier to the piston" << endl;
-    
+        Info<< "Adding a layer addition/removal mesh modifier "
+            << "to the piston" << endl;
+
         topoChanger_.setSize(nMods+1);
-        
+
         topoChanger_.hook
         (
             new layerAdditionRemoval
@@ -176,14 +172,14 @@
                 "pistonLayerFaces",
                 piston().minLayer(),
                 piston().maxLayer()
-            )    
+            )
         );
+
         nMods++;
-        Info << "pistonLayer" << endl;
-        Info << nMods << endl;            
+        Info<< "pistonLayer" << nl
+            << nMods << endl;
+    }
+*/
     }
 
-*/
-    }	
-    
     Info << "Adding " << nMods << " topology modifiers" << endl;

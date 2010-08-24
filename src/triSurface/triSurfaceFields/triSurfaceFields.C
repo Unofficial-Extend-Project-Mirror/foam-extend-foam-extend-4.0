@@ -25,8 +25,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "triSurfaceFields.H"
-#include "DimensionedField.H"
-#include "triSurfaceGeoMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

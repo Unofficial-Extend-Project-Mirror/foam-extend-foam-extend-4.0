@@ -26,7 +26,10 @@ Class
     Foam::fluxCorrectedVelocityFvPatchVectorField
 
 Description
-    Foam::fluxCorrectedVelocityFvPatchVectorField
+    Velocity outlet boundary condition for patches where the pressure is
+    specified. The outflow velocity is obtained by "zeroGradient" and then
+    corrected from the flux.  If reverse flow is possible or expected use
+    the "pressureInletOutletVelocityFvPatchVectorField" BC instead.
 
 SourceFiles
     fluxCorrectedVelocityFvPatchVectorField.C

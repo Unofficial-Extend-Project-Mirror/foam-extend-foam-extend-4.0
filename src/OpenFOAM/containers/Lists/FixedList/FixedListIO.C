@@ -32,14 +32,14 @@ License
 
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
-template<class T, Foam::label Size>
+template<class T, unsigned Size>
 Foam::FixedList<T, Size>::FixedList(Istream& is)
 {
     operator>>(is, *this);
 }
 
 
-template<class T, Foam::label Size>
+template<class T, unsigned Size>
 Foam::Istream& Foam::operator>>(Foam::Istream& is, FixedList<T, Size>& L)
 {
     is.fatalCheck("operator>>(Istream&, FixedList<T, Size>&)");
@@ -82,11 +82,11 @@ Foam::Istream& Foam::operator>>(Foam::Istream& is, FixedList<T, Size>& L)
         }
 
         // Read beginning of contents
-        char listDelimiter = is.readBeginList("FixedList");
+        char delimiter = is.readBeginList("FixedList");
 
-        if (listDelimiter == token::BEGIN_LIST)
+        if (delimiter == token::BEGIN_LIST)
         {
-            for (register label i=0; i<Size; i++)
+            for (register unsigned i=0; i<Size; i++)
             {
                 is >> L[i];
 
@@ -108,7 +108,7 @@ Foam::Istream& Foam::operator>>(Foam::Istream& is, FixedList<T, Size>& L)
                 "reading the single entry"
             );
 
-            for (register label i=0; i<Size; i++)
+            for (register unsigned i=0; i<Size; i++)
             {
                 L[i] = element;
             }
@@ -119,7 +119,7 @@ Foam::Istream& Foam::operator>>(Foam::Istream& is, FixedList<T, Size>& L)
     }
     else
     {
-        is.read(reinterpret_cast<char*>(L.begin()), Size*sizeof(T));
+        is.read(reinterpret_cast<char*>(L.data()), Size*sizeof(T));
 
         is.fatalCheck
         (
@@ -134,7 +134,7 @@ Foam::Istream& Foam::operator>>(Foam::Istream& is, FixedList<T, Size>& L)
 
 // * * * * * * * * * * * * * * * Ostream Operator *  * * * * * * * * * * * * //
 
-template<class T, Foam::label Size>
+template<class T, unsigned Size>
 void Foam::FixedList<T, Size>::writeEntry(Ostream& os) const
 {
     if
@@ -148,12 +148,12 @@ void Foam::FixedList<T, Size>::writeEntry(Ostream& os) const
     {
         os  << word("List<" + word(pTraits<T>::typeName) + '>') << " ";
     }
-    
+
     os << *this;
 }
 
 
-template<class T, Foam::label Size>
+template<class T, unsigned Size>
 void Foam::FixedList<T, Size>::writeEntry
 (
     const word& keyword,
@@ -166,7 +166,7 @@ void Foam::FixedList<T, Size>::writeEntry
 }
 
 
-template<class T, Foam::label Size>
+template<class T, unsigned Size>
 Foam::Ostream& Foam::operator<<(Ostream& os, const FixedList<T, Size>& L)
 {
     // Write list contents depending on data format
@@ -190,49 +190,48 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const FixedList<T, Size>& L)
 
         if (uniform)
         {
-            // Write size of list (so it is valid dictionary entry) and
-            // start contents delimiter
+            // Write size (so it is valid dictionary entry) and start delimiter
             os << L.size() << token::BEGIN_BLOCK;
 
-            // Write list contents
+            // Write contents
             os << L[0];
 
-            // Write end of contents delimiter
+            // Write end delimiter
             os << token::END_BLOCK;
         }
         else if (Size < 11 && contiguous<T>())
         {
-            // Write start of contents delimiter
+            // Write start delimiter
             os << token::BEGIN_LIST;
 
-            // Write list contents
+            // Write contents
             forAll(L, i)
             {
                 if (i > 0) os << token::SPACE;
                 os << L[i];
             }
 
-            // Write end of contents delimiter
+            // Write end delimiter
             os << token::END_LIST;
         }
         else
         {
-            // Write start of contents delimiter
+            // Write start delimiter
             os << nl << token::BEGIN_LIST;
 
-            // Write list contents
+            // Write contents
             forAll(L, i)
             {
                 os << nl << L[i];
             }
 
-            // Write end of contents delimiter
+            // Write end delimiter
             os << nl << token::END_LIST << nl;
         }
     }
     else
     {
-        os.write(reinterpret_cast<const char*>(L.v_), Size*sizeof(T));
+        os.write(reinterpret_cast<const char*>(L.cdata()), Size*sizeof(T));
     }
 
     // Check state of IOstream

@@ -37,6 +37,7 @@ SourceFiles
 #define patchToFace_H
 
 #include "topoSetSource.H"
+#include "wordRe.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,8 +58,8 @@ class patchToFace
         //- Add usage string
         static addToUsageTable usage_;
 
-        //- Name of patch
-        word patchName_;
+        //- Name/regular expression of patch
+        wordRe patchName_;
 
 
     // Private Member Functions

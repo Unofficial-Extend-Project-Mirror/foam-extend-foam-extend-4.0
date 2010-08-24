@@ -4,7 +4,7 @@
 #  \\    /   O peration     |
 #   \\  /    A nd           | Copyright held by original author
 #    \\/     M anipulation  |
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # License
 #     This file is part of OpenFOAM.
 #
@@ -29,7 +29,9 @@
 #     Makefile used to compile wmake utilities.
 #
 #------------------------------------------------------------------------------
-# Set shell the Makefile uses to the Bourne shell
+
+#------------------------------------------------------------------------------
+# The Makefile use a POSIX shell
 #------------------------------------------------------------------------------
 
 SHELL      = /bin/sh
@@ -41,24 +43,38 @@ SHELL      = /bin/sh
 .SUFFIXES:
 .SUFFIXES: .o
 
-RULES_DIR = $(WM_DIR)/rules/$(WM_ARCH)$(WM_COMPILER)
-
-all:  $(RULES_DIR)/dirToString $(RULES_DIR)/wmkdep
-
-$(RULES_DIR)/dirToString: dirToString.c
-	$(cc) $(cFLAGS) dirToString.c -o $(RULES_DIR)/dirToString
-
-$(RULES_DIR)/wmkdep: wmkdep.l
-	flex wmkdep.l ; $(cc) $(cFLAGS) lex.yy.c -o $(RULES_DIR)/wmkdep
 
 #------------------------------------------------------------------------------
 # set compilation and dependency building rules
 #------------------------------------------------------------------------------
 
 GENERAL_RULES = $(WM_DIR)/rules/General
-RULES         = $(RULES_DIR)
+RULES         = $(WM_DIR)/rules/$(WM_ARCH)$(WM_COMPILER)
+BIN           = $(WM_DIR)/bin/$(WM_ARCH)$(WM_COMPILER)
 
 include $(RULES)/general
 include $(RULES)/$(WM_LINK_LANGUAGE)
+
+
+#------------------------------------------------------------------------------
+# targets
+#------------------------------------------------------------------------------
+
+all:  $(BIN)/dirToString $(BIN)/wmkdep
+
+clean:
+	rm -f $(BIN)/dirToString $(BIN)/wmkdep 2>/dev/null
+
+
+$(BIN)/dirToString: dirToString.c
+	@mkdir -p $(BIN)
+	$(cc) $(cFLAGS) dirToString.c -o $(BIN)/dirToString
+
+$(BIN)/wmkdep: wmkdep.l
+	@mkdir -p $(BIN)
+	flex wmkdep.l
+	$(cc) $(cFLAGS) lex.yy.c -o $(BIN)/wmkdep
+	@rm -f lex.yy.c 2>/dev/null
+
 
 #------------------------------------------------------------------------------

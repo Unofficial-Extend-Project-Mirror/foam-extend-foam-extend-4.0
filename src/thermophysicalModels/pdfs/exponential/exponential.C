@@ -28,29 +28,17 @@ License
 #include "exponential.H"
 #include "addToRunTimeSelectionTable.H"
 
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(exponential, 0);
-
-addToRunTimeSelectionTable
-(
-    pdf,
-    exponential,
-    dictionary
-);
+namespace Foam
+{
+    defineTypeNameAndDebug(exponential, 0);
+    addToRunTimeSelectionTable(pdf, exponential, dictionary);
+}
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-
-// Construct from components
-exponential::exponential
-(
-    const dictionary& dict,
-    Random& rndGen
-)
+Foam::exponential::exponential(const dictionary& dict, Random& rndGen)
 :
     pdf(dict, rndGen),
     pdfDict_(dict.subDict(typeName + "PDF")),
@@ -70,10 +58,10 @@ exponential::exponential
 
     scalar sMax = 0;
     label n = lambda_.size();
-    for(label i=0; i<n; i++)
+    for (label i=0; i<n; i++)
     {
         scalar s = lambda_[i]*exp(-lambda_[i]*minValue_);
-        for(label j=0; j<n; j++)
+        for (label j=0; j<n; j++)
         {
             if (i!=j)
             {
@@ -89,7 +77,6 @@ exponential::exponential
     {
         ls_[i] /= sMax;
     }
-
 }
 
 
@@ -101,14 +88,14 @@ Foam::exponential::~exponential()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-scalar exponential::sample() const
+Foam::scalar Foam::exponential::sample() const
 {
     scalar y = 0;
     scalar x = 0;
     label n = lambda_.size();
     bool success = false;
 
-    while(!success)
+    while (!success)
     {
         x = minValue_ + range_*rndGen_.scalar01();
         y = rndGen_.scalar01();
@@ -119,25 +106,26 @@ scalar exponential::sample() const
             p += ls_[i]*exp(-lambda_[i]*x);
         }
 
-        if (y<p) 
+        if (y<p)
         {
             success = true;
         }
     }
-    
+
     return x;
 }
 
-scalar exponential::minValue() const
+
+Foam::scalar Foam::exponential::minValue() const
 {
     return minValue_;
 }
 
-scalar exponential::maxValue() const
+
+Foam::scalar Foam::exponential::maxValue() const
 {
     return maxValue_;
 }
 
-// ************************************************************************* //
 
-}
+// ************************************************************************* //

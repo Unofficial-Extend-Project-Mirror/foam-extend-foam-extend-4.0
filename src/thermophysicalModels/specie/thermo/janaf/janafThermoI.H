@@ -25,17 +25,12 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "janafThermo.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
+#include "specie.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-// Construct from components
 template<class equationOfState>
-inline janafThermo<equationOfState>::janafThermo
+inline Foam::janafThermo<equationOfState>::janafThermo
 (
     const equationOfState& st,
     const scalar Tlow,
@@ -58,9 +53,8 @@ inline janafThermo<equationOfState>::janafThermo
 }
 
 
-// Check given temperature is within the range of the fitted coeffs.
 template<class equationOfState>
-inline void janafThermo<equationOfState>::checkT(const scalar T) const
+inline void Foam::janafThermo<equationOfState>::checkT(const scalar T) const
 {
     if (T <  Tlow_ || T > Thigh_)
     {
@@ -75,15 +69,9 @@ inline void janafThermo<equationOfState>::checkT(const scalar T) const
 }
 
 
-// Return the coefficients corresponding to the given temperature
 template<class equationOfState>
-inline const 
-#ifdef __GNUC__
-coeffArray2&
-#else
-typename janafThermo<equationOfState>::coeffArray&
-#endif
-janafThermo<equationOfState>::coeffs
+inline const typename Foam::janafThermo<equationOfState>::coeffArray&
+Foam::janafThermo<equationOfState>::coeffs
 (
     const scalar T
 ) const
@@ -103,9 +91,8 @@ janafThermo<equationOfState>::coeffs
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct as a named copy
 template<class equationOfState>
-inline janafThermo<equationOfState>::janafThermo
+inline Foam::janafThermo<equationOfState>::janafThermo
 (
     const word& name,
     const janafThermo& jt
@@ -126,9 +113,8 @@ inline janafThermo<equationOfState>::janafThermo
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Heat capacity at constant pressure [J/(kmol K)]
 template<class equationOfState>
-inline scalar janafThermo<equationOfState>::cp
+inline Foam::scalar Foam::janafThermo<equationOfState>::cp
 (
     const scalar T
 ) const
@@ -138,16 +124,14 @@ inline scalar janafThermo<equationOfState>::cp
 }
 
 
-// Enthalpy [J/kmol]
 template<class equationOfState>
-inline scalar janafThermo<equationOfState>::h
+inline Foam::scalar Foam::janafThermo<equationOfState>::h
 (
     const scalar T
 ) const
 {
     const coeffArray& a = coeffs(T);
-    return
-    this->RR*
+    return this->RR*
     (
         ((((a[4]/5.0*T + a[3]/4.0)*T + a[2]/3.0)*T + a[1]/2.0)*T + a[0])*T
       + a[5]
@@ -155,9 +139,33 @@ inline scalar janafThermo<equationOfState>::h
 }
 
 
-// Entropy [J/(kmol K)]
 template<class equationOfState>
-inline scalar janafThermo<equationOfState>::s
+inline Foam::scalar Foam::janafThermo<equationOfState>::hs
+(
+    const scalar T
+) const
+{
+    return h(T) - hc();
+}
+
+
+template<class equationOfState>
+inline Foam::scalar Foam::janafThermo<equationOfState>::hc() const
+{
+    const coeffArray& a = lowCpCoeffs_;
+    const scalar& Tstd = specie::Tstd;
+    return this->RR*
+    (
+        (
+            (((a[4]/5.0*Tstd + a[3]/4.0)*Tstd + a[2]/3.0)*Tstd + a[1]/2.0)*Tstd
+          + a[0]
+        )*Tstd + a[5]
+    );
+}
+
+
+template<class equationOfState>
+inline Foam::scalar Foam::janafThermo<equationOfState>::s
 (
     const scalar T
 ) const
@@ -175,7 +183,7 @@ inline scalar janafThermo<equationOfState>::s
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class equationOfState>
-inline void janafThermo<equationOfState>::operator+=
+inline void Foam::janafThermo<equationOfState>::operator+=
 (
     const janafThermo<equationOfState>& jt
 )
@@ -210,7 +218,7 @@ inline void janafThermo<equationOfState>::operator+=
 
 
 template<class equationOfState>
-inline void janafThermo<equationOfState>::operator-=
+inline void Foam::janafThermo<equationOfState>::operator-=
 (
     const janafThermo<equationOfState>& jt
 )
@@ -244,20 +252,10 @@ inline void janafThermo<equationOfState>::operator-=
 }
 
 
-template<class equationOfState>
-inline void janafThermo<equationOfState>::operator*=
-(
-    const scalar s
-)
-{
-    equationOfState::operator*=(s);
-}
-
-
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
 template<class equationOfState>
-inline janafThermo<equationOfState> operator+
+inline Foam::janafThermo<equationOfState> Foam::operator+
 (
     const janafThermo<equationOfState>& jt1,
     const janafThermo<equationOfState>& jt2
@@ -301,7 +299,7 @@ inline janafThermo<equationOfState> operator+
 
 
 template<class equationOfState>
-inline janafThermo<equationOfState> operator-
+inline Foam::janafThermo<equationOfState> Foam::operator-
 (
     const janafThermo<equationOfState>& jt1,
     const janafThermo<equationOfState>& jt2
@@ -345,7 +343,7 @@ inline janafThermo<equationOfState> operator-
 
 
 template<class equationOfState>
-inline janafThermo<equationOfState> operator*
+inline Foam::janafThermo<equationOfState> Foam::operator*
 (
     const scalar s,
     const janafThermo<equationOfState>& jt
@@ -364,7 +362,7 @@ inline janafThermo<equationOfState> operator*
 
 
 template<class equationOfState>
-inline janafThermo<equationOfState> operator==
+inline Foam::janafThermo<equationOfState> Foam::operator==
 (
     const janafThermo<equationOfState>& jt1,
     const janafThermo<equationOfState>& jt2
@@ -373,9 +371,5 @@ inline janafThermo<equationOfState> operator==
     return jt2 - jt1;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

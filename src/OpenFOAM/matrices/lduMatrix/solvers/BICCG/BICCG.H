@@ -32,7 +32,7 @@ Description
 
 Deprecated
     This solver is present for backward-compatibility and the PBiCG solver
-    should be used for preference.
+    should be used instead.
 
 SourceFiles
     BICCG.C
@@ -65,30 +65,38 @@ class BICCG
         //- Disallow default bitwise assignment
         void operator=(const BICCG&);
 
-        //- Return the dictionary data-stream constructed from the components.
-        //  Needed for backward compatibility
-        IStringStream solverDataStream
-        (
-            const scalar tolerance,
-            const scalar relTol
-        ) const;
-
-        //- Return the dictionary data-stream constructed from the old-style
-        //  data-stream.  Needed for backward compatibility
-        IStringStream solverDataStream
-        (
-            const word& solverName,
-            Istream& solverData
-        ) const;
-
-
 public:
+
+    //- Return the dictionary constructed from the components.
+    //  Needed for backward compatibility
+    static dictionary solverDict
+    (
+        const scalar tol,
+        const scalar relTol
+    );
+
+    //- Return the dictionary constructed from the old-style data-stream.
+    //  Needed for backward compatibility
+    static dictionary solverDict(Istream&);
+
 
     //- Runtime type information
     TypeName("BICCG");
 
 
     // Constructors
+
+        //- Construct from matrix components and solver data stream
+        BICCG
+        (
+            const word& fieldName,
+            const lduMatrix& matrix,
+            const FieldField<Field, scalar>& coupleBouCoeffs,
+            const FieldField<Field, scalar>& coupleIntCoeffs,
+            const lduInterfaceFieldPtrsList& interfaces,
+            const dictionary& solverControls
+        );
+
 
         //- Construct from matrix components and tolerances
         BICCG
@@ -102,28 +110,11 @@ public:
             const scalar relTol = 0.0
         );
 
-        //- Construct from matrix components and solver data stream
-        BICCG
-        (
-            const word& fieldName,
-            const lduMatrix& matrix,
-            const FieldField<Field, scalar>& coupleBouCoeffs,
-            const FieldField<Field, scalar>& coupleIntCoeffs,
-            const lduInterfaceFieldPtrsList& interfaces,
-            Istream& solverData
-        );
-
-
     // Destructor
 
         virtual ~BICCG()
         {}
 
-
-    // Member Functions
-
-        //- Read and reset the solver parameters from the given stream
-        void read(Istream& solverData);
 };
 
 

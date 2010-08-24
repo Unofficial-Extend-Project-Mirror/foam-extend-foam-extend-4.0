@@ -29,19 +29,18 @@ License
 #include "volFields.H"
 #include "surfaceFields.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    makePatchTypeField(fvPatchScalarField, fanFvPatchScalarField);
+}
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-makePatchTypeField(fvPatchScalarField, fanFvPatchScalarField);
-
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 //- Specialisation of the jump-condition for the pressure
 template<>
-void fanFvPatchField<scalar>::updateCoeffs()
+void Foam::fanFvPatchField<Foam::scalar>::updateCoeffs()
 {
     if (updated())
     {
@@ -52,34 +51,39 @@ void fanFvPatchField<scalar>::updateCoeffs()
 
     if (f_.size() > 1)
     {
+        const surfaceScalarField& phi =
+            db().lookupObject<surfaceScalarField>("phi");
+
         const fvsPatchField<scalar>& phip =
-            patch().lookupPatchField<surfaceScalarField, scalar>("phi");
+            patch().patchField<surfaceScalarField, scalar>(phi);
 
-        scalarField Un =
-            scalarField::subField(phip, size()/2)
-           /scalarField::subField(patch().magSf(), size()/2);
-
-        if
+        scalarField Un = max
         (
-            phip.dimensionedInternalField().dimensions()
-         == dimDensity*dimVelocity*dimArea
-        )
+            scalarField::subField(phip, size()/2)
+           /scalarField::subField(patch().magSf(), size()/2),
+            scalar(0)
+        );
+
+        if (phi.dimensions() == dimDensity*dimVelocity*dimArea)
         {
-            Un /= patch().lookupPatchField<volScalarField, scalar>("rho");
+            Un /=
+                scalarField::subField
+                (
+                    patch().lookupPatchField<volScalarField, scalar>("rho"),
+                    size()/2
+                );
         }
 
         for(label i=1; i<f_.size(); i++)
         {
             jump_ += f_[i]*pow(Un, i);
         }
+
+        jump_ = max(jump_, scalar(0));
     }
 
     jumpCyclicFvPatchField<scalar>::updateCoeffs();
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

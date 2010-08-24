@@ -39,7 +39,7 @@ SourceFiles
 #include "face.H"
 #include "indexedOctree.H"
 #include "treeBoundBoxList.H"
-#include "PackedList.H"
+#include "PackedBoolList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -72,7 +72,7 @@ class treeDataFace
         const labelList faceLabels_;
 
         //- Inverse of faceLabels. For every mesh whether face is in faceLabels.
-        PackedList<1> isTreeFace_;
+        PackedBoolList isTreeFace_;
 
         //- Whether to precalculate and store face bounding box
         const bool cacheBb_;

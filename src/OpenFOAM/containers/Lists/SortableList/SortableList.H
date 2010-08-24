@@ -29,6 +29,8 @@ Description
     A list that is sorted upon construction or when explicitly requested
     with the sort() method.
 
+    Uses the Foam::stableSort() algorithm.
+
 SourceFiles
     SortableList.C
 
@@ -45,57 +47,45 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class SortableList Declaration
+                        Class SortableList Declaration
 \*---------------------------------------------------------------------------*/
 
-template <class Type>
+template<class T>
 class SortableList
 :
-    public List<Type>
+    public List<T>
 {
     // Private data
 
         //- Original indices
         labelList indices_;
 
+        //- Resize, fill and sort the parameter according to the list values
+        void sortIndices(List<label>&) const;
 
 public:
 
-    // Public classes
-
-        //- Less function class used by the sort function
-        class less
-        {
-            const UList<Type>& values_;
-
-        public:
-
-            less(const UList<Type>& values)
-            :
-                values_(values)
-            {}
-
-            bool operator()(const label a, const label b)
-            {
-                return values_[a] < values_[b];
-            }
-        };
-
-
     // Constructors
 
-        //- Construct from List, sorting the elements. Starts with indices set
-        //  to index in argument
-        explicit SortableList(const List<Type>&);
+        //- Null constructor, sort later (eg, after assignment or transfer)
+        SortableList();
+
+        //- Construct from UList, sorting immediately.
+        explicit SortableList(const UList<T>&);
+
+        //- Construct from transferred List, sorting immediately.
+        explicit SortableList(const Xfer<List<T> >&);
 
         //- Construct given size. Sort later on.
+        //  The indices remain empty until the list is sorted
         explicit SortableList(const label size);
 
         //- Construct given size and initial value. Sort later on.
-        SortableList(const label size, const Type&);
+        //  The indices remain empty until the list is sorted
+        SortableList(const label size, const T&);
 
         //- Construct as copy.
-        SortableList(const SortableList<Type>&);
+        SortableList(const SortableList<T>&);
 
 
     // Member Functions
@@ -106,19 +96,39 @@ public:
             return indices_;
         }
 
-        //- Size the list. If grow can cause undefined indices (until next sort)
-        void setSize(const label);
+        //- Return non-const access to the sorted indices. Updated every sort.
+        labelList& indices()
+        {
+            return indices_;
+        }
 
-        //- Sort the list (if changed after construction time)
+        //- Clear the list and the indices
+        void clear();
+
+        //- Clear the indices and return a reference to the underlying List
+        List<T>& shrink();
+
+        //- (stable) sort the list (if changed after construction time)
+        //  also resizes the indices as required
         void sort();
 
-        //- Sort the list (if changed after construction time)
-        void stableSort();
+        //- Reverse (stable) sort the list
+        void reverseSort();
+
+        //- Transfer contents to the Xfer container as a plain List
+        inline Xfer<List<T> > xfer();
 
 
     // Member Operators
 
-        void operator=(const SortableList<Type>&);
+        //- Assignment of all entries to the given value
+        inline void operator=(const T&);
+
+        //- Assignment from UList operator. Takes linear time.
+        inline void operator=(const UList<T>&);
+
+        //- Assignment operator. Takes linear time.
+        inline void operator=(const SortableList<T>&);
 
 };
 

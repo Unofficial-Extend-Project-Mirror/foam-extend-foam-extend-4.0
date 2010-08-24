@@ -35,7 +35,7 @@ Description
         type            timeVaryingFlowRateInletVelocity;
         flowRate        0.2;         // Volumetric/mass flow rate [m3/s or kg/s]
         value           uniform (0 0 0);  // placeholder
-        fileName        "time-series";
+        fileName        "$FOAM_CASE/time-series";
         outOfBounds     repeat;           // (error|warn|clamp|repeat)
     }
     @endverbatim

@@ -24,33 +24,20 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-
 #include "normal.H"
 #include "addToRunTimeSelectionTable.H"
 
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(normal, 0);
-
-addToRunTimeSelectionTable
-(
-    pdf,
-    normal,
-    dictionary
-);
+namespace Foam
+{
+    defineTypeNameAndDebug(normal, 0);
+    addToRunTimeSelectionTable(pdf, normal, dictionary);
+}
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-
-// Construct from components
-normal::normal
-(
-    const dictionary& dict,
-    Random& rndGen
-)
+Foam::normal::normal(const dictionary& dict, Random& rndGen)
 :
     pdf(dict, rndGen),
     pdfDict_(dict.subDict(typeName + "PDF")),
@@ -63,11 +50,11 @@ normal::normal
 {
     scalar sMax = 0;
     label n = strength_.size();
-    for(label i=0; i<n; i++)
+    for (label i=0; i<n; i++)
     {
         scalar x = expectation_[i];
         scalar s = strength_[i];
-        for(label j=0; j<n; j++)
+        for (label j=0; j<n; j++)
         {
             if (i!=j)
             {
@@ -80,11 +67,10 @@ normal::normal
         sMax = max(sMax, s);
     }
 
-    for(label i=0; i<n; i++)
+    for (label i=0; i<n; i++)
     {
         strength_[i] /= sMax;
     }
-
 }
 
 
@@ -96,20 +82,20 @@ Foam::normal::~normal()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-scalar normal::sample() const
+Foam::scalar Foam::normal::sample() const
 {
     scalar y = 0;
     scalar x = 0;
     label n = expectation_.size();
     bool success = false;
 
-    while(!success)
+    while (!success)
     {
         x = minValue_ + range_*rndGen_.scalar01();
         y = rndGen_.scalar01();
         scalar p = 0.0;
 
-        for(label i=0; i<n; i++)
+        for (label i=0; i<n; i++)
         {
             scalar nu = expectation_[i];
             scalar sigma = variance_[i];
@@ -118,25 +104,26 @@ scalar normal::sample() const
             p += s*exp(-0.5*v*v);
         }
 
-        if (y<p) 
+        if (y<p)
         {
             success = true;
         }
     }
-    
+
     return x;
 }
 
-scalar normal::minValue() const
+
+Foam::scalar Foam::normal::minValue() const
 {
     return minValue_;
 }
 
-scalar normal::maxValue() const
+
+Foam::scalar Foam::normal::maxValue() const
 {
     return maxValue_;
 }
 
-// ************************************************************************* //
 
-}
+// ************************************************************************* //

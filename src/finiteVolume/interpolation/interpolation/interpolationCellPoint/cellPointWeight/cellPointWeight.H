@@ -51,7 +51,9 @@ class polyMesh;
 
 class cellPointWeight
 {
-    // Private data
+protected:
+
+    // Protected data
 
        //- Cell index
        const label cellIndex_;
@@ -63,7 +65,7 @@ class cellPointWeight
        FixedList<label, 3> faceVertices_;
 
 
-    // Private Member Functions
+    // Protected Member Functions
 
         void findTetrahedron
         (

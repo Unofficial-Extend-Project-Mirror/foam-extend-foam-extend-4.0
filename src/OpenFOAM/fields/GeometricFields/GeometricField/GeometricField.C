@@ -52,20 +52,11 @@ Foam::tmp
     typename Foam::GeometricField<Type, PatchField, GeoMesh>::
     GeometricBoundaryField
 >
-Foam::GeometricField<Type, PatchField, GeoMesh>::readField(Istream& is)
+Foam::GeometricField<Type, PatchField, GeoMesh>::readField
+(
+    const dictionary& fieldDict
+)
 {
-    if (is.version() < 2.0)
-    {
-        FatalIOErrorIn
-        (
-            "GeometricField<Type, PatchField, GeoMesh>::readField(Istream&)",
-            is
-        )   << "IO versions < 2.0 are not supported."
-            << exit(FatalIOError);
-    }
-
-    dictionary fieldDict(is);
-
     DimensionedField<Type, GeoMesh>::readField(fieldDict, "internalField");
 
     tmp<GeometricBoundaryField> tboundaryField
@@ -97,6 +88,28 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::readField(Istream& is)
 
 
 template<class Type, template<class> class PatchField, class GeoMesh>
+Foam::tmp
+<
+    typename Foam::GeometricField<Type, PatchField, GeoMesh>::
+    GeometricBoundaryField
+>
+Foam::GeometricField<Type, PatchField, GeoMesh>::readField(Istream& is)
+{
+    if (is.version() < 2.0)
+    {
+        FatalIOErrorIn
+        (
+            "GeometricField<Type, PatchField, GeoMesh>::readField(Istream&)",
+            is
+        )   << "IO versions < 2.0 are not supported."
+            << exit(FatalIOError);
+    }
+
+    return readField(dictionary(is));
+}
+
+
+template<class Type, template<class> class PatchField, class GeoMesh>
 bool Foam::GeometricField<Type, PatchField, GeoMesh>::readIfPresent()
 {
     if (this->readOpt() == IOobject::MUST_READ)
@@ -105,35 +118,31 @@ bool Foam::GeometricField<Type, PatchField, GeoMesh>::readIfPresent()
         (
             "GeometricField<Type, PatchField, GeoMesh>::readIfPresent()"
         )   << "read option IOobject::MUST_READ "
-            << "suggests that a read constuctor for field " << this->name()
+            << "suggests that a read constructor for field " << this->name()
             << " would be more appropriate." << endl;
     }
-    else if (this->readOpt() == IOobject::READ_IF_PRESENT)
+    else if (this->readOpt() == IOobject::READ_IF_PRESENT && this->headerOk())
     {
-        if (this->headerOk())
+        boundaryField_.transfer(readField(this->readStream(typeName))());
+        this->close();
+
+        // Check compatibility between field and mesh
+        if (this->size() != GeoMesh::size(this->mesh()))
         {
-            boundaryField_.transfer(readField(this->readStream(typeName))());
-            this->close();
-
-            // Check compatibility between field and mesh
-
-            if (this->size() != GeoMesh::size(this->mesh()))
-            {
-                FatalIOErrorIn
-                (
-                    "GeometricField<Type, PatchField, GeoMesh>::"
-                    "readIfPresent()",
-                    this->readStream(typeName)
-                )   << "   number of field elements = " << this->size()
-                    << " number of mesh elements = "
-                    << GeoMesh::size(this->mesh())
-                    << exit(FatalIOError);
-            }
-
-            readOldTimeIfPresent();
-
-            return true;
+            FatalIOErrorIn
+            (
+                "GeometricField<Type, PatchField, GeoMesh>::"
+                "readIfPresent()",
+                this->readStream(typeName)
+            )   << "   number of field elements = " << this->size()
+                << " number of mesh elements = "
+                << GeoMesh::size(this->mesh())
+                << exit(FatalIOError);
         }
+
+        readOldTimeIfPresent();
+
+        return true;
     }
 
     return false;
@@ -149,7 +158,7 @@ bool Foam::GeometricField<Type, PatchField, GeoMesh>::readOldTimeIfPresent()
         this->name()  + "_0",
         this->time().timeName(),
         this->db(),
-        IOobject::MUST_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     );
 
@@ -408,6 +417,44 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
 }
 
 
+template<class Type, template<class> class PatchField, class GeoMesh>
+Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
+(
+    const IOobject& io,
+    const Mesh& mesh,
+    const dictionary& dict
+)
+:
+    DimensionedField<Type, GeoMesh>(io, mesh, dimless),
+    timeIndex_(this->time().timeIndex()),
+    field0Ptr_(NULL),
+    fieldPrevIterPtr_(NULL),
+    boundaryField_(*this, readField(dict))
+{
+    // Check compatibility between field and mesh
+
+    if (this->size() != GeoMesh::size(this->mesh()))
+    {
+        FatalErrorIn
+        (
+            "GeometricField<Type, PatchField, GeoMesh>::GeometricField"
+            "(const IOobject&, const Mesh&, const dictionary&)"
+        )   << "   number of field elements = " << this->size()
+            << " number of mesh elements = " << GeoMesh::size(this->mesh())
+            << exit(FatalIOError);
+    }
+
+    readOldTimeIfPresent();
+
+    if (debug)
+    {
+        Info<< "Finishing dictionary-construct of "
+               "GeometricField<Type, PatchField, GeoMesh>"
+            << endl << this->info() << endl;
+    }
+}
+
+
 // construct as copy
 template<class Type, template<class> class PatchField, class GeoMesh>
 Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
@@ -653,6 +700,7 @@ typename
 Foam::GeometricField<Type, PatchField, GeoMesh>::DimensionedInternalField&
 Foam::GeometricField<Type, PatchField, GeoMesh>::dimensionedInternalField()
 {
+    this->setUpToDate();
     storeOldTimes();
     return *this;
 }
@@ -663,6 +711,7 @@ typename
 Foam::GeometricField<Type, PatchField, GeoMesh>::InternalField&
 Foam::GeometricField<Type, PatchField, GeoMesh>::internalField()
 {
+    this->setUpToDate();
     storeOldTimes();
     return *this;
 }
@@ -674,6 +723,7 @@ typename
 Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricBoundaryField&
 Foam::GeometricField<Type, PatchField, GeoMesh>::boundaryField()
 {
+    this->setUpToDate();
     storeOldTimes();
     return boundaryField_;
 }
@@ -694,10 +744,10 @@ void Foam::GeometricField<Type, PatchField, GeoMesh>::storeOldTimes() const
     )
     {
         storeOldTime();
-    }
 
-    // Correct time index
-    timeIndex_ = this->time().timeIndex();
+        // Correct time index.  Bug fix, Zeljko Tukovic 14/Jun/2010
+        timeIndex_ = this->time().timeIndex();
+    }
 }
 
 // Store old-time field
@@ -826,6 +876,7 @@ template<class Type, template<class> class PatchField, class GeoMesh>
 void Foam::GeometricField<Type, PatchField, GeoMesh>::
 correctBoundaryConditions()
 {
+    this->setUpToDate();
     storeOldTimes();
     boundaryField_.evaluate();
 }
@@ -892,16 +943,6 @@ writeData(Ostream& os) const
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-template<class Type, template<class> class PatchField, class GeoMesh>
-const Foam::GeometricField<Type, PatchField, GeoMesh>&
-Foam::GeometricField<Type, PatchField, GeoMesh>::null()
-{
-    GeometricField<Type, PatchField, GeoMesh>* nullPtr =
-        reinterpret_cast<GeometricField<Type, PatchField, GeoMesh>*>(NULL);
-    return *nullPtr;
-}
-
 
 template<class Type, template<class> class PatchField, class GeoMesh>
 Foam::tmp<Foam::GeometricField<Type, PatchField, GeoMesh> >

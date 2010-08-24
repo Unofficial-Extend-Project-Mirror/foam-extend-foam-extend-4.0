@@ -34,6 +34,7 @@ Description
 #define pointMesh_H
 
 #include "GeoMesh.H"
+#include "MeshObject.H"
 #include "polyMesh.H"
 #include "pointBoundaryMesh.H"
 
@@ -48,6 +49,7 @@ namespace Foam
 
 class pointMesh
 :
+    public MeshObject<polyMesh, pointMesh>,
     public GeoMesh<polyMesh>
 {
     // Permanent data
@@ -95,7 +97,7 @@ public:
         //- Return number of points
         static label size(const Mesh& mesh)
         {
-            return mesh.mesh_.nPoints();
+            return mesh.GeoMesh<polyMesh>::mesh_.nPoints();
         }
 
         //- Return number of points
@@ -125,7 +127,13 @@ public:
         //- Return parallel info
         const globalMeshData& globalData() const
         {
-            return mesh_.globalData();
+            return GeoMesh<polyMesh>::mesh_.globalData();
+        }
+
+        //- Return database. For now is its polyMesh.
+        const objectRegistry& thisDb() const
+        {
+            return GeoMesh<polyMesh>::mesh_.thisDb();
         }
 
 

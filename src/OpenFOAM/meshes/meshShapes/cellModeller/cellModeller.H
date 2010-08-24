@@ -48,7 +48,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class cellModeller Declaration
+                        Class cellModeller Declaration
 \*---------------------------------------------------------------------------*/
 
 class cellModeller
@@ -69,9 +69,8 @@ public:
 
     // Constructors
 
-        //- Construct given file name
+        //- Construct from central "cellModels" file
         cellModeller();
-
 
     // Destructor
 
@@ -80,12 +79,10 @@ public:
 
     // Member functions
 
-        //- Look up a model given name and return ptr to model if good
-        //  else zero
+        //- Look up a model by name and return a pointer to the model or NULL
         static const cellModel* lookup(const word&);
 
-        //- Look up a model given label and return ptr to model if good
-        //  else zero
+        //- Look up a model by index and return a pointer to the model or NULL
         static const cellModel* lookup(const label i)
         {
             return modelPtrs_[i];

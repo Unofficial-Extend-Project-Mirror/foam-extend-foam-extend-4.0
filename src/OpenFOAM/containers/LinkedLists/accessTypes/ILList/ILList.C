@@ -26,22 +26,17 @@ License
 
 #include "ILList.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class LListBase, class T>
-ILList<LListBase, T>::ILList(const ILList<LListBase, T>& slpl)
+Foam::ILList<LListBase, T>::ILList(const ILList<LListBase, T>& lst)
 :
     UILList<LListBase, T>()
 {
     for
     (
-        typename UILList<LListBase, T>::const_iterator iter = slpl.begin();
-        iter != slpl.end();
+        typename UILList<LListBase, T>::const_iterator iter = lst.begin();
+        iter != lst.end();
         ++iter
     )
     {
@@ -53,9 +48,9 @@ ILList<LListBase, T>::ILList(const ILList<LListBase, T>& slpl)
 #ifndef __INTEL_COMPILER
 template<class LListBase, class T>
 template<class CloneArg>
-ILList<LListBase, T>::ILList
+Foam::ILList<LListBase, T>::ILList
 (
-    const ILList<LListBase, T>& slpl,
+    const ILList<LListBase, T>& lst,
     const CloneArg& cloneArg
 )
 :
@@ -63,8 +58,8 @@ ILList<LListBase, T>::ILList
 {
     for
     (
-        typename UILList<LListBase, T>::const_iterator iter = slpl.begin();
-        iter != slpl.end();
+        typename UILList<LListBase, T>::const_iterator iter = lst.begin();
+        iter != lst.end();
         ++iter
     )
     {
@@ -77,7 +72,7 @@ ILList<LListBase, T>::ILList
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
 
 template<class LListBase, class T>
-ILList<LListBase, T>::~ILList()
+Foam::ILList<LListBase, T>::~ILList()
 {
     this->clear();
 }
@@ -85,9 +80,8 @@ ILList<LListBase, T>::~ILList()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-//- Return and remove head
 template<class LListBase, class T>
-bool ILList<LListBase, T>::eraseHead()
+bool Foam::ILList<LListBase, T>::eraseHead()
 {
     T* tPtr;
     if ((tPtr = this->removeHead()))
@@ -101,9 +95,8 @@ bool ILList<LListBase, T>::eraseHead()
     }
 }
 
-//- Return and remove element
 template<class LListBase, class T>
-bool ILList<LListBase, T>::erase(T* p)
+bool Foam::ILList<LListBase, T>::erase(T* p)
 {
     T* tPtr;
     if ((tPtr = remove(p)))
@@ -119,7 +112,7 @@ bool ILList<LListBase, T>::erase(T* p)
 
 
 template<class LListBase, class T>
-void ILList<LListBase, T>::clear()
+void Foam::ILList<LListBase, T>::clear()
 {
     label oldSize = this->size();
     for (label i=0; i<oldSize; i++)
@@ -131,28 +124,31 @@ void ILList<LListBase, T>::clear()
 }
 
 
+template<class LListBase, class T>
+void Foam::ILList<LListBase, T>::transfer(ILList<LListBase, T>& lst)
+{
+    clear();
+    LListBase::transfer(lst);
+}
+
+
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class LListBase, class T>
-void ILList<LListBase, T>::operator=(const ILList<LListBase, T>& slpl)
+void Foam::ILList<LListBase, T>::operator=(const ILList<LListBase, T>& lst)
 {
     this->clear();
 
     for
     (
-        typename UILList<LListBase, T>::const_iterator iter = slpl.begin();
-        iter != slpl.end();
+        typename UILList<LListBase, T>::const_iterator iter = lst.begin();
+        iter != lst.end();
         ++iter
     )
     {
         append(iter().clone().ptr());
     }
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 

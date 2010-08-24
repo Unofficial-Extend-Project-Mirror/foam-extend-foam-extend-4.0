@@ -28,17 +28,12 @@ Description
 
 #include "UILList.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class LListBase, class T>
-UILList<LListBase, T>::UILList(const UILList<LListBase, T>& slpl)
+Foam::UILList<LListBase, T>::UILList(const UILList<LListBase, T>& lst)
 {
-    for (const_iterator iter = slpl.begin(); iter != slpl.end(); ++iter)
+    for (const_iterator iter = lst.begin(); iter != lst.end(); ++iter)
     {
         append(&iter());
     }
@@ -48,22 +43,24 @@ UILList<LListBase, T>::UILList(const UILList<LListBase, T>& slpl)
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class LListBase, class T>
-void UILList<LListBase, T>::operator=(const UILList<LListBase, T>& slpl)
+void Foam::UILList<LListBase, T>::operator=(const UILList<LListBase, T>& rhs)
 {
     LListBase::clear();
 
-    for (const_iterator iter = slpl.begin(); iter != slpl.end(); ++iter)
+    for (const_iterator iter = rhs.begin(); iter != rhs.end(); ++iter)
     {
         append(&iter());
     }
 }
 
 
-// Comparison for equality
 template<class LListBase, class T>
-bool UILList<LListBase, T>::operator==(const UILList<LListBase, T>& slpl) const
+bool Foam::UILList<LListBase, T>::operator==
+(
+    const UILList<LListBase, T>& rhs
+) const
 {
-    if (this->size() != slpl.size())
+    if (this->size() != rhs.size())
     {
         return false;
     }
@@ -71,7 +68,7 @@ bool UILList<LListBase, T>::operator==(const UILList<LListBase, T>& slpl) const
     bool equal = true;
 
     const_iterator iter1 = this->begin();
-    const_iterator iter2 = slpl.begin();
+    const_iterator iter2 = rhs.begin();
 
     for (; iter1 != this->end(); ++iter1, ++iter2)
     {
@@ -84,15 +81,14 @@ bool UILList<LListBase, T>::operator==(const UILList<LListBase, T>& slpl) const
 
 // Comparison for inequality
 template<class LListBase, class T>
-bool UILList<LListBase, T>::operator!=(const UILList<LListBase, T>& slpl) const
+bool Foam::UILList<LListBase, T>::operator!=
+(
+    const UILList<LListBase, T>& rhs
+) const
 {
-    return !operator==(slpl);
+    return !operator==(rhs);
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 

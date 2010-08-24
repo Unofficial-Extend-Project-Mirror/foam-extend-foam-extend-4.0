@@ -53,18 +53,6 @@ Foam::parabolicCylindricalCS::parabolicCylindricalCS
 (
     const word& name,
     const point& origin,
-    const vector& axis,
-    const vector& direction
-)
-:
-    coordinateSystem(name, origin, axis, direction)
-{}
-
-
-Foam::parabolicCylindricalCS::parabolicCylindricalCS
-(
-    const word& name,
-    const point& origin,
     const coordinateRotation& cr
 )
 :
@@ -113,6 +101,7 @@ Foam::vector Foam::parabolicCylindricalCS::localToGlobal
     );
 }
 
+
 Foam::tmp<Foam::vectorField> Foam::parabolicCylindricalCS::localToGlobal
 (
     const vectorField& local,
@@ -123,7 +112,8 @@ Foam::tmp<Foam::vectorField> Foam::parabolicCylindricalCS::localToGlobal
     {
         FatalErrorIn
         (
-            "parabolicCylindricalCS::localToGlobal(const vectorField&, bool) const"
+            "parabolicCylindricalCS::localToGlobal"
+            "(const vectorField&, bool) const"
         )   << "parabolic cylindrical coordinates v < 0"
             << abort(FatalError);
     }

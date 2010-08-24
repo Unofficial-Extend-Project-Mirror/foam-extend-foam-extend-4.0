@@ -89,6 +89,12 @@ void Foam::polyMesh::clearGeom()
     {
         boundary_[patchI].clearGeom();
     }
+
+    // Reset valid directions (could change with rotation)
+    geometricD_ = Vector<label>::zero;
+    solutionD_ = Vector<label>::zero;
+
+    pointMesh::Delete(*this);
 }
 
 
@@ -106,6 +112,12 @@ void Foam::polyMesh::clearAddressing()
     // parallelData depends on the processorPatch ordering so force
     // recalculation
     deleteDemandDrivenData(globalMeshDataPtr_);
+
+    // Reset valid directions
+    geometricD_ = Vector<label>::zero;
+    solutionD_ = Vector<label>::zero;
+
+    pointMesh::Delete(*this);
 }
 
 

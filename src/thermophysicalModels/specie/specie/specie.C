@@ -31,26 +31,21 @@ Description
 #include "IOstreams.H"
 #include "dimensionedConstants.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 /* * * * * * * * * * * * * public constants  * * * * * * * * * * * * */
 
 //- Universal gas constant (default in [J/(kmol K)])
-const scalar specie::RR = dimensionedConstant("R", 8314.51);
+const Foam::scalar Foam::specie::RR = dimensionedConstant("R", 8314.51);
 
 //- Standard pressure (default in [Pa])
-const scalar specie::Pstd = dimensionedConstant("Pstd", 1.0e5);
+const Foam::scalar Foam::specie::Pstd = dimensionedConstant("Pstd", 1.0e5);
 
 //- Standard temperature (default in [K])
-const scalar specie::Tstd = dimensionedConstant("Tstd", 298.15);
+const Foam::scalar Foam::specie::Tstd = dimensionedConstant("Tstd", 298.15);
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-specie::specie(Istream& is)
+Foam::specie::specie(Istream& is)
 :
     name_(is),
     nMoles_(readScalar(is)),
@@ -62,7 +57,7 @@ specie::specie(Istream& is)
 
 // * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
 
-Ostream& operator<<(Ostream& os, const specie& st)
+Foam::Ostream& Foam::operator<<(Ostream& os, const specie& st)
 {
     os  << st.name_ << tab
         << st.nMoles_ << tab
@@ -72,9 +67,5 @@ Ostream& operator<<(Ostream& os, const specie& st)
     return os;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

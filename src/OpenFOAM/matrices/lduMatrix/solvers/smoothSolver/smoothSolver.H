@@ -75,7 +75,7 @@ public:
 
     // Constructors
 
-        //- Construct from matrix components and solver data stream
+        //- Construct from matrix components and solver controls
         smoothSolver
         (
             const word& fieldName,
@@ -83,9 +83,14 @@ public:
             const FieldField<Field, scalar>& coupleBouCoeffs,
             const FieldField<Field, scalar>& coupleIntCoeffs,
             const lduInterfaceFieldPtrsList& interfaces,
-            Istream& solverData
+            const dictionary& dict
         );
 
+
+    // Destructor
+
+        virtual ~smoothSolver()
+        {}
 
     // Member Functions
 

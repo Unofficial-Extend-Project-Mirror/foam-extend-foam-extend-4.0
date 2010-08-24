@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "surfaceToCell.H"
@@ -31,8 +29,6 @@ Description
 #include "meshSearch.H"
 #include "triSurface.H"
 #include "triSurfaceSearch.H"
-#include "octree.H"
-#include "octreeDataTriSurface.H"
 #include "cellClassification.H"
 
 #include "addToRunTimeSelectionTable.H"
@@ -111,7 +107,7 @@ bool Foam::surfaceToCell::differingPointNormals
 
     const vector& span,         // current search span
     const label cellI,
-    const label cellTriI,       // nearest (to cell centre) surface triangle 
+    const label cellTriI,       // nearest (to cell centre) surface triangle
 
     Map<label>& pointToNearest  // cache for nearest triangle to point
 ) const
@@ -398,7 +394,7 @@ Foam::surfaceToCell::surfaceToCell
 Foam::surfaceToCell::surfaceToCell
 (
     const polyMesh& mesh,
-    const dictionary& dict          
+    const dictionary& dict
 )
 :
     topoSetSource(mesh),

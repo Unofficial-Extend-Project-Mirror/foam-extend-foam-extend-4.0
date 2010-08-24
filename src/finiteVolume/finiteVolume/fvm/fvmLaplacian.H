@@ -39,7 +39,7 @@ SourceFiles
 #include "volFieldsFwd.H"
 #include "surfaceFieldsFwd.H"
 #include "fvMatrix.H"
-#include "oneField.H"
+#include "geometricOneField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -85,7 +85,7 @@ namespace fvm
     template<class Type>
     tmp<fvMatrix<Type> > laplacian
     (
-        const oneField&,
+        const geometricOneField&,
         GeometricField<Type, fvPatchField, volMesh>&,
         const word&
     );
@@ -93,7 +93,7 @@ namespace fvm
     template<class Type>
     tmp<fvMatrix<Type> > laplacian
     (
-        const oneField&,
+        const geometricOneField&,
         GeometricField<Type, fvPatchField, volMesh>&
     );
 

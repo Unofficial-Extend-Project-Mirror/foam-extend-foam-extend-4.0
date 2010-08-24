@@ -156,7 +156,7 @@ Foam::cloudSet::~cloudSet()
 
 Foam::point Foam::cloudSet::getRefPoint(const List<point>& pts) const
 {
-    if (pts.size() > 0)
+    if (pts.size())
     {
         // Use first samplePt as starting point
         return pts[0];

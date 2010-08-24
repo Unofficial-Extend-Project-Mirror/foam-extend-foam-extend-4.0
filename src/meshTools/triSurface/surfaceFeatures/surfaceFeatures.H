@@ -50,7 +50,7 @@ SourceFiles
 
 #include "pointField.H"
 #include "Map.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "pointIndexHit.H"
 #include "edgeList.H"
 #include "typeInfo.H"
@@ -148,7 +148,7 @@ private:
             const List<edgeStatus>& edgeStat,
             const label startEdgeI,
             const label startPointI,
-            const label currentFeatI,     
+            const label currentFeatI,
             labelList& featVisited
         );
 
@@ -180,7 +180,7 @@ public:
             const scalar minLen = 0,
             const label minElems = 0
         );
-        
+
         //- Construct from dictionary
         surfaceFeatures(const triSurface&, const dictionary& dict);
 
@@ -320,7 +320,7 @@ public:
             (
                 const labelList& selectedEdges,
                 const pointField& samples,
-                const vector& searchSpan,   // search span 
+                const vector& searchSpan,   // search span
                 labelList& edgeLabel,
                 labelList& edgeEndPoint,
                 pointField& edgePoint
@@ -339,8 +339,7 @@ public:
                 const edgeList& sampleEdges,
                 const labelList& selectedSampleEdges,
                 const pointField& samplePoints,
-                const vector& searchSpan,   // search span 
-
+                const vector& searchSpan,   // search span
                 labelList& edgeLabel,       // label of surface edge or -1
                 pointField& pointOnEdge,    // point on above edge
                 pointField& pointOnFeature  // point on sample edge
