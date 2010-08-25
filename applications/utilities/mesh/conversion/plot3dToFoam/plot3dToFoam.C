@@ -28,7 +28,8 @@ Description
     Work in progress! Handles ascii multiblock (and optionally singleBlock)
     format.
     By default expects blanking. Use -noBlank if none.
-    Use -2D <thickness> if 2D.
+    Use -2D @a thickness if 2D.
+
     Niklas Nordin has experienced a problem with lefthandedness of the blocks.
     The code should detect this automatically - see hexBlock::readPoints but
     if this goes wrong just set the blockHandedness_ variable to 'right'
@@ -70,18 +71,14 @@ int main(int argc, char *argv[])
     }
 
     scalar scaleFactor = 1.0;
-    if (args.options().found("scale"))
-    {
-        scaleFactor = atof(args.options()["scale"].c_str());
-    }
+    args.optionReadIfPresent("scale", scaleFactor);
 
-    bool readBlank = !args.options().found("noBlank");
-    bool singleBlock = args.options().found("singleBlock");
-    scalar twoDThicknes = -1;
-    if (args.options().found("2D"))
+    bool readBlank = !args.optionFound("noBlank");
+    bool singleBlock = args.optionFound("singleBlock");
+    scalar twoDThickness = -1;
+    if (args.optionReadIfPresent("2D", twoDThickness))
     {
-        twoDThicknes = readScalar(IStringStream(args.options()["2D"])());
-        Info<< "Reading 2D case by extruding points by " << twoDThicknes
+        Info<< "Reading 2D case by extruding points by " << twoDThickness
             << " in z direction." << nl << endl;
     }
 
@@ -113,7 +110,7 @@ int main(int argc, char *argv[])
 
         forAll (blocks, blockI)
         {
-            if (twoDThicknes > 0)
+            if (twoDThickness > 0)
             {
                 // Fake second set of points (done in readPoints below)
                 plot3dFile >> nx >> ny;
@@ -138,7 +135,7 @@ int main(int argc, char *argv[])
     forAll (blocks, blockI)
     {
         Info<< "block " << blockI << ":" << nl;
-        blocks[blockI].readPoints(readBlank, twoDThicknes, plot3dFile);
+        blocks[blockI].readPoints(readBlank, twoDThickness, plot3dFile);
         sumPoints += blocks[blockI].nBlockPoints();
         nMeshCells += blocks[blockI].nBlockCells();
         Info<< nl;
@@ -231,7 +228,7 @@ int main(int argc, char *argv[])
             runTime.constant(),
             runTime
         ),
-        newPoints,
+        xferMove(newPoints),
         cellShapes,
         boundary,
         patchNames,

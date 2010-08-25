@@ -23,10 +23,11 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    Utility to split cells with flat faces. Uses a geometric cut with a plane
-    dividing the edge angle into two so might produce funny cells. For hexes
-    it will use by default a cut from edge onto opposite edge (i.e. purely
-    topological).
+    Utility to split cells with flat faces.
+
+    Uses a geometric cut with a plane dividing the edge angle into two so
+    might produce funny cells. For hexes it will use by default a cut from
+    edge onto opposite edge (i.e. purely topological).
 
     Options:
     - split cells from cellSet only
@@ -531,7 +532,9 @@ int main(int argc, char *argv[])
 
 #   include "setRootCase.H"
 #   include "createTime.H"
+    runTime.functionObjects().off();
 #   include "createPolyMesh.H"
+    const word oldInstance = mesh.pointsInstance();
 
     scalar featureAngle(readScalar(IStringStream(args.additionalArgs()[0])()));
 
@@ -539,23 +542,19 @@ int main(int argc, char *argv[])
     scalar minCos = Foam::cos(radAngle);
     scalar minSin = Foam::sin(radAngle);
 
-    bool readSet = args.options().found("set");
-    bool geometry = args.options().found("geometry");
-    bool overwrite = args.options().found("overwrite");
+    bool readSet   = args.optionFound("set");
+    bool geometry  = args.optionFound("geometry");
+    bool overwrite = args.optionFound("overwrite");
 
     scalar edgeTol = 0.2;
-
-    if (args.options().found("tol"))
-    {
-        edgeTol = readScalar(IStringStream(args.options()["tol"])());
-    }
+    args.optionReadIfPresent("tol", edgeTol);
 
     Info<< "Trying to split cells with internal angles > feature angle\n" << nl
         << "featureAngle      : " << featureAngle << nl
         << "edge snapping tol : " << edgeTol << nl;
     if (readSet)
     {
-        Info<< "candidate cells   : cellSet " << args.options()["set"] << nl;
+        Info<< "candidate cells   : cellSet " << args.option("set") << nl;
     }
     else
     {
@@ -583,7 +582,7 @@ int main(int argc, char *argv[])
     if (readSet)
     {
         // Read cells to cut from cellSet
-        cellSet cells(mesh, args.options()["set"]);
+        cellSet cells(mesh, args.option("set"));
 
         cellsToCut = cells;
     }
@@ -650,7 +649,7 @@ int main(int argc, char *argv[])
         // Remove cut cells from cellsToCut  (Note:only relevant if -readSet)
         forAll(cuts.cellLoops(), cellI)
         {
-            if (cuts.cellLoops()[cellI].size() > 0)
+            if (cuts.cellLoops()[cellI].size())
             {
                 //Info<< "Removing cut cell " << cellI << " from wishlist"
                 //    << endl;
@@ -691,7 +690,13 @@ int main(int argc, char *argv[])
         Info<< "Remaining:" << cellsToCut.size() << endl;
 
         // Write resulting mesh
-        Info << "Writing refined morphMesh to time " << runTime.value() << endl;
+        if (overwrite)
+        {
+            mesh.setInstance(oldInstance);
+        }
+
+        Info<< "Writing refined morphMesh to time " << runTime.timeName()
+            << endl;
 
         mesh.write();
     }

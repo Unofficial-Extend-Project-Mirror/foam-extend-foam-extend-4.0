@@ -94,7 +94,7 @@ void mapLagrangian(const meshToMesh& meshToMeshInterp)
     (
         readDir
         (
-            meshSource.time().timePath()/"lagrangian",
+            meshSource.time().timePath()/cloud::prefix,
             fileName::DIRECTORY
         )
     );
@@ -106,7 +106,7 @@ void mapLagrangian(const meshToMesh& meshToMeshInterp)
         (
             meshSource,
             meshSource.time().timeName(),
-            "lagrangian"/cloudDirs[cloudI]
+            cloud::prefix/cloudDirs[cloudI]
         );
 
         IOobject* positionsPtr = objects.lookup("positions");
@@ -206,7 +206,7 @@ void mapLagrangian(const meshToMesh& meshToMeshInterp)
             // Do closer inspection for unmapped particles
             // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-            if (unmappedSource.size() > 0)
+            if (unmappedSource.size())
             {
                 meshSearch targetSearcher(meshTarget, false);
 
@@ -238,7 +238,7 @@ void mapLagrangian(const meshToMesh& meshToMeshInterp)
             Info<< "    after additional mesh searching found "
                 << targetParcels.size() << " parcels in target mesh." << endl;
 
-            if (addParticles.size() > 0)
+            if (addParticles.size())
             {
                 IOPosition<passiveParticle>(targetParcels).write();
 

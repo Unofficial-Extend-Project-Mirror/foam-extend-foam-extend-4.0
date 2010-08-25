@@ -37,25 +37,18 @@ Description
 
 int main(int argc, char *argv[])
 {
+    timeSelector::addOptions();
 
-#   include "addTimeOptions.H"
 #   include "setRootCase.H"
-
 #   include "createTime.H"
 
-    // Get times list
-    instantList Times = runTime.times();
-
-    // set startTime and endTime depending on -time and -latestTime options
-#   include "checkTimeOptions.H"
-
-    runTime.setTime(Times[startTime], startTime);
+    instantList timeDirs = timeSelector::select0(runTime, args);
 
 #   include "createMesh.H"
 
-    for (label i=startTime; i<endTime; i++)
+    forAll(timeDirs, timeI)
     {
-        runTime.setTime(Times[i], i);
+        runTime.setTime(timeDirs[timeI], timeI);
 
         mesh.readUpdate();
 
@@ -124,7 +117,7 @@ int main(int argc, char *argv[])
         wdot.write();
     }
 
-    return(0);
+    return 0;
 }
 
 

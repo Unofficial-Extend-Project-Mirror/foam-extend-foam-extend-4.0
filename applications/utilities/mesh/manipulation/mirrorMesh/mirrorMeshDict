@@ -1,30 +1,28 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4.1                                 |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version  1.0;
-    format   ascii;
-    class    dictionary;
-    object   mirrorMeshDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      mirrorMeshDict;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-planeType                       pointAndNormal;
+planeType           pointAndNormal;
 
 pointAndNormalDict
 {
-    basePoint                   (0 0 0);
-    normalVector                (0 1 0);
+    basePoint       (0 0 0);
+    normalVector    (0 1 0);
 }
 
-planeTolerance                  1e-3;
-
+planeTolerance      1e-3;
 
 // ************************************************************************* //

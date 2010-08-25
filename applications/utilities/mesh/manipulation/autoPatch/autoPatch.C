@@ -32,7 +32,7 @@ Description
 #include "polyMesh.H"
 #include "Time.H"
 #include "boundaryMesh.H"
-#include "repatch.H"
+#include "repatchPolyTopoChanger.H"
 #include "mathematicalConstants.H"
 #include "OFstream.H"
 #include "ListOps.H"
@@ -75,7 +75,9 @@ int main(int argc, char *argv[])
 
 #   include "setRootCase.H"
 #   include "createTime.H"
+    runTime.functionObjects().off();
 #   include "createPolyMesh.H"
+    const word oldInstance = mesh.pointsInstance();
 
     Info<< "Mesh read in = "
         << runTime.cpuTimeIncrement()
@@ -89,7 +91,7 @@ int main(int argc, char *argv[])
     boundaryMesh bMesh;
 
     scalar featureAngle(readScalar(IStringStream(args.additionalArgs()[0])()));
-    bool overwrite = args.options().found("overwrite");
+    bool overwrite = args.optionFound("overwrite");
 
     scalar minCos = Foam::cos(featureAngle * mathematicalConstant::pi/180.0);
 
@@ -222,7 +224,7 @@ int main(int argc, char *argv[])
 
 
     // Change patches
-    repatch polyMeshRepatcher(mesh);
+    repatchPolyTopoChanger polyMeshRepatcher(mesh);
     polyMeshRepatcher.changePatches(newPatchPtrList);
 
 
@@ -239,9 +241,13 @@ int main(int argc, char *argv[])
         polyMeshRepatcher.changePatchID(meshFaceI, patchIDs[faceI]);
     }
 
-    polyMeshRepatcher.execute();
+    polyMeshRepatcher.repatch();
 
     // Write resulting mesh
+    if (overwrite)
+    {
+        mesh.setInstance(oldInstance);
+    }
     mesh.write();
 
 

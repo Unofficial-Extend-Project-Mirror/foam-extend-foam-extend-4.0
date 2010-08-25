@@ -1,10 +1,8 @@
 EXE_LIBS = \
-/*    -lautoMesh */ \
     -lbasicThermophysicalModels \
     -lchemistryModel \
-    -lcombustionThermophysicalModels \
+    -lreactionThermophysicalModels \
     -lcompressibleLESModels \
-    -lcompressibleRASModels \
     -ldecompositionMethods \
     -ldieselSpray \
     -ldynamicFvMesh \
@@ -14,9 +12,10 @@ EXE_LIBS = \
     -lerrorEstimation \
     -lfiniteVolume \
     -lforces \
-    -lfvMotionSolver \
+    -lfvMotionSolvers \
     -lincompressibleLESModels \
     -lincompressibleTransportModels \
+    -lcompressibleRASModels \
     -lincompressibleRASModels \
     -linterfaceProperties \
     -llagrangianIntermediate \
@@ -39,5 +38,5 @@ EXE_LIBS = \
     -lspecie \
     -lthermophysicalFunctions \
     -ltopoChangerFvMesh \
-    -ltriSurface
-
+    -ltriSurface \
+    -lautoMesh

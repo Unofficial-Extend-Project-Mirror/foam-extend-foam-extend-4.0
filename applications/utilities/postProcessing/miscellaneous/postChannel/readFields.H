@@ -1,7 +1,7 @@
     IOobject UMeanHeader
     (
         "UMean",
-        runTime.times()[i].name(),
+        runTime.timeName(),
         mesh,
         IOobject::MUST_READ
     );
@@ -23,7 +23,7 @@
         IOobject
         (
             "UPrime2Mean",
-            runTime.times()[i].name(),
+            runTime.timeName(),
             mesh,
             IOobject::MUST_READ
         ),
@@ -39,7 +39,7 @@
         IOobject
         (
             "pPrime2Mean",
-            runTime.times()[i].name(),
+            runTime.timeName(),
             mesh,
             IOobject::MUST_READ
         ),
@@ -52,7 +52,7 @@
         IOobject
         (
             "epsilonMean",
-            runTime.times()[i].name(),
+            runTime.timeName(),
             mesh,
             IOobject::MUST_READ
         ),
@@ -64,7 +64,7 @@
         IOobject
         (
             "nuMean",
-            runTime.times()[i].name(),
+            runTime.timeName(),
             mesh,
             IOobject::MUST_READ
         ),
@@ -76,7 +76,7 @@
         IOobject
         (
             "gammaDotMean",
-            runTime.times()[i].name(),
+            runTime.timeName(),
             mesh,
             IOobject::MUST_READ
         ),
@@ -88,7 +88,7 @@
         IOobject
         (
             "nuPrime",
-            runTime.times()[i].name(),
+            runTime.timeName(),
             mesh,
             IOobject::MUST_READ
         ),
@@ -102,7 +102,7 @@
         IOobject
         (
             "gammaDotPrime",
-            runTime.times()[i].name(),
+            runTime.timeName(),
             mesh,
             IOobject::MUST_READ
         ),

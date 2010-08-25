@@ -52,10 +52,12 @@ int main(int argc, char *argv[])
 
     argList args(argc, argv);
 
-    scalar x(readScalar(IStringStream(args.options()["x"])()));
-    scalar y(readScalar(IStringStream(args.options()["y"])()));
-    scalar z(readScalar(IStringStream(args.options()["z"])()));
-    point samplePt(x, y, z);
+    point samplePt
+    (
+        args.optionRead<scalar>("x"),
+        args.optionRead<scalar>("y"),
+        args.optionRead<scalar>("z")
+    );
     Info<< "Looking for nearest face/vertex to " << samplePt << endl;
 
 

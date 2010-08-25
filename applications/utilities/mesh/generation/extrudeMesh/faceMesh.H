@@ -78,6 +78,18 @@ public:
         {}
 
 
+    // Member Functions
+
+        void flip()
+        {
+            forAll(*this, i)
+            {
+                face& f = operator[](i);
+                f = f.reverseFace();
+            }
+            clearOut();
+        }
+
     // IOstream Operators
 
         friend Ostream& operator<<(Ostream& os, const faceMesh& fm)
@@ -85,7 +97,8 @@ public:
             return os
                 << fm.points()
                 << token::NL
-                << static_cast<PrimitivePatch<face, Foam::List, pointField> >(fm);
+                << static_cast<PrimitivePatch<face, Foam::List, pointField> >
+                   (fm);
         }
 };
 

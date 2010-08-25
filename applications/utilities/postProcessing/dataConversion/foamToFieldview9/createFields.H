@@ -3,7 +3,7 @@ int nFields = volScalarNames.size() + 3*volVectorNames.size();
 List<volScalarField*> volFieldPtrs
 (
     nFields,
-    reinterpret_cast<volScalarField*>(NULL)
+    reinterpret_cast<volScalarField*>(0)
 );
 
 stringList volFieldNames(nFields);
@@ -27,12 +27,11 @@ nFields = 0;
 
         if (ioHeader.headerOk())
         {
-           volFieldPtrs[nFields] =
-                new volScalarField
-                (
-                    ioHeader,
-                    mesh
-                );
+           volFieldPtrs[nFields] = new volScalarField
+            (
+                ioHeader,
+                mesh
+            );
         }
 
         fieldName = getFieldViewName(fieldName);
@@ -106,7 +105,7 @@ int nSurfFields = surfScalarNames.size() + 3*surfVectorNames.size();
 List<surfaceScalarField*> surfFieldPtrs
 (
     nSurfFields,
-    reinterpret_cast<surfaceScalarField*>(NULL)
+    reinterpret_cast<surfaceScalarField*>(0)
 );
 
 stringList surfFieldNames(nSurfFields);

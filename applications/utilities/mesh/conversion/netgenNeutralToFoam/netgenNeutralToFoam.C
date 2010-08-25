@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    read Neutral file format as written by Netgen4.4.
+    Converts neutral file format as written by Netgen v4.4.
 
     Example:
 
@@ -89,13 +89,11 @@ using namespace Foam;
 int main(int argc, char *argv[])
 {
     argList::validArgs.append("Neutral file");
-    argList::validOptions.insert("overwrite", "");
 
 #   include "setRootCase.H"
 #   include "createTime.H"
 
     fileName neuFile(args.additionalArgs()[0]);
-    bool overwrite = args.options().found("overwrite");
 
 
     IFstream str(neuFile);
@@ -244,7 +242,7 @@ int main(int argc, char *argv[])
     }
 
 
-    if (vertsToBoundary.size() > 0)
+    if (vertsToBoundary.size())
     {
         // Didn't find cells connected to boundary faces.
         WarningIn(args.executable())
@@ -291,19 +289,12 @@ int main(int argc, char *argv[])
                 << patchNames[patchI] << "\t\t"
                 << allPatchFaces[patchI].size() << endl;
 
-            allPatchFaces[patchI].shrink();
             patchFaces[patchI].transfer(allPatchFaces[patchI]);
-            allPatchFaces[patchI].clear();
         }
 
         Info<< endl;
     }
 
-
-    if (!overwrite)
-    {
-        runTime++;
-    }
 
     polyMesh mesh
     (
@@ -313,7 +304,7 @@ int main(int argc, char *argv[])
             runTime.constant(),
             runTime
         ),
-        points,
+        xferMove(points),
         cells,
         patchFaces,
         patchNames,

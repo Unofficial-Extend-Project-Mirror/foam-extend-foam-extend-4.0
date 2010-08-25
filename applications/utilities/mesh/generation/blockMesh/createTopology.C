@@ -40,9 +40,9 @@ bool Foam::blockMesh::blockLabelsOK
 {
     bool ok = true;
 
-    for (int i=0; i<blockShape.size(); i++)
+    forAll(blockShape, blockI)
     {
-        if (blockShape[i] < 0)
+        if (blockShape[blockI] < 0)
         {
             ok = false;
 
@@ -52,10 +52,10 @@ bool Foam::blockMesh::blockLabelsOK
                 "(const label blockLabel, const pointField& points, "
                 "const cellShape& blockShape)"
             )   << "block " << blockLabel
-                << " point label " << blockShape[i]
+                << " point label " << blockShape[blockI]
                 << " less than zero" << endl;
         }
-        else if (blockShape[i] >= points.size())
+        else if (blockShape[blockI] >= points.size())
         {
             ok = false;
 
@@ -65,7 +65,7 @@ bool Foam::blockMesh::blockLabelsOK
                 "(const label blockLabel, const pointField& points, "
                 "const cellShape& blockShape)"
             )   << "block " << blockLabel
-                << " point label " << blockShape[i]
+                << " point label " << blockShape[blockI]
                 << " larger than " << points.size() - 1
                 << " the largest defined point label" << endl;
         }
@@ -84,38 +84,34 @@ bool Foam::blockMesh::patchLabelsOK
 {
     bool ok = true;
 
-    for (label facei=0; facei<patchFaces.size(); facei++)
+    forAll(patchFaces, faceI)
     {
-        const labelList& labels = patchFaces[facei];
+        const labelList& f = patchFaces[faceI];
 
-        for (int i=0; i<labels.size(); i++)
+        forAll(f, fp)
         {
-            if (labels[i] < 0)
+            if (f[fp] < 0)
             {
                 ok = false;
 
                 WarningIn
                 (
-                    "bool Foam::blockMesh::patchLabelsOK"
-                    "(const label patchLabel, const pointField& points, "
-                    "const faceList& patchFaces)"
+                    "bool Foam::blockMesh::patchLabelsOK(...)"
                 )   << "patch " << patchLabel
-                    << " face " << facei
-                    << " point label " << labels[i]
+                    << " face " << faceI
+                    << " point label " << f[fp]
                     << " less than zero" << endl;
             }
-            else if (labels[i] >= points.size())
+            else if (f[fp] >= points.size())
             {
                 ok = false;
 
                 WarningIn
                 (
-                    "bool Foam::blockMesh::patchLabelsOK"
-                    "(const label patchLabel, const pointField& points, "
-                    "const faceList& patchFaces)"
+                    "bool Foam::blockMesh::patchLabelsOK(...)"
                 )   << "patch " << patchLabel
-                    << " face " << facei
-                    << " point label " << labels[i]
+                    << " face " << faceI
+                    << " point label " << f[fp]
                     << " larger than " << points.size() - 1
                     << " the largest defined point label" << endl;
             }
@@ -137,23 +133,13 @@ Foam::polyMesh* Foam::blockMesh::createTopology(IOdictionary& meshDescription)
     word defaultPatchName = "defaultFaces";
     word defaultPatchType = emptyPolyPatch::typeName;
 
-    // get names and types for the unassigned patch faces
-    if (meshDescription.found("defaultPatch"))
+    // get names/types for the unassigned patch faces
+    // this is a bit heavy handed (and ugly), but there is currently
+    // no easy way to rename polyMesh patches subsequently
+    if (const dictionary* dictPtr = meshDescription.subDictPtr("defaultPatch"))
     {
-        const dictionary& defaultPatch =
-            meshDescription.subDict("defaultPatch");
-
-        // this is a bit heavy handed (and ugly), but there is currently
-        // no easy way to rename polyMesh patches subsequently
-        if (defaultPatch.found("name"))
-        {
-            defaultPatch.lookup("name") >> defaultPatchName;
-        }
-
-        if (defaultPatch.found("type"))
-        {
-            defaultPatch.lookup("type") >> defaultPatchType;
-        }
+        dictPtr->readIfPresent("name", defaultPatchName);
+        dictPtr->readIfPresent("type", defaultPatchType);
     }
 
     Info<< nl << "Creating blockCorners" << endl;
@@ -456,4 +442,3 @@ Foam::polyMesh* Foam::blockMesh::createTopology(IOdictionary& meshDescription)
 
 
 // ************************************************************************* //
-

@@ -211,7 +211,7 @@ void Foam::cellSplitter::setRefinement
 
         // Add other pyramids
         for (label i = 1; i < cFaces.size(); i++)
-        {    
+        {
             label addedCellI =
                 meshMod.setAction
                 (
@@ -277,7 +277,7 @@ void Foam::cellSplitter::setRefinement
 
                 label index = findIndex(f0, e[0]);
 
-                bool edgeInFaceOrder = (f0[(index+1) % f0.size()] == e[1]);
+                bool edgeInFaceOrder = (f0[f0.fcIndex(index)] == e[1]);
 
                 // Check if cellI is the face owner
 
@@ -323,7 +323,7 @@ void Foam::cellSplitter::setRefinement
 
                 label index = findIndex(f1, e[0]);
 
-                bool edgeInFaceOrder = (f1[(index+1) % f1.size()] == e[1]);
+                bool edgeInFaceOrder = (f1[f1.fcIndex(index)] == e[1]);
 
                 // Check if cellI is the face owner
 
@@ -362,7 +362,7 @@ void Foam::cellSplitter::setRefinement
             }
         }
     }
-            
+
 
     //
     // Update all existing faces for split owner or neighbour.
@@ -441,7 +441,7 @@ void Foam::cellSplitter::setRefinement
 
                 label patchID, zoneID, zoneFlip;
                 getFaceInfo(faceI, patchID, zoneID, zoneFlip);
-                
+
                 meshMod.setAction
                 (
                     polyModifyFace
@@ -458,7 +458,7 @@ void Foam::cellSplitter::setRefinement
                     )
                 );
             }
-    
+
             faceUpToDate[faceI] = true;
         }
     }

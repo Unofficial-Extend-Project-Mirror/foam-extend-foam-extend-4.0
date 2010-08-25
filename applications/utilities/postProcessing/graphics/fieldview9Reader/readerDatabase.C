@@ -74,10 +74,7 @@ void Foam::readerDatabase::getPolyHedra()
         }
     }
 
-    polys.shrink();
-
     Info<< "Found " << polys.size() << " polyhedral cells " << endl;
-
     polys_.transfer(polys);
 }
 
@@ -90,7 +87,6 @@ Foam::readerDatabase::readerDatabase()
     fieldviewNames_(10),
     runTimePtr_(NULL),
     meshPtr_(NULL),
-    subsetMeshPtr_(NULL),
     setName_(""),
     polys_(),
     volScalarNames_(),
@@ -128,7 +124,6 @@ Foam::readerDatabase::readerDatabase()
 
 Foam::readerDatabase::~readerDatabase()
 {
-    deleteDemandDrivenData(subsetMeshPtr_);
     deleteDemandDrivenData(meshPtr_);
     deleteDemandDrivenData(runTimePtr_);
 }
@@ -155,13 +150,13 @@ const Foam::fvMesh& Foam::readerDatabase::mesh() const
             << "No mesh set" << abort(FatalError);
     }
 
-    if (setName_.size() == 0)
+    if (setName_.empty())
     {
         return *meshPtr_;
     }
     else
     {
-        return subsetMeshPtr_->subMesh();
+        return meshPtr_->subMesh();
     }
 }
 
@@ -220,7 +215,6 @@ bool Foam::readerDatabase::setRunTime
                 Info<< "Deleting old mesh since deleting old database" << endl;
             }
 
-            deleteDemandDrivenData(subsetMeshPtr_);
             deleteDemandDrivenData(meshPtr_);
 
             if (debug_)
@@ -242,7 +236,6 @@ bool Foam::readerDatabase::setRunTime
             Info<< "Deleting old mesh since loading new Time" << endl;
         }
 
-        deleteDemandDrivenData(subsetMeshPtr_);
         deleteDemandDrivenData(meshPtr_);
 
         if (debug_)
@@ -261,47 +254,26 @@ bool Foam::readerDatabase::setRunTime
 
 void Foam::readerDatabase::loadMesh()
 {
-    deleteDemandDrivenData(subsetMeshPtr_);
     deleteDemandDrivenData(meshPtr_);
 
     Info<< "Loading new mesh" << endl;
 
-    meshPtr_ = new fvMesh
+    meshPtr_ = new fvMeshSubset
     (
-        IOobject
-        (
-            fvMesh::defaultRegion,
-            runTimePtr_->timeName(),
-            *runTimePtr_,
-            IOobject::MUST_READ
-        )
+        *runTimePtr_,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
     );
 
-    meshPtr_->constructAndClear();
-
-    subsetMeshPtr_ =
-        new fvMeshSubset
-        (
-            IOobject
-            (
-                "set",
-                meshPtr_->time().constant(),
-                *meshPtr_,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            *meshPtr_
-        );
-
-    if (setName_.size() != 0)
+    if (setName_.size())
     {
         Info<< "Subsetting mesh based on cellSet " << setName_ << endl;
 
-        fvMeshSubset& subsetMesh = *subsetMeshPtr_;
+        fvMeshSubset& mesh = *meshPtr_;
 
-        cellSet currentSet(*meshPtr_, setName_);
+        cellSet currentSet(mesh, setName_);
 
-        subsetMesh.setCellSubset(currentSet);
+        mesh.setCellSubset(currentSet);
     }
     getPolyHedra();
 }
@@ -317,20 +289,20 @@ Foam::polyMesh::readUpdateState Foam::readerDatabase::setTime
 
     polyMesh::readUpdateState meshChange;
 
-    if (meshPtr_ && subsetMeshPtr_)
+    if (meshPtr_)
     {
         // Update loaded mesh
         meshChange = meshPtr_->readUpdate();
 
-        if ((setName_.size() != 0) && (meshChange != polyMesh::UNCHANGED))
+        if (setName_.size() && meshChange != polyMesh::UNCHANGED)
         {
-            Info<< "Subsetting mesh based on " << setName_ << endl;        
+            Info<< "Subsetting mesh based on " << setName_ << endl;
 
-            fvMeshSubset& subsetMesh = *subsetMeshPtr_;
+            fvMeshSubset& mesh = *meshPtr_;
 
-            cellSet currentSet(*meshPtr_, setName_);
+            cellSet currentSet(mesh, setName_);
 
-            subsetMesh.setCellSubset(currentSet);
+            mesh.setCellSubset(currentSet);
         }
 
         if

@@ -1,4 +1,4 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
@@ -246,10 +246,7 @@ int main(int argc, char *argv[])
     }
 
     scalar scaleFactor = 1.0;
-    if (args.options().found("scale"))
-    {
-        scaleFactor = atof(args.options()["scale"].c_str());
-    }
+    args.optionReadIfPresent("scale", scaleFactor);
 
 #   include "createTime.H"
 

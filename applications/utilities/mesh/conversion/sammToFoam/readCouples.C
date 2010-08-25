@@ -136,7 +136,7 @@ void sammMesh::readCouples()
 
             forAll (curFaces, faceI)
             {
-                if (curFaces[faceI].size() == 0)
+                if (curFaces[faceI].empty())
                 {
                     zeroSizeFound++;
                 }
@@ -153,7 +153,7 @@ void sammMesh::readCouples()
 
                 forAll (oldFaces, faceI)
                 {
-                    if (oldFaces[faceI].size() > 0)
+                    if (oldFaces[faceI].size())
                     {
                         curFaces[nFaces] = oldFaces[faceI];
 

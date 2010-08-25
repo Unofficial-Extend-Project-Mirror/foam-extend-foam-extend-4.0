@@ -23,6 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
+    Generates an .obj file to plot a probability distribution function
 
 \*---------------------------------------------------------------------------*/
 
@@ -48,7 +49,7 @@ int main(int argc, char *argv[])
     (
         pdf::New(pdfDictionary, rndGen)
     );
-    
+
     scalar xMin = p->minValue();
 
     scalar xMax = p->maxValue();

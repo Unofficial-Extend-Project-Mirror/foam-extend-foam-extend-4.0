@@ -51,7 +51,7 @@ cellShape create3DCellShape
     static List<const cellModel*> fluentCellModelLookup
     (
         7,
-        reinterpret_cast<const cellModel*>(NULL)
+        reinterpret_cast<const cellModel*>(0)
     );
 
     fluentCellModelLookup[2] = cellModeller::lookup("tet");

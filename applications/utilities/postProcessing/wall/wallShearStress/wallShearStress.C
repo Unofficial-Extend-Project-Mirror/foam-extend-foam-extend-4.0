@@ -32,7 +32,7 @@ Description
 
 #include "fvCFD.H"
 #include "incompressible/singlePhaseTransportModel/singlePhaseTransportModel.H"
-#include "incompressible/RASModel/RASModel.H"
+#include "RASModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -40,9 +40,9 @@ int main(int argc, char *argv[])
 {
     timeSelector::addOptions();
     #include "setRootCase.H"
-#   include "createTime.H"
+    #include "createTime.H"
     instantList timeDirs = timeSelector::select0(runTime, args);
-#   include "createMesh.H"
+    #include "createMesh.H"
 
     forAll(timeDirs, timeI)
     {
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << endl;
         mesh.readUpdate();
 
-#       include "createFields.H"
+        #include "createFields.H"
 
         volSymmTensorField Reff(RASModel->devReff());
 

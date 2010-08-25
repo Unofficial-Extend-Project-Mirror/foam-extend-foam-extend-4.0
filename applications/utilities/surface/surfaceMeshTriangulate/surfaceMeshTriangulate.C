@@ -50,9 +50,8 @@ using namespace Foam;
 int main(int argc, char *argv[])
 {
     argList::validArgs.append("output file");
-
+#   include "addRegionOption.H"
     argList::validOptions.insert("excludeProcPatches", "");
-
     argList::validOptions.insert("patches", "(patch0 .. patchN)");
 
 #   include "setRootCase.H"
@@ -65,11 +64,11 @@ int main(int argc, char *argv[])
 
     Pout<< "Reading mesh from time " << runTime.value() << endl;
 
-#   include "createPolyMesh.H"
+#   include "createNamedPolyMesh.H"
 
     bool includeProcPatches =
        !(
-            args.options().found("excludeProcPatches")
+            args.optionFound("excludeProcPatches")
          || Pstream::parRun()
         );
 
@@ -78,15 +77,15 @@ int main(int argc, char *argv[])
     // - all patches (default in sequential mode)
     // - all non-processor patches (default in parallel mode)
     // - all non-processor patches (sequential mode, -excludeProcPatches option)
-    
+
     // Construct table of patches to include.
     const polyBoundaryMesh& bMesh = mesh.boundaryMesh();
 
     labelHashSet includePatches(bMesh.size());
 
-    if (args.options().found("patches"))
+    if (args.optionFound("patches"))
     {
-        wordList patchNames(IStringStream(args.options()["patches"])());
+        wordList patchNames(args.optionLookup("patches")());
 
         forAll(patchNames, patchNameI)
         {
@@ -109,11 +108,7 @@ int main(int argc, char *argv[])
         {
             const polyPatch& patch = bMesh[patchI];
 
-            if
-            (
-                includeProcPatches
-             || (patch.type() != processorPolyPatch::typeName)
-            )
+            if (includeProcPatches || !isA<processorPolyPatch>(patch))
             {
                 includePatches.insert(patchI);
             }

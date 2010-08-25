@@ -52,19 +52,17 @@ int main(int argc, char *argv[])
 #   include "createTime.H"
 #   include "createMesh.H"
 
-    pointMesh pMesh(mesh);
-    volPointInterpolation pInterp(mesh, pMesh);
+    volPointInterpolation pInterp(mesh);
 
     // Get times list
     instantList Times = runTime.times();
 
     pointField zeroPoints(mesh.points());
 
-    runTime.setTime(Times[0], 0);
-
-    for (int i = 1; i<Times.size(); i++)
+    // skip "constant" time
+    for (label timeI = 1; timeI < Times.size(); ++timeI)
     {
-        runTime.setTime(Times[i], i);
+        runTime.setTime(Times[timeI], timeI);
 
         Info<< "Time = " << runTime.timeName() << endl;
 
@@ -100,7 +98,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

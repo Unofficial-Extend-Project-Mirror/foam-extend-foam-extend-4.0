@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "writePointSet.H"
@@ -64,13 +62,13 @@ void writePointSet
     //------------------------------------------------------------------
     //
     // Write topology
-    // 
+    //
     //------------------------------------------------------------------
 
 
     labelList pointLabels(set.toc());
 
-    pointField setPoints(IndirectList<point>(mesh.points(), pointLabels)());
+    pointField setPoints(mesh.points(), pointLabels);
 
     // Write points
 
@@ -86,7 +84,7 @@ void writePointSet
     //-----------------------------------------------------------------
     //
     // Write data
-    // 
+    //
     //-----------------------------------------------------------------
 
     // Write pointID

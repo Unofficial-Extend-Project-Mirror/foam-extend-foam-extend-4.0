@@ -28,20 +28,6 @@ License
 #include "Time.H"
 #include "plane.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-const Foam::label Foam::mirrorFvMesh::cellRenumber[8][8] =
-{
-    {-1, -1, -1, -1, -1, -1, -1, -1},    // unknown
-    {-1, -1, -1, -1, -1, -1, -1, -1},    // 
-    {-1, -1, -1, -1, -1, -1, -1, -1},    // 
-    { 0,  3,  2,  1,  4,  7,  6,  5},    // hex
-    { 2,  1,  0,  5,  4,  3,  6, -1},    // wedge
-    { 0,  2,  1,  3,  5,  4, -1, -1},    // prism
-    { 0,  3,  2,  1,  4, -1, -1, -1},    // pyramid
-    { 2,  1,  0,  3, -1, -1, -1, -1},    // tet
-};
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::mirrorFvMesh::mirrorFvMesh(const IOobject& io)
@@ -167,6 +153,16 @@ Foam::mirrorFvMesh::mirrorFvMesh(const IOobject& io)
     forAll (oldPatches, patchI)
     {
         const polyPatch& curPatch = oldPatches[patchI];
+
+        if (curPatch.coupled())
+        {
+            WarningIn("mirrorFvMesh::mirrorFvMesh(const IOobject&)")
+                << "Found coupled patch " << curPatch.name() << endl
+                << "    Mirroring faces on coupled patches destroys"
+                << " the ordering. This might be fixed by running a dummy"
+                << " createPatch afterwards." << endl;
+        }
+
         boolList& curInsBouFace = insertedBouFace[patchI];
 
         curInsBouFace.setSize(curPatch.size());
@@ -374,9 +370,9 @@ Foam::mirrorFvMesh::mirrorFvMesh(const IOobject& io)
     mirrorMeshPtr_ = new fvMesh
     (
         io,
-        newPoints,
-        newFaces,
-        newCells
+        xferMove(newPoints),
+        xferMove(newFaces),
+        xferMove(newCells)
     );
 
     fvMesh& pMesh = *mirrorMeshPtr_;

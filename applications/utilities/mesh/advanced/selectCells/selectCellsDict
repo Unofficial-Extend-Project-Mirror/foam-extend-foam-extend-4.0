@@ -1,23 +1,16 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.0                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "/home/penfold/mattijs/foam/mattijs2.1/run/icoFoam";
-    case            "cavity";
-    instance        "system";
-    local           "";
-
-    class           dictionary;
-    object          selectCellsDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      selectCellsDict;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -25,13 +18,13 @@ FoamFile
 
 // Whether to use surface. If false no surface will be read and only
 // outsidePoints/selectOutside will be used to determine cells to keep.
-useSurface false;
+useSurface      false;
 
 // Surface to keep to
-surface "plexi.ftr";
+surface         "plexi.ftr";
 
 // What is outside
-outsidePoints       ((-1 -1 -1));
+outsidePoints   ((-1 -1 -1));
 
 
 //

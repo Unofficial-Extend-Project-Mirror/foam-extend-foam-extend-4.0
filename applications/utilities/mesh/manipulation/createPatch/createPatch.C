@@ -34,6 +34,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+#include "cyclicPolyPatch.H"
 #include "syncTools.H"
 #include "argList.H"
 #include "polyMesh.H"
@@ -71,23 +72,6 @@ public:
         }
     }
 };
-
-
-
-label getPatch(const polyBoundaryMesh& patches, const word& patchName)
-{
-    label patchI = patches.findPatchID(patchName);
-
-    if (patchI == -1)
-    {
-        FatalErrorIn("createPatch(const polyBoundaryMesh&, const word&)")
-            << "Cannot find source patch " << patchName
-            << endl << "Valid patch names are " << patches.names()
-            << exit(FatalError);
-    }
-
-    return patchI;
-}
 
 
 void changePatchID
@@ -172,7 +156,7 @@ void filterPatches(polyMesh& mesh)
 
         if (isA<processorPolyPatch>(pp))
         {
-            if (pp.size() > 0)
+            if (pp.size())
             {
                 allPatches.append
                 (
@@ -225,6 +209,8 @@ void dumpCyclicMatch(const fileName& prefix, const polyMesh& mesh)
             // Dump halves
             {
                 OFstream str(prefix+cycPatch.name()+"_half0.obj");
+                Pout<< "Dumping " << cycPatch.name()
+                    << " half0 faces to " << str.name() << endl;
                 meshTools::writeOBJ
                 (
                     str,
@@ -241,6 +227,8 @@ void dumpCyclicMatch(const fileName& prefix, const polyMesh& mesh)
             }
             {
                 OFstream str(prefix+cycPatch.name()+"_half1.obj");
+                Pout<< "Dumping " << cycPatch.name()
+                    << " half1 faces to " << str.name() << endl;
                 meshTools::writeOBJ
                 (
                     str,
@@ -257,31 +245,13 @@ void dumpCyclicMatch(const fileName& prefix, const polyMesh& mesh)
                 );
             }
 
-//            cycPatch.writeOBJ
-//            (
-//                prefix+cycPatch.name()+"_half0.obj",
-//                SubList<face>
-//                (
-//                    cycPatch,
-//                    halfSize
-//                ),
-//                cycPatch.points()
-//            );
-//            cycPatch.writeOBJ
-//            (
-//                prefix+cycPatch.name()+"_half1.obj",
-//                SubList<face>
-//                (
-//                    cycPatch,
-//                    halfSize,
-//                    halfSize
-//                ),
-//                cycPatch.points()
-//            );
 
             // Lines between corresponding face centres
             OFstream str(prefix+cycPatch.name()+"_match.obj");
             label vertI = 0;
+
+            Pout<< "Dumping cyclic match as lines between face centres to "
+                << str.name() << endl;
 
             for (label faceI = 0; faceI < halfSize; faceI++)
             {
@@ -290,7 +260,8 @@ void dumpCyclicMatch(const fileName& prefix, const polyMesh& mesh)
                 vertI++;
 
                 label nbrFaceI = halfSize + faceI;
-                const point& fc1 = mesh.faceCentres()[cycPatch.start()+nbrFaceI];
+                const point& fc1 =
+                    mesh.faceCentres()[cycPatch.start()+nbrFaceI];
                 meshTools::writeOBJ(str, fc1);
                 vertI++;
 
@@ -301,16 +272,262 @@ void dumpCyclicMatch(const fileName& prefix, const polyMesh& mesh)
 }
 
 
+void separateList
+(
+    const vectorField& separation,
+    UList<vector>& field
+)
+{
+    if (separation.size() == 1)
+    {
+        // Single value for all.
+
+        forAll(field, i)
+        {
+            field[i] += separation[0];
+        }
+    }
+    else if (separation.size() == field.size())
+    {
+        forAll(field, i)
+        {
+            field[i] += separation[i];
+        }
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "separateList(const vectorField&, UList<vector>&)"
+        )   << "Sizes of field and transformation not equal. field:"
+            << field.size() << " transformation:" << separation.size()
+            << abort(FatalError);
+    }
+}
+
+
+// Synchronise points on both sides of coupled boundaries.
+template <class CombineOp>
+void syncPoints
+(
+    const polyMesh& mesh,
+    pointField& points,
+    const CombineOp& cop,
+    const point& nullValue
+)
+{
+    if (points.size() != mesh.nPoints())
+    {
+        FatalErrorIn
+        (
+            "syncPoints"
+            "(const polyMesh&, pointField&, const CombineOp&, const point&)"
+        )   << "Number of values " << points.size()
+            << " is not equal to the number of points in the mesh "
+            << mesh.nPoints() << abort(FatalError);
+    }
+
+    const polyBoundaryMesh& patches = mesh.boundaryMesh();
+
+    // Is there any coupled patch with transformation?
+    bool hasTransformation = false;
+
+    if (Pstream::parRun())
+    {
+        // Send
+
+        forAll(patches, patchI)
+        {
+            const polyPatch& pp = patches[patchI];
+
+            if
+            (
+                isA<processorPolyPatch>(pp)
+             && pp.nPoints() > 0
+             && refCast<const processorPolyPatch>(pp).owner()
+            )
+            {
+                const processorPolyPatch& procPatch =
+                    refCast<const processorPolyPatch>(pp);
+
+                // Get data per patchPoint in neighbouring point numbers.
+                pointField patchInfo(procPatch.nPoints(), nullValue);
+
+                const labelList& meshPts = procPatch.meshPoints();
+                const labelList& nbrPts = procPatch.neighbPoints();
+
+                forAll(nbrPts, pointI)
+                {
+                    label nbrPointI = nbrPts[pointI];
+                    if (nbrPointI >= 0 && nbrPointI < patchInfo.size())
+                    {
+                        patchInfo[nbrPointI] = points[meshPts[pointI]];
+                    }
+                }
+
+                OPstream toNbr(Pstream::blocking, procPatch.neighbProcNo());
+                toNbr << patchInfo;
+            }
+        }
+
+
+        // Receive and set.
+
+        forAll(patches, patchI)
+        {
+            const polyPatch& pp = patches[patchI];
+
+            if
+            (
+                isA<processorPolyPatch>(pp)
+             && pp.nPoints() > 0
+             && !refCast<const processorPolyPatch>(pp).owner()
+            )
+            {
+                const processorPolyPatch& procPatch =
+                    refCast<const processorPolyPatch>(pp);
+
+                pointField nbrPatchInfo(procPatch.nPoints());
+                {
+                    // We do not know the number of points on the other side
+                    // so cannot use Pstream::read.
+                    IPstream fromNbr
+                    (
+                        Pstream::blocking,
+                        procPatch.neighbProcNo()
+                    );
+                    fromNbr >> nbrPatchInfo;
+                }
+                // Null any value which is not on neighbouring processor
+                nbrPatchInfo.setSize(procPatch.nPoints(), nullValue);
+
+                if (!procPatch.parallel())
+                {
+                    hasTransformation = true;
+                    transformList(procPatch.forwardT(), nbrPatchInfo);
+                }
+                else if (procPatch.separated())
+                {
+                    hasTransformation = true;
+                    separateList(-procPatch.separation(), nbrPatchInfo);
+                }
+
+                const labelList& meshPts = procPatch.meshPoints();
+
+                forAll(meshPts, pointI)
+                {
+                    label meshPointI = meshPts[pointI];
+                    points[meshPointI] = nbrPatchInfo[pointI];
+                }
+            }
+        }
+    }
+
+    // Do the cyclics.
+    forAll(patches, patchI)
+    {
+        const polyPatch& pp = patches[patchI];
+
+        if (isA<cyclicPolyPatch>(pp))
+        {
+            const cyclicPolyPatch& cycPatch =
+                refCast<const cyclicPolyPatch>(pp);
+
+            const edgeList& coupledPoints = cycPatch.coupledPoints();
+            const labelList& meshPts = cycPatch.meshPoints();
+
+            pointField half0Values(coupledPoints.size());
+
+            forAll(coupledPoints, i)
+            {
+                const edge& e = coupledPoints[i];
+                label point0 = meshPts[e[0]];
+                half0Values[i] = points[point0];
+            }
+
+            if (!cycPatch.parallel())
+            {
+                hasTransformation = true;
+                transformList(cycPatch.reverseT(), half0Values);
+            }
+            else if (cycPatch.separated())
+            {
+                hasTransformation = true;
+                const vectorField& v = cycPatch.coupledPolyPatch::separation();
+                separateList(v, half0Values);
+            }
+
+            forAll(coupledPoints, i)
+            {
+                const edge& e = coupledPoints[i];
+                label point1 = meshPts[e[1]];
+                points[point1] = half0Values[i];
+            }
+        }
+    }
+
+    //- Note: hasTransformation is only used for warning messages so
+    //  reduction not strictly nessecary.
+    //reduce(hasTransformation, orOp<bool>());
+
+    // Synchronize multiple shared points.
+    const globalMeshData& pd = mesh.globalData();
+
+    if (pd.nGlobalPoints() > 0)
+    {
+        if (hasTransformation)
+        {
+            WarningIn
+            (
+                "syncPoints"
+                "(const polyMesh&, pointField&, const CombineOp&, const point&)"
+            )   << "There are decomposed cyclics in this mesh with"
+                << " transformations." << endl
+                << "This is not supported. The result will be incorrect"
+                << endl;
+        }
+
+
+        // Values on shared points.
+        pointField sharedPts(pd.nGlobalPoints(), nullValue);
+
+        forAll(pd.sharedPointLabels(), i)
+        {
+            label meshPointI = pd.sharedPointLabels()[i];
+            // Fill my entries in the shared points
+            sharedPts[pd.sharedPointAddr()[i]] = points[meshPointI];
+        }
+
+        // Combine on master.
+        Pstream::listCombineGather(sharedPts, cop);
+        Pstream::listCombineScatter(sharedPts);
+
+        // Now we will all have the same information. Merge it back with
+        // my local information.
+        forAll(pd.sharedPointLabels(), i)
+        {
+            label meshPointI = pd.sharedPointLabels()[i];
+            points[meshPointI] = sharedPts[pd.sharedPointAddr()[i]];
+        }
+    }
+}
+
+
 // Main program:
 
 int main(int argc, char *argv[])
 {
+#   include "addRegionOption.H"
     argList::validOptions.insert("overwrite", "");
 
 #   include "setRootCase.H"
 #   include "createTime.H"
+    runTime.functionObjects().off();
 
-    const bool overwrite = args.options().found("overwrite");
+    Foam::word meshRegionName = polyMesh::defaultRegion;
+    args.optionReadIfPresent("region", meshRegionName);
+
+    const bool overwrite = args.optionFound("overwrite");
 
     Info<< "Reading createPatchDict." << nl << endl;
 
@@ -320,6 +537,11 @@ int main(int argc, char *argv[])
         (
             "createPatchDict",
             runTime.system(),
+            (
+                meshRegionName != polyMesh::defaultRegion
+              ? meshRegionName
+              : word::null
+            ),
             runTime,
             IOobject::MUST_READ,
             IOobject::NO_WRITE,
@@ -339,8 +561,9 @@ int main(int argc, char *argv[])
     // Change tolerancein controlDict instead.  HJ, 22/Oct/2008
 //     polyPatch::matchTol_ = tol;
 
+#   include "createNamedPolyMesh.H"
 
-#   include "createPolyMesh.H"
+    const word oldInstance = mesh.pointsInstance();
 
     const polyBoundaryMesh& patches = mesh.boundaryMesh();
 
@@ -351,14 +574,14 @@ int main(int argc, char *argv[])
     dumpCyclicMatch("initial_", mesh);
 
     // Read patch construct info from dictionary
-    PtrList<dictionary> patchSources(dict.lookup("patches"));
+    PtrList<dictionary> patchSources(dict.lookup("patchInfo"));
 
 
 
     // 1. Add all new patches
     // ~~~~~~~~~~~~~~~~~~~~~~
 
-    if (patchSources.size() > 0)
+    if (patchSources.size())
     {
         // Old and new patches.
         DynamicList<polyPatch*> allPatches(patches.size()+patchSources.size());
@@ -394,15 +617,18 @@ int main(int argc, char *argv[])
 
             label destPatchI = patches.findPatchID(patchName);
 
-            word patchType(dict.lookup("type"));
-
             if (destPatchI == -1)
             {
+                dictionary patchDict(dict.subDict("dictionary"));
+
                 destPatchI = allPatches.size();
 
                 Info<< "Adding new patch " << patchName
-                    << " of type " << patchType
-                    << " as patch " << destPatchI << endl;
+                    << " as patch " << destPatchI
+                    << " from " << patchDict << endl;
+
+                patchDict.set("nFaces", 0);
+                patchDict.set("startFace", startFaceI);
 
                 // Add an empty patch.
                 allPatches.append
@@ -474,14 +700,12 @@ int main(int argc, char *argv[])
 
         if (sourceType == "patches")
         {
-            wordList patchSources(dict.lookup("patches"));
+            labelHashSet patchSources(patches.patchSet(dict.lookup("patches")));
 
             // Repatch faces of the patches.
-            forAll(patchSources, sourceI)
+            forAllConstIter(labelHashSet, patchSources, iter)
             {
-                label patchI = getPatch(patches, patchSources[sourceI]);
-
-                const polyPatch& pp = patches[patchI];
+                const polyPatch& pp = patches[iter.key()];
 
                 Info<< "Moving faces from patch " << pp.name()
                     << " to patch " << destPatchI << endl;
@@ -551,6 +775,8 @@ int main(int argc, char *argv[])
     autoPtr<mapPolyMesh> map = meshMod.changeMesh(mesh, true);
     mesh.movePoints(map().preMotionPoints());
 
+    dumpCyclicMatch("coupled_", mesh);
+
     // Synchronise points.
     if (!pointSync)
     {
@@ -558,16 +784,100 @@ int main(int argc, char *argv[])
     }
     else
     {
+        Info<< "Synchronising points." << nl << endl;
+
+        // This is a bit tricky. Both normal and position might be out and
+        // current separation also includes the normal
+        // ( separation_ = (nf&(Cr - Cf))*nf ).
+
+        // For processor patches:
+        // - disallow multiple separation/transformation. This basically
+        //   excludes decomposed cyclics. Use the (probably 0) separation
+        //   to align the points.
+        // For cyclic patches:
+        // - for separated ones use our own recalculated offset vector
+        // - for rotational ones use current one.
+
+        forAll(mesh.boundaryMesh(), patchI)
+        {
+            const polyPatch& pp = mesh.boundaryMesh()[patchI];
+
+            if (pp.size() && isA<coupledPolyPatch>(pp))
+            {
+                const coupledPolyPatch& cpp =
+                    refCast<const coupledPolyPatch>(pp);
+
+                if (cpp.separated())
+                {
+                    Info<< "On coupled patch " << pp.name()
+                        << " separation[0] was "
+                        << cpp.separation()[0] << endl;
+
+                    if (isA<cyclicPolyPatch>(pp))
+                    {
+                        const cyclicPolyPatch& cycpp =
+                            refCast<const cyclicPolyPatch>(pp);
+
+                        if (cycpp.transform() == cyclicPolyPatch::TRANSLATIONAL)
+                        {
+                            Info<< "On cyclic translation patch " << pp.name()
+                                << " forcing uniform separation of "
+                                << cycpp.separationVector() << endl;
+                            const_cast<vectorField&>(cpp.separation()) =
+                                pointField(1, cycpp.separationVector());
+                        }
+                        else
+                        {
+                            const_cast<vectorField&>(cpp.separation()) =
+                                pointField
+                                (
+                                    1,
+                                    pp[pp.size()/2].centre(mesh.points())
+                                  - pp[0].centre(mesh.points())
+                                );
+                        }
+                    }
+                    else
+                    {
+                        const_cast<vectorField&>(cpp.separation())
+                        .setSize(1);
+                    }
+                    Info<< "On coupled patch " << pp.name()
+                        << " forcing uniform separation of "
+                        << cpp.separation() << endl;
+                }
+                else if (!cpp.parallel())
+                {
+                    Info<< "On coupled patch " << pp.name()
+                        << " forcing uniform rotation of "
+                        << cpp.forwardT()[0] << endl;
+
+                    const_cast<tensorField&>
+                    (
+                        cpp.forwardT()
+                    ).setSize(1);
+                    const_cast<tensorField&>
+                    (
+                        cpp.reverseT()
+                    ).setSize(1);
+
+                    Info<< "On coupled patch " << pp.name()
+                        << " forcing uniform rotation of "
+                        << cpp.forwardT() << endl;
+                }
+            }
+        }
+
         Info<< "Synchronising points." << endl;
 
         pointField newPoints(mesh.points());
-        syncTools::syncPointList
+
+        syncPoints
         (
             mesh,
             newPoints,
-            nearestEqOp(),              // cop
-            point(GREAT, GREAT, GREAT), // nullValue
-            true                        // applySeparation
+            nearestEqOp(),
+            point(GREAT, GREAT, GREAT)
         );
 
         scalarField diff(mag(newPoints-mesh.points()));
@@ -584,6 +894,8 @@ int main(int argc, char *argv[])
     filterPatches(mesh);
 
 
+    dumpCyclicMatch("final_", mesh);
+
 
     // Set the precision of the points data to 10
     IOstream::defaultPrecision(10);
@@ -591,6 +903,10 @@ int main(int argc, char *argv[])
     if (!overwrite)
     {
         runTime++;
+    }
+    else
+    {
+        mesh.setInstance(oldInstance);
     }
 
     // Write resulting mesh

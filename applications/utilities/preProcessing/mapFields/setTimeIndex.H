@@ -1,20 +1,31 @@
     instantList sourceTimes = runTimeSource.times();
     label sourceTimeIndex = runTimeSource.timeIndex();
-    if (args.options().found("sourceTime"))
+    if (args.optionFound("sourceTime"))
     {
-        if ((args.options()["sourceTime"]) == "latestTime")
+        if (args.option("sourceTime") == "latestTime")
         {
             sourceTimeIndex = sourceTimes.size() - 1;
         }
         else
         {
-            scalar sourceTime =
-                readScalar(IStringStream(args.options()["sourceTime"])());
-            sourceTimeIndex = getTimeIndex(sourceTimes, sourceTime);
+            sourceTimeIndex = Time::findClosestTimeIndex
+            (
+                sourceTimes,
+                args.optionRead<scalar>("sourceTime")
+            );
         }
     }
     else
     {
-        scalar sourceTime = runTimeTarget.time().value();
-        sourceTimeIndex = getTimeIndex(sourceTimes, sourceTime);
+        sourceTimeIndex = Time::findClosestTimeIndex
+        (
+            sourceTimes,
+            runTimeTarget.time().value()
+        );
     }
+
+    runTimeSource.setTime(sourceTimes[sourceTimeIndex], sourceTimeIndex);
+
+    Info<< "\nSource time: " << runTimeSource.value()
+        << "\nTarget time: " << runTimeTarget.value()
+        << endl;

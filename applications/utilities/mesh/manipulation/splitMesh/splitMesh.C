@@ -50,14 +50,11 @@ Description
 #include "attachDetach.H"
 #include "polyTopoChanger.H"
 #include "regionSide.H"
+#include "primitiveFacePatch.H"
 
 using namespace Foam;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// Calculation engine for set of faces in a mesh
-typedef PrimitivePatch<face, List, const pointField&> facePatch;
-
 
 // Find edge between points v0 and v1.
 label findEdge(const primitiveMesh& mesh, const label v0, const label v1)
@@ -100,10 +97,10 @@ void checkPatch(const polyBoundaryMesh& bMesh, const word& name)
             << exit(FatalError);
     }
 
-    if (bMesh[patchI].size() != 0)
+    if (bMesh[patchI].size())
     {
         FatalErrorIn("checkPatch(const polyBoundaryMesh&, const word&)")
-            << "Patch " << name << " is present but not of zero size"
+            << "Patch " << name << " is present but non-zero size"
             << exit(FatalError);
     }
 }
@@ -122,12 +119,14 @@ int main(int argc, char *argv[])
 
 #   include "setRootCase.H"
 #   include "createTime.H"
+    runTime.functionObjects().off();
 #   include "createPolyMesh.H"
+    const word oldInstance = mesh.pointsInstance();
 
     word setName(args.additionalArgs()[0]);
     word masterPatch(args.additionalArgs()[1]);
     word slavePatch(args.additionalArgs()[2]);
-    bool overwrite = args.options().found("overwrite");
+    bool overwrite = args.optionFound("overwrite");
 
     // List of faces to split
     faceSet facesSet(mesh, setName);
@@ -261,7 +260,7 @@ int main(int argc, char *argv[])
 
     splitter.changeMesh();
 
-    Info << nl << "Writing polyMesh" << endl;
+    Info<< "Writing mesh to " << runTime.timeName() << endl;
     if (!mesh.write())
     {
         FatalErrorIn(args.executable())

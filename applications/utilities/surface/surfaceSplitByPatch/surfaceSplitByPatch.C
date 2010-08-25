@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     argList::noParallel();
     argList::validArgs.clear();
     argList::validArgs.append("input file");
-    argList::argList args(argc, argv);
+    argList args(argc, argv);
 
     fileName surfName(args.additionalArgs()[0]);
 
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
         word patchName = pp.name();
 
-        if (patchName.size() == 0)
+        if (patchName.empty())
         {
             patchName = "patch" + Foam::name(patchI);
         }

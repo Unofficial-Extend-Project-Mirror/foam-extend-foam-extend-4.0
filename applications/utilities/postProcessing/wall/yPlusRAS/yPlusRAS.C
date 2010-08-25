@@ -26,7 +26,12 @@ Application
     yPlusRAS
 
 Description
-    Calculates and reports yPlus for all wall patches, for the specified times.
+    Calculates and reports yPlus for all wall patches, for the specified times
+    when using RAS turbulence models.
+
+    Default behaviour assumes operating in incompressible mode. To apply to
+    compressible RAS cases, use the -compressible option.
+    
     Extended version for being able to handle two phase flows using the
     -twoPhase option.
 
@@ -37,19 +42,30 @@ Description
 #include "fvCFD.H"
 #include "twoPhaseMixture.H"
 #include "incompressible/singlePhaseTransportModel/singlePhaseTransportModel.H"
-#include "incompressible/RASModel/RASModel.H"
-#include "wallFvPatch.H"
+#include "incompressible/RAS/RASModel/RASModel.H"
+#include "nutWallFunction/nutWallFunctionFvPatchScalarField.H"
+
+#include "basicPsiThermo.H"
+#include "compressible/RAS/RASModel/RASModel.H"
+#include "mutWallFunction/mutWallFunctionFvPatchScalarField.H"
+
+#include "wallDist.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Calculate single phase Y+
-void calcSinglePhaseYPlus
+void calcIncompressibleYPlus
 (
+    const fvMesh& mesh,
+    const Time& runTime,
     const volVectorField& U,
-    const surfaceScalarField& phi,
     volScalarField& yPlus
 )
 {
+    typedef incompressible::RASModels::nutWallFunctionFvPatchScalarField
+        wallFunctionPatchField;
+
+    #include "createPhi.H"
+
     singlePhaseTransportModel laminarTransport(U, phi);
 
     autoPtr<incompressible::RASModel> RASModel
@@ -57,57 +73,114 @@ void calcSinglePhaseYPlus
         incompressible::RASModel::New(U, phi, laminarTransport)
     );
 
-    const fvPatchList& patches = U.mesh().boundary();
+    const volScalarField::GeometricBoundaryField nutPatches =
+        RASModel->nut()().boundaryField();
 
-    forAll(patches, patchi)
+    bool foundNutPatch = false;
+    forAll(nutPatches, patchi)
     {
-        const fvPatch& currPatch = patches[patchi];
-
-        if (isA<wallFvPatch>(currPatch))
+        if (isA<wallFunctionPatchField>(nutPatches[patchi]))
         {
-            yPlus.boundaryField()[patchi] = RASModel->yPlus(patchi);
+            foundNutPatch = true;
+
+            const wallFunctionPatchField& nutPw =
+                dynamic_cast<const wallFunctionPatchField&>
+                    (nutPatches[patchi]);
+
+            yPlus.boundaryField()[patchi] = nutPw.yPlus();
             const scalarField& Yp = yPlus.boundaryField()[patchi];
 
             Info<< "Patch " << patchi
-                << " named " << currPatch.name()
-                << " y+ : min: " << gMin(Yp) << " max: " << gMax(Yp)
-                << " average: " << gAverage(Yp) << nl << endl;
+                << " named " << nutPw.patch().name()
+                << " y+ : min: " << min(Yp) << " max: " << max(Yp)
+                << " average: " << average(Yp) << nl << endl;
         }
+    }
+
+    if (!foundNutPatch)
+    {
+        Info<< "    no " << wallFunctionPatchField::typeName << " patches"
+            << endl;
     }
 }
 
-// Calculate two phase Y+
-void calcTwoPhaseYPlus
+
+void calcCompressibleYPlus
 (
+    const fvMesh& mesh,
+    const Time& runTime,
     const volVectorField& U,
-    const surfaceScalarField& phi,
     volScalarField& yPlus
 )
 {
-    Info<< "Reading transportProperties\n" << endl;
-    twoPhaseMixture twoPhaseProperties(U, phi, "gamma");
+    typedef compressible::RASModels::mutWallFunctionFvPatchScalarField
+        wallFunctionPatchField;
 
-    autoPtr<incompressible::RASModel> RASModel
+    IOobject rhoHeader
     (
-        incompressible::RASModel::New(U, phi, twoPhaseProperties)
+        "rho",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
     );
 
-    const fvPatchList& patches = U.mesh().boundary();
-
-    forAll(patches, patchi)
+    if (!rhoHeader.headerOk())
     {
-        const fvPatch& currPatch = patches[patchi];
+        Info<< "    no rho field" << endl;
+        return;
+    }
 
-        if (isA<wallFvPatch>(currPatch))
+    Info << "Reading field rho\n" << endl;
+    volScalarField rho(rhoHeader, mesh);
+
+    #include "compressibleCreatePhi.H"
+
+    autoPtr<basicPsiThermo> pThermo
+    (
+        basicPsiThermo::New(mesh)
+    );
+    basicPsiThermo& thermo = pThermo();
+
+    autoPtr<compressible::RASModel> RASModel
+    (
+        compressible::RASModel::New
+        (
+            rho,
+            U,
+            phi,
+            thermo
+        )
+    );
+
+    const volScalarField::GeometricBoundaryField mutPatches =
+        RASModel->mut()().boundaryField();
+
+    bool foundMutPatch = false;
+    forAll(mutPatches, patchi)
+    {
+        if (isA<wallFunctionPatchField>(mutPatches[patchi]))
         {
-            yPlus.boundaryField()[patchi] = RASModel->yPlus(patchi);
+            foundMutPatch = true;
+
+            const wallFunctionPatchField& mutPw =
+                dynamic_cast<const wallFunctionPatchField&>
+                    (mutPatches[patchi]);
+
+            yPlus.boundaryField()[patchi] = mutPw.yPlus();
             const scalarField& Yp = yPlus.boundaryField()[patchi];
 
             Info<< "Patch " << patchi
-                << " named " << currPatch.name()
-                << " y+ : min: " << gMin(Yp) << " max: " << gMax(Yp)
-                << " average: " << gAverage(Yp) << nl << endl;
+                << " named " << mutPw.patch().name()
+                << " y+ : min: " << min(Yp) << " max: " << max(Yp)
+                << " average: " << average(Yp) << nl << endl;
         }
+    }
+
+    if (!foundMutPatch)
+    {
+        Info<< "    no " << wallFunctionPatchField::typeName << " patches"
+            << endl;
     }
 }
 
@@ -116,24 +189,35 @@ int main(int argc, char *argv[])
 {
     timeSelector::addOptions();
 
-    //Additional option for twoPhase transport model
-    argList::validOptions.insert("twoPhase","");
+    #include "addRegionOption.H"
 
-#   include "setRootCase.H"
-#   include "createTime.H"
+    argList::validOptions.insert("compressible","");
 
+    #include "setRootCase.H"
+    #include "createTime.H"
     instantList timeDirs = timeSelector::select0(runTime, args);
+    #include "createNamedMesh.H"
 
-#   include "createMesh.H"
+    bool compressible = args.optionFound("compressible");
 
     // Check if two phase model was selected
-    bool twoPhase = args.options().found("twoPhase");
+    bool twoPhase = args.optionFound("twoPhase");
 
-    forAll (timeDirs, timeI)
+    forAll(timeDirs, timeI)
     {
         runTime.setTime(timeDirs[timeI], timeI);
         Info<< "Time = " << runTime.timeName() << endl;
-        mesh.readUpdate();
+        fvMesh::readUpdateState state = mesh.readUpdate();
+
+        // Wall distance
+        if (timeI == 0 || state != fvMesh::UNCHANGED)
+        {
+            Info<< "Calculating wall distance\n" << endl;
+            wallDist y(mesh, true);
+            Info<< "Writing wall distance to field "
+                << y.name() << nl << endl;
+            y.write();
+        }
 
         volScalarField yPlus
         (
@@ -164,41 +248,23 @@ int main(int argc, char *argv[])
             Info << "Reading field U\n" << endl;
             volVectorField U(UHeader, mesh);
 
-#           include "createPhi.H"
-
-            if (twoPhase)
+            if (compressible)
             {
-                Info<< "Reading field gamma\n" << endl;
-                IOobject gammaHeader
-                (
-                    "gamma",
-                    runTime.timeName(),
-                    mesh,
-                    IOobject::MUST_READ,
-                    IOobject::NO_WRITE
-                );
-
-                if (gammaHeader.headerOk())
-                {
-                    volScalarField gamma(gammaHeader, mesh);
-                    calcTwoPhaseYPlus(U, phi, yPlus);
-                }
-                else
-                {
-                    Info << "    no gamma field!" << endl;
-                }
+                calcCompressibleYPlus(mesh, runTime, U, yPlus);
             }
             else
             {
-                calcSinglePhaseYPlus(U, phi, yPlus);
+                calcIncompressibleYPlus(mesh, runTime, U, yPlus);
             }
+            Add two phase.  HJ, 25/Aug/2010
         }
         else
         {
-            Info  << "    no U field" << endl;
+            Info<< "    no U field" << endl;
         }
 
         Info<< "Writing yPlus to field " << yPlus.name() << nl << endl;
+
         yPlus.write();
     }
 
@@ -206,5 +272,6 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
 
 // ************************************************************************* //

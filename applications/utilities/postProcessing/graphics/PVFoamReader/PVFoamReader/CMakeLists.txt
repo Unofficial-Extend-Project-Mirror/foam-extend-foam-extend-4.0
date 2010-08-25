@@ -1,6 +1,3 @@
-# Cmake version
-cmake_minimum_required(VERSION 2.4)
-
 # Set the project/library name here.  Classes should be declared as
 # "class VTK_FoamReader_EXPORT vtkFoo", where PVFoamReader is the name of the
 # project set here.
@@ -19,9 +16,13 @@ SET(PVFoamReader_LIBS
   vtkGraphics
 )
 
-INCLUDE_DIRECTORIES($ENV{FOAM_SRC}/OpenFOAM/lnInclude $ENV{FOAM_SRC}/finiteVolume/lnInclude)
-INCLUDE_DIRECTORIES($ENV{ParaView_INST_DIR}/include ../vtkFoam/lnInclude)
-ADD_DEFINITIONS(-D$ENV{WM_PRECISION_OPTION})
+INCLUDE_DIRECTORIES(
+    $ENV{WM_PROJECT_DIR}/src/OpenFOAM/lnInclude
+    $ENV{WM_PROJECT_DIR}/src/finiteVolume/lnInclude
+    $ENV{ParaView_INST_DIR}/include
+    ../vtkFoam/lnInclude
+)
+ADD_DEFINITIONS(-DWM_$ENV{WM_PRECISION_OPTION})
 
 #-----------------------------------------------------------------------------
 # Most users should not need to change anything below this line.
@@ -75,3 +76,4 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/PVFoamReader.pvsm.in
                ${PROJECT_BINARY_DIR}/../${PROJECT_NAME}.pvsm @ONLY IMMEDIATE)
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} OpenFOAM finiteVolume vtkFoam)
+#-----------------------------------------------------------------------------

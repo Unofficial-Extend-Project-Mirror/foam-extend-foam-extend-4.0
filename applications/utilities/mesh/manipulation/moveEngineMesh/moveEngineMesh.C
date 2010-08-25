@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.loop())
     {
         Info<< "Time = " << runTime.theta() << " CA-deg\n" << endl;
 
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 
     Info<< "\n end\n";
 
-    return(0);
+    return 0;
 }
 
 

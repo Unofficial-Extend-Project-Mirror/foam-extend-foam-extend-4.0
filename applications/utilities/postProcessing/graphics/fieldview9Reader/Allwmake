@@ -1,3 +1,8 @@
-#if [ "$FV_HOME" -a -r $FV_HOME ] ; then
+#!/bin/sh
+
+# disabled
+
+# if [ "$FV_HOME" -a -r $FV_HOME ]
+# then
 #    wmake fieldview9Reader
-#fi
+# fi

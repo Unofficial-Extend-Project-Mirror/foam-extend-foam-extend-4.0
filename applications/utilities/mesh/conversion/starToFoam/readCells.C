@@ -48,7 +48,7 @@ void starMesh::addRegularCell
     label regularTypeFlag = -1;
 
     // grab the shape from the table
-    const cellModel* curModelPtr = reinterpret_cast<cellModel*>(NULL);
+    const cellModel* curModelPtr = reinterpret_cast<cellModel*>(0);
 
     if      // Tetrahedron
     (
@@ -130,7 +130,7 @@ void starMesh::addSAMMcell
 
     // grab the shape from the table
     label sammTypeFlag = -1;
-    const cellModel* curModelPtr = reinterpret_cast<cellModel*>(NULL);
+    const cellModel* curModelPtr = reinterpret_cast<cellModel*>(0);
 
     switch (typeFlag)
     {

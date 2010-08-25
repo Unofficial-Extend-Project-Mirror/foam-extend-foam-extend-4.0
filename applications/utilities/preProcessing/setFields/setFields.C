@@ -28,6 +28,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
+#include "timeSelector.H"
 #include "Time.H"
 #include "fvMesh.H"
 #include "topoSetSource.H"
@@ -84,6 +85,7 @@ void setFieldType
 
         forAll(field.boundaryField(), patchi)
         {
+            // Forced patch assignment.  HJ, 1/Aug/2010
             field.boundaryField()[patchi] ==
                 field.boundaryField()[patchi].patchInternalField();
         }
@@ -174,19 +176,13 @@ public:
 
 int main(int argc, char *argv[])
 {
+    timeSelector::addOptions();
 
-#   include "addTimeOptions.H"
 #   include "setRootCase.H"
-
 #   include "createTime.H"
 
     // Get times list
-    instantList Times = runTime.times();
-
-    // set startTime and endTime depending on -time and -latestTime options
-#   include "checkTimeOptions.H"
-
-    runTime.setTime(Times[startTime], startTime);
+    instantList timeDirs = timeSelector::select0(runTime, args);
 
 #   include "createMesh.H"
 
@@ -220,9 +216,9 @@ int main(int argc, char *argv[])
 
     PtrList<entry> regions(setFieldsDict.lookup("regions"));
 
-    forAll(regions, regioni)
+    forAll(regions, regionI)
     {
-        const entry& region = regions[regioni];
+        const entry& region = regions[regionI];
 
         autoPtr<topoSetSource> cellSelector =
             topoSetSource::New(region.keyword(), mesh, region.dict());
@@ -247,7 +243,7 @@ int main(int argc, char *argv[])
         );
     }
 
-    Info << nl << "End" << endl;
+    Info<< "\nEnd" << endl;
 
     return 0;
 }

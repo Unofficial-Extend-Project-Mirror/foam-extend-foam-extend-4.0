@@ -59,8 +59,8 @@ int main(int argc, char *argv[])
     fileName inFileName2(args.additionalArgs()[1]);
     fileName outFileName(args.additionalArgs()[2]);
 
-    bool addPoint = args.options().found("points");
-    bool mergeRegions = args.options().found("mergeRegions");
+    bool addPoint = args.optionFound("points");
+    bool mergeRegions = args.optionFound("mergeRegions");
 
     if (addPoint)
     {
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
             << nl << endl;
 
         Info<< "Surface  : " << inFileName1<< nl
-            << "Points   : " << args.options()["points"] << nl
+            << "Points   : " << args.option("points") << nl
             << "Writing  : " << outFileName << nl << endl;
     }
     else
@@ -111,8 +111,8 @@ int main(int argc, char *argv[])
 
     if (addPoint)
     {
-        IFstream pointStr(args.options()["points"]);
-        pointField extraPoints(pointStr);
+        IFstream pointsFile(args.option("points"));
+        pointField extraPoints(pointsFile);
 
         Info<< "Additional Points:" << extraPoints.size() << endl;
 
@@ -158,45 +158,33 @@ int main(int argc, char *argv[])
 
 
         label trianglei = 0;
-        label maxRegion1 = labelMin;
 
         // Copy triangles1 into trianglesAll
-        // Determine max region.
-
         forAll(surface1, faceI)
         {
-            facesAll[trianglei] = surface1[faceI];
-
-            maxRegion1 = max(maxRegion1, facesAll[trianglei].region());
-
-            trianglei++;
+            facesAll[trianglei++] = surface1[faceI];
         }
+        label nRegions1 = surface1.patches().size();
 
-        label nRegions1 = maxRegion1 + 1;
 
         if (!mergeRegions)
         {
-            Info<< "Surface " << inFileName1 << " has " << nRegions1 << " regions"
+            Info<< "Surface " << inFileName1 << " has " << nRegions1
+                << " regions"
                 << nl
                 << "All region numbers in " << inFileName2 << " will be offset"
                 << " by this amount" << nl << endl;
         }
 
         // Add (renumbered) surface2 triangles
-        label maxRegion2 = labelMin;
-
         forAll(surface2, faceI)
         {
             const labelledTri& tri = surface2[faceI];
 
             labelledTri& destTri = facesAll[trianglei++];
-
             destTri[0] = tri[0] + points1.size();
             destTri[1] = tri[1] + points1.size();
             destTri[2] = tri[2] + points1.size();
-
-            maxRegion2  = max(maxRegion2, tri.region());
-
             if (mergeRegions)
             {
                 destTri.region() = tri.region();
@@ -207,7 +195,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        label nRegions2 = maxRegion2 + 1;
+        label nRegions2 = surface2.patches().size();
 
         geometricSurfacePatchList newPatches;
 
@@ -218,11 +206,11 @@ int main(int argc, char *argv[])
 
             forAll(surface1.patches(), patchI)
             {
-                newPatches[patchI] = surface1.patches()[ patchI];
+                newPatches[patchI] = surface1.patches()[patchI];
             }
             forAll(surface2.patches(), patchI)
             {
-                newPatches[patchI] = surface2.patches()[ patchI];
+                newPatches[patchI] = surface2.patches()[patchI];
             }
         }
         else
@@ -244,15 +232,15 @@ int main(int argc, char *argv[])
 
             forAll(surface1.patches(), patchI)
             {
-                newPatches[newPatchI++] = surface1.patches()[ patchI];
+                newPatches[newPatchI++] = surface1.patches()[patchI];
             }
 
             forAll(surface2.patches(), patchI)
             {
-                newPatches[newPatchI++] = surface2.patches()[ patchI];
+                newPatches[newPatchI++] = surface2.patches()[patchI];
             }
         }
- 
+
 
         Info<< "New patches:" << nl;
         forAll(newPatches, patchI)

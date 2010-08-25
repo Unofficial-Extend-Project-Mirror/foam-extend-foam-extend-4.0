@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
         autoRefineDriver::debug = debug;
         autoSnapDriver::debug = debug;
         autoLayerDriver::debug = debug;
-    }        
+    }
 
 
     // Read geometry
@@ -363,6 +363,8 @@ int main(int argc, char *argv[])
 
     if (wantRefine)
     {
+        cpuTime timer;
+
         autoRefineDriver refineDriver
         (
             meshRefiner,
@@ -387,10 +389,15 @@ int main(int argc, char *argv[])
             meshRefiner,
             debug
         );
+
+        Info<< "Mesh refined in = "
+            << timer.cpuTimeIncrement() << " s." << endl;
     }
 
     if (wantSnap)
     {
+        cpuTime timer;
+
         autoSnapDriver snapDriver
         (
             meshRefiner,
@@ -413,14 +420,32 @@ int main(int argc, char *argv[])
             meshRefiner,
             debug
         );
+
+        Info<< "Mesh snapped in = "
+            << timer.cpuTimeIncrement() << " s." << endl;
     }
 
     if (wantLayers)
     {
+        cpuTime timer;
+
         autoLayerDriver layerDriver(meshRefiner);
 
         // Layer addition parameters
         layerParameters layerParams(layerDict, mesh.boundaryMesh());
+
+        //!!! Temporary hack to get access to maxLocalCells
+        bool preBalance;
+        {
+            refinementParameters refineParams(refineDict);
+
+            preBalance = returnReduce
+            (
+                (mesh.nCells() >= refineParams.maxLocalCells()),
+                orOp<bool>()
+            );
+        }
+
 
         if (!overwrite)
         {
@@ -432,6 +457,7 @@ int main(int argc, char *argv[])
             layerDict,
             motionDict,
             layerParams,
+            preBalance,
             decomposer,
             distributor
         );
@@ -442,6 +468,9 @@ int main(int argc, char *argv[])
             meshRefiner,
             debug
         );
+
+        Info<< "Layers added in = "
+            << timer.cpuTimeIncrement() << " s." << endl;
     }
 
 

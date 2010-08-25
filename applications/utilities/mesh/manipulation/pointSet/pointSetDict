@@ -1,23 +1,16 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.0                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "/home/penfold/mattijs/foam/mattijs2.2/run/icoFoam";
-    case            "cavityTut";
-    instance        "system";
-    local           "";
-
-    class           dictionary;
-    object          pointSetDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      pointSetDict;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -33,9 +26,9 @@ action new;
 topoSetSources
 (
     // Copy elements from pointSet
-    pointToPoint     
+    pointToPoint
     {
-        set p1;     
+        set p1;
     }
 
     // Select based on cellSet
@@ -58,6 +51,18 @@ topoSetSources
         value (12 13 56);   // labels of points
     }
 
+    // All points in pointzone
+    zoneToPoint
+    {
+        name ".*Zone";      // name of pointZone, regular expressions allowed
+    }
+
+    // Points nearest to coordinates
+    nearestToPoint
+    {
+       points ((0 0 0) (1 1 1));
+    }
+
     // Points with coordinate within box
     boxToPoint
     {
@@ -67,14 +72,13 @@ topoSetSources
     // Select based on surface
     surfaceToPoint
     {
-        file                "www.avl.com-geometry.stl";
-        nearDistance        0.1;    // points near to surface
-        includeInside       false;  // points on inside of surface
-                                    // (requires closed surface with consistent
-                                    //  normals)
-        includeOutside      false;  //   ,,    outside  ,,
+        file            "www.avl.com-geometry.stl";
+        nearDistance    0.1;    // points near to surface
+        includeInside   false;  // points on inside of surface
+                                // (requires closed surface with consistent
+                                //  normals)
+        includeOutside  false;  //   ,,    outside  ,,
     }
 );
-
 
 // ************************************************************************* //

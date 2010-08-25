@@ -74,19 +74,7 @@ int main(int argc, char *argv[])
 {
 #   include "setRootCase.H"
 #   include "createTime.H"
-
-    Info<< "Reading mesh for time = " << runTime.value() << endl;
-
-    Info<< "Create mesh\n" << endl;
-    polyMesh mesh
-    (
-        IOobject
-        (
-            polyMesh::defaultRegion,
-            runTime.timeName(),
-            runTime
-        )
-    );
+#   include "createPolyMesh.H"
 
     Info<< "Reading pointSetDict\n" << endl;
 

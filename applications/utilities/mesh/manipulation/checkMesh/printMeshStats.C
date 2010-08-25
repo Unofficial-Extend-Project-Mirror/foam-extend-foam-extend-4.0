@@ -12,43 +12,72 @@
 
 void Foam::printMeshStats(const polyMesh& mesh, const bool allTopology)
 {
-    Pout<< "Mesh stats" << nl
-        << "    points:           " << mesh.points().size() << nl;
+    Info<< "Mesh stats" << nl
+        << "    points:           "
+        << returnReduce(mesh.points().size(), sumOp<label>()) << nl;
 
-    if (mesh.nInternalPoints() != -1)
+    label nInternalPoints = returnReduce
+    (
+        mesh.nInternalPoints(),
+        sumOp<label>()
+    );
+
+    if (nInternalPoints != -Pstream::nProcs())
     {
-        Pout<< "    internal points:  " << mesh.nInternalPoints() << nl;
+        Info<< "    internal points:  " << nInternalPoints << nl;
+
+        if (returnReduce(mesh.nInternalPoints(), minOp<label>()) == -1)
+        {
+            WarningIn("Foam::printMeshStats(const polyMesh&, const bool)")
+                << "Some processors have their points sorted into internal"
+                << " and external and some do not." << endl
+                << "This can cause problems later on." << endl;
+        }
     }
 
-    if (allTopology && mesh.nInternalPoints() != -1)
+    if (allTopology && nInternalPoints != -Pstream::nProcs())
     {
-        Pout<< "    edges:            " << mesh.nEdges() << nl
-            << "    internal edges:   " << mesh.nInternalEdges() << nl
+        label nEdges = returnReduce(mesh.nEdges(), sumOp<label>());
+        label nInternalEdges = returnReduce
+        (
+            mesh.nInternalEdges(),
+            sumOp<label>()
+        );
+        label nInternal1Edges = returnReduce
+        (
+            mesh.nInternal1Edges(),
+            sumOp<label>()
+        );
+        label nInternal0Edges = returnReduce
+        (
+            mesh.nInternal0Edges(),
+            sumOp<label>()
+        );
+
+        Info<< "    edges:            " << nEdges << nl
+            << "    internal edges:   " << nInternalEdges << nl
             << "    internal edges using one boundary point:   "
-            << mesh.nInternal1Edges()-mesh.nInternal0Edges() << nl
+            << nInternal1Edges-nInternal0Edges << nl
             << "    internal edges using two boundary points:  "
-            << mesh.nInternalEdges()-mesh.nInternal1Edges() << nl;
+            << nInternalEdges-nInternal1Edges << nl;
     }
 
-    Pout<< "    faces:            " << mesh.faces().size() << nl
-        << "    internal faces:   " << mesh.faceNeighbour().size() << nl
-        << "    cells:            " << mesh.cells().size() << nl
-        << "    boundary patches: " << mesh.boundaryMesh().size() << nl
-        << "    point zones:      " << mesh.pointZones().size() << nl
-        << "    face zones:       " << mesh.faceZones().size() << nl
-        << "    cell zones:       " << mesh.cellZones().size() << nl
+    Info<< "    faces:            "
+        << returnReduce(mesh.faces().size(), sumOp<label>()) << nl
+        << "    internal faces:   "
+        << returnReduce(mesh.faceNeighbour().size(), sumOp<label>()) << nl
+        << "    cells:            "
+        << returnReduce(mesh.cells().size(), sumOp<label>()) << nl
+        << "    boundary patches: "
+        << mesh.boundaryMesh().size() << nl
+        << "    point zones:      "
+        << mesh.pointZones().size() << nl
+        << "    face zones:       "
+        << mesh.faceZones().size() << nl
+        << "    cell zones:       "
+        << mesh.cellZones().size() << nl
         << endl;
 
-    if (Pstream::parRun())
-    {
-        const globalMeshData& parData = mesh.globalData();
-
-        Info<< "Overall stats" << nl
-            << "    points:   " << parData.nTotalPoints() << nl
-            << "    faces:    " << parData.nTotalFaces() << nl
-            << "    cells:    " << parData.nTotalCells() << nl
-            << endl;
-    }
 
     // Construct shape recognizers
     hexMatcher hex;
@@ -99,7 +128,15 @@ void Foam::printMeshStats(const polyMesh& mesh, const bool allTopology)
         }
     }
 
-    Pout<< "Number of cells of each type: " << nl
+    reduce(nHex,sumOp<label>());
+    reduce(nPrism,sumOp<label>()); 
+    reduce(nWedge,sumOp<label>());
+    reduce(nPyr,sumOp<label>());
+    reduce(nTetWedge,sumOp<label>());
+    reduce(nTet,sumOp<label>());
+    reduce(nUnknown,sumOp<label>());
+
+    Info<< "Overall number of cells of each type:" << nl
         << "    hexahedra:     " << nHex << nl
         << "    prisms:        " << nPrism << nl
         << "    wedges:        " << nWedge << nl

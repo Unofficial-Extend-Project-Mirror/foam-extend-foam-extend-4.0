@@ -28,16 +28,10 @@ Description
 
 #include "blockMesh.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 // Check the blockMesh topology
-
-void blockMesh::checkBlockMesh(const polyMesh& bm)
+void Foam::blockMesh::checkBlockMesh(const polyMesh& bm)
 {
     Info<< nl << "Check block mesh topology" << endl;
 
@@ -147,10 +141,5 @@ void blockMesh::checkBlockMesh(const polyMesh& bm)
             << exit(FatalError);
     }
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

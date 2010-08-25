@@ -48,7 +48,7 @@ template
     template<class> class FaceList,
     class PointField
 >
-Foam::pointField Foam::extrudedMesh::extrudedPoints
+Foam::Xfer<Foam::pointField> Foam::extrudedMesh::extrudedPoints
 (
     const PrimitivePatch<Face, FaceList, PointField>& extrudePatch,
     const extrudeModel& model
@@ -76,12 +76,13 @@ Foam::pointField Foam::extrudedMesh::extrudedPoints
         }
     }
 
-    return ePoints;
+    // return points for transferring
+    return xferMove(ePoints);
 }
 
 
 template<class Face, template<class> class FaceList, class PointField>
-Foam::faceList Foam::extrudedMesh::extrudedFaces
+Foam::Xfer<Foam::faceList> Foam::extrudedMesh::extrudedFaces
 (
     const PrimitivePatch<Face, FaceList, PointField>& extrudePatch,
     const extrudeModel& model
@@ -108,15 +109,33 @@ Foam::faceList Foam::extrudedMesh::extrudedFaces
         label currentLayerOffset = layer*surfacePoints.size();
         label nextLayerOffset = currentLayerOffset + surfacePoints.size();
 
-        // Side faces from layer to layer+1
-        for (label i=0; i<nInternalEdges; i++)
+        // Vertical faces from layer to layer+1
+        for (label edgeI=0; edgeI<nInternalEdges; edgeI++)
         {
-            quad[0] = surfaceEdges[i][1] + currentLayerOffset;
-            quad[1] = surfaceEdges[i][0] + currentLayerOffset;
-            quad[2] = surfaceEdges[i][0] + nextLayerOffset;
-            quad[3] = surfaceEdges[i][1] + nextLayerOffset;
+            const edge& e = surfaceEdges[edgeI];
+            const labelList& edgeFaces = extrudePatch.edgeFaces()[edgeI];
 
-            eFaces[facei++] = face(quad);
+            face& f = eFaces[facei++];
+            f.setSize(4);
+
+            if
+            (
+                (edgeFaces[0] < edgeFaces[1])
+             == sameOrder(surfaceFaces[edgeFaces[0]], e)
+            )
+            {
+                f[0] = e[0] + currentLayerOffset;
+                f[1] = e[1] + currentLayerOffset;
+                f[2] = e[1] + nextLayerOffset;
+                f[3] = e[0] + nextLayerOffset;
+            }
+            else
+            {
+                f[0] = e[1] + currentLayerOffset;
+                f[1] = e[0] + currentLayerOffset;
+                f[2] = e[0] + nextLayerOffset;
+                f[3] = e[1] + nextLayerOffset;
+            }
         }
 
         // Faces between layer and layer+1
@@ -127,7 +146,7 @@ Foam::faceList Foam::extrudedMesh::extrudedFaces
                 eFaces[facei++] =
                     face
                     (
-                        surfaceFaces[i].reverseFace()
+                        surfaceFaces[i] //.reverseFace()
                       + nextLayerOffset
                     );
             }
@@ -141,48 +160,55 @@ Foam::faceList Foam::extrudedMesh::extrudedFaces
         label nextLayerOffset = currentLayerOffset + surfacePoints.size();
 
         // Side faces across layer
-        for (label i=nInternalEdges; i<surfaceEdges.size(); i++)
+        for (label edgeI=nInternalEdges; edgeI<surfaceEdges.size(); edgeI++)
         {
-            const edge& e = surfaceEdges[i];
-            quad[0] = e[1] + currentLayerOffset;
-            quad[1] = e[0] + currentLayerOffset;
-            quad[2] = e[0] + nextLayerOffset;
-            quad[3] = e[1] + nextLayerOffset;
+            const edge& e = surfaceEdges[edgeI];
+            const labelList& edgeFaces = extrudePatch.edgeFaces()[edgeI];
 
-            label ownerFace = extrudePatch.edgeFaces()[i][0];
+            face& f = eFaces[facei++];
+            f.setSize(4);
 
-            if (!sameOrder(surfaceFaces[ownerFace], e))
+            if (sameOrder(surfaceFaces[edgeFaces[0]], e))
             {
-                reverse(quad);
+                f[0] = e[0] + currentLayerOffset;
+                f[1] = e[1] + currentLayerOffset;
+                f[2] = e[1] + nextLayerOffset;
+                f[3] = e[0] + nextLayerOffset;
             }
-
-            eFaces[facei++] = face(quad);
+            else
+            {
+                f[0] = e[1] + currentLayerOffset;
+                f[1] = e[0] + currentLayerOffset;
+                f[2] = e[0] + nextLayerOffset;
+                f[3] = e[1] + nextLayerOffset;
+            }
         }
-    }
-
-    // Top faces
-    forAll(surfaceFaces, i)
-    {
-        eFaces[facei++] = face(surfaceFaces[i]);
     }
 
     // Bottom faces
     forAll(surfaceFaces, i)
     {
+        eFaces[facei++] = face(surfaceFaces[i]).reverseFace();
+    }
+
+    // Top faces
+    forAll(surfaceFaces, i)
+    {
         eFaces[facei++] =
             face
             (
-                surfaceFaces[i].reverseFace()
+                surfaceFaces[i]
               + nLayers*surfacePoints.size()
             );
     }
 
-    return eFaces;
+    // return points for transferring
+    return xferMove(eFaces);
 }
 
 
 template<class Face, template<class> class FaceList, class PointField>
-Foam::cellList Foam::extrudedMesh::extrudedCells
+Foam::Xfer<Foam::cellList> Foam::extrudedMesh::extrudedCells
 (
     const PrimitivePatch<Face, FaceList, PointField>& extrudePatch,
     const extrudeModel& model
@@ -283,7 +309,8 @@ Foam::cellList Foam::extrudedMesh::extrudedCells
         facei++;
     }
 
-    return eCells;
+    // return points for transferring
+    return xferMove(eCells);
 }
 
 

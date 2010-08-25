@@ -32,11 +32,12 @@ License
 #include "OFstream.H"
 #include "surfaceIntersection.H"
 #include "SortableList.H"
+#include "PatchTools.H"
 
 using namespace Foam;
 
 // Does face use valid vertices?
-bool validTri(const triSurface& surf, const label faceI)
+bool validTri(const bool verbose, const triSurface& surf, const label faceI)
 {
     // Simple check on indices ok.
 
@@ -62,6 +63,7 @@ bool validTri(const triSurface& surf, const label faceI)
         WarningIn("validTri(const triSurface&, const label)")
             << "triangle " << faceI
             << " uses non-unique vertices " << f
+            << " coords:" << f.points(surf.points())
             << endl;
         return false;
     }
@@ -95,6 +97,7 @@ bool validTri(const triSurface& surf, const label faceI)
                 << "triangle " << faceI << " vertices " << f
                 << " has the same vertices as triangle " << nbrFaceI
                 << " vertices " << nbrF
+                << " coords:" << f.points(surf.points())
                 << endl;
 
             return false;
@@ -169,10 +172,12 @@ int main(int argc, char *argv[])
 
     argList::validArgs.clear();
     argList::validArgs.append("surface file");
-    argList::validOptions.insert("noSelfIntersection", "");
+    argList::validOptions.insert("checkSelfIntersection", "");
+    argList::validOptions.insert("verbose", "");
     argList args(argc, argv);
 
-    bool checkSelfIntersection = !args.options().found("noSelfIntersection");
+    bool checkSelfIntersection = args.optionFound("checkSelfIntersection");
+    bool verbose = args.optionFound("verbose");
 
     fileName surfFileName(args.additionalArgs()[0]);
     Pout<< "Reading surface from " << surfFileName << " ..." << nl << endl;
@@ -232,15 +237,13 @@ int main(int argc, char *argv[])
 
         forAll(surf, faceI)
         {
-            if (!validTri(surf, faceI))
+            if (!validTri(verbose, surf, faceI))
             {
                 illegalFaces.append(faceI);
             }
         }
 
-        illegalFaces.shrink();
-
-        if (illegalFaces.size() > 0)
+        if (illegalFaces.size())
         {
             Pout<< "Surface has " << illegalFaces.size()
                 << " illegal triangles." << endl;
@@ -270,9 +273,9 @@ int main(int argc, char *argv[])
 
             if (f[0] == f[1] || f[0] == f[2] || f[1] == f[2])
             {
-                WarningIn(args.executable())
-                    << "Illegal triangle " << faceI << " vertices " << f
-                    << " coords " << f.points(surf.points()) << endl;
+                //WarningIn(args.executable())
+                //    << "Illegal triangle " << faceI << " vertices " << f
+                //    << " coords " << f.points(surf.points()) << endl;
             }
             else
             {
@@ -321,7 +324,7 @@ int main(int argc, char *argv[])
             Pout<< "    " << min << " .. " << min+dist << "  : "
                 << 1.0/surf.size() * binCount[binI]
                 << endl;
-            min += dist; 
+            min += dist;
         }
         Pout<< endl;
 
@@ -404,10 +407,10 @@ int main(int argc, char *argv[])
         const pointField& localPoints = surf.localPoints();
 
         const boundBox bb(localPoints);
-        scalar smallDim = 1E-6*mag(bb.max() - bb.min());
+        scalar smallDim = 1E-6 * bb.mag();
 
-        Pout<< "Checking for points less than 1E-6 of bounding box (" 
-            << bb.max() - bb.min() << " meter) apart."
+        Pout<< "Checking for points less than 1E-6 of bounding box ("
+            << bb.span() << " meter) apart."
             << endl;
 
         // Sort points
@@ -491,7 +494,7 @@ int main(int argc, char *argv[])
             nSingleEdges++;
         }
     }
-            
+
     label nMultEdges = 0;
     forAll(eFaces, edgeI)
     {
@@ -594,13 +597,14 @@ int main(int argc, char *argv[])
     // Check orientation
     // ~~~~~~~~~~~~~~~~~
 
-    boolList borderEdge(surf.checkOrientation(false));
+    labelHashSet borderEdge(surf.size()/1000);
+    PatchTools::checkOrientation(surf, false, &borderEdge);
 
     //
     // Colour all faces into zones using borderEdge
     //
     labelList normalZone;
-    label numNormalZones = surf.markZones(borderEdge, normalZone);
+    label numNormalZones = PatchTools::markZones(surf, borderEdge, normalZone);
 
     Pout<< endl
         << "Number of zones (connected area with consistent normal) : "
@@ -624,7 +628,7 @@ int main(int argc, char *argv[])
         triSurfaceSearch querySurf(surf);
         surfaceIntersection inter(querySurf);
 
-        if ((inter.cutEdges().size() == 0) && (inter.cutPoints().size() == 0))
+        if (inter.cutEdges().empty() && inter.cutPoints().empty())
         {
             Pout<< "Surface is not self-intersecting" << endl;
         }
@@ -650,7 +654,7 @@ int main(int argc, char *argv[])
         }
         Pout<< endl;
     }
-     
+
 
     Pout<< "End\n" << endl;
 

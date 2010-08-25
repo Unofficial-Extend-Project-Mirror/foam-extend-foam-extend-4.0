@@ -22,14 +22,11 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "regionSide.H"
 #include "meshTools.H"
 #include "primitiveMesh.H"
-#include "IndirectList.H"
 
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -113,7 +110,7 @@ Foam::label Foam::regionSide::otherEdge
     )   << "Cannot find other edge on face " << faceI << " that uses point "
         << pointI << " but not point " << freePointI << endl
         << "Edges on face:" << fEdges
-        << " verts:" << IndirectList<edge>(mesh.edges(), fEdges)()
+        << " verts:" << UIndirectList<edge>(mesh.edges(), fEdges)()
         << " Vertices on face:"
         << mesh.faces()[faceI]
         << " Vertices on original edge:" << e << abort(FatalError);

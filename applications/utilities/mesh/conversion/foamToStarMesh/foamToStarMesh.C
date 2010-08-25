@@ -61,6 +61,7 @@ See Also
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
+#include "timeSelector.H"
 #include "Time.H"
 #include "polyMesh.H"
 #include "STARCDMeshWriter.H"
@@ -73,23 +74,20 @@ using namespace Foam;
 int main(int argc, char *argv[])
 {
     argList::noParallel();
+    timeSelector::addOptions();
+
     argList::validOptions.insert("scale", "scale");
     argList::validOptions.insert("noBnd", "");
     argList::validOptions.insert("tri", "");
     argList::validOptions.insert("surface", "");
 
-#   include "addTimeOptions.H"
 #   include "setRootCase.H"
 #   include "createTime.H"
-    // Get times list
-    instantList Times = runTime.times();
 
-    // set startTime and endTime depending on -time and -latestTime options
-#   include "checkTimeOptions.H"
-    runTime.setTime(Times[startTime], startTime);
+    instantList timeDirs = timeSelector::select0(runTime, args);
 
     bool surfaceOnly = false;
-    if (args.options().found("surface") or args.options().found("tri"))
+    if (args.optionFound("surface") || args.optionFound("tri"))
     {
         surfaceOnly = true;
     }
@@ -100,16 +98,15 @@ int main(int argc, char *argv[])
         exportName = meshWriter::defaultSurfaceName;
     }
 
-    if (args.options().found("case"))
+    if (args.optionFound("case"))
     {
         exportName += '-' + args.globalCaseName();
     }
 
     // default: rescale from [m] to [mm]
     scalar scaleFactor = 1000;
-    if (args.options().found("scale"))
+    if (args.optionReadIfPresent("scale", scaleFactor))
     {
-        scaleFactor = readScalar(IStringStream(args.options()["scale"])());
         if (scaleFactor <= 0)
         {
             scaleFactor = 1;
@@ -118,21 +115,20 @@ int main(int argc, char *argv[])
 
 #   include "createPolyMesh.H"
 
-    // bool firstCheck = true;
 
-    for (label timeI = startTime; timeI < endTime; ++timeI)
+    forAll(timeDirs, timeI)
     {
-        runTime.setTime(Times[timeI], timeI);
+        runTime.setTime(timeDirs[timeI], timeI);
 
 #       include "getTimeIndex.H"
 
         polyMesh::readUpdateState state = mesh.readUpdate();
 
-        if (timeI == startTime || state != polyMesh::UNCHANGED)
+        if (!timeI || state != polyMesh::UNCHANGED)
         {
             meshWriters::STARCD writer(mesh, scaleFactor);
 
-            if (args.options().found("noBnd"))
+            if (args.optionFound("noBnd"))
             {
                 writer.noBoundary();
             }
@@ -145,7 +141,7 @@ int main(int argc, char *argv[])
 
             if (surfaceOnly)
             {
-                if (args.options().found("tri"))
+                if (args.optionFound("tri"))
                 {
                     writer.writeSurface(meshName, true);
                 }

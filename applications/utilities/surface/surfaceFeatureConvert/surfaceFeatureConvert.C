@@ -49,9 +49,9 @@ void readNASEdges
     edgeList& allEdges
 )
 {
-   IFstream OBJfile(inFileName);
+    IFstream is(inFileName);
 
-    if (!OBJfile.good())
+    if (!is.good())
     {
         FatalErrorIn("readNASEdges")
             << "Cannot read file " << inFileName
@@ -68,14 +68,14 @@ void readNASEdges
     DynamicList<label> edgeIndices;
 
 
-    while (OBJfile.good())
+    while (is.good())
     {
         string line;
-        OBJfile.getLine(line);
+        is.getLine(line);
 
-        if (line.size() > 0 && line[0] == '$')
+        if (line.empty() || line[0] == '$')
         {
-            // Skip comment
+            // Skip empty and comment
             continue;
         }
 
@@ -87,9 +87,9 @@ void readNASEdges
             while (true)
             {
                 string buf;
-                OBJfile.getLine(buf);
+                is.getLine(buf);
 
-                if (buf.size() > 72 && buf[72]=='+')
+                if (buf.size() > 72 && buf[72] == '+')
                 {
                     line += buf.substr(8, 64);
                 }

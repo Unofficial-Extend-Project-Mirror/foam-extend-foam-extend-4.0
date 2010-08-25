@@ -32,11 +32,13 @@ Description
 
     patch_YYY_XXX.obj : all face centres of patch YYY
 
-    Optional: patch faces (as polygons) : patchFaces_YYY_XXX.obj
+    Optional: - patch faces (as polygons) : patchFaces_YYY_XXX.obj
+              - non-manifold edges : patchEdges_YYY_XXX.obj
 
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
+#include "timeSelector.H"
 #include "Time.H"
 #include "polyMesh.H"
 #include "OFstream.H"
@@ -50,7 +52,7 @@ using namespace Foam;
 
 void writeOBJ(const point& pt, Ostream& os)
 {
-    os << "v " << pt.x() << ' ' << pt.y() << ' ' << pt.z() << endl;
+    os << "v " << pt.x() << ' ' << pt.y() << ' ' << pt.z() << nl;
 }
 
 // All edges of mesh
@@ -74,8 +76,7 @@ void writePoints(const polyMesh& mesh, const fileName& timeName)
     {
         const edge& e = mesh.edges()[edgeI];
 
-        pointStream << "l " << e.start() + 1 << ' ' << e.end() + 1
-            << endl;
+        pointStream << "l " << e.start() + 1 << ' ' << e.end() + 1 << nl;
     }
 }
 
@@ -276,7 +277,47 @@ void writePatchFaces
             {
                 patchFaceStream << ' ' << f[fp]+1;
             }
-            patchFaceStream << endl;
+            patchFaceStream << nl;
+        }
+    }
+}
+
+
+void writePatchBoundaryEdges
+(
+    const polyMesh& mesh,
+    const fileName& timeName
+)
+{
+    const polyBoundaryMesh& patches = mesh.boundaryMesh();
+
+    forAll(patches, patchI)
+    {
+        const polyPatch& pp = patches[patchI];
+
+        fileName edgeFile
+        (
+            mesh.time().path()
+          / "patchEdges_" + pp.name() + '_' + timeName + ".obj"
+        );
+
+        Info << "Writing patch edges to " << edgeFile << endl;
+
+        OFstream patchEdgeStream(edgeFile);
+
+        forAll(pp.localPoints(), pointI)
+        {
+            writeOBJ(pp.localPoints()[pointI], patchEdgeStream);
+        }
+
+        for (label edgeI = pp.nInternalEdges(); edgeI < pp.nEdges(); edgeI++)
+        {
+            if (pp.edgeFaces()[edgeI].size() == 1)
+            {
+                const edge& e = pp.edges()[edgeI];
+
+                patchEdgeStream<< "l " << e[0]+1 << ' ' << e[1]+1 << nl;
+            }
         }
     }
 }
@@ -336,23 +377,27 @@ void writePointCells
 
 int main(int argc, char *argv[])
 {
+    timeSelector::addOptions();
     argList::validOptions.insert("patchFaces", "");
+    argList::validOptions.insert("patchEdges", "");
     argList::validOptions.insert("cell", "cellI");
     argList::validOptions.insert("face", "faceI");
     argList::validOptions.insert("point", "pointI");
     argList::validOptions.insert("cellSet", "setName");
     argList::validOptions.insert("faceSet", "setName");
+#   include "addRegionOption.H"
 
-#   include "addTimeOptions.H"
 #   include "setRootCase.H"
 #   include "createTime.H"
+    runTime.functionObjects().off();
 
-    bool patchFaces = args.options().found("patchFaces");
-    bool doCell = args.options().found("cell");
-    bool doPoint = args.options().found("point");
-    bool doFace = args.options().found("face");
-    bool doCellSet = args.options().found("cellSet");
-    bool doFaceSet = args.options().found("faceSet");
+    bool patchFaces = args.optionFound("patchFaces");
+    bool patchEdges = args.optionFound("patchEdges");
+    bool doCell     = args.optionFound("cell");
+    bool doPoint    = args.optionFound("point");
+    bool doFace     = args.optionFound("face");
+    bool doCellSet  = args.optionFound("cellSet");
+    bool doFaceSet  = args.optionFound("faceSet");
 
 
     Info<< "Writing mesh objects as .obj files such that the object"
@@ -360,50 +405,43 @@ int main(int argc, char *argv[])
         << "(for points, faces, cells) is consistent with"
         << " Foam numbering (starting from 0)." << endl << endl;
 
-    // Get times list
-    instantList Times = runTime.times();
+    instantList timeDirs = timeSelector::select0(runTime, args);
 
-#   include "checkTimeOptions.H"
+#   include "createNamedPolyMesh.H"
 
-    runTime.setTime(Times[startTime], startTime);
-
-#   include "createPolyMesh.H"
-
-    bool firstCheck = true;
-
-    for (label i=startTime; i<endTime; i++)
+    forAll(timeDirs, timeI)
     {
-        runTime.setTime(Times[i], i);
+        runTime.setTime(timeDirs[timeI], timeI);
 
         Info<< "Time = " << runTime.timeName() << endl;
 
         polyMesh::readUpdateState state = mesh.readUpdate();
 
-        if (firstCheck || state != polyMesh::UNCHANGED)
+        if (!timeI || state != polyMesh::UNCHANGED)
         {
             if (patchFaces)
             {
                 writePatchFaces(mesh, runTime.timeName());
-
             }
-            else if (doCell)
+            if (patchEdges)
             {
-                label cellI =
-                    readLabel(IStringStream(args.options()["cell"])());
+                writePatchBoundaryEdges(mesh, runTime.timeName());
+            }
+            if (doCell)
+            {
+                label cellI = args.optionRead<label>("cell");
 
                 writePoints(mesh, cellI, runTime.timeName());
             }
-            else if (doPoint)
+            if (doPoint)
             {
-                label pointI =
-                    readLabel(IStringStream(args.options()["point"])());
+                label pointI = args.optionRead<label>("point");
 
                 writePointCells(mesh, pointI, runTime.timeName());
             }
-            else if (doFace)
+            if (doFace)
             {
-                label faceI =
-                    readLabel(IStringStream(args.options()["face"])());
+                label faceI = args.optionRead<label>("face");
 
                 fileName fName
                 (
@@ -423,9 +461,9 @@ int main(int argc, char *argv[])
 
                 meshTools::writeOBJ(str, faceList(1, f), mesh.points());
             }
-            else if (doCellSet)
+            if (doCellSet)
             {
-                word setName(args.options()["cellSet"]);
+                word setName(args.option("cellSet"));
 
                 cellSet cells(mesh, setName);
 
@@ -435,9 +473,9 @@ int main(int argc, char *argv[])
                 writePoints(mesh, cells.toc(), runTime.timeName());
 
             }
-            else if (doFaceSet)
+            if (doFaceSet)
             {
-                word setName(args.options()["faceSet"]);
+                word setName(args.option("faceSet"));
 
                 faceSet faces(mesh, setName);
 
@@ -466,7 +504,16 @@ int main(int argc, char *argv[])
                     faces.toc()
                 );
             }
-            else
+            else if
+            (
+                !patchFaces 
+             && !patchEdges
+             && !doCell
+             && !doPoint
+             && !doFace
+             && !doCellSet
+             && !doFaceSet
+            )
             {
                 // points & edges
                 writePoints(mesh, runTime.timeName());
@@ -486,9 +533,7 @@ int main(int argc, char *argv[])
             Info << "No mesh." << endl;
         }
 
-        firstCheck = false;
-
-        Info << endl << endl;
+        Info << nl << endl;
     }
 
 

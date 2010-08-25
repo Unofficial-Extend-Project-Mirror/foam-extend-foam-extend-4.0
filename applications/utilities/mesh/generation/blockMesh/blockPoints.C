@@ -28,7 +28,6 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
 #include "block.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

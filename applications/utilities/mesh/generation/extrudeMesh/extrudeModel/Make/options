@@ -1,6 +1,6 @@
 EXE_INC = \
-    -I$(FOAM_SRC)/meshTools/lnInclude \
-    -I$(FOAM_SRC)/dynamicMesh/lnInclude
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/dynamicMesh/lnInclude
 
 EXE_LIBS = \
     -lmeshTools \

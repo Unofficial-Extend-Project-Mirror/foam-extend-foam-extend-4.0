@@ -860,7 +860,7 @@ label collapseBase(triSurface& surf, const scalar minLen)
                     splitWeights
                 );
 
-                if (splitVerts.size() > 0)
+                if (splitVerts.size())
                 {
                     // Split edge using splitVerts. All non-collapsed triangles 
                     // using edge will get split.

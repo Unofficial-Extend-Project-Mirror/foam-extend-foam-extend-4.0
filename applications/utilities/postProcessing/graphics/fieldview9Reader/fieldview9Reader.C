@@ -23,7 +23,8 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    Reader module for Fieldview9 to read Foam mesh&data.
+    Reader module for Fieldview9 to read OpenFOAM mesh and data.
+
     Creates new 'fvbin' type executable which needs to be installed in place
     of bin/fvbin.
 
@@ -132,8 +133,8 @@ static void errorMsg(const string& msg)
 // Simple check if directory is valid case directory.
 static bool validCase(const fileName& rootAndCase)
 {
-    //if (dir(rootAndCase/"system") && dir(rootAndCase/"constant"))
-    if (dir(rootAndCase/"constant"))
+    //if (isDir(rootAndCase/"system") && isDir(rootAndCase/"constant"))
+    if (isDir(rootAndCase/"constant"))
     {
         return true;
     }
@@ -235,7 +236,7 @@ static void createFieldNames
     HashSet<word> surfScalarHash;
     HashSet<word> surfVectorHash;
 
-    if (setName.size() == 0)
+    if (setName.empty())
     {
         forAll(Times, timeI)
         {
@@ -528,7 +529,6 @@ void user_query_file_function
 
             return;
         }
-        
     }
 
     fileName rootDir(rootAndCase.path());
@@ -536,12 +536,11 @@ void user_query_file_function
     fileName caseName(rootAndCase.name());
 
     // handle trailing '/'
-    if (caseName.size() == 0)
+    if (caseName.empty())
     {
         caseName = rootDir.name();
         rootDir = rootDir.path();
     }
-
 
     Info<< "rootDir  : " << rootDir << endl
         << "caseName : " << caseName << endl
@@ -609,7 +608,7 @@ void user_query_file_function
 
         strcpy(face_type_names[patchI], patch.name().c_str());
 
-        if (isType<wallPolyPatch>(patch))
+        if (isA<wallPolyPatch>(patch))
         {
             wall_flags[patchI] = 1;
         }

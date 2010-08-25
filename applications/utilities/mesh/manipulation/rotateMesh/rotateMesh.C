@@ -31,6 +31,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
+#include "timeSelector.H"
 #include "Time.H"
 #include "fvMesh.H"
 #include "volFields.H"
@@ -66,7 +67,8 @@ void RotateFields
 
 int main(int argc, char *argv[])
 {
-#   include "addTimeOptions.H"
+    timeSelector::addOptions();
+
     argList::validArgs.append("n1");
     argList::validArgs.append("n2");
 
@@ -105,19 +107,15 @@ int main(int argc, char *argv[])
         points.write();
     }
 
-    // Get times list
-    instantList Times = runTime.times();
 
-    // set startTime and endTime depending on -time and -latestTime options
-#   include "checkTimeOptions.H"
-
-    runTime.setTime(Times[startTime], startTime);
+    instantList timeDirs = timeSelector::select0(runTime, args);
 
 #   include "createMesh.H"
 
-    for (label i=startTime; i<endTime; i++)
+
+    forAll(timeDirs, timeI)
     {
-        runTime.setTime(Times[i], i);
+        runTime.setTime(timeDirs[timeI], timeI);
 
         Info<< "Time = " << runTime.timeName() << endl;
 

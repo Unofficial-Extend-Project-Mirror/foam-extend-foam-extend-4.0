@@ -32,21 +32,16 @@ Description
 
 #include "blockMesh.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from IOdictionary
-blockMesh::blockMesh(IOdictionary& meshDescription)
+Foam::blockMesh::blockMesh(IOdictionary& meshDescription)
 :
     topologyPtr_(createTopology(meshDescription)),
-    scale_(readScalar(meshDescription.lookup("convertToMeters"))),
     blockOffsets_(createBlockOffsets()),
     mergeList_(createMergeList()),
-    points_(createPoints()),
+    points_(createPoints(meshDescription)),
     cells_(createCells()),
     patches_(createPatches())
 {}
@@ -54,7 +49,7 @@ blockMesh::blockMesh(IOdictionary& meshDescription)
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-blockMesh::~blockMesh()
+Foam::blockMesh::~blockMesh()
 {
     delete topologyPtr_;
 }
@@ -62,7 +57,7 @@ blockMesh::~blockMesh()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const polyMesh& blockMesh::topology() const
+const Foam::polyMesh& Foam::blockMesh::topology() const
 {
     if (!topologyPtr_)
     {
@@ -75,13 +70,7 @@ const polyMesh& blockMesh::topology() const
 }
 
 
-const curvedEdgeList& blockMesh::edges() const
-{
-    return edges_;
-}
-
-
-wordList blockMesh::patchNames() const
+Foam::wordList Foam::blockMesh::patchNames() const
 {
     const polyPatchList& patchTopologies = topology().boundaryMesh();
     wordList names(patchTopologies.size());
@@ -95,7 +84,7 @@ wordList blockMesh::patchNames() const
 }
 
 
-wordList blockMesh::patchTypes() const
+Foam::wordList Foam::blockMesh::patchTypes() const
 {
     const polyPatchList& patchTopologies = topology().boundaryMesh();
     wordList types(patchTopologies.size());
@@ -109,7 +98,7 @@ wordList blockMesh::patchTypes() const
 }
 
 
-wordList blockMesh::patchPhysicalTypes() const
+Foam::wordList Foam::blockMesh::patchPhysicalTypes() const
 {
     const polyPatchList& patchTopologies = topology().boundaryMesh();
     wordList physicalTypes(patchTopologies.size());
@@ -123,13 +112,13 @@ wordList blockMesh::patchPhysicalTypes() const
 }
 
 
-label blockMesh::numZonedBlocks() const
+Foam::label Foam::blockMesh::numZonedBlocks() const
 {
     label num = 0;
 
     forAll(*this, blockI)
     {
-        if (operator[](blockI).blockDef().zoneName().size() > 0)
+        if (operator[](blockI).blockDef().zoneName().size())
         {
             num++;
         }
@@ -139,7 +128,7 @@ label blockMesh::numZonedBlocks() const
 }
 
 
-void blockMesh::writeTopology(Ostream& os) const
+void Foam::blockMesh::writeTopology(Ostream& os) const
 {
     const pointField& pts = topology().points();
 
@@ -159,10 +148,5 @@ void blockMesh::writeTopology(Ostream& os) const
         os << "l " << e.start() + 1 << ' ' << e.end() + 1 << endl;
     }
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

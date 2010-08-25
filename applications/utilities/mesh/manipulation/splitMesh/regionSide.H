@@ -45,7 +45,7 @@ SourceFiles
 #ifndef regionSide_H
 #define regionSide_H
 
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "typeInfo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

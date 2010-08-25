@@ -39,12 +39,12 @@ Description
 
 #include "incompressible/singlePhaseTransportModel/singlePhaseTransportModel.H"
 
-#include "incompressible/RASModel/RASModel.H"
-#include "incompressible/LESModel/LESModel.H"
+#include "incompressible/RAS/RASModel/RASModel.H"
+#include "incompressible/LES/LESModel/LESModel.H"
 
-#include "basicThermo.H"
-#include "compressible/RASModel/RASModel.H"
-#include "compressible/LESModel/LESModel.H"
+#include "basicPsiThermo.H"
+#include "compressible/RAS/RASModel/RASModel.H"
+#include "compressible/LES/LESModel/LESModel.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -53,15 +53,13 @@ namespace Foam
 {
     void execFlowFunctionObjects(const argList& args, const Time& runTime)
     {
-        if (args.options().found("dict"))
+        if (args.optionFound("dict"))
         {
-            fileName dictName(args.options()["dict"]);
-
             IOdictionary dict
             (
                 IOobject
                 (
-                    dictName,
+                    args.option("dict"),
                     runTime.system(),
                     runTime,
                     IOobject::MUST_READ
@@ -74,7 +72,7 @@ namespace Foam
         }
         else
         {
-            functionObjectList fol(runTime, runTime.controlDict());
+            functionObjectList fol(runTime);
             fol.start();
             fol.execute();
         }
@@ -139,7 +137,7 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
 
         IOobject LESPropertiesHeader
         (
-            "RASProperties",
+            "LESProperties",
             runTime.constant(),
             mesh,
             IOobject::MUST_READ,
@@ -196,7 +194,7 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
     }
     else if (phi.dimensions() == dimensionSet(1, 0, -1, 0, 0))
     {
-        autoPtr<basicThermo> thermo(basicThermo::New(mesh));
+        autoPtr<basicPsiThermo> thermo(basicPsiThermo::New(mesh));
 
         volScalarField rho
         (

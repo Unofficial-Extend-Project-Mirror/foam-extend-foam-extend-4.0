@@ -1,4 +1,5 @@
 #!/bin/sh
+cd ${0%/*} || exit 1    # run from this directory
 set -x
 
 if [ -d "$ParaView_DIR" -a -r "$ParaView_DIR" ]
@@ -11,13 +12,10 @@ then
          mkdir -p Make/$WM_OPTIONS > /dev/null 2>&1
          cd Make/$WM_OPTIONS
          cmake ../..
-	 if [ $WM_ARCH = "darwinPpc" -o $WM_ARCH = "darwinIntel" ]
-	 then
-	     sed -i bak -e 's/-dynamiclib /& -undefined dynamic_lookup /' CMakeFiles/PV3FoamReader.dir/link.txt	 
-	     sed -i bak -e 's/-dynamiclib /& -undefined dynamic_lookup /' CMakeFiles/PV3FoamReader_SM.dir/link.txt	 
-	 fi
          make
       )
       ;;
    esac
 fi
+
+# ----------------------------------------------------------------- end-of-file

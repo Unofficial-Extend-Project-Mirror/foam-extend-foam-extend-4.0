@@ -6,11 +6,10 @@ $(curvedEdges)/polyLine.C
 $(curvedEdges)/polyLineEdge.C
 $(curvedEdges)/arcEdge.C
 $(curvedEdges)/ellipseEdge.C
-$(curvedEdges)/spline.C
 $(curvedEdges)/BSpline.C
-$(curvedEdges)/simpleSplineEdge.C
-$(curvedEdges)/polySplineEdge.C
 $(curvedEdges)/lineDivide.C
+$(curvedEdges)/CatmullRomSpline.C
+$(curvedEdges)/splineEdge.C
 
 blockMesh.C
 blockDescriptor.C
@@ -27,6 +26,6 @@ blockPoints.C
 blockCells.C
 blockBoundary.C
 
-genBlockMesh.C
+blockMeshApp.C
 
 EXE = $(FOAM_APPBIN)/blockMesh

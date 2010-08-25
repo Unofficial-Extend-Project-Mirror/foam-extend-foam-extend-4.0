@@ -1,8 +1,8 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2008 OpenCFD Ltd.
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -48,6 +48,7 @@ Description
 #include "Swap.H"
 #include "IFstream.H"
 #include "wordIOList.H"
+#include "readHexLabel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -92,6 +93,9 @@ DynamicList<label> cellGroupZoneID;
 DynamicList<label> cellGroupStartIndex;
 DynamicList<label> cellGroupEndIndex;
 DynamicList<label> cellGroupType;
+
+// Special parsing of (incorrect) Cubit files
+bool cubitFile = false;
 
 
 void uniquify(word& name, HashSet<word>& patchNames)
@@ -623,11 +627,20 @@ endOfSection               {space}")"{space}
         BEGIN(readZoneGroupData);
     }
 
-<readZoneGroupData>{space}{label}{space}{word}{space}{word}{space}{label}? {
+<readZoneGroupData>{space}{hexLabel}{space}{word}{space}{word}{space}{label}? {
         IStringStream zoneDataStream(YYText());
 
         // cell zone-ID not in hexadecimal!!! Inconsistency
-        label zoneID(readLabel(zoneDataStream));
+        label zoneID = -1;
+
+        if (cubitFile)
+        {
+            zoneID = readHexLabel(zoneDataStream);
+        }
+        else
+        {
+            zoneID = readLabel(zoneDataStream);
+        }
 
         groupType.insert(zoneID, word(zoneDataStream));
         groupName.insert(zoneID, word(zoneDataStream));
@@ -753,6 +766,7 @@ int main(int argc, char *argv[])
     argList::validOptions.insert("scale", "scale factor");
     argList::validOptions.insert("ignoreCellGroups", "cell group names");
     argList::validOptions.insert("ignoreFaceGroups", "face group names");
+    argList::validOptions.insert("cubit", "");
 
     argList args(argc, argv);
 
@@ -761,21 +775,28 @@ int main(int argc, char *argv[])
         FatalError.exit();
     }
 
-    if (args.options().found("scale"))
-    {
-        scaleFactor = atof(args.options()["scale"].c_str());
-    }
+    args.optionReadIfPresent("scale", scaleFactor);
 
     HashSet<word> ignoreCellGroups;
-    if (args.options().found("ignoreCellGroups"))
+    if (args.optionFound("ignoreCellGroups"))
     {
-        IStringStream(args.options()["ignoreCellGroups"])() >> ignoreCellGroups;
+        args.optionLookup("ignoreCellGroups")() >> ignoreCellGroups;
     }
 
     HashSet<word> ignoreFaceGroups;
-    if (args.options().found("ignoreFaceGroups"))
+    if (args.optionFound("ignoreFaceGroups"))
     {
-        IStringStream(args.options()["ignoreFaceGroups"])() >> ignoreFaceGroups;
+        args.optionLookup("ignoreFaceGroups")() >> ignoreFaceGroups;
+    }
+
+    cubitFile = args.options().found("cubit");
+
+    if (cubitFile)
+    {
+        Info<< nl
+            << "Assuming Cubit generated file"
+            << " (incorrect face orientation; hexadecimal zoneIDs)."
+            << nl << endl;
     }
 
 #   include "createTime.H"
@@ -820,6 +841,8 @@ int main(int argc, char *argv[])
 
     // Pre-filtering: flip "owner" boundary or wrong oriented internal
     // faces and move to neighbour
+
+    boolList fm(faces.size(), false);
     forAll (faces, facei)
     {
         if
@@ -828,7 +851,11 @@ int main(int argc, char *argv[])
          || (neighbour[facei] != -1 && owner[facei] > neighbour[facei])
         )
         {
-            faces[facei] = faces[facei].reverseFace();
+            fm[facei] = true;
+            if (!cubitFile)
+            {
+                faces[facei] = faces[facei].reverseFace();
+            }
             Swap(owner[facei], neighbour[facei]);
         }
     }
@@ -884,10 +911,10 @@ int main(int argc, char *argv[])
             runTime.constant(),
             runTime
         ),
-        pointField(0),
-        faceList(0),
-        labelList(0),
-        labelList(0)
+        xferCopy(pointField()),
+        xferCopy(faceList()),
+        xferCopy(labelList()),
+        xferCopy(labelList())
     );
 
 

@@ -1,23 +1,16 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.0                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "/home/penfold/mattijs/foam/mattijs2.1/run/icoFoam";
-    case            "cavity";
-    instance        "system";
-    local           "";
-
-    class           dictionary;
-    object          refineMeshDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      refineMeshDict;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -59,13 +52,13 @@ directions
 // Whether to use hex topology. This will
 // - if patchLocal: all cells on selected patch should be hex
 // - split all hexes in 2x2x2 through the middle of edges.
-useHexTopology true;
+useHexTopology  true;
 
 // Cut purely geometric (will cut hexes through vertices) or take topology
 // into account. Incompatible with useHexTopology
-geometricCut false;
+geometricCut    false;
 
 // Write meshes from intermediate steps
-writeMesh false;
+writeMesh       false;
 
 // ************************************************************************* //

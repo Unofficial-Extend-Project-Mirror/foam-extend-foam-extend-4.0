@@ -1,33 +1,26 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.0                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "/home/penfold/mattijs/foam/mattijs2.1/run/icoFoam";
-    case            "cavity";
-    instance        "system";
-    local           "";
-
-    class           dictionary;
-    object          autoRefineMeshDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      autoRefineMeshDict;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
 // Surface to keep to
-surface "plexi.ftr";
+surface         "plexi.ftr";
 
 // What is outside. These points have to be inside a cell (so not on a face!)
-outsidePoints       ((-0.99001 -0.99001 -0.99001));
+outsidePoints   ((-0.99001 -0.99001 -0.99001));
 
 
 //
@@ -51,11 +44,11 @@ curvature           0.9;
 nCutLayers 2;
 
 // Refine until smallest edge of mesh < minEdgeLen
-minEdgeLen          0.1;
+minEdgeLen      0.1;
 
 // Or until the number of cells would become more than (stops one level before
 // this)
-cellLimit           2500000;
+cellLimit       2500000;
 
 
 //
@@ -111,16 +104,16 @@ directions
 
 // refinement level difference between neighbouring cells. Set to large if
 // there is no need for a limit.
-splitLevel 2;
+splitLevel      2;
 
 // Cut purely geometric (will cut hexes through vertices) or take topology
 // into account.
-geometricCut false;
+geometricCut    false;
 
 // Whether to use hex topology. This will never cut hex through vertices.
-useHexTopology yes;
+useHexTopology  yes;
 
 // Write meshes from intermediate steps
-writeMesh true;
+writeMesh       true;
 
 // ************************************************************************* //

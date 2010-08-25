@@ -26,7 +26,8 @@ Application
     CreateTurbulenceFields
 
 Description
-    Creates a full setturbulence fields.
+    Creates a full set of turbulence fields.
+
     - Currently does not output nut and nuTilda
 
 Source files:
@@ -36,32 +37,25 @@ Source files:
 
 #include "fvCFD.H"
 #include "incompressible/singlePhaseTransportModel/singlePhaseTransportModel.H"
-#include "incompressible/RASModel/RASModel.H"
-
+#include "RASModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
+    timeSelector::addOptions();
 
-#   include "addTimeOptions.H"
-#   include "setRootCase.H"
-#   include "createTime.H"
+    #include "setRootCase.H"
+    #include "createTime.H"
 
-    // Get times list
-    instantList Times = runTime.times();
+    instantList timeDirs = timeSelector::select0(runTime, args);
 
-    // set startTime and endTime depending on -time and -latestTime options
-#   include "checkTimeOptions.H"
+    #include "createMesh.H"
+    #include "createFields.H"
 
-    runTime.setTime(Times[startTime], startTime);
-#   include "createMesh.H"
-
-#   include "createFields.H"
-
-    for (label i=startTime; i<endTime; i++)
+    forAll(timeDirs, timeI)
     {
-        runTime.setTime(Times[i], i);
+        runTime.setTime(timeDirs[timeI], timeI);
 
         Info<< "Time = " << runTime.timeName() << endl;
 
@@ -135,7 +129,7 @@ int main(int argc, char *argv[])
 
     Info<< "\nEnd\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

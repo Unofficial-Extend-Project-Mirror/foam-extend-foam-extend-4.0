@@ -365,7 +365,7 @@ public:
         }
 
         //- Table of the thermodynamic data given in the CHEMKIN file
-        const HashPtrTable<gasThermoPhysics>& speciesThermo() const
+        const HashPtrTable<gasThermoPhysics>& sThermo() const
         {
             return speciesThermo_;
         }

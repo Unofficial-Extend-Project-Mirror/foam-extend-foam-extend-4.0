@@ -26,7 +26,7 @@ Application
     mergeOrSplitBaffles
 
 Description
-    Detect faces that share points (baffles). Either merge them or
+    Detects faces that share points (baffles). Either merge them or
     duplicate the points.
 
     Notes:
@@ -154,16 +154,87 @@ void insertDuplicateMerge
 }
 
 
+labelList findBaffles(const polyMesh& mesh, const labelList& boundaryFaces)
+{
+    // Get all duplicate face labels (in boundaryFaces indices!).
+    labelList duplicates = localPointRegion::findDuplicateFaces
+    (
+        mesh,
+        boundaryFaces
+    );
+
+
+    // Check that none are on processor patches
+    const polyBoundaryMesh& patches = mesh.boundaryMesh();
+
+    forAll(duplicates, bFaceI)
+    {
+        if (duplicates[bFaceI] != -1)
+        {
+            label faceI = mesh.nInternalFaces() + bFaceI;
+            label patchI = patches.whichPatch(faceI);
+
+            if (isA<processorPolyPatch>(patches[patchI]))
+            {
+                FatalErrorIn("findBaffles(const polyMesh&, const labelList&)")
+                    << "Duplicate face " << faceI
+                    << " is on a processorPolyPatch."
+                    << "This is not allowed." << nl
+                    << "Face:" << faceI
+                    << " is on patch:" << patches[patchI].name()
+                    << abort(FatalError);
+            }
+        }
+    }
+
+
+    // Write to faceSet for ease of postprocessing.
+    {
+        faceSet duplicateSet
+        (
+            mesh,
+            "duplicateFaces",
+            (mesh.nFaces() - mesh.nInternalFaces())/256
+        );
+
+        forAll(duplicates, bFaceI)
+        {
+            label otherFaceI = duplicates[bFaceI];
+
+            if (otherFaceI != -1 && otherFaceI > bFaceI)
+            {
+                duplicateSet.insert(mesh.nInternalFaces() + bFaceI);
+                duplicateSet.insert(mesh.nInternalFaces() + otherFaceI);
+            }
+        }
+
+        Pout<< "Writing " << duplicateSet.size()
+            << " duplicate faces to faceSet " << duplicateSet.objectPath()
+            << nl << endl;
+        duplicateSet.write();
+    }
+
+    return duplicates;
+}
+
+
+
+
 int main(int argc, char *argv[])
 {
+#   include "addRegionOption.H"
     argList::validOptions.insert("split", "");
     argList::validOptions.insert("overwrite", "");
+    argList::validOptions.insert("detectOnly", "");
 #   include "setRootCase.H"
 #   include "createTime.H"
-#   include "createMesh.H"
+    runTime.functionObjects().off();
+#   include "createNamedMesh.H"
+    const word oldInstance = mesh.pointsInstance();
 
-    bool split = args.options().found("split");
-    bool overwrite = args.options().found("overwrite");
+    bool split      = args.optionFound("split");
+    bool overwrite  = args.optionFound("overwrite");
+    bool detectOnly = args.optionFound("detectOnly");
 
     // Collect all boundary faces
     labelList boundaryFaces(mesh.nFaces() - mesh.nInternalFaces());
@@ -172,6 +243,15 @@ int main(int argc, char *argv[])
     {
         boundaryFaces[i] = i+mesh.nInternalFaces();
     }
+
+
+    if (detectOnly)
+    {
+        findBaffles(mesh, boundaryFaces);
+
+        return 0;
+    }
+
 
 
     // Read objects in time directory
@@ -237,62 +317,7 @@ int main(int argc, char *argv[])
             << nl << endl;
 
         // Get all duplicate face labels (in boundaryFaces indices!).
-        labelList duplicates = localPointRegion::findDuplicateFaces
-        (
-            mesh,
-            boundaryFaces
-        );
-
-
-        // Check that none are on processor patches
-        const polyBoundaryMesh& patches = mesh.boundaryMesh();
-
-        forAll(duplicates, bFaceI)
-        {
-            if (duplicates[bFaceI] != -1)
-            {
-                label faceI = mesh.nInternalFaces() + bFaceI;
-                label patchI = patches.whichPatch(faceI);
-
-                if (isA<processorPolyPatch>(patches[patchI]))
-                {
-                    FatalErrorIn(args.executable())
-                        << "Duplicate face " << faceI
-                        << " is on a processorPolyPatch."
-                        << "This is not allowed." << nl
-                        << "Face:" << faceI
-                        << " is on patch:" << patches[patchI].name()
-                        << abort(FatalError);
-                }
-            }
-        }
-
-
-        // Write to faceSet for ease of postprocessing.
-        {
-            faceSet duplicateSet
-            (
-                mesh,
-                "duplicateFaces",
-                (mesh.nFaces() - mesh.nInternalFaces())/256
-            );
-
-            forAll(duplicates, bFaceI)
-            {
-                label otherFaceI = duplicates[bFaceI];
-
-                if (otherFaceI != -1 && otherFaceI > bFaceI)
-                {
-                    duplicateSet.insert(mesh.nInternalFaces() + bFaceI);
-                    duplicateSet.insert(mesh.nInternalFaces() + otherFaceI);
-                }
-            }
-
-            Pout<< "Writing " << duplicateSet.size()
-                << " duplicate faces to faceSet " << duplicateSet.objectPath()
-                << nl << endl;
-            duplicateSet.write();
-        }
+        labelList duplicates(findBaffles(mesh, boundaryFaces));
 
         // Merge into internal faces.
         insertDuplicateMerge(mesh, duplicates, meshMod);
@@ -315,7 +340,10 @@ int main(int argc, char *argv[])
         mesh.movePoints(map().preMotionPoints());
     }
 
-
+    if (overwrite)
+    {
+        mesh.setInstance(oldInstance);
+    }
     Pout<< "Writing mesh to time " << runTime.timeName() << endl;
     mesh.write();
 
@@ -350,7 +378,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

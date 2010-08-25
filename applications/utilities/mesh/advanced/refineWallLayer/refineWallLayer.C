@@ -23,9 +23,10 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    Utility to refine cells next to patches. Takes a patchName
-    and number of layers to refine. Works out cells within these layers
-    and refines those in the wall-normal direction.
+    Utility to refine cells next to patches.
+
+    Takes a patchName and number of layers to refine. Works out cells within
+    these layers and refines those in the wall-normal direction.
 
 \*---------------------------------------------------------------------------*/
 
@@ -53,12 +54,14 @@ int main(int argc, char *argv[])
 
 #   include "setRootCase.H"
 #   include "createTime.H"
+    runTime.functionObjects().off();
 #   include "createPolyMesh.H"
+    const word oldInstance = mesh.pointsInstance();
 
     word patchName(args.additionalArgs()[0]);
 
     scalar weight(readScalar(IStringStream(args.additionalArgs()[1])()));
-    bool overwrite = args.options().found("overwrite");
+    bool overwrite = args.optionFound("overwrite");
 
 
     label patchID = mesh.boundaryMesh().findPatchID(patchName);
@@ -98,11 +101,11 @@ int main(int argc, char *argv[])
     // List of cells to refine
     //
 
-    bool useSet = args.options().found("useSet");
+    bool useSet = args.optionFound("useSet");
 
     if (useSet)
     {
-        word setName(args.options()["useSet"]);
+        word setName(args.option("useSet"));
 
         Info<< "Subsetting cells to cut based on cellSet" << setName << endl
             << endl;
@@ -183,10 +186,6 @@ int main(int argc, char *argv[])
         << endl;
 
     // Transfer DynamicLists to straight ones.
-    labelList cutEdges;
-    cutEdges.transfer(allCutEdges);
-    allCutEdges.clear();
-
     scalarField cutEdgeWeights;
     cutEdgeWeights.transfer(allCutEdgeWeights);
     allCutEdgeWeights.clear();
@@ -198,7 +197,7 @@ int main(int argc, char *argv[])
         mesh,
         cutCells.toc(),     // cells candidate for cutting
         labelList(0),       // cut vertices
-        cutEdges,           // cut edges
+        allCutEdges,        // cut edges
         cutEdgeWeights      // weight on cut edges
     );
 
@@ -228,8 +227,13 @@ int main(int argc, char *argv[])
     // Update stored labels on meshCutter.
     cutter.updateMesh(morphMap());
 
+    if (overwrite)
+    {
+        mesh.setInstance(oldInstance);
+    }
+
     // Write resulting mesh
-    Info << "Writing refined morphMesh to time " << runTime.value() << endl;
+    Info << "Writing refined morphMesh to time " << runTime.timeName() << endl;
 
     mesh.write();
 

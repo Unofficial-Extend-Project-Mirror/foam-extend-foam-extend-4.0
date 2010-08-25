@@ -29,6 +29,9 @@ Description
 
 #include "argList.H"
 #include "dictionary.H"
+#include "IFstream.H"
+#include "IOobject.H"
+#include "HashSet.H"
 
 using namespace Foam;
 
@@ -38,18 +41,108 @@ using namespace Foam;
 int main(int argc, char *argv[])
 {
     argList::noParallel();
+    argList::validOptions.insert("new", "");
+    argList::validOptions.insert("old", "");
 
-    wordList ds(debug::debugSwitches().toc());
-    sort(ds);
-    Info<< "debug switches: " << ds << endl;
+    Foam::argList args(argc, argv);
 
-    wordList is(debug::infoSwitches().toc());
-    sort(is);
-    Info<< "info switches: " << is << endl;
+    wordList currDebug(debug::debugSwitches().toc());
+    wordList currInfo(debug::infoSwitches().toc());
+    wordList currOpt(debug::optimisationSwitches().toc());
 
-    wordList os(debug::optimisationSwitches().toc());
-    sort(os);
-    Info<< "optimisation switches: " << os << endl;
+    if (args.optionFound("old") || args.optionFound("new"))
+    {
+        dictionary controlDict(IFstream(findEtcFile("controlDict", true))());
+
+        wordHashSet oldDebug
+        (
+            controlDict.subDict("DebugSwitches").toc()
+        );
+
+        wordHashSet oldInfo
+        (
+            controlDict.subDict("InfoSwitches").toc()
+        );
+
+        wordHashSet oldOpt
+        (
+            controlDict.subDict("OptimisationSwitches").toc()
+        );
+
+
+        wordHashSet hashset;
+        wordList listing;
+
+
+        // list old switches - but this can't work since the (old) inserted
+        // switches are in both sets
+        // Workaround:
+        //  1. run without any options (get complete list)
+        //  2. comment out DebugSwitches, run again with -new to find new ones
+        //     and do a diff
+        if (args.optionFound("old"))
+        {
+            IOobject::writeDivider(Info);
+
+            hashset = oldDebug;
+            hashset -= currDebug;
+            listing = hashset.toc();
+            sort(listing);
+            Info<< "old DebugSwitches: " << listing << endl;
+
+            hashset = oldInfo;
+            hashset -= currInfo;
+            listing = hashset.toc();
+            sort(listing);
+            Info<< "old InfoSwitches: " << listing << endl;
+
+            hashset = oldOpt;
+            hashset -= currOpt;
+            listing = hashset.toc();
+            sort(listing);
+            Info<< "old OptimisationSwitches: " << listing << endl;
+        }
+
+        // list new switches
+        if (args.optionFound("new"))
+        {
+            IOobject::writeDivider(Info);
+
+            hashset = currDebug;
+            hashset -= oldDebug;
+
+            listing = hashset.toc();
+            sort(listing);
+            Info<< "new DebugSwitches: " << listing << endl;
+
+            hashset = currInfo;
+            hashset -= oldInfo;
+            listing = hashset.toc();
+            sort(listing);
+            Info<< "new InfoSwitches: " << listing << endl;
+
+            hashset = currOpt;
+            hashset -= oldOpt;
+            listing = hashset.toc();
+            sort(listing);
+            Info<< "new OptimisationSwitches: " << listing << endl;
+        }
+    }
+    else
+    {
+        IOobject::writeDivider(Info);
+
+        sort(currDebug);
+        Info<< "DebugSwitches: " << currDebug << endl;
+
+        sort(currInfo);
+        Info<< "InfoSwitches: " << currInfo << endl;
+
+        sort(currOpt);
+        Info<< "OptimisationSwitches: " << currOpt << endl;
+    }
+
+
 
     Info<< "done" << endl;
 

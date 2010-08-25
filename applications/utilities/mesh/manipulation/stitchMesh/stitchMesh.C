@@ -60,13 +60,111 @@ Description
 #include "polyTopoChanger.H"
 #include "mapPolyMesh.H"
 #include "ListOps.H"
-#include "IndirectList.H"
 #include "slidingInterface.H"
 #include "perfectInterface.H"
 #include "IOobjectList.H"
+#include "ReadFields.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+label addPointZone(const polyMesh& mesh, const word& name)
+{
+    label zoneID = mesh.pointZones().findZoneID(name);
+
+    if (zoneID != -1)
+    {
+        Info<< "Reusing existing pointZone "
+            << mesh.pointZones()[zoneID].name()
+            << " at index " << zoneID << endl;
+    }
+    else
+    {
+        pointZoneMesh& pointZones = const_cast<polyMesh&>(mesh).pointZones();
+        zoneID = pointZones.size();
+        Info<< "Adding pointZone " << name << " at index " << zoneID << endl;
+
+        pointZones.setSize(zoneID+1);
+        pointZones.set
+        (
+            zoneID,
+            new pointZone
+            (
+                name,
+                labelList(0),
+                zoneID,
+                pointZones
+            )
+        );
+    }
+    return zoneID;
+}
+
+
+label addFaceZone(const polyMesh& mesh, const word& name)
+{
+    label zoneID = mesh.faceZones().findZoneID(name);
+
+    if (zoneID != -1)
+    {
+        Info<< "Reusing existing faceZone " << mesh.faceZones()[zoneID].name()
+            << " at index " << zoneID << endl;
+    }
+    else
+    {
+        faceZoneMesh& faceZones = const_cast<polyMesh&>(mesh).faceZones();
+        zoneID = faceZones.size();
+        Info<< "Adding faceZone " << name << " at index " << zoneID << endl;
+
+        faceZones.setSize(zoneID+1);
+        faceZones.set
+        (
+            zoneID,
+            new faceZone
+            (
+                name,
+                labelList(0),
+                boolList(),
+                zoneID,
+                faceZones
+            )
+        );
+    }
+    return zoneID;
+}
+
+
+label addCellZone(const polyMesh& mesh, const word& name)
+{
+    label zoneID = mesh.cellZones().findZoneID(name);
+
+    if (zoneID != -1)
+    {
+        Info<< "Reusing existing cellZone " << mesh.cellZones()[zoneID].name()
+            << " at index " << zoneID << endl;
+    }
+    else
+    {
+        cellZoneMesh& cellZones = const_cast<polyMesh&>(mesh).cellZones();
+        zoneID = cellZones.size();
+        Info<< "Adding cellZone " << name << " at index " << zoneID << endl;
+
+        cellZones.setSize(zoneID+1);
+        cellZones.set
+        (
+            zoneID,
+            new cellZone
+            (
+                name,
+                labelList(0),
+                zoneID,
+                cellZones
+            )
+        );
+    }
+    return zoneID;
+}
+
 
 // Checks whether patch present
 void checkPatch(const polyBoundaryMesh& bMesh, const word& name)
@@ -82,39 +180,11 @@ void checkPatch(const polyBoundaryMesh& bMesh, const word& name)
             << exit(FatalError);
     }
 
-    if (bMesh[patchI].size() == 0)
+    if (bMesh[patchI].empty())
     {
         FatalErrorIn("checkPatch(const polyBoundaryMesh&, const word&)")
             << "Patch " << name << " is present but zero size"
             << exit(FatalError);
-    }
-}
-
-
-// Read field
-template<class GeoField>
-void readFields
-(
-    const fvMesh& mesh,
-    const IOobjectList& objects,
-    PtrList<GeoField>& fields
-)
-{
-    // Search list of objects for volScalarFields
-    IOobjectList fieldObjects(objects.lookupClass(GeoField::typeName));
-
-    // Construct the vol scalar fields
-    fields.setSize(fieldObjects.size());
-
-    label fieldi = 0;
-    for
-    (
-        IOobjectList::iterator iter = fieldObjects.begin();
-        iter != fieldObjects.end();
-        ++iter
-    )
-    {
-        fields.set(fieldi++, new GeoField(*iter(), mesh));
     }
 }
 
@@ -124,7 +194,7 @@ void readFields
 int main(int argc, char *argv[])
 {
     Foam::argList::noParallel();
-
+#   include "addRegionOption.H"
     Foam::argList::validArgs.append("masterPatch");
     Foam::argList::validArgs.append("slavePatch");
 
@@ -133,17 +203,21 @@ int main(int argc, char *argv[])
 
     Foam::argList::validOptions.insert("overwrite", "");
 
+    Foam::argList::validOptions.insert("toleranceDict", "file with tolerances");
+
 #   include "setRootCase.H"
 #   include "createTime.H"
-#   include "createMesh.H"
+    runTime.functionObjects().off();
+#   include "createNamedMesh.H"
+    const word oldInstance = mesh.pointsInstance();
 
 
     word masterPatchName(args.additionalArgs()[0]);
     word slavePatchName(args.additionalArgs()[1]);
 
-    bool partialCover = args.options().found("partial");
-    bool perfectCover = args.options().found("perfect");
-    bool overwrite = args.options().found("overwrite");
+    bool partialCover = args.optionFound("partial");
+    bool perfectCover = args.optionFound("perfect");
+    bool overwrite    = args.optionFound("overwrite");
 
     if (partialCover && perfectCover)
     {
@@ -194,6 +268,22 @@ int main(int argc, char *argv[])
             << "If this is not the case use the -partial option" << nl << endl;
     }
 
+    // set up the tolerances for the sliding mesh
+    dictionary slidingTolerances;
+    if (args.options().found("toleranceDict")) 
+    {
+        IOdictionary toleranceFile(
+            IOobject(
+                args.options()["toleranceDict"],
+                runTime.constant(),
+                mesh,
+                IOobject::MUST_READ,
+                IOobject::NO_WRITE                 
+            )
+        );
+        slidingTolerances += toleranceFile;
+    }
+
     // Check for non-empty master and slave patches
     checkPatch(mesh.boundaryMesh(), masterPatchName);
     checkPatch(mesh.boundaryMesh(), slavePatchName);
@@ -218,29 +308,20 @@ int main(int argc, char *argv[])
     polyTopoChanger stitcher(mesh);
     stitcher.setSize(1);
 
-    DynamicList<pointZone*> pz;
-    DynamicList<faceZone*> fz;
-    DynamicList<cellZone*> cz;
+    mesh.pointZones().clearAddressing();
+    mesh.faceZones().clearAddressing();
+    mesh.cellZones().clearAddressing();
 
     if (perfectCover)
     {
         // Add empty zone for resulting internal faces
-        fz.append
-        (
-            new faceZone
-            (
-                cutZoneName,
-                isf,
-                boolList(masterPatch.size(), false),
-                0,
-                mesh.faceZones()
-            )
-        );
+        label cutZoneID = addFaceZone(mesh, cutZoneName);
 
-        // Note: make sure to add the zones BEFORE constructing polyMeshModifier
-        // (since looks up various zones at construction time)
-        Info << "Adding point and face zones" << endl;
-        mesh.addZones(pz.shrink(), fz.shrink(), cz.shrink());
+        mesh.faceZones()[cutZoneID].resetAddressing
+        (
+            isf,
+            boolList(masterPatch.size(), false)
+        );
 
         // Add the perfect interface mesh modifier
         stitcher.set
@@ -259,27 +340,15 @@ int main(int argc, char *argv[])
     }
     else
     {
-        pz.append
-        (
-            new pointZone
-            (
-                mergePatchName + "CutPointZone",
-                labelList(0),
-                0,
-                mesh.pointZones()
-            )
-        );
+        label pointZoneID = addPointZone(mesh, mergePatchName + "CutPointZone");
+        mesh.pointZones()[pointZoneID] = labelList(0);
 
-        fz.append
+        label masterZoneID = addFaceZone(mesh, mergePatchName + "MasterZone");
+
+        mesh.faceZones()[masterZoneID].resetAddressing
         (
-            new faceZone
-            (
-                mergePatchName + "MasterZone",
-                isf,
-                boolList(masterPatch.size(), false),
-                0,
-                mesh.faceZones()
-            )
+            isf,
+            boolList(masterPatch.size(), false)
         );
 
         // Slave patch
@@ -296,36 +365,21 @@ int main(int argc, char *argv[])
             osf[i] = slavePatch.start() + i;
         }
 
-        fz.append
+        label slaveZoneID = addFaceZone(mesh, mergePatchName + "SlaveZone");
+        mesh.faceZones()[slaveZoneID].resetAddressing
         (
-            new faceZone
-            (
-                mergePatchName + "SlaveZone",
-                osf,
-                boolList(slavePatch.size(), false),
-                1,
-                mesh.faceZones()
-            )
+            osf,
+            boolList(slavePatch.size(), false)
         );
 
         // Add empty zone for cut faces
-        fz.append
+        label cutZoneID = addFaceZone(mesh, cutZoneName);
+        mesh.faceZones()[cutZoneID].resetAddressing
         (
-            new faceZone
-            (
-                cutZoneName,
-                labelList(0),
-                boolList(0, false),
-                2,
-                mesh.faceZones()
-            )
+            labelList(0),
+            boolList(0, false)
         );
 
-
-        // Note: make sure to add the zones BEFORE constructing
-        // polyMeshModifier (since looks up various zones at construction time)
-        Info << "Adding point and face zones" << endl;
-        mesh.addZones(pz.shrink(), fz.shrink(), cz.shrink());
 
         // Add the sliding interface mesh modifier
         stitcher.set
@@ -342,10 +396,14 @@ int main(int argc, char *argv[])
                 cutZoneName,
                 masterPatchName,
                 slavePatchName,
-                tom,                  // integral or partial
-                false,                // Attach-detach action
-                intersection::VISIBLE
+                tom,                    // integral or partial
+                true                    // couple/decouple mode
             )
+        );
+        static_cast<slidingInterface&>(stitcher[0]).setTolerances
+        (
+            slidingTolerances,
+            true
         );
     }
 
@@ -356,30 +414,30 @@ int main(int argc, char *argv[])
     // Read all current fvFields so they will get mapped
     Info<< "Reading all current volfields" << endl;
     PtrList<volScalarField> volScalarFields;
-    readFields(mesh, objects, volScalarFields);
+    ReadFields(mesh, objects, volScalarFields);
 
     PtrList<volVectorField> volVectorFields;
-    readFields(mesh, objects, volVectorFields);
+    ReadFields(mesh, objects, volVectorFields);
 
     PtrList<volSphericalTensorField> volSphericalTensorFields;
-    readFields(mesh, objects, volSphericalTensorFields);
+    ReadFields(mesh, objects, volSphericalTensorFields);
 
     PtrList<volSymmTensorField> volSymmTensorFields;
-    readFields(mesh, objects, volSymmTensorFields);
+    ReadFields(mesh, objects, volSymmTensorFields);
 
     PtrList<volTensorField> volTensorFields;
-    readFields(mesh, objects, volTensorFields);
+    ReadFields(mesh, objects, volTensorFields);
 
     //- uncomment if you want to interpolate surface fields (usually bad idea)
     //Info<< "Reading all current surfaceFields" << endl;
     //PtrList<surfaceScalarField> surfaceScalarFields;
-    //readFields(mesh, objects, surfaceScalarFields);
+    //ReadFields(mesh, objects, surfaceScalarFields);
     //
     //PtrList<surfaceVectorField> surfaceVectorFields;
-    //readFields(mesh, objects, surfaceVectorFields);
+    //ReadFields(mesh, objects, surfaceVectorFields);
     //
     //PtrList<surfaceTensorField> surfaceTensorFields;
-    //readFields(mesh, objects, surfaceTensorFields);
+    //ReadFields(mesh, objects, surfaceTensorFields);
 
     if (!overwrite)
     {
@@ -387,15 +445,30 @@ int main(int argc, char *argv[])
     }
 
     // Execute all polyMeshModifiers
-    autoPtr<mapPolyMesh> morphMap = stitcher.changeMesh();
+    autoPtr<mapPolyMesh> morphMap = stitcher.changeMesh(true);
 
     mesh.movePoints(morphMap->preMotionPoints());
 
     // Write mesh
+    if (overwrite)
+    {
+        mesh.setInstance(oldInstance);
+        stitcher.instance() = oldInstance;
+    }
     Info << nl << "Writing polyMesh to time " << runTime.timeName() << endl;
 
     IOstream::defaultPrecision(10);
-    if (!mesh.write())
+
+    // Bypass runTime write (since only writes at outputTime)
+    if
+    (
+       !runTime.objectRegistry::writeObject
+        (
+            runTime.writeFormat(),
+            IOstream::currentVersion,
+            runTime.writeCompression()
+        )
+    )
     {
         FatalErrorIn(args.executable())
             << "Failed writing polyMesh."

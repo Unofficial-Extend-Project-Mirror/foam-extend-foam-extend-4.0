@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    Pick up cells with cell centre 'inside' of surface. Requires surface
+    Picks up cells with cell centre 'inside' of surface. Requires surface
     to be closed and singly connected.
 
 \*---------------------------------------------------------------------------*/

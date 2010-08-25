@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
     Info<< "end" << endl;
 
-    return(0);
+    return 0;
 }
 
 

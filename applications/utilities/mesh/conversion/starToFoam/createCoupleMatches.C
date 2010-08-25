@@ -45,12 +45,11 @@ void starMesh::createCoupleMatches()
     // existing points list
 
     // Estimate the number of cells affected by couple matches
-    const label cellMapSize =
-        min
-        (
-            cellShapes_.size()/10,
-            couples_.size()*2
-        );
+    const label cellMapSize = min
+    (
+        cellShapes_.size()/10,
+        couples_.size()*2
+    );
 
     // Store newly created faces for each cell
     Map<SLList<face> > cellAddedFaces(cellMapSize);
@@ -322,7 +321,7 @@ void starMesh::createCoupleMatches()
 
                                     // A new point is created. Warning:
                                     // using original edge for accuracy.
-                                    // 
+                                    //
                                     coupleFacePoints.append
                                         (P + alpha*curMasterEdge.vec(points_));
                                 }
@@ -338,7 +337,7 @@ void starMesh::createCoupleMatches()
                         // master edge and vice versa. The problem is that
                         // no symmetry exists, i.e. both operations needs
                         // to be done separately for both master and slave
-                        // side. 
+                        // side.
 
                         // Master side
                         // check if the first or second point of slave edge is
@@ -625,11 +624,11 @@ void starMesh::createCoupleMatches()
 
             // Eliminate all zero-length edges
             face newMasterFace(labelList(tmpMasterFace.size(), labelMax));
-          
+
             // insert first point by hand. Careful: the first one is
             // used for comparison to allow the edge collapse across
             // point zero.
-            // 
+            //
             newMasterFace[0] = tmpMasterFace[0];
             label nMaster = 0;
 
@@ -823,7 +822,7 @@ void starMesh::createCoupleMatches()
             // insert first point by hand. Careful: the first one is
             // used for comparison to allow the edge collapse across
             // point zero.
-            // 
+            //
             newSlaveFace[0] = tmpSlaveFace[0];
             label nSlave = 0;
 
@@ -885,7 +884,7 @@ void starMesh::createCoupleMatches()
                 << "newSlaveEdges: " << newSlaveEdges << endl;
 #           endif
 
-            edge startEdge;
+            edge startEdge(-1, -1);
 
             // Remember where the start edge was found:
             // 0 for not found
@@ -1097,7 +1096,7 @@ void starMesh::createCoupleMatches()
                         << "edges to consider: " << edgesToConsider << endl;
 #                   endif
 
-                    if (edgesToConsider.size() == 0)
+                    if (edgesToConsider.empty())
                     {
                         FatalErrorIn("void starMesh::createCoupleMatches()")
                             << setprecision(12)
@@ -1420,7 +1419,7 @@ void starMesh::createCoupleMatches()
         } // end of arbitrary match
     }
 
-    if (couples_.size() > 0)
+    if (couples_.size())
     {
         // Loop through all cells and reset faces for removal to zero size
         const labelList crfToc = cellRemovedFaces.toc();
@@ -1442,7 +1441,7 @@ void starMesh::createCoupleMatches()
                 cellFaces_[curCell][curRemovedFacesIter()].setSize(0);
             }
 
-            if (curRemovedFaces.size() > 0)
+            if (curRemovedFaces.size())
             {
                 // reset the shape pointer to unknown
                 cellShapes_[curCell] = cellShape(*unknownPtr_, labelList(0));
@@ -1468,7 +1467,7 @@ void starMesh::createCoupleMatches()
             // copy original faces that have not been removed
             forAll (oldFaces, faceI)
             {
-                if (oldFaces[faceI].size() > 0)
+                if (oldFaces[faceI].size())
                 {
                     newFaces[nNewFaces] = oldFaces[faceI];
                     nNewFaces++;
@@ -1491,7 +1490,7 @@ void starMesh::createCoupleMatches()
             // reset the size of the face list
             newFaces.setSize(nNewFaces);
 
-            if (curAddedFaces.size() > 0)
+            if (curAddedFaces.size())
             {
                 // reset the shape pointer to unknown
                 cellShapes_[curCell] = cellShape(*unknownPtr_, labelList(0));

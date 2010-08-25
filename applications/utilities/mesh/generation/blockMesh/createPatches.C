@@ -29,14 +29,9 @@ Description
 
 #include "blockMesh.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-faceList blockMesh::createPatchFaces
+Foam::faceList Foam::blockMesh::createPatchFaces
 (
     const polyPatch& patchTopologyFaces
 )
@@ -157,7 +152,7 @@ faceList blockMesh::createPatchFaces
 }
 
 
-faceListList blockMesh::createPatches()
+Foam::faceListList Foam::blockMesh::createPatches()
 {
     Info<< "\nCreating patches\n";
 
@@ -172,10 +167,5 @@ faceListList blockMesh::createPatches()
 
     return patches;
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

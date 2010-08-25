@@ -112,7 +112,7 @@ public:
         }
 
         //- Table of the thermodynamic data given in the foamChemistry file
-        const HashPtrTable<ThermoType>& speciesThermo() const
+        const HashPtrTable<ThermoType>& sThermo() const
         {
             return speciesThermo_;
         }

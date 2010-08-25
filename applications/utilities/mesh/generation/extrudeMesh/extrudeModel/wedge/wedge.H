@@ -60,13 +60,13 @@ class wedge
 {
     // Private data
 
-        //- point on axis
+        //- Point on axis
         const point axisPt_;
 
-        //- normalized direction of axis
-        const vector axisNormal_;
+        //- Normalized direction of axis
+        const vector axis_;
 
-        //- overall angle (radians)
+        //- Overall angle (radians)
         const scalar angle_;
 
 
@@ -79,6 +79,7 @@ public:
 
         //- Construct from components
         wedge(const dictionary& dict);
+
 
     //- Destrcuctor
     ~wedge();

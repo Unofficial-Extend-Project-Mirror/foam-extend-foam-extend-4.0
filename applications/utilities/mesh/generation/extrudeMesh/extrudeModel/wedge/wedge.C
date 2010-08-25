@@ -48,7 +48,7 @@ wedge::wedge(const dictionary& dict)
 :
     extrudeModel(typeName, dict),
     axisPt_(coeffDict_.lookup("axisPt")),
-    axisNormal_(coeffDict_.lookup("axisNormal")),
+    axis_(coeffDict_.lookup("axis")),
     angle_
     (
         readScalar(coeffDict_.lookup("angle"))
@@ -88,7 +88,8 @@ point wedge::operator()
     }
     else
     {
-        sliceAngle = angle_*(layer + 1)/nLayers_;
+        //sliceAngle = angle_*(layer + 1)/nLayers_;
+        sliceAngle = angle_*layer/nLayers_;
     }
 
     // Find projection onto axis (or rather decompose surfacePoint
@@ -96,7 +97,7 @@ point wedge::operator()
     // of surface point and surface normal.
     point d = surfacePoint - axisPt_;
 
-    d -= (axisNormal_ & d)*axisNormal_;
+    d -= (axis_ & d)*axis_;
 
     scalar dMag = mag(d);
 
@@ -107,7 +108,7 @@ point wedge::operator()
 
     if (dMag > VSMALL)
     {
-        vector n = (d/dMag) ^ axisNormal_;
+        vector n = (d/dMag) ^ axis_;
 
         rotatedPoint +=
           + cos(sliceAngle)*d
@@ -124,4 +125,3 @@ point wedge::operator()
 } // End namespace Foam
 
 // ************************************************************************* //
-

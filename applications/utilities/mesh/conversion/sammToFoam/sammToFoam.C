@@ -51,10 +51,7 @@ int main(int argc, char *argv[])
     }
 
     scalar scaleFactor = 1.0;
-    if (args.options().found("scale"))
-    {
-        scaleFactor = atof(args.options()["scale"].c_str());
-    }
+    args.optionReadIfPresent("scale", scaleFactor);
 
 #   include "createTime.H"
 
@@ -69,7 +66,7 @@ int main(int argc, char *argv[])
 
     Info<< nl << "End" << nl << endl;
 
-    return(0);
+    return 0;
 }
 
 

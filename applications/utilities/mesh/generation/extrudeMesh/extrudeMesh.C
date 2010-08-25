@@ -23,7 +23,9 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    Extrude mesh from existing patch or from patch read from file.
+    Extrude mesh from existing patch (by default outwards facing normals;
+    optional flips faces) or from patch read from file.
+
     Note: Merges close points so be careful.
 
     Type of extrusion prescribed by run-time selectable model.
@@ -54,55 +56,47 @@ using namespace Foam;
 
 int main(int argc, char *argv[])
 {
-#   include "setRoots.H"
+#   include "setRootCase.H"
 #   include "createTimeExtruded.H"
-
-
-    if (args.options().found("sourceRoot") == args.options().found("surface"))
-    {
-        FatalErrorIn(args.executable())
-            << "Need to specify either -sourceRoot/Case/Patch or -surface"
-            << " option to specify the source of the patch to extrude"
-            << exit(FatalError);
-    }
-
 
     autoPtr<extrudedMesh> meshPtr(NULL);
 
-    autoPtr<extrudeModel> model
+    IOdictionary dict
     (
-        extrudeModel::New
+        IOobject
         (
-            IOdictionary
-            (
-                IOobject
-                (
-                    "extrudeProperties",
-                    runTimeExtruded.constant(),
-                    runTimeExtruded,
-                    IOobject::MUST_READ
-                )
-            )
+            "extrudeProperties",
+            runTimeExtruded.constant(),
+            runTimeExtruded,
+            IOobject::MUST_READ
         )
     );
 
-    if (args.options().found("sourceRoot"))
+    autoPtr<extrudeModel> model(extrudeModel::New(dict));
+
+    const word sourceType(dict.lookup("constructFrom"));
+
+    autoPtr<faceMesh> fMesh;
+
+    if (sourceType == "patch")
     {
-        fileName rootDirSource(args.options()["sourceRoot"]);
-        fileName caseDirSource(args.options()["sourceCase"]);
-        fileName patchName(args.options()["sourcePatch"]);
+        fileName sourceCasePath(dict.lookup("sourceCase"));
+        sourceCasePath.expand();
+        fileName sourceRootDir = sourceCasePath.path();
+        fileName sourceCaseDir = sourceCasePath.name();
+        word patchName(dict.lookup("sourcePatch"));
 
         Info<< "Extruding patch " << patchName
-            << " on mesh " << rootDirSource << ' ' << caseDirSource << nl
+            << " on mesh " << sourceCasePath << nl
             << endl;
 
         Time runTime
         (
             Time::controlDictName,
-            rootDirSource,
-            caseDirSource
+            sourceRootDir,
+            sourceCaseDir
         );
-#       include "createPolyMesh.H"
+        #include "createPolyMesh.H"
 
         label patchID = mesh.boundaryMesh().findPatchID(patchName);
 
@@ -116,76 +110,80 @@ int main(int argc, char *argv[])
         }
 
         const polyPatch& pp = mesh.boundaryMesh()[patchID];
+        fMesh.reset(new faceMesh(pp.localFaces(), pp.localPoints()));
 
         {
-            fileName surfName(patchName + ".sMesh");
-
-            Info<< "Writing patch as surfaceMesh to " << surfName << nl << endl;
-
-            faceMesh fMesh(pp.localFaces(), pp.localPoints());
-
+            fileName surfName(runTime.path()/patchName + ".sMesh");
+            Info<< "Writing patch as surfaceMesh to "
+                << surfName << nl << endl;
             OFstream os(surfName);
-            os << fMesh << nl;
+            os << fMesh() << nl;
         }
-
-        meshPtr.reset
-        (
-            new extrudedMesh
-            (
-                IOobject
-                (
-                    extrudedMesh::defaultRegion,
-                    runTimeExtruded.constant(),
-                    runTimeExtruded
-                ),
-                pp,
-                model()
-            )
-        );
     }
-    else
+    else if (sourceType == "surface")
     {
         // Read from surface
-        fileName surfName(args.options()["surface"]);
+        fileName surfName(dict.lookup("surface"));
 
         Info<< "Extruding surfaceMesh read from file " << surfName << nl
             << endl;
 
         IFstream is(surfName);
 
-        faceMesh fMesh(is);
+        fMesh.reset(new faceMesh(is));
 
-        Info<< "Read patch from file " << surfName << ':' << nl
-            << "    points : " << fMesh.points().size() << nl
-            << "    faces  : " << fMesh.size() << nl
+        Info<< "Read patch from file " << surfName << nl
+            << endl;
+    }
+    else
+    {
+        FatalErrorIn(args.executable())
+            << "Illegal 'constructFrom' specification. Should either be "
+            << "patch or surface." << exit(FatalError);
+    }
+
+    Switch flipNormals(dict.lookup("flipNormals"));
+
+    if (flipNormals)
+    {
+        Info<< "Flipping faces." << nl << endl;
+
+        faceList faces(fMesh().size());
+        forAll(faces, i)
+        {
+            faces[i] = fMesh()[i].reverseFace();
+        }
+        fMesh.reset(new faceMesh(faces, fMesh().localPoints()));
+    }
+
+
+    Info<< "Extruding patch with :" << nl
+            << "    points     : " << fMesh().points().size() << nl
+            << "    faces      : " << fMesh().size() << nl
+            << "    normals[0] : " << fMesh().faceNormals()[0]
+            << nl
             << endl;
 
-        meshPtr.reset
+    extrudedMesh mesh
+    (
+        IOobject
         (
-            new extrudedMesh
-            (
-                IOobject
-                (
-                    extrudedMesh::defaultRegion,
-                    runTimeExtruded.constant(),
-                    runTimeExtruded
-                ),
-                fMesh,
-                model()
-            )
-        );        
-    }
-    extrudedMesh& mesh = meshPtr();
+            extrudedMesh::defaultRegion,
+            runTimeExtruded.constant(),
+            runTimeExtruded
+        ),
+        fMesh(),
+        model()
+    );
 
 
     const boundBox& bb = mesh.globalData().bb();
-    const vector span(bb.max() - bb.min());
-    const scalar minDim = min(span[0], min(span[1], span[2]));
-    const scalar mergeDim = 1E-4*minDim;
+    const vector span = bb.span();
+    const scalar mergeDim = 1e-4 * bb.minDim();
 
-    Pout<< "Mesh bounding box:" << bb << nl
-        << "        with span:" << span << nl
-        << "Merge distance   :" << mergeDim << nl
+    Info<< "Mesh bounding box : " << bb << nl
+        << "        with span : " << span << nl
+        << "Merge distance    : " << mergeDim << nl
         << endl;
 
     const polyBoundaryMesh& patches = mesh.boundaryMesh();
@@ -204,7 +202,7 @@ int main(int argc, char *argv[])
     // ~~~~~~~~~~~~~~
 
     {
-        Pout<< "Collapsing edges < " << mergeDim << " ..." << nl << endl;
+        Info<< "Collapsing edges < " << mergeDim << " ..." << nl << endl;
 
         // Edge collapsing engine
         edgeCollapser collapser(mesh);
@@ -220,7 +218,7 @@ int main(int argc, char *argv[])
 
             if (d < mergeDim)
             {
-                Pout<< "Merging edge " << e << " since length " << d
+                Info<< "Merging edge " << e << " since length " << d
                     << " << " << mergeDim << nl;
 
                 // Collapse edge to e[0]
@@ -253,10 +251,11 @@ int main(int argc, char *argv[])
     // Merging front and back patch faces
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    if (args.options().found("mergeFaces"))
+    Switch mergeFaces(dict.lookup("mergeFaces"));
+    if (mergeFaces)
     {
-        Pout<< "Assuming full 360 degree axisymmetric case;"
-            << " stitching faces on patches " 
+        Info<< "Assuming full 360 degree axisymmetric case;"
+            << " stitching faces on patches "
             << patches[origPatchID].name() << " and "
             << patches[otherPatchID].name() << " together ..." << nl << endl;
 
@@ -304,7 +303,7 @@ int main(int argc, char *argv[])
         );
 
         // Execute all polyMeshModifiers
-        autoPtr<mapPolyMesh> morphMap = stitcher.changeMesh();
+        autoPtr<mapPolyMesh> morphMap = stitcher.changeMesh(true);
 
         mesh.movePoints(morphMap->preMotionPoints());
     }

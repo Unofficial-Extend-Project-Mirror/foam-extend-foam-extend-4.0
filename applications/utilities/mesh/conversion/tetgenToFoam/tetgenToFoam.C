@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    Reads .ele and .node and .face files as written by tetgen.
+    Converts .ele and .node and .face files, written by tetgen.
 
     Make sure to use add boundary attributes to the smesh file
     (5 fifth column in the element section)
@@ -54,8 +54,9 @@ Description
 NOTE:
 - for some reason boundary faces point inwards. I just reverse them
 always. Might use some geometric check instead.
-- marked faces might not actually be boundary faces of mesh. This is not handled
-and you'll have to run without face file (-noFaceFile option)
+- marked faces might not actually be boundary faces of mesh.
+This is hopefully handled now by first constructing without boundaries
+and then reconstructing with boundary faces.
 
 \*---------------------------------------------------------------------------*/
 
@@ -69,20 +70,40 @@ using namespace Foam;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+// Find label of face.
+label findFace(const primitiveMesh& mesh, const face& f)
+{
+    const labelList& pFaces = mesh.pointFaces()[f[0]];
+
+    forAll(pFaces, i)
+    {
+        label faceI = pFaces[i];
+
+        if (mesh.faces()[faceI] == f)
+        {
+            return faceI;
+        }
+    }
+
+    FatalErrorIn("findFace(const primitiveMesh&, const face&)")
+        << "Cannot find face " << f << " in mesh." << abort(FatalError);
+
+    return -1;
+}
+
+
 // Main program:
 
 int main(int argc, char *argv[])
 {
     argList::validArgs.append("file prefix");
     argList::validOptions.insert("noFaceFile", "");
-    argList::validOptions.insert("overwrite", "");
 
 #   include "setRootCase.H"
 #   include "createTime.H"
 
 
-    bool readFaceFile = !args.options().found("noFaceFile");
-    bool overwrite = args.options().found("overwrite");
+    bool readFaceFile = !args.optionFound("noFaceFile");
 
     fileName prefix(args.additionalArgs()[0]);
 
@@ -108,14 +129,14 @@ int main(int argc, char *argv[])
         Info<< "Reading .face file for boundary information" << nl << endl;
     }
 
-    if (!exists(nodeFile) || !exists(eleFile))
+    if (!isFile(nodeFile) || !isFile(eleFile))
     {
         FatalErrorIn(args.executable())
             << "Cannot read " << nodeFile << " or " << eleFile
             << exit(FatalError);
     }
 
-    if (readFaceFile && !exists(faceFile))
+    if (readFaceFile && !isFile(faceFile))
     {
         FatalErrorIn(args.executable())
             << "Cannot read " << faceFile << endl
@@ -139,7 +160,7 @@ int main(int argc, char *argv[])
     {
         nodeStream.getLine(line);
     }
-    while((line.size() > 0) && (line[0] == '#'));
+    while (line.size() && line[0] == '#');
 
     IStringStream nodeLine(line);
 
@@ -172,7 +193,7 @@ int main(int argc, char *argv[])
         {
             nodeStream.getLine(line);
 
-            if ((line.size() > 0) && (line[0] != '#'))
+            if (line.size() && line[0] != '#')
             {
                 IStringStream nodeLine(line);
 
@@ -216,7 +237,7 @@ int main(int argc, char *argv[])
     {
         eleStream.getLine(line);
     }
-    while((line.size() > 0) && (line[0] == '#'));
+    while (line.size() && line[0] == '#');
 
     IStringStream eleLine(line);
 
@@ -260,7 +281,7 @@ int main(int argc, char *argv[])
     {
         eleStream.getLine(line);
 
-        if ((line.size() > 0) && (line[0] != '#'))
+        if (line.size() && line[0] != '#')
         {
             IStringStream eleLine(line);
 
@@ -287,16 +308,44 @@ int main(int argc, char *argv[])
     }
 
 
-    label nPatches = 0;
+    //
+    // Construct mesh with default boundary only
+    //
 
-    // List of Foam vertices per boundary face
-    faceList boundaryFaces;
+    autoPtr<polyMesh> meshPtr
+    (
+        new polyMesh
+        (
+            IOobject
+            (
+                polyMesh::defaultRegion,
+                runTime.constant(),
+                runTime
+            ),
+            xferCopy(points),
+            cells,
+            faceListList(0),
+            wordList(0),    // boundaryPatchNames
+            wordList(0),    // boundaryPatchTypes
+            "defaultFaces",
+            polyPatch::typeName,
+            wordList(0)
+        )
+    );
+    const polyMesh& mesh = meshPtr;
 
-    // For each boundary faces the Foam patchID
-    labelList boundaryPatch;
+
 
     if (readFaceFile)
     {
+        label nPatches = 0;
+
+        // List of Foam vertices per boundary face
+        faceList boundaryFaces;
+
+        // For each boundary faces the Foam patchID
+        labelList boundaryPatch;
+
         //
         // read boundary faces
         //
@@ -307,7 +356,7 @@ int main(int argc, char *argv[])
         {
             faceStream.getLine(line);
         }
-        while((line.size() > 0) && (line[0] == '#'));
+        while (line.size() && line[0] == '#');
 
         IStringStream faceLine(line);
 
@@ -349,7 +398,7 @@ int main(int argc, char *argv[])
         {
             faceStream.getLine(line);
 
-            if ((line.size() > 0) && (line[0] != '#'))
+            if (line.size() && line[0] != '#')
             {
                 IStringStream faceLine(line);
 
@@ -366,48 +415,59 @@ int main(int argc, char *argv[])
                     f[2-i] = nodeToPoint[nodeI];
                 }
 
-                boundaryFaces[faceI] = f;
 
-                if (nFaceAttr > 0)
+                if (findFace(mesh, f) >= mesh.nInternalFaces())
                 {
-                    // First attribute is the region number
-                    faceLine >> region;
+                    boundaryFaces[faceI] = f;
 
-
-                    // Get Foam patchID and update region->patch table.
-                    label patchI = 0;
-
-                    Map<label>::iterator patchFind = regionToPatch.find(region);
-
-                    if (patchFind == regionToPatch.end())
+                    if (nFaceAttr > 0)
                     {
-                        patchI = nPatches;
+                        // First attribute is the region number
+                        faceLine >> region;
 
-                        Info<< "Mapping tetgen region " << region
-                            << " to Foam patch "
-                            << patchI << endl;
 
-                        regionToPatch.insert(region, nPatches++);
+                        // Get Foam patchID and update region->patch table.
+                        label patchI = 0;
+
+                        Map<label>::iterator patchFind =
+                            regionToPatch.find(region);
+
+                        if (patchFind == regionToPatch.end())
+                        {
+                            patchI = nPatches;
+
+                            Info<< "Mapping tetgen region " << region
+                                << " to Foam patch "
+                                << patchI << endl;
+
+                            regionToPatch.insert(region, nPatches++);
+                        }
+                        else
+                        {
+                            patchI = patchFind();
+                        }
+
+                        boundaryPatch[faceI] = patchI;
+
+                        // Skip remaining attributes
+                        for (label i = 1; i < nFaceAttr; i++)
+                        {
+                            faceLine >> dummy;
+                        }
                     }
-                    else
-                    {
-                        patchI = patchFind();
-                    }
 
-                    boundaryPatch[faceI] = patchI;
-
-                    // Skip remaining attributes
-                    for (label i = 1; i < nFaceAttr; i++)
-                    {
-                        faceLine >> dummy;
-                    }
+                    faceI++;
                 }
-
-                faceI++;
             }
         }
 
-        // Print region to patch mapping
+
+        // Trim
+        boundaryFaces.setSize(faceI);
+        boundaryPatch.setSize(faceI);
+
+
+         // Print region to patch mapping
         Info<< "Regions:" << endl;
 
         for
@@ -421,28 +481,23 @@ int main(int argc, char *argv[])
                 << iter() << endl;
         }
         Info<< endl;
-    }
 
 
-    // Storage for boundary faces
+        // Storage for boundary faces
+        faceListList patchFaces(nPatches);
+        wordList patchNames(nPatches);
 
-    faceListList patchFaces(nPatches);
+        forAll(patchNames, patchI)
+        {
+            patchNames[patchI] = word("patch") + name(patchI);
+        }
 
-    wordList patchNames(nPatches);
-
-    forAll(patchNames, patchI)
-    {
-        patchNames[patchI] = word("patch") + name(patchI);
-    }
-
-    wordList patchTypes(nPatches, polyPatch::typeName);
-    word defaultFacesName = "defaultFaces";
-    word defaultFacesType = polyPatch::typeName;
-    wordList patchPhysicalTypes(nPatches, polyPatch::typeName);
+        wordList patchTypes(nPatches, polyPatch::typeName);
+        word defaultFacesName = "defaultFaces";
+        word defaultFacesType = polyPatch::typeName;
+        wordList patchPhysicalTypes(nPatches, polyPatch::typeName);
 
 
-    if (readFaceFile)
-    {
         // Sort boundaryFaces by patch using boundaryPatch.
         List<DynamicList<face> > allPatchFaces(nPatches);
 
@@ -460,39 +515,38 @@ int main(int argc, char *argv[])
             Info<< "    " << patchNames[patchI] << " : "
                 << allPatchFaces[patchI].size() << endl;
 
-            patchFaces[patchI].transfer(allPatchFaces[patchI].shrink());
+            patchFaces[patchI].transfer(allPatchFaces[patchI]);
         }
 
         Info<< endl;
-    }
 
-    if (!overwrite)
-    {
-        runTime++;
-    }
 
-    polyMesh mesh
-    (
-        IOobject
+        meshPtr.reset
         (
-            polyMesh::defaultRegion,
-            runTime.constant(),
-            runTime
-        ),
-        points,
-        cells,
-        patchFaces,
-        patchNames,
-        patchTypes,
-        defaultFacesName,
-        defaultFacesType,
-        patchPhysicalTypes
-    );
+            new polyMesh
+            (
+                IOobject
+                (
+                    polyMesh::defaultRegion,
+                    runTime.constant(),
+                    runTime
+                ),
+                xferMove(points),
+                cells,
+                patchFaces,
+                patchNames,
+                patchTypes,
+                defaultFacesName,
+                defaultFacesType,
+                patchPhysicalTypes
+            )
+        );
+    }
+
 
     Info<< "Writing mesh to " << runTime.constant() << endl << endl;
 
-    mesh.write();
-
+    meshPtr().write();
 
     Info<< "End\n" << endl;
 

@@ -47,7 +47,7 @@ Description
 #include "polyMesh.H"
 #include "mapPolyMesh.H"
 #include "mathematicalConstants.H"
-#include "PackedList.H"
+#include "PackedBoolList.H"
 #include "SortableList.H"
 
 using namespace Foam;
@@ -73,20 +73,17 @@ labelList getSortedEdges
         const edge& e = edges[edgeI];
 
         label fp = findIndex(f, e[0]);
-
-        label fp1 = (fp+1) % f.size();
+        label fp1 = f.fcIndex(fp);
 
         if (f[fp1] == e[1])
         {
-            // Edgei in fp-fp1 order
+            // EdgeI between fp -> fp1
             faceEdges[fp] = edgeI;
         }
         else
         {
-            // Edgei between fp-1 and fp
-            label fpMin1 = (fp == 0 ? f.size()-1 : fp-1);
-
-            faceEdges[fpMin1] = edgeI;
+            // EdgeI between fp-1 -> fp
+            faceEdges[f.rcIndex(fp)] = edgeI;
         }
     }
 
@@ -176,7 +173,7 @@ label mergeEdges
 
 
 // Return master point edge needs to be collapsed to (or -1)
-label edgeMaster(const PackedList<1>& boundaryPoint, const edge& e)
+label edgeMaster(const PackedBoolList& boundaryPoint, const edge& e)
 {
     label masterPoint = -1;
 
@@ -214,7 +211,7 @@ label edgeMaster(const PackedList<1>& boundaryPoint, const edge& e)
 label collapseSmallEdges
 (
     const polyMesh& mesh,
-    const PackedList<1>& boundaryPoint,
+    const PackedBoolList& boundaryPoint,
     const scalar minLen,
     edgeCollapser& collapser
 )
@@ -253,7 +250,7 @@ label collapseSmallEdges
 label collapseHighAspectFaces
 (
     const polyMesh& mesh,
-    const PackedList<1>& boundaryPoint,
+    const PackedBoolList& boundaryPoint,
     const scalar areaFac,
     const scalar edgeRatio,
     edgeCollapser& collapser
@@ -345,7 +342,7 @@ void set(const labelList& elems, const bool val, boolList& status)
 label simplifyFaces
 (
     const polyMesh& mesh,
-    const PackedList<1>& boundaryPoint,
+    const PackedBoolList& boundaryPoint,
     const label minSize,
     const scalar lenGap,
     edgeCollapser& collapser
@@ -461,13 +458,15 @@ int main(int argc, char *argv[])
 
 #   include "setRootCase.H"
 #   include "createTime.H"
+    runTime.functionObjects().off();
 #   include "createPolyMesh.H"
+    const word oldInstance = mesh.pointsInstance();
 
     scalar minLen(readScalar(IStringStream(args.additionalArgs()[0])()));
     scalar angle(readScalar(IStringStream(args.additionalArgs()[1])()));
-    bool overwrite = args.options().found("overwrite");
+    bool overwrite = args.optionFound("overwrite");
 
-    scalar maxCos = Foam::cos(angle*180/mathematicalConstant::pi);
+    scalar maxCos = Foam::cos(angle*mathematicalConstant::pi/180.0);
 
     Info<< "Merging:" << nl
         << "    edges with length less than " << minLen << " meters" << nl
@@ -483,7 +482,7 @@ int main(int argc, char *argv[])
         const faceList& faces = mesh.faces();
 
         // Get all points on the boundary
-        PackedList<1> boundaryPoint(mesh.nPoints(), false);
+        PackedBoolList boundaryPoint(mesh.nPoints());
 
         label nIntFaces = mesh.nInternalFaces();
         for (label faceI = nIntFaces; faceI < mesh.nFaces(); faceI++)
@@ -585,8 +584,12 @@ int main(int argc, char *argv[])
         {
             runTime++;
         }
+        else
+        {
+            mesh.setInstance(oldInstance);
+        }
 
-        Info << "Writing collapsed mesh to time " << runTime.value() << endl;
+        Info<< "Writing collapsed mesh to time " << runTime.timeName() << endl;
 
         mesh.write();
     }

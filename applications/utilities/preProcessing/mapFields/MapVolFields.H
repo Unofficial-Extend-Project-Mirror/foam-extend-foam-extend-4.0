@@ -29,7 +29,6 @@ License
 
 #include "GeometricField.H"
 #include "meshToMesh.H"
-#include "cuttingPlane.H"
 #include "IOobjectList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

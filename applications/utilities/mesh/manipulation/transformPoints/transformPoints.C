@@ -27,7 +27,10 @@ Application
 
 Description
     Transforms the mesh points in the polyMesh directory according to the
-    options:
+    translate, rotate and scale options.
+
+Usage
+    Options are:
 
     -translate vector
         Translates the points by the given vector,
@@ -35,14 +38,23 @@ Description
     -rotate (vector vector)
         Rotates the points from the first vector to the second,
 
+     or -yawPitchRoll (yawdegrees pitchdegrees rolldegrees)
+     or -rollPitchYaw (rolldegrees pitchdegrees yawdegrees)
+     or -rotateAlongVector (vector and angle)
+
     -scale vector
         Scales the points by the given vector.
 
     The any or all of the three options may be specified and are processed
     in the above order.
 
-    With -rotateFields (in combination with -rotate) it will also
-    read & transform vector & tensor fields.
+    With -rotateFields (in combination with -rotate/yawPitchRoll/rollPitchYaw)
+    it will also read & transform vector & tensor fields.
+
+    Note:
+    yaw (rotation about z)
+    pitch (rotation about y)
+    roll (rotation about x)
 
 \*---------------------------------------------------------------------------*/
 
@@ -59,6 +71,7 @@ Description
 #include "RodriguesRotation.H"
 
 using namespace Foam;
+using namespace Foam::mathematicalConstant;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -81,9 +94,9 @@ void readAndRotateFields
 }
 
 
-void rotateFields(const Time& runTime, const tensor& T)
+void rotateFields(const argList& args, const Time& runTime, const tensor& T)
 {
-#   include "createMesh.H"
+#   include "createNamedMesh.H"
 
     // Read objects in time directory
     IOobjectList objects(mesh, runTime.timeName());
@@ -130,22 +143,37 @@ void rotateFields(const Time& runTime, const tensor& T)
 
 int main(int argc, char *argv[])
 {
+#   include "addRegionOption.H"
     argList::validOptions.insert("translate", "vector");
     argList::validOptions.insert("rotate", "(vector vector)");
     argList::validOptions.insert("rotateAlongVector", "(vector angleInDegree)");
+    argList::validOptions.insert("rollPitchYaw", "(roll pitch yaw)");
+    argList::validOptions.insert("yawPitchRoll", "(yaw pitch roll)");
     argList::validOptions.insert("rotateFields", "");
     argList::validOptions.insert("scale", "vector");
 
 #   include "setRootCase.H"
 #   include "createTime.H"
 
+    word regionName = polyMesh::defaultRegion;
+    fileName meshDir;
+
+    if (args.optionReadIfPresent("region", regionName))
+    {
+        meshDir = regionName/polyMesh::meshSubDir;
+    }
+    else
+    {
+        meshDir = polyMesh::meshSubDir;
+    }
+
     pointIOField points
     (
         IOobject
         (
             "points",
-            runTime.findInstance(polyMesh::meshSubDir, "points"),
-            polyMesh::meshSubDir,
+            runTime.findInstance(meshDir, "points"),
+            meshDir,
             runTime,
             IOobject::MUST_READ,
             IOobject::NO_WRITE,
@@ -154,7 +182,7 @@ int main(int argc, char *argv[])
     );
 
 
-    if (args.options().size() == 0)
+    if (args.options().empty())
     {
         FatalErrorIn(args.executable())
             << "No options supplied, please use one or more of "
@@ -162,18 +190,18 @@ int main(int argc, char *argv[])
             << exit(FatalError);
     }
 
-    if (args.options().found("translate"))
+    if (args.optionFound("translate"))
     {
-        vector transVector(IStringStream(args.options()["translate"])());
+        vector transVector(args.optionLookup("translate")());
 
         Info<< "Translating points by " << transVector << endl;
 
         points += transVector;
     }
 
-    if (args.options().found("rotate"))
+    if (args.optionFound("rotate"))
     {
-        Pair<vector> n1n2(IStringStream(args.options()["rotate"])());
+        Pair<vector> n1n2(args.optionLookup("rotate")());
         n1n2[0] /= mag(n1n2[0]);
         n1n2[1] /= mag(n1n2[1]);
         tensor T = rotationTensor(n1n2[0], n1n2[1]);
@@ -182,15 +210,69 @@ int main(int argc, char *argv[])
 
         points = transform(T, points);
 
-        if (args.options().found("rotateFields"))
+        if (args.optionFound("rotateFields"))
         {
-            rotateFields(runTime, T);
+            rotateFields(args, runTime, T);
         }
     }
-
-    if (args.options().found("rotateAlongVector"))
+    else if (args.optionFound("rollPitchYaw"))
     {
-        IStringStream rotateVectorOptions(args.options()["rotateAlongVector"]);
+        vector v(args.optionLookup("rollPitchYaw")());
+
+        Info<< "Rotating points by" << nl
+            << "    roll  " << v.x() << nl
+            << "    pitch " << v.y() << nl
+            << "    yaw   " << v.z() << endl;
+
+
+        // Convert to radians
+        v *= pi/180.0;
+
+        quaternion R(v.x(), v.y(), v.z());
+
+        Info<< "Rotating points by quaternion " << R << endl;
+        points = transform(R, points);
+
+        if (args.optionFound("rotateFields"))
+        {
+            rotateFields(args, runTime, R.R());
+        }
+    }
+    else if (args.optionFound("yawPitchRoll"))
+    {
+        vector v(args.optionLookup("yawPitchRoll")());
+
+        Info<< "Rotating points by" << nl
+            << "    yaw   " << v.x() << nl
+            << "    pitch " << v.y() << nl
+            << "    roll  " << v.z() << endl;
+
+
+        // Convert to radians
+        v *= pi/180.0;
+
+        scalar yaw = v.x();
+        scalar pitch = v.y();
+        scalar roll = v.z();
+
+        quaternion R = quaternion(vector(0, 0, 1), yaw);
+        R *= quaternion(vector(0, 1, 0), pitch);
+        R *= quaternion(vector(1, 0, 0), roll);
+
+        Info<< "Rotating points by quaternion " << R << endl;
+        points = transform(R, points);
+
+        if (args.optionFound("rotateFields"))
+        {
+            rotateFields(args, runTime, R.R());
+        }
+    }
+    else if (args.optionFound("rotateAlongVector"))
+    {
+        IStringStream rotateVectorOptions
+        (
+            args.optionLookup("rotateAlongVector")
+        );
 
         vector rotationAxis(rotateVectorOptions);
         scalar rotationAngle = readScalar(rotateVectorOptions);
@@ -198,7 +280,7 @@ int main(int argc, char *argv[])
         tensor T = RodriguesRotation(rotationAxis, rotationAngle);
 
         Info << "Rotating points by " << T << endl;
- 
+
         points = transform(T, points);
 
         if (args.options().found("rotateFields"))
@@ -207,9 +289,11 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (args.options().found("scale"))
+
+
+    if (args.optionFound("scale"))
     {
-        vector scaleVector(IStringStream(args.options()["scale"])());
+        vector scaleVector(args.optionLookup("scale")());
 
         Info<< "Scaling points by " << scaleVector << endl;
 
@@ -224,7 +308,7 @@ int main(int argc, char *argv[])
     Info << "Writing points into directory " << points.path() << nl << endl;
     points.write();
 
-    return(0);
+    return 0;
 }
 
 

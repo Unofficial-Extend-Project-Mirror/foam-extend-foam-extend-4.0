@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
+|  \\    /   O peration     | Version:  1.6                                   |
 |   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -10,7 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      autoHexMeshDict;
+    object      snappyHexMeshDict;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -40,6 +40,10 @@ geometry
     {
         type triSurfaceMesh;
 
+        //tolerance   1E-5;   // optional:non-default tolerance on intersections
+        //maxTreeDepth 10;    // optional:depth of octree. Decrease only in case
+                              // of memory limitations.
+
         // Per region the patchname. If not provided will be <name>_<region>.
         regions
         {
@@ -67,10 +71,10 @@ castellatedMeshControls
     // Refinement parameters
     // ~~~~~~~~~~~~~~~~~~~~~
 
-    // While refining maximum number of cells per processor. This is basically
-    // the number of cells that fit on a processor. If you choose this too small
-    // it will do just more refinement iterations to obtain a similar mesh.
-    maxLocalCells 1000000;
+    // If local number of cells is >= maxLocalCells on any processor
+    // switches from from refinement followed by balancing
+    // (current method) to (weighted) balancing before refinement.
+    maxLocalCells 100000;
 
     // Overall cell limit (approximately). Refinement will stop immediately
     // upon reaching this number so a refinement level might not complete.
@@ -84,6 +88,13 @@ castellatedMeshControls
     // are selected for refinement. Note: it will at least do one iteration
     // (unless the number of cells to refine is 0)
     minRefinementCells 0;
+
+    // Allow a certain level of imbalance during refining
+    // (since balancing is quite expensive)
+    // Expressed as fraction of perfect balance (= overall number of cells /
+    // nProcs). 0=balance always.
+    maxLoadUnbalance 0.10;
+
 
     // Number of buffer layers between different levels.
     // 1 means normal 2:1 refinement restriction, larger means slower
@@ -180,6 +191,12 @@ castellatedMeshControls
     // NOTE: This point should never be on a face, always inside a cell, even
     // after refinement.
     locationInMesh (5 0.28 0.43);
+
+
+    // Whether any faceZones (as specified in the refinementSurfaces)
+    // are only on the boundary of corresponding cellZones or also allow
+    // free-standing zone faces
+    allowFreeStandingZoneFaces true;
 }
 
 
@@ -209,6 +226,10 @@ snapControls
 // Settings for the layer addition.
 addLayersControls
 {
+    // Are the thickness parameters below relative to the undistorted
+    // size of the refined cell outside layer (true) or absolute sizes (false).
+    relativeSizes true;
+
     // Per final patch (so not geometry!) the layer information
     layers
     {
@@ -226,15 +247,15 @@ addLayersControls
     // Expansion factor for layer mesh
     expansionRatio 1.0;
 
+
     //- Wanted thickness of final added cell layer. If multiple layers
-    //  is the
-    //  thickness of the layer furthest away from the wall.
-    //  Relative to undistorted size of cell outside layer.
-    finalLayerRatio 0.3;
+    //  is the thickness of the layer furthest away from the wall.
+    //  See relativeSizes parameter.
+    finalLayerThickness 0.3;
 
     //- Minimum thickness of cell layer. If for any reason layer
     //  cannot be above minThickness do not add layer.
-    //  Relative to undistorted size of cell outside layer.
+    //  See relativeSizes parameter.
     minThickness 0.25;
 
     //- If points get not extruded do nGrow layers of connected faces that are
@@ -274,6 +295,17 @@ addLayersControls
 
     // Create buffer region for new layer terminations
     nBufferCellsNoExtrude 0;
+
+
+    // Overall max number of layer addition iterations. The mesher will exit
+    // if it reaches this number of iterations; possibly with an illegal
+    // mesh.
+    nLayerIter 50;
+
+    // Max number of iterations after which relaxed meshQuality controls
+    // get used. Up to nRelaxIter it uses the settings in meshQualityControls,
+    // after nRelaxIter it uses the values in meshQualityControls::relaxed.
+    nRelaxedIter 20;
 }
 
 
@@ -298,6 +330,7 @@ meshQualityControls
     minFlatness 0.5;
 
     //- Minimum pyramid volume. Is absolute volume of cell pyramid.
+    //  Set to a sensible fraction of the smallest cell volume expected.
     //  Set to very negative number (e.g. -1E30) to disable.
     minVol 1e-13;
 
@@ -334,6 +367,16 @@ meshQualityControls
     nSmoothScale 4;
     //- amount to scale back displacement at error points
     errorReduction 0.75;
+
+
+
+    // Optional : some meshing phases allow usage of relaxed rules.
+    // See e.g. addLayersControls::nRelaxedIter.
+    relaxed
+    {
+        //- Maximum non-orthogonality allowed. Set to 180 to disable.
+        maxNonOrtho 75;
+    }
 }
 
 

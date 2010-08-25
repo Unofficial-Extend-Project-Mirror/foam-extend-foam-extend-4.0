@@ -47,7 +47,7 @@ Description
 #include "polyMesh.H"
 #include "IFstream.H"
 #include "cellModeller.H"
-#include "repatch.H"
+#include "repatchPolyTopoChanger.H"
 #include "cellSet.H"
 #include "faceSet.H"
 
@@ -166,7 +166,7 @@ label findInternalFace(const primitiveMesh& mesh, const labelList& meshF)
         if (nMatched == meshF.size())
         {
             return faceI;
-        }        
+        }
     }
     return -1;
 }
@@ -312,11 +312,36 @@ void readPhysNames(IFstream& inFile, Map<word>& physicalNames)
         string line;
         inFile.getLine(line);
         IStringStream lineStr(line);
+        label nSpaces = lineStr.str().count(' ');
 
-        lineStr >> regionI >> regionName;
+        if(nSpaces == 1)
+        {
+            lineStr >> regionI >> regionName;
 
-        Info<< "    " << regionI << '\t' << string::validate<word>(regionName)
-            << endl;
+            Info<< "    " << regionI << '\t'
+                << string::validate<word>(regionName) << endl;
+        }
+        else if(nSpaces == 2)
+        {
+            // >= Gmsh2.4 physical types has tag in front.
+            label physType;
+            lineStr >> physType >> regionI >> regionName;
+            if (physType == 1)
+            {
+                Info<< "    " << "Line " << regionI << '\t'
+                    << string::validate<word>(regionName) << endl;
+            }
+            else if (physType == 2)
+            {
+                Info<< "    " << "Surface " << regionI << '\t'
+                    << string::validate<word>(regionName) << endl;
+            }
+            else if (physType == 3)
+            {
+                Info<< "    " << "Volume " << regionI << '\t'
+                    << string::validate<word>(regionName) << endl;
+            }
+        }
 
         physicalNames.insert(regionI, string::validate<word>(regionName));
     }
@@ -657,6 +682,16 @@ void readCells
     << "    tet  :" << nTet << endl
     << endl;
 
+    if (cells.size() == 0)
+    {
+        FatalErrorIn("readCells(..)")
+            << "No cells read from file " << inFile.name() << nl
+            << "Does your file specify any 3D elements (hex=" << MSHHEX
+            << ", prism=" << MSHPRISM << ", pyramid=" << MSHPYR
+            << ", tet=" << MSHTET << ")?" << nl
+            << "Perhaps you have not exported the 3D elements?"
+            << exit(FatalError);
+    }
 
     Info<< "CellZones:" << nl
         << "Zone\tSize" << endl;
@@ -667,7 +702,7 @@ void readCells
 
         const labelList& zCells = zoneCells[zoneI];
 
-        if (zCells.size() > 0)
+        if (zCells.size())
         {
             Info<< "    " << zoneI << '\t' << zCells.size() << endl;
         }
@@ -689,7 +724,7 @@ int main(int argc, char *argv[])
 
     fileName mshName(args.additionalArgs()[0]);
 
-    bool keepOrientation = args.options().found("keepOrientation");
+    bool keepOrientation = args.optionFound("keepOrientation");
 
     // Storage for points
     pointField points;
@@ -778,7 +813,7 @@ int main(int argc, char *argv[])
 
     forAll(zoneCells, zoneI)
     {
-        if (zoneCells[zoneI].size() > 0)
+        if (zoneCells[zoneI].size())
         {
             nValidCellZones++;
         }
@@ -835,7 +870,7 @@ int main(int argc, char *argv[])
             runTime.constant(),
             runTime
         ),
-        points,
+        xferMove(points),
         cells,
         boundaryFaces,
         boundaryPatchNames,
@@ -845,7 +880,7 @@ int main(int argc, char *argv[])
         boundaryPatchPhysicalTypes
     );
 
-    repatch repatcher(mesh);
+    repatchPolyTopoChanger repatcher(mesh);
 
     // Now use the patchFaces to patch up the outside faces of the mesh.
 
@@ -910,7 +945,7 @@ int main(int argc, char *argv[])
 
         const labelList& zFaces = zoneFaces[zoneI];
 
-        if (zFaces.size() > 0)
+        if (zFaces.size())
         {
             nValidFaceZones++;
 
@@ -923,7 +958,7 @@ int main(int argc, char *argv[])
     //Get polyMesh to write to constant
     runTime.setTime(instant(runTime.constant()), 0);
 
-    repatcher.execute();
+    repatcher.repatch();
 
     List<cellZone*> cz;
     List<faceZone*> fz;
@@ -940,7 +975,7 @@ int main(int argc, char *argv[])
 
         forAll(zoneCells, zoneI)
         {
-            if (zoneCells[zoneI].size() > 0)
+            if (zoneCells[zoneI].size())
             {
                 label physReg = zoneToPhys[zoneI];
 
@@ -979,7 +1014,7 @@ int main(int argc, char *argv[])
 
         forAll(zoneFaces, zoneI)
         {
-            if (zoneFaces[zoneI].size() > 0)
+            if (zoneFaces[zoneI].size())
             {
                 label physReg = zoneToPhys[zoneI];
 
@@ -1011,7 +1046,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (cz.size() > 0 || fz.size() > 0)
+    if (cz.size() || fz.size())
     {
         mesh.addZones(List<pointZone*>(0), fz, cz);
     }

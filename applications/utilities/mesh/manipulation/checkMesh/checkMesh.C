@@ -31,7 +31,9 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
+#include "timeSelector.H"
 #include "Time.H"
+
 #include "polyMesh.H"
 #include "globalMeshData.H"
 
@@ -45,48 +47,34 @@ using namespace Foam;
 
 int main(int argc, char *argv[])
 {
+    timeSelector::addOptions();
 #   include "addRegionOption.H"
-
-#   include "addTimeOptionsNoConstant.H"
-
     argList::validOptions.insert("noTopology", "");
     argList::validOptions.insert("allGeometry", "");
     argList::validOptions.insert("allTopology", "");
 
 #   include "setRootCase.H"
-
-    const bool noTopology = args.options().found("noTopology");
-    const bool allGeometry = args.options().found("allGeometry");
-    const bool allTopology = args.options().found("allTopology");
-
 #   include "createTime.H"
-
-    // Get times list
-    instantList Times = runTime.times();
-
-#   include "checkTimeOptionsNoConstant.H"
-
-    runTime.setTime(Times[startTime], startTime);
-
+    instantList timeDirs = timeSelector::select0(runTime, args);
 #   include "createNamedPolyMesh.H"
 
-    bool firstCheck = true;
+    const bool noTopology  = args.optionFound("noTopology");
+    const bool allGeometry = args.optionFound("allGeometry");
+    const bool allTopology = args.optionFound("allTopology");
 
-    for (label i=startTime; i<endTime; i++)
+    forAll(timeDirs, timeI)
     {
-        runTime.setTime(Times[i], i);
+        runTime.setTime(timeDirs[timeI], timeI);
 
         polyMesh::readUpdateState state = mesh.readUpdate();
 
         if
         (
-            firstCheck
+            !timeI
          || state == polyMesh::TOPO_CHANGE
          || state == polyMesh::TOPO_PATCH_CHANGE
         )
         {
-            firstCheck = false;
-
             Info<< "Time = " << runTime.timeName() << nl << endl;
 
             // Clear mesh before checking
@@ -106,12 +94,12 @@ int main(int argc, char *argv[])
 
             noFailedChecks += checkGeometry(mesh, allGeometry);
 
-            reduce(noFailedChecks, sumOp<label>());
+            // Note: no reduction in noFailedChecks necessary since it is
+            //       a counter of checks, not counter of failed cells,faces etc.
 
             if (noFailedChecks == 0)
             {
-                Info<< "\nMesh OK."
-                    << nl << endl;
+                Info<< nl << "Mesh OK." << nl << endl;
             }
             else
             {
@@ -123,26 +111,23 @@ int main(int argc, char *argv[])
         {
             Info<< "Time = " << runTime.timeName() << nl << endl;
 
-            label noFailedChecks = checkGeometry(mesh, allGeometry);
+            label nFailedChecks = checkGeometry(mesh, allGeometry);
 
-            reduce(noFailedChecks, sumOp<label>());
-
-            if (noFailedChecks == 0)
+            if (nFailedChecks)
             {
-                Info << "\nMesh OK."
-                    << nl << endl;
+                Info<< "\nFailed " << nFailedChecks << " mesh checks.\n"
+                    << endl;
             }
             else
             {
-                Info<< "\nFailed " << noFailedChecks << " mesh checks."
-                    << nl << endl;
+                Info<< nl << "Mesh OK." << nl << endl;
             }
         }
     }
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

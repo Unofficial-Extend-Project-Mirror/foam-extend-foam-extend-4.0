@@ -106,7 +106,7 @@ public:
 
         virtual const speciesTable& species() const = 0;
 
-        virtual const HashPtrTable<ThermoType>& speciesThermo() const = 0;
+        virtual const HashPtrTable<ThermoType>& sThermo() const = 0;
 
         virtual const SLPtrList<Reaction<ThermoType> >& reactions() const = 0;
 };

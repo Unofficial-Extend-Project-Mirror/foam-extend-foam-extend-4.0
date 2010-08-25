@@ -90,13 +90,13 @@ const label sammMesh::shapeFaceLookup[19][9] =
 List<const cellModel*> sammMesh::sammShapeLookup
 (
     256,
-    reinterpret_cast<cellModel*>(NULL)
+    reinterpret_cast<cellModel*>(0)
 );
 
 List<const label*> sammMesh::sammAddressingTable
 (
     256,
-    reinterpret_cast<label*>(NULL)
+    reinterpret_cast<label*>(0)
 );
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

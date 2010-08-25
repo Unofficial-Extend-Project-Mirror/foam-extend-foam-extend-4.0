@@ -26,7 +26,7 @@ Application
     flattenMesh
 
 Description
-    Flatten the front and back planes of a 2D cartesian mesh.
+    Flattens the front and back planes of a 2D cartesian mesh.
 
 \*---------------------------------------------------------------------------*/
 
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    twoDCorr.correctPoints(points); 
+    twoDCorr.correctPoints(points);
 
     // Set the precision of the points data to 10
     IOstream::defaultPrecision(10);
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     Info << "Writing points into directory " << points.path() << nl << endl;
     points.write();
 
-    return(0);
+    return 0;
 }
 
 

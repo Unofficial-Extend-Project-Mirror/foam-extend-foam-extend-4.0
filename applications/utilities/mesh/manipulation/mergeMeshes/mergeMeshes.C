@@ -42,28 +42,28 @@ int main(int argc, char *argv[])
 #   include "setRoots.H"
 #   include "createTimes.H"
 
-    Info<< "Reading master mesh for time = " << runTimeMaster.value() << endl;
+    Info<< "Reading master mesh for time = " << runTimeMaster.timeName() << endl;
 
     Info<< "Create mesh\n" << endl;
     mergePolyMesh masterMesh
     (
         IOobject
         (
-            mergePolyMesh::defaultRegion,
+            masterRegion,
             runTimeMaster.timeName(),
             runTimeMaster
         )
     );
 
 
-    Info<< "Reading mesh to add for time = " << runTimeToAdd.value() << endl;
+    Info<< "Reading mesh to add for time = " << runTimeToAdd.timeName() << endl;
 
     Info<< "Create mesh\n" << endl;
     polyMesh meshToAdd
     (
         IOobject
         (
-            mergePolyMesh::defaultRegion,
+            addRegion,
             runTimeToAdd.timeName(),
             runTimeToAdd
         )
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
     runTimeMaster++;
 
-    Info<< "Writing combined mesh to " << runTimeMaster.value() << endl;
+    Info<< "Writing combined mesh to " << runTimeMaster.timeName() << endl;
 
     masterMesh.addMesh(meshToAdd);
     masterMesh.merge();

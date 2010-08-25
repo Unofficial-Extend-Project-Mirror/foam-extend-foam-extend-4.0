@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     Info<< "Writing surf to " << outFileName << " ..." << endl;
 
 
-    if (args.options().size() == 0)
+    if (args.options().empty())
     {
         FatalErrorIn(args.executable())
             << "No options supplied, please use one or more of "
@@ -86,18 +86,18 @@ int main(int argc, char *argv[])
 
     pointField points(surf1.points());
 
-    if (args.options().found("translate"))
+    if (args.optionFound("translate"))
     {
-        vector transVector(IStringStream(args.options()["translate"])());
+        vector transVector(args.optionLookup("translate")());
 
         Info<< "Translating points by " << transVector << endl;
 
         points += transVector;
     }
 
-    if (args.options().found("rotate"))
+    if (args.optionFound("rotate"))
     {
-        Pair<vector> n1n2(IStringStream(args.options()["rotate"])());
+        Pair<vector> n1n2(args.optionLookup("rotate")());
         n1n2[0] /= mag(n1n2[0]);
         n1n2[1] /= mag(n1n2[1]);
 
@@ -107,9 +107,9 @@ int main(int argc, char *argv[])
 
         points = transform(T, points);
     }
-    else if (args.options().found("rollPitchYaw"))
+    else if (args.optionFound("rollPitchYaw"))
     {
-        vector v(IStringStream(args.options()["rollPitchYaw"])());
+        vector v(args.optionLookup("rollPitchYaw")());
 
         Info<< "Rotating points by" << nl
             << "    roll  " << v.x() << nl
@@ -125,9 +125,9 @@ int main(int argc, char *argv[])
         Info<< "Rotating points by quaternion " << R << endl;
         points = transform(R, points);
     }
-    else if (args.options().found("yawPitchRoll"))
+    else if (args.optionFound("yawPitchRoll"))
     {
-        vector v(IStringStream(args.options()["yawPitchRoll"])());
+        vector v(args.optionLookup("yawPitchRoll")());
 
         Info<< "Rotating points by" << nl
             << "    yaw   " << v.x() << nl
@@ -150,9 +150,9 @@ int main(int argc, char *argv[])
         points = transform(R, points);
     }
 
-    if (args.options().found("scale"))
+    if (args.optionFound("scale"))
     {
-        vector scaleVector(IStringStream(args.options()["scale"])());
+        vector scaleVector(args.optionLookup("scale")());
 
         Info<< "Scaling points by " << scaleVector << endl;
 

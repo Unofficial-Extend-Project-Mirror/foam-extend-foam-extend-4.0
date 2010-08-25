@@ -28,18 +28,11 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
 #include "block.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-
-void block::blockCells()
+void Foam::block::blockCells()
 {
     label ni = blockDef_.n().x();
     label nj = blockDef_.n().y();
@@ -68,10 +61,5 @@ void block::blockCells()
         }
     }
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

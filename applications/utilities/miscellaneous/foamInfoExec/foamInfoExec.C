@@ -49,9 +49,9 @@ int main(int argc, char *argv[])
 
     Info<< endl;
 
-    if (args.options().found("times"))
+    if (args.optionFound("times"))
     {
-        instantList times 
+        instantList times
         (
             Foam::Time::findTimes(args.rootPath()/args.caseName())
         );
@@ -62,11 +62,11 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (args.options().found("dictionary"))
+    if (args.optionFound("dictionary"))
     {
         fileName dictFileName
         (
-            args.rootPath()/args.caseName()/args.options()["dictionary"]
+            args.rootPath()/args.caseName()/args.option("dictionary")
         );
 
         IFstream dictFile(dictFileName);
@@ -75,11 +75,7 @@ int main(int argc, char *argv[])
         {
             dictionary dict(dictFile);
 
-            if
-            (
-                args.options().found("keywords")
-             && !args.options().found("entry")
-            )
+            if (args.optionFound("keywords") && !args.optionFound("entry"))
             {
                 for
                 (
@@ -91,41 +87,51 @@ int main(int argc, char *argv[])
                     Info<< iter().keyword() << endl;
                 }
             }
-            else if (args.options().found("entry"))
+            else if (args.optionFound("entry"))
             {
                 wordList entryNames
                 (
-                    fileName(args.options()["entry"]).components(':')
+                    fileName(args.option("entry")).components(':')
                 );
 
                 if (dict.found(entryNames[0]))
                 {
-                    const entry* entPtr = &dict.lookupEntry(entryNames[0]);
+                    const entry* entPtr = &dict.lookupEntry
+                    (
+                        entryNames[0],
+                        false,
+                        true            // wildcards
+                    );
 
                     for (int i=1; i<entryNames.size(); i++)
                     {
                         if (entPtr->dict().found(entryNames[i]))
                         {
-                            entPtr = &entPtr->dict().lookupEntry(entryNames[i]);
+                            entPtr = &entPtr->dict().lookupEntry
+                            (
+                                entryNames[i],
+                                false,
+                                true    // wildcards
+                            );
                         }
                         else
                         {
                             FatalErrorIn(args.executable())
                                 << "Cannot find sub-entry " << entryNames[i]
-                                << " in entry " << args.options()["entry"]
+                                << " in entry " << args.option("entry")
                                 << " in dictionary " << dictFileName;
                             FatalError.exit(3);
                         }
                     }
-                    
-                    if (args.options().found("keywords"))
+
+                    if (args.optionFound("keywords"))
                     {
                         /*
                         if (ent[1] != token::BEGIN_BLOCK)
                         {
                             FatalErrorIn(args.executable())
                                 << "Cannot find entry "
-                                << args.options()["entry"]
+                                << args.option("entry")
                                 << " in dictionary " << dictFileName
                                 << " is not a sub-dictionary";
                             FatalError.exit(4);

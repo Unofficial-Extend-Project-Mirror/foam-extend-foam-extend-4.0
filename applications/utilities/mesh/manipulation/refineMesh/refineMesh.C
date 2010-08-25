@@ -23,9 +23,10 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    Utility to refine cells in multiple directions. Either supply -all
-    option to refine all cells (3D refinement for 3D cases; 2D for 2D cases)
-    or reads a refineMeshDict with
+    Utility to refine cells in multiple directions.
+
+    Either supply -all option to refine all cells (3D refinement for 3D
+    cases; 2D for 2D cases) or reads a refineMeshDict with
     - cellSet to refine
     - directions to refine
 
@@ -267,10 +268,7 @@ label twoDNess(const polyMesh& mesh)
     {
         const polyPatch& patch = patches[patchI];
 
-        if
-        (
-            typeid(patch) != typeid(wedgePolyPatch)
-        )
+        if (!isA<wedgePolyPatch>(patch))
         {
             const vectorField& n = patch.faceAreas();
 
@@ -298,7 +296,9 @@ int main(int argc, char *argv[])
 
 #   include "setRootCase.H"
 #   include "createTime.H"
+    runTime.functionObjects().off();
 #   include "createPolyMesh.H"
+    const word oldInstance = mesh.pointsInstance();
 
     printEdgeStats(mesh);
 
@@ -307,8 +307,8 @@ int main(int argc, char *argv[])
     // Read/construct control dictionary
     //
 
-    bool readDict = args.options().found("dict");
-    bool overwrite = args.options().found("overwrite");
+    bool readDict = args.optionFound("dict");
+    bool overwrite = args.optionFound("overwrite");
 
     // List of cells to refine
     labelList refCells;
@@ -426,6 +426,10 @@ int main(int argc, char *argv[])
 
 
     // Write resulting mesh
+    if (overwrite)
+    {
+        mesh.setInstance(oldInstance);
+    }
     mesh.write();
 
 
@@ -484,7 +488,7 @@ int main(int argc, char *argv[])
     {
         const labelList& added = oldToNew[oldCellI];
 
-        if (added.size() > 0)
+        if (added.size())
         {
             forAll(added, i)
             {

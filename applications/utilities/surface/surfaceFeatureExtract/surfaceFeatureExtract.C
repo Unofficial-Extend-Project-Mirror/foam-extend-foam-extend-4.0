@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
     argList::validOptions.insert("deleteBox", "((x0 y0 z0)(x1 y1 z1))");
     argList args(argc, argv);
 
-    Pout<< "Feature line extraction is only valid on closed manifold surfaces." 
+    Pout<< "Feature line extraction is only valid on closed manifold surfaces."
         << endl;
 
 
@@ -139,27 +139,24 @@ int main(int argc, char *argv[])
 
     surfaceFeatures set(surf);
 
-    if (args.options().found("set"))
+    if (args.optionFound("set"))
     {
-        fileName setName(args.options()["set"]);
+        fileName setName(args.option("set"));
 
         Pout<< "Reading existing feature set from file " << setName << endl;
 
         set = surfaceFeatures(surf, setName);
     }
-    else if (args.options().found("includedAngle"))
+    else if (args.optionFound("includedAngle"))
     {
-        scalar includedAngle
-        (
-            readScalar(IStringStream(args.options()["includedAngle"])())
-        );
+        scalar includedAngle = args.optionRead<scalar>("includedAngle");
 
         Pout<< "Constructing feature set from included angle " << includedAngle
             << endl;
 
         set = surfaceFeatures(surf, includedAngle);
 
-        Pout<< endl << "Writing initial features" << endl;    
+        Pout<< endl << "Writing initial features" << endl;
         set.write("initial.fSet");
         set.writeObj("initial");
     }
@@ -190,16 +187,14 @@ int main(int argc, char *argv[])
     // ~~~~~~~~
 
     scalar minLen = -GREAT;
-    if (args.options().found("minLen"))
+    if (args.optionReadIfPresent("minLen", minLen))
     {
-        minLen = readScalar(IStringStream(args.options()["minLen"])());
         Pout<< "Removing features of length < " << minLen << endl;
     }
-    
+
     label minElem = 0;
-    if (args.options().found("minElem"))
+    if (args.optionReadIfPresent("minElem", minElem))
     {
-        minElem = readLabel(IStringStream(args.options()["minElem"])());
         Pout<< "Removing features with number of edges < " << minElem << endl;
     }
 
@@ -207,7 +202,7 @@ int main(int argc, char *argv[])
     if (minLen > 0 || minLen > 0)
     {
         set.trimFeatures(minLen, minElem);
-        Pout<< endl << "Removed small features" << endl;    
+        Pout<< endl << "Removed small features" << endl;
     }
 
 
@@ -218,9 +213,9 @@ int main(int argc, char *argv[])
     // Convert to marked edges, points
     List<surfaceFeatures::edgeStatus> edgeStat(set.toStatus());
 
-    if (args.options().found("subsetBox"))
+    if (args.optionFound("subsetBox"))
     {
-        treeBoundBox bb(IStringStream(args.options()["subsetBox"])());
+        treeBoundBox bb(args.optionLookup("subsetBox")());
 
         Pout<< "Removing all edges outside bb " << bb << endl;
         dumpBox(bb, "subsetBox.obj");
@@ -233,9 +228,9 @@ int main(int argc, char *argv[])
             edgeStat
         );
     }
-    else if (args.options().found("deleteBox"))
+    else if (args.optionFound("deleteBox"))
     {
-        treeBoundBox bb(IStringStream(args.options()["deleteBox"])());
+        treeBoundBox bb(args.optionLookup("deleteBox")());
 
         Pout<< "Removing all edges inside bb " << bb << endl;
         dumpBox(bb, "deleteBox.obj");
@@ -254,7 +249,7 @@ int main(int argc, char *argv[])
 
     Pout<< endl << "Writing trimmed features to " << outFileName << endl;
     newSet.write(outFileName);
-    
+
     Pout<< endl << "Writing edge objs." << endl;
     newSet.writeObj("final");
 

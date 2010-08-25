@@ -264,7 +264,7 @@ starMesh::starMesh
 
     readCouples();
 
-    if (couples_.size() > 0)
+    if (couples_.size())
     {
         createCoupleMatches();
     }

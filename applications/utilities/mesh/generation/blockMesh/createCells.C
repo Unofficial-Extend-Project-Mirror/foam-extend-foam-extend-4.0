@@ -29,14 +29,9 @@ License
 #include "blockMesh.H"
 #include "cellModeller.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-cellShapeList blockMesh::createCells()
+Foam::cellShapeList Foam::blockMesh::createCells()
 {
     Info<< nl << "Creating cells" << endl;
 
@@ -76,10 +71,4 @@ cellShapeList blockMesh::createCells()
     return cells;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
-
 // ************************************************************************* //
-

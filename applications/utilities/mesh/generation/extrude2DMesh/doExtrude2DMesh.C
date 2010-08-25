@@ -61,10 +61,12 @@ int main(int argc, char *argv[])
     argList::validOptions.insert("overwrite", "");
 #   include "setRootCase.H"
 #   include "createTime.H"
+    runTime.functionObjects().off();
 #   include "createPolyMesh.H"
+    const word oldInstance = mesh.pointsInstance();
 
     scalar thickness(readScalar(IStringStream(args.additionalArgs()[0])()));
-    bool overwrite = args.options().found("overwrite");
+    bool overwrite = args.optionFound("overwrite");
 
 
     // Check that mesh is 2D
@@ -87,7 +89,7 @@ int main(int argc, char *argv[])
     // ~~~~~~~~~~~~~~~~~~~~~~
 
     scalar minRange = GREAT;
-    direction extrudeDir = -1;
+    direction extrudeDir = 4;   //illegal value.
 
     for (direction dir = 0; dir < 3; dir++)
     {
@@ -180,6 +182,10 @@ int main(int argc, char *argv[])
     if (!overwrite)
     {
         runTime++;
+    }
+    else
+    {
+        mesh.setInstance(oldInstance);
     }
 
     // Take over refinement levels and write to new time directory.

@@ -177,12 +177,12 @@ int main(int argc, char *argv[])
 
     Info<< "Reading surface from " << surfName << " ..." << endl;
 
-    bool readSet = args.options().found("faceSet");
+    bool readSet = args.optionFound("faceSet");
     word setName;
 
     if (readSet)
     {
-        setName = args.options()["faceSet"];
+        setName = args.option("faceSet");
 
         Info<< "Repatching only the faces in faceSet " << setName
             << " according to nearest surface triangle ..." << endl;
@@ -193,17 +193,12 @@ int main(int argc, char *argv[])
             << " triangle ..." << endl;
     }
 
-    scalar searchTol = 1E-3;
-
-    if (args.options().found("tol"))
-    {
-        searchTol =  readScalar(IStringStream(args.options()["tol"])());
-    }
+    scalar searchTol = 1e-3;
+    args.optionReadIfPresent("tol", searchTol);
 
     // Get search box. Anything not within this box will not be considered.
     const boundBox& meshBb = mesh.globalData().bb();
-
-    const vector searchSpan(searchTol*(meshBb.max() - meshBb.min()));
+    const vector searchSpan = searchTol*meshBb.span();
 
     Info<< "All boundary faces further away than " << searchTol
         << " of mesh bounding box " << meshBb
@@ -217,7 +212,7 @@ int main(int argc, char *argv[])
     {
         Info<< "    " << mesh.boundaryMesh()[patchI].name() << '\t'
             << mesh.boundaryMesh()[patchI].size() << endl;
-    } 
+    }
     Info<< endl;
 
 
@@ -309,7 +304,7 @@ int main(int argc, char *argv[])
         {
             Info<< "    " << mesh.boundaryMesh()[patchI].name() << '\t'
                 << mesh.boundaryMesh()[patchI].size() << endl;
-        } 
+        }
         Info<< endl;
 
 
@@ -318,7 +313,7 @@ int main(int argc, char *argv[])
         // Write resulting mesh
         Info << "Writing modified mesh to time " << runTime.value() << endl;
         mesh.write();
-    }    
+    }
 
 
     Info<< "End\n" << endl;

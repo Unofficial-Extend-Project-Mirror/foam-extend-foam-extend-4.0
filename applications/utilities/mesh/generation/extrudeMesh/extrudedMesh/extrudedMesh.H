@@ -63,26 +63,26 @@ class extrudedMesh
 
         //- Construct and return the extruded mesh points
         template<class Face, template<class> class FaceList, class PointField>
-        pointField extrudedPoints
+        Xfer<pointField> extrudedPoints
         (
             const PrimitivePatch<Face, FaceList, PointField>& extrudePatch,
-            const extrudeModel& model
+            const extrudeModel&
         );
 
         //- Construct and return the extruded mesh faces
         template<class Face, template<class> class FaceList, class PointField>
-        faceList extrudedFaces
+        Xfer<faceList> extrudedFaces
         (
             const PrimitivePatch<Face, FaceList, PointField>& extrudePatch,
-            const extrudeModel& model
+            const extrudeModel&
         );
 
         //- Construct and return the extruded mesh cells
         template<class Face, template<class> class FaceList, class PointField>
-        cellList extrudedCells
+        Xfer<cellList> extrudedCells
         (
             const PrimitivePatch<Face, FaceList, PointField>& extrudePatch,
-            const extrudeModel& model
+            const extrudeModel&
         );
 
 
@@ -101,9 +101,9 @@ public:
         template<class Face, template<class> class FaceList, class PointField>
         extrudedMesh
         (
-            const IOobject& io,
+            const IOobject&,
             const PrimitivePatch<Face, FaceList, PointField>& extrudePatch,
-            const extrudeModel& model
+            const extrudeModel&
         );
 };
 

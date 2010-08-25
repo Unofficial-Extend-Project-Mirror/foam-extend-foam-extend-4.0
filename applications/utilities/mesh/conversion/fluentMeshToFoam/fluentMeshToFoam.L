@@ -1,4 +1,4 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
@@ -56,7 +56,8 @@ Description
 
 #include "readHexLabel.H"
 #include "cellShapeRecognition.H"
-#include "repatch.H"
+#include "repatchPolyTopoChanger.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -383,7 +384,7 @@ endOfSection               {space}")"{space}
         scalar x = readScalar(vertexXyzStream);
         scalar y = readScalar(vertexXyzStream);
 
-        points[pointI] = convertToMeters*point(x, y, 0);
+        points[pointI] = point(x, y, 0);
         pointI++;
     }
 
@@ -875,13 +876,10 @@ int main(int argc, char *argv[])
     }
 
     scalar scaleFactor = 1.0;
-    if (args.options().found("scale"))
-    {
-        scaleFactor = atof(args.options()["scale"].c_str());
-    }
+    args.optionReadIfPresent("scale", scaleFactor);
 
-    bool writeSets = args.options().found("writeSets");
-    bool writeZones = args.options().found("writeZones");
+    bool writeSets = args.optionFound("writeSets");
+    bool writeZones = args.optionFound("writeZones");
 
 #   include "createTime.H"
 
@@ -1181,7 +1179,7 @@ int main(int argc, char *argv[])
             runTime.constant(),
             runTime
         ),
-        points,
+        xferMove(points),
         cellShapes,
         patches,
         patchNames,
@@ -1580,7 +1578,7 @@ int main(int argc, char *argv[])
 
     // Use facePatchIDs map to reorder boundary faces into compact regions
 
-    repatch repatcher(pShapeMesh);
+    repatchPolyTopoChanger repatcher(pShapeMesh);
 
     // Add new list of patches
     repatcher.changePatches(newPatches);
@@ -1592,7 +1590,7 @@ int main(int argc, char *argv[])
 
         repatcher.changePatchID(faceI, facePatchID[idI]);
     }
-    repatcher.execute();
+    repatcher.repatch();
 
     preservePatchTypes
     (
@@ -1642,28 +1640,28 @@ int main(int argc, char *argv[])
             boundaryZones[pI].append(bPatches[pI].name());
         }
 
-        label cnt=0;
-        SLList<label>::iterator cg = cellGroupZoneID.begin();
-        SLList<label>::iterator start = cellGroupStartIndex.begin();
-        SLList<label>::iterator end = cellGroupEndIndex.begin();
+	    label cnt = 0;
+	    SLList<label>::iterator cg = cellGroupZoneID.begin();
+	    SLList<label>::iterator start = cellGroupStartIndex.begin();
+	    SLList<label>::iterator end = cellGroupEndIndex.begin();
 
-        for (; cg != cellGroupZoneID.end(); ++cg, ++start, ++end)
-        {
-            const word& name = patchNameIDs[cg()];
-            const word& type = patchTypeIDs[cg()];
+	    for (; cg != cellGroupZoneID.end(); ++cg, ++start, ++end)
+	    {
+	        const word& name = patchNameIDs[cg()];
+	        const word& type = patchTypeIDs[cg()];
 
-            Info<< "Writing cell zone: " << name
+	        Info<< "Writing cell zone: " << name
                 << " of type " << type << " starting at " << start() - 1
                 << " ending at " << end() - 1 << " to cellSet." << endl;
 
-            labelList cls(end() - start() + 1);
+	        labelList cls(end() - start() + 1);
 
             // Mark zone cells, used for finding faces
             boolList zoneCell(pShapeMesh.nCells(), false);
 
-            // shift cell indizes by 1
-            label nr=0;
-            for (label celli = (start() - 1); celli < end(); celli++)
+	        // Shift cell indices by 1
+	        label nr = 0;
+	        for (label celli = (start() - 1); celli < end(); celli++)
             {
                 cls[nr] = celli;
                 zoneCell[celli] = true;

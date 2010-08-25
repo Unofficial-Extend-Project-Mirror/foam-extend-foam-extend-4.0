@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     point visiblePoint(IStringStream(args.additionalArgs()[1])());
     Info<< "Visible point " << visiblePoint << endl;
 
-    bool orientInside = args.options().found("inside");
+    bool orientInside = args.optionFound("inside");
 
     if (orientInside)
     {

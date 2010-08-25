@@ -38,26 +38,22 @@ Description
 int main(int argc, char *argv[])
 {
     argList::noParallel();
-#   include "addTimeOptions.H"
+    timeSelector::addOptions(false);   // no constant
 
 #   include "setRootCase.H"
 #   include "createTime.H"
 
-    instantList Times = runTime.times();
-
-    // set startTime and endTime depending on -time and -latestTime options
-#   include "checkTimeOptionsNoConstant.H"
-
-    runTime.setTime(Times[startTime], startTime);
+    instantList timeDirs = timeSelector::select0(runTime, args);
 
 #   include "createMesh.H"
 
     // make a directory called proInterface in the case
     mkDir(runTime.rootPath()/runTime.caseName()/"fluentInterface");
 
-    for (label timeI = startTime; timeI < endTime; timeI++)
+    forAll(timeDirs, timeI)
     {
-        runTime.setTime(Times[timeI], timeI);
+        runTime.setTime(timeDirs[timeI], timeI);
+
         Info<< "Time = " << runTime.timeName() << endl;
 
         if (mesh.readUpdate())

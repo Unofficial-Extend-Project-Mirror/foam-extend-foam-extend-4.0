@@ -100,7 +100,7 @@ void blockDescriptor::setEdge(label edgeI, label start, label end, label dim)
                 scalar gExp = calcGexp(expand_[edgeI], dim);
 
                 // divide the line
-                lineDivide divEdge(curvedEdges_[nCEI], dim, 1.0/gExp);
+                lineDivide divEdge(curvedEdges_[nCEI], dim, 1.0/(gExp + SMALL));
 
                 pointField p = divEdge.points();
                 scalarList d = divEdge.lambdaDivisions();

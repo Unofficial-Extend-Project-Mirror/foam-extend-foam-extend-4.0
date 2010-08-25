@@ -28,23 +28,25 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
 #include "blockMesh.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-pointField blockMesh::createPoints()
+Foam::pointField Foam::blockMesh::createPoints(const dictionary& dict)
 {
-    Info<< nl << "Creating points" << endl;
+    blockMesh& blocks = *this;
+
+    scalar scaleFactor = 1.0;
+
+    // optional 'convertToMeters' (or 'scale'?)
+    if (!dict.readIfPresent("convertToMeters", scaleFactor))
+    {
+        dict.readIfPresent("scale", scaleFactor);
+    }
+
+    Info<< nl << "Creating points with scale " << scaleFactor << endl;
 
     pointField points(nPoints_);
-
-    blockMesh& blocks = *this;
 
     forAll(blocks, blockLabel)
     {
@@ -59,17 +61,11 @@ pointField blockMesh::createPoints()
                     blockPointLabel
                   + blockOffsets_[blockLabel]
                 ]
-            ] = scale_*blockPoints[blockPointLabel];
+            ] = scaleFactor * blockPoints[blockPointLabel];
         }
     }
 
     return points;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
-
 // ************************************************************************* //
-

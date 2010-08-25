@@ -24,20 +24,7 @@
     Info<< "Source: " << rootDirSource << " " << caseDirSource << nl
         << "Target: " << rootDirTarget << " " << caseDirTarget << endl;
 
-    bool parallelSource = false;
-    if (args.options().found("parallelSource"))
-    {
-        parallelSource = true;
-    }
+    bool parallelSource = args.optionFound("parallelSource");
+    bool parallelTarget = args.optionFound("parallelTarget");
+    bool consistent     = args.optionFound("consistent");
 
-    bool parallelTarget = false;
-    if (args.options().found("parallelTarget"))
-    {
-        parallelTarget = true;
-    }
-
-    bool consistent = false;
-    if (args.options().found("consistent"))
-    {
-        consistent = true;
-    }
