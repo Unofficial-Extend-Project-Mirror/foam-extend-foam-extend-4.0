@@ -1,3 +1,0 @@
-MatrixTest.C
-
-EXE = $(FOAM_USER_APPBIN)/MatrixTest

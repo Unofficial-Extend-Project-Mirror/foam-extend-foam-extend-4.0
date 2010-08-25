@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -267,13 +265,13 @@ inline const liquidMixture& spray::fuels() const
 }
 
 
-inline const PtrList<specieProperties>& spray::gasProperties() const
+inline const PtrList<gasThermoPhysics>& spray::gasProperties() const
 {
     return gasProperties_;
 }
 
 
-inline const combustionMixture& spray::composition() const
+inline const basicMultiComponentMixture& spray::composition() const
 {
     return composition_;
 }
@@ -367,6 +365,7 @@ inline scalarField& spray::shs()
 {
     return shs_;
 }
+
 
 inline const scalarField& spray::shs() const
 {

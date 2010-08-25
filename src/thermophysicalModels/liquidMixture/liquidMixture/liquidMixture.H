@@ -167,7 +167,7 @@ public:
         ) const;
 
 
-        //- Calculate the mean molecular weigth [kg/kmol]
+        //- Calculate the mean molecular weight [kg/kmol]
         // from mole fractions
         scalar W(const scalarField& x) const;
 

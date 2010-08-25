@@ -27,20 +27,19 @@ License
 #include "basicThermoParcel.H"
 #include "ThermoCloud.H"
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 namespace Foam
 {
     defineTemplateTypeNameAndDebug(Cloud<basicThermoParcel>, 0);
 
     defineParcelTypeNameAndDebug(KinematicParcel<basicThermoParcel>, 0);
-//    defineTemplateTypeNameAndDebug(KinematicParcel<basicThermoParcel>, 0);
     defineParcelTypeNameAndDebug(ThermoParcel<basicThermoParcel>, 0);
     defineTemplateTypeNameAndDebug(ThermoParcel<basicThermoParcel>, 0);
 
     defineParcelTypeNameAndDebug(KinematicCloud<basicThermoParcel>, 0);
-//    defineTemplateTypeNameAndDebug(KinematicCloud<basicThermoParcel>, 0);
 
     defineParcelTypeNameAndDebug(ThermoCloud<basicThermoParcel>, 0);
-//    defineTemplateTypeNameAndDebug(ThermoCloud<basicThermoParcel>, 0);
 };
 
 

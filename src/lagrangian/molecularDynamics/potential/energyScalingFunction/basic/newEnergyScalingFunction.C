@@ -22,9 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Class
-    energyScalingFunction
-
 \*---------------------------------------------------------------------------*/
 
 #include "energyScalingFunction.H"
@@ -61,8 +58,8 @@ autoPtr<energyScalingFunction> energyScalingFunction::New
         (
             "energyScalingFunction::New()"
         )   << "Unknown energyScalingFunction type "
-            << energyScalingFunctionTypeName << endl << endl
-            << "Valid  energyScalingFunctions are : " << endl
+            << energyScalingFunctionTypeName << nl << nl
+            << "Valid  energyScalingFunctions are: " << nl
             << dictionaryConstructorTablePtr_->toc()
             << exit(FatalError);
     }

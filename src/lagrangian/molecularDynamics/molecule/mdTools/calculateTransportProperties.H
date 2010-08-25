@@ -37,7 +37,7 @@ if (writeVacf)
     }
 }
 
-Info << "Diffusion coefficient = "
+Info<< "Diffusion coefficient = "
     << vacf.integral() << endl;
 
 if (writePacf)
@@ -57,13 +57,13 @@ Info<< "Viscosity = "
     << pacf.integral()/averageTemperature/moleculeCloud::kb/meshVolume
     << endl;
 
-if(writeHFacf)
+if (writeHFacf)
 {
     OFstream hfacfFile
     (
         runTime.path()/ + "hfacf"
     );
-    
+
     if (!hfacf.writeAveraged(hfacfFile))
     {
         FatalErrorIn(args.executable())
@@ -73,7 +73,7 @@ if(writeHFacf)
     }
 }
 
-Info << "Thermal conductivity = "
+Info<< "Thermal conductivity = "
     << hfacf.integral()
         /averageTemperature
         /averageTemperature

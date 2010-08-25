@@ -46,7 +46,7 @@ namespace tetherPotentials
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class harmonicSpring Declaration
+                       Class harmonicSpring Declaration
 \*---------------------------------------------------------------------------*/
 
 class harmonicSpring
@@ -84,11 +84,11 @@ public:
 
     // Member Functions
 
-        scalar energy(const scalar r) const;
+        scalar energy(const vector r) const;
 
-        scalar force(const scalar r) const;
+        vector force(const vector r) const;
 
-        //- Read transportProperties dictionary
+        //- Read dictionary
         bool read(const dictionary& tetherPotentialProperties);
 };
 

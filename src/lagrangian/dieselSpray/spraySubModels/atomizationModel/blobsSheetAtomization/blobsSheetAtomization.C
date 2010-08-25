@@ -28,7 +28,7 @@ License
 
 #include "blobsSheetAtomization.H"
 #include "addToRunTimeSelectionTable.H"
-#include "combustionMixture.H"
+#include "basicMultiComponentMixture.H"
 
 #include "RosinRammler.H"
 

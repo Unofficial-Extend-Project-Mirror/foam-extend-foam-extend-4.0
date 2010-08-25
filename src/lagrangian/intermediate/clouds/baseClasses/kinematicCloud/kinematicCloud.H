@@ -29,13 +29,14 @@ Description
     Virtual abstract base class for templated KinematicCloud
 
 SourceFiles
+    kinematicCloud.H
 
 \*---------------------------------------------------------------------------*/
 
 #ifndef kinematicCloud_H
 #define kinematicCloud_H
 
-#include "volFields.H"
+#include "typeInfo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,7 +49,6 @@ namespace Foam
 
 class kinematicCloud
 {
-
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -69,14 +69,8 @@ public:
         kinematicCloud();
 
 
-    // Destructors
-
-        virtual ~kinematicCloud();
-
-
-    // Member Functions
-
-        // Access
+    //- Destructor
+    virtual ~kinematicCloud();
 };
 
 

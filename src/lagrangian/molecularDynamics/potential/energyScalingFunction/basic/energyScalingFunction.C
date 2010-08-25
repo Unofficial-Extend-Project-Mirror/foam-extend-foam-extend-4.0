@@ -22,9 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Class
-    energyScalingFunction
-
 \*---------------------------------------------------------------------------*/
 
 #include "energyScalingFunction.H"
@@ -38,8 +35,6 @@ namespace Foam
 
 defineTypeNameAndDebug(energyScalingFunction, 0);
 defineRunTimeSelectionTable(energyScalingFunction, dictionary);
-
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -68,6 +63,7 @@ bool Foam::energyScalingFunction::read
 
     return true;
 }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

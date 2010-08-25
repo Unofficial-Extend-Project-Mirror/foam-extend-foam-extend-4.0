@@ -26,7 +26,7 @@ License
 
 #include "inversePointDistanceDiffusivity.H"
 #include "addToRunTimeSelectionTable.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "pointEdgePoint.H"
 #include "PointEdgeWave.H"
 
@@ -72,9 +72,6 @@ void Foam::inversePointDistanceDiffusivity::correct()
 {
     const polyMesh& mesh = mSolver().mesh();
     const polyBoundaryMesh& bdry = mesh.boundaryMesh();
-
-    // Construct point mesh
-    const pointMesh pMesh(mesh);
 
     labelHashSet patchSet(bdry.size());
 
@@ -133,10 +130,10 @@ void Foam::inversePointDistanceDiffusivity::correct()
         // Do calculations
         PointEdgeWave<pointEdgePoint> waveInfo
         (
-            pMesh,
+            mesh,
             seedPoints,
             seedInfo,
-        
+
             pointWallDist,
             edgeWallDist,
             mesh.globalData().nTotalPoints() // max iterations
@@ -170,7 +167,7 @@ void Foam::inversePointDistanceDiffusivity::correct()
             forAll(bfld, i)
             {
                 const cell& ownFaces = mesh.cells()[faceCells[i]];
- 
+
                 labelHashSet cPoints(4*ownFaces.size());
 
                 scalar dist = 0;
@@ -188,7 +185,7 @@ void Foam::inversePointDistanceDiffusivity::correct()
                     }
                 }
                 dist /= cPoints.size();
-                
+
                 bfld[i] = 1.0/dist;
             }
         }

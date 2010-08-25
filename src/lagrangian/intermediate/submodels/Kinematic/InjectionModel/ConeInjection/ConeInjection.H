@@ -53,6 +53,8 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
+
 template<class Type>
 class DataEntry;
 
@@ -65,17 +67,16 @@ class ConeInjection
 :
     public InjectionModel<CloudType>
 {
-
     // Private data
-
-        //- Coefficients dictionary
-        dictionary coeffDict_;
 
         //- Injection duration [s]
         const scalar duration_;
 
         //- Injector position [m]
-        const vector position_;
+        vector position_;
+
+        //- Cell containing injector position []
+        label injectorCell_;
 
         //- Injector direction []
         vector direction_;
@@ -112,14 +113,14 @@ protected:
 
     // Protected member functions
 
-        //- Number of parcels to introduce over the time step
-        label nParcelsToInject
+        //- Number of parcels to introduce over the time step relative to SOI
+        label parcelsToInject
         (
             const scalar time0,
             const scalar time1
         ) const;
 
-        //- Number of parcels to introduce over the time step
+        //- Number of parcels to introduce over the time step relative to SOI
         scalar volumeToInject
         (
             const scalar time0,
@@ -143,9 +144,8 @@ public:
         );
 
 
-    // Destructor
-
-        ~ConeInjection();
+    //- Destructor
+    virtual ~ConeInjection();
 
 
     // Member Functions
@@ -159,28 +159,31 @@ public:
 
         // Injection geometry
 
-            //- Return the injection position
-            vector position
+            //- Set the injection position and owner cell
+            virtual void setPositionAndCell
             (
-                const label iParcel,
+                const label parcelI,
+                const label nParcels,
                 const scalar time,
-                const polyMeshInfo& meshInfo
+                vector& position,
+                label& cellOwner
             );
 
-            //- Return the velocity of the parcel to introduce at a time
-            vector velocity
+            //- Set the parcel properties
+            virtual void setProperties
             (
-                const label,
+                const label parcelI,
+                const label nParcels,
                 const scalar time,
-                const polyMeshInfo& meshInfo
+                typename CloudType::parcelType& parcel
             );
 
-            //- Return the diameter of the parcel to introduce at a time
-            scalar d0
-            (
-                const label,
-                const scalar
-            ) const;
+            //- Flag to identify whether model fully describes the parcel
+            virtual bool fullyDescribed() const;
+
+            //- Return flag to identify whether or not injection of parcelI is
+            //  permitted
+            virtual bool validInjection(const label parcelI);
 };
 
 

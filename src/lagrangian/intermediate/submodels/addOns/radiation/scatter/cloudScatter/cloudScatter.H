@@ -46,16 +46,13 @@ namespace radiation
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class cloudScatter Declaration
+                         Class cloudScatter Declaration
 \*---------------------------------------------------------------------------*/
 
 class cloudScatter
 :
     public scatterModel
 {
-
-private:
-
     // Private data
 
         //- Absorption model dictionary
@@ -82,13 +79,10 @@ public:
 
 
     // Destructor
-
-        ~cloudScatter();
+    virtual ~cloudScatter();
 
 
     // Member Operators
-
-        // Edit
 
         // Access
 

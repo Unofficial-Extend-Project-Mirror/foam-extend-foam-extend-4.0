@@ -44,7 +44,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                         Class basicThermoParcel Declaration
+                      Class basicThermoParcel Declaration
 \*---------------------------------------------------------------------------*/
 
 class basicThermoParcel
@@ -59,16 +59,25 @@ public:
 
     // Constructors
 
+       //- Construct from owner, position, and cloud owner
+       //  Other properties initialised as null
+       basicThermoParcel
+       (
+            ThermoCloud<basicThermoParcel>& owner,
+            const vector position,
+            const label cellI
+       );
+
        //- Construct from components
        basicThermoParcel
        (
             ThermoCloud<basicThermoParcel>& owner,
-            const label typeId,
             const vector position,
-            const label celli,
+            const label cellI,
+            const label typeId,
+            const scalar nParticle0,
             const scalar d0,
             const vector U0,
-            const scalar nParticle0,
             const constantProperties& constProps
         );
 
@@ -80,16 +89,22 @@ public:
             bool readFields = true
         );
 
+        //- Construct as a copy
+        basicThermoParcel(const basicThermoParcel& p);
+
         //- Construct and return a clone
         autoPtr<basicThermoParcel> clone() const
         {
-            return autoPtr<basicThermoParcel>(new basicThermoParcel(*this));
+            return
+                autoPtr<basicThermoParcel>
+                (
+                    new basicThermoParcel(*this)
+                );
         }
 
 
-    // Destructors
-
-        virtual ~basicThermoParcel();
+    //- Destructor
+    virtual ~basicThermoParcel();
 };
 
 

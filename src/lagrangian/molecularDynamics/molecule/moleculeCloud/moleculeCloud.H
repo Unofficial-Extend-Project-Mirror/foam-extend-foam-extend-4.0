@@ -28,18 +28,8 @@ Class
 Description
 
 SourceFiles
-    moleculeCloudApplyConstraintsAndThermostats.C
-    moleculeCloudBuildCellInteractionLists.C
-    moleculeCloudBuildCellOccupancy.C
-    moleculeCloudBuildCellReferralLists.C
+    moleculeCloudI.H
     moleculeCloud.C
-    moleculeCloudCalculateAndAccumulateProperties.C
-    moleculeCloudCalculateExternalForce.C
-    moleculeCloudCalculateForce.C
-    moleculeCloudCalculatePairForce.C
-    moleculeCloudCalculateTetherForce.C
-    moleculeCloudIntegrateEquationsOfMotion.C
-    moleculeCloudRemoveHighEnergyOverlaps.C
 
 
 \*---------------------------------------------------------------------------*/
@@ -50,14 +40,11 @@ SourceFiles
 #include "Cloud.H"
 #include "molecule.H"
 #include "IOdictionary.H"
-#include "vector2D.H"
-
-#include "pairPotentialList.H"
-#include "tetherPotentialList.H"
-
-#include "receivingReferralList.H"
-#include "sendingReferralList.H"
-#include "referredCellList.H"
+#include "potential.H"
+#include "interactionLists.H"
+#include "labelVector.H"
+#include "Random.H"
+#include "fileName.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -65,7 +52,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class moleculeCloud Declaration
+                       Class moleculeCloud Declaration
 \*---------------------------------------------------------------------------*/
 
 class moleculeCloud
@@ -73,243 +60,167 @@ class moleculeCloud
     public Cloud<molecule>
 {
 
-public:
-
-    enum integrationMethods
-    {
-        imVerletLeapfrog,
-        imPredictorCorrector
-    };
-
-
 private:
 
     // Private data
 
         const polyMesh& mesh_;
 
-            // MD solution parameters
+        const potential& pot_;
 
-            static const NamedEnum<integrationMethods, 2>
-                integrationMethodNames_;
+        List<DynamicList<molecule*> > cellOccupancy_;
 
-            integrationMethods integrationMethod_;
+        interactionLists il_;
 
-            scalar potentialEnergyLimit_;
+        List<molecule::constantProperties> constPropList_;
 
-            labelList removalOrder_;
-
-            labelListList directInteractionList_;
-
-            referredCellList referredInteractionList_;
-
-            labelList realCellsWithinRCutMaxOfAnyReferringPatch_;
-
-            labelList realFacesWithinRCutMaxOfAnyReferringPatch_;
-
-            labelList realEdgesWithinRCutMaxOfAnyReferringPatch_;
-
-            labelList realPointsWithinRCutMaxOfAnyReferringPatch_;
-
-            List<sendingReferralList> cellSendingReferralLists_;
-
-            List<receivingReferralList> cellReceivingReferralLists_;
-
-            pairPotentialList pairPotentials_;
-
-            tetherPotentialList tetherPotentials_;
-
-            vector gravity_;
-
-            List< DynamicList<molecule*> > cellOccupancy_;
+        Random rndGen_;
 
 
-        // Private Member Functions
+    // Private Member Functions
 
-            //- Disallow default bitwise copy construct
-            moleculeCloud(const moleculeCloud&);
+        void buildConstProps();
 
-            //- Disallow default bitwise assignment
-            void operator=(const moleculeCloud&);
+        void setSiteSizesAndPositions();
+
+        //- Determine which molecules are in which cells
+        void buildCellOccupancy();
+
+        void calculatePairForce();
+
+        inline void evaluatePair
+        (
+            molecule* molI,
+            molecule* molJ
+        );
+
+        inline void evaluatePair
+        (
+            molecule* molReal,
+            referredMolecule* molRef
+        );
+
+        inline bool evaluatePotentialLimit
+        (
+            molecule* molI,
+            molecule* molJ
+        ) const;
+
+        inline bool evaluatePotentialLimit
+        (
+            molecule* molReal,
+            referredMolecule* molRef
+        ) const;
+
+        void calculateTetherForce();
+
+        void calculateExternalForce();
+
+        void removeHighEnergyOverlaps();
+
+        void initialiseMolecules
+        (
+            const IOdictionary& mdInitialiseDict
+        );
+
+        void createMolecule
+        (
+            const point& position,
+            label cell,
+            label id,
+            bool tethered,
+            scalar temperature,
+            const vector& bulkVelocity
+        );
+
+        label nSites() const;
+
+        inline vector equipartitionLinearVelocity
+        (
+            scalar temperature,
+            scalar mass
+        );
+
+        inline vector equipartitionAngularMomentum
+        (
+            scalar temperature,
+            const molecule::constantProperties& cP
+        );
+
+        //- Disallow default bitwise copy construct
+        moleculeCloud(const moleculeCloud&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const moleculeCloud&);
 
 
 public:
 
     // Static data members
 
-        //- Tolerance for checking that faces on a patch segment
-        static scalar transTol;
-
         static scalar kb;
+
+        static scalar elementaryCharge;
+
+        static scalar vacuumPermittivity;
 
 
     // Constructors
 
-        //- Construct given mesh
-        moleculeCloud(const polyMesh&);
-
-        //- Construct given polyMesh and fields of position, cell, mass,
-        //- id, U ands A.  Intended for use by the molConfig utility
+        //- Construct given mesh and potential references
         moleculeCloud
         (
             const polyMesh& mesh,
-            label nMol,
-            const labelField& id,
-            const scalarField& mass,
-            const vectorField& positions,
-            const labelField& cells,
-            const vectorField& U,
-            const vectorField& A,
-            const labelField& tethered,
-            const vectorField& tetherPositions
+            const potential& pot,
+            bool readFields = true
+        );
+
+        //- Construct given mesh, potential and mdInitialiseDict
+        moleculeCloud
+        (
+            const polyMesh& mesh,
+            const potential& pot,
+            const IOdictionary& mdInitialiseDict,
+            bool readFields = true
         );
 
 
     // Member Functions
 
+        //- Evolve the molecules (move, calculate forces, control state etc)
+        void evolve();
+
+        void calculateForce();
+
+        void applyConstraintsAndThermostats
+        (
+            const scalar targetTemperature,
+            const scalar measuredTemperature
+        );
+
+
         // Access
 
             inline const polyMesh& mesh() const;
 
-        // MD solution parameters
+            inline const potential& pot() const;
 
-            inline const integrationMethods& integrationMethod() const;
+            inline const List<DynamicList<molecule*> >& cellOccupancy() const;
 
-            inline scalar potentialEnergyLimit() const;
+            inline const interactionLists& il() const;
 
-            inline const labelList& removalOrder() const;
+            inline const List<molecule::constantProperties> constProps() const;
 
-            inline label nPairPotentials() const;
+            inline const molecule::constantProperties&
+                constProps(label id) const;
 
-            inline const labelListList& directInteractionList() const;
-
-            inline const referredCellList& referredInteractionList() const;
-
-            inline const labelList&
-                realCellsWithinRCutMaxOfAnyReferringPatch() const;
-
-            inline const labelList&
-                realFacesWithinRCutMaxOfAnyReferringPatch() const;
-
-            inline const labelList&
-                realEdgesWithinRCutMaxOfAnyReferringPatch() const;
-
-            inline const labelList&
-                realPointsWithinRCutMaxOfAnyReferringPatch() const;
-
-            inline const List<sendingReferralList>&
-                cellSendingReferralLists() const;
-
-            inline const List<receivingReferralList>&
-                cellReceivingReferralLists() const;
-
-            inline label nInteractingProcs() const;
-
-            inline const pairPotentialList& pairPotentials() const;
-
-            inline const tetherPotentialList& tetherPotentials() const;
-
-            inline const vector& gravity() const;
-
-            inline const List< DynamicList<molecule*> >& cellOccupancy() const;
-
-            void buildCellInteractionLists();
-
-            //- Build referralLists which define how to send information
-            // to referredCells to source cells
-            void buildCellReferralLists();
-
-            bool testPointFaceDistance
-            (
-                const label p,
-                const label faceNo
-            ) const;
-
-            bool testPointFaceDistance
-            (
-                const label p,
-                const referredCell& refCell
-            ) const;
-
-            bool testPointFaceDistance
-            (
-                const vectorList& pointsToTest,
-                const label faceNo
-            ) const;
-
-            bool testPointFaceDistance
-            (
-                const vector& p,
-                const label faceNo
-            ) const;
-
-            bool testPointFaceDistance
-            (
-                const vector& p,
-                const labelList& faceToTest,
-                const vectorList& points,
-                const vector& faceC,
-                const vector& faceA
-            ) const;
-
-            bool testEdgeEdgeDistance
-            (
-                const edge& eI,
-                const edge& eJ
-            ) const;
-
-            bool testEdgeEdgeDistance
-            (
-                const edge& eI,
-                const vector& eJs,
-                const vector& eJe
-            ) const;
-
-            const labelList realCellsInRangeOfSegment
-            (
-                const labelList& segmentFaces,
-                const labelList& segmentEdges,
-                const labelList& segmentPoints
-            ) const;
-
-            const labelList referredCellsInRangeOfSegment
-            (
-                const List<referredCell>& referredInteractionList,
-                const labelList& segmentFaces,
-                const labelList& segmentEdges,
-                const labelList& segmentPoints
-            ) const;
-
-            //- Determine which molecules are in which cells
-            void buildCellOccupancy();
-
-            //- Integrate the equations of motion using algorithm selected at
-            //  runtime from a dictionary. This will also call the function
-            //  to calculate the intermolecular forces (calculatePairForce()).
-
-            void integrateEquationsOfMotion();
-
-            void applyConstraintsAndThermostats
-            (
-                const scalar targetTemperature,
-                const scalar measuredTemperature
-            );
-
-            void calculateForce();
-
-            void calculatePairForce();
-
-            void calculateTetherForce();
-
-            void calculateExternalForce();
-
-            void removeHighEnergyOverlaps();
+            inline Random& rndGen();
 
 
     // Member Operators
 
-        //- Write fields
-        void writeFields() const;
+        //- Write molecule sites in XYZ format
+        void writeXYZ(const fileName& fName) const;
 };
 
 

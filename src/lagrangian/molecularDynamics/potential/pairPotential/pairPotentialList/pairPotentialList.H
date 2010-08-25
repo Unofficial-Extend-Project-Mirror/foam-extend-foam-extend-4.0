@@ -47,7 +47,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class pairPotentialList Declaration
+                      Class pairPotentialList Declaration
 \*---------------------------------------------------------------------------*/
 
 class pairPotentialList
@@ -56,11 +56,14 @@ class pairPotentialList
 {
     // Private data
 
-        List<word> idList_;
-        
+        label nIds_;
+
         scalar rCutMax_;
 
         scalar rCutMaxSqr_;
+
+        autoPtr<pairPotential> electrostaticPotential_;
+
 
     // Private Member Functions
 
@@ -72,6 +75,7 @@ class pairPotentialList
 
         void readPairPotentialDict
         (
+            const List<word>& idList,
             const dictionary& pairPotentialDict,
             const polyMesh& mesh
         );
@@ -82,6 +86,7 @@ class pairPotentialList
         //- Disallow default bitwise copy construct
         pairPotentialList(const pairPotentialList&);
 
+
 public:
 
     // Constructors
@@ -91,33 +96,34 @@ public:
         //- Construct from idList and potental dictionaries
         pairPotentialList
         (
-            const dictionary& idListDict,
+            const List<word>& idList,
             const dictionary& pairPotentialDict,
             const polyMesh& mesh
         );
+
 
     // Destructor
 
         ~pairPotentialList();
 
+
     // Member Functions
-        
+
         void buildPotentials
         (
-            const dictionary& idListDict,
+            const List<word>& idList,
             const dictionary& pairPotentialDict,
             const polyMesh& mesh
         );
 
+
         // Access
-
-            inline const List<word>& idList() const;
-
-            inline label nIds() const;
 
             inline scalar rCutMax() const;
 
             inline scalar rCutMaxSqr() const;
+
+            bool rCutMaxSqr(scalar rIJMagSqr) const;
 
             const pairPotential& pairPotentialFunction
             (
@@ -133,13 +139,13 @@ public:
                 const scalar rIJMagSqr
             ) const;
 
-            scalar rMin (const label a, const label b) const;
+            scalar rMin(const label a, const label b) const;
 
-            scalar dr (const label a, const label b) const;
+            scalar dr(const label a, const label b) const;
 
-            scalar rCutSqr (const label a, const label b) const;
+            scalar rCutSqr(const label a, const label b) const;
 
-            scalar rCut (const label a, const label b) const;
+            scalar rCut(const label a, const label b) const;
 
             scalar force
             (
@@ -154,6 +160,8 @@ public:
                 const label b,
                 const scalar rIJMag
             ) const;
+
+            inline const pairPotential& electrostatic() const;
 };
 
 

@@ -62,10 +62,11 @@ PrandtlDelta::PrandtlDelta
 :
     LESdelta(name, mesh),
     geometricDelta_(LESdelta::New(name, mesh, dd.subDict(type() + "Coeffs"))),
-    kappa_(dd.lookupOrDefault<scalar>("kappa", 0.4187)),
+    kappa_(dimensionedScalar(dd.lookup("kappa")).value()),
     Cdelta_
     (
-        dd.subDict(type() + "Coeffs").lookupOrDefault<scalar>("Cdelta", 0.158)
+        dimensionedScalar(dd.subDict(type() + "Coeffs").lookup("Cdelta"))
+       .value()
     )
 {
     calcDelta();
@@ -79,8 +80,8 @@ void PrandtlDelta::read(const dictionary& d)
     const dictionary& dd(d.subDict(type() + "Coeffs"));
 
     geometricDelta_().read(dd);
-    d.readIfPresent<scalar>("kappa", kappa_);
-    dd.readIfPresent<scalar>("Cdelta", Cdelta_);
+    kappa_ = dimensionedScalar(d.lookup("kappa")).value();
+    Cdelta_ = dimensionedScalar(dd.lookup("Cdelta")).value();
     calcDelta();
 }
 

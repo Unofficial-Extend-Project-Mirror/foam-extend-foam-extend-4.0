@@ -31,21 +31,20 @@ License
 #include "fixedEnthalpyFvPatchScalarField.H"
 #include "gradientEnthalpyFvPatchScalarField.H"
 #include "mixedEnthalpyFvPatchScalarField.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
+#include "fixedInternalEnergyFvPatchScalarField.H"
+#include "gradientInternalEnergyFvPatchScalarField.H"
+#include "mixedInternalEnergyFvPatchScalarField.H"
 
 /* * * * * * * * * * * * * * * private static data * * * * * * * * * * * * * */
 
-defineTypeNameAndDebug(basicThermo, 0);
-defineRunTimeSelectionTable(basicThermo, fvMesh);
-
+namespace Foam
+{
+    defineTypeNameAndDebug(basicThermo, 0);
+}
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-wordList basicThermo::hBoundaryTypes()
+Foam::wordList Foam::basicThermo::hBoundaryTypes()
 {
     const volScalarField::GeometricBoundaryField& tbf = T_.boundaryField();
 
@@ -74,9 +73,10 @@ wordList basicThermo::hBoundaryTypes()
     return hbt;
 }
 
-void basicThermo::hBoundaryCorrection(volScalarField& h_)
+
+void Foam::basicThermo::hBoundaryCorrection(volScalarField& h)
 {
-    volScalarField::GeometricBoundaryField& hbf = h_.boundaryField();
+    volScalarField::GeometricBoundaryField& hbf = h.boundaryField();
 
     forAll(hbf, patchi)
     {
@@ -94,9 +94,58 @@ void basicThermo::hBoundaryCorrection(volScalarField& h_)
 }
 
 
+Foam::wordList Foam::basicThermo::eBoundaryTypes()
+{
+    const volScalarField::GeometricBoundaryField& tbf = T_.boundaryField();
+
+    wordList ebt = tbf.types();
+
+    forAll(tbf, patchi)
+    {
+        if (isA<fixedValueFvPatchScalarField>(tbf[patchi]))
+        {
+            ebt[patchi] = fixedInternalEnergyFvPatchScalarField::typeName;
+        }
+        else if
+        (
+            isA<zeroGradientFvPatchScalarField>(tbf[patchi])
+         || isA<fixedGradientFvPatchScalarField>(tbf[patchi])
+        )
+        {
+            ebt[patchi] = gradientInternalEnergyFvPatchScalarField::typeName;
+        }
+        else if (isA<mixedFvPatchScalarField>(tbf[patchi]))
+        {
+            ebt[patchi] = mixedInternalEnergyFvPatchScalarField::typeName;
+        }
+    }
+
+    return ebt;
+}
+
+
+void Foam::basicThermo::eBoundaryCorrection(volScalarField& e)
+{
+    volScalarField::GeometricBoundaryField& ebf = e.boundaryField();
+
+    forAll(ebf, patchi)
+    {
+        if (isA<gradientInternalEnergyFvPatchScalarField>(ebf[patchi]))
+        {
+            refCast<gradientInternalEnergyFvPatchScalarField>(ebf[patchi])
+                .gradient() = ebf[patchi].fvPatchField::snGrad();
+        }
+        else if (isA<mixedInternalEnergyFvPatchScalarField>(ebf[patchi]))
+        {
+            refCast<mixedInternalEnergyFvPatchScalarField>(ebf[patchi])
+                .refGrad() = ebf[patchi].fvPatchField::snGrad();
+        }
+    }
+}
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-basicThermo::basicThermo(const fvMesh& mesh)
+Foam::basicThermo::basicThermo(const fvMesh& mesh)
 :
     IOdictionary
     (
@@ -123,19 +172,6 @@ basicThermo::basicThermo(const fvMesh& mesh)
         mesh
     ),
 
-    T_
-    (
-        IOobject
-        (
-            "T",
-            mesh.time().timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-    ),
-
     psi_
     (
         IOobject
@@ -148,6 +184,19 @@ basicThermo::basicThermo(const fvMesh& mesh)
         ),
         mesh,
         dimensionSet(0, -2, 2, 0, 0)
+    ),
+
+    T_
+    (
+        IOobject
+        (
+            "T",
+            mesh.time().timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
     ),
 
     mu_
@@ -182,20 +231,235 @@ basicThermo::basicThermo(const fvMesh& mesh)
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-basicThermo::~basicThermo()
+Foam::basicThermo::~basicThermo()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-bool basicThermo::read()
+Foam::volScalarField& Foam::basicThermo::p()
+{
+    return p_;
+}
+
+
+const Foam::volScalarField& Foam::basicThermo::p() const
+{
+    return p_;
+}
+
+
+const Foam::volScalarField& Foam::basicThermo::psi() const
+{
+    return psi_;
+}
+
+
+Foam::volScalarField& Foam::basicThermo::h()
+{
+    notImplemented("basicThermo::h()");
+    return const_cast<volScalarField&>(volScalarField::null());
+}
+
+
+const Foam::volScalarField& Foam::basicThermo::h() const
+{
+    notImplemented("basicThermo::h() const");
+    return volScalarField::null();
+}
+
+
+Foam::tmp<Foam::scalarField> Foam::basicThermo::h
+(
+    const scalarField& T,
+    const labelList& cells
+) const
+{
+    notImplemented
+    (
+        "basicThermo::h"
+        "(const scalarField& T, const labelList& cells) const"
+    );
+    return tmp<scalarField>(NULL);
+}
+
+
+Foam::tmp<Foam::scalarField> Foam::basicThermo::h
+(
+    const scalarField& T,
+    const label patchi
+) const
+{
+    notImplemented
+    (
+        "basicThermo::h"
+        "(const scalarField& T, const label patchi) const"
+    );
+    return tmp<scalarField>(NULL);
+}
+
+
+Foam::volScalarField& Foam::basicThermo::hs()
+{
+    notImplemented("basicThermo::hs()");
+    return const_cast<volScalarField&>(volScalarField::null());
+}
+
+
+const Foam::volScalarField& Foam::basicThermo::hs() const
+{
+    notImplemented("basicThermo::hs() const");
+    return volScalarField::null();
+}
+
+
+Foam::tmp<Foam::scalarField> Foam::basicThermo::hs
+(
+    const scalarField& T,
+    const labelList& cells
+) const
+{
+    notImplemented
+    (
+        "basicThermo::hs"
+        "(const scalarField& T, const labelList& cells) const"
+    );
+    return tmp<scalarField>(NULL);
+}
+
+
+Foam::tmp<Foam::scalarField> Foam::basicThermo::hs
+(
+    const scalarField& T,
+    const label patchi
+) const
+{
+    notImplemented
+    (
+        "basicThermo::hs"
+        "(const scalarField& T, const label patchi) const"
+    );
+    return tmp<scalarField>(NULL);
+}
+
+
+Foam::tmp<Foam::volScalarField> Foam::basicThermo::hc() const
+{
+    notImplemented("basicThermo::hc()");
+    return volScalarField::null();
+}
+
+
+Foam::volScalarField& Foam::basicThermo::e()
+{
+    notImplemented("basicThermo::e()");
+    return const_cast<volScalarField&>(volScalarField::null());
+}
+
+
+const Foam::volScalarField& Foam::basicThermo::e() const
+{
+    notImplemented("basicThermo::e()");
+    return volScalarField::null();
+}
+
+
+Foam::tmp<Foam::scalarField> Foam::basicThermo::e
+(
+    const scalarField& T,
+    const labelList& cells
+) const
+{
+    notImplemented
+    (
+        "basicThermo::e"
+        "(const scalarField& T, const labelList& cells) const"
+    );
+    return tmp<scalarField>(NULL);
+}
+
+
+Foam::tmp<Foam::scalarField> Foam::basicThermo::e
+(
+    const scalarField& T,
+    const label patchi
+) const
+{
+    notImplemented
+    (
+        "basicThermo::e"
+        "(const scalarField& T, const label patchi) const"
+    );
+    return tmp<scalarField>(NULL);
+}
+
+
+const Foam::volScalarField& Foam::basicThermo::T() const
+{
+    return T_;
+}
+
+
+Foam::tmp<Foam::scalarField> Foam::basicThermo::Cp
+(
+    const scalarField& T,
+    const label patchi
+) const
+{
+    notImplemented
+    (
+        "basicThermo::Cp"
+        "(const scalarField& T, const label patchi) const"
+    );
+    return tmp<scalarField>(NULL);
+}
+
+
+Foam::tmp<Foam::volScalarField> Foam::basicThermo::Cp() const
+{
+    notImplemented("basicThermo::Cp() const");
+    return volScalarField::null();
+}
+
+
+Foam::tmp<Foam::scalarField> Foam::basicThermo::Cv
+(
+    const scalarField& T,
+    const label patchi
+) const
+{
+    notImplemented
+    (
+        "basicThermo::Cv"
+        "(const scalarField& T, const label patchi) const"
+    );
+    return tmp<scalarField>(NULL);
+}
+
+
+Foam::tmp<Foam::volScalarField> Foam::basicThermo::Cv() const
+{
+    notImplemented("basicThermo::Cv() const");
+    return volScalarField::null();
+}
+
+
+const Foam::volScalarField& Foam::basicThermo::mu() const
+{
+    return mu_;
+}
+
+
+const Foam::volScalarField& Foam::basicThermo::alpha() const
+{
+    return alpha_;
+}
+
+
+bool Foam::basicThermo::read()
 {
     return regIOobject::read();
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

@@ -49,7 +49,7 @@ Foam::laplaceFilter::laplaceFilter(const fvMesh& mesh, scalar widthCoeff)
     (
         IOobject
         (
-            "anisotropicFilterCoeff",
+            "laplaceFilterCoeff",
             mesh.time().timeName(),
             mesh
         ),
@@ -70,7 +70,7 @@ Foam::laplaceFilter::laplaceFilter(const fvMesh& mesh, const dictionary& bd)
     (
         IOobject
         (
-            "anisotropicFilterCoeff",
+            "laplaceFilterCoeff",
             mesh.time().timeName(),
             mesh
         ),

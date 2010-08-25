@@ -59,6 +59,35 @@ LESdelta::LESdelta(const word& name, const fvMesh& mesh)
 {}
 
 
+// * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
+
+autoPtr<LESdelta> LESdelta::New
+(
+    const word& name,
+    const fvMesh& mesh,
+    const dictionary& dict
+)
+{
+    word deltaType(dict.lookup("delta"));
+
+    dictionaryConstructorTable::iterator cstrIter =
+        dictionaryConstructorTablePtr_->find(deltaType);
+
+    if (cstrIter == dictionaryConstructorTablePtr_->end())
+    {
+        FatalErrorIn
+        (
+            "LESdelta::New(const fvMesh&, const dictionary&)"
+        )   << "Unknown LESdelta type " << deltaType << endl << endl
+            << "Valid LESdelta types are :" << endl
+            << dictionaryConstructorTablePtr_->toc()
+            << exit(FatalError);
+    }
+
+    return autoPtr<LESdelta>(cstrIter()(name, mesh, dict));
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

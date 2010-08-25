@@ -26,8 +26,10 @@ Class
     Foam::surfaceSlipDisplacementPointPatchVectorField
 
 Description
-    Displacement follows a triSurface. Use in a displacement fvMotionSolver.
-    Following is either
+    Displacement follows a triSurface. Use in a displacement fvMotionSolver
+    as a bc on the pointDisplacement field.
+    Following is done by calculating the projection onto the surface according
+    to the projectMode
     - NEAREST : nearest
     - POINTNORMAL : intersection with point normal
     - FIXEDNORMAL : intersection with fixed vector
@@ -36,9 +38,10 @@ Description
     stay in 2D.
 
     Needs:
-    - projectSurfaces : names of triSurfaceMeshes (in constant/triSurface)
-    - followMode : see above
-    - projectDirection : if followMode = fixedNormal
+    - geometry : dictionary with searchableSurfaces. (usually
+      triSurfaceMeshes in constant/triSurface)
+    - projectMode : see above
+    - projectDirection : if projectMode = fixedNormal
     - wedgePlane : -1 or component to knock out of intersection normal
     - frozenPointsZone : empty or name of pointZone containing points
                          that do not move
@@ -72,7 +75,7 @@ public:
 
     // Public data types
 
-        enum followMode
+        enum projectMode
         {
             NEAREST,
             POINTNORMAL,
@@ -83,14 +86,14 @@ private:
 
     // Private data
 
-        //- follow mode names
-        static const NamedEnum<followMode, 3> followModeNames_;
+        //- project mode names
+        static const NamedEnum<projectMode, 3> projectModeNames_;
 
         //- names of surfaces
         const dictionary surfacesDict_;
 
-        //- How to follow/project onto surface
-        const followMode projectMode_;
+        //- How to project/project onto surface
+        const projectMode projectMode_;
 
         //- direction to project
         const vector projectDir_;
@@ -101,11 +104,14 @@ private:
         //- pointZone with frozen points
         const word frozenPointsZone_;
 
-        //- Demand driven: surface to follow
+        //- Demand driven: surface to project
         mutable autoPtr<searchableSurfaces> surfacesPtr_;
 
 
     // Private Member Functions
+
+        //- Calculate displacement (w.r.t. points0()) to project onto surface
+        void calcProjection(vectorField& displacement) const;
 
         //- Disallow default bitwise assignment
         void operator=(const surfaceSlipDisplacementPointPatchVectorField&);
@@ -140,7 +146,7 @@ public:
             const surfaceSlipDisplacementPointPatchVectorField&,
             const pointPatch&,
             const DimensionedField<vector, pointMesh>&,
-            const PointPatchFieldMapper&
+            const pointPatchFieldMapper&
         );
 
         //- Construct as copy
@@ -186,39 +192,8 @@ public:
 
     // Member Functions
 
-        //- Surfaces to follow
-        const dictionary& surfacesDict() const
-        {
-            return surfacesDict_;
-        }
-
         //- Surface to follow. Demand loads surfaceNames.
         const searchableSurfaces& surfaces() const;
-
-        //- Mode of projection/following
-        followMode projectMode() const
-        {
-            return projectMode_;
-        }
-
-        //- Direction to project back onto surface
-        const vector& projectDir() const
-        {
-            return projectDir_;
-        }
-
-        //- Normal of wedgeplane (0, 1, 2) or -1. Note: should be obtained
-        //  from twoDPointCorrector.
-        label wedgePlane() const
-        {
-            return wedgePlane_;
-        }
-
-        //- Zone containing frozen points
-        const word& frozenPointsZone() const
-        {
-            return frozenPointsZone_;
-        }
 
         //- Update the patch field
         virtual void evaluate

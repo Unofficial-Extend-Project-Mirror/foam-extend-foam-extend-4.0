@@ -34,17 +34,15 @@ License
 #include "wallPolyPatch.H"
 #include "wedgePolyPatch.H"
 #include "processorPolyPatch.H"
-#include "combustionMixture.H"
+#include "basicMultiComponentMixture.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
     defineParticleTypeNameAndDebug(parcel, 0);
-
     defineTemplateTypeNameAndDebug(Cloud<parcel>, 0);
 }
-
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -160,7 +158,7 @@ bool Foam::parcel::move(spray& sDB)
     );
 
 
-    // Set the end-time for the track
+    // set the end-time for the track
     scalar tEnd = (1.0 - stepFraction())*deltaT;
 
     // Set the maximum time step for this parcel
@@ -255,14 +253,13 @@ bool Foam::parcel::move(spray& sDB)
         {
             oMass[i] = m()*oYf[i];
             label j = sDB.liquidToGasIndex()[i];
-            oHg += oYf[i]*sDB.gasProperties()[j].H(T());
+            oHg += oYf[i]*sDB.gasProperties()[j].Hs(T());
         }
 
         vector oMom = m()*U();
         scalar oHv = fuels.hl(p, T(), X());
         scalar oH = oHg - oHv;
         scalar oPE = (p - fuels.pv(p, T(), X()))/oRho;
-        scalar oKE = 0.5*pow(mag(U()), 2);
 
         // update the parcel properties (U, T, D)
         updateParcelProperties
@@ -282,14 +279,13 @@ bool Foam::parcel::move(spray& sDB)
         {
             nMass[i] = m()*nYf[i];
             label j = sDB.liquidToGasIndex()[i];
-            nHg += nYf[i]*sDB.gasProperties()[j].H(T());
+            nHg += nYf[i]*sDB.gasProperties()[j].Hs(T());
         }
 
         vector nMom = m()*U();
         scalar nHv = fuels.hl(p, T(), X());
         scalar nH = nHg - nHv;
         scalar nPE = (p - fuels.pv(p, T(), X()))/nRho;
-        scalar nKE = 0.5*pow(mag(U()), 2);
 
         // Update the Spray Source Terms
         forAll(nMass, i)
@@ -298,11 +294,9 @@ bool Foam::parcel::move(spray& sDB)
         }
         sDB.sms()[celli]   += oMom - nMom;
 
-        sDB.sms()[celli] += oMom - nMom;
-
-        sDB.shs()[celli] += 
-            oTotMass*(oH + oPE + oKE)
-          - m()*(nH + nPE + nKE); 
+        sDB.shs()[celli]   +=
+            oTotMass*(oH + oPE)
+          - m()*(nH + nPE);
 
         // Remove evaporated mass from stripped mass
         ms() -= ms()*(oTotMass-m())/oTotMass;
@@ -329,7 +323,7 @@ bool Foam::parcel::move(spray& sDB)
         {
             if (face() > -1)
             {
-                if (isType<processorPolyPatch>(pbMesh[patch(face())]))
+                if (isA<processorPolyPatch>(pbMesh[patch(face())]))
                 {
                     switchProcessor = true;
                 }
@@ -461,7 +455,7 @@ void Foam::parcel::updateParcelProperties
     for (label i=0; i<Nf; i++)
     {
         label j = sDB.liquidToGasIndex()[i];
-        oldhg += Yf0[i]*sDB.gasProperties()[j].H(T());
+        oldhg += Yf0[i]*sDB.gasProperties()[j].Hs(T());
     }
 
     scalar oldhv = fuels.hl(pg, T(), X());
@@ -503,9 +497,9 @@ void Foam::parcel::updateParcelProperties
             for(label i=0; i<Nf; i++)
             {
                 label j = sDB.liquidToGasIndex()[i];
-                newhg += Ynew[i]*sDB.gasProperties()[j].H(Tnew);
+                newhg += Ynew[i]*sDB.gasProperties()[j].Hs(Tnew);
             }
-            
+
             newhv = fuels.hl(pg, Tnew, X());
 
             scalar dm = oldMass - newMass;
@@ -598,6 +592,56 @@ void Foam::parcel::updateParcelProperties
             // Prevent droplet temperature to go too low
             // Mainly a numerical stability issue
             Tnew = max(200.0, Tnew);
+            scalar Td = Tnew;
+
+            scalar pAtSurface = fuels.pv(pg, Td, X());
+            scalar pCompare = 0.999*pg;
+            scalar boiling = pAtSurface >= pCompare;
+            if (boiling)
+            {
+                // can not go above boiling temperature
+                scalar Terr = 1.0e-3;
+                label n=0;
+                scalar dT = 1.0;
+                scalar pOld = pAtSurface;
+                while (dT > Terr)
+                {
+                    n++;
+                    pAtSurface = fuels.pv(pg, Td, X());
+                    if ((pAtSurface < pCompare) && (pOld < pCompare))
+                    {
+                        Td += dT;
+                    }
+                    else
+                    {
+                        if ((pAtSurface > pCompare) && (pOld > pCompare))
+                        {
+                            Td -= dT;
+                        }
+                        else
+                        {
+                            dT *= 0.5;
+                            if ((pAtSurface > pCompare) && (pOld < pCompare))
+                            {
+                                Td -= dT;
+                            }
+                            else
+                            {
+                                Td += dT;
+                            }
+                        }
+                    }
+                    pOld = pAtSurface;
+                    if (debug)
+                    {
+                        if (n>100)
+                        {
+                            Info << "n = " << n << ", T = " << Td << ", pv = " << pAtSurface << endl;
+                        }
+                    }
+                }
+                Tnew = Td;
+            }
         }
 
         // Evaporate droplet!
@@ -689,7 +733,5 @@ void Foam::parcel::transformProperties(const tensor& T)
 void Foam::parcel::transformProperties(const vector&)
 {}
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // ************************************************************************* //

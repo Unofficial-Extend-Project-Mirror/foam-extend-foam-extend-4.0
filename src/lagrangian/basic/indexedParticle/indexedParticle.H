@@ -84,7 +84,13 @@ public:
             bool readFields = true
         )
         :
-            Particle<indexedParticle>(c, is)
+            Particle<indexedParticle>(c, is, readFields)
+        {}
+
+        //- Construct as a copy
+        indexedParticle(const indexedParticle& p)
+        :
+            Particle<indexedParticle>(p)
         {}
 
         //- Construct and return a clone

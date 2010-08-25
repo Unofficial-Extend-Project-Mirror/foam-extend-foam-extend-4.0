@@ -1,4 +1,0 @@
-
-namedEnumTest.C
-
-EXE = $(FOAM_APPBIN)/NamedEnum

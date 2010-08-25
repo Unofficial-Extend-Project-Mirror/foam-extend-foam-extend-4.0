@@ -26,33 +26,54 @@ License
 
 #include "chemistrySolver.H"
 
-
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 
-Foam::autoPtr<Foam::chemistrySolver> Foam::chemistrySolver::New
+template<class CompType, class ThermoType>
+Foam::autoPtr<Foam::chemistrySolver<CompType, ThermoType> >
+Foam::chemistrySolver<CompType, ThermoType>::New
 (
-    const dictionary& dict,
-    chemistryModel& chemistry
+    ODEChemistryModel<CompType, ThermoType>& model,
+    const word& compTypeName,
+    const word& thermoTypeName
 )
 {
-    word chemistrySolverType(dict.lookup("chemistrySolver"));
+    word modelName(model.lookup("chemistrySolver"));
 
-    dictionaryConstructorTable::iterator cstrIter =
+    word chemistrySolverType =
+        modelName + '<' + compTypeName + ',' + thermoTypeName + '>';
+
+    Info<< "Selecting chemistrySolver " << modelName << endl;
+
+    typename dictionaryConstructorTable::iterator cstrIter =
         dictionaryConstructorTablePtr_->find(chemistrySolverType);
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
+        wordList models = dictionaryConstructorTablePtr_->toc();
+        forAll(models, i)
+        {
+            models[i] = models[i].replace
+            (
+                '<' + compTypeName + ',' + thermoTypeName + '>',
+                ""
+            );
+        }
+
         FatalErrorIn
         (
-            "chemistrySolver::New(const dictionary&, const chemistryModel&)"
-        )   << "Unknown chemistrySolverType type " << chemistrySolverType
-            << endl << endl
-            << "Valid chemistrySolverType types are :" << endl
-            << dictionaryConstructorTablePtr_->toc()
-            << exit(FatalError);
+            "chemistrySolver::New"
+            "("
+                "const ODEChemistryModel&, "
+                "const word&, "
+                "const word&"
+            ")"
+        )   << "Unknown chemistrySolver type " << modelName
+            << nl << nl << "Valid chemistrySolver types are:" << nl
+            << models << nl << exit(FatalError);
     }
 
-    return autoPtr<chemistrySolver>(cstrIter()(dict, chemistry));
+    return autoPtr<chemistrySolver<CompType, ThermoType> >
+        (cstrIter()(model, modelName));
 }
 
 

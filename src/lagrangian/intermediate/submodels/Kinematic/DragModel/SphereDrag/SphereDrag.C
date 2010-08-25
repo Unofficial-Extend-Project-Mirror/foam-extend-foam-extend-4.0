@@ -56,10 +56,7 @@ bool Foam::SphereDrag<CloudType>::active() const
 
 
 template <class CloudType>
-Foam::scalar Foam::SphereDrag<CloudType>::Cd
-(
-    const scalar Re
-) const
+Foam::scalar Foam::SphereDrag<CloudType>::Cd(const scalar Re) const
 {
     scalar Cd;
     if (Re < SMALL)

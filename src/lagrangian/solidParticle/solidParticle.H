@@ -163,68 +163,91 @@ public:
             inline scalar wallImpactDistance(const vector& n) const;
 
 
-        //- Tracking
-        bool move(trackData&);
+        // Tracking
+
+            //- Move
+            bool move(trackData&);
 
 
-        //- Overridable function to handle the particle hitting a processorPatch
-        void hitProcessorPatch
-        (
-            const processorPolyPatch&,
-            solidParticle::trackData& td
-        );
+        // Patch interactions
 
-        //- Overridable function to handle the particle hitting a processorPatch
-        //- without trackData
-        void hitProcessorPatch
-        (
-            const processorPolyPatch&,
-            int&
-        );
+            //- Overridable function to handle the particle hitting a patch
+            //  Executed before other patch-hitting functions
+            bool hitPatch
+            (
+                const polyPatch&,
+                solidParticle::trackData& td,
+                const label patchI
+            );
 
-        //- Overridable function to handle the particle hitting a wallPatch
-        void hitWallPatch
-        (
-            const wallPolyPatch&,
-            solidParticle::trackData& td
-        );
+            //- Overridable function to handle the particle hitting a patch
+            //  Executed before other patch-hitting functions without trackData
+            bool hitPatch
+            (
+                const polyPatch& p,
+                int& td,
+                const label patchI
+            );
 
-        //- Overridable function to handle the particle hitting a wallPatch
-        //- without trackData
-        void hitWallPatch
-        (
-            const wallPolyPatch&,
-            int&
-        );
+            //- Overridable function to handle the particle hitting a
+            //  processorPatch
+            void hitProcessorPatch
+            (
+                const processorPolyPatch&,
+                solidParticle::trackData& td
+            );
 
-        //- Overridable function to handle the particle hitting a polyPatch
-        void hitPatch
-        (
-            const polyPatch&,
-            solidParticle::trackData& td
-        );
+            //- Overridable function to handle the particle hitting a
+            //  processorPatch without trackData
+            void hitProcessorPatch
+            (
+                const processorPolyPatch&,
+                int&
+            );
 
-        //- Overridable function to handle the particle hitting a polyPatch
-        //- without trackData
-        void hitPatch
-        (
-            const polyPatch&,
-            int&
-        );
+            //- Overridable function to handle the particle hitting a wallPatch
+            void hitWallPatch
+            (
+                const wallPolyPatch&,
+                solidParticle::trackData& td
+            );
 
-        //- Transform the physical properties of the particle
-        //  according to the given transformation tensor
-        void transformProperties
-        (
-            const tensor& T
-        );
+            //- Overridable function to handle the particle hitting a wallPatch
+            //- without trackData
+            void hitWallPatch
+            (
+                const wallPolyPatch&,
+                int&
+            );
 
-        //- Transform the physical properties of the particle
-        //  according to the given separation vector
-        void transformProperties
-        (
-            const vector& separation
-        );
+            //- Overridable function to handle the particle hitting a polyPatch
+            void hitPatch
+            (
+                const polyPatch&,
+                solidParticle::trackData& td
+            );
+
+            //- Overridable function to handle the particle hitting a polyPatch
+            //- without trackData
+            void hitPatch
+            (
+                const polyPatch&,
+                int&
+            );
+
+            //- Transform the physical properties of the particle
+            //  according to the given transformation tensor
+            void transformProperties
+            (
+                const tensor& T
+            );
+
+            //- Transform the physical properties of the particle
+            //  according to the given separation vector
+            void transformProperties
+            (
+                const vector& separation
+            );
 
 
     // I-O

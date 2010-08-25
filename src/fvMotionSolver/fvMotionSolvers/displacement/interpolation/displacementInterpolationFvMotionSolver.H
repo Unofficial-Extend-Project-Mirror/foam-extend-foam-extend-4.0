@@ -35,7 +35,7 @@ Description
     - interpolates the displacement of all points based on the
       faceZone motion.
 
-    Tables are in the <verbatim>constant/tables</verbatim> directory.
+    Tables are in the @a constant/tables directory.
 
 Note
     could be a motionSolver - does not use any fvMesh structure.
@@ -48,7 +48,7 @@ SourceFiles
 #ifndef displacementInterpolationFvMotionSolver_H
 #define displacementInterpolationFvMotionSolver_H
 
-#include "fvMotionSolver.H"
+#include "displacementFvMotionSolver.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -61,12 +61,9 @@ namespace Foam
 
 class displacementInterpolationFvMotionSolver
 :
-    public fvMotionSolver
+    public displacementFvMotionSolver
 {
     // Private data
-
-        //- Reference point field
-        pointField points0_;
 
         //- Additional settings for motion solver
         dictionary dynamicMeshCoeffs_;
@@ -115,10 +112,11 @@ public:
 
     // Constructors
 
+        //- Construct from polyMesh and data stream
         displacementInterpolationFvMotionSolver
         (
-            const polyMesh& mesh,
-            Istream& msData
+            const polyMesh&,
+            Istream& msDataUnused
         );
 
 
@@ -129,21 +127,12 @@ public:
 
     // Member Functions
 
-        //- Return reference to the reference field
-        const pointField& points0() const
-        {
-            return points0_;
-        }
-
         //- Return point location obtained from the current motion field
         virtual tmp<pointField> curPoints() const;
 
         //- Solve for motion
         virtual void solve()
         {}
-
-        //- Update topology
-        virtual void updateMesh(const mapPolyMesh&);
 };
 
 

@@ -26,7 +26,7 @@ License
 
 #include "inverseFaceDistanceDiffusivity.H"
 #include "addToRunTimeSelectionTable.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "wallPoint.H"
 #include "MeshWave.H"
 
@@ -98,7 +98,7 @@ void Foam::inverseFaceDistanceDiffusivity::correct()
         const polyPatch& patch = bdry[iter.key()];
 
         const vectorField::subField fc = patch.faceCentres();
-        
+
         forAll(fc, patchFaceI)
         {
             changedFaces[nPatchFaces] = patch.start() + patchFaceI;
@@ -134,7 +134,7 @@ void Foam::inverseFaceDistanceDiffusivity::correct()
         fvsPatchScalarField& bfld = faceDiffusivity_.boundaryField()[patchI];
 
         const unallocLabelList& faceCells = bfld.patch().faceCells();
-        
+
         if (patchSet.found(patchI))
         {
             forAll(bfld, i)

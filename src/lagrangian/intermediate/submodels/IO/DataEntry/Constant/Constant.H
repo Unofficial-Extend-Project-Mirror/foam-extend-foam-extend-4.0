@@ -28,12 +28,9 @@ Class
 Description
     Templated basic entry that holds a constant value.
 
+    Usage - for entry <entryName> having the value <value>:
     @verbatim
-        entry                    Constant
-        entryCoeffs
-        {
-            value                100.0; // Constant value
-        }
+        <entryName>    constant  <value>
     @endverbatim
 
 SourceFiles
@@ -51,6 +48,16 @@ SourceFiles
 namespace Foam
 {
 
+template<class Type>
+class Constant;
+
+template<class Type>
+Ostream& operator<<
+(
+    Ostream&,
+    const Constant<Type>&
+);
+
 /*---------------------------------------------------------------------------*\
                            Class Constant Declaration
 \*---------------------------------------------------------------------------*/
@@ -62,13 +69,11 @@ class Constant
 {
     // Private data
 
+        //- Constant value
         Type value_;
 
 
     // Private Member Functions
-
-        //- Disallow default bitwise copy construct
-        Constant(const Constant<Type>&);
 
         //- Disallow default bitwise assignment
         void operator=(const Constant<Type>&);
@@ -77,22 +82,20 @@ class Constant
 public:
 
     // Runtime type information
-    TypeName("Constant");
+    TypeName("constant");
 
 
     // Constructors
 
-        //- Construct from dictionary
-        Constant
-        (
-            const word& entryName,
-            const dictionary& dict
-        );
+        //- Construct from entry name and Istream
+        Constant(const word& entryName, Istream& is);
+
+        //- Copy constructor
+        Constant(const Constant<Type>& cnst);
 
 
     //- Destructor
-
-        ~Constant();
+    virtual ~Constant();
 
 
     // Member Functions
@@ -102,16 +105,24 @@ public:
 
         //- Integrate between two values
         Type integrate(const scalar x1, const scalar x2) const;
+
+
+    //- Ostream Operator
+    friend Ostream& operator<< <Type>
+    (
+        Ostream&,
+        const Constant<Type>&
+    );
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<>
-Constant<label>::Constant(const word& entryName, const dictionary& dict);
+Constant<label>::Constant(const word& entryName, Istream& is);
 
 template<>
-Constant<scalar>::Constant(const word& entryName, const dictionary& dict);
+Constant<scalar>::Constant(const word& entryName, Istream& is);
 
 
 } // End namespace Foam

@@ -35,27 +35,24 @@ Foam::autoPtr<Foam::DataEntry<Type> > Foam::DataEntry<Type>::New
     const dictionary& dict
 )
 {
-    word DataEntryType(dict.lookup(entryName));
+    Istream& is(dict.lookup(entryName));
 
-    //    Info<< "Selecting DataEntry " << DataEntryType << endl;
+    word DataEntryType(is);
 
     typename dictionaryConstructorTable::iterator cstrIter =
         dictionaryConstructorTablePtr_->find(DataEntryType);
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "DataEntry<Type>::New(const dictionary&"
-        )   << "Unknown DataEntry type "
-            << DataEntryType << " for " << entryName
-            << ", constructor not in hash table" << nl << nl
-            << "    Valid DataEntry types are :" << nl
+        FatalErrorIn("DataEntry<Type>::New(Istream&)")
+            << "Unknown DataEntry type " << DataEntryType << " for DataEntry "
+            << entryName << ". Constructor not in hash table" << nl << nl
+            << "    Valid DataEntry types are:" << nl
             << dictionaryConstructorTablePtr_->toc() << nl
             << exit(FatalError);
     }
 
-    return autoPtr<DataEntry<Type> >(cstrIter()(entryName, dict));
+    return autoPtr<DataEntry<Type> >(cstrIter()(entryName, is));
 }
 
 

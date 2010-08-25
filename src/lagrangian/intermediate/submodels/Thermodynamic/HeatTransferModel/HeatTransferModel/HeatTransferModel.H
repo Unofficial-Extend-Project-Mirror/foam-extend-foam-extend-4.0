@@ -25,7 +25,6 @@ License
 Class
     Foam::HeatTransferModel
 
-
 Description
     Templated heat transfer model class
 
@@ -54,7 +53,6 @@ namespace Foam
 template<class CloudType>
 class HeatTransferModel
 {
-
     // Private data
 
         //- The cloud dictionary
@@ -63,8 +61,11 @@ class HeatTransferModel
         //- Reference to the owner cloud class
         CloudType& owner_;
 
-        //- The coefficents dictionary
+        //- The coefficients dictionary
         const dictionary coeffDict_;
+
+        //- Apply Bird's correction to the htc
+        const Switch BirdCorrection_;
 
 
 public:
@@ -88,6 +89,9 @@ public:
 
     // Constructors
 
+        //- Construct null from owner
+        HeatTransferModel(CloudType& owner);
+
         //- Construct from dictionary
         HeatTransferModel
         (
@@ -97,70 +101,56 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~HeatTransferModel();
-
-
-    // Selector
-
-        static autoPtr<HeatTransferModel<CloudType> > New
-        (
-            const dictionary& dict,
-            CloudType& owner
-        );
+    //- Destructor
+    virtual ~HeatTransferModel();
 
 
-    // Access
-
-        //- Return the cloud dictionary
-        const dictionary& dict() const;
-
-        //- Return the coefficients dictionary
-        const dictionary& coeffDict() const;
-
-        //- Return the owner cloud object
-        const CloudType& owner() const;
+    //- Selector
+    static autoPtr<HeatTransferModel<CloudType> > New
+    (
+        const dictionary& dict,
+        CloudType& owner
+    );
 
 
     // Member Functions
 
-        //- Flag to indicate whether model activates heat transfer model
-        virtual bool active() const = 0;
+        // Access
 
-        //- Nusselt number
-        virtual scalar Nu
-        (
-            const scalar Re,
-            const scalar Pr
-        ) const = 0;
+            //- Return the cloud dictionary
+            const dictionary& dict() const;
 
-        //- Prandtl number
-        virtual scalar Pr() const = 0;
+            //- Return the coefficients dictionary
+            const dictionary& coeffDict() const;
 
-        //- Return heat transfer coefficient
-        scalar h
-        (
-            const scalar dp,
-            const vector& Ur,
-            const scalar rhoc,
-            const scalar rhop,
-            const scalar cpc,
-            const scalar cpp,
-            const scalar muc
-        ) const;
+            //- Return the owner cloud object
+            const CloudType& owner() const;
 
-        //- Return linearised coefficient for temperature equation
-        scalar Cu
-        (
-            const scalar dp,
-            const vector& Ur,
-            const scalar rhoc,
-            const scalar rhop,
-            const scalar cpc,
-            const scalar cpp,
-            const scalar muc
-        ) const;
+            //- Return the Bird htc correction flag
+            const Switch& BirdCorrection() const;
+
+            //- Flag to indicate whether model activates heat transfer model
+            virtual bool active() const = 0;
+
+
+        // Evaluation
+
+            //- Nusselt number
+            virtual scalar Nu
+            (
+                const scalar Re,
+                const scalar Pr
+            ) const = 0;
+
+            //- Return heat transfer coefficient
+            virtual scalar htc
+            (
+                const scalar dp,
+                const scalar Re,
+                const scalar Pr,
+                const scalar kappa,
+                const scalar NCpW
+            ) const;
 };
 
 
@@ -188,6 +178,20 @@ public:
     HeatTransferModel<CloudType<ParcelType> >::                               \
         adddictionaryConstructorToTable<SS<CloudType<ParcelType> > >          \
             add##SS##CloudType##ParcelType##ConstructorToTable_;
+
+
+#define makeHeatTransferModelThermoType(SS, CloudType, ParcelType, ThermoType)\
+                                                                              \
+    defineNamedTemplateTypeNameAndDebug                                       \
+    (                                                                         \
+        SS<CloudType<ParcelType<ThermoType> > >,                              \
+        0                                                                     \
+    );                                                                        \
+                                                                              \
+    HeatTransferModel<CloudType<ParcelType<ThermoType> > >::                  \
+        adddictionaryConstructorToTable                                       \
+            <SS<CloudType<ParcelType<ThermoType> > > >                        \
+            add##SS##CloudType##ParcelType##ThermoType##ConstructorToTable_;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

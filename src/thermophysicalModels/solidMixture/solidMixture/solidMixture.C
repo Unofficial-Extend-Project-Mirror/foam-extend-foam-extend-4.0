@@ -34,7 +34,7 @@ Foam::solidMixture::solidMixture
     const dictionary& thermophysicalProperties
 )
 :
-    components_(thermophysicalProperties.lookup("solidFuelComponents")),
+    components_(thermophysicalProperties.lookup("solidComponents")),
     properties_(components_.size())
 {
 

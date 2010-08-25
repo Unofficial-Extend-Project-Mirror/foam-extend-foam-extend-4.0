@@ -2,25 +2,25 @@
 
 List< scalarField > allSpeciesN_RU
 (
-    molecules.pairPotentials().nIds(),
+    molecules.potential().nIds(),
     scalarField (mesh.nCells(), 0.0)
 );
 
 List< scalarField > allSpeciesM_RU
 (
-    molecules.pairPotentials().nIds(),
+    molecules.potential().nIds(),
     scalarField (mesh.nCells(), 0.0)
 );
 
 List< vectorField > allSpeciesVelocitySum_RU
 (
-    molecules.pairPotentials().nIds(),
+    molecules.potential().nIds(),
     vectorField (mesh.nCells(), vector::zero)
 );
 
 List< scalarField > allSpeciesVelocityMagSquaredSum_RU
 (
-    molecules.pairPotentials().nIds(),
+    molecules.potential().nIds(),
     scalarField (mesh.nCells(), 0.0)
 );
 
@@ -34,13 +34,13 @@ Info << nl << "Creating fields." << endl;
 
 PtrList<volScalarField> allSpeciesRhoN
 (
-    molecules.pairPotentials().nIds()
+    molecules.potential().nIds()
 );
 
 forAll (allSpeciesRhoN, rN)
 {
     Info << "    Creating number density field for "
-        << molecules.pairPotentials().idList()[rN] << endl;
+        << molecules.potential().idList()[rN] << endl;
 
     allSpeciesRhoN.set
     (
@@ -49,7 +49,7 @@ forAll (allSpeciesRhoN, rN)
         (
             IOobject
             (
-                "rhoN_" + molecules.pairPotentials().idList()[rN],
+                "rhoN_" + molecules.potential().idList()[rN],
                 runTime.timeName(),
                 mesh,
                 IOobject::NO_READ,
@@ -89,13 +89,13 @@ totalRhoN.correctBoundaryConditions();
 
 PtrList<volScalarField> allSpeciesRhoM
 (
-    molecules.pairPotentials().nIds()
+    molecules.potential().nIds()
 );
 
 forAll (allSpeciesRhoM, rM)
 {
     Info << "    Creating mass density field for "
-        << molecules.pairPotentials().idList()[rM] << endl;
+        << molecules.potential().idList()[rM] << endl;
 
     allSpeciesRhoM.set
     (
@@ -104,7 +104,7 @@ forAll (allSpeciesRhoM, rM)
         (
             IOobject
             (
-                "rhoM_" + molecules.pairPotentials().idList()[rM],
+                "rhoM_" + molecules.potential().idList()[rM],
                 runTime.timeName(),
                 mesh,
                 IOobject::NO_READ,
@@ -144,13 +144,13 @@ totalRhoM.correctBoundaryConditions();
 
 PtrList<volVectorField> allSpeciesVelocity
 (
-    molecules.pairPotentials().nIds()
+    molecules.potential().nIds()
 );
 
 forAll (allSpeciesVelocity, v)
 {
     Info << "    Creating velocity field for "
-        << molecules.pairPotentials().idList()[v] << endl;
+        << molecules.potential().idList()[v] << endl;
 
     allSpeciesVelocity.set
     (
@@ -159,7 +159,7 @@ forAll (allSpeciesVelocity, v)
         (
             IOobject
             (
-                "velocity_" + molecules.pairPotentials().idList()[v],
+                "velocity_" + molecules.potential().idList()[v],
                 runTime.timeName(),
                 mesh,
                 IOobject::NO_READ,
@@ -218,13 +218,13 @@ volVectorField totalVelocity
 
 PtrList<volScalarField> allSpeciesTemperature
 (
-    molecules.pairPotentials().nIds()
+    molecules.potential().nIds()
 );
 
 forAll (allSpeciesTemperature, t)
 {
     Info << "    Creating temperature field for "
-        << molecules.pairPotentials().idList()[t] << endl;
+        << molecules.potential().idList()[t] << endl;
 
     allSpeciesTemperature.set
     (
@@ -233,7 +233,7 @@ forAll (allSpeciesTemperature, t)
         (
             IOobject
             (
-                "temperature_" + molecules.pairPotentials().idList()[t],
+                "temperature_" + molecules.potential().idList()[t],
                 runTime.timeName(),
                 mesh,
                 IOobject::NO_READ,
@@ -274,13 +274,13 @@ totalTemperature.correctBoundaryConditions();
 
 PtrList<volScalarField> allSpeciesMeanKE
 (
-    molecules.pairPotentials().nIds()
+    molecules.potential().nIds()
 );
 
 forAll (allSpeciesMeanKE, mKE)
 {
     Info << "    Creating mean kinetic energy field for "
-        << molecules.pairPotentials().idList()[mKE] << endl;
+        << molecules.potential().idList()[mKE] << endl;
 
     allSpeciesMeanKE.set
     (
@@ -289,7 +289,7 @@ forAll (allSpeciesMeanKE, mKE)
         (
             IOobject
             (
-                "meanKE_" + molecules.pairPotentials().idList()[mKE],
+                "meanKE_" + molecules.potential().idList()[mKE],
                 runTime.timeName(),
                 mesh,
                 IOobject::NO_READ,

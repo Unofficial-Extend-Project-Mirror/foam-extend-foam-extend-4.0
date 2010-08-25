@@ -26,6 +26,22 @@ License
 
 #include "KinematicParcel.H"
 #include "IOstreams.H"
+#include "IOField.H"
+#include "Cloud.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+template <class ParcelType>
+Foam::string Foam::KinematicParcel<ParcelType>::propHeader =
+    Particle<ParcelType>::propHeader
+  + " typeId"
+  + " nParticle"
+  + " d"
+  + " (Ux Uy Uz)"
+  + " rho"
+  + " tTurb"
+  + " (UTurbx UTurby UTurbz)";
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -39,9 +55,9 @@ Foam::KinematicParcel<ParcelType>::KinematicParcel
 :
     Particle<ParcelType>(cloud, is, readFields),
     typeId_(0),
+    nParticle_(0.0),
     d_(0.0),
     U_(vector::zero),
-    nParticle_(0.0),
     rho_(0.0),
     tTurb_(0.0),
     UTurb_(vector::zero),
@@ -54,9 +70,9 @@ Foam::KinematicParcel<ParcelType>::KinematicParcel
         if (is.format() == IOstream::ASCII)
         {
             typeId_ = readLabel(is);
+            nParticle_ = readScalar(is);
             d_ = readScalar(is);
             is >> U_;
-            nParticle_ = readScalar(is);
             rho_ = readScalar(is);
             tTurb_ = readScalar(is);
             is >> UTurb_;
@@ -67,9 +83,9 @@ Foam::KinematicParcel<ParcelType>::KinematicParcel
             (
                 reinterpret_cast<char*>(&typeId_),
                 sizeof(typeId_)
+              + sizeof(nParticle_)
               + sizeof(d_)
               + sizeof(U_)
-              + sizeof(nParticle_)
               + sizeof(rho_)
               + sizeof(tTurb_)
               + sizeof(UTurb_)
@@ -87,35 +103,35 @@ Foam::KinematicParcel<ParcelType>::KinematicParcel
 
 
 template<class ParcelType>
-void Foam::KinematicParcel<ParcelType>::readFields
-(
-    KinematicCloud<ParcelType>& c
-)
+void Foam::KinematicParcel<ParcelType>::readFields(Cloud<ParcelType>& c)
 {
     if (!c.size())
     {
         return;
     }
 
-    IOField<label> typeId(c.fieldIOobject("typeId"));
+    Particle<ParcelType>::readFields(c);
+
+    IOField<label> typeId(c.fieldIOobject("typeId", IOobject::MUST_READ));
     c.checkFieldIOobject(c, typeId);
 
-    IOField<scalar> d(c.fieldIOobject("d"));
-    c.checkFieldIOobject(c, d);
-
-    IOField<vector> U(c.fieldIOobject("U"));
-    c.checkFieldIOobject(c, U);
-
-    IOField<scalar> nParticle(c.fieldIOobject("nParticle"));
+    IOField<scalar>
+        nParticle(c.fieldIOobject("nParticle", IOobject::MUST_READ));
     c.checkFieldIOobject(c, nParticle);
 
-    IOField<scalar> rho(c.fieldIOobject("rho"));
+    IOField<scalar> d(c.fieldIOobject("d", IOobject::MUST_READ));
+    c.checkFieldIOobject(c, d);
+
+    IOField<vector> U(c.fieldIOobject("U", IOobject::MUST_READ));
+    c.checkFieldIOobject(c, U);
+
+    IOField<scalar> rho(c.fieldIOobject("rho", IOobject::MUST_READ));
     c.checkFieldIOobject(c, rho);
 
-    IOField<scalar> tTurb(c.fieldIOobject("tTurb"));
+    IOField<scalar> tTurb(c.fieldIOobject("tTurb", IOobject::MUST_READ));
     c.checkFieldIOobject(c, tTurb);
 
-    IOField<vector> UTurb(c.fieldIOobject("UTurb"));
+    IOField<vector> UTurb(c.fieldIOobject("UTurb", IOobject::MUST_READ));
     c.checkFieldIOobject(c, UTurb);
 
     label i = 0;
@@ -124,9 +140,9 @@ void Foam::KinematicParcel<ParcelType>::readFields
         ParcelType& p = iter();
 
         p.typeId_ = typeId[i];
+        p.nParticle_ = nParticle[i];
         p.d_ = d[i];
         p.U_ = U[i];
-        p.nParticle_ = nParticle[i];
         p.rho_ = rho[i];
         p.tTurb_ = tTurb[i];
         p.UTurb_ = UTurb[i];
@@ -136,22 +152,23 @@ void Foam::KinematicParcel<ParcelType>::readFields
 
 
 template<class ParcelType>
-void Foam::KinematicParcel<ParcelType>::writeFields
-(
-    const KinematicCloud<ParcelType>& c
-)
+void Foam::KinematicParcel<ParcelType>::writeFields(const Cloud<ParcelType>& c)
 {
     Particle<ParcelType>::writeFields(c);
 
     label np =  c.size();
 
-    IOField<label> typeId(c.fieldIOobject("typeId"), np);
-    IOField<scalar> d(c.fieldIOobject("d"), np);
-    IOField<vector> U(c.fieldIOobject("U"), np);
-    IOField<scalar> nParticle(c.fieldIOobject("nParticle"), np);
-    IOField<scalar> rho(c.fieldIOobject("rho"), np);
-    IOField<scalar> tTurb(c.fieldIOobject("tTurb"), np);
-    IOField<vector> UTurb(c.fieldIOobject("UTurb"), np);
+    IOField<label> typeId(c.fieldIOobject("typeId", IOobject::NO_READ), np);
+    IOField<scalar> nParticle
+    (
+        c.fieldIOobject("nParticle", IOobject::NO_READ),
+        np
+    );
+    IOField<scalar> d(c.fieldIOobject("d", IOobject::NO_READ), np);
+    IOField<vector> U(c.fieldIOobject("U", IOobject::NO_READ), np);
+    IOField<scalar> rho(c.fieldIOobject("rho", IOobject::NO_READ), np);
+    IOField<scalar> tTurb(c.fieldIOobject("tTurb", IOobject::NO_READ), np);
+    IOField<vector> UTurb(c.fieldIOobject("UTurb", IOobject::NO_READ), np);
 
     label i = 0;
     forAllConstIter(typename Cloud<ParcelType>, c, iter)
@@ -159,9 +176,9 @@ void Foam::KinematicParcel<ParcelType>::writeFields
         const KinematicParcel<ParcelType>& p = iter();
 
         typeId[i] = p.typeId();
+        nParticle[i] = p.nParticle();
         d[i] = p.d();
         U[i] = p.U();
-        nParticle[i] = p.nParticle();
         rho[i] = p.rho();
         tTurb[i] = p.tTurb();
         UTurb[i] = p.UTurb();
@@ -169,9 +186,9 @@ void Foam::KinematicParcel<ParcelType>::writeFields
     }
 
     typeId.write();
+    nParticle.write();
     d.write();
     U.write();
-    nParticle.write();
     rho.write();
     tTurb.write();
     UTurb.write();
@@ -189,25 +206,25 @@ Foam::Ostream& Foam::operator<<
 {
     if (os.format() == IOstream::ASCII)
     {
-        os  << static_cast<const Particle<ParcelType>& >(p)
+        os  << static_cast<const Particle<ParcelType>&>(p)
             << token::SPACE << p.typeId()
+            << token::SPACE << p.nParticle()
             << token::SPACE << p.d()
             << token::SPACE << p.U()
-            << token::SPACE << p.nParticle()
             << token::SPACE << p.rho()
             << token::SPACE << p.tTurb()
             << token::SPACE << p.UTurb();
     }
     else
     {
-        os  << static_cast<const Particle<ParcelType>& >(p);
+        os  << static_cast<const Particle<ParcelType>&>(p);
         os.write
         (
             reinterpret_cast<const char*>(&p.typeId_),
             sizeof(p.typeId())
+          + sizeof(p.nParticle())
           + sizeof(p.d())
           + sizeof(p.U())
-          + sizeof(p.nParticle())
           + sizeof(p.rho())
           + sizeof(p.tTurb())
           + sizeof(p.UTurb())

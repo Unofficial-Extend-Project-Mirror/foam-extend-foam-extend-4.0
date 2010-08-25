@@ -45,8 +45,6 @@ addToRunTimeSelectionTable
     dictionary
 );
 
-// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
-
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -73,33 +71,41 @@ restrainedHarmonicSpring::restrainedHarmonicSpring
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-scalar restrainedHarmonicSpring::energy(const scalar r) const
+scalar restrainedHarmonicSpring::energy(const vector r) const
 {
-    if (r < rR_)
+    scalar magR = mag(r);
+
+    if (magR < rR_)
     {
-        return 0.5 * springConstant_ * r * r;
+        return 0.5 * springConstant_ * magSqr(r);
     }
     else
     {
         return 0.5 * springConstant_ * rR_ * rR_
-            + springConstant_ * rR_ * (r - rR_);
+          + springConstant_ * rR_ * (magR - rR_);
     }
 }
 
-scalar restrainedHarmonicSpring::force(const scalar r) const
+
+vector restrainedHarmonicSpring::force(const vector r) const
 {
-    if (r < rR_)
+    scalar magR = mag(r);
+
+    if (magR < rR_)
     {
         return -springConstant_ * r;
     }
     else
     {
-        return -springConstant_ * rR_;
+        return -springConstant_ * rR_ * r / magR;
     }
-    
 }
 
-bool restrainedHarmonicSpring::read(const dictionary& tetherPotentialProperties)
+
+bool restrainedHarmonicSpring::read
+(
+    const dictionary& tetherPotentialProperties
+)
 {
     tetherPotential::read(tetherPotentialProperties);
 
@@ -108,7 +114,7 @@ bool restrainedHarmonicSpring::read(const dictionary& tetherPotentialProperties)
 
     restrainedHarmonicSpringCoeffs_.lookup("springConstant") >> springConstant_;
     restrainedHarmonicSpringCoeffs_.lookup("rR") >> rR_;
-    
+
     return true;
 }
 

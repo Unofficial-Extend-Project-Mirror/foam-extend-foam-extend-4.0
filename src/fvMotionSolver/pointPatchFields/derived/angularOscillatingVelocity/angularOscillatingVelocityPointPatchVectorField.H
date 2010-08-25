@@ -23,9 +23,10 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    angularOscillatingVelocityPointPatchVectorField
+    Foam::angularOscillatingVelocityPointPatchVectorField
 
 Description
+    Foam::angularOscillatingVelocityPointPatchVectorField
 
 SourceFiles
     angularOscillatingVelocityPointPatchVectorField.C
@@ -35,7 +36,7 @@ SourceFiles
 #ifndef angularOscillatingVelocityPointPatchVectorField_H
 #define angularOscillatingVelocityPointPatchVectorField_H
 
-#include "fixedValuePointPatchFields.H"
+#include "fixedValuePointPatchField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,14 +49,7 @@ namespace Foam
 
 class angularOscillatingVelocityPointPatchVectorField
 :
-    public FixedValuePointPatchField
-    <
-        pointPatchField,
-        pointMesh,
-        pointPatch,
-        DummyMatrix,
-        vector
-    >
+    public fixedValuePointPatchField<vector>
 {
     // Private data
 
@@ -97,7 +91,7 @@ public:
             const angularOscillatingVelocityPointPatchVectorField&,
             const pointPatch&,
             const DimensionedField<vector, pointMesh>&,
-            const PointPatchFieldMapper&
+            const pointPatchFieldMapper&
         );
 
         //- Construct and return a clone
@@ -105,7 +99,10 @@ public:
         {
             return autoPtr<pointPatchField<vector> >
             (
-                new angularOscillatingVelocityPointPatchVectorField(*this)
+                new angularOscillatingVelocityPointPatchVectorField
+                (
+                    *this
+                )
             );
         }
 
@@ -124,12 +121,32 @@ public:
         {
             return autoPtr<pointPatchField<vector> >
             (
-                new angularOscillatingVelocityPointPatchVectorField(*this, iF)
+                new angularOscillatingVelocityPointPatchVectorField
+                (
+                    *this,
+                    iF
+                )
             );
         }
 
 
     // Member functions
+
+        // Mapping functions
+
+            //- Map (and resize as needed) from self given a mapping object
+            virtual void autoMap
+            (
+                const pointPatchFieldMapper&
+            );
+
+            //- Reverse map the given pointPatchField onto this pointPatchField
+            virtual void rmap
+            (
+                const pointPatchField<vector>&,
+                const labelList&
+            );
+
 
         // Evaluation functions
 

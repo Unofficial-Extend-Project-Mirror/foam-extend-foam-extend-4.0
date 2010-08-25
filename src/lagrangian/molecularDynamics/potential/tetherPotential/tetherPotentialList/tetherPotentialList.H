@@ -35,6 +35,7 @@ SourceFiles
 #ifndef tetherPotentialList_H
 #define tetherPotentialList_H
 
+#include "ListOps.H"
 #include "PtrList.H"
 #include "word.H"
 #include "tetherPotential.H"
@@ -56,6 +57,7 @@ class tetherPotentialList
 
         List<label> idMap_;
 
+
     // Private Member Functions
 
         inline label tetherPotentialIndex
@@ -65,9 +67,9 @@ class tetherPotentialList
 
         void readTetherPotentialDict
         (
+            const List<word>& siteIdList,
             const dictionary& tetherPotentialDict,
-            const List<word>& idList,
-            const List<label>& tetherIds
+            const List<word>& tetherSiteIdList
         );
 
         //- Disallow default bitwise assignment
@@ -83,47 +85,38 @@ public:
 
         tetherPotentialList();
 
-        //- Construct from idList and potental dictionaries
+        //- Construct from siteIdList and potental dictionaries
         tetherPotentialList
         (
-            const dictionary& idListDict,
+            const List<word>& siteIdList,
             const dictionary& tetherPotentialDict,
-            const List<label>& tetherIds
+            const List<word>& tetherSiteIdList
         );
+
 
     // Destructor
 
         ~tetherPotentialList();
 
+
     // Member Functions
 
         void buildPotentials
         (
-            const dictionary& idListDict,
+            const List<word>& siteIdList,
             const dictionary& tetherPotentialDict,
-            const List<label>& tetherIds
+            const List<word>& tetherSiteIdList
         );
 
         // Access
 
             inline const List<word>& idMap() const;
 
-            const tetherPotential& tetherPotentialFunction
-            (
-                const label a
-            ) const;
+            const tetherPotential& tetherPotentialFunction(const label a) const;
 
-            scalar force
-            (
-                const label a,
-                const scalar rIJMag
-            ) const;
+            vector force(const label a, const vector rIT) const;
 
-            scalar energy
-            (
-                const label a,
-                const scalar rIJMag
-            ) const;
+            scalar energy (const label a, const vector rIT) const;
 };
 
 

@@ -31,6 +31,7 @@ License
 #include "OFstream.H"
 #include "meshTools.H"
 #include "mapPolyMesh.H"
+#include "volPointInterpolation.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -52,26 +53,10 @@ namespace Foam
 Foam::displacementLaplacianFvMotionSolver::displacementLaplacianFvMotionSolver
 (
     const polyMesh& mesh,
-    Istream& msData
+    Istream& is
 )
 :
-    fvMotionSolver(mesh),
-    points0_
-    (
-        pointIOField
-        (
-            IOobject
-            (
-                "points",
-                time().constant(),
-                polyMesh::meshSubDir,
-                mesh,
-                IOobject::MUST_READ,
-                IOobject::NO_WRITE,
-                false
-            )
-        )
-    ),
+    displacementFvMotionSolver(mesh, is),
     pointDisplacement_
     (
         IOobject
@@ -82,7 +67,7 @@ Foam::displacementLaplacianFvMotionSolver::displacementLaplacianFvMotionSolver
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        pointMesh_
+        pointMesh::New(fvMesh_)
     ),
     cellDisplacement_
     (
@@ -139,7 +124,7 @@ Foam::displacementLaplacianFvMotionSolver::displacementLaplacianFvMotionSolver
             new pointVectorField
             (
                 io,
-                pointMesh_
+                pointMesh::New(fvMesh_)
             )
         );
 
@@ -165,10 +150,14 @@ Foam::displacementLaplacianFvMotionSolver::
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::tmp<Foam::pointField> 
+Foam::tmp<Foam::pointField>
 Foam::displacementLaplacianFvMotionSolver::curPoints() const
 {
-    vpi_.interpolate(cellDisplacement_, pointDisplacement_);
+    volPointInterpolation::New(fvMesh_).interpolate
+    (
+        cellDisplacement_,
+        pointDisplacement_
+    );
 
     if (pointLocation_.valid())
     {
@@ -181,7 +170,7 @@ Foam::displacementLaplacianFvMotionSolver::curPoints() const
         }
 
         pointLocation_().internalField() =
-            points0_
+            points0()
           + pointDisplacement_.internalField();
 
         pointLocation_().correctBoundaryConditions();
@@ -193,7 +182,7 @@ Foam::displacementLaplacianFvMotionSolver::curPoints() const
 
             forAll(pz, i)
             {
-                pointLocation_()[pz[i]] = points0_[pz[i]];
+                pointLocation_()[pz[i]] = points0()[pz[i]];
             }
         }
 
@@ -205,7 +194,7 @@ Foam::displacementLaplacianFvMotionSolver::curPoints() const
     {
         tmp<pointField> tcurPoints
         (
-            points0_ + pointDisplacement_.internalField()
+            points0() + pointDisplacement_.internalField()
         );
 
         // Implement frozen points
@@ -215,7 +204,7 @@ Foam::displacementLaplacianFvMotionSolver::curPoints() const
 
             forAll(pz, i)
             {
-                tcurPoints()[pz[i]] = points0_[pz[i]];
+                tcurPoints()[pz[i]] = points0()[pz[i]];
             }
         }
 
@@ -252,78 +241,7 @@ void Foam::displacementLaplacianFvMotionSolver::updateMesh
     const mapPolyMesh& mpm
 )
 {
-    fvMotionSolver::updateMesh(mpm);
-
-    // Map points0_. Bit special since we somehow have to come up with
-    // a sensible points0 position for introduced points.
-    // Find out scaling between points0 and current points
-
-    // Get the new points either from the map or the mesh
-    const pointField& points =
-    (
-        mpm.hasMotionPoints()
-      ? mpm.preMotionPoints()
-      : fvMesh_.points()
-    );
-
-    // Note: boundBox does reduce
-    const boundBox bb0(points0_, true);
-    const vector span0(bb0.max()-bb0.min());
-    const boundBox bb(points, true);
-    const vector span(bb.max()-bb.min());
-
-    vector scaleFactors(cmptDivide(span0, span));
-
-    pointField newPoints0(mpm.pointMap().size());
-
-    forAll(newPoints0, pointI)
-    {
-        label oldPointI = mpm.pointMap()[pointI];
-    
-        if (oldPointI >= 0)
-        {
-            label masterPointI = mpm.reversePointMap()[oldPointI];
-
-            if (masterPointI == pointI)
-            {
-                newPoints0[pointI] = points0_[oldPointI];
-            }
-            else
-            {
-                // New point. Assume motion is scaling.
-                newPoints0[pointI] =
-                    points0_[oldPointI]
-                  + cmptMultiply
-                    (
-                        scaleFactors,
-                        points[pointI]-points[masterPointI]
-                    );
-            }
-        }
-        else
-        {
-            FatalErrorIn
-            (
-                "displacementLaplacianFvMotionSolver::updateMesh"
-                "(const mapPolyMesh& mpm)"
-            )   << "Cannot work out coordinates of introduced vertices."
-                << " New vertex " << pointI << " at coordinate "
-                << points[pointI] << exit(FatalError);
-        }
-    }
-    points0_.transfer(newPoints0);
-
-    if (debug & 2)
-    {
-        OFstream str(time().timePath()/"points0.obj");
-        Pout<< "displacementLaplacianFvMotionSolver :"
-            << " Writing points0_ to " << str.name() << endl;
-
-        forAll(points0_, pointI)
-        {
-            meshTools::writeOBJ(str, points0_[pointI]);
-        }
-    }
+    displacementFvMotionSolver::updateMesh(mpm);
 
     // Update diffusivity. Note two stage to make sure old one is de-registered
     // before creating/registering new one.

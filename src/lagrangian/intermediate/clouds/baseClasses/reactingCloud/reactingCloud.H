@@ -29,13 +29,14 @@ Description
     Virtual abstract base class for templated ReactingCloud
 
 SourceFiles
+    reactingCloud.C
 
 \*---------------------------------------------------------------------------*/
 
 #ifndef reactingCloud_H
 #define reactingCloud_H
 
-#include "volFields.H"
+#include "typeInfo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,7 +49,6 @@ namespace Foam
 
 class reactingCloud
 {
-
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -69,14 +69,8 @@ public:
         reactingCloud();
 
 
-    // Destructors
-
-        virtual ~reactingCloud();
-
-
-    // Member Functions
-
-        // Access
+    //- Destructor
+    virtual ~reactingCloud();
 };
 
 

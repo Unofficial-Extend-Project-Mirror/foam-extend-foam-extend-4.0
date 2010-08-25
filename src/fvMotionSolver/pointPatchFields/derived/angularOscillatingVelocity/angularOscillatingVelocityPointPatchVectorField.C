@@ -44,7 +44,7 @@ angularOscillatingVelocityPointPatchVectorField
     const DimensionedField<vector, pointMesh>& iF
 )
 :
-    fixedValuePointPatchVectorField(p, iF),
+    fixedValuePointPatchField<vector>(p, iF),
     axis_(vector::zero),
     origin_(vector::zero),
     angle0_(0.0),
@@ -62,7 +62,7 @@ angularOscillatingVelocityPointPatchVectorField
     const dictionary& dict
 )
 :
-    fixedValuePointPatchVectorField(p, iF, dict),
+    fixedValuePointPatchField<vector>(p, iF, dict),
     axis_(dict.lookup("axis")),
     origin_(dict.lookup("origin")),
     angle0_(readScalar(dict.lookup("angle0"))),
@@ -91,10 +91,10 @@ angularOscillatingVelocityPointPatchVectorField
     const angularOscillatingVelocityPointPatchVectorField& ptf,
     const pointPatch& p,
     const DimensionedField<vector, pointMesh>& iF,
-    const PointPatchFieldMapper& mapper
+    const pointPatchFieldMapper& mapper
 )
 :
-    fixedValuePointPatchVectorField(ptf, p, iF, mapper),
+    fixedValuePointPatchField<vector>(ptf, p, iF, mapper),
     axis_(ptf.axis_),
     origin_(ptf.origin_),
     angle0_(ptf.angle0_),
@@ -111,7 +111,7 @@ angularOscillatingVelocityPointPatchVectorField
     const DimensionedField<vector, pointMesh>& iF
 )
 :
-    fixedValuePointPatchVectorField(ptf, iF),
+    fixedValuePointPatchField<vector>(ptf, iF),
     axis_(ptf.axis_),
     origin_(ptf.origin_),
     angle0_(ptf.angle0_),
@@ -122,6 +122,32 @@ angularOscillatingVelocityPointPatchVectorField
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void angularOscillatingVelocityPointPatchVectorField::autoMap
+(
+    const pointPatchFieldMapper& m
+)
+{
+    fixedValuePointPatchField<vector>::autoMap(m);
+
+    p0_.autoMap(m);
+}
+
+
+void angularOscillatingVelocityPointPatchVectorField::rmap
+(
+    const pointPatchField<vector>& ptf,
+    const labelList& addr
+)
+{
+    const angularOscillatingVelocityPointPatchVectorField& aOVptf =
+        refCast<const angularOscillatingVelocityPointPatchVectorField>(ptf);
+
+    fixedValuePointPatchField<vector>::rmap(aOVptf, addr);
+
+    p0_.rmap(aOVptf.p0_, addr);
+}
+
 
 void angularOscillatingVelocityPointPatchVectorField::updateCoeffs()
 {
@@ -146,10 +172,10 @@ void angularOscillatingVelocityPointPatchVectorField::updateCoeffs()
           + (axisHat ^ p0Rel*sin(angle))
           + (axisHat & p0Rel)*(1 - cos(angle))*axisHat
           - p.localPoints()
-        )/t.deltaT().value()
+        )/t.deltaTValue()
     );
 
-    fixedValuePointPatchVectorField::updateCoeffs();
+    fixedValuePointPatchField<vector>::updateCoeffs();
 }
 
 

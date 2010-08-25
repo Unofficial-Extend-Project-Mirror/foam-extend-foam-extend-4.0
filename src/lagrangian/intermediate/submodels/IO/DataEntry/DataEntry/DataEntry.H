@@ -26,6 +26,10 @@ Class
     Foam::DataEntry
 
 Description
+    Top level data entry class for use in dictionaries. Provides a mechanism
+    to specify a variable as a certain type, e.g. constant or table, and
+    provide functions to return the (interpolated) value, and integral between
+    limits.
 
 SourceFiles
     DataEntry.C
@@ -43,17 +47,24 @@ SourceFiles
 namespace Foam
 {
 
+template<class Type>
+class DataEntry;
+
+template<class Type>
+Ostream& operator<<
+(
+    Ostream&,
+    const DataEntry<Type>&
+);
+
 /*---------------------------------------------------------------------------*\
-                          Class DataEntry Declaration
+                         Class DataEntry Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
 class DataEntry
 {
     // Private Member Functions
-
-        //- Disallow default bitwise copy construct
-        DataEntry(const DataEntry<Type>&);
 
         //- Disallow default bitwise assignment
         void operator=(const DataEntry<Type>&);
@@ -63,11 +74,8 @@ protected:
 
     // Protected data
 
-        //- Coefficients dictionary
-        const dictionary dict_;
-
         //- Name of entry
-        const word entry_;
+        const word name_;
 
 
 public:
@@ -83,42 +91,39 @@ public:
         dictionary,
         (
             const word& entryName,
-            const dictionary& dict
+            Istream& is
         ),
-        (entryName, dict)
+        (entryName, is)
     );
 
 
     // Constructor
 
-        //- Construct from type name and dictionary
-        DataEntry
-        (
-            const word& TypeName,
-            const word& entryName,
-            const dictionary& dict
-        );
+        //- Construct from entry name
+        DataEntry(const word& entryName);
+
+        //- Copy constructor
+        DataEntry(const DataEntry<Type>& de);
 
 
     //- Selector
-        static autoPtr<DataEntry<Type> > New
-        (
-            const word& entryName,
-            const dictionary& dict
-        );
+    static autoPtr<DataEntry<Type> > New
+    (
+        const word& entryName,
+        const dictionary& dict
+    );
 
 
     //- Destructor
-
-        virtual ~DataEntry();
+    virtual ~DataEntry();
 
 
     // Member Functions
 
         // Access
 
-            //- Return the dictionary
-            const dictionary& dict() const;
+            //- Return the name of the entry
+            const word& name() const;
 
 
         // Evaluation
@@ -128,6 +133,14 @@ public:
 
             //- Integrate between two (scalar) values
             virtual Type integrate(const scalar x1, const scalar x2) const = 0;
+
+
+    //- Ostream Operator
+    friend Ostream& operator<< <Type>
+    (
+        Ostream&,
+        const DataEntry<Type>&
+    );
 };
 
 

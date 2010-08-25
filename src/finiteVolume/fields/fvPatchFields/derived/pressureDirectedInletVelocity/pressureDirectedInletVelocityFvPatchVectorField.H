@@ -186,7 +186,7 @@ public:
 
         //- Write
         virtual void write(Ostream&) const;
-q
+
 
     // Member operators
 

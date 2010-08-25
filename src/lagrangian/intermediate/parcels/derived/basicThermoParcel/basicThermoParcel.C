@@ -41,24 +41,35 @@ namespace Foam
 Foam::basicThermoParcel::basicThermoParcel
 (
     ThermoCloud<basicThermoParcel>& owner,
-    const label typeId,
     const vector position,
-    const label celli,
+    const label cellI
+)
+:
+    ThermoParcel<basicThermoParcel>(owner, position, cellI)
+{}
+
+
+Foam::basicThermoParcel::basicThermoParcel
+(
+    ThermoCloud<basicThermoParcel>& owner,
+    const vector position,
+    const label cellI,
+    const label typeId,
+    const scalar nParticle0,
     const scalar d0,
     const vector U0,
-    const scalar nParticle0,
     const constantProperties& constProps
 )
 :
     ThermoParcel<basicThermoParcel>
     (
         owner,
-        typeId,
         position,
-        celli,
+        cellI,
+        typeId,
+        nParticle0,
         d0,
         U0,
-        nParticle0,
         constProps
     )
 {}
@@ -72,6 +83,15 @@ Foam::basicThermoParcel::basicThermoParcel
 )
 :
     ThermoParcel<basicThermoParcel>(cloud, is, readFields)
+{}
+
+
+Foam::basicThermoParcel::basicThermoParcel
+(
+    const basicThermoParcel& p
+)
+:
+    ThermoParcel<basicThermoParcel>(p)
 {}
 
 

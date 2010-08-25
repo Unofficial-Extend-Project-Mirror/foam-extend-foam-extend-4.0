@@ -1,3 +1,0 @@
-hashTableTest2.C
-
-EXE = $(FOAM_USER_APPBIN)/hashTableTest2

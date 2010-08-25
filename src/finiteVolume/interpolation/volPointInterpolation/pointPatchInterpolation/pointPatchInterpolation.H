@@ -63,9 +63,6 @@ class pointPatchInterpolation
         //- Reference to volume mesh
         const fvMesh& fvMesh_;
 
-        //- Reference to point mesh
-        const pointMesh& pointMesh_;
-
         //- Primitive patch interpolators
         PtrList<primitivePatchInterpolation> patchInterpolators_;
 
@@ -104,7 +101,7 @@ public:
     // Constructors
 
         //- Constructor given fvMesh and pointMesh.
-        pointPatchInterpolation(const fvMesh&, const pointMesh&);
+        pointPatchInterpolation(const fvMesh&);
 
 
     // Destructor
@@ -119,11 +116,6 @@ public:
             const fvMesh& mesh() const
             {
                 return fvMesh_;
-            }
-
-            const pointMesh& pMesh() const
-            {
-                return pointMesh_;
             }
 
 

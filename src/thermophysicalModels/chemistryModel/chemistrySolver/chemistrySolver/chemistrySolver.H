@@ -26,7 +26,7 @@ Class
     Foam::chemistrySolver
 
 Description
-    An abstract class for solving chemistry
+    An abstract base class for solving chemistry
 
 SourceFiles
     chemistrySolver.C
@@ -36,7 +36,7 @@ SourceFiles
 #ifndef chemistrySolver_H
 #define chemistrySolver_H
 
-#include "chemistryModel.H"
+#include "ODEChemistryModel.H"
 #include "IOdictionary.H"
 #include "scalarField.H"
 #include "autoPtr.H"
@@ -47,17 +47,26 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
+template<class CompType, class ThermoType>
+class chemistrySolver;
+
 /*---------------------------------------------------------------------------*\
-                           Class chemistrySolver Declaration
+                      Class chemistrySolver Declaration
 \*---------------------------------------------------------------------------*/
 
+template<class CompType, class ThermoType>
 class chemistrySolver
 {
-
 protected:
 
-        const dictionary& dict_;
-        chemistryModel& chemistry_;
+    // Protected data
+
+        //- Reference to the chemistry model
+        ODEChemistryModel<CompType, ThermoType>& model_;
+
+        //- Name of the chemistry solver
+        const word name_;
 
 
 public:
@@ -73,10 +82,10 @@ public:
             chemistrySolver,
             dictionary,
             (
-                const dictionary& dict,
-                chemistryModel& chemistry
+                ODEChemistryModel<CompType, ThermoType>& model,
+                const word& modelName
             ),
-            (dict, chemistry)
+            (model, modelName)
         );
 
 
@@ -85,23 +94,22 @@ public:
         //- Construct from components
         chemistrySolver
         (
-            const dictionary& dict,
-            chemistryModel& chemistry
+            ODEChemistryModel<CompType, ThermoType>& model,
+            const word& modelName
         );
 
 
-    // Selectors
+    //- Selector
+    static autoPtr<chemistrySolver> New
+    (
+        ODEChemistryModel<CompType, ThermoType>& model,
+        const word& compTypeName,
+        const word& thermoTypeName
+    );
 
-        static autoPtr<chemistrySolver> New
-        (
-            const dictionary& dict,
-            chemistryModel& chemistry
-        );
 
-
-    // Destructor
-
-        virtual ~chemistrySolver();
+    //- Destructor
+    virtual ~chemistrySolver();
 
 
     // Member Functions
@@ -121,6 +129,50 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#define makeChemistrySolver(Comp, Thermo)                                     \
+                                                                              \
+    typedef chemistrySolver<Comp, Thermo>                                     \
+        chemistrySolver##Comp##Thermo;                                        \
+                                                                              \
+    defineTemplateTypeNameAndDebugWithName                                    \
+    (                                                                         \
+        chemistrySolver##Comp##Thermo,                                        \
+        "chemistryModel<"#Comp","#Thermo">",                                  \
+        0                                                                     \
+    );                                                                        \
+                                                                              \
+    defineTemplateRunTimeSelectionTable                                       \
+    (                                                                         \
+        chemistrySolver##Comp##Thermo,                                        \
+        dictionary                                                            \
+    );
+
+
+#define makeChemistrySolverType(SS, Comp, Thermo)                             \
+                                                                              \
+    typedef SS<Comp, Thermo> SS##Comp##Thermo;                                \
+                                                                              \
+    defineTemplateTypeNameAndDebugWithName                                    \
+    (                                                                         \
+        SS##Comp##Thermo,                                                     \
+        #SS"<"#Comp","#Thermo">",                                             \
+        0                                                                     \
+    );                                                                        \
+                                                                              \
+    chemistrySolver<Comp, Thermo>::                                           \
+        adddictionaryConstructorToTable<SS<Comp, Thermo> >                    \
+            add##SS##Comp##Thermo##ConstructorToTable_;
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "chemistrySolver.C"
+#   include "newChemistrySolver.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -25,32 +25,107 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "ThermoCloud.H"
-#include "HeatTransferModel.H"
-
 #include "interpolationCellPoint.H"
 #include "ThermoParcel.H"
+
+#include "HeatTransferModel.H"
+
+// * * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * //
+
+template<class ParcelType>
+void Foam::ThermoCloud<ParcelType>::preEvolve()
+{
+    KinematicCloud<ParcelType>::preEvolve();
+}
+
+
+template<class ParcelType>
+void Foam::ThermoCloud<ParcelType>::evolveCloud()
+{
+    const volScalarField& T = carrierThermo_.T();
+    const volScalarField cp = carrierThermo_.Cp();
+
+    autoPtr<interpolation<scalar> > rhoInterp = interpolation<scalar>::New
+    (
+        this->interpolationSchemes(),
+        this->rho()
+    );
+
+    autoPtr<interpolation<vector> > UInterp = interpolation<vector>::New
+    (
+        this->interpolationSchemes(),
+        this->U()
+    );
+
+    autoPtr<interpolation<scalar> > muInterp = interpolation<scalar>::New
+    (
+        this->interpolationSchemes(),
+        this->mu()
+    );
+
+    autoPtr<interpolation<scalar> > TInterp = interpolation<scalar>::New
+    (
+        this->interpolationSchemes(),
+        T
+    );
+
+    autoPtr<interpolation<scalar> > cpInterp = interpolation<scalar>::New
+    (
+        this->interpolationSchemes(),
+        cp
+    );
+
+    typename ParcelType::trackData td
+    (
+        *this,
+        constProps_,
+        rhoInterp(),
+        UInterp(),
+        muInterp(),
+        TInterp(),
+        cpInterp(),
+        this->g().value()
+    );
+
+    this->injection().inject(td);
+
+    if (this->coupled())
+    {
+        resetSourceTerms();
+    }
+
+    Cloud<ParcelType>::move(td);
+}
+
+
+template<class ParcelType>
+void Foam::ThermoCloud<ParcelType>::postEvolve()
+{
+    KinematicCloud<ParcelType>::postEvolve();
+}
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class ParcelType>
 Foam::ThermoCloud<ParcelType>::ThermoCloud
 (
-    const word& cloudType,
-    const volPointInterpolation& vpi,
+    const word& cloudName,
     const volScalarField& rho,
     const volVectorField& U,
     const dimensionedVector& g,
-    basicThermo& thermo
+    basicThermo& thermo,
+    bool readFields
 )
 :
     KinematicCloud<ParcelType>
     (
-        cloudType,
-        vpi,
+        cloudName,
         rho,
         U,
         thermo.mu(),
-        g
+        g,
+        false
     ),
     thermoCloud(),
     constProps_(this->particleProperties()),
@@ -72,11 +147,11 @@ Foam::ThermoCloud<ParcelType>::ThermoCloud
         )
     ),
     radiation_(this->particleProperties().lookup("radiation")),
-    hTrans_
+    hsTrans_
     (
         IOobject
         (
-            this->name() + "hTrans",
+            this->name() + "hsTrans",
             this->db().time().timeName(),
             this->db(),
             IOobject::NO_READ,
@@ -84,23 +159,14 @@ Foam::ThermoCloud<ParcelType>::ThermoCloud
             false
         ),
         this->mesh(),
-        dimensionedScalar("zero", dimensionSet(1, 2, -2, 0, 0), 0.0)
-    ),
-    hCoeff_
-    (
-        IOobject
-        (
-            this->name() + "hCoeff",
-            this->db().time().timeName(),
-            this->db(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE,
-            false
-        ),
-        this->mesh(),
-        dimensionedScalar("zero", dimensionSet(1, 2, -3, -1, 0), 0.0)
+        dimensionedScalar("zero", dimEnergy, 0.0)
     )
-{}
+{
+    if (readFields)
+    {
+        ParcelType::readFields(*this);
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -113,82 +179,57 @@ Foam::ThermoCloud<ParcelType>::~ThermoCloud()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class ParcelType>
+void Foam::ThermoCloud<ParcelType>::checkParcelProperties
+(
+    ParcelType& parcel,
+    const scalar lagrangianDt,
+    const bool fullyDescribed
+)
+{
+    KinematicCloud<ParcelType>::checkParcelProperties
+    (
+        parcel,
+        lagrangianDt,
+        fullyDescribed
+    );
+
+    if (!fullyDescribed)
+    {
+        parcel.T() = constProps_.T0();
+        parcel.cp() = constProps_.cp0();
+    }
+}
+
+
+template<class ParcelType>
 void Foam::ThermoCloud<ParcelType>::resetSourceTerms()
 {
     KinematicCloud<ParcelType>::resetSourceTerms();
-    hTrans_.field() = 0.0;
-    hCoeff_.field() = 0.0;
+    hsTrans_.field() = 0.0;
 }
 
 
 template<class ParcelType>
 void Foam::ThermoCloud<ParcelType>::evolve()
 {
-    const volScalarField& T = carrierThermo_.T();
-    const volScalarField cp = carrierThermo_.Cp();
+    if (this->active())
+    {
+        preEvolve();
 
-    autoPtr<interpolation<scalar> > rhoInterpolator = interpolation<scalar>::New
-    (
-        this->interpolationSchemes(),
-        this->vpi(),
-        this->rho()
-    );
+        evolveCloud();
 
-    autoPtr<interpolation<vector> > UInterpolator = interpolation<vector>::New
-    (
-        this->interpolationSchemes(),
-        this->vpi(),
-        this->U()
-    );
+        postEvolve();
 
-    autoPtr<interpolation<scalar> > muInterpolator = interpolation<scalar>::New
-    (
-        this->interpolationSchemes(),
-        this->vpi(),
-        this->mu()
-    );
-
-    autoPtr<interpolation<scalar> > TInterpolator = interpolation<scalar>::New
-    (
-        this->interpolationSchemes(),
-        this->vpi(),
-        T
-    );
-
-    autoPtr<interpolation<scalar> > cpInterpolator = interpolation<scalar>::New
-    (
-        this->interpolationSchemes(),
-        this->vpi(),
-        cp
-    );
-
-    typename ParcelType::trackData td
-    (
-        *this,
-        constProps_,
-        rhoInterpolator(),
-        UInterpolator(),
-        muInterpolator(),
-        TInterpolator(),
-        cpInterpolator(),
-        this->g().value()
-    );
-
-    inject(td);
-
-    this->move(td);
+        info();
+        Info<< endl;
+    }
 }
 
 
 template<class ParcelType>
-template<class TrackingData>
-void Foam::ThermoCloud<ParcelType>::inject
-(
-    TrackingData& td
-)
+void Foam::ThermoCloud<ParcelType>::info() const
 {
-    // Injection is same as for KinematicCloud<ParcelType>
-    KinematicCloud<ParcelType>::inject(td);
+    KinematicCloud<ParcelType>::info();
 }
 
 

@@ -30,39 +30,40 @@ License
 
 void Foam::tetherPotentialList::readTetherPotentialDict
 (
+    const List<word>& siteIdList,
     const dictionary& tetherPotentialDict,
-    const List<word>& idList,
-    const List<label>& tetherIds
+    const List<word>& tetherSiteIdList
 )
 {
-    if (!tetherIds.size())
+
+    Info<< nl << "Building tether potentials." << endl;
+
+    idMap_ = List<label>(siteIdList.size(), -1);
+
+    label tetherMapIndex = 0;
+
+    forAll(tetherSiteIdList, t)
     {
-        Info<< nl << "No tethered molecules found." << endl;
+        word tetherPotentialName = tetherSiteIdList[t];
 
-        idMap_.setSize(0);
-    }
-    else
-    {
-        Info<< nl << "Building tether potentials." << endl;
+        label tetherId = findIndex(siteIdList, tetherPotentialName);
 
-        idMap_ = List<label>(idList.size(), -1);
-
-        label tetherMapIndex = 0;
-
-        forAll(tetherIds, t)
+        if (tetherId == -1)
         {
-            const label tetherId = tetherIds[t];
-
-            word tetherPotentialName = idList[tetherId];
-
-            if (!tetherPotentialDict.found(tetherPotentialName))
-            {
-                FatalErrorIn("tetherPotentialList::readTetherPotentialDict")
-                    << "tether potential specification subDict "
-                    << tetherPotentialName << " not found" << nl
-                    << abort(FatalError);
-            }
-
+            FatalErrorIn("tetherPotentialList::readTetherPotentialDict")
+                << nl << "No matching entry found in siteIdList for tether name "
+                << tetherPotentialName
+                << abort(FatalError);
+        }
+        else if (!tetherPotentialDict.found(tetherPotentialName))
+        {
+            FatalErrorIn("tetherPotentialList::readTetherPotentialDict")
+                << nl << "tether potential specification subDict "
+                << tetherPotentialName << " not found"
+                << abort(FatalError);
+        }
+        else
+        {
             this->set
             (
                 tetherMapIndex,
@@ -72,11 +73,11 @@ void Foam::tetherPotentialList::readTetherPotentialDict
                     tetherPotentialDict.subDict(tetherPotentialName)
                 )
             );
-
-            idMap_[tetherId] = tetherMapIndex;
-
-            tetherMapIndex++;
         }
+
+        idMap_[tetherId] = tetherMapIndex;
+
+        tetherMapIndex++;
     }
 }
 
@@ -92,15 +93,15 @@ Foam::tetherPotentialList::tetherPotentialList()
 
 Foam::tetherPotentialList::tetherPotentialList
 (
-    const dictionary& idListDict,
+    const List<word>& siteIdList,
     const dictionary& tetherPotentialDict,
-    const List<label>& tetherIds
+    const List<word>& tetherSiteIdList
 )
 :
     PtrList<tetherPotential>(),
     idMap_()
 {
-    buildPotentials(idListDict, tetherPotentialDict, tetherIds);
+    buildPotentials(siteIdList, tetherPotentialDict, tetherSiteIdList);
 }
 
 
@@ -114,16 +115,14 @@ Foam::tetherPotentialList::~tetherPotentialList()
 
 void Foam::tetherPotentialList::buildPotentials
 (
-    const dictionary& idListDict,
+    const List<word>& siteIdList,
     const dictionary& tetherPotentialDict,
-    const List<label>& tetherIds
+    const List<word>& tetherSiteIdList
 )
 {
-    setSize(tetherIds.size());
+    setSize(tetherSiteIdList.size());
 
-    List<word> idList(idListDict.lookup("idList"));
-
-    readTetherPotentialDict(tetherPotentialDict, idList, tetherIds);
+    readTetherPotentialDict(siteIdList, tetherPotentialDict, tetherSiteIdList);
 }
 
 
@@ -136,27 +135,23 @@ const Foam::tetherPotential& Foam::tetherPotentialList::tetherPotentialFunction
 }
 
 
-Foam::scalar Foam::tetherPotentialList::force
+Foam::vector Foam::tetherPotentialList::force
 (
     const label a,
-    const scalar rITMag
+    const vector rIT
 ) const
 {
-    scalar f = (*this)[tetherPotentialIndex(a)].force(rITMag);
-
-    return f;
+    return (*this)[tetherPotentialIndex(a)].force(rIT);
 }
 
 
 Foam::scalar Foam::tetherPotentialList::energy
 (
     const label a,
-    const scalar rITMag
+    const vector rIT
 ) const
 {
-    scalar e = (*this)[tetherPotentialIndex(a)].energy(rITMag);
-
-    return e;
+    return (*this)[tetherPotentialIndex(a)].energy(rIT);
 }
 
 

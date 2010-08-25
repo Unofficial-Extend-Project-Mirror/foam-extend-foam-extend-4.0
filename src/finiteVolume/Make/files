@@ -29,6 +29,7 @@ derivedFvPatches = $(fvPatches)/derived
 $(derivedFvPatches)/wall/wallFvPatch.C
 $(derivedFvPatches)/directMapped/directMappedFvPatch.C
 $(derivedFvPatches)/cohesive/cohesiveFvPatch.C
+$(derivedFvPatches)/directMapped/directMappedWallFvPatch.C
 
 wallDist = fvMesh/wallDist
 $(wallDist)/wallPointYPlus/wallPointYPlus.C
@@ -249,7 +250,7 @@ $(limitedSchemes)/limitedSurfaceInterpolationScheme/limitedSurfaceInterpolationS
 $(limitedSchemes)/upwind/upwind.C
 $(limitedSchemes)/blended/blended.C
 $(limitedSchemes)/linearUpwind/linearUpwind.C
-$(limitedSchemes)/linearUpwindV/linearUpwindV.C
+$(limitedSchemes)/linearUpwind/linearUpwindV.C
 $(limitedSchemes)/reconCentral/reconCentral.C
 $(limitedSchemes)/Gamma/Gamma.C
 $(limitedSchemes)/SFCD/SFCD.C

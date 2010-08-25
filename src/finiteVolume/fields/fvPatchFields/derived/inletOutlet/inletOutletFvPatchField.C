@@ -130,8 +130,8 @@ void inletOutletFvPatchField<Type>::updateCoeffs()
     const Field<scalar>& phip = this->patch().lookupPatchField
     (
         phiName_,
-        reinterpret_cast<const surfaceScalarField*>(NULL),
-        reinterpret_cast<const scalar*>(NULL)
+        reinterpret_cast<const surfaceScalarField*>(0),
+        reinterpret_cast<const scalar*>(0)
     );
 
     this->valueFraction() = 1.0 - pos(phip);

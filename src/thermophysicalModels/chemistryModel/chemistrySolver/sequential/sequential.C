@@ -27,31 +27,17 @@ License
 #include "sequential.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-namespace Foam
-{
-    defineTypeNameAndDebug(sequential, 0);
-    addToRunTimeSelectionTable
-    (
-        chemistrySolver,
-        sequential,
-        dictionary
-    );
-};
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from components
-Foam::sequential::sequential
+template<class CompType, class ThermoType>
+Foam::sequential<CompType, ThermoType>::sequential
 (
-    const Foam::dictionary& dict,
-    Foam::chemistryModel& chemistry
+    ODEChemistryModel<CompType, ThermoType>& model,
+    const word& modelName
 )
 :
-    chemistrySolver(dict, chemistry),
-    coeffsDict_(dict.subDict(typeName + "Coeffs")),
+    chemistrySolver<CompType, ThermoType>(model, modelName),
+    coeffsDict_(model.subDict(modelName + "Coeffs")),
     cTauChem_(readScalar(coeffsDict_.lookup("cTauChem"))),
     equil_(coeffsDict_.lookup("equilibriumRateLimiter"))
 {}
@@ -59,13 +45,15 @@ Foam::sequential::sequential
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::sequential::~sequential()
+template<class CompType, class ThermoType>
+Foam::sequential<CompType, ThermoType>::~sequential()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::scalar Foam::sequential::solve
+template<class CompType, class ThermoType>
+Foam::scalar Foam::sequential<CompType, ThermoType>::solve
 (
     scalarField &c,
     const scalar T,
@@ -79,11 +67,11 @@ Foam::scalar Foam::sequential::solve
     scalar pf, cf, pb, cb;
     label lRef, rRef;
 
-    for(label i=0; i<chemistry_.reactions().size(); i++)
+    for (label i=0; i<this->model_.reactions().size(); i++)
     {
-        const chemistryModel::reaction& R = chemistry_.reactions()[i];
+        const Reaction<ThermoType>& R = this->model_.reactions()[i];
 
-        scalar om0 = chemistry_.omega
+        scalar om0 = this->model_.omega
         (
             R, c, T, p, pf, cf, lRef, pb, cb, rRef
         );
@@ -108,23 +96,23 @@ Foam::scalar Foam::sequential::solve
 
 
         // update species
-        for(label s=0; s<R.lhs().size(); s++)
+        for (label s=0; s<R.lhs().size(); s++)
         {
             label si = R.lhs()[s].index;
             scalar sl = R.lhs()[s].stoichCoeff;
             c[si] -= dt*sl*omeg;
             c[si] = max(0.0, c[si]);
-        }        
+        }
 
-        for(label s=0; s<R.rhs().size(); s++)
+        for (label s=0; s<R.rhs().size(); s++)
         {
             label si = R.rhs()[s].index;
             scalar sr = R.rhs()[s].stoichCoeff;
             c[si] += dt*sr*omeg;
             c[si] = max(0.0, c[si]);
-        }        
+        }
 
-    } // end for(label i...
+    } // end for (label i...
 
     return cTauChem_/tChemInv;
 }

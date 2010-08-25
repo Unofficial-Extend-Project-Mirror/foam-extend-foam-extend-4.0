@@ -22,9 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Class
-    pairPotential
-
 \*---------------------------------------------------------------------------*/
 
 #include "pairPotential.H"
@@ -57,8 +54,8 @@ autoPtr<pairPotential> pairPotential::New
         (
             "pairPotential::New()"
         )   << "Unknown pairPotential type "
-            << pairPotentialTypeName << endl << endl
-            << "Valid  pairPotentials are : " << endl
+            << pairPotentialTypeName << nl << nl
+            << "Valid  pairPotentials are: " << nl
             << dictionaryConstructorTablePtr_->toc()
             << exit(FatalError);
     }

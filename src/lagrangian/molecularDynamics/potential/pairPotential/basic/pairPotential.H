@@ -43,6 +43,7 @@ SourceFiles
 #include "List.H"
 #include "Pair.H"
 #include "Switch.H"
+#include "mathematicalConstants.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,7 +54,7 @@ namespace Foam
 class energyScalingFunction;
 
 /*---------------------------------------------------------------------------*\
-                Class pairPotential Declaration
+                     Class pairPotential Declaration
 \*---------------------------------------------------------------------------*/
 
 class pairPotential
@@ -79,6 +80,7 @@ protected:
 
         bool writeTables_;
 
+
     // Private Member Functions
 
         void scaleEnergy(scalar& e, const scalar r) const;
@@ -93,7 +95,7 @@ protected:
 public:
 
     //- Runtime type information
-    TypeName("pairPotential");
+        TypeName("pairPotential");
 
 
     // Declare run-time constructor selection table
@@ -149,9 +151,9 @@ public:
 
         inline scalar rCutSqr() const;
 
-        scalar energyLookup (const scalar r) const;
+        scalar energy (const scalar r) const;
 
-        scalar forceLookup (const scalar r) const;
+        scalar force (const scalar r) const;
 
         List<Pair<scalar> > energyTable() const;
 
@@ -159,7 +161,7 @@ public:
 
         inline bool writeTables() const;
 
-        virtual scalar unscaledEnergy (const scalar r) const = 0;
+        virtual scalar unscaledEnergy(const scalar r) const = 0;
 
         scalar scaledEnergy(const scalar r) const;
 

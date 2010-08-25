@@ -45,8 +45,6 @@ addToRunTimeSelectionTable
     dictionary
 );
 
-// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
-
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -63,6 +61,7 @@ lennardJones::lennardJones
 {
     setLookupTables();
 }
+
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 

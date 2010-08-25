@@ -91,7 +91,7 @@ public:
                 FatalIOErrorIn
                 (
                     "extendedLeastSquaresGrad"
-                    "(const fvMesh& mesh, Istream& schemeData)",
+                    "(const fvMesh&, Istream& schemeData)",
                     schemeData
                 )   << "Minimum determinant = " << minDet_
                     << " should be >= 0 and <= 8"

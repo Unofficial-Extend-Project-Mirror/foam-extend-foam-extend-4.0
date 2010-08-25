@@ -25,11 +25,12 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "ManualInjection.H"
+#include "mathematicalConstants.H"
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::label Foam::ManualInjection<CloudType>::nParcelsToInject
+Foam::label Foam::ManualInjection<CloudType>::parcelsToInject
 (
     const scalar time0,
     const scalar time1
@@ -105,8 +106,7 @@ Foam::ManualInjection<CloudType>::ManualInjection
     }
 
     // Determine volume of particles to inject
-    this->volumeTotal_ = sum(pow(diameters_, 3))
-        *mathematicalConstant::pi/6.0;
+    this->volumeTotal_ = sum(pow3(diameters_))*mathematicalConstant::pi/6.0;
 }
 
 
@@ -130,71 +130,53 @@ template<class CloudType>
 Foam::scalar Foam::ManualInjection<CloudType>::timeEnd() const
 {
     // Not used
-    return 0.0;
+    return this->SOI_;
 }
 
 
 template<class CloudType>
-Foam::vector Foam::ManualInjection<CloudType>::position
+void Foam::ManualInjection<CloudType>::setPositionAndCell
 (
-    const label iParcel,
-    const scalar time,
-    const polyMeshInfo& meshInfo
-)
-{
-    vector pos = positions_[iParcel];
-    if (meshInfo.caseIs2d())
-    {
-        if (meshInfo.caseIs2dWedge())
-        {
-            pos.component(meshInfo.emptyComponent()) = 0.0;
-        }
-        else if (meshInfo.caseIs2dSlab())
-        {
-            pos.component(meshInfo.emptyComponent()) =
-                meshInfo.centrePoint().component(meshInfo.emptyComponent());
-        }
-        else
-        {
-            FatalErrorIn
-            (
-                "Foam::vector Foam::ManualInjection<CloudType>::position"
-            )   << "Could not determine 2-D case geometry" << nl
-                << abort(FatalError);
-        }
-    }
-
-    return pos;
-}
-
-
-template<class CloudType>
-Foam::vector Foam::ManualInjection<CloudType>::velocity
-(
+    const label parcelI,
     const label,
     const scalar,
-    const polyMeshInfo& meshInfo
+    vector& position,
+    label& cellOwner
 )
 {
-    vector vel = U0_;
-    if (meshInfo.caseIs2dSlab())
-    {
-        vel.component(meshInfo.emptyComponent()) =
-            meshInfo.centrePoint().component(meshInfo.emptyComponent());
-    }
-
-    return vel;
+    position = positions_[parcelI];
+    this->findCellAtPosition(cellOwner, position);
 }
 
 
 template<class CloudType>
-Foam::scalar Foam::ManualInjection<CloudType>::d0
+void Foam::ManualInjection<CloudType>::setProperties
 (
-    const label iParcel,
-    const scalar
-) const
+    const label parcelI,
+    const label,
+    const scalar,
+    typename CloudType::parcelType& parcel
+)
 {
-    return diameters_[iParcel];
+    // set particle velocity
+    parcel.U() = U0_;
+
+    // set particle diameter
+    parcel.d() = diameters_[parcelI];
+}
+
+
+template<class CloudType>
+bool Foam::ManualInjection<CloudType>::fullyDescribed() const
+{
+    return false;
+}
+
+
+template<class CloudType>
+bool Foam::ManualInjection<CloudType>::validInjection(const label)
+{
+    return true;
 }
 
 

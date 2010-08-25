@@ -93,9 +93,10 @@ public:
 
     // Constructors
 
+        //- Construct from polyMesh and data stream (provides component)
         velocityComponentLaplacianFvMotionSolver
         (
-            const polyMesh& mesh,
+            const polyMesh&,
             Istream& msData
         );
 

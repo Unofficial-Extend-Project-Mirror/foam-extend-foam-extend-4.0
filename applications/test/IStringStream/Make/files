@@ -1,3 +1,0 @@
-IStringStreamTest.C
-
-EXE = $(FOAM_USER_APPBIN)/IStringStreamTest

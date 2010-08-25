@@ -42,7 +42,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                          Class DispersionModel Declaration
+                        Class DispersionModel Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class CloudType>
@@ -54,7 +54,7 @@ class DispersionModel
         //- Cloud dictionary
         const dictionary& dict_;
 
-        // Reference to the owner cloud class
+        //- Reference to the owner cloud class
         CloudType& owner_;
 
 
@@ -81,6 +81,9 @@ public:
 
     // Constructors
 
+        //- Construct null from owner
+        DispersionModel(CloudType& owner);
+
         //- Construct from components
         DispersionModel
         (
@@ -89,18 +92,16 @@ public:
         );
 
 
-    // Destructor
+    //- Destructor
+    virtual ~DispersionModel();
 
-        virtual ~DispersionModel();
 
-
-    // Selector
-
-        static autoPtr<DispersionModel<CloudType> > New
-        (
-            const dictionary& dict,
-            CloudType& owner
-        );
+    //- Selector
+    static autoPtr<DispersionModel<CloudType> > New
+    (
+        const dictionary& dict,
+        CloudType& owner
+    );
 
 
     // Access
@@ -119,6 +120,9 @@ public:
 
         //- Flag to indicate whether model activates injection model
         virtual bool active() const = 0;
+
+        //- Cache carrier fields
+        virtual void cacheFields(const bool store) = 0;
 
         //- Update (disperse particles)
         virtual vector update
@@ -157,6 +161,20 @@ public:
     DispersionModel<CloudType<ParcelType> >::                                 \
         adddictionaryConstructorToTable<SS<CloudType<ParcelType> > >          \
             add##SS##CloudType##ParcelType##ConstructorToTable_;
+
+
+#define makeDispersionModelThermoType(SS, CloudType, ParcelType, ThermoType)  \
+                                                                              \
+    defineNamedTemplateTypeNameAndDebug                                       \
+    (                                                                         \
+        SS<CloudType<ParcelType<ThermoType> > >,                              \
+        0                                                                     \
+    );                                                                        \
+                                                                              \
+    DispersionModel<CloudType<ParcelType<ThermoType> > >::                    \
+        adddictionaryConstructorToTable                                       \
+            <SS<CloudType<ParcelType<ThermoType> > > >                        \
+            add##SS##CloudType##ParcelType##ThermoType##ConstructorToTable_;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

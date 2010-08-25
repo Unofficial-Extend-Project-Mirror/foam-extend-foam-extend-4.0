@@ -63,14 +63,10 @@ void spray::inject()
         {
             Np = max(1, Np);
             scalar mp = mass/Np/nHoles;
-        
-            // constT is only larger than zero for the first 
+
+            // constT is only larger than zero for the first
             // part of the injection
-            scalar constT = max
-            (
-                0.0,
-                it->tsoi() - time0
-            );
+            scalar constT = max(0.0, it->tsoi() - time0);
 
             // deltaT is the duration of injection during this timestep
             scalar deltaT = min
@@ -103,7 +99,7 @@ void spray::inject()
                         axisOfWedgeNormal_,
                         rndGen_
                     );
-                
+
                     scalar diameter = injection().d0(i, toi);
                     vector direction = injection().direction(i, n, toi, diameter);
                     vector U = injection().velocity(i, toi)*direction;
@@ -119,11 +115,11 @@ void spray::inject()
                     label injectorCell = mesh_.findCell(injectionPosition);
                 
 #                   include "findInjectorCell.H"
-   
+
                     if (injectorCell >= 0)
                     {
                         scalar liquidCore = 1.0;
-                
+
                         // construct the parcel that is to be injected
 
                         parcel* pPtr = new parcel
@@ -148,19 +144,16 @@ void spray::inject()
                             fuels_->components()
                         );
 
-                        injectedLiquidKE_ += 0.5*pPtr->m()*pow(mag(U), 2.0);
-                    
+                        injectedLiquidKE_ += 0.5*pPtr->m()*magSqr(U);
+
                         scalar dt = time - toi;
 
                         pPtr->stepFraction() =
                             (runTime_.deltaT().value() - dt)
                            /runTime_.deltaT().value();
 
-                        bool keepParcel = pPtr->move
-                        (
-                            *this
-                        );
-  
+                        bool keepParcel = pPtr->move(*this);
+
                         if (keepParcel)
                         {
                             addParticle(pPtr);

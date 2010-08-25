@@ -28,7 +28,7 @@ License
 
 #include "noAtomization.H"
 #include "addToRunTimeSelectionTable.H"
-#include "combustionMixture.H"
+#include "basicMultiComponentMixture.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

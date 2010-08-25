@@ -107,9 +107,10 @@ public:
 
     // Constructors
 
+        //- Construct from polyMesh and data stream
         displacementComponentLaplacianFvMotionSolver
         (
-            const polyMesh& mesh,
+            const polyMesh&,
             Istream& msData
         );
 

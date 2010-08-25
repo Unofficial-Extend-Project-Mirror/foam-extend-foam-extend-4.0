@@ -72,7 +72,6 @@ class ThermoParcel
 :
     public KinematicParcel<ParcelType>
 {
-
 public:
 
     //- Class to hold thermo particle constant properties
@@ -86,6 +85,9 @@ public:
             //- Particle initial temperature [K]
             const scalar T0_;
 
+            //- Minimum temperature [K]
+            const scalar TMin_;
+
             //- Particle specific heat capacity [J/(kg.K)]
             const scalar cp0_;
 
@@ -95,29 +97,39 @@ public:
             //- Particle scattering factor [] (radiation)
             const scalar f0_;
 
+            //- Default carrier Prandtl number []
+            const scalar Pr_;
+
 
     public:
 
         // Constructors
-        constantProperties(const dictionary& dict);
+        constantProperties(const dictionary& parentDict);
 
         // Member functions
 
             // Access
 
-                //- Return const access to particle initial temperature [K]
+                //- Return const access to the particle initial temperature [K]
                 inline scalar T0() const;
 
-                //- Return const access to particle specific heat capacity
+                //- Return const access to minimum temperature [K]
+                inline scalar TMin() const;
+
+                //- Return const access to the particle specific heat capacity
                 //  [J/(kg.K)]
                 inline scalar cp0() const;
 
-                //- Return const access to Particle emissivity [] (radiation)
+                //- Return const access to the particle emissivity []
+                //  Active for radiation only
                 inline scalar epsilon0() const;
 
-                //- Return const access to Particle scattering factor []
-                //  (radiation)
+                //- Return const access to the particle scattering factor []
+                //  Active for radiation only
                 inline scalar f0() const;
+
+                //- Return const access to the default carrier Prandtl number []
+                inline scalar Pr() const;
     };
 
 
@@ -140,7 +152,7 @@ public:
                 //- Temperature field interpolator
                 const interpolation<scalar>& TInterp_;
 
-                //- Scpecific heat capacity field interpolator
+                //- Specific heat capacity field interpolator
                 const interpolation<scalar>& cpInterp_;
 
 
@@ -170,11 +182,11 @@ public:
             //- Return const access to the owner cloud
             inline const constantProperties& constProps() const;
 
-            //- Return conat access to the interpolator for continuous
+            //- Return const access to the interpolator for continuous
             //  phase temperature field
             inline const interpolation<scalar>& TInterp() const;
 
-            //- Return conat access to the interpolator for continuous
+            //- Return const access to the interpolator for continuous
             //  phase specific heat capacity field
             inline const interpolation<scalar>& cpInterp() const;
     };
@@ -193,7 +205,7 @@ protected:
             scalar cp_;
 
 
-        // Call-based quantities
+        // Cell-based quantities
 
             //- Temperature [K]
             scalar Tc_;
@@ -209,33 +221,56 @@ protected:
         scalar calcHeatTransfer
         (
             TrackData& td,
-            const scalar dt,
-            const label celli,
-            scalar& htc,
-            scalar& dhTrans
+            const scalar dt,           // timestep
+            const label cellI,         // owner cell
+            const scalar Re,           // Reynolds number
+            const scalar Pr,           // Prandtl number - surface
+            const scalar kappa,        // Thermal conductivity - surface
+            const scalar d,            // diameter
+            const scalar rho,          // density
+            const scalar T,            // temperature
+            const scalar cp,           // specific heat capacity
+            const scalar NCpW,         // Sum of N*Cp*W of emission species
+            const scalar Sh,           // explicit particle enthalpy source
+            scalar& dhsTrans           // sensible enthalpy transfer to carrier
         );
 
 
 public:
 
-    //- Runtime type information
-    TypeName("ThermoParcel");
+    // Static data members
+
+        //- String representation of properties
+        static string propHeader;
+
+        //- Runtime type information
+        TypeName("ThermoParcel");
+
 
     friend class Cloud<ParcelType>;
 
 
     // Constructors
 
+        //- Construct from owner, position, and cloud owner
+        //  Other properties initialised as null
+        inline ThermoParcel
+        (
+            ThermoCloud<ParcelType>& owner,
+            const vector& position,
+            const label cellI
+        );
+
         //- Construct from components
         inline ThermoParcel
         (
             ThermoCloud<ParcelType>& owner,
-            const label typeId,
             const vector& position,
-            const label celli,
+            const label cellI,
+            const label typeId,
+            const scalar nParticle0,
             const scalar d0,
             const vector& U0,
-            const scalar nParticle0,
             const constantProperties& constProps
         );
 
@@ -247,10 +282,13 @@ public:
             bool readFields = true
         );
 
+        //- Construct as a copy
+        ThermoParcel(const ThermoParcel& p);
+
         //- Construct and return a clone
-        autoPtr<ParcelType> clone() const
+        autoPtr<ThermoParcel> clone() const
         {
-            return autoPtr<ParcelType>(new ThermoParcel<ParcelType>(*this));
+            return autoPtr<ThermoParcel>(new ThermoParcel(*this));
         }
 
 
@@ -276,39 +314,55 @@ public:
 
         // Main calculation loop
 
-            //- Update cell based quantities
+            //- Set cell values
             template<class TrackData>
-            void updateCellQuantities
+            void setCellValues
             (
                 TrackData& td,
                 const scalar dt,
-                const label celli
+                const label cellI
             );
 
-            //- Coupled calculation with the continuous phase
+            //- Correct cell values using latest transfer information
             template<class TrackData>
-            void calcCoupled
+            void cellValueSourceCorrection
             (
                 TrackData& td,
                 const scalar dt,
-                const label celli
+                const label cellI
             );
 
-            //- Uncoupled calculation with the continuous phase
+            //- Calculate surface thermo properties
             template<class TrackData>
-            void calcUncoupled
+            void calcSurfaceValues
+            (
+                TrackData& td,
+                const label cellI,
+                const scalar T,
+                scalar& Ts,
+                scalar& rhos,
+                scalar& mus,
+                scalar& Pr,
+                scalar& kappa
+            ) const;
+
+            //- Update parcel properties over the time interval
+            template<class TrackData>
+            void calc
             (
                 TrackData& td,
                 const scalar dt,
-                const label
+                const label cellI
             );
 
 
         // I-O
 
-            static void readFields(ThermoCloud<ParcelType>& c);
+            //- Read
+            static void readFields(Cloud<ParcelType>& c);
 
-            static void writeFields(const ThermoCloud<ParcelType>& c);
+            //- Write
+            static void writeFields(const Cloud<ParcelType>& c);
 
 
     // Ostream Operator
@@ -340,4 +394,3 @@ public:
 #endif
 
 // ************************************************************************* //
-

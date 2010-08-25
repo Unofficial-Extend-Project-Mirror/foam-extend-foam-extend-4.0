@@ -28,6 +28,7 @@ License
 #include "motionDiffusivity.H"
 #include "fvmLaplacian.H"
 #include "addToRunTimeSelectionTable.H"
+#include "volPointInterpolation.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -49,7 +50,7 @@ namespace Foam
 Foam::velocityLaplacianFvMotionSolver::velocityLaplacianFvMotionSolver
 (
     const polyMesh& mesh,
-    Istream& msData
+    Istream&
 )
 :
     fvMotionSolver(mesh),
@@ -63,7 +64,7 @@ Foam::velocityLaplacianFvMotionSolver::velocityLaplacianFvMotionSolver
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        pointMesh_
+        pointMesh::New(fvMesh_)
     ),
     cellMotionU_
     (
@@ -102,7 +103,11 @@ Foam::velocityLaplacianFvMotionSolver::~velocityLaplacianFvMotionSolver()
 Foam::tmp<Foam::pointField>
 Foam::velocityLaplacianFvMotionSolver::curPoints() const
 {
-    vpi_.interpolate(cellMotionU_, pointMotionU_);
+    volPointInterpolation::New(fvMesh_).interpolate
+    (
+        cellMotionU_,
+        pointMotionU_
+    );
 
     tmp<pointField> tcurPoints
     (

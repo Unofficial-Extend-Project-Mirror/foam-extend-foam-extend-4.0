@@ -42,8 +42,7 @@ addToRunTimeSelectionTable(LESdelta, cubeRootVolDelta, dictionary);
 
 void cubeRootVolDelta::calcDelta()
 {
-    const Vector<label>& directions = mesh().directions();
-    label nD = (directions.nComponents + cmptSum(directions))/2;
+    label nD = mesh().nGeometricD();
 
     if (nD == 3)
     {
@@ -55,14 +54,15 @@ void cubeRootVolDelta::calcDelta()
             << "Case is 2D, LES is not strictly applicable\n"
             << endl;
 
+        const Vector<label>& directions = mesh().geometricD();
+
         scalar thickness = 0.0;
         for (direction dir=0; dir<directions.nComponents; dir++)
         {
             if (directions[dir] == -1)
             {
-                boundBox bb(mesh().points(), false);
-
-                thickness = (bb.max() - bb.min())[dir];
+                thickness = mesh().bounds().span()[dir];
+                break;
             }
         }
 
@@ -70,11 +70,9 @@ void cubeRootVolDelta::calcDelta()
     }
     else
     {
-        delta_.internalField() = deltaCoeff_*pow(mesh().V(), 1.0/3.0);
-
-        WarningIn("cubeRootVolDelta::calcDelta()")
+        FatalErrorIn("cubeRootVolDelta::calcDelta()")
             << "Case is not 3D or 2D, LES is not applicable"
-            << endl;
+            << exit(FatalError);
     }
 }
 

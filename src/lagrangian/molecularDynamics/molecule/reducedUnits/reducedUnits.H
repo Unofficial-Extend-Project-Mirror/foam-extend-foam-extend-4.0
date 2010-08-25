@@ -46,7 +46,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class reducedUnits Declaration
+                         Class reducedUnits Declaration
 \*---------------------------------------------------------------------------*/
 
 class reducedUnits

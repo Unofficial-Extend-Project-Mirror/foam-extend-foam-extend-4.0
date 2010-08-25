@@ -44,7 +44,7 @@ angularOscillatingDisplacementPointPatchVectorField
     const DimensionedField<vector, pointMesh>& iF
 )
 :
-    fixedValuePointPatchVectorField(p, iF),
+    fixedValuePointPatchField<vector>(p, iF),
     axis_(vector::zero),
     origin_(vector::zero),
     angle0_(0.0),
@@ -62,7 +62,7 @@ angularOscillatingDisplacementPointPatchVectorField
     const dictionary& dict
 )
 :
-    fixedValuePointPatchVectorField(p, iF, dict),
+    fixedValuePointPatchField<vector>(p, iF, dict),
     axis_(dict.lookup("axis")),
     origin_(dict.lookup("origin")),
     angle0_(readScalar(dict.lookup("angle0"))),
@@ -91,16 +91,16 @@ angularOscillatingDisplacementPointPatchVectorField
     const angularOscillatingDisplacementPointPatchVectorField& ptf,
     const pointPatch& p,
     const DimensionedField<vector, pointMesh>& iF,
-    const PointPatchFieldMapper& mapper
+    const pointPatchFieldMapper& mapper
 )
 :
-    fixedValuePointPatchVectorField(ptf, p, iF, mapper),
+    fixedValuePointPatchField<vector>(ptf, p, iF, mapper),
     axis_(ptf.axis_),
     origin_(ptf.origin_),
     angle0_(ptf.angle0_),
     amplitude_(ptf.amplitude_),
     omega_(ptf.omega_),
-    p0_(ptf.p0_)
+    p0_(ptf.p0_, mapper)
 {}
 
 
@@ -111,7 +111,7 @@ angularOscillatingDisplacementPointPatchVectorField
     const DimensionedField<vector, pointMesh>& iF
 )
 :
-    fixedValuePointPatchVectorField(ptf, iF),
+    fixedValuePointPatchField<vector>(ptf, iF),
     axis_(ptf.axis_),
     origin_(ptf.origin_),
     angle0_(ptf.angle0_),
@@ -122,6 +122,32 @@ angularOscillatingDisplacementPointPatchVectorField
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void angularOscillatingDisplacementPointPatchVectorField::autoMap
+(
+    const pointPatchFieldMapper& m
+)
+{
+    fixedValuePointPatchField<vector>::autoMap(m);
+
+    p0_.autoMap(m);
+}
+
+
+void angularOscillatingDisplacementPointPatchVectorField::rmap
+(
+    const pointPatchField<vector>& ptf,
+    const labelList& addr
+)
+{
+    const angularOscillatingDisplacementPointPatchVectorField& aODptf =
+        refCast<const angularOscillatingDisplacementPointPatchVectorField>(ptf);
+
+    fixedValuePointPatchField<vector>::rmap(aODptf, addr);
+
+    p0_.rmap(aODptf.p0_, addr);
+}
+
 
 void angularOscillatingDisplacementPointPatchVectorField::updateCoeffs()
 {
@@ -144,7 +170,7 @@ void angularOscillatingDisplacementPointPatchVectorField::updateCoeffs()
       + (axisHat & p0Rel)*(1 - cos(angle))*axisHat
     );
 
-    fixedValuePointPatchVectorField::updateCoeffs();
+    fixedValuePointPatchField<vector>::updateCoeffs();
 }
 
 
@@ -153,8 +179,7 @@ void angularOscillatingDisplacementPointPatchVectorField::write
     Ostream& os
 ) const
 {
-    pointPatchVectorField::write(os);
-
+    pointPatchField<vector>::write(os);
     os.writeKeyword("axis")
         << axis_ << token::END_STATEMENT << nl;
     os.writeKeyword("origin")

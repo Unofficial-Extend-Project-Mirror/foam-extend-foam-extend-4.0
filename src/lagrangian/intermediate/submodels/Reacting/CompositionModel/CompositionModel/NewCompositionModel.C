@@ -36,34 +36,31 @@ Foam::CompositionModel<CloudType>::New
     CloudType& owner
 )
 {
-    word ReactingCompositionModelType
-    (
-        dict.lookup("CompositionModel")
-    );
+    word CompositionModelType(dict.lookup("CompositionModel"));
 
-    Info<< "Selecting CompositionModel "
-        << ReactingCompositionModelType << endl;
+    Info<< "Selecting CompositionModel " << CompositionModelType << endl;
 
     typename dictionaryConstructorTable::iterator cstrIter =
-        dictionaryConstructorTablePtr_->find(ReactingCompositionModelType);
+        dictionaryConstructorTablePtr_->find(CompositionModelType);
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
         FatalErrorIn
         (
             "CompositionModel<CloudType>::New"
-            "(const dictionary&, CloudType&)"
-        )
-            << "Unknown ReactingCompositionModelType type "
-            << ReactingCompositionModelType
+            "("
+                "const dictionary&, "
+                "CloudType&"
+            ")"
+        )   << "Unknown CompositionModelType type "
+            << CompositionModelType
             << ", constructor not in hash table" << nl << nl
-            << "    Valid CompositionModel types are :" << nl
-            << dictionaryConstructorTablePtr_->toc()
+            << "    Valid CompositionModel types are:" << nl
+            << dictionaryConstructorTablePtr_->toc() << nl
             << exit(FatalError);
     }
 
-    return autoPtr<CompositionModel<CloudType> >
-        (cstrIter()(dict, owner));
+    return autoPtr<CompositionModel<CloudType> >(cstrIter()(dict, owner));
 }
 
 

@@ -1,3 +1,0 @@
-hashPtrTableTest.C
-
-EXE = $(FOAM_USER_APPBIN)/hashPtrTableTest

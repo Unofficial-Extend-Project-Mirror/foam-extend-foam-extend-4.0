@@ -27,7 +27,7 @@ License
 #include "inverseVolumeDiffusivity.H"
 #include "addToRunTimeSelectionTable.H"
 #include "patchWave.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "surfaceInterpolate.H"
 #include "zeroGradientFvPatchFields.H"
 

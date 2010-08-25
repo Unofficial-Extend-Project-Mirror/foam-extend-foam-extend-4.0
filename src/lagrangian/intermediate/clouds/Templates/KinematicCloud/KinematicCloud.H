@@ -50,9 +50,8 @@ SourceFiles
 #include "Random.H"
 #include "fvMesh.H"
 #include "volFields.H"
-#include "volPointInterpolation.H"
 #include "fvMatrices.H"
-#include "fvm.H"
+#include "particleForces.H"
 
 #include "IntegrationSchemesFwd.H"
 
@@ -73,7 +72,10 @@ template<class CloudType>
 class InjectionModel;
 
 template<class CloudType>
-class WallInteractionModel;
+class PostProcessingModel;
+
+template<class CloudType>
+class PatchInteractionModel;
 
 /*---------------------------------------------------------------------------*\
                        Class KinematicCloud Declaration
@@ -85,34 +87,21 @@ class KinematicCloud
     public Cloud<ParcelType>,
     public kinematicCloud
 {
+    // Private Member Functions
 
-public:
+        //- Disallow default bitwise copy construct
+        KinematicCloud(const KinematicCloud&);
 
-    // Enumerations
-
-        //- Parcel basis representation options
-        //  i.e constant number of particles OR constant mass per parcel
-        enum parcelBasis
-        {
-            pbNumber,
-            pbMass
-        };
+        //- Disallow default bitwise assignment
+        void operator=(const KinematicCloud&);
 
 
-private:
+protected:
 
-    // Private data
-
-        //- Cloud type - used to set the name of the parcel properties
-        //  dictionary by appending "Properties"
-        const word cloudType_;
+    // Protected data
 
         //- References to the mesh and time databases
         const fvMesh& mesh_;
-//        const Time& runTime_;
-
-        //- Reference to the interpolation for the carrier phase to the parcels
-        const volPointInterpolation& vpi_;
 
         //- Dictionary of particle properties
         IOdictionary particleProperties_;
@@ -120,32 +109,23 @@ private:
         //- Parcel constant properties
         typename ParcelType::constantProperties constProps_;
 
+        //- Cloud active flag
+        const Switch active_;
+
         //- Parcel type id - used to flag the type of parcels issued by this
         //  cloud
         const label parcelTypeId_;
 
         //- Flag to indicate whether parcels are coupled to the carrier phase
         //  i.e. whether or not to generate source terms for carrier phase
-        Switch coupled_;
+        const Switch coupled_;
+
+        //- Flag to correct cell values with latest transfer information
+        //  during the lagrangian timestep
+        const Switch cellValueSourceCorrection_;
 
         //- Random number generator - used by some injection routines
         Random rndGen_;
-
-        //- Time at beginning of timestep
-        scalar time0_;
-
-
-        // Injection properties
-
-            //- Parcel basis
-            const word parcelBasisType_;
-            parcelBasis parcelBasis_;
-
-            //- Total mass to inject [kg]
-            scalar massTotal_;
-
-            //- Total mass injected to date [kg]
-            scalar massInjected_;
 
 
         // References to the carrier gas fields
@@ -166,9 +146,11 @@ private:
             const dimensionedVector& g_;
 
 
-        // Interpolation
+        //- Optional particle forces
+        particleForces forces_;
 
-            dictionary interpolationSchemes_;
+        //- Interpolation schemes dictionary
+        dictionary interpolationSchemes_;
 
 
         // References to the cloud sub-models
@@ -184,9 +166,13 @@ private:
             autoPtr<InjectionModel<KinematicCloud<ParcelType> > >
                 injectionModel_;
 
-            //- Wall interaction model
-            autoPtr<WallInteractionModel<KinematicCloud<ParcelType> > >
-                wallInteractionModel_;
+            //- Patch interaction model
+            autoPtr<PatchInteractionModel<KinematicCloud<ParcelType> > >
+                patchInteractionModel_;
+
+            //- Post-processing model
+            autoPtr<PostProcessingModel<KinematicCloud<ParcelType> > >
+                postProcessingModel_;
 
 
         // Reference to the particle integration schemes
@@ -195,98 +181,46 @@ private:
             autoPtr<vectorIntegrationScheme> UIntegrator_;
 
 
-        // Counters
-
-            //- Number of injections counter
-            label nInjections_;
-
-            //- Running counters describing parcels added during each
-            //  injection
-            label nParcelsAdded_;
-            label nParcelsAddedTotal_;
-
-
         // Sources
 
             //- Momentum
             DimensionedField<vector, volMesh> UTrans_;
 
-            //- Coefficient for carrier phase U equation
-            DimensionedField<scalar, volMesh> UCoeff_;
 
+        // Cloud evolution functions
 
-    // Private Member Functions
+            //- Pre-evolve
+            void preEvolve();
 
-        //- Disallow default bitwise copy construct
-        KinematicCloud(const KinematicCloud&);
+            //- Evolve the cloud
+            void evolveCloud();
 
-        //- Disallow default bitwise assignment
-        void operator=(const KinematicCloud&);
-
-
-protected:
-
-    // Protected member functions
-
-        //- Set parcel position and cell into which parcel is introduced
-        void setInjectorCellAndPosition
-        (
-            label& pCell,
-            vector& pPosition
-        );
-
-        //- Set the number of particles per parcel
-        scalar setNumberOfParticles
-        (
-            const label nParcels,
-            const scalar pDiameter,
-            const scalar pVolumeFraction,
-            const scalar pRho,
-            const scalar pVolume
-        );
-
-        //- Inject more parcels
-        template<class TrackingData>
-        void inject(TrackingData& td);
-
-        //- Inject parcel if it is valid - delete otherwise
-        template<class TrackingData>
-        void injectParcel
-        (
-            TrackingData& td,
-            ParcelType* p
-        );
-
-        //- Move the parcels
-        template<class TrackingData>
-        void move(TrackingData& td);
-
-        //- Post-injection checks
-        void postInjectCheck();
+            //- Post-evolve
+            void postEvolve();
 
 
 public:
-
-    //- Runtime type information
-//    TypeName("KinematicCloud");
 
     // Constructors
 
         //- Construct given carrier gas fields
         KinematicCloud
         (
-            const word& cloudType,
-            const volPointInterpolation& vpi,
+            const word& cloudName,
             const volScalarField& rho,
             const volVectorField& U,
             const volScalarField& mu,
-            const dimensionedVector& g
+            const dimensionedVector& g,
+            bool readFields = true
         );
 
 
-    // Destructor
+    //- Destructor
+    virtual ~KinematicCloud();
 
-        virtual ~KinematicCloud();
+
+    //- Type of parcel the cloud was instantiated for
+    typedef ParcelType parcelType;
 
 
     // Member Functions
@@ -295,32 +229,33 @@ public:
 
             // References to the mesh and databases
 
-                //- Return the cloud type
-                inline const word& cloudType() const;
-
-                //- Return the parcel type id
-                inline label parcelTypeId() const;
-
                 //- Return refernce to the mesh
                 inline const fvMesh& mesh() const;
-
-                //- Retuen reference to the interpolation
-                inline const volPointInterpolation& vpi() const;
 
                 //- Return particle properties dictionary
                 inline const IOdictionary& particleProperties() const;
 
-            //- Return coupled flag
-            inline const Switch coupled() const;
+                //- Return the constant properties
+                inline const typename ParcelType::constantProperties&
+                    constProps() const;
 
-            //- Return refernce to the random object
-            inline Random& rndGen();
 
-            //- Return the start of injection interval time
-            inline scalar time0() const;
+            // Cloud data
 
-            //- Return a reference to the mass of particles to introduce
-            inline scalar massTotal() const;
+                //- Return the active flag
+                inline const Switch active() const;
+
+                //- Return the parcel type id
+                inline label parcelTypeId() const;
+
+                //- Return coupled flag
+                inline const Switch coupled() const;
+
+                //- Return cell value correction flag
+                inline const Switch cellValueSourceCorrection() const;
+
+                //- Return refernce to the random object
+                inline Random& rndGen();
 
 
             // References to the carrier gas fields
@@ -341,6 +276,10 @@ public:
                 inline const dimensionedVector& g() const;
 
 
+            //- Optional particle forces
+            inline const particleForces& forces() const;
+
+
             // Interpolations
 
                 //- Return reference to the interpolation dictionary
@@ -349,27 +288,33 @@ public:
 
             // Sub-models
 
-                //- Return reference to dispersion model
+                //- Return const-access to the dispersion model
                 inline const DispersionModel<KinematicCloud<ParcelType> >&
                     dispersion() const;
 
+                //- Return reference to the dispersion model
                 inline DispersionModel<KinematicCloud<ParcelType> >&
                     dispersion();
 
-                //- Return reference to drag model
+                //- Return const-access to the drag model
                 inline const DragModel<KinematicCloud<ParcelType> >&
                     drag() const;
 
-                //- Return reference to injection model
+                //- Return const access to the injection model
                 inline const InjectionModel<KinematicCloud<ParcelType> >&
                     injection() const;
 
+                //- Return reference to the injection model
                 inline InjectionModel<KinematicCloud<ParcelType> >&
                     injection();
 
-                //- Return reference to wall interaction model
-                inline const WallInteractionModel<KinematicCloud<ParcelType> >&
-                    wallInteraction() const;
+                //- Return const-access to the patch interaction model
+                inline const PatchInteractionModel<KinematicCloud<ParcelType> >&
+                    patchInteraction() const;
+
+                //- Return reference to post-processing model
+                inline PostProcessingModel<KinematicCloud<ParcelType> >&
+                    postProcessing();
 
 
             // Integration schemes
@@ -385,15 +330,8 @@ public:
                     //- Return reference to momentum source
                     inline DimensionedField<vector, volMesh>& UTrans();
 
-                    //- Coefficient for carrier phase U equation
-                    inline DimensionedField<scalar, volMesh>& UCoeff();
-
                     //- Return tmp momentum source term - fully explicit
-                    inline tmp<DimensionedField<vector, volMesh> > SU1() const;
-
-                    //- Return tmp momentum source term - semi-implicit
-                    inline tmp<fvVectorMatrix> SU2(volVectorField& U) const;
-
+                    inline tmp<DimensionedField<vector, volMesh> > SU() const;
 
 
         // Check
@@ -407,18 +345,6 @@ public:
             //- Print cloud information
             void info() const;
 
-            //- Dump particle positions to .obj file
-            void dumpParticlePositions() const;
-
-
-            // Counters
-
-                //- Return the number of injections
-                inline label nInjections() const;
-
-                //- Return the total number parcels added
-                inline label nParcelsAddedTotal() const;
-
 
             // Fields
 
@@ -430,13 +356,25 @@ public:
                 //  Note: for particles belonging to this cloud only
                 inline const tmp<volScalarField> alpha() const;
 
+                //- Return the particle effective density field
+                //  Note: for particles belonging to this cloud only
+                inline const tmp<volScalarField> rhoEff() const;
+
 
         // Cloud evolution functions
+
+            //- Check parcel properties
+            void checkParcelProperties
+            (
+                ParcelType& parcel,
+                const scalar lagrangianDt,
+                const bool fullyDescribed
+            );
 
             //- Reset the spray source terms
             void resetSourceTerms();
 
-            //- Evolve the spray (move, inject)
+            //- Evolve the spray (inject, inject)
             void evolve();
 };
 

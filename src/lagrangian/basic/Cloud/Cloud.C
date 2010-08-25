@@ -30,6 +30,7 @@ License
 #include "PstreamCombineReduceOps.H"
 #include "mapPolyMesh.H"
 #include "Time.H"
+#include "OFstream.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -41,16 +42,12 @@ Foam::Cloud<ParticleType>::Cloud
 )
 :
     cloud(pMesh),
-    IDLList<ParticleType>(particles),
+    IDLList<ParticleType>(),
     polyMesh_(pMesh),
-    allFaces_(pMesh.faces()),
-    points_(pMesh.points()),
-    cellFaces_(pMesh.cells()),
-    allFaceCentres_(pMesh.faceCentres()),
-    owner_(pMesh.faceOwner()),
-    neighbour_(pMesh.faceNeighbour()),
-    meshInfo_(polyMesh_)
-{}
+    particleCount_(0)
+{
+    IDLList<ParticleType>::operator=(particles);
+}
 
 
 template<class ParticleType>
@@ -62,19 +59,30 @@ Foam::Cloud<ParticleType>::Cloud
 )
 :
     cloud(pMesh, cloudName),
-    IDLList<ParticleType>(particles),
+    IDLList<ParticleType>(),
     polyMesh_(pMesh),
-    allFaces_(pMesh.faces()),
-    points_(pMesh.points()),
-    cellFaces_(pMesh.cells()),
-    allFaceCentres_(pMesh.faceCentres()),
-    owner_(pMesh.faceOwner()),
-    neighbour_(pMesh.faceNeighbour()),
-    meshInfo_(polyMesh_)
-{}
+    particleCount_(0)
+{
+    IDLList<ParticleType>::operator=(particles);
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class ParticleType>
+Foam::label Foam::Cloud<ParticleType>::getNewParticleID() const
+{
+    label id = particleCount_++;
+
+    if (id == labelMax)
+    {
+        WarningIn("Cloud<ParticleType>::getNewParticleID() const")
+            << "Particle counter has overflowed. This might cause problems"
+            << " when reconstructing particle tracks." << endl;
+    }
+    return id;
+}
+
 
 template<class ParticleType>
 void Foam::Cloud<ParticleType>::addParticle(ParticleType* pPtr)
@@ -317,7 +325,7 @@ void Foam::Cloud<ParticleType>::autoMap(const mapPolyMesh& mapper)
             {
                 pIter().celli_ = polyMesh_.findCell(pIter().position());
             }
-                
+
             vector p = pIter().position();
             const_cast<vector&>(pIter().position()) =
                 polyMesh_.cellCentres()[trackStartCell];
@@ -325,6 +333,25 @@ void Foam::Cloud<ParticleType>::autoMap(const mapPolyMesh& mapper)
             pIter().track(p);
         }
     }
+}
+
+
+template<class ParticleType>
+void Foam::Cloud<ParticleType>::writePositions() const
+{
+    OFstream pObj
+    (
+        this->db().time().path()/this->name() + "_positions.obj"
+    );
+
+    forAllConstIter(typename Cloud<ParticleType>, *this, pIter)
+    {
+        const ParticleType& p = pIter();
+        pObj<< "v " << p.position().x() << " " << p.position().y() << " "
+            << p.position().z() << nl;
+    }
+
+    pObj.flush();
 }
 
 

@@ -36,6 +36,7 @@ namespace Foam
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
+//- Calculate and return the laminar viscosity
 word twoPhaseMixture::getPhaseName(const word& key) const
 {
     if (isDict(key))

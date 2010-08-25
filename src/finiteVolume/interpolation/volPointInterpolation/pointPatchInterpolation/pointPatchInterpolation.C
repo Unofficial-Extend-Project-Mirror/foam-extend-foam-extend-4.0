@@ -55,7 +55,7 @@ void pointPatchInterpolation::makePatchPatchAddressing()
     }
 
     const fvBoundaryMesh& bm = fvMesh_.boundary();
-    const pointBoundaryMesh& pbm = pointMesh_.boundary();
+    const pointBoundaryMesh& pbm = pointMesh::New(fvMesh_).boundary();
 
     // first count the total number of patch-patch points
 
@@ -188,7 +188,7 @@ void pointPatchInterpolation::makePatchPatchWeights()
             fvMesh_.polyMesh::instance(),
             fvMesh_
         ),
-        pointMesh_,
+        pointMesh::New(fvMesh_),
         dimensionedScalar("zero", dimless, 0)
     );
 
@@ -285,14 +285,9 @@ void pointPatchInterpolation::makePatchPatchWeights()
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-pointPatchInterpolation::pointPatchInterpolation
-(
-    const fvMesh& vm,
-    const pointMesh& pm
-)
+pointPatchInterpolation::pointPatchInterpolation(const fvMesh& vm)
 :
-    fvMesh_(vm),
-    pointMesh_(pm)
+    fvMesh_(vm)
 {
     updateMesh();
 }

@@ -24,8 +24,6 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
-
 #include "RanzMarshall.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -37,8 +35,7 @@ Foam::RanzMarshall<CloudType>::RanzMarshall
     CloudType& cloud
 )
 :
-    HeatTransferModel<CloudType>(dict, cloud, typeName),
-    Pr_(dimensionedScalar(this->coeffDict().lookup("Pr")).value())
+    HeatTransferModel<CloudType>(dict, cloud, typeName)
 {}
 
 
@@ -65,14 +62,7 @@ Foam::scalar Foam::RanzMarshall<CloudType>::Nu
     const scalar Pr
 ) const
 {
-    return 2.0 + 0.6*pow(Re, 1.0/2.0)*pow(Pr, 1.0/3.0);
-}
-
-
-template <class CloudType>
-Foam::scalar Foam::RanzMarshall<CloudType>::Pr() const
-{
-    return Pr_;
+    return 2.0 + 0.6*sqrt(Re)*cbrt(Pr);
 }
 
 

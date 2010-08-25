@@ -29,7 +29,7 @@ Description
     Contains the interface properties.
 
     Properties to aid interFoam:
-    -# Correct the gamma boundary condition for dynamic contact angle.
+    -# Correct the alpha boundary condition for dynamic contact angle.
     -# Calculate interface curvature.
 
 SourceFiles
@@ -61,7 +61,7 @@ class interfaceProperties
         const dictionary& transportPropertiesDict_;
 
         //- Compression coefficient
-        scalar cGamma_;
+        scalar cAlpha_;
 
         //- Surface tension
         dimensionedScalar sigma_;
@@ -69,7 +69,7 @@ class interfaceProperties
         //- Stabilisation for normalisation of the interface normal
         const dimensionedScalar deltaN_;
 
-        const volScalarField& gamma_;
+        const volScalarField& alpha1_;
         const volVectorField& U_;
         surfaceScalarField nHatf_;
         volScalarField K_;
@@ -104,7 +104,7 @@ public:
         //- Construct from volume fraction field gamma and IOdictionary
         interfaceProperties
         (
-            const volScalarField& gamma,
+            const volScalarField& alpha1,
             const volVectorField& U,
             const IOdictionary&
         );
@@ -112,9 +112,9 @@ public:
 
     // Member Functions
 
-        scalar cGamma() const
+        scalar cAlpha() const
         {
-            return cGamma_;
+            return cAlpha_;
         }
 
         const dimensionedScalar& deltaN() const

@@ -30,14 +30,9 @@ License
 #include "volFields.H"
 #include "basicThermo.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-wallHeatTransferFvPatchScalarField::wallHeatTransferFvPatchScalarField
+Foam::wallHeatTransferFvPatchScalarField::wallHeatTransferFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
@@ -53,7 +48,7 @@ wallHeatTransferFvPatchScalarField::wallHeatTransferFvPatchScalarField
 }
 
 
-wallHeatTransferFvPatchScalarField::wallHeatTransferFvPatchScalarField
+Foam::wallHeatTransferFvPatchScalarField::wallHeatTransferFvPatchScalarField
 (
     const wallHeatTransferFvPatchScalarField& ptf,
     const fvPatch& p,
@@ -67,7 +62,7 @@ wallHeatTransferFvPatchScalarField::wallHeatTransferFvPatchScalarField
 {}
 
 
-wallHeatTransferFvPatchScalarField::wallHeatTransferFvPatchScalarField
+Foam::wallHeatTransferFvPatchScalarField::wallHeatTransferFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -96,7 +91,7 @@ wallHeatTransferFvPatchScalarField::wallHeatTransferFvPatchScalarField
 }
 
 
-wallHeatTransferFvPatchScalarField::wallHeatTransferFvPatchScalarField
+Foam::wallHeatTransferFvPatchScalarField::wallHeatTransferFvPatchScalarField
 (
     const wallHeatTransferFvPatchScalarField& tppsf
 )
@@ -107,7 +102,7 @@ wallHeatTransferFvPatchScalarField::wallHeatTransferFvPatchScalarField
 {}
 
 
-wallHeatTransferFvPatchScalarField::wallHeatTransferFvPatchScalarField
+Foam::wallHeatTransferFvPatchScalarField::wallHeatTransferFvPatchScalarField
 (
     const wallHeatTransferFvPatchScalarField& tppsf,
     const DimensionedField<scalar, volMesh>& iF
@@ -121,7 +116,7 @@ wallHeatTransferFvPatchScalarField::wallHeatTransferFvPatchScalarField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void wallHeatTransferFvPatchScalarField::autoMap
+void Foam::wallHeatTransferFvPatchScalarField::autoMap
 (
     const fvPatchFieldMapper& m
 )
@@ -132,7 +127,7 @@ void wallHeatTransferFvPatchScalarField::autoMap
 }
 
 
-void wallHeatTransferFvPatchScalarField::rmap
+void Foam::wallHeatTransferFvPatchScalarField::rmap
 (
     const fvPatchScalarField& ptf,
     const labelList& addr
@@ -148,7 +143,7 @@ void wallHeatTransferFvPatchScalarField::rmap
 }
 
 
-void wallHeatTransferFvPatchScalarField::updateCoeffs()
+void Foam::wallHeatTransferFvPatchScalarField::updateCoeffs()
 {
     if (updated())
     {
@@ -159,13 +154,13 @@ void wallHeatTransferFvPatchScalarField::updateCoeffs()
     (
         "thermophysicalProperties"
     );
-    
+
     const label patchi = patch().index();
 
     const scalarField& Tw = thermo.T().boundaryField()[patchi];
     scalarField Cpw = thermo.Cp(Tw, patchi);
 
-    valueFraction() = 
+    valueFraction() =
         1.0/
         (
             1.0
@@ -177,7 +172,7 @@ void wallHeatTransferFvPatchScalarField::updateCoeffs()
 }
 
 
-void wallHeatTransferFvPatchScalarField::write(Ostream& os) const
+void Foam::wallHeatTransferFvPatchScalarField::write(Ostream& os) const
 {
     fvPatchScalarField::write(os);
     Tinf_.writeEntry("Tinf", os);
@@ -188,10 +183,9 @@ void wallHeatTransferFvPatchScalarField::write(Ostream& os) const
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField(fvPatchScalarField, wallHeatTransferFvPatchScalarField);
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
+namespace Foam
+{
+    makePatchTypeField(fvPatchScalarField, wallHeatTransferFvPatchScalarField);
+}
 
 // ************************************************************************* //

@@ -28,30 +28,17 @@ License
 #include "addToRunTimeSelectionTable.H"
 #include "simpleMatrix.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-namespace Foam
-{
-    defineTypeNameAndDebug(EulerImplicit, 0);
-    addToRunTimeSelectionTable
-    (
-        chemistrySolver,
-        EulerImplicit,
-        dictionary
-    );
-};
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::EulerImplicit::EulerImplicit
+template<class CompType, class ThermoType>
+Foam::EulerImplicit<CompType, ThermoType>::EulerImplicit
 (
-    const Foam::dictionary& dict,
-    Foam::chemistryModel& chemistry
+    ODEChemistryModel<CompType, ThermoType>& model,
+    const word& modelName
 )
 :
-    chemistrySolver(dict, chemistry),
-    coeffsDict_(dict.subDict(typeName + "Coeffs")),
+    chemistrySolver<CompType, ThermoType>(model, modelName),
+    coeffsDict_(model.subDict(modelName + "Coeffs")),
     cTauChem_(readScalar(coeffsDict_.lookup("cTauChem"))),
     equil_(coeffsDict_.lookup("equilibriumRateLimiter"))
 {}
@@ -59,13 +46,15 @@ Foam::EulerImplicit::EulerImplicit
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::EulerImplicit::~EulerImplicit()
+template<class CompType, class ThermoType>
+Foam::EulerImplicit<CompType, ThermoType>::~EulerImplicit()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::scalar Foam::EulerImplicit::solve
+template<class CompType, class ThermoType>
+Foam::scalar Foam::EulerImplicit<CompType, ThermoType>::solve
 (
     scalarField &c,
     const scalar T,
@@ -74,28 +63,27 @@ Foam::scalar Foam::EulerImplicit::solve
     const scalar dt
 ) const
 {
-
     scalar pf, cf, pr, cr;
     label lRef, rRef;
 
-    label Ns = chemistry_.Ns();
-    simpleMatrix<scalar> RR(Ns);
-    
-    for(label i=0; i<Ns; i++)
+    label nSpecie = this->model_.nSpecie();
+    simpleMatrix<scalar> RR(nSpecie);
+
+    for (label i=0; i<nSpecie; i++)
     {
         c[i] = max(0.0, c[i]);
     }
 
-    for(label i=0; i<Ns; i++)
+    for (label i=0; i<nSpecie; i++)
     {
         RR.source()[i] = c[i]/dt;
     }
 
-    for(label i=0; i<chemistry_.reactions().size(); i++)
+    for (label i=0; i<this->model_.reactions().size(); i++)
     {
-        const chemistryModel::reaction& R = chemistry_.reactions()[i];
+        const Reaction<ThermoType>& R = this->model_.reactions()[i];
 
-        scalar omegai = chemistry_.omega
+        scalar omegai = this->model_.omega
         (
             R, c, T, p, pf, cf, lRef, pr, cr, rRef
         );
@@ -113,59 +101,59 @@ Foam::scalar Foam::EulerImplicit::solve
             }
         }
 
-        for(label s=0; s<R.lhs().size(); s++)
+        for (label s=0; s<R.lhs().size(); s++)
         {
             label si = R.lhs()[s].index;
             scalar sl = R.lhs()[s].stoichCoeff;
             RR[si][rRef] -= sl*pr*corr;
             RR[si][lRef] += sl*pf*corr;
         }
-            
-        for(label s=0; s<R.rhs().size(); s++)
+
+        for (label s=0; s<R.rhs().size(); s++)
         {
             label si = R.rhs()[s].index;
             scalar sr = R.rhs()[s].stoichCoeff;
             RR[si][lRef] -= sr*pf*corr;
             RR[si][rRef] += sr*pr*corr;
         }
-        
+
     } // end for(label i...
 
-    
-    for(label i=0; i<Ns; i++)
+
+    for (label i=0; i<nSpecie; i++)
     {
         RR[i][i] += 1.0/dt;
     }
 
     c = RR.LUsolve();
-    for(label i=0; i<Ns; i++)
+    for (label i=0; i<nSpecie; i++)
     {
         c[i] = max(0.0, c[i]);
     }
 
     // estimate the next time step
     scalar tMin = GREAT;
-    label n = chemistry_.nEqns();
-    scalarField c1(n, 0.0);
+    label nEqns = this->model_.nEqns();
+    scalarField c1(nEqns, 0.0);
 
-    for(label i=0; i<Ns; i++)
+    for (label i=0; i<nSpecie; i++)
     {
         c1[i] = c[i];
     }
-    c1[Ns] = T;
-    c1[Ns+1] = p;
+    c1[nSpecie] = T;
+    c1[nSpecie+1] = p;
 
-    scalarField dcdt(n, 0.0);
-    chemistry_.derivatives(0.0, c1, dcdt);
-    
+    scalarField dcdt(nEqns, 0.0);
+    this->model_.derivatives(0.0, c1, dcdt);
+
     scalar sumC = sum(c);
 
-    for(label i=0; i<Ns; i++)
+    for (label i=0; i<nSpecie; i++)
     {
         scalar d = dcdt[i];
         if (d < -SMALL)
         {
-            tMin = min(tMin, -(c[i]+SMALL)/d);
+            tMin = min(tMin, -(c[i] + SMALL)/d);
         }
         else
         {
@@ -173,10 +161,9 @@ Foam::scalar Foam::EulerImplicit::solve
             scalar cm = max(sumC - c[i], 1.0e-5);
             tMin = min(tMin, cm/d);
         }
-    }    
+    }
 
     return cTauChem_*tMin;
-
 }
 
 

@@ -36,7 +36,7 @@ Foam::parcel::parcel
     bool readFields
 )
 :
-    Particle<parcel>(cloud, is),
+    Particle<parcel>(cloud, is, readFields),
 
     liquidComponents_
     (
@@ -106,43 +106,48 @@ void Foam::parcel::readFields
         return;
     }
 
-    IOField<scalar> d(c.fieldIOobject("d"));
+    Particle<parcel>::readFields(c);
+
+    IOField<scalar> d(c.fieldIOobject("d", IOobject::MUST_READ));
     c.checkFieldIOobject(c, d);
 
-    IOField<scalar> T(c.fieldIOobject("T"));
+    IOField<scalar> T(c.fieldIOobject("T", IOobject::MUST_READ));
     c.checkFieldIOobject(c, T);
 
-    IOField<scalar> m(c.fieldIOobject("m"));
+    IOField<scalar> m(c.fieldIOobject("m", IOobject::MUST_READ));
     c.checkFieldIOobject(c, m);
 
-    IOField<scalar> y(c.fieldIOobject("y"));
+    IOField<scalar> y(c.fieldIOobject("y", IOobject::MUST_READ));
     c.checkFieldIOobject(c, y);
 
-    IOField<scalar> yDot(c.fieldIOobject("yDot"));
+    IOField<scalar> yDot(c.fieldIOobject("yDot", IOobject::MUST_READ));
     c.checkFieldIOobject(c, yDot);
 
-    IOField<scalar> ct(c.fieldIOobject("ct"));
+    IOField<scalar> ct(c.fieldIOobject("ct", IOobject::MUST_READ));
     c.checkFieldIOobject(c, ct);
 
-    IOField<scalar> ms(c.fieldIOobject("ms"));
+    IOField<scalar> ms(c.fieldIOobject("ms", IOobject::MUST_READ));
     c.checkFieldIOobject(c, ms);
 
-    IOField<scalar> tTurb(c.fieldIOobject("tTurb"));
+    IOField<scalar> tTurb(c.fieldIOobject("tTurb", IOobject::MUST_READ));
     c.checkFieldIOobject(c, tTurb);
 
-    IOField<scalar> liquidCore(c.fieldIOobject("liquidCore"));
+    IOField<scalar> liquidCore
+    (
+        c.fieldIOobject("liquidCore", IOobject::MUST_READ)
+    );
     c.checkFieldIOobject(c, liquidCore);
 
-    IOField<scalar> injector(c.fieldIOobject("injector"));
+    IOField<scalar> injector(c.fieldIOobject("injector", IOobject::MUST_READ));
     c.checkFieldIOobject(c, injector);
 
-    IOField<vector> U(c.fieldIOobject("U"));
+    IOField<vector> U(c.fieldIOobject("U", IOobject::MUST_READ));
     c.checkFieldIOobject(c, U);
 
-    IOField<vector> Uturb(c.fieldIOobject("Uturb"));
+    IOField<vector> Uturb(c.fieldIOobject("Uturb", IOobject::MUST_READ));
     c.checkFieldIOobject(c, Uturb);
 
-    IOField<vector> n(c.fieldIOobject("n"));
+    IOField<vector> n(c.fieldIOobject("n", IOobject::MUST_READ));
     c.checkFieldIOobject(c, n);
 
     label i = 0;
@@ -169,7 +174,7 @@ void Foam::parcel::readFields
     }
 
     // read the liquid molar fractions
-    if (c.size() > 0)
+    if (c.size())
     {
         Cloud<parcel>::const_iterator iter = c.begin();
         const parcel& p0 = iter();
@@ -179,7 +184,7 @@ void Foam::parcel::readFields
 
         for (label j=0; j<nX; j++)
         {
-            IOField<scalar> X(c.fieldIOobject(names[j]));
+            IOField<scalar> X(c.fieldIOobject(names[j], IOobject::MUST_READ));
 
             label i = 0;
             forAllIter(Cloud<parcel>, c, iter)
@@ -201,20 +206,27 @@ void Foam::parcel::writeFields
 
     label np = c.size();
 
-    IOField<scalar> d(c.fieldIOobject("d"), np);
-    IOField<scalar> T(c.fieldIOobject("T"), np);
-    IOField<scalar> m(c.fieldIOobject("m"), np);
-    IOField<scalar> y(c.fieldIOobject("y"), np);
-    IOField<scalar> yDot(c.fieldIOobject("yDot"), np);
-    IOField<scalar> ct(c.fieldIOobject("ct"), np);
-    IOField<scalar> ms(c.fieldIOobject("ms"), np);
-    IOField<scalar> tTurb(c.fieldIOobject("tTurb"), np);
-    IOField<scalar> liquidCore(c.fieldIOobject("liquidCore"), np);
-    IOField<scalar> injector(c.fieldIOobject("injector"), np);
-
-    IOField<vector> U(c.fieldIOobject("U"), np);
-    IOField<vector> Uturb(c.fieldIOobject("Uturb"), np);
-    IOField<vector> n(c.fieldIOobject("n"), np);
+    IOField<scalar> d(c.fieldIOobject("d", IOobject::NO_READ), np);
+    IOField<scalar> T(c.fieldIOobject("T", IOobject::NO_READ), np);
+    IOField<scalar> m(c.fieldIOobject("m", IOobject::NO_READ), np);
+    IOField<scalar> y(c.fieldIOobject("y", IOobject::NO_READ), np);
+    IOField<scalar> yDot(c.fieldIOobject("yDot", IOobject::NO_READ), np);
+    IOField<scalar> ct(c.fieldIOobject("ct", IOobject::NO_READ), np);
+    IOField<scalar> ms(c.fieldIOobject("ms", IOobject::NO_READ), np);
+    IOField<scalar> tTurb(c.fieldIOobject("tTurb", IOobject::NO_READ), np);
+    IOField<scalar> liquidCore
+    (
+        c.fieldIOobject("liquidCore", IOobject::NO_READ),
+        np
+    );
+    IOField<scalar> injector
+    (
+        c.fieldIOobject("injector", IOobject::NO_READ),
+        np
+    );
+    IOField<vector> U(c.fieldIOobject("U", IOobject::NO_READ), np);
+    IOField<vector> Uturb(c.fieldIOobject("Uturb", IOobject::NO_READ), np);
+    IOField<vector> n(c.fieldIOobject("n", IOobject::NO_READ), np);
 
     label i = 0;
     forAllConstIter(Cloud<parcel>, c, iter)
@@ -265,7 +277,7 @@ void Foam::parcel::writeFields
 
         for (label j=0; j<nX; j++)
         {
-            IOField<scalar> X(c.fieldIOobject(names[j]), np);
+            IOField<scalar> X(c.fieldIOobject(names[j], IOobject::NO_READ), np);
 
             label i = 0;
             forAllConstIter(Cloud<parcel>, c, iter)

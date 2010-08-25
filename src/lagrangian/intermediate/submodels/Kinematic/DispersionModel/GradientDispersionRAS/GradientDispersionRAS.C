@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "GradientDispersionRAS.H"
@@ -37,7 +35,8 @@ Foam::GradientDispersionRAS<CloudType>::GradientDispersionRAS
     CloudType& owner
 )
 :
-    DispersionRASModel<CloudType>(dict, owner)
+    DispersionRASModel<CloudType>(dict, owner),
+    gradkPtr_(NULL)
 {}
 
 
@@ -45,7 +44,9 @@ Foam::GradientDispersionRAS<CloudType>::GradientDispersionRAS
 
 template<class CloudType>
 Foam::GradientDispersionRAS<CloudType>::~GradientDispersionRAS()
-{}
+{
+    cacheFields(false);
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -54,6 +55,26 @@ template<class CloudType>
 bool Foam::GradientDispersionRAS<CloudType>::active() const
 {
     return true;
+}
+
+
+template<class CloudType>
+void Foam::GradientDispersionRAS<CloudType>::cacheFields(const bool store)
+{
+    DispersionRASModel<CloudType>::cacheFields(store);
+
+    if (store)
+    {
+        gradkPtr_ = fvc::grad(*this->kPtr_).ptr();
+    }
+    else
+    {
+        if (gradkPtr_)
+        {
+            delete gradkPtr_;
+            gradkPtr_ = NULL;
+        }
+    }
 }
 
 
@@ -70,9 +91,9 @@ Foam::vector Foam::GradientDispersionRAS<CloudType>::update
 {
     const scalar cps = 0.16432;
 
-    const volScalarField& k = this->turbulence().k();
-    const volScalarField& epsilon = this->turbulence().epsilon();
-    const volVectorField gradk = fvc::grad(k);
+    const volScalarField& k = *this->kPtr_;
+    const volScalarField& epsilon = *this->epsilonPtr_;
+    const volVectorField& gradk = *this->gradkPtr_;
 
     const scalar UrelMag = mag(U - Uc - UTurb);
 
@@ -111,7 +132,7 @@ Foam::vector Foam::GradientDispersionRAS<CloudType>::update
             // away from the axis of symmetry
             // This creates a 'hole' in the spray and to
             // prevent this we let x1 be both negative/positive
-            if (this->owner().meshInfo().caseIs2d())
+            if (this->owner().mesh().nSolutionD() == 2)
             {
                 fac *= x1;
             }

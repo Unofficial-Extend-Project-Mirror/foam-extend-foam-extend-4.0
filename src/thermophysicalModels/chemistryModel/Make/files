@@ -1,29 +1,26 @@
-binaryNode = binaryNode
-binaryTree = binaryTree
-chemPoint = chemPoint
-chemistryModel = chemistryModel
-chemistrySolver = chemistrySolver
-chemistryOnlineLibrary = chemistryOnlineLibrary
+binaryNode/binaryNode.C
 
-$(binaryNode)/binaryNode.C
+binaryTree/binaryTreeAdd.C
+binaryTree/binaryTree.C
+binaryTree/binaryTreeClean.C
+binaryTree/binaryTreeInsert.C
+binaryTree/binaryTreeScan.C
+binaryTree/binaryTreeSearch.C
 
-$(binaryTree)/binaryTreeAdd.C
-$(binaryTree)/binaryTree.C
-$(binaryTree)/binaryTreeClean.C
-$(binaryTree)/binaryTreeInsert.C
-$(binaryTree)/binaryTreeScan.C
-$(binaryTree)/binaryTreeSearch.C
+chemPoint/chemPoint.C
 
-$(chemPoint)/chemPoint.C
+chemistryOnlineLibrary/chemistryOnlineLibrary.C
 
-$(chemistryModel)/chemistryModel.C
+chemistryModel/basicChemistryModel/basicChemistryModel.C
 
-$(chemistrySolver)/chemistrySolver/chemistrySolver.C
-$(chemistrySolver)/chemistrySolver/newChemistrySolver.C
-$(chemistrySolver)/sequential/sequential.C
-$(chemistrySolver)/EulerImplicit/EulerImplicit.C
-$(chemistrySolver)/ode/ode.C
+chemistryModel/psiChemistryModel/psiChemistryModel.C
+chemistryModel/psiChemistryModel/newPsiChemistryModel.C
+chemistryModel/psiChemistryModel/psiChemistryModels.C
 
-$(chemistryOnlineLibrary)/chemistryOnlineLibrary.C
+chemistryModel/rhoChemistryModel/rhoChemistryModel.C
+chemistryModel/rhoChemistryModel/newRhoChemistryModel.C
+chemistryModel/rhoChemistryModel/rhoChemistryModels.C
+
+chemistrySolver/chemistrySolver/makeChemistrySolvers.C
 
 LIB = $(FOAM_LIBBIN)/libchemistryModel

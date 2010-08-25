@@ -6,6 +6,4 @@ indexedParticle = indexedParticle
 $(passiveParticle)/passiveParticleCloud.C
 $(indexedParticle)/indexedParticleCloud.C
 
-polyMeshInfo/polyMeshInfo.C
-
 LIB = $(FOAM_LIBBIN)/liblagrangian

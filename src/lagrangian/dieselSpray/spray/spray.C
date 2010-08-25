@@ -36,7 +36,7 @@ License
 #include "injectorModel.H"
 #include "wallModel.H"
 
-#include "combustionMixture.H"
+#include "basicMultiComponentMixture.H"
 
 #include "symmetryPolyPatch.H"
 #include "wedgePolyPatch.H"
@@ -52,23 +52,23 @@ defineTemplateTypeNameAndDebug(IOPtrList<injector>, 0);
 // Construct from components
 Foam::spray::spray
 (
-    const volPointInterpolation& vpi,
     const volVectorField& U,
     const volScalarField& rho,
     const volScalarField& p,
     const volScalarField& T,
-    const combustionMixture& composition,
-    const PtrList<specieProperties>& gasProperties,
+    const basicMultiComponentMixture& composition,
+    const PtrList<gasThermoPhysics>& gasProperties,
     const dictionary&,
-    const dictionary& environmentalProperties
+    const dimensionedVector& g,
+    bool readFields
 )
 :
     Cloud<parcel>(U.mesh(), false), // suppress className checking on positions
     runTime_(U.time()),
     time0_(runTime_.value()),
     mesh_(U.mesh()),
-    volPointInterpolation_(vpi),
     rndGen_(label(0)),
+    g_(g.value()),
 
     U_(U),
     rho_(rho),
@@ -180,7 +180,7 @@ Foam::spray::spray
             sprayProperties_,
             *this
         )
-    ),    
+    ),
 
     sprayIteration_(sprayProperties_.subDict("sprayIteration")),
     sprayIterate_(readLabel(sprayIteration_.lookup("sprayIterate"))),
@@ -188,7 +188,6 @@ Foam::spray::spray
     minimumParcelMass_(readScalar(sprayIteration_.lookup("minimumParcelMass"))),
 
     subCycles_(readLabel(sprayProperties_.lookup("subCycles"))),
-    g_(dimensionedVector(environmentalProperties.lookup("g")).value()),
 
     gasProperties_(gasProperties),
     composition_(composition),
@@ -248,11 +247,11 @@ Foam::spray::spray
     // check for the type of boundary condition
     forAll(bMesh, patchi)
     {
-        if (isType<symmetryPolyPatch>(bMesh[patchi]))
+        if (isA<symmetryPolyPatch>(bMesh[patchi]))
         {
             symPlaneExist = true;
         }
-        else if (isType<wedgePolyPatch>(bMesh[patchi]))
+        else if (isA<wedgePolyPatch>(bMesh[patchi]))
         {
             wedgeExist = true;
             patches[n++] = patchi;
@@ -268,12 +267,12 @@ Foam::spray::spray
         {
             FatalErrorIn
             (
-                "spray::spray(const pointMesh& pMesh, const volVectorField& U, "
+                "spray::spray(const volVectorField& U, "
                 "const volScalarField& rho, const volScalarField& p, "
                 "const volScalarField& T, const combustionMixture& composition,"
-                "const PtrList<specieProperties>& gaseousFuelProperties, "
+                "const PtrList<gasThermoPhsyics>& gaseousFuelProperties, "
                 "const dictionary& thermophysicalProperties, "
-                "const dictionary& environmentalProperties)"
+                "const dimensionedScalar& g)"
             )   << "spray::(...) only one wedgePolyPatch found. "
                    "Please check you BC-setup."
                 << abort(FatalError);
@@ -352,7 +351,10 @@ Foam::spray::spray
         }
     }
 
-    parcel::readFields(*this);
+    if (readFields)
+    {
+        parcel::readFields(*this);
+    }
 }
 
 
@@ -360,14 +362,6 @@ Foam::spray::spray
 
 Foam::spray::~spray()
 {}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-void Foam::spray::writeFields() const
-{
-    parcel::writeFields(*this);
-}
 
 
 // ************************************************************************* //

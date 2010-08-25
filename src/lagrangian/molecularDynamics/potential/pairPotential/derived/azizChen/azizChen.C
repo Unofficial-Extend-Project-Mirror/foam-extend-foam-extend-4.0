@@ -45,8 +45,6 @@ addToRunTimeSelectionTable
     dictionary
 );
 
-// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
-
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -71,6 +69,7 @@ azizChen::azizChen
     setLookupTables();
 }
 
+
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 scalar azizChen::unscaledEnergy(const scalar r) const
@@ -84,15 +83,16 @@ scalar azizChen::unscaledEnergy(const scalar r) const
         F = exp(-pow(((D_ / x) - 1.0),2));
     }
 
-    return epsilon_ *
-    (
-        A_ * Foam::pow(x, gamma_) * exp(-alpha_ * x)
-      - (
-            (C6_/ Foam::pow(x, 6))
-          + (C8_/ Foam::pow(x, 8))
-          + (C10_/ Foam::pow(x, 10))
-        )
-      * F
+    return
+        epsilon_
+       *(
+            A_ * Foam::pow(x, gamma_)*exp(-alpha_*x)
+          - (
+                (C6_/ Foam::pow(x, 6))
+              + (C8_/ Foam::pow(x, 8))
+              + (C10_/ Foam::pow(x, 10))
+            )
+           *F
     );
 }
 
@@ -112,7 +112,7 @@ bool azizChen::read(const dictionary& azizChen)
     azizChenCoeffs_.lookup("C10") >> C10_;
     azizChenCoeffs_.lookup("D") >> D_;
     azizChenCoeffs_.lookup("gamma") >> gamma_;
-    
+
     return true;
 }
 

@@ -34,7 +34,6 @@ const Foam::scalar Foam::liquidMixture::TrMax = 0.999;
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from components
 Foam::liquidMixture::liquidMixture
 (
     const dictionary& thermophysicalProperties
@@ -72,6 +71,7 @@ Foam::liquidMixture::liquidMixture
     }
 }
 
+
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 
 Foam::autoPtr<Foam::liquidMixture> Foam::liquidMixture::New
@@ -85,7 +85,6 @@ Foam::autoPtr<Foam::liquidMixture> Foam::liquidMixture::New
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Critical Temperature
 Foam::scalar Foam::liquidMixture::Tc
 (
     const scalarField& x
@@ -104,9 +103,8 @@ Foam::scalar Foam::liquidMixture::Tc
 
     return vTc/vc;
 }
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Pseudocritical temperature
+
 Foam::scalar Foam::liquidMixture::Tpc
 (
     const scalarField& x
@@ -121,9 +119,7 @@ Foam::scalar Foam::liquidMixture::Tpc
     return Tpc;
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Pseudocritical pressure
 Foam::scalar Foam::liquidMixture::Ppc
 (
     const scalarField& x
@@ -140,7 +136,6 @@ Foam::scalar Foam::liquidMixture::Ppc
     return specie::RR*Zc*Tpc(x)/Vc;
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 Foam::scalar Foam::liquidMixture::omega
 (
@@ -156,7 +151,6 @@ Foam::scalar Foam::liquidMixture::omega
     return omega;
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 Foam::scalarField Foam::liquidMixture::Xs
 (
@@ -178,9 +172,6 @@ Foam::scalarField Foam::liquidMixture::Xs
     return xs;
 }
 
-//-----------------------------------------------------------------------------
-// Physical properties
-//-----------------------------------------------------------------------------
 
 Foam::scalar Foam::liquidMixture::W
 (
@@ -196,6 +187,7 @@ Foam::scalar Foam::liquidMixture::W
     return W;
 }
 
+
 Foam::scalarField Foam::liquidMixture::Y
 (
     const scalarField& X
@@ -210,6 +202,7 @@ Foam::scalarField Foam::liquidMixture::Y
 
     return Y;
 }
+
 
 Foam::scalarField Foam::liquidMixture::X
 (
@@ -250,6 +243,7 @@ Foam::scalar Foam::liquidMixture::rho
     return W(x)/v;
 }
 
+
 Foam::scalar Foam::liquidMixture::pv
 (
     const scalar p,
@@ -270,6 +264,7 @@ Foam::scalar Foam::liquidMixture::pv
 
     return pv/W(x);
 }
+
 
 Foam::scalar Foam::liquidMixture::hl
 (
@@ -292,6 +287,7 @@ Foam::scalar Foam::liquidMixture::hl
     return hl/W(x);
 }
 
+
 Foam::scalar Foam::liquidMixture::cp
 (
     const scalar p,
@@ -306,12 +302,13 @@ Foam::scalar Foam::liquidMixture::cp
         if (x[i] > SMALL)
         {
             scalar Ti = min(TrMax*properties_[i].Tc(), T);
-            cp += x[i]*properties_[i].cp(p, Ti)*properties_[i].W();;
+            cp += x[i]*properties_[i].cp(p, Ti)*properties_[i].W();
         }
     }
 
     return cp/W(x);
 }
+
 
 Foam::scalar Foam::liquidMixture::sigma
 (
@@ -346,6 +343,7 @@ Foam::scalar Foam::liquidMixture::sigma
     return sigma;
 }
 
+
 Foam::scalar Foam::liquidMixture::mu
 (
     const scalar p,
@@ -366,6 +364,7 @@ Foam::scalar Foam::liquidMixture::mu
 
     return exp(mu);
 }
+
 
 Foam::scalar Foam::liquidMixture::K
 (
@@ -402,13 +401,19 @@ Foam::scalar Foam::liquidMixture::K
         {
             scalar Tj = min(TrMax*properties_[j].Tc(), T);
 
-            scalar Kij = 2.0/(1.0/properties_[i].K(p, Ti) + 1.0/properties_[j].K(p, Tj));
+            scalar Kij =
+                2.0
+               /(
+                    1.0/properties_[i].K(p, Ti)
+                  + 1.0/properties_[j].K(p, Tj)
+                );
             K += phii[i]*phii[j]*Kij;
         }
     }
 
     return K;
 }
+
 
 Foam::scalar Foam::liquidMixture::D
 (
@@ -431,5 +436,6 @@ Foam::scalar Foam::liquidMixture::D
 
     return 1.0/Dinv;
 }
+
 
 // ************************************************************************* //

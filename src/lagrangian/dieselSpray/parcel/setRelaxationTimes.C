@@ -30,7 +30,7 @@ License
 #include "dragModel.H"
 #include "evaporationModel.H"
 #include "heatTransferModel.H"
-#include "combustionMixture.H"
+#include "basicMultiComponentMixture.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -93,7 +93,7 @@ void parcel::setRelaxationTimes
     for(label i=0; i<Nf; i++)
     {
         label j = sDB.liquidToGasIndex()[i];
-        scalar Y = sDB.composition().Y()[j][celli];        
+        scalar Y = sDB.composition().Y()[j][celli];
         scalar Wi = sDB.gasProperties()[j].W();
         Yf[i] = Y;
         Xf[i] = Y*W/Wi;
@@ -139,14 +139,14 @@ void parcel::setRelaxationTimes
     scalar Prandtl = Pr(cpMixture, muf, kMixture);
 
     // calculate the characteritic times
-      
+
     if(liquidCore_> 0.5)
     {
 //      no drag for parcels in the liquid core..
         tauMomentum = GREAT;
     }
     else
-    {    
+    {
         tauMomentum = sDB.drag().relaxationTime
         (
             Urel(Up),
@@ -218,10 +218,10 @@ void parcel::setRelaxationTimes
             {
                 scalar Nusselt =
                     sDB.heatTransfer().Nu(Reynolds, Prandtl);
-                
+
 //              calculating the boiling temperature of the liquid at ambient pressure
                 scalar tBoilingSurface = Td;
-                
+
                 label Niter = 0;
                 scalar deltaT = 10.0;
                 scalar dp0 = fuels.properties()[i].pv(pressure, tBoilingSurface) - pressure;
@@ -255,16 +255,16 @@ void parcel::setRelaxationTimes
                     }
                     dp0 = dp;
                 }
-                
+
                 scalar vapourSurfaceEnthalpy = 0.0;
                 scalar vapourFarEnthalpy = 0.0;
-                
+
                 for(label k = 0; k < sDB.gasProperties().size(); k++)
                 {
                     vapourSurfaceEnthalpy += sDB.composition().Y()[k][celli]*sDB.gasProperties()[k].H(tBoilingSurface);
                     vapourFarEnthalpy += sDB.composition().Y()[k][celli]*sDB.gasProperties()[k].H(temperature);
                 }
-               
+
                 scalar kLiquid = fuels.properties()[i].K(pressure, 0.5*(tBoilingSurface+T()));
 
                 tauBoiling[i] = sDB.evaporation().boilingTime

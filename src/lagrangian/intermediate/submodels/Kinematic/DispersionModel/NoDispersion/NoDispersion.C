@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "NoDispersion.H"
@@ -33,11 +31,11 @@ Description
 template<class CloudType>
 Foam::NoDispersion<CloudType>::NoDispersion
 (
-    const dictionary& dict,
+    const dictionary&,
     CloudType& owner
 )
 :
-    DispersionModel<CloudType>(dict, owner)
+    DispersionModel<CloudType>(owner)
 {}
 
 
@@ -58,14 +56,21 @@ bool Foam::NoDispersion<CloudType>::active() const
 
 
 template<class CloudType>
+void Foam::NoDispersion<CloudType>::cacheFields(const bool)
+{
+// do nothing
+}
+
+
+template<class CloudType>
 Foam::vector Foam::NoDispersion<CloudType>::update
 (
-    const scalar dt,
-    const label celli,
-    const vector& U,
+    const scalar,
+    const label,
+    const vector&,
     const vector& Uc,
-    vector& UTurb,
-    scalar& tTurb
+    vector&,
+    scalar&
 )
 {
     // Do nothing

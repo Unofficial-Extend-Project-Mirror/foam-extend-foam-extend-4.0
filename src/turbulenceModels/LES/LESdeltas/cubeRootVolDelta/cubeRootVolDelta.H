@@ -85,7 +85,7 @@ public:
 
     // Destructor
 
-        ~cubeRootVolDelta()
+        virtual ~cubeRootVolDelta()
         {}
 
 

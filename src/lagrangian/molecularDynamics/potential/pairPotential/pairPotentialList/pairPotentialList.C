@@ -32,6 +32,7 @@ License
 
 void Foam::pairPotentialList::readPairPotentialDict
 (
+    const List<word>& idList,
     const dictionary& pairPotentialDict,
     const polyMesh& mesh
 )
@@ -40,13 +41,13 @@ void Foam::pairPotentialList::readPairPotentialDict
 
     rCutMax_ = 0.0;
 
-    for (label a = 0; a < nIds(); ++a)
+    for (label a = 0; a < nIds_; ++a)
     {
-        word idA = idList_[a];
+        word idA = idList[a];
 
-        for (label b = a; b < nIds(); ++b)
+        for (label b = a; b < nIds_; ++b)
         {
-            word idB = idList_[b];
+            word idB = idList[b];
 
             word pairPotentialName;
 
@@ -59,9 +60,9 @@ void Foam::pairPotentialList::readPairPotentialDict
                 else
                 {
                     FatalErrorIn("pairPotentialList::buildPotentials") << nl
-                            << "Pair pairPotential specification subDict "
-                            << idA << "-" << idB << " not found"
-                            << nl << abort(FatalError);
+                        << "Pair pairPotential specification subDict "
+                        << idA << "-" << idB << " not found"
+                        << nl << abort(FatalError);
                 }
             }
             else
@@ -87,8 +88,8 @@ void Foam::pairPotentialList::readPairPotentialDict
 
                 if
                 (
-                    pairPotentialDict.found(idA + "-" + idB)
-                 && pairPotentialDict.found(idB + "-" + idA)
+                    pairPotentialDict.found(idA+"-"+idB)
+                 && pairPotentialDict.found(idB+"-"+idA)
                 )
                 {
                     FatalErrorIn("pairPotentialList::buildPotentials") << nl
@@ -135,29 +136,59 @@ void Foam::pairPotentialList::readPairPotentialDict
         }
     }
 
+    if (!pairPotentialDict.found("electrostatic"))
+    {
+        FatalErrorIn("pairPotentialList::buildPotentials") << nl
+            << "Pair pairPotential specification subDict electrostatic"
+            << nl << abort(FatalError);
+    }
+
+    electrostaticPotential_ = pairPotential::New
+    (
+        "electrostatic",
+        pairPotentialDict.subDict("electrostatic")
+    );
+
+    if (electrostaticPotential_->rCut() > rCutMax_)
+    {
+        rCutMax_ = electrostaticPotential_->rCut();
+    }
+
+    if (electrostaticPotential_->writeTables())
+    {
+        OFstream ppTabFile(mesh.time().path()/"electrostatic");
+
+        if(!electrostaticPotential_->writeEnergyAndForceTables(ppTabFile))
+        {
+            FatalErrorIn("pairPotentialList::readPairPotentialDict")
+                << "Failed writing to "
+                << ppTabFile.name() << nl
+                << abort(FatalError);
+        }
+    }
+
     rCutMaxSqr_ = rCutMax_*rCutMax_;
 }
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::pairPotentialList::pairPotentialList()
 :
-    PtrList<pairPotential>(),
-    idList_()
+    PtrList<pairPotential>()
 {}
 
 
 Foam::pairPotentialList::pairPotentialList
 (
-    const dictionary& idListDict,
+    const List<word>& idList,
     const dictionary& pairPotentialDict,
     const polyMesh& mesh
 )
 :
-    PtrList<pairPotential>(),
-    idList_()
+    PtrList<pairPotential>()
 {
-    buildPotentials(idListDict, pairPotentialDict, mesh);
+    buildPotentials(idList, pairPotentialDict, mesh);
 }
 
 
@@ -171,16 +202,16 @@ Foam::pairPotentialList::~pairPotentialList()
 
 void Foam::pairPotentialList::buildPotentials
 (
-    const dictionary& idListDict,
+    const List<word>& idList,
     const dictionary& pairPotentialDict,
     const polyMesh& mesh
 )
 {
-    idList_ = List<word>(idListDict.lookup("idList"));
+    setSize(((idList.size()*(idList.size() + 1))/2));
 
-    setSize(((idList_.size()*(idList_.size() + 1))/2));
+    nIds_ = idList.size();
 
-    readPairPotentialDict(pairPotentialDict, mesh);
+    readPairPotentialDict(idList, pairPotentialDict, mesh);
 }
 
 
@@ -191,6 +222,19 @@ const Foam::pairPotential& Foam::pairPotentialList::pairPotentialFunction
 ) const
 {
     return (*this)[pairPotentialIndex(a, b)];
+}
+
+
+bool Foam::pairPotentialList::rCutMaxSqr(const scalar rIJMagSqr) const
+{
+    if (rIJMagSqr < rCutMaxSqr_)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 
@@ -259,7 +303,7 @@ Foam::scalar Foam::pairPotentialList::force
     const scalar rIJMag
 ) const
 {
-    scalar f = (*this)[pairPotentialIndex(a, b)].forceLookup(rIJMag);
+    scalar f = (*this)[pairPotentialIndex(a, b)].force(rIJMag);
 
     return f;
 }
@@ -272,7 +316,7 @@ Foam::scalar Foam::pairPotentialList::energy
     const scalar rIJMag
 ) const
 {
-    scalar e = (*this)[pairPotentialIndex(a, b)].energyLookup(rIJMag);
+    scalar e = (*this)[pairPotentialIndex(a, b)].energy(rIJMag);
 
     return e;
 }

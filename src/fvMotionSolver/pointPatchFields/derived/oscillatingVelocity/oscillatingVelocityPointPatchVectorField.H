@@ -36,7 +36,7 @@ SourceFiles
 #ifndef oscillatingVelocityPointPatchVectorField_H
 #define oscillatingVelocityPointPatchVectorField_H
 
-#include "fixedValuePointPatchFields.H"
+#include "fixedValuePointPatchField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -49,14 +49,7 @@ namespace Foam
 
 class oscillatingVelocityPointPatchVectorField
 :
-    public FixedValuePointPatchField
-    <
-        pointPatchField,
-        pointMesh,
-        pointPatch,
-        DummyMatrix,
-        vector
-    >
+    public fixedValuePointPatchField<vector>
 {
     // Private data
 
@@ -95,7 +88,7 @@ public:
             const oscillatingVelocityPointPatchVectorField&,
             const pointPatch&,
             const DimensionedField<vector, pointMesh>&,
-            const PointPatchFieldMapper&
+            const pointPatchFieldMapper&
         );
 
         //- Construct and return a clone
@@ -103,7 +96,10 @@ public:
         {
             return autoPtr<pointPatchField<vector> >
             (
-                new oscillatingVelocityPointPatchVectorField(*this)
+                new oscillatingVelocityPointPatchVectorField
+                (
+                    *this
+                )
             );
         }
 
@@ -122,12 +118,32 @@ public:
         {
             return autoPtr<pointPatchField<vector> >
             (
-                new oscillatingVelocityPointPatchVectorField(*this, iF)
+                new oscillatingVelocityPointPatchVectorField
+                (
+                    *this,
+                    iF
+                )
             );
         }
 
 
     // Member functions
+
+        // Mapping functions
+
+            //- Map (and resize as needed) from self given a mapping object
+            virtual void autoMap
+            (
+                const pointPatchFieldMapper&
+            );
+
+            //- Reverse map the given pointPatchField onto this pointPatchField
+            virtual void rmap
+            (
+                const pointPatchField<vector>&,
+                const labelList&
+            );
+
 
         // Evaluation functions
 

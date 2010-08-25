@@ -88,7 +88,11 @@ public:
     // Constructors
 
         //- Construct from polyMesh and data stream
-        velocityLaplacianFvMotionSolver(const polyMesh& mesh, Istream& msData);
+        velocityLaplacianFvMotionSolver
+        (
+            const polyMesh&,
+            Istream& msDataUnused
+        );
 
 
     // Destructor

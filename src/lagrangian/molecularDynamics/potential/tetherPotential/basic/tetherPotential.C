@@ -26,15 +26,14 @@ License
 
 #include "tetherPotential.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    defineTypeNameAndDebug(tetherPotential, 0);
+    defineRunTimeSelectionTable(tetherPotential, dictionary);
+}
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(tetherPotential, 0);
-defineRunTimeSelectionTable(tetherPotential, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -59,9 +58,5 @@ bool Foam::tetherPotential::read(const dictionary& tetherPotentialProperties)
     return true;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

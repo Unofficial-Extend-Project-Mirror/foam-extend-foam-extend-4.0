@@ -26,15 +26,10 @@ License
 
 #include "polyMesh.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class ParticleType>
-inline scalar Particle<ParticleType>::lambda
+inline Foam::scalar Foam::Particle<ParticleType>::lambda
 (
     const vector& from,
     const vector& to,
@@ -182,7 +177,7 @@ inline scalar Particle<ParticleType>::lambda
 
 
 template<class ParticleType>
-inline scalar Particle<ParticleType>::lambda
+inline Foam::scalar Foam::Particle<ParticleType>::lambda
 (
     const vector& from,
     const vector& to,
@@ -234,23 +229,25 @@ inline scalar Particle<ParticleType>::lambda
 
 
 template<class ParticleType>
-inline bool Particle<ParticleType>::inCell() const
+inline bool Foam::Particle<ParticleType>::inCell() const
 {
-    labelList faces = findFaces(position_);
+    DynamicList<label>& faces = cloud_.labels_;
+    findFaces(position_, faces);
 
     return (!faces.size());
 }
 
 
 template<class ParticleType>
-inline bool Particle<ParticleType>::inCell
+inline bool Foam::Particle<ParticleType>::inCell
 (
     const vector& position,
     const label celli,
     const scalar stepFraction
 ) const
 {
-    labelList faces = findFaces(position, celli, stepFraction);
+    DynamicList<label>& faces = cloud_.labels_;
+    findFaces(position, celli, stepFraction, faces);
 
     return (!faces.size());
 }
@@ -259,7 +256,7 @@ inline bool Particle<ParticleType>::inCell
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class ParticleType>
-inline Particle<ParticleType>::trackData::trackData
+inline Foam::Particle<ParticleType>::trackData::trackData
 (
     Cloud<ParticleType>& cloud
 )
@@ -267,8 +264,10 @@ inline Particle<ParticleType>::trackData::trackData
     cloud_(cloud)
 {}
 
+
 template<class ParticleType>
-inline Cloud<ParticleType>& Particle<ParticleType>::trackData::cloud()
+inline Foam::Cloud<ParticleType>&
+Foam::Particle<ParticleType>::trackData::cloud()
 {
     return cloud_;
 }
@@ -277,83 +276,108 @@ inline Cloud<ParticleType>& Particle<ParticleType>::trackData::cloud()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class ParticleType>
-inline const Cloud<ParticleType>& Particle<ParticleType>::cloud() const
+inline const Foam::Cloud<ParticleType>&
+Foam::Particle<ParticleType>::cloud() const
 {
     return cloud_;
 }
 
 
 template<class ParticleType>
-inline const vector& Particle<ParticleType>::position() const
+inline const Foam::vector& Foam::Particle<ParticleType>::position() const
 {
     return position_;
 }
 
 
 template<class ParticleType>
-inline vector& Particle<ParticleType>::position()
+inline Foam::vector& Foam::Particle<ParticleType>::position()
 {
     return position_;
 }
 
 
 template<class ParticleType>
-inline label Particle<ParticleType>::cell() const
-{
-    return celli_;
-}
-
-template<class ParticleType>
-inline label& Particle<ParticleType>::cell()
+inline Foam::label Foam::Particle<ParticleType>::cell() const
 {
     return celli_;
 }
 
 
 template<class ParticleType>
-inline label Particle<ParticleType>::face() const
+inline Foam::label& Foam::Particle<ParticleType>::cell()
+{
+    return celli_;
+}
+
+
+template<class ParticleType>
+inline Foam::label Foam::Particle<ParticleType>::face() const
 {
     return facei_;
 }
 
 
 template<class ParticleType>
-inline bool Particle<ParticleType>::onBoundary() const
+inline bool Foam::Particle<ParticleType>::onBoundary() const
 {
     return facei_ != -1 && facei_ >= cloud_.pMesh().nInternalFaces();
 }
 
 
 template<class ParticleType>
-inline scalar& Particle<ParticleType>::stepFraction()
+inline Foam::scalar& Foam::Particle<ParticleType>::stepFraction()
 {
     return stepFraction_;
 }
 
 
 template<class ParticleType>
-inline scalar Particle<ParticleType>::stepFraction() const
+inline Foam::scalar Foam::Particle<ParticleType>::stepFraction() const
 {
     return stepFraction_;
 }
 
 
 template<class ParticleType>
-inline bool Particle<ParticleType>::softImpact() const
+inline Foam::label Foam::Particle<ParticleType>::origProc() const
+{
+    return origProc_;
+}
+
+
+template<class ParticleType>
+inline Foam::label Foam::Particle<ParticleType>::origId() const
+{
+    return origId_;
+}
+
+
+template<class ParticleType>
+inline bool Foam::Particle<ParticleType>::softImpact() const
 {
     return false;
 }
 
 
 template<class ParticleType>
-inline label Particle<ParticleType>::patch(const label facei) const
+inline Foam::scalar Foam::Particle<ParticleType>::currentTime() const
+{
+    return
+        cloud_.pMesh().time().value()
+      + stepFraction_*cloud_.pMesh().time().deltaT().value();
+}
+
+
+template<class ParticleType>
+inline Foam::label Foam::Particle<ParticleType>::patch(const label facei) const
 {
     return cloud_.facePatch(facei);
 }
 
 
 template<class ParticleType>
-inline label Particle<ParticleType>::patchFace
+inline Foam::label Foam::Particle<ParticleType>::patchFace
 (
     const label patchi,
     const label facei
@@ -364,21 +388,18 @@ inline label Particle<ParticleType>::patchFace
 
 
 template<class ParticleType>
-inline scalar Particle<ParticleType>::wallImpactDistance(const vector&) const
+inline Foam::scalar
+Foam::Particle<ParticleType>::wallImpactDistance(const vector&) const
 {
     return 0.0;
 }
 
 
 template<class ParticleType>
-inline label Particle<ParticleType>::faceInterpolation() const
+inline Foam::label Foam::Particle<ParticleType>::faceInterpolation() const
 {
     return facei_;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

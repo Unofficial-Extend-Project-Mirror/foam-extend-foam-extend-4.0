@@ -25,103 +25,245 @@ License
 \*----------------------------------------------------------------------------*/
 
 #include "moleculeCloud.H"
+#include "molecule.H"
 #include "Random.H"
 #include "Time.H"
 
-namespace Foam
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+Foam::tensor Foam::molecule::rotationTensorX(scalar phi) const
 {
+    return tensor
+    (
+        1, 0, 0,
+        0, Foam::cos(phi), -Foam::sin(phi),
+        0, Foam::sin(phi), Foam::cos(phi)
+    );
+}
 
-// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
-bool molecule::move(molecule::trackData& td)
+Foam::tensor Foam::molecule::rotationTensorY(scalar phi) const
+{
+    return tensor
+    (
+        Foam::cos(phi), 0, Foam::sin(phi),
+        0, 1, 0,
+        -Foam::sin(phi), 0, Foam::cos(phi)
+    );
+}
+
+
+Foam::tensor Foam::molecule::rotationTensorZ(scalar phi) const
+{
+    return tensor
+    (
+        Foam::cos(phi), -Foam::sin(phi), 0,
+        Foam::sin(phi), Foam::cos(phi), 0,
+        0, 0, 1
+    );
+}
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::molecule::trackData::trackData
+(
+    moleculeCloud& molCloud,
+    label part
+)
+:
+    Particle<molecule>::trackData(molCloud),
+    molCloud_(molCloud),
+    part_(part)
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+
+bool Foam::molecule::move(molecule::trackData& td)
 {
     td.switchProcessor = false;
     td.keepParticle = true;
 
+    const constantProperties& constProps(td.molCloud().constProps(id_));
+
     scalar deltaT = cloud().pMesh().time().deltaT().value();
-    scalar tEnd = (1.0 - stepFraction())*deltaT;
-    scalar dtMax = tEnd;
 
-    moleculeCloud::integrationMethods method
-            = td.molCloud().integrationMethod();
-
-    if (method == moleculeCloud::imVerletLeapfrog)
+    if (td.part() == 0)
     {
-        if (td.part() == 1)  // Leapfrog 1st Part
-        {
-            if (stepFraction() < VSMALL)
-            {
-                U_ += 0.5*deltaT*A_;
-            }
+        // First leapfrog velocity adjust part, required before tracking+force
+        // part
 
-            while (td.keepParticle && !td.switchProcessor && tEnd > ROOTVSMALL)
-            {
-                // set the lagrangian time-step
-                scalar dt = min(dtMax, tEnd);
+        v_ += 0.5*deltaT*a_;
 
-                dt *= trackToFace(position() + dt*U_, td);
+        pi_ += 0.5*deltaT*tau_;
+    }
+    else if (td.part() == 1)
+    {
+        // Leapfrog tracking part
 
-                tEnd -= dt;
-                stepFraction() = 1.0 - tEnd/deltaT;
-            }
-        }
-        else if (td.part() == 2)  // Leapfrog 2nd Part
+        scalar tEnd = (1.0 - stepFraction())*deltaT;
+        scalar dtMax = tEnd;
+
+        while (td.keepParticle && !td.switchProcessor && tEnd > ROOTVSMALL)
         {
-            U_ += 0.5*deltaT*A_;
-        }
-        else
-        {
-            FatalErrorIn("molecule::move(molecule::trackData& td)") << nl
-                << td.part()
-                << " is an invalid part of integration method: "
-                << method << nl
-                << abort(FatalError);
+            // set the lagrangian time-step
+            scalar dt = min(dtMax, tEnd);
+
+            dt *= trackToFace(position() + dt*v_, td);
+
+            tEnd -= dt;
+            stepFraction() = 1.0 - tEnd/deltaT;
         }
     }
-    else if (method == moleculeCloud::imPredictorCorrector)
+    else if (td.part() == 2)
     {
-        if (td.part() == 1) // Predictor Part
-        {
+        // Leapfrog orientation adjustment, carried out before force calculation
+        // but after tracking stage, i.e. rotation carried once linear motion
+        // complete.
 
-        }
-        else if (td.part() == 2) // Corrector Part
+        if (!constProps.pointMolecule())
         {
+            const diagTensor& momentOfInertia(constProps.momentOfInertia());
 
+            tensor R;
+
+            if (!constProps.linearMolecule())
+            {
+                R = rotationTensorX(0.5*deltaT*pi_.x()/momentOfInertia.xx());
+                pi_ = pi_ & R;
+                Q_ = Q_ & R;
+            }
+
+            R = rotationTensorY(0.5*deltaT*pi_.y()/momentOfInertia.yy());
+            pi_ = pi_ & R;
+            Q_ = Q_ & R;
+
+            R = rotationTensorZ(deltaT*pi_.z()/momentOfInertia.zz());
+            pi_ = pi_ & R;
+            Q_ = Q_ & R;
+
+            R = rotationTensorY(0.5*deltaT*pi_.y()/momentOfInertia.yy());
+            pi_ = pi_ & R;
+            Q_ = Q_ & R;
+
+            if (!constProps.linearMolecule())
+            {
+                R = rotationTensorX(0.5*deltaT*pi_.x()/momentOfInertia.xx());
+                pi_ = pi_ & R;
+                Q_ = Q_ & R;
+            }
         }
-        else
+
+        setSitePositions(constProps);
+    }
+    else if (td.part() == 3)
+    {
+        // Second leapfrog velocity adjust part, required after tracking+force
+        // part
+
+        scalar m = constProps.mass();
+
+        a_ = vector::zero;
+
+        tau_ = vector::zero;
+
+        forAll(siteForces_, s)
         {
-            FatalErrorIn("molecule::move(molecule::trackData& td)") << nl
-                << td.part() << " is an invalid part of integration method: "
-                << method
-                << abort(FatalError);
+            const vector& f = siteForces_[s];
+
+            a_ += f/m;
+
+            tau_ += (constProps.siteReferencePositions()[s] ^ (Q_.T() & f));
+        }
+
+        v_ += 0.5*deltaT*a_;
+
+        pi_ += 0.5*deltaT*tau_;
+
+        if (constProps.pointMolecule())
+        {
+            tau_ = vector::zero;
+
+            pi_ = vector::zero;
+        }
+
+        if (constProps.linearMolecule())
+        {
+            tau_.x() = 0.0;
+
+            pi_.x() = 0.0;
         }
     }
     else
     {
         FatalErrorIn("molecule::move(molecule::trackData& td)") << nl
-                << "Unknown integration method: "
-                << method
-                << abort(FatalError);
+            << td.part()
+            << " is an invalid part of the integration method."
+            << abort(FatalError);
     }
 
     return td.keepParticle;
 }
 
 
-void molecule::transformProperties(const tensor& T)
-{}
-
-
-void molecule::transformProperties(const vector& separation)
+void Foam::molecule::transformProperties(const tensor& T)
 {
-    if (tethered_)
+    Q_ = T & Q_;
+
+    sitePositions_ = position_ + (T & (sitePositions_ - position_));
+
+    siteForces_ = T & siteForces_;
+}
+
+
+void Foam::molecule::transformProperties(const vector& separation)
+{
+    if (special_ == SPECIAL_TETHERED)
     {
-        tetherPosition_ += separation;
+        specialPosition_ += separation;
     }
 }
 
 
-void molecule::hitProcessorPatch
+void Foam::molecule::setSitePositions(const constantProperties& constProps)
+{
+    sitePositions_ = position_ + (Q_ & constProps.siteReferencePositions());
+}
+
+
+void Foam::molecule::setSiteSizes(label size)
+{
+    sitePositions_.setSize(size);
+
+    siteForces_.setSize(size);
+}
+
+
+bool Foam::molecule::hitPatch
+(
+    const polyPatch&,
+    molecule::trackData&,
+    const label
+)
+{
+    return false;
+}
+
+
+bool Foam::molecule::hitPatch
+(
+    const polyPatch&,
+    int&,
+    const label
+)
+{
+    return false;
+}
+
+
+void Foam::molecule::hitProcessorPatch
 (
     const processorPolyPatch&,
     molecule::trackData& td
@@ -131,7 +273,7 @@ void molecule::hitProcessorPatch
 }
 
 
-void molecule::hitProcessorPatch
+void Foam::molecule::hitProcessorPatch
 (
     const processorPolyPatch&,
     int&
@@ -139,7 +281,7 @@ void molecule::hitProcessorPatch
 {}
 
 
-void molecule::hitWallPatch
+void Foam::molecule::hitWallPatch
 (
     const wallPolyPatch& wpp,
     molecule::trackData& td
@@ -148,43 +290,17 @@ void molecule::hitWallPatch
     vector nw = wpp.faceAreas()[wpp.whichFace(face())];
     nw /= mag(nw);
 
-    scalar Un = U_ & nw;
-//     vector Ut = U_ - Un*nw;
+    scalar vn = v_ & nw;
 
-//     Random rand(clock::getTime());
-
-//     scalar tmac = 0.8;
-
-//     scalar wallTemp = 2.5;
-
-//     if (rand.scalar01() < tmac)
-//     {
-//         // Diffuse reflection
-//
-//         vector tw1 = Ut/mag(Ut);
-//
-//         vector tw2 = nw ^ tw1;
-//
-//         U_ = sqrt(wallTemp/mass_)*rand.GaussNormal()*tw1
-//                 + sqrt(wallTemp/mass_)*rand.GaussNormal()*tw2
-//                 - mag(sqrt(wallTemp/mass_)*rand.GaussNormal())*nw;
-//     }
-
-//     else
-//     {
-        // Specular reflection
-
-        if (Un > 0)
-        {
-            U_ -= 2*Un*nw;
-        }
-
-//     }
-
+    // Specular reflection
+    if (vn > 0)
+    {
+        v_ -= 2*vn*nw;
+    }
 }
 
 
-void molecule::hitWallPatch
+void Foam::molecule::hitWallPatch
 (
     const wallPolyPatch&,
     int&
@@ -192,7 +308,7 @@ void molecule::hitWallPatch
 {}
 
 
-void molecule::hitPatch
+void Foam::molecule::hitPatch
 (
     const polyPatch&,
     molecule::trackData& td
@@ -202,14 +318,12 @@ void molecule::hitPatch
 }
 
 
-void molecule::hitPatch
+void Foam::molecule::hitPatch
 (
     const polyPatch&,
     int&
 )
 {}
-
-} // End namespace Foam
 
 
 // ************************************************************************* //

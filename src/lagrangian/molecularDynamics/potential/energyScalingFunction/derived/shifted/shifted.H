@@ -57,6 +57,7 @@ class shifted
 
         scalar e_at_rCut_;
 
+
 public:
 
     //- Runtime type information
@@ -79,11 +80,12 @@ public:
         ~shifted()
         {}
 
+
     // Member Functions
 
         void scaleEnergy(scalar& e, const scalar r) const;
 
-        //- Read transportProperties dictionary
+        //- Read dictionary
         bool read(const dictionary& energyScalingFunctionProperties);
 };
 

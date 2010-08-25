@@ -50,7 +50,8 @@ Foam::Euler<Type>::~Euler()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Type Foam::Euler<Type>::integrate
+typename Foam::IntegrationScheme<Type>::integrationResult
+Foam::Euler<Type>::integrate
 (
     const Type phi,
     const scalar dt,
@@ -58,7 +59,11 @@ Type Foam::Euler<Type>::integrate
     const scalar beta
 ) const
 {
-    return (phi + dt*alpha)/(1.0 + dt/beta);
+    typename IntegrationScheme<Type>::integrationResult retValue;
+    retValue.value() = (phi + beta*dt*alpha)/(1.0 + beta*dt);
+    retValue.average() = 0.5*(phi + retValue.value());
+
+    return retValue;
 }
 
 

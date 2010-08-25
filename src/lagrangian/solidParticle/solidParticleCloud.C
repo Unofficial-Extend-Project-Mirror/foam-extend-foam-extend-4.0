@@ -28,7 +28,6 @@ License
 #include "fvMesh.H"
 #include "volFields.H"
 #include "interpolationCellPoint.H"
-#include "volPointInterpolation.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -43,7 +42,8 @@ namespace Foam
 Foam::solidParticleCloud::solidParticleCloud
 (
     const fvMesh& mesh,
-    const word& cloudName
+    const word& cloudName,
+    bool readFields
 )
 :
     Cloud<solidParticle>(mesh, cloudName, false),
@@ -63,7 +63,10 @@ Foam::solidParticleCloud::solidParticleCloud
     e_(dimensionedScalar(particleProperties_.lookup("e")).value()),
     mu_(dimensionedScalar(particleProperties_.lookup("mu")).value())
 {
-    solidParticle::readFields(*this);
+    if (readFields)
+    {
+        solidParticle::readFields(*this);
+    }
 }
 
 
@@ -75,22 +78,13 @@ void Foam::solidParticleCloud::move(const dimensionedVector& g)
     const volVectorField& U = mesh_.lookupObject<const volVectorField>("U");
     const volScalarField& nu = mesh_.lookupObject<const volScalarField>("nu");
 
-    pointMesh pMesh(U.mesh());
-    volPointInterpolation vpi(U.mesh(), pMesh);
-
-    interpolationCellPoint<scalar> rhoInterp(vpi, rho);
-    interpolationCellPoint<vector> UInterp(vpi, U);
-    interpolationCellPoint<scalar> nuInterp(vpi, nu);
+    interpolationCellPoint<scalar> rhoInterp(rho);
+    interpolationCellPoint<vector> UInterp(U);
+    interpolationCellPoint<scalar> nuInterp(nu);
 
     solidParticle::trackData td(*this, rhoInterp, UInterp, nuInterp, g.value());
 
     Cloud<solidParticle>::move(td);
-}
-
-
-void Foam::solidParticleCloud::writeFields() const
-{
-    solidParticle::writeFields(*this);
 }
 
 

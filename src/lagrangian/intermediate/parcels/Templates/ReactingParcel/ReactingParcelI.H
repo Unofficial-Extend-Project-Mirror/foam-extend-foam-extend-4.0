@@ -29,12 +29,14 @@ License
 template<class ParcelType>
 inline Foam::ReactingParcel<ParcelType>::constantProperties::constantProperties
 (
-    const dictionary& dict
+    const dictionary& parentDict
 )
 :
-    ThermoParcel<ParcelType>::constantProperties(dict),
-    Tvap_(dimensionedScalar(dict.lookup("Tvap")).value()),
-    Tbp_(dimensionedScalar(dict.lookup("Tbp")).value())
+    ThermoParcel<ParcelType>::constantProperties(parentDict),
+    pMin_(dimensionedScalar(this->dict().lookup("pMin")).value()),
+    constantVolume_(this->dict().lookup("constantVolume")),
+    Tvap_(dimensionedScalar(this->dict().lookup("Tvap")).value()),
+    Tbp_(dimensionedScalar(this->dict().lookup("Tbp")).value())
 {}
 
 
@@ -73,35 +75,44 @@ template<class ParcelType>
 inline Foam::ReactingParcel<ParcelType>::ReactingParcel
 (
     ReactingCloud<ParcelType>& owner,
-    const label typeId,
     const vector& position,
-    const label celli,
+    const label cellI
+)
+:
+    ThermoParcel<ParcelType>(owner, position, cellI),
+    mass0_(0.0),
+    Y_(0),
+    pc_(0.0)
+{}
+
+
+template<class ParcelType>
+inline Foam::ReactingParcel<ParcelType>::ReactingParcel
+(
+    ReactingCloud<ParcelType>& owner,
+    const vector& position,
+    const label cellI,
+    const label typeId,
+    const scalar nParticle0,
     const scalar d0,
     const vector& U0,
-    const scalar nParticle0,
-    const scalarField& YGas0,
-    const scalarField& YLiquid0,
-    const scalarField& YSolid0,
-    const scalarField& YMixture0,
+    const scalarField& Y0,
     const constantProperties& constProps
 )
 :
     ThermoParcel<ParcelType>
     (
         owner,
-        typeId,
         position,
-        celli,
+        cellI,
+        typeId,
+        nParticle0,
         d0,
         U0,
-        nParticle0,
         constProps
     ),
     mass0_(0.0),
-    YMixture_(YMixture0),
-    YGas_(YGas0),
-    YLiquid_(YLiquid0),
-    YSolid_(YSolid0),
+    Y_(Y0),
     pc_(0.0)
 {
     // Set initial parcel mass
@@ -110,6 +121,22 @@ inline Foam::ReactingParcel<ParcelType>::ReactingParcel
 
 
 // * * * * * * * * * constantProperties Member Functions * * * * * * * * * * //
+
+template<class ParcelType>
+inline Foam::scalar
+Foam::ReactingParcel<ParcelType>::constantProperties::pMin() const
+{
+    return pMin_;
+}
+
+
+template<class ParcelType>
+inline Foam::Switch
+Foam::ReactingParcel<ParcelType>::constantProperties::constantVolume() const
+{
+    return constantVolume_;
+}
+
 
 template<class ParcelType>
 inline Foam::scalar
@@ -156,62 +183,6 @@ Foam::ReactingParcel<ParcelType>::trackData::pInterp() const
 // * * * * * * * * * * ThermoParcel Member Functions * * * * * * * * * * * * //
 
 template<class ParcelType>
-inline const Foam::scalarField& Foam::ReactingParcel<ParcelType>::YGas() const
-{
-    return YGas_;
-}
-
-
-template<class ParcelType>
-inline Foam::scalarField& Foam::ReactingParcel<ParcelType>::YGas()
-{
-    return YGas_;
-}
-
-
-template<class ParcelType>
-inline const Foam::scalarField& Foam::ReactingParcel<ParcelType>::YLiquid() const
-{
-    return YLiquid_;
-}
-
-
-template<class ParcelType>
-inline Foam::scalarField& Foam::ReactingParcel<ParcelType>::YLiquid()
-{
-    return YLiquid_;
-}
-
-
-template<class ParcelType>
-inline const Foam::scalarField& Foam::ReactingParcel<ParcelType>::YSolid() const
-{
-    return YSolid_;
-}
-
-
-template<class ParcelType>
-inline Foam::scalarField& Foam::ReactingParcel<ParcelType>::YSolid()
-{
-    return YSolid_;
-}
-
-
-template<class ParcelType>
-inline const Foam::scalarField& Foam::ReactingParcel<ParcelType>::YMixture() const
-{
-    return YMixture_;
-}
-
-
-template<class ParcelType>
-inline Foam::scalarField& Foam::ReactingParcel<ParcelType>::YMixture()
-{
-    return YMixture_;
-}
-
-
-template<class ParcelType>
 inline Foam::scalar Foam::ReactingParcel<ParcelType>::mass0() const
 {
     return mass0_;
@@ -219,9 +190,30 @@ inline Foam::scalar Foam::ReactingParcel<ParcelType>::mass0() const
 
 
 template<class ParcelType>
+inline const Foam::scalarField& Foam::ReactingParcel<ParcelType>::Y() const
+{
+    return Y_;
+}
+
+
+template<class ParcelType>
+inline Foam::scalar Foam::ReactingParcel<ParcelType>::pc() const
+{
+    return pc_;
+}
+
+
+template<class ParcelType>
 inline Foam::scalar& Foam::ReactingParcel<ParcelType>::mass0()
 {
     return mass0_;
+}
+
+
+template<class ParcelType>
+inline Foam::scalarField& Foam::ReactingParcel<ParcelType>::Y()
+{
+    return Y_;
 }
 
 

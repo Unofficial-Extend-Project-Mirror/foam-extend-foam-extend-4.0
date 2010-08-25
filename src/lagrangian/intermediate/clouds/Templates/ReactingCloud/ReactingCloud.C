@@ -25,31 +25,140 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "ReactingCloud.H"
-#include "CompositionModel.H"
-#include "MassTransferModel.H"
-#include "SurfaceReactionModel.H"
 
-#include "interpolationCellPoint.H"
+#include "CompositionModel.H"
+#include "PhaseChangeModel.H"
+
+// * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * * //
+
+template<class ParcelType>
+void Foam::ReactingCloud<ParcelType>::checkSuppliedComposition
+(
+    const scalarField& YSupplied,
+    const scalarField& Y,
+    const word& YName
+)
+{
+    if (YSupplied.size() != Y.size())
+    {
+        FatalErrorIn
+        (
+            "ReactingCloud<ParcelType>::checkSuppliedComposition"
+            "("
+                "const scalarField&, "
+                "const scalarField&, "
+                "const word&"
+            ")"
+        )   << YName << " supplied, but size is not compatible with "
+            << "parcel composition: " << nl << "    "
+            << YName << "(" << YSupplied.size() << ") vs required composition "
+            << YName << "(" << Y.size() << ")" << nl
+            << abort(FatalError);
+    }
+}
+
+
+template<class ParcelType>
+void Foam::ReactingCloud<ParcelType>::preEvolve()
+{
+    ThermoCloud<ParcelType>::preEvolve();
+}
+
+
+template<class ParcelType>
+void Foam::ReactingCloud<ParcelType>::evolveCloud()
+{
+    const volScalarField& T = this->carrierThermo().T();
+    const volScalarField cp = this->carrierThermo().Cp();
+    const volScalarField& p = this->carrierThermo().p();
+
+    autoPtr<interpolation<scalar> > rhoInterp = interpolation<scalar>::New
+    (
+        this->interpolationSchemes(),
+        this->rho()
+    );
+
+    autoPtr<interpolation<vector> > UInterp = interpolation<vector>::New
+    (
+        this->interpolationSchemes(),
+        this->U()
+    );
+
+    autoPtr<interpolation<scalar> > muInterp = interpolation<scalar>::New
+    (
+        this->interpolationSchemes(),
+        this->mu()
+    );
+
+    autoPtr<interpolation<scalar> > TInterp = interpolation<scalar>::New
+    (
+        this->interpolationSchemes(),
+        T
+    );
+
+    autoPtr<interpolation<scalar> > cpInterp = interpolation<scalar>::New
+    (
+        this->interpolationSchemes(),
+        cp
+    );
+
+    autoPtr<interpolation<scalar> > pInterp = interpolation<scalar>::New
+    (
+        this->interpolationSchemes(),
+        p
+    );
+
+    typename ParcelType::trackData td
+    (
+        *this,
+        constProps_,
+        rhoInterp(),
+        UInterp(),
+        muInterp(),
+        TInterp(),
+        cpInterp(),
+        pInterp(),
+        this->g().value()
+    );
+
+    this->injection().inject(td);
+
+    if (this->coupled())
+    {
+        resetSourceTerms();
+    }
+
+    Cloud<ParcelType>::move(td);
+}
+
+
+template<class ParcelType>
+void Foam::ReactingCloud<ParcelType>::postEvolve()
+{
+    ThermoCloud<ParcelType>::postEvolve();
+}
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class ParcelType>
 Foam::ReactingCloud<ParcelType>::ReactingCloud
 (
-    const word& cloudType,
-    const volPointInterpolation& vpi,
+    const word& cloudName,
     const volScalarField& rho,
     const volVectorField& U,
     const dimensionedVector& g,
-    hCombustionThermo& thermo,
-    PtrList<specieReactingProperties>& gases
+    basicThermo& thermo,
+    bool readFields
 )
 :
-    ThermoCloud<ParcelType>(cloudType, vpi, rho, U, g, thermo),
+    ThermoCloud<ParcelType>(cloudName, rho, U, g, thermo, false),
     reactingCloud(),
     constProps_(this->particleProperties()),
-    carrierThermo_(thermo),
-    gases_(gases),
+    mcCarrierThermo_
+    (
+        dynamic_cast<multiComponentMixture<thermoType>&>(thermo)
+    ),
     compositionModel_
     (
         CompositionModel<ReactingCloud<ParcelType> >::New
@@ -58,23 +167,16 @@ Foam::ReactingCloud<ParcelType>::ReactingCloud
             *this
         )
     ),
-    massTransferModel_
+    phaseChangeModel_
     (
-        MassTransferModel<ReactingCloud<ParcelType> >::New
+        PhaseChangeModel<ReactingCloud<ParcelType> >::New
         (
             this->particleProperties(),
             *this
         )
     ),
-    surfaceReactionModel_
-    (
-        SurfaceReactionModel<ReactingCloud<ParcelType> >::New
-        (
-            this->particleProperties(),
-            *this
-        )
-    ),
-    rhoTrans_(thermo.composition().Y().size())
+    rhoTrans_(mcCarrierThermo_.species().size()),
+    dMassPhaseChange_(0.0)
 {
     // Set storage for mass source fields and initialise to zero
     forAll(rhoTrans_, i)
@@ -86,7 +188,7 @@ Foam::ReactingCloud<ParcelType>::ReactingCloud
             (
                 IOobject
                 (
-                    this->name() + "rhoTrans" + Foam::name(i),
+                    this->name() + "rhoTrans_" + mcCarrierThermo_.species()[i],
                     this->db().time().timeName(),
                     this->db(),
                     IOobject::NO_READ,
@@ -97,6 +199,11 @@ Foam::ReactingCloud<ParcelType>::ReactingCloud
                 dimensionedScalar("zero", dimMass, 0.0)
             )
         );
+    }
+
+    if (readFields)
+    {
+        ParcelType::readFields(*this);
     }
 }
 
@@ -109,6 +216,40 @@ Foam::ReactingCloud<ParcelType>::~ReactingCloud()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class ParcelType>
+void Foam::ReactingCloud<ParcelType>::checkParcelProperties
+(
+    ParcelType& parcel,
+    const scalar lagrangianDt,
+    const bool fullyDescribed
+)
+{
+    ThermoCloud<ParcelType>::checkParcelProperties
+    (
+        parcel,
+        lagrangianDt,
+        fullyDescribed
+    );
+
+    if (!fullyDescribed)
+    {
+        parcel.Y() = composition().YMixture0();
+    }
+    else
+    {
+        checkSuppliedComposition
+        (
+            parcel.Y(),
+            composition().YMixture0(),
+            "YMixture"
+        );
+    }
+
+    // derived information - store initial mass
+    parcel.mass0() = parcel.mass();
+}
+
 
 template<class ParcelType>
 void Foam::ReactingCloud<ParcelType>::resetSourceTerms()
@@ -124,191 +265,34 @@ void Foam::ReactingCloud<ParcelType>::resetSourceTerms()
 template<class ParcelType>
 void Foam::ReactingCloud<ParcelType>::evolve()
 {
-    const volScalarField& T = carrierThermo_.T();
-    const volScalarField cp = carrierThermo_.Cp();
-    const volScalarField& p = carrierThermo_.p();
+    if (this->active())
+    {
+        preEvolve();
 
-    autoPtr<interpolation<scalar> > rhoInterpolator = interpolation<scalar>::New
-    (
-        this->interpolationSchemes(),
-        this->vpi(),
-        this->rho()
-    );
+        evolveCloud();
 
-    autoPtr<interpolation<vector> > UInterpolator = interpolation<vector>::New
-    (
-        this->interpolationSchemes(),
-        this->vpi(),
-        this->U()
-    );
+        postEvolve();
 
-    autoPtr<interpolation<scalar> > muInterpolator = interpolation<scalar>::New
-    (
-        this->interpolationSchemes(),
-        this->vpi(),
-        this->mu()
-    );
-
-    autoPtr<interpolation<scalar> > TInterpolator = interpolation<scalar>::New
-    (
-        this->interpolationSchemes(),
-        this->vpi(),
-        T
-    );
-
-    autoPtr<interpolation<scalar> > cpInterpolator = interpolation<scalar>::New
-    (
-        this->interpolationSchemes(),
-        this->vpi(),
-        cp
-    );
-
-    autoPtr<interpolation<scalar> > pInterpolator = interpolation<scalar>::New
-    (
-        this->interpolationSchemes(),
-        this->vpi(),
-        p
-    );
-
-    typename ParcelType::trackData td
-    (
-        *this,
-        constProps_,
-        rhoInterpolator(),
-        UInterpolator(),
-        muInterpolator(),
-        TInterpolator(),
-        cpInterpolator(),
-        pInterpolator(),
-        this->g().value()
-    );
-
-    inject(td);
-
-    this->move(td);
+        info();
+        Info<< endl;
+    }
 }
 
 
 template<class ParcelType>
-template<class TrackingData>
-void Foam::ReactingCloud<ParcelType>::inject
-(
-    TrackingData& td
-)
+void Foam::ReactingCloud<ParcelType>::info() const
 {
-    scalar time = this->db().time().value();
+    ThermoCloud<ParcelType>::info();
 
-    scalar pRho = td.constProps().rho0();
+    Info<< "    Mass transfer phase change      = "
+        << returnReduce(dMassPhaseChange_, sumOp<scalar>()) << nl;
+}
 
-    this->injection().prepareForNextTimeStep(this->time0(), time);
 
-    // Number of parcels to introduce during this timestep
-    const label nParcels = this->injection().nParcels();
-
-    // Return if no parcels are required
-    if (!nParcels)
-    {
-        this->postInjectCheck();
-        return;
-    }
-
-    // Volume of particles to introduce during this timestep
-    scalar pVolume = this->injection().volume();
-
-    // Volume fraction to introduce during this timestep
-    scalar pVolumeFraction = this->injection().volumeFraction();
-
-    // Duration of injection period during this timestep
-    scalar deltaT = min
-    (
-        this->db().time().deltaT().value(),
-        min
-        (
-            time - this->injection().timeStart(),
-            this->injection().timeEnd() - this->time0()
-        )
-    );
-
-    // Pad injection time if injection starts during this timestep
-    scalar padTime = max
-    (
-        0.0,
-        this->injection().timeStart() - this->time0()
-    );
-
-    // Introduce new parcels linearly with time
-    for (label iParcel=0; iParcel<nParcels; iParcel++)
-    {
-        // Calculate the pseudo time of injection for parcel 'iParcel'
-        scalar timeInj = this->time0() + padTime + deltaT*iParcel/nParcels;
-
-        // Determine injected parcel properties
-        vector pPosition = this->injection().position
-        (
-            iParcel,
-            timeInj,
-            this->meshInfo()
-        );
-
-        // Diameter of parcels
-        scalar pDiameter = this->injection().d0(iParcel, timeInj);
-
-        // Number of particles per parcel
-        scalar pNumberOfParticles = this->setNumberOfParticles
-        (
-            nParcels,
-            pDiameter,
-            pVolumeFraction,
-            pRho,
-            pVolume
-        );
-
-        // Velocity of parcels
-        vector pU = this->injection().velocity
-        (
-            iParcel,
-            timeInj,
-            this->meshInfo()
-        );
-
-        // Determine the injection cell
-        label pCell = -1;
-        this->setInjectorCellAndPosition(pCell, pPosition);
-
-        if (pCell >= 0)
-        {
-            // construct the parcel that is to be injected
-            ParcelType* pPtr = new ParcelType
-            (
-                td.cloud(),
-                this->parcelTypeId(),
-                pPosition,
-                pCell,
-                pDiameter,
-                pU,
-                pNumberOfParticles,
-                composition().YGas0(),
-                composition().YLiquid0(),
-                composition().YSolid0(),
-                composition().YMixture0(),
-                td.constProps()
-            );
-
-            scalar dt = time - timeInj;
-
-            pPtr->stepFraction() = (this->db().time().deltaT().value() - dt)
-                /this->db().time().deltaT().value();
-
-            this->injectParcel(td, pPtr);
-         }
-    }
-
-    this->postInjectCheck();
-
-    if (debug)
-    {
-        this->dumpParticlePositions();
-    }
+template<class ParcelType>
+void Foam::ReactingCloud<ParcelType>::addToMassPhaseChange(const scalar dMass)
+{
+    dMassPhaseChange_ += dMass;
 }
 
 

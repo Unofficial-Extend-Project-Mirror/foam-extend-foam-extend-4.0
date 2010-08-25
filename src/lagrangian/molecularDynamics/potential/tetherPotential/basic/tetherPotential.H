@@ -40,6 +40,7 @@ SourceFiles
 #include "typeInfo.H"
 #include "runTimeSelectionTables.H"
 #include "autoPtr.H"
+#include "vector.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,7 +48,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                Class tetherPotential Declaration
+                      Class tetherPotential Declaration
 \*---------------------------------------------------------------------------*/
 
 class tetherPotential
@@ -119,9 +120,9 @@ public:
 
     // Member Functions
 
-        virtual scalar energy (const scalar r) const = 0;
+        virtual scalar energy (const vector r) const = 0;
 
-        virtual scalar force (const scalar r) const = 0;
+        virtual vector force (const vector r) const = 0;
 
         const dictionary& tetherPotentialProperties() const
         {

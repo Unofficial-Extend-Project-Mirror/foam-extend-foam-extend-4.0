@@ -33,11 +33,13 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-accumulatedTotalMomentum += singleStepTotalMomentum;
+accumulatedTotalLinearMomentum += singleStepTotalLinearMomentum;
 
 accumulatedTotalMass += singleStepTotalMass;
 
-accumulatedTotalKE += singleStepTotalKE;
+accumulatedTotalLinearKE += singleStepTotalLinearKE;
+
+accumulatedTotalAngularKE += singleStepTotalAngularKE;
 
 accumulatedTotalPE += singleStepTotalPE;
 
@@ -45,22 +47,22 @@ accumulatedTotalrDotfSum += singleStepTotalrDotf;
 
 accumulatedNMols += singleStepNMols;
 
+accumulatedDOFs += singleStepDOFs;
+
 if (runTime.outputTime())
 {
-    // calculate averages
-
     if (accumulatedNMols)
     {
         Info << "calculating averages" << endl;
 
         averageTemperature =
         (
-            2.0/(3.0 * moleculeCloud::kb * accumulatedNMols)
+            2.0/(moleculeCloud::kb * accumulatedDOFs)
             *
             (
-                accumulatedTotalKE
+                accumulatedTotalLinearKE + accumulatedTotalAngularKE
                 -
-                0.5*magSqr(accumulatedTotalMomentum)/accumulatedTotalMass
+                0.5*magSqr(accumulatedTotalLinearMomentum)/accumulatedTotalMass
             )
         );
 
@@ -77,40 +79,36 @@ if (runTime.outputTime())
             meshVolume
         );
 
-        // output values
-
         Info << "----------------------------------------" << nl
             << "Averaged properties" << nl
             << "Average |velocity| = "
-                << mag(accumulatedTotalMomentum)/accumulatedTotalMass
-                << " m/s" << nl
-            << "Average temperature = "
-                << averageTemperature << " K" << nl
-            << "accumulatedTotalrDotfSum = "
-                << accumulatedTotalrDotfSum << nl
-            << "Average pressure = "
-                << averagePressure << " N/m^2" << nl
+            << mag(accumulatedTotalLinearMomentum)/accumulatedTotalMass << nl
+            << "Average temperature = " << averageTemperature << nl
+            << "Average pressure = " << averagePressure << nl
             << "----------------------------------------" << endl;
     }
     else
     {
-        Info << "Not averaging temperature and pressure: "
+        Info<< "Not averaging temperature and pressure: "
             << "no molecules in system" << endl;
     }
 
-    // reset counters
-
-    accumulatedTotalMomentum = vector::zero;
+    accumulatedTotalLinearMomentum = vector::zero;
 
     accumulatedTotalMass = 0.0;
 
-    accumulatedTotalKE = 0.0;
+    accumulatedTotalLinearKE = 0.0;
+
+    accumulatedTotalAngularKE = 0.0;
 
     accumulatedTotalPE = 0.0;
 
     accumulatedTotalrDotfSum = 0.0;
 
     accumulatedNMols = 0;
+
+    accumulatedDOFs = 0;
 }
+
 
 // ************************************************************************* //

@@ -39,8 +39,8 @@ inline Foam::label Foam::tetherPotentialList::tetherPotentialIndex
         (
             "Foam::tetherPotentialList::tetherPotentialIndex(const label a)"
         )
-            << "Attempting to access an undefined tetherPotential."
-            << abort(FatalError);
+        << "Attempting to access an undefined tetherPotential."
+        << abort(FatalError);
 
         return -1;
     }

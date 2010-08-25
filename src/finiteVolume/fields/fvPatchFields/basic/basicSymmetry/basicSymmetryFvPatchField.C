@@ -95,7 +95,7 @@ basicSymmetryFvPatchField<Type>::basicSymmetryFvPatchField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Return gradient at boundary
+// return gradient at boundary
 template<class Type>
 tmp<Field<Type> > basicSymmetryFvPatchField<Type>::snGrad() const
 {

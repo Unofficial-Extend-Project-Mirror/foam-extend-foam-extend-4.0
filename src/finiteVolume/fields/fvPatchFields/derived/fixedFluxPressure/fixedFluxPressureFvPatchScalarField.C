@@ -30,28 +30,23 @@ License
 #include "surfaceFields.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
+Foam::fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
 )
 :
     fixedGradientFvPatchScalarField(p, iF),
-    UName_("Undefined"),
-    phiName_("Undefined"),
-    rhoName_("Undefined"),
+    UName_("U"),
+    phiName_("phi"),
+    rhoName_("rho"),
     adjoint_(false)
 {}
 
 
-fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
+Foam::fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
 (
     const fixedFluxPressureFvPatchScalarField& ptf,
     const fvPatch& p,
@@ -67,7 +62,7 @@ fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
 {}
 
 
-fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
+Foam::fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -75,9 +70,9 @@ fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
 )
 :
     fixedGradientFvPatchScalarField(p, iF),
-    UName_(dict.lookup("U")),
-    phiName_(dict.lookup("phi")),
-    rhoName_(dict.lookup("rho")),
+    UName_(dict.lookupOrDefault<word>("U", "U")),
+    phiName_(dict.lookupOrDefault<word>("phi", "phi")),
+    rhoName_(dict.lookupOrDefault<word>("rho", "rho")),
     adjoint_(dict.lookup("adjoint"))
 {
     if (dict.found("gradient"))
@@ -94,7 +89,7 @@ fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
 }
 
 
-fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
+Foam::fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
 (
     const fixedFluxPressureFvPatchScalarField& wbppsf
 )
@@ -107,7 +102,7 @@ fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
 {}
 
 
-fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
+Foam::fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
 (
     const fixedFluxPressureFvPatchScalarField& wbppsf,
     const DimensionedField<scalar, volMesh>& iF
@@ -123,7 +118,7 @@ fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void fixedFluxPressureFvPatchScalarField::updateCoeffs()
+void Foam::fixedFluxPressureFvPatchScalarField::updateCoeffs()
 {
     if (updated())
     {
@@ -133,8 +128,9 @@ void fixedFluxPressureFvPatchScalarField::updateCoeffs()
     const fvPatchField<vector>& Up =
         patch().lookupPatchField<volVectorField, vector>(UName_);
 
-    const surfaceScalarField& phi = 
+    const surfaceScalarField& phi =
         db().lookupObject<surfaceScalarField>(phiName_);
+
     fvsPatchField<scalar> phip =
         patch().patchField<surfaceScalarField, scalar>(phi);
 
@@ -162,12 +158,21 @@ void fixedFluxPressureFvPatchScalarField::updateCoeffs()
 }
 
 
-void fixedFluxPressureFvPatchScalarField::write(Ostream& os) const
+void Foam::fixedFluxPressureFvPatchScalarField::write(Ostream& os) const
 {
     fvPatchScalarField::write(os);
-    os.writeKeyword("U") << UName_ << token::END_STATEMENT << nl;
-    os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
-    os.writeKeyword("rho") << rhoName_ << token::END_STATEMENT << nl;
+    if (UName_ != "U")
+    {
+        os.writeKeyword("U") << UName_ << token::END_STATEMENT << nl;
+    }
+    if (phiName_ != "phi")
+    {
+        os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
+    }
+    if (rhoName_ != "rho")
+    {
+        os.writeKeyword("rho") << rhoName_ << token::END_STATEMENT << nl;
+    }
     os.writeKeyword("adjoint") << adjoint_ << token::END_STATEMENT << nl;
     gradient().writeEntry("gradient", os);
 }
@@ -175,10 +180,13 @@ void fixedFluxPressureFvPatchScalarField::write(Ostream& os) const
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField(fvPatchScalarField, fixedFluxPressureFvPatchScalarField);
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
+namespace Foam
+{
+    makePatchTypeField
+    (
+        fvPatchScalarField,
+        fixedFluxPressureFvPatchScalarField
+    );
+}
 
 // ************************************************************************* //

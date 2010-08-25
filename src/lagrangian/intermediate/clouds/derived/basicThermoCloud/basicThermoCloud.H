@@ -26,6 +26,7 @@ Class
     Foam::basicThermoCloud
 
 Description
+    Cloud class to introduce thermodynamic parcels
 
 SourceFiles
     basicThermoCloud.C
@@ -42,63 +43,8 @@ SourceFiles
 
 namespace Foam
 {
-
-/*---------------------------------------------------------------------------*\
-                        Class basicThermoCloud Declaration
-\*---------------------------------------------------------------------------*/
-
-class basicThermoCloud
-:
-    public ThermoCloud<basicThermoParcel>
-{
-
-    // Private Member Functions
-
-        //- Disallow default bitwise copy construct
-        basicThermoCloud
-        (
-            const basicThermoCloud&
-        );
-
-        //- Disallow default bitwise assignment
-        void operator=(const basicThermoCloud&);
-
-
-public:
-
-    //- Runtime type information
-    TypeName("basicThermoCloud");
-
-
-    // Constructors
-
-        //- Construct given carrier gas fields
-        basicThermoCloud
-        (
-            const word& cloudType,
-            const volPointInterpolation& vpi,
-            const volScalarField& rho,
-            const volVectorField& U,
-            const dimensionedVector& g,
-            basicThermo& thermo
-        );
-
-
-    //- Destructor
-
-        ~basicThermoCloud();
-
-
-    // Member Functions
-
-        //- Write fields
-        void writeFields() const;
-};
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
+    typedef ThermoCloud<basicThermoParcel> basicThermoCloud;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

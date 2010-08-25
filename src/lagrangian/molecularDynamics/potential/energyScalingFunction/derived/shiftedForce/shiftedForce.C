@@ -45,8 +45,6 @@ addToRunTimeSelectionTable
     dictionary
 );
 
-// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
-
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -63,6 +61,7 @@ shiftedForce::shiftedForce
     de_dr_at_rCut_(pairPot.energyDerivative(rCut_, false))
 {}
 
+
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 void shiftedForce::scaleEnergy(scalar& e, const scalar r) const
@@ -70,10 +69,11 @@ void shiftedForce::scaleEnergy(scalar& e, const scalar r) const
     e -= ( e_at_rCut_ + de_dr_at_rCut_ * (r - rCut_) );
 }
 
+
 bool shiftedForce::read(const dictionary& energyScalingFunctionProperties)
 {
     energyScalingFunction::read(energyScalingFunctionProperties);
-    
+
     return true;
 }
 

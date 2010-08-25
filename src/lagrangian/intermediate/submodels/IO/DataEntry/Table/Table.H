@@ -28,18 +28,14 @@ Class
 Description
     Templated table container data entry. Items are stored in a list of
     Tuple2's. First column is always stored as scalar entries. Data is read
-    in the form, e.g. for (scalar, vector):
+    in the form, e.g. for an entry <entryName> that is (scalar, vector):
 
     @verbatim
-        entry                    Table
-        entryCoeffs
-        {
-            table
-            (
-                0.0 (1 2 3)
-                1.0 (4 5 6)
-            )
-        }
+        <entryName>   table
+        (
+            0.0 (1 2 3)
+            1.0 (4 5 6)
+        );
     @endverbatim
 
 SourceFiles
@@ -58,6 +54,16 @@ SourceFiles
 namespace Foam
 {
 
+template<class Type>
+class Table;
+
+template<class Type>
+Ostream& operator<<
+(
+    Ostream&,
+    const Table<Type>&
+);
+
 /*---------------------------------------------------------------------------*\
                            Class Table Declaration
 \*---------------------------------------------------------------------------*/
@@ -69,14 +75,11 @@ class Table
 {
     // Private data
 
-       //- Table data
-       List<Tuple2<scalar, Type> > table_;
+        //- Table data
+        List<Tuple2<scalar, Type> > table_;
 
 
     // Private Member Functions
-
-        //- Disallow default bitwise copy construct
-        Table(const Table<Type>&);
 
         //- Disallow default bitwise assignment
         void operator=(const Table<Type>&);
@@ -84,23 +87,21 @@ class Table
 
 public:
 
-    // Runtime type information
-    TypeName("Table");
+    //- Runtime type information
+    TypeName("table");
 
 
     // Constructors
 
-        //- Construct from dictionary
-        Table
-        (
-            const word& entryName,
-            const dictionary& dict
-        );
+        //- Construct from entry name and Istream
+        Table(const word& entryName, Istream& is);
+
+        //- Copy constructor
+        Table(const Table<Type>& tbl);
 
 
     //- Destructor
-
-        ~Table();
+    virtual ~Table();
 
 
     // Member Functions
@@ -110,6 +111,14 @@ public:
 
         //- Integrate between two (scalar) values
         Type integrate(const scalar x1, const scalar x2) const;
+
+
+    //- Ostream Operator
+    friend Ostream& operator<< <Type>
+    (
+        Ostream&,
+        const Constant<Type>&
+    );
 };
 
 

@@ -1,2 +1,0 @@
-UnixTest.C
-EXE = $(FOAM_USER_APPBIN)/UnixTest

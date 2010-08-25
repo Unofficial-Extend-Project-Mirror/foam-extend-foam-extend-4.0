@@ -110,6 +110,32 @@ void Foam::fvMesh::clearGeom()
 void Foam::fvMesh::clearAddressing()
 {
     deleteDemandDrivenData(lduPtr_);
+
+    // Hack until proper callbacks. Below are all the fvMesh-MeshObjects.
+
+    // HJ, review delete of new function objects
+/*
+    volPointInterpolation::Delete(*this);
+    extendedLeastSquaresVectors::Delete(*this);
+    leastSquaresVectors::Delete(*this);
+    CentredFitData<linearFitPolynomial>::Delete(*this);
+    CentredFitData<quadraticFitPolynomial>::Delete(*this);
+    CentredFitData<quadraticLinearFitPolynomial>::Delete(*this);
+    skewCorrectionVectors::Delete(*this);
+    //quadraticFitSnGradData::Delete(*this);
+
+    centredCECCellToFaceStencilObject::Delete(*this);
+    centredCFCCellToFaceStencilObject::Delete(*this);
+    centredCPCCellToFaceStencilObject::Delete(*this);
+    centredFECCellToFaceStencilObject::Delete(*this);
+    // Is this geometry related - cells distorting to upwind direction?
+    upwindCECCellToFaceStencilObject::Delete(*this);
+    upwindCFCCellToFaceStencilObject::Delete(*this);
+    upwindCPCCellToFaceStencilObject::Delete(*this);
+    upwindFECCellToFaceStencilObject::Delete(*this);
+
+    centredCFCFaceToCellStencilObject::Delete(*this);
+*/
 }
 
 
@@ -644,6 +670,20 @@ Foam::tmp<Foam::scalarField> Foam::fvMesh::movePoints(const pointField& p)
     surfaceInterpolation::movePoints();
     meshObjectBase::allMovePoints<fvMesh>(*this);
 
+    HJ, review
+    
+ /*
+    // Hack until proper callbacks. Below are all the fvMesh MeshObjects with a
+    // movePoints function.
+    MeshObjectMovePoints<volPointInterpolation>(*this);
+    MeshObjectMovePoints<extendedLeastSquaresVectors>(*this);
+    MeshObjectMovePoints<leastSquaresVectors>(*this);
+    MeshObjectMovePoints<CentredFitData<linearFitPolynomial> >(*this);
+    MeshObjectMovePoints<CentredFitData<quadraticFitPolynomial> >(*this);
+    MeshObjectMovePoints<CentredFitData<quadraticLinearFitPolynomial> >(*this);
+    MeshObjectMovePoints<skewCorrectionVectors>(*this);
+    //MeshObjectMovePoints<quadraticFitSnGradData>(*this);
+*/
     return tsweptVols;
 }
 

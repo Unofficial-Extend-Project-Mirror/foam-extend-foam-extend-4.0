@@ -25,10 +25,10 @@ License
 Class
     Foam::CompositionModel
 
-
 Description
     Templated reacting parcel composition model class
-    Consists of gases (via thermo package), liquids and solids
+    Consists of carrier species (via thermo package), and additional liquids
+    and solids
 
 SourceFiles
     CompositionModel.C
@@ -44,10 +44,12 @@ SourceFiles
 #include "runTimeSelectionTables.H"
 
 #include "PtrList.H"
-#include "hCombustionThermo.H"
+#include "multiComponentMixture.H"
 
 #include "liquidMixture.H"
 #include "solidMixture.H"
+
+#include "phasePropertiesList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -61,7 +63,6 @@ namespace Foam
 template<class CloudType>
 class CompositionModel
 {
-
     // Private data
 
         //- The cloud dictionary
@@ -73,17 +74,17 @@ class CompositionModel
         //- The coefficients dictionary
         const dictionary& coeffDict_;
 
-        //- Reference to the carrier phase thermo package
-        hCombustionThermo& carrierThermo_;
+        //- Reference to the multi-component carrier phase thermo
+        multiComponentMixture<typename CloudType::thermoType>& mcCarrierThermo_;
 
-        //- Reference to the carrier phase species
-        const PtrList<specieReactingProperties>& gases_;
-
-        //- Global liquid properties data
+        //- Global (additional) liquid properties data
         autoPtr<liquidMixture> liquids_;
 
-        //- Global solid properties data
+        //- Global (additional) solid properties data
         autoPtr<solidMixture> solids_;
+
+        //- List of phase properties
+        phasePropertiesList phaseProps_;
 
 
 public:
@@ -116,18 +117,16 @@ public:
         );
 
 
-    // Destructor
+    //- Destructor
+    virtual ~CompositionModel();
 
-        virtual ~CompositionModel();
 
-
-    // Selector
-
-        static autoPtr<CompositionModel<CloudType> > New
-        (
-            const dictionary& dict,
-            CloudType& owner
-        );
+    //- Selector
+    static autoPtr<CompositionModel<CloudType> > New
+    (
+        const dictionary& dict,
+        CloudType& owner
+    );
 
 
     // Member Functions
@@ -144,98 +143,133 @@ public:
             const dictionary& coeffDict() const;
 
             //- Return the carrier phase thermo package
-            const hCombustionThermo& carrierThermo() const;
+            const multiComponentMixture<typename CloudType::thermoType>&
+                mcCarrierThermo() const;
 
-            //- Return the gases
-            const PtrList<specieReactingProperties>& gases() const;
 
-            //- Return the global liquids
-            const liquidMixture& liquids() const;
+            // Composition lists
 
-            //- Return the global solids
-            const solidMixture& solids() const;
+                //- Return the global (additional) liquids
+                const liquidMixture& liquids() const;
 
-            //- Return the list of composition names
-            virtual const wordList compositionNames() const = 0;
+                //- Return the global (additional) solids
+                const solidMixture& solids() const;
 
-            //- Return the list of gas names
-            virtual const wordList& gasNames() const = 0;
+                //- Return the list of phase properties
+                const phasePropertiesList& phaseProps() const;
 
-            //- Return local id of gas based on gasName
-            virtual label gasLocalId(const word& gasName) const = 0;
+                //- Return the number of phases
+                label nPhase() const;
 
-            //- Return global id of gas based on gasName
-            virtual label gasGlobalId(const word& gasName) const = 0;
 
-            //- Return the list indices of gases in global thermo list
-            virtual const labelList& gasGlobalIds() const = 0;
+            // Phase properties
 
-            //- Return the list of gas mass fractions
-            virtual const scalarField& YGas0() const = 0;
+                //- Return the list of phase type names
+                //  If only 1 phase, return the component names of that phase
+                const wordList& phaseTypes() const;
 
-            //- Return the list of liquid names
-            virtual const wordList& liquidNames() const = 0;
+                //- Return the list of state labels (s), (l), (g) etc.
+                const wordList& stateLabels() const;
 
-            //- Return local id of liquid based on liquidName
-            virtual label liquidLocalId(const word& liquidName) const = 0;
+                //- Return the list of component names for phaseI
+                const wordList& componentNames(const label phaseI) const;
 
-            //- Return global id of liquid based on liquidName
-            virtual label liquidGlobalId(const word& liquidName) const = 0;
+                //- Return global id of component cmptName in carrier thermo
+                label globalCarrierId(const word& cmptName) const;
 
-            //- Return the list indices of liquid in global thermo list
-            virtual const labelList& liquidGlobalIds() const = 0;
+                //- Return global id of component cmptName in phase phaseI
+                label globalId(const label phaseI, const word& cmptName) const;
 
-            //- Return the list of liquid mass fractions
-            virtual const scalarField& YLiquid0() const = 0;
+                //- Return global ids of for phase phaseI
+                const labelList& globalIds(const label phaseI) const;
 
-            //- Return the list of solid names
-            virtual const wordList& solidNames() const = 0;
+                //- Return local id of component cmptName in phase phaseI
+                label localId(const label phaseI, const word& cmptName) const;
 
-            //- Return local id of solid based on solidName
-            virtual label solidLocalId(const word& solidName) const = 0;
+                //- Return global carrier id of component given local id
+                label localToGlobalCarrierId
+                (
+                    const label phaseI,
+                    const label id
+                ) const;
 
-            //- Return global id of solid based on solidName
-            virtual label solidGlobalId(const word& solidName) const = 0;
+                //- Return the list of phase phaseI mass fractions
+                const scalarField& Y0(const label phaseI) const;
 
-            //- Return the list indices of solids in global thermo list
-            virtual const labelList& solidGlobalIds() const = 0;
+                //- Return the list of phase phaseI volume fractions fractions
+                //  based on supplied mass fractions Y
+                scalarField X
+                (
+                    const label phaseI,
+                    const scalarField& Y
+                ) const;
 
-            //- Return the list of solid mass fractions
-            virtual const scalarField& YSolid0() const = 0;
 
-            //- Return the list of mixture mass fractions
-            virtual const scalarField& YMixture0() const = 0;
+            // Mixture properties
 
-            //- Return the gas constant for the gas mixture
-            virtual scalar RGas(const scalarField& YGas) const = 0;
+                //- Return the list of mixture mass fractions
+                //  If only 1 phase, return component fractions of that phase
+                virtual const scalarField& YMixture0() const = 0;
 
-            //- Return enthalpy for the gas mixture
-            virtual scalar HGas
+                // Indices of gas, liquid and solid phases in phase properties
+                // list - returns -1 if not applicable
+
+                    //- Gas id
+                    virtual label idGas() const = 0;
+
+                    //- Liquid id
+                    virtual label idLiquid() const = 0;
+
+                    //- Solid id
+                    virtual label idSolid() const = 0;
+
+
+        // Evaluation
+
+            //- Return total enthalpy for the phase phaseI
+            virtual scalar H
             (
-                 const scalarField& YGas,
-                 const scalar T
-            ) const = 0;
-
-            //- Return specific heat caparcity for the gas mixture
-            virtual scalar cpGas
-            (
-                 const scalarField& YGas,
-                 const scalar T
-            ) const = 0;
-
-            //- Return specific heat caparcity for the liquid mixture
-            virtual scalar cpLiquid
-            (
-                const scalarField& YLiquid,
+                const label phaseI,
+                const scalarField& Y,
                 const scalar p,
                 const scalar T
-            ) const = 0;
+            ) const;
 
-            //- Return specific heat caparcity for the solid mixture
-            virtual scalar cpSolid
+            //- Return sensible enthalpy for the phase phaseI
+            virtual scalar Hs
             (
-                const scalarField& YSolid
-            ) const = 0;
+                const label phaseI,
+                const scalarField& Y,
+                const scalar p,
+                const scalar T
+            ) const;
+
+            //- Return chemical enthalpy for the phase phaseI
+            virtual scalar Hc
+            (
+                const label phaseI,
+                const scalarField& Y,
+                const scalar p,
+                const scalar T
+            ) const;
+
+            //- Return specific heat caoacity for the phase phaseI
+            virtual scalar cp
+            (
+                const label phaseI,
+                const scalarField& Y,
+                const scalar p,
+                const scalar T
+            ) const;
+
+            //- Return latent heat for the phase phaseI
+            virtual scalar L
+            (
+                const label phaseI,
+                const scalarField& Y,
+                const scalar p,
+                const scalar T
+            ) const;
 };
 
 
@@ -260,13 +294,18 @@ public:
     );
 
 
-#define makeCompositionModelType(SS, CloudType, ParcelType)                   \
+#define makeCompositionModelThermoType(SS, CloudType, ParcelType, ThermoType) \
                                                                               \
-    defineNamedTemplateTypeNameAndDebug(SS<CloudType<ParcelType> >, 0);       \
+    defineNamedTemplateTypeNameAndDebug                                       \
+    (                                                                         \
+        SS<CloudType<ParcelType<ThermoType> > >,                              \
+        0                                                                     \
+    );                                                                        \
                                                                               \
-    CompositionModel<CloudType<ParcelType> >::                                \
-        adddictionaryConstructorToTable<SS<CloudType<ParcelType> > >          \
-            add##SS##CloudType##ParcelType##ConstructorToTable_;
+    CompositionModel<CloudType<ParcelType<ThermoType> > >::                   \
+        adddictionaryConstructorToTable                                       \
+            <SS<CloudType<ParcelType<ThermoType> > > >                        \
+            add##SS##CloudType##ParcelType##ThermoType##ConstructorToTable_;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

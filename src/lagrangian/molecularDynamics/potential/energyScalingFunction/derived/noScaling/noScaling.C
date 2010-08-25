@@ -45,8 +45,6 @@ addToRunTimeSelectionTable
     dictionary
 );
 
-// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
-
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -60,15 +58,17 @@ noScaling::noScaling
     energyScalingFunction(name, energyScalingFunctionProperties, pairPot)
 {}
 
+
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 void noScaling::scaleEnergy(scalar& e, const scalar r) const
 {}
 
+
 bool noScaling::read(const dictionary& energyScalingFunctionProperties)
 {
     energyScalingFunction::read(energyScalingFunctionProperties);
-    
+
     return true;
 }
 

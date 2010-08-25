@@ -44,7 +44,7 @@ waveTransmissiveFvPatchField<Type>::waveTransmissiveFvPatchField
 )
 :
     advectiveFvPatchField<Type>(p, iF),
-    psiName_("Undefined"),
+    psiName_("psi"),
     UName_("Undefined"),
     gamma_(0.0)
 {}
@@ -56,7 +56,6 @@ waveTransmissiveFvPatchField<Type>::waveTransmissiveFvPatchField
     const waveTransmissiveFvPatchField& ptf,
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
-    const dictionary& dict
     const fvPatchFieldMapper& mapper
 )
 :
@@ -118,8 +117,8 @@ tmp<scalarField> waveTransmissiveFvPatchField<Type>::advectionSpeed() const
     const fvPatchField<scalar>& psip = this->patch().lookupPatchField
     (
         psiName_,
-        reinterpret_cast<const volScalarField*>(NULL),
-        reinterpret_cast<const scalar*>(NULL)
+        reinterpret_cast<const volScalarField*>(0),
+        reinterpret_cast<const scalar*>(0)
     );
 
     const surfaceScalarField& phi =
@@ -129,8 +128,8 @@ tmp<scalarField> waveTransmissiveFvPatchField<Type>::advectionSpeed() const
     fvsPatchField<scalar> phip = this->patch().lookupPatchField
     (
         this->phiName_,
-        reinterpret_cast<const surfaceScalarField*>(NULL),
-        reinterpret_cast<const scalar*>(NULL)
+        reinterpret_cast<const surfaceScalarField*>(0),
+        reinterpret_cast<const scalar*>(0)
     );
 
     if (phi.dimensions() == dimDensity*dimVelocity*dimArea)
@@ -138,8 +137,8 @@ tmp<scalarField> waveTransmissiveFvPatchField<Type>::advectionSpeed() const
         const fvPatchScalarField& rhop = this->patch().lookupPatchField
         (
             this->rhoName_,
-            reinterpret_cast<const volScalarField*>(NULL),
-            reinterpret_cast<const scalar*>(NULL)
+            reinterpret_cast<const volScalarField*>(0),
+            reinterpret_cast<const scalar*>(0)
         );
 
         phip /= rhop;
@@ -214,8 +213,6 @@ void waveTransmissiveFvPatchField<Type>::write(Ostream& os) const
     }
 
     this->writeEntry("value", os);
-
-    
 }
 
 

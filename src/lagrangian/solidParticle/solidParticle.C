@@ -84,6 +84,7 @@ bool Foam::solidParticle::move(solidParticle::trackData& td)
 
         if (onBoundary() && td.keepParticle)
         {
+            // Bug fix.  HJ, 25/Aug/2010
             if (face() > -1)
             {
                 if (isType<processorPolyPatch>(pbMesh[patch(face())]))
@@ -92,9 +93,30 @@ bool Foam::solidParticle::move(solidParticle::trackData& td)
                 }
             }
         }
-    }
 
     return td.keepParticle;
+}
+
+
+bool Foam::solidParticle::hitPatch
+(
+    const polyPatch&,
+    solidParticle::trackData&,
+    const label
+)
+{
+    return false;
+}
+
+
+bool Foam::solidParticle::hitPatch
+(
+    const polyPatch&,
+    int&,
+    const label
+)
+{
+    return false;
 }
 
 

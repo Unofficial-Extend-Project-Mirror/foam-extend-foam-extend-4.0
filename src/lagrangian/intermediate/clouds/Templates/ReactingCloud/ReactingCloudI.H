@@ -27,26 +27,26 @@ License
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class ParcelType>
-inline const Foam::hCombustionThermo&
-Foam::ReactingCloud<ParcelType>::carrierThermo() const
+inline const typename ParcelType::constantProperties&
+Foam::ReactingCloud<ParcelType>::constProps() const
 {
-    return carrierThermo_;
+    return constProps_;
 }
 
 
 template<class ParcelType>
-inline Foam::hCombustionThermo&
-Foam::ReactingCloud<ParcelType>::carrierThermo()
+inline const Foam::multiComponentMixture<typename ParcelType::thermoType>&
+Foam::ReactingCloud<ParcelType>::mcCarrierThermo() const
 {
-    return carrierThermo_;
+    return mcCarrierThermo_;
 }
 
 
 template<class ParcelType>
-inline const Foam::PtrList<Foam::specieReactingProperties>&
-Foam::ReactingCloud<ParcelType>::gases() const
+inline Foam::multiComponentMixture<typename ParcelType::thermoType>&
+Foam::ReactingCloud<ParcelType>::mcCarrierThermo()
 {
-    return gases_;
+    return mcCarrierThermo_;
 }
 
 
@@ -59,18 +59,10 @@ Foam::ReactingCloud<ParcelType>::composition() const
 
 
 template<class ParcelType>
-inline const Foam::MassTransferModel<Foam::ReactingCloud<ParcelType> >&
-Foam::ReactingCloud<ParcelType>::massTransfer() const
+inline const Foam::PhaseChangeModel<Foam::ReactingCloud<ParcelType> >&
+Foam::ReactingCloud<ParcelType>::phaseChange() const
 {
-    return massTransferModel_;
-}
-
-
-template<class ParcelType>
-inline const Foam::SurfaceReactionModel<Foam::ReactingCloud<ParcelType> >&
-Foam::ReactingCloud<ParcelType>::surfaceReaction() const
-{
-    return surfaceReactionModel_;
+    return phaseChangeModel_;
 }
 
 
@@ -92,7 +84,7 @@ Foam::ReactingCloud<ParcelType>::rhoTrans()
 
 template<class ParcelType>
 inline Foam::tmp<Foam::DimensionedField<Foam::scalar, Foam::volMesh> >
-Foam::ReactingCloud<ParcelType>::Srho1(const label i) const
+Foam::ReactingCloud<ParcelType>::Srho(const label i) const
 {
     return rhoTrans_[i]/(this->db().time().deltaT()*this->mesh().V());
 }
@@ -100,7 +92,7 @@ Foam::ReactingCloud<ParcelType>::Srho1(const label i) const
 
 template<class ParcelType>
 inline Foam::tmp<Foam::DimensionedField<Foam::scalar, Foam::volMesh> >
-Foam::ReactingCloud<ParcelType>::Srho1() const
+Foam::ReactingCloud<ParcelType>::Srho() const
 {
     tmp<DimensionedField<scalar, volMesh> > trhoTrans
     (
@@ -128,5 +120,6 @@ Foam::ReactingCloud<ParcelType>::Srho1() const
 
     return trhoTrans/(this->db().time().deltaT()*this->mesh().V());
 }
+
 
 // ************************************************************************* //

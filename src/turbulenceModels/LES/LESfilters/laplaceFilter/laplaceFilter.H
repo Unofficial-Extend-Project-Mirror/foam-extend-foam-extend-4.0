@@ -80,34 +80,36 @@ public:
 
     // Constructors
 
-        //- from components
+        //- Construct from components
         laplaceFilter(const fvMesh& mesh, scalar widthCoeff);
 
-        //- from IOdictionary
+        //- Construct from IOdictionary
         laplaceFilter(const fvMesh& mesh, const dictionary&);
 
 
-    // Destructor
-
-        ~laplaceFilter()
-        {}
+    //- Destructor
+    virtual ~laplaceFilter()
+    {}
 
 
     // Member Functions
 
         //- Read the LESfilter dictionary
-        void read(const dictionary&);
+        virtual void read(const dictionary&);
 
 
     // Member Operators
 
-        tmp<volScalarField> operator()(const tmp<volScalarField>&) const;
-        tmp<volVectorField> operator()(const tmp<volVectorField>&) const;
-        tmp<volSymmTensorField> operator()
+        virtual tmp<volScalarField> operator()(const tmp<volScalarField>&) const;
+
+        virtual tmp<volVectorField> operator()(const tmp<volVectorField>&) const;
+
+        virtual tmp<volSymmTensorField> operator()
         (
             const tmp<volSymmTensorField>&
         ) const;
-        tmp<volTensorField> operator()(const tmp<volTensorField>&) const;
+
+        virtual tmp<volTensorField> operator()(const tmp<volTensorField>&) const;
 };
 
 

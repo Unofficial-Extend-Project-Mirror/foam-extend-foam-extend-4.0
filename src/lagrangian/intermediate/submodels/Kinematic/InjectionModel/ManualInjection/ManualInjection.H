@@ -27,23 +27,21 @@ Class
 
 Description
     Manual injection
+
     - User specifies
       - Total mass to inject
-      - Parcel positions in file <positionsFile>
+      - Parcel positions in file @c positionsFile
       - Initial parcel velocity
     - Parcel diameters obtained by PDF model
-    - All parcels introduced at the start of the calculation
-
-    NOTE - not suitable for 2-D slab/wedge simulations unless the positions
-           file describes 2-D data!
+    - All parcels introduced at SOI
 
 SourceFiles
     ManualInjection.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef manualInjection_H
-#define manualInjection_H
+#ifndef ManualInjection_H
+#define ManualInjection_H
 
 #include "InjectionModel.H"
 #include "pdf.H"
@@ -62,11 +60,7 @@ class ManualInjection
 :
     public InjectionModel<CloudType>
 {
-
     // Private data
-
-        //- Coefficients dictionary
-        dictionary coeffDict_;
 
         //- Name of file containing positions data
         const word positionsFile_;
@@ -75,7 +69,7 @@ class ManualInjection
         vectorIOField positions_;
 
         //- Field of parcel diameters
-        scalarField diameters_;
+        scalarList diameters_;
 
         //- Initial parcel velocity
         const vector U0_;
@@ -91,14 +85,14 @@ protected:
 
     // Protected member functions
 
-        //- Number of parcels to introduce over the time step
-        label nParcelsToInject
+        //- Number of parcels to introduce over the time step relative to SOI
+        label parcelsToInject
         (
             const scalar time0,
             const scalar time1
         ) const;
 
-        //- Volume of parcels to introduce over the time step
+        //- Volume of parcels to introduce over the time step relative to SOI
         scalar volumeToInject
         (
             const scalar time0,
@@ -122,9 +116,8 @@ public:
         );
 
 
-    // Destructor
-
-        ~ManualInjection();
+    //- Destructor
+    virtual ~ManualInjection();
 
 
     // Member Functions
@@ -138,28 +131,31 @@ public:
 
         // Injection geometry
 
-            //- Return the injection position
-            vector position
+            //- Set the injection position and owner cell
+            virtual void setPositionAndCell
             (
-                const label iParcel,
+                const label parcelI,
+                const label nParcels,
                 const scalar time,
-                const polyMeshInfo& meshInfo
+                vector& position,
+                label& cellOwner
             );
 
-            //- Return the velocity of the parcel to introduce at a time
-            vector velocity
+            //- Set the parcel properties
+            virtual void setProperties
             (
-                const label,
+                const label parcelI,
+                const label nParcels,
                 const scalar time,
-                const polyMeshInfo& meshInfo
+                typename CloudType::parcelType& parcel
             );
 
-            //- Return the diameter of the parcel to introduce at a time
-            scalar d0
-            (
-                const label,
-                const scalar
-            ) const;
+            //- Flag to identify whether model fully describes the parcel
+            virtual bool fullyDescribed() const;
+
+            //- Return flag to identify whether or not injection of parcelI is
+            //  permitted
+            virtual bool validInjection(const label parcelI);
 };
 
 

@@ -22,13 +22,19 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "DispersionModel.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+template<class CloudType>
+Foam::DispersionModel<CloudType>::DispersionModel(CloudType& owner)
+:
+    dict_(dictionary::null),
+    owner_(owner)
+{}
+
 
 template<class CloudType>
 Foam::DispersionModel<CloudType>::DispersionModel

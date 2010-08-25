@@ -22,33 +22,20 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Application
-    interfaceProperties
-
-Description
-    Properties to aid interFoam :
-    1. Correct the gamma boundary condition for dynamic contact angle.
-    2. Calculate interface curvature.
-
 \*---------------------------------------------------------------------------*/
 
 #include "interfaceProperties.H"
-#include "gammaContactAngleFvPatchScalarField.H"
+#include "alphaContactAngleFvPatchScalarField.H"
 #include "mathematicalConstants.H"
 #include "surfaceInterpolate.H"
 #include "fvcDiv.H"
 #include "fvcGrad.H"
 #include "fvcSnGrad.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * //
 
-const scalar interfaceProperties::convertToRad =
-    mathematicalConstant::pi/180.0;
+const Foam::scalar Foam::interfaceProperties::convertToRad =
+    Foam::mathematicalConstant::pi/180.0;
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -59,26 +46,26 @@ const scalar interfaceProperties::convertToRad =
 // The dynamic contact angle is calculated from the component of the
 // velocity on the direction of the interface, parallel to the wall.
 
-void interfaceProperties::correctContactAngle
+void Foam::interfaceProperties::correctContactAngle
 (
     surfaceVectorField::GeometricBoundaryField& nHatb
 ) const
 {
-    const fvMesh& mesh = gamma_.mesh();
-    const volScalarField::GeometricBoundaryField& gbf = gamma_.boundaryField();
+    const fvMesh& mesh = alpha1_.mesh();
+    const volScalarField::GeometricBoundaryField& gbf = alpha1_.boundaryField();
 
     const fvBoundaryMesh& boundary = mesh.boundary();
 
     forAll(boundary, patchi)
     {
-        if (isA<gammaContactAngleFvPatchScalarField>(gbf[patchi]))
+        if (isA<alphaContactAngleFvPatchScalarField>(gbf[patchi]))
         {
-            const gammaContactAngleFvPatchScalarField& gcap = 
-                refCast<const gammaContactAngleFvPatchScalarField>
+            const alphaContactAngleFvPatchScalarField& gcap =
+                refCast<const alphaContactAngleFvPatchScalarField>
                 (gbf[patchi]);
 
             fvsPatchVectorField& nHatp = nHatb[patchi];
-            scalarField theta = 
+            scalarField theta =
                 convertToRad*gcap.theta(U_.boundaryField()[patchi], nHatp);
 
             vectorField nf = boundary[patchi].nf();
@@ -109,22 +96,22 @@ void interfaceProperties::correctContactAngle
 }
 
 
-void interfaceProperties::calculateK()
+void Foam::interfaceProperties::calculateK()
 {
-    const fvMesh& mesh = gamma_.mesh();
+    const fvMesh& mesh = alpha1_.mesh();
     const surfaceVectorField& Sf = mesh.Sf();
 
-    // Cell gradient of gamma
-    volVectorField gradGamma = fvc::grad(gamma_);
+    // Cell gradient of alpha
+    volVectorField gradAlpha = fvc::grad(alpha1_);
 
-    // Interpolated face-gradient of gamma
-    surfaceVectorField gradGammaf = fvc::interpolate(gradGamma);
-    //gradGammaf -=
+    // Interpolated face-gradient of alpha
+    surfaceVectorField gradAlphaf = fvc::interpolate(gradAlpha);
+    //gradAlphaf -=
     //    (mesh.Sf()/mesh.magSf())
-    //   *(fvc::snGrad(gamma_) - (mesh.Sf() & gradGammaf)/mesh.magSf());
+    //   *(fvc::snGrad(alpha1_) - (mesh.Sf() & gradAlphaf)/mesh.magSf());
 
     // Face unit interface normal
-    surfaceVectorField nHatfv = gradGammaf/(mag(gradGammaf) + deltaN_);
+    surfaceVectorField nHatfv = gradAlphaf/(mag(gradAlphaf) + deltaN_);
     correctContactAngle(nHatfv.boundaryField());
 
     // Face unit interface normal flux
@@ -136,7 +123,7 @@ void interfaceProperties::calculateK()
     // Complex expression for curvature.
     // Correction is formally zero but numerically non-zero.
     /*
-    volVectorField nHat = gradGamma/(mag(gradGamma) + deltaN_);
+    volVectorField nHat = gradAlpha/(mag(gradAlpha) + deltaN_);
     forAll(nHat.boundaryField(), patchi)
     {
         nHat.boundaryField()[patchi] = nHatfv.boundaryField()[patchi];
@@ -149,19 +136,19 @@ void interfaceProperties::calculateK()
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-interfaceProperties::interfaceProperties
+Foam::interfaceProperties::interfaceProperties
 (
-    const volScalarField& gamma,
+    const volScalarField& alpha1,
     const volVectorField& U,
     const IOdictionary& dict
 )
 :
     transportPropertiesDict_(dict),
-    cGamma_
+    cAlpha_
     (
         readScalar
         (
-            gamma.mesh().solutionDict().subDict("PISO").lookup("cGamma")
+            alpha1.mesh().solutionDict().subDict("PISO").lookup("cAlpha")
         )
     ),
     sigma_(dict.lookup("sigma")),
@@ -169,10 +156,10 @@ interfaceProperties::interfaceProperties
     deltaN_
     (
         "deltaN",
-        1e-8/pow(average(gamma.mesh().V()), 1.0/3.0)
+        1e-8/pow(average(alpha1.mesh().V()), 1.0/3.0)
     ),
 
-    gamma_(gamma),
+    alpha1_(alpha1),
     U_(U),
 
     nHatf_
@@ -180,10 +167,10 @@ interfaceProperties::interfaceProperties
         IOobject
         (
             "nHatf",
-            gamma_.time().timeName(),
-            gamma_.mesh()
+            alpha1_.time().timeName(),
+            alpha1_.mesh()
         ),
-        gamma_.mesh(),
+        alpha1_.mesh(),
         dimensionedScalar("nHatf", dimArea, 0.0)
     ),
 
@@ -192,19 +179,15 @@ interfaceProperties::interfaceProperties
         IOobject
         (
             "K",
-            gamma_.time().timeName(),
-            gamma_.mesh()
+            alpha1_.time().timeName(),
+            alpha1_.mesh()
         ),
-        gamma_.mesh(),
+        alpha1_.mesh(),
         dimensionedScalar("K", dimless/dimLength, 0.0)
     )
 {
     calculateK();
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

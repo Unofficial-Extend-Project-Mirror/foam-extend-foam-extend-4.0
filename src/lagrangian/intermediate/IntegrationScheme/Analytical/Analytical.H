@@ -49,7 +49,6 @@ class Analytical
 :
     public IntegrationScheme<Type>
 {
-
 public:
 
     //- Runtime type information
@@ -59,22 +58,17 @@ public:
     // Constructors
 
         //- Construct from components
-        Analytical
-        (
-            const word& phiName,
-            const dictionary& dict
-        );
+        Analytical(const word& phiName, const dictionary& dict);
 
 
     //- Destructor
-
-        virtual ~Analytical();
+    virtual ~Analytical();
 
 
     // Member Functions
 
         //- Perform the integration
-        virtual Type integrate
+        virtual typename IntegrationScheme<Type>::integrationResult integrate
         (
             const Type phi,
             const scalar dt,

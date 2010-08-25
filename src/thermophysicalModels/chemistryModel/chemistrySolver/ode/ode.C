@@ -25,36 +25,21 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "ode.H"
-#include "addToRunTimeSelectionTable.H"
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-namespace Foam
-{
-    defineTypeNameAndDebug(ode, 0);
-    addToRunTimeSelectionTable
-    (
-        chemistrySolver,
-        ode,
-        dictionary
-    );
-}
-
+#include "ODEChemistryModel.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from components
-Foam::ode::ode
+template<class CompType, class ThermoType>
+Foam::ode<CompType, ThermoType>::ode
 (
-    const Foam::dictionary& dict,
-    Foam::chemistryModel& chemistry
+    ODEChemistryModel<CompType, ThermoType>& model,
+    const word& modelName
 )
 :
-    chemistrySolver(dict, chemistry),
-    chemistry_(chemistry),
-    coeffsDict_(dict.subDict(typeName + "Coeffs")),
+    chemistrySolver<CompType, ThermoType>(model, modelName),
+    coeffsDict_(model.subDict(modelName + "Coeffs")),
     solverName_(coeffsDict_.lookup("ODESolver")),
-    odeSolver_(ODESolver::New(solverName_, chemistry)),
+    odeSolver_(ODESolver::New(solverName_, model)),
     eps_(readScalar(coeffsDict_.lookup("eps"))),
     scale_(readScalar(coeffsDict_.lookup("scale")))
 {}
@@ -62,14 +47,15 @@ Foam::ode::ode
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::ode::~ode()
+template<class CompType, class ThermoType>
+Foam::ode<CompType, ThermoType>::~ode()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-
-Foam::scalar Foam::ode::solve
+template<class CompType, class ThermoType>
+Foam::scalar Foam::ode<CompType, ThermoType>::solve
 (
     scalarField& c,
     const scalar T,
@@ -78,28 +64,30 @@ Foam::scalar Foam::ode::solve
     const scalar dt
 ) const
 {
-    label Ns = chemistry_.Ns();
-    scalarField& c1 = chemistry_.coeffs();
+    label nSpecie = this->model_.nSpecie();
+    scalarField c1(this->model_.nEqns(), 0.0);
 
     // copy the concentration, T and P to the total solve-vector
-    for(label i=0; i<Ns; i++)
+    for (label i=0; i<nSpecie; i++)
     {
         c1[i] = c[i];
     }
-    c1[Ns] = T;
-    c1[Ns+1] = p;
+    c1[nSpecie] = T;
+    c1[nSpecie+1] = p;
 
     scalar dtEst = dt;
 
     odeSolver_->solve
     (
+        this->model_,
         t0,
         t0 + dt,
+        c1,
         eps_,
         dtEst
     );
 
-    for(label i=0; i<c.size(); i++)
+    for (label i=0; i<c.size(); i++)
     {
         c[i] = max(0.0, c1[i]);
     }

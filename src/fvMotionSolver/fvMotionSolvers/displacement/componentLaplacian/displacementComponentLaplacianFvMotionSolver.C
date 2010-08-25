@@ -29,6 +29,7 @@ License
 #include "fvmLaplacian.H"
 #include "addToRunTimeSelectionTable.H"
 #include "mapPolyMesh.H"
+#include "volPointInterpolation.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -117,7 +118,7 @@ displacementComponentLaplacianFvMotionSolver
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        pointMesh_
+        pointMesh::New(fvMesh_)
     ),
     cellDisplacement_
     (
@@ -173,7 +174,7 @@ displacementComponentLaplacianFvMotionSolver
             new pointVectorField
             (
                 io,
-                pointMesh_
+                pointMesh::New(fvMesh_)
             )
         );
 
@@ -202,7 +203,11 @@ Foam::displacementComponentLaplacianFvMotionSolver::
 Foam::tmp<Foam::pointField>
 Foam::displacementComponentLaplacianFvMotionSolver::curPoints() const
 {
-    vpi_.interpolate(cellDisplacement_, pointDisplacement_);
+    volPointInterpolation::New(fvMesh_).interpolate
+    (
+        cellDisplacement_,
+        pointDisplacement_
+    );
 
     if (pointLocation_.valid())
     {

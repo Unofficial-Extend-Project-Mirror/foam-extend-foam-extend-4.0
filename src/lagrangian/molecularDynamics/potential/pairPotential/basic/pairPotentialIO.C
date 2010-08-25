@@ -38,12 +38,12 @@ bool Foam::pairPotential::writeEnergyAndForceTables(Ostream& os) const
 
     forAll(eTab, e)
     {
-        os<< eTab[e].first()
-          << token::SPACE
-          << eTab[e].second()
-          << token::SPACE
-          << fTab[e].second()
-          << nl;
+        os  << eTab[e].first()
+            << token::SPACE
+            << eTab[e].second()
+            << token::SPACE
+            << fTab[e].second()
+            << nl;
     }
 
     return os.good();

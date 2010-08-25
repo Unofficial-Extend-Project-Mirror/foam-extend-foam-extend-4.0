@@ -26,11 +26,12 @@ License
 
 #include "ConeInjection.H"
 #include "DataEntry.H"
+#include "mathematicalConstants.H"
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::label Foam::ConeInjection<CloudType>::nParcelsToInject
+Foam::label Foam::ConeInjection<CloudType>::parcelsToInject
 (
     const scalar time0,
     const scalar time1
@@ -77,6 +78,7 @@ Foam::ConeInjection<CloudType>::ConeInjection
     InjectionModel<CloudType>(dict, owner, typeName),
     duration_(readScalar(this->coeffDict().lookup("duration"))),
     position_(this->coeffDict().lookup("position")),
+    injectorCell_(-1),
     direction_(this->coeffDict().lookup("direction")),
     parcelsPerSecond_
     (
@@ -145,6 +147,9 @@ Foam::ConeInjection<CloudType>::ConeInjection
 
     // Set total volume to inject
     this->volumeTotal_ = volumeFlowRate_().integrate(0.0, duration_);
+
+    // Set/cache the injector cell
+    this->findCellAtPosition(injectorCell_, position_);
 }
 
 
@@ -172,47 +177,30 @@ Foam::scalar Foam::ConeInjection<CloudType>::timeEnd() const
 
 
 template<class CloudType>
-Foam::vector Foam::ConeInjection<CloudType>::position
+void Foam::ConeInjection<CloudType>::setPositionAndCell
 (
     const label,
+    const label,
     const scalar,
-    const polyMeshInfo& meshInfo
+    vector& position,
+    label& cellOwner
 )
 {
-    vector pos = position_;
-    if (meshInfo.caseIs2d())
-    {
-        if (meshInfo.caseIs2dWedge())
-        {
-            pos.component(meshInfo.emptyComponent()) = 0.0;
-        }
-        else if (meshInfo.caseIs2dSlab())
-        {
-            pos.component(meshInfo.emptyComponent()) =
-                meshInfo.centrePoint().component(meshInfo.emptyComponent());
-        }
-        else
-        {
-            FatalErrorIn
-            (
-                "Foam::vector Foam::ConeInjection<CloudType>::position"
-            )   << "Could not determine 2-D case geometry" << nl
-                << abort(FatalError);
-        }
-    }
-
-    return pos;
+    position = position_;
+    cellOwner = injectorCell_;
 }
 
 
 template<class CloudType>
-Foam::vector Foam::ConeInjection<CloudType>::velocity
+void Foam::ConeInjection<CloudType>::setProperties
 (
+    const label parcelI,
     const label,
     const scalar time,
-    const polyMeshInfo& meshInfo
+    typename CloudType::parcelType& parcel
 )
 {
+    // set particle velocity
     const scalar deg2Rad = mathematicalConstant::pi/180.0;
 
     scalar t = time - this->SOI_;
@@ -223,33 +211,31 @@ Foam::vector Foam::ConeInjection<CloudType>::velocity
     coneAngle *= deg2Rad;
     scalar alpha = sin(coneAngle);
     scalar dcorr = cos(coneAngle);
-    scalar beta =
-        2.0*mathematicalConstant::pi*this->owner().rndGen().scalar01();
+    scalar beta = mathematicalConstant::twoPi*this->owner().rndGen().scalar01();
 
     vector normal = alpha*(tanVec1_*cos(beta) + tanVec2_*sin(beta));
     vector dirVec = dcorr*direction_;
     dirVec += normal;
-
-    // Remove empty component of velocity for slab cases
-    if (meshInfo.caseIs2dSlab())
-    {
-        dirVec.component(meshInfo.emptyComponent()) = 0.0;
-    }
-
     dirVec /= mag(dirVec);
 
-    return Umag_().value(t)*dirVec;
+    parcel.U() = Umag_().value(t)*dirVec;
+
+    // set particle diameter
+    parcel.d() = parcelPDF_().sample();
 }
 
 
 template<class CloudType>
-Foam::scalar Foam::ConeInjection<CloudType>::d0
-(
-    const label,
-    const scalar
-) const
+bool Foam::ConeInjection<CloudType>::fullyDescribed() const
 {
-    return parcelPDF_().sample();
+    return false;
+}
+
+
+template<class CloudType>
+bool Foam::ConeInjection<CloudType>::validInjection(const label)
+{
+    return true;
 }
 
 

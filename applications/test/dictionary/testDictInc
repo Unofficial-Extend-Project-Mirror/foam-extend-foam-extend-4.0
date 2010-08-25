@@ -1,6 +1,0 @@
-    inlet_4
-    {
-        type            inletOutlet;
-        inletValue      $internalField;
-        value           $internalField;
-    }

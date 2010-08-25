@@ -1,3 +1,0 @@
-testDataEntry.C
-
-EXE = $(FOAM_APPBIN)/testDataEntry

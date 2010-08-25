@@ -98,10 +98,7 @@ public:
 
         // Constructors
 
-            inline trackData
-            (
-                Cloud<ParticleType>& cloud
-            );
+            inline trackData(Cloud<ParticleType>& cloud);
 
 
         // Member functions
@@ -130,6 +127,12 @@ protected:
         //- Fraction of time-step completed
         scalar stepFraction_;
 
+        //- Originating processor id
+        label origProc_;
+
+        //- Local particle id on originating processor
+        label origId_;
+
 
     // Private member functions
 
@@ -154,22 +157,34 @@ protected:
             const label facei
         ) const;
 
-        //- Return the faces between position and cell centre
-        labelList findFaces
+        //- Find the faces between position and cell centre
+        void findFaces
         (
-            const vector& position
+            const vector& position,
+            DynamicList<label>& faceList
         ) const;
 
-        //- Return the faces between position and cell centre
-        labelList findFaces
+        //- Find the faces between position and cell centre
+        void findFaces
         (
             const vector& position,
             const label celli,
-            const scalar stepFraction
+            const scalar stepFraction,
+            DynamicList<label>& faceList
         ) const;
 
 
     // Patch interactions
+
+        //- Overridable function to handle the particle hitting a patch
+        //  Executed before other patch-hitting functions
+        template<class TrackData>
+        bool hitPatch
+        (
+            const polyPatch&,
+            TrackData& td,
+            const label patchI
+        );
 
         //- Overridable function to handle the particle hitting a wedgePatch
         template<class TrackData>
@@ -256,8 +271,13 @@ public:
     friend class Cloud<ParticleType>;
 
 
-    //- Runtime type information
-    TypeName("Particle");
+    // Static data members
+
+        //- Runtime type information
+        TypeName("Particle");
+
+        //- String representation of properties
+        static string propHeader;
 
 
     // Constructors
@@ -278,14 +298,24 @@ public:
             bool readFields = true
         );
 
+        //- Construct as a copy
+        Particle(const Particle& p);
+
+        //- Construct a clone
+        autoPtr<ParticleType> clone() const
+        {
+            return autoPtr<Particle>(new Particle(*this));
+        }
+
+
         //- Factory class to read-construct particles used for
         //  parallel transfer
         class iNew
         {
-
             // Private data
 
-            const Cloud<ParticleType>& cloud_;
+                //- Reference to the cloud
+                const Cloud<ParticleType>& cloud_;
 
 
         public:
@@ -297,15 +327,22 @@ public:
 
             autoPtr<ParticleType> operator()(Istream& is) const
             {
-                return autoPtr<ParticleType>(new ParticleType(cloud_, is));
+                return autoPtr<ParticleType>
+                (
+                    new ParticleType
+                    (
+                        cloud_,
+                        is,
+                        true
+                    )
+                );
             }
         };
 
 
     //- Destructor
-
-        virtual ~Particle()
-        {}
+    virtual ~Particle()
+    {}
 
 
     // Member Functions
@@ -344,6 +381,9 @@ public:
             //- Return the impact model to be used, soft or hard (default).
             inline bool softImpact() const;
 
+            //- Return the particle current time
+            inline scalar currentTime() const;
+
 
         // Check
 
@@ -369,6 +409,12 @@ public:
 
             //-  Return the fraction of time-step completed
             inline scalar stepFraction() const;
+
+            //- Return the originating processor id
+            inline label origProc() const;
+
+            //- Return the particle id on originating processor
+            inline label origId() const;
 
 
         // Track
@@ -413,12 +459,14 @@ public:
 
     // I-O
 
-        //- Write the fields associated with the owner cloud
-        static void writeFields
-        (
-            const Cloud<ParticleType>& c
-        );
+        //- Read the fields associated with the owner cloud
+        static void readFields(Cloud<ParticleType>& c);
 
+        //- Write the fields associated with the owner cloud
+        static void writeFields(const Cloud<ParticleType>& c);
+
+        //- Write the particle data
+        void write(Ostream& os, bool writeFields) const;
 
     // Ostream Operator
 

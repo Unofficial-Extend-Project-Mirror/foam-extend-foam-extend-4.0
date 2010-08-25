@@ -30,14 +30,9 @@ License
 #include "surfaceFields.H"
 #include "volFields.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-turbulentIntensityKineticEnergyInletFvPatchScalarField::
+Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
 turbulentIntensityKineticEnergyInletFvPatchScalarField
 (
     const fvPatch& p,
@@ -49,7 +44,7 @@ turbulentIntensityKineticEnergyInletFvPatchScalarField
     intensity_(0.05)
 {}
 
-turbulentIntensityKineticEnergyInletFvPatchScalarField::
+Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
 turbulentIntensityKineticEnergyInletFvPatchScalarField
 (
     const turbulentIntensityKineticEnergyInletFvPatchScalarField& ptf,
@@ -63,7 +58,7 @@ turbulentIntensityKineticEnergyInletFvPatchScalarField
     intensity_(ptf.intensity_)
 {}
 
-turbulentIntensityKineticEnergyInletFvPatchScalarField::
+Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
 turbulentIntensityKineticEnergyInletFvPatchScalarField
 (
     const fvPatch& p,
@@ -93,7 +88,7 @@ turbulentIntensityKineticEnergyInletFvPatchScalarField
     }
 }
 
-turbulentIntensityKineticEnergyInletFvPatchScalarField::
+Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
 turbulentIntensityKineticEnergyInletFvPatchScalarField
 (
     const turbulentIntensityKineticEnergyInletFvPatchScalarField& ptf
@@ -104,7 +99,8 @@ turbulentIntensityKineticEnergyInletFvPatchScalarField
     intensity_(ptf.intensity_)
 {}
 
-turbulentIntensityKineticEnergyInletFvPatchScalarField::
+
+Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
 turbulentIntensityKineticEnergyInletFvPatchScalarField
 (
     const turbulentIntensityKineticEnergyInletFvPatchScalarField& ptf,
@@ -119,7 +115,9 @@ turbulentIntensityKineticEnergyInletFvPatchScalarField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void turbulentIntensityKineticEnergyInletFvPatchScalarField::updateCoeffs()
+void
+Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
+updateCoeffs()
 {
     if (updated())
     {
@@ -135,7 +133,7 @@ void turbulentIntensityKineticEnergyInletFvPatchScalarField::updateCoeffs()
 }
 
 
-void turbulentIntensityKineticEnergyInletFvPatchScalarField::write
+void Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::write
 (
     Ostream& os
 ) const
@@ -152,15 +150,13 @@ void turbulentIntensityKineticEnergyInletFvPatchScalarField::write
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField
-(
-    fvPatchScalarField,
-    turbulentIntensityKineticEnergyInletFvPatchScalarField
-);
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
+namespace Foam
+{
+    makePatchTypeField
+    (
+        fvPatchScalarField,
+        turbulentIntensityKineticEnergyInletFvPatchScalarField
+    );
+}
 
 // ************************************************************************* //

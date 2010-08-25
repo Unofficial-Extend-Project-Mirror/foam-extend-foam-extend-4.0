@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "IOPosition.H"
@@ -74,7 +72,13 @@ bool Foam::IOPosition<ParticleType>::writeData(Ostream& os) const
 
     forAllConstIter(typename Cloud<ParticleType>, cloud_, iter)
     {
-        os<< static_cast<const Particle<ParticleType>&>(iter()) << nl;
+        // Prevent writing additional fields
+        static_cast<const Particle<ParticleType>&>(iter()).write
+        (
+            os,
+            false
+        );
+        os  << nl;
     }
 
     os<< token::END_LIST << endl;
@@ -103,6 +107,7 @@ void Foam::IOPosition<ParticleType>::readData
 
         for (label i=0; i<s; i++)
         {
+            // Do not read any fields, position only
             c.append(new ParticleType(c, is, false));
         }
 
@@ -133,6 +138,7 @@ void Foam::IOPosition<ParticleType>::readData
         )
         {
             is.putBack(lastToken);
+            // Do not read any fields, position only
             c.append(new ParticleType(c, is, false));
             is >> lastToken;
         }

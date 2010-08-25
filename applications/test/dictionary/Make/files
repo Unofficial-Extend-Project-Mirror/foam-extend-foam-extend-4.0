@@ -1,4 +1,0 @@
-calcEntry/calcEntry.C
-dictionaryTest.C
-
-EXE = $(FOAM_USER_APPBIN)/dictionaryTest

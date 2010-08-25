@@ -115,7 +115,7 @@ void reitzKHRT::breakupParcel
         (1 + ohnesorge)*(1 + 1.4*pow(taylor, 0.6))
     )*sqrt(sigma/(rhoLiquid*pow(r, 3)) );
 
-    // ... and the corresponding KH wave-length.
+    // corresponding KH wave-length.
     scalar lambdaKH =
     9.02*r*
     (
@@ -132,7 +132,7 @@ void reitzKHRT::breakupParcel
         0.6
     );
 
-    // the characteristic Kelvin-Helmholtz breakup time
+    // characteristic Kelvin-Helmholtz breakup time
     scalar tauKH = 3.726*b1_*r/(omegaKH*lambdaKH);
 
     // stable KH diameter
@@ -140,7 +140,6 @@ void reitzKHRT::breakupParcel
 
     // the frequency of the fastest growing RT wavelength.
     scalar helpVariable = mag(gt*(rhoLiquid - rhoGas));
-
     scalar omegaRT = sqrt
     (
         2.0*pow(helpVariable, 1.5)
@@ -148,12 +147,9 @@ void reitzKHRT::breakupParcel
     );
 
     // RT wave number
-    scalar KRT = sqrt
-    (
-        helpVariable/(3.0*sigma + VSMALL)
-    );
+    scalar KRT = sqrt(helpVariable/(3.0*sigma + VSMALL));
 
-    // the wavelength of the fastest growing Raleigh-Taylor frequency
+    // Wavelength of the fastest growing Raleigh-Taylor frequency
     scalar lambdaRT = 2.0*mathematicalConstant::pi*cRT_/(KRT + VSMALL);
 
     // if lambdaRT < diameter, then RT waves are growing on the surface
@@ -163,7 +159,7 @@ void reitzKHRT::breakupParcel
         p.ct() += deltaT;
     }
 
-    // the characteristic RT breakup time
+    // characteristic RT breakup time
     scalar tauRT = cTau_/(omegaRT + VSMALL);
 
     // check if we have RT breakup
@@ -178,7 +174,7 @@ void reitzKHRT::breakupParcel
     // otherwise check for KH breakup
     else if (dc < p.d())
     {
-        // no breakup below weber = 12
+        // no breakup below Weber = 12
         if (weGas > weberLimit_)
         {
 
@@ -206,7 +202,7 @@ void reitzKHRT::breakupParcel
             )
             {
                 // set the initial ms value to -GREAT. This prevents
-                // new droplets from being formed from the childDroplet
+                // new droplets from being formed from the child droplet
                 // from the KH instability
 
                 // mass of stripped child parcel

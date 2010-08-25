@@ -29,14 +29,16 @@ License
 template<class ParcelType>
 inline Foam::ThermoParcel<ParcelType>::constantProperties::constantProperties
 (
-    const dictionary& dict
+    const dictionary& parentDict
 )
 :
-    KinematicParcel<ParcelType>::constantProperties(dict),
-    T0_(dimensionedScalar(dict.lookup("T0")).value()),
-    cp0_(dimensionedScalar(dict.lookup("cp0")).value()),
-    epsilon0_(dimensionedScalar(dict.lookup("epsilon0")).value()),
-    f0_(dimensionedScalar(dict.lookup("f0")).value())
+    KinematicParcel<ParcelType>::constantProperties(parentDict),
+    T0_(dimensionedScalar(this->dict().lookup("T0")).value()),
+    TMin_(dimensionedScalar(this->dict().lookup("TMin")).value()),
+    cp0_(dimensionedScalar(this->dict().lookup("cp0")).value()),
+    epsilon0_(dimensionedScalar(this->dict().lookup("epsilon0")).value()),
+    f0_(dimensionedScalar(this->dict().lookup("f0")).value()),
+    Pr_(dimensionedScalar(this->dict().lookup("Pr")).value())
 {}
 
 
@@ -73,24 +75,40 @@ template<class ParcelType>
 inline Foam::ThermoParcel<ParcelType>::ThermoParcel
 (
     ThermoCloud<ParcelType>& owner,
-    const label typeId,
     const vector& position,
-    const label celli,
+    const label cellI
+)
+:
+    KinematicParcel<ParcelType>(owner, position, cellI),
+    T_(0.0),
+    cp_(0.0),
+    Tc_(0.0),
+    cpc_(0.0)
+{}
+
+
+template<class ParcelType>
+inline Foam::ThermoParcel<ParcelType>::ThermoParcel
+(
+    ThermoCloud<ParcelType>& owner,
+    const vector& position,
+    const label cellI,
+    const label typeId,
+    const scalar nParticle0,
     const scalar d0,
     const vector& U0,
-    const scalar nParticle0,
     const constantProperties& constProps
 )
 :
     KinematicParcel<ParcelType>
     (
         owner,
-        typeId,
         position,
-        celli,
+        cellI,
+        typeId,
+        nParticle0,
         d0,
         U0,
-        nParticle0,
         constProps
     ),
     T_(constProps.T0()),
@@ -107,6 +125,14 @@ inline Foam::scalar
 Foam::ThermoParcel<ParcelType>::constantProperties::T0() const
 {
     return T0_;
+}
+
+
+template <class ParcelType>
+inline Foam::scalar
+Foam::ThermoParcel<ParcelType>::constantProperties::TMin() const
+{
+    return TMin_;
 }
 
 
@@ -131,6 +157,14 @@ inline Foam::scalar
 Foam::ThermoParcel<ParcelType>::constantProperties::f0() const
 {
     return f0_;
+}
+
+
+template <class ParcelType>
+inline Foam::scalar
+Foam::ThermoParcel<ParcelType>::constantProperties::Pr() const
+{
+    return Pr_;
 }
 
 
@@ -178,16 +212,16 @@ inline Foam::scalar Foam::ThermoParcel<ParcelType>::T() const
 
 
 template<class ParcelType>
-inline Foam::scalar& Foam::ThermoParcel<ParcelType>::T()
+inline Foam::scalar Foam::ThermoParcel<ParcelType>::cp() const
 {
-    return T_;
+    return cp_;
 }
 
 
 template<class ParcelType>
-inline Foam::scalar Foam::ThermoParcel<ParcelType>::cp() const
+inline Foam::scalar& Foam::ThermoParcel<ParcelType>::T()
 {
-    return cp_;
+    return T_;
 }
 
 

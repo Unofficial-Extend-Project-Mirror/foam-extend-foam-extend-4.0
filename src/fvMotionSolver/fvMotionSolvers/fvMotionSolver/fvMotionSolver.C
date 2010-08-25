@@ -25,6 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "fvMotionSolver.H"
+#include "volPointInterpolation.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -39,9 +40,7 @@ namespace Foam
 Foam::fvMotionSolver::fvMotionSolver(const polyMesh& mesh)
 :
     motionSolver(mesh),
-    fvMesh_(refCast<const fvMesh>(mesh)),
-    pointMesh_(fvMesh_),
-    vpi_(fvMesh_, pointMesh_)
+    fvMesh_(refCast<const fvMesh>(mesh))
 {}
 
 
@@ -55,16 +54,14 @@ Foam::fvMotionSolver::~fvMotionSolver()
 
 void Foam::fvMotionSolver::movePoints(const pointField& p)
 {
-    pointMesh_.movePoints(p);
-    vpi_.movePoints();
+    // Movement of pointMesh and volPointInterpolation done by polyMesh,fvMesh
 }
 
 
 void Foam::fvMotionSolver::updateMesh(const mapPolyMesh& mpm)
 {
     motionSolver::updateMesh(mpm);
-    pointMesh_.updateMesh(mpm);
-    vpi_.updateMesh();
+    // Update of pointMesh and volPointInterpolation done by polyMesh,fvMesh
 }
 
 

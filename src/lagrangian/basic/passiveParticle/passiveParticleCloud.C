@@ -22,12 +22,9 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
-#include "passiveParticle.H"
-#include "Cloud.H"
+#include "passiveParticleCloud.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -39,8 +36,35 @@ namespace Foam
 defineParticleTypeNameAndDebug(passiveParticle, 0);
 defineTemplateTypeNameAndDebug(Cloud<passiveParticle>, 0);
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+};
 
-} // End namespace Foam
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::passiveParticleCloud::passiveParticleCloud
+(
+    const polyMesh& mesh,
+    const word& cloudName,
+    bool readFields
+)
+:
+    Cloud<passiveParticle>(mesh, cloudName, false)
+{
+    if (readFields)
+    {
+        passiveParticle::readFields(*this);
+    }
+}
+
+
+Foam::passiveParticleCloud::passiveParticleCloud
+(
+    const polyMesh& mesh,
+    const word& cloudName,
+    const IDLList<passiveParticle>& particles
+)
+:
+    Cloud<passiveParticle>(mesh, cloudName, particles)
+{}
+
 
 // ************************************************************************* //

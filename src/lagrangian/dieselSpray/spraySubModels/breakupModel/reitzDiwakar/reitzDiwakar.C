@@ -28,7 +28,7 @@ License
 
 #include "reitzDiwakar.H"
 #include "addToRunTimeSelectionTable.H"
-#include "combustionMixture.H"
+#include "basicMultiComponentMixture.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

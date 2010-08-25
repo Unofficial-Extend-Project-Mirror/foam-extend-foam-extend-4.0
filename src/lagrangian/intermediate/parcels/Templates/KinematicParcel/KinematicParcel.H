@@ -31,7 +31,7 @@ Description
 
     Sub-models include:
     - drag
-    - break-up
+    - turbulent dispersion
     - wall interactions
 
 SourceFiles
@@ -49,7 +49,6 @@ SourceFiles
 #include "autoPtr.H"
 #include "interpolationCellPoint.H"
 #include "contiguous.H"
-#include "mathematicalConstants.H"
 
 #include "KinematicCloud.H"
 
@@ -79,14 +78,18 @@ class KinematicParcel
 :
     public Particle<ParcelType>
 {
-
 public:
 
     //- Class to hold kinematic particle constant properties
     class constantProperties
     {
-
         // Private data
+
+            //- Constant properties dictionary
+            const dictionary dict_;
+
+            //- Minimum density [kg/m3]
+            const scalar rhoMin_;
 
             //- Particle density [kg/m3] (constant)
             const scalar rho0_;
@@ -98,9 +101,15 @@ public:
     public:
 
         //- Constructor
-        constantProperties(const dictionary& dict);
+        constantProperties(const dictionary& parentDict);
 
         // Member functions
+
+            //- Return const access to the constant properties dictionary
+            inline const dictionary& dict() const;
+
+            //- Return const access to the minimum density
+            inline scalar rhoMin() const;
 
             //- Return const access to the particle density
             inline scalar rho0() const;
@@ -115,7 +124,6 @@ public:
     :
         public Particle<ParcelType>::trackData
     {
-
         // Private data
 
             //- Reference to the cloud containing this particle
@@ -183,21 +191,21 @@ public:
 
 protected:
 
-    // Protected member data
+    // Protected data
 
         // Parcel properties
 
             //- Parcel type id
             label typeId_;
 
+            //- Number of particles in Parcel
+            scalar nParticle_;
+
             //- Diameter [m]
             scalar d_;
 
             //- Velocity of Parcel [m/s]
             vector U_;
-
-            //- Number of particles in Parcel
-            scalar nParticle_;
 
             //- Density [kg/m3]
             scalar rho_;
@@ -211,13 +219,13 @@ protected:
 
         // Cell-based quantities
 
-            // - Density [kg/m3]
+            //- Density [kg/m3]
             scalar rhoc_;
 
-            // - Velocity [m/s]
+            //- Velocity [m/s]
             vector Uc_;
 
-            // - Viscosity [Pa.s]
+            //- Viscosity [Pa.s]
             scalar muc_;
 
 
@@ -225,35 +233,57 @@ protected:
 
         //- Calculate new particle velocity
         template<class TrackData>
-        vector calcVelocity
+        const vector calcVelocity
         (
             TrackData& td,
-            const scalar dt,
-            scalar& Cud,
-            vector& dUTrans
-        );
+            const scalar dt,           // timestep
+            const label cellI,         // owner cell
+            const scalar Re,           // Reynolds number
+            const scalar mu,           // local carrier viscosity
+            const scalar d,            // diameter
+            const vector& U,           // velocity
+            const scalar rho,          // density
+            const scalar mass,         // mass
+            const vector& Su,          // explicit particle momentum source
+            vector& dUTrans            // momentum transfer to carrier
+        ) const;
 
 
 public:
 
-    //- Runtime type information
-    TypeName("KinematicParcel");
+    // Static data members
+
+        //- String representation of properties
+        static string propHeader;
+
+        //- Runtime type information
+        TypeName("KinematicParcel");
+
 
     friend class Cloud<ParcelType>;
 
 
     // Constructors
 
+        //- Construct from owner, position, and cloud owner
+        //  Other properties initialised as null
+        inline KinematicParcel
+        (
+            KinematicCloud<ParcelType>& owner,
+            const vector& position,
+            const label cellI
+        );
+
         //- Construct from components
         inline KinematicParcel
         (
             KinematicCloud<ParcelType>& owner,
-            const label typeId,
             const vector& position,
-            const label celli,
+            const label cellI,
+            const label typeId,
+            const scalar nParticle0,
             const scalar d0,
             const vector& U0,
-            const scalar nParticle0,
             const constantProperties& constProps
         );
 
@@ -265,10 +295,13 @@ public:
             bool readFields = true
         );
 
+        //- Construct as a copy
+        KinematicParcel(const KinematicParcel& p);
+
         //- Construct and return a clone
-        autoPtr<ParcelType> clone() const
+        autoPtr<KinematicParcel> clone() const
         {
-            return autoPtr<ParcelType>(new KinematicParcel<ParcelType>(*this));
+            return autoPtr<KinematicParcel>(new KinematicParcel(*this));
         }
 
 
@@ -276,20 +309,17 @@ public:
 
         // Access
 
-            //- Return type id
+            //- Return const access to type id
             inline label typeId() const;
+
+            //- Return const access to number of particles
+            inline scalar nParticle() const;
 
             //- Return const access to diameter
             inline scalar d() const;
 
             //- Return const access to velocity
             inline const vector& U() const;
-
-            //- Return const access to relative velocity
-            inline const vector& Ur() const;
-
-            //- Return const access to number of particles
-            inline scalar nParticle() const;
 
             //- Return const access to density
             inline scalar rho() const;
@@ -300,24 +330,20 @@ public:
             //- Return const access to turbulent velocity fluctuation
             inline const vector& UTurb() const;
 
-            //- The nearest distance to a wall that
-            //  the particle can be in the n direction
-            inline scalar wallImpactDistance(const vector& n) const;
-
 
         // Edit
+
+            //- Return access to type id
+            inline label typeId();
+
+            //- Return access to number of particles
+            inline scalar& nParticle();
 
             //- Return access to diameter
             inline scalar& d();
 
             //- Return access to velocity
             inline vector& U();
-
-            //- Return access to relative velocity
-            inline vector& Ur();
-
-            //- Return access to number of particles
-            inline scalar& nParticle();
 
             //- Return access to density
             inline scalar& rho();
@@ -331,50 +357,75 @@ public:
 
         // Helper functions
 
+            //- The nearest distance to a wall that
+            //  the particle can be in the n direction
+            inline scalar wallImpactDistance(const vector& n) const;
+
             //- Return the index of the face to be used in the interpolation
             //  routine
             inline label faceInterpolation() const;
 
-            //- Particle volume
-            inline scalar volume() const;
+            //- Cell owner mass
+            inline scalar massCell(const label cellI) const;
 
             //- Particle mass
             inline scalar mass() const;
 
+            //- Particle volume
+            inline scalar volume() const;
+
+            //- Particle volume for a given diameter
+            inline scalar volume(const scalar d) const;
+
             //- Particle projected area
             inline scalar areaP() const;
+
+            //- Projected area for given diameter
+            inline scalar areaP(const scalar d) const;
 
             //- Particle surface area
             inline scalar areaS() const;
 
+            //- Surface area for given diameter
+            inline scalar areaS(const scalar d) const;
+
+            //- Reynolds number
+            inline scalar Re
+            (
+                const vector& U,        // particle velocity
+                const scalar d,         // particle diameter
+                const scalar rhoc,      // carrier density
+                const scalar muc        // carrier dynamic viscosity
+            ) const;
+
 
         // Main calculation loop
 
-            //- Update cell based quantities
+            //- Set cell values
             template<class TrackData>
-            void updateCellQuantities
+            void setCellValues
             (
                 TrackData& td,
                 const scalar dt,
-                const label celli
+                const label cellI
             );
 
-            //- Coupled calculation with the continuous phase
+            //- Correct cell values using latest transfer information
             template<class TrackData>
-            void calcCoupled
+            void cellValueSourceCorrection
             (
                 TrackData& td,
                 const scalar dt,
-                const label celli
+                const label cellI
             );
 
-            //- Uncoupled calculation with the continuous phase
+            //- Update parcel properties over the time interval
             template<class TrackData>
-            void calcUncoupled
+            void calc
             (
                 TrackData& td,
                 const scalar dt,
-                const label
+                const label cellI
             );
 
 
@@ -386,6 +437,27 @@ public:
 
 
         // Patch interactions
+
+            //- Overridable function to handle the particle hitting a patch
+            //  Executed before other patch-hitting functions
+            template<class TrackData>
+            bool hitPatch
+            (
+                const polyPatch& p,
+                TrackData& td,
+                const label patchI
+            );
+
+
+            //- Overridable function to handle the particle hitting a patch
+            //  Executed before other patch-hitting functions without trackData
+            bool hitPatch
+            (
+                const polyPatch& p,
+                int& td,
+                const label patchI
+            );
+
 
             //- Overridable function to handle the particle hitting a
             //  processorPatch
@@ -447,9 +519,11 @@ public:
 
         // I-O
 
-            static void readFields(KinematicCloud<ParcelType>& c);
+            //- Read
+            static void readFields(Cloud<ParcelType>& c);
 
-            static void writeFields(const KinematicCloud<ParcelType>& c);
+            //- Write
+            static void writeFields(const Cloud<ParcelType>& c);
 
 
     // Ostream Operator

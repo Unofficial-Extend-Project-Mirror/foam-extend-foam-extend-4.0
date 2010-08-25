@@ -22,9 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Class
-    tetherPotential
-
 \*---------------------------------------------------------------------------*/
 
 #include "tetherPotential.H"
@@ -42,7 +39,11 @@ autoPtr<tetherPotential> tetherPotential::New
     const dictionary& tetherPotentialProperties
 )
 {
-    word tetherPotentialTypeName(tetherPotentialProperties.lookup("tetherPotential"));
+    word
+        tetherPotentialTypeName
+        (
+            tetherPotentialProperties.lookup("tetherPotential")
+        );
 
     Info<< nl << "Selecting tether potential "
         << tetherPotentialTypeName << " for "
@@ -57,8 +58,8 @@ autoPtr<tetherPotential> tetherPotential::New
         (
             "tetherPotential::New()"
         )   << "Unknown tetherPotential type "
-            << tetherPotentialTypeName << endl << endl
-            << "Valid  tetherPotentials are : " << endl
+            << tetherPotentialTypeName << nl << nl
+            << "Valid  tetherPotentials are: " << nl
             << dictionaryConstructorTablePtr_->toc()
             << exit(FatalError);
     }

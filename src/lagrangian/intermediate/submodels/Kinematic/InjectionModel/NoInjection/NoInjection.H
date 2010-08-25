@@ -26,15 +26,15 @@ Class
     Foam::NoInjection
 
 Description
-    Place holder for 'no injection' option
+    Place holder for 'none' option
 
 SourceFiles
     NoInjection.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef noInjection_H
-#define noInjection_H
+#ifndef NoInjection_H
+#define NoInjection_H
 
 #include "InjectionModel.H"
 
@@ -44,7 +44,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                          Class NoInjection Declaration
+                       Class NoInjection Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class CloudType>
@@ -52,19 +52,18 @@ class NoInjection
 :
     public InjectionModel<CloudType>
 {
-
 protected:
 
     // Protected member functions
 
-        //- Number of parcels to introduce over the time step
-        label nParcelsToInject
+        //- Number of parcels to introduce over the time step relative to SOI
+        label parcelsToInject
         (
             const scalar,
             const scalar
         ) const;
 
-        //- Volume of parcels to introduce over the time step
+        //- Volume of parcels to introduce over the time step relative to SOI
         scalar volumeToInject
         (
             const scalar,
@@ -75,7 +74,7 @@ protected:
 public:
 
     //- Runtime type information
-    TypeName("NoInjection");
+    TypeName("none");
 
 
     // Constructors
@@ -83,14 +82,13 @@ public:
         //- Construct from components
         NoInjection
         (
-            const dictionary& dict,
-            CloudType& owner
+            const dictionary&,
+            CloudType&
         );
 
 
-    // Destructor
-
-        ~NoInjection();
+    //- Destructor
+    virtual ~NoInjection();
 
 
     // Member Functions
@@ -104,28 +102,30 @@ public:
 
         // Injection geometry
 
-            //- Return the injection position
-            vector position
+            //- Set the injection position and owner cell
+            virtual void setPositionAndCell
             (
-                const label iParcel,
+                const label parcelI,
+                const label nParcels,
                 const scalar time,
-                const polyMeshInfo& meshInfo
+                vector& position,
+                label& cellOwner
             );
 
-            //- Return the velocity of the parcel to introduce at a time
-            vector velocity
+            virtual void setProperties
             (
-                const label,
+                const label parcelI,
+                const label nParcels,
                 const scalar time,
-                const polyMeshInfo& meshInfo
+                typename CloudType::parcelType& parcel
             );
 
-            //- Return the diameter of the parcel to introduce at a time
-            scalar d0
-            (
-                const label,
-                const scalar
-            ) const;
+            //- Flag to identify whether model fully describes the parcel
+            virtual bool fullyDescribed() const;
+
+            //- Return flag to identify whether or not injection of parcelI is
+            //  permitted
+            virtual bool validInjection(const label parcelI);
 };
 
 

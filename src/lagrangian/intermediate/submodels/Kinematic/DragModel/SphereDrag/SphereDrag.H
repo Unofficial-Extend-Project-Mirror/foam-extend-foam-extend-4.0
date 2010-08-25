@@ -48,7 +48,6 @@ class SphereDrag
 :
     public DragModel<CloudType>
 {
-
 public:
 
     //- Runtime type information
@@ -65,9 +64,8 @@ public:
         );
 
 
-    // Destructor
-
-        ~SphereDrag();
+    //- Destructor
+    virtual ~SphereDrag();
 
 
     // Member Functions

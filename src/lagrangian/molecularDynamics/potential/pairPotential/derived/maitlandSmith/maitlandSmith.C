@@ -45,8 +45,6 @@ addToRunTimeSelectionTable
     dictionary
 );
 
-// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
-
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -65,6 +63,7 @@ maitlandSmith::maitlandSmith
 {
     setLookupTables();
 }
+
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
@@ -90,7 +89,7 @@ bool maitlandSmith::read(const dictionary& maitlandSmith)
     maitlandSmithCoeffs_.lookup("gamma") >> gamma_;
     maitlandSmithCoeffs_.lookup("rm") >> rm_;
     maitlandSmithCoeffs_.lookup("epsilon") >> epsilon_;
-    
+
     return true;
 }
 

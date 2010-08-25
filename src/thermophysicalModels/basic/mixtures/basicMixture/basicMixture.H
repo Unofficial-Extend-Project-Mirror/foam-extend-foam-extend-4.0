@@ -47,7 +47,7 @@ class fvMesh;
 class dictionary;
 
 /*---------------------------------------------------------------------------*\
-                           Class basicMixture Declaration
+                        Class basicMixture Declaration
 \*---------------------------------------------------------------------------*/
 
 class basicMixture

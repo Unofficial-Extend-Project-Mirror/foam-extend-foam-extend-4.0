@@ -27,7 +27,7 @@ License
 #include "inverseDistanceDiffusivity.H"
 #include "addToRunTimeSelectionTable.H"
 #include "patchWave.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "surfaceInterpolate.H"
 #include "zeroGradientFvPatchFields.H"
 
@@ -75,7 +75,7 @@ Foam::tmp<Foam::scalarField> Foam::inverseDistanceDiffusivity::y() const
 
     labelHashSet patchSet(mesh.boundaryMesh().patchSet(patchNames_));
 
-    if (patchSet.size() > 0)
+    if (patchSet.size())
     {
         return tmp<scalarField>
         (

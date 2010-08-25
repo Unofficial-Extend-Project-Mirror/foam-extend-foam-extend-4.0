@@ -48,8 +48,8 @@ advectiveFvPatchField<Type>::advectiveFvPatchField
 )
 :
     mixedFvPatchField<Type>(p, iF),
-    phiName_("Undefined"),
-    rhoName_("Undefined"),
+    phiName_("phi"),
+    rhoName_("rho"),
     fieldInf_(pTraits<Type>::zero),
     lInf_(0.0),
     inletOutlet_(false),
@@ -178,8 +178,8 @@ tmp<scalarField> advectiveFvPatchField<Type>::advectionSpeed() const
     fvsPatchField<scalar> phip = this->patch().lookupPatchField
     (
         phiName_,
-        reinterpret_cast<const surfaceScalarField*>(NULL),
-        reinterpret_cast<const scalar*>(NULL)
+        reinterpret_cast<const surfaceScalarField*>(0),
+        reinterpret_cast<const scalar*>(0)
     );
 
     if (phi.dimensions() == dimDensity*dimVelocity*dimArea)
@@ -187,8 +187,8 @@ tmp<scalarField> advectiveFvPatchField<Type>::advectionSpeed() const
         const fvPatchScalarField& rhop = this->patch().lookupPatchField
         (
             rhoName_,
-            reinterpret_cast<const volScalarField*>(NULL),
-            reinterpret_cast<const scalar*>(NULL)
+            reinterpret_cast<const volScalarField*>(0),
+            reinterpret_cast<const scalar*>(0)
         );
 
         return phip/(rhop*this->patch().magSf());
@@ -428,7 +428,7 @@ void advectiveFvPatchField<Type>::write(Ostream& os) const
 
     if (phiName_ != "phi")
     {
-    os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
+        os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
     }
     if (rhoName_ != "rho")
     {

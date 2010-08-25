@@ -44,7 +44,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                         Class basicKinematicParcel Declaration
+                   Class basicKinematicParcel Declaration
 \*---------------------------------------------------------------------------*/
 
 class basicKinematicParcel
@@ -60,16 +60,25 @@ public:
 
     // Constructors
 
+        //- Construct from owner, position, and cloud owner
+        //  Other properties initialised as null
+        basicKinematicParcel
+        (
+            KinematicCloud<basicKinematicParcel>& owner,
+            const vector& position,
+            const label cellI
+        );
+
         //- Construct from components
         basicKinematicParcel
         (
             KinematicCloud<basicKinematicParcel>& owner,
-            const label typeId,
             const vector& position,
-            const label celli,
+            const label cellI,
+            const label typeId,
+            const scalar nParticle0,
             const scalar d0,
             const vector& U0,
-            const scalar nParticle0,
             const constantProperties& constProps
         );
 
@@ -81,17 +90,22 @@ public:
             bool readFields = true
         );
 
+        //- Construct as a copy
+        basicKinematicParcel(const basicKinematicParcel& p);
+
         //- Construct and return a clone
         autoPtr<basicKinematicParcel> clone() const
         {
-            return autoPtr<basicKinematicParcel>
-                (new basicKinematicParcel(*this));
+            return
+                autoPtr<basicKinematicParcel>
+                (
+                    new basicKinematicParcel(*this)
+                );
         }
 
 
     //- Destructor
-
-        virtual ~basicKinematicParcel();
+    virtual ~basicKinematicParcel();
 };
 
 

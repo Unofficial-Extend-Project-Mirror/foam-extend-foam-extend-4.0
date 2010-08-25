@@ -1,3 +1,0 @@
-parallelTest.C  
-
-EXE = $(FOAM_USER_APPBIN)/parallelTest

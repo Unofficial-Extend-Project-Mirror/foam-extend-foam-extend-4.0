@@ -29,38 +29,34 @@ License
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::Constant<Type>::Constant
-(
-    const word& entryName,
-    const dictionary& dict
-)
+Foam::Constant<Type>::Constant(const word& entryName, Istream& is)
 :
-    DataEntry<Type>(typeName, entryName, dict),
-    value_(this->dict_.lookup("value"))
+    DataEntry<Type>(entryName),
+    value_(is)
+{}
+
+
+template<class Type>
+Foam::Constant<Type>::Constant(const Constant<Type>& cnst)
+:
+    DataEntry<Type>(cnst),
+    value_(cnst.value_)
 {}
 
 
 template<>
-Foam::Constant<Foam::label>::Constant
-(
-    const word& entryName,
-    const dictionary& dict
-)
+Foam::Constant<Foam::label>::Constant(const word& entryName, Istream& is)
 :
-    DataEntry<label>(typeName, entryName, dict),
-    value_(readLabel(this->dict_.lookup("value")))
+    DataEntry<label>(entryName),
+    value_(readLabel(is))
 {}
 
 
 template<>
-Foam::Constant<Foam::scalar>::Constant
-(
-    const word& entryName,
-    const dictionary& dict
-)
+Foam::Constant<Foam::scalar>::Constant(const word& entryName, Istream& is)
 :
-    DataEntry<scalar>(typeName, entryName, dict),
-    value_(readScalar(this->dict_.lookup("value")))
+    DataEntry<scalar>(entryName),
+    value_(readScalar(is))
 {}
 
 
@@ -85,6 +81,11 @@ Type Foam::Constant<Type>::integrate(const scalar x1, const scalar x2) const
 {
     return (x2 - x1)*value_;
 }
+
+
+// * * * * * * * * * * * * * *  IOStream operators * * * * * * * * * * * * * //
+
+#include "ConstantIO.C"
 
 
 // ************************************************************************* //

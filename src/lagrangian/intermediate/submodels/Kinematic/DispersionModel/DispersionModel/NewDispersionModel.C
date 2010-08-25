@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "DispersionModel.H"
@@ -38,10 +36,7 @@ Foam::DispersionModel<CloudType>::New
     CloudType& owner
 )
 {
-    word DispersionModelType
-    (
-        dict.lookup("DispersionModel")
-    );
+    word DispersionModelType(dict.lookup("DispersionModel"));
 
     Info<< "Selecting DispersionModel " << DispersionModelType << endl;
 
@@ -53,11 +48,14 @@ Foam::DispersionModel<CloudType>::New
         FatalErrorIn
         (
             "DispersionModel<CloudType>::New"
-            "(const dictionary&, CloudType&)"
+            "("
+                "const dictionary&, "
+                "CloudType&"
+            ")"
         )   << "Unknown DispersionModelType type "
             << DispersionModelType
             << ", constructor not in hash table" << nl << nl
-            << "    Valid DispersionModel types are :" << nl
+            << "    Valid DispersionModel types are:" << nl
             << dictionaryConstructorTablePtr_->toc() << exit(FatalError);
     }
 
