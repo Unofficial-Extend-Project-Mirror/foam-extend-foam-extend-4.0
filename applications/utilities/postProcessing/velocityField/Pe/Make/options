@@ -1,22 +1,21 @@
 EXE_INC = \
-    -I$(FOAM_SRC)/postProcessing/postCalc \
+    -I$(LIB_SRC)/postProcessing/postCalc \
+    -I$(LIB_SRC)/transportModels \
+    -I$(LIB_SRC)/turbulenceModels \
+    -I$(LIB_SRC)/turbulenceModels/LES/LESdeltas/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
-    -I$(LIB_SRC)/sampling/lnInclude \
-    -I$(LIB_SRC)/transportModels \
-    -I$(LIB_SRC)/turbulenceModels/RAS \
-    -I$(LIB_SRC)/turbulenceModels/LES \
-    -I$(LIB_SRC)/turbulenceModels/LES/LESdeltas/lnInclude \
-    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude
+    -I$(LIB_SRC)/sampling/lnInclude
 
 EXE_LIBS = \
     $(FOAM_LIBBIN)/postCalc.o \
-    -lfiniteVolume \
-    -lmeshTools \
     -lincompressibleTransportModels \
     -lincompressibleRASModels \
     -lincompressibleLESModels \
     -lbasicThermophysicalModels \
     -lspecie \
     -lcompressibleRASModels \
-    -lcompressibleLESModels
+    -lcompressibleLESModels \
+    -lfiniteVolume \
+    -lmeshTools

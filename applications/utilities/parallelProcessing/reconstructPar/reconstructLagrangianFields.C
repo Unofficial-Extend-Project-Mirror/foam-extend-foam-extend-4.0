@@ -47,7 +47,7 @@ Foam::tmp<Foam::IOField<Type> > Foam::reconstructLagrangianField
             (
                 fieldName,
                 mesh.time().timeName(),
-                "lagrangian"/cloudName,
+                cloud::prefix/cloudName,
                 mesh,
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
@@ -61,10 +61,10 @@ Foam::tmp<Foam::IOField<Type> > Foam::reconstructLagrangianField
     {
         // Check object on local mesh
         IOobject localIOobject
-        ( 
+        (
             fieldName,
             meshes[i].time().timeName(),
-            "lagrangian"/cloudName,
+            cloud::prefix/cloudName,
             meshes[i],
             IOobject::MUST_READ,
             IOobject::NO_WRITE

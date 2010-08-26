@@ -4,13 +4,12 @@ int USERD_get_timeset_description
     char timeset_description[Z_BUFL]
 )
 {
-   
+
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_timeset_description" << endl 
-        << flush;
+    Info<< "Entering: USERD_get_timeset_description" << endl;
 #endif
 
-    if (TimeList[1].value() < 0)
+    if (timeDirs[1].value() < 0)
     {
         strncpy(timeset_description, "CAD", Z_BUFL);
     }
@@ -20,8 +19,7 @@ int USERD_get_timeset_description
     }
 
 #ifdef ENSIGHTDEBUG
-    Info << "Leaving: USERD_get_timeset_description" << endl 
-        << flush;
+    Info<< "Leaving: USERD_get_timeset_description" << endl;
 #endif
 
     return Z_OK;

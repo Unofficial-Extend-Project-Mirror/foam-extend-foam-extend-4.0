@@ -1,13 +1,14 @@
     Info<< "Reading thermophysical properties\n" << endl;
 
-    autoPtr<basicThermo> thermo
+    autoPtr<basicPsiThermo> pThermo
     (
-        basicThermo::New(mesh)
+        basicPsiThermo::New(mesh)
     );
+    basicPsiThermo& thermo = pThermo();
 
-    volScalarField& p = thermo->p();
-    volScalarField& h = thermo->h();
-    const volScalarField& psi = thermo->psi();
+    volScalarField& p = thermo.p();
+    volScalarField& h = thermo.h();
+    const volScalarField& psi = thermo.psi();
 
     volScalarField rho
     (
@@ -19,7 +20,7 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        thermo->rho()
+        thermo.rho()
     );
 
     Info<< "Reading field U\n" << endl;
@@ -44,14 +45,14 @@
     );
 
     Info<< "Creating turbulence model\n" << endl;
-    autoPtr<compressible::RASModel> turbulence
+    autoPtr<compressible::turbulenceModel> turbulence
     (
-        compressible::RASModel::New
+        compressible::turbulenceModel::New
         (
             rho,
             U,
             phi,
-            thermo()
+            thermo
         )
     );
 
@@ -59,5 +60,5 @@
 
 
     Info<< "Creating field DpDt\n" << endl;
-    volScalarField DpDt = 
+    volScalarField DpDt =
         fvc::DDt(surfaceScalarField("phiU", phi/fvc::interpolate(rho)), p);

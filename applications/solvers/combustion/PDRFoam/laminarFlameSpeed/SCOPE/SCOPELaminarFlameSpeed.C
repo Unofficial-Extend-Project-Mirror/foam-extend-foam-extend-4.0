@@ -395,7 +395,7 @@ Foam::laminarFlameSpeedModels::SCOPE::Ma() const
                 (
                     "Ma",
                     mesh.time().timeName(),
-                    mesh.db(),
+                    mesh,
                     IOobject::NO_READ,
                     IOobject::NO_WRITE
                 ),

@@ -1,10 +1,11 @@
     Info<< "Reading thermophysical properties\n" << endl;
 
-    autoPtr<hhuCombustionThermo> thermo
+    autoPtr<hhuCombustionThermo> pThermo
     (
         hhuCombustionThermo::New(mesh)
     );
-    combustionMixture& composition = thermo->composition();
+    hhuCombustionThermo& thermo = pThermo();
+    basicMultiComponentMixture& composition = thermo.composition();
 
     volScalarField rho
     (
@@ -16,18 +17,18 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        thermo->rho()
+        thermo.rho()
     );
 
-    volScalarField& p = thermo->p();
-    const volScalarField& psi = thermo->psi();
-    volScalarField& h = thermo->h();
-    volScalarField& hu = thermo->hu();
+    volScalarField& p = thermo.p();
+    const volScalarField& psi = thermo.psi();
+    volScalarField& h = thermo.h();
+    volScalarField& hu = thermo.hu();
 
     volScalarField& b = composition.Y("b");
     Info<< "min(b) = " << min(b).value() << endl;
 
-    const volScalarField& T = thermo->T();
+    const volScalarField& T = thermo.T();
 
 
     Info<< "\nReading field U\n" << endl;
@@ -48,14 +49,14 @@
 
 
     Info<< "Creating turbulence model\n" << endl;
-    autoPtr<compressible::RASModel> turbulence
+    autoPtr<compressible::turbulenceModel> turbulence
     (
-        compressible::RASModel::New
+        compressible::turbulenceModel::New
         (
             rho,
             U,
             phi,
-            thermo()
+            thermo
         )
     );
 

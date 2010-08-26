@@ -1,3 +1,0 @@
-turbFoam.C
-
-EXE = $(FOAM_APPBIN)/turbFoam

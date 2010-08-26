@@ -32,9 +32,10 @@ Description
         myWallPatch
         {
             type            solidWallHeatFluxTemperature;
-            K               K;                 // Name of K field
-            q               uniform 1000;      // Heat flux / [W/m2]
-            value           300.0;             // Initial temperature / [K]
+            K               K;                  // Name of K field
+            q               uniform 1000;       // Heat flux / [W/m2]
+            value           uniform 300.0;      // Initial temperature / [K]
+            gradient        uniform 0.0;        // Initial gradient / [K/m]
         }
 
 
@@ -46,7 +47,7 @@ SourceFiles
 #ifndef solidWallHeatFluxTemperatureFvPatchScalarField_H
 #define solidWallHeatFluxTemperatureFvPatchScalarField_H
 
-#include "fixedValueFvPatchFields.H"
+#include "fixedGradientFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,7 +60,7 @@ namespace Foam
 
 class solidWallHeatFluxTemperatureFvPatchScalarField
 :
-    public fixedValueFvPatchScalarField
+    public fixedGradientFvPatchScalarField
 {
     // Private data
 
@@ -140,6 +141,11 @@ public:
 
 
     // Member functions
+
+        // Helper
+
+            //- Get K field on this patch
+            tmp<scalarField> K() const;
 
         // Evaluation functions
 

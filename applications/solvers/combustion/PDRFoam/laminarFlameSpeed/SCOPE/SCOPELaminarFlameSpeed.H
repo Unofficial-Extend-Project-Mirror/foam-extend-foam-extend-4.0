@@ -196,7 +196,6 @@ public:
 
 
     // Destructor
-
         ~SCOPE();
 
 

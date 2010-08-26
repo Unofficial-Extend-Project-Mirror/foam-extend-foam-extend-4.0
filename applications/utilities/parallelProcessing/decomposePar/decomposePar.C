@@ -33,12 +33,12 @@ Usage
 
     - decomposePar [OPTION]
 
-    @param -region \n
-    Region to decompose.
-
     @param -cellDist \n
     Write the cell distribution as a labelList for use with 'manual'
     decomposition method and as a volScalarField for post-processing.
+
+    @param -region regionName \n
+    Decompose named region. Does not check for existence of processor*.
 
     @param -copyUniform \n
     Copy any @a uniform directories too.
@@ -69,7 +69,6 @@ Usage
 #include "processorFvPatchFields.H"
 #include "domainDecomposition.H"
 #include "labelIOField.H"
-
 #include "scalarIOField.H"
 #include "vectorIOField.H"
 #include "sphericalTensorIOField.H"
@@ -84,7 +83,6 @@ Usage
 #include "pointFields.H"
 
 #include "readFields.H"
-
 #include "fvFieldDecomposer.H"
 #include "pointFieldDecomposer.H"
 #include "lagrangianFieldDecomposer.H"
@@ -99,7 +97,7 @@ Usage
 int main(int argc, char *argv[])
 {
     argList::noParallel();
-    argList::validOptions.insert("region", "name");
+#   include "addRegionOption.H"
     argList::validOptions.insert("cellDist", "");
     argList::validOptions.insert("copyUniform", "");
     argList::validOptions.insert("fields", "");
@@ -109,20 +107,23 @@ int main(int argc, char *argv[])
 
 #   include "setRootCase.H"
 
-    bool writeCellDist(args.options().found("cellDist"));
-    bool copyUniform(args.options().found("copyUniform"));
-    bool decomposeFieldsOnly(args.options().found("fields"));
-    bool filterPatches(args.options().found("filterPatches"));
-    bool forceOverwrite(args.options().found("force"));
-    bool ifRequiredDecomposition(args.options().found("ifRequired"));
-
-    // Get region name
     word regionName = fvMesh::defaultRegion;
+    word regionDir = word::null;
 
-    if (args.options().found("region"))
+    if (args.optionFound("region"))
     {
-        regionName = args.options()["region"];
+        regionName = args.option("region");
+        regionDir = regionName;
+        Info<< "Decomposing mesh " << regionName << nl << endl;
     }
+
+
+    bool writeCellDist = args.optionFound("cellDist");
+    bool copyUniform = args.optionFound("copyUniform");
+    bool decomposeFieldsOnly = args.optionFound("fields");
+    bool filterPatches = args.optionFound("filterPatches");
+    bool forceOverwrite = args.optionFound("force");
+    bool ifRequiredDecomposition = args.optionFound("ifRequired");
 
 #   include "createTime.H"
 
@@ -130,7 +131,17 @@ int main(int argc, char *argv[])
 
     // determine the existing processor count directly
     label nProcs = 0;
-    while (dir(runTime.path()/(word("processor") + name(nProcs))))
+    while
+    (
+        isDir
+        (
+            runTime.path()
+           /(word("processor") + name(nProcs))
+           /runTime.constant()
+           /regionDir
+           /polyMesh::meshSubDir
+        )
+    )
     {
         ++nProcs;
     }
@@ -144,6 +155,7 @@ int main(int argc, char *argv[])
             (
                 "decomposeParDict",
                 runTime.time().system(),
+                regionDir,          // use region if non-standard
                 runTime,
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE,
@@ -190,37 +202,37 @@ int main(int argc, char *argv[])
             Info<< "Using existing processor directories" << nl;
         }
 
-//         if (forceOverwrite)
-//         {
-//             Info<< "Removing " << nProcs
-//                 << " existing processor directories" << endl;
+        if (forceOverwrite)
+        {
+            Info<< "Removing " << nProcs
+                << " existing processor directories" << endl;
 
-//             // remove existing processor dirs
-//             // reverse order to avoid gaps if someone interrupts the process
-//             for (label procI = nProcs-1; procI >= 0; --procI)
-//             {
-//                 fileName procDir
-//                 (
-//                     runTime.path()/(word("processor") + name(procI))
-//                 );
+            // remove existing processor dirs
+            // reverse order to avoid gaps if someone interrupts the process
+            for (label procI = nProcs-1; procI >= 0; --procI)
+            {
+                fileName procDir
+                (
+                    runTime.path()/(word("processor") + name(procI))
+                );
 
-//                 rmDir(procDir);
-//             }
+                rmDir(procDir);
+            }
 
-//             procDirsProblem = false;
-//         }
+            procDirsProblem = false;
+        }
 
-//         if (procDirsProblem)
-//         {
-//             FatalErrorIn(args.executable())
-//                 << "Case is already decomposed with " << nProcs
-//                 << " domains, use the -force option or manually" << nl
-//                 << "remove processor directories before decomposing. e.g.,"
-//                 << nl
-//                 << "    rm -rf " << runTime.path().c_str() << "/processor*"
-//                 << nl
-//                 << exit(FatalError);
-//         }
+        if (procDirsProblem)
+        {
+            FatalErrorIn(args.executable())
+                << "Case is already decomposed with " << nProcs
+                << " domains, use the -force option or manually" << nl
+                << "remove processor directories before decomposing. e.g.,"
+                << nl
+                << "    rm -rf " << runTime.path().c_str() << "/processor*"
+                << nl
+                << exit(FatalError);
+        }
     }
 
     Info<< "Create mesh for region " << regionName << endl;
@@ -243,23 +255,28 @@ int main(int argc, char *argv[])
 
         if (writeCellDist)
         {
+            const labelList& procIds = mesh.cellToProc();
+
             // Write the decomposition as labelList for use with 'manual'
             // decomposition method.
-
-            // FIXME: may attempt to write to a non-existent "region0/"
-            OFstream os
+            labelIOList cellDecomposition
             (
-                runTime.path()
-              / mesh.facesInstance()
-              / regionName
-              / "cellDecomposition"
+                IOobject
+                (
+                    "cellDecomposition",
+                    mesh.facesInstance(),
+                    mesh,
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE,
+                    false
+                ),
+                procIds
             );
-
-            os << mesh.cellToProc();
+            cellDecomposition.write();
 
             Info<< nl << "Wrote decomposition to "
-                << os.name() << " for use in manual decomposition."
-                << endl;
+                << cellDecomposition.objectPath()
+                << " for use in manual decomposition." << endl;
 
             // Write as volScalarField for postprocessing.
             volScalarField cellDist
@@ -277,7 +294,6 @@ int main(int argc, char *argv[])
                 zeroGradientFvPatchScalarField::typeName
             );
 
-            const labelList& procIds = mesh.cellToProc();
             forAll(procIds, celli)
             {
                cellDist[celli] = procIds[celli];
@@ -317,6 +333,14 @@ int main(int argc, char *argv[])
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     PtrList<surfaceScalarField> surfaceScalarFields;
     readFields(mesh, objects, surfaceScalarFields);
+    PtrList<surfaceVectorField> surfaceVectorFields;
+    readFields(mesh, objects, surfaceVectorFields);
+    PtrList<surfaceSphericalTensorField> surfaceSphericalTensorFields;
+    readFields(mesh, objects, surfaceSphericalTensorFields);
+    PtrList<surfaceSymmTensorField> surfaceSymmTensorFields;
+    readFields(mesh, objects, surfaceSymmTensorFields);
+    PtrList<surfaceTensorField> surfaceTensorFields;
+    readFields(mesh, objects, surfaceTensorFields);
 
 
     // Construct the point fields
@@ -383,7 +407,7 @@ int main(int argc, char *argv[])
 
     fileNameList cloudDirs
     (
-        readDir(runTime.timePath()/"lagrangian", fileName::DIRECTORY)
+        readDir(runTime.timePath()/cloud::prefix, fileName::DIRECTORY)
     );
 
     // Particles
@@ -415,7 +439,7 @@ int main(int argc, char *argv[])
         (
             mesh,
             runTime.timeName(),
-            "lagrangian"/cloudDirs[i]
+            cloud::prefix/cloudDirs[i]
         );
 
         IOobject* positionsPtr = sprayObjs.lookup("positions");
@@ -454,7 +478,12 @@ int main(int argc, char *argv[])
 
             label i = 0;
 
-            forAllIter(Cloud<indexedParticle>, lagrangianPositions[cloudI], iter)
+            forAllIter
+            (
+                Cloud<indexedParticle>,
+                lagrangianPositions[cloudI],
+                iter
+            )
             {
                 iter().index() = i++;
 
@@ -489,7 +518,7 @@ int main(int argc, char *argv[])
             (
                 mesh,
                 runTime.timeName(),
-                "lagrangian"/cloudDirs[cloudI]
+                cloud::prefix/cloudDirs[cloudI]
             );
 
             lagrangianFieldDecomposer::readFields
@@ -551,7 +580,7 @@ int main(int argc, char *argv[])
     // Any uniform data to copy/link?
     fileName uniformDir("uniform");
 
-    if (dir(runTime.timePath()/uniformDir))
+    if (isDir(runTime.timePath()/uniformDir))
     {
         Info<< "Detected additional non-decomposed files in "
             << runTime.timePath()/uniformDir
@@ -579,6 +608,17 @@ int main(int argc, char *argv[])
 
         processorDb.setTime(runTime);
 
+        // Remove files remnants that can cause horrible problems
+        // - mut and nut are used to mark the new turbulence models,
+        //   their existence prevents old models from being upgraded
+        // 1.6.x merge.  HJ, 25/Aug/2010
+        {
+            fileName timeDir(processorDb.path()/processorDb.timeName());
+
+            rm(timeDir/"mut");
+            rm(timeDir/"nut");
+        }
+
         // read the mesh
         fvMesh procMesh
         (
@@ -595,7 +635,7 @@ int main(int argc, char *argv[])
             IOobject
             (
                 "cellProcAddressing",
-                "constant",
+                procMesh.facesInstance(),
                 procMesh.meshSubDir,
                 procMesh,
                 IOobject::MUST_READ,
@@ -608,7 +648,7 @@ int main(int argc, char *argv[])
             IOobject
             (
                 "boundaryProcAddressing",
-                "constant",
+                procMesh.facesInstance(),
                 procMesh.meshSubDir,
                 procMesh,
                 IOobject::MUST_READ,
@@ -625,6 +665,10 @@ int main(int argc, char *argv[])
          || volSymmTensorFields.size()
          || volTensorFields.size()
          || surfaceScalarFields.size()
+         || surfaceVectorFields.size()
+         || surfaceSphericalTensorFields.size()
+         || surfaceSymmTensorFields.size()
+         || surfaceTensorFields.size()
         )
         {
             labelIOList faceProcAddressing
@@ -632,7 +676,7 @@ int main(int argc, char *argv[])
                 IOobject
                 (
                     "faceProcAddressing",
-                    "constant",
+                    procMesh.facesInstance(),
                     procMesh.meshSubDir,
                     procMesh,
                     IOobject::MUST_READ,
@@ -656,6 +700,10 @@ int main(int argc, char *argv[])
             fieldDecomposer.decomposeFields(volTensorFields);
 
             fieldDecomposer.decomposeFields(surfaceScalarFields);
+            fieldDecomposer.decomposeFields(surfaceVectorFields);
+            fieldDecomposer.decomposeFields(surfaceSphericalTensorFields);
+            fieldDecomposer.decomposeFields(surfaceSymmTensorFields);
+            fieldDecomposer.decomposeFields(surfaceTensorFields);
         }
 
 
@@ -674,7 +722,7 @@ int main(int argc, char *argv[])
                 IOobject
                 (
                     "pointProcAddressing",
-                    "constant",
+                    procMesh.facesInstance(),
                     procMesh.meshSubDir,
                     procMesh,
                     IOobject::MUST_READ,
@@ -712,7 +760,7 @@ int main(int argc, char *argv[])
                 IOobject
                 (
                     "pointProcAddressing",
-                    "constant",
+                    procMesh.facesInstance(),
                     procMesh.meshSubDir,
                     procMesh,
                     IOobject::MUST_READ,
@@ -726,7 +774,7 @@ int main(int argc, char *argv[])
                 IOobject
                 (
                     "faceProcAddressing",
-                    "constant",
+                    procMesh.facesInstance(),
                     procMesh.meshSubDir,
                     procMesh,
                     IOobject::MUST_READ,
@@ -1005,7 +1053,7 @@ int main(int argc, char *argv[])
 
     Info<< "\nEnd.\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

@@ -82,7 +82,7 @@ class domainDecomposition
         //  sign.  
         labelListList procFaceAddressing_;
 
-        //- Numver of internal faces for each processor
+        //- Number of internal faces for each processor
         labelList nInternalProcFaces_;
 
         //- Number of live faces for each processor

@@ -6,7 +6,7 @@ if (ign.ignited())
 
     // Unburnt gas density
     // ~~~~~~~~~~~~~~~~~~~
-    volScalarField rhou = thermo->rhou();
+    volScalarField rhou = thermo.rhou();
 
     // Calculate flame normal etc.
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -52,7 +52,7 @@ if (ign.ignited())
       + mvConvection->fvmDiv(phi, b)
       + fvm::div(phiSt, b, "div(phiSt,b)")
       - fvm::Sp(fvc::div(phiSt), b)
-      - fvm::laplacian(turbulence->muEff(), b)
+      - fvm::laplacian(turbulence->alphaEff(), b)
     );
 
 
@@ -76,7 +76,7 @@ if (ign.ignited())
 
     volScalarField epsilon = pow(uPrimeCoef, 3)*turbulence->epsilon();
 
-    volScalarField tauEta = sqrt(thermo->muu()/(rhou*epsilon));
+    volScalarField tauEta = sqrt(thermo.muu()/(rhou*epsilon));
 
     volScalarField Reta = up/
     (
@@ -90,7 +90,7 @@ if (ign.ignited())
     // ~~~~~~~~~~~~~~~~~
     surfaceScalarField phiXi =
         phiSt
-      - fvc::interpolate(fvc::laplacian(turbulence->muEff(), b)/mgb)*nf
+      - fvc::interpolate(fvc::laplacian(turbulence->alphaEff(), b)/mgb)*nf
       + fvc::interpolate(rho)*fvc::interpolate(Su*(1.0/Xi - Xi))*nf;
 
 
@@ -134,7 +134,7 @@ if (ign.ignited())
             (sigmas*SuInf*(Su0 - SuInf) + sqr(SuMin)*sigmaExt)
            /(sqr(Su0 - SuInf) + sqr(SuMin));
 
-        solve
+        fvScalarMatrix SuEqn
         (
             fvm::ddt(rho, Su)
           + fvm::div(phi + phiXi, Su, "div(phiXi,Su)")
@@ -143,6 +143,9 @@ if (ign.ignited())
           - fvm::SuSp(-rho*Rc*Su0/Su, Su)
           - fvm::SuSp(rho*(sigmas + Rc), Su)
         );
+
+        SuEqn.relax();
+        SuEqn.solve();
 
         // Limit the maximum Su
         // ~~~~~~~~~~~~~~~~~~~~
@@ -180,7 +183,7 @@ if (ign.ignited())
         // with a linear correction function to give a plausible profile for Xi
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        volScalarField XiEqStar = 
+        volScalarField XiEqStar =
             scalar(1.001) + XiCoef*sqrt(up/(Su + SuMin))*Reta;
 
         volScalarField XiEq =
@@ -196,7 +199,7 @@ if (ign.ignited())
 
         // Solve for the flame wrinkling
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        solve
+        fvScalarMatrix XiEqn
         (
             fvm::ddt(rho, Xi)
           + fvm::div(phi + phiXi, Xi, "div(phiXi,Xi)")
@@ -215,6 +218,8 @@ if (ign.ignited())
             )
         );
 
+        XiEqn.relax();
+        XiEqn.solve();
 
         // Correct boundedness of Xi
         // ~~~~~~~~~~~~~~~~~~~~~~~~~

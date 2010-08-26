@@ -38,11 +38,11 @@ if (mesh.nInternalFaces())
     surfaceScalarField amaxSfbyDelta =
         mesh.surfaceInterpolation::deltaCoeffs()*amaxSf;
 
-    CoNum = max(amaxSfbyDelta/mesh.magSf())
-        .value()*runTime.deltaT().value();
+    CoNum = max(amaxSfbyDelta/mesh.magSf()).value()*runTime.deltaT().value();
 
-    meanCoNum = (sum(amaxSfbyDelta)/sum(mesh.magSf()))
-        .value()*runTime.deltaT().value();
+    meanCoNum =
+        (sum(amaxSfbyDelta)/sum(mesh.magSf())).value()
+       *runTime.deltaT().value();
 }
 
 Info<< "Mean and max Courant Numbers = "

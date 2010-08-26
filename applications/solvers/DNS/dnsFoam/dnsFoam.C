@@ -41,25 +41,24 @@ Description
 
 int main(int argc, char *argv[])
 {
+    #include "setRootCase.H"
 
-#   include "setRootCase.H"
+    #include "createTime.H"
+    #include "createMeshNoClear.H"
+    #include "readTransportProperties.H"
+    #include "createFields.H"
+    #include "readTurbulenceProperties.H"
+    #include "initContinuityErrs.H"
 
-#   include "createTime.H"
-#   include "createMeshNoClear.H"
-#   include "readTransportProperties.H"
-#   include "createFields.H"
-#   include "readTurbulenceProperties.H"
-#   include "initContinuityErrs.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< nl << "Starting time loop" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readPISOControls.H"
+        #include "readPISOControls.H"
 
         force.internalField() = ReImSum
         (
@@ -69,12 +68,12 @@ int main(int argc, char *argv[])
             )
         );
 
-#       include "globalProperties.H"
+        #include "globalProperties.H"
 
         fvVectorMatrix UEqn
         (
-            fvm::ddt(U) 
-          + fvm::div(phi, U) 
+            fvm::ddt(U)
+          + fvm::div(phi, U)
           - fvm::laplacian(nu, U)
          ==
             force
@@ -90,7 +89,7 @@ int main(int argc, char *argv[])
             volScalarField rUA = 1.0/UEqn.A();
 
             U = rUA*UEqn.H();
-            phi = (fvc::interpolate(U) & mesh.Sf()) 
+            phi = (fvc::interpolate(U) & mesh.Sf())
                 + fvc::ddtPhiCorr(rUA, U, phi);
 
             fvScalarMatrix pEqn
@@ -122,7 +121,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

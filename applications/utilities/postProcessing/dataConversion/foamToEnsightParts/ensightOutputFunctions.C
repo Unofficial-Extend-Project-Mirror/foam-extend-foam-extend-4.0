@@ -22,13 +22,11 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-    $Date: 2008/04/02 11:37:10 $
 \*---------------------------------------------------------------------------*/
 
 #include "ensightOutputFunctions.H"
 
 #include "passiveParticle.H"
-#include "Cloud.H"
 #include "IOField.H"
 #include "volFields.H"
 #include "surfaceFields.H"
@@ -41,36 +39,51 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
-template<class Type>
 void ensightCaseEntry
 (
     OFstream& caseFile,
-    const IOobject& fieldObject,
+    const string& ensightType,
+    const word& fieldName,
     const fileName& dataMask,
-    bool measured
+    const fileName& local,
+    const label cloudNo,
+    const label timeSet
 )
 {
     caseFile.setf(ios_base::left);
 
-    if (measured)
+    fileName dirName(dataMask);
+    if (local.size())
     {
+        dirName = dirName/local;
+    }
+
+    if (cloudNo >= 0)
+    {
+        label ts = 1;
+        if (timeSet > ts)
+        {
+            ts = timeSet;
+        }
+
+        // prefix variables with 'c' (cloud)
         caseFile
-            << pTraits<Type>::typeName
-            << " per measured node: 2 "
+            << ensightType.c_str()
+            << " per measured node: " << ts << " "
             << setw(15)
-            << ("s" + fieldObject.name()).c_str()
+            << ("c" + Foam::name(cloudNo) + fieldName).c_str()
             << " "
-            << (dataMask/"lagrangian"/fieldObject.name()).c_str()
+            << (dirName/fieldName).c_str()
             << nl;
     }
     else
     {
         caseFile
-            << pTraits<Type>::typeName
-            << " per element:     "
-            << setw(15) << fieldObject.name()
+            << ensightType.c_str()
+            << " per element: "
+            << setw(15) << fieldName
             << " "
-            << (dataMask/fieldObject.name()).c_str()
+            << (dirName/fieldName).c_str()
             << nl;
     }
 }
@@ -81,16 +94,17 @@ void ensightParticlePositions
     const polyMesh& mesh,
     const fileName& dataDir,
     const fileName& subDir,
+    const word& cloudName,
     IOstream::streamFormat format
 )
 {
-    Cloud<passiveParticle> parcels(mesh);
+    Cloud<passiveParticle> parcels(mesh, cloudName, false);
 
-    fileName lagrangianDir = subDir/"lagrangian";
-    fileName postFileName = lagrangianDir/"positions";
+    fileName cloudDir = subDir/cloud::prefix/cloudName;
+    fileName postFileName = cloudDir/"positions";
 
     // the ITER/lagrangian subdirectory must exist
-    mkDir(dataDir/lagrangianDir);
+    mkDir(dataDir/cloudDir);
     ensightFile os(dataDir/postFileName, format);
 
     // tag binary format (just like geometry files)
@@ -139,20 +153,22 @@ void ensightParticlePositions
 
 
 template<class Type>
-void ensightSprayField
+void ensightLagrangianField
 (
     const IOobject& fieldObject,
     const fileName& dataDir,
     const fileName& subDir,
+    const word& cloudName,
     IOstream::streamFormat format
 )
 {
     Info<< " " << fieldObject.name() << flush;
 
-    fileName lagrangianDir = subDir/"lagrangian";
-    fileName postFileName = lagrangianDir/fieldObject.name();
+    fileName cloudDir = subDir/cloud::prefix/cloudName;
+    fileName postFileName = cloudDir/fieldObject.name();
 
-    string title = postFileName + " with " + pTraits<Type>::typeName + " values";
+    string title =
+        postFileName + " with " + pTraits<Type>::typeName + " values";
 
     ensightFile os(dataDir/postFileName, format);
     os.write(title);
@@ -225,9 +241,9 @@ void ensightVolField
     );
 }
 
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // end namespace Foam
+} // namespace Foam
+
 
 // ************************************************************************* //

@@ -27,18 +27,19 @@ Application
 
 Description
     Calculates and optionally writes the local Mach number from the velocity
-    field U at each time. The -nowrite option just outputs the max value
-    without writing the field.
+    field U at each time.
+
+    The -nowrite option just outputs the max value without writing the field.
 
 \*---------------------------------------------------------------------------*/
 
 #include "calc.H"
-#include "basicThermo.H"
+#include "basicPsiThermo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
 {
-    bool writeResults = !args.options().found("noWrite");
+    bool writeResults = !args.optionFound("noWrite");
 
     IOobject Uheader
     (
@@ -63,12 +64,12 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
 
         volVectorField U(Uheader, mesh);
 
-        if (file(runTime.constantPath()/"thermophysicalProperties"))
+        if (isFile(runTime.constantPath()/"thermophysicalProperties"))
         {
             // thermophysical Mach
-            autoPtr<basicThermo> thermo
+            autoPtr<basicPsiThermo> thermo
             (
-                basicThermo::New(mesh)
+                basicPsiThermo::New(mesh)
             );
 
             volScalarField Cp = thermo->Cp();
@@ -134,6 +135,8 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
     {
         Info<< "    Missing U or T" << endl;
     }
+
+    Info<< "\nEnd\n" << endl;
 }
 
 

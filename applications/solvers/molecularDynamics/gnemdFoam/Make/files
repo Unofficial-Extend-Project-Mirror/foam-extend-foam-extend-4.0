@@ -1,3 +1,0 @@
-gnemdFoam.C
-
-EXE = $(FOAM_APPBIN)/gnemdFoam

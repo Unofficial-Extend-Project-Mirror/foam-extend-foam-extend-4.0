@@ -82,8 +82,7 @@ smoluchowskiJumpTFvPatchScalarField::smoluchowskiJumpTFvPatchScalarField
     if
     (
         mag(accommodationCoeff_) < SMALL
-        ||
-        mag(accommodationCoeff_) > 2.0
+     || mag(accommodationCoeff_) > 2.0
     )
     {
         FatalIOErrorIn
@@ -96,8 +95,8 @@ smoluchowskiJumpTFvPatchScalarField::smoluchowskiJumpTFvPatchScalarField
             "    const dictionary&"
             ")",
             dict
-        )   << "unphysical accommodationCoeff_ specified"
-            << "(0 < accommodationCoeff_ <= 1)" << endl
+        )   << "unphysical accommodationCoeff specified"
+            << "(0 < accommodationCoeff <= 1)" << endl
             << exit(FatalError);
     }
 
@@ -111,15 +110,6 @@ smoluchowskiJumpTFvPatchScalarField::smoluchowskiJumpTFvPatchScalarField
     else
     {
         fvPatchField<scalar>::operator=(patchInternalField());
-    }
-
-    if (dict.found("gamma"))
-    {
-        gamma_ = readScalar(dict.lookup("gamma"));
-    }
-    else
-    {
-        gamma_ = 1.4;
     }
 
     refValue() = *this;

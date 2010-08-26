@@ -28,6 +28,7 @@ License
 #include "addToRunTimeSelectionTable.H"
 #include "fvPatchFieldMapper.H"
 #include "volFields.H"
+#include "directMappedPatchBase.H"
 #include "regionProperties.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -40,13 +41,12 @@ solidWallMixedTemperatureCoupledFvPatchScalarField
 )
 :
     mixedFvPatchScalarField(p, iF),
-    coupleManager_(p),
+    neighbourFieldName_("undefined-neighbourFieldName"),
     KName_("undefined-K")
 {
     this->refValue() = 0.0;
     this->refGrad() = 0.0;
     this->valueFraction() = 1.0;
-    this->fixesValue_ = true;
 }
 
 
@@ -60,9 +60,8 @@ solidWallMixedTemperatureCoupledFvPatchScalarField
 )
 :
     mixedFvPatchScalarField(ptf, p, iF, mapper),
-    coupleManager_(ptf.coupleManager_),
-    KName_(ptf.KName_),
-    fixesValue_(ptf.fixesValue_)
+    neighbourFieldName_(ptf.neighbourFieldName_),
+    KName_(ptf.KName_)
 {}
 
 
@@ -75,14 +74,44 @@ solidWallMixedTemperatureCoupledFvPatchScalarField
 )
 :
     mixedFvPatchScalarField(p, iF),
-    coupleManager_(p, dict),
+    neighbourFieldName_(dict.lookup("neighbourFieldName")),
     KName_(dict.lookup("K"))
 {
+    if (!isA<directMappedPatchBase>(this->patch().patch()))
+    {
+        FatalErrorIn
+        (
+            "solidWallMixedTemperatureCoupledFvPatchScalarField::"
+            "solidWallMixedTemperatureCoupledFvPatchScalarField\n"
+            "(\n"
+            "    const fvPatch& p,\n"
+            "    const DimensionedField<scalar, volMesh>& iF,\n"
+            "    const dictionary& dict\n"
+            ")\n"
+        )   << "\n    patch type '" << p.type()
+            << "' not type '" << directMappedPatchBase::typeName << "'"
+            << "\n    for patch " << p.name()
+            << " of field " << dimensionedInternalField().name()
+            << " in file " << dimensionedInternalField().objectPath()
+            << exit(FatalError);
+    }
+
     fvPatchScalarField::operator=(scalarField("value", dict, p.size()));
-    refValue() = static_cast<scalarField>(*this);
-    refGrad() = 0.0;
-    valueFraction() = 1.0;
-    fixesValue_ = true;
+
+    if (dict.found("refValue"))
+    {
+        // Full restart
+        refValue() = scalarField("refValue", dict, p.size());
+        refGrad() = scalarField("refGradient", dict, p.size());
+        valueFraction() = scalarField("valueFraction", dict, p.size());
+    }
+    else
+    {
+        // Start from user entered data. Assume fixedValue.
+        refValue() = *this;
+        refGrad() = 0.0;
+        valueFraction() = 1.0;
+    }
 }
 
 
@@ -94,9 +123,8 @@ solidWallMixedTemperatureCoupledFvPatchScalarField
 )
 :
     mixedFvPatchScalarField(wtcsf, iF),
-    coupleManager_(wtcsf.coupleManager_),
-    KName_(wtcsf.KName_),
-    fixesValue_(wtcsf.fixesValue_)
+    neighbourFieldName_(wtcsf.neighbourFieldName_),
+    KName_(wtcsf.KName_)
 {}
 
 
@@ -116,112 +144,101 @@ void Foam::solidWallMixedTemperatureCoupledFvPatchScalarField::updateCoeffs()
         return;
     }
 
+    // Get the coupling information from the directMappedPatchBase
+    const directMappedPatchBase& mpp = refCast<const directMappedPatchBase>
+    (
+        patch().patch()
+    );
+    const polyMesh& nbrMesh = mpp.sampleMesh();
+    const fvPatch& nbrPatch = refCast<const fvMesh>
+    (
+        nbrMesh
+    ).boundary()[mpp.samplePolyPatch().index()];
+
+    // Force recalculation of mapping and schedule
+    const mapDistribute& distMap = mpp.map();
+
     tmp<scalarField> intFld = patchInternalField();
 
-    label nFixed = 0;
 
-    // Like snGrad but bypass switching on refValue/refGrad.
-    tmp<scalarField> normalGradient =
-        (*this-intFld())
-      * patch().deltaCoeffs();
+    const solidWallMixedTemperatureCoupledFvPatchScalarField& nbrField =
+    refCast<const solidWallMixedTemperatureCoupledFvPatchScalarField>
+    (
+        nbrPatch.lookupPatchField<volScalarField, scalar>
+        (
+            neighbourFieldName_
+        )
+    );
+
+    // Swap to obtain full local values of neighbour internal field
+    scalarField nbrIntFld = nbrField.patchInternalField();
+    mapDistribute::distribute
+    (
+        Pstream::defaultCommsType,
+        distMap.schedule(),
+        distMap.constructSize(),
+        distMap.subMap(),           // what to send
+        distMap.constructMap(),     // what to receive
+        nbrIntFld
+    );
+
+    // Swap to obtain full local values of neighbour K*delta
+    scalarField nbrKDelta = nbrField.K()*nbrPatch.deltaCoeffs();
+    mapDistribute::distribute
+    (
+        Pstream::defaultCommsType,
+        distMap.schedule(),
+        distMap.constructSize(),
+        distMap.subMap(),           // what to send
+        distMap.constructMap(),     // what to receive
+        nbrKDelta
+    );
+
+    tmp<scalarField> myKDelta = K()*patch().deltaCoeffs();
+
+
+    // Both sides agree on
+    // - temperature : (myKDelta*fld + nbrKDelta*nbrFld)/(myKDelta+nbrKDelta)
+    // - gradient    : (temperature-fld)*delta
+    // We've got a degree of freedom in how to implement this in a mixed bc.
+    // (what gradient, what fixedValue and mixing coefficient)
+    // Two reasonable choices:
+    // 1. specify above temperature on one side (preferentially the high side)
+    //    and above gradient on the other. So this will switch between pure
+    //    fixedvalue and pure fixedgradient
+    // 2. specify gradient and temperature such that the equations are the
+    //    same on both sides. This leads to the choice of
+    //    - refGradient = zero gradient
+    //    - refValue = neighbour value
+    //    - mixFraction = nbrKDelta / (nbrKDelta + myKDelta())
+
+
+    this->refValue() = nbrIntFld;
+
+    this->refGrad() = 0.0;
+
+    this->valueFraction() = nbrKDelta / (nbrKDelta + myKDelta());
+
+    mixedFvPatchScalarField::updateCoeffs();
+
 
     if (debug)
     {
-        Info<< "solidWallMixedTemperatureCoupledFvPatchScalarField::"
-            << "updateCoeffs() :"
+        scalar Q = gSum(K()*patch().magSf()*snGrad());
+
+        Info<< patch().boundaryMesh().mesh().name() << ':'
+            << patch().name() << ':'
+            << this->dimensionedInternalField().name() << " -> "
+            << nbrMesh.name() << ':'
+            << nbrPatch.name() << ':'
+            << this->dimensionedInternalField().name() << " :"
+            << " heatFlux:" << Q
             << " walltemperature "
             << " min:" << gMin(*this)
             << " max:" << gMax(*this)
             << " avg:" << gAverage(*this)
             << endl;
     }
-
-    forAll(*this, i)
-    {
-        // if outgoing flux use fixed value.
-        if (intFld()[i] > operator[](i))
-        {
-            this->refValue()[i] = operator[](i);
-            this->refGrad()[i] = 0.0;   // not used
-            this->valueFraction()[i] = 1.0;
-            nFixed++;
-        }
-        else
-        {
-            this->refValue()[i] = 0.0;  // not used
-            this->refGrad()[i] = normalGradient()[i];
-            this->valueFraction()[i] = 0.0;
-        }
-    }
-
-    reduce(nFixed, sumOp<label>());
-
-    fixesValue_ = (nFixed > 0);
-
-    if (debug)
-    {
-        label nTotSize = returnReduce(this->size(), sumOp<label>());
-
-        Info<< "solidWallMixedTemperatureCoupledFvPatchScalarField::"
-            << "updateCoeffs() : Out of " << nTotSize
-            << " fixedBC:" << nFixed
-            << " gradient:" << nTotSize-nFixed << endl;
-    }
-
-    mixedFvPatchScalarField::updateCoeffs();
-}
-
-
-void Foam::solidWallMixedTemperatureCoupledFvPatchScalarField::evaluate
-(
-    const Pstream::commsTypes
-)
-{
-    if (!this->updated())
-    {
-        this->updateCoeffs();
-    }
-
-    if (!coupleManager_.regionOwner())
-    {
-        // I am the last one to evaluate.
-
-        tmp<scalarField> intFld = patchInternalField();
-
-        const fvPatch& nbrPatch = coupleManager_.neighbourPatch();
-
-        solidWallMixedTemperatureCoupledFvPatchScalarField& nbrField =
-        refCast<solidWallMixedTemperatureCoupledFvPatchScalarField>
-        (
-            const_cast<fvPatchField<scalar>&>
-            (
-                coupleManager_.neighbourPatchField<scalar>()
-            )
-        );
-        tmp<scalarField> nbrIntFld = nbrField.patchInternalField();
-        tmp<scalarField> myKDelta = K()*patch().deltaCoeffs();
-        tmp<scalarField> nbrKDelta = nbrField.K()*nbrPatch.deltaCoeffs();
-
-        // Calculate common wall temperature and assign to both sides
-        scalarField::operator=
-        (
-            (myKDelta()*intFld + nbrKDelta()*nbrIntFld)
-          / (myKDelta() + nbrKDelta())
-        );
-
-        nbrField.scalarField::operator=(*this);
-
-        if (debug)
-        {
-            Info<< "Setting master and slave to wall temperature "
-                << " min:" << gMin(*this)
-                << " max:" << gMax(*this)
-                << " avg:" << gAverage(*this)
-                << endl;
-        }
-    }
-
-    fvPatchScalarField::evaluate();
 }
 
 
@@ -231,7 +248,8 @@ void Foam::solidWallMixedTemperatureCoupledFvPatchScalarField::write
 ) const
 {
     mixedFvPatchScalarField::write(os);
-    coupleManager_.writeEntries(os);
+    os.writeKeyword("neighbourFieldName")<< neighbourFieldName_
+        << token::END_STATEMENT << nl;
     os.writeKeyword("K") << KName_ << token::END_STATEMENT << nl;
 }
 

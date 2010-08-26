@@ -539,7 +539,7 @@ void user_query_file_function
     if (caseName.empty())
     {
         caseName = rootDir.name();
-        rootDir = rootDir.path();
+        rootDir  = rootDir.path();
     }
 
     Info<< "rootDir  : " << rootDir << endl

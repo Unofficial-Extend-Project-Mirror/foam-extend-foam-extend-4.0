@@ -33,9 +33,33 @@ License
 #include "OSspecific.H"
 #include "Map.H"
 #include "globalMeshData.H"
-
+#include "DynamicList.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+void domainDecomposition::mark
+(
+    const labelList& zoneElems,
+    const label zoneI,
+    labelList& elementToZone
+)
+{
+    forAll(zoneElems, i)
+    {
+        label pointi = zoneElems[i];
+
+        if (elementToZone[pointi] == -1)
+        {
+            // First occurrence
+            elementToZone[pointi] = zoneI;
+        }
+        else if (elementToZone[pointi] >= 0)
+        {
+            // Multiple zones
+            elementToZone[pointi] = -2;
+        }
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -307,7 +331,7 @@ bool domainDecomposition::writeDecomposition()
         (
             curPatchSizes.size()
           + curProcessorPatchSizes.size(),
-            reinterpret_cast<polyPatch*>(NULL)
+            reinterpret_cast<polyPatch*>(0)
         );
 
         label nPatches = 0;
@@ -565,7 +589,7 @@ bool domainDecomposition::writeDecomposition()
             IOobject
             (
                 "pointProcAddressing",
-                "constant",
+                procMesh.facesInstance(),
                 procMesh.meshSubDir,
                 procMesh,
                 IOobject::NO_READ,
@@ -580,7 +604,7 @@ bool domainDecomposition::writeDecomposition()
             IOobject
             (
                 "faceProcAddressing",
-                "constant",
+                procMesh.facesInstance(),
                 procMesh.meshSubDir,
                 procMesh,
                 IOobject::NO_READ,
@@ -595,7 +619,7 @@ bool domainDecomposition::writeDecomposition()
             IOobject
             (
                 "cellProcAddressing",
-                "constant",
+                procMesh.facesInstance(),
                 procMesh.meshSubDir,
                 procMesh,
                 IOobject::NO_READ,
@@ -610,7 +634,7 @@ bool domainDecomposition::writeDecomposition()
             IOobject
             (
                 "boundaryProcAddressing",
-                "constant",
+                procMesh.facesInstance(),
                 procMesh.meshSubDir,
                 procMesh,
                 IOobject::NO_READ,

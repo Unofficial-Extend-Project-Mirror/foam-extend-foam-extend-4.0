@@ -32,7 +32,6 @@ static bool isSpray[maxNames];
 static word scalarName             = "volScalarField";
 static word vectorName             = "volVectorField";
 static word tensorName             = "volTensorField";
-static word sprayName              = "lagrangian";
 static word sprayScalarFieldName   = "scalarField";
 static word sprayVectorFieldName   = "vectorField";
 static word sprayTensorFieldName   = "tensorField";
@@ -42,7 +41,7 @@ static word pointPrepend           = "point_";
 static fileName rootDir;
 static fileName caseDir;
 
-static instantList TimeList;
+static instantList timeDirs;
 
 static List<word> fieldNames;
 static List<word> lagrangianScalarNames;

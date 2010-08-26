@@ -57,7 +57,7 @@ void writeEnsDataBinary
     std::ofstream& ensightFile
 )
 {
-    if (sf.size() > 0)
+    if (sf.size())
     {
         List<float> temp(sf.size());
 

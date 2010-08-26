@@ -3,10 +3,7 @@ wordList rhoBoundaryTypes = pbf.types();
 
 forAll(rhoBoundaryTypes, patchi)
 {
-    if
-    (
-        rhoBoundaryTypes[patchi] == "waveTransmissive"
-    )
+    if (rhoBoundaryTypes[patchi] == "waveTransmissive")
     {
         rhoBoundaryTypes[patchi] = zeroGradientFvPatchScalarField::typeName;
     }

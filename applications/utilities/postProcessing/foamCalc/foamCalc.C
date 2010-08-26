@@ -84,6 +84,8 @@ int main(int argc, char *argv[])
 
     utility().tryPostCalc(args, runTime, mesh);
 
+    Info<< "End\n" << endl;
+
     return 0;
 }
 

@@ -90,8 +90,8 @@ Usage
     The quoting is required to avoid shell expansions and to pass the
     information as a single argument.
 
-    @param -faMesh \n
-    Write finite area mesh and fields
+    @param -useTimeName \n
+    use the time index in the VTK file name instead of the time index
 
 Note
     mesh subset is handled by vtkMesh. Slight inconsistency in
@@ -101,30 +101,6 @@ Note
     functions). For the patches however it uses the
     fvMeshSubset.interpolate function to directly interpolate the
     whole-mesh values onto the subset patch.
-
-Note
-    new file format: \n
-    no automatic timestep recognition.
-    However can have .pvd file format which refers to time simulation
-    if XML *.vtu files are available:
-
-    @verbatim
-      <?xml version="1.0"?>
-      <VTKFile type="Collection" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-        <Collection>
-          <DataSet timestep="50" file="pitzDaily_2.vtu"/>
-          <DataSet timestep="100" file="pitzDaily_3.vtu"/>
-          <DataSet timestep="150" file="pitzDaily_4.vtu"/>
-          <DataSet timestep="200" file="pitzDaily_5.vtu"/>
-          <DataSet timestep="250" file="pitzDaily_6.vtu"/>
-          <DataSet timestep="300" file="pitzDaily_7.vtu"/>
-          <DataSet timestep="350" file="pitzDaily_8.vtu"/>
-          <DataSet timestep="400" file="pitzDaily_9.vtu"/>
-          <DataSet timestep="450" file="pitzDaily_10.vtu"/>
-          <DataSet timestep="500" file="pitzDaily_11.vtu"/>
-        </Collection>
-      </VTKFile>
-    @endverbatim
 
 \*---------------------------------------------------------------------------*/
 
@@ -208,8 +184,8 @@ labelList getSelectedPatches
 
         if
         (
-            isType<emptyPolyPatch>(pp)
-            || (Pstream::parRun() && isType<processorPolyPatch>(pp))
+            isA<emptyPolyPatch>(pp)
+            || (Pstream::parRun() && isA<processorPolyPatch>(pp))
         )
         {
             Info<< "    discarding empty/processor patch " << patchI
@@ -231,8 +207,10 @@ labelList getSelectedPatches
 
 int main(int argc, char *argv[])
 {
-#   include "addTimeOptions.H"
+    timeSelector::addOptions();
+
 #   include "addRegionOption.H"
+
     argList::validOptions.insert("fields", "fields");
     argList::validOptions.insert("cellSet", "cellSet name");
     argList::validOptions.insert("faceSet", "faceSet name");
@@ -247,16 +225,16 @@ int main(int argc, char *argv[])
     argList::validOptions.insert("noFaceZones","");
     argList::validOptions.insert("faMesh","");
     argList::validOptions.insert("noLinks","");
+    argList::validOptions.insert("useTimeName","");
 
 #   include "setRootCase.H"
 #   include "createTime.H"
 
-
-    bool doWriteInternal = !args.options().found("noInternal");
-    bool doFaceZones = !args.options().found("noFaceZones");
-    bool doLinks = !args.options().found("noLinks");
-
-    bool binary = !args.options().found("ascii");
+    bool doWriteInternal = !args.optionFound("noInternal");
+    bool doFaceZones = !args.optionFound("noFaceZones");
+    bool doLinks = !args.optionFound("noLinks");
+    bool binary = !args.optionFound("ascii");
+    bool useTimeName = args.optionFound("useTimeName");
 
     if (binary && (sizeof(floatScalar) != 4 || sizeof(label) != 4))
     {
@@ -266,7 +244,7 @@ int main(int argc, char *argv[])
             << exit(FatalError);
     }
 
-    bool nearCellValue = args.options().found("nearCellValue");
+    bool nearCellValue = args.optionFound("nearCellValue");
 
     if (nearCellValue)
     {
@@ -275,7 +253,7 @@ int main(int argc, char *argv[])
             << nl << endl;
     }
 
-    bool noPointValues = args.options().found("noPointValues");
+    bool noPointValues = args.optionFound("noPointValues");
 
     if (noPointValues)
     {
@@ -283,12 +261,12 @@ int main(int argc, char *argv[])
             << "Outputting cell values only" << nl << endl;
     }
 
-    bool allPatches = args.options().found("allPatches");
+    bool allPatches = args.optionFound("allPatches");
 
     HashSet<word> excludePatches;
-    if (args.options().found("excludePatches"))
+    if (args.optionFound("excludePatches"))
     {
-        IStringStream(args.options()["excludePatches"])() >> excludePatches;
+        args.optionLookup("excludePatches")() >> excludePatches;
 
         Info<< "Not including patches " << excludePatches << nl << endl;
     }
@@ -296,9 +274,9 @@ int main(int argc, char *argv[])
     word cellSetName;
     string vtkName;
 
-    if (args.options().found("cellSet"))
+    if (args.optionFound("cellSet"))
     {
-        cellSetName = args.options()["cellSet"];
+        cellSetName = args.option("cellSet");
         vtkName = cellSetName;
     }
     else if (Pstream::parRun())
@@ -319,14 +297,8 @@ int main(int argc, char *argv[])
     }
 
 
-    instantList Times = runTime.times();
+    instantList timeDirs = timeSelector::select0(runTime, args);
 
-    // set startTime and endTime depending on -time and -latestTime options
-#   include "checkTimeOptions.H"
-
-    runTime.setTime(Times[startTime], startTime);
-
-    // Current mesh.
 #   include "createNamedMesh.H"
 
     // VTK/ directory in the case
@@ -340,13 +312,13 @@ int main(int argc, char *argv[])
         regionPrefix = regionName;
     }
 
-    if (dir(fvPath))
+    if (isDir(fvPath))
     {
         if
         (
-            args.options().found("time")
-         || args.options().found("latestTime")
-         || cellSetName.size() > 0
+            args.optionFound("time")
+         || args.optionFound("latestTime")
+         || cellSetName.size()
          || regionName != polyMesh::defaultRegion
         )
         {
@@ -363,6 +335,7 @@ int main(int argc, char *argv[])
     mkDir(fvPath);
 
 
+    // Mesh wrapper; does subsetting and decomposition
     vtkMesh vMesh
     (
         IOobject
@@ -375,11 +348,58 @@ int main(int argc, char *argv[])
         cellSetName
     );
 
-    for (label timeI = startTime; timeI < endTime; timeI++)
+    // Scan for all possible lagrangian clouds
+    HashSet<fileName> allCloudDirs;
+    forAll(timeDirs, timeI)
     {
-        runTime.setTime(Times[timeI], timeI);
+        runTime.setTime(timeDirs[timeI], timeI);
+        fileNameList cloudDirs
+        (
+            readDir
+            (
+                runTime.timePath()/regionPrefix/cloud::prefix,
+                fileName::DIRECTORY
+            )
+        );
+        forAll(cloudDirs, i)
+        {
+            IOobjectList sprayObjs
+            (
+                mesh,
+                runTime.timeName(),
+                cloud::prefix/cloudDirs[i]
+            );
 
-        Info<< "Time " << Times[timeI].name() << endl;
+            IOobject* positionsPtr = sprayObjs.lookup("positions");
+
+            if (positionsPtr)
+            {
+                if (allCloudDirs.insert(cloudDirs[i]))
+                {
+                    Info<< "At time: " << runTime.timeName()
+                        << " detected cloud directory : " << cloudDirs[i]
+                        << endl;
+                }
+            }
+        }
+    }
+
+
+    forAll(timeDirs, timeI)
+    {
+        runTime.setTime(timeDirs[timeI], timeI);
+
+        Info<< "Time: " << runTime.timeName() << endl;
+
+        word timeDesc = "";
+        if (useTimeName)
+        {
+            timeDesc = runTime.timeName();
+        }
+        else
+        {
+            timeDesc = name(runTime.timeIndex());
+        }
 
         // Check for new polyMesh/ and update mesh, fvMeshSubset and cell
         // decomposition.
@@ -398,10 +418,10 @@ int main(int argc, char *argv[])
 
 
         // If faceSet: write faceSet only (as polydata)
-        if (args.options().found("faceSet"))
+        if (args.optionFound("faceSet"))
         {
             // Load the faceSet
-            faceSet set(mesh, args.options()["faceSet"]);
+            faceSet set(mesh, args.option("faceSet"));
 
             // Filename as if patch with same name.
             mkDir(fvPath/set.name());
@@ -410,7 +430,7 @@ int main(int argc, char *argv[])
             (
                 fvPath/set.name()/set.name()
               + "_"
-              + name(timeI)
+              + timeDesc
               + ".vtk"
             );
 
@@ -421,10 +441,10 @@ int main(int argc, char *argv[])
             continue;
         }
         // If pointSet: write pointSet only (as polydata)
-        if (args.options().found("pointSet"))
+        if (args.optionFound("pointSet"))
         {
             // Load the pointSet
-            pointSet set(mesh, args.options()["pointSet"]);
+            pointSet set(mesh, args.option("pointSet"));
 
             // Filename as if patch with same name.
             mkDir(fvPath/set.name());
@@ -433,7 +453,7 @@ int main(int argc, char *argv[])
             (
                 fvPath/set.name()/set.name()
               + "_"
-              + name(timeI)
+              + timeDesc
               + ".vtk"
             );
 
@@ -449,14 +469,15 @@ int main(int argc, char *argv[])
         IOobjectList objects(mesh, runTime.timeName());
 
         HashSet<word> selectedFields;
-        if (args.options().found("fields"))
+        if (args.optionFound("fields"))
         {
-            IStringStream(args.options()["fields"])() >> selectedFields;
+            args.optionLookup("fields")() >> selectedFields;
         }
 
         // Construct the vol fields (on the original mesh if subsetted)
 
         PtrList<volScalarField> vsf;
+        readFields(vMesh, vMesh.baseMesh(), objects, selectedFields, vsf);
         readFields(vMesh, vMesh, objects, selectedFields, vsf);
         print("    volScalarFields            :", Info, vsf);
 
@@ -570,7 +591,7 @@ int main(int argc, char *argv[])
             (
                 fvPath/vtkName
               + "_"
-              + name(timeI)
+              + timeDesc
               + ".vtk"
             );
 
@@ -614,7 +635,7 @@ int main(int argc, char *argv[])
                 writer.write(ptf);
 
                 // Interpolated volFields
-                volPointInterpolation pInterp(mesh, vMesh.pMesh());
+                volPointInterpolation pInterp(mesh);
                 writer.write(pInterp, vsf);
                 writer.write(pInterp, vvf);
                 writer.write(pInterp, vSpheretf);
@@ -629,7 +650,7 @@ int main(int argc, char *argv[])
         //
         //---------------------------------------------------------------------
 
-        if (args.options().found("surfaceFields"))
+        if (args.optionFound("surfaceFields"))
         {
             PtrList<surfaceScalarField> ssf;
             readFields
@@ -676,8 +697,8 @@ int main(int argc, char *argv[])
                     fvPath
                    /"surfaceFields"
                    /"surfaceFields"
-	           + "_"
-                   + name(timeI)
+                   + "_"
+                   + timeDesc
                    + ".vtk"
                 );
 
@@ -711,7 +732,7 @@ int main(int argc, char *argv[])
                 patchFileName =
                     fvPath/"allPatches"/cellSetName
                   + "_"
-                  + name(timeI)
+                  + timeDesc
                   + ".vtk";
             }
             else
@@ -719,7 +740,7 @@ int main(int argc, char *argv[])
                 patchFileName =
                     fvPath/"allPatches"/"allPatches"
                   + "_"
-                  + name(timeI)
+                  + timeDesc
                   + ".vtk";
             }
 
@@ -789,7 +810,7 @@ int main(int argc, char *argv[])
                         patchFileName =
                             fvPath/pp.name()/cellSetName
                           + "_"
-                          + name(timeI)
+                          + timeDesc
                           + ".vtk";
                     }
                     else
@@ -797,7 +818,7 @@ int main(int argc, char *argv[])
                         patchFileName =
                             fvPath/pp.name()/pp.name()
                           + "_"
-                          + name(timeI)
+                          + timeDesc
                           + ".vtk";
                     }
 
@@ -812,7 +833,7 @@ int main(int argc, char *argv[])
                         labelList(1, patchI)
                     );
 
-                    if (!isType<emptyPolyPatch>(pp))
+                    if (!isA<emptyPolyPatch>(pp))
                     {
                         // VolFields + patchID
                         writeFuns::writeCellDataHeader
@@ -889,7 +910,7 @@ int main(int argc, char *argv[])
                     patchFileName =
                         fvPath/pp.name()/cellSetName
                       + "_"
-                      + name(timeI)
+                      + timeDesc
                       + ".vtk";
                 }
                 else
@@ -897,7 +918,7 @@ int main(int argc, char *argv[])
                     patchFileName =
                         fvPath/pp.name()/pp.name()
                       + "_"
-                      + name(timeI)
+                      + timeDesc
                       + ".vtk";
                 }
 
@@ -922,19 +943,16 @@ int main(int argc, char *argv[])
 
         //---------------------------------------------------------------------
         //
-        // Write surface fields
+        // Write lagrangian data
         //
         //---------------------------------------------------------------------
 
-        if (args.options().found("faMesh"))
+        forAllConstIter(HashSet<fileName>, allCloudDirs, iter)
         {
-            mkDir(fvPath/"faMesh");
+            const fileName& cloudName = iter.key();
 
-            fileName faFileName =
-                fvPath/"faMesh"/"faMesh"
-              + "_"
-              + name(timeI)
-              + ".vtk";
+            // Always create the cloud directory.
+            mkDir(fvPath/cloud::prefix/cloudName);
 
             // Create FA mesh
             faMesh aMesh(vMesh.mesh());
@@ -994,38 +1012,18 @@ int main(int argc, char *argv[])
         //
         //---------------------------------------------------------------------
 
-        fileNameList cloudDirs
-        (
-            readDir
-            (
-                runTime.timePath()/regionPrefix/"lagrangian",
-                fileName::DIRECTORY
-            )
-        );
 
-        forAll(cloudDirs, i)
-        {
             IOobjectList sprayObjs
             (
                 mesh,
                 runTime.timeName(),
-                "lagrangian"/cloudDirs[i]
+                cloud::prefix/cloudName
             );
 
             IOobject* positionsPtr = sprayObjs.lookup("positions");
 
             if (positionsPtr)
             {
-                mkDir(fvPath/"lagrangian"/cloudDirs[i]);
-
-                fileName lagrFileName
-                (
-                    fvPath/"lagrangian"/cloudDirs[i]/cloudDirs[i]
-                  + "_" + name(timeI) + ".vtk"
-                );
-
-                Info<< "    Lagrangian: " << lagrFileName << endl;
-
                 wordList labelNames(sprayObjs.names(labelIOField::typeName));
                 Info<< "        labels            :";
                 print(Info, labelNames);
@@ -1067,27 +1065,42 @@ int main(int argc, char *argv[])
                     vMesh,
                     binary,
                     lagrFileName,
-                    cloudDirs[i]
+                    cloudName,
+                    false
                 );
 
                 // Write number of fields
                 writer.writeParcelHeader
                 (
                     labelNames.size()
-                + scalarNames.size()
-                + vectorNames.size()
-                + sphereNames.size()
-                + symmNames.size()
-                + tensorNames.size()
+                  + scalarNames.size()
+                  + vectorNames.size()
+                  + sphereNames.size()
+                  + symmNames.size()
+                  + tensorNames.size()
                 );
 
                 // Fields
                 writer.writeIOField<label>(labelNames);
                 writer.writeIOField<scalar>(scalarNames);
                 writer.writeIOField<vector>(vectorNames);
-                writer.writeIOField<vector>(sphereNames);
-                writer.writeIOField<vector>(symmNames);
-                writer.writeIOField<vector>(tensorNames);
+                writer.writeIOField<sphericalTensor>(sphereNames);
+                writer.writeIOField<symmTensor>(symmNames);
+                writer.writeIOField<tensor>(tensorNames);
+            }
+            else
+            {
+                lagrangianWriter writer
+                (
+                    vMesh,
+                    binary,
+                    lagrFileName,
+                    cloudName,
+                    true
+                );
+
+                // Write number of fields
+                writer.writeParcelHeader(0);
             }
         }
     }

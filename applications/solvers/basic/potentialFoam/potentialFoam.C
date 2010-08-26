@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
     U.write();
     phi.write();
 
-    if (args.options().found("writep"))
+    if (args.optionFound("writep"))
     {
         p.write();
     }
@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

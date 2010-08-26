@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "writePointSet.H"
@@ -76,7 +74,7 @@ void writePointSet
 
     writeFuns::insert
     (
-        IndirectList<point>(vMesh.mesh().points(), set.toc())(),
+        UIndirectList<point>(vMesh.mesh().points(), set.toc())(),
         ptField
     );
 
@@ -102,6 +100,7 @@ void writePointSet
 
     writeFuns::write(pStream, binary, pointIDs);
 }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -65,10 +65,10 @@ bound(p, pMin);
 // to obey overall mass continuity
 if (closedVolume)
 {
-    p += (initialMass - fvc::domainIntegrate(thermo->psi()*p))
-        /fvc::domainIntegrate(thermo->psi());
+    p += (initialMass - fvc::domainIntegrate(psi*p))
+        /fvc::domainIntegrate(psi);
 }
 
-rho = thermo->rho();
+rho = thermo.rho();
 rho.relax();
 Info<< "rho max/min : " << max(rho).value() << " " << min(rho).value() << endl;

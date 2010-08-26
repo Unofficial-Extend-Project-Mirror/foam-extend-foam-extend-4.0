@@ -47,20 +47,32 @@ Description
 #include "processorFaMeshes.H"
 #include "faFieldReconstructor.H"
 
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
+    // enable -constant ... if someone really wants it
+    // enable -zeroTime to prevent accidentally trashing the initial fields
+    timeSelector::addOptions(true, true);
     argList::noParallel();
-    timeSelector::addOptions();
 #   include "addRegionOption.H"
+    argList::validOptions.insert("fields", "\"(list of fields)\"");
+    argList::validOptions.insert("noLagrangian", "");
+
 #   include "setRootCase.H"
 #   include "createTime.H"
 
+    HashSet<word> selectedFields;
+    if (args.optionFound("fields"))
+    {
+        args.optionLookup("fields")() >> selectedFields;
+    }
+
+    bool noLagrangian = args.optionFound("noLagrangian");
+
     // determine the processor count directly
     label nProcs = 0;
-    while (dir(args.path()/(word("processor") + name(nProcs))))
+    while (isDir(args.path()/(word("processor") + name(nProcs))))
     {
         ++nProcs;
     }
@@ -97,7 +109,7 @@ int main(int argc, char *argv[])
         args
     );
 
-    if (!timeDirs.size())
+    if (timeDirs.empty())
     {
         FatalErrorIn(args.executable())
             << "No times selected"
@@ -110,7 +122,6 @@ int main(int argc, char *argv[])
     {
         regionPrefix = regionName;
     }
-
 
     // Set all times on processor meshes equal to reconstructed mesh
     forAll (databases, procI)
@@ -176,6 +187,10 @@ int main(int argc, char *argv[])
          || objects.lookupClass(volSymmTensorField::typeName).size()
          || objects.lookupClass(volTensorField::typeName).size()
          || objects.lookupClass(surfaceScalarField::typeName).size()
+         || objects.lookupClass(surfaceVectorField::typeName).size()
+         || objects.lookupClass(surfaceSphericalTensorField::typeName).size()
+         || objects.lookupClass(surfaceSymmTensorField::typeName).size()
+         || objects.lookupClass(surfaceTensorField::typeName).size()
         )
         {
             Info << "Reconstructing FV fields" << nl << endl;
@@ -189,13 +204,57 @@ int main(int argc, char *argv[])
                 procMeshes.boundaryProcAddressing()
             );
 
-            fvReconstructor.reconstructFvVolumeFields<scalar>(objects);
-            fvReconstructor.reconstructFvVolumeFields<vector>(objects);
-            fvReconstructor.reconstructFvVolumeFields<sphericalTensor>(objects);
-            fvReconstructor.reconstructFvVolumeFields<symmTensor>(objects);
-            fvReconstructor.reconstructFvVolumeFields<tensor>(objects);
+            fvReconstructor.reconstructFvVolumeFields<scalar>
+            (
+                objects,
+                selectedFields
+            );
+            fvReconstructor.reconstructFvVolumeFields<vector>
+            (
+                objects,
+                selectedFields
+            );
+            fvReconstructor.reconstructFvVolumeFields<sphericalTensor>
+            (
+                objects,
+                selectedFields
+            );
+            fvReconstructor.reconstructFvVolumeFields<symmTensor>
+            (
+                objects,
+                selectedFields
+            );
+            fvReconstructor.reconstructFvVolumeFields<tensor>
+            (
+                objects,
+                selectedFields
+            );
 
-            fvReconstructor.reconstructFvSurfaceFields<scalar>(objects);
+            fvReconstructor.reconstructFvSurfaceFields<scalar>
+            (
+                objects,
+                selectedFields
+            );
+            fvReconstructor.reconstructFvSurfaceFields<vector>
+            (
+                objects,
+                selectedFields
+            );
+            fvReconstructor.reconstructFvSurfaceFields<sphericalTensor>
+            (
+                objects,
+                selectedFields
+            );
+            fvReconstructor.reconstructFvSurfaceFields<symmTensor>
+            (
+                objects,
+                selectedFields
+            );
+            fvReconstructor.reconstructFvSurfaceFields<tensor>
+            (
+                objects,
+                selectedFields
+            );
         }
         else
         {
@@ -304,115 +363,117 @@ int main(int argc, char *argv[])
         // the first processor that has them. They are in pass2 only used
         // for name and type (scalar, vector etc).
 
-        HashTable<IOobjectList> cloudObjects;
-
-        forAll (databases, procI)
+        if (!noLagrangian)
         {
-            fileNameList cloudDirs
-            (
-                readDir
-                (
-                    databases[procI].timePath()/regionPrefix/"lagrangian",
-                    fileName::DIRECTORY
-                )
-            );
+            HashTable<IOobjectList> cloudObjects;
 
-            forAll (cloudDirs, i)
+            forAll (databases, procI)
             {
-                // Check if we already have cloud objects for this cloudname.
-                HashTable<IOobjectList>::const_iterator iter =
-                    cloudObjects.find(cloudDirs[i]);
-
-                if (iter == cloudObjects.end())
-                {
-                    // Do local scan for valid cloud objects.
-                    IOobjectList sprayObjs
+                fileNameList cloudDirs
+                (
+                    readDir
                     (
-                        procMeshes.meshes()[procI],
-                        databases[procI].timeName(),
-                        "lagrangian"/cloudDirs[i]
-                    );
+                        databases[procI].timePath()/regionPrefix/cloud::prefix,
+                        fileName::DIRECTORY
+                    )
+                );
 
-                    IOobject* positionsPtr = sprayObjs.lookup("positions");
+                forAll (cloudDirs, i)
+                {
+                    // Check if we already have cloud objects for this cloudname
+                    HashTable<IOobjectList>::const_iterator iter =
+                        cloudObjects.find(cloudDirs[i]);
 
-                    if (positionsPtr)
+                    if (iter == cloudObjects.end())
                     {
-                        cloudObjects.insert(cloudDirs[i], sprayObjs);
+                        // Do local scan for valid cloud objects
+                        IOobjectList sprayObjs
+                        (
+                            procMeshes.meshes()[procI],
+                            databases[procI].timeName(),
+                            cloud::prefix/cloudDirs[i]
+                        );
+
+                        IOobject* positionsPtr = sprayObjs.lookup("positions");
+
+                        if (positionsPtr)
+                        {
+                            cloudObjects.insert(cloudDirs[i], sprayObjs);
+                        }
                     }
                 }
             }
-        }
 
 
-        if (cloudObjects.size() > 0)
-        {
-            // Pass2: reconstruct the cloud
-            forAllConstIter(HashTable<IOobjectList>, cloudObjects, iter)
+            if (cloudObjects.size())
             {
-                const word cloudName = string::validate<word>(iter.key());
+                // Pass2: reconstruct the cloud
+                forAllConstIter(HashTable<IOobjectList>, cloudObjects, iter)
+                {
+                    const word cloudName = string::validate<word>(iter.key());
 
-                // Objects (on arbitrary processor)
-                const IOobjectList& sprayObjs = iter();
+                    // Objects (on arbitrary processor)
+                    const IOobjectList& sprayObjs = iter();
 
-                Info<< "Reconstructing lagrangian fields for cloud "
-                    << cloudName << nl << endl;
+                    Info<< "Reconstructing lagrangian fields for cloud "
+                        << cloudName << nl << endl;
 
-                reconstructLagrangianPositions
-                (
-                    mesh,
-                    cloudName,
-                    procMeshes.meshes(),
-                    procMeshes.faceProcAddressing(),
-                    procMeshes.cellProcAddressing()
-                );
-                reconstructLagrangianFields<label>
-                (
-                    cloudName,
-                    mesh,
-                    procMeshes.meshes(),
-                    sprayObjs
-                );
-                reconstructLagrangianFields<scalar>
-                (
-                    cloudName,
-                    mesh,
-                    procMeshes.meshes(),
-                    sprayObjs
-                );
-                reconstructLagrangianFields<vector>
-                (
-                    cloudName,
-                    mesh,
-                    procMeshes.meshes(),
-                    sprayObjs
-                );
-                reconstructLagrangianFields<sphericalTensor>
-                (
-                    cloudName,
-                    mesh,
-                    procMeshes.meshes(),
-                    sprayObjs
-                );
-                reconstructLagrangianFields<symmTensor>
-                (
-                    cloudName,
-                    mesh,
-                    procMeshes.meshes(),
-                    sprayObjs
-                );
-                reconstructLagrangianFields<tensor>
-                (
-                    cloudName,
-                    mesh,
-                    procMeshes.meshes(),
-                    sprayObjs
-                );
+                    reconstructLagrangianPositions
+                    (
+                        mesh,
+                        cloudName,
+                        procMeshes.meshes(),
+                        procMeshes.faceProcAddressing(),
+                        procMeshes.cellProcAddressing()
+                    );
+                    reconstructLagrangianFields<label>
+                    (
+                        cloudName,
+                        mesh,
+                        procMeshes.meshes(),
+                        sprayObjs
+                    );
+                    reconstructLagrangianFields<scalar>
+                    (
+                        cloudName,
+                        mesh,
+                        procMeshes.meshes(),
+                        sprayObjs
+                    );
+                    reconstructLagrangianFields<vector>
+                    (
+                        cloudName,
+                        mesh,
+                        procMeshes.meshes(),
+                        sprayObjs
+                    );
+                    reconstructLagrangianFields<sphericalTensor>
+                    (
+                        cloudName,
+                        mesh,
+                        procMeshes.meshes(),
+                        sprayObjs
+                    );
+                    reconstructLagrangianFields<symmTensor>
+                    (
+                        cloudName,
+                        mesh,
+                        procMeshes.meshes(),
+                        sprayObjs
+                    );
+                    reconstructLagrangianFields<tensor>
+                    (
+                        cloudName,
+                        mesh,
+                        procMeshes.meshes(),
+                        sprayObjs
+                    );
+                }
             }
-        }
-        else
-        {
-            Info << "No lagrangian fields" << nl << endl;
-        }
+            else
+            {
+                Info << "No lagrangian fields" << nl << endl;
+            }
 
         // If there are any FA fields, reconstruct them
 
@@ -456,10 +517,10 @@ int main(int argc, char *argv[])
         }
 
         // If there are any "uniform" directories copy them from
-        // the master processor.
+        // the master processor
 
         fileName uniformDir0 = databases[0].timePath()/"uniform";
-        if (dir(uniformDir0))
+        if (isDir(uniformDir0))
         {
             cp(uniformDir0, runTime.timePath());
         }

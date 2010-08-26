@@ -39,7 +39,6 @@ SourceFiles
 
 #include "vtkTopo.H"
 #include "fvMeshSubset.H"
-#include "pointMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,9 +57,6 @@ class vtkMesh
     public fvMesh
 {
     // Private data
-
-        //- Demand driven pointMesh
-        mutable autoPtr<pointMesh> pointMeshPtr_;
 
         //- Mesh subset
         fvMeshSubset subsetMesh_;
@@ -92,7 +88,7 @@ public:
 
     // Destructor
 
-        ~vtkMesh();
+        virtual ~vtkMesh();
 
 
     // Member Functions
@@ -104,25 +100,16 @@ public:
                 return subsetMesh_;
             }
 
-            const pointMesh& basePointMesh() const
-            {
-                if (!pointMeshPtr_.valid())
-                {
-                    pointMeshPtr_.reset(new pointMesh(*this));
-                }
-                return pointMeshPtr_();
-            }
-
             //- Check if running subMesh
             bool useSubMesh() const
             {
-                return setName_.size() > 0;
+                return setName_.size();
             }
 
             //- topology
             const vtkTopo& topo() const
             {
-                if (!topoPtr_.valid())
+                if (topoPtr_.empty())
                 {
                     topoPtr_.reset(new vtkTopo(mesh()));
                 }
@@ -147,11 +134,11 @@ public:
             {
                 if (useSubMesh())
                 {
-                    return subsetMesh_.subPointMesh();
+                    return pointMesh::New(subsetMesh_.subMesh());
                 }
                 else
                 {
-                    return basePointMesh();
+                    return pointMesh::New(*this);
                 }
             }
 
@@ -164,7 +151,7 @@ public:
             //- Number of field points
             label nFieldPoints() const
             {
-                return pMesh().size() + topo().addPointCellLabels().size();
+                return mesh().nPoints() + topo().addPointCellLabels().size();
             }
 
 

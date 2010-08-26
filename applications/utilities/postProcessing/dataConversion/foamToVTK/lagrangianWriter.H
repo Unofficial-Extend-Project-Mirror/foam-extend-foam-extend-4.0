@@ -39,6 +39,7 @@ SourceFiles
 
 #include "globalPointPatch.H"
 #include "OFstream.H"
+#include "Cloud.H"
 #include "volFields.H"
 #include "pointFields.H"
 #include "vtkMesh.H"
@@ -62,6 +63,8 @@ class lagrangianWriter
 
     const bool binary_;
 
+    const fileName fName_;
+
     const word cloudName_;
 
     std::ofstream os_;
@@ -79,7 +82,8 @@ public:
             const vtkMesh&,
             const bool binary,
             const fileName&,
-            const word&
+            const word&,
+            const bool dummyCloud
         );
 
 

@@ -27,6 +27,7 @@ Application
 
 Description
     Calculates and writes the flowType of velocity field U.
+
     The -noWrite option has no meaning.
 
     The flow type parameter is obtained according to the following equation:
@@ -87,6 +88,8 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
     {
         Info<< "    No U" << endl;
     }
+
+    Info<< "\nEnd\n" << endl;
 }
 
 

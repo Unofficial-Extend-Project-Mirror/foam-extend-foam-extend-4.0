@@ -61,6 +61,8 @@ class internalWriter
 
     const bool binary_;
 
+    const fileName fName_;
+
     std::ofstream os_;
 
 

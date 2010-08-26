@@ -31,19 +31,21 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
+#include "cyclicPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Main program:
 
 int main(int argc, char *argv[])
 {
+#   include "addRegionOption.H"
     timeSelector::addOptions();
     argList::validArgs.append("fieldName");
     argList::validArgs.append("patchName");
 #   include "setRootCase.H"
 #   include "createTime.H"
     instantList timeDirs = timeSelector::select0(runTime, args);
-#   include "createMesh.H"
+#   include "createNamedMesh.H"
 
     word fieldName(args.additionalArgs()[0]);
     word patchName(args.additionalArgs()[1]);
@@ -75,26 +77,71 @@ int main(int argc, char *argv[])
             }
 
             // Give patch area
-            Info<< "    Patch area = " << gSum(mesh.Sf().boundaryField()[patchi]) << endl;
-
-            if (fieldHeader.headerClassName() == "volScalarField")
+            if (isA<cyclicPolyPatch>(mesh.boundaryMesh()[patchi]))
             {
-                Info<< "    Reading volScalarField " << fieldName << endl;
+                Info<< "    Cyclic patch vector area: " << nl;
+                label nFaces = mesh.boundaryMesh()[patchi].size();
+                vector sum1 = vector::zero;
+                vector sum2 = vector::zero;
+                for (label i=0; i<nFaces/2; i++)
+                {
+                    sum1 += mesh.Sf().boundaryField()[patchi][i];
+                    sum2 += mesh.Sf().boundaryField()[patchi][i+nFaces/2];
+                }
+                reduce(sum1, sumOp<vector>());
+                reduce(sum2, sumOp<vector>());
+                Info<< "    - half 1 = " << sum1 << ", " << mag(sum1) << nl
+                    << "    - half 2 = " << sum2 << ", " << mag(sum2) << nl
+                    << "    - total  = " << (sum1 + sum2) << ", "
+                    << mag(sum1 + sum2) << endl;
+                Info<< "    Cyclic patch area magnitude = "
+                    << gSum(mesh.magSf().boundaryField()[patchi])/2.0 << endl;
+            }
+            else
+            {
+                Info<< "    Area vector of patch "
+                    << patchName << '[' << patchi << ']' << " = "
+                    << gSum(mesh.Sf().boundaryField()[patchi]) << endl;
+                Info<< "    Area magnitude of patch "
+                    << patchName << '[' << patchi << ']' << " = "
+                    << gSum(mesh.magSf().boundaryField()[patchi]) << endl;
+            }
+
+            // Read field and calc integral
+            if (fieldHeader.headerClassName() == volScalarField::typeName)
+            {
+                Info<< "    Reading " << volScalarField::typeName << " "
+                    << fieldName << endl;
+
                 volScalarField field(fieldHeader, mesh);
 
-                vector sumField = gSum
-                (
-                    mesh.Sf().boundaryField()[patchi]
-                  * field.boundaryField()[patchi]
-                );
-
-                Info<< "    Integral of " << fieldName << " over patch "
+                Info<< "    Integral of " << fieldName
+                    << " over vector area of patch "
                     << patchName << '[' << patchi << ']' << " = "
-                    << sumField << nl;
+                    << gSum
+                       (
+                           mesh.Sf().boundaryField()[patchi]
+                          *field.boundaryField()[patchi]
+                       )
+                    << nl;
+
+                Info<< "    Integral of " << fieldName
+                    << " over area magnitude of patch "
+                    << patchName << '[' << patchi << ']' << " = "
+                    << gSum
+                       (
+                           mesh.magSf().boundaryField()[patchi]
+                          *field.boundaryField()[patchi]
+                       )
+                    << nl;
             }
-            else if (fieldHeader.headerClassName() == "surfaceScalarField")
+            else if
+            (
+                fieldHeader.headerClassName() == surfaceScalarField::typeName
+            )
             {
-                Info<< "    Reading surfaceScalarField " << fieldName << endl;
+                Info<< "    Reading " << surfaceScalarField::typeName << " "
+                    << fieldName << endl;
 
                 surfaceScalarField field(fieldHeader, mesh);
                 scalar sumField = gSum(field.boundaryField()[patchi]);
@@ -106,8 +153,10 @@ int main(int argc, char *argv[])
             else
             {
                 FatalError
-                    << "Only possible to integrate volScalarFields "
-                    << "and surfaceScalarFields" << nl << exit(FatalError);
+                    << "Only possible to integrate "
+                    << volScalarField::typeName << "s "
+                    << "and " << surfaceScalarField::typeName << "s"
+                    << nl << exit(FatalError);
             }
         }
         else

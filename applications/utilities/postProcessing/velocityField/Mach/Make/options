@@ -1,5 +1,5 @@
 EXE_INC = \
-    -I$(FOAM_SRC)/postProcessing/postCalc \
+    -I$(LIB_SRC)/postProcessing/postCalc \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude
 
@@ -7,5 +7,4 @@ EXE_LIBS = \
     $(FOAM_LIBBIN)/postCalc.o \
     -lfiniteVolume \
     -lbasicThermophysicalModels \
-    -lcombustionThermophysicalModels \
     -lspecie

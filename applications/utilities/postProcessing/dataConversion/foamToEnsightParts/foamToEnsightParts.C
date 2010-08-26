@@ -36,8 +36,16 @@ Usage
     @param -ascii \n
     Write Ensight data in ASCII format instead of "C Binary"
 
-    @param -zeroTime \n
-    Include the often incomplete initial conditions.
+    @param -noZero \n
+    Exclude the often incomplete initial conditions.
+
+    @param -index \<start\>\n
+    Ignore the time index contained in the time file and use a
+    simple indexing when creating the @c Ensight/data/######## files.
+
+    @param -noMesh \n
+    Suppress writing the geometry. Can be useful for converting partial
+    results for a static geometry.
 
 Note
     - no parallel data.
@@ -66,24 +74,30 @@ using namespace Foam;
 
 int main(int argc, char *argv[])
 {
-    // with -constant and -zeroTime
+    // enable -constant
+    // probably don't need -zeroTime though, since the fields are vetted
+    // afterwards anyhow
     timeSelector::addOptions(true, false);
     argList::noParallel();
     argList::validOptions.insert("ascii", "");
+    argList::validOptions.insert("index",  "start");
+    argList::validOptions.insert("noMesh", "");
 
-    const label nTypes = 2;
-    const word fieldTypes[] =
-    {
-        volScalarField::typeName,
-        volVectorField::typeName
-    };
+    // the volume field types that we handle
+    wordHashSet volFieldTypes;
+    volFieldTypes.insert(volScalarField::typeName);
+    volFieldTypes.insert(volVectorField::typeName);
+    volFieldTypes.insert(volSphericalTensorField::typeName);
+    volFieldTypes.insert(volSymmTensorField::typeName);
+    volFieldTypes.insert(volTensorField::typeName);
 
-    const label nSprayFieldTypes = 2;
-    const word sprayFieldTypes[] =
-    {
-        scalarIOField::typeName,
-        vectorIOField::typeName
-    };
+    // the lagrangian field types that we handle
+    wordHashSet cloudFieldTypes;
+    cloudFieldTypes.insert(scalarIOField::typeName);
+    cloudFieldTypes.insert(vectorIOField::typeName);
+    cloudFieldTypes.insert(tensorIOField::typeName);
+
+    const char* geometryName = "geometry";
 
 #   include "setRootCase.H"
 #   include "createTime.H"
@@ -93,10 +107,22 @@ int main(int argc, char *argv[])
 
     // default to binary output, unless otherwise specified
     IOstream::streamFormat format = IOstream::BINARY;
-    if (args.options().found("ascii"))
+    if (args.optionFound("ascii"))
     {
         format = IOstream::ASCII;
     }
+
+    // control for renumbering iterations
+    bool optIndex = false;
+    label indexingNumber = 0;
+    if (args.optionFound("index"))
+    {
+        optIndex = true;
+        indexingNumber = args.optionRead<label>("index");
+    }
+
+    // always write the geometry, unless the -noMesh option is specified
+    bool optNoMesh = args.optionFound("noMesh");
 
     fileName ensightDir = args.rootPath()/args.globalCaseName()/"Ensight";
     fileName dataDir = ensightDir/"data";
@@ -104,14 +130,26 @@ int main(int argc, char *argv[])
     fileName dataMask = fileName("data")/ensightFile::mask();
 
     // Ensight and Ensight/data directories must exist
-    if (dir(ensightDir))
+    // do not remove old data - we might wish to convert new results
+    // or a particular time interval
+    if (isDir(ensightDir))
     {
-        rmDir(ensightDir);
+        Info<<"Warning: reusing existing directory" << nl
+            << "    " << ensightDir << endl;
     }
     mkDir(ensightDir);
     mkDir(dataDir);
 
-#   include "createMesh.H"
+#   include "createNamedMesh.H"
+
+    // Mesh instance (region0 gets filtered out)
+    fileName regionPrefix;
+
+    if (regionName != polyMesh::defaultRegion)
+    {
+        regionPrefix = regionName;
+    }
+
     // Construct the list of ensight parts for the entire mesh
     ensightParts partsList(mesh);
 
@@ -125,58 +163,30 @@ int main(int argc, char *argv[])
     }
 
 #   include "checkHasMovingMesh.H"
-#   include "checkHasLagrangian.H"
+#   include "findFields.H"
 
-    // only take the objects that exists at the end of the calculation
-    IOobjectList objects(mesh, timeDirs[timeDirs.size()-1].name());
-    IOobjectList sprayObjects(mesh, timeDirs[timeDirs.size()-1].name(), "lagrangian");
-
-    // write single geometry or one per time step
-    fileName geometryFileName("geometry");
-    if (hasMovingMesh)
+    if (hasMovingMesh && optNoMesh)
     {
-        geometryFileName = dataMask/geometryFileName;
+        Info<< "mesh is moving: ignoring '-noMesh' option" << endl;
+        optNoMesh = false;
     }
 
-    // the case file is always ASCII
-    Info << "write case: " << caseFileName.c_str() << endl;
 
-    OFstream caseFile
-    (
-        ensightDir/caseFileName,
-        ios_base::out|ios_base::trunc,
-        IOstream::ASCII
-    );
-    caseFile.setf(ios_base::left);
-    caseFile
-        << "FORMAT" << nl
-        << setw(16) << "type:" << "ensight gold" << nl << nl
-        << "GEOMETRY" << nl
-        << setw(16) << "model: 1" << geometryFileName.c_str() << nl;
-
-    if (hasLagrangian)
-    {
-        caseFile
-            << setw(16) << "measured: 2"
-            << fileName(dataMask/"lagrangian"/"positions").c_str() << nl;
-    }
-    caseFile
-        << nl << "VARIABLE" << nl;
-
-    label nFieldTime = timeDirs.size();
-    if (nFieldTime < 0)
-    {
-        nFieldTime = 0;
-    }
-
-    List<label> fieldFileNumbers(nFieldTime);
-    List<label> sprayFileNumbers(nFieldTime);
-
-    // map used times used
+    // map times used
     Map<scalar>  timeIndices;
 
-    nFieldTime = 0;
-    label nSprayTime = 0;
+    // Track the time indices used by the volume fields
+    DynamicList<label> fieldTimesUsed;
+
+    // Track the time indices used by each cloud
+    HashTable<DynamicList<label> > cloudTimesUsed;
+
+    // Create a new DynamicList for each cloud
+    forAllConstIter(HashTable<HashTable<word> >, cloudFields, cloudIter)
+    {
+        cloudTimesUsed.insert(cloudIter.key(), DynamicList<label>());
+    }
+
 
     forAll(timeDirs, timeI)
     {
@@ -184,7 +194,8 @@ int main(int argc, char *argv[])
 
 #       include "getTimeIndex.H"
 
-        fieldFileNumbers[nFieldTime++] = timeIndex;
+        // remember the time index
+        fieldTimesUsed.append(timeIndex);
 
         // the data/ITER subdirectory must exist
         fileName subDir = ensightFile::subDir(timeIndex);
@@ -200,300 +211,214 @@ int main(int argc, char *argv[])
 
 #       include "moveMesh.H"
 
-        if (nFieldTime == 1 || mesh.moving())
+        if (timeI == 0 || mesh.moving())
         {
-            if (hasMovingMesh)
-            {
-                geometryFileName = dataDir/subDir/"geometry";
-            }
             if (mesh.moving())
             {
                 partsList.recalculate(mesh);
             }
 
-            ensightGeoFile geoFile(ensightDir/geometryFileName, format);
-            partsList.writeGeometry(geoFile);
-            Info << nl;
+            if (!optNoMesh)
+            {
+                fileName geomDir;
+                if (hasMovingMesh)
+                {
+                    geomDir = dataDir/subDir;
+                }
+
+                ensightGeoFile geoFile(ensightDir/geomDir/geometryName, format);
+                partsList.writeGeometry(geoFile);
+                Info<< nl;
+            }
         }
 
-        Info<< "write volume field: " << flush;
+        Info<< "write volume field (" << flush;
 
-        for (label i=0; i < nTypes; i++)
+        forAllConstIter(HashTable<word>, volumeFields, fieldIter)
         {
-            wordList fieldNames = objects.names(fieldTypes[i]);
+            const word& fieldName = fieldIter.key();
+            const word& fieldType = fieldIter();
 
-            forAll (fieldNames, fieldI)
+            IOobject fieldObject
+            (
+                fieldName,
+                mesh.time().timeName(),
+                mesh,
+                IOobject::MUST_READ,
+                IOobject::NO_WRITE
+            );
+
+            if (fieldType == volScalarField::typeName)
             {
-                word fieldName = fieldNames[fieldI];
+                ensightVolField<scalar>
+                (
+                    partsList,
+                    fieldObject,
+                    mesh,
+                    dataDir,
+                    subDir,
+                    format
+                );
 
-#               include "checkHasValidField.H"
+            }
+            else if (fieldType == volVectorField::typeName)
+            {
+                ensightVolField<vector>
+                (
+                    partsList,
+                    fieldObject,
+                    mesh,
+                    dataDir,
+                    subDir,
+                    format
+                );
 
-                if (!hasValidField)
+            }
+            else if (fieldType == volSphericalTensorField::typeName)
+            {
+                ensightVolField<sphericalTensor>
+                (
+                    partsList,
+                    fieldObject,
+                    mesh,
+                    dataDir,
+                    subDir,
+                    format
+                );
+
+            }
+            else if (fieldType == volSymmTensorField::typeName)
+            {
+                ensightVolField<symmTensor>
+                (
+                    partsList,
+                    fieldObject,
+                    mesh,
+                    dataDir,
+                    subDir,
+                    format
+                );
+            }
+            else if (fieldType == volTensorField::typeName)
+            {
+                ensightVolField<tensor>
+                (
+                    partsList,
+                    fieldObject,
+                    mesh,
+                    dataDir,
+                    subDir,
+                    format
+                );
+            }
+        }
+        Info<< " )" << endl;
+
+        // check for clouds
+        forAllConstIter(HashTable<HashTable<word> >, cloudFields, cloudIter)
+        {
+            const word& cloudName = cloudIter.key();
+
+            if
+            (
+                !isDir
+                (
+                    runTime.timePath()/regionPrefix/
+                    cloud::prefix/cloudName
+                )
+            )
+            {
+                continue;
+            }
+
+            IOobjectList cloudObjs
+            (
+                mesh,
+                runTime.timeName(),
+                cloud::prefix/cloudName
+            );
+
+            // check that the positions field is present for this time
+            if (cloudObjs.lookup("positions"))
+            {
+                ensightParticlePositions
+                (
+                    mesh,
+                    dataDir,
+                    subDir,
+                    cloudName,
+                    format
+                );
+            }
+            else
+            {
+                continue;
+            }
+
+            Info<< "write " << cloudName << " (" << flush;
+
+            forAllConstIter(HashTable<word>, cloudIter(), fieldIter)
+            {
+                const word& fieldName = fieldIter.key();
+                const word& fieldType = fieldIter();
+
+                IOobject *fieldObject = cloudObjs.lookup(fieldName);
+
+                if (!fieldObject)
                 {
+                    Info<< "missing "
+                        << runTime.timeName()/cloud::prefix/cloudName
+                        / fieldName
+                        << endl;
                     continue;
                 }
 
-                IOobject fieldObject
-                (
-                    fieldName,
-                    mesh.time().timeName(),
-                    mesh,
-                    IOobject::MUST_READ,
-                    IOobject::NO_WRITE
-                );
-
-                if (fieldTypes[i] == volScalarField::typeName)
+                if (fieldType == scalarIOField::typeName)
                 {
-                    if (nFieldTime == 1)
-                    {
-                        ensightCaseEntry<scalar>
-                        (
-                            caseFile,
-                            fieldObject,
-                            dataMask
-                        );
-                    }
-
-                    ensightVolField<scalar>
+                    ensightLagrangianField<scalar>
                     (
-                        partsList,
-                        fieldObject,
-                        mesh,
+                        *fieldObject,
                         dataDir,
                         subDir,
+                        cloudName,
                         format
                     );
 
                 }
-                else if (fieldTypes[i] == volVectorField::typeName)
+                else if (fieldType == vectorIOField::typeName)
                 {
-                    if (nFieldTime == 1)
-                    {
-                        ensightCaseEntry<vector>
-                        (
-                            caseFile,
-                            fieldObject,
-                            dataMask
-                        );
-                    }
-
-                    ensightVolField<vector>
+                    ensightLagrangianField<vector>
                     (
-                        partsList,
-                        fieldObject,
-                        mesh,
+                        *fieldObject,
                         dataDir,
                         subDir,
+                        cloudName,
                         format
                     );
 
                 }
-                else if (fieldTypes[i] == volSphericalTensorField::typeName)
+                else if (fieldType == tensorIOField::typeName)
                 {
-                    if (nFieldTime == 1)
-                    {
-                        ensightCaseEntry<sphericalTensor>
-                        (
-                            caseFile,
-                            fieldObject,
-                            dataMask
-                        );
-                    }
-
-                    ensightVolField<sphericalTensor>
+                    ensightLagrangianField<tensor>
                     (
-                        partsList,
-                        fieldObject,
-                        mesh,
+                        *fieldObject,
                         dataDir,
                         subDir,
-                        format
-                    );
-
-                }
-                else if (fieldTypes[i] == volSymmTensorField::typeName)
-                {
-                    if (nFieldTime == 1)
-                    {
-                        ensightCaseEntry<symmTensor>
-                        (
-                            caseFile,
-                            fieldObject,
-                            dataMask
-                        );
-                    }
-
-                    ensightVolField<symmTensor>
-                    (
-                        partsList,
-                        fieldObject,
-                        mesh,
-                        dataDir,
-                        subDir,
-                        format
-                    );
-
-                }
-                else if (fieldTypes[i] == volTensorField::typeName)
-                {
-                    if (nFieldTime == 1)
-                    {
-                        ensightCaseEntry<tensor>
-                        (
-                            caseFile,
-                            fieldObject,
-                            dataMask
-                        );
-                    }
-
-                    ensightVolField<tensor>
-                    (
-                        partsList,
-                        fieldObject,
-                        mesh,
-                        dataDir,
-                        subDir,
+                        cloudName,
                         format
                     );
 
                 }
             }
-        }
-        Info<< endl;
 
+            Info<< " )" << endl;
 
-        if (hasLagrangian)
-        {
-            // check that the positions field is present for this time
-            {
-                IOobject ioHeader
-                (
-                    "positions",
-                    mesh.time().timeName(),
-                    "lagrangian",
-                    mesh,
-                    IOobject::NO_READ
-                );
-
-                if (ioHeader.headerOk())
-                {
-                    sprayFileNumbers[nSprayTime++] = timeIndex;
-                }
-            }
-
-            Info<< "write  spray field: " << flush;
-
-            ensightParticlePositions
-            (
-                mesh,
-                dataDir,
-                subDir,
-                format
-            );
-
-            for (label i=0; i < nSprayFieldTypes; i++)
-            {
-                wordList fieldNames = sprayObjects.names(sprayFieldTypes[i]);
-
-                forAll (fieldNames, fieldI)
-                {
-                    word fieldName = fieldNames[fieldI];
-
-#                   include "checkHasSprayField.H"
-
-                    if (!hasSprayField)
-                    {
-                        continue;
-                    }
-
-                    IOobject fieldObject
-                    (
-                        fieldName,
-                        mesh.time().timeName(),
-                        "lagrangian",
-                        mesh,
-                        IOobject::MUST_READ,
-                        IOobject::NO_WRITE
-                    );
-
-                    if (sprayFieldTypes[i] == scalarIOField::typeName)
-                    {
-                        if (nSprayTime == 1)
-                        {
-                            ensightCaseEntry<scalar>
-                            (
-                                caseFile,
-                                fieldObject,
-                                dataMask,
-                                true
-                            );
-                        }
-
-                        ensightSprayField<scalar>
-                        (
-                            fieldObject,
-                            dataDir,
-                            subDir,
-                            format
-                        );
-
-                    }
-                    else if (sprayFieldTypes[i] == vectorIOField::typeName)
-                    {
-                        if (nSprayTime == 1)
-                        {
-                            ensightCaseEntry<vector>
-                            (
-                                caseFile,
-                                fieldObject,
-                                dataMask,
-                                true
-                            );
-                        }
-
-                        ensightSprayField<vector>
-                        (
-                            fieldObject,
-                            dataDir,
-                            subDir,
-                            format
-                        );
-
-                    }
-                    else if (sprayFieldTypes[i] == tensorIOField::typeName)
-                    {
-                        if (nSprayTime == 1)
-                        {
-                            ensightCaseEntry<tensor>
-                            (
-                                caseFile,
-                                fieldObject,
-                                dataMask,
-                                true
-                            );
-                        }
-
-                        ensightSprayField<tensor>
-                        (
-                            fieldObject,
-                            dataDir,
-                            subDir,
-                            format
-                        );
-
-                    }
-                }
-            }
-            Info<< endl;
+            // remember the time index
+            cloudTimesUsed[cloudName].append(timeIndex);
         }
     }
 
-    fieldFileNumbers.setSize(nFieldTime);
-    sprayFileNumbers.setSize(nSprayTime);
-
-    // add time values
-    caseFile << nl << "TIME" << nl;
-#   include "ensightCaseTimes.H"
+#   include "ensightOutputCase.H"
 
     Info<< "\nEnd\n"<< endl;
 

@@ -7,7 +7,7 @@
      ==
         fvc::div(phi/fvc::interpolate(rho)*fvc::interpolate(p))
       - p*fvc::div(phi/fvc::interpolate(rho))
-      + radiation->Sh(thermo())
+      + radiation->Sh(thermo)
     );
 
     hEqn.relax();
@@ -15,7 +15,7 @@
     eqnResidual = hEqn.solve().initialResidual();
     maxResidual = max(eqnResidual, maxResidual);
 
-    thermo->correct();
+    thermo.correct();
 
     radiation->correct();
 }

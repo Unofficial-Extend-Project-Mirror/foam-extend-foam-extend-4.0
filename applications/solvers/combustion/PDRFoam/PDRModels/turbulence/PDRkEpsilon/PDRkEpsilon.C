@@ -25,9 +25,10 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "PDRkEpsilon.H"
-#include "wallFvPatch.H"
 #include "PDRDragModel.H"
 #include "addToRunTimeSelectionTable.H"
+
+#include "backwardsCompatibilityWallFunctions.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,7 +51,7 @@ PDRkEpsilon::PDRkEpsilon
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& phi,
-    basicThermo& thermophysicalModel
+    const basicThermo& thermophysicalModel
 )
 :
     RASModel(typeName, rho, U, phi, thermophysicalModel),
@@ -82,29 +83,29 @@ PDRkEpsilon::PDRkEpsilon
             1.92
         )
     ),
-    alphak_
+    sigmak_
     (
         dimensioned<scalar>::lookupOrAddToDict
         (
-            "alphak",
+            "sigmak",
             coeffDict_,
             1.0
         )
     ),
-    alphaEps_
+    sigmaEps_
     (
         dimensioned<scalar>::lookupOrAddToDict
         (
-            "alphaEps",
+            "sigmaEps",
             coeffDict_,
-            0.76923
+            1.3
         )
     ),
-    alphah_
+    Prt_
     (
         dimensioned<scalar>::lookupOrAddToDict
         (
-            "alphah",
+            "Prt",
             coeffDict_,
             1.0
         )
@@ -147,9 +148,26 @@ PDRkEpsilon::PDRkEpsilon
             IOobject::NO_WRITE
         ),
         Cmu_*rho_*sqr(k_)/(epsilon_ + epsilonSmall_)
+    ),
+
+    alphat_
+    (
+        IOobject
+        (
+            "alphat",
+            runTime_.timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        autoCreateAlphat("alphat", mesh_)
     )
 {
-#   include "wallViscosityI.H"
+    mut_ = Cmu_*rho_*sqr(k_)/(epsilon_ + epsilonSmall_);
+    mut_.correctBoundaryConditions();
+
+    alphat_ = mut_/Prt_;
+    alphat_.correctBoundaryConditions();
 
     printCoeffs();
 }
@@ -214,9 +232,9 @@ bool PDRkEpsilon::read()
         Cmu_.readIfPresent(coeffDict_);
         C1_.readIfPresent(coeffDict_);
         C2_.readIfPresent(coeffDict_);
-        alphak_.readIfPresent(coeffDict_);
-        alphaEps_.readIfPresent(coeffDict_);
-        alphah_.readIfPresent(coeffDict_);
+        sigmak_.readIfPresent(coeffDict());
+        sigmaEps_.readIfPresent(coeffDict());
+        Prt_.readIfPresent(coeffDict());
 
         return true;
     }
@@ -233,7 +251,12 @@ void PDRkEpsilon::correct()
     {
         // Re-calculate viscosity
         mut_ = rho_*Cmu_*sqr(k_)/(epsilon_ + epsilonSmall_);
-#       include "wallViscosityI.H"
+        mut_.correctBoundaryConditions();
+
+        // Re-calculate thermal diffusivity
+        alphat_ = mut_/Prt_;
+        alphat_.correctBoundaryConditions();
+
         return;
     }
 
@@ -250,6 +273,9 @@ void PDRkEpsilon::correct()
     volScalarField G = 2*mut_*(tgradU() && dev(symm(tgradU())));
     tgradU.clear();
 
+    // Update espsilon and G at the wall
+    epsilon_.boundaryField().updateCoeffs();
+
     // Add the blockage generation term so that it is included consistently
     // in both the k and epsilon equations
     const volScalarField& betav = U_.db().lookupObject<volScalarField>("betav");
@@ -258,8 +284,6 @@ void PDRkEpsilon::correct()
         U_.db().lookupObject<PDRDragModel>("PDRDragModel");
 
     volScalarField GR = drag.Gk();
-
-#   include "wallFunctionsI.H"
 
     // Dissipation equation
     tmp<fvScalarMatrix> epsEqn
@@ -273,9 +297,9 @@ void PDRkEpsilon::correct()
       - fvm::Sp(C2_*betav*rho_*epsilon_/k_, epsilon_)
     );
 
-#   include "wallDissipationI.H"
-
     epsEqn().relax();
+
+    epsEqn().boundaryManipulate(epsilon_.boundaryField());
 
     solve(epsEqn);
     bound(epsilon_, epsilon0_);
@@ -298,12 +322,13 @@ void PDRkEpsilon::correct()
     solve(kEqn);
     bound(k_, k0_);
 
-
     // Re-calculate viscosity
     mut_ = rho_*Cmu_*sqr(k_)/epsilon_;
+    mut_.correctBoundaryConditions();
 
-#   include "wallViscosityI.H"
-
+    // Re-calculate thermal diffusivity
+    alphat_ = mut_/Prt_;
+    alphat_.correctBoundaryConditions();
 }
 
 

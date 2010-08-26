@@ -26,10 +26,9 @@ Application
     libuserd-foam
 
 Description
-    Module for EnSight 7.6 to read FOAM data directly without translation
+    EnSight library module to read OpenFOAM data directly without translation
 
-    It can currently handle cells of type:
-    Z_HEX08, Z_PEN06, Z_TET04, Z_PUR05
+    It can currently handle most cell types.
 
     See also: README_USERD_2.0
     24 Sep 2001: NN - Added support for Ensight API 2.0

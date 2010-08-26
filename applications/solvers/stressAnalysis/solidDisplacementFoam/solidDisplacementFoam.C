@@ -43,7 +43,6 @@ Description
 
 int main(int argc, char *argv[])
 {
-
 #   include "setRootCase.H"
 
 #   include "createTime.H"
@@ -57,7 +56,7 @@ int main(int argc, char *argv[])
 
     Info<< "\nCalculating displacement field\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.loop())
     {
         Info<< "Iteration: " << runTime.value() << nl << endl;
 
@@ -91,7 +90,7 @@ int main(int argc, char *argv[])
                     const volScalarField& T = Tptr();
                     DEqn += fvc::grad(threeKalpha*T);
                 }
-                
+
                 //DEqn.setComponentReference(1, 0, vector::X, 0);
                 //DEqn.setComponentReference(1, 0, vector::Z, 0);
 
@@ -132,7 +131,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

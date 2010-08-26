@@ -35,7 +35,7 @@ int USERD_get_gold_part_build_info
     for(label i=0; i<nPatches; i++)
     {
         word patchName(meshPtr->boundary()[i].name());
-        strncpy(part_descriptions[i+1], patchName.c_str(), Z_BUFL);   
+        strncpy(part_descriptions[i+1], patchName.c_str(), Z_BUFL);
     }
 
     label nHex08 = 0;
@@ -101,7 +101,7 @@ int USERD_get_gold_part_build_info
         */
 
     number_of_nodes[0] = meshPtr->nPoints();
-    
+
     const polyBoundaryMesh& bMesh = meshPtr->boundaryMesh();
 
     for(label i=0; i<nPatches; i++)
@@ -137,7 +137,12 @@ int USERD_get_gold_part_build_info
 
     if (Numparts_available > nPatches+1)
     {
-        strncpy(part_descriptions[nPatches+1], sprayName.c_str(), Z_BUFL);
+        strncpy
+        (
+            part_descriptions[nPatches+1],
+            cloud::prefix.c_str(),
+            Z_BUFL
+        );
         number_of_elements[nPatches+1][Z_POINT] = sprayPtr->size();
         number_of_nodes[nPatches+1] = sprayPtr->size();
     }

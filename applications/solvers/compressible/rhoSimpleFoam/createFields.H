@@ -1,9 +1,10 @@
     Info<< "Reading thermophysical properties\n" << endl;
 
-    autoPtr<basicThermo> thermo
+    autoPtr<basicPsiThermo> pThermo
     (
-        basicThermo::New(mesh)
+        basicPsiThermo::New(mesh)
     );
+    basicPsiThermo& thermo = pThermo();
 
     volScalarField rho
     (
@@ -15,12 +16,12 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        thermo->rho()
+        thermo.rho()
     );
 
-    volScalarField& p = thermo->p();
-    volScalarField& h = thermo->h();
-
+    volScalarField& p = thermo.p();
+    volScalarField& h = thermo.h();
+    const volScalarField& psi = thermo.psi();
 
     Info<< "Reading field U\n" << endl;
     volVectorField U
@@ -43,9 +44,14 @@
     scalar pRefValue = 0.0;
     setRefCell(p, mesh.solutionDict().subDict("SIMPLE"), pRefCell, pRefValue);
 
-    dimensionedScalar pMin
+    dimensionedScalar rhoMax
     (
-        mesh.solutionDict().subDict("SIMPLE").lookup("pMin")
+        mesh.solutionDict().subDict("SIMPLE").lookup("rhoMax")
+    );
+
+    dimensionedScalar rhoMin
+    (
+        mesh.solutionDict().subDict("SIMPLE").lookup("rhoMin")
     );
 
     Info<< "Creating turbulence model\n" << endl;
@@ -56,7 +62,7 @@
             rho,
             U,
             phi,
-            thermo()
+            thermo
         )
     );
 

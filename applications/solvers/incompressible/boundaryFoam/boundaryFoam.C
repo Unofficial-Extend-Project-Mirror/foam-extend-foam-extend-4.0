@@ -26,8 +26,8 @@ Application
     boundaryFoam
 
 Description
-    Steady-state solver for 1D turbulent flow, typically to generate boundary 
-    layer conditions at an inlet, for use in a simulation. 
+    Steady-state solver for 1D turbulent flow, typically to generate boundary
+    layer conditions at an inlet, for use in a simulation.
 
     Boundary layer code to calculate the U, k and epsilon distributions.
     Used to create inlet boundary conditions for experimental comparisons
@@ -37,8 +37,8 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "incompressible/singlePhaseTransportModel/singlePhaseTransportModel.H"
-#include "incompressible/RASModel/RASModel.H"
+#include "singlePhaseTransportModel.H"
+#include "RASModel.H"
 #include "wallFvPatch.H"
 #include "makeGraph.H"
 
@@ -47,7 +47,6 @@ Description
 
 int main(int argc, char *argv[])
 {
-
 #   include "setRootCase.H"
 
 #   include "createTime.H"
@@ -58,7 +57,7 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
@@ -82,11 +81,14 @@ int main(int argc, char *argv[])
         U += (Ubar - UbarStar);
         gradP += (Ubar - UbarStar)/(1.0/UEqn.A())().weightedAverage(mesh.V());
 
+        label id = y.size() - 1;
+
         scalar wallShearStress =
-            flowDirection & turbulence->R()()[0] & wallNormal;
+            flowDirection & turbulence->R()()[id] & wallNormal;
 
         scalar yplusWall
-            = Foam::sqrt(mag(wallShearStress))*y[0]/laminarTransport.nu()[0];
+//            = Foam::sqrt(mag(wallShearStress))*y[id]/laminarTransport.nu()()[id];
+            = Foam::sqrt(mag(wallShearStress))*y[id]/turbulence->nuEff()()[id];
 
         Info<< "Uncorrected Ubar = " << (flowDirection & UbarStar.value())<< tab
             << "pressure gradient = " << (flowDirection & gradP.value()) << tab
@@ -141,7 +143,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

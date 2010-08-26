@@ -29,6 +29,7 @@ Description
     Calculates and writes the second largest eigenvalue of the sum of the
     square of the symmetrical and anti-symmetrical parts of the velocity
     gradient tensor.
+
     The -noWrite option has no meaning.
 
 \*---------------------------------------------------------------------------*/
@@ -78,6 +79,8 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
     {
         Info<< "    No U" << endl;
     }
+
+    Info<< "\nEnd\n" << endl;
 }
 
 

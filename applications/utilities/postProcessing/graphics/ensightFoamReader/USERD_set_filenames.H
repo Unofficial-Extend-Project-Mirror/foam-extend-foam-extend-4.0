@@ -47,7 +47,7 @@ int USERD_set_filenames
     }
     caseDir = tmp;
 
-    if (!dir(rootDir/caseDir))
+    if (!isDir(rootDir/caseDir))
     {
        Info<< rootDir/caseDir << " is not a valid directory."
            << endl;
@@ -79,18 +79,18 @@ int USERD_set_filenames
     );
 
     // set the available number of time-steps
-    TimeList = (const instantList&)Foam::Time::findTimes(rootDir/caseDir);
+    timeDirs = Foam::Time::findTimes(rootDir/caseDir);
 
-    Num_time_steps = TimeList.size() - 1;
+    Num_time_steps = timeDirs.size() - 1;
 
     nPatches = meshPtr->boundaryMesh().size();
 
     // set the number of fields and store their names
     // a valid field must exist for all time-steps
-    runTime.setTime(TimeList[TimeList.size()-1], TimeList.size()-1);
+    runTime.setTime(timeDirs[timeDirs.size()-1], timeDirs.size()-1);
     IOobjectList objects(*meshPtr, runTime.timeName());
 
-    fieldNames = (const wordList&)objects.names();
+    fieldNames = objects.names();
 
     // because of the spray being a 'field' ...
     // get the availabe number of variables and
@@ -144,17 +144,17 @@ int USERD_set_filenames
         }
         isTensor[n] = isitTensor;
     }
-    
+
     bool lagrangianNamesFound = false;
     label n = 0;
-    while ((!lagrangianNamesFound) && (n<Num_time_steps))
+    while (!lagrangianNamesFound && n < Num_time_steps)
     {
-        runTime.setTime(TimeList[n+1], n+1);
+        runTime.setTime(timeDirs[n+1], n+1);
 
         Cloud<passiveParticle> lagrangian(*meshPtr);
 
         n++;
-        if (lagrangian.size()>0)
+        if (lagrangian.size())
         {
             lagrangianNamesFound = true;
         }
@@ -164,7 +164,7 @@ int USERD_set_filenames
     (
         "positions",
         runTime.timeName(),
-        "lagrangian",
+        cloud::prefix,
         runTime,
         IOobject::NO_READ,
         IOobject::NO_WRITE,
@@ -176,10 +176,10 @@ int USERD_set_filenames
         Info << "[Found lagrangian]" << endl;
 
         delete sprayPtr;
-        
+
         sprayPtr = new Cloud<passiveParticle>(*meshPtr);
 
-        IOobjectList objects(*meshPtr, runTime.timeName(), "lagrangian");
+        IOobjectList objects(*meshPtr, runTime.timeName(), cloud::prefix);
 
         lagrangianScalarNames =
             (const wordList&)objects.names(sprayScalarFieldName);
@@ -195,7 +195,7 @@ int USERD_set_filenames
     }
 
     Current_time_step = Num_time_steps;
-    runTime.setTime(TimeList[Current_time_step], Current_time_step);
+    runTime.setTime(timeDirs[Current_time_step], Current_time_step);
 
     Num_variables = nVar + nSprayVariables;
     Numparts_available = Num_unstructured_parts + Num_structured_parts + nPatches;

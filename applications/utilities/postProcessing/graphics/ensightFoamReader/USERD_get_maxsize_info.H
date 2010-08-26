@@ -8,7 +8,7 @@ int USERD_get_maxsize_info
     return Z_ERR; 
 
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_maxsize_info" << endl << flush;
+    Info << "Entering: USERD_get_maxsize_info" << endl;
 #endif
 
     label maxNPoints = 0;
@@ -19,9 +19,9 @@ int USERD_get_maxsize_info
     label nPyr05Max = 0;
     label nTet04Max = 0;
 
-    Info << "Checking all time steps for EnSight memory allocation purpose. This can take some time." << endl;
+    Info<< "Checking all time steps for EnSight memory allocation purpose. This can take some time." << endl;
 
-    for (label t=1; t < TimeList.size(); t++)
+    for (label timeI=1; timeI < timeDirs.size(); ++timeI)
     {
 
         label nPen06 = 0;
@@ -29,21 +29,21 @@ int USERD_get_maxsize_info
         label nPyr05 = 0;
         label nTet04 = 0;
 
-        runTimePtr->setTime(TimeList[t], t);
+        runTimePtr->setTime(timeDirs[timeI], timeI);
 
-        Info << "Checking time = " << TimeList[t].value() << endl << flush;
+        Info<< "Checking time = " << runTimePtr->timeName() << endl;
 
         const cellShapeList& cells = meshPtr->cellShapes();
         
-        label nPoints = meshPtr->nPoints();
-        label nCells = cells.size();
+        const label nPoints = meshPtr->nPoints();
+        const label nCells  = cells.size();
         
         maxNPoints = max(maxNPoints, nPoints);
 
         for (label n=0; n<nCells;n++)
         {
             label nFaces = cells[n].nFaces();
-            labelList points = cells[n];
+            const labelList& points = cells[n];
 
             if ((nFaces == 6) && (points.size() == 8))
             {
@@ -70,7 +70,6 @@ int USERD_get_maxsize_info
 
         if (Numparts_available > 1)
         {
-
             // Get the maximum number of spray parcels
             // and store it
             Cloud<passiveParticle> lagrangian(*meshPtr);
@@ -79,9 +78,7 @@ int USERD_get_maxsize_info
             {
                 nMaxParcels = lagrangian.size();
             }
-
         }
-
     }
 
     max_number_of_nodes[0] = maxNPoints;
@@ -97,7 +94,7 @@ int USERD_get_maxsize_info
     }
 
 #ifdef ENSIGHTDEBUG
-    Info << "Leaving: USERD_get_maxsize_info" << endl << flush;
+    Info<< "Leaving: USERD_get_maxsize_info" << endl;
 #endif
 
     return Z_OK;

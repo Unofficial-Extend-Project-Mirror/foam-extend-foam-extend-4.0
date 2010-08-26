@@ -20,18 +20,30 @@ void USERD_set_time_set_and_step
 
         if (time_step == 0)
         {
-            runTime.setTime(TimeList[Current_time_step], Current_time_step);
+            runTime.setTime
+            (
+                timeDirs[Current_time_step],
+                Current_time_step
+            );
         }
         else
         {
-            runTime.setTime(TimeList[Current_time_step + 1], Current_time_step + 1);
+            runTime.setTime
+            (
+                timeDirs[Current_time_step + 1],
+                Current_time_step + 1
+            );
         }
 
         meshPtr->readUpdate();
 
         if (time_step == 0)
         {
-            runTime.setTime(TimeList[Current_time_step + 1], Current_time_step + 1);
+            runTime.setTime
+            (
+                timeDirs[Current_time_step + 1],
+                Current_time_step + 1
+            );
         }
 
         if (Numparts_available > nPatches+1)

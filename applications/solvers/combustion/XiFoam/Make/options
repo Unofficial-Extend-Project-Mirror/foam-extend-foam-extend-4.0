@@ -1,19 +1,21 @@
 EXE_INC = \
     -I$(LIB_SRC)/engine/lnInclude \
-    -I$(LIB_SRC)/finiteVolume/lnInclude \
-    -I$(LIB_SRC)/sampling/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
-    -I$(LIB_SRC)/thermophysicalModels/combustion/lnInclude \
-    -I$(LIB_SRC)/turbulenceModels/RAS \
-    -I$(LIB_SRC)/thermophysicalModels/laminarFlameSpeed/lnInclude
+    -I$(LIB_SRC)/thermophysicalModels/reactionThermo/lnInclude \
+    -I$(LIB_SRC)/turbulenceModels/compressible/turbulenceModel \
+    -I$(LIB_SRC)/thermophysicalModels/laminarFlameSpeed/lnInclude \
+    -I$(LIB_SRC)/sampling/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude
 
 EXE_LIBS = \
     -lengine \
+    -lcompressibleRASModels \
+    -lcompressibleLESModels \
+    -lbasicThermophysicalModels \
+    -lreactionThermophysicalModels \
+    -lspecie \
+    -llaminarFlameSpeedModels \
     -lfiniteVolume \
     -lmeshTools \
-    -lcompressibleRASModels \
-    -lbasicThermophysicalModels \
-    -lcombustionThermophysicalModels \
-    -lspecie \
-    -llaminarFlameSpeedModels
+    -llduSolvers

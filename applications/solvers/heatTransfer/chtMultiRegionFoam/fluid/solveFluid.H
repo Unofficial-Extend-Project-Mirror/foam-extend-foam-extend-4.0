@@ -1,15 +1,18 @@
-#   include "rhoEqn.H"
-    for (int ocorr=0; ocorr<nOuterCorr; ocorr++)
-    {
-    #   include "UEqn.H"
+if (oCorr == 0)
+{
+    #include "rhoEqn.H"
+}
 
-    #   include "hEqn.H"
+#include "UEqn.H"
 
-     // --- PISO loop
+#include "hEqn.H"
 
-        for (int corr=0; corr<nCorr; corr++)
-        {
-    #       include "pEqn.H"
-        }
-    }
-    turb[i].correct();
+// --- PISO loop
+for (int corr=0; corr<nCorr; corr++)
+{
+    #include "pEqn.H"
+}
+
+turb.correct();
+
+rho = thermo.rho();

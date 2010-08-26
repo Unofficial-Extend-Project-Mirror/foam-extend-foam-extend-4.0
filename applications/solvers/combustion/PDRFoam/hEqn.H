@@ -8,5 +8,5 @@
         betav*DpDt
     );
 
-    thermo->correct();
+    thermo.correct();
 }

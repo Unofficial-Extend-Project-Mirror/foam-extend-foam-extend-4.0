@@ -5,7 +5,6 @@ nVar -= Num_variables - nSprayVariables + lagrangianScalarNames.size();
 
 if (nVar >= 0)
 {
-
     word name = lagrangianVectorNames[nVar];
 
     IOField<vector> v
@@ -14,23 +13,17 @@ if (nVar >= 0)
         (
             name,
             runTime.timeName(),
-            "lagrangian",
+            cloud::prefix,
             mesh,
             IOobject::MUST_READ,
             IOobject::NO_WRITE
         )
     );
 
-    if (v.size() != 0)
+    if (v.size())
     {
-        for
-        (
-            label n = 0;
-            n < v.size();
-            n++
-        )
+        for (label n = 0; n < v.size(); n++)
         {
-
             if (component == 0)
             {
                 var_array[n+1] = v[n].x();
@@ -48,7 +41,7 @@ if (nVar >= 0)
 }
 else
 {
-    //Info << "getLagrangianVector: nVar = " << nVar << endl;
+    // Info<< "getLagrangianVector: nVar = " << nVar << endl;
     return Z_UNDEF;
 }
 

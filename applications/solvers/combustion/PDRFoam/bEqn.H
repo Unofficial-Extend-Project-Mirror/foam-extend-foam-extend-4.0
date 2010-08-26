@@ -1,7 +1,7 @@
 tmp<fv::convectionScheme<scalar> > mvConvection
 (
     fv::convectionScheme<scalar>::New
-    (    
+    (
         mesh,
         fields,
         phi,
@@ -25,7 +25,7 @@ if (ign.ignited())
 
     // Unburnt gas density
     // ~~~~~~~~~~~~~~~~~~~
-    volScalarField rhou = thermo->rhou();
+    volScalarField rhou = thermo.rhou();
 
     // Calculate flame normal etc.
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~

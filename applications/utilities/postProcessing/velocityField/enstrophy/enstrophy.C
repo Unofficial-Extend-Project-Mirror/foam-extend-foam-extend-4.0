@@ -27,6 +27,7 @@ Application
 
 Description
     Calculates and writes the enstrophy of the velocity field U.
+
     The -noWrite option just outputs the max/min values without writing the
     field.
 
@@ -39,7 +40,7 @@ Description
 
 void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
 {
-    bool writeResults = !args.options().found("noWrite");
+    bool writeResults = !args.optionFound("noWrite");
 
     IOobject Uheader
     (
@@ -80,6 +81,8 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
     {
         Info<< "    No U" << endl;
     }
+
+    Info<< "\nEnd\n" << endl;
 }
 
 

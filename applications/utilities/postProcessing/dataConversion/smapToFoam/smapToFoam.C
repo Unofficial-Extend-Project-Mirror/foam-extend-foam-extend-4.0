@@ -24,7 +24,7 @@ License
 
 Description
     Translates a STAR-CD SMAP data file into FOAM field format.
- 
+
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
@@ -108,15 +108,15 @@ int main(int argc, char *argv[])
         List<volScalarField*> sFields
         (
             nCols,
-            reinterpret_cast<volScalarField*>(NULL)
+            reinterpret_cast<volScalarField*>(0)
         );
 
         List<volVectorField*> vFields
         (
             nCols,
-            reinterpret_cast<volVectorField*>(NULL)
+            reinterpret_cast<volVectorField*>(0)
         );
-        
+
         label i=0;
         while (i < nCols)
         {

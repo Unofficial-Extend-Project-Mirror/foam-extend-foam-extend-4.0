@@ -13,6 +13,6 @@ if (ign.ignited())
     //+ fvm::Sp(fvc::div(muEff*fvc::grad(b)/(b + 0.001)), hu)
 
      ==
-        DpDt*rho/thermo->rhou()
+        DpDt*rho/thermo.rhou()
     );
 }

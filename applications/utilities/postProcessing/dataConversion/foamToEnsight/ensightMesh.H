@@ -58,9 +58,8 @@ class argList;
 class ensightMesh
 {
 public:
-
-    class nFacePrimitives
-    {
+        class nFacePrimitives
+        {
         public:
 
             label nPoints;
@@ -75,28 +74,28 @@ public:
                 nQuads(0),
                 nPolys(0)
             {}
-    };
+        };
 
 private:
 
     // Private data
 
+        //- Reference to the OpenFOAM mesh
+        const fvMesh& mesh_;
+
         //- Set binary file output
         bool binary_;
 
-        //- Reference to the OpenFOAM mesh
-        const fvMesh& mesh_;
+        //- The ensight part id for the first patch
+        label patchPartOffset_;
 
         cellSets meshCellSets_;
 
         List<faceSets> boundaryFaceSets_;
 
+        wordList allPatchNames_;
 
-
-
-        HashTable<labelList> allPatchNames_;
-
-        HashTable<label> patchIndices_;
+        List<labelList> allPatchProcs_;
 
         wordHashSet patchNames_;
 
@@ -137,12 +136,33 @@ private:
             OFstream& ensightGeometryFile
         ) const;
 
-        void writePolys
+        void writePolysNFaces
+        (
+            const labelList& polys,
+            const cellList& cellFaces,
+            OFstream& ensightGeometryFile
+        ) const;
+
+        void writePolysNPointsPerFace
+        (
+            const labelList& polys,
+            const cellList& cellFaces,
+            const faceList& faces,
+            OFstream& ensightGeometryFile
+        ) const;
+
+        void writePolysPoints
         (
             const labelList& polys,
             const cellList& cellFaces,
             const faceList& faces,
             const label pointOffset,
+            OFstream& ensightGeometryFile
+        ) const;
+
+        void writeAllPolys
+        (
+            const labelList& pointOffsets,
             OFstream& ensightGeometryFile
         ) const;
 
@@ -157,7 +177,6 @@ private:
 
         void writeFacePrims
         (
-            const char* key,
             const faceList& patchFaces,
             const label pointOffset,
             OFstream& ensightGeometryFile
@@ -172,6 +191,29 @@ private:
         void writeAllFacePrims
         (
             const char* key,
+            const labelList& prims,
+            const label nPrims,
+            const faceList& patchFaces,
+            const labelList& pointOffsets,
+            const labelList& patchProcessors,
+            OFstream& ensightGeometryFile
+        ) const;
+
+        void writeNSidedNPointsPerFace
+        (
+            const faceList& patchFaces,
+            OFstream& ensightGeometryFile
+        ) const;
+
+        void writeNSidedPoints
+        (
+            const faceList& patchFaces,
+            const label pointOffset,
+            OFstream& ensightGeometryFile
+        ) const;
+
+        void writeAllNSided
+        (
             const labelList& prims,
             const label nPrims,
             const faceList& patchFaces,
@@ -212,12 +254,33 @@ private:
             std::ofstream& ensightGeometryFile
         ) const;
 
-        void writePolysBinary
+        void writePolysNFacesBinary
+        (
+            const labelList& polys,
+            const cellList& cellFaces,
+            std::ofstream& ensightGeometryFile
+        ) const;
+
+        void writePolysNPointsPerFaceBinary
+        (
+            const labelList& polys,
+            const cellList& cellFaces,
+            const faceList& faces,
+            std::ofstream& ensightGeometryFile
+        ) const;
+
+        void writePolysPointsBinary
         (
             const labelList& polys,
             const cellList& cellFaces,
             const faceList& faces,
             const label pointOffset,
+            std::ofstream& ensightGeometryFile
+        ) const;
+
+        void writeAllPolysBinary
+        (
+            const labelList& pointOffsets,
             std::ofstream& ensightGeometryFile
         ) const;
 
@@ -234,12 +297,33 @@ private:
 
         void writeFacePrimsBinary
         (
-            const char* key,
             const faceList& patchFaces,
             const label pointOffset,
             std::ofstream& ensightGeometryFile
         ) const;
 
+        void writeNSidedPointsBinary
+        (
+            const faceList& patchFaces,
+            const label pointOffset,
+            std::ofstream& ensightGeometryFile
+        ) const;
+
+        void writeNSidedNPointsPerFaceBinary
+        (
+            const faceList& patchFaces,
+            std::ofstream& ensightGeometryFile
+        ) const;
+
+        void writeAllNSidedBinary
+        (
+            const labelList& prims,
+            const label nPrims,
+            const faceList& patchFaces,
+            const labelList& pointOffsets,
+            const labelList& patchProcessors,
+            std::ofstream& ensightGeometryFile
+        ) const;
 
 public:
 
@@ -249,9 +333,8 @@ public:
         ensightMesh(const fvMesh&, const argList& args, const bool binary);
 
 
-    // Destructor
-
-        ~ensightMesh();
+    //- Destructor
+    ~ensightMesh();
 
 
     // Member Functions
@@ -273,14 +356,14 @@ public:
                 return boundaryFaceSets_;
             }
 
-            const HashTable<labelList>& allPatchNames() const
+            const wordList& allPatchNames() const
             {
                 return allPatchNames_;
             }
 
-            const HashTable<label>& patchIndices() const
+            const List<labelList>& allPatchProcs() const
             {
-                return patchIndices_;
+                return allPatchProcs_;
             }
 
             const wordHashSet& patchNames() const
@@ -291,6 +374,12 @@ public:
             const HashTable<nFacePrimitives>& nPatchPrims() const
             {
                 return nPatchPrims_;
+            }
+
+            //- The ensight part id for the first patch
+            label patchPartOffset() const
+            {
+                return patchPartOffset_;
             }
 
 

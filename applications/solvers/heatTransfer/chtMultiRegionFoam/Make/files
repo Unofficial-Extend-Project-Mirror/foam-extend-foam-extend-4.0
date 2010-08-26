@@ -1,11 +1,10 @@
 regionProperties/regionProperties.C
 
-coupleManager/coupleManager.C
-
 derivedFvPatchFields/solidWallHeatFluxTemperature/solidWallHeatFluxTemperatureFvPatchScalarField.C
-derivedFvPatchFields/solidWallHeatFluxTemperatureCoupled/solidWallHeatFluxTemperatureCoupledFvPatchScalarField.C
-derivedFvPatchFields/solidWallTemperatureCoupled/solidWallTemperatureCoupledFvPatchScalarField.C
 derivedFvPatchFields/solidWallMixedTemperatureCoupled/solidWallMixedTemperatureCoupledFvPatchScalarField.C
+
+fluid/compressibleCourantNo.C
+solid/solidRegionDiffNo.C
 
 chtMultiRegionFoam.C
 

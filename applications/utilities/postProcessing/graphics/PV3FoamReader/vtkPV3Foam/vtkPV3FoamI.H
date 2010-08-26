@@ -37,7 +37,7 @@ inline Foam::word Foam::vtkPV3Foam::getFirstWord(const char* str)
         {
             ++n;
         }
-        return word(str, n);
+        return word(str, n, true);
     }
     else
     {

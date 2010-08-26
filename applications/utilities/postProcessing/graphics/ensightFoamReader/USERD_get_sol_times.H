@@ -10,18 +10,18 @@ int USERD_get_sol_times
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_sol_times" << endl << flush;
-    Info << TimeList << endl;
+    Info<< "Entering: USERD_get_sol_times\n" << timeDirs << endl;
 #endif
+
     for (label n=0; n<Num_time_steps;n++)
     {
-        solution_times[n] = TimeList[n+1].value();
+        solution_times[n] = timeDirs[n+1].value();
     }
 
-    if (TimeList[1].value() < 0)
+    if (timeDirs[1].value() < 0)
     {
         scalar addCAD = 360.0;
-        while (TimeList[1].value() + addCAD < 0.0)
+        while (timeDirs[1].value() + addCAD < 0.0)
         {
             addCAD += 360.0;
         }
@@ -29,14 +29,14 @@ int USERD_get_sol_times
         {
             solution_times[n] += addCAD;
 
-            Info << "Time[" << n << "] = " << TimeList[n+1].value()
+            Info << "Time[" << n << "] = " << timeDirs[n+1].value()
                 << " was corrected to " << solution_times[n]  << endl;
         }
 
     }
 
 #ifdef ENSIGHTDEBUG
-    Info << "Leaving: USERD_get_sol_times" << endl << flush;
+    Info<< "Leaving: USERD_get_sol_times" << endl;
 #endif
 
     return Z_OK;

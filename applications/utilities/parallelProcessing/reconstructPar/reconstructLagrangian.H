@@ -36,6 +36,7 @@ SourceFiles
 #ifndef reconstructLagrangian_H
 #define reconstructLagrangian_H
 
+#include "cloud.H"
 #include "polyMesh.H"
 #include "IOobjectList.H"
 #include "fvMesh.H"

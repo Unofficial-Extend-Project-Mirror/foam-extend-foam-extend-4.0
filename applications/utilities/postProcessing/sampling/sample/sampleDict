@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  dev                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 
@@ -30,17 +30,20 @@ setFormat raw;
 //      dx          : DX scalar or vector format
 //      vtk         : VTK ascii format
 //      raw         : x y z value format for use with e.g. gnuplot 'splot'.
-//      stl         : ascii stl. Does not contain values!
+//
+// Note:
+// other formats such as obj, stl, etc can also be written (by proxy)
+// but without any values!
 surfaceFormat vtk;
 
 // interpolationScheme. choice of
-//	cell          : use cell-centre value only; constant over cells (default)
-//	cellPoint     : use cell-centre and vertex values
-//	cellPointFace : use cell-centre, vertex and face values.
+//      cell          : use cell-centre value only; constant over cells (default)
+//      cellPoint     : use cell-centre and vertex values
+//      cellPointFace : use cell-centre, vertex and face values.
 // 1] vertex values determined from neighbouring cell-centre values
 // 2] face values determined using the current face interpolation scheme
 //    for the field (linear, gamma, etc.)
-interpolationScheme cellPointFace;
+interpolationScheme cellPoint;
 
 // Fields to sample.
 fields
@@ -78,9 +81,9 @@ sets
         type        uniform;
         axis        distance;
 
-        //- cavity
-        start       (0.02 0.051 0.005);
-        end         (0.06 0.051 0.005);
+        //- cavity. Slightly perturbed so not to align with face or edge.
+        start       (0.0201 0.05101 0.00501);
+        end         (0.0601 0.05101 0.00501);
         nPoints     10;
     }
 
@@ -98,10 +101,18 @@ sets
         //end         ( 1 0.05 0.005);
 
         //- cavity
-        start       (0.0 0.51  0.005);
-        end         (2 0.51  0.005);
+        start       (0.001 0.5101  0.00501);
+        end         (2.01 0.5101  0.00501);
         nPoints     10;
     }
+
+    somePoints
+    {
+        type    cloud;
+        axis    xyz;
+        points  ((0.049 0.049 0.00501)(0.051 0.049 0.00501));
+    }
+
 );
 
 
@@ -109,26 +120,24 @@ sets
 //      plane : values on plane defined by point, normal.
 //      patch : values on patch.
 //
-// 1] planes are triangulated by default
-// 2] patches are not triangulated by default
+// 1] patches are not triangulated by default
+// 2] planes are always triangulated
+// 3] iso-surfaces are always triangulated
 surfaces
 (
     constantPlane
     {
-        type            plane;
+        type            plane;    // always triangulated
         basePoint       (0.0501 0.0501 0.005);
         normalVector    (0.1 0.1 1);
 
         //- Optional: restrict to a particular zone
         // zoneName        zone1;
-
-        // Optional: whether to leave as faces or triangulate (=default)
-        triangulate     false;
     }
 
     interpolatedPlane
     {
-        type            plane;
+        type            plane;    // always triangulated
         // make plane relative to the coordinateSystem (Cartesian)
         coordinateSystem
         {
@@ -136,7 +145,6 @@ surfaces
         }
         basePoint       (0 0 0);
         normalVector    (0.1 0.1 1);
-        triangulate     false;
         interpolate     true;
     }
 
@@ -145,6 +153,7 @@ surfaces
         type            patch;
         patchName       movingWall;
         // Optional: whether to leave as faces (=default) or triangulate
+        // triangulate     false;
     }
 
     movingWall_interpolated
@@ -153,23 +162,51 @@ surfaces
         patchName       movingWall;
         interpolate     true;
         // Optional: whether to leave as faces (=default) or triangulate
+        // triangulate     false;
     }
 
-/* not yet (re)implemented --
+    interpolatedIso
+    {
+        // Iso surface for interpolated values only
+        type            isoSurface;    // always triangulated
+        isoField        rho;
+        isoValue        0.5;
+        interpolate     true;
+
+        //zone            ABC;          // Optional: zone only
+        //exposedPatchName fixedWalls;  // Optional: zone only
+
+        // regularise      false;    // Optional: do not simplify
+    }
     constantIso
     {
-        name            iso;
-        field           rho;
-        value           0.5;
+        // Iso surface for constant values.
+        // Triangles guaranteed not to cross cells.
+        type            isoSurfaceCell;    // always triangulated
+        isoField        rho;
+        isoValue        0.5;
+        interpolate     false;
+        regularise      false;              // do not simplify
     }
-    someIso
+
+    triangleCut
     {
-        type            iso;
-        field           rho;
-        value           0.5;
+        // Cutingplane using iso surface
+        type            cuttingPlane;
+        planeType       pointAndNormal;
+        pointAndNormalDict
+        {
+            basePoint       (0.4 0 0.4);
+            normalVector    (1 0.2 0.2);
+        }
         interpolate     true;
+
+        //zone            ABC;          // Optional: zone only
+        //exposedPatchName fixedWalls;  // Optional: zone only
+
+        // regularise      false;    // Optional: do not simplify
     }
- */
+
 );
 
 

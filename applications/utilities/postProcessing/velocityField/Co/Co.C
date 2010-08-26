@@ -28,6 +28,7 @@ Application
 Description
     Calculates and writes the Co number as a surfaceScalarField obtained
     from field phi.
+
     The -noWrite option just outputs the max values without writing the
     field.
 
@@ -38,9 +39,55 @@ Description
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+namespace Foam
+{
+    tmp<volScalarField> Co(const surfaceScalarField& Cof)
+    {
+        const fvMesh& mesh = Cof.mesh();
+
+        tmp<volScalarField> tCo
+        (
+            new volScalarField
+            (
+                IOobject
+                (
+                    "Co",
+                    mesh.time().timeName(),
+                    mesh
+                ),
+                mesh,
+                dimensionedScalar("0", Cof.dimensions(), 0)
+            )
+        );
+
+        volScalarField& Co = tCo();
+
+        // Set local references to mesh data
+        const unallocLabelList& owner = mesh.owner();
+        const unallocLabelList& neighbour = mesh.neighbour();
+
+        forAll(owner, facei)
+        {
+            label own = owner[facei];
+            label nei = neighbour[facei];
+
+            Co[own] = max(Co[own], Cof[facei]);
+            Co[nei] = max(Co[nei], Cof[facei]);
+        }
+
+        forAll(Co.boundaryField(), patchi)
+        {
+            Co.boundaryField()[patchi] = Cof.boundaryField()[patchi];
+        }
+
+        return tCo;
+    }
+}
+
+
 void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
 {
-    bool writeResults = !args.options().found("noWrite");
+    bool writeResults = !args.optionFound("noWrite");
 
     IOobject phiHeader
     (
@@ -79,7 +126,7 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
                 (
                     IOobject
                     (
-                        "Co",
+                        "Cof",
                         runTime.timeName(),
                         mesh,
                         IOobject::NO_READ
@@ -101,7 +148,7 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
                 (
                     IOobject
                     (
-                        "Co",
+                        "Cof",
                         runTime.timeName(),
                         mesh,
                         IOobject::NO_READ
@@ -126,26 +173,15 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
         if (writeResults)
         {
             CoPtr().write();
-
-            volVectorField cellCo
-            (
-                IOobject
-                (
-                    "cellCo",
-                    runTime.timeName(),
-                    mesh,
-                    IOobject::NO_READ
-                ),
-                fvc::reconstruct(CoPtr()*mesh.magSf())
-            );
-
-            cellCo.write();
+            Co(CoPtr())().write();
         }
     }
     else
     {
         Info<< "    No phi" << endl;
     }
+
+    Info<< "\nEnd\n" << endl;
 }
 
 // ************************************************************************* //

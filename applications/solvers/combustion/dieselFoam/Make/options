@@ -1,24 +1,24 @@
 EXE_INC = \
     -I../dieselEngineFoam \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
-    -I$(LIB_SRC)/turbulenceModels/RAS \
+    -I$(LIB_SRC)/turbulenceModels/compressible/turbulenceModel \
     -I$(LIB_SRC)/lagrangian/basic/lnInclude \
     -I$(LIB_SRC)/lagrangian/dieselSpray/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/liquids/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/liquidMixture/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/thermophysicalFunctions/lnInclude \
-    -I$(LIB_SRC)/thermophysicalModels/combustion/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/reactionThermo/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/laminarFlameSpeed/lnInclude \
-    -I$(LIB_SRC)/../applications/solvers/combustion/XiFoam \
+    -I$(LIB_SRC)/../applications/solvers/reactionThermo/XiFoam \
     -I$(LIB_SRC)/thermophysicalModels/chemistryModel/lnInclude \
     -I$(LIB_SRC)/ODE/lnInclude
 
 EXE_LIBS = \
     -lcompressibleRASModels \
-    -lcombustionThermophysicalModels \
-    -lfiniteVolume \
+    -lcompressibleLESModels \
+    -lreactionThermophysicalModels \
     -llagrangian \
     -ldieselSpray \
     -lliquids \
@@ -29,4 +29,6 @@ EXE_LIBS = \
     -llaminarFlameSpeedModels \
     -lchemistryModel \
     -lODE \
-    -lpdf
+    -lpdf \
+    -lfiniteVolume \
+    -llduSolvers

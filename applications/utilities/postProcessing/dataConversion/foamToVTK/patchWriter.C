@@ -44,6 +44,7 @@ Foam::patchWriter::patchWriter
     vMesh_(vMesh),
     binary_(binary),
     nearCellValue_(nearCellValue),
+    fName_(fName),
     patchIDs_(patchIDs),
     os_(fName.c_str())
 {
@@ -151,7 +152,7 @@ void Foam::patchWriter::writePatchIDs()
 
         const polyPatch& pp = mesh.boundaryMesh()[patchI];
 
-        if (!isType<emptyPolyPatch>(pp))
+        if (!isA<emptyPolyPatch>(pp))
         {
             writeFuns::insert(scalarField(pp.size(), patchI), fField);
         }

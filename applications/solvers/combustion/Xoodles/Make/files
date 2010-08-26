@@ -1,3 +1,0 @@
-Xoodles.C
-
-EXE = $(FOAM_APPBIN)/Xoodles

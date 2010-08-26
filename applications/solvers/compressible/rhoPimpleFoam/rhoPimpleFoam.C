@@ -23,11 +23,11 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Application
-    rhoSimpleFoam
+    rhoPimpleFoam
 
 Description
-    Transient solver for turbulent flow of compressible fluids for
-    ventilation and heat-transfer.
+    Transient solver for laminar or turbulent flow of compressible fluids
+    for HVAC and similar applications.
 
     Uses the flexible PIMPLE (PISO-SIMPLE) solution for time-resolved and
     pseudo-transient simulations.
@@ -35,9 +35,9 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "basicThermo.H"
-#include "compressible/RASModel/RASModel.H"
-#include "fixedGradientFvPatchFields.H"
+#include "basicPsiThermo.H"
+#include "turbulenceModel.H"
+#include "bound.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,6 +48,8 @@ int main(int argc, char *argv[])
     #include "createMesh.H"
     #include "createFields.H"
     #include "initContinuityErrs.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nStarting time loop\n" << endl;
 
@@ -68,9 +70,10 @@ int main(int argc, char *argv[])
             rho.storePrevIter();
         }
 
-        // --- PIMPLE loop
-        int oCorr=0;
-        do
+        #include "rhoEqn.H"
+
+        // --- Pressure-velocity PIMPLE corrector loop
+        for (int oCorr=0; oCorr<nOuterCorr; oCorr++)
         {
             #include "UEqn.H"
             #include "hEqn.H"
@@ -82,8 +85,7 @@ int main(int argc, char *argv[])
             }
 
             turbulence->correct();
-
-        } while (++oCorr < nOuterCorr);
+        }
 
         runTime.write();
 

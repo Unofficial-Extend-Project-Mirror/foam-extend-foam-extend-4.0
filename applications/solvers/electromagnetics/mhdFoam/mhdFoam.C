@@ -26,7 +26,7 @@ Application
     mhdFoam
 
 Description
-    Solver for magnetohydrodynamics (MHD): incompressible, laminar flow of a 
+    Solver for magnetohydrodynamics (MHD): incompressible, laminar flow of a
     conducting fluid under the influence of a magnetic field.
 
     An applied magnetic field H acts as a driving force,
@@ -49,8 +49,6 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "string.H"
-#include "Time.H"
 #include "fvCFD.H"
 #include "OSspecific.H"
 
@@ -58,7 +56,6 @@ Description
 
 int main(int argc, char *argv[])
 {
-
 #   include "setRootCase.H"
 
 #   include "createTime.H"
@@ -71,7 +68,7 @@ int main(int argc, char *argv[])
 
     Info<< nl << "Starting time loop" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.loop())
     {
 #       include "readPISOControls.H"
 #       include "readBPISOControls.H"
@@ -162,7 +159,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

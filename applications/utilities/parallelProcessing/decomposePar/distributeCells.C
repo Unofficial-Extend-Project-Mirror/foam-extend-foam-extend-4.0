@@ -104,14 +104,6 @@ void domainDecomposition::distributeCells()
         }
     }
 
-    if (sameProcFaces.size() > 0)
-    {
-        Info<< "Selected " << sameProcFaces.size()
-            << " faces whose owner and neighbour cell should be kept on the"
-            << " same processor" << endl;
-    }
-
-
 
     // Construct decomposition method and either do decomposition on
     // cell centres or on agglomeration
@@ -123,12 +115,16 @@ void domainDecomposition::distributeCells()
         *this
     );
 
-    if (sameProcFaces.size() == 0)
+    if (sameProcFaces.empty())
     {
         cellToProc_ = decomposePtr().decompose(cellCentres());
     }
     else
     {
+        Info<< "Selected " << sameProcFaces.size()
+            << " faces whose owner and neighbour cell should be kept on the"
+            << " same processor" << endl;
+
         // Faces where owner and neighbour are not 'connected' (= all except
         // sameProcFaces)
         boolList blockedFace(nFaces(), true);

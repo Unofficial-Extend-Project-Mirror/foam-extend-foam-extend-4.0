@@ -1,13 +1,25 @@
 Info<< nl << "Reading thermophysicalProperties" << endl;
-autoPtr<hCombustionThermo> thermo
-(
-    hCombustionThermo::New(mesh)
-);
 
-combustionMixture& composition = thermo->composition();
+autoPtr<psiChemistryModel> pChemistry
+(
+    psiChemistryModel::New(mesh)
+);
+psiChemistryModel& chemistry = pChemistry();
+
+hsCombustionThermo& thermo = chemistry.thermo();
+
+basicMultiComponentMixture& composition = thermo.composition();
 PtrList<volScalarField>& Y = composition.Y();
 
-word inertSpecie(thermo->lookup("inertSpecie"));
+word inertSpecie(thermo.lookup("inertSpecie"));
+
+if (!composition.contains(inertSpecie))
+{
+    FatalErrorIn(args.executable())
+        << "Specified inert specie '" << inertSpecie << "' not found in "
+        << "species list. Available species:" << composition.species()
+        << exit(FatalError);
+}
 
 volScalarField rho
 (
@@ -17,7 +29,7 @@ volScalarField rho
         runTime.timeName(),
         mesh
     ),
-    thermo->rho()
+    thermo.rho()
 );
 
 Info<< "Reading field U\n" << endl;
@@ -35,10 +47,10 @@ volVectorField U
 );
 
 
-volScalarField& p = thermo->p();
-const volScalarField& psi = thermo->psi();
-const volScalarField& T = thermo->T();
-volScalarField& h = thermo->h();
+volScalarField& p = thermo.p();
+const volScalarField& psi = thermo.psi();
+const volScalarField& T = thermo.T();
+volScalarField& hs = thermo.hs();
 
 
 #include "compressibleCreatePhi.H"
@@ -58,46 +70,40 @@ volScalarField kappa
 );
 
 Info << "Creating turbulence model.\n" << nl;
-autoPtr<compressible::RASModel> turbulence
+autoPtr<compressible::turbulenceModel> turbulence
 (
-    compressible::RASModel::New
+    compressible::turbulenceModel::New
     (
         rho,
         U,
         phi,
-        thermo()
+        thermo
     )
 );
 
 Info<< "Creating field DpDt\n" << endl;
-volScalarField DpDt = 
+volScalarField DpDt =
     fvc::DDt(surfaceScalarField("phiU", phi/fvc::interpolate(rho)), p);
 
-Info << "Constructing chemical mechanism" << endl;
-chemistryModel chemistry
-(
-    thermo(),
-    rho
-);
 
 multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
 
-for(label i=0; i<Y.size(); i++)
+forAll(Y, i)
 {
     fields.add(Y[i]);
 }
-fields.add(h);
+fields.add(hs);
 
-volScalarField dQ
+DimensionedField<scalar, volMesh> chemistrySh
 (
     IOobject
     (
-        "dQ",
+        "chemistry::Sh",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
-        IOobject::AUTO_WRITE
+        IOobject::NO_WRITE
     ),
     mesh,
-    dimensionedScalar("zero", dimensionSet(1,-3,-1,0,0,0,0), 0.0)
+    dimensionedScalar("chemistrySh", dimEnergy/dimTime/dimVolume, 0.0)
 );

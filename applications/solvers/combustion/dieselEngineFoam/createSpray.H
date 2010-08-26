@@ -1,24 +1,21 @@
 Info << "Constructing Spray" << endl;
 
-pointMesh pMesh(mesh);
-volPointInterpolation vpi(mesh, pMesh);
-
-PtrList<specieProperties> gasProperties(Y.size());
+PtrList<gasThermoPhysics> gasProperties(Y.size());
 forAll(gasProperties, i)
 {
     gasProperties.set
     (
         i,
-        new specieProperties
+        new gasThermoPhysics
         (
-            dynamic_cast<const reactingMixture&>(thermo()).speciesData()[i]
+            dynamic_cast<const reactingMixture<gasThermoPhysics>&>
+                (thermo).speciesData()[i]
         )
     );
 }
 
 spray dieselSpray
 (
-    vpi,
     U,
     rho,
     p,
@@ -26,7 +23,7 @@ spray dieselSpray
     composition,
     gasProperties,
     thermo,
-    environmentalProperties
+    g
 );
 
 scalar gasMass0 = fvc::domainIntegrate(rho).value();

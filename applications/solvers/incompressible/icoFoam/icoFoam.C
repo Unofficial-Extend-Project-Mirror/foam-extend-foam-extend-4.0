@@ -36,7 +36,6 @@ Description
 
 int main(int argc, char *argv[])
 {
-
 #   include "setRootCase.H"
 
 #   include "createTime.H"
@@ -48,7 +47,7 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
@@ -71,7 +70,7 @@ int main(int argc, char *argv[])
             volScalarField rUA = 1.0/UEqn.A();
 
             U = rUA*UEqn.H();
-            phi = (fvc::interpolate(U) & mesh.Sf()) 
+            phi = (fvc::interpolate(U) & mesh.Sf())
                 + fvc::ddtPhiCorr(rUA, U, phi);
 
             adjustPhi(phi, U, p);
@@ -107,7 +106,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

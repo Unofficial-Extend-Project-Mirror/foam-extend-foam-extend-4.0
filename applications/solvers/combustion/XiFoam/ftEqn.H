@@ -1,7 +1,7 @@
 tmp<fv::convectionScheme<scalar> > mvConvection
 (
     fv::convectionScheme<scalar>::New
-    (    
+    (
         mesh,
         fields,
         phi,
@@ -17,6 +17,6 @@ if (composition.contains("ft"))
     (
         fvm::ddt(rho, ft)
       + mvConvection->fvmDiv(phi, ft)
-      - fvm::laplacian(turbulence->muEff(), ft)
+      - fvm::laplacian(turbulence->alphaEff(), ft)
     );
 }

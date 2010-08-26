@@ -1,5 +1,5 @@
 EXE_INC = \
-    -I$(FOAM_SRC)/postProcessing/postCalc \
+    -I$(LIB_SRC)/postProcessing/postCalc \
     -I$(LIB_SRC)/finiteVolume/lnInclude 
 
 EXE_LIBS = \

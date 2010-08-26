@@ -1,9 +1,13 @@
-// Read time index from */uniform/time,
-// but treat 0 and constant specially
+// Read time index from */uniform/time, but treat 0 and constant specially
+// or simply increment from the '-index' option if it was supplied
 
     label timeIndex = 0;
 
-    if
+    if (optIndex)
+    {
+        timeIndex = indexingNumber++;
+    }
+    else if
     (
         runTime.timeName() != "constant"
      && runTime.timeName() != "0"
@@ -22,19 +26,8 @@
 
         if (io.headerOk())
         {
-            IOdictionary timeObject
-            (
-                IOobject
-                (
-                    "time",
-                    runTime.timeName(),
-                    "uniform",
-                    runTime,
-                    IOobject::MUST_READ,
-                    IOobject::NO_WRITE,
-                    false
-                )
-            );
+            io.readOpt() = IOobject::MUST_READ;
+            IOdictionary timeObject(io);
 
             timeObject.lookup("index") >> timeIndex;
         }

@@ -26,8 +26,8 @@ Application
     XiFoam
 
 Description
-    Compressible premixed/partially-premixed combustion solver with turbulence
-    modelling.
+    Solver for compressible premixed/partially-premixed combustion with
+    turbulence modelling.
 
     Combusting RANS code using the b-Xi two-equation model.
     Xi may be obtained by either the solution of the Xi transport
@@ -52,7 +52,7 @@ Description
 
 #include "fvCFD.H"
 #include "hhuCombustionThermo.H"
-#include "compressible/RASModel/RASModel.H"
+#include "turbulenceModel.H"
 #include "laminarFlameSpeed.H"
 #include "ignition.H"
 #include "Switch.H"
@@ -66,9 +66,8 @@ int main(int argc, char *argv[])
 #   include "createTime.H"
 #   include "createMesh.H"
 #   include "readCombustionProperties.H"
-#   include "readEnvironmentalProperties.H"
+#   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
-#   include "readPISOControls.H"
 #   include "initContinuityErrs.H"
 #   include "readTimeControls.H"
 #   include "compressibleCourantNo.H"
@@ -88,12 +87,12 @@ int main(int argc, char *argv[])
         runTime++;
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
+        // --- Pressure-velocity PIMPLE corrector loop
+        for (int oCorr=0; oCorr<nOuterCorr; oCorr++)
+        {
 #       include "rhoEqn.H"
 #       include "UEqn.H"
 
-        // --- PISO loop
-        for (int corr=1; corr<=nCorr; corr++)
-        {
 #           include "ftEqn.H"
 #           include "bEqn.H"
 #           include "huEqn.H"
@@ -104,12 +103,16 @@ int main(int argc, char *argv[])
                 hu == h;
             }
 
+            // --- PISO loop
+            for (int corr=1; corr<=nCorr; corr++)
+            {
 #           include "pEqn.H"
         }
 
-        turbulence->correct();
+            turbulence->correct();
+        }
 
-        rho = thermo->rho();
+        rho = thermo.rho();
 
         runTime.write();
 
@@ -120,7 +123,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

@@ -14,7 +14,7 @@ tmp<fv::convectionScheme<scalar> > mvConvection
     label inertIndex = -1;
     volScalarField Yt = 0.0*Y[0];
 
-    for(label i=0; i<Y.size(); i++)
+    for (label i = 0; i < Y.size(); i++)
     {
         if (Y[i].name() != inertSpecie)
         {
@@ -39,8 +39,7 @@ tmp<fv::convectionScheme<scalar> > mvConvection
             inertIndex = i;
         }
     }
-    
+
     Y[inertIndex] = scalar(1) - Yt;
     Y[inertIndex].max(0.0);
-
 }

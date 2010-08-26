@@ -31,23 +31,25 @@ Description
 \*---------------------------------------------------------------------------*/
 
 {
-scalar meanStCoNum = 0.0;
+    scalar meanStCoNum = 0.0;
 
-if (mesh.nInternalFaces())
-{
-    surfaceScalarField SfUfbyDelta = 
-        mesh.surfaceInterpolation::deltaCoeffs()
-       *mag(phiSt/fvc::interpolate(rho));
+    if (mesh.nInternalFaces())
+    {
+        surfaceScalarField SfUfbyDelta =
+            mesh.surfaceInterpolation::deltaCoeffs()
+        *mag(phiSt/fvc::interpolate(rho));
 
-    StCoNum = max(SfUfbyDelta/mesh.magSf())
-        .value()*runTime.deltaT().value();
+        StCoNum =
+            max(SfUfbyDelta/mesh.magSf()).value()
+           *runTime.deltaT().value();
 
-    meanStCoNum = (sum(SfUfbyDelta)/sum(mesh.magSf()))
-        .value()*runTime.deltaT().value();
-}
+        meanStCoNum =
+            (sum(SfUfbyDelta)/sum(mesh.magSf())).value()
+        *runTime.deltaT().value();
+    }
 
-Info<< "St courant Number mean: " << meanStCoNum
-    << " max: " << StCoNum << endl;
+    Info<< "St courant Number mean: " << meanStCoNum
+        << " max: " << StCoNum << endl;
 }
 
 // ************************************************************************* //

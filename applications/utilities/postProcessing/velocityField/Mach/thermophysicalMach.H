@@ -18,9 +18,9 @@
         {
             volVectorField U(Uheader, mesh);
 
-            autoPtr<basicThermo> thermo
+            autoPtr<basicPsiThermo> thermo
             (
-                basicThermo::New(mesh)
+                basicPsiThermo::New(mesh)
             );
 
             volScalarField Cp = thermo->Cp();

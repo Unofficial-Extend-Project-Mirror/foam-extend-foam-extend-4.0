@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
+|  \\    /   O peration     | Version:  1.6                                   |
 |   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -19,15 +19,20 @@ FoamFile
 
 numberOfSubdomains  4;
 
-// Patches or face zones which need to face both cells on the same CPU
-// preservePatches (inlet);
+//- Keep owner and neighbour on same processor for faces in zones:
 // preserveFaceZones (heater solid1 solid3);
 
 // Face zones which need to be present on all CPUs in its entirety
 // globalFaceZones (ggiInside ggiOutside);
 
-method          simple;
+//- Keep owner and neighbour on same processor for faces in patches:
+//  (makes sense only for cyclic patches)
+//preservePatches (cyclic_left_right);
+
+
+method          scotch;
 // method          hierarchical;
+// method          simple;
 // method          metis;
 // method          manual;
 
@@ -57,9 +62,33 @@ metisCoeffs
   */
 }
 
+scotchCoeffs
+{
+    //processorWeights
+    //(
+    //    1
+    //    1
+    //    1
+    //    1
+    //);
+    //writeGraph  true;
+    //strategy "b";
+}
+
 manualCoeffs
 {
-    dataFile    "decompositionData";
+    dataFile    "cellDecomposition";
 }
+
+
+//// Is the case distributed
+//distributed     yes;
+//// Per slave (so nProcs-1 entries) the directory above the case.
+//roots           
+//(
+//    "/tmp"
+//    "/tmp"
+//);
+
 
 // ************************************************************************* //

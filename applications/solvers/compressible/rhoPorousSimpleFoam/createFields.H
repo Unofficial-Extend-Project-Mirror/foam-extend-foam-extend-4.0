@@ -1,9 +1,10 @@
     Info<< "Reading thermophysical properties\n" << endl;
 
-    autoPtr<basicThermo> thermo
+    autoPtr<basicPsiThermo> pThermo
     (
-        basicThermo::New(mesh)
+        basicPsiThermo::New(mesh)
     );
+    basicPsiThermo& thermo = pThermo();
 
     volScalarField rho
     (
@@ -15,11 +16,12 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        thermo->rho()
+        thermo.rho()
     );
 
-    volScalarField& p = thermo->p();
-    volScalarField& h = thermo->h();
+    volScalarField& p = thermo.p();
+    volScalarField& h = thermo.h();
+    const volScalarField& psi = thermo.psi();
 
 
     Info<< "Reading field U\n" << endl;
@@ -36,7 +38,7 @@
         mesh
     );
 
-#   include "compressibleCreatePhi.H"
+    #include "compressibleCreatePhi.H"
 
 
     label pRefCell = 0;
@@ -56,7 +58,7 @@
             rho,
             U,
             phi,
-            thermo()
+            thermo
         )
     );
 

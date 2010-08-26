@@ -28,6 +28,7 @@ Application
 Description
     Calculates and writes the Pe number as a surfaceScalarField obtained from
     field phi.
+
     The -noWrite option just outputs the max/min values without writing
     the field.
 
@@ -37,17 +38,17 @@ Description
 #include "fvc.H"
 
 #include "incompressible/singlePhaseTransportModel/singlePhaseTransportModel.H"
-#include "incompressible/RASModel/RASModel.H"
-#include "incompressible/LESModel/LESModel.H"
-#include "basicThermo.H"
-#include "compressible/RASModel/RASModel.H"
-#include "compressible/LESModel/LESModel.H"
+#include "incompressible/RAS/RASModel/RASModel.H"
+#include "incompressible/LES/LESModel/LESModel.H"
+#include "basicPsiThermo.H"
+#include "compressible/RAS/RASModel/RASModel.H"
+#include "compressible/LES/LESModel/LESModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
 {
-    bool writeResults = !args.options().found("noWrite");
+    bool writeResults = !args.optionFound("noWrite");
 
     IOobject phiHeader
     (
@@ -204,7 +205,7 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
             {
                 IOdictionary RASProperties(RASPropertiesHeader);
 
-                autoPtr<basicThermo> thermo(basicThermo::New(mesh));
+                autoPtr<basicPsiThermo> thermo(basicPsiThermo::New(mesh));
 
                 volScalarField rho
                 (
@@ -252,7 +253,7 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
             {
                 IOdictionary LESProperties(LESPropertiesHeader);
 
-                autoPtr<basicThermo> thermo(basicThermo::New(mesh));
+                autoPtr<basicPsiThermo> thermo(basicPsiThermo::New(mesh));
 
                 volScalarField rho
                 (
@@ -361,6 +362,9 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
     {
         Info<< "    No phi" << endl;
     }
+
+    Info<< "\nEnd\n" << endl;
 }
+
 
 // ************************************************************************* //

@@ -1,10 +1,11 @@
     Info<< "Reading thermophysical properties\n" << endl;
 
-    autoPtr<hhuCombustionThermo> thermo
+    autoPtr<hhuCombustionThermo> pThermo
     (
         hhuCombustionThermo::New(mesh)
     );
-    combustionMixture& composition = thermo->composition();
+    hhuCombustionThermo& thermo = pThermo();
+    basicMultiComponentMixture& composition = thermo.composition();
 
     volScalarField rho
     (
@@ -16,13 +17,13 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        thermo->rho()
+        thermo.rho()
     );
 
-    volScalarField& p = thermo->p();
-    const volScalarField& psi = thermo->psi();
-    volScalarField& h = thermo->h();
-    volScalarField& hu = thermo->hu();
+    volScalarField& p = thermo.p();
+    const volScalarField& psi = thermo.psi();
+    volScalarField& h = thermo.h();
+    volScalarField& hu = thermo.hu();
 
     volScalarField& b = composition.Y("b");
     Info<< "min(b) = " << min(b).value() << endl;
@@ -54,7 +55,7 @@
             rho,
             U,
             phi,
-            thermo()
+            thermo
         )
     );
 

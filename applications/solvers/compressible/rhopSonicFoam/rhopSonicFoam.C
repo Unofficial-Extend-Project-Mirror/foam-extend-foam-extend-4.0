@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.loop())
     {
         Info<< "Time = " << runTime.value() << nl << endl;
 
@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
 
 #               include "resetPhiPatches.H"
 
-                surfaceScalarField rhof = 
+                surfaceScalarField rhof =
                     mvConvection.interpolationScheme()()(rho)()
                    .interpolate(rho);
 
@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
 
                 phi += phiGradp + pEqn.flux();
                 rho = psi*p;
-                rhof = 
+                rhof =
                     mvConvection.interpolationScheme()()(rho)()
                    .interpolate(rho);
                 phiv = phi/rhof;
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

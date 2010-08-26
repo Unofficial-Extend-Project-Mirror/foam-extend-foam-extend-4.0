@@ -1,15 +1,16 @@
 Info<< "Reading thermophysical properties\n" << endl;
 
-autoPtr<basicThermo> thermo
+autoPtr<basicPsiThermo> pThermo
 (
-    basicThermo::New(mesh)
+    basicPsiThermo::New(mesh)
 );
+basicPsiThermo& thermo = pThermo();
 
-volScalarField& p = thermo->p();
-volScalarField& h = thermo->h();
-const volScalarField& T = thermo->T();
-const volScalarField& psi = thermo->psi();
-const volScalarField& mu = thermo->mu();
+volScalarField& p = thermo.p();
+volScalarField& e = thermo.e();
+const volScalarField& T = thermo.T();
+const volScalarField& psi = thermo.psi();
+const volScalarField& mu = thermo.mu();
 
 bool inviscid(true);
 if (max(mu.internalField()) > 0.0)
@@ -42,7 +43,7 @@ volScalarField rho
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    thermo->rho(),
+    thermo.rho(),
     rhoBoundaryTypes
 );
 
@@ -69,7 +70,7 @@ volScalarField rhoE
         IOobject::NO_READ,
         IOobject::NO_WRITE
     ),
-    rho*(h + 0.5*magSqr(U)) - p
+    rho*(e + 0.5*magSqr(U))
 );
 
 surfaceScalarField pos

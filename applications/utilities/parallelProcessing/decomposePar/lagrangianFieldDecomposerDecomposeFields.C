@@ -88,7 +88,7 @@ tmp<IOField<Type> > lagrangianFieldDecomposer::decomposeField
             (
                 field.name(),
                 procMesh_.time().timeName(),
-                "lagrangian"/cloudName,
+                cloud::prefix/cloudName,
                 procMesh_,
                 IOobject::NO_READ,
                 IOobject::NO_WRITE

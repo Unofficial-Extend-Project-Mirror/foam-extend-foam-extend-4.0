@@ -1,3 +1,0 @@
-turbDyMFoam.C
-
-EXE = $(FOAM_APPBIN)/turbDyMFoam

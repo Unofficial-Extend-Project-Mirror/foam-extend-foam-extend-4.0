@@ -56,17 +56,6 @@ void readFields
     PtrList<GeoField>& fields
 );
 
-// Read the fields and optionally subset and put on the pointer list
-template<class GeoField>
-void readFieldsNoSubset
-(
-    const vtkMesh& vMesh,
-    const typename GeoField::Mesh& mesh,
-    const IOobjectList& objects,
-    const HashSet<word>& selectedFields,
-    PtrList<GeoField>& fields
-);
-
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

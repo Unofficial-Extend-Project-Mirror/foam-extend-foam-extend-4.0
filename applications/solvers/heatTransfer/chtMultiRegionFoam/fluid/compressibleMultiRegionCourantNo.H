@@ -1,4 +1,5 @@
     scalar CoNum = -GREAT;
+
     forAll(fluidRegions, regionI)
     {
         CoNum = max
@@ -7,8 +8,8 @@
             (
                 fluidRegions[regionI],
                 runTime,
-                rhof[regionI],
-                phif[regionI]
+                rhoFluid[regionI],
+                phiFluid[regionI]
             ),
             CoNum
         );

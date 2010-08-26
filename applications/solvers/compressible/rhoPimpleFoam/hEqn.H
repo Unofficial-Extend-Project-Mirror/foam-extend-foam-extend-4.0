@@ -19,5 +19,5 @@
         hEqn.solve();
     }
 
-    thermo->correct();
+    thermo.correct();
 }

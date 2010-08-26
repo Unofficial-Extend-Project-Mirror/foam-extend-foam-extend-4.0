@@ -37,9 +37,7 @@ Description
 #include "boolList.H"
 #include "cellList.H"
 #include "primitiveMesh.H"
-#include "cyclicFvPatch.H"
-#include "fvPatchList.H"
-#include "DynamicList.H"
+#include "cyclicPolyPatch.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -254,7 +252,7 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
             const label patchStart = patches[patchi].start();
 
-            if (typeid(patches[patchi]) != typeid(cyclicPolyPatch))
+            if (!isA<cyclicPolyPatch>(patches[patchi]))
             {
                 // Normal patch. Add faces to processor where the cell
                 // next to the face lives

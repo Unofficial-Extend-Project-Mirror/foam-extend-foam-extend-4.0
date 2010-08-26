@@ -38,12 +38,11 @@ Description
 
 int main(int argc, char *argv[])
 {
+#   include "setRootCase.H"
 
-#include "setRootCase.H"
-
-#include "createTime.H"
-#include "createMesh.H"
-#include "createFields.H"
+#   include "createTime.H"
+#   include "createMesh.H"
+#   include "createFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,7 +54,7 @@ int main(int argc, char *argv[])
 
     Info<< "Starting time loop\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.loop())
     {
         delta == fvc::grad(V)().component(Foam::vector::X);
 
@@ -84,7 +83,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

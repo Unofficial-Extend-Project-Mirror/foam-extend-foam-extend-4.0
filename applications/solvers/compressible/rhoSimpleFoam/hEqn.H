@@ -5,8 +5,8 @@
       - fvm::Sp(fvc::div(phi), h)
       - fvm::laplacian(turbulence->alphaEff(), h)
      ==
-        fvc::div(phi/fvc::interpolate(rho)*fvc::interpolate(p, "div(U,p)"))
-      - p*fvc::div(phi/fvc::interpolate(rho))
+        fvc::div(phi/fvc::interpolate(rho), rho/psi, "div(U,p)")
+      - (rho/psi)*fvc::div(phi/fvc::interpolate(rho))
     );
 
     hEqn.relax();
@@ -14,5 +14,5 @@
     eqnResidual = hEqn.solve().initialResidual();
     maxResidual = max(eqnResidual, maxResidual);
 
-    thermo->correct();
+    thermo.correct();
 }

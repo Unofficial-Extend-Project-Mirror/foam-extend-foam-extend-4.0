@@ -78,6 +78,7 @@ void writePatchGeom
     writeFuns::write(pStream, binary, vertLabels);
 }
 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

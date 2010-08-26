@@ -74,10 +74,7 @@ class readerDatabase
         Time* runTimePtr_;
 
         //- Cached mesh, guaranteed uptodate with runTime.
-        fvMesh* meshPtr_;
-
-        //- Mesh subset
-        fvMeshSubset* subsetMeshPtr_;
+        fvMeshSubset* meshPtr_;
 
         //- Empty string or name of current set.
         word setName_;

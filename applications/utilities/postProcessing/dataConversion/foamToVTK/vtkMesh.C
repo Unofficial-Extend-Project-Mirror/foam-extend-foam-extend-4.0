@@ -58,7 +58,7 @@ Foam::vtkMesh::vtkMesh
     ),
     setName_(setName)
 {
-    if (setName.size() > 0)
+    if (setName.size())
     {
         // Read cellSet using whole mesh
         cellSet currentSet(*this, setName_);
@@ -89,7 +89,7 @@ Foam::polyMesh::readUpdateState Foam::vtkMesh::readUpdate()
         topoPtr_.clear();
         pointMeshPtr_.clear();
 
-        if (setName_.size() > 0)
+        if (setName_.size())
         {
             Info<< "Subsetting mesh based on cellSet " << setName_ << endl;
 

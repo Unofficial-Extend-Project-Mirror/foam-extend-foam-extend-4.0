@@ -23,9 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-
-    miscellaneous collection of functions and template related
-    to Ensight data
+    Miscellaneous collection of functions and template related to Ensight data
 
 SourceFiles
     ensightOutputFunctions.C
@@ -36,6 +34,7 @@ SourceFiles
 #define ensightOutputFunctions_H
 
 #include "ensightFile.H"
+#include "Cloud.H"
 #include "polyMesh.H"
 #include "IOobject.H"
 
@@ -44,13 +43,15 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class Type>
 void ensightCaseEntry
 (
     OFstream& caseFile,
-    const IOobject& fieldObject,
+    const string& ensightType,
+    const word& fieldName,
     const fileName& dataMask,
-    bool measured = false
+    const fileName& local=fileName::null,
+    const label cloudNo=-1,
+    const label timeSet=1
 );
 
 
@@ -59,17 +60,19 @@ void ensightParticlePositions
     const polyMesh& mesh,
     const fileName& dataDir,
     const fileName& subDir,
+    const word& cloudName,
     IOstream::streamFormat format
 );
 
 
-//- write spray parcels
+//- write lagrangian parcels
 template<class Type>
-void ensightSprayField
+void ensightLagrangianField
 (
     const IOobject& fieldObject,
     const fileName& dataDir,
     const fileName& subDir,
+    const word& cloudName,
     IOstream::streamFormat format
 );
 
@@ -87,7 +90,7 @@ void ensightVolField
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // end namespace Foam
+} // namespace Foam
 
 #ifdef NoRepository
 #   include "ensightOutputFunctions.C"

@@ -1,3 +1,0 @@
-channelOodles.C
-
-EXE = $(FOAM_APPBIN)/channelOodles

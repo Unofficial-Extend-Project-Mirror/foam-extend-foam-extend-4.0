@@ -26,7 +26,7 @@ Application
     PDRFoam
 
 Description
-    Compressible premixed/partially-premixed combustion solver with turbulence 
+    Compressible premixed/partially-premixed combustion solver with turbulence
     modelling.
 
     Combusting RANS code using the b-Xi two-equation model.
@@ -77,14 +77,14 @@ int main(int argc, char *argv[])
 #   include "createTime.H"
 #   include "createDynamicFvMesh.H"
 #   include "readCombustionProperties.H"
-#   include "readEnvironmentalProperties.H"
+#   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
 #   include "readPISOControls.H"
 #   include "initContinuityErrs.H"
 #   include "readTimeControls.H"
 #   include "setInitialDeltaT.H"
 
-scalar StCoNum = 0.0;
+    scalar StCoNum = 0.0;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -119,9 +119,10 @@ scalar StCoNum = 0.0;
             fvc::makeAbsolute(phi, rho, U);
 
             // Test : disable refinement for some cells
-            PackedList<1>& protectedCell =
+            PackedBoolList& protectedCell =
                 refCast<dynamicRefineFvMesh>(mesh).protectedCell();
-            if (protectedCell.size() == 0)
+
+            if (protectedCell.empty())
             {
                 protectedCell.setSize(mesh.nCells());
                 protectedCell = 0;
@@ -135,7 +136,7 @@ scalar StCoNum = 0.0;
                 }
             }
 
-            //volScalarField pIndicator("pIndicator", 
+            //volScalarField pIndicator("pIndicator",
             //    p*(fvc::laplacian(p))
             //  / (
             //        magSqr(fvc::grad(p))
@@ -194,7 +195,7 @@ scalar StCoNum = 0.0;
 
     Info<< "\n end\n";
 
-    return(0);
+    return 0;
 }
 
 

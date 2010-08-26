@@ -28,21 +28,21 @@ Class
 Description
     Mixed boundary condition for temperature, to be used by the
     conjugate heat transfer solver.
-    If my temperature is T1, neighbour is T2:
-
-    T1 > T2: my side becomes fixedValue T2 bc, other side becomes fixedGradient.
-    
+    Both sides use a mix of zeroGradient and neighbourvalue.
 
     Example usage:
         myInterfacePatchName
         {
             type                solidWallMixedTemperatureCoupled;
-            neighbourRegionName fluid;
-            neighbourPatchName  fluidSolidInterface;
             neighbourFieldName  T;
             K                   K;
             value               uniform 300;
         }
+
+    Needs to be on underlying directMapped(Wall)FvPatch.
+
+    Note: runs in parallel with arbitrary decomposition. Uses directMapped
+    functionality to calculate exchange.
 
 SourceFiles
     solidWallMixedTemperatureCoupledFvPatchScalarField.C
@@ -52,10 +52,7 @@ SourceFiles
 #ifndef solidWallMixedTemperatureCoupledFvPatchScalarField_H
 #define solidWallMixedTemperatureCoupledFvPatchScalarField_H
 
-#include "fvPatchFields.H"
 #include "mixedFvPatchFields.H"
-#include "coupleManager.H"
-#include "fvPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -72,13 +69,11 @@ class solidWallMixedTemperatureCoupledFvPatchScalarField
 {
     // Private data
 
-        //- Couple manager object
-        coupleManager coupleManager_;
-
+        //- Name of field on the neighbour region
+        const word neighbourFieldName_;
+        
         //- Name of thermal conductivity field
-        word KName_;
-
-        bool fixesValue_;
+        const word KName_;
 
 public:
 
@@ -103,8 +98,8 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given solidWallMixedTemperatureCoupledFvPatchScalarField
-        //  onto a new patch
+        //- Construct by mapping given
+        //  solidWallMixedTemperatureCoupledFvPatchScalarField onto a new patch
         solidWallMixedTemperatureCoupledFvPatchScalarField
         (
             const solidWallMixedTemperatureCoupledFvPatchScalarField&,
@@ -151,22 +146,8 @@ public:
         //- Get corresponding K field
         const fvPatchScalarField& K() const;
 
-        //- Return true if this patch field fixes a value.
-        //  Needed to check if a level has to be specified while solving
-        //  Poissons equations.
-        virtual bool fixesValue() const
-        {
-            return fixesValue_;
-        }
-
         //- Update the coefficients associated with the patch field
         virtual void updateCoeffs();
-
-        //- Evaluate the patch field
-        virtual void evaluate
-        (
-            const Pstream::commsTypes commsType=Pstream::blocking
-        );
 
         //- Write
         virtual void write(Ostream&) const;

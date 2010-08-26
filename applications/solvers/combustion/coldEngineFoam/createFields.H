@@ -1,9 +1,10 @@
     Info<< "Reading thermophysical properties\n" << endl;
 
-    autoPtr<basicThermo> thermo
+    autoPtr<basicPsiThermo> pThermo
     (
-        basicThermo::New(mesh)
+        basicPsiThermo::New(mesh)
     );
+    basicPsiThermo& thermo = pThermo();
 
     volScalarField rho
     (
@@ -15,13 +16,13 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        thermo->rho()
+        thermo.rho()
     );
 
-    volScalarField& p = thermo->p();
-    const volScalarField& psi = thermo->psi();
-    volScalarField& h = thermo->h();
-    const volScalarField& T = thermo->T();
+    volScalarField& p = thermo.p();
+    const volScalarField& psi = thermo.psi();
+    volScalarField& h = thermo.h();
+    const volScalarField& T = thermo.T();
 
 
     Info<< "\nReading field U\n" << endl;
@@ -42,14 +43,14 @@
 
 
     Info<< "Creating turbulence model\n" << endl;
-    autoPtr<compressible::RASModel> turbulence
+    autoPtr<compressible::turbulenceModel> turbulence
     (
-        compressible::RASModel::New
+        compressible::turbulenceModel::New
         (
             rho,
             U,
             phi,
-            thermo()
+            thermo
         )
     );
 

@@ -23,10 +23,10 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Application
-    dieselFoam
+    dieselEngineFoam
 
 Description
-    Diesel engine spray and combustion code.
+    Solver for diesel engine spray and combustion.
 
 \*---------------------------------------------------------------------------*/
 
@@ -34,13 +34,15 @@ Description
 #include "engineTime.H"
 #include "engineMesh.H"
 #include "hCombustionThermo.H"
-#include "compressible/RASModel/RASModel.H"
+#include "turbulenceModel.H"
 #include "spray.H"
-#include "chemistryModel.H"
+#include "psiChemistryModel.H"
 #include "chemistrySolver.H"
 #include "multivariateScheme.H"
 #include "Switch.H"
 #include "OFstream.H"
+#include "volPointInterpolation.H"
+#include "thermoPhysicsTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,7 +52,7 @@ int main(int argc, char *argv[])
 #   include "createEngineTime.H"
 #   include "createEngineMesh.H"
 #   include "createFields.H"
-#   include "readEnvironmentalProperties.H"
+#   include "readGravitationalAcceleration.H"
 #   include "readCombustionProperties.H"
 #   include "createSpray.H"
 #   include "initContinuityErrs.H"
@@ -61,7 +63,7 @@ int main(int argc, char *argv[])
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    Info << "\nStarting time loop\n" << endl;
+    Info<< "\nStarting time loop\n" << endl;
 
     while (runTime.run())
     {
@@ -75,11 +77,16 @@ int main(int argc, char *argv[])
         Info<< "Crank angle = " << runTime.theta() << " CA-deg" << endl;
 
         mesh.move();
-        vpi.updateMesh();
+        Check that this is unnecessary. HJ
+        // 1.6.x merge.  HJ, 26/Aug/2010
+        const_cast<volPointInterpolation&>
+        (
+            volPointInterpolation::New(mesh)
+        ).updateMesh();
 
         dieselSpray.evolve();
 
-        Info << "Solving chemistry" << endl;
+        Info<< "Solving chemistry" << endl;
 
         chemistry.solve
         (
@@ -97,13 +104,15 @@ int main(int argc, char *argv[])
             kappa = (runTime.deltaT() + tc)/(runTime.deltaT() + tc + tk);
         }
 
+        chemistrySh = kappa*chemistry.Sh()();
+
 #       include "rhoEqn.H"
 #       include "UEqn.H"
 
         for (label ocorr=1; ocorr <= nOuterCorr; ocorr++)
         {
 #           include "YEqn.H"
-#           include "hEqn.H"
+#           include "hsEqn.H"
 
             // --- PISO loop
             for (int corr=1; corr<=nCorr; corr++)
@@ -117,9 +126,12 @@ int main(int argc, char *argv[])
 #       include "logSummary.H"
 #       include "spraySummary.H"
 
-        rho = thermo->rho();
+        rho = thermo.rho();
 
-        runTime.write();
+        if (runTime.write())
+        {
+            chemistry.dQ()().write();
+        }
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
@@ -128,7 +140,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 
