@@ -43,7 +43,7 @@ Foam::diagonalSolver::diagonalSolver
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    const dictionary& solverControls
+    const dictionary& dict
 )
 :
     lduMatrix::solver
@@ -53,7 +53,7 @@ Foam::diagonalSolver::diagonalSolver
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverControls
+        dict
     )
 {}
 
@@ -72,7 +72,7 @@ Foam::lduMatrix::solverPerformance Foam::diagonalSolver::solve
     return lduSolverPerformance
     (
         typeName,
-        fieldName_,
+        fieldName(),
         0,
         0,
         0,

@@ -108,7 +108,7 @@ Foam::GAMGSolver::GAMGSolver
     nFinestSweeps_(2),
     scaleCorrection_(matrix.symmetric()),
     directSolveCoarsest_(false),
-    agglomeration_(GAMGAgglomeration::New(matrix_, dict())),
+    agglomeration_(GAMGAgglomeration::New(matrix_, dict)),
 
     matrixLevels_(agglomeration_.size()),
     interfaceLevels_(agglomeration_.size()),

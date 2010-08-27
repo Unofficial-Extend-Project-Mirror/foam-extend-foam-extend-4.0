@@ -33,7 +33,7 @@ SourceFiles
 #ifndef DenseMatrixTools_H
 #define DenseMatrixTools_H
 
-#include "Matrix.H"
+#include "SquareMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,16 +47,16 @@ namespace Foam
 namespace DenseMatrixTools
 {
     //- Solve using Gauss Elimination with pivoting.  Destroys matrix and b
-    template<class T>
-    static void solve(Matrix<T>& A, List<T>& x, List<T>& b);
+    template<class Type>
+    static void solve(SquareMatrix<Type>& A, List<Type>& x, List<Type>& b);
 
     //- Q-R decomposition
-    template<class T>
+    template<class Form, class T>
     static void qrDecompose
     (
         const label nCols,
         FieldField<Field, T>& A,
-        Matrix<T>& R
+        Matrix<class Form, class Type>& R
     );
 };
 

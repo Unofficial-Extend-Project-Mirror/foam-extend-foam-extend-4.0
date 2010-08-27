@@ -71,386 +71,232 @@ Foam::label Foam::primitiveMesh::getEdge
 }
 
 
-void Foam::primitiveMesh::calcEdges(const bool doFaceEdges) const
+void Foam::primitiveMesh::calcEdges() const
 {
     if (debug)
     {
-        Pout<< "primitiveMesh::calcEdges(const bool) : "
-            << "calculating edges, pointEdges and optionally faceEdges"
+        Pout<< "primitiveMesh::calcEdges() : "
+            << "calculating edges, pointEdges and faceEdges"
             << endl;
     }
 
     // It is an error to attempt to recalculate edges
     // if the pointer is already set
-    if ((edgesPtr_ || pePtr_) || (doFaceEdges && fePtr_))
+    if (edgesPtr_ || fePtr_)
     {
         FatalErrorIn("primitiveMesh::calcEdges(const bool) const")
-            << "edges or pointEdges or faceEdges already calculated"
+            << "edges or faceEdges already calculated"
             << abort(FatalError);
     }
     else
     {
+        // Note: replaced with the original and correct algorithm
+        // which preserved correct ordering for edges list
+        // Version 1.5.x, 1.5-dev were wrong, with failures in parallel
+        // point-based data exchange.  Fixed in 1.6-ext and
+        // consecutive versions
+        // HJ, 27/Aug/2010
+
         // ALGORITHM:
-        // Go through the faces list. Search pointEdges for existing edge.
-        // If not found create edge and add to pointEdges.
-        // In second loop sort edges in order of increasing neighbouring
-        // point.
-        // This algorithm replaces the one using pointFaces which used more
-        // allocations but less memory and was on practical cases
-        // quite a bit slower.
+        // Go through the pointFace list.  Go through the list of faces for that
+        // point and ask for edges.  If the edge has got the point in question
+        // AND the second point in the edge is larger than the first, add the
+        // edge to the list.  At the same time, add the edge label to the list
+        // of edges for the current face (faceEdges) and log the other face as
+        // the neighbour of this face.
 
-        const faceList& fcs = faces();
+        const faceList& f = faces();
 
-        // Size up lists
-        // ~~~~~~~~~~~~~
+        const labelListList& pf = pointFaces();
 
-        // Estimate pointEdges storage
-        List<DynamicList<label> > pe(nPoints());
-        forAll(pe, pointI)
+        fePtr_ = new labelListList(nFaces());
+        labelListList& fe = *fePtr_;
+
+        // count the maximum number of edges
+        label maxEdges = 0;
+
+        // create a list of edges for each face and store for efficiency
+        edgeListList edgesOfFace(nFaces());
+
+        forAll (f, faceI)
         {
-            pe[pointI].setCapacity(primitiveMesh::edgesPerPoint_);
-        }
+            edgesOfFace[faceI] = f[faceI].edges();
 
-        // Estimate edges storage
-        DynamicList<edge> es(pe.size()*primitiveMesh::edgesPerPoint_/2);
+            maxEdges += f[faceI].nEdges();
 
-        // Estimate faceEdges storage
-        if (doFaceEdges)
-        {
-            fePtr_ = new labelListList(fcs.size());
-            labelListList& faceEdges = *fePtr_;
-            forAll(fcs, faceI)
+            labelList& curFE = fe[faceI];
+
+            curFE.setSize(f[faceI].nEdges());
+
+            forAll (curFE, curFEI)
             {
-                faceEdges[faceI].setSize(fcs[faceI].size());
+                curFE[curFEI] = -1;
             }
         }
 
+        // EDGE CALCULATION
 
-        // Find consecutive face points in edge list
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        edgesPtr_ = new edgeList(maxEdges);
+        edgeList& e = *edgesPtr_;
+        label nEdges = 0;
 
-        // Edges on boundary faces
-        label nExtEdges = 0;
-        // Edges using no boundary point
-        nInternal0Edges_ = 0;
-        // Edges using 1 boundary point
-        label nInt1Edges = 0;
-        // Edges using two boundary points but not on boundary face:
-        // edges.size()-nExtEdges-nInternal0Edges_-nInt1Edges
-
-        // Ordering is different if points are ordered.
-        if (nInternalPoints_ == -1)
+        forAll (pf, pointI)
         {
-            // No ordering. No distinction between types.
-            forAll(fcs, faceI)
+            const labelList& curFaces = pf[pointI];
+
+            // create a list of labels to keep the neighbours that
+            // have already been added
+            DynamicList<label, edgesPerPoint_> addedNeighbours;
+            DynamicList<DynamicList<label, edgesPerPoint_> >
+                faceGivingNeighbour;
+            DynamicList<DynamicList<label, edgesPerPoint_> >
+                edgeOfFaceGivingNeighbour;
+
+            forAll (curFaces, faceI)
             {
-                const face& f = fcs[faceI];
+                // get the edges
+                const edgeList& fEdges = edgesOfFace[curFaces[faceI]];
 
-                forAll(f, fp)
+                // for every edge
+                forAll(fEdges, edgeI)
                 {
-                    label pointI = f[fp];
-                    label nextPointI = f[f.fcIndex(fp)];
+                    const edge& ends = fEdges[edgeI];
 
-                    label edgeI = getEdge(pe, es, pointI, nextPointI);
+                    // does the edge has got the point in question
+                    bool found = false;
+                    label secondPoint = -1;
 
-                    if (doFaceEdges)
+                    if (ends.start() == pointI)
                     {
-                        (*fePtr_)[faceI][fp] = edgeI;
+                        found = true;
+                        secondPoint = ends.end();
                     }
-                }
-            }
-            // Assume all edges internal
-            nExtEdges = 0;
-            nInternal0Edges_ = es.size();
-            nInt1Edges = 0;
-        }
-        else
-        {
-            // 1. Do external faces first. This creates external edges.
-            for (label faceI = nInternalFaces_; faceI < fcs.size(); faceI++)
-            {
-                const face& f = fcs[faceI];
 
-                forAll(f, fp)
-                {
-                    label pointI = f[fp];
-                    label nextPointI = f[f.fcIndex(fp)];
-
-                    label oldNEdges = es.size();
-                    label edgeI = getEdge(pe, es, pointI, nextPointI);
-
-                    if (es.size() > oldNEdges)
+                    if (ends.end() == pointI)
                     {
-                        nExtEdges++;
+                        found = true;
+                        secondPoint = ends.start();
                     }
-                    if (doFaceEdges)
+
+                    // if the edge has got the point and second label is larger
+                    // than first, it is a candidate for adding
+                    if (found && (secondPoint > pointI))
                     {
-                        (*fePtr_)[faceI][fp] = edgeI;
-                    }
-                }
-            }
+                        // check if the edge has already been added
+                        bool added = false;
 
-            // 2. Do internal faces. This creates internal edges.
-            for (label faceI = 0; faceI < nInternalFaces_; faceI++)
-            {
-                const face& f = fcs[faceI];
-
-                forAll(f, fp)
-                {
-                    label pointI = f[fp];
-                    label nextPointI = f[f.fcIndex(fp)];
-
-                    label oldNEdges = es.size();
-                    label edgeI = getEdge(pe, es, pointI, nextPointI);
-
-                    if (es.size() > oldNEdges)
-                    {
-                        if (pointI < nInternalPoints_)
+                        forAll (addedNeighbours, eopI)
                         {
-                            if (nextPointI < nInternalPoints_)
+                            if (secondPoint == addedNeighbours[eopI])
                             {
-                                nInternal0Edges_++;
-                            }
-                            else
-                            {
-                                nInt1Edges++;
+                                // Edge is already added. New face sharing it
+                                added = true;
+
+                                // Remember the face and edge giving neighbour
+                                faceGivingNeighbour[eopI].append
+                                    (curFaces[faceI]);
+
+                                edgeOfFaceGivingNeighbour[eopI].append(edgeI);
+
+                                break;
                             }
                         }
-                        else
+
+                        // If not added, add the edge to the list
+                        if (!added)
                         {
-                            if (nextPointI < nInternalPoints_)
-                            {
-                                nInt1Edges++;
-                            }
-                            else
-                            {
-                                // Internal edge with two points on boundary
-                            }
-                        }
-                    }
-                    if (doFaceEdges)
-                    {
-                        (*fePtr_)[faceI][fp] = edgeI;
-                    }
-                }
-            }
-        }
+                            addedNeighbours.append(secondPoint);
 
-
-        // For unsorted meshes the edges will be in order of occurrence inside
-        // the faces. For sorted meshes the first nExtEdges will be the external
-        // edges.
-
-        if (nInternalPoints_ != -1)
-        {
-            nInternalEdges_ = es.size()-nExtEdges;
-            nInternal1Edges_ = nInternal0Edges_+nInt1Edges;
-
-            //Pout<< "Edge overview:" << nl
-            //    << "    total number of edges           : " << es.size()
-            //    << nl
-            //    << "    boundary edges                  : " << nExtEdges
-            //    << nl
-            //    << "    edges using no boundary point   : "
-            //    << nInternal0Edges_
-            //    << nl
-            //    << "    edges using one boundary points : " << nInt1Edges
-            //   << nl
-            //    << "    edges using two boundary points : "
-            //    << es.size()-nExtEdges-nInternal0Edges_-nInt1Edges << endl;
-        }
-
-
-        // Like faces sort edges in order of increasing neigbouring point.
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Automatically if points are sorted into internal and external points
-        // the edges will be sorted into
-        // - internal point to internal point
-        // - internal point to external point
-        // - external point to external point
-        // The problem is that the last one mixes external edges with internal
-        // edges with two points on the boundary.
-
-
-        // Map to sort into new upper-triangular order
-        labelList oldToNew(es.size());
-        if (debug)
-        {
-            oldToNew = -1;
-        }
-
-        // start of edges with 0 boundary points
-        label internal0EdgeI = 0;
-
-        // start of edges with 1 boundary points
-        label internal1EdgeI = nInternal0Edges_;
-
-        // start of edges with 2 boundary points
-        label internal2EdgeI = nInternal1Edges_;
-
-        // start of external edges
-        label externalEdgeI = nInternalEdges_;
-
-
-        // To sort neighbouring points in increasing order. Defined outside
-        // for optimisation reasons: if all connectivity size same will need
-        // no reallocations
-        SortableList<label> nbrPoints(primitiveMesh::edgesPerPoint_);
-
-        forAll(pe, pointI)
-        {
-            const DynamicList<label>& pEdges = pe[pointI];
-
-            nbrPoints.setSize(pEdges.size());
-
-            forAll(pEdges, i)
-            {
-                const edge& e = es[pEdges[i]];
-
-                label nbrPointI = e.otherVertex(pointI);
-
-                if (nbrPointI < pointI)
-                {
-                    nbrPoints[i] = -1;
-                }
-                else
-                {
-                    nbrPoints[i] = nbrPointI;
-                }
-            }
-            nbrPoints.sort();
-
-
-            if (nInternalPoints_ == -1)
-            {
-                // Sort all upper-triangular
-                forAll(nbrPoints, i)
-                {
-                    if (nbrPoints[i] != -1)
-                    {
-                        label edgeI = pEdges[nbrPoints.indices()[i]];
-
-                        oldToNew[edgeI] = internal0EdgeI++;
-                    }
-                }
-            }
-            else
-            {
-                if (pointI < nInternalPoints_)
-                {
-                    forAll(nbrPoints, i)
-                    {
-                        label nbrPointI = nbrPoints[i];
-
-                        label edgeI = pEdges[nbrPoints.indices()[i]];
-
-                        if (nbrPointI != -1)
-                        {
-                            if (edgeI < nExtEdges)
-                            {
-                                // External edge
-                                oldToNew[edgeI] = externalEdgeI++;
-                            }
-                            else if (nbrPointI < nInternalPoints_)
-                            {
-                                // Both points inside
-                                oldToNew[edgeI] = internal0EdgeI++;
-                            }
-                            else
-                            {
-                                // One points inside, one outside
-                                oldToNew[edgeI] = internal1EdgeI++;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    forAll(nbrPoints, i)
-                    {
-                        label nbrPointI = nbrPoints[i];
-
-                        label edgeI = pEdges[nbrPoints.indices()[i]];
-
-                        if (nbrPointI != -1)
-                        {
-                            if (edgeI < nExtEdges)
-                            {
-                                // External edge
-                                oldToNew[edgeI] = externalEdgeI++;
-                            }
-                            else if (nbrPointI < nInternalPoints_)
-                            {
-                                // Not possible!
-                                FatalErrorIn("primitiveMesh::calcEdges(..)")
-                                    << abort(FatalError);
-                            }
-                            else
-                            {
-                                // Both points outside
-                                oldToNew[edgeI] = internal2EdgeI++;
-                            }
+                            // Remember the face and subShape giving neighbour
+                            faceGivingNeighbour(addedNeighbours.size() - 1)
+                                .append(curFaces[faceI]);
+                            edgeOfFaceGivingNeighbour
+                                (addedNeighbours.size() - 1).append(edgeI);
                         }
                     }
                 }
             }
-        }
 
+            // All edges for the current point found. Before adding them to the
+            // list, it is necessary to sort them in the increasing order of the
+            // neighbouring point.
 
-        if (debug)
-        {
-            label edgeI = findIndex(oldToNew, -1);
+            // Make real list out of SLList to simplify the manipulation.
+            // Also, make another list to "remember" how the original list was
+            // reshuffled.
+            labelList shuffleList(addedNeighbours.size());
 
-            if (edgeI != -1)
+            forAll (shuffleList, i)
             {
-                const edge& e = es[edgeI];
+                shuffleList[i] = i;
+            }
 
-                FatalErrorIn("primitiveMesh::calcEdges(..)")
-                    << "Did not sort edge " << edgeI << " points:" << e
-                    << " coords:" << points()[e[0]] << points()[e[1]]
-                    << endl
-                    << "Current buckets:" << endl
-                    << "    internal0EdgeI:" << internal0EdgeI << endl
-                    << "    internal1EdgeI:" << internal1EdgeI << endl
-                    << "    internal2EdgeI:" << internal2EdgeI << endl
-                    << "    externalEdgeI:" << externalEdgeI << endl
-                    << abort(FatalError);
+            // Use a simple sort to sort the addedNeighbours list.
+            //  Other two lists mimic the same behaviour
+            label i, j, a, b;
+
+            for (j = 1; j <= addedNeighbours.size() - 1; j++)
+            {
+                a = addedNeighbours[j];
+                b = shuffleList[j];
+
+                i = j - 1;
+
+                while (i >= 0 && addedNeighbours[i] > a)
+                {
+                    addedNeighbours[i + 1] = addedNeighbours[i];
+                    shuffleList[i + 1] = shuffleList[i];
+                    i--;
+                }
+
+                addedNeighbours[i + 1] = a;
+                shuffleList[i + 1] = b;
+            }
+
+            labelList reshuffleList(shuffleList.size());
+
+            forAll(shuffleList, i)
+            {
+                reshuffleList[shuffleList[i]] = i;
+            }
+
+            // Reshuffle other lists
+
+            labelListList fgn(faceGivingNeighbour.size());
+
+            forAll (faceGivingNeighbour, i)
+            {
+                fgn[reshuffleList[i]].transfer(faceGivingNeighbour[i].shrink());
+            }
+
+            labelListList eofgn(edgeOfFaceGivingNeighbour.size());
+
+            forAll (edgeOfFaceGivingNeighbour, i)
+            {
+                eofgn[reshuffleList[i]].transfer
+                (
+                    edgeOfFaceGivingNeighbour[i].shrink()
+                );
+            }
+
+            // adding the edges
+            forAll(addedNeighbours, edgeI)
+            {
+                const labelList& curFgn = fgn[edgeI];
+                const labelList& curEofgn = eofgn[edgeI];
+
+                forAll (curFgn, fgnI)
+                {
+                    fe[curFgn[fgnI]][curEofgn[fgnI]] = nEdges;
+                }
+
+                e[nEdges] = edge(pointI, addedNeighbours[edgeI]);
+                nEdges++;
             }
         }
 
-
-
-        // Renumber and transfer.
-
-        // Edges
-        edgesPtr_ = new edgeList(es.size());
-        edgeList& edges = *edgesPtr_;
-        forAll(es, edgeI)
-        {
-            edges[oldToNew[edgeI]] = es[edgeI];
-        }
-
-        // pointEdges
-        pePtr_ = new labelListList(nPoints());
-        labelListList& pointEdges = *pePtr_;
-        forAll(pe, pointI)
-        {
-            DynamicList<label>& pEdges = pe[pointI];
-            pEdges.shrink();
-            inplaceRenumber(oldToNew, pEdges);
-            pointEdges[pointI].transfer(pEdges);
-            Foam::sort(pointEdges[pointI]);
-        }
-
-        // faceEdges
-        if (doFaceEdges)
-        {
-            labelListList& faceEdges = *fePtr_;
-            forAll(faceEdges, faceI)
-            {
-                inplaceRenumber(oldToNew, faceEdges[faceI]);
-            }
-        }
+        // reset the size
+        e.setSize(nEdges);
     }
 }
 
@@ -505,22 +351,12 @@ const Foam::edgeList& Foam::primitiveMesh::edges() const
 {
     if (!edgesPtr_)
     {
-        //calcEdges(true);
-        calcEdges(false);
+        // 1.6.x merge: reverting to correct code
+        // HJ, 17/Aug/2010
+        calcEdges();
     }
 
     return *edgesPtr_;
-}
-
-const Foam::labelListList& Foam::primitiveMesh::pointEdges() const
-{
-    if (!pePtr_)
-    {
-        //calcEdges(true);
-        calcEdges(false);
-    }
-
-    return *pePtr_;
 }
 
 
@@ -528,47 +364,9 @@ const Foam::labelListList& Foam::primitiveMesh::faceEdges() const
 {
     if (!fePtr_)
     {
-        if (debug)
-        {
-            Pout<< "primitiveMesh::faceEdges() : "
-                << "calculating faceEdges" << endl;
-        }
-
-        //calcEdges(true);
-        const faceList& fcs = faces();
-        const labelListList& pe = pointEdges();
-        const edgeList& es = edges();
-
-        fePtr_ = new labelListList(fcs.size());
-        labelListList& faceEdges = *fePtr_;
-
-        forAll(fcs, faceI)
-        {
-            const face& f = fcs[faceI];
-
-            labelList& fEdges = faceEdges[faceI];
-            fEdges.setSize(f.size());
-
-            forAll(f, fp)
-            {
-                label pointI = f[fp];
-                label nextPointI = f[f.fcIndex(fp)];
-
-                // Find edge between pointI, nextPontI
-                const labelList& pEdges = pe[pointI];
-
-                forAll(pEdges, i)
-                {
-                    label edgeI = pEdges[i];
-
-                    if (es[edgeI].otherVertex(pointI) == nextPointI)
-                    {
-                        fEdges[fp] = edgeI;
-                        break;
-                    }
-                }
-            }
-        }
+        // 1.6.x merge: reverting to correct code
+        // HJ, 17/Aug/2010
+        calcEdges();
     }
 
     return *fePtr_;
@@ -578,7 +376,6 @@ const Foam::labelListList& Foam::primitiveMesh::faceEdges() const
 void Foam::primitiveMesh::clearOutEdges()
 {
     deleteDemandDrivenData(edgesPtr_);
-    deleteDemandDrivenData(pePtr_);
     deleteDemandDrivenData(fePtr_);
     labels_.clear();
     labelSet_.clear();
@@ -677,7 +474,5 @@ const Foam::labelList& Foam::primitiveMesh::cellEdges(const label cellI) const
     return cellEdges(cellI, labels_);
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // ************************************************************************* //

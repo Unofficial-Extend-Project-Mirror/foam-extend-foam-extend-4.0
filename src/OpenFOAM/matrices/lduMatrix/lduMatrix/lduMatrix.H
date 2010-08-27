@@ -250,6 +250,11 @@ public:
             //- Maximum number of iterations
             label maxIter_;
 
+
+    protected:
+
+        // Protected data
+
             //- Matrix reference
             const lduMatrix& matrix_;
 
@@ -451,7 +456,9 @@ public:
     //- Abstract base-class for lduMatrix smoothers
     class smoother
     {
-        // Private data
+    protected:
+
+        // Protected data
 
             //- Matrix reference
             const lduMatrix& matrix_;
@@ -585,7 +592,9 @@ public:
     //- Abstract base-class for lduMatrix preconditioners
     class preconditioner
     {
-        // Private data
+    protected:
+
+        // Protected data
 
             //- Matrix reference
             const lduMatrix& matrix_;

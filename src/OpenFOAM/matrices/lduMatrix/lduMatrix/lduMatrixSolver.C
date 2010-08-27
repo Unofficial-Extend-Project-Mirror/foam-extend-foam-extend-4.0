@@ -48,7 +48,7 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
     const dictionary& dict
 )
 {
-    word name(dict.lookup("solver"));
+    word solverName(dict.lookup("solver"));
 
     if (matrix.diagonal())
     {
@@ -243,10 +243,11 @@ Foam::lduMatrix::solver::solver
 
 void Foam::lduMatrix::solver::readControls()
 {
-    minIter_   = dict_.lookupOrDefault<label>("minIter", 0);
-    maxIter_   = dict_.lookupOrDefault<label>("maxIter", 1000);
     tolerance_ = dict_.lookupOrDefault<scalar>("tolerance", 1e-6);
-    relTol_    = dict_.lookupOrDefault<scalar>("relTol", 0);
+    relTolerance_ = dict_.lookupOrDefault<scalar>("relTol", 0);
+
+    minIter_ = dict_.lookupOrDefault<label>("minIter", 0);
+    maxIter_ = dict_.lookupOrDefault<label>("maxIter", 1000);
 }
 
 

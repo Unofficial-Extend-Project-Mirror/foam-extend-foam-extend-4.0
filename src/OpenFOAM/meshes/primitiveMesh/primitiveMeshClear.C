@@ -94,7 +94,7 @@ void Foam::primitiveMesh::printAllocated() const
     {
         Pout<< "    Point-point" << endl;
     }
-    
+
     if (cpPtr_)
     {
         Pout<< "    Cell-point" << endl;

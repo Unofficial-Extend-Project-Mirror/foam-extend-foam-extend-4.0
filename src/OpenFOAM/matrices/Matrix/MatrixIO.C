@@ -32,8 +32,8 @@ License
 
 // * * * * * * * * * * * * * * * Ostream Operator *  * * * * * * * * * * * * //
 
-template<class T>
-Foam::Matrix<T>::Matrix(Istream& is)
+template<class Form, class Type>
+Foam::Matrix<Form, Type>::Matrix(Istream& is)
 :
     v_(NULL),
     n_(0),
@@ -43,17 +43,17 @@ Foam::Matrix<T>::Matrix(Istream& is)
 }
 
 
-template<class T>
-Foam::Istream& Foam::operator>>(Istream& is, Matrix<T>& M)
+template<class Form, class Type>
+Foam::Istream& Foam::operator>>(Istream& is, Matrix<Form, Type>& M)
 {
     // Anull matrix
     M.clear();
 
-    is.fatalCheck("operator>>(Istream&, Matrix<T>&)");
+    is.fatalCheck("operator>>(Istream&, Matrix<Form, Type>&)");
 
     token firstToken(is);
 
-    is.fatalCheck("operator>>(Istream&, Matrix<T>&) : reading first token");
+    is.fatalCheck("operator>>(Istream&, Matrix<Form, Type>&) : reading first token");
 
     if (firstToken.isLabel())
     {
@@ -63,7 +63,7 @@ Foam::Istream& Foam::operator>>(Istream& is, Matrix<T>& M)
         label nm = M.n_*M.m_;
 
         // Read list contents depending on data format
-        if (is.format() == IOstream::ASCII || !contiguous<T>())
+        if (is.format() == IOstream::ASCII || !contiguous<Type>())
         {
             // Read beginning of contents
             char listDelimiter = is.readBeginList("Matrix");
@@ -71,7 +71,7 @@ Foam::Istream& Foam::operator>>(Istream& is, Matrix<T>& M)
             if (nm)
             {
                 M.allocate();
-                T* v = M.v_[0];
+                Type* v = M.v_[0];
 
                 if (listDelimiter == token::BEGIN_LIST)
                 {
@@ -88,7 +88,7 @@ Foam::Istream& Foam::operator>>(Istream& is, Matrix<T>& M)
 
                             is.fatalCheck
                             (
-                                "operator>>(Istream&, Matrix<T>&) : "
+                                "operator>>(Istream&, Matrix<Form, Type>&) : "
                                 "reading entry"
                             );
                         }
@@ -98,12 +98,12 @@ Foam::Istream& Foam::operator>>(Istream& is, Matrix<T>& M)
                 }
                 else
                 {
-                    T element;
+                    Type element;
                     is >> element;
 
                     is.fatalCheck
                     (
-                        "operator>>(Istream&, Matrix<T>&) : "
+                        "operator>>(Istream&, Matrix<Form, Type>&) : "
                         "reading the single entry"
                     );
 
@@ -122,13 +122,13 @@ Foam::Istream& Foam::operator>>(Istream& is, Matrix<T>& M)
             if (nm)
             {
                 M.allocate();
-                T* v = M.v_[0];
+                Type* v = M.v_[0];
 
-                is.read(reinterpret_cast<char*>(v), nm*sizeof(T));
+                is.read(reinterpret_cast<char*>(v), nm*sizeof(Type));
 
                 is.fatalCheck
                 (
-                    "operator>>(Istream&, Matrix<T>&) : "
+                    "operator>>(Istream&, Matrix<Form, Type>&) : "
                     "reading the binary block"
                 );
             }
@@ -136,7 +136,7 @@ Foam::Istream& Foam::operator>>(Istream& is, Matrix<T>& M)
     }
     else
     {
-        FatalIOErrorIn("operator>>(Istream&, Matrix<T>&)", is)
+        FatalIOErrorIn("operator>>(Istream&, Matrix<Form, Type>&)", is)
             << "incorrect first token, expected <int>, found "
             << firstToken.info()
             << exit(FatalIOError);
@@ -146,23 +146,23 @@ Foam::Istream& Foam::operator>>(Istream& is, Matrix<T>& M)
 }
 
 
-template<class T>
-Foam::Ostream& Foam::operator<<(Ostream& os, const Matrix<T>& M)
+template<class Form, class Type>
+Foam::Ostream& Foam::operator<<(Ostream& os, const Matrix<Form, Type>& M)
 {
     label nm = M.n_*M.m_;
 
     os  << M.n() << token::SPACE << M.m();
 
     // Write list contents depending on data format
-    if (os.format() == IOstream::ASCII || !contiguous<T>())
+    if (os.format() == IOstream::ASCII || !contiguous<Type>())
     {
         if (nm)
         {
             bool uniform = false;
 
-            const T* v = M.v_[0];
+            const Type* v = M.v_[0];
 
-            if (nm > 1 && contiguous<T>())
+            if (nm > 1 && contiguous<Type>())
             {
                 uniform = true;
 
@@ -189,7 +189,7 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const Matrix<T>& M)
             }
             // Fix: matrices smaller than 20x20 will be written square.
             // HJ, 22/Jan/2009
-            else if (nm < 400 && contiguous<T>())
+            else if (nm < 400 && contiguous<Type>())
             {
                 // Write size of list and start contents delimiter
                 os  << token::BEGIN_LIST;
@@ -248,7 +248,7 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const Matrix<T>& M)
     {
         if (nm)
         {
-            os.write(reinterpret_cast<const char*>(M.v_[0]), nm*sizeof(T));
+            os.write(reinterpret_cast<const char*>(M.v_[0]), nm*sizeof(Type));
         }
     }
 

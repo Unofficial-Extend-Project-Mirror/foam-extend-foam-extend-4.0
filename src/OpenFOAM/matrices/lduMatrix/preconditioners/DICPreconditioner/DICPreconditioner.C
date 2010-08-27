@@ -38,21 +38,6 @@ namespace Foam
 }
 
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-Foam::DICPreconditioner::DICPreconditioner
-(
-    const lduMatrix::solver& sol,
-    const dictionary&
-)
-:
-    lduMatrix::preconditioner(sol),
-    rD_(sol.matrix().diag())
-{
-    calcReciprocalD(rD_, sol.matrix());
-}
-
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void Foam::DICPreconditioner::calcReciprocalD
@@ -93,7 +78,7 @@ Foam::DICPreconditioner::DICPreconditioner
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    const dictionary& 
+    const dictionary&
 )
 :
     lduPreconditioner

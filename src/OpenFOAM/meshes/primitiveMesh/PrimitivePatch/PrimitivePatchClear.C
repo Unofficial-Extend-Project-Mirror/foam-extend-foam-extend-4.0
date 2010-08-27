@@ -27,7 +27,6 @@ License
 #include "PrimitivePatch.H"
 #include "demandDrivenData.H"
 
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template

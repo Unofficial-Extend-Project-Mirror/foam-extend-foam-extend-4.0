@@ -200,12 +200,15 @@ class primitiveMesh
             //- Calculate point-point addressing
             void calcPointPoints() const;
 
-            //- Calculate edges, pointEdges and faceEdges (if doFaceEdges=true)
-            //  During edge calculation, a larger set of data is assembled.
-            //  Create and destroy as a set, using clearOutEdges()
-            void calcEdges(const bool doFaceEdges) const;
+            //- Calculate edges, pointEdges and faceEdges
+            void calcEdges(const bool) const;
+
+            //- During edge calculation, a larger set of data is assembled.
+            // Create and destroy as a set, using clearOutEdges()
             void clearOutEdges();
-            //- Helper: return (after optional creation) edge between two points
+
+            //- Helper:
+            //  return (after optional creation) edge between two points
             static label getEdge
             (
                 List<DynamicList<label> >&,
@@ -432,18 +435,8 @@ public:
                     const label nCells = -1
                 );
 
-                //- Helper function to calculate point ordering. Returns true
-                //  if points already ordered, false and fills pointMap (old to
-                //  new). Map splits points into those not used by any boundary
-                //  face and those that are.
-                static bool calcPointOrder
-                (
-                    label& nInternalPoints,
-                    labelList& pointMap,
-                    const faceList&,
-                    const label nInternalFaces,
-                    const label nPoints
-                );
+            // Removed calcPointOrder - garbage.  HJ, 27/Aug/2010
+
 
             // Return mesh connectivity
 

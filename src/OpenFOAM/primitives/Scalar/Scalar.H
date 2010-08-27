@@ -208,6 +208,11 @@ inline Scalar cmptDivide(const Scalar s1, const Scalar s2)
     return s1/s2;
 }
 
+inline Scalar cmptSumMultiply(const Scalar s1, const Scalar s2)
+{
+    return s1*s2;
+}
+
 inline Scalar cmptMax(const Scalar s)
 {
     return s;
@@ -271,6 +276,24 @@ inline Scalar stabilise(const Scalar s, const Scalar small)
     else
     {
         return s - small;
+    }
+}
+
+
+inline Scalar cmptStabilise
+(
+    const Scalar s,
+    const Scalar small,
+    const Scalar value
+)
+{
+    if (mag(s) < small)
+    {
+        return sign(s)*value;
+    }
+    else
+    {
+        return s;
     }
 }
 

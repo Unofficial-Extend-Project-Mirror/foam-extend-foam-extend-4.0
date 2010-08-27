@@ -26,7 +26,6 @@ License
 
 #include "cylindricalCS.H"
 
-#include "one.H"
 #include "Switch.H"
 #include "mathematicalConstants.H"
 #include "addToRunTimeSelectionTable.H"
@@ -133,7 +132,7 @@ Foam::vector Foam::cylindricalCS::localToGlobal
 {
     scalar theta
     (
-        local.y() * ( inDegrees_ ? mathematicalConstant::pi/180.0 : 1.0 )  
+        local.y() * ( inDegrees_ ? mathematicalConstant::pi/180.0 : 1.0 )
     );
 
     return coordinateSystem::localToGlobal

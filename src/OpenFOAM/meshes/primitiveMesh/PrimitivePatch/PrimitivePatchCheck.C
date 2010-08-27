@@ -30,7 +30,7 @@ Description
 #include "PrimitivePatch.H"
 #include "Map.H"
 #include "ListOps.H"
-
+#include "OFstream.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -496,9 +496,5 @@ writeVTKNormals
     mps << nl;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

@@ -49,28 +49,6 @@ namespace Foam
                        Class dlLibraryTable Declaration
 \*---------------------------------------------------------------------------*/
 
-//- A means of hashing pointer addresses
-template<>
-class Hash<void*>
-{
-
-public:
-
-    Hash()
-    {}
-
-    long operator()(const void* const& p) const
-    {
-        return long(p);
-    }
-
-    label operator()(const void* const& p, const label tableSize) const
-    {
-        return abs(operator()(p)) % tableSize;
-    }
-};
-
-
 class dlLibraryTable
 :
     public HashTable<fileName, void*, Hash<void*> >

@@ -84,7 +84,7 @@ Foam::lduPreconditioner::New
 
     const dictionary& controls = e.isDict() ? e.dict() : dictionary::null;
 
-    if (sol.matrix().symmetric())
+    if (matrix.symmetric())
     {
         symMatrixConstructorTable::iterator constructorIter =
             symMatrixConstructorTablePtr_->find(preconName);
@@ -121,7 +121,7 @@ Foam::lduPreconditioner::New
             )
         );
     }
-    else if (sol.matrix().asymmetric())
+    else if (matrix.asymmetric())
     {
         asymMatrixConstructorTable::iterator constructorIter =
             asymMatrixConstructorTablePtr_->find(preconName);

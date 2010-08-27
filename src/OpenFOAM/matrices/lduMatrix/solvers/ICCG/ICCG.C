@@ -72,7 +72,7 @@ Foam::ICCG::ICCG
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    const dictionary& solverControls
+    const dictionary& dict
 )
 :
     PCG
@@ -82,7 +82,7 @@ Foam::ICCG::ICCG
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverControls
+        dict
     )
 {}
 

@@ -42,7 +42,7 @@ inline Foam::SubField<Type>::SubField
     const UList<Type>& list
 )
 :
-q    SubList<Type>(list, list.size())
+    SubList<Type>(list, list.size())
 {}
 
 

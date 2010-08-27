@@ -62,7 +62,7 @@ class GAMGPreconditioner
         //- Number of V-cycles to perform
         label nVcycles_;
 
-        //- Read the control parameters from the controlDict_
+        //- Read the control parameters from the dictionary
         virtual void readControls();
 
 public:

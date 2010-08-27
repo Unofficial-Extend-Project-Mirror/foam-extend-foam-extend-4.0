@@ -414,6 +414,7 @@ $(primitiveMesh)/primitiveMeshFaceCentresAndAreas.C
 $(primitiveMesh)/primitiveMeshFindCell.C
 $(primitiveMesh)/primitiveMeshPointCells.C
 $(primitiveMesh)/primitiveMeshPointFaces.C
+$(primitiveMesh)/primitiveMeshPointEdges.C
 $(primitiveMesh)/primitiveMeshPointPoints.C
 $(primitiveMesh)/primitiveMeshCellPoints.C
 $(primitiveMesh)/primitiveMeshCalcCellShapes.C

@@ -95,13 +95,13 @@ public:
     // Constructors
 
         //- Construct null
-        cylindricalCS(const bool inDegrees=true);
+        cylindricalCS(const bool inDegrees = true);
 
         //- Construct copy
         cylindricalCS
         (
             const coordinateSystem&,
-            const bool inDegrees=true
+            const bool inDegrees = true
         );
 
         //- Construct copy with a different name
@@ -109,7 +109,7 @@ public:
         (
             const word& name,
             const coordinateSystem&,
-            const bool inDegrees=true
+            const bool inDegrees = true
         );
 
         //- Construct from origin and rotation
@@ -118,7 +118,7 @@ public:
             const word& name,
             const point& origin,
             const coordinateRotation&,
-            const bool inDegrees=true
+            const bool inDegrees = true
         );
 
         //- Construct from origin and 2 axes
@@ -128,7 +128,7 @@ public:
             const point& origin,
             const vector& axis,
             const vector& dirn,
-            const bool inDegrees=true
+            const bool inDegrees = true
         );
 
         //- Construct from dictionary

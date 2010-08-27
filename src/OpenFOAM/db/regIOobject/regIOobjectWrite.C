@@ -84,7 +84,15 @@ bool Foam::regIOobject::writeObject
 
     {
         // Try opening an OFstream for object
-        OFstream os(objectPath(), fmt, ver, cmp);
+        // Stream open for over-write.  HJ, 17/Aug/2010
+        OFstream os
+        (
+            objectPath(),
+            ios_base::out|ios_base::trunc,
+            fmt,
+            ver,
+            cmp
+        );
 
         // If any of these fail, return (leave error handling to Ostream class)
         if (!os.good())

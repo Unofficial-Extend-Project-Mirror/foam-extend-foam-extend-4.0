@@ -51,31 +51,32 @@ namespace Foam
 
 // Forward declaration of friend functions and operators
 
-template<class T> class Matrix;
+template<class Form, class Type> class Matrix;
 
-template<class T> const T& max(const Matrix<T>&);
-template<class T> const T& min(const Matrix<T>&);
+template<class Form, class Type> Istream& operator>>
+(
+    Istream&,
+    Matrix<Form, Type>&
+);
 
-template<class T> Matrix<T> operator-(const Matrix<T>&);
-template<class T> Matrix<T> operator+(const Matrix<T>&, const Matrix<T>&);
-template<class T> Matrix<T> operator-(const Matrix<T>&, const Matrix<T>&);
-template<class T> Matrix<T> operator*(const scalar, const Matrix<T>&);
-
-template<class T> Istream& operator>>(Istream&, Matrix<T>&);
-template<class T> Ostream& operator<<(Ostream&, const Matrix<T>&);
+template<class Form, class Type> Ostream& operator<<
+(
+    Ostream&,
+    const Matrix<Form, Type>&
+);
 
 
 /*---------------------------------------------------------------------------*\
                            Class Matrix Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class T>
+template<class Form, class Type>
 class Matrix
 {
     // Private data
 
         //- Row pointers
-        T** __restrict__ v_;
+        Type** __restrict__ v_;
 
         //- Number of rows and columns in Matrix.
         label n_, m_;
@@ -87,6 +88,12 @@ class Matrix
 
 public:
 
+    // Static Member Functions
+
+        //- Return a null Matrix
+        inline static const Matrix<Form, Type>& null();
+
+
     // Constructors
 
         //- Null constructor.
@@ -97,16 +104,16 @@ public:
 
         //- Construct with given number of rows and columns
         //  and value for all elements.
-        Matrix(const label n, const label m, const T&);
+        Matrix(const label n, const label m, const Type&);
 
         //- Copy constructor.
-        Matrix(const Matrix<T>&);
+    Matrix(const Matrix<Form, Type>&);
 
         //- Construct from Istream.
         Matrix(Istream&);
 
         //- Clone
-        inline autoPtr<Matrix<T> > clone() const;
+        inline autoPtr<Matrix<Form, Type> > clone() const;
 
 
     // Destructor
@@ -115,10 +122,6 @@ public:
 
 
     // Member functions
-
-        //- Return a null Matrix
-        static const Matrix<T>& null();
-
 
         // Access
 
@@ -148,46 +151,70 @@ public:
 
             //- Transfer the contents of the argument Matrix into this Matrix
             //  and annull the argument Matrix.
-            void transfer(Matrix<T>&);
+            void transfer(Matrix<Form, Type>&);
+
+
+        //- Return the transpose of the matrix
+        Form T() const;
 
 
     // Member operators
 
         //- Return subscript-checked element of Matrix.
-        inline T* operator[](const label);
+        inline Type* operator[](const label);
 
         //- Return subscript-checked element of constant Matrix.
-        inline const T* operator[](const label) const;
+        inline const Type* operator[](const label) const;
 
         //- Assignment operator. Takes linear time.
-        void operator=(const Matrix<T>&);
+        void operator=(const Matrix<Form, Type>&);
 
         //- Assignment of all entries to the given value
-        void operator=(const T&);
-
-
-    // Friend functions
-
-        friend const T& max<T>(const Matrix<T>&);
-        friend const T& min<T>(const Matrix<T>&);
-
-
-    // Friend operators
-
-        friend Matrix<T> operator-<T>(const Matrix<T>&);
-        friend Matrix<T> operator+<T>(const Matrix<T>&, const Matrix<T>&);
-        friend Matrix<T> operator-<T>(const Matrix<T>&, const Matrix<T>&);
-        friend Matrix<T> operator*<T>(const scalar, const Matrix<T>&);
+        void operator=(const Type&);
 
 
     // IOstream operators
 
         //- Read Matrix from Istream, discarding contents of existing Matrix.
-        friend Istream& operator>> <T>(Istream&, Matrix<T>&);
+        friend Istream& operator>> <Form, Type>
+        (
+            Istream&,
+            Matrix<Form, Type>&
+        );
 
         // Write Matrix to Ostream.
-        friend Ostream& operator<< <T>(Ostream&, const Matrix<T>&);
+        friend Ostream& operator<< <Form, Type>
+        (
+            Ostream&,
+            const Matrix<Form, Type>&
+        );
 };
+
+
+// Global functions and operators
+
+template<class Form, class Type> const Type& max(const Matrix<Form, Type>&);
+template<class Form, class Type> const Type& min(const Matrix<Form, Type>&);
+
+template<class Form, class Type> Form operator-(const Matrix<Form, Type>&);
+
+template<class Form, class Type> Form operator+
+(
+    const Matrix<Form, Type>&,
+    const Matrix<Form, Type>&
+);
+
+template<class Form, class Type> Form operator-
+(
+    const Matrix<Form, Type>&,
+    const Matrix<Form, Type>&
+);
+
+template<class Form, class Type> Form operator*
+(
+    const scalar,
+    const Matrix<Form, Type>&
+);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

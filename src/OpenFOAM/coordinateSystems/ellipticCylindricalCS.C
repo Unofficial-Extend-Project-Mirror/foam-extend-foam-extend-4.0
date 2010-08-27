@@ -25,8 +25,10 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "ellipticCylindricalCS.H"
-#include "addToRunTimeSelectionTable.H"
+
+#include "Switch.H"
 #include "mathematicalConstants.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -59,6 +61,7 @@ Foam::ellipticCylindricalCS::ellipticCylindricalCS
 )
 :
     coordinateSystem(cs),
+    a_(0),
     inDegrees_(inDegrees)
 {}
 
@@ -71,6 +74,22 @@ Foam::ellipticCylindricalCS::ellipticCylindricalCS
 )
 :
     coordinateSystem(name, cs),
+    a_(0),
+    inDegrees_(inDegrees)
+{}
+
+
+Foam::ellipticCylindricalCS::ellipticCylindricalCS
+(
+    const word& name,
+    const point& origin,
+    const coordinateRotation& cr,
+    const scalar a,
+    const bool inDegrees
+)
+:
+    coordinateSystem(name, origin, cr),
+    a_(a),
     inDegrees_(inDegrees)
 {}
 
@@ -86,21 +105,6 @@ Foam::ellipticCylindricalCS::ellipticCylindricalCS
 )
 :
     coordinateSystem(name, origin, axis, direction),
-    a_(a),
-    inDegrees_(inDegrees)
-{}
-
-
-Foam::ellipticCylindricalCS::ellipticCylindricalCS
-(
-    const word& name,
-    const point& origin,
-    const coordinateRotation& cr,
-    const scalar a,
-    const bool inDegrees
-)
-:
-    coordinateSystem(name, origin, cr),
     a_(a),
     inDegrees_(inDegrees)
 {}
@@ -128,8 +132,7 @@ Foam::vector Foam::ellipticCylindricalCS::localToGlobal
 {
     // Notation: u = local.x() v = local.y() z = local.z();
     scalar theta =
-        local.y()
-       *( inDegrees_ ? mathematicalConstant::pi/180.0 : 1.0 )
+        local.y()*( inDegrees_ ? mathematicalConstant::pi/180.0 : 1.0 );
 
     return coordinateSystem::localToGlobal
     (
@@ -150,8 +153,8 @@ Foam::tmp<Foam::vectorField> Foam::ellipticCylindricalCS::localToGlobal
 ) const
 {
     scalarField theta =
-        local.component(vector::Y)
-       *( inDegrees_ ? mathematicalConstant::pi/180.0 : 1.0 )
+        local.component(vector::Y)*
+        ( inDegrees_ ? mathematicalConstant::pi/180.0 : 1.0 );
 
     vectorField lc(local.size());
     lc.replace

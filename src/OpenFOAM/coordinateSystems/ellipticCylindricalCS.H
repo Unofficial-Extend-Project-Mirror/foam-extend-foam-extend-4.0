@@ -108,14 +108,14 @@ public:
         ellipticCylindricalCS(const bool inDegrees = true);
 
         //- Construct copy
-        sphericalCS
+        ellipticCylindricalCS
         (
             const coordinateSystem&,
             const bool inDegrees = true
         );
 
         //- Construct copy with a different name
-        sphericalCS
+        ellipticCylindricalCS
         (
             const word& name,
             const coordinateSystem&,
@@ -128,6 +128,17 @@ public:
             const word& name,
             const point& origin,
             const coordinateRotation& cr,
+            const scalar a,
+            const bool inDegrees = true
+        );
+
+        //- Construct from origin and 2 axes
+        ellipticCylindricalCS
+        (
+            const word& name,
+            const point& origin,
+            const vector& axis,
+            const vector& dirn,
             const scalar a,
             const bool inDegrees = true
         );

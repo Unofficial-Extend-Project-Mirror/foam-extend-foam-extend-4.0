@@ -624,46 +624,45 @@ inline pointHit triangle<Point, PointRef>::fastIntersection
             // Ray parallel to triangle. Return miss
             return intersection;
         }
-    }
 
-    const scalar inv_det = 1/det;
+        const scalar inv_det = 1/det;
 
         /* calculate distance from a_ to ray origin */
         const vector tVec = orig - a_;
 
-    /* calculate U parameter and test bounds */
-    const scalar u = (tVec & pVec)*inv_det;
+        /* calculate U parameter and test bounds */
+        const scalar u = (tVec & pVec)*inv_det;
 
-    if (u < -tol || u > 1.0 + tol)
-    {
-        // return miss
-        return intersection;
-    }
+        if (u < -tol || u > 1.0 + tol)
+        {
+            // return miss
+            return intersection;
+        }
 
-    /* prepare to test V parameter */
-    const vector qVec = tVec ^ edge1;
+        /* prepare to test V parameter */
+        const vector qVec = tVec ^ edge1;
 
-    /* calculate V parameter and test bounds */
-    const scalar v = (dir & qVec) * inv_det;
+        /* calculate V parameter and test bounds */
+        const scalar v = (dir & qVec) * inv_det;
 
-    if (v < -tol || u + v > 1.0 + tol)
-    {
-        // return miss
-        return intersection;
-    }
+        if (v < -tol || u + v > 1.0 + tol)
+        {
+            // return miss
+            return intersection;
+        }
 
-    /* calculate t, scale parameters, ray intersects triangle */
-    const scalar t = (edge2 & qVec)*inv_det;
+        /* calculate t, scale parameters, ray intersects triangle */
+        const scalar t = (edge2 & qVec)*inv_det;
 
-    if (alg == intersection::HALF_RAY && t < -tol)
-    {
-        // Wrong side of orig. Return miss
-        return intersection;
-    }
+        if (alg == intersection::HALF_RAY && t < -tol)
+        {
+            // Wrong side of orig. Return miss
+            return intersection;
+        }
 
-    intersection.setHit();
-    intersection.setPoint(a_ + u*edge1 + v*edge2);
-    intersection.setDistance(t);
+        intersection.setHit();
+        intersection.setPoint(a_ + u*edge1 + v*edge2);
+        intersection.setDistance(t);
     }
     else
     {

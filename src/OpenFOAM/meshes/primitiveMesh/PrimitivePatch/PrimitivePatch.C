@@ -26,11 +26,6 @@ License
 
 #include "Map.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template
@@ -41,7 +36,8 @@ template
     class PointType
 >
 const bool
-PrimitivePatch<Face, FaceList, PointField, PointType>::nSquaredProjection_
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+nSquaredProjection_
 (
     debug::optimisationSwitch("nSquaredProjection", 0) > 0
 );

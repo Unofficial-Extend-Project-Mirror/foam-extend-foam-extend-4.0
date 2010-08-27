@@ -49,7 +49,7 @@ Foam::smoothSolver::smoothSolver
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    const dictionary& solverControls
+    const dictionary& dict
 )
 :
     lduSolver
@@ -59,7 +59,7 @@ Foam::smoothSolver::smoothSolver
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverControls
+        dict
     )
 {
     readControls();
@@ -71,7 +71,7 @@ Foam::smoothSolver::smoothSolver
 void Foam::smoothSolver::readControls()
 {
     lduSolver::readControls();
-    nSweeps_ = controlDict_.lookupOrDefault<label>("nSweeps", 1);
+    nSweeps_ = dict().lookupOrDefault<label>("nSweeps", 1);
 }
 
 
@@ -93,6 +93,7 @@ Foam::lduSolverPerformance Foam::smoothSolver::solve
             matrix_,
             coupleBouCoeffs_,
             coupleIntCoeffs_,
+            interfaces_,
             dict()
         );
 
@@ -140,6 +141,7 @@ Foam::lduSolverPerformance Foam::smoothSolver::solve
                 matrix_,
                 coupleBouCoeffs_,
                 coupleIntCoeffs_,
+                interfaces_,
                 dict()
             );
 

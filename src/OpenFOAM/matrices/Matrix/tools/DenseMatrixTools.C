@@ -25,7 +25,7 @@ License
 Class
     DenseMatrixTools
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "DenseMatrixTools.H"
 #include "Swap.H"
@@ -36,7 +36,7 @@ Class
 template<class T>
 static void Foam::DenseMatrixTools::solve
 (
-    Matrix<T>& A,
+    SquareMatrix<T>& A,
     List<T>& x,
     List<T>& b
 )
@@ -107,12 +107,12 @@ static void Foam::DenseMatrixTools::solve
 }
 
 
-template<class T>
+template<class Form, class Type>
 static void Foam::DenseMatrixTools::qrDecompose
 (
     const label nCols,
-    FieldField<Field, T>& A,
-    Matrix<T>& R
+    FieldField<Field, Type>& A,
+    Matrix<Form, T>& R
 )
 {
     // Note: consider Arnoldi algorithm for speed-up.  HJ, 14/Sep/2006
@@ -128,9 +128,9 @@ static void Foam::DenseMatrixTools::qrDecompose
 
         for (label k = j + 1; k < nCols; k++)
         {
-            const Field<T>& Aj = A[j];
-            Field<T>& Ak = A[k];
-            T& Rjk = R[j][k];
+            const Field<Type>& Aj = A[j];
+            Field<Type>& Ak = A[k];
+            Type& Rjk = R[j][k];
 
             Rjk = gSumProd(Aj, Ak);
 

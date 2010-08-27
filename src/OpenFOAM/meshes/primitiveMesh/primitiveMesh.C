@@ -125,85 +125,6 @@ Foam::primitiveMesh::~primitiveMesh()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-bool Foam::primitiveMesh::calcPointOrder
-(
-    label& nInternalPoints,
-    labelList& oldToNew,
-    const faceList& faces,
-    const label nInternalFaces,
-    const label nPoints
-)
-{
-    // Internal points are points that are not used by a boundary face.
-
-    // Map from old to new position
-    oldToNew.setSize(nPoints);
-    oldToNew = -1;
-
-
-    // 1. Create compact addressing for boundary points. Start off by indexing
-    // from 0 inside oldToNew. (shifted up later on)
-
-    label nBoundaryPoints = 0;
-    for (label faceI = nInternalFaces; faceI < faces.size(); faceI++)
-    {
-        const face& f = faces[faceI];
-
-        forAll(f, fp)
-        {
-            label pointI = f[fp];
-
-            if (oldToNew[pointI] == -1)
-            {
-                oldToNew[pointI] = nBoundaryPoints++;
-            }
-        }
-    }
-
-    // Now we know the number of boundary and internal points
-
-    nInternalPoints = nPoints - nBoundaryPoints;
-
-    // Move the boundary addressing up
-    forAll(oldToNew, pointI)
-    {
-        if (oldToNew[pointI] != -1)
-        {
-            oldToNew[pointI] += nInternalPoints;
-        }
-    }
-
-
-    // 2. Compact the internal points. Detect whether internal and boundary
-    // points are mixed.
-
-    label internalPointI = 0;
-
-    bool ordered = true;
-
-    for (label faceI = 0; faceI < nInternalFaces; faceI++)
-    {
-        const face& f = faces[faceI];
-
-        forAll(f, fp)
-        {
-            label pointI = f[fp];
-
-            if (oldToNew[pointI] == -1)
-            {
-                if (pointI >= nInternalPoints)
-                {
-                    ordered = false;
-                }
-                oldToNew[pointI] = internalPointI++;
-            }
-        }
-    }
-
-    return ordered;
-}
-
-
 void Foam::primitiveMesh::reset
 (
     const label nPoints,
@@ -216,40 +137,14 @@ void Foam::primitiveMesh::reset
 
     nPoints_ = nPoints;
     nEdges_ = -1;
-    nInternal0Edges_ = -1;
-    nInternal1Edges_ = -1;
-    nInternalEdges_ = -1;
 
     nInternalFaces_ = nInternalFaces;
     nFaces_ = nFaces;
     nCells_ = nCells;
 
-    // Check if points are ordered
-    label nInternalPoints;
-    labelList pointMap;
-
-    bool isOrdered = calcPointOrder
-    (
-        nInternalPoints,
-        pointMap,
-        faces(),
-        nInternalFaces_,
-        nPoints_
-    );
-
-    if (isOrdered)
-    {
-        nInternalPoints_ = nInternalPoints;
-    }
-    else
-    {
-        nInternalPoints_ = -1;
-    }
-
     if (debug)
     {
         Pout<< "primitiveMesh::reset : mesh reset to"
-            << " nInternalPoints:" << nInternalPoints_
             << " nPoints:" << nPoints_
             << " nEdges:" << nEdges_
             << " nInternalFaces:" << nInternalFaces_

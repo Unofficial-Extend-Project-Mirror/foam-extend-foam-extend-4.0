@@ -75,7 +75,7 @@ Foam::lduMatrix::solverPerformance Foam::GAMGSolver::solve
         PtrList<scalarField> coarseB;
 
         // Create the smoothers for all levels
-        PtrList<lduMatrix::smoother> smoothers;
+        PtrList<lduSmoother> smoothers;
 
         // Initialise the above data structures
         initVcycle(coarseCorrX, coarseB, smoothers);
@@ -115,7 +115,7 @@ Foam::lduMatrix::solverPerformance Foam::GAMGSolver::solve
 
 void Foam::GAMGSolver::Vcycle
 (
-    const PtrList<lduMatrix::smoother>& smoothers,
+    const PtrList<lduSmoother>& smoothers,
     scalarField& x,
     const scalarField& b,
     scalarField& Ax,
@@ -352,7 +352,7 @@ void Foam::GAMGSolver::initVcycle
 (
     PtrList<scalarField>& coarseCorrX,
     PtrList<scalarField>& coarseB,
-    PtrList<lduMatrix::smoother>& smoothers
+    PtrList<lduSmoother>& smoothers
 ) const
 {
     coarseCorrX.setSize(matrixLevels_.size());
@@ -363,13 +363,13 @@ void Foam::GAMGSolver::initVcycle
     smoothers.set
     (
         0,
-        lduMatrix::smoother::New
+        lduSmoother::New
         (
-            dict().lookup("smoother"),
             matrix_,
             coupleBouCoeffs_,
             coupleIntCoeffs_,
-            interfaces_
+            interfaces_,
+            dict()
         )
     );
 
@@ -396,13 +396,13 @@ void Foam::GAMGSolver::initVcycle
         smoothers.set
         (
             leveli + 1,
-            lduMatrix::smoother::New
+            lduSmoother::New
             (
-                dict().lookup("smoother"),
                 matrixLevels_[leveli],
                 coupleLevelsBouCoeffs_[leveli],
                 coupleLevelsIntCoeffs_[leveli],
-                interfaceLevels_[leveli]
+                interfaceLevels_[leveli],
+                dict()
             )
         );
     }

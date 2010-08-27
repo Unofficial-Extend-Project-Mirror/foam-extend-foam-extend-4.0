@@ -33,16 +33,20 @@ inline Stream& Foam::IOobject::writeBanner(Stream& os, bool noHint)
 {
     static bool spacesSet = false;
     static char spaces[40];
-    static char spacesRev[40];
 
     if (!spacesSet)
     {
         memset(spaces, ' ', 40);
-        spaces[38 - strlen(Foam::FOAMversion)] = '\0';
 
-        memset(spacesRev, ' ', 40);
-        spacesRev[38 - strlen(Foam::FOAMDevRevisionNumber)] = '\0';
-
+        size_t len = strlen(Foam::FOAMversion);
+        if (len < 38)
+        {
+            spaces[38 - len] = '\0';
+        }
+        else
+        {
+            spaces[0] = '\0';
+        }
         spacesSet = true;
     }
 
@@ -59,10 +63,10 @@ inline Stream& Foam::IOobject::writeBanner(Stream& os, bool noHint)
 
     os  <<
         "| =========                 |                                                 |\n"
-        "| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n"
-        "|  \\\\    /   O peration     | Version:  " << FOAMversion           << spaces << "|\n"
-        "|   \\\\  /    A nd           | Revision: " << FOAMDevRevisionNumber << spacesRev << "|\n"
-        "|    \\\\/     M anipulation  | Web:             www.OpenFOAM.org               |\n"
+        "| \\\\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |\n"
+        "|  \\\\    /   O peration     | Version:  " << FOAMversion << spaces << "|\n"
+        "|   \\\\  /    A nd           | Web:      www.extend-project.de                 |\n"
+        "|    \\\\/     M anipulation  |                                                 |\n"
         "\\*---------------------------------------------------------------------------*/\n";
 
     return os;

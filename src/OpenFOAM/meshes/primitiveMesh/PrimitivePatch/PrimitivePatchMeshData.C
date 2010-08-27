@@ -91,51 +91,35 @@ calcMeshData() const
     forAll(*this, facei)
     {
         const Face& curPoints = this->operator[](facei);
-    
+
         forAll(curPoints, pointi)
         {
             markedPoints.insert(curPoints[pointi], -1);
         }
     }
- 
+
     // Create the storage and store the meshPoints.  Mesh points are
     // the ones marked by the usage loop above
     meshPointsPtr_ = new labelList(markedPoints.toc());
     labelList& pointPatch = *meshPointsPtr_;
-    
+
     // Sort the list to preserve compatibility with the old ordering
     sort(pointPatch);
-    
+
     // For every point in map give it its label in mesh points
     forAll(pointPatch, pointi)
     {
         markedPoints.find(pointPatch[pointi])() = pointi;
     }
 
-    //- Unsorted version:
-    //DynamicList<label> meshPoints(2*this->size());
-    //forAll(*this, facei)
-    //{
+    forAll(*this, faceI)
+    {
         const Face& curPoints = this->operator[](faceI);
 
         forAll (curPoints, pointI)
         {
             markedPoints.insert(curPoints[pointI], -1);
         }
-    }
-
-    // Create the storage and store the meshPoints.  Mesh points are
-    // the ones marked by the usage loop above
-    meshPointsPtr_ = new labelList(markedPoints.toc());
-    labelList& pointPatch = *meshPointsPtr_;
-
-    // Sort the list to preserve compatibility with the old ordering
-    sort(pointPatch);
-
-    // For every point in map give it its label in mesh points
-    forAll (pointPatch, pointI)
-    {
-        markedPoints.find(pointPatch[pointI])() = pointI;
     }
 
     // Create local faces. Note that we start off from copy of original face

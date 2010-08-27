@@ -27,7 +27,6 @@ License
 #include "PrimitivePatch.H"
 #include "HashSet.H"
 
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template

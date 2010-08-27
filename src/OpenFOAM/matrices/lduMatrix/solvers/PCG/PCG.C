@@ -46,7 +46,7 @@ Foam::PCG::PCG
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    const dictionary& solverControls
+    const dictionary& dict
 )
 :
     lduSolver
@@ -56,7 +56,7 @@ Foam::PCG::PCG
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverControls
+        dict
     )
 {}
 
@@ -71,10 +71,10 @@ Foam::lduSolverPerformance Foam::PCG::solve
 ) const
 {
     // --- Setup class containing solver performance data
-    lduMatrix::solverPerformance solverPerf
+    lduSolverPerformance solverPerf
     (
-        lduMatrix::preconditioner::getName(controlDict_) + typeName,
-        fieldName_
+        lduMatrix::preconditioner::getName(dict()) + typeName,
+        fieldName()
     );
 
     register label nCells = x.size();
@@ -194,7 +194,7 @@ Foam::lduSolverPerformance Foam::PCG::solve
 
             for (register label cell=0; cell<nCells; cell++)
             {
-                psiPtr[cell] += alpha*pAPtr[cell];
+                xPtr[cell] += alpha*pAPtr[cell];
                 rAPtr[cell] -= alpha*wAPtr[cell];
             }
 

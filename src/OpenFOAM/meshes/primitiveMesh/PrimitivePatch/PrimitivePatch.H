@@ -69,14 +69,14 @@ class objectHit;
 template<class T> class Map;
 
 /*---------------------------------------------------------------------------*\
-                        Class PrimitivePatchName Declaration
+                      Class PrimitivePatchName Declaration
 \*---------------------------------------------------------------------------*/
 
 TemplateName(PrimitivePatch);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class PrimitivePatch Declaration
+                        Class PrimitivePatch Declaration
 \*---------------------------------------------------------------------------*/
 
 template

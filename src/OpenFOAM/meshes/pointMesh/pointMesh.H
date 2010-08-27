@@ -106,7 +106,7 @@ public:
         //  HJ, 16/Oct/2008
         label nPoints() const
         {
-            return mesh_.nPoints();
+            return mesh.GeoMesh<polyMesh>::mesh_.nPoints();
         }
 
         //- Return number of points
@@ -115,7 +115,7 @@ public:
         //  HJ, 16/Oct/2008
         label nCells() const
         {
-            return mesh_.nCells();
+            return mesh.GeoMesh<polyMesh>::mesh_.nCells();
         }
 
         //- Return reference to boundary mesh
