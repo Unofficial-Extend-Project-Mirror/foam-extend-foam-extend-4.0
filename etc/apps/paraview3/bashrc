@@ -38,7 +38,7 @@ export CMAKE_HOME=$WM_THIRD_PARTY_DIR/cmake-2.4.6/platforms/$WM_ARCH
 if [ -r $CMAKE_HOME ]; then
 # determine the cmake to be used
 unset CMAKE_HOME
-for cmake in cmake-2.6.4 cmake-2.6.2 cmake-2.4.6
+for cmake in cmake-2.8.2 cmake-2.6.4 cmake-2.6.2 cmake-2.4.6
 do
     cmake=$WM_THIRD_PARTY_DIR/$cmake/platforms/$WM_ARCH
     if [ -r $cmake ]

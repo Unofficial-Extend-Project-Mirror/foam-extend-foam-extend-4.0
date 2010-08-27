@@ -75,7 +75,7 @@ namespace debug
     int optimisationSwitch(const char* name, const int defaultValue = 0);
 
     //- Lookup tolerances switch or add default value.
-    double optimisationSwitch(const char* name, const double defaultValue = 0);
+    double tolerances(const char* name, const double defaultValue = 0);
 
     //- Internal function to lookup a sub-dictionary from controlDict.
     dictionary& switchSet(const char* subDictName, dictionary*& subDictPtr);

@@ -63,14 +63,13 @@ coordinateSystems/coordinateSystems.C
 coordinateSystems/parabolicCylindricalCS.C
 coordinateSystems/ellipticCylindricalCS.C
 coordinateSystems/toroidalCS.C
-coordinateSystems/cartesianCS.C
 coordinateSystems/newCoordinateSystem.C
 coordinateSystems/cylindricalCS.C
 coordinateSystems/sphericalCS.C
-coordinateSystems/coordinateRotation/coordinateRotation/coordinateRotation.C
-coordinateSystems/coordinateRotation/EulerCoordinateRotation/EulerCoordinateRotation.C
-coordinateSystems/coordinateRotation/STARCDCoordinateRotation/STARCDCoordinateRotation.C
-coordinateSystems/coordinateRotation/axisCoordinateRotation/axisCoordinateRotation.C
+coordinateSystems/coordinateRotation/coordinateRotation.C
+coordinateSystems/coordinateRotation/EulerCoordinateRotation.C
+coordinateSystems/coordinateRotation/STARCDCoordinateRotation.C
+coordinateSystems/coordinateRotation/axisCoordinateRotation.C
 
 primitives/random/Random.C
 
@@ -98,7 +97,6 @@ $(Streams)/token/tokenIO.C
 
 IOstreams = $(Streams)/IOstreams
 $(IOstreams)/IOstream.C
-$(IOstreams)/versionNumber.C
 $(IOstreams)/Istream.C
 $(IOstreams)/Ostream.C
 
@@ -205,9 +203,6 @@ dimensionedTypes/dimensionedTensor/dimensionedTensor.C
 
 matrices/solution/solution.C
 matrices/constraint/scalarConstraint.C
-
-scalarMatrix = matrices/scalarMatrix
-$(scalarMatrix)/scalarMatrix.C
 
 LUscalarMatrix = matrices/LUscalarMatrix
 $(LUscalarMatrix)/LUscalarMatrix.C

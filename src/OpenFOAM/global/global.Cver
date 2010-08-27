@@ -37,7 +37,6 @@ Description
 
 const char* const Foam::FOAMversion = "VERSION_STRING";
 const char* const Foam::FOAMbuild = "BUILD_STRING";
-const char* const Foam::FOAMDevRevisionNumber = STR_FOAM_DEV_REVISION_NUMBER(FOAM_DEV_REVISION_NUMBER);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

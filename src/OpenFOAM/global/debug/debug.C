@@ -162,9 +162,9 @@ int Foam::debug::optimisationSwitch(const char* name, const int defaultValue)
 }
 
 
-double Foam::debug::debugTolerance
+double Foam::debug::tolerances
 (
-    const char* switchName,
+    const char* name,
     const double defaultValue
 )
 {
@@ -173,11 +173,6 @@ double Foam::debug::debugTolerance
         name, defaultValue, false, false
     );
 }
-
-}  // End namespace debug
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
 // ************************************************************************* //

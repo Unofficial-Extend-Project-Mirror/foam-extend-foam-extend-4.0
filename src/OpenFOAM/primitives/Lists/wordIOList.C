@@ -22,44 +22,23 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Namespace
-    Foam
-
 Description
-    Namespace for OpenFOAM
-
-
-Global
-    Foam::FOAMversion
-
-Description
-    OpenFOAM version number static string.
-
-Global
-    Foam::FOAMbuild
-
-Description
-    OpenFOAM version number static string with build information
-
-SourceFiles
-    global.Cver
+    Declaration of IOList ClassNames for IOLists that do not have .C files.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef foamVersion_H
-#define foamVersion_H
+#include "wordIOList.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    extern const char* const FOAMversion;
-    extern const char* const FOAMbuild;
+    defineCompoundTypeName(List<word>, wordList);
+    addCompoundToRunTimeSelectionTable(List<word>, wordList);
+
+    defineTemplateTypeNameAndDebugWithName(wordIOList, "wordList", 0);
+    defineTemplateTypeNameAndDebugWithName(wordListIOList, "wordListList", 0);
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
-
 // ************************************************************************* //
-

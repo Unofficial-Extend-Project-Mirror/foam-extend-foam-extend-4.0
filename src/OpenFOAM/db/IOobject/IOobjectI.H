@@ -42,7 +42,7 @@ inline Stream& Foam::IOobject::writeBanner(Stream& os, bool noHint)
 
         memset(spacesRev, ' ', 40);
         spacesRev[38 - strlen(Foam::FOAMDevRevisionNumber)] = '\0';
-        
+
         spacesSet = true;
     }
 
