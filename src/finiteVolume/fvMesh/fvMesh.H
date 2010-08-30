@@ -318,7 +318,7 @@ public:
             virtual tmp<scalarField> movePoints(const pointField&);
 
             //- Map all fields in time using given map.
-            virtual void mapFields(const mapPolyMesh& mpm);
+            virtual void mapFields(const mapPolyMesh& mpm) const;
 
             //- Map cell volumes in time using given map.
             virtual void mapOldVolumes(const mapPolyMesh& mpm);

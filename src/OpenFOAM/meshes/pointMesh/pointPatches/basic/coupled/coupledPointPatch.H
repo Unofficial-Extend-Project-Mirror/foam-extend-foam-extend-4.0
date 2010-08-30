@@ -76,11 +76,8 @@ protected:
         //- Calculate the patch geometry
         virtual void calcGeometry() = 0;
 
-        //- Initialise the patches for moving points
-        virtual void initMovePoints(const pointField&) = 0;
-
         //- Correct patches after moving points
-        virtual void movePoints(const pointField&) = 0;
+        virtual void movePoints() = 0;
 
         //- Initialise the update of the patch topology
         virtual void initUpdateMesh() = 0;

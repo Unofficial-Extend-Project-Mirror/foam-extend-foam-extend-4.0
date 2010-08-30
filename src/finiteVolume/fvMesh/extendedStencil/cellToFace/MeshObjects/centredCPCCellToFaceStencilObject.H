@@ -44,7 +44,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class centredCPCCellToFaceStencilObject Declaration
+              Class centredCPCCellToFaceStencilObject Declaration
 \*---------------------------------------------------------------------------*/
 
 class centredCPCCellToFaceStencilObject
@@ -81,6 +81,23 @@ public:
 
         virtual ~centredCPCCellToFaceStencilObject()
         {}
+
+
+    // Member functions
+
+        //- Delete the stencil when the mesh moves
+        virtual bool movePoints() const
+        {
+            deleteObject();
+            return true;
+        }
+
+        //- Delete the stencil when mesh updates
+        virtual bool updateMesh(const mapPolyMesh&) const
+        {
+            deleteObject();
+            return true;
+        }
 };
 
 

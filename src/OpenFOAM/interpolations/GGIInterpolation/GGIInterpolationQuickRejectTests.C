@@ -322,11 +322,11 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursAABB
                 curFacePoints += forwardSep_[0];
             }
             else
-            {        
+            {
                 curFacePoints += forwardSep_[faceSi];
             }
         }
-            
+
         slavePatchBB[faceSi] = boundBox(curFacePoints, false);
 
         // We compute the extent of the slave face BB.
@@ -358,7 +358,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursAABB
                 masterPatchBB[faceMi].max() + deltaBBSlave[faceSi]
             );
 
-            if (augmentedBBMaster.intersects(slavePatchBB[faceSi]))
+            if (augmentedBBMaster.overlaps(slavePatchBB[faceSi]))
             {
                 // Compute featureCos between the two face normals
                 // before adding to the list of candidates

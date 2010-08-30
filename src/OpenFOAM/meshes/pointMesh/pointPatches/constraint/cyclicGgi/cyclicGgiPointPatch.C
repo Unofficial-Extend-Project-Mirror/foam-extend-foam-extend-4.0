@@ -65,14 +65,6 @@ void Foam::cyclicGgiPointPatch::calcGeometry()
 }
 
 
-void Foam::cyclicGgiPointPatch::initMovePoints(const pointField&)
-{}
-
-
-void Foam::cyclicGgiPointPatch::movePoints(const pointField&)
-{}
-
-
 void Foam::cyclicGgiPointPatch::initUpdateMesh()
 {
     facePointPatch::initUpdateMesh();

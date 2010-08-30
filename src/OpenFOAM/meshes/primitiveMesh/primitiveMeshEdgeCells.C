@@ -36,7 +36,8 @@ const Foam::labelListList& Foam::primitiveMesh::edgeCells() const
     {
         if (debug)
         {
-            Pout<< "primitiveMesh::edgeCells() : calculating edgeCells" << endl;
+            Pout<< "primitiveMesh::edgeCells() : calculating edgeCells"
+                << endl;
 
             if (debug == -1)
             {

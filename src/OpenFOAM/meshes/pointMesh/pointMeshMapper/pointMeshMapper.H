@@ -100,7 +100,7 @@ public:
 
         //- Return reference to objectRegistry storing fields. Can be
         //  removed once fields stored on pointMesh.
-        const objectRegistry& db() const
+        const objectRegistry& thisDb() const
         {
             return mesh_();
         }

@@ -60,19 +60,12 @@ void Foam::regionCouplePointPatch::calcGeometry()
     meshPoints_ = regionCouplePolyPatch_.meshPoints();
 
     nonGlobalPatchPoints_.setSize(meshPoints_.size());
+
     forAll(nonGlobalPatchPoints_, i)
     {
         nonGlobalPatchPoints_[i] = i;
     }
 }
-
-
-void Foam::regionCouplePointPatch::initMovePoints(const pointField&)
-{}
-
-
-void Foam::regionCouplePointPatch::movePoints(const pointField&)
-{}
 
 
 void Foam::regionCouplePointPatch::initUpdateMesh()

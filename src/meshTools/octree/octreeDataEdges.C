@@ -107,7 +107,7 @@ bool Foam::octreeDataEdges::overlaps
     const treeBoundBox& sampleBb
 ) const
 {
-    return sampleBb.intersects(allBb_[index]);
+    return sampleBb.overlaps(allBb_[index]);
 }
 
 

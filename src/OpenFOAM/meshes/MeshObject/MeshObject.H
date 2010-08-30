@@ -115,6 +115,9 @@ public:
 
     // Member Functions
 
+        //- Delete object from database
+        virtual bool deleteObject() const;
+
         //- Return mesh reference
         const Mesh& mesh() const
         {

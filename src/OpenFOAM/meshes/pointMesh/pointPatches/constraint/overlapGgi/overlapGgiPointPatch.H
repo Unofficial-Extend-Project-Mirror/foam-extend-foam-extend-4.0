@@ -70,6 +70,10 @@ class overlapGgiPointPatch
         void operator=(const overlapGgiPointPatch&);
 
 
+protected:
+
+    // Protected Member Functions
+
         //- Initialise the calculation of the patch geometry
         virtual void initGeometry();
 
@@ -80,7 +84,7 @@ class overlapGgiPointPatch
         virtual void initMovePoints(const pointField&);
 
         //- Correct patches after moving points
-        virtual void movePoints(const pointField&);
+        virtual void movePoints();
 
         //- Initialise the update of the patch topology
         virtual void initUpdateMesh();

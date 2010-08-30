@@ -301,13 +301,6 @@ pointPatchInterpolation::~pointPatchInterpolation()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void pointPatchInterpolation::updateMesh()
-{
-    makePatchPatchAddressing();
-    makePatchPatchWeights();
-}
-
-
 bool pointPatchInterpolation::movePoints()
 {
     forAll(patchInterpolators_, patchi)
@@ -321,7 +314,14 @@ bool pointPatchInterpolation::movePoints()
 }
 
 
-// Specialisaion of applyCornerConstraints for scalars because
+void pointPatchInterpolation::updateMesh()
+{
+    makePatchPatchAddressing();
+    makePatchPatchWeights();
+}
+
+
+// Specialisation of applyCornerConstraints for scalars because
 // no constraint need be applied
 template<>
 void pointPatchInterpolation::applyCornerConstraints<scalar>

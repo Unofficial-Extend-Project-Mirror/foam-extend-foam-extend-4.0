@@ -66,27 +66,34 @@ class processorPointPatch
 
 
     // Private Member Functions
- 
-       //- Initialise the calculation of the patch geometry
+
+        //- Disallow default construct as copy
+        processorPointPatch(const processorPointPatch&);
+
+        //- Disallow default assignment
+        void operator=(const processorPointPatch&);
+
+
+        //- Initialise the points on this patch which are should also be
+        //  on a neighbouring patch but are not part of faces of that patch
+        void initPatchPatchPoints();
+
+        //- Calculate the points on this patch which are should also be
+        //  on a neighbouring patch but are not part of faces of that patch
+        void calcPatchPatchPoints();
+
+
+protected:
+
+        //- Initialise the calculation of the patch geometry
         virtual void initGeometry();
 
         //- Calculate the patch geometry
         virtual void calcGeometry();
 
-
-        //- Initialise the points on this patch which are should also be 
-        //  on a neighbouring patch but are not part of faces of that patch
-        void initPatchPatchPoints();
-
-        //- Calculate the points on this patch which are should also be 
-        //  on a neighbouring patch but are not part of faces of that patch
-        void calcPatchPatchPoints();
-
-        //- Initialise the patches for moving points
-        virtual void initMovePoints(const pointField&);
-
         //- Correct patches after moving points
-        virtual void movePoints(const pointField&);
+        virtual void movePoints()
+        {}
 
         //- Initialise the update of the patch topology
         virtual void initUpdateMesh();
@@ -94,12 +101,6 @@ class processorPointPatch
         //- Update of the patch topology
         virtual void updateMesh();
 
-
-        //- Disallow default construct as copy
-        processorPointPatch(const processorPointPatch&);
-
-        //- Disallow default assignment
-        void operator=(const processorPointPatch&);
 
 public:
 

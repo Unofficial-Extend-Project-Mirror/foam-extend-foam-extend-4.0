@@ -60,9 +60,6 @@ $(topoSets)/cellSet.C
 $(topoSets)/topoSet.C
 $(topoSets)/faceSet.C
 $(topoSets)/pointSet.C
-$(topoSets)/cellZoneSet.C
-$(topoSets)/faceZoneSet.C
-$(topoSets)/pointZoneSet.C
 
 sets/topoSetSource/topoSetSource.C
 
@@ -107,18 +104,6 @@ $(pointSources)/surfaceToPoint/surfaceToPoint.C
 $(pointSources)/zoneToPoint/zoneToPoint.C
 $(pointSources)/setToPoint/setToPoint.C
 $(pointSources)/nearestToPoint/nearestToPoint.C
-
-faceZoneSources = sets/faceZoneSources
-$(faceZoneSources)/faceZoneToFaceZone/faceZoneToFaceZone.C
-$(faceZoneSources)/setsToFaceZone/setsToFaceZone.C
-$(faceZoneSources)/setToFaceZone/setToFaceZone.C
-
-cellZoneSources = sets/cellZoneSources
-$(cellZoneSources)/setToCellZone/setToCellZone.C
-
-pointZoneSources = sets/pointZoneSources
-$(pointZoneSources)/setToPointZone/setToPointZone.C
-
 
 surfaceSets/surfaceSets.C
 

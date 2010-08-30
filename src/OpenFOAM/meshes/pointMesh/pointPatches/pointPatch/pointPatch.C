@@ -30,4 +30,5 @@ License
 
 defineTypeNameAndDebug(Foam::pointPatch, 0);
 
+
 // ************************************************************************* //

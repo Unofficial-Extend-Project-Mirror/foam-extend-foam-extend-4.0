@@ -478,7 +478,6 @@ public:
             //  patch ends at nActiveFaces) and change patches with addPatches.
             void resetPrimitives
             (
-                const label nUsedFaces,
                 const Xfer<pointField>& points,
                 const Xfer<faceList>& faces,
                 const Xfer<labelList>& owner,

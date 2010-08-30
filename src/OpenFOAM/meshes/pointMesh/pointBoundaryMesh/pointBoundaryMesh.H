@@ -102,7 +102,7 @@ public:
         const globalPointPatch& globalPatch() const;
 
         //- Correct polyBoundaryMesh after moving points
-        void movePoints(const pointField&);
+        void movePoints();
 
         //- Correct polyBoundaryMesh after topology update
         void updateMesh();

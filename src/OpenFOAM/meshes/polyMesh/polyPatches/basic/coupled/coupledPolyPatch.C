@@ -33,8 +33,6 @@ License
 
 defineTypeNameAndDebug(Foam::coupledPolyPatch, 0);
 
-Foam::scalar Foam::coupledPolyPatch::matchTol = 1E-3;
-
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 

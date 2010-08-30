@@ -766,10 +766,6 @@ bool Foam::polyMeshZipUpCells(polyMesh& mesh)
             true                // boundary forms valid boundary mesh.
         );
 
-        // Reset any addressing on face zones.
-        // 1.6.x merge change.  Reconsider.  HJ, 22/Aug/2010
-        mesh.faceZones().clearAddressing();
-
         // Clear the addressing
         mesh.clearOut();
 

@@ -127,9 +127,6 @@ class faceZone
         //- Check addressing
         void checkAddressing() const;
 
-        //- Clear addressing
-        void clearAddressing();
-
 
 public:
 
@@ -295,6 +292,9 @@ public:
             //- Return global edge index for local edges
             const labelList& meshEdges() const;
 
+
+        //- Clear addressing
+        void clearAddressing();
 
         //- Reset addressing and flip map (clearing demand-driven data)
         void resetAddressing(const labelList&, const boolList&);

@@ -49,8 +49,8 @@ Foam::simpleMatrix<Type>::simpleMatrix
 {}
 
 
-template<class T>
-Foam::simpleMatrix<T>::simpleMatrix
+template<class Type>
+Foam::simpleMatrix<Type>::simpleMatrix
 (
     const scalarSquareMatrix& matrix,
     const Field<Type>& source
@@ -76,10 +76,10 @@ Foam::Field<Type> Foam::simpleMatrix<Type>::solve() const
 {
     // Since matrix and source are trashed during solution,
     // a copy is made.  HJ, 23/Dec/2008
-    scalarMatrix tmpMatrix = *this;
-    Field<T> sourceSol = source_;
+    scalarSquareMatrix tmpMatrix = *this;
+    Field<Type> sourceSol = source_;
 
-    scalarMatrix::solve(tmpMatrix, sourceSol);
+    scalarSquareMatrix::solve(tmpMatrix, sourceSol);
 
     return sourceSol;
 }
@@ -90,10 +90,10 @@ Foam::Field<Type> Foam::simpleMatrix<Type>::LUsolve() const
 {
     // Since matrix and source are trashed during solution,
     // a copy is made.  HJ, 23/Dec/2008
-    scalarMatrix luMatrix = *this;
-    Field<T> sourceSol = source_;
+    scalarSquareMatrix luMatrix = *this;
+    Field<Type> sourceSol = source_;
 
-    scalarMatrix::LUsolve(luMatrix, sourceSol);
+    scalarSquareMatrix::LUsolve(luMatrix, sourceSol);
 
     return sourceSol;
 }

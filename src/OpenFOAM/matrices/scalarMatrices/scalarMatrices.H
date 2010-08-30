@@ -40,6 +40,8 @@ SourceFiles
 #include "RectangularMatrix.H"
 #include "SquareMatrix.H"
 #include "DiagonalMatrix.H"
+
+#include "scalarSquareMatrix.H"
 #include "scalarField.H"
 #include "labelList.H"
 
@@ -49,45 +51,7 @@ namespace Foam
 {
 
 typedef RectangularMatrix<scalar> scalarRectangularMatrix;
-typedef SquareMatrix<scalar> scalarSquareMatrix;
 typedef DiagonalMatrix<scalar> scalarDiagonalMatrix;
-
-//- Solve the matrix using Gaussian elimination with pivoting,
-//  returning the solution in the source
-template<class Type>
-void solve(scalarSquareMatrix& matrix, Field<Type>& source);
-
-//- Solve the matrix using Gaussian elimination with pivoting
-//  and return the solution
-template<class Type>
-void solve
-(
-    Field<Type>& psi,
-    const scalarSquareMatrix& matrix,
-    const Field<Type>& source
-);
-
-//- LU decompose the matrix with pivoting
-void LUDecompose
-(
-    scalarSquareMatrix& matrix,
-    labelList& pivotIndices
-);
-
-//- LU back-substitution with given source, returning the solution
-//  in the source
-template<class Type>
-void LUBacksubstitute
-(
-    const scalarSquareMatrix& luMmatrix,
-    const labelList& pivotIndices,
-    Field<Type>& source
-);
-
-//- Solve the matrix using LU decomposition with pivoting
-//  returning the LU form of the matrix and the solution in the source
-template<class Type>
-void LUsolve(scalarSquareMatrix& matrix, Field<Type>& source);
 
 void multiply
 (
@@ -108,7 +72,7 @@ void multiply
 (
     scalarRectangularMatrix& answer,         // value changed in return
     const scalarRectangularMatrix& A,
-    const DiagonalMatrix<scalar>& B,
+    const scalarDiagonalMatrix& B,
     const scalarRectangularMatrix& C
 );
 
@@ -123,12 +87,6 @@ scalarRectangularMatrix SVDinv
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#ifdef NoRepository
-#   include "scalarMatricesTemplates.C"
-#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

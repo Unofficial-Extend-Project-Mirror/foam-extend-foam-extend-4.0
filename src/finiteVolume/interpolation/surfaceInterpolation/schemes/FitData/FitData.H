@@ -143,7 +143,15 @@ public:
 
 
         //- Recalculate weights (but not stencil) when the mesh moves
-        bool movePoints();
+        virtual bool movePoints() const;
+
+
+        //- Delete the stencil when mesh updates
+        virtual bool updateMesh(const mapPolyMesh&) const
+        {
+            this->deleteObject();
+            return true;
+        }
 };
 
 

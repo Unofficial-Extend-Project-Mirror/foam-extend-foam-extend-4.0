@@ -29,9 +29,6 @@ License
 #include "globalMeshData.H"
 #include "demandDrivenData.H"
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void Foam::polyMesh::removeBoundary()
@@ -93,8 +90,6 @@ void Foam::polyMesh::clearGeom()
     // Reset valid directions (could change with rotation)
     geometricD_ = Vector<label>::zero;
     solutionD_ = Vector<label>::zero;
-
-    pointMesh::Delete(*this);
 }
 
 
@@ -116,8 +111,6 @@ void Foam::polyMesh::clearAddressing()
     // Reset valid directions
     geometricD_ = Vector<label>::zero;
     solutionD_ = Vector<label>::zero;
-
-    pointMesh::Delete(*this);
 }
 
 

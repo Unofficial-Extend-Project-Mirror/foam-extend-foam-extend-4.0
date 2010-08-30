@@ -358,7 +358,6 @@ void timeVaryingMappedFixedValueFvPatchField<Type>::readSamplePoints()
     referenceCS_.reset
     (
         new coordinateSystem
-        new cartesianCS
         (
             "reference",
             p0,  // origin

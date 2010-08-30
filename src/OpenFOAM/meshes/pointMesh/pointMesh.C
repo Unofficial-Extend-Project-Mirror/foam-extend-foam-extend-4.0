@@ -32,9 +32,14 @@ License
 #include "MapGeometricFields.H"
 #include "MapPointField.H"
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+defineTypeNameAndDebug(Foam::pointMesh, 0);
+
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::pointMesh::mapFields(const mapPolyMesh& mpm)
+void Foam::pointMesh::mapFields(const mapPolyMesh& mpm) const
 {
     // Create a mapper
     const pointMeshMapper m(*this, mpm);
@@ -48,8 +53,10 @@ void Foam::pointMesh::mapFields(const mapPolyMesh& mpm)
         pointMeshMapper,
         pointMesh
     >(m);
+
     MapGeometricFields<symmTensor, pointPatchField, pointMeshMapper, pointMesh>
     (m);
+
     MapGeometricFields<tensor, pointPatchField, pointMeshMapper, pointMesh>(m);
 }
 
@@ -91,18 +98,26 @@ Foam::pointMesh::pointMesh
 }
 
 
-void Foam::pointMesh::movePoints(const pointField& newPoints)
+bool Foam::pointMesh::movePoints() const
 {
-    boundary_.movePoints(newPoints);
+    // Casting const-ness to answer the interface of meshObject
+    // HJ, 30/Aug/2010
+    const_cast<pointBoundaryMesh&>(boundary_).movePoints();
+
+    return true;
 }
 
 
-void Foam::pointMesh::updateMesh(const mapPolyMesh& mpm)
+bool Foam::pointMesh::updateMesh(const mapPolyMesh& mpm) const
 {
-    boundary_.updateMesh();
+    // Casting const-ness to answer the interface of meshObject
+    // HJ, 30/Aug/2010
+    const_cast<pointBoundaryMesh&>(boundary_).updateMesh();
 
     // Map all registered point fields
     mapFields(mpm);
+
+    return true;
 }
 
 

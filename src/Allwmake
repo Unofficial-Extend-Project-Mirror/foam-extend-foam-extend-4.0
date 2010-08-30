@@ -1,10 +1,14 @@
 #!/bin/sh
 set -x
 
-( cd OpenFOAM && wmakeLnInclude . )
-( cd finiteVolume && wmakeLnInclude . )
-( cd Pstream && ./Allwmake )
-wmake libo OSspecific/$WM_OS
+# update OpenFOAM version strings if required
+wmakePrintBuild -check || /bin/rm -f OpenFOAM/Make/$WM_OPTIONS/global.? 2>/dev/null
+
+wmakeLnInclude OpenFOAM
+wmakeLnInclude OSspecific/$WM_OSTYPE
+Pstream/Allwmake
+
+wmake libo  OSspecific/$WM_OSTYPE
 wmake libso OpenFOAM
 
 ( cd decompositionAgglomeration && ./Allwmake )

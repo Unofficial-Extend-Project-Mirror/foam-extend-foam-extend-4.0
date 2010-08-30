@@ -538,7 +538,7 @@ void Foam::cyclicPolyPatch::getCentresAndAnchors
     const primitivePatch& pp,
     const faceList& half0Faces,
     const faceList& half1Faces,
-
+    pointField& ppPoints,
     pointField& half0Ctrs,
     pointField& half1Ctrs,
     pointField& anchors0,
@@ -770,7 +770,7 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
     transform_(UNKNOWN),
     rotationAxis_(vector::zero),
     rotationCentre_(point::zero),
-    rotationAngle_(0)
+    rotationAngle_(0),
     separationVector_(vector::zero)
 {}
 
@@ -790,7 +790,7 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
     transform_(UNKNOWN),
     rotationAxis_(vector::zero),
     rotationCentre_(point::zero),
-    rotationAngle_(0)
+    rotationAngle_(0),
     separationVector_(vector::zero)
 {
     dict.readIfPresent("featureCos", featureCos_);

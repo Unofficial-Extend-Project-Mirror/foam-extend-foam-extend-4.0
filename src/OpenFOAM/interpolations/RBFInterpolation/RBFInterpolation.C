@@ -33,7 +33,7 @@ Author
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-const Foam::scalarMatrix& Foam::RBFInterpolation::B() const
+const Foam::scalarSquareMatrix& Foam::RBFInterpolation::B() const
 {
     if (!BPtr_)
     {
@@ -48,6 +48,7 @@ void Foam::RBFInterpolation::calcB() const
 {
     // Determine inverse of boundary connectivity matrix
     label polySize(4);
+
     if(!polynomials_)
     {
         polySize = 0;
@@ -151,7 +152,7 @@ void Foam::RBFInterpolation::calcB() const
     // Collect ALL control points from ALL CPUs
     // Create an identical inverse for all CPUs
 
-    BPtr_ = new scalarMatrix(A.LUinvert());
+    BPtr_ = new scalarSquareMatrix(A.LUinvert());
 }
 
 

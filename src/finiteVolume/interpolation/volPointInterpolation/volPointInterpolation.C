@@ -44,7 +44,7 @@ defineTypeNameAndDebug(volPointInterpolation, 0);
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void volPointInterpolation::makeWeights()
+void volPointInterpolation::makeWeights() const
 {
     if (debug)
     {
@@ -87,7 +87,7 @@ void volPointInterpolation::makeWeights()
 
         forAll(pcp, pointCelli)
         {
-            pw[pointCelli] = 
+            pw[pointCelli] =
                 1.0/mag(points[pointi] - cellCentres[pcp[pointCelli]]);
 
             sumWeights[pointi] += pw[pointCelli];
@@ -144,7 +144,7 @@ volPointInterpolation::volPointInterpolation(const fvMesh& vm)
     MeshObject<fvMesh, volPointInterpolation>(vm),
     boundaryInterpolator_(vm)
 {
-    updateMesh();
+    makeWeights();
 }
 
 
@@ -156,17 +156,25 @@ volPointInterpolation::~volPointInterpolation()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void volPointInterpolation::updateMesh()
+bool volPointInterpolation::movePoints() const
 {
     makeWeights();
-    boundaryInterpolator_.updateMesh();
+
+    // Updated for MeshObject handling
+    // HJ, 30/Aug/2010
+    const_cast<pointPatchInterpolation&>(boundaryInterpolator_).movePoints();
+
+    return true;
 }
 
 
-bool volPointInterpolation::movePoints()
+bool volPointInterpolation::updateMesh(const mapPolyMesh&) const
 {
     makeWeights();
-    boundaryInterpolator_.movePoints();
+
+    // Updated for MeshObject handling
+    // HJ, 30/Aug/2010
+    const_cast<pointPatchInterpolation&>(boundaryInterpolator_).updateMesh();
 
     return true;
 }

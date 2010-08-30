@@ -62,7 +62,7 @@ void pointPatchInterpolation::interpolate
     // patch
 
     const fvBoundaryMesh& bm = fvMesh_.boundary();
-    const pointBoundaryMesh& pbm = pointMesh_.boundary();
+    const pointBoundaryMesh& pbm = pointMesh::New(fvMesh_).boundary();
 
     forAll(bm, patchi)
     {

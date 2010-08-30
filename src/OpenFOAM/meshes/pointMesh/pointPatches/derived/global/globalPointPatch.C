@@ -26,8 +26,7 @@ License
 
 #include "globalPointPatch.H"
 #include "globalMeshData.H"
-#include "triFace.H"
-
+#include "triFaceList.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -55,7 +54,7 @@ Foam::globalPointPatch::~globalPointPatch()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-triFaceList globalPointPatch::faceTriangles
+Foam::triFaceList Foam::globalPointPatch::faceTriangles
 (
     const label
 ) const
@@ -65,67 +64,67 @@ triFaceList globalPointPatch::faceTriangles
         "processorPointPatch::faceTriangles(label faceID) const"
     );
 
-    return List<triFace>::null();
+    return triFaceList::null();
 }
 
 
-const edgeList& globalPointPatch::meshEdges() const
+const Foam::edgeList& Foam::globalPointPatch::meshEdges() const
 {
     notImplemented("globalPointPatch::meshEdges() const");
     return edgeList::null();
 }
 
 
-const labelList& globalPointPatch::sharedEdgeAddr() const
+const Foam::labelList& Foam::globalPointPatch::sharedEdgeAddr() const
 {
     notImplemented("globalPointPatch::sharedEdgeAddr() const");
     return labelList::null();
 }
 
 
-const edgeList& globalPointPatch::meshCutEdges() const
+const Foam::edgeList& Foam::globalPointPatch::meshCutEdges() const
 {
     notImplemented("globalPointPatch::meshCutEdges() const");
     return edgeList::null();
 }
 
 
-const scalarField& globalPointPatch::meshCutEdgeMask() const
+const Foam::scalarField& Foam::globalPointPatch::meshCutEdgeMask() const
 {
     notImplemented("globalPointPatch::meshCutEdgeMask() const");
     return scalarField::null();
 }
 
 
-const labelList& globalPointPatch::localEdgeIndices() const
+const Foam::labelList& Foam::globalPointPatch::localEdgeIndices() const
 {
     notImplemented("globalPointPatch::localEdgeIndices() const");
     return labelList::null();
 }
 
 
-const labelList& globalPointPatch::cutEdgeIndices() const
+const Foam::labelList& Foam::globalPointPatch::cutEdgeIndices() const
 {
     notImplemented("globalPointPatch::cutEdgeIndices() const");
     return labelList::null();
 }
 
 
-const labelList& globalPointPatch::cutEdgeOwnerIndices() const
+const Foam::labelList& Foam::globalPointPatch::cutEdgeOwnerIndices() const
 {
     notImplemented("globalPointPatch::cutEdgeOwnerIndices() const");
     return labelList::null();
 }
 
 
-const labelList& globalPointPatch::cutEdgeOwnerStart() const
+const Foam::labelList& Foam::globalPointPatch::cutEdgeOwnerStart() const
 {
     notImplemented("globalPointPatch::cutEdgeOwnerStart() const");
     return labelList::null();
 }
 
 
-const labelList& globalPointPatch::cutEdgeNeighbourIndices() const
+const Foam::labelList& Foam::globalPointPatch::cutEdgeNeighbourIndices() const
 {
     notImplemented
     (
@@ -135,35 +134,35 @@ const labelList& globalPointPatch::cutEdgeNeighbourIndices() const
 }
 
 
-const labelList& globalPointPatch::cutEdgeNeighbourStart() const
+const Foam::labelList& Foam::globalPointPatch::cutEdgeNeighbourStart() const
 {
     notImplemented("globalPointPatch::cutEdgeNeighbourStart() const");
     return labelList::null();
 }
 
 
-const labelList& globalPointPatch::doubleCutEdgeIndices() const
+const Foam::labelList& Foam::globalPointPatch::doubleCutEdgeIndices() const
 {
     notImplemented("globalPointPatch::doubleCutEdgeIndices() const");
     return labelList::null();
 }
 
 
-const labelList& globalPointPatch::doubleCutOwner() const
+const Foam::labelList& Foam::globalPointPatch::doubleCutOwner() const
 {
     notImplemented("globalPointPatch::doubleCutOwner() const");
     return labelList::null();
 }
 
 
-const labelList& globalPointPatch::doubleCutNeighbour() const
+const Foam::labelList& Foam::globalPointPatch::doubleCutNeighbour() const
 {
     notImplemented("globalPointPatch::doubleCutNeighbour() const");
     return labelList::null();
 }
 
 
-const scalarField& globalPointPatch::ownNeiDoubleMask() const
+const Foam::scalarField& Foam::globalPointPatch::ownNeiDoubleMask() const
 {
     notImplemented("globalPointPatch::ownNeiDoubleMask() const");
     return scalarField::null();

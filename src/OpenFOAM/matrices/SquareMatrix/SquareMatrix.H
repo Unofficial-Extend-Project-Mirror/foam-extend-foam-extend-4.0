@@ -65,14 +65,9 @@ public:
         //- Construct given number of rows/columns.
         inline SquareMatrix(const label n);
 
-        //- Construct given number of rows and columns,
-        //  It checks that m == n.
-        inline SquareMatrix(const label m, const label n);
-
         //- Construct with given number of rows and rows
         //  and value for all elements.
-        //  It checks that m == n.
-        inline SquareMatrix(const label m, const label n, const Type&);
+        inline SquareMatrix(const label n, const Type&);
 
         //- Construct from Istream.
         inline SquareMatrix(Istream&);

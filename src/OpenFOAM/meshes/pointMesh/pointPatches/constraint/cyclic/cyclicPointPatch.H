@@ -58,6 +58,13 @@ class cyclicPointPatch
         const cyclicPolyPatch& cyclicPolyPatch_;
 
 
+    // Demand driven private data
+
+        //- The set of pairs of points that require transformation
+        //  and/or mapping
+        edgeList transformPairs_;
+
+
     // Private Member Functions
 
         //- Disallow default construct as copy
@@ -67,11 +74,9 @@ class cyclicPointPatch
         void operator=(const cyclicPointPatch&);
 
 
-    // Demand driven private data
+protected:
 
-        //- The set of pairs of points that require transformation
-        //  and/or mapping
-        edgeList transformPairs_;
+    // Protected Member Functions
 
         //- Initialise the calculation of the patch geometry
         virtual void initGeometry();
@@ -79,11 +84,9 @@ class cyclicPointPatch
         //- Calculate the patch geometry
         virtual void calcGeometry();
 
-        //- Initialise the patches for moving points
-        virtual void initMovePoints(const pointField&);
-
         //- Correct patches after moving points
-        virtual void movePoints(const pointField&);
+        virtual void movePoints()
+        {}
 
         //- Initialise the update of the patch topology
         virtual void initUpdateMesh();

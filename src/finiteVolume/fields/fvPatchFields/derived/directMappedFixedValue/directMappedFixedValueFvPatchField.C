@@ -160,10 +160,6 @@ void directMappedFixedValueFvPatchField<Type>::updateCoeffs()
     );
     const mapDistribute& distMap = mpp.map();
 
-    // Get the scheduling information
-    const List<labelPair>& schedule = mpp.schedule();
-    const labelListList& sendCellLabels = mpp.sendCellLabels();
-    const labelListList& receiveFaceLabels = mpp.receiveFaceLabels();
     // Force recalculation of schedule
     distMap.schedule();
 

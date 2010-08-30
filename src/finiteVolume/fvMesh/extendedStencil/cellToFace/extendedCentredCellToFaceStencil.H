@@ -45,7 +45,7 @@ namespace Foam
 class cellToFaceStencil;
 
 /*---------------------------------------------------------------------------*\
-                           Class extendedCentredCellToFaceStencil Declaration
+               Class extendedCentredCellToFaceStencil Declaration
 \*---------------------------------------------------------------------------*/
 
 class extendedCentredCellToFaceStencil

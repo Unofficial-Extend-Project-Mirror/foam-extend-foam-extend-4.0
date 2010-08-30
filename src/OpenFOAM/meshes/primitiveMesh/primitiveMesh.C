@@ -27,8 +27,6 @@ License
 #include "primitiveMesh.H"
 #include "demandDrivenData.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 defineTypeNameAndDebug(Foam::primitiveMesh, 0);
@@ -38,11 +36,7 @@ defineTypeNameAndDebug(Foam::primitiveMesh, 0);
 
 Foam::primitiveMesh::primitiveMesh()
 :
-    nInternalPoints_(0),    // note: points are considered ordered on empty mesh
     nPoints_(0),
-    nInternal0Edges_(-1),
-    nInternal1Edges_(-1),
-    nInternalEdges_(-1),
     nEdges_(-1),
     nInternalFaces_(0),
     nFaces_(0),
@@ -83,7 +77,6 @@ Foam::primitiveMesh::primitiveMesh
     const label nCells
 )
 :
-    nInternalPoints_(-1),
     nPoints_(nPoints),
     nEdges_(-1),
     nInternalFaces_(nInternalFaces),

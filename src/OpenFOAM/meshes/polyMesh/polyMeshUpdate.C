@@ -31,6 +31,7 @@ Description
 #include "mapPolyMesh.H"
 #include "Time.H"
 #include "globalMeshData.H"
+#include "meshObjectBase.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -74,6 +75,12 @@ void Foam::polyMesh::updateMesh(const mapPolyMesh& mpm)
     geometricD_ = Vector<label>::zero;
     solutionD_ = Vector<label>::zero;
 
+    // Update all function objects
+    // Moved from fvMesh.C in 1.6.x merge.  HJ, 29/Aug/2010
+    meshObjectBase::allUpdateTopology<polyMesh>(*this, mpm);
+}
+
+
 // Sync mesh update with changes on other processors
 void Foam::polyMesh::syncUpdateMesh()
 {
@@ -89,10 +96,18 @@ void Foam::polyMesh::syncUpdateMesh()
     deleteDemandDrivenData(globalMeshDataPtr_);
 
     setInstance(time().timeName());
-    
+
     // Reset valid directions (could change by faces put into empty patches)
     geometricD_ = Vector<label>::zero;
     solutionD_ = Vector<label>::zero;
+
+    // Update all function objects
+    // Moved from fvMesh.C in 1.6.x merge.  HJ, 29/Aug/2010
+
+    // Instantiate a dummy mapPolyMesh
+    autoPtr<mapPolyMesh> mapPtr(new mapPolyMesh(*this));
+
+    meshObjectBase::allUpdateTopology<polyMesh>(*this, mapPtr());
 }
 
 

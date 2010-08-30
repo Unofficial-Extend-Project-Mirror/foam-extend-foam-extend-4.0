@@ -61,7 +61,7 @@ namespace Foam
 class globalIndex;
 
 /*---------------------------------------------------------------------------*\
-                           Class extendedCellToFaceStencil Declaration
+                 Class extendedCellToFaceStencil Declaration
 \*---------------------------------------------------------------------------*/
 
 class extendedCellToFaceStencil
@@ -70,11 +70,8 @@ protected:
 
     // Protected data
 
+        //- Reference to mesh
         const polyMesh& mesh_;
-
-
-    // Protected Member Functions
-
 
 
 private:
@@ -97,6 +94,7 @@ protected:
             const labelListList& stencil,
             const mapDistribute& map
         );
+
 
 public:
 

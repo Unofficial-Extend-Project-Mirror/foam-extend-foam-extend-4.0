@@ -292,7 +292,10 @@ Foam::extendedCellToFaceStencil::calcDistributeMap
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::extendedCellToFaceStencil::extendedCellToFaceStencil(const polyMesh& mesh)
+Foam::extendedCellToFaceStencil::extendedCellToFaceStencil
+(
+    const polyMesh& mesh
+)
 :
     mesh_(mesh)
 {

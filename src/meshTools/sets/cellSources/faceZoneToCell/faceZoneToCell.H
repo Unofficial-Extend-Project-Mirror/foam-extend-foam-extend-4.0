@@ -23,20 +23,21 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::setsToFaceZone
+    Foam::faceZoneToCell
 
 Description
-    A topoSetSource to select faces based on usage in a faceSet and cellSet
+    A topoSetSource to select cells based on side of faceZone.
 
 SourceFiles
-    setsToFaceZone.C
+    faceZoneToCell.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef setsToFaceZone_H
-#define setsToFaceZone_H
+#ifndef faceZoneToCell_H
+#define faceZoneToCell_H
 
 #include "topoSetSource.H"
+#include "wordRe.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,48 +45,66 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class setsToFaceZone Declaration
+                        Class faceZoneToCell Declaration
 \*---------------------------------------------------------------------------*/
 
-class setsToFaceZone
+class faceZoneToCell
 :
     public topoSetSource
 {
+public:
+        //- Enumeration defining the valid options
+        enum faceAction
+        {
+            MASTER,
+            SLAVE
+        };
+
+private:
+
     // Private data
+
+        static const NamedEnum<faceAction, 2> faceActionNames_;
 
         //- Add usage string
         static addToUsageTable usage_;
 
-        //- Name of set to use
-        word faceSetName_;
+        //- Name/regular expression of faceZone
+        wordRe zoneName_;
 
-        //- Name of set to use
-        word cellSetName_;
+        //- Option
+        faceAction option_;
+
+
+    // Private Member Functions
+
+        void combine(topoSet& set, const bool add) const;
+
 
 public:
 
     //- Runtime type information
-    TypeName("setsToFaceZone");
+    TypeName("faceZoneToCell");
 
     // Constructors
 
         //- Construct from components
-        setsToFaceZone
+        faceZoneToCell
         (
             const polyMesh& mesh,
-            const word& faceSetName,
-            const word& cellSetName
+            const word& zoneName,
+            const faceAction option
         );
 
         //- Construct from dictionary
-        setsToFaceZone
+        faceZoneToCell
         (
             const polyMesh& mesh,
             const dictionary& dict
         );
 
         //- Construct from Istream
-        setsToFaceZone
+        faceZoneToCell
         (
             const polyMesh& mesh,
             Istream&
@@ -94,7 +113,7 @@ public:
 
     // Destructor
 
-        virtual ~setsToFaceZone();
+        virtual ~faceZoneToCell();
 
 
     // Member Functions

@@ -75,7 +75,7 @@ protected:
 
     // Protected Member Functions
 
-        // The pointPatch geometry initialisation is called by pointBoundaryMesh
+        // The geometry initialisation is called by pointBoundaryMesh
         friend class pointBoundaryMesh;
 
         //- Initialise the calculation of the patch geometry
@@ -86,15 +86,11 @@ protected:
         virtual void calcGeometry()
         {}
 
-        //- Initialise the patches for moving points
-        virtual void initMovePoints(const pointField&)
-        {}
-
         //- Correct patches after moving points
-        virtual void movePoints(const pointField&)
+        virtual void movePoints()
         {}
 
-        //- Initialise the update of the patch topology
+        //- Initialise update of the patch topology
         virtual void initUpdateMesh()
         {}
 

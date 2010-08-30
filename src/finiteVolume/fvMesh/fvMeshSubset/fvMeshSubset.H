@@ -60,7 +60,7 @@ SourceFiles
 #include "fvPatchFieldMapper.H"
 #include "PointPatchFieldMapper.H"
 #include "GeometricField.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "surfaceMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -73,6 +73,50 @@ inline Foam::SubList<T>::SubList
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class T>
+inline void Foam::SubList<T>::reset
+(
+    const UList<T>& list,
+    const label subSize
+)
+{
+    UList<T>::reset(list.v_, subSize);
+
+#   ifdef FULLDEBUG
+    list.checkSize(subSize);
+#   endif
+}
+
+
+template<class T>
+inline void Foam::SubList<T>::reset
+(
+    const UList<T>& list,
+    const label subSize,
+    const label startIndex
+)
+{
+    UList<T>::reset(&(list.v_[startIndex]), subSize);
+
+#   ifdef FULLDEBUG
+
+    // Artificially allowing the start of a zero-sized subList to be
+    // one past the end of the original list.
+    if (subSize > 0)
+    {
+        list.checkStart(startIndex);
+        list.checkSize(startIndex + subSize);
+    }
+    else
+    {
+        // Start index needs to fall between 0 and size.  One position
+        // behind the last element is allowed
+        list.checkSize(startIndex);
+    }
+#   endif
+}
+
+
+template<class T>
 inline const Foam::SubList<T>& Foam::SubList<T>::null()
 {
     return *reinterpret_cast< SubList<T>* >(0);

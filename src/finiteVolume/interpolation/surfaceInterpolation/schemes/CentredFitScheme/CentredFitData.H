@@ -46,13 +46,18 @@ namespace Foam
 class extendedCentredCellToFaceStencil;
 
 /*---------------------------------------------------------------------------*\
-                    Class CentredFitData Declaration
+                        Class CentredFitData Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Polynomial>
 class CentredFitData
 :
-    public FitData<CentredFitData<Polynomial>, extendedCentredCellToFaceStencil, Polynomial>
+    public FitData
+    <
+        CentredFitData<Polynomial>,
+        extendedCentredCellToFaceStencil,
+        Polynomial
+    >
 {
     // Private data
 
@@ -86,8 +91,9 @@ public:
 
 
     //- Destructor
-    virtual ~CentredFitData()
-    {}
+
+        virtual ~CentredFitData()
+        {}
 
 
     // Member functions

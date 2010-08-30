@@ -98,9 +98,6 @@ class pointZone
         //- Build map of local point indices
         void calcPointLookupMap() const;
 
-        //- Clear addressing
-        void clearAddressing();
-
 
 public:
 
@@ -239,6 +236,9 @@ public:
 
         //- Return zoneMesh reference
         const pointZoneMesh& zoneMesh() const;
+
+        //- Clear addressing
+        void clearAddressing();
 
         //- Check zone definition. Return true if in error.
         bool checkDefinition(const bool report = false) const;

@@ -61,7 +61,7 @@ waveTransmissiveFvPatchField<Type>::waveTransmissiveFvPatchField
 :
     advectiveFvPatchField<Type>(ptf, p, iF, mapper),
     psiName_(ptf.psiName_),
-    psiName_(ptf.UName_),
+    UName_(ptf.UName_),
     gamma_(ptf.gamma_)
 {}
 

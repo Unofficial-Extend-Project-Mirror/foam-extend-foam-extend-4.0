@@ -197,11 +197,14 @@ class primitiveMesh
             //- Calculate edge list
             void calcCellEdges() const;
 
+            //- Calculate point-edge addressing
+            void calcPointEdges() const;
+
             //- Calculate point-point addressing
             void calcPointPoints() const;
 
             //- Calculate edges, pointEdges and faceEdges
-            void calcEdges(const bool) const;
+            void calcEdges() const;
 
             //- During edge calculation, a larger set of data is assembled.
             // Create and destroy as a set, using clearOutEdges()
@@ -218,7 +221,7 @@ class primitiveMesh
             );
             //- For on-the-fly addressing calculation
             static label findFirstCommonElementFromSortedLists
-            ( 
+            (
                 const labelList&,
                 const labelList&
             );

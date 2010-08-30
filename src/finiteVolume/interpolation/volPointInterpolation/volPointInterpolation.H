@@ -58,17 +58,18 @@ class volPointInterpolation
 {
     // Private data
 
-        //- Boundary interpolation engine.
+        //- Boundary interpolation engine
         pointPatchInterpolation boundaryInterpolator_;
 
-        //- Interpolation scheme weighting factor array.
-        scalarListList pointWeights_;
+        //- Interpolation scheme weighting factor array
+        //  Updated for MeshObject.  HJ, 30/Aug/2010
+        mutable scalarListList pointWeights_;
 
 
     // Private member functions
 
         //- Construct point weighting factors
-        void makeWeights();
+        void makeWeights() const;
 
         //- Disallow default bitwise copy construct
         volPointInterpolation(const volPointInterpolation&);
@@ -106,11 +107,13 @@ public:
 
         // Edit
 
-            //- Update mesh topology using the morph engine
-            void updateMesh();
-
             //- Correct weighting factors for moving mesh.
-            bool movePoints();
+            //  Updated for MeshObject.  HJ, 30/Aug/2010
+            virtual bool movePoints() const;
+
+            //- Update mesh topology using the morph engine
+            //  Updated for MeshObject.  HJ, 30/Aug/2010
+            virtual bool updateMesh(const mapPolyMesh&) const;
 
 
     // Interpolation functions

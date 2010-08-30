@@ -64,6 +64,8 @@ class globalPointPatch
         label index_;
 
 
+protected:
+
     // Protected Member Functions
 
         //- Initialise the calculation of the patch geometry
@@ -74,12 +76,8 @@ class globalPointPatch
         virtual void calcGeometry()
         {}
 
-        //- Initialise the patches for moving points
-        virtual void initMovePoints(const pointField&)
-        {}
-
         //- Correct patches after moving points
-        virtual void movePoints(const pointField&)
+        virtual void movePoints()
         {}
 
         //- Initialise the update of the patch topology

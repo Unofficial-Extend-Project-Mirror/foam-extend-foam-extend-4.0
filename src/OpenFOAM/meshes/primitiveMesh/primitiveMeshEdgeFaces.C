@@ -35,7 +35,8 @@ const Foam::labelListList& Foam::primitiveMesh::edgeFaces() const
     {
         if (debug)
         {
-            Pout<< "primitiveMesh::edgeFaces() : calculating edgeFaces" << endl;
+            Pout<< "primitiveMesh::edgeFaces() : calculating edgeFaces"
+                << endl;
 
             if (debug == -1)
             {

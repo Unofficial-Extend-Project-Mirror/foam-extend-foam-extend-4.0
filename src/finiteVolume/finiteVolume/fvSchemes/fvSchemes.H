@@ -128,6 +128,7 @@ public:
 
             bool fluxRequired(const word& name) const;
 
+            bool cache(const word& name) const;
 
 
         // Edit

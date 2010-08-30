@@ -83,6 +83,25 @@ public:
         );
 
 
+    // Member functions
+
+        //- Reset the SubList
+        //- Construct from UList and SubList size
+        inline void reset
+        (
+            const UList<T>& list,
+            const label subSize
+        );
+
+        //- Construct from UList, start and end indices
+        inline void reset
+        (
+            const UList<T>& list,
+            const label subSize,
+            const label startIndex
+        );
+
+
     // Member operators
 
         //- Allow cast to a const List<T>&

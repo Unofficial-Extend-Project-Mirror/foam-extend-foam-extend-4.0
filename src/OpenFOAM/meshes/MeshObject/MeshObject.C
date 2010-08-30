@@ -59,7 +59,10 @@ const Type& Foam::MeshObject<Mesh, Type>::New
     }
     else
     {
-        return mesh.thisDb().objectRegistry::lookupObject<Type>(Type::typeName);
+        return mesh.thisDb().objectRegistry::lookupObject<Type>
+        (
+            Type::typeName
+        );
     }
 }
 
@@ -78,7 +81,10 @@ const Type& Foam::MeshObject<Mesh, Type>::New
     }
     else
     {
-        return mesh.thisDb().objectRegistry::lookupObject<Type>(Type::typeName);
+        return mesh.thisDb().objectRegistry::lookupObject<Type>
+        (
+            Type::typeName
+        );
     }
 }
 
@@ -98,7 +104,10 @@ const Type& Foam::MeshObject<Mesh, Type>::New
     }
     else
     {
-        return mesh.thisDb().objectRegistry::lookupObject<Type>(Type::typeName);
+        return mesh.thisDb().objectRegistry::lookupObject<Type>
+        (
+            Type::typeName
+        );
     }
 }
 
@@ -119,7 +128,10 @@ const Type& Foam::MeshObject<Mesh, Type>::New
     }
     else
     {
-        return mesh.thisDb().objectRegistry::lookupObject<Type>(Type::typeName);
+        return mesh.thisDb().objectRegistry::lookupObject<Type>
+        (
+            Type::typeName
+        );
     }
 }
 
@@ -141,7 +153,10 @@ const Type& Foam::MeshObject<Mesh, Type>::New
     }
     else
     {
-        return mesh.thisDb().objectRegistry::lookupObject<Type>(Type::typeName);
+        return mesh.thisDb().objectRegistry::lookupObject<Type>
+        (
+            Type::typeName
+        );
     }
 }
 
@@ -176,6 +191,19 @@ Foam::MeshObject<Mesh, Type>::~MeshObject()
 {
     release();
 }
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Mesh, class Type>
+bool Foam::MeshObject<Mesh, Type>::deleteObject() const
+{
+    return mesh().thisDb().checkOut
+    (
+        const_cast<MeshObject<Mesh, Type>&>(*this)
+    );
+}
+
 
 
 // ************************************************************************* //

@@ -291,7 +291,8 @@ void Foam::processorPointPatch::calcPatchPatchPoints()
         const labelList& patchPoints = patchPatchPoints[patchi];
         const List<vector>& patchPointNormals = patchPatchPointNormals[patchi];
 
-        // If there are potentially shared points for the patch being considered
+        // If there are potentially shared points for the patch
+        // being considered
         if (patchPoints.size())
         {
             // Get the current meshPoints list for the patch
@@ -358,14 +359,6 @@ void Foam::processorPointPatch::calcPatchPatchPoints()
         }
     }
 }
-
-
-void processorPointPatch::initMovePoints(const pointField&)
-{}
-
-
-void processorPointPatch::movePoints(const pointField&)
-{}
 
 
 void processorPointPatch::initUpdateMesh()

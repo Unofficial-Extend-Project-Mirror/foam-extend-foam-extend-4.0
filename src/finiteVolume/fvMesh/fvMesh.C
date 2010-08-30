@@ -88,22 +88,11 @@ void Foam::fvMesh::clearGeom()
 
     // Mesh motion flux cannot be deleted here because the old-time flux
     // needs to be saved.
-    
-    HJ, review delete of new function objects
-    
-    // Things geometry dependent that are not updated.
-/*
-    volPointInterpolation::Delete(*this);
-    extendedLeastSquaresVectors::Delete(*this);
-    leastSquaresVectors::Delete(*this);
-    CentredFitData<linearFitPolynomial>::Delete(*this);
-    CentredFitData<quadraticFitPolynomial>::Delete(*this);
-    CentredFitData<quadraticLinearFitPolynomial>::Delete(*this);
-    skewCorrectionVectors::Delete(*this);
-    //quadraticFitSnGradData::Delete(*this);
-*/
-}
 
+    // Geometry dependent object updated through call-back
+    // "Reserve" optional delete.  Reconsider
+    // HJ, 29/Aug/2010
+//     meshObjectBase::allDelete(*this);
 }
 
 
@@ -111,31 +100,10 @@ void Foam::fvMesh::clearAddressing()
 {
     deleteDemandDrivenData(lduPtr_);
 
-    // Hack until proper callbacks. Below are all the fvMesh-MeshObjects.
-
-    // HJ, review delete of new function objects
-/*
-    volPointInterpolation::Delete(*this);
-    extendedLeastSquaresVectors::Delete(*this);
-    leastSquaresVectors::Delete(*this);
-    CentredFitData<linearFitPolynomial>::Delete(*this);
-    CentredFitData<quadraticFitPolynomial>::Delete(*this);
-    CentredFitData<quadraticLinearFitPolynomial>::Delete(*this);
-    skewCorrectionVectors::Delete(*this);
-    //quadraticFitSnGradData::Delete(*this);
-
-    centredCECCellToFaceStencilObject::Delete(*this);
-    centredCFCCellToFaceStencilObject::Delete(*this);
-    centredCPCCellToFaceStencilObject::Delete(*this);
-    centredFECCellToFaceStencilObject::Delete(*this);
-    // Is this geometry related - cells distorting to upwind direction?
-    upwindCECCellToFaceStencilObject::Delete(*this);
-    upwindCFCCellToFaceStencilObject::Delete(*this);
-    upwindCPCCellToFaceStencilObject::Delete(*this);
-    upwindFECCellToFaceStencilObject::Delete(*this);
-
-    centredCFCFaceToCellStencilObject::Delete(*this);
-*/
+    // Geometry dependent object updated through call-back
+    // "Reserve" optional delete.  Reconsider
+    // HJ, 29/Aug/2010
+//     meshObjectBase::allDelete(*this);
 }
 
 
@@ -428,11 +396,11 @@ const Foam::lduAddressing& Foam::fvMesh::lduAddr() const
 }
 
 
-void fvMesh::mapFields(const mapPolyMesh& meshMap)
+void  Foam::fvMesh::mapFields(const mapPolyMesh& meshMap) const
 {
     if (debug)
     {
-        Info<< "void fvMesh::mapFields(const mapPolyMesh& meshMap): "
+        Info<< "void fvMesh::mapFields(const mapPolyMesh& meshMap) const: "
             << "Mapping fv fields."
             << endl;
     }
@@ -445,18 +413,24 @@ void fvMesh::mapFields(const mapPolyMesh& meshMap)
     MapGeometricFields<vector, fvPatchField, fvMeshMapper, volMesh>(mapper);
     MapGeometricFields<sphericalTensor, fvPatchField, fvMeshMapper, volMesh>
         (mapper);
-    MapGeometricFields<symmTensor, fvPatchField, fvMeshMapper, volMesh>(mapper);
+
+    MapGeometricFields<symmTensor, fvPatchField, fvMeshMapper, volMesh>
+        (mapper);
+
     MapGeometricFields<tensor, fvPatchField, fvMeshMapper, volMesh>(mapper);
 
     // Map all the surfaceFields in the objectRegistry
     MapGeometricFields<scalar, fvsPatchField, fvMeshMapper, surfaceMesh>
         (mapper);
+
     MapGeometricFields<vector, fvsPatchField, fvMeshMapper, surfaceMesh>
         (mapper);
+
     MapGeometricFields
         <sphericalTensor, fvsPatchField, fvMeshMapper, surfaceMesh>(mapper);
     MapGeometricFields<symmTensor, fvsPatchField, fvMeshMapper, surfaceMesh>
         (mapper);
+
     MapGeometricFields<tensor, fvsPatchField, fvMeshMapper, surfaceMesh>
         (mapper);
 
@@ -465,7 +439,7 @@ void fvMesh::mapFields(const mapPolyMesh& meshMap)
 }
 
 
-void fvMesh::mapOldVolumes(const mapPolyMesh& meshMap)
+void Foam::fvMesh::mapOldVolumes(const mapPolyMesh& meshMap)
 {
     const labelList& cellMap = meshMap.cellMap();
 
@@ -525,7 +499,7 @@ void fvMesh::mapOldVolumes(const mapPolyMesh& meshMap)
 }
 
 
-void fvMesh::updateMesh(const mapPolyMesh& mpm)
+void  Foam::fvMesh::updateMesh(const mapPolyMesh& mpm)
 {
     // Update polyMesh. This needs to keep volume existent!
     polyMesh::updateMesh(mpm);
@@ -545,11 +519,12 @@ void fvMesh::updateMesh(const mapPolyMesh& mpm)
     // This is a temporary solution
     surfaceInterpolation::movePoints();
 
-    meshObjectBase::allUpdateTopology<fvMesh>(*this, mpm);
+    // Function object update moved to polyMesh
+    // HJ, 29/Aug/2010
 }
 
 
-void fvMesh::syncUpdateMesh()
+void  Foam::fvMesh::syncUpdateMesh()
 {
     // Update polyMesh. This needs to keep volume existent!
     polyMesh::syncUpdateMesh();
@@ -568,11 +543,11 @@ void fvMesh::syncUpdateMesh()
     // Instantiate a dummy mapPolyMesh
     autoPtr<mapPolyMesh> mapPtr(new mapPolyMesh(*this));
 
-    meshObjectBase::allUpdateTopology<fvMesh>(*this, mapPtr());
+    // Function object update moved to polyMesh
+    // HJ, 29/Aug/2010
 }
 
 
-tmp<scalarField> fvMesh::movePoints(const pointField& p)
 Foam::tmp<Foam::scalarField> Foam::fvMesh::movePoints(const pointField& p)
 {
     // Grab old time volumes if the time has been incremented
@@ -668,22 +643,10 @@ Foam::tmp<Foam::scalarField> Foam::fvMesh::movePoints(const pointField& p)
 
     boundary_.movePoints();
     surfaceInterpolation::movePoints();
-    meshObjectBase::allMovePoints<fvMesh>(*this);
 
-    HJ, review
-    
- /*
-    // Hack until proper callbacks. Below are all the fvMesh MeshObjects with a
-    // movePoints function.
-    MeshObjectMovePoints<volPointInterpolation>(*this);
-    MeshObjectMovePoints<extendedLeastSquaresVectors>(*this);
-    MeshObjectMovePoints<leastSquaresVectors>(*this);
-    MeshObjectMovePoints<CentredFitData<linearFitPolynomial> >(*this);
-    MeshObjectMovePoints<CentredFitData<quadraticFitPolynomial> >(*this);
-    MeshObjectMovePoints<CentredFitData<quadraticLinearFitPolynomial> >(*this);
-    MeshObjectMovePoints<skewCorrectionVectors>(*this);
-    //MeshObjectMovePoints<quadraticFitSnGradData>(*this);
-*/
+    // Function object update moved to polyMesh
+    // HJ, 29/Aug/2010
+
     return tsweptVols;
 }
 

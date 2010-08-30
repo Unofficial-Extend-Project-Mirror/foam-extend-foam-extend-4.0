@@ -65,14 +65,6 @@ void Foam::overlapGgiPointPatch::calcGeometry()
 }
 
 
-void Foam::overlapGgiPointPatch::initMovePoints(const pointField&)
-{}
-
-
-void Foam::overlapGgiPointPatch::movePoints(const pointField&)
-{}
-
-
 void Foam::overlapGgiPointPatch::initUpdateMesh()
 {
     facePointPatch::initUpdateMesh();

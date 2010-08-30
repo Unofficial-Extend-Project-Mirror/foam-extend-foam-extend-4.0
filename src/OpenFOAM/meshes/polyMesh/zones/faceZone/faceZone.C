@@ -34,6 +34,7 @@ Description
 #include "primitiveMesh.H"
 #include "demandDrivenData.H"
 #include "mapPolyMesh.H"
+#include "syncTools.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -539,8 +540,9 @@ bool Foam::faceZone::checkParallelSync(const bool report) const
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     {
-        boolList neiZoneFace(mesh.nFaces()-mesh.nInternalFaces(), false);
-        boolList neiZoneFlip(mesh.nFaces()-mesh.nInternalFaces(), false);
+        boolList neiZoneFace(mesh.nFaces() - mesh.nInternalFaces(), false);
+        boolList neiZoneFlip(mesh.nFaces() - mesh.nInternalFaces(), false);
+
         forAll(*this, i)
         {
             label faceI = operator[](i);
@@ -551,6 +553,7 @@ bool Foam::faceZone::checkParallelSync(const bool report) const
                 neiZoneFlip[faceI-mesh.nInternalFaces()] = flipMap()[i];
             }
         }
+
         boolList myZoneFace(neiZoneFace);
         syncTools::swapBoundaryFaceList(mesh, neiZoneFace, false);
         boolList myZoneFlip(neiZoneFlip);

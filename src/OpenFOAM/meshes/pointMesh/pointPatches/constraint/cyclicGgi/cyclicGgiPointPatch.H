@@ -73,17 +73,19 @@ class cyclicGgiPointPatch
         void operator=(const cyclicGgiPointPatch&);
 
 
+protected:
+
+    // Protected Member Functions
+
         //- Initialise the calculation of the patch geometry
         virtual void initGeometry();
 
         //- Calculate mesh points
         virtual void calcGeometry();
 
-        //- Initialise the patches for moving points
-        virtual void initMovePoints(const pointField&);
-
         //- Correct patches after moving points
-        virtual void movePoints(const pointField&);
+        virtual void movePoints()
+        {}
 
         //- Initialise the update of the patch topology
         virtual void initUpdateMesh();

@@ -48,7 +48,7 @@ namespace Foam
 
 bool Foam::fvMeshSubset::checkCellSubset() const
 {
-    if (fvMeshSubsetPtr_.empty())
+    if (fvMeshSubsetPtr_)
     {
         FatalErrorIn("bool fvMeshSubset::checkCellSubset() const")
             << "Mesh subset not set.  Please set the cell map using "

@@ -768,7 +768,7 @@ Foam::Map<Foam::label> Foam::surfaceFeatures::nearestSamples
     // Not a compiler bug: octree takes references.
     // HJ, 24/Aug/2010
     treeBoundBox bb(samples);
-    octreeDataPoint odp(samples)
+    octreeDataPoint odp(samples);
 
     octree<octreeDataPoint> ppTree
     (
@@ -1021,7 +1021,7 @@ Foam::Map<Foam::pointIndexHit> Foam::surfaceFeatures::nearestEdges
         sampleEdges,
         samplePoints,
         selectedSampleEdges
-    )
+    );
 
     octree<octreeDataEdges> ppTree
     (

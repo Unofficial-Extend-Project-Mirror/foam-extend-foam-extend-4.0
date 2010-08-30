@@ -31,7 +31,7 @@ License
 #include "emptyPolyPatch.H"
 #include "globalMeshData.H"
 #include "processorPolyPatch.H"
-#include "OSspecific.H"
+#include "meshObjectBase.H"
 #include "demandDrivenData.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -663,7 +663,6 @@ Foam::polyMesh::polyMesh
 
 void Foam::polyMesh::resetPrimitives
 (
-    const label nUsedFaces,
     const Xfer<pointField>& pts,
     const Xfer<faceList>& fcs,
     const Xfer<labelList>& own,
@@ -689,7 +688,8 @@ void Foam::polyMesh::resetPrimitives
 
     if (&fcs)
     {
-        allGaces_.transfer(fcs());
+        allFaces_.transfer(fcs());
+        // Faces will be reset in initMesh(), using size of owner list
     }
 
     if (&own)
@@ -731,7 +731,6 @@ void Foam::polyMesh::resetPrimitives
             (
                 "polyMesh::polyMesh::resetPrimitives\n"
                 "(\n"
-                "    const label nUsedFaces,\n"
                 "    const Xfer<pointField>& points,\n"
                 "    const Xfer<faceList>& faces,\n"
                 "    const Xfer<labelList>& owner,\n"
@@ -748,7 +747,6 @@ void Foam::polyMesh::resetPrimitives
             (
                 "polyMesh::polyMesh::resetPrimitives\n"
                 "(\n"
-                "    const label nUsedFaces,\n"
                 "    const Xfer<pointField>& points,\n"
                 "    const Xfer<faceList>& faces,\n"
                 "    const Xfer<labelList>& owner,\n"
@@ -791,7 +789,6 @@ void Foam::polyMesh::resetPrimitives
             (
                 "polyMesh::polyMesh::resetPrimitives\n"
                 "(\n"
-                "    const label nUsedFaces,\n"
                 "    const Xfer<pointField>&,\n"
                 "    const Xfer<faceList>&,\n"
                 "    const Xfer<labelList>& owner,\n"
@@ -803,6 +800,11 @@ void Foam::polyMesh::resetPrimitives
                 << "no points or no cells in mesh" << endl;
         }
     }
+
+    // Update zones.  1.6.x merge.  HJ, 30/Aug/2010
+    pointZones_.updateMesh();
+    faceZones_.updateMesh();
+    cellZones_.updateMesh();
 }
 
 
@@ -1155,7 +1157,7 @@ Foam::tmp<Foam::scalarField> Foam::polyMesh::movePoints
     tmp<scalarField> sweptVols = primitiveMesh::movePoints
     (
         points_,
-        oldAllPoints()
+        oldPoints()
     );
 
     // Adjust parallel shared points
@@ -1177,6 +1179,10 @@ Foam::tmp<Foam::scalarField> Foam::polyMesh::movePoints
     geometricD_ = Vector<label>::zero;
     solutionD_ = Vector<label>::zero;
 
+    // Update all function objects
+    // Moved from fvMesh.C in 1.6.x merge.  HJ, 29/Aug/2010
+    meshObjectBase::allMovePoints<polyMesh>(*this);
+
     return sweptVols;
 }
 
@@ -1193,7 +1199,7 @@ void Foam::polyMesh::resetMotion() const
 void Foam::polyMesh::setOldPoints
 (
     const pointField& setPoints
-) 
+)
 {
 
     if(setPoints.size() != allPoints_.size())
@@ -1204,7 +1210,8 @@ void Foam::polyMesh::setOldPoints
                 "(\n"
                 "    const pointField& setPoints\n"
                 ")\n"
-            )   << "setPoints size " << setPoints.size() << "different from the mesh points size "
+            )   << "setPoints size " << setPoints.size()
+                << "different from the mesh points size "
                 << allPoints_.size()
                 << abort(FatalError);
     }
@@ -1215,7 +1222,7 @@ void Foam::polyMesh::setOldPoints
     deleteDemandDrivenData(oldAllPointsPtr_);
     deleteDemandDrivenData(oldPointsPtr_);
     allPoints_ = setPoints;
-    oldAllPointsPtr_ = new pointField(allPoints_);    
+    oldAllPointsPtr_ = new pointField(allPoints_);
     oldPointsPtr_ = new pointField::subField(oldAllPoints(), nPoints());
     curMotionTimeIndex_ = 0;
     primitiveMesh::clearGeom();
@@ -1322,6 +1329,7 @@ void Foam::polyMesh::removeFiles(const fileName& instanceDir) const
         rmDir(meshFilesPath/"sets");
     }
 }
+
 
 void Foam::polyMesh::removeFiles() const
 {

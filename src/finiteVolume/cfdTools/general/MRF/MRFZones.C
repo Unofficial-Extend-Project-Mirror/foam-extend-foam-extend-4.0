@@ -65,6 +65,24 @@ void Foam::MRFZones::addCoriolis(fvVectorMatrix& UEqn) const
 }
 
 
+void Foam::MRFZones::relativeFlux(surfaceScalarField& phi) const
+{
+    forAll(*this, i)
+    {
+        operator[](i).relativeFlux(phi);
+    }
+}
+
+
+void Foam::MRFZones::absoluteFlux(surfaceScalarField& phi) const
+{
+    forAll(*this, i)
+    {
+        operator[](i).absoluteFlux(phi);
+    }
+}
+
+
 void Foam::MRFZones::addCoriolis
 (
     const volScalarField& rho,
@@ -74,6 +92,32 @@ void Foam::MRFZones::addCoriolis
     forAll(*this, i)
     {
         operator[](i).addCoriolis(rho, UEqn);
+    }
+}
+
+
+void Foam::MRFZones::relativeFlux
+(
+    const surfaceScalarField& rho,
+    surfaceScalarField& phi
+) const
+{
+    forAll(*this, i)
+    {
+        operator[](i).relativeFlux(rho, phi);
+    }
+}
+
+
+void Foam::MRFZones::absoluteFlux
+(
+    const surfaceScalarField& rho,
+    surfaceScalarField& phi
+) const
+{
+    forAll(*this, i)
+    {
+        operator[](i).absoluteFlux(rho, phi);
     }
 }
 
@@ -92,50 +136,6 @@ void Foam::MRFZones::absoluteVelocity(volVectorField& U) const
     forAll(*this, i)
     {
         operator[](i).absoluteVelocity(U);
-    }
-}
-
-
-void Foam::MRFZones::relativeFlux(surfaceScalarField& phi) const
-{
-    forAll(*this, i)
-    {
-        operator[](i).relativeFlux(phi);
-    }
-}
-
-
-void Foam::MRFZones::relativeFlux
-(
-    const surfaceScalarField& rho,
-    surfaceScalarField& phi
-) const
-{
-    forAll(*this, i)
-    {
-        operator[](i).relativeFlux(rho, phi);
-    }
-}
-
-
-void Foam::MRFZones::absoluteFlux(surfaceScalarField& phi) const
-{
-    forAll(*this, i)
-    {
-        operator[](i).absoluteFlux(phi);
-    }
-}
-
-
-void Foam::MRFZones::absoluteFlux
-(
-    const surfaceScalarField& rho,
-    surfaceScalarField& phi
-) const
-{
-    forAll(*this, i)
-    {
-        operator[](i).absoluteFlux(rho, phi);
     }
 }
 

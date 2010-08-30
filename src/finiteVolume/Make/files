@@ -134,7 +134,6 @@ $(derivedFvPatchFields)/movingWallVelocity/movingWallVelocityFvPatchVectorField.
 $(derivedFvPatchFields)/translatingWallVelocity/translatingWallVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/rotatingWallVelocity/rotatingWallVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/movingRotatingWallVelocity/movingRotatingWallVelocityFvPatchVectorField.C
-$(derivedFvPatchFields)/activeBaffleVelocity/activeBaffleVelocityFvPatchVectorField.C
 $(derivedFvPatchFields)/oscillatingFixedValue/oscillatingFixedValueFvPatchFields.C
 $(derivedFvPatchFields)/fixedMeanValue/fixedMeanValueFvPatchFields.C
 $(derivedFvPatchFields)/outletInlet/outletInletFvPatchFields.C

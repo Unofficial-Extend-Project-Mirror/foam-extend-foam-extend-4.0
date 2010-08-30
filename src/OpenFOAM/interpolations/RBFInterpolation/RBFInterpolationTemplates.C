@@ -72,7 +72,7 @@ Foam::tmp<Foam::Field<Type> > Foam::RBFInterpolation::interpolate
     // 3) Return displacements using tresult()
 
     const label nControlPoints = controlPoints_.size();
-    const scalarMatrix& B_ = B();
+    const scalarSquareMatrix& mat = B();
 
     // Determine interpolation coefficients
     Field<Type> alpha(nControlPoints, pTraits<Type>::zero);
@@ -82,7 +82,7 @@ Foam::tmp<Foam::Field<Type> > Foam::RBFInterpolation::interpolate
     {
         for (label col = 0; col < nControlPoints; col++)
         {
-            alpha[row] += B_[row][col]*ctrlField[col];
+            alpha[row] += mat[row][col]*ctrlField[col];
         }
     }
 
@@ -97,7 +97,7 @@ Foam::tmp<Foam::Field<Type> > Foam::RBFInterpolation::interpolate
         {
             for (label col = 0; col < nControlPoints; col++)
             {
-                beta[row - nControlPoints] += B_[row][col]*ctrlField[col];
+                beta[row - nControlPoints] += mat[row][col]*ctrlField[col];
             }
         }
     }

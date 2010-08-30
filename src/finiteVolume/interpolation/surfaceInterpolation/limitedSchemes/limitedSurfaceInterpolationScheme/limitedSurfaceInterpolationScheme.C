@@ -1,3 +1,4 @@
+
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -156,20 +157,13 @@ limitedSurfaceInterpolationScheme<Type>::~limitedSurfaceInterpolationScheme()
 template<class Type>
 tmp<surfaceScalarField> limitedSurfaceInterpolationScheme<Type>::weights
 (
-    const GeometricField<Type, fvPatchField, volMesh>& phi
     const GeometricField<Type, fvPatchField, volMesh>& phi,
     const surfaceScalarField& CDweights,
     tmp<surfaceScalarField> tLimiter
 ) const
 {
-    const fvMesh& mesh = this->mesh();
-
     // Note that here the weights field is initialised as the limiter
     // from which the weight is calculated using the limiter value
-    tmp<surfaceScalarField> tWeights(this->limiter(phi));
-    surfaceScalarField& Weights = tWeights();
-
-    const surfaceScalarField& CDweights = mesh.surfaceInterpolation::weights();
     surfaceScalarField& Weights = tLimiter();
 
     scalarField& pWeights = Weights.internalField();
@@ -199,7 +193,6 @@ tmp<surfaceScalarField> limitedSurfaceInterpolationScheme<Type>::weights
         }
     }
 
-    return tWeights;
     return tLimiter;
 }
 

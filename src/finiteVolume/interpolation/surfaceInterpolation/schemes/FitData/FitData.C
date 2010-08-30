@@ -318,9 +318,12 @@ void Foam::FitData<FitDataType, ExtendedStencil, Polynomial>::calcFit
 
 
 template<class FitDataType, class ExtendedStencil, class Polynomial>
-bool Foam::FitData<FitDataType, ExtendedStencil, Polynomial>::movePoints()
+bool
+Foam::FitData<FitDataType, ExtendedStencil, Polynomial>::movePoints() const
 {
-    calcFit();
+    const_cast<FitData<FitDataType, ExtendedStencil, Polynomial>&>
+        (*this).calcFit();
+
     return true;
 }
 

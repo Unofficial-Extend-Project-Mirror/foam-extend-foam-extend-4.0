@@ -27,8 +27,6 @@ License
 #include "CECCellToFaceStencil.H"
 #include "CECCellToCellStencil.H"
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::CECCellToFaceStencil::CECCellToFaceStencil(const polyMesh& mesh)

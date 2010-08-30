@@ -60,17 +60,20 @@ class pointMesh
 
     // Private Member Functions
 
-        //- Map all fields
-        void mapFields(const mapPolyMesh&);
-
         //- Disallow default bitwise copy construct
         pointMesh(const pointMesh&);
 
         //- Disallow default bitwise assignment
         void operator=(const pointMesh&);
 
+        //- Map all fields
+        void mapFields(const mapPolyMesh&) const;
+
 
 public:
+
+    // Declare name of the class and its debug switch
+    ClassName("pointMesh");
 
     typedef pointMesh Mesh;
     typedef pointBoundaryMesh BoundaryMesh;
@@ -106,7 +109,7 @@ public:
         //  HJ, 16/Oct/2008
         label nPoints() const
         {
-            return mesh.GeoMesh<polyMesh>::mesh_.nPoints();
+            return GeoMesh<polyMesh>::mesh_.nPoints();
         }
 
         //- Return number of points
@@ -115,7 +118,7 @@ public:
         //  HJ, 16/Oct/2008
         label nCells() const
         {
-            return mesh.GeoMesh<polyMesh>::mesh_.nCells();
+            return GeoMesh<polyMesh>::mesh_.nCells();
         }
 
         //- Return reference to boundary mesh
@@ -140,10 +143,10 @@ public:
         // Mesh motion
 
             //- Move points, returns volumes swept by faces in motion
-            void movePoints(const pointField&);
+            virtual bool movePoints() const;
 
             //- Update the mesh corresponding to given map
-            void updateMesh(const mapPolyMesh& mpm);
+            virtual bool updateMesh(const mapPolyMesh& mpm) const;
 
 
     // Member Operators

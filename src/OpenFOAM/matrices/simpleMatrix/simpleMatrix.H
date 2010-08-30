@@ -148,14 +148,10 @@ public:
         void operator=(const simpleMatrix<Type>&);
 
 
-    // Friend Operators
     // Ostream Operator
 
-        friend simpleMatrix<T> operator+ <T>
         friend Ostream& operator<< <Type>
         (
-            const simpleMatrix<T>&,
-            const simpleMatrix<T>&
             Ostream&,
             const simpleMatrix<Type>&
         );

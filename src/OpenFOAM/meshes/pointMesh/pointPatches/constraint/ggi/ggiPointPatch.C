@@ -65,14 +65,6 @@ void Foam::ggiPointPatch::calcGeometry()
 }
 
 
-void Foam::ggiPointPatch::initMovePoints(const pointField&)
-{}
-
-
-void Foam::ggiPointPatch::movePoints(const pointField&)
-{}
-
-
 void Foam::ggiPointPatch::initUpdateMesh()
 {
     facePointPatch::initUpdateMesh();

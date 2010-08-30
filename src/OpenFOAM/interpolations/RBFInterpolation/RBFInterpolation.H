@@ -99,7 +99,7 @@ class RBFInterpolation
         autoPtr<RBFFunction> RBF_;
 
         //- Interpolation matrix
-        mutable scalarMatrix* BPtr_;
+        mutable scalarSquareMatrix* BPtr_;
 
         //- Focal point for cut-off radii
         point focalPoint_;
@@ -124,7 +124,7 @@ class RBFInterpolation
 
 
         //- Return interpolation matrix
-        const scalarMatrix& B() const;
+        const scalarSquareMatrix& B() const;
 
         //- Calculate interpolation matrix
         void calcB() const;

@@ -149,14 +149,6 @@ void Foam::cyclicPointPatch::calcGeometry()
 }
 
 
-void cyclicPointPatch::initMovePoints(const pointField&)
-{}
-
-
-void cyclicPointPatch::movePoints(const pointField&)
-{}
-
-
 void cyclicPointPatch::initUpdateMesh()
 {
     facePointPatch::initUpdateMesh();

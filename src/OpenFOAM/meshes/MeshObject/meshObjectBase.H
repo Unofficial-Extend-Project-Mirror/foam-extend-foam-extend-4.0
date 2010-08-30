@@ -129,6 +129,32 @@ public:
             }
         }
 
+        //- Move points on all mesh objects
+        template<class Mesh>
+        static void allDelete(const Mesh& mesh)
+        {
+            HashTable<const meshObjectBase*> tbl =
+                mesh.objectRegistry::lookupClass<meshObjectBase>();
+
+            for
+            (
+                HashTable<const meshObjectBase*>::iterator iter =
+                    tbl.begin();
+                iter != tbl.end();
+                ++iter
+            )
+            {
+                const meshObjectBase& obj = *(iter());
+
+                if (Mesh::debug)
+                {
+                    Info << "Deleting object " << obj.type() << endl;
+
+                    obj.deleteObject();
+                }
+            }
+        }
+
 
     // Destructor
 
@@ -143,6 +169,9 @@ public:
 
         //- Update after topology change
         virtual bool updateMesh(const mapPolyMesh&) const = 0;
+
+        //- Delete object from database
+        virtual bool deleteObject() const = 0;
 };
 
 

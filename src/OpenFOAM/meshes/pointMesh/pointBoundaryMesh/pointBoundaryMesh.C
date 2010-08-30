@@ -95,18 +95,13 @@ Foam::pointBoundaryMesh::globalPatch() const
 }
 
 
-void Foam::pointBoundaryMesh::movePoints(const pointField& p)
+void Foam::pointBoundaryMesh::movePoints()
 {
     pointPatchList& patches = *this;
 
     forAll(patches, patchi)
     {
-        patches[patchi].initMovePoints(p);
-    }
-
-    forAll(patches, patchi)
-    {
-        patches[patchi].movePoints(p);
+        patches[patchi].movePoints();
     }
 }
 
