@@ -65,7 +65,7 @@ Foam::scalar Foam::ode<CompType, ThermoType>::solve
 ) const
 {
     label nSpecie = this->model_.nSpecie();
-    scalarField c1(this->model_.nEqns(), 0.0);
+    scalarField& c1 = this->model_.coeffs();
 
     // copy the concentration, T and P to the total solve-vector
     for (label i=0; i<nSpecie; i++)
@@ -79,10 +79,8 @@ Foam::scalar Foam::ode<CompType, ThermoType>::solve
 
     odeSolver_->solve
     (
-        this->model_,
         t0,
         t0 + dt,
-        c1,
         eps_,
         dtEst
     );

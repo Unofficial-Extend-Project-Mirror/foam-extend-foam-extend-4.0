@@ -25,7 +25,7 @@ License
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "ggiCheckFunctionObject.H"
 #include "addToRunTimeSelectionTable.H"
@@ -57,8 +57,7 @@ Foam::ggiCheckFunctionObject::ggiCheckFunctionObject
     const dictionary& dict
 )
 :
-    functionObject(),
-    name_(name),
+    functionObject(name),
     time_(t),
     regionName_(polyMesh::defaultRegion),
     phiName_(dict.lookup("phi"))

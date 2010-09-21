@@ -195,7 +195,7 @@ void Foam::sixDOFqODE::derivatives
     dimensionedVector curOmega
     (
         "curOmega",
-        dimless/dimTime, 
+        dimless/dimTime,
         vector(y[6], y[7], y[8])
     );
 
@@ -217,7 +217,7 @@ void Foam::sixDOFqODE::jacobian
     const scalar x,
     const scalarField& y,
     scalarField& dfdx,
-    Matrix<scalar>& dfdy
+    scalarSquareMatrix& dfdy
 ) const
 {
     Info << "jacobian(...)" << endl;

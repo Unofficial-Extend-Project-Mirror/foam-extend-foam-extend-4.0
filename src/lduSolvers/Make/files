@@ -3,6 +3,7 @@ crMatrix/crMatrix.C
 
 lduPrecon = lduPrecon
 $(lduPrecon)/CholeskyPrecon/CholeskyPrecon.C
+$(lduPrecon)/ILU0/ILU0.C
 $(lduPrecon)/symGaussSeidelPrecon/symGaussSeidelPrecon.C
 $(lduPrecon)/amgPrecon/amgPrecon.C
 

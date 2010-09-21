@@ -32,4 +32,4 @@ pointPatchFields/derived/angularOscillatingDisplacement/angularOscillatingDispla
 pointPatchFields/derived/surfaceSlipDisplacement/surfaceSlipDisplacementPointPatchVectorField.C
 pointPatchFields/derived/surfaceDisplacement/surfaceDisplacementPointPatchVectorField.C
 
-LIB = $(FOAM_LIBBIN)/libfvMotionSolvers
+LIB = $(FOAM_LIBBIN)/libfvMotionSolver

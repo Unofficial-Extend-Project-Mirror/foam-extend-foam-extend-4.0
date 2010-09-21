@@ -31,7 +31,7 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "symGaussSeidelSmoother.H"
 #include "addToRunTimeSelectionTable.H"
@@ -42,7 +42,11 @@ namespace Foam
 {
     defineTypeNameAndDebug(symGaussSeidelSmoother, 0);
 
-    addToRunTimeSelectionTable(lduSmoother, symGaussSeidelSmoother, word);
+    lduSmoother::addsymMatrixConstructorToTable<symGaussSeidelSmoother>
+        addGaussSeidelSmootherSymMatrixConstructorToTable_;
+
+    lduSmoother::addasymMatrixConstructorToTable<symGaussSeidelSmoother>
+        addGaussSeidelSmootherAsymMatrixConstructorToTable_;
 }
 
 

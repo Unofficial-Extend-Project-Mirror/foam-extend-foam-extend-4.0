@@ -29,7 +29,7 @@ License
 #include "Time.H"
 #include "transformField.H"
 #include "fvMesh.H"
-#include "displacementFvMotionSolver.H"
+#include "displacementLaplacianFvMotionSolver.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -40,7 +40,7 @@ namespace Foam
 
 template<>
 const char*
-NamedEnum<surfaceSlipDisplacementPointPatchVectorField::projectMode, 3>::
+NamedEnum<surfaceSlipDisplacementPointPatchVectorField::followMode, 3>::
 names[] =
 {
     "nearest",
@@ -48,27 +48,132 @@ names[] =
     "fixedNormal"
 };
 
-const NamedEnum<surfaceSlipDisplacementPointPatchVectorField::projectMode, 3>
-    surfaceSlipDisplacementPointPatchVectorField::projectModeNames_;
+const NamedEnum<surfaceSlipDisplacementPointPatchVectorField::followMode, 3>
+    surfaceSlipDisplacementPointPatchVectorField::followModeNames_;
 
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-void surfaceSlipDisplacementPointPatchVectorField::calcProjection
+surfaceSlipDisplacementPointPatchVectorField::
+surfaceSlipDisplacementPointPatchVectorField
 (
-    vectorField& displacement
-) const
+    const pointPatch& p,
+    const DimensionedField<vector, pointMesh>& iF
+)
+:
+    pointPatchVectorField(p, iF),
+    projectMode_(NEAREST),
+    projectDir_(vector::zero),
+    wedgePlane_(-1)
+{}
+
+
+surfaceSlipDisplacementPointPatchVectorField::
+surfaceSlipDisplacementPointPatchVectorField
+(
+    const pointPatch& p,
+    const DimensionedField<vector, pointMesh>& iF,
+    const dictionary& dict
+)
+:
+    pointPatchVectorField(p, iF),
+    surfacesDict_(dict.subDict("geometry")),
+    projectMode_(followModeNames_.read(dict.lookup("followMode"))),
+    projectDir_(dict.lookup("projectDirection")),
+    wedgePlane_(readLabel(dict.lookup("wedgePlane"))),
+    frozenPointsZone_(dict.lookup("frozenPointsZone"))
+{}
+
+
+surfaceSlipDisplacementPointPatchVectorField::
+surfaceSlipDisplacementPointPatchVectorField
+(
+    const surfaceSlipDisplacementPointPatchVectorField& ppf,
+    const pointPatch& p,
+    const DimensionedField<vector, pointMesh>& iF,
+    const PointPatchFieldMapper&
+)
+:
+    pointPatchVectorField(p, iF),
+    surfacesDict_(ppf.surfacesDict()),
+    projectMode_(ppf.projectMode()),
+    projectDir_(ppf.projectDir()),
+    wedgePlane_(ppf.wedgePlane()),
+    frozenPointsZone_(ppf.frozenPointsZone())
+{}
+
+
+surfaceSlipDisplacementPointPatchVectorField::
+surfaceSlipDisplacementPointPatchVectorField
+(
+    const surfaceSlipDisplacementPointPatchVectorField& ppf
+)
+:
+    pointPatchVectorField(ppf),
+    surfacesDict_(ppf.surfacesDict()),
+    projectMode_(ppf.projectMode()),
+    projectDir_(ppf.projectDir()),
+    wedgePlane_(ppf.wedgePlane()),
+    frozenPointsZone_(ppf.frozenPointsZone())
+{}
+
+
+surfaceSlipDisplacementPointPatchVectorField::
+surfaceSlipDisplacementPointPatchVectorField
+(
+    const surfaceSlipDisplacementPointPatchVectorField& ppf,
+    const DimensionedField<vector, pointMesh>& iF
+)
+:
+    pointPatchVectorField(ppf, iF),
+    surfacesDict_(ppf.surfacesDict()),
+    projectMode_(ppf.projectMode()),
+    projectDir_(ppf.projectDir()),
+    wedgePlane_(ppf.wedgePlane()),
+    frozenPointsZone_(ppf.frozenPointsZone())
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+const searchableSurfaces& surfaceSlipDisplacementPointPatchVectorField::
+surfaces() const
+{
+    if (!surfacesPtr_.valid())
+    {
+        surfacesPtr_.reset
+        (
+            new searchableSurfaces
+            (
+                IOobject
+                (
+                    "abc",                              // dummy name
+                    db().time().constant(),             // directory
+                    "triSurface",                       // instance
+                    db().time(),                        // registry
+                    IOobject::MUST_READ,
+                    IOobject::NO_WRITE
+                ),
+                surfacesDict_
+            )
+        );
+    }
+    return surfacesPtr_();
+}
+
+
+void surfaceSlipDisplacementPointPatchVectorField::evaluate
+(
+    const Pstream::commsTypes commsType
+)
 {
     const polyMesh& mesh = patch().boundaryMesh().mesh()();
-    const pointField& localPoints = patch().localPoints();
-    const labelList& meshPoints = patch().meshPoints();
 
     //const scalar deltaT = mesh.time().deltaT().value();
 
     // Construct large enough vector in direction of projectDir so
     // we're guaranteed to hit something.
 
-    //- Per point projection vector:
     const scalar projectLen = mag(mesh.bounds().max()-mesh.bounds().min());
 
     // For case of fixed projection vector:
@@ -78,6 +183,13 @@ void surfaceSlipDisplacementPointPatchVectorField::calcProjection
         vector n = projectDir_/mag(projectDir_);
         projectVec = projectLen*n;
     }
+
+    //- Per point projection vector:
+
+    const pointField& localPoints = patch().localPoints();
+    const labelList& meshPoints = patch().meshPoints();
+
+    vectorField displacement(this->patchInternalField());
 
 
     // Get fixed points (bit of a hack)
@@ -95,10 +207,15 @@ void surfaceSlipDisplacementPointPatchVectorField::calcProjection
     }
 
     // Get the starting locations from the motionSolver
-    const pointField& points0 = mesh.lookupObject<displacementFvMotionSolver>
-    (
-        "dynamicMeshDict"
-    ).points0();
+    const displacementLaplacianFvMotionSolver& motionSolver =
+        mesh.lookupObject<displacementLaplacianFvMotionSolver>
+        (
+            "dynamicMeshDict"
+        );
+    const pointField& points0 = motionSolver.points0();
+
+
+//XXXXXX
 
 
     pointField start(meshPoints.size());
@@ -106,8 +223,6 @@ void surfaceSlipDisplacementPointPatchVectorField::calcProjection
     {
         start[i] = points0[meshPoints[i]] + displacement[i];
     }
-
-    label nNotProjected = 0;
 
     if (projectMode_ == NEAREST)
     {
@@ -136,15 +251,10 @@ void surfaceSlipDisplacementPointPatchVectorField::calcProjection
             }
             else
             {
-                nNotProjected++;
-
-                if (debug)
-                {
-                    Pout<< "    point:" << meshPoints[i]
-                        << " coord:" << localPoints[i]
-                        << "  did not find any surface within " << projectLen
-                        << endl;
-                }
+                Pout<< "    point:" << meshPoints[i]
+                    << " coord:" << localPoints[i]
+                    << "  did not find any surface within " << projectLen
+                    << endl;
             }
         }
     }
@@ -176,7 +286,7 @@ void surfaceSlipDisplacementPointPatchVectorField::calcProjection
 
         // Knock out any wedge component
         scalarField offset(start.size(), 0.0);
-        if (wedgePlane_ >= 0 && wedgePlane_ < vector::nComponents)
+        if (wedgePlane_ >= 0 && wedgePlane_ <= vector::nComponents)
         {
             forAll(offset, i)
             {
@@ -197,7 +307,7 @@ void surfaceSlipDisplacementPointPatchVectorField::calcProjection
                 rightHit
             );
         }
-
+        
         List<pointIndexHit> leftHit;
         {
             labelList leftSurf;
@@ -262,7 +372,7 @@ void surfaceSlipDisplacementPointPatchVectorField::calcProjection
 
                 if (interPt.hit())
                 {
-                    if (wedgePlane_ >= 0 && wedgePlane_ < vector::nComponents)
+                    if (wedgePlane_ >= 0 && wedgePlane_ <= vector::nComponents)
                     {
                         interPt.rawPoint()[wedgePlane_] += offset[i];
                     }
@@ -270,153 +380,16 @@ void surfaceSlipDisplacementPointPatchVectorField::calcProjection
                 }
                 else
                 {
-                    nNotProjected++;
-
-                    if (debug)
-                    {
-                        Pout<< "    point:" << meshPoints[i]
-                            << " coord:" << localPoints[i]
-                            << "  did not find any intersection between"
-                            << " ray from " << start[i]-projectVecs[i]
-                            << " to " << start[i]+projectVecs[i] << endl;
-                    }
+                    Pout<< "    point:" << meshPoints[i]
+                        << " coord:" << localPoints[i]
+                        << "  did not find any intersection between ray from "
+                        << start[i]-projectVecs[i]
+                        << " to " << start[i]+projectVecs[i]
+                        << endl;
                 }
             }
         }
     }
-
-    reduce(nNotProjected, sumOp<label>());
-
-    if (nNotProjected > 0)
-    {
-        Info<< "surfaceSlipDisplacement :"
-            << " on patch " << patch().name()
-            << " did not project " << nNotProjected
-            << " out of " << returnReduce(localPoints.size(), sumOp<label>())
-            << " points." << endl;
-    }
-}
-
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-surfaceSlipDisplacementPointPatchVectorField::
-surfaceSlipDisplacementPointPatchVectorField
-(
-    const pointPatch& p,
-    const DimensionedField<vector, pointMesh>& iF
-)
-:
-    pointPatchVectorField(p, iF),
-    projectMode_(NEAREST),
-    projectDir_(vector::zero),
-    wedgePlane_(-1)
-{}
-
-
-surfaceSlipDisplacementPointPatchVectorField::
-surfaceSlipDisplacementPointPatchVectorField
-(
-    const pointPatch& p,
-    const DimensionedField<vector, pointMesh>& iF,
-    const dictionary& dict
-)
-:
-    pointPatchVectorField(p, iF, dict),
-    surfacesDict_(dict.subDict("geometry")),
-    projectMode_(projectModeNames_.read(dict.lookup("projectMode"))),
-    projectDir_(dict.lookup("projectDirection")),
-    wedgePlane_(dict.lookupOrDefault("wedgePlane", -1)),
-    frozenPointsZone_(dict.lookupOrDefault("frozenPointsZone", word::null))
-{}
-
-
-surfaceSlipDisplacementPointPatchVectorField::
-surfaceSlipDisplacementPointPatchVectorField
-(
-    const surfaceSlipDisplacementPointPatchVectorField& ppf,
-    const pointPatch& p,
-    const DimensionedField<vector, pointMesh>& iF,
-    const pointPatchFieldMapper&
-)
-:
-    pointPatchVectorField(p, iF),
-    surfacesDict_(ppf.surfacesDict_),
-    projectMode_(ppf.projectMode_),
-    projectDir_(ppf.projectDir_),
-    wedgePlane_(ppf.wedgePlane_),
-    frozenPointsZone_(ppf.frozenPointsZone_)
-{}
-
-
-surfaceSlipDisplacementPointPatchVectorField::
-surfaceSlipDisplacementPointPatchVectorField
-(
-    const surfaceSlipDisplacementPointPatchVectorField& ppf
-)
-:
-    pointPatchVectorField(ppf),
-    surfacesDict_(ppf.surfacesDict_),
-    projectMode_(ppf.projectMode_),
-    projectDir_(ppf.projectDir_),
-    wedgePlane_(ppf.wedgePlane_),
-    frozenPointsZone_(ppf.frozenPointsZone_)
-{}
-
-
-surfaceSlipDisplacementPointPatchVectorField::
-surfaceSlipDisplacementPointPatchVectorField
-(
-    const surfaceSlipDisplacementPointPatchVectorField& ppf,
-    const DimensionedField<vector, pointMesh>& iF
-)
-:
-    pointPatchVectorField(ppf, iF),
-    surfacesDict_(ppf.surfacesDict_),
-    projectMode_(ppf.projectMode_),
-    projectDir_(ppf.projectDir_),
-    wedgePlane_(ppf.wedgePlane_),
-    frozenPointsZone_(ppf.frozenPointsZone_)
-{}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-const searchableSurfaces&
-surfaceSlipDisplacementPointPatchVectorField::surfaces() const
-{
-    if (surfacesPtr_.empty())
-    {
-        surfacesPtr_.reset
-        (
-            new searchableSurfaces
-            (
-                IOobject
-                (
-                    "abc",                              // dummy name
-                    db().time().constant(),             // directory
-                    "triSurface",                       // instance
-                    db().time(),                        // registry
-                    IOobject::MUST_READ,
-                    IOobject::NO_WRITE
-                ),
-                surfacesDict_
-            )
-        );
-    }
-    return surfacesPtr_();
-}
-
-
-void surfaceSlipDisplacementPointPatchVectorField::evaluate
-(
-    const Pstream::commsTypes commsType
-)
-{
-    vectorField displacement(this->patchInternalField());
-
-    // Calculate displacement to project points onto surface
-    calcProjection(displacement);
 
     // Get internal field to insert values into
     Field<vector>& iF = const_cast<Field<vector>&>(this->internalField());
@@ -433,17 +406,14 @@ void surfaceSlipDisplacementPointPatchVectorField::write(Ostream& os) const
     pointPatchVectorField::write(os);
     os.writeKeyword("geometry") << surfacesDict_
         << token::END_STATEMENT << nl;
-    os.writeKeyword("projectMode") << projectModeNames_[projectMode_]
+    os.writeKeyword("followMode") << followModeNames_[projectMode_]
         << token::END_STATEMENT << nl;
     os.writeKeyword("projectDirection") << projectDir_
         << token::END_STATEMENT << nl;
     os.writeKeyword("wedgePlane") << wedgePlane_
         << token::END_STATEMENT << nl;
-    if (frozenPointsZone_ != word::null)
-    {
-        os.writeKeyword("frozenPointsZone") << frozenPointsZone_
-            << token::END_STATEMENT << nl;
-    }
+    os.writeKeyword("frozenPointsZone") << frozenPointsZone_
+        << token::END_STATEMENT << nl;
 }
 
 

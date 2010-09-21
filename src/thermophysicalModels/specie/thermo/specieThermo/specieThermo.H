@@ -184,7 +184,13 @@ public:
 
                 //- Enthalpy [J/kg]
                 inline scalar H(const scalar T) const;
-                
+
+                //- Sensible enthalpy [J/kg]
+                inline scalar Hs(const scalar T) const;
+
+                //- Chemical enthalpy [J/kg]
+                inline scalar Hc() const;
+
                 //- Entropy [J/(kg K)]
                 inline scalar S(const scalar T) const;
 

@@ -35,36 +35,8 @@ License
 #include "globalMeshData.H"
 #include "DynamicList.H"
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-void domainDecomposition::mark
-(
-    const labelList& zoneElems,
-    const label zoneI,
-    labelList& elementToZone
-)
-{
-    forAll(zoneElems, i)
-    {
-        label pointi = zoneElems[i];
-
-        if (elementToZone[pointi] == -1)
-        {
-            // First occurrence
-            elementToZone[pointi] = zoneI;
-        }
-        else if (elementToZone[pointi] >= 0)
-        {
-            // Multiple zones
-            elementToZone[pointi] = -2;
-        }
-    }
-}
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// from components
 domainDecomposition::domainDecomposition(const IOobject& io)
 :
     fvMesh(io),
@@ -295,16 +267,16 @@ bool domainDecomposition::writeDecomposition()
         (
             IOobject
             (
-                name(),
-                "constant",
+                this->polyMesh::name(),  // region name of undecomposed mesh
+                pointsInstance(),
                 processorDb
             ),
-            procPoints,
-            procFaces,
-            procOwner,
-            procNeighbour,
+            xferMove(procPoints),
+            xferMove(procFaces),
+            xferMove(procOwner),
+            xferMove(procNeighbour),
             false          // Do not sync par
-//             procCells   // Old-fashioned mesh creation using cells.
+//   xferMove(procCells)   // Old-fashioned mesh creation using cells.
                            // Deprecated: using face owner/neighbour
                            // HJ, 30/Mar/2009
         );

@@ -76,9 +76,10 @@ public:
         reactingMixture(const dictionary&, const fvMesh&);
 
 
-    //- Destructor
-    virtual ~reactingMixture()
-    {}
+    // Destructor
+
+        virtual ~reactingMixture()
+        {}
 
 
     // Member functions

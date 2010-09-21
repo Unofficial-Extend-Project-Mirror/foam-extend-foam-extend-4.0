@@ -26,7 +26,7 @@ Class
     CholeskyPrecon
 
 Description
-    Incmplete Cholesky preconditioning with no fill-in
+    Incmplete Cholesky preconditioning with no fill-in for symmeytric matrices
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
@@ -112,14 +112,6 @@ public:
         (
             scalarField& wA,
             const scalarField& rA,
-            const direction cmpt = 0
-        ) const;
-
-        //- Execute preconditioning with matrix transpose
-        virtual void preconditionT
-        (
-            scalarField& wT,
-            const scalarField& rT,
             const direction cmpt = 0
         ) const;
 };

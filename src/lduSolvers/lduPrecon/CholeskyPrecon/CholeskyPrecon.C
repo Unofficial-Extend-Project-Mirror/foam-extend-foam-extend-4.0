@@ -31,7 +31,7 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "CholeskyPrecon.H"
 #include "addToRunTimeSelectionTable.H"
@@ -42,7 +42,9 @@ namespace Foam
 {
     defineTypeNameAndDebug(CholeskyPrecon, 0);
 
-    addToRunTimeSelectionTable(lduPreconditioner, CholeskyPrecon, dictionary);
+    lduPreconditioner::
+        addsymMatrixConstructorToTable<CholeskyPrecon>
+        addCholeskyPreconditionerSymMatrixConstructorToTable_;
 }
 
 
@@ -63,21 +65,6 @@ void Foam::CholeskyPrecon::calcPreconDiag()
         {
             preconDiag_[upperAddr[coeffI]] -=
                 sqr(upper[coeffI])/preconDiag_[lowerAddr[coeffI]];
-        }
-    }
-    else if (matrix_.asymmetric())
-    {
-        const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
-        const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
-
-        // Get off-diagonal matrix coefficients
-        const scalarField& upper = matrix_.upper();
-        const scalarField& lower = matrix_.lower();
-
-        forAll (upper, coeffI)
-        {
-            preconDiag_[upperAddr[coeffI]] -=
-                upper[coeffI]*lower[coeffI]/preconDiag_[lowerAddr[coeffI]];
         }
     }
 
@@ -174,85 +161,6 @@ void Foam::CholeskyPrecon::precondition
             x[lowerAddr[coeffI]] -=
                 preconDiag_[lowerAddr[coeffI]]*
                 upper[coeffI]*x[upperAddr[coeffI]];
-        }
-    }
-    else if (matrix_.asymmetric())
-    {
-        const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
-        const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
-        const unallocLabelList& losortAddr = matrix_.lduAddr().losortAddr();
-
-        // Get off-diagonal matrix coefficients
-        const scalarField& upper = matrix_.upper();
-        const scalarField& lower = matrix_.lower();
-
-        label losortCoeff;
-
-        forAll (lower, coeffI)
-        {
-            losortCoeff = losortAddr[coeffI];
-
-            x[upperAddr[losortCoeff]] -=
-                preconDiag_[upperAddr[losortCoeff]]*
-                lower[losortCoeff]*x[lowerAddr[losortCoeff]];
-        }
-
-        forAllReverse (upper, coeffI)
-        {
-            x[lowerAddr[coeffI]] -=
-                preconDiag_[lowerAddr[coeffI]]*
-                upper[coeffI]*x[upperAddr[coeffI]];
-        }
-    }
-}
-
-
-void Foam::CholeskyPrecon::preconditionT
-(
-    scalarField& x,
-    const scalarField& b,
-    const direction cmpt
-) const
-{
-    // HJ: handling of assymetric matrices
-//     if (matrix_.symmetric())
-//     {
-//         precondition(x, b, cmpt);
-//     }
-
-    forAll(x, i)
-    {
-        x[i] = b[i]*preconDiag_[i];
-    }
-
-    if (matrix_.asymmetric())
-    {
-        const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
-        const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
-        const unallocLabelList& losortAddr = matrix_.lduAddr().losortAddr();
-
-        // Get off-diagonal matrix coefficients
-        const scalarField& upper = matrix_.upper();
-        const scalarField& lower = matrix_.lower();
-
-        label losortCoeff;
-
-        forAll (lower, coeffI)
-        {
-            // Transpose multiplication.  HJ, 19/Jan/2009
-            x[upperAddr[coeffI]] -=
-                preconDiag_[upperAddr[coeffI]]*
-                upper[coeffI]*x[lowerAddr[coeffI]];
-        }
-
-        forAllReverse (upper, coeffI)
-        {
-            losortCoeff = losortAddr[coeffI];
-
-            // Transpose multiplication.  HJ, 19/Jan/2009
-            x[lowerAddr[losortCoeff]] -=
-                preconDiag_[lowerAddr[losortCoeff]]*
-                lower[losortCoeff]*x[upperAddr[losortCoeff]];
         }
     }
 }

@@ -57,7 +57,7 @@ SourceFiles
 #include "DynamicList.H"
 #include "point.H"
 #include "Map.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "typeInfo.H"
 #include "edgeList.H"
 

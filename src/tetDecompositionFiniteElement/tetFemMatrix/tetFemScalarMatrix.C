@@ -41,12 +41,12 @@ namespace Foam
 template<>
 lduSolverPerformance tetFemMatrix<scalar>::solve
 (
-    Istream& solverControls
+    const dictionary& solverControls
 )
 {
     if (debug)
     {
-        Info<< "tetFemMatrix<scalar>::solve(Istream& solverControls) : "
+        Info<< "tetFemMatrix<scalar>::solve(const dictionary&) : "
             << "solving tetFemMatrix<scalar>"
             << endl;
     }
@@ -107,7 +107,7 @@ lduSolverPerformance tetFemMatrix<scalar>::solve
         coupledBouCoeffs,
         coupledIntCoeffs,
         interfaces,
-        psi_.mesh().solver(psi_.name())
+        solverControls
     )->solve(psi_.internalField(), sourceCpy);
 
     solverPerf.print();

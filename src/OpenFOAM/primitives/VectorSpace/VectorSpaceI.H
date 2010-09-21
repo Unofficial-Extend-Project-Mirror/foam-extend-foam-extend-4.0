@@ -28,6 +28,7 @@ License
 #include "products.H"
 #include "VectorSpaceM.H"
 #include "ops.H"
+#include "pTraits.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -38,6 +38,14 @@ Foam::ODEChemistryModel<CompType, ThermoType>::RR()
 
 
 template<class CompType, class ThermoType>
+inline const Foam::PtrList<Foam::volScalarField>&
+Foam::ODEChemistryModel<CompType, ThermoType>::Y() const
+{
+    return Y_;
+}
+
+
+template<class CompType, class ThermoType>
 inline const Foam::PtrList<Foam::Reaction<ThermoType> >&
 Foam::ODEChemistryModel<CompType, ThermoType>::reactions() const
 {

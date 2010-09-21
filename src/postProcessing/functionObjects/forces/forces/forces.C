@@ -415,7 +415,7 @@ Foam::forces::forcesMoments Foam::forces::calcForcesMoment() const
 
             scalarField sA = mag(Sfb[patchi]);
 
-            // Normal force = surfaceUnitNormal * (surfaceNormal & forceDensity)
+            // Normal force = surfaceUnitNormal*(surfaceNormal & forceDensity)
             vectorField fN =
                 Sfb[patchi]/sA
                *(

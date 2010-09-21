@@ -64,7 +64,8 @@ class Knupp
         //- Disallow default bitwise assignment
         void operator=(const Knupp&);
 
-    public:
+
+public:
 
         //- Runtime type information
         TypeName("Knupp");
@@ -76,6 +77,12 @@ class Knupp
             const point& p2,
             const point& p3
         );
+
+
+    // Destructor
+
+        virtual ~Knupp()
+        {}
 };
 
 
@@ -94,7 +101,8 @@ class Dihedral
         // Enumeration for tets
         static label tetEnum[6][4];
 
-    public:
+
+public:
 
         //- Runtime type information
         TypeName("Dihedral");
@@ -106,6 +114,12 @@ class Dihedral
             const point& p2,
             const point& p3
         );
+
+
+    // Destructor
+
+        virtual ~Dihedral()
+        {}
 };
 
 
@@ -133,6 +147,12 @@ class cubicMeanRatio
             const point& p2,
             const point& p3
         );
+
+
+    // Destructor
+
+        virtual ~cubicMeanRatio()
+        {}
 };
 
 
@@ -148,7 +168,8 @@ class Frobenius
         //- Disallow default bitwise assignment
         void operator=(const Frobenius&);
 
-    public:
+
+public:
 
         //- Runtime type information
         TypeName("Frobenius");
@@ -160,6 +181,12 @@ class Frobenius
             const point& p2,
             const point& p3
         );
+
+
+    // Destructor
+
+        virtual ~Frobenius()
+        {}
 };
 
 
@@ -175,7 +202,8 @@ class PGH
         //- Disallow default bitwise assignment
         void operator=(const PGH&);
 
-    public:
+
+public:
 
         //- Runtime type information
         TypeName("PGH");
@@ -187,6 +215,12 @@ class PGH
             const point& p2,
             const point& p3
         );
+
+
+    // Destructor
+
+        virtual ~PGH()
+        {}
 };
 
 
@@ -202,7 +236,8 @@ class CSG
         //- Disallow default bitwise assignment
         void operator=(const CSG&);
 
-    public:
+
+public:
 
         //- Runtime type information
         TypeName("CSG");
@@ -214,6 +249,12 @@ class CSG
             const point& p2,
             const point& p3
         );
+
+
+    // Destructor
+
+        virtual ~CSG()
+        {}
 };
 
 

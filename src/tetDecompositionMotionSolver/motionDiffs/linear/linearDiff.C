@@ -31,7 +31,7 @@ Description
 #include "addToRunTimeSelectionTable.H"
 #include "elementFields.H"
 #include "patchWave.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 

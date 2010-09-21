@@ -2228,11 +2228,10 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
 
         mesh.resetPrimitives
         (
-            nUsedFaces,
-            newPointsZeroVol,
-            newFaces,
-            allOwn,
-            allNei,
+            xferMove(newPointsZeroVol),
+            xferMove(newFaces),
+            xferMove(allOwn),
+            xferMove(allNei),
             patchSizes,
             patchStarts,
             false         // The mesh is not complete: no parallel comms

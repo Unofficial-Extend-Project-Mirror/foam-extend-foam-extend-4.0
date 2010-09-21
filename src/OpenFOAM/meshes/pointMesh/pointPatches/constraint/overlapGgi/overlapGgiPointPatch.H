@@ -81,10 +81,12 @@ protected:
         virtual void calcGeometry();
 
         //- Initialise the patches for moving points
-        virtual void initMovePoints(const pointField&);
+        virtual void initMovePoints(const pointField&)
+        {}
 
         //- Correct patches after moving points
-        virtual void movePoints();
+        virtual void movePoints()
+        {}
 
         //- Initialise the update of the patch topology
         virtual void initUpdateMesh();

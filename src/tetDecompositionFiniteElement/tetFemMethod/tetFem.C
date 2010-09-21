@@ -31,7 +31,7 @@ Description
 #include "tetCell.H"
 #include "tetCellList.H"
 #include "tetPointRef.H"
-#include "Matrix.H"
+#include "SquareMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -52,7 +52,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacian
         (
             "gamma",
             vf.time().constant(),
-            vf.db(),
+            vf.mesh(),
             IOobject::NO_READ
         ),
         vf.mesh(),
@@ -99,9 +99,8 @@ tmp<tetFemMatrix<Type> > tetFem::laplacian
     labelList localToGlobalBuffer(mesh.maxNPointsForCell());
     labelList globalToLocalBuffer(lduAddr.size(), -1);
 
-    Matrix<scalar> denseMatrix
+    SquareMatrix<scalar> denseMatrix
     (
-        mesh.maxNPointsForCell(),
         mesh.maxNPointsForCell(),
         0
     );
@@ -218,7 +217,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacian
         (
             "gamma",
             vf.instance(),
-            vf.db(),
+            vf.mesh(),
             IOobject::NO_READ
         ),
         vf.mesh(),
@@ -241,7 +240,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacianTranspose
         (
             "gamma",
             vf.time().constant(),
-            vf.db(),
+            vf.mesh(),
             IOobject::NO_READ
         ),
         vf.mesh(),
@@ -292,9 +291,8 @@ tmp<tetFemMatrix<Type> > tetFem::laplacianTranspose
     labelList localToGlobalBuffer(mesh.maxNPointsForCell());
     labelList globalToLocalBuffer(lduAddr.size(), -1);
 
-    Matrix<tensor> denseMatrix
+    SquareMatrix<tensor> denseMatrix
     (
-        mesh.maxNPointsForCell(),
         mesh.maxNPointsForCell(),
         tensor::zero
     );
@@ -411,7 +409,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacianTranspose
         (
             gamma.name(),
             vf.instance(),
-            vf.db(),
+            vf.mesh(),
             IOobject::NO_READ
         ),
         vf.mesh(),
@@ -451,7 +449,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacianTrace
 
     // In order to avoid excessive memory allocation and copying,
     // matrix coefficients and addressing are retrieved using a buffer.
-    // 
+    // HJ, date deleted
 
     // Get reference to ldu addressing
     const lduAddressing& lduAddr = fem.lduAddr();
@@ -462,9 +460,8 @@ tmp<tetFemMatrix<Type> > tetFem::laplacianTrace
     labelList localToGlobalBuffer(mesh.maxNPointsForCell());
     labelList globalToLocalBuffer(lduAddr.size(), -1);
 
-    Matrix<tensor> denseMatrix
+    SquareMatrix<tensor> denseMatrix
     (
-        mesh.maxNPointsForCell(),
         mesh.maxNPointsForCell(),
         tensor::zero
     );
@@ -577,7 +574,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacianTrace
         (
             gamma.name(),
             vf.instance(),
-            vf.db(),
+            vf.mesh(),
             IOobject::NO_READ
         ),
         vf.mesh(),
@@ -600,7 +597,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacianTrace
         (
             "1",
             vf.instance(),
-            vf.db(),
+            vf.mesh(),
             IOobject::NO_READ
         ),
         vf.mesh(),

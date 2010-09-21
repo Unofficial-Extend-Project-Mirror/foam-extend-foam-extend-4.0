@@ -425,7 +425,7 @@ Foam::polyMesh* Foam::blockMesh::createTopology(IOdictionary& meshDescription)
             IOobject::NO_WRITE,
             false
         ),
-        tmpBlockPoints,
+        xferMove(tmpBlockPoints),
         tmpBlockCells,
         tmpBlocksPatches,
         patchNames,

@@ -49,7 +49,7 @@ Foam::tetPolyMeshLduAddressingFaceDecomp::tetPolyMeshLduAddressingFaceDecomp
     patchSchedule_(mesh.globalData().patchSchedule())
 {
     // Get reference to edges
-    const edgeList& meshEdges = mesh().orderedEdges();
+    const edgeList& meshEdges = mesh().edges();
 
     // Get references to pointFaces and pointCells
     const labelListList& pointFaces = mesh().pointFaces();

@@ -225,7 +225,7 @@ int main(int argc, char *argv[])
             runTime.constant(),
             runTime
         ),
-        blocks.points(),
+        xferCopy(blocks.points()),
         blocks.cells(),
         blocks.patches(),
         patchNames,

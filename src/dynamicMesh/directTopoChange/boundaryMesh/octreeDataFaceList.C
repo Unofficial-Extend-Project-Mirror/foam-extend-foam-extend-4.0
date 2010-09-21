@@ -399,7 +399,7 @@ bool Foam::octreeDataFaceList::overlaps
     const treeBoundBox& sampleBb
 ) const
 {
-    return sampleBb.intersects(allBb_[index]);
+    return sampleBb.overlaps(allBb_[index]);
 }
 
 
@@ -434,7 +434,7 @@ bool Foam::octreeDataFaceList::intersects
     // Disable picking up intersections behind us.
     scalar oldTol = intersection::setPlanarTol(0.0);
 
-    pointHit inter = 
+    pointHit inter =
         f.ray
         (
             start,

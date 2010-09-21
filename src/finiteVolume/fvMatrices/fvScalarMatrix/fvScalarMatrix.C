@@ -45,7 +45,7 @@ void Foam::fvMatrix<Foam::scalar>::setComponentReference
             internalCoeffs_[patchi][facei] +=
                 diag()[psi_.mesh().boundary()[patchi].faceCells()[facei]];
 
-            boundaryCoeffs_[patchi][facei] += 
+            boundaryCoeffs_[patchi][facei] +=
                 diag()[psi_.mesh().boundary()[patchi].faceCells()[facei]]
                *value;
         }
@@ -98,7 +98,8 @@ Foam::fvMatrix<Foam::scalar>::solver
 
 
 template<>
-Foam::lduMatrix::solverPerformance Foam::fvMatrix<Foam::scalar>::fvSolver::solve
+Foam::lduMatrix::solverPerformance
+Foam::fvMatrix<Foam::scalar>::fvSolver::solve
 (
     const dictionary& solverControls
 )
@@ -111,7 +112,7 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Foam::scalar>::fvSolver::solve
 
     // assign new solver controls
     solver_->read(solverControls);
-    lduSolverPerformance solverPerf = 
+    lduSolverPerformance solverPerf =
         solver_->solve(fvMat_.psi().internalField(), totalSource);
 
     solverPerf.print();

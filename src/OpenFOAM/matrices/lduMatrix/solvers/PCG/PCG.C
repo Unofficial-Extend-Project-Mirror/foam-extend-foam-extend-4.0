@@ -115,38 +115,15 @@ Foam::lduSolverPerformance Foam::PCG::solve
         // Select and construct the preconditioner
         autoPtr<lduPreconditioner> preconPtr;
 
-        // For backward compatibility, check type of preconditioner entry
-        // HJ, 2/Oct/2007
-
-        if (dict().isDict("preconditioner"))
-        {
-            // New format: preconditioner is dictionary
-            preconPtr =
-                lduPreconditioner::New
-                (
-                    matrix_,
-                    coupleBouCoeffs_,
-                    coupleIntCoeffs_,
-                    interfaces_,
-                    dict().subDict("preconditioner")
-                );
-        }
-        else
-        {
-            // Old format: manufacture a dictionary
-            dictionary preconDict;
-            preconDict.add("type", word(dict().lookup("preconditioner")));
-
-            preconPtr =
-                lduPreconditioner::New
-                (
-                    matrix_,
-                    coupleBouCoeffs_,
-                    coupleIntCoeffs_,
-                    interfaces_,
-                    preconDict
-                );
-        }
+        preconPtr =
+            lduPreconditioner::New
+            (
+                matrix_,
+                coupleBouCoeffs_,
+                coupleIntCoeffs_,
+                interfaces_,
+                dict()
+            );
 
         // Solver iteration
         do

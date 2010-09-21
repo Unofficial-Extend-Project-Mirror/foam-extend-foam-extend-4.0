@@ -44,7 +44,7 @@ oscillatingDisplacementPointPatchVectorField
     const DimensionedField<vector, pointMesh>& iF
 )
 :
-    fixedValuePointPatchField<vector>(p, iF),
+    fixedValuePointPatchVectorField(p, iF),
     amplitude_(vector::zero),
     omega_(0.0)
 {}
@@ -58,7 +58,7 @@ oscillatingDisplacementPointPatchVectorField
     const dictionary& dict
 )
 :
-    fixedValuePointPatchField<vector>(p, iF, dict),
+    fixedValuePointPatchVectorField(p, iF, dict),
     amplitude_(dict.lookup("amplitude")),
     omega_(readScalar(dict.lookup("omega")))
 {
@@ -75,10 +75,10 @@ oscillatingDisplacementPointPatchVectorField
     const oscillatingDisplacementPointPatchVectorField& ptf,
     const pointPatch& p,
     const DimensionedField<vector, pointMesh>& iF,
-    const pointPatchFieldMapper& mapper
+    const PointPatchFieldMapper& mapper
 )
 :
-    fixedValuePointPatchField<vector>(ptf, p, iF, mapper),
+    fixedValuePointPatchVectorField(ptf, p, iF, mapper),
     amplitude_(ptf.amplitude_),
     omega_(ptf.omega_)
 {}
@@ -91,7 +91,7 @@ oscillatingDisplacementPointPatchVectorField
     const DimensionedField<vector, pointMesh>& iF
 )
 :
-    fixedValuePointPatchField<vector>(ptf, iF),
+    fixedValuePointPatchVectorField(ptf, iF),
     amplitude_(ptf.amplitude_),
     omega_(ptf.omega_)
 {}
@@ -111,7 +111,7 @@ void oscillatingDisplacementPointPatchVectorField::updateCoeffs()
 
     Field<vector>::operator=(amplitude_*sin(omega_*t.value()));
 
-    fixedValuePointPatchField<vector>::updateCoeffs();
+    fixedValuePointPatchVectorField::updateCoeffs();
 }
 
 

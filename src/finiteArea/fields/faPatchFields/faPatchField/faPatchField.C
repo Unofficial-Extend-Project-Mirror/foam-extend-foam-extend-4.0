@@ -140,7 +140,7 @@ faPatchField<Type>::faPatchField
 template<class Type>
 const objectRegistry& faPatchField<Type>::db() const
 {
-    return patch_.boundaryMesh().mesh().db();
+    return patch_.boundaryMesh().mesh();
 }
 
 

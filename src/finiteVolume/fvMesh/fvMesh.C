@@ -170,7 +170,7 @@ Foam::fvMesh::fvMesh(const IOobject& io)
         V00();
     }
 
-    // Check the existance of the mesh fluxes, read if present and set the 
+    // Check the existance of the mesh fluxes, read if present and set the
     // mesh to be moving
     if (isFile(time().timePath()/"meshPhi"))
     {

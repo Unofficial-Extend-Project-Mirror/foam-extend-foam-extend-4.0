@@ -40,14 +40,17 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::layerAR, 0);
+namespace Foam
+{
+    defineTypeNameAndDebug(layerAR, 0);
 
-addToRunTimeSelectionTable
-(
-    Foam::engineTopoChangerMesh,
-    Foam::layerAR,
-    IOobject
-);
+    addToRunTimeSelectionTable
+    (
+        engineTopoChangerMesh,
+        layerAR,
+        IOobject
+    );
+}
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

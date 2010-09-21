@@ -110,7 +110,7 @@ namespace Foam
 {
 
 // Class forward declarations
-template<class Type> class Matrix;
+template<class Type> class SquareMatrix;
 
 class tetPolyMeshMapperCellDecomp;
 class tetPolyMeshLduAddressingCellDecomp;
@@ -210,9 +210,9 @@ public:
         // Access
 
             //- Return the object registry
-            virtual const objectRegistry& db() const
+            virtual const objectRegistry& thisDb() const
             {
-                return GeoMesh<polyMesh>::db();
+                return GeoMesh<polyMesh>::thisDb();
             }
 
             //- Return number of points in decomposition
@@ -316,7 +316,7 @@ public:
             void gradNiDotGradNj
             (
                 const label cellID,
-                Matrix<scalar>& denseMatrix,
+                SquareMatrix<scalar>& denseMatrix,
                 const labelList& globalToLocalBuffer
             ) const;
 
@@ -325,7 +325,7 @@ public:
             void gradNiGradNj
             (
                 const label cellID,
-                Matrix<tensor>& denseMatrix,
+                SquareMatrix<tensor>& denseMatrix,
                 const labelList& globalToLocalBuffer
             ) const;
 

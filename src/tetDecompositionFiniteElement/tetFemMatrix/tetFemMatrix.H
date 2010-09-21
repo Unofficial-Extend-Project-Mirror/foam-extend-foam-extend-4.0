@@ -232,15 +232,15 @@ public:
             void check();
 
             //- Solve returning the solution statistics.
-            //  Convergence tolerance read from Istream
-            lduSolverPerformance solve(Istream&);
+            //  Convergence tolerance read from dictionary
+            lduSolverPerformance solve(const dictionary&);
 
             //- Solve returning the solution statistics.
             //  Solver controls read from tetFemSolution
             lduSolverPerformance solve();
 
             //- Return the matrix residual
-            tmp<Field<Type> >  residual();
+            tmp<Field<Type> > residual();
 
 
     // Member operators

@@ -25,7 +25,7 @@ License
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "meshCheckFunctionObject.H"
 #include "addToRunTimeSelectionTable.H"
@@ -56,8 +56,7 @@ Foam::meshCheckFunctionObject::meshCheckFunctionObject
     const dictionary& dict
 )
 :
-    functionObject(),
-    name_(name),
+    functionObject(name),
     time_(t),
     regionName_(polyMesh::defaultRegion),
     checkTopology_(dict.lookup("checkTopology"))

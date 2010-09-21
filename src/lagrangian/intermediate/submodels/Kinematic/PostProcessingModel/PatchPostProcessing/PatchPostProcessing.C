@@ -85,6 +85,7 @@ void Foam::PatchPostProcessing<CloudType>::write()
             OFstream patchOutFile
             (
                 outputDir/patchNames_[patchI] + ".post",
+                ios_base::out|ios_base::trunc,
                 IOstream::ASCII,
                 IOstream::currentVersion,
                 mesh_.time().writeCompression()

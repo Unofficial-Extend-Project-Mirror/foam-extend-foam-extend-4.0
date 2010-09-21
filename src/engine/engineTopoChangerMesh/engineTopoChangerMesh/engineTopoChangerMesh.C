@@ -39,8 +39,6 @@ Foam::engineTopoChangerMesh::engineTopoChangerMesh(const IOobject& io)
 :
     fvMesh(io),
     topoChanger_(*this),
-    pMesh_(*this),
-    vpi_(*this, pMesh_),
     engineTime_(refCast<const engineTime>(time()))
 {}
 

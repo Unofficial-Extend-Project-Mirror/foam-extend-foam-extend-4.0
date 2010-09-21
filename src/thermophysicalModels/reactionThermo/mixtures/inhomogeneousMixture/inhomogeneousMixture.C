@@ -94,7 +94,10 @@ const ThermoType& Foam::inhomogeneousMixture<ThermoType>::mixture
 template<class ThermoType>
 void Foam::inhomogeneousMixture<ThermoType>::read(const dictionary& thermoDict)
 {
-    stoicRatio_ = thermoDict.lookup("stoichiometricAirFuelMassRatio");
+    stoicRatio_ = dimensionedScalar
+    (
+        thermoDict.lookup("stoichiometricAirFuelMassRatio")
+    );
 
     fuel_ = ThermoType(thermoDict.lookup("fuel"));
     oxidant_ = ThermoType(thermoDict.lookup("oxidant"));

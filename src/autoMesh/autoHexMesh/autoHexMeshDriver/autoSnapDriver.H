@@ -36,6 +36,7 @@ SourceFiles
 #ifndef autoSnapDriver_H
 #define autoSnapDriver_H
 
+#include "PackedBoolList.H"
 #include "meshRefinement.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

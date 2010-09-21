@@ -100,7 +100,10 @@ const ThermoType& Foam::egrMixture<ThermoType>::mixture
 template<class ThermoType>
 void Foam::egrMixture<ThermoType>::read(const dictionary& thermoDict)
 {
-    stoicRatio_ = thermoDict.lookup("stoichiometricAirFuelMassRatio");
+    stoicRatio_ = dimensionedScalar
+    (
+        thermoDict.lookup("stoichiometricAirFuelMassRatio")
+    );
 
     fuel_ = ThermoType(thermoDict.lookup("fuel"));
     oxidant_ = ThermoType(thermoDict.lookup("oxidant"));

@@ -31,7 +31,6 @@ Description
 #include "IOstream.H"
 #include "dictionary.H"
 #include "Switch.H"
-#include "Matrix.H"
 #include "scalarField.H"
 #include "chemPoint.H"
 #include "binaryNode.H"

@@ -79,9 +79,22 @@ void Foam::sampledCuttingPlane::createGeometry()
                 << patches[exposedPatchI].name() << endl;
         }
 
+        const fvMesh& fvm = static_cast<const fvMesh&>(mesh());
+
         subMeshPtr_.reset
         (
-            new fvMeshSubset(static_cast<const fvMesh&>(mesh()))
+            new fvMeshSubset
+            (
+                IOobject
+                (
+                    "set",
+                    fvm.time().timeName(),
+                    fvm,
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE
+                ),
+                fvm
+            )
         );
         subMeshPtr_().setLargeCellSubset
         (

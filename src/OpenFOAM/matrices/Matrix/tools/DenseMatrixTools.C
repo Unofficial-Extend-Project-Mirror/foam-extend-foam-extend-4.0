@@ -112,7 +112,7 @@ static void Foam::DenseMatrixTools::qrDecompose
 (
     const label nCols,
     FieldField<Field, Type>& A,
-    Matrix<Form, T>& R
+    Matrix<Form, Type>& R
 )
 {
     // Note: consider Arnoldi algorithm for speed-up.  HJ, 14/Sep/2006

@@ -46,7 +46,7 @@ template<class Type, class MeshMapper, class GeoMesh>
 class MapInternalField
 {
 public:
-    
+
     MapInternalField()
     {}
 
@@ -82,7 +82,7 @@ void MapGeometricFields
     // It is necessary to enforce that all old-time fields are stored
     // before the mapping is performed.  Otherwise, if the
     // old-time-level field is mapped before the field itself, sizes
-    // will not match.  
+    // will not match.
 
     for
     (
@@ -92,7 +92,7 @@ void MapGeometricFields
         ++fieldIter
     )
     {
-        GeometricField<Type, PatchField, GeoMesh>& field = 
+        GeometricField<Type, PatchField, GeoMesh>& field =
             const_cast<GeometricField<Type, PatchField, GeoMesh>&>
             (*fieldIter());
 
@@ -112,7 +112,7 @@ void MapGeometricFields
         ++fieldIter
     )
     {
-        GeometricField<Type, PatchField, GeoMesh>& field = 
+        GeometricField<Type, PatchField, GeoMesh>& field =
             const_cast<GeometricField<Type, PatchField, GeoMesh>&>
             (*fieldIter());
 
@@ -137,7 +137,6 @@ void MapGeometricFields
                 // Cannot check sizes for patch fields because of
                 // empty fields in FV and because point fields get their size
                 // from the patch which has already been resized
-                // 
 
                 field.boundaryField()[patchi].autoMap
                 (

@@ -99,6 +99,6 @@ directTopoChange/boundaryMesh/boundaryMesh.C
 directTopoChange/fvMeshDistribute/fvMeshDistribute.C
 
 
-directTopoChange/repatch/repatch.C
+directTopoChange/repatchPolyTopoChanger/repatchPolyTopoChanger.C
 
 LIB = $(FOAM_LIBBIN)/libdynamicMesh

@@ -31,7 +31,7 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "iluSmoother.H"
 #include "addToRunTimeSelectionTable.H"
@@ -41,7 +41,12 @@ Author
 namespace Foam
 {
     defineTypeNameAndDebug(iluSmoother, 0);
-    addToRunTimeSelectionTable(lduSmoother, iluSmoother, word);
+
+    lduSmoother::addsymMatrixConstructorToTable<iluSmoother>
+        addiluSmootherSymMatrixConstructorToTable_;
+
+    lduSmoother::addasymMatrixConstructorToTable<iluSmoother>
+        addiluSmootherAsymMatrixConstructorToTable_;
 }
 
 

@@ -27,7 +27,7 @@ License
 #include "boundaryMesh.H"
 #include "Time.H"
 #include "polyMesh.H"
-#include "repatch.H"
+#include "repatchPolyTopoChanger.H"
 #include "faceList.H"
 #include "octree.H"
 #include "octreeDataFaceList.H"
@@ -1232,8 +1232,8 @@ void Foam::boundaryMesh::patchify
     }
 
     // Actually add new list of patches
-    repatch polyMeshRepatcher(newMesh);
-    polyMeshRepatcher.changePatches(newPatchPtrList);
+    repatchPolyTopoChanger rep(newMesh);
+    rep.changePatches(newPatchPtrList);
 
 
     // Pass2:
@@ -1289,11 +1289,11 @@ void Foam::boundaryMesh::patchify
 
             forAll(pFaces, pFaceI)
             {
-                polyMeshRepatcher.changePatchID(pFaces[pFaceI], newPatchI);
+                rep.changePatchID(pFaces[pFaceI], newPatchI);
             }
         }
 
-        polyMeshRepatcher.execute();
+        rep.repatch();
     }
 }
 

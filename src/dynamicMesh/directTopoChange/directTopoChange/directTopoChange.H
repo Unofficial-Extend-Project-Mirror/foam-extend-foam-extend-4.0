@@ -73,7 +73,7 @@ SourceFiles
 #include "PtrList.H"
 #include "cellList.H"
 #include "Map.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "mapPolyMesh.H"
 #include "CompactListList.H"
 #include "PackedList.H"

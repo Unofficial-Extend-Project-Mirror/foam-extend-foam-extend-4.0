@@ -26,7 +26,7 @@ License
 
 #include "tetPolyMeshCellDecomp.H"
 #include "tetPointRef.H"
-#include "Matrix.H"
+#include "SquareMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -195,7 +195,7 @@ tetCellList tetPolyMeshCellDecomp::tets(const label cellID) const
 void tetPolyMeshCellDecomp::gradNiDotGradNj
 (
     const label cellID,
-    Matrix<scalar>& denseMatrix,
+    SquareMatrix<scalar>& denseMatrix,
     const labelList& globalToLocalBuffer
 ) const
 {
@@ -282,7 +282,7 @@ void tetPolyMeshCellDecomp::gradNiDotGradNj
 void tetPolyMeshCellDecomp::gradNiGradNj
 (
     const label cellID,
-    Matrix<tensor>& denseMatrix,
+    SquareMatrix<tensor>& denseMatrix,
     const labelList& globalToLocalBuffer
 ) const
 {

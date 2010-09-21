@@ -58,7 +58,7 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve
 {
     if (debug)
     {
-        Info<< "fvMatrix<Type>::solve(const dictionary& solverControls) : "
+        Info<< "fvMatrix<Type>::solve(const dictionary&) : "
                "solving fvMatrix<Type>"
             << endl;
     }

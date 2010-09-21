@@ -340,7 +340,7 @@ public:
                 const scalar x,
                 const scalarField& y,
                 scalarField& dfdx,
-                Matrix<scalar>& dfdy
+                scalarSquareMatrix& dfdy
             ) const;
 
             //- Update ODE after the solution, advancing by delta

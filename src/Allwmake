@@ -11,12 +11,16 @@ Pstream/Allwmake
 wmake libo  OSspecific/$WM_OSTYPE
 wmake libso OpenFOAM
 
-( cd decompositionAgglomeration && ./Allwmake )
+# Decomposition methods needed by meshTools
+decompositionMethods/AllwmakeLnInclude
+decompositionMethods/Allwmake
 
 wmake libso lagrangian/basic
 
 wmake libso triSurface
 wmake libso edgeMesh
+wmake libso surfMesh
+
 wmake libso meshTools
 wmake libso finiteVolume
 wmake libso finiteArea

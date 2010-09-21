@@ -1,16 +1,26 @@
-physicalConstants/physicalConstants.C
+mixtures/basicMixture/basicMixture.C
+mixtures/basicMixture/basicMixtures.C
 
-basicMixture = mixtures/basicMixture
-basicThermo = basicThermo
+basicThermo/basicThermo.C
 
-$(basicMixture)/basicMixture.C
-$(basicThermo)/basicThermo.C
-$(basicThermo)/newBasicThermo.C
-$(basicThermo)/basicThermos.C
+psiThermo/basicPsiThermo/basicPsiThermo.C
+psiThermo/basicPsiThermo/newBasicPsiThermo.C
+psiThermo/hPsiThermo/hPsiThermos.C
+psiThermo/hsPsiThermo/hsPsiThermos.C
+psiThermo/ePsiThermo/ePsiThermos.C
+
+rhoThermo/basicRhoThermo/basicRhoThermo.C
+rhoThermo/basicRhoThermo/newBasicRhoThermo.C
+rhoThermo/hRhoThermo/hRhoThermos.C
+rhoThermo/hsRhoThermo/hsRhoThermos.C
 
 derivedFvPatchFields/fixedEnthalpy/fixedEnthalpyFvPatchScalarField.C
 derivedFvPatchFields/gradientEnthalpy/gradientEnthalpyFvPatchScalarField.C
 derivedFvPatchFields/mixedEnthalpy/mixedEnthalpyFvPatchScalarField.C
+
+derivedFvPatchFields/fixedInternalEnergy/fixedInternalEnergyFvPatchScalarField.C
+derivedFvPatchFields/gradientInternalEnergy/gradientInternalEnergyFvPatchScalarField.C
+derivedFvPatchFields/mixedInternalEnergy/mixedInternalEnergyFvPatchScalarField.C
 
 derivedFvPatchFields/wallHeatTransfer/wallHeatTransferFvPatchScalarField.C
 

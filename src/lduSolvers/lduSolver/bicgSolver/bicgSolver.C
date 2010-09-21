@@ -54,7 +54,7 @@ Foam::bicgSolver::bicgSolver
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    Istream& solverData
+    const dictionary& dict
 )
 :
     lduSolver
@@ -64,7 +64,7 @@ Foam::bicgSolver::bicgSolver
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverData
+        dict
     ),
     preconPtr_
     (
@@ -74,7 +74,7 @@ Foam::bicgSolver::bicgSolver
             coupleBouCoeffs,
             coupleIntCoeffs,
             interfaces,
-            dict().subDict("preconditioner")
+            dict.subDict("preconditioner")
         )
     )
 {}

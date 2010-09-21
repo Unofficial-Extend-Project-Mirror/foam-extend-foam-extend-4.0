@@ -138,9 +138,10 @@ public:
         );
 
 
-    //- Destructor
-    virtual ~turbulenceModel()
-    {}
+    // Destructor
+
+        virtual ~turbulenceModel()
+        {}
 
 
     // Member Functions

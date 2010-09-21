@@ -57,7 +57,7 @@ Foam::amgSolver::amgSolver
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    Istream& solverData
+    const dictionary& dict
 )
 :
     lduSolver
@@ -67,7 +67,7 @@ Foam::amgSolver::amgSolver
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverData
+        dict
     ),
     amg_
     (
@@ -75,7 +75,7 @@ Foam::amgSolver::amgSolver
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        dict()
+        dict
     )
 {}
 

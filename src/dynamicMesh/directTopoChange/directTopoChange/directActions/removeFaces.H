@@ -40,7 +40,7 @@ SourceFiles
 #define removeFaces_H
 
 #include "Pstream.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "Map.H"
 #include "boolList.H"
 #include "indirectPrimitivePatch.H"

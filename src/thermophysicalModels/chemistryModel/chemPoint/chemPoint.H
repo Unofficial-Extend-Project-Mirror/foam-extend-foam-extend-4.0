@@ -23,7 +23,7 @@ License
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 Description
-    Point of the binary tree. 
+    Point of the binary tree.
 
 \*---------------------------------------------------------------------------*/
 
@@ -35,7 +35,6 @@ Description
 #include "IOstream.H"
 #include "dictionary.H"
 #include "Switch.H"
-#include "Matrix.H"
 #include "scalarField.H"
 
 namespace Foam
@@ -43,48 +42,53 @@ namespace Foam
 
 class binaryNode;
 
+/*---------------------------------------------------------------------------*\
+                           Class chemPoint Declaration
+\*---------------------------------------------------------------------------*/
+
 class chemPoint
 {
-
 public:
-        
+
         //- Reference to the node in the binary tree
         binaryNode* node_;
+
 
 private:
 
 
         //- Number of times the element has been used
         label nUsed_;
-        
+
         //- Vector storing the composition, temperature and pressure
         scalarField v0_;
-        
+
         //- Reaction mapping for v0
         scalarField r_;
-        
+
         //- Ellipsoid of accuracy
-        scalarField EOA_;        
-        
+        scalarField EOA_;
+
         //- Ellipsoid of accuracy for the solution
         scalarField solutionsEOA_;
-        
+
         //- tolerance for the Ellipsoid of accuracy
         scalar absErr_;
 
-        //- Use logarithm of temperature                
+        //- Use logarithm of temperature
         Switch logT_;
-        
+
         //- Time step, stored but not actually used
         scalar deltaT_;
-        
+
         //- Ellipsoid of accuracy for the time step
         scalar timeEOA_;
-                               
+
+
 public:
 
-        //- Constructors
-        
+    // Constructors
+
         //- Construct from components
         chemPoint
         (
@@ -114,19 +118,18 @@ public:
         chemPoint
         (
             const chemPoint& p,
-            binaryNode* node 
+            binaryNode* node
         );
 
-        
         //- Construct from another chemPoint
         chemPoint
         (
             const chemPoint& p
         );
 
-        
+
         //- Access
-    
+
         inline label& nUsed()
         {
             return nUsed_;
@@ -217,27 +220,62 @@ public:
             return timeEOA_;
         }
 
-        
-//        scalar difference(const scalarField& point, const scalarField& scaleFactor, const bool& logT);
 
-        // is the point in the ellipsoid of accuracy?
-        bool inEOA(const scalarField& point, const scalarField& Wi, const scalar& rhoi, const scalar& deltaT, const scalarField& scaleFactor);
-        
-        // grow the ellipsoid of accuracy?
-        void grow(const scalarField& v0, const scalarField& Wi, const scalar& rhoi, const scalarField& v, const scalar& deltaT);
-        
-        // check if the new solution is in the ellipsoid of accuracy?
-        bool checkSolution(const scalarField& v0, const scalarField& v, const scalarField& Wi, const scalar& rhoi, const scalar& T, const scalar& p, const scalar& deltaT, const scalarField& tolerance);
-  
-        // set free the point from its node, used for replacing purposes in the binary tree
+//         scalar difference
+//         (
+//             const scalarField& point,
+//             const scalarField& scaleFactor,
+//             const bool& logT
+//         );
+
+        // Is the point in the ellipsoid of accuracy?
+        bool inEOA
+        (
+            const scalarField& point,
+            const scalarField& Wi,
+            const scalar& rhoi,
+            const scalar& deltaT,
+            const scalarField& scaleFactor
+        );
+
+        // Grow the ellipsoid of accuracy?
+        void grow
+        (
+            const scalarField& v0,
+            const scalarField& Wi,
+            const scalar& rhoi,
+            const scalarField& v,
+            const scalar& deltaT
+        );
+
+        // Check if the new solution is in the ellipsoid of accuracy?
+        bool checkSolution
+        (
+            const scalarField& v0,
+            const scalarField& v,
+            const scalarField& Wi,
+            const scalar& rhoi,
+            const scalar& T,
+            const scalar& p,
+            const scalar& deltaT,
+            const scalarField& tolerance
+        );
+
+        //- Set free the point from its node, used for replacing
+        //  in the binary tree
         void setFree();
-        
+
         // clear all the stored data
         void clearData();
-        
 };
 
-}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
 
+// ************************************************************************* //

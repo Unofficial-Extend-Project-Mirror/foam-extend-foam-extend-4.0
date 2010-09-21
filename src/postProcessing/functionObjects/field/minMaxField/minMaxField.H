@@ -58,9 +58,6 @@ class minMaxField
 {
     // Private data
 
-        //- Name
-        const word name_;
-
         //- Reference to main object registry
         const Time& time_;
 

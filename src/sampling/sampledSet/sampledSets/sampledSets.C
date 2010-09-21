@@ -30,7 +30,7 @@ License
 #include "volFields.H"
 #include "ListListOps.H"
 #include "SortableList.H"
-
+#include "volPointInterpolation.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 

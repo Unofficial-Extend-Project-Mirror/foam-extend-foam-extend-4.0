@@ -61,6 +61,7 @@ class tetMetric
         //- Disallow default bitwise assignment
         void operator=(const tetMetric&);
 
+
 public:
 
     // Typedef for tetrahedral metrics
@@ -73,6 +74,7 @@ public:
             const point& p3
         );
 
+
     // Selector
 
         static tetMetricReturnType New
@@ -80,6 +82,7 @@ public:
             const dictionary& dict,
             const word& metricName
         );
+
 
     // Member Function Selectors
 
@@ -105,6 +108,11 @@ public:
             const point& p2,
             const point& p3
         );
+
+    // Destructor
+
+        virtual ~tetMetric()
+        {}
 };
 
 } // End namespace Foam

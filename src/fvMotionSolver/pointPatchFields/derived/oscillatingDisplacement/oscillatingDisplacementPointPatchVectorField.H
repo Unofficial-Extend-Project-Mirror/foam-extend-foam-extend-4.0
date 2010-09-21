@@ -23,10 +23,9 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::oscillatingDisplacementPointPatchVectorField
+    oscillatingDisplacementPointPatchVectorField
 
 Description
-    Foam::oscillatingDisplacementPointPatchVectorField
 
 SourceFiles
     oscillatingDisplacementPointPatchVectorField.C
@@ -36,7 +35,7 @@ SourceFiles
 #ifndef oscillatingDisplacementPointPatchVectorField_H
 #define oscillatingDisplacementPointPatchVectorField_H
 
-#include "fixedValuePointPatchField.H"
+#include "fixedValuePointPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -49,7 +48,14 @@ namespace Foam
 
 class oscillatingDisplacementPointPatchVectorField
 :
-    public fixedValuePointPatchField<vector>
+    public FixedValuePointPatchField
+    <
+        pointPatchField,
+        pointMesh,
+        pointPatch,
+        DummyMatrix,
+        vector
+    >
 {
     // Private data
 
@@ -86,7 +92,7 @@ public:
             const oscillatingDisplacementPointPatchVectorField&,
             const pointPatch&,
             const DimensionedField<vector, pointMesh>&,
-            const pointPatchFieldMapper&
+            const PointPatchFieldMapper&
         );
 
         //- Construct and return a clone
@@ -94,10 +100,7 @@ public:
         {
             return autoPtr<pointPatchField<vector> >
             (
-                new oscillatingDisplacementPointPatchVectorField
-                (
-                    *this
-                )
+                new oscillatingDisplacementPointPatchVectorField(*this)
             );
         }
 
@@ -116,11 +119,7 @@ public:
         {
             return autoPtr<pointPatchField<vector> >
             (
-                new oscillatingDisplacementPointPatchVectorField
-                (
-                    *this,
-                    iF
-                )
+                new oscillatingDisplacementPointPatchVectorField(*this, iF)
             );
         }
 

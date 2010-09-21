@@ -45,6 +45,7 @@ Author
 Foam::coarseAmgLevel::coarseAmgLevel
 (
     autoPtr<amgMatrix> matrixPtr,
+    const dictionary& dict,
     const word& policyType,
     const label groupSize,
     const label minCoarseEqns,
@@ -54,6 +55,7 @@ Foam::coarseAmgLevel::coarseAmgLevel
     matrixPtr_(matrixPtr),
     x_(matrixPtr_->size()),
     b_(matrixPtr_->size()),
+    dict_(dict),
     policyPtr_
     (
         amgPolicy::New
@@ -68,11 +70,11 @@ Foam::coarseAmgLevel::coarseAmgLevel
     (
         lduSmoother::New
         (
-            smootherType,
             matrixPtr_->matrix(),
             matrixPtr_->coupleBouCoeffs(),
             matrixPtr_->coupleIntCoeffs(),
-            matrixPtr_->interfaceFields()
+            matrixPtr_->interfaceFields(),
+            dict
         )
     )
 {}
@@ -290,6 +292,7 @@ Foam::autoPtr<Foam::amgLevel> Foam::coarseAmgLevel::makeNextLevel() const
                     matrixPtr_->coupleIntCoeffs(),
                     matrixPtr_->interfaceFields()
                 ),
+                dict(),
                 policyPtr_->type(),
                 policyPtr_->groupSize(),
                 policyPtr_->minCoarseEqns(),

@@ -67,6 +67,9 @@ class coarseAmgLevel
         //- RHS field
         scalarField b_;
 
+        //- Dictionary
+        const dictionary& dict_;
+
         //- AMG policy
         autoPtr<amgPolicy> policyPtr_;
 
@@ -89,6 +92,7 @@ public:
         coarseAmgLevel
         (
             autoPtr<amgMatrix> matrixPtr,
+            const dictionary& dict,
             const word& policyType,
             const label groupSize,
             const label minCoarseEqns,
@@ -108,6 +112,12 @@ public:
 
         //- Return reference to b
         virtual scalarField& b();
+
+        //- Return reference to dictionary
+        const dictionary& dict() const
+        {
+            return dict_;
+        }
 
         //- Calculate residual
         virtual void residual

@@ -32,7 +32,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "repatchPolyTopoChanger.H"
-#include "directTopoChanger.H"
+#include "directTopoChange.H"
 #include "mapPolyMesh.H"
 #include "polyModifyFace.H"
 

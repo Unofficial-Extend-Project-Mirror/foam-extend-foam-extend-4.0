@@ -46,7 +46,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class blended Declaration
+                 Class blendedEdgeInterpolation Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -91,7 +91,7 @@ public:
             blendingFactor_(blendingFactor)
         {}
 
-        //- Construct from mesh and Istream. 
+        //- Construct from mesh and Istream.
         //  The name of the flux field is read from the Istream and looked-up
         //  from the database
         blendedEdgeInterpolation
@@ -105,7 +105,7 @@ public:
             upwindEdgeInterpolation<Type>
             (
                 mesh,
-                mesh.db().objectRegistry::lookupObject<edgeScalarField>
+                mesh().objectRegistry::lookupObject<edgeScalarField>
                 (
                     word(is)
                 )
@@ -137,8 +137,10 @@ public:
         ) const
         {
             return
-                blendingFactor_*linearEdgeInterpolation<Type>::weights(vf)
-              + (1 - blendingFactor_)*upwindEdgeInterpolation<Type>::weights(vf);
+                blendingFactor_*
+                linearEdgeInterpolation<Type>::weights(vf)
+              + (1 - blendingFactor_)*
+                upwindEdgeInterpolation<Type>::weights(vf);
         }
 };
 

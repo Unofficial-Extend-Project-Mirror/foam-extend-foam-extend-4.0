@@ -1,1 +1,0 @@
-    argList::validOptions.insert("constant", "");

@@ -35,11 +35,14 @@ namespace Foam
 // * * * * * * * * * * * * * * * * Solvers * * * * * * * * * * * * * * * * * //
 
 template<class Type>
-lduSolverPerformance tetFemMatrix<Type>::solve(Istream& solverControls)
+lduSolverPerformance tetFemMatrix<Type>::solve
+(
+     const dictionary& solverControls
+)
 {
     if (debug)
     {
-        Info<< "tetFemMatrix<Type>::solve(Istream& solverControls) : "
+        Info<< "tetFemMatrix<Type>::solve(const dictionary&) : "
                "solving tetFemMatrix<Type>"
             << endl;
     }
@@ -60,7 +63,7 @@ lduSolverPerformance tetFemMatrix<Type>::solve(Istream& solverControls)
     (
         pow
         (
-            psi_.mesh()().directions(),
+            psi_.mesh()().solutionD(),
             pTraits<typename powProduct<Vector<label>, Type::rank>::type>::zero
         )
     );
@@ -125,7 +128,7 @@ lduSolverPerformance tetFemMatrix<Type>::solve(Istream& solverControls)
             coupledBouCoeffs,
             coupledIntCoeffs,
             interfaces,
-            solverControls.rewind()
+            solverControls
         )->solve(psiCmpt, sourceCmpt, cmpt);
 
         solverPerf.print();

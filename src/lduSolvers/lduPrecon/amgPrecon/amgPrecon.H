@@ -98,24 +98,6 @@ public:
 
     // Constructors
 
-        //- Construct from components
-        amgPrecon
-        (
-            const lduMatrix& matrix,
-            const FieldField<Field, scalar>& coupleBouCoeffs,
-            const FieldField<Field, scalar>& coupleIntCoeffs,
-            const lduInterfaceFieldPtrsList& interfaceFields,
-            const amgCycle::cycleType cycle,
-            const label nPreSweeps,
-            const label nPostSweeps,
-            const label nMaxLevels,
-            const bool scale,
-            const word& policyType,
-            const label groupSize,
-            const label minCoarseEqns,
-            const word& smootherType
-        );
-
         //- Construct from matrix and dictionary
         amgPrecon
         (

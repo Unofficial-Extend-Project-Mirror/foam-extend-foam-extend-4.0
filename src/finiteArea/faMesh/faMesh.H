@@ -365,7 +365,7 @@ public:
         // Access
 
             //- Return reference to the mesh database
-            virtual const objectRegistry& db() const;
+            virtual const objectRegistry& thisDb() const;
 
             //- Return constant reference to boundary mesh
             const faBoundaryMesh& boundary() const;

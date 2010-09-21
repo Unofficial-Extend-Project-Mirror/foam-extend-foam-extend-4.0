@@ -48,7 +48,7 @@ tmp
         tetPolyPatchField,
         tetPointMesh
     >
-> 
+>
 tetFec::grad
 (
     const GeometricField<Type, tetPolyPatchField, tetPointMesh>& psi
@@ -66,7 +66,7 @@ tetFec::grad
             (
                 "grad("+psi.name()+')',
                 psi.instance(),
-                psi.db(),
+                tetMesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -80,7 +80,7 @@ tetFec::grad
         )
     );
 
-    GeometricField<GradType, tetPolyPatchField, tetPointMesh>& femGrad = 
+    GeometricField<GradType, tetPolyPatchField, tetPointMesh>& femGrad =
         tFemGrad();
 
     pointField points = tetMesh.points();
@@ -100,7 +100,7 @@ tetFec::grad
             points[curShape[3]]
         );
 
-        GradType tetGrad = 
+        GradType tetGrad =
           - (1.0/3.0)*
             (
                 curTetrahedron.Sa()*psi.internalField()[curShape[0]]
@@ -111,7 +111,7 @@ tetFec::grad
 
         forAll (curShape, pointI)
         {
-            scalar weight = 
+            scalar weight =
                 curTetrahedron.mag()/
                 mag
                 (
@@ -140,7 +140,7 @@ tmp
         elementPatchField,
         elementMesh
     >
-> 
+>
 tetFec::elementGrad
 (
     const GeometricField<Type, tetPolyPatchField, tetPointMesh>& psi
@@ -161,7 +161,7 @@ tetFec::elementGrad
             (
                 "grad("+psi.name()+')',
                 psi.instance(),
-                psi.db(),
+                mesh,
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -175,7 +175,7 @@ tetFec::elementGrad
         )
     );
 
-    GeometricField<GradType, elementPatchField, elementMesh>& elemGrad = 
+    GeometricField<GradType, elementPatchField, elementMesh>& elemGrad =
         tElemGrad();
 
     pointField points = tetMesh.points();
@@ -187,28 +187,28 @@ tetFec::elementGrad
 
     for (label cellI = 0; cellI < tetMesh.nCells(); cellI++)
     {
-	tetCellList tets = tetMesh.tets(cellI);
+        tetCellList tets = tetMesh.tets(cellI);
 
-	forAll (tets, tetI)
-	{
-	    tetPointRef curTetrahedron = tets[tetI].tet(points);
+        forAll (tets, tetI)
+        {
+            tetPointRef curTetrahedron = tets[tetI].tet(points);
 
-	    cellShape curShape = tets[tetI].tetCellShape();
+            cellShape curShape = tets[tetI].tetCellShape();
 
-	    GradType tetGrad = 
-	      - (1.0/3.0)*
-		(
-		    curTetrahedron.Sa()*psi.internalField()[curShape[0]]
-		  + curTetrahedron.Sb()*psi.internalField()[curShape[1]]
-		  + curTetrahedron.Sc()*psi.internalField()[curShape[2]]
-		  + curTetrahedron.Sd()*psi.internalField()[curShape[3]]
-		 )/curTetrahedron.mag();
+            GradType tetGrad =
+              - (1.0/3.0)*
+                (
+                    curTetrahedron.Sa()*psi.internalField()[curShape[0]]
+                  + curTetrahedron.Sb()*psi.internalField()[curShape[1]]
+                  + curTetrahedron.Sc()*psi.internalField()[curShape[2]]
+                  + curTetrahedron.Sd()*psi.internalField()[curShape[3]]
+                )/curTetrahedron.mag();
 
-	    scalar weight = mag(C[cellI] - curShape.centre(points));
+            scalar weight = mag(C[cellI] - curShape.centre(points));
 
-	    elemGrad.internalField()[cellI] += weight*tetGrad;
-	    weights[cellI] += weight;
-	}
+            elemGrad.internalField()[cellI] += weight*tetGrad;
+            weights[cellI] += weight;
+        }
     }
 
     elemGrad.internalField() /= weights;

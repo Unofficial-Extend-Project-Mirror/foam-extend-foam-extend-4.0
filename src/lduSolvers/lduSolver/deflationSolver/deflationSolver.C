@@ -53,7 +53,7 @@ namespace Foam
 void Foam::deflationSolver::GaussSolve
 (
     const label activeSize,
-    const scalarMatrix& A,
+    const scalarSquareMatrix& A,
     scalarField& x,
     const scalarField& b
 ) const
@@ -71,7 +71,7 @@ void Foam::deflationSolver::GaussSolve
         // Non-trivial solution
 
         // Create a temporary matrix and b - they are destroyed in solver call
-        scalarMatrix lm(activeSize, activeSize);
+        scalarSquareMatrix lm(activeSize);
 
         for (label i = 0; i < activeSize; i++)
         {
@@ -126,7 +126,7 @@ Foam::deflationSolver::deflationSolver
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    Istream& solverData
+    const dictionary& dict
 )
 :
     lduSolver
@@ -136,7 +136,7 @@ Foam::deflationSolver::deflationSolver
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverData
+        dict
     ),
     preconPtr_
     (
@@ -146,15 +146,15 @@ Foam::deflationSolver::deflationSolver
             coupleBouCoeffs,
             coupleIntCoeffs,
             interfaces,
-            dict().subDict("preconditioner")
+            dict.subDict("preconditioner")
         )
     ),
-    rpmOrder_(readLabel(dict().lookup("rpmOrder"))),
-    maxDirs_(Foam::max(readLabel(dict().lookup("maxDirections")), 2)),
-    basisTol_(readScalar(dict().lookup("basisTolerance"))),
-    divTol_(readScalar(dict().lookup("divergenceTolerance"))),
-    nBasisSteps_(readLabel(dict().lookup("nBasisSteps"))),
-    nPowerIter_(readLabel(dict().lookup("nPowerIter"))),
+    rpmOrder_(readLabel(dict.lookup("rpmOrder"))),
+    maxDirs_(Foam::max(readLabel(dict.lookup("maxDirections")), 2)),
+    basisTol_(readScalar(dict.lookup("basisTolerance"))),
+    divTol_(readScalar(dict.lookup("divergenceTolerance"))),
+    nBasisSteps_(readLabel(dict.lookup("nBasisSteps"))),
+    nPowerIter_(readLabel(dict.lookup("nPowerIter"))),
     xBuffer_(matrix.lduAddr().size())
 {}
 
@@ -205,8 +205,8 @@ Foam::lduSolverPerformance Foam::deflationSolver::solve
         scalarField v(maxDirs_);
 
         // Matrices
-        scalarMatrix H(maxDirs_, maxDirs_, 0);
-        scalarMatrix R(maxDirs_, maxDirs_, 0);
+        scalarSquareMatrix H(maxDirs_, 0);
+        scalarSquareMatrix R(maxDirs_, 0);
 
         // Number of directions
         label nDirs = 0;

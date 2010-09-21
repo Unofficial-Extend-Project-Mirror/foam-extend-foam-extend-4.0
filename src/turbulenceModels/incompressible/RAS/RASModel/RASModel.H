@@ -169,7 +169,8 @@ public:
 
     //- Destructor
 
-        virtual ~RASModel();
+        virtual ~RASModel()
+        {}
 
 
     // Member Functions

@@ -134,7 +134,7 @@ faePatchField<Type>::faePatchField
 template<class Type>
 const objectRegistry& faePatchField<Type>::db() const
 {
-    return patch_.boundaryMesh().mesh().db();
+    return patch_.boundaryMesh().mesh();
 }
 
 

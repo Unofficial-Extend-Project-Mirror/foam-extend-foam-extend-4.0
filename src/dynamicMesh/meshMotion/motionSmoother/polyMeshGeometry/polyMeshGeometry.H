@@ -40,7 +40,7 @@ SourceFiles
 #define polyMeshGeometry_H
 
 #include "pointFields.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

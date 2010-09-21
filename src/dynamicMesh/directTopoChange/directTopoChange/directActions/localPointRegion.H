@@ -46,7 +46,7 @@ SourceFiles
 #include "typeInfo.H"
 #include "Map.H"
 #include "labelList.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "faceList.H"
 #include "boolList.H"
 

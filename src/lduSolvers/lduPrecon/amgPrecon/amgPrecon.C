@@ -31,7 +31,7 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "amgPrecon.H"
 #include "fineAmgLevel.H"
@@ -43,67 +43,17 @@ namespace Foam
 {
     defineTypeNameAndDebug(amgPrecon, 0);
 
-    addToRunTimeSelectionTable(lduPreconditioner, amgPrecon, dictionary);
+    lduPreconditioner::
+        addsymMatrixConstructorToTable<amgPrecon>
+        addamgPreconditionerSymMatrixConstructorToTable_;
+
+    lduPreconditioner::
+        addasymMatrixConstructorToTable<amgPrecon>
+        addamgPreconditionerAsymMatrixConstructorToTable_;
 }
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-Foam::amgPrecon::amgPrecon
-(
-    const lduMatrix& matrix,
-    const FieldField<Field, scalar>& coupleBouCoeffs,
-    const FieldField<Field, scalar>& coupleIntCoeffs,
-    const lduInterfaceFieldPtrsList& interfaceFields,
-    const amgCycle::cycleType cycle,
-    const label nPreSweeps,
-    const label nPostSweeps,
-    const label nMaxLevels,
-    const bool scale,
-    const word& policyType,
-    const label groupSize,
-    const label minCoarseEqns,
-    const word& smootherType
-)
-:
-    lduPreconditioner
-    (
-        matrix,
-        coupleBouCoeffs,
-        coupleIntCoeffs,
-        interfaceFields
-    ),
-    cycle_(cycle),
-    nPreSweeps_(nPreSweeps),
-    nPostSweeps_(nPostSweeps),
-    nMaxLevels_(nMaxLevels),
-    scale_(scale),
-    amgPtr_
-    (
-        new amgCycle
-        (
-            autoPtr<amgLevel>
-            (
-                new fineAmgLevel
-                (
-                    matrix,
-                    coupleBouCoeffs,
-                    coupleIntCoeffs,
-                    interfaceFields,
-                    policyType,
-                    groupSize,
-                    minCoarseEqns,
-                    smootherType
-                )
-            )
-        )
-    ),
-    xBuffer_(matrix.lduAddr().size())
-{
-    // Make coarse levels
-    amgPtr_->makeCoarseLevels(nMaxLevels_);
-}
-
 
 Foam::amgPrecon::amgPrecon
 (
@@ -138,6 +88,7 @@ Foam::amgPrecon::amgPrecon
                     coupleBouCoeffs,
                     coupleIntCoeffs,
                     interfaceFields,
+                    dict,
                     dict.lookup("policy"),
                     readLabel(dict.lookup("groupSize")),
                     readLabel(dict.lookup("minCoarseEqns")),

@@ -43,6 +43,7 @@ namespace RASModels
 defineTypeNameAndDebug(kOmegaSST_LowRe, 0);
 addToRunTimeSelectionTable(RASModel, kOmegaSST_LowRe, dictionary);
 
+
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
 tmp<volScalarField> kOmegaSST_LowRe::F1(const volScalarField& CDkOmega) const
@@ -197,6 +198,24 @@ kOmegaSST_LowRe::kOmegaSST_LowRe
             10.0
         )
     ),
+    Cmu_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "Cmu",
+            coeffDict_,
+            0.09
+        )
+    ),
+    kappa_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "kappa",
+            coeffDict_,
+            0.41
+        )
+    ),
 
     y_(mesh_),
 
@@ -223,7 +242,7 @@ kOmegaSST_LowRe::kOmegaSST_LowRe
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh
+        mesh_
     ),
     nut_
     (

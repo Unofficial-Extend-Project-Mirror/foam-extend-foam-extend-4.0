@@ -50,7 +50,7 @@ void Foam::pistonLayer::addZonesAndModifiers()
         Info<< "void pistonLayer::addZonesAndModifiers() : "
             << "Zones and modifiers already present.  Skipping."
             << endl;
-        
+
         if (topoChanger_.size() == 0)
         {
             FatalErrorIn
@@ -59,14 +59,12 @@ void Foam::pistonLayer::addZonesAndModifiers()
             )   << "Mesh modifiers not read properly"
                 << abort(FatalError);
         }
-        
+
         Info << "topoChanger.size() = " << topoChanger_.size() << endl;
-        
+
         checkAndCalculate();
 
         setVirtualPistonPosition();
-        vpi_.movePoints();
-        vpi_.updateMesh();
         topoChanger_.writeOpt() = IOobject::AUTO_WRITE;
         topoChanger_.write();
 
@@ -74,7 +72,7 @@ void Foam::pistonLayer::addZonesAndModifiers()
     }
 
     checkAndCalculate();
-    
+
     Info<< "Time = " << engTime().theta() << endl
         << "Adding zones to the engine mesh" << endl;
 

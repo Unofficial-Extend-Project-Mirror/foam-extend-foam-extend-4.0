@@ -34,6 +34,11 @@ Documentation
 
 DebugSwitches
 {
+    BlockLduMatrix  2;
+
+    CircumferentialAveragingInterpolation 0;
+    mixingPlanePolyPatch                  1;
+
     overlapGgi          0;
     cyclicGgi           0;
     coupledLduMatrix    1;
@@ -465,6 +470,7 @@ DebugSwitches
     genericPatch        0;
     geomCellLooper      0;
     geometricSurfacePatch   0;
+    ggi                 0;
     global              0;
     globalMeshData      0;
     globalPoints        0;
@@ -874,10 +880,59 @@ InfoSwitches
 OptimisationSwitches
 {
     fileModificationSkew 10;
-    commsType       nonBlocking; //scheduled; //blocking;
-//     commsType       blocking; //scheduled; //blocking;
+//     commsType       nonBlocking; //scheduled; //blocking;
+    commsType       blocking; //scheduled;
     floatTransfer   0;// Floating transfer not realiable
     nProcsSimpleSum 0;
+
+    nSquaredProjection    0;
+//     nSquaredProjection    1;
+}
+
+Tolerances
+{
+    // Primitive mesh checking limits
+    primitiveMeshClosedThreshold     1e-6;
+    primitiveMeshAspectThreshold     1000;
+    primitiveMeshNonOrthThreshold    70;
+    primitiveMeshSkewThreshold       4;
+    primitiveMeshFaceAngleThreshold  10;
+    primitiveMeshFaceFlatnessThreshold 0.8;
+
+    // Geometric matching tolerances
+    cyclicMatchTol      1e-4;
+    processorMatchTol   1e-4;
+
+    // Volumetric closed domain
+    closedDomainTol     1e-10;
+
+    // Patch-to-patch interpolation tolerances
+    patchToPatchDirectHit       1e-5;
+    patchToPatchProjectionTol   0.05;
+
+    // Thermophysical models
+    specieThermoTol     1e-4;
+
+    // Intersection tolerance
+    intersectionPlanarTol      0.2;
+    intersectionMissTol        1e-10;
+
+    // Sliding interface
+//     slidingPointMergeTol            0.2;
+//     slidingEdgeMergeTol             0.05;
+//     slidingIntegralAdjTol           0.15;
+//     slidingEdgeMasterCatchFraction  0.4;
+//     slidingEdgeEndCutoffTol         0.0001;
+//     slidingEdgeCoPlanarTol          0.8;
+
+    slidingPointMergeTol            0.2;
+    slidingEdgeMergeTol             0.01;
+    slidingIntegralAdjTol           0.05;
+    slidingEdgeMasterCatchFraction  0.4;
+    slidingEdgeEndCutoffTol         0.0001;
+    slidingEdgeCoPlanarTol          0.8;
+
+//     GGIAreaErrorTol                 1e-8;
 }
 
 DimensionedConstants

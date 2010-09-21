@@ -44,13 +44,13 @@ Foam::reactingMixture<ThermoType>::reactingMixture
     (
         thermoDict,
         autoPtr<chemistryReader<ThermoType> >::operator()().species(),
-        autoPtr<chemistryReader<ThermoType> >::operator()().speciesThermo(),
+        autoPtr<chemistryReader<ThermoType> >::operator()().sThermo(),
         mesh
     ),
     PtrList<Reaction<ThermoType> >
     (
         autoPtr<chemistryReader<ThermoType> >::operator()().reactions(),
-        this->species_
+        this->multiComponentMixture<ThermoType>::species_
     )
 {
     autoPtr<chemistryReader<ThermoType> >::clear();

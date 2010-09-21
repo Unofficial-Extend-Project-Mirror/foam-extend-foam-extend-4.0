@@ -32,7 +32,7 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "gmresSolver.H"
-#include "Matrix.H"
+#include "scalarMatrices.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -89,7 +89,7 @@ Foam::gmresSolver::gmresSolver
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    Istream& solverData
+    const dictionary& dict
 )
 :
     lduSolver
@@ -99,7 +99,7 @@ Foam::gmresSolver::gmresSolver
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverData
+        dict
     ),
     preconPtr_
     (
@@ -109,10 +109,10 @@ Foam::gmresSolver::gmresSolver
             coupleBouCoeffs,
             coupleIntCoeffs,
             interfaces,
-            dict().subDict("preconditioner")
+            dict.subDict("preconditioner")
         )
     ),
-    nDirs_(readLabel(dict().lookup("nDirections")))
+    nDirs_(readLabel(dict.lookup("nDirections")))
 {}
 
 
@@ -154,7 +154,7 @@ Foam::lduSolverPerformance Foam::gmresSolver::solve
     if (!stop(solverPerf))
     {
         // Create the Hesenberg matrix
-        Matrix<scalar> H(nDirs_, nDirs_, 0);
+        scalarSquareMatrix H(nDirs_, 0);
 
         // Create y and b for Hessenberg matrix
         scalarField yh(nDirs_, 0);

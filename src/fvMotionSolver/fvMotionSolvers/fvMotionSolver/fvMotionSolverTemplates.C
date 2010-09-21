@@ -44,7 +44,19 @@ Foam::wordList Foam::fvMotionSolver::cellMotionBoundaryTypes
 
     forAll(cmUbf, patchi)
     {
-        if (isA<fixedValuePointPatchField<Type> >(pmUbf[patchi]))
+        if
+        (
+            isA
+            <
+                FixedValuePointPatchField
+                <
+                    pointPatchField,
+                    pointMesh,
+                    pointPatch,
+                    DummyMatrix,
+                    Type
+                >
+            >(pmUbf[patchi]))
         {
             cmUbf[patchi] = cellMotionFvPatchField<Type>::typeName;
         }

@@ -39,7 +39,7 @@ SourceFiles
 #define polyTopoChange_H
 
 #include "DynamicList.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "polyAddPoint.H"
 #include "polyModifyPoint.H"
 #include "polyRemovePoint.H"

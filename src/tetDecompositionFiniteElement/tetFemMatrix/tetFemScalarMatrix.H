@@ -47,7 +47,7 @@ namespace Foam
 template<>
 lduSolverPerformance tetFemMatrix<scalar>::solve
 (
-    Istream& solverControls
+    const dictionary& solverControls
 );
 
 // Return the matrix residual

@@ -25,6 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "SIBS.H"
+#include "simpleMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -43,7 +44,7 @@ void Foam::SIBS::SIMPR
     scalar h = deltaX/nSteps;
     const label nEqns = ode_.nEqns();
 
-    Matrix<scalar> a(nEqns, nEqns);
+    scalarSquareMatrix a(nEqns);
     for (register label i=0; i<nEqns; i++)
     {
         for (register label j=0; j<nEqns; j++)
@@ -54,14 +55,14 @@ void Foam::SIBS::SIMPR
     }
 
     labelList pivotIndices(nEqns);
-    simpleMatrix<scalar>::LUDecompose(a, pivotIndices);
+    scalarSquareMatrix::LUDecompose(a, pivotIndices);
 
     for (register label i=0; i<nEqns; i++)
     {
         yEnd[i] = h*(dydx[i] + h*dfdx[i]);
     }
 
-    simpleMatrix<scalar>::LUBacksubstitute(a, pivotIndices, yEnd);
+    scalarSquareMatrix::LUBacksubstitute(a, pivotIndices, yEnd);
 
     scalarField del(yEnd);
     scalarField ytemp(nEqns);

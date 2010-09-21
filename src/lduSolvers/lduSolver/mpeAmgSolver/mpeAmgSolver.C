@@ -32,7 +32,7 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "mpeAmgSolver.H"
-#include "Matrix.H"
+#include "scalarMatrices.H"
 #include "DenseMatrixTools.H"
 #include "FieldFields.H"
 
@@ -61,7 +61,7 @@ Foam::mpeAmgSolver::mpeAmgSolver
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    Istream& solverData
+    const dictionary& dict
 )
 :
     lduSolver
@@ -71,7 +71,7 @@ Foam::mpeAmgSolver::mpeAmgSolver
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverData
+        dict
     ),
     amg_
     (
@@ -79,9 +79,9 @@ Foam::mpeAmgSolver::mpeAmgSolver
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        dict()
+        dict
     ),
-    kDimension_(readLabel(dict().lookup("kDimension")))
+    kDimension_(readLabel(dict.lookup("kDimension")))
 {}
 
 
@@ -130,7 +130,7 @@ Foam::lduSolverPerformance Foam::mpeAmgSolver::solve
         scalarField xRhs(x.size());
 
         // Matrices
-        Matrix<scalar> AN(kDimension_ - 1, kDimension_ - 1);
+        scalarSquareMatrix AN(kDimension_ - 1);
         scalarField xN(kDimension_ - 1);
         scalarField bN(kDimension_ - 1);
 

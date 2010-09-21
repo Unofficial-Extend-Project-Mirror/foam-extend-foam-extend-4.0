@@ -24,13 +24,13 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "CompactListList_dev.H"
 #include "fvMeshDistribute.H"
-#include "ProcessorTopology.H"
-#include "commSchedule.H"
 #include "PstreamCombineReduceOps.H"
 #include "fvMeshAdder.H"
 #include "faceCoupleInfo.H"
 #include "processorFvPatchField.H"
+#include "processorFvsPatchField.H"
 #include "directTopoChange.H"
 #include "removeCells.H"
 #include "polyModifyFace.H"
@@ -38,6 +38,7 @@ License
 #include "mergePoints.H"
 #include "mapDistributePolyMesh.H"
 #include "surfaceFields.H"
+#include "syncTools.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -45,71 +46,6 @@ defineTypeNameAndDebug(Foam::fvMeshDistribute, 0);
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-//Foam::List<Foam::labelPair> Foam::fvMeshDistribute::getSchedule
-//(
-//    const labelList& distribution
-//)
-//{
-//    labelList nCellsPerProc(countCells(distribution));
-//
-//    if (debug)
-//    {
-//        Pout<< "getSchedule : Wanted distribution:" << nCellsPerProc << endl;
-//    }
-//
-//    // Processors I need to send data to
-//    labelListList mySendProcs(Pstream::nProcs());
-//
-//    // Count
-//    label nSendProcs = 0;
-//    forAll(nCellsPerProc, sendProcI)
-//    {
-//        if (sendProcI != Pstream::myProcNo() && nCellsPerProc[sendProcI] > 0)
-//        {
-//            nSendProcs++;
-//        }
-//    }
-//
-//    // Fill 
-//    mySendProcs[Pstream::myProcNo()].setSize(nSendProcs);
-//    nSendProcs = 0;
-//    forAll(nCellsPerProc, sendProcI)
-//    {
-//        if (sendProcI != Pstream::myProcNo() && nCellsPerProc[sendProcI] > 0)
-//        {
-//            mySendProcs[Pstream::myProcNo()][nSendProcs++] = sendProcI;
-//        }
-//    }
-//
-//    // Synchronise
-//    Pstream::gatherList(mySendProcs);
-//    Pstream::scatterList(mySendProcs);
-//
-//    // Combine into list (same on all procs) giving sending and receiving
-//    // processor
-//    label nComms = 0;
-//    forAll(mySendProcs, procI)
-//    {
-//        nComms += mySendProcs[procI].size();
-//    }
-//
-//    List<labelPair> schedule(nComms);
-//    nComms = 0;
-//
-//    forAll(mySendProcs, procI)
-//    {
-//        const labelList& sendProcs = mySendProcs[procI];
-//
-//        forAll(sendProcs, i)
-//        {
-//            schedule[nComms++] = labelPair(procI, sendProcs[i]);
-//        }
-//    }
-//
-//    return schedule;
-//}
-
 
 Foam::labelList Foam::fvMeshDistribute::select
 (
@@ -143,14 +79,29 @@ Foam::labelList Foam::fvMeshDistribute::select
 
 
 // Check all procs have same names and in exactly same order.
-void Foam::fvMeshDistribute::checkEqualWordList(const wordList& lst)
+void Foam::fvMeshDistribute::checkEqualWordList
+(
+    const string& msg,
+    const wordList& lst
+)
 {
-    wordList myObjects(lst);
+    List<wordList> allNames(Pstream::nProcs());
+    allNames[Pstream::myProcNo()] = lst;
+    Pstream::gatherList(allNames);
+    Pstream::scatterList(allNames);
 
-    // Check that all meshes have same objects
-    Pstream::listCombineGather(myObjects, checkEqualType());
-    // Below scatter only needed to balance sends and receives.
-    Pstream::listCombineScatter(myObjects);
+    for (label procI = 1; procI < Pstream::nProcs(); procI++)
+    {
+        if (allNames[procI] != allNames[0])
+        {
+            FatalErrorIn("fvMeshDistribute::checkEqualWordList(..)")
+                << "When checking for equal " << msg.c_str() << " :" << endl
+                << "processor0 has:" << allNames[0] << endl
+                << "processor" << procI << " has:" << allNames[procI] << endl
+                << msg.c_str() << " need to be synchronised on all processors."
+                << exit(FatalError);
+        }
+    }
 }
 
 
@@ -196,7 +147,7 @@ void Foam::fvMeshDistribute::printMeshInfo(const fvMesh& mesh)
             << endl;
     }
 
-    if (mesh.pointZones().size() > 0)
+    if (mesh.pointZones().size())
     {
         Pout<< "PointZones:" << endl;
         forAll(mesh.pointZones(), zoneI)
@@ -207,7 +158,7 @@ void Foam::fvMeshDistribute::printMeshInfo(const fvMesh& mesh)
                 << endl;
         }
     }
-    if (mesh.faceZones().size() > 0)
+    if (mesh.faceZones().size())
     {
         Pout<< "FaceZones:" << endl;
         forAll(mesh.faceZones(), zoneI)
@@ -218,7 +169,7 @@ void Foam::fvMeshDistribute::printMeshInfo(const fvMesh& mesh)
                 << endl;
         }
     }
-    if (mesh.cellZones().size() > 0)
+    if (mesh.cellZones().size())
     {
         Pout<< "CellZones:" << endl;
         forAll(mesh.cellZones(), zoneI)
@@ -392,7 +343,7 @@ void Foam::fvMeshDistribute::deleteTrailingPatch()
         const_cast<polyBoundaryMesh&>(mesh_.boundaryMesh());
     fvBoundaryMesh& fvPatches = const_cast<fvBoundaryMesh&>(mesh_.boundary());
 
-    if (polyPatches.size() == 0)
+    if (polyPatches.empty())
     {
         FatalErrorIn("fvMeshDistribute::deleteTrailingPatch(fvMesh&)")
             << "No patches in mesh"
@@ -410,7 +361,7 @@ void Foam::fvMeshDistribute::deleteTrailingPatch()
             << " : " << polyPatches[sz-1].name() << " size:" << nFaces << endl;
     }
 
-    if (nFaces != 0)
+    if (nFaces)
     {
         FatalErrorIn("fvMeshDistribute::deleteTrailingPatch()")
             << "There are still " << nFaces << " faces in patch to be deleted "
@@ -502,7 +453,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::fvMeshDistribute::repatch
 )
 {
     directTopoChange meshMod(mesh_);
-    
+
     forAll(newPatchID, bFaceI)
     {
         if (newPatchID[bFaceI] != -1)
@@ -586,8 +537,8 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::fvMeshDistribute::repatch
                 "fvMeshDistribute::repatch(const labelList&, labelListList&)"
             )   << "reverseFaceMap contains -1 at index:"
                 << index << endl
-                << "This means that the repatch operation was not just a shuffle?"
-                << abort(FatalError);
+                << "This means that the repatch operation was not just"
+                << " a shuffle?" << abort(FatalError);
         }
     }
 
@@ -622,11 +573,9 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::fvMeshDistribute::mergeSharedPoints
         )
     );
 
-    bool merged = pointToMaster.size() > 0;
-
-    if (!returnReduce(merged, orOp<bool>()))
+    if (returnReduce(pointToMaster.size(), sumOp<label>()) == 0)
     {
-        return autoPtr<mapPolyMesh>(new mapPolyMesh(mesh_));
+        return autoPtr<mapPolyMesh>(NULL);
     }
 
     directTopoChange meshMod(mesh_);
@@ -639,14 +588,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::fvMeshDistribute::mergeSharedPoints
     // Update fields. No inflation, parallel sync.
     mesh_.updateMesh(map);
 
-    // Move mesh (since morphing does not do this)
-    if (map().hasMotionPoints())
-    {
-        mesh_.movePoints(map().preMotionPoints());
-    }
-
     // Adapt constructMaps for merged points.
-    // 1.4.1: use reversePointMap < -1 feature.
     forAll(constructPointMap, procI)
     {
         labelList& constructMap = constructPointMap[procI];
@@ -655,15 +597,22 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::fvMeshDistribute::mergeSharedPoints
         {
             label oldPointI = constructMap[i];
 
-            // See if merged into other point
-            Map<label>::const_iterator iter = pointToMaster.find(oldPointI);
+            label newPointI = map().reversePointMap()[oldPointI];
 
-            if (iter != pointToMaster.end())
+            if (newPointI < -1)
             {
-                oldPointI = iter();
+                constructMap[i] = -newPointI-2;
             }
-
-            constructMap[i] = map().reversePointMap()[oldPointI];
+            else if (newPointI >= 0)
+            {
+                constructMap[i] = newPointI;
+            }
+            else
+            {
+                FatalErrorIn("fvMeshDistribute::mergeSharedPoints()")
+                    << "Problem. oldPointI:" << oldPointI
+                    << " newPointI:" << newPointI << abort(FatalError);
+            }
         }
     }
     return map;
@@ -679,57 +628,55 @@ void Foam::fvMeshDistribute::getNeighbourData
     labelList& sourceNewProc
 ) const
 {
-    sourceFace.setSize(mesh_.nFaces() - mesh_.nInternalFaces());
-    sourceProc.setSize(sourceFace.size());
-    sourceNewProc.setSize(sourceFace.size());
+    label nBnd = mesh_.nFaces() - mesh_.nInternalFaces();
+    sourceFace.setSize(nBnd);
+    sourceProc.setSize(nBnd);
+    sourceNewProc.setSize(nBnd);
 
     const polyBoundaryMesh& patches = mesh_.boundaryMesh();
 
-    // Send meshFace labels of processor patches and destination processor.
+    // Get neighbouring meshFace labels and new processor of coupled boundaries.
+    labelList nbrFaces(nBnd, -1);
+    labelList nbrNewProc(nBnd, -1);
+
     forAll(patches, patchI)
     {
         const polyPatch& pp = patches[patchI];
 
         if (isA<processorPolyPatch>(pp))
         {
-            const processorPolyPatch& procPatch =
-                refCast<const processorPolyPatch>(pp);
+            label offset = pp.start() - mesh_.nInternalFaces();
 
-            // Labels of faces on this side
-            labelList meshFaceLabels(pp.size());
-            forAll(meshFaceLabels, i)
+            // Mesh labels of faces on this side
+            forAll(pp, i)
             {
-                meshFaceLabels[i] = pp.start()+i;
+                label bndI = offset + i;
+                nbrFaces[bndI] = pp.start()+i;
             }
 
             // Which processor they will end up on
-            const labelList newProc
+            SubList<label>(nbrNewProc, pp.size(), offset).assign
             (
-                IndirectList<label>(distribution, pp.faceCells())
+                UIndirectList<label>(distribution, pp.faceCells())()
             );
-
-            OPstream toNeighbour(Pstream::blocking, procPatch.neighbProcNo());
-
-            toNeighbour << meshFaceLabels << newProc;
         }
     }
 
-    // Receive meshFace labels and destination processors of processor faces.
+
+    // Exchange the boundary data
+    syncTools::swapBoundaryFaceList(mesh_, nbrFaces, false);
+    syncTools::swapBoundaryFaceList(mesh_, nbrNewProc, false);
+
+
     forAll(patches, patchI)
     {
         const polyPatch& pp = patches[patchI];
-
         label offset = pp.start() - mesh_.nInternalFaces();
 
         if (isA<processorPolyPatch>(pp))
         {
             const processorPolyPatch& procPatch =
                 refCast<const processorPolyPatch>(pp);
-
-            // Receive the data
-            IPstream fromNeighbour(Pstream::blocking, procPatch.neighbProcNo());
-            labelList nbrFaces(fromNeighbour);
-            labelList nbrNewProc(fromNeighbour);
 
             // Check which of the two faces we store.
 
@@ -738,9 +685,10 @@ void Foam::fvMeshDistribute::getNeighbourData
                 // Use my local face labels
                 forAll(pp, i)
                 {
-                    sourceFace[offset + i] = pp.start()+i;
-                    sourceProc[offset + i] = Pstream::myProcNo();
-                    sourceNewProc[offset + i] = nbrNewProc[i];
+                    label bndI = offset + i;
+                    sourceFace[bndI] = pp.start()+i;
+                    sourceProc[bndI] = Pstream::myProcNo();
+                    sourceNewProc[bndI] = nbrNewProc[bndI];
                 }
             }
             else
@@ -748,9 +696,10 @@ void Foam::fvMeshDistribute::getNeighbourData
                 // Use my neighbours face labels
                 forAll(pp, i)
                 {
-                    sourceFace[offset + i] = nbrFaces[i];
-                    sourceProc[offset + i] = procPatch.neighbProcNo();
-                    sourceNewProc[offset + i] = nbrNewProc[i];
+                    label bndI = offset + i;
+                    sourceFace[bndI] = nbrFaces[bndI];
+                    sourceProc[bndI] = procPatch.neighbProcNo();
+                    sourceNewProc[bndI] = nbrNewProc[bndI];
                 }
             }
         }
@@ -759,9 +708,10 @@ void Foam::fvMeshDistribute::getNeighbourData
             // Normal (physical) boundary
             forAll(pp, i)
             {
-                sourceFace[offset + i] = patchI;
-                sourceProc[offset + i] = -1;
-                sourceNewProc[offset + i] = -1;
+                label bndI = offset + i;
+                sourceFace[bndI] = patchI;
+                sourceProc[bndI] = -1;
+                sourceNewProc[bndI] = -1;
             }
         }
     }
@@ -851,7 +801,7 @@ void Foam::fvMeshDistribute::findCouples
 {
     // Store domain neighbour as map so we can easily look for pair
     // with same face+proc.
-    HashTable<label, labelPair, labelPairHash> map(domainFace.size());
+    HashTable<label, labelPair, labelPair::Hash<> > map(domainFace.size());
 
     forAll(domainFace, bFaceI)
     {
@@ -871,8 +821,8 @@ void Foam::fvMeshDistribute::findCouples
         {
             labelPair myData(sourceFace[bFaceI], sourceProc[bFaceI]);
 
-            HashTable<label, labelPair, labelPairHash>::const_iterator iter =
-                map.find(myData);
+            HashTable<label, labelPair, labelPair::Hash<> >::const_iterator
+                iter = map.find(myData);
 
             if (iter != map.end())
             {
@@ -915,7 +865,7 @@ Foam::labelList Foam::fvMeshDistribute::mapBoundaryData
     {
         label newFaceI = map.oldFaceMap()[oldBFaceI + map.nOldInternalFaces()];
 
-        // Face still exists (is nessecary?) and still boundary face
+        // Face still exists (is necessary?) and still boundary face
         if (newFaceI >= 0 && newFaceI >= mesh.nInternalFaces())
         {
             newBoundaryData[newFaceI - mesh.nInternalFaces()] =
@@ -981,8 +931,8 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::fvMeshDistribute::doRemoveCells
 }
 
 
-// Delete and add processor patches. Changes mesh and returns per
-//  neighbour proc the processor patchID.
+// Delete and add processor patches. Changes mesh and returns per neighbour proc
+// the processor patchID.
 void Foam::fvMeshDistribute::addProcPatches
 (
     const labelList& neighbourNewProc,   // processor that neighbour is on
@@ -1106,7 +1056,8 @@ void Foam::fvMeshDistribute::sendMesh
 
     const labelList& sourceFace,
     const labelList& sourceProc,
-    const labelList& sourceNewProc
+    const labelList& sourceNewProc,
+    OSstream& toDomain
 )
 {
     if (debug)
@@ -1119,10 +1070,13 @@ void Foam::fvMeshDistribute::sendMesh
             << endl;
     }
 
-    // Assume sparse point zones. Get contents in merged-zone indices.
-    labelListList zonePoints(pointZoneNames.size());
+    // Assume sparse, possibly overlapping point zones. Get contents
+    // in merged-zone indices.
+    CompactListList_dev<label> zonePoints;
     {
         const pointZoneMesh& pointZones = mesh.pointZones();
+
+        labelList rowSizes(pointZoneNames.size(), 0);
 
         forAll(pointZoneNames, nameI)
         {
@@ -1130,16 +1084,29 @@ void Foam::fvMeshDistribute::sendMesh
 
             if (myZoneID != -1)
             {
-                zonePoints[nameI] = pointZones[myZoneID];
+                rowSizes[nameI] = pointZones[myZoneID].size();
+            }
+        }
+        zonePoints.setSize(rowSizes);
+
+        forAll(pointZoneNames, nameI)
+        {
+            label myZoneID = pointZones.findZoneID(pointZoneNames[nameI]);
+
+            if (myZoneID != -1)
+            {
+                zonePoints[nameI].assign(pointZones[myZoneID]);
             }
         }
     }
 
-    // Assume sparse face zones
-    labelListList zoneFaces(faceZoneNames.size());
-    boolListList zoneFaceFlip(faceZoneNames.size());
+    // Assume sparse, possibly overlapping face zones
+    CompactListList_dev<label> zoneFaces;
+    CompactListList_dev<bool> zoneFaceFlip;
     {
         const faceZoneMesh& faceZones = mesh.faceZones();
+
+        labelList rowSizes(faceZoneNames.size(), 0);
 
         forAll(faceZoneNames, nameI)
         {
@@ -1147,16 +1114,31 @@ void Foam::fvMeshDistribute::sendMesh
 
             if (myZoneID != -1)
             {
-                zoneFaces[nameI] = faceZones[myZoneID];
-                zoneFaceFlip[nameI] = faceZones[myZoneID].flipMap();
+                rowSizes[nameI] = faceZones[myZoneID].size();
+            }
+        }
+
+        zoneFaces.setSize(rowSizes);
+        zoneFaceFlip.setSize(rowSizes);
+
+        forAll(faceZoneNames, nameI)
+        {
+            label myZoneID = faceZones.findZoneID(faceZoneNames[nameI]);
+
+            if (myZoneID != -1)
+            {
+                zoneFaces[nameI].assign(faceZones[myZoneID]);
+                zoneFaceFlip[nameI].assign(faceZones[myZoneID].flipMap());
             }
         }
     }
 
-    // Assume sparse cell zones
-    labelListList zoneCells(cellZoneNames.size());
+    // Assume sparse, possibly overlapping cell zones
+    CompactListList_dev<label> zoneCells;
     {
         const cellZoneMesh& cellZones = mesh.cellZones();
+
+        labelList rowSizes(cellZoneNames.size(), 0);
 
         forAll(cellZoneNames, nameI)
         {
@@ -1164,7 +1146,19 @@ void Foam::fvMeshDistribute::sendMesh
 
             if (myZoneID != -1)
             {
-                zoneCells[nameI] = cellZones[myZoneID];
+                rowSizes[nameI] = cellZones[myZoneID].size();
+            }
+        }
+
+        zoneCells.setSize(rowSizes);
+
+        forAll(cellZoneNames, nameI)
+        {
+            label myZoneID = cellZones.findZoneID(cellZoneNames[nameI]);
+
+            if (myZoneID != -1)
+            {
+                zoneCells[nameI].assign(cellZones[myZoneID]);
             }
         }
     }
@@ -1172,22 +1166,21 @@ void Foam::fvMeshDistribute::sendMesh
     //labelList cellZoneID;
     //if (hasCellZones)
     //{
-    //    cellZoneID.setSize(mesh.nCells());;
+    //    cellZoneID.setSize(mesh.nCells());
     //    cellZoneID = -1;
     //
     //    const cellZoneMesh& cellZones = mesh.cellZones();
     //
     //    forAll(cellZones, zoneI)
     //    {
-    //        IndirectList<label>(cellZoneID, cellZones[zoneI]) = zoneI;
+    //        UIndirectList<label>(cellZoneID, cellZones[zoneI]) = zoneI;
     //    }
     //}
 
     // Send
-    OPstream toDomain(Pstream::blocking, domain);
     toDomain
         << mesh.points()
-        << mesh.faces()
+        << CompactListList_dev<label, face>(mesh.faces())
         << mesh.faceOwner()
         << mesh.faceNeighbour()
         << mesh.boundaryMesh()
@@ -1200,6 +1193,13 @@ void Foam::fvMeshDistribute::sendMesh
         << sourceFace
         << sourceProc
         << sourceNewProc;
+
+
+    if (debug)
+    {
+        Pout<< "Started sending mesh to domain " << domain
+            << endl;
+    }
 }
 
 
@@ -1213,21 +1213,20 @@ Foam::autoPtr<Foam::fvMesh> Foam::fvMeshDistribute::receiveMesh
     const Time& runTime,
     labelList& domainSourceFace,
     labelList& domainSourceProc,
-    labelList& domainSourceNewProc
+    labelList& domainSourceNewProc,
+    ISstream& fromNbr
 )
 {
-    IPstream fromNbr(Pstream::blocking, domain);
-
     pointField domainPoints(fromNbr);
-    faceList domainFaces(fromNbr);
+    faceList domainFaces = CompactListList_dev<label, face>(fromNbr)();
     labelList domainAllOwner(fromNbr);
     labelList domainAllNeighbour(fromNbr);
     PtrList<entry> patchEntries(fromNbr);
 
-    labelListList zonePoints(fromNbr);
-    labelListList zoneFaces(fromNbr);
-    boolListList zoneFaceFlip(fromNbr);
-    labelListList zoneCells(fromNbr);
+    CompactListList_dev<label> zonePoints(fromNbr);
+    CompactListList_dev<label> zoneFaces(fromNbr);
+    CompactListList_dev<bool> zoneFaceFlip(fromNbr);
+    CompactListList_dev<label> zoneCells(fromNbr);
 
     fromNbr
         >> domainSourceFace
@@ -1237,7 +1236,7 @@ Foam::autoPtr<Foam::fvMesh> Foam::fvMeshDistribute::receiveMesh
     // Construct fvMesh
     autoPtr<fvMesh> domainMeshPtr
     (
-        new fvMesh 
+        new fvMesh
         (
             IOobject
             (
@@ -1246,10 +1245,10 @@ Foam::autoPtr<Foam::fvMesh> Foam::fvMeshDistribute::receiveMesh
                 runTime,
                 IOobject::NO_READ
             ),
-            domainPoints,
-            domainFaces,
-            domainAllOwner,
-            domainAllNeighbour,
+            xferMove(domainPoints),
+            xferMove(domainFaces),
+            xferMove(domainAllOwner),
+            xferMove(domainAllNeighbour),
             false                   // no parallel comms
         )
     );
@@ -1269,7 +1268,6 @@ Foam::autoPtr<Foam::fvMesh> Foam::fvMeshDistribute::receiveMesh
     }
     // Add patches; no parallel comms
     domainMesh.addFvPatches(patches, false);
-
 
     // Construct zones
     List<pointZone*> pZonePtrs(pointZoneNames.size());
@@ -1406,18 +1404,18 @@ Foam::autoPtr<Foam::mapDistributePolyMesh> Foam::fvMeshDistribute::distribute
                 nOldPoints,
                 nOldFaces,
                 nOldCells,
-                oldPatchStarts,
-                oldPatchNMeshPoints,
+                oldPatchStarts.xfer(),
+                oldPatchNMeshPoints.xfer(),
 
-                labelListList(1, identity(mesh_.nPoints())),//subPointMap
-                labelListList(1, identity(mesh_.nFaces())), //subFaceMap
-                labelListList(1, identity(mesh_.nCells())), //subCellMap
-                labelListList(1, identity(patches.size())), //subPatchMap
+                labelListList(1, identity(mesh_.nPoints())).xfer(),//subPointMap
+                labelListList(1, identity(mesh_.nFaces())).xfer(), //subFaceMap
+                labelListList(1, identity(mesh_.nCells())).xfer(), //subCellMap
+                labelListList(1, identity(patches.size())).xfer(), //subPatchMap
 
-                labelListList(1, identity(mesh_.nPoints())),//constructPointMap
-                labelListList(1, identity(mesh_.nFaces())), //constructFaceMap
-                labelListList(1, identity(mesh_.nCells())), //constructCellMap
-                labelListList(1, identity(patches.size()))  //constructPatchMap
+                labelListList(1, identity(mesh_.nPoints())).xfer(),//pointMap
+                labelListList(1, identity(mesh_.nFaces())).xfer(), //faceMap
+                labelListList(1, identity(mesh_.nCells())).xfer(), //cellMap
+                labelListList(1, identity(patches.size())).xfer()  //patchMap
             )
         );
     }
@@ -1427,6 +1425,7 @@ Foam::autoPtr<Foam::mapDistributePolyMesh> Foam::fvMeshDistribute::distribute
     const wordList pointZoneNames(mergeWordList(mesh_.pointZones().names()));
     const wordList faceZoneNames(mergeWordList(mesh_.faceZones().names()));
     const wordList cellZoneNames(mergeWordList(mesh_.cellZones().names()));
+
 
 
     // Local environment of all boundary faces
@@ -1468,36 +1467,39 @@ Foam::autoPtr<Foam::mapDistributePolyMesh> Foam::fvMeshDistribute::distribute
     mesh_.clearOut();
     mesh_.resetMotion();
 
+    // Get data to send. Make sure is synchronised
     const wordList volScalars(mesh_.names(volScalarField::typeName));
-    checkEqualWordList(volScalars);
+    checkEqualWordList("volScalarFields", volScalars);
     const wordList volVectors(mesh_.names(volVectorField::typeName));
-    checkEqualWordList(volVectors);
+    checkEqualWordList("volVectorFields", volVectors);
     const wordList volSphereTensors
     (
         mesh_.names(volSphericalTensorField::typeName)
     );
-    checkEqualWordList(volSphereTensors);
+    checkEqualWordList("volSphericalTensorFields", volSphereTensors);
     const wordList volSymmTensors(mesh_.names(volSymmTensorField::typeName));
-    checkEqualWordList(volSymmTensors);
+    checkEqualWordList("volSymmTensorFields", volSymmTensors);
     const wordList volTensors(mesh_.names(volTensorField::typeName));
-    checkEqualWordList(volTensors);
+    checkEqualWordList("volTensorField", volTensors);
 
     const wordList surfScalars(mesh_.names(surfaceScalarField::typeName));
-    checkEqualWordList(surfScalars);
+    checkEqualWordList("surfaceScalarFields", surfScalars);
     const wordList surfVectors(mesh_.names(surfaceVectorField::typeName));
-    checkEqualWordList(surfVectors);
+    checkEqualWordList("surfaceVectorFields", surfVectors);
     const wordList surfSphereTensors
     (
         mesh_.names(surfaceSphericalTensorField::typeName)
     );
-    checkEqualWordList(surfSphereTensors);
+    checkEqualWordList("surfaceSphericalTensorFields", surfSphereTensors);
     const wordList surfSymmTensors
     (
         mesh_.names(surfaceSymmTensorField::typeName)
     );
-    checkEqualWordList(surfSymmTensors);
+    checkEqualWordList("surfaceSymmTensorFields", surfSymmTensors);
     const wordList surfTensors(mesh_.names(surfaceTensorField::typeName));
-    checkEqualWordList(surfTensors);
+    checkEqualWordList("surfaceTensorFields", surfTensors);
+
+
 
 
     // Find patch to temporarily put exposed and processor faces into.
@@ -1576,6 +1578,14 @@ Foam::autoPtr<Foam::mapDistributePolyMesh> Foam::fvMeshDistribute::distribute
     Pstream::scatterList(nSendCells);
 
 
+    // Allocate buffers
+    PtrList<OStringStream> sendStr(Pstream::nProcs());
+    forAll(sendStr, i)
+    {
+        sendStr.set(i, new OStringStream(IOstream::BINARY));
+    }
+    //PstreamBuffers pBufs(Pstream::nonBlocking);
+
 
     // What to send to neighbouring domains
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1599,13 +1609,17 @@ Foam::autoPtr<Foam::mapDistributePolyMesh> Foam::fvMeshDistribute::distribute
                     << nl << endl;
             }
 
+            // Pstream for sending mesh and fields
+            //OPstream str(Pstream::blocking, recvProc);
+            //UOPstream str(recvProc, pBufs);
+
             // Mesh subsetting engine
             fvMeshSubset subsetter
             (
                 IOobject
                 (
                     "set",
-                    mesh_.time().constant(),
+                    mesh_.time().timeName(),
                     mesh_,
                     IOobject::NO_READ,
                     IOobject::NO_WRITE
@@ -1657,6 +1671,8 @@ Foam::autoPtr<Foam::mapDistributePolyMesh> Foam::fvMeshDistribute::distribute
                 procSourceNewProc
             );
 
+
+
             // Send to neighbour
             sendMesh
             (
@@ -1669,42 +1685,120 @@ Foam::autoPtr<Foam::mapDistributePolyMesh> Foam::fvMeshDistribute::distribute
 
                 procSourceFace,
                 procSourceProc,
-                procSourceNewProc
+                procSourceNewProc,
+                sendStr[recvProc]
             );
-            sendFields<volScalarField>(recvProc, volScalars, subsetter);
-            sendFields<volVectorField>(recvProc, volVectors, subsetter);
+            sendFields<volScalarField>
+            (
+                recvProc,
+                volScalars,
+                subsetter,
+                sendStr[recvProc]
+            );
+            sendFields<volVectorField>
+            (
+                recvProc,
+                volVectors,
+                subsetter,
+                sendStr[recvProc]
+            );
             sendFields<volSphericalTensorField>
             (
                 recvProc,
                 volSphereTensors,
-                subsetter
+                subsetter,
+                sendStr[recvProc]
             );
             sendFields<volSymmTensorField>
             (
                 recvProc,
                 volSymmTensors,
-                subsetter
+                subsetter,
+                sendStr[recvProc]
             );
-            sendFields<volTensorField>(recvProc, volTensors, subsetter);
+            sendFields<volTensorField>
+            (
+                recvProc,
+                volTensors,
+                subsetter,
+                sendStr[recvProc]
+            );
 
-            sendFields<surfaceScalarField>(recvProc, surfScalars, subsetter);
-            sendFields<surfaceVectorField>(recvProc, surfVectors, subsetter);
+            sendFields<surfaceScalarField>
+            (
+                recvProc,
+                surfScalars,
+                subsetter,
+                sendStr[recvProc]
+            );
+            sendFields<surfaceVectorField>
+            (
+                recvProc,
+                surfVectors,
+                subsetter,
+                sendStr[recvProc]
+            );
             sendFields<surfaceSphericalTensorField>
-            (   
+            (
                 recvProc,
                 surfSphereTensors,
-                subsetter
+                subsetter,
+                sendStr[recvProc]
             );
             sendFields<surfaceSymmTensorField>
             (
                 recvProc,
                 surfSymmTensors,
-                subsetter
+                subsetter,
+                sendStr[recvProc]
             );
-            sendFields<surfaceTensorField>(recvProc, surfTensors, subsetter);
+            sendFields<surfaceTensorField>
+            (
+                recvProc,
+                surfTensors,
+                subsetter,
+                sendStr[recvProc]
+            );
         }
     }
 
+
+    // Start sending&receiving from buffers
+    //pBufs.finishedSends();
+
+    // get the data.
+    PtrList<IStringStream> recvStr(Pstream::nProcs());
+    {
+        List<List<char> > sendBufs(sendStr.size());
+        forAll(sendStr, procI)
+        {
+            string contents = sendStr[procI].str();
+            const char* ptr = contents.data();
+
+            sendBufs[procI].setSize(contents.size());
+            forAll(sendBufs[procI], i)
+            {
+                sendBufs[procI][i] = *ptr++;
+            }
+            // Clear OStringStream
+            sendStr.set(procI, NULL);
+        }
+
+        // Transfer sendBufs into recvBufs
+        List<List<char> > recvBufs(Pstream::nProcs());
+        labelListList sizes(Pstream::nProcs());
+        exchange<List<char>, char>(sendBufs, recvBufs, sizes);
+
+        forAll(recvStr, procI)
+        {
+            string contents(recvBufs[procI].begin(), recvBufs[procI].size());
+            recvStr.set
+            (
+                procI,
+                new IStringStream(contents, IOstream::BINARY)
+            );
+        }
+    }
 
 
     // Subset the part that stays
@@ -1815,109 +1909,132 @@ Foam::autoPtr<Foam::mapDistributePolyMesh> Foam::fvMeshDistribute::distribute
                     << nl << endl;
             }
 
+
+            // Pstream for receiving mesh and fields
+            //UIPstream str(sendProc, pBufs);
+
+
             // Receive from sendProc
             labelList domainSourceFace;
             labelList domainSourceProc;
             labelList domainSourceNewProc;
 
-            // Opposite of sendMesh
-            autoPtr<fvMesh> domainMeshPtr = receiveMesh
-            (
-                sendProc,
-                pointZoneNames,
-                faceZoneNames,
-                cellZoneNames,
-
-                const_cast<Time&>(mesh_.time()),
-                domainSourceFace,
-                domainSourceProc,
-                domainSourceNewProc
-            );
-            fvMesh& domainMesh = domainMeshPtr();
-
-            // Receive fields
+            autoPtr<fvMesh> domainMeshPtr;
             PtrList<volScalarField> vsf;
-            receiveFields<volScalarField>
-            (
-                sendProc,
-                volScalars,
-                domainMesh,
-                vsf
-            );
-
             PtrList<volVectorField> vvf;
-            receiveFields<volVectorField>
-            (
-                sendProc,
-                volVectors,
-                domainMesh,
-                vvf
-            );
             PtrList<volSphericalTensorField> vsptf;
-            receiveFields<volSphericalTensorField>
-            (
-                sendProc,
-                volSphereTensors,
-                domainMesh,
-                vsptf
-            );
             PtrList<volSymmTensorField> vsytf;
-            receiveFields<volSymmTensorField>
-            (
-                sendProc,
-                volSymmTensors,
-                domainMesh,
-                vsytf
-            );
             PtrList<volTensorField> vtf;
-            receiveFields<volTensorField>
-            (
-                sendProc,
-                volTensors,
-                domainMesh,
-                vtf
-            );
-
             PtrList<surfaceScalarField> ssf;
-            receiveFields<surfaceScalarField>
-            (
-                sendProc,
-                surfScalars,
-                domainMesh,
-                ssf
-            );
             PtrList<surfaceVectorField> svf;
-            receiveFields<surfaceVectorField>
-            (
-                sendProc,
-                surfVectors,
-                domainMesh,
-                svf
-            );
             PtrList<surfaceSphericalTensorField> ssptf;
-            receiveFields<surfaceSphericalTensorField>
-            (
-                sendProc,
-                surfSphereTensors,
-                domainMesh,
-                ssptf
-            );
             PtrList<surfaceSymmTensorField> ssytf;
-            receiveFields<surfaceSymmTensorField>
-            (
-                sendProc,
-                surfSymmTensors,
-                domainMesh,
-                ssytf
-            );
             PtrList<surfaceTensorField> stf;
-            receiveFields<surfaceTensorField>
-            (
-                sendProc,
-                surfTensors,
-                domainMesh,
-                stf
-            );
+
+            // Opposite of sendMesh
+            {
+                domainMeshPtr = receiveMesh
+                (
+                    sendProc,
+                    pointZoneNames,
+                    faceZoneNames,
+                    cellZoneNames,
+
+                    const_cast<Time&>(mesh_.time()),
+                    domainSourceFace,
+                    domainSourceProc,
+                    domainSourceNewProc,
+                    recvStr[sendProc]
+                );
+                fvMesh& domainMesh = domainMeshPtr();
+
+                // Receive fields. Read as single dictionary because
+                // of problems reading consecutive fields from single stream.
+                dictionary fieldDicts(recvStr[sendProc]);
+
+                receiveFields<volScalarField>
+                (
+                    sendProc,
+                    volScalars,
+                    domainMesh,
+                    vsf,
+                    fieldDicts.subDict(volScalarField::typeName)
+                );
+                receiveFields<volVectorField>
+                (
+                    sendProc,
+                    volVectors,
+                    domainMesh,
+                    vvf,
+                    fieldDicts.subDict(volVectorField::typeName)
+                );
+                receiveFields<volSphericalTensorField>
+                (
+                    sendProc,
+                    volSphereTensors,
+                    domainMesh,
+                    vsptf,
+                    fieldDicts.subDict(volSphericalTensorField::typeName)
+                );
+                receiveFields<volSymmTensorField>
+                (
+                    sendProc,
+                    volSymmTensors,
+                    domainMesh,
+                    vsytf,
+                    fieldDicts.subDict(volSymmTensorField::typeName)
+                );
+                receiveFields<volTensorField>
+                (
+                    sendProc,
+                    volTensors,
+                    domainMesh,
+                    vtf,
+                    fieldDicts.subDict(volTensorField::typeName)
+                );
+
+                receiveFields<surfaceScalarField>
+                (
+                    sendProc,
+                    surfScalars,
+                    domainMesh,
+                    ssf,
+                    fieldDicts.subDict(surfaceScalarField::typeName)
+                );
+                receiveFields<surfaceVectorField>
+                (
+                    sendProc,
+                    surfVectors,
+                    domainMesh,
+                    svf,
+                    fieldDicts.subDict(surfaceVectorField::typeName)
+                );
+                receiveFields<surfaceSphericalTensorField>
+                (
+                    sendProc,
+                    surfSphereTensors,
+                    domainMesh,
+                    ssptf,
+                    fieldDicts.subDict(surfaceSphericalTensorField::typeName)
+                );
+                receiveFields<surfaceSymmTensorField>
+                (
+                    sendProc,
+                    surfSymmTensors,
+                    domainMesh,
+                    ssytf,
+                    fieldDicts.subDict(surfaceSymmTensorField::typeName)
+                );
+                receiveFields<surfaceTensorField>
+                (
+                    sendProc,
+                    surfTensors,
+                    domainMesh,
+                    stf,
+                    fieldDicts.subDict(surfaceTensorField::typeName)
+                );
+            }
+            const fvMesh& domainMesh = domainMeshPtr();
 
 
             constructCellMap[sendProc] = identity(domainMesh.nCells());
@@ -1997,7 +2114,7 @@ Foam::autoPtr<Foam::mapDistributePolyMesh> Foam::fvMeshDistribute::distribute
             // Update mesh data: sourceFace,sourceProc for added
             // mesh.
 
-            sourceFace = 
+            sourceFace =
                 mapBoundaryData
                 (
                     mesh_,
@@ -2006,7 +2123,7 @@ Foam::autoPtr<Foam::mapDistributePolyMesh> Foam::fvMeshDistribute::distribute
                     domainMesh.nInternalFaces(),
                     domainSourceFace
                 );
-            sourceProc = 
+            sourceProc =
                 mapBoundaryData
                 (
                     mesh_,
@@ -2015,7 +2132,7 @@ Foam::autoPtr<Foam::mapDistributePolyMesh> Foam::fvMeshDistribute::distribute
                     domainMesh.nInternalFaces(),
                     domainSourceProc
                 );
-            sourceNewProc = 
+            sourceNewProc =
                 mapBoundaryData
                 (
                     mesh_,
@@ -2034,7 +2151,7 @@ Foam::autoPtr<Foam::mapDistributePolyMesh> Foam::fvMeshDistribute::distribute
 
             forAll(constructPatchMap, procI)
             {
-                if (procI != sendProc && constructPatchMap[procI].size() > 0)
+                if (procI != sendProc && constructPatchMap[procI].size())
                 {
                     // Processor already in mesh (either myProcNo or received)
                     inplaceRenumber(oldCellMap, constructCellMap[procI]);
@@ -2123,54 +2240,56 @@ Foam::autoPtr<Foam::mapDistributePolyMesh> Foam::fvMeshDistribute::distribute
 
     // Bit of hack: processorFvPatchField does not get reset since created
     // from nothing so explicitly reset.
-    initPatchFields<volScalarField>
+    initPatchFields<volScalarField, processorFvPatchField<scalar> >
     (
-        processorFvPatchField<scalar>::typeName,
         pTraits<scalar>::zero
     );
-    initPatchFields<volVectorField>
+    initPatchFields<volVectorField, processorFvPatchField<vector> >
     (
-        processorFvPatchField<vector>::typeName,
         pTraits<vector>::zero
     );
-    initPatchFields<volSphericalTensorField>
+    initPatchFields
+    <
+        volSphericalTensorField,
+        processorFvPatchField<sphericalTensor>
+    >
     (
-        processorFvPatchField<sphericalTensor>::typeName,
         pTraits<sphericalTensor>::zero
     );
-    initPatchFields<volSymmTensorField>
+    initPatchFields<volSymmTensorField, processorFvPatchField<symmTensor> >
     (
-        processorFvPatchField<symmTensor>::typeName,
         pTraits<symmTensor>::zero
     );
-    initPatchFields<volTensorField>
+    initPatchFields<volTensorField, processorFvPatchField<tensor> >
     (
-        processorFvPatchField<tensor>::typeName,
         pTraits<tensor>::zero
     );
-    initPatchFields<surfaceScalarField>
+    initPatchFields<surfaceScalarField, processorFvsPatchField<scalar> >
     (
-        processorFvPatchField<scalar>::typeName,
         pTraits<scalar>::zero
     );
-    initPatchFields<surfaceVectorField>
+    initPatchFields<surfaceVectorField, processorFvsPatchField<vector> >
     (
-        processorFvPatchField<vector>::typeName,
         pTraits<vector>::zero
     );
-    initPatchFields<surfaceSphericalTensorField>
+    initPatchFields
+    <
+        surfaceSphericalTensorField,
+        processorFvsPatchField<sphericalTensor>
+    >
     (
-        processorFvPatchField<sphericalTensor>::typeName,
         pTraits<sphericalTensor>::zero
     );
-    initPatchFields<surfaceSymmTensorField>
+    initPatchFields
+    <
+        surfaceSymmTensorField,
+        processorFvsPatchField<symmTensor>
+    >
     (
-        processorFvPatchField<symmTensor>::typeName,
         pTraits<symmTensor>::zero
     );
-    initPatchFields<surfaceTensorField>
+    initPatchFields<surfaceTensorField, processorFvsPatchField<tensor> >
     (
-        processorFvPatchField<tensor>::typeName,
         pTraits<tensor>::zero
     );
 

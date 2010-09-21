@@ -36,8 +36,8 @@ Description
 #include "processorFaPatch.H"
 #include "wedgeFaPatch.H"
 #include "PstreamCombineReduceOps.H"
-#include "cartesianCS.H"
-#include "scalarMatrix.H"
+#include "coordinateSystem.H"
+#include "scalarMatrices.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -1395,21 +1395,21 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
         vector dir = (allPoints[0] - points[curPoint]);
         dir -= axis*(axis&dir);
         dir /= mag(dir);
-        cartesianCS cs("cs", origin, axis, dir);
+        coordinateSystem cs("cs", origin, axis, dir);
 
         forAll(allPoints, pI)
         {
             allPoints[pI] = cs.localPosition(allPoints[pI]);
         }
 
-        Matrix<scalar> M
+        scalarRectangularMatrix M
         (
-            allPoints.size(), 
+            allPoints.size(),
             5,
             0.0
         );
 
-        for(label i=0; i<allPoints.size(); i++)
+        for(label i = 0; i < allPoints.size(); i++)
         {
             M[i][0] = sqr(allPoints[i].x());
             M[i][1] = sqr(allPoints[i].y());
@@ -1418,12 +1418,13 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
             M[i][4] = allPoints[i].y();
         }
 
-        Matrix<scalar> MtM(5, 5, 0.0);
-        for (label i=0; i<MtM.n(); i++)
+        scalarSquareMatrix MtM(5, 0.0);
+
+        for (label i = 0; i < MtM.n(); i++)
         {
-            for (label j=0; j<MtM.m(); j++)
+            for (label j = 0; j < MtM.m(); j++)
             {
-                for (label k=0; k<M.n(); k++)
+                for (label k = 0; k < M.n(); k++)
                 {
                     MtM[i][j] += M[k][i]*M[k][j]*W[k];
                 }
@@ -1431,6 +1432,7 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
         }
 
         scalarField MtR(5, 0);
+
         for (label i=0; i<MtR.size(); i++)
         {
             for (label j=0; j<M.n(); j++)
@@ -1439,14 +1441,14 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
             }
         }
 
-        scalarMatrix::LUsolve(MtM, MtR);
+        scalarSquareMatrix::LUsolve(MtM, MtR);
 
         vector curNormal = vector(MtR[3], MtR[4], -1);
-        
+
         curNormal = cs.globalVector(curNormal);
-        
+
         curNormal *= sign(curNormal&result[curPoint]);
-        
+
         result[curPoint] = curNormal;
     }
 
@@ -1658,7 +1660,7 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
 
                     if (!duplicate)
                     {
-                        allPoints[nAllPoints++] = 
+                        allPoints[nAllPoints++] =
                             allPointsExt[pI];
                     }
                 }
@@ -1674,14 +1676,14 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                         << "fitting for a point at processor patch"
                         << abort(FatalError);
                 }
-                
+
                 // Transforme points
                 vector origin = points[curPoint];
                 vector axis = result[curPoint]/mag(result[curPoint]);
                 vector dir = (allPoints[0] - points[curPoint]);
                 dir -= axis*(axis&dir);
                 dir /= mag(dir);
-                cartesianCS cs("cs", origin, axis, dir);
+                coordinateSystem cs("cs", origin, axis, dir);
 
                 scalarField W(allPoints.size(), 1.0);
 
@@ -1689,13 +1691,13 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                 {
                     W[pI] = 1.0/magSqr(allPoints[pI] - points[curPoint]);
 
-                    allPoints[pI] = 
+                    allPoints[pI] =
                         cs.localPosition(allPoints[pI]);
                 }
 
-                Matrix<scalar> M
+                scalarRectangularMatrix M
                 (
-                    allPoints.size(), 
+                    allPoints.size(),
                     5,
                     0.0
                 );
@@ -1709,12 +1711,13 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                     M[i][4] = allPoints[i].y();
                 }
 
-                Matrix<scalar> MtM(5, 5, 0.0);
-                for (label i=0; i<MtM.n(); i++)
+                scalarSquareMatrix MtM(5, 0.0);
+
+                for (label i = 0; i < MtM.n(); i++)
                 {
-                    for (label j=0; j<MtM.m(); j++)
+                    for (label j = 0; j < MtM.m(); j++)
                     {
-                        for (label k=0; k<M.n(); k++)
+                        for (label k = 0; k < M.n(); k++)
                         {
                             MtM[i][j] += M[k][i]*M[k][j]*W[k];
                         }
@@ -1722,24 +1725,25 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                 }
 
                 scalarField MtR(5, 0);
-                for (label i=0; i<MtR.size(); i++)
+
+                for (label i = 0; i < MtR.size(); i++)
                 {
-                    for (label j=0; j<M.n(); j++)
+                    for (label j = 0; j < M.n(); j++)
                     {
                         MtR[i] += M[j][i]*allPoints[j].z()*W[j];
                     }
                 }
-                    
-                scalarMatrix::LUsolve(MtM, MtR);
+
+                scalarSquareMatrix::LUsolve(MtM, MtR);
 
                 vector curNormal = vector(MtR[3], MtR[4], -1);
 
                 curNormal = cs.globalVector(curNormal);
 
                 curNormal *= sign(curNormal&result[curPoint]);
-                    
+
                 result[curPoint] = curNormal;
-            }                
+            }
         }
     }
 
@@ -1834,7 +1838,7 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
 
                         if (!duplicate)
                         {
-                            allPoints[nAllPoints++] = 
+                            allPoints[nAllPoints++] =
                                 procLsPoints[procI][pointI];
                         }
                     }
@@ -1858,7 +1862,7 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                 vector dir = (allPoints[0] - points[curPoint]);
                 dir -= axis*(axis&dir);
                 dir /= mag(dir);
-                cartesianCS cs("cs", origin, axis, dir);
+                coordinateSystem cs("cs", origin, axis, dir);
 
                 scalarField W(allPoints.size(), 1.0);
 
@@ -1867,13 +1871,13 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                     W[pointI]=
                         1.0/magSqr(allPoints[pointI] - points[curPoint]);
 
-                    allPoints[pointI] = 
+                    allPoints[pointI] =
                         cs.localPosition(allPoints[pointI]);
                 }
 
-                Matrix<scalar> M
+                scalarRectangularMatrix M
                 (
-                    allPoints.size(), 
+                    allPoints.size(),
                     5,
                     0.0
                 );
@@ -1887,35 +1891,35 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                     M[i][4] = allPoints[i].y();
                 }
 
-                Matrix<scalar> MtM(5, 5, 0.0);
-                for (label i=0; i<MtM.n(); i++)
+                scalarSquareMatrix MtM(5, 0.0);
+                for (label i = 0; i < MtM.n(); i++)
                 {
-                    for (label j=0; j<MtM.m(); j++)
+                    for (label j = 0; j < MtM.m(); j++)
                     {
-                        for (label k=0; k<M.n(); k++)
+                        for (label k = 0; k < M.n(); k++)
                         {
                             MtM[i][j] += M[k][i]*M[k][j]*W[k];
                         }
                     }
                 }
-                    
+
                 scalarField MtR(5, 0);
-                for (label i=0; i<MtR.size(); i++)
+                for (label i = 0; i < MtR.size(); i++)
                 {
-                    for (label j=0; j<M.n(); j++)
+                    for (label j = 0; j < M.n(); j++)
                     {
                         MtR[i] += M[j][i]*allPoints[j].z()*W[j];
                     }
                 }
-                    
-                scalarMatrix::LUsolve(MtM, MtR);
+
+                scalarSquareMatrix::LUsolve(MtM, MtR);
 
                 vector curNormal = vector(MtR[3], MtR[4], -1);
 
                 curNormal = cs.globalVector(curNormal);
-                
+
                 curNormal *= sign(curNormal&result[curPoint]);
-                    
+
                 result[curPoint] = curNormal;
             }
         }

@@ -33,6 +33,8 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
+#include "pTraits.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // template specialisation for pTraits<Scalar>

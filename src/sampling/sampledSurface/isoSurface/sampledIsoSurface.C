@@ -407,7 +407,18 @@ bool Foam::sampledIsoSurface::updateGeometry() const
 
         subMeshPtr_.reset
         (
-            new fvMeshSubset(fvm)
+            new fvMeshSubset
+            (
+                IOobject
+                (
+                    "set",
+                    fvm.time().timeName(),
+                    fvm,
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE
+                ),
+                fvm
+            )
         );
         subMeshPtr_().setLargeCellSubset
         (

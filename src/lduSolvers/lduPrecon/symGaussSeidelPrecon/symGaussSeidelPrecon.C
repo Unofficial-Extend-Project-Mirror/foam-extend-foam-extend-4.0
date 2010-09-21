@@ -31,7 +31,7 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "symGaussSeidelPrecon.H"
 #include "addToRunTimeSelectionTable.H"
@@ -42,12 +42,13 @@ namespace Foam
 {
     defineTypeNameAndDebug(symGaussSeidelPrecon, 0);
 
-    addToRunTimeSelectionTable
-    (
-        lduPreconditioner,
-        symGaussSeidelPrecon,
-        dictionary
-    );
+    lduPreconditioner::
+        addsymMatrixConstructorToTable<symGaussSeidelPrecon>
+        addsymGaussSeidelPreconditionerSymMatrixConstructorToTable_;
+
+    lduPreconditioner::
+        addasymMatrixConstructorToTable<symGaussSeidelPrecon>
+        addsymGaussSeidelPreconditionerAsymMatrixConstructorToTable_;
 }
 
 

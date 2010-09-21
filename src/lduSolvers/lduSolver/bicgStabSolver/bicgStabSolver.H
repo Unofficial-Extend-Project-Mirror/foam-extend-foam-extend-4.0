@@ -86,7 +86,7 @@ public:
             const FieldField<Field, scalar>& coupleBouCoeffs,
             const FieldField<Field, scalar>& coupleIntCoeffs,
             const lduInterfaceFieldPtrsList& interfaces,
-            Istream& solverData
+            const dictionary& dict
         );
 
 

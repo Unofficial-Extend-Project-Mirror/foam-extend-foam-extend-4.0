@@ -204,6 +204,11 @@ dimensionedTypes/dimensionedTensor/dimensionedTensor.C
 matrices/solution/solution.C
 matrices/constraint/scalarConstraint.C
 
+scalarMatrices = matrices/scalarMatrices
+$(scalarMatrices)/scalarMatrices.C
+$(scalarMatrices)/scalarSquareMatrix.C
+$(scalarMatrices)/SVD/SVD.C
+
 LUscalarMatrix = matrices/LUscalarMatrix
 $(LUscalarMatrix)/LUscalarMatrix.C
 $(LUscalarMatrix)/procLduMatrix.C
@@ -441,6 +446,7 @@ $(cellMatcher)/degenerateMatcher.C
 
 mapPolyMesh = $(polyMesh)/mapPolyMesh
 $(mapPolyMesh)/mapPolyMesh.C
+$(mapPolyMesh)/pointMapper/pointMapper.C
 $(mapPolyMesh)/faceMapper/faceMapper.C
 $(mapPolyMesh)/cellMapper/cellMapper.C
 $(mapPolyMesh)/mapDistribute/mapDistribute.C

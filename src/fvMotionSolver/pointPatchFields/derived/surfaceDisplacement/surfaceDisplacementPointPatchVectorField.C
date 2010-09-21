@@ -198,7 +198,7 @@ void surfaceDisplacementPointPatchVectorField::calcProjection
                 rightHit
             );
         }
-        
+
         List<pointIndexHit> leftHit;
         {
             labelList leftSurf;
@@ -357,7 +357,7 @@ surfaceDisplacementPointPatchVectorField
     const surfaceDisplacementPointPatchVectorField& ppf,
     const pointPatch& p,
     const DimensionedField<vector, pointMesh>& iF,
-    const pointPatchFieldMapper& mapper
+    const PointPatchFieldMapper& mapper
 )
 :
     fixedValuePointPatchVectorField(ppf, p, iF, mapper),

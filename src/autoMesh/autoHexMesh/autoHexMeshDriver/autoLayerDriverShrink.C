@@ -25,7 +25,7 @@ License
 Description
     Shrinking mesh (part of adding cell layers)
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "autoLayerDriver.H"
 #include "fvMesh.H"
@@ -1132,7 +1132,8 @@ void Foam::autoLayerDriver::shrinkMeshMedialDistance
         Info<< "Iteration " << iter << endl;
         if (iter == nSnap)
         {
-            Info<< "Displacement scaling for error reduction set to 0." << endl;
+            Info<< "Displacement scaling for error reduction set to 0."
+                << endl;
             oldErrorReduction = meshMover.setErrorReduction(0.0);
         }
 
@@ -1149,7 +1150,8 @@ void Foam::autoLayerDriver::shrinkMeshMedialDistance
             )
         )
         {
-            Info<< "shrinkMeshMedialDistance : Successfully moved mesh" << endl;
+            Info<< "shrinkMeshMedialDistance : Successfully moved mesh"
+                << endl;
             break;
         }
     }

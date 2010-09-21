@@ -162,6 +162,12 @@ int Foam::debug::optimisationSwitch(const char* name, const int defaultValue)
 }
 
 
+Foam::dictionary& Foam::debug::tolerances()
+{
+    return switchSet("Tolerances", tolerancesPtr_);
+}
+
+
 double Foam::debug::tolerances
 (
     const char* name,

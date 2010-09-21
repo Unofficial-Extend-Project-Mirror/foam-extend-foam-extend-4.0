@@ -70,15 +70,8 @@ protected:
 
         polyTopoChanger topoChanger_;
 
-        // Used when spray calculations are performed
-        pointMesh pMesh_;
-
-        // Used when spray calculations are performed
-        volPointInterpolation vpi_;
-
         //- Engine database
         const engineTime& engineTime_;
-
 
 
 public:
@@ -125,16 +118,6 @@ public:
         const engineTime& engTime() const
         {
             return engineTime_;
-        }
-
-        const volPointInterpolation& vpi() const
-        {
-            return vpi_;
-        }
-
-        volPointInterpolation& vpi()
-        {
-            return vpi_;
         }
 
 

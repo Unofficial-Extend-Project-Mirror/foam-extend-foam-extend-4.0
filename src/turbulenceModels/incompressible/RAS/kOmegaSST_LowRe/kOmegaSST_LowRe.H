@@ -105,6 +105,7 @@ class kOmegaSST_LowRe
     // Private data
 
         // Model coefficients
+
             dimensionedScalar alphaK1_;
             dimensionedScalar alphaK2_;
 
@@ -121,6 +122,10 @@ class kOmegaSST_LowRe
 
             dimensionedScalar a1_;
             dimensionedScalar c1_;
+
+            dimensionedScalar Cmu_;
+            dimensionedScalar kappa_;
+
 
         //- Wall distance field
         //  Note: different to wall distance in parent RASModel

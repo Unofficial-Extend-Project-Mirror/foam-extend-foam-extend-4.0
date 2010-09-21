@@ -74,7 +74,14 @@ namespace Foam
 
 class surfaceDisplacementPointPatchVectorField
 :
-    public fixedValuePointPatchVectorField
+    public FixedValuePointPatchField
+    <
+        pointPatchField,
+        pointMesh,
+        pointPatch,
+        DummyMatrix,
+        vector
+    >
 {
 
 public:
@@ -155,7 +162,7 @@ public:
             const surfaceDisplacementPointPatchVectorField&,
             const pointPatch&,
             const DimensionedField<vector, pointMesh>&,
-            const pointPatchFieldMapper&
+            const PointPatchFieldMapper&
         );
 
         //- Construct as copy

@@ -42,7 +42,7 @@ const Foam::scalar Foam::specieThermo<thermo>::tol_
 
 
 template<class thermo>
-const int specieThermo<thermo>::maxIter_
+const int Foam::specieThermo<thermo>::maxIter_
 (
     debug::optimisationSwitch("speciesThermoMaxIter", 100)
 );

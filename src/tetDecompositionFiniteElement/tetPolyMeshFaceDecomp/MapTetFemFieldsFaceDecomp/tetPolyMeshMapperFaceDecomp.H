@@ -117,9 +117,9 @@ public:
 
         //- Return reference to objectRegistry storing fields
         //  Needed in mappers.  HJ, 16/Oct/2008
-        const objectRegistry& db() const
+        const objectRegistry& thisDb() const
         {
-            return mesh_();
+            return mesh_.thisDb();
         }
 
         //- Return point mapper

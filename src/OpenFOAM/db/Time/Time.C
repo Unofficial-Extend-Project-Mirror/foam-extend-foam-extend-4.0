@@ -559,7 +559,11 @@ void Foam::Time::setTime(const instant& inst, const label newIndex)
 }
 
 
-void Foam::Time::setTime(const dimensionedScalar& newTime, const label newIndex)
+void Foam::Time::setTime
+(
+    const dimensionedScalar& newTime,
+    const label newIndex
+)
 {
     setTime(newTime.value(), newIndex);
 }

@@ -69,6 +69,9 @@ class fineAmgLevel
         //- Coupling interface fields
         const lduInterfaceFieldPtrsList& interfaceFields_;
 
+        //- Dictionary
+        const dictionary& dict_;
+
         //- AMG policy
         autoPtr<amgPolicy> policyPtr_;
 
@@ -94,6 +97,7 @@ public:
             const FieldField<Field, scalar>& coupleBouCoeffs,
             const FieldField<Field, scalar>& coupleIntCoeffs,
             const lduInterfaceFieldPtrsList& interfacesFields,
+            const dictionary& dict,
             const word& policyType,
             const label groupSize,
             const label minCoarseEqns,
@@ -108,6 +112,12 @@ public:
 
 
     // Member Functions
+
+        //- Return reference to dictionary
+        const dictionary& dict() const
+        {
+            return dict_;
+        }
 
         //- Return reference to x
         virtual scalarField& x();

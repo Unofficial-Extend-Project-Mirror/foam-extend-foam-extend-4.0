@@ -36,6 +36,7 @@ SourceFiles
 #ifndef autoLayerDriver_H
 #define autoLayerDriver_H
 
+#include "PackedBoolList.H"
 #include "meshRefinement.H"
 #include "wallPoint.H"
 
@@ -379,7 +380,8 @@ class autoLayerDriver
                     Field<Type>& average
                 );
 
-                //- Calculate inverse sum of edge weights (currently always 1.0)
+                //- Calculate inverse sum of edge weights
+                //  (currently always 1.0)
                 void sumWeights
                 (
                     const PackedBoolList& isMasterEdge,

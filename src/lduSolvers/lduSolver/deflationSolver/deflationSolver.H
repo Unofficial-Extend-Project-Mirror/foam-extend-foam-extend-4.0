@@ -41,7 +41,7 @@ SourceFiles
 
 #include "lduMatrix.H"
 #include "amgPrecon.H"
-#include "Matrix.H"
+#include "scalarMatrices.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,7 +57,6 @@ class deflationSolver
     public lduSolver
 {
 
-    typedef Matrix<scalar> scalarMatrix;
     typedef FieldField<Field, scalar> scalarFieldField;
 
 
@@ -101,7 +100,7 @@ class deflationSolver
         void GaussSolve
         (
             const label activeSize,
-            const scalarMatrix& m,
+            const scalarSquareMatrix& m,
             scalarField& x,
             const scalarField& b
         ) const;
@@ -131,7 +130,7 @@ public:
             const FieldField<Field, scalar>& coupleBouCoeffs,
             const FieldField<Field, scalar>& coupleIntCoeffs,
             const lduInterfaceFieldPtrsList& interfaces,
-            Istream& solverData
+            const dictionary& dict
         );
 
 

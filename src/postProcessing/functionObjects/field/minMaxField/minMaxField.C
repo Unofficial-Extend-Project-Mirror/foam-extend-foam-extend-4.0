@@ -25,7 +25,7 @@ License
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "minMaxField.H"
 #include "addToRunTimeSelectionTable.H"
@@ -58,8 +58,7 @@ Foam::minMaxField::minMaxField
     const dictionary& dict
 )
 :
-    functionObject(),
-    name_(name),
+    functionObject(name),
     time_(t),
     regionName_(polyMesh::defaultRegion),
     fieldName_(dict.lookup("name"))
@@ -89,7 +88,10 @@ bool Foam::minMaxField::execute()
 
     if (mesh.foundObject<volScalarField>(fieldName_))
     {
-        const volScalarField& f = mesh.lookupObject<volScalarField>(fieldName_);
+        const volScalarField& f = mesh.lookupObject<volScalarField>
+        (
+            fieldName_
+        );
 
         Info<< "Field " << fieldName_ << " min = " << Foam::min(f).value()
             << " max = " << Foam::max(f).value() << endl;

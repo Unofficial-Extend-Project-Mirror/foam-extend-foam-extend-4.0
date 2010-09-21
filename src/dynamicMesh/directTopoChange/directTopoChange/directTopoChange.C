@@ -3036,11 +3036,10 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::directTopoChange::changeMesh
 
         mesh.resetPrimitives
         (
-            nActiveFaces_,
-            renumberedMeshPoints,
-            faces_,
-            faceOwner_,
-            faceNeighbour_,
+            xferMove(renumberedMeshPoints),
+            faces_.xfer(),
+            faceOwner_.xfer(),
+            faceNeighbour_.xfer(),
             patchSizes,
             patchStarts,
             syncParallel
@@ -3053,11 +3052,10 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::directTopoChange::changeMesh
         // Set new points.
         mesh.resetPrimitives
         (
-            nActiveFaces_,
-            newPoints,
-            faces_,
-            faceOwner_,
-            faceNeighbour_,
+            xferMove(newPoints),
+            faces_.xfer(),
+            faceOwner_.xfer(),
+            faceNeighbour_.xfer(),
             patchSizes,
             patchStarts,
             syncParallel
@@ -3299,10 +3297,10 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::directTopoChange::makeMesh
         new fvMesh
         (
             io,
-            newPoints,
-            faces_,
-            faceOwner_,
-            faceNeighbour_
+            xferMove(newPoints),
+            faces_.xfer(),
+            faceOwner_.xfer(),
+            faceNeighbour_.xfer()
         )
     );
     fvMesh& newMesh = newMeshPtr();

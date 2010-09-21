@@ -67,7 +67,8 @@ Foam::ODEChemistryModel<CompType, ThermoType>::ODEChemistryModel
         )
     ),
 
-    RR_(nSpecie_)
+    RR_(nSpecie_),
+    coeffs_(nSpecie_ + 2)
 {
     // create the fields for the chemistry sources
     forAll(RR_, fieldI)
@@ -689,7 +690,7 @@ Foam::scalar Foam::ODEChemistryModel<CompType, ThermoType>::solve
         this->thermo().rho()
     );
 
-    for (label i=0; i<nSpecie_; i++)
+    for (label i = 0; i < nSpecie_; i++)
     {
         RR_[i].setSize(rho.size());
     }
@@ -720,7 +721,7 @@ Foam::scalar Foam::ODEChemistryModel<CompType, ThermoType>::solve
         scalarField c0(nSpecie_);
         scalarField dc(nSpecie_, 0.0);
 
-        for (label i=0; i<nSpecie_; i++)
+        for (label i = 0; i < nSpecie_; i++)
         {
             c[i] = rhoi*Y_[i][celli]/specieThermo_[i].W();
         }
@@ -773,6 +774,22 @@ Foam::scalar Foam::ODEChemistryModel<CompType, ThermoType>::solve
     deltaTMin = min(deltaTMin, 2*deltaT);
 
     return deltaTMin;
+}
+
+
+template<class CompType, class ThermoType>
+inline Foam::scalarField&
+Foam::ODEChemistryModel<CompType, ThermoType>::coeffs()
+{
+    return coeffs_;
+}
+
+
+template<class CompType, class ThermoType>
+inline const Foam::scalarField&
+Foam::ODEChemistryModel<CompType, ThermoType>::coeffs() const
+{
+    return coeffs_;
 }
 
 

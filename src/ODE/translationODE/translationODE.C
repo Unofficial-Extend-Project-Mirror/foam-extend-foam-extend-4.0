@@ -33,7 +33,7 @@ Author
     Hrvoje Jasak
     Dubravko Matijasevic
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "translationODE.H"
 #include "Time.H"
@@ -143,7 +143,7 @@ void Foam::translationODE::jacobian
     const scalar x,
     const scalarField& y,
     scalarField& dfdx,
-    Matrix<scalar>& dfdy
+    scalarSquareMatrix& dfdy
 ) const
 {
     notImplemented("translationODE::jacobian(...) const");

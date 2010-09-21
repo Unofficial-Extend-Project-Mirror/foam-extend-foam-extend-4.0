@@ -43,7 +43,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class decompositionMethod Declaration
+                     Class decompositionMethod Declaration
 \*---------------------------------------------------------------------------*/
 
 class decompositionMethod

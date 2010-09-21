@@ -38,7 +38,7 @@ SourceFiles
 
 #include "labelIOList.H"
 #include "face.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "DynamicList.H"
 #include "primitivePatch.H"
 #include "removeFaces.H"

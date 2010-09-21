@@ -125,6 +125,9 @@ class kOmegaSST_LowRe
             dimensionedScalar a1_;
             dimensionedScalar c1_;
 
+            dimensionedScalar Cmu_;
+            dimensionedScalar kappa_;
+
 
         //- Wall distance
         //  Note: different to wall distance in parent RASModel

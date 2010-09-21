@@ -27,7 +27,7 @@ License
 #include "tetPolyMeshFaceDecomp.H"
 #include "tetPointRef.H"
 #include "tetPointRef.H"
-#include "Matrix.H"
+#include "SquareMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -228,7 +228,7 @@ tetCellList tetPolyMeshFaceDecomp::tets(const label cellID) const
 void tetPolyMeshFaceDecomp::gradNiDotGradNj
 (
     const label cellID,
-    Matrix<scalar>& denseMatrix,
+    SquareMatrix<scalar>& denseMatrix,
     const labelList& globalToLocalBuffer
 ) const
 {
@@ -258,7 +258,7 @@ void tetPolyMeshFaceDecomp::gradNiDotGradNj
         }
         else
         {
-            faceEdges = meshFaces[curFaceID].edges();     
+            faceEdges = meshFaces[curFaceID].edges();
         }
 
         forAll (faceEdges, i)
@@ -316,7 +316,7 @@ void tetPolyMeshFaceDecomp::gradNiDotGradNj
 void tetPolyMeshFaceDecomp::gradNiGradNj
 (
     const label cellID,
-    Matrix<tensor>& denseMatrix,
+    SquareMatrix<tensor>& denseMatrix,
     const labelList& globalToLocalBuffer
 ) const
 {

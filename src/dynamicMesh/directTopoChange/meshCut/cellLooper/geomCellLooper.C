@@ -31,7 +31,7 @@ License
 #include "meshTools.H"
 #include "SortableList.H"
 #include "triSurfaceTools.H"
-#include "labelHashSet.H"
+#include "HashSet.H"
 #include "ListOps.H"
 #include "transform.H"
 

@@ -36,7 +36,7 @@ SourceFiles
 #ifndef angularOscillatingDisplacementPointPatchVectorField_H
 #define angularOscillatingDisplacementPointPatchVectorField_H
 
-#include "fixedValuePointPatchField.H"
+#include "fixedValuePointPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -49,7 +49,14 @@ namespace Foam
 
 class angularOscillatingDisplacementPointPatchVectorField
 :
-    public fixedValuePointPatchField<vector>
+    public FixedValuePointPatchField
+    <
+        pointPatchField,
+        pointMesh,
+        pointPatch,
+        DummyMatrix,
+        vector
+    >
 {
     // Private data
 
@@ -91,7 +98,7 @@ public:
             const angularOscillatingDisplacementPointPatchVectorField&,
             const pointPatch&,
             const DimensionedField<vector, pointMesh>&,
-            const pointPatchFieldMapper&
+            const PointPatchFieldMapper&
         );
 
         //- Construct and return a clone
@@ -131,22 +138,6 @@ public:
 
 
     // Member functions
-
-        // Mapping functions
-
-            //- Map (and resize as needed) from self given a mapping object
-            virtual void autoMap
-            (
-                const pointPatchFieldMapper&
-            );
-
-            //- Reverse map the given pointPatchField onto this pointPatchField
-            virtual void rmap
-            (
-                const pointPatchField<vector>&,
-                const labelList&
-            );
-
 
         // Evaluation functions
 

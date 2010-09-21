@@ -305,7 +305,11 @@ public:
             instant findClosestTime(const scalar) const;
 
             //- Search instantList for the time index closest to the given time
-            static label findClosestTimeIndex(const instantList&, const scalar);
+            static label findClosestTimeIndex
+            (
+                const instantList&,
+                const scalar
+            );
 
             //- Write using given format, version and compression
             virtual bool writeObject

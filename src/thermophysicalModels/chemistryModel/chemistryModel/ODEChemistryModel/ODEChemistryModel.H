@@ -64,14 +64,6 @@ class ODEChemistryModel
     public CompType,
     public ODE
 {
-    // Private Member Functions
-
-        //- Disallow default bitwise assignment
-        void operator=(const ODEChemistryModel&);
-
-
-protected:
-
     // Private data
 
         //- Reference to the field of specie mass fractions
@@ -95,6 +87,17 @@ protected:
         //- Chemical source term [kg/m3/s]
         PtrList<scalarField> RR_;
 
+        //- ODE coefficients
+        scalarField coeffs_;
+
+
+    // Private Member Functions
+
+        //- Disallow default bitwise assignment
+        void operator=(const ODEChemistryModel&);
+
+
+protected:
 
     // Protected Member Functions
 
@@ -125,6 +128,9 @@ public:
 
 
     // Member Functions
+
+        //- Access the fractions of the species
+        inline const PtrList<volScalarField>& Y() const;
 
         //- The reactions
         inline const PtrList<Reaction<ThermoType> >& reactions() const;
@@ -194,6 +200,12 @@ public:
             //- Number of ODE's to solve
             virtual label nEqns() const;
 
+            //- Return access to coefficients
+            virtual scalarField& coeffs();
+
+            //- Return reference to coefficients
+            virtual const scalarField& coeffs() const;
+
             virtual void derivatives
             (
                 const scalar t,
@@ -208,6 +220,10 @@ public:
                 scalarField& dcdt,
                 scalarSquareMatrix& dfdc
             ) const;
+
+            //- Update ODE after the solution, advancing by delta
+            virtual void update(const scalar delta)
+            {}
 };
 
 

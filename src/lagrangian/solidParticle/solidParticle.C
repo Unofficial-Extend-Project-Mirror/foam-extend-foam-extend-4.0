@@ -93,6 +93,7 @@ bool Foam::solidParticle::move(solidParticle::trackData& td)
                 }
             }
         }
+    }
 
     return td.keepParticle;
 }

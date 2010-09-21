@@ -31,7 +31,7 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "fineAmgLevel.H"
 #include "coarseAmgLevel.H"
@@ -47,6 +47,7 @@ Foam::fineAmgLevel::fineAmgLevel
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaceFields,
+    const dictionary& dict,
     const word& policyType,
     const label groupSize,
     const label minCoarseEqns,
@@ -57,6 +58,7 @@ Foam::fineAmgLevel::fineAmgLevel
     coupleBouCoeffs_(coupleBouCoeffs),
     coupleIntCoeffs_(coupleIntCoeffs),
     interfaceFields_(interfaceFields),
+    dict_(dict),
     policyPtr_
     (
         amgPolicy::New(policyType, matrix_, groupSize, minCoarseEqns)
@@ -65,11 +67,11 @@ Foam::fineAmgLevel::fineAmgLevel
     (
         lduSmoother::New
         (
-            smootherType,
             matrix,
             coupleBouCoeffs_,
             coupleIntCoeffs_,
-            interfaceFields_
+            interfaceFields_,
+            dict
         )
     )
 {}
@@ -283,6 +285,7 @@ Foam::autoPtr<Foam::amgLevel> Foam::fineAmgLevel::makeNextLevel() const
                     coupleIntCoeffs_,
                     interfaceFields_
                 ),
+                dict(),
                 policyPtr_->type(),
                 policyPtr_->groupSize(),
                 policyPtr_->minCoarseEqns(),

@@ -2851,13 +2851,18 @@ void Foam::autoLayerDriver::addLayers
     // Saved old points
     pointField oldPoints(mesh.points());
 
-    // Last set of topology changes. (changing mesh clears out polyTopoChange)
-    polyTopoChange savedMeshMod(mesh.boundaryMesh().size());
+    // Last set of topology changes.  Changing mesh clears out directTopoChange
+    directTopoChange savedMeshMod(mesh.boundaryMesh().size());
 
     boolList flaggedCells;
     boolList flaggedFaces;
 
-    for (label iteration = 0; iteration < layerParams.nLayerIter(); iteration++)
+    for
+    (
+        label iteration = 0;
+        iteration < layerParams.nLayerIter();
+        iteration++
+    )
     {
         Info<< nl
             << "Layer addition iteration " << iteration << nl

@@ -199,13 +199,11 @@ Foam::pistonLayer::pistonLayer
     virtualPistonPosition_(-GREAT),
     deckHeight_(GREAT),
     scalePoints_(engTime().engineDict().lookup("scalePoints")),
-    movePointsBelowPiston_(false)
+    movePointsBelowPiston_
+    (
+        engTime().engineDict().lookupOrDefault("movePointsBelowPiston", false)
+    )
 {
-    if(engTime().engineDict().found("movePointsBelowPiston"))
-    {
-        movePointsBelowPiston_ =
-            engTime().engineDict().lookup("movePointsBelowPiston");
-    }
     // Add zones and modifiers if not already there.
     addZonesAndModifiers();
 }

@@ -45,13 +45,17 @@ Class
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::engineValveSliding, 0);
-addToRunTimeSelectionTable
-(
-    Foam::engineTopoChangerMesh,
-    Foam::engineValveSliding,
-    IOobject
-);
+namespace Foam
+{
+    defineTypeNameAndDebug(Foam::engineValveSliding, 0);
+
+    addToRunTimeSelectionTable
+    (
+        engineTopoChangerMesh,
+        engineValveSliding,
+        IOobject
+    );
+}
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

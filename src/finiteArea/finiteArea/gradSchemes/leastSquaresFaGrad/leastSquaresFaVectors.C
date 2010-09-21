@@ -73,7 +73,7 @@ void Foam::leastSquaresFaVectors::makeLeastSquaresVectors() const
         (
             "LeastSquaresP",
             mesh_.pointsInstance(),
-            mesh_.db(),
+            mesh_.thisDb(),
             IOobject::NO_READ,
             IOobject::NO_WRITE,
             false
@@ -89,7 +89,7 @@ void Foam::leastSquaresFaVectors::makeLeastSquaresVectors() const
         (
             "LeastSquaresN",
             mesh_.pointsInstance(),
-            mesh_.db(),
+            mesh_.thisDb(),
             IOobject::NO_READ,
             IOobject::NO_WRITE,
             false
@@ -134,18 +134,7 @@ void Foam::leastSquaresFaVectors::makeLeastSquaresVectors() const
         const unallocLabelList& edgeFaces = p.edgeFaces();
 
         // Build the d-vectors
-        vectorField pd = 
-            mesh_.Le().boundaryField()[patchi]
-           /(
-               mesh_.magLe().boundaryField()[patchi]
-              *mesh_.deltaCoeffs().boundaryField()[patchi]
-           );
-
-        if (!mesh_.orthogonal())
-        {
-            pd -= mesh_.correctionVectors().boundaryField()[patchi]
-                /mesh_.deltaCoeffs().boundaryField()[patchi];
-        }
+        vectorField pd = p.delta();
 
         if (p.coupled())
         {
@@ -200,19 +189,7 @@ void Foam::leastSquaresFaVectors::makeLeastSquaresVectors() const
         const unallocLabelList& edgeFaces = p.edgeFaces();
 
         // Build the d-vectors
-        vectorField pd =
-            mesh_.Le().boundaryField()[patchi]
-           /(
-               mesh_.magLe().boundaryField()[patchi]
-              *mesh_.deltaCoeffs().boundaryField()[patchi]
-           );
-
-        if (!mesh_.orthogonal())
-        {
-            pd -= mesh_.correctionVectors().boundaryField()[patchi]
-                /mesh_.deltaCoeffs().boundaryField()[patchi];
-        }
-
+        vectorField pd = p.delta();
 
         if (p.coupled())
         {

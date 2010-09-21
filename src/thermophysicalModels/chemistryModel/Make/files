@@ -1,16 +1,3 @@
-binaryNode/binaryNode.C
-
-binaryTree/binaryTreeAdd.C
-binaryTree/binaryTree.C
-binaryTree/binaryTreeClean.C
-binaryTree/binaryTreeInsert.C
-binaryTree/binaryTreeScan.C
-binaryTree/binaryTreeSearch.C
-
-chemPoint/chemPoint.C
-
-chemistryOnlineLibrary/chemistryOnlineLibrary.C
-
 chemistryModel/basicChemistryModel/basicChemistryModel.C
 
 chemistryModel/psiChemistryModel/psiChemistryModel.C

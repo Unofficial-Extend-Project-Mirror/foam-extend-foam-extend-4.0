@@ -206,6 +206,24 @@ kOmegaSST_LowRe::kOmegaSST_LowRe
             10.0
         )
     ),
+    Cmu_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "Cmu",
+            coeffDict_,
+            0.09
+        )
+    ),
+    kappa_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "kappa",
+            coeffDict_,
+            0.41
+        )
+    ),
 
     y_(mesh_),
 

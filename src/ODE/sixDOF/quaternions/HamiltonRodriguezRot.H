@@ -37,7 +37,7 @@ Description
 #ifndef HamiltonRodriguezRot_H
 #define HamiltonRodriguezRot_H
 
-#include "Matrix.H"
+#include "scalarMatrices.H"
 #include "coordinateRotation.H"
 #include "scalarField.H"
 #include "dimensionedTypes.H"
@@ -64,7 +64,7 @@ class HamiltonRodriguezRot
         scalar e3_;
 
         //- Body to quaternions transformation
-        Matrix<scalar> Gt_;
+        scalarRectangularMatrix Gt_;
 
         //- Inertial to rotated coordinate system transformation
         mutable tensor R_;

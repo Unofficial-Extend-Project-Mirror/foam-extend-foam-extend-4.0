@@ -64,7 +64,7 @@ Description
         {
 #           include "checkkOmega_LowRePatchFieldTypes.H"
 
-            const scalarField& rhow = rho_.boundaryField()[patchi];
+//             const scalarField& rhow = rho_.boundaryField()[patchi];
 
             const scalarField& muw = mu().boundaryField()[patchi];
             const scalarField& mutw = mut_.boundaryField()[patchi];

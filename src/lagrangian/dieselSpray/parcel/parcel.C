@@ -286,17 +286,17 @@ bool Foam::parcel::move(spray& sDB)
         scalar nHv = fuels.hl(p, T(), X());
         scalar nH = nHg - nHv;
         scalar nPE = (p - fuels.pv(p, T(), X()))/nRho;
+        scalar nKE = 0.5*pow(mag(U()), 2);
 
         // Update the Spray Source Terms
         forAll(nMass, i)
         {
             sDB.srhos()[i][celli] += oMass[i] - nMass[i];
         }
-        sDB.sms()[celli]   += oMom - nMom;
 
-        sDB.shs()[celli]   +=
-            oTotMass*(oH + oPE)
-          - m()*(nH + nPE);
+        sDB.sms()[celli] += oMom - nMom;
+
+        sDB.shs()[celli] += oTotMass*(oH + oPE) - m()*(nH + nPE + nKE);
 
         // Remove evaporated mass from stripped mass
         ms() -= ms()*(oTotMass-m())/oTotMass;

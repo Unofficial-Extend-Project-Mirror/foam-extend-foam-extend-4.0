@@ -136,6 +136,7 @@ void Foam::MeshedSurfaceProxy<Face>::write
         OFstream os
         (
             objectDir/io.name(),
+            ios_base::out|ios_base::trunc,
             t.writeFormat(),
             IOstream::currentVersion,
             t.writeCompression()
@@ -168,6 +169,7 @@ void Foam::MeshedSurfaceProxy<Face>::write
         OFstream os
         (
             objectDir/io.name(),
+            ios_base::out|ios_base::trunc,
             t.writeFormat(),
             IOstream::currentVersion,
             t.writeCompression()

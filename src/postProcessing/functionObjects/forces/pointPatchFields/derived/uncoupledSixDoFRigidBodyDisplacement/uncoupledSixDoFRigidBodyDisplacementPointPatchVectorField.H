@@ -36,7 +36,7 @@ SourceFiles
 #ifndef uncoupledSixDoFRigidBodyDisplacementPointPatchVectorField_H
 #define uncoupledSixDoFRigidBodyDisplacementPointPatchVectorField_H
 
-#include "fixedValuePointPatchField.H"
+#include "fixedValuePointPatchFields.H"
 #include "sixDoFRigidBodyMotion.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -50,7 +50,14 @@ namespace Foam
 
 class uncoupledSixDoFRigidBodyDisplacementPointPatchVectorField
 :
-    public fixedValuePointPatchField<vector>
+    public FixedValuePointPatchField
+    <
+        pointPatchField,
+        pointMesh,
+        pointPatch,
+        DummyMatrix,
+        vector
+    >
 {
     // Private data
 
@@ -95,7 +102,7 @@ public:
             const uncoupledSixDoFRigidBodyDisplacementPointPatchVectorField&,
             const pointPatch&,
             const DimensionedField<vector, pointMesh>&,
-            const pointPatchFieldMapper&
+            const PointPatchFieldMapper&
         );
 
         //- Construct and return a clone
@@ -141,7 +148,7 @@ public:
             //- Map (and resize as needed) from self given a mapping object
             virtual void autoMap
             (
-                const pointPatchFieldMapper&
+                const PointPatchFieldMapper&
             );
 
             //- Reverse map the given pointPatchField onto this pointPatchField

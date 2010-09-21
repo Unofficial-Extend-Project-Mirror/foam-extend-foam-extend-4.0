@@ -247,7 +247,7 @@ Foam::faMesh::faMesh(const polyMesh& pMesh)
     // Calculate the geometry for the patches (transformation tensors etc.)
     boundary_.calcGeometry();
 
-    if (file(pMesh.time().timePath()/"S0"))
+    if (isFile(pMesh.time().timePath()/"S0"))
     {
         S0Ptr_ = new DimensionedField<scalar, areaMesh>
         (
@@ -609,7 +609,7 @@ Foam::faMesh::faMesh
 
     addFaPatches(List<faPatch*>(faPatchLst));
 
-    setPrimitiveMeshData();    
+    setPrimitiveMeshData();
 
     // Calculate topology for the patches (processor-processor comms etc.)
     boundary_.updateMesh();
@@ -617,7 +617,7 @@ Foam::faMesh::faMesh
     // Calculate the geometry for the patches (transformation tensors etc.)
     boundary_.calcGeometry();
 
-    if (file(mesh_.time().timePath()/"S0"))
+    if (isFile(mesh_.time().timePath()/"S0"))
     {
         S0Ptr_ = new DimensionedField<scalar, areaMesh>
         (
@@ -701,7 +701,7 @@ Foam::faMesh::faMesh
     // Set faceLabels
     forAll(faceLabels_, faceI)
     {
-        faceLabels_[faceI] = 
+        faceLabels_[faceI] =
             mesh_.boundaryMesh()[polyPatchID].start() + faceI;
     }
 
@@ -724,15 +724,15 @@ Foam::faMesh::faMesh
     patchDict.add("type", "patch");
     patchDict.add("edgeLabels", edgeLabels);
     patchDict.add("ngbPolyPatchIndex", -1);
-    
+
     List<faPatch*> faPatchLst(1);
 
-    faPatchLst[0] = 
+    faPatchLst[0] =
         faPatch::New("default", patchDict, 0, boundary()).ptr();
 
     addFaPatches(faPatchLst);
 
-    setPrimitiveMeshData();    
+    setPrimitiveMeshData();
 
     // Calculate topology for the patches (processor-processor comms etc.)
     boundary_.updateMesh();
@@ -862,9 +862,9 @@ void Foam::faMesh::addFaPatches(const List<faPatch*>& p)
 }
 
 
-const Foam::objectRegistry& Foam::faMesh::db() const
+const Foam::objectRegistry& Foam::faMesh::thisDb() const
 {
-    return mesh_.db();
+    return mesh_.thisDb();
 }
 
 

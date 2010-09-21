@@ -106,6 +106,8 @@ public:
 
         virtual const speciesTable& species() const = 0;
 
+        // Bug fix: cannot be named speciesThermo because of name clash
+        // with the speciesThermo class.  HJ, 21/Sep/2010
         virtual const HashPtrTable<ThermoType>& sThermo() const = 0;
 
         virtual const SLPtrList<Reaction<ThermoType> >& reactions() const = 0;

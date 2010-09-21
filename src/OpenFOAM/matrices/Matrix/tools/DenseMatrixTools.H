@@ -51,12 +51,12 @@ namespace DenseMatrixTools
     static void solve(SquareMatrix<Type>& A, List<Type>& x, List<Type>& b);
 
     //- Q-R decomposition
-    template<class Form, class T>
+    template<class Form, class Type>
     static void qrDecompose
     (
         const label nCols,
-        FieldField<Field, T>& A,
-        Matrix<class Form, class Type>& R
+        FieldField<Field, Type>& A,
+        Matrix<Form, Type>& R
     );
 };
 

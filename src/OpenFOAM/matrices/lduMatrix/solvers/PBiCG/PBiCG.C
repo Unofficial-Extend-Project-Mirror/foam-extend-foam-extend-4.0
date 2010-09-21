@@ -125,36 +125,15 @@ Foam::lduSolverPerformance Foam::PBiCG::solve
         // Select and construct the preconditioner
         autoPtr<lduPreconditioner> preconPtr;
 
-        if (dict().isDict("preconditioner"))
-        {
-            // New format: preconditioner is dictionary
-            preconPtr =
-                lduPreconditioner::New
-                (
-                    matrix_,
-                    coupleBouCoeffs_,
-                    coupleIntCoeffs_,
-                    interfaces_,
-                    dict().subDict("preconditioner")
-                );
-        }
-        else
-        {
-            // Old format: manufacture a dictionary
-            dictionary preconDict;
-            preconDict.add("type", word(dict().lookup("preconditioner")));
-
-            preconPtr =
-                lduPreconditioner::New
-                (
-                    matrix_,
-                    coupleBouCoeffs_,
-                    coupleIntCoeffs_,
-                    interfaces_,
-                    preconDict
-                );
-        }
-
+        preconPtr =
+            lduPreconditioner::New
+            (
+                matrix_,
+                coupleBouCoeffs_,
+                coupleIntCoeffs_,
+                interfaces_,
+                dict().subDict("preconditioner")
+            );
 
         // Solver iteration
         do

@@ -58,7 +58,7 @@ Foam::fpeAmgSolver::fpeAmgSolver
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    Istream& solverData
+    const dictionary& dict
 )
 :
     lduSolver
@@ -68,7 +68,7 @@ Foam::fpeAmgSolver::fpeAmgSolver
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        solverData
+        dict
     ),
     amg_
     (
@@ -76,10 +76,10 @@ Foam::fpeAmgSolver::fpeAmgSolver
         coupleBouCoeffs,
         coupleIntCoeffs,
         interfaces,
-        dict()
+        dict
     ),
-    nSmoothingSteps_(readLabel(dict().lookup("nSmoothingSteps"))),
-    mFactor_(readScalar(dict().lookup("mFactor")))
+    nSmoothingSteps_(readLabel(dict.lookup("nSmoothingSteps"))),
+    mFactor_(readScalar(dict.lookup("mFactor")))
 {}
 
 
