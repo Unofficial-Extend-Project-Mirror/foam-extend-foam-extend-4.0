@@ -1,3 +1,0 @@
-compressibleLesInterFoam.C
-
-EXE = $(FOAM_APPBIN)/compressibleLesInterFoam

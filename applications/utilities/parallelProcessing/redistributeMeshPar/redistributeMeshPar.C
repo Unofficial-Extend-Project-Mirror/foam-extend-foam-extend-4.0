@@ -648,7 +648,21 @@ int main(int argc, char *argv[])
 
         // Subset 0 cells, no parallel comms. This is used to create zero-sized
         // fields.
-        subsetterPtr.reset(new fvMeshSubset(mesh));
+        subsetterPtr.reset
+        (
+            new fvMeshSubset
+            (
+                IOobject
+                (
+                    "set",
+                    runTime.timeName(),
+                    mesh,
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE
+                ),
+                mesh
+            )
+        );
         subsetterPtr().setLargeCellSubset(labelHashSet(0), nonProcI, false);
     }
 

@@ -9,11 +9,5 @@
         )
     );
 
-    pointMesh pStressMesh(stressMesh);
-
-    volPointInterpolation cpi
-    (
-        stressMesh,
-        pStressMesh
-    );
+    const volPointInterpolation& cpi = volPointInterpolation::New(stressMesh);
 

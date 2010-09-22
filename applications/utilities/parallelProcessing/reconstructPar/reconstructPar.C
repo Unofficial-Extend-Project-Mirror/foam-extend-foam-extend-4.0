@@ -474,6 +474,7 @@ int main(int argc, char *argv[])
             {
                 Info << "No lagrangian fields" << nl << endl;
             }
+        }
 
         // If there are any FA fields, reconstruct them
 
@@ -492,7 +493,7 @@ int main(int argc, char *argv[])
             faMesh aMesh(mesh);
 
             processorFaMeshes procFaMeshes(procMeshes.meshes());
-            
+
             faFieldReconstructor faReconstructor
             (
                 aMesh,

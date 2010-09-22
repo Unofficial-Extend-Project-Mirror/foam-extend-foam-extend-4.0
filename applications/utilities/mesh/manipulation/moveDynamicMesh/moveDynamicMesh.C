@@ -30,8 +30,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "argList.H"
-#include "Time.H"
+#include "fvCFD.H"
 #include "dynamicFvMesh.H"
 
 using namespace Foam;
@@ -50,14 +49,14 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << endl;
 
-        if (dir(runTime.path()/"VTK"))
+        if (isDir(runTime.path()/"VTK"))
         {
             Info << "Clear VTK directory" << endl;
             rmDir(runTime.path()/"VTK");
         }
 
         mesh.update();
-        
+
 #       include "checkVolContinuity.H"
 
         mesh.checkMesh(true);

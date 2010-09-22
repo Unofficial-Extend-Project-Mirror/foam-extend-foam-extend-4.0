@@ -26,12 +26,12 @@ Class
     coupledLduPrecon
 
 Description
-    Virtual base class for matrix preconditioners
+    Virtual base class for coupled matrix preconditioners
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "coupledLduPrecon.H"
 
@@ -45,6 +45,28 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 
+Foam::word Foam::coupledLduPrecon::getName
+(
+    const dictionary& dict
+)
+{
+    word name;
+
+    // handle primitive or dictionary entry
+    const entry& e = dict.lookupEntry("preconditioner", false, false);
+    if (e.isDict())
+    {
+        e.dict().lookup("preconditioner") >> name;
+    }
+    else
+    {
+        e.stream() >> name;
+    }
+
+    return name;
+}
+
+
 Foam::autoPtr<Foam::coupledLduPrecon> Foam::coupledLduPrecon::New
 (
     const coupledLduMatrix& matrix,
@@ -54,7 +76,20 @@ Foam::autoPtr<Foam::coupledLduPrecon> Foam::coupledLduPrecon::New
     const dictionary& dict
 )
 {
-    word preconName(dict.lookup("type"));
+    word preconName;
+
+    // handle primitive or dictionary entry
+    const entry& e = dict.lookupEntry("preconditioner", false, false);
+    if (e.isDict())
+    {
+        e.dict().lookup("preconditioner") >> preconName;
+    }
+    else
+    {
+        e.stream() >> preconName;
+    }
+
+    const dictionary& controls = e.isDict() ? e.dict() : dictionary::null;
 
     dictionaryConstructorTable::iterator constructorIter =
         dictionaryConstructorTablePtr_->find(preconName);
@@ -87,7 +122,7 @@ Foam::autoPtr<Foam::coupledLduPrecon> Foam::coupledLduPrecon::New
             bouCoeffs,
             intCoeffs,
             interfaces,
-            dict
+            controls
         )
     );
 }

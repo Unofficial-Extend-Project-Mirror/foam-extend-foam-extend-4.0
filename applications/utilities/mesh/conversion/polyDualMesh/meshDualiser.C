@@ -30,7 +30,7 @@ Class
 #include "meshDualiser.H"
 #include "meshTools.H"
 #include "polyMesh.H"
-#include "polyTopoChange.H"
+#include "directTopoChange.H"
 #include "mapPolyMesh.H"
 #include "edgeFaceCirculator.H"
 #include "mergePoints.H"
@@ -43,7 +43,7 @@ defineTypeNameAndDebug(Foam::meshDualiser, 0);
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::meshDualiser::checkPolyTopoChange(const polyTopoChange& meshMod)
+void Foam::meshDualiser::checkPolyTopoChange(const directTopoChange& meshMod)
 {
     // Assume no removed points
     pointField points(meshMod.points().size());
@@ -73,7 +73,7 @@ void Foam::meshDualiser::checkPolyTopoChange(const polyTopoChange& meshMod)
             {
                 FatalErrorIn
                 (
-                    "meshDualiser::checkPolyTopoChange(const polyTopoChange&)"
+                    "meshDualiser::checkPolyTopoChange(const directTopoChange&)"
                 )   << "duplicate verts:" << newToOld[newI]
                     << " coords:"
                     << UIndirectList<point>(points, newToOld[newI])()
@@ -87,14 +87,14 @@ void Foam::meshDualiser::checkPolyTopoChange(const polyTopoChange& meshMod)
 // Dump state so far.
 void Foam::meshDualiser::dumpPolyTopoChange
 (
-    const polyTopoChange& meshMod,
+    const directTopoChange& meshMod,
     const fileName& prefix
 )
 {
     OFstream str1(prefix + "Faces.obj");
     OFstream str2(prefix + "Edges.obj");
 
-    Info<< "Dumping current polyTopoChange. Faces to " << str1.name()
+    Info<< "Dumping current directTopoChange. Faces to " << str1.name()
         << " , points and edges to " << str2.name() << endl;
 
     const DynamicList<point>& points = meshMod.points();
@@ -157,7 +157,7 @@ void Foam::meshDualiser::generateDualBoundaryEdges
 (
     const PackedBoolList& isBoundaryEdge,
     const label pointI,
-    polyTopoChange& meshMod
+    directTopoChange& meshMod
 )
 {
     const labelList& pEdges = mesh_.pointEdges()[pointI];
@@ -214,7 +214,7 @@ Foam::label Foam::meshDualiser::addInternalFace
     const label dualCell0,
     const label dualCell1,
     const DynamicList<label>& verts,
-    polyTopoChange& meshMod
+    directTopoChange& meshMod
 ) const
 {
     face newFace(verts);
@@ -332,7 +332,7 @@ Foam::label Foam::meshDualiser::addBoundaryFace
     const label dualCellI,
     const label patchI,
     const DynamicList<label>& verts,
-    polyTopoChange& meshMod
+    directTopoChange& meshMod
 ) const
 {
     face newFace(verts);
@@ -388,7 +388,7 @@ void Foam::meshDualiser::createFacesAroundEdge
     const PackedBoolList& isBoundaryEdge,
     const label edgeI,
     const label startFaceI,
-    polyTopoChange& meshMod,
+    directTopoChange& meshMod,
     boolList& doneEFaces
 ) const
 {
@@ -555,7 +555,7 @@ void Foam::meshDualiser::createFaceFromInternalFace
 (
     const label faceI,
     label& fp,
-    polyTopoChange& meshMod
+    directTopoChange& meshMod
 ) const
 {
     const face& f = mesh_.faces()[faceI];
@@ -654,7 +654,7 @@ void Foam::meshDualiser::createFacesAroundBoundaryPoint
     const label patchI,
     const label patchPointI,
     const label startFaceI,
-    polyTopoChange& meshMod,
+    directTopoChange& meshMod,
     boolList& donePFaces            // pFaces visited
 ) const
 {
@@ -894,7 +894,7 @@ void Foam::meshDualiser::setRefinement
     const labelList& featureEdges,
     const labelList& singleCellFeaturePoints,
     const labelList& multiCellFeaturePoints,
-    polyTopoChange& meshMod
+    directTopoChange& meshMod
 )
 {
     const labelList& own = mesh_.faceOwner();
@@ -938,7 +938,7 @@ void Foam::meshDualiser::setRefinement
             (
                 "meshDualiser::setRefinement"
                 "(const labelList&, const labelList&, const labelList&"
-                ", const labelList, polyTopoChange&)"
+                ", const labelList, directTopoChange&)"
             )   << "In split-face-mode (splitFace=true) but not all faces"
                 << " marked as feature faces." << endl
                 << "First conflicting face:" << faceI
@@ -960,7 +960,7 @@ void Foam::meshDualiser::setRefinement
             (
                 "meshDualiser::setRefinement"
                 "(const labelList&, const labelList&, const labelList&"
-                ", const labelList, polyTopoChange&)"
+                ", const labelList, directTopoChange&)"
             )   << "In split-face-mode (splitFace=true) but not all edges"
                 << " marked as feature edges." << endl
                 << "First conflicting edge:" << edgeI
@@ -991,7 +991,7 @@ void Foam::meshDualiser::setRefinement
                 (
                     "meshDualiser::setRefinement"
                     "(const labelList&, const labelList&, const labelList&"
-                    ", const labelList, polyTopoChange&)"
+                    ", const labelList, directTopoChange&)"
                 )   << "Not all boundary faces marked as feature faces."
                     << endl
                     << "First conflicting face:" << faceI
@@ -1083,7 +1083,7 @@ void Foam::meshDualiser::setRefinement
             (
                 "meshDualiser::setRefinement"
                 "(const labelList&, const labelList&, const labelList&"
-                ", const labelList, polyTopoChange&)"
+                ", const labelList, directTopoChange&)"
             )   << "Point " << pointI << " at:" << mesh_.points()[pointI]
                 << " is both in singleCellFeaturePoints"
                 << " and multiCellFeaturePoints."

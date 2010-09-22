@@ -28,47 +28,61 @@ Application
 Description
     Solver for mixing 2 incompressible fluids.
 
+    Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
+
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
 #include "twoPhaseMixture.H"
+#include "turbulenceModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
-
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createMesh.H"
-#   include "readEnvironmentalProperties.H"
+#   include "readGravitationalAcceleration.H"
+#   include "readPIMPLEControls.H"
 #   include "initContinuityErrs.H"
 #   include "createFields.H"
+#   include "readTimeControls.H"
+#   include "CourantNo.H"
+#   include "setInitialDeltaT.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nStarting time loop\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.run())
     {
+#       include "readPIMPLEControls.H"
+#       include "readTimeControls.H"
+#       include "CourantNo.H"
+#       include "setDeltaT.H"
+
+        runTime++;
+
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readPISOControls.H"
-#       include "CourantNo.H"
-
-        twoPhaseProperties.correct();
-
-#       include "gammaEqn.H"
-
-#       include "UEqn.H"
-
-        // --- PISO loop
-        for (int corr=0; corr<nCorr; corr++)
+        // --- Pressure-velocity PIMPLE corrector loop
+        for (int oCorr=0; oCorr<nOuterCorr; oCorr++)
         {
-#           include "pEqn.H"
-        }
+            twoPhaseProperties.correct();
 
-#       include "continuityErrs.H"
+#           include "alphaEqn.H"
+
+#           include "UEqn.H"
+
+            // --- PISO loop
+            for (int corr=0; corr<nCorr; corr++)
+            {
+#               include "p_rghEqn.H"
+            }
+
+            turbulence->correct();
+        }
 
         runTime.write();
 
@@ -79,7 +93,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

@@ -41,7 +41,7 @@ Foam::coupledIterativeSolver::coupledIterativeSolver
     const PtrList<FieldField<Field, scalar> >& bouCoeffs,
     const PtrList<FieldField<Field, scalar> >& intCoeffs,
     const lduInterfaceFieldPtrsListList& interfaces,
-    Istream& solverData
+    const dictionary& solverData
 )
 :
     coupledLduSolver

@@ -4,7 +4,7 @@ EXE_INC = \
     -I$(LIB_SRC)/dynamicMesh/lnInclude \
     -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
-    -I$(LIB_SRC)/turbulenceModels/RAS
+    -I$(LIB_SRC)/turbulenceModels/compressible/turbulenceModel
 
 EXE_LIBS = \
     -lengine \
@@ -12,6 +12,7 @@ EXE_LIBS = \
     -ldynamicMesh \
     -ltopoChangerFvMesh \
     -lcompressibleRASModels \
+    -lcompressibleLESModels \
     -lbasicThermophysicalModels \
     -lspecie \
     -lmeshTools \

@@ -47,12 +47,11 @@ Description
 
 int main(int argc, char *argv[])
 {
-
 #   include "setRootCase.H"
 
 #   include "createTime.H"
 #   include "createMesh.H"
-#   include "readEnvironmentalProperties.H"
+#   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
 #   include "readPPProperties.H"
 #   include "initContinuityErrs.H"
@@ -108,7 +107,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

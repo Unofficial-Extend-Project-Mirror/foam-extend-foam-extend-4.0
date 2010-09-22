@@ -1,5 +1,0 @@
-lesCavitatingFoam.C
-
-devOneEqEddy/devOneEqEddy.C
-
-EXE = $(FOAM_APPBIN)/lesCavitatingFoam

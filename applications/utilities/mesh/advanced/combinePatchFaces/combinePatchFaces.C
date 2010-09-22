@@ -86,21 +86,25 @@ void checkSnapMesh
 
     // Max nonorthogonality allowed
     scalar maxNonOrtho(readScalar(snapDict.lookup("maxNonOrtho")));
+    primitiveMesh::nonOrthThreshold_ = maxNonOrtho;
+
     // Max concaveness allowed.
     scalar maxConcave(readScalar(snapDict.lookup("maxConcave")));
+    primitiveMesh::faceAngleThreshold_ = maxConcave;
+
     // Min volume allowed (factor of minimum cellVolume)
     scalar relMinVol(readScalar(snapDict.lookup("minVol")));
     const scalar minCellVol = min(mesh.cellVolumes());
     const scalar minPyrVol = relMinVol*minCellVol;
+
     // Min area
     scalar minArea(readScalar(snapDict.lookup("minArea")));
 
-    if (maxNonOrtho < 180.0-SMALL)
+    if (maxNonOrtho < 180.0 - SMALL)
     {
         Pout<< "Checking non orthogonality" << endl;
 
         label nOldSize = wrongFaces.size();
-        mesh.setNonOrthThreshold(maxNonOrtho);
         mesh.checkFaceOrthogonality(false, &wrongFaces);
 
         Pout<< "Detected " << wrongFaces.size() - nOldSize
@@ -123,7 +127,8 @@ void checkSnapMesh
         Pout<< "Checking face angles" << endl;
 
         label nOldSize = wrongFaces.size();
-        mesh.checkFaceAngles(false, maxConcave, &wrongFaces);
+        mesh.checkFaceAngles(false, &wrongFaces);
+
         Pout<< "Detected additional " << wrongFaces.size() - nOldSize
             << " faces with concavity > " << maxConcave << " degrees"
             << endl;
@@ -144,6 +149,7 @@ void checkSnapMesh
                 wrongFaces.insert(faceI);
             }
         }
+
         Pout<< "Detected additional " << wrongFaces.size() - nOldSize
             << " faces with area < " << minArea << " m^2" << endl;
     }

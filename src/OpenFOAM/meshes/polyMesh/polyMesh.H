@@ -123,7 +123,7 @@ private:
             mutable polyBoundaryMesh boundary_;
 
             //- Mesh bounding-box.
-            //  Created from points on construction, updated when the mesh moves
+            //  Created from points on construction, updated with mesh motion
             boundBox bounds_;
 
             //- Vector of non-constrained directions in mesh

@@ -46,9 +46,46 @@
 
 
     Info<< "Calculating field g.h\n" << endl;
+    volScalarField gh("gh", g & mesh.C());
     surfaceScalarField ghf("gh", g & mesh.Cf());
+
+    volScalarField p
+    (
+        IOobject
+        (
+            "p",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        pd + rho*gh
+    );
 
 
     label pdRefCell = 0;
     scalar pdRefValue = 0.0;
     setRefCell(pd, mesh.solutionDict().subDict("PISO"), pdRefCell, pdRefValue);
+
+    scalar pRefValue = 0.0;
+
+    if (pd.needReference())
+    {
+        pRefValue = readScalar
+        (
+            mesh.solutionDict().subDict("PISO").lookup("pRefValue")
+        );
+
+        p += dimensionedScalar
+        (
+            "p",
+            p.dimensions(),
+            pRefValue - getRefCellValue(p, pdRefCell)
+        );
+    }
+
+    // Construct incompressible turbulence model
+    autoPtr<incompressible::turbulenceModel> turbulence
+    (
+        incompressible::turbulenceModel::New(U, phi, mixture)
+    );

@@ -1,9 +1,9 @@
-    Info<< "Reading field pd\n" << endl;
-    volScalarField pd
+    Info<< "Reading field p_rgh\n" << endl;
+    volScalarField p_rgh
     (
         IOobject
         (
-            "pd",
+            "p_rgh",
             runTime.timeName(),
             mesh,
             IOobject::MUST_READ,
@@ -12,12 +12,12 @@
         mesh
     );
 
-    Info<< "Reading field gamma\n" << endl;
-    volScalarField gamma
+    Info<< "Reading field alpha1\n" << endl;
+    volScalarField alpha1
     (
         IOobject
         (
-            "gamma",
+            "alpha1",
             runTime.timeName(),
             mesh,
             IOobject::MUST_READ,
@@ -40,24 +40,27 @@
         mesh
     );
 
-#   include "createPhi.H"
+    #include "createPhi.H"
 
     Info<< "Reading transportProperties\n" << endl;
-    twoPhaseMixture twoPhaseProperties(U, phi, "gamma");
-    
+    twoPhaseMixture twoPhaseProperties(U, phi);
+
     const dimensionedScalar& rho1 = twoPhaseProperties.rho1();
     const dimensionedScalar& rho2 = twoPhaseProperties.rho2();
 
     dimensionedScalar Dab(twoPhaseProperties.lookup("Dab"));
 
+    // Read the reciprocal of the turbulent Schmidt number
+    dimensionedScalar alphatab(twoPhaseProperties.lookup("alphatab"));
+
     // Need to store rho for ddt(rho, U)
-    volScalarField rho("rho", gamma*rho1 + (scalar(1) - gamma)*rho2);
+    volScalarField rho("rho", alpha1*rho1 + (scalar(1) - alpha1)*rho2);
     rho.oldTime();
 
 
     // Mass flux
     // Initialisation does not matter because rhoPhi is reset after the
-    // gamma solution before it is used in the U equation.
+    // alpha1 solution before it is used in the U equation.
     surfaceScalarField rhoPhi
     (
         IOobject
@@ -71,11 +74,53 @@
         rho1*phi
     );
 
+    Info<< "Calculating field (g.h)f\n" << endl;
+    volScalarField gh("gh", g & mesh.C());
+    surfaceScalarField ghf = surfaceScalarField("gh", g & mesh.Cf());
 
-    Info<< "Calculating field g.h\n" << endl;
-    surfaceScalarField ghf("gh", g & mesh.Cf());
+    volScalarField p
+    (
+        IOobject
+        (
+            "p",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        p_rgh + rho*gh
+    );
+
+    label p_rghRefCell = 0;
+    scalar p_rghRefValue = 0.0;
+    setRefCell
+    (
+        p_rgh,
+        mesh.solutionDict().subDict("PIMPLE"),
+        p_rghRefCell,
+        p_rghRefValue
+    );
+
+    scalar pRefValue = 0.0;
+
+    if (p_rgh.needReference())
+    {
+        pRefValue = readScalar
+        (
+            mesh.solutionDict().subDict("PIMPLE").lookup("pRefValue")
+        );
+
+        p += dimensionedScalar
+        (
+            "p",
+            p.dimensions(),
+            pRefValue - getRefCellValue(p, p_rghRefCell)
+        );
+    }
 
 
-    label pdRefCell = 0;
-    scalar pdRefValue = 0.0;
-    setRefCell(pd, mesh.solutionDict().subDict("PISO"), pdRefCell, pdRefValue);
+    // Construct incompressible turbulence model
+    autoPtr<incompressible::turbulenceModel> turbulence
+    (
+        incompressible::turbulenceModel::New(U, phi, twoPhaseProperties)
+    );

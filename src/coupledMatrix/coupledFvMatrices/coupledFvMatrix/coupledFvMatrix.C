@@ -70,11 +70,11 @@ Foam::word Foam::coupledFvMatrix<Type>::coupledPsiName() const
 
 template<class Type>
 Foam::coupledSolverPerformance
-Foam::coupledFvMatrix<Type>::solve(Istream& solverControls)
+Foam::coupledFvMatrix<Type>::solve(const dictionary& solverControls)
 {
     if (debug)
     {
-        InfoIn("coupledFvMatrix<Type>::solve(Istream& solverControls)")
+        InfoIn("coupledFvMatrix<Type>::solve(const dictionary&)")
             << "solving coupledFvMatrix<Type>" << endl;
     }
 
@@ -180,7 +180,7 @@ Foam::coupledFvMatrix<Type>::solve(Istream& solverControls)
             bouCoeffsCmpt,
             intCoeffsCmpt,
             interfaces,
-            solverControls.rewind()
+            solverControls
         )->solve(psiCmpt, sourceCmpt, cmpt);
 
         solverPerf.print();

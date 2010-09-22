@@ -64,10 +64,10 @@ autoPtr<coupledLduSolver> coupledLduSolver::New
     const PtrList<FieldField<Field, scalar> >& bouCoeffs,
     const PtrList<FieldField<Field, scalar> >& intCoeffs,
     const lduInterfaceFieldPtrsListList& interfaces,
-    Istream& solverData
+    const dictionary& dict
 )
 {
-    word solverName(solverData);
+    word solverName(dict.lookup("solver"));
 
     if (matrix.diagonal())
     {
@@ -99,9 +99,9 @@ autoPtr<coupledLduSolver> coupledLduSolver::New
                 "    const PtrList<FieldField<Field, scalar> >& bouCoeffs,\n"
                 "    const PtrList<FieldField<Field, scalar> >& intCoeffs,\n"
                 "    const lduInterfaceFieldPtrsListList& interfaces,\n"
-                "    Istream& solverData\n"
+                "    const dictionary& dict\n"
                 ")",
-                solverData
+                dict
             )   << "Unknown symmetric matrix solver " << solverName
                 << endl << endl
                 << "Valid symmetric matrix solvers are :" << endl
@@ -118,7 +118,7 @@ autoPtr<coupledLduSolver> coupledLduSolver::New
                 bouCoeffs,
                 intCoeffs,
                 interfaces,
-                solverData
+                dict
             )
         );
     }
@@ -138,9 +138,9 @@ autoPtr<coupledLduSolver> coupledLduSolver::New
                 "    const PtrList<FieldField<Field, scalar> >& bouCoeffs,\n"
                 "    const PtrList<FieldField<Field, scalar> >& intCoeffs,\n"
                 "    const lduInterfaceFieldPtrsListList& interfaces,\n"
-                "    Istream& solverData\n"
+                "    const dictionary& dict\n"
                 ")",
-                solverData
+                dict
             )   << "Unknown asymmetric matrix solver " << solverName
                 << endl << endl
                 << "Valid asymmetric matrix solvers are :" << endl
@@ -157,7 +157,7 @@ autoPtr<coupledLduSolver> coupledLduSolver::New
                 bouCoeffs,
                 intCoeffs,
                 interfaces,
-                solverData
+                dict
             )
         );
     }
@@ -173,7 +173,7 @@ autoPtr<coupledLduSolver> coupledLduSolver::New
             "    const PtrList<FieldField<Field, scalar> >& bouCoeffs,\n"
             "    const PtrList<FieldField<Field, scalar> >& intCoeffs,\n"
             "    const lduInterfaceFieldPtrsListList& interfaces,\n"
-            "    Istream& solverData\n"
+            "    const dictionary& dict\n"
             ")"
         )   << "cannot solve incomplete matrix, "
                "no diagonal or off-diagonal coefficient"

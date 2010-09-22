@@ -1357,6 +1357,7 @@ void Foam::ensightMesh::writeAscii
         ensightGeometryFilePtr = new OFstream
         (
             postProcPath/ensightGeometryFileName,
+            ios_base::out|ios_base::trunc,
             runTime.writeFormat(),
             runTime.writeVersion(),
             IOstream::UNCOMPRESSED

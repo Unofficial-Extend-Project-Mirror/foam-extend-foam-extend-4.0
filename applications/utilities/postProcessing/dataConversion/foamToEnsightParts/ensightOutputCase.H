@@ -10,7 +10,12 @@ if (timeDirs[0].value() < 0)
 // the case file is always ASCII
 Info << "write case: " << caseFileName.c_str() << endl;
 
-OFstream caseFile(ensightDir/caseFileName, IOstream::ASCII);
+OFstream caseFile
+(
+    ensightDir/caseFileName,
+    ios_base::out|ios_base::trunc,
+    IOstream::ASCII
+);
 caseFile.setf(ios_base::left);
 
 caseFile.setf(ios_base::scientific, ios_base::floatfield);

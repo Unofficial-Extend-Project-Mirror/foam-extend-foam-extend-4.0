@@ -132,7 +132,7 @@ Foam::fvFieldReconstructor::reconstructFvVolumeField
                 forAll(cp, faceI)
                 {
                     // Subtract one to take into account offsets for
-                    // face direction.  
+                    // face direction.
                     reverseAddressing[faceI] = cp[faceI] - 1 - curPatchStart;
                 }
 
@@ -152,7 +152,7 @@ Foam::fvFieldReconstructor::reconstructFvVolumeField
                 forAll(cp, faceI)
                 {
                     // Subtract one to take into account offsets for
-                    // face direction.  
+                    // face direction.
                     label curF = cp[faceI] - 1;
 
                     // Is the face on the boundary?
@@ -192,7 +192,7 @@ Foam::fvFieldReconstructor::reconstructFvVolumeField
         // add empty patches
         if
         (
-            typeid(mesh_.boundary()[patchI]) == typeid(emptyFvPatch)
+            isType<emptyFvPatch>(mesh_.boundary()[patchI])
          && !patchFields(patchI)
         )
         {
@@ -283,7 +283,7 @@ Foam::fvFieldReconstructor::reconstructFvSurfaceField
 
         // It is necessary to create a copy of the addressing array to
         // take care of the face direction offset trick.
-        // 
+        //
         {
             labelList curAddr(faceProcAddressing_[procI]);
 
@@ -344,7 +344,7 @@ Foam::fvFieldReconstructor::reconstructFvSurfaceField
                 forAll(cp, faceI)
                 {
                     // Subtract one to take into account offsets for
-                    // face direction.  
+                    // face direction.
                     reverseAddressing[faceI] = cp[faceI] - 1 - curPatchStart;
                 }
 
@@ -413,7 +413,7 @@ Foam::fvFieldReconstructor::reconstructFvSurfaceField
         // add empty patches
         if
         (
-            typeid(mesh_.boundary()[patchI]) == typeid(emptyFvPatch)
+            isType<emptyFvPatch>(mesh_.boundary()[patchI])
          && !patchFields(patchI)
         )
         {
@@ -454,11 +454,12 @@ Foam::fvFieldReconstructor::reconstructFvSurfaceField
 }
 
 
-// Reconstruct and write all volume fields
+// Reconstruct and write all/selected volume fields
 template<class Type>
 void Foam::fvFieldReconstructor::reconstructFvVolumeFields
 (
-    const IOobjectList& objects
+    const IOobjectList& objects,
+    const HashSet<word>& selectedFields
 )
 {
     const word& fieldClassName =
@@ -470,27 +471,29 @@ void Foam::fvFieldReconstructor::reconstructFvVolumeFields
     {
         Info<< "    Reconstructing " << fieldClassName << "s\n" << endl;
 
-        for
-        (
-            IOobjectList::const_iterator fieldIter = fields.begin();
-            fieldIter != fields.end();
-            ++fieldIter
-        )
+        forAllConstIter(IOobjectList, fields, fieldIter)
         {
-            Info<< "        " << fieldIter()->name() << endl;
+            if
+            (
+                !selectedFields.size()
+             || selectedFields.found(fieldIter()->name())
+            )
+            {
+                Info<< "        " << fieldIter()->name() << endl;
 
-            reconstructFvVolumeField<Type>(*fieldIter())().write();
+                reconstructFvVolumeField<Type>(*fieldIter())().write();
+            }
         }
-
         Info<< endl;
     }
 }
 
-// Reconstruct and write all surface fields
+// Reconstruct and write all/selected surface fields
 template<class Type>
 void Foam::fvFieldReconstructor::reconstructFvSurfaceFields
 (
-    const IOobjectList& objects
+    const IOobjectList& objects,
+    const HashSet<word>& selectedFields
 )
 {
     const word& fieldClassName =
@@ -502,18 +505,19 @@ void Foam::fvFieldReconstructor::reconstructFvSurfaceFields
     {
         Info<< "    Reconstructing " << fieldClassName << "s\n" << endl;
 
-        for
-        (
-            IOobjectList::const_iterator fieldIter = fields.begin();
-            fieldIter != fields.end();
-            ++fieldIter
-        )
+        forAllConstIter(IOobjectList, fields, fieldIter)
         {
-            Info<< "        " << fieldIter()->name() << endl;
+            if
+            (
+                !selectedFields.size()
+             || selectedFields.found(fieldIter()->name())
+            )
+            {
+                Info<< "        " << fieldIter()->name() << endl;
 
-            reconstructFvSurfaceField<Type>(*fieldIter())().write();
+                reconstructFvSurfaceField<Type>(*fieldIter())().write();
+            }
         }
-
         Info<< endl;
     }
 }

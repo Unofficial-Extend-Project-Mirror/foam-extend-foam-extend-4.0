@@ -34,46 +34,61 @@ License
 // Construct from components
 Foam::vtkMesh::vtkMesh
 (
-    fvMesh& baseMesh,
+    const IOobject& io,
     const word& setName
 )
 :
-    baseMesh_(baseMesh),
-    subsetter_(baseMesh),
+    fvMesh(io),
+    subsetMesh_
+    (
+        IOobject
+        (
+            "subset",
+            io.time().constant(),
+            *this,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        *this
+    ),
     setName_(setName)
 {
-    if (setName.size())
+    if (setName.size() > 0)
     {
         // Read cellSet using whole mesh
-        cellSet currentSet(baseMesh_, setName_);
+        cellSet currentSet(*this, setName_);
 
         // Set current subset
-        subsetter_.setLargeCellSubset(currentSet);
+        subsetMesh_.setLargeCellSubset(currentSet);
     }
 }
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+Foam::vtkMesh::~vtkMesh()
+{}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 Foam::polyMesh::readUpdateState Foam::vtkMesh::readUpdate()
 {
-    polyMesh::readUpdateState meshState = baseMesh_.readUpdate();
+    polyMesh::readUpdateState meshState = fvMesh::readUpdate();
 
     if (meshState != polyMesh::UNCHANGED)
     {
-        // Note: since fvMeshSubset has no movePoints() functionality reconstruct
-        // the subset even if only movement.
-
-//        topoPtr_.clear();
+        // Note: since fvMeshSubset has no movePoints() functionality
+        // reconstruct the subset even if only movement.
 
         if (setName_.size())
         {
             Info<< "Subsetting mesh based on cellSet " << setName_ << endl;
 
             // Read cellSet using whole mesh
-            cellSet currentSet(baseMesh_, setName_);
+            cellSet currentSet(*this, setName_);
 
-            subsetter_.setLargeCellSubset(currentSet);
+            subsetMesh_.setLargeCellSubset(currentSet);
         }
     }
 

@@ -5,16 +5,17 @@
     U = rAU*UEqn.H();
     surfaceScalarField phiU("phiU", (fvc::interpolate(U) & mesh.Sf()));
 
-    phi = phiU +
-    (
-        fvc::interpolate(interface.sigmaK())*fvc::snGrad(gamma)
-      - ghf*fvc::snGrad(rho)
-    )*rAUf*mesh.magSf();
-
     if (pd.needReference())
     {
         adjustPhi(phi, U, pd);
     }
+
+    phi = phiU +
+    (
+        fvc::interpolate(interface.sigmaK())*fvc::snGrad(alpha1)
+      - ghf*fvc::snGrad(rho)
+    )*rAUf*mesh.magSf();
+
 
     for(int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
     {

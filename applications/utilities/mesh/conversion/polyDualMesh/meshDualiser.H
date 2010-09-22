@@ -29,9 +29,9 @@ Description
     Creates dual of polyMesh. Every point becomes a cell (or multiple cells
     for feature points), a walk around every edge creates faces between them.
 
-    Put all points you want in the final mesh into featurePoints; all edge(mid)s
-    you want in the final mesh into featureEdges; all face(centre)s in
-    faceFaces.
+    Put all points you want in the final mesh into featurePoints;
+    all edge(mid)s you want in the final mesh into featureEdges;
+    all face(centre)s in faceFaces.
 
     Usually to preserve boundaries:
         - all boundary faces are featureFaces
@@ -59,7 +59,7 @@ namespace Foam
 {
 
 class polyMesh;
-class polyTopoChange;
+class directTopoChange;
 
 /*---------------------------------------------------------------------------*\
                            Class meshDualiser Declaration
@@ -90,9 +90,9 @@ class meshDualiser
 
     // Private Member Functions
 
-        static void checkPolyTopoChange(const polyTopoChange&);
+        static void checkPolyTopoChange(const directTopoChange&);
 
-        static void dumpPolyTopoChange(const polyTopoChange&, const fileName&);
+        static void dumpPolyTopoChange(const directTopoChange&, const fileName&);
 
         //- Find dual cell given point and cell
         label findDualCell(const label cellI, const label pointI) const;
@@ -103,7 +103,7 @@ class meshDualiser
         (
             const PackedBoolList&,
             const label pointI,
-            polyTopoChange&
+            directTopoChange&
         );
 
         //- Check that owner and neighbour of face have same dual cell
@@ -124,7 +124,7 @@ class meshDualiser
             const label dualCell0,
             const label dualCell1,
             const DynamicList<label>& verts,
-            polyTopoChange& meshMod
+            directTopoChange& meshMod
         ) const;
 
         //- Add boundary face
@@ -137,7 +137,7 @@ class meshDualiser
             const label dualCellI,
             const label patchI,
             const DynamicList<label>& verts,
-            polyTopoChange& meshMod
+            directTopoChange& meshMod
         ) const;
 
         //- Create internal faces walking around edge
@@ -147,7 +147,7 @@ class meshDualiser
             const PackedBoolList&,
             const label edgeI,
             const label startFaceI,
-            polyTopoChange&,
+            directTopoChange&,
             boolList& doneEFaces
         ) const;
 
@@ -156,7 +156,7 @@ class meshDualiser
         (
             const label faceI,
             label& fp,
-            polyTopoChange&
+            directTopoChange&
         ) const;
 
         //- Creates boundary faces walking around point on patchI.
@@ -165,7 +165,7 @@ class meshDualiser
             const label patchI,
             const label patchPointI,
             const label startFaceI,
-            polyTopoChange&,
+            directTopoChange&,
             boolList& donePFaces            // pFaces visited
         ) const;
 
@@ -247,7 +247,7 @@ public:
                 const labelList& featureEdges,
                 const labelList& singleCellFeaturePoints,
                 const labelList& multiCellFeaturePoints,
-                polyTopoChange& meshMod
+                directTopoChange& meshMod
             );
 };
 

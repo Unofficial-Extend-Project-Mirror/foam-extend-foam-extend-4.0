@@ -61,12 +61,12 @@ void faMatrix<scalar>::setComponentReference
 template<>
 autoPtr<faMatrix<scalar>::faSolver> faMatrix<scalar>::solver
 (
-    Istream& solverControls
+    const dictionary& solverControls
 )
 {
     if (debug)
     {
-        Info<< "faMatrix<scalar>::solver(Istream& solverControls) : "
+        Info<< "faMatrix<scalar>::solver(const dictionary&) : "
                "solver for faMatrix<scalar>"
             << endl;
     }
@@ -104,7 +104,7 @@ autoPtr<faMatrix<scalar>::faSolver> faMatrix<scalar>::solver
 template<>
 lduSolverPerformance faMatrix<scalar>::faSolver::solve
 (
-    Istream& solverControls
+    const dictionary& solverControls
 )
 {
     scalarField saveDiag = faMat_.diag();
@@ -114,7 +114,7 @@ lduSolverPerformance faMatrix<scalar>::faSolver::solve
     faMat_.addBoundarySource(totalSource, false);
 
     solver_->read(solverControls);
-    lduSolverPerformance solverPerf = 
+    lduSolverPerformance solverPerf =
         solver_->solve(faMat_.psi().internalField(), totalSource);
 
     solverPerf.print();
@@ -128,11 +128,14 @@ lduSolverPerformance faMatrix<scalar>::faSolver::solve
 
 
 template<>
-lduSolverPerformance faMatrix<scalar>::solve(Istream& solverControls)
+lduSolverPerformance faMatrix<scalar>::solve
+(
+    const dictionary& solverControls
+)
 {
     if (debug)
     {
-        Info<< "faMatrix<scalar>::solve(Istream& solverControls) : "
+        Info<< "faMatrix<scalar>::solve(const dictionary&) : "
                "solving faMatrix<scalar>"
             << endl;
     }

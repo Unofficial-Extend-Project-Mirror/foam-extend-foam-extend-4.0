@@ -16,52 +16,6 @@ void Foam::printMeshStats(const polyMesh& mesh, const bool allTopology)
         << "    points:           "
         << returnReduce(mesh.points().size(), sumOp<label>()) << nl;
 
-    label nInternalPoints = returnReduce
-    (
-        mesh.nInternalPoints(),
-        sumOp<label>()
-    );
-
-    if (nInternalPoints != -Pstream::nProcs())
-    {
-        Info<< "    internal points:  " << nInternalPoints << nl;
-
-        if (returnReduce(mesh.nInternalPoints(), minOp<label>()) == -1)
-        {
-            WarningIn("Foam::printMeshStats(const polyMesh&, const bool)")
-                << "Some processors have their points sorted into internal"
-                << " and external and some do not." << endl
-                << "This can cause problems later on." << endl;
-        }
-    }
-
-    if (allTopology && nInternalPoints != -Pstream::nProcs())
-    {
-        label nEdges = returnReduce(mesh.nEdges(), sumOp<label>());
-        label nInternalEdges = returnReduce
-        (
-            mesh.nInternalEdges(),
-            sumOp<label>()
-        );
-        label nInternal1Edges = returnReduce
-        (
-            mesh.nInternal1Edges(),
-            sumOp<label>()
-        );
-        label nInternal0Edges = returnReduce
-        (
-            mesh.nInternal0Edges(),
-            sumOp<label>()
-        );
-
-        Info<< "    edges:            " << nEdges << nl
-            << "    internal edges:   " << nInternalEdges << nl
-            << "    internal edges using one boundary point:   "
-            << nInternal1Edges-nInternal0Edges << nl
-            << "    internal edges using two boundary points:  "
-            << nInternalEdges-nInternal1Edges << nl;
-    }
-
     Info<< "    faces:            "
         << returnReduce(mesh.faces().size(), sumOp<label>()) << nl
         << "    internal faces:   "

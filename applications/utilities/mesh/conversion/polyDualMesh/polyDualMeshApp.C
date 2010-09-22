@@ -60,7 +60,7 @@ Usage
 #include "timeSelector.H"
 #include "fvMesh.H"
 #include "mathematicalConstants.H"
-#include "polyTopoChange.H"
+#include "directTopoChange.H"
 #include "mapPolyMesh.H"
 #include "PackedBoolList.H"
 #include "meshTools.H"
@@ -498,13 +498,13 @@ int main(int argc, char *argv[])
 
 
     // Topo change container
-    polyTopoChange meshMod(mesh.boundaryMesh().size());
+    directTopoChange meshMod(mesh.boundaryMesh().size());
 
     // Mesh dualiser engine
     meshDualiser dualMaker(mesh);
 
-    // Insert all commands into polyTopoChange to create dual of mesh. This does
-    // all the hard work.
+    // Insert all commands into directTopoChange to create dual of mesh.
+    // This does all the hard work.
     dualMaker.setRefinement
     (
         splitAllFaces,

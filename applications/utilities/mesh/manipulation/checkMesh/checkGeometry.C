@@ -14,7 +14,7 @@ Foam::label Foam::checkGeometry(const polyMesh& mesh, const bool allGeometry)
 
     // Check directions
     {
-        Vector<label> dirs = mesh.directions();
+        Vector<label> dirs = mesh.solutionD();
 
         label nValidDirs = 0;
 
@@ -87,7 +87,13 @@ Foam::label Foam::checkGeometry(const polyMesh& mesh, const bool allGeometry)
 
     {
         cellSet cells(mesh, "nonClosedCells", mesh.nCells()/100 + 1);
-        cellSet aspectCells(mesh, "highAspectRatioCells", mesh.nCells()/100 + 1);
+        cellSet aspectCells
+        (
+            mesh,
+            "highAspectRatioCells",
+            mesh.nCells()/100 + 1
+        );
+
         if (mesh.checkClosedCells(true, &cells, &aspectCells))
         {
             noFailedChecks++;
@@ -241,7 +247,7 @@ Foam::label Foam::checkGeometry(const polyMesh& mesh, const bool allGeometry)
     if (allGeometry)
     {
         faceSet faces(mesh, "concaveFaces", mesh.nFaces()/100 + 1);
-        if (mesh.checkFaceAngles(true, 10, &faces))
+        if (mesh.checkFaceAngles(true, &faces))
         {
             //noFailedChecks++;
 
@@ -260,7 +266,7 @@ Foam::label Foam::checkGeometry(const polyMesh& mesh, const bool allGeometry)
     if (allGeometry)
     {
         faceSet faces(mesh, "warpedFaces", mesh.nFaces()/100 + 1);
-        if (mesh.checkFaceFlatness(true, 0.8, &faces))
+        if (mesh.checkFaceFlatness(true, &faces))
         {
             //noFailedChecks++;
 

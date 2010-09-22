@@ -26,7 +26,7 @@ Application
     sonicTurbDyMEngineFoam
 
 Description
-    Solver for compressible cold flow in internal combustion engines 
+    Solver for compressible cold flow in internal combustion engines
     with mesh motion and topological changes.
 
 
@@ -36,8 +36,8 @@ Description
 #include "engineTime.H"
 #include "dynamicFvMesh.H"
 #include "engineTopoChangerMesh.H"
-#include "basicThermo.H"
-#include "compressible/RASModel/RASModel.H"
+#include "basicPsiThermo.H"
+#include "turbulenceModel.H"
 #include "Switch.H"
 #include "OFstream.H"
 
@@ -61,8 +61,8 @@ int main(int argc, char *argv[])
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    thermo->correct();
-    
+    thermo.correct();
+
     Info << "\nStarting time loop\n" << endl;
 
     while (runTime.run())
@@ -72,24 +72,24 @@ int main(int argc, char *argv[])
 #       include "setDeltaT.H"
 
         runTime++;
-                
+
         Info<< "Crank angle = " << runTime.theta() << " CA-deg" << endl;
 
 //      make phi relative
-        
+
         phi += meshFlux;
-        
+
         bool meshChanged = mesh.update();
 
         if(meshChanged)
         {
-            thermo->correct();
+            thermo.correct();
 
 #           include "checkTotalVolume.H"
 #           include "compressibleCorrectPhi.H"
 #           include "CourantNo.H"
         }
-        
+
         meshFlux = fvc::interpolate(rho)*fvc::meshPhi(rho, U);
 
         // Make phi absolute
@@ -109,11 +109,11 @@ int main(int argc, char *argv[])
         }
 
         turbulence->correct();
-        
+
 #       include "logSummary.H"
 
-        rho = thermo->rho();
-    
+        rho = thermo.rho();
+
         runTime.write();
 
 #       include "infoDataOutput.H"

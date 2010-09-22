@@ -240,7 +240,20 @@ int main(int argc, char *argv[])
 
     instantList timeDirs = timeSelector::select0(runTime, args);
 
-#   include "createNamedMesh.H"
+    // Get region name
+    word regionName;
+
+    if (args.optionReadIfPresent("region", regionName))
+    {
+        Info<< "Create mesh " << regionName << " for time = "
+            << runTime.timeName() << Foam::nl << Foam::endl;
+    }
+    else
+    {
+        regionName = fvMesh::defaultRegion;
+        Info<< "Create mesh for time = "
+            << runTime.timeName() << Foam::nl << Foam::endl;
+    }
 
     // TecplotData/ directory in the case
     fileName fvPath(runTime.path()/"Tecplot360");
@@ -277,7 +290,17 @@ int main(int argc, char *argv[])
 
 
     // mesh wrapper; does subsetting and decomposition
-    vtkMesh vMesh(mesh, cellSetName);
+    vtkMesh vMesh
+    (
+        Foam::IOobject
+        (
+            regionName,
+            runTime.timeName(),
+            runTime,
+            Foam::IOobject::MUST_READ
+        ),
+        cellSetName
+    );
 
     forAll(timeDirs, timeI)
     {
@@ -315,23 +338,23 @@ int main(int argc, char *argv[])
         // Construct the vol fields (on the original mesh if subsetted)
 
         PtrList<volScalarField> vsf;
-        readFields(vMesh, vMesh.baseMesh(), objects, selectedFields, vsf);
+        readFields(vMesh, vMesh, objects, selectedFields, vsf);
         print("    volScalarFields            :", Info, vsf);
 
         PtrList<volVectorField> vvf;
-        readFields(vMesh, vMesh.baseMesh(), objects, selectedFields, vvf);
+        readFields(vMesh, vMesh, objects, selectedFields, vvf);
         print("    volVectorFields            :", Info, vvf);
 
         PtrList<volSphericalTensorField> vSpheretf;
-        readFields(vMesh, vMesh.baseMesh(), objects, selectedFields, vSpheretf);
+        readFields(vMesh, vMesh, objects, selectedFields, vSpheretf);
         print("    volSphericalTensorFields   :", Info, vSpheretf);
 
         PtrList<volSymmTensorField> vSymmtf;
-        readFields(vMesh, vMesh.baseMesh(), objects, selectedFields, vSymmtf);
+        readFields(vMesh, vMesh, objects, selectedFields, vSymmtf);
         print("    volSymmTensorFields        :", Info, vSymmtf);
 
         PtrList<volTensorField> vtf;
-        readFields(vMesh, vMesh.baseMesh(), objects, selectedFields, vtf);
+        readFields(vMesh, vMesh, objects, selectedFields, vtf);
         print("    volTensorFields            :", Info, vtf);
 
 
@@ -385,7 +408,7 @@ int main(int argc, char *argv[])
             readFields
             (
                 vMesh,
-                pointMesh::New(vMesh.baseMesh()),
+                pointMesh::New(vMesh),
                 objects,
                 selectedFields,
                 psf
@@ -395,7 +418,7 @@ int main(int argc, char *argv[])
             readFields
             (
                 vMesh,
-                pointMesh::New(vMesh.baseMesh()),
+                pointMesh::New(vMesh),
                 objects,
                 selectedFields,
                 pvf
@@ -405,7 +428,7 @@ int main(int argc, char *argv[])
             //readFields
             //(
             //    vMesh,
-            //    pointMesh::New(vMesh.baseMesh()),
+            //    pointMesh::New(vMesh),
             //    objects,
             //    selectedFields,
             //    pSpheretf
@@ -415,7 +438,7 @@ int main(int argc, char *argv[])
             //readFields
             //(
             //    vMesh,
-            //    pointMesh::New(vMesh.baseMesh()),
+            //    pointMesh::New(vMesh),
             //    objects,
             //    selectedFields,
             //    pSymmtf
@@ -425,7 +448,7 @@ int main(int argc, char *argv[])
             //readFields
             //(
             //    vMesh,
-            //    pointMesh::New(vMesh.baseMesh()),
+            //    pointMesh::New(vMesh),
             //    objects,
             //    selectedFields,
             //    ptf

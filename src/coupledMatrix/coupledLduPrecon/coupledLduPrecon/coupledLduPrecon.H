@@ -80,6 +80,9 @@ protected:
 
 public:
 
+    //- Find the preconditioner name (directly or from a sub-dictionary)
+    static word getName(const dictionary&);
+
     //- Runtime type information
     virtual const word& type() const = 0;
 

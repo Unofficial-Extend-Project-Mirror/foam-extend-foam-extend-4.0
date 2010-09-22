@@ -1,7 +1,11 @@
 {
 #   include "continuityErrs.H"
 
-    wordList pcorrTypes(pd.boundaryField().types());
+    wordList pcorrTypes
+    (
+        pd.boundaryField().size(),
+        zeroGradientFvPatchScalarField::typeName
+    );
 
     for (label i=0; i<pd.boundaryField().size(); i++)
     {

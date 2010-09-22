@@ -27,22 +27,24 @@ Application
 
 Description
     Solver for n incompressible fluids which captures the interfaces and
-    includes surface-tension and contact-angle effects for each.
+    includes surface-tension and contact-angle effects for each phase.
+
+    Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
 
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
 #include "multiphaseMixture.H"
+#include "turbulenceModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
-
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createMesh.H"
-#   include "readEnvironmentalProperties.H"
+    #include "readGravitationalAcceleration.H"
 #   include "readPISOControls.H"
 #   include "initContinuityErrs.H"
 #   include "createFields.H"
@@ -79,6 +81,8 @@ int main(int argc, char *argv[])
 
 #       include "continuityErrs.H"
 
+        turbulence->correct();
+
         runTime.write();
 
         Info<< "ExecutionTime = "
@@ -88,7 +92,7 @@ int main(int argc, char *argv[])
 
     Info<< "\n end \n";
 
-    return(0);
+    return 0;
 }
 
 

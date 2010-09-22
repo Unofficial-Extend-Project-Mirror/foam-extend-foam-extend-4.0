@@ -43,15 +43,15 @@ Description
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCase.H"
-    #include "createTime.H"
-    #include "createMesh.H"
-    #include "readGravitationalAcceleration.H"
-    #include "createFields.H"
-    #include "initContinuityErrs.H"
-    #include "readTimeControls.H"
-    #include "compressibleCourantNo.H"
-    #include "setInitialDeltaT.H"
+#   include "setRootCase.H"
+#   include "createTime.H"
+#   include "createMesh.H"
+#   include "readGravitationalAcceleration.H"
+#   include "createFields.H"
+#   include "initContinuityErrs.H"
+#   include "readTimeControls.H"
+#   include "compressibleCourantNo.H"
+#   include "setInitialDeltaT.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,26 +59,26 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-        #include "readTimeControls.H"
-        #include "readPISOControls.H"
-        #include "compressibleCourantNo.H"
-        #include "setDeltaT.H"
+#       include "readTimeControls.H"
+#       include "readPISOControls.H"
+#       include "compressibleCourantNo.H"
+#       include "setDeltaT.H"
 
         runTime++;
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        #include "rhoEqn.H"
+#       include "rhoEqn.H"
 
-        #include "UEqn.H"
+#       include "UEqn.H"
 
-        #include "hEqn.H"
+#       include "hEqn.H"
 
         // --- PISO loop
 
         for (int corr=0; corr<nCorr; corr++)
         {
-            #include "pEqn.H"
+#           include "pEqn.H"
         }
 
         turbulence->correct();

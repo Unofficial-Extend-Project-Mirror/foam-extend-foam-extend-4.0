@@ -173,8 +173,8 @@ public:
         // Member functions
 
             //- Solve returning the solution statistics.
-            //  Solver controls read from Istream
-            lduSolverPerformance solve(Istream&);
+            //  Solver controls read from dictionary
+            lduSolverPerformance solve(const dictionary&);
 
             //- Solve returning the solution statistics.
             //  Solver controls read from faSolution
@@ -300,15 +300,15 @@ public:
 
             //- Construct and return the solver
             //  Solver controls read from Istream
-            autoPtr<faSolver> solver(Istream&);
+            autoPtr<faSolver> solver(const dictionary&);
 
             //- Construct and return the solver
-            //  Solver controls read from fvSolution
+            //  Solver controls read from faSolution
             autoPtr<faSolver> solver();
 
             //- Solve returning the solution statistics.
             //  Solver controls read Istream
-            lduSolverPerformance solve(Istream&);
+            lduSolverPerformance solve(const dictionary&);
 
             //- Solve returning the solution statistics.
             //  Solver controls read from faSolution

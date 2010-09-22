@@ -52,21 +52,16 @@ class Time;
 \*---------------------------------------------------------------------------*/
 
 class vtkMesh
+:
+    public fvMesh
 {
     // Private data
 
-        //- Reference to mesh
-        fvMesh& baseMesh_;
-
-        //- Subsetting engine + sub-fvMesh
-        fvMeshSubset subsetter_;
+        //- Mesh subset
+        fvMeshSubset subsetMesh_;
 
         //- Current cellSet (or empty)
         const word setName_;
-
-//        //- Current decomposition of topology
-//        mutable autoPtr<vtkTopo> topoPtr_;
-
 
 
     // Private Member Functions
@@ -83,22 +78,21 @@ public:
     // Constructors
 
         //- Construct from components
-        vtkMesh(fvMesh& baseMesh, const word& setName = "");
+        vtkMesh(const IOobject& io, const word& setName = "");
+
+
+    // Destructor
+
+        ~vtkMesh();
 
 
     // Member Functions
 
         // Access
 
-            //- whole mesh
-            const fvMesh& baseMesh() const
+            const fvMeshSubset& subsetMesh() const
             {
-                return baseMesh_;
-            }
-
-            const fvMeshSubset& subsetter() const
-            {
-                return subsetter_;
+                return subsetMesh_;
             }
 
             //- Check if running subMesh
@@ -107,40 +101,18 @@ public:
                 return setName_.size();
             }
 
-//            //- topology
-//            const vtkTopo& topo() const
-//            {
-//                if (topoPtr_.empty())
-//                {
-//                    topoPtr_.reset(new vtkTopo(mesh()));
-//                }
-//                return topoPtr_();
-//            }
-
             //- Access either mesh or submesh
             const fvMesh& mesh() const
             {
                 if (useSubMesh())
                 {
-                    return subsetter_.subMesh();
+                    return subsetMesh_.subMesh();
                 }
                 else
                 {
-                    return baseMesh_;
+                    return *this;
                 }
             }
-
-//            //- Number of field cells
-//            label nFieldCells() const
-//            {
-//                return topo().vertLabels().size();
-//            }
-//
-//            //- Number of field points
-//            label nFieldPoints() const
-//            {
-//                return mesh().nPoints() + topo().addPointCellLabels().size();
-//            }
 
 
         // Edit
@@ -156,7 +128,7 @@ public:
             {
                 if (useSubMesh())
                 {
-                    tmp<GeoField> subFld = subsetter_.interpolate(fld);
+                    tmp<GeoField> subFld = subsetMesh_.interpolate(fld);
                     subFld().rename(fld.name());
                     return subFld;
                 }

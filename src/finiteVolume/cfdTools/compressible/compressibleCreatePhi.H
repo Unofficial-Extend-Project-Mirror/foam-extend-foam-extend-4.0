@@ -30,8 +30,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef compressibleCreatePhi_H
-#define compressibleCreatePhi_H
+// Include protection not allowed.  HJ, 22/Sep/2010
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,8 +49,5 @@ surfaceScalarField phi
     linearInterpolate(rho*U) & mesh.Sf()
 );
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     // Force n-sqaured projection
 //     polyPatch::setNSquaredProjection(true);
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.loop())
     {
         Info<< "Iteration: " << runTime.timeName() << nl << endl;
 

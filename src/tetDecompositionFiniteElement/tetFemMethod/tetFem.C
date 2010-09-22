@@ -52,7 +52,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacian
         (
             "gamma",
             vf.time().constant(),
-            vf.mesh(),
+            vf.db(),
             IOobject::NO_READ
         ),
         vf.mesh(),
@@ -217,7 +217,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacian
         (
             "gamma",
             vf.instance(),
-            vf.mesh(),
+            vf.db(),
             IOobject::NO_READ
         ),
         vf.mesh(),
@@ -240,7 +240,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacianTranspose
         (
             "gamma",
             vf.time().constant(),
-            vf.mesh(),
+            vf.db(),
             IOobject::NO_READ
         ),
         vf.mesh(),
@@ -409,7 +409,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacianTranspose
         (
             gamma.name(),
             vf.instance(),
-            vf.mesh(),
+            vf.db(),
             IOobject::NO_READ
         ),
         vf.mesh(),
@@ -574,7 +574,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacianTrace
         (
             gamma.name(),
             vf.instance(),
-            vf.mesh(),
+            vf.db(),
             IOobject::NO_READ
         ),
         vf.mesh(),
@@ -597,7 +597,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacianTrace
         (
             "1",
             vf.instance(),
-            vf.mesh(),
+            vf.db(),
             IOobject::NO_READ
         ),
         vf.mesh(),

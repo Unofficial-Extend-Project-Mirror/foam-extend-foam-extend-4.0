@@ -26,9 +26,9 @@ Application
     icoFoam
 
 Description
-    Transient solver for incompressible, laminar flow of Newtonian fluids with 
+    Transient solver for incompressible, laminar flow of Newtonian fluids with
     mesh motion.  Set up as a fake fluid structure interaction solver
-    
+
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"

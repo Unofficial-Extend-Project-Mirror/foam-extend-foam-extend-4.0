@@ -39,11 +39,14 @@ namespace Foam
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<>
-coupledSolverPerformance coupledFvMatrix<scalar>::solve(Istream& solverControls)
+coupledSolverPerformance coupledFvMatrix<scalar>::solve
+(
+    const dictionary& solverControls
+)
 {
     if (debug)
     {
-        InfoIn("coupledFvMatrix<Type>::solve(Istream& solverControls)")
+        InfoIn("coupledFvMatrix<Type>::solve(const dictionary)")
             << "solving coupledFvMatrix<Type>" << endl;
     }
 

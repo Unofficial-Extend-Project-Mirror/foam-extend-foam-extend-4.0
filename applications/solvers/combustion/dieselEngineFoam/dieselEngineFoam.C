@@ -77,12 +77,6 @@ int main(int argc, char *argv[])
         Info<< "Crank angle = " << runTime.theta() << " CA-deg" << endl;
 
         mesh.move();
-        Check that this is unnecessary. HJ
-        // 1.6.x merge.  HJ, 26/Aug/2010
-        const_cast<volPointInterpolation&>
-        (
-            volPointInterpolation::New(mesh)
-        ).updateMesh();
 
         dieselSpray.evolve();
 

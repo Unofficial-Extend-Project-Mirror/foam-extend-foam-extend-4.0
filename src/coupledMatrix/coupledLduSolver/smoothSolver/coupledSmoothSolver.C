@@ -58,7 +58,7 @@ Foam::coupledSmoothSolver::coupledSmoothSolver
     const PtrList<FieldField<Field, scalar> >& bouCoeffs,
     const PtrList<FieldField<Field, scalar> >& intCoeffs,
     const lduInterfaceFieldPtrsListList& interfaces,
-    Istream& solverData
+    const dictionary& solverData
 )
 :
     coupledIterativeSolver
@@ -101,11 +101,11 @@ Foam::coupledSolverPerformance Foam::coupledSmoothSolver::solve
     {
         autoPtr<coupledLduSmoother> smootherPtr = coupledLduSmoother::New
         (
-            word(dict().lookup("smoother")),
             matrix_,
             bouCoeffs_,
             intCoeffs_,
-            interfaces_
+            interfaces_,
+            dict()
         );
 
         smootherPtr->smooth
@@ -145,11 +145,11 @@ Foam::coupledSolverPerformance Foam::coupledSmoothSolver::solve
         autoPtr<coupledLduSmoother> smootherPtr =
             coupledLduSmoother::New
             (
-                word(dict().lookup("smoother")),
                 matrix_,
                 bouCoeffs_,
                 intCoeffs_,
-                interfaces_
+                interfaces_,
+                dict()
             );
 
         // Smoothing loop

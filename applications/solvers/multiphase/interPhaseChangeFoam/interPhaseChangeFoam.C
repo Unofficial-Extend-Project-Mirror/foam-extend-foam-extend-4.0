@@ -28,12 +28,16 @@ Application
 Description
     Solver for 2 incompressible, isothermal immiscible fluids with phase-change
     (e.g. cavitation).  Uses a VOF (volume of fluid) phase-fraction based
-    interface capturing approach.  The momentum and other fluid properties are
-    of the "mixture" and a single momentum equation is solved.
+    interface capturing approach.
+
+    The momentum and other fluid properties are of the "mixture" and a
+    single momentum equation is solved.
 
     The set of phase-change models provided are designed to simulate cavitation
     but other mechanisms of phase-change are supported within this solver
     framework.
+
+    Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
 
 \*---------------------------------------------------------------------------*/
 
@@ -42,23 +46,23 @@ Description
 #include "subCycle.H"
 #include "interfaceProperties.H"
 #include "phaseChangeTwoPhaseMixture.H"
-#include "incompressible/LESModel/LESModel.H"
+#include "turbulenceModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCase.H"
-    #include "createTime.H"
-    #include "createMesh.H"
-    #include "readEnvironmentalProperties.H"
-    #include "readPISOControls.H"
-    #include "initContinuityErrs.H"
-    #include "createFields.H"
-    #include "readTimeControls.H"
-    #include "correctPhi.H"
-    #include "CourantNo.H"
-    #include "setInitialDeltaT.H"
+#   include "setRootCase.H"
+#   include "createTime.H"
+#   include "createMesh.H"
+#   include "readGravitationalAcceleration.H"
+#   include "readPISOControls.H"
+#   include "initContinuityErrs.H"
+#   include "createFields.H"
+#   include "readTimeControls.H"
+#   include "correctPhi.H"
+#   include "CourantNo.H"
+#   include "setInitialDeltaT.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -66,18 +70,16 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-        #include "readPISOControls.H"
-        #include "readTimeControls.H"
-        #include "CourantNo.H"
-        #include "setDeltaT.H"
+#       include "readPISOControls.H"
+#       include "readTimeControls.H"
+#       include "CourantNo.H"
+#       include "setDeltaT.H"
 
         runTime++;
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        twoPhaseProperties->correct();
-
-        #include "gammaEqnSubCycle.H"
+#       include "alphaEqnSubCycle.H"
 
         turbulence->correct();
 
@@ -89,11 +91,13 @@ int main(int argc, char *argv[])
             // --- PISO loop
             for (int corr=0; corr<nCorr; corr++)
             {
-                #include "pEqn.H"
+#               include "pEqn.H"
             }
 
-            #include "continuityErrs.H"
+#            include "continuityErrs.H"
         }
+
+        twoPhaseProperties->correct();
 
         runTime.write();
 
@@ -104,7 +108,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

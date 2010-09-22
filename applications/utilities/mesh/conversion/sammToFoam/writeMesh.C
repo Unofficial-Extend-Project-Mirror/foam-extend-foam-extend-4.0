@@ -47,7 +47,7 @@ void sammMesh::writeMesh()
                 runTime_.constant(),
                 runTime_
             ),
-            points_,
+            xferCopy(points_),           // we could probably re-use the data
             cellShapes_,
             boundary_,
             patchNames_,
@@ -76,9 +76,9 @@ void sammMesh::writeMesh()
                 runTime_.constant(),
                 runTime_
             ),
-            points_,
-            meshFaces_,
-            cellPolys_
+            xferCopy(points_),           // we could probably re-use the data
+            xferCopy(meshFaces_),
+            xferCopy(cellPolys_)
         );
 
         pMesh.addPatches(polyBoundaryPatches(pMesh));

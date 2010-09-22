@@ -12,12 +12,12 @@
         mesh
     );
 
-    Info<< "Reading field gamma\n" << endl;
-    volScalarField gamma
+    Info<< "Reading field alpha1\n" << endl;
+    volScalarField alpha1
     (
         IOobject
         (
-            "gamma",
+            "alpha1",
             runTime.timeName(),
             mesh,
             IOobject::MUST_READ,
@@ -44,7 +44,7 @@
 
     Info<< "Creating phaseChangeTwoPhaseMixture\n" << endl;
     autoPtr<phaseChangeTwoPhaseMixture> twoPhaseProperties =
-        phaseChangeTwoPhaseMixture::New(U, phi, "gamma");
+        phaseChangeTwoPhaseMixture::New(U, phi, "alpha1");
 
     const dimensionedScalar& rho1 = twoPhaseProperties->rho1();
     const dimensionedScalar& rho2 = twoPhaseProperties->rho2();
@@ -60,19 +60,32 @@
             mesh,
             IOobject::READ_IF_PRESENT
         ),
-        gamma*rho1 + (scalar(1) - gamma)*rho2,
-        gamma.boundaryField().types()
+        alpha1*rho1 + (scalar(1) - alpha1)*rho2,
+        alpha1.boundaryField().types()
     );
     rho.oldTime();
 
 
-    label pdRefCell = 0;
-    scalar pdRefValue = 0.0;
-    setRefCell(pd, mesh.solutionDict().subDict("PISO"), pdRefCell, pdRefValue);
+    // Mass flux
+    // Initialisation does not matter because rhoPhi is reset after the
+    // alpha1 solution before it is used in the U equation.
+    surfaceScalarField rhoPhi
+    (
+        IOobject
+        (
+            "rho*phi",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        rho1*phi
+    );
 
-    Info<< "Calculating field g.h" << endl;
+
+    Info<< "Calculating field g.h\n" << endl;
     volScalarField gh("gh", g & mesh.C());
-    surfaceScalarField ghf("ghf", g & mesh.Cf());
+    surfaceScalarField ghf("gh", g & mesh.Cf());
 
     volScalarField p
     (
@@ -88,11 +101,32 @@
     );
 
 
-    // Construct interface from gamma distribution
-    interfaceProperties interface(gamma, U, twoPhaseProperties());
+    label pdRefCell = 0;
+    scalar pdRefValue = 0.0;
+    setRefCell(pd, mesh.solutionDict().subDict("PISO"), pdRefCell, pdRefValue);
 
-    // Construct LES model
-    autoPtr<incompressible::LESModel> turbulence
+    scalar pRefValue = 0.0;
+
+    if (pd.needReference())
+    {
+        pRefValue = readScalar
+        (
+            mesh.solutionDict().subDict("PISO").lookup("pRefValue")
+        );
+
+        p += dimensionedScalar
+        (
+            "p",
+            p.dimensions(),
+            pRefValue - getRefCellValue(p, pdRefCell)
+        );
+    }
+
+    // Construct interface from alpha1 distribution
+    interfaceProperties interface(alpha1, U, twoPhaseProperties());
+
+    // Construct incompressible turbulence model
+    autoPtr<incompressible::turbulenceModel> turbulence
     (
-        incompressible::LESModel::New(U, phi, twoPhaseProperties())
+        incompressible::turbulenceModel::New(U, phi, twoPhaseProperties())
     );

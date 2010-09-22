@@ -43,12 +43,11 @@ Description
 
 int main(int argc, char *argv[])
 {
-
 #   include "setRootCase.H"
 
 #   include "createTime.H"
 #   include "createMesh.H"
-#   include "readEnvironmentalProperties.H"
+#   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
 
@@ -57,7 +56,7 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
@@ -66,22 +65,24 @@ int main(int argc, char *argv[])
 
 #       include "rhoEqn.H"
 
-#       include "calcVdj.H"
-
-#       include "UEqn.H"
-
-#       include "alphaEqn.H"
-
-#       include "correctViscosity.H"
-
-
-        // --- PISO loop
-        for (int corr=0; corr<nCorr; corr++)
+        for (int oCorr=0; oCorr<nOuterCorr; oCorr++)
         {
-#           include "pEqn.H"
-        }
+#           include "calcVdj.H"
 
-#       include "kEpsilon.H"
+#           include "UEqn.H"
+
+#           include "alphaEqn.H"
+
+#           include "correctViscosity.H"
+
+            // --- PISO loop
+            for (int corr=0; corr<nCorr; corr++)
+            {
+#               include "pEqn.H"
+            }
+
+#           include "kEpsilon.H"
+        }
 
         runTime.write();
 
@@ -92,7 +93,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

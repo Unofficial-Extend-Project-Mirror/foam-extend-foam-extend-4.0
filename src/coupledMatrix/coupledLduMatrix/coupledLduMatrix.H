@@ -109,8 +109,8 @@ public:
                 const lduInterfaceFieldPtrsListList& interfaces,
                 const direction cmpt
             ) const;
-    
-            //- Matrix transpose multiplication with updated coupled interfaces.
+
+            //- Matrix transpose multiplication with updated coupled interfaces
             void Tmul
             (
                 FieldField<Field, scalar>& result,

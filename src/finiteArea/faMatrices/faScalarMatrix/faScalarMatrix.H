@@ -56,13 +56,19 @@ void faMatrix<scalar>::setComponentReference
 );
 
 template<>
-autoPtr<faMatrix<scalar>::faSolver> faMatrix<scalar>::solver(Istream&);
+autoPtr<faMatrix<scalar>::faSolver> faMatrix<scalar>::solver
+(
+    const dictionary&
+);
 
 template<>
-lduSolverPerformance faMatrix<scalar>::faSolver::solve(Istream&);
+lduSolverPerformance faMatrix<scalar>::faSolver::solve
+(
+    const dictionary&
+);
 
 template<>
-lduSolverPerformance faMatrix<scalar>::solve(Istream&);
+lduSolverPerformance faMatrix<scalar>::solve(const dictionary&);
 
 // Return the matrix residual
 template<>

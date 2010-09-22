@@ -30,8 +30,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef createPhiv_H
-#define createPhiv_H
+// Include protection not allowed.  HJ, 22/Sep/2010
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,8 +49,5 @@ surfaceScalarField phiv
     linearInterpolate(U) & mesh.Sf()
 );
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

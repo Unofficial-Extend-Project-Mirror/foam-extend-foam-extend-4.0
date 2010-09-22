@@ -32,8 +32,8 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "incompressible/singlePhaseTransportModel/singlePhaseTransportModel.H"
-#include "incompressible/RASModel/RASModel.H"
+#include "singlePhaseTransportModel.H"
+#include "turbulenceModel.H"
 #include "dynamicFvMesh.H"
 #include "engineTime.H"
 
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
                 {
                     pEqn.solve(mesh.solver(p.name()));
                 }
-            
+
                 if (nonOrth == nNonOrthCorr)
                 {
                     phi -= pEqn.flux();

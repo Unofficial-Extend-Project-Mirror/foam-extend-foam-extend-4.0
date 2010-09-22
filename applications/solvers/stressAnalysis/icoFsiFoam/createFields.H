@@ -12,12 +12,10 @@
         )
     );
 
-
     dimensionedScalar nu
     (
         transportProperties.lookup("nu")
     );
-
 
     dimensionedScalar rhoFluid
     (
@@ -55,11 +53,6 @@
     );
 
 #   include "createPhi.H"
-
-
-//     surfaceScalarField phiNet = phi;
-//     phiNet.rename("phiNet");
-
 
     label pRefCell = 0;
     scalar pRefValue = 0.0;

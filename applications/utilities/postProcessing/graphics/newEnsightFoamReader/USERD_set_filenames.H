@@ -47,7 +47,7 @@ int USERD_set_filenames
     }
     caseDir = tmp;
 
-    if (!dir(rootDir/caseDir))
+    if (!isDir(rootDir/caseDir))
     {
        Info<< rootDir/caseDir << " is not a valid directory."
            << endl;

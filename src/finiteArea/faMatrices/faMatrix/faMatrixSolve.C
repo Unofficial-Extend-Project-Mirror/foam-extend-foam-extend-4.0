@@ -27,8 +27,6 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 namespace Foam
 {
 
@@ -54,11 +52,11 @@ void faMatrix<Type>::setComponentReference
 
 
 template<class Type>
-lduSolverPerformance faMatrix<Type>::solve(Istream& solverControls)
+lduSolverPerformance faMatrix<Type>::solve(const dictionary& solverControls)
 {
     if (debug)
     {
-        Info<< "faMatrix<Type>::solve(Istream& solverControls) : "
+        Info<< "faMatrix<Type>::solve(const dictionary&) : "
                "solving faMatrix<Type>"
             << endl;
     }
@@ -107,7 +105,7 @@ lduSolverPerformance faMatrix<Type>::solve(Istream& solverControls)
             bouCoeffsCmpt,
             intCoeffsCmpt,
             interfaces,
-            solverControls.rewind()
+            solverControls
         )->solve(psiCmpt, sourceCmpt, cmpt);
 
         solverPerf.print();
@@ -134,20 +132,20 @@ lduSolverPerformance faMatrix<Type>::solve(Istream& solverControls)
 template<class Type>
 autoPtr<typename faMatrix<Type>::faSolver> faMatrix<Type>::solver()
 {
-    return solver(psi_.mesh().solver(psi_.name()));
+    return solver(psi_.mesh().solverDict(psi_.name()));
 }
 
 template<class Type>
 lduSolverPerformance faMatrix<Type>::faSolver::solve()
 {
-    return solve(psi_.mesh().solver(psi_.name()));
+    return solve(psi_.mesh().solverDict(psi_.name()));
 }
 
 
 template<class Type>
 lduSolverPerformance faMatrix<Type>::solve()
 {
-    return solve(psi_.mesh().solver(psi_.name()));
+    return solve(psi_.mesh().solverDict(psi_.name()));
 }
 
 

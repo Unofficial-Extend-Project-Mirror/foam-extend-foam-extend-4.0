@@ -48,7 +48,7 @@ Description
 #include "polyMeshAdder.H"
 #include "faceCoupleInfo.H"
 #include "fvMeshAdder.H"
-#include "polyTopoChange.H"
+#include "directTopoChange.H"
 
 using namespace Foam;
 
@@ -232,7 +232,7 @@ autoPtr<mapPolyMesh> mergeSharedPoints
         return autoPtr<mapPolyMesh>(NULL);
     }
 
-    polyTopoChange meshMod(mesh);
+    directTopoChange meshMod(mesh);
 
     fvMeshAdder::mergePoints(mesh, pointToMaster, meshMod);
 

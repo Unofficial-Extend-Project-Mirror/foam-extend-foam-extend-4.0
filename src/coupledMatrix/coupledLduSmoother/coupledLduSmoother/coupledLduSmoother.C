@@ -31,7 +31,7 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "coupledLduSmoother.H"
 
@@ -45,15 +45,53 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 
+Foam::word Foam::coupledLduSmoother::getName
+(
+    const dictionary& dict
+)
+{
+    word name;
+
+    // handle primitive or dictionary entry
+    const entry& e = dict.lookupEntry("smoother", false, false);
+    if (e.isDict())
+    {
+        e.dict().lookup("smoother") >> name;
+    }
+    else
+    {
+        e.stream() >> name;
+    }
+
+    return name;
+}
+
+
 Foam::autoPtr<Foam::coupledLduSmoother> Foam::coupledLduSmoother::New
 (
-    const word& smootherName,
     const coupledLduMatrix& matrix,
     const PtrList<FieldField<Field, scalar> >& bouCoeffs,
     const PtrList<FieldField<Field, scalar> >& intCoeffs,
-    const lduInterfaceFieldPtrsListList& interfaces
+    const lduInterfaceFieldPtrsListList& interfaces,
+    const dictionary& dict
 )
 {
+    word smootherName;
+
+    // Handle primitive or dictionary entry
+    const entry& e = dict.lookupEntry("smoother", false, false);
+    if (e.isDict())
+    {
+        e.dict().lookup("smoother") >> smootherName;
+    }
+    else
+    {
+        e.stream() >> smootherName;
+    }
+
+    // Not (yet?) needed:
+    // const dictionary& controls = e.isDict() ? e.dict() : dictionary::null;
+
     wordConstructorTable::iterator constructorIter =
         wordConstructorTablePtr_->find(smootherName);
 

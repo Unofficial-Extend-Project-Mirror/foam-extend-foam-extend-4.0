@@ -26,7 +26,7 @@ Application
     bubbleFoam
 
 Description
-    Solver for a system of 2 incompressible fluid phases with one phase 
+    Solver for a system of 2 incompressible fluid phases with one phase
     dispersed, e.g. gas bubbles in a liquid.
 
 \*---------------------------------------------------------------------------*/
@@ -40,12 +40,11 @@ Description
 
 int main(int argc, char *argv[])
 {
-
 #   include "setRootCase.H"
 
 #   include "createTime.H"
 #   include "createMesh.H"
-#   include "readEnvironmentalProperties.H"
+#   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
 
@@ -53,7 +52,7 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 

@@ -31,7 +31,7 @@ Description
 
     Default behaviour assumes operating in incompressible mode. To apply to
     compressible RAS cases, use the -compressible option.
-    
+
     Extended version for being able to handle two phase flows using the
     -twoPhase option.
 
@@ -40,7 +40,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "twoPhaseMixture.H"
+#include "incompressible/incompressibleTwoPhaseMixture/twoPhaseMixture.H"
 #include "incompressible/singlePhaseTransportModel/singlePhaseTransportModel.H"
 #include "incompressible/RAS/RASModel/RASModel.H"
 #include "nutWallFunction/nutWallFunctionFvPatchScalarField.H"
@@ -64,7 +64,7 @@ void calcIncompressibleYPlus
     typedef incompressible::RASModels::nutWallFunctionFvPatchScalarField
         wallFunctionPatchField;
 
-    #include "createPhi.H"
+#   include "createPhi.H"
 
     singlePhaseTransportModel laminarTransport(U, phi);
 
@@ -134,7 +134,7 @@ void calcCompressibleYPlus
     Info << "Reading field rho\n" << endl;
     volScalarField rho(rhoHeader, mesh);
 
-    #include "compressibleCreatePhi.H"
+#   include "compressibleCreatePhi.H"
 
     autoPtr<basicPsiThermo> pThermo
     (
@@ -178,6 +178,60 @@ void calcCompressibleYPlus
     }
 
     if (!foundMutPatch)
+    {
+        Info<< "    no " << wallFunctionPatchField::typeName << " patches"
+            << endl;
+    }
+}
+
+
+// Calculate two phase Y+
+void calcTwoPhaseYPlus
+(
+    const fvMesh& mesh,
+    const Time& runTime,
+    const volVectorField& U,
+    volScalarField& yPlus
+)
+{
+    typedef incompressible::RASModels::nutWallFunctionFvPatchScalarField
+        wallFunctionPatchField;
+
+#   include "createPhi.H"
+
+    Info<< "Reading transportProperties\n" << endl;
+    twoPhaseMixture twoPhaseProperties(U, phi, "gamma");
+
+    autoPtr<incompressible::RASModel> RASModel
+    (
+        incompressible::RASModel::New(U, phi, twoPhaseProperties)
+    );
+
+    const volScalarField::GeometricBoundaryField nutPatches =
+        RASModel->nut()().boundaryField();
+
+    bool foundNutPatch = false;
+    forAll(nutPatches, patchi)
+    {
+        if (isA<wallFunctionPatchField>(nutPatches[patchi]))
+        {
+            foundNutPatch = true;
+
+            const wallFunctionPatchField& nutPw =
+                dynamic_cast<const wallFunctionPatchField&>
+                    (nutPatches[patchi]);
+
+            yPlus.boundaryField()[patchi] = nutPw.yPlus();
+            const scalarField& Yp = yPlus.boundaryField()[patchi];
+
+            Info<< "Patch " << patchi
+                << " named " << nutPw.patch().name()
+                << " y+ : min: " << min(Yp) << " max: " << max(Yp)
+                << " average: " << average(Yp) << nl << endl;
+        }
+    }
+
+    if (!foundNutPatch)
     {
         Info<< "    no " << wallFunctionPatchField::typeName << " patches"
             << endl;
@@ -252,11 +306,14 @@ int main(int argc, char *argv[])
             {
                 calcCompressibleYPlus(mesh, runTime, U, yPlus);
             }
+            else if (twoPhase)
+            {
+                calcTwoPhaseYPlus(mesh, runTime, U, yPlus);
+            }
             else
             {
                 calcIncompressibleYPlus(mesh, runTime, U, yPlus);
             }
-            Add two phase.  HJ, 25/Aug/2010
         }
         else
         {

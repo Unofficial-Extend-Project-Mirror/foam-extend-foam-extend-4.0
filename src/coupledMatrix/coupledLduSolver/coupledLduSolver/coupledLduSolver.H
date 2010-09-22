@@ -95,7 +95,7 @@ public:
                 const PtrList<FieldField<Field, scalar> >& bouCoeffs,
                 const PtrList<FieldField<Field, scalar> >& intCoeffs,
                 const lduInterfaceFieldPtrsListList& interfaces,
-                Istream& solverData
+                const dictionary& solverData
             ),
             (
                 fieldName,
@@ -118,7 +118,7 @@ public:
                 const PtrList<FieldField<Field, scalar> >& bouCoeffs,
                 const PtrList<FieldField<Field, scalar> >& intCoeffs,
                 const lduInterfaceFieldPtrsListList& interfaces,
-                Istream& solverData
+                const dictionary& solverData
             ),
             (
                 fieldName,
@@ -160,7 +160,7 @@ public:
                 const PtrList<FieldField<Field, scalar> >& bouCoeffs,
                 const PtrList<FieldField<Field, scalar> >& intCoeffs,
                 const lduInterfaceFieldPtrsListList& interfaces,
-                Istream& solverData
+                const dictionary& solverData
             );
 
 

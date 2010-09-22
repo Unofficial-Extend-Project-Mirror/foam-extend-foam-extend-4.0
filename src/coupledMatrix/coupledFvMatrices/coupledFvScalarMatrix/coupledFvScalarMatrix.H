@@ -46,7 +46,7 @@ namespace Foam
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<>
-coupledSolverPerformance coupledFvMatrix<scalar>::solve(Istream&);
+coupledSolverPerformance coupledFvMatrix<scalar>::solve(const dictionary&);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -7,16 +7,18 @@
     surfaceScalarField phiU
     (
         "phiU",
-        (fvc::interpolate(U) & mesh.Sf()) + fvc::ddtPhiCorr(rUA, rho, U, phi)
+        (fvc::interpolate(U) & mesh.Sf())
+      + fvc::ddtPhiCorr(rUA, rho, U, phi)
     );
+
+    adjustPhi(phiU, U, p);
 
     phi = phiU +
         (
-            fvc::interpolate(interface.sigmaK())*fvc::snGrad(gamma)
+            fvc::interpolate(interface.sigmaK())*fvc::snGrad(alpha1)
           - ghf*fvc::snGrad(rho)
         )*rUAf*mesh.magSf();
 
-    adjustPhi(phi, U, pd);
 
     for(int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
     {

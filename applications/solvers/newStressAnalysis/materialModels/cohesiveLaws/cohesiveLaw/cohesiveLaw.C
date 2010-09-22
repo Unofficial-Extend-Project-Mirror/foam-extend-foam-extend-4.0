@@ -104,7 +104,7 @@ Foam::cohesiveLaw::~cohesiveLaw()
 
 void Foam::cohesiveLaw::writeDict(Ostream& os) const
 {
-    os.writeKeyword(type() + "Coeffs") 
+    os.writeKeyword(word(type() + "Coeffs"))
         << cohesiveLawCoeffs();
 }
 

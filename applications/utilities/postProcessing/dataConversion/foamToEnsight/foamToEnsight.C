@@ -161,6 +161,7 @@ int main(int argc, char *argv[])
         ensightCaseFilePtr = new OFstream
         (
             ensightDir/caseFileName,
+            ios_base::out|ios_base::trunc,
             IOstream::ASCII
         );
 

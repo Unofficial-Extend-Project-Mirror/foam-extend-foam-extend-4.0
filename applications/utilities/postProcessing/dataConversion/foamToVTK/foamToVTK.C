@@ -477,7 +477,7 @@ int main(int argc, char *argv[])
         // Construct the vol fields (on the original mesh if subsetted)
 
         PtrList<volScalarField> vsf;
-        readFields(vMesh, vMesh.baseMesh(), objects, selectedFields, vsf);
+        readFields(vMesh, vMesh, objects, selectedFields, vsf);
         readFields(vMesh, vMesh, objects, selectedFields, vsf);
         print("    volScalarFields            :", Info, vsf);
 
@@ -526,7 +526,7 @@ int main(int argc, char *argv[])
             readFields
             (
                 vMesh,
-                vMesh.basePointMesh(),
+                pointMesh::New(vMesh),
                 objects,
                 selectedFields,
                 psf
@@ -536,7 +536,7 @@ int main(int argc, char *argv[])
             readFields
             (
                 vMesh,
-                vMesh.basePointMesh(),
+                pointMesh::New(vMesh),
                 objects,
                 selectedFields,
                 pvf
@@ -546,7 +546,7 @@ int main(int argc, char *argv[])
             readFields
             (
                 vMesh,
-                vMesh.basePointMesh(),
+                pointMesh::New(vMesh),
                 objects,
                 selectedFields,
                 pSpheretf
@@ -556,7 +556,7 @@ int main(int argc, char *argv[])
             readFields
             (
                 vMesh,
-                vMesh.basePointMesh(),
+                pointMesh::New(vMesh),
                 objects,
                 selectedFields,
                 pSymmtf
@@ -566,7 +566,7 @@ int main(int argc, char *argv[])
             readFields
             (
                 vMesh,
-                vMesh.basePointMesh(),
+                pointMesh::New(vMesh),
                 objects,
                 selectedFields,
                 ptf
@@ -943,16 +943,19 @@ int main(int argc, char *argv[])
 
         //---------------------------------------------------------------------
         //
-        // Write lagrangian data
+        // Write finite area data
         //
         //---------------------------------------------------------------------
 
-        forAllConstIter(HashSet<fileName>, allCloudDirs, iter)
+        if (args.options().found("faMesh"))
         {
-            const fileName& cloudName = iter.key();
+            mkDir(fvPath/"faMesh");
 
-            // Always create the cloud directory.
-            mkDir(fvPath/cloud::prefix/cloudName);
+            fileName faFileName =
+                fvPath/"faMesh"/"faMesh"
+              + "_"
+              + name(timeI)
+              + ".vtk";
 
             // Create FA mesh
             faMesh aMesh(vMesh.mesh());
@@ -1011,6 +1014,21 @@ int main(int argc, char *argv[])
         // Write lagrangian data
         //
         //---------------------------------------------------------------------
+
+        forAllConstIter(HashSet<fileName>, allCloudDirs, iter)
+        {
+            const fileName& cloudName = iter.key();
+
+            // Always create the cloud directory.
+            mkDir(fvPath/cloud::prefix/cloudName);
+
+            fileName lagrFileName
+            (
+                fvPath/cloud::prefix/cloudName/cloudName
+              + "_" + timeDesc + ".vtk"
+            );
+
+            Info<< "    Lagrangian: " << lagrFileName << endl;
 
 
             IOobjectList sprayObjs

@@ -11,13 +11,14 @@
       + fvc::ddtPhiCorr(rUA, rho, U, phi)
     );
 
+    adjustPhi(phiU, U, p);
+
     phi = phiU +
         (
-            fvc::interpolate(interface.sigmaK())*fvc::snGrad(gamma)
+            fvc::interpolate(interface.sigmaK())*fvc::snGrad(alpha1)
           - ghf*fvc::snGrad(rho)
         )*rUAf*mesh.magSf();
 
-    adjustPhi(phi, U, pd);
 
     Pair<tmp<volScalarField> > vDotP = twoPhaseProperties->vDotP();
     const volScalarField& vDotcP = vDotP[0]();

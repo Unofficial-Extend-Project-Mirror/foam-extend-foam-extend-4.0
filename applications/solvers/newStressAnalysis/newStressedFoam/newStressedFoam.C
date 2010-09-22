@@ -52,11 +52,11 @@ int main(int argc, char *argv[])
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nCalculating displacement field\n" << endl;
- 
+
     volTensorField gradU = fvc::grad(U);
     volScalarField rho = rheology.rho();
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.loop())
     {
         Info<< "Iteration: " << runTime.timeName() << nl << endl;
 

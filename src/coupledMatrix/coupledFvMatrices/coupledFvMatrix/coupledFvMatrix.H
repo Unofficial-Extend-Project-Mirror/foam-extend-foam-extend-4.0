@@ -97,8 +97,8 @@ public:
     // Member functions
 
         //- Solve returning the solution statistics.
-        //  Solver controls read Istream
-        coupledSolverPerformance solve(Istream&);
+        //  Solver controls read from dictionary
+        coupledSolverPerformance solve(const dictionary&);
 
         //- Solve returning the solution statistics.
         //  Solver controls read from fvSolution

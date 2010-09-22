@@ -28,8 +28,11 @@ Application
 Description
     Solver for 2 incompressible, isothermal immiscible fluids using a VOF
     (volume of fluid) phase-fraction based interface capturing approach.
+
     The momentum and other fluid properties are of the "mixture" and a single
     momentum equation is solved.
+
+    Turbulence modelling is generic, i.e.  laminar, RAS or LES may be selected.
 
     For a two-fluid approach see twoPhaseEulerFoam.
 
@@ -40,6 +43,7 @@ Description
 #include "subCycle.H"
 #include "interfaceProperties.H"
 #include "twoPhaseMixture.H"
+#include "turbulenceModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,7 +52,7 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
-    #include "readEnvironmentalProperties.H"
+    #include "readGravitationalAcceleration.H"
     #include "readPISOControls.H"
     #include "initContinuityErrs.H"
     #include "createFields.H"
@@ -74,7 +78,7 @@ int main(int argc, char *argv[])
 
         twoPhaseProperties.correct();
 
-        #include "gammaEqnSubCycle.H"
+        #include "alphaEqnSubCycle.H"
 
         #include "UEqn.H"
 
@@ -107,7 +111,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return(0);
+    return 0;
 }
 
 

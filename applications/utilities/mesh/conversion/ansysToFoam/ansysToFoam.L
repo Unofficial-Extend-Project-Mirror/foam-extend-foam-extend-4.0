@@ -39,6 +39,8 @@ Description
  \* ------------------------------------------------------------------------- */
 
 #include <sstream>
+// For EOF only
+#include <cstdio>
 
 #include "scalar.H"
 #include "IStringStream.H"
@@ -278,7 +280,7 @@ int main(int argc, char *argv[])
     )
     {
         // Scale points for the given scale factor
-        points[i++] = scaleFactor*pointIter();
+        points[i++] = scaleFactor * pointIter();
     }
 
 
@@ -476,7 +478,7 @@ int main(int argc, char *argv[])
             runTime.constant(),
             runTime
         ),
-        points,
+        xferMove(points),
         cellShapes,
         boundary,
         patchNames,

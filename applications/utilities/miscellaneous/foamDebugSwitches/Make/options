@@ -12,7 +12,7 @@ EXE_LIBS = \
     -lerrorEstimation \
     -lfiniteVolume \
     -lforces \
-    -lfvMotionSolvers \
+    -lfvMotionSolver \
     -lincompressibleLESModels \
     -lincompressibleTransportModels \
     -lcompressibleRASModels \

@@ -164,7 +164,6 @@ int main(int argc, char *argv[])
 
     // Update fields
     mesh.updateMesh(map);
-    pMesh.updateMesh(map);
 
     // Update numbering of cells/vertices.
     meshCutter.updateMesh(map);
@@ -173,11 +172,11 @@ int main(int argc, char *argv[])
     if (map().hasMotionPoints())
     {
         mesh.movePoints(map().preMotionPoints());
-        pMesh.movePoints(map().preMotionPoints());
     }
 
     Pout<< "Refined from " << returnReduce(map().nOldCells(), sumOp<label>())
-        << " to " << mesh.globalData().nTotalCells() << " cells." << nl << endl;
+        << " to " << mesh.globalData().nTotalCells() << " cells."
+        << nl << endl;
 
     if (overwrite)
     {

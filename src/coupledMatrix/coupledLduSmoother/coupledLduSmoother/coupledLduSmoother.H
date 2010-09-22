@@ -80,6 +80,9 @@ protected:
 
 public:
 
+    //- Find the smoother name (directly or from a sub-dictionary)
+    static word getName(const dictionary&);
+
     //- Runtime type information
     virtual const word& type() const = 0;
 
@@ -129,11 +132,11 @@ public:
         //- Select given matrix data and type
         static autoPtr<coupledLduSmoother> New
         (
-            const word& smootherName,
             const coupledLduMatrix& matrix,
             const PtrList<FieldField<Field, scalar> >& bouCoeffs,
             const PtrList<FieldField<Field, scalar> >& intCoeffs,
-            const lduInterfaceFieldPtrsListList& interfaces
+            const lduInterfaceFieldPtrsListList& interfaces,
+            const dictionary& dict
         );
 
 

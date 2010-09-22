@@ -451,6 +451,7 @@ void writePatchField
         ensightFilePtr = new OFstream
         (
             postProcPath/ensightFileName,
+            ios_base::out|ios_base::trunc,
             runTime.writeFormat(),
             runTime.writeVersion(),
             runTime.writeCompression()
@@ -541,6 +542,7 @@ void ensightFieldAscii
         ensightFilePtr = new OFstream
         (
             postProcPath/ensightFileName,
+            ios_base::out|ios_base::trunc,
             runTime.writeFormat(),
             runTime.writeVersion(),
             runTime.writeCompression()
