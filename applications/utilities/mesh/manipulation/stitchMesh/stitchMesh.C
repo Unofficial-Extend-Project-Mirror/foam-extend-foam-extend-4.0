@@ -68,104 +68,6 @@ Description
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-label addPointZone(const polyMesh& mesh, const word& name)
-{
-    label zoneID = mesh.pointZones().findZoneID(name);
-
-    if (zoneID != -1)
-    {
-        Info<< "Reusing existing pointZone "
-            << mesh.pointZones()[zoneID].name()
-            << " at index " << zoneID << endl;
-    }
-    else
-    {
-        pointZoneMesh& pointZones = const_cast<polyMesh&>(mesh).pointZones();
-        zoneID = pointZones.size();
-        Info<< "Adding pointZone " << name << " at index " << zoneID << endl;
-
-        pointZones.setSize(zoneID+1);
-        pointZones.set
-        (
-            zoneID,
-            new pointZone
-            (
-                name,
-                labelList(0),
-                zoneID,
-                pointZones
-            )
-        );
-    }
-    return zoneID;
-}
-
-
-label addFaceZone(const polyMesh& mesh, const word& name)
-{
-    label zoneID = mesh.faceZones().findZoneID(name);
-
-    if (zoneID != -1)
-    {
-        Info<< "Reusing existing faceZone " << mesh.faceZones()[zoneID].name()
-            << " at index " << zoneID << endl;
-    }
-    else
-    {
-        faceZoneMesh& faceZones = const_cast<polyMesh&>(mesh).faceZones();
-        zoneID = faceZones.size();
-        Info<< "Adding faceZone " << name << " at index " << zoneID << endl;
-
-        faceZones.setSize(zoneID+1);
-        faceZones.set
-        (
-            zoneID,
-            new faceZone
-            (
-                name,
-                labelList(0),
-                boolList(),
-                zoneID,
-                faceZones
-            )
-        );
-    }
-    return zoneID;
-}
-
-
-label addCellZone(const polyMesh& mesh, const word& name)
-{
-    label zoneID = mesh.cellZones().findZoneID(name);
-
-    if (zoneID != -1)
-    {
-        Info<< "Reusing existing cellZone " << mesh.cellZones()[zoneID].name()
-            << " at index " << zoneID << endl;
-    }
-    else
-    {
-        cellZoneMesh& cellZones = const_cast<polyMesh&>(mesh).cellZones();
-        zoneID = cellZones.size();
-        Info<< "Adding cellZone " << name << " at index " << zoneID << endl;
-
-        cellZones.setSize(zoneID+1);
-        cellZones.set
-        (
-            zoneID,
-            new cellZone
-            (
-                name,
-                labelList(0),
-                zoneID,
-                cellZones
-            )
-        );
-    }
-    return zoneID;
-}
-
-
 // Checks whether patch present
 void checkPatch(const polyBoundaryMesh& bMesh, const word& name)
 {
@@ -203,8 +105,6 @@ int main(int argc, char *argv[])
 
     Foam::argList::validOptions.insert("overwrite", "");
 
-    Foam::argList::validOptions.insert("toleranceDict", "file with tolerances");
-
 #   include "setRootCase.H"
 #   include "createTime.H"
     runTime.functionObjects().off();
@@ -217,7 +117,7 @@ int main(int argc, char *argv[])
 
     bool partialCover = args.optionFound("partial");
     bool perfectCover = args.optionFound("perfect");
-    bool overwrite    = args.optionFound("overwrite");
+    bool overwrite = args.optionFound("overwrite");
 
     if (partialCover && perfectCover)
     {
@@ -268,22 +168,6 @@ int main(int argc, char *argv[])
             << "If this is not the case use the -partial option" << nl << endl;
     }
 
-    // set up the tolerances for the sliding mesh
-    dictionary slidingTolerances;
-    if (args.options().found("toleranceDict")) 
-    {
-        IOdictionary toleranceFile(
-            IOobject(
-                args.options()["toleranceDict"],
-                runTime.constant(),
-                mesh,
-                IOobject::MUST_READ,
-                IOobject::NO_WRITE                 
-            )
-        );
-        slidingTolerances += toleranceFile;
-    }
-
     // Check for non-empty master and slave patches
     checkPatch(mesh.boundaryMesh(), masterPatchName);
     checkPatch(mesh.boundaryMesh(), slavePatchName);
@@ -308,20 +192,29 @@ int main(int argc, char *argv[])
     polyTopoChanger stitcher(mesh);
     stitcher.setSize(1);
 
-    mesh.pointZones().clearAddressing();
-    mesh.faceZones().clearAddressing();
-    mesh.cellZones().clearAddressing();
+    DynamicList<pointZone*> pz;
+    DynamicList<faceZone*> fz;
+    DynamicList<cellZone*> cz;
 
     if (perfectCover)
     {
         // Add empty zone for resulting internal faces
-        label cutZoneID = addFaceZone(mesh, cutZoneName);
-
-        mesh.faceZones()[cutZoneID].resetAddressing
+        fz.append
         (
-            isf,
-            boolList(masterPatch.size(), false)
+            new faceZone
+            (
+                cutZoneName,
+                isf,
+                boolList(masterPatch.size(), false),
+                0,
+                mesh.faceZones()
+            )
         );
+
+        // Note: make sure to add the zones BEFORE constructing polyMeshModifier
+        // (since looks up various zones at construction time)
+        Info << "Adding point and face zones" << endl;
+        mesh.addZones(pz.shrink(), fz.shrink(), cz.shrink());
 
         // Add the perfect interface mesh modifier
         stitcher.set
@@ -340,15 +233,27 @@ int main(int argc, char *argv[])
     }
     else
     {
-        label pointZoneID = addPointZone(mesh, mergePatchName + "CutPointZone");
-        mesh.pointZones()[pointZoneID] = labelList(0);
-
-        label masterZoneID = addFaceZone(mesh, mergePatchName + "MasterZone");
-
-        mesh.faceZones()[masterZoneID].resetAddressing
+        pz.append
         (
-            isf,
-            boolList(masterPatch.size(), false)
+            new pointZone
+            (
+                mergePatchName + "CutPointZone",
+                labelList(0),
+                0,
+                mesh.pointZones()
+            )
+        );
+
+        fz.append
+        (
+            new faceZone
+            (
+                mergePatchName + "MasterZone",
+                isf,
+                boolList(masterPatch.size(), false),
+                0,
+                mesh.faceZones()
+            )
         );
 
         // Slave patch
@@ -365,21 +270,36 @@ int main(int argc, char *argv[])
             osf[i] = slavePatch.start() + i;
         }
 
-        label slaveZoneID = addFaceZone(mesh, mergePatchName + "SlaveZone");
-        mesh.faceZones()[slaveZoneID].resetAddressing
+        fz.append
         (
-            osf,
-            boolList(slavePatch.size(), false)
+            new faceZone
+            (
+                mergePatchName + "SlaveZone",
+                osf,
+                boolList(slavePatch.size(), false),
+                1,
+                mesh.faceZones()
+            )
         );
 
         // Add empty zone for cut faces
-        label cutZoneID = addFaceZone(mesh, cutZoneName);
-        mesh.faceZones()[cutZoneID].resetAddressing
+        fz.append
         (
-            labelList(0),
-            boolList(0, false)
+            new faceZone
+            (
+                cutZoneName,
+                labelList(0),
+                boolList(0, false),
+                2,
+                mesh.faceZones()
+            )
         );
 
+
+        // Note: make sure to add the zones BEFORE constructing
+        // polyMeshModifier (since looks up various zones at construction time)
+        Info << "Adding point and face zones" << endl;
+        mesh.addZones(pz.shrink(), fz.shrink(), cz.shrink());
 
         // Add the sliding interface mesh modifier
         stitcher.set
@@ -396,14 +316,10 @@ int main(int argc, char *argv[])
                 cutZoneName,
                 masterPatchName,
                 slavePatchName,
-                tom,                    // integral or partial
-                true                    // couple/decouple mode
+                tom,                  // integral or partial
+                false,                // Attach-detach action
+                intersection::VISIBLE
             )
-        );
-        static_cast<slidingInterface&>(stitcher[0]).setTolerances
-        (
-            slidingTolerances,
-            true
         );
     }
 
@@ -445,7 +361,7 @@ int main(int argc, char *argv[])
     }
 
     // Execute all polyMeshModifiers
-    autoPtr<mapPolyMesh> morphMap = stitcher.changeMesh(true);
+    autoPtr<mapPolyMesh> morphMap = stitcher.changeMesh();
 
     mesh.movePoints(morphMap->preMotionPoints());
 

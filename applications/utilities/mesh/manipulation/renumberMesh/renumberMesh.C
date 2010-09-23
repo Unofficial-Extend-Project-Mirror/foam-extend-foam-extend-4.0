@@ -88,7 +88,7 @@ labelList regionBandCompression
         Pout<< "    region " << regionI << " starts at " << cellI << endl;
 
         // Per region do a reordering.
-        fvMeshSubset subsetter
+        fvMeshSubset meshSubset
         (
             IOobject
             (
@@ -100,11 +100,11 @@ labelList regionBandCompression
             ),
             mesh
         );
-        subsetter.setLargeCellSubset(cellToRegion, regionI);
-        const fvMesh& subMesh = subsetter.subMesh();
+        meshSubset.setLargeCellSubset(cellToRegion, regionI);
+        const fvMesh& subMesh = meshSubset.subMesh();
         labelList subCellOrder(bandCompression(subMesh.cellCells()));
 
-        const labelList& cellMap = subsetter.cellMap();
+        const labelList& cellMap = meshSubset.cellMap();
 
         forAll(subCellOrder, i)
         {
@@ -376,7 +376,6 @@ autoPtr<mapPolyMesh> reorderMesh
 int main(int argc, char *argv[])
 {
     argList::validOptions.insert("blockOrder", "");
-    argList::validOptions.insert("orderPoints", "");
     argList::validOptions.insert("writeMaps", "");
     argList::validOptions.insert("overwrite", "");
 
@@ -402,13 +401,6 @@ int main(int argc, char *argv[])
     {
         Info<< "Ordering cells into regions (using decomposition);"
             << " ordering faces into region-internal and region-external." << nl
-            << endl;
-    }
-
-    const bool orderPoints = args.optionFound("orderPoints");
-    if (orderPoints)
-    {
-        Info<< "Ordering points into internal and boundary points." << nl
             << endl;
     }
 
@@ -564,7 +556,7 @@ int main(int argc, char *argv[])
             false,      // inflate
             true,       // parallel sync
             true,       // cell ordering
-            orderPoints // point ordering
+            false       // point ordering
         );
     }
 
@@ -583,66 +575,8 @@ int main(int argc, char *argv[])
     Info<< "Band after renumbering: "
         << returnReduce(band, maxOp<label>()) << nl << endl;
 
-
-    if (orderPoints)
-    {
-        // Force edge calculation (since only reason that points would need to
-        // be sorted)
-        (void)mesh.edges();
-
-        label nTotPoints = returnReduce
-        (
-            mesh.nPoints(),
-            sumOp<label>()
-        );
-
-        label nTotIntPoints = returnReduce
-        (
-            mesh.nInternalPoints(),
-            sumOp<label>()
-        );
-
-        label nTotEdges = returnReduce
-        (
-            mesh.nEdges(),
-            sumOp<label>()
-        );
-
-        label nTotIntEdges = returnReduce
-        (
-            mesh.nInternalEdges(),
-            sumOp<label>()
-        );
-
-        label nTotInt0Edges = returnReduce
-        (
-            mesh.nInternal0Edges(),
-            sumOp<label>()
-        );
-
-        label nTotInt1Edges = returnReduce
-        (
-            mesh.nInternal1Edges(),
-            sumOp<label>()
-        );
-
-        Info<< "Points:" << nl
-            << "    total   : " << nTotPoints << nl
-            << "    internal: " << nTotIntPoints << nl
-            << "    boundary: " << nTotPoints-nTotIntPoints << nl
-            << "Edges:" << nl
-            << "    total   : " << nTotEdges << nl
-            << "    internal: " << nTotIntEdges << nl
-            << "        internal using 0 boundary points: "
-            << nTotInt0Edges << nl
-            << "        internal using 1 boundary points: "
-            << nTotInt1Edges-nTotInt0Edges << nl
-            << "        internal using 2 boundary points: "
-            << nTotIntEdges-nTotInt1Edges << nl
-            << "    boundary: " << nTotEdges-nTotIntEdges << nl
-            << endl;
-    }
-
+    // Removed.  HJ, 23/Sep/2010
+//     if (orderPoints)
 
     if (overwrite)
     {

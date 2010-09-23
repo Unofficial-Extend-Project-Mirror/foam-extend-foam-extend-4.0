@@ -51,7 +51,7 @@ using namespace Foam;
 
 void modifyOrAddFace
 (
-    polyTopoChange& meshMod,
+    directTopoChange& meshMod,
     const face& f,
     const label faceI,
     const label own,
@@ -59,7 +59,6 @@ void modifyOrAddFace
     const label newPatchI,
     const label zoneID,
     const bool zoneFlip,
-
     PackedBoolList& modifiedFace
 )
 {
@@ -398,7 +397,8 @@ int main(int argc, char *argv[])
                         if (patchWarned.insert(patchI))
                         {
                             WarningIn(args.executable())
-                                << "Found boundary face (in patch " << pp.name()
+                                << "Found boundary face (in patch "
+                                << pp.name()
                                 << ") in faceZone " << fZone.name()
                                 << " to convert to baffle patch "
                                 << patches[newPatchI].name()
@@ -408,43 +408,23 @@ int main(int argc, char *argv[])
                                 << " boundary faces." << endl;
                         }
 
-            meshMod.setAction
+                        modifyOrAddFace
                         (
-                polyModifyFace
-                (
-                    f,                          // modified face
-                    faceI,                      // label of face
-                    mesh.faceOwner()[faceI],    // owner
-                    -1,                         // neighbour
-                    false,                      // face flip
-                    newPatch[faceI],            // patch for face
-                    false,                      // remove from zone
-                    zoneID,                     // zone for face
-                    zoneFlip                    // face flip in zone
-                )
-            );
+                            meshMod,
+                            mesh.faces()[faceI],        // modified face
+                            faceI,                      // label of face
+                            mesh.faceOwner()[faceI],    // owner
+                            false,                      // face flip
+                            newPatchI,                  // patch for face
+                            zoneID.index(),             // zone for face
+                            fZone.flipMap()[zoneFaceI], // face flip in zone
+                            modifiedFace                // modify or add status
+                        );
 
-            if (mesh.isInternalFace(faceI))
-            {
-                meshMod.setAction
-                (
-                    polyAddFace
-                    (
-                        f.reverseFace(),            // modified face
-                        mesh.faceNeighbour()[faceI],// owner
-                        -1,                         // neighbour
-                        -1,                         // masterPointID
-                        -1,                         // masterEdgeID
-                        faceI,                      // masterFaceID,
-                        false,                      // face flip
-                        newPatch[faceI],            // patch for face
-                        zoneID,                     // zone for face
-                        zoneFlip                    // face flip in zone
-                    )
-                );
+                        nModified++;
+                    }
+                }
             }
-
-            nBaffled++;
         }
     }
 

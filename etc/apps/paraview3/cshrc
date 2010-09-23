@@ -54,9 +54,9 @@ setenv ParaView_DIR $ParaView_INST_DIR/platforms/$WM_ARCH$WM_COMPILER
 set paraviewPython=$ParaView_DIR/Utilities/VTKPythonWrapping
 if ( -r $paraviewPython ) then
     if ($?PYTHONPATH) then
-        setenv PYTHONPATH ${PYTHONPATH}:${paraviewPython}:$ParaView_DIR/lib/${$ParaView_MAJOR}
+        setenv PYTHONPATH ${PYTHONPATH}:${paraviewPython}:$ParaView_DIR/lib/${ParaView_MAJOR}
     else
-        setenv PYTHONPATH ${paraviewPython}:$ParaView_DIR/lib/${$ParaView_MAJOR}
+        setenv PYTHONPATH ${paraviewPython}:$ParaView_DIR/lib/${ParaView_MAJOR}
     endif
 endif
 

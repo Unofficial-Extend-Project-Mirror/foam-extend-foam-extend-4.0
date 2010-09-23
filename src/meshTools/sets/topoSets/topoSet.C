@@ -53,8 +53,7 @@ autoPtr<topoSet> topoSet::New
 )
 {
     wordConstructorTable::iterator cstrIter =
-        wordConstructorTablePtr_
-            ->find(setType);
+        wordConstructorTablePtr_->find(setType);
 
     if (cstrIter == wordConstructorTablePtr_->end())
     {
@@ -84,8 +83,7 @@ autoPtr<topoSet> topoSet::New
 )
 {
     sizeConstructorTable::iterator cstrIter =
-        sizeConstructorTablePtr_
-            ->find(setType);
+        sizeConstructorTablePtr_->find(setType);
 
     if (cstrIter == sizeConstructorTablePtr_->end())
     {
@@ -107,7 +105,6 @@ autoPtr<topoSet> topoSet::New
 // Construct named object from existing set.
 autoPtr<topoSet> topoSet::New
 (
-    const word& setType,
     const polyMesh& mesh,
     const word& name,
     const topoSet& set,
@@ -115,16 +112,15 @@ autoPtr<topoSet> topoSet::New
 )
 {
     setConstructorTable::iterator cstrIter =
-        setConstructorTablePtr_
-            ->find(setType);
+        setConstructorTablePtr_->find(set.type());
 
     if (cstrIter == setConstructorTablePtr_->end())
     {
         FatalErrorIn
         (
-            "topoSet::New(const word&, "
-            "const polyMesh&, const word&, const topoSet&, writeOption)"
-        )   << "Unknown set type " << setType
+            "topoSet::New(const polyMesh&, const word&, "
+            "const topoSet&, writeOption)"
+        )   << "Unknown set type " << set.type()
             << endl << endl
             << "Valid set types : " << endl
             << setConstructorTablePtr_->toc()

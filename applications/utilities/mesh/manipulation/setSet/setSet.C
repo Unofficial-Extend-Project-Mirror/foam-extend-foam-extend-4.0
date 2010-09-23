@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    Manipulate a cell/face/point/ set or zone interactively.
+    Manipulate a cell/face/point set interactively.
 
 \*---------------------------------------------------------------------------*/
 
@@ -42,16 +42,13 @@ Description
 #include "writePatch.H"
 #include "writePointSet.H"
 #include "IOobjectList.H"
-#include "cellZoneSet.H"
-#include "faceZoneSet.H"
-#include "pointZoneSet.H"
 
 #include <stdio.h>
 
 
 #if READLINE != 0
-# include <readline/readline.h>
-# include <readline/history.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 #endif
 
 using namespace Foam;
@@ -85,7 +82,6 @@ Istream& selectStream(Istream* is0Ptr, Istream* is1Ptr)
 // Copy set
 void backup
 (
-    const word& setType,
     const polyMesh& mesh,
     const word& fromName,
     const topoSet& fromSet,
@@ -96,7 +92,7 @@ void backup
     {
         Info<< "    Backing up " << fromName << " into " << toName << endl;
 
-        topoSet::New(setType, mesh, toName, fromSet)().write();
+        topoSet::New(mesh, toName, fromSet)().write();
     }
 }
 
@@ -118,7 +114,7 @@ void backup
         IOobject::READ_IF_PRESENT
     );
 
-    backup(setType, mesh, fromName, fromSet(), toName);
+    backup(mesh, fromName, fromSet(), toName);
 }
 
 
@@ -250,8 +246,7 @@ void printHelp(Ostream& os)
         << "A set command should be of the following form" << endl
         << endl
         << "    cellSet|faceSet|pointSet <setName> <action> <source>"
-        << endl
-        << endl
+        << endl << endl
         << "The <action> is one of" << endl
         << "    list            - prints the contents of the set" << endl
         << "    clear           - clears the set" << endl
@@ -281,18 +276,6 @@ void printHelp(Ostream& os)
         << "    cellSet c0 add pointToCell p0 any" << endl
         << "List set:" << endl
         << "    cellSet c0 list" << endl
-        << endl
-        << "Zones can be set using zoneSets from corresponding sets:" << endl
-        << "    cellZoneSet c0Zone new setToCellZone c0" << endl
-        << "    faceZoneSet f0Zone new setToFaceZone f0" << endl
-        << endl
-        << "or if orientation is important:" << endl
-        << "    faceZoneSet f0Zone new setsToFaceZone f0 c0" << endl
-        << endl
-        << "ZoneSets can be manipulated using the general actions:" << endl
-        << "    list            - prints the contents of the set" << endl
-        << "    clear           - clears the set" << endl
-        << "    invert          - inverts the set (undefined orientation)"
         << endl
         << "    remove          - remove the set" << endl
         << endl;
@@ -337,71 +320,7 @@ void printAllSets(const polyMesh& mesh, Ostream& os)
             os  << '\t' << set.name() << "\tsize:" << set.size() << endl;
         }
     }
-
-    const cellZoneMesh& cellZones = mesh.cellZones();
-    if (cellZones.size())
-    {
-        os  << "cellZones:" << endl;
-        forAll(cellZones, i)
-        {
-            const cellZone& zone = cellZones[i];
-            os  << '\t' << zone.name() << "\tsize:" << zone.size() << endl;
-        }
-    }
-    const faceZoneMesh& faceZones = mesh.faceZones();
-    if (faceZones.size())
-    {
-        os  << "faceZones:" << endl;
-        forAll(faceZones, i)
-        {
-            const faceZone& zone = faceZones[i];
-            os  << '\t' << zone.name() << "\tsize:" << zone.size() << endl;
-        }
-    }
-    const pointZoneMesh& pointZones = mesh.pointZones();
-    if (pointZones.size())
-    {
-        os  << "pointZones:" << endl;
-        forAll(pointZones, i)
-        {
-            const pointZone& zone = pointZones[i];
-            os  << '\t' << zone.name() << "\tsize:" << zone.size() << endl;
-        }
-    }
-
     os  << endl;
-}
-
-
-template<class ZoneType>
-void removeZone
-(
-    ZoneMesh<ZoneType, polyMesh>& zones,
-    const word& setName
-)
-{
-    label zoneID = zones.findZoneID(setName);
-
-    if (zoneID != -1)
-    {
-        Info<< "Removing zone " << setName << " at index " << zoneID << endl;
-        // Shuffle to last position
-        labelList oldToNew(zones.size());
-        label newI = 0;
-        forAll(oldToNew, i)
-        {
-            if (i != zoneID)
-            {
-                oldToNew[i] = newI++;
-            }
-        }
-        oldToNew[zoneID] = newI;
-        zones.reorder(oldToNew);
-        // Remove last element
-        zones.setSize(zones.size()-1);
-        zones.clearAddressing();
-        zones.write();
-    }
 }
 
 
@@ -427,32 +346,6 @@ void removeSet
         fileName object = objects[setName]->objectPath();
         Info<< "Removing file " << object << endl;
         rm(object);
-    }
-
-    // See if zone
-    if (setType == cellZoneSet::typeName)
-    {
-        removeZone
-        (
-            const_cast<cellZoneMesh&>(mesh.cellZones()),
-            setName
-        );
-    }
-    else if (setType == faceZoneSet::typeName)
-    {
-        removeZone
-        (
-            const_cast<faceZoneMesh&>(mesh.faceZones()),
-            setName
-        );
-    }
-    else if (setType == pointZoneSet::typeName)
-    {
-        removeZone
-        (
-            const_cast<pointZoneMesh&>(mesh.pointZones()),
-            setName
-        );
     }
 }
 
@@ -521,7 +414,14 @@ bool doCommand
             currentSet.resize(max(currentSet.size(), typSize));
         }
 
-        if (currentSetPtr.valid())
+        if (!currentSetPtr.valid())
+        {
+            Info<< "    Cannot construct/load set "
+                << topoSet::localPath(mesh, setName) << endl;
+
+            ok = false;
+        }
+        else
         {
             topoSet& currentSet = currentSetPtr();
 
@@ -529,6 +429,12 @@ bool doCommand
                 << "  Size:" << currentSet.size()
                 << "  Action:" << actionName
                 << endl;
+
+            if ((r == IOobject::MUST_READ) && (action != topoSetSource::LIST))
+            {
+                // currentSet has been read so can make copy.
+                backup(mesh, setName, currentSet, setName + "_old");
+            }
 
             switch (action)
             {
@@ -567,7 +473,6 @@ bool doCommand
                         (
                             topoSet::New
                             (
-                                setType,
                                 mesh,
                                 currentSet.name() + "_old2",
                                 currentSet
@@ -786,15 +691,6 @@ commandStatus parseType
     {
         return VALIDSETCMD;
     }
-    else if
-    (
-        setType == "cellZoneSet"
-     || setType == "faceZoneSet"
-     || setType == "pointZoneSet"
-    )
-    {
-        return VALIDZONECMD;
-    }
     else
     {
         SeriousErrorIn
@@ -803,7 +699,7 @@ commandStatus parseType
             ", IStringStream&)"
         )   << "Illegal command " << setType << endl
             << "Should be one of 'help', 'list', 'time' or a set type :"
-            << " 'cellSet', 'faceSet', 'pointSet', 'faceZoneSet'"
+            << " 'cellSet', 'faceSet', 'pointSet'"
             << endl;
 
         return INVALID;
@@ -958,12 +854,12 @@ int main(int argc, char *argv[])
 
         IStringStream is(rawLine + ' ');
 
-        // Type: cellSet, faceSet, pointSet, faceZoneSet
+        // Type: cellSet, faceSet, pointSet
         is >> setType;
 
         stat = parseType(runTime, mesh, setType, is);
 
-        if (stat == VALIDSETCMD || stat == VALIDZONECMD)
+        if (stat == VALIDSETCMD)
         {
             if (is >> setName)
             {
@@ -979,7 +875,7 @@ int main(int argc, char *argv[])
         {
             break;
         }
-        else if (stat == VALIDSETCMD || stat == VALIDZONECMD)
+        else if (stat == VALIDSETCMD)
         {
             ok = doCommand(mesh, setType, setName, actionName, writeVTK, is);
         }

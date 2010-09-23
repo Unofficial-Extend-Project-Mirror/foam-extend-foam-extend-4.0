@@ -123,7 +123,6 @@ Foam::mergePolyMesh::mergePolyMesh(const IOobject& io)
     patchNames_(2*boundaryMesh().size()),
     pointZoneNames_(),
     faceZoneNames_(),
-    cellZoneNames_()
     cellZoneNames_(),
     pointZones_(),
     faceZones_(),

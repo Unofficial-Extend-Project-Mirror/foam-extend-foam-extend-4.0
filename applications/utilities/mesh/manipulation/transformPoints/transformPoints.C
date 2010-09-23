@@ -269,13 +269,12 @@ int main(int argc, char *argv[])
     }
     else if (args.optionFound("rotateAlongVector"))
     {
-        IStringStream rotateVectorOptions
-        (
-            args.optionLookup("rotateAlongVector")
-        );
+        vector rotationAxis;
+        scalar rotationAngle;
 
-        vector rotationAxis(rotateVectorOptions);
-        scalar rotationAngle = readScalar(rotateVectorOptions);
+        args.optionLookup("rotateAlongVector")()
+            >> rotationAxis
+            >> rotationAngle;
 
         tensor T = RodriguesRotation(rotationAxis, rotationAngle);
 
@@ -285,7 +284,7 @@ int main(int argc, char *argv[])
 
         if (args.options().found("rotateFields"))
         {
-            rotateFields(runTime, T);
+            rotateFields(args, runTime, T);
         }
     }
 

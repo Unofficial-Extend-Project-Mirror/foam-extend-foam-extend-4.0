@@ -65,7 +65,6 @@ class topoSet
     public regIOobject,
     public labelHashSet
 {
-
 protected:
 
     // Protected Member Functions
@@ -182,8 +181,8 @@ public:
             const polyMesh& mesh,
             const word& wantedType,
             const word& name,
-            readOption r=MUST_READ,
-            writeOption w=NO_WRITE
+            readOption r = MUST_READ,
+            writeOption w = NO_WRITE
         );
 
         //- Construct empty from additional size of labelHashSet
@@ -192,7 +191,7 @@ public:
             const polyMesh& mesh,
             const word& name,
             const label,
-            writeOption w=NO_WRITE
+            writeOption w = NO_WRITE
         );
 
         //- Construct empty from additional labelHashSet
@@ -201,7 +200,7 @@ public:
             const polyMesh& mesh,
             const word& name,
             const labelHashSet&,
-            writeOption w=NO_WRITE
+            writeOption w = NO_WRITE
         );
 
         //- Construct empty from IOobject and size
@@ -245,7 +244,6 @@ public:
         //- Return a pointer to a new toposet as copy of another toposet
         static autoPtr<topoSet> New
         (
-            const word& setType,
             const polyMesh& mesh,
             const word& name,
             const topoSet& set,
@@ -286,7 +284,7 @@ public:
             Ostream& os,
             const primitiveMesh&,
             const label maxLen
-        ) const;    // = 0;
+        ) const;
 
         //- Write contents.
         virtual bool writeData(Ostream&) const;
@@ -295,7 +293,7 @@ public:
         virtual void updateMesh(const mapPolyMesh& morphMap);
 
         //- Return max allowable index (+1). Not implemented.
-        virtual label maxSize(const polyMesh& mesh) const;  // = 0;
+        virtual label maxSize(const polyMesh& mesh) const;
 
 
 

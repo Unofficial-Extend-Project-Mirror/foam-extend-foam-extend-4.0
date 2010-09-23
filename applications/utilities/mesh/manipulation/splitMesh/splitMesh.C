@@ -162,6 +162,10 @@ int main(int argc, char *argv[])
 
     IndirectList<face> zoneFaces(mesh.faces(), faces);
 
+    // Calculation engine for set of faces in a mesh
+    typedef PrimitivePatch<face, List, const pointField&> facePatch;
+
+
     // Addressing on faces only in mesh vertices.
     facePatch fPatch(zoneFaces(), mesh.points());
 

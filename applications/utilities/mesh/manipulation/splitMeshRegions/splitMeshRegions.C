@@ -69,7 +69,9 @@ Description
         - cellRegionAddressing  :   ,,      cell                ,,  cell    ,,
         - faceRegionAddressing  :   ,,      face                ,,  face in
         the original mesh + 'turning index'. For a face in the same orientation
-        this is the original facelabel+1, for a turned face this is -facelabel-1
+        this is the original facelabel+1, for a turned face
+        this is -facelabel-1
+
 \*---------------------------------------------------------------------------*/
 
 #include "SortableList.H"
@@ -80,7 +82,8 @@ Description
 #include "volFields.H"
 #include "faceSet.H"
 #include "cellSet.H"
-#include "polyTopoChange.H"
+#include "directTopoChange.H"
+#include "mapPolyMesh.H"
 #include "removeCells.H"
 #include "EdgeMap.H"
 #include "syncTools.H"
@@ -414,7 +417,7 @@ void subsetVolFields
 
         tmp<GeoField> tSubFld
         (
-            fvMeshSubset::interpolate
+            fvMeshSubset::meshToMesh
             (
                 fld,
                 subMesh,
@@ -473,7 +476,7 @@ void subsetSurfaceFields
 
         tmp<GeoField> tSubFld
         (
-            fvMeshSubset::interpolate
+            fvMeshSubset::meshToMesh
             (
                 fld,
                 subMesh,
@@ -750,7 +753,7 @@ autoPtr<mapPolyMesh> createRegionMesh
 
 
     // Topology change container. Start off from existing mesh.
-    polyTopoChange meshMod(mesh);
+    directTopoChange meshMod(mesh);
 
     // Cell remover engine
     removeCells cellRemover(mesh);

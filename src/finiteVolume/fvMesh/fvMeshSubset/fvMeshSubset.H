@@ -258,10 +258,10 @@ private:
         bool checkCellSubset() const;
 
         //- Mark points in Map
-        static void markPoints(const labelList&, Map<label>&); 
+        static void markPoints(const labelList&, Map<label>&);
 
         //- Mark points (with 0) in labelList
-        static void markPoints(const labelList&, labelList&); 
+        static void markPoints(const labelList&, labelList&);
 
         //- Adapt nCellsUsingFace for coupled faces becoming 'uncoupled'.
         void doCoupledPatches
@@ -394,6 +394,16 @@ public:
 
             //- Map surface field
             template<class Type>
+            static tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
+            meshToMesh
+            (
+                const GeometricField<Type, fvsPatchField, surfaceMesh>&,
+                const fvMesh& sMesh,
+                const labelList& patchMap,
+                const labelList& faceMap
+            );
+
+            template<class Type>
             tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
             interpolate
             (
@@ -403,7 +413,7 @@ public:
             //- Map point field
             template<class Type>
             static tmp<GeometricField<Type, pointPatchField, pointMesh> >
-            interpolate
+            meshToMesh
             (
                 const GeometricField<Type, pointPatchField, pointMesh>&,
                 const pointMesh& sMesh,

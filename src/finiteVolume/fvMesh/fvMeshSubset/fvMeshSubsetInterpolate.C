@@ -26,8 +26,9 @@ License
 
 #include "fvMeshSubset.H"
 #include "calculatedFvPatchFields.H"
-#include "emptyFvPatchFields.H"
 #include "calculatedFvsPatchFields.H"
+#include "emptyFvPatchFields.H"
+#include "emptyFvsPatchFields.H"
 #include "calculatedPointPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -247,7 +248,137 @@ tmp<GeometricField<Type, fvPatchField, volMesh> > fvMeshSubset::interpolate
 
 
 template<class Type>
-tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > fvMeshSubset::interpolate
+tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
+fvMeshSubset::meshToMesh
+(
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& vf,
+    const fvMesh& sMesh,
+    const labelList& patchMap,
+    const labelList& faceMap
+)
+{
+    // Create and map the internal-field values
+    Field<Type> internalField
+    (
+        vf.internalField(),
+        SubList<label>
+        (
+            faceMap,
+            sMesh.nInternalFaces()
+        )
+    );
+
+    // Create and map the patch field values
+    PtrList<fvsPatchField<Type> > patchFields(patchMap.size());
+
+    forAll (patchFields, patchI)
+    {
+        // Set the first one by hand as it corresponds to the
+        // exposed internal faces.  Additional interpolation can be put here
+        // as necessary.
+        if (patchMap[patchI] == -1)
+        {
+            patchFields.set
+            (
+                patchI,
+                new emptyFvsPatchField<Type>
+                (
+                    sMesh.boundary()[patchI],
+                    DimensionedField<Type, surfaceMesh>::null()
+                )
+            );
+        }
+        else
+        {
+            // Construct addressing
+            const fvPatch& subPatch = sMesh.boundary()[patchI];
+            const fvPatch& basePatch = vf.mesh().boundary()[patchMap[patchI]];
+            label baseStart = basePatch.patch().start();
+            label baseSize = basePatch.size();
+
+            labelList directAddressing(subPatch.size());
+
+            forAll(directAddressing, i)
+            {
+                label baseFaceI = faceMap[subPatch.patch().start()+i];
+
+                if (baseFaceI >= baseStart && baseFaceI < baseStart+baseSize)
+                {
+                    directAddressing[i] = baseFaceI-baseStart;
+                }
+                else
+                {
+                    // Mapped from internal face. Do what? Map from element
+                    // 0 for now.
+                    directAddressing[i] = 0;
+                }
+            }
+
+            patchFields.set
+            (
+                patchI,
+                fvsPatchField<Type>::New
+                (
+                    vf.boundaryField()[patchMap[patchI]],
+                    sMesh.boundary()[patchI],
+                    DimensionedField<Type, surfaceMesh>::null(),
+                    patchFieldSubset
+                    (
+                        vf.boundaryField()[patchMap[patchI]].size(),
+                        directAddressing
+                    )
+                )
+            );
+        }
+    }
+
+
+    // Map exposed internal faces. Note: Only nessecary if exposed faces added
+    // into existing patch but since we don't know that at this point...
+    forAll(patchFields, patchI)
+    {
+        fvsPatchField<Type>& pfld = patchFields[patchI];
+
+        label meshFaceI = pfld.patch().patch().start();
+
+        forAll(pfld, i)
+        {
+            label oldFaceI = faceMap[meshFaceI++];
+
+            if (oldFaceI < vf.internalField().size())
+            {
+                pfld[i] = vf.internalField()[oldFaceI];
+            }
+        }
+    }
+
+    // Create the complete field from the pieces
+    tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > tresF
+    (
+        new GeometricField<Type, fvsPatchField, surfaceMesh>
+        (
+            IOobject
+            (
+                "subset"+vf.name(),
+                sMesh.time().timeName(),
+                sMesh,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            sMesh,
+            vf.dimensions(),
+            internalField,
+            patchFields
+        )
+    );
+
+    return tresF;
+}
+
+
+template<class Type>
+tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
+fvMeshSubset::interpolate
 (
     const GeometricField<Type, fvsPatchField, surfaceMesh>& vf
 ) const
@@ -423,7 +554,8 @@ fvMeshSubset::interpolate
                 // Get mesh point on original mesh.
                 label meshPointI = ptMap[subMeshPoints[localI]];
 
-                Map<label>::const_iterator iter = meshPointMap.find(meshPointI);
+                Map<label>::const_iterator iter =
+                    meshPointMap.find(meshPointI);
 
                 if (iter != meshPointMap.end())
                 {
@@ -439,7 +571,10 @@ fvMeshSubset::interpolate
                     vf.boundaryField()[pm[patchI]],
                     subPatch,
                     DimensionedField<Type, pointMesh>::null(),
-                    pointPatchFieldSubset(directAddressing)
+                    pointPatchFieldSubset
+                    (
+                        directAddressing
+                    )
                 )
             );
         }

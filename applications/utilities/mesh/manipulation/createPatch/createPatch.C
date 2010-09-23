@@ -554,12 +554,13 @@ int main(int argc, char *argv[])
     const Switch pointSync(dict.lookup("pointSync"));
 
 
+    // Change tolerance in controlDict instead.  HJ, 22/Oct/2008
+
     // Set the matching tolerance so we can read illegal meshes
-    scalar tol = readScalar(dict.lookup("matchTolerance"));
-    Info<< "Using relative tolerance " << tol
-        << " to match up faces and points" << nl << endl;
-    // Change tolerancein controlDict instead.  HJ, 22/Oct/2008
-//     polyPatch::matchTol_ = tol;
+//     scalar tol = readScalar(dict.lookup("matchTolerance"));
+//     Info<< "Using relative tolerance " << tol
+//         << " to match up faces and points" << nl << endl;
+//      polyPatch::matchTol_ = tol;
 
 #   include "createNamedPolyMesh.H"
 
@@ -635,10 +636,8 @@ int main(int argc, char *argv[])
                 (
                     polyPatch::New
                     (
-                        patchType,
                         patchName,
-                        0,              // size
-                        startFaceI,     // start
+                        patchDict,
                         destPatchI,
                         patches
                     ).ptr()

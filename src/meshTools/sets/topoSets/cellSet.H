@@ -51,8 +51,6 @@ class cellSet
 :
     public topoSet
 {
-
-
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -75,8 +73,8 @@ public:
         (
             const polyMesh& mesh,
             const word& name,
-            readOption r=MUST_READ,
-            writeOption w=NO_WRITE
+            readOption r = MUST_READ,
+            writeOption w = NO_WRITE
         );
 
         //- Construct empty from size of labelHashSet
@@ -85,7 +83,7 @@ public:
             const polyMesh& mesh,
             const word& name,
             const label sizes,
-            writeOption w=NO_WRITE
+            writeOption w = NO_WRITE
         );
 
         //- Construct from existing set
@@ -103,7 +101,7 @@ public:
             const polyMesh& mesh,
             const word& name,
             const labelHashSet&,
-            writeOption w=NO_WRITE
+            writeOption w = NO_WRITE
         );
 
 
@@ -114,8 +112,8 @@ public:
             (
                 const Time&,
                 const word& name,
-                readOption r=MUST_READ,
-                writeOption w=NO_WRITE
+                readOption r = MUST_READ,
+                writeOption w = NO_WRITE
             );
 
             //- Construct empty from objectRegistry.
@@ -124,7 +122,7 @@ public:
                 const Time&,
                 const word& name,
                 const label size,
-                writeOption w=NO_WRITE
+                writeOption w = NO_WRITE
             );
 
             //- Construct from labelHashSet
@@ -133,7 +131,7 @@ public:
                 const Time&,
                 const word& name,
                 const labelHashSet&,
-                writeOption w=NO_WRITE
+                writeOption w = NO_WRITE
             );
 
 

@@ -255,12 +255,24 @@ void Foam::vtkPV3Foam::convertMeshCellZones
                 << zoneName << endl;
         }
 
-        fvMeshSubset subsetter(mesh);
-        subsetter.setLargeCellSubset(zMesh[zoneId]);
+        fvMeshSubset subsetMesh
+        (
+            IOobject
+            (
+                "set",
+                mesh.time().constant(),
+                mesh,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh
+        );
+
+        subsetMesh.setLargeCellSubset(zMesh[zoneId]);
 
         vtkUnstructuredGrid* vtkmesh = volumeVTKMesh
         (
-            subsetter.subMesh(),
+            subsetMesh.subMesh(),
             zonePolyDecomp_[datasetNo]
         );
 
@@ -269,17 +281,17 @@ void Foam::vtkPV3Foam::convertMeshCellZones
             // superCells + addPointCellLabels must contain global cell ids
             inplaceRenumber
             (
-                subsetter.cellMap(),
+                subsetMesh.cellMap(),
                 zonePolyDecomp_[datasetNo].superCells()
             );
             inplaceRenumber
             (
-                subsetter.cellMap(),
+                subsetMesh.cellMap(),
                 zonePolyDecomp_[datasetNo].addPointCellLabels()
             );
 
             // copy pointMap as well, otherwise pointFields fail
-            zonePolyDecomp_[datasetNo].pointMap() = subsetter.pointMap();
+            zonePolyDecomp_[datasetNo].pointMap() = subsetMesh.pointMap();
 
             AddToBlock(output, vtkmesh, selector, datasetNo, zoneName);
             vtkmesh->Delete();
@@ -337,12 +349,25 @@ void Foam::vtkPV3Foam::convertMeshCellSets
         }
 
         const cellSet cSet(mesh, partName);
-        fvMeshSubset subsetter(mesh);
-        subsetter.setLargeCellSubset(cSet);
+
+        fvMeshSubset subsetMesh
+        (
+            IOobject
+            (
+                "set",
+                mesh.time().constant(),
+                mesh,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh
+        );
+
+        subsetMesh.setLargeCellSubset(cSet);
 
         vtkUnstructuredGrid* vtkmesh = volumeVTKMesh
         (
-            subsetter.subMesh(),
+            subsetMesh.subMesh(),
             csetPolyDecomp_[datasetNo]
         );
 
@@ -351,17 +376,17 @@ void Foam::vtkPV3Foam::convertMeshCellSets
             // superCells + addPointCellLabels must contain global cell ids
             inplaceRenumber
             (
-                subsetter.cellMap(),
+                subsetMesh.cellMap(),
                 csetPolyDecomp_[datasetNo].superCells()
             );
             inplaceRenumber
             (
-                subsetter.cellMap(),
+                subsetMesh.cellMap(),
                 csetPolyDecomp_[datasetNo].addPointCellLabels()
             );
 
             // copy pointMap as well, otherwise pointFields fail
-            csetPolyDecomp_[datasetNo].pointMap() = subsetter.pointMap();
+            csetPolyDecomp_[datasetNo].pointMap() = subsetMesh.pointMap();
 
             AddToBlock(output, vtkmesh, selector, datasetNo, partName);
             vtkmesh->Delete();

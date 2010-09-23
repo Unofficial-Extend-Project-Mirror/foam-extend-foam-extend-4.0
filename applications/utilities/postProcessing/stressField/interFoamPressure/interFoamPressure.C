@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2006-7 H. Jasak. All rights reserved
+    \\  /    A nd           | Copyright (C) 2010 Hrvoje Jasak
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,6 +24,9 @@ License
 
 Application
     interFoamPressure
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 Description
     Calculate static pressure from interFoam results
@@ -53,7 +56,7 @@ int main(int argc, char *argv[])
     runTime.setTime(Times[startTime], startTime);
 
 #   include "createMesh.H"
-#   include "readEnvironmentalProperties.H"
+#   include "readGravitationalAcceleration.H"
 
     const dictionary& piso = mesh.solutionDict().subDict("PISO");
 

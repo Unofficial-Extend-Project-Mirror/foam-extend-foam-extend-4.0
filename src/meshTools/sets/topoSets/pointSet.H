@@ -51,8 +51,6 @@ class pointSet
 :
     public topoSet
 {
-
-
 public:
 
     //- Runtime type information
@@ -70,8 +68,8 @@ public:
         (
             const polyMesh& mesh,
             const word& name,
-            readOption r=MUST_READ,
-            writeOption w=NO_WRITE
+            readOption r = MUST_READ,
+            writeOption w = NO_WRITE
         );
 
         //- Construct from additional size of labelHashSet
@@ -80,7 +78,7 @@ public:
             const polyMesh& mesh,
             const word& name,
             const label,
-            writeOption w=NO_WRITE
+            writeOption w = NO_WRITE
         );
 
         //- Construct from additional labelHashSet
@@ -98,7 +96,7 @@ public:
             const polyMesh& mesh,
             const word& name,
             const labelHashSet&,
-            writeOption w=NO_WRITE
+            writeOption w = NO_WRITE
         );
 
 
