@@ -132,7 +132,7 @@ Foam::lduSolverPerformance Foam::PBiCG::solve
                 coupleBouCoeffs_,
                 coupleIntCoeffs_,
                 interfaces_,
-                dict().subDict("preconditioner")
+                dict()
             );
 
         // Solver iteration
