@@ -13,7 +13,7 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 
 {
     label inertIndex = -1;
-    volScalarField Yt = 0.0*Y[0];
+    volScalarField Yt("Yt", 0.0*Y[0]);
 
     forAll(Y, i)
     {
