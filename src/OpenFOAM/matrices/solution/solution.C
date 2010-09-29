@@ -273,7 +273,7 @@ const Foam::dictionary& Foam::solution::solver(const word& name) const
             << "Lookup solver for " << name << endl;
     }
 
-    return solvers_.lookup(name);
+    return solvers_.subDict(name);
 }
 
 
