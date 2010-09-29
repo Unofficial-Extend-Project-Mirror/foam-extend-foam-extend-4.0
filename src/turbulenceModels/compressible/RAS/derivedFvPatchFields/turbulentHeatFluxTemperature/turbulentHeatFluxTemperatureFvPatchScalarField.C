@@ -34,24 +34,32 @@ License
 
 namespace Foam
 {
-namespace compressible
-{
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
+// Note: Specialisation must be in the same namespace as the template
+// HJ, 29/Sep/2010
+
 template<>
 const char*
-NamedEnum<turbulentHeatFluxTemperatureFvPatchScalarField::heatSourceType, 2>::
-names[] =
-    {
-        "power",
-        "flux"
-    };
+NamedEnum<compressible::turbulentHeatFluxTemperatureFvPatchScalarField::
+heatSourceType, 2>::names[] =
+{
+    "power",
+    "flux"
+};
 
 const
-NamedEnum<turbulentHeatFluxTemperatureFvPatchScalarField::heatSourceType, 2>
-    turbulentHeatFluxTemperatureFvPatchScalarField::heatSourceTypeNames_;
+NamedEnum<compressible::turbulentHeatFluxTemperatureFvPatchScalarField::
+heatSourceType, 2>
+compressible::turbulentHeatFluxTemperatureFvPatchScalarField::
+heatSourceTypeNames_;
 
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace compressible
+{
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
