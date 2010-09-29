@@ -789,7 +789,7 @@ const Foam::indirectPrimitivePatch& Foam::faMesh::patch() const
             mesh_.allPoints()
         );
     }
-        
+
     return *patchPtr_;
 }
 
@@ -802,13 +802,13 @@ Foam::indirectPrimitivePatch& Foam::faMesh::patch()
         (
             IndirectList<face>
             (
-                mesh_.allFaces(), 
+                mesh_.allFaces(),
                 faceLabels_
             ),
             mesh_.allPoints()
         );
     }
-        
+
     return *patchPtr_;
 }
 
