@@ -50,7 +50,11 @@ const ThermoType& Foam::multiComponentMixture<ThermoType>::constructSpeciesData
 template<class ThermoType>
 void Foam::multiComponentMixture<ThermoType>::correctMassFractions()
 {
-    volScalarField Yt = Y_[0];
+    volScalarField Yt
+    (
+        "Yt",
+        Y_[0]
+    );
 
     for (label n=1; n<Y_.size(); n++)
     {
