@@ -69,15 +69,16 @@ public:
 
     // Member operators
 
-        operator PrimitiveType() const
-        {
-            return *this;
-        }
+    //HJ, unnecessary compilation problems.  HJ, 28/Sep/2010
+//         operator PrimitiveType() const
+//         {
+//             return *this;
+//         }
 
-        operator PrimitiveType&()
-        {
-            return *this;
-        }
+//         operator PrimitiveType&()
+//         {
+//             return *this;
+//         }
 };
 
 
