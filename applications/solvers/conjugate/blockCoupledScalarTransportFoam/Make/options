@@ -1,0 +1,8 @@
+EXE_INC = \
+    -ftemplate-depth-100 \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/blockMatrix/lnInclude
+
+EXE_LIBS = \
+    -lfiniteVolume \
+    -lblockMatrix

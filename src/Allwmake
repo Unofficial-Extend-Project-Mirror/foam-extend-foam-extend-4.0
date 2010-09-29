@@ -36,6 +36,8 @@ wmake libso finiteVolume
 wmake libso finiteArea
 
 wmake libso lduSolvers
+wmake libso blockMatrix
+
 wmake libso dynamicMesh
 
 (cd tetDecompositionFiniteElement ; Allwmake)
