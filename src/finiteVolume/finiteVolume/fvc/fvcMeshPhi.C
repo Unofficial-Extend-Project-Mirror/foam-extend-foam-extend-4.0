@@ -92,7 +92,7 @@ void Foam::fvc::makeRelative
 {
     if (phi.mesh().moving())
     {
-        phi -= fvc::meshPhi(rho, U);
+        phi -= rho*fvc::meshPhi(rho, U);
     }
 }
 
@@ -105,7 +105,7 @@ void Foam::fvc::makeRelative
 {
     if (phi.mesh().moving())
     {
-        phi -= fvc::meshPhi(rho, U);
+        phi -= fvc::interpolate(rho)*fvc::meshPhi(rho, U);
     }
 }
 
@@ -131,7 +131,7 @@ void Foam::fvc::makeAbsolute
 {
     if (phi.mesh().moving())
     {
-        phi += fvc::meshPhi(rho, U);
+        phi += rho*fvc::meshPhi(rho, U);
     }
 }
 
@@ -144,7 +144,7 @@ void Foam::fvc::makeAbsolute
 {
     if (phi.mesh().moving())
     {
-        phi += fvc::meshPhi(rho, U);
+        phi += fvc::interpolate(rho)*fvc::meshPhi(rho, U);
     }
 }
 
