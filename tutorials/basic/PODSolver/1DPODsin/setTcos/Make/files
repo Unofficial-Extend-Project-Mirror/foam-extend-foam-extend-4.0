@@ -1,0 +1,3 @@
+setTcos.C
+
+EXE = $(FOAM_APPBIN)/setTcos
