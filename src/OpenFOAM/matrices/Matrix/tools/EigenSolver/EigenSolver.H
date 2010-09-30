@@ -36,7 +36,7 @@ SourceFiles
 #ifndef EigenSolver_H
 #define EigenSolver_H
 
-#include "Matrix.H"
+#include "SquareMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -71,15 +71,15 @@ class EigenSolver
 
 
         //- Check matrix for shape and symmetry
-        void checkMatrix(const Matrix<T>& mtx) const;
+        void checkMatrix(const SquareMatrix<T>& mtx) const;
 
         //- Factorise into eigen-values and eigen-vectors
-        void factorise(const Matrix<T>& mtx);
+        void factorise(const SquareMatrix<T>& mtx);
 
         //- Rotate the matrix
         inline void rotate
         (
-            Matrix<T>& a,
+            SquareMatrix<T>& a,
             const T s,
             const T tau,
             const label i,
@@ -97,7 +97,7 @@ public:
     // Constructors
 
         //- Construct from matrix
-        EigenSolver(const Matrix<T>& mtx);
+        EigenSolver(const SquareMatrix<T>& mtx);
 
 
     // Destructor - default

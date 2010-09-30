@@ -25,9 +25,7 @@ License
 Class
     EigenSolver
 
-Description
-
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "EigenSolver.H"
 
@@ -37,19 +35,8 @@ Description
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class T>
-void Foam::EigenSolver<T>::checkMatrix(const Matrix<T>& mtx) const
+void Foam::EigenSolver<T>::checkMatrix(const SquareMatrix<T>& mtx) const
 {
-    // Check shape
-    if (mtx.m() != mtx.n())
-    {
-        FatalErrorIn
-        (
-            "void EigenSolver<T>::checkMatrix(const Matrix<T>& m) const"
-        )   << "Matrix is not square, cannot calculate eigen-values.  "
-            << "M = " << mtx.m() << " N = " << mtx.n()
-            << abort(FatalError);
-    }
-
     // Check symmetry
     T assymetry = pTraits<T>::zero;
 
@@ -65,7 +52,7 @@ void Foam::EigenSolver<T>::checkMatrix(const Matrix<T>& mtx) const
     {
         FatalErrorIn
         (
-            "void EigenSolver<T>::checkMatrix(const Matrix<T>& m) const"
+            "void EigenSolver<T>::checkMatrix(const SquareMatrix<T>& m) const"
         )   << "Matrix is not symmetric.  Assymetry = " << assymetry
             << abort(FatalError);
     }
@@ -73,15 +60,15 @@ void Foam::EigenSolver<T>::checkMatrix(const Matrix<T>& mtx) const
 
 
 template<class T>
-void Foam::EigenSolver<T>::factorise(const Matrix<T>& mtx)
+void Foam::EigenSolver<T>::factorise(const SquareMatrix<T>& mtx)
 {
     // Copy the original matrix into scratch space
-    Matrix<T> a = mtx;
+    SquareMatrix<T> a = mtx;
 
     label n = a.m();
 
     // Create and initialise the matrix to hold eigen-vectors in columns
-    Matrix<T> v(n, n, pTraits<T>::zero);
+    SquareMatrix<T> v(n, pTraits<T>::zero);
 
     for (label ip = 0; ip < n; ip++)
     {
@@ -230,7 +217,10 @@ void Foam::EigenSolver<T>::factorise(const Matrix<T>& mtx)
 
     } // End of main iteration loop
 
-    FatalErrorIn("void Foam::EigenSolver<T>::factorise(const Matrix<T>& mtx)")
+    FatalErrorIn
+    (
+        "void EigenSolver<T>::factorise(const SquareMatrix<T>& mtx)"
+    )
         << "Maximum number of iterations exceeded"
         << abort(FatalError);
 }
@@ -239,12 +229,12 @@ void Foam::EigenSolver<T>::factorise(const Matrix<T>& mtx)
 template<class T>
 inline void Foam::EigenSolver<T>::rotate
 (
-    Matrix<T>& a,
+    SquareMatrix<T>& a,
     const T s,
     const T tau,
     const label i,
-    const label j, 
-    const label k, 
+    const label j,
+    const label k,
     const label l
 ) const
 {
@@ -260,7 +250,7 @@ inline void Foam::EigenSolver<T>::rotate
 
 // Construct from components
 template<class T>
-Foam::EigenSolver<T>::EigenSolver(const Matrix<T>& mtx)
+Foam::EigenSolver<T>::EigenSolver(const SquareMatrix<T>& mtx)
 :
     values_(mtx.m(), pTraits<T>::zero),
     vectors_(mtx.m())
