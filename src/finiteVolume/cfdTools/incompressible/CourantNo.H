@@ -36,8 +36,10 @@ scalar velMag = 0.0;
 
 if (mesh.nInternalFaces())
 {
-    surfaceScalarField SfUfbyDelta = 
-        mesh.surfaceInterpolation::deltaCoeffs()*mag(phi);
+    surfaceScalarField magPhi = mag(phi);
+
+    surfaceScalarField SfUfbyDelta =
+        mesh.surfaceInterpolation::deltaCoeffs()*magPhi;
 
     CoNum = max(SfUfbyDelta/mesh.magSf())
         .value()*runTime.deltaT().value();
@@ -45,11 +47,12 @@ if (mesh.nInternalFaces())
     meanCoNum = (sum(SfUfbyDelta)/sum(mesh.magSf()))
         .value()*runTime.deltaT().value();
 
-    velMag = max(mag(phi)/mesh.magSf()).value();
+    velMag = max(magPhi/mesh.magSf()).value();
 }
 
 Info<< "Courant Number mean: " << meanCoNum
-    << " max: " << CoNum 
-    << " velocity magnitude: " << velMag << endl;
+    << " max: " << CoNum
+    << " velocity magnitude: " << velMag
+    << endl;
 
 // ************************************************************************* //
