@@ -53,6 +53,7 @@ wmake libso topoChangerFvMesh
 wmake libso engine
 
 wmake libso ODE
+wmake libso POD
 wmake libso randomProcesses
 
 thermophysicalModels/Allwmake
