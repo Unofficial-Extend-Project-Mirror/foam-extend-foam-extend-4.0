@@ -135,8 +135,24 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         const unallocLabelList& faceCells = p.patch().faceCells();
 
         // Build the d-vectors
+
+        // Original version: closest distance to boundary
+        vectorField pd =
+            mesh_.Sf().boundaryField()[patchi]
+           /(
+               mesh_.magSf().boundaryField()[patchi]
+              *mesh_.deltaCoeffs().boundaryField()[patchi]
+           );
+
+        if (!mesh_.orthogonal())
+        {
+            pd -= mesh_.correctionVectors().boundaryField()[patchi]
+                /mesh_.deltaCoeffs().boundaryField()[patchi];
+        }
+
         // Better version of d-vectors: Zeljko Tukovic, 25/Apr/2010
-        vectorField pd = p.delta();
+        // Experimental: review fixed gradient condition.  HJ, 30/Sep/2010
+//         vectorField pd = p.delta();
 
         if (p.coupled())
         {
