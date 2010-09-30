@@ -33,17 +33,22 @@ Description
 scalar CoNum = 0.0;
 scalar meanCoNum = 0.0;
 scalar acousticCoNum = 0.0;
+scalar velMag = 0.0;
 
 if (mesh.nInternalFaces())
 {
-    surfaceScalarField SfUfbyDelta = 
-        mesh.surfaceInterpolation::deltaCoeffs()*mag(phiv);
+    surfaceScalarField magPhiv = mag(phiv);
+
+    surfaceScalarField SfUfbyDelta =
+        mesh.surfaceInterpolation::deltaCoeffs()*magPhiv;
 
     CoNum = max(SfUfbyDelta/mesh.magSf())
         .value()*runTime.deltaT().value();
 
     meanCoNum = (sum(SfUfbyDelta)/sum(mesh.magSf()))
         .value()*runTime.deltaT().value();
+
+    velMag = max(magPhiv/mesh.magSf()).value();
 
     acousticCoNum = max
     (
@@ -54,6 +59,7 @@ if (mesh.nInternalFaces())
 Info<< "phiv Courant Number mean: " << meanCoNum
     << " max: " << CoNum
     << " acoustic max: " << acousticCoNum
+    << " velocity magnitude: " << velMag
     << endl;
 
 // ************************************************************************* //
