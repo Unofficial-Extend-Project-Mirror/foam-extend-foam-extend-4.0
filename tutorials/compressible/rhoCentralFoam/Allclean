@@ -20,7 +20,7 @@ do
         cp -r $case/0.org $case/0
     fi
 
-    (cd $case && foamCleanTutorials)
+    (cd $case && foamCleanTutorials && cleanSamples)
 
     if [ "$case" = "biconic25-55Run35" ]
     then

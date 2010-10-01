@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
+|  \\    /   O peration     | Version:  1.6                                   |
 |   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -10,6 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
+    location    "constant";
     object      injectorProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -32,7 +33,7 @@ FoamFile
                 1.0
             );
 
-            massFlowRateProfile 
+            massFlowRateProfile
             (
                 (0 0.1272)
                 (4.16667e-05 6.1634)
@@ -91,7 +92,7 @@ FoamFile
                 1.0
             );
 
-            massFlowRateProfile 
+            massFlowRateProfile
             (
                 (0 0.1272)
                 (4.16667e-05 6.1634)
@@ -132,7 +133,7 @@ FoamFile
                 (0.00125    1.0)
             );
         }
-    }   
+    }
 )
 
 // ************************************************************************* //

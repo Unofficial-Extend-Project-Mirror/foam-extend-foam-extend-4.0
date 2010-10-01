@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,6 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
+    location    "constant";
     object      combustionProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -18,21 +19,21 @@ laminarFlameSpeedCorrelation Gulders;
 
 fuel            IsoOctane;
 
-Su              Su [0 1 -1 0 0 0 0] 0;
+Su              Su [ 0 1 -1 0 0 0 0 ] 0;
 
 SuModel         unstrained;
 
-equivalenceRatio equivalenceRatio [0 0 0 0 0 0 0] 1;
+equivalenceRatio equivalenceRatio [ 0 0 0 0 0 0 0 ] 1;
 
-sigmaExt        sigmaExt [0 0 -1 0 0 0 0] 100000;
+sigmaExt        sigmaExt [ 0 0 -1 0 0 0 0 ] 100000;
 
 XiModel         transport;
 
-XiCoef          XiCoef [0 0 0 0 0 0 0] 0.62;
+XiCoef          XiCoef [ 0 0 0 0 0 0 0 ] 0.62;
 
-XiShapeCoef     XiShapeCoef [0 0 0 0 0 0 0] 1;
+XiShapeCoef     XiShapeCoef [ 0 0 0 0 0 0 0 ] 1;
 
-uPrimeCoef      uPrimeCoef [0 0 0 0 0 0 0] 1;
+uPrimeCoef      uPrimeCoef [ 0 0 0 0 0 0 0 ] 1;
 
 GuldersCoeffs
 {
@@ -45,6 +46,7 @@ GuldersCoeffs
         beta            -0.5;
         f               2.3;
     }
+
     Propane
     {
         W               0.446;
@@ -54,6 +56,7 @@ GuldersCoeffs
         beta            -0.2;
         f               2.3;
     }
+
     IsoOctane
     {
         W               0.4658;
@@ -69,7 +72,6 @@ ignite          yes;
 
 ignitionSites
 (
-
     {
         location        (0.03 0 0.091);
         diameter        0.002;
@@ -79,11 +81,13 @@ ignitionSites
     }
 );
 
-ignitionSphereFraction 1.0;
+ignitionSphereFraction 1;
 
-ignitionThickness       ignitionThickness [0 1 0 0 0 0 0] 0;
-ignitionCircleFraction  1;
+ignitionThickness ignitionThickness [ 0 1 0 0 0 0 0 ] 0;
 
-ignitionKernelArea      ignitionKernelArea [0 2 0 0 0 0 0] 0;
+ignitionCircleFraction 1;
+
+ignitionKernelArea ignitionKernelArea [ 0 2 0 0 0 0 0 ] 0;
+
 
 // ************************************************************************* //

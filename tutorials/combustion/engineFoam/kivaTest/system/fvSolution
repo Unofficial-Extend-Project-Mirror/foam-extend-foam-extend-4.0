@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,90 +10,116 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
+    location    "system";
     object      fvSolution;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 solvers
 {
-    rho PCG
+    rho
     {
-        preconditioner   DIC;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    U PBiCG
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    U
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    p PCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    p
     {
-        preconditioner   DIC;
-        tolerance        1e-06;
-        relTol           0;
-    };
-    ft PBiCG
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-06;
+        relTol          0;
+    }
+
+    ft
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    fu PBiCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    fu
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    b PBiCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    b
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    Xi PBiCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    Xi
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    Su PBiCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    Su
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    h PBiCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    h
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    hu PBiCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    hu
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    R PBiCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    R
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    k PBiCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    k
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    epsilon PBiCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    epsilon
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
 }
 
 PISO
@@ -103,5 +129,6 @@ PISO
     momentumPredictor yes;
     fluxGradp       no;
 }
+
 
 // ************************************************************************* //

@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
+|  \\    /   O peration     | Version:  1.6                                   |
 |   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -30,15 +30,12 @@ boundaryField
     {
         type            waveTransmissive;
         field           p;
-        U               U;
         phi             phi;
         rho             rho;
         psi             psi;
         fieldInf        101325;
         gamma           1.4;
         lInf            0.025;
-        inletOutlet     off;
-        correctSupercritical off;
         value           uniform 101325;
     }
 

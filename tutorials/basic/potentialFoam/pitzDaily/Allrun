@@ -2,7 +2,7 @@
 # Source tutorial run functions
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
-application="potentialFoam"
+application=`getApplication`
 
 runApplication blockMesh
 runApplication $application

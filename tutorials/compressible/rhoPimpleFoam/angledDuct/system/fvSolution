@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,98 +10,120 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
+    location    "system";
     object      fvSolution;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 solvers
 {
-    rho PCG
+    rho
     {
-        preconditioner   DIC;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    U PBiCG
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    U
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0.1;
-    };
-    UFinal PBiCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0.1;
+    }
+
+    UFinal
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    p PCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    p
     {
-        preconditioner   DIC;
-        tolerance        1e-06;
-        relTol           0.01;
-    };
-    pFinal PCG
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-06;
+        relTol          0.01;
+    }
+
+    pFinal
     {
-        preconditioner   DIC;
-        tolerance        1e-06;
-        relTol           0;
-    };
-    h PBiCG
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-06;
+        relTol          0;
+    }
+
+    h
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0.1;
-    };
-    hFinal PBiCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0.1;
+    }
+
+    hFinal
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    R PBiCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    R
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    k PBiCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    k
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    epsilon PBiCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    epsilon
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
-    omega PBiCG
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    omega
     {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-05;
+        relTol          0;
+    }
 }
 
 PIMPLE
 {
-    nOuterCorrectors  50;
-    nCorrectors       1;
+    nOuterCorrectors 50;
+    nCorrectors     1;
     nNonOrthogonalCorrectors 0;
     momentumPredictor yes;
-
-    pMin            pMin [1 -1 -2 0 0 0 0] 1000;
+    pMin            pMin [ 1 -1 -2 0 0 0 0 ] 1000;
 }
 
 relaxationFactors
 {
-    U    0.7;
-    p    0.3;
-    rho  0.05;
-    h    0.7;
-    k    0.7;
-    omega 0.7;
+    U               0.7;
+    p               0.3;
+    rho             0.05;
+    h               0.7;
+    k               0.7;
+    omega           0.7;
 }
+
 
 // ************************************************************************* //

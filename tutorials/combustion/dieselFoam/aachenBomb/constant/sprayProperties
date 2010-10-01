@@ -1,15 +1,16 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
-    format      ascii;
+    format      binary;
     class       dictionary;
+    location    "constant";
     object      sprayProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -24,20 +25,13 @@ interpolationSchemes
 
 subCycles       2;
 
-atomizationModel        off;
-//atomizationModel      LISA;
+atomizationModel off;
 
-includeOscillation      yes;
-//breakupModel    TAB;
-//breakupModel    ETAB;
-//breakupModel    ReitzDiwakar;
+includeOscillation yes;
+
 breakupModel    ReitzKHRT;
 
-//injectorModel         constInjector;
-//injectorModel         ChomiakInjector;
-//injectorModel         definedInjector;
-//injectorModel         pressureSwirlInjector;
-injectorModel           hollowConeInjector;
+injectorModel   hollowConeInjector;
 
 collisionModel  off;
 
@@ -51,42 +45,29 @@ dragModel       standardDragModel;
 
 wallModel       reflect;
 
-sprayIteration
-{
-    sprayIterate 1;
-    sprayRelaxFactor 1;
-    minimumParcelMass 1e-14;
-}
-
 specConstAtomizationCoeffs
 {
-    dropletNozzleDiameterRatio
-    (
-        0.4
-    );
-    sprayAngle
-    (
-        10
-    );
+    dropletNozzleDiameterRatio ( 0.4 );
+    sprayAngle      ( 10 );
 }
 
 TABCoeffs
 {
-    y0              0.0;
-    yDot0           0.0;
-    Cmu             10.0;
-    Comega          8.0;
+    y0              0;
+    yDot0           0;
+    Cmu             10;
+    Comega          8;
     WeCrit          12;
 }
 
 ETABCoeffs
 {
-    Cmu         10.0;
-    Comega      8.0;
-    WeCrit      12;
-    k1          0.2;
-    k2          0.2;
-    WeTransition    100.0;
+    Cmu             10;
+    Comega          8;
+    WeCrit          12;
+    k1              0.2;
+    k2              0.2;
+    WeTransition    100;
 }
 
 ReitzDiwakarCoeffs
@@ -141,50 +122,31 @@ hollowConeInjectorCoeffs
 {
     dropletPDF
     {
-        //pdfType           exponential;
         pdfType         RosinRammler;
-
         RosinRammlerPDF
         {
-            minValue        1.00e-6;
-            maxValue        1.50e-4;
-
-            d
-            (
-                1.5e-4
-            );
-
-            n
-            (
-                3
-            );
+            minValue        1e-06;
+            maxValue        0.00015;
+            d               ( 0.00015 );
+            n               ( 3 );
         }
+
         exponentialPDF
         {
-            minValue        1.0e-4;
-            maxValue        1.0e-3;
-
-            lambda
-            (
-                1.0e+4
-            );
+            minValue        0.0001;
+            maxValue        0.001;
+            lambda          ( 10000 );
         }
     }
 
-    innerConeAngle
-    (
-        0.0
-    );
-
-    outerConeAngle
-    (
-        20.0
-    );
+    innerConeAngle  ( 0 );
+    outerConeAngle  ( 20 );
 }
 
 reflectCoeffs
 {
     elasticity      0.9;
 }
+
 
 // ************************************************************************* //

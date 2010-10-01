@@ -2,8 +2,8 @@
 # Source tutorial run functions
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
-# Get application name from directory
-application=`basename $PWD`
+# Set application name
+application="sonicLiquidFoam"
 
 setDecompressionTankFine ()
 {

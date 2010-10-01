@@ -1,35 +1,34 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
-    format      ascii;
+    format      binary;
     class       dictionary;
-    object      thermodynamicProperties;
+    location    "constant";
+    object      thermophysicalProperties;
 }
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-thermoType hMixtureThermo<reactingMixture>;
+thermoType      hsPsiMixtureThermo<reactingMixture<gasThermoPhysics>>;
 
-CHEMKINFile         "$FOAM_CASE/chemkin/chem.inp";
-// We use the central thermo data:
-CHEMKINThermoFile   "~OpenFOAM/thermoData/therm.dat";
+CHEMKINFile     "$FOAM_CASE/chemkin/chem.inp";
+
+CHEMKINThermoFile "~OpenFOAM/thermoData/therm.dat";
 
 inertSpecie     N2;
 
-liquidComponents
-(
-    C7H16
-);
+liquidComponents ( C7H16 );
 
 liquidProperties
 {
-    C7H16  C7H16 defaultCoeffs;
+    C7H16           C7H16 defaultCoeffs;
 }
 
-/*********************************************************************/
+
+// ************************************************************************* //

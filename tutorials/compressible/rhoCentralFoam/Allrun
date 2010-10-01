@@ -1,10 +1,9 @@
 #!/bin/sh
-
 # Source tutorial run functions
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
-# Get application name from directory
-application=`basename $PWD`
+# Get application name
+application="rhoCentralFoam"
 
 cases=" \
 shockTube \
@@ -15,12 +14,13 @@ LadenburgJet60psi \
 biconic25-55Run35 \
 "
 
-moveTimeMeshToConstant () {
-DT=`foamInfoExec -times | tail -1`
-if [ $DT != 0 ] ; then
-    mv ${DT}/polyMesh/* constant/polyMesh
-    rm -rf ${DT}
-fi
+moveTimeMeshToConstant ()
+{
+   DT=`foamInfoExec -times | tail -1`
+   if [ "$DT" != 0 ] ; then
+       mv ${DT}/polyMesh/* constant/polyMesh
+       rm -rf ${DT}
+   fi
 }
 
 for case in $cases
