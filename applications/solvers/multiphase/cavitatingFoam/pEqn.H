@@ -24,7 +24,7 @@
 
     phiv -= phiGradp/rhof;
 
-    #include "resetPhivPatches.H"
+#   include "resetPhivPatches.H"
 
     for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
     {
@@ -63,7 +63,7 @@
         rhoMin
     );
 
-    #include "gammaPsi.H"
+#   include "gammaPsi.H"
 
     p =
     (
