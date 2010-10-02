@@ -1,0 +1,45 @@
+syntax: glob
+
+# This line is a comment, and will be skipped.
+# Empty lines are skipped too.
+
+# Backup files left behind by the Emacs editor.
+*~
+
+# Lock files used by the Emacs editor.
+# Notice that the "#" character is quoted with a backslash.
+# This prevents it from being interpreted as starting a comment.
+.\#*
+
+# Temporary files used by the vim editor.
+.*.swp
+
+# A hidden file created by the Mac OS X Finder.
+.DS_Store
+
+# Ignore the Darwin-dirctories
+darwinIntel*
+
+# those have to go
+lnInclude
+
+# dependency-files
+*.dep
+
+# no Doxygen stuff
+doc/Doxygen/html
+
+# patch residue
+*.orig
+*.rej
+
+# pyFoam-stuff
+PlyParser_FoamFileParser_parsetab.py
+
+# python-compile
+*.pyc
+
+# other stuff
+.build
+.gitignore
+.timeStamp
