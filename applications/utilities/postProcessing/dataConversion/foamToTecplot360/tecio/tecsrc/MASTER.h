@@ -373,7 +373,7 @@
 #define SYSV
 #endif
 
-#if defined DECX || defined LINUX || defined IBMRS6000X || defined COMPAQX || defined DARWIN
+#if defined DECX || defined LINUX || defined IBMRS6000X || defined COMPAQX || defined DARWIN || defined darwin
 #define UNIXX
 #endif
 

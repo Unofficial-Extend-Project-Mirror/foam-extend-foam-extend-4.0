@@ -12,6 +12,11 @@ then
          mkdir -p Make/$WM_OPTIONS > /dev/null 2>&1
          cd Make/$WM_OPTIONS
          cmake ../..
+	 if [ $WM_ARCH_BASE == "darwin" ]
+	 then
+	     sed -i bak -e 's/-dynamiclib /& -undefined dynamic_lookup /' CMakeFiles/PV3FoamReader.dir/link.txt	 
+	     sed -i bak -e 's/-dynamiclib /& -undefined dynamic_lookup /' CMakeFiles/PV3FoamReader_SM.dir/link.txt	 
+	 fi
          make
       )
       ;;
