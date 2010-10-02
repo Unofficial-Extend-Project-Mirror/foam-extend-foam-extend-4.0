@@ -179,6 +179,9 @@ Linux)
     ;;
 
 Darwin)
+    # this makes certain things easier
+    export WM_ARCH_BASE=darwin
+
     case `uname -p` in
     powerpc)
 	export WM_ARCH=darwinPpc
@@ -191,6 +194,45 @@ Darwin)
 	export WM_ARCH=darwinIntel
 	;;
     esac
+    case $WM_ARCH_OPTION in
+    32)
+	export WM_CFLAGS='-m32 -fPIC'
+	export WM_CXXFLAGS='-m32 -fPIC'
+	export WM_LDFLAGS='-m32'
+	;;
+    64)
+        export WM_ARCH=${WM_ARCH}64
+	export WM_CFLAGS='-m64 -fPIC'
+	export WM_CXXFLAGS='-m64 -fPIC'
+	export WM_LDFLAGS='-m64'
+	;;
+    *)
+	echo Unknown WM_ARCH_OPTION $WM_ARCH_OPTION, should be 32 or 64
+	;;
+    esac
+
+    # Make sure that binaries use the best features of the used OS-Version
+    export MACOSX_DEPLOYMENT_TARGET=`sw_vers -productVersion`
+
+    # Use Mac-Ports-Compiler instead of Apple-gcc-4.2
+    case $WM_COMPILER in
+    Gcc43)
+        export WM_CC='gcc-mp-4.3'
+	export WM_CXX='g++-mp-4.3'
+	;;
+    Gcc44)
+        export WM_CC='gcc-mp-4.4'
+	export WM_CXX='g++-mp-4.4'
+	;;
+    Gcc45)
+        export WM_CC='gcc-mp-4.5'
+	export WM_CXX='g++-mp-4.5'
+        ;;
+    *)
+        export WM_COMPILER=
+        ;;
+    esac
+
     ;;
 
 SunOS)
@@ -222,6 +264,12 @@ cleanEnv=`$cleanProg "$PATH" "$foamOldDirs"` && PATH="$cleanEnv"
 
 #- Clean LD_LIBRARY_PATH
 cleanEnv=`$cleanProg "$LD_LIBRARY_PATH" "$foamOldDirs"` && LD_LIBRARY_PATH="$cleanEnv"
+
+#- Clean DYLD_LIBRARY_PATH
+if [[ "$WM_ARCH_BASE" == "darwin" ]] 
+then
+    cleanEnv=`$cleanProg "$DYLD_LIBRARY_PATH" "$foamOldDirs"` && DYLD_LIBRARY_PATH="$cleanEnv"
+fi
 
 #- Clean MANPATH
 cleanEnv=`$cleanProg "$MANPATH" "$foamCleanDirs"` && MANPATH="$cleanEnv"
