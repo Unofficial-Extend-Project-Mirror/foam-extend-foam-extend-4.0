@@ -173,8 +173,13 @@ libso:   $(LIB).$(SO)
 $(LIB).$(SO): $(OBJECTS)
 	     @$(WM_SCRIPTS)/mkObjectDir $(LIB)
 	     @rm -f so_locations
+ifeq ($(WM_ARCH_BASE),darwin)
+	     @cd $(OBJECTS_DIR) ; \
+	     $(LINKLIBSO) $(LOCAL_OBJECTS) -L$(LIB_WM_OPTIONS_DIR) $(LIB_LIBS) $(GLIB_LIBS) -install_name $(notdir $(LIB)).$(SO) -o $(LIB).$(SO)
+else
 	     @cd $(OBJECTS_DIR) ; \
 	     $(LINKLIBSO) $(LOCAL_OBJECTS) -L$(LIB_WM_OPTIONS_DIR) $(LIB_LIBS) $(GLIB_LIBS) -o $(LIB).$(SO)
+endif
 
 lib:     $(LIB).a
 	     @echo \'$(LIB).a\' is up to date.
