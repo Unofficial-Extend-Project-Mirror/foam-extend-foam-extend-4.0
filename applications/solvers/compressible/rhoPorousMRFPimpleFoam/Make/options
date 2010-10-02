@@ -11,5 +11,6 @@ EXE_LIBS = \
     -lspecie \
     -lcompressibleRASModels \
     -lcompressibleLESModels \
+    -lcompressibleTurbulenceModel \
     -lfiniteVolume \
     -lmeshTools

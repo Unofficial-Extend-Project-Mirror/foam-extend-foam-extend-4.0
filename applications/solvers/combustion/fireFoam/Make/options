@@ -16,4 +16,5 @@ EXE_LIBS = \
     -lfiniteVolume \
     -lcompressibleLESModels \
     -lcompressibleRASModels \
+    -lcompressibleTurbulenceModel \
     -lradiation
