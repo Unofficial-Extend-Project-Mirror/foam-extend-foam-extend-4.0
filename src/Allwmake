@@ -40,10 +40,10 @@ wmake libso blockMatrix
 
 wmake libso dynamicMesh
 
-(cd tetDecompositionFiniteElement ; Allwmake)
+(cd tetDecompositionFiniteElement ; ./Allwmake)
 
 wmake libso fvMotionSolver
-(cd tetDecompositionMotionSolver ; Allwmake)
+(cd tetDecompositionMotionSolver ; ./Allwmake)
 
 wmake libso coupledMatrix
 wmake libso sampling
