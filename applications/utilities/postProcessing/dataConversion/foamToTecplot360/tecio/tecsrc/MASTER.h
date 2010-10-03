@@ -524,7 +524,11 @@
 #    if XmVERSION == 1 && XmREVISION == 0
 #    endif
 #  else
-#    include <X11/Intrinsic.h>
+#    ifndef darwin
+#      include <X11/Intrinsic.h>
+#    else
+       typedef void *Widget;
+#    endif
 #  endif
 #endif
 
