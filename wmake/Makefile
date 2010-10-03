@@ -90,7 +90,7 @@ EXE_DEP         = $(OBJECTS_DIR)/options
 LIB             = libNULL
 
 # Shared library extension
-ifeq ($(WM_ARCH),darwin)
+ifeq ($(WM_ARCH_BASE),darwin)
 # Using Mac OSX
 SO              = dylib
 else
