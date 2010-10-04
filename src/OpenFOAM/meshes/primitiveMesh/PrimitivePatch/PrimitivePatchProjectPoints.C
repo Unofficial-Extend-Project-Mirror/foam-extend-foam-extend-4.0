@@ -346,7 +346,7 @@ projectFaceCentres
 
     const ToPatch& masterFaces = targetPatch;
 
-    const typename ToPatch::PointFieldType& masterPoints = targetPatch.points();
+    const Field<PointType>& masterPoints = targetPatch.points();
 
     forAll (masterFaceCentres, faceI)
     {
