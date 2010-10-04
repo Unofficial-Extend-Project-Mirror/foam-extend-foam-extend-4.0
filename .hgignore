@@ -5,6 +5,22 @@ syntax: glob
 
 # Backup files left behind by the Emacs editor.
 *~
+.*~
+*.bak
+*.bak[0-9][0-9]
+*.orig
+*.orig[0-9][0-9]
+\#*\#
+
+# CVS recovered versions - anywhere
+.#*
+
+# objects and archives - anywhere
+*.[oa]
+*.la
+*.so
+*.jar
+*.dylib
 
 # Lock files used by the Emacs editor.
 # Notice that the "#" character is quoted with a backslash.
@@ -17,17 +33,34 @@ syntax: glob
 # A hidden file created by the Mac OS X Finder.
 .DS_Store
 
-# Ignore the Darwin-dirctories
+# Ignore the build-dirctories
 darwinIntel*
+linux*Gcc*/
+linux*Icc*/
+linuxming*/
+SiCortex*Gcc*/
+solaris*Gcc*/
+SunOS*Gcc*/
+
+# reinstate wmake/rules that might look like build folders
+!wmake/rules/*/
 
 # those have to go
 lnInclude
+
+# derived files
+lex.yy.c
+
+# Corefiles
+core
 
 # dependency-files
 *.dep
 
 # no Doxygen stuff
-doc/Doxygen/html
+doc/[Dd]oxygen/html
+doc/[Dd]oxygen/latex
+doc/[Dd]oxygen/man
 
 # patch residue
 *.orig
@@ -41,5 +74,5 @@ PlyParser_FoamFileParser_parsetab.py
 
 # other stuff
 .build
-.gitignore
+# .gitignore
 .timeStamp
