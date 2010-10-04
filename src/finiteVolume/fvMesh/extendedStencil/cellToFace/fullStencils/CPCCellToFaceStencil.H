@@ -44,7 +44,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class CPCCellToFaceStencil Declaration
+                    Class CPCCellToFaceStencil Declaration
 \*---------------------------------------------------------------------------*/
 
 class CPCCellToFaceStencil
