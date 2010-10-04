@@ -13,4 +13,6 @@ EXE_LIBS = \
     -lmeshTools \
     -lincompressibleTransportModels \
     -lphaseModel \
-    -lkineticTheoryModel
+    -lkineticTheoryModel \
+    -llduSolvers
+
