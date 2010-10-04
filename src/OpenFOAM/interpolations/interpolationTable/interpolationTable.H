@@ -113,8 +113,8 @@ public:
         //- Construct given the name of the file containing the table of data
         interpolationTable(const fileName& fName);
 
-        //- Construct by reading the fileName and boundsHandling from dictionary
-        //  and read the table from that file.
+        //- Construct by reading the fileName and boundsHandling
+        //  from dictionary and read the table from that file.
         //  This is a specialised constructor used by patchFields
         interpolationTable(const dictionary& dict);
 
