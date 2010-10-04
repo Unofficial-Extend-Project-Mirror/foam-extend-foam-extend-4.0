@@ -1,6 +1,0 @@
-.SUFFIXES: .L
-
-Ltoo = foamFlex++ -f $$SOURCE ; mv lex.yy.cc $*.C ; $(CC) $(c++FLAGS) -c $*.C -o $@ 
-
-.L.dep:
-	$(MAKE_DEP)

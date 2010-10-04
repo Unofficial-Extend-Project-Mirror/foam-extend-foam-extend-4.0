@@ -1,6 +1,7 @@
-CPP        = cpp $(WM_CPP_OPTIONS)
+CPP        = cpp-4.2 $(WM_CPP_OPTIONS)
 LD         = ld 
-GLIBS      = -L$(FOAM_LIBBIN)/dummy -lPstream
+
+PROJECT_LIBS = -l$(WM_PROJECT)
 
 include $(GENERAL_RULES)/standard
 

@@ -1,6 +1,9 @@
 # git-ls-files --others --exclude-from=.git/info/exclude
 # Lines that start with '#' are comments.
 
+#HJ, local modifications of setup
+etc/bashrc
+
 # editor and misc backup files - anywhere
 *~
 .*~
@@ -37,6 +40,7 @@ lnInclude
 # build folders - anywhere
 linux*Gcc*/
 linux*Icc*/
+darwin*Gcc*/
 linuxming*/
 SiCortex*Gcc*/
 solaris*Gcc*/
