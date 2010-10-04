@@ -44,7 +44,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class fixedGradientFvPatch Declaration
+                    Class fixedGradientFvPatch Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
