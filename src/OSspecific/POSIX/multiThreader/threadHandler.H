@@ -76,21 +76,21 @@ class threadHandler
     pthread_t pthreadID_;
 
     // Is this a master/slave thread
-    bool master_;
+    mutable bool master_;
 
     // Synchronization mutexes
-    Mutex startMutex_;
-    Mutex stopMutex_;
+    mutable Mutex startMutex_;
+    mutable Mutex stopMutex_;
 
     // Conditionals for synchronization
-    Conditional startConditional_;
-    Conditional stopConditional_;
+    mutable Conditional startConditional_;
+    mutable Conditional stopConditional_;
 
     // On some implementations, a conditional wait
     // might return prematurely due to a spurious
     // wake-up signal. Use a predicate to avoid this
     // behaviour.
-    FixedList<bool, 2> predicate_;
+    mutable FixedList<bool, 2> predicate_;
 
 public:
 
@@ -121,43 +121,43 @@ public:
     inline void set(const label index, void* argPtr);
 
     // Return a reference to the multiThreader
-    inline const multiThreader& threader();
+    inline const multiThreader& threader() const;
 
     // Return the number of threads
-    inline label nThreads();
+    inline label nThreads() const;
 
     // Designate as master thread
-    inline void setMaster();
+    inline void setMaster() const;
 
     // Designate as slave thread
-    inline void setSlave();
+    inline void setSlave() const;
 
     // Is this a master thread?
-    inline bool master();
+    inline bool master() const;
 
     // Is this a slave thread?
-    inline bool slave();
+    inline bool slave() const;
 
     // Lock this thread
-    inline void lock(const signalType sType);
+    inline void lock(const signalType sType) const;
 
     // Unlock this thread
-    inline void unlock(const signalType sType);
+    inline void unlock(const signalType sType) const;
 
     // Send signal to a waiting conditional
-    inline void sendSignal(const signalType sType);
+    inline void sendSignal(const signalType sType) const;
 
     // Wait for signal
-    inline void waitForSignal(const signalType sType);
+    inline void waitForSignal(const signalType sType) const;
 
     // Return state of the predicate variable
-    inline bool predicate(const signalType sType);
+    inline bool predicate(const signalType sType) const;
 
     // Set the predicate variable
-    inline void setPredicate(const signalType sType);
+    inline void setPredicate(const signalType sType) const;
 
     // Unset the predicate variable
-    inline void unsetPredicate(const signalType sType);
+    inline void unsetPredicate(const signalType sType) const;
 
     // Set the ID
     inline void setID(const pthread_t& pt);
@@ -165,10 +165,40 @@ public:
     // Return the ID
     inline pthread_t ID() const;
 
+    // Does the calling thread correspond to this handler?
+    inline bool self() const;
+
     // Return an argument pointer at a particular index
     inline void * operator()(const label index);
 };
 
+
+// Lock all threads provided by sequence
+template <class T>
+void lockThreads
+(
+    const List<label>& sequence,
+    const PtrList<threadHandler<T> >& handler
+);
+
+
+// Synchronize all threads provided by sequence
+template <class T>
+void synchronizeThreads
+(
+    const List<label>& sequence,
+    const PtrList<threadHandler<T> >& handler
+);
+
+
+// Execute threads for the submitted static function by sequence
+template <class T>
+void executeThreads
+(
+    const List<label>& sequence,
+    PtrList<threadHandler<T> >& handler,
+    void (*tFunction)(void*)
+);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

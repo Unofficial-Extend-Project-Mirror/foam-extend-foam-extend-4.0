@@ -176,9 +176,9 @@ class multiThreader
 {
     // Private data
 
-        int numThreads_;
+        mutable int numThreads_;
 
-        int maxQueueSize_;
+        mutable int maxQueueSize_;
 
         // Work-queue item: Holds a pointer to the method and its argument
         struct workQueueItem
@@ -189,7 +189,7 @@ class multiThreader
         };
 
         // Common structure for all threads in the pool.
-        struct threadPool
+        mutable struct threadPool
         {
             multiThreader *threader;
             int numThreads;
@@ -246,7 +246,7 @@ public:
         int getNumThreads() const;
 
         //- Obtain the thread ID for a given index
-        pthread_t getID(int index);
+        pthread_t getID(int index) const;
 
         //- Return true if the number of threads is equal to one.
         bool singleThreaded() const;
@@ -258,10 +258,10 @@ public:
         int getMaxQueueSize() const;
 
         //- Set the maxQueueSize
-        void setMaxQueueSize(int size);
+        void setMaxQueueSize(int size) const;
 
         //- Add a function to the work queue
-        void addToWorkQueue(void (*tFunction)(void*), void *arg);
+        void addToWorkQueue(void (*tFunction)(void*), void *arg) const;
 
         //- Conditional handling
         void waitForCondition(Conditional&, Mutex&) const;
