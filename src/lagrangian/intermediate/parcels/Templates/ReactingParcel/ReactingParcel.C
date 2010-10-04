@@ -512,6 +512,7 @@ Foam::ReactingParcel<ParcelType>::ReactingParcel
     const ReactingParcel<ParcelType>& p
 )
 :
+    reactingParcel(),
     ThermoParcel<ParcelType>(p),
     mass0_(p.mass0_),
     Y_(p.Y_),

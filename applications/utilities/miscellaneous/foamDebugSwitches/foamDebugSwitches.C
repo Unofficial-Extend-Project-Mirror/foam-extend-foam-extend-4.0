@@ -84,20 +84,20 @@ int main(int argc, char *argv[])
         {
             IOobject::writeDivider(Info);
 
-            hashset = oldDebug;
-            hashset -= currDebug;
+            hashset = wordHashSet(oldDebug);
+            hashset -= wordHashSet(currDebug);
             listing = hashset.toc();
             sort(listing);
             Info<< "old DebugSwitches: " << listing << endl;
 
-            hashset = oldInfo;
-            hashset -= currInfo;
+            hashset = wordHashSet(oldInfo);
+            hashset -= wordHashSet(currInfo);
             listing = hashset.toc();
             sort(listing);
             Info<< "old InfoSwitches: " << listing << endl;
 
-            hashset = oldOpt;
-            hashset -= currOpt;
+            hashset = wordHashSet(oldOpt);
+            hashset -= wordHashSet(currOpt);
             listing = hashset.toc();
             sort(listing);
             Info<< "old OptimisationSwitches: " << listing << endl;
@@ -108,21 +108,21 @@ int main(int argc, char *argv[])
         {
             IOobject::writeDivider(Info);
 
-            hashset = currDebug;
-            hashset -= oldDebug;
+            hashset = wordHashSet(currDebug);
+            hashset -= wordHashSet(oldDebug);
 
             listing = hashset.toc();
             sort(listing);
             Info<< "new DebugSwitches: " << listing << endl;
 
-            hashset = currInfo;
-            hashset -= oldInfo;
+            hashset = wordHashSet(currInfo);
+            hashset -= wordHashSet(oldInfo);
             listing = hashset.toc();
             sort(listing);
             Info<< "new InfoSwitches: " << listing << endl;
 
-            hashset = currOpt;
-            hashset -= oldOpt;
+            hashset = wordHashSet(currOpt);
+            hashset -= wordHashSet(oldOpt);
             listing = hashset.toc();
             sort(listing);
             Info<< "new OptimisationSwitches: " << listing << endl;

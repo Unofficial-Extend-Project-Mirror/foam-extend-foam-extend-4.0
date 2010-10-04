@@ -343,7 +343,7 @@ void Foam::motionSmoother::getAffectedFacesAndPoints
         (
             mesh_,
             "grownPoints",
-            labelHashSet(getPoints(labelHashSet(nbrFaces.toc())))
+            getPoints(labelHashSet(nbrFaces.toc()))
         );
 
         forAllConstIter(pointSet, nbrPoints, iter)

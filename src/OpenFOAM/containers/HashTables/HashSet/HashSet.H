@@ -72,19 +72,19 @@ public:
     // Constructors
 
         //- Construct given initial size
-        HashSet(const label size = 128)
+        explicit HashSet(const label size = 128)
         :
             HashTable<nil, Key, Hash>(size)
         {}
 
         //- Construct from Istream
-        HashSet(Istream& is)
+        explicit HashSet(Istream& is)
         :
             HashTable<nil, Key, Hash>(is)
         {}
 
         //- Construct from UList of Key
-        HashSet(const UList<Key>& lst)
+        explicit HashSet(const UList<Key>& lst)
         :
             HashTable<nil, Key, Hash>(2*lst.size())
         {
@@ -101,13 +101,13 @@ public:
         {}
 
         //- Construct by transferring the parameter contents
-        HashSet(const Xfer<HashSet<Key, Hash> >& hs)
+        explicit HashSet(const Xfer<HashSet<Key, Hash> >& hs)
         :
             HashTable<nil, Key, Hash>(hs)
         {}
 
         //- Construct by transferring the parameter contents
-        HashSet(const Xfer<HashTable<nil, Key, Hash> >& hs)
+        explicit HashSet(const Xfer<HashTable<nil, Key, Hash> >& hs)
         :
             HashTable<nil, Key, Hash>(hs)
         {}

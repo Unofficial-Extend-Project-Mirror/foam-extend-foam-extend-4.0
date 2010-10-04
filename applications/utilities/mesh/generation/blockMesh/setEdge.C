@@ -125,10 +125,12 @@ void blockDescriptor::setEdge(label edgeI, label start, label end, label dim)
         // edge is a straight line
         scalar gExp = calcGexp(expand_[edgeI], dim);
 
-        // divide the line
+        // Divide the line
+        lineEdge le(blockPoints, start, end);
+
         lineDivide divEdge
         (
-            lineEdge(blockPoints, start, end),
+            le,
             dim,
             gExp
         );

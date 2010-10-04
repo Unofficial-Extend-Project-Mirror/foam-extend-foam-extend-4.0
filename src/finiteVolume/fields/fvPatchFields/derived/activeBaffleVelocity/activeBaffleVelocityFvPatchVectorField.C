@@ -178,7 +178,7 @@ void Foam::activeBaffleVelocityFvPatchVectorField::rmap
 
     // See autoMap.
     const vectorField& areas = patch().boundaryMesh().mesh().faceAreas();
-    initWallSf_ = patch().patchSlice(areas);
+    initWallSf_ = vectorField(patch().patchSlice(areas));
     initCyclicSf_ = patch().boundaryMesh()
     [
         cyclicPatchLabel_

@@ -84,7 +84,6 @@ class DynamicList
         //- The capacity (allocated size) of the underlying list.
         label capacity_;
 
-    // Private Member Functions
 
 public:
 
@@ -101,8 +100,8 @@ public:
         //- Construct given size.
         explicit inline DynamicList(const label);
 
-        //- Construct copy.
-        explicit inline DynamicList
+        //- Construct copy
+        inline DynamicList
         (
             const DynamicList<T, SizeInc, SizeMult, SizeDiv>&
         );

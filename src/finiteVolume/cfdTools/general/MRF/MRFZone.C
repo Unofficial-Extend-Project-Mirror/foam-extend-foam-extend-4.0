@@ -189,7 +189,7 @@ void Foam::MRFZone::setMRFFaces()
 
     if (debug)
     {
-        faceSet internalFaces(mesh_, "internalFaces", internalFaces_);
+        faceSet internalFaces(mesh_, "internalFaces", labelHashSet(internalFaces_));
         Pout<< "Writing " << internalFaces.size()
             << " internal faces in MRF zone to faceSet "
             << internalFaces.name() << endl;

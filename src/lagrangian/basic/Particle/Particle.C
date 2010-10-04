@@ -185,6 +185,7 @@ Foam::Particle<ParticleType>::Particle
 template<class ParticleType>
 Foam::Particle<ParticleType>::Particle(const Particle<ParticleType>& p)
 :
+    IDLList<ParticleType>::link(),
     cloud_(p.cloud_),
     position_(p.position_),
     celli_(p.celli_),

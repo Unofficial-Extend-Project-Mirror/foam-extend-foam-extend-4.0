@@ -1944,7 +1944,7 @@ int main(int argc, char *argv[])
         {
             const cellZone& cz = cellZones[zoneI];
 
-            cellSet(mesh, cz.name(), cz).write();
+            cellSet(mesh, cz.name(), labelHashSet(cz)).write();
         }
     }
     else

@@ -67,11 +67,11 @@ class faceToCellStencil
 
     // Private Member Functions
 
-        //- Disallow default bitwise copy construct
-        faceToCellStencil(const faceToCellStencil&);
-
-        //- Disallow default bitwise assignment
-        void operator=(const faceToCellStencil&);
+//HJ        //- Disallow default bitwise copy construct
+//HJ        faceToCellStencil(const faceToCellStencil&);
+//HJ
+//HJ        //- Disallow default bitwise assignment
+//HJ        void operator=(const faceToCellStencil&);
 
 public:
 
