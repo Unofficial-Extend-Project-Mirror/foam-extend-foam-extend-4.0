@@ -318,7 +318,7 @@ void multiThreader::addToWorkQueue
 (
     void (*tFunction)(void*),
     void *arg
-)
+) const
 {
     if (singleThreaded())
     {
@@ -494,7 +494,7 @@ int multiThreader::getNumThreads() const
 
 
 //- Obtain the thread ID for a given index
-pthread_t multiThreader::getID(int index)
+pthread_t multiThreader::getID(int index) const
 {
     if (multiThreaded())
     {
@@ -536,7 +536,7 @@ int multiThreader::getMaxQueueSize() const
 
 
 //- Set the maxQueueSize
-void multiThreader::setMaxQueueSize(int size)
+void multiThreader::setMaxQueueSize(int size) const
 {
     if (size > 0)
     {
