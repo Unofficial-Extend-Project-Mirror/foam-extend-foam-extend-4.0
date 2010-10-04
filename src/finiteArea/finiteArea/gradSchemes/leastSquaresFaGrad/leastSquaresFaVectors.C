@@ -134,6 +134,9 @@ void Foam::leastSquaresFaVectors::makeLeastSquaresVectors() const
         const unallocLabelList& edgeFaces = p.edgeFaces();
 
         // Build the d-vectors
+        // HJ, reconsider deltas at the boundary, consistent with FVM
+        // Current implementation is good for fixedValue boudaries, but may
+        // cause problems with fixedGradient.  HJ, 4/Oct/2010
         vectorField pd = p.delta();
 
         if (p.coupled())
