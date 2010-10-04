@@ -268,7 +268,7 @@ void Foam::vtkPV3Foam::convertMeshCellZones
             mesh
         );
 
-        subsetMesh.setLargeCellSubset(zMesh[zoneId]);
+        subsetMesh.setLargeCellSubset(labelHashSet(zMesh[zoneId]));
 
         vtkUnstructuredGrid* vtkmesh = volumeVTKMesh
         (
