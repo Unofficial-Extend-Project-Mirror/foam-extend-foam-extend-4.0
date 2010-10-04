@@ -44,14 +44,13 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class CFCCellToFaceStencil Declaration
+                   Class CFCCellToFaceStencil Declaration
 \*---------------------------------------------------------------------------*/
 
 class CFCCellToFaceStencil
 :
     public cellToFaceStencil
 {
-
 public:
 
     // Constructors
