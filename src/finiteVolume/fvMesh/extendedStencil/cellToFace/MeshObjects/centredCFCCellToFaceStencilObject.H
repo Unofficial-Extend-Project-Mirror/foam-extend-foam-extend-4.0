@@ -53,6 +53,18 @@ class centredCFCCellToFaceStencilObject
     public extendedCentredCellToFaceStencil
 {
 
+    // Private Member Functions
+
+        //- Disallow default bitwise copy construct
+        centredCFCCellToFaceStencilObject
+        (
+            const centredCFCCellToFaceStencilObject&
+        );
+
+        //- Disallow default bitwise assignment
+        void operator=(const centredCFCCellToFaceStencilObject&);
+
+
 public:
 
     TypeName("centredCFCCellToFaceStencil");

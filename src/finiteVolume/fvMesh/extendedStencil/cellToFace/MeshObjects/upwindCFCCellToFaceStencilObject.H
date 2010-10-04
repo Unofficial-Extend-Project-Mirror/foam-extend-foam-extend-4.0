@@ -53,6 +53,18 @@ class upwindCFCCellToFaceStencilObject
     public extendedUpwindCellToFaceStencil
 {
 
+    // Private Member Functions
+
+        //- Disallow default bitwise copy construct
+        upwindCFCCellToFaceStencilObject
+        (
+            const upwindCFCCellToFaceStencilObject&
+        );
+
+        //- Disallow default bitwise assignment
+        void operator=(const upwindCFCCellToFaceStencilObject&);
+
+
 public:
 
     TypeName("upwindCFCCellToFaceStencil");
