@@ -50,18 +50,6 @@ License
 //#include "quadraticFitSnGradData.H"
 #include "skewCorrectionVectors.H"
 
-
-#include "centredCECCellToFaceStencilObject.H"
-#include "centredCFCCellToFaceStencilObject.H"
-#include "centredCPCCellToFaceStencilObject.H"
-#include "centredFECCellToFaceStencilObject.H"
-#include "upwindCECCellToFaceStencilObject.H"
-#include "upwindCFCCellToFaceStencilObject.H"
-#include "upwindCPCCellToFaceStencilObject.H"
-#include "upwindFECCellToFaceStencilObject.H"
-
-#include "centredCFCFaceToCellStencilObject.H"
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 defineTypeNameAndDebug(Foam::fvMesh, 0);
