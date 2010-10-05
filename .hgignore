@@ -34,7 +34,8 @@ syntax: glob
 .DS_Store
 
 # Ignore the build-dirctories
-darwinIntel*
+darwinIntel*Opt*/
+darwinIntel*Debug*/
 linux*Gcc*/
 linux*Icc*/
 linuxming*/
