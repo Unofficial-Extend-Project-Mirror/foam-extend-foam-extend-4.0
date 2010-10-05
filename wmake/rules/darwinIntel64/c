@@ -3,7 +3,7 @@
 cWARN        = -Wall
 
 # cc          = gcc-mp-4.3 -m64
-cc          = g++ $(WM_CXXFLAGS)
+cc          = gcc $(WM_CXXFLAGS)
 
 include $(RULES)/c$(WM_COMPILE_OPTION)
 
