@@ -70,7 +70,7 @@ if [ "$PYTHONPATH" ]; then
 else
     export PYTHONPATH=$ParaView_DIR/Utilities/VTKPythonWrapping
 fi
-if [ $WM_ARCH = "darwinPpc" -o $WM_ARCH = "darwinIntel" ]	    
+if [ $WM_ARCH_BASE = "darwin" ]	    
 then
     export PYTHONPATH=$PYTHONPATH:$ParaView_DIR/bin
 fi
@@ -79,6 +79,25 @@ if [ -r $ParaView_DIR ]
 then
     export PATH=$ParaView_DIR/bin:$PATH
     export PV_PLUGIN_PATH=$FOAM_LIBBIN
+    if [ "$WM_ARCH_BASE" == "darwin" ]
+ 	then
+	export PATH=$ParaView_DIR/bin/paraview.app/Contents/MacOS:$PATH
+ 	export DYLD_LIBRARY_PATH=$ParaView_DIR/bin:$DYLD_LIBRARY_PATH
+ 	export DYLD_LIBRARY_PATH=$ParaView_DIR/lib/$ParaView_MAJOR:$DYLD_LIBRARY_PATH
+
+	# Move plugins to a separate directory because paraview crashes 
+	# when it tries to load one of the other libraries in $FOAM_LIBBIN as a plugin
+ 	export PV_PLUGIN_PATH=$FOAM_LIBBIN/paraview
+ 	if [ ! -e $PV_PLUGIN_PATH ]
+ 	    then
+ 	    echo "Creating $PV_PLUGIN_PATH"
+ 	    mkdir $PV_PLUGIN_PATH
+ 	fi
+ 	for i in $(find $FOAM_LIBBIN -depth 1 -name "libPV*")
+	  do
+ 	  ln -sf $i $PV_PLUGIN_PATH
+ 	done
+    fi
 fi
 
 unset cmake paraviewPython
