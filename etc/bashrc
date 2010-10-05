@@ -221,8 +221,8 @@ Darwin)
 	export WM_ARCH=darwinIntel
 	;;
     *)
-        echo "This seems to be an Intel-Mac please tell me the output of 'uname -p'. Bernhard."
-	export WM_ARCH=darwinIntel
+        echo "This seems to be neither an Intel-Mac nor a PPC-Mac please tell me the output of 'uname -p'. Bernhard."
+	export WM_ARCH=darwinUnknown
 	;;
     esac
     case $WM_ARCH_OPTION in

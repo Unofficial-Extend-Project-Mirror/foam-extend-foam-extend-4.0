@@ -1,4 +1,4 @@
-CPP        = cpp-mp-4.3 $(GFLAGS)
+CPP        = cpp $(GFLAGS)
 LD         = ld
 
 PROJECT_LIBS = -l$(WM_PROJECT)
