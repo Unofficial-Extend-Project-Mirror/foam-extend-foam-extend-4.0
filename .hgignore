@@ -1,0 +1,79 @@
+syntax: glob
+
+# This line is a comment, and will be skipped.
+# Empty lines are skipped too.
+
+# Backup files left behind by the Emacs editor.
+*~
+.*~
+*.bak
+*.bak[0-9][0-9]
+*.orig
+*.orig[0-9][0-9]
+\#*\#
+
+# CVS recovered versions - anywhere
+.#*
+
+# objects and archives - anywhere
+*.[oa]
+*.la
+*.so
+*.jar
+*.dylib
+
+# Lock files used by the Emacs editor.
+# Notice that the "#" character is quoted with a backslash.
+# This prevents it from being interpreted as starting a comment.
+.\#*
+
+# Temporary files used by the vim editor.
+.*.swp
+
+# A hidden file created by the Mac OS X Finder.
+.DS_Store
+
+# Ignore the build-dirctories
+darwinIntel*Opt*/
+darwinIntel*Debug*/
+linux*Gcc*/
+linux*Icc*/
+linuxming*/
+SiCortex*Gcc*/
+solaris*Gcc*/
+SunOS*Gcc*/
+
+# reinstate wmake/rules that might look like build folders
+!wmake/rules/*/
+
+# those have to go
+lnInclude
+
+# derived files
+lex.yy.c
+
+# Corefiles
+core
+
+# dependency-files
+*.dep
+
+# no Doxygen stuff
+doc/[Dd]oxygen/html
+doc/[Dd]oxygen/latex
+doc/[Dd]oxygen/man
+
+# patch residue
+*.orig
+*.rej
+
+# pyFoam-stuff
+PlyParser_FoamFileParser_parsetab.py
+
+# python-compile
+*.pyc
+
+# other stuff
+.build
+# .gitignore
+.timeStamp
