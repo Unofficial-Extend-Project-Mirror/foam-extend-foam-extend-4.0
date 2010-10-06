@@ -23,8 +23,8 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
     From scotch forum:
- 	
-    By: Francois PELLEGRINI RE: Graph mapping 'strategy' string [ reply ]  
+
+    By: Francois PELLEGRINI RE: Graph mapping 'strategy' string [ reply ]
     2008-08-22 10:09 Strategy handling in Scotch is a bit tricky. In order
     not to be confused, you must have a clear view of how they are built.
     Here are some rules:

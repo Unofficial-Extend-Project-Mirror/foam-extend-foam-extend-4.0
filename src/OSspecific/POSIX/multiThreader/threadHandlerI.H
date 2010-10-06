@@ -113,7 +113,7 @@ inline void threadHandler<T>::set
 
 // Return a reference to the multiThreader
 template<class T>
-inline const multiThreader& threadHandler<T>::threader()
+inline const multiThreader& threadHandler<T>::threader() const
 {
     return threader_;
 }
@@ -121,7 +121,7 @@ inline const multiThreader& threadHandler<T>::threader()
 
 // Return the number of threads
 template<class T>
-inline label threadHandler<T>::nThreads()
+inline label threadHandler<T>::nThreads() const
 {
     return nThreads_;
 }
@@ -129,7 +129,7 @@ inline label threadHandler<T>::nThreads()
 
 // Designate as master thread
 template<class T>
-inline void threadHandler<T>::setMaster()
+inline void threadHandler<T>::setMaster() const
 {
     master_ = true;
 }
@@ -137,7 +137,7 @@ inline void threadHandler<T>::setMaster()
 
 // Designate as slave thread
 template<class T>
-inline void threadHandler<T>::setSlave()
+inline void threadHandler<T>::setSlave() const
 {
     master_ = false;
 }
@@ -145,7 +145,7 @@ inline void threadHandler<T>::setSlave()
 
 // Is this a master thread?
 template<class T>
-inline bool threadHandler<T>::master()
+inline bool threadHandler<T>::master() const
 {
     return (master_ == true);
 }
@@ -153,7 +153,7 @@ inline bool threadHandler<T>::master()
 
 // Is this a slave thread?
 template<class T>
-inline bool threadHandler<T>::slave()
+inline bool threadHandler<T>::slave() const
 {
     return !master();
 }
@@ -164,7 +164,7 @@ template<class T>
 inline void threadHandler<T>::lock
 (
     const signalType sType
-)
+) const
 {
     if (sType == START)
     {
@@ -183,7 +183,7 @@ template<class T>
 inline void threadHandler<T>::unlock
 (
     const signalType sType
-)
+) const
 {
     if (sType == START)
     {
@@ -202,7 +202,7 @@ template<class T>
 inline void threadHandler<T>::sendSignal
 (
     const signalType sType
-)
+) const
 {
     lock(sType);
 
@@ -249,7 +249,7 @@ template<class T>
 inline void threadHandler<T>::waitForSignal
 (
     const signalType sType
-)
+) const
 {
     if (sType == START)
     {
@@ -294,7 +294,7 @@ template<class T>
 inline bool threadHandler<T>::predicate
 (
     const signalType sType
-)
+) const
 {
     return predicate_[sType];
 }
@@ -305,7 +305,7 @@ template<class T>
 inline void threadHandler<T>::setPredicate
 (
     const signalType sType
-)
+) const
 {
     predicate_[sType] = true;
 }
@@ -316,7 +316,7 @@ template<class T>
 inline void threadHandler<T>::unsetPredicate
 (
     const signalType sType
-)
+) const
 {
     predicate_[sType] = false;
 }
@@ -335,6 +335,14 @@ template<class T>
 inline pthread_t threadHandler<T>::ID() const
 {
     return pthreadID_;
+}
+
+
+// Does the calling thread correspond to this handler?
+template<class T>
+inline bool threadHandler<T>::self() const
+{
+    return pthread_equal(ID(), pthread_self());
 }
 
 
@@ -370,6 +378,88 @@ inline void * threadHandler<T>::operator()
     return argList_[index];
 }
 
+
+// * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
+
+// Lock all threads provided by sequence
+template <class T>
+void lockThreads
+(
+    const List<label>& sequence,
+    const PtrList<threadHandler<T> >& handler
+)
+{
+    forAll(sequence, i)
+    {
+        handler[sequence[i]].lock(threadHandler<T>::START);
+        handler[sequence[i]].lock(threadHandler<T>::STOP);
+
+        handler[sequence[i]].unsetPredicate(threadHandler<T>::START);
+        handler[sequence[i]].unsetPredicate(threadHandler<T>::STOP);
+    }
+}
+
+
+// Synchronize all threads provided by sequence
+template <class T>
+void synchronizeThreads
+(
+    const List<label>& sequence,
+    const PtrList<threadHandler<T> >& handler
+)
+{
+    forAll(sequence, i)
+    {
+        // Wait for a signal from this thread before moving on.
+        handler[sequence[i]].waitForSignal(threadHandler<T>::STOP);
+    }
+}
+
+
+// Execute threads for the submitted static function by sequence
+template <class T>
+void executeThreads
+(
+    const List<label>& sequence,
+    PtrList<threadHandler<T> >& handler,
+    void (*tFunction)(void*)
+)
+{
+    if (!handler.size())
+    {
+        FatalErrorIn
+        (
+            "\n\n"
+            "template <class T>\n"
+            "void executeThreads\n"
+            "(\n"
+            "    const List<label>& sequence,\n"
+            "    PtrList<threadHandler<T> >& handler,\n"
+            "    void (*tFunction)(void*)\n"
+            ")\n"
+        )
+            << "Empty handler list."
+            << abort(FatalError);
+    }
+
+    // Fetch threader reference
+    const multiThreader& threader = handler[0].threader();
+
+    // Lock slave threads by sequence
+    lockThreads(sequence, handler);
+
+    forAll(sequence, i)
+    {
+        // Submit jobs to the work queue
+        threader.addToWorkQueue(tFunction, &(handler[sequence[i]]));
+
+        // Wait for a signal from this thread before moving on.
+        handler[sequence[i]].waitForSignal(threadHandler<T>::START);
+    }
+
+    // Synchronize threads
+    synchronizeThreads(sequence, handler);
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

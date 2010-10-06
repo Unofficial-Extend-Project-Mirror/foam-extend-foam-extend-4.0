@@ -53,6 +53,11 @@ class MRFZones
 :
     public IOPtrList<MRFZone>
 {
+    // Private data
+
+        //- Mesh reference
+        const fvMesh& mesh_;
+
 
     // Private Member Functions
 
