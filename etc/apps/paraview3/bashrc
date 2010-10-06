@@ -70,7 +70,7 @@ if [ "$PYTHONPATH" ]; then
 else
     export PYTHONPATH=$ParaView_DIR/Utilities/VTKPythonWrapping
 fi
-if [ $WM_ARCH_BASE = "darwin" ]	    
+if [ "$WM_ARCH_BASE" = "darwin" ]	    
 then
     export PYTHONPATH=$PYTHONPATH:$ParaView_DIR/bin
 fi
