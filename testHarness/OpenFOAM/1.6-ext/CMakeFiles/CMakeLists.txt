@@ -119,7 +119,7 @@ set (UPDATE_TYPE git)
 #
 find_package(Git)
 if(GIT_FOUND)
-  message("git found: ${GIT_EXECUTABLE}")
+  message("Git was found: ${GIT_EXECUTABLE}")
 endif()
 
 

@@ -9,5 +9,5 @@ tutorialPath=`dirname $0`/..
 
 for case in $cases
 do
-    runApplication $application $case
+    (cd $case; runApplication $application)
 done
