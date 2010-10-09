@@ -1239,6 +1239,8 @@ boundaryField
         gamma           1.4;
         fieldInf        101325;
         lInf            0.025;
+        inletOutlet     off;
+        correctSupercritical off;
         value           nonuniform List<scalar> 
 20
 (
