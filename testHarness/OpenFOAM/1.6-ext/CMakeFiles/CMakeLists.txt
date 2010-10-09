@@ -112,7 +112,15 @@ SET(
 
 # Update section
 #-----------------------------------------------------------------------------
-set (UPDATE_TYPE svn)
+set (UPDATE_TYPE git)
+
+#
+# Using GIT as SCM
+#
+find_package(Git)
+if(GIT_FOUND)
+  message("git found: ${GIT_EXECUTABLE}")
+endif()
 
 
 # Build section
@@ -142,7 +150,7 @@ add_custom_target (OpenFOAM-$ENV{WM_PROJECT_VERSION}_unitTests
 ENABLE_TESTING()
 INCLUDE(CTest)
 
-SET (CTEST_UPDATE_COMMAND "svn")
+SET (CTEST_UPDATE_COMMAND ${GIT_EXECUTABLE})
 
 SET(
     CTEST_CUSTOM_MAXIMUM_NUMBER_OF_ERRORS 1000

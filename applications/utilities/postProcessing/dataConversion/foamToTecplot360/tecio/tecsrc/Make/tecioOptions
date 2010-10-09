@@ -8,11 +8,17 @@
 
 #elif defined(linux)
 
-    TECIO_FLAGS = -DMAKEARCHIVE -DLINUX -DUSEENUM -DTHREED -U_WIN32
+    TECIO_FLAGS = -DMAKEARCHIVE -DLINUX -DLINUX64 -DUSEENUM -DTHREED -U_WIN32
+
+#elif defined(darwinIntel)
+
+#   warning "DarwinIntel architecture detected"
+
+    TECIO_FLAGS = -DMAKEARCHIVE -DLINUX -DLINUX64 -DUSEENUM -DTHREED -U_WIN32
 
 #else
 
-#   error architecture not supported for compiling tecio.
+#error "architecture not supported for compiling tecio."
 
 #endif
 
