@@ -18,7 +18,7 @@ FoamFile
 
 dynamicFvMesh dynamicMotionSolverFvMesh;
 
-motionSolverLibs ("libfvMotionSolvers.so");
+motionSolverLibs ("libfvMotionSolver.so");
 
 solver displacementSBRStress;   //displacementLaplacian;   //displacementSBRStress;
 diffusivity quadratic quadratic inverseDistance 1(minZ);

@@ -16,7 +16,7 @@ FoamFile
 
 dynamicFvMesh dynamicMotionSolverFvMesh;
 
-motionSolverLibs ("libfvMotionSolvers.so");
+motionSolverLibs ("libfvMotionSolver.so");
 
 //solver laplacian;
 solver velocityComponentLaplacian x;
