@@ -14,7 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-applicationClass twoPhaseEulerFoam;
+application     twoPhaseEulerFoam;
 
 startFrom       latestTime;
 

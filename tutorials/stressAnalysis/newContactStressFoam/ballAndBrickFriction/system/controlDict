@@ -22,7 +22,7 @@ FoamFile
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-applicationClass newContactStressFoam;
+application     newContactStressFoam;
 
 startFrom       startTime;
 

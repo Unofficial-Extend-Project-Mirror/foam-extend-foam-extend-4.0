@@ -22,7 +22,7 @@ FoamFile
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-applicationClass icoDyMFoam;
+application     icoDyMFoam;
 
 startFrom       startTime;
 
