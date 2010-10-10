@@ -58,7 +58,7 @@ functions
         type fieldAverage;
 
         // Where to load it from (if not already in solver)
-        functionObjectLibs ("libfieldAverage.so");
+        functionObjectLibs ("libfieldFunctionObjects.so");
 
         // Fields to be  averaged - runTime modifiable
         fields
