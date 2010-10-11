@@ -8,6 +8,7 @@ tutorialPath=`dirname $0`/..
 
 for case in $cases
 do
+    runApplication blockMesh
     runApplication $application
 done 
 
