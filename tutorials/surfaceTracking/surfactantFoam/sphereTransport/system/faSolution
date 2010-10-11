@@ -26,11 +26,7 @@ solvers
 {
     Cs PBiCG
     {
-        preconditioner
-        {
-            type        DILU;
-        }
-
+        preconditioner   DILU;
         minIter          0;
         maxIter          2000;
         tolerance        1e-06;
