@@ -577,7 +577,7 @@ Foam::label Foam::directTopoChange::getCellOrder
     // Now we have new-to-old in newOrder.
     newOrder.setSize(cellInOrder);
 
-    // Invert to get old-to-new. Make sure removed (i.e. unmapped) cells are -1.
+    // Invert to get old-to-new. Make sure removed (i.e. unmapped) cells are -1
     oldToNew = invert(cellCellAddressing.size(), newOrder);
 
     return cellInOrder;
@@ -904,7 +904,7 @@ void Foam::directTopoChange::compact
                                     << " at position " << faceI << endl
                                     << "Probably face has not been adapted for"
                                     << " removed points." << abort(FatalError);
-                            } 
+                            }
                             localPointMap[pointI] = newPointI++;
                         }
                     }
@@ -1487,7 +1487,8 @@ void Foam::directTopoChange::resetZones
             {
                 if (newZoneAddr[i] < pointMap_.size())
                 {
-                    curPzRnb[i] = oldZone.whichPoint(pointMap_[newZoneAddr[i]]);
+                    curPzRnb[i] =
+                        oldZone.whichPoint(pointMap_[newZoneAddr[i]]);
                 }
                 else
                 {
@@ -1719,13 +1720,13 @@ void Foam::directTopoChange::calcFaceZonePointMap
 
         curFzPointRnb.setSize(newZoneMeshPoints.size());
 
-	if( zoneI < oldFaceZoneMeshPointMaps.size() )
+        if( zoneI < oldFaceZoneMeshPointMaps.size() )
         {
-     	    //HR 22.11.09: cannot take reference to zero element of 
+            //HR 22.11.09: cannot take reference to zero element of
             //  oldFaceZoneMeshPointMaps. It may be empty. Hence this
             //  if-statement needs to move out of the loop
-	    const Map<label>& oldZoneMeshPointMap =
-	        oldFaceZoneMeshPointMaps[zoneI];
+            const Map<label>& oldZoneMeshPointMap =
+                oldFaceZoneMeshPointMaps[zoneI];
 
             forAll (newZoneMeshPoints, pointI)
             {
@@ -2034,7 +2035,8 @@ void Foam::directTopoChange::compactAndReorder
     {
         //HR 22.11.09: Fixes error when faceZone is empty
         label maxFaceIndex = -1;
-	if ( mesh.faceZones()[zoneI].size() > 0 )
+
+        if ( mesh.faceZones()[zoneI].size() > 0 )
         {
             maxFaceIndex = max(mesh.faceZones()[zoneI]);
         }
@@ -2211,8 +2213,8 @@ void Foam::directTopoChange::addMesh
         const pointZoneMesh& pointZones = mesh.pointZones();
 
         // Resize
-        points_.setSize(points_.size() + points.size());
-        pointMap_.setSize(pointMap_.size() + points.size());
+        points_.setCapacity(points_.size() + points.size());
+        pointMap_.setCapacity(pointMap_.size() + points.size());
         pointZone_.resize(pointZone_.size() + points.size()/100);
 
         // Precalc offset zones
@@ -2251,11 +2253,11 @@ void Foam::directTopoChange::addMesh
         // always equals nCells
         label nAllCells = mesh.nCells();
 
-        cellMap_.setSize(cellMap_.size() + nAllCells);
+        cellMap_.setCapacity(cellMap_.size() + nAllCells);
         cellFromPoint_.resize(cellFromPoint_.size() + nAllCells/100);
         cellFromEdge_.resize(cellFromEdge_.size() + nAllCells/100);
         cellFromFace_.resize(cellFromFace_.size() + nAllCells/100);
-        cellZone_.setSize(cellZone_.size() + nAllCells);
+        cellZone_.setCapacity(cellZone_.size() + nAllCells);
 
 
         // Precalc offset zones
@@ -2311,11 +2313,11 @@ void Foam::directTopoChange::addMesh
         // Resize
         label nAllFaces = mesh.faces().size();
 
-        faces_.setSize(faces_.size() + nAllFaces);
-        region_.setSize(region_.size() + nAllFaces);
-        faceOwner_.setSize(faceOwner_.size() + nAllFaces);
-        faceNeighbour_.setSize(faceNeighbour_.size() + nAllFaces);
-        faceMap_.setSize(faceMap_.size() + nAllFaces);
+        faces_.setCapacity(faces_.size() + nAllFaces);
+        region_.setCapacity(region_.size() + nAllFaces);
+        faceOwner_.setCapacity(faceOwner_.size() + nAllFaces);
+        faceNeighbour_.setCapacity(faceNeighbour_.size() + nAllFaces);
+        faceMap_.setCapacity(faceMap_.size() + nAllFaces);
         faceFromPoint_.resize(faceFromPoint_.size() + nAllFaces/100);
         faceFromEdge_.resize(faceFromEdge_.size() + nAllFaces/100);
         flipFaceFlux_.resize(flipFaceFlux_.size() + nAllFaces/100);

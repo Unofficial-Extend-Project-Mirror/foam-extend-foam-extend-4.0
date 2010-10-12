@@ -28,7 +28,7 @@ Class
 Description
     A mesh which allows changes in the patch distribution of the
     boundary faces.  The change in patching is set using changePatchID. For a
-    boundary face, a new patch ID is given. 
+    boundary face, a new patch ID is given.
 
 SourceFiles
     repatchPolyTopoChanger.C
@@ -47,7 +47,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                       Class repatchPolyTopoChanger Declaration
+                  Class repatchPolyTopoChanger Declaration
 \*---------------------------------------------------------------------------*/
 
 class repatchPolyTopoChanger
