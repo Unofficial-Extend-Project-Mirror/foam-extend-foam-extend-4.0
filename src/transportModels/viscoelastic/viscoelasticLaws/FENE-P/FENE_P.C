@@ -27,20 +27,18 @@ License
 #include "FENE_P.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    defineTypeNameAndDebug(FENE_P, 0);
+    addToRunTimeSelectionTable(viscoelasticLaw, FENE_P, dictionary);
+}
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(FENE_P, 0);
-addToRunTimeSelectionTable(viscoelasticLaw, FENE_P, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// from components
-FENE_P::FENE_P
+Foam::FENE_P::FENE_P
 (
     const word& name,
     const volVectorField& U,
@@ -71,10 +69,9 @@ FENE_P::FENE_P
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<fvVectorMatrix> FENE_P::divTau(volVectorField& U) const
+Foam::tmp<Foam::fvVectorMatrix> Foam::FENE_P::divTau(volVectorField& U) const
 {
-
-     dimensionedScalar etaPEff = etaP_;
+    dimensionedScalar etaPEff = etaP_;
 
     return
     (
@@ -86,36 +83,35 @@ tmp<fvVectorMatrix> FENE_P::divTau(volVectorField& U) const
 }
 
 
-void FENE_P::correct()
+void Foam::FENE_P::correct()
 {
-
     // Velocity gradient tensor
-    volTensorField L = fvc::grad( U() );
+    volTensorField L = fvc::grad(U());
 
     // Convected derivate term
     volTensorField C = tau_ & L;
 
     // Twice the rate of deformation tensor
-    volSymmTensorField twoD = twoSymm( L );
+    volSymmTensorField twoD = twoSymm(L);
 
-     // Stress transport equation
-    tmp<fvSymmTensorMatrix> tauEqn
+    // Stress transport equation
+    fvSymmTensorMatrix tauEqn
     (
         fvm::ddt(tau_)
-        + fvm::div(phi(), tau_)
-        ==
-        ( 1 / lambda_ / (1 - 3/L2_) ) * etaP_ * twoD 
-        + twoSymm( C )
-        - fvm::Sp( 1 / lambda_ + ( 3 / lambda_ / (1 - 3/L2_) +  tr(tau_)/etaP_ ) / (L2_), tau_ )
+      + fvm::div(phi(), tau_)
+     ==
+        (1/lambda_/(1 - 3/L2_))*etaP_*twoD
+      + twoSymm(C)
+      - fvm::Sp
+        (
+            1/lambda_ + (3/lambda_/(1 - 3/L2_) + tr(tau_)/etaP_)/(L2_),
+            tau_
+        )
     );
 
-    tauEqn().relax();
-    solve(tauEqn);
+    tauEqn.relax();
+    tauEqn.solve();
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

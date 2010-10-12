@@ -1,0 +1,30 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+#
+#+TITLE: *Oldroyd-B viscoelastic constitutive model README file for version 1.6-ext* 
+#+AUTHOR: Jovani                
+#+DATE:  05 October 2010
+
+
+
+* This is a simulation case for a viscoelastic fluid described by the Oldroyd-B
+  constitutive model (PTT-Linear).
+  The geometry was the 4:1 plane contraction. This is a well studied 
+  geometry in viscoelastic fluid flow research.
+
+  More details about the model or parameters used can be found at:
+
+*** L.M. Quinzani, R.C. Amstrong, R.A. Brown, Birefringence and laser-Doppler velocimetry (LDV) studies of
+    viscoelastic flow through a planar contraction, J. Non-Newtonian Fluid Mech. 52 (1994) 1-36.
+
+
+*** This is only an illustrative case for the Oldroyd-B constitutive model. Therefore,
+    there are not more details published until now for this model using this geometry
+    and viscoelasticFluidFoam solver.
+
+

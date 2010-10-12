@@ -1,0 +1,31 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+#
+#+TITLE: *S-MDCPP viscoelastic constitutive model README file for version 1.6-ext* 
+#+AUTHOR: Jovani                
+#+DATE:  05 October 2010
+
+
+
+* This is a simulation case for a viscoelastic fluid described by the 
+  Simplified Modified Double Convected Pom-Pom constitutive model (S-MDCPP).
+  The geometry was the 4:1 plane contraction. 
+
+*** This is only an illustrative case for the S-MDCPP constitutive model. Therefore,
+    there are not more details published until now for this model using this geometry
+    and viscoelasticFluidFoam solver. New tests will be done for this model.
+
+*** The parameters for the constitutive model was obtained from:
+    Wei Wang; Xikui Li; Xianhong Han. A numerical study of constitutive models 
+    endowed with Pom-Pom molecular attributes.Journal of Non-Newtonian 
+    Fluid Mechanics, v. 165,p. 1480-1493, 2010.
+
+
+
+
+

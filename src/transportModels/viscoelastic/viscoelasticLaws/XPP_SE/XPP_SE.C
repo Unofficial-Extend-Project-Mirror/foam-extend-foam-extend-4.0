@@ -27,19 +27,17 @@ License
 #include "XPP_SE.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(XPP_SE, 0);
-addToRunTimeSelectionTable(viscoelasticLaw, XPP_SE, dictionary);
+    defineTypeNameAndDebug(XPP_SE, 0);
+    addToRunTimeSelectionTable(viscoelasticLaw, XPP_SE, dictionary);
+}
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-XPP_SE::XPP_SE
+Foam::XPP_SE::XPP_SE
 (
     const word& name,
     const volVectorField& U,
@@ -86,7 +84,7 @@ XPP_SE::XPP_SE
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<fvVectorMatrix> XPP_SE::divTau(volVectorField& U) const
+Foam::tmp<Foam::fvVectorMatrix> Foam::XPP_SE::divTau(volVectorField& U) const
 {
 
      dimensionedScalar etaPEff = etaP_;
@@ -101,47 +99,50 @@ tmp<fvVectorMatrix> XPP_SE::divTau(volVectorField& U) const
 }
 
 
-void XPP_SE::correct()
+void Foam::XPP_SE::correct()
 {
     // Velocity gradient tensor
-    volTensorField L = fvc::grad( U() );
+    volTensorField L = fvc::grad(U());
 
     // Convected derivate term
     volTensorField C = tau_ & L;
 
     // Twice the rate of deformation tensor
-    volSymmTensorField twoD = twoSymm( L );
+    volSymmTensorField twoD = twoSymm(L);
 
     // Lambda (Backbone stretch)
-    volScalarField Lambda = Foam::sqrt( 1 + tr(tau_)*lambdaOb_/3/etaP_ );
+    volScalarField Lambda = Foam::sqrt(1 + tr(tau_)*lambdaOb_/3/etaP_);
 
     // lambdaS (stretch relaxation time)
-    volScalarField lambdaS = lambdaOs_*Foam::exp( -2/q_*(Lambda - 1));
+    volScalarField lambdaS = lambdaOs_*Foam::exp(-2/q_*(Lambda - 1));
 
     // Extra function
-    volScalarField fTau = 2*lambdaOb_/lambdaS*(1 - 1/Lambda) + 1/Foam::sqr(Lambda)*(1 - alpha_*tr(tau_ & tau_)/3/Foam::sqr(etaP_/lambdaOb_) );
+    volScalarField fTau = 2*lambdaOb_/lambdaS*(1 - 1/Lambda)
+      + 1/Foam::sqr(Lambda)*
+        (1 - alpha_*tr(tau_ & tau_)/3/Foam::sqr(etaP_/lambdaOb_));
 
      // Stress transport equation
-    tmp<fvSymmTensorMatrix> tauEqn
+    fvSymmTensorMatrix tauEqn
     (
         fvm::ddt(tau_)
-        + fvm::div(phi(), tau_)
-        ==
-        etaP_ / lambdaOb_ * twoD 
-        + twoSymm( C )
-        - fvm::Sp(1/lambdaOb_*fTau, tau_)
-        - (
-            1/lambdaOb_*( alpha_*lambdaOb_/etaP_*(tau_ & tau_) + etaP_/lambdaOb_*(fTau -1)*I_ ) )
+      + fvm::div(phi(), tau_)
+     ==
+        etaP_/lambdaOb_*twoD
+      + twoSymm(C)
+      - fvm::Sp(1/lambdaOb_*fTau, tau_)
+      - (
+            1/lambdaOb_*
+            (
+                alpha_*lambdaOb_/etaP_*(tau_ & tau_)
+              + etaP_/lambdaOb_*(fTau - 1)*I_
+            )
+        )
     );
 
-    tauEqn().relax();
-    solve(tauEqn);
+    tauEqn.relax();
+    tauEqn.solve();
 
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

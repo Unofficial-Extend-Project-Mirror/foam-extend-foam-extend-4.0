@@ -1,0 +1,26 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+#
+#+TITLE: *Feta-PTT viscoelastic constitutive model README file for version 1.6-ext* 
+#+AUTHOR: Jovani                
+#+DATE:  05 October 2010
+
+
+
+* This is a simulation case for a viscoelastic fluid described by the Fixed 
+  Eta Phan-Thien-Tanner constitutive model (Feta-PTT).
+  The geometry was a rectangular channel.  
+
+*** This is only an illustrative case for this constitutive model. Therefore,
+    there are not more details published until now for this model using this geometry
+    and viscoelasticFluidFoam solver.
+
+*** The parameters for the constitutive model was obtained from:
+    VERBEETEN, W. M. H. Computational polymer melt rheology. [S.l.]: CIP-Data Library
+    Technische Universiteit Eindhoven, 2001.
+

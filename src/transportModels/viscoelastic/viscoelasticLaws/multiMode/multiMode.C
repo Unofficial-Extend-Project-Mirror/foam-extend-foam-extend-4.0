@@ -27,20 +27,18 @@ License
 #include "multiMode.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    defineTypeNameAndDebug(multiMode, 0);
+    addToRunTimeSelectionTable(viscoelasticLaw, multiMode, dictionary);
+}
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(multiMode, 0);
-addToRunTimeSelectionTable(viscoelasticLaw, multiMode, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// from components
-multiMode::multiMode
+Foam::multiMode::multiMode
 (
     const word& name,
     const volVectorField& U,
@@ -58,24 +56,6 @@ multiMode::multiMode
             U.mesh(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
-        ),
-        U.mesh(),
-        dimensionedSymmTensor
-        (
-            "zero",
-            dimensionSet(1, -1, -2, 0, 0, 0, 0),
-            symmTensor::zero
-        )
-    ),
-    nulo_
-    (
-        IOobject
-        (
-            "nulo",
-            U.time().timeName(),
-            U.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
         ),
         U.mesh(),
         dimensionedSymmTensor
@@ -109,7 +89,8 @@ multiMode::multiMode
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<fvVectorMatrix> multiMode::divTau(volVectorField& U) const
+Foam::tmp<Foam::fvVectorMatrix>
+Foam::multiMode::divTau(volVectorField& U) const
 {
     tmp<fvVectorMatrix> divMatrix = models_[0].divTau(U);
 
@@ -122,10 +103,9 @@ tmp<fvVectorMatrix> multiMode::divTau(volVectorField& U) const
 }
 
 
-tmp<volSymmTensorField> multiMode::tau() const
+Foam::tmp<Foam::volSymmTensorField> Foam::multiMode::tau() const
 {
-
-    tau_ = nulo_; 
+    tau_ *= 0;
 
     for (label i = 0; i < models_.size(); i++)
     {
@@ -133,11 +113,10 @@ tmp<volSymmTensorField> multiMode::tau() const
     }
 
     return tau_;
-
 }
 
 
-void multiMode::correct()
+void Foam::multiMode::correct()
 {
     forAll (models_, i)
     {
@@ -146,12 +125,7 @@ void multiMode::correct()
     }
 
     tau();
-
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

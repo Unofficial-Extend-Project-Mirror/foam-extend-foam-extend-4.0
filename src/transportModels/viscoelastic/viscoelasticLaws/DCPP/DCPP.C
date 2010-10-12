@@ -27,20 +27,18 @@ License
 #include "DCPP.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    defineTypeNameAndDebug(DCPP, 0);
+    addToRunTimeSelectionTable(viscoelasticLaw, DCPP, dictionary);
+}
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(DCPP, 0);
-addToRunTimeSelectionTable(viscoelasticLaw, DCPP, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// from components
-DCPP::DCPP
+Foam::DCPP::DCPP
 (
     const word& name,
     const volVectorField& U,
@@ -117,25 +115,23 @@ DCPP::DCPP
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<fvVectorMatrix> DCPP::divTau(volVectorField& U) const
+Foam::tmp<Foam::fvVectorMatrix> Foam::DCPP::divTau(volVectorField& U) const
 {
-
-     dimensionedScalar etaPEff = etaP_;
+    dimensionedScalar etaPEff = etaP_;
 
     return
     (
         fvc::div(tau_/rho_, "div(tau)")
       - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-      + fvm::laplacian( (etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+      + fvm::laplacian((etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
     );
-
 }
 
 
-void DCPP::correct()
+void Foam::DCPP::correct()
 {
     // Velocity gradient tensor
-    volTensorField L = fvc::grad( U() );
+    volTensorField L = fvc::grad(U());
 
     // Upper convected derivate term
     volTensorField Cupper = S_ & L;
@@ -144,48 +140,42 @@ void DCPP::correct()
     volTensorField Clower = L & S_;
 
     // Twice the rate of deformation tensor
-    volSymmTensorField twoD = twoSymm( L );
+    volSymmTensorField twoD = twoSymm(L);
 
 
     // Evolution of orientation
-    tmp<fvSymmTensorMatrix> SEqn
+    fvSymmTensorMatrix SEqn
     (
         fvm::ddt(S_)
-        + fvm::div(phi(), S_)
-        ==
-        (1 - zeta_/2)*twoSymm( Cupper )
-        - (zeta_/2)*twoSymm( Clower )
-        - (1 - zeta_)*fvm::Sp( (twoD && S_) , S_ )
-        - fvm::Sp(( 1/lambdaOb_/Foam::sqr(Lambda_) ), S_ )
-        + 1/lambdaOb_/Foam::sqr(Lambda_)/3*I_
-
+      + fvm::div(phi(), S_)
+     ==
+        (1 - zeta_/2)*twoSymm(Cupper)
+      - (zeta_/2)*twoSymm(Clower)
+      - (1 - zeta_)*fvm::Sp((twoD && S_), S_)
+      - fvm::Sp(1/lambdaOb_/Foam::sqr(Lambda_), S_)
+      + 1/lambdaOb_/Foam::sqr(Lambda_)/3*I_
     );
 
-    SEqn().relax();
-    solve(SEqn);
+    SEqn.relax();
+    SEqn.solve();
 
      // Evolution of the backbone stretch
-    tmp<fvScalarMatrix> LambdaEqn
+    fvScalarMatrix lambdaEqn
     (
         fvm::ddt(Lambda_)
-        + fvm::div(phi(), Lambda_)
-        ==
-        fvm::Sp( (twoD && S_) / 2 , Lambda_ )
-        - fvm::Sp( Foam::exp( 2/q_*(Lambda_ - 1))/lambdaOs_ , Lambda_ )
-        + Foam::exp( 2/q_*(Lambda_ - 1))/lambdaOs_
+      + fvm::div(phi(), Lambda_)
+     ==
+        fvm::Sp((twoD && S_)/2 , Lambda_)
+      - fvm::Sp(Foam::exp(2/q_*(Lambda_ - 1))/lambdaOs_ , Lambda_)
+      + Foam::exp( 2/q_*(Lambda_ - 1))/lambdaOs_
     );
 
-    LambdaEqn().relax();
-    solve(LambdaEqn);
+    lambdaEqn.relax();
+    lambdaEqn.solve();
 
     // Viscoelastic stress
     tau_ = etaP_/lambdaOb_/(1 - zeta_) * (3*Foam::sqr(Lambda_)*S_ - I_);
-
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

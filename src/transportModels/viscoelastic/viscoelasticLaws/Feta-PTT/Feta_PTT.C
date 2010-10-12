@@ -27,20 +27,17 @@ License
 #include "Feta_PTT.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(Feta_PTT, 0);
-addToRunTimeSelectionTable(viscoelasticLaw, Feta_PTT, dictionary);
+    defineTypeNameAndDebug(Feta_PTT, 0);
+    addToRunTimeSelectionTable(viscoelasticLaw, Feta_PTT, dictionary);
+}
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// from components
-Feta_PTT::Feta_PTT
+Foam::Feta_PTT::Feta_PTT
 (
     const word& name,
     const volVectorField& U,
@@ -80,7 +77,11 @@ Feta_PTT::Feta_PTT
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        etaP_/( Foam::pow(scalar(1) + A_*Foam::pow(0.5*( Foam::sqr(tr(tau_)) - tr(tau_ & tau_) ) * Foam::sqr(lambda_) / Foam::sqr(etaP_), a_), b_) ) 
+        etaP_/
+        (
+            Foam::pow(scalar(1) + A_*Foam::pow(0.5*( Foam::sqr(tr(tau_))
+          - tr(tau_ & tau_))*Foam::sqr(lambda_)/Foam::sqr(etaP_), a_), b_)
+        )
     ),
     lambdaEff_
     (
@@ -92,17 +93,17 @@ Feta_PTT::Feta_PTT
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        lambda_ / (scalar(1)  + epsilon_*lambda_*tr(tau_) / etaP_) 
+        lambda_ / (scalar(1)  + epsilon_*lambda_*tr(tau_) / etaP_)
     )
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<fvVectorMatrix> Feta_PTT::divTau(volVectorField& U) const
+Foam::tmp<Foam::fvVectorMatrix> Foam::Feta_PTT::divTau(volVectorField& U) const
 {
-
-     dimensionedScalar etaPEff = etaP_;  // need to be equal to old time step (a constant)
+    // Need to be equal to old time step (a constant)
+    dimensionedScalar etaPEff = etaP_;
 
     return
     (
@@ -110,46 +111,45 @@ tmp<fvVectorMatrix> Feta_PTT::divTau(volVectorField& U) const
       - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
       + fvm::laplacian( (etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
     );
-
 }
 
 
-void Feta_PTT::correct()
+void Foam::Feta_PTT::correct()
 {
     // Velocity gradient tensor
-    volTensorField L = fvc::grad( U() );
+    volTensorField L = fvc::grad(U());
 
     // Convected derivate term
     volTensorField C = tau_ & L;
 
     // Twice the rate of deformation tensor
-    volSymmTensorField twoD = twoSymm( L );
+    volSymmTensorField twoD = twoSymm(L);
 
     // etaP effective
-    etaPEff_ =  etaP_/( Foam::pow(scalar(1) + A_*Foam::pow(0.5*( Foam::sqr(tr(tau_)) - tr(tau_ & tau_) ) * Foam::sqr(lambda_) / Foam::sqr(etaP_), a_), b_) );
+    etaPEff_ = etaP_/
+        (
+            Foam::pow(scalar(1) + A_*Foam::pow(0.5*( Foam::sqr(tr(tau_))
+          - tr(tau_ & tau_)) * Foam::sqr(lambda_)/Foam::sqr(etaP_), a_), b_)
+        );
 
     // lambda effective
-    lambdaEff_ =  (lambda_ / (scalar(1)  + epsilon_*lambda_*tr(tau_) / etaP_) );
+    lambdaEff_ = lambda_/(scalar(1)  + epsilon_*lambda_*tr(tau_)/etaP_);
 
-     // Stress transport equation
-    tmp<fvSymmTensorMatrix> tauEqn
+    // Stress transport equation
+    fvSymmTensorMatrix tauEqn
     (
         fvm::ddt(tau_)
-        + fvm::div(phi(), tau_)
-        ==
-        etaPEff_ / lambdaEff_ * twoD
-        + twoSymm( C )
-        - zeta_ / 2 * ( (tau_ & twoD) + (twoD & tau_) )
-        - fvm::Sp( epsilon_ / etaPEff_ * tr(tau_) + 1/lambdaEff_, tau_ )
+      + fvm::div(phi(), tau_)
+     ==
+        etaPEff_/lambdaEff_*twoD
+      + twoSymm(C)
+      - zeta_/2*((tau_ & twoD) + (twoD & tau_))
+      - fvm::Sp(epsilon_/etaPEff_*tr(tau_) + 1/lambdaEff_, tau_)
     );
 
-    tauEqn().relax();
-    solve(tauEqn);
+    tauEqn.relax();
+    tauEqn.solve();
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

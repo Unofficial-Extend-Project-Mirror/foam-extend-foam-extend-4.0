@@ -1,31 +1,22 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4.1                                 |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version 2.0;
-    format ascii;
-
-    root     "/home/jovani/OpenFOAM/jovani-1.4.1/run/tutorials/viscoelasticFluidFoam";
-    case     "DCPP";
-    instance "system";
-    local "";
-
-    class           dictionary;
-    object          fvSchemes;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSchemes;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 ddtSchemes
 {
-    default         CrankNicholson 1;
-
+    default         Euler;
 }
 
 gradSchemes
@@ -33,23 +24,22 @@ gradSchemes
     default         Gauss linear;
     grad(p)         Gauss linear;
     grad(U)         Gauss linear;
-
 }
 
 divSchemes
 {
     default                  none;
-    div(phi,U)               Gauss upwind; //GammaV 0.5;
+    div(phi,U)               Gauss Minmod; //upwind; 
 
-    div(phi,Sfirst)          Gauss upwind; //Gamma 0.5;
-    div(phi,Ssecond)         Gauss upwind; //Gamma 0.5;
-    div(phi,Sthird)          Gauss upwind; //Gamma 0.5;
-    div(phi,Sfourth)         Gauss upwind; //Gamma 0.5;
+    div(phi,Sfirst)          Gauss Minmod; //upwind; 
+    div(phi,Ssecond)         Gauss Minmod; //upwind; 
+    div(phi,Sthird)          Gauss Minmod; //upwind; 
+    div(phi,Sfourth)         Gauss Minmod; //upwind; 
 
-    div(phi,Lambdafirst)     Gauss upwind; //Gamma 0.5;
-    div(phi,Lambdasecond)    Gauss upwind; //Gamma 0.5;
-    div(phi,Lambdathird)     Gauss upwind; //Gamma 0.5;
-    div(phi,Lambdafourth)    Gauss upwind; //Gamma 0.5;
+    div(phi,Lambdafirst)     Gauss Minmod; //upwind; 
+    div(phi,Lambdasecond)    Gauss Minmod; //upwind; 
+    div(phi,Lambdathird)     Gauss Minmod; //upwind; 
+    div(phi,Lambdafourth)    Gauss Minmod; //upwind; 
 
     div(tau)                 Gauss linear;
 }
@@ -78,6 +68,5 @@ fluxRequired
     default         no;
     p;
 }
-
 
 // ************************************************************************* //

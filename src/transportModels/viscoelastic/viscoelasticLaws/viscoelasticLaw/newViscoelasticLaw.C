@@ -29,12 +29,7 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-autoPtr<viscoelasticLaw> viscoelasticLaw::New
+Foam::autoPtr<Foam::viscoelasticLaw> Foam::viscoelasticLaw::New
 (
     const word& name,
     const volVectorField& U,
@@ -65,9 +60,5 @@ autoPtr<viscoelasticLaw> viscoelasticLaw::New
     return autoPtr<viscoelasticLaw>(cstrIter()(name, U, phi, dict));
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

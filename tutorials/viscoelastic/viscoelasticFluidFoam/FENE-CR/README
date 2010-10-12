@@ -1,0 +1,26 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+#
+#+TITLE: *FENE-CR viscoelastic constitutive model README file for version 1.6-ext* 
+#+AUTHOR: Jovani                
+#+DATE:  05 October 2010
+
+
+
+* This is a simulation case for a viscoelastic fluid described by the Finitely 
+  Extensible Nonlinear Elastic Chilcott-Rallison constitutive model (FENE-CR).
+  The geometry was the 5:1 3D plane contraction, considering 1/4 of the real
+  geometry. 
+
+*** This is only an illustrative case for the FENE-CR constitutive model. Therefore,
+    there are not more details published until now for this model using this geometry
+    and viscoelasticFluidFoam solver.
+
+*** Some results using this model with a 2D 4:1 plane contraction can be found at:
+    <http://hdl.handle.net/10183/16306>
+
