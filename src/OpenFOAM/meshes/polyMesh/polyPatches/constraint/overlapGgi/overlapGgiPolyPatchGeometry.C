@@ -24,17 +24,122 @@ License
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
+    Fethi Tekin, All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
 #include "overlapGgiPolyPatch.H"
 #include "polyMesh.H"
+#include "polyPatch.H"
+#include "primitiveMesh.H"
 #include "demandDrivenData.H"
 #include "polyPatchID.H"
 #include "OFstream.H"
 #include "Time.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+void Foam::overlapGgiPolyPatch::calcExpandedMaster() const
+{
+    // Create expanded master patch interpolation
+    if (expandedMasterPtr_)
+    {
+        FatalErrorIn("void overlapGgiPolyPatch::calcExpandedMaster() const")
+            << "Expanded master already calculated"
+            << abort(FatalError);
+    }
+
+    if (master())
+    {
+        // Create expanded master patch
+        const label ncpm = nCopies();
+
+        Info << "Number of master copies: " << ncpm << endl;
+
+        // Create expanded master points and faces
+        const polyPatch& master = boundaryMesh()[index()];
+        const pointField& masterLocalPoints = master.localPoints();
+
+        pointField MasterExpandedPoints(ncpm*masterLocalPoints.size());
+
+        const scalar masterAngle = angle();
+
+        Info << "Master Angle is: " << masterAngle << endl;
+
+        // Transform points
+        label nPoints_master = 0;
+
+        for (label copyI = 0; copyI < ncpm; copyI++)
+        {
+            // Calculate transform
+            const tensor curRotation =
+                RodriguesRotation(rotationAxis_,  copyI*(masterAngle));
+
+            forAll (masterLocalPoints, pointI)
+            {
+                MasterExpandedPoints[nPoints_master] =
+                    transform(curRotation, masterLocalPoints[pointI]);
+                nPoints_master++;
+            }
+        }
+
+        // Transform faces
+        const faceList& masterLocalFaces = master.localFaces();
+        faceList MasterExpandedFaces(ncpm*masterLocalFaces.size());
+
+        label nFacesMaster = 0;
+
+        for (label copyI = 0; copyI < ncpm; copyI++)
+        {
+            const label copyOffsetMaster = copyI*masterLocalPoints.size();
+
+            forAll (masterLocalFaces, faceI)
+            {
+                const face& curMasterFace = masterLocalFaces[faceI];
+
+                face& MastercurExpandedFace =
+                    MasterExpandedFaces[nFacesMaster];
+
+                // Copy face with offsets
+                MastercurExpandedFace.setSize(curMasterFace.size());
+
+                forAll (curMasterFace, fpI)
+                {
+                    MastercurExpandedFace[fpI] =
+                        curMasterFace[fpI] + copyOffsetMaster;
+                }
+
+                nFacesMaster++;
+            }
+        }
+
+        expandedMasterPtr_ =
+            new standAlonePatch(MasterExpandedFaces, MasterExpandedPoints);
+
+        if (debug > 1)
+        {
+            Info << "Writing expanded master patch as VTK" << endl;
+
+            const polyMesh& mesh = boundaryMesh().mesh();
+
+            fileName fvPath(mesh.time().path()/"VTK");
+            mkDir(fvPath);
+
+            standAlonePatch::writeVTK
+            (
+                fvPath/fileName("expandedMaster" + name() + shadow().name()),
+                MasterExpandedFaces,
+                MasterExpandedPoints
+            );
+        }
+    }
+    else
+    {
+        FatalErrorIn("void overlapGgiPolyPatch::calcExpandedMaster() const")
+            << "Attempting to create expanded master on a shadow"
+            << abort(FatalError);
+    }
+}
 
 void Foam::overlapGgiPolyPatch::calcExpandedSlave() const
 {
@@ -49,7 +154,7 @@ void Foam::overlapGgiPolyPatch::calcExpandedSlave() const
     if (master())
     {
         // Create expanded patch
-        const label ncp = nCopies();
+        const label ncp = shadow().nCopies();
 
         Info << "Number of slave copies: " << ncp << endl;
 
@@ -135,11 +240,18 @@ void Foam::overlapGgiPolyPatch::calcExpandedSlave() const
 }
 
 
+const Foam::standAlonePatch& Foam::overlapGgiPolyPatch::expandedMaster() const
+{
+    if (!expandedMasterPtr_)
+    {
+        calcExpandedMaster();
+    }
+
+    return *expandedMasterPtr_;
+}
+
 const Foam::standAlonePatch& Foam::overlapGgiPolyPatch::expandedSlave() const
 {
-    // Note: expanded slave only exists for the master side.
-    // Slave patch will use master for interpolation.
-    // HJ, 14/Jan/2009
     if (!expandedSlavePtr_)
     {
         calcExpandedSlave();
@@ -151,7 +263,8 @@ const Foam::standAlonePatch& Foam::overlapGgiPolyPatch::expandedSlave() const
 
 void Foam::overlapGgiPolyPatch::calcPatchToPatch() const
 {
-    // Create patch-to-patch interpolation
+    // Create patch-to-patch interpolation between the expanded master
+    // and slave patches
     if (patchToPatchPtr_)
     {
         FatalErrorIn("void overlapGgiPolyPatch::calcPatchToPatch() const")
@@ -164,7 +277,7 @@ void Foam::overlapGgiPolyPatch::calcPatchToPatch() const
         patchToPatchPtr_ =
             new overlapGgiInterpolation
             (
-                *this,
+                expandedMaster(),
                 expandedSlave(),
                 forwardT(),
                 reverseT(),
@@ -214,8 +327,6 @@ void Foam::overlapGgiPolyPatch::calcReconFaceCellCentres() const
     // Create neighbouring face centres using interpolation
     if (master())
     {
-        vectorField alpha(shadow().size(), vector(0, 0, 1));
-
         const label shadowID = shadowIndex();
 
         // Get the transformed and interpolated shadow face cell centers
@@ -239,7 +350,7 @@ void Foam::overlapGgiPolyPatch::calcReconFaceCellCentres() const
 void Foam::overlapGgiPolyPatch::checkDefinition() const
 {
     // Sanity checks
-    // 1. Check 
+    // 1. Check
     Info << "overlapGgiPolyPatch: sanity checks missing.  HJ" << endl;
 
 //     if
@@ -265,6 +376,7 @@ void Foam::overlapGgiPolyPatch::checkDefinition() const
 
 void Foam::overlapGgiPolyPatch::clearOut()
 {
+    deleteDemandDrivenData(expandedMasterPtr_);
     deleteDemandDrivenData(expandedSlavePtr_);
     deleteDemandDrivenData(patchToPatchPtr_);
     deleteDemandDrivenData(reconFaceCellCentresPtr_);

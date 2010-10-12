@@ -24,6 +24,7 @@ License
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
+    Fethi Tekin, All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
@@ -60,7 +61,8 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     shadowName_(word::null),
     shadowIndex_(-1),
     rotationAxis_(vector(0.0, 0.0, 1.0)),
-    angle_(0),
+    nCopies_(0),
+    expandedMasterPtr_(NULL),
     expandedSlavePtr_(NULL),
     patchToPatchPtr_(NULL),
     reconFaceCellCentresPtr_(NULL)
@@ -77,14 +79,15 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     const polyBoundaryMesh& bm,
     const word& shadowName,
     const vector& axis,
-    const scalar angle
+    const scalar nCopies
 )
 :
     coupledPolyPatch(name, size, start, index, bm),
     shadowName_(shadowName),
     shadowIndex_(-1),
     rotationAxis_(axis),
-    angle_(angle),
+    nCopies_(nCopies),
+    expandedMasterPtr_(NULL),
     expandedSlavePtr_(NULL),
     patchToPatchPtr_(NULL),
     reconFaceCellCentresPtr_(NULL)
@@ -104,7 +107,8 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     shadowName_(dict.lookup("shadowPatch")),
     shadowIndex_(-1),
     rotationAxis_(dict.lookup("rotationAxis")),
-    angle_(readScalar(dict.lookup("angle"))),
+    nCopies_(readScalar(dict.lookup("nCopies"))),
+    expandedMasterPtr_(NULL),
     expandedSlavePtr_(NULL),
     patchToPatchPtr_(NULL),
     reconFaceCellCentresPtr_(NULL)
@@ -122,7 +126,8 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     shadowName_(pp.shadowName_),
     shadowIndex_(-1),
     rotationAxis_(pp.rotationAxis_),
-    angle_(pp.angle_),
+    nCopies_(pp.nCopies_),
+    expandedMasterPtr_(NULL),
     expandedSlavePtr_(NULL),
     patchToPatchPtr_(NULL),
     reconFaceCellCentresPtr_(NULL)
@@ -143,7 +148,8 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     shadowName_(pp.shadowName_),
     shadowIndex_(-1),
     rotationAxis_(pp.rotationAxis_),
-    angle_(pp.angle_),
+    nCopies_(pp.nCopies_),
+    expandedMasterPtr_(NULL),
     expandedSlavePtr_(NULL),
     patchToPatchPtr_(NULL),
     reconFaceCellCentresPtr_(NULL)
@@ -199,7 +205,6 @@ Foam::label Foam::overlapGgiPolyPatch::shadowIndex() const
     return shadowIndex_;
 }
 
-
 const Foam::overlapGgiPolyPatch&
 Foam::overlapGgiPolyPatch::shadow() const
 {
@@ -209,34 +214,21 @@ Foam::overlapGgiPolyPatch::shadow() const
 
 Foam::label Foam::overlapGgiPolyPatch::nCopies() const
 {
-    // Calculate number of copies to be made for the expanded slave
-    // to completely cover the master
-    if (!master())
-    {
-        FatalErrorIn("label overlapGgiPolyPatch::nCopies() const")
-            << "nCopies requested for a slave.  Error in master-slave logic"
-            << abort(FatalError);
-    }
-
-    label ncp = 0;
-    scalar remainder = angle_;
-
-    const scalar slaveAngle = shadow().angle();
-
-    while (remainder > SMALL)
-    {
-        remainder -= slaveAngle;
-        ncp++;
-    }
-
-    return ncp;
+    // Read the number of copies to be made from the dictionary for the
+    // expanded slave and expanded master to cover 360 degrees
+    return nCopies_;
 }
-
 
 bool Foam::overlapGgiPolyPatch::master() const
 {
+    // The first overlapggi interface is master,second one is slave
+    if (angle() == shadow().angle())
+    {
+        return start() < shadow().start() ;
+    }
+
     // Master is the one with the larger angle
-    return angle() >= shadow().angle();
+    return angle() > shadow().angle();
 }
 
 
@@ -246,7 +238,9 @@ void Foam::overlapGgiPolyPatch::write(Ostream& os) const
     polyPatch::write(os);
     os.writeKeyword("rotationAxis") << rotationAxis_
         << token::END_STATEMENT << nl;
-    os.writeKeyword("angle") << angle_
+    os.writeKeyword("nCopies") << nCopies_
+        << token::END_STATEMENT << nl;
+    os.writeKeyword("shadowPatch") << shadowName_
         << token::END_STATEMENT << nl;
 }
 

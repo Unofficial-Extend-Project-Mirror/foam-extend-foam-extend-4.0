@@ -26,17 +26,17 @@ Class
     overlapGgiPolyPatch
 
 Description
-    Partial overlap generalised grid interface (GGI) patch.  Master side
-    remains unchanged and the slave side will be copied as needed
-    to pave the master patch surface.
+    Partial overlap generalised grid interface (GGI) patch. Master and slave
+    sides are copied as much as the given number to complete the 360 degree
+    cicumferential surface.
 
-    This implies that the master patch has got a larger angular pitch than
-    the slave and that master and slave are aligned at one edge.
-    Master and slave will specify the pitch, based on which the expansion
-    of the master side will be performed and used in interpolation.
+    The data interpolation between master and slave patches do not depend on
+    relative position of them, because of the full circumferential expansion
+    for both sides.
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
+    Fethi Tekin, All rights reserved.
 
 SourceFiles
     overlapGgiPolyPatch.C
@@ -78,11 +78,19 @@ class overlapGgiPolyPatch
             //- Rotation axis
             const vector rotationAxis_;
 
-            //- Wedge angle
-            const scalar angle_;
-
+            // Number of copies in order to complete 360 degrees
+            const scalar nCopies_;
 
         // Interpolation
+
+            //- Pointer to expanded master patch
+            mutable standAlonePatch* expandedMasterPtr_;
+
+            //- Pointer to expanded faceCentres of Master
+            mutable vectorField* faceCentresPtr_;
+
+            //- Pointer to expanded faceareas of Master
+            mutable vectorField* faceAreasPtr_;
 
             //- Pointer to expanded slave patch
             mutable standAlonePatch* expandedSlavePtr_;
@@ -97,17 +105,23 @@ class overlapGgiPolyPatch
 
     // Private member functions
 
+        //- Return reference to patch-to-patch interpolation
+        const overlapGgiInterpolation& patchToPatch() const;
+
+        //- Calculate expanded master patch
+        void calcExpandedMaster() const;
+
         //- Calculate expanded slave patch
-       void calcExpandedSlave() const;
+        void calcExpandedSlave() const;
+
+        //- Return reference to expanded master patch
+        const standAlonePatch& expandedMaster() const;
 
         //- Return reference to expanded slave patch
         const standAlonePatch& expandedSlave() const;
 
         //- Calculate interpolation
-       void calcPatchToPatch() const;
-
-        //- Return reference to patch-to-patch interpolation
-        const overlapGgiInterpolation& patchToPatch() const;
+        void calcPatchToPatch() const;
 
         //- Calculate reconstructed cell centres
         void calcReconFaceCellCentres() const;
@@ -117,10 +131,6 @@ class overlapGgiPolyPatch
 
         //- Check definition: angles and offsets
         void checkDefinition() const;
-
-        //- Expand slave face field to full coverage
-        template<class Type>
-        tmp<Field<Type> > expandSlaveData(const Field<Type>& spf) const;
 
         //- Clear out
         void clearOut();
@@ -177,7 +187,7 @@ public:
             const polyBoundaryMesh& bm,
             const word& shadowName,
             const vector& axis,
-            const scalar angle
+            const scalar n
         );
 
         //- Construct from dictionary
@@ -263,9 +273,9 @@ public:
         }
 
         //- Return wedge angle
-        const scalar& angle() const
+        scalar angle() const
         {
-            return angle_;
+            return 360.0/nCopies();
         }
 
         //- Return number of slave copies
@@ -279,6 +289,14 @@ public:
         {
             return !master();
         }
+
+        //- Expand master face field to full for 360 degrees coverage
+        template<class Type>
+        tmp<Field<Type> > expandMasterData(const Field<Type>& spf) const;
+
+        //- Expand slave face field to full for 360 degrees coverage
+        template<class Type>
+        tmp<Field<Type> > expandSlaveData(const Field<Type>& spf) const;
 
         //- Interpolate face field: given field on a the shadow side,
         //  create an interpolated field on this side
