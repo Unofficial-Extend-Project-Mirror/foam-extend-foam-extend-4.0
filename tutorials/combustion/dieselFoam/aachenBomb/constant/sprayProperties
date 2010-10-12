@@ -45,6 +45,13 @@ dragModel       standardDragModel;
 
 wallModel       reflect;
 
+sprayIteration
+{
+    sprayIterate 1;
+    sprayRelaxFactor 1;
+    minimumParcelMass 1e-14;
+}
+
 specConstAtomizationCoeffs
 {
     dropletNozzleDiameterRatio ( 0.4 );

@@ -1,7 +1,6 @@
 #!/bin/sh
 
-currDir=`pwd`
-application=`basename $currDir`
+application="conjugateHeatFoam"
 cases="conjugateCavity"
 
 tutorialPath=`dirname $0`/..
@@ -9,6 +8,7 @@ tutorialPath=`dirname $0`/..
 
 for case in $cases
 do
+    runApplication blockMesh
     runApplication $application
 done 
 

@@ -28,7 +28,7 @@ solvers
     {
         preconditioner
         {
-            type        DIC;
+            preconditioner DIC;
         }
 
         minIter          0;
@@ -40,7 +40,7 @@ solvers
     {
         preconditioner
         {
-            type        DILU;
+            preconditioner DILU;
         }
 
         minIter          0;
@@ -52,7 +52,7 @@ solvers
     {
         preconditioner
         {
-            type        DILU;
+            preconditioner DILU;
         }
 
         minIter          0;
@@ -64,7 +64,7 @@ solvers
     {
         preconditioner
         {
-            type        DILU;
+            preconditioner DILU;
         }
 
         minIter          0;
@@ -76,7 +76,7 @@ solvers
     {
         preconditioner
         {
-            type        DILU;
+            preconditioner DILU;
         }
 
         minIter          0;
@@ -88,7 +88,7 @@ solvers
     {
         preconditioner
         {
-            type        DILU;
+            preconditioner DILU;
         }
 
         minIter          0;

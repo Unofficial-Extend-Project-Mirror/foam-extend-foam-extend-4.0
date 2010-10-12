@@ -16,7 +16,7 @@ FoamFile
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-applicationClass icoTopoFoam;
+application     icoTopoFoam;
 
 startFrom       startTime;
 
