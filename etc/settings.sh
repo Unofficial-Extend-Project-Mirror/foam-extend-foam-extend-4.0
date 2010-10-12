@@ -47,6 +47,10 @@ _foamAddLib()
     while [ $# -ge 1 ]
     do
         export LD_LIBRARY_PATH=$1:$LD_LIBRARY_PATH
+	if [ "$WM_ARCH" == "darwinIntel" ]
+	then
+	    export DYLD_LIBRARY_PATH=$1:$DYLD_LIBRARY_PATH
+	fi
         shift
     done
 }
@@ -168,15 +172,24 @@ unset MPI_ARCH_PATH
 
 case "$WM_MPLIB" in
 OPENMPI)
-    mpi_version=openmpi-1.4.1
-    export MPI_HOME=$WM_THIRD_PARTY_DIR/$mpi_version
-    export MPI_ARCH_PATH=$MPI_HOME/platforms/$WM_OPTIONS
+    if [ "$WM_ARCH" == "darwinIntel" ]
+	then
+	mpi_version=openmpi-system
+	export MPI_HOME=/usr
+	export MPI_ARCH_PATH=/usr
 
-    # Tell OpenMPI where to find its install directory
-    export OPAL_PREFIX=$MPI_ARCH_PATH
+	unset OPAL_PREFIX
+    else
+	mpi_version=openmpi-1.4.1
+        export MPI_HOME=$WM_THIRD_PARTY_DIR/$mpi_version
+        export MPI_ARCH_PATH=$MPI_HOME/platforms/$WM_OPTIONS
 
-    _foamAddPath $MPI_ARCH_PATH/bin
-    _foamAddLib  $MPI_ARCH_PATH/lib
+        # Tell OpenMPI where to find its install directory
+        export OPAL_PREFIX=$MPI_ARCH_PATH
+
+        _foamAddPath $MPI_ARCH_PATH/bin
+        _foamAddLib  $MPI_ARCH_PATH/lib
+    fi
 
     export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
     unset mpi_version
@@ -317,6 +330,16 @@ export MPI_BUFFER_SIZE
 #    export LD_PRELOAD=$FOAM_LIBBIN/libhoard.so:$LD_PRELOAD
 #fi
 
+# HOARD seems to crash Paraview on Mac OS X 10.6
+#if [ -f $FOAM_LIBBIN/libhoard.dylib ]
+#then
+#    if [ -z "$DYLD_INSERT_LIBRARIES" ]
+#    then
+#	export DYLD_INSERT_LIBRARIES=$FOAM_LIBBIN/libhoard.dylib
+#    else
+#	export DYLD_INSERT_LIBRARIES=$FOAM_LIBBIN/libhoard.dylib:$DYLD_INSERT_LIBRARIES
+#    fi
+#fi
 
 # cleanup environment:
 # ~~~~~~~~~~~~~~~~~~~~

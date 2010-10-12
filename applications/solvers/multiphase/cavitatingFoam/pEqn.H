@@ -37,7 +37,7 @@
           - fvm::laplacian(rUAf, p)
         );
 
-        if (corr == nCorr-1 && nonOrth == nNonOrthCorr)
+        if (corr == nCorr - 1 && nonOrth == nNonOrthCorr)
         {
             pEqn.solve(mesh.solver(p.name() + "Final"));
         }
