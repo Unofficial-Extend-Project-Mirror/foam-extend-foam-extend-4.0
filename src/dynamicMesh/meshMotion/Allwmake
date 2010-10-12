@@ -1,0 +1,10 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # run from this directory
+set -x
+
+# Make meshMotion solvers
+wmake libso fvMotionSolver
+wmake libso RBFMotionSolver
+(cd tetDecompositionMotionSolver ; ./Allwmake)
+
+# ----------------------------------------------------------------- end-of-file
