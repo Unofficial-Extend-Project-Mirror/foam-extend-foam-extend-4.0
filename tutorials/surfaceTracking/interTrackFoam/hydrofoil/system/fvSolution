@@ -20,7 +20,7 @@ solvers
     {
         preconditioner
         {
-            type         Cholesky;
+            preconditioner Cholesky;
         }
 
         tolerance        1e-08;
@@ -31,7 +31,7 @@ solvers
     {
         preconditioner
         {
-            type         Cholesky;
+            preconditioner Cholesky;
         }
 
         tolerance        1e-09;
