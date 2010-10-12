@@ -41,7 +41,7 @@ cd PTT-Linear
    ./Allclean
 
 cd ..
-cd White-Metzner/Carreau-Yasuda
+cd WhiteMetzner/CarreauYasuda
    ./Allclean
 
 cd ../..
