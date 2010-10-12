@@ -1,0 +1,30 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+#
+#+TITLE: *White-Metzner_Carreau-Yasuda viscoelastic constitutive model README file for version 1.6-ext* 
+#+AUTHOR: Jovani                
+#+DATE:  05 October 2010
+
+
+
+* This is a simulation case for a viscoelastic fluid described by the 
+  White-Metzner with Carreau-Yasuda viscosity constitutive model (White-Metzner_Carreau-Yasuda).
+  The geometry was the 4:1 plane contraction. 
+
+
+*** This is only an illustrative case for the White-Metzner with Carreau-Yasuda constitutive model. 
+    Therefore, there are not more details published until now for this model using this geometry
+    and viscoelasticFluidFoam solver. 
+
+
+
+
+
+
+
+

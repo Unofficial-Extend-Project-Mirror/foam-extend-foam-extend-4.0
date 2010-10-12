@@ -1,0 +1,92 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+
+    p
+    {
+        solver          PCG;
+        preconditioner
+        {
+//          preconditioner  Cholesky;
+            preconditioner  AMG;
+            cycle           W-cycle;
+            policy          AAMG;
+            nPreSweeps      0;
+            nPostSweeps     2;
+            groupSize       4;
+            minCoarseEqns   20;
+            nMaxLevels      100;
+            scale           off;
+            smoother        ILU;
+        }
+
+        tolerance        1e-07;
+        relTol           0;
+        minIter          0;
+        maxIter          800;
+    }
+
+    U
+    {
+
+        solver           BiCGStab;
+        preconditioner
+        {
+            preconditioner Cholesky;
+        }
+
+        tolerance         1e-6;
+        relTol            0;
+        minIter           0;
+        maxIter           1000;
+    }
+
+    tau 
+    {
+
+        solver           BiCGStab;
+        preconditioner
+        {
+            preconditioner Cholesky;
+        }
+
+        tolerance         1e-6;
+        relTol            0;
+        minIter           0;
+        maxIter           1000;
+
+    };
+
+}
+
+PISO
+{
+    nCorrectors    2;
+    nNonOrthogonalCorrectors 0;
+    pRefCell        0;
+    pRefValue       0;
+}
+
+relaxationFactors
+{
+    p               0.3;
+    U               0.5;
+    tau             0.3;
+}
+
+// ************************************************************************* //
