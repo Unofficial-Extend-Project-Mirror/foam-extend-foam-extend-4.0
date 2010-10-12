@@ -18,7 +18,7 @@ viscoelasticLaws/Leonov/Leonov.C
 viscoelasticLaws/WhiteMetzner/WhiteMetznerLarson/WhiteMetznerLarson.C
 viscoelasticLaws/WhiteMetzner/WhiteMetznerCross/WhiteMetznerCross.C
 viscoelasticLaws/WhiteMetzner/WhiteMetznerCarreauYasuda/WhiteMetznerCarreauYasuda.C
-viscoelasticLaws/S-MDCPP/S-MDCPP.C
+viscoelasticLaws/S_MDCPP/S_MDCPP.C
 
 viscoelasticLaws/multiMode/multiMode.C
 
