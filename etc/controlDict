@@ -911,7 +911,9 @@ Tolerances
     patchToPatchProjectionTol   0.05;
 
     // Thermophysical models
-    specieThermoTol     1e-4;
+    specieThermoTol      1e-4;
+    speciesThermoTJump     20;
+    speciesThermoMaxIter  100;
 
     // Intersection tolerance
     intersectionPlanarTol      0.2;
