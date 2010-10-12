@@ -324,6 +324,16 @@ export MPI_BUFFER_SIZE
 #    export LD_PRELOAD=$FOAM_LIBBIN/libhoard.so:$LD_PRELOAD
 #fi
 
+# HOARD seems to crash Paraview on Mac OS X 10.6
+#if [ -f $FOAM_LIBBIN/libhoard.dylib ]
+#then
+#    if [ -z "$DYLD_INSERT_LIBRARIES" ]
+#    then
+#	export DYLD_INSERT_LIBRARIES=$FOAM_LIBBIN/libhoard.dylib
+#    else
+#	export DYLD_INSERT_LIBRARIES=$FOAM_LIBBIN/libhoard.dylib:$DYLD_INSERT_LIBRARIES
+#    fi
+#fi
 
 # cleanup environment:
 # ~~~~~~~~~~~~~~~~~~~~
