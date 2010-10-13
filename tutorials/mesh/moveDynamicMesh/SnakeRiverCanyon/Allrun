@@ -1,0 +1,23 @@
+#!/bin/bash
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+# Simple temporary bypass for Martin's  laptop...
+# Otherwise, this tutorial will generate junk for 10 whole minutes
+# MB 
+# Oct 12, 2010
+#
+if [ `hostname` == "pollux.local" ]
+then
+    echo "This tutorial is not working on my Macbook Pro laptop. Need to get back later to this one. Martin Beaudoin, Oct 12 2010"
+    exit -1;
+fi
+
+# Get application name
+application=`getApplication`
+
+#parentDir=`dirname $PWD`
+#application=`basename $parentDir`
+
+runApplication blockMesh
+runApplication $application

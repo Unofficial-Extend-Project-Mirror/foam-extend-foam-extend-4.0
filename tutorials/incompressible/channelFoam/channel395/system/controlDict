@@ -54,6 +54,8 @@ functions
         // Where to load it from (if not already in solver)
         functionObjectLibs ("libfieldFunctionObjects.so");
 
+        outputControl     outputTime;
+
         // Fields to be  averaged - runTime modifiable
         fields
         (

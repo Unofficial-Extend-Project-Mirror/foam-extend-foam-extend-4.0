@@ -1,0 +1,15 @@
+#!/bin/sh
+
+(cd PTT-Exponential;            ./Allclean)
+(cd DCPP;                       ./Allclean)
+(cd Giesekus;                   ./Allclean)
+(cd FENE-CR;                    ./Allclean)
+(cd FENE-P;                     ./Allclean)
+(cd Feta-PTT;                   ./Allclean)
+(cd Leonov;                     ./Allclean)
+(cd Oldroyd-B;                  ./Allclean)
+(cd S-MDCPP;                    ./Allclean)
+(cd PTT-Linear;                 ./Allclean)
+(cd WhiteMetzner/CarreauYasuda; ./Allclean)
+(cd XPP_DE;                     ./Allclean)
+(cd XPP_SE;                     ./Allclean)
