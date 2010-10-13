@@ -1,27 +1,18 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.3                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "FENE-CR";
-    instance        "";
-    local           "";
-
-    class           volScalarField;
-    object          p;
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      p;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 dimensions      [0 2 -2 0 0 0 0];
 
@@ -29,27 +20,27 @@ internalField   uniform 0;
 
 boundaryField
 {
-    patch3
+    inlet
     {
         type            zeroGradient;
-
     }
-    patch2
+    fixedWalls
+    {
+        type            zeroGradient;
+    }
+    outlet
     {
         type            fixedValue;
         value           uniform 0;
     }
-    patch1
+    simetry
     {
-        type            zeroGradient;
+        type            symmetryPlane;
     }
-
-    patch0
+    frontAndBack
     {
         type            empty;
     }
-
 }
-
 
 // ************************************************************************* //

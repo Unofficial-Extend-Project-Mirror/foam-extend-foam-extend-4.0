@@ -72,7 +72,7 @@ class FENE_CR
             //- Zero shear rate polymer viscosity
             dimensionedScalar etaP_;
 
-            //- Molecular adimensional extensibility 
+            //- Molecular adimensional extensibility
             dimensionedScalar L2_;
 
             //- Relaxation time
@@ -118,7 +118,7 @@ public:
         virtual tmp<volSymmTensorField> tau() const
         {
             return tau_;
-        } 
+        }
 
         //- Return the coupling term for the momentum equation
         virtual tmp<fvVectorMatrix> divTau(volVectorField& U) const;

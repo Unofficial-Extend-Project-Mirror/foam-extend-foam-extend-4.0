@@ -1,0 +1,27 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+#
+#+TITLE: *PTT-Exponential viscoelastic constitutive model README file for version 1.6-ext* 
+#+AUTHOR: Jovani                
+#+DATE:  05 October 2010
+
+
+
+* This is a simulation case for a viscoelastic fluid described by the Exponential form of
+  the Phan-Thien-Tanner constitutive model (PTT-Exponential).
+  The simulation is about the flow past by a cylinder. 
+
+*** This is only an illustrative case for the PTT-Exponential constitutive model. Therefore,
+    there are not more details published until now for this model using this geometry
+    and viscoelasticFluidFoam solver. Some adjustments can improve the results, once the mesh
+    used was coarse to make the simulation more fast.
+
+*** The parameters for constitutive model was obtained from:
+    VERBEETEN, W. M. H.; PETERS, G. W. M.; BAAIJENS, F. P. T. Viscoelastic analysis
+    of complex polymer melt flows using the extended pom-pom model. Journal
+    of Non-Newtonian Fluid Mechanics, v. 108, n. 1-3, p. 301-326, 2002.

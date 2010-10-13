@@ -27,20 +27,17 @@ License
 #include "Leonov.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(Leonov, 0);
-addToRunTimeSelectionTable(viscoelasticLaw, Leonov, dictionary);
+    defineTypeNameAndDebug(Leonov, 0);
+    addToRunTimeSelectionTable(viscoelasticLaw, Leonov, dictionary);
+}
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// from components
-Leonov::Leonov
+Foam::Leonov::Leonov
 (
     const word& name,
     const volVectorField& U,
@@ -102,10 +99,9 @@ Leonov::Leonov
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<fvVectorMatrix> Leonov::divTau(volVectorField& U) const
+Foam::tmp<Foam::fvVectorMatrix> Foam::Leonov::divTau(volVectorField& U) const
 {
-
-     dimensionedScalar etaPEff = etaP_;
+    dimensionedScalar etaPEff = etaP_;
 
     return
     (
@@ -116,40 +112,43 @@ tmp<fvVectorMatrix> Leonov::divTau(volVectorField& U) const
 }
 
 
-void Leonov::correct()
+void Foam::Leonov::correct()
 {
     // Velocity gradient tensor
-    volTensorField L = fvc::grad( U() );
+    volTensorField L = fvc::grad(U());
 
     // Convected derivate term
     volTensorField C = sigma_ & L;
 
     // Twice the rate of deformation tensor
-    volSymmTensorField twoD = twoSymm( L );
+    volSymmTensorField twoD = twoSymm(L);
 
      // Stress transport equation
-    tmp<fvSymmTensorMatrix> sigmaEqn
+    fvSymmTensorMatrix sigmaEqn
     (
         fvm::ddt(sigma_)
-        + fvm::div(phi(), sigma_)
-        ==
-        twoSymm( C )
-        - 1/etaP_/2*( (sigma_ & sigma_) - Foam::pow( (etaP_/lambda_),2)*I_ )
-        + fvm::Sp(1/etaP_/6*( tr(sigma_) - Foam::pow(etaP_/lambda_,2) * tr(inv(sigma_)) ), sigma_)
-
+      + fvm::div(phi(), sigma_)
+     ==
+        twoSymm(C)
+      - 1/etaP_/2*((sigma_ & sigma_) - Foam::pow((etaP_/lambda_), 2)*I_)
+      + fvm::Sp
+        (
+            1/etaP_/6*
+            (
+                tr(sigma_)
+              - Foam::pow(etaP_/lambda_,2) * tr(inv(sigma_))
+            ),
+            sigma_
+        )
     );
 
 
-    sigmaEqn().relax();
-    solve(sigmaEqn);
+    sigmaEqn.relax();
+    sigmaEqn.solve();
 
     // Viscoelastic stress
-    tau_ = sigma_ - etaP_/lambda_ * I_;
+    tau_ = sigma_ - etaP_/lambda_*I_;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

@@ -62,7 +62,7 @@ class DCPP
         volSymmTensorField S_;
 
         //- Evolution of the backbone stretch
-        volScalarField Lambda_; 
+        volScalarField Lambda_;
 
        //- Transported viscoelastic stress
         volSymmTensorField tau_;
@@ -91,7 +91,7 @@ class DCPP
             //- Relaxation time for the stretch
             dimensionedScalar lambdaOs_;
 
-            //- Amount of arms at the end of a backbone 
+            //- Amount of arms at the end of a backbone
             dimensionedScalar q_;
 
 

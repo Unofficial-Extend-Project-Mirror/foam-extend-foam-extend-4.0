@@ -27,20 +27,18 @@ License
 #include "Oldroyd_B.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    defineTypeNameAndDebug(Oldroyd_B, 0);
+    addToRunTimeSelectionTable(viscoelasticLaw, Oldroyd_B, dictionary);
+}
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(Oldroyd_B, 0);
-addToRunTimeSelectionTable(viscoelasticLaw, Oldroyd_B, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// from components
-Oldroyd_B::Oldroyd_B
+Foam::Oldroyd_B::Oldroyd_B
 (
     const word& name,
     const volVectorField& U,
@@ -70,10 +68,10 @@ Oldroyd_B::Oldroyd_B
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<fvVectorMatrix> Oldroyd_B::divTau(volVectorField& U) const
+Foam::tmp<Foam::fvVectorMatrix>
+Foam::Oldroyd_B::divTau(volVectorField& U) const
 {
-
-     dimensionedScalar etaPEff = etaP_;
+    dimensionedScalar etaPEff = etaP_;
 
     return
     (
@@ -81,40 +79,34 @@ tmp<fvVectorMatrix> Oldroyd_B::divTau(volVectorField& U) const
       - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
       + fvm::laplacian( (etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
     );
-
 }
 
 
-void Oldroyd_B::correct()
+void Foam::Oldroyd_B::correct()
 {
-
     // Velocity gradient tensor
-    volTensorField L = fvc::grad( U() );
+    volTensorField L = fvc::grad(U());
 
     // Convected derivate term
     volTensorField C = tau_ & L;
 
     // Twice the rate of deformation tensor
-    volSymmTensorField twoD = twoSymm( L );
+    volSymmTensorField twoD = twoSymm(L);
 
-     // Stress transport equation
-    tmp<fvSymmTensorMatrix> tauEqn
+    // Stress transport equation
+    fvSymmTensorMatrix tauEqn
     (
         fvm::ddt(tau_)
-        + fvm::div(phi(), tau_)
-        ==
-        etaP_ / lambda_ * twoD
-        + twoSymm( C )
-        - fvm::Sp( 1/lambda_, tau_ )
+      + fvm::div(phi(), tau_)
+     ==
+        etaP_/lambda_*twoD
+      + twoSymm(C)
+      - fvm::Sp(1/lambda_, tau_)
     );
 
-    tauEqn().relax();
-    solve(tauEqn);
+    tauEqn.relax();
+    tauEqn.solve();
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

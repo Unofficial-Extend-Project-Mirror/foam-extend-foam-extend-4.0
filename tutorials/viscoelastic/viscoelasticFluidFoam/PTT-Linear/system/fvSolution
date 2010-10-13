@@ -1,36 +1,29 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4.1                                 |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version 2.0;
-    format ascii;
-
-    root "/opt/OpenFOAM/jovani-1.4.1/run/tutorials/viscoelasticFluidFoam";
-    case "PTT-Linear";
-    instance "system";
-    local "";
-
-    class           dictionary;
-    object          fvSolution;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 solvers
 {
 
-    p CG
+    p
     {
+        solver          PCG;
         preconditioner
         {
-//          type           Cholesky;
-            type            AMG;
+//          preconditioner  Cholesky;
+            preconditioner  AMG;
             cycle           W-cycle;
             policy          AAMG;
             nPreSweeps      0;
@@ -42,38 +35,40 @@ solvers
             smoother        ILU;
         }
 
-
         tolerance        1e-07;
-        relTol           0.0;
+        relTol           0;
         minIter          0;
         maxIter          800;
-    };
+    }
 
-
-    U BiCGStab
+    U
     {
+
+        solver           BiCGStab;
         preconditioner
         {
-            type          Cholesky;
+            preconditioner Cholesky;
         }
 
+        tolerance         1e-6;
+        relTol            0;
         minIter           0;
         maxIter           1000;
-        tolerance         1e-6;
-        relTol            0.0;
-    };
+    }
 
-    taufirst BiCGStab
+    tau 
     {
+
+        solver           BiCGStab;
         preconditioner
         {
-            type          Cholesky;
+            preconditioner Cholesky;
         }
 
+        tolerance         1e-6;
+        relTol            0;
         minIter           0;
         maxIter           1000;
-        tolerance         1e-6;
-        relTol            0.0;
 
     };
 
@@ -81,9 +76,8 @@ solvers
 
 PISO
 {
-    momentumPredictor yes;
     nCorrectors    2;
-    nNonOrthogonalCorrectors 1;
+    nNonOrthogonalCorrectors 0;
     pRefCell        0;
     pRefValue       0;
 }
@@ -92,9 +86,7 @@ relaxationFactors
 {
     p               0.3;
     U               0.5;
-    taufirst        0.3;
+    tau             0.3;
 }
-
-
 
 // ************************************************************************* //

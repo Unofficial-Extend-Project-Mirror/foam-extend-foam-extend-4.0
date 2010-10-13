@@ -1,0 +1,34 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+#
+#+TITLE: *Giesekus viscoelastic constitutive model README file for version 1.6-ext* 
+#+AUTHOR: Jovani                
+#+DATE:  05 October 2010
+
+
+
+* This is a simulation case for a viscoelastic fluid described by the multimode 
+  Giesekus constitutive model (PTT-Linear).
+  The geometry was the 4:1 plane contraction. 
+
+  More details about the model or parameters used, as also informations 
+  about the geometry, can be found at:
+
+*** AZAIEZ, J.; GUÉNETTE, R.; AIT-KADI, A. Entry ﬂow calculations using multi-mode
+    models. Journal of Non-Newtonian Fluid Mechanics, v. 66, n. 2-3, p. 271 – 281, 1996.
+    ISSN 0377-0257. 
+    <http://www.sciencedirect.com/science/article/B6TGV-3VVMNS1-V/2/e80ddcde87f949cba70577242c8a9465>
+
+
+
+* The results for this case using viscoelasticFluidFoam solver can be found at:
+
+*** Journal of Non-Newtonian Fluid Mechanics:
+    <http://www.sciencedirect.com/science/article/B6TGV-511BYYF-1/2/53b604790dda6f271bb2e82870ba0c2a>
+
+

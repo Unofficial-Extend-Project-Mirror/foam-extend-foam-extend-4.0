@@ -12,13 +12,13 @@ viscoelasticLaws/FENE-CR/FENE_CR.C
 viscoelasticLaws/FENE-P/FENE_P.C
 viscoelasticLaws/XPP_SE/XPP_SE.C
 viscoelasticLaws/XPP_DE/XPP_DE.C
-viscoelasticLaws/PP/PP.C
 viscoelasticLaws/DCPP/DCPP.C
 viscoelasticLaws/Feta-PTT/Feta_PTT.C
 viscoelasticLaws/Leonov/Leonov.C
-viscoelasticLaws/White-Metzner/White-Metzner_Larson/White_Metzner_Larson.C
-viscoelasticLaws/White-Metzner/White-Metzner_CM/White_Metzner_CM.C
-viscoelasticLaws/White-Metzner/White-Metzner_CY/White_Metzner_CY.C
+viscoelasticLaws/WhiteMetzner/WhiteMetznerLarson/WhiteMetznerLarson.C
+viscoelasticLaws/WhiteMetzner/WhiteMetznerCross/WhiteMetznerCross.C
+viscoelasticLaws/WhiteMetzner/WhiteMetznerCarreauYasuda/WhiteMetznerCarreauYasuda.C
+viscoelasticLaws/S_MDCPP/S_MDCPP.C
 
 viscoelasticLaws/multiMode/multiMode.C
 

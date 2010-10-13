@@ -116,7 +116,7 @@ public:
         virtual tmp<volSymmTensorField> tau() const
         {
             return tau_;
-        } 
+        }
 
         //- Return the coupling term for the momentum equation
         virtual tmp<fvVectorMatrix> divTau(volVectorField& U) const;

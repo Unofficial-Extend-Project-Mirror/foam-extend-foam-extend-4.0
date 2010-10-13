@@ -27,20 +27,17 @@ License
 #include "XPP_DE.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(XPP_DE, 0);
-addToRunTimeSelectionTable(viscoelasticLaw, XPP_DE, dictionary);
+    defineTypeNameAndDebug(XPP_DE, 0);
+    addToRunTimeSelectionTable(viscoelasticLaw, XPP_DE, dictionary);
+}
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// from components
-XPP_DE::XPP_DE
+Foam::XPP_DE::XPP_DE
 (
     const word& name,
     const volVectorField& U,
@@ -117,9 +114,8 @@ XPP_DE::XPP_DE
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<fvVectorMatrix> XPP_DE::divTau(volVectorField& U) const
+Foam::tmp<Foam::fvVectorMatrix> Foam::XPP_DE::divTau(volVectorField& U) const
 {
-
      dimensionedScalar etaPEff = etaP_;
 
     return
@@ -132,29 +128,33 @@ tmp<fvVectorMatrix> XPP_DE::divTau(volVectorField& U) const
 }
 
 
-void XPP_DE::correct()
+void Foam::XPP_DE::correct()
 {
     // Velocity gradient tensor
-    volTensorField L = fvc::grad( U() );
+    volTensorField L = fvc::grad(U());
 
     // Convected derivate term
     volTensorField C = S_ & L;
 
     // Twice the rate of deformation tensor
-    volSymmTensorField twoD = twoSymm( L );
+    volSymmTensorField twoD = twoSymm(L);
 
-
-     // Evolution of orientation
+    // Evolution of orientation
     tmp<fvSymmTensorMatrix> SEqn
     (
         fvm::ddt(S_)
-        + fvm::div(phi(), S_)
-        ==
-        twoSymm( C )
-        - fvm::Sp( (twoD && S_) , S_ )
-        - fvm::Sp( 1/lambdaOb_/Foam::sqr(Lambda_)*(1 - alpha_ - 3*alpha_*Foam::pow(Lambda_, 4)*tr(S_ & S_) ), S_ )
-        - 1/lambdaOb_/Foam::sqr(Lambda_)*( 3*alpha_*Foam::pow(Lambda_, 4)*(S_ & S_) - (1 - alpha_)/3*I_ )
-
+      + fvm::div(phi(), S_)
+     ==
+        twoSymm(C)
+      - fvm::Sp((twoD && S_) , S_)
+      - fvm::Sp
+        (
+            1/lambdaOb_/Foam::sqr(Lambda_)*
+            (1 - alpha_ - 3*alpha_*Foam::pow(Lambda_, 4)*tr(S_ & S_)),
+            S_
+        )
+        - 1/lambdaOb_/Foam::sqr(Lambda_)*
+        (3*alpha_*Foam::pow(Lambda_, 4)*(S_ & S_) - (1 - alpha_)/3*I_)
     );
 
     SEqn().relax();
@@ -162,28 +162,22 @@ void XPP_DE::correct()
 
 
      // Evolution of the backbone stretch
-    tmp<fvScalarMatrix> LambdaEqn
+    fvScalarMatrix LambdaEqn
     (
         fvm::ddt(Lambda_)
-        + fvm::div(phi(), Lambda_)
-        ==
-        fvm::Sp( (twoD && S_) / 2 , Lambda_ )
-        - fvm::Sp( Foam::exp( 2/q_*(Lambda_ - 1))/lambdaOs_ , Lambda_ )
-        + Foam::exp( 2/q_*(Lambda_ - 1))/lambdaOs_
-
+      + fvm::div(phi(), Lambda_)
+     ==
+        fvm::Sp((twoD && S_)/2 , Lambda_)
+      - fvm::Sp(Foam::exp( 2/q_*(Lambda_ - 1))/lambdaOs_ , Lambda_)
+      + Foam::exp(2/q_*(Lambda_ - 1))/lambdaOs_
     );
 
-    LambdaEqn().relax();
-    solve(LambdaEqn);
+    LambdaEqn.relax();
+    LambdaEqn.solve();
 
     // Viscoelastic stress
-    tau_ = etaP_/lambdaOb_ * (3*Foam::sqr(Lambda_)*S_ - I_);
-
+    tau_ = etaP_/lambdaOb_*(3*Foam::sqr(Lambda_)*S_ - I_);
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //
