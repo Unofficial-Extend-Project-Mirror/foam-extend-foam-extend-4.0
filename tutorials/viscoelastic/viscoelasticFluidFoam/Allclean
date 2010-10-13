@@ -1,56 +1,15 @@
 #!/bin/sh
 
-cd PTT-Exponential
-   ./Allclean
-
-cd ..
-cd DCPP
-   ./Allclean
-
-cd ..
-cd Giesekus
-   ./Allclean
-
-
-cd ..
-cd FENE-CR
-   ./Allclean
-
-cd ..
-cd FENE-P
-   ./Allclean
-
-cd ..
-cd Feta-PTT
-   ./Allclean
-
-cd ..
-cd Leonov
-   ./Allclean
-
-cd ..
-cd Oldroyd-B
-   ./Allclean
-
-cd ..
-cd S-MDCPP
-   ./Allclean
-
-cd ..
-cd PTT-Linear
-   ./Allclean
-
-cd ..
-cd WhiteMetzner/CarreauYasuda
-   ./Allclean
-
-cd ../..
-cd XPP_DE
-   ./Allclean
-
-cd ..
-cd XPP_SE
-   ./Allclean
-
-cd ..
-
+(cd PTT-Exponential;            ./Allclean)
+(cd DCPP;                       ./Allclean)
+(cd Giesekus;                   ./Allclean)
+(cd FENE-CR;                    ./Allclean)
+(cd FENE-P;                     ./Allclean)
+(cd Feta-PTT;                   ./Allclean)
+(cd Leonov;                     ./Allclean)
+(cd Oldroyd-B;                  ./Allclean)
+(cd S-MDCPP;                    ./Allclean)
+(cd PTT-Linear;                 ./Allclean)
+(cd WhiteMetzner/CarreauYasuda; ./Allclean)
+(cd XPP_DE;                     ./Allclean)
+(cd XPP_SE;                     ./Allclean)
