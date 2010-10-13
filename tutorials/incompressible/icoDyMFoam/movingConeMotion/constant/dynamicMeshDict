@@ -18,15 +18,16 @@ FoamFile
 
 twoDMotion      yes;
 
-dynamicFvMesh dynamicMotionSolverFvMesh;
+dynamicFvMesh   dynamicMotionSolverFvMesh;
 
 solver          laplaceFaceDecomposition;
 
 diffusivity     file;
+// diffusivity     uniform;
 
 frozenDiffusion off;
 
-distancePatches 
+distancePatches
 (
     movingWall
     farFieldMoving
