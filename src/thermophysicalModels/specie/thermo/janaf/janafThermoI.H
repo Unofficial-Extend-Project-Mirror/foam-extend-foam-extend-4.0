@@ -54,17 +54,21 @@ inline Foam::janafThermo<equationOfState>::janafThermo
 
 
 template<class equationOfState>
-inline void Foam::janafThermo<equationOfState>::checkT(const scalar T) const
+inline void Foam::janafThermo<equationOfState>::checkT(scalar& T) const
 {
     if (T <  Tlow_ || T > Thigh_)
     {
-        FatalErrorIn
+        // Improvements: graceful exit with recovery.  HJ, 11/Oct/2010
+        InfoIn
         (
-            "janafThermo<equationOfState>::checkT(const scalar T) const"
+            "janafThermo<equationOfState>::checkT(scalar& T) const"
         )   << "attempt to use janafThermo<equationOfState>"
                " out of temperature range "
             << Tlow_ << " -> " << Thigh_ << ";  T = " << T
-            << abort(FatalError);
+            << endl;
+
+        // Bracket T to avoid out-of-range error
+        T = Foam::min(Thigh_, Foam::max(T, Tlow_));
     }
 }
 
@@ -73,9 +77,11 @@ template<class equationOfState>
 inline const typename Foam::janafThermo<equationOfState>::coeffArray&
 Foam::janafThermo<equationOfState>::coeffs
 (
-    const scalar T
+    scalar& T
 ) const
 {
+    // Note: T will be bounded by checkT in coeffs(T).  No longer const
+    // HJ, 12/Oct/2010
     checkT(T);
 
     if (T < Tcommon_)
@@ -103,7 +109,7 @@ inline Foam::janafThermo<equationOfState>::janafThermo
     Thigh_(jt.Thigh_),
     Tcommon_(jt.Tcommon_)
 {
-    for (register label coefLabel=0; coefLabel<nCoeffs_; coefLabel++)
+    for (register label coefLabel = 0; coefLabel < nCoeffs_; coefLabel++)
     {
         highCpCoeffs_[coefLabel] = jt.highCpCoeffs_[coefLabel];
         lowCpCoeffs_[coefLabel] = jt.lowCpCoeffs_[coefLabel];
@@ -116,7 +122,7 @@ inline Foam::janafThermo<equationOfState>::janafThermo
 template<class equationOfState>
 inline Foam::scalar Foam::janafThermo<equationOfState>::cp
 (
-    const scalar T
+    scalar T
 ) const
 {
     const coeffArray& a = coeffs(T);
@@ -127,7 +133,7 @@ inline Foam::scalar Foam::janafThermo<equationOfState>::cp
 template<class equationOfState>
 inline Foam::scalar Foam::janafThermo<equationOfState>::h
 (
-    const scalar T
+    scalar T
 ) const
 {
     const coeffArray& a = coeffs(T);
@@ -142,7 +148,7 @@ inline Foam::scalar Foam::janafThermo<equationOfState>::h
 template<class equationOfState>
 inline Foam::scalar Foam::janafThermo<equationOfState>::hs
 (
-    const scalar T
+    scalar T
 ) const
 {
     return h(T) - hc();
@@ -167,9 +173,12 @@ inline Foam::scalar Foam::janafThermo<equationOfState>::hc() const
 template<class equationOfState>
 inline Foam::scalar Foam::janafThermo<equationOfState>::s
 (
-    const scalar T
+    scalar T
 ) const
 {
+    // Note: T will be bounded by checkT in coeffs(T).  No longer const
+    // HJ, 12/Oct/2010
+
     const coeffArray& a = coeffs(T);
     return
     this->RR*

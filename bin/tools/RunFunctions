@@ -65,6 +65,12 @@ compileApplication ()
     wmake $1
 }
 
+compileLibrary ()
+{
+    echo "Compiling $1 application"
+    wmake libso $1
+}
+
 cloneCase ()
 {
     if [ -d $2 ] ; then

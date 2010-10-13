@@ -58,20 +58,17 @@ class RBFMotionFunctionObject
 {
     // Private data
 
-        //- Name
-        const word name_;
-
         //- Reference to main object registry
         const Time& time_;
 
         //- Region name
         word regionName_;
 
-		scalar rotationAmplitude_;		
-		scalar rotationFrequency_;
-		vector translationAmplitude_;
-		vector translationFrequency_;
-		vector initialRotationOrigin_;
+        scalar rotationAmplitude_;
+        scalar rotationFrequency_;
+        vector translationAmplitude_;
+        vector translationFrequency_;
+        vector initialRotationOrigin_;
 
         //- Stationary points
         pointField statPoints_;
@@ -113,8 +110,8 @@ public:
 
         //- Read and set the function object if its data has changed
         virtual bool read(const dictionary& dict);
-        
-		//- Update for changes of mesh
+
+        //- Update for changes of mesh
         virtual void movePoints(const pointField&)
         {}
 };

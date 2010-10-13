@@ -57,7 +57,7 @@ class skewCorrectionVectors
     public MeshObject<fvMesh, skewCorrectionVectors>
 {
     // Private data
-    
+
         //- Is mesh skew
         mutable bool skew_;
 

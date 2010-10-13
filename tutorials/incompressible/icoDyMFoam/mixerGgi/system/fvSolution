@@ -18,12 +18,10 @@ FoamFile
 
 solvers
 {
-    pcorr BiCGStab
+    pcorr
     {
-        preconditioner
-        {
-            type         DILU;
-        }
+        solver           BiCGStab;
+        preconditioner   DILU;
 
         minIter          0;
         maxIter          1000;
@@ -31,12 +29,10 @@ solvers
         relTol           0;
     };
 
-    p BiCGStab
+    p
     {
-        preconditioner
-        {
-            type         DILU;
-        }
+        solver           CG;
+        preconditioner   Cholesky;
 
         minIter          0;
         maxIter          1000;
@@ -44,12 +40,10 @@ solvers
         relTol           0.0;
     };
 
-    pFinal BiCGStab
+    pFinal
     {
-        preconditioner
-        {
-            type         DILU;
-        }
+        solver           CG;
+        preconditioner   Cholesky;
 
         minIter          0;
         maxIter          1000;
@@ -57,12 +51,10 @@ solvers
         relTol           0;
     };
 
-    U BiCGStab
+    U
     {
-        preconditioner   
-        {
-            type         DILU;
-        }
+        solver            BiCGStab;
+        preconditioner    DILU;
 
         minIter          0;
         maxIter          1000;
@@ -70,6 +62,7 @@ solvers
         relTol           0;
     };
 }
+
 
 PISO
 {

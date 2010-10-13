@@ -37,7 +37,6 @@ License
 #include "MapFvFields.H"
 #include "fvMeshMapper.H"
 #include "mapClouds.H"
-#include "meshObjectBase.H"
 
 #include "volPointInterpolation.H"
 #include "extendedLeastSquaresVectors.H"
@@ -78,9 +77,8 @@ void Foam::fvMesh::clearGeom()
     // needs to be saved.
 
     // Geometry dependent object updated through call-back
-    // "Reserve" optional delete.  Reconsider
+    // and handled by polyMesh
     // HJ, 29/Aug/2010
-//     meshObjectBase::allDelete(*this);
 }
 
 
@@ -89,9 +87,8 @@ void Foam::fvMesh::clearAddressing()
     deleteDemandDrivenData(lduPtr_);
 
     // Geometry dependent object updated through call-back
-    // "Reserve" optional delete.  Reconsider
+    // and handled by polyMesh
     // HJ, 29/Aug/2010
-//     meshObjectBase::allDelete(*this);
 }
 
 
@@ -527,9 +524,6 @@ void  Foam::fvMesh::syncUpdateMesh()
     // handleMorph() should also clear out the surfaceInterpolation.
     // This is a temporary solution
     surfaceInterpolation::movePoints();
-
-    // Instantiate a dummy mapPolyMesh
-    autoPtr<mapPolyMesh> mapPtr(new mapPolyMesh(*this));
 
     // Function object update moved to polyMesh
     // HJ, 29/Aug/2010

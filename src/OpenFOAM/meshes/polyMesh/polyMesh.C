@@ -1226,7 +1226,6 @@ void Foam::polyMesh::setOldPoints
     oldPointsPtr_ = new pointField::subField(oldAllPoints(), nPoints());
     curMotionTimeIndex_ = 0;
     primitiveMesh::clearGeom();
-
 }
 
 

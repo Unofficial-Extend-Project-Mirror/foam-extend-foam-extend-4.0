@@ -98,13 +98,16 @@ class specieThermo
         //- Convergence tolerance of energy -> temperature inversion functions
         static const scalar tol_;
 
+        //- Max temperature jump of energy -> temperature inversion functions
+        static const scalar TJump_;
+
         //- Max number of iterations in energy->temperature inversion functions
         static const int maxIter_;
 
 
     // Private member functions
 
-        //- return the temperature corresponding to the value of the
+        //- Return the temperature corresponding to the value of the
         //  thermodynamic property f, given the function f = F(T) and dF(T)/dT
         inline scalar T
         (
@@ -131,7 +134,7 @@ public:
 
     // Member Functions
 
-        // Fundamaental properties
+        // Fundamental properties
         // (These functions must be provided in derived types)
 
             // Heat capacity at constant pressure [J/(kmol K)]

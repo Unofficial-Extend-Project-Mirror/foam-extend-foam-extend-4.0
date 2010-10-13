@@ -25,7 +25,7 @@ License
 Author
     Frank Bos, TU Delft.  All rights reserved.
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "RBFMotionFunctionObject.H"
 #include "addToRunTimeSelectionTable.H"
@@ -56,15 +56,14 @@ Foam::RBFMotionFunctionObject::RBFMotionFunctionObject
     const dictionary& dict
 )
 :
-    functionObject(),
-    name_(name),
+    functionObject(name),
     time_(t),
     regionName_(polyMesh::defaultRegion),
-	rotationAmplitude_(readScalar(dict.lookup("rotationAmplitude"))),
-	rotationFrequency_(readScalar(dict.lookup("rotationFrequency"))),
-	translationAmplitude_(dict.lookup("translationAmplitude")),
-	translationFrequency_(dict.lookup("translationFrequency")),
-	initialRotationOrigin_(dict.lookup("initialRotationOrigin")),
+    rotationAmplitude_(readScalar(dict.lookup("rotationAmplitude"))),
+    rotationFrequency_(readScalar(dict.lookup("rotationFrequency"))),
+    translationAmplitude_(dict.lookup("translationAmplitude")),
+    translationFrequency_(dict.lookup("translationFrequency")),
+    initialRotationOrigin_(dict.lookup("initialRotationOrigin")),
     statPoints_()
 
 {
@@ -86,7 +85,7 @@ bool Foam::RBFMotionFunctionObject::start()
             mesh.lookupObject<RBFMotionSolver>("dynamicMeshDict")
         );
 
- 	statPoints_ = ms.movingPoints();
+    statPoints_ = ms.movingPoints();
 
     return true;
 }

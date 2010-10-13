@@ -114,10 +114,12 @@ private:
     // Private member functions
 
         //- Check given temperature is within the range of the fitted coeffs
-        inline void checkT(const scalar T) const;
+        //  Note: bounding T within range.  HJ, 12/Oct/2010
+        inline void checkT(scalar& T) const;
 
         //- Return the coefficients corresponding to the given temperature
-        inline const coeffArray& coeffs(const scalar T) const;
+        //  Note: bounding T within range.  HJ, 12/Oct/2010
+        inline const coeffArray& coeffs(scalar& T) const;
 
 
 public:
@@ -145,19 +147,23 @@ public:
     // Member Functions
 
         //- Heat capacity at constant pressure [J/(kmol K)]
-        inline scalar cp(const scalar T) const;
+        //  Note: bounding T within range.  HJ, 12/Oct/2010
+        inline scalar cp(scalar T) const;
 
         //- Enthalpy [J/kmol]
-        inline scalar h(const scalar T) const;
+        //  Note: bounding T within range.  HJ, 12/Oct/2010
+        inline scalar h(scalar T) const;
 
         //- Sensible enthalpy [J/kmol]
-        inline scalar hs(const scalar T) const;
+        //  Note: bounding T within range.  HJ, 12/Oct/2010
+        inline scalar hs(scalar T) const;
 
         //- Chemical enthalpy [J/kmol]
         inline scalar hc() const;
 
         //- Entropy [J/(kmol K)]
-        inline scalar s(const scalar T) const;
+        //  Note: bounding T within range.  HJ, 12/Oct/2010
+        inline scalar s(scalar T) const;
 
 
     // Member operators

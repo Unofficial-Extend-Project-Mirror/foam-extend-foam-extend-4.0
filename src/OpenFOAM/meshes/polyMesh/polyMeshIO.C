@@ -27,6 +27,8 @@ License
 #include "polyMesh.H"
 #include "Time.H"
 #include "cellIOList.H"
+#include "meshObjectBase.H"
+#include "mapPolyMesh.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -394,6 +396,11 @@ Foam::polyMesh::readUpdateState Foam::polyMesh::readUpdate()
             cellZones_.set(czI, newCellZones[czI].clone(cellZones_));
         }
 
+        // Instantiate a dummy mapPolyMesh
+        autoPtr<mapPolyMesh> mapPtr(new mapPolyMesh(*this));
+
+        // Execute dummy  topo change on all mesh objects
+        meshObjectBase::allUpdateTopology(*this, mapPtr());
 
         if (boundaryChanged)
         {
@@ -432,14 +439,17 @@ Foam::polyMesh::readUpdateState Foam::polyMesh::readUpdate()
 
         // Reset points, mesh is not moved
         points_ = pointField::subField(allPoints_, nPoints());
-        
+
         // Derived info
         bounds_ = boundBox(allPoints_);
 
         // Rotation can cause direction vector to change
         geometricD_ = Vector<label>::zero;
         solutionD_ = Vector<label>::zero;
-        
+
+        // Move points in all mesh objects
+        meshObjectBase::allMovePoints<polyMesh>(*this);
+
         return polyMesh::POINTS_MOVED;
     }
     else

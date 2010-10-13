@@ -23,12 +23,11 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Application
-    icoDyMSimpleFoam
+    icoDyMFoam
 
 Description
     Transient solver for incompressible, laminar flow of Newtonian fluids
-    with dynamic mesh.  Solver implements a SIMPLE-based algorithm
-    in time-stepping mode.
+    with dynamic mesh.
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
@@ -59,10 +58,10 @@ int main(int argc, char *argv[])
 #       include "checkTotalVolume.H"
 #       include "CourantNo.H"
 
+#       include "setDeltaT.H"
+
         // Make the fluxes absolute
         fvc::makeAbsolute(phi, U);
-
-#       include "setDeltaT.H"
 
         runTime++;
 
@@ -82,19 +81,17 @@ int main(int argc, char *argv[])
         // Make the fluxes relative to the mesh motion
         fvc::makeRelative(phi, U);
 
-        if (checkMeshCourantNo)
-        {
-#           include "meshCourantNo.H"
-        }
-
-        // --- SIMPLE loop
-
-        for (int ocorr = 0; ocorr < nOuterCorr; ocorr++)
+        if (meshChanged)
         {
 #           include "CourantNo.H"
+        }
 
-#           include "UEqn.H"
+#       include "UEqn.H"
 
+        // --- PISO loop
+
+        for (int corr=0; corr<nCorr; corr++)
+        {
             rAU = 1.0/UEqn.A();
 
             U = rAU*UEqn.H();
@@ -102,8 +99,6 @@ int main(int argc, char *argv[])
               //+ fvc::ddtPhiCorr(rAU, U, phi);
 
             adjustPhi(phi, U, p);
-
-            p.storePrevIter();
 
             for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
             {
@@ -114,11 +109,7 @@ int main(int argc, char *argv[])
 
                 pEqn.setReference(pRefCell, pRefValue);
 
-                if
-                (
-                    ocorr == nOuterCorr - 1
-                 && nonOrth == nNonOrthCorr
-                )
+                if (corr == nCorr - 1 && nonOrth == nNonOrthCorr)
                 {
                     pEqn.solve(mesh.solver(p.name() + "Final"));
                 }
@@ -134,9 +125,6 @@ int main(int argc, char *argv[])
             }
 
 #           include "continuityErrs.H"
-
-            // Explicitly relax pressure for momentum corrector
-            p.relax();
 
             // Make the fluxes relative to the mesh motion
             fvc::makeRelative(phi, U);
