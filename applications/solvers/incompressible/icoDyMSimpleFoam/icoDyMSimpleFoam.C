@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
 #   include "createTime.H"
 #   include "createDynamicFvMesh.H"
 #   include "initContinuityErrs.H"
+#   include "initTotalVolume.H"
 #   include "createFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

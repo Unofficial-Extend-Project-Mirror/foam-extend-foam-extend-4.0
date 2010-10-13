@@ -24,12 +24,6 @@
         pcorrTypes
     );
 
-#   include "continuityErrs.H"
-
-    // Flux predictor
-    phi = (fvc::interpolate(U) & mesh.Sf());
-    rAU == runTime.deltaT();
-
     for(int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
     {
         fvScalarMatrix pcorrEqn
@@ -50,4 +44,4 @@
     }
 }
 
-
+#include "continuityErrs.H"
