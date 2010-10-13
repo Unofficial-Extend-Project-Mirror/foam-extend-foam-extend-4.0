@@ -146,7 +146,7 @@ Foam::deflationSolver::deflationSolver
             coupleBouCoeffs,
             coupleIntCoeffs,
             interfaces,
-            dict.subDict("preconditioner")
+            dict
         )
     ),
     rpmOrder_(readLabel(dict.lookup("rpmOrder"))),

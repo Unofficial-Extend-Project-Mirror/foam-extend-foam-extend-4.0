@@ -74,7 +74,7 @@ Foam::cgSolver::cgSolver
             coupleBouCoeffs,
             coupleIntCoeffs,
             interfaces,
-            dict.subDict("preconditioner")
+            dict
         )
     )
 {}

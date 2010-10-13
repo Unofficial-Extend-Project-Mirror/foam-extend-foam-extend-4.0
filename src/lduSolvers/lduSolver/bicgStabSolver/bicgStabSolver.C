@@ -78,7 +78,7 @@ Foam::bicgStabSolver::bicgStabSolver
             coupleBouCoeffs,
             coupleIntCoeffs,
             interfaces,
-            dict.subDict("preconditioner")
+            dict
         )
     )
 {}
