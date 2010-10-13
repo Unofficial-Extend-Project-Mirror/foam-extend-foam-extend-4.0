@@ -59,6 +59,7 @@ void boundMinMax
     const dimensionedScalar& vsf1
 );
 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
