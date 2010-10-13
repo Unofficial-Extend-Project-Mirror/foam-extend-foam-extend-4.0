@@ -1,0 +1,15 @@
+#!/bin/sh
+
+(cd PTT-Exponential;            ./Allrun)
+(cd DCPP;                       ./Allrun)
+(cd Giesekus;                   ./Allrun)
+(cd FENE-CR;                    ./Allrun)
+(cd FENE-P;                     ./Allrun)
+(cd Feta-PTT;                   ./Allrun)
+(cd Leonov;                     ./Allrun)
+(cd Oldroyd-B;                  ./Allrun)
+(cd S-MDCPP;                    ./Allrun)
+(cd PTT-Linear;                 ./Allrun)
+(cd WhiteMetzner/CarreauYasuda; ./Allrun)
+(cd XPP_DE;                     ./Allrun)
+(cd XPP_SE;                     ./Allrun)
