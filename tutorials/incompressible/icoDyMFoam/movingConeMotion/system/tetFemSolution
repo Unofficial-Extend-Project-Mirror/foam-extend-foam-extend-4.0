@@ -18,8 +18,9 @@ FoamFile
 
 solvers
 {
-    motionU amgSolver
+    motionU
     {
+        solver          amgSolver;
         cycle           W-cycle;
         policy          AAMG;
         nPreSweeps      0;

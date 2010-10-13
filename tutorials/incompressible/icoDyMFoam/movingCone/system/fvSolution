@@ -16,29 +16,33 @@ FoamFile
 
 solvers
 {
-    pcorr PCG
+    pcorr
     {
+        solver           PCG;
         preconditioner   DIC;
         tolerance        1e-02;
         relTol           0;
     };
 
-    p PCG
+    p
     {
+        solver           PCG;
         preconditioner   DIC;
         tolerance        1e-06;
         relTol           0.05;
     };
 
-    pFinal PCG
+    pFinal
     {
+        solver           PCG;
         preconditioner   DIC;
         tolerance        1e-06;
         relTol           0;
     };
 
-    U PBiCG
+    U
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;

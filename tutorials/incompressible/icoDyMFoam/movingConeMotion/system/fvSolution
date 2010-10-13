@@ -1,4 +1,4 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  1.4                                   |
@@ -10,12 +10,6 @@ FoamFile
 {
     version         2.0;
     format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
     class           dictionary;
     object          fvSolution;
 }
@@ -24,12 +18,10 @@ FoamFile
 
 solvers
 {
-    pcorr PCG
+    pcorr
     {
-        preconditioner
-        {
-            type         DIC;
-        }
+        solver           PCG;
+        preconditioner   DIC;
 
         minIter          0;
         maxIter          1000;
@@ -37,12 +29,10 @@ solvers
         relTol           0;
     };
 
-    p PCG
+    p
     {
-        preconditioner
-        {
-            type         DIC;
-        }
+        solver           PCG;
+        preconditioner   DIC;
 
         minIter          0;
         maxIter          1000;
@@ -50,12 +40,10 @@ solvers
         relTol           0.05;
     };
 
-    pFinal PCG
+    pFinal
     {
-        preconditioner
-        {
-            type         DIC;
-        }
+        solver           PCG;
+        preconditioner   DIC;
 
         minIter          0;
         maxIter          1000;
@@ -63,32 +51,18 @@ solvers
         relTol           0;
     };
 
-    U PBiCG
+    U
     {
-        preconditioner   
-        {
-            type         DILU;
-        }
+        solver           PBiCG;
+        preconditioner   DILU;
 
         minIter          0;
         maxIter          1000;
         tolerance        1e-05;
         relTol           0;
     };
-
-    cellMotionUx PCG
-    {
-        preconditioner      
-        {
-            type         DIC;
-        }
-
-        minIter          0;
-        maxIter          1000;
-        tolerance        1e-08;
-        relTol           0;
-    };
 }
+
 
 PISO
 {

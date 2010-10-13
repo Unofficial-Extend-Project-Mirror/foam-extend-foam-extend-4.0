@@ -4,6 +4,5 @@
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions
 
 cleanCase
-rm -rf VTK
-rm -f constant/polyMesh/boundary
-rm -rf constant/polyMesh/sets
+rm -f 0/motionGamma
+( cd setMotionMovingCone ; wclean )
