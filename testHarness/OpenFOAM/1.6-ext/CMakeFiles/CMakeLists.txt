@@ -1,4 +1,4 @@
-# /*---------------------------------------------------------------------------*\
+#/*---------------------------------------------------------------------------*\
 #   =========                 |
 #   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
 #    \\    /   O peration     |
@@ -82,14 +82,12 @@ SET(
 
 # Find out the version of the compiler being used.
 # Add this information to the buildname 
-# This is for gcc 
-IF(CMAKE_COMPILER_IS_GNUCC)
-  EXEC_PROGRAM(${CMAKE_CXX_COMPILER}
-    ARGS -dumpversion
-    OUTPUT_VARIABLE COMPILER_VERSION
-  )
-  SET(BUILDNAME "${BUILDNAME}-gcc${COMPILER_VERSION}")  
-ENDIF(CMAKE_COMPILER_IS_GNUCC)
+# This is for gcc or icc because they both support the -dumpversion option
+EXEC_PROGRAM($ENV{WM_CC}
+  ARGS -dumpversion
+  OUTPUT_VARIABLE COMPILER_VERSION
+)
+SET(BUILDNAME "${BUILDNAME}-$ENV{WM_CC}${COMPILER_VERSION}")  
 #
 # We will support more compilers eventually.
 # 
@@ -99,7 +97,7 @@ ENDIF(CMAKE_COMPILER_IS_GNUCC)
 #    DART_TESTING_TIMEOUT 14400
 #    CACHE STRING "Maximum time allowed (4 hours) before CTest will kill the test."
 #)
-# Timeout for running all this: 10 minutes : 600 secondes
+# Timeout for running all this: 10 minutes : 600 seconds
 SET(
     DART_TESTING_TIMEOUT 600
     CACHE STRING "Maximum time allowed (10 minutes) before CTest will kill the test."
@@ -119,8 +117,21 @@ set (UPDATE_TYPE git)
 #
 find_package(Git)
 if(GIT_FOUND)
-  message("Git was found: ${GIT_EXECUTABLE}")
+    message("Git was found: ${GIT_EXECUTABLE}")
+
+    # Adding the name of the git branch to the build name
+    EXEC_PROGRAM(git
+      ARGS branch --no-color 2> /dev/null | grep '*'| awk '{print $2}'
+      OUTPUT_VARIABLE GIT_BRANCH_NAME
+    )
+    message("Git branch: ${GIT_BRANCH_NAME}")
+    SET(BUILDNAME "${BUILDNAME}-git-branch:${GIT_BRANCH_NAME}")  
 endif()
+
+# Some last minute cleanup
+# Seems like no '/' are allowed in the BUILDNAME or in the SITE name
+string(REPLACE "/" "_" BUILDNAME ${BUILDNAME})
+string(REPLACE "/" "_" SITE ${SITE})
 
 
 # Build section
