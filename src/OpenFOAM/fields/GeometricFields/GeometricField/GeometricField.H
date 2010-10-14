@@ -45,6 +45,7 @@ SourceFiles
 #include "DimensionedField.H"
 #include "FieldField.H"
 #include "lduInterfaceFieldPtrsList.H"
+#include "BlockLduInterfaceFieldPtrsList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -192,6 +193,10 @@ public:
             //  pointing to interfaces being set
             lduInterfaceFieldPtrsList interfaces() const;
 
+            //- Return a list of pointers for each patch field with only those
+            //  pointing to block-coupled interfaces being set
+            typename BlockLduInterfaceFieldPtrsList<Type>::Type blockInterfaces() const;
+            
             //- Write boundary field as dictionary entry
             void writeEntry(const word& keyword, Ostream& os) const;
  
