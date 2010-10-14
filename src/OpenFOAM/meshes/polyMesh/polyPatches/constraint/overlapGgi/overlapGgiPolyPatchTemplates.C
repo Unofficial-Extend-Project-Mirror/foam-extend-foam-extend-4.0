@@ -24,7 +24,7 @@ License
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
-    Fethi Tekin, All rights reserved.
+    Fethi Tekin, All rights reserved. fethitekin@gmail.com
 
 \*---------------------------------------------------------------------------*/
 
@@ -43,6 +43,7 @@ Foam::overlapGgiPolyPatch::expandSlaveData(const Field<Type>& spf) const
     const label ncp = shadow().nCopies();
 
     tmp<Field<Type> > tef(new Field<Type>(ncp*spf.size()));
+
     Field<Type>& ef = tef();
 
     label nFaces = 0;
@@ -67,11 +68,12 @@ template<class Type>
 Foam::tmp<Foam::Field<Type> >
 Foam::overlapGgiPolyPatch::expandMasterData(const Field<Type>& spf) const
 {
-    const scalar masterAngle = angle();
+    const scalar masterAngle = shadow().angle();
 
-    const label ncpm = nCopies();
+    const label ncpm = shadow().nCopies();
 
     tmp<Field<Type> > tef(new Field<Type>(ncpm*spf.size()));
+
     Field<Type>& ef = tef();
 
     label nFaces = 0;
@@ -91,8 +93,6 @@ Foam::overlapGgiPolyPatch::expandMasterData(const Field<Type>& spf) const
 
     return tef;
 }
-
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
@@ -154,6 +154,5 @@ Foam::overlapGgiPolyPatch::interpolate(const tmp<Field<Type> >& tpf) const
         return tresult;
     }
 }
-
 
 // ************************************************************************* //
