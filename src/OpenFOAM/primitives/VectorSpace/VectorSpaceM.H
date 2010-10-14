@@ -48,6 +48,20 @@ public:
         vs.v_[I] = o(vs1.v_[I], vs2.v_[I]);
         VectorSpaceOps<endLoop*N, endLoop*(I+1)>::op(vs, vs1, vs2, o);
     }
+
+    template<class V, class V1, class V2, class Op>
+    static inline void opVV(V& vs, const V1& vs1, const V2& vs2, Op o)
+    {
+        vs.v_[I] = o(vs1.v_[I], vs2.v_[I]);
+        VectorSpaceOps<endLoop*N, endLoop*(I+1)>::opVV(vs, vs1, vs2, o);
+    }
+
+    template<class S, class V1, class V2, class EqOp, class Op>
+    static inline void SopEqOpVV(S& s, const V1& vs1, const V2& vs2, EqOp eo, Op o)
+    {
+        eo(s, o(vs1.v_[I], vs2.v_[I]));
+        VectorSpaceOps<endLoop*N, endLoop*(I+1)>::SopEqOpVV(s, vs1, vs2, eo, o);
+    }
 };
 
 
@@ -79,5 +93,13 @@ public:
 
     template<class V, class V1, class Op>
     static inline void op(V& vs, const V1&, const V1&, Op)
+    {}
+    
+    template<class V, class V1, class V2, class Op>
+    static inline void opVV(V& vs, const V1& vs1, const V2& vs2, Op o)
+    {}
+
+    template<class S, class V1, class V2, class EqOp, class Op>
+    static inline void SopEqOpVV(S& s, const V1& vs1, const V2& vs2, EqOp eo, Op o)
     {}
 };
