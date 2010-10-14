@@ -131,11 +131,14 @@ void Foam::turboFvMesh::calcMovingPoints() const
 
                  forAll (curFace, pointI)
                  {
-                     //The rotation data is saved within the cell data. For
-                     //non-rotating regions rpm is zero,so mesh movement is
-                     //also zero. The conversion of rotational speed
+                     // The rotation data is saved within the cell data. For
+                     // non-rotating regions rpm is zero, so mesh movement is
+                     // also zero. The conversion of rotational speed
+
+                     // Note: deltaT changes during the run: moved to
+                     // turboFvMesh::update().  HJ, 14/Oct/2010
                      movingPoints[curFace[pointI]] =
-                         vector(0,rpm_*360.0*time().deltaT().value()/60.0, 0);
+                         vector(0, rpm_/60.0*360.0, 0);
                  }
             }
         }
@@ -213,7 +216,8 @@ bool Foam::turboFvMesh::update()
     (
         csPtr_->globalPosition
         (
-          csPtr_->localPosition(allPoints()) + movingPoints()
+            csPtr_->localPosition(allPoints())
+          + movingPoints()*time().deltaT().value()
         )
     );
 
