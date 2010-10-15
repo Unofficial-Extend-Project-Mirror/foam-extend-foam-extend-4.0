@@ -37,7 +37,6 @@ template<class Type>
 Foam::tmp<Foam::Field<Type> >
 Foam::overlapGgiPolyPatch::expandSlaveData(const Field<Type>& spf) const
 {
-
     const scalar slaveAngle = shadow().angle();
 
     const label ncp = shadow().nCopies();
@@ -63,6 +62,7 @@ Foam::overlapGgiPolyPatch::expandSlaveData(const Field<Type>& spf) const
 
     return tef;
 }
+
 
 template<class Type>
 Foam::tmp<Foam::Field<Type> >
