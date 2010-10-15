@@ -85,7 +85,10 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
             << abort(FatalError);
     }
 
-    Info << "Evaluation of GGI weighting factors:" << endl;
+    if (debug)
+    {
+        Info << "Evaluation of GGI weighting factors:" << endl;
+    }
 
     // Create the dynamic lists to hold the addressing
 
@@ -475,8 +478,6 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
     {
         rescaleWeightingFactors();
     }
-
-    Info << endl;
 }
 
 
@@ -569,12 +570,17 @@ void GGIInterpolation<MasterPatch, SlavePatch>::rescaleWeightingFactors() const
         }
     }
 
-    if (saW.size() > 0 && maW.size() > 0)
+    if (debug)
     {
-        Info<< "  Largest slave weighting factor correction : " << largestSWC
-            << " average: " << sumSWC/saW.size() << nl
-            << "  Largest master weighting factor correction: " << largestMWC
-            << " average: " << sumMWC/maW.size() << endl;
+        if (saW.size() > 0 && maW.size() > 0)
+        {
+            Info<< "  Largest slave weighting factor correction : "
+                << largestSWC
+                << " average: " << sumSWC/saW.size() << nl
+                << "  Largest master weighting factor correction: "
+                << largestMWC
+                << " average: " << sumMWC/maW.size() << endl;
+        }
     }
 }
 
