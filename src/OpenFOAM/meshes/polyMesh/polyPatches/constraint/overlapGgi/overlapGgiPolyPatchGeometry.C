@@ -54,8 +54,6 @@ void Foam::overlapGgiPolyPatch::calcExpandedMaster() const
         // Create expanded master patch
         const label ncpm = nCopies();
 
-        Info << "Number of master copies: " << ncpm << endl;
-
         // Create expanded master points and faces
         const polyPatch& master = boundaryMesh()[index()];
         const pointField& masterLocalPoints = master.localPoints();
@@ -63,8 +61,6 @@ void Foam::overlapGgiPolyPatch::calcExpandedMaster() const
         pointField MasterExpandedPoints(ncpm*masterLocalPoints.size());
 
         const scalar masterAngle = angle();
-
-        Info << "Master Angle is: " << masterAngle << endl;
 
         // Transform points
         label nPoints_master = 0;
@@ -155,8 +151,6 @@ void Foam::overlapGgiPolyPatch::calcExpandedSlave() const
     {
         // Create expanded patch
         const label ncp = shadow().nCopies();
-
-        Info << "Number of slave copies: " << ncp << endl;
 
         // Create expanded points and faces
         const polyPatch& slave = boundaryMesh()[shadowIndex()];
