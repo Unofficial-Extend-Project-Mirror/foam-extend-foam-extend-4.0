@@ -71,6 +71,7 @@ public:
 
     // Declare run-time constructor selection table
 
+#ifndef SWIG
         declareRunTimeSelectionTable
         (
             autoPtr,
@@ -79,6 +80,7 @@ public:
             (const IOobject& io),
             (io)
         );
+#endif
 
 
     // Constructors

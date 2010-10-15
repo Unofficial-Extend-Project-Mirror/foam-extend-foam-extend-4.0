@@ -131,11 +131,11 @@ tmp<volScalarField> twoPhaseMixture::rho() const
 {
     volScalarField limitedAlpha1 = min(max(alpha1_, scalar(0)), scalar(1));
 
-    return tmp<volScalarField> 
+    return tmp<volScalarField>
     (
         new volScalarField
         (
-            "rho",
+            "rho_twoPhaseMixture",
             limitedAlpha1*rho1_
           + (scalar(1) - limitedAlpha1)*rho2_
         )
@@ -151,7 +151,7 @@ tmp<volScalarField> twoPhaseMixture::mu() const
     (
         new volScalarField
         (
-            "mu",
+            "mu_twoPhaseMixture",
             limitedAlpha1*rho1_*nuModel1_->nu()
           + (scalar(1) - limitedAlpha1)*rho2_*nuModel2_->nu()
         )
@@ -168,7 +168,7 @@ tmp<surfaceScalarField> twoPhaseMixture::muf() const
     (
         new surfaceScalarField
         (
-            "muf",
+            "muf_twoPhaseMixture",
             alpha1f*rho1_*fvc::interpolate(nuModel1_->nu())
           + (scalar(1) - alpha1f)*rho2_*fvc::interpolate(nuModel2_->nu())
         )
@@ -185,7 +185,7 @@ tmp<surfaceScalarField> twoPhaseMixture::nuf() const
     (
         new surfaceScalarField
         (
-            "nuf",
+            "nuf_twoPhaseMixture",
             (
                 alpha1f*rho1_*fvc::interpolate(nuModel1_->nu())
               + (scalar(1) - alpha1f)*rho2_*fvc::interpolate(nuModel2_->nu())

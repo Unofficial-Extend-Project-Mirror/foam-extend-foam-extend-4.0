@@ -228,6 +228,7 @@ public:
 
     // Declare run-time constructor selection tables
 
+#ifndef SWIG
         declareRunTimeSelectionTable
         (
             autoPtr,
@@ -256,6 +257,7 @@ public:
             ),
             (name, dict, index, bm)
         );
+#endif
 
 
     // Constructors
