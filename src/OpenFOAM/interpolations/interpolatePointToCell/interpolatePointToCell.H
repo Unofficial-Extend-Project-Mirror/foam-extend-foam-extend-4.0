@@ -47,7 +47,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Interpolate field to cell center.
+// Interpolate field to cell center
 template<class Type>
 Type interpolatePointToCell
 (
