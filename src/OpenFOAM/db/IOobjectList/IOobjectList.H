@@ -50,7 +50,11 @@ namespace Foam
 
 class IOobjectList
 :
+#ifndef SWIG
     public HashPtrTable<IOobject>
+#else
+    public HashPtrTable<IOobject, word, string_hash>
+#endif
 {
     // Private Member Functions
 

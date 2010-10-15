@@ -51,7 +51,11 @@ namespace Foam
 class objectRegistry
 :
     public regIOobject,
+#ifndef SWIG
     public HashTable<regIOobject*>
+#else
+    public HashTable<regIOobject*, word, string_hash>
+#endif
 {
     // Private Data
 

@@ -208,6 +208,7 @@ public:
 
     // IOstream operators
 
+#ifndef SWIG
         // Write DynamicList to Ostream.
         friend Ostream& operator<< <T, SizeInc, SizeMult, SizeDiv>
         (
@@ -221,6 +222,7 @@ public:
             Istream&,
             DynamicList<T, SizeInc, SizeMult, SizeDiv>&
         );
+#endif
 };
 
 
