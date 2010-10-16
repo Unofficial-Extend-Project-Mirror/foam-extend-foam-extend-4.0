@@ -1,0 +1,10 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # run from this directory
+set -x
+
+wmakeLnInclude dynamicMesh
+wmakeLnInclude dynamicFvMesh
+wmakeLnInclude topoChangerFvMesh
+
+# Make lnInclude directories for motionSolvers
+meshMotion/AllwmakeLnInclude

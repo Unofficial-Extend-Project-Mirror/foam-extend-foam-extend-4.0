@@ -40,13 +40,11 @@ polyTopoChange/polyTopoChange/actions/topoAction/topoActions.C
 polyTopoChange/polyTopoChanger/polyTopoChanger.C
 polyTopoChange/polyTopoChanger/polyTopoChangerChangeMesh.C
 
-meshMotion = meshMotion
-$(meshMotion)/motionSmoother/motionSmoother.C
-$(meshMotion)/motionSmoother/motionSmootherCheck.C
-$(meshMotion)/motionSmoother/polyMeshGeometry/polyMeshGeometry.C
+motionSmoother/motionSmoother.C
+motionSmoother/motionSmootherCheck.C
+motionSmoother/polyMeshGeometry/polyMeshGeometry.C
 
-$(meshMotion)/motionSolver/motionSolver.C
-$(meshMotion)/RBFMotionSolver/RBFMotionSolver.C
+motionSolver/motionSolver.C
 
 refinementData/refinementData.C
 refinementData/refinementDistanceData.C
@@ -97,7 +95,6 @@ directTopoChange/boundaryMesh/octreeDataFaceList.C
 directTopoChange/boundaryMesh/boundaryPatch.C
 directTopoChange/boundaryMesh/boundaryMesh.C
 directTopoChange/fvMeshDistribute/fvMeshDistribute.C
-
 
 directTopoChange/repatchPolyTopoChanger/repatchPolyTopoChanger.C
 
