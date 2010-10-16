@@ -5,9 +5,9 @@
 # Get application name
 application=`getApplication`
 
-# Disabling the tutorial for now.
+# Disabling the tutorial.
 # Using an exit code != 0 will still flag the tutorial as failed 
-echo "This tutorial is disabled for now."
+echo "Warning: This tutorial is currently disabled."
 exit -1
 
 runApplication blockMesh
