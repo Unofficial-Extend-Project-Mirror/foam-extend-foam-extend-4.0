@@ -27,7 +27,7 @@ Class
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
-    Fethi Tekin, All rights reserved,
+    Fethi Tekin, All rights reserved
 
 Description
     Mass-conservative face interpolation: typedef for stand-alone patch to

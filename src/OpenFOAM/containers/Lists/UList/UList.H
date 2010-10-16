@@ -321,12 +321,15 @@ public:
     // Ostream operator
 
         // Write UList to Ostream.
+#ifndef SWIG
         friend Ostream& operator<< <T>
         (
             Ostream&,
             const UList<T>&
         );
+#endif
 };
+
 
 template<class T>
 void sort(UList<T>&);

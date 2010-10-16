@@ -53,7 +53,8 @@ namespace Foam
 tensor RodriguesRotation
 (
     const vector& rotationAxis,
-    const scalar& rotationAngle
+    const scalar& rotationAngle,
+    const bool inDegrees = true
 );
 
 

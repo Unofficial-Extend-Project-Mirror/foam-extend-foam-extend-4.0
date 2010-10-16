@@ -65,10 +65,10 @@ template<class T, class Key, class Hash> Ostream& operator<<
 
 
 /*---------------------------------------------------------------------------*\
-                           Class HashPtrTable Declaration
+                        Class HashPtrTable Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class T, class Key=word, class Hash=string::hash>
+template<class T, class Key = word, class Hash = string::hash>
 class HashPtrTable
 :
     public HashTable<T*, Key, Hash>
@@ -89,7 +89,7 @@ public:
     // Constructors
 
         //- Construct given initial table size
-        HashPtrTable(label size = 100);
+        HashPtrTable(const label size = 128);
 
         //- Construct from Istream using given Istream constructor class
         template<class INew>
@@ -128,23 +128,19 @@ public:
 
     // IOstream Operators
 
-        friend Istream& operator>>
-        #ifndef __CINT__
-        <T, Key, Hash>
-        #endif
+#ifndef SWIG
+        friend Istream& operator>> <T, Key, Hash>
         (
             Istream&,
             HashPtrTable<T, Key, Hash>&
         );
 
-        friend Ostream& operator<<
-        #ifndef __CINT__
-        <T, Key, Hash>
-        #endif
+        friend Ostream& operator<< <T, Key, Hash>
         (
             Ostream&,
             const HashPtrTable<T, Key, Hash>&
         );
+#endif
 };
 
 

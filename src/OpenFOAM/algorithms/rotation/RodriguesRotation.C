@@ -32,11 +32,18 @@ License
 Foam::tensor Foam::RodriguesRotation
 (
     const vector& rotationAxis,
-    const scalar& rotationAngle
+    const scalar& rotationAngle,
+    const bool inDegrees
 )
 {
     tensor rotTensor;
-    scalar theta = rotationAngle*mathematicalConstant::pi/180.0;
+    scalar theta = rotationAngle;
+
+    if (inDegrees)
+    {
+        theta *= mathematicalConstant::pi/180.0;
+    }
+
     scalar sinTheta = sin(theta);
     scalar cosTheta = cos(theta);
     scalar oneMinusCosTheta = 1.0 - cosTheta;

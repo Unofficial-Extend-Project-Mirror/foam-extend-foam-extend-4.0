@@ -53,8 +53,11 @@ class NamedEnum
 :
     public HashTable<int>
 {
+#ifndef SWIG
     //- nEnum must be positive (non-zero)
     StaticAssert(nEnum > 0);
+#endif
+
 
     // Private Member Functions
 

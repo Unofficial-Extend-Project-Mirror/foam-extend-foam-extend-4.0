@@ -102,6 +102,7 @@ public:
 
     // Declare run-time constructor selection tables
 
+#ifndef SWIG
         declareRunTimeSelectionTable
         (
             tmp,
@@ -140,7 +141,7 @@ public:
             ),
             (p, iF, dict)
         );
-
+#endif
 
     // Constructors
 
@@ -354,7 +355,13 @@ public:
 
     // Ostream operator
 
-        friend Ostream& operator<< <Type>(Ostream&, const fvsPatchField<Type>&);
+#ifndef SWIG
+        friend Ostream& operator<< <Type>
+        (
+            Ostream&,
+            const fvsPatchField<Type>&
+        );
+#endif
 };
 
 

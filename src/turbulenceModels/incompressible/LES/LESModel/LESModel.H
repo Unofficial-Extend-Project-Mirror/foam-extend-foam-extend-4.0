@@ -142,7 +142,7 @@ public:
     // Selectors
 
         //- Return a reference to the selected LES model
-        static autoPtr<LESModel> New
+        static autoPtr<incompressible::LESModel> New
         (
             const volVectorField& U,
             const surfaceScalarField& phi,

@@ -129,6 +129,18 @@ void surfaceNormalFixedValueFvPatchVectorField::rmap
 }
 
 
+void surfaceNormalFixedValueFvPatchVectorField::updateCoeffs()
+{
+    if (updated())
+    {
+        return;
+    }
+
+    // Bug fix: update for moving mesh.  HJ, 15/Oct/2010
+    operator==(refValue_*patch().nf());
+}
+
+
 void surfaceNormalFixedValueFvPatchVectorField::write(Ostream& os) const
 {
     fvPatchVectorField::write(os);

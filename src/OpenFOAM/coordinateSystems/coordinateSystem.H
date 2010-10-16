@@ -166,6 +166,7 @@ class coordinateSystem
         //- Global-to-Local transformation tensor
         tensor Rtr_;
 
+
 protected:
 
     // Protected Member Functions
@@ -249,8 +250,10 @@ public:
             return autoPtr<coordinateSystem>(new coordinateSystem(*this));
         }
 
+
     // Declare run-time constructor selection table
 
+#ifndef SWIG
         declareRunTimeSelectionTable
         (
             autoPtr,
@@ -275,6 +278,8 @@ public:
             ),
             (name, origin, cr)
         );
+#endif
+
 
     // Selectors
 

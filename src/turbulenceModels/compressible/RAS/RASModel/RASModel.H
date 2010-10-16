@@ -136,6 +136,7 @@ public:
 
     // Declare run-time constructor selection table
 
+#ifndef SWIG
         declareRunTimeSelectionTable
         (
             autoPtr,
@@ -149,7 +150,7 @@ public:
             ),
             (rho, U, phi, thermoPhysicalModel)
         );
-
+#endif
 
     // Constructors
 
@@ -167,7 +168,7 @@ public:
     // Selectors
 
         //- Return a reference to the selected turbulence model
-        static autoPtr<RASModel> New
+        static autoPtr<compressible::RASModel> New
         (
             const volScalarField& rho,
             const volVectorField& U,
@@ -176,8 +177,7 @@ public:
         );
 
 
-    // Destructor
-
+    //- Destructor
         virtual ~RASModel()
         {}
 

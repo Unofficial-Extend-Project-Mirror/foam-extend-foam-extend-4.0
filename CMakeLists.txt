@@ -1,10 +1,10 @@
-#/*---------------------------------------------------------------------------*\
+# /*-------------------------------------------------------------------------*\
 #   =========                 |
 #   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
 #    \\    /   O peration     |
 #     \\  /    A nd           | Copyright held by original author
 #      \\/     M anipulation  |
-# -------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # License
 #     This file is part of OpenFOAM.
 #
@@ -23,17 +23,17 @@
 #     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 # Description
-#        CMakeLists.txt file for implementing a test harness for the compilation
-#        and test of OpenFOAM-1.5-dev using Kitware CTest./CMake/CDash
+#     CMakeLists.txt file for implementing a test harness for the compilation
+#     and test of OpenFOAM-1.5-dev using Kitware CTest./CMake/CDash
 #
-#        The results will be submitted to the CDash server identified by the file
-#        CTestConfig.cmake
+#     The results will be submitted to the CDash server identified by the file
+#     CTestConfig.cmake
 #
 # Author
-#        Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved
+#     Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved
 #
 #
-# \*---------------------------------------------------------------------------*/
+# \*-------------------------------------------------------------------------*/
 
 cmake_minimum_required (VERSION 2.8)
 

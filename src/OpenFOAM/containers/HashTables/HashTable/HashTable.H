@@ -417,6 +417,7 @@ public:
 
     // IOstream Operator
 
+#ifndef SWIG
         friend Istream& operator>> <T, Key, Hash>
         (
             Istream&,
@@ -428,6 +429,7 @@ public:
             Ostream&,
             const HashTable<T, Key, Hash>&
         );
+#endif
 
 
 private:

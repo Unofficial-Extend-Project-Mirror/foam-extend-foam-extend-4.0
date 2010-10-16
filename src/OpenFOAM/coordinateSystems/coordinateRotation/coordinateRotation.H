@@ -139,9 +139,15 @@ public:
         //- Construct from dictionary
         coordinateRotation(const dictionary&);
 
+        //- Return clone
+        autoPtr<coordinateRotation> clone() const
+        {
+            return autoPtr<coordinateRotation>(new coordinateRotation(*this));
+        }
 
     // Declare run-time constructor selection table
 
+#ifndef SWIG
         declareRunTimeSelectionTable
         (
             autoPtr,
@@ -152,6 +158,7 @@ public:
             ),
             (dict)
         );
+#endif
 
 
     // Selectors

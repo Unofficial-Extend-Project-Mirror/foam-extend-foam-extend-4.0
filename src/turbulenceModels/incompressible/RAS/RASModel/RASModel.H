@@ -159,7 +159,7 @@ public:
     // Selectors
 
         //- Return a reference to the selected RAS model
-        static autoPtr<RASModel> New
+        static autoPtr<incompressible::RASModel> New
         (
             const volVectorField& U,
             const surfaceScalarField& phi,
