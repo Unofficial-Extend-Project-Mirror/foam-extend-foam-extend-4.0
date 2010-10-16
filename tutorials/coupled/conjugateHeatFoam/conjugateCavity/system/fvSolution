@@ -18,31 +18,34 @@ FoamFile
 
 solvers
 {
-    p PCG
+    p
     {
+        solver           PCG;
         preconditioner   DIC;
         tolerance        1e-06;
         relTol           0;
     };
 
-    U PBiCG
+    U
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
     };
 
-    T+T BiCG
+    T+T 
     {
+        solver           BiCG;
         preconditioner
         {
-            type                Cholesky;
+            preconditioner       Cholesky;
         }
 
-        minIter      0;
-        maxIter      1000;
-        tolerance    1e-6;
-        relTol       0.0;
+        minIter          0;
+        maxIter          1000;
+        tolerance        1e-6;
+        relTol           0.0;
     };
 }
 
