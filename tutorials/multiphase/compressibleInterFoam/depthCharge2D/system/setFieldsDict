@@ -17,7 +17,7 @@ FoamFile
 defaultFieldValues
 (
     volScalarFieldValue alpha1 1
-    volScalarFieldValue pd 1e5
+    volScalarFieldValue p 1e5
 );
 
 regions
@@ -30,7 +30,7 @@ regions
         fieldValues
         (
             volScalarFieldValue alpha1 0
-            volScalarFieldValue pd 10e5
+            volScalarFieldValue p 10e5
         );
     }
 
