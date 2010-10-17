@@ -1,0 +1,109 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      dynamicMeshDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Select the type of dynamicFvMesh, and load custom library
+dynamicFvMesh           dynamicMotionSolverFvMesh;
+
+// Load custom libraries
+motionSolverLibs        ("libmesquiteMotionSolver.so");
+
+solver                  mesquiteMotionSolver;
+
+mesquiteOptions
+{
+    // Optimization metric
+    optMetric               AspectRatioGamma;
+
+    // Objective function
+    objFunction             LPtoP;
+
+    // Optimization algorithm
+    optAlgorithm            FeasibleNewton;
+
+    // Termination criteria sub-dictionary
+    // (takes default values if not specified)
+    // Specifying an empty sub-dictionary
+    // terminates with available options
+    tcInner
+    {
+        absGradL2            1e-4;
+        cpuTime              0.5;
+    }
+
+    // tcOuter
+    // {}
+
+    // For composite functions, two objectives need to be specified
+    // firstFunction           LPtoP;
+    // secondFunction          LInf;
+
+    // For scaled functions, scale and objective needs to be specified
+    // scaleFunction        PMeanP;
+    // scale                1.5;
+
+    // Power value for the LPtoP objective function
+    pValue                  2;
+    power                   2;
+
+    // Specify a tolerance for the surface-smoothing CG solver
+    tolerance               1e-2;
+
+    // Specify number of CG sweeps for surface-smoothing
+    nSweeps                 2;
+
+    // Specify slip patches for the motionSolver
+    slipPatches
+    {
+        sideWall;
+        topWall;
+    }
+
+    cylindricalConstraints
+    {
+        // Specify options per slip patch
+        sideWall
+        {
+            axisPoint      (0.0 0.0 0.0);
+            axisVector     (0.0 0.0 1.0);
+            radius          1.0;
+        }
+    }
+
+    // Specify fixedValue patches for the motionSolver
+    fixedValuePatches
+    {
+        topWall
+        {
+            //type          angularOscillatingDisplacement;
+            //amplitude     -0.0125;
+            type          oscillatingDisplacement;
+            amplitude     (0 0 -0.01);
+            axis          (1 0 0);
+            origin        (0 0 3);
+            angle0        0.0;
+            omega         0.15;
+            value         uniform (0 0 0);
+        }
+    }
+
+    // Specify interval for surface smoothing
+    surfInterval            1;
+}
+
+
+// ************************************************************************* //

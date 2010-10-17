@@ -4,3 +4,4 @@ set -x
 
 wmakeLnInclude fvMotionSolver
 wmakeLnInclude RBFMotionSolver
+wmakeLnInclude mesquiteMotionSolver

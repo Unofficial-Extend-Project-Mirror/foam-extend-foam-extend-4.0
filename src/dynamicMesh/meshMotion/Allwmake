@@ -5,6 +5,7 @@ set -x
 # Make meshMotion solvers
 wmake libso fvMotionSolver
 wmake libso RBFMotionSolver
+wmake libso mesquiteMotionSolver
 (cd tetDecompositionMotionSolver ; ./Allwmake)
 
 # ----------------------------------------------------------------- end-of-file

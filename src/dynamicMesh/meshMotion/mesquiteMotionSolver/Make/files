@@ -1,0 +1,3 @@
+mesquiteMotionSolver.C
+
+LIB = $(FOAM_LIBBIN)/libmesquiteMotionSolver
