@@ -34,9 +34,7 @@ solvers
 
     T+T BiCG
     {
-        preconditioner
-        {
-            type                Cholesky;
+        preconditioner   Cholesky;
         }
 
         minIter      0;
