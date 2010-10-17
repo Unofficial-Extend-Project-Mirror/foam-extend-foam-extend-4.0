@@ -44,9 +44,11 @@ ADDITIONAL_SHELL_FUNCTIONS=$2
 
 for AR in `find ${TEST_RUN_DIR} -name Allrun`
 do
+    # Make sure we are using /bin/bash as the activation shell
     # Replace the macro runApplication with runApplicationAndReportOnError
     mv ${AR} ${AR}.org
     sed \
+	-e s/"#!\/bin\/sh"/"#!\/bin\/bash"/g \
 	-e s/"runApplication "/"runApplicationAndReportOnError "/g \
         -e /RunFunctions/r${ADDITIONAL_SHELL_FUNCTIONS} \
 	${AR}.org > ${AR}

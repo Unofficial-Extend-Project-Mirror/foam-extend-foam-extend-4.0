@@ -1,0 +1,14 @@
+#!/bin/bash
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+# Get application name
+application=`getApplication`
+
+# Disabling the tutorial.
+# Using an exit code != 0 will still flag the tutorial as failed 
+echo "Warning: This tutorial is currently disabled."
+exit -1
+
+runApplication blockMesh
+runApplication $application
