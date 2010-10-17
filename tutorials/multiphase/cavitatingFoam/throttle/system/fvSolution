@@ -16,36 +16,58 @@ FoamFile
 
 solvers
 {
-    omega PBiCG
+    omega
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-08;
         relTol           0;
     };
 
-    k PBiCG
+    k
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-08;
         relTol           0;
     };
 
-    rho PBiCG
+    rho
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-08;
         relTol           0;
     };
 
-    U PBiCG
+    U
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-08;
         relTol           0;
     };
 
-    p GAMG
+    p
     {
+        solver           GAMG;
+        tolerance        1e-8;
+        relTol           0;
+
+        smoother         GaussSeidel;
+        nPreSweeps       0;
+        nPostSweeps      2;
+
+        cacheAgglomeration true;
+
+        nCellsInCoarsestLevel 10;
+        agglomerator     faceAreaPair;
+        mergeLevels      1;
+    };
+
+    pFinal
+    {
+        solver           GAMG;
         tolerance        1e-8;
         relTol           0;
 
