@@ -34,7 +34,7 @@ Documentation
 
 DebugSwitches
 {
-    BlockLduMatrix  2;
+    BlockLduMatrix  1;
 
     CircumferentialAveragingInterpolation 0;
     mixingPlanePolyPatch                  1;
