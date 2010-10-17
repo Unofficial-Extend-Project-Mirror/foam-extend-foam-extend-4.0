@@ -6,6 +6,6 @@
 application="icoDyMFoam"
 
 compileApplication setMotionMovingCone
-runApplication setMotionMovingCone
 runApplication blockMesh
+runApplication setMotionMovingCone
 runApplication $application

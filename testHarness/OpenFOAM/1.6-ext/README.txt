@@ -48,14 +48,14 @@ a) You can set your local system identifier using the environment variable
 b) Install the CMakeLists.txt and CTestConfig.cmake files by executing the following commands:
 
 cp ./CMakeFiles/CMakeLists.txt $WM_PROJECT_DIR
-cp ./CMakeFiles/CTestConfig.cmake.openfoam-extend $WM_PROJECT_DIR/CTestConfig.cmake
+cp ./CMakeFiles/CTestConfig.cmake.openfoam-extend_of-1.6-ext-testing $WM_PROJECT_DIR/CTestConfig.cmake
 
 
 c) Run the test harness and push your results on the CDash server on openfoam-extend
 
-cd ./runDir; ./Allrun_Experimental
+cd ./runDir; ./Allclean; ./Allrun_Experimental
   or
-cd ./runDir; ./Allrun_Nightly
+cd ./runDir; ./Allclean; ./Allrun_Nightly
 
 
 2: Instructions for restarting your setup from scratch:
@@ -74,5 +74,5 @@ To submit your results to the CDash server on openfoam-extend, just use
 the file CTestConfig.cmake.openfoam-extend. 
 
 If submitted to the CDash server on openfoam-extend, your results will be displayed here:
-http://openfoam-extend.sourceforge.net/CDash/index.php?project=OpenFOAM-1.5-dev
+http://openfoam-extend.sourceforge.net/CDash/index.php?project=OpenFOAM-1.6-ext_testing
 
