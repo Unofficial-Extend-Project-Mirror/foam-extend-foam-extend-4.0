@@ -1,0 +1,44 @@
+dynamicFvMesh/dynamicFvMesh.C
+dynamicFvMesh/newDynamicFvMesh.C
+staticFvMesh/staticFvMesh.C
+dynamicBoxFvMesh/dynamicBoxFvMesh.C
+movingBoxFvMesh/movingBoxFvMesh.C
+dynamicBodyFvMesh/dynamicBodyFvMesh.C
+dynamicMotionSolverFvMesh/dynamicMotionSolverFvMesh.C
+subsetMotionSolverFvMesh/subsetMotionSolverFvMesh.C
+dynamicInkJetFvMesh/dynamicInkJetFvMesh.C
+dynamicRefineFvMesh/dynamicRefineFvMesh.C
+
+solidBodyMotionFvMesh/solidBodyMotionFvMesh.C
+solidBodyMotionFunctions = solidBodyMotionFvMesh/solidBodyMotionFunctions
+$(solidBodyMotionFunctions)/solidBodyMotionFunction/solidBodyMotionFunction.C
+$(solidBodyMotionFunctions)/solidBodyMotionFunction/newSolidBodyMotionFunction.C
+$(solidBodyMotionFunctions)/SDA/SDA.C
+$(solidBodyMotionFunctions)/SKA/SKA.C
+$(solidBodyMotionFunctions)/translation/translation.C
+
+mixerGgiFvMesh/mixerGgiFvMesh.C
+turboFvMesh/turboFvMesh.C
+
+tetMetrics/tetMetric.C
+tetMetrics/tetMetrics.C
+
+lengthScaleEstimator/lengthScaleEstimator.C
+
+eMesh = dynamicTopoFvMesh/eMesh
+$(eMesh)/eMesh.C
+$(eMesh)/eMeshDemandDrivenData.C
+$(eMesh)/eBoundaryMesh/eBoundaryMesh.C
+ePatches = $(eMesh)/ePatches
+$(ePatches)/ePatch/ePatch.C
+$(ePatches)/ePatch/newEPatch.C
+dynamicTopoFvMesh/meshOps.C
+dynamicTopoFvMesh/dynamicTopoFvMesh.C
+dynamicTopoFvMesh/dynamicTopoFvMeshCheck.C
+dynamicTopoFvMesh/dynamicTopoFvMeshReOrder.C
+dynamicTopoFvMesh/dynamicTopoFvMeshMapping.C
+dynamicTopoFvMesh/edgeSwap.C
+dynamicTopoFvMesh/edgeBisect.C
+dynamicTopoFvMesh/edgeCollapse.C
+
+LIB = $(FOAM_LIBBIN)/libdynamicFvMesh
