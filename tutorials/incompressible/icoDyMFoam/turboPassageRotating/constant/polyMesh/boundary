@@ -1,0 +1,78 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5-dev                               |
+|   \\  /    A nd           | Revision: exported                              |
+|    \\/     M anipulation  | Web:      http://www.OpenFOAM.org               |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+8
+(
+    inlet
+    {
+        type            patch;
+        nFaces          200;
+        startFace       28100;
+    }
+    outlet
+    {
+        type            patch;
+        nFaces          200;
+        startFace       28300;
+    }
+    fixedWalls
+    {
+        type            wall;
+        nFaces          1400;
+        startFace       28500;
+    }
+    movingwalls
+    {
+        type            patch;
+        nFaces          1400;
+        startFace       29900;
+    }
+    rotor_cyclics
+    {
+        type            cyclic;
+        nFaces          100;
+        startFace       31300;
+        featureCos      0.9;
+    }
+    stator_cyclics
+    {
+        type            cyclic;
+        nFaces          100;
+        startFace       31400;
+        featureCos      0.9;
+    }
+    interface1
+    {
+        type            overlapGgi;
+        nFaces          200;
+        startFace       31500;
+        rotationAxis    (0 0 1);
+        nCopies         12;
+        shadowPatch     interface2;
+    }
+    interface2
+    {
+        type            overlapGgi;
+        nFaces          200;
+        startFace       31700;
+        rotationAxis    (0 0 1);
+        nCopies         12;
+        shadowPatch     interface1;
+    }
+)
+
+// ************************************************************************* //
