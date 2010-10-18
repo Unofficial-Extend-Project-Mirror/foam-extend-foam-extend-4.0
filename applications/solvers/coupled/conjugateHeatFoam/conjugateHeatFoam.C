@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2006-7 H. Jasak All rights reserved
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,6 +24,9 @@ License
 
 Application
     conjugateHeatFoam
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 Description
     Transient solver for incompressible, laminar flow of Newtonian fluids
