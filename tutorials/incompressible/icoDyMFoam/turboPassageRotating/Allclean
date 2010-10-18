@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Source tutorial clean functions
+. $WM_PROJECT_DIR/bin/tools/CleanFunctions
+
+cleanCase
+rm -rf {VTK,log*}
+rm constant/polyMesh/{cellZones*,faces*,neighbour*,owner*,points*,sets}
+find -iname "*~" | xargs rm -f
