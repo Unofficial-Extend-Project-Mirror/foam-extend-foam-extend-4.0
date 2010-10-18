@@ -20,10 +20,12 @@ $(solidBodyMotionFunctions)/translation/translation.C
 mixerGgiFvMesh/mixerGgiFvMesh.C
 turboFvMesh/turboFvMesh.C
 
-tetMetrics/tetMetric.C
-tetMetrics/tetMetrics.C
+tetMetrics = dynamicTopoFvMesh/tetMetrics
+$(tetMetrics)/tetMetric.C
+$(tetMetrics)/tetMetrics.C
 
-lengthScaleEstimator/lengthScaleEstimator.C
+lengthScaleEstimator = dynamicTopoFvMesh/lengthScaleEstimator
+$(lengthScaleEstimator)/lengthScaleEstimator.C
 
 eMesh = dynamicTopoFvMesh/eMesh
 $(eMesh)/eMesh.C
