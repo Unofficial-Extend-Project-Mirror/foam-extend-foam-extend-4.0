@@ -120,7 +120,7 @@ public:
 
     // Destructor
 
-        ~laplaceTetDecompositionMotionSolver();
+        virtual ~laplaceTetDecompositionMotionSolver();
 
 
     // Member Functions

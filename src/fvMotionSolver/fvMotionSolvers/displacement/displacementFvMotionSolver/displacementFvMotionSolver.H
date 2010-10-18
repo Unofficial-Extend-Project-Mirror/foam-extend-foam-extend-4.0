@@ -87,7 +87,7 @@ public:
 
     // Destructor
 
-        ~displacementFvMotionSolver();
+        virtual ~displacementFvMotionSolver();
 
 
     // Member Functions
