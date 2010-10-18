@@ -58,7 +58,47 @@ void dynamicTopoFvMesh::computeMapping
     const label cellSize
 )
 {
+    // Compute cell mapping
+    for (label cellI = cellStart; cellI < (cellStart + cellSize); cellI++)
+    {
+        label cIndex = cellsFromCells_[cellI].index();
 
+        if (skipMapping)
+        {
+            // Set empty mapping parameters
+            const labelList& mo = cellParents_[cIndex];
+
+            cellsFromCells_[cellI].masterObjects() = mo;
+            cellWeights_[cellI].setSize(mo.size(), (1.0/(mo.size() + VSMALL)));
+            cellCentres_[cellI].setSize(mo.size(), vector::zero);
+        }
+    }
+
+    // Compute face mapping
+    for (label faceI = faceStart; faceI < (faceStart + faceSize); faceI++)
+    {
+        label fIndex = facesFromFaces_[faceI].index();
+        label patchIndex = whichPatch(fIndex);
+
+        // Skip mapping for internal faces.
+        if (patchIndex == -1)
+        {
+            // Set dummy masters, so that the conventional
+            // faceMapper doesn't incur a seg-fault.
+            facesFromFaces_[faceI].masterObjects() = labelList(1, 0);
+            continue;
+        }
+
+        if (skipMapping)
+        {
+            // Set empty mapping parameters
+            const labelList& mo = faceParents_[fIndex];
+
+            facesFromFaces_[faceI].masterObjects() = mo;
+            faceWeights_[faceI].setSize(mo.size(), (1.0/(mo.size() + VSMALL)));
+            faceCentres_[faceI].setSize(mo.size(), vector::zero);
+        }
+    }
 }
 
 

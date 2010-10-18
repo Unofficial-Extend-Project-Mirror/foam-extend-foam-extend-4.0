@@ -1197,10 +1197,12 @@ void dynamicTopoFvMesh::readOptionalParameters(bool reRead)
     // Read from disk
     dict_.readIfModified();
 
+    const dictionary& meshSubDict = dict_.subDict("dynamicTopoFvMesh");
+
     // Enable/disable run-time debug level
-    if (dict_.found("debug") || mandatory_)
+    if (meshSubDict.found("debug") || mandatory_)
     {
-        debug = readLabel(dict_.lookup("debug"));
+        debug = readLabel(meshSubDict.lookup("debug"));
     }
     else
     {
@@ -1215,8 +1217,6 @@ void dynamicTopoFvMesh::readOptionalParameters(bool reRead)
         fvMesh::debug = true;
         polyMesh::debug = true;
     }
-
-    const dictionary& meshSubDict = dict_.subDict("dynamicTopoFvMesh");
 
     // Re-read edge-refinement options, if necessary
     if (edgeRefinement_ && reRead)
