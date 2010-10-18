@@ -23,4 +23,22 @@ turboFvMesh/turboFvMesh.C
 tetMetrics/tetMetric.C
 tetMetrics/tetMetrics.C
 
+lengthScaleEstimator/lengthScaleEstimator.C
+
+eMesh = dynamicTopoFvMesh/eMesh
+$(eMesh)/eMesh.C
+$(eMesh)/eMeshDemandDrivenData.C
+$(eMesh)/eBoundaryMesh/eBoundaryMesh.C
+ePatches = $(eMesh)/ePatches
+$(ePatches)/ePatch/ePatch.C
+$(ePatches)/ePatch/newEPatch.C
+dynamicTopoFvMesh/meshOps.C
+dynamicTopoFvMesh/dynamicTopoFvMesh.C
+dynamicTopoFvMesh/dynamicTopoFvMeshCheck.C
+dynamicTopoFvMesh/dynamicTopoFvMeshReOrder.C
+dynamicTopoFvMesh/dynamicTopoFvMeshMapping.C
+dynamicTopoFvMesh/edgeSwap.C
+dynamicTopoFvMesh/edgeBisect.C
+dynamicTopoFvMesh/edgeCollapse.C
+
 LIB = $(FOAM_LIBBIN)/libdynamicFvMesh
