@@ -17,30 +17,10 @@ FoamFile
 
 solvers
 {
-//     T
-//     {
-//         solver           PBiCG;
-//         preconditioner   DILU;
-//         tolerance        1e-09;
-//         relTol           0.01;
-//     };
-
-//     Ts
-//     {
-//         solver           PCG;
-//         preconditioner   DILU;
-//         tolerance        1e-09;
-//         relTol           0.01;
-//     };
-
     blockVar
     {
         solver           BiCGStab;
-
-        preconditioner
-        {
-            preconditioner Cholesky;
-        }
+        preconditioner   Cholesky;
 
         tolerance        1e-09;
         relTol           0.01;

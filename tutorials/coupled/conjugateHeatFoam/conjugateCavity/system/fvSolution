@@ -34,10 +34,10 @@ solvers
         relTol           0;
     };
 
-    T+T 
+    T+T
     {
-        preconditioner   Cholesky;
         solver           BiCG;
+        preconditioner   Cholesky;
 
         minIter          0;
         maxIter          1000;
