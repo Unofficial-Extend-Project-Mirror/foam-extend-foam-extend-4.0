@@ -29,7 +29,7 @@ Description
     Automatic motion of the mesh around a moving body. A direction,
     amplitude and frequency of translational motion and origin, axis,
     amplitude and frequency of rotational motion must be specified.
- 
+
 SourceFiles
     dynamicBodyFvMesh.C
 
@@ -93,7 +93,7 @@ class dynamicBodyFvMesh
 
         //- Rotational motion frequency
         scalar rotationFrequency_;
-    
+
 
     // Private Member Functions
 
@@ -118,7 +118,7 @@ public:
 
     // Destructor
 
-        ~dynamicBodyFvMesh();
+        virtual ~dynamicBodyFvMesh();
 
 
     // Member Functions

@@ -129,7 +129,7 @@ public:
             {
                 if (!totDisplacementPtr_)
                 {
-                    totDisplacementPtr_ = 
+                    totDisplacementPtr_ =
                         new tetPointVectorField
                         (
                             IOobject

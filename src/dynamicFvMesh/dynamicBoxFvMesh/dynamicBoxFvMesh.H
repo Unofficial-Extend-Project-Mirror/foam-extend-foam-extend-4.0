@@ -110,7 +110,7 @@ public:
 
     // Destructor
 
-        ~dynamicBoxFvMesh();
+        virtual ~dynamicBoxFvMesh();
 
 
     // Member Functions

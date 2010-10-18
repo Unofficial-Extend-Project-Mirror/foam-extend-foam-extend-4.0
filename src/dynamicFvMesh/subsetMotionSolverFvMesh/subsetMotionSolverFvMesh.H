@@ -91,7 +91,7 @@ public:
 
     // Destructor
 
-        ~subsetMotionSolverFvMesh();
+        virtual ~subsetMotionSolverFvMesh();
 
 
     // Member Functions

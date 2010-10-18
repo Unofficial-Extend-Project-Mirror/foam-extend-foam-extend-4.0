@@ -30,7 +30,7 @@ Description
     vertex-based pseudo-solid motion equation.  The boundary motion is set as a
     boundary condition on the motion velocity variable motionU.
 
-    Note: Diffusion field from laplaceTetDecompositionMotionSolver is used 
+    Note: Diffusion field from laplaceTetDecompositionMotionSolver is used
           as Lame's constant \mu
 
 SourceFiles
@@ -107,7 +107,7 @@ public:
 
     // Destructor
 
-        ~pseudoSolidTetDecompositionMotionSolver();
+        virtual ~pseudoSolidTetDecompositionMotionSolver();
 
 
     // Member Functions
