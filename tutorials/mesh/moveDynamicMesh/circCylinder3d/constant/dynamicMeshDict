@@ -135,7 +135,7 @@ dynamicTopoFvMesh
 
     //- Skip mapping step. Useful while using
     //- this tool as a pre-processor
-    skipMapping         true;
+    // skipMapping         true;
 
     // Toggle edgeRefinement on/off
     edgeRefinement      yes;

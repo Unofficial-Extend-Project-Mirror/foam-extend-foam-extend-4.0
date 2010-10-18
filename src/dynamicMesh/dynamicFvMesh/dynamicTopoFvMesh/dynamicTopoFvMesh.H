@@ -257,6 +257,17 @@ class dynamicTopoFvMesh
         // Static equivalent for multiThreading
         static void computeMappingThread(void *argument);
 
+        // Compute parents for inverse-distance weighting
+        void computeParents
+        (
+            const label index,
+            const labelList& mapCandidates,
+            const labelListList& oldNeighbourList,
+            const vectorField& oldCentres,
+            const label dimension,
+            labelList& parents
+        ) const;
+
         // Routine to invoke threaded mapping
         void threadedMapping(scalar matchTol, bool skipMapping);
 

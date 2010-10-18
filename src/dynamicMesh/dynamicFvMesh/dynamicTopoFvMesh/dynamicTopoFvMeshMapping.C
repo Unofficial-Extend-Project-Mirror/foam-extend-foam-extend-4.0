@@ -72,6 +72,19 @@ void dynamicTopoFvMesh::computeMapping
             cellWeights_[cellI].setSize(mo.size(), (1.0/(mo.size() + VSMALL)));
             cellCentres_[cellI].setSize(mo.size(), vector::zero);
         }
+        else
+        {
+            // Compute master objects for inverse-distance weighting
+            computeParents
+            (
+                cIndex,
+                cellParents_[cIndex],
+                polyMesh::cellCells(),
+                polyMesh::cellCentres(),
+                3,
+                cellsFromCells_[cellI].masterObjects()
+            );
+        }
     }
 
     // Compute face mapping
@@ -97,6 +110,19 @@ void dynamicTopoFvMesh::computeMapping
             facesFromFaces_[faceI].masterObjects() = mo;
             faceWeights_[faceI].setSize(mo.size(), (1.0/(mo.size() + VSMALL)));
             faceCentres_[faceI].setSize(mo.size(), vector::zero);
+        }
+        else
+        {
+            // Compute master objects for inverse-distance weighting
+            computeParents
+            (
+                fIndex,
+                faceParents_[fIndex],
+                boundaryMesh()[patchIndex].faceFaces(),
+                boundaryMesh()[patchIndex].faceCentres(),
+                2,
+                facesFromFaces_[faceI].masterObjects()
+            );
         }
     }
 }
@@ -236,16 +262,142 @@ void dynamicTopoFvMesh::threadedMapping
     // force calculation of demand-driven data.
     polyMesh::cells();
     primitiveMesh::cellCells();
+    primitiveMesh::cellCentres();
 
     const polyBoundaryMesh& boundary = boundaryMesh();
 
     forAll(boundary, patchI)
     {
         boundary[patchI].faceFaces();
+        boundary[patchI].faceCentres();
     }
 
     // Execute threads in linear sequence
     executeThreads(identity(nThreads), hdl, &computeMappingThread);
+}
+
+
+// Compute parents for inverse-distance weighting
+void dynamicTopoFvMesh::computeParents
+(
+    const label index,
+    const labelList& mapCandidates,
+    const labelListList& oldNeighbourList,
+    const vectorField& oldCentres,
+    const label dimension,
+    labelList& parents
+) const
+{
+    if (parents.size())
+    {
+        FatalErrorIn
+        (
+            "\n\n"
+            "void dynamicTopoFvMesh::computeParents\n"
+            "(\n"
+            "    const label index,\n"
+            "    const labelList& mapCandidates,\n"
+            "    const labelListList& oldNeighbourList,\n"
+            "    const vectorField& oldCentres,\n"
+            "    const label dimension,\n"
+            "    labelList& parents\n"
+            ") const\n"
+        )
+            << " Addressing has already been calculated." << nl
+            << " Index: " << index << nl
+            << " Type: " << (dimension == 2 ? "Face" : "Cell") << nl
+            << " mapCandidates: " << mapCandidates << nl
+            << " Parents: " << parents << nl
+            << abort(FatalError);
+    }
+
+    // Figure out the patch offset and centre
+    label offset = -1;
+    vector centre = vector::zero;
+
+    if (dimension == 2)
+    {
+        offset = boundaryMesh()[whichPatch(index)].start();
+
+        meshOps::faceCentre(faces_[index], oldPoints_, centre);
+    }
+    else
+    if (dimension == 3)
+    {
+        offset = 0;
+        scalar dummyVol = 0.0;
+
+        meshOps::cellCentreAndVolume
+        (
+            index,
+            oldPoints_,
+            faces_,
+            cells_,
+            owner_,
+            centre,
+            dummyVol
+        );
+    }
+
+    // Maintain a check-list
+    labelHashSet checked;
+
+    // Insert candidates first
+    forAll(mapCandidates, indexI)
+    {
+        checked.insert(mapCandidates[indexI] - offset);
+    }
+
+    // Loop for three outward levels from candidates
+    for (label i = 0; i < 3; i++)
+    {
+        // Fetch the set of candidates
+        const labelList checkList = checked.toc();
+
+        forAll(checkList, indexI)
+        {
+            const labelList& oldNei = oldNeighbourList[checkList[indexI]];
+
+            forAll(oldNei, entityI)
+            {
+                if (!checked.found(oldNei[entityI]))
+                {
+                    checked.insert(oldNei[entityI]);
+                }
+            }
+        }
+    }
+
+    // Loop through accumulated candidates and fetch the nearest one.
+    scalar minDist = GREAT;
+    label minLocation = -1;
+
+    const labelList checkList = checked.toc();
+
+    forAll(checkList, indexI)
+    {
+        scalar dist = magSqr(oldCentres[checkList[indexI]] - centre);
+
+        if (dist < minDist)
+        {
+            minDist = dist;
+            minLocation = checkList[indexI];
+        }
+    }
+
+    // Set the final list
+    const labelList& neiList = oldNeighbourList[minLocation];
+
+    parents.setSize(neiList.size() + 1, -1);
+
+    // Fill indices
+    forAll(neiList, indexI)
+    {
+        parents[indexI] = neiList[indexI] + offset;
+    }
+
+    // Set final index
+    parents[neiList.size()] = minLocation + offset;
 }
 
 

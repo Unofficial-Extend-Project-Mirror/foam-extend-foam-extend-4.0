@@ -3293,11 +3293,11 @@ void dynamicTopoFvMesh::mapFields(const mapPolyMesh& meshMap) const
     // Set the mapPolyMesh object in the mapper
     fieldMapper.setMapper(meshMap);
 
-    // Conservatively map scalar/vector volFields
-    fieldMapper.conservativeMapVolFields<scalar>();
-    fieldMapper.conservativeMapVolFields<vector>();
-
     // Map all the volFields in the objectRegistry
+    MapGeometricFields<scalar,fvPatchField,topoMapper,volMesh>
+        (fieldMapper);
+    MapGeometricFields<vector,fvPatchField,topoMapper,volMesh>
+        (fieldMapper);
     MapGeometricFields<sphericalTensor,fvPatchField,topoMapper,volMesh>
         (fieldMapper);
     MapGeometricFields<symmTensor,fvPatchField,topoMapper,volMesh>
@@ -3305,11 +3305,11 @@ void dynamicTopoFvMesh::mapFields(const mapPolyMesh& meshMap) const
     MapGeometricFields<tensor,fvPatchField,topoMapper,volMesh>
         (fieldMapper);
 
-    // Conservatively map scalar/vector surfaceFields
-    fieldMapper.conservativeMapSurfaceFields<scalar>();
-    fieldMapper.conservativeMapSurfaceFields<vector>();
-
     // Map all the surfaceFields in the objectRegistry
+    MapGeometricFields<scalar,fvsPatchField,topoMapper,surfaceMesh>
+        (fieldMapper);
+    MapGeometricFields<vector,fvsPatchField,topoMapper,surfaceMesh>
+        (fieldMapper);
     MapGeometricFields<sphericalTensor,fvsPatchField,topoMapper,surfaceMesh>
         (fieldMapper);
     MapGeometricFields<symmTensor,fvsPatchField,topoMapper,surfaceMesh>
