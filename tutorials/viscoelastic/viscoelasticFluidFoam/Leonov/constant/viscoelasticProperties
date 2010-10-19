@@ -1,25 +1,17 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "Leonov";
-    instance        "";
-    local           "";
-
-    class           dictionary;
-    object          viscoelasticProperties;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      viscoelasticProperties;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 /*
@@ -28,22 +20,12 @@ FoamFile
 
 rheology
 {
-
-        type multiMode;
-
-        models
-        (
-                first
-                {
                 type Leonov;
                 rho              rho [1 -3 0 0 0 0 0] 803.87097;
                 etaS             etaS [1 -1 -1 0 0 0 0] 0.002;
                 etaP             etaP [1 -1 -1 0 0 0 0] 1.422;
                 lambda           lambda [0 0 1 0 0 0 0] 0.03;
-                }
-        );
 
 }
-
 
 // ************************************************************************* //

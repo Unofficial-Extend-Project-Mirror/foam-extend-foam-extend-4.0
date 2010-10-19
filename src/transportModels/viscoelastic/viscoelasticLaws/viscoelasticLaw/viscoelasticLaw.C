@@ -30,15 +30,14 @@ License
 
 namespace Foam
 {
+    defineTypeNameAndDebug(viscoelasticLaw, 0);
+    defineRunTimeSelectionTable(viscoelasticLaw, dictionary);
+}
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(viscoelasticLaw, 0);
-defineRunTimeSelectionTable(viscoelasticLaw, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-viscoelasticLaw::viscoelasticLaw
+Foam::viscoelasticLaw::viscoelasticLaw
 (
     const word& name,
     const volVectorField& U,
@@ -50,9 +49,5 @@ viscoelasticLaw::viscoelasticLaw
     phi_(phi)
 {}
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

@@ -1,0 +1,32 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+#
+#+TITLE: *XPP_SE viscoelastic constitutive model README file for version 1.6-ext* 
+#+AUTHOR: Jovani                
+#+DATE:  05 October 2010
+
+
+
+* This is a simulation case for a viscoelastic fluid described by the 
+  Extended Pom-Pom Single Equation constitutive model (XPP_SE).
+  The geometry was the 4:1 plane contraction. See also the XPP_DE case.
+
+*** This is only an illustrative case for the PP constitutive model. Therefore,
+    there are not more details published until now for this model using this geometry
+    and viscoelasticFluidFoam solver. 
+
+*** The parameters for the constitutive model was obtained from:
+    VERBEETEN,W. M. H.; PETERS, G.W. M.; BAAIJENS, F. P. T. Differential constitutive
+    equations for polymer melts: The extended pom-pom model. Journal of Rheology,
+    SOR, v. 45, n. 4, p. 823-843, 2001.
+
+
+
+
+
+

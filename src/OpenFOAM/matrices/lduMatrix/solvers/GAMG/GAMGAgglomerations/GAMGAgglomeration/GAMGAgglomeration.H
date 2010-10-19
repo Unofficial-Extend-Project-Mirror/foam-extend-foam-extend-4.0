@@ -81,10 +81,11 @@ protected:
 
         //- Face restriction addressing array.
         //  Maps from the finer to the coarser level.
-        //  Positive indices map the finer faces which form part of the boundary
-        //  of the coarser cells to the corresponding coarser cell face.
+        //  Positive indices map the finer faces which form part of the
+        //   boundary of the coarser cells to the corresponding coarser
+        //  cell face.
         //  Negative indices map the finer faces which are internal to the
-        //  coarser cells to minus the corresponding coarser cell index minus 1.
+        //  coarser cells to minus the corresponding coarser cell index minus 1
         PtrList<labelList> faceRestrictAddressing_;
 
         //- Hierarchy of mesh addressing

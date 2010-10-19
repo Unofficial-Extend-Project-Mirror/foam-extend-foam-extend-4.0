@@ -27,20 +27,18 @@ License
 #include "Maxwell.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    defineTypeNameAndDebug(Maxwell, 0);
+    addToRunTimeSelectionTable(viscoelasticLaw, Maxwell, dictionary);
+}
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(Maxwell, 0);
-addToRunTimeSelectionTable(viscoelasticLaw, Maxwell, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// from components
-Maxwell::Maxwell
+Foam::Maxwell::Maxwell
 (
     const word& name,
     const volVectorField& U,
@@ -70,10 +68,9 @@ Maxwell::Maxwell
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<fvVectorMatrix> Maxwell::divTau(volVectorField& U) const
+Foam::tmp<Foam::fvVectorMatrix> Foam::Maxwell::divTau(volVectorField& U) const
 {
-
-     dimensionedScalar etaPEff = etaP_;
+    dimensionedScalar etaPEff = etaP_;
 
     return
     (
@@ -85,32 +82,26 @@ tmp<fvVectorMatrix> Maxwell::divTau(volVectorField& U) const
 }
 
 
-void Maxwell::correct()
+void Foam::Maxwell::correct()
 {
-
     // Velocity gradient tensor
-    volTensorField L = fvc::grad( U() );
+    volTensorField L = fvc::grad(U());
 
     // Twice the rate of deformation tensor
-    volSymmTensorField twoD = twoSymm( L );
+    volSymmTensorField twoD = twoSymm(L);
 
      // Stress transport equation
-    tmp<fvSymmTensorMatrix> tauEqn
+    fvSymmTensorMatrix tauEqn
     (
         fvm::ddt(tau_)
-        ==
-        etaP_ / lambda_ * twoD
-        - fvm::Sp( 1/lambda_, tau_ )
+     ==
+        etaP_/lambda_*twoD
+      - fvm::Sp( 1/lambda_, tau_ )
     );
 
-//    tauEqn().relax();  // to see
-    solve(tauEqn);
-
+    tauEqn.relax();
+    tauEqn.solve();
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

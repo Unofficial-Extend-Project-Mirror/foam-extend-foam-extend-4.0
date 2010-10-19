@@ -18,32 +18,29 @@ FoamFile
 
 solvers
 {
-    p CG
+    p
     {
-        preconditioner
-        {
-            type         DIC;
-        }
+        solver           CG;
+        preconditioner   DIC;
+
         tolerance        1e-06;
         relTol           0;
     };
 
-    pFinal CG
+    pFinal
     {
-        preconditioner
-        {
-            type         DIC;
-        }
+        solver           CG;
+        preconditioner   DIC;
+
         tolerance        1e-06;
         relTol           0;
     };
 
-    U BiCGStab
+    U
     {
-        preconditioner
-        {
-            type         DILU;
-        }
+        solver           BiCGStab;
+        preconditioner   DILU;
+
         tolerance        1e-7;
         relTol           0;
     };

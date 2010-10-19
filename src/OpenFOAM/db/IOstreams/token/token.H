@@ -209,6 +209,8 @@ public:
 
 
     //- A templated class for holding compound tokens
+
+#ifndef SWIG
     template<class T>
     class Compound
     :
@@ -235,7 +237,7 @@ public:
             operator<<(os, static_cast<const T&>(*this));
         }
     };
-
+#endif
 
     //- Static undefined token
     static token undefinedToken;

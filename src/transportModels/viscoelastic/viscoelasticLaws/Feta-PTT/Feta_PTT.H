@@ -89,10 +89,12 @@ class Feta_PTT
             dimensionedScalar b_;
 
 
-        //- Effective zero shear rate polymer viscosity and relaxation time
+        //- Effective zero shear rate polymer viscosity
         volScalarField etaPEff_;
 
+        //- Relaxation time
         volScalarField lambdaEff_;
+
 
     // Private Member Functions
 

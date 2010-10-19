@@ -97,7 +97,7 @@ public:
 
     // Destructor
 
-        ~velocityLaplacianFvMotionSolver();
+        virtual ~velocityLaplacianFvMotionSolver();
 
 
     // Member Functions

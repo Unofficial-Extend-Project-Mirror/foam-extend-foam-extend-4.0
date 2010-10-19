@@ -24,6 +24,7 @@ License
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
+    Fethi Tekin, All rights reserved. fethitekin@gmail.com
 
 \*---------------------------------------------------------------------------*/
 
@@ -36,22 +37,12 @@ template<class Type>
 Foam::tmp<Foam::Field<Type> >
 Foam::overlapGgiPolyPatch::expandSlaveData(const Field<Type>& spf) const
 {
-    if (spf.size() != shadow().size())
-    {
-        FatalErrorIn
-        (
-            "tmp<Field<Type> > overlapGgiPolyPatch::interpolate"
-            "(const Field<Type>& spf) const"
-        )   << " Incorrect field size for expansion.  Field size: "
-            << spf.size() << " patch size: " << shadow().size()
-            << abort(FatalError);
-    }
-
     const scalar slaveAngle = shadow().angle();
 
-    const label ncp = nCopies();
+    const label ncp = shadow().nCopies();
 
     tmp<Field<Type> > tef(new Field<Type>(ncp*spf.size()));
+
     Field<Type>& ef = tef();
 
     label nFaces = 0;
@@ -73,6 +64,35 @@ Foam::overlapGgiPolyPatch::expandSlaveData(const Field<Type>& spf) const
 }
 
 
+template<class Type>
+Foam::tmp<Foam::Field<Type> >
+Foam::overlapGgiPolyPatch::expandMasterData(const Field<Type>& spf) const
+{
+    const scalar masterAngle = shadow().angle();
+
+    const label ncpm = shadow().nCopies();
+
+    tmp<Field<Type> > tef(new Field<Type>(ncpm*spf.size()));
+
+    Field<Type>& ef = tef();
+
+    label nFaces = 0;
+
+    for (label copyI = 0; copyI < ncpm; copyI++)
+    {
+        // Calculate transform
+        const tensor curRotation =
+            RodriguesRotation(rotationAxis_, copyI*(masterAngle));
+
+        forAll (spf, faceI)
+        {
+            ef[nFaces] = transform(curRotation, spf[faceI]);
+            nFaces++;
+        }
+    }
+
+    return tef;
+}
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
@@ -82,13 +102,20 @@ Foam::overlapGgiPolyPatch::interpolate(const Field<Type>& pf) const
     if (master())
     {
         // Expand slave data
-        tmp<Field<Type> > expand = expandSlaveData(pf);
+        tmp<Field<Type> > expandslave = expandSlaveData(pf);
 
-        return patchToPatch().slaveToMaster(expand);
+        tmp<Field<Type> > tresult= patchToPatch().slaveToMaster(expandslave);
+        // Truncate to size
+        tresult().setSize(size());
+
+        return tresult;
     }
     else
     {
-        tmp<Field<Type> > tresult = patchToPatch().masterToSlave(pf);
+        // Expand master data
+        tmp<Field<Type> > expandmaster = expandMasterData(pf);
+
+        tmp<Field<Type> > tresult = patchToPatch().masterToSlave(expandmaster);
 
         // Truncate to size
         tresult().setSize(size());
@@ -107,11 +134,19 @@ Foam::overlapGgiPolyPatch::interpolate(const tmp<Field<Type> >& tpf) const
         // Expand slave data
         tmp<Field<Type> > expand = expandSlaveData(tpf());
 
-        return patchToPatch().slaveToMaster(expand);
+        tmp<Field<Type> > tresult = patchToPatch().slaveToMaster(expand);
+
+        // Truncate to size
+        tresult().setSize(size());
+
+        return tresult;
     }
     else
     {
-        tmp<Field<Type> > tresult = patchToPatch().masterToSlave(tpf);
+        // Expand master data
+        tmp<Field<Type> > expandmaster = expandMasterData(tpf());
+
+        tmp<Field<Type> > tresult = patchToPatch().masterToSlave(expandmaster);
 
         // Truncate to size
         tresult().setSize(size());
@@ -119,6 +154,5 @@ Foam::overlapGgiPolyPatch::interpolate(const tmp<Field<Type> >& tpf) const
         return tresult;
     }
 }
-
 
 // ************************************************************************* //

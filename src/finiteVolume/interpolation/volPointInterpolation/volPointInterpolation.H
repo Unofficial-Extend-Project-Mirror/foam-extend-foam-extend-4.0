@@ -81,7 +81,7 @@ class volPointInterpolation
 public:
 
     // Declare name of the class and its debug switch
-    ClassName("volPointInterpolation");
+    TypeName("volPointInterpolation");
 
 
     // Constructors

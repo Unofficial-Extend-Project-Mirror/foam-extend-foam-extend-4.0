@@ -1,5 +1,0 @@
-#!/bin/sh
-
-foamCleanTutorials cases
-rm -rf processor*
-rm -rf 0/pd.gz 0/alpha1.gz

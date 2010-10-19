@@ -92,7 +92,7 @@ public:
 
     // Destructor
 
-        ~dynamicInkJetFvMesh();
+        virtual ~dynamicInkJetFvMesh();
 
 
     // Member Functions

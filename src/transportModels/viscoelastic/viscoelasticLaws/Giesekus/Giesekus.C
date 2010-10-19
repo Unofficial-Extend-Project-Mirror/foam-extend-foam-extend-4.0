@@ -27,20 +27,18 @@ License
 #include "Giesekus.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    defineTypeNameAndDebug(Giesekus, 0);
+    addToRunTimeSelectionTable(viscoelasticLaw, Giesekus, dictionary);
+}
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(Giesekus, 0);
-addToRunTimeSelectionTable(viscoelasticLaw, Giesekus, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// from components
-Giesekus::Giesekus
+Foam::Giesekus::Giesekus
 (
     const word& name,
     const volVectorField& U,
@@ -71,7 +69,7 @@ Giesekus::Giesekus
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<fvVectorMatrix> Giesekus::divTau(volVectorField& U) const
+Foam::tmp<Foam::fvVectorMatrix> Foam::Giesekus::divTau(volVectorField& U) const
 {
     dimensionedScalar etaPEff = etaP_;
 
@@ -84,7 +82,7 @@ tmp<fvVectorMatrix> Giesekus::divTau(volVectorField& U) const
 }
 
 
-void Giesekus::correct()
+void Foam::Giesekus::correct()
 {
     // Velocity gradient tensor
     volTensorField L = fvc::grad(U());
@@ -96,25 +94,21 @@ void Giesekus::correct()
     volSymmTensorField twoD = twoSymm(L);
 
 
-     // Stress transport equation
-    tmp<fvSymmTensorMatrix> tauEqn
+    // Stress transport equation
+    fvSymmTensorMatrix tauEqn
     (
         fvm::ddt(tau_)
-        + fvm::div(phi(), tau_)
-        ==
-        etaP_ / lambda_ * twoD
-        + twoSymm( C )
-        - (alpha_ / etaP_) * ( tau_ & tau_)
-        - fvm::Sp(1/lambda_, tau_ )
+      + fvm::div(phi(), tau_)
+     ==
+        etaP_/lambda_*twoD
+      + twoSymm(C)
+      - (alpha_/etaP_)*(tau_ & tau_)
+      - fvm::Sp(1/lambda_, tau_)
     );
 
-    tauEqn().relax();
-    solve(tauEqn);
+    tauEqn.relax();
+    tauEqn.solve();
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

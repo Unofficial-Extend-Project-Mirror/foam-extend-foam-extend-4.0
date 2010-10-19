@@ -69,6 +69,8 @@ public:
 
 
     //- Declare run-time constructor selection table
+
+#ifndef SWIG
     declareRunTimeSelectionTable
     (
         autoPtr,
@@ -77,6 +79,8 @@ public:
         (const fvMesh& mesh),
         (mesh)
     );
+#endif
+
 
     // Constructors
 

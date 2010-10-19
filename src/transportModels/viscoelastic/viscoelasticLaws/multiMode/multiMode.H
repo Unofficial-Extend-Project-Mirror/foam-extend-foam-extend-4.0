@@ -59,9 +59,6 @@ class multiMode
         //- Transported viscoelastic stress
         mutable volSymmTensorField tau_;
 
-        //- A null (zero) symmetric tensor
-        volSymmTensorField nulo_;
-
         //- List of models
         PtrList<viscoelasticLaw> models_;
 

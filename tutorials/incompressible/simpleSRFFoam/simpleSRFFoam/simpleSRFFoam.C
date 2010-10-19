@@ -33,7 +33,7 @@ Description
 
 #include "fvCFD.H"
 #include "incompressible/singlePhaseTransportModel/singlePhaseTransportModel.H"
-#include "incompressible/RASModel/RASModel.H"
+#include "incompressible/RAS/RASModel/RASModel.H"
 #include "SRFModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

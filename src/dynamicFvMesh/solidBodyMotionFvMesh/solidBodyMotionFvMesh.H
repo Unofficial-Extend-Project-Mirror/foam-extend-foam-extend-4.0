@@ -90,7 +90,7 @@ public:
 
     // Destructor
 
-        ~solidBodyMotionFvMesh();
+        virtual ~solidBodyMotionFvMesh();
 
 
     // Member Functions

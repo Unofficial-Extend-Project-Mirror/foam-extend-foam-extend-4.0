@@ -1,0 +1,71 @@
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation; either version 2 of the License, or (at your
+#     option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM; if not, write to the Free Software Foundation,
+#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Description
+#    Additionnal run functions, based on the original RunFunctions file
+#
+# Author:
+#    Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved
+#
+#------------------------------------------------------------------------------
+
+# Exception handler: dump the tail of the log file on error
+verbose_report_on_runApplication_error()
+{
+   ecode=$?
+   if [ "$reportOnErrorOnlyOnce" ] ; then
+       echo " "
+       echo " => Error running $APP_RUN..."
+       echo " => Here are the last 50 lines of the log file log.$APP_RUN..."
+       echo " "
+       if [ -f log.$APP_RUN ] ; then
+           tail -50 log.$APP_RUN
+           exit $ecode;
+       fi
+   fi
+
+   # Do not report again when exiting
+   unset reportOnErrorOnlyOnce
+}
+
+# Variation of runApplication with exception handling
+runApplicationAndReportOnError ()
+{
+    trap 'verbose_report_on_runApplication_error' ERR
+
+    APP_RUN=$1; shift
+
+    reportOnErrorOnlyOnce=1
+
+    if [ -f log.$APP_RUN ] ; then
+        echo "$APP_RUN already run on $PWD: remove log file to run"
+        exit 1;
+    else
+        echo "Running $APP_RUN on $PWD"
+        $APP_RUN $* > log.$APP_RUN 2>&1
+    fi
+}
+
+# We force the display of a stack trace if we encounter problems
+export FOAM_ABORT=1

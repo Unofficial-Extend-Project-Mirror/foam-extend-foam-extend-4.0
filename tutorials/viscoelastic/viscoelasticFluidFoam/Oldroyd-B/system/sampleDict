@@ -1,31 +1,22 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           dictionary;
-    object          sampleDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      sampleDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 interpolationScheme cellPoint;
 
-writeFormat     raw;
+setFormat     raw;
 
 sets
 (
@@ -49,7 +40,6 @@ sets
         nPoints         100;
     }
 
-
     fig7_x_1
     {
         type            uniform;
@@ -58,7 +48,6 @@ sets
         end             (0.2528  0.0128 0.00016);
         nPoints         100;
     }
-
 
     fig7_x_15
     {
@@ -86,7 +75,6 @@ sets
         end             (0.2240  0.0128 0.00016);
         nPoints         100;
     }
-
 
 // y axes N1 upstream profile
 
@@ -220,6 +208,5 @@ fields
 (
     N1
 );
-
 
 // ************************************************************************* //

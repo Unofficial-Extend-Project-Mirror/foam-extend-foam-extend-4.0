@@ -73,7 +73,7 @@ class pointMesh
 public:
 
     // Declare name of the class and its debug switch
-    ClassName("pointMesh");
+    TypeName("pointMesh");
 
     typedef pointMesh Mesh;
     typedef pointBoundaryMesh BoundaryMesh;

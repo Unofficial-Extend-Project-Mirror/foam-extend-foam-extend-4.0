@@ -36,6 +36,8 @@ boundaryField
         gamma           1.4;
         fieldInf        1;
         lInf            3;
+        inletOutlet     off;
+        correctSupercritical off;
         value           uniform 1;
     }
 

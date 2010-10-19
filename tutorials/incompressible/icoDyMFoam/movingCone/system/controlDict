@@ -14,7 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application icoFoamAutoMotion;
+application     icoDyMFoam;
 
 startFrom       startTime;
 

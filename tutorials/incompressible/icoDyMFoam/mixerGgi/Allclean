@@ -5,5 +5,5 @@
 
 cleanCase
 rm -rf VTK
-rm constant/polyMesh/boundary
+rm -f constant/polyMesh/boundary
 rm -rf constant/polyMesh/sets

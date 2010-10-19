@@ -16,7 +16,7 @@ FoamFile
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-applicationClass icoTopoFoam;
+application     icoTopoFoam;
 
 startFrom       startTime;
 
@@ -62,7 +62,7 @@ functions
         phi phi;
 
         // Where to load it from (if not already in solver)
-        functionObjectLibs ("libsampling.so");
+        functionObjectLibs ("libcheckFunctionObjects.so");
     }
 );
 

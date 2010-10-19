@@ -1,14 +1,16 @@
 #!/bin/sh
-
-currDir=`pwd`
-application=`basename $currDir`
-cases="conjugateCavity"
-
-tutorialPath=`dirname $0`/..
+# Source tutorial run functions
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
-for case in $cases
-do
-    runApplication $application
-done 
+application="conjugateHeatFoam"
+
+runApplication blockMesh
+cp boundary constant/polyMesh
+
+cd ../heatedBlock
+runApplication blockMesh
+cp boundary constant/polyMesh
+
+cd ../conjugateCavity
+runApplication $application
 

@@ -27,20 +27,17 @@ License
 #include "LPTT.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(LPTT, 0);
-addToRunTimeSelectionTable(viscoelasticLaw, LPTT, dictionary);
+    defineTypeNameAndDebug(LPTT, 0);
+    addToRunTimeSelectionTable(viscoelasticLaw, LPTT, dictionary);
+}
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// from components
-LPTT::LPTT
+Foam::LPTT::LPTT
 (
     const word& name,
     const volVectorField& U,
@@ -72,11 +69,10 @@ LPTT::LPTT
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<fvVectorMatrix> LPTT::divTau(volVectorField& U) const
+Foam::tmp<Foam::fvVectorMatrix> Foam::LPTT::divTau(volVectorField& U) const
 {
-
 //     dimensionedScalar etaPEff = (1 + 1/epsilon_)*etaP_;
-     dimensionedScalar etaPEff = etaP_;
+    dimensionedScalar etaPEff = etaP_;
 
     return
     (
@@ -88,37 +84,32 @@ tmp<fvVectorMatrix> LPTT::divTau(volVectorField& U) const
 }
 
 
-void LPTT::correct()
+void Foam::LPTT::correct()
 {
     // Velocity gradient tensor
-    volTensorField L = fvc::grad( U() );
+    volTensorField L = fvc::grad(U());
 
     // Convected derivate term
     volTensorField C = tau_ & L;
 
     // Twice the rate of deformation tensor
-    volSymmTensorField twoD = twoSymm( L );
+    volSymmTensorField twoD = twoSymm(L);
 
-
-     // Stress transport equation
-    tmp<fvSymmTensorMatrix> tauEqn
+    // Stress transport equation
+    fvSymmTensorMatrix tauEqn
     (
         fvm::ddt(tau_)
-        + fvm::div(phi(), tau_)
-        ==
-        etaP_ / lambda_ * twoD 
-        + twoSymm( C )
-        - zeta_ / 2 * ( (tau_ & twoD) + (twoD & tau_) )
-        - fvm::Sp( epsilon_ / etaP_ * tr(tau_) + 1/lambda_, tau_ )
+      + fvm::div(phi(), tau_)
+     ==
+        etaP_/lambda_*twoD
+      + twoSymm(C)
+      - zeta_/2*((tau_ & twoD) + (twoD & tau_))
+      - fvm::Sp(epsilon_/etaP_*tr(tau_) + 1/lambda_, tau_)
     );
 
-    tauEqn().relax();
-    solve(tauEqn);
+    tauEqn.relax();
+    tauEqn.solve();
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

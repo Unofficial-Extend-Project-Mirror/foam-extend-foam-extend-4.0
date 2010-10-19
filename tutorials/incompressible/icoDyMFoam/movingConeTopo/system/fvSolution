@@ -18,12 +18,10 @@ FoamFile
 
 solvers
 {
-    pcorr PCG
+    pcorr
     {
-        preconditioner
-        {
-            type         DIC;
-        }
+        solver           PCG;
+        preconditioner   DIC;
 
         minIter          0;
         maxIter          1000;
@@ -31,12 +29,10 @@ solvers
         relTol           0;
     };
 
-    p PCG
+    p
     {
-        preconditioner
-        {
-            type         DIC;
-        }
+        solver           PCG;
+        preconditioner   DIC;
 
         minIter          0;
         maxIter          1000;
@@ -44,12 +40,10 @@ solvers
         relTol           0.0;
     };
 
-    pFinal PCG
+    pFinal
     {
-        preconditioner
-        {
-            type         DIC;
-        }
+        solver           PCG;
+        preconditioner   DIC;
 
         minIter          0;
         maxIter          1000;
@@ -57,12 +51,10 @@ solvers
         relTol           0;
     };
 
-    U PBiCG
+    U
     {
-        preconditioner   
-        {
-            type         DILU;
-        }
+        solver           PBiCG;
+        preconditioner   DILU;
 
         minIter          0;
         maxIter          1000;

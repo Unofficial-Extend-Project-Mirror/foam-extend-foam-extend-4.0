@@ -61,7 +61,7 @@ class XPP_DE
         volSymmTensorField S_;
 
         //- Evolution of the backbone stretch
-        volScalarField Lambda_; 
+        volScalarField Lambda_;
 
        //- Transported viscoelastic stress
         volSymmTensorField tau_;

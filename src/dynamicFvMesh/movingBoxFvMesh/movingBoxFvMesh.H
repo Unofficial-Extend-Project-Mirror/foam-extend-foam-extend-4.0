@@ -107,7 +107,7 @@ public:
 
     // Destructor
 
-        ~movingBoxFvMesh();
+        virtual ~movingBoxFvMesh();
 
 
     // Member Functions

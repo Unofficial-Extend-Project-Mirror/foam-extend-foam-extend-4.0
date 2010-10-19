@@ -18,6 +18,7 @@ $(solidBodyMotionFunctions)/SKA/SKA.C
 $(solidBodyMotionFunctions)/translation/translation.C
 
 mixerGgiFvMesh/mixerGgiFvMesh.C
+turboFvMesh/turboFvMesh.C
 
 tetMetrics/tetMetric.C
 tetMetrics/tetMetrics.C

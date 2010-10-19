@@ -296,7 +296,8 @@ public:
             const word& patchFieldType=PatchField<Type>::calculatedType()
         );
 
-        //- Constructor given IOobject, mesh, dimensioned<Type> and patch types.
+        //- Constructor given IOobject, mesh, dimensioned<Type>
+        //  and patch types.
         GeometricField
         (
             const IOobject&,
@@ -306,6 +307,8 @@ public:
         );
 
         //- Constructor from components
+
+#if ( !defined(SWIG) || (SWIG_VERSION > 0x010340) )
         GeometricField
         (
             const IOobject&,
@@ -314,6 +317,7 @@ public:
             const Field<Type>&,
             const PtrList<PatchField<Type> >&
         );
+#endif
 
         //- Construct and read given IOobject
         GeometricField
@@ -345,12 +349,12 @@ public:
         );
 
         //- Construct as copy of tmp<GeometricField> deleting argument
-        #ifdef ConstructFromTmp
+#       ifdef ConstructFromTmp
         GeometricField
         (
             const tmp<GeometricField<Type, PatchField, GeoMesh> >&
         );
-        #endif
+#       endif
 
         //- Construct as copy resetting IO parameters
         GeometricField
@@ -367,13 +371,13 @@ public:
         );
 
         //- Construct as copy resetting name
-        #ifdef ConstructFromTmp
+#       ifdef ConstructFromTmp
         GeometricField
         (
             const word& newName,
             const tmp<GeometricField<Type, PatchField, GeoMesh> >&
         );
-        #endif
+#       endif
 
         //- Construct as copy resetting IO parameters and patch type
         GeometricField
@@ -547,6 +551,7 @@ public:
 
     // Ostream operators
 
+#ifndef SWIG
         friend Ostream& operator<< <Type, PatchField, GeoMesh>
         (
             Ostream&,
@@ -558,6 +563,7 @@ public:
             Ostream&,
             const tmp<GeometricField<Type, PatchField, GeoMesh> >&
         );
+#endif
 };
 
 

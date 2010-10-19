@@ -102,6 +102,7 @@ public:
 
     // Declare run-time New selection table
 
+#ifndef SWIG
         declareRunTimeNewSelectionTable
         (
             autoPtr,
@@ -114,6 +115,7 @@ public:
             ),
             (U, phi, lamTransportModel)
         );
+#endif
 
 
     // Constructors
@@ -130,7 +132,7 @@ public:
     // Selectors
 
         //- Return a reference to the selected turbulence model
-        static autoPtr<turbulenceModel> New
+        static autoPtr<incompressible::turbulenceModel> New
         (
             const volVectorField& U,
             const surfaceScalarField& phi,

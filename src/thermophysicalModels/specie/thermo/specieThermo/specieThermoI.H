@@ -50,23 +50,33 @@ inline Foam::scalar Foam::specieThermo<thermo>::T
     scalar Test = T0;
     scalar Tnew = T0;
     scalar Ttol = T0*tol_;
-    int    iter = 0;
+    int iter = 0;
 
     do
     {
+        // Limit the temperature jump in a single corrector to TJump_
+        // HJ, 12/Oct/2010
+
         Test = Tnew;
-        Tnew = Test - ((this->*F)(Test) - f)/(this->*dFdT)(Test);
+        Tnew = Test
+            - Foam::min(((this->*F)(Test) - f)/(this->*dFdT)(Test), TJump_);
 
         if (iter++ > maxIter_)
         {
-            FatalErrorIn
+            // Improvements: graceful exit with recovery.  HJ, 11/Oct/2010
+            InfoIn
             (
                 "specieThermo<thermo>::T(scalar f, scalar T0, "
                 "scalar (specieThermo<thermo>::*F)(const scalar) const, "
                 "scalar (specieThermo<thermo>::*dFdT)(const scalar) const"
                 ") const"
-            )   << "Maximum number of iterations exceeded"
-                << abort(FatalError);
+            )   << "Maximum number of iterations exceeded.  Rescue by HJ"
+                << endl;
+
+            // Use value where dFdT is calculated using T0.  HJ, 11/Oct/2010
+            Tnew = f/(this->*dFdT)(T0);
+
+            return Tnew;
         }
 
     } while (mag(Tnew - Test) > Ttol);

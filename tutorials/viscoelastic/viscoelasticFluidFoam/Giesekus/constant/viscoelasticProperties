@@ -1,32 +1,23 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "Giesekus";
-    instance        "";
-    local           "";
-
-    class           dictionary;
-    object          viscoelasticProperties;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      viscoelasticProperties;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 /*
 From:
 AZAIEZ, J.; GUÉNETTE, R.; AIT-KADI, A. Entry flow calculations using multi-mode
 models. Journal of Non-Newtonian Fluid Mechanics, v. 66, n. 2-3, p. 271 - 281, 1996.
-
 
 Mode        Model parameter      lambda   etaP    etaS   
 1           0.5                  0.6855   0.0400  0.002 
@@ -86,6 +77,5 @@ rheology
         );
 
 }
-
 
 // ************************************************************************* //

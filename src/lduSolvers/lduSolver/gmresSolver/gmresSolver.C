@@ -109,7 +109,7 @@ Foam::gmresSolver::gmresSolver
             coupleBouCoeffs,
             coupleIntCoeffs,
             interfaces,
-            dict.subDict("preconditioner")
+            dict
         )
     ),
     nDirs_(readLabel(dict.lookup("nDirections")))

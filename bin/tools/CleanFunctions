@@ -55,7 +55,7 @@ cleanTimeDirectories ()
         zeros=`printf %0${nZeros}d 0`
         nZeros=$(($nZeros + 1))
     done
-    rm -rf ./{[1-9]*,-[1-9]*,log,log.*,log-*,logSummary.*,.fxLock,*.xml,ParaView*,paraFoam*,*.OpenFOAM} > /dev/null 2>&1
+    rm -rf ./[1-9]* ./-[1-9]* ./log ./log.* ./log-* ./logSummary.* ./.fxLock ./*.xml ./ParaView* ./paraFoam* ./*.OpenFOAM > /dev/null 2>&1
 }
 
 cleanCase ()
@@ -66,10 +66,20 @@ cleanCase ()
     rm -rf forces* > /dev/null 2>&1
 
     rm -rf system/machines \
-           constant/polyMesh/{allOwner*,cell*,face*,meshModifiers*} \
-           constant/polyMesh/{owner*,neighbour*,point*,edge*} \
-           constant/polyMesh/{cellLevel*,pointLevel*,refinementHistory*,surfaceIndex*} \
-           constant/{cellToRegion,cellLevel*,pointLevel*} \
+           constant/polyMesh/allOwner* \
+           constant/polyMesh/cell* \
+           constant/polyMesh/face* \
+           constant/polyMesh/meshModifiers* \
+           constant/polyMesh/owner* \
+           constant/polyMesh/neighbour* \
+           constant/polyMesh/point* \
+           constant/polyMesh/edge* \
+           constant/polyMesh/zoneToPatchName \
+           constant/polyMesh/cellLevel* \
+           constant/polyMesh/pointLevel* \
+           constant/polyMesh/refinementHistory*, \
+           constant/polyMesh/surfaceIndex* \
+           constant/cellToRegion \
            constant/polyMesh/sets/ \
            VTK \
            > /dev/null 2>&1
