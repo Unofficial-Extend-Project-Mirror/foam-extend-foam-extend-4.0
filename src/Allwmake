@@ -38,19 +38,14 @@ wmake libso finiteArea
 wmake libso lduSolvers
 wmake libso blockMatrix
 
-wmake libso dynamicMesh
-
 (cd tetDecompositionFiniteElement ; ./Allwmake)
 
-wmake libso fvMotionSolver
-(cd tetDecompositionMotionSolver ; ./Allwmake)
+# Make dynamicMesh tools
+dynamicMesh/AllwmakeLnInclude
+dynamicMesh/Allwmake
 
 wmake libso coupledMatrix
 wmake libso sampling
-
-wmake libso dynamicFvMesh
-wmake libso topoChangerFvMesh
-wmake libso engine
 
 wmake libso ODE
 wmake libso POD
@@ -68,7 +63,6 @@ wmake libso errorEstimation
 
 fvAgglomerationMethods/Allwmake
 
-wmake libso fvMotionSolver
 wmake libso engine
 
 # ----------------------------------------------------------------- end-of-file

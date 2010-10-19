@@ -1,0 +1,55 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+    class           dictionary;
+    object          fvSchemes;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default         none;
+}
+
+gradSchemes
+{
+    default         none;
+}
+
+divSchemes
+{
+    default         none;
+}
+
+laplacianSchemes
+{
+    default         none;
+}
+
+interpolationSchemes
+{
+    default         none;
+}
+
+snGradSchemes
+{
+    default         none;
+}
+
+fluxRequired
+{
+    default         none;
+}
+
+
+// ************************************************************************* //
