@@ -49,7 +49,6 @@ namespace Foam
 
 typedef Vector2D<scalar> vector2D;
 
-
 //- Data associated with vector2D type are contiguous
 template<>
 inline bool contiguous<vector2D>() {return true;}

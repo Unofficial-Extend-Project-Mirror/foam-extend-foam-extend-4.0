@@ -48,7 +48,7 @@ namespace Foam
 
 typedef SphericalTensor<label> labelSphericalTensor;
 
-//- Identity labelTensor
+//- Global identity labelTensor
 static const labelSphericalTensor labelI(1);
 
 //- Data associated with labelSphericalTensor type are contiguous

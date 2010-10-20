@@ -49,7 +49,6 @@ namespace Foam
 
 typedef Vector<scalar> vector;
 
-
 //- Data associated with vector type are contiguous
 template<>
 inline bool contiguous<vector>() {return true;}
