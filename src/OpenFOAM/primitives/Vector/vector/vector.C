@@ -54,6 +54,7 @@ const vector vector::max(VGREAT, VGREAT, VGREAT);
 template<>
 const vector vector::min(-VGREAT, -VGREAT, -VGREAT);
 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

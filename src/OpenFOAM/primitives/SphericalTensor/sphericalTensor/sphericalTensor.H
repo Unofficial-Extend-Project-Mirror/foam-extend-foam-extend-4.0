@@ -48,12 +48,11 @@ namespace Foam
 
 typedef SphericalTensor<scalar> sphericalTensor;
 
+// Global spherical tensor definitions
 
-// Identity tensor
-static const sphericalTensor I;
-
-static const sphericalTensor oneThirdI;
-static const sphericalTensor twoThirdsI;
+static const sphericalTensor I(1);
+static const sphericalTensor oneThirdI(1.0/3.0);
+static const sphericalTensor twoThirdsI(2.0/3.0);
 
 
 //- Specify data associated with sphericalTensor type are contiguous
