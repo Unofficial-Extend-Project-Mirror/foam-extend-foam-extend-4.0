@@ -44,8 +44,16 @@ SourceFiles
 
 namespace Foam
 {
-    typedef Vector<complex> complexVector;
-}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+typedef Vector<complex> complexVector;
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "complexVectorI.H"
 

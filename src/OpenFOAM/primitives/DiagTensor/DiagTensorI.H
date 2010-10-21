@@ -299,7 +299,7 @@ inline Cmpt det(const DiagTensor<Cmpt>& t)
 template <class Cmpt>
 inline DiagTensor<Cmpt> inv(const DiagTensor<Cmpt>& dt)
 {
-    return DiagTensor<Cmpt>(1.0/dt.xx(), 1.0/dt.yy(), 1.0/dt.zz()); 
+    return DiagTensor<Cmpt>(1.0/dt.xx(), 1.0/dt.yy(), 1.0/dt.zz());
 }
 
 

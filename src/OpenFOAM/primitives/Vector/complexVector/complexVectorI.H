@@ -94,7 +94,11 @@ inline complex operator&(const complexVector& v1, const complexVector& v2)
 
 // complexVector cross product
 
-inline complexVector operator^(const complexVector& v1, const complexVector& v2)
+inline complexVector operator^
+(
+    const complexVector& v1,
+    const complexVector& v2
+)
 {
     return complexVector
     (
