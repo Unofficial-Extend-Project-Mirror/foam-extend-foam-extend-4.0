@@ -400,20 +400,20 @@ const changeMap dynamicTopoFvMesh::collapseQuadFace
             // Compute face position / normal
             if (c0BdyFace[0].which(original[0]) > -1)
             {
-                meshOps::faceCentre(c0BdyFace[0], oldPoints_, xf[0]);
-                meshOps::faceNormal(c0BdyFace[0], oldPoints_, nf[0]);
+                xf[0] = c0BdyFace[0].centre(oldPoints_);
+                nf[0] = c0BdyFace[0].normal(oldPoints_);
 
-                meshOps::faceCentre(c0BdyFace[1], oldPoints_, xf[1]);
-                meshOps::faceNormal(c0BdyFace[1], oldPoints_, nf[1]);
+                xf[1] = c0BdyFace[1].centre(oldPoints_);
+                nf[1] = c0BdyFace[1].normal(oldPoints_);
             }
             else
             if (c0BdyFace[1].which(original[0]) > -1)
             {
-                meshOps::faceCentre(c0BdyFace[1], oldPoints_, xf[0]);
-                meshOps::faceNormal(c0BdyFace[1], oldPoints_, nf[0]);
+                xf[0] = c0BdyFace[1].centre(oldPoints_);
+                nf[0] = c0BdyFace[1].normal(oldPoints_);
 
-                meshOps::faceCentre(c0BdyFace[0], oldPoints_, xf[1]);
-                meshOps::faceNormal(c0BdyFace[0], oldPoints_, nf[1]);
+                xf[1] = c0BdyFace[0].centre(oldPoints_);
+                nf[1] = c0BdyFace[0].normal(oldPoints_);
             }
             else
             {

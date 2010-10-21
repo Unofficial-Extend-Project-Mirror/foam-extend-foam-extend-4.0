@@ -319,7 +319,7 @@ void dynamicTopoFvMesh::computeParents
     {
         offset = boundaryMesh()[whichPatch(index)].start();
 
-        meshOps::faceCentre(faces_[index], oldPoints_, centre);
+        centre = faces_[index].centre(oldPoints_);
     }
     else
     if (dimension == 3)

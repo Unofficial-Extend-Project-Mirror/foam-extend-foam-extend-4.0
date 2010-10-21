@@ -67,22 +67,6 @@ class polyMesh;
 
 namespace meshOps
 {
-    // Compute the centre for a given face, using UList
-    inline void faceCentre
-    (
-        const face& faceToCheck,
-        const UList<vector>& points,
-        vector& centre
-    );
-
-    // Compute the normal for a given face, using UList
-    inline void faceNormal
-    (
-        const face& faceToCheck,
-        const UList<vector>& points,
-        vector& normal
-    );
-
     // Method to find the common-edge between two faces.
     inline bool findCommonEdge
     (
@@ -168,16 +152,15 @@ namespace meshOps
     );
 
     // Given a cell index, find the centroid / volume of a cell.
-    template <class T1, class T2>
     inline bool cellCentreAndVolume
     (
         const label cIndex,
-        const UList<Vector<T1> >& points,
+        const vectorField& points,
         const UList<face>& faces,
         const UList<cell>& cells,
         const UList<label>& owner,
-        Vector<T2>& centre,
-        T2& volume,
+        vector& centre,
+        scalar& volume,
         bool checkClosed = false
     );
 

@@ -47,127 +47,6 @@ namespace Foam
 namespace meshOps
 {
 
-// Compute the centroid for a given face, using UList
-inline void faceCentre
-(
-    const face& faceToCheck,
-    const UList<vector>& points,
-    vector& centre
-)
-{
-    // Reset to zero
-    centre = vector::zero;
-
-    vector a(vector::zero);
-    vector b(vector::zero);
-    vector c(vector::zero);
-
-    // If the face is a triangle, do a direct calculation
-    // to avoid round-off error-related problems
-    if (faceToCheck.size() == 3)
-    {
-        a = points[faceToCheck[0]];
-        b = points[faceToCheck[1]];
-        c = points[faceToCheck[2]];
-
-        centre = ((1.0 / 3.0) * (a + b + c));
-
-        return;
-    }
-
-    label nPoints = faceToCheck.size();
-
-    register label pI;
-
-    // Store the centre point in c
-    for (pI = 0; pI < nPoints; pI++)
-    {
-        c += points[faceToCheck[pI]];
-    }
-
-    c /= nPoints;
-
-    scalar ta = 0.0;
-    scalar sumA = 0.0;
-    vector ttc = vector::zero;
-    vector sumAc = vector::zero;
-
-    for (pI = 0; pI < nPoints; pI++)
-    {
-        a = points[faceToCheck[pI]];
-        b = points[faceToCheck[(pI + 1) % nPoints]];
-
-        // Calculate 3*triangle centre
-        ttc = (a + b + c);
-
-        // Calculate 2*triangle area
-        ta = mag((a - c)^(b - c));
-
-        sumA += ta;
-        sumAc += ta*ttc;
-    }
-
-    if (sumA > VSMALL)
-    {
-        centre = (sumAc/(3.0 * sumA));
-    }
-    else
-    {
-        centre = c;
-    }
-}
-
-
-// Compute the normal for a given face, using UList
-inline void faceNormal
-(
-    const face& faceToCheck,
-    const UList<vector>& points,
-    vector& normal
-)
-{
-    // Reset to zero
-    normal = vector::zero;
-
-    vector a(vector::zero);
-    vector b(vector::zero);
-    vector c(vector::zero);
-
-    // If the face is a triangle, do a direct calculation
-    // to avoid round-off error-related problems
-    if (faceToCheck.size() == 3)
-    {
-        a = points[faceToCheck[0]];
-        b = points[faceToCheck[1]];
-        c = points[faceToCheck[2]];
-
-        normal = (0.5 * ((b - a)^(c - a)));
-
-        return;
-    }
-
-    label nPoints = faceToCheck.size();
-
-    register label pI;
-
-    // Store the centre point in c
-    for (pI = 0; pI < nPoints; pI++)
-    {
-        c += points[faceToCheck[pI]];
-    }
-
-    c /= nPoints;
-
-    for (pI = 0; pI < nPoints; pI++)
-    {
-        a = points[faceToCheck[pI]];
-        b = points[faceToCheck[(pI + 1) % nPoints]];
-
-        normal += (0.5 * ((b - a)^(c - a)));
-    }
-}
-
-
 // Utility method to find the common edge between two faces.
 inline bool findCommonEdge
 (
@@ -393,35 +272,27 @@ inline label tetApexPoint
 
 // Given a cell index, find the centroid / volume of a cell.
 //  - If checking is enabled, return whether the cell is closed
-template <class T1, class T2>
 inline bool cellCentreAndVolume
 (
     const label cIndex,
-    const UList<Vector<T1> >& points,
+    const vectorField& points,
     const UList<face>& faces,
     const UList<cell>& cells,
     const UList<label>& owner,
-    Vector<T2>& centre,
-    T2& volume,
+    vector& centre,
+    scalar& volume,
     bool checkClosed
 )
 {
     // Reset inputs
-    volume = pTraits<T2>::zero;
-    centre = Vector<T2>::zero;
+    volume = 0.0;
+    centre = vector::zero;
 
     const cell& cellToCheck = cells[cIndex];
 
     // Average face-centres to get an estimate centroid
-    Vector<T2> cEst(Vector<T2>::zero);
-    Vector<T2> fCentre(Vector<T2>::zero);
-    Vector<T2> fArea(Vector<T2>::zero);
-    Vector<T2> sumClosed(Vector<T2>::zero), sumMagClosed(Vector<T2>::zero);
-
-    const T2 three(3.0), four(4.0);
-    const T2 oneThird = (pTraits<T2>::one / three);
-    const T2 oneFourth = (pTraits<T2>::one / four);
-    const T2 threeFourths = (three / four);
+    vector cEst(vector::zero), fCentre(vector::zero), fArea(vector::zero);
+    vector sumClosed(vector::zero), sumMagClosed(vector::zero);
 
     forAll(cellToCheck, faceI)
     {
@@ -432,17 +303,10 @@ inline bool cellCentreAndVolume
             continue;
         }
 
-        meshOps::faceCentre
-        (
-            checkFace,
-            points,
-            fCentre
-        );
-
-        cEst += fCentre;
+        cEst += checkFace.centre(points);
     }
 
-    cEst /= T2(cellToCheck.size());
+    cEst /= cellToCheck.size();
 
     forAll(cellToCheck, faceI)
     {
@@ -453,19 +317,8 @@ inline bool cellCentreAndVolume
             continue;
         }
 
-        meshOps::faceNormal
-        (
-            checkFace,
-            points,
-            fArea
-        );
-
-        meshOps::faceCentre
-        (
-            checkFace,
-            points,
-            fCentre
-        );
+        fArea = checkFace.normal(points);
+        fCentre = checkFace.centre(points);
 
         // Flip if necessary
         if (owner[cellToCheck[faceI]] != cIndex)
@@ -474,10 +327,10 @@ inline bool cellCentreAndVolume
         }
 
         // Calculate 3*face-pyramid volume
-        T2 pyr3Vol = fArea & (fCentre - cEst);
+        scalar pyr3Vol = fArea & (fCentre - cEst);
 
         // Calculate face-pyramid centre
-        Vector<T2> pc = (threeFourths*fCentre) + (oneFourth*cEst);
+        vector pc = ((3.0 / 4.0) * fCentre) + ((1.0 / 4.0) * cEst);
 
         // Accumulate volume-weighted face-pyramid centre
         centre += pyr3Vol*pc;
@@ -494,12 +347,12 @@ inline bool cellCentreAndVolume
     }
 
     centre /= volume + VSMALL;
-    volume *= oneThird;
+    volume *= (1.0 / 3.0);
 
     if (checkClosed)
     {
         // Check the sum across components
-        T2 closed = pTraits<T2>::zero;
+        scalar closed = 0.0;
 
         for (direction cmpt = 0; cmpt < vector::nComponents; cmpt++)
         {

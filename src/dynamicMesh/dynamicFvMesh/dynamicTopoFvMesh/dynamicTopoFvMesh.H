@@ -50,6 +50,7 @@ SourceFiles
 
 #include "Switch.H"
 #include "tetMetric.H"
+#include "DynamicField.H"
 #include "threadHandler.H"
 #include "dynamicFvMesh.H"
 
@@ -124,7 +125,14 @@ class dynamicTopoFvMesh
             typedef DynamicList<T, 0, 11, 10> Type;
         };
 
-        resizableList<point>::Type oldPoints_, points_;
+        template <class T>
+        class resizableField
+        {
+        public:
+            typedef DynamicField<T> Type;
+        };
+
+        resizableField<point>::Type oldPoints_, points_;
         resizableList<face>::Type faces_;
         resizableList<label>::Type owner_, neighbour_;
         resizableList<cell>::Type cells_;

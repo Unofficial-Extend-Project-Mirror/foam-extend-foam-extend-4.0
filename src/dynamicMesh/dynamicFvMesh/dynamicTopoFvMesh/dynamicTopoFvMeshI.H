@@ -407,12 +407,7 @@ inline scalar dynamicTopoFvMesh::edgeLengthScale
                 if (neighbour_[eFaces[faceI]] == -1)
                 {
                     // Obtain the normal.
-                    meshOps::faceNormal
-                    (
-                        faces_[eFaces[faceI]],
-                        points_,
-                        fNorm[count]
-                    );
+                    fNorm[count] = faces_[eFaces[faceI]].normal(points_);
 
                     // Normalize it.
                     fNorm[count] /= mag(fNorm[count]);
