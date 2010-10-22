@@ -241,6 +241,12 @@ Foam::faMesh::faMesh(const polyMesh& pMesh)
 
     setPrimitiveMeshData();
 
+    // Create global mesh data
+    if (Pstream::parRun())
+    {
+        globalData();
+    }
+
     // Calculate topology for the patches (processor-processor comms etc.)
     boundary_.updateMesh();
 
