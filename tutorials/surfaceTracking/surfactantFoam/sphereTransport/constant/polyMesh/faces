@@ -1,34 +1,19 @@
-// The FOAM Project // File: faces
-/*
--------------------------------------------------------------------------------
- =========         | faceList
- \\      /         | 
-  \\    /          | Name:   faces
-   \\  /           | Family: Data file
-    \\/            | 
-    F ield         | FOAM version: 2.2
-    O peration     | Product of Nabla Ltd.
-    A and          | 
-    M anipulation  | Email: Enquiries@Nabla.co.uk
--------------------------------------------------------------------------------
-*/
-
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version 2.0;
-    format ascii;
-
-    root ".";
-    case "sphereDense";
-    instance "constant";
-    local "polyMesh";
-
-    class faceList;
-    object faces;
+    version     2.0;
+    format      ascii;
+    class       faceList;
+    location    "constant/polyMesh";
+    object      faces;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 5100
 (
