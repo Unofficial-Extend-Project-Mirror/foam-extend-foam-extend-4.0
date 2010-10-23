@@ -1,33 +1,18 @@
-// The FOAM Project // File: blockMeshDict
-/*
--------------------------------------------------------------------------------
- =========         | dictionary
- \\      /         | 
-  \\    /          | Name:   blockMeshDict
-   \\  /           | Family: FoamX configuration file
-    \\/            | 
-    F ield         | FOAM version: 2.2
-    O peration     | Product of Nabla Ltd.
-    A and          | 
-    M anipulation  | Email: Enquiries@Nabla.co.uk
--------------------------------------------------------------------------------
-*/
-// FoamX Case Dictionary.
-
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "/home/warhol/chris/foam/chris2.2/run/tutorials/stressedFoam";
-    case            "plateHole";
-    instance        "constant/polyMesh";
-    local           "";
-
-    class           dictionary;
-    object          blockMeshDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant/polyMesh";
+    object      blockMeshDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 convertToMeters 1;
