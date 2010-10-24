@@ -194,6 +194,12 @@ public:
         //- Clone
         tmp<Field<Type> > clone() const;
 
+        //- Return a pointer to a new Field created on freestore
+        static autoPtr<Field<Type> > New(Istream& is)
+        {
+            return autoPtr<Field<Type> >(new Field<Type>(is));
+        }
+
         //- Return a pointer to a new calculatedFvPatchFieldField created on
         //  freestore without setting patchField values
         template<class Type2>

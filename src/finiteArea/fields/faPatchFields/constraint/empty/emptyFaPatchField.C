@@ -140,17 +140,21 @@ emptyFaPatchField<Type>::emptyFaPatchField
 template<class Type>
 void emptyFaPatchField<Type>::updateCoeffs()
 {
-    if
-    (
-        this->patch().size()
-      % this->dimensionedInternalField().mesh().nFaces()
-    )
+    // ZT, 26/06/2010, bug-fix for faMesh of zero size
+    if (this->dimensionedInternalField().mesh().nFaces())
     {
-        FatalErrorIn("emptyFaPatchField<Type>::updateCoeffs()")
-            << "This mesh contains patches of type empty but is not 1D or 2D\n"
-               "    by virtue of the fact that the number of faces of this\n"
-               "    empty patch is not divisible by the number of cells."
-            << exit(FatalError);
+        if
+        (
+            this->patch().size()
+          % this->dimensionedInternalField().mesh().nFaces()
+        )
+        {
+            FatalErrorIn("emptyFaPatchField<Type>::updateCoeffs()")
+                << "This mesh contains patches of type empty but is not 1D or 2D\n"
+                "    by virtue of the fact that the number of faces of this\n"
+                "    empty patch is not divisible by the number of cells."
+                    << exit(FatalError);
+        }
     }
 }
 
