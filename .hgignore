@@ -34,8 +34,7 @@ syntax: glob
 .DS_Store
 
 # Ignore the build-dirctories
-darwinIntel*Opt*/
-darwinIntel*Debug*/
+darwinIntel*/
 linux*Gcc*/
 linux*Icc*/
 linuxming*/
@@ -77,3 +76,12 @@ PlyParser_FoamFileParser_parsetab.py
 .build
 # .gitignore
 .timeStamp
+
+#Test-Harness generated stuff
+testHarness/OpenFOAM/1.6-ext/runDir/tutorialsTestSuites_oneTimeStep
+testHarness/OpenFOAM/1.6-ext/runDir/Testing
+testHarness/OpenFOAM/1.6-ext/runDir/CMake*
+testHarness/OpenFOAM/1.6-ext/runDir/CTestTestfile.cmake
+testHarness/OpenFOAM/1.6-ext/runDir/DartConfiguration.tcl
+testHarness/OpenFOAM/1.6-ext/runDir/Makefile
+testHarness/OpenFOAM/1.6-ext/runDir/cmake_install.cmake
