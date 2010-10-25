@@ -1,0 +1,12 @@
+particleNum
+{
+	theTitle "Number of particles";
+	expr "Current number of parcels + = (%f%)";
+	titles ( nr);
+}
+particlesAdded
+{
+	theTitle "Particles added";
+	expr "Added (%f%) new parcels";
+	titles ( nr );
+}

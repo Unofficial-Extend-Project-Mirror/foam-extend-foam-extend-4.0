@@ -7,6 +7,8 @@ case="channelParticles"
 tutorialPath=`dirname $0`/..
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
+compileApplication icoLagrangianFoam
+
 (cd $case; runApplication blockMesh)
 (cd $case; runApplication $application)
 
