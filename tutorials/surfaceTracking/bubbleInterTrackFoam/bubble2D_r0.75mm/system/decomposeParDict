@@ -9,52 +9,36 @@ FoamFile
 {
     version         2.0;
     format          ascii;
-    class           tetPointVectorField;
-    location        "0";
-    object          motionU;
+    class           dictionary;
+    location        "system";
+    object          decomposeParDict;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 1 -1 0 0 0 0];
+numberOfSubdomains   4;
 
-internalField   uniform (0 0 0);
+method               simple;
+//method               hierarchical;
+//method               metis;
+//method               manual;
 
-boundaryField
+simpleCoeffs
 {
-    freeSurfaceShadow
-    {
-        type            fixedValue;
-        value           uniform (0 0 0);
-    }
-    topWall
-    {
-        type            fixedValue;
-        value           uniform (0 0 0);
-    }
-    rightWall
-    {
-        type            slip;
-    }
-    bottomWall
-    {
-        type            fixedValue;
-        value           uniform (0 0 0);
-    }
-    leftWall
-    {
-        type            slip;
-    }
-    freeSurface
-    {
-        type            fixedValue;
-        value           uniform (0 0 0);
-    }
-    frontAndBack
-    {
-        type            empty;
-    }
+    n                    (2 2 1);
+    delta                0.001;
 }
 
+hierarchicalCoeffs
+{
+    n                    (2 2 1);
+    delta                0.001;
+    order                xyz;
+}
+
+manualCoeffs
+{
+    dataFile             "decompositionData";
+}
 
 // ************************************************************************* //

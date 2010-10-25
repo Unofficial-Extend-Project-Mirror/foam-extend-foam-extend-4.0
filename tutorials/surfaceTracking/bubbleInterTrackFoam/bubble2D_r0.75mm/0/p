@@ -9,48 +9,35 @@ FoamFile
 {
     version         2.0;
     format          ascii;
-    class           tetPointVectorField;
+    class           volScalarField;
     location        "0";
-    object          motionU;
+    object          p;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 1 -1 0 0 0 0];
+dimensions      [1 -1 -2 0 0 0 0];
 
-internalField   uniform (0 0 0);
+internalField   uniform 0;
 
 boundaryField
 {
+    space
+    {
+        type            zeroGradient;
+    }
     freeSurfaceShadow
     {
-        type            fixedValue;
-        value           uniform (0 0 0);
-    }
-    topWall
-    {
-        type            fixedValue;
-        value           uniform (0 0 0);
-    }
-    rightWall
-    {
-        type            slip;
-    }
-    bottomWall
-    {
-        type            fixedValue;
-        value           uniform (0 0 0);
-    }
-    leftWall
-    {
-        type            slip;
+        type            fixedGradient;
+        gradient        uniform 0;
+	    value           uniform 0;
     }
     freeSurface
     {
         type            fixedValue;
-        value           uniform (0 0 0);
+        value           uniform 0;
     }
-    frontAndBack
+    frontAndBackPlanes
     {
         type            empty;
     }

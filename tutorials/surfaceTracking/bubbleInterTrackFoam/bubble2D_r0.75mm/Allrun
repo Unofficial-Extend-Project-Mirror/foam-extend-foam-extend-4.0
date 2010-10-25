@@ -1,0 +1,8 @@
+#!/bin/sh
+
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+application="bubbleInterTrackFoam"
+
+runApplication makeFaMesh
+runApplication $application

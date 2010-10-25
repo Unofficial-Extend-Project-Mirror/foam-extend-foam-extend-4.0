@@ -9,52 +9,22 @@ FoamFile
 {
     version         2.0;
     format          ascii;
-    class           tetPointVectorField;
-    location        "0";
-    object          motionU;
+    class           dictionary;
+    location        "system";
+    object          tetFemSolution;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 1 -1 0 0 0 0];
-
-internalField   uniform (0 0 0);
-
-boundaryField
+solvers
 {
-    freeSurfaceShadow
+    motionU
     {
-        type            fixedValue;
-        value           uniform (0 0 0);
-    }
-    topWall
-    {
-        type            fixedValue;
-        value           uniform (0 0 0);
-    }
-    rightWall
-    {
-        type            slip;
-    }
-    bottomWall
-    {
-        type            fixedValue;
-        value           uniform (0 0 0);
-    }
-    leftWall
-    {
-        type            slip;
-    }
-    freeSurface
-    {
-        type            fixedValue;
-        value           uniform (0 0 0);
-    }
-    frontAndBack
-    {
-        type            empty;
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-06;
+        relTol          0.001;
     }
 }
-
 
 // ************************************************************************* //
