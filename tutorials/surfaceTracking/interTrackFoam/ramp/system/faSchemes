@@ -7,58 +7,46 @@
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version     2.0;
-    format      ascii;
-    class       polyBoundaryMesh;
-    location    "constant/polyMesh";
-    object      boundary;
+    version         2.0;
+    format          ascii;
+    class           dictionary;
+    location        "system";
+    object          faSchemes;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-6
-(
-bottom
+ddtSchemes
 {
-    type wall;
-    nFaces 310;
-    startFace 14213;
 }
 
-hydrofoil
+gradSchemes
 {
-    type wall;
-    nFaces 34;
-    startFace 14523;
+    default none;
+    grad(Us) Gauss linear;
 }
 
-freeSurface
+divSchemes
 {
-    type patch;
-    nFaces 310;
-    startFace 14557;
+    default none;
+    div(Us) Gauss linear;
 }
 
-outlet
+laplacianSchemes
 {
-    type patch;
-    nFaces 4;
-    startFace 14867;
 }
 
-inlet
+interpolationSchemes
 {
-    type patch;
-    nFaces 4;
-    startFace 14871;
 }
 
-frontAndBackPlanes
+snGradSchemes
 {
-    type empty;
-    nFaces 14544;
-    startFace 14875;
 }
-)
+
+fluxRequired
+{
+}
+
 
 // ************************************************************************* //

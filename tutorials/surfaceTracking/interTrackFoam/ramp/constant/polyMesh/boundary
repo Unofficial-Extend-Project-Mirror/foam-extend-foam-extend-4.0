@@ -13,52 +13,40 @@ FoamFile
     location    "constant/polyMesh";
     object      boundary;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-6
+5
 (
-bottom
-{
-    type wall;
-    nFaces 310;
-    startFace 14213;
-}
-
-hydrofoil
-{
-    type wall;
-    nFaces 34;
-    startFace 14523;
-}
-
-freeSurface
-{
-    type patch;
-    nFaces 310;
-    startFace 14557;
-}
-
-outlet
-{
-    type patch;
-    nFaces 4;
-    startFace 14867;
-}
-
-inlet
-{
-    type patch;
-    nFaces 4;
-    startFace 14871;
-}
-
-frontAndBackPlanes
-{
-    type empty;
-    nFaces 14544;
-    startFace 14875;
-}
+    freeSurface
+    {
+        type            wall;
+        nFaces          50;
+        startFace       940;
+    }
+    inlet
+    {
+        type            wall;
+        nFaces          10;
+        startFace       990;
+    }
+    outlet
+    {
+        type            wall;
+        nFaces          10;
+        startFace       1000;
+    }
+    walls
+    {
+        type            wall;
+        nFaces          50;
+        startFace       1010;
+    }
+    frontAndBack
+    {
+        type            empty;
+        nFaces          1000;
+        startFace       1060;
+    }
 )
 
 // ************************************************************************* //

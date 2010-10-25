@@ -7,58 +7,32 @@
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version     2.0;
-    format      ascii;
-    class       polyBoundaryMesh;
-    location    "constant/polyMesh";
-    object      boundary;
+    version         2.0;
+    format          ascii;
+    class           dictionary;
+    object          dynamicMeshDict;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-6
-(
-bottom
-{
-    type wall;
-    nFaces 310;
-    startFace 14213;
-}
+dynamicFvMesh dynamicMotionSolverFvMesh;
 
-hydrofoil
-{
-    type wall;
-    nFaces 34;
-    startFace 14523;
-}
+twoDMotion yes;
 
-freeSurface
-{
-    type patch;
-    nFaces 310;
-    startFace 14557;
-}
+solver laplaceFaceDecomposition;
 
-outlet
-{
-    type patch;
-    nFaces 4;
-    startFace 14867;
-}
+diffusivity uniform 1.0;
 
-inlet
-{
-    type patch;
-    nFaces 4;
-    startFace 14871;
-}
+distancePatches 1 (freeSurface);
 
-frontAndBackPlanes
+frozenDiffusion yes;
+
+
+pseudoSolid
 {
-    type empty;
-    nFaces 14544;
-    startFace 14875;
-}
-)
+    poissonsRatio           0.3;
+    nCorrectors             3;
+    convergenceTolerance    1e-9;
+};
 
 // ************************************************************************* //

@@ -7,58 +7,49 @@
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version     2.0;
-    format      ascii;
-    class       polyBoundaryMesh;
-    location    "constant/polyMesh";
-    object      boundary;
+    version         2.0;
+    format          ascii;
+    class           tetPointVectorField;
+    location        "0";
+    object          motionU;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-6
-(
-bottom
-{
-    type wall;
-    nFaces 310;
-    startFace 14213;
-}
+dimensions          [ 0 1 0 0 0 0 0 ];
 
-hydrofoil
-{
-    type wall;
-    nFaces 34;
-    startFace 14523;
-}
+internalField       uniform (0 0 0);
 
-freeSurface
-{
-    type patch;
-    nFaces 310;
-    startFace 14557;
-}
+referenceLevel      (0 0 0);
 
-outlet
+boundaryField
 {
-    type patch;
-    nFaces 4;
-    startFace 14867;
-}
+    walls
+    {
+        type fixedValue;
+        value uniform (0 0 0);
+    }
 
-inlet
-{
-    type patch;
-    nFaces 4;
-    startFace 14871;
-}
+    freeSurface
+    {
+        type fixedValue;
+        value uniform (0 0 0);
+    }
 
-frontAndBackPlanes
-{
-    type empty;
-    nFaces 14544;
-    startFace 14875;
+    outlet
+    {
+        type slip;
+    }
+
+    inlet
+    {
+        type slip;
+    }
+
+    frontAndBack
+    {
+        type empty;
+    }   
 }
-)
 
 // ************************************************************************* //

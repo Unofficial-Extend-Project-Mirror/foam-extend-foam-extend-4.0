@@ -9,56 +9,40 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       polyBoundaryMesh;
-    location    "constant/polyMesh";
-    object      boundary;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-6
-(
-bottom
-{
-    type wall;
-    nFaces 310;
-    startFace 14213;
-}
+application         interTrackFoam;
 
-hydrofoil
-{
-    type wall;
-    nFaces 34;
-    startFace 14523;
-}
+startFrom           startTime;
 
-freeSurface
-{
-    type patch;
-    nFaces 310;
-    startFace 14557;
-}
+startTime           0;
 
-outlet
-{
-    type patch;
-    nFaces 4;
-    startFace 14867;
-}
+stopAt              endTime;
 
-inlet
-{
-    type patch;
-    nFaces 4;
-    startFace 14871;
-}
+endTime             6.0;
 
-frontAndBackPlanes
-{
-    type empty;
-    nFaces 14544;
-    startFace 14875;
-}
-)
+deltaT              0.01;
+
+writeControl        runTime;
+
+writeInterval       0.1;
+
+cycleWrite          0;
+
+writeFormat         ascii;
+
+writeCompression    compressed;
+
+timeFormat          general;
+
+timePrecision       6;
+
+runTimeModifiable   yes;
 
 // ************************************************************************* //
+
+
