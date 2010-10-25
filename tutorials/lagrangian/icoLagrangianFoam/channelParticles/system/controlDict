@@ -24,7 +24,7 @@ FoamFile
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     icoFoam;
+application     icoLagrangianFoam;
 
 startFrom       firstTime;
 
