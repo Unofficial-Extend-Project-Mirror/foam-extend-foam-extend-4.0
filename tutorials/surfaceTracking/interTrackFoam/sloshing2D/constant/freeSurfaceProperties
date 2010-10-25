@@ -1,0 +1,61 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+    class           dictionary;
+    object          freeSurfaceProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+twoFluids yes;
+
+normalMotionDir no;
+
+motionDir (0 1 0);
+
+cleanInterface yes;
+
+muFluidA muFluidA [ 1 -1 -1 0 0 0 0 ] 0.01;
+
+muFluidB muFluidB [ 1 -1 -1 0 0 0 0 ] 0.00001;
+
+rhoFluidA rhoFluidA [ 1 -3  0 0 0 0 0 ] 1;
+
+rhoFluidB rhoFluidB [ 1 -3  0 0 0 0 0 ] 0.001;
+
+surfaceTension surfaceTension [ 1 -2 0 0 0 0 0 ] 0.1 ;
+
+g g [ 0 1 -2 0 0 0 0 ] ( 0 -1 0 ) ;
+
+fixedFreeSurfacePatches 0();
+
+pointNormalsCorrectionPatches 2( left right );
+
+nFreeSurfaceCorrectors 1;
+
+surfactantProperties
+{
+bulkConc            bulkConc            [ 0 -3  0 0  1 0 0 ] 1.0e-2;
+
+saturatedConc       saturatedSurfConc   [ 0 -2  0 0  1 0 0 ] 5.0e-6;
+
+adsorptionCoeff     adsorptionCoeff     [ 0  3 -1 0 -1 0 0 ] 40.0;
+
+desorptionCoeff     desorptionCoeff     [ 0 -3  0 0  1 0 0 ] 8.93e-2;
+
+bulkDiffusion       bulkDiffusion       [ 0  2 -1 0  0 0 0 ] 1.0e-9;
+
+diffusion           diffusion           [ 0  2 -1 0  0 0 0 ] 1.0e-9;
+
+temperature         temperature         [ 0  0  0 1  0 0 0 ] 293.0;
+}
+
+// ************************************************************************* //
