@@ -377,7 +377,7 @@ const unallocLabelList& faPatch::edgeFaces() const
 // Return the patch edge centres
 const vectorField& faPatch::edgeCentres() const
 {
-    return boundaryMesh().mesh().areaCentres().boundaryField()[index()];
+    return boundaryMesh().mesh().edgeCentres().boundaryField()[index()];
 }
 
 
