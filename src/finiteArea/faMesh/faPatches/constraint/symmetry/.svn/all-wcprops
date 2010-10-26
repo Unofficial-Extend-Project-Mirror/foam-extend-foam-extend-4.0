@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/svnroot/openfoam-extend/!svn/ver/1836/trunk/Core/OpenFOAM-1.5-dev/src/finiteArea/faMesh/faPatches/constraint/symmetry
+END
+symmetryFaPatch.C
+K 25
+svn:wc:ra_dav:version-url
+V 136
+/svnroot/openfoam-extend/!svn/ver/1836/trunk/Core/OpenFOAM-1.5-dev/src/finiteArea/faMesh/faPatches/constraint/symmetry/symmetryFaPatch.C
+END
+symmetryFaPatch.H
+K 25
+svn:wc:ra_dav:version-url
+V 136
+/svnroot/openfoam-extend/!svn/ver/1836/trunk/Core/OpenFOAM-1.5-dev/src/finiteArea/faMesh/faPatches/constraint/symmetry/symmetryFaPatch.H
+END

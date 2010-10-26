@@ -10,6 +10,8 @@ $(faPatches)/basic/coupled/coupledFaPatch.C
 $(faPatches)/constraint/empty/emptyFaPatch.C
 $(faPatches)/constraint/processor/processorFaPatch.C
 $(faPatches)/constraint/wedge/wedgeFaPatch.C
+$(faPatches)/constraint/cyclic/cyclicFaPatch.C
+$(faPatches)/constraint/symmetry/symmetryFaPatch.C
 
 faPatchFields = fields/faPatchFields
 $(faPatchFields)/faPatchField/faPatchFields.C
