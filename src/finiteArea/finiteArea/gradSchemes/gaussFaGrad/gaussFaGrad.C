@@ -71,10 +71,10 @@ gaussGrad<Type>::grad
 
     // Remove component of gradient normal to surface (area)
     const areaVectorField& n = vsf.mesh().faceAreaNormals();
-    const areaScalarField& K = vsf.mesh().faceCurvatures();
+//     const areaScalarField& K = vsf.mesh().faceCurvatures();
 
-//     gGrad -= n*(n & gGrad);
-    gGrad -= K*(n*vsf);
+    gGrad -= n*(n & gGrad);
+//     gGrad -= K*(n*vsf);
     gGrad.correctBoundaryConditions();
 
     gGrad.rename("grad(" + vsf.name() + ')');
