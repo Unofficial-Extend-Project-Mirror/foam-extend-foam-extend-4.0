@@ -25,7 +25,7 @@ solvers
         relTol          0;
     }
 
-    p
+    pd
     {
         solver          PCG;
         preconditioner  DIC;
@@ -33,7 +33,7 @@ solvers
         relTol          0.05;
     }
 
-    pFinal
+    pdFinal
     {
         solver          PCG;
         preconditioner  DIC;
@@ -59,7 +59,9 @@ PISO
     nAlphaSubCycles 2;
     cAlpha          1;
     pRefCell        0;
+    pdRefCell       0;
     pRefValue       0;
+    pdRefValue      0;
 }
 
 

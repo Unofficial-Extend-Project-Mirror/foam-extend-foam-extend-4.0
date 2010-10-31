@@ -2,9 +2,6 @@
 # Source tutorial run functions
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
-# Set application name
-application="interFoam"
-
 setDamBreakFine ()
 {
     blockMeshDict="constant/polyMesh/blockMeshDict"
@@ -25,7 +22,14 @@ setDamBreakFine ()
 }
 
 # Do damBreak
-(cd damBreak && foamRunTutorials)
+cd damBreak 
+   application=`getApplication`
+      
+   runApplication blockMesh   
+   runApplication setFields   
+   runApplication $application
+cd ..
+
 
 # Clone case
 cloneCase damBreak damBreakFine

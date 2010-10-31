@@ -21,25 +21,25 @@
 
     for(int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
     {
-        fvScalarMatrix pEqn
+        fvScalarMatrix pdEqn
         (
-            fvm::laplacian(rUAf, p) == fvc::div(phi)
+            fvm::laplacian(rUAf, pd) == fvc::div(phi)
         );
 
-        pEqn.setReference(pRefCell, pRefValue);
+        pdEqn.setReference(pdRefCell, pdRefValue);
 
         if (corr == nCorr-1 && nonOrth == nNonOrthCorr)
         {
-            pEqn.solve(mesh.solver(p.name() + "Final"));
+            pdEqn.solve(mesh.solver(pd.name() + "Final"));
         }
         else
         {
-            pEqn.solve(mesh.solver(p.name()));
+            pdEqn.solve(mesh.solver(pd.name()));
         }
 
         if (nonOrth == nNonOrthCorr)
         {
-            phi -= pEqn.flux();
+            phi -= pdEqn.flux();
         }
     }
 
