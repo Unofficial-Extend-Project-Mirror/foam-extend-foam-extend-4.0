@@ -10,5 +10,5 @@ wmake ../$application
 wclean ../$application
 
 # Now run the tutorial case
-runApplication ./makeMesh
+./makeMesh
 runApplication $application

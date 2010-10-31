@@ -41,6 +41,8 @@ pointNormalsCorrectionPatches 0();
 
 nFreeSurfaceCorrectors 1;
 
+freeSurfaceSmoothing   on;
+
 surfactantProperties
 {
     bulkConc            bulkConc            [ 0 -3  0 0  1 0 0 ] 1.0e-2;

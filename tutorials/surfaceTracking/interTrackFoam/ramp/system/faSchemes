@@ -24,6 +24,7 @@ gradSchemes
 {
     default none;
     grad(Us) Gauss linear;
+    grad((Us&faceAreaNormals)) Gauss linear;
 }
 
 divSchemes

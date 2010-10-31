@@ -15,6 +15,17 @@ cleanHistoryFolder ()
         > /dev/null 2>&1
 }
 
+cleanAuxFolders ()
+{
+    rm -rf forces \
+        > /dev/null 2>&1
+        
+    rm -rf path \
+        > /dev/null 2>&1    
+}        
+
 cleanHistoryFolder
 cleanTimeDirectories
 cleanFaMesh
+cleanAuxFolders
+
