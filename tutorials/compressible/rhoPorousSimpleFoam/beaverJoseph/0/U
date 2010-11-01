@@ -1,0 +1,59 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4.1                                 |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version 2.0;
+    format ascii;
+
+    root "/home2/mnordlun/OpenFOAM/mnordlun-1.4.1/run/pmiCases";
+    case "SMAR_MD2_Puffing";
+    instance "0";
+    local "";
+
+    class volVectorField;
+    object U;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 -1 0 0 0 0];
+
+// Re = 1 = rho=(rho U H)/mu; rho=1.144, mu=1.861e-5; H=0.01 
+internalField   uniform (1.62589e-4 0 0);
+
+boundaryField
+{
+    inlet
+    {
+        // type            groovyBC;
+        type fixedValue;
+        variables "relax=0.7;UTarget=1.62589e-4;Uout@outlet=sum((pos().y) > 0.1 ? mag(U)*mag(Sf()) : 0.)/sum(pos().y > 0.1 ? mag(Sf()) : 0);Uold=mag(U);Uo=(Uout>1e-7 ? Uout : 1e-7);Unew=Uold*((1-relax)+relax*(UTarget/Uo));Unew2=(Unew > UTarget ? UTarget : Unew);";
+        valueExpression "vector(1,0,0)*Unew2";
+        value           $internalField;
+    }
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      uniform (0 0 0);
+        value           uniform (0 0 0);
+    }
+    upperWall
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+    lowerWall
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+}
+
+
+// ************************************************************************* //
