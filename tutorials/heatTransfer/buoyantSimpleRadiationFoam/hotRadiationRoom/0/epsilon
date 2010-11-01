@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,6 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
+    location    "0";
     object      epsilon;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -20,25 +21,39 @@ internalField   uniform 0.01;
 
 boundaryField
 {
-    floor           
-    {
-        type            zeroGradient;
-    }
-
-    ceiling         
-    {
-        type            zeroGradient;
-    }
-
-    fixedWalls      
-    {
-        type            zeroGradient;
-    }
-
     box
     {
-        type            zeroGradient;
+        type            compressible::epsilonWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0.01;
+    }
+    floor
+    {
+        type            compressible::epsilonWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0.01;
+    }
+    ceiling
+    {
+        type            compressible::epsilonWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0.01;
+    }
+    fixedWalls
+    {
+        type            compressible::epsilonWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0.01;
     }
 }
+
 
 // ************************************************************************* //

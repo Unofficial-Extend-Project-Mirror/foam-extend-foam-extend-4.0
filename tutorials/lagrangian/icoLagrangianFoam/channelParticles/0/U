@@ -1,29 +1,18 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.2                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
-// Field Dictionary
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "/home/coyote/hjasak/OpenFOAM/hjasak-1.2/run/test";
-    case            "cavity";
-    instance        "0";
-    local           "";
-
-    class           volVectorField;
-    object          U;
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      U;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 dimensions      [0 1 -1 0 0 0 0];
 
@@ -53,6 +42,5 @@ boundaryField
         type            empty;
     }
 }
-
 
 // ************************************************************************* //

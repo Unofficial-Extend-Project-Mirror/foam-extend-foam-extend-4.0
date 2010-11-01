@@ -1,19 +1,18 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "/home/warhol/chris/foam/chris2.1/run/tutorials/interFoam";
-    case            "damBreak";
-    instance        "system";
-    local           "";
-
-    class           dictionary;
-    object          changePatchTypeDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      changePatchTypeDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 dictionaryReplacement
 {
@@ -33,7 +32,6 @@ dictionaryReplacement
                 inletValue      uniform (0 0 0);
             }
 
-
             topAir_to_leftSolid
             {
                 type            fixedValue;
@@ -52,8 +50,6 @@ dictionaryReplacement
             }
         }
     }
-
-
 
     T
     {
@@ -94,7 +90,6 @@ dictionaryReplacement
             }
         }
     }
-
 
     epsilon
     {
@@ -151,7 +146,6 @@ dictionaryReplacement
             }
         }
     }
-
 
     k
     {
@@ -210,15 +204,14 @@ dictionaryReplacement
         }
     }
 
-
-    pd
+    p
     {
         boundaryField
         {
             minX
             {
-                type            fixedFluxBuoyantPressure;
-                value           0;
+                type            buoyantPressure;
+                value           uniform 1e+05;
             }
             maxX
             {
@@ -233,93 +226,44 @@ dictionaryReplacement
                 lInf            0.40;   // double length of domain
                 inletOutlet     off;
                 correctSupercritical off;
-                value           uniform 0;
+                value           uniform 1e+05;
             }
 
             minY
             {
-                type            fixedFluxBuoyantPressure;
-                value           0;
+                type            buoyantPressure;
+                value           uniform 1e+05;
             }
 
             minZ
             {
-                type            fixedFluxBuoyantPressure;
-                value           0;
+                type            buoyantPressure;
+                value           uniform 1e+05;
             }
             maxZ
             {
-                type            fixedFluxBuoyantPressure;
-                value           0;
+                type            buoyantPressure;
+                value           uniform 1e+05;
             }
 
             topAir_to_leftSolid
             {
-                type            fixedFluxBuoyantPressure;
-                value           0;
+                type            buoyantPressure;
+                value           uniform 1e+05;
             }
             topAir_to_heater
             {
-                type            fixedFluxBuoyantPressure;
-                value           0;
+                type            buoyantPressure;
+                value           uniform 1e+05;
             }
             topAir_to_rightSolid
             {
-                type            fixedFluxBuoyantPressure;
-                value           0;
+                type            buoyantPressure;
+                value           uniform 1e+05;
             }
         }
     }
 
-    p
-    {
-        internalField   uniform 100000;
-
-        boundaryField
-        {
-            minX
-            {
-                type            calculated;
-                value           uniform 100000;
-            }
-            maxX
-            {
-                type            calculated;
-                value           uniform 100000;
-            }
-            maxY
-            {
-                type            calculated;
-                value           uniform 100000;
-            }
-            minZ
-            {
-                type            calculated;
-                value           uniform 100000;
-            }
-            maxZ
-            {
-                type            calculated;
-                value           uniform 100000;
-            }
-
-            topAir_to_leftSolid
-            {
-                type            calculated;
-                value           uniform 100000;
-            }
-            topAir_to_heater
-            {
-                type            calculated;
-                value           uniform 100000;
-            }
-            topAir_to_rightSolid
-            {
-                type            calculated;
-                value           uniform 100000;
-            }
-        }
-    }
 }
 
 // ************************************************************************* //

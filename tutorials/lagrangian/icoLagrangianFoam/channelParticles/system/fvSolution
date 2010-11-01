@@ -26,8 +26,21 @@ FoamFile
 
 solvers
 {
-    p               ICCG 1e-06 0;
-    U               BICCG 1e-05 0;
+    p
+    {
+        solver          PCG;  
+        preconditioner  DIC;  
+        tolerance       1e-06;
+        relTol          0;
+    }
+
+    U
+    {
+        solver          PBiCG;
+        preconditioner  DILU; 
+        tolerance       1e-05;
+        relTol          0;
+    }
 }
 
 PISO
