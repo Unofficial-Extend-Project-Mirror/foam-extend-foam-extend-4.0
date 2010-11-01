@@ -1,5 +1,5 @@
-CPP        = cpp-4.2 $(WM_CPP_OPTIONS)
-LD         = ld 
+CPP        = cpp $(GFLAGS)
+LD         = ld
 
 PROJECT_LIBS = -l$(WM_PROJECT)
 

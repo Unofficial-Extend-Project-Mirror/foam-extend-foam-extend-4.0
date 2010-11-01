@@ -2,8 +2,7 @@
 
 cWARN        = -Wall
 
-# cc          = gcc 
-cc          = gcc-4.2 
+cc          = gcc $(WM_CXXFLAGS)
 
 include $(RULES)/c$(WM_COMPILE_OPTION)
 

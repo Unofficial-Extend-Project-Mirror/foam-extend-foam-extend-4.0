@@ -648,7 +648,8 @@
     defined LINUXI64   || \
     defined LINUX64    || \
     defined MAC64      || \
-    defined COMPAQALPHA
+    defined COMPAQALPHA || \
+    defined darwin
 #define LONGIS64
 #endif
 

@@ -56,11 +56,22 @@ string pOpen(const string &cmd, label line=0)
         for (label cnt = 0; cnt <= line; cnt++)
         {
             char buffer[MAX];
+
             char* s = fgets(buffer, MAX-1, cmdPipe);
 
             if (s == NULL)
             {
+#ifdef darwin
+                // workaround for the Python-Script
+                for(int i=0;i<MAX;i++) {
+                    if(buffer[i]=='\n') {
+                        buffer[i]='\0';
+                    }
+                }
+                return buffer;
+#else
                 return "";
+#endif
             }
 
             if (cnt == line)
@@ -123,7 +134,8 @@ void printSourceFileAndLine
 #ifndef darwin
             "addr2line -f --demangle=auto --exe "
 #else
-            "gaddr2line -f --inline --demangle=auto --exe "
+            //            "gaddr2line -f --inline --demangle=auto --exe "
+            "addr2line4Mac.py "
 #endif
           + filename
           + " "
@@ -148,38 +160,6 @@ void printSourceFileAndLine
             os << " at " << homeLine.c_str();
         }
     }
-}
-
-
-void getSymbolForRaw
-(
-    Ostream& os,
-    const string& raw,
-    const fileName& filename,
-    const word& address
-)
-{
-    if (filename.size() && filename[0] == '/')
-    {
-        string fcnt = pOpen
-        (
-#ifndef darwin
-            "addr2line -f --demangle=auto --exe "
-#else
-            "gaddr2line -f --inline --demangle=auto --exe "
-#endif
-          + filename
-          + " "
-          + address
-        );
-
-        if (fcnt != "")
-        {
-            os << fcnt.c_str();
-            return;
-        }
-    }
-    os << "Uninterpreted: " << raw.c_str();
 }
 
 #ifdef darwin
@@ -265,11 +245,11 @@ char **backtrace_symbols(void **bt,unsigned nr)
         int result=dladdr(bt[i],&info);
 
         char tmp[1000];
-#       ifdef darwin
+#ifdef darwinIntel64
         sprintf(tmp,"%s(%s+%p) [%p]",info.dli_fname,info.dli_sname,(void *)((unsigned long)bt[i]-(unsigned long)info.dli_saddr),bt[i]);
-#       else
+#else
         sprintf(tmp,"%s(%s+%p) [%p]",info.dli_fname,info.dli_sname,(void *)((unsigned int)bt[i]-(unsigned int)info.dli_saddr),bt[i]);
-#       endif
+#endif
         strings[i]=(char *)malloc(strlen(tmp)+1);
         strcpy(strings[i],tmp);
     }
@@ -278,6 +258,38 @@ char **backtrace_symbols(void **bt,unsigned nr)
 }
 
 #endif
+
+void getSymbolForRaw
+(
+    Ostream& os,
+    const string& raw,
+    const fileName& filename,
+    const word& address
+)
+{
+    if (filename.size() && filename[0] == '/')
+    {
+        string fcnt = pOpen
+        (
+#ifndef darwin
+            "addr2line -f --demangle=auto --exe "
+#else
+            //            "gaddr2line -f --inline --demangle=auto --exe "
+            "addr2line4Mac.py "
+#endif
+          + filename
+          + " "
+          + address
+        );
+
+        if (fcnt != "")
+        {
+            os << fcnt.c_str();
+            return;
+        }
+    }
+    os << "Uninterpreted: " << raw.c_str();
+}
 
 void error::printStack(Ostream& os)
 {
