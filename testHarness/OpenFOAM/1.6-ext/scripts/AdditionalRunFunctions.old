@@ -54,27 +54,16 @@ runApplicationAndReportOnError ()
 {
     trap 'verbose_report_on_runApplication_error' ERR
 
-    LOG_NAME=
-    while getopts "l:" OPTFLAG ; do
-        LOG_NAME=$OPTARG
-        shift $((OPTIND-1)) ; OPTIND=1
-    done
-
     APP_RUN=$1; shift
-    APP_NAME=${APP_RUN##*/}
-
-    if [ -z $LOG_NAME ] ; then
-        LOG_NAME=log.$APP_NAME
-    fi
 
     reportOnErrorOnlyOnce=1
 
-    if [ -f $LOG_NAME ] ; then
-        echo "$APP_NAME already run on $PWD: remove log file to run"
+    if [ -f log.$APP_RUN ] ; then
+        echo "$APP_RUN already run on $PWD: remove log file to run"
         exit 1;
     else
-        echo "Running $APP_NAME on $PWD"
-        $APP_RUN $* > $LOG_NAME 2>&1
+        echo "Running $APP_RUN on $PWD"
+        $APP_RUN $* > log.$APP_RUN 2>&1
     fi
 }
 
