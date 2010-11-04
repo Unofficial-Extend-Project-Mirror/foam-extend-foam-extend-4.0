@@ -69,6 +69,16 @@ public:
 
     // Constructors
 
+        //- Construct from components
+        symmetryFaPatch
+        (
+            const word& name,
+            const labelList& edgeLabels,
+            const label index,
+            const faBoundaryMesh& bm,
+            const label ngbPolyPatchIndex
+        );
+
         //- Construct from dictionary
         symmetryFaPatch
         (
@@ -77,6 +87,25 @@ public:
             const label index,
             const faBoundaryMesh& bm
         );
+
+        //- Construct and return a clone, resetting the edge list
+        //  and boundary mesh
+        virtual autoPtr<faPatch> clone
+        (
+            const faBoundaryMesh& bm,
+            const labelList& edgeLabels,
+            const label index,
+            const label ngbPolyPatchIndex
+        ) const
+        {
+            return autoPtr<faPatch>
+            (
+                new symmetryFaPatch
+                (
+                    name(), edgeLabels, index, bm, ngbPolyPatchIndex
+                )
+            );
+        }
 
     // Destructor
 

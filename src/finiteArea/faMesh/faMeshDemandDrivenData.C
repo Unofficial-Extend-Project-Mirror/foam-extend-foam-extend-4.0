@@ -38,6 +38,8 @@ Description
 #include "PstreamCombineReduceOps.H"
 #include "coordinateSystem.H"
 #include "scalarMatrices.H"
+#include "processorFaPatchFields.H"
+#include "emptyFaPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -261,6 +263,7 @@ void faMesh::calcMagLe() const
     }
 }
 
+
 void faMesh::calcAreaCentres() const
 {
     if (debug)
@@ -304,20 +307,30 @@ void faMesh::calcAreaCentres() const
 
     forAll (boundary(), patchI)
     {
-        if (!boundary()[patchI].coupled())
-        {
-            const edgeList::subList patchEdges =
-                boundary()[patchI].patchSlice(edges());
+        const edgeList::subList patchEdges =
+            boundary()[patchI].patchSlice(edges());
 
-            forAll (patchEdges, edgeI)
-            {
-                centres.boundaryField()[patchI][edgeI] =
-                    patchEdges[edgeI].centre(localPoints);
-            }
+        forAll (patchEdges, edgeI)
+        {
+            centres.boundaryField()[patchI][edgeI] =
+                patchEdges[edgeI].centre(localPoints);
         }
     }
 
-    centres.correctBoundaryConditions();
+    forAll(centres.boundaryField(), patchI)
+    {
+        if
+        (
+            isA<processorFaPatchVectorField>
+            (
+                centres.boundaryField()[patchI]
+            )
+        )
+        {
+            centres.boundaryField()[patchI].initEvaluate();
+            centres.boundaryField()[patchI].evaluate();            
+        }
+    }
 }
 
 
@@ -469,14 +482,24 @@ void faMesh::calcFaceAreaNormals() const
 
     forAll (boundary(), patchI)
     {
-        if (!boundary()[patchI].coupled())
-        {
-            faceAreaNormals.boundaryField()[patchI] =
-                edgeAreaNormals().boundaryField()[patchI];
-        }
+        faceAreaNormals.boundaryField()[patchI] =
+            edgeAreaNormals().boundaryField()[patchI];
     }
 
-    faceAreaNormals.correctBoundaryConditions();
+    forAll(faceAreaNormals.boundaryField(), patchI)
+    {
+        if 
+        (
+            isA<processorFaPatchVectorField>
+            (
+                faceAreaNormals.boundaryField()[patchI]
+            )
+        )
+        {
+            faceAreaNormals.boundaryField()[patchI].initEvaluate();
+            faceAreaNormals.boundaryField()[patchI].evaluate();            
+        }
+    }
 }
 
 
@@ -1159,31 +1182,6 @@ void faMesh::calcPointAreaNormals() const
         }
     }
 
-    // Boundary points correction
-    forAll (boundary(), patchI)
-    {
-        if (correctPatchPointNormals(patchI) && !boundary()[patchI].coupled())
-        {
-            if (boundary()[patchI].ngbPolyPatchIndex() == -1)
-            {
-                FatalErrorIn
-                    (
-                        "void faMesh::calcPointAreaNormals const"
-                    )   << "Neighbour polyPatch index is not defined "
-                        << "for faPatch " << boundary()[patchI].name()
-                        << abort(FatalError);
-            }
-
-            labelList patchPoints = boundary()[patchI].pointLabels();
-            vectorField N = boundary()[patchI].ngbPolyPatchPointNormals();
-
-            forAll (patchPoints, pointI)
-            {
-                result[patchPoints[pointI]]
-                    -= N[pointI]*(N[pointI]&result[patchPoints[pointI]]);
-            }
-        }
-    }
 
     // Processor patch points correction
     forAll (boundary(), patchI)
@@ -1224,13 +1222,13 @@ void faMesh::calcPointAreaNormals() const
             );
 
             {
-            IPstream::read
-            (
-                Pstream::blocking,
-                procPatch.neighbProcNo(),
-                reinterpret_cast<char*>(ngbPatchPointNormals.begin()),
-                ngbPatchPointNormals.byteSize()
-            );
+                IPstream::read
+                (
+                    Pstream::blocking,
+                    procPatch.neighbProcNo(),
+                    reinterpret_cast<char*>(ngbPatchPointNormals.begin()),
+                    ngbPatchPointNormals.byteSize()
+                );
             }
 
             const labelList& nonGlobalPatchPoints =
@@ -1249,7 +1247,6 @@ void faMesh::calcPointAreaNormals() const
 
 
     // Correct global points
-
     if (globalData().nGlobalPoints() > 0)
     {
         const labelList& spLabels =
@@ -1285,6 +1282,34 @@ void faMesh::calcPointAreaNormals() const
         forAll (spNormals, pointI)
         {
             result[spLabels[pointI]] = spNormals[pointI];
+        }
+    }
+
+
+    // Boundary points correction
+    forAll (boundary(), patchI)
+    {
+        if (correctPatchPointNormals(patchI) && !boundary()[patchI].coupled())
+        {
+            if (boundary()[patchI].ngbPolyPatchIndex() == -1)
+            {
+                FatalErrorIn
+                    (
+                        "void faMesh::calcPointAreaNormals const"
+                    )   << "Neighbour polyPatch index is not defined "
+                        << "for faPatch " << boundary()[patchI].name()
+                        << abort(FatalError);
+            }
+
+            labelList patchPoints = boundary()[patchI].pointLabels();
+
+            vectorField N = boundary()[patchI].ngbPolyPatchPointNormals();
+
+            forAll (patchPoints, pointI)
+            {
+                result[patchPoints[pointI]]
+                    -= N[pointI]*(N[pointI]&result[patchPoints[pointI]]);
+            }
         }
     }
 

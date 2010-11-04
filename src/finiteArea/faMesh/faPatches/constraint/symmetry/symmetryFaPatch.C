@@ -50,6 +50,19 @@ void symmetryFaPatch::makeCorrVecs(vectorField& cv) const
 
 // * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * * * * //
 
+// Construct from components
+symmetryFaPatch::symmetryFaPatch
+(
+    const word& name,
+    const labelList& edgeLabels,
+    const label index,
+    const faBoundaryMesh& bm,
+    const label ngbPolyPatchIndex
+)
+:
+    faPatch(name, edgeLabels, index, bm, ngbPolyPatchIndex)
+{}
+
 //- Construct from dictionary
 symmetryFaPatch::symmetryFaPatch
 (
