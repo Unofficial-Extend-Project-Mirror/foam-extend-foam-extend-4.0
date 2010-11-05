@@ -96,24 +96,6 @@ Foam::BlockLduSolver<Type>::BlockLduSolver
     const BlockLduMatrix<Type>& matrix,
     const FieldField<CoeffField, Type>& boundaryCoeffs,
     const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
-    Istream& solverData
-)
-:
-    fieldName_(fieldName),
-    dict_(solverData),
-    matrix_(matrix),
-    boundaryCoeffs_(boundaryCoeffs),
-    interfaces_(interfaces)
-{}
-
-
-template<class Type>
-Foam::BlockLduSolver<Type>::BlockLduSolver
-(
-    const word& fieldName,
-    const BlockLduMatrix<Type>& matrix,
-    const FieldField<CoeffField, Type>& boundaryCoeffs,
-    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
     const dictionary& dict
 )
 :
@@ -135,10 +117,10 @@ Foam::BlockLduSolver<Type>::New
     BlockLduMatrix<Type>& matrix,
     const FieldField<CoeffField, Type>& boundaryCoeffs,
     const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
-    const dictionary& solverDict
+    const dictionary& dict
 )
 {
-    word solverName(solverDict.lookup("solver"));
+    word solverName(dict.lookup("solver"));
 
     if (matrix.diagonal())
     {
@@ -150,7 +132,7 @@ Foam::BlockLduSolver<Type>::New
                 matrix,
                 boundaryCoeffs,
                 interfaces,
-                solverDict
+                dict
             )
         );
     }
@@ -166,7 +148,7 @@ Foam::BlockLduSolver<Type>::New
                 "    BlockLduMatrix<Type>& matrix,\n"
                 "    const FieldField<CoeffField, Type>& boundaryCoeffs,\n"
                 "    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,\n"
-                "    Istream& solverDict\n"
+                "    const dictionary& dict\n"
                 ")"
             )   << "Initialization problem." << endl;
         }
@@ -184,9 +166,9 @@ Foam::BlockLduSolver<Type>::New
                 "    BlockLduMatrix<Type>& matrix,\n"
                 "    const FieldField<CoeffField, Type>& boundaryCoeffs,\n"
                 "    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,\n"
-                "    Istream& solverDict\n"
+                "    const dictionary& dict\n"
                 ")",
-                solverDict
+                dict
             )   << "Unknown symmetric matrix solver " << solverName
                 << endl << endl
                 << "Valid symmetric matrix solvers are :" << endl
@@ -202,7 +184,7 @@ Foam::BlockLduSolver<Type>::New
                 matrix,
                 boundaryCoeffs,
                 interfaces,
-                solverDict
+                dict
             )
         );
     }
@@ -218,7 +200,7 @@ Foam::BlockLduSolver<Type>::New
                 "    BlockLduMatrix<Type>& matrix,\n"
                 "    const FieldField<CoeffField, Type>& boundaryCoeffs,\n"
                 "    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,\n"
-                "    Istream& solverDict\n"
+                "    const dictionary& dict\n"
                 ")"
             )   << "Initialization problem." << endl;
         }
@@ -236,9 +218,9 @@ Foam::BlockLduSolver<Type>::New
                 "    BlockLduMatrix<Type>& matrix,\n"
                 "    const FieldField<CoeffField, Type>& boundaryCoeffs,\n"
                 "    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,\n"
-                "    Istream& solverDict\n"
+                "    const dictionary& dict\n"
                 ")",
-                solverDict
+                dict
             )   << "Unknown asymmetric matrix solver " << solverName
                 << endl << endl
                 << "Valid asymmetric matrix solvers are :" << endl
@@ -254,7 +236,7 @@ Foam::BlockLduSolver<Type>::New
                 matrix,
                 boundaryCoeffs,
                 interfaces,
-                solverDict
+                dict
             )
         );
     }
@@ -267,8 +249,9 @@ Foam::BlockLduSolver<Type>::New
             "    const word& fieldName,\n"
             "    BlockLduMatrix<Type>& matrix,\n"
             "    const FieldField<CoeffField, Type>& boundaryCoeffs,\n"
-            "    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,\n"
-            "    Istream& solverDict\n"
+            "    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& "
+            "interfaces,\n"
+            "    const dictionary& dict\n"
             ")"
         )   << "cannot solve incomplete matrix, "
                "no diagonal or off-diagonal coefficient"

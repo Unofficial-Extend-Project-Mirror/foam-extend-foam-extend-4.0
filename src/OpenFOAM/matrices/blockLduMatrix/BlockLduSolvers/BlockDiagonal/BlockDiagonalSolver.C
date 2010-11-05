@@ -40,7 +40,7 @@ Foam::BlockDiagonalSolver<Type>::BlockDiagonalSolver
     const BlockLduMatrix<Type>& matrix,
     const FieldField<CoeffField, Type>& boundaryCoeffs,
     const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
-    const dictionary& solverDict
+    const dictionary& dict
 )
 :
     BlockLduSolver<Type>
@@ -49,7 +49,7 @@ Foam::BlockDiagonalSolver<Type>::BlockDiagonalSolver
         matrix,
         boundaryCoeffs,
         interfaces,
-        solverDict
+        dict
     )
 {}
 

@@ -72,6 +72,13 @@ protected:
         //- Reference to interfaces
         const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces_;
 
+
+    // Protected member functions
+
+        //- Find the smoother name (directly or from a sub-dictionary)
+        static word getName(const dictionary&);
+
+
 public:
 
     //- Runtime type information
@@ -153,7 +160,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "newBlockLduSmoother.C"
+#   include "BlockLduSmoother.C"
 #endif
 
 #define makeBlockSmoother(SmootherType, typeSmootherType)                    \

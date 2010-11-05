@@ -73,7 +73,7 @@ Foam::BlockGMRESSolver<Type>::BlockGMRESSolver
     const BlockLduMatrix<Type>& matrix,
     const FieldField<CoeffField, Type>& boundaryCoeffs,
     const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
-    const dictionary& solverDict
+    const dictionary& dict
 )
 :
     BlockIterativeSolver<Type>
@@ -82,7 +82,7 @@ Foam::BlockGMRESSolver<Type>::BlockGMRESSolver
         matrix,
         boundaryCoeffs,
         interfaces,
-        solverDict
+        dict
     ),
     preconPtr_
     (

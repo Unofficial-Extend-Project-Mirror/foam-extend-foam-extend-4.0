@@ -41,7 +41,7 @@ Foam::BlockGaussSeidelSolver<Type>::BlockGaussSeidelSolver
     const BlockLduMatrix<Type>& matrix,
     const FieldField<CoeffField, Type>& boundaryCoeffs,
     const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
-    const dictionary& solverDict
+    const dictionary& dict
 )
 :
     BlockIterativeSolver<Type>
@@ -50,7 +50,7 @@ Foam::BlockGaussSeidelSolver<Type>::BlockGaussSeidelSolver
         matrix,
         boundaryCoeffs,
         interfaces,
-        solverDict
+        dict
     ),
     gs_(matrix),
     nResSweeps_(readLabel(this->dict().lookup("nResSweeps")))

@@ -28,7 +28,7 @@ Class
 Description
     Block LDU matrix smoother virtual base class
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "BlockLduSmoother.H"
 
@@ -46,7 +46,21 @@ Foam::autoPtr<Foam::BlockLduSmoother<Type> > Foam::BlockLduSmoother<Type>::New
     const dictionary& dict
 )
 {
-    word smootherName(dict.lookup("smoother"));
+    word smootherName;
+
+    // Handle primitive or dictionary entry
+    const entry& e = dict.lookupEntry("smoother", false, false);
+    if (e.isDict())
+    {
+        e.dict().lookup("smoother") >> smootherName;
+    }
+    else
+    {
+        e.stream() >> smootherName;
+    }
+
+    // Not (yet?) needed:
+    // const dictionary& controls = e.isDict() ? e.dict() : dictionary::null;
 
     typename dictionaryConstructorTable::iterator constructorIter =
         dictionaryConstructorTablePtr_->find(smootherName);
@@ -80,6 +94,28 @@ Foam::autoPtr<Foam::BlockLduSmoother<Type> > Foam::BlockLduSmoother<Type>::New
             dict
         )
     );
+}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+Foam::word Foam::BlockLduSmoother<Type>::getName(const dictionary& dict)
+{
+    word name;
+
+    // handle primitive or dictionary entry
+    const entry& e = dict.lookupEntry("preconditioner", false, false);
+    if (e.isDict())
+    {
+        e.dict().lookup("preconditioner") >> name;
+    }
+    else
+    {
+        e.stream() >> name;
+    }
+
+    return name;
 }
 
 

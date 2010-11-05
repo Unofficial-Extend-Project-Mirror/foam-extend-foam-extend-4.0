@@ -22,7 +22,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "BlockLduPrecon.H"
 #include "blockNoPrecons.H"
@@ -39,7 +39,20 @@ Foam::autoPtr<Foam::BlockLduPrecon<Type> > Foam::BlockLduPrecon<Type>::New
     const dictionary& dict
 )
 {
-    word preconName(dict.lookup("preconditioner"));
+    word preconName;
+
+    // handle primitive or dictionary entry
+    const entry& e = dict.lookupEntry("preconditioner", false, false);
+    if (e.isDict())
+    {
+        e.dict().lookup("preconditioner") >> preconName;
+    }
+    else
+    {
+        e.stream() >> preconName;
+    }
+
+    const dictionary& controls = e.isDict() ? e.dict() : dictionary::null;
 
     if (matrix.diagonal())
     {
@@ -84,6 +97,28 @@ Foam::autoPtr<Foam::BlockLduPrecon<Type> > Foam::BlockLduPrecon<Type>::New
             )
         );
     }
+}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+Foam::word Foam::BlockLduPrecon<Type>::getName(const dictionary& dict)
+{
+    word name;
+
+    // handle primitive or dictionary entry
+    const entry& e = dict.lookupEntry("preconditioner", false, false);
+    if (e.isDict())
+    {
+        e.dict().lookup("preconditioner") >> name;
+    }
+    else
+    {
+        e.stream() >> name;
+    }
+
+    return name;
 }
 
 

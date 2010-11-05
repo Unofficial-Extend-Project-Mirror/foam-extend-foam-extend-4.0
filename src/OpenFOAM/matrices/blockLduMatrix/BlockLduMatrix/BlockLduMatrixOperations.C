@@ -805,6 +805,10 @@ void Foam::BlockLduMatrix<Type>::negate()
     {
         diagPtr_->negate();
     }
+
+    // Do coupling coefficients
+    coupleUpper_.negate();
+    coupleLower_.negate();
 }
 
 
@@ -849,6 +853,11 @@ void Foam::BlockLduMatrix<Type>::operator=(const BlockLduMatrix<Type>& A)
         diag() = A.diag();
     }
 
+    // Copy interface data
+    interfaces_ = A.interfaces_;
+    coupleUpper_ = A.coupleUpper_;
+    coupleLower_ = A.coupleLower_;
+
     // Copy constraints
     fixedEqns_ = A.fixedEqns_;
 }
@@ -878,6 +887,10 @@ void Foam::BlockLduMatrix<Type>::operator+=(const BlockLduMatrix<Type>& A)
         upper() += A.upper();
         lower() += A.lower();
     }
+
+    // Interface data
+    coupleUpper_ += A.coupleUpper_;
+    coupleLower_ += A.coupleLower_;
 }
 
 
@@ -905,6 +918,10 @@ void Foam::BlockLduMatrix<Type>::operator-=(const BlockLduMatrix<Type>& A)
         upper() -= A.upper();
         lower() -= A.lower();
     }
+
+    // Interface data
+    coupleUpper_ -= A.coupleUpper_;
+    coupleLower_ -= A.coupleLower_;
 }
 
 
@@ -1015,6 +1032,10 @@ void Foam::BlockLduMatrix<Type>::operator*=(const scalar s)
     {
         *lowerPtr_ *= s;
     }
+
+    // Interface data
+    coupleUpper_ *= s;
+    coupleLower_ *= s;
 }
 
 

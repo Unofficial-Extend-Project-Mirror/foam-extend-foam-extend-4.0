@@ -39,10 +39,10 @@ Foam::BlockIterativeSolver<Type>::BlockIterativeSolver
     const BlockLduMatrix<Type>& matrix,
     const FieldField<CoeffField, Type>& boundaryCoeffs,
     const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
-    const dictionary& solverDict
+    const dictionary& dict
 )
 :
-    BlockLduSolver<Type>(fieldName, matrix, boundaryCoeffs, interfaces, solverDict),
+    BlockLduSolver<Type>(fieldName, matrix, boundaryCoeffs, interfaces, dict),
     tolerance_(readScalar(this->dict().lookup("tolerance"))),
     relTolerance_(readScalar(this->dict().lookup("relTol"))),
     minIter_(readLabel(this->dict().lookup("minIter"))),

@@ -130,14 +130,14 @@ public:
                 BlockLduMatrix<Type>& matrix,
                 const FieldField<CoeffField, Type>& boundaryCoeffs,
                 const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
-                const dictionary& solverDict
+                const dictionary& dict
             ),
             (
                 fieldName,
                 matrix,
                 boundaryCoeffs,
                 interfaces,
-                solverDict
+                dict
             )
         );
 
@@ -151,14 +151,14 @@ public:
                 BlockLduMatrix<Type>& matrix,
                 const FieldField<CoeffField, Type>& boundaryCoeffs,
                 const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
-                const dictionary& solverDict
+                const dictionary& dict
             ),
             (
                 fieldName,
                 matrix,
                 boundaryCoeffs,
                 interfaces,
-                solverDict
+                dict
             )
         );
 
@@ -172,17 +172,8 @@ public:
             const word& fieldName,
             const BlockLduMatrix<Type>& matrix,
             const FieldField<CoeffField, Type>& boundaryCoeffs,
-            const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces
-        );
-
-        //- Construct from Istream
-        BlockLduSolver
-        (
-            const word& fieldName,
-            const BlockLduMatrix<Type>& matrix,
-            const FieldField<CoeffField, Type>& boundaryCoeffs,
-            const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
-            Istream& solverData
+            const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
+                interfaces
         );
 
         //- Construct from dictionary
@@ -191,8 +182,9 @@ public:
             const word& fieldName,
             const BlockLduMatrix<Type>& matrix,
             const FieldField<CoeffField, Type>& boundaryCoeffs,
-            const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
-            const dictionary& solverDict
+            const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
+                interfaces,
+            const dictionary& dict
         );
 
 
@@ -204,8 +196,9 @@ public:
             const word& fieldName,
             BlockLduMatrix<Type>& matrix,
             const FieldField<CoeffField, Type>& boundaryCoeffs,
-            const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
-            const dictionary& solverDict
+            const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
+                interfaces,
+            const dictionary& dict
         );
 
 

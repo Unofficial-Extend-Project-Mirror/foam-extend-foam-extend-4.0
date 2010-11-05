@@ -70,6 +70,12 @@ protected:
         const BlockLduMatrix<Type>& matrix_;
 
 
+    // Protected member functions
+
+        //- Find the smoother name (directly or from a sub-dictionary)
+        static word getName(const dictionary&);
+
+
 public:
 
     //- Runtime type information
@@ -151,7 +157,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "newBlockLduPrecon.C"
+#   include "BlockLduPrecon.C"
 #endif
 
 #define makeBlockPrecon(PreconType, typePreconType)                          \
