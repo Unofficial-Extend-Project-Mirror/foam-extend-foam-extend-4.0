@@ -1,0 +1,44 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+    class           dictionary;
+    location        "system";
+    object          decomposeParDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+numberOfSubdomains   4;
+
+method               simple;
+//method               hierarchical;
+//method               metis;
+//method               manual;
+
+simpleCoeffs
+{
+    n                    (2 2 1);
+    delta                0.001;
+}
+
+hierarchicalCoeffs
+{
+    n                    (2 2 1);
+    delta                0.001;
+    order                xyz;
+}
+
+manualCoeffs
+{
+    dataFile             "decompositionData";
+}
+
+// ************************************************************************* //

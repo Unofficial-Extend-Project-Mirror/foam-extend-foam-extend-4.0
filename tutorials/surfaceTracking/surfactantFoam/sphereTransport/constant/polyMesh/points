@@ -1,34 +1,19 @@
-// The FOAM Project // File: points
-/*
--------------------------------------------------------------------------------
- =========         | vectorField
- \\      /         | 
-  \\    /          | Name:   points
-   \\  /           | Family: Data file
-    \\/            | 
-    F ield         | FOAM version: 2.2
-    O peration     | Product of Nabla Ltd.
-    A and          | 
-    M anipulation  | Email: Enquiries@Nabla.co.uk
--------------------------------------------------------------------------------
-*/
-
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version 2.0;
-    format ascii;
-
-    root ".";
-    case "sphereDense";
-    instance "constant";
-    local "polyMesh";
-
-    class vectorField;
-    object points;
+    version     2.0;
+    format      ascii;
+    class       vectorField;
+    location    "constant/polyMesh";
+    object      points;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 1933
 (

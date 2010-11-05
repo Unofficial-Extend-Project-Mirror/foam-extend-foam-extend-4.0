@@ -9,7 +9,8 @@ tutorialPath=`dirname $0`/..
 
 cleanFaMesh ()
 {
-    rm -rf ./constant/faMesh/{faceLabels*,boundary*} \
+    rm -rf ./constant/faMesh/faceLabels* \
+           ./constant/faMesh/boundary* \
            > /dev/null 2>&1
 }
 

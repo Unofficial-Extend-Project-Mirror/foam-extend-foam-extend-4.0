@@ -1,32 +1,18 @@
-// The FOAM Project // File: materials
-/*
--------------------------------------------------------------------------------
- =========         | volScalarField
- \\      /         | 
-  \\    /          | Name:   materials
-   \\  /           | Family: Data file
-    \\/            | 
-    F ield         | FOAM version: 2.3
-    O peration     | Product of Nabla Ltd.
-    A and          | 
-    M anipulation  | Email: Enquiries@Nabla.co.uk
--------------------------------------------------------------------------------
-*/
-
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version 2.0;
-    format ascii;
-
-    root "/home/coyote/hjasak/c++/foam/hjasak2.3/run/development";
-    case "newPlateHole";
-    instance "constant";
-    local "";
-
-    class volScalarField;
-    object materials;
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      materials;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 dimensions      [0 0 0 0 0 0 0];

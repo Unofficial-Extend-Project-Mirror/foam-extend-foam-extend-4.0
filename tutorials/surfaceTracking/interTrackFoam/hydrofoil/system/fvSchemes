@@ -1,16 +1,16 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.0                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
     version         2.0;
     format          ascii;
     class           dictionary;
+    location        "system";
     object          fvSchemes;
 }
 
@@ -18,42 +18,36 @@ FoamFile
 
 ddtSchemes
 {
-    ddt(rho,U)          Euler;
-
-    ddt(U)              Euler;
+    ddt(rho,U) Euler;
 }
 
 gradSchemes
 {
-    default             Gauss linear;
-    grad(p)             Gauss linear;
+    default Gauss linear;
+    grad(p) Gauss linear;
 }
 
 divSchemes
 {
-//     div(phiNet,U)       Gauss GammaV 0.5;
-    div(phiNet,U)       Gauss upwind;
+    div(phi,U) Gauss GammaVDC 0.5;
 }
 
 laplacianSchemes
 {
-    default                 none;
-    laplacian(mu,U)         Gauss linear limited 0.5;
-    laplacian(mu,U_0)       Gauss linear limited 0.5;
-    laplacian((1|A(U)),p)     Gauss linear limited 0.5;
-
-    laplacian(nu,U)         Gauss linear limited 0.5;
+    default none;
+    laplacian(mu,U) Gauss linear corrected;
+    laplacian((1|A(U)),p) Gauss linear corrected;
 }
 
 interpolationSchemes
 {
-    default             linear;
-    interpolate(HbyA)   linear;
+    default linear;
+    interpolate(HbyA) linear;
 }
 
 snGradSchemes
 {
-    default         limited 0.5;
+    default corrected;
 }
 
 fluxRequired

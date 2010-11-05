@@ -1,0 +1,62 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+applicationClass    bubbleInterTrackFoam;
+
+startFrom           startTime;
+
+startTime           0;
+
+stopAt              endTime;
+
+endTime             0.3;
+
+deltaT              1e-5;
+
+writeControl        runTime;
+
+writeInterval       0.001;
+
+cycleWrite          0;
+
+writeFormat         binary;
+
+writeCompression    compressed;
+
+timeFormat          general;
+
+timePrecision       6;
+
+runTimeModifiable   yes;
+
+functions 
+(
+    history
+    {
+        type bubbleHistory;
+        functionObjectLibs
+        (
+            "libbubbleHistory.so"
+        );
+    }
+);
+
+
+
+// ************************************************************************* //
+
+

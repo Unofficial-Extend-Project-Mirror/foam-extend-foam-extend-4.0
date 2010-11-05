@@ -1,11 +1,10 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.0                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
     version         2.0;
@@ -16,28 +15,31 @@ FoamFile
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-twoFluids               no;
+twoFluids no;
 
-normalMotionDir         no;
+normalMotionDir no;
 
-freeSurfaceSmoothing    no;
+motionDir (0 1 0);
 
-cleanInterface          yes;
+cleanInterface yes;
 
-muFluidA                muFluidA    [ 1 -1 -1 0 0 0 0 ]     0;
+muFluidA muFluidA [ 1 -1 -1 0 0 0 0 ] 1e-3;
 
-muFluidB                muFluidB    [ 1 -1 -1 0 0 0 0 ]     1.5e-5;
+muFluidB muFluidB [ 1 -1 -1 0 0 0 0 ] 1.5e-5;
 
-rhoFluidA               rhoFluidA   [ 1 -3  0 0 0 0 0 ]     1000.0;
+rhoFluidA rhoFluidA [ 1 -3  0 0 0 0 0 ] 1000.0;
 
-rhoFluidB               rhoFluidB   [ 1 -3  0 0 0 0 0 ]     1.0;
+rhoFluidB rhoFluidB [ 1 -3  0 0 0 0 0 ] 1.0;
 
-surfaceTension          surfaceTension [ 1 -2 0 0 0 0 0 ] 0.0;
+surfaceTension surfaceTension [ 1 -2 0 0 0 0 0 ] 0.0;
 
-g                       g [ 0 1 -2 0 0 0 0 ] (0 -9.81 0);
+g g [ 0 1 -2 0 0 0 0 ] (0 -9.81 0);
 
-fixedFreeSurfacePatches 1 ( inlet );
+fixedFreeSurfacePatches 1( inlet );
 
+pointNormalsCorrectionPatches 0();
+
+nFreeSurfaceCorrectors 1;
 
 surfactantProperties
 {

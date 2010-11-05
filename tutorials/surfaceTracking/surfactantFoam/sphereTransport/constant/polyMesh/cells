@@ -1,34 +1,19 @@
-// The FOAM Project // File: cells
-/*
--------------------------------------------------------------------------------
- =========         | cellList
- \\      /         | 
-  \\    /          | Name:   cells
-   \\  /           | Family: Data file
-    \\/            | 
-    F ield         | FOAM version: 2.2
-    O peration     | Product of Nabla Ltd.
-    A and          | 
-    M anipulation  | Email: Enquiries@Nabla.co.uk
--------------------------------------------------------------------------------
-*/
-
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version 2.0;
-    format ascii;
-
-    root ".";
-    case "sphereDense";
-    instance "constant";
-    local "polyMesh";
-
-    class cellList;
-    object cells;
+    version     2.0;
+    format      ascii;
+    class       cellList;
+    location    "constant/polyMesh";
+    object      cells;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 1600
 (

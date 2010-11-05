@@ -1,60 +1,45 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version     2.0;
-    format      ascii;
-    class       dictionary;
-    object      fvSolution;
+    version         2.0;
+    format          ascii;
+    class           dictionary;
+    location        "system";
+    object          fvSolution;
 }
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 solvers
 {
-    p CG
+    p
     {
-        preconditioner
-        {
-            preconditioner Cholesky;
-        }
-
-        tolerance        1e-08;
-        relTol           0;
-    };
-
-    U BiCGStab
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-07;
+        relTol          0;
+    }
+    
+    U
     {
-        preconditioner
-        {
-            preconditioner Cholesky;
-        }
-
-        tolerance        1e-09;
-        relTol           0;
-    };
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-06;
+        relTol          0;
+    }
 }
 
-SIMPLE
+PISO
 {
-    nTimeCorrectors             30;
-    nNonOrthogonalCorrectors    0;
-
-    pRefCell        100;
-    pRefValue       0;
+    nOuterCorrectors            5;
+    nCorrectors                 2;
+    nNonOrthogonalCorrectors    1;
 }
-
-}
-
-relaxationFactors
-{
-    p               0.7;
-    U               0.7;
-}
-
 
 // ************************************************************************* //

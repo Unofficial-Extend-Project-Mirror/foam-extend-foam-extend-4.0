@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -15,43 +15,37 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-6
+5
 (
-    maxX
+    freeSurface
     {
         type            wall;
-        nFaces          1200;
-        startFace       210000;
+        nFaces          50;
+        startFace       940;
     }
-    minZ
+    inlet
     {
         type            wall;
-        nFaces          3600;
-        startFace       211200;
+        nFaces          10;
+        startFace       990;
     }
-    maxZ
+    outlet
     {
         type            wall;
-        nFaces          3600;
-        startFace       214800;
+        nFaces          10;
+        startFace       1000;
     }
-    minX
+    walls
     {
         type            wall;
-        nFaces          1200;
-        startFace       218400;
+        nFaces          50;
+        startFace       1010;
     }
-    minY
+    frontAndBack
     {
-        type            wall;
-        nFaces          1200;
-        startFace       219600;
-    }
-    maxY
-    {
-        type            wall;
-        nFaces          1200;
-        startFace       220800;
+        type            empty;
+        nFaces          1000;
+        startFace       1060;
     }
 )
 
