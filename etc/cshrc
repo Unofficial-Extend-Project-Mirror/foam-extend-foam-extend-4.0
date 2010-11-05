@@ -73,7 +73,7 @@ setenv WM_PROJECT_USER_DIR $HOME/$WM_PROJECT/$LOGNAME-$WM_PROJECT_VERSION
 setenv WM_THIRD_PARTY_DIR $WM_PROJECT_INST_DIR/ThirdParty-$WM_PROJECT_VERSION
 
 # Source files, possibly with some verbosity
-alias _foamSource 'if ($?FOAM_VERBOSE && $?prompt) echo "Sourcing: \!*"; source
+alias _foamSource 'if ($?FOAM_VERBOSE && $?prompt) echo "Sourcing: \!*"; source \!*'
 
 # Add in preset user or site preferences:
 set foamPrefs=`$WM_PROJECT_DIR/bin/foamEtcFile prefs.csh`
