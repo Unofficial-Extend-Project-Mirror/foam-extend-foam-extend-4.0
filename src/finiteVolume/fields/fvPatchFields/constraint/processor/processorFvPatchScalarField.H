@@ -28,6 +28,7 @@ License
 #define processorFvPatchScalarField_H
 
 #include "processorFvPatchField.H"
+#include "scalarCoeffField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,6 +60,27 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
     const Pstream::commsTypes commsType
 ) const;
 
+
+template<>
+void processorFvPatchField<scalar>::initInterfaceMatrixUpdate
+(
+    const scalarField& psiInternal,
+    scalarField&,
+    const BlockLduMatrix<scalar>&,
+    const CoeffField<scalar>&,
+    const Pstream::commsTypes commsType
+) const;
+
+
+template<>
+void processorFvPatchField<scalar>::updateInterfaceMatrix
+(
+    const scalarField&,
+    scalarField& result,
+    const BlockLduMatrix<scalar>&,
+    const CoeffField<scalar>& coeffs,
+    const Pstream::commsTypes commsType
+) const;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

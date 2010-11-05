@@ -578,4 +578,55 @@ $(writers)/gnuplotGraph/gnuplotGraph.C
 $(writers)/xmgrGraph/xmgrGraph.C
 $(writers)/jplotGraph/jplotGraph.C
 
+//- Block Matrix Additions
+//- I. Clifford 03-12-2009
+primitives/BlockCoeff/blockCoeffBase.C
+primitives/BlockCoeff/scalarBlockCoeff.C
+primitives/BlockCoeff/sphericalTensorBlockCoeff.C
+primitives/BlockCoeff/symmTensorBlockCoeff.C
+primitives/BlockCoeff/tensorBlockCoeff.C
+
+fields/expandContract/expandTensorField.C
+
+fields/CoeffField/scalarCoeffField.C
+// fields/CoeffField/sphericalTensorCoeffField.C
+// fields/CoeffField/symmTensorCoeffField.C
+fields/CoeffField/tensorCoeffField.C
+
+matrices/blockLduMatrix/BlockLduMatrix/blockLduMatrices.C
+matrices/blockLduMatrix/BlockLduMatrix/scalarBlockLduMatrix.C
+// matrices/blockLduMatrix/BlockLduMatrix/sphericalTensorBlockLduMatrix.C
+// matrices/blockLduMatrix/BlockLduMatrix/symmTensorBlockLduMatrix.C
+matrices/blockLduMatrix/BlockLduMatrix/tensorBlockLduMatrix.C
+matrices/blockLduMatrix/BlockLduMatrix/BlockConstraint/scalarBlockConstraint.C
+
+matrices/blockLduMatrix/BlockLduPrecons/BlockLduPrecon/blockLduPrecons.C
+matrices/blockLduMatrix/BlockLduPrecons/BlockNoPrecon/blockNoPrecons.C
+
+matrices/blockLduMatrix/BlockLduPrecons/BlockDiagonalPrecon/scalarBlockDiagonalPrecon.C
+matrices/blockLduMatrix/BlockLduPrecons/BlockDiagonalPrecon/tensorBlockDiagonalPrecon.C
+matrices/blockLduMatrix/BlockLduPrecons/BlockDiagonalPrecon/blockDiagonalPrecons.C
+
+matrices/blockLduMatrix/BlockLduPrecons/BlockGaussSeidelPrecon/scalarBlockGaussSeidelPrecon.C
+matrices/blockLduMatrix/BlockLduPrecons/BlockGaussSeidelPrecon/tensorBlockGaussSeidelPrecon.C
+matrices/blockLduMatrix/BlockLduPrecons/BlockGaussSeidelPrecon/blockGaussSeidelPrecons.C
+
+matrices/blockLduMatrix/BlockLduPrecons/BlockCholeskyPrecon/scalarBlockCholeskyPrecon.C
+matrices/blockLduMatrix/BlockLduPrecons/BlockCholeskyPrecon/tensorBlockCholeskyPrecon.C
+matrices/blockLduMatrix/BlockLduPrecons/BlockCholeskyPrecon/blockCholeskyPrecons.C
+
+matrices/blockLduMatrix/BlockLduSmoothers/BlockLduSmoother/blockLduSmoothers.C
+// matrices/blockLduMatrix/BlockLduSmoothers/BlockGaussSeidelSmoother/blockGaussSeidelSmoothers.C
+matrices/blockLduMatrix/BlockLduSmoothers/BlockILUSmoother/blockILUSmoothers.C
+
+matrices/blockLduMatrix/BlockLduSolvers/BlockLduSolver/blockLduSolvers.C
+matrices/blockLduMatrix/BlockLduSolvers/BlockDiagonal/blockDiagonalSolvers.C
+// matrices/blockLduMatrix/BlockLduSolvers/Segregated/segregatedSolvers.C
+matrices/blockLduMatrix/BlockLduSolvers/BlockGaussSeidel/blockGaussSeidelSolvers.C
+matrices/blockLduMatrix/BlockLduSolvers/BlockCG/blockCGSolvers.C
+matrices/blockLduMatrix/BlockLduSolvers/BlockBiCGStab/blockBiCGStabSolvers.C
+matrices/blockLduMatrix/BlockLduSolvers/BlockGMRES/blockGMRESSolvers.C
+
+matrices/blockLduMatrix/BlockLduMatrix/BlockLduInterface/BlockLduInterfaceFields.C
+
 LIB = $(FOAM_LIBBIN)/libOpenFOAM

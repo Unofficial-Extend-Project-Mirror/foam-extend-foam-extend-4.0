@@ -194,6 +194,32 @@ public:
                 const Pstream::commsTypes commsType
             ) const;
 
+        // Block coupled interface functionality
+
+            //- Initialise neighbour matrix update
+            virtual void initInterfaceMatrixUpdate
+            (
+                const Field<Type>&,
+                Field<Type>&,
+                const BlockLduMatrix<Type>&,
+                const CoeffField<Type>&,
+                const Pstream::commsTypes commsType
+            ) const
+            {}
+
+            //- Update result field based on interface functionality
+            virtual void updateInterfaceMatrix
+            (
+                const Field<Type>&,
+                Field<Type>&,
+                const BlockLduMatrix<Type>&,
+                const CoeffField<Type>&,
+                const Pstream::commsTypes commsType
+            ) const
+            {
+                notImplemented("processorFvPatchField<Type>::updateInterfaceMatrix for block matrices")
+            }
+            
         //- Processor coupled interface functions
 
             //- Return processor number

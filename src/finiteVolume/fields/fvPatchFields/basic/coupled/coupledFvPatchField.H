@@ -36,7 +36,8 @@ SourceFiles
 #ifndef coupledFvPatchField_H
 #define coupledFvPatchField_H
 
-#include "lduInterfaceField.H"
+#include "BlockLduInterfaceField.H"
+#include "CoeffField.H"
 #include "fvPatchField.H"
 #include "coupledFvPatch.H"
 
@@ -52,7 +53,7 @@ namespace Foam
 template<class Type>
 class coupledFvPatchField
 :
-    public lduInterfaceField,
+    public BlockLduInterfaceField<Type>,
     public fvPatchField<Type>
 {
 
@@ -188,6 +189,32 @@ public:
                 const Pstream::commsTypes commsType
             ) const = 0;
 
+        // Block coupled interface functionality
+
+            //- Initialise neighbour matrix update
+            virtual void initInterfaceMatrixUpdate
+            (
+                const Field<Type>&,
+                Field<Type>&,
+                const BlockLduMatrix<Type>&,
+                const CoeffField<Type>&,
+                const Pstream::commsTypes commsType
+            ) const
+            {}
+
+            //- Update result field based on interface functionality
+            virtual void updateInterfaceMatrix
+            (
+                const Field<Type>&,
+                Field<Type>&,
+                const BlockLduMatrix<Type>&,
+                const CoeffField<Type>&,
+                const Pstream::commsTypes commsType
+            ) const
+            {
+                notImplemented("coupledFvPatchField<Type>::updateInterfaceMatrix for block matrices")
+            }
+            
         //- Write
         virtual void write(Ostream&) const;
 };

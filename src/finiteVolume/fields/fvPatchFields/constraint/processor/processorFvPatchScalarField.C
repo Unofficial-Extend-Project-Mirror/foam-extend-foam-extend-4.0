@@ -77,6 +77,48 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
 }
 
 
+template<>
+void processorFvPatchField<scalar>::initInterfaceMatrixUpdate
+(
+    const scalarField& psiInternal,
+    scalarField&,
+    const BlockLduMatrix<scalar>&,
+    const CoeffField<scalar>&,
+    const Pstream::commsTypes commsType
+) const
+{
+    procPatch_.compressedSend
+    (
+        commsType,
+        patch().patchInternalField(psiInternal)()
+    );
+}
+
+
+template<>
+void processorFvPatchField<scalar>::updateInterfaceMatrix
+(
+    const scalarField&,
+    scalarField& result,
+    const BlockLduMatrix<scalar>&,
+    const CoeffField<scalar>& coeffs,
+    const Pstream::commsTypes commsType
+) const
+{  
+    scalarField pnf
+    (
+        procPatch_.compressedReceive<scalar>(commsType, this->size())()
+    );
+
+    const unallocLabelList& faceCells = patch().faceCells();
+    const scalarField& scalarCoeffs = coeffs.asScalar();
+    
+    forAll(faceCells, facei)
+    {
+        result[faceCells[facei]] -= scalarCoeffs[facei]*pnf[facei];
+    }
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
