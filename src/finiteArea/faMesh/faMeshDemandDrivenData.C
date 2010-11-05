@@ -1029,7 +1029,6 @@ void faMesh::calcPointAreaNormals() const
 
     vectorField& result = *pointAreaNormalsPtr_;
 
-
     labelList intPoints = internalPoints();
     labelList bndPoints = boundaryPoints();
 
