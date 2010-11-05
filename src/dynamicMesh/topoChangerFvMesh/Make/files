@@ -5,5 +5,7 @@ attachDetachFvMesh/attachDetachFvMesh.C
 linearValveLayersFvMesh/linearValveLayersFvMesh.C
 movingConeTopoFvMesh/movingConeTopoFvMesh.C
 mixerFvMesh/mixerFvMesh.C
+multiMixerFvMesh/mixerRotor.C
+multiMixerFvMesh/multiMixerFvMesh.C
 
 LIB = $(FOAM_LIBBIN)/libtopoChangerFvMesh
