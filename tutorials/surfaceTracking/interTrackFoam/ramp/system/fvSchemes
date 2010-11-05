@@ -30,6 +30,7 @@ gradSchemes
 divSchemes
 {
     div(phi,U) Gauss GammaVDC 0.5;
+    div(phiNet,U) Gauss GammaVDC 0.5;
 }
 
 laplacianSchemes

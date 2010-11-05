@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4.2                                 |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,48 +10,46 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volVectorField;
+    location    "0";
     object      U;
-    location    "0.003";
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 1 -1 0 0 0 0];
+dimensions      [ 0 1 -1 0 0 0 0 ];
 
-internalField   uniform (0.01 0 0);
+internalField   uniform ( 0.01 0 0 );
 
 boundaryField
 {
     minX
     {
         type            fixedValue;
-        value           uniform (0.01 0 0);
+        value           uniform ( 0.01 0 0 );
     }
     maxX
     {
         type            inletOutlet;
-        inletValue      uniform (0 0 0);
+        inletValue      uniform ( 0 0 0 );
     }
-
     minY
     {
         type            fixedValue;
-        value           uniform (0 0 0);
+        value           uniform ( 0 0 0 );
     }
     maxY
     {
         type            fixedValue;
-        value           uniform (0 0 0);
+        value           uniform ( 0 0 0 );
     }
-
     minZ
     {
         type            fixedValue;
-        value           uniform (0 0 0);
+        value           uniform ( 0 0 0 );
     }
     maxZ
     {
         type            fixedValue;
-        value           uniform (0 0 0);
+        value           uniform ( 0 0 0 );
     }
 }
 

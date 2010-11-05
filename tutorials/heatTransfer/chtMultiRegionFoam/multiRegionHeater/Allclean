@@ -5,9 +5,10 @@
 
 cleanCase
 
+rm 0/cellToRegion 
+
 if [ -d "VTK" ]
 then
     rm -r VTK
 fi
-
 

@@ -35,11 +35,16 @@ solvers
     }
 }
 
-PISO
+SIMPLE
 {
-    nOuterCorrectors            5;
-    nCorrectors                 2;
+    nTimeCorrectors             5;
     nNonOrthogonalCorrectors    1;
+}
+
+relaxationFactors
+{
+    p          0.7;
+    U          0.7;
 }
 
 // ************************************************************************* //

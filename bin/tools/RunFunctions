@@ -36,26 +36,47 @@ getApplication ()
 
 runApplication ()
 {
+    LOG_NAME=
+    while getopts "l:" OPTFLAG ; do
+        LOG_NAME=$OPTARG
+        shift $((OPTIND-1)) ; OPTIND=1
+    done
+        
     APP_RUN=$1; shift
     APP_NAME=${APP_RUN##*/}
 
-    if [ -f log.$APP_NAME ] ; then
+    if [ -z $LOG_NAME ] ; then
+        LOG_NAME=log.$APP_NAME
+    fi
+
+    if [ -f $LOG_NAME ] ; then
         echo "$APP_NAME already run on $PWD: remove log file to run"
     else
-        echo "Running $APP_RUN on $PWD"
-        $APP_RUN $* > log.$APP_NAME 2>&1
+        echo "Running $APP_NAME on $PWD"
+        $APP_RUN $* > $LOG_NAME 2>&1
     fi
 }
 
 runParallel ()
 {
+    LOG_NAME=
+    while getopts "l:" OPTFLAG ; do
+        LOG_NAME=$OPTARG
+        shift $((OPTIND-1)) ; OPTIND=1
+    done
+    
     APP_RUN=$1; shift
+    APP_NAME=${APP_RUN##*/}
 
-    if [ -f $log.$APP_RUN ] ; then
-        echo "$APP_RUN already run on $PWD: remove log file to run"
+    if [ -z $LOG_NAME ] ; then
+        LOG_NAME=log.$APP_NAME
+    fi
+
+    if [ -f $LOG_NAME ] ; then
+        echo "$APP_NAME already run on $PWD: remove log file to run"
     else
-        echo "Running $APP_RUN in parallel on $PWD using $1 processes"
-        ( mpirun -np $1 $APP_RUN -parallel < /dev/null > log.$APP_RUN 2>&1 )
+        echo "Running $APP_NAME in parallel on $PWD using $1 processes"
+        ( mpirun -np $1 $APP_RUN -parallel < /dev/null > $LOG_NAME 2>&1 )
     fi
 }
 

@@ -5,7 +5,7 @@
 application="icoDyMFoam"
 
 runApplication blockMesh
-cp constant/polyMesh/boundary.orig constant/polyMesh/boundary
+cp constant/polyMesh/boundary.org constant/polyMesh/boundary
 runApplication regionCellSets
 runApplication setsToZones -noFlipMap
 runApplication $application

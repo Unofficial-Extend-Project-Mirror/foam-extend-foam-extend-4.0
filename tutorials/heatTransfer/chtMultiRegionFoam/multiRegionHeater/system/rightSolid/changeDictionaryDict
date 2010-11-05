@@ -1,19 +1,18 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "/home/warhol/chris/foam/chris2.1/run/tutorials/interFoam";
-    case            "damBreak";
-    instance        "system";
-    local           "";
-
-    class           dictionary;
-    object          changePatchTypeDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      changePatchTypeDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 dictionaryReplacement
 {
@@ -98,7 +97,6 @@ dictionaryReplacement
         }
     }
 
-
     K
     {
         internalField   uniform 80;
@@ -131,7 +129,6 @@ dictionaryReplacement
             }
         }
     }
-
 
     cp
     {

@@ -16,38 +16,44 @@ FoamFile
 
 solvers
 {
-    pd PCG
+    p
     {
+        solver           PCG;
         preconditioner   DIC;
         tolerance        1e-08;
         relTol           0;
     };
-    U PBiCG
+    U
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
     };
-    h PBiCG
+    h
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
     };
-    k PBiCG
+    k
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
     };
-    epsilon PBiCG
+    epsilon
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
     };
-    R PBiCG
+    R
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
@@ -57,14 +63,14 @@ solvers
 SIMPLE
 {
     nNonOrthogonalCorrectors 0;
-    pdRefCell        0;
-    pdRefValue       0;
+    pRefCell         0;
+    pRefValue        0;
 }
 
 relaxationFactors
 {
     rho             1.0;
-    pd              0.3;
+    p               0.3;
     U               0.7;
     h               0.7;
     k               0.7;

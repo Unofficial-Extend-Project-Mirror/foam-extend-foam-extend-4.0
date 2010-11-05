@@ -35,10 +35,9 @@ solvers
     }
 }
 
-PISO
+SIMPLE
 {
-    nOuterCorrectors            5;
-    nCorrectors                 2;
+    nTimeCorrectors             5;
     nNonOrthogonalCorrectors    1;
     ddtPhiCorr no;
 }

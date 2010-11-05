@@ -30,6 +30,7 @@ gradSchemes
 divSchemes
 {
     div(phi,U) Gauss linear;
+    div(phiNet,U) Gauss linear;
 }
 
 laplacianSchemes

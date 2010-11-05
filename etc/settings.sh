@@ -47,7 +47,7 @@ _foamAddLib()
     while [ $# -ge 1 ]
     do
         export LD_LIBRARY_PATH=$1:$LD_LIBRARY_PATH
-	if [ "$WM_ARCH" == "darwinIntel" ]
+	if [ "$WM_ARCH_BASE" == "darwin" ]	    
 	then
 	    export DYLD_LIBRARY_PATH=$1:$DYLD_LIBRARY_PATH
 	fi
@@ -172,24 +172,15 @@ unset MPI_ARCH_PATH
 
 case "$WM_MPLIB" in
 OPENMPI)
-    if [ "$WM_ARCH" == "darwinIntel" ]
-	then
-	mpi_version=openmpi-system
-	export MPI_HOME=/usr
-	export MPI_ARCH_PATH=/usr
+    mpi_version=openmpi-1.4.1
+    export MPI_HOME=$WM_THIRD_PARTY_DIR/$mpi_version
+    export MPI_ARCH_PATH=$MPI_HOME/platforms/$WM_OPTIONS
 
-	unset OPAL_PREFIX
-    else
-	mpi_version=openmpi-1.4.1
-        export MPI_HOME=$WM_THIRD_PARTY_DIR/$mpi_version
-        export MPI_ARCH_PATH=$MPI_HOME/platforms/$WM_OPTIONS
+    # Tell OpenMPI where to find its install directory
+    export OPAL_PREFIX=$MPI_ARCH_PATH
 
-        # Tell OpenMPI where to find its install directory
-        export OPAL_PREFIX=$MPI_ARCH_PATH
-
-        _foamAddPath $MPI_ARCH_PATH/bin
-        _foamAddLib  $MPI_ARCH_PATH/lib
-    fi
+    _foamAddPath $MPI_ARCH_PATH/bin
+    _foamAddLib  $MPI_ARCH_PATH/lib
 
     export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
     unset mpi_version
@@ -198,9 +189,12 @@ OPENMPI)
 SYSTEMOPENMPI)
     mpi_version=openmpi-system
 
+    # make sure not the "old" mpi is used 
+    export OPAL_PREFIX=
+
     # Set compilation flags here instead of in wmake/rules/../mplibSYSTEMOPENMPI
     export PINC=`mpicc --showme:compile` 
-    export PLIBS=`mpicc --showme:link`
+    export PLIBS="`mpicc --showme:link`"
     libDir=`echo "$PLIBS" | sed -e 's/.*-L\([^ ]*\).*/\1/'`
 
     if [ "$FOAM_VERBOSE" -a "$PS1" ]

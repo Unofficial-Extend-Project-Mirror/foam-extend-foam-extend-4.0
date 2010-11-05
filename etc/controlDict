@@ -18,6 +18,7 @@ FoamFile
 
 Documentation
 {
+    // for Macs:    docBrowser      "open %f";
     docBrowser      "kde-open %f";
     doxyDocDirs
     (

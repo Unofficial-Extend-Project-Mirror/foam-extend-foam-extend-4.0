@@ -373,7 +373,7 @@
 #define SYSV
 #endif
 
-#if defined DECX || defined LINUX || defined IBMRS6000X || defined COMPAQX || defined DARWIN
+#if defined DECX || defined LINUX || defined IBMRS6000X || defined COMPAQX || defined DARWIN || defined darwin
 #define UNIXX
 #endif
 
@@ -524,7 +524,11 @@
 #    if XmVERSION == 1 && XmREVISION == 0
 #    endif
 #  else
-#    include <X11/Intrinsic.h>
+#    ifndef darwin
+#      include <X11/Intrinsic.h>
+#    else
+       typedef void *Widget;
+#    endif
 #  endif
 #endif
 
