@@ -46,7 +46,7 @@ SourceFiles
 #include "HashSet.H"
 
 // Have gcc ignore certain warnings while including mesquite headers
-#pragma GCC diagnostic ignored "-Wold-style-cast"
+//HJ #pragma GCC diagnostic ignored "-Wold-style-cast"
 
 #include "Mesquite_all_headers.hpp"
 
