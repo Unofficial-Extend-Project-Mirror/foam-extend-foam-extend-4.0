@@ -79,7 +79,10 @@ public:
         inline VectorN();
 
         //- Construct given VectorSpace
-        inline VectorN(const VectorSpace<VectorN<Cmpt, length>, Cmpt, length>&);
+        inline VectorN
+        (
+            const VectorSpace<VectorN<Cmpt, length>, Cmpt, length>&
+        );
 
         //- Construct given component value.  Special use only!
         explicit inline VectorN(const Cmpt& vx);
@@ -97,8 +100,10 @@ public:
         inline Cmpt& operator()(const direction i);
 
         //- Componentwise multiply
-        inline VectorN<Cmpt, length> cmptMultiply(const VectorN<Cmpt, length>&);
-
+        inline VectorN<Cmpt, length> cmptMultiply
+        (
+            const VectorN<Cmpt, length>&
+        );
 };
 
 

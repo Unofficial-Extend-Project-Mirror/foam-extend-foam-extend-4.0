@@ -4,5 +4,4 @@ blockVector2Solvers.C
 
 blockCoupledScalarTransportFoam.C
 
-
 EXE = $(FOAM_APPBIN)/blockCoupledScalarTransportFoam

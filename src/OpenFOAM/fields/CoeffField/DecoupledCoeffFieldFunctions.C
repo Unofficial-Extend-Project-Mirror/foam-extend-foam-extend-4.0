@@ -313,7 +313,7 @@ Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
     BINARY_OPERATOR_TRF(Type1, Type2, op, opFunc)                             \
     BINARY_OPERATOR_TRT(Type1, Type2, op, opFunc)
 
-BINARY_OPERATOR_R(Type, Type, *, multiply)
+// BINARY_OPERATOR_R(Type, Type, *, multiply)
 
 #undef BINARY_OPERATOR_R
 #undef BINARY_OPERATOR_FF

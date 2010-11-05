@@ -327,7 +327,9 @@ Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
     BINARY_OPERATOR_TRF(Type1, Type2, op, opFunc)                             \
     BINARY_OPERATOR_TRT(Type1, Type2, op, opFunc)
 
-BINARY_OPERATOR_R(Type, Type, *, multiply)
+// Operator multiply is not available for all types, as it expands rank
+// HJ, 17/Jun/2010
+// BINARY_OPERATOR_R(Type, Type, *, multiply)
 
 #undef BINARY_OPERATOR_R
 #undef BINARY_OPERATOR_FF
