@@ -33,7 +33,7 @@ Author
     University of Massachusetts Amherst
     All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "dynamicTopoFvMesh.H"
 #include "addToRunTimeSelectionTable.H"
@@ -1519,12 +1519,15 @@ void dynamicTopoFvMesh::initializeThreadingEnvironment
 
             if (threadI == 0)
             {
-                handlerPtr_[0].setID(-1);
+                // HJ, bug fix - please review: negative number not allowed
+                // HJ, 6/Nov/2010
+                handlerPtr_[0].setID(0);
+//                 handlerPtr_[0].setID(-1);
                 handlerPtr_[0].setMaster();
             }
             else
             {
-                handlerPtr_[threadI].setID(threader_->getID(threadI-1));
+                handlerPtr_[threadI].setID(threader_->getID(threadI - 1));
                 handlerPtr_[threadI].setSlave();
             }
         }

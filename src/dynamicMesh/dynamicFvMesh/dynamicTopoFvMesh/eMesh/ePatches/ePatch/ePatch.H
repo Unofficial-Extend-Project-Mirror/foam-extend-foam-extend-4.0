@@ -69,13 +69,6 @@ private:
         //- Size of the patch
         label size_;
 
-        // Demand-driven private data
-
-
-    // Private Member Functions
-
-        //- Disallow construct as copy
-        ePatch(const ePatch&);
 
 protected:
 
@@ -170,6 +163,9 @@ public:
             const eBoundaryMesh& bm
         );
 
+        //- Construct as copy
+        ePatch(const ePatch&);
+
         //- Construct as copy, resetting the boundary mesh
         ePatch(const ePatch&, const eBoundaryMesh&);
 
@@ -189,7 +185,7 @@ public:
         );
 
 
-        //- Return a pointer to a new patch created 
+        //- Return a pointer to a new patch created
         // on freestore from dictionary
         static autoPtr<ePatch> New
         (

@@ -42,6 +42,7 @@ defineTypeNameAndDebug(eMesh, 0);
 
 word eMesh::meshSubDir = "eMesh";
 
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 void eMesh::clearGeom() const

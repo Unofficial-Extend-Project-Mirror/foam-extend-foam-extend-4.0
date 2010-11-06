@@ -232,7 +232,7 @@ inline label tetApexPoint
 
         apexPoint = findIsolatedPoint(baseFace, faceToCheck);
 
-        if (foundApex > -1)
+        if (apexPoint > -1)
         {
             foundApex = true;
             break;

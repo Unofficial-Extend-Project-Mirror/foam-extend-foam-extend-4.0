@@ -43,7 +43,8 @@ threadHandler<T>::threadHandler
     threader_(threader),
     argList_(0),
     nThreads_(threader.getNumThreads()),
-    pthreadID_(-1),
+    pthreadID_(0),//HJ, bug fix - please review (-1 not allowed)
+//     pthreadID_(-1),
     master_(false),
     predicate_(false)
 {}
