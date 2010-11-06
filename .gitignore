@@ -38,6 +38,7 @@ lnInclude
 linux*Gcc*/
 linux*Icc*/
 darwin*Gcc*/
+darwin*Intel*/
 linuxming*/
 SiCortex*Gcc*/
 solaris*Gcc*/
