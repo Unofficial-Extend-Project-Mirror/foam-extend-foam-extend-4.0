@@ -125,7 +125,7 @@ Foam::processorGAMGInterface::processorGAMGInterface
             if (!nbrFound)
             {
                 curNbrs.append(curSlave);
-                curFaceFaces.append(ffi);
+                curFaceFaces.append(SLList<label>(ffi));
 
                 // New coarse face created
                 nCoarseFaces++;
@@ -136,7 +136,11 @@ Foam::processorGAMGInterface::processorGAMGInterface
             // This master has got no neighbours yet.  Add a neighbour
             // and a coefficient, thus creating a new face
             neighboursTable.insert(curMaster, SLList<label>(curSlave));
-            faceFaceTable.insert(curMaster, SLList<SLList<label> >(ffi));
+            faceFaceTable.insert
+            (
+                curMaster,
+                SLList<SLList<label> >(SLList<label>(ffi))
+            );
 
             // New coarse face created
             nCoarseFaces++;

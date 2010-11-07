@@ -124,7 +124,7 @@ void starMesh::createCoupleMatches()
                 cellRemovedFaces.insert
                 (
                     fp.masterCell(),
-                    fp.masterFace()
+                    SLList<label>(fp.masterFace())
                 );
             }
             else
@@ -1363,7 +1363,7 @@ void starMesh::createCoupleMatches()
                 cellRemovedFaces.insert
                 (
                     fp.masterCell(),
-                    fp.masterFace()
+                    SLList<label>(fp.masterFace())
                 );
             }
             else
@@ -1379,7 +1379,7 @@ void starMesh::createCoupleMatches()
                 cellRemovedFaces.insert
                 (
                     fp.slaveCell(),
-                    fp.slaveFace()
+                    SLList<label>(fp.slaveFace())
                 );
             }
             else

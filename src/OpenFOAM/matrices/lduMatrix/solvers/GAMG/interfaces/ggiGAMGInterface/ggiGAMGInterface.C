@@ -228,8 +228,8 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
                     if (!nbrFound)
                     {
                         curNbrs.append(curSlave);
-                        curFaceFaces.append(ffI);
-                        curFaceWeights.append(curNW);
+                        curFaceFaces.append(SLList<label>(ffI));
+                        curFaceWeights.append(SLList<scalar>(curNW));
 
                         // New coarse face created
                         nCoarseFaces++;
@@ -245,13 +245,13 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
                     faceFaceTable.insert
                     (
                         curMaster,
-                        SLList<SLList<label> >(ffI)
+                        SLList<SLList<label> >(SLList<label>(ffI))
                     );
 
                     faceFaceWeightsTable.insert
                     (
                         curMaster,
-                        SLList<SLList<scalar> >(curNW)
+                        SLList<SLList<scalar> >(SLList<scalar>(curNW))
                     );
 
                     // New coarse face created
@@ -335,9 +335,9 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
                 if (!nbrFound)
                 {
                     curNbrs.append(curSlave);
-                    curFaceFaces.append(ffi);
+                    curFaceFaces.append(SLList<label>(ffi));
                     // Add dummy weight
-                    curFaceWeights.append(1.0);
+                    curFaceWeights.append(SLList<scalar>(1.0));
 
                     // New coarse face created
                     nCoarseFaces++;
@@ -350,13 +350,17 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
                 // and a coefficient, thus creating a new face
                 neighboursTable.insert(curMaster, SLList<label>(curSlave));
 
-                faceFaceTable.insert(curMaster, SLList<SLList<label> >(ffi));
+                faceFaceTable.insert
+                (
+                    curMaster,
+                    SLList<SLList<label> >(SLList<label>(ffi))
+                );
 
                 // Add dummy weight
                 faceFaceWeightsTable.insert
                 (
                     curMaster,
-                    SLList<SLList<scalar> >(1.0)
+                    SLList<SLList<scalar> >(SLList<scalar>(1.0))
                 );
 
                 // New coarse face created

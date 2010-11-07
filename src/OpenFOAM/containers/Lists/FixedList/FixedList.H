@@ -91,6 +91,7 @@ public:
     class Hash
     {
     public:
+
         Hash()
         {}
 
@@ -116,7 +117,7 @@ public:
         inline FixedList(const T v[Size]);
 
         //- Construct from value
-        inline FixedList(const T&);
+        explicit inline FixedList(const T&);
 
         //- Construct from UList.
         inline FixedList(const UList<T>&);

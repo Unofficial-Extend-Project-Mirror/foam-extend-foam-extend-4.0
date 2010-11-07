@@ -60,7 +60,7 @@ public:
         {}
 
         //- Construct given initial T
-        SLList(T a)
+        explicit SLList(T a)
         :
             LList<SLListBase, T>(a)
         {}

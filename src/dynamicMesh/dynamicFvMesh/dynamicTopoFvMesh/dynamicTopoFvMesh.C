@@ -1519,10 +1519,6 @@ void dynamicTopoFvMesh::initializeThreadingEnvironment
 
             if (threadI == 0)
             {
-                // HJ, bug fix - please review: negative number not allowed
-                // HJ, 6/Nov/2010
-                handlerPtr_[0].setID(0);
-//                 handlerPtr_[0].setID(-1);
                 handlerPtr_[0].setMaster();
             }
             else

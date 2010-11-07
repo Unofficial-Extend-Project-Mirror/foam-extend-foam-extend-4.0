@@ -88,7 +88,7 @@ inline Foam::FixedList<T, Size>::FixedList(const SLList<T>& lst)
 template<class T, unsigned Size>
 inline Foam::FixedList<T, Size>::FixedList(const FixedList<T, Size>& lst)
 {
-    for (register unsigned i=0; i<Size; i++)
+    for (register unsigned i = 0; i < Size; i++)
     {
         v_[i] = lst[i];
     }
