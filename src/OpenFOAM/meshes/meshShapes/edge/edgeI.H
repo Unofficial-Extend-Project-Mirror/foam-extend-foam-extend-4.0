@@ -28,7 +28,6 @@ License
 
 // * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
 
-
 // return
 //  -  0: different
 //  - +1: identical
@@ -53,6 +52,10 @@ inline int Foam::edge::compare(const edge& a, const edge& b)
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 inline Foam::edge::edge()
+{}
+
+
+inline Foam::edge::edge(const label)
 {}
 
 

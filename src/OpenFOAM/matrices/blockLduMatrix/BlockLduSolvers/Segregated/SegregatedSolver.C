@@ -38,7 +38,7 @@ Foam::SegregatedSolver<Type>::SegregatedSolver
 (
     const word& fieldName,
     const BlockLduMatrix<Type>& matrix,
-    const FieldField<CoeffField, Type>& boundaryCoeffs,,
+    const FieldField<CoeffField, Type>& boundaryCoeffs,
     const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
     const dictionary& dict
 )
@@ -181,8 +181,8 @@ Foam::BlockSolverPerformance<Type> Foam::SegregatedSolver<Type>::solve
             (
                 this->fieldName(),
                 scalarMatrix_,
-                BlockLduSolver<Type>::boundaryCoeffs,
-                BlockLduSolver<Type>::interfaces_,
+                boundaryCoeffs,
+                interfaces_,
                 this->dict()
             )->solve(scalarX_, scalarB_);
 

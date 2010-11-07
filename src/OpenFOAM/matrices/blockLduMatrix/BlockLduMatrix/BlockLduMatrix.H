@@ -88,6 +88,7 @@ public:
         typedef Field<Type> TypeField;
         typedef BlockConstraint<Type> ConstraintType;
 
+
 private:
 
     // Private data
@@ -148,15 +149,16 @@ private:
             void decoupledMultEqOp(const scalarField& sf);
 
             //- Matrix multiplication without coupled interface update,
-            //  decoupled version
+            //  Decoupled version
             void decoupledAmulCore
             (
                 TypeField& Ax,
                 const TypeField& x
             ) const;
 
-            //- Matrix transpose multiplication without coupled interface update
-            //  decoupled version
+            //- Matrix transpose multiplication without coupled
+            //  interface update
+            //  Decoupled version
             void decoupledTmulCore
             (
                 TypeField& Tx,
@@ -164,11 +166,11 @@ private:
             ) const;
 
             //- Return L-U vector-matrix multiplication in row-form,
-            //  decoupled version
+            //  Decoupled version
             tmp<TypeField> decoupledH(const TypeField& x) const;
 
             //- Return L-U  vector-matrix multiplication in off-diagonal form,
-            //  decoupled version
+            //  Decoupled version
             tmp<TypeField> decoupledFaceH(const TypeField& x) const;
 
 
@@ -318,8 +320,9 @@ public:
             (
                 TypeField& Ax,
                 const TypeField& x,
-				const FieldField<CoeffField, Type>& boundaryCoeffs,
-                const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces
+                const FieldField<CoeffField, Type>& boundaryCoeffs,
+                const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
+                    interfaces
             ) const;
 
             //- Matrix multiplication without coupled interface update
@@ -334,11 +337,13 @@ public:
             (
                 TypeField& Ax,
                 const TypeField& x,
-				const FieldField<CoeffField, Type>& boundaryCoeffs,
-                const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces
+                const FieldField<CoeffField, Type>& boundaryCoeffs,
+                const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
+                    interfaces
             ) const;
 
-            //- Matrix transpose multiplication without coupled interface update
+            //- Matrix transpose multiplication without coupled
+           //  interface update
             void TmulCore
             (
                 TypeField& Ax,

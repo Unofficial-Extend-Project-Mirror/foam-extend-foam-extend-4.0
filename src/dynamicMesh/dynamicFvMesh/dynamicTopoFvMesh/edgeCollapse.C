@@ -307,7 +307,7 @@ const changeMap dynamicTopoFvMesh::collapseQuadFace
 
     // Configure the new point-positions
     FixedList<bool, 2> check(false);
-    FixedList<FixedList<label, 2>, 2> checkPoints(-1);
+    FixedList<FixedList<label, 2>, 2> checkPoints(FixedList<label, 2>(-1));
     FixedList<point, 2> newPoint(vector::zero);
     FixedList<point, 2> oldPoint(vector::zero);
 

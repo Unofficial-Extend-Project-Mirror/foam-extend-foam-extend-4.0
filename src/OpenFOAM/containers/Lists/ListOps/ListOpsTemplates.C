@@ -644,6 +644,7 @@ Foam::List<Container> Foam::initListList(const T elems[nRows][nColumns])
     List<Container> lst(nRows);
 
     Container cols(nColumns);
+
     forAll(lst, rowI)
     {
         forAll(cols, colI)

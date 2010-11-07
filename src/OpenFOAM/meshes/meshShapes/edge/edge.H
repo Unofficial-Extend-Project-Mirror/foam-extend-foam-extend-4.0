@@ -74,6 +74,11 @@ public:
         //- Null constructor for lists
         inline edge();
 
+        //- Constructor given size
+        //  Nasty hack for consistency in creation of edges/faces/cells
+        //  HJ, 6/Nov/2010
+        explicit inline edge(const label size);
+
         //- Construct from components
         inline edge(const label a, const label b);
 

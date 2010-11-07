@@ -129,7 +129,8 @@ public:
                 const word& fieldName,
                 BlockLduMatrix<Type>& matrix,
                 const FieldField<CoeffField, Type>& boundaryCoeffs,
-                const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
+                const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
+                    interfaces,
                 const dictionary& dict
             ),
             (
@@ -150,7 +151,8 @@ public:
                 const word& fieldName,
                 BlockLduMatrix<Type>& matrix,
                 const FieldField<CoeffField, Type>& boundaryCoeffs,
-                const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
+                const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
+                    interfaces,
                 const dictionary& dict
             ),
             (
