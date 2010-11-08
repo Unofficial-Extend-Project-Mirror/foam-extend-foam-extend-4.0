@@ -138,7 +138,7 @@ void Foam::dsmcFields::write()
             iDofMeanName
         );
 
-        volVectorField fDMean =  obr_.lookupObject<volVectorField>
+        const volVectorField& fDMean = obr_.lookupObject<volVectorField>
         (
             fDMeanName
         );
