@@ -187,7 +187,7 @@ public:
             const polyBoundaryMesh& bm,
             const word& shadowName,
             const vector& axis,
-            const scalar n
+            const scalar nCopies
         );
 
         //- Construct from dictionary

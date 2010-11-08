@@ -109,7 +109,10 @@ public:
             const polyBoundaryMesh& bm,
             const word& shadowName,
             const word& zoneName,
-            const bool bridgeOverlap
+            const bool bridgeOverlap,
+            const vector& separationOffset,
+            const vector& rotationAxis,
+            const scalar rotationAngle
         );
 
         //- Construct from dictionary
