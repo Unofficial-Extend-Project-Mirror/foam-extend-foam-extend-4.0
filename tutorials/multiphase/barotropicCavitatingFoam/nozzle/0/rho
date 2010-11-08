@@ -23,11 +23,11 @@ boundaryField
 {
     in
     {
-        type            zeroGradient;   
+        type            zeroGradient;
     }
     out
     {
-        type            zeroGradient;  
+        type            zeroGradient;
     }
     bottom
     {
