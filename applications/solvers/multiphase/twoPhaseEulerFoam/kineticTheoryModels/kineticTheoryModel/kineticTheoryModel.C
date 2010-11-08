@@ -202,7 +202,14 @@ void Foam::kineticTheoryModel::solve()
 
     word scheme("div(phi,Theta)");
 
-    volScalarField alpha = alpha_;
+    // Bug fix: copying field alpha without mane change vreaks objectRegistry
+    // HJ, 7/Nov/2010
+    volScalarField alpha
+    (
+        "alphaMinMax",
+        alpha_
+    );
+
     alpha.max(1.0e-6);
     const scalar sqrtPi = sqrt(mathematicalConstant::pi);
 

@@ -1899,15 +1899,16 @@ internalField   nonuniform List<vector>
 
 boundaryField
 {
-    inlet           
+    inlet
     {
         type            fixedValue;
         value           uniform (0 0.1 0);
     }
 
-    outlet          
+    outlet
     {
         type            inletOutlet;
+        phi             phia;
         inletValue      uniform (0 0 0);
         value           nonuniform List<vector> 
 25

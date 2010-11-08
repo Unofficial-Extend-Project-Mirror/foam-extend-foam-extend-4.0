@@ -30,6 +30,7 @@ boundaryField
     top
     {
         type                inletOutlet;
+        phi                 phia;
         inletValue          uniform 1.0e-8;
     }
 
@@ -38,10 +39,10 @@ boundaryField
         type                zeroGradient;
     }
 
-	frontBack
-	{
-	type					empty;
-	}
+    frontBack
+    {
+        type                empty;
+    }
 
 }
 

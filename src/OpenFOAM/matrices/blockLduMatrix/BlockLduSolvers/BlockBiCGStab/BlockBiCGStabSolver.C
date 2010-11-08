@@ -51,7 +51,7 @@ Foam::BlockBiCGStabSolver<Type>::BlockBiCGStabSolver
         BlockLduPrecon<Type>::New
         (
             matrix,
-            this->dict().subDict("preconditioner")
+            this->dict()
         )
     )
 {}

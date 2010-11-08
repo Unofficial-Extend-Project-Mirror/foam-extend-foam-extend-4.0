@@ -4,7 +4,14 @@
     U = UEqn.H()/UEqn.A();
 
     phi = fvc::interpolate(U) & mesh.Sf();
-    surfaceScalarField phiU = phi;
+
+    // Bug fix: must change name of phi on copy to keep objectRegistry happy
+    // HJ, 7/Nov/2010
+    surfaceScalarField phiU
+    (
+        "phiU",
+        phi
+    );
 
     surfaceScalarField phip = fvc::interpolate(psiByRho)*phi;
 
