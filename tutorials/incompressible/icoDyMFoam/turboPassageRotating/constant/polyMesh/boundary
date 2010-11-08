@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5-dev                               |
-|   \\  /    A nd           | Revision: exported                              |
-|    \\/     M anipulation  | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -61,8 +61,8 @@ FoamFile
         nFaces          200;
         startFace       31500;
         rotationAxis    (0 0 1);
-        nCopies         12;
-        shadowPatch     interface2;
+        nCopies         0;
+        shadowPatch     ;
     }
     interface2
     {
@@ -70,8 +70,8 @@ FoamFile
         nFaces          200;
         startFace       31700;
         rotationAxis    (0 0 1);
-        nCopies         12;
-        shadowPatch     interface1;
+        nCopies         0;
+        shadowPatch     ;
     }
 )
 
