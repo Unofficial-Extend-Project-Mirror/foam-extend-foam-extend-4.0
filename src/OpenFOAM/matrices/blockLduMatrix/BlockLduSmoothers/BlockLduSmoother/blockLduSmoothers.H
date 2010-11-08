@@ -50,7 +50,7 @@ namespace Foam
 
 typedef BlockLduSmoother<scalar> blockScalarSmoother;
 typedef BlockLduSmoother<vector> blockVectorSmoother;
-// typedef BlockLduSmoother<tensor> blockTensorSmoother;
+typedef BlockLduSmoother<tensor> blockTensorSmoother;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

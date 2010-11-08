@@ -38,11 +38,11 @@ namespace Foam
 
 defineNamedTemplateTypeNameAndDebug(blockScalarSmoother, 0);
 defineNamedTemplateTypeNameAndDebug(blockVectorSmoother, 0);
-// defineNamedTemplateTypeNameAndDebug(blockTensorSmoother, 0);
+defineNamedTemplateTypeNameAndDebug(blockTensorSmoother, 0);
 
 defineTemplateRunTimeSelectionTable(blockScalarSmoother, dictionary);
 defineTemplateRunTimeSelectionTable(blockVectorSmoother, dictionary);
-// defineTemplateRunTimeSelectionTable(blockTensorSmoother, dictionary);
+defineTemplateRunTimeSelectionTable(blockTensorSmoother, dictionary);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

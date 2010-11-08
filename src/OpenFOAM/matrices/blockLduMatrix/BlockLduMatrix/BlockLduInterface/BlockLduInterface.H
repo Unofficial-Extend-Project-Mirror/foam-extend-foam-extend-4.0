@@ -86,7 +86,7 @@ public:
         // Coupled interface matrix update
 
             //- Initialise matrix update
-            virtual void initMatrixUpdate
+            virtual void initInterfaceMatrixUpdate
             (
                 const BlockLduMatrix<Type>& matrix,
                 Field<Type>& Ax,
@@ -95,7 +95,7 @@ public:
             {}
 
             //- Update result based on interface functionality
-            virtual void updateMatrix
+            virtual void updateInterfaceMatrix
             (
                 const BlockLduMatrix<Type>& matrix,
                 const FieldField<CoeffField, Type>& coeffs,

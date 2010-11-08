@@ -39,8 +39,6 @@ Foam::BlockGaussSeidelSolver<Type>::BlockGaussSeidelSolver
 (
     const word& fieldName,
     const BlockLduMatrix<Type>& matrix,
-    const FieldField<CoeffField, Type>& boundaryCoeffs,
-    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
     const dictionary& dict
 )
 :
@@ -48,8 +46,6 @@ Foam::BlockGaussSeidelSolver<Type>::BlockGaussSeidelSolver
     (
         fieldName,
         matrix,
-        boundaryCoeffs,
-        interfaces,
         dict
     ),
     gs_(matrix),
@@ -82,13 +78,7 @@ Foam::BlockGaussSeidelSolver<Type>::solve
     Field<Type> wA(x.size());
 
     // Calculate residual.  Note: sign of residual swapped for efficiency
-    matrix.Amul
-    (
-        wA,
-        x,
-        BlockLduSolver<Type>::boundaryCoeffs_,
-        BlockLduSolver<Type>::interfaces_
-    );
+    matrix.Amul(wA, x);
     wA -= b;
 
     solverPerf.initialResidual() = gSum(cmptMag(wA))/norm;
@@ -111,13 +101,7 @@ Foam::BlockGaussSeidelSolver<Type>::solve
 
             // Re-calculate residual.  Note: sign of residual swapped
             // for efficiency
-            matrix.Amul
-            (
-                wA,
-                x,
-                BlockLduSolver<Type>::boundaryCoeffs_,
-                BlockLduSolver<Type>::interfaces_
-            );
+            matrix.Amul(wA, x);
             wA -= b;
 
             solverPerf.finalResidual() = gSum(cmptMag(wA))/norm;

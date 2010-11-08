@@ -66,12 +66,6 @@ protected:
         //- Matrix reference
         const BlockLduMatrix<Type>& matrix_;
 
-        //- Reference to boundary coefficients
-        const FieldField<CoeffField, Type>& boundaryCoeffs_;
-
-        //- Reference to interfaces
-        const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces_;
-
 
     // Protected member functions
 
@@ -94,14 +88,10 @@ public:
             dictionary,
             (
                 const BlockLduMatrix<Type>& matrix,
-                const FieldField<CoeffField, Type>& boundaryCoeffs,
-                const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
                 const dictionary& dict
             ),
             (
                 matrix,
-                boundaryCoeffs,
-                interfaces,
                 dict
             )
         );
@@ -110,16 +100,9 @@ public:
     // Constructors
 
         //- Construct from matrix
-        BlockLduSmoother
-        (
-            const BlockLduMatrix<Type>& matrix,
-            const FieldField<CoeffField, Type>& boundaryCoeffs,
-            const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces
-        )
+        BlockLduSmoother(const BlockLduMatrix<Type>& matrix)
         :
-            matrix_(matrix),
-            boundaryCoeffs_(boundaryCoeffs),
-            interfaces_(interfaces)
+            matrix_(matrix)
         {}
 
 
@@ -129,8 +112,6 @@ public:
         static autoPtr<BlockLduSmoother<Type> > New
         (
             const BlockLduMatrix<Type>& matrix,
-            const FieldField<CoeffField, Type>& boundaryCoeffs,
-            const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
             const dictionary& dict
         );
 
@@ -172,8 +153,8 @@ addToRunTimeSelectionTable(SmootherType, typeSmootherType, dictionary);
 #define makeBlockSmoothers(smootherType)                                       \
                                                                              \
 makeBlockSmoother(blockScalarSmoother, smootherType##Scalar);                  \
-makeBlockSmoother(blockVectorSmoother, smootherType##Vector);
-// makeBlockSmoother(blockTensorSmoother, smootherType##Tensor);
+makeBlockSmoother(blockVectorSmoother, smootherType##Vector);                  \
+makeBlockSmoother(blockTensorSmoother, smootherType##Tensor);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

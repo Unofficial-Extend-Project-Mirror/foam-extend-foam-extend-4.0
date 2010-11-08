@@ -37,8 +37,6 @@ Foam::BlockBiCGStabSolver<Type>::BlockBiCGStabSolver
 (
     const word& fieldName,
     const BlockLduMatrix<Type>& matrix,
-    const FieldField<CoeffField, Type>& boundaryCoeffs,
-    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
     const dictionary& dict
 )
 :
@@ -46,8 +44,6 @@ Foam::BlockBiCGStabSolver<Type>::BlockBiCGStabSolver
     (
         fieldName,
         matrix,
-        boundaryCoeffs,
-        interfaces,
         dict
     ),
     preconPtr_
@@ -89,13 +85,7 @@ Foam::BlockBiCGStabSolver<Type>::solve
     Field<Type> p(x.size());
 
     // Calculate initial residual
-    matrix.Amul
-    (
-        p,
-        x,
-        BlockLduSolver<Type>::boundaryCoeffs_,
-        BlockLduSolver<Type>::interfaces_
-    );
+    matrix.Amul(p, x);
     Field<Type> r(b - p);
 
     solverPerf.initialResidual() = gSum(cmptMag(r))/norm;
@@ -148,13 +138,7 @@ Foam::BlockBiCGStabSolver<Type>::solve
             }
 
             preconPtr_->precondition(ph, p);
-            matrix.Amul
-            (
-                v,
-                ph,
-                BlockLduSolver<Type>::boundaryCoeffs_,
-                BlockLduSolver<Type>::interfaces_
-            );
+            matrix.Amul(v, ph);
             alpha = rho/gSumProd(rw, v);
 
             forAll (s, i)
@@ -163,13 +147,7 @@ Foam::BlockBiCGStabSolver<Type>::solve
             }
 
             preconPtr_->preconditionT(sh, s);
-            matrix.Amul
-            (
-                t,
-                sh,
-                BlockLduSolver<Type>::boundaryCoeffs_,
-                BlockLduSolver<Type>::interfaces_
-            );
+            matrix.Amul(t, sh);
             omega = gSumProd(t, s)/gSumProd(t, t);
 
             forAll (x, i)

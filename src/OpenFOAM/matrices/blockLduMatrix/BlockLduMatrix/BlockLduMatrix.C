@@ -54,8 +54,19 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(const lduMesh& ldu)
     diagPtr_(NULL),
     upperPtr_(NULL),
     lowerPtr_(NULL),
+    interfaces_(),
+    coupleUpper_(ldu.lduAddr().nPatches()),
+    coupleLower_(ldu.lduAddr().nPatches()),
     fixedEqns_(ldu.lduAddr().size()/fixFillIn)
-{}
+{
+    const lduAddressing& addr = ldu.lduAddr();
+
+    forAll (coupleUpper_, i)
+    {
+        coupleUpper_.set(i, new CoeffField<Type>(addr.patchAddr(i).size()));
+        coupleLower_.set(i, new CoeffField<Type>(addr.patchAddr(i).size()));
+    }
+}
 
 
 template<class Type>
@@ -66,6 +77,9 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(const BlockLduMatrix<Type>& A)
     diagPtr_(NULL),
     upperPtr_(NULL),
     lowerPtr_(NULL),
+    interfaces_(),
+    coupleUpper_(ldu.lduAddr().nPatches()),
+    coupleLower_(ldu.lduAddr().nPatches()),
     fixedEqns_(A.fixedEqns_)
 {
     if (A.diagPtr_)
@@ -82,8 +96,19 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(const BlockLduMatrix<Type>& A)
     {
         lowerPtr_ = new TypeCoeffField(*(A.lowerPtr_));
     }
+
+    const lduAddressing& addr = ldu.lduAddr();
+
+    forAll (coupleUpper_, i)
+    {
+        coupleUpper_.set(i, A.coupleUpper_.clone());
+        coupleLower_.set(i, , A.coupleLower_.clone());
+    }
 }
 
+
+//HJ, problematic: memmory management.
+// Reconsider.  HJ, 7/Nov/2010
 template<class Type>
 Foam::BlockLduMatrix<Type>::BlockLduMatrix(BlockLduMatrix<Type>& A, bool reUse)
 :
@@ -92,6 +117,9 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(BlockLduMatrix<Type>& A, bool reUse)
     diagPtr_(NULL),
     upperPtr_(NULL),
     lowerPtr_(NULL),
+    interfaces_(),
+    coupleUpper_(),
+    coupleLower_(),
     fixedEqns_(A.fixedEqns_)
 {
     if (reUse)
@@ -131,7 +159,12 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(BlockLduMatrix<Type>& A, bool reUse)
             lowerPtr_ = new TypeCoeffField(*(A.lowerPtr_));
         }
     }
+
+    // Interface data
+    coupleUpper_ = A.coupleUpper_;
+    coupleLower_ = A.coupleUpper_;
 }
+
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
@@ -142,6 +175,7 @@ Foam::BlockLduMatrix<Type>::~BlockLduMatrix()
     deleteDemandDrivenData(upperPtr_);
     deleteDemandDrivenData(lowerPtr_);
 }
+
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 

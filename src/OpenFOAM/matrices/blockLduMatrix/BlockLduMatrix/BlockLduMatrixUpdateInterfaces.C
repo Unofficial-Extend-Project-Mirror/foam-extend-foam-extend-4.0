@@ -35,7 +35,6 @@ template<class Type>
 void Foam::BlockLduMatrix<Type>::initInterfaces
 (
     const FieldField<CoeffField, Type>& interfaceCoeffs,
-    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
     TypeField& result,
     const TypeField& psi
 ) const
@@ -46,18 +45,18 @@ void Foam::BlockLduMatrix<Type>::initInterfaces
      || Pstream::defaultCommsType == Pstream::nonBlocking
     )
     {
-        forAll (interfaces, interfaceI)
+        forAll (interfaces_, interfaceI)
         {
-            if (interfaces.set(interfaceI))
+            if (interfaces_.set(interfaceI))
             {
-                interfaces[interfaceI].initInterfaceMatrixUpdate
-                (
-                    psi,
-                    result,
-                    *this,
-                    interfaceCoeffs[interfaceI],
-                    Pstream::defaultCommsType
-                );
+//                 interfaces_[interfaceI].initInterfaceMatrixUpdate
+//                 (
+//                     psi,
+//                     result,
+//                     *this,
+//                     interfaceCoeffs[interfaceI],
+//                     Pstream::defaultCommsType
+//                 );
             }
         }
     }
@@ -69,24 +68,24 @@ void Foam::BlockLduMatrix<Type>::initInterfaces
         // beyond the end of the schedule which only handles "normal" patches
         for
         (
-            label interfaceI=patchSchedule.size()/2;
-            interfaceI<interfaces.size();
+            label interfaceI = patchSchedule.size()/2;
+            interfaceI < interfaces_.size();
             interfaceI++
         )
         {
-            if (interfaces.set(interfaceI))
+            if (interfaces_.set(interfaceI))
             {
-                interfaces[interfaceI].initInterfaceMatrixUpdate
-                (
-                    psi,
-                    result,
-                    *this,
-                    interfaceCoeffs[interfaceI],
-                    Pstream::blocking
-                );
+//                 interfaces_[interfaceI].initInterfaceMatrixUpdate
+//                 (
+//                     psi,
+//                     result,
+//                     *this,
+//                     interfaceCoeffs[interfaceI],
+//                     Pstream::blocking
+//                 );
             }
         }
-    }    
+    }
     else
     {
         FatalErrorIn("BlockLduMatrix<Type>::initMatrixInterfaces")
@@ -101,7 +100,6 @@ template<class Type>
 void Foam::BlockLduMatrix<Type>::updateInterfaces
 (
     const FieldField<CoeffField, Type>& interfaceCoeffs,
-    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
     TypeField& result,
     const TypeField& psi
 ) const
@@ -119,18 +117,18 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
             OPstream::waitRequests();
         }
 
-        forAll (interfaces, interfaceI)
+        forAll (interfaces_, interfaceI)
         {
-            if (interfaces.set(interfaceI))
+            if (interfaces_.set(interfaceI))
             {
-                interfaces[interfaceI].updateInterfaceMatrix
-                (
-                    psi,
-                    result,
-                    *this,
-                    interfaceCoeffs[interfaceI],
-                    Pstream::defaultCommsType
-                );
+//                 interfaces_[interfaceI].updateInterfaceMatrix
+//                 (
+//                     psi,
+//                     result,
+//                     *this,
+//                     interfaceCoeffs[interfaceI],
+//                     Pstream::defaultCommsType
+//                 );
             }
         }
     }
@@ -143,29 +141,29 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
         {
             label interfaceI = patchSchedule[i].patch;
 
-            if (interfaces.set(interfaceI))
+            if (interfaces_.set(interfaceI))
             {
                 if (patchSchedule[i].init)
                 {
-                    interfaces[interfaceI].initInterfaceMatrixUpdate
-                    (
-                        psi,
-                        result,
-                        *this,
-                        interfaceCoeffs[interfaceI],
-                        Pstream::scheduled
-                    );
+//                     interfaces_[interfaceI].initInterfaceMatrixUpdate
+//                     (
+//                         psi,
+//                         result,
+//                         *this,
+//                         interfaceCoeffs[interfaceI],
+//                         Pstream::scheduled
+//                     );
                 }
                 else
                 {
-                    interfaces[interfaceI].updateInterfaceMatrix
-                    (
-                        psi,
-                        result,
-                        *this,
-                        interfaceCoeffs[interfaceI],
-                        Pstream::scheduled
-                    );
+//                     interfaces_[interfaceI].updateInterfaceMatrix
+//                     (
+//                         psi,
+//                         result,
+//                         *this,
+//                         interfaceCoeffs[interfaceI],
+//                         Pstream::scheduled
+//                     );
                 }
             }
         }
@@ -174,21 +172,21 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
         // beyond the end of the schedule which only handles "normal" patches
         for
         (
-            label interfaceI=patchSchedule.size()/2;
-            interfaceI<interfaces.size();
+            label interfaceI = patchSchedule.size()/2;
+            interfaceI < interfaces_.size();
             interfaceI++
         )
         {
-            if (interfaces.set(interfaceI))
+            if (interfaces_.set(interfaceI))
             {
-                interfaces[interfaceI].updateInterfaceMatrix
-                (
-                    psi,
-                    result,
-                    *this,
-                    interfaceCoeffs[interfaceI],
-                    Pstream::blocking
-                );
+//                 interfaces_[interfaceI].updateInterfaceMatrix
+//                 (
+//                     psi,
+//                     result,
+//                     *this,
+//                     interfaceCoeffs[interfaceI],
+//                     Pstream::blocking
+//                 );
             }
         }
     }

@@ -35,20 +35,18 @@ template<class Type>
 void Foam::BlockLduMatrix<Type>::Amul
 (
     TypeField& Ax,
-    const TypeField& x,
-    const FieldField<CoeffField, Type>& boundaryCoeffs,
-    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces
+    const TypeField& x
 ) const
 {
     Ax = pTraits<Type>::zero;
 
     // Initialise the update of coupled interfaces
-    initInterfaces(boundaryCoeffs, interfaces, Ax, x);
+    initInterfaces(coupleUpper_, Ax, x);
 
     AmulCore(Ax, x);
 
     // Update coupled interfaces
-    updateInterfaces(boundaryCoeffs, interfaces, Ax, x);
+    updateInterfaces(coupleUpper_, Ax, x);
 }
 
 
@@ -179,20 +177,18 @@ template<class Type>
 void Foam::BlockLduMatrix<Type>::Tmul
 (
     TypeField& Ax,
-    const TypeField& x,
-    const FieldField<CoeffField, Type>& boundaryCoeffs,
-    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces
+    const TypeField& x
 ) const
 {
     Ax = pTraits<Type>::zero;
 
     // Initialise the update of coupled interfaces
-    initInterfaces(boundaryCoeffs, interfaces, Ax, x);
+    initInterfaces(coupleLower_, Ax, x);
 
     TmulCore(Ax, x);
 
     // Update coupled interfaces
-    updateInterfaces(boundaryCoeffs, interfaces, Ax, x);
+    updateInterfaces(coupleLower_, Ax, x);
 }
 
 
