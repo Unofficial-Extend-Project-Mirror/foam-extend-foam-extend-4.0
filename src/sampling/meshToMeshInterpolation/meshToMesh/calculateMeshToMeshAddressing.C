@@ -234,6 +234,10 @@ void meshToMesh::cellAddresses
     const octree<octreeDataCell>& oc
 ) const
 {
+
+    label nCellsOutsideAddressing = 0;
+
+
     // the implemented search method is a simple neighbour array search.
     // It starts from a cell zero, searches its neighbours and finds one
     // which is nearer to the target point than the current position.
@@ -291,9 +295,9 @@ void meshToMesh::cellAddresses
         }
         else
         {
-            // If curCell is a boundary cell then the point maybe either outside
-            // the domain or in an other region of the doamin, either way use
-            // the octree search to find it.
+            // If curCell is a boundary cell then the point maybe either
+            // outside the domain or in an other region of the doamin,
+            //  either way use the octree search to find it.
             if (boundaryCell[curCell])
             {
                 cellAddressing_[toI] = oc.find(p);
@@ -351,7 +355,22 @@ void meshToMesh::cellAddresses
                     cellAddressing_[toI] = oc.find(p);
                 }
             }
+
+            if(cellAddressing_[toI] < 0)
+            {
+
+                cellAddressing_[toI] = curCell;
+
+                nCellsOutsideAddressing++;
+            }
         }
+    }
+
+    if (nCellsOutsideAddressing > 0)
+    {
+        Info<< "Found " << nCellsOutsideAddressing
+            << " cells outside of the addressing" << nl
+            << "Cell addressing size = " << cellAddressing_.size() << endl;
     }
 }
 
