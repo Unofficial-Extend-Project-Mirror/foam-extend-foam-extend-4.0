@@ -71,8 +71,6 @@ Foam::BlockGMRESSolver<Type>::BlockGMRESSolver
 (
     const word& fieldName,
     const BlockLduMatrix<Type>& matrix,
-    const FieldField<CoeffField, Type>& boundaryCoeffs,
-    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
     const dictionary& dict
 )
 :
@@ -80,8 +78,6 @@ Foam::BlockGMRESSolver<Type>::BlockGMRESSolver
     (
         fieldName,
         matrix,
-        boundaryCoeffs,
-        interfaces,
         dict
     ),
     preconPtr_
@@ -124,13 +120,7 @@ Foam::BlockGMRESSolver<Type>::solve
     Field<Type> wA(x.size());
 
     // Calculate initial residual
-    matrix.Amul
-    (
-        wA,
-        x,
-        BlockLduSolver<Type>::boundaryCoeffs_,
-        BlockLduSolver<Type>::interfaces_
-    );
+    matrix.Amul(wA, x);
     Field<Type> rA(b - wA);
 
     solverPerf.initialResidual() = gSum(cmptMag(rA))/norm;
@@ -178,13 +168,7 @@ Foam::BlockGMRESSolver<Type>::solve
                 V[i] /= beta;
 
                 // Arnoldi's method
-                matrix.Amul
-                (
-                    rA,
-                    V[i],
-                    BlockLduSolver<Type>::boundaryCoeffs_,
-                    BlockLduSolver<Type>::interfaces_
-                );
+                matrix.Amul(rA, V[i]);
 
                 // Execute preconditioning
                 preconPtr_->precondition(wA, rA);
@@ -247,13 +231,7 @@ Foam::BlockGMRESSolver<Type>::solve
             }
 
             // Re-calculate the residual
-            matrix.Amul
-            (
-                wA,
-                x,
-                BlockLduSolver<Type>::boundaryCoeffs_,
-                BlockLduSolver<Type>::interfaces_
-            );
+            matrix.Amul(wA, x);
 
             forAll (rA, raI)
             {

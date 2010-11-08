@@ -51,6 +51,7 @@ SourceFiles
 #include "coeffFields.H"
 #include "FieldField.H"
 #include "lduMesh.H"
+#include "BlockLduInterface.H"
 #include "BlockLduInterfaceFieldPtrsList.H"
 #include "Map.H"
 
@@ -97,7 +98,7 @@ private:
         const lduMesh& lduMesh_;
 
 
-        // Block matrix elements (excluding interfaces)
+        // Block matrix elements
 
             //- Diagonal coefficients
             CoeffField<Type>* diagPtr_;
@@ -107,6 +108,18 @@ private:
 
             //- Lower triangle coefficients
             CoeffField<Type> *lowerPtr_;
+
+
+        // Coupling
+
+            //- List of coupled interfaces
+            PtrList<BlockLduInterface<Type> > interfaces_;
+
+            //- Coupled interface coefficients, upper
+            FieldField<CoeffField, Type> coupleUpper_;
+
+            //- Coupled interface coefficients, lower
+            FieldField<CoeffField, Type> coupleLower_;
 
 
         // Constraints
@@ -209,6 +222,7 @@ public:
         //- Construct as copy or re-use as specified.
         BlockLduMatrix(BlockLduMatrix<Type>&, bool reUse);
 
+
     // Destructor
 
         virtual ~BlockLduMatrix();
@@ -258,6 +272,30 @@ public:
 
             //- Return lower coefficients
             const TypeCoeffField& lower() const;
+
+            //- Return access to coupled interface coefficients, upper
+            FieldField<CoeffField, Type>& coupleUpper()
+            {
+                return coupleUpper_;
+            }
+
+            //- Return coupled interface coefficients, upper
+            const FieldField<CoeffField, Type>& coupleUpper() const
+            {
+                return coupleUpper_;
+            }
+
+            //- Return access to coupled interface coefficients, lower
+            FieldField<CoeffField, Type>& coupleLower()
+            {
+                return coupleLower_;
+            }
+
+            //- Return coupled interface coefficients, lower
+            const FieldField<CoeffField, Type>& coupleLower() const
+            {
+                return coupleLower_;
+            }
 
 
         // Matrix structure
@@ -319,10 +357,7 @@ public:
             void Amul
             (
                 TypeField& Ax,
-                const TypeField& x,
-                const FieldField<CoeffField, Type>& boundaryCoeffs,
-                const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
-                    interfaces
+                const TypeField& x
             ) const;
 
             //- Matrix multiplication without coupled interface update
@@ -336,10 +371,7 @@ public:
             void Tmul
             (
                 TypeField& Ax,
-                const TypeField& x,
-                const FieldField<CoeffField, Type>& boundaryCoeffs,
-                const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
-                    interfaces
+                const TypeField& x
             ) const;
 
             //- Matrix transpose multiplication without coupled
@@ -366,7 +398,6 @@ public:
             void initInterfaces
             (
                 const FieldField<CoeffField, Type>& interfaceCoeffs,
-                const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
                 TypeField& result,
                 const TypeField& psi
             ) const;
@@ -375,7 +406,6 @@ public:
             void updateInterfaces
             (
                 const FieldField<CoeffField, Type>& interfaceCoeffs,
-                const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
                 TypeField& result,
                 const TypeField& psi
             ) const;

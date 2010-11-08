@@ -67,6 +67,7 @@ class BlockLduSolver
         //- Control data dictionary
         dictionary dict_;
 
+
 protected:
 
     // Protected data types
@@ -79,11 +80,6 @@ protected:
         //- Matrix
         const BlockLduMatrix<Type>& matrix_;
 
-        // Reference to boundary coefficients
-        const FieldField<CoeffField, Type>& boundaryCoeffs_;
-
-        //- Reference to interfaces
-        const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces_;
 
     // Protected Member Functions
 
@@ -128,16 +124,11 @@ public:
             (
                 const word& fieldName,
                 BlockLduMatrix<Type>& matrix,
-                const FieldField<CoeffField, Type>& boundaryCoeffs,
-                const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
-                    interfaces,
                 const dictionary& dict
             ),
             (
                 fieldName,
                 matrix,
-                boundaryCoeffs,
-                interfaces,
                 dict
             )
         );
@@ -150,16 +141,11 @@ public:
             (
                 const word& fieldName,
                 BlockLduMatrix<Type>& matrix,
-                const FieldField<CoeffField, Type>& boundaryCoeffs,
-                const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
-                    interfaces,
                 const dictionary& dict
             ),
             (
                 fieldName,
                 matrix,
-                boundaryCoeffs,
-                interfaces,
                 dict
             )
         );
@@ -172,10 +158,7 @@ public:
         BlockLduSolver
         (
             const word& fieldName,
-            const BlockLduMatrix<Type>& matrix,
-            const FieldField<CoeffField, Type>& boundaryCoeffs,
-            const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
-                interfaces
+            const BlockLduMatrix<Type>& matrix
         );
 
         //- Construct from dictionary
@@ -183,9 +166,6 @@ public:
         (
             const word& fieldName,
             const BlockLduMatrix<Type>& matrix,
-            const FieldField<CoeffField, Type>& boundaryCoeffs,
-            const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
-                interfaces,
             const dictionary& dict
         );
 
@@ -197,9 +177,6 @@ public:
         (
             const word& fieldName,
             BlockLduMatrix<Type>& matrix,
-            const FieldField<CoeffField, Type>& boundaryCoeffs,
-            const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
-                interfaces,
             const dictionary& dict
         );
 
@@ -245,8 +222,8 @@ defineNamedTemplateTypeNameAndDebug(typeSolverType, 0);
 #define makeBlockSolvers(solverType)                                         \
                                                                              \
 makeBlockSolverTypeName(solverType##Scalar);                                 \
-makeBlockSolverTypeName(solverType##Vector);
-// makeBlockSolverTypeName(solverType##Tensor);
+makeBlockSolverTypeName(solverType##Vector);                                 \
+makeBlockSolverTypeName(solverType##Tensor);
 
 
 #define addSolverToBlockMatrix(Type, typeSolverType, typeMatrix)             \
@@ -256,8 +233,8 @@ addToRunTimeSelectionTable(block##Type##Solver, typeSolverType, typeMatrix);
 #define addSolversToBlockMatrix(solverType, typeMatrix)                      \
                                                                              \
 addSolverToBlockMatrix(Scalar, solverType##Scalar, typeMatrix);              \
-addSolverToBlockMatrix(Vector, solverType##Vector, typeMatrix);
-// addSolverToBlockMatrix(Tensor, solverType##Tensor, typeMatrix);
+addSolverToBlockMatrix(Vector, solverType##Vector, typeMatrix);              \
+addSolverToBlockMatrix(Tensor, solverType##Tensor, typeMatrix);
 
 #define addSymSolverToBlockMatrix(solverType)                                \
                                                                              \

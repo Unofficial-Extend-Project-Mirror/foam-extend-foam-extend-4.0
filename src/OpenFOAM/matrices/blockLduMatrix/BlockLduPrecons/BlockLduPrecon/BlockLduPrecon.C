@@ -62,7 +62,7 @@ Foam::autoPtr<Foam::BlockLduPrecon<Type> > Foam::BlockLduPrecon<Type>::New
             new BlockNoPrecon<Type>
             (
                 matrix,
-                dict
+                controls
             )
         );
     }
@@ -93,7 +93,7 @@ Foam::autoPtr<Foam::BlockLduPrecon<Type> > Foam::BlockLduPrecon<Type>::New
             constructorIter()
             (
                 matrix,
-                dict
+                controls
             )
         );
     }

@@ -157,7 +157,10 @@ Foam::cyclicGgiPolyPatch::cyclicGgiPolyPatch
     const polyBoundaryMesh& bm,
     const word& shadowName,
     const word& zoneName,
-    const bool bridgeOverlap
+    const bool bridgeOverlap,
+    const vector& separationOffset,
+    const vector& rotationAxis,
+    const scalar rotationAngle
 )
 :
     ggiPolyPatch
@@ -171,9 +174,9 @@ Foam::cyclicGgiPolyPatch::cyclicGgiPolyPatch
         zoneName,
         bridgeOverlap
     ),
-    separationOffset_(vector::zero),
-    rotationAxis_(vector(0.0, 0.0, 1.0)),
-    rotationAngle_(0.0)
+    separationOffset_(separationOffset),
+    rotationAxis_(rotationAxis),
+    rotationAngle_(rotationAngle)
 {}
 
 

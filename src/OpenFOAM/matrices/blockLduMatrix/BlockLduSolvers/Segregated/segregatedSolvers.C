@@ -40,10 +40,10 @@ makeBlockSolverTypeName(segregatedSolverVector);
 makeBlockSolverTypeName(segregatedSolverTensor);
 
 addSolverToBlockMatrix(Vector, segregatedSolverVector, symMatrix);
-// addSolverToBlockMatrix(Tensor, segregatedSolverTensor, symMatrix);
+addSolverToBlockMatrix(Tensor, segregatedSolverTensor, symMatrix);
 
 addSolverToBlockMatrix(Vector, segregatedSolverVector, asymMatrix);
-// addSolverToBlockMatrix(Tensor, segregatedSolverTensor, asymMatrix);
+addSolverToBlockMatrix(Tensor, segregatedSolverTensor, asymMatrix);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

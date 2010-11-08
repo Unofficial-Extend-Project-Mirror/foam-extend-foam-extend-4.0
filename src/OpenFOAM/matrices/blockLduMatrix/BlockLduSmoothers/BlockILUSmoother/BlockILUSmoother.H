@@ -86,12 +86,10 @@ public:
         BlockILUSmoother
         (
             const BlockLduMatrix<Type>& matrix,
-            const FieldField<CoeffField, Type>& boundaryCoeffs,
-            const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
             const dictionary& dict
         )
         :
-            BlockLduSmoother<Type>(matrix, boundaryCoeffs, interfaces),
+            BlockLduSmoother<Type>(matrix),
             precon_(matrix),
             xCorr_(matrix.lduAddr().size()),
             residual_(matrix.lduAddr().size())
@@ -117,13 +115,7 @@ public:
             for (label sweep = 0; sweep < nSweeps; sweep++)
             {
                 // Calculate residual
-                this-> matrix_.Amul
-                (
-                    residual_,
-                    x,
-                    BlockLduSmoother<Type>::boundaryCoeffs_,
-                    BlockLduSmoother<Type>::interfaces_
-                );
+                this-> matrix_.Amul(residual_, x);
 
                 // residual = b - Ax
                 forAll (b, i)

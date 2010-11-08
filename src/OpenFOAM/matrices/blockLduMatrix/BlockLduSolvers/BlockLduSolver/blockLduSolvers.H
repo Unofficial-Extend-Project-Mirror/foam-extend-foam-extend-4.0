@@ -44,7 +44,7 @@ namespace Foam
 
 typedef BlockLduSolver<scalar> blockScalarSolver;
 typedef BlockLduSolver<vector> blockVectorSolver;
-// typedef BlockLduSolver<tensor> blockTensorSolver;
+typedef BlockLduSolver<tensor> blockTensorSolver;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

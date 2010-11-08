@@ -83,12 +83,10 @@ public:
         BlockGaussSeidelSmoother
         (
             const BlockLduMatrix<Type>& matrix,
-            const FieldField<CoeffField, Type>& boundaryCoeffs,
-            const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
             const dictionary& dict
         )
         :
-            BlockLduSmoother<Type>(matrix, boundaryCoeffs, interfaces),
+            BlockLduSmoother<Type>(matrix),
             gs_(matrix)
         {}
 

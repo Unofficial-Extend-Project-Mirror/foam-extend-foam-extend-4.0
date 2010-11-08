@@ -37,12 +37,10 @@ Foam::BlockIterativeSolver<Type>::BlockIterativeSolver
 (
     const word& fieldName,
     const BlockLduMatrix<Type>& matrix,
-    const FieldField<CoeffField, Type>& boundaryCoeffs,
-    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
     const dictionary& dict
 )
 :
-    BlockLduSolver<Type>(fieldName, matrix, boundaryCoeffs, interfaces, dict),
+    BlockLduSolver<Type>(fieldName, matrix, dict),
     tolerance_(readScalar(this->dict().lookup("tolerance"))),
     relTolerance_(readScalar(this->dict().lookup("relTol"))),
     minIter_(readLabel(this->dict().lookup("minIter"))),
@@ -71,21 +69,13 @@ Foam::scalar Foam::BlockIterativeSolver<Type>::normFactor
     Type xRef = gAverage(x);
 
     // Calculate A.x
-    matrix.Amul
-    (
-        wA,
-        x,
-        BlockLduSolver<Type>::boundaryCoeffs_,
-        BlockLduSolver<Type>::interfaces_
-    );
+    matrix.Amul(wA, x);
 
     // Calculate A.xRef, temporarily using pA for storage
     matrix.Amul
     (
         pA,
-        Field<Type>(nRows, xRef),
-        BlockLduSolver<Type>::boundaryCoeffs_,
-        BlockLduSolver<Type>::interfaces_
+        Field<Type>(nRows, xRef)
     );
 
     scalar normFactor = gSum(mag(wA - pA) + mag(b - pA)) + this->small_;

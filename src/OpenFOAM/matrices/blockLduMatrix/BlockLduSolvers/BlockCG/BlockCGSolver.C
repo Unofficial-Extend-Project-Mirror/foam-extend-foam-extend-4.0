@@ -37,8 +37,6 @@ Foam::BlockCGSolver<Type>::BlockCGSolver
 (
     const word& fieldName,
     const BlockLduMatrix<Type>& matrix,
-    const FieldField<CoeffField, Type>& boundaryCoeffs,
-    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
     const dictionary& dict
 )
 :
@@ -46,8 +44,6 @@ Foam::BlockCGSolver<Type>::BlockCGSolver
     (
         fieldName,
         matrix,
-        boundaryCoeffs,
-        interfaces,
         dict
     ),
     preconPtr_
@@ -88,13 +84,7 @@ typename Foam::BlockSolverPerformance<Type> Foam::BlockCGSolver<Type>::solve
     Field<Type> wA(x.size());
 
     // Calculate initial residual
-    matrix.Amul
-    (
-        wA,
-        x,
-        BlockLduSolver<Type>::boundaryCoeffs_,
-        BlockLduSolver<Type>::interfaces_
-    );
+    matrix.Amul(wA, x);
     Field<Type> rA(b - wA);
 
     solverPerf.initialResidual() = gSum(cmptMag(rA))/norm;
@@ -129,13 +119,7 @@ typename Foam::BlockSolverPerformance<Type> Foam::BlockCGSolver<Type>::solve
             }
 
             // Update preconditioner residual
-            matrix.Amul
-            (
-                wA,
-                pA,
-                BlockLduSolver<Type>::boundaryCoeffs_,
-                BlockLduSolver<Type>::interfaces_
-            );
+            matrix.Amul(wA, pA);
 
             wApA = gSumProd(wA, pA);
 

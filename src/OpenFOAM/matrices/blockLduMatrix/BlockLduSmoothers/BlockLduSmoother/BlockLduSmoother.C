@@ -41,8 +41,6 @@ template<class Type>
 Foam::autoPtr<Foam::BlockLduSmoother<Type> > Foam::BlockLduSmoother<Type>::New
 (
     const BlockLduMatrix<Type>& matrix,
-    const FieldField<CoeffField, Type>& boundaryCoeffs,
-    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,
     const dictionary& dict
 )
 {
@@ -72,8 +70,6 @@ Foam::autoPtr<Foam::BlockLduSmoother<Type> > Foam::BlockLduSmoother<Type>::New
             "autoPtr<BlockLduSmoother> BlockLduSmoother::New\n"
             "(\n"
             "    const BlockLduMatrix<Type>& matrix,\n"
-            "    const FieldField<CoeffField, Type>& boundaryCoeffs,\n"
-            "    const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces,\n"
             "    const dictionary& dict\n"
             ")",
             dict
@@ -89,8 +85,6 @@ Foam::autoPtr<Foam::BlockLduSmoother<Type> > Foam::BlockLduSmoother<Type>::New
         constructorIter()
         (
             matrix,
-            boundaryCoeffs,
-            interfaces,
             dict
         )
     );

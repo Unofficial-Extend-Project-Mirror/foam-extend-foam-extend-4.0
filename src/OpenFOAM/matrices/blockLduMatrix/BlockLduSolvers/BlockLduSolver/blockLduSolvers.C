@@ -38,7 +38,7 @@ namespace Foam
 
 defineNamedTemplateTypeNameAndDebug(blockScalarSolver, 0);
 defineNamedTemplateTypeNameAndDebug(blockVectorSolver, 0);
-// defineNamedTemplateTypeNameAndDebug(blockTensorSolver, 0);
+defineNamedTemplateTypeNameAndDebug(blockTensorSolver, 0);
 
 
 // Define the constructor function hash tables for symmetric solvers
@@ -55,11 +55,11 @@ defineTemplateRunTimeSelectionTable
     symMatrix
 );
 
-// defineTemplateRunTimeSelectionTable
-// (
-//     blockTensorSolver,
-//     symMatrix
-// );
+defineTemplateRunTimeSelectionTable
+(
+    blockTensorSolver,
+    symMatrix
+);
 
 
 // Define the constructor function hash tables for asymmetric solvers
@@ -76,11 +76,11 @@ defineTemplateRunTimeSelectionTable
     asymMatrix
 );
 
-// defineTemplateRunTimeSelectionTable
-// (
-//     blockTensorSolver,
-//     asymMatrix
-// );
+defineTemplateRunTimeSelectionTable
+(
+    blockTensorSolver,
+    asymMatrix
+);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
