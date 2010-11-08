@@ -20,25 +20,26 @@ internalField   uniform 1e-8;
 
 boundaryField
 {
-    inlet           
+    inlet
     {
         type            fixedValue;
         value           uniform 1e-8;
     }
 
-    outlet          
+    outlet
     {
         type            inletOutlet;
+        phi             phia;
         inletValue      uniform 1e-8;
         value           uniform 1e-8;
     }
 
-    walls           
+    walls
     {
         type            zeroGradient;
     }
 
-    defaultFaces    
+    defaultFaces
     {
         type            empty;
     }

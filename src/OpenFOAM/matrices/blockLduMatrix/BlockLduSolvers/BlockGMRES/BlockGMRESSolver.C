@@ -85,7 +85,7 @@ Foam::BlockGMRESSolver<Type>::BlockGMRESSolver
         BlockLduPrecon<Type>::New
         (
             matrix,
-            this->dict().subDict("preconditioner")
+            this->dict()
         )
     ),
     nDirs_(readLabel(this->dict().lookup("nDirections")))

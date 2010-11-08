@@ -1899,25 +1899,26 @@ internalField   nonuniform List<scalar>
 
 boundaryField
 {
-    inlet           
+    inlet
     {
         type            fixedValue;
         value           uniform 0.5;
     }
 
-    outlet          
+    outlet
     {
         type            inletOutlet;
+        phi             phia;
         inletValue      uniform 1;
         value           uniform 1;
     }
 
-    walls           
+    walls
     {
         type            zeroGradient;
     }
 
-    defaultFaces    
+    defaultFaces
     {
         type            empty;
     }
