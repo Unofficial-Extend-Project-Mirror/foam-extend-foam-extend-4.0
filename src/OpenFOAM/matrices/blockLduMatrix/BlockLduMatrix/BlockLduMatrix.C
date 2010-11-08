@@ -78,8 +78,8 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(const BlockLduMatrix<Type>& A)
     upperPtr_(NULL),
     lowerPtr_(NULL),
     interfaces_(),
-    coupleUpper_(ldu.lduAddr().nPatches()),
-    coupleLower_(ldu.lduAddr().nPatches()),
+    coupleUpper_(A.lduAddr().nPatches()),
+    coupleLower_(A.lduAddr().nPatches()),
     fixedEqns_(A.fixedEqns_)
 {
     if (A.diagPtr_)
@@ -97,12 +97,12 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(const BlockLduMatrix<Type>& A)
         lowerPtr_ = new TypeCoeffField(*(A.lowerPtr_));
     }
 
-    const lduAddressing& addr = ldu.lduAddr();
+    const lduAddressing& addr = this->lduAddr();
 
     forAll (coupleUpper_, i)
     {
         coupleUpper_.set(i, A.coupleUpper_.clone());
-        coupleLower_.set(i, , A.coupleLower_.clone());
+        coupleLower_.set(i, A.coupleLower_.clone());
     }
 }
 
