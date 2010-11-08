@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,7 +10,8 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    object      p;
+    location    "0.001";
+    object      pd;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -20,29 +21,23 @@ internalField   uniform 0;
 
 boundaryField
 {
-    walls
-    {
-        type            buoyantPressure;
-        value           uniform 0;
-    }
-
-    obstacle
-    {
-        type            buoyantPressure;
-        value           uniform 0;
-    }
-
     atmosphere
     {
         type            totalPressure;
-        p0              uniform 0;
-        U               U;
-        phi             phi;
         rho             rho;
         psi             none;
         gamma           1;
+        p0              uniform 0;
+        value           uniform 0;
+    }
+    walls
+    {
+        type            buoyantPressure;
+        gradient        uniform 0;
+        rho             rho;
         value           uniform 0;
     }
 }
+
 
 // ************************************************************************* //

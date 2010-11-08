@@ -4,6 +4,10 @@
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions
 
 cleanCase
-rm -rf {VTK,log*}
-rm constant/polyMesh/{cellZones*,faces*,neighbour*,owner*,points*,sets}
-find -iname "*~" | xargs rm -f
+rm -rf VTK log*
+rm -rf constant/polyMesh/points* \
+    constant/polyMesh/face* \
+    constant/polyMesh/owner* \
+    constant/polyMesh/neighbour* \
+    constant/polyMesh/*Zones* \
+    constant/polyMesh/sets
