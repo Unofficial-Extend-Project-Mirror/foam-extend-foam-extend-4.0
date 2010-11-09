@@ -29,8 +29,8 @@ divSchemes
     default              none;
     div(phiv,rho)        Gauss limitedLinear 0.2;
     div(phi,U)           Gauss limitedLinearV 0.2;
-    div(phiv,omega)      Gauss limitedLinear 0.2;
-    div(phiv,k)          Gauss limitedLinear 0.2;
+    div(phiv,omega)      Gauss upwind;
+    div(phiv,k)          Gauss upwind;
 }
 
 gradSchemes
