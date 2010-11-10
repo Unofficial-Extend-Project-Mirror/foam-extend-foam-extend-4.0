@@ -8,10 +8,10 @@
 License
     This file is part of OpenFOAM.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
-    option) any later version.
+    OpenFOAM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -19,94 +19,59 @@ License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
 #include "DynamicField.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
-namespace Foam
-{
-
-// * * * * * * * * * * * * * * * Static Members  * * * * * * * * * * * * * * //
-
-template<class Type>
-const char* const DynamicField<Type>::typeName("DynamicField");
-
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-template<class Type>
-DynamicField<Type>::DynamicField(Istream& is)
+template<class T, unsigned SizeInc, unsigned SizeMult, unsigned SizeDiv>
+Foam::DynamicField<T, SizeInc, SizeMult, SizeDiv>::DynamicField(Istream& is)
 :
-    Field<Type>(is),
-    capacity_(Field<Type>::size())
+    Field<T>(is),
+    capacity_(Field<T>::size())
 {}
 
 
-template<class Type>
-tmp<DynamicField<Type> > DynamicField<Type>::clone() const
+template<class T, unsigned SizeInc, unsigned SizeMult, unsigned SizeDiv>
+Foam::tmp<Foam::DynamicField<T, SizeInc, SizeMult, SizeDiv> >
+Foam::DynamicField<T, SizeInc, SizeMult, SizeDiv>::clone() const
 {
-    return tmp<DynamicField<Type> >(new DynamicField<Type>(*this));
+    return tmp<DynamicField<T, SizeInc, SizeMult, SizeDiv> >
+    (
+        new DynamicField<T, SizeInc, SizeMult, SizeDiv>(*this)
+    );
 }
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-template<class Type>
-void DynamicField<Type>::setSize(const label nElem)
-{
-    // allocate more capacity?
-    if (nElem > capacity_)
-    {
-        capacity_ = max(nElem, label(1 + capacity_*2));
-
-        Field<Type>::setSize(capacity_);
-    }
-
-    // adjust addressed size
-    Field<Type>::size(nElem);
-}
-
-
-// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 
 // * * * * * * * * * * * * * * * IOstream Operator * * * * * * * * * * * * * //
 
-template<class Type>
-Ostream& operator<<(Ostream& os, const DynamicField<Type>& f)
+template<class T, unsigned SizeInc, unsigned SizeMult, unsigned SizeDiv>
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const DynamicField<T, SizeInc, SizeMult, SizeDiv>& lst
+)
 {
-    os << static_cast<const Field<Type>&>(f);
+    os << static_cast<const Field<T>&>(lst);
     return os;
 }
 
 
-template<class Type>
-Ostream& operator<<(Ostream& os, const tmp<DynamicField<Type> >& tf)
+template<class T, unsigned SizeInc, unsigned SizeMult, unsigned SizeDiv>
+Foam::Istream& Foam::operator>>
+(
+    Istream& is,
+    DynamicField<T, SizeInc, SizeMult, SizeDiv>& lst
+)
 {
-    os << tf();
-    tf.clear();
-    return os;
-}
-
-
-template<class Type>
-Istream& operator>>(Istream& is, DynamicField<Type>& lst)
-{
-    is >> static_cast<Field<Type>&>(lst);
-    lst.capacity_ = lst.Field<Type>::size();
+    is >> static_cast<Field<T>&>(lst);
+    lst.capacity_ = lst.Field<T>::size();
 
     return is;
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 
 // ************************************************************************* //
