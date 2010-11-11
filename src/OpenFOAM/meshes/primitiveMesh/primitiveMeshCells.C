@@ -42,7 +42,7 @@ void Foam::primitiveMesh::calcCells
     {
         nCells = -1;
 
-        forAll(own, faceI)
+        forAll (own, faceI)
         {
             nCells = max(nCells, own[faceI]);
         }

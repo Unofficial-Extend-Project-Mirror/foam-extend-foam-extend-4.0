@@ -260,7 +260,6 @@ Foam::polyMesh::readUpdateState Foam::polyMesh::readUpdate()
             initMesh(cells);
         }
 
-
         // Even if number of patches stayed same still recalculate boundary
         // data.
 

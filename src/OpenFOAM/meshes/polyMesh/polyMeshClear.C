@@ -29,6 +29,7 @@ License
 #include "globalMeshData.H"
 #include "demandDrivenData.H"
 #include "meshObjectBase.H"
+#include "pointMesh.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -93,7 +94,9 @@ void Foam::polyMesh::clearGeom()
     solutionD_ = Vector<label>::zero;
 
     // Move points all mesh objects.  HJ, 13/Oct/2010
-    meshObjectBase::allMovePoints(*this);
+    // This is a problem, because it is called in a destructor.
+    meshObjectBase::allDelete(*this);
+//     meshObjectBase::allMovePoints(*this);
 }
 
 

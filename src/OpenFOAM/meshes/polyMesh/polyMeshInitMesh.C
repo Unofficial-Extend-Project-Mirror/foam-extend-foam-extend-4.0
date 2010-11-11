@@ -36,9 +36,34 @@ void Foam::polyMesh::initMesh()
             << "initialising primitiveMesh" << endl;
     }
 
+    // For backward compatibility check if the owner array is the same
+    // length as the number of allFaces and shrink to remove the -1s padding
+    if (min(owner_) < 0)
+    {
+        label nActiveFaces = 0;
+
+        forAll(owner_, faceI)
+        {
+            if (owner_[faceI] == -1)
+            {
+                break;
+            }
+            else
+            {
+                nActiveFaces++;
+            }
+        }
+
+        InfoIn("void polyMesh::initMesh()")
+            << "Truncating owner list at " << nActiveFaces
+            << " for backward compatibility" << endl;
+
+        owner_.setSize(nActiveFaces);
+    }
+
     // For backward compatibility check if the neighbour array is the same
     // length as the owner and shrink to remove the -1s padding
-    if (neighbour_.size() == owner_.size())
+    if (min(neighbour_) < 0)
     {
         label nIntFaces = 0;
 
@@ -53,6 +78,10 @@ void Foam::polyMesh::initMesh()
                 nIntFaces++;
             }
         }
+
+        InfoIn("void polyMesh::initMesh()")
+            << "Truncating neighbour list at " << nIntFaces
+            << " for backward compatibility" << endl;
 
         neighbour_.setSize(nIntFaces);
     }
@@ -270,7 +299,7 @@ void Foam::polyMesh::initMesh(cellList& c)
         {
             Info<< "void polyMesh::initMesh(cellList& c) : "
                 << "unused faces detected.  "
-                << "Number of used faces: " << nUsedFaces 
+                << "Number of used faces: " << nUsedFaces
                 << ".  Total number of faces: " << owner_.size() << endl;
         }
 

@@ -192,7 +192,11 @@ void Foam::vtkPV3Foam::convertPointFields
     }
 
     // Construct interpolation on the raw mesh
-    pointMesh pMesh(mesh);
+
+    // HJ, bug fix?  Point mesh handled by objectRegistry
+    // HJ, 11/Nov/2010
+    const pointMesh& pMesh = pointMesh::New(mesh);
+//     pointMesh pMesh(mesh);
 
 
     convertPointFields<scalar>

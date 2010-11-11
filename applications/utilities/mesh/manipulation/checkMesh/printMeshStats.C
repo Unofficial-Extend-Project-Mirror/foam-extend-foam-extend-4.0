@@ -82,13 +82,13 @@ void Foam::printMeshStats(const polyMesh& mesh, const bool allTopology)
         }
     }
 
-    reduce(nHex,sumOp<label>());
-    reduce(nPrism,sumOp<label>()); 
-    reduce(nWedge,sumOp<label>());
-    reduce(nPyr,sumOp<label>());
-    reduce(nTetWedge,sumOp<label>());
-    reduce(nTet,sumOp<label>());
-    reduce(nUnknown,sumOp<label>());
+    reduce(nHex, sumOp<label>());
+    reduce(nPrism, sumOp<label>());
+    reduce(nWedge, sumOp<label>());
+    reduce(nPyr, sumOp<label>());
+    reduce(nTetWedge, sumOp<label>());
+    reduce(nTet, sumOp<label>());
+    reduce(nUnknown, sumOp<label>());
 
     Info<< "Overall number of cells of each type:" << nl
         << "    hexahedra:     " << nHex << nl
