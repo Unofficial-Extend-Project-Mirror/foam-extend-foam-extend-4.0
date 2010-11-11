@@ -206,17 +206,18 @@ public:
         //- Assignment from UList
         inline void operator=(const UList<T>&);
 
+
     // IOstream operators
 
 #ifndef SWIG
-        // Write DynamicList to Ostream.
+        // Write DynamicList to Ostream
         friend Ostream& operator<< <T, SizeInc, SizeMult, SizeDiv>
         (
             Ostream&,
             const DynamicList<T, SizeInc, SizeMult, SizeDiv>&
         );
 
-        //- Read from Istream, discarding contents of existing DynamicList.
+        //- Read from Istream, discarding contents of existing DynamicList
         friend Istream& operator>> <T, SizeInc, SizeMult, SizeDiv>
         (
             Istream&,
