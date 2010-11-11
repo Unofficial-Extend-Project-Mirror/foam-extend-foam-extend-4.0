@@ -337,7 +337,7 @@ void Foam::sampledSets::read(const dictionary& dict)
 
 void Foam::sampledSets::correct()
 {
-    // reset interpolation
+    // Reset interpolation
     pointMesh::Delete(mesh_);
     volPointInterpolation::Delete(mesh_);
 
