@@ -234,19 +234,22 @@ public:
 
         // IOstream operators
 
-            // Write DynamicField to Ostream.
-            friend Ostream& operator<< <T, SizeInc, SizeMult, SizeDiv>
-            (
-                Ostream&,
-                const DynamicField<T, SizeInc, SizeMult, SizeDiv>&
-            );
+            //HJ, this does not compile with Icc.  Cannot figure it out
+            // HJ, 11/Nov/2010
 
-            //- Read from Istream, discarding contents of existing DynamicField.
-            friend Istream& operator>> <T, SizeInc, SizeMult, SizeDiv>
-            (
-                Istream&,
-                DynamicField<T, SizeInc, SizeMult, SizeDiv>&
-            );
+//             //- Write DynamicField to Ostream.
+//             friend Ostream& operator<< <T, SizeInc, SizeMult, SizeDiv>
+//             (
+//                 Ostream&,
+//                 const DynamicField<T, SizeInc, SizeMult, SizeDiv>&
+//             );
+
+//             //- Read from Istream, discarding contents of existing DynamicField.
+//             friend Istream& operator>> <T, SizeInc, SizeMult, SizeDiv>
+//             (
+//                 Istream&,
+//                 DynamicField<T, SizeInc, SizeMult, SizeDiv>&
+//             );
 };
 
 
