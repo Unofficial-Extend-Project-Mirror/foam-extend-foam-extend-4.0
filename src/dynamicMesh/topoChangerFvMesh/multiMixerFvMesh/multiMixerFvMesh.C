@@ -96,8 +96,7 @@ void Foam::multiMixerFvMesh::addZonesAndModifiers()
 
         List<cellZone*> czList;
         czList.transfer(cz.shrink());
-        Info << "pzList: " << pzList.size() << " fzList: " << fzList.size()
-            << " czList: " << czList.size() << endl;
+
         addZones(pzList, fzList, czList);
     }
 
@@ -118,6 +117,9 @@ void Foam::multiMixerFvMesh::addZonesAndModifiers()
         topoChanger_.writeOpt() = IOobject::AUTO_WRITE;
         topoChanger_.write();
     }
+
+    // Write mesh with new zones
+    write();
 }
 
 
