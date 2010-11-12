@@ -201,7 +201,6 @@ void Foam::movingConeTopoFvMesh::addZonesAndModifiers()
     Info << "Adding mesh zones." << endl;
     addZones(pz, fz, cz);
 
-
     // Add layer addition/removal interfaces
 
     topoChanger_.setSize(2);
