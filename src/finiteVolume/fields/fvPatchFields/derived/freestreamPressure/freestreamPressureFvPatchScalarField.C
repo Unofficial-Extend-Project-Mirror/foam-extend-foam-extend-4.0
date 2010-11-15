@@ -102,7 +102,7 @@ void freestreamPressureFvPatchScalarField::updateCoeffs()
     const freestreamFvPatchVectorField& Up = 
         refCast<const freestreamFvPatchVectorField>
         (
-            patch().lookupPatchField<volVectorField, vector>("U")
+            lookupPatchField<volVectorField, vector>("U")
         );
 
     const surfaceScalarField& phi = 
@@ -121,7 +121,7 @@ void freestreamPressureFvPatchScalarField::updateCoeffs()
     else if (phi.dimensions() == dimDensity*dimVelocity*dimArea)
     {
         const fvPatchField<scalar>& rhop =
-            patch().lookupPatchField<volScalarField, scalar>("rho");
+            lookupPatchField<volScalarField, scalar>("rho");
 
         phip = rhop*(patch().Sf() & Up.freestreamValue());
     }

@@ -161,7 +161,7 @@ void pressureDirectedInletVelocityFvPatchVectorField::updateCoeffs()
     else if (phi.dimensions() == dimDensity*dimVelocity*dimArea)
     {
         const fvPatchField<scalar>& rhop =
-            patch().lookupPatchField<volScalarField, scalar>(rhoName_);
+            lookupPatchField<volScalarField, scalar>(rhoName_);
 
         operator==(inletDir_*phip/(rhop*ndmagS));
     }

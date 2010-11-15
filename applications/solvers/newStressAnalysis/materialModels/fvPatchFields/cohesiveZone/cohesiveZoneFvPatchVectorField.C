@@ -213,7 +213,7 @@ void cohesiveZoneFvPatchVectorField::updateCoeffs()
         rheology.lambda()().boundaryField()[patch().index()];
 
     const fvPatchField<tensor>& gradU =
-        patch().lookupPatchField<volTensorField, tensor>
+        lookupPatchField<volTensorField, tensor>
         (
             "grad(" +UName_ + ")"
         );

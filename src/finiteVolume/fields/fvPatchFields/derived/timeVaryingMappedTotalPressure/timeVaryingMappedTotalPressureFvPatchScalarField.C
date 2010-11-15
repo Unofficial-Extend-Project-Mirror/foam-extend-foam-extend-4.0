@@ -166,7 +166,7 @@ void Foam::timeVaryingMappedTotalPressureFvPatchScalarField::updateCoeffs
     const scalarField p0 = *this;
 
     const fvsPatchField<scalar>& phip =
-        patch().lookupPatchField<surfaceScalarField, scalar>(phiName_);
+        lookupPatchField<surfaceScalarField, scalar>(phiName_);
 
     if (dimensionedInternalField().dimensions() == dimPressure/dimDensity)
     {
@@ -199,14 +199,14 @@ void Foam::timeVaryingMappedTotalPressureFvPatchScalarField::updateCoeffs
         if (rhoName_ != "none")
         {
             const fvPatchField<scalar>& rho =
-                patch().lookupPatchField<volScalarField, scalar>(rhoName_);
+                lookupPatchField<volScalarField, scalar>(rhoName_);
 
             operator==(p0 - 0.5*rho*(1.0 - pos(phip))*magSqr(Up));
         }
         else if (psiName_ != "none")
         {
             const fvPatchField<scalar>& psip =
-                patch().lookupPatchField<volScalarField, scalar>(psiName_);
+                lookupPatchField<volScalarField, scalar>(psiName_);
 
             if (gamma_ > 1.0)
             {
@@ -265,7 +265,7 @@ void Foam::timeVaryingMappedTotalPressureFvPatchScalarField::updateCoeffs
 
 void Foam::timeVaryingMappedTotalPressureFvPatchScalarField::updateCoeffs()
 {
-    updateCoeffs(patch().lookupPatchField<volVectorField, vector>(UName_));
+    updateCoeffs(lookupPatchField<volVectorField, vector>(UName_));
 }
 
 

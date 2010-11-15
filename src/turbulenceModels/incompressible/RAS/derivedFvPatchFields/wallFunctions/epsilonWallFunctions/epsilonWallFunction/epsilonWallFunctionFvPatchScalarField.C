@@ -193,13 +193,13 @@ void epsilonWallFunctionFvPatchScalarField::updateCoeffs()
     const volScalarField& k = db().lookupObject<volScalarField>(kName_);
 
     const scalarField& nuw =
-        patch().lookupPatchField<volScalarField, scalar>(nuName_);
+        lookupPatchField<volScalarField, scalar>(nuName_);
 
     const scalarField& nutw =
-        patch().lookupPatchField<volScalarField, scalar>(nutName_);
+        lookupPatchField<volScalarField, scalar>(nutName_);
 
     const fvPatchVectorField& Uw =
-        patch().lookupPatchField<volVectorField, vector>(UName_);
+        lookupPatchField<volVectorField, vector>(UName_);
 
     const scalarField magGradUw = mag(Uw.snGrad());
 

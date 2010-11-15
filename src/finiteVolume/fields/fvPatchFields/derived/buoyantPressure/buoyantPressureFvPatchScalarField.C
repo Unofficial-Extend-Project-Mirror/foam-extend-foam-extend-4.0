@@ -115,7 +115,7 @@ void buoyantPressureFvPatchScalarField::updateCoeffs()
         db().lookupObject<uniformDimensionedVectorField>("g");
 
     const fvPatchField<scalar>& rho =
-        patch().lookupPatchField<volScalarField, scalar>(rhoName_);
+        lookupPatchField<volScalarField, scalar>(rhoName_);
 
     // If the variable name is "p_rgh" or "pd" assume it is p - rho*g.h
     // and set the gradient appropriately.

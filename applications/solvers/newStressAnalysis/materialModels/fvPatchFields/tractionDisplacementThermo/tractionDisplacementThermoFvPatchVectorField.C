@@ -180,7 +180,7 @@ void tractionDisplacementThermoFvPatchVectorField::updateCoeffs()
     vectorField n = patch().nf();
 
     const fvPatchField<tensor>& gradU =
-        patch().lookupPatchField<volTensorField, tensor>("grad(" +UName_ + ")");
+        lookupPatchField<volTensorField, tensor>("grad(" +UName_ + ")");
 
     // Thermal component
 
@@ -189,7 +189,7 @@ void tractionDisplacementThermoFvPatchVectorField::updateCoeffs()
         this->db().objectRegistry::lookupObject<thermalModel>(thermoName_);
 
     const fvPatchField<scalar>& T =
-        patch().lookupPatchField<volScalarField, scalar>(TName_);
+        lookupPatchField<volScalarField, scalar>(TName_);
 
     const scalarField rhoThreeKalpha =
         rheology.rho()().boundaryField()[patch().index()]*

@@ -137,11 +137,11 @@ void mixedRhoEFvPatchScalarField::updateCoeffs()
     }
 
     const fvPatchField<scalar>& rhop =
-        patch().lookupPatchField<volScalarField, scalar>("rho");
+        lookupPatchField<volScalarField, scalar>("rho");
     const fvPatchField<vector>& rhoUp =
-        patch().lookupPatchField<volVectorField, vector>("rhoU");
+        lookupPatchField<volVectorField, vector>("rhoU");
 //    fvPatchField<scalar>& Tp =
-//        patch().lookupPatchField<volScalarField, scalar>("T");
+//        lookupPatchField<volScalarField, scalar>("T");
 
     const volScalarField& T = db().lookupObject<volScalarField>("T");
     const label patchi = patch().index();

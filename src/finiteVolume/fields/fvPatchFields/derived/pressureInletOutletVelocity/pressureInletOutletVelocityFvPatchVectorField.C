@@ -176,7 +176,7 @@ void pressureInletOutletVelocityFvPatchVectorField::updateCoeffs()
     }
 
     const fvsPatchField<scalar>& phip =
-        patch().lookupPatchField<surfaceScalarField, scalar>(phiName_);
+        lookupPatchField<surfaceScalarField, scalar>(phiName_);
 
     valueFraction() = neg(phip)*(I - sqr(patch().nf()));
 

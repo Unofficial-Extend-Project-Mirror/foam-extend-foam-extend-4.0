@@ -121,7 +121,7 @@ void outletInletFvPatchField<Type>::updateCoeffs()
         return;
     }
 
-    const fvsPatchField<scalar>& phip = this->patch().lookupPatchField
+    const fvsPatchField<scalar>& phip = this->lookupPatchField
     (
         "phi",
         reinterpret_cast<const surfaceScalarField*>(0),

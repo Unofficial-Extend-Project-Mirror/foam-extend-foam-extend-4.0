@@ -127,12 +127,12 @@ void nuSgsWallFunctionFvPatchScalarField::evaluate
     const scalarField& ry = patch().deltaCoeffs();
 
     const fvPatchVectorField& U =
-        patch().lookupPatchField<volVectorField, vector>(UName_);
+        lookupPatchField<volVectorField, vector>(UName_);
 
     scalarField magUp = mag(U.patchInternalField() - U);
 
     const scalarField& nuw =
-        patch().lookupPatchField<volScalarField, scalar>(nuName_);
+        lookupPatchField<volScalarField, scalar>(nuName_);
 
     scalarField& nuSgsw = *this;
 

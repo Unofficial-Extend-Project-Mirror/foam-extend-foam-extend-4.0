@@ -209,7 +209,7 @@ void alphaSgsJayatillekeWallFunctionFvPatchScalarField::evaluate
 
     const scalarField& rhow = lesModel.rho().boundaryField()[patchI];
     const fvPatchScalarField& hw =
-        patch().lookupPatchField<volScalarField, scalar>("h");
+        lookupPatchField<volScalarField, scalar>("h");
 
     const scalarField& ry = patch().deltaCoeffs();
 

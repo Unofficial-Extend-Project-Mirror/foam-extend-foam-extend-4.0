@@ -95,7 +95,7 @@ greyDiffusiveRadiationMixedFvPatchScalarField
         // No value given. Restart as fixedValue b.c.
 
         const scalarField& Tp =
-            patch().lookupPatchField<volScalarField, scalar>(TName_);
+            lookupPatchField<volScalarField, scalar>(TName_);
 
         refValue() =
             emissivity_*4.0*radiation::sigmaSB.value()*pow4(Tp)
@@ -145,7 +145,7 @@ updateCoeffs()
     }
 
     const scalarField& Tp =
-        patch().lookupPatchField<volScalarField, scalar>(TName_);
+        lookupPatchField<volScalarField, scalar>(TName_);
 
     const radiationModel& radiation =
         db().lookupObject<radiationModel>("radiationProperties");

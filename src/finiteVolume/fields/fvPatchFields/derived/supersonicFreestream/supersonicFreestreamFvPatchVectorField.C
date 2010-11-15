@@ -153,13 +153,13 @@ void supersonicFreestreamFvPatchVectorField::updateCoeffs()
     }
 
     const fvPatchField<scalar>& pT =
-        patch().lookupPatchField<volScalarField, scalar>("T");
+        lookupPatchField<volScalarField, scalar>("T");
 
     const fvPatchField<scalar>& pp =
-        patch().lookupPatchField<volScalarField, scalar>("p");
+        lookupPatchField<volScalarField, scalar>("p");
 
     const fvPatchField<scalar>& ppsi =
-        patch().lookupPatchField<volScalarField, scalar>("psi");
+        lookupPatchField<volScalarField, scalar>("psi");
 
     // Need R of the free-stream flow.  Assume R is independent of location
     // along patch so use face 0

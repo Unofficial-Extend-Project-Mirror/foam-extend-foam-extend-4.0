@@ -69,7 +69,7 @@ void Foam::fanFvPatchField<Foam::scalar>::updateCoeffs()
             Un /=
                 scalarField::subField
                 (
-                    patch().lookupPatchField<volScalarField, scalar>("rho"),
+                    lookupPatchField<volScalarField, scalar>("rho"),
                     size()/2
                 );
         }
