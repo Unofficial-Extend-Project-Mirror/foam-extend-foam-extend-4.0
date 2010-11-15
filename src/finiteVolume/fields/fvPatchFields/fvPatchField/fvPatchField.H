@@ -269,6 +269,19 @@ public:
             //- Return local objectRegistry
             const objectRegistry& db() const;
 
+            //- Lookup and return the patchField of the named field from the
+            //  field's objectRegistry.
+            //  N.B.  The dummy pointer arguments are used if this function is
+            //  instantiated within a templated function to avoid a bug in gcc.
+            //  See inletOutletFvPatchField.C and outletInletFvPatchField.C
+            template<class GeometricField, class Type2>
+            const typename GeometricField::PatchFieldType& lookupPatchField
+            (
+                const word& name,
+                const GeometricField* = NULL,
+                const Type2* = NULL
+            ) const;
+
             //- Return patch
             const fvPatch& patch() const
             {
