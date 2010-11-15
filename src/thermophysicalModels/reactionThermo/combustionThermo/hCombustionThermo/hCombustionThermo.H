@@ -75,21 +75,26 @@ public:
         autoPtr,
         hCombustionThermo,
         fvMesh,
-        (const fvMesh& mesh),
-        (mesh)
+        (const fvMesh& mesh, const objectRegistry& obj),
+        (mesh, obj)
     );
 
 
     // Constructors
 
         //- Construct from dictionary and mesh
-        hCombustionThermo(const fvMesh&);
+        hCombustionThermo(const fvMesh&, const objectRegistry&);
 
 
     // Selectors
 
         //- Standard selection based on fvMesh
-        static autoPtr<hCombustionThermo> New(const fvMesh&);
+        static autoPtr<hCombustionThermo> New(const fvMesh&, const objectRegistry&);
+
+        static autoPtr<hCombustionThermo> New(const fvMesh& mesh)
+        {
+	        return New(mesh, mesh)
+        }
 
         //- Select and check that package contains 'thermoType'
         static autoPtr<hCombustionThermo> NewType

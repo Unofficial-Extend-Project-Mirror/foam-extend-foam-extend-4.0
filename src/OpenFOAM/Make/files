@@ -169,13 +169,13 @@ $(regIOobject)/regIOobjectWrite.C
 
 db/IOobjectList/IOobjectList.C
 db/objectRegistry/objectRegistry.C
+db/postfixedSubRegistry/postfixedSubRegistry.C
 db/CallbackRegistry/CallbackRegistryName.C
 db/dlLibraryTable/dlLibraryTable.C
 
 db/functionObjects/functionObject/functionObject.C
 db/functionObjects/functionObjectList/functionObjectList.C
 db/functionObjects/outputFilterOutputControl/outputFilterOutputControl.C
-
 
 Time = db/Time
 $(Time)/TimePaths.C

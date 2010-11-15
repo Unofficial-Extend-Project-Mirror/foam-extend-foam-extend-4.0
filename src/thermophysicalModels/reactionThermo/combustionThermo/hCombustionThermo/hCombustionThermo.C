@@ -47,7 +47,7 @@ Foam::hCombustionThermo::hCombustionThermo(const fvMesh& mesh)
         (
             "h",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),

@@ -116,6 +116,34 @@ bool Foam::IOobject::IOobject::fileNameComponents
 Foam::IOobject::IOobject
 (
     const word& name,
+    const Time& time,
+    readOption ro,
+    writeOption wo
+)
+:
+    name_(name),
+    headerClassName_(typeName),
+    note_(),
+    instance_(""),
+    local_(),
+    db_(time),
+    rOpt_(ro),
+    wOpt_(wo),
+    registerObject_(false),
+    objState_(GOOD)
+{
+    if (objectRegistry::debug)
+    {
+        Info<< "Constructing IOobject called " << name_
+            << " of type " << headerClassName_
+            << endl;
+    }
+}
+
+
+Foam::IOobject::IOobject
+(
+    const word& name,
     const fileName& instance,
     const objectRegistry& registry,
     readOption ro,
@@ -123,7 +151,7 @@ Foam::IOobject::IOobject
     bool registerObject
 )
 :
-    name_(name),
+    name_(registry.mangleFileName(name)),
     headerClassName_(typeName),
     note_(),
     instance_(instance),
@@ -154,7 +182,7 @@ Foam::IOobject::IOobject
     bool registerObject
 )
 :
-    name_(name),
+    name_(registry.mangleFileName(name)),
     headerClassName_(typeName),
     note_(),
     instance_(instance),
