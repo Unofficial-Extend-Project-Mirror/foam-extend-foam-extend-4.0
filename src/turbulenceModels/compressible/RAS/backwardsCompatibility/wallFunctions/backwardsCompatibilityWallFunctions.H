@@ -50,10 +50,24 @@ namespace compressible
     tmp<volScalarField> autoCreateMut
     (
         const word& fieldName,
+        const fvMesh& mesh,
+        const objectRegistry& obj
+    );
+
+    tmp<volScalarField> autoCreateMut
+    (
+        const word& fieldName,
         const fvMesh& mesh
     );
 
     //- mut for Low-Reynolds number models
+    tmp<volScalarField> autoCreateLowReMut
+    (
+        const word& fieldName,
+        const fvMesh& mesh,
+        const objectRegistry& obj
+    );
+
     tmp<volScalarField> autoCreateLowReMut
     (
         const word& fieldName,
@@ -64,10 +78,24 @@ namespace compressible
     tmp<volScalarField> autoCreateAlphat
     (
         const word& fieldName,
+        const fvMesh& mesh,
+        const objectRegistry& obj
+    );
+
+    tmp<volScalarField> autoCreateAlphat
+    (
+        const word& fieldName,
         const fvMesh& mesh
     );
 
     //- epsilon
+    tmp<volScalarField> autoCreateEpsilon
+    (
+        const word& fieldName,
+        const fvMesh& mesh,
+        const objectRegistry& obj
+    );
+
     tmp<volScalarField> autoCreateEpsilon
     (
         const word& fieldName,
@@ -78,10 +106,24 @@ namespace compressible
     tmp<volScalarField> autoCreateOmega
     (
         const word& fieldName,
+        const fvMesh& mesh,
+        const objectRegistry& obj
+    );
+
+    tmp<volScalarField> autoCreateOmega
+    (
+        const word& fieldName,
         const fvMesh& mesh
     );
 
     //- k
+    tmp<volScalarField> autoCreateK
+    (
+        const word& fieldName,
+        const fvMesh& mesh,
+        const objectRegistry& obj
+    );
+
     tmp<volScalarField> autoCreateK
     (
         const word& fieldName,
@@ -92,10 +134,24 @@ namespace compressible
     tmp<volScalarField> autoCreateQ
     (
         const word& fieldName,
+        const fvMesh& mesh,
+        const objectRegistry& obj
+    );
+
+    tmp<volScalarField> autoCreateQ
+    (
+        const word& fieldName,
         const fvMesh& mesh
     );
 
     //- R
+    tmp<volSymmTensorField> autoCreateR
+    (
+        const word& fieldName,
+        const fvMesh& mesh,
+        const objectRegistry& obj
+    );
+
     tmp<volSymmTensorField> autoCreateR
     (
         const word& fieldName,
@@ -108,7 +164,8 @@ namespace compressible
     autoCreateWallFunctionField
     (
         const word& fieldName,
-        const fvMesh& mesh
+        const fvMesh& mesh,
+        const objectRegistry& obj
     );
 
 

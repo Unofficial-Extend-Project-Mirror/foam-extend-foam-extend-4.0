@@ -205,11 +205,11 @@ kOmegaSST::kOmegaSST
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        autoCreateK("k", mesh_)
+        autoCreateK("k", mesh_, U_.db())
     ),
     omega_
     (
@@ -217,11 +217,11 @@ kOmegaSST::kOmegaSST
         (
             "omega",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        autoCreateOmega("omega", mesh_)
+        autoCreateOmega("omega", mesh_, U_.db())
     ),
     nut_
     (
@@ -229,11 +229,11 @@ kOmegaSST::kOmegaSST
         (
             "nut",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        autoCreateNut("nut", mesh_)
+        autoCreateNut("nut", mesh_, U_.db())
     )
 {
     bound(omega_, omega0_);
@@ -257,7 +257,7 @@ tmp<volSymmTensorField> kOmegaSST::R() const
             (
                 "R",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -278,7 +278,7 @@ tmp<volSymmTensorField> kOmegaSST::devReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

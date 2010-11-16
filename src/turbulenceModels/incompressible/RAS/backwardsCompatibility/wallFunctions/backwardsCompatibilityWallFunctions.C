@@ -45,14 +45,15 @@ namespace incompressible
 tmp<volScalarField> autoCreateNut
 (
     const word& fieldName,
-    const fvMesh& mesh
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 {
     IOobject nutHeader
     (
         fieldName,
         mesh.time().timeName(),
-        mesh,
+        obj,
         IOobject::MUST_READ,
         IOobject::NO_WRITE,
         false
@@ -112,17 +113,28 @@ tmp<volScalarField> autoCreateNut
 }
 
 
-tmp<volScalarField> autoCreateLowReNut
+tmp<volScalarField> autoCreateNut
 (
     const word& fieldName,
     const fvMesh& mesh
+)
+{
+    return autoCreateNut(fieldName, mesh, mesh);
+}
+
+
+tmp<volScalarField> autoCreateLowReNut
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 {
     IOobject nutHeader
     (
         fieldName,
         mesh.time().timeName(),
-        mesh,
+        obj,
         IOobject::MUST_READ,
         IOobject::NO_WRITE,
         false
@@ -182,6 +194,37 @@ tmp<volScalarField> autoCreateLowReNut
 }
 
 
+tmp<volScalarField> autoCreateLowReNut
+(
+    const word& fieldName,
+    const fvMesh& mesh
+)
+{
+    return autoCreateLowReNut(fieldName, mesh, mesh);
+}
+
+
+tmp<volScalarField> autoCreateEpsilon
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+{
+    return
+        autoCreateWallFunctionField
+        <
+            scalar,
+            RASModels::epsilonWallFunctionFvPatchScalarField
+        >
+        (
+            fieldName,
+            mesh,
+            obj
+        );
+}
+
+
 tmp<volScalarField> autoCreateEpsilon
 (
     const word& fieldName,
@@ -196,7 +239,29 @@ tmp<volScalarField> autoCreateEpsilon
         >
         (
             fieldName,
+            mesh,
             mesh
+        );
+}
+
+
+tmp<volScalarField> autoCreateOmega
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+{
+    return
+        autoCreateWallFunctionField
+        <
+            scalar,
+            RASModels::omegaWallFunctionFvPatchScalarField
+        >
+        (
+            fieldName,
+            mesh,
+            obj
         );
 }
 
@@ -215,7 +280,29 @@ tmp<volScalarField> autoCreateOmega
         >
         (
             fieldName,
+            mesh,
             mesh
+        );
+}
+
+
+tmp<volScalarField> autoCreateK
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+{
+    return
+        autoCreateWallFunctionField
+        <
+            scalar,
+            RASModels::kqRWallFunctionFvPatchField<scalar>
+        >
+        (
+            fieldName,
+            mesh,
+            obj
         );
 }
 
@@ -234,7 +321,29 @@ tmp<volScalarField> autoCreateK
         >
         (
             fieldName,
+            mesh,
             mesh
+        );
+}
+
+
+tmp<volScalarField> autoCreateQ
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+{
+    return
+        autoCreateWallFunctionField
+        <
+            scalar,
+            RASModels::kqRWallFunctionFvPatchField<scalar>
+        >
+        (
+            fieldName,
+            mesh,
+            obj
         );
 }
 
@@ -253,7 +362,29 @@ tmp<volScalarField> autoCreateQ
         >
         (
             fieldName,
+            mesh,
             mesh
+        );
+}
+
+
+tmp<volSymmTensorField> autoCreateR
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+{
+    return
+        autoCreateWallFunctionField
+        <
+            symmTensor,
+            RASModels::kqRWallFunctionFvPatchField<symmTensor>
+        >
+        (
+            fieldName,
+            mesh,
+            obj
         );
 }
 
@@ -272,6 +403,7 @@ tmp<volSymmTensorField> autoCreateR
         >
         (
             fieldName,
+            mesh,
             mesh
         );
 }

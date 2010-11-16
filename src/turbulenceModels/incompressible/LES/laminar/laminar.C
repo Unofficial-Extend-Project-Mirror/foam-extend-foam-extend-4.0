@@ -67,7 +67,7 @@ tmp<volScalarField> laminar::k() const
             (
                 "k",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -92,7 +92,7 @@ tmp<volScalarField> laminar::nuSgs() const
             (
                 "nuSgs",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -121,7 +121,7 @@ tmp<volSymmTensorField> laminar::B() const
             (
                 "B",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

@@ -190,7 +190,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "R",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -202,7 +202,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -214,7 +214,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "epsilon",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -226,7 +226,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "mut",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -238,7 +238,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "alphat",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -279,7 +279,7 @@ tmp<volSymmTensorField> LaunderGibsonRSTM::devRhoReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

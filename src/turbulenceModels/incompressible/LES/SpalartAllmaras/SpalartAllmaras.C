@@ -255,7 +255,7 @@ SpalartAllmaras::SpalartAllmaras
         (
             "nuTilda",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -268,7 +268,7 @@ SpalartAllmaras::SpalartAllmaras
         (
             "nuSgs",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
