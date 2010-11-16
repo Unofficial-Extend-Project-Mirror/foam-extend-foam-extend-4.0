@@ -34,11 +34,12 @@ template<class CompType, class ThermoType>
 Foam::ODEChemistryModel<CompType, ThermoType>::ODEChemistryModel
 (
     const fvMesh& mesh,
+    const objectRegistry& obj,
     const word& compTypeName,
     const word& thermoTypeName
 )
 :
-    CompType(mesh, thermoTypeName),
+    CompType(mesh, obj, thermoTypeName),
 
     ODE(),
 

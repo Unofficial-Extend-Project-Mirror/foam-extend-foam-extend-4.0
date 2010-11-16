@@ -104,10 +104,14 @@ void Foam::hRhoMixtureThermo<MixtureType>::calculate()
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class MixtureType>
-Foam::hRhoMixtureThermo<MixtureType>::hRhoMixtureThermo(const fvMesh& mesh)
+Foam::hRhoMixtureThermo<MixtureType>::hRhoMixtureThermo
+(
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
 :
-    hReactionThermo(mesh),
-    MixtureType(*this, mesh)
+    hReactionThermo(mesh, obj),
+    MixtureType(*this, mesh, obj)
 {
     scalarField& hCells = h_.internalField();
     const scalarField& TCells = T_.internalField();
@@ -168,7 +172,7 @@ Foam::hRhoMixtureThermo<MixtureType>::hc() const
             (
                 "hc",
                 mesh.time().timeName(),
-                mesh,
+                this->T_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -274,7 +278,7 @@ Foam::hRhoMixtureThermo<MixtureType>::Cp() const
             (
                 "Cp",
                 mesh.time().timeName(),
-                mesh,
+                this->T_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

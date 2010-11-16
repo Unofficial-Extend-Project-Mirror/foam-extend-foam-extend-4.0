@@ -37,9 +37,13 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::hReactionThermo::hReactionThermo(const fvMesh& mesh)
+Foam::hReactionThermo::hReactionThermo
+(
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
 :
-    basicRhoThermo(mesh),
+    basicRhoThermo(mesh, obj),
 
     h_
     (
@@ -47,7 +51,7 @@ Foam::hReactionThermo::hReactionThermo(const fvMesh& mesh)
         (
             "h",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),

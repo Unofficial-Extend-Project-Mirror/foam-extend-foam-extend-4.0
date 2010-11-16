@@ -34,7 +34,11 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-autoPtr<hhuCombustionThermo> hhuCombustionThermo::New(const fvMesh& mesh)
+autoPtr<hhuCombustionThermo> hhuCombustionThermo::New
+(
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
 {
     word hhuCombustionThermoTypeName;
 
@@ -48,7 +52,7 @@ autoPtr<hhuCombustionThermo> hhuCombustionThermo::New(const fvMesh& mesh)
             (
                 "thermophysicalProperties",
                 mesh.time().constant(),
-                mesh,
+                obj,
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE
             )
@@ -65,7 +69,7 @@ autoPtr<hhuCombustionThermo> hhuCombustionThermo::New(const fvMesh& mesh)
 
     if (cstrIter == fvMeshConstructorTablePtr_->end())
     {
-        FatalErrorIn("hhuCombustionThermo::New(const fvMesh&)")
+        FatalErrorIn("hhuCombustionThermo::New(const fvMesh&, const objectRegistry&)")
             << "Unknown hhuCombustionThermo type "
             << hhuCombustionThermoTypeName << endl << endl
             << "Valid hhuCombustionThermo types are :" << endl
@@ -73,7 +77,7 @@ autoPtr<hhuCombustionThermo> hhuCombustionThermo::New(const fvMesh& mesh)
             << exit(FatalError);
     }
 
-    return autoPtr<hhuCombustionThermo>(cstrIter()(mesh));
+    return autoPtr<hhuCombustionThermo>(cstrIter()(mesh, obj));
 }
 
 

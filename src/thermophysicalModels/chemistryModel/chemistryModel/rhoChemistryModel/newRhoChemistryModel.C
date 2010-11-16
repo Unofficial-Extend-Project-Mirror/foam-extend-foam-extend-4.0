@@ -30,7 +30,8 @@ License
 
 Foam::autoPtr<Foam::rhoChemistryModel> Foam::rhoChemistryModel::New
 (
-    const fvMesh& mesh
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 {
     word rhoChemistryModelType;
@@ -47,7 +48,7 @@ Foam::autoPtr<Foam::rhoChemistryModel> Foam::rhoChemistryModel::New
             (
                 "chemistryProperties",
                 mesh.time().constant(),
-                mesh,
+                obj,
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE
             )
@@ -83,7 +84,7 @@ Foam::autoPtr<Foam::rhoChemistryModel> Foam::rhoChemistryModel::New
     {
         if (debug)
         {
-            FatalErrorIn("rhoChemistryModelBase::New(const mesh&)")
+            FatalErrorIn("rhoChemistryModelBase::New(const mesh&, const objectRegistry&)")
                 << "Unknown rhoChemistryModel type " << rhoChemistryModelType
                 << nl << nl << "Valid rhoChemistryModel types are:" << nl
                 << fvMeshConstructorTablePtr_->toc() << nl << exit(FatalError);
@@ -96,7 +97,7 @@ Foam::autoPtr<Foam::rhoChemistryModel> Foam::rhoChemistryModel::New
                 models[i] = models[i].replace(typeName + ',', "");
             }
 
-            FatalErrorIn("rhoChemistryModelBase::New(const mesh&)")
+            FatalErrorIn("rhoChemistryModelBase::New(const mesh&, const objectRegistry&)")
                 << "Unknown rhoChemistryModel type " << userModel
                 << nl << nl << "Valid rhoChemistryModel types are:" << nl
                 << models << nl << exit(FatalError);
@@ -104,7 +105,7 @@ Foam::autoPtr<Foam::rhoChemistryModel> Foam::rhoChemistryModel::New
     }
 
     return autoPtr<rhoChemistryModel>
-        (cstrIter()(mesh, typeName, thermoTypeName));
+        (cstrIter()(mesh, obj, typeName, thermoTypeName));
 }
 
 

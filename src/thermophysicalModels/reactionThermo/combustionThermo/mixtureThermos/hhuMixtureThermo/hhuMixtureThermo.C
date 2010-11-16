@@ -31,10 +31,14 @@ License
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class MixtureType>
-Foam::hhuMixtureThermo<MixtureType>::hhuMixtureThermo(const fvMesh& mesh)
+Foam::hhuMixtureThermo<MixtureType>::hhuMixtureThermo
+(
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
 :
-    hhuCombustionThermo(mesh),
-    MixtureType(*this, mesh)
+    hhuCombustionThermo(mesh, obj),
+    MixtureType(*this, mesh, obj)
 {
     scalarField& hCells = h_.internalField();
     scalarField& huCells = hu_.internalField();

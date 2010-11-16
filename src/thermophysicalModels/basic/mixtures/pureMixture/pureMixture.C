@@ -40,10 +40,11 @@ template<class ThermoType>
 pureMixture<ThermoType>::pureMixture
 (
     const dictionary& thermoDict,
-    const fvMesh& mesh
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 :
-    basicMixture(thermoDict, mesh),
+    basicMixture(thermoDict, mesh, obj),
     mixture_(thermoDict.lookup("mixture"))
 {}
 

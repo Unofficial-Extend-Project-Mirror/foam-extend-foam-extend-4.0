@@ -37,9 +37,13 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::hCombustionThermo::hCombustionThermo(const fvMesh& mesh)
+Foam::hCombustionThermo::hCombustionThermo
+(
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
 :
-    basicPsiThermo(mesh),
+    basicPsiThermo(mesh, obj),
 
     h_
     (

@@ -79,7 +79,7 @@ Foam::radiation::constantScatter::sigmaEff() const
             (
                 "sigma",
                 mesh_.time().timeName(),
-                mesh_,
+                mesh_, // HR 101116 -- Todo: Need to bring object registry here!
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false

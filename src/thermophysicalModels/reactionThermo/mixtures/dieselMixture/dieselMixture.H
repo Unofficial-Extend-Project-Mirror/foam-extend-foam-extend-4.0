@@ -81,7 +81,7 @@ public:
     // Constructors
 
         //- Construct from dictionary and mesh
-        dieselMixture(const dictionary&, const fvMesh&);
+        dieselMixture(const dictionary&, const fvMesh&, const objectRegistry&);
 
 
     //- Destructor

@@ -33,7 +33,8 @@ template<class ThermoType>
 Foam::reactingMixture<ThermoType>::reactingMixture
 (
     const dictionary& thermoDict,
-    const fvMesh& mesh
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 :
     autoPtr<chemistryReader<ThermoType> >
@@ -45,7 +46,8 @@ Foam::reactingMixture<ThermoType>::reactingMixture
         thermoDict,
         autoPtr<chemistryReader<ThermoType> >::operator()().species(),
         autoPtr<chemistryReader<ThermoType> >::operator()().sThermo(),
-        mesh
+        mesh,
+        obj
     ),
     PtrList<Reaction<ThermoType> >
     (

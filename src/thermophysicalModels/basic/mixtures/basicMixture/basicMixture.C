@@ -43,7 +43,8 @@ defineTypeNameAndDebug(basicMixture, 0);
 basicMixture::basicMixture
 (
     const dictionary&,
-    const fvMesh&
+    const fvMesh&,
+    const objectRegistry&
 )
 {}
 

@@ -78,7 +78,7 @@ public:
     // Constructors
 
         //- Construct from mesh
-        hRhoThermo(const fvMesh&);
+        hRhoThermo(const fvMesh&, const objectRegistry&);
 
 
     //- Destructor

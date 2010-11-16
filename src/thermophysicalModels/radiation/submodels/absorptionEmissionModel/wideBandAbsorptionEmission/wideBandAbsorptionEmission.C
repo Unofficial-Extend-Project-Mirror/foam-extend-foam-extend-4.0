@@ -175,7 +175,7 @@ Foam::radiation::wideBandAbsorptionEmission::aCont(const label bandI) const
             (
                 "a",
                 mesh().time().timeName(),
-                mesh(),
+                mesh(), // HR 101116 -- Todo: Need to bring object registry here!
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -240,7 +240,7 @@ Foam::radiation::wideBandAbsorptionEmission::eCont(const label bandI) const
             (
                 "e",
                 mesh().time().timeName(),
-                mesh(),
+                mesh(), // HR 101116 -- Todo: Need to bring object registry here!
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -264,7 +264,7 @@ Foam::radiation::wideBandAbsorptionEmission::ECont(const label bandI) const
             (
                 "E",
                 mesh().time().timeName(),
-                mesh(),
+                mesh(), // HR 101116 -- Todo: Need to bring object registry here!
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
