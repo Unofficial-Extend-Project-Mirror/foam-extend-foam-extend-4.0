@@ -80,7 +80,7 @@ void coupledFaPatch::calcTransformTensors
     const vectorField& nr
 ) const
 {
-    if (sum(mag(nf & nr)) < size() - SMALL)
+    if (sum(mag(nf & nr)) < Cf.size() - SMALL)
     {
         separation_.setSize(0);
 
