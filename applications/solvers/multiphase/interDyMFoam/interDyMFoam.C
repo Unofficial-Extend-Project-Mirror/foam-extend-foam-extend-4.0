@@ -45,17 +45,17 @@ Description
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCase.H"
-    #include "createTime.H"
-    #include "createDynamicFvMesh.H"
-    #include "readGravitationalAcceleration.H"
-    #include "readPISOControls.H"
-    #include "initContinuityErrs.H"
-    #include "createFields.H"
-    #include "readTimeControls.H"
-    #include "correctPhi.H"
-    #include "CourantNo.H"
-    #include "setInitialDeltaT.H"
+#   include "setRootCase.H"
+#   include "createTime.H"
+#   include "createDynamicFvMesh.H"
+#   include "readGravitationalAcceleration.H"
+#   include "readPISOControls.H"
+#   include "initContinuityErrs.H"
+#   include "createFields.H"
+#   include "readTimeControls.H"
+#   include "correctPhi.H"
+#   include "CourantNo.H"
+#   include "setInitialDeltaT.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -63,13 +63,13 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-        #include "readControls.H"
-        #include "CourantNo.H"
+#       include "readControls.H"
+#       include "CourantNo.H"
 
         // Make the fluxes absolute
         fvc::makeAbsolute(phi, U);
 
-        #include "setDeltaT.H"
+#       include "setDeltaT.H"
 
         runTime++;
 
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
         if (mesh.changing() && correctPhi)
         {
-            #include "correctPhi.H"
+#           include "correctPhi.H"
         }
 
         // Make the fluxes relative to the mesh motion
@@ -100,19 +100,19 @@ int main(int argc, char *argv[])
 
         if (mesh.changing() && checkMeshCourantNo)
         {
-            #include "meshCourantNo.H"
+#           include "meshCourantNo.H"
         }
 
         twoPhaseProperties.correct();
 
-        #include "alphaEqnSubCycle.H"
+#       include "alphaEqnSubCycle.H"
 
-        #include "UEqn.H"
+#       include "UEqn.H"
 
         // --- PISO loop
         for (int corr=0; corr<nCorr; corr++)
         {
-            #include "pEqn.H"
+#           include "pEqn.H"
         }
 
         p = pd + rho*gh;

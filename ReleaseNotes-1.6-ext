@@ -1,0 +1,83 @@
+#                            -*- mode: org; -*-
+#
+#+TITLE:          *OpenFOAM release notes for version 1.6-ext*
+#+AUTHOR:                      Hrvoje Jasak.
+#+DATE:                       12 November 2010
+#+LINK:                  http://www.extend-project.de
+#+OPTIONS: author:nil
+
+* Overview
+  OpenFOAM-1.6-ext is a formal release of the community developments in the
+  OpenFOAM software library, following the establishment of the -Extend Project
+  and  web portal.
+
+  This release includes an automatic test harness, which passes our standard
+  tests and tutorials.
+
+* Compatibility
+  OpenFOAM-1.6-ext is compatible with the OpenFOAM-1.6.x and 1.7.1 versions
+  of the code and incorporate most developments and changes from above versions
+  and ensure top-level compatibility.  In some cases, the differences are
+  caused by bug fixes and algorithmic improvements, considered more important
+  than inter-operability.
+
+  The list of developments is a result of the work of numerous contributors.
+  The Extend Project Admins would formally like to thank all contributors;
+  the list will be updated with further code development
+
+* Fundamental developments
+  Improvements in accuracy and stability on tetrahedral and tet-dominant meshes
+  Implicit coupled multi-domain solver
+  Block-implicit multi-equation matrix support
+  Proper Orthogonal Decomposition (POD) data analyss tools
+  Rewrite of Ordinary Differential Equation (ODE) and ODE solver classes
+  Dynamic remeshing classes, based on tetrahedral edge swapping
+  Radial Basis Function interpolation and mesh motion classes
+  Turbomachinery features: GGI interface, cyclic GGI, partial overlap GGI
+  Parallelisation of topological change engine
+  Support for parallelisation and topological changes in the Finite Area Method
+  Library preparation for Python/Swig interface for OpenFOAM: VulaSHAKA project
+  (http://sourceforge.net/projects/vulashaka/)
+  Basic implementation of OpenMP wrapping for multi-core support
+
+* Ongoing developments
+  This section lists the applications that existed in versions of OpenFOAM
+  but were abandoned by OpenCFD due to lack of expertise.  In some cases, code
+  may still be present but it is buggy or unusable.  The -Extend project line
+  maintains, validates and develops the features in contact with original
+  authors and contributes new features and bug fixes.
+
+  Working parallel point mesh and field tools, shared between interpolation
+  and FEM discretisation solvers
+  FEM-based automatic mesh motion solver, with working parallelisation
+  Dynamic mesh features and topological mesh changes
+  The Finite Area Method: parallelisation, volume-to-surface mapping
+  New generation of linear equation solvers, including accelerated AMG
+
+* Developments to solvers (applications)
+  Basic 6-degree-of-freedom (6-DOF) solver
+  POD solver tools: prototype
+  Demonstration solver for fully implicit block-matrix coupling
+
+* Developments to utilities
+  New parallel decomposition and reconstruction formulation, with support
+  for topologically changing meshes
+  Level-set support tools
+
+* Model development
+  Transport models and top-level solver for visco-elasto-plastic flows
+  Updates to internal combustion engine simulation tools
+  Updated version of free surface tracking tools for free surface flows
+  Updated fluid-structure interaction solver with parallelisation support
+  Updated stress analysis tools, new large deformation solver formulation
+
+* Validation
+  Integrated automatic and publicly available test harness with ~150 cases
+  http://openfoam-extend.sourceforge.net/CDash/index.php
+  Community-driven test-case base to enhance code quality and integrity.
+  Contributions under  
+  http://www.extend-project.de/project-final/openfoam-extend-test-harness
+
+* Other
+  The number of cumulative bug fixes compared to OpenFOAM-1.6.x is over
+  5000; we will stop counting.

@@ -1,0 +1,111 @@
+The OpenFOAM-Extend Project
+
+Web site: http://www.extend-project.de/
+
+The goal of the OpenFOAM -Extend Project is to open the OpenFOAM CFD toolbox
+to community contributed extensions in the spirit of the Open Source
+development model.
+
+Software under the name OpenFOAM has been developed by a large group of
+volunteers starting in 1991 and has spread through scientific and engineering
+community in the late 1990s and early 2000s.  Its main strength was the spirit
+of open collaboration in the community: the aim of the OpenFOAM-Extend Project
+is to formalize this spirit.
+
+ * Trademark notice
+  Currently, the word "OpenFOAM" is held as a trademark by a commercial
+  company, not associated with the Open Source development effort of this
+  software.  While the author acknowledges the existence of Trademark,
+  association of trademarked phrase with the the code developed by third
+  parties and including the author is misleading in terms of authorship,
+  ownership of intellectual property of the source code.
+
+  In the absence of a legal resolution, we shall refer to the project as the
+  -Extend project and software as "OpenFOAM", as per agreement between
+  Prof. Hrvoje Jasak and Mr. Henry G. Weller of 30 September 2004
+
+    09/30/2004 01:45 PM
+    
+    Dear Dr. Jasak,
+
+    I propose that we make FOAM open-source and shutdown Nabla, that way we
+     are free to pursue whatever future we wish independently.
+
+    Henry G. Weller
+    Managing Director
+    Nabla Ltd
+
+    The first release of the OpenFOAM source code of 10 December 2004
+    and subsequent clarification of 16 February 2005.
+
+    Hi Henry,
+
+    ...
+
+    Regarding the new setup, I would like to thank you for your effort i
+    n making FOAM public domain, with crucial comments regarding some
+    important details.
+
+    - in the header files for the open version of foam there exists a line
+     which claims copyright for OpenCFD Ltd:
+
+    Copyright (C) 1991-2004 OpenCFD Ltd.
+
+    I am not sure whether it is possible to claim copyright over a GPL piece
+    of software, but this is at least misleading.  In order for this
+    statement to be true, OpenCFD Ltd. would need to purchase the copyright
+    from Nabla Ltd. and from you and me personally (due to unresolved
+    ownership and the remaining payments Nabla Ltd. needs to make to us
+    regarding the original transfer of copyright).  I can offer a number
+    of solutions acceptable to me as follows:
+
+        1) no Copyright statement apart from the required GPL statement
+        2) Copyright OpenFOAM.org
+        3) Copyright Henry Weller, Hrvoje Jasak et al
+        4) Copyright OpenCFD and Hrvoje Jasak
+        5) List of authors instead of the copyright statement
+
+    I am also prepared to consider any other reasonable ideas along the same
+    lines (including the sale of copyright, which would be a bit pointless
+    at this stage) - please advise.
+
+
+    02/17/2005 11:09 PM
+
+    Under the GPL there has to be an organization in place to enforce the GPL
+    if there are violation, these are part of the rules.  OpenCFD undertakes
+    that responsibility hence the copyright.
+
+    Henry G. Weller
+    Managing Director
+
+
+    12 November 2010
+
+    From the above it is clear that OpenCFD does not own the rights or
+    authorship of the source code, which is currently concealed in public.
+    For further details, I have been attempting to get a formal response by
+    this company for 6 years now, without success.  It is time to move on.
+
+    The current Copyright notice does not fairly describe the authorship of
+    the software.  In the spirit of the open source development model, the
+    -Extend project wishes to formally acknowledge all contributors and
+    developers of OpenFOAM from its inception to today.
+
+    As this issue still remains unresolved, and the list of contributors
+    has been illegally removed from the source code by Mr. Weller in 2006,
+    we shall re-base OpenFOAM as an Open Source community-based project
+    and associate the authorship and Copyright in each case with the
+    original author.
+
+    Hrvoje Jasak
+
+
+This offering is not affiliated with OpenCFD Limited, owner of the OpenFOAM
+trade mark.
+
+
+Please find the official website of OpenCFD Limited at http://www.openfoam.org 
+In particular, OpenCFD Limited hosts the following legal statements:
+- licensing and intellectual property: http://www.openfoam.com/legal/index.php
+- trademark policy: http://www.openfoam.com/legal/trademark-policy.php

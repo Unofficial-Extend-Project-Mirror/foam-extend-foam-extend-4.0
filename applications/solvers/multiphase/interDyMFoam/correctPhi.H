@@ -38,7 +38,14 @@
         pcorrTypes
     );
 
-    dimensionedScalar rAUf("(1|A(U))", dimTime/rho.dimensions(), 1.0);
+    dimensionedScalar rAUf
+    (
+        "(1|A(U))",
+        dimTime/rho.dimensions(),
+        runTime.deltaT().value()
+    );
+
+    phi = (fvc::interpolate(U) & mesh.Sf());
 
     adjustPhi(phi, U, pcorr);
 
@@ -59,4 +66,8 @@
     }
 
 #   include "continuityErrs.H"
+#   include "CourantNo.H"
+
+    // Recalculate rhoPhi from rho
+    rhoPhi = fvc::interpolate(rho)*phi;
 }

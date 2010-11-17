@@ -259,7 +259,7 @@ kOmegaSST_LowRe::kOmegaSST_LowRe
 {
     bound(omega_, omega0_);
 
-    nut_ = a1_*k_/max(a1_*omega_, F2()*mag(symm(fvc::grad(U_))));
+    nut_ = a1_*k_/max(a1_*omega_, F2()*sqrt(2.0)*mag(symm(fvc::grad(U_))));
     nut_.correctBoundaryConditions();
 
     printCoeffs();
@@ -410,7 +410,7 @@ void kOmegaSST_LowRe::correct()
 
 
     // Re-calculate viscosity
-    nut_ = a1_*k_/max(a1_*omega_, F2()*sqrt(S2));
+    nut_ = a1_*k_/max(a1_*omega_, F2()*sqrt(2*S2));
 }
 
 
