@@ -22,7 +22,7 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "syncTools.H"
 #include "polyMesh.H"
@@ -306,9 +306,9 @@ void Foam::syncTools::syncPointMap
         }
     }
 
-    //- Note: hasTransformation is only used for warning messages so
-    //  reduction not strictly nessecary.
-    //reduce(hasTransformation, orOp<bool>());
+    // Note: hasTransformation is only used for warning messages so
+    // reduction not strictly nessecary.
+    // reduce(hasTransformation, orOp<bool>());
 
     // Synchronize multiple shared points.
     const globalMeshData& pd = mesh.globalData();

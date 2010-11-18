@@ -508,29 +508,33 @@ void GlobalPointPatchField
         // Create the global list and insert local values
         if (globalPointPatch_.globalPointSize() > 0)
         {
-            Field<Type> gpf
-            (
-                globalPointPatch_.globalPointSize(),
-                pTraits<Type>::zero
-            );
+            // Bug fix: use map-based communication.  HJ, 18/Nov/2010
 
+            // Get addressing
             const labelList& sharedPointAddr =
                 globalPointPatch_.sharedPointAddr();
+
+            // Get internal field data
             Field<Type> pField = this->patchInternalField();
+
+            // Pack data into a map
+            Map<Type> dataMap;
 
             forAll (sharedPointAddr, i)
             {
-                gpf[sharedPointAddr[i]] = pField[i];
+                dataMap.insert(sharedPointAddr[i], pField[i]);
             }
 
-            combineReduce(gpf, eqOp<Field<Type> >());
+            // Communicate map
+            Pstream::mapCombineGather(dataMap, eqOp<Type>());
+            Pstream::mapCombineScatter(dataMap);
 
             // Extract local data
             Field<Type> lpf(sharedPointAddr.size());
 
             forAll (sharedPointAddr, i)
             {
-                lpf[i] = gpf[sharedPointAddr[i]];
+                lpf[i] = dataMap[sharedPointAddr[i]];
             }
 
             // Get addressing and enforce values on all processors

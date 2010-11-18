@@ -91,7 +91,10 @@ tetPolyBoundaryMeshFaceDecomp::globalPatch() const
     {
         if (isA<globalTetPolyPatchFaceDecomp>(patches[patchI]))
         {
-            return refCast<const globalTetPolyPatchFaceDecomp>(patches[patchI]);
+            return refCast<const globalTetPolyPatchFaceDecomp>
+            (
+                patches[patchI]
+            );
         }
     }
 

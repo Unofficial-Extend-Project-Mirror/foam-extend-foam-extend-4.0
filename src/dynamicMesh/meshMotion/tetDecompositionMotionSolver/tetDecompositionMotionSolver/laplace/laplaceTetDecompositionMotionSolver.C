@@ -120,7 +120,7 @@ void Foam::laplaceTetDecompositionMotionSolver::solve()
     }
 
 
-    if(needTotDisplacement())
+    if (needTotDisplacement())
     {
         totDisplacement() += motionU()*tetMesh().time().deltaT();
     }

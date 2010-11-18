@@ -259,7 +259,7 @@ public:
             //- Does the patch field perform the transfromation
             virtual bool doTransform() const
             {
-                return 
+                return
                    !(
                         procPatch_.procPolyPatch().parallel()
                      || pTraits<Type>::rank == 0
@@ -269,13 +269,13 @@ public:
             //- Initialise evaluation of the patch field
             virtual void initEvaluate
             (
-                const Pstream::commsTypes commsType=Pstream::blocking
+                const Pstream::commsTypes commsType = Pstream::blocking
             );
 
             //- Evaluate the patch field
             virtual void evaluate
             (
-                const Pstream::commsTypes commsType=Pstream::blocking
+                const Pstream::commsTypes commsType = Pstream::blocking
             );
 
             //- Init add field to internal field
