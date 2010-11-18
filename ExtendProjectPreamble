@@ -22,7 +22,14 @@ is to formalize this spirit.
 
   In the absence of a legal resolution, we shall refer to the project as the
   -Extend project and software as "OpenFOAM", as per agreement between
-  Prof. Hrvoje Jasak and Mr. Henry G. Weller of 30 September 2004
+  Prof. Hrvoje Jasak and Mr. Henry G. Weller of 30 September 2004.
+
+  The excerpts below are from the correspondences of Dr.Jasak and are to
+  his knowledge all the relevant writings about this topic. Although
+  this topic has been discussed before in public forums there exists no
+  'official' answer by OpenCFD on this issue. In the interest of
+  fairness a reference (link) to such an answer will be added to this
+  document as soon as we come aware of it.
 
     09/30/2004 01:45 PM
     
@@ -93,7 +100,7 @@ is to formalize this spirit.
     developers of OpenFOAM from its inception to today.
 
     As this issue still remains unresolved, and the list of contributors
-    has been illegally removed from the source code by Mr. Weller in 2006,
+    has been removed from the OpenFOAM source code by Mr. Weller in 2006,
     we shall re-base OpenFOAM as an Open Source community-based project
     and associate the authorship and Copyright in each case with the
     original author.

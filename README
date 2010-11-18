@@ -169,23 +169,64 @@
     Hrvoje Jasak
     Mattijs Janssens
     Zeljko Tukovic
+    Bernhard Gschaider
     Tommaso Lucchini
+    Martin Beaudoin
     Sandeep Menon
     Niklas Nordin
-    Martin Beaudoin
     Eugene De Villiers
     Henrik Rusche
-    Bernhard Gschaider
     Ivor Clifford
-    Oliver Borm
     Philiposse Rajan
-    Chris Greenshields
-    Mark Olesen
     Gavin Tabor
     Jovani Favero
     Frank Bos
     David Hill
     Niklas Wikstrom
     Dubravko Matijasevic
+    Darrin Stephens 
+    Christian Beck
+    Oliver Borm
+    James Criner
+    Hua Shan
+    David Boner
+    Pierre-Olivier Dallaire
+    Norman Del Puppo
+    Dennis Kingsley
+    Frank Albina
+    Flavio Galeazzo
+    Hannes Kroger
+    Olivier Petit
+    David Schmidt
+    Andreas Feymark
+    Luca Mangani
+    Daniel Schmode
+    Christoph Goniva
+    Takuya Oshima
+    Juho Peltola
+    Eric Paterson
+    Fabian Peng Karrholm
+    Aleksandar Karac
+    Maria Garcia Camprubi
+    Chris Greenshields
+    Mark Olesen
     Hilary Spencer
     Andy Heather
+#                            -*- mode: org; -*-
+#
+#+TITLE:             *OpenFOAM README for version 1.6-ext*
+#+AUTHOR:                      Hrvoje Jasak.
+#+DATE:                       12 November 2010
+#+LINK:                    http://www.extend-project.de
+#+OPTIONS: author:nil
+
+* Copyright
+  OpenFOAM is free software; you can redistribute it and/or modify it under the
+  terms of the GNU General Public License as published by the Free Software
+  Foundation; either version 2 of the License, or (at your option) any later
+  version.  See the file COPYING in this directory, for a description of
+  the GNU General Public License terms under which you can copy the files.
+
+* System requirements
+  OpenFOAM is developed and tested on Linux and Mac OS X.
+  E
