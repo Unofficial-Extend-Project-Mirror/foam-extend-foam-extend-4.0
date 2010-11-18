@@ -48,7 +48,7 @@ void reduce
 {
     Pstream::gather(comms, Value, bop);
     Pstream::scatter(comms, Value);
-}    
+}
 
 
 // Reduce using either linear or tree communication schedule
@@ -67,7 +67,7 @@ void reduce
     {
         reduce(Pstream::treeCommunication(), Value, bop);
     }
-}    
+}
 
 
 // Reduce using either linear or tree communication schedule
@@ -90,7 +90,7 @@ T returnReduce
     }
 
     return WorkValue;
-}    
+}
 
 
 // Insist there is a specialisation for the reduction of a scalar

@@ -660,7 +660,7 @@ Foam::pointField Foam::globalMeshData::geometricSharedPoints() const
     combineReduce(sharedPoints, plusEqOp<pointField>());
 
     // Merge tolerance
-    scalar tolDim = matchTol_ * bb_.mag();
+    scalar tolDim = matchTol_*bb_.mag();
 
     // And see how many are unique
     labelList pMap;

@@ -216,7 +216,7 @@ public:
         //  there's nothing to do
         virtual void initEvaluate
         (
-            const Pstream::commsTypes commsType=Pstream::blocking
+            const Pstream::commsTypes commsType = Pstream::blocking
         );
 
         //- Write

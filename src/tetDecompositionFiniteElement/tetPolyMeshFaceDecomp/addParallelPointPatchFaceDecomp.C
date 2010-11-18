@@ -57,7 +57,7 @@ public:
 
         for
         (
-            typename SLList<Type>::const_iterator myObjectsIter = 
+            typename SLList<Type>::const_iterator myObjectsIter =
                 myObjects.begin();
             myObjectsIter != myObjects.end();
             ++myObjectsIter
@@ -97,7 +97,7 @@ void Foam::tetPolyMeshFaceDecomp::addParallelPointPatch()
     // The processor point patch will be added if processor boundaries
     // exist in the case.  If the mesh with processor boundaries is
     // not created during a parallel run (e.g. decomposePar), the
-    // addressing will be dummy.  
+    // addressing will be dummy.  HJ, date deleted
 
     if (mesh_.globalData().parallel())
     {
@@ -360,7 +360,12 @@ void Foam::tetPolyMeshFaceDecomp::addParallelPointPatch()
                 }
 
                 // Send the list to the first slave
-                OPstream toFirstSlave(Pstream::blocking, Pstream::firstSlave());
+                OPstream toFirstSlave
+                (
+                    Pstream::blocking,
+                    Pstream::firstSlave()
+                );
+
                 toFirstSlave << globalCutEdges;
             }
             else
@@ -439,7 +444,6 @@ void Foam::tetPolyMeshFaceDecomp::addParallelPointPatch()
                 }
             }
         }
-
 
         // Add the processor point patch
         boundary_.setSize(boundary_.size() + 1);

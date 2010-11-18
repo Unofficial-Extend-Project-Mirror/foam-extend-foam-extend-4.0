@@ -208,7 +208,7 @@ public:
         virtual const word& name() const
         {
             // There can only be a single patch of this type - therefore
-            // its name is hard-coded.  
+            // its name is hard-coded.  HJ, date deleted
             return type();
         }
 

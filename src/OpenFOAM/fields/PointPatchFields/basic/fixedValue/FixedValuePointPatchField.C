@@ -208,7 +208,7 @@ FixedValuePointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>
 {
     Field<Type>::operator=(ptf);
 
-    // insert the result into the internal field
+    // Insert the result into the internal field
     initEvaluate();
 }
 
@@ -243,7 +243,8 @@ template
     template<class> class MatrixType,
     class Type
 >
-void FixedValuePointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>::
+void
+FixedValuePointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>::
 operator==
 (
     const Type& t

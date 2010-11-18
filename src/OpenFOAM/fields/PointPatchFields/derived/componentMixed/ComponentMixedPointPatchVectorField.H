@@ -28,7 +28,7 @@ Class
     fixedValue/zeroGradient mix may be different for each direction.
 
     I am still not sure how to do the fixedValue-fixedGradient
-    combination. 
+    combination.  HJ, date deleted
 
 Description
 
