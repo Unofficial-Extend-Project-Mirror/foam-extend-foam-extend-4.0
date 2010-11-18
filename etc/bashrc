@@ -279,7 +279,7 @@ SunOS)
     cat <<USAGE
 
     Your "$WM_ARCH" operating system is not supported by this release
-    of OpenFOAM. For further assistance, please contact www.openfoam.org
+    of OpenFOAM. For further assistance, please contact www.extend-project.de
 
 USAGE
     ;;
