@@ -2,13 +2,7 @@ EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/lagrangian/basic/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
-    -I$(ParaView_DIR)/VTK \
-    -I$(ParaView_DIR)/include/$(ParaView_MAJOR) \
-    -I$(ParaView_INST_DIR) \
-    -I$(ParaView_INST_DIR)/VTK \
-    -I$(ParaView_INST_DIR)/VTK/Common \
-    -I$(ParaView_INST_DIR)/VTK/Filtering \
-    -I$(ParaView_INST_DIR)/VTK/Rendering \
+    -I$(PARAVIEW_DIR)/include/paraview-3.8 \
     -I../PV3FoamReader
 
 LIB_LIBS = \

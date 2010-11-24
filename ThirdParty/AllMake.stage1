@@ -1,0 +1,84 @@
+#!/bin/bash
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Script
+#     AllMake.stage1
+#
+# Description
+#     Build script for ThirdParty packages: Stage1
+#
+#     Compilers and basic tools.
+#
+#     Once this stage is built, you would normally re-initialize your
+#     OpenFOAM environment in order to use the new compilers and tools
+#
+#     NOTE: This stage is optional. Use it only if you want to override 
+#           your system pre-installed compilers and tools
+#
+# Requirements:
+#     1: Your OpenFOAM environment must be properly initialized
+#
+# Author:
+#     Martin Beaudoin, Hydro-Quebec, (2010)
+#
+#------------------------------------------------------------------------------
+# run from third-party directory only
+cd ${0%/*} || exit 1
+
+wmakeCheckPwd "$WM_THIRD_PARTY_DIR" || {
+    echo "Error: Current directory is not \$WM_THIRD_PARTY_DIR"
+    echo "    The environment variables are inconsistent with the installation."
+    echo "    Check the OpenFOAM entries in your dot-files and source them."
+    exit 1
+}
+. tools/makeThirdPartyFunctionsForRPM
+#------------------------------------------------------------------------------
+
+echo ========================================
+echo Starting ThirdParty AllMake: Stage1
+echo ========================================
+echo
+
+# Gcc and companion libraries
+#( rpm_make gmp-5.0.1      ftp://ftp.gnu.org/gnu/gmp/gmp-5.0.1.tar.gz                  )
+#( rpm_make mpfr-3.0.0     http://www.mpfr.org/mpfr-current/mpfr-3.0.0.tar.gz          )
+#( rpm_make gcc-4.4.5      ftp://ftp.gnu.org/gnu/gcc/gcc-4.4.5/gcc-4.4.5.tar.gz        )
+#
+#( rpm_make mpc-0.8.2      http://www.multiprecision.org/mpc/download/mpc-0.8.2.tar.gz )
+#( rpm_make gcc-4.5.1      ftp://ftp.gnu.org/gnu/gcc/gcc-4.5.1/gcc-4.5.1.tar.gz        )
+
+# Python
+#( rpm_make Python-2.7     http://www.python.org/ftp/python/2.7/Python-2.7.tgz        )
+
+# cmake
+( rpm_make cmake-2.8.3     http://www.cmake.org/files/v2.8/cmake-2.8.3.tar.gz        )
+
+echo ========================================
+echo Done ThirdParty AllMake: Stage1
+echo ========================================
+echo
+
+# ----------------------------------------------------------------- end-of-file
+
+

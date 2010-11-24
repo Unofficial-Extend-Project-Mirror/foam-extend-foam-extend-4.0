@@ -1,0 +1,73 @@
+#!/bin/bash
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Script
+#     AllMake.stage0
+#
+# Description
+#     Build script for ThirdParty packages: Stage0
+#
+#     Populate the local RPM vault
+#
+#     NOTE: This stage is optional. Use it only if you want to move some RPMs
+#           to the appropriate location for your architcture so the other stage scripts 
+#           will be able to pick them up
+#
+# Author:
+#     Martin Beaudoin, Hydro-Quebec, (2010)
+#
+#------------------------------------------------------------------------------
+# run from third-party directory only
+cd ${0%/*} || exit 1
+
+wmakeCheckPwd "$WM_THIRD_PARTY_DIR" || {
+    echo "Error: Current directory is not \$WM_THIRD_PARTY_DIR"
+    echo "    The environment variables are inconsistent with the installation."
+    echo "    Check the OpenFOAM entries in your dot-files and source them."
+    exit 1
+}
+
+. tools/makeThirdPartyFunctionsForRPM
+#------------------------------------------------------------------------------
+
+echo ========================================
+echo Starting ThirdParty AllMake: Stage0
+echo ========================================
+echo
+
+(
+  
+  [ "$#" -gt 0 ] && {
+      rpm_populateRPMvault "$@"
+  }
+)
+
+echo ========================================
+echo Done ThirdParty AllMake: Stage0
+echo ========================================
+echo
+
+# ----------------------------------------------------------------- end-of-file
+
+

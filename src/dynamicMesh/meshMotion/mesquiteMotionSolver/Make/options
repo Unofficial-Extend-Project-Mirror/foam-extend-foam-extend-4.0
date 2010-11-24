@@ -1,9 +1,9 @@
 EXE_INC = \
-    -I$(WM_THIRD_PARTY_DIR)/mesquite-2.1.2/lnInclude \
+    -I$(MESQUITE_DIR)/include \
     -I$(LIB_SRC)/meshTools/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/dynamicMesh/lnInclude \
 
 LIB_LIBS = \
     -lmeshTools \
     -ldynamicMesh \
-    -lmesquite
+    -L$(MESQUITE_DIR)/lib -lmesquite

@@ -92,6 +92,10 @@
     The value set in '$FOAM_INST_DIR' will be used to locate the remaining parts
     of the OpenFOAM installation.
 
+* Building the ThirdParty packages from Sources
+   A new way of compiling and installing the ThirdParty suite of packages is proposed with OpenFOAM-1.6-ext. 
+   Please consult the file ThirdParty/README.ThirdParty a for more information.
+
 * Building from Sources (Optional)
   If you cannot find an appropriate binary pack for your platform, you can
    build the complete OpenFOAM from the source-pack.  You will first need to

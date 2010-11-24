@@ -1,0 +1,99 @@
+#!/bin/bash
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Script
+#     AllMake.stage3
+#
+# Description
+#     Build script for ThirdParty packages: Stage3
+#
+#     The ThirdParty libraries
+#
+# Requirements:
+#     1: Your OpenFOAM environment must be properly initialized
+#     2: AllMake.stage1 if you are overriding your system compiler
+#     3: AllMake.stage2 if you are overriding your system comm. libraries
+#
+# Author:
+#     Martin Beaudoin, Hydro-Quebec, (2010)
+#
+#------------------------------------------------------------------------------
+# run from third-party directory only
+cd ${0%/*} || exit 1
+
+wmakeCheckPwd "$WM_THIRD_PARTY_DIR" || {
+    echo "Error: Current directory is not \$WM_THIRD_PARTY_DIR"
+    echo "    The environment variables are inconsistent with the installation."
+    echo "    Check the OpenFOAM entries in your dot-files and source them."
+    exit 1
+}
+. tools/makeThirdPartyFunctionsForRPM
+#------------------------------------------------------------------------------
+
+echo ========================================
+echo Starting ThirdParty AllMake: Stage3
+echo ========================================
+echo
+
+
+# Metis
+( rpm_make metis-5.0pre2   http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.0pre2.tar.gz      )
+
+# ParMGridGen
+( rpm_make ParMGridGen-1.0 http://www.mgnet.org/mgnet/Codes/parmgridgen/ParMGridGen-1.0.tar.gz       )
+
+# Libccmio
+#( rpm_make libccmio-2.6.1  )
+
+# Mesquite
+( rpm_make mesquite-2.1.2  http://software.sandia.gov/~jakraft/mesquite-2.1.2.tar.gz                 )
+
+# Scotch
+if [ -d "$OPENMPI_DIR" ]; then
+    ( rpm_make scotch-5.1.10b  https://gforge.inria.fr/frs/download.php/27583/scotch-5.1.10b.tar.gz  )
+else
+    echo "WARNING: The OPENMPI_DIR environment variable is not set."
+    echo "WARNING: Please make sure your environment is properly set up for openmpi. This is necessary for compiling scotch-5.1.10b"
+    echo "WARNING: Skipping the compilation of scotch-5.1.10b"
+    echo ""
+fi
+
+# ParMetis
+if [ -d "$OPENMPI_DIR" ]; then
+    ( rpm_make ParMetis-3.1.1  http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis/ParMetis-3.1.1.tar.gz )
+else
+    echo "WARNING: The OPENMPI_DIR environment variable is not set."
+    echo "WARNING: Please make sure your environment is properly set up for openmpi. This is necessary for compiling ParMetis-3.1.1"
+    echo "WARNING: Skipping the compilation of ParMetis-3.1.1"
+    echo ""
+fi
+
+echo ========================================
+echo Done ThirdParty AllMake: Stage3
+echo ========================================
+echo
+
+# ----------------------------------------------------------------- end-of-file
+
+

@@ -2,9 +2,9 @@
 cd ${0%/*} || exit 1    # run from this directory
 set -x
 
-if [ -d "$ParaView_DIR" -a -r "$ParaView_DIR" ]
+if [ -d "$PARAVIEW_DIR" -a -r "$PARAVIEW_DIR" ]
 then
-   case "$ParaView_VERSION" in
+   case "$PARAVIEW_VERSION" in
    3*)
       wmake libso vtkPV3Foam
       (
