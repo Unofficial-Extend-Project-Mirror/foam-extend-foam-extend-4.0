@@ -1,0 +1,19 @@
+EXE_INC = \
+    -I../include \
+    -I../../freeSurface \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/finiteArea/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/dynamicMesh/dynamicFvMesh/lnInclude \
+    $(WM_DECOMP_INC) \
+    -I$(LIB_SRC)/tetDecompositionFiniteElement/lnInclude \
+    -I$(LIB_SRC)/tetDecompositionMotionSolver/lnInclude
+
+EXE_LIBS = \
+    -lfreeSurface \
+    -lfiniteVolume \
+    -lfiniteArea \
+    -ldynamicFvMesh \
+    -ldynamicMesh \
+    -lmeshTools \
+    $(WM_DECOMP_LIBS)

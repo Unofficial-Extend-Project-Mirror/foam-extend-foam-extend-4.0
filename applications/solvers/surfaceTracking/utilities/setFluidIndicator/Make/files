@@ -1,0 +1,3 @@
+setFluidIndicator.C
+
+EXE = $(FOAM_APPBIN)/setFluidIndicator
