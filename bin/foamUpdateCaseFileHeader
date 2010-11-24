@@ -52,12 +52,11 @@ USAGE
     exit 1
 }
 
-
 printHeader() {
     cat<<HEADER
 /*--------------------------------*- C++ -*----------------------------------*\\
 | =========                 |                                                 |
-| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+| \\\\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
 |  \\\\    /   O peration     | Version:  ${foamVersion}  |
 |   \\\\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\\\/     M anipulation  |                                                 |
@@ -65,13 +64,29 @@ printHeader() {
 FoamFile
 {
     version     2.0;
-    format      ${1};
-    class       ${2};
-    object      ${3};
+    format      ${FORMAT};
+    class       ${CLASS};
+HEADER
+
+    if [ -n "${NOTE}" ];
+    then
+        cat<<HEADER
+    note        ${NOTE};
+HEADER
+    fi
+
+    if [ -n "${LOCATION}" ];
+    then
+        cat<<HEADER
+    location    ${LOCATION};
+HEADER
+    fi
+
+        cat<<HEADER
+    object      ${OBJECT};
 }
 HEADER
 }
-
 
 #
 # extract attribute '$1' from file '$2'
@@ -79,7 +94,6 @@ HEADER
 FoamFileAttribute() {
     sed -n -e 's/[ ;]*$//' -e "s/^ *$1 *//p" $2
 }
-
 
 #
 # OPTIONS
@@ -108,29 +122,29 @@ shift
 
 [ $# -ge 1 ] || usage
 
-
 # constant width for version
 foamVersion=$(printf %-36s $foamVersion)
 
 #
 # MAIN
 #
-unset NOTE
 
 for caseFile
 do
-    if grep FoamFile $caseFile >/dev/null 2>&1
+    if [ ! -x "$caseFile" ] && (grep "^ *FoamFile" $caseFile >/dev/null 2>&1)
     then
         echo "Updating case file: $caseFile"
         sed -n '/FoamFile/,/}/p' $caseFile > FoamFile.tmp
 
         FORMAT=$(FoamFileAttribute format FoamFile.tmp)
         CLASS=$(FoamFileAttribute  class  FoamFile.tmp)
+        NOTE=$(FoamFileAttribute note FoamFile.tmp)
+        LOCATION=$(FoamFileAttribute location FoamFile.tmp)
         OBJECT=$(FoamFileAttribute object FoamFile.tmp)
-        # extract NOTE?
 
-        printHeader $FORMAT $CLASS $OBJECT $NOTE > FoamFile.tmp
-        sed '1,/}/d' $caseFile | sed '/./,/^$/!d' >> FoamFile.tmp
+        printHeader > FoamFile.tmp
+        sed '1,/}/d' $caseFile | sed '/./,/^$/!d' | sed 's/ *$//g' >> FoamFile.tmp
+        #sed '1,/}/d' $caseFile >> FoamFile.tmp
 
         # use cat to avoid removing/replace soft-links
         [ -s FoamFile.tmp ] && cat FoamFile.tmp >| $caseFile
