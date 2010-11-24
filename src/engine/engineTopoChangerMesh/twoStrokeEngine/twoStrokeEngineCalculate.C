@@ -81,6 +81,7 @@ void Foam::twoStrokeEngine::calcMovingMasks() const
     }
 }
 
+
 // Return moving points mask.  Moving points marked with 1
 const Foam::scalarField& Foam::twoStrokeEngine::movingPointsMask() const
 {
