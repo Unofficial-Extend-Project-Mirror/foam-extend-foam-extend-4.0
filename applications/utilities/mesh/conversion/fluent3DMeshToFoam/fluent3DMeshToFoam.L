@@ -341,7 +341,8 @@ endOfSection               {space}")"{space}
             << " start: "
             << pointGroupStartIndex[pointGroupStartIndex.size()-1]
             << " end: "
-            << pointGroupEndIndex[pointGroupEndIndex.size()-1] << flush;
+            << pointGroupEndIndex[pointGroupEndIndex.size()-1]
+            << " nComponents: " << pointGroupNumberOfComponents << flush;
     }
 
 <readNumberOfPoints,readPointGroupData>{endOfSection} {
