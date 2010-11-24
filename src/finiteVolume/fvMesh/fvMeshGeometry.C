@@ -368,13 +368,6 @@ const volScalarField::DimensionedInternalField& fvMesh::V0() const
 
 DimensionedField<scalar, volMesh>& fvMesh::setV0()
 {
-    if (!V0Ptr_)
-    {
-        FatalErrorIn("fvMesh::setV0()")
-            << "V0 is not available"
-            << abort(FatalError);
-    }
-
     // Delete old volume and mesh motion fluxes.  setV0() must be followed by
     // another mesh motion.  HJ, 25/Feb/2009
     deleteDemandDrivenData(phiPtr_);
