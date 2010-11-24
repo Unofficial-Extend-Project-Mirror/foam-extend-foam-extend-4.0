@@ -56,7 +56,7 @@ printHeader() {
     cat<<HEADER
 /*--------------------------------*- C++ -*----------------------------------*\\
 | =========                 |                                                 |
-| \\\\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+| \\\\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
 |  \\\\    /   O peration     | Version:  ${foamVersion}  |
 |   \\\\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\\\/     M anipulation  |                                                 |

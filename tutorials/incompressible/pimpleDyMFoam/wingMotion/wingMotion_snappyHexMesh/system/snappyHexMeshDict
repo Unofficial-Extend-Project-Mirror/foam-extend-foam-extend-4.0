@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6.x                                 |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -18,7 +18,6 @@ FoamFile
 castellatedMesh true;
 snap            true;
 addLayers       true;
-
 
 // Geometry. Definition of all surfaces. All surfaces are of class
 // searchableSurface.
@@ -40,8 +39,6 @@ geometry
         max ( 5  1  1);
     }
 };
-
-
 
 // Settings for the castellatedMesh generation.
 castellatedMeshControls
@@ -73,16 +70,12 @@ castellatedMeshControls
     // refinement.
     nCellsBetweenLevels 6;
 
-
-
     // Explicit feature edge refinement
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Specifies a level for any cell intersected by its edges.
     // This is a featureEdgeMesh, read from constant/triSurface for now.
     features ();
-
-
 
     // Surface based refinement
     // ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -104,7 +97,6 @@ castellatedMeshControls
 
     // Resolve sharp angles on fridges
     resolveFeatureAngle 30;
-
 
     // Region-wise refinement
     // ~~~~~~~~~~~~~~~~~~~~~~
@@ -128,7 +120,6 @@ castellatedMeshControls
         }
     }
 
-
     // Mesh selection
     // ~~~~~~~~~~~~~~
 
@@ -139,14 +130,11 @@ castellatedMeshControls
     // after refinement.
     locationInMesh (-0.5 0 0);
 
-
     // Whether any faceZones (as specified in the refinementSurfaces)
     // are only on the boundary of corresponding cellZones or also allow
     // free-standing zone faces. Not used if there are no faceZones.
     allowFreeStandingZoneFaces true;
 }
-
-
 
 // Settings for the snapping.
 snapControls
@@ -167,8 +155,6 @@ snapControls
     //  before upon reaching a correct mesh.
     nRelaxIter 5;
 }
-
-
 
 // Settings for the layer addition.
 addLayersControls
@@ -208,7 +194,6 @@ addLayersControls
     //  close to features.
     nGrow 0;
 
-
     // Advanced settings
 
     //- When not to extrude surface. 0 is flat surface, 90 is when two faces
@@ -242,14 +227,11 @@ addLayersControls
     // Create buffer region for new layer terminations
     nBufferCellsNoExtrude 0;
 
-
     // Overall max number of layer addition iterations. The mesher will exit
     // if it reaches this number of iterations; possibly with an illegal
     // mesh.
     nLayerIter 50;
 }
-
-
 
 // Generic mesh quality settings. At any undoable phase these determine
 // where to undo.
@@ -298,7 +280,6 @@ meshQualityControls
     //must be >0 for Fluent compatibility
     minTriangleTwist -1;
 
-
     // Advanced
 
     //- Number of error distribution iterations
@@ -306,7 +287,6 @@ meshQualityControls
     //- amount to scale back displacement at error points
     errorReduction 0.75;
 }
-
 
 // Advanced
 
@@ -317,10 +297,8 @@ meshQualityControls
 // 4 : write current intersections as .obj files
 debug 0;
 
-
 // Merge tolerance. Is fraction of overall bounding box of initial mesh.
 // Note: the write tolerance needs to be higher than this.
 mergeTolerance 1E-6;
-
 
 // ************************************************************************* //

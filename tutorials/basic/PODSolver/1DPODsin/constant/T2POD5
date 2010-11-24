@@ -1,30 +1,22 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.3                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version 2.0;
-    format ascii;
-
-    root "/home/hjasak/OpenFOAM/hjasak-1.3/run/development";
-    case "1DPOD";
-    instance ""constant"";
-    local "";
-
-    class volScalarField;
-    object T2POD5;
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      T2POD5;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 dimensions      [0 0 0 1 0 0 0];
 
-internalField   nonuniform List<scalar> 
+internalField   nonuniform List<scalar>
 50
 (
 -0.165974
@@ -97,6 +89,5 @@ boundaryField
         type            empty;
     }
 }
-
 
 // ************************************************************************* //

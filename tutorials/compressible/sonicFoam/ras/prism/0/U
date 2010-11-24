@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -20,20 +20,20 @@ internalField   uniform (650 0 0);
 
 boundaryField
 {
-    inlet           
+    inlet
     {
         type            fixedValue;
         value           uniform (650 0 0);
     }
 
-    outlet          
+    outlet
     {
         type            inletOutlet;
         inletValue      uniform (0 0 0);
         value           uniform (0 0 0);
     }
 
-    bottomWall      
+    bottomWall
     {
         type            supersonicFreestream;
         pInf            100000;
@@ -43,7 +43,7 @@ boundaryField
         value           uniform (650 0 0);
     }
 
-    topWall         
+    topWall
     {
         type            supersonicFreestream;
         pInf            100000;
@@ -53,13 +53,13 @@ boundaryField
         value           uniform (650 0 0);
     }
 
-    prismWall       
+    prismWall
     {
         type            fixedValue;
         value           uniform (0 0 0);
     }
 
-    defaultFaces    
+    defaultFaces
     {
         type            empty;
     }

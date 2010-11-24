@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -16,34 +16,34 @@ FoamFile
 // block definition for a porosity with an angled inlet/outlet
 // the porosity is not aligned with the main axes
 //
-                             
+
 convertToMeters 0.001;
 
 vertices
 (
     // inlet region
-    ( -150  0  -25 )  // pt 0 (in1b) 
-    ( -150 35.35533906  -25 ) // pt 1 (in2b) 
-    ( -150  0  25 )  // pt 2 (in1f) 
-    ( -150 35.35533906  25 ) // pt 3 (in2f) 
+    ( -150  0  -25 )  // pt 0 (in1b)
+    ( -150 35.35533906  -25 ) // pt 1 (in2b)
+    ( -150  0  25 )  // pt 2 (in1f)
+    ( -150 35.35533906  25 ) // pt 3 (in2f)
 
     // join inlet->outlet
-    (  0 0  -25 )    // pt 4 (join1b) 
-    ( -35.35533906   35.35533906  -25 ) // pt 5 (join2b) 
-    (  0 0  25 )    // pt 6 (join1f) 
-    ( -35.35533906   35.35533906  25 ) // pt 7 (join2f) 
+    (  0 0  -25 )    // pt 4 (join1b)
+    ( -35.35533906   35.35533906  -25 ) // pt 5 (join2b)
+    (  0 0  25 )    // pt 6 (join1f)
+    ( -35.35533906   35.35533906  25 ) // pt 7 (join2f)
 
     // porosity ends ->outlet
-    ( 70.71067812 70.71067812  -25 )  // pt 8 (poro1b) 
-    ( 35.35533906 106.06601718  -25 )  // pt 9 (poro2b) 
-    ( 70.71067812 70.71067812  25 )  // pt 10 (poro1f) 
-    ( 35.35533906 106.06601718  25 )  // pt 11 (poro2f) 
+    ( 70.71067812 70.71067812  -25 )  // pt 8 (poro1b)
+    ( 35.35533906 106.06601718  -25 )  // pt 9 (poro2b)
+    ( 70.71067812 70.71067812  25 )  // pt 10 (poro1f)
+    ( 35.35533906 106.06601718  25 )  // pt 11 (poro2f)
 
     // outlet
-    ( 141.42135624 141.42135624 -25 ) // pt 12 (out1b) 
-    ( 106.06601718 176.7766953 -25 ) // pt 13 (out2b) 
-    ( 141.42135624 141.42135624 25 ) // pt 14 (out1f) 
-    ( 106.06601718 176.7766953 25 ) // pt 15 (out2f) 
+    ( 141.42135624 141.42135624 -25 ) // pt 12 (out1b)
+    ( 106.06601718 176.7766953 -25 ) // pt 13 (out2b)
+    ( 141.42135624 141.42135624 25 ) // pt 14 (out1f)
+    ( 106.06601718 176.7766953 25 ) // pt 15 (out2f)
 );
 
 blocks

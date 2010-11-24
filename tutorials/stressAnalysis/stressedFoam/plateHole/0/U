@@ -1,6 +1,6 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
@@ -21,12 +21,12 @@ internalField   uniform (0 0 0);
 
 boundaryField
 {
-    left            
+    left
     {
         type            symmetryPlane;
     }
 
-    right           
+    right
     {
         type            tractionDisplacement;
         traction        uniform (10000 0 0);
@@ -34,12 +34,12 @@ boundaryField
         value           uniform (0 0 0);
     }
 
-    down            
+    down
     {
         type            symmetryPlane;
     }
 
-    up              
+    up
     {
         type            tractionDisplacement;
         traction        uniform (0 0 0);
@@ -47,7 +47,7 @@ boundaryField
         value           uniform (0 0 0);
     }
 
-    hole            
+    hole
     {
         type            tractionDisplacement;
         traction        uniform (0 0 0);
@@ -55,11 +55,10 @@ boundaryField
         value           uniform (0 0 0);
     }
 
-    frontAndBack    
+    frontAndBack
     {
         type            empty;
     }
 }
-
 
 // ************************************************************************* //

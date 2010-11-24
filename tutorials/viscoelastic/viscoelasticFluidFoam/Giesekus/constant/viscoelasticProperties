@@ -1,6 +1,6 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
@@ -19,11 +19,11 @@ From:
 AZAIEZ, J.; GUÉNETTE, R.; AIT-KADI, A. Entry flow calculations using multi-mode
 models. Journal of Non-Newtonian Fluid Mechanics, v. 66, n. 2-3, p. 271 - 281, 1996.
 
-Mode        Model parameter      lambda   etaP    etaS   
-1           0.5                  0.6855   0.0400  0.002 
+Mode        Model parameter      lambda   etaP    etaS
+1           0.5                  0.6855   0.0400  0.002
 2           0.2                  0.1396   0.2324  0.002
-3           0.3                  0.0389   0.5664  0.002 
-4           0.2                  0.0059   0.5850  0.002 
+3           0.3                  0.0389   0.5664  0.002
+4           0.2                  0.0059   0.5850  0.002
 
 */
 

@@ -1,31 +1,22 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           dictionary;
-    object          blockMeshDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 convertToMeters 0.1;
 
-vertices        
+vertices
 (
     (-5 0.01 0)
     (-5 -0.01 0)
@@ -109,7 +100,7 @@ vertices
     (1.5 2.59808 0.5)
 );
 
-blocks          
+blocks
 (
     hex (5 17 18 7 45 57 58 47) (9 4 1) simpleGrading (1 1 1)
     hex (17 10 9 19 57 50 49 59) (9 4 1) simpleGrading (1 1 1)
@@ -133,7 +124,7 @@ blocks
     hex (32 0 2 34 72 40 42 74) (6 4 1) simpleGrading (1 1 1)
 );
 
-edges           
+edges
 (
     arc 7 18 (-0.707107 -0.707107 0)
     arc 19 9 (0.707107 -0.707107 0)
@@ -197,9 +188,9 @@ edges
     arc 72 40 (-4.33013 2.5 0.5)
 );
 
-patches         
+patches
 (
-    wall impellerWall 
+    wall impellerWall
     (
         (7 47 58 18)
         (18 58 57 17)
@@ -214,7 +205,7 @@ patches
         (6 46 45 5)
         (5 45 47 7)
     )
-    wall baffleWall 
+    wall baffleWall
     (
         (1 24 64 41)
         (24 26 66 64)
@@ -235,14 +226,14 @@ patches
         (0 2 42 40)
         (2 42 41 1)
     )
-    patch insideSlider 
+    patch insideSlider
     (
         (4 16 56 44)
         (16 11 51 56)
         (11 23 63 51)
         (23 4 44 63)
     )
-    patch outsideSlider 
+    patch outsideSlider
     (
         (3 43 67 27)
         (27 67 71 31)
@@ -253,9 +244,8 @@ patches
     )
 );
 
-mergePatchPairs 
+mergePatchPairs
 (
 );
-
 
 // ************************************************************************* //

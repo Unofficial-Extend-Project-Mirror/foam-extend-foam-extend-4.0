@@ -1,6 +1,6 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
@@ -70,7 +70,7 @@ patches
         (12 14 13 11)
         (14 16 15 13)
     )
-    wall fixedWalls 
+    wall fixedWalls
     (
         (1 4 5 2)
         (4 6 7 5)

@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -16,7 +16,7 @@ FoamFile
 
 convertToMeters 0.001;
 
-vertices        
+vertices
 (
     (-7.5 0 0)
     (-7 0 0)
@@ -40,7 +40,7 @@ vertices
     (0 2.5 0.109152)
 );
 
-blocks          
+blocks
 (
     hex (0 1 5 4 0 1 13 12) (15 15 1) simpleGrading (1 1 1)
     hex (2 3 7 6 2 3 15 14) (20 20 1) simpleGrading (2 0.25 1)
@@ -49,43 +49,43 @@ blocks
     hex (6 7 11 10 14 15 19 18) (20 15 1) simpleGrading (2 1 1)
 );
 
-edges           
+edges
 (
 );
 
-patches         
+patches
 (
-    wall movingWall 
+    wall movingWall
     (
         (1 5 13 1)
         (5 6 14 13)
         (2 2 14 6)
     )
-    patch farFieldMoving 
+    patch farFieldMoving
     (
         (9 17 18 10)
     )
-    wall fixedWall 
+    wall fixedWall
     (
         (3 7 15 3)
         (7 11 19 15)
     )
-    symmetryPlane axis 
+    symmetryPlane axis
     (
         (0 1 1 0)
         (2 3 3 2)
     )
-    patch left 
+    patch left
     (
         (0 0 12 4)
         (4 12 16 8)
     )
-    patch farField 
+    patch farField
     (
         (8 16 17 9)
         (10 18 19 11)
     )
-    wedge back 
+    wedge back
     (
         (0 4 5 1)
         (2 6 7 3)
@@ -93,7 +93,7 @@ patches
         (5 9 10 6)
         (6 10 11 7)
     )
-    wedge front 
+    wedge front
     (
         (0 1 13 12)
         (2 3 15 14)

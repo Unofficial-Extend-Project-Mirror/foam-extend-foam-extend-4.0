@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -14,14 +14,6 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // General m4 macros
-
-  
-
-
-
-
-
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // User-defined parameters
@@ -53,44 +45,28 @@ convertToMeters 1;
  // Breadth to the top (height) of lower chamfer
  // Breadth of upper chamfer
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Parametric description
 
 vertices
 (
-    (-10 -15 -10.0) // Vertex bllcb = 0 
-    (-10 -20 -5)  // Vertex bllc = 1 
-    (-10 -20 10)  // Vertex bluc = 2 
-    (-10 -10 20) // Vertex bluct = 3 
-    (-10 15 -10.0) // Vertex brlcb = 4 
-    (-10 20 -5)  // Vertex brlc = 5 
-    (-10 20 10)  // Vertex bruc = 6 
-    (-10 10 20) // Vertex bruct = 7 
+    (-10 -15 -10.0) // Vertex bllcb = 0
+    (-10 -20 -5)  // Vertex bllc = 1
+    (-10 -20 10)  // Vertex bluc = 2
+    (-10 -10 20) // Vertex bluct = 3
+    (-10 15 -10.0) // Vertex brlcb = 4
+    (-10 20 -5)  // Vertex brlc = 5
+    (-10 20 10)  // Vertex bruc = 6
+    (-10 10 20) // Vertex bruct = 7
 
-    (10 -15 -10.0) // Vertex fllcb = 8 
-    (10 -20 -5)  // Vertex fllc = 9 
-    (10 -20 10)  // Vertex fluc = 10 
-    (10 -10 20) // Vertex fluct = 11 
-    (10 15 -10.0) // Vertex frlcb = 12 
-    (10 20 -5)  // Vertex frlc = 13 
-    (10 20 10)  // Vertex fruc = 14 
-    (10 10 20) // Vertex fruct = 15 
+    (10 -15 -10.0) // Vertex fllcb = 8
+    (10 -20 -5)  // Vertex fllc = 9
+    (10 -20 10)  // Vertex fluc = 10
+    (10 -10 20) // Vertex fluct = 11
+    (10 15 -10.0) // Vertex frlcb = 12
+    (10 20 -5)  // Vertex frlc = 13
+    (10 20 10)  // Vertex fruc = 14
+    (10 10 20) // Vertex fruct = 15
 );
 
 blocks

@@ -1,27 +1,17 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
-// FoamX Case Dictionary.
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "boundaryFoam";
-    case            "boundaryWallFunctions";
-    instance        "constant";
-    local           "";
-
-    class           dictionary;
-    object          transportProperties;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      transportProperties;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Ubar
@@ -58,6 +48,5 @@ BirdCarreauCoeffs
     // n
     n               n [0 0 0 0 0 0 0] 1;
 }
-
 
 // ************************************************************************* //

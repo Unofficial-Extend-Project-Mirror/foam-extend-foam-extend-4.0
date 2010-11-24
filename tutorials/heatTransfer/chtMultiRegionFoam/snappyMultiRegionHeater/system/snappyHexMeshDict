@@ -1,32 +1,23 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "/home/penfold/mattijs/foam/mattijs2.1/run/icoFoam";
-    case            "cavity";
-    instance        "system";
-    local           "";
-
-    class           dictionary;
-    object          autoHexMeshDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      autoHexMeshDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Which of the steps to run
 castellatedMesh true;
 snap            true;
 addLayers       false;
-
 
 // Geometry. Definition of all surfaces. All surfaces are of class
 // searchableSurface.
@@ -74,8 +65,6 @@ geometry
    // }
 };
 
-
-
 // Settings for the castellatedMesh generation.
 castellatedMeshControls
 {
@@ -106,8 +95,6 @@ castellatedMeshControls
     // refinement.
     nCellsBetweenLevels 2;
 
-
-
     // Explicit feature edge refinement
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -116,8 +103,6 @@ castellatedMeshControls
     features
     (
     );
-
-
 
     // Surface based refinement
     // ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -184,7 +169,6 @@ castellatedMeshControls
     // Resolve sharp angles
     resolveFeatureAngle 30;
 
-
     // Region-wise refinement
     // ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -207,7 +191,6 @@ castellatedMeshControls
         //}
     }
 
-
     // Mesh selection
     // ~~~~~~~~~~~~~~
 
@@ -218,8 +201,6 @@ castellatedMeshControls
     // after refinement.
     locationInMesh (0.01 0.01 0.01);
 }
-
-
 
 // Settings for the snapping.
 snapControls
@@ -240,8 +221,6 @@ snapControls
     //  before upon reaching a correct mesh.
     nRelaxIter 5;
 }
-
-
 
 // Settings for the layer addition.
 addLayersControls
@@ -272,7 +251,7 @@ addLayersControls
     //  is the
     //  thickness of the layer furthest away from the wall.
     //  Relative to undistorted size of cell outside layer.
-    finalLayerThickness 0.3; 
+    finalLayerThickness 0.3;
 
     //- Minimum thickness of cell layer. If for any reason layer
     //  cannot be above minThickness do not add layer.
@@ -284,7 +263,6 @@ addLayersControls
     //  close to features.
     nGrow 0;
 
-
     // Advanced settings
 
     //- When not to extrude surface. 0 is flat surface, 90 is when two faces
@@ -295,20 +273,20 @@ addLayersControls
     //  before upon reaching a correct mesh.
     nRelaxIter 3;
 
-    // Number of smoothing iterations of surface normals 
+    // Number of smoothing iterations of surface normals
     nSmoothSurfaceNormals 1;
 
-    // Number of smoothing iterations of interior mesh movement direction  
+    // Number of smoothing iterations of interior mesh movement direction
     nSmoothNormals 3;
 
     // Smooth layer thickness over surface patches
     nSmoothThickness 10;
 
-    // Stop layer growth on highly warped cells 
+    // Stop layer growth on highly warped cells
     maxFaceThicknessRatio 0.5;
 
-    // Reduce layer growth where ratio thickness to medial 
-    // distance is large 
+    // Reduce layer growth where ratio thickness to medial
+    // distance is large
     maxThicknessToMedialRatio 0.3;
 
     // Angle used to pick up medial axis points
@@ -317,8 +295,6 @@ addLayersControls
     // Create buffer region for new layer terminations
     nBufferCellsNoExtrude 0;
 }
-
-
 
 // Generic mesh quality settings. At any undoable phase these determine
 // where to undo.
@@ -354,7 +330,7 @@ meshQualityControls
     //- 1 = hex, <= 0 = folded or flattened illegal cell
     minDeterminant 0.001;
 
-    //- minFaceWeight (0 -> 0.5) 
+    //- minFaceWeight (0 -> 0.5)
     minFaceWeight 0.02;
 
     //- minVolRatio (0 -> 1)
@@ -363,7 +339,6 @@ meshQualityControls
     //must be >0 for Fluent compatibility
     minTriangleTwist -1;
 
-
     // Advanced
 
     //- Number of error distribution iterations
@@ -371,7 +346,6 @@ meshQualityControls
     //- amount to scale back displacement at error points
     errorReduction 0.75;
 }
-
 
 // Advanced
 
@@ -382,10 +356,8 @@ meshQualityControls
 // 4 : write current intersections as .obj files
 debug 0;
 
-
 // Merge tolerance. Is fraction of overall bounding box of initial mesh.
 // Note: the write tolerance needs to be higher than this.
 mergeTolerance 1E-6;
-
 
 // ************************************************************************* //

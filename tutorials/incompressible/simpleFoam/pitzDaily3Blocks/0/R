@@ -1,27 +1,18 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           volSymmTensorField;
-    object          R;
+    version     2.0;
+    format      ascii;
+    class       volSymmTensorField;
+    object      R;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 dimensions      [0 2 -2 0 0 0 0];
 
@@ -29,28 +20,28 @@ internalField   uniform (0 0 0 0 0 0);
 
 boundaryField
 {
-    inlet           
+    inlet
     {
         type            fixedValue;
         value           uniform (0 0 0 0 0 0);
     }
 
-    outlet          
+    outlet
     {
         type            zeroGradient;
     }
 
-    upperWall       
+    upperWall
     {
         type            zeroGradient;
     }
 
-    lowerWall       
+    lowerWall
     {
         type            zeroGradient;
     }
 
-    lowerWallInlet  
+    lowerWallInlet
     {
         type            zeroGradient;
     }
@@ -65,11 +56,10 @@ boundaryField
         type            zeroGradient;
     }
 
-    defaultFaces    
+    defaultFaces
     {
         type            empty;
     }
 }
-
 
 // ************************************************************************* //

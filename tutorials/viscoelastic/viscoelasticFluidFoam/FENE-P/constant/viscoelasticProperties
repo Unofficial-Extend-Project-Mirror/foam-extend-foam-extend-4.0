@@ -1,6 +1,6 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
@@ -29,14 +29,12 @@ FENE-P       L2 = 6.0       0.04     0.002   1.422
 rheology
 {
 
-   
                 type FENE-P;
                 rho              rho [1 -3 0 0 0 0 0] 803.87097;
                 etaS             etaS [1 -1 -1 0 0 0 0] 0.002;
                 etaP             etaP [1 -1 -1 0 0 0 0] 1.422;
                 lambda           lambda [0 0 1 0 0 0 0] 0.04;
                 L2               L2 [0 0 0 0 0 0 0] 6.0;
-               
 
 }
 

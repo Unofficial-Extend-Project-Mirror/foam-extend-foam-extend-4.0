@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -16,7 +16,7 @@ FoamFile
 
 convertToMeters 1;
 
-vertices        
+vertices
 (
     (0.5 0 -0.5)
     (1 0 -0.5)
@@ -58,7 +58,7 @@ vertices
     (-0.707107 2 0.5)
 );
 
-blocks          
+blocks
 (
     hex (5 4 9 10 24 23 28 29) (10 10 1) simpleGrading (1 1 1)
     hex (0 1 4 5 19 20 23 24) (10 10 1) simpleGrading (1 1 1)
@@ -72,7 +72,7 @@ blocks
     hex (15 9 8 18 34 28 27 37) (10 20 1) simpleGrading (1 1 1)
 );
 
-edges           
+edges
 (
     arc 0 5 (0.469846 0.17101 -0.5)
     arc 5 10 (0.17101 0.469846 -0.5)
@@ -92,33 +92,33 @@ edges
     arc 34 28 (-0.34202 0.939693 0.5)
 );
 
-patches         
+patches
 (
-    symmetryPlane down 
+    symmetryPlane down
     (
         (0 1 20 19)
         (1 2 21 20)
         (12 11 30 31)
         (13 12 31 32)
     )
-    patch right 
+    patch right
     (
         (2 3 22 21)
         (3 6 25 22)
     )
-    symmetryPlane up 
+    symmetryPlane up
     (
         (7 8 27 26)
         (6 7 26 25)
         (8 18 37 27)
         (18 17 36 37)
     )
-    patch left 
+    patch left
     (
         (14 13 32 33)
         (17 14 33 36)
     )
-    symmetryPlane cylinder 
+    symmetryPlane cylinder
     (
         (10 5 24 29)
         (5 0 19 24)

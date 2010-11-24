@@ -1,21 +1,18 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.3                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-    class           dictionary;
-    object          blockMeshDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 convertToMeters 1;
 
@@ -44,7 +41,7 @@ vertices
 
     (-12.5 0.5 -0.1)
     (-12.5 12.5 -0.1)
-    
+
     // Front
     (-12.5 -12.5 0.1)
     (-2.5 -12.5 0.1)
@@ -69,10 +66,9 @@ vertices
     (-12.5 0.5 0.1)
     (-12.5 12.5 0.1)
 
-
 );
 
-blocks          
+blocks
 (
     hex (0 1 2 3 16 17 18 19) (10 12 1) simpleGrading (1 1 1)
     hex (1 4 5 2 17 20 21 18) (5 12 1) simpleGrading (1 1 1)
@@ -84,11 +80,11 @@ blocks
     hex (3 2 12 14 19 18 28 30) (10 1 1) simpleGrading (1 1 1)
 );
 
-edges           
+edges
 (
 );
 
-patches         
+patches
 (
     wall block
     (
@@ -97,14 +93,14 @@ patches
         (9 25 28 12)
         (12 28 18 2)
     )
-    
-    patch top 
+
+    patch top
     (
         (15 13 29 31)
         (13 11 27 29)
         (11 10 26 27)
     )
-    
+
     wall bottom
     (
         (0 1 17 16)
@@ -126,7 +122,7 @@ patches
         (8 24 26 10)
     )
 
-    empty frontAndBack 
+    empty frontAndBack
     (
         (0 1 2 3)
         (1 4 5 2)
@@ -149,9 +145,8 @@ patches
 
 );
 
-mergePatchPairs 
+mergePatchPairs
 (
 );
-
 
 // ************************************************************************* //

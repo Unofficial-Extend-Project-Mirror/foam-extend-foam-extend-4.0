@@ -1,27 +1,18 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           volScalarField;
-    object          epsilon;
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      epsilon;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 dimensions      [0 2 -3 0 0 0 0];
 
@@ -29,28 +20,28 @@ internalField   uniform 14.855;
 
 boundaryField
 {
-    inlet           
+    inlet
     {
         type            fixedValue;
         value           uniform 14.855;
     }
 
-    outlet          
+    outlet
     {
         type            zeroGradient;
     }
 
-    upperWall       
+    upperWall
     {
         type            zeroGradient;
     }
 
-    lowerWall       
+    lowerWall
     {
         type            zeroGradient;
     }
 
-    lowerWallInlet  
+    lowerWallInlet
     {
         type            zeroGradient;
     }
@@ -60,16 +51,15 @@ boundaryField
         type            zeroGradient;
     }
 
-    interface    
+    interface
     {
         type            zeroGradient;
     }
 
-    defaultFaces    
+    defaultFaces
     {
         type            empty;
     }
 }
-
 
 // ************************************************************************* //

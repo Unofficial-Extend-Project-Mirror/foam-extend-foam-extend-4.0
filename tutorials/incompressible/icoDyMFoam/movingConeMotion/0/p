@@ -1,27 +1,18 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           volScalarField;
-    object          p;
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      p;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 dimensions      [0 2 -2 0 0 0 0];
 
@@ -29,27 +20,27 @@ internalField   uniform 0;
 
 boundaryField
 {
-    movingWall      
+    movingWall
     {
         type            zeroGradient;
     }
 
-    farFieldMoving  
+    farFieldMoving
     {
         type            zeroGradient;
     }
 
-    fixedWall       
+    fixedWall
     {
         type            zeroGradient;
     }
 
-    axis            
+    axis
     {
         type            empty;
     }
 
-    left            
+    left
     {
         type            totalPressure;
         p0              uniform 0;
@@ -61,21 +52,20 @@ boundaryField
         value           uniform 0;
     }
 
-    farField        
+    farField
     {
         type            zeroGradient;
     }
 
-    back            
+    back
     {
         type            wedge;
     }
 
-    front           
+    front
     {
         type            wedge;
     }
 }
-
 
 // ************************************************************************* //
