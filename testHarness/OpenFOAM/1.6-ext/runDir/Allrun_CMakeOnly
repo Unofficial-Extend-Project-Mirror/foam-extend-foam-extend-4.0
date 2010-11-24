@@ -1,11 +1,11 @@
 #!/bin/bash
-# /*---------------------------------------------------------------------------*\
+# /*-------------------------------------------------------------------------*\
 #   =========                 |
 #   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
 #    \\    /   O peration     |
 #     \\  /    A nd           | Copyright held by original author
 #      \\/     M anipulation  |
-# -------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # License
 #     This file is part of OpenFOAM.
 #
@@ -31,11 +31,12 @@
 #        Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved
 #
 #
-# \*---------------------------------------------------------------------------*/
+# \*-------------------------------------------------------------------------*/
 
 #set -x
 
-# This environment variable must point to the location of the test harness main directory
+# This environment variable must point to the location of the test harness
+# main directory
 export FOAM_TEST_HARNESS_DIR=$(dirname $PWD)
 
 # First, some sanity checks
