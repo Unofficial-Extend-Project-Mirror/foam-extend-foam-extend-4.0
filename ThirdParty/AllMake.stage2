@@ -64,8 +64,8 @@ echo
 
 # MPI
 #( rpm_make openmpi-1.4.1   http://www.open-mpi.org/software/ompi/v1.4/downloads/openmpi-1.4.1.tar.gz )
-( rpm_make openmpi-1.4.3   http://www.open-mpi.org/software/ompi/v1.4/downloads/openmpi-1.4.3.tar.gz )
-#( rpm_make openmpi-1.5     http://www.open-mpi.org/software/ompi/v1.5/downloads/openmpi-1.5.tar.gz   )
+#( rpm_make openmpi-1.4.3   http://www.open-mpi.org/software/ompi/v1.4/downloads/openmpi-1.4.3.tar.gz )
+( rpm_make openmpi-1.5     http://www.open-mpi.org/software/ompi/v1.5/downloads/openmpi-1.5.tar.gz   )
 
 echo ========================================
 echo Done ThirdParty AllMake: Stage2
