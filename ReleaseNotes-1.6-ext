@@ -11,8 +11,9 @@
   OpenFOAM software library, following the establishment of the -Extend Project
   and  web portal.
 
-  This release includes an automatic test harness, which passes our standard
-  tests and tutorials.
+  This release includes many improvements, including an automatic test harness
+  which provides basic quality control by running OpenFOAM over a growing
+  suite of tutorials and test cases.
 
 * Compatibility
   OpenFOAM-1.6-ext is compatible with the OpenFOAM-1.6.x and 1.7.1 versions
@@ -71,7 +72,7 @@
   Updated fluid-structure interaction solver with parallelisation support
   Updated stress analysis tools, new large deformation solver formulation
 
-* Validation
+* Quality Control
   Integrated automatic and publicly available test harness with ~150 cases
   http://openfoam-extend.sourceforge.net/CDash/index.php
   Community-driven test-case base to enhance code quality and integrity.
