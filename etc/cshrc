@@ -70,7 +70,8 @@ setenv WM_PROJECT_USER_DIR $HOME/$WM_PROJECT/$LOGNAME-$WM_PROJECT_VERSION
 
 # Location of third-party software
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-setenv WM_THIRD_PARTY_DIR $WM_PROJECT_INST_DIR/ThirdParty-$WM_PROJECT_VERSION
+#setenv WM_THIRD_PARTY_DIR $WM_PROJECT_INST_DIR/ThirdParty-$WM_PROJECT_VERSION
+setenv WM_THIRD_PARTY_DIR $WM_PROJECT_DIR/ThirdParty
 
 # Source files, possibly with some verbosity
 alias _foamSource 'if ($?FOAM_VERBOSE && $?prompt) echo "Sourcing: \!*"; source \!*'
@@ -189,10 +190,6 @@ case Linux:
         setenv WM_LDFLAGS '-mabi=64 -G0'
         setenv WM_MPLIB MPI
         ;;
-    case Darwin:
-        setenv WM_ARCH darwin
-        setenv WM_COMPILER
-        breaksw
 
     case ppc64:
         setenv WM_ARCH linuxPPC64
@@ -207,6 +204,57 @@ case Linux:
         breaksw
 
     endsw
+    breaksw
+
+case Darwin:
+    switch (`uname -p`)
+    case powerpc:
+	setenv WM_ARCH darwinPpc
+        breaksw
+    case i386:
+	setenv WM_ARCH darwinIntel
+        breaksw
+    default:
+        echo "This seems to be an Intel-Mac please tell me the output of 'uname -p'. Bernhard."
+	setenv WM_ARCH darwinIntel
+        breaksw
+    endsw
+    switch ($WM_ARCH_OPTION)
+    case 32:
+	setenv WM_CFLAGS '-m32 -fPIC'
+	setenv WM_CXXFLAGS '-m32 -fPIC'
+	setenv WM_LDFLAGS '-m32'
+        breaksw;
+    case 64:
+        setenv WM_ARCH ${WM_ARCH}64
+	setenv WM_CFLAGS '-m64 -fPIC'
+	setenv WM_CXXFLAGS '-m64 -fPIC'
+	setenv WM_LDFLAGS '-m64'
+        breaksw;
+    default:
+        echo "Unknown WM_ARCH_OPTION $WM_ARCH_OPTION, should be 32 or 64"
+        breaksw
+    endsw
+
+    # Make sure that binaries use the best features of the used OS-Version
+    setenv MACOSX_DEPLOYMENT_TARGET `sw_vers -productVersion`
+
+    # Use Mac-Ports-Compiler instead of Apple-gcc-4.2
+    switch ($WM_COMPILER)
+    case Gcc43:
+        setenv WM_CC 'gcc-mp-4.3'
+	setenv WM_CXX 'g++-mp-4.3'
+	breaksw;
+    case Gcc44:
+        setenv WM_CC 'gcc-mp-4.4'
+	setenv WM_CXX 'g++-mp-4.4'
+	breaksw;
+    case Gcc45:
+        setenv WM_CC 'gcc-mp-4.5'
+	setenv WM_CXX 'g++-mp-4.5'
+        breaksw;
+    endsw
+    setenv WM_COMPILER ""
     breaksw
 
 case SunOS:
@@ -261,7 +309,7 @@ _foamSource $WM_PROJECT_DIR/etc/aliases.csh
 # Source user setup files for optional packages
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # _foamSource $WM_PROJECT_DIR/etc/apps/paraview/cshrc
-_foamSource $WM_PROJECT_DIR/etc/apps/paraview3/cshrc
+#_foamSource $WM_PROJECT_DIR/etc/apps/paraview3/cshrc
 # _foamSource $WM_PROJECT_DIR/etc/apps/ensight/cshrc
 
 
@@ -283,6 +331,11 @@ setenv MANPATH `$cleanProg "$MANPATH"`:
 #- Clean LD_PRELOAD
 if ( $?LD_PRELOAD ) then
     setenv LD_PRELOAD `$cleanProg "$LD_PRELOAD"`
+endif
+
+#- Clean DYLD_LIBRARY_PATH
+if ( $?DYLD_LIBRARY_PATH ) then
+    setenv DYLD_LIBRARY_PATH `$cleanProg "$DYLD_LIBRARY_PATH"`
 endif
 
 # cleanup environment:

@@ -144,16 +144,26 @@ unset MPI_ARCH_PATH
 
 switch ("$WM_MPLIB")
 case OPENMPI:
-    set mpi_version=openmpi-1.5
-    setenv MPI_HOME $WM_THIRD_PARTY_DIR/$mpi_version
-    setenv MPI_ARCH_PATH $MPI_HOME/platforms/$WM_OPTIONS
+    if (-e $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3 ) then
+	set mpi_version=openmpi-1.4.3
+	_foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
 
-    # Tell OpenMPI where to find its install directory
-    setenv OPAL_PREFIX $MPI_ARCH_PATH
+        setenv MPI_HOME $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS
+        setenv MPI_ARCH_PATH $MPI_HOME
 
-    _foamAddPath $MPI_ARCH_PATH/bin
-    _foamAddLib  $MPI_ARCH_PATH/lib
+        # Tell OpenMPI where to find its install directory
+        setenv OPAL_PREFIX $MPI_ARCH_PATH
+    else
+        set mpi_version=openmpi-1.5
+        setenv MPI_HOME $WM_THIRD_PARTY_DIR/$mpi_version
+        setenv MPI_ARCH_PATH $MPI_HOME/platforms/$WM_OPTIONS
 
+        # Tell OpenMPI where to find its install directory
+        setenv OPAL_PREFIX $MPI_ARCH_PATH
+
+        _foamAddPath $MPI_ARCH_PATH/bin
+        _foamAddLib  $MPI_ARCH_PATH/lib
+    endif
     setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/$mpi_version
     unset mpi_version
     breaksw
@@ -288,6 +298,35 @@ if ( $?CGAL_LIB_DIR ) then
     _foamAddLib $CGAL_LIB_DIR
 endif
 
+# Mesquite library if available
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if ( -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2 ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS/etc/mesquite-2.1.2.csh
+endif
+
+# Metis library if available
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~
+if ( -e $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2 ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS/etc/metis-5.0pre2.csh
+endif
+
+# ParMetis library if available
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if ( -e $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1 ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1/platforms/$WM_OPTIONS/etc/ParMetis-3.1.1.csh
+endif
+
+# ParMGridGen library if available
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if ( -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0 ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS/etc/ParMGridGen-1.0.csh
+endif
+
+# Scotch library if available
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if ( -e $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b/platforms/$WM_OPTIONS/etc/scotch-5.1.10b.csh
+endif
 
 # Switch on the hoard memory allocator if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -295,6 +334,35 @@ endif
 #    setenv LD_PRELOAD $FOAM_LIBBIN/libhoard.so:${LD_PRELOAD}
 #endif
 
+# Third party packages
+
+# cmake
+# ~~~~~
+if ( -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.3 ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3/platforms/$WM_OPTIONS/etc/cmake-2.8.3.csh
+endif
+
+# Python
+# ~~~~~
+if ( -e "$WM_THIRD_PARTY_DIR"/packages/Python-2.7 ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/Python-2.7/platforms/$WM_OPTIONS/etc/Python-2.7.csh
+endif
+
+# QT
+# ~~~~~
+if ( -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-opensource-src-4.7.0 )then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.0/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.7.0.csh
+endif
+
+# PARAVIEW
+# ~~~~~
+if ( -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.8.1 ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.csh
+endif
+
+if ( $WM_ARCH == "darwinIntel" ) then
+    setenv DYLD_LIBRARY_PATH ${LD_LIBRARY_PATH}
+endif
 
 # cleanup environment:
 # ~~~~~~~~~~~~~~~~~~~~

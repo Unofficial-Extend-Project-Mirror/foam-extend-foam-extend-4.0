@@ -1,0 +1,183 @@
+#---------------------------------*- sh -*-------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+#
+# File
+#     makeThirdPartyFunctionsForRPM
+#
+# Description
+#     Functions for managing the third-party packages with RPM
+#
+#------------------------------------------------------------------------------
+
+# define the build and the system architecture type
+buildBase=$WM_THIRD_PARTY_DIR/rpmBuild
+architecture=`rpm --eval "%{_target_cpu}"`
+
+# Adjust the rpm command on Ubuntu system
+rpm --force-debian >& /dev/null
+
+RETVAL=$?
+[ $RETVAL -eq 0 ] && RPM_CMD="rpm --force-debian" #Success : Debian system
+[ $RETVAL -ne 0 ] && RPM_CMD="rpm"                #Failed  : Non-Debian system
+
+echo ""
+echo "This system rpm command: $RPM_CMD"
+echo ""
+
+#
+# Download/Build/Uninstall/Install a package
+#
+rpm_make()
+{
+    package="$1"
+    rpmName=$package-$WM_OPTIONS.$architecture
+    rpmFile=$buildBase/RPMS/$architecture/$rpmName.rpm
+
+    # We check immediatly if the RPM binary package is available in the local RPMs vault.
+    # If so, we basically uninstall/reinstall the package. This is handy for installation
+    # on machines with no Internet access, so without downloading capabilities. If one wants to
+    # force the recompilation of a given package, just make sure to move the corresponding RPM
+    # binary package away from the local RPM vault.
+    #
+    if [ ! -e "$rpmFile" ]; then
+        #
+        # The package's RPM is absent. We build from the package source tarball 
+        #
+	cd $buildBase
+
+        # Here, the logic is fairly simple: 
+        #    We assume that the 2nd command-line parameter is necessarily the URL for dowmloading the package.
+        #    If more than 2 command-line parameters are supplied, we assume that these additional parameters
+        #    are for the command rpmbuild.
+        #    This is a bit fragile, improvements will come later if necessary.
+        #  
+	[ "$#" -ge 2 ] && {
+            packageURL="$2"
+            packageTarBall=`basename $packageURL`
+
+            if [ ! -e "SOURCES/$packageTarBall" ]; then
+		echo "Download $packageTarBall from : $packageURL"
+		( cd SOURCES; wget --no-check-certificate $packageURL )
+            fi
+	}
+
+	[ "$#" -gt 2 ] && {
+        # We will pass the rest of the command-line arguments to rpmbuild
+            shift 2
+	}
+
+        echo "Making package $package using RPM."
+	rpm_build $package "$@"
+    fi
+
+    # Install RPM package if not done already
+    if [ ! -e "$WM_THIRD_PARTY_DIR/packages/$package/platforms/$WM_OPTIONS" ]; then
+        echo "Installing package: $package"
+        rpm_uninstall $package
+        rpm_install   $package
+    else
+        echo "Package $package is already installed"
+    fi
+
+    echo "Done installing package $package"
+    echo ""
+}
+
+#
+# Build a RPM file using the package SPEC file
+#
+rpm_build()
+{
+    package="$1"
+    shift
+    specFile="$package.spec"
+
+    cd $buildBase
+
+    [ -e ./SPECS/$specFile ] || {
+        echo "rpm_build: missing SPEC file for package $package. Aborting."
+        return 1
+    }
+
+    #Build RPM package
+    echo "Building package $package"
+    rpmbuild --define "_topdir $buildBase" --dbpath $buildBase/rpmDB --clean -bb ./SPECS/$specFile "$@"
+}
+
+#
+# Uninstall a package using its RPM
+#
+rpm_uninstall()
+{
+    package="$1"
+    rpmName=$package-$WM_OPTIONS.$architecture
+
+    cd $buildBase
+
+    echo "  Uninstalling $package using RPM: $rpmName"
+    $RPM_CMD -e $rpmName --dbpath $buildBase/rpmDB --norepackage >& /dev/null
+
+    # Note: rpm will rant when uninstalling packages with an error message
+    #       starting with "error: LOOP:"
+    #       Googling about this problem shows that this error is benign, and
+    #       is related to the list of the files included in the RPM, and the
+    #       syntax used in the SPEC file. Need to revisit later... MB
+}
+
+#
+# Install a package using its relocatable RPM
+#
+rpm_install()
+{
+    package="$1";
+    rpmName=$package-$WM_OPTIONS.$architecture;
+    rpmFile=$buildBase/RPMS/$architecture/$rpmName.rpm;
+
+    echo "  Installing $package using RPM file: $rpmFile";
+    $RPM_CMD -ivh              \
+	$rpmFile          \
+	--dbpath $buildBase/rpmDB --force --nodeps;
+
+}
+
+#
+# Populate the local RPM vault with comand-line supplied list of RPMs
+#
+rpm_populateRPMvault()
+{
+    rpmVault=$buildBase/RPMS/$architecture
+
+    echo " Local RPM vault location: $rpmVault"
+    echo ""
+    echo " Moving the following RPMs to the local RPM vault: `echo $@`" 
+
+    mkdir -p $rpmVault
+    mv $@ $rpmVault
+
+    echo ""
+    echo " Current content of the local RPM vault:"
+    ls -axlt $rpmVault
+    echo ""
+
+}
+# ----------------------------------------------------------------- end-of-file

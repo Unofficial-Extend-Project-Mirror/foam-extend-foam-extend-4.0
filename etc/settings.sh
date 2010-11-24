@@ -172,15 +172,35 @@ unset MPI_ARCH_PATH
 
 case "$WM_MPLIB" in
 OPENMPI)
-    mpi_version=openmpi-1.4.1
-    export MPI_HOME=$WM_THIRD_PARTY_DIR/$mpi_version
-    export MPI_ARCH_PATH=$MPI_HOME/platforms/$WM_OPTIONS
+    if [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3 ]
+        then
+        if [ "$FOAM_VERBOSE" -a "$PS1" ]
+        then
+            echo "Using openmpi-1.4.3"
+        fi
+        mpi_version=openmpi-1.4.3
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.sh
 
-    # Tell OpenMPI where to find its install directory
-    export OPAL_PREFIX=$MPI_ARCH_PATH
+        export MPI_HOME=$WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS
+        export MPI_ARCH_PATH=$MPI_HOME
 
-    _foamAddPath $MPI_ARCH_PATH/bin
-    _foamAddLib  $MPI_ARCH_PATH/lib
+        # Tell OpenMPI where to find its install directory
+        export OPAL_PREFIX=$MPI_ARCH_PATH
+    elif [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.1 ]
+        then
+        if [ "$FOAM_VERBOSE" -a "$PS1" ]
+        then
+            echo "Using openmpi-1.4.1"
+        fi
+        mpi_version=openmpi-1.4.1
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.sh
+
+        export MPI_HOME=$WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS
+        export MPI_ARCH_PATH=$MPI_HOME
+
+        # Tell OpenMPI where to find its install directory
+        export OPAL_PREFIX=$MPI_ARCH_PATH
+    fi
 
     export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
     unset mpi_version
@@ -334,6 +354,112 @@ export MPI_BUFFER_SIZE
 #	export DYLD_INSERT_LIBRARIES=$FOAM_LIBBIN/libhoard.dylib:$DYLD_INSERT_LIBRARIES
 #    fi
 #fi
+
+
+# Third party packages
+#
+# In order to use a pre-installed version of the ThirdParty packages, just set the
+# appropriate XXX_DIR environment variable for a given package in order to disable 
+# the sourcing of the ThirdParty version of the same package.
+
+# Load Mesquite library if the MESQUITE_DIR variable is empty or non-existent
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ ! -n "${MESQUITE_DIR:+x}" ]
+then
+    [ -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2 ] && {
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS/etc/mesquite-2.1.2.sh
+    }
+fi
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "MESQUITE_DIR is initialized to: $MESQUITE_DIR"
+
+
+# Load Metis library if the METIS_DIR variable is empty or non-existent
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ ! -n "${METIS_DIR:+x}" ]
+then
+    [ -e $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2 ] && {
+        _foamSource $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS/etc/metis-5.0pre2.sh
+    }
+fi
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "METIS_DIR is initialized to: $METIS_DIR"
+
+
+# Load ParMetis library if the PARMETIS_DIR variable is empty or non-existent
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ ! -n "${PARMETIS_DIR:+x}" ]
+then
+    [ -e $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1 ] && {
+        _foamSource $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1/platforms/$WM_OPTIONS/etc/ParMetis-3.1.1.sh
+    }
+fi
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "PARMETIS_DIR is initialized to: $PARMETIS_DIR"
+
+
+# Load ParMGridGen library if the PARMGRIDGEN_DIR variable is empty or non-existent
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ ! -n "${PARMGRIDGEN_DIR:+x}" ]
+then
+    [ -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0 ] && {
+        _foamSource $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS/etc/ParMGridGen-1.0.sh
+    }
+fi
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "PARMGRIDGEN_DIR is initialized to: $PARMGRIDGEN_DIR"
+
+
+# Load Scotch library if the SCOTCH_DIR variable is empty or non-existent
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ ! -n "${SCOTCH_DIR:+x}" ]
+then
+    [ -e $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b ] && {
+        _foamSource $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b/platforms/$WM_OPTIONS/etc/scotch-5.1.10b.sh
+    }
+fi
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "SCOTCH_DIR is initialized to: $SCOTCH_DIR"
+
+
+# Load cmake if the CMAKE_DIR variable is empty or non-existent
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ ! -n "${CMAKE_DIR:+x}" ]
+then
+    [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3 ] && {
+        _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3/platforms/$WM_OPTIONS/etc/cmake-2.8.3.sh
+    }
+fi
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "CMAKE_DIR is initialized to: $CMAKE_DIR"
+
+
+# Load Python if the PYTHON_DIR variable is empty or non-existent
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ ! -n "${PYTHON_DIR:+x}" ]
+then
+    [ -e $WM_THIRD_PARTY_DIR/packages/Python-2.7 ] && {
+        _foamSource $WM_THIRD_PARTY_DIR/packages/Python-2.7/platforms/$WM_OPTIONS/etc/Python-2.7.sh
+    }
+fi
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "PYTHON_DIR is initialized to: $PYTHON_DIR"
+
+
+# Load QT if the QT_DIR variable is empty or non-existent
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ ! -n "${QT_DIR:+x}" ]
+then
+    [ -e $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.0 ] && {
+        _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.0/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.7.0.sh
+    }
+fi
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "QT_DIR is initialized to: $QT_DIR"
+
+
+# Load ParaView if the PARAVIEW_DIR variable is empty or non-existent
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ ! -n "${PARAVIEW_DIR:+x}" ]
+then
+    [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1 ] && {
+        _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.sh
+    }
+fi
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "PARAVIEW_DIR is initialized to: $PARAVIEW_DIR"
+
 
 # cleanup environment:
 # ~~~~~~~~~~~~~~~~~~~~

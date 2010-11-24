@@ -1,0 +1,97 @@
+diff -ruN ParMetis-3.1.1-orig/METISLib/Makefile ParMetis-3.1.1/METISLib/Makefile
+--- ParMetis-3.1.1-orig/METISLib/Makefile	2007-03-19 13:46:34.000000000 -0400
++++ ParMetis-3.1.1/METISLib/Makefile	2010-10-29 12:21:47.000000000 -0400
+@@ -19,7 +19,7 @@
+ .c.o:
+ 	$(CC) $(CFLAGS) -c $*.c
+ 
+-../libmetis.a: $(OBJS)
++libmetis-parmetis.$(LIB_EXT): $(OBJS)
+ 	$(AR) $@ $(OBJS)
+ 	$(RANLIB) $@
+ 
+@@ -27,7 +27,7 @@
+ 	rm -f *.o 
+ 
+ realclean:
+-	rm -f *.o ; rm -f ../libmetis.a
++	rm -f *.o ; rm -f libmetis-parmetis.$(LIB_EXT)
+ 
+ 
+ checkin:
+
+diff -ruN ParMetis-3.1.1-orig/Makefile.in ParMetis-3.1.1/Makefile.in
+--- ParMetis-3.1.1-orig/Makefile.in	2008-11-17 18:47:06.000000000 -0500
++++ ParMetis-3.1.1/Makefile.in	2010-10-29 12:06:46.000000000 -0400
+@@ -4,7 +4,7 @@
+ 
+ 
+ # What optimization level to use
+-OPTFLAGS = -O3 
++OPTFLAGS = -O3 -fPIC
+ 
+ # Include directories for the compiler
+ INCDIR = 
+@@ -22,11 +22,14 @@
+ #XTRALIBS = -lefence
+ #XTRALIBS = -ldmalloc
+ 
++# Dynamic lib extension
++LIB_EXT = so
++
+ # What archiving to use
+-AR = ar rv
++AR = gcc -shared -o
+ 
+ # What to use for indexing the archive
+ #RANLIB = ranlib
+-RANLIB = ar -ts
++RANLIB = true
+ 
+ VERNUM = 
+diff -ruN ParMetis-3.1.1-orig/ParMETISLib/Makefile ParMetis-3.1.1/ParMETISLib/Makefile
+--- ParMetis-3.1.1-orig/ParMETISLib/Makefile	2008-11-17 17:43:23.000000000 -0500
++++ ParMetis-3.1.1/ParMETISLib/Makefile	2010-10-29 12:07:44.000000000 -0400
+@@ -22,7 +22,7 @@
+ 	$(CC) $(CFLAGS) -c $*.c
+ 
+ 
+-../libparmetis.a: $(OBJS)
++libparmetis.$(LIB_EXT): $(OBJS)
+ 	$(AR) $@ $(OBJS)
+ 	$(RANLIB) $@
+ 
+@@ -30,7 +30,7 @@
+ 	rm -f *.o 
+ 
+ realclean:
+-	rm -f *.o ; rm -f ../libparmetis.a
++	rm -f *.o ; rm -f ./libparmetis.$(LIB_EXT)
+ 
+ 
+ checkin:
+
+diff -ruN ParMetis-3.1.1-orig/Programs/Makefile ParMetis-3.1.1/Programs/Makefile
+--- ParMetis-3.1.1-orig/Programs/Makefile	2008-11-17 18:47:06.000000000 -0500
++++ ParMetis-3.1.1/Programs/Makefile	2010-10-29 12:27:24.000000000 -0400
+@@ -6,9 +6,9 @@
+ CFLAGS = $(COPTIONS) $(OPTFLAGS) $(INCLUDES)
+ 
+ 
+-LIBSDIR = -L.. $(LIBDIR) 
+-LIBS = -lparmetis -lmetis $(XTRALIBS) -lm
+-PARMETISLIB = ../libparmetis.a ../libmetis.a
++LIBSDIR = -L../METISLib -L../ParMETISLib $(LIBDIR) 
++LIBS = -lparmetis -lmetis-parmetis $(XTRALIBS) -lm
++PARMETISLIB = ../ParMETISLib/libparmetis.$(LIB_EXT) ../METISLib/libmetis-parmetis.$(LIB_EXT)
+ 
+ 
+ PTESTOBJS = ptest.o io.o adaptgraph.o 
+@@ -16,7 +16,6 @@
+ PARMETISOBJS = parmetis.o io.o adaptgraph.o
+ POMETISOBJS = pometis.o io.o 
+ 
+-          
+ .c.o:
+ 	$(CC) $(CFLAGS) -c $*.c
+ 

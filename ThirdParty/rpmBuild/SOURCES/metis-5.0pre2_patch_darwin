@@ -1,0 +1,90 @@
+diff -uNr metis-5.0pre2/GKlib/trunk/Makefile metis-5.0pre2_patch/GKlib/trunk/Makefile
+--- metis-5.0pre2/GKlib/trunk/Makefile	2007-03-27 17:34:29.000000000 -0400
++++ metis-5.0pre2_patch/GKlib/trunk/Makefile	2010-10-26 01:02:24.000000000 -0400
+@@ -55,6 +55,23 @@
+   LIBEXT = .lib
+   EXEEXT = .exe
+ else
++
++  #-------------------------------------------------------------------
++  # These defs are common among the GNU/GCC based systems
++  #-------------------------------------------------------------------
++  #Library creation information
++  AR = ar crv $@ 
++  RANLIB = ar -ts $@
++
++  #Compile input/output file specification
++  SOURCEFILE = -c $<
++  OUTPUTFILE = -o $@
++
++  # Standard file extensions
++  OBJEXT = .o
++  LIBEXT = .a
++  EXEEXT = 
++
+   ifeq ($(systype),Linux)  
+     ifeq ($(x86compiler),gcc) 
+       #Compiler information
+@@ -86,7 +103,7 @@
+   ifeq ($(systype),Darwin)  
+     #Compiler information
+     CC = gcc
+-    OPTFLAGS = -O6
++    OPTFLAGS = -O3 -shared
+     COPTIONS = -DDARWIN -D_FILE_OFFSET_BITS=64 -Wall -std=c99 -pedantic
+ 
+     #Linker information
+@@ -95,7 +112,11 @@
+ 
+     #Linker information
+     LDOPTIONS =
+-    LD = gcc
++    #LD = gcc
++    AR = gcc -shared  -dynamiclib -undefined dynamic_lookup -o $@
++    LD = $(CC) -dynamiclib -undefined dynamic_lookup
++    RANLIB =
++    LIBEXT = .dylib
+   endif
+ 
+ 
+@@ -121,22 +142,6 @@
+     LD = gcc
+   endif
+ 
+-
+-  #-------------------------------------------------------------------
+-  # These defs are common among the GNU/GCC based systems
+-  #-------------------------------------------------------------------
+-  #Library creation information
+-  AR = ar crv $@ 
+-  RANLIB = ar -ts $@
+-
+-  #Compile input/output file specification
+-  SOURCEFILE = -c $<
+-  OUTPUTFILE = -o $@
+-
+-  # Standard file extensions
+-  OBJEXT = .o
+-  LIBEXT = .a
+-  EXEEXT = 
+ endif
+ 
+ 
+diff -uNr metis-5.0pre2/Makefile.in metis-5.0pre2_patch/Makefile.in
+--- metis-5.0pre2/Makefile.in	2007-04-08 00:01:04.000000000 -0400
++++ metis-5.0pre2_patch/Makefile.in	2010-10-26 01:01:50.000000000 -0400
+@@ -105,8 +105,12 @@
+   ifeq ($(systype),Darwin)
+     #Compiler information
+     CC = gcc
+-    OPTFLAGS = -O6 
+-    COPTIONS += -DDARWINPPC 
++    OPTFLAGS = -O3 -shared
++    COPTIONS += -DDARWIN
++    AR = gcc -shared  -dynamiclib -undefined dynamic_lookup -o $@
++    LD = $(CC) -dynamiclib -undefined dynamic_lookup
++    RANLIB =
++    LIBEXT = .dylib
+   endif
+ 
+   ifeq ($(systype),CYGWIN)
