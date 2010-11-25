@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2004-2007 Z. Tukovic and H. Jasak
+    \\  /    A nd           | Copyright (C) 1991-2005 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,43 +26,31 @@ Application
     interfaceTrackinFoam
 
 Description
-    Incompressible laminar CFD code for simulation of a single bubble rising 
+    Incompressible laminar CFD code for simulation of a single bubble rising
     in a stil liquid. Interface between fluid phases is tracked using moving
     mesh.
 
 \*---------------------------------------------------------------------------*/
 
-#include "Ostream.H"
-#include "OFstream.H"
-
 #include "fvCFD.H"
-
-#include "inletOutletFvPatchFields.H"
-#include "zeroGradientFvPatchFields.H"
-#include "fixedGradientFvPatchFields.H"
-
-#include "motionSolver.H"
+#include "dynamicFvMesh.H"
 #include "freeSurface.H"
+#include "inletOutletFvPatchFields.H"
+#include "fixedGradientFvPatchFields.H"
+#include "boundBox.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
 #   include "setRootCase.H"
-
 #   include "createTime.H"
-
-#   include "createMeshNoClear.H"
-
+#   include "createDynamicFvMesh.H"
 #   include "createFields.H"
-
 #   include "initContinuityErrs.H"
-
 #   include "createBubble.H"
-
-#   include "createPath.H"
-
-#   include "createForces.H"
+#   include "createSurfactantConcentrationField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -70,97 +58,99 @@ int main(int argc, char *argv[])
 
     for (runTime++; !runTime.end(); runTime++)
     {
-        Info << "Time = " << runTime.value() << endl;
+        Info << "Time = " << runTime.value() << endl << endl;
 
-#       include "readBubbleSIMPLEControls.H"
-#       include "CourantNo.H"
-
-        interface.updateDisplacementDirections();
+#       include "readPISOControls.H"
 
         interface.moveMeshPointsForOldFreeSurfDisplacement();
 
-        interface.smooth();
+        interface.updateDisplacementDirections();
 
-#       include "updateMovingReferenceFrame.H"
+        interface.predictPoints();
 
-        // --- SIMPLE loop
-        for (label timeCorr=0; timeCorr<=nTimeCorr; timeCorr++)
+        Info<< "\nMax surface Courant Number = "
+            << interface.maxCourantNumber() << endl << endl;
+
+        for (int corr=0; corr<nOuterCorr; corr++)
         {
-            Info << endl;
+            // Update interface bc
+            interface.updateBoundaryConditions();
 
-            p.storePrevIter();        
+            // Make the fluxes relative
+            phi -= fvc::meshPhi(rho, U);
 
-            interface.correctBoundaryConditions();
+#           include "CourantNo.H"
 
-            tmp<fvVectorMatrix> UEqn
+            fvVectorMatrix UEqn
             (
                 fvm::ddt(rho, U)
               + rho*aF
-              + fvm::div(phiNet, U)
-              - fvm::laplacian(mu, U)             
+              + fvm::div(fvc::interpolate(rho)*phi, U, "div(phi,U)")
+              - fvm::laplacian(mu, U)
             );
 
-            UEqn().relax();
+            solve(UEqn == -fvc::grad(p));
 
-            solve(UEqn() == -fvc::grad(p));
-
-            volScalarField AU = UEqn().A();
-
-            U = UEqn().H()/AU;
-            U.correctBoundaryConditions();
-
-            UEqn.clear();
-
-            phi = (fvc::interpolate(U) & mesh.Sf());
-
-#           include "spacePatchFlowRateScaling.H"
-
-#           include "freeSurfacePatchFlowRateScaling.H"
-
-            // Non-orthogonal pressure corrector loop
-            for (label nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+            // --- PISO loop
+            for (int i=0; i<nCorr; i++)
             {
-                fvScalarMatrix pEqn
-                (
-                    fvm::laplacian(1.0/AU, p) == fvc::div(phi)
-                );
+                volScalarField AU = UEqn.A();
 
-                pEqn.setReference(0, 0.0);
-                pEqn.solve();
+                U = UEqn.H()/AU;
 
-                if (nonOrth == nNonOrthCorr)
+                phi = (fvc::interpolate(U) & mesh.Sf());
+
+#               include "scalePhi.H"
+
+#               include "scaleSpacePhi.H"
+
+                // Non-orthogonal pressure corrector loop
+                for (label nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
                 {
-                    phi -= pEqn.flux();
+                    fvScalarMatrix pEqn
+                    (
+                        fvm::laplacian(1.0/AU, p)
+                     == fvc::div(phi)
+                    );
+
+#                   include "setReference.H"
+
+                    pEqn.solve();
+
+                    if (nonOrth == nNonOrthCorr)
+                    {
+                        phi -= pEqn.flux();
+                    }
                 }
+
+#               include "continuityErrs.H"
+
+                // Momentum corrector
+                U -= fvc::grad(p)/AU;
+                U.correctBoundaryConditions();
             }
 
-#           include "continuityErrs.H"
+#           include "solveBulkSurfactant.H"
 
-            // Explicitly relax pressure
-            p.relax();
-
-            // Momentum corrector
-            U -= fvc::grad(p)/AU;
-            U.correctBoundaryConditions();
-
-            // Move mesh
-            interface.movePoints();
-
-            // Update motion fluxes
-            phiNet = fvc::interpolate(rho)*(phi - fvc::meshPhi(rho, U));
+            interface.correctPoints();
 
 #           include "freeSurfaceContinuityErrs.H"
         }
 
-#       include "bubbleVolumeReduction.H"
+#       include "updateMovingReferenceFrame.H"
+
+#       include "volContinuity.H"
+
+        Info << "Total surface tension force: "
+            << interface.totalSurfaceTensionForce() << endl;
+
+        vector totalForce =
+            interface.totalViscousForce()
+          + interface.totalPressureForce();
+
+        Info << "Total force: " << totalForce << endl;
 
         runTime.write();
-
-#       include "writeData.H"
-
-#       include "writePath.H"
-
-#       include "writeForces.H"
 
         Info << "ExecutionTime = "
             << scalar(runTime.elapsedCpuTime())

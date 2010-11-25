@@ -11,42 +11,20 @@ FoamFile
     format          ascii;
     class           dictionary;
     location        "system";
-    object          faSchemes;
+    object          tetFemSolution;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-ddtSchemes
+solvers
 {
+    motionU
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-09;
+        relTol          0.001;
+    }
 }
-
-gradSchemes
-{
-    default none;
-    grad(Us) Gauss linear;
-}
-
-divSchemes
-{
-    default none;
-    div(Us) Gauss linear;
-}
-
-laplacianSchemes
-{
-}
-
-interpolationSchemes
-{
-}
-
-snGradSchemes
-{
-}
-
-fluxRequired
-{
-}
-
 
 // ************************************************************************* //

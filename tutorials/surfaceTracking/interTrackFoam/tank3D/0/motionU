@@ -9,39 +9,55 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    location    "system";
-    object      fvSolution;
+    class       tetPointVectorField;
+    location    "0";
+    object      motionU;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-solvers
-{
-    p
-    {
-        solver          PCG;
-        preconditioner  DIC;
-        tolerance       1e-06;
-        relTol          0;
-    }
+dimensions      [0 1 -1 0 0 0 0];
 
-    U
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    freeSurface
     {
-        solver          PBiCG;
-        preconditioner  DILU;
-        tolerance       1e-05;
-        relTol          0;
+        type            fixedValue;
+        value           uniform (0 0 -1);
+    }
+    inlet
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+    outlet
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+    bottom
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+    side-1
+    {
+        type            slip;
+    }
+    side-2
+    {
+        type            slip;
+    }
+    symm-1
+    {
+        type            symmetryPlane;
+    }
+    symm-2
+    {
+        type            symmetryPlane;
     }
 }
 
-PISO
-{
-    nOuterCorrectors            6;
-    nCorrectors                 2;
-    nNonOrthogonalCorrectors    1;
-
-    pRefPoint (0 0 0);
-    pRefValue 0;
-}
 
 // ************************************************************************* //

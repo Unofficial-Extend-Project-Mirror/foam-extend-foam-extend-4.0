@@ -29,8 +29,8 @@ gradSchemes
 
 divSchemes
 {
+    defalut none;
     div(phi,U) Gauss linear;
-    div(phiNet,U) Gauss linear;
 }
 
 laplacianSchemes

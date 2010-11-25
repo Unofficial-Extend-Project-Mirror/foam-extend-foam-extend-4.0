@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2004-2007 Z. Tukovic and H. Jasak
+    \\  /    A nd           | Copyright (C) 1991-2005 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,29 +23,33 @@ License
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 Application
-    interTrackFoam
+    interfaceTrackinFoam
 
 Description
-    Solver for 1 or 2 incompressible fluids, which tracks the interface 
-    using moving mesh
+    Incompressible laminar CFD code for simulation of a single bubble rising 
+    in a stil liquid. Interface between fluid phases is tracked using moving
+    mesh.
 
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "motionSolver.H"
+#include "dynamicFvMesh.H"
 #include "freeSurface.H"
-#include "OFstream.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
 #   include "setRootCase.H"
-#   include "createTime.H"
-#   include "createMeshNoClear.H"
-#   include "createFields.H"
-#   include "initContinuityErrs.H"
 
+#   include "createTime.H"
+
+#   include "createDynamicFvMesh.H"
+
+#   include "createFields.H"
+
+#   include "initContinuityErrs.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,78 +57,90 @@ int main(int argc, char *argv[])
 
     for (runTime++; !runTime.end(); runTime++)
     {
-        Info << "Time = " << runTime.value() << endl;
+        Info << "Time = " << runTime.value() << endl << endl;
 
-#       include "readInterfaceSIMPLEControls.H"
-#       include "CourantNo.H"
-
-        interface.updateDisplacementDirections();
+#       include "readPISOControls.H"
 
         interface.moveMeshPointsForOldFreeSurfDisplacement();
 
-        interface.smooth();
+        interface.updateDisplacementDirections();
 
-        // --- SIMPLE loop
-        for (label timeCorr=0; timeCorr<=nTimeCorr; timeCorr++)
+        interface.predictPoints();
+
+        Pout<< "\nMax surface Courant Number = "
+            << interface.maxCourantNumber() << endl << endl;
+
+        for (int corr=0; corr<nOuterCorr; corr++)
         {
-            p.storePrevIter();
+            // Update interface bc
+            interface.updateBoundaryConditions();
+            
+            // Make the fluxes relative
+            phi -= fvc::meshPhi(rho, U);
 
-            interface.correctBoundaryConditions();
+#           include "CourantNo.H"
 
-            tmp<fvVectorMatrix> UEqn
+            fvVectorMatrix UEqn
             (
                 fvm::ddt(rho, U)
-              + fvm::div(phiNet, U)
+              + fvm::div(fvc::interpolate(rho)*phi, U, "div(phi,U)")
               - fvm::laplacian(mu, U)
             );
 
-            UEqn().relax(); 
+            solve(UEqn == -fvc::grad(p));
 
-            solve(UEqn() == - fvc::grad(p));
-
-            volScalarField AU = UEqn().A();
-
-            U = UEqn().H()/AU;
-            U.correctBoundaryConditions();
-
-            UEqn.clear();
-
-            phi = (fvc::interpolate(U) & mesh.Sf());
-
-            // Non-orthogonal pressure corrector loop
-            for (label nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+            // --- PISO loop
+            for (int i=0; i<nCorr; i++)
             {
-                tmp<fvScalarMatrix> pEqn
-                (
-                    fvm::laplacian(1.0/AU, p) == fvc::div(phi)
-                );
+                volScalarField AU = UEqn.A();
 
-                pEqn().setReference(0, 0.0);
-                pEqn().solve();
+                U = UEqn.H()/AU;
 
-                if (nonOrth == nNonOrthCorr)
+                phi = (fvc::interpolate(U) & mesh.Sf());
+
+#               include "scalePhi.H"
+
+                // Non-orthogonal pressure corrector loop
+                for (label nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
                 {
-                    phi -= pEqn().flux();
+                    fvScalarMatrix pEqn
+                    (
+                        fvm::laplacian(1.0/AU, p)
+                     == fvc::div(phi)
+                    );
+
+#                   include "setReference.H"
+
+                    pEqn.solve();
+
+                    if (nonOrth == nNonOrthCorr)
+                    {
+                        phi -= pEqn.flux();
+                    }
                 }
+
+#               include "continuityErrs.H"
+
+                // Momentum corrector
+                U -= fvc::grad(p)/AU;
+                U.correctBoundaryConditions();
             }
 
-#           include "continuityErrs.H"
-
-            // Explicitly relax pressure for momentum corrector
-            p.relax();
-
-            // Momentum corrector
-            U -= fvc::grad(p)/AU;
-            U.correctBoundaryConditions();
-
-            // Move mesh 
-            interface.movePoints();
-
-            // Update motion fluxes
-            phiNet = fvc::interpolate(rho)*(phi - fvc::meshPhi(rho, U));
+            interface.correctPoints();
 
 #           include "freeSurfaceContinuityErrs.H"
         }
+
+#       include "volContinuity.H"
+    
+        Info << "Total surface tension force: "
+            << interface.totalSurfaceTensionForce() << endl;
+
+        vector totalForce =
+            interface.totalViscousForce() 
+          + interface.totalPressureForce();
+
+        Info << "Total force: " << totalForce << endl;
 
         runTime.write();
 

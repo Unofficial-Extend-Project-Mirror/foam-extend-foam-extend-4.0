@@ -1,5 +1,5 @@
-Info<< "Reading field p\n" << endl;
 
+Info<< "\nReading field p\n" << endl << flush;
 volScalarField p
 (
     IOobject
@@ -14,8 +14,7 @@ volScalarField p
 );
 
 
-Info<< "Reading field U\n" << endl;
-
+Info<< "Reading field U\n" << endl << flush;
 volVectorField U
 (
     IOobject
@@ -30,7 +29,7 @@ volVectorField U
 );
 
 
-#include "createPhi.H"
+#   include "createPhi.H"
 
 
 volScalarField rho
@@ -51,14 +50,48 @@ volScalarField rho
 freeSurface interface(mesh, rho, U, p, phi);
 
 
-rho = interface.fluidIndicator()*
+volScalarField* fluidIndicatorPtr = NULL;
+
+if(Pstream::parRun())
+{
+    fluidIndicatorPtr = new volScalarField
     (
+        IOobject
+        (
+            "fluidIndicator",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    );
+}
+else
+{
+    fluidIndicatorPtr = new volScalarField
+    (
+        IOobject
+        (
+            "fluidIndicator",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        interface.fluidIndicator()
+    );
+}
+
+volScalarField& fluidIndicator = *fluidIndicatorPtr;
+
+
+rho = fluidIndicator
+   *(
         interface.rhoFluidA() 
       - interface.rhoFluidB()
     ) 
   + interface.rhoFluidB();
-
-rho.correctBoundaryConditions();
 
 
 volScalarField mu
@@ -69,14 +102,22 @@ volScalarField mu
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
-        IOobject::AUTO_WRITE
+        IOobject::NO_WRITE
     ),
-    interface.fluidIndicator()*(interface.muFluidA() - interface.muFluidB()) 
+    fluidIndicator
+   *(
+        interface.muFluidA() 
+      - interface.muFluidB()
+    ) 
   + interface.muFluidB()
 );
 
+// Read interpolators if present
+if (interface.twoFluids())
+{
+    interface.interpolatorAB();
+}
 
-surfaceScalarField phiNet = 
-    fvc::interpolate(rho)*(phi - fvc::meshPhi(rho, U));
-phiNet.rename("phiNet");
+
+#   include "setRefCell.H"
 

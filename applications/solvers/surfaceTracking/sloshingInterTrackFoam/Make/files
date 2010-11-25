@@ -1,4 +1,0 @@
-sloshingInterTrackFoam.C
-
-EXE = $(FOAM_APPBIN)/sloshingInterTrackFoam
-

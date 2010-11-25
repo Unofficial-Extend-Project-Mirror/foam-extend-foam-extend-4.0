@@ -25,7 +25,7 @@ solvers
         tolerance       1e-07;
         relTol          0;
     }
-    
+
     U
     {
         solver          PBiCG;
@@ -35,16 +35,12 @@ solvers
     }
 }
 
-SIMPLE
+PISO
 {
-    nTimeCorrectors             5;
+    nOuterCorrectors            5;
+    nCorrectors                 2;
     nNonOrthogonalCorrectors    1;
 }
 
-relaxationFactors
-{
-    p          0.7;
-    U          0.7;
-}
 
 // ************************************************************************* //

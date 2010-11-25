@@ -2,4 +2,18 @@ freeSurface.C
 makeFreeSurfaceData.C
 freeSurfacePointDisplacement.C
 
+correctedFvPatchFields/correctedFvPatchField/correctedFvPatchFields.C
+
+basicCorrectedFvPatchFields = correctedFvPatchFields/basicCorrectedFvPatchFields
+$(basicCorrectedFvPatchFields)/fixedGradient/fixedGradientCorrectedFvPatchFields.C
+$(basicCorrectedFvPatchFields)/fixedValue/fixedValueCorrectedFvPatchFields.C
+$(basicCorrectedFvPatchFields)/zeroGradient/zeroGradientCorrectedFvPatchFields.C
+
+
+
+patchCorrectedSnGrad/patchCorrectedSnGrads.C
+
+functionObjects/bubbleHistory/bubbleHistory.C
+functionObjects/sloshingHistory/sloshingHistory.C
+
 LIB = $(FOAM_LIBBIN)/libfreeSurface

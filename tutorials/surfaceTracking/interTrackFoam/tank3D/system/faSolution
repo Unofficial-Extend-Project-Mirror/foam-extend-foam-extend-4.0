@@ -11,42 +11,10 @@ FoamFile
     format          ascii;
     class           dictionary;
     location        "system";
-    object          faSchemes;
+    object          faSolution;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-ddtSchemes
-{
-}
-
-gradSchemes
-{
-    default none;
-    grad(Us) Gauss linear;
-}
-
-divSchemes
-{
-    default none;
-    div(Us) Gauss linear;
-}
-
-laplacianSchemes
-{
-}
-
-interpolationSchemes
-{
-}
-
-snGradSchemes
-{
-}
-
-fluxRequired
-{
-}
 
 
 // ************************************************************************* //

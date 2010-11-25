@@ -11,41 +11,47 @@ FoamFile
     format          ascii;
     class           dictionary;
     location        "system";
-    object          faSchemes;
+    object          fvSchemes;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 ddtSchemes
 {
+    ddt(rho,U) backward;
 }
 
 gradSchemes
 {
-    default none;
-    grad(Us) Gauss linear;
+    default Gauss linear;
+    grad(p) Gauss linear;
 }
 
 divSchemes
 {
-    default none;
-    div(Us) Gauss linear;
+    div(phi,U) Gauss GammaVDC 0.5;
 }
 
 laplacianSchemes
 {
+    default none;
+    laplacian(mu,U) Gauss linear corrected;
+    laplacian((1|A(U)),p) Gauss linear corrected;
 }
 
 interpolationSchemes
 {
+    default linear;
 }
 
 snGradSchemes
 {
+    default corrected;
 }
 
 fluxRequired
 {
+    p;
 }
 
 

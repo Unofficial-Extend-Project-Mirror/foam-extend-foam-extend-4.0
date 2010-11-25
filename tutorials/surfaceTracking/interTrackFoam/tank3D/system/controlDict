@@ -7,46 +7,42 @@
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-    class           dictionary;
-    location        "system";
-    object          faSchemes;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-ddtSchemes
-{
-}
+application         interTrackFoam;
 
-gradSchemes
-{
-    default none;
-    grad(Us) Gauss linear;
-}
+startFrom           latestTime;
 
-divSchemes
-{
-    default none;
-    div(Us) Gauss linear;
-}
+startTime           0;
 
-laplacianSchemes
-{
-}
+stopAt              endTime;
 
-interpolationSchemes
-{
-}
+endTime             10;
 
-snGradSchemes
-{
-}
+deltaT              0.001;
 
-fluxRequired
-{
-}
+writeControl        runTime;
 
+writeInterval       0.01;
+
+cycleWrite          0;
+
+writeFormat         ascii;
+
+writeCompression    compressed;
+
+timeFormat          general;
+
+timePrecision       6;
+
+runTimeModifiable   yes;
 
 // ************************************************************************* //
+
+

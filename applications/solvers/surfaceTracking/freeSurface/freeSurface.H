@@ -45,9 +45,8 @@ SourceFiles
 #include "volFieldsFwd.H"
 #include "surfaceFieldsFwd.H"
 #include "faCFD.H"
-#include "patchToPatchInterpolation.H"
-#include "tetDecompositionMotionSolver.H"
-#include "tetPolyPatchInterpolation.H"
+#include "IOpatchToPatchInterpolation.H"
+#include "dynamicFvMesh.H"
 
 #include "surfactantProperties.H"
 
@@ -67,7 +66,7 @@ class freeSurface
     // Private data
     
         //- Reference to fvMesh 
-        fvMesh& mesh_;
+        dynamicFvMesh& mesh_;
 
         //- Reference to density field
         const volScalarField& rho_;
@@ -91,10 +90,11 @@ class freeSurface
         //  parallel with free-surface point normals
         Switch normalMotionDir_;
 
-        //- Is it necessary to smoot the free surface
-        Switch freeSurfaceSmoothing_;
+        //- Free-surface points displacement direction
+        //  if not normal motion direction 
+        vector motionDir_;
 
-        //- Is it free-surface clean of surfactants
+        //- Is it free-surface clean of surfactant
         Switch cleanInterface_;
 
         //- ID of the fvMesh patch which represents 
@@ -126,23 +126,27 @@ class freeSurface
         //- Free surface patches which do not move
         wordList fixedFreeSurfacePatches_;
 
+        //- Free surface patches for witch point normals 
+        //  must be corrected
+        wordList pointNormalsCorrectionPatches_;
+
+         //- Number of free-surface correctors
+        label nFreeSurfCorr_;
+
+        //- Interface smoothing at the begining of time step
+        Switch smoothing_;
+
     // Demand-driven data
-
-        //- Patch A motion interpolation
-        mutable tetPolyPatchInterpolation* interpolatorAPtr_;
-
-        //- Patch B motion interpolation
-        mutable tetPolyPatchInterpolation* interpolatorBPtr_;
 
         //- Patch to patch interpolation object which deals with
         //  interpolation of flow variables between two free-surface 
         //  (interface) patches
-        mutable patchToPatchInterpolation* interpolatorABPtr_;
+        mutable IOpatchToPatchInterpolation* interpolatorABPtr_;
     
         //- Patch to patch interpolation object which deals with
         //  interpolation of flow variables between two free-surface 
         //  (interface) patches
-        mutable patchToPatchInterpolation* interpolatorBAPtr_;
+        mutable IOpatchToPatchInterpolation* interpolatorBAPtr_;
 
         //- Points which are attached to the free-surface A side faces
         //  and which defines the free-surface shape
@@ -150,7 +154,7 @@ class freeSurface
 
         //- Field which additionally determines 
         //  the motion of free-surface points
-        mutable scalarField* motionPointsMaskPtr_;
+        mutable labelList* motionPointsMaskPtr_;
 
         //- Displacement direction of free-surface points
         mutable vectorField* pointsDisplacementDirPtr_;
@@ -165,9 +169,6 @@ class freeSurface
         //- Finite area mesh which consists
         //  free-surface side A faces
         mutable faMesh* aMeshPtr_;
-
-        //- Reference to mesh motion solver
-        mutable tetDecompositionMotionSolver* mSolverPtr_;
 
         //- Free-surface velocity field
         mutable areaVectorField* UsPtr_;
@@ -197,16 +198,15 @@ class freeSurface
             void makeDirections();
             void makeTotalDisplacement();
             void readTotalDisplacement();
-            void makeFaMesh();
-            void makeMeshMotionSolver();
-            void makeUs();
+            void makeFaMesh() const;
+            void makeUs() const;
             void makePhis();
-            void makeSurfactConc();
-            void makeSurfaceTension();
-            void makeSurfactant();
+            void makePhi();
+            void makeDdtPhi();
+            void makeSurfactConc() const;
+            void makeSurfaceTension() const;
+            void makeSurfactant() const;
             void makeFluidIndicator();
-            void makePatchPointInterpolators();
-
 
         //- Clear all demand-driven data
         void clearOut();
@@ -222,6 +222,14 @@ class freeSurface
         //  for given new control points position
         tmp<vectorField> pointDisplacement(const scalarField& deltaH);
 
+        // Calc least sqare plane point and normal
+        tmp<vectorField> lsPlanePointAndNormal
+        (
+            const vectorField& points,
+            const vector& origin,
+            const vector& axis
+        ) const;
+
 public:
 
     // Declare name of the class and it's debug switch
@@ -232,7 +240,7 @@ public:
 
     freeSurface
     (
-        fvMesh& m,
+        dynamicFvMesh& m,
         const volScalarField& rho,
         volVectorField& Ub, 
         volScalarField& Pb, 
@@ -249,19 +257,19 @@ public:
 
 
         //- Return reference to fvMesh
-        const fvMesh& mesh() const
+        dynamicFvMesh& mesh()
         {
             return mesh_;
         }
 
         //- Return reference to fvMesh
-        fvMesh& mesh()
+        const dynamicFvMesh& mesh() const
         {
             return mesh_;
         }
 
-        //- Return reference to time
-        const Time& time() const
+        //- Return reference to DB
+        const Time& DB() const
         {
             return U_.mesh().time();
         }
@@ -278,16 +286,22 @@ public:
             return U_;
         }
 
+        //- Return reference to velocity field
+        const volVectorField& U() const
+        {
+            return U_;
+        }
+
         //- Return reference to pressure field
         volScalarField& p()
         {
             return p_;
         }
 
-        //- Return reference to flux field
-        const surfaceScalarField& phi() const
+        //- Return reference to pressure field
+        const volScalarField& p() const
         {
-            return phi_;
+            return p_;
         }
 
         //- Are there exist two fluid
@@ -301,13 +315,6 @@ public:
         bool normalMotionDir() const
         {
             return normalMotionDir_;
-        }
-
-        //- Is it necessary to consider the normal shear stress 
-        //  at the free-surface
-        bool freeSurfaceSmoothing() const
-        {
-            return freeSurfaceSmoothing_;
         }
 
         //- Is it interface clean
@@ -366,25 +373,19 @@ public:
             return cleanInterfaceSurfTension_;
         }
 
-        //- Return reference to interpolator for point motion, side A
-        const tetPolyPatchInterpolation& interpolatorA();
-
-        //- Return reference to interpolator for point motion, side B
-        const tetPolyPatchInterpolation& interpolatorB();
-
         //- Return reference to interpolator from free surface side A to
         //  free surface side B
-        const patchToPatchInterpolation& interpolatorAB();
+        const IOpatchToPatchInterpolation& interpolatorAB();
 
         //- Return reference to interpolator from free surface side B to
         //  free surface side A
-        const patchToPatchInterpolation& interpolatorBA();
+        const IOpatchToPatchInterpolation& interpolatorBA();
 
         //- Return control points
         vectorField& controlPoints();
 
         //- Return reference to motion points mask field
-        scalarField& motionPointsMask();
+        labelList& motionPointsMask();
 
         //- Return reference to point displacement direction field
         vectorField& pointsDisplacementDir();
@@ -398,11 +399,14 @@ public:
         //- Return reference to finite area mesh
         faMesh& aMesh();
 
-        //- Return reference to motion solver
-        tetDecompositionMotionSolver& meshMotionSolver();
-    
+        //- Return reference to finite area mesh
+        const faMesh& aMesh() const;
+
         //- Return free-surface velocity field
         areaVectorField& Us();
+
+        //- Return free-surface velocity field
+        const areaVectorField& Us() const;
 
         //- Return free-surface fluid flux field
         edgeScalarField& Phis();
@@ -410,11 +414,20 @@ public:
         //- Return free-surface surfactant concentration field
         areaScalarField& surfactantConcentration();
 
+        //- Return free-surface surfactant concentration field
+        const areaScalarField& surfactantConcentration() const;
+
         //- Return surface tension field
         areaScalarField& surfaceTension();
 
+        //- Return surface tension field
+        const areaScalarField& surfaceTension() const;
+
+        //- Return surface tension gradient
+        tmp<areaVectorField> surfaceTensionGrad();
+
         //- Return surfactant properties
-        const surfactantProperties& surfactant();
+        const surfactantProperties& surfactant() const;
 
         //- Return referenct to fluid indicator
         const volScalarField& fluidIndicator();
@@ -422,11 +435,14 @@ public:
         //- Update control points end displacement directions
         void updateDisplacementDirections();
 
-        //- Move only free-surface points
-        bool movePoints();
+        //- Predict interface points position
+        bool predictPoints();
 
-        //- Move only free-surface points for uniform displacement 
-        bool movePoints(scalar displ);
+        //- Correct interface points position
+        bool correctPoints();
+
+        //- Move only free-surface points
+        bool movePoints(const scalarField& interfacePHi);
 
         //- Move mesh points for old time free-surface points displacement
         bool moveMeshPointsForOldFreeSurfDisplacement();
@@ -434,38 +450,56 @@ public:
         //- Move mesh points
         bool moveMeshPoints();
 
-        //- Move mesh points for given displacement filed
-        bool moveMeshPoints(const scalarField& delta);
+        //- Update free-surface boundary conditions
+        void updateBoundaryConditions();
 
-        //- Correct free-surface boundary conditions
-        void correctBoundaryConditions();
-    
         //- Correct free-surface pressure
-        void correctPressure();
+        void updatePressure();
 
         //- Correct free-surface velocity
-        void correctVelocity();
+        void updateVelocity();
 
-        //- Correct free-surface velocity gradient
-        void correctVelocityGradient();
+        //- Update free-surface flux
+        void updateSurfaceFlux();
 
-        //- Correct free-surface velocity
-        void correctSurfaceFlux();
+        //- Update free-surface surfactant concentration 
+        void updateSurfactantConcentration();
 
-        //- Correct free-surface surfactant concentration 
-        void correctSurfactantConcentration();
+        //- Correct surface velocity boundary conditions
+        void correctUsBoundaryConditions();
 
         //- Calculate total pressure force
-        vector totalPressureForce();
+        vector totalPressureForce() const;
 
         //- Calculate total viscous force
-        vector totalViscousForce();
+        vector totalViscousForce() const;
+
+        //- Calculate total surface tension force
+        vector totalSurfaceTensionForce() const;
 
         //- Calculate free-surface undulation indicator
         tmp<scalarField> undulationIndicator();
 
         //- Smooth free-surface
         void smooth();
+
+        //- Chech free-surface faces flatness
+        tmp<scalarField> checkFaceFlatness();
+
+        //- Initialize control points position
+        void initializeControlPointsPosition();
+
+        //- Maximal surface tension based Courant number
+        scalar maxCourantNumber();
+
+        //- Update properties
+        void updateProperties();
+
+        //- Write VTK freeSurface mesh
+        void writeVTK() const;
+
+        //- Write VTK freeSurface control points
+        void writeVTKControlPoints();
 };
 
 

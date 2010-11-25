@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2004-2007 Z. Tukovic and H. Jasak
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -79,6 +79,9 @@ class surfactantProperties
         //- Equilibrium surfactant concentration at the free-surface
         dimensionedScalar surfactEquilibriumConc_;
 
+        //- Is the surfactant soluble
+        Switch soluble_;
+
 public:
 
     // Constructors
@@ -94,9 +97,14 @@ public:
         surfactR_("R", dimGasConstant*dimMass/dimMoles, 8.3144),
         surfactEquilibriumConc_
         (
-            surfactSaturatedConc_/
-            (1.0 + surfactDesorptionCoeff_/surfactBulkConc_)
-        )                
+            surfactSaturatedConc_
+           /(
+                1.0 
+              + surfactDesorptionCoeff_
+               /surfactBulkConc_
+            )
+        ),
+        soluble_(dict.lookup("soluble"))
     {}
 
 
@@ -154,6 +162,12 @@ public:
         const dimensionedScalar& surfactEquilibriumConc() const
         {
             return surfactEquilibriumConc_;
+        }
+
+        //- Is the surfactant soluble
+        Switch soluble() const
+        {
+            return soluble_;
         }
 };
 

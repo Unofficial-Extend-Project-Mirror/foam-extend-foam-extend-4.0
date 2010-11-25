@@ -10,43 +10,28 @@ FoamFile
     version         2.0;
     format          ascii;
     class           dictionary;
-    location        "system";
-    object          faSchemes;
+    object          dynamicMeshDict;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-ddtSchemes
-{
-}
+dynamicFvMesh dynamicMotionSolverFvMesh;
 
-gradSchemes
-{
-    default none;
-    grad(Us) Gauss linear;
-}
+twoDMotion yes;
 
-divSchemes
-{
-    default none;
-    div(Us) Gauss linear;
-}
+solver laplaceFaceDecomposition;
 
-laplacianSchemes
-{
-}
+diffusivity quadratic;
 
-interpolationSchemes
-{
-}
+distancePatches 1 (freeSurface);
 
-snGradSchemes
-{
-}
+frozenDiffusion yes;
 
-fluxRequired
+pseudoSolid
 {
-}
-
+    poissonsRatio           0.3;
+    nCorrectors             3;
+    convergenceTolerance    1e-9;
+};
 
 // ************************************************************************* //

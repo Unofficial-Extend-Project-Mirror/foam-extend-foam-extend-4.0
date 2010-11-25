@@ -24,13 +24,12 @@ ddtSchemes
 gradSchemes
 {
     default Gauss linear;
-    grad(p) Gauss linear;
 }
 
 divSchemes
 {
+    default none;
     div(phi,U) Gauss GammaVDC 0.5;
-    div(phiNet,U) Gauss GammaVDC 0.5;
 }
 
 laplacianSchemes
@@ -53,7 +52,7 @@ snGradSchemes
 
 fluxRequired
 {
-    p                   0;
+    p;
 }
 
 

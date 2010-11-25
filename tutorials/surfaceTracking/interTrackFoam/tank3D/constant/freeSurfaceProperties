@@ -19,27 +19,29 @@ twoFluids no;
 
 normalMotionDir no;
 
-motionDir (0 1 0);
+motionDir (0 0 1);
 
 cleanInterface yes;
 
-muFluidA muFluidA [ 1 -1 -1 0 0 0 0 ] 0;
+muFluidA muFluidA [ 1 -1 -1 0 0 0 0 ] 0.01;
 
 muFluidB muFluidB [ 1 -1 -1 0 0 0 0 ] 0;
 
-rhoFluidA rhoFluidA [ 1 -3  0 0 0 0 0 ] 1.0;
+rhoFluidA rhoFluidA [ 1 -3  0 0 0 0 0 ] 100;
 
 rhoFluidB rhoFluidB   [ 1 -3  0 0 0 0 0 ] 1.0;
 
-surfaceTension surfaceTension [ 1 -2 0 0 0 0 0 ] 0.0;
+surfaceTension surfaceTension [ 1 -2 0 0 0 0 0 ] 0;
 
-g g [ 0 1 -2 0 0 0 0 ] (0 -9.81 0);
+g g [ 0 1 -2 0 0 0 0 ] (0 0 -9.81);
 
-fixedFreeSurfacePatches 1( inlet );
+fixedFreeSurfacePatches 0( );
 
-pointNormalsCorrectionPatches 2(inlet outlet);
+pointNormalsCorrectionPatches 4(side-1 side-2 symm-1 symm-2);
 
 nFreeSurfaceCorrectors 1;
+
+smoothing yes;
 
 surfactantProperties
 {

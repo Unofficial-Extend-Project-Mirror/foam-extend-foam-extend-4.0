@@ -42,7 +42,6 @@ pointNormalsCorrectionPatches 0 ();
 
 nFreeSurfaceCorrectors 1;
 
-freeSurfaceSmoothing   on;
 
 surfactantProperties
 {

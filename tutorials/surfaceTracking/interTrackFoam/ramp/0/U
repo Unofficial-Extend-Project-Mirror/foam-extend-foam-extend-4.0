@@ -26,9 +26,7 @@ boundaryField
 {
     walls
     {
-//         type slip;
-        type fixedValue;
-        value uniform (0 0 0);
+        type slip;
     }
 
     freeSurface
