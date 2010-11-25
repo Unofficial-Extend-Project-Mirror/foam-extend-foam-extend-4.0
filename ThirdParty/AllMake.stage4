@@ -57,7 +57,7 @@ echo ========================================
 echo
 
 # qt-everywhere-opensource-src-4.7.0
-( rpm_make qt-everywhere-opensource-src-4.7.0 http://get.qt.nokia.com/qt/source/qt-everywhere-opensource-src-4.7.0.tar.gz )
+#( rpm_make qt-everywhere-opensource-src-4.7.0 http://get.qt.nokia.com/qt/source/qt-everywhere-opensource-src-4.7.0.tar.gz )
 
 # paraview
 if [ -d "$QT_DIR" -a -r "$QT_DIR"/bin/qmake ]
