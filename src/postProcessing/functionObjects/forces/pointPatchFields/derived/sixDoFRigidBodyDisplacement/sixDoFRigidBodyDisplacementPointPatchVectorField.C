@@ -160,6 +160,7 @@ void sixDoFRigidBodyDisplacementPointPatchVectorField::updateCoeffs()
     dictionary forcesDict;
 
     forcesDict.add("patches", wordList(1, ptPatch.name()));
+    forcesDict.add("rhoName", "rhoInf");
     forcesDict.add("rhoInf", rhoInf_);
     forcesDict.add("CofR", motion_.centreOfMass());
 
