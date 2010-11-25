@@ -223,11 +223,19 @@ void Foam::coordinateRotation::operator=(const dictionary& rhs)
     {
         order = e1e2;
     }
-    else if (dict.readIfPresent("e2", axis1) && dict.readIfPresent("e3", axis2))
+    else if
+    (
+        dict.readIfPresent("e2", axis1)
+     && dict.readIfPresent("e3", axis2)
+    )
     {
         order = e2e3;
     }
-    else if (dict.readIfPresent("e3", axis1) && dict.readIfPresent("e1", axis2))
+    else if
+    (
+        dict.readIfPresent("e3", axis1)
+     && dict.readIfPresent("e1", axis2)
+    )
     {
         order = e3e1;
     }
@@ -235,8 +243,8 @@ void Foam::coordinateRotation::operator=(const dictionary& rhs)
     {
         // let it bomb if only one of axis/direction is defined
         order = e3e1;
-        dict.lookup("axis") >> axis1;
-        dict.lookup("direction") >> axis2;
+        axis1 = vector(dict.lookup("axis"));
+        axis2 = vector(dict.lookup("direction"));
     }
     else
     {
