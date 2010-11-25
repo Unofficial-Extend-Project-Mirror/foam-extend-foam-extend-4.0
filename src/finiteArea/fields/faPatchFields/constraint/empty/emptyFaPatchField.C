@@ -145,7 +145,7 @@ void emptyFaPatchField<Type>::updateCoeffs()
     {
         if
         (
-            this->patch().size()
+            this->patch().faPatch::size()
           % this->dimensionedInternalField().mesh().nFaces()
         )
         {

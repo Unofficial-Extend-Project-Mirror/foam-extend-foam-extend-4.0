@@ -80,7 +80,7 @@ void Foam::faMesh::setPrimitiveMeshData()
 
     forAll (boundary(), patchI)
     {
-        const faPatch& curP = boundary()[patchI];
+        const labelList& curP = boundary()[patchI];
 
         forAll (curP, eI)
         {
@@ -109,7 +109,7 @@ void Foam::faMesh::setPrimitiveMeshData()
 
     forAll (boundary(), patchI)
     {
-        const faPatch& curP = boundary()[patchI];
+        const labelList& curP = boundary()[patchI];
 
         forAll (curP, eI)
         {

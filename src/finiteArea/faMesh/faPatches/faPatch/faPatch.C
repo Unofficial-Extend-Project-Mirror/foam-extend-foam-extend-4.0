@@ -249,7 +249,7 @@ labelList faPatch::ngbPolyPatchFaces() const
         return ngbFaces;
     }
 
-    ngbFaces.setSize(size());
+    ngbFaces.setSize(faPatch::size());
 
     const faMesh& aMesh = boundaryMesh().mesh();
     const polyMesh& pMesh = aMesh();
@@ -314,7 +314,7 @@ tmp<vectorField> faPatch::ngbPolyPatchFaceNormals() const
         return fN;
     }
 
-    fN().setSize(size());
+    fN().setSize(faPatch::size());
 
     labelList ngbFaces = ngbPolyPatchFaces();
 

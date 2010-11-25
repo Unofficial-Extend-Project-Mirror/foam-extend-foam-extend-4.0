@@ -95,6 +95,27 @@ lduSolverPerformance faMatrix<Type>::solve(const dictionary& solverControls)
             internalCoeffs_.component(cmpt)
         );
 
+        // Use the initMatrixInterfaces and updateMatrixInterfaces to correct
+        // bouCoeffsCmpt for the explicit part of the coupled boundary
+        // conditions
+        initMatrixInterfaces
+        (
+            bouCoeffsCmpt,
+            interfaces,
+            psiCmpt,
+            sourceCmpt,
+            cmpt
+        );
+
+        updateMatrixInterfaces
+        (
+            bouCoeffsCmpt,
+            interfaces,
+            psiCmpt,
+            sourceCmpt,
+            cmpt
+        );
+
         lduSolverPerformance solverPerf;
 
         // Solver call

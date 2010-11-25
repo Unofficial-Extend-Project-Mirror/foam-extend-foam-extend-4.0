@@ -572,6 +572,9 @@ void edgeInterpolation::makeCorrectionVectors() const
         NonOrthogCoeff = max(Foam::asin(sinAlpha)*180.0/M_PI);
     }
 
+    // ZT, 12/Nov/2010
+    reduce(NonOrthogCoeff, maxOp<scalar>());
+
     if (debug)
     {
         Info<< "edgeInterpolation::makeCorrectionVectors() : "

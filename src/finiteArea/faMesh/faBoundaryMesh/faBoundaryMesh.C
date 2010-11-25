@@ -268,7 +268,7 @@ bool faBoundaryMesh::checkDefinition(const bool report) const
                 << "." << nl << endl;
         }
 
-        nextPatchStart += bm[patchI].size();
+        nextPatchStart += bm[patchI].faPatch::size();
     }
 
     if (boundaryError)
