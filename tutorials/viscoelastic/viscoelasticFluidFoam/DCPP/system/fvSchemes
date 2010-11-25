@@ -1,6 +1,6 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
@@ -29,17 +29,17 @@ gradSchemes
 divSchemes
 {
     default                  none;
-    div(phi,U)               Gauss Minmod; //upwind; 
+    div(phi,U)               Gauss Minmod; //upwind;
 
-    div(phi,Sfirst)          Gauss Minmod; //upwind; 
-    div(phi,Ssecond)         Gauss Minmod; //upwind; 
-    div(phi,Sthird)          Gauss Minmod; //upwind; 
-    div(phi,Sfourth)         Gauss Minmod; //upwind; 
+    div(phi,Sfirst)          Gauss Minmod; //upwind;
+    div(phi,Ssecond)         Gauss Minmod; //upwind;
+    div(phi,Sthird)          Gauss Minmod; //upwind;
+    div(phi,Sfourth)         Gauss Minmod; //upwind;
 
-    div(phi,Lambdafirst)     Gauss Minmod; //upwind; 
-    div(phi,Lambdasecond)    Gauss Minmod; //upwind; 
-    div(phi,Lambdathird)     Gauss Minmod; //upwind; 
-    div(phi,Lambdafourth)    Gauss Minmod; //upwind; 
+    div(phi,Lambdafirst)     Gauss Minmod; //upwind;
+    div(phi,Lambdasecond)    Gauss Minmod; //upwind;
+    div(phi,Lambdathird)     Gauss Minmod; //upwind;
+    div(phi,Lambdafourth)    Gauss Minmod; //upwind;
 
     div(tau)                 Gauss linear;
 }

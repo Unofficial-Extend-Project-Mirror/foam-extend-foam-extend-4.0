@@ -1,11 +1,10 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
     version     2.0;
@@ -14,7 +13,6 @@ FoamFile
     location    "constant";
     object      LESProperties;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 LESModel       oneEqEddy;
@@ -24,7 +22,6 @@ delta          cubeRootVol;
 turbulence      on;
 
 printCoeffs     on;
-
 
 cubeRootVolCoeffs
 {
@@ -79,6 +76,5 @@ smoothCoeffs
     }
     maxDeltaRatio   1.1;
 }
-
 
 // ************************************************************************* //

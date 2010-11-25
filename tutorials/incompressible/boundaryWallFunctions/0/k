@@ -1,29 +1,18 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
-// Field Dictionary
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "boundaryFoam";
-    case            "boundaryWallFunctions";
-    instance        "0";
-    local           "";
-
-    class           volScalarField;
-    object          k;
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      k;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 dimensions      [0 2 -2 0 0 0 0];
 
@@ -31,21 +20,20 @@ internalField   uniform 0.375;
 
 boundaryField
 {
-    lowerWall       
+    lowerWall
     {
         type            zeroGradient;
     }
 
-    upperWall       
+    upperWall
     {
         type            zeroGradient;
     }
 
-    defaultFaces    
+    defaultFaces
     {
         type            empty;
     }
 }
-
 
 // ************************************************************************* //

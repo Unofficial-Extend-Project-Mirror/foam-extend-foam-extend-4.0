@@ -1,0 +1,207 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      changeDictionaryDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dictionaryReplacement
+{
+    T
+    {
+        internalField   uniform 300;
+
+        boundaryField
+        {
+            minY
+            {
+                type            fixedValue;
+                value           uniform 500;
+            }
+
+            minZ
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+
+            heater_to_bottomAir
+            {
+                type            solidWallMixedTemperatureCoupled;
+                neighbourFieldName T;
+                K               K;
+                value           $internalField;
+
+            }
+            heater_to_leftSolid
+            {
+                type            solidWallMixedTemperatureCoupled;
+                neighbourFieldName T;
+                K               K;
+                value           $internalField;
+            }
+            heater_to_rightSolid
+            {
+                type            solidWallMixedTemperatureCoupled;
+                neighbourFieldName T;
+                K               K;
+                value           $internalField;
+            }
+            heater_to_topAir
+            {
+                type            solidWallMixedTemperatureCoupled;
+                neighbourFieldName T;
+                K               K;
+                value           $internalField;
+            }
+        }
+    }
+
+    rho
+    {
+        internalField   uniform 8000;
+
+        boundaryField
+        {
+            minY
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            minZ
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            heater_to_bottomAir
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            heater_to_leftSolid
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            heater_to_rightSolid
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            heater_to_topAir
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+        }
+    }
+
+    K
+    {
+        internalField   uniform 80;
+
+        boundaryField
+        {
+            minY
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            minZ
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            heater_to_bottomAir
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            heater_to_leftSolid
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            heater_to_rightSolid
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            heater_to_topAir
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+        }
+    }
+
+    cp
+    {
+        internalField   uniform 450;
+
+        boundaryField
+        {
+            minY
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            minZ
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            maxZ
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            heater_to_bottomAir
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            heater_to_leftSolid
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            heater_to_rightSolid
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+            heater_to_topAir
+            {
+                type            zeroGradient;
+                value           $internalField;
+            }
+        }
+    }
+}
+
+// ************************************************************************* //

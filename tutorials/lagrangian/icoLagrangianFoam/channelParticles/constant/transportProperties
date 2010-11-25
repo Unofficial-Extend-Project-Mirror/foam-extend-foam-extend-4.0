@@ -1,27 +1,17 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.2                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
-// FoamX Case Dictionary.
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "/home/coyote/hjasak/OpenFOAM/hjasak-1.2/run/test";
-    case            "cavity";
-    instance        "constant";
-    local           "";
-
-    class           dictionary;
-    object          transportProperties;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      transportProperties;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 nu              nu [0 2 -1 0 0 0 0] 0.01;

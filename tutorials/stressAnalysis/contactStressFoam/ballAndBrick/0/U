@@ -1,27 +1,18 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           volVectorField;
-    object          U;
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      U;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 dimensions      [0 1 0 0 0 0 0];
 
@@ -29,18 +20,18 @@ internalField   uniform (0 0 0);
 
 boundaryField
 {
-    bottomBrickDown 
+    bottomBrickDown
     {
         type            symmetryPlane;
     }
 
-    bottomBrickUp   
+    bottomBrickUp
     {
         type            fixedGradient;
         gradient        uniform (0 0 0);
     }
 
-    topBrickDown    
+    topBrickDown
     {
         type            directionMixed;
         refValue        uniform (0 0 0);
@@ -48,46 +39,45 @@ boundaryField
         valueFraction   uniform (0 0 0 0 0 0);
     }
 
-    topBrickUp      
+    topBrickUp
     {
         type            fixedGradient;
         gradient        uniform (0 0 0);
     }
 
-    bottomBrickLeft 
+    bottomBrickLeft
     {
         type            fixedGradient;
         gradient        uniform (0 0 0);
     }
 
-    bottomBrickRight 
+    bottomBrickRight
     {
         type            fixedGradient;
         gradient        uniform (0 0 0);
     }
 
-    topBrickLeft    
+    topBrickLeft
     {
         type            fixedGradient;
         gradient        uniform (0 0 0);
     }
 
-    topBrickRight   
+    topBrickRight
     {
         type            fixedGradient;
         gradient        uniform (0 0 0);
     }
 
-    back            
+    back
     {
         type            empty;
     }
 
-    front           
+    front
     {
         type            empty;
     }
 }
-
 
 // ************************************************************************* //

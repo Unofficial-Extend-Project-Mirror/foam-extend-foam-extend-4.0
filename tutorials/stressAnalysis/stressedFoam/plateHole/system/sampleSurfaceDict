@@ -1,6 +1,6 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
@@ -19,9 +19,9 @@ interpolationScheme cellPoint;
 
 surfaceFormat     dx;
 
-surfaces      
+surfaces
 (
-    constantPlane 
+    constantPlane
     {
         name      plate;
         basePoint (0 0 0.25);
@@ -29,10 +29,9 @@ surfaces
     }
 );
 
-fields          
+fields
 (
     sigmaxx
 );
-
 
 // ************************************************************************* //

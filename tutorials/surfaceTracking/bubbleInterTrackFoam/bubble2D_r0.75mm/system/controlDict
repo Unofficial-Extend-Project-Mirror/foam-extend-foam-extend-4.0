@@ -1,6 +1,6 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
@@ -43,7 +43,7 @@ timePrecision       6;
 
 runTimeModifiable   yes;
 
-//functions 
+//functions
 //(
 //    history
 //    {
@@ -55,8 +55,5 @@ runTimeModifiable   yes;
 //    }
 //);
 
-
-
 // ************************************************************************* //
-
 

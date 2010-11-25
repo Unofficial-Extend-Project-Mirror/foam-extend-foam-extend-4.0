@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -15,12 +15,10 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
 // General Properties
 // ~~~~~~~~~~~~~~~~~~
 
 nEquivalentParticles            1e12;
-
 
 // Wall Interaction Model
 // ~~~~~~~~~~~~~~~~~~~~~~
@@ -39,7 +37,6 @@ LarsenBorgnakkeVariableHardSphereCoeffs
     Tref                        273;
     relaxationCollisionNumber   5.0;
 }
-
 
 // Inflow Boundary Model
 // ~~~~~~~~~~~~~~~~~~~~~
@@ -72,6 +69,5 @@ moleculeProperties
         omega                           0.77;
     }
 }
-
 
 // ************************************************************************* //

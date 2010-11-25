@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -32,7 +32,6 @@ vertices
     (1.25  1.00  0)    //  9
     (1.00  0.75  0)    // 10
     (0.00  0.75  0)    // 11
-
 
     (0.00  0.25  0.1)  // 12
     (1.00  0.25  0.1)  // 13
@@ -108,6 +107,5 @@ patches
         (16 17 18 19)
     )
 );
-
 
 // ************************************************************************* //

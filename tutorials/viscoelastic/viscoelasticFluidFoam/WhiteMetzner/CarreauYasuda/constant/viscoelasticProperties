@@ -1,6 +1,6 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
@@ -29,6 +29,5 @@ rheology
     a                a [0 0 0 0 0 0 0] 5.5061e-1 ;
     b                b [0 0 0 0 0 0 0] 2.3229e-1;
 }
-
 
 // ************************************************************************* //

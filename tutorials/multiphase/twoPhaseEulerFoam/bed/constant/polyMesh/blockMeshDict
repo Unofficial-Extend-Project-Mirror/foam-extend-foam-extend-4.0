@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -33,7 +33,7 @@ vertices
 //          7 ---------- 6
 //         /|           /|
 //        / |          / |   z
-//       3 ---------- 2  |   ^ 
+//       3 ---------- 2  |   ^
 //       |  |         |  |   |   y
 //       |  4 --------|- 5   |  /
 //       | /          | /    | /
@@ -44,7 +44,7 @@ blocks
     hex (0 1 5 4 3 2 6 7) (25 1 125) simpleGrading (1 1 1)
 );
 
-edges           
+edges
 (
 );
 

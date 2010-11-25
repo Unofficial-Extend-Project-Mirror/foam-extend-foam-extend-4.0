@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -16,7 +16,7 @@ FoamFile
 
 convertToMeters 0.1;
 
-vertices        
+vertices
 (
     (0 0 0)
     (1 0 0)
@@ -28,28 +28,28 @@ vertices
     (0 1 0.1)
 );
 
-blocks          
+blocks
 (
     hex (0 1 2 3 4 5 6 7) (20 20 1) simpleGrading (1 1 1)
 );
 
-edges           
+edges
 (
 );
 
-patches         
+patches
 (
-    wall movingWall 
+    wall movingWall
     (
         (3 7 6 2)
     )
-    wall fixedWalls 
+    wall fixedWalls
     (
         (0 4 7 3)
         (2 6 5 1)
         (1 5 4 0)
     )
-    empty frontAndBack 
+    empty frontAndBack
     (
         (0 3 2 1)
         (4 5 6 7)

@@ -1,6 +1,6 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
@@ -24,7 +24,7 @@ boundaryField
     outer
     {
         type            calculated;
-        value           nonuniform List<scalar> 
+        value           nonuniform List<scalar>
 600
 (
 0.348943
@@ -631,6 +631,5 @@ boundaryField
 ;
     }
 }
-
 
 // ************************************************************************* //

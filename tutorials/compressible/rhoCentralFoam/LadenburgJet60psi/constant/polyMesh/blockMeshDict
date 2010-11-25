@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -63,20 +63,20 @@ patches
         (4 8 9 5)
     )
 
-    wedge wedge1 
+    wedge wedge1
     (
         (0 2 3 1)
         (2 4 5 3)
     )
 
-    wedge wedge2 
+    wedge wedge2
     (
         (0 1 7 6)
         (6 7 9 8)
     )
 );
 
-mergePatchPairs 
+mergePatchPairs
 (
 );
 

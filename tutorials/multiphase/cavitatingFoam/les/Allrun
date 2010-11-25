@@ -12,7 +12,7 @@ refineMeshByCellSet()
    do
       echo "creating cell set for primary zone - $1"
       cp system/cellSetDict.$1 system/cellSetDict
-      runApplication -l log.cellSet.$1 cellSet
+      runApplication -l log.cellSet.$1 cellSet 
 
       echo "refining primary zone - $1"
       runApplication -l log.refineMesh.$1 refineMesh -dict -overwrite
@@ -33,7 +33,7 @@ cd throttle3D
     refineMeshByCellSet 1 2 3
 
     echo "mapping fields from 2D throttle case"
-    mapFields ../throttle -sourceTime latestTime >& log.mapFields
+    mapFields ../throttle -sourceTime latestTime > log.mapFields 2>&1
 
     runApplication decomposePar
     runParallel $application 4

@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -20,26 +20,26 @@ internalField   uniform 300;
 
 boundaryField
 {
-    INLE1           
+    INLE1
     {
         type            inletOutlet;
         inletValue      uniform 300;
         value           uniform 300;
     }
 
-    OUTL2           
+    OUTL2
     {
         type            inletOutlet;
         inletValue      uniform 300;
         value           uniform 300;
     }
 
-    SYMP3           
+    SYMP3
     {
         type            empty;
     }
 
-    WALL10          
+    WALL10
     {
         type            zeroGradient;
     }

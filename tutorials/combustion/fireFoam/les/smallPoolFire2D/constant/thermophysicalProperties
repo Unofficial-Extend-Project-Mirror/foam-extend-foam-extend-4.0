@@ -1,17 +1,16 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-    class           dictionary;
-    object          thermophysicalProperties;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      thermophysicalProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,6 +49,5 @@ products  products  1   27.6004
     3.05615 0.0018477 -6.01767e-07 9.06474e-11 -5.05149e-15 -10995.9 5.33537
     3.55084 0.000338343 3.42018e-07 7.91162e-10 -6.34688e-13 -11099.7 2.87954
     1.67212e-06 170.672;
-
 
 // ************************************************************************* //

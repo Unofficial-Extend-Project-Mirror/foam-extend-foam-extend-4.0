@@ -1,20 +1,18 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.7.1                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-    class           dictionary;
-    location        system;
-    object          sampleDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    system;
+    object      sampleDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Set output format : choice of
@@ -53,7 +51,6 @@ fields
     mu
     rhoFluid
 );
-
 
 // Set sampling definition: choice of
 //      uniform             evenly distributed points on line
@@ -111,7 +108,6 @@ sets
 
 );
 
-
 // Surface sampling definition: choice of
 //      plane : values on plane defined by point, normal.
 //      patch : values on patch.
@@ -123,6 +119,5 @@ surfaces
 (
 
 );
-
 
 // *********************************************************************** //

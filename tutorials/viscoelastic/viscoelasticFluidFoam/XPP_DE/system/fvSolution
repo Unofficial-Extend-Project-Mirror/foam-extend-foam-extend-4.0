@@ -1,6 +1,6 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
@@ -56,7 +56,7 @@ solvers
         maxIter           1000;
     }
 
-    Sfirst 
+    Sfirst
     {
         solver            BiCGStab;
         preconditioner
@@ -70,7 +70,7 @@ solvers
         maxIter           1000;
     }
 
-    Ssecond 
+    Ssecond
     {
         solver            BiCGStab;
         preconditioner
@@ -84,7 +84,7 @@ solvers
         maxIter           1000;
     }
 
-    Sthird 
+    Sthird
     {
         solver            BiCGStab;
         preconditioner
@@ -98,7 +98,7 @@ solvers
         maxIter           1000;
     }
 
-    Sfourth 
+    Sfourth
     {
         solver            BiCGStab;
         preconditioner
@@ -112,7 +112,7 @@ solvers
         maxIter           1000;
     }
 
-    Sfifth 
+    Sfifth
     {
         solver            BiCGStab;
         preconditioner
@@ -140,7 +140,7 @@ solvers
         maxIter           1000;
     }
 
-    Lambdafirst 
+    Lambdafirst
     {
         solver            BiCGStab;
         preconditioner
@@ -154,7 +154,7 @@ solvers
         maxIter           1000;
     }
 
-    Lambdasecond 
+    Lambdasecond
     {
         solver            BiCGStab;
         preconditioner
@@ -168,7 +168,7 @@ solvers
         maxIter           1000;
     }
 
-    Lambdathird 
+    Lambdathird
     {
         solver            BiCGStab;
         preconditioner
@@ -182,7 +182,7 @@ solvers
         maxIter           1000;
     }
 
-    Lambdafourth 
+    Lambdafourth
     {
         solver            BiCGStab;
         preconditioner
@@ -196,7 +196,7 @@ solvers
         maxIter           1000;
     }
 
-    Lambdafifth 
+    Lambdafifth
     {
         solver            BiCGStab;
         preconditioner
@@ -210,7 +210,7 @@ solvers
         maxIter           1000;
     }
 
-    Lambdasixth 
+    Lambdasixth
     {
         solver            BiCGStab;
         preconditioner

@@ -1,31 +1,22 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.0                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           dictionary;
-    object          blockMeshDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 convertToMeters 1;
 
-vertices        
+vertices
 (
     (0 0 0)
     (1 0 0)
@@ -41,17 +32,17 @@ vertices
     (2 1 0.1)
 );
 
-blocks          
+blocks
 (
     hex (0 1 4 3 6 7 10 9) (20 20 1) simpleGrading (1 1 1)
     hex (1 2 5 4 7 8 11 10) (20 20 1) simpleGrading (1 1 1)
 );
 
-edges           
+edges
 (
 );
 
-patches         
+patches
 (
     patch inlet
     (
@@ -61,7 +52,7 @@ patches
     (
         (3 9 10 4)
     )
-    wall fixedWalls 
+    wall fixedWalls
     (
         (3 0 6 9)
         (0 1 7 6)
@@ -69,6 +60,5 @@ patches
         (2 5 11 8)
     )
 );
-
 
 // ************************************************************************* //

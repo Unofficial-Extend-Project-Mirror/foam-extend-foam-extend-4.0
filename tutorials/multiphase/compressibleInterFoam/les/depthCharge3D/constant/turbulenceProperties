@@ -1,12 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-<<<<<<< Updated upstream:tutorials/multiphase/compressibleInterFoam/depthCharge3D/constant/turbulenceProperties
-|  \\    /   O peration     | Version:  1.6                                   |
-=======
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
->>>>>>> Stashed changes:tutorials/multiphase/compressibleInterFoam/depthCharge3D/0/pd.org
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -20,6 +16,5 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 simulationType  LESModel;
-
 
 // ************************************************************************* //

@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -20,6 +20,5 @@ phases          ( water { transportModel Newtonian ; nu nu [ 0 2 -1 0 0 0 0 ] 1e
 refPhase        air;
 
 sigmas          ( ( air water ) 0.07 ( air oil ) 0.07 ( air mercury ) 0.07 ( water oil ) 0.07 ( water mercury ) 0.07 ( oil mercury ) 0.07 );
-
 
 // ************************************************************************* //

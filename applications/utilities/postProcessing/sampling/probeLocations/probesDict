@@ -1,17 +1,17 @@
-/*-------------------------------*- C++ -*---------------------------------*\
-|    =========                                                              |
-|    \\      /     OpenFOAM  1.4.1                                          |
-|     \\    /                                                               |
-|      \\  /       The Open Source CFD Toolbox                              |
-|       \\/                                        http://www.OpenFOAM.org  |
-\*-------------------------------------------------------------------------*/
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-    class           dictionary;
-    location        system;
-    object          probesDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    system;
+    object      probesDict;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

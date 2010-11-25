@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                 |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -36,21 +36,17 @@ output
     name            CH4;
 }
 
-
 {
     name            CO2;
 }
-
 
 {
     name            H2O;
 }
 
-
 {
     name            CO;
 }
-
 
 {
     name            soot;
@@ -167,7 +163,6 @@ values
 0.999
 )
 
-
 101
 (
 0
@@ -273,7 +268,6 @@ values
 0.999385
 )
 
-
 101
 (
 0.00200328
@@ -378,7 +372,6 @@ values
 0.000527591
 5.8413e-05
 )
-
 
 101
 (

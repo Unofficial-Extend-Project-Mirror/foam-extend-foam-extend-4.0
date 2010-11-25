@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -25,27 +25,27 @@ boundaryField
         type            empty;
     }
 
-    inlet           
+    inlet
     {
         type            zeroGradient;
     }
 
-    wall            
+    wall
     {
         type            zeroGradient;
     }
 
-    atmosphere      
+    atmosphere
     {
         type            zeroGradient;
     }
 
-    front         
+    front
     {
         type            wedge;
     }
 
-    back         
+    back
     {
         type            wedge;
     }

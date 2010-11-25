@@ -1,25 +1,17 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4.1                                 |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version 2.0;
-    format ascii;
-
-    root "/home2/mnordlun/OpenFOAM/mnordlun-1.4.1/run/pmiCases";
-    case "SMAR_MD2_Puffing";
-    instance "0";
-    local "";
-
-    class volScalarField;
-    object T;
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      T;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 dimensions      [0 0 0 1 0 0 0];
@@ -47,6 +39,5 @@ boundaryField
         type zeroGradient;
     }
 }
-
 
 // ************************************************************************* //

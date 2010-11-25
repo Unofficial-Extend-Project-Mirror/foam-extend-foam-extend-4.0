@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -20,12 +20,12 @@ internalField   uniform 1e5;
 
 boundaryField
 {
-    inlet           
+    inlet
     {
         type            zeroGradient;
     }
 
-    outlet          
+    outlet
     {
         type            waveTransmissive;
         field           p;
@@ -40,17 +40,17 @@ boundaryField
         value           uniform 1e5;
     }
 
-    upperWall       
+    upperWall
     {
         type            zeroGradient;
     }
 
-    lowerWall       
+    lowerWall
     {
         type            zeroGradient;
     }
 
-    frontAndBack    
+    frontAndBack
     {
         type            empty;
     }

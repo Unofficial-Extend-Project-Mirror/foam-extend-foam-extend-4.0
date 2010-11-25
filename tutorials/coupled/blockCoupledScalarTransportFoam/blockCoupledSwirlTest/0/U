@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5-dev                               |
-|   \\  /    A nd           | Revision: 1731                                  |
-|    \\/     M anipulation  | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -17,7 +17,7 @@ FoamFile
 
 dimensions      [0 1 -1 0 0 0 0];
 
-internalField   nonuniform List<vector> 
+internalField   nonuniform List<vector>
 800
 (
 (-0.975 0.975 0)
@@ -828,7 +828,7 @@ boundaryField
     inlet
     {
         type            fixedValue;
-        value           nonuniform List<vector> 
+        value           nonuniform List<vector>
 20
 (
 (0 -0.025 0)
@@ -857,7 +857,7 @@ boundaryField
     outlet
     {
         type            fixedValue;
-        value           nonuniform List<vector> 
+        value           nonuniform List<vector>
 20
 (
 (0 0.975 0)
@@ -886,7 +886,7 @@ boundaryField
     fixedWalls
     {
         type            fixedValue;
-        value           nonuniform List<vector> 
+        value           nonuniform List<vector>
 80
 (
 (-0.975 1 0)
@@ -977,6 +977,5 @@ boundaryField
         type            empty;
     }
 }
-
 
 // ************************************************************************* //

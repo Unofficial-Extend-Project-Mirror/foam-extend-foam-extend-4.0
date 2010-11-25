@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -421,7 +421,7 @@ vertices
     vert(4, 7, Zt) vlabel(R7st)
 );
 
-blocks          
+blocks
 (
     // block0
     hex2D(r0, r1, rb1, rb0)
@@ -693,7 +693,7 @@ edges
     arc R7t R0t evert(4, 7, Zt)
 );
 
-patches         
+patches
 (
     wall rotor
     (
