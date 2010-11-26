@@ -43,6 +43,10 @@ SourceFiles
 extern "C"
 {
 #   include "mgridgen.h"
+#   ifdef darwin
+#       undef FALSE
+#       undef TRUE
+#   endif
 }
 
 
