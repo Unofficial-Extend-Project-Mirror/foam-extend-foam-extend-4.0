@@ -2,13 +2,13 @@ include $(RULES)/mplib$(WM_MPLIB)
 
 EXE_INC = \
     $(PFLAGS) $(PINC) \
-    -I$(PARMETIS_DIR)/include/ParMETISLib \
-    -I$(PARMETIS_DIR)/include \
+    -I/usr/include/parmetis \
+    -I/usr/include/metis \
     -I../decompositionMethods/lnInclude \
     -I../metisDecomp/lnInclude \
     -I../scotchDecomp/lnInclude
 
 LIB_LIBS = \
     -L$(FOAM_MPI_LIBBIN) \
-    -L$(PARMETIS_DIR)/lib -lmetis-parmetis \
+    -L$(PARMETIS_DIR)/lib -lmetis \
     -L$(PARMETIS_DIR)/lib -lparmetis

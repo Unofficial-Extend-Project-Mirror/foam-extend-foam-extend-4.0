@@ -1,10 +1,8 @@
 EXE_INC = \
-    -I$(METIS_DIR)/include \
+    -I/usr/include/metis \
     -I../decompositionMethods/lnInclude \
     -I../scotchDecomp/lnInclude
 
 LIB_LIBS = \
     -L$(FOAM_LIBBIN)/dummy \
-    -L$(METIS_DIR)/lib -lmetis \
-    -L$(METIS_DIR)/lib -lGKlib
-
+    -L$(METIS_DIR)/lib -lmetis

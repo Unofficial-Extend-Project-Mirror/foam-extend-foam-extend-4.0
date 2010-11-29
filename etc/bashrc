@@ -50,6 +50,7 @@ foamInstall=$HOME/$WM_PROJECT
 # foamInstall=~$WM_PROJECT
 # foamInstall=/usr/local/$WM_PROJECT
 # foamInstall=/opt/$WM_PROJECT
+# foamInstall=/usr/lib
 #
 # END OF (NORMAL) USER EDITABLE PART
 ################################################################################
@@ -77,7 +78,7 @@ export WM_PROJECT_DIR=$WM_PROJECT_INST_DIR/$WM_PROJECT-$WM_PROJECT_VERSION
 # Location of third-party software
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #: ${WM_THIRD_PARTY_DIR=$WM_PROJECT_INST_DIR/ThirdParty-$WM_PROJECT_VERSION}; export WM_THIRD_PARTY_DIR
-: ${WM_THIRD_PARTY_DIR=$WM_PROJECT_DIR/ThirdParty}; export WM_THIRD_PARTY_DIR
+# : ${WM_THIRD_PARTY_DIR=$WM_PROJECT_DIR/ThirdParty}; export WM_THIRD_PARTY_DIR
 
 # Source files, possibly with some verbosity
 _foamSource()
@@ -312,14 +313,14 @@ export PATH LD_LIBRARY_PATH MANPATH
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 _foamSource $WM_PROJECT_DIR/etc/settings.sh
-_foamSource $WM_PROJECT_DIR/etc/aliases.sh
+# _foamSource $WM_PROJECT_DIR/etc/aliases.sh
 
 
 # Source user setup files for optional packages
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # _foamSource $WM_PROJECT_DIR/etc/apps/paraview/bashrc
 # _foamSource $WM_PROJECT_DIR/etc/apps/paraview3/bashrc
-_foamSource $WM_PROJECT_DIR/etc/apps/ensight/bashrc
+# _foamSource $WM_PROJECT_DIR/etc/apps/ensight/bashrc
 
 
 # Clean environment paths again. Only remove duplicates
