@@ -91,7 +91,6 @@ Group: 			Development/Tools
     [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
-    GMP_VERSION=gmp-5.0.1
     ./configure     \
         --prefix=%{_installPrefix}  \
 	--enable-release            \
@@ -103,6 +102,10 @@ Group: 			Development/Tools
 	--without-cppunit           \
 	--enable-trap-fpe           \
 	--disable-function-timers
+
+    # Remove the file include/Mesquite_all_headers.hpp
+    # This file will be regenerated during the compilation process
+    [ -e include/Mesquite_all_headers.hpp ] && rm -f include/Mesquite_all_headers.hpp
 
     make
 
