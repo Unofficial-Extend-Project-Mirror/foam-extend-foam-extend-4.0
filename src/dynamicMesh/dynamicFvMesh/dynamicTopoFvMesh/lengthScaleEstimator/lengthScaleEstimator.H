@@ -84,6 +84,8 @@ class lengthScaleEstimator
         // Buffers for parallel length-scale calculations
         labelListList sendLblBuffer_;
         labelListList recvLblBuffer_;
+        labelListList sendLvlBuffer_;
+        labelListList recvLvlBuffer_;
         scalarListList sendSclBuffer_;
         scalarListList recvSclBuffer_;
 
