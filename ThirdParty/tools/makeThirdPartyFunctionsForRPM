@@ -50,6 +50,11 @@ echo ""
 rpm_make()
 {
     package="$1"
+
+    # Make sure the ThirdParty environment is up-to-date
+    echo "Updating the ThirdParty environment variables before building package $package" 
+    . $WM_PROJECT_DIR/etc/settings.sh
+
     rpmName=$package-$WM_OPTIONS.$architecture
     rpmFile=$buildBase/RPMS/$architecture/$rpmName.rpm
 
@@ -121,7 +126,10 @@ rpm_build()
 
     #Build RPM package
     echo "Building package $package"
-    rpmbuild --define "_topdir $buildBase" --dbpath $buildBase/rpmDB --clean -bb ./SPECS/$specFile "$@"
+    #rpmbuild --define "_topdir $buildBase" --dbpath $buildBase/rpmDB --clean -bb ./SPECS/$specFile "$@"
+    #
+    # Let's keep the compilation directory alive for now in order to facilitate postmortems of failed compilations
+    rpmbuild --define "_topdir $buildBase" --dbpath $buildBase/rpmDB -bb ./SPECS/$specFile "$@"
 }
 
 #
