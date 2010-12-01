@@ -41,20 +41,20 @@ Description
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCase.H"
-    #include "createTime.H"
-    #include "createMesh.H"
-    #include "createFields.H"
-    #include "initContinuityErrs.H"
+#   include "setRootCase.H"
+#   include "createTime.H"
+#   include "createMesh.H"
+#   include "createFields.H"
+#   include "initContinuityErrs.H"
 
     Info<< "\nStarting time loop\n" << endl;
 
     while (runTime.run())
     {
-        #include "readTimeControls.H"
-        #include "readPIMPLEControls.H"
-        #include "CourantNo.H"
-        #include "setDeltaT.H"
+#       include "readTimeControls.H"
+#       include "readPIMPLEControls.H"
+#       include "CourantNo.H"
+#       include "setDeltaT.H"
 
         runTime++;
 
@@ -68,12 +68,12 @@ int main(int argc, char *argv[])
                 p.storePrevIter();
             }
 
-            #include "UEqn.H"
+#           include "UEqn.H"
 
             // --- PISO loop
             for (int corr=0; corr<nCorr; corr++)
             {
-                #include "pEqn.H"
+#               include "pEqn.H"
             }
 
             turbulence->correct();
