@@ -73,7 +73,7 @@ void Foam::wallDist::correct()
     // Calculate distance starting from wallPatch faces.
     patchWave wave(cellDistFuncs::mesh(), wallPatchIDs, correctWalls_);
 
-    // Transfer cell values from wave into *this 
+    // Transfer cell values from wave into *this
     transfer(wave.distance());
 
     // Transfer values on patches into boundaryField of *this
