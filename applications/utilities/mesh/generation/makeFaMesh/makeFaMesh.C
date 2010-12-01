@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     dictionary bndDict = faMeshDefinition.subDict("boundary");
 
     wordList faPatchNames = bndDict.toc();
-    
+
     List<faPatchData> faPatches(faPatchNames.size()+1);
 
     forAll (faPatchNames, patchI)
