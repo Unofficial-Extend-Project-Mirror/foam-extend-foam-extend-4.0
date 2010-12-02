@@ -269,43 +269,15 @@ tensor eigenVectors(const tensor& t)
 
     // Modification for strict-aliasing compliance.
     // Sandeep Menon, 01/Dec/2010
+
+    // Test for null eigen values to return a not null eigen vector
+    // Jovani Favero, 18/Nov/2009
     tensor evs
     (
         (mag(evals.x()) < SMALL) ? vector(0, 0, 1) : eigenVector(t, evals.x()),
         (mag(evals.y()) < SMALL) ? vector(0, 1, 0) : eigenVector(t, evals.y()),
         (mag(evals.z()) < SMALL) ? vector(1, 0, 0) : eigenVector(t, evals.z())
     );
-
-    /*
-    // Test for null eigen values to return a not null eigen vector
-    // Jovani Favero, 18/Nov/2009
-    if (mag(evals.x()) < SMALL)
-    {
-        evs.x() = vector(0, 0, 1);
-    }
-    else
-    {
-        evs.x() = eigenVector(t, evals.x());
-    }
-
-    if (mag(evals.y()) < SMALL)
-    {
-        evs.y() = vector(0, 1, 0);
-    }
-    else
-    {
-        evs.y() = eigenVector(t, evals.y());
-    }
-
-    if (mag(evals.z()) < SMALL)
-    {
-        evs.z() = vector(1, 0, 0);
-    }
-    else
-    {
-        evs.z() = eigenVector(t, evals.z());
-    }
-    */
 
     return evs;
 }

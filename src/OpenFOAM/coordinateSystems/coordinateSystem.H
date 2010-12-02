@@ -348,26 +348,26 @@ public:
         }
 
         //- Return local Cartesian x-axis
-        const vector e1() const
+        vector e1() const
         {
            return Rtr_.x();
         }
 
         //- Return local Cartesian y-axis
-        const vector e2() const
+        vector e2() const
         {
            return Rtr_.y();
         }
 
         //- Return local Cartesian z-axis
-        const vector e3() const
+        vector e3() const
         {
            return Rtr_.z();
         }
 
         //- Return axis (e3: local Cartesian z-axis)
         // @deprecated method e3 is preferred
-        const vector axis() const
+        vector axis() const
         {
            return Rtr_.z();
         }

@@ -126,10 +126,9 @@ public:
             inline Cmpt& yy();
 
             // Access vector components.
-            // Note: returning const only to find out lhs usage
 
-            inline const Vector2D<Cmpt> x() const;
-            inline const Vector2D<Cmpt> y() const;
+            inline Vector2D<Cmpt> x() const;
+            inline Vector2D<Cmpt> y() const;
 
         //- Transpose
         inline Tensor2D<Cmpt> T() const;
