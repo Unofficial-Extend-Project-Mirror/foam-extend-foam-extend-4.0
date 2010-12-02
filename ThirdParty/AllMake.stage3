@@ -56,7 +56,6 @@ echo Starting ThirdParty AllMake: Stage3
 echo ========================================
 echo
 
-
 # Metis
 ( rpm_make metis-5.0pre2   http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.0pre2.tar.gz      )
 
@@ -69,25 +68,17 @@ echo
 # Mesquite
 ( rpm_make mesquite-2.1.2  http://software.sandia.gov/~jakraft/mesquite-2.1.2.tar.gz                 )
 
+# The following two packages depends on the availability of OpenMPI
+# The macro rpm_make() will make sure to update the ThirdParty environment variables before starting
+# the compilation. 
+# Just make sure the OpenMPI environment variables are properly initialized, or that
+# the AllMake.stage2 script completed correctly 
+#
 # Scotch
-if [ -d "$OPENMPI_DIR" ]; then
-    ( rpm_make scotch-5.1.10b  https://gforge.inria.fr/frs/download.php/27583/scotch-5.1.10b.tar.gz  )
-else
-    echo "WARNING: The OPENMPI_DIR environment variable is not set."
-    echo "WARNING: Please make sure your environment is properly set up for openmpi. This is necessary for compiling scotch-5.1.10b"
-    echo "WARNING: Skipping the compilation of scotch-5.1.10b"
-    echo ""
-fi
+( rpm_make scotch-5.1.10b  https://gforge.inria.fr/frs/download.php/27583/scotch-5.1.10b.tar.gz  )
 
 # ParMetis
-if [ -d "$OPENMPI_DIR" ]; then
-    ( rpm_make ParMetis-3.1.1  http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis/ParMetis-3.1.1.tar.gz )
-else
-    echo "WARNING: The OPENMPI_DIR environment variable is not set."
-    echo "WARNING: Please make sure your environment is properly set up for openmpi. This is necessary for compiling ParMetis-3.1.1"
-    echo "WARNING: Skipping the compilation of ParMetis-3.1.1"
-    echo ""
-fi
+( rpm_make ParMetis-3.1.1  http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis/ParMetis-3.1.1.tar.gz )
 
 echo ========================================
 echo Done ThirdParty AllMake: Stage3

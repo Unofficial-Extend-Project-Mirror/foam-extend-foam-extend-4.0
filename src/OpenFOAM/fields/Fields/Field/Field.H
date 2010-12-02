@@ -128,14 +128,14 @@ public:
         Field
         (
             const UList<Type>& mapF,
-            const labelList& mapAddressing
+            const unallocLabelList& mapAddressing
         );
 
         //- Construct by 1 to 1 mapping from the given tmp field
         Field
         (
             const tmp<Field<Type> >& tmapF,
-            const labelList& mapAddressing
+            const unallocLabelList& mapAddressing
         );
 
         //- Construct by interpolative mapping from the given field
@@ -215,14 +215,14 @@ public:
         void map
         (
             const UList<Type>& mapF,
-            const labelList& mapAddressing
+            const unallocLabelList& mapAddressing
         );
 
         //- 1 to 1 map from the given tmp field
         void map
         (
             const tmp<Field<Type> >& tmapF,
-            const labelList& mapAddressing
+            const unallocLabelList& mapAddressing
         );
 
         //- Interpolative map from the given field
@@ -265,21 +265,21 @@ public:
         void rmap
         (
             const UList<Type>& mapF,
-            const labelList& mapAddressing
+            const unallocLabelList& mapAddressing
         );
 
         //- 1 to 1 reverse-map from the given tmp field
         void rmap
         (
             const tmp<Field<Type> >& tmapF,
-            const labelList& mapAddressing
+            const unallocLabelList& mapAddressing
         );
 
         //- Interpolative reverse map from the given field
         void rmap
         (
             const UList<Type>& mapF,
-            const labelList& mapAddressing,
+            const unallocLabelList& mapAddressing,
             const scalarList& weights
         );
 
@@ -287,7 +287,7 @@ public:
         void rmap
         (
             const tmp<Field<Type> >& tmapF,
-            const labelList& mapAddressing,
+            const unallocLabelList& mapAddressing,
             const scalarList& weights
         );
 

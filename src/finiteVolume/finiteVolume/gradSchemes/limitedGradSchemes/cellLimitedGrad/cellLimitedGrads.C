@@ -21,7 +21,7 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-    
+
 \*---------------------------------------------------------------------------*/
 
 #include "cellLimitedGrad.H"
@@ -377,7 +377,7 @@ tmp<volTensorField> cellLimitedGrad<vector>::grad
             );
         }
     }
- 
+
     if (fv::debug)
     {
         Info<< "gradient limiter for: " << vsf.name()
@@ -390,9 +390,12 @@ tmp<volTensorField> cellLimitedGrad<vector>::grad
 
     forAll(gIf, celli)
     {
-        gIf[celli].x() = cmptMultiply(limiter[celli], gIf[celli].x());
-        gIf[celli].y() = cmptMultiply(limiter[celli], gIf[celli].y());
-        gIf[celli].z() = cmptMultiply(limiter[celli], gIf[celli].z());
+        gIf[celli] = tensor
+        (
+            cmptMultiply(limiter[celli], gIf[celli].x()),
+            cmptMultiply(limiter[celli], gIf[celli].y()),
+            cmptMultiply(limiter[celli], gIf[celli].z())
+        );
     }
 
     g.correctBoundaryConditions();

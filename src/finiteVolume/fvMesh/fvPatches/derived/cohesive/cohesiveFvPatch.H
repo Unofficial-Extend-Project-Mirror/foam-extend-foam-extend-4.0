@@ -77,7 +77,7 @@ public:
         //- Construct from polyPatch
         cohesiveFvPatch
         (
-            const polyPatch& patch, 
+            const polyPatch& patch,
             const fvBoundaryMesh& bm
         )
         :

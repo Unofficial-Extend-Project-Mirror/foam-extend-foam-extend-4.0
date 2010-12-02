@@ -267,7 +267,7 @@ public:
             }
 
             //- Return axis
-            const vector& axis() const
+            vector axis() const
             {
                 return coordSys_.axis();
             }

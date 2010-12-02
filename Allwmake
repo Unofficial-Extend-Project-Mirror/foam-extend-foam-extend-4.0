@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 cd ${0%/*} || exit 1    # run from this directory
 
 if [ "$PWD" != "$WM_PROJECT_DIR" ]
@@ -15,6 +15,10 @@ fi
 # build ThirdParty sources
 #( cd $WM_THIRD_PARTY_DIR && ./Allwmake )
 # ( cd $WM_THIRD_PARTY_DIR && ./AllMake )
+
+# We make sure the ThirdParty packages environment variables are up-to-date
+# before compiling the rest of OpenFOAM
+. $WM_PROJECT_DIR/etc/settings.sh
 
 # build OpenFOAM libraries and applications
 src/Allwmake
