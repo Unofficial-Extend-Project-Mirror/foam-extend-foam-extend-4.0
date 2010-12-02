@@ -25,6 +25,7 @@ License
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
     Fethi Tekin, All rights reserved.
+    Oliver Borm, All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
@@ -39,206 +40,95 @@ Author
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::overlapGgiPolyPatch::calcExpandedMaster() const
+// Create expanded patch
+Foam::standAlonePatch*
+Foam::overlapGgiPolyPatch::calcExpandedGeometry(label ncp, label index) const
 {
-    // Create expanded master patch interpolation
-    if (expandedMasterPtr_)
+    const scalar myAngle = 360.0/scalar(ncp);
+
+    // Create expanded master points and faces
+    const faceZone& geomZone = boundaryMesh().mesh().faceZones()[index];
+    const primitiveFacePatch& geom = geomZone();
+
+    const pointField& geomLocalPoints = geom.localPoints();
+
+    pointField expandedPoints(ncp*geomLocalPoints.size());
+
+    // Transform points
+    label nPointsGeom = 0;
+
+    for (label copyI = 0; copyI < ncp; copyI++)
     {
-        FatalErrorIn("void overlapGgiPolyPatch::calcExpandedMaster() const")
-            << "Expanded master already calculated"
-            << abort(FatalError);
+        // Calculate transform
+        const tensor curRotation =
+            RodriguesRotation(rotationAxis_,  copyI*myAngle);
+
+        forAll (geomLocalPoints, pointI)
+        {
+            expandedPoints[nPointsGeom] =
+                transform(curRotation, geomLocalPoints[pointI]);
+            nPointsGeom++;
+        }
     }
 
-    if (master())
+    // Transform faces
+    const faceList& geomLocalFaces = geom.localFaces();
+    faceList expandedFaces(ncp*geomLocalFaces.size());
+
+    label nFacesGeom = 0;
+
+    for (label copyI = 0; copyI < ncp; copyI++)
     {
-        // Create expanded master patch
-        const label ncpm = nCopies();
+        const label copyOffsetGeom = copyI*geomLocalPoints.size();
 
-        // Create expanded master points and faces
-        const polyPatch& master = boundaryMesh()[index()];
-        const pointField& masterLocalPoints = master.localPoints();
-
-        pointField MasterExpandedPoints(ncpm*masterLocalPoints.size());
-
-        const scalar masterAngle = angle();
-
-        // Transform points
-        label nPoints_master = 0;
-
-        for (label copyI = 0; copyI < ncpm; copyI++)
+        forAll (geomLocalFaces, faceI)
         {
-            // Calculate transform
-            const tensor curRotation =
-                RodriguesRotation(rotationAxis_,  copyI*(masterAngle));
+            const face& curGeomFace = geomLocalFaces[faceI];
 
-            forAll (masterLocalPoints, pointI)
+            face& curExpandedFace = expandedFaces[nFacesGeom];
+
+            // Copy face with offsets
+            curExpandedFace.setSize(curGeomFace.size());
+
+            forAll (curGeomFace, fpI)
             {
-                MasterExpandedPoints[nPoints_master] =
-                    transform(curRotation, masterLocalPoints[pointI]);
-                nPoints_master++;
+                curExpandedFace[fpI] = curGeomFace[fpI] + copyOffsetGeom;
             }
-        }
 
-        // Transform faces
-        const faceList& masterLocalFaces = master.localFaces();
-        faceList MasterExpandedFaces(ncpm*masterLocalFaces.size());
-
-        label nFacesMaster = 0;
-
-        for (label copyI = 0; copyI < ncpm; copyI++)
-        {
-            const label copyOffsetMaster = copyI*masterLocalPoints.size();
-
-            forAll (masterLocalFaces, faceI)
-            {
-                const face& curMasterFace = masterLocalFaces[faceI];
-
-                face& MastercurExpandedFace =
-                    MasterExpandedFaces[nFacesMaster];
-
-                // Copy face with offsets
-                MastercurExpandedFace.setSize(curMasterFace.size());
-
-                forAll (curMasterFace, fpI)
-                {
-                    MastercurExpandedFace[fpI] =
-                        curMasterFace[fpI] + copyOffsetMaster;
-                }
-
-                nFacesMaster++;
-            }
-        }
-
-        expandedMasterPtr_ =
-            new standAlonePatch(MasterExpandedFaces, MasterExpandedPoints);
-
-        if (debug > 1)
-        {
-            Info << "Writing expanded master patch as VTK" << endl;
-
-            const polyMesh& mesh = boundaryMesh().mesh();
-
-            fileName fvPath(mesh.time().path()/"VTK");
-            mkDir(fvPath);
-
-            standAlonePatch::writeVTK
-            (
-                fvPath/fileName("expandedMaster" + name() + shadow().name()),
-                MasterExpandedFaces,
-                MasterExpandedPoints
-            );
+            nFacesGeom++;
         }
     }
-    else
+
+    if (debug > 1)
     {
-        FatalErrorIn("void overlapGgiPolyPatch::calcExpandedMaster() const")
-            << "Attempting to create expanded master on a shadow"
-            << abort(FatalError);
+        Info << "Writing expanded geom patch as VTK" << endl;
+
+        const polyMesh& mesh = boundaryMesh().mesh();
+
+        fileName fvPath(mesh.time().path()/"VTK");
+        mkDir(fvPath);
+
+        OStringStream outputFilename;
+        outputFilename << "expandedGeom" << name() << shadow().name()
+            << index << "_" << mesh.time().timeName();
+
+        standAlonePatch::writeVTK
+        (
+            fvPath/fileName(outputFilename.str()),
+            expandedFaces,
+            expandedPoints
+        );
     }
+
+    return new standAlonePatch(expandedFaces, expandedPoints);
 }
-
-void Foam::overlapGgiPolyPatch::calcExpandedSlave() const
-{
-    // Create expanded slave patch interpolation
-    if (expandedSlavePtr_)
-    {
-        FatalErrorIn("void overlapGgiPolyPatch::calcExpandedSlave() const")
-            << "Expanded slave already calculated"
-            << abort(FatalError);
-    }
-
-    if (master())
-    {
-        // Create expanded patch
-        const label ncp = shadow().nCopies();
-
-        // Create expanded points and faces
-        const polyPatch& slave = boundaryMesh()[shadowIndex()];
-        const pointField& slaveLocalPoints = slave.localPoints();
-
-        pointField expandedPoints(ncp*slaveLocalPoints.size());
-
-        const scalar slaveAngle = shadow().angle();
-
-        // Transform points
-        label nPoints = 0;
-
-        for (label copyI = 0; copyI < ncp; copyI++)
-        {
-            // Calculate transform
-            const tensor curRotation =
-                RodriguesRotation(rotationAxis_,  copyI*slaveAngle);
-
-            forAll (slaveLocalPoints, pointI)
-            {
-                expandedPoints[nPoints] =
-                    transform(curRotation, slaveLocalPoints[pointI]);
-                nPoints++;
-            }
-        }
-
-        // Transform faces
-
-        const faceList& slaveLocalFaces = slave.localFaces();
-        faceList expandedFaces(ncp*slaveLocalFaces.size());
-
-        label nFaces = 0;
-
-        for (label copyI = 0; copyI < ncp; copyI++)
-        {
-            const label copyOffset = copyI*slaveLocalPoints.size();
-
-            forAll (slaveLocalFaces, faceI)
-            {
-                const face& curSlaveFace = slaveLocalFaces[faceI];
-
-                face& curExpandedFace = expandedFaces[nFaces];
-
-                // Copy face with offsets
-                curExpandedFace.setSize(curSlaveFace.size());
-
-                forAll (curSlaveFace, fpI)
-                {
-                    curExpandedFace[fpI] = curSlaveFace[fpI] + copyOffset;
-                }
-
-                nFaces++;
-            }
-        }
-
-        expandedSlavePtr_ = new standAlonePatch(expandedFaces, expandedPoints);
-
-        if (debug > 1)
-        {
-            Info << "Writing expanded slave patch as VTK" << endl;
-
-            const polyMesh& mesh = boundaryMesh().mesh();
-
-            fileName fvPath(mesh.time().path()/"VTK");
-            mkDir(fvPath);
-
-            standAlonePatch::writeVTK
-            (
-                fvPath/fileName("expandedSlave" + name() + shadow().name()),
-                expandedFaces,
-                expandedPoints
-            );
-        }
-    }
-    else
-    {
-        FatalErrorIn("void overlapGgiPolyPatch::calcExpandedSlave() const")
-            << "Attempting to create expanded slave on a shadow"
-            << abort(FatalError);
-    }
-}
-
 
 const Foam::standAlonePatch& Foam::overlapGgiPolyPatch::expandedMaster() const
 {
     if (!expandedMasterPtr_)
     {
-        calcExpandedMaster();
+        expandedMasterPtr_ =
+            calcExpandedGeometry( nCopies(), zoneIndex() );
     }
 
     return *expandedMasterPtr_;
@@ -248,7 +138,8 @@ const Foam::standAlonePatch& Foam::overlapGgiPolyPatch::expandedSlave() const
 {
     if (!expandedSlavePtr_)
     {
-        calcExpandedSlave();
+        expandedSlavePtr_ =
+            calcExpandedGeometry( shadow().nCopies(), shadow().zoneIndex() );
     }
 
     return *expandedSlavePtr_;
@@ -279,6 +170,21 @@ void Foam::overlapGgiPolyPatch::calcPatchToPatch() const
                 0,             // master overlap tolerance
                 0              // slave overlap tolerance
             );
+
+        // Abort immediatly if uncovered faces are present
+        if
+        (
+            patchToPatch().uncoveredMasterFaces().size() > 0
+            ||
+            patchToPatch().uncoveredSlaveFaces().size() > 0
+        )
+        {
+            FatalErrorIn("void overlapGgiPolyPatch::calcPatchToPatch() const")
+                << "Found uncovered faces for GGI interface "
+                << name() << "/" << shadowName() << endl
+                << "This is an unrecoverable error. Aborting."
+                << abort(FatalError);
+        }
     }
     else
     {
@@ -324,11 +230,16 @@ void Foam::overlapGgiPolyPatch::calcReconFaceCellCentres() const
         const label shadowID = shadowIndex();
 
         // Get the transformed and interpolated shadow face cell centers
-        vectorField delta = boundaryMesh()[shadowID].faceCellCentres()
-            - boundaryMesh()[shadowID].faceCentres();
-
         reconFaceCellCentresPtr_ =
-            new vectorField(interpolate(delta) + faceCentres());
+            new vectorField
+            (
+                interpolate
+                (
+                    boundaryMesh()[shadowID].faceCellCentres()
+                  - boundaryMesh()[shadowID].faceCentres()
+                )
+              + faceCentres()
+            );
     }
     else
     {
@@ -368,7 +279,7 @@ void Foam::overlapGgiPolyPatch::checkDefinition() const
 }
 
 
-void Foam::overlapGgiPolyPatch::clearOut()
+void Foam::overlapGgiPolyPatch::clearGeom()
 {
     deleteDemandDrivenData(expandedMasterPtr_);
     deleteDemandDrivenData(expandedSlavePtr_);
@@ -376,6 +287,13 @@ void Foam::overlapGgiPolyPatch::clearOut()
     deleteDemandDrivenData(reconFaceCellCentresPtr_);
 }
 
+
+void Foam::overlapGgiPolyPatch::clearOut()
+{
+    clearGeom();
+
+    deleteDemandDrivenData(localParallelPtr_);
+}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -399,14 +317,19 @@ void Foam::overlapGgiPolyPatch::initGeometry()
 
 void Foam::overlapGgiPolyPatch::calcGeometry()
 {
+    polyPatch::calcGeometry();
+
+    // Note: Calculation of transforms must be forced before the
+    // reconFaceCellCentres in order to correctly set the transformation
+    // in the interpolation routines.
+    // HJ, 3/Jul/2009
+    calcTransforms();
+
     // Reconstruct the cell face centres
     if (patchToPatchPtr_ && master())
     {
         reconFaceCellCentres();
     }
-
-    calcTransforms();
-    polyPatch::calcGeometry();
 }
 
 
@@ -421,7 +344,7 @@ void Foam::overlapGgiPolyPatch::movePoints(const pointField& p)
     polyPatch::movePoints(p);
 
     // Force recalculation of interpolation
-    clearOut();
+    clearGeom();
 }
 
 

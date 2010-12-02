@@ -22,35 +22,17 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Instructions:
-    This tool is used to have multiple rotating regions around the same origin
-    with different rpms.
-    Creating the cellZones is not implemented in this tool.
-    The steps to obtain the cellZones are :
-
-    1) use regionCellSets utility. With this command you can have different
-       cellSets for each region.
-
-    2) Change the name of the regions  eg. CellRegion0 to Rotor1 ,CellRegion1
-       to Stator and vice versa.
-
-    3) run command " setsToZones -noFlipMap ".  After this command the
-       cellSets are transformed to cellZones.
-
-    4) in dynamicMeshDict rpm section should be added.
-
-    5) The case is ready to be run.
-
-    Implemented by Fethi Tekin, 24.03.2010
-
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
     Fethi Tekin, All rights reserved.
+    Oliver Borm, All rights reserved.
 
 \*---------------------------------------------------------------------------*/
+
 #include "turboFvMesh.H"
 #include "Time.H"
 #include "addToRunTimeSelectionTable.H"
+#include "ZoneIDs.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -63,26 +45,6 @@ namespace Foam
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::turboFvMesh::addZonesAndModifiers()
-{
-    // Add zones and modifiers for motion action
-    // No functionality is implemented
-
-    if (cellZones().size() > 0)
-    {
-        Info<< "void turboFvMesh::addZonesAndModifiers() : "
-            << "Zones and modifiers already present.  Skipping."
-            << endl;
-
-        return;
-    }
-    else
-    {
-            FatalErrorIn("turboFvMesh")
-            << "Cell Regions have to be created"
-            << abort(FatalError);
-    }
-}
 void Foam::turboFvMesh::calcMovingPoints() const
 {
     if (debug)
@@ -99,8 +61,8 @@ void Foam::turboFvMesh::calcMovingPoints() const
             << abort(FatalError);
     }
 
-    // Retrieve the zone Names
-    const wordList zoneNames = cellZones().names();
+    // Retrieve the cell zone Names
+    const wordList cellZoneNames = cellZones().names();
 
     // Set the points
     movingPointsPtr_ = new vectorField(allPoints().size(),vector::zero);
@@ -110,36 +72,75 @@ void Foam::turboFvMesh::calcMovingPoints() const
     const cellList& c = cells();
     const faceList& f = allFaces();
 
-    forAll(zoneNames,zoneI)
+    scalar rpm;
+
+    forAll(cellZoneNames,cellZoneI)
     {
-        Info<< "Moving Region Zone Name:" << zoneNames[zoneI]<< nl<<endl;
-
         const labelList& cellAddr =
-        cellZones()[cellZones().findZoneID(zoneNames[zoneI])];
+            cellZones()[cellZones().findZoneID(cellZoneNames[cellZoneI])];
 
-        rpm_ = readScalar(dict_.subDict("rpm").lookup(zoneNames[zoneI]));
-
-        Info<< "rpm:" << rpm_<<nl<<endl;
-
-        forAll (cellAddr, cellI)
+        if (dict_.subDict("rpm").found(cellZoneNames[cellZoneI]))
         {
-            const cell& curCell = c[cellAddr[cellI]];
+            rpm = readScalar(dict_.subDict("rpm").lookup(cellZoneNames[cellZoneI]));
 
-            forAll (curCell, faceI)
+            Info<< "Moving Cell Zone Name: " << cellZoneNames[cellZoneI]
+                << " rpm: " << rpm << endl;
+
+            forAll (cellAddr, cellI)
             {
-                 const face& curFace = f[curCell[faceI]];
+                const cell& curCell = c[cellAddr[cellI]];
 
-                 forAll (curFace, pointI)
-                 {
-                     // The rotation data is saved within the cell data. For
-                     // non-rotating regions rpm is zero, so mesh movement is
-                     // also zero. The conversion of rotational speed
+                forAll (curCell, faceI)
+                {
+                    const face& curFace = f[curCell[faceI]];
 
-                     // Note: deltaT changes during the run: moved to
-                     // turboFvMesh::update().  HJ, 14/Oct/2010
-                     movingPoints[curFace[pointI]] =
-                         vector(0, rpm_/60.0*360.0, 0);
-                 }
+                    forAll (curFace, pointI)
+                    {
+                        // The rotation data is saved within the cell data. For
+                        // non-rotating regions rpm is zero, so mesh movement
+                        // is also zero. The conversion of rotational speed
+
+                        // Note: deltaT changes during the run: moved to
+                        // turboFvMesh::update().  HJ, 14/Oct/2010
+                        movingPoints[curFace[pointI]] =
+                            vector(0, rpm/60.0*360.0, 0);
+                    }
+                }
+            }
+        }
+    }
+
+    // Retrieve the face zone Names
+    const wordList faceZoneNames = faceZones().names();
+
+    // This is not bullet proof, as one could specify the wrong name of a
+    // faceZone, which is then not selected. The solver will crash after the
+    // first meshMotion iteration.
+    forAll (faceZoneNames, faceZoneI)
+    {
+        if (dict_.subDict("slider").found(faceZoneNames[faceZoneI]))
+        {
+            rpm = readScalar
+            (
+                dict_.subDict("slider").lookup(faceZoneNames[faceZoneI])
+            );
+
+            Info<< "Moving Face Zone Name: " << faceZoneNames[faceZoneI]
+                << " rpm: " << rpm << endl;
+
+            faceZoneID zoneID(faceZoneNames[faceZoneI], faceZones());
+
+            const labelList& movingSliderAddr = faceZones()[zoneID.index()];
+
+            forAll (movingSliderAddr, faceI)
+            {
+                const face& curFace = f[movingSliderAddr[faceI]];
+
+                forAll (curFace, pointI)
+                {
+                    movingPoints[curFace[pointI]] =
+                        vector( 0, rpm/60.0*360.0, 0);
+                }
             }
         }
     }
@@ -177,11 +178,8 @@ Foam::turboFvMesh::turboFvMesh
             dict_.subDict("coordinateSystem")
         )
     ),
-
     movingPointsPtr_(NULL)
 {
-    addZonesAndModifiers();
-
     Info<< "Turbomachine Mixer mesh:" << nl
         << "    origin: " << cs().origin() << nl
         << "    axis  : " << cs().axis() << endl;

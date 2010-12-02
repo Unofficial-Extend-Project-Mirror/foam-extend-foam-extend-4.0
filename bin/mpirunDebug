@@ -104,9 +104,9 @@ echo "run $args" > $PWD/gdbCommands
 echo "where" >> $PWD/gdbCommands
 echo "Constructed gdb initialization file $PWD/gdbCommands"
 
-$ECHO "Choose running method: 0)normal  1)gdb+xterm  2)gdb  3)log  4)log+xterm  5)xterm+valgrind: \c"
+$ECHO "Choose running method: 0)normal  1)gdb+xterm  2)gdb  3)log  4)log+xterm  5)xterm+valgrind 6)nemiver: \c"
 read method
-if [ "$method" -ne 0 -a "$method" -ne 1 -a "$method" -ne 2 -a "$method" -ne 3 -a "$method" -ne 4 -a "$method" -ne 5 ]; then
+if [ "$method" -ne 0 -a "$method" -ne 1 -a "$method" -ne 2 -a "$method" -ne 3 -a "$method" -ne 4 -a "$method" -ne 5 -a "$method" -ne 6 ]; then
     printUsage
     exit 1
 fi
@@ -184,6 +184,12 @@ do
     elif [ "$method" -eq 5 ]; then
         echo "$sourceFoam; cd $PWD; valgrind $exec $args; read dummy" >> $procCmdFile
         echo "${node}xterm -font fixed -title 'processor'$proc $geom -e $procCmdFile" >> $PWD/mpirun.schema
+    elif [ "$method" -eq 6 ]; then
+        ## maybe one could use nemiver sessions for reloading breakpoints --session=<N> or --last
+        # echo "$sourceFoam; cd $PWD; nemiver --last $exec $args; read dummy" >> $procCmdFile
+        echo "$sourceFoam; cd $PWD; nemiver $exec $args; read dummy" >> $procCmdFile
+        # echo "$sourceFoam; cd $PWD; ddd --args $exec $args; read dummy" >> $procCmdFile
+        echo "${node} $procCmdFile" >> $PWD/mpirun.schema
     fi
 
     chmod +x $procCmdFile

@@ -1,6 +1,6 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-8
+9
 (
     inlet
     {
@@ -41,12 +41,29 @@ FoamFile
         nFaces          1400;
         startFace       29900;
     }
-    rotor_cyclics
+    rotor_cyclic_upper
     {
-        type            cyclic;
-        nFaces          100;
+        type            cyclicGgi;
+        nFaces          50;
         startFace       31300;
-        featureCos      0.9;
+        shadowPatch     rotor_cyclic_lower;
+        zone            rotor_cyclic_upper_faces;
+        bridgeOverlap   false;
+        rotationAxis    (0 0 1);
+        rotationAngle   -30;
+        separationOffset (0 0 0);
+    }
+    rotor_cyclic_lower
+    {
+        type            cyclicGgi;
+        nFaces          50;
+        startFace       31350;
+        shadowPatch     rotor_cyclic_upper;
+        zone            rotor_cyclic_lower_faces;
+        bridgeOverlap   false;
+        rotationAxis    (0 0 1);
+        rotationAngle   30;
+        separationOffset (0 0 0);
     }
     stator_cyclics
     {
@@ -63,6 +80,7 @@ FoamFile
         rotationAxis    (0 0 1);
         nCopies         12;
         shadowPatch     interface2;
+        zone            interface1_faces;
     }
     interface2
     {
@@ -72,6 +90,7 @@ FoamFile
         rotationAxis    (0 0 1);
         nCopies         12;
         shadowPatch     interface1;
+        zone            interface2_faces;
     }
 )
 

@@ -446,6 +446,47 @@ void Foam::MRFZone::absoluteFlux
     absoluteRhoFlux(rho, phi);
 }
 
+void Foam::MRFZone::faceU
+(
+    surfaceVectorField& zoneFaceU
+) const
+{
+    const surfaceVectorField& Cf = mesh_.Cf();
+
+    const vector& origin = origin_.value();
+    const vector& Omega = Omega_.value();
+
+    // Internal faces
+    forAll(internalFaces_, i)
+    {
+        label facei = internalFaces_[i];
+        zoneFaceU[facei] = (Omega ^ (Cf[facei] - origin));
+    }
+
+    // Included patches
+    forAll(includedFaces_, patchi)
+    {
+        forAll(includedFaces_[patchi], i)
+        {
+            label patchFacei = includedFaces_[patchi][i];
+
+            zoneFaceU.boundaryField()[patchi][patchFacei] =
+                (Omega ^ (Cf.boundaryField()[patchi][patchFacei] - origin));
+        }
+    }
+
+    // Excluded patches
+    forAll(excludedFaces_, patchi)
+    {
+        forAll(excludedFaces_[patchi], i)
+        {
+            label patchFacei = excludedFaces_[patchi][i];
+
+            zoneFaceU.boundaryField()[patchi][patchFacei] =
+                (Omega ^ (Cf.boundaryField()[patchi][patchFacei] - origin));
+        }
+    }
+}
 
 void Foam::MRFZone::correctBoundaryVelocity(volVectorField& U) const
 {

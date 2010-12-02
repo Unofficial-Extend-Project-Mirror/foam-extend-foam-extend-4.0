@@ -37,6 +37,7 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
     Fethi Tekin, All rights reserved.
+    Oliver Borm, All rights reserved.
 
 SourceFiles
     overlapGgiPolyPatch.C
@@ -50,6 +51,7 @@ SourceFiles
 #include "coupledPolyPatch.H"
 #include "standAlonePatch.H"
 #include "overlapGgiInterpolation.H"
+#include "faceZone.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -69,9 +71,14 @@ class overlapGgiPolyPatch
         //- Shadow patch name
         const word shadowName_;
 
+        //- Interpolation zone name
+        const word zoneName_;
+
         //- Shadow patch index.  Delayed evaluation for construction
         mutable label shadowIndex_;
 
+        //- Interpolation zone index.  Delayed evaluation for construction
+        mutable label zoneIndex_;
 
         //- Rotation parameter for the overlap
 
@@ -79,18 +86,12 @@ class overlapGgiPolyPatch
             const vector rotationAxis_;
 
             // Number of copies in order to complete 360 degrees
-            const scalar nCopies_;
+            const label nCopies_;
 
         // Interpolation
 
             //- Pointer to expanded master patch
             mutable standAlonePatch* expandedMasterPtr_;
-
-            //- Pointer to expanded faceCentres of Master
-            mutable vectorField* faceCentresPtr_;
-
-            //- Pointer to expanded faceareas of Master
-            mutable vectorField* faceAreasPtr_;
 
             //- Pointer to expanded slave patch
             mutable standAlonePatch* expandedSlavePtr_;
@@ -98,27 +99,30 @@ class overlapGgiPolyPatch
             //- Patch-to-expanded-patch interpolation
             mutable overlapGgiInterpolation* patchToPatchPtr_;
 
+            //- Is the patch localised on a single processor
+            // (single processor in a parallel run)?
+            //  Used for parallel optimisation
+            mutable bool* localParallelPtr_;
 
-        //- Reconstructed patch neighbour cell centres
-        mutable vectorField* reconFaceCellCentresPtr_;
-
+            //- Reconstructed patch neighbour cell centres
+            mutable vectorField* reconFaceCellCentresPtr_;
 
     // Private member functions
 
         //- Return reference to patch-to-patch interpolation
         const overlapGgiInterpolation& patchToPatch() const;
 
-        //- Calculate expanded master patch
-        void calcExpandedMaster() const;
-
-        //- Calculate expanded slave patch
-        void calcExpandedSlave() const;
+        //- Calculate expanded patch geometry
+        standAlonePatch* calcExpandedGeometry(label ncp, label index) const;
 
         //- Return reference to expanded master patch
         const standAlonePatch& expandedMaster() const;
 
         //- Return reference to expanded slave patch
         const standAlonePatch& expandedSlave() const;
+
+        //- Calculate local parallel switch
+        void calcLocalParallel() const;
 
         //- Calculate interpolation
         void calcPatchToPatch() const;
@@ -131,6 +135,9 @@ class overlapGgiPolyPatch
 
         //- Check definition: angles and offsets
         void checkDefinition() const;
+
+        //- Clear geometry
+        void clearGeom();
 
         //- Clear out
         void clearOut();
@@ -186,6 +193,7 @@ public:
             const label index,
             const polyBoundaryMesh& bm,
             const word& shadowName,
+            const word& zoneName,
             const vector& axis,
             const scalar nCopies
         );
@@ -260,11 +268,23 @@ public:
             return shadowName_;
         }
 
+        //- Return name of interpolation face zone
+        const word& zoneName() const
+        {
+            return zoneName_;
+        }
+
         //- Return shadow patch index
-        int shadowIndex() const;
+        label shadowIndex() const;
+
+        //- Return zone patch index
+        label zoneIndex() const;
 
         //- Return shadow patch
         const overlapGgiPolyPatch& shadow() const;
+
+        //- Return interpolation face zone
+        const faceZone& zone() const;
 
         //- Return rotation axis
         const vector& rotationAxis() const
@@ -279,7 +299,7 @@ public:
         }
 
         //- Return number of slave copies
-        label nCopies() const;
+        const label& nCopies() const;
 
         //- Is this the master side?
         bool master() const;
@@ -290,15 +310,14 @@ public:
             return !master();
         }
 
-        //- Expand master face field to full for 360 degrees coverage
-        template<class Type>
-        tmp<Field<Type> > expandMasterData(const Field<Type>& spf) const;
+        //- Is the patch localised on a single processor
+        bool localParallel() const;
 
-        //- Expand slave face field to full for 360 degrees coverage
+        //- Expand face field to full for 360 degrees coverage
         template<class Type>
-        tmp<Field<Type> > expandSlaveData(const Field<Type>& spf) const;
+        tmp<Field<Type> > expandData(const Field<Type>& spf) const;
 
-        //- Interpolate face field: given field on a the shadow side,
+        //- Interpolate face field: given field on the shadow side,
         //  create an interpolated field on this side
         template<class Type>
         tmp<Field<Type> > interpolate(const Field<Type>& pf) const;
@@ -306,6 +325,9 @@ public:
         template<class Type>
         tmp<Field<Type> > interpolate(const tmp<Field<Type> >& tpf) const;
 
+        //- Filter zone field to patch size
+        template<class Type>
+        tmp<Field<Type> > filter(const Field<Type>& zf) const;
 
         //- Return reconstructed cell centres
         const vectorField& reconFaceCellCentres() const;

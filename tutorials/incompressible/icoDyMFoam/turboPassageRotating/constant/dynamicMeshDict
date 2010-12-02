@@ -29,7 +29,14 @@ turboFvMeshCoeffs
     rpm
     {
        cellRegion0  60;
-       cellRegion1  0;
+//        cellRegion1  0;
+    }
+
+    slider
+    {
+        interface1_faces 60;
+        rotor_cyclic_upper_faces 60;
+        rotor_cyclic_lower_faces 60;
     }
 }
 

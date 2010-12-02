@@ -1,0 +1,5 @@
+faceSet interface1_faces new patchToFace interface1
+faceSet interface2_faces new patchToFace interface2
+faceSet rotor_cyclic_upper_faces new patchToFace rotor_cyclic_upper
+faceSet rotor_cyclic_lower_faces new patchToFace rotor_cyclic_lower
+quit

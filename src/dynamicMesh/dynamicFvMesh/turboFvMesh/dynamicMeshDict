@@ -14,7 +14,6 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dynamicFvMeshLib   "libtopoChangerFvMesh.so";
 dynamicFvMesh       turboFvMesh;
 
 turboFvMeshCoeffs
@@ -29,9 +28,14 @@ turboFvMeshCoeffs
 
     rpm
     {
-         Rotor1 60;
-	 Rotor2 -30;
-	 Stator 0;	
+        Rotor1 60;
+        Rotor2 -30;
+    }
+
+    slider
+    {
+        Rotor1_faceZone 60;
+        Rotor2_faceZone -30;
     }
 }
 
