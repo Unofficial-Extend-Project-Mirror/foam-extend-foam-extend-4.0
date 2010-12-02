@@ -78,11 +78,7 @@ Foam::ellipticCylindricalCS Foam::ellipseEdge::calcCS()
         Info << "p = " << p << " q = " << q << " n = " << normal << endl;
     }
 
-    tensor A;
-    A.x() = p;
-    A.z() = normal;
-    A.y() = normal ^ p;
-
+    tensor A(p, normal ^ p, normal);
 
     vector2D p2D(1.0, 0.0);
     vector qTmp = (A & q);

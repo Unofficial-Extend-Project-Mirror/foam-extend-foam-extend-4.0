@@ -267,8 +267,16 @@ tensor eigenVectors(const tensor& t)
 {
     vector evals(eigenValues(t));
 
-    tensor evs;
+    // Modification for strict-aliasing compliance.
+    // Sandeep Menon, 01/Dec/2010
+    tensor evs
+    (
+        (mag(evals.x()) < SMALL) ? vector(0, 0, 1) : eigenVector(t, evals.x()),
+        (mag(evals.y()) < SMALL) ? vector(0, 1, 0) : eigenVector(t, evals.y()),
+        (mag(evals.z()) < SMALL) ? vector(1, 0, 0) : eigenVector(t, evals.z())
+    );
 
+    /*
     // Test for null eigen values to return a not null eigen vector
     // Jovani Favero, 18/Nov/2009
     if (mag(evals.x()) < SMALL)
@@ -297,6 +305,7 @@ tensor eigenVectors(const tensor& t)
     {
         evs.z() = eigenVector(t, evals.z());
     }
+    */
 
     return evs;
 }
@@ -490,8 +499,16 @@ tensor eigenVectors(const symmTensor& t)
 {
     vector evals(eigenValues(t));
 
-    tensor evs;
+    // Modification for strict-aliasing compliance.
+    // Sandeep Menon, 01/Dec/2010
+    tensor evs
+    (
+        (mag(evals.x()) < SMALL) ? vector(0, 0, 1) : eigenVector(t, evals.x()),
+        (mag(evals.y()) < SMALL) ? vector(0, 1, 0) : eigenVector(t, evals.y()),
+        (mag(evals.z()) < SMALL) ? vector(1, 0, 0) : eigenVector(t, evals.z())
+    );
 
+    /*
     // Test for null eigen values to return a not null eigen vector.
     // Jovani Favero, 18/Nov/2009
     if (mag(evals.x()) < SMALL)
@@ -520,6 +537,7 @@ tensor eigenVectors(const symmTensor& t)
     {
         evs.z() = eigenVector(t, evals.z());
     }
+    */
 
     return evs;
 }
