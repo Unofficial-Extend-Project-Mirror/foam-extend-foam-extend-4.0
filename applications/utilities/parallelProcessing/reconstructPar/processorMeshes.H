@@ -38,14 +38,12 @@ SourceFiles
 
 #include "PtrList.H"
 #include "fvMesh.H"
-#include "IOobjectList.H"
 #include "labelIOList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
 
 /*---------------------------------------------------------------------------*\
                      Class processorMeshes Declaration
@@ -78,14 +76,15 @@ class processorMeshes
 
     // Private Member Functions
 
-        //- Read all meshes
-        void read();
-
         //- Disallow default bitwise copy construct
         processorMeshes(const processorMeshes&);
 
         //- Disallow default bitwise assignment
         void operator=(const processorMeshes&);
+
+
+        //- Read all meshes
+        void read();
 
 
 public:
@@ -109,24 +108,30 @@ public:
         {
             return meshes_;
         }
+
+        //- Return point-processor addressing arrays
         const PtrList<labelIOList>& pointProcAddressing() const
         {
             return pointProcAddressing_;
         }
+
+        //- Return face-processor addressing arrays
         PtrList<labelIOList>& faceProcAddressing()
         {
             return faceProcAddressing_;
         }
+
+        //- Return cell-processor addressing arrays
         const PtrList<labelIOList>& cellProcAddressing() const
         {
             return cellProcAddressing_;
         }
+
+        //- Return boundary-processor addressing arrays
         const PtrList<labelIOList>& boundaryProcAddressing() const
         {
             return boundaryProcAddressing_;
         }
-
-
 };
 
 
