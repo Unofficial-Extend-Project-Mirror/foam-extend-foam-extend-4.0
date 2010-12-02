@@ -68,7 +68,7 @@ then
 else
     echo "WARNING: Skipping the installation of ParaView-3.8.1."
     echo "WARNING: Please initialize the QT_DIR environment variable to your QT installation directory."
-    echo "WARNING: The command $QT_DIR/bin/qmake needs to be valid"
+    echo "WARNING: The command \$QT_DIR/bin/qmake needs to be valid"
     echo "WARNING: "
 fi
 

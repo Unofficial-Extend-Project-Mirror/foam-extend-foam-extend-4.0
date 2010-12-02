@@ -55,6 +55,19 @@ _foamAddLib()
     done
 }
 
+# Source files, possibly with some verbosity
+# Yes, this is the same definition as in the file etc/bash
+# We need that definition available for scripts sourcing
+# settings.sh directly.
+_foamSource()
+{
+   while [ $# -ge 1 ]
+   do
+      [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "Sourcing: $1"
+      . $1
+      shift
+   done
+}
 
 # location of the jobControl directory
 export FOAM_JOB_DIR=$WM_PROJECT_INST_DIR/jobControl
