@@ -159,8 +159,10 @@ void wedgeFaPatchField<Type>::evaluate(const Pstream::commsTypes)
 template<class Type>
 tmp<Field<Type> > wedgeFaPatchField<Type>::snGradTransformDiag() const
 {
-    diagTensor diagT = 
+    const diagTensor diagT =
         0.5*diag(I - refCast<const wedgeFaPatch>(this->patch()).faceT());
+
+    const vector diagV(diagT.xx(), diagT.yy(), diagT.zz());
 
     return tmp<Field<Type> >
     (
@@ -171,7 +173,7 @@ tmp<Field<Type> > wedgeFaPatchField<Type>::snGradTransformDiag() const
             (
                 pow
                 (
-                    reinterpret_cast<const vector&>(diagT),
+                    diagV,
                     pTraits<typename powProduct<vector, pTraits<Type>::rank>
                     ::type>::zero
                 )

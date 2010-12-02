@@ -8,10 +8,10 @@
 License
     This file is part of OpenFOAM.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
-    option) any later version.
+    OpenFOAM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -19,8 +19,7 @@ License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
     Read token and binary block from IPstream
@@ -30,15 +29,7 @@ Description
 #include "mpi.h"
 
 #include "IPstream.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-// Outstanding non-blocking operations.
-//! @cond fileScope
-Foam::DynamicList<MPI_Request> IPstream_outstandingRequests_;
-//! @endcond fileScope
+#include "PstreamGlobals.H"
 
 // * * * * * * * * * * * * * * * * Constructor * * * * * * * * * * * * * * * //
 
@@ -171,7 +162,7 @@ Foam::label Foam::IPstream::read
             return 0;
         }
 
-        IPstream_outstandingRequests_.append(request);
+        PstreamGlobals::IPstream_outstandingRequests_.append(request);
 
         return 1;
     }
@@ -191,14 +182,14 @@ Foam::label Foam::IPstream::read
 
 void Foam::IPstream::waitRequests()
 {
-    if (IPstream_outstandingRequests_.size())
+    if (PstreamGlobals::IPstream_outstandingRequests_.size())
     {
         if
         (
             MPI_Waitall
             (
-                IPstream_outstandingRequests_.size(),
-                IPstream_outstandingRequests_.begin(),
+                PstreamGlobals::IPstream_outstandingRequests_.size(),
+                PstreamGlobals::IPstream_outstandingRequests_.begin(),
                 MPI_STATUSES_IGNORE
             )
         )
@@ -209,19 +200,20 @@ void Foam::IPstream::waitRequests()
             )   << "MPI_Waitall returned with error" << endl;
         }
 
-        IPstream_outstandingRequests_.clear();
+        PstreamGlobals::IPstream_outstandingRequests_.clear();
     }
 }
 
 
 bool Foam::IPstream::finishedRequest(const label i)
 {
-    if (i >= IPstream_outstandingRequests_.size())
+    if (i >= PstreamGlobals::IPstream_outstandingRequests_.size())
     {
         FatalErrorIn
         (
             "IPstream::finishedRequest(const label)"
-        )   << "There are " << IPstream_outstandingRequests_.size()
+        )   << "There are "
+            << PstreamGlobals::IPstream_outstandingRequests_.size()
             << " outstanding send requests and you are asking for i=" << i
             << nl
             << "Maybe you are mixing blocking/non-blocking comms?"
@@ -229,7 +221,12 @@ bool Foam::IPstream::finishedRequest(const label i)
     }
 
     int flag;
-    MPI_Test(&IPstream_outstandingRequests_[i], &flag, MPI_STATUS_IGNORE);
+    MPI_Test
+    (
+        &PstreamGlobals::IPstream_outstandingRequests_[i],
+        &flag,
+        MPI_STATUS_IGNORE
+    );
 
     return flag != 0;
 }
