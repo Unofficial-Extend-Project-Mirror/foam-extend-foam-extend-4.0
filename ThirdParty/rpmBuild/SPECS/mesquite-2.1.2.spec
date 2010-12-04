@@ -107,7 +107,8 @@ Group: 			Development/Tools
     # This file will be regenerated during the compilation process
     [ -e include/Mesquite_all_headers.hpp ] && rm -f include/Mesquite_all_headers.hpp
 
-    make
+    [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
+    make -j $WM_NCOMPPROCS
 
 %install
     make install prefix=$RPM_BUILD_ROOT%{_installPrefix}

@@ -98,7 +98,9 @@ Group: 			Development/Tools
     ./configure                           \
         -opensource --confirm-license=yes \
         --prefix=%{_installPrefix}
-    make
+
+    [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
+    make -j $WM_NCOMPPROCS
 
 %install
 #    make install INSTALL_ROOT=$RPM_BUILD_ROOT%{_installPrefix}

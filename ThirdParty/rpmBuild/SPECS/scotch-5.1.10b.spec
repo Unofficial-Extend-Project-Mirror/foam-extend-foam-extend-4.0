@@ -102,8 +102,9 @@ Patch0:                 scotch-5.1.10b_patch_0
         ln -s Make.inc/Makefile.inc.i686_pc_linux2.shlib Makefile.inc
 %endif
 
-    make scotch
-    make ptscotch
+    [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
+    make -j $WM_NCOMPPROCS scotch
+    make -j $WM_NCOMPPROCS ptscotch
 
 %install
     cd src

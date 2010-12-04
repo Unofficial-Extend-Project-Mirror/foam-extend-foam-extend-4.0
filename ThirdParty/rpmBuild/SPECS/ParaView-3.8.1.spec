@@ -166,7 +166,9 @@ Patch0:                 ParaView-3.8.1.patch_darwin
         -DCMAKE_INSTALL_PREFIX:PATH=$RPM_BUILD_ROOT%{_installPrefix} \
         $CMAKE_VARIABLES \
 	..
-    make
+
+    [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
+    make -j $WM_NCOMPPROCS
 
 %install
     cd buildObj

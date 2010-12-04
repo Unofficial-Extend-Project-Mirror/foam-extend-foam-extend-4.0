@@ -95,7 +95,9 @@ Group: 			Development/Tools
     ./configure     \
         --prefix=%{_installPrefix}  \
 	--with-gmp=$WM_THIRD_PARTY_DIR/packages/$GMP_VERSION/platforms/$WM_OPTIONS
-    make
+
+    [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
+    make -j $WM_NCOMPPROCS
 
 %install
     make install prefix=$RPM_BUILD_ROOT%{_installPrefix}

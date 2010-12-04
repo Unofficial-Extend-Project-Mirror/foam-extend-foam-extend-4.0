@@ -92,7 +92,9 @@ Group: 			Development/Tools
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
     ./configure --prefix=%{_installPrefix}
-    make
+
+    [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
+    make -j $WM_NCOMPPROCS
 
 %install
     make install prefix=$RPM_BUILD_ROOT%{_installPrefix}

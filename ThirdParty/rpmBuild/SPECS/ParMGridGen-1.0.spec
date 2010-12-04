@@ -92,22 +92,8 @@ Patch1:                 ParMGridGen-1.0.patch
 %endif
 
 %build
-#    if [ "$WM_ARCH" == "darwinIntel" ]
-#    then
-#        ARFLAGS="-dynamiclib -undefined dynamic_lookup"
-#        LIBEXT="dylib"
-#    else
-#        ARFLAGS=""
-#        LIBEXT="so"
-#    fi
-#    make \
-#        AR="gcc $ARFLAGS -shared -o"  \
-#        OPTFLAGS="-O3 -shared"  \
-#        RANLIB="true"
-#    mv ./MGridGen/IMlib/libIMlib.a ./MGridGen/IMlib/libIMlib.$LIBEXT
-#    mv ./MGridGen/Lib/libMGridGen.a ./MGridGen/Lib/libMGridGen.$LIBEXT
-
-    make
+    [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
+    make -j $WM_NCOMPPROCS
 
 %install
     # Manual installation
