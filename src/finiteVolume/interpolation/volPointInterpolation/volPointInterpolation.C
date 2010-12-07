@@ -98,11 +98,7 @@ void volPointInterpolation::makeWeights() const
     {
         if (sumWeights.boundaryField()[patchi].coupled())
         {
-            refCast<coupledPointPatchScalarField>
-                (sumWeights.boundaryField()[patchi]).initSwapAdd
-                (
-                    sumWeights.internalField()
-                );
+            sumWeights.boundaryField()[patchi].initAddField();
         }
     }
 
@@ -110,8 +106,7 @@ void volPointInterpolation::makeWeights() const
     {
         if (sumWeights.boundaryField()[patchi].coupled())
         {
-            refCast<coupledPointPatchScalarField>
-            (sumWeights.boundaryField()[patchi]).swapAdd
+            sumWeights.boundaryField()[patchi].addField
             (
                 sumWeights.internalField()
             );
