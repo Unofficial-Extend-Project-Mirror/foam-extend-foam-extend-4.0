@@ -55,7 +55,7 @@ class lduMatrix;
 class mapPolyMesh;
 
 /*---------------------------------------------------------------------------*\
-                           Class GAMGAgglomeration Declaration
+                      Class GAMGAgglomeration Declaration
 \*---------------------------------------------------------------------------*/
 
 class GAMGAgglomeration
