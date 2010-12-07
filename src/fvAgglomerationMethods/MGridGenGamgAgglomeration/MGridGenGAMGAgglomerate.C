@@ -129,7 +129,7 @@ Foam::tmp<Foam::labelField> Foam::MGridGenGAMGAgglomeration::agglomerate
         faceWeights
     );
 
-    // agglomeration options.
+    // MGridGen agglomeration options.
     List<int> options(4, 0);
     options[0] = 4;                   // globular agglom
     options[1] = 6;                   // objective F3 and F2
@@ -140,7 +140,7 @@ Foam::tmp<Foam::labelField> Foam::MGridGenGAMGAgglomeration::agglomerate
     // output: cell -> processor addressing
     List<int> finalAgglom(nFineCells);
     int nMoves = -1;
-        
+
     MGridGen
     (
         nFineCells,

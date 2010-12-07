@@ -58,7 +58,7 @@ namespace Foam
 class fvMesh;
 
 /*---------------------------------------------------------------------------*\
-                           Class MGridGenGAMGAgglomeration Declaration
+                   Class MGridGenGAMGAgglomeration Declaration
 \*---------------------------------------------------------------------------*/
 
 class MGridGenGAMGAgglomeration
@@ -114,7 +114,7 @@ public:
         MGridGenGAMGAgglomeration
         (
             const lduMesh& mesh,
-            const dictionary& controlDict
+            const dictionary& dict
         );
 };
 
