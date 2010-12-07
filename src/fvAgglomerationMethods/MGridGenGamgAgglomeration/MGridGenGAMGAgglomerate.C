@@ -31,10 +31,16 @@ Description
 #include "fvMesh.H"
 #include "syncTools.H"
 
-//extern "C"
-//{
-//#   include "mgridgen.h"
-//}
+extern "C"
+{
+#   include "mgridgen.h"
+#   ifdef darwin
+#       undef FALSE
+#       undef TRUE
+#   endif
+
+#undef sign
+}
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -42,8 +48,8 @@ void Foam::MGridGenGAMGAgglomeration::
 makeCompactCellFaceAddressingAndFaceWeights
 (
     const lduAddressing& fineAddressing,
-    List<idxtype>& cellCells,
-    List<idxtype>& cellCellOffsets,
+    labelList& cellCells,
+    labelList& cellCellOffsets,
     const vectorField& Si,
     List<scalar>& faceWeights
 )
@@ -113,8 +119,8 @@ Foam::tmp<Foam::labelField> Foam::MGridGenGAMGAgglomeration::agglomerate
     const label nFineCells = fineAddressing.size();
 
     // Compact addressing for cellCells
-    List<idxtype> cellCells;
-    List<idxtype> cellCellOffsets;
+    labelList cellCells;
+    labelList cellCellOffsets;
 
     // Face weights = face areas of the internal faces
     List<scalar> faceWeights;
@@ -130,7 +136,7 @@ Foam::tmp<Foam::labelField> Foam::MGridGenGAMGAgglomeration::agglomerate
     );
 
     // MGridGen agglomeration options.
-    List<int> options(4, 0);
+    labelList options(4, 0);
     options[0] = 4;                   // globular agglom
     options[1] = 6;                   // objective F3 and F2
     options[2] = 128;                 // debugging output level
