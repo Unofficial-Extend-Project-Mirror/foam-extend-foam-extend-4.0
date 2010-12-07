@@ -42,7 +42,7 @@ bool Foam::layerAdditionRemoval::setLayerPairing() const
     // This is also the most complex part of the topological change.
     // Therefore it will be calculated here and stored as temporary
     // data until the actual topological change, after which it will
-    // be cleared.  
+    // be cleared.  HJ, 2/Oct/2002
 
     // Algorithm for point collapse
     // 1)  Go through the master cell layer and for every face of
@@ -90,7 +90,8 @@ bool Foam::layerAdditionRemoval::setLayerPairing() const
     facesPairingPtr_ = new labelList(mf.size(), -1);
     labelList& ftc = *facesPairingPtr_;
 //     Pout << "meshPoints: " << meshPoints << nl
-//          << "localPoints: " << mesh.faceZones()[faceZoneID_.index()]().localPoints() << endl;
+//          << "localPoints: "
+//          << mesh.faceZones()[faceZoneID_.index()]().localPoints() << endl;
 
     // For all faces, create the mapping
     label nPointErrors = 0;
@@ -212,7 +213,7 @@ void Foam::layerAdditionRemoval::modifyMotionPoints
 {
     if (debug)
     {
-        Pout<< "void layerAdditionRemoval::modifyMotionPoints(" 
+        Pout<< "void layerAdditionRemoval::modifyMotionPoints("
             << "pointField& motionPoints) const for object "
             << name() << " : ";
     }
