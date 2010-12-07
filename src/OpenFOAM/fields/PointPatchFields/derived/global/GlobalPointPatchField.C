@@ -629,55 +629,6 @@ void GlobalPointPatchField
 }
 
 
-template
-<
-    template<class> class PatchField,
-    class Mesh,
-    class PointPatch,
-    class GlobalPointPatch,
-    template<class> class MatrixType,
-    class Type
->
-void GlobalPointPatchField
-<
-    PatchField,
-    Mesh,
-    PointPatch,
-    GlobalPointPatch,
-    MatrixType,
-    Type
->::swapAdd(Field<Type>& pField) const
-{
-    // Create the global list and insert local values
-    if (globalPointPatch_.globalPointSize() > 0)
-    {
-        Field<Type> lpf = patchInternalField(pField);
-        const labelList& addr = globalPointPatch_.sharedPointAddr();
-
-        Field<Type> gpf
-        (
-            globalPointPatch_.globalPointSize(),
-            pTraits<Type>::zero
-        );
-
-        forAll(addr, i)
-        {
-            gpf[addr[i]] += lpf[i];
-        }
-
-        combineReduce(gpf, plusEqOp<Field<Type> >());
-
-        // Extract local data
-        forAll (addr, i)
-        {
-            lpf[i] = gpf[addr[i]];
-        }
-
-        setInInternalField(pField, lpf);
-    }
-}
-
-
 // Add diagonal coefficients
 template
 <

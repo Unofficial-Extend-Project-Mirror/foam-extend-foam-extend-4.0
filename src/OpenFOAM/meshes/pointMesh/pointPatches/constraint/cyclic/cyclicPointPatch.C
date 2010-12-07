@@ -48,118 +48,15 @@ addToRunTimeSelectionTable
 );
 
 
-// * * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * //
-
-void Foam::cyclicPointPatch::initGeometry()
-{
-    transformPairs_.setSize(0);
-}
-
-
-void Foam::cyclicPointPatch::calcGeometry()
-{
-    const edgeList& cp = cyclicPolyPatch_.coupledPoints();
-    const labelList& mp = cyclicPolyPatch_.meshPoints();
-
-    // If there are no global points create a 1->1 map
-    if (!boundaryMesh().mesh().globalData().nGlobalPoints())
-    {
-        nonGlobalPatchPoints_.setSize(mp.size());
-        forAll(nonGlobalPatchPoints_, i)
-        {
-            nonGlobalPatchPoints_[i] = i;
-        }
-
-        meshPoints_ = cyclicPolyPatch_.meshPoints();
-        transformPairs_ = cp;
-    }
-    else
-    {
-        // Get reference to shared points
-        const labelList& sharedPoints = 
-            boundaryMesh().globalPatch().meshPoints();
-
-        nonGlobalPatchPoints_.setSize(mp.size());
-        meshPoints_.setSize(mp.size());
-
-        labelList pointMap(mp.size(), -1);
-
-        label noFiltPoints = 0;
-
-        forAll (mp, pointI)
-        {
-            label curP = mp[pointI];
-
-            bool found = false;
-
-            forAll (sharedPoints, sharedI)
-            {
-                if (sharedPoints[sharedI] == curP)
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-            {
-                pointMap[pointI] = noFiltPoints;
-                nonGlobalPatchPoints_[noFiltPoints] = pointI;
-                meshPoints_[noFiltPoints] = curP;
-                noFiltPoints++;
-            }
-        }
-
-        nonGlobalPatchPoints_.setSize(noFiltPoints);
-        meshPoints_.setSize(noFiltPoints);
-
-
-        transformPairs_.setSize(cp.size());
-
-        label noFiltPointPairs = 0;
-
-        forAll(cp, i)
-        {
-            if (pointMap[cp[i][0]] != -1 && pointMap[cp[i][1]] != -1)
-            {
-                transformPairs_[noFiltPointPairs][0] = pointMap[cp[i][0]];
-                transformPairs_[noFiltPointPairs][1] = pointMap[cp[i][1]];
-                noFiltPointPairs++;
-            }
-            else if (pointMap[cp[i][0]] == -1 && pointMap[cp[i][1]] != -1)
-            {
-                FatalErrorIn("cyclicPointPatch::calcGeometry() const")
-                    << "Point " << cp[i][0] << "of point-pair " << i
-                    << " is a global point but the other point "
-                    << cp[i][1] << " is not"
-                    << exit(FatalError);
-            }
-            else if (pointMap[cp[i][0]] != -1 && pointMap[cp[i][1]] == -1)
-            {
-                FatalErrorIn("cyclicPointPatch::calcGeometry() const")
-                    << "Point " << cp[i][1] << "of point-pair " << i
-                    << " is a global point but the other point "
-                    << cp[i][0] << " is not"
-                    << exit(FatalError);
-            }
-        }
-
-        transformPairs_.setSize(noFiltPointPairs);
-    }
-}
-
-
 void cyclicPointPatch::initUpdateMesh()
 {
     facePointPatch::initUpdateMesh();
-    cyclicPointPatch::initGeometry();
 }
 
 
 void cyclicPointPatch::updateMesh()
 {
     facePointPatch::updateMesh();
-    cyclicPointPatch::calcGeometry();
 }
 
 
@@ -184,10 +81,6 @@ cyclicPointPatch::~cyclicPointPatch()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const edgeList& cyclicPointPatch::transformPairs() const
-{
-    return transformPairs_;
-}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

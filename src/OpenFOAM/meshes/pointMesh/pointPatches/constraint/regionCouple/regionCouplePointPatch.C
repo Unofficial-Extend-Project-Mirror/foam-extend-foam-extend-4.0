@@ -51,34 +51,15 @@ addToRunTimeSelectionTable
 
 // * * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * //
 
-void Foam::regionCouplePointPatch::initGeometry()
-{}
-
-
-void Foam::regionCouplePointPatch::calcGeometry()
-{
-    meshPoints_ = regionCouplePolyPatch_.meshPoints();
-
-    nonGlobalPatchPoints_.setSize(meshPoints_.size());
-
-    forAll(nonGlobalPatchPoints_, i)
-    {
-        nonGlobalPatchPoints_[i] = i;
-    }
-}
-
-
 void Foam::regionCouplePointPatch::initUpdateMesh()
 {
     facePointPatch::initUpdateMesh();
-    regionCouplePointPatch::initGeometry();
 }
 
 
 void Foam::regionCouplePointPatch::updateMesh()
 {
     facePointPatch::updateMesh();
-    regionCouplePointPatch::calcGeometry();
 }
 
 

@@ -198,9 +198,6 @@ public:
                 Map<typename MatrixType<Type>::ConstraintType> &
             ) const;
 
-            //- Complete swap of patch point values and add to local values
-            virtual void swapAdd(Field<Type>&) const;
-
 
         // Matrix construction (completion) functionality
 

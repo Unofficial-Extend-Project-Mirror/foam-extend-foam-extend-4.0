@@ -71,24 +71,6 @@ class coupledFacePointPatch
         void operator=(const coupledFacePointPatch&);
 
 
-protected:
-
-    // Demand driven private data
-
-        //- The set of labels of the pointPatch points which are
-        //  non-global, i.e. present only in this coupledPointPatch.
-        //  MUST be initialised by calcGeometry()!
-        labelList nonGlobalPatchPoints_;
-
-        labelList loneMeshPoints_;
-
-
-        // Construction of demand-driven data
-
-            //- Calculate mesh points
-            virtual void calcGeometry() = 0;
-
-
 public:
 
     //- Runtime type information
@@ -119,21 +101,6 @@ public:
             {
                 return true;
             }
-
-
-        // Access functions for demand driven data
-
-            //- Return the set of labels of the pointPatch points which are
-            //  non-global, i.e. present in this coupledFacePointPatch
-            virtual const labelList& nonGlobalPatchPoints() const;
-
-            //- Return the set of labels of the pointPatch points which are
-            //  lone, i.e. present in this coupledFacePointPatch but not
-            //  associated with any faces
-            virtual const labelList& loneMeshPoints() const;
-
-            //- Return point unit normals.  Not impelemented.
-            virtual const vectorField& pointNormals() const;
 };
 
 

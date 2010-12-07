@@ -49,33 +49,15 @@ namespace Foam
 
 // * * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * //
 
-void Foam::overlapGgiPointPatch::initGeometry()
-{}
-
-
-void Foam::overlapGgiPointPatch::calcGeometry()
-{
-    meshPoints_ = overlapGgiPolyPatch_.meshPoints();
-
-    nonGlobalPatchPoints_.setSize(meshPoints_.size());
-    forAll(nonGlobalPatchPoints_, i)
-    {
-        nonGlobalPatchPoints_[i] = i;
-    }
-}
-
-
 void Foam::overlapGgiPointPatch::initUpdateMesh()
 {
     facePointPatch::initUpdateMesh();
-    overlapGgiPointPatch::initGeometry();
 }
 
 
 void Foam::overlapGgiPointPatch::updateMesh()
 {
     facePointPatch::updateMesh();
-    overlapGgiPointPatch::calcGeometry();
 }
 
 
