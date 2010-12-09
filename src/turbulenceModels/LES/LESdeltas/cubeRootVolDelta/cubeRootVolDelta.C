@@ -57,7 +57,7 @@ void cubeRootVolDelta::calcDelta()
         const Vector<label>& directions = mesh().geometricD();
 
         scalar thickness = 0.0;
-        for (direction dir=0; dir<directions.nComponents; dir++)
+        for (direction dir = 0; dir < directions.nComponents; dir++)
         {
             if (directions[dir] == -1)
             {
