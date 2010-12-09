@@ -115,11 +115,10 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export CMAKE_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+export CMAKE_BIN_DIR=\$CMAKE_DIR/bin
 
-[ -d \$CMAKE_DIR/lib ] && _foamAddLib \$CMAKE_DIR/lib
-
-# Enable access to the package applications if present
-[ -d \$CMAKE_DIR/bin ] && _foamAddPath \$CMAKE_DIR/bin
+# Enable access to the runtime package applications
+[ -d \$CMAKE_BIN_DIR ] && _foamAddPath \$CMAKE_BIN_DIR
 DOT_SH_EOF
 
     #
@@ -129,13 +128,10 @@ cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.cs
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 setenv CMAKE_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+setenv CMAKE_BIN_DIR \$CMAKE_DIR/bin
 
-if ( -e \$CMAKE_DIR/lib ) then
-    _foamAddLib \$CMAKE_DIR/lib
-endif
-
-if ( -e \$CMAKE_DIR/bin ) then
-    _foamAddPath \$CMAKE_DIR/bin
+if ( -e \$CMAKE_BIN_DIR ) then
+    _foamAddPath \$CMAKE_BIN_DIR
 endif
 DOT_CSH_EOF
 

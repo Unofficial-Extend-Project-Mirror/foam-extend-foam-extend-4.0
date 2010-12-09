@@ -36,17 +36,96 @@
 #
 #------------------------------------------------------------------------------
 
+export FOAM_VERBOSE=1
+
 # Specify system compiler
 # ~~~~~~~~~~~~~~~~~~~~~~~
 compilerInstall=system
 
 # Specify system openmpi
 # ~~~~~~~~~~~~~~~~~~~~~~
-export WM_MPLIB=SYSTEMOPENMPI
+#
+# Normally, you don't need to set more than these 3 env. variables
+# The other openmpi related variables will be initialized using 
+# the command mpicc --showme:
+#
+#export WM_MPLIB=SYSTEMOPENMPI
+#export OPENMPI_DIR=path_to_system_installed_openmpi
+#export OPENMPI_BIN_DIR=$OPENMPI_DIR/bin
+#
+#export OPENMPI_LIB_DIR="`$OPENMPI_BIN_DIR/mpicc --showme:libdirs`"
+#export OPENMPI_INCLUDE_DIR="`$OPENMPI_BIN_DIR/mpicc --showme:incdirs`"
+#export OPENMPI_COMPILE_FLAGS="`$OPENMPI_BIN_DIR/mpicc --showme:compile`"
+#export OPENMPI_LINK_FLAGS="`$OPENMPI_BIN_DIR/mpicc --showme:link`"
+
+# Specify system installed ThirdParty packages/libraries
+# NB: The packages installed under $WM_THIRD_PARTY_DIR
+#     will always override these values. 
+#     So build your ThirdParty directory accordingly.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# System installed Mesquite
+#export MESQUITE_SYSTEM=1
+#export MESQUITE_DIR=path_to_system_installed_mesquite
+#export MESQUITE_BIN_DIR=$MESQUITE_DIR/bin
+#export MESQUITE_LIB_DIR=$MESQUITE_DIR/lib
+#export MESQUITE_INCLUDE_DIR=$MESQUITE_DIR/include
+
+# System installed Metis
+#export METIS_SYSTEM=1
+#export METIS_DIR=path_to_system_installed_metis
+#export METIS_BIN_DIR=$METIS_DIR/bin
+#export METIS_LIB_DIR=$METIS_DIR/lib
+#export METIS_INCLUDE_DIR=$METIS_DIR/include
+
+# System installed ParMetis
+#export PARMETIS_SYSTEM=1
+#export PARMETIS_DIR=path_to_system_installed_parmetis
+#export PARMETIS_BIN_DIR=$PARMETIS_DIR/bin
+#export PARMETIS_LIB_DIR=$PARMETIS_DIR/lib
+#export PARMETIS_INCLUDE_DIR=$PARMETIS_DIR/include
+
+# System installed ParMGridgen
+#export PARMGRIDGEN_SYSTEM=1
+#export PARMGRIDGEN_DIR=path_to_system_installed_parmgridgen
+#export PARMGRIDGEN_BIN_DIR=$PARMGRIDGEN_DIR/bin
+#export PARMGRIDGEN_LIB_DIR=$PARMGRIDGEN_DIR/lib
+#export PARMGRIDGEN_INCLUDE_DIR=$PARMGRIDGEN_DIR/include
+
+# System installed Scotch
+#export SCOTCH_SYSTEM=1
+#export SCOTCH_DIR=path_to_system_installed_scotch
+#export SCOTCH_BIN_DIR=$SCOTCH_DIR/bin
+#export SCOTCH_LIB_DIR=$SCOTCH_DIR/lib
+#export SCOTCH_INCLUDE_DIR=$SCOTCH_DIR/include
+
+# System installed CMake
+#export CMAKE_SYSTEM=1
+#export CMAKE_DIR=path_to_system_installed_cmake
+#export CMAKE_BIN_DIR=$CMAKE_DIR/bin
+
+# System installed Python
+#export PYTHON_SYSTEM=1
+#export PYTHON_DIR=path_to_system_installed_python
+#export PYTHON_BIN_DIR=$PYTHON_DIR/bin
+
+# System installed Qt
+# This is the only package we assume is system installed by default.
+# So we don't use a variable called QT_SYSTEM, but instead a variable
+# called QT_THIRD_PARTY in order to override to the ThirdParty QT
+# package.
+#export QT_THIRD_PARTY=1
+#export QT_DIR=path_to_system_installed_qt
+#export QT_BIN_DIR=$QT_DIR/bin
+
+# System installed ParaView
+#export PARAVIEW_SYSTEM=1
+#export PARAVIEW_DIR=path_to_system_installed_paraview
+#export PARAVIEW_BIN_DIR=$PARAVIEW_DIR/bin
 
 # Specify ParaView version
 # ~~~~~~~~~~~~~~~~~~~~~~~~
-export ParaView_VERSION=git        # eg, cvs/git version
-export ParaView_MAJOR=3.7
+#export ParaView_VERSION=git        # eg, cvs/git version
+#export ParaView_MAJOR=3.7
 
 # ----------------------------------------------------------------- end-of-file

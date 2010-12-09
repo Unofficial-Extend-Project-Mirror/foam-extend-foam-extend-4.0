@@ -40,13 +40,91 @@
 ## ~~~~~~~~~~~~~~~~~~~~~~~
 #set compilerInstall=system
 
-## Specify system openmpi
-## ~~~~~~~~~~~~~~~~~~~~~~
+# Specify system openmpi
+# ~~~~~~~~~~~~~~~~~~~~~~
+#
+# Normally, you don't need to set more than these 3 env. variables
+# The other openmpi related variables will be initialized using 
+# the command mpicc --showme:
+#
 #setenv WM_MPLIB SYSTEMOPENMPI
+#setenv OPENMPI_DIR path_to_system_installed_openmpi
+#setenv OPENMPI_BIN_DIR $OPENMPI_DIR/bin
+#
+#setenv OPENMPI_LIB_DIR "`$OPENMPI_BIN_DIR/mpicc --showme:libdirs`"
+#setenv OPENMPI_INCLUDE_DIR "`$OPENMPI_BIN_DIR/mpicc --showme:incdirs`"
+#setenv OPENMPI_COMPILE_FLAGS "`$OPENMPI_BIN_DIR/mpicc --showme:compile`"
+#setenv OPENMPI_LINK_FLAGS "`$OPENMPI_BIN_DIR/mpicc --showme:link`"
+
+# Specify system installed ThirdParty packages/libraries
+# NB: The packages installed under $WM_THIRD_PARTY_DIR
+#     will always override these values. 
+#     So build your ThirdParty directory accordingly.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# System installed Mesquite
+#setenv MESQUITE_SYSTEM 1
+#setenv MESQUITE_DIR path_to_system_installed_mesquite
+#setenv MESQUITE_BIN_DIR $MESQUITE_DIR/bin
+#setenv MESQUITE_LIB_DIR $MESQUITE_DIR/lib
+#setenv MESQUITE_INCLUDE_DIR $MESQUITE_DIR/include
+
+# System installed Metis
+#setenv METIS_SYSTEM 1
+#setenv METIS_DIR path_to_system_installed_metis
+#setenv METIS_BIN_DIR $METIS_DIR/bin
+#setenv METIS_LIB_DIR $METIS_DIR/lib
+#setenv METIS_INCLUDE_DIR $METIS_DIR/include
+
+# System installed ParMetis
+#setenv PARMETIS_SYSTEM 1
+#setenv PARMETIS_DIR path_to_system_installed_parmetis
+#setenv PARMETIS_BIN_DIR $PARMETIS_DIR/bin
+#setenv PARMETIS_LIB_DIR $PARMETIS_DIR/lib
+#setenv PARMETIS_INCLUDE_DIR $PARMETIS_DIR/include
+
+# System installed ParMGridgen
+#setenv PARMGRIDGEN_SYSTEM 1
+#setenv PARMGRIDGEN_DIR path_to_system_installed_parmgridgen
+#setenv PARMGRIDGEN_BIN_DIR $PARMGRIDGEN_DIR/bin
+#setenv PARMGRIDGEN_LIB_DIR $PARMGRIDGEN_DIR/lib
+#setenv PARMGRIDGEN_INCLUDE_DIR $PARMGRIDGEN_DIR/include
+
+# System installed Scotch
+#setenv SCOTCH_SYSTEM 1
+#setenv SCOTCH_DIR path_to_system_installed_scotch
+#setenv SCOTCH_BIN_DIR $SCOTCH_DIR/bin
+#setenv SCOTCH_LIB_DIR $SCOTCH_DIR/lib
+#setenv SCOTCH_INCLUDE_DIR $SCOTCH_DIR/include
+
+# System installed CMake
+#setenv CMAKE_SYSTEM 1
+#setenv CMAKE_DIR path_to_system_installed_cmake
+#setenv CMAKE_BIN_DIR $CMAKE_DIR/bin
+
+# System installed Python
+#setenv PYTHON_SYSTEM 1
+#setenv PYTHON_DIR path_to_system_installed_python
+#setenv PYTHON_BIN_DIR $PYTHON_DIR/bin
+
+# System installed Qt
+# This is the only package we assume is system installed by default.
+# So we don't use a variable called QT_SYSTEM, but instead a variable
+# called QT_THIRD_PARTY in order to override to the ThirdParty QT
+# package.
+#setenv QT_THIRD_PARTY 1
+#setenv QT_DIR path_to_system_installed_qt
+#setenv QT_BIN_DIR $QT_DIR/bin
+
+# System installed ParaView
+#setenv PARAVIEW_SYSTEM 1
+#setenv PARAVIEW_DIR path_to_system_installed_paraview
+#setenv PARAVIEW_BIN_DIR $PARAVIEW_DIR/bin
+
 
 # Specify ParaView version
 # ~~~~~~~~~~~~~~~~~~~~~~~~
-setenv ParaView_VERSION git        # eg, cvs/git version
-setenv ParaView_MAJOR 3.7
+#setenv ParaView_VERSION git        # eg, cvs/git version
+#setenv ParaView_MAJOR 3.7
 
 # ----------------------------------------------------------------- end-of-file

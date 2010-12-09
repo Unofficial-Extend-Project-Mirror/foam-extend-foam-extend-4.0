@@ -187,32 +187,21 @@ case "$WM_MPLIB" in
 OPENMPI)
     if [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3 ]
         then
-        if [ "$FOAM_VERBOSE" -a "$PS1" ]
-        then
-            echo "Using openmpi-1.4.3"
-        fi
         mpi_version=openmpi-1.4.3
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.sh
-
-        export MPI_HOME=$WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS
-        export MPI_ARCH_PATH=$MPI_HOME
-
-        # Tell OpenMPI where to find its install directory
-        export OPAL_PREFIX=$MPI_ARCH_PATH
-    elif [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.1 ]
-        then
         if [ "$FOAM_VERBOSE" -a "$PS1" ]
         then
-            echo "Using openmpi-1.4.1"
+            echo "Using openmpi-1.4.3 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
         fi
-        mpi_version=openmpi-1.4.1
         _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.sh
 
-        export MPI_HOME=$WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS
-        export MPI_ARCH_PATH=$MPI_HOME
-
-        # Tell OpenMPI where to find its install directory
-        export OPAL_PREFIX=$MPI_ARCH_PATH
+    elif [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.5 ]
+        then
+        mpi_version=openmpi-1.5
+        if [ "$FOAM_VERBOSE" -a "$PS1" ]
+        then
+            echo "Using openmpi-1.5 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
+        fi
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.sh
     fi
 
     export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
@@ -223,23 +212,79 @@ SYSTEMOPENMPI)
     mpi_version=openmpi-system
 
     # make sure not the "old" mpi is used 
-    export OPAL_PREFIX=
+    # Not sure if this is necessary anymore.
+    # export OPAL_PREFIX=
+
+    # Make sure OPENMPI_BIN_DIR is set and valid
+    if [ -n "${OPENMPI_BIN_DIR}" ] && [ -d "${OPENMPI_BIN_DIR}" ] 
+    then
+	# User defined value specified for OPENMPI_BIN_DIR
+	#
+	# WARNING:
+	#          We assume this path specified by $OPENMPI_BIN_DIR is valid
+	#          We assume the command mpicc is located somewhere under this path
+	#          We assume the file mpi.h is located somewhere under this path
+	#
+        #          Otherwise, please double check your openmpi installation, you are
+	#          probably missing the openmpi runtime and/or development packages
+	#          available for your system.
+	#
+	_foamAddPath $OPENMPI_BIN_DIR
+    else
+	# Here, we assume your environment is already set for running
+	# and developping with openmpi.
+	#
+	# Initialize OPENMPI_BIN_DIR using the path to mpicc 
+	export OPENMPI_BIN_DIR=$(dirname `which mpicc`)
+    fi
+
+    # Make sure OPENMPI_LIB_DIR is set
+    if [ ! -n "${OPENMPI_LIB_DIR}" ]
+    then
+	# Initialize OPENMPI_LIB_DIR using the path to mpicc 
+	export OPENMPI_LIB_DIR="`mpicc --showme:libdirs`"
+    fi
+
+    # Make sure the dynamic libraries are accessible
+    [   -n "${OPENMPI_LIB_DIR}" ]       && _foamAddLib $OPENMPI_LIB_DIR
+
+    export MPI_HOME=`dirname $OPENMPI_BIN_DIR`
+    export MPI_ARCH_PATH=$MPI_HOME
+    export OPAL_PREFIX=$MPI_ARCH_PATH
+
+    # We initialize the rest of the environment using mpicc --showme:
+    [ ! -n "${OPENMPI_INCLUDE_DIR}" ]   && export OPENMPI_INCLUDE_DIR="`mpicc --showme:incdirs`"
+    [ ! -n "${OPENMPI_COMPILE_FLAGS}" ] && export OPENMPI_COMPILE_FLAGS="`mpicc --showme:compile`"
+    [ ! -n "${OPENMPI_LINK_FLAGS}" ]    && export OPENMPI_LINK_FLAGS="`mpicc --showme:link`"
+
+    #
+    # WARNING: We assume the file mpi.h will be available under the directories identified
+    #          by the variable $OPENMPI_INCLUDE_DIR. Otherwise, please double check your
+    #          system openmpi installation.
 
     # Set compilation flags here instead of in wmake/rules/../mplibSYSTEMOPENMPI
-    export PINC=`mpicc --showme:compile` 
-    export PLIBS="`mpicc --showme:link`"
-    libDir=`echo "$PLIBS" | sed -e 's/.*-L\([^ ]*\).*/\1/'`
+    export PINC=$OPENMPI_COMPILE_FLAGS
+    export PLIBS=$OPENMPI_LINK_FLAGS
+
+    # No longer needed, but we keep this as a reference, just in case...
+    #libDir=`echo "$PLIBS" | sed -e 's/.*-L\([^ ]*\).*/\1/'`
+    #_foamAddLib $libDir
 
     if [ "$FOAM_VERBOSE" -a "$PS1" ]
     then
-        echo "Using system installed MPI:"
-        echo "    compile flags : $PINC"
-        echo "    link flags    : $PLIBS"
-        echo "    libmpi dir    : $libDir"
+        echo "Using system installed OpenMPI:"
+        echo "    OPENMPI_BIN_DIR       : $OPENMPI_BIN_DIR"
+        echo "    OPENMPI_LIB_DIR       : $OPENMPI_LIB_DIR"
+        echo "    OPENMPI_INCLUDE_DIR   : $OPENMPI_INCLUDE_DIR"
+        echo "    OPENMPI_COMPILE_FLAGS : $OPENMPI_COMPILE_FLAGS"
+        echo "    OPENMPI_LINK_FLAGS    : $OPENMPI_LINK_FLAGS"
+        echo ""
+        echo "    MPI_HOME              : $MPI_HOME"
+        echo "    MPI_ARCH_PATH         : $MPI_ARCH_PATH"
+        echo "    OPAL_PREFIX           : $OPAL_PREFIX"
+        echo "    PINC                  : $PINC"
+        echo "    PLIBS                 : $PLIBS"
     fi
-
-    _foamAddLib $libDir
-
 
     export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
     unset mpi_version
@@ -372,79 +417,79 @@ export MPI_BUFFER_SIZE
 # Third party packages
 #
 # In order to use a pre-installed version of the ThirdParty packages, just set the
-# appropriate XXX_DIR environment variable for a given package in order to disable 
-# the sourcing of the ThirdParty version of the same package.
+# appropriate XXX_SYSTEM environment variable for a given package in your prefs.sh
+# file in order to disable the sourcing of the ThirdParty version of the same package.
 
 # Load Mesquite library 
 # ~~~~~~~~~~~~~~~~~~~~~~
-[ -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2 ] && {
+[ -z "$MESQUITE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2 ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS/etc/mesquite-2.1.2.sh
 }
-[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "MESQUITE_DIR is initialized to: $MESQUITE_DIR"
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    MESQUITE_DIR is initialized to: $MESQUITE_DIR"
 
 
 # Load Metis library 
 # ~~~~~~~~~~~~~~~~~~
-[ -e $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2 ] && {
+[ -z "$METIS_SYSTEM" ] && [ -d $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2 ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS/etc/metis-5.0pre2.sh
 }
-[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "METIS_DIR is initialized to: $METIS_DIR"
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    METIS_DIR is initialized to: $METIS_DIR"
 
 
 # Load ParMetis library
 # ~~~~~~~~~~~~~~~~~~~~~
-[ -e $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1 ] && {
+[ -z "$PARMETIS_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1 ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1/platforms/$WM_OPTIONS/etc/ParMetis-3.1.1.sh
 }
-[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "PARMETIS_DIR is initialized to: $PARMETIS_DIR"
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARMETIS_DIR is initialized to: $PARMETIS_DIR"
 
 
 # Load ParMGridGen library 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
-[ -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0 ] && {
+[ -z "$PARMGRIDGEN_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0 ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS/etc/ParMGridGen-1.0.sh
 }
-[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "PARMGRIDGEN_DIR is initialized to: $PARMGRIDGEN_DIR"
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARMGRIDGEN_DIR is initialized to: $PARMGRIDGEN_DIR"
 
 
 # Load Scotch library
 # ~~~~~~~~~~~~~~~~~~~
-[ -e $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b ] && {
+[ -z "$SCOTCH_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b/platforms/$WM_OPTIONS/etc/scotch-5.1.10b.sh
 }
-[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "SCOTCH_DIR is initialized to: $SCOTCH_DIR"
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    SCOTCH_DIR is initialized to: $SCOTCH_DIR"
 
 
 # Load cmake
 # ~~~~~~~~~~
-[ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3 ] && {
+[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3 ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3/platforms/$WM_OPTIONS/etc/cmake-2.8.3.sh
 }
-[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "CMAKE_DIR is initialized to: $CMAKE_DIR"
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    CMAKE_DIR is initialized to: $CMAKE_DIR"
 
 
 # Load Python
 # ~~~~~~~~~~~
-[ -e $WM_THIRD_PARTY_DIR/packages/Python-2.7 ] && {
+[ -z "$PYTHON_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/Python-2.7 ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/Python-2.7/platforms/$WM_OPTIONS/etc/Python-2.7.sh
 }
-[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "PYTHON_DIR is initialized to: $PYTHON_DIR"
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PYTHON_DIR is initialized to: $PYTHON_DIR"
 
 
 # Load QT
 # ~~~~~~~
-[ -e $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.0 ] && {
+[ ! -z "$QT_THIRD_PARTY" ] && [ -e $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.0 ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.0/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.7.0.sh
 }
-[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "QT_DIR is initialized to: $QT_DIR"
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    QT_DIR is initialized to: $QT_DIR"
 
 
 # Load ParaView
 # ~~~~~~~~~~~~~
-[ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1 ] && {
+[ -z "$PARAVIEW_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1 ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.sh
 }
-[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "PARAVIEW_DIR is initialized to: $PARAVIEW_DIR"
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARAVIEW_DIR is initialized to: $PARAVIEW_DIR"
 
 
 # cleanup environment:

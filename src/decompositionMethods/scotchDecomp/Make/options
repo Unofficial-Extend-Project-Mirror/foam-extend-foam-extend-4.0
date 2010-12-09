@@ -1,7 +1,7 @@
 EXE_INC = \
-    -I$(SCOTCH_DIR)/include \
+    -I$(SCOTCH_INCLUDE_DIR) \
     -I../decompositionMethods/lnInclude
 
 LIB_LIBS = \
-    -L$(SCOTCH_DIR)/lib -lscotch \
-    -L$(SCOTCH_DIR)/lib -lscotcherrexit
+    -L$(SCOTCH_LIB_DIR) -lscotch \
+    -L$(SCOTCH_LIB_DIR) -lscotcherrexit
