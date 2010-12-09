@@ -293,6 +293,7 @@ void qZeta::correct()
     (
         fvm::ddt(zeta_)
       + fvm::div(phi_, zeta_)
+      + fvm::SuSp(-fvc::div(phi_), zeta_)
       - fvm::laplacian(DzetaEff(), zeta_)
      ==
         (2.0*C1_ - 1)*G*zeta_/q_
@@ -311,6 +312,7 @@ void qZeta::correct()
     (
         fvm::ddt(q_)
       + fvm::div(phi_, q_)
+      + fvm::SuSp(-fvc::div(phi_), q_)
       - fvm::laplacian(DqEff(), q_)
      ==
         G - fvm::Sp(zeta_/q_, q_)
