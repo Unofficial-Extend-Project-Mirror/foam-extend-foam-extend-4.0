@@ -11,7 +11,7 @@ packaging of the ThirdParty packages.
 The RPM suite of tools was selected to develop a first prototype.  
 The whole process needs to run and install in user-space, without the need to
 be root for installing the packages.  
- 
+
 Here is what's available:
  
  a: A set of rpm spec files for specific ThirdParty packages.
@@ -22,6 +22,14 @@ Here is what's available:
     OF-1.6-ext. 
  d: A simple mecanism that allows replacing any of the ThirdParty packages by
     a system installed package instead. 
+
+
+Pre-requisite:
+--------------
+You will need a working installation of the commands 'rpm' and 'rpmbuild' on 
+your system in order to compile and install the ThirdParty packages.
+Please check your system installation first.
+
 
 Quick description of the main scripts:
 -------------------------------------- 
