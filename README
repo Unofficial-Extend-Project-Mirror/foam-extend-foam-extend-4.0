@@ -80,14 +80,14 @@
     appropriate resource file. Here is a bash/ksh/sh example:
 
 	+ export FOAM_INST_DIR=/data/app/OpenFOAM
-    + foamDotFile=$FOAM_INST_DIR/OpenFOAM-<VERSION>/etc/bashrc
-    + [ -f $foamDotFile ] && . $foamDotFile
+        + foamDotFile=$FOAM_INST_DIR/OpenFOAM-<VERSION>/etc/bashrc
+        + [ -f $foamDotFile ] && . $foamDotFile
 
     and a csh/tcsh example:
 
 	+ setenv FOAM_INST_DIR /data/app/OpenFOAM
-    + foamDotFile=$FOAM_INST_DIR/OpenFOAM-<VERSION>/etc/bashrc
-    + if ( -f $foamDotFile ) source $foamDotFile
+        + set foamDotFile=$FOAM_INST_DIR/OpenFOAM-<VERSION>/etc/cshrc
+        + if ( -f $foamDotFile ) source $foamDotFile
 
     The value set in '$FOAM_INST_DIR' will be used to locate the remaining parts
     of the OpenFOAM installation.
@@ -141,7 +141,7 @@
 
   Run the first example case of incompressible laminar flow in a cavity:
 
-  + cd $HOME/OpenFOAM/${USER}-${WM_PROJECT_VERSION}/run/tutorials/icoFoam/cavity
+  + cd $HOME/OpenFOAM/${USER}-${WM_PROJECT_VERSION}/run/tutorials/incompressible/icoFoam/cavity
   + blockMesh
   + icoFoam
   + paraFoam

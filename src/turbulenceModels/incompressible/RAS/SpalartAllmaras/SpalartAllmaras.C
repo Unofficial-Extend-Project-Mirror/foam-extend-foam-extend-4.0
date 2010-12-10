@@ -364,7 +364,8 @@ void SpalartAllmaras::correct()
     volScalarField fv1 = this->fv1(chi);
 
     volScalarField Stilda =
-        fv3(chi, fv1)*::sqrt(2.0)*mag(skew(fvc::grad(U_)))
+//        fv3(chi, fv1)*::sqrt(2.0)*mag(skew(fvc::grad(U_)))
+        sqrt(2.0)*mag(skew(fvc::grad(U_)))
       + fv2(chi, fv1)*nuTilda_/sqr(kappa_*d_);
 
     tmp<fvScalarMatrix> nuTildaEqn
