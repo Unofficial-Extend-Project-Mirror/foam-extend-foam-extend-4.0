@@ -84,7 +84,10 @@ class processorMeshes
 
 
         //- Read all meshes
-        void read();
+        void readMeshes();
+
+        //- Read addressing
+        void readAddressing();
 
 
 public:
@@ -116,7 +119,7 @@ public:
         }
 
         //- Return face-processor addressing arrays
-        PtrList<labelIOList>& faceProcAddressing()
+        const PtrList<labelIOList>& faceProcAddressing() const
         {
             return faceProcAddressing_;
         }

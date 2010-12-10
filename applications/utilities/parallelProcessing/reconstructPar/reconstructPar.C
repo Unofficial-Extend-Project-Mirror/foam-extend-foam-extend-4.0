@@ -132,11 +132,6 @@ int main(int argc, char *argv[])
     // Read all meshes and addressing to reconstructed mesh
     processorMeshes procMeshes(databases, regionName);
 
-
-    // Check face addressing for meshes that have been decomposed
-    // with a very old foam version
-#   include "checkFaceAddressingComp.H"
-
     // Loop over all times
     forAll (timeDirs, timeI)
     {

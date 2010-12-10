@@ -402,7 +402,7 @@ bool domainDecomposition::writeDecomposition()
                     );
                 }
             }
-        
+
 
             // Face zones
             List<faceZone*> procFz(faceZones().size());

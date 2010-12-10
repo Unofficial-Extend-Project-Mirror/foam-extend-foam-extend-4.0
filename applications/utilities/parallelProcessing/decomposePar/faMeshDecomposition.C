@@ -43,7 +43,6 @@ void faMeshDecomposition::distributeFaces()
 
     cpuTime decompositionTime;
 
-
     for (label procI = 0; procI < nProcs(); procI++)
     {
         Time processorDb
@@ -76,15 +75,14 @@ void faMeshDecomposition::distributeFaces()
             )
         );
 
-        forAll(faceLabels(), faceI)
+        forAll (faceLabels(), faceI)
         {
-            if(findIndex(faceProcAddressing, faceLabels()[faceI]+1) > -1)
+            if (findIndex(faceProcAddressing, faceLabels()[faceI] + 1) > -1)
             {
                 faceToProc_[faceI] = procI;
             }
         }
-    }    
-
+    }
 
     Info<< "\nFinished decomposition in "
         << decompositionTime.elapsedCpuTime()
@@ -147,7 +145,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
 {
     // Decide which cell goes to which processor
     distributeFaces();
-    
+
     Info<< "\nDistributing faces to processors" << endl;
 
     // Memory management
@@ -177,7 +175,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
     }
 
 
-    // Find processor mesh faceLabels and ... 
+    // Find processor mesh faceLabels and ...
 
     for (label procI = 0; procI < nProcs(); procI++)
     {
@@ -232,7 +230,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
         forAll(curProcFaceAddressing, faceI)
         {
-            curFaceLabels[faceI] = 
+            curFaceLabels[faceI] =
                 findIndex
                 (
                     fvFaceProcAddressing,
@@ -254,7 +252,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
         edgeList edges(patch.nEdges());
 
         label edgeI = -1;
-        
+
         label nIntEdges = patch.nInternalEdges();
 
         for (label curEdge = 0; curEdge < nIntEdges; curEdge++)
@@ -265,7 +263,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
         forAll (boundary(), patchI)
         {
-            // Include emptyFaPatch 
+            // Include emptyFaPatch
 
             label size = boundary()[patchI].labelList::size();
 
@@ -281,17 +279,16 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
         const vectorField& procPoints = procPatch.localPoints();
         const labelList& procMeshPoints = procPatch.meshPoints();
         const edgeList& procEdges = procPatch.edges();
-        
+
         labelList& curPatchPointAddressing = procPatchPointAddressing_[procI];
         curPatchPointAddressing.setSize(procPoints.size(), -1);
 
         forAll(procPoints, pointI)
         {
-            curPatchPointAddressing[pointI] = 
+            curPatchPointAddressing[pointI] =
                 map[fvPointProcAddressing[procMeshPoints[pointI]]];
         }
 
-        
         labelList& curPatchEdgeAddressing = procPatchEdgeAddressing_[procI];
         curPatchEdgeAddressing.setSize(procEdges.size(), -1);
 
@@ -326,8 +323,8 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
     Info << "\nDistributing edges to processors" << endl;
 
-    // Loop through all internal edges and decide which processor they 
-    // belong to. First visit all internal edges. 
+    // Loop through all internal edges and decide which processor they
+    // belong to. First visit all internal edges.
 
     // set references to the original mesh
     const faBoundaryMesh& patches = boundary();
@@ -399,7 +396,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
                         SLList<label>::iterator curInterProcBdrsNeiIter =
                             interProcBoundaries[neighbourProc].begin();
 
-                        SLList<SLList<label> >::iterator 
+                        SLList<SLList<label> >::iterator
                             curInterProcBEdgesNeiIter =
                             interProcBEdges[neighbourProc].begin();
 
@@ -494,7 +491,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
             {
                 // Normal patch. Add edges to processor where the face
                 // next to the edge lives
-                
+
                 const labelListList& eF = patch().edgeFaces();
 
                 label size = patches[patchI].labelList::size();
@@ -562,7 +559,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
                         SLList<label>::iterator curInterProcBdrsOwnIter =
                             interProcBoundaries[ownerProc].begin();
 
-                        SLList<SLList<label> >::iterator 
+                        SLList<SLList<label> >::iterator
                             curInterProcBEdgesOwnIter =
                             interProcBEdges[ownerProc].begin();
 
@@ -687,7 +684,6 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
                         // Note: I cannot add the other side of the cyclic
                         // boundary here because this would violate the order.
                         // They will be added in a separate loop below
-                        // 
                     }
                 }
 
@@ -738,7 +734,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
             // calculate the size
             label nEdgesOnProcessor = curProcEdges.size();
 
-            for 
+            for
             (
                 SLList<SLList<label> >::iterator curInterProcBEdgesIter =
                     interProcBEdges[procI].begin();
@@ -761,7 +757,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
             // Add internal and boundary edges
             // Remember to increment the index by one such that the
-            // turning index works properly.  
+            // turning index works properly.
             for
             (
                 SLList<label>::iterator curProcEdgeIter = curProcEdges.begin();
@@ -832,7 +828,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
                     // add the edges
 
                     // Remember to increment the index by one such that the
-                    // turning index works properly.  
+                    // turning index works properly.
                     if (faceToProc_[owner[curEdgesIter()]] == procI)
                     {
                         curProcEdgeAddressing[nEdges] = curEdgesIter();
@@ -963,7 +959,6 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
                 {
                     // Mark the original edge as used
                     // Remember to decrement the index by one (turning index)
-                    // 
                     const label curE = curEdgeLabels[edgeI];
 
                     const edge& e = edges[curE];
@@ -991,13 +986,13 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
     }
 
 
-    // Edge label for faPatch-es 
+    // Edge label for faPatches
 
     for (label procI = 0; procI < nProcs(); procI++)
     {
         fileName processorCasePath
         (
-            time().caseName()/fileName(word("processor") 
+            time().caseName()/fileName(word("processor")
           + Foam::name(procI))
         );
 
@@ -1034,16 +1029,17 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
         const labelList& curPatchStartIndex = procPatchStartIndex_[procI];
         const labelList& curPatchSize = procPatchSize_[procI];
 
-        const labelList& curProcessorPatchStartIndex = 
+        const labelList& curProcessorPatchStartIndex =
             procProcessorPatchStartIndex_[procI];
-        const labelList& curProcessorPatchSize = 
+
+        const labelList& curProcessorPatchSize =
             procProcessorPatchSize_[procI];
 
         labelListList& curPatchEdgeLabels = procPatchEdgeLabels_[procI];
         curPatchEdgeLabels =
             labelListList
             (
-                curPatchSize.size() 
+                curPatchSize.size()
               + curProcessorPatchSize.size()
             );
 
@@ -1056,7 +1052,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
             for
             (
-                int i=curPatchStartIndex[patchI]; 
+                int i=curPatchStartIndex[patchI];
                 i<(curPatchStartIndex[patchI]+curPatchSize[patchI]);
                 i++
             )
@@ -1077,7 +1073,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
             for
             (
-                int i=curProcessorPatchStartIndex[patchI]; 
+                int i=curProcessorPatchStartIndex[patchI];
                 i<(curProcessorPatchStartIndex[patchI]
                 +curProcessorPatchSize[patchI]);
                 i++
@@ -1088,7 +1084,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
                 edgeI++;
             }
         }
-    }    
+    }
 }
 
 
@@ -1158,9 +1154,9 @@ bool faMeshDecomposition::writeDecomposition()
             procFvMesh,
             procFaceLabels_[procI]
         );
-        
+
         // Create processor boundary patches
-        const labelList& curBoundaryAddressing = 
+        const labelList& curBoundaryAddressing =
             procBoundaryAddressing_[procI];
 
         const labelList& curPatchSizes = procPatchSize_[procI];
@@ -1171,7 +1167,7 @@ bool faMeshDecomposition::writeDecomposition()
         const labelList& curProcessorPatchSizes =
             procProcessorPatchSize_[procI];
 
-        const labelListList& curPatchEdgeLabels = 
+        const labelListList& curPatchEdgeLabels =
             procPatchEdgeLabels_[procI];
 
         const faPatchList& meshPatches = boundary();
@@ -1189,7 +1185,7 @@ bool faMeshDecomposition::writeDecomposition()
         {
             const labelList& curEdgeLabels = curPatchEdgeLabels[nPatches];
 
-            label ngbPolyPatchIndex = 
+            label ngbPolyPatchIndex =
                 findIndex
                 (
                     fvBoundaryProcAddressing,
@@ -1261,7 +1257,7 @@ bool faMeshDecomposition::writeDecomposition()
                     procMesh.boundary()[patchi]
                 );
 
-                Info<< "    Number of edges shared with processor " 
+                Info<< "    Number of edges shared with processor "
                     << ppp.neighbProcNo() << " = " << ppp.size() << endl;
 
                 nProcPatches++;

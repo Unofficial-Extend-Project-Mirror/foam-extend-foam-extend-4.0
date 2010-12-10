@@ -30,7 +30,7 @@ License
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::processorMeshes::read()
+void Foam::processorMeshes::readMeshes()
 {
     forAll (databases_, procI)
     {
@@ -47,7 +47,14 @@ void Foam::processorMeshes::read()
                 )
             )
         );
+    }
+}
 
+
+void Foam::processorMeshes::readAddressing()
+{
+    forAll (databases_, procI)
+    {
         pointProcAddressing_.set
         (
             procI,
@@ -135,33 +142,24 @@ Foam::processorMeshes::processorMeshes
     cellProcAddressing_(databases.size()),
     boundaryProcAddressing_(databases.size())
 {
-    read();
+    readMeshes();
+    readAddressing();
 }
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::fvMesh::readUpdateState Foam::processorMeshes::readUpdate()
+Foam::polyMesh::readUpdateState Foam::processorMeshes::readUpdate()
 {
-    fvMesh::readUpdateState stat = fvMesh::UNCHANGED;
+    polyMesh::readUpdateState stat = polyMesh::UNCHANGED;
 
     forAll (databases_, procI)
     {
         // Check if any new meshes need to be read.
-        fvMesh::readUpdateState procStat = meshes_[procI].readUpdate();
-
-        /*
-        if (procStat != fvMesh::UNCHANGED)
-        {
-            Info<< "Processor " << procI
-                << " at time " << databases_[procI].timeName()
-                << " detected mesh change " << procStat
-                << endl;
-        }
-        */
+        polyMesh::readUpdateState procStat = meshes_[procI].readUpdate();
 
         // Combine into overall mesh change status
-        if (stat == fvMesh::UNCHANGED)
+        if (stat == polyMesh::UNCHANGED)
         {
             stat = procStat;
         }
@@ -182,50 +180,29 @@ Foam::fvMesh::readUpdateState Foam::processorMeshes::readUpdate()
         }
     }
 
+    // Reading of meshes removed: readUpdate will do this
     if
     (
-        stat == fvMesh::TOPO_CHANGE
-     || stat == fvMesh::TOPO_PATCH_CHANGE
+        stat == polyMesh::TOPO_CHANGE
+     || stat == polyMesh::TOPO_PATCH_CHANGE
     )
     {
-        // Reread all meshes and addresssing
-        read();
+        // Reread addressing; meshes are already updated with readUpdate.
+        readAddressing();
     }
+
     return stat;
 }
 
 
 void Foam::processorMeshes::reconstructPoints(fvMesh& mesh)
 {
-    // Read the field for all the processors
-    PtrList<pointIOField> procsPoints(meshes_.size());
-
-    forAll (meshes_, procI)
-    {
-        procsPoints.set
-        (
-            procI,
-            new pointIOField
-            (
-                IOobject
-                (
-                    "points",
-                    meshes_[procI].time().timeName(),
-                    polyMesh::meshSubDir,
-                    meshes_[procI],
-                    IOobject::MUST_READ,
-                    IOobject::NO_WRITE
-                )
-            )
-        );
-    }
-
     // Create the new points
     vectorField newPoints(mesh.nPoints());
 
     forAll (meshes_, procI)
     {
-        const vectorField& procPoints = procsPoints[procI];
+        const vectorField& procPoints = meshes_[procI].allPoints();
 
         // Set the cell values in the reconstructed field
 
