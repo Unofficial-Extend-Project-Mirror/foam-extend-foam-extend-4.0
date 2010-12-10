@@ -189,6 +189,7 @@ bool Foam::Time::read()
     if (controlDict_.regIOobject::read())
     {
         readDict();
+
         return true;
     }
     else
@@ -210,7 +211,9 @@ void Foam::Time::readModifiedObjects()
 
         if (Pstream::parRun())
         {
-            anyModified = controlDict_.modified() || objectRegistry::modified();
+            anyModified = controlDict_.modified()
+                || objectRegistry::modified();
+
             bool anyModifiedOnThisProc = anyModified;
             reduce(anyModified, andOp<bool>());
 
