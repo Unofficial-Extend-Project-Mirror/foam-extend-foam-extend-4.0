@@ -195,11 +195,12 @@ public:
 
             //- Return a list of pointers for each patch field with only those
             //  pointing to block-coupled interfaces being set
-            typename BlockLduInterfaceFieldPtrsList<Type>::Type blockInterfaces() const;
-            
+            typename BlockLduInterfaceFieldPtrsList<Type>::Type
+            blockInterfaces() const;
+
             //- Write boundary field as dictionary entry
             void writeEntry(const word& keyword, Ostream& os) const;
- 
+
 
         // Member operators
 
@@ -229,7 +230,7 @@ private:
 
     // Private data
 
-        //- Current time index.  
+        //- Current time index
         //  Used to trigger the storing of the old-time value
         mutable label timeIndex_;
 
@@ -400,8 +401,18 @@ public:
             const wordList& patchFieldTypes
         );
 
+        //- Clone
+        tmp<GeometricField<Type, PatchField, GeoMesh> > clone() const
+        {
+            return tmp<GeometricField<Type, PatchField, GeoMesh> >
+            (
+                new GeometricField<Type, PatchField, GeoMesh>(*this)
+            );
+        }
+
 
     //- Destructor
+
         virtual ~GeometricField();
 
 
@@ -411,7 +422,8 @@ public:
         DimensionedInternalField& dimensionedInternalField();
 
         //- Return dimensioned internal field
-        inline const DimensionedInternalField& dimensionedInternalField() const;
+        inline const DimensionedInternalField&
+        dimensionedInternalField() const;
 
         //- Return internal field
         InternalField& internalField();

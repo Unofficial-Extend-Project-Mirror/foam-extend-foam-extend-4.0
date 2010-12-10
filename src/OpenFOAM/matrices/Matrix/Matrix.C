@@ -206,8 +206,10 @@ void Foam::Matrix<Form, Type>::operator=(const Matrix<Form, Type>& a)
 {
     if (this == &a)
     {
-        FatalErrorIn("Matrix<Form, Type>::operator=(const Matrix<Form, Type>&)")
-            << "attempted assignment to self"
+        FatalErrorIn
+        (
+            "Matrix<Form, Type>::operator=(const Matrix<Form, Type>&)"
+        )   << "attempted assignment to self"
             << abort(FatalError);
     }
 
@@ -329,7 +331,8 @@ Form Foam::operator+(const Matrix<Form, Type>& a, const Matrix<Form, Type>& b)
     {
         FatalErrorIn
         (
-            "Matrix<Form, Type>::operator+(const Matrix<Form, Type>&, const Matrix<Form, Type>&)"
+            "Matrix<Form, Type>::operator+(const Matrix<Form, Type>&, "
+            "const Matrix<Form, Type>&)"
         )   << "attempted add matrices with different number of rows: "
             << a.n() << ", " << b.n()
             << abort(FatalError);
@@ -339,7 +342,8 @@ Form Foam::operator+(const Matrix<Form, Type>& a, const Matrix<Form, Type>& b)
     {
         FatalErrorIn
         (
-            "Matrix<Form, Type>::operator+(const Matrix<Form, Type>&, const Matrix<Form, Type>&)"
+            "Matrix<Form, Type>::operator+(const Matrix<Form, Type>&, "
+            "const Matrix<Form, Type>&)"
         )   << "attempted add matrices with different number of columns: "
             << a.m() << ", " << b.m()
             << abort(FatalError);
@@ -368,7 +372,8 @@ Form Foam::operator-(const Matrix<Form, Type>& a, const Matrix<Form, Type>& b)
     {
         FatalErrorIn
         (
-            "Matrix<Form, Type>::operator-(const Matrix<Form, Type>&, const Matrix<Form, Type>&)"
+            "Matrix<Form, Type>::operator-(const Matrix<Form, Type>&, "
+            "const Matrix<Form, Type>&)"
         )   << "attempted add matrices with different number of rows: "
             << a.n() << ", " << b.n()
             << abort(FatalError);
@@ -378,7 +383,8 @@ Form Foam::operator-(const Matrix<Form, Type>& a, const Matrix<Form, Type>& b)
     {
         FatalErrorIn
         (
-            "Matrix<Form, Type>::operator-(const Matrix<Form, Type>&, const Matrix<Form, Type>&)"
+            "Matrix<Form, Type>::operator-(const Matrix<Form, Type>&, "
+            "const Matrix<Form, Type>&)"
         )   << "attempted add matrices with different number of columns: "
             << a.m() << ", " << b.m()
             << abort(FatalError);
