@@ -171,6 +171,16 @@ Patch0:                 ParaView-3.8.1.patch_darwin
     make -j $WM_NCOMPPROCS
 
 %install
+    # On OpenSUSE, rpmbuild, will choke when detecting unreferenced symlinks
+    # created during installation.
+    # Qt version 4.6.3 will generate some unreferenced symlinks when
+    # ParaView is compiled and installed. By enabling the following
+    # environment variable, the command brp-symlink will still complain
+    # about missing link targets, but it won't stop rpmbuild from generating
+    # the final rpm.
+    # For all other Unix distros, this is a no-op.
+    export NO_BRP_STALE_LINK_ERROR=yes
+
     cd buildObj
     make install
 
@@ -188,6 +198,10 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export PARAVIEW_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+export PARAVIEW_BIN_DIR=\$PARAVIEW_DIR/bin
+export PARAVIEW_LIB_DIR=\$PARAVIEW_DIR/lib
+export PARAVIEW_INCLUDE_DIR=\$PARAVIEW_DIR/include
+
 export PARAVIEW_VERSION=%{version}
 
 # NB: It is important to set the PV_PLUGIN_PATH location to a directory containing only the ParaView plugins.
@@ -197,15 +211,15 @@ export PARAVIEW_VERSION=%{version}
 #     startup of paraview or even make paraview crash on startup.
 export PV_PLUGIN_PATH=\$FOAM_LIBBIN/paraview_plugins
 
-[ -d \$PARAVIEW_DIR/lib/paraview-3.8 ] && _foamAddLib \$PARAVIEW_DIR/lib/paraview-3.8
+[ -d \$PARAVIEW_LIB_DIR/paraview-3.8 ] && _foamAddLib \$PARAVIEW_LIB_DIR/paraview-3.8
 
 # Enable access to the package applications if present
-[ -d \$PARAVIEW_DIR/bin ] && _foamAddPath \$PARAVIEW_DIR/bin
+[ -d \$PARAVIEW_BIN_DIR ] && _foamAddPath \$PARAVIEW_BIN_DIR
 
 if [ "$WM_ARCH" == "darwinIntel" ]
 then
     # Additional binary path is running on Mac OS X
-    [ -d \$PARAVIEW_DIR/bin/paraview.app/Contents/MacOS ] && _foamAddPath \$PARAVIEW_DIR/bin/paraview.app/Contents/MacOS
+    [ -d \$PARAVIEW_BIN_DIR/paraview.app/Contents/MacOS ] && _foamAddPath \$PARAVIEW_BIN_DIR/paraview.app/Contents/MacOS
 fi
 DOT_SH_EOF
 
@@ -216,6 +230,10 @@ cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.cs
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 setenv PARAVIEW_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+setenv PARAVIEW_BIN_DIR \$PARAVIEW_DIR/bin
+setenv PARAVIEW_LIB_DIR \$PARAVIEW_DIR/lib
+setenv PARAVIEW_INCLUDE_DIR \$PARAVIEW_INCLUDE_DIR/include
+
 setenv PARAVIEW_VERSION %{version}
 
 # NB: It is important to set the PV_PLUGIN_PATH location to a directory containing only the ParaView plugins.
@@ -225,17 +243,18 @@ setenv PARAVIEW_VERSION %{version}
 #     startup of paraview or even make paraview crash on startup.
 setenv PV_PLUGIN_PATH \$FOAM_LIBBIN/paraview_plugins
 
-if ( -e \$PARAVIEW_DIR/lib/paraview-3.8 ) then
-    _foamAddLib \$PARAVIEW_DIR/lib/paraview-3.8
+if ( -e \$PARAVIEW_BIN_DIR ) then
+    _foamAddPath \$PARAVIEW_BIN_DIR
 endif
 
-if ( -e \$PARAVIEW_DIR/bin ) then
-    _foamAddPath \$PARAVIEW_DIR/bin
+if ( -e \$PARAVIEW_LIB_DIR/paraview-3.8 ) then
+    _foamAddLib \$PARAVIEW_LIB_DIR/paraview-3.8
 endif
+
 
 # Additional binary path is running on Mac OS X
-if ( -e \$PARAVIEW_DIR/bin/paraview.app/Contents/MacOS ) then
-    _foamAddPath \$PARAVIEW_DIR/bin/paraview.app/Contents/MacOS
+if ( -e \$PARAVIEW_BIN_DIR/paraview.app/Contents/MacOS ) then
+    _foamAddPath \$PARAVIEW_BIN_DIR/paraview.app/Contents/MacOS
 endif
 DOT_CSH_EOF
 

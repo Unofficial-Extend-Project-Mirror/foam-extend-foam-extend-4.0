@@ -115,11 +115,10 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export PYTHON_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+export PYTHON_BIN_DIR=\$PYTHON_DIR/bin
 
-[ -d \$PYTHON_DIR/lib ] && _foamAddLib \$PYTHON_DIR/lib
-
-# Enable access to the package applications if present
-[ -d \$PYTHON_DIR/bin ] && _foamAddPath \$PYTHON_DIR/bin
+# Enable access to the runtime package applications
+[ -d \$PYTHON_BIN_DIR ] && _foamAddPath \$PYTHON_BIN_DIR
 DOT_SH_EOF
 
     #
@@ -129,13 +128,10 @@ cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.cs
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 setenv PYTHON_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+setenv PYTHON_BIN_DIR \$PYTHON_DIR/bin
 
-if ( -e \$PYTHON_DIR/lib ) then
-    _foamAddLib \$PYTHON_DIR/lib
-endif
-
-if ( -e \$PYTHON_DIR/bin ) then
-    _foamAddPath \$PYTHON_DIR/bin
+if ( -e \$PYTHON_BIN_DIR ) then
+    _foamAddPath \$PYTHON_BIN_DIR
 endif
 DOT_CSH_EOF
 

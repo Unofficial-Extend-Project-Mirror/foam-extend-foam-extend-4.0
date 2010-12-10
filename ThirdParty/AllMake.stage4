@@ -57,19 +57,34 @@ echo ========================================
 echo
 
 # qt-everywhere-opensource-src-4.7.0
-#( rpm_make qt-everywhere-opensource-src-4.7.0 http://get.qt.nokia.com/qt/source/qt-everywhere-opensource-src-4.7.0.tar.gz )
-
-# paraview
-if [ -d "$QT_DIR" -a -r "$QT_DIR"/bin/qmake ]
+if [ ! -z "$QT_THIRD_PARTY" ] 
 then
-    ( rpm_make ParaView-3.8.1  http://www.paraview.org/files/v3.8/ParaView-3.8.1.tar.gz \
-        -D '_qmakePath     $QT_DIR/bin/qmake'     
-    )
+    ( rpm_make qt-everywhere-opensource-src-4.7.0 http://get.qt.nokia.com/qt/source/qt-everywhere-opensource-src-4.7.0.tar.gz )
 else
-    echo "WARNING: Skipping the installation of ParaView-3.8.1."
-    echo "WARNING: Please initialize the QT_DIR environment variable to your QT installation directory."
-    echo "WARNING: The command \$QT_DIR/bin/qmake needs to be valid"
-    echo "WARNING: "
+    echo "Using system installed QT"
+    echo ""
+fi
+
+
+# Paraview
+if [ -z "$PARAVIEW_SYSTEM" ] 
+then
+    if [ -d "$QT_BIN_DIR" -a -r "$QT_BIN_DIR"/qmake ]
+    then
+        ( rpm_make ParaView-3.8.1  http://www.paraview.org/files/v3.8/ParaView-3.8.1.tar.gz \
+            -D '_qmakePath     $QT_BIN_DIR/qmake'     
+        )
+    else
+        echo "WARNING: "
+        echo "WARNING: Skipping the installation of ParaView-3.8.1."
+        echo "WARNING: Please make sure the QT_BIN_DIR environment variable properly"
+        echo "WARNING: initialized in the file prefs.sh or prefs.csh"
+        echo "WARNING: The command \$QT_BIN_DIR/qmake needs to be valid"
+        echo "WARNING: "
+    fi
+else
+    echo "Using system installed ParaView"
+    echo ""
 fi
 
 echo ========================================

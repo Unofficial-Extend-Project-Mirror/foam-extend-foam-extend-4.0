@@ -57,16 +57,40 @@ echo ========================================
 echo
 
 # Metis
-( rpm_make metis-5.0pre2   http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.0pre2.tar.gz      )
+if [ -z "$METIS_SYSTEM" ] 
+then
+    ( rpm_make metis-5.0pre2   http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.0pre2.tar.gz      )
+else
+    echo "Using system installed Metis"
+    echo ""
+fi
 
 # ParMGridGen
-( rpm_make ParMGridGen-1.0 http://www.mgnet.org/mgnet/Codes/parmgridgen/ParMGridGen-1.0.tar.gz       )
+if [ -z "$PARMGRIDGEN_SYSTEM" ] 
+then
+    ( rpm_make ParMGridGen-1.0 http://www.mgnet.org/mgnet/Codes/parmgridgen/ParMGridGen-1.0.tar.gz       )
+else
+    echo "Using system installed ParMGridGen"
+    echo ""
+fi
 
 # Libccmio
-#( rpm_make libccmio-2.6.1  )
+#if [ -z "$LIBCCMIO_SYSTEM" ] 
+#then
+#    ( rpm_make libccmio-2.6.1  )
+#else
+#    echo "Using system installed Libccmio"
+#    echo ""
+#fi
 
 # Mesquite
-( rpm_make mesquite-2.1.2  http://software.sandia.gov/~jakraft/mesquite-2.1.2.tar.gz                 )
+if [ -z "$MESQUITE_SYSTEM" ] 
+then
+    ( rpm_make mesquite-2.1.2  http://software.sandia.gov/~jakraft/mesquite-2.1.2.tar.gz                 )
+else
+    echo "Using system installed Mesquite"
+    echo ""
+fi
 
 # The following two packages depends on the availability of OpenMPI
 # The macro rpm_make() will make sure to update the ThirdParty environment variables before starting
@@ -75,10 +99,22 @@ echo
 # the AllMake.stage2 script completed correctly 
 #
 # Scotch
-( rpm_make scotch-5.1.10b  https://gforge.inria.fr/frs/download.php/27583/scotch-5.1.10b.tar.gz  )
+if [ -z "$SCOTCH_SYSTEM" ] 
+then
+    ( rpm_make scotch-5.1.10b  https://gforge.inria.fr/frs/download.php/27583/scotch-5.1.10b.tar.gz  )
+else
+    echo "Using system installed Scotch"
+    echo ""
+fi
 
 # ParMetis
-( rpm_make ParMetis-3.1.1  http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis/ParMetis-3.1.1.tar.gz )
+if [ -z "$PARMETIS_SYSTEM" ] 
+then
+    ( rpm_make ParMetis-3.1.1  http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis/ParMetis-3.1.1.tar.gz )
+else
+    echo "Using system installed ParMetis"
+    echo ""
+fi
 
 echo ========================================
 echo Done ThirdParty AllMake: Stage3

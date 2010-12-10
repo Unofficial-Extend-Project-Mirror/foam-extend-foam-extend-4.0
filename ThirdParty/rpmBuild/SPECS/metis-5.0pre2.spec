@@ -128,11 +128,14 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export METIS_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+export METIS_BIN_DIR=\$METIS_DIR/bin
+export METIS_LIB_DIR=\$METIS_DIR/lib
+export METIS_INCLUDE_DIR=\$METIS_DIR/include
 
-[ -d \$METIS_DIR/lib ] && _foamAddLib \$METIS_DIR/lib
+# Enable access to the package runtime applications and libraries
+[ -d \$METIS_BIN_DIR ] && _foamAddPath \$METIS_BIN_DIR
+[ -d \$METIS_LIB_DIR ] && _foamAddLib  \$METIS_LIB_DIR
 
-# Enable access to the package applications if present
-[ -d \$METIS_DIR/bin ] && _foamAddPath \$METIS_DIR/bin
 DOT_SH_EOF
 
     #
@@ -142,13 +145,16 @@ cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.cs
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 setenv METIS_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+setenv METIS_BIN_DIR \$METIS_DIR/bin
+setenv METIS_LIB_DIR \$METIS_DIR/lib
+setenv METIS_INCLUDE_DIR \$METIS_DIR/include
 
-if ( -e \$METIS_DIR/lib ) then
-    _foamAddLib \$METIS_DIR/lib
+if ( -e \$METIS_BIN_DIR ) then
+    _foamAddPath \$METIS_BIN_DIR
 endif
 
-if ( -e \$METIS_DIR/bin ) then
-    _foamAddPath \$METIS_DIR/bin
+if ( -e \$METIS_LIB_DIR ) then
+    _foamAddLib \$METIS_LIB_DIR
 endif
 DOT_CSH_EOF
 

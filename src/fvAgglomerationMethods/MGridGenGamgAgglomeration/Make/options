@@ -7,9 +7,9 @@ TYPE_REAL=-DTYPE_REAL
 
 EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
-    -I$(PARMGRIDGEN_DIR)/include/Lib    \
-    -I$(PARMGRIDGEN_DIR)/include/IMlib  \
+    -I$(PARMGRIDGEN_INCLUDE_DIR)/Lib    \
+    -I$(PARMGRIDGEN_INCLUDE_DIR)/IMlib  \
     $(TYPE_REAL)
 
 LIB_LIBS = \
-    -L$(PARMGRIDGEN_DIR)/lib -lMGridGen
+    -L$(PARMGRIDGEN_LIB_DIR) -lMGridGen

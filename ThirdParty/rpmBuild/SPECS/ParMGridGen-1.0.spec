@@ -121,11 +121,13 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export PARMGRIDGEN_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+export PARMGRIDGEN_BIN_DIR=\$PARMGRIDGEN_DIR/bin
+export PARMGRIDGEN_LIB_DIR=\$PARMGRIDGEN_DIR/lib
+export PARMGRIDGEN_INCLUDE_DIR=\$PARMGRIDGEN_DIR/include
 
-[ -d \$PARMGRIDGEN_DIR/lib ] && _foamAddLib \$PARMGRIDGEN_DIR/lib
-
-# Enable access to the package applications if present
-[ -d \$PARMGRIDGEN_DIR/bin ] && _foamAddPath \$PARMGRIDGEN_DIR/bin
+# Enable access to the runtime package applications and libraries
+[ -d \$PARMGRIDGEN_BIN_DIR ] && _foamAddPath \$PARMGRIDGEN_BIN_DIR
+[ -d \$PARMGRIDGEN_LIB_DIR ] && _foamAddLib  \$PARMGRIDGEN_LIB_DIR
 DOT_SH_EOF
 
     #
@@ -135,13 +137,16 @@ cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.cs
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 setenv PARMGRIDGEN_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+setenv PARMGRIDGEN_BIN_DIR \$PARMGRIDGEN_DIR/bin
+setenv PARMGRIDGEN_LIB_DIR \$PARMGRIDGEN_DIR/lib
+setenv PARMGRIDGEN_INCLUDE_DIR \$PARMGRIDGEN_DIR/include
 
-if ( -e \$PARMGRIDGEN_DIR/lib ) then
-    _foamAddLib \$PARMGRIDGEN_DIR/lib
+if ( -e \$PARMGRIDGEN_BIN_DIR ) then
+    _foamAddPath \$PARMGRIDGEN_BIN_DIR
 endif
 
-if ( -e \$PARMGRIDGEN_DIR/bin ) then
-    _foamAddPath \$PARMGRIDGEN_DIR/bin
+if ( -e \$PARMGRIDGEN_LIB_DIR ) then
+    _foamAddLib \$PARMGRIDGEN_LIB_DIR
 endif
 DOT_CSH_EOF
 
