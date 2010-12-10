@@ -105,7 +105,9 @@ Group: 			Development/Tools
         --disable-multilib        \
 	--with-gmp=$WM_THIRD_PARTY_DIR/packages/$GMP_VERSION/platforms/$WM_OPTIONS \
 	--with-mpfr=$WM_THIRD_PARTY_DIR/packages/$MPFR_VERSION/platforms/$WM_OPTIONS
-    make
+
+    [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
+    make -j $WM_NCOMPPROCS
 
 %install
     cd ./objBuildDir

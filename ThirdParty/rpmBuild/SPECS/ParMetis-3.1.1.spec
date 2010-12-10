@@ -98,21 +98,9 @@ Patch1:                 ParMetis-3.1.1.patch
     [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
-# Need to remove this later
-#    if [ "$WM_ARCH" == "darwinIntel" ]
-#    then
-#        ARFLAGS="-dynamiclib -undefined dynamic_lookup"
-#	LIBEXT="dylib"
-#    else
-#        ARFLAGS=""
-#	LIBEXT="so"
-#    fi
-#    make \
-#	AR="gcc $ARFLAGS -shared -o"  \
-#	OPTFLAGS="-O3 -shared"  \
-#	RANLIB="true"
+    [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
+    make -j $WM_NCOMPPROCS
 
-    make
 
 %install
     # Manual installation
