@@ -49,33 +49,15 @@ namespace Foam
 
 // * * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * //
 
-void Foam::cyclicGgiPointPatch::initGeometry()
-{}
-
-
-void Foam::cyclicGgiPointPatch::calcGeometry()
-{
-    meshPoints_ = cyclicGgiPolyPatch_.meshPoints();
-
-    nonGlobalPatchPoints_.setSize(meshPoints_.size());
-    forAll(nonGlobalPatchPoints_, i)
-    {
-        nonGlobalPatchPoints_[i] = i;
-    }
-}
-
-
 void Foam::cyclicGgiPointPatch::initUpdateMesh()
 {
     facePointPatch::initUpdateMesh();
-    cyclicGgiPointPatch::initGeometry();
 }
 
 
 void Foam::cyclicGgiPointPatch::updateMesh()
 {
     facePointPatch::updateMesh();
-    cyclicGgiPointPatch::calcGeometry();
 }
 
 

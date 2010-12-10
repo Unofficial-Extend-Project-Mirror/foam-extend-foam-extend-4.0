@@ -48,15 +48,15 @@ namespace Foam
 Foam::MGridGenGAMGAgglomeration::MGridGenGAMGAgglomeration
 (
     const lduMesh& mesh,
-    const dictionary& controlDict
+    const dictionary& dict
 )
 :
-    GAMGAgglomeration(mesh, controlDict),
+    GAMGAgglomeration(mesh, dict),
     fvMesh_(refCast<const fvMesh>(mesh))
 {
     // Min, max size of agglomerated cells
-    label minSize(readLabel(controlDict.lookup("minSize")));
-    label maxSize(readLabel(controlDict.lookup("maxSize")));
+    label minSize(readLabel(dict.lookup("minSize")));
+    label maxSize(readLabel(dict.lookup("maxSize")));
 
 
     // Get the finest-level interfaces from the mesh

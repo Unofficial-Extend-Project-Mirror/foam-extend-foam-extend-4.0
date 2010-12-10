@@ -110,21 +110,20 @@ void pointPatchInterpolation::interpolate
                 >(ppf) = ppf;
             }
         }
-        else if (bm[patchi].coupled())
-        {
-            // Initialise the "lone" points on the coupled patch to zero,
-            // these values are obtained from the couple-transfer
+//         else if (bm[patchi].coupled())
+//         {
+//             // Initialise the "lone" points on the coupled patch to zero,
+//             // these values are obtained from the couple-transfer
 
-            const labelList& loneMeshPoints =
-                refCast<const coupledFacePointPatch>(pbm[patchi])
-               .loneMeshPoints();
+//             const labelList& loneMeshPoints =
+//                 refCast<const coupledFacePointPatch>(pbm[patchi])
+//                .loneMeshPoints();
 
-            forAll(loneMeshPoints, i)
-            {
-                pf[loneMeshPoints[i]] = pTraits<Type>::zero;
-            }
-        }
-
+//             forAll(loneMeshPoints, i)
+//             {
+//                 pf[loneMeshPoints[i]] = pTraits<Type>::zero;
+//             }
+//         }
     }
 
 
@@ -165,55 +164,8 @@ void pointPatchInterpolation::interpolate
     }
 
 
-    // Update coupled boundaries
-    forAll(pf.boundaryField(), patchi)
-    {
-        if (pf.boundaryField()[patchi].coupled())
-        {
-            refCast
-            <
-                CoupledPointPatchField
-                <
-                    pointPatchField,
-                    pointMesh,
-                    pointPatch,
-                    coupledPointPatch,
-                    DummyMatrix,
-                    Type
-                >
-            >(pf.boundaryField()[patchi]).initSwapAdd(pf.internalField());
-        }
-    }
-
-    forAll(pf.boundaryField(), patchi)
-    {
-        if (pf.boundaryField()[patchi].coupled())
-        {
-            refCast
-            <
-                CoupledPointPatchField
-                <
-                    pointPatchField,
-                    pointMesh,
-                    pointPatch,
-                    coupledPointPatch,
-                    DummyMatrix,
-                    Type
-                >
-            >(pf.boundaryField()[patchi]).swapAdd(pf.internalField());
-        }
-    }
-
-
-    // Override constrained pointPatchField types with the constraint value.
-    // This relys on only constrained pointPatchField implementing the evaluate
-    // function
+    // Update coupled and constrained boundaries
     pf.correctBoundaryConditions();
-
-
-    // Apply multiple constraints on edge/corner points
-    applyCornerConstraints(pf);
-
 
     if (debug)
     {

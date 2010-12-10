@@ -56,7 +56,7 @@ using namespace Foam;
 
 // Tolerance (as fraction of the bounding box). Needs to be fairly lax since
 // usually meshes get written with limited precision (6 digits)
-static const scalar defaultMergeTol = 1E-7;
+static const scalar defaultMergeTol = 1e-7;
 
 
 static void renumber
@@ -299,9 +299,7 @@ int main(int argc, char *argv[])
         << " and construct" << nl
         << "xxxxProcAddressing files in the processor meshes so"
         << " reconstructPar can be" << nl
-        << "used to regenerate the fields on the master mesh." << nl
-        << nl
-        << "Not well tested & use at your own risk!" << nl
+        << "used to regenerate the fields on the master mesh."
         << endl;
 
 
@@ -327,8 +325,8 @@ int main(int argc, char *argv[])
         FatalErrorIn(args.executable())
             << "Your current settings specify ASCII writing with "
             << IOstream::defaultPrecision() << " digits precision." << endl
-            << "Your merging tolerance (" << mergeTol << ") is finer than this."
-            << endl
+            << "Your merging tolerance (" << mergeTol
+            << ") is finer than this." << nl
             << "Please change your writeFormat to binary"
             << " or increase the writePrecision" << endl
             << "or adjust the merge tolerance (-mergeTol)."
@@ -347,8 +345,6 @@ int main(int argc, char *argv[])
         Info<< "Doing geometric matching on correct procBoundaries only."
             << nl << "This assumes a correct decomposition." << endl;
     }
-
-
 
     int nProcs = 0;
 
@@ -397,11 +393,11 @@ int main(int argc, char *argv[])
 
         procTime.setTime(Times[startTime], startTime);
 
-        if (procI > 0 && databases[procI-1].value() != procTime.value())
+        if (procI > 0 && databases[procI - 1].value() != procTime.value())
         {
             FatalErrorIn(args.executable())
                 << "Time not equal on processors." << nl
-                << "Processor:" << procI-1
+                << "Processor:" << procI - 1
                 << " time:" << databases[procI-1].value() << nl
                 << "Processor:" << procI
                 << " time:" << procTime.value()
@@ -430,16 +426,24 @@ int main(int argc, char *argv[])
             )
         );
 
-        if (pointsInstance != databases[procI].timeName())
+        // Look for pointProcAddressing next to points instance
+        IOobject ppAddrHeader
+        (
+            "pointProcAddressing",
+            pointsInstance,
+            regionPrefix/polyMesh::meshSubDir,
+            databases[procI],
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE,
+            false
+        );
+
+        if (ppAddrHeader.headerOk())
         {
-            FatalErrorIn(args.executable())
-                << "Your time was specified as " << databases[procI].timeName()
-                << " but there is no polyMesh/points in that time." << endl
-                << "(there is a points file in " << pointsInstance
-                << ")" << endl
-                << "Please rerun with the correct time specified"
-                << " (through the -constant, -time or -latestTime option)."
-                << endl << exit(FatalError);
+            Info<< "Found pointProcAddressing in " << pointsInstance
+                << ".  Skipping" << endl;
+
+            return 0;
         }
 
         Info<< "Reading points from "
@@ -452,11 +456,7 @@ int main(int argc, char *argv[])
             IOobject
             (
                 "points",
-                databases[procI].findInstance
-                (
-                    regionPrefix/polyMesh::meshSubDir,
-                    "points"
-                ),
+                pointsInstance,
                 regionPrefix/polyMesh::meshSubDir,
                 databases[procI],
                 IOobject::MUST_READ,
@@ -470,7 +470,7 @@ int main(int argc, char *argv[])
         bb.min() = min(bb.min(), domainBb.min());
         bb.max() = max(bb.max(), domainBb.max());
     }
-    const scalar mergeDist = mergeTol * bb.mag();
+    const scalar mergeDist = mergeTol*bb.mag();
 
     Info<< "Overall mesh bounding box  : " << bb << nl
         << "Relative tolerance         : " << mergeTol << nl

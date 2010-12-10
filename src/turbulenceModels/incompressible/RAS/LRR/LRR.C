@@ -307,7 +307,7 @@ void LRR::correct()
     (
         fvm::ddt(epsilon_)
       + fvm::div(phi_, epsilon_)
-      - fvm::Sp(fvc::div(phi_), epsilon_)
+      + fvm::SuSp(-fvc::div(phi_), epsilon_)
     //- fvm::laplacian(Ceps*(K/epsilon_)*R, epsilon_)
       - fvm::laplacian(DepsilonEff(), epsilon_)
       ==

@@ -16,36 +16,30 @@ FoamFile
 
 solvers
 {
-    p PCG
+    p
     {
-        preconditioner
-        {
-            preconditioner DIC;
-        }
+        solver           PCG;
+        preconditioner   DIC;
 
         minIter          0;
         maxIter          2000;
         tolerance        1e-06;
         relTol           0.01;
     };
-    U PBiCG
+    U
     {
-        preconditioner
-        {
-            preconditioner DILU;
-        }
+        solver           PBiCG;
+        preconditioner   DILU;
 
         minIter          0;
         maxIter          500;
         tolerance        1e-05;
         relTol           0.1;
     };
-    k PBiCG
+    k
     {
-        preconditioner
-        {
-            preconditioner DILU;
-        }
+        solver           PBiCG;
+        preconditioner   DILU;
 
         minIter          0;
         maxIter          500;
@@ -54,10 +48,8 @@ solvers
     };
     epsilon PBiCG
     {
-        preconditioner
-        {
-            preconditioner DILU;
-        }
+        solver           PBiCG;
+        preconditioner   DILU;
 
         minIter          0;
         maxIter          500;
@@ -66,10 +58,8 @@ solvers
     };
     R PBiCG
     {
-        preconditioner
-        {
-            preconditioner DILU;
-        }
+        solver           PBiCG;
+        preconditioner   DILU;
 
         minIter          0;
         maxIter          500;
@@ -78,10 +68,8 @@ solvers
     };
     nuTilda PBiCG
     {
-        preconditioner
-        {
-            preconditioner DILU;
-        }
+        solver           PBiCG;
+        preconditioner   DILU;
 
         minIter          0;
         maxIter          500;

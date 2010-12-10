@@ -16,8 +16,9 @@ FoamFile
 
 solvers
 {
-    p GAMG
+    p
     {
+        solver           GAMG;
         tolerance        1e-8;
         relTol           0;
 
@@ -30,49 +31,55 @@ solvers
         nCellsInCoarsestLevel 10;
         agglomerator     faceAreaPair;
         mergeLevels      1;
-    };
-    Ua PBiCG
+    }
+    Ua
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
-    Ub PBiCG
+    }
+    Ub
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
-    alpha PBiCG
+    }
+    alpha
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-10;
         relTol           0;
-    };
-    beta PBiCG
+    }
+    beta
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-10;
         relTol           0;
-    };
-    Theta PBiCG
+    }
+    Theta
+    {
+        solver           PBiCG;
+        preconditioner   DILU;
+        tolerance        1e-05;
+        relTol           0;
+    }
+    k
     {
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
-    k PBiCG
+    }
+    epsilon
     {
+        solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
-    epsilon PBiCG
-    {
-        preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    };
+    }
 }
 
 PISO

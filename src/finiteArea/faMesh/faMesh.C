@@ -204,8 +204,8 @@ Foam::faMesh::faMesh(const polyMesh& pMesh)
     (
         IOobject
         (
-            "boundary",
-            time().findInstance(meshDir(), "boundary"),
+            "faBoundary",
+            time().findInstance(meshDir(), "faBoundary"),
             meshSubDir,
             mesh_,
             IOobject::MUST_READ,
@@ -298,7 +298,7 @@ Foam::faMesh::faMesh
     (
         IOobject
         (
-            "boundary",
+            "faBoundary",
             mesh_.facesInstance(),
             meshSubDir,
             mesh_,
@@ -362,7 +362,7 @@ Foam::faMesh::faMesh
     (
         IOobject
         (
-            "boundary",
+            "faBoundary",
             mesh_.facesInstance(),
             meshSubDir,
             mesh_,
@@ -396,7 +396,7 @@ Foam::faMesh::faMesh
     {
         Info<< "faMesh::faMesh(...) : "
             << "Creating faMesh from definition file" << endl;
-    }   
+    }
 
     // Reading faMeshDefinition dictionary
     IOdictionary faMeshDefinition
@@ -411,7 +411,7 @@ Foam::faMesh::faMesh
             IOobject::NO_WRITE
         )
     );
-    
+
     wordList polyMeshPatches
     (
         faMeshDefinition.lookup("polyMeshPatches")
@@ -420,7 +420,7 @@ Foam::faMesh::faMesh
     dictionary bndDict = faMeshDefinition.subDict("boundary");
 
     wordList faPatchNames = bndDict.toc();
-    
+
     List<faPatchData> faPatches(faPatchNames.size() + 1);
 
     forAll (faPatchNames, patchI)
@@ -430,7 +430,7 @@ Foam::faMesh::faMesh
 
         faPatches[patchI].name_ = faPatchNames[patchI];
 
-        faPatches[patchI].type_ = 
+        faPatches[patchI].type_ =
             word(curPatchDict.lookup("type"));
 
         faPatches[patchI].ownPolyPatchID_ =
@@ -471,7 +471,6 @@ Foam::faMesh::faMesh
     forAll (polyMeshPatches, patchI)
     {
         label start = mesh_.boundaryMesh()[patchIDs[patchI]].start();
-        
         label size  = mesh_.boundaryMesh()[patchIDs[patchI]].size();
 
         for(label i = 0; i < size; i++)
@@ -668,7 +667,7 @@ Foam::faMesh::faMesh
     (
         IOobject
         (
-            "boundary",
+            "faBoundary",
             mesh_.facesInstance(),
             meshSubDir,
             mesh_,

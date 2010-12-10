@@ -153,12 +153,6 @@ public:
             //- Add field to internal field
             virtual void addField(Field<Type>&) const = 0;
 
-            //- Initialise swap of patch point values
-            virtual void initSwapAdd(Field<Type>&) const
-            {}
-
-            //- Complete swap of patch point values and add to local values
-            virtual void swapAdd(Field<Type>&) const = 0;
 
         // Matrix construction (completion) functionality
 

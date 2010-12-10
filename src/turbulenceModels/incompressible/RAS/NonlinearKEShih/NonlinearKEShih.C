@@ -332,6 +332,7 @@ void NonlinearKEShih::correct()
     (
         fvm::ddt(epsilon_)
       + fvm::div(phi_, epsilon_)
+      + fvm::SuSp(-fvc::div(phi_), epsilon_)
       - fvm::laplacian(DepsilonEff(), epsilon_)
       ==
         C1_*G*epsilon_/k_

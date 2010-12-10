@@ -75,10 +75,12 @@ protected:
     // Protected Member Functions
 
         //- Initialise the calculation of the patch geometry
-        virtual void initGeometry();
+        virtual void initGeometry()
+        {}
 
         //- Calculate mesh points
-        virtual void calcGeometry();
+        virtual void calcGeometry()
+        {}
 
         //- Correct patches after moving points
         virtual void movePoints()

@@ -756,6 +756,16 @@ public:
         lduMatrix(const lduMesh&, Istream&);
 
 
+        //- Clone
+        autoPtr<lduMatrix> clone() const
+        {
+            return autoPtr<lduMatrix>
+            (
+                new lduMatrix(*this)
+            );
+        }
+
+
     // Destructor
 
         virtual ~lduMatrix();

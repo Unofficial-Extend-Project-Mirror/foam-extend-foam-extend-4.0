@@ -55,7 +55,10 @@ class smoothDelta
 {
     // Private data
 
+        //- Raw geometric delta, to be used in smoothing
         autoPtr<LESdelta> geometricDelta_;
+
+        //- Smoothing ratio
         scalar maxDeltaRatio_;
 
 

@@ -64,7 +64,8 @@ class pointBoundaryMesh
 
     // Private Member Functions
 
-        //- Calculate the geometry for the patches (transformation tensors etc.)
+        //- Calculate the geometry for the patches
+        //  (transformation tensors etc.)
         void calcGeometry();
 
         //- Disallow default bitwise copy construct

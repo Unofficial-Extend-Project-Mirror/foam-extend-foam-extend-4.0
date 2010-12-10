@@ -194,8 +194,6 @@ public:
             virtual void addField(Field<Type>&) const
             {}
 
-            //- Complete swap of patch point values and add to local values
-            virtual void swapAdd(Field<Type>&) const;
 
         // Matrix construction (completion) functionality.  Currently faked
         // HJ, 31/May/2007

@@ -16,8 +16,9 @@ FoamFile
 
 solvers
 {
-    p GAMG
+    p
     {
+        solver           GAMG;
         tolerance        1e-8;
         relTol           0.05;
 
@@ -28,31 +29,34 @@ solvers
         nCellsInCoarsestLevel 20;
         agglomerator     faceAreaPair;
         mergeLevels      1;
-    };
+    }
 
-    U smoothSolver
+    U
     {
+        solver           smoothSolver;
         smoother         GaussSeidel;
         nSweeps          2;
         tolerance        1e-7;
         relTol           0.1;
-    };
+    }
 
-    k smoothSolver
+    k
     {
+        solver           smoothSolver;
         smoother         GaussSeidel;
         nSweeps          2;
         tolerance        1e-7;
         relTol           0.1;
-    };
+    }
 
-    epsilon smoothSolver
+    epsilon
     {
+        solver           smoothSolver;
         smoother         GaussSeidel;
         nSweeps          2;
         tolerance        1e-7;
         relTol           0.1;
-    };
+    }
 }
 
 SIMPLE

@@ -79,10 +79,12 @@ protected:
     // Protected Member Functions
 
         //- Initialise the calculation of the patch geometry
-        virtual void initGeometry();
+        virtual void initGeometry()
+        {}
 
         //- Calculate the patch geometry
-        virtual void calcGeometry();
+        virtual void calcGeometry()
+        {}
 
         //- Correct patches after moving points
         virtual void movePoints()
@@ -147,13 +149,6 @@ public:
             {
                 return cyclicPolyPatch_.reverseT();
             }
-
-
-        // Access functions for demand driven data
-
-            //- Return the set of pairs of points that require transformation
-            //  and/or mapping
-            virtual const edgeList& transformPairs() const;
 };
 
 

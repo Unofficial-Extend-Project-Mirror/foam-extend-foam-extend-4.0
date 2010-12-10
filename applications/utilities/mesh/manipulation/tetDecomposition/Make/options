@@ -1,0 +1,8 @@
+EXE_INC = \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/tetDecompositionFiniteElement/lnInclude \
+    $(WM_DECOMP_INC)
+
+EXE_LIBS = \
+    -lfiniteVolume \
+    $(WM_DECOMP_LIBS)

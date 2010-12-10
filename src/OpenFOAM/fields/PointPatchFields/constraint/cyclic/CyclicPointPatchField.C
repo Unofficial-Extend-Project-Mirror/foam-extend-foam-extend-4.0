@@ -230,47 +230,6 @@ CyclicPointPatchField
 {}
 
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-template
-<
-    template<class> class PatchField,
-    class Mesh,
-    class PointPatch,
-    class CyclicPointPatch,
-    template<class> class MatrixType,
-    class Type
->
-void
-CyclicPointPatchField
-<PatchField, Mesh, PointPatch, CyclicPointPatch, MatrixType, Type>::
-swapAdd(Field<Type>& pField) const
-{
-    Field<Type> pf(this->patchInternalField(pField));
-
-    const edgeList& pairs = cyclicPatch_.transformPairs();
-
-    if (doTransform())
-    {
-        forAll(pairs, pairi)
-        {
-            Type tmp = pf[pairs[pairi][0]];
-            pf[pairs[pairi][0]] = transform(forwardT()[0], pf[pairs[pairi][1]]);
-            pf[pairs[pairi][1]] = transform(reverseT()[0], tmp);
-        }
-    }
-    else
-    {
-        forAll(pairs, pairi)
-        {
-            Swap(pf[pairs[pairi][0]], pf[pairs[pairi][1]]);
-        }
-    }
-
-    addToInternalField(pField, pf);
-}
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

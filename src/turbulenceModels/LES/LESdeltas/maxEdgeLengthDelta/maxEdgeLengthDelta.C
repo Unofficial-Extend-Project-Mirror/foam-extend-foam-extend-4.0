@@ -24,7 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "cubeRootVolDelta.H"
+#include "maxEdgeLengthDelta.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -34,43 +34,82 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(cubeRootVolDelta, 0);
-addToRunTimeSelectionTable(LESdelta, cubeRootVolDelta, dictionary);
+defineTypeNameAndDebug(maxEdgeLengthDelta, 0);
+addToRunTimeSelectionTable(LESdelta, maxEdgeLengthDelta, dictionary);
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void cubeRootVolDelta::calcDelta()
+void maxEdgeLengthDelta::calcDelta()
 {
     label nD = mesh().nGeometricD();
 
+    const cellList& cells = mesh().cells();
+    const faceList& faces = mesh().faces();
+    const pointField& points = mesh().points();
+
+    scalarField& d = delta_.internalField();
+
+    // Initialise d to a large number
+    d = 0;
+
+
     if (nD == 3)
     {
-        delta_.internalField() = deltaCoeff_*pow(mesh().V(), 1.0/3.0);
+        forAll (cells, cellI)
+        {
+            edgeList ce = cells[cellI].edges(faces);
+
+            forAll (ce, ceI)
+            {
+                d[cellI] = Foam::max(d[cellI], ce[ceI].mag(points));
+            }
+        }
     }
     else if (nD == 2)
     {
-        WarningIn("cubeRootVolDelta::calcDelta()")
+        WarningIn("maxEdgeLengthDelta::calcDelta()")
             << "Case is 2D, LES is not strictly applicable\n"
             << endl;
 
+        // Find the dead direction
         const Vector<label>& directions = mesh().geometricD();
 
-        scalar thickness = 0.0;
+        vector deadDir = vector::zero;
+
         for (direction dir = 0; dir < directions.nComponents; dir++)
         {
             if (directions[dir] == -1)
             {
-                thickness = mesh().bounds().span()[dir];
+                deadDir[dir] = 1;
                 break;
             }
         }
 
-        delta_.internalField() = deltaCoeff_*sqrt(mesh().V()/thickness);
+        forAll (cells, cellI)
+        {
+            edgeList ce = cells[cellI].edges(faces);
+
+            forAll (ce, ceI)
+            {
+                // Calculate edge magnitude and unit vector
+                scalar magE = ce[ceI].mag(points);
+                vector eN = ce[ceI].vec(points)/magE;
+
+                // Filter the edges in the dead direction: the dot-product
+                // of eN and deadDir should be 1, but in 2-D checking
+                // can be relaxed.  HJ, 8/Dec/2010
+                if (mag(eN & deadDir) < 0.9)
+                {
+                    d[cellI] = Foam::max(d[cellI], magE);
+                }
+            }
+        }
+
     }
     else
     {
-        FatalErrorIn("cubeRootVolDelta::calcDelta()")
+        FatalErrorIn("maxEdgeLengthDelta::calcDelta()")
             << "Case is not 3D or 2D, LES is not applicable"
             << exit(FatalError);
     }
@@ -79,7 +118,7 @@ void cubeRootVolDelta::calcDelta()
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-cubeRootVolDelta::cubeRootVolDelta
+maxEdgeLengthDelta::maxEdgeLengthDelta
 (
     const word& name,
     const fvMesh& mesh,
@@ -95,14 +134,14 @@ cubeRootVolDelta::cubeRootVolDelta
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void cubeRootVolDelta::read(const dictionary& dd)
+void maxEdgeLengthDelta::read(const dictionary& dd)
 {
     dd.subDict(type() + "Coeffs").lookup("deltaCoeff") >> deltaCoeff_;
     calcDelta();
 }
 
 
-void cubeRootVolDelta::correct()
+void maxEdgeLengthDelta::correct()
 {
     if (mesh_.changing())
     {

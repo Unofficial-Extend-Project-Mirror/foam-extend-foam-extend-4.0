@@ -240,11 +240,7 @@ void pointPatchInterpolation::makePatchPatchWeights()
     {
         if (sumWeights.boundaryField()[patchi].coupled())
         {
-            refCast<coupledPointPatchScalarField>
-                (sumWeights.boundaryField()[patchi]).initSwapAdd
-                (
-                    sumWeights.internalField()
-                );
+            sumWeights.boundaryField()[patchi].initAddField();
         }
     }
 
@@ -252,8 +248,7 @@ void pointPatchInterpolation::makePatchPatchWeights()
     {
         if (sumWeights.boundaryField()[patchi].coupled())
         {
-            refCast<coupledPointPatchScalarField>
-            (sumWeights.boundaryField()[patchi]).swapAdd
+            sumWeights.boundaryField()[patchi].addField
             (
                 sumWeights.internalField()
             );

@@ -23,70 +23,61 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Application
-    pimpleFoam
+    tetDecomposition.C
+
+Author
+    Hrvoje Jasak, resurrected to life by Sandeep Menon.
 
 Description
-    Large time-step transient solver for incompressible, flow using the PIMPLE
-    (merged PISO-SIMPLE) algorithm.
-
-    Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
+    Decompose a given polyhedral mesh using tetDecomposition.
 
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "singlePhaseTransportModel.H"
-#include "turbulenceModel.H"
+#include "tetPolyMesh.H"
+
+using namespace Foam;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Main program:
 
 int main(int argc, char *argv[])
 {
+
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createMesh.H"
-#   include "createFields.H"
-#   include "initContinuityErrs.H"
 
-    Info<< "\nStarting time loop\n" << endl;
+    tetPolyMesh getTets(mesh);
 
-    while (runTime.run())
-    {
-#       include "readTimeControls.H"
-#       include "readPIMPLEControls.H"
-#       include "CourantNo.H"
-#       include "setDeltaT.H"
+    runTime++;
 
-        runTime++;
+    Info<< "Creating decomposed tet mesh. Number of tets: "
+        << getTets.nTets()
+        << endl;
 
-        Info<< "Time = " << runTime.timeName() << nl << endl;
+    polyMesh newMesh
+    (
+        IOobject
+        (
+            fvMesh::defaultRegion,
+            runTime.timeName(),
+            runTime
+        ),
+        xferCopy(getTets.points()()),
+        getTets.tetCells(),
+        getTets.boundary().boundaryTriFaces(),
+        mesh.boundaryMesh().names(),
+        mesh.boundaryMesh().types(),
+        polyPatch::typeName,
+        "defaultPatch",
+        mesh.boundaryMesh().physicalTypes()
+    );
 
-        // --- Pressure-velocity PIMPLE corrector loop
-        for (int oCorr=0; oCorr<nOuterCorr; oCorr++)
-        {
-            if (nOuterCorr != 1)
-            {
-                p.storePrevIter();
-            }
+    Info << "Writing polyMesh" << endl;
+    newMesh.write();
 
-#           include "UEqn.H"
-
-            // --- PISO loop
-            for (int corr=0; corr<nCorr; corr++)
-            {
-#               include "pEqn.H"
-            }
-
-            turbulence->correct();
-        }
-
-        runTime.write();
-
-        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-            << nl << endl;
-    }
-
-    Info<< "End\n" << endl;
+    Info << "End\n" << endl;
 
     return 0;
 }

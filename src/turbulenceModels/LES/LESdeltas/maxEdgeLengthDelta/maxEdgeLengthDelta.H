@@ -22,69 +22,92 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Class
+    Foam::maxEdgeLengthDelta
+
+Description
+    Maximum cell edge length delta used in LES models.
+
+SourceFiles
+    maxEdgeLengthDelta.C
+
 \*---------------------------------------------------------------------------*/
 
-#include "cyclicPointPatch.H"
-#include "pointBoundaryMesh.H"
-#include "addToRunTimeSelectionTable.H"
-#include "pointMesh.H"
-#include "globalPointPatch.H"
-#include "edgeList.H"
+#ifndef maxEdgeLengthDelta_H
+#define maxEdgeLengthDelta_H
+
+#include "LESdelta.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+/*---------------------------------------------------------------------------*\
+                      Class maxEdgeLengthDelta Declaration
+\*---------------------------------------------------------------------------*/
 
-defineTypeNameAndDebug(cyclicPointPatch, 0);
-
-addToRunTimeSelectionTable
-(
-    facePointPatch,
-    cyclicPointPatch,
-    polyPatch
-);
-
-
-void cyclicPointPatch::initUpdateMesh()
-{
-    facePointPatch::initUpdateMesh();
-}
-
-
-void cyclicPointPatch::updateMesh()
-{
-    facePointPatch::updateMesh();
-}
-
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-cyclicPointPatch::cyclicPointPatch
-(
-    const polyPatch& patch,
-    const pointBoundaryMesh& bm
-)
+class maxEdgeLengthDelta
 :
-    coupledFacePointPatch(patch, bm),
-    cyclicPolyPatch_(refCast<const cyclicPolyPatch>(patch))
-{}
+    public LESdelta
+{
+    // Private data
+
+        scalar deltaCoeff_;
 
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+    // Private Member Functions
 
-cyclicPointPatch::~cyclicPointPatch()
-{}
+        //- Disallow default bitwise copy construct
+        maxEdgeLengthDelta(const maxEdgeLengthDelta&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const maxEdgeLengthDelta&);
 
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+        // Calculate the delta values
+        void calcDelta();
 
+
+public:
+
+    //- Runtime type information
+    TypeName("maxEdgeLength");
+
+
+    // Constructors
+
+        //- Construct from name, mesh and IOdictionary
+        maxEdgeLengthDelta
+        (
+            const word& name,
+            const fvMesh& mesh,
+            const dictionary&
+        );
+
+
+    // Destructor
+
+        virtual ~maxEdgeLengthDelta()
+        {}
+
+
+    // Member Functions
+
+        //- Read the LESdelta dictionary
+        void read(const dictionary&);
+
+        // Correct values
+        void correct();
+};
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

@@ -38,9 +38,9 @@ void Foam::sampledSurfaces::sampleAndWrite
 )
 {
     // interpolator for this field
-    autoPtr< interpolation<Type> > interpolator;
+    autoPtr<interpolation<Type> > interpolator;
 
-    const word& fieldName   = vField.name();
+    const word& fieldName = vField.name();
     const fileName outputDir = outputPath_/vField.time().timeName();
 
     forAll(*this, surfI)

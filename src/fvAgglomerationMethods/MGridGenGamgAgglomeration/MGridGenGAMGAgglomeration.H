@@ -40,16 +40,6 @@ SourceFiles
 #include "fvMesh.H"
 #include "GAMGAgglomeration.H"
 
-extern "C"
-{
-#   include "mgridgen.h"
-#   ifdef darwin
-#       undef FALSE
-#       undef TRUE
-#   endif
-}
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -58,7 +48,7 @@ namespace Foam
 class fvMesh;
 
 /*---------------------------------------------------------------------------*\
-                           Class MGridGenGAMGAgglomeration Declaration
+                   Class MGridGenGAMGAgglomeration Declaration
 \*---------------------------------------------------------------------------*/
 
 class MGridGenGAMGAgglomeration
@@ -76,8 +66,8 @@ class MGridGenGAMGAgglomeration
         void makeCompactCellFaceAddressingAndFaceWeights
         (
             const lduAddressing& fineAddressing,
-            List<idxtype>& cellCells,
-            List<idxtype>& cellCellOffsets,
+            labelList& cellCells,
+            labelList& cellCellOffsets,
             const vectorField& Si,
             List<scalar>& faceWeights
         );
@@ -114,7 +104,7 @@ public:
         MGridGenGAMGAgglomeration
         (
             const lduMesh& mesh,
-            const dictionary& controlDict
+            const dictionary& dict
         );
 };
 

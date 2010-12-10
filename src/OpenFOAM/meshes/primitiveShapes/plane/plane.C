@@ -217,8 +217,10 @@ Foam::plane::plane(const dictionary& dict)
             "plane::plane(const dictionary&)",
             dict
         )
-        << "Invalid plane type: " << planeType
-        << abort(FatalIOError);
+            << "Invalid plane type: " << planeType << nl
+            << "Valid types are planeEquation, embeddedPoints "
+            << "and pointAndNormal"
+            << abort(FatalIOError);
     }
 }
 

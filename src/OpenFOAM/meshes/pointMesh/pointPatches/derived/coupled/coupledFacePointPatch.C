@@ -57,25 +57,6 @@ coupledFacePointPatch::~coupledFacePointPatch()
 {}
 
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-const labelList& coupledFacePointPatch::nonGlobalPatchPoints() const
-{
-    return nonGlobalPatchPoints_;
-}
-
-const labelList& coupledFacePointPatch::loneMeshPoints() const
-{
-    return loneMeshPoints_;
-}
-
-const vectorField& coupledFacePointPatch::pointNormals() const
-{
-    notImplemented("coupledFacePointPatch::pointNormals() const");
-    return Field<vector>::null();
-}
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

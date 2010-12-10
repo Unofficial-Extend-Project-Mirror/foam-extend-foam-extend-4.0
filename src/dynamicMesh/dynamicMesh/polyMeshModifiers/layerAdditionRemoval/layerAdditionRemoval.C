@@ -67,6 +67,34 @@ void Foam::layerAdditionRemoval::checkDefinition()
             << abort(FatalError);
     }
 
+    const polyMesh& mesh = topoChanger().mesh();
+
+    if (debug > 1)
+    {
+        fileName fvPath(mesh.time().path()/"VTK");
+        mkDir(fvPath);
+
+        Info<< "Writing VTK files master face zone"
+            << "Layer addition/removal " << name()
+            << ", face zone " << faceZoneID_.name()
+            << "into " << fvPath
+            << endl;
+
+        primitiveFacePatch::writeVTK
+        (
+            fvPath/fileName(faceZoneID_.name() + "FaceZone"),
+            mesh.faceZones()[faceZoneID_.index()]().localFaces(),
+            mesh.faceZones()[faceZoneID_.index()]().localPoints()
+        );
+
+        primitiveFacePatch::writeVTKNormals
+        (
+            fvPath/fileName(faceZoneID_.name() + "FaceZoneNormals"),
+            mesh.faceZones()[faceZoneID_.index()]().localFaces(),
+            mesh.faceZones()[faceZoneID_.index()]().localPoints()
+        );
+    }
+
     if
     (
         minLayerThickness_ < VSMALL
@@ -80,7 +108,15 @@ void Foam::layerAdditionRemoval::checkDefinition()
             << abort(FatalError);
     }
 
-    if (topoChanger().mesh().faceZones()[faceZoneID_.index()].size() == 0)
+    // Check size of zones
+    label globalZoneSize =
+        returnReduce
+        (
+           mesh.faceZones()[faceZoneID_.index()].size(),
+            sumOp<label>()
+        );
+
+    if (globalZoneSize == 0)
     {
         FatalErrorIn
         (
@@ -211,66 +247,30 @@ bool Foam::layerAdditionRemoval::changeTopology() const
             << abort(FatalError);
     }
 
-    scalar avgDelta = 0;
     scalar minDelta = GREAT;
     scalar maxDelta = 0;
+    scalar avgDelta = 0;
+    scalar nAvg = 0;
 
-    forAll (fz, faceI)
+    if (fz.size())
     {
-        scalar curDelta = V[mc[faceI]]/mag(S[fz[faceI]]);
-        avgDelta += curDelta;
-        minDelta = min(minDelta, curDelta);
-        maxDelta = max(maxDelta, curDelta);
+        forAll (fz, faceI)
+        {
+            scalar curDelta = V[mc[faceI]]/mag(S[fz[faceI]]);
+            avgDelta += curDelta;
+            minDelta = min(minDelta, curDelta);
+            maxDelta = max(maxDelta, curDelta);
+        }
+        nAvg += fz.size();
+
     }
 
-    avgDelta /= fz.size();
+    reduce(minDelta, minOp<scalar>());
+    reduce(maxDelta, maxOp<scalar>());
+    reduce(avgDelta, sumOp<scalar>());
+    reduce(nAvg, sumOp<scalar>());
 
-    ////MJ Alternative thickness determination
-    //{
-    //    // Edges on layer.
-    //    const Map<label>& zoneMeshPointMap = fz().meshPointMap();
-    //
-    //    label nDelta = 0;
-    //
-    //    // Edges with only one point on zone
-    //    const polyMesh& mesh = topoChanger().mesh();
-    //
-    //    forAll(mc, faceI)
-    //    {
-    //        const cell& cFaces = mesh.cells()[mc[faceI]];
-    //        const edgeList cellEdges(cFaces.edges(mesh.faces()));
-    //
-    //        forAll(cellEdges, i)
-    //        {
-    //            const edge& e = cellEdges[i];
-    //
-    //            if (zoneMeshPointMap.found(e[0]))
-    //            {
-    //                if (!zoneMeshPointMap.found(e[1]))
-    //                {
-    //                    scalar curDelta = e.mag(mesh.points());
-    //                    avgDelta += curDelta;
-    //                    nDelta++;
-    //                    minDelta = min(minDelta, curDelta);
-    //                    maxDelta = max(maxDelta, curDelta);
-    //                }
-    //            }
-    //            else
-    //            {
-    //                if (zoneMeshPointMap.found(e[1]))
-    //                {
-    //                    scalar curDelta = e.mag(mesh.points());
-    //                    avgDelta += curDelta;
-    //                    nDelta++;
-    //                    minDelta = min(minDelta, curDelta);
-    //                    maxDelta = max(maxDelta, curDelta);
-    //                }
-    //            }
-    //        }
-    //    }
-    //
-    //    avgDelta /= nDelta;
-    //}
+    avgDelta /= nAvg;
 
     if (debug)
     {
@@ -279,7 +279,7 @@ bool Foam::layerAdditionRemoval::changeTopology() const
             << "Layer thickness: min: " << minDelta
             << " max: " << maxDelta << " avg: " << avgDelta
             << " old thickness: " << oldLayerThickness_ << nl
-            << "Removal threshold: " << minLayerThickness_ 
+            << "Removal threshold: " << minLayerThickness_
             << " addition threshold: " << maxLayerThickness_ << endl;
     }
 
@@ -295,7 +295,7 @@ bool Foam::layerAdditionRemoval::changeTopology() const
         }
 
         // No topological changes allowed before first mesh motion
-        // 
+        // HJ, 8/Oct/2002
         oldLayerThickness_ = avgDelta;
 
         topologicalChange = false;
@@ -314,7 +314,7 @@ bool Foam::layerAdditionRemoval::changeTopology() const
                     // At this point, info about moving the old mesh
                     // in a way to collapse the cells in the removed
                     // layer is available.  Not sure what to do with
-                    // it.  
+                    // it.  HJ, 3/Nov/2003
 
                     if (debug)
                     {

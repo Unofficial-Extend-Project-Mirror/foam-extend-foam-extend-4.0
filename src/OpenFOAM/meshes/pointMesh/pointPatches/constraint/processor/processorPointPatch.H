@@ -62,7 +62,11 @@ class processorPointPatch
 {
     // Private data
 
+        //- Reference to processor patch
         const processorPolyPatch& procPolyPatch_;
+
+        //- Mesh points.  On slave they will be reversed
+        mutable labelList meshPoints_;
 
 
     // Private Member Functions
@@ -174,10 +178,13 @@ public:
 
         // Access functions for demand driven data
 
-            //- Return pointField of points in patch.  Not implemented.
+            //- Return mesh points
+            virtual const labelList& meshPoints() const;
+
+            //- Return pointField of points in patch.  Not implemented
             virtual const pointField& localPoints() const;
 
-            //- Return point unit normals.  Not impelemented.
+            //- Return point unit normals.  Not implemented
             virtual const vectorField& pointNormals() const;
 
             //- Return list of edge indices for edges local to the patch
