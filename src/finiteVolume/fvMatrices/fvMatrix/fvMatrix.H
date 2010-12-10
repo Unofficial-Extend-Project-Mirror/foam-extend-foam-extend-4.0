@@ -232,6 +232,16 @@ public:
         fvMatrix(GeometricField<Type, fvPatchField, volMesh>&, Istream&);
 
 
+        //- Clone
+        tmp<fvMatrix<Type> > clone() const
+        {
+            return tmp<fvMatrix<Type> >
+            (
+                new fvMatrix<Type>(*this)
+            );
+        }
+
+
     // Destructor
 
         virtual ~fvMatrix();
