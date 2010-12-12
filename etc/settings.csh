@@ -142,6 +142,8 @@ endsw
 
 unset MPI_ARCH_PATH
 
+set mpi_version=unknown
+
 switch ("$WM_MPLIB")
 case OPENMPI:
     if (-d $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3 ) then
@@ -376,7 +378,7 @@ endif
 
 # Metis library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
-if ( $?METIS_SYSTEM == 0&& -e $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2 ) then
+if ( $?METIS_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2 ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS/etc/metis-5.0pre2.csh
 endif
 

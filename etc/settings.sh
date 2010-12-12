@@ -182,7 +182,7 @@ esac
 # ~~~~~~~~~~~~~~~~~~~~~~
 
 unset MPI_ARCH_PATH
-
+mpi_version=unknown
 case "$WM_MPLIB" in
 OPENMPI)
     if [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3 ]
