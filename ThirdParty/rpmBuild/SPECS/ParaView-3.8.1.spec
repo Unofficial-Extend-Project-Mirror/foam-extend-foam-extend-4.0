@@ -157,6 +157,9 @@ Patch0:                 ParaView-3.8.1.patch_darwin
     addCMakeVariable  PARAVIEW_EXTRA_INSTALL_RULES_FILE:FILEPATH=%{_topdir}/BUILD/%{name}-%{version}/Applications/ParaView-3.8.1_extra_install_Darwin.cmake
 %endif
 
+    # Add the value of _qmakePath for QT_QMAKE_EXECUTABLE
+    addCMakeVariable  QT_QMAKE_EXECUTABLE:FILEPATH=%{_qmakePath}
+
     echo "CMAKE_VARIABLES: $CMAKE_VARIABLES"
 
     mkdir -p ./buildObj
@@ -216,11 +219,9 @@ export PV_PLUGIN_PATH=\$FOAM_LIBBIN/paraview_plugins
 # Enable access to the package applications if present
 [ -d \$PARAVIEW_BIN_DIR ] && _foamAddPath \$PARAVIEW_BIN_DIR
 
-if [ "$WM_ARCH" == "darwinIntel" ]
-then
-    # Additional binary path is running on Mac OS X
-    [ -d \$PARAVIEW_BIN_DIR/paraview.app/Contents/MacOS ] && _foamAddPath \$PARAVIEW_BIN_DIR/paraview.app/Contents/MacOS
-fi
+# Additional binary path if running on Mac OS X
+[ -d \$PARAVIEW_BIN_DIR/paraview.app/Contents/MacOS ] && _foamAddPath \$PARAVIEW_BIN_DIR/paraview.app/Contents/MacOS
+
 DOT_SH_EOF
 
     #
@@ -252,7 +253,7 @@ if ( -e \$PARAVIEW_LIB_DIR/paraview-3.8 ) then
 endif
 
 
-# Additional binary path is running on Mac OS X
+# Additional binary path if running on Mac OS X
 if ( -e \$PARAVIEW_BIN_DIR/paraview.app/Contents/MacOS ) then
     _foamAddPath \$PARAVIEW_BIN_DIR/paraview.app/Contents/MacOS
 endif
