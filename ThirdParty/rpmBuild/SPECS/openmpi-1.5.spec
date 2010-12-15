@@ -4,7 +4,7 @@
 #  \\    /   O peration     |
 #   \\  /    A nd           | Copyright held by original author
 #    \\/     M anipulation  |
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # License
 #     This file is part of OpenFOAM.
 #
@@ -204,8 +204,8 @@ setenv OPENMPI_COMPILE_FLAGS "\`mpicc --showme:compile\`"
 setenv OPENMPI_LINK_FLAGS "\`mpicc --showme:link\`"
 
 # Set the OpenFOAM compilation flags 
-setenv PINC \$OPENMPI_COMPILE_FLAGS
-setenv PLIBS \$OPENMPI_LINK_FLAGS
+setenv PINC \`echo \$OPENMPI_COMPILE_FLAGS\`
+setenv PLIBS \`echo \$OPENMPI_LINK_FLAGS\`
 
 
 if (\$?FOAM_VERBOSE && \$?prompt) then
@@ -221,7 +221,7 @@ if (\$?FOAM_VERBOSE && \$?prompt) then
     echo "    OPAL_PREFIX           : \$OPAL_PREFIX"
     echo "    PINC                  : \$PINC"
     echo "    PLIBS                 : \$PLIBS"
-fi
+endif
 DOT_CSH_EOF
 
 %clean
