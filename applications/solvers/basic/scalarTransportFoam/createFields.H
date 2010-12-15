@@ -45,7 +45,7 @@
     );
 
 
-    Info<< "Reading diffusivity D\n" << endl;
+    Info<< "Reading diffusivity DT\n" << endl;
 
     dimensionedScalar DT
     (
