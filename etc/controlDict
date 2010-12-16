@@ -887,6 +887,10 @@ OptimisationSwitches
 
     nSquaredProjection    0;
 //     nSquaredProjection    1;
+
+    // Multigrid clustering
+    mgMinClusterSize 2;
+    mgMaxClusterSize 8;
 }
 
 Tolerances
