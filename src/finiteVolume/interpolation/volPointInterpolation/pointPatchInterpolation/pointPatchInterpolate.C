@@ -62,7 +62,6 @@ void pointPatchInterpolation::interpolate
     // patch
 
     const fvBoundaryMesh& bm = fvMesh_.boundary();
-    const pointBoundaryMesh& pbm = pointMesh::New(fvMesh_).boundary();
 
     forAll(bm, patchi)
     {
@@ -110,20 +109,6 @@ void pointPatchInterpolation::interpolate
                 >(ppf) = ppf;
             }
         }
-//         else if (bm[patchi].coupled())
-//         {
-//             // Initialise the "lone" points on the coupled patch to zero,
-//             // these values are obtained from the couple-transfer
-
-//             const labelList& loneMeshPoints =
-//                 refCast<const coupledFacePointPatch>(pbm[patchi])
-//                .loneMeshPoints();
-
-//             forAll(loneMeshPoints, i)
-//             {
-//                 pf[loneMeshPoints[i]] = pTraits<Type>::zero;
-//             }
-//         }
     }
 
 
