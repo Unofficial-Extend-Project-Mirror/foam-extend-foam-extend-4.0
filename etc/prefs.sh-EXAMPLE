@@ -114,6 +114,18 @@ compilerInstall=system
 # So we don't use a variable called QT_SYSTEM, but instead a variable
 # called QT_THIRD_PARTY in order to override to the ThirdParty QT
 # package.
+#
+# If you choose to use the system installed version of QT, keep
+# the variable QT_THIRD_PARTY commented, and uncomment the initialization
+# of the variable QT_DIR and QT_BIN_DIR. Make sure both variables are
+# properly initialized.
+#
+# If you choose instead to use the ThirdParty version of QT, only uncomment
+# the variable QT_THIRD_PARTY and set it to 1. Keep the initialization 
+# of the variables QT_DIR nd QT_BIN_DIR commented. The QT ThirdParty scripts
+# will take care of setting the variables QT_DIR and QT_BIN_DIR to the 
+# proper values.
+#
 #export QT_THIRD_PARTY=1
 #export QT_DIR=path_to_system_installed_qt
 #export QT_BIN_DIR=$QT_DIR/bin

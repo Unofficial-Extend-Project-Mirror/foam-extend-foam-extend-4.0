@@ -233,7 +233,7 @@ cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.cs
 setenv PARAVIEW_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 setenv PARAVIEW_BIN_DIR \$PARAVIEW_DIR/bin
 setenv PARAVIEW_LIB_DIR \$PARAVIEW_DIR/lib
-setenv PARAVIEW_INCLUDE_DIR \$PARAVIEW_INCLUDE_DIR/include
+setenv PARAVIEW_INCLUDE_DIR \$PARAVIEW__DIR/include
 
 setenv PARAVIEW_VERSION %{version}
 
