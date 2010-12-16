@@ -89,7 +89,7 @@ public:
     // Constructors
 
         //- From input stream and the approximate number of vertices in the STL
-        STLLexer(istream* is, const label approxNpoints);
+    STLLexer(std::istream* is, const label approxNpoints);
 
 
     // Member Functions
@@ -126,7 +126,7 @@ public:
 };
 
 
-STLLexer::STLLexer(istream* is, const label approxNpoints)
+STLLexer::STLLexer(std::istream* is, const label approxNpoints)
 :
     yyFlexLexer(is),
 
