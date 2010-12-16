@@ -1,0 +1,153 @@
+How to Contribute
+~~~~~~~~~~~~~~~~~
+
+Contacts:
+
+Release Committee:    Hrvoje Jasak (h.jasak@wikki.co.uk)
+SourceForge Accounts: Bernhard Gschaider (Bernhard.Gschaider@ice-sf.at)
+git Repository:       Henrik Rusche (h.rusche@wikki.co.uk)
+                      Martin Beaudoin (beaudoin.martin@ireq.ca)
+
+1. SourceForge Access
+   ~~~~~~~~~~~~~~~~~~ 
+
+   To make contributions to the -extend project, you should first obtain an
+   account at SourceForge.net. (SourceForge will suggest a username
+   of firstnamelastname, but a username of firstname_lastname may
+   be a better choice.) After you obtain your account at SourceForge, you will
+   still need to be granted specific access to the -extend project. Make a
+   request to the "SourceForge Accounts" contact at the top of this document
+   for access to the project.
+
+2. Access to the git Repository
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   For a read-only copy of the repository, use the following command:
+   + git clone git://openfoam-extend.git.sourceforge.net/gitroot/openfoam-extend/OpenFOAM-1.6-ext
+
+   To obtain a copy of the repository with write access, use the following
+   command:
+
+   + git clone ssh://username@openfoam-extend.git.sourceforge.net/gitroot/openfoam-extend/OpenFOAM-1.6-ext
+
+   Also see:
+
+   http://openfoam-extend.git.sourceforge.net/git/gitweb.cgi?p=openfoam-extend
+
+3. git Commit Policies and Workflow (Introduction)
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   A formal procedure for contributions has been established for the project
+   with regard to branching and commits in the git repository. The workflow
+   proposed by Hrvoje Jasak and Henrik Rusche for contributing to the git
+   repository is described in the following two documents:
+
+   http://nvie.com/posts/a-successful-git-branching-model/
+   http://www.itk.org/Wiki/Git/Workflow/Topic
+
+   Both of the two articles listed above should be considered mandatory
+   reading material for those planning to make contributions to the repository.
+
+   Please do not hesitate to ask one of the "git Repository" contacts at the
+   top of this document if you are not sure about specific operation relative
+   to the git repository.
+
+4. git Commit Policies and Workflow (User Perspective)
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   The document listed in Section 3 above from nvie.com provides an excellent
+   conceptual description of the policies that will be used for the -extend
+   repository. More detailed instructions for users who wish to make
+   contributions are spelled out in this section.
+
+   Before making any commits to the git repository, be sure to configure git with your
+   username and e-mail address, which helps to ensure that you receive proper credit
+   in the git repository for work you contribute.
+
+   The author's name and e-mail address can be provided to git using commands such
+   as these:
+
+   + git config --global user.name "John Doe"
+   + git config --global user.email john.doe@xxx.com
+
+   Afterwards, the provided information will be contained in a file named .gitconfig
+   in the user's home directory.
+
+   All contributions to the project repository will be contained in a new feature branch
+   created by the contributor. The recommended way of creating branches is to create one
+   branch for each new specific fix or feature using a command such as this:
+
+   + git checkout -b my-feature-branch
+
+   Feature branches should be named after the fix or feature that they contain,
+   *not* named after the author. There may be more than one author, after all, and 
+   this information is recorded in the commit anyway. As an example, a bug fix
+   to the mesquite package should be committed to a branch named "hotfix/mesquite".
+
+   Carefully organized commits and branches, clear commit messages, and well-chosen
+   branch names will make it easier for the release committee to review and merge
+   each contribution. 
+           
+   When you have a feature branch that is ready to be merged, push it to the server
+   using a command such as this:
+
+   + git push origin my-feature-branch
+
+   Next, notify the "Release Committee" point-of-contact listed at the top of this
+   document that the feature branch has been pushed to the server and is ready to be
+   merged. A release committee member will review your contribution, merge your
+   branch, and then delete the branch from the server, as it is no longer needed once
+   it has been merged.
+
+5. git Commit Policies and Workflow (Committee Perspective)
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   The -extend project "release committee" (initially comprised of Hrv Jasak) will be
+   solely responsible for merging user contributions into the master branch.
+
+   User contributions will be contained in feature branches, with a new feature branch for
+   each new fix or feature, as described in Section 4 above.
+
+   The feature branches provided by users will be merged by the release committee
+   into an integration branch called "nextRelease", and then both the local
+   and remote copy of the feature branch will be deleted. The merge will be performed 
+   using a "git merge --no-ff" command, which forces the creation of a merge commit
+   even in the case where the merge could be accomplished by fast-forward.
+   Note that the automated test loop will be run off of this integration branch.
+
+   When the next release is ready, the release committee will merge the
+   integration branch into the master branch, again using a "git merge --no-ff" command.
+   Consistent with the proposed workflow, the master branch will only contain releases
+   and hotfixes.
+
+   Note that hotfixes should be branched off of the master branch and should be merged
+   twice - once into the integration branch and once into the master branch - in order to 
+   guarantee that a merge of the integration branch into the master branch can be
+   accomplished by a fast-forward.
+
+6. Specific Usage Instructions
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   In case you find out that something that should be a hotfix ended up in
+   your local feature branch, follow the steps below to ensure that the hotfix is
+   properly committed to the integration and master branches:
+
+   a. Single out the SHA-1 of the commit that contains the hotfix (e.g. 13e5d2f)
+
+   b. Rebase the hotfix commit onto the master branch; e.g.
+
+      + (Can we provide an example of the git commands to do this?
+         Is it literally a rebase command or a cherry-pick?)
+
+   c. Create a new hotfix branch; e.g.
+
+      + git checkout -b hotfix/my-hotfix-topic
+
+   d. Contact the "Release Committee" point-of-contact at the top of this document
+      and request that the hotfix be merged into the integration and master branches.
+
+7. Other Suggested Topics
+   ~~~~~~~~~~~~~~~~~~~~~~
+
+   Author attribution: What is the policy/format for author credits and copyrights
+                       in new contributions provided by users to the -extend project?
