@@ -13,4 +13,5 @@ EXE_LIBS = \
     -ltopoChangerFvMesh \
     -lmeshTools \
     -lfiniteVolume \
-    $(WM_DECOMP_LIBS)
+    $(WM_DECOMP_LIBS) \
+    -llduSolvers

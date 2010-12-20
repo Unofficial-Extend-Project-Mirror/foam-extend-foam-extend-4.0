@@ -5,4 +5,5 @@ EXE_INC = \
 EXE_LIBS = \
     -lsampling \
     -lmeshTools \
-    -lfiniteVolume
+    -lfiniteVolume \
+    -llduSolvers

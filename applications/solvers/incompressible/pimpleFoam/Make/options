@@ -10,4 +10,5 @@ EXE_LIBS = \
     -lincompressibleRASModels \
     -lincompressibleLESModels \
     -lfiniteVolume \
-    -lmeshTools
+    -lmeshTools \
+    -llduSolvers
