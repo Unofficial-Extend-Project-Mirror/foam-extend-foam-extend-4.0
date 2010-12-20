@@ -39,7 +39,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class LimitedScheme Declaration
+                           Class NVDVTVDV Declaration
 \*---------------------------------------------------------------------------*/
 
 class NVDVTVDV
@@ -84,7 +84,7 @@ public:
 
             // Stabilise for division
             gradcf = stabilise(gradcf, VSMALL);
-            
+
             return 1 - 0.5*gradf/gradcf;
         }
 
