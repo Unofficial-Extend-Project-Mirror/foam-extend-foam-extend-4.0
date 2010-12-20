@@ -204,8 +204,8 @@ setenv OPENMPI_COMPILE_FLAGS "\`mpicc --showme:compile\`"
 setenv OPENMPI_LINK_FLAGS "\`mpicc --showme:link\`"
 
 # Set the OpenFOAM compilation flags 
-setenv PINC \`echo \$OPENMPI_COMPILE_FLAGS\`
-setenv PLIBS \`echo \$OPENMPI_LINK_FLAGS\`
+setenv PINC "\$OPENMPI_COMPILE_FLAGS"
+setenv PLIBS "\$OPENMPI_LINK_FLAGS"
 
 
 if (\$?FOAM_VERBOSE && \$?prompt) then
