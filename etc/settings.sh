@@ -452,6 +452,14 @@ export MPI_BUFFER_SIZE
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARMGRIDGEN_DIR is initialized to: $PARMGRIDGEN_DIR"
 
 
+# Load Libccmio library 
+# ~~~~~~~~~~~~~~~~~~~~~
+[ -z "$LIBCCMIO_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1 ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1/platforms/$WM_OPTIONS/etc/libccmio-2.6.1.sh
+}
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    LIBCCMIO_DIR is initialized to: $LIBCCMIO_DIR"
+
+
 # Load Scotch library
 # ~~~~~~~~~~~~~~~~~~~
 [ -z "$SCOTCH_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b ] && {

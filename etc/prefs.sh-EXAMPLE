@@ -92,6 +92,13 @@ compilerInstall=system
 #export PARMGRIDGEN_LIB_DIR=$PARMGRIDGEN_DIR/lib
 #export PARMGRIDGEN_INCLUDE_DIR=$PARMGRIDGEN_DIR/include
 
+# System installed Libccmio
+#export LIBCCMIO_SYSTEM=1
+#export LIBCCMIO_DIR=path_to_system_installed_libccmio
+#export LIBCCMIO_BIN_DIR=$LIBCCMIO_DIR/bin
+#export LIBCCMIO_LIB_DIR=$LIBCCMIO_DIR/lib
+#export LIBCCMIO_INCLUDE_DIR=$LIBCCMIO_DIR/include
+
 # System installed Scotch
 #export SCOTCH_SYSTEM=1
 #export SCOTCH_DIR=path_to_system_installed_scotch

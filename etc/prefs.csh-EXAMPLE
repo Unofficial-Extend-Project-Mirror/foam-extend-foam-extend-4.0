@@ -90,6 +90,13 @@
 #setenv PARMGRIDGEN_LIB_DIR $PARMGRIDGEN_DIR/lib
 #setenv PARMGRIDGEN_INCLUDE_DIR $PARMGRIDGEN_DIR/include
 
+# System installed Libccmio
+#setenv LIBCCMIO_SYSTEM 1
+#setenv LIBCCMIO_DIR path_to_system_installed_libccmio
+#setenv LIBCCMIO_BIN_DIR $LIBCCMIO_DIR/bin
+#setenv LIBCCMIO_LIB_DIR $LIBCCMIO_DIR/lib
+#setenv LIBCCMIO_INCLUDE_DIR $LIBCCMIO_DIR/include
+
 # System installed Scotch
 #setenv SCOTCH_SYSTEM 1
 #setenv SCOTCH_DIR path_to_system_installed_scotch
