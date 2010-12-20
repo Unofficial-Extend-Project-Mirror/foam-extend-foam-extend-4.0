@@ -36,4 +36,5 @@ EXE_LIBS = \
     -lreactionThermophysicalModels \
     -lchemistryModel \
     -lradiation \
-    -lODE
+    -lODE \
+    -llduSolvers

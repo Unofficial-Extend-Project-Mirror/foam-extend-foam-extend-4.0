@@ -10,4 +10,5 @@ EXE_LIBS = \
     -lspecie \
     -lcompressibleRASModels \
     -lfiniteVolume \
-    -lmeshTools
+    -lmeshTools \
+    -llduSolvers

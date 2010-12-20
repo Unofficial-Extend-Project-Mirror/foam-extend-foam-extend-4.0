@@ -8,4 +8,5 @@ EXE_LIBS = \
     -lfiniteVolume \
     -lbasicThermophysicalModels \
     -lspecie \
-    -lrhoCentralFoam
+    -lrhoCentralFoam \
+    -llduSolvers

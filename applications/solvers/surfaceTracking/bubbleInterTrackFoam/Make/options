@@ -12,4 +12,5 @@ EXE_LIBS = \
     -ldynamicMesh \
     -lmeshTools \
     -lfiniteVolume \
-    -lfiniteArea
+    -lfiniteArea \
+    -llduSolvers
