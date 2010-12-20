@@ -85,6 +85,33 @@ Foam::tmp<Foam::surfaceScalarField> Foam::MRFZones::fluxCorrection() const
     return tMRFZonesPhiCorr;
 }
 
+Foam::tmp<Foam::surfaceVectorField> Foam::MRFZones::faceU() const
+{
+    tmp<surfaceVectorField> tMRFZonesFaceU
+    (
+        new surfaceVectorField
+        (
+            IOobject
+            (
+                "MRFZonesFaceU",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimensionedVector("zero", dimVelocity, vector::zero)
+        )
+    );
+    surfaceVectorField& MRFZonesFaceU = tMRFZonesFaceU();
+
+    forAll(*this, i)
+    {
+        operator[](i).faceU(MRFZonesFaceU);
+    }
+
+    return tMRFZonesFaceU;
+}
 
 void Foam::MRFZones::addCoriolis(fvVectorMatrix& UEqn) const
 {

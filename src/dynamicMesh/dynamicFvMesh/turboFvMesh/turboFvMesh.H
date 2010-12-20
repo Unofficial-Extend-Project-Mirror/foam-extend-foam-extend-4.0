@@ -26,11 +26,31 @@ Class
     turboFvMesh
 
 Description
-    Simple mixer mesh using an overlapGGI interface
+    Simple mixer mesh using an ggi interfaces
+
+    This tool is used to have multiple rotating regions around the same origin
+    with different rpms. Creating the cellZones is not implemented in this tool.
+    The steps to obtain the cellZones and faceZones are:
+
+    1) use regionCellSets utility. With this command you can have different
+       cellSets for each region.
+
+    2) run command "setsToZones -noFlipMap".  After this command the
+       cellSets are transformed to cellZones.
+
+    4) for each rotating cellZone add an entry in rpm subDict of
+       constant/dynamicMeshDict
+
+    5) in parallel you need to create from all rotating coupled-interface
+       patches faceZones (if you use a ggi interface between you have already
+       created these faceZones), Then you need to specify these faceZones with
+       the corresponding rpm in the additional "slider" subDict in
+       constant/dynamicMeshDict
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
     Fethi Tekin, All rights reserved.
+    Oliver Borm, All rights reserved.
 
 SourceFiles
     turboFvMesh.C
@@ -64,9 +84,6 @@ class turboFvMesh
         //- Coordinate system
         autoPtr<coordinateSystem> csPtr_;
 
-        // - Rotational speed in rotations per minute (rpm)
-       mutable scalar rpm_;
-
         //- Markup field for points.
         mutable vectorField* movingPointsPtr_;
 
@@ -78,10 +95,6 @@ class turboFvMesh
 
         //- Disallow default bitwise assignment
         void operator=(const turboFvMesh&);
-
-
-        //- Add mixer zones
-        void addZonesAndModifiers();
 
         //- Calculate moving Points
         void calcMovingPoints() const;

@@ -37,7 +37,7 @@ alias _foamAddPath 'set path=(\!* $path)'
 alias _foamAddLib 'setenv LD_LIBRARY_PATH \!*\:${LD_LIBRARY_PATH}'
 
 # location of the jobControl directory
-setenv FOAM_JOB_DIR $WM_PROJECT_INST_DIR/jobControl
+setenv FOAM_JOB_DIR $HOME/$WM_PROJECT/jobControl
 
 # wmake configuration
 setenv WM_DIR $WM_PROJECT_DIR/wmake
@@ -52,18 +52,18 @@ setenv WM_DECOMP_LIBS "-lfaceDecompFiniteElement -lfaceDecompositionMotionSolver
 
 # base configuration
 setenv FOAM_APP $WM_PROJECT_DIR/applications
-setenv FOAM_APPBIN $WM_PROJECT_DIR/applications/bin/$WM_OPTIONS
+setenv FOAM_APPBIN $WM_PROJECT_DIR/applications/bin
 setenv FOAM_LIB $WM_PROJECT_DIR/lib
 setenv FOAM_LIBBIN $WM_PROJECT_DIR/lib/$WM_OPTIONS
 setenv FOAM_SRC $WM_PROJECT_DIR/src
 
 # shared site configuration - similar naming convention as ~OpenFOAM expansion
-setenv FOAM_SITE_APPBIN $WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/bin/$WM_OPTIONS
-setenv FOAM_SITE_LIBBIN $WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/lib/$WM_OPTIONS
+setenv FOAM_SITE_APPBIN $WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/bin
+setenv FOAM_SITE_LIBBIN $WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/lib
 
 # user configuration
-setenv FOAM_USER_APPBIN $WM_PROJECT_USER_DIR/applications/bin/$WM_OPTIONS
-setenv FOAM_USER_LIBBIN $WM_PROJECT_USER_DIR/lib/$WM_OPTIONS
+setenv FOAM_USER_APPBIN $WM_PROJECT_USER_DIR/applications/bin
+setenv FOAM_USER_LIBBIN $WM_PROJECT_USER_DIR/lib
 
 # convenience
 setenv FOAM_TUTORIALS $WM_PROJECT_DIR/tutorials

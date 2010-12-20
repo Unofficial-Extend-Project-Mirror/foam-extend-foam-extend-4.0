@@ -6,6 +6,9 @@ application="icoDyMFoam"
 
 runApplication blockMesh
 cp constant/polyMesh/boundary.org constant/polyMesh/boundary
+runApplication setSet -batch setBatch
 runApplication regionCellSets
 runApplication setsToZones -noFlipMap
-runApplication $application
+runApplication decomposePar
+# # runApplication $application
+runParallel icoDyMFoam 4

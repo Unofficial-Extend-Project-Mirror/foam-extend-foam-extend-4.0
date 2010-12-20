@@ -49,6 +49,7 @@ set foamInstall = $HOME/$WM_PROJECT
 # set foamInstall = ~$WM_PROJECT
 # set foamInstall = /usr/local/$WM_PROJECT
 # set foamInstall = /opt/$WM_PROJECT
+# set foamInstall = /usr/lib
 #
 # END OF (NORMAL) USER EDITABLE PART
 ###############################################################################
@@ -304,7 +305,7 @@ setenv MANPATH `$cleanProg "$MANPATH" "$foamOldDirs"`
 # Source project setup files
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 _foamSource $WM_PROJECT_DIR/etc/settings.csh
-_foamSource $WM_PROJECT_DIR/etc/aliases.csh
+# _foamSource $WM_PROJECT_DIR/etc/aliases.csh
 
 # Source user setup files for optional packages
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

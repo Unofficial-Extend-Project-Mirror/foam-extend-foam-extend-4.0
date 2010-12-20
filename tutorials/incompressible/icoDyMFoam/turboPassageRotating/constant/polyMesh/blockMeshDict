@@ -96,10 +96,13 @@ patches
         (12 14 15 13)
         (0 2 3 1)
     )
-    cyclic rotor_cyclics
+    cyclicGgi rotor_cyclic_upper
+    (
+        (14 16 17 15)
+    )
+    cyclicGgi rotor_cyclic_lower
     (
         (2 4 5 3)
-        (14 16 17 15)
     )
     cyclic stator_cyclics
     (

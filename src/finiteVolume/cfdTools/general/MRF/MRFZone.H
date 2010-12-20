@@ -199,6 +199,9 @@ public:
             surfaceScalarField& phi
         ) const;
 
+        //- Compute the pseudo face velocity of the MRF region
+        void faceU(surfaceVectorField& zoneFaceU) const;
+
         //- Correct the boundary velocity for the roation of the MRF region
         void correctBoundaryVelocity(volVectorField& U) const;
 

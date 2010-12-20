@@ -40,13 +40,17 @@ boundaryField
         type            movingWallVelocity;
         value           uniform (0 0 0);
     }
-    rotor_cyclics
+    rotor_cyclic_upper
     {
-       type cyclic;
+       type             cyclicGgi;
+    }
+    rotor_cyclic_lower
+    {
+       type             cyclicGgi;
     }
     stator_cyclics
     {
-       type  cyclic;
+       type             cyclic;
     }
     interface1
     {

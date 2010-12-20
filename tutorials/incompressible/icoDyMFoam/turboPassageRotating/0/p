@@ -37,9 +37,13 @@ boundaryField
     {
         type            zeroGradient;
     }
-    rotor_cyclics
+    rotor_cyclic_upper
     {
-        type            cyclic;
+        type            cyclicGgi;
+    }
+    rotor_cyclic_lower
+    {
+        type            cyclicGgi;
     }
     stator_cyclics
     {

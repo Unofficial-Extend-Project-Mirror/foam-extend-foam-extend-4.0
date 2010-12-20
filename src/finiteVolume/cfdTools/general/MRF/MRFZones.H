@@ -81,6 +81,9 @@ public:
         //- Return raw correction flux
         tmp<surfaceScalarField> fluxCorrection() const;
 
+        //- Return pseudo mesh flux
+        tmp<surfaceVectorField> faceU() const;
+
         // Incompressible MRF
 
             //- Add the Coriolis force contribution to the momentum equation
