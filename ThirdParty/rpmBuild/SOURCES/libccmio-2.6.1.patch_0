@@ -1,0 +1,78 @@
+diff -ruN libccmio-2.6.1_orig/config/config.gnu.to.star libccmio-2.6.1/config/config.gnu.to.star
+--- libccmio-2.6.1_orig/config/config.gnu.to.star	2007-12-17 18:32:03.000000000 -0500
++++ libccmio-2.6.1/config/config.gnu.to.star	2010-12-18 14:50:35.000000000 -0500
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ 
+ # $Id: config.gnu.to.star,v 1.4 2006/06/05 21:12:16 geoffp Exp $
+ 
+@@ -34,6 +34,7 @@
+     x86_64-unknown-linux-gnu-null)     echo linux64_2.4-x86-glibc_2.2.5     ;;
+     ppc64-unknown-linux-gnu-null)      echo linux64_2.6-pwr4-glibc_2.3.3    ;;
+     i386-apple-darwin8-null)           echo i386-apple-darwin8              ;;
++    i386-apple-darwin10-null)          echo i386-apple-darwin10             ;;
+     *)                                 echo unknown                         ;;
+ esac
+ 
+diff -ruN libccmio-2.6.1_orig/config/config.guess libccmio-2.6.1/config/config.guess
+--- libccmio-2.6.1_orig/config/config.guess	2006-06-30 14:00:19.000000000 -0400
++++ libccmio-2.6.1/config/config.guess	2010-12-18 14:50:49.000000000 -0500
+@@ -1,4 +1,4 @@
+-#! /bin/sh
++#! /bin/bash
+ # Attempt to guess a canonical system name.
+ #   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
+ #   Free Software Foundation, Inc.
+diff -ruN libccmio-2.6.1_orig/config/config.system libccmio-2.6.1/config/config.system
+--- libccmio-2.6.1_orig/config/config.system	2008-02-25 22:07:16.000000000 -0500
++++ libccmio-2.6.1/config/config.system	2010-12-18 14:51:34.000000000 -0500
+@@ -1,4 +1,4 @@
+-#! /bin/sh
++#! /bin/bash
+ 
+ # $Id: config.system,v 1.2 2005/09/29 22:19:19 geoffp Exp $
+ 
+@@ -87,6 +87,9 @@
+     i386-apple-darwin8.11.1)
+ 	echo i386-apple-darwin8 ;;
+ 
++    i386-apple-darwin10.5.0)
++	echo i386-apple-darwin10 ;;
++
+     *)
+         echo unknown
+         echo System type ${SYSTEM} not supported! 1>&2 ;;
+diff -ruN libccmio-2.6.1_orig/config/runqmake libccmio-2.6.1/config/runqmake
+--- libccmio-2.6.1_orig/config/runqmake	2006-06-30 14:00:19.000000000 -0400
++++ libccmio-2.6.1/config/runqmake	2010-12-18 14:53:41.000000000 -0500
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ 
+ PATHTOSRC=$1
+ shift
+diff -ruN libccmio-2.6.1_orig/libadf/adf.pro libccmio-2.6.1/libadf/adf.pro
+--- libccmio-2.6.1_orig/libadf/adf.pro	2006-06-30 14:00:17.000000000 -0400
++++ libccmio-2.6.1/libadf/adf.pro	2010-12-18 13:32:43.000000000 -0500
+@@ -1,7 +1,7 @@
+ TEMPLATE = lib
+ windows-vc.net:TEMPLATE = vclib
+ windows-vc.net:config += release
+-TARGET = adf
++TARGET = adf_ccmio
+ PATHTOSRC = ../
+ 
+ include($$PATHTOSRC/config/ccm.pro)
+diff -ruN libccmio-2.6.1_orig/libcgns/cgns.pro libccmio-2.6.1/libcgns/cgns.pro
+--- libccmio-2.6.1_orig/libcgns/cgns.pro	2006-06-30 14:00:18.000000000 -0400
++++ libccmio-2.6.1/libcgns/cgns.pro	2010-12-18 13:33:29.000000000 -0500
+@@ -1,7 +1,7 @@
+ TEMPLATE = lib
+ windows-vc.net:TEMPLATE = vclib
+ windows-vc.net:config += release
+-TARGET = cgns
++TARGET = cgns_ccmio
+ PATHTOSRC = ../
+ 
+ include($$PATHTOSRC/config/ccm.pro)

@@ -75,13 +75,13 @@ else
 fi
 
 # Libccmio
-#if [ -z "$LIBCCMIO_SYSTEM" ] 
-#then
-#    ( rpm_make libccmio-2.6.1  )
-#else
-#    echo "Using system installed Libccmio"
-#    echo ""
-#fi
+if [ -z "$LIBCCMIO_SYSTEM" ] 
+then
+    ( rpm_make libccmio-2.6.1  https://wci.llnl.gov/codes/visit/3rd_party/libccmio-2.6.1.tar.gz          )
+else
+    echo "Using system installed Libccmio"
+    echo ""
+fi
 
 # Mesquite
 if [ -z "$MESQUITE_SYSTEM" ] 

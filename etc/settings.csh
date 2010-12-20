@@ -394,6 +394,13 @@ if ( $?PARMGRIDGEN_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS/etc/ParMGridGen-1.0.csh
 endif
 
+# Load Libccmio library 
+# ~~~~~~~~~~~~~~~~~~~~~
+if ( $?LIBCCMIO_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1 ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1/platforms/$WM_OPTIONS/etc/libccmio-2.6.1.csh
+endif
+
+
 # Scotch library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if ( $?SCOTCH_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b ) then
