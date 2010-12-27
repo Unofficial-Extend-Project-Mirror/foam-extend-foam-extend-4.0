@@ -131,7 +131,7 @@ public:
         //- Size of largest patch (out of supplied subset of patches)
         label maxPatchSize(const labelHashSet& patchIDs) const;
 
-        //- Sum of patch sizes (out of supplied subset of patches). 
+        //- Sum of patch sizes (out of supplied subset of patches)
         //  Used in sizing arrays.
         label sumPatchSize(const labelHashSet& patchIDs) const;
 
