@@ -31,9 +31,9 @@ Description
     The time-step is adjusted locally so that the local Courant number
     does not exceed the specified value.
 
-    This scheme should only be used for steady-state computations
-    using transient codes where local time-stepping is preferably to
-    under-relaxation for transport consistency reasons.
+    This is a transient first-order scheme with "consistent locally introduced
+    inertial under-relaxation" for cells where the specified Co limit has been
+    breached.  HJ, 22/Dec/2010
 
 SourceFiles
     CoEulerDdtScheme.C
