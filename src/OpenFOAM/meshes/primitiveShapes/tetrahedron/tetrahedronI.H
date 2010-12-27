@@ -134,6 +134,13 @@ inline scalar tetrahedron<Point, PointRef>::mag() const
 
 
 template<class Point, class PointRef>
+inline vector tetrahedron<Point, PointRef>::centre() const
+{
+    return 0.25*(a_ + b_ + c_ + d_);
+}
+
+
+template<class Point, class PointRef>
 inline vector tetrahedron<Point, PointRef>::circumCentre() const
 {
     vector a = b_ - a_;
