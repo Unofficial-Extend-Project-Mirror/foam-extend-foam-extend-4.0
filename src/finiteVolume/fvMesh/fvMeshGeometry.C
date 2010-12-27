@@ -93,7 +93,7 @@ void fvMesh::makeMagSf() const
 
     // Note: Added stabilisation for faces with exactly zero area.
     // These should be caught on mesh checking but at least this stops
-    // the code from producing Nans.  
+    // the code from producing NaNs.  HJ, date deleted
     magSfPtr_ = new surfaceScalarField
     (
         IOobject
