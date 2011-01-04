@@ -114,7 +114,7 @@ public:
             }
 
             // Stabilise for division
-            gradf = stabilise(gradf, VSMALL);
+            gradf = stabilise(gradf, SMALL);
 
             return 2*(gradcf/gradf) - 1;
         }

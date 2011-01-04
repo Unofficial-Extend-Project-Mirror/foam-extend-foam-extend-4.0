@@ -78,7 +78,7 @@ public:
             faceFlux, phiP, phiN, gradcP, gradcN, d
         );
 
-        return r*(r + 1)/(sqr(r) + 1);
+        return max(r*(r + 1)/(sqr(r) + 1),0);
     }
 };
 
