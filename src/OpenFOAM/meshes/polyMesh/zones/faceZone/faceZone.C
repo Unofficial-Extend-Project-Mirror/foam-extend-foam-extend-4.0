@@ -565,7 +565,7 @@ bool Foam::faceZone::checkParallelSync(const bool report) const
 
             label patchI = bm.whichPatch(faceI);
 
-            if (patchI != -1 && bm[patchI].coupled())
+            if (patchI != -1 && isA<cyclicPolyPatch>(bm[patchI]))
             {
                 label bFaceI = faceI-mesh.nInternalFaces();
 
