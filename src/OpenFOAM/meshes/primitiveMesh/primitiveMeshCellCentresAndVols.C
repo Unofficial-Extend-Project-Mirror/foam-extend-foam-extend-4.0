@@ -30,6 +30,8 @@ Description
 
 #include "primitiveMesh.H"
 
+#include "tetPointRef.H"
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 void Foam::primitiveMesh::calcCellCentresAndVols() const
@@ -108,50 +110,100 @@ void Foam::primitiveMesh::makeCellCentresAndVols
         cEst[celli] /= nCellFaces[celli];
     }
 
-    forAll (own, facei)
+    const faceList& allFaces = faces();
+    const pointField& allPoints = points();
+
+    forAll(own, faceI)
     {
-        // Calculate 3*face-pyramid volume
+        const face& f = allFaces[faceI];
 
-        // Bug fix: incorrect volume calculation for mildly concave cells
-        // Critical in mesh motion sliding cases for volume conservation
-        // HJ, 9/Feb/2009
-        scalar pyr3Vol =
-//             max(fAreas[facei] & (fCtrs[facei] - cEst[own[facei]]), VSMALL);
-            fAreas[facei] & (fCtrs[facei] - cEst[own[facei]]);
+        if (f.size() == 3)
+        {
+            tetPointRef tpr
+            (
+                allPoints[f[2]],
+                allPoints[f[1]],
+                allPoints[f[0]],
+                cEst[own[faceI]]
+            );
 
-        // Calculate face-pyramid centre
-        vector pc = (3.0/4.0)*fCtrs[facei] + (1.0/4.0)*cEst[own[facei]];
+            scalar tetVol = tpr.mag();
 
-        // Accumulate volume-weighted face-pyramid centre
-        cellCtrs[own[facei]] += pyr3Vol*pc;
+            // Accumulate volume-weighted tet centre
+            cellCtrs[own[faceI]] += tetVol*tpr.centre();
 
-        // Accumulate face-pyramid volume
-        cellVols[own[facei]] += pyr3Vol;
+            // Accumulate tet volume
+            cellVols[own[faceI]] += tetVol;
+        }
+        else
+        {
+            forAll(f, pI)
+            {
+                tetPointRef tpr
+                (
+                    allPoints[f[pI]],
+                    allPoints[f.prevLabel(pI)],
+                    fCtrs[faceI],
+                    cEst[own[faceI]]
+                );
+
+                scalar tetVol = tpr.mag();
+
+                // Accumulate volume-weighted tet centre
+                cellCtrs[own[faceI]] += tetVol*tpr.centre();
+
+                // Accumulate tet volume
+                cellVols[own[faceI]] += tetVol;
+            }
+        }
     }
 
-    forAll (nei, facei)
+    forAll(nei, faceI)
     {
-        // Calculate 3*face-pyramid volume
+        const face& f = allFaces[faceI];
 
-        // Bug fix: incorrect volume calculation for mildly concave cells
-        // Critical in mesh motion sliding cases for volume conservation
-        // HJ, 9/Feb/2009
-        scalar pyr3Vol =
-//             max(fAreas[facei] & (cEst[nei[facei]] - fCtrs[facei]), VSMALL);
-            fAreas[facei] & (cEst[nei[facei]] - fCtrs[facei]);
+        if (f.size() == 3)
+        {
+            tetPointRef tpr
+            (
+                allPoints[f[0]],
+                allPoints[f[1]],
+                allPoints[f[2]],
+                cEst[nei[faceI]]
+            );
 
-        // Calculate face-pyramid centre
-        vector pc = (3.0/4.0)*fCtrs[facei] + (1.0/4.0)*cEst[nei[facei]];
+            scalar tetVol = tpr.mag();
 
-        // Accumulate volume-weighted face-pyramid centre
-        cellCtrs[nei[facei]] += pyr3Vol*pc;
+            // Accumulate volume-weighted tet centre
+            cellCtrs[nei[faceI]] += tetVol*tpr.centre();
 
-        // Accumulate face-pyramid volume
-        cellVols[nei[facei]] += pyr3Vol;
+            // Accumulate tet volume
+            cellVols[nei[faceI]] += tetVol;
+        }
+        else
+        {
+            forAll(f, pI)
+            {
+                tetPointRef tpr
+                (
+                    allPoints[f[pI]],
+                    allPoints[f.nextLabel(pI)],
+                    fCtrs[faceI],
+                    cEst[nei[faceI]]
+                );
+
+                scalar tetVol = tpr.mag();
+
+                // Accumulate volume-weighted tet centre
+                cellCtrs[nei[faceI]] += tetVol*tpr.centre();
+
+                // Accumulate tet volume
+                cellVols[nei[faceI]] += tetVol;
+            }
+        }
     }
 
     cellCtrs /= cellVols + VSMALL;
-    cellVols *= (1.0/3.0);
 }
 
 
