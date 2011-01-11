@@ -37,7 +37,7 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-Foam::SLList<Foam::string>    Foam::argList::validArgs;
+Foam::SLList<Foam::string> Foam::argList::validArgs;
 Foam::HashTable<Foam::string> Foam::argList::validOptions;
 Foam::HashTable<Foam::string> Foam::argList::validParOptions;
 bool Foam::argList::bannerEnabled(true);
@@ -114,7 +114,7 @@ bool Foam::argList::regroupArgv(int& argc, char**& argv)
 }
 
 
-// get rootPath_ / globalCase_ from one of the following forms
+// get rootPath_/globalCase_ from one of the following forms
 //   * [-case dir]
 //   * cwd
 //
@@ -152,29 +152,26 @@ void Foam::argList::getRootCase()
         casePath = cwd();
     }
 
-    rootPath_   = casePath.path();
+    rootPath_ = casePath.path();
     globalCase_ = casePath.name();
-    case_       = globalCase_;
-
+    case_ = globalCase_;
 
     // Set the case and case-name as an environment variable
     if (rootPath_[0] == '/')
     {
-        // absolute path - use as-is
+        // Absolute path - use as-is
         setEnv("FOAM_CASE", rootPath_/globalCase_, true);
         setEnv("FOAM_CASENAME", globalCase_, true);
     }
     else
     {
-        // qualify relative path
+        // Qualify relative path
         fileName casePath = cwd()/rootPath_/globalCase_;
         casePath.clean();
 
         setEnv("FOAM_CASE", casePath, true);
         setEnv("FOAM_CASENAME", casePath.name(), true);
     }
-
-
 }
 
 
