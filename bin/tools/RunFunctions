@@ -107,4 +107,29 @@ cloneCase ()
     fi
 }
 
+makeFsiCaseLinks ()
+{
+    cd $1
+    cd system
+    ln -s ../../$2/system $2
+    cd ../constant
+    ln -s ../../$2/constant $2
+    cd ../0
+    ln -s ../../$2/0 $2
+    cd ../..
+}
+
+makeFsiResultsLinks ()
+{
+    cd $1
+    TIME_DIRS=`foamInfoExec -times | sed '1,/constant/d'`
+    echo "makeFsiResultsLinks for" $TIME_DIRS
+    cd ../$2
+    for T in $TIME_DIRS
+    do
+        ln -s ../$1/${T}/solid ${T}
+    done
+    cd ..
+}
+
 #------------------------------------------------------------------------------
