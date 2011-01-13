@@ -91,6 +91,7 @@ find -H $packDir               \
  -e '\@/platforms/@d'          \
  -e '\@libccmio.*/@d'          \
  -e '\@/.svn/@d'               \
+ -e "\@$packDir/ThirdParty/rpmBuild/@d"\
  > $tmpFile
 
 
