@@ -159,8 +159,8 @@ public:
         //- Return patch index for a given face label
         label whichPatch(const label faceIndex) const;
 
-        //- Return the set of patch IDs corresponding to the given list of names
-        //  Wild cards are expanded.
+        //- Return the set of patch IDs corresponding to the given list
+        //  of names.  Wild cards are expanded.
         labelHashSet patchSet(const wordList&) const;
 
         //- Check whether all procs have all patches and in same order. Return

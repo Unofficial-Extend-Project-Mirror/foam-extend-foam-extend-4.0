@@ -386,7 +386,8 @@ Foam::label Foam::FaceCellWave<Type>::getChangedPatchFaces
         if (changedFace_[meshFaceI])
         {
             changedPatchFaces[nChangedPatchFaces] = patchFaceI;
-            changedPatchFacesInfo[nChangedPatchFaces] = allFaceInfo_[meshFaceI];
+            changedPatchFacesInfo[nChangedPatchFaces] =
+                allFaceInfo_[meshFaceI];
             nChangedPatchFaces++;
         }
     }
@@ -405,7 +406,7 @@ void Foam::FaceCellWave<Type>::leaveDomain
 ) const
 {
     const vectorField& fc = mesh_.faceCentres();
-    
+
     for(label i = 0; i < nFaces; i++)
     {
         label patchFaceI = faceLabels[i];
@@ -427,7 +428,7 @@ void Foam::FaceCellWave<Type>::enterDomain
 ) const
 {
     const vectorField& fc = mesh_.faceCentres();
-    
+
     for(label i = 0; i < nFaces; i++)
     {
         label patchFaceI = faceLabels[i];
@@ -739,7 +740,7 @@ void Foam::FaceCellWave<Type>::handleCyclicPatches()
 
             if (debug)
             {
-                Pout<< " Cyclic patch " << patchI << ' ' << patch.name() 
+                Pout<< " Cyclic patch " << patchI << ' ' << patch.name()
                     << "  Changed on first half : " << nSendFaces
                     << "  Changed on second half : " << nReceiveFaces
                     << endl;
@@ -819,7 +820,7 @@ Foam::FaceCellWave<Type>::FaceCellWave
 {}
 
 
-// Iterate, propagating changedFacesInfo across mesh, until no change (or 
+// Iterate, propagating changedFacesInfo across mesh, until no change (or
 // maxIter reached). Initial cell values specified.
 template <class Type>
 Foam::FaceCellWave<Type>::FaceCellWave
@@ -861,7 +862,7 @@ Foam::FaceCellWave<Type>::FaceCellWave
             "(const polyMesh&, const labelList&, const List<Type>,"
             " UList<Type>&, UList<Type>&, const label maxIter)"
         )
-            << "Maximum number of iterations reached. Increase maxIter." << endl
+            << "Maximum number of iterations reached. Increase maxIter." << nl
             << "    maxIter:" << maxIter << endl
             << "    nChangedCells:" << nChangedCells_ << endl
             << "    nChangedFaces:" << nChangedFaces_ << endl
@@ -989,7 +990,8 @@ Foam::label Foam::FaceCellWave<Type>::cellToFace()
         label cellI = changedCells_[changedCellI];
         if (!changedCell_[cellI])
         {
-            FatalErrorIn("FaceCellWave<Type>::cellToFace()") << "Cell " << cellI
+            FatalErrorIn("FaceCellWave<Type>::cellToFace()")
+                << "Cell " << cellI
                 << " not marked as having been changed"
                 << abort(FatalError);
         }

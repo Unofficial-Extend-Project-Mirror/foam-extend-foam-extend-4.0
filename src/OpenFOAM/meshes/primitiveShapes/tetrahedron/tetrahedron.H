@@ -138,6 +138,9 @@ public:
             //- Return volume
             inline scalar mag() const;
 
+            //- Return centre
+            inline vector centre() const;
+
             //- Return circum-centre
             inline vector circumCentre() const;
 

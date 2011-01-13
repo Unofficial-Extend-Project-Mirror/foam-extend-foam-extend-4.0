@@ -547,10 +547,14 @@ bool Foam::faceZone::checkParallelSync(const bool report) const
         {
             label faceI = operator[](i);
 
-            if (!mesh.isInternalFace(faceI))
+            // Only check live faces
+            if (faceI < mesh.nFaces())
             {
-                neiZoneFace[faceI-mesh.nInternalFaces()] = true;
-                neiZoneFlip[faceI-mesh.nInternalFaces()] = flipMap()[i];
+                if (!mesh.isInternalFace(faceI))
+                {
+                    neiZoneFace[faceI - mesh.nInternalFaces()] = true;
+                    neiZoneFlip[faceI - mesh.nInternalFaces()] = flipMap()[i];
+                }
             }
         }
 
@@ -563,44 +567,49 @@ bool Foam::faceZone::checkParallelSync(const bool report) const
         {
             label faceI = operator[](i);
 
-            label patchI = bm.whichPatch(faceI);
-
-            if (patchI != -1 && bm[patchI].coupled())
+            // Only check live faces
+            if (faceI < mesh.nFaces())
             {
-                label bFaceI = faceI-mesh.nInternalFaces();
+                label patchI = bm.whichPatch(faceI);
 
-                // Check face in zone on both sides
-                if (myZoneFace[bFaceI] != neiZoneFace[bFaceI])
+                if (patchI != -1 && isA<cyclicPolyPatch>(bm[patchI]))
                 {
-                    boundaryError = true;
+                    label bFaceI = faceI-mesh.nInternalFaces();
 
-                    if (report)
+                    // Check face in zone on both sides
+                    if (myZoneFace[bFaceI] != neiZoneFace[bFaceI])
                     {
-                        Pout<< " ***Problem with faceZone " << index()
-                            << " named " << name()
-                            << ". Face " << faceI
-                            << " on coupled patch "
-                            << bm[patchI].name()
-                            << " is not consistent with its coupled neighbour."
-                            << endl;
+                        boundaryError = true;
+
+                        if (report)
+                        {
+                            Pout<< " ***Problem with faceZone " << index()
+                                << " named " << name()
+                                << ". Face " << faceI
+                                << " on coupled patch "
+                                << bm[patchI].name()
+                                << " is not consistent with its "
+                                << "coupled neighbour."
+                                << endl;
+                        }
                     }
-                }
 
-                // Flip state should be opposite.
-                if (myZoneFlip[bFaceI] == neiZoneFlip[bFaceI])
-                {
-                    boundaryError = true;
-
-                    if (report)
+                    // Flip state should be opposite.
+                    if (myZoneFlip[bFaceI] == neiZoneFlip[bFaceI])
                     {
-                        Pout<< " ***Problem with faceZone " << index()
-                            << " named " << name()
-                            << ". Face " << faceI
-                            << " on coupled patch "
-                            << bm[patchI].name()
-                            << " does not have consistent flipMap"
-                            << " across coupled faces."
-                            << endl;
+                        boundaryError = true;
+
+                        if (report)
+                        {
+                            Pout<< " ***Problem with faceZone " << index()
+                                << " named " << name()
+                                << ". Face " << faceI
+                                << " on coupled patch "
+                                << bm[patchI].name()
+                                << " does not have consistent flipMap"
+                                << " across coupled faces."
+                                << endl;
+                        }
                     }
                 }
             }

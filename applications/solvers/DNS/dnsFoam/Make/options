@@ -7,4 +7,5 @@ EXE_LIBS = \
     -lfiniteVolume \
     -lrandomProcesses \
     -lsampling \
-    -lmeshTools
+    -lmeshTools \
+    -llduSolvers

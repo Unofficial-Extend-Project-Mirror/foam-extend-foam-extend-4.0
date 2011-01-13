@@ -34,6 +34,7 @@ Description
 #include "IOmanip.H"
 #include "BisectionRoot.H"
 #include "RiddersRoot.H"
+#include "NewtonSecantRoot.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,15 +51,38 @@ public:
     }
 };
 
+
+class testFunctionDerivative
+{
+public:
+
+    testFunctionDerivative()
+    {}
+
+    scalar operator()(const scalar& x) const
+    {
+        return 0.5*Foam::pow(x,-1.5) - Foam::cos(x);
+    }
+};
+
+
 int main(int argc, char *argv[])
 {
-    testFunction tf;
+    testFunction           tf;
+    testFunctionDerivative df;
 
     Info<< setprecision(10)
         << "Bisection root "
         << BisectionRoot<testFunction>(tf, 1e-5).root(0, 10) << nl
         << "Ridders root "
-        << RiddersRoot<testFunction>(tf, 1e-5).root(0, 10) << endl;
+        << RiddersRoot<testFunction>(tf, 1e-5).root(0, 10) << nl
+        << "NewtonSecant root "
+        << NewtonSecantRoot<testFunction,testFunctionDerivative>
+           (
+               tf,
+               df,
+               1e-5
+           ).root(1.5) << endl;
 
 
     Info<< "End\n" << endl;

@@ -5,7 +5,7 @@
 #  \\    /   O peration     |
 #   \\  /    A nd           | Copyright held by original author
 #    \\/     M anipulation  |
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # License
 #     This file is part of OpenFOAM.
 #
@@ -30,7 +30,7 @@
 #     Check that the current working directory is equal to a particular
 #     target directory, resolving the absolute path as required
 #
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 unset quietOpt
 
 usage() {

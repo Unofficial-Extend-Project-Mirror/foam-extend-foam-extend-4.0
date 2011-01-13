@@ -23,15 +23,25 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::NVDTVD
+    NewtonSecantRoot
 
 Description
-    Foam::NVDTVD
+    NewtonSecant root is based on combination of Newton and Secant methods.
+    Function and the funciton derivative are provided as a template parameter
+    function object, evaluated using operator()(const scalar x)
+
+Author
+    Aleksandar Jemcov.  All rights reserved.
+
+SourceFiles
+    NewtonSecantRoot.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef NVDTVD_H
-#define NVDTVD_H
+#ifndef NewtonSecantRoot_H
+#define NewtonSecantRoot_H
+
+#include "scalar.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -39,90 +49,57 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class NVDTVD Declaration
+                           Class NewtonSecantRoot Declaration
 \*---------------------------------------------------------------------------*/
 
-class NVDTVD
+template<typename Func, typename Deriv>
+class NewtonSecantRoot
 {
+    // Private data
+
+        //- Reference to a function
+        const Func&  f_;
+
+        //- Reference to a derivative
+        const Deriv& d_;
+
+        //- Required accuracy
+        const scalar eps_;
+
 
 public:
 
-    typedef scalar phiType;
-    typedef vector gradPhiType;
+    // Static data members
+
+        //- Maximum number of iterations
+        static const label maxIter;
 
 
-    // Null Constructor
+    // Constructors
 
-        NVDTVD()
-        {}
+        //- Construct given a function
+        NewtonSecantRoot(const Func& f, const Deriv& d, const scalar eps);
+
+
+    // Destructor - default
 
 
     // Member Functions
 
-        scalar phict
-        (
-            const scalar faceFlux,
-            const scalar phiP,
-            const scalar phiN,
-            const vector& gradcP,
-            const vector& gradcN,
-            const vector& d
-        ) const
-        {
-            scalar gradf = phiN - phiP;
-
-            scalar gradcf;
-
-            if (faceFlux > 0)
-            {
-                gradcf = d & gradcP;
-            }
-            else
-            {
-                gradcf = d & gradcN;
-            }
-
-            // Stabilise for division
-            gradcf = stabilise(gradcf, VSMALL);
-
-            return 1 - 0.5*gradf/gradcf;
-        }
-
-
-        scalar r
-        (
-            const scalar faceFlux,
-            const scalar phiP,
-            const scalar phiN,
-            const vector& gradcP,
-            const vector& gradcN,
-            const vector& d
-        ) const
-        {
-            scalar gradf = phiN - phiP;
-
-            scalar gradcf;
-
-            if (faceFlux > 0)
-            {
-                gradcf = d & gradcP;
-            }
-            else
-            {
-                gradcf = d & gradcN;
-            }
-
-            // Stabilise for division
-            gradf = stabilise(gradf, VSMALL);
-
-            return 2*(gradcf/gradf) - 1;
-        }
+        //- Return root
+        scalar root(scalar xN) const;
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "NewtonSecantRoot.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

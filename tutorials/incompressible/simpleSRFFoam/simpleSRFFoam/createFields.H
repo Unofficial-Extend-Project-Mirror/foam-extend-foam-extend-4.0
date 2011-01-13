@@ -56,3 +56,19 @@
     (
         SRF::SRFModel::New(Urel)
     );
+
+    // Create Uabs as a permanent field to make it available for on-the-fly
+    // post-processing operations
+    volVectorField Uabs
+    (
+        IOobject
+        (
+            "Uabs",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        Urel + SRF->U()
+    );
+

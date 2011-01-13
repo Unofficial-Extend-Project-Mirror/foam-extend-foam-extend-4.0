@@ -26,7 +26,7 @@ License
 
 #include "SlicedGeometricField.H"
 
-// * * * * * * * * * * * * Private Member Functions * * * * * * * * * * * * * //
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
 template
 <

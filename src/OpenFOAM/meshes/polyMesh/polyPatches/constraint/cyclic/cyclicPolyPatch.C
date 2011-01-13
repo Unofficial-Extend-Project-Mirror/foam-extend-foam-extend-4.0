@@ -35,6 +35,7 @@ License
 #include "EdgeMap.H"
 #include "Time.H"
 #include "RodriguesRotation.H"
+#include "standAlonePatch.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -133,12 +134,12 @@ void Foam::cyclicPolyPatch::calcTransforms()
             fileName fvPath(boundaryMesh().mesh().time().path()/"VTK");
 
             mkDir(fvPath);
-            fileName nm0(fvPath/name()+"_half0_faces");
+            fileName nm0(fvPath/name() + "_half0_faces");
             Pout<< "cyclicPolyPatch::calcTransforms : Writing half0"
                 << " faces to file " << nm0 << endl;
             half0.writeVTK(nm0, half0, points);
 
-            fileName nm1(fvPath/name()+"_half1_faces");
+            fileName nm1(fvPath/name() + "_half1_faces");
             Pout<< "cyclicPolyPatch::calcTransforms : Writing half1"
                 << " faces to file " << nm1 << endl;
             half1.writeVTK(nm1, half1, points);
@@ -171,7 +172,7 @@ void Foam::cyclicPolyPatch::calcTransforms()
             else if
             (
                 mag(magSf - nbrMagSf)/avSf
-             > coupledPolyPatch::matchTol_
+             > polyPatch::matchTol_
             )
             {
                 // Error in area matching.  Find largest error
@@ -184,40 +185,6 @@ void Foam::cyclicPolyPatch::calcTransforms()
                 half0Normals[facei] /= magSf;
                 half1Normals[facei] /= nbrMagSf;
             }
-        }
-
-        // Check for error in face matching
-        if (maxMatchError > coupledPolyPatch::matchTol_)
-        {
-            label nbrFacei = errorFace + size()/2;
-            scalar magSf = mag(half0Normals[errorFace]);
-            scalar nbrMagSf = mag(half1Normals[errorFace]);
-            scalar avSf = (magSf + nbrMagSf)/2.0;
-
-            FatalErrorIn
-            (
-                "cyclicPolyPatch::calcTransforms()"
-            )   << "face " << errorFace
-                << " area does not match neighbour "
-                << nbrFacei << " by "
-                << 100*mag(magSf - nbrMagSf)/avSf
-                << "% -- possible face ordering problem." << endl
-                << "patch:" << name()
-                << " my area:" << magSf
-                << " neighbour area:" << nbrMagSf
-                << " matching tolerance:" << coupledPolyPatch::matchTol_
-                << endl
-                << "Mesh face:" << start() + errorFace
-                << " vertices:"
-                << IndirectList<point>(points, operator[](errorFace))()
-                << endl
-                << "Neighbour face:" << start() + nbrFacei
-                << " vertices:"
-                << IndirectList<point>(points, operator[](nbrFacei))()
-                << endl
-                << "Other errors also exist, only the largest is reported. "
-                << "Please rerun with cyclic debug flag set"
-                << " for more information." << exit(FatalError);
         }
 
 
@@ -284,15 +251,76 @@ void Foam::cyclicPolyPatch::calcTransforms()
                 (
                     "void cyclicPolyPatch::calcTransforms()"
                 )   << "Transformation tensor is not constant for the cyclic "
-                    << "patch.  Please reconsider your setup and definition of "
+                    << "patch " << name()
+                    << ".  Please reconsider your setup and definition of "
                     << "cyclic boundaries." << endl;
             }
+        }
+
+        // Dump transformed first half
+        if (debug)
+        {
+            fileName fvPath(boundaryMesh().mesh().time().path()/"VTK");
+
+            pointField transformPoints = half0.localPoints();
+
+            forAll (transformPoints, pointI)
+            {
+                 transformPoints[pointI] =
+                     Foam::transform(reverseT_[0], transformPoints[pointI]);
+            }
+
+            standAlonePatch transformHalf0
+            (
+                half0.localFaces(),
+                transformPoints
+            );
+
+            fileName nm2(fvPath/name() + "_transform_half0_faces");
+            Pout<< "cyclicPolyPatch::calcTransforms : Writing transform_half0"
+                << " faces to file " << nm2 << endl;
+            transformHalf0.writeVTK(nm2, transformHalf0, transformPoints);
+        }
+
+        // Check for error in face matching
+        if (maxMatchError > polyPatch::matchTol_)
+        {
+            label nbrFacei = errorFace + size()/2;
+            scalar magSf = mag(half0Normals[errorFace]);
+            scalar nbrMagSf = mag(half1Normals[errorFace]);
+            scalar avSf = (magSf + nbrMagSf)/2.0;
+
+            FatalErrorIn
+            (
+                "cyclicPolyPatch::calcTransforms()"
+            )   << "face " << errorFace
+                << " area does not match neighbour "
+                << nbrFacei << " by "
+                << 100*mag(magSf - nbrMagSf)/avSf
+                << "% -- possible face ordering problem." << endl
+                << "patch:" << name()
+                << " my area:" << magSf
+                << " neighbour area:" << nbrMagSf
+                << " matching tolerance:" << polyPatch::matchTol_
+                << endl
+                << "Mesh face:" << start() + errorFace
+                << " vertices:"
+                << IndirectList<point>(points, operator[](errorFace))()
+                << endl
+                << "Neighbour face:" << start() + nbrFacei
+                << " vertices:"
+                << IndirectList<point>(points, operator[](nbrFacei))()
+                << endl
+                << "Other errors also exist, only the largest is reported. "
+                << "Please rerun with cyclic debug flag set"
+                << " for more information." << exit(FatalError);
         }
 
         if (debug)
         {
             // Check the transformation
             scalar maxDistance = 0;
+            scalar maxRelDistance = 0;
 
             forAll (half0Ctrs, faceI)
             {
@@ -307,8 +335,19 @@ void Foam::cyclicPolyPatch::calcTransforms()
                                 Foam::transform(reverseT_[0], half0Ctrs[faceI])
                               - half1Ctrs[faceI]
                             )
+                        );
+
+                    maxRelDistance =
+                        Foam::max
+                        (
+                            maxRelDistance,
+                            mag
+                            (
+                                Foam::transform(reverseT_[0], half0Ctrs[faceI])
+                              - half1Ctrs[faceI]
+                            )
                            /(
-                               mag(half1Ctrs[faceI] - half0Ctrs[faceI]) 
+                               mag(half1Ctrs[faceI] - half0Ctrs[faceI])
                              + SMALL
                             )
                         );
@@ -324,8 +363,19 @@ void Foam::cyclicPolyPatch::calcTransforms()
                                 half0Ctrs[faceI]
                               - half1Ctrs[faceI]
                             )
+                        );
+
+                    maxRelDistance =
+                        Foam::max
+                        (
+                            maxRelDistance,
+                            mag
+                            (
+                                half0Ctrs[faceI]
+                              - half1Ctrs[faceI]
+                            )
                            /(
-                               mag(half1Ctrs[faceI] - half0Ctrs[faceI]) 
+                               mag(half1Ctrs[faceI] - half0Ctrs[faceI])
                              + SMALL
                             )
                         );
@@ -334,14 +384,15 @@ void Foam::cyclicPolyPatch::calcTransforms()
 
             // Check max distance between face centre and
             // transformed face centre
-            if (maxDistance > sqrt(areaMatchTol))
+            if (maxRelDistance > sqrt(areaMatchTol))
             {
                 SeriousErrorIn
                 (
                     "void cyclicPolyPatch::calcTransforms()"
-                )   << "Relative difference in transformation = "
-                    << 100*maxDistance
-                    << "%. Please check the definition of the transformation"
+                )   << "Relative difference in transformation for patch "
+                    << name() << " = " << 100*maxRelDistance
+                    << "%, abs distance = " << maxDistance
+                    << ".  Please check the definition of the transformation"
                     << endl;
             }
         }
@@ -582,7 +633,7 @@ void Foam::cyclicPolyPatch::getCentresAndAnchors
         }
     }
 
-    if (mag(n0 & n1) < 1 - coupledPolyPatch::matchTol_)
+    if (mag(n0 & n1) < 1 - polyPatch::matchTol_)
     {
         if (debug)
         {
@@ -697,7 +748,7 @@ bool Foam::cyclicPolyPatch::matchAnchors
                 SeriousErrorIn
                 (
                     "cyclicPolyPatch::matchAnchors(..)"
-                )   << "Patch:" << name() << " : "
+                )   << "Patch " << name() << " : "
                     << "Cannot find point on face " << f
                     << " with vertices:"
                     << IndirectList<point>(pp.points(), f)()
@@ -821,7 +872,7 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
                     )   << "Incorrect rotation axis: " << rotationAxis_
                         << abort(FatalError);
                 }
-                 
+
                 rotationAxis_ /= mag(rotationAxis_);
 
                 // Check rotation axis if appropriate
@@ -1455,9 +1506,10 @@ bool Foam::cyclicPolyPatch::order
         (
             "cyclicPolyPatch::order"
             "(const primitivePatch&, labelList&, labelList&) const"
-        )   << "Patch:" << name() << " : "
-            << "Cannot match vectors to faces on both sides of patch" << endl
-            << "    Perhaps your faces do not match?"
+        )   << "Patch " << name() << " : "
+            << "Cannot match vectors to faces on both sides of patch "
+            << name() << endl
+            << ".  Perhaps your faces do not match?"
             << " The obj files written contain the current match." << endl
             << "    Continuing with incorrect face ordering from now on!"
             << endl;

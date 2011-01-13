@@ -58,7 +58,7 @@ WM_SCRIPTS   = $(WM_DIR)/scripts
 
 LIB_SRC            = $(WM_PROJECT_DIR)/src
 LIB_DIR            = $(WM_PROJECT_DIR)/lib
-LIB_WM_OPTIONS_DIR = $(LIB_DIR)
+LIB_WM_OPTIONS_DIR = $(LIB_DIR)/$(WM_OPTIONS)
 OBJECTS_DIR        = $(MAKE_DIR)/$(WM_OPTIONS)
 CLASSES_DIR        = $(MAKE_DIR)/classes
 

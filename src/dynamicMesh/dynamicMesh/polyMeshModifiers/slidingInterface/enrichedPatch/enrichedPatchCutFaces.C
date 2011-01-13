@@ -277,9 +277,13 @@ void Foam::enrichedPatch::calcCutFaces() const
                     FatalErrorIn("void enrichedPatch::calcCutFaces() const")
                         << "Cannot determine best atan point.  "
                         << "Doing face: " << curGlobalFace
-                        << " Cur point: " << mp[curPointLabel]
-                        << " Next points: "
-                        << IndirectList<label>(mp, nextPoints)()
+                        << " position: "
+                        << IndirectList<vector>(lp, curLocalFace)()
+                        << " Cur point: " << curPointLabel
+                        << " position " << lp[curPointLabel]
+                        << " Next points: " << nextPoints
+                        << " position: "
+                        << IndirectList<vector>(lp, nextPoints)()
                         << abort(FatalError);
                 }
 //                 Pout<< "   bestAtanPoint: " << bestAtanPoint << " or "

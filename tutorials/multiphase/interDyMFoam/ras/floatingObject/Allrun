@@ -102,7 +102,7 @@ makeMeshByCellSet()
 runApplicationAndReportOnError blockMesh
 makeMeshByCellSet 1 2
 runApplicationAndReportOnError subsetMesh -overwrite c0 -patch floatingObject
-cp -r 0.org/* 0 > /dev/null 2>&1
+cp -r 0.org 0 > /dev/null 2>&1
 runApplicationAndReportOnError setFields
 runApplicationAndReportOnError $application
 

@@ -309,7 +309,7 @@ bool Foam::linearValveLayersFvMesh::attached() const
         {
             if
             (
-                result 
+                result
              != refCast<const slidingInterface>(topoChanges[modI]).attached()
             )
             {

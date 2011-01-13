@@ -87,10 +87,6 @@ class processorPolyPatch
         //- Whether to use geometric or topological matching
         static bool geometricMatch_;
 
-        //- Relative tolerance (for geometric matching only). Is factor of
-        //  maximum edge length per face.
-        static scalar matchTol_;
-
 
 protected:
 

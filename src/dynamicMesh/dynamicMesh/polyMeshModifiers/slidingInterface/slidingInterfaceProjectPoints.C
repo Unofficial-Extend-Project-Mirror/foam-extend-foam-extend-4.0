@@ -1210,7 +1210,8 @@ bool Foam::slidingInterface::projectPoints() const
 
         standAlonePatch::writeVTK
         (
-            fvPath/fileName(slaveFaceZoneID_.name() + "ProjectedAdjustedSlave"),
+            fvPath/fileName(slaveFaceZoneID_.name()
+          + "ProjectedAdjustedSlave"),
             slavePatch.localFaces(),
             projectedSlavePoints
         );

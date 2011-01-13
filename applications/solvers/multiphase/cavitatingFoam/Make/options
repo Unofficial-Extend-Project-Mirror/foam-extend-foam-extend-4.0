@@ -12,4 +12,5 @@ EXE_LIBS = \
     -lincompressibleRASModels \
     -lincompressibleLESModels \
     -lfiniteVolume \
-    -lbarotropicCompressibilityModel
+    -lbarotropicCompressibilityModel \
+    -llduSolvers

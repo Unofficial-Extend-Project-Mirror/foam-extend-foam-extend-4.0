@@ -5,7 +5,7 @@
 #  \\    /   O peration     |
 #   \\  /    A nd           | Copyright held by original author
 #    \\/     M anipulation  |
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # License
 #     This file is part of OpenFOAM.
 #
@@ -48,7 +48,7 @@
 #         count the total number of slots available in WM_HOSTS
 #         eg,  export WM_NCOMPPROCS=$(wmakeScheduler -count)
 #
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 lockDir=$HOME/.wmakeScheduler
 
 # fallback - 1 core on current host

@@ -69,18 +69,58 @@ public:
     // Constructors
 
         //- Construct from name
-        polyPatchID(const word& name, const polyBoundaryMesh& bm)
+        polyPatchID
+        (
+            const word& name,
+            const polyBoundaryMesh& bm,
+            bool checkValid = false
+        )
         :
             name_(name),
             index_(bm.findPatchID(name))
-        {}
+        {
+            if (checkValid && index_ < 0)
+            {
+                FatalErrorIn
+                (
+                    "polyPatchID\n"
+                    "(\n"
+                    "    const word& name,\n"
+                    "    const polyBoundaryMesh& bm,\n"
+                    "    bool checkValid = false\n"
+                    ")"
+                )   << "Patch " << name_ << " not found.  Valid patch names: "
+                    << bm.names()
+                    << abort(FatalError);
+            }
+        }
 
         //- Construct from Istream
-        polyPatchID(Istream& is, const polyBoundaryMesh& bm)
+        polyPatchID
+        (
+            Istream& is,
+            const polyBoundaryMesh& bm,
+            bool checkValid = false
+        )
         :
             name_(is),
             index_(bm.findPatchID(name_))
-        {}
+        {
+            if (checkValid && index_ < 0)
+            {
+                FatalErrorIn
+                (
+                    "polyPatchID\n"
+                    "(\n"
+                    "    Istream& is\n"
+                    "    const polyBoundaryMesh& bm,\n"
+                    "    bool checkValid = false\n"
+                    ")"
+                )   << "Patch " << name_ << " not found.  Valid patch names: "
+                    << bm.names()
+                    << abort(FatalError);
+            }
+        }
 
 
     // Member Functions

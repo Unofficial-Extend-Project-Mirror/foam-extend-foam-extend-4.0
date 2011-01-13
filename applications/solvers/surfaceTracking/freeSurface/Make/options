@@ -13,5 +13,4 @@ EXE_LIBS = \
     -lfiniteVolume \
     -lmeshTools \
     -ldynamicMesh \
-    $(WM_DECOMP_LIBS) \
-    -llduSolvers
+    $(WM_DECOMP_LIBS)
