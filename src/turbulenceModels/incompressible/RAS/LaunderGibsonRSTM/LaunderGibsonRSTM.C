@@ -26,7 +26,6 @@ License
 
 #include "LaunderGibsonRSTM.H"
 #include "addToRunTimeSelectionTable.H"
-#include "wallFvPatch.H"
 
 #include "backwardsCompatibilityWallFunctions.H"
 
@@ -380,7 +379,7 @@ void LaunderGibsonRSTM::correct()
     {
         const fvPatch& curPatch = patches[patchi];
 
-        if (isA<wallFvPatch>(curPatch))
+        if (curPatch.isWall())
         {
             forAll(curPatch, facei)
             {
@@ -448,7 +447,7 @@ void LaunderGibsonRSTM::correct()
     {
         const fvPatch& curPatch = patches[patchi];
 
-        if (isA<wallFvPatch>(curPatch))
+        if (curPatch.isWall())
         {
             symmTensorField& Rw = R_.boundaryField()[patchi];
 

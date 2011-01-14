@@ -28,7 +28,6 @@ License
 #include "RASModel.H"
 #include "fvPatchFieldMapper.H"
 #include "volFields.H"
-#include "wallFvPatch.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -44,7 +43,7 @@ namespace RASModels
 
 void mutWallFunctionFvPatchScalarField::checkType()
 {
-    if (!isA<wallFvPatch>(patch()))
+    if (!patch().isWall())
     {
         FatalErrorIn("mutWallFunctionFvPatchScalarField::checkType()")
             << "Invalid wall function specification" << nl

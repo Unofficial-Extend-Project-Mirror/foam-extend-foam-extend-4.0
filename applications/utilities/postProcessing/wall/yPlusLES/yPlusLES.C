@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
         {
             const fvPatch& currPatch = patches[patchi];
 
-            if (isA<wallFvPatch>(currPatch))
+            if (currPatch.isWall())
             {
                 yPlus.boundaryField()[patchi] =
                     d[patchi]

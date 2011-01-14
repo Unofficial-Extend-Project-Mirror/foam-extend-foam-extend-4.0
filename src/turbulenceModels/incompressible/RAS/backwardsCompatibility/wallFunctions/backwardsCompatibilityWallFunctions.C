@@ -73,7 +73,7 @@ tmp<volScalarField> autoCreateNut
 
         forAll(bm, patchI)
         {
-            if (isA<wallFvPatch>(bm[patchI]))
+            if (bm[patchI].isWall())
             {
                 nutBoundaryTypes[patchI] =
                     RASModels::nutWallFunctionFvPatchScalarField::typeName;
@@ -143,7 +143,7 @@ tmp<volScalarField> autoCreateLowReNut
 
         forAll(bm, patchI)
         {
-            if (isA<wallFvPatch>(bm[patchI]))
+            if (bm[patchI].isWall())
             {
                 nutBoundaryTypes[patchI] =
                     RASModels::nutLowReWallFunctionFvPatchScalarField::typeName;

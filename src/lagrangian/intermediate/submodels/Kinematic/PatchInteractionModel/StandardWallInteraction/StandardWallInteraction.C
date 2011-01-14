@@ -102,7 +102,7 @@ bool Foam::StandardWallInteraction<CloudType>::correct
     vector& U
 ) const
 {
-    if (isA<wallPolyPatch>(pp))
+    if (pp.isWall())
     {
         switch (interactionType_)
         {

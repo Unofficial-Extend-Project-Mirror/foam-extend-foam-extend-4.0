@@ -25,7 +25,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "RASModel.H"
-#include "wallFvPatch.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -174,7 +173,7 @@ tmp<scalarField> RASModel::yPlus(const label patchNo, const scalar Cmu) const
     tmp<scalarField> tYp(new scalarField(curPatch.size()));
     scalarField& Yp = tYp();
 
-    if (isA<wallFvPatch>(curPatch))
+    if (curPatch.isWall())
     {
         Yp = pow(Cmu, 0.25)
             *y_[patchNo]

@@ -28,8 +28,6 @@ License
 #include "fvPatchFieldMapper.H"
 #include "addToRunTimeSelectionTable.H"
 #include "wallFvPatch.H"
-#include "regionCoupleFvPatch.H"
-#include "movingWallVelocityFvPatchVectorField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,8 +43,6 @@ namespace RASModels
 template<class Type>
 void kqRWallFunctionFvPatchField<Type>::checkType()
 {
-    // AJ: Allow other patch types to be seemovingWalln as wall type
-    // if (!isA<wallFvPatch>(this->patch())) 
     if (!this->patch().isWall()) 
     {
         FatalErrorIn("kqRWallFunctionFvPatchField::checkType()")

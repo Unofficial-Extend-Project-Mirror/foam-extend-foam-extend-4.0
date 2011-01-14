@@ -39,8 +39,6 @@ Description
 #include "volFields.H"
 #include "surfaceFields.H"
 
-#include "wallPolyPatch.H"
-
 #include "incompressible/RAS/derivedFvPatchFields/wallFunctions/epsilonWallFunctions/epsilonWallFunction/epsilonWallFunctionFvPatchScalarField.H"
 #include "incompressible/RAS/derivedFvPatchFields/wallFunctions/kqRWallFunctions/kqRWallFunction/kqRWallFunctionFvPatchField.H"
 #include "incompressible/RAS/derivedFvPatchFields/wallFunctions/nutWallFunctions/nutWallFunction/nutWallFunctionFvPatchScalarField.H"
@@ -203,7 +201,7 @@ void replaceBoundaryType
     dictionary& boundaryDict = dict.subDict("boundaryField");
     forAll(bMesh, patchI)
     {
-        if (isA<wallPolyPatch>(bMesh[patchI]))
+        if (bMesh[patchI].isWall())
         {
             word patchName = bMesh[patchI].name();
             dictionary& oldPatch = boundaryDict.subDict(patchName);

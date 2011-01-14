@@ -26,7 +26,6 @@ License
 
 #include "vanDriestDelta.H"
 #include "LESModel.H"
-#include "wallFvPatch.H"
 #include "wallDistData.H"
 #include "wallPointYPlus.H"
 #include "addToRunTimeSelectionTable.H"
@@ -70,7 +69,7 @@ void vanDriestDelta::calcDelta()
     const fvPatchList& patches = mesh_.boundary();
     forAll(patches, patchi)
     {
-        if (isA<wallFvPatch>(patches[patchi]))
+        if (patches[patchi].isWall())
         {
             const fvPatchVectorField& Uw = U.boundaryField()[patchi];
             const scalarField& nuw = nu.boundaryField()[patchi];

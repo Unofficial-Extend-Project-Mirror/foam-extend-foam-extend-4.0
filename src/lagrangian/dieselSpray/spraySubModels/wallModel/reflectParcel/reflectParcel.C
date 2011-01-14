@@ -26,7 +26,6 @@ License
 
 #include "reflectParcel.H"
 #include "addToRunTimeSelectionTable.H"
-#include "wallPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -82,7 +81,7 @@ bool reflectParcel::wallTreatment
 
     const polyMesh& mesh = spray_.mesh();
 
-    if (isA<wallPolyPatch>(mesh_.boundaryMesh()[patchi]))
+    if (mesh_.boundaryMesh()[patchi].isWall())
     {
         // wallNormal defined to point outwards of domain
         vector Sf = mesh_.Sf().boundaryField()[patchi][facei];
