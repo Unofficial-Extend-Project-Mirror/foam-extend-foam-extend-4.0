@@ -37,7 +37,7 @@ Description
     {
         const fvPatch& p = patches[patchi];
 
-        if (isA<wallFvPatch>(p))
+        if (p.isWall())
         {
             epsEqn().setValues
             (

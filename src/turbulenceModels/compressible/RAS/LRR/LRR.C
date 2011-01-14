@@ -26,7 +26,6 @@ License
 
 #include "LRR.H"
 #include "addToRunTimeSelectionTable.H"
-#include "wallFvPatch.H"
 
 #include "backwardsCompatibilityWallFunctions.H"
 
@@ -370,7 +369,7 @@ void LRR::correct()
     {
         const fvPatch& curPatch = patches[patchi];
 
-        if (isA<wallFvPatch>(curPatch))
+        if (curPatch.isWall())
         {
             forAll(curPatch, facei)
             {
@@ -432,7 +431,7 @@ void LRR::correct()
     {
         const fvPatch& curPatch = patches[patchi];
 
-        if (isA<wallFvPatch>(curPatch))
+        if (curPatch.isWall())
         {
             symmTensorField& Rw = R_.boundaryField()[patchi];
 

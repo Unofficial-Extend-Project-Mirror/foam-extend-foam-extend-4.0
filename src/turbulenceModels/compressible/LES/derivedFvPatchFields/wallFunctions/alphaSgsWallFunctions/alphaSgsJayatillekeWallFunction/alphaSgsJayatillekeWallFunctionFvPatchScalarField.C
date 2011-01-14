@@ -29,7 +29,6 @@ License
 #include "fvPatchFieldMapper.H"
 #include "volFields.H"
 #include "addToRunTimeSelectionTable.H"
-#include "wallFvPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,7 +49,7 @@ label alphaSgsJayatillekeWallFunctionFvPatchScalarField::maxIters_ = 10;
 
 void alphaSgsJayatillekeWallFunctionFvPatchScalarField::checkType()
 {
-    if (!isA<wallFvPatch>(patch()))
+    if (!patch().isWall())
     {
         FatalErrorIn
         (

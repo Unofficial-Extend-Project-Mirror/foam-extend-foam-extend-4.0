@@ -27,7 +27,6 @@ License
 #include "nearWallDist.H"
 #include "fvMesh.H"
 #include "cellDistFuncs.H"
-#include "wallFvPatch.H"
 #include "surfaceFields.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -65,8 +64,6 @@ void Foam::nearWallDist::doAll()
 
         const fvPatch& patch = mesh_.boundary()[patchI];
 
-        // AJ: Allow other patch types to be seen as a wall type
-        // if (isA<wallFvPatch>(patch))
         if (patch.isWall())
         {
             const polyPatch& pPatch = patch.patch();

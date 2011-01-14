@@ -25,7 +25,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "cellPointWeightWallModified.H"
-#include "wallPolyPatch.H"
 #include "polyMesh.H"
 #include "polyBoundaryMesh.H"
 
@@ -51,7 +50,7 @@ Foam::cellPointWeightWallModified::cellPointWeightWallModified
         label patchI = bm.whichPatch(faceIndex);
         if (patchI != -1)
         {
-            if (isA<wallPolyPatch>(bm[patchI]))
+            if (bm[patchI].isWall())
             {
                 // Apply cell centre value wall faces
                 weights_[0] = 0.0;

@@ -43,7 +43,7 @@ namespace RASModels
 template<class Type>
 void kqRWallFunctionFvPatchField<Type>::checkType()
 {
-    if (!isA<wallFvPatch>(this->patch()))
+    if (!this->patch().isWall()) 
     {
         FatalErrorIn("kqRWallFunctionFvPatchField::checkType()")
             << "Invalid wall function specification" << nl

@@ -27,7 +27,6 @@ License
 #include "nearWallDistNoSearch.H"
 #include "fvMesh.H"
 #include "wallPoint.H"
-#include "wallFvPatch.H"
 #include "surfaceFields.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -41,7 +40,7 @@ void Foam::nearWallDistNoSearch::doAll()
     {
         fvPatchScalarField& ypatch = operator[](patchI);
 
-        if (isA<wallFvPatch>(patches[patchI]))
+        if (patches[patchI].isWall())
         {
             const unallocLabelList& faceCells = patches[patchI].faceCells();
 

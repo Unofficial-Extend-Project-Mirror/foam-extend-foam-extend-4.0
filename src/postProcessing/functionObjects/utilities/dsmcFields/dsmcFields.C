@@ -220,7 +220,7 @@ void Foam::dsmcFields::write()
             {
                 const polyPatch& patch = mesh.boundaryMesh()[i];
 
-                if (isA<wallPolyPatch>(patch))
+                if (patch.isWall())
                 {
                     p.boundaryField()[i] =
                         fDMean.boundaryField()[i]

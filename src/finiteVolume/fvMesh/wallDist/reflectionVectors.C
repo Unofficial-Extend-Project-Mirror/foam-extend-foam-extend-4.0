@@ -25,7 +25,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "reflectionVectors.H"
-#include "wallFvPatch.H"
 #include "surfaceFields.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -60,7 +59,7 @@ void Foam::reflectionVectors::correct()
     forAll(patches, patchi)
     {
         // find the nearest face for every cell
-        if (isA<wallFvPatch>(patches[patchi]))
+        if (patches[patchi].isWall())
         {
             n_.boundaryField()[patchi] =
                 mesh.Sf().boundaryField()[patchi]

@@ -81,7 +81,7 @@ Foam::LocalInteraction<CloudType>::LocalInteraction
     {
         if
         (
-            isA<wallPolyPatch>(bMesh[patchI])
+            bMesh[patchI].isWall()
          && applyToPatch(bMesh[patchI].index()) < 0
         )
         {

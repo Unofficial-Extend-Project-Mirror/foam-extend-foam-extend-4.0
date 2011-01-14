@@ -29,7 +29,6 @@ License
 #include "fvPatchFieldMapper.H"
 #include "volFields.H"
 #include "addToRunTimeSelectionTable.H"
-#include "wallFvPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,8 +43,6 @@ namespace RASModels
 
 void epsilonWallFunctionFvPatchScalarField::checkType()
 {
-    // AJ: Allow other patch types to be seen as wall type
-    // if (!isA<wallFvPatch>(patch()))
     if (!this->patch().isWall())
     {
         FatalErrorIn("epsilonWallFunctionFvPatchScalarField::checkType()")
