@@ -30,7 +30,7 @@ Description
     centres and processors they're on.
 
 Note
-    Storage is not optimal. It temporary collects all (patch)face centres
+    Storage is not optimal. It temporary collects all (patch) face centres
     on all processors to keep the addressing calculation simple.
 
 SourceFiles
