@@ -170,6 +170,12 @@ public:
                 return polyPatch_.coupled();
             }
 
+            //- Return true if this patch is wall
+            bool isWall() const
+            {
+                return polyPatch_.isWall();
+            }
+
             //- Return true if the given type is a constraint type
             static bool constraintType(const word& pt);
 
@@ -200,10 +206,7 @@ public:
             }
 
             template<class T>
-            const typename Field<T>::subField patchSlice
-            (
-                const Field<T>& l
-            ) const
+            const typename Field<T>::subField patchSlice(const Field<T>& l) const
             {
                 return typename Field<T>::subField
                 (

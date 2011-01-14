@@ -172,13 +172,15 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     const polyBoundaryMesh& bm,
     const word& shadowRegionName,
     const word& shadowPatchName,
-    const bool attached
+    const bool attached,
+    const bool attachedWalls
 )
 :
     coupledPolyPatch(name, size, start, index, bm),
     shadowRegionName_(shadowRegionName),
     shadowPatchName_(shadowPatchName),
     attached_(attached),
+    attachedWalls_(attachedWalls),
     shadowIndex_(-1),
     patchToPatchPtr_(NULL),
     reconFaceCellCentresPtr_(NULL)
@@ -198,6 +200,7 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     shadowRegionName_(dict.lookup("shadowRegion")),
     shadowPatchName_(dict.lookup("shadowPatch")),
     attached_(dict.lookup("attached")),
+    attachedWalls_(dict.lookup("attachedWalls")),
     shadowIndex_(-1),
     patchToPatchPtr_(NULL),
     reconFaceCellCentresPtr_(NULL)
@@ -215,6 +218,7 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     shadowRegionName_(pp.shadowRegionName_),
     shadowPatchName_(pp.shadowPatchName_),
     attached_(pp.attached_),
+    attachedWalls_(pp.attachedWalls_),
     shadowIndex_(-1),
     patchToPatchPtr_(NULL),
     reconFaceCellCentresPtr_(NULL)
@@ -235,6 +239,7 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     shadowRegionName_(pp.shadowRegionName_),
     shadowPatchName_(pp.shadowPatchName_),
     attached_(pp.attached_),
+    attachedWalls_(pp.attachedWalls_),
     shadowIndex_(-1),
     patchToPatchPtr_(NULL),
     reconFaceCellCentresPtr_(NULL)

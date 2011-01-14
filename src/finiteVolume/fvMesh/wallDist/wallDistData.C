@@ -73,14 +73,25 @@ Foam::wallDistData<TransferType>::~wallDistData()
 template<class TransferType>
 void Foam::wallDistData<TransferType>::correct()
 {
+  Info<< "wallDistData.correct() called" << endl;
     const polyMesh& mesh = cellDistFuncs::mesh();
 
     //
     // Fill data on wall patches with initial values
     //
 
+    const polyBoundaryMesh& bMesh = mesh.boundaryMesh();
+    labelHashSet wallPatchIDs(bMesh.size());
+    forAll(bMesh, patchI)
+    {
+        if (bMesh[patchI].isWall())
+        {
+            wallPatchIDs.insert(patchI);
+        }
+    }
+
     // Get patchids of walls
-    labelHashSet wallPatchIDs(getPatchIDs<wallPolyPatch>());
+    // labelHashSet wallPatchIDs(getPatchIDs<wallPolyPatch>());
 
     // Collect pointers to data on patches
     UPtrList<Field<Type> > patchData(mesh.boundaryMesh().size());

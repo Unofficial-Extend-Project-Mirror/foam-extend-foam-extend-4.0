@@ -36,8 +36,19 @@ void Foam::nearWallDist::doAll()
 {
     cellDistFuncs wallUtils(mesh_);
 
+    // AJ: make sure to pick up all patches that are specified as a wall
+    const polyBoundaryMesh& bMesh = wallUtils.mesh().boundaryMesh();
+    labelHashSet wallPatchIDs(bMesh.size());
+    forAll(bMesh, patchI)
+    {
+        if (bMesh[patchI].isWall())
+        {
+            wallPatchIDs.insert(patchI);
+        }
+    }
+
     // Get patch ids of walls
-    labelHashSet wallPatchIDs(wallUtils.getPatchIDs<wallPolyPatch>());
+    // labelHashSet wallPatchIDs(wallUtils.getPatchIDs<wallPolyPatch>());
 
     // Size neighbours array for maximum possible
 
@@ -54,7 +65,9 @@ void Foam::nearWallDist::doAll()
 
         const fvPatch& patch = mesh_.boundary()[patchI];
 
-        if (isA<wallFvPatch>(patch))
+        // AJ: Allow other patch types to be seen as a wall type
+        // if (isA<wallFvPatch>(patch))
+        if (patch.isWall())
         {
             const polyPatch& pPatch = patch.patch();
 

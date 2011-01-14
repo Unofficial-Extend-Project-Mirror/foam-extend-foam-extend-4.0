@@ -67,13 +67,24 @@ Foam::wallDist::~wallDist()
 // future (if only small topology change)
 void Foam::wallDist::correct()
 {
+    // AJ: make sure to pick up all patches that are specified as a wall
+    const polyBoundaryMesh& bMesh = cellDistFuncs::mesh().boundaryMesh();
+    labelHashSet wallPatchIDs(bMesh.size());
+    forAll(bMesh, patchI)
+    {
+        if (bMesh[patchI].isWall())
+        {
+            wallPatchIDs.insert(patchI);
+        }
+    }
+
     // Get patchids of walls
-    labelHashSet wallPatchIDs(getPatchIDs<wallPolyPatch>());
+    // labelHashSet wallPatchIDs(getPatchIDs<wallPolyPatch>());
 
     // Calculate distance starting from wallPatch faces.
     patchWave wave(cellDistFuncs::mesh(), wallPatchIDs, correctWalls_);
 
-    // Transfer cell values from wave into *this
+    // Transfer cell values from wave into *this 
     transfer(wave.distance());
 
     // Transfer values on patches into boundaryField of *this
