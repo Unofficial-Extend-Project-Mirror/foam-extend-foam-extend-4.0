@@ -69,6 +69,9 @@ class regionCouplePolyPatch
         //- Are the regions attached
         mutable Switch attached_;
 
+        //- Are the region attached walls
+        mutable Switch attachedWalls_;
+
         //- Shadow patch index.  Delayed evaluation for construction
         mutable label shadowIndex_;
 
@@ -85,7 +88,7 @@ class regionCouplePolyPatch
         //- Calculate interpolation
         void calcInterpolation() const;
 
-
+        
 protected:
 
     // Protected Member functions
@@ -139,7 +142,8 @@ public:
             const polyBoundaryMesh& bm,
             const word& shadowRegionName,
             const word& shadowPatchName,
-            const bool attached
+            const bool attached,
+            const bool attachedWall
         );
 
         //- Construct from dictionary
@@ -231,6 +235,12 @@ public:
         bool attached() const
         {
             return attached_;
+        }
+
+        //AJ: read from dictionary if coupled patch is also a wall
+        bool isWall() const
+        {
+            return attachedWalls_;
         }
 
         //- Attach regions

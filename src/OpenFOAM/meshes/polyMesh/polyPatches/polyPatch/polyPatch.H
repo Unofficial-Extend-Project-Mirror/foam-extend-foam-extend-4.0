@@ -368,6 +368,12 @@ public:
             return false;
         }
 
+        // Virtual function for wall handling of all derived calsses
+        virtual bool isWall() const
+        {
+            return false;
+        }       
+
         //- Return true if the given type is a constraint type
         static bool constraintType(const word& pt);
 
