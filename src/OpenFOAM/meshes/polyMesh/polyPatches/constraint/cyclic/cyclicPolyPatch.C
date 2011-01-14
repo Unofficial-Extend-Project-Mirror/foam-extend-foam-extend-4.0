@@ -260,26 +260,30 @@ void Foam::cyclicPolyPatch::calcTransforms()
         // Dump transformed first half
         if (debug)
         {
-            fileName fvPath(boundaryMesh().mesh().time().path()/"VTK");
-
-            pointField transformPoints = half0.localPoints();
-
-            forAll (transformPoints, pointI)
+            if (reverseT_.size() > 0)
             {
-                 transformPoints[pointI] =
-                     Foam::transform(reverseT_[0], transformPoints[pointI]);
+                fileName fvPath(boundaryMesh().mesh().time().path()/"VTK");
+
+                pointField transformPoints = half0.localPoints();
+
+                forAll (transformPoints, pointI)
+                {
+                    transformPoints[pointI] =
+                        Foam::transform(reverseT_[0], transformPoints[pointI]);
+                }
+
+                standAlonePatch transformHalf0
+                (
+                    half0.localFaces(),
+                    transformPoints
+                );
+
+                fileName nm2(fvPath/name() + "_transform_half0_faces");
+                Pout<< "cyclicPolyPatch::calcTransforms : Writing "
+                    << "transform_half0 faces to file " << nm2 << endl;
+
+                transformHalf0.writeVTK(nm2, transformHalf0, transformPoints);
             }
-
-            standAlonePatch transformHalf0
-            (
-                half0.localFaces(),
-                transformPoints
-            );
-
-            fileName nm2(fvPath/name() + "_transform_half0_faces");
-            Pout<< "cyclicPolyPatch::calcTransforms : Writing transform_half0"
-                << " faces to file " << nm2 << endl;
-            transformHalf0.writeVTK(nm2, transformHalf0, transformPoints);
         }
 
         // Check for error in face matching
@@ -354,31 +358,33 @@ void Foam::cyclicPolyPatch::calcTransforms()
                 }
                 else
                 {
-                    maxDistance =
-                        Foam::max
-                        (
-                            maxDistance,
-                            mag
-                            (
-                                half0Ctrs[faceI]
-                              - half1Ctrs[faceI]
-                            )
-                        );
+                    // Disable checking for translational distance
+                    // HJ, 13/Jan/2011
+//                     maxDistance =
+//                         Foam::max
+//                         (
+//                             maxDistance,
+//                             mag
+//                             (
+//                                 half0Ctrs[faceI]
+//                               - half1Ctrs[faceI]
+//                             )
+//                         );
 
-                    maxRelDistance =
-                        Foam::max
-                        (
-                            maxRelDistance,
-                            mag
-                            (
-                                half0Ctrs[faceI]
-                              - half1Ctrs[faceI]
-                            )
-                           /(
-                               mag(half1Ctrs[faceI] - half0Ctrs[faceI])
-                             + SMALL
-                            )
-                        );
+//                     maxRelDistance =
+//                         Foam::max
+//                         (
+//                             maxRelDistance,
+//                             mag
+//                             (
+//                                 half0Ctrs[faceI]
+//                               - half1Ctrs[faceI]
+//                             )
+//                            /(
+//                                mag(half1Ctrs[faceI] - half0Ctrs[faceI])
+//                              + SMALL
+//                             )
+//                         );
                 }
             }
 
