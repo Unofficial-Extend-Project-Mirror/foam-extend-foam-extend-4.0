@@ -42,7 +42,6 @@ SourceFiles
 #include "surfaceInterpolationScheme.H"
 #include "volFields.H"
 #include "surfaceFields.H"
-#include "reverseLinear.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,9 +52,10 @@ namespace Foam
                            Class harmonic Declaration
 \*---------------------------------------------------------------------------*/
 
+template<class Type>
 class harmonic
 :
-    public surfaceInterpolationScheme<scalar>
+    public surfaceInterpolationScheme<Type>
 {
     // Private Member Functions
 
@@ -74,10 +74,10 @@ public:
         //- Construct from mesh
         harmonic(const fvMesh& mesh)
         :
-            surfaceInterpolationScheme<scalar>(mesh)
+            surfaceInterpolationScheme<Type>(mesh)
         {}
 
-        //- Construct from Istream. 
+        //- Construct from Istream
         //  The name of the flux field is read from the Istream and looked-up
         //  from the mesh objectRegistry
         harmonic
@@ -86,7 +86,7 @@ public:
             Istream& is
         )
         :
-            surfaceInterpolationScheme<scalar>(mesh)
+            surfaceInterpolationScheme<Type>(mesh)
         {}
 
         //- Construct from faceFlux and Istream
@@ -97,7 +97,7 @@ public:
             Istream& is
         )
         :
-            surfaceInterpolationScheme<scalar>(mesh)
+            surfaceInterpolationScheme<Type>(mesh)
         {}
 
 
@@ -106,26 +106,60 @@ public:
         //- Return the interpolation weighting factors
         virtual tmp<surfaceScalarField> weights
         (
-            const GeometricField<scalar, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>& phi
         ) const
         {
-            notImplemented
+            tmp<surfaceScalarField> tw
             (
-                "harmonic::weights"
-                "(const GeometricField<scalar, fvPatchField, volMesh>&)"
+                new surfaceScalarField
+                (
+                    IOobject
+                    (
+                        "harmonicWeightingFactors" + phi.name(),
+                        this->mesh().time().timeName(),
+                        this->mesh()
+                    ),
+                    this->mesh() ,
+                    dimless
+                )
             );
 
-            return tmp<surfaceScalarField>(NULL);
-        }
+            surfaceScalarField& w = tw();
 
-        //- Return the face-interpolate of the given cell field
-        virtual tmp<GeometricField<scalar, fvsPatchField, surfaceMesh> >
-        interpolate
-        (
-            const GeometricField<scalar, fvPatchField, volMesh>& vf
-        ) const
-        {
-            return 1.0/(reverseLinear<scalar>(vf.mesh()).interpolate(1.0/vf));
+            const unallocLabelList& owner = this->mesh().owner();
+            const unallocLabelList& neighbour = this->mesh().neighbour();
+
+            scalarField magPhi = mag(phi);
+
+            // Initialise weights to 0.5 for uniform field (den = 0)
+            scalarField& wIn = w.internalField();
+            wIn = 0.5;
+
+            // Calculate internal weights using field magnitude
+            scalar mOwn, mNei, den, mean;
+
+            forAll (owner, faceI)
+            {
+                mOwn = magPhi[owner[faceI]];
+                mNei = magPhi[neighbour[faceI]];
+
+                mean = 2*(mOwn*mNei)/(mOwn + mNei + SMALL);
+                den = mOwn - mNei;
+
+                if (mag(den) > SMALL)
+                {
+                    wIn[faceI] = (mean - mNei)/den;
+                }
+                else
+                {
+                    // Use 0.5 weights
+                }
+            }
+
+            // Boundary weights are 1
+            w.boundaryField() = 1;
+
+            return tw;
         }
 };
 
