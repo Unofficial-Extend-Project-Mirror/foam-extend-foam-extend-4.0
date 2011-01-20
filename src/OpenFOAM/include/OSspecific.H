@@ -103,11 +103,11 @@ bool chDir(const fileName& dir);
 //
 //  @return the full path name or fileName() if the name cannot be found
 //  Optionally abort if the file cannot be found
-fileName findEtcFile(const fileName&, bool mandatory=false);
+fileName findEtcFile(const fileName&, bool mandatory = false);
 
 //- Make a directory and return an error if it could not be created
 //  and does not already exist
-bool mkDir(const fileName&, mode_t=0777);
+bool mkDir(const fileName&, mode_t = 0777);
 
 //- Set the file mode
 bool chMod(const fileName&, const mode_t);
@@ -120,14 +120,14 @@ fileName::Type type(const fileName&);
 
 //- Does the name exist (as DIRECTORY or FILE) in the file system?
 //  Optionally enable/disable check for gzip file.
-bool exists(const fileName&, const bool checkGzip=true);
+bool exists(const fileName&, const bool checkGzip = true);
 
 //- Does the name exist as a DIRECTORY in the file system?
 bool isDir(const fileName&);
 
 //- Does the name exist as a FILE in the file system?
 //  Optionally enable/disable check for gzip file.
-bool isFile(const fileName&, const bool checkGzip=true);
+bool isFile(const fileName&, const bool checkGzip = true);
 
 //- Return size of file
 off_t fileSize(const fileName&);
@@ -139,8 +139,8 @@ time_t lastModified(const fileName&);
 fileNameList readDir
 (
     const fileName&,
-    const fileName::Type=fileName::FILE,
-    const bool filtergz=true
+    const fileName::Type = fileName::FILE,
+    const bool filtergz = true
 );
 
 //- Copy, recursively if necessary, the source to the destination
@@ -172,7 +172,7 @@ void fdClose(const int);
 bool ping(const word&, const label port, const label timeOut);
 
 //- Check if machine is up by pinging port 22 (ssh) and 222 (rsh)
-bool ping(const word&, const label timeOut=10);
+bool ping(const word&, const label timeOut = 10);
 
 //- Execute the specified command
 int system(const string& command);
