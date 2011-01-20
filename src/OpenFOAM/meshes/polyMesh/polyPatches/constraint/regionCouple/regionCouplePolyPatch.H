@@ -239,15 +239,6 @@ public:
         //- Attach regions
         void detach() const;
 
-        //- Is this the master side?
-        bool master() const;
-
-        //- Is this the slave side?
-        bool slave() const
-        {
-            return !master();
-        }
-
         //- Return shadow patch
         const regionCouplePolyPatch& shadow() const;
 
