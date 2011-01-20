@@ -42,9 +42,9 @@ void Foam::attachDetach::detachInterface
     // 2. Modify all faces of the master zone, by putting them into the master
     //    patch (look for orientation) and their renumbered mirror images
     //    into the slave patch
-    // 3. Create a point renumbering list, giving a new point index for original
-    //    points in the face patch
-    // 4. Grab all faces in cells on the master side and renumber them 
+    // 3. Create a point renumbering list, giving a new point index for
+    //    original points in the face patch
+    // 4. Grab all faces in cells on the master side and renumber them
     //    using the point renumbering list.  Exclude the ones that belong to
     //    the master face zone
     //
@@ -70,7 +70,9 @@ void Foam::attachDetach::detachInterface
     const polyMesh& mesh = topoChanger().mesh();
     const faceZoneMesh& zoneMesh = mesh.faceZones();
 
-    const primitiveFacePatch& masterFaceLayer = zoneMesh[faceZoneID_.index()]();
+    const primitiveFacePatch& masterFaceLayer =
+        zoneMesh[faceZoneID_.index()]();
+
     const pointField& points = mesh.points();
     const labelListList& meshEdgeFaces = mesh.edgeFaces();
 
@@ -88,7 +90,12 @@ void Foam::attachDetach::detachInterface
     // with their original labels to stop duplication
     label nIntEdges = masterFaceLayer.nInternalEdges();
 
-    for (label curEdgeID = nIntEdges; curEdgeID < meshEdges.size(); curEdgeID++)
+    for
+    (
+        label curEdgeID = nIntEdges;
+        curEdgeID < meshEdges.size();
+        curEdgeID++
+    )
     {
         const labelList& curFaces = meshEdgeFaces[meshEdges[curEdgeID]];
 
@@ -389,7 +396,7 @@ void Foam::attachDetach::detachInterface
                         false,                      // flip flux
                         -1,                         // patch for face
                         false,                      // remove from zone
-                        -1,                         // zone for face
+                        zoneMesh.whichZone(curFaceID), // zone for face
                         false                       // face zone flip
                     )
                 );
@@ -408,12 +415,12 @@ void Foam::attachDetach::detachInterface
                         false,                       // flip flux
                         mesh.boundaryMesh().whichPatch(curFaceID), // patch
                         false,                        // remove from zone
-                        -1,                           // zone for face
+                        zoneMesh.whichZone(curFaceID),  // zone for face
                         false                         // face zone flip
                     )
-                );   
+                );
 // Pout << "modifying stick-out face. Boundary Old face: " << oldFace << " new face: " << newFace << " own: " << own[curFaceID] << " patch: " << mesh.boundaryMesh().whichPatch(curFaceID) << endl;
-            }                                                  
+            }
         }
     }
 

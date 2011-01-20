@@ -109,7 +109,7 @@ void Foam::attachDetach::attachInterface
                 polyModifyFace
                 (
                     faces[masterPatchStart + faceI], // modified face
-                    masterPatchStart + faceI,    // label of face being modified
+                    masterPatchStart + faceI,   // label of face being modified
                     masterFaceCells[faceI],          // owner
                     slaveFaceCells[faceI],           // neighbour
                     false,                           // face flip
@@ -128,7 +128,7 @@ void Foam::attachDetach::attachInterface
                 polyModifyFace
                 (
                     faces[masterPatchStart + faceI].reverseFace(), // mod face
-                    masterPatchStart + faceI,    // label of face being modified
+                    masterPatchStart + faceI,   // label of face being modified
                     slaveFaceCells[faceI],        // owner
                     masterFaceCells[faceI],       // neighbour
                     true,                         // face flip
@@ -204,7 +204,7 @@ void Foam::attachDetach::attachInterface
                     mesh.faceZones()[modifiedFaceZone].whichFace(curFaceID)
                 ];
         }
-            
+
         // Modify the face
         label curNeighbour = -1;
 
@@ -222,7 +222,7 @@ void Foam::attachDetach::attachInterface
                 own[curFaceID],         // owner
                 curNeighbour,           // neighbour
                 false,                  // face flip
-                mesh.boundaryMesh().whichPatch(curFaceID),// patch for face
+                mesh.boundaryMesh().whichPatch(curFaceID), // patch for face
                 false,                  // remove from zone
                 modifiedFaceZone,       // zone for face
                 modifiedFaceZoneFlip    // face flip in zone
@@ -251,7 +251,7 @@ void Foam::attachDetach::modifyMotionPoints
 
     if (debug)
     {
-        Pout<< "void attachDetach::modifyMotionPoints(" 
+        Pout<< "void attachDetach::modifyMotionPoints("
             << "pointField& motionPoints) const "
             << " for object " << name() << " : "
             << "Adjusting motion points." << endl;
