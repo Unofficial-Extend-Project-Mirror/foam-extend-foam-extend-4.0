@@ -26,6 +26,7 @@ License
 
 #include "kOmegaSST_LowRe.H"
 #include "addToRunTimeSelectionTable.H"
+#include "wallFvPatch.H"
 
 #include "backwardsCompatibilityWallFunctions.H"
 
