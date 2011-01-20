@@ -238,7 +238,7 @@ void Foam::attachDetach::checkDefinition()
         {
             FatalErrorIn("void attachDetach::checkDefinition()")
                 << "Master and slave patch share " << nSharedPoints
-                << " point.  This is not allowed." << nl 
+                << " point.  This is not allowed." << nl
                 << "Please check mesh for topological errors."
                 << abort(FatalError);
         }

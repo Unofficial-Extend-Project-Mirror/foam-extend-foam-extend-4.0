@@ -170,6 +170,12 @@ public:
 
     // Member Functions
 
+        //- Set layer removal
+        void setRemoval();
+
+        //- Set addition
+        void setAddition();
+
         //- Check for topology change
         virtual bool changeTopology() const;
 
