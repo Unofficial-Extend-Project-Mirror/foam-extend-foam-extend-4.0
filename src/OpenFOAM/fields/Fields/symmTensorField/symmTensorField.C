@@ -61,45 +61,45 @@ void inv(Field<symmTensor>& tf, const UList<symmTensor>& tf1)
     }
 
     scalar scale = magSqr(tf1[0]);
-    Vector<bool> removeCmpts
-    (
-        magSqr(tf1[0].xx())/scale < SMALL,
-        magSqr(tf1[0].yy())/scale < SMALL,
-        magSqr(tf1[0].zz())/scale < SMALL
-    );
 
-    if (removeCmpts.x() || removeCmpts.y() || removeCmpts.z())
+    // Fixed terrible hack.  HJ, 20/Jan/2011
+    boolList removeCmpts(3);
+    removeCmpts[0] =  magSqr(tf1[0].xx())/scale < SMALL;
+    removeCmpts[1] =  magSqr(tf1[0].yy())/scale < SMALL;
+    removeCmpts[2] =  magSqr(tf1[0].zz())/scale < SMALL;
+
+    if (removeCmpts[0] || removeCmpts[1] || removeCmpts[2])
     {
         symmTensorField tf1Plus(tf1);
 
-        if (removeCmpts.x())
+        if (removeCmpts[0])
         {
             tf1Plus += symmTensor(1,0,0,0,0,0);
         }
 
-        if (removeCmpts.y())
+        if (removeCmpts[1])
         {
             tf1Plus += symmTensor(0,0,0,1,0,0);
         }
 
-        if (removeCmpts.z())
+        if (removeCmpts[2])
         {
             tf1Plus += symmTensor(0,0,0,0,0,1);
         }
 
         TFOR_ALL_F_OP_FUNC_F(symmTensor, tf, =, inv, symmTensor, tf1Plus)
 
-        if (removeCmpts.x())
+        if (removeCmpts[0])
         {
             tf -= symmTensor(1,0,0,0,0,0);
         }
 
-        if (removeCmpts.y())
+        if (removeCmpts[1])
         {
             tf -= symmTensor(0,0,0,1,0,0);
         }
 
-        if (removeCmpts.z())
+        if (removeCmpts[2])
         {
             tf -= symmTensor(0,0,0,0,0,1);
         }

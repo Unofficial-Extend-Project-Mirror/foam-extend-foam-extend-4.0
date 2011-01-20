@@ -26,6 +26,7 @@ License
 
 #include "tensorField.H"
 #include "transformField.H"
+#include "boolList.H"
 
 #define TEMPLATE
 #include "FieldFunctionsM.C"
@@ -61,45 +62,46 @@ void inv(Field<tensor>& tf, const UList<tensor>& tf1)
     }
 
     scalar scale = magSqr(tf1[0]);
-    Vector<bool> removeCmpts
-    (
-        magSqr(tf1[0].xx())/scale < SMALL,
-        magSqr(tf1[0].yy())/scale < SMALL,
-        magSqr(tf1[0].zz())/scale < SMALL
-    );
 
-    if (removeCmpts.x() || removeCmpts.y() || removeCmpts.z())
+    // Fixed terrible hack.  HJ, 20/Jan/2011
+    boolList removeCmpts(3);
+    removeCmpts[0] = magSqr(tf1[0].xx())/scale < SMALL;
+    removeCmpts[1] = magSqr(tf1[0].yy())/scale < SMALL;
+    removeCmpts[2] = magSqr(tf1[0].zz())/scale < SMALL;
+
+
+    if (removeCmpts[0] || removeCmpts[1] || removeCmpts[2])
     {
         tensorField tf1Plus(tf1);
 
-        if (removeCmpts.x())
+        if (removeCmpts[0])
         {
             tf1Plus += tensor(1,0,0,0,0,0,0,0,0);
         }
 
-        if (removeCmpts.y())
+        if (removeCmpts[1])
         {
             tf1Plus += tensor(0,0,0,0,1,0,0,0,0);
         }
 
-        if (removeCmpts.z())
+        if (removeCmpts[2])
         {
             tf1Plus += tensor(0,0,0,0,0,0,0,0,1);
         }
 
         TFOR_ALL_F_OP_FUNC_F(tensor, tf, =, inv, tensor, tf1Plus)
 
-        if (removeCmpts.x())
+        if (removeCmpts[0])
         {
             tf -= tensor(1,0,0,0,0,0,0,0,0);
         }
 
-        if (removeCmpts.y())
+        if (removeCmpts[1])
         {
             tf -= tensor(0,0,0,0,1,0,0,0,0);
         }
 
-        if (removeCmpts.z())
+        if (removeCmpts[2])
         {
             tf -= tensor(0,0,0,0,0,0,0,0,1);
         }
