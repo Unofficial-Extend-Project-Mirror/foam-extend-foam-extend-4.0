@@ -30,6 +30,8 @@ License
 #include "constraints.H"
 #include "PstreamCombineReduceOps.H"
 
+#define OLD_COMBINE_REDUCE 1
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -65,30 +67,58 @@ tmp<Field<Type2> > GlobalPointPatchField
     // Create the global list and insert local values
     if (globalPointPatch_.globalPointSize() > 0)
     {
+        // Get addressing
+        const labelList& sharedPointAddr =
+            globalPointPatch_.sharedPointAddr();
+
+        const Field<Type2>& pField = tpField();
+
+        // Prepare result
+        tmp<Field<Type2> > tlpf(new Field<Type2>(sharedPointAddr.size()));
+        Field<Type2>& lpf = tlpf();
+
+#       ifdef OLD_COMBINE_REDUCE
+
         Field<Type2> gpf
         (
             globalPointPatch_.globalPointSize(),
             pTraits<Type2>::zero
         );
 
-        const labelList& addr = globalPointPatch_.sharedPointAddr();
-        const Field<Type2>& pField = tpField();
-
-        forAll (addr, i)
+        forAll (sharedPointAddr, i)
         {
-            gpf[addr[i]] = pField[i];
+            gpf[sharedPointAddr[i]] = pField[i];
         }
 
         combineReduce(gpf, plusEqOp<Field<Type2> >());
 
         // Extract local data
-        tmp<Field<Type2> > tlpf(new Field<Type2>(addr.size()));
-        Field<Type2>& lpf = tlpf();
-
-        forAll (addr, i)
+        forAll (sharedPointAddr, i)
         {
-            lpf[i] = gpf[addr[i]];
+            lpf[i] = gpf[sharedPointAddr[i]];
         }
+
+#       else
+
+        // Pack data into a map
+        Map<Type2> dataMap;
+
+        forAll (sharedPointAddr, i)
+        {
+            dataMap.insert(sharedPointAddr[i], pField[i]);
+        }
+
+        // Communicate map
+        Pstream::mapCombineGather(dataMap, plusEqOp<Type2>());
+        Pstream::mapCombineScatter(dataMap);
+
+        // Extract local data
+        forAll (sharedPointAddr, i)
+        {
+            lpf[i] = dataMap[sharedPointAddr[i]];
+        }
+
+#       endif
 
         return tlpf;
     }
@@ -126,6 +156,19 @@ tmp<Field<Type2> > GlobalPointPatchField
 {
     if (globalPointPatch_.globalEdgeSize() > 0)
     {
+        // Bug fix: use map-based communication.  HJ, 18/Nov/2010
+
+        const labelList& sharedEdgeAddr =
+            globalPointPatch_.sharedEdgeAddr();
+
+        const Field<Type2>& eField = teField();
+
+        // Prepare result
+        tmp<Field<Type2> > tlef(new Field<Type2>(sharedEdgeAddr.size()));
+        Field<Type2>& lef = tlef();
+
+#       ifdef OLD_COMBINE_REDUCE
+
         // Create the global list and insert local values
         Field<Type2> gef
         (
@@ -133,24 +176,40 @@ tmp<Field<Type2> > GlobalPointPatchField
             pTraits<Type2>::zero
         );
 
-        const labelList& addr = globalPointPatch_.sharedEdgeAddr();
-        const Field<Type2>& eField = teField();
-
-        forAll (addr, i)
+        forAll (sharedEdgeAddr, i)
         {
-            gef[addr[i]] = eField[i];
+            gef[sharedEdgeAddr[i]] = eField[i];
         }
 
         combineReduce(gef, plusEqOp<Field<Type2> >());
 
         // Extract local data
-        tmp<Field<Type2> > tlef(new Field<Type2>(addr.size()));
-        Field<Type2>& lef = tlef();
-
-        forAll (addr, i)
+        forAll (sharedEdgeAddr, i)
         {
-            lef[i] = gef[addr[i]];
+            lef[i] = gef[sharedEdgeAddr[i]];
         }
+
+#       else
+
+        // Pack data into a map
+        Map<Type2> dataMap;
+
+        forAll (sharedEdgeAddr, i)
+        {
+            dataMap.insert(sharedEdgeAddr[i], eField[i]);
+        }
+
+        // Communicate map
+        Pstream::mapCombineGather(dataMap, plusEqOp<Type2>());
+        Pstream::mapCombineScatter(dataMap);
+
+        // Extract local data
+        forAll (sharedEdgeAddr, i)
+        {
+            lef[i] = dataMap[sharedEdgeAddr[i]];
+        }
+
+#       endif
 
         return tlef;
     }
@@ -189,6 +248,7 @@ void GlobalPointPatchField
     // Set the values from the global sum
     tmp<Field<Type2> > trpf =
         reduceExtractPoint<Type2>(patchInternalField(pField));
+
     Field<Type2>& rpf = trpf();
 
     // Get addressing
@@ -526,6 +586,8 @@ void GlobalPointPatchField
             }
 
             // Communicate map
+            // Note: Cannot use reduceExtract, because it uses plusEqOp
+            // HJ, 14/Jan/2011
             Pstream::mapCombineGather(dataMap, eqOp<Type>());
             Pstream::mapCombineScatter(dataMap);
 
@@ -1063,7 +1125,8 @@ void GlobalPointPatchField
         {
             // Owner side
             localMult[doubleCutOwner[edgeI]] +=
-                cutMask[coeffI]*coeffs[coeffI]*psiInternal[U[doubleCut[edgeI]]];
+                cutMask[coeffI]*coeffs[coeffI]*
+                psiInternal[U[doubleCut[edgeI]]];
 
             sumOffDiag[doubleCutOwner[edgeI]] +=
                 cutMask[coeffI]*coeffs[coeffI];
@@ -1072,7 +1135,8 @@ void GlobalPointPatchField
 
             // Neighbour side
             localMult[doubleCutNeighbour[edgeI]] +=
-                cutMask[coeffI]*coeffs[coeffI]*psiInternal[L[doubleCut[edgeI]]];
+                cutMask[coeffI]*coeffs[coeffI]*
+                psiInternal[L[doubleCut[edgeI]]];
 
             sumOffDiag[doubleCutNeighbour[edgeI]] +=
                 cutMask[coeffI]*coeffs[coeffI];
@@ -1085,6 +1149,7 @@ void GlobalPointPatchField
 
     tmp<Field<scalar> > trpf =
         reduceExtractPoint<scalar>(localMult);
+
     Field<scalar>& rpf = trpf();
 
     // Get addressing
