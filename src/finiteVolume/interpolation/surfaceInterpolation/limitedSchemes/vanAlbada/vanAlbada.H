@@ -78,7 +78,11 @@ public:
             faceFlux, phiP, phiN, gradcP, gradcN, d
         );
 
-        return r*(r + 1)/(sqr(r) + 1);
+        // New formulation.  Oliver Borm and Aleks Jemcov
+        // HJ, 13/Jan/2011
+        return (r + 1)/(r + 1/stabilise(r, VSMALL));
+
+//         return r*(r + 1)/(sqr(r) + 1);
     }
 };
 
