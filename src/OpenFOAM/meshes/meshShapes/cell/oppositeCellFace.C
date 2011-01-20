@@ -99,7 +99,7 @@ Foam::label Foam::cell::opposingFaceLabel
                 {
                     // There has already been an opposite face.
                     // Non-prismatic cell
-                    Info<< "Multiple faces not sharing vertex: " 
+                    Info<< "Multiple faces not sharing vertex: "
                         << oppositeFaceLabel << " and "
                         << curFaceLabels[faceI] << endl;
                     return -1;
