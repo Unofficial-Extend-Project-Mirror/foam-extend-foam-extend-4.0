@@ -39,19 +39,11 @@ License
 #include "mapClouds.H"
 
 #include "volPointInterpolation.H"
-#include "extendedLeastSquaresVectors.H"
-#include "extendedLeastSquaresVectors.H"
-#include "leastSquaresVectors.H"
-#include "CentredFitData.H"
-#include "linearFitPolynomial.H"
-#include "quadraticFitPolynomial.H"
-#include "quadraticLinearFitPolynomial.H"
-//#include "quadraticFitSnGradData.H"
-#include "skewCorrectionVectors.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 defineTypeNameAndDebug(Foam::fvMesh, 0);
+
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 

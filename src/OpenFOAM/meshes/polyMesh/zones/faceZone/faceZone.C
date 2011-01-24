@@ -217,8 +217,6 @@ void Foam::faceZone::calcCellLayers() const
             mc[faceI] = curMc;
             sc[faceI] = curSc;
         }
-        //Info << "masterCells: " << mc << endl;
-        //Info << "slaveCells: " << sc << endl;
     }
 }
 
