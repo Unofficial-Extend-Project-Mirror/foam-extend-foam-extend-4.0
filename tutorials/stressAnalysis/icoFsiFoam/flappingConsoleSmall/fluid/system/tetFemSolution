@@ -25,7 +25,7 @@ solvers
 
         tolerance        1e-06;
         relTol           0;
-    };
+    }
 }
 
 
