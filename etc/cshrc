@@ -49,7 +49,6 @@ set foamInstall = $HOME/$WM_PROJECT
 # set foamInstall = ~$WM_PROJECT
 # set foamInstall = /usr/local/$WM_PROJECT
 # set foamInstall = /opt/$WM_PROJECT
-# set foamInstall = /usr/lib
 #
 # END OF (NORMAL) USER EDITABLE PART
 ###############################################################################
@@ -118,7 +117,7 @@ setenv WM_COMPILER_LIB_ARCH
 
 # Compilation options (architecture, precision, optimised, debug or profiling)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-setenv WM_NCOMPPROCS 2
+setenv WM_NCOMPPROCS 4
 
 # WM_ARCH_OPTION = 32 | 64
 if ( ! $?WM_ARCH_OPTION ) setenv WM_ARCH_OPTION 64
@@ -305,7 +304,7 @@ setenv MANPATH `$cleanProg "$MANPATH" "$foamOldDirs"`
 # Source project setup files
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 _foamSource $WM_PROJECT_DIR/etc/settings.csh
-# _foamSource $WM_PROJECT_DIR/etc/aliases.csh
+_foamSource $WM_PROJECT_DIR/etc/aliases.csh
 
 # Source user setup files for optional packages
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
