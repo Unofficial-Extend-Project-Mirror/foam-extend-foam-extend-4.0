@@ -168,7 +168,8 @@ void regionCoupleFvPatchField<Type>::evaluate
     const Pstream::commsTypes
 )
 {
-    // Implement weights-based stabilised harmonic interpolation using magnitude
+    // Implement weights-based stabilised harmonic interpolation using
+    // magnitude of type
     // Algorithm:
     // 1) calculate magnitude of internal field and neighbour field
     // 2) calculate harmonic mean magnitude
@@ -189,7 +190,7 @@ void regionCoupleFvPatchField<Type>::evaluate
 
     forAll (weights, faceI)
     {
-        den = (mOwn[faceI] - mNei[faceI]);
+        den = mOwn[faceI] - mNei[faceI];
 
         if (mag(den) > SMALL)
         {

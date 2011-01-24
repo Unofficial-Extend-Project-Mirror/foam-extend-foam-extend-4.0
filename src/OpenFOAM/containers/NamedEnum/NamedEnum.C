@@ -72,7 +72,7 @@ Enum Foam::NamedEnum<Enum, nEnum>::read(Istream& is) const
         (
             "NamedEnum<Enum, nEnum>::read(Istream& is) const",
             is
-        ) << name << " is not in enumeration " << toc()
+        )   << name << " is not in enumeration " << toc()
             << exit(FatalIOError);
     }
 

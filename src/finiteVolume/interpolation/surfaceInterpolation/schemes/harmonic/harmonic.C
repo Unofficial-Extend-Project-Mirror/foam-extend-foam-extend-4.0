@@ -34,15 +34,7 @@ Description
 
 namespace Foam
 {
-
-defineTypeNameAndDebug(harmonic, 0);
-
-surfaceInterpolationScheme<scalar>::addMeshFluxConstructorToTable<harmonic>
-    addharmonicScalarMeshFluxConstructorToTable_;
-
-surfaceInterpolationScheme<scalar>::addMeshConstructorToTable<harmonic>
-    addharmonicScalarMeshConstructorToTable_;
-
+    makeSurfaceInterpolationScheme(harmonic)
 }
 
 // ************************************************************************* //

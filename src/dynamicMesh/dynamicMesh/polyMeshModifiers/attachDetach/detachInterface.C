@@ -42,9 +42,9 @@ void Foam::attachDetach::detachInterface
     // 2. Modify all faces of the master zone, by putting them into the master
     //    patch (look for orientation) and their renumbered mirror images
     //    into the slave patch
-    // 3. Create a point renumbering list, giving a new point index for original
-    //    points in the face patch
-    // 4. Grab all faces in cells on the master side and renumber them 
+    // 3. Create a point renumbering list, giving a new point index for
+    //    original points in the face patch
+    // 4. Grab all faces in cells on the master side and renumber them
     //    using the point renumbering list.  Exclude the ones that belong to
     //    the master face zone
     //
@@ -70,7 +70,9 @@ void Foam::attachDetach::detachInterface
     const polyMesh& mesh = topoChanger().mesh();
     const faceZoneMesh& zoneMesh = mesh.faceZones();
 
-    const primitiveFacePatch& masterFaceLayer = zoneMesh[faceZoneID_.index()]();
+    const primitiveFacePatch& masterFaceLayer =
+        zoneMesh[faceZoneID_.index()]();
+
     const pointField& points = mesh.points();
     const labelListList& meshEdgeFaces = mesh.edgeFaces();
 
@@ -88,7 +90,12 @@ void Foam::attachDetach::detachInterface
     // with their original labels to stop duplication
     label nIntEdges = masterFaceLayer.nInternalEdges();
 
-    for (label curEdgeID = nIntEdges; curEdgeID < meshEdges.size(); curEdgeID++)
+    for
+    (
+        label curEdgeID = nIntEdges;
+        curEdgeID < meshEdges.size();
+        curEdgeID++
+    )
     {
         const labelList& curFaces = meshEdgeFaces[meshEdges[curEdgeID]];
 
@@ -374,6 +381,33 @@ void Foam::attachDetach::detachInterface
         // If the face has changed, create a modification entry
         if (changed)
         {
+            // Get zone ID and flipMap for the face
+            // Bug fix. Henrik Rusche, 20/Jan/2011
+            const label oldZoneID = zoneMesh.whichZone(curFaceID);
+            bool oldFlip = false;
+
+            if (oldZoneID > -1)
+            {
+                const label oldFaceInZoneID =
+                    zoneMesh[oldZoneID].whichFace(curFaceID);
+
+                if (oldFaceInZoneID > -1)
+                {
+                    oldFlip = zoneMesh[oldZoneID].flipMap()[oldFaceInZoneID];
+                }
+                else
+                {
+                    FatalErrorIn
+                    (
+                        "attachDetach::detachInterface\n"
+                        "(\n"
+                        "    polyTopoChange& ref\n"
+                        ") const\n"
+                    )   << "Error in zone access."
+                        << abort(FatalError);
+                }
+            }
+
             if (mesh.isInternalFace(curFaceID))
             {
                 // No need to check for nei index: internal face.
@@ -389,8 +423,8 @@ void Foam::attachDetach::detachInterface
                         false,                      // flip flux
                         -1,                         // patch for face
                         false,                      // remove from zone
-                        -1,                         // zone for face
-                        false                       // face zone flip
+                        oldZoneID,                  // zone for face
+                        oldFlip                     // face zone flip
                     )
                 );
 // Pout << "modifying stick-out face. Internal Old face: " << oldFace << " new face: " << newFace << " own: " << own[curFaceID] << " nei: " << nei[curFaceID] << endl;
@@ -408,12 +442,12 @@ void Foam::attachDetach::detachInterface
                         false,                       // flip flux
                         mesh.boundaryMesh().whichPatch(curFaceID), // patch
                         false,                        // remove from zone
-                        -1,                           // zone for face
-                        false                         // face zone flip
+                        oldZoneID,                    // zone for face
+                        oldFlip                      // face zone flip
                     )
-                );   
+                );
 // Pout << "modifying stick-out face. Boundary Old face: " << oldFace << " new face: " << newFace << " own: " << own[curFaceID] << " patch: " << mesh.boundaryMesh().whichPatch(curFaceID) << endl;
-            }                                                  
+            }
         }
     }
 

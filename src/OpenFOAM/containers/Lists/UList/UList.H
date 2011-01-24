@@ -95,10 +95,12 @@ public:
         //- Declare friendship with the SubList class
         friend class SubList<T>;
 
+
     // Static Member Functions
 
         //- Return a null UList
         inline static const UList<T>& null();
+
 
     // Public classes
 

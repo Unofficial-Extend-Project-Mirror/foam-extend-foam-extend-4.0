@@ -904,8 +904,7 @@ Tolerances
     primitiveMeshFaceFlatnessThreshold 0.8;
 
     // Geometric matching tolerances
-    cyclicMatchTol      1e-4;
-    processorMatchTol   1e-4;
+    patchFaceMatchTol   1e-4;
 
     // Volumetric closed domain
     closedDomainTol     1e-10;

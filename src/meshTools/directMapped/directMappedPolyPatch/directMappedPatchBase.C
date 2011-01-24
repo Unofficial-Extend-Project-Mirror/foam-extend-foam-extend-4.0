@@ -98,7 +98,9 @@ void Foam::directMappedPatchBase::collectSamples
     labelListList globalFaces(Pstream::nProcs());
 
     globalFc[Pstream::myProcNo()] = patch_.faceCentres();
-    globalSamples[Pstream::myProcNo()] = globalFc[Pstream::myProcNo()]+offsets_;
+    globalSamples[Pstream::myProcNo()] =
+        globalFc[Pstream::myProcNo()] + offsets_;
+
     globalFaces[Pstream::myProcNo()] = identity(patch_.size());
 
     // Distribute to all processors
@@ -115,11 +117,13 @@ void Foam::directMappedPatchBase::collectSamples
         globalSamples,
         accessOp<pointField>()
     );
+
     patchFaces = ListListOps::combine<labelList>
     (
         globalFaces,
         accessOp<labelList>()
     );
+
     patchFc = ListListOps::combine<pointField>
     (
         globalFc,
@@ -135,8 +139,9 @@ void Foam::directMappedPatchBase::collectSamples
             accessOp<labelList>()
         )
     );
+
     label sampleI = 0;
-    forAll(nPerProc, procI)
+    forAll (nPerProc, procI)
     {
         for (label i = 0; i < nPerProc[procI]; i++)
         {
@@ -173,13 +178,14 @@ void Foam::directMappedPatchBase::findSamples
                     "directMappedPatchBase::findSamples(const pointField&,"
                     " labelList&, labelList&, pointField&) const"
                 )   << "No need to supply a patch name when in "
-                    << sampleModeNames_[mode_] << " mode." << exit(FatalError);
+                    << sampleModeNames_[mode_] << " mode."
+                    << abort(FatalError);
             }
 
             // Octree based search engine
             meshSearch meshSearchEngine(mesh, false);
 
-            forAll(samples, sampleI)
+            forAll (samples, sampleI)
             {
                 const point& sample = samples[sampleI];
 
@@ -200,7 +206,7 @@ void Foam::directMappedPatchBase::findSamples
                         cc,
                         cellI
                     );
-                    nearest[sampleI].second().first() = magSqr(cc-sample);
+                    nearest[sampleI].second().first() = magSqr(cc - sample);
                     nearest[sampleI].second().second() = Pstream::myProcNo();
                 }
             }
@@ -215,7 +221,7 @@ void Foam::directMappedPatchBase::findSamples
 
             if (pp.empty())
             {
-                forAll(samples, sampleI)
+                forAll (samples, sampleI)
                 {
                     nearest[sampleI].second().first() = Foam::sqr(GREAT);
                     nearest[sampleI].second().second() = Pstream::myProcNo();
@@ -251,7 +257,7 @@ void Foam::directMappedPatchBase::findSamples
                     3.0             // duplicity
                 );
 
-                forAll(samples, sampleI)
+                forAll (samples, sampleI)
                 {
                     const point& sample = samples[sampleI];
 
@@ -290,13 +296,14 @@ void Foam::directMappedPatchBase::findSamples
                     "directMappedPatchBase::findSamples(const pointField&,"
                     " labelList&, labelList&, pointField&) const"
                 )   << "No need to supply a patch name when in "
-                    << sampleModeNames_[mode_] << " mode." << exit(FatalError);
+                    << sampleModeNames_[mode_] << " mode."
+                    << abort(FatalError);
             }
 
             // Octree based search engine
             meshSearch meshSearchEngine(mesh, false);
 
-            forAll(samples, sampleI)
+            forAll (samples, sampleI)
             {
                 const point& sample = samples[sampleI];
 
@@ -340,20 +347,21 @@ void Foam::directMappedPatchBase::findSamples
     {
         Info<< "directMappedPatchBase::findSamples on mesh " << sampleRegion_
             << " : " << endl;
-        forAll(nearest, sampleI)
+
+        forAll (nearest, sampleI)
         {
             label procI = nearest[sampleI].second().second();
             label localI = nearest[sampleI].first().index();
 
-            Info<< "    " << sampleI << " coord:"<< samples[sampleI]
-                << " found on processor:" << procI
-                << " in local cell/face:" << localI
-                << " with cc:" << nearest[sampleI].first().rawPoint() << endl;
+            Info<< "    " << sampleI << " coord: "<< samples[sampleI]
+                << " found on processor: " << procI
+                << " in local cell/face: " << localI
+                << " with cc: " << nearest[sampleI].first().rawPoint() << endl;
         }
     }
 
     // Check for samples not being found
-    forAll(nearest, sampleI)
+    forAll (nearest, sampleI)
     {
         if (!nearest[sampleI].first().hit())
         {
@@ -363,8 +371,8 @@ void Foam::directMappedPatchBase::findSamples
                 "(const pointField&, labelList&"
                 ", labelList&, pointField&)"
             )   << "Did not find sample " << samples[sampleI]
-                << " on any processor of region" << sampleRegion_
-                << exit(FatalError);
+                << " on any processor of region " << sampleRegion_
+                << abort(FatalError);
         }
     }
 
@@ -374,7 +382,7 @@ void Foam::directMappedPatchBase::findSamples
     sampleIndices.setSize(samples.size());
     sampleLocations.setSize(samples.size());
 
-    forAll(nearest, sampleI)
+    forAll (nearest, sampleI)
     {
         sampleProcs[sampleI] = nearest[sampleI].second().second();
         sampleIndices[sampleI] = nearest[sampleI].first().index();
@@ -388,7 +396,8 @@ void Foam::directMappedPatchBase::calcMapping() const
     if (mapPtr_.valid())
     {
         FatalErrorIn("directMappedPatchBase::calcMapping() const")
-            << "Mapping already calculated" << exit(FatalError);
+            << "Mapping already calculated"
+            << abort(FatalError);
     }
 
     if
@@ -415,7 +424,7 @@ void Foam::directMappedPatchBase::calcMapping() const
     }
 
 
-    // Get global list of all samples and the processor and face they come from.
+    // Get global list of all samples and the processor and face they come from
     pointField samples;
     labelList patchFaceProcs;
     labelList patchFaces;
@@ -435,7 +444,7 @@ void Foam::directMappedPatchBase::calcMapping() const
     // - cell/face sample is in (so source when mapping)
     //   sampleIndices, sampleProcs.
 
-    //forAll(samples, i)
+    //forAll (samples, i)
     //{
     //    Info<< i << " need data in region "
     //        << patch_.boundaryMesh().mesh().name()
@@ -464,7 +473,7 @@ void Foam::directMappedPatchBase::calcMapping() const
 
         label vertI = 0;
 
-        forAll(patchFc, i)
+        forAll (patchFc, i)
         {
             meshTools::writeOBJ(str, patchFc[i]);
             vertI++;
@@ -482,7 +491,7 @@ void Foam::directMappedPatchBase::calcMapping() const
     //    const scalarField magOffset(mag(sampleLocations - patchFc));
     //    const scalar avgOffset(average(magOffset));
     //
-    //    forAll(magOffset, sampleI)
+    //    forAll (magOffset, sampleI)
     //    {
     //        if
     //        (
@@ -518,7 +527,7 @@ void Foam::directMappedPatchBase::calcMapping() const
     labelListList& subMap = mapPtr_().subMap();
     labelListList& constructMap = mapPtr_().constructMap();
 
-    forAll(subMap, procI)
+    forAll (subMap, procI)
     {
         subMap[procI] = UIndirectList<label>
         (
@@ -547,11 +556,11 @@ void Foam::directMappedPatchBase::calcMapping() const
     {
         // Check that all elements get a value.
         PackedBoolList used(patch_.size());
-        forAll(constructMap, procI)
+        forAll (constructMap, procI)
         {
             const labelList& map = constructMap[procI];
 
-            forAll(map, i)
+            forAll (map, i)
             {
                 label faceI = map[i];
 
@@ -569,7 +578,7 @@ void Foam::directMappedPatchBase::calcMapping() const
                 }
             }
         }
-        forAll(used, faceI)
+        forAll (used, faceI)
         {
             if (used[faceI] == 0)
             {
@@ -734,7 +743,7 @@ const Foam::polyPatch& Foam::directMappedPatchBase::samplePolyPatch() const
             << "Cannot find patch " << samplePatch_
             << " in region " << sampleRegion_ << endl
             << "Valid patches are " << nbrMesh.boundaryMesh().names()
-            << exit(FatalError);
+            << abort(FatalError);
     }
 
     return nbrMesh.boundaryMesh()[patchI];

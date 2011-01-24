@@ -263,8 +263,8 @@ public:
         }
 
         //- Map storing the local face index for every global face index.
-        //  Used to find out the index of face in the zone from the known global
-        //  face index.  If the face is not in the zone, returns -1
+        //  Used to find out the index of face in the zone from the known
+        //   global face index.  If the face is not in the zone, returns -1
         label whichFace(const label globalFaceID) const;
 
         //- Return reference to primitive patch

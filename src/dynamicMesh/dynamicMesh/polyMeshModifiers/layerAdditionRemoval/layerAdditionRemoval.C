@@ -217,6 +217,18 @@ Foam::layerAdditionRemoval::~layerAdditionRemoval()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+void  Foam::layerAdditionRemoval::setRemoval()
+{
+    triggerRemoval_ = topoChanger().morphIndex();
+}
+
+
+void  Foam::layerAdditionRemoval::setAddition()
+{
+    triggerAddition_ = topoChanger().morphIndex();
+}
+
+
 bool Foam::layerAdditionRemoval::changeTopology() const
 {
     // Protect from multiple calculation in the same time-step

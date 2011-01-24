@@ -29,17 +29,17 @@ gradSchemes
 divSchemes
 {
     default         none;
-    div(phi,rho)    Gauss limitedLinear 1;
-    div(phi,U)      Gauss limitedLinearV 1;
+    div(phi,rho)    Gauss vanLeer;
+    div(phi,U)      Gauss linearUpwind Gauss linear;
     div(phiU,p)     Gauss linear;
-    div(phi,k)      Gauss limitedLinear 1;
-    div(phi,epsilon) Gauss limitedLinear 1;
-    div(phi,Yi_h)   Gauss upwind;
+    div(phi,k)      Gauss upwind;
+    div(phi,epsilon) Gauss upwind;
+    div(phi,Yi_h)   Gauss vanLeer;
     div(phi,fu_ft_h) Gauss multivariateSelection
     {
-        fu limitedLinear 1;
-        ft limitedLinear 1;
-        hs limitedLinear 1;
+        fu vanLeer;
+        ft vanLeer;
+        hs vanLeer;
     };
     div((muEff*dev2(grad(U).T()))) Gauss linear;
 }

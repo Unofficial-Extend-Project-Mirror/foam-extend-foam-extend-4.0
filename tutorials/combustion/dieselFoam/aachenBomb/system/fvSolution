@@ -23,6 +23,7 @@ solvers
         preconditioner  DIC;
         tolerance       1e-09;
         relTol          0;
+        minIter         1;
     }
 
     rho
@@ -35,14 +36,15 @@ solvers
     {
         solver          PBiCG;
         preconditioner  DILU;
-        tolerance       1e-06;
+        tolerance       1e-08;
         relTol          0;
+        minIter         1;
     }
 }
 
 PISO
 {
-    nCorrectors     2;
+    nCorrectors     4;
     nNonOrthogonalCorrectors 0;
 }
 
