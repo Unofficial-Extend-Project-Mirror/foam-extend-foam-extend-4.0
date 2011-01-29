@@ -5,6 +5,7 @@ Contacts:
 
 Release Committee:    Hrvoje Jasak (h.jasak@wikki.co.uk)
 SourceForge Accounts: Bernhard Gschaider (Bernhard.Gschaider@ice-sf.at)
+                      Martin Beaudoin (beaudoin.martin@ireq.ca)
 git Repository:       Henrik Rusche (h.rusche@wikki.co.uk)
                       Martin Beaudoin (beaudoin.martin@ireq.ca)
 
@@ -15,9 +16,10 @@ git Repository:       Henrik Rusche (h.rusche@wikki.co.uk)
    account at SourceForge.net. (SourceForge will suggest a username
    of firstnamelastname, but a username of firstname_lastname may
    be a better choice.) After you obtain your account at SourceForge, you will
-   still need to be granted specific access to the -extend project. Make a
-   request to the "SourceForge Accounts" contact at the top of this document
-   for access to the project.
+   still need to be granted specific access to the -extend project. Make a request
+   to the "SourceForge Accounts" contact at the top of this document for access to
+   the project.
+
 
 2. Access to the git Repository
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -25,40 +27,39 @@ git Repository:       Henrik Rusche (h.rusche@wikki.co.uk)
    For a read-only copy of the repository, use the following command:
    + git clone git://openfoam-extend.git.sourceforge.net/gitroot/openfoam-extend/OpenFOAM-1.6-ext
 
-   To obtain a copy of the repository with write access, use the following
-   command:
-
+   To obtain a copy of the repository with write access, use the following command:
    + git clone ssh://username@openfoam-extend.git.sourceforge.net/gitroot/openfoam-extend/OpenFOAM-1.6-ext
 
    Also see:
-
    http://openfoam-extend.git.sourceforge.net/git/gitweb.cgi?p=openfoam-extend
+
 
 3. git Commit Policies and Workflow (Introduction)
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   A formal procedure for contributions has been established for the project
-   with regard to branching and commits in the git repository. The workflow
-   proposed by Hrvoje Jasak and Henrik Rusche for contributing to the git
-   repository is described in the following two documents:
+   A formal procedure for contributions has been established for the project with
+   regard to branching and commits in the git repository. The workflow proposed
+   by Hrv Jasak and Henrik Rusche for contributing to the git repository is described
+   in the following document:
 
    http://nvie.com/posts/a-successful-git-branching-model/
-   http://www.itk.org/Wiki/Git/Workflow/Topic
 
-   Both of the two articles listed above should be considered mandatory
-   reading material for those planning to make contributions to the repository.
+   The article listed above should be considered mandatory reading material
+   for those planning to make contributions to the repository. Some links about
+   the general usage of GIT can be found in Section 8. 
 
-   Please do not hesitate to ask one of the "git Repository" contacts at the
-   top of this document if you are not sure about specific operation relative
-   to the git repository.
+   Please do not hesitate to ask one of the "git Repository" contacts at the top
+   of this document if you are not sure about specific operation relative to the git
+   repository.
+
 
 4. git Commit Policies and Workflow (User Perspective)
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   The document listed in Section 3 above from nvie.com provides an excellent
-   conceptual description of the policies that will be used for the -extend
-   repository. More detailed instructions for users who wish to make
-   contributions are spelled out in this section.
+   The document listed in Section 3 above from nvie.com provides an excellent conceptual
+   description of the policies that will be used for the -extend repository. More
+   detailed instructions for users who wish to make contributions are spelled out in
+   this section.
 
    Before making any commits to the git repository, be sure to configure git with your
    username and e-mail address, which helps to ensure that you receive proper credit
@@ -99,11 +100,12 @@ git Repository:       Henrik Rusche (h.rusche@wikki.co.uk)
    branch, and then delete the branch from the server, as it is no longer needed once
    it has been merged.
 
+
 5. git Commit Policies and Workflow (Committee Perspective)
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
    The -extend project "release committee" (initially comprised of Hrv Jasak) will be
-   solely responsible for merging user contributions into the master branch.
+   solely responsible for merging user contributions into the master and nextRelease branches.
 
    User contributions will be contained in feature branches, with a new feature branch for
    each new fix or feature, as described in Section 4 above.
@@ -125,6 +127,7 @@ git Repository:       Henrik Rusche (h.rusche@wikki.co.uk)
    guarantee that a merge of the integration branch into the master branch can be
    accomplished by a fast-forward.
 
+
 6. Specific Usage Instructions
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -134,20 +137,36 @@ git Repository:       Henrik Rusche (h.rusche@wikki.co.uk)
 
    a. Single out the SHA-1 of the commit that contains the hotfix (e.g. 13e5d2f)
 
-   b. Rebase the hotfix commit onto the master branch; e.g.
-
-      + (Can we provide an example of the git commands to do this?
-         Is it literally a rebase command or a cherry-pick?)
-
    c. Create a new hotfix branch; e.g.
 
+      + git checkout master
       + git checkout -b hotfix/my-hotfix-topic
+
+   b. Single out the commit and base it on the master branch; e.g.
+
+      # The fix is in a single commit, but localBranch has advanced
+      + git cherry-pick commitID
+
+      OR
+
+      # The fix is small, but the commit contains other changes
+      + git checkout localBranch file
+      + git commit
 
    d. Contact the "Release Committee" point-of-contact at the top of this document
       and request that the hotfix be merged into the integration and master branches.
 
-7. Other Suggested Topics
-   ~~~~~~~~~~~~~~~~~~~~~~
 
-   Author attribution: What is the policy/format for author credits and copyrights
-                       in new contributions provided by users to the -extend project?
+7. Acknowledgements & Copyright
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Your authorship is tracked by the version control system (git). You may also document
+   your authorship in the header of the files. Furthermore, the release committee will
+   update the list of contributors in the README file with every release.
+
+
+8. Background Reading on git
+   ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   http://openfoamwiki.net/index.php/Starting_points_for_using_GIT
+
