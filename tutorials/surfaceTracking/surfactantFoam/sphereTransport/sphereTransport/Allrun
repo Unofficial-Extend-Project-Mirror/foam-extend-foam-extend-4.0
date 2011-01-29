@@ -4,5 +4,7 @@
 
 application="sphereSurfactantFoam"
 
+wmake ../$application
+
 runApplication makeFaMesh
 runApplication $application
