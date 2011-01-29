@@ -37,7 +37,8 @@ DebugSwitches
     BlockLduMatrix  1;
 
     CircumferentialAveragingInterpolation 0;
-    mixingPlanePolyPatch                  1;
+    mixingPlane                           0;
+    MixingPlaneInterpolation              0;
 
     overlapGgi          0;
     cyclicGgi           0;
