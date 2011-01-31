@@ -26,6 +26,7 @@ License
 
 #include "symmTensorField.H"
 #include "transformField.H"
+#include "boolList.H"
 
 #define TEMPLATE
 #include "FieldFunctionsM.C"
