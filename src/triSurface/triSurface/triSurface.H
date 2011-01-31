@@ -58,7 +58,7 @@ class IFstream;
 
 class triSurface
 :
-    public PrimitivePatch<labelledTri, ::Foam::List, pointField, point>
+    public PrimitivePatch<labelledTri, List, pointField, point>
 {
     // Private typedefs
 
@@ -67,7 +67,7 @@ class triSurface
         typedef PrimitivePatch
         <
             labelledTri,
-            ::Foam::List,
+            List,
             pointField,
             point
         >
