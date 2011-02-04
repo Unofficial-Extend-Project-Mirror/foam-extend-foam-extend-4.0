@@ -42,7 +42,8 @@ int main(int argc, char *argv[])
 #   include "setRoots.H"
 #   include "createTimes.H"
 
-    Info<< "Reading master mesh for time = " << runTimeMaster.timeName() << endl;
+    Info<< "Reading master mesh for time = " << runTimeMaster.timeName()
+        << endl;
 
     Info<< "Create mesh\n" << endl;
     mergePolyMesh masterMesh
@@ -56,7 +57,8 @@ int main(int argc, char *argv[])
     );
 
 
-    Info<< "Reading mesh to add for time = " << runTimeToAdd.timeName() << endl;
+    Info<< "Reading mesh to add for time = " << runTimeToAdd.timeName()
+        << endl;
 
     Info<< "Create mesh\n" << endl;
     polyMesh meshToAdd
