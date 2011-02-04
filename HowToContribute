@@ -100,6 +100,19 @@ git Repository:       Henrik Rusche (h.rusche@wikki.co.uk)
    branch, and then delete the branch from the server, as it is no longer needed once
    it has been merged.
 
+   If you need to delete the branch from the server or are requested to do so, the proper
+   command is
+
+   + git push origin :my-feature-branch
+
+   To delete the same branch from your local repository requires the command
+
+   + git branch -d my-feature-branch
+
+   Finally, to clean your local repository of tracking branches that have been deleted
+   from the server requires the command
+
+   + git remote prune origin
 
 5. git Commit Policies and Workflow (Committee Perspective)
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
