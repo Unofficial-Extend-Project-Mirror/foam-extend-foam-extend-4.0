@@ -1,0 +1,23 @@
+Standard response:
+
+Your name and authorship will be preserved by the git system, but please put the author name for the classes you have written, or a note saying that yo have changed the code.
+
+Bug fixes:
+
+- Peter Janas: accordionEngineMesh and bug fixes
+
+
+Contributions:
+
+- Niels Linnemann: Actuator disk
+- Bernhard Gscheider: surfactantFoam clean-up; swakToFoam
+- TU Braunschweig: real gas thermo
+- Kornev, Rostock: inlet turbulence generator; locDynV2F hybrid turbulence model
+- Christoph Goniva: and multi-mixer dynamic mesh class
+- 
+
+
+- segregated pressure-based turbomachinery (Wikki)
+- improvements to GGI
+- mixing plane interface
+- ??? Swig interface
