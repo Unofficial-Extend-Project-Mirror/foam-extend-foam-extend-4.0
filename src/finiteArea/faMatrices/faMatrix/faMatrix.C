@@ -352,9 +352,10 @@ void faMatrix<Type>::setValues
 {
     const faMesh& mesh = psi_.mesh();
 
-    const faceList& faces = mesh.faces();
+    //    const faceList& faces = mesh.faces();
     const unallocLabelList& own = mesh.owner();
     const unallocLabelList& nei = mesh.neighbour();
+    const labelListList& edges=mesh.patch().faceEdges();
 
     scalarField& Diag = diag();
 
@@ -367,7 +368,8 @@ void faMatrix<Type>::setValues
 
         if (symmetric() || asymmetric())
         {
-            const face& c = faces[facei];
+	  //            const face& c = faces[facei];
+	    const labelList &c=edges[facei];
 
             forAll(c, j)
             {
