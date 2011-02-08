@@ -52,7 +52,7 @@ solvers
 
 PISO
 {
-    momentumPredictor no;
+    momentumPredictor yes;
     nCorrectors     3;
     nNonOrthogonalCorrectors 0;
     nAlphaCorr      1;
