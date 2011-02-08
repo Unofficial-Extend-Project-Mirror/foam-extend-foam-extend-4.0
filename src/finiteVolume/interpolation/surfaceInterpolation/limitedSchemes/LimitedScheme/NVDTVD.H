@@ -83,7 +83,7 @@ public:
             }
 
             // Stabilise for division
-            gradcf = stabilise(gradcf, VSMALL);
+            gradcf = stabilise(gradcf, SMALL);
 
             return 1 - 0.5*gradf/gradcf;
         }

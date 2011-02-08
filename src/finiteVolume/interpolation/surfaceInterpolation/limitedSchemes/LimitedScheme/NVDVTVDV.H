@@ -83,7 +83,7 @@ public:
             }
 
             // Stabilise for division
-            gradcf = stabilise(gradcf, VSMALL);
+            gradcf = stabilise(gradcf, SMALL);
 
             return 1 - 0.5*gradf/gradcf;
         }
@@ -114,7 +114,7 @@ public:
             }
 
             // Stabilise for division
-            //Changed to SMALL to prevent FPE.  OB, 14/Jan/2011
+            // Changed to SMALL to prevent FPE.  OB, 14/Jan/2011
             gradf = stabilise(gradf, SMALL);
 
             // New formulation.  Oliver Borm and Aleks Jemcov
