@@ -36,7 +36,7 @@ Description
     reversing all the patch faces of the owner.  Warning: this will
     work only with the FOAM parallel decomposition tools - enforce the
     same in all other decomposition tools.
-    
+
 
 SourceFiles
     processorTetPolyPatchFaceDecomp.C
@@ -120,7 +120,10 @@ class processorTetPolyPatchFaceDecomp
     // Private Member Functions
 
         //- Disallow default construct as copy
-        processorTetPolyPatchFaceDecomp(const processorTetPolyPatchFaceDecomp&);
+        processorTetPolyPatchFaceDecomp
+        (
+            const processorTetPolyPatchFaceDecomp&
+        );
 
         //- Disallow default assignment
         void operator=(const processorTetPolyPatchFaceDecomp&);
@@ -246,7 +249,7 @@ public:
               // either multiplied twice or not at all.  For this purpose, the
               // offending edges need to be separated out and multiplied
               // appropriately.  This will only happen for cell tetrahedral
-              // decomposition and is generally nasty.  
+              // decomposition and is generally nasty.  HJ, 4/Dec/2001
 
                   //- Return doubly cut edge indices
                   const labelList& doubleCutEdgeIndices() const;
