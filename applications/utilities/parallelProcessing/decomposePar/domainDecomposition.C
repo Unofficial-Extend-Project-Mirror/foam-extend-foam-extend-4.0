@@ -347,8 +347,8 @@ bool domainDecomposition::writeDecomposition()
         // Create and add zones
 
         // Note:
-        // This coding was all wrong, as each point/face/cell may only belong to
-        // a single zone.
+        // This coding was all wrong, as each point/face/cell may only
+        //  belong to a single zone.
         // Additionally, ordering of points/faces/cells in the processor mesh
         // needs to match the ordering in global mesh zones.  Full rewrite.
         // HJ, 30/Mar/2009
