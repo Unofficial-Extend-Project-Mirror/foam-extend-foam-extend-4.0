@@ -64,7 +64,7 @@ scalar nutkWallFunctionFvPatchScalarField::calcYPlusLam
 {
     scalar ypl = 11.0;
 
-    for (int i=0; i<10; i++)
+    for (int i = 0; i < 10; i++)
     {
         ypl = log(E*ypl)/kappa;
     }
