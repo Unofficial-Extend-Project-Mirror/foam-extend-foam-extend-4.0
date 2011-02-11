@@ -60,6 +60,31 @@ addToRunTimeSelectionTable                                                    \
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#define makeBasicRealGasThermo(Cthermo,Mixture,Transport,SpecieThermo,Thermo,EqnOfState)       \
+                                                                              \
+typedef Cthermo<Mixture<Transport<SpecieThermo<Thermo<EqnOfState> > > > >     \
+    Cthermo##Mixture##Transport##SpecieThermo##Thermo##EqnOfState;                          \
+                                                                              \
+defineTemplateTypeNameAndDebugWithName                                        \
+(                                                                             \
+    Cthermo##Mixture##Transport##SpecieThermo##Thermo##EqnOfState,                          \
+    #Cthermo                                                                  \
+        "<"#Mixture"<"#Transport"<"#SpecieThermo"<"#Thermo"<"#EqnOfState">>>>>", \
+    0                                                                         \
+);                                                                            \
+                                                                              \
+addToRunTimeSelectionTable                                                    \
+(                                                                             \
+    basicPsiThermo,                                                           \
+    Cthermo##Mixture##Transport##SpecieThermo##Thermo##EqnOfState,                          \
+    fvMesh                                                                    \
+)
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #endif
 
 // ************************************************************************* //

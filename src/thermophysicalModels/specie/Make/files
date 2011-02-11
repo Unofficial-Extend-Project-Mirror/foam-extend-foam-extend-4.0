@@ -12,4 +12,9 @@ $(reactions)/makeChemkinReactions.C
 $(reactions)/makeReactionThermoReactions.C
 $(reactions)/makeLangmuirHinshelwoodReactions.C
 
+$(equationOfState)/aungierRedlichKwong/aungierRedlichKwong.C
+$(equationOfState)/pengRobinson/pengRobinson.C
+$(equationOfState)/redlichKwong/redlichKwong.C
+$(equationOfState)/soaveRedlichKwong/soaveRedlichKwong.C
+
 LIB = $(FOAM_LIBBIN)/libspecie

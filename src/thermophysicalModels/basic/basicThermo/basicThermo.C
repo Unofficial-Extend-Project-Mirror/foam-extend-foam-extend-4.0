@@ -33,6 +33,13 @@ License
 #include "fixedInternalEnergyFvPatchScalarField.H"
 #include "gradientInternalEnergyFvPatchScalarField.H"
 #include "mixedInternalEnergyFvPatchScalarField.H"
+#include "zeroGradientFvPatchFields.H"
+#include "fixedEnthalpyRealFluids.H"
+#include "gradientEnthalpyRealFluids.H"
+#include "mixedEnthalpyRealFluids.H"
+#include "fixedInternalEnergyRealFluids.H"
+#include "gradientInternalEnergyRealFluids.H"
+#include "mixedInternalEnergyRealFluids.H"
 
 /* * * * * * * * * * * * * * Private Static Data * * * * * * * * * * * * * * */
 
@@ -141,6 +148,106 @@ void Foam::basicThermo::eBoundaryCorrection(volScalarField& e)
         }
     }
 }
+
+Foam::wordList Foam::basicThermo::hRealBoundaryTypes()
+{
+    const volScalarField::GeometricBoundaryField& tbf = T_.boundaryField();
+
+    wordList hbt = tbf.types();
+
+    forAll(tbf, patchi)
+    {
+        if (isA<fixedValueFvPatchScalarField>(tbf[patchi]))
+        {
+            hbt[patchi] = fixedEnthalpyRealFluids::typeName;
+        }
+        else if
+        (
+            isA<zeroGradientFvPatchScalarField>(tbf[patchi])
+         || isA<fixedGradientFvPatchScalarField>(tbf[patchi])
+        )
+        {
+            hbt[patchi] = gradientEnthalpyRealFluids::typeName;
+        }
+        else if (isA<mixedFvPatchScalarField>(tbf[patchi]))
+        {
+            hbt[patchi] = mixedEnthalpyRealFluids::typeName;
+        }
+    }
+
+    return hbt;
+}
+
+
+void Foam::basicThermo::hRealBoundaryCorrection(volScalarField& h)
+{
+    volScalarField::GeometricBoundaryField& hbf = h.boundaryField();
+
+    forAll(hbf, patchi)
+    {
+        if (isA<gradientEnthalpyRealFluids>(hbf[patchi]))
+        {
+            refCast<gradientEnthalpyRealFluids>(hbf[patchi]).gradient()
+                = hbf[patchi].fvPatchField::snGrad();
+        }
+        else if (isA<mixedEnthalpyRealFluids>(hbf[patchi]))
+        {
+            refCast<mixedEnthalpyRealFluids>(hbf[patchi]).refGrad()
+                = hbf[patchi].fvPatchField::snGrad();
+        }
+    }
+}
+
+
+Foam::wordList Foam::basicThermo::eRealBoundaryTypes()
+{
+    const volScalarField::GeometricBoundaryField& tbf = T_.boundaryField();
+
+    wordList ebt = tbf.types();
+
+    forAll(tbf, patchi)
+    {
+        if (isA<fixedValueFvPatchScalarField>(tbf[patchi]))
+        {
+            ebt[patchi] = fixedInternalEnergyRealFluids::typeName;
+        }
+        else if
+        (
+            isA<zeroGradientFvPatchScalarField>(tbf[patchi])
+         || isA<fixedGradientFvPatchScalarField>(tbf[patchi])
+        )
+        {
+            ebt[patchi] = gradientInternalEnergyRealFluids::typeName;
+        }
+        else if (isA<mixedFvPatchScalarField>(tbf[patchi]))
+        {
+            ebt[patchi] = mixedInternalEnergyRealFluids::typeName;
+        }
+    }
+
+    return ebt;
+}
+
+
+void Foam::basicThermo::eRealBoundaryCorrection(volScalarField& e)
+{
+    volScalarField::GeometricBoundaryField& ebf = e.boundaryField();
+
+    forAll(ebf, patchi)
+    {
+        if (isA<gradientInternalEnergyRealFluids>(ebf[patchi]))
+        {
+            refCast<gradientInternalEnergyRealFluids>(ebf[patchi])
+                .gradient() = ebf[patchi].fvPatchField::snGrad();
+        }
+        else if (isA<mixedInternalEnergyRealFluids>(ebf[patchi]))
+        {
+            refCast<mixedInternalEnergyRealFluids>(ebf[patchi])
+                .refGrad() = ebf[patchi].fvPatchField::snGrad();
+        }
+    }
+}
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -468,6 +575,86 @@ const Foam::volScalarField& Foam::basicThermo::alpha() const
 {
     return alpha_;
 }
+
+
+// real gas functions 
+
+Foam::tmp<Foam::scalarField> Foam::basicThermo::h
+(
+    const scalarField& p,
+    const scalarField& T,
+    const label patchi
+) const
+{
+// using ideal gas function (by default)
+// template gets overwritten for real gas library
+
+    return this->h(T,patchi);
+  
+}
+
+Foam::tmp<Foam::scalarField> Foam::basicThermo::h
+(
+    const scalarField& p,
+    const scalarField& T,
+    const labelList& cells
+) const
+{
+// using ideal gas function (by default)
+// template gets overwritten for real gas library
+    return this->h(T,cells);
+}
+
+Foam::tmp<Foam::scalarField> Foam::basicThermo::e
+(
+    const scalarField& p,
+    const scalarField& T,
+    const label patchi
+) const
+{
+// using ideal gas function (by default)
+// template gets overwritten for real gas library
+    return this->e(T,patchi);
+}
+
+Foam::tmp<Foam::scalarField> Foam::basicThermo::e
+(
+    const scalarField& p,
+    const scalarField& T,
+    const labelList& cells
+) const
+{
+// using ideal gas function (by default)
+// template gets overwritten for real gas library
+    return this->e(T,cells);
+}
+
+Foam::tmp<Foam::scalarField> Foam::basicThermo::Cp
+(
+    const scalarField& p,
+    const scalarField& T,
+    const label patchi
+) const
+{
+// using ideal gas function (by default)
+// template gets overwritten for real gas library
+    return this->Cp(T,patchi);
+}
+
+
+
+Foam::tmp<Foam::scalarField> Foam::basicThermo::Cv
+(
+    const scalarField& p,
+    const scalarField& T,
+    const label patchi
+) const
+{
+// using ideal gas function (by default)
+// template gets overwritten for real gas library
+    return this->Cv(T,patchi);
+}
+
 
 
 bool Foam::basicThermo::read()
