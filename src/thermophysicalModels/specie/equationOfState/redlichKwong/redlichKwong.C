@@ -42,6 +42,18 @@ Germany
 namespace Foam
 {
 
+/* * * * * * * * * * * * * * * Private static data * * * * * * * * * * * * * */
+
+const scalar redlichKwong::rhoMin_
+(
+    debug::tolerances("redlichKwongRhoMin", 1e-3)
+);
+
+const scalar redlichKwong::rhoMax_
+(
+    debug::tolerances("redlichKwongRhoMax", 1500)
+);
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 redlichKwong::redlichKwong(Istream& is)
@@ -49,12 +61,12 @@ redlichKwong::redlichKwong(Istream& is)
     specie(is),
     pcrit_(readScalar(is)),
     Tcrit_(readScalar(is)),
-    azentricFactor_(readScalar(is))
+    a_(0.42748*pow(this->RR,2)*pow(Tcrit_,2.5)/pcrit_),
+    b_(0.08664*this->RR*Tcrit_/pcrit_),
+	// Starting GUESS for the density by ideal gas law
+    rhostd_(this->rho(Pstd, Tstd, Pstd*this->W()/(Tstd*this->R())))
 { 
     is.check("redlichKwong::redlichKwong(Istream& is)");
-    rhostd_=this->rho(Pstd,Tstd,Pstd*this->W()/(Tstd*this->R()));
-    rhoMax_=1500;	
-    rhoMin_=0.001;
 }
 
 
@@ -63,7 +75,7 @@ redlichKwong::redlichKwong(Istream& is)
 Ostream& operator<<(Ostream& os, const redlichKwong& pg)
 {
     os  << static_cast<const specie&>(pg)<< tab
-        << pg.pcrit_ << tab<< pg.Tcrit_<< tab << pg.azentricFactor_;
+        << pg.pcrit_ << tab<< pg.Tcrit_;
 
     os.check("Ostream& operator<<(Ostream& os, const redlichKwong& st)");
     return os;

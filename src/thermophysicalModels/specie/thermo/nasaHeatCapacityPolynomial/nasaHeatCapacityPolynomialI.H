@@ -224,7 +224,7 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::h
     const scalar T   
 ) const
 {
-  return this->e(rho,T)+this->pReturn(rho,T)/rho*this->W()-this->Pstd/this->rhostd()*this->W();
+  return this->e(rho,T)+this->p(rho,T)/rho*this->W()-this->Pstd/this->rhostd()*this->W();
 }
 
 

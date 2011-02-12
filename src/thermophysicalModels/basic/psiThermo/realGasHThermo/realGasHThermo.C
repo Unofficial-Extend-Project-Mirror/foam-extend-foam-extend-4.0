@@ -38,8 +38,6 @@ Germany
 template<class MixtureType>
 void Foam::realGasHThermo<MixtureType>::calculate()
 {
-
-
     const scalarField& hCells = h_.internalField();
     const scalarField& pCells = this->p_.internalField();
 
@@ -56,10 +54,10 @@ void Foam::realGasHThermo<MixtureType>::calculate()
         const typename MixtureType::thermoType& mixture_ =
             this->cellMixture(celli);
 
-        mixture_.TH(hCells[celli], TCells[celli],pCells[celli],rhoCells[celli]);
-        psiCells[celli]=mixture_.psi(rhoCells[celli],TCells[celli]);
+        mixture_.TH(hCells[celli], TCells[celli], pCells[celli], rhoCells[celli]);
+        psiCells[celli]=mixture_.psi(rhoCells[celli], TCells[celli]);
         muCells[celli] = mixture_.mu(TCells[celli]);
-        alphaCells[celli] = mixture_.alpha(rhoCells[celli],  TCells[celli]);
+        alphaCells[celli] = mixture_.alpha(rhoCells[celli], TCells[celli]);
     }
 
 
@@ -138,7 +136,7 @@ Foam::realGasHThermo<MixtureType>::realGasHThermo(const fvMesh& mesh)
     (
         IOobject
         (
-          "rho1",
+            "rho1",
             mesh.time().timeName(),
             mesh,
             IOobject::READ_IF_PRESENT,

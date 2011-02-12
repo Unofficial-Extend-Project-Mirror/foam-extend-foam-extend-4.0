@@ -92,7 +92,7 @@ inline scalar realGasConstTransport<thermo>::alpha(const scalar rho,const scalar
 
     scalar deltaT = T - specie::Tstd;
     scalar CpBar =
-        (deltaT*(this->H(rho,T) - this->H(this->rhostd_,specie::Tstd)) + Cp_)/(sqr(deltaT) + 1);
+        (deltaT*(this->H(rho,T) - this->H(this->rhostd(),specie::Tstd)) + Cp_)/(sqr(deltaT) + 1);
 
     return Cp_*mu(T)*rPr/CpBar;
 }

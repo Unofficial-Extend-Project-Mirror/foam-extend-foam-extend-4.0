@@ -49,7 +49,7 @@ Foam::nasaHeatCapacityPolynomial<equationOfState>::nasaHeatCapacityPolynomial(Is
     a7_(readScalar(is))
 {
     is.check("nasaHeatCapacityPolynomial::nasaHeatCapacityPolynomial(Istream& is)"); 	
-    cp_std=this->cp_nonLimited(this->rhostd_,this->Tstd); 	// cp @ STD (needed to limit cp for stability
+    cp_std=this->cp_nonLimited(this->rhostd(),this->Tstd); 	// cp @ STD (needed to limit cp for stability
 }
 
 

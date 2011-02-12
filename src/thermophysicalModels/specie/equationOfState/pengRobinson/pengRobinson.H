@@ -104,7 +104,7 @@ public:
         inline scalar Tcrit() const;
 	inline scalar azentricFactor() const;
 	inline scalar rhostd()const;
-        inline scalar pReturn(const scalar rho, const scalar T) const;
+        inline scalar p(const scalar rho, const scalar T) const;
 
 	//-Redlich Kwong factors
      	inline scalar a() const;

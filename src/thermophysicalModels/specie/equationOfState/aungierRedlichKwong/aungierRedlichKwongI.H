@@ -74,7 +74,7 @@ return azentricFactor_;
 }
 
 //returns the pressure for a given density and temperature    
-inline scalar aungierRedlichKwong::pReturn(const scalar rho,const scalar T) const
+inline scalar aungierRedlichKwong::p(const scalar rho,const scalar T) const
 {
 
 return this->RR*T/((this->W()/rho)-this->b()+this->c())
@@ -338,7 +338,7 @@ molarVolume=this->W()/rho0;
    i=0;
       	do
    	{		
-  	molarVolume=molarVolumePrevIteration-((this->pReturn((this->W()/molarVolumePrevIteration),T)-p)/(this->dpdv((this->W()/       	
+  	molarVolume=molarVolumePrevIteration-((this->p((this->W()/molarVolumePrevIteration),T)-p)/(this->dpdv((this->W()/       	
   	molarVolumePrevIteration),T)))/(pow(2,i)); 
 	i++;
 		if(i>8) 
@@ -347,10 +347,10 @@ molarVolume=this->W()/rho0;
 		//using bisection methode as backup, solution must be between rho=0.001 to rho=1500; 
 		  for(i=0;i<200;i++) 
 		  {
-                  	f1= (this->pReturn(rho1,T)-p);
-                  	f2= (this->pReturn(rho2,T)-p);
+                  	f1= (this->p(rho1,T)-p);
+                  	f2= (this->p(rho2,T)-p);
                   	rho3=(rho1+rho2)/2;
-		  	f3=(this->pReturn(rho3,T)-p);
+		  	f3=(this->p(rho3,T)-p);
 	
 			if ((f2<0 && f3>0)||(f2>0 &&f3<0))	
 		  	{
@@ -379,7 +379,7 @@ molarVolume=this->W()/rho0;
 		    }		  
   		}  
         }
-        while(mag(this->pReturn((this->W()/molarVolume),T)-p)>mag(this->pReturn((this->W()/molarVolumePrevIteration),T)-p));
+        while(mag(this->p((this->W()/molarVolume),T)-p)>mag(this->p((this->W()/molarVolumePrevIteration),T)-p));
 
            if (iter++ > maxIter_)
         {
