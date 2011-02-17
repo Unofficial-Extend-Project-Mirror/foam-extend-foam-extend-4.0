@@ -293,6 +293,13 @@ public:
             void setInstance(const fileName&);
 
 
+            //- Set motion write option
+            void setMotionWriteOpt(IOobject::writeOption);
+
+            //- Set topological write option
+            void setTopoWriteOpt(IOobject::writeOption);
+
+
         // Access
 
             //- Return all points, including inactive ones
