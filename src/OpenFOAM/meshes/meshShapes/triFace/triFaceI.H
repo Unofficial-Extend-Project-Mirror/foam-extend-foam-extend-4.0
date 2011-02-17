@@ -288,6 +288,22 @@ inline Foam::pointHit Foam::triFace::ray
 }
 
 
+inline Foam::scalar Foam::triFace::contactSphereDiameter
+(
+    const point& p,
+    const vector& n,
+    const pointField& meshPoints
+) const
+{
+    vector n1 = n/(Foam::mag(n) + SMALL);
+    vector n2 = normal(meshPoints);
+
+    n2 /= Foam::mag(n2) + SMALL;
+
+    return 2*((centre(meshPoints) - p) & n2)/((n1 & n2) - 1.0);
+}
+
+
 inline Foam::triPointRef Foam::triFace::tri(const pointField& points) const
 {
     return triPointRef

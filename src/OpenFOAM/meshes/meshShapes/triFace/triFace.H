@@ -148,6 +148,14 @@ public:
                 const intersection::direction dir = intersection::VECTOR
             ) const;
 
+            //- Return contact sphere diameter
+            inline scalar contactSphereDiameter
+            (
+                const point& p,
+                const vector& n,
+                const pointField& meshPoints
+            ) const;
+
             //- Return the triangle
             inline triPointRef tri(const pointField&) const;
 
@@ -167,7 +175,11 @@ public:
 //- Hash specialization for hashing triFace - a commutative hash value.
 //  Hash incrementally.
 template<>
-inline unsigned Hash<triFace>::operator()(const triFace& t, unsigned seed) const
+inline unsigned Hash<triFace>::operator()
+(
+    const triFace& t,
+    unsigned seed
+) const
 {
     // Fortunately we don't need this very often
     const uLabel t0(t[0]);
