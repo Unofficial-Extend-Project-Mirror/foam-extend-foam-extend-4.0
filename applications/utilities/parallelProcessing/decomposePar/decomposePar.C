@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
                     runTime.timeName(),
                     mesh,
                     IOobject::NO_READ,
-                    IOobject::AUTO_WRITE
+                    IOobject::NO_WRITE
                 ),
                 mesh,
                 dimensionedScalar("cellDist", dimless, 0),

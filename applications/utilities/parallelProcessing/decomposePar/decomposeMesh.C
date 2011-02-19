@@ -92,7 +92,7 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
     Info << "\nDistributing faces to processors" << endl;
 
-    // Loop through all internal faces and decide which processor they belong to
+    // Loop through internal faces and decide which processor they belong to
     // First visit all internal faces. If cells at both sides belong to the
     // same processor, the face is an internal face. If they are different,
     // it belongs to both processors.
@@ -167,7 +167,7 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                         SLList<label>::iterator curInterProcBdrsNeiIter =
                             interProcBoundaries[neighbourProc].begin();
 
-                        SLList<SLList<label> >::iterator 
+                        SLList<SLList<label> >::iterator
                             curInterProcBFacesNeiIter =
                             interProcBFaces[neighbourProc].begin();
 
@@ -199,8 +199,10 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
                         if (interProcBouFound && !neighbourFound)
                         {
-                            FatalErrorIn("domainDecomposition::decomposeMesh()")
-                                << "Inconsistency in inter - "
+                            FatalErrorIn
+                            (
+                                "domainDecomposition::decomposeMesh()"
+                            )   << "Inconsistency in inter - "
                                 << "processor boundary lists for processors "
                                 << ownerProc << " and " << neighbourProc
                                 << abort(FatalError);
@@ -223,7 +225,10 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
                     // neighbour
                     interProcBoundaries[neighbourProc].append(ownerProc);
-                    interProcBFaces[neighbourProc].append(SLList<label>(facei));
+                    interProcBFaces[neighbourProc].append
+                    (
+                        SLList<label>(facei)
+                    );
                 }
             }
         }
@@ -390,7 +395,8 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                                         "domainDecomposition::decomposeMesh()"
                                     )   << "Inconsistency in inter-processor "
                                         << "boundary lists for processors "
-                                        << ownerProc << " and " << neighbourProc
+                                        << ownerProc << " and "
+                                        << neighbourProc
                                         << " in cyclic boundary matching"
                                         << abort(FatalError);
                                 }
@@ -492,7 +498,8 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                         << exit(FatalError);
                 }
 
-                Info<< "Preserving global face zone " << fzNames[nameI] << endl;
+                Info<< "Preserving global face zone " << fzNames[nameI]
+                    << endl;
 
                 const faceZone& curFz = fz[zoneID];
 
@@ -554,7 +561,7 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
             // calculate the size
             label nFacesOnProcessor = curProcFaces.size();
 
-            for 
+            for
             (
                 SLList<SLList<label> >::const_iterator curInterProcBFacesIter =
                     interProcBFaces[procI].begin();
@@ -638,7 +645,7 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
                 curSize = 0;
 
-                // add faces for this processor boundary
+                // Add faces for this processor boundary
 
                 for
                 (
@@ -648,7 +655,7 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                     ++curFacesIter
                 )
                 {
-                    // add the face
+                    // Add the face
 
                     // Remember to increment the index by one such that the
                     // turning index works properly.  HJ, 5/Dec/2001
@@ -658,7 +665,7 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                     }
                     else
                     {
-                        // turning face
+                        // Turning face
                         curProcFaceAddressing[nFaces] = -(curFacesIter() + 1);
                     }
 
@@ -890,7 +897,7 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                 {
                     // Mark the original face as used
                     // Remember to decrement the index by one (turning index)
-                    // 
+                    // HJ, 5/Dec/2001
                     const label curF = mag(curFaceLabels[faceI]) - 1;
 
                     const face& f = fcs[curF];
