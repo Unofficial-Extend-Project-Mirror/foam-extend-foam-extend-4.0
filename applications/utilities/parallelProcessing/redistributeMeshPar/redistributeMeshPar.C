@@ -261,8 +261,8 @@ scalar getMergeDistance
         FatalErrorIn("getMergeDistance")
             << "Your current settings specify ASCII writing with "
             << IOstream::defaultPrecision() << " digits precision." << endl
-            << "Your merging tolerance (" << mergeTol << ") is finer than this."
-            << endl
+            << "Your merging tolerance (" << mergeTol
+            << ") is finer than this." << endl
             << "Please change your writeFormat to binary"
             << " or increase the writePrecision" << endl
             << "or adjust the merge tolerance (-mergeTol)."
@@ -809,7 +809,8 @@ int main(int argc, char *argv[])
     Pout<< endl;
 
     runTime++;
-    Pout<< "Writing redistributed mesh to " << runTime.timeName() << nl << endl;
+    Pout<< "Writing redistributed mesh to " << runTime.timeName()
+        << nl << endl;
     mesh.write();
 
 
