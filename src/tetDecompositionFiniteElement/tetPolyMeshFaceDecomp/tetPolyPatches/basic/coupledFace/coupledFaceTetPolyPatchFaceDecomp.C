@@ -89,7 +89,7 @@ const Foam::pointField&
 Foam::coupledFaceTetPolyPatchFaceDecomp::localPoints() const
 {
     notImplemented("coupledFaceTetPolyPatchFaceDecomp::localPoints() const");
-    return Field<point>::null();
+    return pointField::null();
 }
 
 
@@ -97,7 +97,7 @@ const Foam::vectorField&
 Foam::coupledFaceTetPolyPatchFaceDecomp::pointNormals() const
 {
     notImplemented("coupledFaceTetPolyPatchFaceDecomp::pointNormals() const");
-    return Field<vector>::null();
+    return vectorField::null();
 }
 
 

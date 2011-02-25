@@ -147,6 +147,9 @@ void processorTetPolyPatchFaceDecomp::calcCutEdgeAddressing() const
      || cutEdgeOwnerStartPtr_
      || cutEdgeNeighbourIndicesPtr_
      || cutEdgeNeighbourStartPtr_
+     || doubleCutEdgeIndicesPtr_
+     || doubleCutOwnerPtr_
+     || doubleCutNeighbourPtr_
     )
     {
         FatalErrorIn
@@ -160,13 +163,19 @@ void processorTetPolyPatchFaceDecomp::calcCutEdgeAddressing() const
 
     // Make a list over all edges in the mesh.  Mark the ones that are local
     // to the patch and then collect the rest
+    // For doubly cut edges, mark up the local points
 
     const tetPolyMeshFaceDecomp& mesh = boundaryMesh().mesh();
 
-    boolList isLocal(mesh.nEdges(), false);
-
-    // get reference to local edge indices
+    // Get reference to local edge indices
     const labelList& localEdges = localEdgeIndices();
+
+    // Get reference to mesh point addressing for the patch
+    const labelList& mp = meshPoints();
+
+    // Mark up the local edges
+
+    boolList isLocal(mesh.nEdges(), false);
 
     forAll (localEdges, edgeI)
     {
@@ -190,12 +199,15 @@ void processorTetPolyPatchFaceDecomp::calcCutEdgeAddressing() const
         isLocal[sharedCutEdges[sharedCutI]] = true;
     }
 
+    labelList localPointLabel(mesh.nPoints(), -1);
+
+    forAll (mp, pointI)
+    {
+        localPointLabel[mp[pointI]] = pointI;
+    }
+
     // Count the maximum number of edges coming from the patch
     label maxEdgesOnPatch = 0;
-
-    // Get reference to mesh point addressing for the patch
-
-    const labelList& mp = meshPoints();
 
     forAll (mp, pointI)
     {
@@ -204,6 +216,21 @@ void processorTetPolyPatchFaceDecomp::calcCutEdgeAddressing() const
 
     // Get reference to addressing
     const lduAddressing& ldu = mesh.lduAddr();
+
+    // Allocate doubly cut arrays
+    doubleCutEdgeIndicesPtr_ = new labelList(maxEdgesOnPatch, -1);
+    labelList& doubleCutEdges = *doubleCutEdgeIndicesPtr_;
+
+    doubleCutOwnerPtr_ = new labelList(maxEdgesOnPatch, -1);
+    labelList& doubleCutOwn = *doubleCutOwnerPtr_;
+
+    doubleCutNeighbourPtr_ = new labelList(maxEdgesOnPatch, -1);
+    labelList& doubleCutNei = *doubleCutNeighbourPtr_;
+
+    label nDoubleCut = 0;
+
+    const labelList& globalOwner = ldu.lowerAddr();
+    const labelList& globalNeighbour = ldu.upperAddr();
 
     // Owner side
     //~~~~~~~~~~~
@@ -238,9 +265,24 @@ void processorTetPolyPatchFaceDecomp::calcCutEdgeAddressing() const
         {
             if (!isLocal[edgeLabel])
             {
-                own[nOwn] = edgeLabel;
                 isLocal[edgeLabel] = true;
-                nOwn++;
+
+                if (localPointLabel[globalNeighbour[edgeLabel]] == -1)
+                {
+                    // Singly cut edge
+                    own[nOwn] = edgeLabel;
+                    nOwn++;
+                }
+                else
+                {
+                    // Doubly cut edge
+                    doubleCutEdges[nDoubleCut] = edgeLabel;
+                    doubleCutOwn[nDoubleCut] = pointI;
+                    doubleCutNei[nDoubleCut] =
+                        localPointLabel[globalNeighbour[edgeLabel]];
+
+                    nDoubleCut++;
+                }
             }
         }
     }
@@ -287,9 +329,24 @@ void processorTetPolyPatchFaceDecomp::calcCutEdgeAddressing() const
         {
             if (!isLocal[losort[edgeLabel]])
             {
-                nei[nNei] = losort[edgeLabel];
                 isLocal[losort[edgeLabel]] = true;
-                nNei++;
+
+                if (localPointLabel[globalOwner[losort[edgeLabel]]] == -1)
+                {
+                    // Singly cut edge
+                    nei[nNei] = losort[edgeLabel];
+                    nNei++;
+                }
+                else
+                {
+                    // Doubly cut edge
+                    doubleCutEdges[nDoubleCut] = losort[edgeLabel];
+                    doubleCutOwn[nDoubleCut] =
+                        localPointLabel[globalOwner[losort[edgeLabel]]];
+                    doubleCutNei[nDoubleCut] = pointI;
+
+                    nDoubleCut++;
+                }
             }
         }
     }
@@ -299,6 +356,11 @@ void processorTetPolyPatchFaceDecomp::calcCutEdgeAddressing() const
 
     // set the last start label by hand
     neiStart[meshPoints().size()] = nNei;
+
+    // Reset the size of double cut edge data
+    doubleCutEdges.setSize(nDoubleCut);
+    doubleCutOwn.setSize(nDoubleCut);
+    doubleCutNei.setSize(nDoubleCut);
 }
 
 
@@ -328,8 +390,7 @@ void processorTetPolyPatchFaceDecomp::calcOwnNeiDoubleMask() const
     {
         if
         (
-            typeid(boundaryMesh()[patchI])
-         == typeid(processorTetPolyPatchFaceDecomp)
+            isA<processorTetPolyPatchFaceDecomp>(boundaryMesh()[patchI])
         )
         {
             // Get the local points and mark up the list
@@ -409,7 +470,7 @@ void processorTetPolyPatchFaceDecomp::calcOwnNeiDoubleMask() const
 
     // Doubly cut coefficients
     // ~~~~~~~~~~~~~~~~~~~~~~~
-    // Not needed.  
+    // Not needed.  HJ, 18/Apr/2002
 }
 
 
@@ -512,21 +573,35 @@ const labelList& processorTetPolyPatchFaceDecomp::cutEdgeNeighbourStart() const
 }
 
 
-// For face decompositon, doubly cut coefficients cannot occur.  
 const labelList& processorTetPolyPatchFaceDecomp::doubleCutEdgeIndices() const
 {
+    if (!doubleCutEdgeIndicesPtr_)
+    {
+        calcCutEdgeAddressing();
+    }
+
     return *doubleCutEdgeIndicesPtr_;
 }
 
 
 const labelList& processorTetPolyPatchFaceDecomp::doubleCutOwner() const
 {
+    if (!doubleCutEdgeIndicesPtr_)
+    {
+        calcCutEdgeAddressing();
+    }
+
     return *doubleCutOwnerPtr_;
 }
 
 
 const labelList& processorTetPolyPatchFaceDecomp::doubleCutNeighbour() const
 {
+    if (!doubleCutEdgeIndicesPtr_)
+    {
+        calcCutEdgeAddressing();
+    }
+
     return *doubleCutNeighbourPtr_;
 }
 

@@ -388,8 +388,7 @@ void processorTetPolyPatchCellDecomp::calcOwnNeiDoubleMask() const
     {
         if
         (
-            typeid(boundaryMesh()[patchI])
-         == typeid(processorTetPolyPatchCellDecomp)
+            isA<processorTetPolyPatchCellDecomp>(boundaryMesh()[patchI])
         )
         {
             // Get the local points and mark up the list
@@ -469,7 +468,7 @@ void processorTetPolyPatchCellDecomp::calcOwnNeiDoubleMask() const
 
     // Doubly cut coefficients
     // ~~~~~~~~~~~~~~~~~~~~~~~
-    // Not needed.  
+    // Not needed.  HJ, 18/Apr/2002
 }
 
 

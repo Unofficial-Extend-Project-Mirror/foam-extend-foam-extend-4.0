@@ -117,7 +117,7 @@ class tetFemMatrix
         //  parallel patch and protruding into the neighbouring domain.
         //  This is treated by doing a "local" multiplication on the
         //  neighbouring side and then adding the result.
-        //  
+        //  HJ, 13/Nov/2001
         void addCouplingCoeffs();
 
         void eliminateCouplingCoeffs();
