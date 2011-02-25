@@ -43,11 +43,8 @@ SourceFiles
 #include "Switch.H"
 #include "edgeList.H"
 #include "pointIOField.H"
+#include "MeshObject.H"
 #include "HashSet.H"
-
-// Have gcc ignore certain warnings while including mesquite headers
-//HJ #pragma GCC diagnostic ignored "-Wold-style-cast"
-
 #include "Mesquite_all_headers.hpp"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -64,7 +61,8 @@ class polyMesh;
 
 class mesquiteMotionSolver
 :
-    public motionSolver
+    public motionSolver,
+    public MeshObject<polyMesh, mesquiteMotionSolver>
 {
 
     // Private data
@@ -75,6 +73,9 @@ class mesquiteMotionSolver
         //- Mesh characteristics [2D/3D]
         Switch twoDMesh_;
 
+        //- Flag to determine if arrays have been initialized
+        bool arraysInitialized_;
+
         //- Number of points
         unsigned long nPoints_;
 
@@ -82,10 +83,10 @@ class mesquiteMotionSolver
         unsigned long nCells_;
 
         //- Number of auxiliary points
-        label nAuxPoints_;
+        labelList nAuxPoints_;
 
         //- Number of auxiliary elements
-        label nAuxCells_;
+        labelList nAuxCells_;
 
         //- Switch to toggle surface smoothing
         Switch surfaceSmoothing_;
@@ -126,10 +127,6 @@ class mesquiteMotionSolver
         //- Original points prior to surface-smoothing
         mutable pointField origPoints_;
 
-        //- Map for the auxiliary entities
-        Map<Map<label> > auxPointMap_;
-        Map<Map<label> > auxSurfPointMap_;
-
         //- The quality metric
         word qMetric_;
 
@@ -154,8 +151,17 @@ class mesquiteMotionSolver
         List<vectorField> localPts_;
         List<scalarField> edgeMarker_;
 
-        Map<vectorField> sendFields_;
-        Map<vectorField> recvFields_;
+        //- Data for the auxiliary entities
+        labelList procIndices_;
+        scalarField pointFractions_;
+        labelListList procPointLabels_;
+
+        List<vectorField> sendSurfFields_, recvSurfFields_;
+        List<Map<label> > sendSurfPointMap_, recvSurfPointMap_;
+
+        List<Map<label> > sendPointMap_, recvPointMap_;
+        List<labelList> sendCellToNode_, recvCellToNode_;
+        List<vectorField> sendPointBuffer_, recvPointBuffer_;
 
         //- Explicit patch coupling for surface smoothing
         Map<label> patchCoupling_;
@@ -213,8 +219,31 @@ class mesquiteMotionSolver
         // Private member function to construct parallel connectivity data
         void initParallelConnectivity();
 
+        // Parallel send
+        void parWrite(const label toID, const label& data);
+
+        // Parallel send (for lists)
+        template <class Type>
+        void parWrite(const label toID, const UList<Type>& data);
+
+        // Parallel receive
+        void parRead(const label fromID, label& data);
+
+        // Parallel receive (for lists)
+        template <class Type>
+        void parRead(const label fromID, UList<Type>& data);
+
+        // Identify coupled patches
+        void identifyCoupledPatches();
+
+        // Prepare for parallel surface smoothing
+        void initParallelSurfaceSmoothing();
+
+        // Prepare mesquite connectivity for parallel runs
+        void initMesquiteParallelArrays();
+
         // Copy auxiliary points to/from buffers
-        void copyAuxiliaryPoints(bool copyBack = false);
+        void copyAuxiliaryPoints(bool firstCopy);
 
         // Private member functions to read dictionary options
         void readOptions();
@@ -229,12 +258,16 @@ class mesquiteMotionSolver
         scalar tetQuality
         (
             const label cIndex,
-            const pointField& pField
+            const pointField& pField,
+            bool returnVolume = false
         );
 
         // Private member function to check for invalid
         // cells and correct if necessary.
         void correctInvalidCells();
+
+        // Correct global volume
+        void correctGlobalVolume();
 
         // Enforce cylindrical constraints for slip-patches
         void enforceCylindricalConstraints();
@@ -253,10 +286,13 @@ class mesquiteMotionSolver
         // Clear out addressing
         void clearOut();
 
+        // Update on topology change
+        void update(const mapPolyMesh&);
+
 public:
 
     //- Runtime type information
-    ClassName("mesquiteMotionSolver");
+    TypeName("mesquiteMotionSolver");
 
 
     // Constructors
@@ -285,8 +321,14 @@ public:
         //- Solve for motion
         virtual void solve();
 
+        //- Move points
+        virtual bool movePoints() const;
+
         //- Update topology
         virtual void updateMesh(const mapPolyMesh&);
+
+        //- Update topology (using meshObjectBase)
+        virtual bool updateMesh(const mapPolyMesh&) const;
 };
 
 
@@ -299,3 +341,4 @@ public:
 #endif
 
 // ************************************************************************* //
+
