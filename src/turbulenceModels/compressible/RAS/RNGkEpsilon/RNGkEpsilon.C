@@ -273,6 +273,14 @@ bool RNGkEpsilon::read()
 
 void RNGkEpsilon::correct()
 {
+    // Bound in case of topological change
+    // HJ, 22/Aug/2007
+    if (mesh_.changing())
+    {
+        bound(k_, k0_);
+        bound(epsilon_, epsilon0_);
+    }
+
     if (!turbulence_)
     {
         // Re-calculate viscosity
@@ -307,7 +315,7 @@ void RNGkEpsilon::correct()
     volScalarField R =
         ((eta*(-eta/eta0_ + scalar(1)))/(beta_*eta3 + scalar(1)));
 
-    // Update espsilon and G at the wall
+    // Update epsilon and G at the wall
     epsilon_.boundaryField().updateCoeffs();
 
     // Dissipation equation

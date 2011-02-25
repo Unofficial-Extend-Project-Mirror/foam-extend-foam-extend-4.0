@@ -328,6 +328,13 @@ bool SpalartAllmaras::read()
 
 void SpalartAllmaras::correct()
 {
+    // Bound in case of topological change
+    // HJ, 22/Aug/2007
+    if (mesh_.changing())
+    {
+        bound(nuTilda_, dimensionedScalar("0", nuTilda_.dimensions(), 0.0));
+    }
+
     if (!turbulence_)
     {
         // Re-calculate viscosity

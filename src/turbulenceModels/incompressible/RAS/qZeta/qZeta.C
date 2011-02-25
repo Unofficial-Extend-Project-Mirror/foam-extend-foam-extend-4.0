@@ -274,6 +274,14 @@ bool qZeta::read()
 
 void qZeta::correct()
 {
+    // Bound in case of topological change
+    // HJ, 22/Aug/2007
+    if (mesh_.changing())
+    {
+        bound(q_, sqrt(k0_));
+        bound(zeta_, epsilon0_/(2*sqrt(k0_)));
+    }
+
     RASModel::correct();
 
     if (!turbulence_)

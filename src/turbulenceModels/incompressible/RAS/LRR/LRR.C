@@ -289,6 +289,14 @@ bool LRR::read()
 
 void LRR::correct()
 {
+    // Bound in case of topological change
+    // HJ, 22/Aug/2007
+    if (mesh_.changing())
+    {
+        R_.correctBoundaryConditions();
+        bound(epsilon_, epsilon0_);
+    }
+
     RASModel::correct();
 
     if (!turbulence_)
@@ -299,7 +307,7 @@ void LRR::correct()
     volSymmTensorField P = -twoSymm(R_ & fvc::grad(U_));
     volScalarField G("RASModel::G", 0.5*mag(tr(P)));
 
-    // Update espsilon and G at the wall
+    // Update epsilon and G at the wall
     epsilon_.boundaryField().updateCoeffs();
 
     // Dissipation equation
