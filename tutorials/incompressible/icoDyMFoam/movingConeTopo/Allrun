@@ -1,0 +1,20 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # run from this directory
+
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+application="icoDyMSimpleFoam"
+
+runApplication blockMesh
+runApplication setSet -batch setBatch
+
+cd constant/polyMesh/sets/
+\rm leftCentre leftCentre_old leftWallSet leftWallSet_old leftZone_old rightCentre rightCentre_old rightWallSet rightWallSet_old rightZone_old wallSet
+cd ../../..
+
+runApplication setsToZones
+runApplication decomposePar
+#runApplication $application
+runParallel $application 4
+runApplication reconstructParMesh -cellDist

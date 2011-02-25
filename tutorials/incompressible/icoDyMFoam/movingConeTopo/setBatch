@@ -1,0 +1,27 @@
+faceSet wallSet new patchToFace movingWall
+
+faceSet leftWallSet new setToFace wallSet
+faceSet leftWallSet delete cellToFace moving all
+faceSet leftWallSet delete cellToFace right all
+
+cellSet leftCentre new zoneToCell left
+cellSet leftCentre add zoneToCell moving
+faceSet leftZone new cellToFace leftCentre both
+faceSet leftZone delete cellToFace left both
+faceSet leftZone delete cellToFace moving both
+faceSet leftZone add setToFace leftWallSet
+cellSet leftZoneMasterCells new zoneToCell left
+
+faceSet rightWallSet new setToFace wallSet
+faceSet rightWallSet delete cellToFace moving all
+faceSet rightWallSet delete cellToFace left all
+
+cellSet rightCentre new zoneToCell right
+cellSet rightCentre add zoneToCell moving
+faceSet rightZone new cellToFace rightCentre both
+faceSet rightZone delete cellToFace right both
+faceSet rightZone delete cellToFace moving both
+faceSet rightZone add setToFace rightWallSet
+cellSet rightZoneMasterCells new zoneToCell right
+
+quit
