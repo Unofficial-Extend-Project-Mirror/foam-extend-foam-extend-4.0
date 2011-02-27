@@ -2,6 +2,7 @@
 cd ${0%/*} || exit 1    # run from this directory
 set -x
 
+wmakeLnInclude solidBodyMotion
 wmakeLnInclude fvMotionSolver
 wmakeLnInclude RBFMotionSolver
 wmakeLnInclude mesquiteMotionSolver
