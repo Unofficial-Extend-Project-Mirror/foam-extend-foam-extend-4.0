@@ -98,6 +98,7 @@ public:
     //- Runtime type information
     ClassName("regionSplit");
 
+
     // Constructors
 
         //- Construct from mesh
@@ -107,8 +108,8 @@ public:
         //  NOTE: blockedFace has to be consistent across coupled faces!
         regionSplit(const polyMesh&, const boolList& blockedFace);
 
-        //- Construct from mesh and whether face is blocked. Additional explicit
-        //  connections between normal boundary faces.
+        //- Construct from mesh and whether face is blocked.  Additional
+        //   explicit connections between normal boundary faces.
         //  NOTE: blockedFace has to be consistent across coupled faces!
         regionSplit
         (
