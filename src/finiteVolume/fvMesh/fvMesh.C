@@ -312,6 +312,8 @@ Foam::polyMesh::readUpdateState Foam::fvMesh::readUpdate()
             << "Updating fvMesh.  ";
     }
 
+    // Note: issues with update: should meshObject update happen
+    // in polyMesh or fvMesh?  HJ, 18/Feb/2011
     polyMesh::readUpdateState state = polyMesh::readUpdate();
 
     if (state == polyMesh::TOPO_PATCH_CHANGE)
