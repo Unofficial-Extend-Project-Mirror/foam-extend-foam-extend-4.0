@@ -68,6 +68,7 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         bool meshChanged = mesh.update();
+        reduce(meshChanged, orOp<bool>());
 
 #       include "volContinuity.H"
 

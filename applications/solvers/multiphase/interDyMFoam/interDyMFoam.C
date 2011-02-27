@@ -75,22 +75,15 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        scalar timeBeforeMeshUpdate = runTime.elapsedCpuTime();
+        bool meshChanged = mesh.update();
+        reduce(meshChanged, orOp<bool>());
 
-        // Do any mesh changes
-        mesh.update();
-
-        if (mesh.changing())
-        {
-            Info<< "Execution time for mesh.update() = "
-                << runTime.elapsedCpuTime() - timeBeforeMeshUpdate
-                << " s" << endl;
-        }
+#       include "volContinuity.H"
 
         volScalarField gh("gh", g & mesh.C());
         surfaceScalarField ghf("ghf", g & mesh.Cf());
 
-        if (mesh.changing() && correctPhi)
+        if (correctPhi && meshChanged)
         {
 #           include "correctPhi.H"
         }
@@ -98,7 +91,7 @@ int main(int argc, char *argv[])
         // Make the fluxes relative to the mesh motion
         fvc::makeRelative(phi, U);
 
-        if (mesh.changing() && checkMeshCourantNo)
+        if (checkMeshCourantNo)
         {
 #           include "meshCourantNo.H"
         }

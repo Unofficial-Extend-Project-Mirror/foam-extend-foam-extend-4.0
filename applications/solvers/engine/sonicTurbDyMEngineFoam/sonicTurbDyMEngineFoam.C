@@ -80,8 +80,9 @@ int main(int argc, char *argv[])
         phi += meshFlux;
 
         bool meshChanged = mesh.update();
+        reduce(meshChanged, orOp<bool>());
 
-        if(meshChanged)
+        if (meshChanged)
         {
             thermo.correct();
 

@@ -113,6 +113,68 @@ int main(int argc, char *argv[])
 
     if (args.optionFound("writep"))
     {
+        // Find reference patch
+        label refPatch = -1;
+        scalar maxMagU = 0;
+
+        // Go through all velocity patches and find the one that fixes
+        // velocity to the largest value
+
+        forAll (U.boundaryField(), patchI)
+        {
+            const fvPatchVectorField& Upatch = U.boundaryField()[patchI];
+
+            if (Upatch.fixesValue())
+            {
+                // Calculate mean velocity
+                scalar u = sum(mag(Upatch));
+                label patchSize = Upatch.size();
+
+                reduce(u, sumOp<scalar>());
+                reduce(patchSize, sumOp<label>());
+
+                if (patchSize > 0)
+                {
+                    scalar curMag = u/patchSize;
+
+                    if (curMag > maxMagU)
+                    {
+                        refPatch = patchI;
+
+                        maxMagU = curMag;
+                    }
+                }
+            }
+        }
+
+        if (refPatch > -1)
+        {
+            // Calculate reference pressure
+            const fvPatchVectorField& Upatch = U.boundaryField()[refPatch];
+            const fvPatchScalarField& pPatch = p.boundaryField()[refPatch];
+
+            scalar patchE = sum(mag(pPatch + 0.5*magSqr(Upatch)));
+            label patchSize = Upatch.size();
+
+            reduce(patchE, sumOp<scalar>());
+            reduce(patchSize, sumOp<label>());
+
+            scalar e = patchE/patchSize;
+
+
+            Info<< "Using reference patch " << refPatch
+                << " with mag(U) = " << maxMagU
+                << " p + 0.5*U^2 = " << e << endl;
+
+            p.internalField() = e - 0.5*magSqr(U.internalField());
+            p.correctBoundaryConditions();
+        }
+        else
+        {
+            Info<< "No reference patch found.  Writing potential function"
+                << endl;
+        }
+
         p.write();
     }
 
