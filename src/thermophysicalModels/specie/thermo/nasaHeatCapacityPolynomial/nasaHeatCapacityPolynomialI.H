@@ -33,7 +33,7 @@ Germany
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 
-
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class equationOfState>
 inline Foam::nasaHeatCapacityPolynomial<equationOfState>::nasaHeatCapacityPolynomial
@@ -55,12 +55,16 @@ inline Foam::nasaHeatCapacityPolynomial<equationOfState>::nasaHeatCapacityPolyno
 	    a4_(a4),
 	    a5_(a5),
 	    a6_(a6),
-            a7_(a7)
-{
-}
+            a7_(a7),
+            e0_std(e0(this->Tstd)),
+	    s0_std(s0(this->Tstd)),
+            integral_p_dv_std(this->integral_p_dv(this->rhostd(),this->Tstd)),
+            integral_dpdT_dv_std(this->integral_dpdT_dv(this->rhostd(),this->Tstd)),
+            cp_std(this->cp_nonLimited(this->rhostd(),this->Tstd)) 
+{}
 
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
 
 template<class equationOfState>
 inline Foam::nasaHeatCapacityPolynomial<equationOfState>::nasaHeatCapacityPolynomial
@@ -76,9 +80,13 @@ inline Foam::nasaHeatCapacityPolynomial<equationOfState>::nasaHeatCapacityPolyno
 	    a4_(ct.a4_),
 	    a5_(ct.a5_),
 	    a6_(ct.a6_),
-            a7_(ct.a7_)
-{
-}
+            a7_(ct.a7_),
+            e0_std(ct.e0_std),
+            s0_std(ct.s0_std),
+            integral_p_dv_std(ct.integral_p_dv_std),
+            integral_dpdT_dv_std(ct.integral_dpdT_dv_std),
+            cp_std(ct.cp_std)
+{}
 
 
 template<class equationOfState>
@@ -102,13 +110,8 @@ Foam::nasaHeatCapacityPolynomial<equationOfState>::New(Istream& is)
     );
 }
 
+ // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-
-
-
-
- // * * * * * * * * * * * * * * *useful functions* * * * * * * * * * * * * //
- 
 //used to calculate the internal energy
 //perfect gas enthalpy 
 template<class equationOfState>
@@ -117,7 +120,17 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::h0
     const scalar T
 ) const
 {
-return this->RR*T*(-this->a1_*pow(T,-2)+this->a2_*log(T)/T+this->a3_+0.5*this->a4_*T+(this->a5_*pow(T,2))/3+(this->a6_*pow(T,3))/4+(this->a7_*pow(T,4))/5);
+    return 
+    this->RR*T*
+    (
+        -this->a1_*pow(T,-2)
+        +this->a2_*log(T)/T
+        +this->a3_
+        +0.5*this->a4_*T
+        +(this->a5_*pow(T,2))/3
+        +(this->a6_*pow(T,3))/4
+        +(this->a7_*pow(T,4))/5
+    );
 }
 
 
@@ -129,7 +142,7 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::e0
     const scalar T
 ) const
 {
-return this->h0(T) - this->RR*T;
+    return this->h0(T) - this->RR*T;
 }
 	    
 // used to calculate the entropy
@@ -140,11 +153,19 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::s0
     const scalar T
 ) const
 {
-return this->RR*( this->a1_*(-1)/(2*pow(T,2))-this->a2_/T+this->a3_*log(T)+this->a4_*T+(this->a5_*pow(T,2))/2+(this->a6_*pow(T,3))/3+(this->a7_*pow(T,4))/4);
+     return this->RR*
+     ( 
+          this->a1_*(-1)/(2*pow(T,2))
+          -this->a2_/T+this->a3_*log(T)
+          +this->a4_*T
+          +(this->a5_*pow(T,2))/2
+          +(this->a6_*pow(T,3))/3
+          +(this->a7_*pow(T,4))/4
+     );
 }
 
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
 
 //perfect gas cp
 template<class equationOfState>
@@ -153,8 +174,16 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::cp0
     const scalar T
 ) const
 {
-
-   return this->RR*(this->a1_*1/pow(T,2)+this->a2_*1/T+this->a3_+this->a4_*T+this->a5_*pow(T,2)+this->a6_*pow(T,3)+this->a7_*pow(T,4));
+    return this->RR*
+    (
+        this->a1_*1/pow(T,2)
+        +this->a2_*1/T
+        +this->a3_
+        +this->a4_*T
+        +this->a5_*pow(T,2)
+        +this->a6_*pow(T,3)
+        +this->a7_*pow(T,4)
+    );
 }
 
 
@@ -166,7 +195,7 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::cv0
 ) const
 {
 
-   return this->cp0(T)-this->RR;
+    return this->cp0(T)-this->RR;
 }
 
 
@@ -180,14 +209,25 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::cp
      const scalar T 
 ) const
 {
-// Problem --> dpdv(rho,T)  is =0 at some points within the vapour dome. To increase stability, (dp/dv) has to be limited 
-// cp can be negative within the vapor dome. To avoid this nonphysical result, the absolute value is used.
-// within the vapourdome and at the critical point, cp increases to very high values --> infinity, 
-// this would decrease the stability, so cp will be limited to 20 time the cp @ STD    
- return  min(cp_std*20,fabs(this->cv(rho,T)-T*pow((this->dpdT(rho, T)),2)/min(this->dpdv(rho, T),-1))); 
+    // Problem --> dpdv(rho,T)  is =0 at some points within the vapour dome. To increase stability, (dp/dv) has to be limited 
+    // cp can be negative within the vapor dome. To avoid this nonphysical result, the absolute value is used.
+    // within the vapourdome and at the critical point, cp increases to very high values --> infinity, 
+    // this would decrease the stability, so cp will be limited to 20 time the cp @ STD    
+    return  
+    min
+    (
+        cp_std*20,
+        fabs
+        (
+            this->cv(rho,T)
+            -T*pow((this->dpdT(rho, T)),2)
+                /min(this->dpdv(rho, T),-1)
+        )
+    ); 
 }
 
-// this function is needed to get cp @ STD (without the limit imposed in the function above), which in turn is needed to limit the cp in the function above
+// this function is needed to get cp @ STD (without the limit imposed in the function above),
+// which in turn is needed to limit the cp in the function above
 template<class equationOfState>
 inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::cp_nonLimited
 (
@@ -195,7 +235,7 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::cp_nonLim
      const scalar T 
 ) const
 {
- return  fabs(this->cv(rho,T)-T*pow((this->dpdT(rho, T)),2)/min(this->dpdv(rho, T),-1));    
+     return  fabs(this->cv(rho,T)-T*pow((this->dpdT(rho, T)),2)/min(this->dpdv(rho, T),-1));    
 }
 
 
@@ -209,8 +249,7 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::cv
     
 ) const
 {
-
-   return this->cv0(T)+T*this->integral_d2pdT2_dv(rho, T);
+    return this->cv0(T)+T*this->integral_d2pdT2_dv(rho, T);
 }
 
 
@@ -224,12 +263,12 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::h
     const scalar T   
 ) const
 {
-  return this->e(rho,T)+this->p(rho,T)/rho*this->W()-this->Pstd/this->rhostd()*this->W();
+    return this->e(rho,T)+this->p(rho,T)/rho*this->W()-this->Pstd/this->rhostd()*this->W();
 }
 
 
 // function to calculate real gas internal energy
-// important assumption used is that the internal Energie is 0 at STD conditions.
+// important assumption used: internal Energie is 0 at STD conditions.
 // equation: du= cv0 dT +[T*dp/dT -p]dv
 template<class equationOfState>
 inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::e
@@ -238,19 +277,20 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::e
     const scalar T    
 ) const
 {
-return (	-this->Tstd*this->integral_dpdT_dv(this->rhostd(),this->Tstd)
-			+this->integral_p_dv(this->rhostd(),this->Tstd)
-				+this->e0(T)-this->e0(this->Tstd)
-					+T*this->integral_dpdT_dv(rho,T)
-						-this->integral_p_dv(rho,T)
-	);
- 
+    return 
+    (
+        -this->Tstd*integral_dpdT_dv_std
+	+integral_p_dv_std
+	+this->e0(T)-e0_std
+	+T*this->integral_dpdT_dv(rho,T)
+	-this->integral_p_dv(rho,T)
+    );
 }
 
 
 
 //function to calculate real gas entropy
-// important assumption used is that the Entropy is 0 at STD conditions.
+// important assumption used: the Entropy is 0 at STD conditions.
 // equation: ds= cv0/T * dT +  dp/dT *dv
 // --> integral cv0/T dT = s0(T) -s0(Tstd) - R*ln(T/Tstd)  --> due to s0(T)-s0(Tstd)=integral cp0/T dT
 template<class equationOfState>
@@ -261,8 +301,14 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::s
     
 ) const
 {
-  return -this->integral_dpdT_dv(this->rhostd(),this->Tstd)+(this->s0(T)-this->s0(this->Tstd))-this->RR*log(T/this->Tstd)+ this->integral_dpdT_dv(rho,T);
+    return -integral_dpdT_dv_std
+    +(this->s0(T)-s0_std)
+    -this->RR*log(T/this->Tstd)
+    + this->integral_dpdT_dv(rho,T);
 }
+
+
+
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
@@ -283,11 +329,11 @@ inline void Foam::nasaHeatCapacityPolynomial<equationOfState>::operator+=
 
     a1_ = molr1*a1_ + molr2*ct.a1_;
     a2_ = molr1*a2_ + molr2*ct.a2_;
-	a3_ = molr1*a3_ + molr2*ct.a3_;
-	a4_ = molr1*a4_ + molr2*ct.a4_;
-	a5_ = molr1*a5_ + molr2*ct.a5_;
-	a6_ = molr1*a6_ + molr2*ct.a6_;
-	a7_ = molr1*a7_ + molr2*ct.a7_;
+    a3_ = molr1*a3_ + molr2*ct.a3_;
+    a4_ = molr1*a4_ + molr2*ct.a4_;
+    a5_ = molr1*a5_ + molr2*ct.a5_;
+    a6_ = molr1*a6_ + molr2*ct.a6_;
+    a7_ = molr1*a7_ + molr2*ct.a7_;
 }
 
 
@@ -306,11 +352,11 @@ inline void Foam::nasaHeatCapacityPolynomial<equationOfState>::operator-=
 
     a1_ = molr1*a1_ - molr2*ct.a1_;
     a2_ = molr1*a2_ - molr2*ct.a2_;
-	a3_ = molr1*a3_ - molr2*ct.a3_;
-	a4_ = molr1*a4_ - molr2*ct.a4_;
-	a5_ = molr1*a5_ - molr2*ct.a5_;
-	a6_ = molr1*a6_ - molr2*ct.a6_;
-	a7_ = molr1*a7_ - molr2*ct.a7_;
+    a3_ = molr1*a3_ - molr2*ct.a3_;
+    a4_ = molr1*a4_ - molr2*ct.a4_;
+    a5_ = molr1*a5_ - molr2*ct.a5_;
+    a6_ = molr1*a6_ - molr2*ct.a6_;
+    a7_ = molr1*a7_ - molr2*ct.a7_;
 }
 
 
@@ -336,15 +382,15 @@ inline Foam::nasaHeatCapacityPolynomial<equationOfState> Foam::operator+
       + ct2.nMoles()/eofs.nMoles()*ct2.a1_,
         ct1.nMoles()/eofs.nMoles()*ct1.a2_
       + ct2.nMoles()/eofs.nMoles()*ct2.a2_,
-	    ct1.nMoles()/eofs.nMoles()*ct1.a3_
+	ct1.nMoles()/eofs.nMoles()*ct1.a3_
       + ct2.nMoles()/eofs.nMoles()*ct2.a3_,
         ct1.nMoles()/eofs.nMoles()*ct1.a4_
       + ct2.nMoles()/eofs.nMoles()*ct2.a4_,
-	    ct1.nMoles()/eofs.nMoles()*ct1.a5_
+	ct1.nMoles()/eofs.nMoles()*ct1.a5_
       + ct2.nMoles()/eofs.nMoles()*ct2.a5_,
         ct1.nMoles()/eofs.nMoles()*ct1.a6_
       + ct2.nMoles()/eofs.nMoles()*ct2.a6_,    
-	    ct1.nMoles()/eofs.nMoles()*ct1.a7_
+	ct1.nMoles()/eofs.nMoles()*ct1.a7_
       + ct2.nMoles()/eofs.nMoles()*ct2.a7_
     );
 }
@@ -370,15 +416,15 @@ inline Foam::nasaHeatCapacityPolynomial<equationOfState> Foam::operator-
       - ct2.nMoles()/eofs.nMoles()*ct2.a1_,
         ct1.nMoles()/eofs.nMoles()*ct1.a2_
       - ct2.nMoles()/eofs.nMoles()*ct2.a2_,
-	    ct1.nMoles()/eofs.nMoles()*ct1.a3_
+	ct1.nMoles()/eofs.nMoles()*ct1.a3_
       - ct2.nMoles()/eofs.nMoles()*ct2.a3_,
         ct1.nMoles()/eofs.nMoles()*ct1.a4_
       - ct2.nMoles()/eofs.nMoles()*ct2.a4_,
-	    ct1.nMoles()/eofs.nMoles()*ct1.a5_
+	ct1.nMoles()/eofs.nMoles()*ct1.a5_
       - ct2.nMoles()/eofs.nMoles()*ct2.a5_,
         ct1.nMoles()/eofs.nMoles()*ct1.a6_
       - ct2.nMoles()/eofs.nMoles()*ct2.a6_,    
-	    ct1.nMoles()/eofs.nMoles()*ct1.a7_
+	ct1.nMoles()/eofs.nMoles()*ct1.a7_
       - ct2.nMoles()/eofs.nMoles()*ct2.a7_
     );
 }
@@ -396,11 +442,11 @@ inline Foam::nasaHeatCapacityPolynomial<equationOfState> Foam::operator*
         s*static_cast<const equationOfState&>(ct),
         ct.a1_,
         ct.a2_,
-		ct.a3_,
+	ct.a3_,
         ct.a4_,
-		ct.a5_,
+	ct.a5_,
         ct.a6_,
-		ct.a7_
+	ct.a7_
     );
 }
 

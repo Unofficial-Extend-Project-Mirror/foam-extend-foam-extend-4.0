@@ -43,6 +43,19 @@ Germany
 namespace Foam
 {
 
+
+/* * * * * * * * * * * * * * * Private static data * * * * * * * * * * * * * */
+
+const scalar aungierRedlichKwong::rhoMin_
+(
+    debug::tolerances("aungierRedlichKwongRhoMin", 1e-3)
+);
+
+const scalar aungierRedlichKwong::rhoMax_
+(
+    debug::tolerances("aungierRedlichKwongRhoMax", 1500)
+);
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 aungierRedlichKwong::aungierRedlichKwong(Istream& is)
@@ -50,13 +63,16 @@ aungierRedlichKwong::aungierRedlichKwong(Istream& is)
     specie(is),
     pcrit_(readScalar(is)),
     Tcrit_(readScalar(is)),
-	azentricFactor_(readScalar(is)),
-	rhocrit_(readScalar(is))
+    azentricFactor_(readScalar(is)),
+    rhocrit_(readScalar(is)),    
+    a_(0.42747*pow(this->RR,2)*pow(Tcrit_,2)/pcrit_),
+    b_(0.08664*this->RR*Tcrit_/pcrit_),
+    c_(this->RR*Tcrit_/(pcrit_+(a_/(this->W()/rhocrit_*(this->W()/rhocrit_+b_))))+b_-this->W()/rhocrit_),
+    n_(0.4986+1.2735*azentricFactor_+0.4754*pow(azentricFactor_,2)),
+        // Starting GUESS for the density by ideal gas law
+        rhostd_(this->rho(Pstd,Tstd,Pstd*this->W()/(Tstd*this->R())))
 {
     is.check("aungierRedlichKwong::aungierRedlichKwong(Istream& is)");
-    rhostd_=this->rho(Pstd,Tstd,Pstd*this->W()/(Tstd*this->R()));
-    rhoMax_=1500;	
-    rhoMin_=0.001;
 }
 
 
@@ -65,7 +81,8 @@ aungierRedlichKwong::aungierRedlichKwong(Istream& is)
 Ostream& operator<<(Ostream& os, const aungierRedlichKwong& pg)
 {
     os  << static_cast<const specie&>(pg)<< tab
-        << pg.pcrit_ << tab<< pg.Tcrit_<<tab<<pg.azentricFactor_<<tab<<pg.rhocrit_;
+        << pg.pcrit_ << tab<< pg.Tcrit_<< tab<<pg.azentricFactor_<< tab<<pg.rhocrit_;
+
     os.check("Ostream& operator<<(Ostream& os, const aungierRedlichKwong& st)");
     return os;
 }

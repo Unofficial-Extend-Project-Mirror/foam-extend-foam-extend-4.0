@@ -47,7 +47,7 @@ inline Foam::realGasSpecieThermo<thermo>::realGasSpecieThermo
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 
-// using a stabilizing newton solver 
+// using two one dimensional newton solvers in a row
 template<class thermo>
 inline void Foam::realGasSpecieThermo<thermo>::T
 (
@@ -59,47 +59,59 @@ inline void Foam::realGasSpecieThermo<thermo>::T
     scalar (realGasSpecieThermo<thermo>::*dFdT)(const scalar,const scalar) const
 ) const
 {
-
-   
-    scalar Test = T0;
+    scalar Test ;
     scalar Tnew = T0;
+    scalar rhoOld;
     scalar rho=rho0;
     scalar Ttol = T0*tol_;
-    int    iter = 0;
-int i;
+    scalar rhotol=rho0*tol_;
+    int iter = 0;
+    int i;
 
     do
     {
-        Test = Tnew;
-        
-	rho=this->rho(p,Test,rho);
-
-
-   i=0;
-;
+        Test = Tnew;   
+	rhoOld=rho;
+	rho=this->rho(p,Test,rhoOld);
+        i=0;
       	do
-   	{
-        Tnew = Test - ((this->*F)(rho,Test) - f)/(this->*dFdT)(rho,Test)/(pow(2,i)); 
-	i++;				// if the solve is diverging, the time step is reduced until the solver converges	
-         }while((i<20)&&((mag((this->*F)(rho,Tnew) - f) > mag((this->*F)(rho,Test) - f))));	
+   	{   
+            // using a stabilizing newton solver 
+            // if the solve is diverging, the time step is reduced until the solver converges
+            Tnew = Test - ((this->*F)(rho,Test) - f)/(this->*dFdT)(rho,Test)/(pow(2,i)); 
+	    i++;					
+        }while
+        (
+            (i<20)
+            &&
+            ((
+                mag((this->*F)(rho,Tnew) - f) 
+                > 
+                mag((this->*F)(rho,Test) - f)
+            ))
+        );	
 
         if (iter++ > maxIter_)
         {
             FatalErrorIn
             (
-                "realGasSpecieThermo<thermo>::T(scalar f, scalar T0, "
+                "realGasSpecieThermo<thermo>::T(scalar f, scalar T0, scalar p, scalar rho0, "
                 "scalar (realGasSpecieThermo<thermo>::*F)(const scalar) const, "
                 "scalar (realGasSpecieThermo<thermo>::*dFdT)(const scalar) const"
                 ") const"
             )   << "Maximum number of iterations exceeded"
                 << abort(FatalError);
         }
+    } while
+    // both fields must converge
+    ( 
+        (mag(mag(Tnew) - mag(Test)) > Ttol)
+        ||
+        (mag(mag(rho) - mag(rhoOld)) > rhotol)
+    );		
 
-
-    } while (mag(mag(Tnew) - mag(Test)) > Ttol);		
-
-  rho0=rho;
-  T0=Tnew;
+    rho0=rho;
+    T0=Tnew;
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -184,8 +196,52 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::A(const scalar rho,  cons
     return this->a(rho, T)/this->W();
 }
 
+//- Return compressibility drho/dp at h=constant [s^2/m^2]
+//- using Bridgeman's Table
+template<class thermo>
+inline Foam::scalar Foam::realGasSpecieThermo<thermo>::psiH
+(
+    const scalar rho,
+    const scalar T
+    
+) const
+{
+    scalar cp=this->cp(rho,T);
+    scalar beta=this->isobarExpCoef(rho,T);
+    return  
+    -(
+        T*pow(beta,2)/cp
+        -beta/cp
+        -this->isothermalCompressiblity(rho,T)*rho/this->W()
+    )*this->W();
+}
 
-
+//- Return compressibility drho/dp at e=constant [s^2/m^2]
+//- using Bridgeman's Table
+template<class thermo>
+inline Foam::scalar Foam::realGasSpecieThermo<thermo>::psiE
+(
+    const scalar rho,
+    const scalar T
+    
+) const
+{
+    scalar Vm = this->W()/rho;
+    scalar cp=this->cp(rho,T);
+    scalar beta=this->isobarExpCoef(rho,T);
+    return  
+    -(
+        (
+	    T*pow(beta,2)*Vm
+	    -this->isothermalCompressiblity(rho,T)*cp
+	)
+	/
+	(
+            cp*Vm
+            -beta*this->p(rho,T)*pow(Vm,2)
+	)
+    )*this->W();
+}
 
 template<class thermo>
 inline void Foam::realGasSpecieThermo<thermo>::TH

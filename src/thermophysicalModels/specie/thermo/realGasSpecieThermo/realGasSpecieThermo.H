@@ -205,8 +205,6 @@ public:
                 //- Enthalpy [J/kg]
                 inline scalar H(const scalar rho, const scalar T) const;
 
-
-
                 //- Sensible enthalpy [J/kg]
                // inline scalar Hs(const scalar T) const;
 
@@ -225,9 +223,13 @@ public:
                 //- Helmholtz free energy [J/kg]
                 inline scalar A(const scalar rho, const scalar T) const;
 
+                //Other variables
 
+	        //- Return compressibility drho/dp at h=constant [s^2/m^2] 
+                inline scalar psiH(const scalar rho, const scalar T) const;
 
-
+                //- Return compressibility drho/dp at e=constant [s^2/m^2]     
+                inline scalar psiE(const scalar rho, const scalar T) const;
 
 
         // Energy->temperature  inversion functions

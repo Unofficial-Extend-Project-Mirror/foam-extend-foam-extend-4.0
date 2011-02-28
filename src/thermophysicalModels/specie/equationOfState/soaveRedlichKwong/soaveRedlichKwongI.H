@@ -38,225 +38,7 @@ Germany
 namespace Foam
 {
 
-
-
-
-
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-inline scalar soaveRedlichKwong::pcrit()const
-{
-return pcrit_;
-}
-
-
-
-inline scalar soaveRedlichKwong::Tcrit()const
-{
-return Tcrit_;
-}
-
-
-inline scalar soaveRedlichKwong::rhostd()const
-{
-return rhostd_;
-}
-
-
-// Returns the Azentric Factor (Acentric Factor)
-inline scalar soaveRedlichKwong::azentricFactor() const
-{
-return azentricFactor_;
-}
-
-//returns the pressure for a given density and temperature    
-inline scalar soaveRedlichKwong::p(const scalar rho,const scalar T) const
-{
-return  (this->RR*T/((this->W()/rho)-this->b())-this->a()*pow((1+this->n()*(1-pow((T/this->Tcrit()),0.5))),2)/((this->W()/rho)*((this->W()/rho)+this->b())));
-}
-
-
-
-// Faktor a of the soave redlich Kwong equation of state  
-//(molar values)
-inline scalar soaveRedlichKwong::a() const
-{
-return 0.42747*pow(this->RR,2)*pow(this->Tcrit(),2)/(this->pcrit());
-}
-
-
-
-// Faktor b of the soave redlich Kwong equation of state 
-//(molar values)
-inline scalar soaveRedlichKwong::b() const
-{
-return 0.08664*this->RR*this->Tcrit()/this->pcrit(); 
-}
-
-// Faktor n of the soave redlich Kwong equation of state  
-//(molar values)
-inline scalar soaveRedlichKwong::n() const
-{
-return 0.48508+1.55171*this->azentricFactor()-0.15613*pow(this->azentricFactor(),2);
-}
-
-
-//* * * * * * * * * * * * * Derivatives * * * * * * * * * * * //
-
-
-
-//Real deviative dp/dv at constant temperature 
-//(molar values)
-inline scalar soaveRedlichKwong::dpdv(const scalar rho, const scalar T) const
-{
- return -(2*this->a()*this->n()*this->Tcrit()*(this->b()-(this->W()/rho))*(pow(this->b(),2)+this->b()*(this->W()/rho)-2*pow((this->W()/rho),2))*(this->n()+1)*pow((T/this->Tcrit()),0.5)+this->Tcrit()*(this->RR*T*pow((this->W()/rho),2)*(pow(this->b(),2)+2*this->b()*(this->W()/rho)+pow((this->W()/rho),2))-this->a()*(pow(this->b(),3)-3*this->b()*pow((this->W()/rho),2)+2*pow((this->W()/rho),3))*pow((this->n()+1),2))-this->a()*pow(this->n(),2)*T*(pow(this->b(),3)-3*this->b()*pow((this->W()/rho),2)+2*pow((this->W()/rho),3)))/(pow((this->W()/rho),2)*this->Tcrit()*pow((this->b()+(this->W()/rho)),2)*pow((this->b()-(this->W()/rho)),2));
-}
-
-
-
-
-//Real deviative dp/dT at constant molar volume 
-//(molar values)
-inline scalar soaveRedlichKwong::dpdT(const scalar rho, const scalar T) const
-{
-return this->a()*this->n()*(this->n()+1)*pow((T/this->Tcrit()),0.5)/(T*(this->W()/rho)*(this->b()+(this->W()/rho)))-this->a()*pow(this->n(),2)/((this->W()/rho)*this->Tcrit()*(this->b()+(this->W()/rho)))-this->RR/(this->b()-(this->W()/rho));
-}
-
-
-
-
-//Real  deviative dv/dT at constant pressure
-//using implicit differentiation
-// (molar values)
-inline scalar soaveRedlichKwong::dvdT(const scalar rho,const scalar T) const
-{
-return (-1)*this->dpdT(rho,T)/this->dpdv(rho,T);
-}
-
-
-
-
-//Real  deviative dv/dp at constant temperature 
-//(molar values)
-inline scalar soaveRedlichKwong::dvdp(const scalar rho,const scalar T)  const 
-{
-return 1/this->dpdv(rho,T);
-}
-
-
-
-//needed to calculate the internal energy 
-//(molar values)
-inline scalar soaveRedlichKwong::integral_p_dv(const scalar rho,const scalar T) const
-{
-return this->RR*T*log((this->W()/rho)-this->b())
--(this->a()*(2*this->n()*this->Tcrit()*(this->n()+1)*pow(T/this->Tcrit(),0.5)-this->Tcrit()*(pow(this->n(),2)+2*this->n()+1)-pow(this->n(),2)*T)*log(this->b()+(this->W()/rho)))/(this->b()*this->Tcrit())
-+this->a()*(2*this->n()*this->Tcrit()*(this->n()+1)*pow(T/this->Tcrit(),0.5)-this->Tcrit()*(pow(this->n(),2)+2*this->n()+1)-pow(this->n(),2)*T)*log((this->W()/rho))/(this->b()*this->Tcrit());
-}
-
-
-
-//needed to calculate the entropy
-//(molar values)
-inline scalar soaveRedlichKwong::integral_dpdT_dv(const scalar rho,const scalar T) const
-{
-return this->RR*log((this->W()/rho)-this->b())+(pow(this->n(),2)*this->a()/(this->b()*this->Tcrit())-this->a()*this->n()*(this->n()+1)*pow((T/this->Tcrit()),0.5)/(this->b()*T))*log(this->b()+(this->W()/rho))+(this->a()*this->n()*(this->n()+1)*pow((T/this->Tcrit()),0.5)/(this->b()*T)-this->a()*pow(this->n(),2)/(this->b()*this->Tcrit()))*log((this->W()/rho));
-}
-
-
-
-
-//* * * * * * * * * * * * * second order Derivative based functions * * * * * * * * * * * //
-
-
-
-//(molar values)
-inline scalar soaveRedlichKwong::d2pdT2(const scalar rho,const scalar T) const
-{
-return -this->a()*this->n()*(this->n()+1)*pow(T/this->Tcrit(),0.5)/(2*pow(T,2)*(this->W()/rho)*(this->b()+(this->W()/rho)));
-}
-
-
-
-
-//(molar values) 
-inline scalar soaveRedlichKwong::d2pdv2(const scalar rho,const scalar T) const
-{
- return 2*(2*this->a()*this->n()*this->Tcrit()*(this->b()-(this->W()/rho))
-    *(pow(this->b(),4)+pow(this->b(),3)*(this->W()/rho)-2*pow(this->b(),2)*pow((this->W()/rho),2)
-	-3*this->b()*pow((this->W()/rho),3)+3*pow((this->W()/rho),4))*(this->n()+1)*pow(T/this->Tcrit(),0.5)
-	-this->Tcrit()*(this->a()*(pow(this->b(),5)-3*pow(this->b(),3)*pow((this->W()/rho),2)-pow(this->b(),2)*pow((this->W()/rho),3)
-	+6*this->b()*pow((this->W()/rho),4)-3*pow((this->W()/rho),5))*pow((this->n()+1),2)
-	+this->RR*T*pow((this->W()/rho),3)*(pow(this->b(),3)+3*pow(this->b(),2)*(this->W()/rho)+3*this->b()*pow((this->W()/rho),2)+pow((this->W()/rho),3)))
-	-this->a()*pow(this->n(),2)*T*(pow(this->b(),5)-3*pow(this->b(),3)*pow((this->W()/rho),2)-pow(this->b(),2)*pow((this->W()/rho),3)
-	+6*this->b()*pow((this->W()/rho),4)-3*pow((this->W()/rho),5)))
-	/(pow((this->W()/rho),3)*this->Tcrit()*pow(((this->W()/rho)+this->b()),3)*pow((this->b()-(this->W()/rho)),3));
-}
-
-
-
-
-//(molar values)
-// using second Order implicit differentiation 
-inline scalar soaveRedlichKwong::d2vdT2(const scalar rho, const scalar T) const
-{
-return -(pow(this->dpdT(rho,T),2)*this->d2pdv2(rho,T)+   pow(this->dpdv(rho,T),2)  *this->d2pdT2(rho,T)- 2*this->dpdv(rho,T)*this->dpdT(rho,T)*this->d2pdvdT(rho,T))/(   pow(this->dpdv(rho,T),3));
-}
-
-
-
-
-//(molar values)
-inline scalar soaveRedlichKwong::d2pdvdT(const scalar rho, const scalar T) const
-{
-return -this->a()*this->n()*(this->b()+2*(this->W()/rho))*(this->n()+1)*pow(T/this->Tcrit(),0.5)
-/(T*pow((this->W()/rho),2)*pow((this->b()+(this->W()/rho)),2))
--(this->RR*pow((this->W()/rho),2)*this->Tcrit()*(pow(this->b(),2)+2*this->b()*(this->W()/rho)+pow((this->W()/rho),2))
-  -this->a()*pow(this->n(),2)*(pow(this->b(),3)-3*this->b()*pow((this->W()/rho),2)+2*pow((this->W()/rho),3)))
-  /(pow((this->W()/rho),2)*this->Tcrit()*pow((this->b()+(this->W()/rho)),2)*pow((this->b()-(this->W()/rho)),2));
-}
-
-
-
-
-// the result of this intergal is needed for the nasa based cp polynomial 
-//(molar values)
-inline scalar soaveRedlichKwong::integral_d2pdT2_dv(const scalar rho,const scalar T) const 
-{
-return this->a()*this->n()*(this->n()+1)*pow(T/this->Tcrit(),0.5)*log(this->b()+(this->W()/rho))
-/(2*this->b()*pow(T,2))
--this->a()*this->n()*(this->n()+1)*pow(T/this->Tcrit(),0.5)*log((this->W()/rho))/(2*this->b()*pow(T,2));
-}
-
-
-
-
-
-//* * * * * * * * * * * * * thermodynamic properties * * * * * * * * * * * //
-
-
-//Isobar expansion Coefficent beta = 1/v (dv/dt) at constant p
-//(molar values)
-inline scalar soaveRedlichKwong::isobarExpCoef(const scalar rho,const scalar T)  const
-{
-return this->dvdT(rho, T)*rho/this->W();
-}
-
-//isothemal compressiblity kappa 
-//(molar values)
-inline scalar soaveRedlichKwong::isothermalCompressiblity(const scalar rho,const scalar T) const
-{
-return this->isobarExpCoef(rho, T)/this->dpdT(rho, T);
-}
-
-
-
-
-
-
-
-
-
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
 inline soaveRedlichKwong::soaveRedlichKwong
@@ -264,31 +46,36 @@ inline soaveRedlichKwong::soaveRedlichKwong
     const specie& sp,
     scalar pcrit, 
     scalar Tcrit,
-	scalar azentricFactor
+    scalar azentricFactor
     
 )
 :
     specie(sp),    
     pcrit_(pcrit),
     Tcrit_(Tcrit),
-	azentricFactor_(azentricFactor)
-{
-	rhostd_=this->rho(Pstd,Tstd,Pstd*this->W()/(Tstd*this->R()));
-}
+    azentricFactor_(azentricFactor),
+    a_(0.42747*pow(this->RR,2)*pow(Tcrit_,2)/(pcrit_)),
+    b_(0.08664*this->RR*Tcrit_/pcrit_),
+    n_(0.48508+1.55171*azentricFactor_-0.15613*pow(azentricFactor_,2)),
+        // Starting GUESS for the density by ideal gas law
+        rhostd_(this->rho(Pstd,Tstd,Pstd*this->W()/(Tstd*this->R())))
+{}
 
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
 
 // Construct as named copy
-inline soaveRedlichKwong::soaveRedlichKwong(const word& name,  soaveRedlichKwong& pg)
+inline soaveRedlichKwong::soaveRedlichKwong(const word& name,const  soaveRedlichKwong& pg)
 :
     specie(name, pg),
     pcrit_(pg.pcrit_),
     Tcrit_(pg.Tcrit_),
-	azentricFactor_(pg.azentricFactor_)
-{
-  pg.rhostd_=this->rho(Pstd,Tstd,  (Pstd*this->W()/(Tstd*this->R())));	
-}
+    azentricFactor_(pg.azentricFactor_),
+    a_(pg.a_),
+    b_(pg.b_),
+    n_(pg.n_),
+    rhostd_(pg.rhostd_)
+{}
 
 
 // Construct and return a clone
@@ -305,111 +92,351 @@ inline autoPtr<soaveRedlichKwong> soaveRedlichKwong::New(Istream& is)
 }
 
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * *  Member Functions  * * * * * * * * * * * //
 
-//- Return density [kg/m^3]on 
-inline scalar soaveRedlichKwong::rho(const scalar p,const scalar T,const scalar rho0) const
+inline scalar soaveRedlichKwong::rhostd()const
+{
+    return rhostd_;
+}
+
+
+//returns the pressure for a given density and temperature    
+inline scalar soaveRedlichKwong::p(const scalar rho,const scalar T) const
+{
+    scalar Vm = this->W()/rho;
+    return 
+    (
+        this->RR*T/(Vm-b_)
+        -a_*pow((1+n_*(1-pow((T/Tcrit_),0.5))),2)
+            /(Vm*(Vm+b_))
+    );
+}
+
+
+//Real deviative dp/dv at constant temperature 
+//(molar values)
+inline scalar soaveRedlichKwong::dpdv(const scalar rho, const scalar T) const
+{
+    scalar Vm = this->W()/rho;
+    return 
+    -(
+        2*a_*n_*Tcrit_*(b_-Vm)*(pow(b_,2)
+        +b_*Vm-2*pow(Vm,2))*(n_+1)*pow((T/Tcrit_),0.5)
+        +Tcrit_*
+        (
+            this->RR*T*pow(Vm,2)*(pow(b_,2)
+                +2*b_*Vm+pow(Vm,2))
+        -a_*
+            (pow(b_,3)-3*b_*pow(Vm,2)+
+            2*pow(Vm,3))
+        *pow((n_+1),2)
+        )
+        -a_*pow(n_,2)*T*(pow(b_,3)
+        -3*b_*pow(Vm,2)+2*pow(Vm,3))
+     )
+     /
+     (
+         pow(Vm,2)*Tcrit_*pow((b_+Vm),2)
+             *pow((b_-Vm),2)
+     );
+}
+
+
+//Real deviative dp/dT at constant molar volume 
+//(molar values)
+inline scalar soaveRedlichKwong::dpdT(const scalar rho, const scalar T) const
+{
+    scalar Vm = this->W()/rho;
+    return a_*n_*(n_+1)*pow((T/Tcrit_),0.5)
+        /(T*Vm*(b_+Vm))
+    -a_*pow(n_,2)
+        /(Vm*Tcrit_*(b_+Vm))
+    -this->RR/(b_-Vm);
+}
+
+
+//Real  deviative dv/dT at constant pressure
+//using implicit differentiation
+// (molar values)
+inline scalar soaveRedlichKwong::dvdT(const scalar rho,const scalar T) const
+{
+    return (-1)*this->dpdT(rho,T)/this->dpdv(rho,T);
+}
+
+
+//Real  deviative dv/dp at constant temperature 
+//(molar values)
+inline scalar soaveRedlichKwong::dvdp(const scalar rho,const scalar T)  const 
+{
+    return 1/this->dpdv(rho,T);
+}
+
+
+//needed to calculate the internal energy 
+//(molar values)
+inline scalar soaveRedlichKwong::integral_p_dv(const scalar rho,const scalar T) const
+{
+    scalar Vm = this->W()/rho;
+    return this->RR*T*log(Vm-b_)
+    -(
+        a_*(2*n_*Tcrit_*(n_+1)*pow(T/Tcrit_,0.5)
+        -Tcrit_*(pow(n_,2)+2*n_+1)
+        -pow(n_,2)*T)*log(b_+Vm)
+     )
+     /(b_*Tcrit_)
+     +a_*
+     (
+         2*n_*Tcrit_*(n_+1)*pow(T/Tcrit_,0.5)
+         -Tcrit_*(pow(n_,2)+2*n_+1)-pow(n_,2)*T
+     )
+     *log(Vm)/(b_*Tcrit_);
+}
+
+
+//needed to calculate the entropy
+//(molar values)
+inline scalar soaveRedlichKwong::integral_dpdT_dv(const scalar rho,const scalar T) const
+{
+    scalar Vm = this->W()/rho;
+    return this->RR*log(Vm-b_)
+    +(
+        pow(n_,2)*a_/(b_*Tcrit_)
+        -a_*n_*(n_+1)*pow((T/Tcrit_),0.5)
+            /(b_*T)
+    )*log(b_+Vm)
+    +(a_*n_*(n_+1)*pow((T/Tcrit_),0.5)
+        /(b_*T)
+    -a_*pow(n_,2)/(b_*Tcrit_))*log(Vm);
+}
+
+
+//(molar values)
+inline scalar soaveRedlichKwong::d2pdT2(const scalar rho,const scalar T) const
+{
+    scalar Vm = this->W()/rho;
+    return -a_*n_*(n_+1)*pow(T/Tcrit_,0.5)
+        /(2*pow(T,2)*Vm*(b_+Vm));
+}
+
+
+//(molar values) 
+inline scalar soaveRedlichKwong::d2pdv2(const scalar rho,const scalar T) const
+{
+    scalar Vm = this->W()/rho;
+    return 
+    2*(
+        2*a_*n_*Tcrit_*(b_-Vm)*
+        (
+            pow(b_,4)+pow(b_,3)*Vm
+            -2*pow(b_,2)*pow(Vm,2)
+	    -3*b_*pow(Vm,3)
+            +3*pow(Vm,4)
+        )
+        *(n_+1)*pow(T/Tcrit_,0.5)
+	-Tcrit_*
+        (
+            a_*
+            (
+                pow(b_,5)
+                -3*pow(b_,3)*pow(Vm,2)
+                -pow(b_,2)*pow(Vm,3)
+	        +6*b_*pow(Vm,4)
+                -3*pow(Vm,5)
+            )*pow((n_+1),2)
+	    +this->RR*T*pow(Vm,3)*
+            (
+                pow(b_,3)
+                +3*pow(b_,2)*Vm
+                +3*b_*pow(Vm,2)
+                +pow(Vm,3)
+            )
+        )
+	-a_*pow(n_,2)*T*
+        (
+            pow(b_,5)
+            -3*pow(b_,3)*pow(Vm,2)
+            -pow(b_,2)*pow(Vm,3)
+	    +6*b_*pow(Vm,4)
+            -3*pow(Vm,5)
+        )
+    )
+    /(pow(Vm,3)*Tcrit_*pow((Vm+b_),3)
+        *pow((b_-Vm),3));
+}
+
+
+//(molar values)
+// using second Order implicit differentiation 
+inline scalar soaveRedlichKwong::d2vdT2(const scalar rho, const scalar T) const
+{
+    return 
+    -(
+          pow(this->dpdT(rho,T),2)*this->d2pdv2(rho,T)
+        + pow(this->dpdv(rho,T),2)*this->d2pdT2(rho,T)
+        - 2*this->dpdv(rho,T)*this->dpdT(rho,T)*this->d2pdvdT(rho,T)
+    )
+    /(pow(this->dpdv(rho,T),3));
+}
+
+
+//(molar values)
+inline scalar soaveRedlichKwong::d2pdvdT(const scalar rho, const scalar T) const
+{
+    scalar Vm = this->W()/rho;
+    return -a_*n_*(b_+2*Vm)*(n_+1)*pow(T/Tcrit_,0.5)
+        /(T*pow(Vm,2)*pow((b_+Vm),2))
+    -(
+        this->RR*pow(Vm,2)*Tcrit_*(pow(b_,2)
+        +2*b_*Vm+pow(Vm,2))
+        -a_*pow(n_,2)*
+        (
+            pow(b_,3)
+            -3*b_*pow(Vm,2)
+            +2*pow(Vm,3)
+        )
+    )
+  /(pow(Vm,2)*Tcrit_*pow((b_+Vm),2)*pow((b_-Vm),2));
+}
+
+
+// the result of this intergal is needed for the nasa based cp polynomial 
+//(molar values)
+inline scalar soaveRedlichKwong::integral_d2pdT2_dv(const scalar rho,const scalar T) const 
+{    
+    scalar Vm = this->W()/rho;
+    return a_*n_*(n_+1)*pow(T/Tcrit_,0.5)*log(b_+Vm)
+        /(2*b_*pow(T,2))
+    -a_*n_*(n_+1)*pow(T/Tcrit_,0.5)*log(Vm)
+        /(2*b_*pow(T,2));
+}
+
+
+//Isobar expansion Coefficent beta = 1/v (dv/dt) at constant p
+//(molar values)
+inline scalar soaveRedlichKwong::isobarExpCoef(const scalar rho,const scalar T)  const
+{
+    return this->dvdT(rho, T)*rho/this->W();
+}
+
+
+//isothemal compressiblity kappa (not Thermal conductivity)
+//(molar values)
+inline scalar soaveRedlichKwong::isothermalCompressiblity(const scalar rho,const scalar T) const
+{
+    return this->isobarExpCoef(rho, T)/this->dpdT(rho, T);
+}
+
+
+//- Return density [kg/m^3]
+inline scalar soaveRedlichKwong::rho(
+    const scalar p,
+    const scalar T,
+    const scalar rho0
+) const
 {
  
    scalar molarVolumePrevIteration;
    scalar molarVolume;
-   int iter=0;	
+   int iter=0;
    int maxIter_=400;
    scalar tol_=1e-8;
-   int i;
-   scalar rho1=rhoMax_, rho2=rhoMin_,rho3, f1,f2,f3;
+   scalar rho1=rhoMax_;
+   scalar rho2=rhoMin_;
 
-molarVolume=this->W()/rho0;	 
+   molarVolume=this->W()/rho0;	 
 
    do
    {
-   molarVolumePrevIteration= molarVolume;
-
+       molarVolumePrevIteration= molarVolume;
    
-   i=0;
-      	do
-   	{
-  	molarVolume=molarVolumePrevIteration-((this->p((this->W()/molarVolumePrevIteration),T)-p)/(this->dpdv((this->W()/       	
-  	molarVolumePrevIteration),T)))/(pow(2,i)); 
-		
-	i++;
-		if(i>8) 
-		{
-		  //using bisection methode as backup, solution must be between rho=0.001 to rho=1500; 
-		  for(i=0;i<200;i++)
-		  {
-                  	f1= (this->p(rho1,T)-p);
-                  	f2= (this->p(rho2,T)-p);
-                  	rho3=(rho1+rho2)/2;
-		  	f3=(this->p(rho3,T)-p);
+       label i=0;
+       do
+       {
+           molarVolume=molarVolumePrevIteration
+               -(
+                   (this->p((this->W()/molarVolumePrevIteration),T) - p)
+                   /(this->dpdv((this->W()/molarVolumePrevIteration),T))
+               )/pow(2,i);
+
+           i++;
+           if (i>8) 
+           {
+               //using bisection methode as backup,
+               //solution must be between rho=0.001 to rho=1500;
+               for(i=0; i<200; i++)
+               {
+                   scalar f1 = this->p(rho1,T) - p;
+                   scalar f2 = this->p(rho2,T) - p;
+                   scalar rho3 = (rho1 + rho2)/2;
+                   scalar f3 = this->p(rho3,T) - p;
 	
-			if ((f2<0 && f3>0)||(f2>0 &&f3<0))	
-		  	{
-		 		rho1=rho3;
-			}  
- 		  	else if ((f1<0 && f3>0)||(f1>0 &&f3<0))
-                  	{
-		 		rho2=rho3;
-			}
-		 
-			else	
-			{
-                        	rho2=(rho2+rho3)/2;
-			}
+                   if ((f2 < 0 && f3 > 0) || (f2 > 0 && f3 < 0))
+                   {
+                       rho1=rho3;
+                   }  
+                   else if ((f1 < 0 && f3 > 0)||(f1 > 0 && f3 < 0))
+                   {
+                       rho2=rho3;
+                   }		 
+                   else	
+                   {
+                       rho2=(rho2 + rho3)/2;
+                   }
 
-			if(mag(f3)<p*tol_)
-                  	{	  	  
-				molarVolume=this->W()/rho3;
-                 	 	molarVolumePrevIteration=this->W()/rho3;
-				break; 
-		  	}
-			
-			else
-			{
-				molarVolumePrevIteration=this->W()/rho3;
-			}
-		    }		  
-  		}
-        }
-        while(mag(this->p((this->W()/molarVolume),T)-p)>mag(this->p((this->W()/molarVolumePrevIteration),T)-p));
+                   if(mag(f3) < p*tol_)
+                   {	  	  
+                       molarVolume=this->W()/rho3;
+                       molarVolumePrevIteration=this->W()/rho3;
+                       break; 
+                   }
+                   else
+                   {
+                       molarVolumePrevIteration=this->W()/rho3;
+                   }
+               }		  
+           }
+       }
+       while
+       (
+           mag(this->p((this->W()/molarVolume),T) - p)
+         > mag(this->p((this->W()/molarVolumePrevIteration),T) - p)
+       );
 
-
-           if (iter++ > maxIter_)
-        {
-            FatalErrorIn
-            (
-               "inline scalar soaveRedlichKwong::rho(const scalar p,const scalar T,const scalar rho0) const "
-            )   << "Maximum number of iterations exceeded"
-                << abort(FatalError);
-        }
-
+       if (iter++ > maxIter_)
+       {
+           FatalErrorIn
+           (
+               "inline scalar redlichKwong::rho(const scalar p, const scalar T, const scalar rho0) const "
+           )   << "Maximum number of iterations exceeded"
+               << abort(FatalError);
+       }
    }
-   while(mag(molarVolumePrevIteration-molarVolume)>tol_*(this->W()/rho0));
+   while(mag(molarVolumePrevIteration-molarVolume) > tol_*(this->W()/rho0));
 
-   return this->W()/molarVolume;   
-
+   return this->W()/molarVolume;
 }
 
 //- Return density [kg/m^3]on 
 inline scalar soaveRedlichKwong::rho(const scalar p,const scalar T) const
 {
 
-	scalar rho0=p/(this->R()*T); //using perfect gas equation as starting point
-	return rho(p,T,rho0);
+    //using perfect gas equation as starting point
+    return rho(p,T,p/(this->R()*T));
 }
 
-//- Return compressibility drho/dp [s^2/m^2]
+
+//- Return compressibility drho/dp at T=constant [s^2/m^2]
 inline scalar soaveRedlichKwong::psi(const scalar rho, const scalar T) const
 {
-  return -this->dvdp(rho,T)*pow(rho,2)/this->W();
+    return -this->dvdp(rho,T)*pow(rho,2)/this->W();
 }
+
 
 //- Return compression factor []
 inline scalar soaveRedlichKwong::Z( const scalar p, const scalar T,const scalar rho0) const
 {
-        return (p*this->rho(p,T,rho0))/(this->R()*T);
+    return (p*this->rho(p,T,rho0))/(this->R()*T);
 }
-
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 

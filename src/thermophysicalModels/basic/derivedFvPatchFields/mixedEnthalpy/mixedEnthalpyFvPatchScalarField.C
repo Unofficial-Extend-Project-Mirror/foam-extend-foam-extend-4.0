@@ -1,25 +1,26 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of OpenFOAM.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    OpenFOAM is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 2 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 \*---------------------------------------------------------------------------*/
 
@@ -110,6 +111,10 @@ void Foam::mixedEnthalpyFvPatchScalarField::updateCoeffs()
 
     Tw.evaluate();
 
+    fvPatchScalarField& pw =
+        const_cast<fvPatchScalarField&>(thermo.p().boundaryField()[patchi]);
+    pw.evaluate();
+
     valueFraction() = Tw.valueFraction();
 
     if
@@ -121,8 +126,8 @@ void Foam::mixedEnthalpyFvPatchScalarField::updateCoeffs()
         refGrad() = thermo.Cp(Tw, patchi)*Tw.refGrad()
           + patch().deltaCoeffs()*
             (
-                thermo.h(Tw, patchi)
-              - thermo.h(Tw, patch().faceCells())
+                thermo.h(pw, Tw, patchi)
+              - thermo.h(pw, Tw, patch().faceCells())
             );
     }
     else if
@@ -137,8 +142,8 @@ void Foam::mixedEnthalpyFvPatchScalarField::updateCoeffs()
         refGrad() = thermo.Cp(Tw, patchi)*Tw.refGrad()
           + patch().deltaCoeffs()*
             (
-                thermo.hs(Tw, patchi)
-              - thermo.hs(Tw, patch().faceCells())
+                thermo.hs(pw, Tw, patchi)
+              - thermo.hs(pw, Tw, patch().faceCells())
             );
     }
 

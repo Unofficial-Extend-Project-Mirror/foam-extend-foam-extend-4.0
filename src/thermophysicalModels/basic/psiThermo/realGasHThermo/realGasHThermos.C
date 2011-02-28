@@ -42,10 +42,10 @@ Germany
 #include "soaveRedlichKwong.H"
 #include "nasaHeatCapacityPolynomial.H"
 #include "realGasSpecieThermo.H"
+#include "constTransport.H"
+#include "sutherlandTransport.H"
 
 #include "pureMixture.H"
-#include "realGasSutherlandTransport.H"
-#include "realGasConstTransport.H"
 #include "realGasHThermo.H"
 
 
@@ -60,7 +60,47 @@ makeBasicRealGasThermo
 (
     realGasHThermo,
     pureMixture,
-    realGasSutherlandTransport,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    pengRobinson
+);
+
+makeBasicRealGasThermo
+(
+    realGasHThermo,
+    pureMixture,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    aungierRedlichKwong
+);
+
+makeBasicRealGasThermo
+(
+    realGasHThermo,
+    pureMixture,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    redlichKwong
+);
+
+makeBasicRealGasThermo
+(
+    realGasHThermo,
+    pureMixture,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    soaveRedlichKwong
+);
+
+makeBasicRealGasThermo
+(
+    realGasHThermo,
+    pureMixture,
+    constTransport,
     realGasSpecieThermo,
     nasaHeatCapacityPolynomial,
     pengRobinson
@@ -73,88 +113,31 @@ makeBasicRealGasThermo
 (
     realGasHThermo,
     pureMixture,
-    realGasSutherlandTransport,
+    constTransport,
     realGasSpecieThermo,
     nasaHeatCapacityPolynomial,
     aungierRedlichKwong
 );
 
-
-
-
 makeBasicRealGasThermo
 (
     realGasHThermo,
     pureMixture,
-    realGasSutherlandTransport,
+    constTransport,
     realGasSpecieThermo,
     nasaHeatCapacityPolynomial,
     redlichKwong
 );
 
-
-
-
 makeBasicRealGasThermo
 (
     realGasHThermo,
     pureMixture,
-    realGasSutherlandTransport,
+    constTransport,
     realGasSpecieThermo,
     nasaHeatCapacityPolynomial,
     soaveRedlichKwong
 );
-
-makeBasicRealGasThermo
-(
-    realGasHThermo,
-    pureMixture,
-    realGasConstTransport,
-    realGasSpecieThermo,
-    nasaHeatCapacityPolynomial,
-    pengRobinson
-);
-
-
-
-
-makeBasicRealGasThermo
-(
-    realGasHThermo,
-    pureMixture,
-    realGasConstTransport,
-    realGasSpecieThermo,
-    nasaHeatCapacityPolynomial,
-    aungierRedlichKwong
-);
-
-
-
-
-makeBasicRealGasThermo
-(
-    realGasHThermo,
-    pureMixture,
-    realGasConstTransport,
-    realGasSpecieThermo,
-    nasaHeatCapacityPolynomial,
-    redlichKwong
-);
-
-
-
-
-makeBasicRealGasThermo
-(
-    realGasHThermo,
-    pureMixture,
-    realGasConstTransport,
-    realGasSpecieThermo,
-    nasaHeatCapacityPolynomial,
-    soaveRedlichKwong
-);
-
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -107,7 +107,12 @@ void fixedInternalEnergyFvPatchScalarField::updateCoeffs()
     fvPatchScalarField& Tw =
         const_cast<fvPatchScalarField&>(thermo.T().boundaryField()[patchi]);
     Tw.evaluate();
-    operator==(thermo.e(Tw, patchi));
+
+    fvPatchScalarField& pw = 
+        const_cast<fvPatchScalarField&>(thermo.p().boundaryField()[patchi]);
+    pw.evaluate();
+
+    operator==(thermo.e(pw,Tw, patchi));
 
     fixedValueFvPatchScalarField::updateCoeffs();
 }

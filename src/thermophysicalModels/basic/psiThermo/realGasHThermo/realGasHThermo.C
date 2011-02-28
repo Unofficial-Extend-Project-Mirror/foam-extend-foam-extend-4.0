@@ -129,7 +129,7 @@ Foam::realGasHThermo<MixtureType>::realGasHThermo(const fvMesh& mesh)
         ),
         mesh,
         dimensionSet(0, 2, -2, 0, 0),
-        this->hRealBoundaryTypes()
+        this->hBoundaryTypes()
     ),
     
     rho_
@@ -184,7 +184,7 @@ Foam::realGasHThermo<MixtureType>::realGasHThermo(const fvMesh& mesh)
             h((this->rho_.boundaryField()[patchi])  ,  this->T_.boundaryField()[patchi], patchi);                    
     }
 
-    hRealBoundaryCorrection(h_);
+    hBoundaryCorrection(h_);
     calculate();
 
     // Switch on saving old time

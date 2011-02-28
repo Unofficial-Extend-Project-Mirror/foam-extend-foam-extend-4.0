@@ -41,6 +41,17 @@ Germany
 namespace Foam
 {
 
+/* * * * * * * * * * * * * * * Private static data * * * * * * * * * * * * * */
+const scalar soaveRedlichKwong::rhoMin_
+(
+    debug::tolerances("soaveRedlichKwongRhoMin", 1e-3)
+);
+
+const scalar soaveRedlichKwong::rhoMax_
+(
+    debug::tolerances("soaveRedlichKwongRhoMax", 1500)
+);
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 soaveRedlichKwong::soaveRedlichKwong(Istream& is)
@@ -48,12 +59,14 @@ soaveRedlichKwong::soaveRedlichKwong(Istream& is)
     specie(is),
     pcrit_(readScalar(is)),
     Tcrit_(readScalar(is)),
-	azentricFactor_(readScalar(is))
+    azentricFactor_(readScalar(is)),
+    a_(0.42747*pow(this->RR,2)*pow(Tcrit_,2)/(pcrit_)),
+    b_(0.08664*this->RR*Tcrit_/pcrit_),
+    n_(0.48508+1.55171*azentricFactor_-0.15613*pow(azentricFactor_,2)),
+        // Starting GUESS for the density by ideal gas law
+        rhostd_(this->rho(Pstd,Tstd,Pstd*this->W()/(Tstd*this->R())))
 {
-    is.check("soaveRedlichKwong::soaveRedlichKwong(Istream& is)");
-    rhostd_=this->rho(Pstd,Tstd,Pstd*this->W()/(Tstd*this->R()));
-    rhoMax_=1500;	
-    rhoMin_=0.001;    	
+    is.check("soaveRedlichKwong::soaveRedlichKwong(Istream& is)"); 	
 }
 
 

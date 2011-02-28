@@ -115,6 +115,10 @@ class nasaHeatCapacityPolynomial
 	scalar a5_;
 	scalar a6_;
         scalar a7_;
+	scalar e0_std;
+	scalar s0_std;
+	scalar integral_p_dv_std;
+	scalar integral_dpdT_dv_std;
 	scalar cp_std;
 
     // Private member functions
@@ -124,22 +128,20 @@ class nasaHeatCapacityPolynomial
         (
             const equationOfState& st,
             const scalar a1,
-			const scalar a2,
-			const scalar a3,
-			const scalar a4,
-		    const scalar a5,
-		    const scalar a6,
+	    const scalar a2,
+            const scalar a3,
+	    const scalar a4,
+	    const scalar a5,
+	    const scalar a6,
             const scalar a7
-			);
+	);
 
 
 public:
 
 //Variable
 
-
     // Constructors
-
         //- Construct from Istream
         nasaHeatCapacityPolynomial(Istream&);
 
@@ -152,49 +154,41 @@ public:
         //- Selector from Istream
         inline static autoPtr<nasaHeatCapacityPolynomial> New(Istream& is);
 
-
     // Member Functions
-
- 	//useful functions
-           //used to calculate the internal energy
-	   //ideal Gas Enthalpy
-            inline scalar h0(const scalar T) const;
+        
+	//- perfect Gas Enthalpy [J/kmol]
+        inline scalar h0(const scalar T) const;
 	    
-          
-           // used to calculate the entropy
-           //ideal Gas Entropy
-            inline scalar s0(const scalar T) const;
+        //- perfect Gas Entropy [J/(kmol K)]
+        inline scalar s0(const scalar T) const;
 
+        //- perfect Gas internal Energy  [J/kmol]
+        inline scalar e0(const scalar T) const;
+
+        //- perfect gas Heat capacity at constant pressure [J/(kmol K)]
+        inline scalar cv0(const scalar T) const;
+
+        //- perfect gas Heat capacity at constant pressure [J/(kmol K)]
+        inline scalar cp0(const scalar T) const;
+
+        //- Limited Heat capacity at constant pressure [J/(kmol K)]
+        inline scalar cp(const scalar rho, const scalar T) const;
+
+        //- non Limited Heat capacity at constant pressure [J/(kmol K)]
+	inline scalar cp_nonLimited(const scalar rho, const scalar T) const;
+
+        //- Heat capacity at constant pressure [J/(kmol K)]
+        inline scalar cv(const scalar rho, const scalar T) const;
+
+        //- Enthalpy [J/kmol]
+        inline scalar h(const scalar rho, const scalar T) const;
+
+        //- Entropy [J/(kmol K)]
+        inline scalar s(const scalar rho,const scalar T) const;
 	    
-	   //used to calculate the internal energy
-           //ideal Gas Enthalpy 
-           inline scalar e0(const scalar T) const;
+        //- Internal Energy [J/kmol]
+        inline scalar e(const scalar rho, const scalar T) const;
 
-        // Fundamental properties
-
-             //- ideal gas Heat capacity at constant pressure [J/(kmol K)]
-            inline scalar cv0(const scalar T) const;
-
-             //- ideal gas Heat capacity at constant pressure [J/(kmol K)]
-            inline scalar cp0(const scalar T) const;
-
-            //- Heat capacity at constant pressure [J/(kmol K)]
-            inline scalar cp(const scalar rho, const scalar T) const;
-
-            //- Heat capacity at constant pressure [J/(kmol K)]
-	    inline scalar cp_nonLimited(const scalar rho, const scalar T) const;
-
-            //- Heat capacity at constant pressure [J/(kmol K)]
-            inline scalar cv(const scalar rho, const scalar T) const;
-
-            //- Enthalpy [J/kmol]
-            inline scalar h(const scalar rho, const scalar T) const;
-
-            //- Entropy [J/(kmol K)]
-            inline scalar s(const scalar rho,const scalar T) const;
-	    
-            //- Internal Energy [J/kmol]
-            inline scalar e(const scalar rho, const scalar T) const;
 
 
     // Member operators

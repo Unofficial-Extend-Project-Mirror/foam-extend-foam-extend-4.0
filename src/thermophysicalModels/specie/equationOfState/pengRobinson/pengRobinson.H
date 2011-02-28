@@ -47,8 +47,7 @@ Germany
 
 #include "specie.H"
 #include "autoPtr.H"
-#include "word.H"
-#include "scalar.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -64,6 +63,25 @@ class pengRobinson
     public specie
 
 {
+   //Member Variabels
+    scalar pcrit_;
+    scalar Tcrit_; 
+    scalar azentricFactor_;
+
+    //-Peng Robinson factors
+    scalar a_;
+    scalar b_;
+    scalar n_;
+
+    //- Density @STD, initialise after a, b!
+    scalar rhostd_;
+
+    // Static Private data
+
+    //should be read from the fvSolution file where rhoMax and rhoMin values must be defined (for rhoSimpleFoam)
+    //HR: Don't know, yet. Let's make these static for starters
+    static const scalar rhoMax_;
+    static const scalar rhoMin_;
 
 
 public:
@@ -83,7 +101,7 @@ public:
         pengRobinson(Istream&);
 
         //- Construct as named copy
-        inline pengRobinson(const word& name, pengRobinson&);
+        inline pengRobinson(const word& name,const pengRobinson&);
 
         //- Construct and return a clone
         inline autoPtr<pengRobinson> clone() const;
@@ -91,49 +109,78 @@ public:
         // Selector from Istream
         inline static autoPtr<pengRobinson> New(Istream& is);
 
-        //Member Variabels
-	    scalar pcrit_;
- 	    scalar Tcrit_; 
-            scalar rhostd_;
-	    scalar azentricFactor_;
-	    scalar rhoMax_;	//should be read from the fvSolution file where rhoMax and rhoMin values must be define ( for rhoSimpleFoam)
-    	    scalar rhoMin_;	
+
+	
 
     // Member functions
-        inline scalar pcrit() const;
-        inline scalar Tcrit() const;
-	inline scalar azentricFactor() const;
 	inline scalar rhostd()const;
+
         inline scalar p(const scalar rho, const scalar T) const;
 
-	//-Redlich Kwong factors
-     	inline scalar a() const;
-	inline scalar b() const;
-	inline scalar n() const;
-
-        //derivatives 
+        //first order derivatives 
         inline scalar dpdv(const scalar rho,const  scalar T) const;
-        inline scalar dpdT(const scalar rho, const scalar T) const;
-        inline scalar dvdT(const scalar rho,const  scalar T) const;
-        inline scalar dvdp(const scalar rho, const scalar T) const; 
-        inline scalar isobarExpCoef(const scalar rho,const  scalar T) const; 
-        inline scalar isothermalCompressiblity(const scalar rho,const  scalar T) const; 
-        inline scalar integral_d2pdT2_dv(const scalar rho,const  scalar T) const ; 	// Used for cv
-        inline scalar d2pdv2(const scalar rho,const  scalar T) const;    		// not Used At The Moment
-	inline scalar d2pdT2(const scalar rho,const  scalar T) const;    		// not Used At The Moment
-        inline scalar d2pdvdT(const scalar rho,const  scalar T) const;    		// not Used At The Moment
-	inline scalar d2vdT2(const scalar rho,const  scalar T) const;    		// not Used At The Moment
-        inline scalar integral_p_dv(const scalar rho,const  scalar T) const;     	//Used for internal Energy
-        inline scalar integral_dpdT_dv(const scalar rho,const  scalar T) const;  	//Used for Entropy
 
-        //- Return density [kg/m^3] // rho0 is the starting point of the newton solver used to calculate rho
-        inline scalar rho(const scalar p,const  scalar T,const scalar rho0) const;
+        inline scalar dpdT(const scalar rho, const scalar T) const;
+
+        inline scalar dvdT(const scalar rho,const  scalar T) const;
+
+        inline scalar dvdp(const scalar rho, const scalar T) const; 
+
+        inline scalar isobarExpCoef
+        (
+            const scalar rho,
+            const  scalar T
+        ) const; 
+
+        inline scalar isothermalCompressiblity
+        (
+            const scalar rho,
+            const  scalar T
+        ) const; 
+
+        // Used for cv
+        inline scalar integral_d2pdT2_dv
+        ( 
+            const scalar rho,
+            const  scalar T
+        ) const ; 
+	
+        // second order derivatives, not Used At The Moment
+        inline scalar d2pdv2(const scalar rho,const  scalar T) const;    		
+	
+        inline scalar d2pdT2(const scalar rho,const  scalar T) const;    		
+        
+        inline scalar d2pdvdT(const scalar rho,const  scalar T) const;    		
+	
+        inline scalar d2vdT2(const scalar rho,const  scalar T) const;    
+	
+        //Used for internal Energy
+        inline scalar integral_p_dv(const scalar rho,const  scalar T) const;
+        
+        //Used for Entropy
+        inline scalar integral_dpdT_dv(const scalar rho,const  scalar T) const;  	
+
+        //- Return density [kg/m^3] 
+        // rho0 is the starting point of the newton solver used to calculate rho
+        inline scalar rho
+        (
+            const scalar p,
+            const scalar T,
+            const scalar rho0
+        ) const;
+
         inline scalar rho(const scalar p,const  scalar T) const;
-        //- Return compressibility rho/p [s^2/m^2]   // rho0 is the starting point of the newton solver used to calculate rho
+
+        //- Return compressibility drho/dp at T=constant [s^2/m^2]
         inline scalar psi(const scalar rho, const scalar T) const;
 
         //- Return compression factor []
-        inline scalar Z(const scalar p,const  scalar T,const scalar rho0) const;
+        inline scalar Z
+        (
+            const scalar p,
+            const scalar T,
+            const scalar rho0
+        ) const;
 
 
     // Member operators

@@ -252,7 +252,7 @@ inline scalar redlichKwong::isobarExpCoef
 }
 
 
-//isothemal compressiblity kappa 
+//isothemal compressiblity kappa (not Thermal conductivity)
 //(molar values)
 inline scalar redlichKwong::isothermalCompressiblity
 (
@@ -360,11 +360,11 @@ inline scalar redlichKwong::rho
 inline scalar redlichKwong::rho(const scalar p, const scalar T) const
 {
     // using perfect gas equation as starting point
-	return rho(p,T,p/(this->R()*T)); 
+    return rho(p,T,p/(this->R()*T));
 }
 
 
-//- Return compressibility drho/dp [s^2/m^2]
+//- Return compressibility drho/dp at T=constant [s^2/m^2]
 inline scalar redlichKwong::psi(const scalar rho, const scalar T) const
 {
     return -this->dvdp(rho,T)*pow(rho,2)/this->W();

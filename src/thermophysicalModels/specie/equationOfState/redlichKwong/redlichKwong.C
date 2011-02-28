@@ -63,8 +63,8 @@ redlichKwong::redlichKwong(Istream& is)
     Tcrit_(readScalar(is)),
     a_(0.42748*pow(this->RR,2)*pow(Tcrit_,2.5)/pcrit_),
     b_(0.08664*this->RR*Tcrit_/pcrit_),
-	// Starting GUESS for the density by ideal gas law
-    rhostd_(this->rho(Pstd, Tstd, Pstd*this->W()/(Tstd*this->R())))
+        // Starting GUESS for the density by ideal gas law
+        rhostd_(this->rho(Pstd, Tstd, Pstd*this->W()/(Tstd*this->R())))
 { 
     is.check("redlichKwong::redlichKwong(Istream& is)");
 }

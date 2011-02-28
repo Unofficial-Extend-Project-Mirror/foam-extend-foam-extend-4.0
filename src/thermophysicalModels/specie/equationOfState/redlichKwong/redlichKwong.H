@@ -53,7 +53,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class perfectGas Declaration
+                           Class redlichKwong Declaration
 \*---------------------------------------------------------------------------*/
 
 class redlichKwong
@@ -62,27 +62,22 @@ class redlichKwong
 {
     // Private data
 
-        scalar pcrit_;
+    scalar pcrit_;
+    scalar Tcrit_; 
 
- 	    scalar Tcrit_; 
-
-	//-Redlich Kwong factors
-
-	    scalar a_;
-
-        scalar b_;
+    //-Redlich Kwong factors
+    scalar a_;
+    scalar b_;
 
     //- Density @STD, initialise after a, b!
-
-        scalar rhostd_;
+    scalar rhostd_;
 
     // Static Private data
 
-	//should be read from the fvSolution file where rhoMax and rhoMin values must be defined (for rhoSimpleFoam)
+    //should be read from the fvSolution file where rhoMax and rhoMin values must be defined (for rhoSimpleFoam)
     //HR: Don't know, yet. Let's make these static for starters
-	    static const scalar rhoMax_;
-
-        static const scalar rhoMin_;
+    static const scalar rhoMax_;
+    static const scalar rhoMin_;
 
 
 public:
@@ -96,7 +91,7 @@ public:
             const specie& sp, 
             scalar pcrit, 
             scalar Tcrit
-		);
+        );
 
         //- Construct from Istream
         redlichKwong(Istream&);
@@ -117,7 +112,7 @@ public:
         inline scalar p(const scalar rho, const scalar T) const;
 
 
-        // Derivatives
+        //first order derivatives 
         inline scalar dpdv(const scalar rho, const  scalar T) const;
 
         inline scalar dpdT(const scalar rho, const scalar T) const;
@@ -147,7 +142,7 @@ public:
         // Used for Entropy
         inline scalar integral_dpdT_dv(const scalar rho, const scalar T) const;
 
-        // Not Used At The Moment
+        // second order derivatives, not Used At The Moment
         inline scalar d2pdv2(const scalar rho, const scalar T) const;
 
         inline scalar d2pdT2(const scalar rho, const scalar T) const;
@@ -161,13 +156,13 @@ public:
         inline scalar rho
         (
             const scalar p,
-            const  scalar T,
+            const scalar T,
             const scalar rho0
         ) const;
 
         inline scalar rho(const scalar p, const scalar T) const;
 
-        //- Return compressibility drho/dp [s^2/m^2]  
+        //- Return compressibility drho/dp at T=constant [s^2/m^2]  
         inline scalar psi(const scalar rho, const scalar T) const;
 
         //- Return compression factor []

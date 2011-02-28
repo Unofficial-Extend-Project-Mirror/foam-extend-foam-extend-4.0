@@ -41,6 +41,18 @@ Germany
 namespace Foam
 {
 
+/* * * * * * * * * * * * * * * Private static data * * * * * * * * * * * * * */
+
+const scalar pengRobinson::rhoMin_
+(
+    debug::tolerances("pengRobinsonRhoMin", 1e-3)
+);
+
+const scalar pengRobinson::rhoMax_
+(
+    debug::tolerances("pengRobinsonRhoMax", 1500)
+);
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 pengRobinson::pengRobinson(Istream& is)
@@ -48,15 +60,14 @@ pengRobinson::pengRobinson(Istream& is)
     specie(is),
     pcrit_(readScalar(is)),
     Tcrit_(readScalar(is)),
-    azentricFactor_(readScalar(is))
+    azentricFactor_(readScalar(is)),
+    a_(0.457235*pow(this->RR,2)*pow(Tcrit_,2)/pcrit_),
+    b_(0.077796*this->RR*Tcrit_/pcrit_), 
+    n_(0.37464+1.54226*azentricFactor_-0.26992*pow(azentricFactor_,2)), 
+    rhostd_(this->rho(Pstd,Tstd,Pstd*this->W()/(Tstd*this->R())))  	
 {
     is.check("pengRobinson::pengRobinson(Istream& is)");
-    rhostd_=this->rho(Pstd,Tstd,Pstd*this->W()/(Tstd*this->R()));
-    rhoMax_=1500;	
-    rhoMin_=0.001;
-
-
-    	
+   
 }
 
 

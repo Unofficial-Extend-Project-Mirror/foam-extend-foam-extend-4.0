@@ -155,7 +155,28 @@ inline scalar sutherlandTransport<thermo>::alpha(const scalar T) const
     return mu(T)*Cv_*(1.32 + 1.77*this->R()/Cv_)/CpBar;
 }
 
+// Thermal conductivity [W/mK]
+template<class thermo>
+inline scalar sutherlandTransport<thermo>::kappa(const scalar rho, const scalar T) const
+{
+    scalar Cv_ = this->Cv(rho,T);
+    return mu(T)*Cv_*(1.32 + 1.77*this->R()/Cv_);
+}
 
+
+// Thermal diffusivity for enthalpy [kg/ms]
+template<class thermo>
+inline scalar sutherlandTransport<thermo>::alpha(const scalar rho, const scalar T) const
+{
+    scalar Cv_ = this->Cv(rho,T);
+    scalar Cp_ = this->Cp(rho,T);
+
+    scalar deltaT = T - specie::Tstd;
+    scalar CpBar =
+        (deltaT*(this->H(rho, T) - this->H(this->rhostd(),specie::Tstd)) + Cp_)/(sqr(deltaT) + 1);
+
+    return mu(T)*Cv_*(1.32 + 1.77*this->R()/Cv_)/CpBar;
+}
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class thermo>

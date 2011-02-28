@@ -115,13 +115,17 @@ void mixedInternalEnergyFvPatchScalarField::updateCoeffs()
 
     Tw.evaluate();
 
+    fvPatchScalarField& pw =
+        const_cast<fvPatchScalarField&>(thermo.p().boundaryField()[patchi]);
+    pw.evaluate();
+
     valueFraction() = Tw.valueFraction();
-    refValue() = thermo.e(Tw.refValue(), patchi);
-    refGrad() = thermo.Cv(Tw, patchi)*Tw.refGrad()
+    refValue() = thermo.e(pw,Tw.refValue(), patchi);
+    refGrad() = thermo.Cv(pw,Tw, patchi)*Tw.refGrad()
       + patch().deltaCoeffs()*
         (
-            thermo.e(Tw, patchi)
-          - thermo.e(Tw, patch().faceCells())
+            thermo.e(pw,Tw, patchi)
+          - thermo.e(pw,Tw, patch().faceCells())
         );
 
     mixedFvPatchScalarField::updateCoeffs();
