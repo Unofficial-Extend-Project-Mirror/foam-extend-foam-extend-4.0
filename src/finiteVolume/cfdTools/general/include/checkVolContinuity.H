@@ -5,7 +5,8 @@ if (mesh.moving())
 
     const scalarField& V = mesh.V().field();
     const scalarField& V0 = mesh.V0().field();
-    scalar sumV = gSum(V);
+    scalar sumV = sum(V);
+    scalar sumV0 = sum(V0);
 
     scalarField volChange = (1.0 - V0/V)/dt;
 
@@ -44,6 +45,7 @@ if (mesh.moving())
 
     Info<< "volume continuity errors : "
         << "volume = " << sumV
+        << ", old volume = " << sumV0
         << ", max error = " << maxMotionError
         << ", sum local = " << sumLocalContErr
         << ", global = " << globalContErr << endl;

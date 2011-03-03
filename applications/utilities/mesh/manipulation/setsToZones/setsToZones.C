@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
         ++iter
     )
     {
-        // Not in memory. Load it.
+        // Set not in memory. Load it.
         pointSet set(*iter());
         SortableList<label> pointLabels(set.toc());
 
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
         ++iter
     )
     {
-        // Not in memory. Load it.
+        // Set not in memory. Load it.
         faceSet set(*iter());
         SortableList<label> faceLabels(set.toc());
 
@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
     {
         if (!masterCellSets.found(iter.key()))
         {
-            // Not in memory. Load it.
+            // Set not in memory. Load it.
             cellSet set(*iter());
             SortableList<label> cellLabels(set.toc());
 
