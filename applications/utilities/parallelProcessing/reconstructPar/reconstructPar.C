@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 
     bool noLagrangian = args.optionFound("noLagrangian");
 
-    // determine the processor count directly
+    // Determine the processor count directly
     label nProcs = 0;
     while (isDir(args.path()/(word("processor") + name(nProcs))))
     {
