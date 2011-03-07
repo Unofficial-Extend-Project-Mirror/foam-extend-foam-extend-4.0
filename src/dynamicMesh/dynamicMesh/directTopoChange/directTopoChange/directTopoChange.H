@@ -87,7 +87,6 @@ namespace Foam
 class face;
 class primitiveMesh;
 class polyMesh;
-class fvMesh;
 class Time;
 class fileName;
 class polyBoundaryMesh;
@@ -582,9 +581,9 @@ public:
             //- Create new mesh with old mesh patches
             autoPtr<mapPolyMesh> makeMesh
             (
-                autoPtr<fvMesh>& newMesh,
+                autoPtr<polyMesh>& newMesh,
                 const IOobject& io,
-                const fvMesh& mesh,
+                const polyMesh& mesh,
                 const bool syncParallel = true,
                 const bool orderCells = false,
                 const bool orderPoints = false
