@@ -178,7 +178,7 @@ void Foam::attachDetach::detachInterface
                 polyModifyFace
                 (
                     faces[curFaceID].reverseFace(), // modified face
-                    curFaceID,                   // label of face being modified
+                    curFaceID,                 // label of face being modified
                     nei[curFaceID],                 // owner
                     -1,                             // neighbour
                     true,                           // face flip
