@@ -93,7 +93,10 @@ void Foam::slidingInterface::checkDefinition() const
         FatalErrorIn
         (
             "void slidingInterface::checkDefinition()"
-        )   << "Not all zones and patches needed in the definition "
+        )   << "Sliding interface object " << name() << " :" << nl
+            << "    master face zone: " << masterFaceZoneID_.index() << nl
+            << "    slave face zone: " << slaveFaceZoneID_.index() << nl
+            << "Not all zones and patches needed in the definition "
             << "have been found.  Please check your mesh definition." << nl
             << "Error code: "
             << masterFaceZoneID_.active() << slaveFaceZoneID_.active()
@@ -110,7 +113,10 @@ void Foam::slidingInterface::checkDefinition() const
     )
     {
         FatalErrorIn("void slidingInterface::checkDefinition()")
-            << "Master or slave face zone contain no faces.  "
+            << "Sliding interface object " << name() << " :" << nl
+            << "    master face zone: " << masterFaceZoneID_.index() << nl
+            << "    slave face zone: " << slaveFaceZoneID_.index() << nl
+            << "Master or slave face zone contain no faces "
             << "Please check your mesh definition."
             << abort(FatalError);
     }
@@ -146,8 +152,13 @@ void Foam::slidingInterface::checkDefinition() const
             if (nSharedPoints > 0)
             {
                 FatalErrorIn("void slidingInterface::checkDefinition()")
+                    << "Sliding interface object " << name() << " :" << nl
+                    << "    master face zone: "
+                    << masterFaceZoneID_.index() << nl
+                    << "    slave face zone: "
+                    << slaveFaceZoneID_.index() << nl
                     << "Master and slave face zone share " << nSharedPoints
-                    << " point.  This is not allowed." << nl 
+                    << " point.  This is not allowed." << nl
                     << "Please check mesh for topological errors."
                     << abort(FatalError);
             }
@@ -474,7 +485,7 @@ void Foam::slidingInterface::setRefinement(polyTopoChange& ref) const
         }
 
         coupleInterface(ref);
-        
+
         trigger_ = false;
     }
 }
@@ -484,7 +495,7 @@ void Foam::slidingInterface::modifyMotionPoints(pointField& motionPoints) const
 {
     if (debug)
     {
-        Pout<< "void slidingInterface::modifyMotionPoints(" 
+        Pout<< "void slidingInterface::modifyMotionPoints("
             << "pointField& motionPoints) const for object " << name() << " : "
             << "Adjusting motion points." << endl;
     }
@@ -539,7 +550,7 @@ void Foam::slidingInterface::modifyMotionPoints(pointField& motionPoints) const
             else
             {
                 // A cut point is not a projected slave point.  Therefore, it
-                // must be an edge-to-edge intersection.  
+                // must be an edge-to-edge intersection.  HJ, 24/Jul/2003
 
                 Map<Pair<edge> >::const_iterator cpepmIter =
                     cpepm.find(cutPoints[pointI]);
@@ -553,7 +564,7 @@ void Foam::slidingInterface::modifyMotionPoints(pointField& motionPoints) const
                     // slidingInterface::coupleInterface.  This is done for
                     // efficiency reasons and avoids multiple creation of
                     // cutting planes.  Please update both simultaneously.
-                    // 
+                    // HJ, 28/Jul/2003
                     const edge& globalMasterEdge = cpepmIter().first();
 
                     const label curMasterEdgeIndex =
@@ -636,7 +647,7 @@ void Foam::slidingInterface::modifyMotionPoints(pointField& motionPoints) const
                         if (slaveCut.hit())
                         {
                             // Strict checking of slave cut to avoid capturing
-                            // end points.  
+                            // end points.  HJ, 15/Oct/2004
                             scalar cutOnSlave =
                                 (
                                     (
@@ -669,7 +680,7 @@ void Foam::slidingInterface::modifyMotionPoints(pointField& motionPoints) const
                                 << cme.line(masterLocalPoints)
                                 << " slave edge: " << curSlaveLine
                                 << " point: " << masterCutPoint
-                                << " weight: " << 
+                                << " weight: " <<
                                 (
                                     (
                                         slaveCut.missPoint()
@@ -711,7 +722,7 @@ void Foam::slidingInterface::updateMesh(const mapPolyMesh& m)
 {
     if (debug)
     {
-        Pout<< "void slidingInterface::updateMesh(const mapPolyMesh& m)" 
+        Pout<< "void slidingInterface::updateMesh(const mapPolyMesh& m)"
             << " const for object " << name() << " : "
             << "Updating topology." << endl;
     }
