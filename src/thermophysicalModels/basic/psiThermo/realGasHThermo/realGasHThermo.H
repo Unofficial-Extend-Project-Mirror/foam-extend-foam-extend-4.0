@@ -91,7 +91,6 @@ public:
         //- Construct from mesh
         realGasHThermo(const fvMesh&);
 
-
     //- Destructor
     virtual ~realGasHThermo();
 
@@ -129,54 +128,32 @@ public:
                 return h_;
             }
 
-
         // Fields derived from thermodynamic state variables
-
-
-
-
 
             //- Enthalpy for cell-set [J/kg]
             virtual tmp<scalarField> h
             (
-		const scalarField& p,
                 const scalarField& T,
                 const labelList& cells
             ) const;
 
-
-
             //- Enthalpy for patch [J/kg]
             virtual tmp<scalarField> h
             (
-	        const scalarField& p,
                 const scalarField& T,
                 const label patchi
             ) const;
-
-            //- Psi for patch [J/kg]
-            virtual tmp<scalarField> psi
-            (
-	        const scalarField& rho,
-                const scalarField& T,
-                const label patchi
-            ) const;
-
 
             //- Density for patch [J/kg]
             virtual tmp<scalarField> rho
             (
-	        const scalarField& p,
                 const scalarField& T,
                 const label patchi
             ) const;
 
-
-
             //- Heat capacity at constant pressure for patch [J/kg/K]
             virtual tmp<scalarField> Cp
             (
-		const scalarField& p,
                 const scalarField& T,
                 const label patchi
             ) const;
@@ -187,7 +164,6 @@ public:
             //- Heat capacity at constant volume for patch [J/kg/K]
             virtual tmp<scalarField> Cv
             (
-	        const scalarField& rho, 
                 const scalarField& T,
                 const label patchi
             ) const;
@@ -195,13 +171,8 @@ public:
             //- Heat capacity at constant volume [J/kg/K]
             virtual tmp<volScalarField> Cv() const;
 
-
-         //- Density [kg/m^3] - uses current value of pressure
-             virtual tmp<volScalarField> rho() const
-            {
-	
-                return rho_*1;   		
-            }
+            //- Density [kg/m^3] - uses current value of pressure
+            virtual tmp<volScalarField> rho() const;
 
 
         //- Read thermophysicalProperties dictionary

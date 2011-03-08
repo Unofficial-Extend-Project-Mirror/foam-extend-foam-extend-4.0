@@ -268,8 +268,8 @@ inline scalar aungierRedlichKwong::rho(
  
    scalar molarVolumePrevIteration;
    scalar molarVolume;
-   int iter=0;
-   int maxIter_=400;
+   label iter=0;
+   label maxIter_=400;
    scalar tol_=1e-8;
    scalar rho1=rhoMax_;
    scalar rho2=rhoMin_;

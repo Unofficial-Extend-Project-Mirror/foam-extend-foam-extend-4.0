@@ -114,15 +114,11 @@ void gradientInternalEnergyFvPatchScalarField::updateCoeffs()
 
     Tw.evaluate();
 
-    fvPatchScalarField& pw =
-        const_cast<fvPatchScalarField&>(thermo.p().boundaryField()[patchi]);
-    pw.evaluate();
-
-    gradient() = thermo.Cv(pw,Tw, patchi)*Tw.snGrad()
+    gradient() = thermo.Cv(Tw, patchi)*Tw.snGrad()
       + patch().deltaCoeffs()*
         (
-            thermo.e(pw,Tw, patchi)
-          - thermo.e(pw,Tw, patch().faceCells())
+            thermo.e(Tw, patchi)
+          - thermo.e(Tw, patch().faceCells())
         );
 
     fixedGradientFvPatchScalarField::updateCoeffs();

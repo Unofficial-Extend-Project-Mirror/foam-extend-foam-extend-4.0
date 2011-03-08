@@ -112,7 +112,7 @@ void Foam::fixedEnthalpyFvPatchScalarField::updateCoeffs()
         dimensionedInternalField().name() == db().mangleFileName("h")
     )
     {
-        operator==(pw,thermo.h(Tw, patchi));
+        operator==(pw, thermo.h(Tw, patchi));
     }
     else if
     (
@@ -122,7 +122,7 @@ void Foam::fixedEnthalpyFvPatchScalarField::updateCoeffs()
     }
     else
     {
-        operator==(pw,thermo.hs(Tw, patchi));
+        operator==(pw, thermo.hs(Tw, patchi));
     }
 
     fixedValueFvPatchScalarField::updateCoeffs();

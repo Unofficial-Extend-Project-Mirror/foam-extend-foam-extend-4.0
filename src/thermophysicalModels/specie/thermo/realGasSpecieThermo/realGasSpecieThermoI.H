@@ -65,8 +65,8 @@ inline void Foam::realGasSpecieThermo<thermo>::T
     scalar rho=rho0;
     scalar Ttol = T0*tol_;
     scalar rhotol=rho0*tol_;
-    int iter = 0;
-    int i;
+    label iter = 0;
+    label i;
 
     do
     {
@@ -206,12 +206,11 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::psiH
     
 ) const
 {
-    scalar cp=this->cp(rho,T);
+
     scalar beta=this->isobarExpCoef(rho,T);
     return  
     -(
-        T*pow(beta,2)/cp
-        -beta/cp
+        (T*pow(beta,2)-beta)/this->cp(rho,T)
         -this->isothermalCompressiblity(rho,T)*rho/this->W()
     )*this->W();
 }

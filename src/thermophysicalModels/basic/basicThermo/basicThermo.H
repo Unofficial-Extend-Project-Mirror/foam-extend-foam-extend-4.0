@@ -269,67 +269,7 @@ public:
             //- Thermal diffusivity for enthalpy of mixture [kg/m/s]
             virtual const volScalarField& alpha() const;
 
-
-
-            //-  enthalpy for cell-set [J/kg]
-            //function needed for real gases
-            virtual tmp<scalarField> h
-            (
-                const scalarField& rho,
-                const scalarField& T,
-                const labelList& cells
-            ) const;
-
-            //- enthalpy for patch [J/kg]
-	    //function needed for real gases
-            virtual tmp<scalarField> h
-            (
-                const scalarField& p,
-                const scalarField& T,
-                const label patchi
-            ) const;
-
-            //-  internal energy for cell-set [J/kg]
-            //function needed for real gases
-            virtual tmp<scalarField> e
-            (
-                const scalarField& rho,
-                const scalarField& T,
-                const labelList& cells
-            ) const;
-
-            //-  internal energy for patch [J/kg]
-	    //function needed for real gases
-            virtual tmp<scalarField> e
-            (
-                const scalarField& p,
-                const scalarField& T,
-                const label patchi
-            ) const;
-
-
-
-            //- Heat capacity at constant pressure for patch [J/kg/K]
-            //function needed for real gases
-            virtual tmp<scalarField> Cp
-            (
-                const scalarField& p,
-                const scalarField& T,
-                const label patchi
-            ) const;
-
-
-
-            //- Heat capacity at constant spec.Volume for patch [J/kg/K]
-            //function needed for real gases
-            virtual tmp<scalarField> Cv
-            (
-                const scalarField& p,
-                const scalarField& T,
-                const label patchi
-            ) const;
-
-
+       
         //- Read thermophysicalProperties dictionary
         virtual bool read();
 };

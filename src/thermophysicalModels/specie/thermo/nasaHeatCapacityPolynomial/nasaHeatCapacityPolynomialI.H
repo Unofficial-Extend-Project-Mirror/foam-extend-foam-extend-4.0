@@ -212,7 +212,7 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::cp
     // Problem --> dpdv(rho,T)  is =0 at some points within the vapour dome. To increase stability, (dp/dv) has to be limited 
     // cp can be negative within the vapor dome. To avoid this nonphysical result, the absolute value is used.
     // within the vapourdome and at the critical point, cp increases to very high values --> infinity, 
-    // this would decrease the stability, so cp will be limited to 20 time the cp @ STD    
+    // this would decrease the stability, so cp will be limited to 20 times the cp @ STD    
     return  
     min
     (
