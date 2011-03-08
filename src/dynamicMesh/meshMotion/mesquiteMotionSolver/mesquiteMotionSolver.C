@@ -36,6 +36,13 @@ License
 #include "pointPatchField.H"
 #include "pointMesh.H"
 
+#include "hexMatcher.H"
+#include "tetMatcher.H"
+#include "prismMatcher.H"
+#include "pyrMatcher.H"
+// #include "wedgeMatcher.H"
+// #include "tetWedgeMatcher.H"
+
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
@@ -73,6 +80,7 @@ mesquiteMotionSolver::mesquiteMotionSolver
     vtxCoords_(NULL),
     cellToNode_(NULL),
     fixFlags_(NULL),
+    mixedTypes_(NULL),
     refPoints_
     (
         IOobject
@@ -118,6 +126,7 @@ mesquiteMotionSolver::mesquiteMotionSolver
     vtxCoords_(NULL),
     cellToNode_(NULL),
     fixFlags_(NULL),
+    mixedTypes_(NULL),
     refPoints_
     (
         IOobject
@@ -153,11 +162,13 @@ void mesquiteMotionSolver::clearOut()
     delete [] vtxCoords_;
     delete [] cellToNode_;
     delete [] fixFlags_;
+    delete [] mixedTypes_;
 
     // Reset to NULL
     vtxCoords_ = NULL;
     cellToNode_ = NULL;
     fixFlags_ = NULL;
+    mixedTypes_ = NULL;
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -360,13 +371,87 @@ void mesquiteMotionSolver::readOptions()
         )
     );
 
-    // Read the optimization metric
-    qMetric_ = word(optionsDict.lookup("optMetric"));
+    qMetricTable_.insert
+    (
+        "EdgeLengthQuality",
+        autoPtr<Mesquite::QualityMetric>
+        (
+            new Mesquite::EdgeLengthQualityMetric
+        )
+    );
 
-    if (!qMetricTable_.found(qMetric_))
+    qMetricTable_.insert
+    (
+        "EdgeLength",
+        autoPtr<Mesquite::QualityMetric>
+        (
+            new Mesquite::EdgeLengthMetric
+        )
+    );
+
+    qMetricTable_.insert
+    (
+        "UntangleBeta",
+        autoPtr<Mesquite::QualityMetric>
+        (
+            new Mesquite::UntangleBetaQualityMetric
+        )
+    );
+
+    qMetricTable_.insert
+    (
+        "LocalSize",
+        autoPtr<Mesquite::QualityMetric>
+        (
+            new Mesquite::LocalSizeQualityMetric
+        )
+    );
+
+//     qMetricTable_.insert
+//     (
+//         "VolumeRatio",
+//         autoPtr<Mesquite::QualityMetric>
+//         (
+//             new Mesquite::VolumeRatioQualityMetric
+//         )
+//     );
+
+//     qMetricTable_.insert
+//     (
+//         "Multiply",
+//         autoPtr<Mesquite::QualityMetric>
+//         (
+//             new Mesquite::MultiplyQualityMetric
+//         )
+//     );
+
+    qMetric_.setSize(1);
+
+    if (optionsDict.found("optMetrics"))
+    {
+        const dictionary& optMetricsDict = optionsDict.subDict("optMetrics");
+
+        if (optMetricsDict.found("secondMetric"))
+        {
+            qMetric_.setSize(2);
+            qMetric_[1] = word(optMetricsDict.lookup("secondMetric"));
+        }
+
+        if (optMetricsDict.found("firstMetric"))
+        {
+            qMetric_[0] = word(optMetricsDict.lookup("firstMetric"));
+        }
+    }
+    else
+    {
+        // Read the optimization metric
+        qMetric_[0] = word(optionsDict.lookup("optMetric"));
+    }
+
+    if (!qMetricTable_.found(qMetric_[0]))
     {
         FatalErrorIn("void mesquiteMotionSolver::readOptions()")
-            << "Unrecognized quality metric: " << qMetric_ << nl
+            << "Unrecognized quality metric: " << qMetric_[0] << nl
             << "Available metrics are: " << nl << qMetricTable_.toc()
             << abort(FatalError);
     }
@@ -469,7 +554,7 @@ void mesquiteMotionSolver::readOptions()
                 (
                     new Mesquite::LInfTemplate
                     (
-                        &qMetricTable_[qMetric_]()
+                        &qMetricTable_[qMetric_[i]]()
                     )
                 );
 
@@ -485,7 +570,7 @@ void mesquiteMotionSolver::readOptions()
                 (
                     new Mesquite::LPtoPTemplate
                     (
-                        &qMetricTable_[qMetric_](),
+                        &qMetricTable_[qMetric_[i]](),
                         pValue,
                         err
                     )
@@ -501,7 +586,7 @@ void mesquiteMotionSolver::readOptions()
                 (
                     new Mesquite::MaxTemplate
                     (
-                        &qMetricTable_[qMetric_]()
+                        &qMetricTable_[qMetric_[i]]()
                     )
                 );
 
@@ -520,7 +605,7 @@ void mesquiteMotionSolver::readOptions()
                     new Mesquite::PMeanPTemplate
                     (
                         power,
-                        &qMetricTable_[qMetric_]()
+                        &qMetricTable_[qMetric_[i]]()
                     )
                 );
 
@@ -533,7 +618,7 @@ void mesquiteMotionSolver::readOptions()
                 (
                     new Mesquite::StdDevTemplate
                     (
-                        &qMetricTable_[qMetric_]()
+                        &qMetricTable_[qMetric_[i]]()
                     )
                 );
 
@@ -546,7 +631,7 @@ void mesquiteMotionSolver::readOptions()
                 (
                     new Mesquite::VarianceTemplate
                     (
-                        &qMetricTable_[qMetric_]()
+                        &qMetricTable_[qMetric_[i]]()
                     )
                 );
 
@@ -564,7 +649,7 @@ void mesquiteMotionSolver::readOptions()
                     new Mesquite::PatchPowerMeanP
                     (
                         power,
-                        &qMetricTable_[qMetric_]()
+                        &qMetricTable_[qMetric_[i]]()
                     )
                 );
 
@@ -711,7 +796,7 @@ void mesquiteMotionSolver::readOptions()
                 (
                     dynamic_cast<Mesquite::ElementQM*>
                     (
-                        &qMetricTable_[qMetric_]()
+                        &qMetricTable_[qMetric_[0]]()
                     )
                 )
             );
@@ -1053,13 +1138,22 @@ void mesquiteMotionSolver::initArrays()
         return;
     }
 
-    // Prepare arrays for mesquite
-    vtxCoords_ = new double[3 * nPoints_];
-    cellToNode_ = new unsigned long[4 * nCells_];
-    fixFlags_ = new int[nPoints_];
+    // Construct shape recognizers
+    hexMatcher hex;
+    tetMatcher tet;
+    prismMatcher prism;
+    pyrMatcher pyr;
+//     wedgeMatcher wedge;
+//     tetWedgeMatcher tetWedge;
 
-    // Set connectivity information
-    label cIndex = 0;
+    // Counters for different cell types
+    label nHex = 0;
+    label nTet = 0;
+    label nPrism = 0;
+    label nPyr = 0;
+//     label nWedge = 0;
+//     label nTetWedge = 0;
+    label nUnknown = 0;
 
     const faceList& meshFaces = mesh().faces();
     const cellList& meshCells = mesh().cells();
@@ -1067,38 +1161,135 @@ void mesquiteMotionSolver::initArrays()
 
     forAll(meshCells, cellI)
     {
-        const cell& curCell  = meshCells[cellI];
-        const face& currFace = meshFaces[curCell[0]];
-        const face& nextFace = meshFaces[curCell[1]];
-
-        // Get the fourth point
-        forAll(nextFace, pointI)
+        if (hex.isA(mesh(), cellI))
         {
-            if
-            (
-                nextFace[pointI] != currFace[0]
-             && nextFace[pointI] != currFace[1]
-             && nextFace[pointI] != currFace[2]
-            )
-            {
-                // Fill in cellPoints in order
-                if (owner[curCell[0]] == cellI)
-                {
-                    cellToNode_[cIndex++] = currFace[2];
-                    cellToNode_[cIndex++] = currFace[1];
-                    cellToNode_[cIndex++] = currFace[0];
-                    cellToNode_[cIndex++] = nextFace[pointI];
-                }
-                else
-                {
-                    cellToNode_[cIndex++] = currFace[0];
-                    cellToNode_[cIndex++] = currFace[1];
-                    cellToNode_[cIndex++] = currFace[2];
-                    cellToNode_[cIndex++] = nextFace[pointI];
-                }
+            nHex++;
+        }
+        else if (tet.isA(mesh(), cellI))
+        {
+            nTet++;
+        }
+        else if (pyr.isA(mesh(), cellI))
+        {
+            nPyr++;
+        }
+        else if (prism.isA(mesh(), cellI))
+        {
+            nPrism++;
+        }
+        // I think these are not supported by mesquite
+//         else if (wedge.isA(mesh(), cellI))
+//         {
+//             nWedge++;
+//         }
+//         else if (tetWedge.isA(mesh(), cellI))
+//         {
+//             nTetWedge++;
+//         }
+        else
+        {
+            // TODO: You will need to count all face points from these
+            // polyhedra to get the correct number of tets
+            // OR: improve the polyhedra support of mesquite
+//             nUnknown++;
+            Info << "You will need to count all face points from these "
+                 << "polyhedra to get the correct number of tets!"
+                 << endl;
+        }
+    }
 
-                break;
+    Info << "nHex     = " << nHex << endl
+         << "nTet     = " << nTet << endl
+         << "nPyr     = " << nPyr << endl
+         << "nPrism   = " << nPrism << endl
+         << "nUnknown = " << nUnknown << endl;
+
+    // Prepare arrays for mesquite
+    vtxCoords_ = new double[3 * nPoints_];
+    cellToNode_ = new unsigned long[8*nHex+4*nTet+5*nPyr+6*nPrism+nUnknown];
+    fixFlags_ = new int[nPoints_];
+    mixedTypes_ = new Mesquite::EntityTopology[nCells_];
+
+    // Set connectivity information
+    label cIndex = 0;
+    label cellIndex = 0;
+
+    forAll(meshCells, cellI)
+    {
+        if (hex.isA(mesh(), cellI))
+        {
+            hex.matchShape
+            (
+                false,
+                meshFaces,
+                owner,
+                cellI,
+                meshCells[cellI]
+            );
+            const labelList& pointLabelList = hex.vertLabels();
+            forAll(pointLabelList, pointI)
+            {
+                cellToNode_[cIndex++] = pointLabelList[pointI];
             }
+            mixedTypes_[cellIndex++] = Mesquite::HEXAHEDRON;
+        }
+        else if (tet.isA(mesh(), cellI))
+        {
+            tet.matchShape
+            (
+                false,
+                meshFaces,
+                owner,
+                cellI,
+                meshCells[cellI]
+            );
+            const labelList& pointLabelList = tet.vertLabels();
+            forAll(pointLabelList, pointI)
+            {
+                cellToNode_[cIndex++] = pointLabelList[pointI];
+            }
+            mixedTypes_[cellIndex++] = Mesquite::TETRAHEDRON;
+        }
+        else if (pyr.isA(mesh(), cellI))
+        {
+            pyr.matchShape
+            (
+                false,
+                meshFaces,
+                owner,
+                cellI,
+                meshCells[cellI]
+            );
+            // TODO: Check numbering of pyramids in mesquite!
+            const labelList& pointLabelList = pyr.vertLabels();
+            forAll(pointLabelList, pointI)
+            {
+                cellToNode_[cIndex++] = pointLabelList[pointI];
+            }
+            mixedTypes_[cellIndex++] = Mesquite::PYRAMID;
+        }
+        else if (prism.isA(mesh(), cellI))
+        {
+            prism.matchShape
+            (
+                false,
+                meshFaces,
+                owner,
+                cellI,
+                meshCells[cellI]
+            );
+            const labelList& pointLabelList = prism.vertLabels();
+            forAll(pointLabelList, pointI)
+            {
+                cellToNode_[cIndex++] = pointLabelList[pointI];
+            }
+            mixedTypes_[cellIndex++] = Mesquite::PRISM;
+        }
+        else
+        {
+            // TODO: These cells have to be decomposed into tet4 elements
+            Info << "tet decomposition of polyhedra is not yet supported!"
+                 << endl;
         }
     }
 
@@ -1121,6 +1312,25 @@ void mesquiteMotionSolver::initArrays()
         forAll(meshPointLabels, pointI)
         {
             fixFlags_[meshPointLabels[pointI]] = 1;
+        }
+    }
+
+    // Fetch the sub-dictionary
+    const dictionary& optionsDict = subDict("mesquiteOptions");
+
+    // fix additional points
+    if (optionsDict.found("fixPointsZone"))
+    {
+        word fixPoints = word(optionsDict.lookup("fixPointsZone"));
+
+        label zoneID = mesh().pointZones().findZoneID(fixPoints);
+        if (zoneID > -1)
+        {
+            const pointZone& fixedPointLabels = mesh().pointZones()[zoneID];
+            forAll(fixedPointLabels, pointI)
+            {
+                fixFlags_[fixedPointLabels[pointI]] = 1;
+            }
         }
     }
 
@@ -1901,6 +2111,21 @@ void mesquiteMotionSolver::solve()
 
     Mesquite::MsqError err;
 
+//     //- ArrayMesh object defined by Mesquite
+//     Mesquite::ArrayMesh
+//     msqMesh
+//     (
+//         3,                         // Number of coords per vertex
+//         nPoints_,                  // Number of vertices
+//         vtxCoords_,                // The vertex coordinates
+//         fixFlags_,                 // Fixed vertex flags
+//         nCells_,                   // Number of elements
+//         Mesquite::TETRAHEDRON,     // Element type
+//         cellToNode_,               // Connectivity
+//         false,                     // Fortran-style array indexing
+//         4                          // Number of nodes per element
+//     );
+
     //- ArrayMesh object defined by Mesquite
     Mesquite::ArrayMesh
     msqMesh
@@ -1910,10 +2135,10 @@ void mesquiteMotionSolver::solve()
         vtxCoords_,                // The vertex coordinates
         fixFlags_,                 // Fixed vertex flags
         nCells_,                   // Number of elements
-        Mesquite::TETRAHEDRON,     // Element type
-        cellToNode_,               // Connectivity
-        false,                     // Fortran-style array indexing
-        4                          // Number of nodes per element
+        mixedTypes_,               // array with all Element types
+        cellToNode_,               // Connectivity - globel vertex indices
+        NULL,                      // Element offset connectivity
+        false                      // Fortran-style array indexing
     );
 
     // Create an instruction queue
@@ -1924,10 +2149,19 @@ void mesquiteMotionSolver::solve()
     optAlgorithm_->set_inner_termination_criterion(&tcInner_);
 
     // Set up the quality assessor
-    Mesquite::QualityAssessor qA(&qMetricTable_[qMetric_]());
+    Mesquite::QualityAssessor qA(&qMetricTable_[qMetric_[0]]());
 
     // Assess the quality of the initial mesh before smoothing
     queue.add_quality_assessor(&qA, err);
+
+    // Set up second optional quality assessor
+    Mesquite::QualityAssessor qASecond;
+
+    if (qMetric_.size() == 2 )
+    {
+        qASecond.add_quality_assessment(&qMetricTable_[qMetric_[1]]());
+        queue.add_quality_assessor(&qASecond, err);
+    }
 
     // Set the master quality improver
     queue.set_master_quality_improver
@@ -1938,11 +2172,16 @@ void mesquiteMotionSolver::solve()
 
     // Assess the quality of the final mesh after smoothing
     queue.add_quality_assessor(&qA, err);
+    if (qMetric_.size() == 2 )
+    {
+        queue.add_quality_assessor(&qASecond, err);
+    }
 
     // Disable slave output for parallel runs.
     if (Pstream::parRun() && !Pstream::master())
     {
         qA.disable_printing_results();
+        qASecond.disable_printing_results();
     }
 
     // Launches optimization on the mesh

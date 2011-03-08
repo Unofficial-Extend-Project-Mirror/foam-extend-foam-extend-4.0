@@ -120,6 +120,9 @@ class mesquiteMotionSolver
         //- Flag array for vertices (fixed/free)
         mutable int* fixFlags_;
 
+        //- array with element types
+        mutable Mesquite::EntityTopology* mixedTypes_;
+
         //- Reference points
         mutable pointIOField refPoints_;
 
@@ -131,7 +134,7 @@ class mesquiteMotionSolver
         Map<Map<label> > auxSurfPointMap_;
 
         //- The quality metric
-        word qMetric_;
+        List<word> qMetric_;
 
         //- Pointers to base element metric class
         HashTable<autoPtr<Mesquite::QualityMetric> > qMetricTable_;
