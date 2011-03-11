@@ -36,7 +36,7 @@ namespace Foam
 
 /* * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * */
 
-// Return a string representation of a complex
+// Return a string representation of a FadOne
 template<int nVars>
 word name(const FadOne<nVars>&);
 
