@@ -30,15 +30,16 @@ Description
 
 Typedef
     Foam::wordHashSet
+    Foam::labelHashSet
 
 Description
     A HashSet with (the default) word keys.
 
 Typedef
-    Foam::labelHashSet
+    Foam::HashSet
 
 Description
-    A HashSet with label keys.
+    A HashSet with default word keys.
 
 \*---------------------------------------------------------------------------*/
 
