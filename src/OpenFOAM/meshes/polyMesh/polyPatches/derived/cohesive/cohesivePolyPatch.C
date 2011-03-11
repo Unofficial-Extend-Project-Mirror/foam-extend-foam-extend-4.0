@@ -136,9 +136,9 @@ bool cohesivePolyPatch::order
     }
 
     label oldFacesStartIndex = -1;
-    for(label i=0; i<topoFaceMap.size(); i=i+2)
+    for (label i = 0; i < topoFaceMap.size(); i += 2)
     {
-        if(topoFaceMap[i+1]-topoFaceMap[i] == 1)
+        if (topoFaceMap[i + 1] - topoFaceMap[i] == 1)
         {
             oldFacesStartIndex = i;
             break;
@@ -146,10 +146,10 @@ bool cohesivePolyPatch::order
     }
 
     label oldFacesSize = 0;
-    if(oldFacesStartIndex != -1)
+    if (oldFacesStartIndex != -1)
     {
         oldFacesSize = oldFacesSize + 2;
-        for (label i = oldFacesStartIndex+2; i < topoFaceMap.size(); i += 2)
+        for (label i = oldFacesStartIndex + 2; i < topoFaceMap.size(); i += 2)
         {
             oldFacesSize += 2*(topoFaceMap[i + 1]-topoFaceMap[i]);
         }
@@ -164,7 +164,7 @@ bool cohesivePolyPatch::order
         // Calculate normals
         vectorField normals(pp.size());
 
-        forAll(pp, faceI)
+        forAll (pp, faceI)
         {
             normals[faceI] = pp[faceI].normal(pp.points());
         }
@@ -176,7 +176,7 @@ bool cohesivePolyPatch::order
 
         label sizeByTwo = oldFacesSize/2;
 
-        if(oldFacesStartIndex != -1)
+        if (oldFacesStartIndex != -1)
         {
             for
             (
@@ -189,7 +189,7 @@ bool cohesivePolyPatch::order
                 half1ToPatch[n1Faces++] = i + sizeByTwo;
             }
 
-            for (label i=0; i<oldFacesStartIndex; i += 2)
+            for (label i = 0; i < oldFacesStartIndex; i += 2)
             {
                 half0ToPatch[n0Faces++] = i;
                 half1ToPatch[n1Faces++] = i + 1;
@@ -199,7 +199,7 @@ bool cohesivePolyPatch::order
             (
                 label i=oldFacesStartIndex+oldFacesSize;
                 i<topoFaceMap.size();
-                i=i+2
+                i = i + 2
             )
             {
                 half0ToPatch[n0Faces++] = i;
@@ -210,9 +210,9 @@ bool cohesivePolyPatch::order
         {
             for
             (
-                label i=0;
-                i<topoFaceMap.size();
-                i=i+2
+                label i = 0;
+                i < topoFaceMap.size();
+                i += 2
             )
             {
                 half0ToPatch[n0Faces++] = i;
@@ -259,7 +259,7 @@ bool cohesivePolyPatch::order
         faceMap[patchFaceI] = half0ToPatch.size() + faceI;
     }
 
-    forAll(faceMap, faceI)
+    forAll (faceMap, faceI)
     {
         if (faceMap[faceI] != faceI)
         {

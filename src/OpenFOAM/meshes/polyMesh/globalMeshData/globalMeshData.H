@@ -27,9 +27,9 @@ Class
 
 Description
     Various mesh related information for a parallel run. Upon construction
-    constructs all info by using parallel communication. 
+    constructs all info by using parallel communication.
 
-    Requires: 
+    Requires:
     - all processor patches to have correct ordering.
     - all processorPatches to have their transforms set ('makeTransforms')
 
@@ -148,7 +148,7 @@ class globalMeshData
 
         // Processor patch addressing (be careful if not running in parallel!)
 
-            //- List of processor patch labels 
+            //- List of processor patch labels
             //  (size of list = number of processor patches)
             labelList processorPatches_;
 
