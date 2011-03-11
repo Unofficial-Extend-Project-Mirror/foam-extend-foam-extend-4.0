@@ -166,10 +166,10 @@ public:
         inline FadOne();
 
         //- Construct from value
-        inline FadOne(const double& v);
+        explicit inline FadOne(const double& v);
 
         //- Construct from Istream
-        inline FadOne(Istream&);
+        explicit inline FadOne(Istream&);
 
         //- Construct as copy
         inline FadOne(const FadOne<nVars>&);
