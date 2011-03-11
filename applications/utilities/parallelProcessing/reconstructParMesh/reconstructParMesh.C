@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
 
             if (writeCellDist)
             {
-                // Write as volScalarField for postprocessing.
+                // Write as volScalarField for post-processing
                 volScalarField cellDist
                 (
                     IOobject
