@@ -80,7 +80,7 @@ calcMeshData() const
     // In <= 1.5 the meshPoints would be in increasing order but this gives
     // problems in processor point synchronisation where we have to find out
     // how the opposite side would have allocated points.
-    
+
     // Note:
     // ~~~~~
     // This is all garbage.  All -ext versions will preserve strong ordering

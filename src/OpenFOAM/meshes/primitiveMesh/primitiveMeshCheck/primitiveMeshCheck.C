@@ -751,7 +751,6 @@ bool Foam::primitiveMesh::checkFaceSkewness
         {
             Info<< " ***Max skewness = " << maxSkew
                 << ", " << nWarnSkew << " highly skew faces detected"
-                << " which may impair the quality of the results"
                 << " Threshold = " << skewThreshold_
                 << endl;
         }

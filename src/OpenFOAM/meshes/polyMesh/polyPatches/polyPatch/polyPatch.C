@@ -256,6 +256,7 @@ Foam::scalarField Foam::polyPatch::calcFaceTol
 
         tols[faceI] = matchTol_*maxLen;
     }
+
     return tols;
 }
 

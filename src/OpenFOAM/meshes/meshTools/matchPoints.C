@@ -59,7 +59,7 @@ bool Foam::matchPoints
 
     SortableList<scalar> pts1MagSqr(magSqr(pts1 - compareOrigin));
 
-    forAll(pts0MagSqr, i)
+    forAll (pts0MagSqr, i)
     {
         scalar dist0 = pts0MagSqr[i];
 
@@ -78,7 +78,7 @@ bool Foam::matchPoints
         // Go through range of equal mag and find nearest vector.
         scalar minDistSqr = VGREAT;
         label minFaceI = -1;
-    
+
         for
         (
             label j = startI;
@@ -90,6 +90,7 @@ bool Foam::matchPoints
         )
         {
             label faceI = pts1MagSqr.indices()[j];
+
             // Compare actual vectors
             scalar distSqr = magSqr(pts0[face0I] - pts1[faceI]);
 
