@@ -121,7 +121,7 @@ public:
                         this->mesh()
                     ),
                     this->mesh(),
-                    dimless
+                    dimensionedScalar("upwindLimiter", dimless, 0)
                 )
             );
         }
