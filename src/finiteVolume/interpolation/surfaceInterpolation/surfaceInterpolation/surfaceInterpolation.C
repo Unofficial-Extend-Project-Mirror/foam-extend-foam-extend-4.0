@@ -169,7 +169,7 @@ void Foam::surfaceInterpolation::makeWeights() const
     // ... and reference to the internal field of the weighting factors
     scalarField& w = weightingFactors.internalField();
 
-    forAll(owner, facei)
+    forAll (owner, facei)
     {
         // Note: mag in the dot-product.
         // For all valid meshes, the non-orthogonality will be less that
@@ -181,7 +181,7 @@ void Foam::surfaceInterpolation::makeWeights() const
         w[facei] = SfdNei/(SfdOwn + SfdNei);
     }
 
-    forAll(mesh_.boundary(), patchi)
+    forAll (mesh_.boundary(), patchi)
     {
         mesh_.boundary()[patchi].makeWeights
         (
@@ -233,7 +233,7 @@ void Foam::surfaceInterpolation::makeDeltaCoeffs() const
     const surfaceVectorField& Sf = mesh_.Sf();
     const surfaceScalarField& magSf = mesh_.magSf();
 
-    forAll(owner, facei)
+    forAll (owner, facei)
     {
         vector delta = C[neighbour[facei]] - C[owner[facei]];
         vector unitArea = Sf[facei]/magSf[facei];
@@ -251,7 +251,7 @@ void Foam::surfaceInterpolation::makeDeltaCoeffs() const
         DeltaCoeffs[facei] = 1.0/max(unitArea & delta, 0.05*mag(delta));
     }
 
-    forAll(DeltaCoeffs.boundaryField(), patchi)
+    forAll (DeltaCoeffs.boundaryField(), patchi)
     {
         mesh_.boundary()[patchi].makeDeltaCoeffs
         (
@@ -291,19 +291,22 @@ void Foam::surfaceInterpolation::makeCorrectionVectors() const
     const surfaceScalarField& magSf = mesh_.magSf();
     const surfaceScalarField& DeltaCoeffs = deltaCoeffs();
 
-    forAll(owner, facei)
+    forAll (owner, facei)
     {
         vector unitArea = Sf[facei]/magSf[facei];
         vector delta = C[neighbour[facei]] - C[owner[facei]];
 
-        corrVecs[facei] = unitArea - delta*DeltaCoeffs[facei];
+        // If non-orthogonality is over 90 deg, kill correction vector
+        // HJ, 27/Feb/2011
+        corrVecs[facei] = pos(unitArea & delta)*
+            (unitArea - delta*DeltaCoeffs[facei]);
     }
 
     // Boundary correction vectors set to zero for boundary patches
     // and calculated consistently with internal corrections for
     // coupled patches
 
-    forAll(corrVecs.boundaryField(), patchI)
+    forAll (corrVecs.boundaryField(), patchI)
     {
         mesh_.boundary()[patchI].makeCorrVecs
         (
@@ -333,8 +336,6 @@ void Foam::surfaceInterpolation::makeCorrectionVectors() const
             << "maximum non-orthogonality = " << MaxNonOrthog << " deg."
             << endl;
     }
-
-    //MaxNonOrthog = 0.0;
 
     if (MaxNonOrthog < 5)
     {
