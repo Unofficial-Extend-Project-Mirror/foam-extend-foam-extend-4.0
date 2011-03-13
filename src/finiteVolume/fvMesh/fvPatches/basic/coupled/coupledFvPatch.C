@@ -56,7 +56,9 @@ void coupledFvPatch::makeCorrVecs(vectorField& cv) const
     vectorField patchDeltas = delta();
     vectorField n = nf();
 
-    cv = n - patchDeltas*patchDeltaCoeffs;
+    // If non-orthogonality is over 90 deg, kill correction vector
+    // HJ, 27/Feb/2011
+    cv = pos(n & patchDeltas)*(n - patchDeltas*patchDeltaCoeffs);
 }
 
 

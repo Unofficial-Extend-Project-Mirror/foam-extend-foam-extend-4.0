@@ -86,7 +86,7 @@ void Foam::overlapGgiFvPatch::makeCorrVecs(vectorField& cv) const
 {
     // Non-orthogonality correction on a ggi interface
     // MB, 7/April/2009
-    
+
     // Calculate correction vectors on coupled patches
     const scalarField& patchDeltaCoeffs = deltaCoeffs();
 
