@@ -115,7 +115,7 @@ tmp<vectorField> fvPatch::Cn() const
 
     const unallocLabelList& faceCells = this->faceCells();
 
-    // get reference to global cell centres
+    // Get reference to global cell centres
     const vectorField& gcc = boundaryMesh().mesh().cellCentres();
 
     forAll (faceCells, faceI)
@@ -165,13 +165,6 @@ void fvPatch::makeDeltaCoeffs(scalarField& dc) const
 
 void fvPatch::makeCorrVecs(vectorField& cv) const
 {
-    // Correction vector
-//     vectorField d = delta();
-//     vectorField n = nf();
-//     cv = n - d/(n & d);
-
-    // Old version: no non-orthogonal correction on the wall
-    // Testing.  HJ, 9/Apr/2009
     cv = vector::zero;
 }
 
