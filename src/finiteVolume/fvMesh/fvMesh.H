@@ -201,6 +201,21 @@ public:
             const bool syncPar = true
         );
 
+        //- Construct from cell shapes
+        fvMesh
+        (
+            const IOobject& io,
+            const Xfer<pointField>& points,
+            const cellShapeList& shapes,
+            const faceListList& boundaryFaces,
+            const wordList& boundaryPatchNames,
+            const wordList& boundaryPatchTypes,
+            const word& defaultBoundaryPatchName,
+            const word& defaultBoundaryPatchType,
+            const wordList& boundaryPatchPhysicalTypes,
+            const bool syncPar = true
+        );
+
 
     // Destructor
 
