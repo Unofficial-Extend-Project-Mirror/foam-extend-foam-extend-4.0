@@ -880,17 +880,20 @@ int main(int argc, char *argv[])
             }
             else
             {
-                // link with relative paths
+                // Link with relative paths
                 const string parentPath = string("..")/"..";
 
                 fileName currentDir(cwd());
                 chDir(timePath);
-                ln
-                (
-                    parentPath/runTime.timeName()/uniformDir,
-                    uniformDir
-                );
-                chDir(currentDir);
+                if (!exists(parentPath/runTime.timeName()/uniformDir))
+                {
+                    ln
+                    (
+                        parentPath/runTime.timeName()/uniformDir,
+                        uniformDir
+                    );
+                    chDir(currentDir);
+                }
             }
         }
     }
