@@ -30,7 +30,8 @@ Description
     condition which basically denotes the side of the face. In this application
     it reads a cellSet (xxxCells if 'xxx' is the name of the faceSet) which
     is the masterCells of the zone.  Master cell is the one IN FRONT of the
-    face, ie. the one into which the face normal points
+    face, ie. the one into which the face normal points.  If master cells are
+    not found, take faces without a flip
 
     If one is not interested in sidedness specify the -noFlipMap
     command line option.
@@ -162,74 +163,96 @@ int main(int argc, char *argv[])
             word setName(set.name() + "MasterCells");
 
             Info<< "Using cellSet " << setName
-                << " to determing the master side of the zone." << nl
+                << " to determine the master side of the zone." << nl
                 << endl;
 
             // Load corresponding cells
-            cellSet cells(mesh, setName);
+            cellSet cells
+            (
+                mesh,
+                setName,
+                IOobject::READ_IF_PRESENT
+            );
 
             // Store setName to exclude from cellZones further on
             masterCellSets.insert(setName);
 
-            forAll(faceLabels, i)
+            if (!cells.empty())
             {
-                label faceI = faceLabels[i];
-
-                bool flip = false;
-
-                if (mesh.isInternalFace(faceI))
+                forAll(faceLabels, i)
                 {
-                    if
-                    (
-                        cells.found(mesh.faceOwner()[faceI])
-                    && !cells.found(mesh.faceNeighbour()[faceI])
-                    )
+                    label faceI = faceLabels[i];
+
+                    bool flip = false;
+
+                    if (mesh.isInternalFace(faceI))
                     {
-                        // Fixed, using master zone.  HJ, 17/Feb/2011
-                        flip = true;
-                    }
-                    else if
-                    (
-                       !cells.found(mesh.faceOwner()[faceI])
-                     && cells.found(mesh.faceNeighbour()[faceI])
-                    )
-                    {
-                        // Fixed, using master zone.  HJ, 17/Feb/2011
-                        flip = false;
+                        if
+                        (
+                            cells.found(mesh.faceOwner()[faceI])
+                        && !cells.found(mesh.faceNeighbour()[faceI])
+                        )
+                        {
+                            // Fixed, using master zone.  HJ, 17/Feb/2011
+                            flip = true;
+                        }
+                        else if
+                        (
+                           !cells.found(mesh.faceOwner()[faceI])
+                         && cells.found(mesh.faceNeighbour()[faceI])
+                        )
+                        {
+                            // Fixed, using master zone.  HJ, 17/Feb/2011
+                            flip = false;
+                        }
+                        else
+                        {
+                            FatalErrorIn(args.executable())
+                                << "Pwner or neighbour of internal face "
+                                << faceI << " should be in cellSet "
+                                << cells.name()
+                                << " to be able to determine orientation."
+                                << nl << "Face:" << faceI
+                                << " own:" << mesh.faceOwner()[faceI]
+                                << " OwnInCellSet:"
+                                << cells.found(mesh.faceOwner()[faceI])
+                                << " nei:" << mesh.faceNeighbour()[faceI]
+                                << " NeiInCellSet:"
+                                << cells.found(mesh.faceNeighbour()[faceI])
+                                << abort(FatalError);
+                        }
                     }
                     else
                     {
-                        FatalErrorIn(args.executable())
-                            << "One of owner or neighbour of internal face "
-                            << faceI << " should be in cellSet "
-                            << cells.name()
-                            << " to be able to determine orientation." << nl
-                            << "Face:" << faceI
-                            << " own:" << mesh.faceOwner()[faceI]
-                            << " OwnInCellSet:"
-                            << cells.found(mesh.faceOwner()[faceI])
-                            << " nei:" << mesh.faceNeighbour()[faceI]
-                            << " NeiInCellSet:"
-                            << cells.found(mesh.faceNeighbour()[faceI])
-                            << abort(FatalError);
+                        if (cells.found(mesh.faceOwner()[faceI]))
+                        {
+                            // Fixed, using master zone.  HJ, 17/Feb/2011
+                            flip = true;
+                        }
+                        else
+                        {
+                            // Fixed, using master zone.  HJ, 17/Feb/2011
+                            flip = false;
+                        }
                     }
-                }
-                else
-                {
-                    if (cells.found(mesh.faceOwner()[faceI]))
-                    {
-                        // Fixed, using master zone.  HJ, 17/Feb/2011
-                        flip = true;
-                    }
-                    else
-                    {
-                        // Fixed, using master zone.  HJ, 17/Feb/2011
-                        flip = false;
-                    }
-                }
 
-                addressing.append(faceI);
-                flipMap.append(flip);
+                    addressing.append(faceI);
+                    flipMap.append(flip);
+                }
+            }
+            else
+            {
+                // Cell set not found or empty.  Using faces without flip
+                Info<< "cellSet " << setName
+                    << " not found or empty.  Setting flipMap to false" << nl
+                    << endl;
+
+                forAll(faceLabels, i)
+                {
+                    label faceI = faceLabels[i];
+                    addressing.append(faceI);
+                    flipMap.append(false);
+                }
             }
         }
         else
