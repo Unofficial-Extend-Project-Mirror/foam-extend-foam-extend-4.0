@@ -174,6 +174,15 @@ void epsilonWallFunctionFvPatchScalarField::updateCoeffs()
         return;
     }
 
+    // If G field is not present, execute zero gradient evaluation
+    // HJ, 20/Mar/2011
+    if (!db().foundObject<volScalarField>(GName_))
+    {
+        zeroGradientFvPatchScalarField::updateCoeffs();
+
+        return;
+    }
+
     const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
 
     const scalar Cmu25 = pow(Cmu_, 0.25);
