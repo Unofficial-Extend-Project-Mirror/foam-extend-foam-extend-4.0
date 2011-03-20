@@ -174,6 +174,15 @@ void omegaWallFunctionFvPatchScalarField::updateCoeffs()
         return;
     }
 
+    // If G field is not present, execute zero gradient evaluation
+    // HJ, 20/Mar/2011
+    if (!db().foundObject<volScalarField>(GName_))
+    {
+        zeroGradientFvPatchScalarField::evaluate();
+
+        return;
+    }
+
     const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
     const scalar yPlusLam = rasModel.yPlusLam(kappa_, E_);
     const scalarField& y = rasModel.y()[patch().index()];
