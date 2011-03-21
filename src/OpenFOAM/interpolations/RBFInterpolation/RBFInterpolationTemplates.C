@@ -107,11 +107,11 @@ Foam::tmp<Foam::Field<Type> > Foam::RBFInterpolation::interpolate
 
     forAll (allPoints_, flPoint)
     {
+        scalarField weights =
+            RBF_->weights(controlPoints_, allPoints_[flPoint]);
+
         forAll (controlPoints_, i)
         {
-            scalarField weights =
-                RBF_->weights(controlPoints_, allPoints_[flPoint]);
-
             result[flPoint] += weights[i]*alpha[i];
         }
 
