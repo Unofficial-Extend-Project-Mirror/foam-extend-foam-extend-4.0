@@ -54,12 +54,22 @@ vtkPolyData* Foam::vtkPV3Foam::faceZoneVTKMesh
 
     // Construct primitivePatch of faces in faceZone
 
-    const faceList& meshFaces = mesh.faces();
+    const faceList& meshFaces = mesh.allFaces();
     faceList patchFaces(faceLabels.size());
+    label npf = 0;
+
+    // Filter faces that are not in live mesh
+    // Bug fix.  HJ, 21/Mar/2011
     forAll(faceLabels, faceI)
     {
-        patchFaces[faceI] = meshFaces[faceLabels[faceI]];
+        if (faceLabels[faceI] < mesh.nFaces())
+        {
+            patchFaces[npf] = meshFaces[faceLabels[faceI]];
+            npf++;
+        }
     }
+    patchFaces.setSize(npf);
+
     primitiveFacePatch p(patchFaces, mesh.points());
 
 
@@ -69,7 +79,7 @@ vtkPolyData* Foam::vtkPV3Foam::faceZoneVTKMesh
     const pointField& points = p.localPoints();
 
     vtkPoints* vtkpoints = vtkPoints::New();
-    vtkpoints->Allocate( points.size() );
+    vtkpoints->Allocate(points.size());
     forAll(points, i)
     {
         vtkPV3FoamInsertNextPoint(vtkpoints, points[i]);
@@ -124,14 +134,28 @@ vtkPolyData* Foam::vtkPV3Foam::pointZoneVTKMesh
         printMemory();
     }
 
-    const pointField& meshPoints = mesh.points();
+    const pointField& meshPoints = mesh.allPoints();
+
+    // Filter point labels to include only live points
+    labelList pl(pointLabels.size());
+    label npl = 0;
+
+    forAll (pointLabels, pointI)
+    {
+        if (pointLabels[pointI] < mesh.nPoints())
+        {
+            pl[npl] = pointLabels[pointI];
+            npl++;
+        }
+    }
+    pl.setSize(npl);
 
     vtkPoints *vtkpoints = vtkPoints::New();
-    vtkpoints->Allocate( pointLabels.size() );
+    vtkpoints->Allocate( pl.size());
 
     forAll(pointLabels, pointI)
     {
-        vtkPV3FoamInsertNextPoint(vtkpoints, meshPoints[pointLabels[pointI]]);
+        vtkPV3FoamInsertNextPoint(vtkpoints, meshPoints[pl[pointI]]);
     }
 
     vtkmesh->SetPoints(vtkpoints);

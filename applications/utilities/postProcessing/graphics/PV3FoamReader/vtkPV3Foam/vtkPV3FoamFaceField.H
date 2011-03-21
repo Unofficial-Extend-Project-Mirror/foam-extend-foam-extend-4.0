@@ -53,6 +53,7 @@ void Foam::vtkPV3Foam::convertFaceField
 {
     const label nComp = pTraits<Type>::nComponents;
     const label nInternalFaces = mesh.nInternalFaces();
+    const label nFaces = mesh.nFaces();
     const labelList& faceOwner = mesh.faceOwner();
     const labelList& faceNeigh = mesh.faceNeighbour();
 
@@ -77,22 +78,31 @@ void Foam::vtkPV3Foam::convertFaceField
     // for boundary faces: owner
     forAll(faceLabels, faceI)
     {
+        // Bug fix: filter inactive faces.  HJ, 21/Mar/2011
         const label faceNo = faceLabels[faceI];
+
         if (faceNo < nInternalFaces)
         {
             Type t = 0.5*(tf[faceOwner[faceNo]] + tf[faceNeigh[faceNo]]);
 
-            for (direction d=0; d<nComp; d++)
+            for (direction d = 0; d < nComp; d++)
+            {
+                vec[d] = component(t, d);
+            }
+        }
+        else if (faceNo < nFaces)
+        {
+            const Type& t = tf[faceOwner[faceNo]];
+            for (direction d = 0; d < nComp; d++)
             {
                 vec[d] = component(t, d);
             }
         }
         else
         {
-            const Type& t = tf[faceOwner[faceNo]];
-            for (direction d=0; d<nComp; d++)
+            for (direction d = 0; d < nComp; d++)
             {
-                vec[d] = component(t, d);
+                vec[d] = 0;
             }
         }
         vtkOpenFOAMTupleRemap<Type>(vec);
@@ -124,6 +134,7 @@ void Foam::vtkPV3Foam::convertFaceField
 {
     const label nComp = pTraits<Type>::nComponents;
     const label nInternalFaces = mesh.nInternalFaces();
+    const label nFaces = mesh.nFaces();
     const labelList& faceOwner = mesh.faceOwner();
     const labelList& faceNeigh = mesh.faceNeighbour();
 
@@ -151,21 +162,29 @@ void Foam::vtkPV3Foam::convertFaceField
     {
         const label faceNo = iter.key();
 
+        // Bug fix: filter inactive faces.  HJ, 21/Mar/2011
         if (faceNo < nInternalFaces)
         {
             Type t = 0.5*(tf[faceOwner[faceNo]] + tf[faceNeigh[faceNo]]);
 
-            for (direction d=0; d<nComp; d++)
+            for (direction d = 0; d < nComp; d++)
+            {
+                vec[d] = component(t, d);
+            }
+        }
+        else if (faceNo < nFaces)
+        {
+            const Type& t = tf[faceOwner[faceNo]];
+            for (direction d = 0; d < nComp; d++)
             {
                 vec[d] = component(t, d);
             }
         }
         else
         {
-            const Type& t = tf[faceOwner[faceNo]];
-            for (direction d=0; d<nComp; d++)
+            for (direction d = 0; d < nComp; d++)
             {
-                vec[d] = component(t, d);
+                vec[d] = 0;
             }
         }
         vtkOpenFOAMTupleRemap<Type>(vec);
