@@ -76,8 +76,17 @@ public:
 
     // Constructors
 
+        //- Construct given radius
+        Gauss(const scalar radius);
+
         //- Construct from dictionary
         Gauss(const dictionary& dict);
+
+        //- Create and return a clone
+        virtual autoPtr<RBFFunction> clone() const
+        {
+            return autoPtr<RBFFunction>(new Gauss(this->radius_));
+        }
 
 
     // Destructor

@@ -105,44 +105,52 @@ Foam::tmp<Foam::Field<Type> > Foam::RBFInterpolation::interpolate
     // Evaluation
     scalar t;
 
+    // Algorithmic improvement, Matteo Lombardi.  21/Mar/2011
+
     forAll (allPoints_, flPoint)
     {
-        scalarField weights =
-            RBF_->weights(controlPoints_, allPoints_[flPoint]);
-
-        forAll (controlPoints_, i)
-        {
-            result[flPoint] += weights[i]*alpha[i];
-        }
-
-        if (polynomials_)
-        {
-            result[flPoint] +=
-                beta[0]
-              + beta[1]*allPoints_[flPoint].x()
-              + beta[2]*allPoints_[flPoint].y()
-              + beta[3]*allPoints_[flPoint].z();
-        }
-
         // Cut-off function to justify neglecting outer boundary points
         t = (Foam::mag(allPoints_[flPoint] - focalPoint_) - innerRadius_)/
             (outerRadius_ - innerRadius_);
 
-        scalar w;
-
-        if (t <= 0)
+        if (t >= 1)
         {
-            w = 1.0;
-        }
-        else if(t >= 1)
-        {
-            w = 0.0;
+            // Increment is zero: w = 0
+            result[flPoint] = 0*result[flPoint];
         }
         else
         {
-            w = 1 - sqr(t)*(3-2*t);
+            // Full calculation of weights
+            scalarField weights =
+                RBF_->weights(controlPoints_, allPoints_[flPoint]);
+
+            forAll (controlPoints_, i)
+            {
+                result[flPoint] += weights[i]*alpha[i];
+            }
+
+            if (polynomials_)
+            {
+                result[flPoint] +=
+                    beta[0]
+                  + beta[1]*allPoints_[flPoint].x()
+                  + beta[2]*allPoints_[flPoint].y()
+                  + beta[3]*allPoints_[flPoint].z();
+            }
+
+            scalar w;
+
+            if (t <= 0)
+            {
+                w = 1.0;
+            }
+            else
+            {
+                w = 1 - sqr(t)*(3-2*t);
+            }
+
+            result[flPoint] = w*result[flPoint];
         }
-        result[flPoint] = w*result[flPoint];
     }
 
     return tresult;

@@ -116,9 +116,6 @@ class RBFInterpolation
 
     // Private Member Functions
 
-        //- Disallow default bitwise copy construct
-        RBFInterpolation(const RBFInterpolation&);
-
         //- Disallow default bitwise assignment
         void operator=(const RBFInterpolation&);
 
@@ -144,6 +141,9 @@ public:
             const vectorField& controlPoints,
             const vectorField& allPoints
         );
+
+        //- Construct as copy
+        RBFInterpolation(const RBFInterpolation&);
 
 
     // Destructor
