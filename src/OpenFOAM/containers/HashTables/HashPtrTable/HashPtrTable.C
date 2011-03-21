@@ -51,7 +51,8 @@ HashPtrTable<T, Key, Hash>::HashPtrTable(const HashPtrTable<T, Key, Hash>& ht)
 {
     for (const_iterator iter = ht.begin(); iter != ht.end(); ++iter)
     {
-        insert(iter.key(), new T(**iter));
+        // Bug fix, Microsoft port.  HJ, 21/Mar/2011
+        insert(iter.key(), iter()->clone().ptr());
     }
 }
 
@@ -117,7 +118,10 @@ void HashPtrTable<T, Key, Hash>::clear()
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class T, class Key, class Hash>
-void HashPtrTable<T, Key, Hash>::operator=(const HashPtrTable<T, Key, Hash>& ht)
+void HashPtrTable<T, Key, Hash>::operator=
+(
+    const HashPtrTable<T, Key, Hash>& ht
+)
 {
     // Check for assignment to self
     if (this == &ht)
@@ -134,7 +138,8 @@ void HashPtrTable<T, Key, Hash>::operator=(const HashPtrTable<T, Key, Hash>& ht)
 
     for(const_iterator iter = ht.begin(); iter != ht.end(); ++iter)
     {
-        insert(iter.key(), new T(**iter));
+        // Bug fix, Microsoft port.  HJ, 21/Mar/2011
+        insert(iter.key(), iter()->clone().ptr());
     }
 }
 
