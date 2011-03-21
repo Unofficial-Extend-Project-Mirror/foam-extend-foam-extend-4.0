@@ -38,7 +38,13 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from dictionary
+Foam::TPS::TPS(const scalar radius)
+:
+    RBFFunction(),
+    radius_(radius)
+{}
+
+
 Foam::TPS::TPS(const dictionary& dict)
 :
     RBFFunction(),
@@ -65,7 +71,7 @@ Foam::tmp<Foam::scalarField> Foam::TPS::weights
 
     forAll(RBF, i)
     {
-        if(dist[i] != 0.0)
+        if (dist[i] > SMALL)
         {
             RBF[i] = sqr(dist[i])*log(dist[i]);
         }

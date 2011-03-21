@@ -183,6 +183,23 @@ Foam::RBFInterpolation::RBFInterpolation
 {}
 
 
+Foam::RBFInterpolation::RBFInterpolation
+(
+    const RBFInterpolation& rbf
+)
+:
+    dict_(rbf.dict_),
+    controlPoints_(rbf.controlPoints_),
+    allPoints_(rbf.allPoints_),
+    RBF_(rbf.RBF_->clone()),
+    BPtr_(NULL),
+    focalPoint_(rbf.focalPoint_),
+    innerRadius_(rbf.innerRadius_),
+    outerRadius_(rbf.outerRadius_),
+    polynomials_(rbf.polynomials_)
+{}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::RBFInterpolation::~RBFInterpolation()

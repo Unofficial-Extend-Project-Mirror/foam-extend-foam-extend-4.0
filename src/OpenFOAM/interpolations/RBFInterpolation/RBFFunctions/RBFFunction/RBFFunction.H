@@ -102,6 +102,9 @@ public:
         RBFFunction()
         {}
 
+        //- Create and return a clone
+        virtual autoPtr<RBFFunction> clone() const = 0;
+
 
     // Destructor
 
