@@ -33,9 +33,11 @@ cycleWrite      0;
 
 writeFormat     ascii;
 
-writeCompression uncompressed;
+writeCompression compressed;
 
 timeFormat      general;
+writePrecision  10;
+timePrecision   10;
 
 runTimeModifiable yes;
 
