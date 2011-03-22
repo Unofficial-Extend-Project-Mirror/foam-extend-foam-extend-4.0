@@ -49,8 +49,8 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 
 #   include "createEngineTime.H"
-#   include "createDynamicFvMesh.H"
-#   include "readPISOControls.H"
+#   include "createEngineDynamicMesh.H"
+#   include "readPIMPLEControls.H"
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
 #   include "readEngineTimeControls.H"
@@ -67,7 +67,9 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-#       include "readControls.H"
+#       include "readPIMPLEControls.H"
+#       include "checkTotalVolume.H"
+#       include "readEngineTimeControls.H"
 #       include "compressibleCourantNo.H"
 #       include "setDeltaT.H"
 
@@ -75,39 +77,48 @@ int main(int argc, char *argv[])
 
         Info<< "Crank angle = " << runTime.theta() << " CA-deg" << endl;
 
-//      make phi relative
-
+        // Make flux absolute
         phi += meshFlux;
 
         bool meshChanged = mesh.update();
-        reduce(meshChanged, orOp<bool>());
+
+#       include "volContinuity.H"
+
+        mesh.setBoundaryVelocity(U);
 
         if (meshChanged)
         {
             thermo.correct();
-
-#           include "checkTotalVolume.H"
-#           include "compressibleCorrectPhi.H"
-#           include "CourantNo.H"
+            rho = thermo.rho();
+            rho.correctBoundaryConditions();
         }
 
         meshFlux = fvc::interpolate(rho)*fvc::meshPhi(rho, U);
 
-        // Make phi absolute
+        phi = fvc::interpolate(rho)
+            *((fvc::interpolate(U) & mesh.Sf()) - fvc::meshPhi(rho, U));
 
-        phi -= meshFlux;
+        DpDt = dpdt + fvc::div(phi/fvc::interpolate(rho), p)
+            - fvc::div(phi/fvc::interpolate(rho) + fvc::meshPhi(U))*p;
 
-#       include "rhoEqn.H"
-
-        // --- SIMPLE loop
-        for (int corr=1; corr<=nCorr; corr++)
         {
+#           include "compressibleCourantNo.H"
+        }
+
+        // Pressure-velocity corrector
+        int oCorr = 0;
+        do
+        {
+#           include "rhoEqn.H"
 #           include "UEqn.H"
 
-#           include "hEqn.H"
-
-#           include "pEqn.H"
-        }
+            // --- PISO loop
+            for (int corr = 1; corr <= nCorr; corr++)
+            {
+#               include "pEqn.H"
+#               include "hEqn.H"
+            }
+        } while (++oCorr < nOuterCorr);
 
         turbulence->correct();
 

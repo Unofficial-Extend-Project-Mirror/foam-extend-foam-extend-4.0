@@ -22,33 +22,31 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Namespace
-    Foam::solidBodyMotionFunctions
-
-Description
-    Namespace for solid-body motions
-
-
 Class
-    Foam::solidBodyMotionFunction
+    Foam::movingBodyTopoFvMesh
 
 Description
-    Base class for defining solid-body motions
+    Sample topoChangerFvMesh that moves a cell zone in a given direction,
+    introducing/removing layers around it.
+
+    Cells in the movingCells zone shall be moved given the prescribed velocity
+    and will be bounded in "front" and "back" by other cell zones.
+    Layer addition/removal interfaces are inserted at boundaries between the
+    moving zone and front and back, pointing outside of the moving cell zone
+
+Author and rewrite
+    Hrvoje Jasak, Wikki Ltd.
 
 SourceFiles
-    solidBodyMotionFunction.C
-    newDynamicFvMesh.C
+    movingBodyTopoFvMesh.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef solidBodyMotionFunction_H
-#define solidBodyMotionFunction_H
+#ifndef movingBodyTopoFvMesh_H
+#define movingBodyTopoFvMesh_H
 
-#include "Time.H"
-#include "dictionary.H"
-#include "septernion.H"
-#include "autoPtr.H"
-#include "runTimeSelectionTables.H"
+#include "topoChangerFvMesh.H"
+#include "solidBodyMotionFunction.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -56,80 +54,71 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class solidBodyMotionFunction Declaration
+                      Class movingBodyTopoFvMesh Declaration
 \*---------------------------------------------------------------------------*/
 
-class solidBodyMotionFunction
+class movingBodyTopoFvMesh
+:
+    public topoChangerFvMesh
 {
-protected:
+    // Private data
 
-    // Protected data
+        //- Dynamic mesh dictionary
+        dictionary dict_;
 
-        dictionary SBMFCoeffs_;
-        const Time& time_;
+        //- Moving cell zone name
+        word movingCellsName_;
 
+        //- Front face zone name
+        word frontFacesName_;
 
-private:
+        //- Back face zone name
+        word backFacesName_;
+
+        //- Motion control function
+        autoPtr<solidBodyMotionFunction> SBMFPtr_;
+
+        //- Vertex motion mask
+        scalarField motionMask_;
+
 
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        solidBodyMotionFunction(const solidBodyMotionFunction&);
+        movingBodyTopoFvMesh(const movingBodyTopoFvMesh&);
 
         //- Disallow default bitwise assignment
-        void operator=(const solidBodyMotionFunction&);
+        void operator=(const movingBodyTopoFvMesh&);
+
+
+        //- Add mixer zones and modifiers
+        void addZonesAndModifiers();
+
+        //- Mark motion vertices
+        tmp<scalarField> calcMotionMask() const;
 
 
 public:
 
     //- Runtime type information
-    TypeName("solidBodyMotionFunction");
-
-
-    // Declare run-time constructor selection table
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            solidBodyMotionFunction,
-            dictionary,
-            (const dictionary& SBMFCoeffs, const Time& runTime),
-            (SBMFCoeffs, runTime)
-        );
+    TypeName("movingBodyTopoFvMesh");
 
 
     // Constructors
 
-        //- Construct from the SBMFCoeffs dictionary and Time
-        solidBodyMotionFunction
-        (
-            const dictionary& SBMFCoeffs,
-            const Time& runTime
-        );
-
-
-    // Selectors
-
-        //- Select constructed from the SBMFCoeffs dictionary and Time
-        static autoPtr<solidBodyMotionFunction> New
-        (
-            const dictionary& SBMFCoeffs,
-            const Time& runTime
-        );
+        //- Construct from database
+        explicit movingBodyTopoFvMesh(const IOobject& io);
 
 
     // Destructor
 
-        virtual ~solidBodyMotionFunction();
+        virtual ~movingBodyTopoFvMesh();
 
 
     // Member Functions
 
-        //- Return the solid-body motion transformation septernion
-        virtual septernion transformation() const = 0;
-
-        //- Update properties from given dictionary
-        virtual bool read(const dictionary& SBMFCoeffs) = 0;
+        //- Update the mesh for both mesh motion and topology change
+        virtual bool update();
 };
 
 

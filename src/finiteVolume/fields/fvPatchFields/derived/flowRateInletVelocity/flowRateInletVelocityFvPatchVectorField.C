@@ -118,7 +118,7 @@ void Foam::flowRateInletVelocityFvPatchVectorField::updateCoeffs()
         return;
     }
 
-    // a simpler way of doing this would be nice
+    // A simpler way of doing this would be nice
     scalar avgU = -flowRate_/gSum(patch().magSf());
 
     vectorField n = patch().nf();
@@ -128,7 +128,7 @@ void Foam::flowRateInletVelocityFvPatchVectorField::updateCoeffs()
 
     if (phi.dimensions() == dimVelocity*dimArea)
     {
-        // volumetric flow-rate
+        // Volumetric flow-rate
         operator==(n*avgU);
     }
     else if (phi.dimensions() == dimDensity*dimVelocity*dimArea)
@@ -136,7 +136,7 @@ void Foam::flowRateInletVelocityFvPatchVectorField::updateCoeffs()
         const fvPatchField<scalar>& rhop =
             patch().lookupPatchField<volScalarField, scalar>(rhoName_);
 
-        // mass flow-rate
+        // Mass flow-rate
         operator==(n*avgU/rhop);
     }
     else

@@ -77,6 +77,13 @@ class hierarchGeomDecomp
 
     // Private Member Functions
 
+        //- Disallow default bitwise copy construct
+        hierarchGeomDecomp(const hierarchGeomDecomp&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const hierarchGeomDecomp&);
+
+
         //- Convert ordering string ("xyz") into list of components.
         void setDecompOrder();
 
@@ -105,13 +112,13 @@ class hierarchGeomDecomp
         //  wantedSize. Binary search.
         static void findBinary
         (
-            const label sizeTol,        // size difference considered acceptible
+            const label sizeTol,        // Acceptable size difference
             const List<scalar>&,
             const label leftIndex,      // index of previous value
             const scalar leftValue,     // value at leftIndex
             const scalar maxValue,      // global max of values
             const scalar wantedSize,    // wanted size
-            label& mid,                 // index where size of bin is wantedSize
+            label& mid,                 // index where bin size is wantedSize
             scalar& midValue            // value at mid
         );
 
@@ -120,14 +127,14 @@ class hierarchGeomDecomp
         //  wantedSize. Binary search.
         static void findBinary
         (
-            const label sizeTol,        // size difference considered acceptible
+            const label sizeTol,        // Acceptable size difference
             const List<scalar>& sortedWeightedSizes,
             const List<scalar>&,
             const label leftIndex,      // index of previous value
             const scalar leftValue,     // value at leftIndex
             const scalar maxValue,      // global max of values
             const scalar wantedSize,    // wanted size
-            label& mid,                 // index where size of bin is wantedSize
+            label& mid,                 // index where bin size is wantedSize
             scalar& midValue            // value at mid
         );
 
@@ -154,11 +161,6 @@ class hierarchGeomDecomp
             const label prevMult,           // multiplication factor
             labelList& finalDecomp          // overall decomposition
         );
-
-
-        //- Disallow default bitwise copy construct and assignment
-        void operator=(const hierarchGeomDecomp&);
-        hierarchGeomDecomp(const hierarchGeomDecomp&);
 
 
 public:
@@ -194,25 +196,19 @@ public:
             return true;
         }
 
-        //- Return for every coordinate the wanted processor number. Use the
-        //  mesh connectivity (if needed)
+        //- Decompose cells without weights. Code for weighted decomposition
+        //  is a bit complex so it is kept separate for now
+        virtual labelList decompose(const pointField&);
+
+        //- Decompose cells with weights
         virtual labelList decompose
         (
-            const pointField&,
+            const pointField& points,
             const scalarField& weights
         );
 
-        //- Without weights. Code for weighted decomposition is a bit complex
-        //  so kept separate for now.
-        virtual labelList decompose(const pointField&);
-
-        //- Return for every coordinate the wanted processor number. Explicitly
-        //  provided connectivity - does not use mesh_.
-        //  The connectivity is equal to mesh.cellCells() except for
-        //  - in parallel the cell numbers are global cell numbers (starting
-        //    from 0 at processor0 and then incrementing all through the
-        //    processors)
-        //  - the connections are across coupled patches
+        //- Decompose cells with weights with explicitly provided connectivity
+        //  Does not use mesh for connectivity
         virtual labelList decompose
         (
             const labelListList& globalCellCells,
@@ -223,6 +219,7 @@ public:
             return decompose(cc, cWeights);
         }
 
+        //- Decompose cells with weights with explicitly provided connectivity
         virtual labelList decompose
         (
             const labelListList& globalCellCells,

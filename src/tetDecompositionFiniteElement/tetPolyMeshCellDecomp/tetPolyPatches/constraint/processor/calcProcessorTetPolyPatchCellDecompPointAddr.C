@@ -59,8 +59,7 @@ void Foam::processorTetPolyPatchCellDecomp::calcMeshPoints() const
             masterFaces[faceI] = pp[faceI].reverseFace();
         }
 
-        mp =
-            primitiveFacePatch
+        mp = primitiveFacePatch
             (
                 masterFaces,
                 pp.points()

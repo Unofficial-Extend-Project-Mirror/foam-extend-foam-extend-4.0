@@ -65,9 +65,7 @@ class fvMeshAdder
 :
     public polyMeshAdder
 {
-
 private:
-
 
     // Private class
 

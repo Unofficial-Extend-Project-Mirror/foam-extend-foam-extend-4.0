@@ -8,6 +8,8 @@
     );
     basicPsiThermo& thermo = pThermo();
 
+    // Make density field with zero gradient boundary conditions to handle
+    // attach-detach cases.  HJ, 20/Mar/2011
     volScalarField rho
     (
         IOobject
@@ -18,7 +20,8 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        thermo.rho()
+        thermo.rho(),
+        zeroGradientFvPatchScalarField::typeName
     );
     rho.oldTime();
 
@@ -73,6 +76,7 @@
         fvc::DDt(surfaceScalarField("phiU", phi/fvc::interpolate(rho)), p)
     );
 
+    volScalarField dpdt = fvc::ddt(p);
 
     volScalarField rUA
     (

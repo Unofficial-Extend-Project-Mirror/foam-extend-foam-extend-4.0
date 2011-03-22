@@ -144,6 +144,7 @@ public:
             const scalarField& y
         );
 
+        //- Create and return a clone
         autoPtr<curve> clone() const
         {
             return autoPtr<curve>(new curve(*this));

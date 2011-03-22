@@ -23,38 +23,64 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::scotchDecomp
+    Foam::engineScotchDecomp
 
 Description
-    Scotch domain decomposition
+    Domain decomposition for internal combustion engine simulations with
+    topological changes.
+
+    The algorithm attempts to be as general as possible and operates in the
+    following steps:
+    - identify piston region and peform a decomposition biased towards the
+    piston axis.  This aims to preserve load balancing when cell layers
+    are added
+    - identify static regions and decompose them separately
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 SourceFiles
-    scotchDecomp.C
+    engineScotchDecomp.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef scotchDecomp_H
-#define scotchDecomp_H
+#ifndef engineScotchDecomp_H
+#define engineScotchDecomp_H
 
-#include "decompositionMethod.H"
+#include "scotchDecomp.H"
+#include "Switch.H"
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class scotchDecomp Declaration
+                       Class engineScotchDecomp Declaration
 \*---------------------------------------------------------------------------*/
 
-class scotchDecomp
+class engineScotchDecomp
 :
-    public decompositionMethod
+    public scotchDecomp
 {
     // Private data
 
-        const polyMesh& mesh_;
+        //- Dictionary
+        dictionary dict_;
+
+        //- Sliding patch pairs
+        List<Pair<word> > slidingPatchPairs_;
+
+        //- Use expanded area around sliding patches
+        Switch expandSliding_;
 
 
     // Private Member Functions
+
+        //- Disallow default bitwise copy construct
+        engineScotchDecomp(const engineScotchDecomp&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const engineScotchDecomp&);
+
 
         //- Check and print error message
         static void check(const int, const char*);
@@ -67,21 +93,17 @@ class scotchDecomp
             List<int>& finalDecomp
         );
 
-        //- Disallow default bitwise copy construct and assignment
-        void operator=(const scotchDecomp&);
-        scotchDecomp(const scotchDecomp&);
-
 
 public:
 
     //- Runtime type information
-    TypeName("scotch");
+    TypeName("engineScotch");
 
 
     // Constructors
 
         //- Construct given the decomposition dictionary and mesh
-        scotchDecomp
+        engineScotchDecomp
         (
             const dictionary& decompositionDict,
             const polyMesh& mesh
@@ -90,7 +112,7 @@ public:
 
     // Destructor
 
-        virtual ~scotchDecomp()
+        virtual ~engineScotchDecomp()
         {}
 
 
@@ -98,67 +120,26 @@ public:
 
         virtual bool parallelAware() const
         {
-            // Metis does not know about proc boundaries
             return false;
         }
 
-        //- Return for every coordinate the wanted processor number. Use the
-        //  mesh connectivity (if needed)
-        //  Weights get normalised so the minimum value is 1 before truncation
-        //  to an integer so the weights should be multiples of the minimum
-        //  value. The overall sum of weights might otherwise overflow.
+        //- Decompose cells with weights
         virtual labelList decompose
         (
             const pointField& points,
             const scalarField& pointWeights
         );
 
-        //- Return for every coordinate the wanted processor number. Gets
-        //  passed agglomeration map (from fine to coarse cells) and coarse cell
-        //  location. Can be overridden by decomposers that provide this
-        //  functionality natively.
-        //  See note on weights above.
-        virtual labelList decompose
-        (
-            const labelList& agglom,
-            const pointField& regionPoints,
-            const scalarField& regionWeights
-        );
-
-        //- Return for every coordinate the wanted processor number. Explicitly
-        //  provided mesh connectivity.
-        //  The connectivity is equal to mesh.cellCells() except for
-        //  - in parallel the cell numbers are global cell numbers (starting
-        //    from 0 at processor0 and then incrementing all through the
-        //    processors)
-        //  - the connections are across coupled patches
-        //  See note on weights above.
+        //- Decompose cells with weights with explicitly provided connectivity
         virtual labelList decompose
         (
             const labelListList& globalCellCells,
             const pointField& cc,
             const scalarField& cWeights
-        );
-
-
-        //- Helper to convert local connectivity (supplied as owner,neighbour)
-        //  into CSR (Metis,scotch) storage. Does cyclics but not processor
-        //  patches
-        static void calcCSR
-        (
-            const polyMesh& mesh,
-            List<int>& adjncy,
-            List<int>& xadj
-        );
-
-        //- Helper to convert connectivity (supplied as cellcells) into
-        //  CSR (Metis,scotch) storage
-        static void calcCSR
-        (
-            const labelListList& globalCellCells,
-            List<int>& adjncy,
-            List<int>& xadj
-        );
+        )
+        {
+            return decompose(cc, cWeights);
+        }
 };
 
 

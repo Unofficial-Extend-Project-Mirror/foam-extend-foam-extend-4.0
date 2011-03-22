@@ -27,7 +27,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "manualDecomp.H"
+#include "patchConstrainedDecomp.H"
 #include "addToRunTimeSelectionTable.H"
 #include "IFstream.H"
 #include "labelIOList.H"
@@ -36,12 +36,12 @@ Description
 
 namespace Foam
 {
-    defineTypeNameAndDebug(manualDecomp, 0);
+    defineTypeNameAndDebug(patchConstrainedDecomp, 0);
 
     addToRunTimeSelectionTable
     (
         decompositionMethod,
-        manualDecomp,
+        patchConstrainedDecomp,
         dictionaryMesh
     );
 }
@@ -49,7 +49,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::manualDecomp::manualDecomp
+Foam::patchConstrainedDecomp::patchConstrainedDecomp
 (
     const dictionary& decompositionDict,
     const polyMesh& mesh
@@ -57,65 +57,60 @@ Foam::manualDecomp::manualDecomp
 :
     decompositionMethod(decompositionDict),
     mesh_(mesh),
-    decompDataFile_
+    dict_
     (
         decompositionDict.subDict
         (
-            word(decompositionDict.lookup("method"))
-          + "Coeffs"
-        ).lookup("dataFile")
-    )
+            typeName + "Coeffs"
+        )
+    ),
+    baseDecompPtr_
+    (
+        decompositionMethod::New(dict_, mesh)
+    ),
+    patchConstraints_(dict_.lookup("patchConstraints"))
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::labelList Foam::manualDecomp::decompose
+Foam::labelList Foam::patchConstrainedDecomp::decompose
 (
     const pointField& points,
     const scalarField& pointWeights
 )
 {
-    labelIOList finalDecomp
-    (
-        IOobject
-        (
-            decompDataFile_,
-            mesh_.facesInstance(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE,
-            false
-        )
-    );
 
-    // Check if the final decomposition is OK
+    labelList finalDecomp = baseDecompPtr_->decompose(points, pointWeights);
 
-    if (finalDecomp.size() != points.size())
+    // Impose the decomposition along patches
+    forAll (patchConstraints_, i)
     {
-        FatalErrorIn
-        (
-            "manualDecomp::decompose(const pointField&, const scalarField&)"
-        )   << "Size of decomposition list does not correspond "
-            << "to the number of points.  Size: "
-            << finalDecomp.size() << " Number of points: "
-            << points.size()
-            << ".\n" << "Manual decomposition data read from file "
-            << decompDataFile_ << "." << endl
-            << exit(FatalError);
-    }
+        const label patchID =
+            mesh_.boundaryMesh().findPatchID(patchConstraints_[i].first());
 
-    if (min(finalDecomp) < 0 || max(finalDecomp) > nProcessors_ - 1)
-    {
-        FatalErrorIn
-        (
-            "manualDecomp::decompose(const pointField&, const scalarField&)"
-        )   << "According to the decomposition, cells assigned to "
-            << "impossible processor numbers.  Min processor = "
-            << min(finalDecomp) << " Max processor = " << max(finalDecomp)
-            << ".\n" << "Manual decomposition data read from file "
-            << decompDataFile_ << "." << endl
-            << exit(FatalError);
+        const label procID = patchConstraints_[i].second();
+
+        if (patchID < 0 || procID < 0 || procID > nProcessors_ - 1)
+        {
+            FatalErrorIn
+            (
+                "labelList patchConstrainedDecomp::decompose\n"
+                "(\n"
+                "    const pointField& points,\n"
+                "    const scalarField& pointWeights\n"
+                ")"
+            )   << "Incorrect patch constraint definition for "
+                << patchConstraints_[i]
+                << abort(FatalError);
+        }
+
+        const labelList fc = mesh_.boundaryMesh()[patchID].faceCells();
+
+        forAll (fc, fcI)
+        {
+            finalDecomp[fc[fcI]] = procID;
+        }
     }
 
     return finalDecomp;

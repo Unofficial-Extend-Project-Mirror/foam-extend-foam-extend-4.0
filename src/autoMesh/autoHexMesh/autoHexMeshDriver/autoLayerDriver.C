@@ -2975,7 +2975,8 @@ void Foam::autoLayerDriver::addLayers
             );
 
             const_cast<Time&>(mesh.time())++;
-            Info<< "Writing shrunk mesh to " << meshRefiner_.timeName() << endl;
+            Info<< "Writing shrunk mesh to " << meshRefiner_.timeName()
+                << endl;
 
             // See comment in autoSnapDriver why we should not remove meshPhi
             // using mesh.clearPout().

@@ -209,7 +209,7 @@ void Foam::fvMeshDistribute::printCoupleInfo
 }
 
 
-// Finds (non-empty) patch that exposed internal and proc faces can be put into.
+// Finds (non-empty) patch that exposed internal and proc faces can be put into
 Foam::label Foam::fvMeshDistribute::findNonEmptyPatch() const
 {
     const polyBoundaryMesh& patches = mesh_.boundaryMesh();
@@ -288,9 +288,11 @@ Foam::label Foam::fvMeshDistribute::addProcPatch
 
     if (polyPatches.findPatchID(patchName) != -1)
     {
-        FatalErrorIn("fvMeshDistribute::addProcPatch(const word&, const label)")
-            << "Cannot create patch " << patchName << " since already exists."
-            << nl
+        FatalErrorIn
+        (
+            "fvMeshDistribute::addProcPatch(const word&, const label)"
+        )   << "Cannot create patch " << patchName
+            << " since it already exists." << nl
             << "Current patch names:" << polyPatches.names()
             << exit(FatalError);
     }
@@ -635,7 +637,7 @@ void Foam::fvMeshDistribute::getNeighbourData
 
     const polyBoundaryMesh& patches = mesh_.boundaryMesh();
 
-    // Get neighbouring meshFace labels and new processor of coupled boundaries.
+    // Get neighbouring meshFace labels and new processor of coupled boundaries
     labelList nbrFaces(nBnd, -1);
     labelList nbrNewProc(nBnd, -1);
 
@@ -931,8 +933,8 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::fvMeshDistribute::doRemoveCells
 }
 
 
-// Delete and add processor patches. Changes mesh and returns per neighbour proc
-// the processor patchID.
+// Delete and add processor patches. Changes mesh and returns per
+// neighbour processor the processor patchID.
 void Foam::fvMeshDistribute::addProcPatches
 (
     const labelList& neighbourNewProc,   // processor that neighbour is on
@@ -1371,7 +1373,7 @@ Foam::autoPtr<Foam::mapDistributePolyMesh> Foam::fvMeshDistribute::distribute
         FatalErrorIn("fvMeshDistribute::distribute(const labelList&)")
             << "This application requires all non-processor patches"
             << " to be present in the same order on all patches" << nl
-            << "followed by the processor patches (which of course are unique)."
+            << "followed by the processor patches (which are unique)."
             << nl
             << "Local patches:" << mesh_.boundaryMesh().names()
             << abort(FatalError);

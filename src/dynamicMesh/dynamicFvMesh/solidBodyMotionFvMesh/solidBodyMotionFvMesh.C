@@ -53,20 +53,20 @@ Foam::solidBodyMotionFvMesh::solidBodyMotionFvMesh(const IOobject& io)
             IOobject
             (
                 "dynamicMeshDict",
-                io.time().constant(),
+                time().constant(),
                 *this,
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE
             )
         ).subDict(typeName + "Coeffs")
     ),
-    SBMFPtr_(solidBodyMotionFunction::New(dynamicMeshCoeffs_, io.time())),
+    SBMFPtr_(solidBodyMotionFunction::New(dynamicMeshCoeffs_, time())),
     undisplacedPoints_
     (
         IOobject
         (
             "points",
-            io.time().constant(),
+            time().constant(),
             meshSubDir,
             *this,
             IOobject::MUST_READ,
@@ -88,8 +88,7 @@ bool Foam::solidBodyMotionFvMesh::update()
 {
     fvMesh::movePoints
     (
-        transform(SBMFPtr_().transformation(),
-        undisplacedPoints_)
+        transform(SBMFPtr_().transformation(), undisplacedPoints_)
     );
 
     return false;

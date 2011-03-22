@@ -77,13 +77,13 @@ void setFieldType
         }
         else
         {
-            forAll(selectedCells, celli)
+            forAll (selectedCells, celli)
             {
                 field[selectedCells[celli]] = value;
             }
         }
 
-        forAll(field.boundaryField(), patchi)
+        forAll (field.boundaryField(), patchi)
         {
             // Forced patch assignment.  HJ, 1/Aug/2010
             field.boundaryField()[patchi] ==
@@ -176,13 +176,10 @@ public:
 
 int main(int argc, char *argv[])
 {
-    timeSelector::addOptions();
-
 #   include "setRootCase.H"
 #   include "createTime.H"
 
-    // Get times list
-    instantList timeDirs = timeSelector::select0(runTime, args);
+    Info<< "Time = " << runTime.timeName() << endl;
 
 #   include "createMesh.H"
 
@@ -216,7 +213,7 @@ int main(int argc, char *argv[])
 
     PtrList<entry> regions(setFieldsDict.lookup("regions"));
 
-    forAll(regions, regionI)
+    forAll (regions, regionI)
     {
         const entry& region = regions[regionI];
 

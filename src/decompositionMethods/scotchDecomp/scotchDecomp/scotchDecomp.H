@@ -23,105 +23,117 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::movingConeTopoFvMesh
+    Foam::scotchDecomp
 
 Description
-    Sample topoChangerFvMesh that moves an object in x direction
-    and introduces/removes layers.
+    Scotch domain decomposition
 
 SourceFiles
-    movingConeTopoFvMesh.C
+    scotchDecomp.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef movingConeTopoFvMesh_H
-#define movingConeTopoFvMesh_H
+#ifndef scotchDecomp_H
+#define scotchDecomp_H
 
-#include "topoChangerFvMesh.H"
-#include "motionSolver.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "decompositionMethod.H"
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class movingConeTopoFvMesh Declaration
+                        Class scotchDecomp Declaration
 \*---------------------------------------------------------------------------*/
 
-class movingConeTopoFvMesh
+class scotchDecomp
 :
-    public topoChangerFvMesh
+    public decompositionMethod
 {
     // Private data
 
-        //- Motion dictionary
-        dictionary motionDict_;
-
-        //- Motion velocity amplitude
-        vector motionVelAmplitude_;
-
-        //- Motion velocity period
-        scalar motionVelPeriod_;
-
-        //- Motion velocity period
-        vector curMotionVel_;
-
-        //- Left edge
-        scalar leftEdge_;
-
-        //- Current left obstacle position
-        scalar curLeft_;
-
-        //- Current right obstacle position
-        scalar curRight_;
-
-        //- Vertex motion mask
-        scalarField motionMask_;
+        //- Mesh reference
+        const polyMesh& mesh_;
 
 
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        movingConeTopoFvMesh(const movingConeTopoFvMesh&);
+        scotchDecomp(const scotchDecomp&);
 
         //- Disallow default bitwise assignment
-        void operator=(const movingConeTopoFvMesh&);
+        void operator=(const scotchDecomp&);
 
 
-        //- Add mixer zones and modifiers
-        void addZonesAndModifiers();
+        //- Check and print error message
+        static void check(const int, const char*);
 
-        //- Markup motion vertices
-        tmp<scalarField> vertexMarkup
+        label decompose
         (
-            const pointField& p,
-            const scalar& curLeft,
-            const scalar& curRight
-        ) const;
+            const List<int>& adjncy,
+            const List<int>& xadj,
+            const scalarField& cWeights,
+            List<int>& finalDecomp
+        );
 
 
 public:
 
     //- Runtime type information
-    TypeName("movingConeTopoFvMesh");
+    TypeName("scotch");
 
 
     // Constructors
 
-        //- Construct from database
-        explicit movingConeTopoFvMesh(const IOobject& io);
+        //- Construct given the decomposition dictionary and mesh
+        scotchDecomp
+        (
+            const dictionary& decompositionDict,
+            const polyMesh& mesh
+        );
 
 
     // Destructor
 
-        virtual ~movingConeTopoFvMesh();
+        virtual ~scotchDecomp()
+        {}
 
 
     // Member Functions
 
-        //- Update the mesh for both mesh motion and topology change
-        virtual bool update();
+        //- Return mesh
+        const polyMesh& mesh() const
+        {
+            return mesh_;
+        }
+
+        virtual bool parallelAware() const
+        {
+            // Scotch does not know about proc boundaries
+            return false;
+        }
+
+        //- Decompose cells with weights
+        virtual labelList decompose
+        (
+            const pointField& points,
+            const scalarField& pointWeights
+        );
+
+        //- Decompose cell clusters with weights on clusters
+        virtual labelList decompose
+        (
+            const labelList& fineToCoarse,
+            const pointField& coarsePoints,
+            const scalarField& coarseWeights
+        );
+
+        //- Decompose cells with weights with explicitly provided connectivity
+        virtual labelList decompose
+        (
+            const labelListList& globalCellCells,
+            const pointField& cc,
+            const scalarField& cWeights
+        );
 };
 
 

@@ -195,7 +195,8 @@ void Foam::fvMeshDistribute::addPatchFields(const word& patchFieldType)
 
     for
     (
-        typename HashTable<const GeoField*>::const_iterator iter = flds.begin();
+        typename HashTable<const GeoField*>::const_iterator iter =
+            flds.begin();
         iter != flds.end();
         ++iter
     )
@@ -235,7 +236,8 @@ void Foam::fvMeshDistribute::deleteTrailingPatchFields()
 
     for
     (
-        typename HashTable<const GeoField*>::const_iterator iter = flds.begin();
+        typename HashTable<const GeoField*>::const_iterator iter =
+            flds.begin();
         iter != flds.end();
         ++iter
     )
@@ -347,7 +349,11 @@ void Foam::fvMeshDistribute::mapBoundaryFields
                 {
                     label oldLocalI = oldFaceI - oldPatchStarts[oldPatchI];
 
-                    if (oldLocalI >= 0 && oldLocalI < oldBfld[oldPatchI].size())
+                    if
+                    (
+                        oldLocalI >= 0
+                     && oldLocalI < oldBfld[oldPatchI].size()
+                    )
                     {
                         patchFld[i] = oldBfld[oldPatchI][oldLocalI];
                     }
@@ -372,7 +378,8 @@ void Foam::fvMeshDistribute::initPatchFields
 
     for
     (
-        typename HashTable<const GeoField*>::const_iterator iter = flds.begin();
+        typename HashTable<const GeoField*>::const_iterator iter =
+            flds.begin();
         iter != flds.end();
         ++iter
     )
@@ -396,7 +403,7 @@ void Foam::fvMeshDistribute::initPatchFields
 }
 
 
-// Send fields. Note order supplied so we can receive in exactly the same order.
+// Send fields. Note order supplied so we can receive in exactly the same order
 // Note that field gets written as entry in dictionary so we
 // can construct from subdictionary.
 // (since otherwise the reading as-a-dictionary mixes up entries from
@@ -413,7 +420,7 @@ void Foam::fvMeshDistribute::initPatchFields
 //  }
 
 // volVectorField {U {internalField ..; boundaryField ..;}}
-// 
+
 template<class GeoField>
 void Foam::fvMeshDistribute::sendFields
 (
@@ -423,7 +430,8 @@ void Foam::fvMeshDistribute::sendFields
     OSstream& toNbr
 )
 {
-    toNbr << GeoField::typeName << token::NL << token::BEGIN_BLOCK << token::NL;
+    toNbr<< GeoField::typeName << token::NL << token::BEGIN_BLOCK
+        << token::NL;
     forAll(fieldNames, i)
     {
         if (debug)
