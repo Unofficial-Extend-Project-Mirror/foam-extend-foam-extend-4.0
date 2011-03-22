@@ -131,33 +131,63 @@ public:
 
             scalarField magPhi = mag(phi);
 
-            // Initialise weights to 0.5 for uniform field (den = 0)
             scalarField& wIn = w.internalField();
-            wIn = 0.5;
 
             // Calculate internal weights using field magnitude
-            scalar mOwn, mNei, den, mean;
-
             forAll (owner, faceI)
             {
-                mOwn = magPhi[owner[faceI]];
-                mNei = magPhi[neighbour[faceI]];
+                scalar mOwn = magPhi[owner[faceI]];
+                scalar mNei = magPhi[neighbour[faceI]];
 
-                mean = 2*(mOwn*mNei)/(mOwn + mNei + SMALL);
-                den = mOwn - mNei;
+                scalar den = mOwn - mNei;
 
                 if (mag(den) > SMALL)
                 {
+                    scalar mean = 2.0*mOwn*mNei/(mOwn + mNei);
                     wIn[faceI] = (mean - mNei)/den;
                 }
                 else
                 {
-                    // Use 0.5 weights
+                    wIn[faceI] = 0.5;
                 }
             }
 
-            // Boundary weights are 1
-            w.boundaryField() = 1;
+            forAll (phi.boundaryField(), pi)
+            {
+                fvsPatchScalarField& wp = w.boundaryField()[pi];
+
+                const fvPatchField<Type>& patchPhi = phi.boundaryField()[pi];
+
+                if (patchPhi.coupled())
+                {
+                    scalarField magPhiOwn = mag(patchPhi.patchInternalField());
+                    scalarField magPhiNei = mag(patchPhi.patchNeighbourField());
+
+                    // Calculate internal weights using field magnitude
+                    forAll (patchPhi, faceI)
+                    {
+                        scalar mOwn = magPhiOwn[faceI];
+                        scalar mNei = magPhiNei[faceI];
+
+                        scalar den = mOwn - mNei;
+
+                        if (mag(den) > SMALL)
+                        {
+                             scalar mean = 2.0*mOwn*mNei/(mOwn + mNei);
+                             wp[faceI] = (mean - mNei)/den;
+                        }
+                        else
+                        {
+                             wp[faceI] = 0.5;
+                        }
+                    }
+                }
+                else
+                {
+                    // Boundary weights for uncoupled patches are 1
+                    wp = 1;
+                }
+            }
 
             return tw;
         }
