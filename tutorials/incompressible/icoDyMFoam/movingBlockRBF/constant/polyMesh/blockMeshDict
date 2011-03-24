@@ -17,7 +17,7 @@ FoamFile
 convertToMeters 1;
 
 vertices
-(	
+(
     // Back
     (-12.5 -12.5 -0.1)
     (-2.5 -12.5 -0.1)
