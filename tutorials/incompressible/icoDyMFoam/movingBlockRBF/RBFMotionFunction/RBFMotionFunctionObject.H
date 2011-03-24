@@ -26,7 +26,7 @@ Class
     RBFMotionFunctionObject
 
 Description
-    FunctionObject checking the fluxes on ggi interfaces.
+    FunctionObject specifying motion of control points using RBF
 
 Author
     Frank Bos, TU Delft.  All rights reserved.
