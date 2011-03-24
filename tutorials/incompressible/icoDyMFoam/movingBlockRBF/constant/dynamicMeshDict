@@ -10,7 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      motionProperties;
+    object      dynamicMeshDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -23,6 +23,9 @@ movingPatches ( block );
 staticPatches ( left right top bottom );
 
 coarseningRatio 5;
+
+includeStaticPatches   no;
+frozenInterpolation    yes;
 
 interpolation
 {
@@ -49,5 +52,6 @@ interpolation
         radius     0.001;
     }
 }
+
 
 // ************************************************************************* //
