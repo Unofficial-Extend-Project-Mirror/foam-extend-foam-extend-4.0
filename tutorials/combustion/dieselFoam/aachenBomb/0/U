@@ -25,17 +25,6 @@ boundaryField
         type                fixedValue;
         value               uniform ( 0 0 0 );
     }
-
-    front
-    {
-        type                wedge;
-    }
-
-    back
-    {
-        type                wedge;
-    }
-
 }
 
 // ************************************************************************* //

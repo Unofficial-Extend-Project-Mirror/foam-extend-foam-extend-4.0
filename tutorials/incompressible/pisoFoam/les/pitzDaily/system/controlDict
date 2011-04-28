@@ -46,7 +46,7 @@ timePrecision   6;
 runTimeModifiable yes;
 
 functions
-{
+(
     probes
     {
         type            probes;
@@ -94,6 +94,7 @@ functions
             }
         );
     }
-}
+);
+
 
 // ************************************************************************* //
