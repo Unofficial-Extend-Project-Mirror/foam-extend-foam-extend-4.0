@@ -45,7 +45,6 @@ bool Foam::layerAdditionRemoval::setLayerPairing() const
     // be cleared.  HJ, 2/Oct/2002
 
     // Algorithm for point collapse
-    // 1)  Go through the master cell layer and for every face of
     //     the face zone find the opposite face in the master cell.
     //     Check the direction of the opposite face and adjust as
     //     necessary.  Check other faces to find an edge defining
@@ -144,14 +143,53 @@ bool Foam::layerAdditionRemoval::setLayerPairing() const
                 // Point mapped from some other face.  Check the label
                 if (ptc[clp] != lidFace[pointI])
                 {
-                    nPointErrors++;
-//                     Pout<< "Topological error in cell layer pairing.  "
-//                         << "This mesh is either topologically incorrect "
-//                         << "or the master afce layer is not defined "
-//                         << "consistently.  Please check the "
-//                         << "face zone flip map." << nl
-//                         << "First index: " << ptc[clp]
-//                         << " new index: " << lidFace[pointI] << endl;
+                    // HR 01.05.2011:
+                    // We may be dealing with a layer that is wrapped around
+                    // a cell. Check second point neighbours for common point.
+                    // This is most probably not a general solution for
+                    // arbitray polyhedra!
+
+                    label curPoint = faces[mf[faceI]][pointI];
+
+                    const labelListList& ppAddr = mesh.pointPoints();
+
+                    const labelList& p1List = ppAddr[lidFace[pointI]];
+                    const labelList& p2List = ppAddr[ptc[clp]];
+
+                    bool found = false;
+                    forAll(p1List, p1I)
+                    {
+                        label p1 = p1List[p1I];
+
+                        if (p1 != curPoint)
+                        {
+                            forAll(p2List, p2I)
+                            {
+                                label p2 = p2List[p2I];
+
+                                if(p1 == p2)
+                                {
+                                    ptc[clp] = p1;
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if(found) { break; }
+                    }
+
+                    if (!found)
+                    {
+                        nPointErrors++;
+//                         Pout<< "Topological error in cell layer pairing.  "
+//                             << "This mesh is either topologically incorrect "
+//                             << "or the master afce layer is not defined "
+//                             << "consistently.  Please check the "
+//                             << "face zone flip map." << nl
+//                             << "First index: " << ptc[clp]
+//                             << " new index: " << lidFace[pointI] << endl;
+                    }
                 }
             }
         }
