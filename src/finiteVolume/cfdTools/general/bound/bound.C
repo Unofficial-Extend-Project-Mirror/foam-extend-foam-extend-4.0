@@ -73,8 +73,8 @@ void Foam::boundMinMax
     if (minVsf < vsf0.value() || maxVsf > vsf1.value())
     {
         Info<< "bounding " << vsf.name()
-            << ", min: " << gMin(vsf.internalField())
-            << " max: " << gMax(vsf.internalField())
+            << ", min: " << minVsf
+            << " max: " << maxVsf
             << " average: " << gAverage(vsf.internalField())
             << endl;
     }
