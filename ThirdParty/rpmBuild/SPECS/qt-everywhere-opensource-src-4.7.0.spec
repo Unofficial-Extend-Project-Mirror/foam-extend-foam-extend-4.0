@@ -97,14 +97,18 @@ Group: 			Development/Tools
 
     ./configure                           \
         -opensource --confirm-license=yes \
+        -release -shared                  \
+        -nomake examples -nomake demos    \
         --prefix=%{_installPrefix}
+
+    # Explicitely specify LD_LIBRARY_PATH so it can find QT own libraries
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%{_builddir}/%{name}-%{version}/lib
 
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
     make -j $WM_NCOMPPROCS
 
 %install
-#    make install INSTALL_ROOT=$RPM_BUILD_ROOT%{_installPrefix}
-    make install INSTALL_ROOT=$RPM_BUILD_ROOT
+    make install DESTDIR=$RPM_BUILD_ROOT
 
     # Creation of OpenFOAM specific .csh and .sh files"
 
@@ -145,15 +149,6 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%{_installPrefix}/bin
-%{_installPrefix}/etc
-%{_installPrefix}/lib
-%{_installPrefix}/imports
-%{_installPrefix}/include
-%{_installPrefix}/mkspecs
-%{_installPrefix}/plugins
-%{_installPrefix}/phrasebooks
-%{_installPrefix}/q3porting.xml
-%{_installPrefix}/translations
+%{_installPrefix}
 
 

@@ -120,8 +120,13 @@ unset compilerBin compilerLib
 # Select compiler installation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # compilerInstall = OpenFOAM | System
+# 
+# We can override the value of compilerInstall from prefs.sh
+: ${compilerInstall:=System}
+
+# Or we can force it right here
 #compilerInstall=OpenFOAM
-compilerInstall=System
+#compilerInstall=System
 
 case "${compilerInstall:-OpenFOAM}" in
 OpenFOAM)
@@ -131,6 +136,11 @@ OpenFOAM)
         _foamAddLib $WM_THIRD_PARTY_DIR/mpfr-2.4.1/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
         _foamAddLib $WM_THIRD_PARTY_DIR/gmp-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
         ;;
+    Gcc44)
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.0/platforms/$WM_OPTIONS/etc/mpfr-3.0.0.sh
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.sh
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS/etc/gcc-4.4.5.sh
+	;;
     Gcc43)
         export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/gcc-4.3.3/platforms/$WM_ARCH$WM_COMPILER_ARCH
         _foamAddLib $WM_THIRD_PARTY_DIR/mpfr-2.4.1/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
@@ -272,7 +282,7 @@ SYSTEMOPENMPI)
 
     if [ "$FOAM_VERBOSE" -a "$PS1" ]
     then
-        echo "Using system installed OpenMPI:"
+        echo "  Environment variables defined for OpenMPI:"
         echo "    OPENMPI_BIN_DIR       : $OPENMPI_BIN_DIR"
         echo "    OPENMPI_LIB_DIR       : $OPENMPI_LIB_DIR"
         echo "    OPENMPI_INCLUDE_DIR   : $OPENMPI_INCLUDE_DIR"
@@ -474,6 +484,35 @@ export MPI_BUFFER_SIZE
     _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3/platforms/$WM_OPTIONS/etc/cmake-2.8.3.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    CMAKE_DIR is initialized to: $CMAKE_DIR"
+
+# Load m4
+# ~~~~~~~~~~
+[ -z "$M4_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/m4-1.4.16 ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/m4-1.4.16/platforms/$WM_OPTIONS/etc/m4-1.4.16.sh
+}
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    M4_DIR is initialized to: $M4_DIR"
+
+# Load bison
+# ~~~~~~~~~~
+[ -z "$BISON_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/bison-2.4.3 ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/bison-2.4.3/platforms/$WM_OPTIONS/etc/bison-2.4.3.sh
+}
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    BISON_DIR is initialized to: $BISON_DIR"
+
+# Load flex
+# ~~~~~~~~~~
+[ -z "$FLEX_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/flex-2.5.35 ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/flex-2.5.35/platforms/$WM_OPTIONS/etc/flex-2.5.35.sh
+}
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    FLEX_DIR is initialized to: $FLEX_DIR"
+
+
+# Load zoltan
+# ~~~~~~~~~~
+[ -z "$ZOLTAN_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/zoltan_3.5 ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/zoltan_3.5/platforms/$WM_OPTIONS/etc/zoltan_3.5.sh
+}
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    ZOLTAN_DIR is initialized to: $ZOLTAN_DIR"
 
 
 # Load Python

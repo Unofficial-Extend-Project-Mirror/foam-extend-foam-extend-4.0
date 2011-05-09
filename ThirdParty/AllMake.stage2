@@ -65,9 +65,9 @@ echo
 if [ "$WM_MPLIB" != "SYSTEMOPENMPI" ]
 then
     # MPI
-    #( rpm_make openmpi-1.4.1   http://www.open-mpi.org/software/ompi/v1.4/downloads/openmpi-1.4.1.tar.gz )
-    ( rpm_make openmpi-1.4.3   http://www.open-mpi.org/software/ompi/v1.4/downloads/openmpi-1.4.3.tar.gz )
-    #( rpm_make openmpi-1.5     http://www.open-mpi.org/software/ompi/v1.5/downloads/openmpi-1.5.tar.gz   )
+    #( rpm_make -p openmpi-1.4.1 -s openmpi-1.4.1.spec  -u http://www.open-mpi.org/software/ompi/v1.4/downloads/openmpi-1.4.1.tar.gz )
+    #( rpm_make -p openmpi-1.5   -s openmpi-1.5.spec    -u http://www.open-mpi.org/software/ompi/v1.5/downloads/openmpi-1.5.tar.gz   )
+     ( rpm_make -p openmpi-1.4.3 -s openmpi-1.4.3.spec  -u http://www.open-mpi.org/software/ompi/v1.4/downloads/openmpi-1.4.3.tar.gz )
 else
     echo "Using system installed OpenMPI"
     echo ""

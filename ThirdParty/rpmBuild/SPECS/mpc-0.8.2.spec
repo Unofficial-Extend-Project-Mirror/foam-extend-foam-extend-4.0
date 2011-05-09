@@ -104,7 +104,7 @@ Group: 			Development/Tools
     make -j $WM_NCOMPPROCS
 
 %install
-    make install prefix=$RPM_BUILD_ROOT%{_installPrefix}
+    make install DESTDIR=$RPM_BUILD_ROOT
 
     # Creation of OpenFOAM specific .csh and .sh files"
 

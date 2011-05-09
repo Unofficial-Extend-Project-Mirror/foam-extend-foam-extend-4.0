@@ -23,7 +23,7 @@
 #     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 # Script
-#     RPM spec file for Python-2.7
+#     RPM spec file for m4-1.4.16
 #
 # Description
 #     RPM spec file for creating a relocatable RPM
@@ -58,23 +58,22 @@
 #
 %define _prefix         %{_WM_THIRD_PARTY_DIR}
 
-%define name		Python
+%define name		m4
 %define release		%{_WM_OPTIONS}
-%define version 	2.7
+%define version 	1.4.16
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
 BuildRoot:	        %{buildroot}
-Summary: 		Python
+Summary: 		m4
 License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://www.python.org/ftp/python/2.7
-Source: 		%url/%{name}-%{version}.tgz
+URL:                    http://ftp.gnu.org/gnu/m4
+Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
-
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -114,11 +113,12 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export PYTHON_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
-export PYTHON_BIN_DIR=\$PYTHON_DIR/bin
+export M4_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 
-# Enable access to the runtime package applications
-[ -d \$PYTHON_BIN_DIR ] && _foamAddPath \$PYTHON_BIN_DIR
+[ -d \$M4_DIR/lib ] && _foamAddLib \$M4_DIR/lib
+
+# Enable access to the package applications if present
+[ -d \$M4_DIR/bin ] && _foamAddPath \$M4_DIR/bin
 DOT_SH_EOF
 
     #
@@ -127,13 +127,22 @@ DOT_SH_EOF
 cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.csh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-setenv PYTHON_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
-setenv PYTHON_BIN_DIR \$PYTHON_DIR/bin
+setenv M4_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 
-if ( -e \$PYTHON_BIN_DIR ) then
-    _foamAddPath \$PYTHON_BIN_DIR
+if ( -e \$M4_DIR/lib ) then
+    _foamAddLib \$M4_DIR/lib
+endif
+
+if ( -e \$M4_DIR/bin ) then
+    _foamAddPath \$M4_DIR/bin
 endif
 DOT_CSH_EOF
+
+    #finally, generate a .tgz file for systems where using rpm for installing packages
+    # as a non-root user might be a problem.
+
+    (cd $RPM_BUILD_ROOT/%{_prefix}; tar -zcvf %{_topdir}/TGZ/%{name}-%{version}.tgz  packages/%{name}-%{version})
+ 
 
 %clean
 rm -rf %{buildroot}

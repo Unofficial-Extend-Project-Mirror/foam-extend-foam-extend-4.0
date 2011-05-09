@@ -97,6 +97,9 @@ Group: 			Development/Tools
     if [ -n "$SGE_ROOT" ]
     then
         mpiWith="$mpiWith --with-sge"
+    else
+        mpiWith="$mpiWith --without-sge"
+	mpiWith="$mpiWith --enable-mca-no-build=ras-gridengine,pls-gridengine"
     fi
 
         # Infiniband support
@@ -107,13 +110,15 @@ Group: 			Development/Tools
         # fi
 
     ./configure \
-        --prefix=$RPM_BUILD_ROOT%{_installPrefix}  \
+        --prefix=%{_installPrefix}  \
+        --exec_prefix=%{_installPrefix}  \
         --disable-mpirun-prefix-by-default \
         --disable-orterun-prefix-by-default \
         --enable-shared --disable-static \
         --disable-mpi-f77 \
         --disable-mpi-f90 \
         --disable-mpi-cxx \
+        --without-slurm \
         --disable-mpi-profile \
         $mpiWith \
         ;
@@ -122,7 +127,7 @@ Group: 			Development/Tools
     make -j $WM_NCOMPPROCS
 
 %install
-    make install prefix=$RPM_BUILD_ROOT%{_installPrefix}
+    make install DESTDIR=$RPM_BUILD_ROOT
 
     # Creation of OpenFOAM specific .csh and .sh files"
 
@@ -160,7 +165,7 @@ export PLIBS=\$OPENMPI_LINK_FLAGS
 
 if [ "\$FOAM_VERBOSE" -a "\$PS1" ]
 then
-    echo "Using system installed OpenMPI:"
+    echo "  Environment variables defined for OpenMPI:"
     echo "    OPENMPI_BIN_DIR       : \$OPENMPI_BIN_DIR"
     echo "    OPENMPI_LIB_DIR       : \$OPENMPI_LIB_DIR"
     echo "    OPENMPI_INCLUDE_DIR   : \$OPENMPI_INCLUDE_DIR"
@@ -209,7 +214,7 @@ setenv PLIBS \`echo \$OPENMPI_LINK_FLAGS\`
 
 
 if (\$?FOAM_VERBOSE && \$?prompt) then
-    echo "Using system installed OpenMPI:"
+    echo "  Environment variables defined for OpenMPI:"
     echo "    OPENMPI_BIN_DIR       : \$OPENMPI_BIN_DIR"
     echo "    OPENMPI_LIB_DIR       : \$OPENMPI_LIB_DIR"
     echo "    OPENMPI_INCLUDE_DIR   : \$OPENMPI_INCLUDE_DIR"

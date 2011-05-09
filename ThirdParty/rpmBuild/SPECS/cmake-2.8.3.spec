@@ -93,13 +93,13 @@ Group: 			Development/Tools
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
     ./configure     \
-        --prefix=$RPM_BUILD_ROOT/%{_installPrefix}
+        --prefix=%{_installPrefix}
 
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
     make -j $WM_NCOMPPROCS
 
 %install
-    make install prefix=$RPM_BUILD_ROOT%{_installPrefix}
+    make install DESTDIR=$RPM_BUILD_ROOT
 
     # Creation of OpenFOAM specific .csh and .sh files"
 

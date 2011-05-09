@@ -166,7 +166,7 @@ Patch0:                 ParaView-3.8.1.patch_darwin
     cd ./buildObj
 
     cmake \
-        -DCMAKE_INSTALL_PREFIX:PATH=$RPM_BUILD_ROOT%{_installPrefix} \
+        -DCMAKE_INSTALL_PREFIX:PATH=%{_installPrefix} \
         $CMAKE_VARIABLES \
 	..
 
@@ -185,7 +185,7 @@ Patch0:                 ParaView-3.8.1.patch_darwin
     export NO_BRP_STALE_LINK_ERROR=yes
 
     cd buildObj
-    make install
+    make install DESTDIR=$RPM_BUILD_ROOT
 
     # Creation of OpenFOAM specific .csh and .sh files"
 

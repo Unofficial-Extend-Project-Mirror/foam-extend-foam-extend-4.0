@@ -97,7 +97,7 @@ Group: 			Development/Tools
     make -j $WM_NCOMPPROCS
 
 %install
-    make install prefix=$RPM_BUILD_ROOT%{_installPrefix}
+    make install DESTDIR=$RPM_BUILD_ROOT
 
     # Creation of OpenFOAM specific .csh and .sh files"
 
@@ -137,6 +137,11 @@ if ( -e \$GMP_DIR/bin ) then
 endif
 DOT_CSH_EOF
 
+    #finally, generate a .tgz file for systems where using rpm for installing packages
+    # as a non-root user might be a problem.
+
+    (cd $RPM_BUILD_ROOT/%{_prefix}; tar -zcvf %{_topdir}/TGZ/%{name}-%{version}.tgz  packages/%{name}-%{version})
+ 
 %clean
 rm -rf %{buildroot}
 

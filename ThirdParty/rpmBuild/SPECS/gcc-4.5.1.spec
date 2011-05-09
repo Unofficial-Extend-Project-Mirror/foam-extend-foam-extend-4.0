@@ -113,7 +113,7 @@ Group: 			Development/Tools
 
 %install
     cd ./objBuildDir
-    make install prefix=$RPM_BUILD_ROOT%{_installPrefix}
+    make install DESTDIR=$RPM_BUILD_ROOT
 
     # Creation of OpenFOAM specific .csh and .sh files"
 

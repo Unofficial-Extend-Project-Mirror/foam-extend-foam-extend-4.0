@@ -23,13 +23,13 @@
 #     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 # Script
-#     RPM spec file for Python-2.7
+#     RPM spec file for flex-2.5.35
 #
 # Description
 #     RPM spec file for creating a relocatable RPM
 #
 # Author:
-#     Martin Beaudoin, Hydro-Quebec, (2010)
+#     Martin Beaudoin, Hydro-Quebec, (2011)
 #
 #------------------------------------------------------------------------------
 
@@ -58,23 +58,22 @@
 #
 %define _prefix         %{_WM_THIRD_PARTY_DIR}
 
-%define name		Python
+%define name		flex
 %define release		%{_WM_OPTIONS}
-%define version 	2.7
+%define version 	2.5.35
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
 BuildRoot:	        %{buildroot}
-Summary: 		Python
+Summary: 		flex
 License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://www.python.org/ftp/python/2.7
-Source: 		%url/%{name}-%{version}.tgz
+URL:                     http://downloads.sourceforge.net/project/flex/flex/flex-2.5.35
+Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
-
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -114,11 +113,12 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export PYTHON_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
-export PYTHON_BIN_DIR=\$PYTHON_DIR/bin
+export FLEX_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 
-# Enable access to the runtime package applications
-[ -d \$PYTHON_BIN_DIR ] && _foamAddPath \$PYTHON_BIN_DIR
+[ -d \$FLEX_DIR/lib ] && _foamAddLib \$FLEX_DIR/lib
+
+# Enable access to the package applications if present
+[ -d \$FLEX_DIR/bin ] && _foamAddPath \$FLEX_DIR/bin
 DOT_SH_EOF
 
     #
@@ -127,13 +127,22 @@ DOT_SH_EOF
 cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.csh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-setenv PYTHON_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
-setenv PYTHON_BIN_DIR \$PYTHON_DIR/bin
+setenv FLEX_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 
-if ( -e \$PYTHON_BIN_DIR ) then
-    _foamAddPath \$PYTHON_BIN_DIR
+if ( -e \$FLEX_DIR/lib ) then
+    _foamAddLib \$FLEX_DIR/lib
+endif
+
+if ( -e \$FLEX_DIR/bin ) then
+    _foamAddPath \$FLEX_DIR/bin
 endif
 DOT_CSH_EOF
+
+    #finally, generate a .tgz file for systems where using rpm for installing packages
+    # as a non-root user might be a problem.
+
+    (cd $RPM_BUILD_ROOT/%{_prefix}; tar -zcvf %{_topdir}/TGZ/%{name}-%{version}.tgz  packages/%{name}-%{version})
+ 
 
 %clean
 rm -rf %{buildroot}

@@ -59,7 +59,7 @@ echo
 # qt-everywhere-opensource-src-4.7.0
 if [ ! -z "$QT_THIRD_PARTY" ] 
 then
-    ( rpm_make qt-everywhere-opensource-src-4.7.0 http://get.qt.nokia.com/qt/source/qt-everywhere-opensource-src-4.7.0.tar.gz )
+    ( rpm_make -p qt-everywhere-opensource-src-4.7.0 -s qt-everywhere-opensource-src-4.7.0.spec -u http://get.qt.nokia.com/qt/source/qt-everywhere-opensource-src-4.7.0.tar.gz )
 else
     echo "Using system installed QT"
     echo ""
@@ -69,9 +69,12 @@ fi
 # Paraview
 if [ -z "$PARAVIEW_SYSTEM" ] 
 then
+     # Make sure we get the value of QT_BIN_DIR initialized
+     . $WM_PROJECT_DIR/etc/settings.sh
+
     if [ -d "$QT_BIN_DIR" -a -r "$QT_BIN_DIR"/qmake ]
     then
-        ( rpm_make ParaView-3.8.1  http://www.paraview.org/files/v3.8/ParaView-3.8.1.tar.gz \
+        ( rpm_make -p ParaView-3.8.1 -s ParaView-3.8.1.spec -u http://www.paraview.org/files/v3.8/ParaView-3.8.1.tar.gz \
             -D '_qmakePath     $QT_BIN_DIR/qmake'     
         )
     else
