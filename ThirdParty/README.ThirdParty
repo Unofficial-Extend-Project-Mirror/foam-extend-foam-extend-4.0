@@ -67,6 +67,9 @@ For every packages, this is the basic process we will be going through when star
 	     Please note that a compressed tarball (.tgz) is now also generated for systems where using rpm for installing packages
              as a non-root user might be a problem.
 
+	     The .rpm files will be located under the directory $WM_THIRD_PARTY_DIR/rpmBuild/RPMS
+	     The .tgz files will be located under the directory $WM_THIRD_PARTY_DIR/rpmBuild/TGZS
+
     d: The default installation root  directory is "$WM_THIRD_PARTY_DIR". This can be overriden though when installing the RPM.
  
 Relocating the RPM root installation directory: 
