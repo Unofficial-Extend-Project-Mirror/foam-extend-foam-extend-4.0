@@ -116,14 +116,14 @@ else
     echo ""
 fi
 
-# Zoltan
-if [ -z "$ZOLTAN_SYSTEM" ] 
-then
-    ( rpm_make -p zoltan-3.5 -s zoltan-3.5.spec -u http://www.cs.sandia.gov/~kddevin/Zoltan_Distributions/zoltan_distrib_v3.5.tar.gz )
-else
-    echo "Using system installed Zoltan"
-    echo ""
-fi
+## Zoltan
+#if [ -z "$ZOLTAN_SYSTEM" ] 
+#then
+#    ( rpm_make -p zoltan-3.5 -s zoltan-3.5.spec -u http://www.cs.sandia.gov/~kddevin/Zoltan_Distributions/zoltan_distrib_v3.5.tar.gz )
+#else
+#    echo "Using system installed Zoltan"
+#    echo ""
+#fi
 
 echo ========================================
 echo Done ThirdParty AllMake: Stage3
