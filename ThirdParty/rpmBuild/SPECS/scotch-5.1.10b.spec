@@ -109,7 +109,7 @@ Patch0:                 scotch-5.1.10b_patch_0
 %install
     cd src
     mkdir -p $RPM_BUILD_ROOT%{_installPrefix}
-    make install DESTDIR=$RPM_BUILD_ROOT
+    make install prefix=$RPM_BUILD_ROOT%{_installPrefix}
 
     # Creation of OpenFOAM specific .csh and .sh files"
 
