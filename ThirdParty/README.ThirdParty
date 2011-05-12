@@ -12,7 +12,7 @@ The whole process needs to run and install in user-space, without the need to be
 Here is what's available:
  
  a: A set of rpm spec files for specific ThirdParty packages.
- b: A suite of bash scripts to automate the complete sequence of  downloading, compiling, installing and generating RPMs.
+ b: A suite of bash scripts to automate the complete sequence of downloading, compiling, installing and generating RPMs.
  c: An empty directory structure pre-configured and ready to proceed with the download, compilation and installation of
     chosen ThirdParty packages for OF-1.6-ext.
  
@@ -55,12 +55,18 @@ Quick description of the main scripts:
  
  
 For every packages, this is the basic process we will be going through when starting building the ThirdParty packages from scratch::
-    a: Verify in the local "RPM vault" if  a RPM is available for a given package
+    a: Verify in the local "RPM vault" if a RPM file is available for a given package
     b: If it is, simply install this RPM and move on to the next package
     c: if the RPM is absent:
         i: verify if the source tarbal is available from the SOURCES "vault"
         ii: if it is not, download the tarball using the specified URL.
-        iii: proceed with the extraction, patching, configuration, compilation, RPM generation and installation of the package. The generated RPM is always used for installation. 
+        iii: proceed with the extraction, patching, configuration, compilation, RPM generation and installation of the package. 
+             The generated RPM is always used for installation.
+
+             Important notice:
+	     Please note that a compressed tarball (.tgz) is now also generated for systems where using rpm for installing packages
+             as a non-root user might be a problem.
+
     d: The default installation root  directory is "$WM_THIRD_PARTY_DIR". This can be overriden though when installing the RPM.
  
 Relocating the RPM root installation directory: 
@@ -72,11 +78,12 @@ Relocating the RPM root installation directory:
  
     The Relocations path is the actual location pointed by the $WM_THIRD_PARTY_DIR on my laptop when I generated the RPM.
     It is the indication that the RPM is relocatable
-    This path will turn to be hardcoded in the RPM because the environment variable was expanded before generating the RPM..
+    This path will end up being hardcoded in the RPM because the environment variable was expanded before generating the RPM..
     This is the default root directory where the RPM will install its "payload"
     This can be overridden using the 'rpm' command-line parameter --relocate OLDPATH=NEWPATH .
  
-    For example, let's say you want to install the RPM under the root directory /tmp/someDir instead, you will call the 'rpm' command like this:
+    For example, let's say you want to install the RPM under the root directory /tmp/someDir instead.
+    You will need to call the 'rpm' command like this:
  
     rpm -ivh ./cmake-2.8.3-darwinIntelGccDPOpt.i386.rpm --relocate /Users/beaudoin/Projets/SAMH/OpenFOAM/ThirdParty-1.6-ext-RPM-based=/tmp/someDir
  
@@ -99,5 +106,5 @@ To be continued...
  
  
 Martin Beaudoin
-Novembre 2010
+May 2011
  
