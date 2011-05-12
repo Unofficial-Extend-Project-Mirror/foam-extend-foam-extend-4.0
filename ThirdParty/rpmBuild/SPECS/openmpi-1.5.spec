@@ -229,6 +229,11 @@ if (\$?FOAM_VERBOSE && \$?prompt) then
 endif
 DOT_CSH_EOF
 
+    #finally, generate a .tgz file for systems where using rpm for installing packages
+    # as a non-root user might be a problem.
+    (mkdir -p  %{_topdir}/TGZ; cd $RPM_BUILD_ROOT/%{_prefix}; tar -zcvf %{_topdir}/TGZ/%{name}-%{version}.tgz  packages/%{name}-%{version})
+
+
 %clean
 rm -rf %{buildroot}
 
