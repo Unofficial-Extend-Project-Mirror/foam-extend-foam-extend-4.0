@@ -33,15 +33,17 @@
 buildBase=$WM_THIRD_PARTY_DIR/rpmBuild
 architecture=`rpm --eval "%{_target_cpu}"`
 
-# Adjust the rpm command on Ubuntu system
-rpm --force-debian >& /dev/null
+RPM_CMD='rpm' 
+RPM_CMD_XTRA_OPTIONS='' 
+
+# Adjust the rpm command options on Ubuntu/Debian based systems
+${RPM_CMD} --force-debian >& /dev/null
 
 RETVAL=$?
-[ $RETVAL -eq 0 ] && RPM_CMD="rpm --force-debian" #Success : Debian system
-[ $RETVAL -ne 0 ] && RPM_CMD="rpm"                #Failed  : Non-Debian system
+[ $RETVAL -eq 0 ] && RPM_CMD_XTRA_OPTIONS="--force-debian" #Success : Debian system
 
 echo ""
-echo "This system rpm command: $RPM_CMD"
+echo "This system rpm command: ${RPM_CMD} ${RPM_CMD_XTRA_OPTIONS}"
 echo ""
 
 #
@@ -167,7 +169,7 @@ rpm_uninstall()
     cd $buildBase
 
     echo "  Uninstalling $package using RPM: $rpmName"
-    $RPM_CMD -e $rpmName --dbpath $buildBase/rpmDB --norepackage >& /dev/null
+    ${RPM_CMD} ${RPM_CMD_XTRA_OPTIONS} -e $rpmName --dbpath $buildBase/rpmDB --norepackage >& /dev/null
 
     # Note: rpm will rant when uninstalling packages with an error message
     #       starting with "error: LOOP:"
@@ -186,7 +188,7 @@ rpm_install()
     rpmFile=$buildBase/RPMS/$architecture/$rpmName.rpm;
 
     echo "  Installing $package using RPM file: $rpmFile";
-    $RPM_CMD -ivh              \
+    ${RPM_CMD} ${RPM_CMD_XTRA_OPTIONS} -ivh              \
 	$rpmFile          \
 	--dbpath $buildBase/rpmDB --force --nodeps;
 
