@@ -37,6 +37,9 @@
 %{expand:%%define _WM_THIRD_PARTY_DIR %(echo $WM_THIRD_PARTY_DIR)}
 %{expand:%%define _WM_OPTIONS         %(echo $WM_OPTIONS)}
 
+# Disable the generation of debuginfo packages
+%define debug_package %{nil}
+
 # The topdir needs to point to the $WM_THIRD_PARTY/rpmbuild directory
 %define _topdir	 	%{_WM_THIRD_PARTY_DIR}/rpmBuild
 %define _tmppath	%{_topdir}/tmp
