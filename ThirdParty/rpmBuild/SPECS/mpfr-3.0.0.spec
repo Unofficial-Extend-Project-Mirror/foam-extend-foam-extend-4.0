@@ -103,7 +103,7 @@ Group: 			Development/Tools
     make -j $WM_NCOMPPROCS
 
 %install
-    make install DESTDIR=$RPM_BUILD_ROOTbg
+    make install DESTDIR=$RPM_BUILD_ROOT
 
 
     # Creation of OpenFOAM specific .csh and .sh files"
@@ -154,8 +154,5 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%{_installPrefix}/etc
-%{_installPrefix}/include
-%{_installPrefix}/lib
-%{_installPrefix}/share
+%{_installPrefix}
 
