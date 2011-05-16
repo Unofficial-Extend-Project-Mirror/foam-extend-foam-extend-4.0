@@ -96,7 +96,7 @@ Group: 			Development/Tools
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
     GMP_VERSION=gmp-5.0.1
-    MPFR_VERSION=mpfr-3.0.0
+    MPFR_VERSION=mpfr-3.0.1
 
     # Set LD_LIBRARY_FILE for GMP and MPFR so configure won't fail some of the tests 
     export LD_LIBRARY_PATH=$WM_THIRD_PARTY_DIR/packages/$GMP_VERSION/platforms/$WM_OPTIONS/lib:$LD_LIBRARY_PATH    

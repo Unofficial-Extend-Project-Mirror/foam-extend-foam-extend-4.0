@@ -96,7 +96,7 @@ Group: 			Development/Tools
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
     GMP_VERSION=gmp-5.0.1
-    MPFR_VERSION=mpfr-3.0.0
+    MPFR_VERSION=mpfr-3.0.1
 
     ./configure     \
         --prefix=%{_installPrefix}  \

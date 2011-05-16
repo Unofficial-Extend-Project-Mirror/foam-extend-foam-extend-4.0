@@ -73,7 +73,7 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://www.mpfr.org/mpfr-current
+URL:                    ftp://ftp.gnu.org/gnu/mpfr
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools

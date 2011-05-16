@@ -65,13 +65,13 @@ echo
 # You need gmp and mpfr for gcc-4.4.5
 # Uncomment the following 3 lines for gcc-4.4.5
 #( rpm_make -p gmp-5.0.1   -s gmp-5.0.1.spec  -u ftp://ftp.gnu.org/gnu/gmp/gmp-5.0.1.tar.gz                  )
-#( rpm_make -p mpfr-3.0.0  -s mpfr-3.0.0.spec -u http://www.mpfr.org/mpfr-current/mpfr-3.0.0.tar.gz          )
+#( rpm_make -p mpfr-3.0.1  -s mpfr-3.0.1.spec -u ftp://ftp.gnu.org/gnu/mpfr/mpfr-3.0.1.tar.gz                )
 #( rpm_make -p gcc-4.4.5   -s gcc-4.4.5.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.4.5/gcc-4.4.5.tar.gz        )
 #
 # You need gmp, mpfr and mpc for gcc-4.5.1
 # Uncomment the following 4 lines for gcc-4.5.1
 #( rpm_make -p gmp-5.0.1  -s gmp-5.0.1.spec  -u ftp://ftp.gnu.org/gnu/gmp/gmp-5.0.1.tar.gz                  )
-#( rpm_make -p mpfr-3.0.0 -s mpfr-3.0.0.spec -u http://www.mpfr.org/mpfr-current/mpfr-3.0.0.tar.gz          )
+#( rpm_make -p mpfr-3.0.1 -s mpfr-3.0.1.spec -u ftp://ftp.gnu.org/gnu/mpfr/mpfr-3.0.1.tar.gz                )
 #( rpm_make -p mpc-0.8.2  -s mpc-0.8.2.spec  -u http://www.multiprecision.org/mpc/download/mpc-0.8.2.tar.gz )
 #( rpm_make -p gcc-4.5.1  -s gcc-4.5.1.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.5.1/gcc-4.5.1.tar.gz        )
 
