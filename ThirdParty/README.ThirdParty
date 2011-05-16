@@ -105,6 +105,19 @@ Relocating the RPM root installation directory:
    
    b: Maybe adding some RPM dependencies might be useful. I have not explored this yet.
  
+
+10: Gotchas and solutions:
+
+   Error messages from rpm:
+   ------------------------
+
+   Problem : error: can't create transaction lock on /var/lock/rpm/transaction
+   Solution: add the following entry in your file ~/.rpmmacros
+             
+             %_rpmlock_path %{_dbpath}/__db.000
+
+             
+
 To be continued...
  
  
