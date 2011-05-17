@@ -33,7 +33,7 @@ Author
     University of Massachusetts Amherst
     All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "dynamicTopoFvMesh.H"
 
@@ -41,6 +41,7 @@ Author
 #include "volFields.H"
 #include "triPointRef.H"
 #include "tetPointRef.H"
+#include "coupledInfo.H"
 
 namespace Foam
 {
@@ -70,6 +71,21 @@ bool dynamicTopoFvMesh::meshQuality
 
         if (cellToCheck.empty())
         {
+            continue;
+        }
+
+        // Skip hexahedral cells
+        if (cellToCheck.size() == 6)
+        {
+            cQuality = 1.0;
+            meanQuality += cQuality;
+
+            // Update min / max
+            maxQuality = Foam::max(cQuality, maxQuality);
+            minQuality = Foam::min(cQuality, minQuality);
+
+            nCells++;
+
             continue;
         }
 
@@ -201,13 +217,14 @@ bool dynamicTopoFvMesh::meshQuality
                 << endl;
         }
 
-        Info << endl;
-        Info << " ~~~ Mesh Quality Statistics ~~~ " << endl;
-        Info << " Min: " << minQuality << endl;
-        Info << " Max: " << maxQuality << endl;
-        Info << " Mean: " << meanQuality/nCells << endl;
-        Info << " Cells: " << nCells << endl;
-        Info << " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << nl << endl;
+        Info<< nl
+            << " ~~~ Mesh Quality Statistics ~~~ " << nl
+            << " Min: " << minQuality << nl
+            << " Max: " << maxQuality << nl
+            << " Mean: " << meanQuality/nCells << nl
+            << " Cells: " << nCells << nl
+            << " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << nl
+            << endl;
     }
 
     return sliversAbsent;
@@ -248,10 +265,29 @@ dynamicTopoFvMesh::checkEdgeBoundary
 
 
 // Check whether the given edge is on a bounding curve
-bool dynamicTopoFvMesh::checkBoundingCurve(const label eIndex) const
+//  - If nProcCurves is provided, the variable is incremented
+//    if the edge is processor-coupled
+bool dynamicTopoFvMesh::checkBoundingCurve
+(
+    const label eIndex,
+    const bool overRidePurityCheck,
+    label* nProcCurves
+) const
 {
     // Internal edges don't count
     label edgePatch = -1;
+
+    // If this entity was deleted, skip it.
+    if (edgeFaces_[eIndex].empty())
+    {
+        // Return true so that swap3DEdges skips this edge.
+        return true;
+    }
+
+    // Check if two boundary faces lie on different face-patches
+    bool procCoupled = false;
+    FixedList<label, 2> fPatches(-1);
+    FixedList<vector, 2> fNorm(vector::zero);
 
     if ((edgePatch = whichEdgePatch(eIndex)) < 0)
     {
@@ -264,35 +300,115 @@ bool dynamicTopoFvMesh::checkBoundingCurve(const label eIndex) const
         {
             return true;
         }
-    }
 
-    // Check if two boundary faces lie on different face-patches
-    FixedList<vector, 2> fNorm(vector::zero);
-    label fPatch, firstPatch = -1, secondPatch = -1, count = 0;
-    const labelList& edgeFaces = edgeFaces_[eIndex];
-
-    forAll(edgeFaces, faceI)
-    {
-        if ((fPatch = whichPatch(edgeFaces[faceI])) > -1)
+        // Explicit check for processor edges (both 2D and 3D)
+        if (processorCoupledEntity(eIndex, false, true))
         {
-            // Obtain the normal.
-            fNorm[count] = faces_[edgeFaces[faceI]].normal(points_);
-
-            // Normalize it.
-            fNorm[count] /= mag(fNorm[count]) + VSMALL;
-
-            count++;
-
-            if (firstPatch == -1)
+            // Increment nProcCurves
+            if (nProcCurves)
             {
-                firstPatch = fPatch;
+                (*nProcCurves)++;
+            }
+
+            // Check for pure processor edge, and if not,
+            // fetch boundary patch labels / normals
+            if
+            (
+                processorCoupledEntity
+                (
+                    eIndex,
+                    false,
+                    true,
+                    true,
+                    &fPatches,
+                    &fNorm
+                )
+            )
+            {
+                // 'Pure' processor coupled edges don't count
+                return false;
             }
             else
+            if (!overRidePurityCheck)
             {
-                secondPatch = fPatch;
-                break;
+                // This edge lies between a processor and physical patch,
+                //  - This a bounding curve (unless an override is requested)
+                //  - An override is warranted for 2-2 swaps on impure edges,
+                //    which is typically requested by swap3DEdges.
+                return true;
+            }
+
+            // Specify that the edge is procCoupled
+            procCoupled = true;
+        }
+    }
+
+    if (procCoupled)
+    {
+        // Normalize patch normals from coupled check
+        fNorm[0] /= mag(fNorm[0]) + VSMALL;
+        fNorm[1] /= mag(fNorm[1]) + VSMALL;
+    }
+    else
+    {
+        // Fetch patch indices / normals
+        const labelList& eFaces = edgeFaces_[eIndex];
+
+        label fPatch = -1, count = 0;
+
+        forAll(eFaces, faceI)
+        {
+            if ((fPatch = whichPatch(eFaces[faceI])) > -1)
+            {
+                // Obtain the normal.
+                fNorm[count] = faces_[eFaces[faceI]].normal(points_);
+
+                // Normalize it.
+                fNorm[count] /= mag(fNorm[count]) + VSMALL;
+
+                // Note patch index
+                fPatches[count] = fPatch;
+
+                count++;
+
+                if (count == 2)
+                {
+                    break;
+                }
             }
         }
+    }
+
+    // Check for legitimate patches
+    if (fPatches[0] < 0 || fPatches[1] < 0)
+    {
+        const labelList& eFaces = edgeFaces_[eIndex];
+
+        forAll(eFaces, faceI)
+        {
+            Pout<< " Face: " << eFaces[faceI]
+                << " :: " << faces_[eFaces[faceI]]
+                << " Patch: " << whichPatch(eFaces[faceI]) << nl;
+        }
+
+        label epI = whichEdgePatch(eIndex);
+
+        FatalErrorIn
+        (
+            "bool dynamicTopoFvMesh::checkBoundingCurve"
+            "(const label, const bool) const"
+        )
+            << " Edge: " << eIndex << ":: " << edges_[eIndex]
+            << " Patch: "
+            << (epI < 0 ? "Internal" : boundaryMesh()[epI].name())
+            << " edgeFaces: " << eFaces << nl
+            << " expected 2 boundary patches." << nl
+            << " fPatches[0]: " << fPatches[0] << nl
+            << " fPatches[1]: " << fPatches[1] << nl
+            << " fNorm[0]: " << fNorm[0] << nl
+            << " fNorm[1]: " << fNorm[1] << nl
+            << " coupledModification: " << coupledModification_
+            << abort(FatalError);
     }
 
     scalar deviation = (fNorm[0] & fNorm[1]);
@@ -304,7 +420,7 @@ bool dynamicTopoFvMesh::checkBoundingCurve(const label eIndex) const
     }
 
     // Check if the edge borders two different patches
-    if (firstPatch != secondPatch)
+    if (fPatches[0] != fPatches[1])
     {
         return true;
     }
@@ -333,11 +449,67 @@ bool dynamicTopoFvMesh::checkQuality
 
         if (debug > 2)
         {
-            Info << nl << nl
-                 << " eIndex: " << eIndex
-                 << " minQuality: " << minQuality
-                 << " newQuality: " << Q[checkIndex][0][m[checkIndex]-1]
-                 << endl;
+            Pout<< nl << nl
+                << " eIndex: " << eIndex
+                << " minQuality: " << minQuality
+                << " newQuality: " << Q[checkIndex][0][m[checkIndex]-1]
+                << endl;
+        }
+    }
+
+    if (coupledModification_)
+    {
+        // Only locally coupled indices require checks
+        if (locallyCoupledEntity(eIndex))
+        {
+            // Check the quality of the slave edge as well.
+            label sIndex = -1;
+
+            // Loop through masterToSlave and determine the slave index.
+            forAll(patchCoupling_, patchI)
+            {
+                if (patchCoupling_(patchI))
+                {
+                    const label edgeEnum  = coupleMap::EDGE;
+                    const coupleMap& cMap = patchCoupling_[patchI].map();
+
+                    if ((sIndex = cMap.findSlave(edgeEnum, eIndex)) > -1)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (sIndex == -1)
+            {
+                FatalErrorIn
+                (
+                    "bool dynamicTopoFvMesh::checkQuality\n"
+                    "(\n"
+                    "    const label eIndex,\n"
+                    "    const labelList& m,\n"
+                    "    const PtrList<scalarListList>& Q,\n"
+                    "    const scalar minQuality,\n"
+                    "    const label checkIndex\n"
+                    ") const\n"
+                )
+                    << "Coupled maps were improperly specified." << nl
+                    << " Slave index not found for: " << nl
+                    << " Edge: " << eIndex << nl
+                    << abort(FatalError);
+            }
+
+            // Turn off switch temporarily.
+            unsetCoupledModification();
+
+            // Recursively call for the slave edge.
+            myResult =
+            (
+                myResult && checkQuality(sIndex, m, Q, minQuality, 1)
+            );
+
+            // Turn it back on.
+            setCoupledModification();
         }
     }
 
@@ -354,68 +526,68 @@ void dynamicTopoFvMesh::printTables
     const label checkIndex
 ) const
 {
-    Info << "m: " << m[checkIndex] << endl;
+    Pout<< "m: " << m[checkIndex] << endl;
 
     // Print out Q
-    Info << "===" << endl;
-    Info << " Q " << endl;
-    Info << "===" << endl;
+    Pout<< "===" << nl
+        << " Q " << nl
+        << "===" << endl;
 
-    Info << "   ";
-
-    for (label j = 0; j < m[checkIndex]; j++)
-    {
-        Info << setw(12) << j;
-    }
-
-    Info << nl;
+    Pout<< "   ";
 
     for (label j = 0; j < m[checkIndex]; j++)
     {
-        Info << "-------------";
+        Pout<< setw(12) << j;
     }
 
-    Info << nl;
+    Pout<< nl;
+
+    for (label j = 0; j < m[checkIndex]; j++)
+    {
+        Pout<< "-------------";
+    }
+
+    Pout<< nl;
 
     for (label i = 0; i < (m[checkIndex]-2); i++)
     {
-        Info << i << ": ";
+        Pout<< i << ": ";
 
         for (label j = 0; j < m[checkIndex]; j++)
         {
-            Info << setw(12) << Q[checkIndex][i][j];
+            Pout<< setw(12) << Q[checkIndex][i][j];
         }
 
-        Info << nl;
+        Pout<< nl;
     }
 
     // Print out K
-    Info << "===" << endl;
-    Info << " K " << endl;
-    Info << "===" << endl;
+    Pout<< "===" << nl
+        << " K " << nl
+        << "===" << endl;
 
-    Info << "   ";
+    Pout<< "   ";
 
     for (label j = 0; j < m[checkIndex]; j++)
     {
-        Info << setw(12) << j;
+        Pout<< setw(12) << j;
     }
 
-    Info << nl;
+    Pout<< nl;
 
     for (label i = 0; i < (m[checkIndex]-2); i++)
     {
-        Info << i << ": ";
+        Pout<< i << ": ";
 
         for (label j = 0; j < m[checkIndex]; j++)
         {
-            Info << setw(12) << K[checkIndex][i][j];
+            Pout<< setw(12) << K[checkIndex][i][j];
         }
 
-        Info << nl;
+        Pout<< nl;
     }
 
-    Info << endl;
+    Pout<< endl;
 }
 
 
@@ -428,14 +600,25 @@ bool dynamicTopoFvMesh::checkTriangulationVolumes
 ) const
 {
     label m = hullVertices.size();
-    scalar tetVol = 0.0;
+    scalar oldTetVol = 0.0, newTetVol = 0.0;
 
     const edge& edgeToCheck = edges_[eIndex];
 
     for (label i = 0; i < (m-2); i++)
     {
         // Compute volume for the upper-half
-        tetVol =
+        newTetVol =
+        (
+            tetPointRef
+            (
+                points_[hullVertices[triangulations[0][i]]],
+                points_[hullVertices[triangulations[1][i]]],
+                points_[hullVertices[triangulations[2][i]]],
+                points_[edgeToCheck[0]]
+            ).mag()
+        );
+
+        oldTetVol =
         (
             tetPointRef
             (
@@ -446,32 +629,37 @@ bool dynamicTopoFvMesh::checkTriangulationVolumes
             ).mag()
         );
 
-        if (tetVol < 0.0)
+        if (oldTetVol < 0.0 || (mag(oldTetVol) < mag(0.1 * newTetVol)))
         {
             if (debug > 2)
             {
-                InfoIn
-                (
-                    "bool dynamicTopoFvMesh::checkTriangulationVolumes\n"
-                    "(\n"
-                    "    const label eIndex,\n"
-                    "    const labelList& hullVertices,\n"
-                    "    const labelListList& triangulations\n"
-                    ") const\n"
-                )
-                    << "Swap sequence leads to negative old-volumes." << nl
-                    << "Edge: " << edgeToCheck << nl
-                    << "using Points: " << nl
+                Pout<< " Swap sequence leads to bad old-volumes." << nl
+                    << " Edge: " << edgeToCheck << nl
+                    << " using Points: " << nl
                     << oldPoints_[hullVertices[triangulations[0][i]]] << nl
                     << oldPoints_[hullVertices[triangulations[1][i]]] << nl
                     << oldPoints_[hullVertices[triangulations[2][i]]] << nl
-                    << oldPoints_[edgeToCheck[0]] << endl;
+                    << oldPoints_[edgeToCheck[0]] << nl
+                    << " Old Volume: " << oldTetVol << nl
+                    << " New Volume: " << newTetVol << nl
+                    << endl;
             }
 
             return true;
         }
 
-        tetVol =
+        newTetVol =
+        (
+            tetPointRef
+            (
+                points_[hullVertices[triangulations[2][i]]],
+                points_[hullVertices[triangulations[1][i]]],
+                points_[hullVertices[triangulations[0][i]]],
+                points_[edgeToCheck[1]]
+            ).mag()
+        );
+
+        oldTetVol =
         (
             tetPointRef
             (
@@ -482,26 +670,20 @@ bool dynamicTopoFvMesh::checkTriangulationVolumes
             ).mag()
         );
 
-        if (tetVol < 0.0)
+        if (oldTetVol < 0.0 || (mag(oldTetVol) < mag(0.1 * newTetVol)))
         {
             if (debug > 2)
             {
-                InfoIn
-                (
-                    "bool dynamicTopoFvMesh::checkTriangulationVolumes\n"
-                    "(\n"
-                    "    const label eIndex,\n"
-                    "    const labelList& hullVertices,\n"
-                    "    const labelListList& triangulations\n"
-                    ") const\n"
-                )
-                    << "Swap sequence leads to negative old-volumes." << nl
-                    << "Edge: " << edgeToCheck << nl
-                    << "using Points: " << nl
+                Pout<< " Swap sequence leads to bad old-volumes." << nl
+                    << " Edge: " << edgeToCheck << nl
+                    << " using Points: " << nl
                     << oldPoints_[hullVertices[triangulations[2][i]]] << nl
                     << oldPoints_[hullVertices[triangulations[1][i]]] << nl
                     << oldPoints_[hullVertices[triangulations[0][i]]] << nl
-                    << oldPoints_[edgeToCheck[1]] << endl;
+                    << oldPoints_[edgeToCheck[1]] << nl
+                    << " Old Volume: " << oldTetVol << nl
+                    << " New Volume: " << newTetVol << nl
+                    << endl;
             }
 
             return true;
@@ -509,6 +691,163 @@ bool dynamicTopoFvMesh::checkTriangulationVolumes
     }
 
     return false;
+}
+
+
+// Write out connectivity for an edge
+void dynamicTopoFvMesh::writeEdgeConnectivity
+(
+    const label eIndex
+) const
+{
+    // Write out edge
+    writeVTK("Edge_" + Foam::name(eIndex), eIndex, 1, false, true);
+
+    const labelList& eFaces = edgeFaces_[eIndex];
+
+    // Write out edge faces
+    writeVTK
+    (
+        "EdgeFaces_"
+      + Foam::name(eIndex)
+      + '_'
+      + Foam::name(Pstream::myProcNo()),
+        eFaces,
+        2, false, true
+    );
+
+    DynamicList<label> edgeCells(10);
+
+    forAll(eFaces, faceI)
+    {
+        label pIdx = whichPatch(eFaces[faceI]);
+
+        word pName((pIdx < 0) ?	"Internal" : boundaryMesh()[pIdx].name());
+
+        Pout<< " Face: " << eFaces[faceI]
+            << " :: " << faces_[eFaces[faceI]]
+            << " Patch: " << pName
+            << " Proc: " << Pstream::myProcNo() << nl;
+
+        label own = owner_[eFaces[faceI]];
+        label nei = neighbour_[eFaces[faceI]];
+
+        if (findIndex(edgeCells, own) == -1)
+        {
+            edgeCells.append(own);
+        }
+
+        if (nei == -1)
+        {
+            continue;
+        }
+
+        if (findIndex(edgeCells, nei) == -1)
+        {
+            edgeCells.append(nei);
+        }
+    }
+
+    // Write out cells connected to edge
+    writeVTK
+    (
+        "EdgeCells_"
+      + Foam::name(eIndex)
+      + '_'
+      + Foam::name(Pstream::myProcNo()),
+        edgeCells,
+        3, false, true
+    );
+
+    if (twoDMesh_)
+    {
+        return;
+    }
+
+    // Check processors for coupling
+    forAll(procIndices_, pI)
+    {
+        // Fetch reference to subMesh
+        const coupleMap& cMap = recvMeshes_[pI].map();
+        const dynamicTopoFvMesh& mesh = recvMeshes_[pI].subMesh();
+
+        label sI = -1;
+
+        if ((sI = cMap.findSlave(coupleMap::EDGE, eIndex)) == -1)
+        {
+            continue;
+        }
+
+        const edge& slaveEdge = mesh.edges_[sI];
+        const labelList& seFaces = mesh.edgeFaces_[sI];
+
+        edge cE
+        (
+            cMap.findMaster(coupleMap::POINT, slaveEdge[0]),
+            cMap.findMaster(coupleMap::POINT, slaveEdge[1])
+        );
+
+        Pout<< " >> Edge: " << sI << "::" << slaveEdge
+            << " mapped: " << cE << nl;
+
+        mesh.writeVTK
+        (
+            "EdgeFaces_"
+          + Foam::name(eIndex)
+          + '_'
+          + Foam::name(procIndices_[pI]),
+            seFaces,
+            2, false, true
+        );
+
+        // Clear existing list
+        edgeCells.clear();
+
+        forAll(seFaces, faceI)
+        {
+            label pIdx = mesh.whichPatch(seFaces[faceI]);
+
+            word pName
+            (
+                (pIdx < 0) ?
+                "Internal" :
+                mesh.boundaryMesh()[pIdx].name()
+            );
+
+            Pout<< " Face: " << seFaces[faceI]
+                << " :: " << mesh.faces_[seFaces[faceI]]
+                << " Patch: " << pName
+                << " Proc: " << procIndices_[pI] << nl;
+
+            label own = mesh.owner_[seFaces[faceI]];
+            label nei = mesh.neighbour_[seFaces[faceI]];
+
+            if (findIndex(edgeCells, own) == -1)
+            {
+                edgeCells.append(own);
+            }
+
+            if (nei == -1)
+            {
+                continue;
+            }
+
+            if (findIndex(edgeCells, nei) == -1)
+            {
+                edgeCells.append(nei);
+            }
+        }
+
+        mesh.writeVTK
+        (
+            "EdgeCells_"
+          + Foam::name(eIndex)
+          + '_'
+          + Foam::name(procIndices_[pI]),
+            edgeCells,
+            3, false, true
+        );
+    }
 }
 
 
@@ -545,9 +884,105 @@ void dynamicTopoFvMesh::writeVTK
     const labelList& cList,
     const label primitiveType,
     const bool useOldConnectivity,
-    const bool useOldPoints
+    const bool useOldPoints,
+    const UList<scalar>& scalField,
+    const UList<label>& lablField
 ) const
 {
+    // Check if spatial bounding box has been specified
+    const dictionary& meshSubDict = dict_.subDict("dynamicTopoFvMesh");
+
+    labelList entityList;
+
+    if (meshSubDict.found("spatialDebug") && !useOldConnectivity)
+    {
+        // Read the bounding box
+        boundBox bb
+        (
+            meshSubDict.subDict("spatialDebug").lookup("debugBoundBox")
+        );
+
+        DynamicList<label> cSubList(10);
+
+        forAll(cList, cellI)
+        {
+            label index = cList[cellI];
+
+            if (index < 0)
+            {
+                continue;
+            }
+
+            point containPoint(vector::zero);
+
+            switch (primitiveType)
+            {
+                // Are we looking at points?
+                case 0:
+                {
+                    containPoint = points_[index];
+                    break;
+                }
+
+                // Are we looking at edges?
+                case 1:
+                {
+                    containPoint = edges_[index].centre(points_);
+                    break;
+                }
+
+                // Are we looking at faces?
+                case 2:
+                {
+                    containPoint = faces_[index].centre(points_);
+                    break;
+                }
+
+                // Are we looking at cells?
+                case 3:
+                {
+                    scalar volume = 0.0;
+
+                    // Compute centre
+                    meshOps::cellCentreAndVolume
+                    (
+                        index,
+                        points_,
+                        faces_,
+                        cells_,
+                        owner_,
+                        containPoint,
+                        volume
+                    );
+
+                    break;
+                }
+            }
+
+            // Is the point of interest?
+            if (bb.contains(containPoint))
+            {
+                cSubList.append(index);
+            }
+        }
+
+        // If nothing is present, don't write out anything
+        if (cSubList.empty())
+        {
+            return;
+        }
+        else
+        {
+            // Take over contents
+            entityList = cSubList;
+        }
+    }
+    else
+    {
+        // Conventional output
+        entityList = cList;
+    }
+
     if (useOldPoints)
     {
         if (useOldConnectivity)
@@ -557,13 +992,15 @@ void dynamicTopoFvMesh::writeVTK
             (
                 (*this),
                 name,
-                cList,
+                entityList,
                 primitiveType,
                 polyMesh::points(),
                 polyMesh::edges(),
                 polyMesh::faces(),
                 polyMesh::cells(),
-                polyMesh::faceOwner()
+                polyMesh::faceOwner(),
+                scalField,
+                lablField
             );
         }
         else
@@ -572,13 +1009,15 @@ void dynamicTopoFvMesh::writeVTK
             (
                 (*this),
                 name,
-                cList,
+                entityList,
                 primitiveType,
                 oldPoints_,
                 edges_,
                 faces_,
                 cells_,
-                owner_
+                owner_,
+                scalField,
+                lablField
             );
         }
     }
@@ -588,13 +1027,15 @@ void dynamicTopoFvMesh::writeVTK
         (
             (*this),
             name,
-            cList,
+            entityList,
             primitiveType,
             points_,
             edges_,
             faces_,
             cells_,
-            owner_
+            owner_,
+            scalField,
+            lablField
         );
     }
 }
@@ -603,8 +1044,8 @@ void dynamicTopoFvMesh::writeVTK
 // Return the status report interval
 scalar dynamicTopoFvMesh::reportInterval() const
 {
-    // Default to 3 seconds
-    scalar interval = 3.0;
+    // Default to 1 second
+    scalar interval = 1.0;
 
     const dictionary& meshSubDict = dict_.subDict("dynamicTopoFvMesh");
 
@@ -636,7 +1077,7 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
     );
 
     // Check face-label ranges
-    Info << "Checking index ranges...";
+    Pout<< "Checking index ranges...";
 
     forAll(edges_, edgeI)
     {
@@ -653,31 +1094,31 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
             curEdge[1] < 0 || curEdge[1] > (points_.size()-1)
         )
         {
-            Pout << "Edge " << edgeI
-                 << " contains vertex labels out of range: "
-                 << curEdge
-                 << " Max point index = " << (points_.size()-1) << endl;
+            Pout<< "Edge " << edgeI
+                << " contains vertex labels out of range: "
+                << curEdge
+                << " Max point index = " << (points_.size()-1) << endl;
 
             nFailedChecks++;
 
             ConnectivityWarning()
-                 << nl << "Edge-point connectivity is inconsistent."
-                 << endl;
+                << nl << "Edge-point connectivity is inconsistent."
+                << endl;
         }
 
         // Check for unique point-labels
         if (curEdge[0] == curEdge[1])
         {
-            Pout << "Edge " << edgeI
-                 << " contains identical vertex labels: "
-                 << curEdge
-                 << endl;
+            Pout<< "Edge " << edgeI
+                << " contains identical vertex labels: "
+                << curEdge
+                << endl;
 
             nFailedChecks++;
 
             ConnectivityWarning()
-                 << nl << "Edge-point connectivity is inconsistent."
-                 << endl;
+                << nl << "Edge-point connectivity is inconsistent."
+                << endl;
         }
     }
 
@@ -695,16 +1136,16 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
 
         if (min(curFace) < 0 || max(curFace) > (points_.size()-1))
         {
-            Pout << "Face " << faceI
-                 << " contains vertex labels out of range: "
-                 << curFace
-                 << " Max point index = " << (points_.size()-1) << endl;
+            Pout<< "Face " << faceI
+                << " contains vertex labels out of range: "
+                << curFace
+                << " Max point index = " << (points_.size()-1) << endl;
 
             nFailedChecks++;
 
             ConnectivityWarning()
-                 << nl << "Face-point connectivity is inconsistent."
-                 << endl;
+                << nl << "Face-point connectivity is inconsistent."
+                << endl;
         }
 
         // Check for unique point-labels
@@ -716,16 +1157,16 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
 
             if (!inserted)
             {
-                Pout << "Face " << faceI
-                     << " contains identical vertex labels: "
-                     << curFace
-                     << endl;
+                Pout<< "Face " << faceI
+                    << " contains identical vertex labels: "
+                    << curFace
+                    << endl;
 
                 nFailedChecks++;
 
                 ConnectivityWarning()
-                     << nl << "Face-point connectivity is inconsistent."
-                     << endl;
+                    << nl << "Face-point connectivity is inconsistent."
+                    << endl;
             }
         }
 
@@ -754,17 +1195,17 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
 
             if (nCommon != 1)
             {
-                Pout << "Cells: " << nl
-                     << '\t' << owner_[faceI] << ":: " << ownCell << nl
-                     << '\t' << neighbour_[faceI] << " :: " << neiCell << nl
-                     << " share multiple faces. "
-                     << endl;
+                Pout<< "Cells: " << nl
+                    << '\t' << owner_[faceI] << ":: " << ownCell << nl
+                    << '\t' << neighbour_[faceI] << " :: " << neiCell << nl
+                    << " share multiple faces. "
+                    << endl;
 
                 nFailedChecks++;
 
                 ConnectivityWarning()
-                     << nl << "Cell-Face connectivity is inconsistent."
-                     << endl;
+                    << nl << "Cell-Face connectivity is inconsistent."
+                    << endl;
             }
         }
     }
@@ -783,16 +1224,15 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
 
         if (min(curCell) < 0 || max(curCell) > (faces_.size()-1))
         {
-            Pout << "Cell " << cellI
-                 << " contains vertex labels out of range: "
-                 << curCell
-                 << " Max point index = " << (faces_.size()-1) << endl;
+            Pout<< "Cell " << cellI
+                << " contains face labels out of range: " << curCell
+                << " Max face index = " << (faces_.size()-1) << endl;
 
             nFailedChecks++;
 
             ConnectivityWarning()
-                 << nl << "Cell-Face connectivity is inconsistent."
-                 << endl;
+                << nl << "Cell-Face connectivity is inconsistent."
+                << endl;
         }
 
         // Check for unique face-labels
@@ -804,16 +1244,16 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
 
             if (!inserted)
             {
-                Pout << "Cell " << cellI
-                     << " contains identical face labels: "
-                     << curCell
-                     << endl;
+                Pout<< "Cell " << cellI
+                    << " contains identical face labels: "
+                    << curCell
+                    << endl;
 
                 nFailedChecks++;
 
                 ConnectivityWarning()
-                     << nl << "Cell-Face connectivity is inconsistent."
-                     << endl;
+                    << nl << "Cell-Face connectivity is inconsistent."
+                    << endl;
             }
 
             // Count cells per face
@@ -821,79 +1261,108 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
         }
     }
 
-    Info << "Done." << endl;
+    Pout<< "Done." << endl;
 
-    Info << "Checking face-cell connectivity...";
+    Pout<< "Checking face-cell connectivity...";
 
     forAll(nCellsPerFace, faceI)
     {
+        // This might be a deleted face
+        if (faceI < nOldFaces_)
+        {
+            if (reverseFaceMap_[faceI] == -1)
+            {
+                continue;
+            }
+        }
+        else
+        if (deletedFaces_.found(faceI))
+        {
+            continue;
+        }
+
+        // Determine patch
+        label uPatch = whichPatch(faceI);
+
         if (nCellsPerFace[faceI] == 0)
         {
-            // This might be a deleted face
-            if (faceI < nOldFaces_)
-            {
-                if (reverseFaceMap_[faceI] == -1)
-                {
-                    continue;
-                }
-            }
-            else
-            {
-                if (deletedFaces_.found(faceI))
-                {
-                    continue;
-                }
-            }
-
             // Looks like this is really an unused face.
-            Pout << "Face " << faceI
-                 << " :: " << faces_[faceI]
-                 << " is unused. "
-                 << endl;
+            Pout<< "Face " << faceI << " :: " << faces_[faceI]
+                << " is unused. Patch: "
+                << (uPatch > -1 ? boundaryMesh()[uPatch].name() : "Internal")
+                << nl << endl;
 
             nFailedChecks++;
 
             ConnectivityWarning()
-                 << nl << "Cell-Face connectivity is inconsistent."
-                 << endl;
+                << nl << "Cell-Face connectivity is inconsistent."
+                << endl;
         }
         else
-        if (nCellsPerFace[faceI] != 2 && whichPatch(faceI) == -1)
+        if (nCellsPerFace[faceI] != 2 && uPatch == -1)
         {
             // Internal face is not shared by exactly two cells
-            Pout << "Internal Face " << faceI
-                 << " :: " << faces_[faceI]
-                 << " is multiply connected." << nl
-                 << " nCellsPerFace: " << nCellsPerFace[faceI]
-                 << endl;
+            Pout<< "Internal Face " << faceI
+                << " :: " << faces_[faceI]
+                << " Owner: " << owner_[faceI]
+                << " Neighbour: " << neighbour_[faceI]
+                << " is multiply connected." << nl
+                << " nCellsPerFace: " << nCellsPerFace[faceI] << nl
+                << " Patch: Internal" << nl
+                << endl;
+
+            // Loop through cells and find another instance
+            forAll(cells_, cellI)
+            {
+                if (findIndex(cells_[cellI], faceI) > -1)
+                {
+                    Pout<< "  Cell: " << cellI
+                        << "  :: " << cells_[cellI]
+                        << endl;
+                }
+            }
 
             nFailedChecks++;
 
             ConnectivityWarning()
-                 << nl << "Cell-Face connectivity is inconsistent."
-                 << endl;
+                << nl << "Cell-Face connectivity is inconsistent."
+                << endl;
         }
         else
-        if (nCellsPerFace[faceI] != 1 && whichPatch(faceI) > -1)
+        if (nCellsPerFace[faceI] != 1 && uPatch > -1)
         {
             // Boundary face is not shared by exactly one cell
-            Pout << "Boundary Face " << faceI
-                 << " :: " << faces_[faceI]
-                 << " is multiply connected." << nl
-                 << " nCellsPerFace: " << nCellsPerFace[faceI]
-                 << endl;
+            Pout<< "Boundary Face " << faceI
+                << " :: " << faces_[faceI]
+                << " Owner: " << owner_[faceI]
+                << " Neighbour: " << neighbour_[faceI]
+                << " is multiply connected." << nl
+                << " nCellsPerFace: " << nCellsPerFace[faceI] << nl
+                << " Patch: " << boundaryMesh()[uPatch].name() << nl
+                << endl;
+
+            // Loop through cells and find another instance
+            forAll(cells_, cellI)
+            {
+                if (findIndex(cells_[cellI], faceI) > -1)
+                {
+                    Pout<< "  Cell: " << cellI
+                        << "  :: " << cells_[cellI]
+                        << endl;
+                }
+            }
 
             nFailedChecks++;
 
             ConnectivityWarning()
-                 << nl << "Cell-Face connectivity is inconsistent."
-                 << endl;
+                << nl << "Cell-Face connectivity is inconsistent."
+                << endl;
         }
     }
 
-    Info << "Done." << endl;
+    Pout<< "Done." << endl;
 
-    Info << "Checking for unused points...";
+    Pout<< "Checking for unused points...";
 
     forAll(nPointFaces, pointI)
     {
@@ -916,19 +1385,20 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
             }
 
             // Looks like this is really an unused point.
-            Pout << "Point " << pointI << " is unused. " << endl;
+            Pout<< nl << nl << "Point " << pointI
+                << " is unused. " << endl;
 
             nFailedChecks++;
 
             ConnectivityWarning()
-                 << nl << "Point-Face connectivity is inconsistent."
-                 << endl;
+                << nl << "Point-Face connectivity is inconsistent."
+                << endl;
         }
     }
 
-    Info << "Done." << endl;
+    Pout<< "Done." << endl;
 
-    Info << "Checking edge-face connectivity...";
+    Pout<< "Checking edge-face connectivity...";
 
     label allEdges = edges_.size();
     labelList nEdgeFaces(allEdges, 0);
@@ -964,23 +1434,24 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
 
             if (!found)
             {
-                Pout << nl << nl << "Edge: " << faceEdges[edgeI]
-                     << ": " << edgeToCheck << nl
-                     << "was not found in face: " << faceI
-                     << ": " << faces_[faceI] << nl
-                     << "faceEdges: " << faceEdges
-                     << endl;
+                Pout<< nl << nl << "Edge: " << faceEdges[edgeI]
+                    << ": " << edgeToCheck << nl
+                    << "was not found in face: " << faceI
+                    << ": " << faces_[faceI] << nl
+                    << "faceEdges: " << faceEdges
+                    << endl;
 
                 nFailedChecks++;
 
                 ConnectivityWarning()
-                     << nl << "Edge-Face connectivity is inconsistent."
-                     << endl;
+                    << nl << "Edge-Face connectivity is inconsistent."
+                    << endl;
             }
         }
     }
 
     label nInternalEdges = 0;
+    DynamicList<label> bPatchIDs(10);
     labelList patchInfo(boundaryMesh().size(), 0);
 
     forAll(edgeFaces_, edgeI)
@@ -994,8 +1465,11 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
 
         if (edgeFaces.size() != nEdgeFaces[edgeI])
         {
-            Pout << nl << nl << "Edge: " << edgeI
-                 << ": edgeFaces: " << edgeFaces << endl;
+            Pout<< nl << nl << "Edge: " << edgeI << ": " << edges_[edgeI]
+                << ": edgeFaces: " << edgeFaces
+                << nl << UIndirectList<face>(faces_, edgeFaces)
+                << nl << " Expected nFaces: " << nEdgeFaces[edgeI]
+                << endl;
 
             nFailedChecks++;
 
@@ -1005,18 +1479,23 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
         }
 
         label nBF = 0;
+        bPatchIDs.clear();
 
         // Check if this edge belongs to faceEdges for each face
         forAll(edgeFaces, faceI)
         {
-            if (findIndex(faceEdges_[edgeFaces[faceI]], edgeI) == -1)
+            const labelList& faceEdges = faceEdges_[edgeFaces[faceI]];
+
+            if (findIndex(faceEdges, edgeI) == -1)
             {
-                Pout << nl << nl << "Edge: " << edgeI << ": " << edges_[edgeI]
-                     << ", edgeFaces: " << edgeFaces << nl
-                     << "was not found in faceEdges of face: "
-                     << edgeFaces[faceI] << ": " << faces_[edgeFaces[faceI]]
-                     << nl << "faceEdges: " << faceEdges_[edgeFaces[faceI]]
-                     << endl;
+                Pout<< nl << nl << "Edge: " << edgeI << ": " << edges_[edgeI]
+                    << ", edgeFaces: " << edgeFaces
+                    << nl << UIndirectList<face>(faces_, edgeFaces)
+                    << "was not found in faceEdges of face: "
+                    << edgeFaces[faceI] << ": " << faces_[edgeFaces[faceI]]
+                    << nl << "faceEdges: " << faceEdges
+                    << nl << UIndirectList<edge>(edges_, faceEdges)
+                    << endl;
 
                 nFailedChecks++;
 
@@ -1027,6 +1506,9 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
 
             if (neighbour_[edgeFaces[faceI]] == -1)
             {
+                // Add to list of patch IDs
+                bPatchIDs.append(whichPatch(edgeFaces[faceI]));
+
                 nBF++;
             }
         }
@@ -1038,11 +1520,11 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
             // Check if this edge is actually internal.
             if (whichEdgePatch(edgeI) >= 0)
             {
-                Pout << "Edge: " << edgeI
-                     << ": " << edges_[edgeI] << " is internal, "
-                     << " but patch is specified as: "
-                     << whichEdgePatch(edgeI)
-                     << endl;
+                Pout<< "Edge: " << edgeI
+                    << ": " << edges_[edgeI] << " is internal, "
+                    << " but patch is specified as: "
+                    << whichEdgePatch(edgeI)
+                    << endl;
 
                 nFailedChecks++;
             }
@@ -1054,10 +1536,10 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
             // Check if this edge is actually on a boundary.
             if (patchID < 0)
             {
-                Pout << "Edge: " << edgeI
-                     << ": " << edges_[edgeI]
-                     << " is on a boundary, but patch is specified as: "
-                     << patchID << endl;
+                Pout<< "Edge: " << edgeI
+                    << ": " << edges_[edgeI]
+                    << " is on a boundary, but patch is specified as: "
+                    << patchID << endl;
 
                 nFailedChecks++;
             }
@@ -1066,14 +1548,49 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
                 patchInfo[patchID]++;
             }
 
+            bool failedManifoldCheck = false;
+
             if (nBF > 2)
             {
-                Pout << "Edge: " << edgeI
-                     << ": " << edges_[edgeI]
-                     << " has " << nBF
-                     << " boundary faces connected to it." << nl
-                     << " Pinched manifolds are not allowed."
-                     << endl;
+                if (Pstream::parRun())
+                {
+                    // Pinched manifolds should be allowed in parallel
+                    failedManifoldCheck = false;
+                }
+                else
+                {
+                    failedManifoldCheck = true;
+                }
+            }
+
+            if (failedManifoldCheck)
+            {
+                // Write out for post-processing
+                forAll(bPatchIDs, faceI)
+                {
+                    if (bPatchIDs[faceI] == -1)
+                    {
+                        Pout<< " Edge: " << edgeI
+                            << " Face Patch: Internal" << nl;
+                    }
+                    else
+                    {
+                        Pout<< " Edge: " << edgeI
+                            << " Face Patch: "
+                            << boundaryMesh()[bPatchIDs[faceI]].name() << nl;
+                    }
+                }
+
+                Pout<< endl;
+
+                writeVTK("pinched_" + Foam::name(edgeI), edgeFaces, 2);
+
+                Pout<< "Edge: " << edgeI
+                    << ": " << edges_[edgeI]
+                    << " has " << nBF
+                    << " boundary faces connected to it." << nl
+                    << " Pinched manifolds are not allowed."
+                    << endl;
 
                 nFailedChecks++;
             }
@@ -1082,9 +1599,9 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
 
     if (nInternalEdges != nInternalEdges_)
     {
-        Pout << nl << "Internal edge-count is inconsistent." << nl
-             << " Counted internal edges: " << nInternalEdges
-             << " Actual count: " << nInternalEdges_ << endl;
+        Pout<< nl << "Internal edge-count is inconsistent." << nl
+            << " Counted internal edges: " << nInternalEdges
+            << " Actual count: " << nInternalEdges_ << endl;
 
         nFailedChecks++;
     }
@@ -1093,10 +1610,10 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
     {
         if (patchInfo[patchI] != edgePatchSizes_[patchI])
         {
-            Pout << "Patch-count is inconsistent." << nl
-                 << " Patch: " << patchI
-                 << " Counted edges: " << patchInfo[patchI]
-                 << " Actual count: " << edgePatchSizes_[patchI] << endl;
+            Pout<< "Patch-count is inconsistent." << nl
+                << " Patch: " << patchI
+                << " Counted edges: " << patchInfo[patchI]
+                << " Actual count: " << edgePatchSizes_[patchI] << endl;
 
             nFailedChecks++;
         }
@@ -1122,31 +1639,60 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
 
         if ((patch < 0) && (nBF > 0))
         {
-            Pout << nl << nl << "Edge: " << key
-                 << ", edgeFaces: " << edgeFaces
-                 << " is internal, but contains boundary faces."
-                 << endl;
+            Pout<< nl << nl << "Edge: " << key
+                << "::" << edges_[key]
+                << ", edgeFaces: " << edgeFaces
+                << " is internal, but contains boundary faces."
+                << endl;
 
             nFailedChecks++;
         }
 
         if ((patch >= 0) && (nBF != 2))
         {
-            Pout << nl << nl << "Edge: " << key
-                 << ", edgeFaces: " << edgeFaces
-                 << " is on a boundary patch, but doesn't contain"
-                 << " two boundary faces."
-                 << endl;
+            if (!Pstream::parRun())
+            {
+                Pout<< nl << nl << "Edge: " << key
+                    << "::" << edges_[key]
+                    << ", edgeFaces: " << edgeFaces
+                    << " is on a boundary patch, but doesn't contain"
+                    << " two boundary faces."
+                    << endl;
 
-            nFailedChecks++;
+                nFailedChecks++;
+            }
         }
     }
 
-    Info << "Done." << endl;
+    Pout<< "Done." << endl;
+
+    // Check coupled-patch sizes
+    forAll(patchCoupling_, patchI)
+    {
+        if (patchCoupling_(patchI))
+        {
+            const coupleMap& cMap = patchCoupling_[patchI].map();
+
+            label mSize = patchSizes_[cMap.masterIndex()];
+            label sSize = patchSizes_[cMap.slaveIndex()];
+
+            if (mSize != sSize)
+            {
+                Pout<< "Coupled patch-count is inconsistent." << nl
+                    << " Master Patch: " << cMap.masterIndex()
+                    << " Count: " << mSize << nl
+                    << " Slave Patch: " << cMap.slaveIndex()
+                    << " Count: " << sSize
+                    << endl;
+
+                nFailedChecks++;
+            }
+        }
+    }
 
     if (!twoDMesh_)
     {
-        Info << "Checking point-edge connectivity...";
+        Pout<< "Checking point-edge connectivity...";
 
         label allPoints = points_.size();
         List<labelHashSet> hlPointEdges(allPoints);
@@ -1173,10 +1719,10 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
             {
                 if (!hlPointEdges[pointI].found(pointEdges[edgeI]))
                 {
-                    Pout << nl << nl << "Point: " << pointI << nl
-                         << "pointEdges: " << pointEdges << nl
-                         << "hlPointEdges: " << hlPointEdges[pointI]
-                         << endl;
+                    Pout<< nl << nl << "Point: " << pointI << nl
+                        << "pointEdges: " << pointEdges << nl
+                        << "hlPointEdges: " << hlPointEdges[pointI]
+                        << endl;
 
                     nFailedChecks++;
 
@@ -1193,104 +1739,24 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
                 pointEdges.size() == 1
             )
             {
-                Pout << nl << nl << "Point: " << pointI << nl
-                     << "pointEdges: " << pointEdges << nl
-                     << "hlPointEdges: " << hlPointEdges[pointI]
-                     << endl;
+                Pout<< nl << nl << "Point: " << pointI << nl
+                    << "pointEdges: " << pointEdges << nl
+                    << "hlPointEdges: " << hlPointEdges[pointI]
+                    << endl;
 
                 nFailedChecks++;
 
                 ConnectivityWarning()
-                    << "Size inconsistency."
+                    << nl << "Size inconsistency."
                     << nl << "Point-Edge connectivity is inconsistent."
                     << endl;
             }
         }
 
-        Info << "Done." << endl;
-
-        Info << "Checking edge-points connectivity...";
-
-        label otherPoint = -1, nextPoint = -1;
-
-        forAll(edgePoints_, edgeI)
-        {
-            // Do a preliminary size check
-            const labelList& edgePoints = edgePoints_[edgeI];
-            const labelList& edgeFaces = edgeFaces_[edgeI];
-
-            if (edgeFaces.empty())
-            {
-                continue;
-            }
-
-            if (edgePoints.size() != edgeFaces.size())
-            {
-                Pout << nl << nl
-                     << "Edge: " << edgeI
-                     << " " << edges_[edgeI] << endl;
-
-                Pout << "edgeFaces: " << edgeFaces << endl;
-                forAll(edgeFaces, faceI)
-                {
-                    Info << edgeFaces[faceI] << ": "
-                         << faces_[edgeFaces[faceI]]
-                         << endl;
-                }
-
-                Pout << "edgePoints: " << edgePoints << endl;
-
-                nFailedChecks++;
-
-                ConnectivityWarning()
-                    << nl << "Edge-Points connectivity is inconsistent."
-                    << endl;
-            }
-
-            // Now check to see that both lists are consistent.
-            const edge& edgeToCheck = edges_[edgeI];
-
-            forAll(edgeFaces, faceI)
-            {
-                const face& faceToCheck = faces_[edgeFaces[faceI]];
-
-                meshOps::findIsolatedPoint
-                (
-                    faceToCheck,
-                    edgeToCheck,
-                    otherPoint,
-                    nextPoint
-                );
-
-                if (findIndex(edgePoints, otherPoint) == -1)
-                {
-                    Pout << nl << nl
-                         << "Edge: " << edgeI
-                         << " " << edges_[edgeI] << endl;
-
-                    Pout << "edgeFaces: " << edgeFaces << endl;
-                    forAll(edgeFaces, faceI)
-                    {
-                        Info << edgeFaces[faceI] << ": "
-                             << faces_[edgeFaces[faceI]]
-                             << endl;
-                    }
-
-                    Pout << "edgePoints: " << edgePoints << endl;
-
-                    nFailedChecks++;
-
-                    ConnectivityWarning()
-                        << nl << "Edge-Points connectivity is inconsistent."
-                        << endl;
-                }
-            }
-        }
-
-        Info << "Done." << endl;
+        Pout<< "Done." << endl;
     }
 
-    Info << "Checking cell-point connectivity...";
+    Pout<< "Checking cell-point connectivity...";
 
     // Loop through all cells and construct cell-to-node
     label cIndex = 0;
@@ -1339,33 +1805,43 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
     // Preliminary check for size
     forAll(cellToNode, cellI)
     {
+        // Check for hexahedral cells
+        if
+        (
+            (cellToNode[cellI].size() == 8) &&
+            (cells_[cellIndex[cellI]].size() == 6)
+        )
+        {
+            continue;
+        }
+
         if
         (
             (cellToNode[cellI].size() != 6 && twoDMesh_) ||
             (cellToNode[cellI].size() != 4 && !twoDMesh_)
         )
         {
-            Pout << nl << "Warning: Cell: "
-                 << cellIndex[cellI] << " is inconsistent. "
-                 << endl;
+            Pout<< nl << "Warning: Cell: "
+                << cellIndex[cellI] << " is inconsistent. "
+                << endl;
 
             const cell& failedCell = cells_[cellIndex[cellI]];
 
-            Info << "Cell faces: " << failedCell << endl;
+            Pout<< "Cell faces: " << failedCell << endl;
 
             forAll(failedCell, faceI)
             {
-                Info << "\tFace: " << failedCell[faceI]
-                     << " :: " << faces_[failedCell[faceI]]
-                     << endl;
+                Pout<< "\tFace: " << failedCell[faceI]
+                    << " :: " << faces_[failedCell[faceI]]
+                    << endl;
 
                 const labelList& fEdges = faceEdges_[failedCell[faceI]];
 
                 forAll(fEdges, edgeI)
                 {
-                    Info << "\t\tEdge: " << fEdges[edgeI]
-                         << " :: " << edges_[fEdges[edgeI]]
-                         << endl;
+                    Pout<< "\t\tEdge: " << fEdges[edgeI]
+                        << " :: " << edges_[fEdges[edgeI]]
+                        << endl;
                 }
             }
 
@@ -1373,9 +1849,7 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
         }
     }
 
-    Info << "Done." << endl;
-
-    reduce(nFailedChecks, orOp<bool>());
+    Pout<< "Done." << endl;
 
     if (nFailedChecks)
     {
@@ -1534,13 +2008,15 @@ bool dynamicTopoFvMesh::checkBisection
 }
 
 
-// Utility method to check whether the cell given by 'cellIndex' will yield
-// a valid cell when 'pointIndex' is moved to 'newPoint'.
+// Utility method to check whether the faces in triFaces will yield
+// valid triangles when 'pointIndex' is moved to 'newPoint'.
 //  - The routine performs metric-based checks.
-//  - Returns 'true' if the collapse in NOT feasible, and
-//    makes entries in cellsChecked to avoid repetitive checks.
+//  - Returns 'true' if the collapse in NOT feasible.
+//  - Does not reference member data, because this function
+//    is also used on subMeshes
 bool dynamicTopoFvMesh::checkCollapse
 (
+    const dynamicTopoFvMesh& mesh,
     const labelList& triFaces,
     const FixedList<label,2>& c0BdyIndex,
     const FixedList<label,2>& c1BdyIndex,
@@ -1550,7 +2026,7 @@ bool dynamicTopoFvMesh::checkCollapse
     scalar& collapseQuality,
     const bool checkNeighbour,
     bool forceOp
-) const
+)
 {
     // Reset input
     collapseQuality = GREAT;
@@ -1579,7 +2055,7 @@ bool dynamicTopoFvMesh::checkCollapse
             }
         }
 
-        const face& checkFace = faces_[triFaces[indexI]];
+        const face& checkFace = mesh.faces_[triFaces[indexI]];
 
         // Configure a triangle face
         FixedList<point, 3> tFNew(vector::zero);
@@ -1588,8 +2064,8 @@ bool dynamicTopoFvMesh::checkCollapse
         // Make necessary replacements
         forAll(checkFace, pointI)
         {
-            tFNew[pointI] = points_[checkFace[pointI]];
-            tFOld[pointI] = oldPoints_[checkFace[pointI]];
+            tFNew[pointI] = mesh.points_[checkFace[pointI]];
+            tFOld[pointI] = mesh.oldPoints_[checkFace[pointI]];
 
             if (checkFace[pointI] == pointIndex[0])
             {
@@ -1643,20 +2119,44 @@ bool dynamicTopoFvMesh::checkCollapse
     }
 
     // Final quality check
-    if (collapseQuality < sliverThreshold_ && !forceOp)
+    if (collapseQuality < mesh.sliverThreshold_ && !forceOp)
     {
+        if (debug > 3)
+        {
+            Pout<< " * * * 2D checkCollapse * * * " << nl
+                << " collapseQuality: " << collapseQuality
+                << " below threshold: " << mesh.sliverThreshold_
+                << endl;
+        }
+
         return true;
     }
 
     // Negative quality is a no-no
     if (collapseQuality < 0.0)
     {
+        if (forceOp)
+        {
+            Pout<< " * * * 2D checkCollapse * * * " << nl
+                << " Negative collapseQuality: " << collapseQuality << nl
+                << " Operation cannot be forced."
+                << endl;
+        }
+
         return true;
     }
 
     // Negative old-area is also a no-no
     if (minArea < 0.0)
     {
+        if (forceOp)
+        {
+            Pout<< " * * * 2D checkCollapse * * * " << nl
+                << " minArea: " << minArea << nl
+                << " Operation cannot be forced."
+                << endl;
+        }
+
         return true;
     }
 
@@ -1676,13 +2176,13 @@ bool dynamicTopoFvMesh::checkCollapse
     const point& oldPoint,
     const label pointIndex,
     const label cellIndex,
-    labelHashSet& cellsChecked,
+    DynamicList<label>& cellsChecked,
     scalar& collapseQuality,
     bool forceOp
 ) const
 {
     label faceIndex = -1;
-    scalar cQuality = 0.0, oldVolume = 0.0;
+    scalar cQuality = 0.0, oldVolume = 0.0, newVolume = 0.0;
     const cell& cellToCheck = cells_[cellIndex];
 
     // Look for a face that doesn't contain 'pointIndex'
@@ -1713,6 +2213,17 @@ bool dynamicTopoFvMesh::checkCollapse
             )
         );
 
+        newVolume =
+        (
+            tetPointRef
+            (
+                points_[faceToCheck[2]],
+                points_[faceToCheck[1]],
+                points_[faceToCheck[0]],
+                newPoint
+            ).mag()
+        );
+
         oldVolume =
         (
             tetPointRef
@@ -1737,6 +2248,17 @@ bool dynamicTopoFvMesh::checkCollapse
             )
         );
 
+        newVolume =
+        (
+            tetPointRef
+            (
+                points_[faceToCheck[0]],
+                points_[faceToCheck[1]],
+                points_[faceToCheck[2]],
+                newPoint
+            ).mag()
+        );
+
         oldVolume =
         (
             tetPointRef
@@ -1752,22 +2274,9 @@ bool dynamicTopoFvMesh::checkCollapse
     // Final quality check
     if (cQuality < sliverThreshold_ && !forceOp)
     {
-        if (debug > 3)
+        if (debug > 4)
         {
-            InfoIn
-            (
-                "\n\n"
-                "bool dynamicTopoFvMesh::checkCollapse\n"
-                "(\n"
-                "    const point& newPoint,\n"
-                "    const point& oldPoint,\n"
-                "    const label pointIndex,\n"
-                "    const label cellIndex,\n"
-                "    labelHashSet& cellsChecked,\n"
-                "    scalar& collapseQuality,\n"
-                "    bool forceOp\n"
-                ") const\n"
-            )
+            Pout<< " * * * 3D checkCollapse * * * " << nl
                 << "\nCollapsing cell: " << cellIndex
                 << " containing points:\n"
                 << faceToCheck[0] << "," << faceToCheck[1] << ","
@@ -1787,20 +2296,7 @@ bool dynamicTopoFvMesh::checkCollapse
     {
         if (forceOp)
         {
-            InfoIn
-            (
-                "\n\n"
-                "bool dynamicTopoFvMesh::checkCollapse\n"
-                "(\n"
-                "    const point& newPoint,\n"
-                "    const point& oldPoint,\n"
-                "    const label pointIndex,\n"
-                "    const label cellIndex,\n"
-                "    labelHashSet& cellsChecked,\n"
-                "    scalar& collapseQuality,\n"
-                "    bool forceOp\n"
-                ") const\n"
-            )
+            Pout<< " * * * 3D checkCollapse * * * " << nl
                 << "\nCollapsing cell: " << cellIndex
                 << " containing points:\n"
                 << faceToCheck[0] << "," << faceToCheck[1] << ","
@@ -1817,24 +2313,11 @@ bool dynamicTopoFvMesh::checkCollapse
     }
 
     // Negative old-volume is also a no-no
-    if (oldVolume < 0.0)
+    if (oldVolume < 0.0 || (mag(oldVolume) < mag(0.1 * newVolume)))
     {
         if (forceOp)
         {
-            InfoIn
-            (
-                "\n\n"
-                "bool dynamicTopoFvMesh::checkCollapse\n"
-                "(\n"
-                "    const point& newPoint,\n"
-                "    const point& oldPoint,\n"
-                "    const label pointIndex,\n"
-                "    const label cellIndex,\n"
-                "    labelHashSet& cellsChecked,\n"
-                "    scalar& collapseQuality,\n"
-                "    bool forceOp\n"
-                ") const\n"
-            )
+            Pout<< " * * * 3D checkCollapse * * * " << nl
                 << "\nCollapsing cell: " << cellIndex
                 << " containing points:\n"
                 << faceToCheck[0] << "," << faceToCheck[1] << ","
@@ -1843,6 +2326,7 @@ bool dynamicTopoFvMesh::checkCollapse
                 << ", when " << pointIndex
                 << " is moved to location: " << nl
                 << oldPoint << nl
+                << "newVolume: " << newVolume << nl
                 << "Operation cannot be forced."
                 << endl;
         }
@@ -1851,7 +2335,7 @@ bool dynamicTopoFvMesh::checkCollapse
     }
 
     // No problems, so a collapse is feasible
-    cellsChecked.insert(cellIndex);
+    cellsChecked.append(cellIndex);
 
     // Update input quality
     collapseQuality = Foam::min(collapseQuality, cQuality);

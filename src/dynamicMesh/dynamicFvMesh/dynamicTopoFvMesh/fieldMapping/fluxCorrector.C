@@ -33,7 +33,7 @@ Author
     University of Massachusetts Amherst
     All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "fluxCorrector.H"
 #include "dlLibraryTable.H"

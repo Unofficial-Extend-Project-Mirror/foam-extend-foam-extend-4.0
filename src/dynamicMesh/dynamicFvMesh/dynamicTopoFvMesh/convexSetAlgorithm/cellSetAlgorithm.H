@@ -23,10 +23,10 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    fluxCorrector
+    cellSetAlgorithm
 
 Description
-    Virtual base class that deals with flux-correction after topo-changes.
+    Class for convexSetAlgorithms pertaining to cells
 
 Author
     Sandeep Menon
@@ -34,15 +34,14 @@ Author
     All rights reserved
 
 SourceFiles
-    fluxCorrector.C
+    cellSetAlgorithm.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef fluxCorrector_H
-#define fluxCorrector_H
+#ifndef cellSetAlgorithm_H
+#define cellSetAlgorithm_H
 
-#include "fvMesh.H"
-#include "runTimeSelectionTables.H"
+#include "convexSetAlgorithm.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,91 +49,73 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                         Class fluxCorrector Declaration
+                     Class cellSetAlgorithm Declaration
 \*---------------------------------------------------------------------------*/
 
-class fluxCorrector
+class cellSetAlgorithm
+:
+    public convexSetAlgorithm
 {
-    // Private data
-
-        //- Reference to fvMesh
-        const fvMesh& mesh_;
-
-        //- Reference to dictionary
-        const dictionary& dict_;
 
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        fluxCorrector(const fluxCorrector&);
+        cellSetAlgorithm(const cellSetAlgorithm&);
 
         //- Disallow default bitwise assignment
-        void operator=(const fluxCorrector&);
+        void operator=(const cellSetAlgorithm&);
+
+        //- Write out tets as a VTK
+        void writeVTK
+        (
+            const word&,
+            const List<FixedList<point, 4> >&
+        ) const;
 
 public:
 
-    //- Runtime type information
-    TypeName("fluxCorrector");
+    //- Constructor
 
-
-    // Declare run-time constructor selection tables
-
-        declareRunTimeSelectionTable
+        cellSetAlgorithm
         (
-            autoPtr,
-            fluxCorrector,
-            mesh,
-            (
-                const fvMesh& mesh,
-                const dictionary& dict
-            ),
-            (mesh, dict)
+            const polyMesh& mesh,
+            const pointField& newPoints,
+            const UList<edge>& newEdges,
+            const UList<face>& newFaces,
+            const UList<cell>& newCells,
+            const UList<label>& newOwner,
+            const UList<label>& newNeighbour
         );
 
+    //- Destructor
 
-    // Selectors
+        virtual ~cellSetAlgorithm()
+        {}
 
-        //- Select constructed from fvMesh
-        static autoPtr<fluxCorrector> New
+    //- Virtual member functions
+
+        // Dimensions of the algorithm
+        virtual label dimension() const
+        {
+            return 3;
+        }
+
+        // Compute normFactor
+        virtual void computeNormFactor(const label index) const;
+
+        // Check whether the bounding box contains the entity
+        virtual bool contains(const label index) const;
+
+        // Compute intersections
+        virtual bool computeIntersection
         (
-            const fvMesh& mesh,
-            const dictionary& dict
-        );
-
-
-    // Constructors
-
-        //- Construct from fvMesh and dictionary
-        fluxCorrector(const fvMesh& mesh, const dictionary& dict)
-        :
-            mesh_(mesh),
-            dict_(dict)
-        {}
-
-
-    // Destructor
-
-        virtual ~fluxCorrector()
-        {}
-
-
-    // Member Functions
-
-        //- Return reference to mesh
-        const fvMesh& mesh() const;
-
-        //- Return reference to dictionary
-        const dictionary& dict() const;
-
-        //- Is flux-correction required?
-        virtual bool required() const;
-
-        //- Interpolate fluxes to a specified list of faces
-        virtual void interpolateFluxes(const labelList& faces) const;
-
-        //- Update fluxes in the registry
-        virtual void updateFluxes() const;
+            const label newIndex,
+            const label oldIndex,
+            const label offset,
+            bool output
+        ) const;
 };
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

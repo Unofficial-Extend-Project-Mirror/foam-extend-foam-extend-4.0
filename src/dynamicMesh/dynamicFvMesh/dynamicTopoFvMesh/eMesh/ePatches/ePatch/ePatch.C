@@ -80,16 +80,6 @@ ePatch::ePatch
     size_(readLabel(dict.lookup("size")))
 {}
 
-
-ePatch::ePatch(const ePatch& p)
-:
-    patchIdentifier(p, p.index()),
-    boundaryMesh_(p.boundaryMesh_),
-    start_(p.start()),
-    size_(p.size())
-{}
-
-
 ePatch::ePatch(const ePatch& p, const eBoundaryMesh& bm)
 :
     patchIdentifier(p, p.index()),

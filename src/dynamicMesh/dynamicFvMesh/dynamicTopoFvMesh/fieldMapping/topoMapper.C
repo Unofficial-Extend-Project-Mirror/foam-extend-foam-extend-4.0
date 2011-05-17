@@ -35,119 +35,17 @@ Author
 
 \*----------------------------------------------------------------------------*/
 
-#include "fvc.H"
 #include "topoMapper.H"
 #include "fluxCorrector.H"
 #include "topoCellMapper.H"
-#include "leastSquaresGrad.H"
 #include "topoSurfaceMapper.H"
 #include "topoBoundaryMeshMapper.H"
+#include "fixedValueFvPatchFields.H"
 
 namespace Foam
 {
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-// Store gradients of fields on the mesh prior to topology changes
-template <class Type, class gradType>
-void topoMapper::storeGradients
-(
-    HashTable<autoPtr<gradType> >& gradTable
-) const
-{
-    // Define a few typedefs for convenience
-    typedef typename outerProduct<vector, Type>::type gCmptType;
-    typedef GeometricField<Type, fvPatchField, volMesh> volType;
-    typedef GeometricField<gCmptType, fvPatchField, volMesh> gVolType;
-
-    // Fetch all fields from registry
-    HashTable<const volType*> fields
-    (
-        mesh_.objectRegistry::lookupClass<volType>()
-    );
-
-    forAllConstIter(typename HashTable<const volType*>, fields, fIter)
-    {
-        const volType& field = *fIter();
-
-        // Compute the gradient.
-        tmp<gVolType> tGrad;
-
-        // If the fvSolution dictionary contains an entry,
-        // use that, otherwise, default to leastSquares
-        word gradName("grad(" + field.name() + ')');
-
-        if (mesh_.schemesDict().subDict("gradSchemes").found(gradName))
-        {
-            tGrad = fvc::grad(field);
-        }
-        else
-        {
-            tGrad = fv::leastSquaresGrad<Type>(mesh_).grad(field);
-        }
-
-        // Make a new entry, but don't register the field.
-        gradTable.insert
-        (
-            field.name(),
-            autoPtr<gradType>
-            (
-                new gradType
-                (
-                    IOobject
-                    (
-                        tGrad().name(),
-                        mesh_.time().timeName(),
-                        mesh_,
-                        IOobject::NO_READ,
-                        IOobject::NO_WRITE,
-                        false
-                    ),
-                    tGrad()
-                )
-            )
-        );
-    }
-}
-
-
-//- Fetch the gradient field (template specialisation)
-template <>
-const volVectorField& topoMapper::gradient(const word& name) const
-{
-    if (!sGrads_.found(name))
-    {
-        FatalErrorIn
-        (
-            "const volVectorField& "
-            "topoMapper::gradient(const word& name) const"
-        ) << nl << " Gradient for: " << name
-          << " has not been stored."
-          << abort(FatalError);
-    }
-
-    return sGrads_[name]();
-}
-
-
-//- Fetch the gradient field (template specialisation)
-template <>
-const volTensorField& topoMapper::gradient(const word& name) const
-{
-    if (!vGrads_.found(name))
-    {
-        FatalErrorIn
-        (
-            "const volTensorField& "
-            "topoMapper::gradient(const word& name) const"
-        ) << nl << " Gradient for: " << name
-          << " has not been stored."
-          << abort(FatalError);
-    }
-
-    return vGrads_[name]();
-}
-
 
 //- Store gradients prior to mesh reset
 void topoMapper::storeGradients() const
@@ -157,11 +55,8 @@ void topoMapper::storeGradients() const
 
     if (fvMesh::debug)
     {
-        Info << "Registered volScalarFields: " << endl;
-        Info << sGrads_.toc() << endl;
-
-        Info << "Registered volVectorFields: " << endl;
-        Info << vGrads_.toc() << endl;
+        Info<< "Registered volScalarFields: " << scalarGrads() << endl;
+        Info<< "Registered volVectorFields: " << vectorGrads() << endl;
     }
 }
 
@@ -169,51 +64,77 @@ void topoMapper::storeGradients() const
 //- Store geometric information
 void topoMapper::storeGeometry() const
 {
-    if (cellCentresPtr_)
+    // Wipe out existing information
+    deleteDemandDrivenData(cellCentresPtr_);
+
+    vectorField Cv(mesh_.cellCentres());
+    vectorField Cf(mesh_.faceCentres());
+
+    // Create and map the patch field values
+    label nPatches = mesh_.boundary().size();
+
+    // Create field parts
+    PtrList<fvPatchField<vector> > volCentrePatches(nPatches);
+
+    // Over-ride and set all patches to fixedValue
+    for (label patchI = 0; patchI < nPatches; patchI++)
     {
-        deleteDemandDrivenData(cellVolumesPtr_);
-        deleteDemandDrivenData(cellCentresPtr_);
+        volCentrePatches.set
+        (
+            patchI,
+            new fixedValueFvPatchField<vector>
+            (
+                mesh_.boundary()[patchI],
+                DimensionedField<vector, volMesh>::null()
+            )
+        );
 
-        patchAreasPtr_.clear();
-        patchCentresPtr_.clear();
+        // Slice field to patch (forced assignment)
+        volCentrePatches[patchI] ==
+        (
+            mesh_.boundaryMesh()[patchI].patchSlice(Cf)
+        );
     }
-
-    // Set the cell-volumes pointer.
-    cellVolumesPtr_ = new scalarField(mesh_.cellVolumes());
 
     // Set the cell-centres pointer.
-    cellCentresPtr_ = new vectorField(mesh_.cellCentres());
-
-    // Set patch-areas
-    patchAreasPtr_.setSize(mesh_.boundaryMesh().size());
-
-    forAll(mesh_.boundaryMesh(), patchI)
-    {
-        patchAreasPtr_.set
+    cellCentresPtr_ =
+    (
+        new volVectorField
         (
-            patchI,
-            new scalarField
+            IOobject
             (
-                mag(mesh_.boundaryMesh()[patchI].faceAreas())
-            )
-        );
-    }
-
-    // Set patch-centres.
-    patchCentresPtr_.setSize(mesh_.boundaryMesh().size());
-
-    forAll(mesh_.boundaryMesh(), patchI)
-    {
-        patchCentresPtr_.set
-        (
-            patchI,
-            new vectorField
-            (
-                mesh_.boundaryMesh()[patchI].faceCentres()
-            )
-        );
-    }
+                "cellCentres",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE,
+                false
+            ),
+            mesh_,
+            dimLength,
+            SubField<vector>(Cv, mesh_.nCells()),
+            volCentrePatches
+        )
+    );
 }
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+//- Construct from mesh and dictionary
+topoMapper::topoMapper
+(
+    const fvMesh& mesh,
+    const dictionary& dict
+)
+:
+    mesh_(mesh),
+    dict_(dict),
+    cellMap_(NULL),
+    surfaceMap_(NULL),
+    boundaryMap_(NULL),
+    fluxCorrector_(fluxCorrector::New(mesh, dict)),
+    cellCentresPtr_(NULL)
+{}
 
 
 // * * * * * * * * * * * * * * * * Destructor * * * * * * * * * * * * * * *  //
@@ -287,6 +208,26 @@ void topoMapper::setCellWeights
 }
 
 
+//- Set cell / patch offset information
+void topoMapper::setOffsets
+(
+    const labelList& cellSizes,
+    const labelList& cellStarts,
+    const labelList& faceSizes,
+    const labelList& faceStarts,
+    const labelListList& patchSizes,
+    const labelListList& patchStarts
+) const
+{
+    cellSizes_ = cellSizes;
+    cellStarts_ = cellStarts;
+    faceSizes_ = faceSizes;
+    faceStarts_ = faceStarts;
+    patchSizes_ = patchSizes;
+    patchStarts_ = patchStarts;
+}
+
+
 //- Fetch face weights
 const List<scalarField>& topoMapper::faceWeights() const
 {
@@ -315,6 +256,48 @@ const List<vectorField>& topoMapper::cellCentres() const
 }
 
 
+//- Fetch cell sizes
+const labelList& topoMapper::cellSizes() const
+{
+    return cellSizes_;
+}
+
+
+//- Fetch face sizes
+const labelList& topoMapper::faceSizes() const
+{
+    return faceSizes_;
+}
+
+
+//- Fetch patch sizes
+const labelListList& topoMapper::patchSizes() const
+{
+    return patchSizes_;
+}
+
+
+//- Fetch cell starts
+const labelList& topoMapper::cellStarts() const
+{
+    return cellStarts_;
+}
+
+
+//- Fetch face starts
+const labelList& topoMapper::faceStarts() const
+{
+    return faceStarts_;
+}
+
+
+//- Fetch patch starts
+const labelListList& topoMapper::patchStarts() const
+{
+    return patchStarts_;
+}
+
+
 //- Store mesh information for the mapping stage
 void topoMapper::storeMeshInformation() const
 {
@@ -325,20 +308,19 @@ void topoMapper::storeMeshInformation() const
     storeGeometry();
 }
 
-
-//- Return stored cell volume information
-const scalarField& topoMapper::cellVolumes() const
+//- Return non-const access to cell centres
+volVectorField& topoMapper::volCentres() const
 {
-    if (!cellVolumesPtr_)
+    if (!cellCentresPtr_)
     {
         FatalErrorIn
         (
-            "const scalarField& topoMapper::cellVolumes()"
+            "const vectorField& topoMapper::volCentres() const"
         ) << nl << " Pointer has not been set. "
           << abort(FatalError);
     }
 
-    return *cellVolumesPtr_;
+    return *cellCentresPtr_;
 }
 
 
@@ -349,7 +331,7 @@ const vectorField& topoMapper::internalCentres() const
     {
         FatalErrorIn
         (
-            "const vectorField& topoMapper::internalCentres()"
+            "const vectorField& topoMapper::internalCentres() const"
         ) << nl << " Pointer has not been set. "
           << abort(FatalError);
     }
@@ -358,154 +340,70 @@ const vectorField& topoMapper::internalCentres() const
 }
 
 
-//- Return stored patch areas information
-const scalarField& topoMapper::patchAreas(const label i) const
-{
-    if (!patchAreasPtr_.set(i))
-    {
-        FatalErrorIn
-        (
-            "const scalarField& topoMapper::patchAreas"
-            "(const label i) const"
-        ) << nl << " Pointer has not been set at index: " << i
-          << abort(FatalError);
-    }
-
-    return patchAreasPtr_[i];
-}
-
-
 //- Return stored patch centre information
 const vectorField& topoMapper::patchCentres(const label i) const
 {
-    if (!patchCentresPtr_.set(i))
+    if (!cellCentresPtr_)
     {
         FatalErrorIn
         (
             "const vectorField& topoMapper::patchCentres"
             "(const label i) const"
-        ) << nl << " Pointer has not been set at index: " << i
+        ) << nl << " Pointer has not been set. index: " << i
           << abort(FatalError);
     }
 
-    return patchCentresPtr_[i];
+    return (*cellCentresPtr_).boundaryField()[i];
 }
 
 
-// Conservatively map all volFields in the registry
-template <class Type>
-void topoMapper::conservativeMapVolFields() const
+//- Return names of stored scalar gradients
+const wordList topoMapper::scalarGrads() const
 {
-    // Define a few typedefs for convenience
-    typedef typename outerProduct<vector, Type>::type gCmptType;
-    typedef GeometricField<Type, fvPatchField, volMesh> volType;
-    typedef GeometricField<gCmptType, fvPatchField, volMesh> gradVolType;
-
-    HashTable<const volType*> fields(mesh_.lookupClass<volType>());
-
-    // Store old-times before mapping
-    forAllIter(typename HashTable<const volType*>, fields, fIter)
-    {
-        volType& field = const_cast<volType&>(*fIter());
-
-        field.storeOldTimes();
-    }
-
-    // Fetch internal/boundary mappers
-    const topoCellMapper& fMap = volMap();
-    const topoBoundaryMeshMapper& bMap = boundaryMap();
-
-    // Now map all fields
-    forAllIter(typename HashTable<const volType*>, fields, fIter)
-    {
-        volType& field = const_cast<volType&>(*fIter());
-
-        if (fvMesh::debug)
-        {
-            Info << "Conservatively mapping "
-                 << field.typeName
-                 << ' ' << field.name()
-                 << endl;
-        }
-
-        // Map the internal field
-        fMap.mapInternalField
-        (
-            field.name(),
-            gradient<gradVolType>(field.name()).internalField(),
-            field.internalField()
-        );
-
-        // Map patch fields
-        forAll(bMap, patchI)
-        {
-            bMap[patchI].mapPatchField
-            (
-                field.name(),
-                field.boundaryField()[patchI]
-            );
-        }
-
-        // Set the field instance
-        field.instance() = field.mesh().thisDb().time().timeName();
-    }
+    return sGrads_.toc();
 }
 
 
-// Conservatively map all surfaceFields in the registry
-template <class Type>
-void topoMapper::conservativeMapSurfaceFields() const
+//- Return names of stored vector gradients
+const wordList topoMapper::vectorGrads() const
 {
-    // Define a few typedefs for convenience
-    typedef GeometricField<Type, fvsPatchField, surfaceMesh> surfType;
+    return vGrads_.toc();
+}
 
-    HashTable<const surfType*> fields(mesh_.lookupClass<surfType>());
 
-    // Store old-times before mapping
-    forAllIter(typename HashTable<const surfType*>, fields, fIter)
+//- Fetch the gradient field (template specialisation)
+template <>
+volVectorField& topoMapper::gradient(const word& name) const
+{
+    if (!sGrads_.found(name))
     {
-        surfType& field = const_cast<surfType&>(*fIter());
-
-        field.storeOldTimes();
-    }
-
-    // Fetch internal/boundary mappers
-    const topoSurfaceMapper& fMap = surfaceMap();
-    const topoBoundaryMeshMapper& bMap = boundaryMap();
-
-    // Now map all fields
-    forAllIter(typename HashTable<const surfType*>, fields, fIter)
-    {
-        surfType& field = const_cast<surfType&>(*fIter());
-
-        if (fvMesh::debug)
-        {
-            Info << "Conservatively mapping "
-                 << field.typeName
-                 << ' ' << field.name()
-                 << endl;
-        }
-
-        // Map the internal field
-        fMap.mapInternalField
+        FatalErrorIn
         (
-            field.name(),
-            field.internalField()
-        );
-
-        // Map patch fields
-        forAll(bMap, patchI)
-        {
-            bMap[patchI].mapPatchField
-            (
-                field.name(),
-                field.boundaryField()[patchI]
-            );
-        }
-
-        // Set the field instance
-        field.instance() = field.mesh().thisDb().time().timeName();
+            "volVectorField& topoMapper::gradient(const word& name) const"
+        ) << nl << " Gradient for: " << name
+          << " has not been stored."
+          << abort(FatalError);
     }
+
+    return sGrads_[name]();
+}
+
+
+//- Fetch the gradient field (template specialisation)
+template <>
+volTensorField& topoMapper::gradient(const word& name) const
+{
+    if (!vGrads_.found(name))
+    {
+        FatalErrorIn
+        (
+            "volTensorField& topoMapper::gradient(const word& name) const"
+        ) << nl << " Gradient for: " << name
+          << " has not been stored."
+          << abort(FatalError);
+    }
+
+    return vGrads_[name]();
 }
 
 
@@ -533,7 +431,7 @@ const topoCellMapper& topoMapper::volMap() const
     {
         FatalErrorIn
         (
-            "const topoCellMapper& topoMapper::volMap()"
+            "const topoCellMapper& topoMapper::volMap() const"
         ) << nl << " Volume mapper has not been set. "
           << abort(FatalError);
     }
@@ -549,7 +447,7 @@ const topoSurfaceMapper& topoMapper::surfaceMap() const
     {
         FatalErrorIn
         (
-            "const topoSurfaceMapper& topoMapper::surfaceMap()"
+            "const topoSurfaceMapper& topoMapper::surfaceMap() const"
         ) << nl << " Surface mapper has not been set. "
           << abort(FatalError);
     }
@@ -565,7 +463,7 @@ const topoBoundaryMeshMapper& topoMapper::boundaryMap() const
     {
         FatalErrorIn
         (
-            "const topoBoundaryMeshMapper& topoMapper::boundaryMap()"
+            "const topoBoundaryMeshMapper& topoMapper::boundaryMap() const"
         ) << nl << " Boundary mapper has not been set. "
           << abort(FatalError);
     }
@@ -581,7 +479,7 @@ const fluxCorrector& topoMapper::surfaceFluxCorrector() const
     {
         FatalErrorIn
         (
-            "const fluxCorrector& topoMapper::surfaceFluxCorrector()"
+            "const fluxCorrector& topoMapper::surfaceFluxCorrector() const"
         ) << nl << " fluxCorrector has not been set. "
           << abort(FatalError);
     }
@@ -591,7 +489,7 @@ const fluxCorrector& topoMapper::surfaceFluxCorrector() const
 
 
 //- Clear out member data
-void topoMapper::clear()
+void topoMapper::clear() const
 {
     // Clear out mappers
     cellMap_.clear();
@@ -603,10 +501,7 @@ void topoMapper::clear()
     vGrads_.clear();
 
     // Wipe out geomtry information
-    deleteDemandDrivenData(cellVolumesPtr_);
     deleteDemandDrivenData(cellCentresPtr_);
-    patchAreasPtr_.clear();
-    patchCentresPtr_.clear();
 
     // Clear maps
     faceWeights_.clear();
@@ -614,6 +509,16 @@ void topoMapper::clear()
 
     faceCentres_.clear();
     cellCentres_.clear();
+
+    // Clear sizes / offsets
+    cellSizes_.clear();
+    cellStarts_.clear();
+
+    faceSizes_.clear();
+    faceStarts_.clear();
+
+    patchSizes_.clear();
+    patchStarts_.clear();
 }
 
 
