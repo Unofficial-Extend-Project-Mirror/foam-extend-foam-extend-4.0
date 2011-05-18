@@ -38,6 +38,7 @@ Description
 #include "faMeshLduAddressing.H"
 #include "wedgeFaPatch.H"
 #include "faPatchData.H"
+#include "SortableList.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -577,12 +578,155 @@ Foam::faMesh::faMesh
 
     if (tmpList.size() > 0)
     {
-        label pI = faPatches.size()-1;
+        // Check for processor edges
+        labelList allUndefEdges = tmpList;
+        labelList ngbPolyPatch(allUndefEdges.size(), -1);
+        forAll(ngbPolyPatch, edgeI)
+        {
+            label curEdge = allUndefEdges[edgeI];
 
-        faPatches[pI].name_ = "undefined";
-        faPatches[pI].type_ = "patch";
-        faPatches[pI].edgeLabels_ = tmpList;
+            label curPMeshEdge = meshEdges[curEdge];
+
+            forAll(edgeFaces[curPMeshEdge], faceI)
+            {
+                label curFace = edgeFaces[curPMeshEdge][faceI];
+                    
+                if (findIndex(faceLabels_, curFace) == -1)
+                {
+                    label polyPatchID = 
+                        m.boundaryMesh().whichPatch(curFace);
+                    
+                    if (polyPatchID != -1)
+                    {
+                        ngbPolyPatch[edgeI] = polyPatchID;
+                    }
+                }    
+            }
+        }
+
+        //Count ngb processorPolyPatch-es
+        labelHashSet processorPatchSet;
+        forAll(ngbPolyPatch, edgeI)
+        {
+            if (ngbPolyPatch[edgeI] != -1)
+            {
+                if 
+                (
+                    m.boundaryMesh()[ngbPolyPatch[edgeI]].type()
+                 == processorPolyPatch::typeName
+                )
+                {
+                    if(!processorPatchSet.found(ngbPolyPatch[edgeI]))
+                    {
+                        processorPatchSet.insert(ngbPolyPatch[edgeI]);
+                    }
+                }
+            }
+        }
+        labelList processorPatches(processorPatchSet.toc());
+        faPatches.setSize(faPatches.size() + processorPatches.size());
+
+        for(label i=0; i<processorPatches.size(); i++)
+        {
+            SLList<label> tmpLst;
+
+            forAll (ngbPolyPatch, eI)
+            {
+                if (ngbPolyPatch[eI] == processorPatches[i])
+                {
+                    tmpLst.append(allUndefEdges[eI]);
+                }
+            }
+            
+            faPatches[faPatchNames.size() + i].edgeLabels_ = tmpLst;
+            faPatches[faPatchNames.size() + i].name_ = 
+                m.boundaryMesh()[processorPatches[i]].name();
+            faPatches[faPatchNames.size() + i].type_ = 
+                processorFaPatch::typeName;
+            faPatches[faPatchNames.size() + i].ngbPolyPatchID_ =
+                processorPatches[i];
+        }
+
+        // Remaining undefined edges
+        SLList<label> undefEdges;
+        forAll(ngbPolyPatch, eI)
+        {
+            if (ngbPolyPatch[eI] == -1)
+            {
+                undefEdges.append(allUndefEdges[eI]);
+            }
+            else if 
+            (
+                m.boundaryMesh()[ngbPolyPatch[eI]].type()
+             != processorPolyPatch::typeName
+            )
+            {
+                undefEdges.append(allUndefEdges[eI]);                
+            }
+        }
+
+        if (undefEdges.size() > 0)
+        {
+            label pI = faPatches.size()-1;
+
+            faPatches[pI].name_ = "undefined";
+            faPatches[pI].type_ = "patch";
+            faPatches[pI].edgeLabels_ = undefEdges;
+        }
+        else
+        {
+            faPatches.setSize(faPatches.size()-1);
+        }
     }
+    else
+    {
+        faPatches.setSize(faPatches.size()-1);
+    }
+    
+
+    // Reorder processorFaPatch using 
+    // ordering of ngb processorPolyPatch
+    forAll(faPatches, patchI)
+    {
+        if (faPatches[patchI].type_ == processorFaPatch::typeName)
+        {
+            labelList ngbFaces(faPatches[patchI].edgeLabels_.size(), -1);
+
+            forAll(ngbFaces, edgeI)
+            {
+                label curEdge = faPatches[patchI].edgeLabels_[edgeI];
+
+                label curPMeshEdge = meshEdges[curEdge];
+
+                forAll(edgeFaces[curPMeshEdge], faceI)
+                {
+                    label curFace = edgeFaces[curPMeshEdge][faceI];
+                    
+                    label curPatchID = 
+                        m.boundaryMesh().whichPatch(curFace);
+                    
+                    if (curPatchID == faPatches[patchI].ngbPolyPatchID_)
+                    {
+                        ngbFaces[edgeI] = curFace;
+                    }            
+                }
+            }
+
+            SortableList<label> sortedNgbFaces(ngbFaces);
+            labelList reorderedEdgeLabels(ngbFaces.size(), -1);
+            for (label i=0; i<reorderedEdgeLabels.size(); i++)
+            {
+                reorderedEdgeLabels[i] =
+                    faPatches[patchI].edgeLabels_
+                    [
+                        sortedNgbFaces.indices()[i]
+                    ];
+            }
+
+            faPatches[patchI].edgeLabels_ = reorderedEdgeLabels;
+        }
+    }
+
 
     // Add good patches to faMesh
     SLList<faPatch*> faPatchLst;
@@ -597,24 +741,52 @@ Foam::faMesh::faMesh
             faPatches[pI].ngbPolyPatchID_
         );
 
-        if(faPatches[pI].edgeLabels_.size() > 0)
+        if (faPatches[pI].type_ == processorFaPatch::typeName)
         {
-            faPatchLst.append
-            (
-                faPatch::New
+            if (faPatches[pI].ngbPolyPatchID_ == -1)
+            {
+                FatalErrorIn
                 (
-                    faPatches[pI].name_,
-                    faPatches[pI].dict_,
-                    pI,
-                    boundary()
-                ).ptr()
+                    "void faMesh::faMesh(const polyMesh&, const fileName&)"
+                )
+                    << "ngbPolyPatch is not defined for processorFaPatch: "
+                        << faPatches[pI].name_
+                        << abort(FatalError);
+            }
+
+            const processorPolyPatch& procPolyPatch =
+                refCast<const processorPolyPatch>
+                (
+                    m.boundaryMesh()[faPatches[pI].ngbPolyPatchID_]
+                );
+
+            faPatches[pI].dict_.add("myProcNo", procPolyPatch.myProcNo());
+            faPatches[pI].dict_.add
+            (
+                "neighbProcNo", 
+                procPolyPatch.neighbProcNo()
             );
         }
+
+        faPatchLst.append
+        (
+            faPatch::New
+            (
+                faPatches[pI].name_,
+                faPatches[pI].dict_,
+                pI,
+                boundary()
+            ).ptr()
+        );
     }
 
     addFaPatches(List<faPatch*>(faPatchLst));
 
-    setPrimitiveMeshData();
+    // Create global mesh data
+    if (Pstream::parRun())
+    {
+        globalData();
+    }
 
     // Calculate topology for the patches (processor-processor comms etc.)
     boundary_.updateMesh();
@@ -861,9 +1033,6 @@ void Foam::faMesh::addFaPatches(const List<faPatch*>& p)
     setPrimitiveMeshData();
 
     boundary_.checkDefinition();
-
-    // Calculate the geometry for the patches (transformation tensors etc.)
-    boundary_.calcGeometry();
 }
 
 
