@@ -1068,7 +1068,7 @@ void faMesh::calcPointAreaNormals() const
                 points[curPatch.meshPoints()[curPointPoints[p]]]
               - points[curPoint];
 
-            vector n = (d1^d2)/mag(d1^d2);
+            vector n = (d1 ^ d2)/(mag(d1 ^ d2) + SMALL);
 
             scalar sinAlpha = mag(d1^d2)/(mag(d1)*mag(d2));
 
@@ -1122,7 +1122,7 @@ void faMesh::calcPointAreaNormals() const
 
             vector d2 = points[curPointPoints[i + 1]] - points[curPoint];
 
-            vector n = (d1^d2)/mag(d1 ^ d2);
+            vector n = (d1 ^ d2)/(mag(d1 ^ d2) + SMALL);
 
             scalar sinAlpha = mag(d1 ^ d2)/(mag(d1)*mag(d2));
 
