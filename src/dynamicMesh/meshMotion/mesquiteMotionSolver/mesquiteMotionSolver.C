@@ -2886,7 +2886,7 @@ label mesquiteMotionSolver::CG
 )
 {
     // Local variables
-    scalar alpha, beta, rho, rhoOld, residual;
+    scalar alpha, beta, rho, rhoOld, residual, wApA;
     label maxIter = x.size(), iter = 0;
 
     reduce(maxIter, sumOp<label>());
@@ -2915,7 +2915,16 @@ label mesquiteMotionSolver::CG
     {
         A(p,w);
 
-        alpha = rho / dot(p,w);
+        wApA = dot(p,w);
+
+        if ((mag(wApA)/norm) < VSMALL)
+        {
+            Info<< " Solution singularity.";
+
+            return iter;
+        }
+
+        alpha = rho / wApA;
 
         forAll (x, i)
         {
