@@ -48,7 +48,9 @@ SourceFiles
 #include "HashSet.H"
 
 // Have gcc ignore certain warnings while including mesquite headers
-#pragma GCC diagnostic ignored "-Wold-style-cast"
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#   pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 
 #include "Mesquite_all_headers.hpp"
 
@@ -165,6 +167,7 @@ class mesquiteMotionSolver
         labelListList procPointLabels_;
         List<List<labelPair> > globalProcPoints_;
 
+        List<Map<label> > unmatchedRecvPoints_;
         List<vectorField> sendSurfFields_, recvSurfFields_;
         List<Map<label> > sendSurfPointMap_, recvSurfPointMap_;
 

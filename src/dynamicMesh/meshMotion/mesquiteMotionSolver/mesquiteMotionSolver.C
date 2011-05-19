@@ -456,43 +456,24 @@ void mesquiteMotionSolver::readOptions()
         )
     );
 
-//     qMetricTable_.insert
-//     (
-//         "VolumeRatio",
-//         autoPtr<Mesquite::QualityMetric>
-//         (
-//             new Mesquite::VolumeRatioQualityMetric
-//         )
-//     );
-
-//     qMetricTable_.insert
-//     (
-//         "Multiply",
-//         autoPtr<Mesquite::QualityMetric>
-//         (
-//             new Mesquite::MultiplyQualityMetric
-//         )
-//     );
-
-    // Make sure we have at least one entry
+    // Size up metric list to contain at least one entry
     qMetrics_.setSize(1);
 
     // Read the optimization metric
     if (optionsDict.isDict("optMetric"))
     {
         // Metrics are in dictionary form
-        // does not work if two entries with the same name are present
-//         qMetrics_ = optionsDict.subDict("optMetric").toc();
+        const dictionary& metricDict = optionsDict.subDict("optMetric");
 
-        if (optionsDict.subDict("optMetric").found("secondMetric"))
+        // Read first metric
+        qMetrics_[0] = word(metricDict.lookup("firstMetric"));
+
+        // Optionally read the second metric
+        if (metricDict.found("secondMetric"))
         {
             qMetrics_.setSize(2);
-            qMetrics_[1] =
-                word(optionsDict.subDict("optMetric").lookup("secondMetric"));
+            qMetrics_[1] = word(metricDict.lookup("secondMetric"));
         }
-
-        qMetrics_[0] =
-            word(optionsDict.subDict("optMetric").lookup("firstMetric"));
 
         forAll(qMetrics_, wordI)
         {
@@ -588,7 +569,7 @@ void mesquiteMotionSolver::readOptions()
         }
 
         // Make sure we have two quality metrics
-        if ( qMetrics_.size() < 2)
+        if (qMetrics_.size() < 2)
         {
             FatalErrorIn("void mesquiteMotionSolver::readOptions()")
                 << "Two quality metrics are needed for composite functions."
@@ -1632,6 +1613,7 @@ void mesquiteMotionSolver::initParallelSurfaceSmoothing()
     recvSurfFields_.setSize(procIndices_.size(), vectorField(0));
     sendSurfPointMap_.setSize(procIndices_.size(), Map<label>());
     recvSurfPointMap_.setSize(procIndices_.size(), Map<label>());
+    unmatchedRecvPoints_.setSize(procIndices_.size(), Map<label>());
 
     // Build a reverse processor map for convenience
     labelList procMap(Pstream::nProcs(), -1);
@@ -1769,7 +1751,6 @@ void mesquiteMotionSolver::initParallelSurfaceSmoothing()
 
     // Check to ensure that field sizes match
     labelList nProcSize(procIndices_.size(), -1);
-    boolList requiresSync(procIndices_.size(), false);
 
     forAll(sendSurfPointMap_, pI)
     {
@@ -1780,9 +1761,11 @@ void mesquiteMotionSolver::initParallelSurfaceSmoothing()
         parRead(procIndices_[pI], nProcSize[pI]);
 
         // Require a sync for size mismatch
+        bool requiresSync = false;
+
         if (nProcSize[pI] != sendSurfPointMap_[pI].size())
         {
-            requiresSync[pI] = true;
+            requiresSync = true;
         }
 
         if (debug)
@@ -1790,7 +1773,7 @@ void mesquiteMotionSolver::initParallelSurfaceSmoothing()
             Pout<< " neiProcNo: " << procIndices_[pI]
                 << " mySize: " << sendSurfPointMap_[pI].size()
                 << " neiSize: " << nProcSize[pI]
-                << " requireSync: " << Switch::asText(requiresSync[pI])
+                << " requireSync: " << Switch::asText(requiresSync)
                 << endl;
         }
     }
@@ -1857,30 +1840,30 @@ void mesquiteMotionSolver::initParallelSurfaceSmoothing()
     }
 
     // Send and receive points for geometric match
-    vector largeVec(GREAT, GREAT, GREAT);
-
     forAll(sendSurfPointMap_, pI)
     {
         label proc = procIndices_[pI];
 
-        // Set size to max, incase of mismatch
-        label bSize = Foam::max(sendSurfPointMap_[pI].size(), nProcSize[pI]);
+        // Set size to max, in case of mismatch
+        label maxSize = Foam::max(sendSurfPointMap_[pI].size(), nProcSize[pI]);
 
         // Size-up send / recv fields
-        sendSurfFields_[pI].setSize(bSize, largeVec);
-        recvSurfFields_[pI].setSize(bSize, largeVec);
+        sendSurfFields_[pI].setSize(maxSize, vector::zero);
+        recvSurfFields_[pI].setSize(maxSize, vector::zero);
 
         // Fetch references
         vectorField& recvField = recvSurfFields_[pI];
+        DynamicList<point>& bufPoints = auxSurfPoints[pI];
 
         // Send and receive points
         if (recvField.size())
         {
             // Get field from neighbour
             parRead(proc, recvField);
+        }
 
-            DynamicList<point>& bufPoints = auxSurfPoints[pI];
-
+        if (bufPoints.size())
+        {
             // Send points to neighbour
             parWrite(proc, bufPoints);
         }
@@ -1899,6 +1882,9 @@ void mesquiteMotionSolver::initParallelSurfaceSmoothing()
     OPstream::waitRequests();
     IPstream::waitRequests();
 
+    // Set up a reversePointMap for mismatches
+    labelListList reversePointMap(procIndices_.size());
+
     forAll(sendSurfPointMap_, pI)
     {
         // Fetch references
@@ -1906,29 +1892,29 @@ void mesquiteMotionSolver::initParallelSurfaceSmoothing()
         DynamicList<point>& bufPoints = auxSurfPoints[pI];
 
         // Match points geometrically
-        labelList pMap(recvField.size(), -1);
+        labelList pointMap;
 
         matchPoints
         (
             bufPoints,
             recvField,
-            List<scalar>(recvField.size(), tol),
+            List<scalar>(bufPoints.size(), tol),
             false,
-            pMap
+            pointMap
         );
 
-        // Renumber to shuffled indices
-        Map<label>& anbMap = recvSurfPointMap_[pI];
+        // Size-up the reverse-map
+        reversePointMap[pI].setSize(nProcSize[pI], -1);
 
-        forAllIter(Map<label>, anbMap, pIter)
+        // Fill reversePointMap
+        forAll(pointMap, pointI)
         {
-            // Deal with mismatches later
-            if (pMap[pIter()] < 0)
+            if (pointMap[pointI] < 0)
             {
                 if (debug)
                 {
-                    Pout<< " Could not match point: " << pIter()
-                        << " :: " << bufPoints[pIter()]
+                    Pout<< " Could not match sent point: " << pointI
+                        << " :: " << bufPoints[pointI]
                         << " for proc: " << procIndices_[pI]
                         << endl;
                 }
@@ -1936,7 +1922,58 @@ void mesquiteMotionSolver::initParallelSurfaceSmoothing()
                 continue;
             }
 
-            pIter() = pMap[pIter()];
+            reversePointMap[pI][pointMap[pointI]] = pointI;
+        }
+
+        // Check reversePointMap for unfilled points
+        forAll(reversePointMap[pI], pointI)
+        {
+            // Compute tolSqr for matching
+            scalar tolSqr = sqr(tol);
+
+            if (reversePointMap[pI][pointI] == -1)
+            {
+                // Search my points for the unmatched point
+                const vector& uPoint = recvField[pointI];
+                const pointField& points = mesh().points();
+
+                bool foundMatch = false;
+
+                forAll(points, pointJ)
+                {
+                    scalar distSqr = magSqr(uPoint - points[pointJ]);
+
+                    if (distSqr < tolSqr)
+                    {
+                        unmatchedRecvPoints_[pI].insert(pointI, pointJ);
+
+                        foundMatch = true;
+                        break;
+                    }
+                }
+
+                if (!foundMatch)
+                {
+                    Pout<< " Could not match recv point: " << pointI
+                        << " :: " << recvField[pointI]
+                        << " for proc: " << procIndices_[pI]
+                        << abort(FatalError);
+                }
+            }
+        }
+
+        // Renumber to shuffled indices
+        Map<label>& anbMap = recvSurfPointMap_[pI];
+
+        forAllIter(Map<label>, anbMap, pIter)
+        {
+            // Skip mismatches
+            if (pointMap[pIter()] < 0)
+            {
+                continue;
+            }
+
+            pIter() = pointMap[pIter()];
         }
     }
 
@@ -2672,11 +2709,14 @@ void mesquiteMotionSolver::transferBuffers
         vectorField& recvField = recvSurfFields_[pI];
         vectorField& sendField = sendSurfFields_[pI];
 
-        if (recvField.size() && sendField.size())
+        if (recvField.size())
         {
             // Schedule receipt from neighbour
             parRead(neiProcNo, recvField);
+        }
 
+        if (sendField.size())
+        {
             // Prepare the send buffer
             forAllConstIter(Map<label>, pointMap, pIter)
             {
@@ -2697,10 +2737,13 @@ void mesquiteMotionSolver::transferBuffers
         const Map<label>& pointMap = sendSurfPointMap_[pI];
         const vectorField& recvField = recvSurfFields_[pI];
 
-        // Correct field values
-        forAllConstIter(Map<label>, pointMap, pIter)
+        if (recvField.size())
         {
-            field[pIter.key()] += recvField[pIter()];
+            // Correct field values
+            forAllConstIter(Map<label>, pointMap, pIter)
+            {
+                field[pIter.key()] += recvField[pIter()];
+            }
         }
     }
 }
@@ -3095,6 +3138,78 @@ void mesquiteMotionSolver::smoothSurfaces()
         }
     }
 
+    // Check if a parallel sync is necessary
+    bool requireParSync = false;
+
+    forAll(unmatchedRecvPoints_, pI)
+    {
+        if (unmatchedRecvPoints_[pI].size())
+        {
+            requireParSync = true;
+            break;
+        }
+    }
+
+    // Reduce across processors.
+    reduce(requireParSync, orOp<bool>());
+
+    if (requireParSync)
+    {
+        // Fill buffers with current points, and transfer
+        forAll(pIDs_, patchI)
+        {
+            const labelList& meshPts = boundary[pIDs_[patchI]].meshPoints();
+
+            forAll(meshPts,pointI)
+            {
+                xV_[pointI + offsets_[patchI]] = refPoints_[meshPts[pointI]];
+            }
+        }
+
+        forAll(procIndices_, pI)
+        {
+            label neiProcNo = procIndices_[pI];
+            const Map<label>& pointMap = sendSurfPointMap_[pI];
+
+            // Fetch references
+            vectorField& recvField = recvSurfFields_[pI];
+            vectorField& sendField = sendSurfFields_[pI];
+
+            if (recvField.size())
+            {
+                // Schedule receipt from neighbour
+                parRead(neiProcNo, recvField);
+            }
+
+            if (sendField.size())
+            {
+                // Prepare the send buffer
+                forAllConstIter(Map<label>, pointMap, pIter)
+                {
+                    sendField[pIter()] = xV_[pIter.key()];
+                }
+
+                parWrite(neiProcNo, sendField);
+            }
+        }
+
+        // Wait for all transfers to complete
+        OPstream::waitRequests();
+        IPstream::waitRequests();
+
+        // Correct unmatched points
+        forAll(procIndices_, pI)
+        {
+            const vectorField& recvField = recvSurfFields_[pI];
+            const Map<label>& pointMap = unmatchedRecvPoints_[pI];
+
+            forAllConstIter(Map<label>, pointMap, pIter)
+            {
+                refPoints_[pIter()] = recvField[pIter.key()];
+            }
+        }
+    }
+
     // Transform and update any cyclics
     forAll(boundary, patchI)
     {
@@ -3169,6 +3284,12 @@ inline scalar mesquiteMotionSolver::tetQuality
 )
 {
     const cell& cellToCheck = mesh().cells()[cIndex];
+
+    // Disregard non-tetrahedral cells
+    if (cellToCheck.size() != 4)
+    {
+        return 1.0;
+    }
 
     const face& currFace = mesh().faces()[cellToCheck[0]];
     const face& nextFace = mesh().faces()[cellToCheck[1]];
@@ -3275,7 +3396,7 @@ void mesquiteMotionSolver::correctInvalidCells()
     const polyBoundaryMesh& boundary = mesh().boundaryMesh();
 
     // Check if a minimum quality was specified.
-    scalar thresh = 0.45;
+    scalar thresh = 0.15;
 
     if (optionsDict.found("sliverThreshold"))
     {
@@ -3309,7 +3430,12 @@ void mesquiteMotionSolver::correctInvalidCells()
         }
     }
 
-    if (invCells.size() == 0)
+    label nInvCells = invCells.size();
+
+    // Reduce across processors
+    reduce(nInvCells, sumOp<label>());
+
+    if (nInvCells == 0)
     {
         return;
     }
@@ -3348,6 +3474,9 @@ void mesquiteMotionSolver::correctInvalidCells()
                 break;
             }
         }
+
+        // Reduce across processors
+        reduce(valid, andOp<bool>());
 
         if (valid)
         {
@@ -3938,6 +4067,7 @@ void mesquiteMotionSolver::update(const mapPolyMesh& mpm)
     procPointLabels_.clear();
     globalProcPoints_.clear();
 
+    unmatchedRecvPoints_.clear();
     sendSurfFields_.clear();
     recvSurfFields_.clear();
     sendSurfPointMap_.clear();
