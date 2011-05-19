@@ -69,7 +69,10 @@ uniformDensityHydrostaticPressureFvPatchScalarField
     }
     else
     {
-        evaluate();
+        // Evaluation not allowed here since g may not be available
+        // Bug fix, HJ, 19/May/2011
+        fvPatchField<scalar>::operator=(patchInternalField());
+//         evaluate();
     }
 }
 
