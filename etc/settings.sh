@@ -120,8 +120,12 @@ unset compilerBin compilerLib
 # Select compiler installation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # compilerInstall = OpenFOAM | System
+#
+# We can override the value of compilerInstall from prefs.sh
+: ${compilerInstall:=System}
+
 #compilerInstall=OpenFOAM
-compilerInstall=System
+#compilerInstall=System
 
 case "${compilerInstall:-OpenFOAM}" in
 OpenFOAM)
@@ -130,6 +134,11 @@ OpenFOAM)
         export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/gcc-4.3.3/platforms/$WM_ARCH$WM_COMPILER_ARCH
         _foamAddLib $WM_THIRD_PARTY_DIR/mpfr-2.4.1/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
         _foamAddLib $WM_THIRD_PARTY_DIR/gmp-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
+        ;;
+    Gcc44)
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.sh
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.sh
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS/etc/gcc-4.4.5.sh
         ;;
     Gcc43)
         export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/gcc-4.3.3/platforms/$WM_ARCH$WM_COMPILER_ARCH
@@ -167,7 +176,7 @@ unset compilerBin compilerLib compilerInstall
 
 
 case "$WM_COMPILER" in
-Gcc)
+Gcc*)
     export WM_CC='gcc'
     export WM_CXX='g++'
     ;;
