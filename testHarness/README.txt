@@ -7,7 +7,7 @@ Directory Structure
 ===================
 
 OpenFOAM            : CMake/CTest scripts for compilation and execution test harness for OpenFOAM.
-OpenFOAM/1.6-dev    : Test harness for OpenFOAM version 1.6-dev. See the file OpenFOAM/1.6-dev/README.txt for more information
+OpenFOAM/1.6-ext    : Test harness for OpenFOAM version 1.6-ext. See the file OpenFOAM/1.6-ext/README.txt for more information
 
 OSIG                : CMake/CTest scripts for OpenFOAM Special Interest Group (OSIG) test harness
 OSIG/TurboMachinery : Test harness for the TurboMachinery OSIG. See the file OSIG/Turbomachinery/README.txt for more information.
@@ -42,7 +42,7 @@ Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved.
    Still, I recommand always checking that these two important files are up-to-date:
 
    cp ../CMakeFiles/CMakeLists.txt $WM_PROJECT_DIR
-   cp ../CMakeFiles/CTestConfig.cmake.openfoam-extend_of-1.6-ext-testing $WM_PROJECT_DIR/CTestConfig.cmake 
+   cp ../CMakeFiles/CTestConfig.cmake.openfoam-extend $WM_PROJECT_DIR/CTestConfig.cmake 
 
 
 7:   Next, running the test loop is pretty simple:
@@ -55,9 +55,7 @@ Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved.
 8: The results will be published on the CDash dashboard on openfoam-extend. 
 
    To see your results:
-   URL      : http://openfoam-extend.sourceforge.net/CDash/index.php?project=OpenFOAM-1.6-ext_testing
-   Username : of-1.6-ext@of-extend.cdash
-   Password : onepasswd4all
+   URL      : http://openfoam-extend.sourceforge.net/CDash/index.php?project=OpenFOAM-1.6-ext
 
 
 9: You can customize your system identifier on the dashboard using the environment variable $CDASH_SUBMIT_LOCAL_HOST_ID. 
@@ -71,15 +69,6 @@ Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved.
 
 10: In general, see the file $WM_PROJECT_DIR/testHarness/OpenFOAM/1.6-ext/README.txt for the necessary information about running the 
     test loop. 
-    (NB: I just found out a couple of mistakes in that file, so please use this message for now as per instructions for running the test loop. 
-         I will fix this shortly. Sorry.)
 
 
-11: As more people will start using these basic steps, I will supply more information about some other features that are available with 
-    the test loop. 
-
-    But I need to see those baby steps first...  :) 
-
-
-12: Please do not hesitate to report any problems, comments, suggestions about the test loop. 
-    This stuff runs great on my systems, but it needs to run even better on yours.
+11: Please do not hesitate to report any problems, comments, suggestions about the test loop. 
