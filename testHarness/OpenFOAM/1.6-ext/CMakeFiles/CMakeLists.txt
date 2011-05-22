@@ -125,6 +125,14 @@ if(GIT_FOUND)
       OUTPUT_VARIABLE GIT_BRANCH_NAME
     )
     message("Git branch: ${GIT_BRANCH_NAME}")
+    if (GIT_BRANCH_NAME STREQUAL "")
+       message("No git-branch. Mercurial?")
+       EXEC_PROGRAM(hg
+	 ARGS branch
+         OUTPUT_VARIABLE GIT_BRANCH_NAME
+       )
+       message("Git branch (mercurial): ${GIT_BRANCH_NAME}")
+    endif()
     SET(BUILDNAME "${BUILDNAME}-git-branch:${GIT_BRANCH_NAME}")  
 endif()
 
