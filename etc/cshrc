@@ -240,20 +240,23 @@ case Darwin:
     setenv MACOSX_DEPLOYMENT_TARGET `sw_vers -productVersion`
 
     # Use Mac-Ports-Compiler instead of Apple-gcc-4.2
-    switch ($WM_COMPILER)
-    case Gcc43:
-        setenv WM_CC 'gcc-mp-4.3'
-	setenv WM_CXX 'g++-mp-4.3'
-	breaksw;
-    case Gcc44:
-        setenv WM_CC 'gcc-mp-4.4'
-	setenv WM_CXX 'g++-mp-4.4'
-	breaksw;
-    case Gcc45:
-        setenv WM_CC 'gcc-mp-4.5'
-	setenv WM_CXX 'g++-mp-4.5'
-        breaksw;
-    endsw
+    if ( $compilerInstall == "System" ) then 
+	switch ($WM_COMPILER)
+	case Gcc43:
+	    setenv WM_CC 'gcc-mp-4.3'
+	    setenv WM_CXX 'g++-mp-4.3'
+	    breaksw;
+	case Gcc44:
+	    setenv WM_CC 'gcc-mp-4.4'
+	    setenv WM_CXX 'g++-mp-4.4'
+	    breaksw;
+	case Gcc45:
+	    setenv WM_CC 'gcc-mp-4.5'
+	    setenv WM_CXX 'g++-mp-4.5'
+	    breaksw;
+	endsw
+    endif
+
     setenv WM_COMPILER ""
     breaksw
 
