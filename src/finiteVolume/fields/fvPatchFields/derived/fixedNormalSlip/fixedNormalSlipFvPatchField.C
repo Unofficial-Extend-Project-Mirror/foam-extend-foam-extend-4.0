@@ -161,7 +161,8 @@ void fixedNormalSlipFvPatchField<Type>::evaluate(const Pstream::commsTypes)
 
 
 template<class Type>
-tmp<Field<Type> > fixedNormalSlipFvPatchField<Type>::snGradTransformDiag() const
+tmp<Field<Type> >
+fixedNormalSlipFvPatchField<Type>::snGradTransformDiag() const
 {
     vectorField nHat = this->patch().nf();
     vectorField diag(nHat.size());
