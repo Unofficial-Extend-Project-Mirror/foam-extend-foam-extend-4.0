@@ -170,7 +170,7 @@ tmp<Field<Type> > partialSlipFvPatchField<Type>::snGradTransformDiag() const
     diag.replace(vector::Y, mag(nHat.component(vector::Y)));
     diag.replace(vector::Z, mag(nHat.component(vector::Z)));
 
-    return 
+    return
         valueFraction_*pTraits<Type>::one
       + (1.0 - valueFraction_)
        *transformFieldMask<Type>(pow<vector, pTraits<Type>::rank>(diag));
