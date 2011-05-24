@@ -207,6 +207,9 @@ case Linux:
     breaksw
 
 case Darwin:
+    # this makes certain things easier
+    setenv WM_ARCH_BASE darwin
+
     switch (`uname -p`)
     case powerpc:
 	setenv WM_ARCH darwinPpc
@@ -240,6 +243,7 @@ case Darwin:
     setenv MACOSX_DEPLOYMENT_TARGET `sw_vers -productVersion`
 
     # Use Mac-Ports-Compiler instead of Apple-gcc-4.2
+    if ( ! $?compilerInstall ) setenv compilerInstall System
     if ( $compilerInstall == "System" ) then 
 	switch ($WM_COMPILER)
 	case Gcc43:
@@ -255,7 +259,7 @@ case Darwin:
 	    setenv WM_CXX 'g++-mp-4.5'
 	    breaksw;
 	endsw
-        setenv WM_COMPILER ""
+        #setenv WM_COMPILER ""
     endif
 
     breaksw

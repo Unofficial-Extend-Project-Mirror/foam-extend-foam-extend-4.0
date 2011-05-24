@@ -88,7 +88,10 @@ _foamAddLib  $FOAM_USER_LIBBIN
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # compilerInstall = OpenFOAM | System
 #set compilerInstall=OpenFOAM
-set compilerInstall=System
+#set compilerInstall=System
+if ( ! $?compilerInstall ) then
+    setenv compilerInstall System
+endif
 
 switch ("$compilerInstall")
 case OpenFOAM:
@@ -444,7 +447,7 @@ if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.8.1 
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.csh
 endif
 
-if ( $WM_ARCH == "darwinIntel" ) then
+if ( $WM_ARCH == "darwinIntel" || $WM_ARCH == "darwinIntel64" ) then
     setenv DYLD_LIBRARY_PATH ${LD_LIBRARY_PATH}
 endif
 
