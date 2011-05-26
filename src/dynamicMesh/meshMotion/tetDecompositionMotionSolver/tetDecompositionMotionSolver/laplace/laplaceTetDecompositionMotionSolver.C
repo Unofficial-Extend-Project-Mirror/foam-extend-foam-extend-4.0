@@ -32,7 +32,6 @@ Description
 #include "laplaceTetDecompositionMotionSolver.H"
 #include "motionDiff.H"
 #include "addToRunTimeSelectionTable.H"
-#include "twoDPointCorrector.H"
 #include "tetFem.H"
 #include "elementFields.H"
 #include "tetFec.H"
