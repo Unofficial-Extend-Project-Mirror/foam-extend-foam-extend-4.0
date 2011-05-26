@@ -58,7 +58,7 @@ Foam::overlapGgiPolyPatch::expandData(const Field<Type>& pf) const
 
     tmp<Field<Type> > texpandField
     (
-        new Field<Type>( ncp*zone().size(), pTraits<Type>::zero )
+        new Field<Type>(ncp*zone().size(), pTraits<Type>::zero)
     );
 
     Field<Type>& expandField = texpandField();
