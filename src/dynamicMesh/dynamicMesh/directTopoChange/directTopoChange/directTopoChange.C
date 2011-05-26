@@ -3236,10 +3236,12 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::directTopoChange::makeMesh
         writeMeshStats(mesh, Pout);
     }
 
-    // new mesh points
+    // New mesh points
     pointField newPoints;
-    // number of internal points
+
+    // Number of internal points
     label nInternalPoints;
+
     // patch slicing
     labelList patchSizes;
     labelList patchStarts;

@@ -419,27 +419,30 @@ public:
 
         // Access
 
-            //- Points. Shrunk after constructing mesh (or calling of compact())
+            //- Points. Shrunk after constructing mesh or calling of compact()
             const DynamicList<point>& points() const
             {
                 return points_;
             }
 
+            //- Faces
             const DynamicList<face>& faces() const
             {
                 return faces_;
             }
 
-            const DynamicList<label>& region()const
+            const DynamicList<label>& region() const
             {
                 return region_;
             }
 
-            const DynamicList<label>& faceOwner()const
+            //- Owner
+            const DynamicList<label>& faceOwner() const
             {
                 return faceOwner_;
             }
 
+            //- Neighbour
             const DynamicList<label>& faceNeighbour()const
             {
                 return faceNeighbour_;
@@ -447,8 +450,10 @@ public:
 
             //- Is point removed?
             inline bool pointRemoved(const label pointI) const;
+
             //- Is face removed?
             inline bool faceRemoved(const label faceI) const;
+
             //- Is cell removed?
             inline bool cellRemoved(const label cellI) const;
 
@@ -472,7 +477,7 @@ public:
             //- Move all points. Incompatible with other topology changes.
             void movePoints(const pointField& newPoints);
 
-            //- For compatibility with directTopoChange: set topological action.
+            //- For compatibility with directTopoChange: set topological action
             label setAction(const topoAction& action);
 
             //- Add point. Return new point label.
@@ -550,8 +555,9 @@ public:
             void removeCell(const label, const label);
 
             //- Explicitly set the number of patches if construct-without-mesh
-            //  used.
+            //  used
             inline void setNumPatches(const label nPatches);
+
 
         // Other
 
