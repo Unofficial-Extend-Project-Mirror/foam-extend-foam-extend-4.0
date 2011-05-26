@@ -49,7 +49,7 @@ void Foam::RBFInterpolation::calcB() const
     // Determine inverse of boundary connectivity matrix
     label polySize(4);
 
-    if(!polynomials_)
+    if (!polynomials_)
     {
         polySize = 0;
     }
@@ -151,6 +151,8 @@ void Foam::RBFInterpolation::calcB() const
     // HJ and FB (05 Jan 2009)
     // Collect ALL control points from ALL CPUs
     // Create an identical inverse for all CPUs
+
+    Info<< "Inverting RBF motion matrix" << endl;
 
     BPtr_ = new scalarSquareMatrix(A.LUinvert());
 }
