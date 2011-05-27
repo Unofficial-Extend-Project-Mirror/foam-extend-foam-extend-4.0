@@ -104,14 +104,14 @@ void processorTetPolyPatchCellDecomp::clearCutEdgeAddressing() const
 const pointField& processorTetPolyPatchCellDecomp::localPoints() const
 {
     notImplemented("processorTetPolyPatchCellDecomp::localPoints() const");
-    return Field<point>::null();
+    return pointField::null();
 }
 
 
 const vectorField& processorTetPolyPatchCellDecomp::pointNormals() const
 {
     notImplemented("processorTetPolyPatchCellDecomp::pointNormals() const");
-    return Field<vector>::null();
+    return vectorField::null();
 }
 
 

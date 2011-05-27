@@ -1,4 +1,4 @@
-if (isA<wallPolyPatch>(pbMesh[patch(face())]))
+if (pbMesh[patch(face())].isWall())
 {
     keepParcel = sDB.wall().wallTreatment(*this, face());
 

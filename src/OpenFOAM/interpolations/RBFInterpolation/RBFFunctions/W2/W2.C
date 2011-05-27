@@ -38,7 +38,13 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from dictionary
+Foam::W2::W2(const scalar radius)
+:
+    RBFFunction(),
+    radius_(radius)
+{}
+
+
 Foam::W2::W2(const dictionary& dict)
 :
     RBFFunction(),

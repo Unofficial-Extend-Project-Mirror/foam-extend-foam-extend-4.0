@@ -185,9 +185,9 @@ public:
             const word& name,
             const fileName& instance,
             const objectRegistry& registry,
-            readOption r=NO_READ,
-            writeOption w=NO_WRITE,
-            bool registerObject=true
+            readOption r = NO_READ,
+            writeOption w = NO_WRITE,
+            bool registerObject = true
         );
 
         //- Construct from name, instance, local, registry, io options
@@ -197,9 +197,9 @@ public:
             const fileName& instance,
             const fileName& local,
             const objectRegistry& registry,
-            readOption r=NO_READ,
-            writeOption w=NO_WRITE,
-            bool registerObject=true
+            readOption r = NO_READ,
+            writeOption w = NO_WRITE,
+            bool registerObject = true
         );
 
         //- Construct from path, registry, io options
@@ -208,9 +208,9 @@ public:
         (
             const fileName& path,
             const objectRegistry& registry,
-            readOption r=NO_READ,
-            writeOption w=NO_WRITE,
-            bool registerObject=true
+            readOption r = NO_READ,
+            writeOption w = NO_WRITE,
+            bool registerObject = true
         );
 
         //- Clone
@@ -265,7 +265,8 @@ public:
                 name_ = newName;
             }
 
-            //- Register object created from this IOobject with registry if true
+            //- Register object created from this IOobject with registry
+            //  if true
             bool registerObject() const
             {
                 return registerObject_;

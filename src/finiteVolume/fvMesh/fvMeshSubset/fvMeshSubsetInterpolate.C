@@ -85,7 +85,7 @@ tmp<GeometricField<Type, fvPatchField, volMesh> > fvMeshSubset::meshToMesh
             {
                 label baseFaceI = faceMap[subPatch.patch().start()+i];
 
-                if (baseFaceI >= baseStart && baseFaceI < baseStart+baseSize)
+                if (baseFaceI >= baseStart && baseFaceI < baseStart + baseSize)
                 {
                     directAddressing[i] = baseFaceI-baseStart;
                 }

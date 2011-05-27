@@ -116,7 +116,7 @@ DeferredCorrectionLimitedScheme<Type, Limiter, LimitFunc>::limiter
 
     surfaceScalarField::GeometricBoundaryField& bLim = lim.boundaryField();
 
-    forAll(bLim, patchi)
+    forAll (bLim, patchi)
     {
         scalarField& pLim = bLim[patchi];
 

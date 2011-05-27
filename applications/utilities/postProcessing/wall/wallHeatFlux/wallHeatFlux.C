@@ -35,7 +35,6 @@ Description
 #include "fvCFD.H"
 #include "hCombustionThermo.H"
 #include "RASModel.H"
-#include "wallFvPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -64,7 +63,7 @@ int main(int argc, char *argv[])
         Info<< "\nWall heat fluxes [W]" << endl;
         forAll(patchHeatFlux, patchi)
         {
-            if (isA<wallFvPatch>(mesh.boundary()[patchi]))
+            if (mesh.boundary()[patchi].isWall())
             {
                 Info<< mesh.boundary()[patchi].name()
                     << " "

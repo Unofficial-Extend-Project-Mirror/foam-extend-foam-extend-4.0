@@ -38,6 +38,13 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
+Foam::IMQB::IMQB(const scalar radius)
+:
+    RBFFunction(),
+    radius_(radius)
+{}
+
+
 // Construct from dictionary
 Foam::IMQB::IMQB(const dictionary& dict)
 :
@@ -60,9 +67,10 @@ Foam::tmp<Foam::scalarField> Foam::IMQB::weights
     const vector& controlPoint
 ) const
 {
-    scalarField dist = mag(points - controlPoint);
+    // Algorithmic improvement, Matteo Lombardi.  21/Mar/2011
+    scalarField sqrDist = magSqr(points - controlPoint);
 
-    return 1/sqrt(sqr(dist) + sqr(radius_));
+    return 1/sqrt(sqrDist + sqr(radius_));
 }
 
 

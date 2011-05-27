@@ -76,8 +76,17 @@ public:
 
     // Constructors
 
+        //- Construct given radius
+        IMQB(const scalar radius);
+
         //- Construct from dictionary
         IMQB(const dictionary& dict);
+
+        //- Create and return a clone
+        virtual autoPtr<RBFFunction> clone() const
+        {
+            return autoPtr<RBFFunction>(new IMQB(this->radius_));
+        }
 
 
     // Destructor

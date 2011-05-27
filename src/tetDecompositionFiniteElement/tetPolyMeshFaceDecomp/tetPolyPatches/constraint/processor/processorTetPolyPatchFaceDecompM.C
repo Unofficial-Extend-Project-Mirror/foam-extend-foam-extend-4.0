@@ -66,9 +66,9 @@ processorTetPolyPatchFaceDecomp::processorTetPolyPatchFaceDecomp
     cutEdgeOwnerStartPtr_(NULL),
     cutEdgeNeighbourIndicesPtr_(NULL),
     cutEdgeNeighbourStartPtr_(NULL),
-    doubleCutEdgeIndicesPtr_(new labelList(0)),
-    doubleCutOwnerPtr_(new labelList(0)),
-    doubleCutNeighbourPtr_(new labelList(0)),
+    doubleCutEdgeIndicesPtr_(NULL),
+    doubleCutOwnerPtr_(NULL),
+    doubleCutNeighbourPtr_(NULL),
     ownNeiDoubleMaskPtr_(NULL)
 {}
 
@@ -80,11 +80,6 @@ processorTetPolyPatchFaceDecomp::~processorTetPolyPatchFaceDecomp()
     deleteDemandDrivenData(localEdgeIndicesPtr_);
 
     clearCutEdgeAddressing();
-
-    // Clear storage for nonexistent things
-    deleteDemandDrivenData(doubleCutEdgeIndicesPtr_);
-    deleteDemandDrivenData(doubleCutOwnerPtr_);
-    deleteDemandDrivenData(doubleCutNeighbourPtr_);
 }
 
 
@@ -96,6 +91,10 @@ void processorTetPolyPatchFaceDecomp::clearCutEdgeAddressing() const
     deleteDemandDrivenData(cutEdgeNeighbourIndicesPtr_);
     deleteDemandDrivenData(cutEdgeNeighbourStartPtr_);
 
+    deleteDemandDrivenData(doubleCutEdgeIndicesPtr_);
+    deleteDemandDrivenData(doubleCutOwnerPtr_);
+    deleteDemandDrivenData(doubleCutNeighbourPtr_);
+
     deleteDemandDrivenData(ownNeiDoubleMaskPtr_);
 }
 
@@ -105,14 +104,14 @@ void processorTetPolyPatchFaceDecomp::clearCutEdgeAddressing() const
 const pointField& processorTetPolyPatchFaceDecomp::localPoints() const
 {
     notImplemented("processorTetPolyPatchFaceDecomp::localPoints() const");
-    return Field<point>::null();
+    return pointField::null();
 }
 
 
 const vectorField& processorTetPolyPatchFaceDecomp::pointNormals() const
 {
     notImplemented("processorTetPolyPatchFaceDecomp::pointNormals() const");
-    return Field<vector>::null();
+    return vectorField::null();
 }
 
 

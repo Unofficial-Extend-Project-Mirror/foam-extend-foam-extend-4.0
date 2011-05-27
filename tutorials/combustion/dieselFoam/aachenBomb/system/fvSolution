@@ -21,31 +21,32 @@ solvers
     {
         solver          PCG;
         preconditioner  DIC;
-        tolerance       1e-09;
+        tolerance       1e-07;
         relTol          0;
         minIter         1;
     }
 
     rho
     {
-        $p;
-        tolerance       1e-06;
+        solver          diagonal;
     }
 
     "(U|Yi|hs|k|epsilon)"
     {
         solver          PBiCG;
         preconditioner  DILU;
-        tolerance       1e-08;
+        tolerance       1e-06;
         relTol          0;
-        minIter         1;
+        minIter         0;
     }
 }
 
 PISO
 {
-    nCorrectors     4;
+    transonic       no;
+    nCorrectors     2;
     nNonOrthogonalCorrectors 0;
 }
+
 
 // ************************************************************************* //

@@ -56,8 +56,7 @@ void Foam::tetPolyMeshCellDecomp::calcParPointData() const
         {
             if
             (
-                typeid(mesh_.boundaryMesh()[patchI])
-             == typeid(processorPolyPatch)
+                isA<processorPolyPatch>(mesh_.boundaryMesh()[patchI])
             )
             {
                 const labelList& p = mesh_.boundaryMesh()[patchI].meshPoints();
@@ -93,8 +92,7 @@ void Foam::tetPolyMeshCellDecomp::calcParPointData() const
         {
             if
             (
-                typeid(mesh_.boundaryMesh()[patchI])
-             == typeid(processorPolyPatch)
+                isA<processorPolyPatch>(mesh_.boundaryMesh()[patchI])
             )
             {
                 const labelList& p = mesh_.boundaryMesh()[patchI].meshPoints();

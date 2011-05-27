@@ -118,10 +118,10 @@ public:
 
            // Transform
 
-               //- Transform the given vector 
+               //- Transform the given vector
                inline vector transform(const vector& v) const;
 
-               //- Inverse Transform the given vector
+               //- Inverse transform the given vector
                inline vector invTransform(const vector& v) const;
 
 
@@ -170,7 +170,9 @@ inline bool operator==(const septernion& tr1, const septernion& tr2);
 inline bool operator!=(const septernion& tr1, const septernion& tr2);
 inline septernion operator+(const septernion& tr, const vector& t);
 inline septernion operator+(const vector& t, const septernion& tr);
+inline septernion operator+(const septernion& tr1, const septernion& tr2);
 inline septernion operator-(const septernion& tr, const vector& t);
+inline septernion operator-(const septernion& tr1, const septernion& tr2);
 inline septernion operator*(const quaternion& r, const septernion& tr);
 inline septernion operator*(const septernion& tr, const quaternion& r);
 inline septernion operator/(const septernion& tr, const quaternion& r);

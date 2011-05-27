@@ -56,8 +56,13 @@ class multivariateSelectionScheme
 {
     // Private data
 
+        //- Schemes dictionary
         dictionary schemes_;
+
+        //- Face flux
         const surfaceScalarField& faceFlux_;
+
+        //- Combined weights
         surfaceScalarField weights_;
 
 
@@ -104,7 +109,7 @@ public:
         public:
 
             // Constructors
-            
+
                 fieldScheme
                 (
                     const GeometricField<Type, fvPatchField, volMesh>& field,

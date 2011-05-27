@@ -14,30 +14,34 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dynamicFvMeshLibs   1("libtopoChangerFvMesh.so");
+dynamicFvMesh      movingBodyTopoFvMesh;
 
-dynamicFvMesh      movingConeTopoFvMesh;
-
-movingConeTopoFvMeshCoeffs
+movingBodyTopoFvMeshCoeffs
 {
-    motionVelAmplitude      (0.00051 0 0);
-    motionVelPeriod         10;
+    movingCells     moving;
+    frontFaces      rightZone;
+    backFaces       leftZone;
 
-    leftEdge                -0.0075;
-    leftObstacleEdge        -0.007;
-    rightObstacleEdge       -0.0035;
+    solidBodyMotionFunction   linearOscillation;
 
-    left
+    linearOscillationCoeffs
     {
-        minThickness        2e-4;
-        maxThickness        5e-4;
+        amplitude   (0.0032 0 0);
+        period      40;
     }
 
-    right
+    front
     {
-        minThickness        2e-4;
-        maxThickness        5e-4;
+        minThickness        5e-5;
+        maxThickness        2e-4;
+    }
+
+    back
+    {
+        minThickness        5e-5;
+        maxThickness        2e-4;
     }
 }
+
 
 // ************************************************************************* //

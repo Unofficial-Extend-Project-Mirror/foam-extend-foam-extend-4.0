@@ -32,7 +32,6 @@ Description
 #include "pseudoSolidTetDecompositionMotionSolver.H"
 #include "motionDiff.H"
 #include "addToRunTimeSelectionTable.H"
-#include "twoDPointCorrector.H"
 #include "tetFem.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

@@ -188,6 +188,16 @@ inline Foam::septernion Foam::operator+
 }
 
 
+inline Foam::septernion Foam::operator+
+(
+    const septernion& tr1,
+    const septernion& tr2
+)
+{
+    return septernion(tr1.t() + tr2.t(), tr1.r() + tr2.r());
+}
+
+
 inline Foam::septernion Foam::operator-
 (
     const septernion& tr,
@@ -195,6 +205,16 @@ inline Foam::septernion Foam::operator-
 )
 {
     return septernion(tr.t() - t, tr.r());
+}
+
+
+inline Foam::septernion Foam::operator-
+(
+    const septernion& tr1,
+    const septernion& tr2
+)
+{
+    return septernion(tr1.t() - tr2.t(), tr1.r() - tr2.r());
 }
 
 

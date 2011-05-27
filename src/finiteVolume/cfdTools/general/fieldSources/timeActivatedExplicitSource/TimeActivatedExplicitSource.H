@@ -49,7 +49,7 @@ Description
             (2.75 0.5 0)
         );
 
-        cellSet         c0;        // cellSet name when selectionMode = cekllSet
+        cellSet         c0;        // cellSet name when selectionMode = cellSet
     }
 
 SourceFiles

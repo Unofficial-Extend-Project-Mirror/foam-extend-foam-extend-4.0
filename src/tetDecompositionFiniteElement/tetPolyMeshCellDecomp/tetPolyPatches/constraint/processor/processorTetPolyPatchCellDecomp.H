@@ -85,7 +85,7 @@ class processorTetPolyPatchCellDecomp
         // so on; the breaks in the list are stored in the "start"
         // mechanism, described in lduAddressing.  This will be used to
         // calculate the cross-processor contribution of the vector-matrix
-        // multiply.  
+        // multiply.  HJ, 13/Nov/2001
 
             //- Cut edges owner list
             mutable labelList* cutEdgeOwnerIndicesPtr_;

@@ -340,10 +340,10 @@ tmp<vectorField> freeSurface::pointDisplacement(const scalarField& deltaH)
 
             forAll(nonGlobalPatchPoints, pointI)
             {
-                label curPatchPoint = 
+                label curPatchPoint =
                     nonGlobalPatchPoints[pointI];
 
-                label curPoint = 
+                label curPoint =
                     patchPointLabels[curPatchPoint];
 
                 label curNgbPoint = procPatch.neighbPoints()[curPatchPoint];
@@ -354,7 +354,7 @@ tmp<vectorField> freeSurface::pointDisplacement(const scalarField& deltaH)
                   + ngbLsPoints[curNgbPoint].size(),
                     vector::zero
                 );
-                
+
                 label counter = -1;
                 forAll(lsPoints[curPatchPoint], pointI)
                 {
@@ -365,20 +365,20 @@ tmp<vectorField> freeSurface::pointDisplacement(const scalarField& deltaH)
                     allLsPoints[++counter] = ngbLsPoints[curNgbPoint][pointI];
                 }
 
-                vectorField pointAndNormal = 
+                vectorField pointAndNormal =
                     lsPlanePointAndNormal
                     (
-                        allLsPoints, 
-                        points[curPoint], 
+                        allLsPoints,
+                        points[curPoint],
                         pointNormals[curPoint]
                     );
 
                 vector& P = pointAndNormal[0];
                 vector& N = pointAndNormal[1];
-                    
+
                 if (motionPointsMask()[curPoint] != 0)
                 {
-                    displacement[curPoint] = 
+                    displacement[curPoint] =
                         pointsDisplacementDir()[curPoint]
                        *((P - points[curPoint])&N)
                        /(pointsDisplacementDir()[curPoint]&N);

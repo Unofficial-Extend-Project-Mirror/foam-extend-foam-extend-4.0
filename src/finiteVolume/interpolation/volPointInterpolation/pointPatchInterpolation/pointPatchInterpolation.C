@@ -61,7 +61,7 @@ void pointPatchInterpolation::makePatchPatchAddressing()
 
     label nPatchPatchPoints = 0;
 
-    forAll(bm, patchi)
+    forAll (bm, patchi)
     {
         if(!isA<emptyFvPatch>(bm[patchi]) && !bm[patchi].coupled())
         {
@@ -79,14 +79,14 @@ void pointPatchInterpolation::makePatchPatchAddressing()
 
     label pppi = 0;
 
-    forAll(bm, patchi)
+    forAll (bm, patchi)
     {
         if(!isA<emptyFvPatch>(bm[patchi]) && !bm[patchi].coupled())
         {
             const labelList& bp = bm[patchi].patch().boundaryPoints();
             const labelList& meshPoints = bm[patchi].patch().meshPoints();
 
-            forAll(bp, pointi)
+            forAll (bp, pointi)
             {
                 label ppp = meshPoints[bp[pointi]];
 
@@ -125,7 +125,7 @@ void pointPatchInterpolation::makePatchPatchAddressing()
 
     label nConstraints = 0;
 
-    forAll(patchPatchPointConstraints, i)
+    forAll (patchPatchPointConstraints, i)
     {
         if (patchPatchPointConstraints[i].first() != 0)
         {
@@ -142,11 +142,10 @@ void pointPatchInterpolation::makePatchPatchAddressing()
     patchPatchPointConstraintPoints_.setSize(nConstraints);
     patchPatchPointConstraintTensors_.setSize(nConstraints);
 
-
     patchInterpolators_.clear();
     patchInterpolators_.setSize(bm.size());
 
-    forAll(bm, patchi)
+    forAll (bm, patchi)
     {
         patchInterpolators_.set
         (
@@ -176,8 +175,11 @@ void pointPatchInterpolation::makePatchPatchWeights()
     patchPatchPointWeights_.clear();
     patchPatchPointWeights_.setSize(patchPatchPoints_.size());
 
+    // Note: Do not use fvMesh functionality, because of update order
+    // The polyMesh is already up-to-date - use this instead
+    // HJ, 18/Feb/2011
+
     const labelListList& pf = fvMesh_.pointFaces();
-    const volVectorField& centres = fvMesh_.C();
     const fvBoundaryMesh& bm = fvMesh_.boundary();
 
     pointScalarField sumWeights
@@ -192,7 +194,7 @@ void pointPatchInterpolation::makePatchPatchWeights()
         dimensionedScalar("zero", dimless, 0)
     );
 
-    forAll(patchPatchPoints_, pointi)
+    forAll (patchPatchPoints_, pointi)
     {
         const label curPoint = patchPatchPoints_[pointi];
         const labelList& curFaces = pf[curPoint];
@@ -204,7 +206,7 @@ void pointPatchInterpolation::makePatchPatchWeights()
 
         const vector& pointLoc = fvMesh_.points()[curPoint];
 
-        forAll(curFaces, facei)
+        forAll (curFaces, facei)
         {
             if (!fvMesh_.isInternalFace(curFaces[facei]))
             {
@@ -217,7 +219,7 @@ void pointPatchInterpolation::makePatchPatchWeights()
                         1.0/mag
                         (
                             pointLoc
-                          - centres.boundaryField()[patchi]
+                            - fvMesh_.boundaryMesh()[patchi].faceCentres()
                                 [bm[patchi].patch().whichFace(curFaces[facei])]
                         );
 
@@ -236,7 +238,7 @@ void pointPatchInterpolation::makePatchPatchWeights()
     // Do parallel correction of weights
 
     // Update coupled boundaries
-    forAll(sumWeights.boundaryField(), patchi)
+    forAll (sumWeights.boundaryField(), patchi)
     {
         if (sumWeights.boundaryField()[patchi].coupled())
         {
@@ -244,7 +246,7 @@ void pointPatchInterpolation::makePatchPatchWeights()
         }
     }
 
-    forAll(sumWeights.boundaryField(), patchi)
+    forAll (sumWeights.boundaryField(), patchi)
     {
         if (sumWeights.boundaryField()[patchi].coupled())
         {
@@ -255,19 +257,17 @@ void pointPatchInterpolation::makePatchPatchWeights()
         }
     }
 
-
     // Re-scale the weights for the current point
-    forAll(patchPatchPoints_, pointi)
+    forAll (patchPatchPoints_, pointi)
     {
         scalarList& pw = patchPatchPointWeights_[pointi];
         scalar sumw = sumWeights[patchPatchPoints_[pointi]];
 
-        forAll(pw, facei)
+        forAll (pw, facei)
         {
             pw[facei] /= sumw;
         }
     }
-
 
     if (debug)
     {
@@ -298,7 +298,7 @@ pointPatchInterpolation::~pointPatchInterpolation()
 
 bool pointPatchInterpolation::movePoints()
 {
-    forAll(patchInterpolators_, patchi)
+    forAll (patchInterpolators_, patchi)
     {
         patchInterpolators_[patchi].movePoints();
     }

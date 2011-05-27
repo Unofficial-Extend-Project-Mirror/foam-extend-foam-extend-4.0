@@ -208,6 +208,14 @@ bool kEpsilon::read()
 
 void kEpsilon::correct()
 {
+    // Bound in case of topological change
+    // HJ, 22/Aug/2007
+    if (mesh_.changing())
+    {
+        bound(k_, k0_);
+        bound(epsilon_, epsilon0_);
+    }
+
     RASModel::correct();
 
     if (!turbulence_)
@@ -217,7 +225,7 @@ void kEpsilon::correct()
 
     volScalarField G("RASModel::G", nut_*2*magSqr(symm(fvc::grad(U_))));
 
-    // Update espsilon and G at the wall
+    // Update epsilon and G at the wall
     epsilon_.boundaryField().updateCoeffs();
 
     // Dissipation equation

@@ -147,7 +147,7 @@ bool Foam::layerAdditionRemoval::setLayerPairing() const
                     nPointErrors++;
 //                     Pout<< "Topological error in cell layer pairing.  "
 //                         << "This mesh is either topologically incorrect "
-//                         << "or the master afce layer is not defined "
+//                         << "or the master face layer is not defined "
 //                         << "consistently.  Please check the "
 //                         << "face zone flip map." << nl
 //                         << "First index: " << ptc[clp]

@@ -76,8 +76,17 @@ public:
 
     // Constructors
 
+        //- Construct given radius
+        W2(const scalar radius);
+
         //- Construct from dictionary
         W2(const dictionary& dict);
+
+        //- Create and return a clone
+        virtual autoPtr<RBFFunction> clone() const
+        {
+            return autoPtr<RBFFunction>(new W2(this->radius_));
+        }
 
 
     // Destructor

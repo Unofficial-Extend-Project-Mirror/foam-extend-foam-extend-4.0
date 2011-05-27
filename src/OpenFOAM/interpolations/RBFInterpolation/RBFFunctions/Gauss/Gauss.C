@@ -38,7 +38,13 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from dictionary
+Foam::Gauss::Gauss(const scalar radius)
+:
+    RBFFunction(),
+    radius_(radius)
+{}
+
+
 Foam::Gauss::Gauss(const dictionary& dict)
 :
     RBFFunction(),
@@ -60,9 +66,10 @@ Foam::tmp<Foam::scalarField> Foam::Gauss::weights
     const vector& controlPoint
 ) const
 {
-    scalarField dist = mag(points - controlPoint);
+    // Algorithmic improvement, Matteo Lombardi.  21/Mar/2011
+    scalarField sqrDist = magSqr(points - controlPoint);
 
-    return Foam::exp(-pow(radius_*dist, 2));
+    return Foam::exp(-sqr(radius_)*sqrDist);
 }
 
 

@@ -33,7 +33,7 @@ Description
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * Member functions * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 template<class Type>
 void tetFemMatrix<Type>::check()
@@ -128,7 +128,7 @@ void tetFemMatrix<Type>::check()
                     *this,
                     coupledBouCoeffs[interfaceI],
                     0,
-                    true
+                    Pstream::defaultCommsType
                 );
             }
         }
@@ -144,7 +144,8 @@ void tetFemMatrix<Type>::check()
                     matrixSumOffDiag,
                     *this,
                     coupledBouCoeffs[interfaceI],
-                    0
+                    0,
+                    Pstream::defaultCommsType
                 );
             }
         }

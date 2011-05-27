@@ -166,19 +166,19 @@ public:
 
 // Add the patch constructor functions to the hash tables
 
-#define makeFvDivTypeScheme(SS, Type)                                          \
-                                                                               \
-defineNamedTemplateTypeNameAndDebug(SS<Type>, 0);                              \
-                                                                               \
-divScheme<Type>::addIstreamConstructorToTable<SS<Type> >                       \
+#define makeFvDivTypeScheme(SS, Type)                                         \
+                                                                              \
+defineNamedTemplateTypeNameAndDebug(SS<Type>, 0);                             \
+                                                                              \
+divScheme<Type>::addIstreamConstructorToTable<SS<Type> >                      \
     add##SS##Type##IstreamConstructorToTable_;
 
 
-#define makeFvDivScheme(SS)                                                    \
-                                                                               \
-makeFvDivTypeScheme(SS, vector)                                                \
-makeFvDivTypeScheme(SS, sphericalTensor)                                       \
-makeFvDivTypeScheme(SS, symmTensor)                                            \
+#define makeFvDivScheme(SS)                                                   \
+                                                                              \
+makeFvDivTypeScheme(SS, vector)                                               \
+makeFvDivTypeScheme(SS, sphericalTensor)                                      \
+makeFvDivTypeScheme(SS, symmTensor)                                           \
 makeFvDivTypeScheme(SS, tensor)
 
 

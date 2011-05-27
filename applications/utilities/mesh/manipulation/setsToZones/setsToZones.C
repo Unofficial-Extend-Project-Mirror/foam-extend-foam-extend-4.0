@@ -27,13 +27,13 @@ Description
     pointSets/faceSets/cellSets.
 
     There is one catch: for faceZones you also need to specify a flip
-    condition which basically denotes the side of the face. In this app
+    condition which basically denotes the side of the face. In this application
     it reads a cellSet (xxxCells if 'xxx' is the name of the faceSet) which
-    is the masterCells of the zone.
-    There are lots of situations in which this will go wrong but it is the
-    best I can think of for now.
+    is the masterCells of the zone.  Master cell is the one IN FRONT of the
+    face, ie. the one into which the face normal points.  If master cells are
+    not found, take faces without a flip
 
-    If one is not interested in sideNess specify the -noFlipMap
+    If one is not interested in sidedness specify the -noFlipMap
     command line option.
 
 \*---------------------------------------------------------------------------*/
@@ -84,19 +84,17 @@ int main(int argc, char *argv[])
     IOobjectList objects
     (
         mesh,
-        mesh.pointsInstance(),
+        mesh.facesInstance(),
         polyMesh::meshSubDir/"sets"
     );
 
-    Info<< "Searched : " << mesh.pointsInstance()/polyMesh::meshSubDir/"sets"
+    Info<< "Searched : " << mesh.facesInstance()/polyMesh::meshSubDir/"sets"
         << nl
         << "Found    : " << objects.names() << nl
         << endl;
 
 
     IOobjectList pointObjects(objects.lookupClass(pointSet::typeName));
-
-    //Pout<< "pointSets:" << pointObjects.names() << endl;
 
     for
     (
@@ -113,6 +111,7 @@ int main(int argc, char *argv[])
         if (zoneID == -1)
         {
             Info<< "Adding set " << set.name() << " as a pointZone." << endl;
+
             label sz = mesh.pointZones().size();
             mesh.pointZones().setSize(sz+1);
             mesh.pointZones().set
@@ -143,9 +142,7 @@ int main(int argc, char *argv[])
 
     IOobjectList faceObjects(objects.lookupClass(faceSet::typeName));
 
-    HashSet<word> slaveCellSets;
-
-    //Pout<< "faceSets:" << faceObjects.names() << endl;
+    HashSet<word> masterCellSets;
 
     for
     (
@@ -163,75 +160,99 @@ int main(int argc, char *argv[])
 
         if (!noFlipMap)
         {
-            word setName(set.name() + "SlaveCells");
+            word setName(set.name() + "MasterCells");
 
-            Info<< "Trying to load cellSet " << setName
-                << " to find out the slave side of the zone." << nl
-                << "If you do not care about the flipMap"
-                << " (i.e. do not use the sideness)" << nl
-                << "use the -noFlipMap command line option."
+            Info<< "Using cellSet " << setName
+                << " to determine the master side of the zone." << nl
                 << endl;
 
             // Load corresponding cells
-            cellSet cells(mesh, setName);
+            cellSet cells
+            (
+                mesh,
+                setName,
+                IOobject::READ_IF_PRESENT
+            );
 
             // Store setName to exclude from cellZones further on
-            slaveCellSets.insert(setName);
+            masterCellSets.insert(setName);
 
-            forAll(faceLabels, i)
+            if (!cells.empty())
             {
-                label faceI = faceLabels[i];
-
-                bool flip = false;
-
-                if (mesh.isInternalFace(faceI))
+                forAll(faceLabels, i)
                 {
-                    if
-                    (
-                        cells.found(mesh.faceOwner()[faceI])
-                    && !cells.found(mesh.faceNeighbour()[faceI])
-                    )
+                    label faceI = faceLabels[i];
+
+                    bool flip = false;
+
+                    if (mesh.isInternalFace(faceI))
                     {
-                        flip = false;
-                    }
-                    else if
-                    (
-                       !cells.found(mesh.faceOwner()[faceI])
-                     && cells.found(mesh.faceNeighbour()[faceI])
-                    )
-                    {
-                        flip = true;
+                        if
+                        (
+                            cells.found(mesh.faceOwner()[faceI])
+                        && !cells.found(mesh.faceNeighbour()[faceI])
+                        )
+                        {
+                            // Fixed, using master zone.  HJ, 17/Feb/2011
+                            flip = true;
+                        }
+                        else if
+                        (
+                           !cells.found(mesh.faceOwner()[faceI])
+                         && cells.found(mesh.faceNeighbour()[faceI])
+                        )
+                        {
+                            // Fixed, using master zone.  HJ, 17/Feb/2011
+                            flip = false;
+                        }
+                        else
+                        {
+                            FatalErrorIn(args.executable())
+                                << "Pwner or neighbour of internal face "
+                                << faceI << " should be in cellSet "
+                                << cells.name()
+                                << " to be able to determine orientation."
+                                << nl << "Face:" << faceI
+                                << " own:" << mesh.faceOwner()[faceI]
+                                << " OwnInCellSet:"
+                                << cells.found(mesh.faceOwner()[faceI])
+                                << " nei:" << mesh.faceNeighbour()[faceI]
+                                << " NeiInCellSet:"
+                                << cells.found(mesh.faceNeighbour()[faceI])
+                                << abort(FatalError);
+                        }
                     }
                     else
                     {
-                        FatalErrorIn(args.executable())
-                            << "One of owner or neighbour of internal face "
-                            << faceI << " should be in cellSet " << cells.name()
-                            << " to be able to determine orientation." << endl
-                            << "Face:" << faceI
-                            << " own:" << mesh.faceOwner()[faceI]
-                            << " OwnInCellSet:"
-                            << cells.found(mesh.faceOwner()[faceI])
-                            << " nei:" << mesh.faceNeighbour()[faceI]
-                            << " NeiInCellSet:"
-                            << cells.found(mesh.faceNeighbour()[faceI])
-                            << abort(FatalError);
+                        if (cells.found(mesh.faceOwner()[faceI]))
+                        {
+                            // Fixed, using master zone.  HJ, 17/Feb/2011
+                            flip = true;
+                        }
+                        else
+                        {
+                            // Fixed, using master zone.  HJ, 17/Feb/2011
+                            flip = false;
+                        }
                     }
-                }
-                else
-                {
-                    if (cells.found(mesh.faceOwner()[faceI]))
-                    {
-                        flip = false;
-                    }
-                    else
-                    {
-                        flip = true;
-                    }
-                }
 
-                addressing.append(faceI);
-                flipMap.append(flip);
+                    addressing.append(faceI);
+                    flipMap.append(flip);
+                }
+            }
+            else
+            {
+                // Cell set not found or empty.  Using faces without flip
+                Info<< "cellSet " << setName
+                    << " not found or empty.  Setting flipMap to false" << nl
+                    << endl;
+
+                forAll(faceLabels, i)
+                {
+                    label faceI = faceLabels[i];
+                    addressing.append(faceI);
+                    flipMap.append(false);
+                }
             }
         }
         else
@@ -256,11 +277,11 @@ int main(int argc, char *argv[])
                 sz,
                 new faceZone
                 (
-                    set.name(),             //name
-                    addressing.shrink(),    //addressing
-                    flipMap.shrink(),       //flipmap
-                    sz,                     //index
-                    mesh.faceZones()        //pointZoneMesh
+                    set.name(),             // name
+                    addressing.shrink(),    // addressing
+                    flipMap.shrink(),       // flipmap
+                    sz,                     // index
+                    mesh.faceZones()        // faceZoneMesh
                 )
             );
             mesh.faceZones().writeOpt() = IOobject::AUTO_WRITE;
@@ -284,8 +305,6 @@ int main(int argc, char *argv[])
 
     IOobjectList cellObjects(objects.lookupClass(cellSet::typeName));
 
-    //Pout<< "cellSets:" << cellObjects.names() << endl;
-
     for
     (
         IOobjectList::const_iterator iter = cellObjects.begin();
@@ -293,7 +312,7 @@ int main(int argc, char *argv[])
         ++iter
     )
     {
-        if (!slaveCellSets.found(iter.key()))
+        if (!masterCellSets.found(iter.key()))
         {
             // Not in memory. Load it.
             cellSet set(*iter());
@@ -302,7 +321,9 @@ int main(int argc, char *argv[])
             label zoneID = mesh.cellZones().findZoneID(set.name());
             if (zoneID == -1)
             {
-                Info<< "Adding set " << set.name() << " as a cellZone." << endl;
+                Info<< "Adding set " << set.name() << " as a cellZone."
+                    << endl;
+
                 label sz = mesh.cellZones().size();
                 mesh.cellZones().setSize(sz+1);
                 mesh.cellZones().set

@@ -79,7 +79,7 @@ class domainDecomposition
         //  original face. In order to do this properly, all face
         //   indices will be incremented by 1 and the decremented as
         //  necessary t avoid the problem of face number zero having no
-        //  sign.  
+        //  sign.  HJ, 5/Dec/2001
         labelListList procFaceAddressing_;
 
         //- Number of internal faces for each processor

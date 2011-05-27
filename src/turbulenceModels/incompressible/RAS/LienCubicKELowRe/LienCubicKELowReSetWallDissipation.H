@@ -14,7 +14,7 @@
     {
         const fvPatch& curPatch = patches[patchi];
 
-        if (isA<wallFvPatch>(curPatch))
+        if (curPatch.isWall())
         {
             forAll(curPatch, facei)
             {
@@ -29,7 +29,7 @@
     {
         const fvPatch& curPatch = patches[patchi];
 
-        if (isA<wallFvPatch>(curPatch))
+        if (curPatch.isWall())
         {
             forAll(curPatch, facei)
             {
@@ -58,7 +58,7 @@
     {
         const fvPatch& curPatch = patches[patchi];
 
-        if (isA<wallFvPatch>(curPatch))
+        if (curPatch.isWall())
         {
             forAll(curPatch, facei)
             {

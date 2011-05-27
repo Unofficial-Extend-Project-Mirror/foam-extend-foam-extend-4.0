@@ -60,10 +60,10 @@ class solidBodyMotionFvMesh
         //- Dictionary of motion control parameters
         dictionary dynamicMeshCoeffs_;
 
-        //- The motion control function
+        //- Motion control function
         autoPtr<solidBodyMotionFunction> SBMFPtr_;
 
-        //- The reference points which are transformed
+        //- Reference points which are transformed
         pointIOField undisplacedPoints_;
 
 
@@ -85,7 +85,7 @@ public:
     // Constructors
 
         //- Construct from IOobject
-        solidBodyMotionFvMesh(const IOobject& io);
+        explicit solidBodyMotionFvMesh(const IOobject& io);
 
 
     // Destructor

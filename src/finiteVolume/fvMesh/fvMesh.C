@@ -255,6 +255,53 @@ Foam::fvMesh::fvMesh
 }
 
 
+Foam::fvMesh::fvMesh
+(
+    const IOobject& io,
+    const Xfer<pointField>& points,
+    const cellShapeList& shapes,
+    const faceListList& boundaryFaces,
+    const wordList& boundaryPatchNames,
+    const wordList& boundaryPatchTypes,
+    const word& defaultBoundaryPatchName,
+    const word& defaultBoundaryPatchType,
+    const wordList& boundaryPatchPhysicalTypes,
+    const bool syncPar
+)
+:
+    polyMesh
+    (
+        io,
+        points,
+        shapes,
+        boundaryFaces,
+        boundaryPatchNames,
+        boundaryPatchTypes,
+        defaultBoundaryPatchName,
+        defaultBoundaryPatchType,
+        boundaryPatchPhysicalTypes,
+        syncPar
+    ),
+    surfaceInterpolation(*this),
+    boundary_(*this),
+    lduPtr_(NULL),
+    curTimeIndex_(time().timeIndex()),
+    VPtr_(NULL),
+    V0Ptr_(NULL),
+    V00Ptr_(NULL),
+    SfPtr_(NULL),
+    magSfPtr_(NULL),
+    CPtr_(NULL),
+    CfPtr_(NULL),
+    phiPtr_(NULL)
+{
+    if (debug)
+    {
+        Info<< "Constructing fvMesh from components" << endl;
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::fvMesh::~fvMesh()
@@ -312,6 +359,8 @@ Foam::polyMesh::readUpdateState Foam::fvMesh::readUpdate()
             << "Updating fvMesh.  ";
     }
 
+    // Note: issues with update: should meshObject update happen
+    // in polyMesh or fvMesh?  HJ, 18/Feb/2011
     polyMesh::readUpdateState state = polyMesh::readUpdate();
 
     if (state == polyMesh::TOPO_PATCH_CHANGE)

@@ -95,7 +95,7 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve
     {
         if (validComponents[cmpt] == -1) continue;
 
-        // copy field and source
+        // Copy field and source
 
         scalarField psiCmpt = psi_.internalField().component(cmpt);
         addBoundaryDiag(diag(), cmpt);
@@ -191,7 +191,9 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve()
 template<class Type>
 Foam::tmp<Foam::Field<Type> > Foam::fvMatrix<Type>::residual() const
 {
-    tmp<Field<Type> > tres(source_);
+    // Bug fix: Creating a tmp out of a const reference will change the field
+    // HJ, 15/Apr/2011
+    tmp<Field<Type> > tres(new Field<Type>(source_));
     Field<Type>& res = tres();
 
     addBoundarySource(res);
@@ -201,11 +203,11 @@ Foam::tmp<Foam::Field<Type> > Foam::fvMatrix<Type>::residual() const
     lduInterfaceFieldPtrsList interfaces = psi_.boundaryField().interfaces();
 
     // Loop over field components
-    for (direction cmpt=0; cmpt<Type::nComponents; cmpt++)
+    for (direction cmpt = 0; cmpt < Type::nComponents; cmpt++)
     {
         scalarField psiCmpt = psi_.internalField().component(cmpt);
 
-        scalarField boundaryDiagCmpt(psi_.size(), 0.0);
+        scalarField boundaryDiagCmpt(psi_.size(), 0);
         addBoundaryDiag(boundaryDiagCmpt, cmpt);
 
         FieldField<Field, scalar> bouCoeffsCmpt

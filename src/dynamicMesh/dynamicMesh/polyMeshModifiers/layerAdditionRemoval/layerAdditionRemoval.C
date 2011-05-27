@@ -248,6 +248,43 @@ bool Foam::layerAdditionRemoval::changeTopology() const
     const faceZone& fz = topoChanger().mesh().faceZones()[faceZoneID_.index()];
     const labelList& mc = fz.masterCells();
 
+    if (debug)
+    {
+        // Check master cell addressing
+        if (min(mc) < 0)
+        {
+            const polyMesh& mesh = topoChanger().mesh();
+
+            fileName fvPath(mesh.time().path()/"VTK");
+            mkDir(fvPath);
+
+            Info<< "Writing VTK files master face zone"
+                << "Layer addition/removal " << name()
+                << ", face zone " << faceZoneID_.name()
+                << "into " << fvPath
+                << endl;
+
+            primitiveFacePatch::writeVTK
+            (
+                fvPath/fileName(faceZoneID_.name() + "FaceZone"),
+                mesh.faceZones()[faceZoneID_.index()]().localFaces(),
+                mesh.faceZones()[faceZoneID_.index()]().localPoints()
+            );
+
+            primitiveFacePatch::writeVTKNormals
+            (
+                fvPath/fileName(faceZoneID_.name() + "FaceZoneNormals"),
+                mesh.faceZones()[faceZoneID_.index()]().localFaces(),
+                mesh.faceZones()[faceZoneID_.index()]().localPoints()
+            );
+
+            FatalErrorIn("bool layerAdditionRemoval::changeTopology() const")
+                << "Error in master cell addressing for face zone "
+                    << faceZoneID_.name()
+                    << abort(FatalError);
+        }
+    }
+
     const scalarField& V = topoChanger().mesh().cellVolumes();
     const vectorField& S = topoChanger().mesh().faceAreas();
 
@@ -273,14 +310,32 @@ bool Foam::layerAdditionRemoval::changeTopology() const
             minDelta = min(minDelta, curDelta);
             maxDelta = max(maxDelta, curDelta);
         }
-        nAvg += fz.size();
 
+        nAvg += fz.size();
     }
 
-    reduce(minDelta, minOp<scalar>());
-    reduce(maxDelta, maxOp<scalar>());
-    reduce(avgDelta, sumOp<scalar>());
-    reduce(nAvg, sumOp<scalar>());
+    // If the patch is empty on a processor in a parallel simulation,
+    // original values will be preserved.  HJ, 7/Mar/2011
+
+    Pout<< "HRVOJE 1: " << minDelta;
+//     reduce(minDelta, minOp<scalar>());
+    Foam::sleep(2);
+    Pout<< " and " << minDelta << endl;;
+
+    Pout<< "2: " << maxDelta;
+//     reduce(maxDelta, maxOp<scalar>());
+    Foam::sleep(2);
+    Pout<< " and " << maxDelta << endl;;
+
+    Pout<< "3: " << avgDelta;
+//     reduce(avgDelta, sumOp<scalar>());
+    Foam::sleep(2);
+    Pout<< " and " << avgDelta << endl;;
+
+    Pout<< "4: " << nAvg;
+//     reduce(nAvg, sumOp<scalar>());
+    Foam::sleep(2);
+    Pout<< " and " << nAvg << endl;;
 
     avgDelta /= nAvg;
 

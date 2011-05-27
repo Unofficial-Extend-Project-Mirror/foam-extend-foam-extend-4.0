@@ -42,7 +42,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class standardEvaporationModel Declaration
+                  Class standardEvaporationModel Declaration
 \*---------------------------------------------------------------------------*/
 
 class standardEvaporationModel
@@ -58,7 +58,7 @@ private:
         scalar preReScFactor_;
         scalar ReExponent_;
         scalar ScExponent_;
-    
+
         word evaporationScheme_;
         label nEvapIter_;
 
@@ -119,15 +119,15 @@ public:
             const scalar Nusselt,
             const scalar deltaTemp,
             const scalar diameter,
-            const scalar, 
-            const scalar, 
-            const scalar, 
-            const scalar, 
-            const scalar, 
-            const scalar, 
-            const scalar, 
-            const scalar, 
-            const scalar 
+            const scalar,
+            const scalar,
+            const scalar,
+            const scalar,
+            const scalar,
+            const scalar,
+            const scalar,
+            const scalar,
+            const scalar
         ) const;
 
         inline label nEvapIter() const;

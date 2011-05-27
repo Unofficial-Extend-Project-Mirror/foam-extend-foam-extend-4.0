@@ -348,6 +348,11 @@ bool SpalartAllmaras::read()
 
 void SpalartAllmaras::correct()
 {
+    if (mesh_.changing())
+    {
+        bound(nuTilda_, dimensionedScalar("0", nuTilda_.dimensions(), 0.0));
+    }
+
     RASModel::correct();
 
     if (!turbulence_)

@@ -111,14 +111,14 @@ void globalTetPolyPatchFaceDecomp::clearCutEdgeAddressing() const
 const pointField& globalTetPolyPatchFaceDecomp::localPoints() const
 {
     notImplemented("globalTetPolyPatchFaceDecomp::localPoints() const");
-    return Field<point>::null();
+    return pointField::null();
 }
 
 
 const vectorField& globalTetPolyPatchFaceDecomp::pointNormals() const
 {
     notImplemented("globalTetPolyPatchFaceDecomp::pointNormals() const");
-    return Field<point>::null();
+    return pointField::null();
 }
 
 

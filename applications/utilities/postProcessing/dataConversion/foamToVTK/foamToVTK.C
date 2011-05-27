@@ -82,6 +82,9 @@ Usage
     @param -allPatches \n
     Combine all patches into a single file
 
+    @param -allWallPatches \n
+    Combine all wall patches into a single file
+
     @param -excludePatches \<patchNames\>\n
     Specify patches to exclude. For example,
     @verbatim
@@ -137,9 +140,9 @@ Note
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
-static const label VTK_TETRA      = 10;
-static const label VTK_PYRAMID    = 14;
-static const label VTK_WEDGE      = 13;
+static const label VTK_TETRA = 10;
+static const label VTK_PYRAMID = 14;
+static const label VTK_WEDGE = 13;
 static const label VTK_HEXAHEDRON = 12;
 
 
@@ -221,6 +224,7 @@ int main(int argc, char *argv[])
     argList::validOptions.insert("noInternal","");
     argList::validOptions.insert("noPointValues","");
     argList::validOptions.insert("allPatches","");
+    argList::validOptions.insert("allWallPatches","");
     argList::validOptions.insert("excludePatches","patches to exclude");
     argList::validOptions.insert("noFaceZones","");
     argList::validOptions.insert("faMesh","");
@@ -248,8 +252,7 @@ int main(int argc, char *argv[])
 
     if (nearCellValue)
     {
-        WarningIn(args.executable())
-            << "Using neighbouring cell value instead of patch value"
+        Info<< "Using neighbouring cell value instead of patch value"
             << nl << endl;
     }
 
@@ -257,11 +260,11 @@ int main(int argc, char *argv[])
 
     if (noPointValues)
     {
-        WarningIn(args.executable())
-            << "Outputting cell values only" << nl << endl;
+        Info<< "Outputting cell values only" << nl << endl;
     }
 
     bool allPatches = args.optionFound("allPatches");
+    bool allWallPatches = args.optionFound("allWallPatches");
 
     HashSet<word> excludePatches;
     if (args.optionFound("excludePatches"))
@@ -752,6 +755,89 @@ int main(int argc, char *argv[])
                 binary,
                 nearCellValue,
                 patchFileName,
+                getSelectedPatches(patches, excludePatches)
+            );
+
+            // VolFields + patchID
+            writeFuns::writeCellDataHeader
+            (
+                writer.os(),
+                writer.nFaces(),
+                1+nVolFields
+            );
+
+            // Write patchID field
+            writer.writePatchIDs();
+
+            // Write volFields
+            writer.write(vsf);
+            writer.write(vvf);
+            writer.write(vSpheretf);
+            writer.write(vSymmtf);
+            writer.write(vtf);
+
+            if (!noPointValues)
+            {
+                writeFuns::writePointDataHeader
+                (
+                    writer.os(),
+                    writer.nPoints(),
+                    nPointFields
+                );
+
+                // Write pointFields
+                writer.write(psf);
+                writer.write(pvf);
+                writer.write(pSpheretf);
+                writer.write(pSymmtf);
+                writer.write(ptf);
+
+                // no interpolated volFields since I cannot be bothered to
+                // create the patchInterpolation for all subpatches.
+            }
+        }
+        else if (allWallPatches)
+        {
+            mkDir(fvPath/"allWallPatches");
+
+            fileName wallPatchFileName;
+
+            if (vMesh.useSubMesh())
+            {
+                wallPatchFileName =
+                    fvPath/"allWallPatches"/cellSetName
+                  + "_"
+                  + timeDesc
+                  + ".vtk";
+            }
+            else
+            {
+                wallPatchFileName =
+                    fvPath/"allWallPatches"/"allWallPatches"
+                  + "_"
+                  + timeDesc
+                  + ".vtk";
+            }
+
+            // Go through the boundary and add all patches that are not
+            // of type wall onto the exclude{atches list
+            forAll (patches, patchI)
+            {
+                if (!isA<wallPolyPatch>(patches[patchI]))
+                {
+                    excludePatches.insert(patches[patchI].name());
+                }
+            }
+
+            Info<< "    Combined wall patches     : " << wallPatchFileName
+                << endl;
+
+            patchWriter writer
+            (
+                vMesh,
+                binary,
+                nearCellValue,
+                wallPatchFileName,
                 getSelectedPatches(patches, excludePatches)
             );
 

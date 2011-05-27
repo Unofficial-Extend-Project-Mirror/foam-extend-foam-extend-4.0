@@ -40,29 +40,48 @@ void Foam::polyMesh::setInstance(const fileName& inst)
             << "Resetting file instance to " << inst << endl;
     }
 
-    allPoints_.writeOpt() = IOobject::AUTO_WRITE;
     allPoints_.instance() = inst;
-
-    allFaces_.writeOpt() = IOobject::AUTO_WRITE;
     allFaces_.instance() = inst;
-
-    owner_.writeOpt() = IOobject::AUTO_WRITE;
     owner_.instance() = inst;
-
-    neighbour_.writeOpt() = IOobject::AUTO_WRITE;
     neighbour_.instance() = inst;
-
-    boundary_.writeOpt() = IOobject::AUTO_WRITE;
     boundary_.instance() = inst;
-
-    pointZones_.writeOpt() = IOobject::AUTO_WRITE;
     pointZones_.instance() = inst;
-
-    faceZones_.writeOpt() = IOobject::AUTO_WRITE;
     faceZones_.instance() = inst;
-
-    cellZones_.writeOpt() = IOobject::AUTO_WRITE;
     cellZones_.instance() = inst;
+
+    setMotionWriteOpt(IOobject::AUTO_WRITE);
+    setTopoWriteOpt(IOobject::AUTO_WRITE);
+}
+
+void Foam::polyMesh::setMotionWriteOpt(IOobject::writeOption wOpt)
+{
+    if (debug)
+    {
+        Info<< "void polyMesh::setMotionWriteOpt(IOobject::writeOption) "
+            << "Setting motion writeOpt to " << wOpt << endl;
+    }
+
+    allPoints_.writeOpt() = wOpt;
+}
+
+
+void Foam::polyMesh::setTopoWriteOpt(IOobject::writeOption wOpt)
+{
+    if (debug)
+    {
+        Info<< "void polyMesh::setTopoWriteOpt(IOobject::writeOption) "
+            << "Setting topo writeOpt to " << wOpt << endl;
+    }
+
+    allFaces_.writeOpt() = wOpt;
+    owner_.writeOpt() = wOpt;
+    neighbour_.writeOpt() = wOpt;
+    boundary_.writeOpt() = wOpt;
+
+    pointZones_.writeOpt() = wOpt;
+    faceZones_.writeOpt() = wOpt;
+    cellZones_.writeOpt() = wOpt;
+
 }
 
 

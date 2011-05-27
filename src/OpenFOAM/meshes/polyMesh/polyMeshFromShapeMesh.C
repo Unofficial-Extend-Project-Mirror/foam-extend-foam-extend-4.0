@@ -506,8 +506,10 @@ Foam::polyMesh::polyMesh
 
             if (!found)
             {
-                FatalErrorIn("polyMesh::polyMesh(... construct from shapes...)")
-                    << "face " << faceI << " of patch " << patchI
+                FatalErrorIn
+                (
+                    "polyMesh::polyMesh(... construct from shapes...)"
+                )    << "face " << faceI << " of patch " << patchI
                     << " does not seem to belong to cell " << cellInside
                     << " which, according to the addressing, "
                     << "should be next to it."

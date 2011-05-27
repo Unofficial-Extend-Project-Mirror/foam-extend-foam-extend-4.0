@@ -28,8 +28,6 @@ License
 #include "Time.H"
 #include "OSspecific.H"
 
-#include "wallFvPatch.H"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -111,7 +109,7 @@ autoCreateWallFunctionField
 
         forAll(newPatchFields, patchI)
         {
-            if (isA<wallFvPatch>(mesh.boundary()[patchI]))
+            if (mesh.boundary()[patchI].isWall())
             {
                 newPatchFields.set
                 (

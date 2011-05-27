@@ -1,0 +1,4 @@
+processorMeshes.C
+decomposeSets.C
+
+EXE = $(FOAM_APPBIN)/decomposeSets

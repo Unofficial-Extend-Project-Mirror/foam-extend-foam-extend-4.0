@@ -68,7 +68,8 @@ void Foam::polyMesh::calcDirections() const
             if (isA<emptyPolyPatch>(boundaryMesh()[patchi]))
             {
                 nEmptyPatches++;
-                emptyDirVec += sum(cmptMag(boundaryMesh()[patchi].faceAreas()));
+                emptyDirVec +=
+                    sum(cmptMag(boundaryMesh()[patchi].faceAreas()));
             }
             else if (isA<wedgePolyPatch>(boundaryMesh()[patchi]))
             {
@@ -339,7 +340,7 @@ Foam::polyMesh::polyMesh
         ),
         points
     ),
-    // To be re-sliced later.  HJ, 19/oct/2008
+    // To be re-sliced later.  HJ, 19/Oct/2008
     points_(allPoints_, allPoints_.size()),
     allFaces_
     (
@@ -354,7 +355,7 @@ Foam::polyMesh::polyMesh
         ),
         faces
     ),
-    // To be re-sliced later.  HJ, 19/oct/2008
+    // To be re-sliced later.  HJ, 19/Oct/2008
     faces_(allFaces_, allFaces_.size()),
     owner_
     (
@@ -500,7 +501,7 @@ Foam::polyMesh::polyMesh
         ),
         points
     ),
-    // To be re-sliced later.  HJ, 19/oct/2008
+    // To be re-sliced later.  HJ, 19/Oct/2008
     points_(allPoints_, allPoints_.size()),
     allFaces_
     (

@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
 
     Info<< "Time = " << runTime.timeName() << endl;
 
-    // determine the existing processor count directly
+    // Determine the existing processor count directly
     label nProcs = 0;
     while
     (
@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
                     runTime.timeName(),
                     mesh,
                     IOobject::NO_READ,
-                    IOobject::AUTO_WRITE
+                    IOobject::NO_WRITE
                 ),
                 mesh,
                 dimensionedScalar("cellDist", dimless, 0),
@@ -505,7 +505,8 @@ int main(int argc, char *argv[])
 
                 if (!cellParticles[cloudI][celli])
                 {
-                    cellParticles[cloudI][celli] = new SLList<indexedParticle*>();
+                    cellParticles[cloudI][celli] =
+                        new SLList<indexedParticle*>();
                 }
 
                 cellParticles[cloudI][celli]->append(&iter());
@@ -593,7 +594,7 @@ int main(int argc, char *argv[])
 
     Info<< endl;
 
-    // split the fields over processors
+    // Split the fields over processors
     for (label procI = 0; procI < mesh.nProcs(); procI++)
     {
         Info<< "Processor " << procI << ": field transfer" << endl;
@@ -879,17 +880,20 @@ int main(int argc, char *argv[])
             }
             else
             {
-                // link with relative paths
+                // Link with relative paths
                 const string parentPath = string("..")/"..";
 
                 fileName currentDir(cwd());
                 chDir(timePath);
-                ln
-                (
-                    parentPath/runTime.timeName()/uniformDir,
-                    uniformDir
-                );
-                chDir(currentDir);
+                if (!exists(parentPath/runTime.timeName()/uniformDir))
+                {
+                    ln
+                    (
+                        parentPath/runTime.timeName()/uniformDir,
+                        uniformDir
+                    );
+                    chDir(currentDir);
+                }
             }
         }
     }

@@ -29,7 +29,6 @@ License
 #include "fvPatchFieldMapper.H"
 #include "volFields.H"
 #include "addToRunTimeSelectionTable.H"
-#include "wallFvPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,7 +43,7 @@ namespace RASModels
 
 void omegaWallFunctionFvPatchScalarField::checkType()
 {
-    if (!isA<wallFvPatch>(patch()))
+    if (!patch().isWall())
     {
         FatalErrorIn("omegaWallFunctionFvPatchScalarField::checkType()")
             << "Invalid wall function specification" << nl
@@ -171,6 +170,15 @@ void omegaWallFunctionFvPatchScalarField::updateCoeffs()
 {
     if (updated())
     {
+        return;
+    }
+
+    // If G field is not present, execute zero gradient evaluation
+    // HJ, 20/Mar/2011
+    if (!db().foundObject<volScalarField>(GName_))
+    {
+        zeroGradientFvPatchScalarField::evaluate();
+
         return;
     }
 

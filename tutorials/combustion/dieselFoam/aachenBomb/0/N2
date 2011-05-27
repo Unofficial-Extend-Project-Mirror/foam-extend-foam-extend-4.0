@@ -26,17 +26,6 @@ boundaryField
     {
         type                zeroGradient;
     }
-
-    front
-    {
-        type                wedge;
-    }
-
-    back
-    {
-        type                wedge;
-    }
-
 }
 
 // ************************************************************************* //

@@ -67,11 +67,20 @@ class RBFMotionSolver
         //- Coarsening ratio
         label coarseningRatio_;
 
+        //- Include zero motion of static patches in RBF interpolation
+        Switch includeStaticPatches_;
+
+        //- Frozen interpolation
+        Switch frozenInterpolation_;
+
         //- Moving point IDs
         labelList movingIDs_;
 
         //- Moving points on the boundary
         mutable vectorField movingPoints_;
+
+        //- Static point IDs
+        labelList staticIDs_;
 
         //- Control point IDs
         labelList controlIDs_;

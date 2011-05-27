@@ -180,7 +180,9 @@ void parcel::setRelaxationTimes
     for(label i=0; i<Nf; i++)
     {
         scalar Td = min(T(), 0.999*fuels.properties()[i].Tc());
-        bool boiling = fuels.properties()[i].pv(pressure, Td) >= 0.999*pressure;
+        bool boiling = fuels.properties()[i].pv(pressure, Td)
+            >= 0.999*pressure;
+
         scalar Di = fuels.properties()[i].D(pressure, Td);
         scalar Schmidt = Sc(nuf, Di);
 
@@ -196,7 +198,8 @@ void parcel::setRelaxationTimes
         {
             if (!boiling)
             {
-                // for saturation evaporation, only use 99.99% for numerical robustness
+                // For saturation evaporation, only use 99.99% for
+                // numerical robustness
                 scalar dm = max(SMALL, 0.9999*msat[i] - mfg[i]);
 
                 tauEvaporation[i] = sDB.evaporation().relaxationTime

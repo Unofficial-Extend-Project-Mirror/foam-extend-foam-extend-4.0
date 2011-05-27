@@ -185,7 +185,10 @@ Foam::spray::spray
     sprayIteration_(sprayProperties_.subDict("sprayIteration")),
     sprayIterate_(readLabel(sprayIteration_.lookup("sprayIterate"))),
     sprayRelaxFactor_(readScalar(sprayIteration_.lookup("sprayRelaxFactor"))),
-    minimumParcelMass_(readScalar(sprayIteration_.lookup("minimumParcelMass"))),
+    minimumParcelMass_
+    (
+        readScalar(sprayIteration_.lookup("minimumParcelMass"))
+    ),
 
     subCycles_(readLabel(sprayProperties_.lookup("subCycles"))),
 

@@ -38,7 +38,6 @@ License
 #include "polyRemoveCell.H"
 #include "objectMap.H"
 #include "processorPolyPatch.H"
-#include "fvMesh.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -3215,9 +3214,9 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::directTopoChange::changeMesh
 
 Foam::autoPtr<Foam::mapPolyMesh> Foam::directTopoChange::makeMesh
 (
-    autoPtr<fvMesh>& newMeshPtr,
+    autoPtr<polyMesh>& newMeshPtr,
     const IOobject& io,
-    const fvMesh& mesh,
+    const polyMesh& mesh,
     const bool syncParallel,
     const bool orderCells,
     const bool orderPoints
@@ -3226,7 +3225,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::directTopoChange::makeMesh
     if (debug)
     {
         Pout<< "directTopoChange::changeMesh"
-            << "(autoPtr<fvMesh>&, const IOobject&, const fvMesh&"
+            << "(autoPtr<polyMesh>&, const IOobject&, const polyMesh&"
             << ", const bool, const bool, const bool)"
             << endl;
     }
@@ -3237,10 +3236,12 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::directTopoChange::makeMesh
         writeMeshStats(mesh, Pout);
     }
 
-    // new mesh points
+    // New mesh points
     pointField newPoints;
-    // number of internal points
+
+    // Number of internal points
     label nInternalPoints;
+
     // patch slicing
     labelList patchSizes;
     labelList patchStarts;
@@ -3296,7 +3297,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::directTopoChange::makeMesh
 
     newMeshPtr.reset
     (
-        new fvMesh
+        new polyMesh
         (
             io,
             xferMove(newPoints),
@@ -3305,7 +3306,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::directTopoChange::makeMesh
             faceNeighbour_.xfer()
         )
     );
-    fvMesh& newMesh = newMeshPtr();
+    polyMesh& newMesh = newMeshPtr();
 
     if (debug)
     {
@@ -3369,7 +3370,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::directTopoChange::makeMesh
                 patchStarts[patchI]
             ).ptr();
         }
-        newMesh.addFvPatches(newBoundary);
+        newMesh.addPatches(newBoundary);
     }
 
 

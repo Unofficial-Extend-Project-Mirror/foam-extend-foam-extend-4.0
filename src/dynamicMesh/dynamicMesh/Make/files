@@ -86,15 +86,12 @@ $(modifiers)/undoableMeshCutter/undoableMeshCutter.C
 $(modifiers)/refinementIterator/refinementIterator.C
 $(modifiers)/multiDirRefinement/multiDirRefinement.C
 
-meshAdder = directTopoChange/meshAdder
-$(meshAdder)/polyMeshAdder/faceCoupleInfo.C
-$(meshAdder)/polyMeshAdder/polyMeshAdder.C
-$(meshAdder)/fvMeshAdder/fvMeshAdder.C
+directTopoChange/polyMeshAdder/faceCoupleInfo.C
+directTopoChange/polyMeshAdder/polyMeshAdder.C
 
 directTopoChange/boundaryMesh/octreeDataFaceList.C
 directTopoChange/boundaryMesh/boundaryPatch.C
 directTopoChange/boundaryMesh/boundaryMesh.C
-directTopoChange/fvMeshDistribute/fvMeshDistribute.C
 
 directTopoChange/repatchPolyTopoChanger/repatchPolyTopoChanger.C
 

@@ -49,7 +49,7 @@ sprayIteration
 {
     sprayIterate 1;
     sprayRelaxFactor 1;
-    minimumParcelMass 1e-14;
+    minimumParcelMass 1e-20;
 }
 
 specConstAtomizationCoeffs

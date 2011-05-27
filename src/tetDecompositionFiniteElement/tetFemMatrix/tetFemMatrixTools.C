@@ -60,7 +60,7 @@ void tetFemMatrix<Type>::storeBoundaryCoeffs() const
     // requested. Once the list of requested fixes is complete, collapse the
     // list. Note the use of list of pointers for the first part of operation
     // and creation of collapsed list by copying the pointers into a pointer
-    // list. 
+    // list.   HJ, 28/Feb/2001
 
     if (!boundaryConditionsSet_)
     {

@@ -1147,6 +1147,14 @@ void GlobalPointPatchField
 
     // Reduce/extract the result and enforce over all processors
 
+    // Requires global sync points to flush buffers before gather-scatter
+    // communications.  Reconsider.  HJ, 29/Mar/2011
+    if (Pstream::defaultCommsType == Pstream::nonBlocking)
+    {
+        IPstream::waitRequests();
+        OPstream::waitRequests();
+    }
+
     tmp<Field<scalar> > trpf =
         reduceExtractPoint<scalar>(localMult);
 

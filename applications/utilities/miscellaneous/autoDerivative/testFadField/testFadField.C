@@ -54,7 +54,8 @@ int main(int argc, char *argv[])
     fadScalarField b = tf - ten;
     fadScalarField c = ten - tf;
     fadScalarField d = sqr(tf - ten);
-    fadScalarField e = (sqr(tf - bs + 10) + 22.3*sqr(cs - bs + 10));
+    fadScalarField e =
+        (sqr(tf - bs + fadScalar(10)) + 22.3*sqr(cs - bs + fadScalar(10)));
     fadScalarField f = d/e;
 //     fadScalarField g = Foam::atan(f);    // HJ, not prepared
 //     fadScalarField h = Foam::log(f);     // HJ, not prepared
@@ -62,7 +63,11 @@ int main(int argc, char *argv[])
 
     Info << "new tf: " << tf << endl;
 
-    Field<Vector<fadScalar> > tfVector(3, Vector<fadScalar>(1, 2, 3));
+    Field<Vector<fadScalar> > tfVector
+    (
+        3,
+        Vector<fadScalar>(fadScalar(1), fadScalar(2), fadScalar(3))
+    );
 
     Info << "tfVector: " << tfVector << endl;
 

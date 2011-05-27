@@ -126,12 +126,14 @@ bool Foam::parcel::move(spray& sDB)
         cpMixture += Yi[cell()]*sDB.gasProperties()[i].Cp(Tg);
     }
 
-    // correct the gaseous temperature for evaporated fuel
+    // Correct the gaseous temperature for evaporated fuel
 
     scalar cellV = sDB.mesh().V()[cell()];
     scalar cellMass = rhog*cellV;
     Tg += sDB.shs()[cell()]/(cpMixture*cellMass);
-    Tg = max(200.0, Tg);
+
+    // Changed cut-off temperature for evaporation.  HJ, 27/Apr/2011
+    Tg = max(273, Tg);
 
     scalar tauMomentum = GREAT;
     scalar tauHeatTransfer = GREAT;
@@ -212,7 +214,8 @@ bool Foam::parcel::move(spray& sDB)
         // track parcel to face, or end of trajectory
         if (keepParcel)
         {
-            // Track and adjust the time step if the trajectory is not completed
+            // Track and adjust the time step if the trajectory
+            // is not completed
             dt *= trackToFace(position() + dt*U_, sDB);
 
             // Decrement the end-time acording to how much time the track took
@@ -231,6 +234,7 @@ bool Foam::parcel::move(spray& sDB)
         {
             scalar z = position() & sDB.axisOfSymmetry();
             vector r = position() - z*sDB.axisOfSymmetry();
+
             if (mag(r) > SMALL)
             {
                 correctNormal(sDB.axisOfSymmetry());
@@ -299,7 +303,7 @@ bool Foam::parcel::move(spray& sDB)
         sDB.shs()[celli] += oTotMass*(oH + oPE) - m()*(nH + nPE + nKE);
 
         // Remove evaporated mass from stripped mass
-        ms() -= ms()*(oTotMass-m())/oTotMass;
+        ms() -= ms()*(oTotMass - m())/oTotMass;
 
         // Remove parcel if it is 'small'
 
@@ -350,7 +354,7 @@ void Foam::parcel::updateParcelProperties
 
     // calculate mean molecular weight
     scalar W = 0.0;
-    for(label i=0; i<Ns; i++)
+    for(label i = 0; i < Ns; i++)
     {
         W += sDB.composition().Y()[i][celli]/sDB.gasProperties()[i].W();
 
@@ -366,15 +370,15 @@ void Foam::parcel::updateParcelProperties
 
     // correct the gaseous temperature for evaporated fuel
     scalar cpMix = 0.0;
-    for(label i=0; i<Ns; i++)
+    for (label i = 0; i < Ns; i++)
     {
         cpMix += sDB.composition().Y()[i][celli]
-                *sDB.gasProperties()[i].Cp(T());
+            *sDB.gasProperties()[i].Cp(T());
     }
-    scalar cellV            = sDB.mesh().V()[celli];
-    scalar rho              = sDB.rho()[celli];
-    scalar cellMass         = rho*cellV;
-    scalar dh               = sDB.shs()[celli];
+    scalar cellV = sDB.mesh().V()[celli];
+    scalar rho = sDB.rho()[celli];
+    scalar cellMass = rho*cellV;
+    scalar dh = sDB.shs()[celli];
     scalarField addedMass(Nf, 0.0);
 
     forAll(addedMass, i)
@@ -383,7 +387,9 @@ void Foam::parcel::updateParcelProperties
     }
 
     scalar Tg  = Tg0 + dh/(cpMix*cellMass);
-    Tg = max(200.0, Tg);
+
+    // Changed cut-off temperature for evaporation.  HJ, 27/Apr/2011
+    Tg = max(273.0, Tg);
 
     scalarField Yfg(Nf, 0.0);
     forAll(Yfg, i)
@@ -474,7 +480,7 @@ void Foam::parcel::updateParcelProperties
     // gaseous temperature, Tg, and mass fraction, Yfg,
     // to calculate the new properties for the parcel
     // This procedure seems to be more stable
-    // FPK. 
+    // FPK.
     // Iterate the temperature until convergedT and parcel mass
     // is above minimumParcelMass
 
@@ -488,32 +494,37 @@ void Foam::parcel::updateParcelProperties
         n++;
         // new characteristic times does not need to be calculated
         // the first time
-        if (n > 1) 
+        if (n > 1)
         {
             newDensity = fuels.rho(pg, Tnew, X());
             newMass = m();
             newhg = 0.0;
             scalarField Ynew(fuels.Y(X()));
-            for(label i=0; i<Nf; i++)
+
+            for(label i = 0; i < Nf; i++)
             {
                 label j = sDB.liquidToGasIndex()[i];
+
                 newhg += Ynew[i]*sDB.gasProperties()[j].Hs(Tnew);
             }
 
             newhv = fuels.hl(pg, Tnew, X());
 
             scalar dm = oldMass - newMass;
-            scalar dhNew = oldMass*(oldhg-oldhv) - newMass*(newhg-newhv);
+            scalar dhNew = oldMass*(oldhg - oldhv) - newMass*(newhg - newhv);
 
             // Prediction of new gaseous temperature and fuel mass fraction
-            Tg  = Tg0 + (dh+dhNew)/(cpMix*cellMass);
-            Tg = max(200.0, Tg);
+            Tg  = Tg0 + (dh + dhNew)/(cpMix*cellMass);
 
-            forAll(Yfg, i)
+            // Changed cut-off temperature for evaporation.  HJ, 27/Apr/2011
+            Tg = max(273.0, Tg);
+
+            forAll (Yfg, i)
             {
                 label j = sDB.liquidToGasIndex()[i];
                 const volScalarField& Yj = sDB.composition().Y()[j];
                 scalar Yfg0 = Yj[celli];
+
                 Yfg[i] =
                     (Yfg0*cellMass + addedMass[i] + dm)/
                     (addedMass[i] + cellMass + dm);
@@ -543,7 +554,7 @@ void Foam::parcel::updateParcelProperties
         scalar liquidcL = sDB.fuels().cp(pg, TDroplet, X());
 
         cpMix = 0.0;
-        for(label i=0; i<Ns; i++)
+        for (label i = 0; i < Ns; i++)
         {
             if (sDB.isLiquidFuel()[i])
             {
@@ -553,6 +564,7 @@ void Foam::parcel::updateParcelProperties
             else
             {
                 scalar Y = sDB.composition().Y()[i][celli];
+
                 cpMix += Y*sDB.gasProperties()[i].Cp(Taverage);
             }
         }
@@ -561,7 +573,7 @@ void Foam::parcel::updateParcelProperties
         scalar z = 0.0;
         scalar tauEvap = 0.0;
 
-        for(label i=0; i<Nf; i++)
+        for (label i =0 ; i < Nf; i++)
         {
             tauEvap += X()[i]*fuels.properties()[i].W()/tauEvaporation[i];
         }
@@ -571,8 +583,7 @@ void Foam::parcel::updateParcelProperties
         if (sDB.evaporation().evaporation())
         {
             scalar hv = fuels.hl(pg, TDroplet, X());
-            evaporationSource =
-                hv/liquidcL/tauEvap;
+            evaporationSource = hv/liquidcL/tauEvap;
 
             z = cpMix*tauHeatTransfer/liquidcL/tauEvap;
         }
@@ -582,8 +593,7 @@ void Foam::parcel::updateParcelProperties
             scalar fCorrect =
                 sDB.heatTransfer().fCorrection(z)/tauHeatTransfer;
 
-            Tnew =
-                (TDroplet + dt*(fCorrect * Tg - evaporationSource))
+            Tnew = (TDroplet + dt*(fCorrect*Tg - evaporationSource))
                 /(1.0 + dt*fCorrect);
 
             // Prevent droplet temperature to go above critial value
@@ -591,19 +601,23 @@ void Foam::parcel::updateParcelProperties
 
             // Prevent droplet temperature to go too low
             // Mainly a numerical stability issue
-            Tnew = max(200.0, Tnew);
+
+            // Changed cut-off temperature for evaporation.  HJ, 27/Apr/2011
+            Tnew = max(273.0, Tnew);
             scalar Td = Tnew;
 
             scalar pAtSurface = fuels.pv(pg, Td, X());
             scalar pCompare = 0.999*pg;
             scalar boiling = pAtSurface >= pCompare;
+
             if (boiling)
             {
                 // can not go above boiling temperature
                 scalar Terr = 1.0e-3;
-                label n=0;
+                label n = 0;
                 scalar dT = 1.0;
                 scalar pOld = pAtSurface;
+
                 while (dT > Terr)
                 {
                     n++;
@@ -631,10 +645,12 @@ void Foam::parcel::updateParcelProperties
                             }
                         }
                     }
+
                     pOld = pAtSurface;
-                    if (debug)
+
+//                     if (debug)
                     {
-                        if (n>100)
+                        if (n > 100)
                         {
                             Info << "n = " << n << ", T = " << Td << ", pv = " << pAtSurface << endl;
                         }
@@ -648,7 +664,7 @@ void Foam::parcel::updateParcelProperties
         // if the droplet is NOT boiling use implicit scheme.
         if (sDB.evaporation().evaporation())
         {
-            for(label i=0; i<Nf; i++)
+            for (label i = 0; i < Nf; i++)
             {
                 // Immediately evaporate mass that has reached
                 // critical condition
@@ -678,6 +694,7 @@ void Foam::parcel::updateParcelProperties
             }
 
             scalar mTot = sum(mi);
+
             if (mTot > VSMALL)
             {
                 scalarField Ynew(mi/mTot);
@@ -696,15 +713,10 @@ void Foam::parcel::updateParcelProperties
 
         // FPK changes: avoid temperature-out-of-range errors
         // in spray tracking.  HJ, 13/Oct/2007
-        scalar temprhod;
         const scalar relaxfac = sDB.sprayRelaxFactor();
-        if (debug)
-        {
-            temprhod = fuels.rho(pg,T(),X());
-        }
 
-        convergedT = mag(Tnew-T()) < 0.1 || n > sDB.sprayIterate();
-    
+        convergedT = mag(Tnew - T()) < 0.1 || n > sDB.sprayIterate();
+
         // FPK version, 13/Oct/2007
         T() = T()*(1 - relaxfac) + Tnew*relaxfac;
         // NN version

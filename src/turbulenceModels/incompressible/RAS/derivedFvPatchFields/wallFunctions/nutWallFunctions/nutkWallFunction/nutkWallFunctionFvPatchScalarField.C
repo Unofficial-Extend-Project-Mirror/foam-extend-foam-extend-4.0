@@ -28,7 +28,6 @@ License
 #include "RASModel.H"
 #include "fvPatchFieldMapper.H"
 #include "volFields.H"
-#include "wallFvPatch.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -44,7 +43,7 @@ namespace RASModels
 
 void nutkWallFunctionFvPatchScalarField::checkType()
 {
-    if (!isA<wallFvPatch>(patch()))
+    if (!patch().isWall())
     {
         FatalErrorIn("nutkWallFunctionFvPatchScalarField::checkType()")
             << "Invalid wall function specification" << nl
@@ -64,7 +63,7 @@ scalar nutkWallFunctionFvPatchScalarField::calcYPlusLam
 {
     scalar ypl = 11.0;
 
-    for (int i=0; i<10; i++)
+    for (int i = 0; i < 10; i++)
     {
         ypl = log(E*ypl)/kappa;
     }

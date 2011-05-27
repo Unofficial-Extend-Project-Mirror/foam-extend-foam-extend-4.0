@@ -49,7 +49,7 @@ void Foam::RBFInterpolation::calcB() const
     // Determine inverse of boundary connectivity matrix
     label polySize(4);
 
-    if(!polynomials_)
+    if (!polynomials_)
     {
         polySize = 0;
     }
@@ -152,6 +152,8 @@ void Foam::RBFInterpolation::calcB() const
     // Collect ALL control points from ALL CPUs
     // Create an identical inverse for all CPUs
 
+    Info<< "Inverting RBF motion matrix" << endl;
+
     BPtr_ = new scalarSquareMatrix(A.LUinvert());
 }
 
@@ -180,6 +182,23 @@ Foam::RBFInterpolation::RBFInterpolation
     innerRadius_(readScalar(dict.lookup("innerRadius"))),
     outerRadius_(readScalar(dict.lookup("outerRadius"))),
     polynomials_(dict.lookup("polynomials"))
+{}
+
+
+Foam::RBFInterpolation::RBFInterpolation
+(
+    const RBFInterpolation& rbf
+)
+:
+    dict_(rbf.dict_),
+    controlPoints_(rbf.controlPoints_),
+    allPoints_(rbf.allPoints_),
+    RBF_(rbf.RBF_->clone()),
+    BPtr_(NULL),
+    focalPoint_(rbf.focalPoint_),
+    innerRadius_(rbf.innerRadius_),
+    outerRadius_(rbf.outerRadius_),
+    polynomials_(rbf.polynomials_)
 {}
 
 

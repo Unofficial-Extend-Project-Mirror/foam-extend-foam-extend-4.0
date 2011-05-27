@@ -47,6 +47,12 @@ lduSolverPerformance tetFemMatrix<Type>::solve
             << endl;
     }
 
+    // Check the matrix
+    if (debug > 1)
+    {
+        this->check();
+    }
+
     lduSolverPerformance solverPerfVec
     (
         "tetFemMatrix<Type>::solve",
@@ -88,8 +94,15 @@ lduSolverPerformance tetFemMatrix<Type>::solve
         addCouplingSource(sourceCmpt);
 
         // Prepare for coupled interface update
-        FieldField<Field, scalar> coupledBouCoeffs(psi_.boundaryField().size());
-        FieldField<Field, scalar> coupledIntCoeffs(psi_.boundaryField().size());
+        FieldField<Field, scalar> coupledBouCoeffs
+        (
+            psi_.boundaryField().size()
+        );
+
+        FieldField<Field, scalar> coupledIntCoeffs
+        (
+            psi_.boundaryField().size()
+        );
 
         forAll(psi_.boundaryField(), patchI)
         {

@@ -166,14 +166,45 @@ bool Foam::primitiveMesh::checkClosedCells
         return true;
     }
 
+    // Check if a face has got the same cell as owner and neighbour
+    // HJ, 25/May/2011
+    const labelList& own = faceOwner();
+    const labelList& nei = faceNeighbour();
+
+    label nErrorOwnNei = 0;
+
+    // Check internal faces only
+    forAll (nei, faceI)
+    {
+        if (own[faceI] == nei[faceI])
+        {
+            if (setPtr)
+            {
+                setPtr->insert(own[faceI]);
+            }
+
+            nErrorOwnNei++;
+        }
+    }
+
+    if (nErrorOwnNei > 0)
+    {
+        if (debug || report)
+        {
+            Info<< " ***Faces declaring same cell as owner and neighbour "
+                << "found, number of faces "
+                << nErrorOwnNei << endl;
+        }
+
+        return true;
+    }
+
     // Loop through cell faces and sum up the face area vectors for each cell.
     // This should be zero in all vector components
 
     vectorField sumClosed(nCells(), vector::zero);
     vectorField sumMagClosed(nCells(), vector::zero);
 
-    const labelList& own = faceOwner();
-    const labelList& nei = faceNeighbour();
     const vectorField& areas = faceAreas();
 
     forAll (own, faceI)
@@ -751,7 +782,6 @@ bool Foam::primitiveMesh::checkFaceSkewness
         {
             Info<< " ***Max skewness = " << maxSkew
                 << ", " << nWarnSkew << " highly skew faces detected"
-                << " which may impair the quality of the results"
                 << " Threshold = " << skewThreshold_
                 << endl;
         }

@@ -63,8 +63,15 @@ solvers
 
 PISO
 {
+    nOuterCorrectors 4;
     nCorrectors     4;
     nNonOrthogonalCorrectors 0;
+}
+
+relaxationFactors
+{
+    U 0.7;
+    p 0.3;
 }
 
 // ************************************************************************* //

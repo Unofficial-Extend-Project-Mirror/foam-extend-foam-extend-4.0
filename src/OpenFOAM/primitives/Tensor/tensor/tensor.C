@@ -317,24 +317,14 @@ vector eigenValues(const symmTensor& t)
 
         // If there is a zero root
         if (mag(c) < SMALL)
-//         if (mag(c) < 1.0e-100)
         {
-            scalar disc = sqr(a) - 4*b;
+            const scalar disc = Foam::max(sqr(a) - 4*b, 0.0);
 
-            if (disc >= -SMALL)
-            {
-                scalar q = -0.5*sqrt(max(scalar(0), disc));
+            scalar q = -0.5*sqrt(max(scalar(0), disc));
 
-                i = 0;
-                ii = -0.5*a + q;
-                iii = -0.5*a - q;
-            }
-            else
-            {
-                FatalErrorIn("eigenValues(const tensor&)")
-                    << "zero and complex eigenvalues in tensor: " << t
-                    << abort(FatalError);
-            }
+            i = 0;
+            ii = -0.5*a + q;
+            iii = -0.5*a - q;
         }
         else
         {

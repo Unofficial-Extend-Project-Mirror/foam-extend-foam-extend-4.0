@@ -67,7 +67,7 @@ Foam::RBFMotionFunctionObject::RBFMotionFunctionObject
     statPoints_()
 
 {
-    Info << "Creating RBFMotion check" << endl;
+    Info << "Creating RBFMotion function object" << endl;
 }
 
 
@@ -105,9 +105,9 @@ bool Foam::RBFMotionFunctionObject::execute()
 
 #	include "kinematicModel.H"
 
-	ms.setMotion(motion);
-	movePoints(ms.newPoints());
-	
+    ms.setMotion(motion);
+    movePoints(ms.newPoints());
+
     return true;
 }
 
@@ -116,5 +116,6 @@ bool Foam::RBFMotionFunctionObject::read(const dictionary& dict)
 {
     return false;
 }
+
 
 // ************************************************************************* //

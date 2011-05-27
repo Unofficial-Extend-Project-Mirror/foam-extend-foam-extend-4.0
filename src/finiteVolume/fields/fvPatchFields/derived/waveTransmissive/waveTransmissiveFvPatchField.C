@@ -53,6 +53,21 @@ waveTransmissiveFvPatchField<Type>::waveTransmissiveFvPatchField
 template<class Type>
 waveTransmissiveFvPatchField<Type>::waveTransmissiveFvPatchField
 (
+    const fvPatch& p,
+    const DimensionedField<Type, volMesh>& iF,
+    const dictionary& dict
+)
+:
+    advectiveFvPatchField<Type>(p, iF, dict),
+    psiName_(dict.lookupOrDefault<word>("psi", "psi")),
+    UName_(dict.lookupOrDefault<word>("U", "U")),
+    gamma_(readScalar(dict.lookup("gamma")))
+{}
+
+
+template<class Type>
+waveTransmissiveFvPatchField<Type>::waveTransmissiveFvPatchField
+(
     const waveTransmissiveFvPatchField& ptf,
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
@@ -69,27 +84,12 @@ waveTransmissiveFvPatchField<Type>::waveTransmissiveFvPatchField
 template<class Type>
 waveTransmissiveFvPatchField<Type>::waveTransmissiveFvPatchField
 (
-    const fvPatch& p,
-    const DimensionedField<Type, volMesh>& iF,
-    const dictionary& dict
-)
-:
-    advectiveFvPatchField<Type>(p, iF, dict),
-    psiName_(dict.lookupOrDefault<word>("psi", "psi")),
-    UName_(dict.lookupOrDefault<word>("U", "U")),
-    gamma_(readScalar(dict.lookup("gamma")))
-{}
-
-
-template<class Type>
-waveTransmissiveFvPatchField<Type>::waveTransmissiveFvPatchField
-(
     const waveTransmissiveFvPatchField& ptpsf
 )
 :
     advectiveFvPatchField<Type>(ptpsf),
     psiName_(ptpsf.psiName_),
-    UName_(ptpsf.psiName_),
+    UName_(ptpsf.UName_),
     gamma_(ptpsf.gamma_)
 {}
 
@@ -201,7 +201,7 @@ void waveTransmissiveFvPatchField<Type>::write(Ostream& os) const
     {
         os.writeKeyword("psi") << psiName_ << token::END_STATEMENT << nl;
     }
-    
+
     os.writeKeyword("gamma") << gamma_ << token::END_STATEMENT << nl;
 
     if (this->lInf_ > SMALL)

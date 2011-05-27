@@ -192,26 +192,35 @@ void Foam::faceZone::calcCellLayers() const
             if (!faceFlip[faceI])
             {
                 // Face is oriented correctly, no flip needed
+                // Master is the neighbour, with normal pointing into it
+                // Bug fix, HJ, 7/Mar/2011
                 if (mesh.isInternalFace(mf[faceI]))
                 {
                     curMc = nei[mf[faceI]];
+                    curSc = own[mf[faceI]];
                 }
-
-                if (mf[faceI] < mesh.nFaces())
+                else if (mf[faceI] < mesh.nFaces())
                 {
+                    curMc = -1;
                     curSc = own[mf[faceI]];
                 }
             }
             else
             {
-                if (mf[faceI] < mesh.nFaces())
-                {
-                    curMc = own[mf[faceI]];
-                }
+                // Face flip
+                // Master is the owner, with normal pointing into it
+                // Bug fix, HJ, 7/Mar/2011
                 if (mesh.isInternalFace(mf[faceI]))
                 {
+                    curMc = own[mf[faceI]];
                     curSc = nei[mf[faceI]];
                 }
+                else if (mf[faceI] < mesh.nFaces())
+                {
+                    curMc = own[mf[faceI]];
+                    curSc = -1;
+                }
+
             }
 
             mc[faceI] = curMc;

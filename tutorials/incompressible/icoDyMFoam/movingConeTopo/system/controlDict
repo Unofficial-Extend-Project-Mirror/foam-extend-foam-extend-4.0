@@ -24,11 +24,10 @@ stopAt          endTime;
 
 endTime         20;
 
-deltaT          0.1;
+deltaT          0.05;
 
 writeControl    adjustableRunTime;
-
-writeInterval   1;
+writeInterval   0.5;
 
 cycleWrite      0;
 
@@ -37,8 +36,6 @@ writeFormat     ascii;
 writeCompression uncompressed;
 
 timeFormat      general;
-
-timePrecision   6;
 
 runTimeModifiable yes;
 

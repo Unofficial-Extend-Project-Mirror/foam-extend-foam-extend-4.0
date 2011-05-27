@@ -20,32 +20,32 @@ internalField   uniform 0;
 
 boundaryField
 {
-	block
-	{
-		type			zeroGradient;
-	}
+    block
+    {
+        type            zeroGradient;
+    }
 
     top
     {
         type            zeroGradient;
     }
 
-   	bottom
+    bottom
     {
         type            zeroGradient;
     }
 
-	left
-	{
-		type			zeroGradient;
-	}
+    left
+    {
+        type            zeroGradient;
+    }
 
-	right
-	{
-		type			fixedValue;
-		value			uniform 0;
-	}
-	
+    right
+    {
+        type            fixedValue;
+        value           uniform 0;
+    }
+
     defaultFaces
     {
         type            empty;

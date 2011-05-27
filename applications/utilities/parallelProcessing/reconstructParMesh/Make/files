@@ -1,3 +1,14 @@
+processorMeshesReconstructor.C
+processorMeshesRebuild.C
+
+processorFaMeshes.C
+
+fvFieldReconstructor.C
+faFieldReconstructor.C
+pointFieldReconstructor.C
+tetPointFieldReconstructor.C
+reconstructLagrangianPositions.C
+
 reconstructParMesh.C
 
 EXE = $(FOAM_APPBIN)/reconstructParMesh

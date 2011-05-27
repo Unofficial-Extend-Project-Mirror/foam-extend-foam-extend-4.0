@@ -42,17 +42,17 @@ Description
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCase.H"
-    #include "createTime.H"
-    #include "createMesh.H"
-    #include "readGravitationalAcceleration.H"
-    #include "readPISOControls.H"
-    #include "initContinuityErrs.H"
-    #include "createFields.H"
-    #include "readTimeControls.H"
-    #include "CourantNo.H"
-    #include "setInitialDeltaT.H"
-    #include "correctPhi.H"
+#   include "setRootCase.H"
+#   include "createTime.H"
+#   include "createMesh.H"
+#   include "readGravitationalAcceleration.H"
+#   include "readPISOControls.H"
+#   include "initContinuityErrs.H"
+#   include "createFields.H"
+#   include "readTimeControls.H"
+#   include "CourantNo.H"
+#   include "setInitialDeltaT.H"
+#   include "correctPhi.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -60,10 +60,10 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-        #include "readPISOControls.H"
-        #include "readTimeControls.H"
-        #include "CourantNo.H"
-        #include "setDeltaT.H"
+#       include "readPISOControls.H"
+#       include "readTimeControls.H"
+#       include "CourantNo.H"
+#       include "setDeltaT.H"
 
         runTime++;
 
@@ -71,18 +71,18 @@ int main(int argc, char *argv[])
 
         threePhaseProperties.correct();
 
-        #include "alphaEqnsSubCycle.H"
+#       include "alphaEqnsSubCycle.H"
 
-        #define twoPhaseProperties threePhaseProperties
-        #include "UEqn.H"
+#       define twoPhaseProperties threePhaseProperties
+#       include "UEqn.H"
 
         // --- PISO loop
-        for (int corr=0; corr<nCorr; corr++)
+        for (int corr = 0; corr < nCorr; corr++)
         {
-            #include "pEqn.H"
+#           include "pEqn.H"
         }
 
-        #include "continuityErrs.H"
+#       include "continuityErrs.H"
 
         turbulence->correct();
 

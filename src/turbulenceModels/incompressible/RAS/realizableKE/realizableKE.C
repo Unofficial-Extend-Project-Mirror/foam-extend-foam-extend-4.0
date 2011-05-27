@@ -262,6 +262,14 @@ bool realizableKE::read()
 
 void realizableKE::correct()
 {
+    // Bound in case of topological change
+    // HJ, 22/Aug/2007
+    if (mesh_.changing())
+    {
+        bound(k_, k0_);
+        bound(epsilon_, epsilon0_);
+    }
+
     RASModel::correct();
 
     if (!turbulence_)

@@ -1,0 +1,9 @@
+solidBodyMotionFunction/solidBodyMotionFunction.C
+solidBodyMotionFunction/newSolidBodyMotionFunction.C
+
+translation/translation.C
+linearOscillation/linearOscillation.C
+SDA/SDA.C
+SKA/SKA.C
+
+LIB = $(FOAM_LIBBIN)/libsolidBodyMotion

@@ -94,13 +94,5 @@ void Foam::directTopoChange::renumberKey
     elems.transfer(newElems);
 }
 
-// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
-
 
 // ************************************************************************* //

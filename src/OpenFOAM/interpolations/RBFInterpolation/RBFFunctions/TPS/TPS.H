@@ -76,8 +76,16 @@ public:
 
     // Constructors
 
+        //- Construct given radius
+        TPS(const scalar radius);
+
         //- Construct from dictionary
         TPS(const dictionary& dict);
+
+        virtual autoPtr<RBFFunction> clone() const
+        {
+            return autoPtr<RBFFunction>(new TPS(this->radius_));
+        }
 
 
     // Destructor

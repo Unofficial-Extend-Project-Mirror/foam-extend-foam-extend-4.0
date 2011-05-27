@@ -50,9 +50,6 @@ SourceFiles
 namespace Foam
 {
 
-// Forward class declarations
-class twoDPointCorrector;
-
 /*---------------------------------------------------------------------------*\
                   Class tetDecompositionMotionSolver Declaration
 \*---------------------------------------------------------------------------*/

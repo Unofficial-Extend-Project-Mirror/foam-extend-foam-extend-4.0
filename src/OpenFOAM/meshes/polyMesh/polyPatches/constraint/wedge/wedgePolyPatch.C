@@ -43,6 +43,11 @@ namespace Foam
 
 void Foam::wedgePolyPatch::initTransforms()
 {
+    if (empty())
+    {
+        return;
+    }
+
     const pointField& points = this->points();
 
     patchNormal_ = operator[](0).normal(points);

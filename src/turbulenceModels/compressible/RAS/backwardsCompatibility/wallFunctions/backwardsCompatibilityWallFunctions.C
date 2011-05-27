@@ -74,7 +74,7 @@ tmp<volScalarField> autoCreateAlphat
 
         forAll(bm, patchI)
         {
-            if (isA<wallFvPatch>(bm[patchI]))
+            if (bm[patchI].isWall())
             {
                 alphatBoundaryTypes[patchI] =
                     RASModels::alphatWallFunctionFvPatchScalarField::typeName;
@@ -144,7 +144,7 @@ tmp<volScalarField> autoCreateMut
 
         forAll(bm, patchI)
         {
-            if (isA<wallFvPatch>(bm[patchI]))
+            if (bm[patchI].isWall())
             {
                 mutBoundaryTypes[patchI] =
                     RASModels::mutWallFunctionFvPatchScalarField::typeName;
@@ -214,7 +214,7 @@ tmp<volScalarField> autoCreateLowReMut
 
         forAll(bm, patchI)
         {
-            if (isA<wallFvPatch>(bm[patchI]))
+            if (bm[patchI].isWall())
             {
                 mutBoundaryTypes[patchI] =
                     RASModels::mutLowReWallFunctionFvPatchScalarField::typeName;
