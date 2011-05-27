@@ -104,7 +104,9 @@ bool Foam::adjustPhi
         // to be taken into account.
         if (phi.mesh().moving())
         {
-            dimensionedScalar Vdiff = sum(phi.mesh().V()) - sum(phi.mesh().V0());
+            dimensionedScalar Vdiff =
+                sum(phi.mesh().V()) - sum(phi.mesh().V0());
+
             fixedMassOut += Vdiff.value()/phi.time().deltaT().value();
         }
 
