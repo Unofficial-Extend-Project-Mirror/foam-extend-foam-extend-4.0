@@ -103,12 +103,18 @@ int main(int argc, char *argv[])
                     mesh,
                     IOobject::NO_READ
                 ),
-                mag(fvc::div(phi, U) + fvc::div(turbulence->R()) + fvc::grad(p))
+                mag
+                (
+                    fvc::div(phi, U)
+                  + fvc::div(turbulence->R())
+                  + fvc::grad(p)
+                )
             );
 
             Info<< "uResidual max: " << max(uResidual.internalField())
                 << " mean: "
-                << sum(uResidual.internalField()*mesh.V())/sum(mesh.V()).value()
+                << sum(uResidual.internalField()*mesh.V())/
+                       sum(mesh.V()).value()
                 << endl;
 
             uResidual.write();
@@ -119,7 +125,6 @@ int main(int argc, char *argv[])
         }
 
         Info<< endl;
-            
     }
 
     Info<< "End\n" << endl;

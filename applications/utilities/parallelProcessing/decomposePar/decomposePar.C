@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
                 << cellDecomposition.objectPath()
                 << " for use in manual decomposition." << endl;
 
-            // Write as volScalarField for postprocessing.
+            // Write as volScalarField for post-processing
             volScalarField cellDist
             (
                 IOobject
@@ -302,7 +302,7 @@ int main(int argc, char *argv[])
             cellDist.write();
 
             Info<< nl << "Wrote decomposition as volScalarField to "
-                << cellDist.name() << " for use in postprocessing."
+                << cellDist.name() << " for use in post-processing."
                 << endl;
         }
     }

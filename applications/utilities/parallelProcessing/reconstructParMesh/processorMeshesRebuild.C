@@ -279,7 +279,8 @@ void Foam::processorMeshesReconstructor::reconstructPoints(fvMesh& mesh) const
 
     forAll (meshes_, procI)
     {
-        const vectorField& procPoints = meshes_[procI].allPoints();
+        // Reconstruct only live points.  HJ, 7/Mar/2011
+        const vectorField& procPoints = meshes_[procI].points();
 
         // Set the cell values in the reconstructed field
 
@@ -395,7 +396,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
     forAll (meshes_, procI)
     {
         // Count total number of points and faces
-        nReconPoints += meshes_[procI].allPoints().size();
+        nReconPoints += meshes_[procI].nPoints();
         nReconFaces += meshes_[procI].allFaces().size();
         nReconCells += meshes_[procI].nCells();
 
@@ -481,7 +482,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                     IOobject::NO_READ,
                     IOobject::NO_WRITE
                 ),
-                labelList(procMesh.allPoints().size(), -1)
+                labelList(procMesh.nPoints(), -1)
             )
         );
 
@@ -564,7 +565,8 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
         globalPointMapping = -1;
 
         // Dump all points into the global point list
-        const pointField& curPoints = curMesh.allPoints();
+        // Reconstruct only live points.  HJ, 7/Mar/2011
+        const pointField& curPoints = curMesh.points();
         ppAddr.setSize(curPoints.size());
 
         forAll (curPoints, pointI)
@@ -710,7 +712,8 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
         // Point mapping
 
-        const pointField& curPoints = curMesh.allPoints();
+        // Reconstruct only live points.  HJ, 7/Mar/2011
+        const pointField& curPoints = curMesh.points();
 
         // Set ppAddr to -1, to use as point usage indicators
         ppAddr.setSize(curPoints.size());
@@ -742,10 +745,6 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                         neighbourProcPatch(procPatch);
 
                     // Find the addressing of the master side
-
-                    const labelList& masterMeshPoints =
-                        masterProcPatch.meshPoints();
-
                     const labelList& masterPpAddr =
                         pointProcAddressing_[masterProcID];
 
@@ -763,21 +762,27 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
                         reversedFaces,
                         procPatch.points()
                     );
-                    Info<< "Mesh point merge check: " << nl
-                        << masterProcPatch.localPoints()
-                        - reversedPatch.localPoints()
-                        << endl;
+
                     // Insert addressing from master side into
-                    // local point addressing
+                    // local point addressing.  Each face of reversed patch
+                    // now matches the master face.
+                    // Note: this is done by visiting faces, since meshPoints
+                    // are ordered in increasing order.  HJ, 10/Mar/2011
 
-                    const labelList& reversedMeshPoints =
-                        reversedPatch.meshPoints();
-
-                    forAll (reversedMeshPoints, mpI)
+                    forAll (reversedFaces, faceI)
                     {
-                        // Mapping is established
-                        ppAddr[reversedMeshPoints[mpI]] =
-                            masterPpAddr[masterMeshPoints[mpI]];
+                        // Current reverse face
+                        const face& curRF = reversedFaces[faceI];
+
+                        // Current master face
+                        const face& curMF = masterProcPatch[faceI];
+
+                        forAll (curRF, pointI)
+                        {
+                            // Mapping is established
+                            ppAddr[curRF[pointI]] =
+                                masterPpAddr[curMF[pointI]];
+                        }
                     }
                 } // End of "is neighbour"
             } // End of "is processor"
