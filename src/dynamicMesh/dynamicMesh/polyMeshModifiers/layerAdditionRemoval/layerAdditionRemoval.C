@@ -317,25 +317,10 @@ bool Foam::layerAdditionRemoval::changeTopology() const
     // If the patch is empty on a processor in a parallel simulation,
     // original values will be preserved.  HJ, 7/Mar/2011
 
-    Pout<< "HRVOJE 1: " << minDelta;
-//     reduce(minDelta, minOp<scalar>());
-    Foam::sleep(2);
-    Pout<< " and " << minDelta << endl;;
-
-    Pout<< "2: " << maxDelta;
-//     reduce(maxDelta, maxOp<scalar>());
-    Foam::sleep(2);
-    Pout<< " and " << maxDelta << endl;;
-
-    Pout<< "3: " << avgDelta;
-//     reduce(avgDelta, sumOp<scalar>());
-    Foam::sleep(2);
-    Pout<< " and " << avgDelta << endl;;
-
-    Pout<< "4: " << nAvg;
-//     reduce(nAvg, sumOp<scalar>());
-    Foam::sleep(2);
-    Pout<< " and " << nAvg << endl;;
+    reduce(minDelta, minOp<scalar>());
+    reduce(maxDelta, maxOp<scalar>());
+    reduce(avgDelta, sumOp<scalar>());
+    reduce(nAvg, sumOp<scalar>());
 
     avgDelta /= nAvg;
 
