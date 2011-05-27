@@ -8,6 +8,8 @@
       + dieselSpray.momentumSource()
     );
 
+    UEqn.relax();
+
     if (momentumPredictor)
     {
         solve(UEqn == -fvc::grad(p));
