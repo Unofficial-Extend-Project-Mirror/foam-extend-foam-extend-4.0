@@ -1,6 +1,7 @@
 EXE_INC = \
     -I$(LIB_SRC)/decompositionMethods/decompositionMethods/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/dynamicMesh/lnInclude \
+    -I$(LIB_SRC)/dynamicMesh/dynamicFvMesh/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/lagrangian/basic/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
@@ -10,6 +11,7 @@ EXE_INC = \
 LIB_LIBS = \
     -ldecompositionMethods \
     -ldynamicMesh \
+    -ldynamicFvMesh \
     -lfiniteVolume \
     -llagrangian \
     -lmeshTools \

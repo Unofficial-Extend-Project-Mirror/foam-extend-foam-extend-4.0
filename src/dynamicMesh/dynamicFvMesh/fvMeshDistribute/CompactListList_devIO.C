@@ -24,42 +24,42 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "solidBodyMotionFunction.H"
+#include "CompactListList_dev.H"
+#include "Istream.H"
 
-// * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Foam::autoPtr<Foam::solidBodyMotionFunction> Foam::solidBodyMotionFunction::New
-(
-    const dictionary& SBMFCoeffs,
-    const Time& runTime
-)
+template<class T, class Container>
+Foam::CompactListList_dev<T, Container>::CompactListList_dev(Istream& is)
 {
-    word solidBodyMotionFunctionTypeName = 
-        SBMFCoeffs.lookup("solidBodyMotionFunction");
+    operator>>(is, *this);
+}
 
-    Info<< "Selecting solid-body motion function "
-        << solidBodyMotionFunctionTypeName << endl;
 
-    dictionaryConstructorTable::iterator cstrIter =
-        dictionaryConstructorTablePtr_->find(solidBodyMotionFunctionTypeName);
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
-    if (cstrIter == dictionaryConstructorTablePtr_->end())
+template<class T, class Container>
+Foam::Istream& Foam::operator>>(Istream& is, CompactListList_dev<T, Container>& lst)
+{
+    is  >> lst.offsets_ >> lst.m_;
+    // Note: empty list gets output as two empty lists
+    if (lst.offsets_.size() == 0)
     {
-        FatalErrorIn
-        (
-            "solidBodyMotionFunction::New"
-            "("
-            "    const dictionary& SBMFCoeffs,"
-            "    const Time& runTime"
-            ")"
-        )   << "Unknown solidBodyMotionFunction type "
-            << solidBodyMotionFunctionTypeName << endl << endl
-            << "Valid  solidBodyMotionFunctions are : " << endl
-            << dictionaryConstructorTablePtr_->toc()
-            << exit(FatalError);
+        lst.size_ = 0;
     }
+    else
+    {
+        lst.size_ = lst.offsets_.size()-1;
+    }
+    return is;
+}
 
-    return autoPtr<solidBodyMotionFunction>(cstrIter()(SBMFCoeffs, runTime));
+
+template<class T, class Container>
+Foam::Ostream& Foam::operator<<(Ostream& os, const CompactListList_dev<T, Container>& lst)
+{
+    os  << lst.offsets_ << lst.m_;
+    return os;
 }
 
 
