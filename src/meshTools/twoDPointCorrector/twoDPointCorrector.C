@@ -166,8 +166,8 @@ void twoDPointCorrector::calcAddressing() const
             (
                 "twoDPointCorrector::twoDPointCorrector("
                 "const polyMesh& mesh, const vector& n)"
-            )   << "The number of points in the mesh is "
-                << "not equal to twice the number of edges normal to the plane "
+            )   << "The number of points in the mesh is not equal "
+                << "to twice the number of edges normal to the plane "
                 << "- this may be OK only for wedge geometries.\n"
                 << "    Please check the geometry or adjust "
                 << "the orthogonality tolerance.\n" << endl
