@@ -33,11 +33,11 @@
             sgsModel.k()().boundaryField()[targetPatchNumber] ==
             interPatch.faceInterpolate(planek)();
         }
-        
+
         U.boundaryField()[targetPatchNumber] ==
             interPatch.faceInterpolate(planeU)();
 
-/*         sgsModel.k()().boundaryField()[targetPatchNumber] == 
+/*         sgsModel.k()().boundaryField()[targetPatchNumber] ==
          toPatchInter.pointToFaceInterpolate
          (
              interPatch.pointInterpolate
