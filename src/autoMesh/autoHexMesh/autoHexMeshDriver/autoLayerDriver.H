@@ -338,7 +338,7 @@ class autoLayerDriver
                     const addPatchCellLayer& addLayer,
                     const dictionary& motionDict,
                     const indirectPrimitivePatch& pp,
-                    const fvMesh&,
+                    const polyMesh&,
 
                     pointField& patchDisp,
                     labelList& patchNLayers,
