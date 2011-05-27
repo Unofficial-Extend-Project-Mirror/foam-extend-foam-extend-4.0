@@ -182,7 +182,7 @@ void Foam::processorPolyPatch::calcGeometry()
         // Cache face areas
         const vectorField::subField localFaceAreas = faceAreas();
 
-        forAll(faceNormals, facei)
+        forAll (faceNormals, facei)
         {
             scalar magSf = mag(localFaceAreas[facei]);
             scalar nbrMagSf = mag(neighbFaceAreas_[facei]);
@@ -320,6 +320,10 @@ void Foam::processorPolyPatch::updateMesh()
         {
             // Note cannot predict exact size since opposite nPoints might
             // be different from one over here.
+
+            // Disagree: This needs to be sorted out, so that processor patches
+            // are simply internal faces and treat cyclics separately
+            // HJ, 10/Mar/2011
             IPstream fromNeighbProc(Pstream::blocking, neighbProcNo());
 
             fromNeighbProc
@@ -338,7 +342,7 @@ void Foam::processorPolyPatch::updateMesh()
         neighbPointsPtr_ = new labelList(nPoints(), -1);
         labelList& neighbPoints = *neighbPointsPtr_;
 
-        forAll(nbrPointFace, nbrPointI)
+        forAll (nbrPointFace, nbrPointI)
         {
             // Find face and index in face on this side.
             const face& f = localFaces()[nbrPointFace[nbrPointI]];
@@ -358,7 +362,7 @@ void Foam::processorPolyPatch::updateMesh()
         }
 
         // Reset all duplicate entries to -1.
-        forAll(neighbPoints, patchPointI)
+        forAll (neighbPoints, patchPointI)
         {
             if (neighbPoints[patchPointI] == -2)
             {
@@ -372,7 +376,7 @@ void Foam::processorPolyPatch::updateMesh()
         neighbEdgesPtr_ = new labelList(nEdges(), -1);
         labelList& neighbEdges = *neighbEdgesPtr_;
 
-        forAll(nbrEdgeFace, nbrEdgeI)
+        forAll (nbrEdgeFace, nbrEdgeI)
         {
             // Find face and index in face on this side.
             const labelList& f = faceEdges()[nbrEdgeFace[nbrEdgeI]];
@@ -392,7 +396,7 @@ void Foam::processorPolyPatch::updateMesh()
         }
 
         // Reset all duplicate entries to -1.
-        forAll(neighbEdges, patchEdgeI)
+        forAll (neighbEdges, patchEdgeI)
         {
             if (neighbEdges[patchEdgeI] == -2)
             {
@@ -414,6 +418,7 @@ const Foam::labelList& Foam::processorPolyPatch::neighbPoints() const
             << "No extended addressing calculated for patch " << name()
             << abort(FatalError);
     }
+
     return *neighbPointsPtr_;
 }
 
@@ -426,6 +431,7 @@ const Foam::labelList& Foam::processorPolyPatch::neighbEdges() const
             << "No extended addressing calculated for patch " << name()
             << abort(FatalError);
     }
+
     return *neighbEdgesPtr_;
 }
 
@@ -437,12 +443,13 @@ void Foam::processorPolyPatch::initOrder(const primitivePatch& pp) const
         return;
     }
 
-    const bool isMaster = Pstream::myProcNo() < neighbProcNo();
-
-    if (isMaster)
+    // Master side sends the data and slave side rotates the faces
+    // HJ, 10/Mar/2011
+    if (owner())
     {
         pointField ctrs(calcFaceCentres(pp, pp.points()));
 
+        // Anchor point is the start point of all faces.  HJ, 10/Mar/2011
         pointField anchors(getAnchorPoints(pp, pp.points()));
 
         // Now send all info over to the neighbour
@@ -475,7 +482,7 @@ bool Foam::processorPolyPatch::order
         fileName nm
         (
             boundaryMesh().mesh().time().path()
-           /name()+"_faces.obj"
+           /name() + "_faces.obj"
         );
         Pout<< "processorPolyPatch::order : Writing my " << pp.size()
             << " faces to OBJ file " << nm << endl;
@@ -493,7 +500,7 @@ bool Foam::processorPolyPatch::order
             << "Dumping " << ctrs.size()
             << " local faceCentres to " << localStr.name() << endl;
 
-        forAll(ctrs, faceI)
+        forAll (ctrs, faceI)
         {
             writeOBJ(localStr, ctrs[faceI]);
         }
@@ -505,13 +512,11 @@ bool Foam::processorPolyPatch::order
     rotation.setSize(pp.size());
     rotation = 0;
 
-    const bool isMaster = Pstream::myProcNo() < neighbProcNo();
-
-    if (isMaster)
+    if (owner())
     {
         // Do nothing (i.e. identical mapping, zero rotation).
         // See comment at top.
-        forAll(faceMap, patchFaceI)
+        forAll (faceMap, patchFaceI)
         {
             faceMap[patchFaceI] = patchFaceI;
         }
@@ -520,6 +525,7 @@ bool Foam::processorPolyPatch::order
     }
     else
     {
+        // Slave side: receive points
         vectorField masterCtrs;
         vectorField masterAnchors;
 
@@ -543,10 +549,12 @@ bool Foam::processorPolyPatch::order
                     boundaryMesh().mesh().time().path()
                    /name() + "_nbrFaceCentres.obj"
                 );
+
                 Pout<< "processorPolyPatch::order : "
                     << "Dumping neighbour faceCentres to " << nbrStr.name()
                     << endl;
-                forAll(masterCtrs, faceI)
+
+                forAll (masterCtrs, faceI)
                 {
                     writeOBJ(nbrStr, masterCtrs[faceI]);
                 }
@@ -585,12 +593,13 @@ bool Foam::processorPolyPatch::order
 
             if (v.size() == 1)
             {
-                transformedCtrs = masterCtrs-v[0];
+                transformedCtrs = masterCtrs - v[0];
             }
             else
             {
-                transformedCtrs = masterCtrs-v;
+                transformedCtrs = masterCtrs - v;
             }
+
             matchedAll = matchPoints
             (
                 ctrs,
@@ -624,6 +633,7 @@ bool Foam::processorPolyPatch::order
         {
             vectorField transformedCtrs = masterCtrs;
             transformList(forwardT(), transformedCtrs);
+
             matchedAll = matchPoints
             (
                 ctrs,
@@ -656,7 +666,7 @@ bool Foam::processorPolyPatch::order
             fileName str
             (
                 boundaryMesh().mesh().time().path()
-               /name()/name()+"_faces.obj"
+               /name()/name() + "_faces.obj"
             );
             Pout<< "processorPolyPatch::order :"
                 << " Writing faces to OBJ file " << str.name() << endl;
@@ -675,7 +685,7 @@ bool Foam::processorPolyPatch::order
 
             label vertI = 0;
 
-            forAll(ctrs, faceI)
+            forAll (ctrs, faceI)
             {
                 label masterFaceI = faceMap[faceI];
 
@@ -690,7 +700,8 @@ bool Foam::processorPolyPatch::order
 
         if (!matchedAll)
         {
-            SeriousErrorIn
+            FatalErrorIn
+//             SeriousErrorIn
             (
                 "processorPolyPatch::order(const primitivePatch&"
                 ", labelList&, labelList&) const"
@@ -703,13 +714,13 @@ bool Foam::processorPolyPatch::order
                 << " multiple separated (from cyclics) processor patches"
                 << endl
                 << "    Continuing with incorrect face ordering from now on!"
-                << endl;
+                << abort(FatalError);
 
             return false;
         }
 
-        // Set rotation.
-        forAll(faceMap, oldFaceI)
+        // Set rotation
+        forAll (faceMap, oldFaceI)
         {
             // The face f will be at newFaceI (after morphing) and we want its
             // anchorPoint (= f[0]) to align with the anchorpoint for the
@@ -729,7 +740,8 @@ bool Foam::processorPolyPatch::order
 
             if (rotation[newFaceI] == -1)
             {
-                SeriousErrorIn
+                FatalErrorIn
+//                 SeriousErrorIn
                 (
                     "processorPolyPatch::order(const primitivePatch&"
                     ", labelList&, labelList&) const"
@@ -742,13 +754,13 @@ bool Foam::processorPolyPatch::order
                     << " when matching the halves of processor patch "
                     << name()
                     << "Continuing with incorrect face ordering from now on!"
-                    << endl;
+                    << abort(FatalError);
 
                 return false;
             }
         }
 
-        forAll(faceMap, faceI)
+        forAll (faceMap, faceI)
         {
             if (faceMap[faceI] != faceI || rotation[faceI] != 0)
             {
@@ -768,10 +780,8 @@ void Foam::processorPolyPatch::syncOrder() const
         return;
     }
 
-    // Read and discard info from master side
-    const bool isMaster = Pstream::myProcNo() < neighbProcNo();
-
-    if (!isMaster)
+    // Read and discard info from owner side from the neighbour
+    if (neighbour())
     {
         vectorField masterCtrs;
         vectorField masterAnchors;
@@ -783,6 +793,7 @@ void Foam::processorPolyPatch::syncOrder() const
         }
     }
 }
+
 
 void Foam::processorPolyPatch::write(Ostream& os) const
 {

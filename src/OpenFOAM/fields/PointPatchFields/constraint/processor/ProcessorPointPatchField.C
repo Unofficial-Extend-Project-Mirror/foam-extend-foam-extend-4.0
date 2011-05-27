@@ -466,9 +466,12 @@ initEvaluate
     const Pstream::commsTypes commsType
 )
 {
-    if (this->isPointField())
+    if (Pstream::parRun())
     {
-        initAddFieldTempl(Pstream::blocking, this->internalField());
+        if (this->isPointField())
+        {
+            initAddFieldTempl(Pstream::blocking, this->internalField());
+        }
     }
 }
 
@@ -491,27 +494,30 @@ evaluate
     const Pstream::commsTypes commsType
 )
 {
-    if (this->isPointField())
+    if (Pstream::parRun())
     {
-        // Get the neighbour side values
-        tmp<Field<Type> > tpNeighbour = receivePointField<Type>(commsType);
-        Field<Type>& tpn = tpNeighbour();
-
-        if (doTransform())
+        if (this->isPointField())
         {
-            const processorPolyPatch& ppp = procPatch_.procPolyPatch();
-            const tensorField& forwardT = ppp.forwardT();
+            // Get the neighbour side values
+            tmp<Field<Type> > tpNeighbour = receivePointField<Type>(commsType);
+            Field<Type>& tpn = tpNeighbour();
 
-            transform(tpn, forwardT[0], tpn);
+            if (doTransform())
+            {
+                const processorPolyPatch& ppp = procPatch_.procPolyPatch();
+                const tensorField& forwardT = ppp.forwardT();
+
+                transform(tpn, forwardT[0], tpn);
+            }
+
+            // Average over two sides
+            tpn = 0.5*(patchInternalField(this->internalField()) + tpn);
+
+            // Get internal field to insert values into
+            Field<Type>& iF = const_cast<Field<Type>&>(this->internalField());
+
+            this->setInInternalField(iF, tpn);
         }
-
-        // Average over two sides
-        tpn = 0.5*(patchInternalField(this->internalField()) + tpn);
-
-        // Get internal field to insert values into
-        Field<Type>& iF = const_cast<Field<Type>&>(this->internalField());
-
-        this->setInInternalField(iF, tpn);
     }
 }
 
@@ -697,7 +703,7 @@ initAddUpperLower
 {
     // Gather the data from the given field and send it. Note that the
     // size of the field is equal to the number of edges on the field
-    // and NOT the number of points.  
+    // and NOT the number of points.  HJ, 14/Nov/2001
 
     // Get the addressing
     const labelList& me = procPatch_.localEdgeIndices();

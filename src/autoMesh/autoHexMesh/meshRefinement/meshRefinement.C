@@ -1613,7 +1613,7 @@ Foam::label Foam::meshRefinement::addPatch
     fvBoundaryMesh& fvPatches = const_cast<fvBoundaryMesh&>(mesh.boundary());
 
     // Add polyPatch at the end
-    polyPatches.setSize(sz+1);
+    polyPatches.setSize(sz + 1);
     polyPatches.set
     (
         sz,

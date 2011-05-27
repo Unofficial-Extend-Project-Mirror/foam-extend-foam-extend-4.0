@@ -59,12 +59,11 @@ void Foam::processorTetPolyPatchCellDecomp::calcMeshPoints() const
             masterFaces[faceI] = pp[faceI].reverseFace();
         }
 
-        mp =
-            primitiveFacePatch
-            (
-                masterFaces,
-                pp.points()
-            ).meshPoints();
+        mp = primitiveFacePatch
+        (
+            masterFaces,
+            pp.points()
+        ).meshPoints();
     }
 
     // Get reference to shared points

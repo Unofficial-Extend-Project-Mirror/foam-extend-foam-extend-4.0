@@ -206,7 +206,10 @@ public:
             }
 
             template<class T>
-            const typename Field<T>::subField patchSlice(const Field<T>& l) const
+            const typename Field<T>::subField patchSlice
+            (
+                const Field<T>& l
+            ) const
             {
                 return typename Field<T>::subField
                 (

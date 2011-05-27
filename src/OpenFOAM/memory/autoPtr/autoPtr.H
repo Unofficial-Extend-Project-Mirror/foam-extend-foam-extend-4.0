@@ -95,7 +95,8 @@ public:
             //  If object pointer already set issue a FatalError.
             inline void set(T*);
 
-            //- If object pointer already set, delete object and set to given pointer
+            //- If object pointer already set, delete object and set to
+            //  given pointer
             inline void reset(T* = 0);
 
             //- If object pointer points to valid object:
