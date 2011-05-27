@@ -41,7 +41,7 @@ fvVectorMatrix UbEqn(Ub, Ub.dimensions()*dimVol/dimTime);
        - fvc::interpolate(nuEffb)
         *mesh.magSf()*fvc::snGrad(beta)/fvc::interpolate(beta + scalar(0.001));
 
-    UbEqn = 
+    UbEqn =
     (
         (scalar(1) + Cvm*rhob*alpha/rhob)*
         (

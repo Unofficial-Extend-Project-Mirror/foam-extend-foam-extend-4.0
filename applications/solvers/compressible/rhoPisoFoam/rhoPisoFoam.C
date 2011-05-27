@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
         #include "UEqn.H"
 
         // --- PISO loop
-        for (int corr=1; corr<=nCorr; corr++)
+        for (int corr = 1; corr <= nCorr; corr++)
         {
             #include "hEqn.H"
             #include "pEqn.H"
