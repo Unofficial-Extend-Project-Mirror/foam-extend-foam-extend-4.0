@@ -57,8 +57,6 @@ class mapPolyMesh;
 
 class writeRegisteredObject
 {
-protected:
-
     // Private data
 
         //- Name of this set of writeRegisteredObject
@@ -77,7 +75,6 @@ protected:
 
 
     // Private Member Functions
-
 
         //- Disallow default bitwise copy construct
         writeRegisteredObject(const writeRegisteredObject&);
