@@ -62,15 +62,15 @@ standardEvaporationModel::standardEvaporationModel
     evaporationScheme_(evapDict_.lookup("evaporationScheme")),
     nEvapIter_(0)
 {
-    if (evaporationScheme_ == "implicit") 
+    if (evaporationScheme_ == "implicit")
     {
         nEvapIter_ = 2;
     }
-    else if (evaporationScheme_ == "explicit") 
+    else if (evaporationScheme_ == "explicit")
     {
         nEvapIter_ = 1;
     }
-    else 
+    else
     {
         FatalError
             << "evaporationScheme type " << evaporationScheme_
@@ -94,6 +94,7 @@ bool standardEvaporationModel::evaporation() const
     return true;
 }
 
+
 // Correlation for the Sherwood Number
 scalar standardEvaporationModel::Sh
 (
@@ -101,8 +102,10 @@ scalar standardEvaporationModel::Sh
     const scalar SchmidtNumber
 ) const
 {
-    return 2.0 + preReScFactor_*pow(ReynoldsNumber,ReExponent_)*pow(SchmidtNumber,ScExponent_);
+    return 2.0 + preReScFactor_*pow(ReynoldsNumber,ReExponent_)*
+        pow(SchmidtNumber,ScExponent_);
 }
+
 
 scalar standardEvaporationModel::relaxationTime
 (
@@ -173,15 +176,15 @@ scalar standardEvaporationModel::boilingTime
     const scalar Nusselt,
     const scalar deltaTemp,
     const scalar diameter,
-    const scalar, 
-    const scalar, 
-    const scalar, 
-    const scalar, 
-    const scalar, 
-    const scalar, 
-    const scalar, 
-    const scalar, 
-    const scalar 
+    const scalar,
+    const scalar,
+    const scalar,
+    const scalar,
+    const scalar,
+    const scalar,
+    const scalar,
+    const scalar,
+    const scalar
 ) const
 {
     scalar time = GREAT;
@@ -194,7 +197,10 @@ scalar standardEvaporationModel::boilingTime
 
     time = liquidDensity*cpFuel*sqr(diameter)/
     (
-        6.0 * kappa * Nusselt * log(1.0 + cpFuel * deltaT/max(SMALL, heatOfVapour))
+        6.0*kappa*Nusselt*log
+        (
+            1.0 + cpFuel * deltaT/max(SMALL, heatOfVapour)
+        )
     );
 
     time = max(VSMALL, time);
@@ -202,10 +208,13 @@ scalar standardEvaporationModel::boilingTime
     return time;
 }
 
+
 inline label standardEvaporationModel::nEvapIter() const
 {
     return nEvapIter_;
 }
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
