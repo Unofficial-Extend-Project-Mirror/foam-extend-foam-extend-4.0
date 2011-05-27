@@ -96,7 +96,7 @@ Foam::unitInjector::unitInjector
     }
 
     // convert CA to real time
-    forAll(massFlowRateProfile_, i)
+    forAll (massFlowRateProfile_, i)
     {
         massFlowRateProfile_[i][0] =
             t.userTimeToTime(massFlowRateProfile_[i][0]);
@@ -104,14 +104,14 @@ Foam::unitInjector::unitInjector
         injectionPressureProfile_[i][0] = massFlowRateProfile_[i][0];
     }
 
-    forAll(TProfile_, i)
+    forAll (TProfile_, i)
     {
         TProfile_[i][0] = t.userTimeToTime(TProfile_[i][0]);
     }
 
     scalar integratedMFR = integrateTable(massFlowRateProfile_);
 
-    forAll(massFlowRateProfile_, i)
+    forAll (massFlowRateProfile_, i)
     {
         // correct the massFlowRateProfile to match the injected mass
         massFlowRateProfile_[i][1] *= mass_/integratedMFR;
@@ -125,9 +125,9 @@ Foam::unitInjector::unitInjector
 
     setTangentialVectors();
 
-    // check molar fractions
+    // Check molar fractions
     scalar Xsum = 0.0;
-    forAll(X_, i)
+    forAll (X_, i)
     {
         Xsum += X_[i];
     }
@@ -137,7 +137,7 @@ Foam::unitInjector::unitInjector
         WarningIn("unitInjector::unitInjector(const time& t, Istream& is)")
             << "X does not sum to 1.0, correcting molar fractions."
             << nl << endl;
-        forAll(X_, i)
+        forAll (X_, i)
         {
             X_[i] /= Xsum;
         }
@@ -179,8 +179,14 @@ Foam::label Foam::unitInjector::nParcelsToInject
     const scalar time1
 ) const
 {
-    scalar mInj = mass_*(fractionOfInjection(time1)-fractionOfInjection(time0));
+    scalar mInj = mass_*
+    (
+        fractionOfInjection(time1)
+      - fractionOfInjection(time0)
+    );
+
     label nParcels = label(mInj/averageParcelMass_ + 0.49);
+
     return nParcels;
 }
 
@@ -366,7 +372,7 @@ void Foam::unitInjector::correctProfiles
     scalar A = 0.25*mathematicalConstant::pi*pow(d_, 2.0);
     scalar pDummy = 1.0e+5;
 
-    forAll(velocityProfile_, i)
+    forAll (velocityProfile_, i)
     {
         scalar time = velocityProfile_[i][0];
         scalar rho = fuel.rho(pDummy, T(time), X_);

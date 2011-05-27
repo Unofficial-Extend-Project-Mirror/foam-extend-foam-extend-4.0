@@ -61,14 +61,27 @@ private:
 
     // Private data
 
+        //- Injector properties dictionary
         dictionary propsDict_;
 
+        //- Injector position
         vector position_;
+
+        //- Injector direction
         vector direction_;
+
+        //- Injector diameter
         scalar d_;
+
+        //- Cd
         scalar Cd_;
+
+        //- Parcel mass
         scalar mass_;
+
+        //- Number of parcels
         label nParcels_;
+
         scalarField X_;
         List<pair> massFlowRateProfile_;
         List<pair> velocityProfile_;
@@ -145,7 +158,7 @@ public:
             const vector& axisOfWedgeNormal,
             Random& rndGen
         ) const;
-    
+
         //- Return the number of holes
         label nHoles() const;
 
@@ -200,7 +213,7 @@ public:
         {
             return injectionPressureProfile_;
         }
-    
+
         scalar injectionPressure(const scalar time) const;
 
         List<pair> velocityProfile() const

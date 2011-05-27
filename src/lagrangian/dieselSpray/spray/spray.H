@@ -119,11 +119,20 @@ class spray
             autoPtr<liquidMixture> fuels_;
             autoPtr<injectorModel> injectorModel_;
 
-        // Iterations to avoid errors due to too small parcels causing temperature out of range
 
+        // Iterations to avoid errors due to too small parcels
+        // causing temperature out of range
+
+            //- Spray iteration dictionary
             dictionary sprayIteration_;
+
+            //- Number of spray iterations
             const label sprayIterate_;
+
+            //- Spray relaxation factor
             const scalar sprayRelaxFactor_;
+
+            //- Minimum parcel mass
             const scalar minimumParcelMass_;
 
 
