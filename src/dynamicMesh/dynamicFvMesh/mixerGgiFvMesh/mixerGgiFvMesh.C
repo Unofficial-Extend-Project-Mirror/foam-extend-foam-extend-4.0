@@ -138,8 +138,16 @@ void Foam::mixerGgiFvMesh::calcMovingMasks() const
     const cellList& c = cells();
     const faceList& f = allFaces();
 
-    const labelList& cellAddr =
-        cellZones()[cellZones().findZoneID("movingCells")];
+    label movingCellsID = cellZones().findZoneID("movingCells");
+
+    if (movingCellsID < 0)
+    {
+        FatalErrorIn("void mixerGgiFvMesh::calcMovingMasks() const")
+            << "Cannot find moving cell zone ID"
+            << abort(FatalError);
+    }
+
+    const labelList& cellAddr = cellZones()[movingCellsID];
 
     forAll (cellAddr, cellI)
     {
@@ -162,13 +170,10 @@ void Foam::mixerGgiFvMesh::calcMovingMasks() const
 
     forAll (movingPatches, patchI)
     {
-        polyPatchID movingSliderID
-        (
-            movingPatches[patchI],
-            boundaryMesh()
-        );
+        const label movingSliderID =
+            boundaryMesh().findPatchID(movingPatches[patchI]);
 
-        if (!movingSliderID.active())
+        if (movingSliderID < 0)
         {
             FatalErrorIn("void mixerGgiFvMesh::calcMovingMasks() const")
                 << "Moving slider named " << movingPatches[patchI]
@@ -177,7 +182,7 @@ void Foam::mixerGgiFvMesh::calcMovingMasks() const
         }
 
         const ggiPolyPatch& movingGgiPatch =
-            refCast<const ggiPolyPatch>(boundaryMesh()[movingSliderID.index()]);
+            refCast<const ggiPolyPatch>(boundaryMesh()[movingSliderID]);
 
         const labelList& movingSliderAddr = movingGgiPatch.zone();
 
@@ -197,13 +202,10 @@ void Foam::mixerGgiFvMesh::calcMovingMasks() const
 
     forAll (staticPatches, patchI)
     {
-        polyPatchID staticSliderID
-        (
-            staticPatches[patchI],
-            boundaryMesh()
-        );
+        const label staticSliderID =
+            boundaryMesh().findPatchID(movingPatches[patchI]);
 
-        if (!staticSliderID.active())
+        if (staticSliderID < 0)
         {
             FatalErrorIn("void mixerGgiFvMesh::calcMovingMasks() const")
                 << "Static slider named " << staticPatches[patchI]
@@ -212,7 +214,7 @@ void Foam::mixerGgiFvMesh::calcMovingMasks() const
         }
 
         const ggiPolyPatch& staticGgiPatch =
-            refCast<const ggiPolyPatch>(boundaryMesh()[staticSliderID.index()]);
+            refCast<const ggiPolyPatch>(boundaryMesh()[staticSliderID]);
 
         const labelList& staticSliderAddr = staticGgiPatch.zone();
 
