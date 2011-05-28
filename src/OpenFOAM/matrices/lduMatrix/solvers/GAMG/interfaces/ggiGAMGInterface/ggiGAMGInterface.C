@@ -134,10 +134,11 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
     );
 
     // Table of face-sets weights to be agglomerated
-    HashTable<SLList<SLList<scalar> >, label, Hash<label> > faceFaceWeightsTable
-    (
-        localExpandAddressing.size()
-    );
+    HashTable<SLList<SLList<scalar> >, label, Hash<label> >
+        faceFaceWeightsTable
+        (
+            localExpandAddressing.size()
+        );
 
     // Count the number of coarse faces
     label nCoarseFaces = 0;
@@ -221,6 +222,7 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
                             faceFacesIter().append(ffI);
                             faceFaceWeightsIter().append(curNW);
                             nAgglomPairs++;
+
                             break;
                         }
                     }
@@ -436,7 +438,8 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
                         contents[masterI] - procOffset*Pstream::myProcNo();
                     nProcFaces++;
 
-                    SLList<label>::iterator facesIter = faceFacesIter().begin();
+                    SLList<label>::iterator facesIter =
+                        faceFacesIter().begin();
                     SLList<scalar>::iterator weightsIter =
                         faceFaceWeightsIter().begin();
 
@@ -473,7 +476,7 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
         // On slave side, the owner addressing is stored in linked lists
         forAll (contents, masterI)
         {
-            // Note: maste processor index is irrelevant.  HJ, 1/Apr/2009
+            // Note: master processor index is irrelevant.  HJ, 1/Apr/2009
 
             SLList<label>& curNbrs = neighboursTable.find(contents[masterI])();
 
@@ -512,7 +515,9 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
                         nbrsIter() - procOffset*Pstream::myProcNo();
                     nProcFaces++;
 
-                    SLList<label>::iterator facesIter = faceFacesIter().begin();
+                    SLList<label>::iterator facesIter =
+                        faceFacesIter().begin();
+
                     SLList<scalar>::iterator weightsIter =
                         faceFaceWeightsIter().begin();
 
