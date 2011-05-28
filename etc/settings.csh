@@ -88,7 +88,10 @@ _foamAddLib  $FOAM_USER_LIBBIN
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # compilerInstall = OpenFOAM | System
 #set compilerInstall=OpenFOAM
-set compilerInstall=System
+#set compilerInstall=System
+if ( ! $?compilerInstall ) then
+    setenv compilerInstall System
+endif
 
 switch ("$compilerInstall")
 case OpenFOAM:
@@ -97,6 +100,11 @@ case OpenFOAM:
         setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/gcc-4.3.3/platforms/$WM_ARCH$WM_COMPILER_ARCH
         _foamAddLib $WM_THIRD_PARTY_DIR/mpfr-2.4.1/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
         _foamAddLib $WM_THIRD_PARTY_DIR/gmp-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
+    breaksw
+    case Gcc44:
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.csh
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.csh
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS/etc/gcc-4.4.5.csh
     breaksw
     case Gcc43:
         setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/gcc-4.3.3/platforms/$WM_ARCH$WM_COMPILER_ARCH
@@ -127,7 +135,7 @@ endsw
 
 
 switch ("$WM_COMPILER")
-case Gcc:
+case Gcc*:
     setenv WM_CC 'gcc'
     setenv WM_CXX 'g++'
     breaksw
@@ -439,7 +447,7 @@ if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.8.1 
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.csh
 endif
 
-if ( $WM_ARCH == "darwinIntel" ) then
+if ( $WM_ARCH == "darwinIntel" || $WM_ARCH == "darwinIntel64" ) then
     setenv DYLD_LIBRARY_PATH ${LD_LIBRARY_PATH}
 endif
 
