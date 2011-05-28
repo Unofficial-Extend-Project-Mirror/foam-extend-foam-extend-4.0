@@ -177,7 +177,7 @@ unset compilerBin compilerLib compilerInstall
 
 
 case "$WM_COMPILER" in
-Gcc)
+Gcc*)
     export WM_CC='gcc'
     export WM_CXX='g++'
     ;;
