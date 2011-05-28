@@ -45,7 +45,7 @@ fvFieldDecomposer::patchFieldDecomposer::patchFieldDecomposer
 {
     forAll (directAddressing_, i)
     {
-        // Subtract one to align addressing.  
+        // Subtract one to align addressing.  HJ, 5/Dec/2001
         directAddressing_[i] -= addressingOffset + 1;
     }
 }
@@ -68,7 +68,7 @@ processorVolPatchFieldDecomposer
 
     forAll (addressing_, i)
     {
-        // Subtract one to align addressing.  
+        // Subtract one to align addressing.  HJ, 5/Dec/2001
         label ai = mag(addressingSlice[i]) - 1;
 
         if (ai < neighb.size())
@@ -92,7 +92,7 @@ processorVolPatchFieldDecomposer
             // do the interpolation properly (I would need to look
             // up the different (face) list of data), so I will
             // just grab the value from the owner cell
-            // 
+            // HJ, 16/Mar/2001
             addressing_[i].setSize(1);
             weights_[i].setSize(1);
 
@@ -172,14 +172,14 @@ fvFieldDecomposer::fvFieldDecomposer
         }
         else
         {
-            processorVolPatchFieldDecomposerPtrs_[patchi] = 
+            processorVolPatchFieldDecomposerPtrs_[patchi] =
                 new processorVolPatchFieldDecomposer
                 (
                     completeMesh_,
                     procMesh_.boundary()[patchi].patchSlice(faceAddressing_)
                 );
 
-            processorSurfacePatchFieldDecomposerPtrs_[patchi] = 
+            processorSurfacePatchFieldDecomposerPtrs_[patchi] =
                 new processorSurfacePatchFieldDecomposer
                 (
                     procMesh_.boundary()[patchi].size(),
