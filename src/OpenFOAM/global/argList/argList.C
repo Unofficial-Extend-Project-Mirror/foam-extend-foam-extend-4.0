@@ -311,17 +311,21 @@ Foam::argList::argList
 
     string dateString = clock::date();
     string timeString = clock::clockTime();
-
+    fileName ctrlDict = debug::controlDict().name();
+    string ctrlDictString = ctrlDict.path()/ctrlDict.name();
+ 
     // Print the banner once only for parallel runs
     if (Pstream::master() && bannerEnabled)
     {
         IOobject::writeBanner(Info, true)
-            << "Build  : " << Foam::FOAMbuild << nl
-            << "Exec   : " << argListString.c_str() << nl
-            << "Date   : " << dateString.c_str() << nl
-            << "Time   : " << timeString.c_str() << nl
-            << "Host   : " << hostName() << nl
-            << "PID    : " << pid() << endl;
+            << "Build    : " << Foam::FOAMbuild << nl
+            << "Exec     : " << argListString.c_str() << nl
+            << "Date     : " << dateString.c_str() << nl
+            << "Time     : " << timeString.c_str() << nl
+            << "Host     : " << hostName() << nl
+            << "PID      : " << pid() << nl
+            << "CtrlDict : " << ctrlDictString.c_str()
+            << endl;
     }
 
     jobInfo.add("startDate", dateString);
@@ -528,8 +532,8 @@ Foam::argList::argList
 
     if (Pstream::master() && bannerEnabled)
     {
-        Info<< "Case   : " << (rootPath_/globalCase_).c_str() << nl
-            << "nProcs : " << nProcs << endl;
+        Info<< "Case     : " << (rootPath_/globalCase_).c_str() << nl
+            << "nProcs   : " << nProcs << endl;
 
         if (parRunControl_.parRun())
         {
