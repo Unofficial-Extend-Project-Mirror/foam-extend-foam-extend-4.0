@@ -51,7 +51,7 @@ SourceFiles
 #include "coeffFields.H"
 #include "FieldField.H"
 #include "lduMesh.H"
-#include "BlockLduInterface.H"
+// #include "BlockLduInterfaceField.H"
 #include "BlockLduInterfaceFieldPtrsList.H"
 #include "Map.H"
 
@@ -113,7 +113,7 @@ private:
         // Coupling
 
             //- List of coupled interfaces
-            PtrList<BlockLduInterface<Type> > interfaces_;
+            typename BlockLduInterfaceFieldPtrsList<Type>::Type interfaces_;
 
             //- Coupled interface coefficients, upper
             FieldField<CoeffField, Type> coupleUpper_;
@@ -296,6 +296,12 @@ public:
             {
                 return coupleLower_;
             }
+			
+			//- Access to coupled interfaces
+			typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces()
+			{
+				return interfaces_;
+			}
 
 
         // Matrix structure

@@ -1,7 +1,3 @@
-tensor2Field.C
-blockVector2Matrix.C
-blockVector2Solvers.C
-
 blockCoupledScalarTransportFoam.C
 
 EXE = $(FOAM_APPBIN)/blockCoupledScalarTransportFoam

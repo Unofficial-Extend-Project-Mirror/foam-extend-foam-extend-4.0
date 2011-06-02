@@ -37,9 +37,9 @@ namespace Foam
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #define UNARY_FUNCTION(returnType, type, fun, text)                 \
-inline returnType fun(const type& t)                                \
+inline dimensioned< returnType > fun(const dimensioned< type >& t)  \
 {                                                                   \
-    return returnType                                               \
+    return dimensioned< returnType >                                \
     (                                                               \
         #text "(" + t.name() + ')',                                 \
         fun(t.dimensions()),                                        \
@@ -47,34 +47,48 @@ inline returnType fun(const type& t)                                \
     );                                                              \
 }
 
-#define dimensionedType_Funs(cmptType, vectorType, tensorType,      \
-    diagTensorType, sphericalTensorType)                            \
-UNARY_FUNCTION(tensorType, tensorType, inv, inv)                    \
-UNARY_FUNCTION(diagTensorType, diagTensorType, inv, inv)            \
-UNARY_FUNCTION(sphericalTensorType, sphericalTensorType, inv, inv)  \
-UNARY_FUNCTION(diagTensorType, tensorType, diag, diag)              \
-UNARY_FUNCTION(diagTensorType, diagTensorType, diag, diag)          \
-UNARY_FUNCTION(sphericalTensorType, sphericalTensorType, diag, diag)\
-UNARY_FUNCTION(cmptType, vectorType, cmptSum, cmptSum)
 
-#define dimensionedVectorN_Funs(length)                         \
-dimensionedType_Funs                                            \
-(                                                               \
-    dimensionedScalar,                                          \
-    dimensionedVector##length,                                  \
-    dimensionedTensor##length,                                  \
-    dimensionedDiagTensor##length,                              \
-    dimensionedSphericalTensor##length                          \
-)
+#define BINARY_OPERATOR(returnType, type1, type2, op, text)            \
+dimensioned< returnType > op(const dimensioned< type1 >& dt1,       \
+    const dimensioned< type2 >& dt2)                                \
+{                                                                   \
+    return dimensioned<returnType>                                  \
+    (                                                               \
+        '(' + dt1.name() + #text + dt2.name() + ')',                \
+        op(dt1.dimensions(), dt2.dimensions()),                     \
+        op(dt1.value(), dt2.value())                                \
+    );                                                              \
+}
 
-dimensionedVectorN_Funs(2)
-dimensionedVectorN_Funs(4)
-dimensionedVectorN_Funs(6)
-dimensionedVectorN_Funs(8)
+#define dimensionedType_Funs(tensorType, diagTensorType,                            \
+    sphericalTensorType, vectorType, cmptType, args...)                             \
+UNARY_FUNCTION(tensorType, tensorType, inv, inv)                                    \
+UNARY_FUNCTION(diagTensorType, diagTensorType, inv, inv)                            \
+UNARY_FUNCTION(sphericalTensorType, sphericalTensorType, inv, inv)                  \
+                                                                                    \
+UNARY_FUNCTION(diagTensorType, tensorType, diag, diag)                              \
+UNARY_FUNCTION(diagTensorType, diagTensorType, diag, diag)                          \
+UNARY_FUNCTION(sphericalTensorType, sphericalTensorType, diag, diag)                \
+                                                                                    \
+BINARY_OPERATOR(tensorType, tensorType, diagTensorType, operator+, +)               \
+BINARY_OPERATOR(tensorType, diagTensorType, tensorType, operator+, +)               \
+BINARY_OPERATOR(tensorType, tensorType, sphericalTensorType, operator+, +)          \
+BINARY_OPERATOR(tensorType, sphericalTensorType, tensorType, operator+, +)          \
+BINARY_OPERATOR(diagTensorType, diagTensorType, sphericalTensorType, operator+, +)  \
+BINARY_OPERATOR(diagTensorType, sphericalTensorType, diagTensorType, operator+, +)  \
+                                                                                    \
+BINARY_OPERATOR(tensorType, tensorType, diagTensorType, operator-, -)               \
+BINARY_OPERATOR(tensorType, diagTensorType, tensorType, operator-, -)               \
+BINARY_OPERATOR(tensorType, tensorType, sphericalTensorType, operator-, -)          \
+BINARY_OPERATOR(tensorType, sphericalTensorType, tensorType, operator-, -)          \
+BINARY_OPERATOR(diagTensorType, diagTensorType, sphericalTensorType, operator-, -)  \
+BINARY_OPERATOR(diagTensorType, sphericalTensorType, diagTensorType, operator-, -)
 
-#undef dimensionedVectorN_Funs
+forAllVectorTensorNTypes(dimensionedType_Funs)
+
 #undef dimensionedType_Funs
 #undef UNARY_FUNCTION
+#undef BINARY_OPERATOR
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

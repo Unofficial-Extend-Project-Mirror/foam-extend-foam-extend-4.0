@@ -95,6 +95,7 @@ template<>
 tmp<tensorField> BlockLduMatrix<tensor>::faceH(const tensorField& x) const;
 
 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

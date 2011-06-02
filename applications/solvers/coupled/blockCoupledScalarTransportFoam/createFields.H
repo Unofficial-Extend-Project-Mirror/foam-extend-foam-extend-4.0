@@ -28,6 +28,31 @@
     );
 
 
+// Working coupled solution field
+    Info<< "Creating field blockT\n" << endl;
+    volVector2Field blockT
+    (
+        IOobject
+        (
+            "blockT",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedVector2(word(), dimless, vector2::zero)
+    );
+
+    {
+        vector2Field& blockX = blockT.internalField();
+
+        blockMatrixTools::blockInsert(0, T.internalField(), blockX);
+        blockMatrixTools::blockInsert(1, Ts.internalField(), blockX);
+    }
+
+    blockT.write();
+
 // Removed comparison with the reference field.  HJ, 17/Jun/2010
 #if (0)
     Info<< "Reading field Tref\n" << endl;

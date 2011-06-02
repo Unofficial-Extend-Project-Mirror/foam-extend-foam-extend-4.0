@@ -54,7 +54,7 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(const lduMesh& ldu)
     diagPtr_(NULL),
     upperPtr_(NULL),
     lowerPtr_(NULL),
-    interfaces_(),
+    interfaces_(ldu.interfaces().size()),
     coupleUpper_(ldu.lduAddr().nPatches()),
     coupleLower_(ldu.lduAddr().nPatches()),
     fixedEqns_(ldu.lduAddr().size()/fixFillIn)
@@ -77,9 +77,9 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(const BlockLduMatrix<Type>& A)
     diagPtr_(NULL),
     upperPtr_(NULL),
     lowerPtr_(NULL),
-    interfaces_(),
-    coupleUpper_(A.lduAddr().nPatches()),
-    coupleLower_(A.lduAddr().nPatches()),
+    interfaces_(A.interfaces_),
+    coupleUpper_(A.coupleUpper_),
+    coupleLower_(A.coupleLower_),
     fixedEqns_(A.fixedEqns_)
 {
     if (A.diagPtr_)
@@ -96,14 +96,6 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(const BlockLduMatrix<Type>& A)
     {
         lowerPtr_ = new TypeCoeffField(*(A.lowerPtr_));
     }
-
-    const lduAddressing& addr = this->lduAddr();
-
-    forAll (coupleUpper_, i)
-    {
-        coupleUpper_.set(i, A.coupleUpper_.clone());
-        coupleLower_.set(i, A.coupleLower_.clone());
-    }
 }
 
 
@@ -117,9 +109,9 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(BlockLduMatrix<Type>& A, bool reUse)
     diagPtr_(NULL),
     upperPtr_(NULL),
     lowerPtr_(NULL),
-    interfaces_(),
-    coupleUpper_(),
-    coupleLower_(),
+    interfaces_(A.interfaces_, reUse),
+    coupleUpper_(A.coupleUpper_, reUse),
+    coupleLower_(A.coupleLower_, reUse),
     fixedEqns_(A.fixedEqns_)
 {
     if (reUse)
@@ -159,10 +151,6 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(BlockLduMatrix<Type>& A, bool reUse)
             lowerPtr_ = new TypeCoeffField(*(A.lowerPtr_));
         }
     }
-
-    // Interface data
-    coupleUpper_ = A.coupleUpper_;
-    coupleLower_ = A.coupleUpper_;
 }
 
 
@@ -385,7 +373,11 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const BlockLduMatrix<Type>& ldum)
         os.writeKeyword("lower")  << typename BlockLduMatrix<Type>::TypeCoeffField
             (ldum.lduAddr().lowerAddr().size()) <<  token::END_STATEMENT << nl;
     }
-
+	
+	os.writeKeyword("coupleUpper") << ldum.coupleUpper_ << token::END_STATEMENT << endl;
+	
+	os.writeKeyword("coupleLower") << ldum.coupleLower_ << token::END_STATEMENT << endl;
+	
     os.check("Ostream& operator<<(Ostream&, const BlockLduMatrix<Type>&");
 
     return os;

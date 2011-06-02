@@ -21,8 +21,10 @@ finiteVolume/fields/fvPatchFields/transformFvPatchVectorNFields.C
 finiteVolume/fields/fvPatchFields/wedgeFvPatchVectorNFields.C
 finiteVolume/fields/fvPatchFields/coupledFvPatchVectorNFields.C
 finiteVolume/fields/fvPatchFields/processorFvPatchVectorNFields.C
+finiteVolume/fields/fvPatchFields/cyclicFvPatchVectorNFields.C
 finiteVolume/fields/fvPatchFields/fixedValueFvPatchVectorNFields.C
 finiteVolume/fields/fvPatchFields/zeroGradientFvPatchVectorNFields.C
+finiteVolume/fields/fvPatchFields/fixedGradientFvPatchVectorNFields.C
 
 finiteVolume/fields/fvsPatchFields/fvsPatchVectorNFields.C
 finiteVolume/fields/fvsPatchFields/calculatedFvsPatchVectorNFields.C

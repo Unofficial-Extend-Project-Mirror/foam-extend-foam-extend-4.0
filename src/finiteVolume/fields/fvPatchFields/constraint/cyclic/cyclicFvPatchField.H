@@ -165,6 +165,20 @@ public:
                 const Pstream::commsTypes commsType
             ) const;
 
+        // Block coupled interface functionality
+
+            //- Update result field based on interface functionality
+            virtual void updateInterfaceMatrix
+            (
+                const Field<Type>&,
+                Field<Type>&,
+                const BlockLduMatrix<Type>&,
+                const CoeffField<Type>&,
+                const Pstream::commsTypes commsType
+            ) const
+            {
+                notImplemented("cyclicFvPatchField<Type>::updateInterfaceMatrix for block matrices")
+            }
 
         //- Cyclic coupled interface functions
 

@@ -82,7 +82,7 @@ void insertDiagSource
 
     // Add boundary source contribution
     m.addBoundaryDiag(diag, 0);
-    m.addBoundarySource(source);
+    m.addBoundarySource(source, false);
 
     if (blockM.diag().activeType() == blockCoeffBase::UNALLOCATED)
     {

@@ -37,15 +37,14 @@ Description
 
 #include "fvCFD.H"
 #include "fieldTypes.H"
-#include "blockLduMatrices.H"
-#include "blockLduSolvers.H"
 #include "Time.H"
 #include "fvMesh.H"
 
-#include "blockVector2Matrix.H"
-#include "tensor2.H"
-#include "vector2Field.H"
-#include "tensor2Field.H"
+#include "blockLduSolvers.H"
+#include "VectorNFieldTypes.H"
+#include "volVectorNFields.H"
+#include "blockVectorNMatrices.H"
+
 #include "blockMatrixTools.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -106,7 +105,8 @@ int main(int argc, char *argv[])
             u = vector2::zero;
             l = vector2::zero;
 
-            vector2Field blockX(mesh.nCells(), vector2::zero);
+            vector2Field& blockX = blockT.internalField();
+            // vector2Field blockX(mesh.nCells(), vector2::zero);
             vector2Field blockB(mesh.nCells(), vector2::zero);
 
             //- Inset equations into block Matrix
@@ -123,7 +123,30 @@ int main(int argc, char *argv[])
                 blockB[i][1] -= alpha.value()*blockX[i][0]*mesh.V()[i];
             }
 
+            //- Transfer the coupled interface list for processor/cyclic/etc. boundaries
+            blockM.interfaces()	= blockT.boundaryField().blockInterfaces();
 
+            //- Transfer the coupled interface coefficients
+            forAll(mesh.boundaryMesh(), patchI)
+            {
+                if (blockM.interfaces().set(patchI))
+                {
+                    Field<vector2>& coupledLower = blockM.coupleLower()[patchI].asLinear();
+                    Field<vector2>& coupledUpper = blockM.coupleUpper()[patchI].asLinear();
+
+                    const scalarField& TLower = TEqn.internalCoeffs()[patchI];
+                    const scalarField& TUpper = TEqn.boundaryCoeffs()[patchI];
+                    const scalarField& TsLower = TsEqn.internalCoeffs()[patchI];
+                    const scalarField& TsUpper = TsEqn.boundaryCoeffs()[patchI];
+
+                    blockMatrixTools::blockInsert(0, TLower, coupledLower);
+                    blockMatrixTools::blockInsert(1, TsLower, coupledLower);
+                    blockMatrixTools::blockInsert(0, TUpper, coupledUpper);
+                    blockMatrixTools::blockInsert(1, TsUpper, coupledUpper);
+                }
+            }
+
+            //- Block coupled solver call
             BlockSolverPerformance<vector2> solverPerf =
                 BlockLduSolver<vector2>::New
                 (
