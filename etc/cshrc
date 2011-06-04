@@ -107,8 +107,8 @@ if ( ! $?WM_OSTYPE ) setenv WM_OSTYPE POSIX
 
 # Compiler: set to Gcc, Gcc43 or Icc (for Intel's icc)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#if ( ! $?WM_COMPILER ) setenv WM_COMPILER Gcc
-setenv WM_COMPILER Gcc
+if ( ! $?WM_COMPILER ) setenv WM_COMPILER Gcc
+#setenv WM_COMPILER Gcc
 #setenv WM_COMPILER Icc
 
 setenv WM_COMPILER_ARCH
@@ -207,6 +207,9 @@ case Linux:
     breaksw
 
 case Darwin:
+    # this makes certain things easier
+    setenv WM_ARCH_BASE darwin
+
     switch (`uname -p`)
     case powerpc:
 	setenv WM_ARCH darwinPpc
@@ -240,21 +243,25 @@ case Darwin:
     setenv MACOSX_DEPLOYMENT_TARGET `sw_vers -productVersion`
 
     # Use Mac-Ports-Compiler instead of Apple-gcc-4.2
-    switch ($WM_COMPILER)
-    case Gcc43:
-        setenv WM_CC 'gcc-mp-4.3'
-	setenv WM_CXX 'g++-mp-4.3'
-	breaksw;
-    case Gcc44:
-        setenv WM_CC 'gcc-mp-4.4'
-	setenv WM_CXX 'g++-mp-4.4'
-	breaksw;
-    case Gcc45:
-        setenv WM_CC 'gcc-mp-4.5'
-	setenv WM_CXX 'g++-mp-4.5'
-        breaksw;
-    endsw
-    setenv WM_COMPILER ""
+    if ( ! $?compilerInstall ) setenv compilerInstall System
+    if ( $compilerInstall == "System" ) then 
+	switch ($WM_COMPILER)
+	case Gcc43:
+	    setenv WM_CC 'gcc-mp-4.3'
+	    setenv WM_CXX 'g++-mp-4.3'
+	    breaksw;
+	case Gcc44:
+	    setenv WM_CC 'gcc-mp-4.4'
+	    setenv WM_CXX 'g++-mp-4.4'
+	    breaksw;
+	case Gcc45:
+	    setenv WM_CC 'gcc-mp-4.5'
+	    setenv WM_CXX 'g++-mp-4.5'
+	    breaksw;
+	endsw
+        #setenv WM_COMPILER ""
+    endif
+
     breaksw
 
 case SunOS:

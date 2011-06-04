@@ -37,6 +37,9 @@
 %{expand:%%define _WM_THIRD_PARTY_DIR %(echo $WM_THIRD_PARTY_DIR)}
 %{expand:%%define _WM_OPTIONS         %(echo $WM_OPTIONS)}
 
+# Disable the generation of debuginfo packages
+%define debug_package %{nil}
+
 # The topdir needs to point to the $WM_THIRD_PARTY/rpmbuild directory
 %define _topdir	 	%{_WM_THIRD_PARTY_DIR}/rpmBuild
 %define _tmppath	%{_topdir}/tmp
@@ -93,7 +96,11 @@ Group: 			Development/Tools
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
     GMP_VERSION=gmp-5.0.1
-    MPFR_VERSION=mpfr-3.0.0
+    MPFR_VERSION=mpfr-3.0.1
+
+    # Set LD_LIBRARY_FILE for GMP and MPFR so configure won't fail some of the tests 
+    export LD_LIBRARY_PATH=$WM_THIRD_PARTY_DIR/packages/$GMP_VERSION/platforms/$WM_OPTIONS/lib:$LD_LIBRARY_PATH    
+    export LD_LIBRARY_PATH=$WM_THIRD_PARTY_DIR/packages/$MPFR_VERSION/platforms/$WM_OPTIONS/lib:$LD_LIBRARY_PATH 
 
     mkdir ./objBuildDir
     cd ./objBuildDir
@@ -111,7 +118,7 @@ Group: 			Development/Tools
 
 %install
     cd ./objBuildDir
-    make install prefix=$RPM_BUILD_ROOT%{_installPrefix}
+    make install DESTDIR=$RPM_BUILD_ROOT
 
     # Creation of OpenFOAM specific .csh and .sh files"
 
@@ -126,12 +133,13 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export GCC_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+export WM_COMPILER_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 
-[ -d \$GCC_DIR/lib ] && _foamAddLib \$GCC_DIR/lib
+[ -d \$WM_COMPILER_DIR/lib ] && _foamAddLib \$WM_COMPILER_DIR/lib
+[ -d \$WM_COMPILER_DIR/lib64 ] && _foamAddLib \$WM_COMPILER_DIR/lib64
 
 # Enable access to the package applications if present
-[ -d \$GCC_DIR/bin ] && _foamAddPath \$GCC_DIR/bin
+[ -d \$WM_COMPILER_DIR/bin ] && _foamAddPath \$WM_COMPILER_DIR/bin
 DOT_SH_EOF
 
     #
@@ -140,28 +148,29 @@ DOT_SH_EOF
 cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.csh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-setenv GCC_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+setenv WM_COMPILER_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 
-if ( -e \$GCC_DIR/lib ) then
-    _foamAddLib \$GCC_DIR/lib
+if ( -e \$WM_COMPILER_DIR/lib ) then
+    _foamAddLib \$WM_COMPILER_DIR/lib
 endif
 
-if ( -e \$GCC_DIR/bin ) then
-    _foamAddPath \$GCC_DIR/bin
+if ( -e \$WM_COMPILER_DIR/lib64 ) then
+    _foamAddLib \$WM_COMPILER_DIR/lib64
+endif
+
+if ( -e \$WM_COMPILER_DIR/bin ) then
+    _foamAddPath \$WM_COMPILER_DIR/bin
 endif
 DOT_CSH_EOF
+
+    #finally, generate a .tgz file for systems where using rpm for installing packages
+    # as a non-root user might be a problem.
+    (mkdir -p  %{_topdir}/TGZS/%{_target_cpu}; cd $RPM_BUILD_ROOT/%{_prefix}; tar -zcvf %{_topdir}/TGZS/%{_target_cpu}/%{name}-%{version}.tgz  packages/%{name}-%{version})
 
 %clean
 rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%{_installPrefix}/bin
-%{_installPrefix}/etc
-%{_installPrefix}/include
-%{_installPrefix}/info
-%{_installPrefix}/lib
-%{_installPrefix}/libexec
-%{_installPrefix}/man
-%{_installPrefix}/share
+%{_installPrefix}
 

@@ -33,6 +33,8 @@
 #     NOTE: This stage is optional. Use it only if you want to move some RPMs
 #           to the appropriate location for your architcture so the other stage scripts 
 #           will be able to pick them up
+#    
+#     Usage: ./AllMake.stage0 file_1.rpm file_2.rpm ... file_n.rpm
 #
 # Author:
 #     Martin Beaudoin, Hydro-Quebec, (2010)
