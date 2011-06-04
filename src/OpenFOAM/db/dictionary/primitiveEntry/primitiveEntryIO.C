@@ -208,6 +208,21 @@ void Foam::primitiveEntry::readEntry(const dictionary& dict, Istream& is)
     }
     else
     {
+        // When reading an invalid global controlDict file, the following call
+        // to FatalIOErrorIn will crash with a "Segmentation Fault", and will
+        // fail to generate any useful error message to the console.
+        // This additional error message will at least leave a minimal trace.
+        //
+        // The cause of the Seg. fault is still unknown, but seems to be related
+        // to the initialization of the string member attributes of the global
+        // object FatalIOError. (MB 05/2011)
+        //
+        std::cerr << "--> Error from: "
+            << "primitiveEntry::readEntry(const dictionary&, Istream&)"
+            << std::endl;
+        std::cerr << "--> Fatal error reading input from: "
+            << is.name() << std::endl;
+
         FatalIOErrorIn
         (
             "primitiveEntry::readEntry(const dictionary&, Istream&)",
