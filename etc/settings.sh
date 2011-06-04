@@ -480,8 +480,11 @@ export MPI_BUFFER_SIZE
 
 # Load cmake
 # ~~~~~~~~~~
-[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3 ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3/platforms/$WM_OPTIONS/etc/cmake-2.8.3.sh
+#[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3 ] && {
+#    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3/platforms/$WM_OPTIONS/etc/cmake-2.8.3.sh
+#}
+[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.git ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.git/platforms/$WM_OPTIONS/etc/cmake-2.8.git.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    CMAKE_DIR is initialized to: $CMAKE_DIR"
 
