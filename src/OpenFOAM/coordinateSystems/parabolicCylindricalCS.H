@@ -56,6 +56,11 @@ class parabolicCylindricalCS
 :
     public coordinateSystem
 {
+    // Private data members
+
+        //- Are angles in degrees? (default = true)
+        bool inDegrees_;
+
 
 protected:
 
@@ -94,19 +99,37 @@ public:
     // Constructors
 
         //- Construct null
-        parabolicCylindricalCS();
+        parabolicCylindricalCS(const bool inDegrees = true);
 
         //- Construct from origin and rotation
         parabolicCylindricalCS
         (
             const word& name,
             const point& origin,
-            const coordinateRotation&
+            const coordinateRotation&,
+            const bool inDegrees = true
         );
 
         //- Construct from dictionary
         parabolicCylindricalCS(const word&, const dictionary&);
 
+
+    // Member Functions
+
+        // Global information about the coordinate system
+
+            //- Directions in which the span is limited
+            virtual spanInfo spanLimited() const;
+
+            //- Span bounds
+            virtual boundBox spanBounds() const;
+
+
+        //- Are angles in degrees?
+        bool  inDegrees() const;
+
+        //- Non-const access to inDegrees
+        bool& inDegrees();
 };
 
 

@@ -28,6 +28,7 @@ License
 
 #include "Switch.H"
 #include "mathematicalConstants.H"
+#include "boundBox.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -111,6 +112,40 @@ Foam::cylindricalCS::cylindricalCS
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+Foam::coordinateSystem::spanInfo Foam::cylindricalCS::spanLimited() const
+{
+    spanInfo b(Pair<bool>(true, true));
+
+    // Upper bound or r is unlimited
+    b[0] = Pair<bool>(true, false);
+
+    // z is unlimited
+    b[2] = Pair<bool>(false, false);
+
+    return b;
+}
+
+
+Foam::boundBox Foam::cylindricalCS::spanBounds() const
+{
+    return boundBox
+    (
+        vector
+        (
+            0,
+            ( inDegrees_ ? -180.0 : -mathematicalConstant::pi ),
+            -GREAT
+        ),
+        vector
+        (
+            GREAT,
+            ( inDegrees_ ? 180.0 : mathematicalConstant::pi ),
+            GREAT
+        )
+    );
+}
+
 
 bool Foam::cylindricalCS::inDegrees() const
 {

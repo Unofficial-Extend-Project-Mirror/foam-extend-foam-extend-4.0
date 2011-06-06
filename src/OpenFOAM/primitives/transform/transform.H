@@ -33,7 +33,7 @@ Description
 #ifndef transform_H
 #define transform_H
 
-#include "tensor.H"
+#include "tensorField.H"
 #include "mathematicalConstants.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -47,6 +47,19 @@ inline tensor rotationTensor
 (
     const vector& n1,
     const vector& n2
+)
+{
+    return
+        (n1 & n2)*I
+      + (1 - (n1 & n2))*sqr(n1 ^ n2)/(magSqr(n1 ^ n2) + VSMALL)
+      + (n2*n1 - n1*n2);
+}
+
+
+inline tmp<tensorField> rotationTensor
+(
+    const vectorField& n1,
+    const vectorField& n2
 )
 {
     return

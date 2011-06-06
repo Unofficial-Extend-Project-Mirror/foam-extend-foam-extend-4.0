@@ -153,6 +153,20 @@ public:
 
     // Member Functions
 
+        // Global information about the coordinate system
+
+            //- Directions in which the span is limited
+            virtual spanInfo spanLimited() const;
+
+            //- Span bounds
+            virtual boundBox spanBounds() const;
+
+
+        //- Are angles in degrees?
+        bool  inDegrees() const;
+
+        //- Non-const access to inDegrees
+        bool& inDegrees();
 };
 
 

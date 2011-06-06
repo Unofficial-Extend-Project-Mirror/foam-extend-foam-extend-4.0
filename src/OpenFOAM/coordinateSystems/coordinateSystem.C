@@ -27,6 +27,7 @@ License
 #include "IOstream.H"
 #include "coordinateSystem.H"
 #include "coordinateSystems.H"
+#include "boundBox.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -60,7 +61,7 @@ Foam::coordinateSystem::coordinateSystem
     note_(),
     origin_(cs.origin_),
     R_(cs.R_),
-    Rtr_(Rtr_)
+    Rtr_(cs.Rtr_)
 {}
 
 
@@ -200,6 +201,18 @@ Foam::coordinateSystem::~coordinateSystem()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+Foam::coordinateSystem::spanInfo Foam::coordinateSystem::spanLimited() const
+{
+    return spanInfo(Pair<bool>(false, false));
+}
+
+
+Foam::boundBox Foam::coordinateSystem::spanBounds() const
+{
+    return boundBox::greatBox;
+}
+
 
 Foam::dictionary Foam::coordinateSystem::dict(bool ignoreType) const
 {

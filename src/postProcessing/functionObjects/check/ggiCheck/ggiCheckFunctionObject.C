@@ -123,7 +123,10 @@ bool Foam::ggiCheckFunctionObject::execute()
                     << " %" << endl;
             }
         }
-        else if (isA<cyclicGgiFvsPatchScalarField>(phi.boundaryField()[patchI]))
+        else if
+        (
+            isA<cyclicGgiFvsPatchScalarField>(phi.boundaryField()[patchI])
+        )
         {
             if (!visited[patchI])
             {
