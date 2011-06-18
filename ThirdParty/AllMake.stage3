@@ -59,7 +59,7 @@ echo
 # Metis
 if [ -z "$METIS_SYSTEM" ] 
 then
-    ( rpm_make -p metis-5.0pre2 -s metis-5.0pre2.spec -u http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.0pre2.tar.gz      )
+    ( rpm_make -p metis-5.0pre2 -s metis-5.0pre2.spec -u http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/OLD/metis-5.0pre2.tar.gz      )
 else
     echo "Using system installed Metis"
     echo ""

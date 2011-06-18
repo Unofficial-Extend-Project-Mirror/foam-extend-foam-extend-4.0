@@ -73,7 +73,7 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis
+URL:                    http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/OLD
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
