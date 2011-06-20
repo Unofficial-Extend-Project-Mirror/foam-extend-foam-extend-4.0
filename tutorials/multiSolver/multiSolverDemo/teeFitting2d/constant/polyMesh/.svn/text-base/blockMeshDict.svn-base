@@ -1,0 +1,90 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 0.1;
+
+vertices        
+(
+    (0 0 0)
+    (1.5 0 0)
+    (1.5 1 0)
+    (0 1 0)
+    (2.5 0 0)
+    (4 0 0)
+    (4 1 0)
+    (2.5 1 0)
+    (1.5 2.5 0)
+    (2.5 2.5 0)
+
+    (0 0 0.1)
+    (1.5 0 0.1)
+    (1.5 1 0.1)
+    (0 1 0.1)
+    (2.5 0 0.1)
+    (4 0 0.1)
+    (4 1 0.1)
+    (2.5 1 0.1)
+    (1.5 2.5 0.1)
+    (2.5 2.5 0.1)
+
+);
+
+blocks          
+(
+    hex (0 1 2 3 10 11 12 13) (20 20 1) simpleGrading (1 1 1)
+    hex (1 4 7 2 11 14 17 12) (20 20 1) simpleGrading (1 1 1)
+    hex (4 5 6 7 14 15 16 17) (20 20 1) simpleGrading (1 1 1)
+    hex (2 7 9 8 12 17 19 18) (20 20 1) simpleGrading (1 1 1)
+);
+
+edges           
+(
+);
+
+patches         
+(
+    wall steetWalls
+    (
+        (1 0 10 11)
+        (4 1 11 14)
+        (5 4 14 15)
+        (2 3 13 12)
+        (6 7 17 16)
+    )
+    wall branchWalls
+    (
+        (8 2 12 18)
+        (7 9 19 17)
+    )
+    patch westStreet
+    (
+        (3 0 10 13)
+    )
+    patch eastStreet
+    (
+        (5 6 16 15)
+    )
+    patch northBranch
+    (
+        (9 8 18 19)
+    )
+);
+
+mergePatchPairs 
+(
+);
+
+// ************************************************************************* //
