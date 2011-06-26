@@ -70,7 +70,7 @@ class regionCouplePolyPatch
         mutable Switch attached_;
 
         //- Are the region attached walls
-        mutable Switch attachedWalls_;
+        Switch isWall_;
 
         //- Shadow patch index.  Delayed evaluation for construction
         mutable label shadowIndex_;
@@ -88,10 +88,16 @@ class regionCouplePolyPatch
         //- Calculate interpolation
         void calcInterpolation() const;
 
-        
+
 protected:
 
     // Protected Member functions
+
+        //- Initialise the calculation of the patch addressing
+        virtual void initAddressing();
+
+        //- Calculate the patch addressing
+        virtual void calcAddressing();
 
         //- Initialise the calculation of the patch geometry
         virtual void initGeometry();
@@ -121,8 +127,12 @@ protected:
         //- Calculate reconstructed cell centres
         void calcReconFaceCellCentres() const;
 
+        //- Clear geometry
+        void clearGeom() const;
+
         //- Clear out
         void clearOut() const;
+
 
 public:
 
@@ -237,10 +247,10 @@ public:
             return attached_;
         }
 
-        //AJ: read from dictionary if coupled patch is also a wall
+        // Return true if patch is considered a wall
         bool isWall() const
         {
-            return attachedWalls_;
+            return isWall_;
         }
 
         //- Attach regions

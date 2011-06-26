@@ -175,8 +175,7 @@ void Foam::overlapGgiPolyPatch::calcPatchToPatch() const
         if
         (
             patchToPatch().uncoveredMasterFaces().size() > 0
-            ||
-            patchToPatch().uncoveredSlaveFaces().size() > 0
+         || patchToPatch().uncoveredSlaveFaces().size() > 0
         )
         {
             FatalErrorIn("void overlapGgiPolyPatch::calcPatchToPatch() const")
@@ -306,6 +305,18 @@ Foam::overlapGgiPolyPatch::reconFaceCellCentres() const
     }
 
     return *reconFaceCellCentresPtr_;
+}
+
+
+void Foam::overlapGgiPolyPatch::initAddressing()
+{
+    polyPatch::initAddressing();
+}
+
+
+void Foam::overlapGgiPolyPatch::calcAddressing()
+{
+    polyPatch::calcAddressing();
 }
 
 

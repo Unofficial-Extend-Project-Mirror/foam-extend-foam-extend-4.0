@@ -46,6 +46,7 @@ SourceFiles
 #include "objectRegistry.H"
 #include "indexedOctree.H"
 #include "treeDataTriSurface.H"
+#include "octreeDataTriSurfaceTreeLeaf.H"
 #include "treeDataEdge.H"
 #include "EdgeMap.H"
 

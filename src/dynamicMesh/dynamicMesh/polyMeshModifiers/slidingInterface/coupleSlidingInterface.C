@@ -573,7 +573,7 @@ void Foam::slidingInterface::coupleInterface(polyTopoChange& ref) const
             forAll (curFaces, faceI)
             {
 //                 Pout<< "face: " << curFaces[faceI] << " "
-//                     << masterPatch[curFaces[faceI]] 
+//                     << masterPatch[curFaces[faceI]]
 //                     << " local: "
 //                     << masterPatch.localFaces()[curFaces[faceI]]
 //                     << endl;
@@ -1764,7 +1764,9 @@ void Foam::slidingInterface::coupleInterface(polyTopoChange& ref) const
                     "polyTopoChange& ref) const"
                 )   << "Face " << curFaceID << " reduced to less than "
                     << "3 points.  Topological/cutting error B." << nl
-                    << "Old face: " << oldFace << " new face: " << newFaceLabels
+                    << "Old face: " << oldFace << " new face: "
+                    << newFaceLabels << nl
+                    << "old points: " << oldFace.points(points)
                     << abort(FatalError);
             }
 

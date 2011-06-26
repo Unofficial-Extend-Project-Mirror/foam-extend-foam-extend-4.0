@@ -73,6 +73,7 @@ class triSurfaceTools
                 RED,
                 GREEN
             };
+
             static void calcRefineStatus
             (
                 const triSurface& surf,
@@ -118,8 +119,8 @@ class triSurfaceTools
                 label edgeI
             );
 
-            // Return value of faceUsed for faces using vertI (local numbering).
-            // Used internally.
+            // Return value of faceUsed for faces using vertI (local numbering)
+            // Used internally
             static label vertexUsesFace
             (
                 const triSurface& surf,

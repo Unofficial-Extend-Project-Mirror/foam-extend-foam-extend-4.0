@@ -115,6 +115,14 @@ protected:
         // The polyPatch geometry initialisation is called by polyBoundaryMesh
         friend class polyBoundaryMesh;
 
+        //- Initialise the calculation of the patch addressing
+        virtual void initAddressing()
+        {}
+
+        //- Calculate the patch addressing
+        virtual void calcAddressing()
+        {}
+
         //- Initialise the calculation of the patch geometry
         virtual void initGeometry()
         {}
@@ -372,7 +380,7 @@ public:
         virtual bool isWall() const
         {
             return false;
-        }       
+        }
 
         //- Return true if the given type is a constraint type
         static bool constraintType(const word& pt);

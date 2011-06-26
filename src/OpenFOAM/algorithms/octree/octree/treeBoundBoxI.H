@@ -242,7 +242,7 @@ inline void Foam::treeBoundBox::searchOrder
     if (dist.z() < 0)
     {
         octant |= treeBoundBox::FRONTHALF;
-	dist.z() *= -1;
+        dist.z() *= -1;
     }
 
     direction min = 0;
@@ -252,44 +252,44 @@ inline void Foam::treeBoundBox::searchOrder
     if (dist.x() < dist.y())
     {
         if (dist.y() < dist.z())
-	{
-	    min = treeBoundBox::RIGHTHALF;
-	    mid = treeBoundBox::TOPHALF;
-	    max = treeBoundBox::FRONTHALF;
-	}
-	else if (dist.z() < dist.x())
-	{
-	    min = treeBoundBox::FRONTHALF;
+        {
+            min = treeBoundBox::RIGHTHALF;
+            mid = treeBoundBox::TOPHALF;
+            max = treeBoundBox::FRONTHALF;
+        }
+        else if (dist.z() < dist.x())
+        {
+            min = treeBoundBox::FRONTHALF;
             mid = treeBoundBox::RIGHTHALF;
-	    max = treeBoundBox::TOPHALF;
-	}
-	else
-	{
-	    min = treeBoundBox::RIGHTHALF;
-	    mid = treeBoundBox::FRONTHALF;
-	    max = treeBoundBox::TOPHALF;
-	}
+            max = treeBoundBox::TOPHALF;
+        }
+        else
+        {
+            min = treeBoundBox::RIGHTHALF;
+            mid = treeBoundBox::FRONTHALF;
+            max = treeBoundBox::TOPHALF;
+        }
     }
     else
     {
         if (dist.z() < dist.y())
-	{
-	    min = treeBoundBox::FRONTHALF;
-	    mid = treeBoundBox::TOPHALF;
-	    max = treeBoundBox::RIGHTHALF;
-	}
-	else if (dist.x() < dist.z())
-	{
-	    min = treeBoundBox::TOPHALF;
-	    mid = treeBoundBox::RIGHTHALF;
-	    max = treeBoundBox::FRONTHALF;
-	}
-	else
-	{
-	    min = treeBoundBox::TOPHALF;
-	    mid = treeBoundBox::FRONTHALF;
-	    max = treeBoundBox::RIGHTHALF;
-	}
+        {
+            min = treeBoundBox::FRONTHALF;
+            mid = treeBoundBox::TOPHALF;
+            max = treeBoundBox::RIGHTHALF;
+        }
+        else if (dist.x() < dist.z())
+        {
+            min = treeBoundBox::TOPHALF;
+            mid = treeBoundBox::RIGHTHALF;
+            max = treeBoundBox::FRONTHALF;
+        }
+        else
+        {
+            min = treeBoundBox::TOPHALF;
+            mid = treeBoundBox::FRONTHALF;
+            max = treeBoundBox::RIGHTHALF;
+        }
     }
 
     // Primary subOctant
@@ -309,7 +309,7 @@ inline void Foam::treeBoundBox::searchOrder
 
 // true if bb's intersect or overlap.
 // Note: <= to make sure we catch all.
-inline bool Foam::treeBoundBox::overlaps(const treeBoundBox& bb) const
+inline bool Foam::treeBoundBox::overlaps(const boundBox& bb) const
 {
     return boundBox::overlaps(bb);
 }
@@ -347,6 +347,28 @@ inline Foam::treeBoundBox Foam::treeBoundBox::extend
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+//- Return slightly wider bounding box, without a random gen param
+//  So we are sure to stay away from very small offsets like rndGen == 0
+//  MB, 28/May/2011
+inline Foam::treeBoundBox Foam::treeBoundBox::extend(const scalar s) const
+{
+    treeBoundBox bb(*this);
+
+    vector span(bb.max() - bb.min());
+
+    // Make 3D
+    scalar magSpan = Foam::mag(span);
+
+    for (direction dir = 0; dir < vector::nComponents; dir++)
+    {
+        span[dir] = Foam::max(s*magSpan, span[dir]);
+    }
+
+    bb.min() -= cmptMultiply(s*vector::one, span);
+    bb.max() += cmptMultiply(s*vector::one, span);
+
+    return bb;
+}
+
 
 // ************************************************************************* //

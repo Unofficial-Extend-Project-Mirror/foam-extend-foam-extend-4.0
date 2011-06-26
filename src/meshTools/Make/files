@@ -16,30 +16,10 @@ primitiveMeshGeometry/primitiveMeshGeometry.C
 
 meshSearch/meshSearch.C
 
-meshTools/meshTools.C
-
 PointEdgeWave/PointEdgeWaveName.C
 PointEdgeWave/pointEdgePoint.C
 
 regionSplit/regionSplit.C
-
-octree/octreeName.C
-octree/octreeDataPoint.C
-octree/octreeDataPointTreeLeaf.C
-octree/octreeDataEdges.C
-octree/octreeDataCell.C
-octree/octreeDataFace.C
-octree/treeBoundBox.C
-octree/treeNodeName.C
-octree/treeLeafName.C
-octree/pointIndexHitIOList.C
-
-indexedOctree/indexedOctreeName.C
-indexedOctree/treeDataCell.C
-indexedOctree/treeDataEdge.C
-indexedOctree/treeDataFace.C
-indexedOctree/treeDataPoint.C
-indexedOctree/treeDataTriSurface.C
 
 searchableSurface = searchableSurface
 $(searchableSurface)/distributedTriSurfaceMesh.C
@@ -127,7 +107,6 @@ $(intersectedSurface)/edgeSurface.C
 triSurface/triSurfaceSearch/triSurfaceSearch.C
 triSurface/octreeData/octreeDataTriSurface.C
 triSurface/octreeData/octreeDataTriSurfaceTreeLeaf.C
-triSurface/triangleFuncs/triangleFuncs.C
 triSurface/surfaceFeatures/surfaceFeatures.C
 triSurface/triSurfaceTools/triSurfaceTools.C
 triSurface/triSurfaceTools/geompack/geompack.C

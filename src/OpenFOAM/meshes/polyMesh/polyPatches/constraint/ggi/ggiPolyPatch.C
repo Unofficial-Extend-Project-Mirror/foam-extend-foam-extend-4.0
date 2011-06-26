@@ -51,6 +51,15 @@ namespace Foam
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
+bool Foam::ggiPolyPatch::active() const
+{
+    polyPatchID shadow(shadowName_, boundaryMesh());
+    faceZoneID zone(zoneName_, boundaryMesh().mesh().faceZones());
+
+    return shadow.active() && zone.active();
+}
+
+
 void Foam::ggiPolyPatch::calcZoneAddressing() const
 {
     // Calculate patch-to-zone addressing
@@ -61,23 +70,108 @@ void Foam::ggiPolyPatch::calcZoneAddressing() const
             << abort(FatalError);
     }
 
+    if (debug)
+    {
+        Pout<< "ggiPolyPatch::calcZoneAddressing() const for patch "
+            << index() << endl;
+    }
+
     // Calculate patch-to-zone addressing
     zoneAddressingPtr_ = new labelList(size());
-    labelList& addr = *zoneAddressingPtr_;
+    labelList& zAddr = *zoneAddressingPtr_;
     const faceZone& myZone = zone();
 
     for (label i = 0; i < size(); i++)
     {
-        addr[i] = myZone.whichFace(start() + i);
+        zAddr[i] = myZone.whichFace(start() + i);
     }
 
     // Check zone addressing
-    if (addr.size() > 0 && min(addr) < 0)
+    if (zAddr.size() > 0 && min(zAddr) < 0)
     {
         FatalErrorIn("void ggiPolyPatch::calcZoneAddressing() const")
             << "Problem with patch-to zone addressing: some patch faces "
             << "not found in interpolation zone"
             << abort(FatalError);
+    }
+}
+
+
+void Foam::ggiPolyPatch::calcRemoteZoneAddressing() const
+{
+    // Calculate patch-to-zone addressing
+    if (remoteZoneAddressingPtr_)
+    {
+        FatalErrorIn("void ggiPolyPatch::calcRemoteZoneAddressing() const")
+            << "Patch to remote zone addressing already calculated"
+            << abort(FatalError);
+    }
+
+    if (debug)
+    {
+        Pout<< "ggiPolyPatch::calcRemoteZoneAddressing() const for patch "
+            << index() << endl;
+    }
+
+    // Once zone addressing is established, visit the opposite side and find
+    // out which face data is needed for interpolation
+    boolList usedShadows(shadow().zone().size(), false);
+
+    const labelList& zAddr = zoneAddressing();
+
+    if (master())
+    {
+        const labelListList& addr = patchToPatch().masterAddr();
+
+        forAll (zAddr, mfI)
+        {
+            const labelList& nbrs = addr[zAddr[mfI]];
+
+            forAll (nbrs, nbrI)
+            {
+                usedShadows[nbrs[nbrI]] = true;
+            }
+        }
+    }
+    else
+    {
+        const labelListList& addr = patchToPatch().slaveAddr();
+
+        forAll (zAddr, mfI)
+        {
+            const labelList& nbrs = addr[zAddr[mfI]];
+
+            forAll (nbrs, nbrI)
+            {
+                usedShadows[nbrs[nbrI]] = true;
+            }
+        }
+    }
+
+    // Count and pick up shadow indices
+    label nShadows = 0;
+
+    forAll (usedShadows, sI)
+    {
+        if (usedShadows[sI])
+        {
+            nShadows++;
+        }
+    }
+
+    remoteZoneAddressingPtr_ = new labelList(nShadows);
+    labelList& rza = *remoteZoneAddressingPtr_;
+
+    // Reset counter for re-use
+    nShadows = 0;
+
+    forAll (usedShadows, sI)
+    {
+        if (usedShadows[sI])
+        {
+            rza[nShadows] = sI;
+            nShadows++;
+        }
     }
 }
 
@@ -98,31 +192,29 @@ void Foam::ggiPolyPatch::calcPatchToPatch() const
         patchToPatchPtr_ =
             new ggiZoneInterpolation
             (
-                zone()(),
-                shadow().zone()(),
+                zone()(),           // This zone reference
+                shadow().zone()(),  // This shadow zone reference
                 forwardT(),
                 reverseT(),
                 shadow().separation(), // Slave-to-master separation. Bug fix
                 0,             // Non-overlapping face tolerances
                 0,             // HJ, 24/Oct/2008
                 true,          // Rescale weighting factors.  Bug fix, MB.
-                ggiInterpolation::AABB
+//                 ggiInterpolation::AABB
+                ggiInterpolation::BB_OCTREE  // Octree search, MB.
             );
 
-        // Abort immediatly if uncovered faces are present and the option
+        // Abort immediately if uncovered faces are present and the option
         // bridgeOverlap is not set.
         if
         (
             (
                 patchToPatch().uncoveredMasterFaces().size() > 0
-                &&
-                !bridgeOverlap()
+            && !bridgeOverlap()
             )
-            ||
-            (
+         || (
                 patchToPatch().uncoveredSlaveFaces().size() > 0
-                &&
-                !shadow().bridgeOverlap()
+            && !shadow().bridgeOverlap()
             )
         )
         {
@@ -140,43 +232,6 @@ void Foam::ggiPolyPatch::calcPatchToPatch() const
         FatalErrorIn("void ggiPolyPatch::calcPatchToPatch() const")
             << "Attempting to create GGIInterpolation on a shadow"
             << abort(FatalError);
-    }
-}
-
-
-void Foam::ggiPolyPatch::calcLocalParallel() const
-{
-    // Calculate patch-to-zone addressing
-    if (localParallelPtr_)
-    {
-        FatalErrorIn("void ggiPolyPatch::calcLocalParallel() const")
-            << "Local parallel switch already calculated"
-            << abort(FatalError);
-    }
-
-    localParallelPtr_ = new bool(false);
-    bool& emptyOrComplete = *localParallelPtr_;
-
-    // Calculate localisation on master and shadow
-    emptyOrComplete =
-        (zone().size() == size() && shadow().zone().size() == shadow().size())
-     || (size() == 0 && shadow().size() == 0);
-
-    reduce(emptyOrComplete, andOp<bool>());
-
-    if (debug && Pstream::parRun())
-    {
-        Info<< "GGI patch Master: " << name()
-            << " Slave: " << shadowName() << " is ";
-
-        if (emptyOrComplete)
-        {
-           Info<< "local parallel" << endl;
-        }
-        else
-        {
-            Info<< "split between multiple processors" << endl;
-        }
     }
 }
 
@@ -209,12 +264,162 @@ void Foam::ggiPolyPatch::calcReconFaceCellCentres() const
 }
 
 
+void Foam::ggiPolyPatch::calcLocalParallel() const
+{
+    // Calculate patch-to-zone addressing
+    if (localParallelPtr_)
+    {
+        FatalErrorIn("void ggiPolyPatch::calcLocalParallel() const")
+            << "Local parallel switch already calculated"
+            << abort(FatalError);
+    }
+
+    localParallelPtr_ = new bool(false);
+    bool& emptyOrComplete = *localParallelPtr_;
+
+    // If running in serial, all GGIs are local parallel
+    // HJ, 1/Jun/2011
+    if (!Pstream::parRun())
+    {
+        return;
+    }
+
+    // Calculate localisation on master and shadow
+    emptyOrComplete =
+        (zone().size() == size() && shadow().zone().size() == shadow().size())
+     || (size() == 0 && shadow().size() == 0);
+
+    reduce(emptyOrComplete, andOp<bool>());
+
+    if (debug && Pstream::parRun())
+    {
+        Info<< "GGI patch Master: " << name()
+            << " Slave: " << shadowName() << " is ";
+
+        if (emptyOrComplete)
+        {
+           Info<< "local parallel" << endl;
+        }
+        else
+        {
+            Info<< "split between multiple processors" << endl;
+        }
+    }
+}
+
+
+void Foam::ggiPolyPatch::calcSendReceive() const
+{
+    // Note: all processors will execute calcSendReceive but only master will
+    // hold the information.  Therefore, pointers on slave processors
+    // will remain meaningless, but for purposes of consistency
+    // (of the calc-call) they will be set to zero-sized array
+    // HJ, 4/Jun/2011
+
+    if (receiveAddrPtr_ || sendAddrPtr_)
+    {
+        FatalErrorIn("void ggiPolyPatch::calcSendReceive() const")
+            << "Send-receive addressing already calculated"
+            << abort(FatalError);
+    }
+
+    if (debug)
+    {
+        Pout<< "ggiPolyPatch::calcSendReceive() const for patch "
+            << index() << endl;
+    }
+
+    if (!Pstream::parRun())
+    {
+        FatalErrorIn("void ggiPolyPatch::calcSendReceive() const")
+            << "Requested calculation of send-receive addressing for a "
+            << "serial run.  This is not allowed"
+            << abort(FatalError);
+    }
+
+    // Master will receive and store the maps
+    if (Pstream::master())
+    {
+        receiveAddrPtr_ = new labelListList(Pstream::nProcs());
+        labelListList& rAddr = *receiveAddrPtr_;
+
+        sendAddrPtr_ = new labelListList(Pstream::nProcs());
+        labelListList& sAddr = *sendAddrPtr_;
+
+        // Insert master
+        rAddr[0] = zoneAddressing();
+
+        for (label procI = 1; procI < Pstream::nProcs(); procI++)
+        {
+            // Note: must use normal comms because the size of the
+            // communicated lists is unknown on the receiving side
+            // HJ, 4/Jun/2011
+
+            // Opt: reconsider mode of communication
+            IPstream ip(Pstream::scheduled, procI);
+
+            rAddr[procI] = labelList(ip);
+
+            sAddr[procI] = labelList(ip);
+        }
+    }
+    else
+    {
+        // Create dummy pointers: only master processor stores maps
+        receiveAddrPtr_ = new labelListList();
+        sendAddrPtr_ = new labelListList();
+
+        // Send information to master
+        const labelList& za = zoneAddressing();
+        const labelList& ra = remoteZoneAddressing();
+
+        // Note: must use normal comms because the size of the
+        // communicated lists is unknown on the receiving side
+        // HJ, 4/Jun/2011
+
+        // Opt: reconsider mode of communication
+        OPstream op(Pstream::scheduled, Pstream::masterNo());
+
+        // Send local and remote addressing to master
+        op << za << ra;
+    }
+}
+
+
+const Foam::labelListList& Foam::ggiPolyPatch::receiveAddr() const
+{
+    if (!receiveAddrPtr_)
+    {
+        calcSendReceive();
+    }
+
+    return *receiveAddrPtr_;
+}
+
+
+const Foam::labelListList& Foam::ggiPolyPatch::sendAddr() const
+{
+    if (!sendAddrPtr_)
+    {
+        calcSendReceive();
+    }
+
+    return *sendAddrPtr_;
+}
+
+
 void Foam::ggiPolyPatch::clearGeom()
 {
-    deleteDemandDrivenData(patchToPatchPtr_);
-    deleteDemandDrivenData(zoneAddressingPtr_);
-
     deleteDemandDrivenData(reconFaceCellCentresPtr_);
+
+    // Remote addressing and send-receive maps depend on the local
+    // position.  Therefore, it needs to be recalculated at mesh motion.
+    // Local zone addressing does not change with mesh motion
+    // HJ, 23/Jun/2011
+    deleteDemandDrivenData(remoteZoneAddressingPtr_);
+
+    deleteDemandDrivenData(receiveAddrPtr_);
+    deleteDemandDrivenData(sendAddrPtr_);
 }
 
 
@@ -222,6 +427,8 @@ void Foam::ggiPolyPatch::clearOut()
 {
     clearGeom();
 
+    deleteDemandDrivenData(zoneAddressingPtr_);
+    deleteDemandDrivenData(patchToPatchPtr_);
     deleteDemandDrivenData(localParallelPtr_);
 }
 
@@ -245,8 +452,11 @@ Foam::ggiPolyPatch::ggiPolyPatch
     zoneIndex_(-1),
     patchToPatchPtr_(NULL),
     zoneAddressingPtr_(NULL),
+    remoteZoneAddressingPtr_(NULL),
+    reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    receiveAddrPtr_(NULL),
+    sendAddrPtr_(NULL)
 {}
 
 
@@ -270,8 +480,11 @@ Foam::ggiPolyPatch::ggiPolyPatch
     zoneIndex_(-1),
     patchToPatchPtr_(NULL),
     zoneAddressingPtr_(NULL),
+    remoteZoneAddressingPtr_(NULL),
+    reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    receiveAddrPtr_(NULL),
+    sendAddrPtr_(NULL)
 {}
 
 
@@ -291,8 +504,11 @@ Foam::ggiPolyPatch::ggiPolyPatch
     zoneIndex_(-1),
     patchToPatchPtr_(NULL),
     zoneAddressingPtr_(NULL),
+    remoteZoneAddressingPtr_(NULL),
+    reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    receiveAddrPtr_(NULL),
+    sendAddrPtr_(NULL)
 {}
 
 
@@ -310,8 +526,11 @@ Foam::ggiPolyPatch::ggiPolyPatch
     zoneIndex_(-1),
     patchToPatchPtr_(NULL),
     zoneAddressingPtr_(NULL),
+    remoteZoneAddressingPtr_(NULL),
+    reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    receiveAddrPtr_(NULL),
+    sendAddrPtr_(NULL)
 {}
 
 
@@ -333,8 +552,11 @@ Foam::ggiPolyPatch::ggiPolyPatch
     zoneIndex_(-1),
     patchToPatchPtr_(NULL),
     zoneAddressingPtr_(NULL),
+    remoteZoneAddressingPtr_(NULL),
+    reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    receiveAddrPtr_(NULL),
+    sendAddrPtr_(NULL)
 {}
 
 
@@ -437,6 +659,17 @@ const Foam::labelList& Foam::ggiPolyPatch::zoneAddressing() const
 }
 
 
+const Foam::labelList& Foam::ggiPolyPatch::remoteZoneAddressing() const
+{
+    if (!remoteZoneAddressingPtr_)
+    {
+        calcRemoteZoneAddressing();
+    }
+
+    return *remoteZoneAddressingPtr_;
+}
+
+
 bool Foam::ggiPolyPatch::localParallel() const
 {
     // Calculate patch-to-zone addressing
@@ -483,8 +716,45 @@ const Foam::vectorField& Foam::ggiPolyPatch::reconFaceCellCentres() const
 }
 
 
+void Foam::ggiPolyPatch::initAddressing()
+{
+    if (active())
+    {
+        // Force zone addressing first
+        zoneAddressing();
+        remoteZoneAddressing();
+
+        if (Pstream::parRun() && !localParallel())
+        {
+            sendAddr();
+        }
+    }
+
+    polyPatch::initAddressing();
+}
+
+
+void Foam::ggiPolyPatch::calcAddressing()
+{
+    polyPatch::calcAddressing();
+}
+
+
 void Foam::ggiPolyPatch::initGeometry()
 {
+    // Communication is allowed either before or after processor
+    // patch comms.  HJ, 11/Jul/2011
+    if (active())
+    {
+        calcTransforms();
+
+        // Note: Only master calculates recon; slave uses master interpolation
+        if (master())
+        {
+            reconFaceCellCentres();
+        }
+    }
+
     polyPatch::initGeometry();
 }
 
@@ -497,18 +767,40 @@ void Foam::ggiPolyPatch::calcGeometry()
     // reconFaceCellCentres in order to correctly set the transformation
     // in the interpolation routines.
     // HJ, 3/Jul/2009
-    calcTransforms();
-
-    // Reconstruct the cell face centres
-    if (patchToPatchPtr_ && master())
-    {
-        reconFaceCellCentres();
-    }
 }
 
 
 void Foam::ggiPolyPatch::initMovePoints(const pointField& p)
 {
+    clearGeom();
+
+    // Calculate transforms on mesh motion?
+    calcTransforms();
+
+    // Update interpolation for new relative position of GGI interfaces
+    if (patchToPatchPtr_)
+    {
+        patchToPatchPtr_->movePoints();
+    }
+
+    // Recalculate send and receive maps
+    if (active())
+    {
+        // Force zone addressing first
+        zoneAddressing();
+        remoteZoneAddressing();
+
+        if (Pstream::parRun() && !localParallel())
+        {
+            sendAddr();
+        }
+    }
+
+    if (active() && master())
+    {
+        reconFaceCellCentres();
+    }
+
     polyPatch::initMovePoints(p);
 }
 
@@ -516,7 +808,6 @@ void Foam::ggiPolyPatch::initMovePoints(const pointField& p)
 void Foam::ggiPolyPatch::movePoints(const pointField& p)
 {
     polyPatch::movePoints(p);
-    clearGeom();
 }
 
 

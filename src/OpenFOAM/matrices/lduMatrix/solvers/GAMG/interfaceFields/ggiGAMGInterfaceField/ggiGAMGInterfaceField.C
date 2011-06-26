@@ -107,12 +107,29 @@ void Foam::ggiGAMGInterfaceField::updateInterfaceMatrix
 
     const unallocLabelList& faceCells = ggiInterface_.faceCells();
 
+    // New treatment.  HJ, 26/Jun/2011
+    if (zonePnf.size() != faceCells.size())
+    {
+        FatalErrorIn("ggiGAMGInterfaceField::updateInterfaceMatrix")
+            << "Bananas!!!"
+            << abort(FatalError);
+    }
+
+    forAll(faceCells, elemI)
+    {
+        result[faceCells[elemI]] -= coeffs[elemI]*zonePnf[elemI];
+    }
+
+
+    // Old treatment
+#if(0)
     const labelList& za = ggiInterface_.zoneAddressing();
 
     forAll(faceCells, elemI)
     {
         result[faceCells[elemI]] -= coeffs[elemI]*zonePnf[za[elemI]];
     }
+#endif
 }
 
 

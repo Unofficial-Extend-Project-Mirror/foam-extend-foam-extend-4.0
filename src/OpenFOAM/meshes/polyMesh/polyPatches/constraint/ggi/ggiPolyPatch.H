@@ -85,42 +85,85 @@ class ggiPolyPatch
         //- Patch-to-zone addressing
         mutable labelList* zoneAddressingPtr_;
 
-        //- Is the patch localised on a single processor
-        // (single processor in a parallel run)?
-        //  Used for parallel optimisation
-        mutable bool* localParallelPtr_;
+        //- Remote zone addressing: data needed for interpolation
+        mutable labelList* remoteZoneAddressingPtr_;
 
         //- Reconstructed patch neighbour cell centres
         mutable vectorField* reconFaceCellCentresPtr_;
 
 
+        // Parallel communication optimisation, stored on master processor
+
+            //- Is the patch localised on a single processor
+            // (single processor in a parallel run)?
+            //  Used for parallel optimisation
+            mutable bool* localParallelPtr_;
+
+            //- List of zone faces indices received from each processor
+            mutable labelListList* receiveAddrPtr_;
+
+            //- List of zone faces indices to send to each processor
+            mutable labelListList* sendAddrPtr_;
+
+
     // Private member functions
+
+        //- Is the GGI active& (zone and shadow present)
+        bool active() const;
 
         //- Calculate patch-to-zone addressing
         virtual void calcZoneAddressing() const;
 
+        //- Calculate remote patch-to-zone addressing
+        virtual void calcRemoteZoneAddressing() const;
+
         //- Calculate interpolation
         virtual void calcPatchToPatch() const;
 
-        //- Calculate local parallel switch
-        void calcLocalParallel() const;
 
-        //- Calculate reconstructed cell centres
-        void calcReconFaceCellCentres() const;
+        // Geometry
 
-        //- Force calculation of transformation tensors
-        virtual void calcTransforms();
+            //- Calculate reconstructed cell centres
+            void calcReconFaceCellCentres() const;
 
-        //- Clear geometry
-        void clearGeom();
+            //- Force calculation of transformation tensors
+            virtual void calcTransforms();
 
-        //- Clear out
-        void clearOut();
+
+        // Parallel communication optimisation, stored on master processor
+
+            //- Calculate local parallel switch
+            void calcLocalParallel() const;
+
+            //- Calculate send and receive addressing
+            void calcSendReceive() const;
+
+
+            //- Return receive addressing
+            const labelListList& receiveAddr() const;
+
+            //- Return send addressing
+            const labelListList& sendAddr() const;
+
+
+        // Memory management
+
+            //- Clear geometry
+             void clearGeom();
+
+            //- Clear out
+            void clearOut();
 
 
 protected:
 
     // Protected Member functions
+
+        //- Initialise the calculation of the patch addressing
+        virtual void initAddressing();
+
+        //- Calculate the patch addressing
+        virtual void calcAddressing();
 
         //- Initialise the calculation of the patch geometry
         virtual void initGeometry();
@@ -281,6 +324,9 @@ public:
         //- Return patch-to-zone addressing
         const labelList& zoneAddressing() const;
 
+        //- Return remote patch-to-zone addressing
+        const labelList& remoteZoneAddressing() const;
+
         //- Is the patch localised on a single processor
         bool localParallel() const;
 
@@ -289,12 +335,20 @@ public:
         const ggiZoneInterpolation& patchToPatch() const;
 
         //- Expand face field to full zone size, including reduction
+        //  New.  HJ, 12/Jun/2011
+        template<class Type>
+        tmp<Field<Type> > fastExpand(const Field<Type>& pf) const;
+
+        //- Expand face field to full zone size, including reduction
+        //  Obsolete.  HJ, 12/Jun/2011
         template<class Type>
         tmp<Field<Type> > expand(const Field<Type>& pf) const;
 
         //- Filter zone field to patch size
+        //  Obsolete.  HJ, 12/Jun/2011
         template<class Type>
         tmp<Field<Type> > filter(const Field<Type>& zf) const;
+
 
         //- Interpolate face field: given field on a the shadow side,
         //  create an interpolated field on this side

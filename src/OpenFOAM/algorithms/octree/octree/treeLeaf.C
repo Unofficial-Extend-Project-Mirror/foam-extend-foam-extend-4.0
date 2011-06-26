@@ -334,7 +334,7 @@ template <class Type>
 bool Foam::treeLeaf<Type>::findBox
 (
     const Type& shapes,
-    const boundBox& box,
+    const treeBoundBox& box,
     labelHashSet& elements
 ) const
 {

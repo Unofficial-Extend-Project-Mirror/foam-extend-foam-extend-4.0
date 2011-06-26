@@ -88,7 +88,7 @@ bool Foam::regionCoupleFvPatch::coupled() const
 
 const Foam::fvMesh& Foam::regionCoupleFvPatch::shadowRegion() const
 {
-    return 
+    return
         boundaryMesh().mesh().objectRegistry::parent().lookupObject<fvMesh>
         (
             rcPolyPatch_.shadowRegionName()

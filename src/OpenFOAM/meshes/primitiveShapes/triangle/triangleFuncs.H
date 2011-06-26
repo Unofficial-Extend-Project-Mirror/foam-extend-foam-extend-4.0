@@ -119,7 +119,7 @@ public:
         const treeBoundBox& cubeBb
     );
 
-    //- Does triangle intersect plane. Return bool and set intersection segment.
+    //- Does triangle intersect plane. Return bool and set intersection segment
     static bool intersect
     (
         const point& va0,
@@ -133,7 +133,7 @@ public:
         point& pInter1
     );
 
-    //- Do triangles intersect. Return bool and set intersection segment.
+    //- Do triangles intersect. Return bool and set intersection segment
     static bool intersect
     (
         const point& va0,

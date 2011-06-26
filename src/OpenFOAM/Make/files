@@ -308,6 +308,7 @@ primitiveShapes = meshes/primitiveShapes
 
 $(primitiveShapes)/line/line.C
 $(primitiveShapes)/plane/plane.C
+$(primitiveShapes)/triangle/triangleFuncs.C
 $(primitiveShapes)/triangle/intersection.C
 
 meshShapes = meshes/meshShapes
@@ -495,6 +496,7 @@ $(pointBoundaryMesh)/pointBoundaryMesh.C
 meshes/boundBox/boundBox.C
 
 meshTools = meshes/meshTools
+$(meshTools)/meshTools.C
 $(meshTools)/matchPoints.C
 $(meshTools)/mergePoints.C
 
@@ -563,11 +565,32 @@ $(interpolations)/RBFInterpolation/RBFFunctions/Gauss/Gauss.C
 $(interpolations)/RBFInterpolation/RBFFunctions/TPS/TPS.C
 $(interpolations)/RBFInterpolation/RBFFunctions/IMQB/IMQB.C
 
+
 algorithms/MeshWave/MeshWaveName.C
 algorithms/MeshWave/FaceCellWaveName.C
 algorithms/polygon/clipping/SutherlandHodgman.C
 algorithms/polygon/pointInPolygon/HormannAgathos.C
 algorithms/rotation/RodriguesRotation.C
+
+octree = algorithms/octree/octree
+$(octree)/octreeName.C
+$(octree)/octreeDataPoint.C
+$(octree)/octreeDataPointTreeLeaf.C
+$(octree)/octreeDataEdges.C
+$(octree)/octreeDataCell.C
+$(octree)/octreeDataFace.C
+$(octree)/octreeDataBoundBox.C
+$(octree)/treeBoundBox.C
+$(octree)/treeNodeName.C
+$(octree)/treeLeafName.C
+$(octree)/pointIndexHitIOList.C
+
+indexedOctree = algorithms/octree/indexedOctree
+$(indexedOctree)/indexedOctreeName.C
+$(indexedOctree)/treeDataCell.C
+$(indexedOctree)/treeDataEdge.C
+$(indexedOctree)/treeDataFace.C
+$(indexedOctree)/treeDataPoint.C
 
 graph/curve/curve.C
 graph/graph.C

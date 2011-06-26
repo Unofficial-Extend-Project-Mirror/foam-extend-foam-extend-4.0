@@ -87,7 +87,11 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
 
     if (debug)
     {
-        Info << "Evaluation of GGI weighting factors:" << endl;
+        InfoIn
+        (
+            "void GGIInterpolation<MasterPatch, SlavePatch>::"
+            "calcAddressing() const"
+        )   << "Evaluation of GGI weighting factors:" << endl;
     }
 
     // Create the dynamic lists to hold the addressing
@@ -112,13 +116,18 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
     // The candidates master neighbours
     // Choice of algorithm:
     // 1) Axis-aligned bounding box
-    // 2) 3-D vector distance
-    // 3) n-Squared search
+    // 2) Octree search with bounding box
+    // 3) 3-D vector distance
+    // 4) n-Squared search
     labelListList candidateMasterNeighbors;
 
     if (reject_ == AABB)
     {
          findNeighboursAABB(candidateMasterNeighbors);
+    }
+    else if (reject_ == BB_OCTREE)
+    {
+         findNeighboursBBOctree(candidateMasterNeighbors);
     }
     else if (reject_ == THREE_D_DISTANCE)
     {
@@ -160,7 +169,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
 
     // Tolerance factor for the Separation of Axes Theorem == distErrorTol_
 
-    forAll(masterPatch_, faceMi)
+    forAll (masterPatch_, faceMi)
     {
         // First, we make sure that all the master faces points are
         // recomputed onto the 2D plane defined by the master faces
@@ -500,7 +509,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
 // other.  A good case: the ercoftac conical diffuser, Case0...  GGI
 // located right between the cylindrical and conical parts, rotate the
 // cylindrical by 15 degrees.  For this case, we will need to devise a
-// decent strategy in order to intelligently take care of this
+// decent strategy in order to intelligently take care of these
 // "missing weights"
 //
 // The purpose of the ::rescaleWeightingFactors() method is mainly for
@@ -537,7 +546,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::rescaleWeightingFactors() const
             << " on slave: " << uncoveredSlaveFaces().size() << endl;
     }
 
-    forAll(saW, saWi)
+    forAll (saW, saWi)
     {
         scalar slaveWeightSum = Foam::sum(saW[saWi]);
 
@@ -584,6 +593,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::rescaleWeightingFactors() const
     }
 }
 
+
 // Find non-overlapping faces from both master and slave patches
 // The default non-overlapping criteria is total absence of neighbours.
 // Later on, ths criteria will be based on minimum surface intersection, or
@@ -602,7 +612,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::findNonOverlappingFaces
     DynamicList<label> patchFaceNonOverlap(patchWeights.size());
 
     // Scan the list of patch weights, looking for empty lists
-    forAll(patchWeights, paWi)
+    forAll (patchWeights, paWi)
     {
         scalar sumWeightsFace = sum(patchWeights[paWi]);
 

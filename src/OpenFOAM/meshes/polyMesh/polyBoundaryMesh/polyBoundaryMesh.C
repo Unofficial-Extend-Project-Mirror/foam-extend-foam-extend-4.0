@@ -144,6 +144,19 @@ void Foam::polyBoundaryMesh::clearAddressing()
 
 void Foam::polyBoundaryMesh::calcGeometry()
 {
+    // Calculation of addressing, with communication
+    // HJ, 12/Jun/2011
+    forAll(*this, patchi)
+    {
+        operator[](patchi).initAddressing();
+    }
+
+    forAll(*this, patchi)
+    {
+        operator[](patchi).calcAddressing();
+    }
+
+    // Calculation of geometry with communications
     forAll(*this, patchi)
     {
         operator[](patchi).initGeometry();

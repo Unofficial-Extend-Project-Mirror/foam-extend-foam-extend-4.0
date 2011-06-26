@@ -279,7 +279,7 @@ public:
         //- Am I the master process
         static bool master()
         {
-            return myProcNo_ == 0;
+            return myProcNo_ == masterNo();
         }
 
         //- Process index of the master

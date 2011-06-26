@@ -34,11 +34,44 @@ Author
 #include "boundBox.H"
 #include "plane.H"
 #include "transformField.H"
+#include "octree.H"
+#include "octreeDataBoundBox.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+template<class MasterPatch, class SlavePatch>
+const scalar
+GGIInterpolation<MasterPatch, SlavePatch>::faceBoundBoxExtendSpanFraction_
+(
+    debug::tolerances("GGIFaceBoundBoxExtendSpanFraction", 1.0e-2)
+);
+
+template<class MasterPatch, class SlavePatch>
+const label
+ GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMinNLevel_
+(
+    debug::optimisationSwitch("GGIOctreeSearchMinNLevel", 3)
+);
+
+template<class MasterPatch, class SlavePatch>
+const scalar
+GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMaxLeafRatio_
+(
+    debug::optimisationSwitch("GGIOctreeSearchMaxLeafRatio", 3)
+);
+
+template<class MasterPatch, class SlavePatch>
+const scalar
+GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMaxShapeRatio_
+(
+    debug::optimisationSwitch("GGIOctreeSearchMaxShapeRatio", 1)
+);
+
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -382,6 +415,148 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursAABB
     }
 }
 
+// This algorithm find the faces in proximity of another face based
+// on the face BB (Bounding Box) and an octree of bounding boxes.
+template<class MasterPatch, class SlavePatch>
+void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
+(
+    labelListList& result
+) const
+{
+    List<DynamicList<label> > candidateMasterNeighbors(masterPatch_.size());
+
+    // Initialize the list of master patch faces bounding box
+    treeBoundBoxList lmasterFaceBB(masterPatch_.size());
+
+    forAll (masterPatch_, faceMi)
+    {
+        pointField facePoints
+        (
+            masterPatch_[faceMi].points(masterPatch_.points())
+        );
+
+        // Construct face BB with an extension of face span defined by the
+        //  global tolerance factor faceBoundBoxExtendSpanFraction_
+        // (1% by default)
+        treeBoundBox bbFaceMaster(facePoints);
+
+        lmasterFaceBB[faceMi] =
+            bbFaceMaster.extend(faceBoundBoxExtendSpanFraction_);
+    }
+
+    // Initialize the list of slave patch faces bounding box
+    treeBoundBoxList lslaveFaceBB(slavePatch_.size());
+
+    forAll (slavePatch_, faceSi)
+    {
+        pointField facePoints
+        (
+            slavePatch_[faceSi].points(slavePatch_.points())
+        );
+
+        // possible transformation and separation for cyclic patches
+        if (doTransform())
+        {
+            if (forwardT_.size() == 1)
+            {
+                transform(facePoints, forwardT_[0], facePoints);
+            }
+            else
+            {
+                transform(facePoints, forwardT_[faceSi], facePoints);
+            }
+        }
+
+        if (doSeparation())
+        {
+            if (forwardSep_.size() == 1)
+            {
+                facePoints += forwardSep_[0];
+            }
+            else
+            {
+                facePoints += forwardSep_[faceSi];
+            }
+        }
+
+        // Construct face BB with an extension of face span defined by the
+        //  global tolerance factor faceBoundBoxExtendSpanFraction_
+        // (1% by default)
+        treeBoundBox bbFaceSlave(facePoints);
+
+        lslaveFaceBB[faceSi] =
+            bbFaceSlave.extend(faceBoundBoxExtendSpanFraction_);
+    }
+
+    // Create the slave octreeData, using the boundBox flavor
+    octreeDataBoundBox slaveDataBB(lslaveFaceBB);
+
+    // Overall slave patch BB
+    treeBoundBox slaveOverallBB(slavePatch_.points());
+
+    // Create the slave patch octree
+
+    octree<octreeDataBoundBox> slavePatchOctree
+    (
+        slaveOverallBB,              // overall search domain
+        slaveDataBB,
+        octreeSearchMinNLevel_,      // min number of levels
+        octreeSearchMaxLeafRatio_,   // max avg. size of leaves
+        octreeSearchMaxShapeRatio_   // max avg. duplicity.
+    );
+
+    const vectorField& masterFaceNormals = masterPatch_.faceNormals();
+    vectorField slaveNormals = slavePatch_.faceNormals();
+
+    // Transform slave normals to master plane if needed
+    if (doTransform())
+    {
+        if (forwardT_.size() == 1)
+        {
+            transform(slaveNormals, forwardT_[0], slaveNormals);
+        }
+        else
+        {
+            transform(slaveNormals, forwardT_, slaveNormals);
+        }
+    }
+
+    // Visit each master patch face BB and find the potential neighbours
+    // using the slave patch octree
+
+    forAll (lmasterFaceBB, faceMi)
+    {
+        // List of candidate neighbours
+        labelList overlappedFaces  =
+            slavePatchOctree.findBox(lmasterFaceBB[faceMi]);
+
+        forAll (overlappedFaces, ovFi)
+        {
+            label faceSi = overlappedFaces[ovFi];
+
+            // Compute and verify featureCos between the two face normals
+            // before adding to the list of candidates
+            scalar featureCos =
+                masterFaceNormals[faceMi] & slaveNormals[faceSi];
+
+            if (mag(featureCos) > featureCosTol_)
+            {
+                candidateMasterNeighbors[faceMi].append(faceSi);
+            }
+        }
+    }
+
+    // Repack the list
+    result.setSize(masterPatch_.size());
+
+    forAll (result, i)
+    {
+        result[i].transfer(candidateMasterNeighbors[i].shrink());
+    }
+
+    return;
+}
+
 
 
 // Projects a list of points onto a plane located at planeOrig,
@@ -434,7 +609,7 @@ tmp<pointField> GGIInterpolation<MasterPatch, SlavePatch>::projectPointsOnPlane
 // Compute an orthonormal basis (u, v, w) where: w is aligned on the
 // normalVector u is the direction from normalVectorCentre to the most
 // distant point in the list pointsOnPlane v = w^u
-// 
+//
 // Everything is normalized
 template<class MasterPatch, class SlavePatch>
 typename GGIInterpolation<MasterPatch, SlavePatch>::orthoNormalBasis
@@ -447,9 +622,9 @@ GGIInterpolation<MasterPatch, SlavePatch>::computeOrthonormalBasis
 {
     // The orthonormal basis uvw
     orthoNormalBasis uvw;
-   
-    vector u = pTraits<vector>::zero; 
-    vector v = pTraits<vector>::zero; 
+
+    vector u = pTraits<vector>::zero;
+    vector v = pTraits<vector>::zero;
     vector w = normalVector;
 
     // Normalized w
@@ -473,12 +648,12 @@ GGIInterpolation<MasterPatch, SlavePatch>::computeOrthonormalBasis
     u /= mag(u) + VSMALL;
 
     // Compute v from u and w
-    v = w ^ u;    // v = w^u; 
+    v = w ^ u;    // v = w^u;
 
     // We got ourselves a new orthonormal basis to play with
-    uvw[0] = u; 
-    uvw[1] = v; 
-    uvw[2] = w; 
+    uvw[0] = u;
+    uvw[1] = v;
+    uvw[2] = w;
 
     return uvw;
 }
@@ -498,7 +673,7 @@ List<point2D> GGIInterpolation<MasterPatch, SlavePatch>::projectPoints3Dto2D
 {
     List<point2D> pointsIn2D(pointsIn3D.size());
     scalarField  dist(pointsIn3D.size(), 0.0);
-    
+
     pointField pointsIn3DTranslated = pointsIn3D - orthoBaseOffset;
 
     // Project onto the uv plane. The distance from the plane is
@@ -511,7 +686,7 @@ List<point2D> GGIInterpolation<MasterPatch, SlavePatch>::projectPoints3Dto2D
 
         // v component
         pointsIn2D[pointsI][1] =
-            pointsIn3DTranslated[pointsI] & orthoBase[1]; 
+            pointsIn3DTranslated[pointsI] & orthoBase[1];
 
         // w component = error above projection plane
         dist[pointsI] = pointsIn3DTranslated[pointsI] & orthoBase[2];
@@ -548,7 +723,7 @@ scalarField GGIInterpolation<MasterPatch, SlavePatch>::projectPoints2Dto1D
 // Polygon overlap or polygon collision detection using the Separating
 // Axes Theorem.  We expect this algorithm to possibly call himself a
 // second time: code needs to be re-entrant!!!
-// 
+//
 // First time it is called, we test polygon2 agains each edges of
 // polygon1 If we still detect an overlap, then the algorith will call
 // itself to test polygon1 against polygon2 in order to find a possibe
@@ -579,7 +754,7 @@ bool GGIInterpolation<MasterPatch, SlavePatch>::detect2dPolygonsOverlap
         point2D origEdge1 = poly1[iend1];
 
         // normalPerpDirection1 & curEdge1 == 0
-        vector2D normalPerpDirection1(curEdge1[1], - curEdge1[0]); 
+        vector2D normalPerpDirection1(curEdge1[1], - curEdge1[0]);
 
         // Normalize
         normalPerpDirection1 /= mag(normalPerpDirection1) + VSMALL;
@@ -614,38 +789,38 @@ bool GGIInterpolation<MasterPatch, SlavePatch>::detect2dPolygonsOverlap
         //    P2 ------------- 
         //
         //    P2 -------------                       p1_min + epsilon < p2_max  &&  p2_min + epsilon < p1_max  == true
-        //    P1 ------------- 
+        //    P1 -------------
         //
         //
         //    P1  -------------                      p1_min + epsilon < p2_max  &&  p2_min + epsilon < p1_max  == true
-        //         P2  ---- 
+        //         P2  ----
         //
-        //         P1  ---- 
+        //         P1  ----
         //    P2  -------------                      p1_min + epsilon < p2_max  &&  p2_min + epsilon < p1_max  == true
         //
         //
         //    P1  -------------                      p1_min + epsilon < p2_max  &&  p2_min + epsilon < p1_max  == true
-        //              P2  --------- 
+        //              P2  ---------
         //
         //    P2  -------------                      p1_min + epsilon < p2_max  &&  p2_min + epsilon < p1_max  == true
-        //              P1  --------- 
+        //              P1  ---------
         //
         //
         //                        P1 -------------   p1_min + epsilon < p2_max  &&  p2_min + epsilon < p1_max  == false
-        //    P2  -------------        
+        //    P2  -------------
         //
         //
         //                        P2 -------------   p1_min + epsilon < p2_max  &&  p2_min + epsilon < p1_max  == false
-        //    P1  -------------        
+        //    P1  -------------
         //
         //
         //
-        //    P1  -------------                      p1_min + epsilon < p2_max  &&  p2_min + epsilon < p1_max  == false 
-        //                     ------------- P2       
+        //    P1  -------------                      p1_min + epsilon < p2_max  &&  p2_min + epsilon < p1_max  == false
+        //                     ------------- P2
         //
         //
-        //    P2  -------------                      p1_min + epsilon < p2_max  &&  p2_min + epsilon < p1_max  == false 
-        //                     ------------- P1       
+        //    P2  -------------                      p1_min + epsilon < p2_max  &&  p2_min + epsilon < p1_max  == false
+        //                     ------------- P1
         //
         //
         //
@@ -658,14 +833,14 @@ bool GGIInterpolation<MasterPatch, SlavePatch>::detect2dPolygonsOverlap
         // This means that epsilon^2 is roughly the size of the minimal
         // surface area intersecting the 2 polygons that one accept to
         // discard.
-        // 
+        //
         // So, if for instance we fix epsilon = 10e-3 * min
         // (range_of_polygon1, range_of_polygon2), this means that we
         // accept to discard an intersecting area roughly 10e-6 times the
         // surface of the smallest polygon, so 1 PPM.
         //
-        // Which means also that our GGI weighting factors will never be smaller
-        // than roughly 10e-6, because this is the fraction of
+        // Which means also that our GGI weighting factors will never be
+        //  smaller than roughly 10e-6, because this is the fraction of
         // the intersection surface area we choose to discard.
 
         scalar _epsilon = tolFactor*
@@ -687,15 +862,17 @@ bool GGIInterpolation<MasterPatch, SlavePatch>::detect2dPolygonsOverlap
         }
     }
 
-    if (isOverlapping && firstCall) 
+    if (isOverlapping && firstCall)
     {
         // We have not found any separating axes by exploring from
         // poly1, let's switch by exploring from poly2 instead
-        isOverlapping = detect2dPolygonsOverlap(poly2, poly1, tolFactor, false);
+        isOverlapping =
+            detect2dPolygonsOverlap(poly2, poly1, tolFactor, false);
     }
 
     return isOverlapping;
 }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

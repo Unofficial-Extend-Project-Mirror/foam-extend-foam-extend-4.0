@@ -36,7 +36,7 @@ Description
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template <class Type>
-const Foam::label Foam::treeNode<Type>::leafOffset =100;
+const Foam::label Foam::treeNode<Type>::leafOffset = 100;
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -764,7 +764,7 @@ bool Foam::treeNode<Type>::findTightest
     // Estimate for best place to start searching
     label sampleOctant = this->bb().subOctant(midpoint(), sample, onEdge);
 
-    // Go into all suboctants (one containing sample first) and update tightest.
+    // Go into all suboctants (one containing sample first) and update tightest
     // Order of visiting is if e.g. sampleOctant = 5:
     //  5 1 2 3 4 0 6 7
     for (label octantI=0; octantI<8; octantI++)
@@ -846,7 +846,7 @@ bool Foam::treeNode<Type>::findNearest
     // Estimate for best place to start searching
     label sampleOctant = this->bb().subOctant(midpoint(), sample, onEdge);
 
-    // Go into all suboctants (one containing sample first) and update tightest.
+    // Go into all suboctants (one containing sample first) and update tightest
     // Order of visiting is if e.g. sampleOctant = 5:
     //  5 1 2 3 4 0 6 7
     for (label octantI=0; octantI<8; octantI++)
@@ -1004,7 +1004,7 @@ template <class Type>
 bool Foam::treeNode<Type>::findBox
 (
     const Type& shapes,
-    const boundBox& box,
+    const treeBoundBox& box,
     labelHashSet& elements
 ) const
 {
@@ -1018,7 +1018,7 @@ bool Foam::treeNode<Type>::findBox
         onEdge
     );
 
-    // Go into all suboctants (one containing sample first) and update tightest.
+    // Go into all suboctants (one containing sample first) and update tightest
     // Order of visiting is if e.g. sampleOctant = 5:
     //  5 1 2 3 4 0 6 7
     for (label octantI=0; octantI<8; octantI++)

@@ -77,8 +77,8 @@ bool Foam::treeDataPoint::overlaps
 }
 
 
-// Calculate nearest point to sample. Updates (if any) nearestDistSqr, minIndex,
-// nearestPoint.
+// Calculate nearest point to sample. Updates (if any) nearestDistSqr,
+//  minIndex, nearestPoint.
 void Foam::treeDataPoint::findNearest
 (
     const labelList& indices,

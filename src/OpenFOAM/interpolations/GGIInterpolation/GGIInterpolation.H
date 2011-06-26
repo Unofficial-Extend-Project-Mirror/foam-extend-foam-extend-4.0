@@ -85,6 +85,7 @@ public:
         {
             THREE_D_DISTANCE,
             AABB,
+            BB_OCTREE,
             N_SQUARED
         };
 
@@ -192,6 +193,39 @@ class GGIInterpolation
         //- Facet normal featureCos criteria
         static const scalar featureCosTol_;
 
+       //- Facet bound box extension factor
+       static const scalar faceBoundBoxExtendSpanFraction_;
+
+       //- The next 3 attributes are parameters controlling the creation
+       //  of an octree search engine for the GGI facets neighbourhood
+       //  determination.
+       //
+       //  Tests using GGI patches of up to ~100K facets have shown that
+       //  the following values gave the best compromise between the
+       //  "octree creation time" vs "octree search time":
+       //
+       //     octreeSearchMinNLevel_     : 3
+       //     octreeSearchMaxLeafRatio_  : 3
+       //     octreeSearchMaxShapeRatio_ : 1
+       //
+       //  For GGI patches larger than ~100K facets, your mileage may vary.
+       //  So these 3 control parameters are adjustable using the following
+       //  global optimization switches:
+       //
+       //     GGIOctreeSearchMinNLevel
+       //     GGIOctreeSearchMaxLeafRatio
+       //     GGIOctreeSearchMaxShapeRatio
+       //
+
+       //- Octree search: minNlevel parameter for octree constructor
+       static const label octreeSearchMinNLevel_;
+
+       //- Octree search: maxLeafRatio parameter for octree constructor
+       static const scalar octreeSearchMaxLeafRatio_;
+
+       //- Octree search: maxShapeRatio parameter for octree constructor
+       static const scalar octreeSearchMaxShapeRatio_;
+
 
     // Private Member Functions
 
@@ -209,6 +243,10 @@ class GGIInterpolation
 
         //- Evaluate faces neighborhood based of faces Axis Aligned BB
         void findNeighboursAABB(labelListList& result) const;
+
+        //- Evaluate faces neighborhood based of faces BB and an octree
+        //  search engine
+        void findNeighboursBBOctree(labelListList& result) const;
 
         //- Projects a list of points onto a plane located at
         //  planeOrig, oriented along planeNormal
@@ -326,12 +364,35 @@ class GGIInterpolation
             const scalarListList& weights
         );
 
+        //- Interpolate given source and target, addressing and weights
+        //  for masked faces only
+        template<class Type>
+        static void maskedInterpolate
+        (
+            const Field<Type>& ff,
+            Field<Type>& result,
+            const labelList& mask,
+            const labelListList& addr,
+            const scalarListList& weights
+        );
+
         //- Bridge uncovered faces given addressing
         template<class Type>
         static void bridge
         (
             const Field<Type>& bridgeField,
             Field<Type>& ff,
+            const labelList& addr
+        );
+
+        //- Bridge uncovered faces given addressing
+        //  for masked faces only
+        template<class Type>
+        static void maskedBridge
+        (
+            const Field<Type>& bridgeField,
+            Field<Type>& ff,
+            const labelList& mask,
             const labelList& addr
         );
 
@@ -360,8 +421,8 @@ public:
             const tensorField& forwardT,
             const tensorField& reverseT,
             const vectorField& forwardSep,
-            const scalar masterFaceNonOverlapFaceTol = 0.0,
-            const scalar slaveFaceNonOverlapFaceTol = 0.0,
+            const scalar masterFaceNonOverlapFaceTol = 0,
+            const scalar slaveFaceNonOverlapFaceTol = 0,
             const bool rescaleGGIWeightingFactors = true,
             const quickReject reject = AABB
         );
@@ -399,22 +460,45 @@ public:
 
         //- Interpolate from master to slave
         template<class Type>
-        tmp<Field<Type> > masterToSlave(const Field<Type>& pf) const;
+        tmp<Field<Type> > masterToSlave(const Field<Type>& ff) const;
 
         template<class Type>
         tmp<Field<Type> > masterToSlave
         (
-            const tmp<Field<Type> >& tpf
+            const tmp<Field<Type> >& tff
         ) const;
+
+        //- Interpolate from master to slave, only for marked master faces
+        //  Addressing picks the faces from patch that are selected
+        //  for collection into the result field
+        template<class Type>
+        void maskedMasterToSlave
+        (
+            const Field<Type>& ff,
+            Field<Type>& result,
+            const labelList& mask
+        ) const;
+
 
         //- Interpolate from slave to master
         template<class Type>
-        tmp<Field<Type> > slaveToMaster(const Field<Type>& pf) const;
+        tmp<Field<Type> > slaveToMaster(const Field<Type>& ff) const;
 
         template<class Type>
         tmp<Field<Type> > slaveToMaster
         (
-            const tmp<Field<Type> >& tpf
+            const tmp<Field<Type> >& tff
+        ) const;
+
+        //- Interpolate from slave to master, only for marked slave faces
+        //  Addressing picks the faces from patch that are selected
+        //  for collection into the result field
+        template<class Type>
+        void maskedSlaveToMaster
+        (
+            const Field<Type>& ff,
+            Field<Type>& result,
+            const labelList& mask
         ) const;
 
 
@@ -426,12 +510,30 @@ public:
             Field<Type>& ff
         ) const;
 
+        //- Bridge uncovered master patch field, only for marked master faces
+        template<class Type>
+        void maskedBridgeMaster
+        (
+            const Field<Type>& bridgeField,
+            Field<Type>& ff,
+            const labelList& mask
+        ) const;
+
         //- Bridge uncovered slave patch field
         template<class Type>
         void bridgeSlave
         (
             const Field<Type>& bridgeField,
             Field<Type>& ff
+        ) const;
+
+        //- Bridge uncovered slave patch field, only for marked slave faces
+        template<class Type>
+        void maskedBridgeSlave
+        (
+            const Field<Type>& bridgeField,
+            Field<Type>& ff,
+            const labelList& mask
         ) const;
 
 

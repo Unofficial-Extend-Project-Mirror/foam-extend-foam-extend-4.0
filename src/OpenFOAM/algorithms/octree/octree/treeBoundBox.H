@@ -255,18 +255,18 @@ public:
             //  second the octant with boundary nearest to the point etc.
             inline void searchOrder
             (
-	         const point& pt,
+                const point& pt,
                  FixedList<direction, 8>& octantOrder
             ) const;
 
             //- Overlaps other boundingbox?
-            inline bool overlaps(const treeBoundBox&) const;
+            inline bool overlaps(const boundBox&) const;
 
             //- Overlaps boundingSphere (centre + sqr(radius))?
             bool overlaps(const point&, const scalar radiusSqr) const;
 
-            //- Intersects segment; set point to intersection position and face,
-            //  return true if intersection found.
+            //- Intersects segment; set point to intersection position and face
+            //  Will return true if intersection found.
             //  (pt argument used during calculation even if not intersecting).
             //  Calculates intersections from outside supplied vector
             //  (overallStart, overallVec). This is so when
@@ -332,6 +332,12 @@ public:
             //  Extends all dimensions with s*span*Random::scalar01()
             //  and guarantees in any direction s*mag(span) minimum width
             inline treeBoundBox extend(Random&, const scalar s) const;
+
+            //- Return slightly wider bounding box
+            //  Extends all dimensions with s*span
+            //  MB, 28/May/2011
+            inline treeBoundBox extend(const scalar s) const;
+
 
     // Friend Operators
 

@@ -69,6 +69,18 @@ class ggiGAMGInterface
         labelList zoneAddressing_;
 
 
+        // Parallel communication optimisation, stored on master processor
+
+            //- Has reduce been initialised?
+            mutable bool initReduce_;
+
+            //- List of zone faces indices received from each processor
+            mutable labelListList receiveAddr_;
+
+            //- List of zone faces indices to send to each processor
+            mutable labelListList sendAddr_;
+
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -77,8 +89,19 @@ class ggiGAMGInterface
         //- Disallow default bitwise assignment
         void operator=(const ggiGAMGInterface&);
 
+
+        //- Init fast reduce
+        void initFastReduce() const;
+
+        //- Fast reduce
+        //  Note: contains global communications
+        //  New, HJ, 24/Jun/2011
+        template<class Type>
+        tmp<Field<Type> > fastReduce(const UList<Type>&) const;
+
         //- Expand data to zone size
         //  Note: contains global reduce.  HJ, 15/May/2009
+        //  Obsolete.  HJ, 24/Jun/2011
         template<class Type>
         tmp<Field<Type> > expand(const UList<Type>&) const;
 

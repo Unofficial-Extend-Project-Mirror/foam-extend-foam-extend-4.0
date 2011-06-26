@@ -28,26 +28,193 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "ggiPolyPatch.H"
+#include "OSspecific.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+// New.  HJ, 12/Jun/2011
 template<class Type>
-Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::expand
+Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
 (
-    const Field<Type>& pf
+    const Field<Type>& ff
 ) const
 {
     // Check and expand the field from patch size to zone size
-    if (pf.size() != size())
+    // with communication
+
+    // Algorithm:
+    // 1) Master processor holds maps of all zone addressing (data provided)
+    // and all remote zone addressing (data required)
+    // 2) Each processor will send the locally active data to the master
+    // 3) Master assembles all the data
+    // 4) Master sends to all processors the data they need to receive
+    //
+    // Notes:
+    // A) If the size of zone addressing is zero, data is not sent
+    // B) Communicated data on each processor has the size of live faces
+    // C) Expanded data will be equal to actual data fronm other processors
+    //    only for the faces marked in remote; for other faces, it will be
+    //    equal to zero
+    // D) On processor zero, complete data is available
+    // HJ, 4/Jun/2011
+    if (ff.size() != size())
+    {
+        FatalErrorIn
+        (
+            "tmp<Field<Type> > ggiPolyPatch::fastExpand"
+            "("
+            "    const Field<Type>& ff"
+            ") const"
+        )   << "Incorrect patch field size.  Field size: "
+            << ff.size() << " patch size: " << size()
+            << abort(FatalError);
+    }
+
+    if (localParallel())
+    {
+        FatalErrorIn
+        (
+            "tmp<Field<Type> > ggiPolyPatch::fastExpand"
+            "("
+            "    const Field<Type>& ff"
+            ") const"
+        )   << "Requested expand on local parallel.  This is not allowed"
+            << abort(FatalError);
+    }
+
+    // Expand the field to zone size
+    tmp<Field<Type> > texpandField
+    (
+        new Field<Type>(zone().size(), pTraits<Type>::zero)
+    );
+
+    Field<Type>& expandField = texpandField();
+
+    if (Pstream::master())
+    {
+        // Insert master processor
+        const labelList& za = zoneAddressing();
+
+        forAll (za, i)
+        {
+            expandField[za[i]] = ff[i];
+        }
+
+        // Master receives and inserts data from all processors for which
+        // receiveAddr contains entries
+        for (label procI = 1; procI < Pstream::nProcs(); procI++)
+        {
+            const labelList& curRAddr = receiveAddr()[procI];
+
+            if (!curRAddr.empty())
+            {
+                Field<Type> receiveBuf(curRAddr.size());
+
+                // Opt: reconsider mode of communication
+                IPstream::read
+                (
+                    Pstream::blocking,
+                    procI,
+                    reinterpret_cast<char*>(receiveBuf.begin()),
+                    receiveBuf.byteSize()
+                );
+
+                // Insert received information
+                forAll (curRAddr, i)
+                {
+                    expandField[curRAddr[i]] = receiveBuf[i];
+                }
+            }
+        }
+
+        // Expanded field complete, send required data to other processors
+        for (label procI = 1; procI < Pstream::nProcs(); procI++)
+        {
+            const labelList& curSAddr = sendAddr()[procI];
+
+            if (!curSAddr.empty())
+            {
+                Field<Type> sendBuf(curSAddr.size());
+
+                forAll (curSAddr, i)
+                {
+                    sendBuf[i] = expandField[curSAddr[i]];
+                }
+
+                // Opt: reconsider mode of communication
+                OPstream::write
+                (
+                    Pstream::blocking,
+                    procI,
+                    reinterpret_cast<const char*>(sendBuf.begin()),
+                    sendBuf.byteSize()
+                );
+            }
+        }
+    }
+    else
+    {
+        // Send local data to master and receive remote data
+        // If patch is empty, communication is avoided
+        // HJ, 4/Jun/2011
+        if (size())
+        {
+            // Opt: reconsider mode of communication
+            OPstream::write
+            (
+                Pstream::blocking,
+                Pstream::masterNo(),
+                reinterpret_cast<const char*>(ff.begin()),
+                ff.byteSize()
+            );
+        }
+
+        // Prepare to receive remote data
+        const labelList& rza = remoteZoneAddressing();
+
+        if (!rza.empty())
+        {
+            Field<Type> receiveBuf(rza.size());
+
+            // Opt: reconsider mode of communication
+            IPstream::read
+            (
+                Pstream::blocking,
+                Pstream::masterNo(),
+                reinterpret_cast<char*>(receiveBuf.begin()),
+                receiveBuf.byteSize()
+            );
+
+            // Insert the data into expanded field
+            forAll (rza, i)
+            {
+                expandField[rza[i]] = receiveBuf[i];
+            }
+        }
+    }
+
+    return texpandField;
+}
+
+
+// Obsolete.  HJ, 12/Jun/2011
+template<class Type>
+Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::expand
+(
+    const Field<Type>& ff
+) const
+{
+    // Check and expand the field from patch size to zone size
+    if (ff.size() != size())
     {
         FatalErrorIn
         (
             "tmp<Field<Type> > ggiPolyPatch::expand"
             "("
-            "    const Field<Type>& pf"
+            "    const Field<Type>& ff"
             ") const"
         )   << "Incorrect patch field size.  Field size: "
-            << pf.size() << " patch size: " << size()
+            << ff.size() << " patch size: " << size()
             << abort(FatalError);
     }
 
@@ -63,7 +230,7 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::expand
 
     forAll (addr, i)
     {
-        expandField[addr[i]] = pf[i];
+        expandField[addr[i]] = ff[i];
     }
 
     // Parallel data exchange: update surface field on all processors
@@ -79,6 +246,7 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::expand
 }
 
 
+// Obsolete.  HJ, 12/Jun/2011
 template<class Type>
 Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::filter
 (
@@ -121,25 +289,82 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::filter
 template<class Type>
 Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::interpolate
 (
-    const Field<Type>& pf
+    const Field<Type>& ff
 ) const
 {
     // Check and expand the field from patch size to zone size
-    if (pf.size() != shadow().size())
+    if (ff.size() != shadow().size())
     {
         FatalErrorIn
         (
             "tmp<Field<Type> > ggiPolyPatch::interpolate"
             "("
-            "    const Field<Type>& pf"
+            "    const Field<Type>& ff"
             ") const"
         )   << "Incorrect slave patch field size.  Field size: "
-            << pf.size() << " patch size: " << shadow().size()
+            << ff.size() << " patch size: " << shadow().size()
             << abort(FatalError);
     }
 
+#   if 1
+
+    // New.  HJ, 12/Jun/2011
+    if (localParallel())
+    {
+        // No expansion or filtering needed.  HJ, 4/Jun/2011
+
+        // Interpolate field
+        if (master())
+        {
+            return patchToPatch().slaveToMaster(ff);
+        }
+        else
+        {
+            return patchToPatch().masterToSlave(ff);
+        }
+    }
+    else
+    {
+        // Note: fast expand is always done on the local side
+        // HJ, 24/Jun/2011
+        Field<Type> expandField = fastExpand(ff);
+
+        tmp<Field<Type> > tresult(new Field<Type>(size()));
+        Field<Type>& result = tresult();
+
+        if (master())
+        {
+            patchToPatch().maskedSlaveToMaster
+            (
+                expandField,
+                result,
+                zoneAddressing()
+            );
+        }
+        else
+        {
+            patchToPatch().maskedMasterToSlave
+            (
+                expandField,
+                result,
+                zoneAddressing()
+            );
+        }
+
+        return tresult;
+    }
+
+#   else
+
+    // Old treatment
+    // Obsolete.  HJ, 12/Jun/2011
+
     // Expand the field to zone size
-    Field<Type> expandField = shadow().expand(pf);
+    // Note: with full fields it is the shadow side that does
+    // the expand.  This is different than fastExpand because
+    // the addressing is stored remotely.
+    // HJ, 24/Jun/2011
+    Field<Type> expandField = shadow().expand(ff);
 
     Field<Type> zoneField;
 
@@ -154,17 +379,19 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::interpolate
     }
 
     return this->filter(zoneField);
+
+#   endif
 }
 
 
 template<class Type>
 Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::interpolate
 (
-    const tmp<Field<Type> >& tpf
+    const tmp<Field<Type> >& tff
 ) const
 {
-    tmp<Field<Type> > tint = interpolate(tpf());
-    tpf.clear();
+    tmp<Field<Type> > tint = interpolate(tff());
+    tff.clear();
     return tint;
 }
 
@@ -178,7 +405,43 @@ void Foam::ggiPolyPatch::bridge
 {
     if (bridgeOverlap())
     {
-        // Parallelisation
+#       ifdef FAST_PARALLEL_GGI
+
+        if (localParallel())
+        {
+            if (master())
+            {
+                patchToPatch().bridgeMaster(bridgeField, ff);
+            }
+            else
+            {
+                patchToPatch().bridgeSlave(bridgeField, ff);
+            }
+        }
+        else
+        {
+            // Note: since bridging is only a local operation
+            if (master())
+            {
+                patchToPatch().maskedBridgeMaster
+                (
+                    bridgeField,
+                    ff,
+                    zoneAddressing()
+                );
+            }
+            else
+            {
+                patchToPatch().maskedBridgeSlave
+                (
+                    bridgeField,
+                    ff,
+                    zoneAddressing()
+                );
+            }
+        }
+
+#       else
 
         // Expand the field to zone size
         Field<Type> expandBridge = this->expand(bridgeField);
@@ -200,15 +463,8 @@ void Foam::ggiPolyPatch::bridge
         {
             ff[i] = expandField[addr[i]];
         }
-    }
-    else
-    {
-        // HJ, temporary
-        InfoIn
-        (
-            "void bridge(const Field<Type>& bridgeField, "
-            "Field<Type>& ff) const"
-        )   << "Bridging is switched off " << endl;
+
+#       endif
     }
 }
 

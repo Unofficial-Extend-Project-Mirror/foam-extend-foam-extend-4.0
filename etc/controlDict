@@ -471,7 +471,7 @@ DebugSwitches
     genericPatch        0;
     geomCellLooper      0;
     geometricSurfacePatch   0;
-    ggi                 0;
+    GGIInterpolation    0;
     global              0;
     globalMeshData      0;
     globalPoints        0;

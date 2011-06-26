@@ -203,7 +203,7 @@ void Foam::mixerGgiFvMesh::calcMovingMasks() const
     forAll (staticPatches, patchI)
     {
         const label staticSliderID =
-            boundaryMesh().findPatchID(movingPatches[patchI]);
+            boundaryMesh().findPatchID(staticPatches[patchI]);
 
         if (staticSliderID < 0)
         {

@@ -120,8 +120,8 @@ public:
 
         // Search
 
-            //- Get type (inside,outside,mixed,unknown) of point w.r.t. surface.
-            //  Only makes sense for closed surfaces.
+            //- Get type (inside,outside,mixed,unknown) of point w.r.t. surface
+            //  Only makes sense for closed surfaces
             label getVolumeType
             (
                 const indexedOctree<treeDataCell>&,

@@ -545,6 +545,7 @@ bool Foam::octreeDataFace::overlaps
             return true;
         }
     }
+
     return false;
 }
 
@@ -555,6 +556,7 @@ bool Foam::octreeDataFace::contains(const label, const point&) const
     (
         "octreeDataFace::contains(const label, const point&)"
     );
+
     return false;
 }
 

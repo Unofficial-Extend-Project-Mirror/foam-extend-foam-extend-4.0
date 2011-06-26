@@ -22,138 +22,108 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
-#include "octreeDataCell.H"
+#include "octreeDataBoundBox.H"
+#include "labelList.H"
 #include "polyMesh.H"
-#include "primitiveMesh.H"
-#include "treeNode.H"
+#include "octree.H"
+#include "polyPatch.H"
+#include "triangleFuncs.H"
+#include "linePointRef.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+defineTypeNameAndDebug(Foam::octreeDataBoundBox, 0);
+
+Foam::scalar Foam::octreeDataBoundBox::tol
+(
+    debug::tolerances("octreeDataBoundBoxTol", 1e-6)
+);
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from components
-Foam::octreeDataCell::octreeDataCell
+Foam::octreeDataBoundBox::octreeDataBoundBox
 (
-    const polyMesh& mesh,
-    const labelList& cellLabels,
-    const treeBoundBoxList& bbs
+    const treeBoundBoxList& bbL
 )
 :
-    mesh_(mesh),
-    cellLabels_(cellLabels),
-    bbs_(bbs)
+    allBb_(bbL)
 {}
 
 
-// Construct from mesh (assumes all cells)
-Foam::octreeDataCell::octreeDataCell
-(
-    const polyMesh& mesh
-)
+Foam::octreeDataBoundBox::octreeDataBoundBox(const octreeDataBoundBox& shapes)
 :
-    mesh_(mesh),
-    cellLabels_(mesh_.nCells()),
-    bbs_
-    (
-        mesh_.nCells(),
-        treeBoundBox::invertedBox
-    )
-{
-    // Set one-one indexing
-    for (label i=0; i < mesh_.nCells(); i++)
-    {
-        cellLabels_[i] = i;
-    }
+    allBb_(shapes.allBb())
+{}
 
-    const pointField& points = mesh_.points();
-    const faceList& faces = mesh_.faces();
-    const cellList& cells = mesh_.cells();
 
-    forAll(cells, celli)
-    {
-        const labelList& facesi = cells[celli];
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-        forAll(facesi, facei)
-        {
-            const labelList& pointsi = faces[facesi[facei]];
-
-            forAll(pointsi, pointi)
-            {
-                const point& p = points[pointsi[pointi]];
-                
-                bbs_[celli].min() = min(bbs_[celli].min(), p);
-                bbs_[celli].max() = max(bbs_[celli].max(), p);
-            }
-        }
-    }
-}
+Foam::octreeDataBoundBox::~octreeDataBoundBox()
+{}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::label Foam::octreeDataCell::getSampleType
+Foam::label Foam::octreeDataBoundBox::getSampleType
 (
-    octree<octreeDataCell>&,
-    const point&
-) const
-{
-    return octree<octreeDataCell>::UNKNOWN;
-}
-
-
-bool Foam::octreeDataCell::overlaps
-(
-    const label index,
-    const treeBoundBox& cubeBb
-) const
-{
-    return cubeBb.overlaps(bbs_[index]);
-}
-
-
-bool Foam::octreeDataCell::contains
-(
-    const label index,
+    const octree<octreeDataBoundBox>& oc,
     const point& sample
 ) const
 {
-    return mesh_.pointInCell(sample, cellLabels_[index]);
+    return octree<octreeDataBoundBox>::UNKNOWN;
 }
 
 
-bool Foam::octreeDataCell::intersects
+bool Foam::octreeDataBoundBox::overlaps
 (
-    const label,
-    const point&,
-    const point&,
-    point&
+    const label index,
+    const treeBoundBox& sampleBb
 ) const
 {
-    //Hack: don't know what to do here.
+    return sampleBb.overlaps(allBb_[index]);
+}
 
+
+bool Foam::octreeDataBoundBox::contains(const label, const point&) const
+{
     notImplemented
     (
-        "octreeDataCell::intersects(const label, const point&,"
-        "const point&, point&)"
+        "octreeDataBoundBox::contains(const label, const point&)"
     );
 
     return false;
 }
 
 
-bool Foam::octreeDataCell::findTightest
+bool Foam::octreeDataBoundBox::intersects
+(
+    const label index,
+    const point& start,
+    const point& end,
+    point& intersectionPoint
+) const
+{
+    notImplemented
+    (
+        "octreeDataBoundBox::intersects(const label, const point&)"
+    );
+    return false;
+}
+
+
+bool Foam::octreeDataBoundBox::findTightest
 (
     const label index,
     const point& sample,
     treeBoundBox& tightest
 ) const
 {
-
-    // get nearest and furthest away vertex
+    // Get furthest away vertex
     point myNear, myFar;
-    bbs_[index].calcExtremities(sample, myNear, myFar);
+    allBb_[index].calcExtremities(sample, myNear, myFar);
 
     const point dist = myFar - sample;
     scalar myFarDist = mag(dist);
@@ -171,7 +141,7 @@ bool Foam::octreeDataCell::findTightest
     else
     {
         // Construct bb around sample and myFar
-        const point dist2(fabs(dist.x()), fabs(dist.y()), fabs(dist.z())); 
+        const point dist2(fabs(dist.x()), fabs(dist.y()), fabs(dist.z()));
 
         tightest.min() = sample - dist2;
         tightest.max() = sample + dist2;
@@ -182,35 +152,39 @@ bool Foam::octreeDataCell::findTightest
 
 
 // Determine numerical value of sign of sample compared to shape at index
-Foam::scalar Foam::octreeDataCell::calcSign
+Foam::scalar Foam::octreeDataBoundBox::calcSign
 (
-    const label,
-    const point&,
-    vector& n
+    const label index,
+    const point& sample,
+    point& n
 ) const
 {
     n = vector::zero;
 
-    return GREAT;
+    return 1;
 }
 
 
 // Calculate nearest point on/in shapei
-Foam::scalar Foam::octreeDataCell::calcNearest
+Foam::scalar Foam::octreeDataBoundBox::calcNearest
 (
     const label index,
     const point& sample,
     point& nearest
 ) const
 {
-    nearest = mesh_.cellCentres()[cellLabels_[index]];
+    notImplemented
+    (
+        "octreeDataBoundBox::calcNearest"
+        "(const label index, const point& sample, point& nearest)"
+    );
 
-    return mag(nearest - sample);
+    return GREAT;
 }
 
 
 // Calculate nearest point on/in shapei
-Foam::scalar Foam::octreeDataCell::calcNearest
+Foam::scalar Foam::octreeDataBoundBox::calcNearest
 (
     const label index,
     const linePointRef& ln,
@@ -220,20 +194,16 @@ Foam::scalar Foam::octreeDataCell::calcNearest
 {
     notImplemented
     (
-        "octreeDataCell::calcNearest(const label, const linePointRef&"
-        ", point& linePt, point&)"
+        "octreeDataBoundBox::calcNearest"
+        "(const label, const linePointRef&, point&, point&)"
     );
     return GREAT;
 }
-    
 
-void Foam::octreeDataCell::write
-(
-    Ostream& os,
-    const label index
-) const
+
+void Foam::octreeDataBoundBox::write(Ostream& os, const label index) const
 {
-    os << cellLabels_[index] << " " << bbs_[index];
+    os << allBb_[index];
 }
 
 

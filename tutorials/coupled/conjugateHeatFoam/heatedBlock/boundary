@@ -32,6 +32,7 @@ left
     shadowRegion    region0;
     shadowPatch     right;
     attached        on;
+    isWall          yes;  // Not relevant
 }
 
 right

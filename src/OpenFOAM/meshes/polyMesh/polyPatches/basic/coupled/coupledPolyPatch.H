@@ -86,6 +86,12 @@ protected:
             const scalar absTol = matchTol_
         ) const;
 
+        //- Initialise the calculation of the patch addressing
+        virtual void initAddressing() = 0;
+
+        //- Calculate the patch addressing
+        virtual void calcAddressing() = 0;
+
         //- Initialise the calculation of the patch geometry
         virtual void initGeometry() = 0;
 

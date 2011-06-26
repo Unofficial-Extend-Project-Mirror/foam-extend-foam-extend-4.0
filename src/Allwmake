@@ -15,6 +15,7 @@ set -x
 wmakePrintBuild -check || /bin/rm -f OpenFOAM/Make/$WM_OPTIONS/global.? 2>/dev/null
 
 wmakeLnInclude OpenFOAM
+wmakeLnInclude meshTools
 wmakeLnInclude OSspecific/$WM_OSTYPE
 Pstream/Allwmake
 

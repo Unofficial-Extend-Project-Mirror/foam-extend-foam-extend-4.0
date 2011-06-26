@@ -950,6 +950,18 @@ Foam::cyclicPolyPatch::~cyclicPolyPatch()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+void Foam::cyclicPolyPatch::initAddressing()
+{
+    polyPatch::initAddressing();
+}
+
+
+void Foam::cyclicPolyPatch::calcAddressing()
+{
+    polyPatch::calcAddressing();
+}
+
+
 void Foam::cyclicPolyPatch::initGeometry()
 {
     polyPatch::initGeometry();
@@ -959,6 +971,7 @@ void Foam::cyclicPolyPatch::initGeometry()
 void Foam::cyclicPolyPatch::calcGeometry()
 {
     polyPatch::calcGeometry();
+
     calcTransforms();
 }
 

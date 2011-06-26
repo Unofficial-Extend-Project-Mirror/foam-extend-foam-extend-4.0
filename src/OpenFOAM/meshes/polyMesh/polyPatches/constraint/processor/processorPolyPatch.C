@@ -135,6 +135,18 @@ Foam::processorPolyPatch::~processorPolyPatch()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+void Foam::processorPolyPatch::initAddressing()
+{
+    polyPatch::initAddressing();
+}
+
+
+void Foam::processorPolyPatch::calcAddressing()
+{
+    polyPatch::calcAddressing();
+}
+
+
 void Foam::processorPolyPatch::initGeometry()
 {
     if (Pstream::parRun())

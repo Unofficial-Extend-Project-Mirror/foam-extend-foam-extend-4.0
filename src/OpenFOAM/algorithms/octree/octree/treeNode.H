@@ -271,7 +271,7 @@ public:
             bool findBox
             (
                 const Type& shapes,
-                const boundBox& bb,
+                const treeBoundBox& bb,
                 labelHashSet& elements
             ) const;
 

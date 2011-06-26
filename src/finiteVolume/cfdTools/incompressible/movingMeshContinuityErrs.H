@@ -30,6 +30,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+if (mesh.moving())
 {
     volScalarField contErr = fvc::div(phi + fvc::meshPhi(U));
 
@@ -47,5 +48,10 @@ Description
         << ", cumulative = " << cumulativeContErr
         << endl;
 }
+else
+{
+#   include "continuityErrs.H"
+}
+
 
 // ************************************************************************* //

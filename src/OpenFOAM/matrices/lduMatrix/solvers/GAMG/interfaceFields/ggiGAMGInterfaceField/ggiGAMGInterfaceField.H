@@ -79,7 +79,7 @@ class ggiGAMGInterfaceField
 
         //- Disallow default bitwise assignment
         void operator=(const ggiGAMGInterfaceField&);
-    
+
 
 public:
 

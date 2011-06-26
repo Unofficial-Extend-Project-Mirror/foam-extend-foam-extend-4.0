@@ -1,4 +1,4 @@
-/*---------------------------------------------------------------------------* \
+/*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
@@ -44,7 +44,7 @@ SRFVelocityFvPatchVectorField::SRFVelocityFvPatchVectorField
 )
 :
     fixedValueFvPatchVectorField(p, iF),
-    relative_(0),
+    relative_(false),
     inletValue_(p.size(), vector::zero)
 {}
 

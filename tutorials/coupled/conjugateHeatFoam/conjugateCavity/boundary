@@ -39,6 +39,7 @@ right
     shadowRegion    solid;
     shadowPatch     left;
     attached        on;
+    isWall          yes;
 }
 
 bottom

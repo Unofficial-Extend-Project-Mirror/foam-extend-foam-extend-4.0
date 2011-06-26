@@ -129,7 +129,7 @@ Foam::rotatedBoxToCell::rotatedBoxToCell
 )
 :
     topoSetSource(mesh),
-    origin_(origin_),
+    origin_(origin),
     i_(i),
     j_(j),
     k_(k)

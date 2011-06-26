@@ -178,6 +178,12 @@ protected:
 
     // Protected Member functions
 
+        //- Initialise the calculation of the patch addressing
+        virtual void initAddressing();
+
+        //- Calculate the patch addressing
+        virtual void calcAddressing();
+
         //- Initialise the calculation of the patch geometry
         virtual void initGeometry();
 

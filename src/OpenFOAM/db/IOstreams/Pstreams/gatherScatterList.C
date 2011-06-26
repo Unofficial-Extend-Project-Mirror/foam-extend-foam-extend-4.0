@@ -25,9 +25,10 @@ License
 Description
     Gather data from all processors onto single processor according to some
     communication schedule (usually linear-to-master or tree-to-master).
-    The gathered data will be a list with element procID the data from processor
-    procID. Before calling every processor should insert its value into
-    Values[Pstream::myProcNo()].
+    The gathered data will be a list with element procID the data from
+     processor procID. Before calling every processor should insert
+    its value into Values[Pstream::myProcNo()].
+
     Note: after gather every processor only knows its own data and that of the
     processors below it. Only the 'master' of the communication schedule holds
     a fully filled List. Use scatter to distribute the data.

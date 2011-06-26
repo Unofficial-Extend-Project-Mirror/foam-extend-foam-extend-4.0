@@ -338,7 +338,7 @@ Foam::label Foam::octree<Type>::findNearest
 
 
 template <class Type>
-Foam::labelList Foam::octree<Type>::findBox(const boundBox& bb) const
+Foam::labelList Foam::octree<Type>::findBox(const treeBoundBox& bb) const
 {
     // Storage for labels of shapes inside bb. Size estimate.
     labelHashSet elements(100);

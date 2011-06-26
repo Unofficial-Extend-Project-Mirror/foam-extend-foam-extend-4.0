@@ -339,7 +339,7 @@ public:
 
             //- Find (in no particular order) indices of all shapes inside or
             //  overlapping bounding box (i.e. all shapes not outside box)
-            labelList findBox(const boundBox& bb) const;
+            labelList findBox(const treeBoundBox& bb) const;
 
             //- Find intersected shape along line. pointIndexHit contains index
             //  of nearest shape intersected and the intersection point. Uses

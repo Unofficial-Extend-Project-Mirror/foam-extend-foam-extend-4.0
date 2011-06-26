@@ -235,7 +235,7 @@ public:
             bool findBox
             (
                 const Type& shapes,
-                const boundBox& bb,
+                const treeBoundBox& bb,
                 labelHashSet& elements
             ) const;
 
@@ -276,7 +276,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "octreeDataPointTreeLeaf.H"
-#include "octreeDataTriSurfaceTreeLeaf.H"
+//#include "octreeDataTriSurfaceTreeLeaf.H"  HJ, header moved to triSurfaceMesh.H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
