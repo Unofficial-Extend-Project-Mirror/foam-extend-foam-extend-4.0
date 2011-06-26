@@ -60,7 +60,7 @@ Foam::coordinateSystem::coordinateSystem
     note_(),
     origin_(cs.origin_),
     R_(cs.R_),
-    Rtr_(Rtr_)
+    Rtr_(cs.Rtr_)
 {}
 
 
