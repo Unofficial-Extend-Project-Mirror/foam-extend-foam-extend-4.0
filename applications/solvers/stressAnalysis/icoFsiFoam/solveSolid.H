@@ -22,5 +22,5 @@
 
         initialResidual = UEqn.solve().initialResidual();
 
-    } while (initialResidual > convergenceTolerance && ++iCorr < nCorr);    
+    } while (initialResidual > convergenceTolerance && ++iCorr < nCorr);
 }

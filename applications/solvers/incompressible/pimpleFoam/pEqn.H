@@ -23,8 +23,8 @@ for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
 
     if
     (
-        oCorr == nOuterCorr-1
-     && corr == nCorr-1
+        oCorr == nOuterCorr - 1
+     && corr == nCorr - 1
      && nonOrth == nNonOrthCorr
     )
     {

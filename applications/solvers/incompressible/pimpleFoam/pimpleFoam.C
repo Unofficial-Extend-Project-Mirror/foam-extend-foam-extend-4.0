@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         // --- Pressure-velocity PIMPLE corrector loop
-        for (int oCorr=0; oCorr<nOuterCorr; oCorr++)
+        for (int oCorr = 0; oCorr < nOuterCorr; oCorr++)
         {
             if (nOuterCorr != 1)
             {
