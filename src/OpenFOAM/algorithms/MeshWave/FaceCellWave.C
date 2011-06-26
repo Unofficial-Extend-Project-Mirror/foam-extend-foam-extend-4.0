@@ -611,7 +611,7 @@ void Foam::FaceCellWave<Type>::handleProcPatches()
             {
                 transform
                 (
-                    procPatch.reverseT(),
+                    procPatch.forwardT(),
                     nReceiveFaces,
                     receiveFacesInfo
                 );
@@ -732,7 +732,7 @@ void Foam::FaceCellWave<Type>::handleCyclicPatches()
                 // receiveFaces = received data from half2
                 transform
                 (
-                    cycPatch.reverseT(),
+                    cycPatch.forwardT(),
                     nReceiveFaces,
                     receiveFacesInfo
                 );
