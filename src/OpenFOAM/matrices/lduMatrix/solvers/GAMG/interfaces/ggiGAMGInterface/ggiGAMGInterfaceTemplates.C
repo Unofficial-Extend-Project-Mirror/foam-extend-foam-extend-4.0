@@ -173,15 +173,15 @@ tmp<Field<Type> > ggiGAMGInterface::fastReduce(const UList<Type>& ff) const
         }
 
         // Prepare to receive remote data
-        const labelList& za = zoneAddressing();
+        const labelList& sza = shadowInterface().zoneAddressing();
 
         tmp<Field<Type> > treceiveBuf
         (
-            new Field<Type>(za.size(), pTraits<Type>::zero)
+            new Field<Type>(sza.size(), pTraits<Type>::zero)
         );
         Field<Type>& receiveBuf = treceiveBuf();
 
-        if (!za.empty())
+        if (!sza.empty())
         {
             // Opt: reconsider mode of communication
             IPstream::read

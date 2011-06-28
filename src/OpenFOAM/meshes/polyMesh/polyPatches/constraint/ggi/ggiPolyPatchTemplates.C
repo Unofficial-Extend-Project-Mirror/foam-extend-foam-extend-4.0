@@ -61,9 +61,9 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
     {
         FatalErrorIn
         (
-            "tmp<Field<Type> > ggiPolyPatch::fastExpand"
-            "("
-            "    const Field<Type>& ff"
+            "tmp<Field<Type> > ggiPolyPatch::fastExpand\n"
+            "(\n"
+            "    const Field<Type>& ff\n"
             ") const"
         )   << "Incorrect patch field size.  Field size: "
             << ff.size() << " patch size: " << size()
@@ -130,7 +130,7 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
         // Expanded field complete, send required data to other processors
         for (label procI = 1; procI < Pstream::nProcs(); procI++)
         {
-            const labelList& curSAddr = sendAddr()[procI];
+            const labelList& curSAddr = shadow().sendAddr()[procI];
 
             if (!curSAddr.empty())
             {
@@ -170,7 +170,7 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
         }
 
         // Prepare to receive remote data
-        const labelList& rza = remoteZoneAddressing();
+        const labelList& rza = shadow().remoteZoneAddressing();
 
         if (!rza.empty())
         {
@@ -325,9 +325,8 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::interpolate
     }
     else
     {
-        // Note: fast expand is always done on the local side
-        // HJ, 24/Jun/2011
-        Field<Type> expandField = fastExpand(ff);
+        // Expand shadow
+        Field<Type> expandField = shadow().fastExpand(ff);
 
         tmp<Field<Type> > tresult(new Field<Type>(size()));
         Field<Type>& result = tresult();
@@ -360,10 +359,6 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::interpolate
     // Obsolete.  HJ, 12/Jun/2011
 
     // Expand the field to zone size
-    // Note: with full fields it is the shadow side that does
-    // the expand.  This is different than fastExpand because
-    // the addressing is stored remotely.
-    // HJ, 24/Jun/2011
     Field<Type> expandField = shadow().expand(ff);
 
     Field<Type> zoneField;
