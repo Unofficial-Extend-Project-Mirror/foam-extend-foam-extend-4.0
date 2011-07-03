@@ -420,7 +420,7 @@ int main(int argc, char *argv[])
             {
                 // Incorrect solver domain name
                 FatalErrorIn("multiSolver::main")
-                    << "solverDomainName " << solverDomains[i] << "is not "
+                    << "solverDomainName " << solverDomains[i] << " is not "
                     << "found."
                     << abort(FatalError);
             }

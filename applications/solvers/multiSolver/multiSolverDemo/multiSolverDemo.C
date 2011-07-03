@@ -26,8 +26,7 @@ Application
     multiSolverDemo
 
 Description
-    Combination of icoFoam and scalarTransportFoam for testing of new multiTime
-    framework.
+    Demonstration multiSolver-enabled application.
 
 Author
     David L. F. Gaden
