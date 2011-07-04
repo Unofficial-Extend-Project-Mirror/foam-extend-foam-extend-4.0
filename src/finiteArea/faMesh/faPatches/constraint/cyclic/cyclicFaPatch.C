@@ -198,7 +198,7 @@ void cyclicFaPatch::makeWeights(scalarField& w) const
     }
 
     // Check for error in matching
-    if (maxMatchError > cyclicPolyPatch::areaMatchTol)
+    if (maxMatchError > polyPatch::matchTol_)
     {
         scalar avL = (magL[errorEdge] + magL[errorEdge + sizeby2])/2.0;
 
@@ -208,7 +208,7 @@ void cyclicFaPatch::makeWeights(scalarField& w) const
             << 100*mag(magL[errorEdge] - magL[errorEdge + sizeby2])/avL
             << "% -- possible edge ordering problem." << nl
             << "Cyclic area match tolerance = "
-            << cyclicPolyPatch::areaMatchTol << " patch: " << name()
+            << polyPatch::matchTol_ << " patch: " << name()
             << abort(FatalError);
     }
 }
