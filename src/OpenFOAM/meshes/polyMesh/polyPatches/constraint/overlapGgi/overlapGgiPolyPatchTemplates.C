@@ -109,21 +109,22 @@ Foam::overlapGgiPolyPatch::interpolate(const Field<Type>& pf) const
     // Expand data
     tmp<Field<Type> > expanddata = shadow().expandData(pf);
 
-    tmp<Field<Type> > tresult;
+    tmp<Field<Type> > tresult(new Field<Type>());
+    Field<Type>& result = tresult();
 
     if (master())
     {
         // Expand slave data
-        tresult= patchToPatch().slaveToMaster(expanddata);
+        result = patchToPatch().slaveToMaster(expanddata);
     }
     else
     {
         // Expand master data
-        tresult = patchToPatch().masterToSlave(expanddata);
+        result = patchToPatch().masterToSlave(expanddata);
     }
 
     // Truncate to size
-    tresult().setSize(size());
+    result.setSize(size());
 
     return tresult;
 }

@@ -49,29 +49,54 @@ namespace Foam
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
+bool Foam::overlapGgiPolyPatch::active() const
+{
+    polyPatchID shadow(shadowName_, boundaryMesh());
+    faceZoneID zone(zoneName_, boundaryMesh().mesh().faceZones());
+
+    return shadow.active() && zone.active();
+}
+
+
 void Foam::overlapGgiPolyPatch::calcLocalParallel() const
 {
     // Calculate patch-to-zone addressing
     if (localParallelPtr_)
     {
-        FatalErrorIn("void ggiPolyPatch::calcLocalParallel() const")
+        FatalErrorIn("void overlapGgiPolyPatch::calcLocalParallel() const")
             << "Local parallel switch already calculated"
             << abort(FatalError);
     }
 
+    // If running in serial, all GGIs are local parallel
+    // HJ, 1/Jun/2011
     localParallelPtr_ = new bool(false);
     bool& emptyOrComplete = *localParallelPtr_;
 
-    // Calculate localisation on master and shadow
-    emptyOrComplete =
-        (zone().size() == size() && shadow().zone().size() == shadow().size())
-     || (size() == 0 && shadow().size() == 0);
+    // If running in serial, all GGIs are expanded to zone size.
+    // This happens on decomposition and reconstruction where
+    // size and shadow size may be zero, but zone size may not
+    // HJ, 1/Jun/2011
+    if (!Pstream::parRun())
+    {
+        emptyOrComplete = false;
+    }
+    else
+    {
+        // Calculate localisation on master and shadow
+        emptyOrComplete =
+            (
+                zone().size() == size()
+             && shadow().zone().size() == shadow().size()
+            )
+         || (size() == 0 && shadow().size() == 0);
 
-    reduce(emptyOrComplete, andOp<bool>());
+        reduce(emptyOrComplete, andOp<bool>());
+    }
 
     if (debug && Pstream::parRun())
     {
-        Info<< "GGI patch Master: " << name()
+        Info<< "Overlap GGI patch Master: " << name()
             << " Slave: " << shadowName() << " is ";
 
         if (emptyOrComplete)
@@ -101,7 +126,7 @@ Foam::overlapGgiPolyPatch::overlapGgiPolyPatch
     zoneName_(word::null),
     shadowIndex_(-1),
     zoneIndex_(-1),
-    rotationAxis_(vector(0.0, 0.0, 1.0)),
+    rotationAxis_(vector(0, 0, 1)),
     nCopies_(0),
     expandedMasterPtr_(NULL),
     expandedSlavePtr_(NULL),
@@ -257,9 +282,6 @@ Foam::label Foam::overlapGgiPolyPatch::shadowIndex() const
         }
     }
 
-    // Force local parallel
-    localParallel();
-
     return shadowIndex_;
 }
 
@@ -290,10 +312,12 @@ Foam::overlapGgiPolyPatch::shadow() const
     return refCast<const overlapGgiPolyPatch>(boundaryMesh()[shadowIndex()]);
 }
 
+
 const Foam::faceZone& Foam::overlapGgiPolyPatch::zone() const
 {
     return boundaryMesh().mesh().faceZones()[zoneIndex()];
 }
+
 
 bool Foam::overlapGgiPolyPatch::localParallel() const
 {
@@ -306,12 +330,14 @@ bool Foam::overlapGgiPolyPatch::localParallel() const
     return *localParallelPtr_;
 }
 
+
 const Foam::label& Foam::overlapGgiPolyPatch::nCopies() const
 {
     // Read the number of copies to be made from the dictionary for the
     // expanded slave and expanded master to cover 360 degrees
     return nCopies_;
 }
+
 
 bool Foam::overlapGgiPolyPatch::master() const
 {

@@ -37,7 +37,11 @@ namespace Foam
 
 defineTypeNameAndDebug(meshToMesh, 0);
 
-const scalar meshToMesh::directHitTol = 1e-5;
+const scalar meshToMesh::directHitTol
+(
+    debug::tolerances("meshToMeshdirectHitTol", 1e-5)
+);
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

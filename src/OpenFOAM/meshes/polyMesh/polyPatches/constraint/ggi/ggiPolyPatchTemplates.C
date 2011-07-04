@@ -313,6 +313,12 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::interpolate
     {
         // No expansion or filtering needed.  HJ, 4/Jun/2011
 
+        if (empty())
+        {
+            // Patch empty, no interpolation
+            return tmp<Field<Type> >(new Field<Type>());
+        }
+
         // Interpolate field
         if (master())
         {

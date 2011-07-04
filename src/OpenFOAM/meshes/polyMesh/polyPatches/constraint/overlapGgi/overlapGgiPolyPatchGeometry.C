@@ -123,23 +123,24 @@ Foam::overlapGgiPolyPatch::calcExpandedGeometry(label ncp, label index) const
     return new standAlonePatch(expandedFaces, expandedPoints);
 }
 
+
 const Foam::standAlonePatch& Foam::overlapGgiPolyPatch::expandedMaster() const
 {
     if (!expandedMasterPtr_)
     {
-        expandedMasterPtr_ =
-            calcExpandedGeometry( nCopies(), zoneIndex() );
+        expandedMasterPtr_ = calcExpandedGeometry(nCopies(), zoneIndex());
     }
 
     return *expandedMasterPtr_;
 }
+
 
 const Foam::standAlonePatch& Foam::overlapGgiPolyPatch::expandedSlave() const
 {
     if (!expandedSlavePtr_)
     {
         expandedSlavePtr_ =
-            calcExpandedGeometry( shadow().nCopies(), shadow().zoneIndex() );
+            calcExpandedGeometry(shadow().nCopies(), shadow().zoneIndex());
     }
 
     return *expandedSlavePtr_;
@@ -168,7 +169,11 @@ void Foam::overlapGgiPolyPatch::calcPatchToPatch() const
                 reverseT(),
                 separation(),
                 0,             // master overlap tolerance
-                0              // slave overlap tolerance
+                0,             // slave overlap tolerance
+                true,          // Rescale weighting factors.  Bug fix, MB.
+//                 ggiInterpolation::AABB
+                overlapGgiInterpolation::BB_OCTREE  // Octree search, MB.
+
             );
 
         // Abort immediatly if uncovered faces are present
@@ -223,6 +228,15 @@ Foam::overlapGgiPolyPatch::patchToPatch() const
 
 void Foam::overlapGgiPolyPatch::calcReconFaceCellCentres() const
 {
+    if (reconFaceCellCentresPtr_)
+    {
+        FatalErrorIn
+        (
+            "void overlapGgiPolyPatch::calcReconFaceCellCentres() const"
+        )   << "Reconstructed cell centres already calculated"
+            << abort(FatalError);
+    }
+
     // Create neighbouring face centres using interpolation
     if (master())
     {
@@ -280,9 +294,15 @@ void Foam::overlapGgiPolyPatch::checkDefinition() const
 
 void Foam::overlapGgiPolyPatch::clearGeom()
 {
+    // Note: Currently deleting patch-to-patch interpolation together with
+    // expanded master and slave patches on mesh motion to avoid problems
+    // with motion of points in primitive patch.
+    // HJ, 4/Jul/2011
     deleteDemandDrivenData(expandedMasterPtr_);
     deleteDemandDrivenData(expandedSlavePtr_);
+
     deleteDemandDrivenData(patchToPatchPtr_);
+
     deleteDemandDrivenData(reconFaceCellCentresPtr_);
 }
 
@@ -293,6 +313,7 @@ void Foam::overlapGgiPolyPatch::clearOut()
 
     deleteDemandDrivenData(localParallelPtr_);
 }
+
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -310,6 +331,13 @@ Foam::overlapGgiPolyPatch::reconFaceCellCentres() const
 
 void Foam::overlapGgiPolyPatch::initAddressing()
 {
+    if (active())
+    {
+        // Calculate transforms for correct GGI interpolator cut
+        calcTransforms();
+        localParallel();
+    }
+
     polyPatch::initAddressing();
 }
 
@@ -322,6 +350,17 @@ void Foam::overlapGgiPolyPatch::calcAddressing()
 
 void Foam::overlapGgiPolyPatch::initGeometry()
 {
+    // Communication is allowed either before or after processor
+    // patch comms.  HJ, 11/Jul/2011
+    if (active())
+    {
+        // Note: Only master calculates recon; slave uses master interpolation
+        if (master())
+        {
+            reconFaceCellCentres();
+        }
+    }
+
     polyPatch::initGeometry();
 }
 
@@ -329,23 +368,29 @@ void Foam::overlapGgiPolyPatch::initGeometry()
 void Foam::overlapGgiPolyPatch::calcGeometry()
 {
     polyPatch::calcGeometry();
-
-    // Note: Calculation of transforms must be forced before the
-    // reconFaceCellCentres in order to correctly set the transformation
-    // in the interpolation routines.
-    // HJ, 3/Jul/2009
-    calcTransforms();
-
-    // Reconstruct the cell face centres
-    if (patchToPatchPtr_ && master())
-    {
-        reconFaceCellCentres();
-    }
 }
 
 
 void Foam::overlapGgiPolyPatch::initMovePoints(const pointField& p)
 {
+    clearGeom();
+
+    // Calculate transforms on mesh motion?
+    calcTransforms();
+
+    // Update interpolation for new relative position of GGI interfaces
+    // Note: currently, patches and interpolation are cleared in clearGeom()
+    // HJ. 4/Jul/2011
+//     if (patchToPatchPtr_)
+//     {
+//         patchToPatchPtr_->movePoints();
+//     }
+
+    if (active() && master())
+    {
+        reconFaceCellCentres();
+    }
+
     polyPatch::initMovePoints(p);
 }
 
@@ -353,9 +398,6 @@ void Foam::overlapGgiPolyPatch::initMovePoints(const pointField& p)
 void Foam::overlapGgiPolyPatch::movePoints(const pointField& p)
 {
     polyPatch::movePoints(p);
-
-    // Force recalculation of interpolation
-    clearGeom();
 }
 
 
