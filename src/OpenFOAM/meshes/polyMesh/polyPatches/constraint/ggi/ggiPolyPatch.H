@@ -108,9 +108,6 @@ class ggiPolyPatch
 
     // Private member functions
 
-        //- Is the GGI active& (zone and shadow present)
-        bool active() const;
-
         //- Calculate patch-to-zone addressing
         virtual void calcZoneAddressing() const;
 
@@ -158,6 +155,9 @@ class ggiPolyPatch
 protected:
 
     // Protected Member functions
+
+        //- Is the GGI active? (zone and shadow present)
+        bool active() const;
 
         //- Initialise the calculation of the patch addressing
         virtual void initAddressing();
@@ -285,14 +285,14 @@ public:
             return shadowName_;
         }
 
-        //- Return shadow patch index
-        label shadowIndex() const;
-
         //- Return name of interpolation face zone
         const word& zoneName() const
         {
             return zoneName_;
         }
+
+        //- Return shadow patch index
+        label shadowIndex() const;
 
         //- Return zone patch index
         label zoneIndex() const;

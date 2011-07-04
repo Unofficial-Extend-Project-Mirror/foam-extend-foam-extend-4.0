@@ -158,7 +158,19 @@ void overlapGgiFvPatchField<Type>::initEvaluate
 (
     const Pstream::commsTypes commsType
 )
-{}
+{
+    if (!this->updated())
+    {
+        this->updateCoeffs();
+    }
+
+    Field<Type>::operator=
+    (
+        this->patch().weights()*this->patchInternalField()
+      + (1.0 - this->patch().weights())*this->patchNeighbourField()
+    );
+
+}
 
 
 template<class Type>
@@ -167,11 +179,10 @@ void overlapGgiFvPatchField<Type>::evaluate
     const Pstream::commsTypes
 )
 {
-    Field<Type>::operator=
-    (
-        this->patch().weights()*this->patchInternalField()
-      + (1.0 - this->patch().weights())*this->patchNeighbourField()
-    );
+    if (!this->updated())
+    {
+        this->updateCoeffs();
+    }
 }
 
 
@@ -179,27 +190,16 @@ template<class Type>
 void overlapGgiFvPatchField<Type>::initInterfaceMatrixUpdate
 (
     const scalarField& psiInternal,
-    scalarField&,
-    const lduMatrix&,
-    const scalarField&,
-    const direction,
-    const Pstream::commsTypes commsType
-) const
-{}
-
-
-// Return matrix product for coupled boundary
-template<class Type>
-void overlapGgiFvPatchField<Type>::updateInterfaceMatrix
-(
-    const scalarField& psiInternal,
     scalarField& result,
     const lduMatrix&,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes
+    const Pstream::commsTypes commsType
 ) const
 {
+    // Communication is allowed either before or after processor
+    // patch comms.  HJ, 11/Jul/2011
+
     // Get shadow face-cells and assemble shadow field
     const unallocLabelList& sfc = overlapGgiPatch_.shadow().faceCells();
 
@@ -220,6 +220,20 @@ void overlapGgiFvPatchField<Type>::updateInterfaceMatrix
         result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
     }
 }
+
+
+// Return matrix product for coupled boundary
+template<class Type>
+void overlapGgiFvPatchField<Type>::updateInterfaceMatrix
+(
+    const scalarField& psiInternal,
+    scalarField& result,
+    const lduMatrix&,
+    const scalarField& coeffs,
+    const direction cmpt,
+    const Pstream::commsTypes
+) const
+{}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

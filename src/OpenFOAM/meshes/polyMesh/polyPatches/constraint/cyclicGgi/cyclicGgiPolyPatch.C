@@ -69,7 +69,7 @@ void Foam::cyclicGgiPolyPatch::checkDefinition() const
     // patches must specify the same information If not, well,
     // we stop the simulation and ask for a fix.
 
-    if (shadowIndex() < 0)
+    if (!active())
     {
         // No need to check anything, the shadow is not initialized properly.
         // This will happen with blockMesh when defining cyclicGGI patches.
@@ -243,7 +243,7 @@ const Foam::cyclicGgiPolyPatch& Foam::cyclicGgiPolyPatch::cyclicShadow() const
 
 void Foam::cyclicGgiPolyPatch::calcTransforms()
 {
-    if (debug)
+    if (active() && debug)
     {
         // Check definition of the cyclic pair
         checkDefinition();

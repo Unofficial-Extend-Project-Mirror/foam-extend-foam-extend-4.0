@@ -235,6 +235,9 @@ void ggiFvPatchField<Type>::initInterfaceMatrixUpdate
     const Pstream::commsTypes commsType
 ) const
 {
+    // Communication is allowed either before or after processor
+    // patch comms.  HJ, 11/Jul/2011
+
     // Get shadow face-cells and assemble shadow field
     const unallocLabelList& sfc = ggiPatch_.shadow().faceCells();
 

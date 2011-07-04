@@ -238,6 +238,15 @@ void Foam::ggiPolyPatch::calcPatchToPatch() const
 
 void Foam::ggiPolyPatch::calcReconFaceCellCentres() const
 {
+    if (reconFaceCellCentresPtr_)
+    {
+        FatalErrorIn
+        (
+            "void ggiPolyPatch::calcReconFaceCellCentres() const"
+        )   << "Reconstructed cell centres already calculated"
+            << abort(FatalError);
+    }
+
     // Create neighbouring face centres using interpolation
     if (master())
     {
@@ -277,19 +286,26 @@ void Foam::ggiPolyPatch::calcLocalParallel() const
     localParallelPtr_ = new bool(false);
     bool& emptyOrComplete = *localParallelPtr_;
 
-    // If running in serial, all GGIs are local parallel
+    // If running in serial, all GGIs are expanded to zone size.
+    // This happens on decomposition and reconstruction where
+    // size and shadow size may be zero, but zone size may not
     // HJ, 1/Jun/2011
     if (!Pstream::parRun())
     {
-        return;
+        emptyOrComplete = false;
     }
+    else
+    {
+        // Calculate localisation on master and shadow
+        emptyOrComplete =
+            (
+                zone().size() == size()
+             && shadow().zone().size() == shadow().size()
+            )
+         || (size() == 0 && shadow().size() == 0);
 
-    // Calculate localisation on master and shadow
-    emptyOrComplete =
-        (zone().size() == size() && shadow().zone().size() == shadow().size())
-     || (size() == 0 && shadow().size() == 0);
-
-    reduce(emptyOrComplete, andOp<bool>());
+        reduce(emptyOrComplete, andOp<bool>());
+    }
 
     if (debug && Pstream::parRun())
     {
@@ -607,9 +623,6 @@ Foam::label Foam::ggiPolyPatch::shadowIndex() const
         }
     }
 
-    // Force local parallel
-    localParallel();
-
     return shadowIndex_;
 }
 
@@ -720,12 +733,18 @@ void Foam::ggiPolyPatch::initAddressing()
 {
     if (active())
     {
-        // Force zone addressing first
+        // Calculate transforms for correct GGI cut
+        calcTransforms();
+
+        // Force zone addressing and remote zone addressing
+        // (uses GGI interpolator)
         zoneAddressing();
         remoteZoneAddressing();
 
+        // Force local parallel
         if (Pstream::parRun() && !localParallel())
         {
+            // Calculate send addressing
             sendAddr();
         }
     }
@@ -746,8 +765,6 @@ void Foam::ggiPolyPatch::initGeometry()
     // patch comms.  HJ, 11/Jul/2011
     if (active())
     {
-        calcTransforms();
-
         // Note: Only master calculates recon; slave uses master interpolation
         if (master())
         {
