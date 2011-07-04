@@ -41,6 +41,12 @@ Description
 namespace Foam
 {
 
+const scalar meshToMesh::cellCentreDistanceTol
+(
+    debug::tolerances("meshToMeshCellCentreDistanceTol", 1e-3)
+);
+
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 void meshToMesh::calcAddressing()
@@ -129,15 +135,18 @@ void meshToMesh::calcAddressing()
         toMesh_.cellCentres(),
         fromMesh_,
         boundaryCell,
-        oc
+        oc,
+        true
     );
 
     forAll (toMesh_.boundaryMesh(), patchi)
     {
+
         const polyPatch& toPatch = toMesh_.boundaryMesh()[patchi];
 
         if (cuttingPatches_.found(toPatch.name()))
         {
+
             boundaryAddressing_[patchi].setSize(toPatch.size());
 
             cellAddresses
@@ -146,7 +155,8 @@ void meshToMesh::calcAddressing()
                 toPatch.faceCentres(),
                 fromMesh_,
                 boundaryCell,
-                oc
+                oc,
+                false
             );
         }
         else if
@@ -231,12 +241,12 @@ void meshToMesh::cellAddresses
     const pointField& points,
     const fvMesh& fromMesh,
     const List<bool>& boundaryCell,
-    const octree<octreeDataCell>& oc
+    const octree<octreeDataCell>& oc,
+    bool forceFind
 ) const
 {
 
     label nCellsOutsideAddressing = 0;
-
 
     // the implemented search method is a simple neighbour array search.
     // It starts from a cell zero, searches its neighbours and finds one
@@ -255,6 +265,11 @@ void meshToMesh::cellAddresses
 
     forAll (points, toI)
     {
+
+        scalar localTol = cellCentreDistanceTol;
+
+        bool isBoundary = false;
+
         // pick up target position
         const vector& p = points[toI];
 
@@ -300,6 +315,7 @@ void meshToMesh::cellAddresses
             //  either way use the octree search to find it.
             if (boundaryCell[curCell])
             {
+                isBoundary = true;
                 cellAddressing_[toI] = oc.find(p);
             }
             else
@@ -356,12 +372,51 @@ void meshToMesh::cellAddresses
                 }
             }
 
-            if(cellAddressing_[toI] < 0)
+            if (cellAddressing_[toI] < 0)
             {
-
-                cellAddressing_[toI] = curCell;
-
                 nCellsOutsideAddressing++;
+
+                if (isBoundary && forceFind)
+                {
+                    // If still not found, get the closest cell within the
+                    // specified tolerance
+
+                    forAll(fromMesh.boundary(), patchi)
+                    {
+                        const fvPatch& patch = fromMesh.boundary()[patchi];
+
+                        word name = patch.name();
+
+                        label patchID =
+                            toMesh_.boundaryMesh().findPatchID(name);
+
+                        label sizePatch = 0;
+                        if (patchID > -1)
+                        {
+                            sizePatch = toMesh_.boundary()[patchID].size();
+                        }
+
+                        if
+                        (
+                            sizePatch > 0
+                        )
+                        {
+                            forAll(patch, facei)
+                            {
+                                label celli = patch.faceCells()[facei];
+
+                                const vector& centre = fromMesh.C()[celli];
+                                if (mag(points[toI] - centre) < localTol)
+                                {
+                                    localTol = mag(points[toI] - centre);
+                                    cellAddressing_[toI] = celli;
+                                }
+
+                            }
+                        }
+
+                    }
+                }
             }
         }
     }

@@ -100,7 +100,8 @@ class meshToMesh
             const pointField& points,
             const fvMesh& fromMesh,
             const List<bool>& boundaryCell,
-            const octree<octreeDataCell>& oc
+            const octree<octreeDataCell>& oc,
+            bool forceFind = false
         ) const;
 
         void calculateInverseDistanceWeights() const;
@@ -112,6 +113,9 @@ class meshToMesh
 
         //- Direct hit tolerance
         static const scalar directHitTol;
+
+        //- Cell centre distance required to establish a hit
+        static const scalar cellCentreDistanceTol;
 
 
 public:
@@ -212,7 +216,7 @@ public:
             {
                 return fromMesh_;
             }
- 
+
             const fvMesh& toMesh() const
             {
                 return toMesh_;
