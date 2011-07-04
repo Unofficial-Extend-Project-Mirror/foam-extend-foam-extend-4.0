@@ -60,12 +60,6 @@ const NamedEnum<cyclicPolyPatch::transformType, 3>
 }
 
 
-const Foam::scalar Foam::cyclicPolyPatch::areaMatchTol
-(
-    debug::tolerances("cyclicMatchTol", 1e-4)
-);
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 Foam::label Foam::cyclicPolyPatch::findMaxArea
@@ -390,7 +384,7 @@ void Foam::cyclicPolyPatch::calcTransforms()
 
             // Check max distance between face centre and
             // transformed face centre
-            if (maxRelDistance > sqrt(areaMatchTol))
+            if (maxRelDistance > sqrt(polyPatch::matchTol_))
             {
                 SeriousErrorIn
                 (

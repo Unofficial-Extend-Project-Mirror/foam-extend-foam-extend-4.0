@@ -208,14 +208,6 @@ public:
     TypeName("cyclic");
 
 
-    // Static data
-
-        //- Relative tolerance (for geometric matching only).
-        //  Calculated as a factor of maximum edge length per face.
-        //  HJ, 21/Dec/2006
-        static const scalar areaMatchTol;
-
-
     // Constructors
 
         //- Construct from components

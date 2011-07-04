@@ -103,13 +103,6 @@ class polyPatch
 
 protected:
 
-    // Protected static data
-
-        //- Relative tolerance (for geometric matching). Is factor of
-        //  maximum edge length per face.
-        static const scalar matchTol_;
-
-
     // Protected Member Functions
 
         // The polyPatch geometry initialisation is called by polyBoundaryMesh
@@ -230,8 +223,16 @@ public:
     //- Runtime type information
     TypeName("patch");
 
-    //- Debug switch to disallow the use of genericPolyPatch
-    static int disallowGenericPolyPatch;
+    // Static data
+
+        //- Debug switch to disallow the use of genericPolyPatch
+        static int disallowGenericPolyPatch;
+
+        //- Relative tolerance (for geometric matching)
+        //  Calculated as a factor of maximum edge length per face.
+        //  HJ, 21/Dec/2006
+        static const scalar matchTol_;
+
 
 
     // Declare run-time constructor selection tables

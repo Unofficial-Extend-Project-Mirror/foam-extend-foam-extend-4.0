@@ -59,7 +59,7 @@ void cyclicFvPatch::makeWeights(scalarField& w) const
         if
         (
             mag(magFa[facei] - magFa[facei + sizeby2])/avFa
-          > cyclicPolyPatch::areaMatchTol
+          > polyPatch::matchTol_
         )
         {
             // Found error.  Look for largest matching error
@@ -81,7 +81,7 @@ void cyclicFvPatch::makeWeights(scalarField& w) const
     }
 
     // Check for error in matching
-    if (maxMatchError > cyclicPolyPatch::areaMatchTol)
+    if (maxMatchError > polyPatch::matchTol_)
     {
         scalar avFa = (magFa[errorFace] + magFa[errorFace + sizeby2])/2.0;
 
@@ -91,7 +91,7 @@ void cyclicFvPatch::makeWeights(scalarField& w) const
             << 100*mag(magFa[errorFace] - magFa[errorFace + sizeby2])/avFa
             << "% -- possible face ordering problem." << nl
             << "Cyclic area match tolerance = "
-            << cyclicPolyPatch::areaMatchTol << " patch: " << name()
+            << polyPatch::matchTol_ << " patch: " << name()
             << abort(FatalError);
     }
 }
