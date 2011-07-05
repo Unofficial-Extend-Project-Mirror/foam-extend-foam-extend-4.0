@@ -311,7 +311,8 @@ void Foam::cyclicPolyPatch::calcTransforms()
                 << endl
                 << "Other errors also exist, only the largest is reported. "
                 << "Please rerun with cyclic debug flag set"
-                << " for more information." << exit(FatalError);
+                << " for more information."
+                << abort(FatalError);
         }
 
         if (debug)
