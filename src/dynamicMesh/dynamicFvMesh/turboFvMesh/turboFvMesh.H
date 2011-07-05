@@ -29,7 +29,8 @@ Description
     Simple mixer mesh using an ggi interfaces
 
     This tool is used to have multiple rotating regions around the same origin
-    with different rpms. Creating the cellZones is not implemented in this tool.
+    with different rpms. Creating the cellZones is not implemented
+    in this tool.
     The steps to obtain the cellZones and faceZones are:
 
     1) use regionCellSets utility. With this command you can have different
