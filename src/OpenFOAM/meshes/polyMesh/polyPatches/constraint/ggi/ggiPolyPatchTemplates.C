@@ -297,9 +297,9 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::interpolate
     {
         FatalErrorIn
         (
-            "tmp<Field<Type> > ggiPolyPatch::interpolate"
-            "("
-            "    const Field<Type>& ff"
+            "tmp<Field<Type> > ggiPolyPatch::interpolate\n"
+            "(\n"
+            "    const Field<Type>& ff\n"
             ") const"
         )   << "Incorrect slave patch field size.  Field size: "
             << ff.size() << " patch size: " << shadow().size()
@@ -404,9 +404,30 @@ void Foam::ggiPolyPatch::bridge
     Field<Type>& ff
 ) const
 {
+    // Check and expand the field from patch size to zone size
+    if (ff.size() != size())
+    {
+        FatalErrorIn
+        (
+            "tmp<Field<Type> > ggiPolyPatch::bridge\n"
+            "(\n"
+            "    const Field<Type>& ff,\n"
+            "    Field<Type>& ff\n"
+            ") const"
+        )   << "Incorrect patch field size for bridge.  Field size: "
+            << ff.size() << " patch size: " << size()
+            << abort(FatalError);
+    }
+
     if (bridgeOverlap())
     {
-#       ifdef FAST_PARALLEL_GGI
+#       if 1
+
+        if (empty())
+        {
+            // Patch empty, no bridging
+            return;
+        }
 
         if (localParallel())
         {
