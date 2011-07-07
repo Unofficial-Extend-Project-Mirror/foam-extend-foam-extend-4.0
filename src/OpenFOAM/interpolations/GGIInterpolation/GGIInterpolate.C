@@ -509,11 +509,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridgeMaster
     const labelList& mask
 ) const
 {
-    if
-    (
-        bridgeField.size() != masterPatch_.size()
-     || ff.size() != mask.size()
-    )
+    if (ff.size() != mask.size())
     {
         FatalErrorIn
         (
@@ -578,11 +574,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridgeSlave
     const labelList& mask
 ) const
 {
-    if
-    (
-        bridgeField.size() != slavePatch_.size()
-     || ff.size() != mask.size()
-    )
+    if (ff.size() != mask.size())
     {
         FatalErrorIn
         (

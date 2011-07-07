@@ -65,7 +65,7 @@ void Foam::turboFvMesh::calcMovingPoints() const
     const wordList cellZoneNames = cellZones().names();
 
     // Set the points
-    movingPointsPtr_ = new vectorField(allPoints().size(),vector::zero);
+    movingPointsPtr_ = new vectorField(allPoints().size(), vector::zero);
 
     vectorField& movingPoints = *movingPointsPtr_;
 
@@ -74,14 +74,17 @@ void Foam::turboFvMesh::calcMovingPoints() const
 
     scalar rpm;
 
-    forAll(cellZoneNames,cellZoneI)
+    forAll (cellZoneNames,cellZoneI)
     {
         const labelList& cellAddr =
             cellZones()[cellZones().findZoneID(cellZoneNames[cellZoneI])];
 
         if (dict_.subDict("rpm").found(cellZoneNames[cellZoneI]))
         {
-            rpm = readScalar(dict_.subDict("rpm").lookup(cellZoneNames[cellZoneI]));
+            rpm = readScalar
+            (
+                dict_.subDict("rpm").lookup(cellZoneNames[cellZoneI])
+            );
 
             Info<< "Moving Cell Zone Name: " << cellZoneNames[cellZoneI]
                 << " rpm: " << rpm << endl;

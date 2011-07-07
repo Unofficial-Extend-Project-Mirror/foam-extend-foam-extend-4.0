@@ -34,20 +34,17 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "dynamicFvMesh.H"
 #include "engineTime.H"
-
-using namespace Foam;
+#include "engineTopoChangerMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// Main program:
 
 int main(int argc, char *argv[])
 {
 
 #   include "setRootCase.H"
 #   include "createEngineTime.H"
-#   include "createDynamicFvMesh.H"
+#   include "createEngineDynamicMesh.H"
 
     scalar totalVolume = sum(mesh.V()).value();
 
@@ -80,7 +77,7 @@ int main(int argc, char *argv[])
     );
 
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << endl;
 

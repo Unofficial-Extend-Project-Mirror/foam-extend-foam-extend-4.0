@@ -603,6 +603,12 @@ void Foam::Time::setDeltaT(const scalar deltaT)
 }
 
 
+void Foam::Time::setWriteInterval(const scalar& deltaTheta)
+{
+    writeInterval_ = deltaTheta;
+}
+
+
 Foam::TimeState Foam::Time::subCycle(const label nSubCycles)
 {
     subCycling_ = true;
