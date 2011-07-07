@@ -364,6 +364,11 @@ Foam::dimensionSet Foam::inv(const dimensionSet& ds)
     return dimless/ds;
 }
 
+Foam::dimensionSet Foam::hinv(const dimensionSet& ds)
+{
+    return inv(ds);
+}
+
 Foam::dimensionSet Foam::trans(const dimensionSet& ds)
 {
     if (dimensionSet::debug && !ds.dimensionless())

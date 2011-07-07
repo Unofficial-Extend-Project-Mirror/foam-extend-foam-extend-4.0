@@ -78,6 +78,7 @@ dimensionSet sign(const dimensionSet&);
 dimensionSet pos(const dimensionSet&);
 dimensionSet neg(const dimensionSet&);
 dimensionSet inv(const dimensionSet&);
+dimensionSet hinv(const dimensionSet&);
 
 // Function to check the argument is dimensionless
 //  for transcendental functions

@@ -63,7 +63,7 @@ UNARY_FUNCTION(symmTensor, symmTensor, inv, inv)
 UNARY_FUNCTION(symmTensor, symmTensor, hinv, hinv)
 
 
-// * * * * * * * * * * * * * * * global operators  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Global operators  * * * * * * * * * * * * * //
 
 UNARY_OPERATOR(vector, symmTensor, *, hdual, transform)
 
