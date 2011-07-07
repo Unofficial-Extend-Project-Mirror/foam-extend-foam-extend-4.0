@@ -26,7 +26,7 @@ Application
     moveDynamicMesh
 
 Description
-    Mesh motion and topological mesh changes run for an engine geometry
+    Mesh motion and topological mesh changes utility for an engine geometry
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
@@ -41,11 +41,11 @@ Author
 
 int main(int argc, char *argv[])
 {
-
 #   include "setRootCase.H"
 #   include "createEngineTime.H"
 #   include "createEngineDynamicMesh.H"
 
+<<<<<<< HEAD
     scalar totalVolume = sum(mesh.V()).value();
 
     Info<< "Reading field U\n" << endl;
@@ -76,15 +76,34 @@ int main(int argc, char *argv[])
         zeroGradientFvPatchScalarField::typeName
     );
 
+=======
+
+    fileName path = runTime.caseName();
+    OFstream volFile(path+"/totVol.Cyl");
+>>>>>>> Engine updates: parallelisation of topo changes
 
     while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << endl;
 
-        mesh.update();
-//         mesh.checkMesh(true);
+        volFile << runTime.timeName() << "\t" << sum(mesh.V()).value() << endl;
 
-#       include "checkTotalVolume.H"
+        if (isDir(runTime.path()/"VTK"))
+        {
+            Info << "Clear VTK directory" << endl;
+            rmDir(runTime.path()/"VTK");
+        }
+
+        mesh.update();
+
+#       include "checkVolContinuity.H"
+
+        if(checkEngineMesh)
+        {
+            mesh.checkMesh(true);
+        }
+
+        volFile << runTime.timeName() << tab << sum(mesh.V()).value() << endl;
 
         runTime.write();
 
