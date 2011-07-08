@@ -43,7 +43,10 @@ License
 defineTypeNameAndDebug(Foam::globalMeshData, 0);
 
 // Geometric matching tolerance. Factor of mesh bounding box.
-const Foam::scalar Foam::globalMeshData::matchTol_ = 1E-8;
+const Foam::scalar Foam::globalMeshData::matchTol_
+(
+    debug::tolerances("globalMeshDataMatchTol", 1e-8)
+);
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -73,7 +76,6 @@ void Foam::globalMeshData::initProcAddr()
     }
     processorPatches_.setSize(nNeighbours);
 
-
     if (Pstream::parRun())
     {
         // Send indices of my processor patches to my neighbours
@@ -96,7 +98,7 @@ void Foam::globalMeshData::initProcAddr()
         forAll(processorPatches_, i)
         {
             label patchi = processorPatches_[i];
-            
+
             IPstream fromNeighbour
             (
                 Pstream::blocking,
@@ -105,7 +107,7 @@ void Foam::globalMeshData::initProcAddr()
                     mesh_.boundaryMesh()[patchi]
                 ).neighbProcNo()
             );
-            
+
             fromNeighbour >> processorPatchNeighbours_[patchi];
         }
     }
@@ -210,8 +212,8 @@ void Foam::globalMeshData::calcSharedEdges() const
             {
                 // Found edge which uses shared points. Probably shared.
 
-                // Construct the edge in shared points (or rather global indices
-                // of the shared points)
+                // Construct the edge in shared points (or rather global
+                //  indices of the shared points)
                 edge sharedEdge
                 (
                     sharedPtAddr[e0Fnd()],
@@ -628,7 +630,7 @@ Foam::pointField Foam::globalMeshData::sharedPoints() const
             OPstream toMaster(Pstream::blocking, Pstream::masterNo());
 
             toMaster
-                << sharedPointAddr_ 
+                << sharedPointAddr_
                 << UIndirectList<point>(mesh_.points(), sharedPointLabels_)();
         }
 
@@ -728,7 +730,7 @@ void Foam::globalMeshData::updateMesh()
     // Note: boundBox does reduce
     bb_ = boundBox(mesh_.points());
 
-    scalar tolDim = matchTol_ * bb_.mag();
+    scalar tolDim = matchTol_*bb_.mag();
 
     if (debug)
     {
@@ -747,6 +749,7 @@ void Foam::globalMeshData::updateMesh()
         sharedPointLabels_ = parallelPoints.sharedPointLabels();
         sharedPointAddr_ = parallelPoints.sharedPointAddr();
     }
+
     //// Option 2. Geometric
     //{
     //    // Calculate all shared points. This does all the hard work.
@@ -837,22 +840,32 @@ void Foam::globalMeshData::updateMesh()
             label patchI = processorPatches_[i];
 
             const processorPolyPatch& procPatch =
-                refCast<const processorPolyPatch>(mesh_.boundaryMesh()[patchI]);
+                refCast<const processorPolyPatch>
+                (
+                    mesh_.boundaryMesh()[patchI]
+                );
 
             OPstream toNeighbour(Pstream::blocking, procPatch.neighbProcNo());
 
             toNeighbour << procPatch.localPoints();
         }
 
-        // Receive patch local points and uncount if coincident (and not shared)
+        // Receive patch local points and uncount if coincident and not shared
         forAll(processorPatches_, i)
         {
             label patchI = processorPatches_[i];
 
             const processorPolyPatch& procPatch =
-                refCast<const processorPolyPatch>(mesh_.boundaryMesh()[patchI]);
+                refCast<const processorPolyPatch>
+                (
+                    mesh_.boundaryMesh()[patchI]
+                );
 
-            IPstream fromNeighbour(Pstream::blocking, procPatch.neighbProcNo());
+            IPstream fromNeighbour
+            (
+                Pstream::blocking,
+                procPatch.neighbProcNo()
+            );
 
             pointField nbrPoints(fromNeighbour);
 
@@ -876,8 +889,8 @@ void Foam::globalMeshData::updateMesh()
 
                     if (stat == UNSET)
                     {
-                        // Mark point as visited so if point is on multiple proc
-                        // patches it only gets uncounted once.
+                        // Mark point as visited so if point is on multipl
+                        // e processor patches it only gets uncounted once
                         pointStatus.set(meshPointI, VISITED);
 
                         if (pMap[patchPointI] != -1)

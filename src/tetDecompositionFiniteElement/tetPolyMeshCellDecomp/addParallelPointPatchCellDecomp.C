@@ -56,7 +56,7 @@ public:
 
         for
         (
-            typename SLList<Type>::const_iterator myObjectsIter = 
+            typename SLList<Type>::const_iterator myObjectsIter =
                 myObjects.begin();
             myObjectsIter != myObjects.end();
             ++myObjectsIter
@@ -68,7 +68,7 @@ public:
 
             for
             (
-                typename SLList<Type>::iterator globalObjectsIter = 
+                typename SLList<Type>::iterator globalObjectsIter =
                     globalObjects.begin();
                 globalObjectsIter != globalObjects.end();
                 ++globalObjectsIter
