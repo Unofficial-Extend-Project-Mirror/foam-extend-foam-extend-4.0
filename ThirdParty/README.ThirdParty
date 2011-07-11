@@ -108,8 +108,11 @@ Relocating the RPM root installation directory:
 
 10: Gotchas and solutions:
 
-   Error messages from rpm:
-   ------------------------
+   1: It was reported that version 5.2.0 of rpm does not work well with the provided scripts.
+      rpm version 5.2.1 works nicely.
+
+   2: Error messages from rpm:
+   ---------------------------
 
    Problem : error: can't create transaction lock on /var/lock/rpm/transaction
    Solution: add the following entry in your file ~/.rpmmacros
