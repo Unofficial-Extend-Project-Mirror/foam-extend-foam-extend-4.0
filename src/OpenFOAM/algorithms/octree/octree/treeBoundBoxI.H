@@ -361,7 +361,7 @@ inline Foam::treeBoundBox Foam::treeBoundBox::extend(const scalar s) const
 
     for (direction dir = 0; dir < vector::nComponents; dir++)
     {
-        span[dir] = Foam::max(s*magSpan, span[dir]);
+        span[dir] = Foam::max(magSpan, span[dir]);
     }
 
     bb.min() -= cmptMultiply(s*vector::one, span);
