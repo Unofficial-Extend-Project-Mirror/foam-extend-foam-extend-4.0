@@ -40,6 +40,7 @@ void Foam::OutputFilterFunctionObject<OutputFilter>::readDict()
     dict_.readIfPresent("storeFilter", storeFilter_);
 }
 
+
 template<class OutputFilter>
 void Foam::OutputFilterFunctionObject<OutputFilter>::allocateFilter()
 {
@@ -68,6 +69,7 @@ void Foam::OutputFilterFunctionObject<OutputFilter>::allocateFilter()
         );
     }
 }
+
 
 template<class OutputFilter>
 void Foam::OutputFilterFunctionObject<OutputFilter>::destroyFilter()
