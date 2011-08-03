@@ -227,7 +227,7 @@ void fvMesh::makePhi() const
             << abort(FatalError);
     }
 
-    // Reading old time mesh motion flux if it exists and 
+    // Reading old time mesh motion flux if it exists and
     // creating zero current time mesh motion flux
 
     scalar t0 = this->time().value() - this->time().deltaT().value();
