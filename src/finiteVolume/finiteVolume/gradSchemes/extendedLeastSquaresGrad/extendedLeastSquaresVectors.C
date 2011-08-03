@@ -77,20 +77,18 @@ void Foam::extendedLeastSquaresVectors::makeLeastSquaresVectors() const
             << endl;
     }
 
-    const fvMesh& mesh = mesh_;
-
     pVectorsPtr_ = new surfaceVectorField
     (
         IOobject
         (
             "LeastSquaresP",
-            mesh_.pointsInstance(),
-            mesh_,
+            mesh().pointsInstance(),
+            mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE,
             false
         ),
-        mesh_,
+        mesh(),
         dimensionedVector("zero", dimless/dimLength, vector::zero)
     );
     surfaceVectorField& lsP = *pVectorsPtr_;
@@ -100,24 +98,24 @@ void Foam::extendedLeastSquaresVectors::makeLeastSquaresVectors() const
         IOobject
         (
             "LeastSquaresN",
-            mesh_.pointsInstance(),
-            mesh_,
+            mesh().pointsInstance(),
+            mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE,
             false
         ),
-        mesh_,
+        mesh(),
         dimensionedVector("zero", dimless/dimLength, vector::zero)
     );
     surfaceVectorField& lsN = *nVectorsPtr_;
 
     // Set local references to mesh data
-    const unallocLabelList& owner = mesh_.owner();
-    const unallocLabelList& neighbour = mesh_.neighbour();
-    const volVectorField& C = mesh_.C();
+    const unallocLabelList& owner = mesh().owner();
+    const unallocLabelList& neighbour = mesh().neighbour();
+    const volVectorField& C = mesh().C();
 
     // Set up temporary storage for the dd tensor (before inversion)
-    symmTensorField dd(mesh_.nCells(), symmTensor::zero);
+    symmTensorField dd(mesh().nCells(), symmTensor::zero);
 
     forAll(owner, faceI)
     {
@@ -137,7 +135,7 @@ void Foam::extendedLeastSquaresVectors::makeLeastSquaresVectors() const
     // in the construction of d vectors.
     forAll(lsP.boundaryField(), patchI)
     {
-        const fvPatch& p = mesh_.boundary()[patchI];
+        const fvPatch& p = mesh().boundary()[patchI];
         const unallocLabelList& faceCells = p.faceCells();
 
         // Better version of d-vectors: Zeljko Tukovic, 25/Apr/2010
@@ -177,7 +175,7 @@ void Foam::extendedLeastSquaresVectors::makeLeastSquaresVectors() const
                     << exit(FatalError);
             }
 
-            labelList pointLabels = mesh.cells()[i].labels(mesh.faces());
+            labelList pointLabels = mesh().cells()[i].labels(mesh().faces());
 
             scalar maxDetddij = 0.0;
 
@@ -185,15 +183,15 @@ void Foam::extendedLeastSquaresVectors::makeLeastSquaresVectors() const
 
             forAll(pointLabels, j)
             {
-                forAll(mesh.pointCells()[pointLabels[j]], k)
+                forAll(mesh().pointCells()[pointLabels[j]], k)
                 {
-                    label cellj = mesh.pointCells()[pointLabels[j]][k];
+                    label cellj = mesh().pointCells()[pointLabels[j]][k];
 
                     if (cellj != i)
                     {
                         if (cellj != -1)
                         {
-                            vector dCij = (mesh.C()[cellj] - mesh.C()[i]);
+                            vector dCij = (C[cellj] - C[i]);
 
                             symmTensor ddij =
                                 dd[i] + (1.0/magSqr(dCij))*sqr(dCij);
@@ -214,7 +212,7 @@ void Foam::extendedLeastSquaresVectors::makeLeastSquaresVectors() const
             {
                 additionalCells_[nAddCells][0] = i;
                 additionalCells_[nAddCells++][1] = addCell;
-                vector dCij = mesh.C()[addCell] - mesh.C()[i];
+                vector dCij = C[addCell] - C[i];
                 dd[i] += (1.0/magSqr(dCij))*sqr(dCij);
                 detdd[i] = det(dd[i]);
             }
@@ -226,7 +224,7 @@ void Foam::extendedLeastSquaresVectors::makeLeastSquaresVectors() const
     Info<< "max(detdd) = " << max(detdd) << endl;
     Info<< "min(detdd) = " << min(detdd) << endl;
     Info<< "average(detdd) = " << average(detdd) << endl;
-    Info<< "nAddCells/nCells = " << scalar(nAddCells)/mesh.nCells() << endl;
+    Info<< "nAddCells/nCells = " << scalar(nAddCells)/mesh().nCells() << endl;
 
     // Invert the dd tensor
     symmTensorField invDd = inv(dd);
@@ -248,7 +246,7 @@ void Foam::extendedLeastSquaresVectors::makeLeastSquaresVectors() const
 
     forAll(lsP.boundaryField(), patchI)
     {
-        vectorField pd = mesh_.boundary()[patchI].delta();
+        vectorField pd = mesh().boundary()[patchI].delta();
 
         fvsPatchVectorField& patchLsP = lsP.boundaryField()[patchI];
 
@@ -269,8 +267,8 @@ void Foam::extendedLeastSquaresVectors::makeLeastSquaresVectors() const
 
     forAll(additionalCells_, i)
     {
-        vector dCij = mesh.C()[additionalCells_[i][1]]
-            - mesh.C()[additionalCells_[i][0]];
+        vector dCij = C[additionalCells_[i][1]]
+            - C[additionalCells_[i][0]];
 
         additionalVectors_[i] =
             (1.0/magSqr(dCij))*(invDd[additionalCells_[i][0]] & dCij);
