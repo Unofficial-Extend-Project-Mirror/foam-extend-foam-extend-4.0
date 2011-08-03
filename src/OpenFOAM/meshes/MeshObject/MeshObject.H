@@ -56,8 +56,7 @@ class MeshObject
     public meshObjectBase,
     public regIOobject
 {
-
-protected:
+    // Private data
 
         // Reference to Mesh
         const Mesh& mesh_;
