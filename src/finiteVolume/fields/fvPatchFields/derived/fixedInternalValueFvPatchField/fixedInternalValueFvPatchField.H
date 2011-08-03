@@ -46,7 +46,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-              Class fixedInternalValueFvPatchField Declaration
+                Class fixedInternalValueFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -54,6 +54,11 @@ class fixedInternalValueFvPatchField
 :
     public zeroGradientFvPatchField<Type>
 {
+    // Private data
+
+        //- Value to be set in internal field
+        Field<Type> refValue_;
+
 
 public:
 
@@ -125,10 +130,48 @@ public:
 
     // Member functions
 
+        // Access
+
+            //- Return reference field value
+            const Field<Type>& refValue() const
+            {
+                return refValue_;
+            }
+
+            //- Return access to reference field value
+            Field<Type>& refValue()
+            {
+                return refValue_;
+            }
+
+
+        // Mapping functions
+
+            //- Map (and resize as needed) from self given a mapping object
+            virtual void autoMap
+            (
+                const fvPatchFieldMapper&
+            );
+
+            //- Reverse map the given fvPatchField onto this fvPatchField
+            virtual void rmap
+            (
+                const fvPatchField<Type>&,
+                const labelList&
+            );
+
+
         // Evaluation functions
 
-            //-Manipulate a matrix
+            //- Update the coefficients associated with the patch field
+            virtual void updateCoeffs();
+
+            //- Manipulate a matrix
             virtual void manipulateMatrix(fvMatrix<Type>& matrix);
+
+
+        //- Write
+        virtual void write(Ostream&) const;
 };
 
 

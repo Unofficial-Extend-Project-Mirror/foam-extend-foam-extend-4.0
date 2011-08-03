@@ -191,8 +191,9 @@ void omegaWallFunctionFvPatchScalarField::updateCoeffs()
     volScalarField& G = const_cast<volScalarField&>
         (db().lookupObject<volScalarField>(GName_));
 
-    volScalarField& omega = const_cast<volScalarField&>
-        (db().lookupObject<volScalarField>(dimensionedInternalField().name()));
+    // Note: omega is now a refValue and set in fixedInternalValueFvPatchField
+    // HJ, 3/Aug/2011
+    scalarField& omega = refValue();
 
     const scalarField& k = db().lookupObject<volScalarField>(kName_);
 
@@ -209,10 +210,12 @@ void omegaWallFunctionFvPatchScalarField::updateCoeffs()
 
     const scalarField magGradUw = mag(Uw.snGrad());
 
+    const labelList& faceCells = patch().faceCells();
+
     // Set omega and G
     forAll(nutw, faceI)
     {
-        label faceCellI = patch().faceCells()[faceI];
+        label faceCellI = faceCells[faceI];
 
         scalar yPlus = Cmu25*y[faceI]*sqrt(k[faceCellI])/nuw[faceI];
 
@@ -220,7 +223,10 @@ void omegaWallFunctionFvPatchScalarField::updateCoeffs()
 
         scalar omegaLog = sqrt(k[faceCellI])/(Cmu25*kappa_*y[faceI]);
 
-        omega[faceCellI] = sqrt(sqr(omegaVis) + sqr(omegaLog));
+        // Note: omega is now a refValue and set in
+        // fixedInternalValueFvPatchField
+        // HJ, 3/Aug/2011
+        omega[faceI] = sqrt(sqr(omegaVis) + sqr(omegaLog));
 
         if (yPlus > yPlusLam)
         {
@@ -254,7 +260,6 @@ void omegaWallFunctionFvPatchScalarField::write(Ostream& os) const
     os.writeKeyword("kappa") << kappa_ << token::END_STATEMENT << nl;
     os.writeKeyword("E") << E_ << token::END_STATEMENT << nl;
     os.writeKeyword("beta1") << beta1_ << token::END_STATEMENT << nl;
-    writeEntry("value", os);
 }
 
 
