@@ -193,8 +193,10 @@ void epsilonWallFunctionFvPatchScalarField::updateCoeffs()
     volScalarField& G = const_cast<volScalarField&>
         (db().lookupObject<volScalarField>(GName_));
 
-    volScalarField& epsilon = const_cast<volScalarField&>
-        (db().lookupObject<volScalarField>(dimensionedInternalField().name()));
+    // Note: epsilon is now a refValue and set in
+    // fixedInternalValueFvPatchField
+    // HJ, 3/Aug/2011
+    scalarField& epsilon = refValue();
 
     const volScalarField& k = db().lookupObject<volScalarField>(kName_);
 
@@ -212,16 +214,21 @@ void epsilonWallFunctionFvPatchScalarField::updateCoeffs()
 
     const scalarField magGradUw = mag(Uw.snGrad());
 
+    const labelList& faceCells = patch().faceCells();
+
     // Set epsilon and G
     forAll(mutw, faceI)
     {
-        label faceCellI = patch().faceCells()[faceI];
+        label faceCellI = faceCells[faceI];
 
         scalar yPlus =
             Cmu25*y[faceI]*sqrt(k[faceCellI])
            /(muw[faceI]/rhow[faceI]);
 
-        epsilon[faceCellI] = Cmu75*pow(k[faceCellI], 1.5)/(kappa_*y[faceI]);
+        // Note: epsilon is now a refValue and set in
+        // fixedInternalValueFvPatchField
+        // HJ, 3/Aug/2011
+        epsilon[faceI] = Cmu75*pow(k[faceCellI], 1.5)/(kappa_*y[faceI]);
 
         if (yPlus > yPlusLam)
         {
@@ -264,7 +271,6 @@ void epsilonWallFunctionFvPatchScalarField::write(Ostream& os) const
     os.writeKeyword("Cmu") << Cmu_ << token::END_STATEMENT << nl;
     os.writeKeyword("kappa") << kappa_ << token::END_STATEMENT << nl;
     os.writeKeyword("E") << E_ << token::END_STATEMENT << nl;
-    writeEntry("value", os);
 }
 
 
