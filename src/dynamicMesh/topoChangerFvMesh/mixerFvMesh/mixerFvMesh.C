@@ -46,50 +46,35 @@ namespace Foam
 void Foam::mixerFvMesh::addZonesAndModifiers()
 {
     // Add zones and modifiers for motion action
-
-    if
-    (
-        pointZones().size() > 0
-     || faceZones().size() > 0
-     || cellZones().size() > 0
-    )
+    if (cellZones().size() > 0)
     {
         Info<< "void mixerFvMesh::addZonesAndModifiers() : "
             << "Zones and modifiers already present.  Skipping."
             << endl;
 
-        if (topoChanger_.size() == 0)
+        // Check definition of the modifier
+        if
+        (
+            pointZones().size() > 0
+         || faceZones().size() > 0
+        )
         {
-            FatalErrorIn
-            (
-                "void mixerFvMesh::addZonesAndModifiers()"
-            )   << "Mesh modifiers not read properly"
-                << abort(FatalError);
+            if (topoChanger_.size() == 0)
+            {
+                FatalErrorIn
+                (
+                    "void mixerFvMesh::addZonesAndModifiers()"
+                )   << "Mesh modifiers not read properly.  "
+                    << "pointZones = " <<  pointZones().size()
+                    << " faceZones = " << faceZones().size()
+                    << abort(FatalError);
+            }
         }
 
         return;
     }
 
-    Info<< "Time = " << time().timeName() << endl
-        << "Adding zones and modifiers to the mesh" << endl;
-
-    // Add zones
-    List<pointZone*> pz(1);
-
-    // Add an empty zone for cut points
-
-    pz[0] = new pointZone
-    (
-        "cutPointZone",
-        labelList(0),
-        0,
-        pointZones()
-    );
-
-
-    // Do face zones for slider
-
-    List<faceZone*> fz(3);
+    // Find patches and check sizes
 
     // Moving slider
     const word movingSliderName(dict_.subDict("slider").lookup("moving"));
@@ -114,51 +99,84 @@ void Foam::mixerFvMesh::addZonesAndModifiers()
     }
 
     const polyPatch& movingSlider = boundaryMesh()[movingSliderIndex];
-
-    labelList isf(movingSlider.size());
-
-    forAll (isf, i)
-    {
-        isf[i] = movingSlider.start() + i;
-    }
-
-    fz[0] = new faceZone
-    (
-        movingSliderName + "Zone",
-        isf,
-        boolList(movingSlider.size(), false),
-        0,
-        faceZones()
-    );
-
-    // Static slider
     const polyPatch& staticSlider = boundaryMesh()[staticSliderIndex];
 
-    labelList osf(staticSlider.size());
+    List<pointZone*> pz;
+    List<faceZone*> fz;
 
-    forAll (osf, i)
+    bool addSlider = false;
+
+    if (movingSlider.size() > 0 && staticSlider.size() > 0)
     {
-        osf[i] = staticSlider.start() + i;
+        addSlider = true;
+
+        pz.setSize(1);
+        fz.setSize(3);
+
+        Info<< "Time = " << time().timeName() << endl
+            << "Adding zones and modifiers to the mesh" << endl;
+
+        // Add zones
+
+        // Add an empty zone for cut points
+
+        pz[0] = new pointZone
+        (
+            "cutPointZone",
+            labelList(0),
+            0,
+            pointZones()
+        );
+
+
+        // Do face zones for slider
+
+        // Moving slider
+        labelList isf(movingSlider.size());
+
+        forAll (isf, i)
+        {
+            isf[i] = movingSlider.start() + i;
+        }
+
+        fz[0] = new faceZone
+        (
+            movingSliderName + "Zone",
+            isf,
+            boolList(movingSlider.size(), false),
+            0,
+            faceZones()
+        );
+
+        // Static slider
+        labelList osf(staticSlider.size());
+
+        forAll (osf, i)
+        {
+            osf[i] = staticSlider.start() + i;
+        }
+
+        fz[1] = new faceZone
+        (
+            staticSliderName + "Zone",
+            osf,
+            boolList(staticSlider.size(), false),
+            1,
+            faceZones()
+        );
+
+        // Add empty zone for cut faces
+        fz[2] = new faceZone
+        (
+            "cutFaceZone",
+            labelList(0),
+            boolList(0, false),
+            2,
+            faceZones()
+        );
     }
 
-    fz[1] = new faceZone
-    (
-        staticSliderName + "Zone",
-        osf,
-        boolList(staticSlider.size(), false),
-        1,
-        faceZones()
-    );
-
-    // Add empty zone for cut faces
-    fz[2] = new faceZone
-    (
-        "cutFaceZone",
-        labelList(0),
-        boolList(0, false),
-        2,
-        faceZones()
-    );
+    // Add cell zone even if slider does not exist
 
     List<cellZone*> cz(1);
 
@@ -194,28 +212,32 @@ void Foam::mixerFvMesh::addZonesAndModifiers()
     Info << "Adding point, face and cell zones" << endl;
     addZones(pz, fz, cz);
 
-    // Add a topology modifier
-    Info << "Adding topology modifiers" << endl;
-    topoChanger_.setSize(1);
-    topoChanger_.set
-    (
-        0,
-        new slidingInterface
+    if (addSlider)
+    {
+        // Add a topology modifier
+        Info << "Adding topology modifiers" << endl;
+        topoChanger_.setSize(1);
+
+        topoChanger_.set
         (
-            "mixerSlider",
             0,
-            topoChanger_,
-            staticSliderName + "Zone",
-            movingSliderName + "Zone",
-            "cutPointZone",
-            "cutFaceZone",
-            staticSliderName,
-            movingSliderName,
-            slidingInterface::INTEGRAL,   // Edge matching algorithm
-            attachDetach_,                // Attach-detach action
-            intersection::VISIBLE         // Projection algorithm
-        )
-    );
+            new slidingInterface
+            (
+                "mixerSlider",
+                0,
+                topoChanger_,
+                staticSliderName + "Zone",
+                movingSliderName + "Zone",
+                "cutPointZone",
+                "cutFaceZone",
+                staticSliderName,
+                movingSliderName,
+                slidingInterface::INTEGRAL,   // Edge matching algorithm
+                attachDetach_,                // Attach-detach action
+                intersection::VISIBLE         // Projection algorithm
+            )
+        );
+    }
 
     // Write mesh and modifiers
     topoChanger_.writeOpt() = IOobject::AUTO_WRITE;
@@ -226,7 +248,16 @@ void Foam::mixerFvMesh::addZonesAndModifiers()
 
 bool Foam::mixerFvMesh::attached() const
 {
-    return refCast<const slidingInterface>(topoChanger_[0]).attached();
+    bool result = false;
+
+    if (topoChanger_.size() > 0)
+    {
+        result = refCast<const slidingInterface>(topoChanger_[0]).attached();
+    }
+
+    reduce(result, orOp<bool>());
+
+    return result;
 }
 
 
@@ -272,41 +303,43 @@ void Foam::mixerFvMesh::calcMovingMask() const
         }
     }
 
-    const word movingSliderZoneName
-    (
-        word(dict_.subDict("slider").lookup("moving"))
-      + "Zone"
-    );
-
-    const labelList& movingSliderAddr =
-        faceZones()[faceZones().findZoneID(movingSliderZoneName)];
-
-    forAll (movingSliderAddr, faceI)
+    if (topoChanger_.size() > 0)
     {
-        const face& curFace = f[movingSliderAddr[faceI]];
+        // Topo changer present.  Use zones for motion
+        const word movingSliderZoneName
+        (
+            word(dict_.subDict("slider").lookup("moving")) + "Zone"
+        );
 
-        forAll (curFace, pointI)
+        const labelList& movingSliderAddr =
+            faceZones()[faceZones().findZoneID(movingSliderZoneName)];
+
+        forAll (movingSliderAddr, faceI)
         {
-            movingPointsMask[curFace[pointI]] = 1;
+            const face& curFace = f[movingSliderAddr[faceI]];
+
+            forAll (curFace, pointI)
+            {
+                movingPointsMask[curFace[pointI]] = 1;
+            }
         }
-    }
 
-    const word staticSliderZoneName
-    (
-        word(dict_.subDict("slider").lookup("static"))
-      + "Zone"
-    );
+        const word staticSliderZoneName
+        (
+            word(dict_.subDict("slider").lookup("static")) + "Zone"
+        );
 
-    const labelList& staticSliderAddr =
-        faceZones()[faceZones().findZoneID(staticSliderZoneName)];
+        const labelList& staticSliderAddr =
+            faceZones()[faceZones().findZoneID(staticSliderZoneName)];
 
-    forAll (staticSliderAddr, faceI)
-    {
-        const face& curFace = f[staticSliderAddr[faceI]];
-
-        forAll (curFace, pointI)
+        forAll (staticSliderAddr, faceI)
         {
-            movingPointsMask[curFace[pointI]] = 0;
+            const face& curFace = f[staticSliderAddr[faceI]];
+
+            forAll (curFace, pointI)
+            {
+                movingPointsMask[curFace[pointI]] = 0;
+            }
         }
     }
 }
@@ -415,22 +448,43 @@ bool Foam::mixerFvMesh::update()
 
     autoPtr<mapPolyMesh> topoChangeMap = topoChanger_.changeMesh();
 
-    if (topoChangeMap->morphing())
+    bool localMorphing = topoChangeMap->morphing();
+    bool globalMorphing = localMorphing;
+
+    reduce(globalMorphing, orOp<bool>());
+
+    if (globalMorphing)
     {
         Info << "Attaching rotors" << endl;
 
         deleteDemandDrivenData(movingPointsMaskPtr_);
 
         // Move the sliding interface points to correct position
-        pointField mappedOldPointsNew(allPoints().size());
-        mappedOldPointsNew.map(oldPointsNew, topoChangeMap->pointMap());
+        if (localMorphing)
+        {
+            pointField mappedOldPointsNew(allPoints().size());
+            mappedOldPointsNew.map(oldPointsNew, topoChangeMap->pointMap());
 
-        movePoints(mappedOldPointsNew);
-        resetMotion();
-        setV0();
+            movePoints(mappedOldPointsNew);
 
-        // Move the sliding interface points to correct position
-        movePoints(topoChangeMap->preMotionPoints());
+            resetMotion();
+            setV0();
+
+            // Move the sliding interface points to correct position
+            movePoints(topoChangeMap->preMotionPoints());
+        }
+        else
+        {
+            pointField newPoints = allPoints();
+            movePoints(oldPointsNew);
+
+            resetMotion();
+            setV0();
+
+            // Move the sliding interface points to correct position
+            movePoints(newPoints);
+        }
+
     }
 
     return topoChangeMap->morphing();

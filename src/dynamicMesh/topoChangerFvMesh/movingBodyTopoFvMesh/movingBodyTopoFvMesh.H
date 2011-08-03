@@ -23,22 +23,30 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::movingConeTopoFvMesh
+    Foam::movingBodyTopoFvMesh
 
 Description
-    Sample topoChangerFvMesh that moves an object in x direction
-    and introduces/removes layers.
+    Sample topoChangerFvMesh that moves a cell zone in a given direction,
+    introducing/removing layers around it.
+
+    Cells in the movingCells zone shall be moved given the prescribed velocity
+    and will be bounded in "front" and "back" by other cell zones.
+    Layer addition/removal interfaces are inserted at boundaries between the
+    moving zone and front and back, pointing outside of the moving cell zone
+
+Author and rewrite
+    Hrvoje Jasak, Wikki Ltd.
 
 SourceFiles
-    movingConeTopoFvMesh.C
+    movingBodyTopoFvMesh.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef movingConeTopoFvMesh_H
-#define movingConeTopoFvMesh_H
+#ifndef movingBodyTopoFvMesh_H
+#define movingBodyTopoFvMesh_H
 
 #include "topoChangerFvMesh.H"
-#include "motionSolver.H"
+#include "solidBodyMotionFunction.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,35 +54,29 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class movingConeTopoFvMesh Declaration
+                      Class movingBodyTopoFvMesh Declaration
 \*---------------------------------------------------------------------------*/
 
-class movingConeTopoFvMesh
+class movingBodyTopoFvMesh
 :
     public topoChangerFvMesh
 {
     // Private data
 
-        //- Motion dictionary
-        dictionary motionDict_;
+        //- Dynamic mesh dictionary
+        dictionary dict_;
 
-        //- Motion velocity amplitude
-        vector motionVelAmplitude_;
+        //- Moving cell zone name
+        word movingCellsName_;
 
-        //- Motion velocity period
-        scalar motionVelPeriod_;
+        //- Front face zone name
+        word frontFacesName_;
 
-        //- Motion velocity period
-        vector curMotionVel_;
+        //- Back face zone name
+        word backFacesName_;
 
-        //- Left edge
-        scalar leftEdge_;
-
-        //- Current left obstacle position
-        scalar curLeft_;
-
-        //- Current right obstacle position
-        scalar curRight_;
+        //- Motion control function
+        autoPtr<solidBodyMotionFunction> SBMFPtr_;
 
         //- Vertex motion mask
         scalarField motionMask_;
@@ -83,39 +85,34 @@ class movingConeTopoFvMesh
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        movingConeTopoFvMesh(const movingConeTopoFvMesh&);
+        movingBodyTopoFvMesh(const movingBodyTopoFvMesh&);
 
         //- Disallow default bitwise assignment
-        void operator=(const movingConeTopoFvMesh&);
+        void operator=(const movingBodyTopoFvMesh&);
 
 
         //- Add mixer zones and modifiers
         void addZonesAndModifiers();
 
-        //- Markup motion vertices
-        tmp<scalarField> vertexMarkup
-        (
-            const pointField& p,
-            const scalar& curLeft,
-            const scalar& curRight
-        ) const;
+        //- Mark motion vertices
+        tmp<scalarField> calcMotionMask() const;
 
 
 public:
 
     //- Runtime type information
-    TypeName("movingConeTopoFvMesh");
+    TypeName("movingBodyTopoFvMesh");
 
 
     // Constructors
 
         //- Construct from database
-        explicit movingConeTopoFvMesh(const IOobject& io);
+        explicit movingBodyTopoFvMesh(const IOobject& io);
 
 
     // Destructor
 
-        virtual ~movingConeTopoFvMesh();
+        virtual ~movingBodyTopoFvMesh();
 
 
     // Member Functions

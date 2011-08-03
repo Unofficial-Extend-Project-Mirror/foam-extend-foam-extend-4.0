@@ -10,39 +10,33 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      controlDict;
+    location    "system";
+    object      decomposeParDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     icoDyMFoam;
+// numberOfSubdomains 2;
+// method          simple;
 
-startFrom       startTime;
+numberOfSubdomains 4;
+method          simple;
 
-startTime       0;
+// numberOfSubdomains 5;
+// method    metis;
 
-stopAt          endTime;
+//- Keep owner and neighbour on same processor for faces in zones:
+// preserveFaceZones ( leftZone rightZone );
 
-endTime         20;
 
-deltaT          0.05;
+simpleCoeffs
+{
+//     n               ( 2 1 1 );
+    n               ( 2 2 1 );
+    delta           0.001;
+}
 
-writeControl    adjustableRunTime;
-writeInterval   0.5;
+distributed     no;
 
-cycleWrite      0;
-
-writeFormat     ascii;
-
-writeCompression compressed;
-
-timeFormat      general;
-writePrecision  10;
-timePrecision   10;
-
-runTimeModifiable yes;
-
-adjustTimeStep   on;
-
-maxCo            0.3;
+roots           ( );
 
 // ************************************************************************* //
