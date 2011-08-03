@@ -35,7 +35,7 @@ Description
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
-#include "turbulenceModel.H"
+#include "RASModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -88,9 +88,9 @@ int main(int argc, char *argv[])
 
             singlePhaseTransportModel laminarTransport(U, phi);
 
-            autoPtr<incompressible::turbulenceModel> turbulence
+            autoPtr<incompressible::RASModel> turbulence
             (
-                incompressible::turbulenceModel::New(U, phi, laminarTransport)
+                incompressible::RASModel::New(U, phi, laminarTransport)
             );
 
             Info<< "    Calculating uResidual" << endl;
