@@ -394,6 +394,12 @@ public:
                 return moving_;
             }
 
+            //- Return current motion time index
+            label curMotionTimeIndex() const
+            {
+                return moving_;
+            }
+
             //- Set the mesh to be moving
             bool moving(const bool m)
             {
