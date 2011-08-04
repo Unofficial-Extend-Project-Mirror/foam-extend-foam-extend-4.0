@@ -122,9 +122,9 @@ void faMesh::calcLe() const
             IOobject
             (
                 "Le",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimLength
@@ -226,9 +226,9 @@ void faMesh::calcMagLe() const
             IOobject
             (
                 "magLe",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimLength
@@ -287,9 +287,9 @@ void faMesh::calcAreaCentres() const
             IOobject
             (
                 "centres",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimLength
@@ -357,9 +357,9 @@ void faMesh::calcEdgeCentres() const
             IOobject
             (
                 "edgeCentres",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimLength
@@ -417,12 +417,12 @@ void faMesh::calcS() const
         (
             "S",
             time().timeName(),
-            mesh_,
+            mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
         *this,
-        dimVolume
+        dimArea
     );
     DimensionedField<scalar, areaMesh>& S = *SPtr_;
 
@@ -459,9 +459,9 @@ void faMesh::calcFaceAreaNormals() const
             IOobject
             (
                 "faceAreaNormals",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimless
@@ -526,9 +526,9 @@ void faMesh::calcEdgeAreaNormals() const
             IOobject
             (
                 "edgeAreaNormals",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimless
@@ -666,9 +666,9 @@ void faMesh::calcFaceCurvatures() const
             IOobject
             (
                 "faceCurvatures",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimless/dimLength
@@ -1968,9 +1968,9 @@ tmp<edgeScalarField> faMesh::edgeLengthCorrection() const
             IOobject
             (
                 "edgeLengthCorrection",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimless
