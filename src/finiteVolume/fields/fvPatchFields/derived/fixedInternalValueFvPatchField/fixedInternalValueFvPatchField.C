@@ -145,6 +145,8 @@ void Foam::fixedInternalValueFvPatchField<Type>::updateCoeffs()
     {
         vf[faceCells[faceI]] = refValue_[faceI];
     }
+
+    fvPatchField<Type>::updateCoeffs();
 }
 
 
