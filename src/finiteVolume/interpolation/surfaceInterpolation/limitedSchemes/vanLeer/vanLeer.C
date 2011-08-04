@@ -61,6 +61,16 @@ namespace Foam
     // Deferred correction schemes
     makeDeferredSurfaceInterpolationScheme(vanLeerDC, vanLeerLimiter)
     makeDeferredVSurfaceInterpolationScheme(vanLeerVDC, vanLeerLimiter)
+
+    makeLDeferredSurfaceInterpolationTypeScheme
+    (
+        vanLeer01DC,
+        Limited01Limiter,
+        vanLeerLimiter,
+        NVDTVD,
+        magSqr,
+        scalar
+    )
 }
 
 // ************************************************************************* //
