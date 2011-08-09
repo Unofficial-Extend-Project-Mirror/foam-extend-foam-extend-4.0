@@ -247,24 +247,27 @@ Darwin)
     # Make sure that binaries use the best features of the used OS-Version
     export MACOSX_DEPLOYMENT_TARGET=`sw_vers -productVersion`
 
-    # Use Mac-Ports-Compiler instead of Apple-gcc-4.2
-    case $WM_COMPILER in
-    Gcc43)
-        export WM_CC='gcc-mp-4.3'
-	export WM_CXX='g++-mp-4.3'
-	;;
-    Gcc44)
-        export WM_CC='gcc-mp-4.4'
-	export WM_CXX='g++-mp-4.4'
-	;;
-    Gcc45)
-        export WM_CC='gcc-mp-4.5'
-	export WM_CXX='g++-mp-4.5'
-        ;;
-    *)
-        export WM_COMPILER=
-        ;;
-    esac
+    if [ "$compilerInstall" == "System" ]
+    then
+        # Use Mac-Ports-Compiler instead of Apple-gcc-4.2
+	case $WM_COMPILER in
+	Gcc43)
+            export WM_CC='gcc-mp-4.3'
+	    export WM_CXX='g++-mp-4.3'
+	    ;;
+        Gcc44)
+            export WM_CC='gcc-mp-4.4'
+	    export WM_CXX='g++-mp-4.4'
+	    ;;
+        Gcc45)
+            export WM_CC='gcc-mp-4.5'
+	    export WM_CXX='g++-mp-4.5'
+            ;;
+        *)
+            export WM_COMPILER=
+            ;;
+        esac
+    fi
 
     ;;
 

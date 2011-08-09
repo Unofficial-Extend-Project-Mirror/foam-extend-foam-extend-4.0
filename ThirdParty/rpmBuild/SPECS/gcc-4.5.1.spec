@@ -37,6 +37,9 @@
 %{expand:%%define _WM_THIRD_PARTY_DIR %(echo $WM_THIRD_PARTY_DIR)}
 %{expand:%%define _WM_OPTIONS         %(echo $WM_OPTIONS)}
 
+# Disable the generation of debuginfo packages
+%define debug_package %{nil}
+
 # The topdir needs to point to the $WM_THIRD_PARTY/rpmbuild directory
 %define _topdir	 	%{_WM_THIRD_PARTY_DIR}/rpmBuild
 %define _tmppath	%{_topdir}/tmp
@@ -93,7 +96,7 @@ Group: 			Development/Tools
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
     GMP_VERSION=gmp-5.0.1
-    MPFR_VERSION=mpfr-3.0.0
+    MPFR_VERSION=mpfr-3.0.1
     MPC_VERSION=mpc-0.8.2
 
     mkdir ./objBuildDir
@@ -113,7 +116,7 @@ Group: 			Development/Tools
 
 %install
     cd ./objBuildDir
-    make install prefix=$RPM_BUILD_ROOT%{_installPrefix}
+    make install DESTDIR=$RPM_BUILD_ROOT
 
     # Creation of OpenFOAM specific .csh and .sh files"
 
@@ -152,6 +155,11 @@ if ( -e \$GCC_DIR/bin ) then
     _foamAddPath \$GCC_DIR/bin
 endif
 DOT_CSH_EOF
+
+    #finally, generate a .tgz file for systems where using rpm for installing packages
+    # as a non-root user might be a problem.
+    (mkdir -p  %{_topdir}/TGZS/%{_target_cpu}; cd $RPM_BUILD_ROOT/%{_prefix}; tar -zcvf %{_topdir}/TGZS/%{_target_cpu}/%{name}-%{version}.tgz  packages/%{name}-%{version})
+
 
 %clean
 rm -rf %{buildroot}

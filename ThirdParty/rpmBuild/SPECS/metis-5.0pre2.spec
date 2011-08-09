@@ -37,6 +37,9 @@
 %{expand:%%define _WM_THIRD_PARTY_DIR %(echo $WM_THIRD_PARTY_DIR)}
 %{expand:%%define _WM_OPTIONS         %(echo $WM_OPTIONS)}
 
+# Disable the generation of debuginfo packages
+%define debug_package %{nil}
+
 # The topdir needs to point to the $WM_THIRD_PARTY/rpmbuild directory
 %define _topdir	 	%{_WM_THIRD_PARTY_DIR}/rpmBuild
 %define _tmppath	%{_topdir}/tmp
@@ -70,7 +73,7 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis
+URL:                    http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/OLD
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
@@ -157,6 +160,11 @@ if ( -e \$METIS_LIB_DIR ) then
     _foamAddLib \$METIS_LIB_DIR
 endif
 DOT_CSH_EOF
+
+    #finally, generate a .tgz file for systems where using rpm for installing packages
+    # as a non-root user might be a problem.
+    (mkdir -p  %{_topdir}/TGZS/%{_target_cpu}; cd $RPM_BUILD_ROOT/%{_prefix}; tar -zcvf %{_topdir}/TGZS/%{_target_cpu}/%{name}-%{version}.tgz  packages/%{name}-%{version})
+
 
 %clean
 rm -rf %{buildroot}

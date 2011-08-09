@@ -37,6 +37,9 @@
 %{expand:%%define _WM_THIRD_PARTY_DIR %(echo $WM_THIRD_PARTY_DIR)}
 %{expand:%%define _WM_OPTIONS         %(echo $WM_OPTIONS)}
 
+# Disable the generation of debuginfo packages
+%define debug_package %{nil}
+
 # The topdir needs to point to the $WM_THIRD_PARTY/rpmbuild directory
 %define _topdir	 	%{_WM_THIRD_PARTY_DIR}/rpmBuild
 %define _tmppath	%{_topdir}/tmp
@@ -84,6 +87,7 @@ Group: 			Development/Tools
 %prep
 %setup -q
 
+
 %build
     # export WM settings in a form that GNU configure recognizes
     [ -n "$WM_CC" ]         &&  export CC="$WM_CC"
@@ -93,36 +97,42 @@ Group: 			Development/Tools
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
     unset mpiWith
-        # enable GridEngine if it appears to be in use
+    # Enable GridEngine if it appears to be in use
+    # If you don't want any integration with SGE, simply unset the SGE
+    # environment variable
     if [ -n "$SGE_ROOT" ]
     then
         mpiWith="$mpiWith --with-sge"
+    else
+        mpiWith="$mpiWith --without-sge"
+	mpiWith="$mpiWith --enable-mca-no-build=ras-gridengine,pls-gridengine"
     fi
 
-        # Infiniband support
-        # if [ -d /usr/local/ofed -a -d /usr/local/ofed/lib64 ]
-        # then
-        #     mpiWith="$mpiWith --with-openib=/usr/local/ofed"
-        #     mpiWith="$mpiWith --with-openib-libdir=/usr/local/ofed/lib64"
-        # fi
+    # Infiniband support
+    # Adjust according to your local paths
+    # if [ -d /usr/local/ofed -a -d /usr/local/ofed/lib64 ]
+    # then
+    #     mpiWith="$mpiWith --with-openib=/usr/local/ofed"
+    #     mpiWith="$mpiWith --with-openib-libdir=/usr/local/ofed/lib64"
+    # fi
 
     ./configure \
-        --prefix=$RPM_BUILD_ROOT%{_installPrefix}  \
+        --prefix=%{_installPrefix}  \
+        --exec_prefix=%{_installPrefix}  \
         --disable-mpirun-prefix-by-default \
         --disable-orterun-prefix-by-default \
         --enable-shared --disable-static \
         --disable-mpi-f77 \
         --disable-mpi-f90 \
         --disable-mpi-cxx \
-        --disable-mpi-profile \
-        $mpiWith \
-        ;
+        --without-slurm \
+        --disable-mpi-profile $mpiWith
 
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
     make -j $WM_NCOMPPROCS
 
 %install
-    make install prefix=$RPM_BUILD_ROOT%{_installPrefix}
+    make install DESTDIR=$RPM_BUILD_ROOT
 
     # Creation of OpenFOAM specific .csh and .sh files"
 
@@ -136,7 +146,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_installPrefix}/etc
 cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 # Load %{name}-%{version} libraries and binaries
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-export OPENMPI_DIR=\$WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3/platforms/\$WM_OPTIONS
+export OPENMPI_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 export OPENMPI_BIN_DIR=\$OPENMPI_DIR/bin
 export OPENMPI_LIB_DIR=\$OPENMPI_DIR/lib
 
@@ -160,7 +170,7 @@ export PLIBS=\$OPENMPI_LINK_FLAGS
 
 if [ "\$FOAM_VERBOSE" -a "\$PS1" ]
 then
-    echo "Using system installed OpenMPI:"
+    echo "  Environment variables defined for OpenMPI:"
     echo "    OPENMPI_BIN_DIR       : \$OPENMPI_BIN_DIR"
     echo "    OPENMPI_LIB_DIR       : \$OPENMPI_LIB_DIR"
     echo "    OPENMPI_INCLUDE_DIR   : \$OPENMPI_INCLUDE_DIR"
@@ -209,7 +219,7 @@ setenv PLIBS "\$OPENMPI_LINK_FLAGS"
 
 
 if (\$?FOAM_VERBOSE && \$?prompt) then
-    echo "Using system installed OpenMPI:"
+    echo "  Environment variables defined for OpenMPI:"
     echo "    OPENMPI_BIN_DIR       : \$OPENMPI_BIN_DIR"
     echo "    OPENMPI_LIB_DIR       : \$OPENMPI_LIB_DIR"
     echo "    OPENMPI_INCLUDE_DIR   : \$OPENMPI_INCLUDE_DIR"
@@ -224,9 +234,14 @@ if (\$?FOAM_VERBOSE && \$?prompt) then
 endif
 DOT_CSH_EOF
 
+    #finally, generate a .tgz file for systems where using rpm for installing packages
+    # as a non-root user might be a problem.
+    (mkdir -p  %{_topdir}/TGZS/%{_target_cpu}; cd $RPM_BUILD_ROOT/%{_prefix}; tar -zcvf %{_topdir}/TGZS/%{_target_cpu}/%{name}-%{version}.tgz  packages/%{name}-%{version})
+
+
 %clean
 rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%{_installPrefix}/*
+%{_installPrefix}
