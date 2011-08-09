@@ -11,6 +11,7 @@ runApplication setSet -batch setBatch
 
 cd constant/polyMesh/sets/
 \rm leftCentre leftCentre_old leftWallSet leftWallSet_old leftZone_old rightCentre rightCentre_old rightWallSet rightWallSet_old rightZone_old wallSet
+\rm leftCentre.gz leftCentre_old.gz leftWallSet.gz leftWallSet_old.gz leftZone_old.gz rightCentre.gz rightCentre_old.gz rightWallSet.gz rightWallSet_old.gz rightZone_old.gz wallSet.gz
 cd ../../..
 
 runApplication setsToZones
