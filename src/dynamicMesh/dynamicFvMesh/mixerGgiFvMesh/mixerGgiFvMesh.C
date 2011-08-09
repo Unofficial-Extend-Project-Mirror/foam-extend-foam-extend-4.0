@@ -111,6 +111,7 @@ void Foam::mixerGgiFvMesh::addZonesAndModifiers()
     addZones(pz, fz, cz);
 
     // Write mesh
+    syncUpdateMesh();
     write();
 }
 
