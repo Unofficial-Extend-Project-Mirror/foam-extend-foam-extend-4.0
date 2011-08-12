@@ -63,7 +63,7 @@ reconstruct
         (
             IOobject
             (
-                "volIntegrate("+ssf.name()+')',
+                "volIntegrate(" + ssf.name() + ')',
                 ssf.instance(),
                 mesh,
                 IOobject::NO_READ,
@@ -74,6 +74,27 @@ reconstruct
             zeroGradientFvPatchField<GradType>::typeName
         )
     );
+    GeometricField<GradType, fvPatchField, volMesh>& reconField =
+        treconField();
+
+    // Note:
+    // 1) Reconstruction is only available in cell centres: there is no need
+    //    to invert the tensor on the boundary
+    // 2) For boundaries, the only reconstructed data is the flux times
+    //    normal.  Based on this guess, boundary conditions can adjust
+    //    patch values
+    // HJ, 12/Aug/2011
+
+    GeometricField<GradType, fvPatchField, volMesh> fluxTimesNormal =
+        surfaceSum((mesh.Sf()/mesh.magSf())*ssf);
+
+    reconField.internalField() =
+    (
+        inv(surfaceSum(sqr(mesh.Sf())/mesh.magSf())().internalField())
+      & fluxTimesNormal.internalField()
+    );
+
+    reconField.boundaryField() = fluxTimesNormal.boundaryField();
 
     treconField().correctBoundaryConditions();
 
