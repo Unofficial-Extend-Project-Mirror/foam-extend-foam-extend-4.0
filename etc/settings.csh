@@ -154,7 +154,7 @@ set mpi_version=unknown
 
 switch ("$WM_MPLIB")
 case OPENMPI:
-    if (-d $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3 ) then
+    if (-d $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3/platforms/$WM_OPTIONS ) then
 	set mpi_version=openmpi-1.4.3
 
 	if ($?FOAM_VERBOSE && $?prompt) then
@@ -162,7 +162,7 @@ case OPENMPI:
         endif
 	_foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
 
-    else if (-d $WM_THIRD_PARTY_DIR/packages/openmpi-1.5 ) then
+    else if (-d $WM_THIRD_PARTY_DIR/packages/openmpi-1.5/platforms/$WM_OPTIONS ) then
 	set mpi_version=openmpi-1.5
 
 	if ($?FOAM_VERBOSE && $?prompt) then
@@ -380,38 +380,38 @@ endif
 
 # Mesquite library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if ( $?MESQUITE_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2 ) then
+if ( $?MESQUITE_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS/etc/mesquite-2.1.2.csh
 endif
 
 # Metis library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
-if ( $?METIS_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2 ) then
+if ( $?METIS_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS/etc/metis-5.0pre2.csh
 endif
 
 # ParMetis library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if ( $?PARMETIS_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1 ) then
+if ( $?PARMETIS_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1/platforms/$WM_OPTIONS/etc/ParMetis-3.1.1.csh
 endif
 
 # ParMGridGen library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if ( $?PARMGRIDGEN_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0 ) then
+if ( $?PARMGRIDGEN_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS/etc/ParMGridGen-1.0.csh
 endif
 
 # Load Libccmio library 
 # ~~~~~~~~~~~~~~~~~~~~~
-if ( $?LIBCCMIO_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1 ) then
+if ( $?LIBCCMIO_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1/platforms/$WM_OPTIONS/etc/libccmio-2.6.1.csh
 endif
 
 
 # Scotch library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if ( $?SCOTCH_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b ) then
+if ( $?SCOTCH_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b/platforms/$WM_OPTIONS/etc/scotch-5.1.10b.csh
 endif
 
@@ -425,26 +425,26 @@ endif
 
 # cmake
 # ~~~~~
-if ( $?CMAKE_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.3 ) then
+if ( $?CMAKE_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.3/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3/platforms/$WM_OPTIONS/etc/cmake-2.8.3.csh
 endif
 
 # Python
 # ~~~~~
-if ( $?PYTHON_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/Python-2.7 ) then
+if ( $?PYTHON_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/Python-2.7/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/Python-2.7/platforms/$WM_OPTIONS/etc/Python-2.7.csh
 endif
 
 # QT
 # ~~~~~
-if ( $?QT_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-opensource-src-4.7.0 )then
+if ( $?QT_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-opensource-src-4.7.0/platforms/$WM_OPTIONS )then
     _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.0/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.7.0.csh
 endif
 
 # PARAVIEW
 # ~~~~~
-if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.8.1 ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.csh
+if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.10.1/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.10.1/platforms/$WM_OPTIONS/etc/ParaView-3.10.1.csh
 endif
 
 if ( $WM_ARCH == "darwinIntel" || $WM_ARCH == "darwinIntel64" ) then

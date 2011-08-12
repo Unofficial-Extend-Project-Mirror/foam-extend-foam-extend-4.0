@@ -195,7 +195,7 @@ unset MPI_ARCH_PATH
 mpi_version=unknown
 case "$WM_MPLIB" in
 OPENMPI)
-    if [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3 ]
+    if [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3/platforms/$WM_OPTIONS ]
         then
         mpi_version=openmpi-1.4.3
         if [ "$FOAM_VERBOSE" -a "$PS1" ]
@@ -204,7 +204,7 @@ OPENMPI)
         fi
         _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.sh
 
-    elif [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.5 ]
+    elif [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.5/platforms/$WM_OPTIONS ]
         then
         mpi_version=openmpi-1.5
         if [ "$FOAM_VERBOSE" -a "$PS1" ]
@@ -432,7 +432,7 @@ export MPI_BUFFER_SIZE
 
 # Load Mesquite library 
 # ~~~~~~~~~~~~~~~~~~~~~~
-[ -z "$MESQUITE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2 ] && {
+[ -z "$MESQUITE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS/etc/mesquite-2.1.2.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    MESQUITE_DIR is initialized to: $MESQUITE_DIR"
@@ -440,7 +440,7 @@ export MPI_BUFFER_SIZE
 
 # Load Metis library 
 # ~~~~~~~~~~~~~~~~~~
-[ -z "$METIS_SYSTEM" ] && [ -d $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2 ] && {
+[ -z "$METIS_SYSTEM" ] && [ -d $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS/etc/metis-5.0pre2.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    METIS_DIR is initialized to: $METIS_DIR"
@@ -448,7 +448,7 @@ export MPI_BUFFER_SIZE
 
 # Load ParMetis library
 # ~~~~~~~~~~~~~~~~~~~~~
-[ -z "$PARMETIS_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1 ] && {
+[ -z "$PARMETIS_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1/platforms/$WM_OPTIONS/etc/ParMetis-3.1.1.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARMETIS_DIR is initialized to: $PARMETIS_DIR"
@@ -456,7 +456,7 @@ export MPI_BUFFER_SIZE
 
 # Load ParMGridGen library 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
-[ -z "$PARMGRIDGEN_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0 ] && {
+[ -z "$PARMGRIDGEN_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS/etc/ParMGridGen-1.0.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARMGRIDGEN_DIR is initialized to: $PARMGRIDGEN_DIR"
@@ -464,7 +464,7 @@ export MPI_BUFFER_SIZE
 
 # Load Libccmio library 
 # ~~~~~~~~~~~~~~~~~~~~~
-[ -z "$LIBCCMIO_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1 ] && {
+[ -z "$LIBCCMIO_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1/platforms/$WM_OPTIONS/etc/libccmio-2.6.1.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    LIBCCMIO_DIR is initialized to: $LIBCCMIO_DIR"
@@ -472,7 +472,7 @@ export MPI_BUFFER_SIZE
 
 # Load Scotch library
 # ~~~~~~~~~~~~~~~~~~~
-[ -z "$SCOTCH_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b ] && {
+[ -z "$SCOTCH_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b/platforms/$WM_OPTIONS/etc/scotch-5.1.10b.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    SCOTCH_DIR is initialized to: $SCOTCH_DIR"
@@ -480,28 +480,28 @@ export MPI_BUFFER_SIZE
 
 # Load cmake
 # ~~~~~~~~~~
-[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3 ] && {
+[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3/platforms/$WM_OPTIONS/etc/cmake-2.8.3.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    CMAKE_DIR is initialized to: $CMAKE_DIR"
 
 # Load m4
 # ~~~~~~~~~~
-[ -z "$M4_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/m4-1.4.16 ] && {
+[ -z "$M4_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/m4-1.4.16/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/m4-1.4.16/platforms/$WM_OPTIONS/etc/m4-1.4.16.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    M4_DIR is initialized to: $M4_DIR"
 
 # Load bison
 # ~~~~~~~~~~
-[ -z "$BISON_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/bison-2.4.3 ] && {
+[ -z "$BISON_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/bison-2.4.3/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/bison-2.4.3/platforms/$WM_OPTIONS/etc/bison-2.4.3.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    BISON_DIR is initialized to: $BISON_DIR"
 
 # Load flex
 # ~~~~~~~~~~
-[ -z "$FLEX_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/flex-2.5.35 ] && {
+[ -z "$FLEX_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/flex-2.5.35/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/flex-2.5.35/platforms/$WM_OPTIONS/etc/flex-2.5.35.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    FLEX_DIR is initialized to: $FLEX_DIR"
@@ -517,7 +517,7 @@ export MPI_BUFFER_SIZE
 
 # Load Python
 # ~~~~~~~~~~~
-[ -z "$PYTHON_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/Python-2.7 ] && {
+[ -z "$PYTHON_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/Python-2.7/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/Python-2.7/platforms/$WM_OPTIONS/etc/Python-2.7.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PYTHON_DIR is initialized to: $PYTHON_DIR"
@@ -525,7 +525,7 @@ export MPI_BUFFER_SIZE
 
 # Load QT
 # ~~~~~~~
-[ ! -z "$QT_THIRD_PARTY" ] && [ -e $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.0 ] && {
+[ ! -z "$QT_THIRD_PARTY" ] && [ -e $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.0/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.0/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.7.0.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    QT_DIR is initialized to: $QT_DIR"
@@ -533,8 +533,8 @@ export MPI_BUFFER_SIZE
 
 # Load ParaView
 # ~~~~~~~~~~~~~
-[ -z "$PARAVIEW_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1 ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.sh
+[ -z "$PARAVIEW_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.10.1/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.10.1/platforms/$WM_OPTIONS/etc/ParaView-3.10.1.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARAVIEW_DIR is initialized to: $PARAVIEW_DIR"
 

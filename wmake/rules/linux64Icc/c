@@ -10,7 +10,7 @@ cFLAGS      = $(GFLAGS) $(cWARN) $(cOPT) $(cDBUG) $(LIB_HEADER_DIRS) -fPIC
 
 ctoo        = $(WM_SCHEDULER) $(cc) $(cFLAGS) -c $$SOURCE -o $@
 
-LINK_LIBS   = $(cDBUG) -L$(IA32ROOT)/lib
+LINK_LIBS   = $(cDBUG)
 
 LINKLIBSO   = $(cc) $(cFLAGS) -shared
 LINKEXE     = $(cc) $(cFLAGS)
