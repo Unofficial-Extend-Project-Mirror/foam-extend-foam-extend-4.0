@@ -115,7 +115,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridge
     const Field<Type>& bridgeField,
     Field<Type>& ff,
     const labelList& mask,
-    const labelList& addr
+    const labelList& uncoveredFaces
 )
 {
     // Note: tricky algorithm
@@ -124,21 +124,30 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridge
     // This implies an n-squared search, but we can use the fact that
     // both lists are ordered.
 
-    label curAddrI = 0;
+    label maskAddrI = 0;
 
-    forAll (mask, maskI)
+    forAll (uncoveredFaces, uncoI)
     {
-        // Pick the masked face
-        const label faceI = mask[maskI];
+        // Pick the uncovered face
+        const label faceI = uncoveredFaces[uncoI];
 
-        for (; curAddrI < addr.size(); curAddrI++)
+        // Search through the mask
+        for (; maskAddrI < mask.size(); maskAddrI++)
         {
-            if (faceI == addr[curAddrI])
+            if (faceI == mask[maskAddrI])
             {
                 // Found masked bridged face
                 // Put the result into condensed list: masked faces only
-                ff[maskI] = bridgeField[faceI];
+                ff[maskAddrI] = bridgeField[maskAddrI];
 
+                break;
+            }
+            else if (mask[maskAddrI] > faceI)
+            {
+                // Gone beyond my index: my face is not present in the mask
+                // Go one back and check for next uncovered face
+
+                maskAddrI--;
                 break;
             }
         }
