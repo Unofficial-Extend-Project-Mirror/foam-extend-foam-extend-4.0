@@ -118,12 +118,11 @@ void basicSymmetryFvPatchField<Type>::evaluate(const Pstream::commsTypes)
     }
 
     vectorField nHat = this->patch().nf();
+
+    Field<Type> pif = this->patchInternalField();
     Field<Type>::operator=
     (
-        (
-            this->patchInternalField()
-          + transform(I - 2.0*sqr(nHat), this->patchInternalField())
-        )/2.0
+        0.5*(pif + transform(I - 2.0*sqr(nHat), pif))
     );
 
     transformFvPatchField<Type>::evaluate();
