@@ -393,7 +393,7 @@ class GGIInterpolation
             const Field<Type>& bridgeField,
             Field<Type>& ff,
             const labelList& mask,
-            const labelList& addr
+            const labelList& uncoveredFaces
         );
 
         //- Is a transform required?
