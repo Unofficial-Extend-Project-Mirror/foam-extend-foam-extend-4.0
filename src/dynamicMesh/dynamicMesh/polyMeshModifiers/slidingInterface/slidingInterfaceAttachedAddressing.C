@@ -329,7 +329,7 @@ void Foam::slidingInterface::renumberAttachedAddressing
     // Renumber stick-out faces
 
     const labelList& reverseFaceMap = m.reverseFaceMap();
-    
+
     // Master side
     const labelList& msof = masterStickOutFaces();
 
