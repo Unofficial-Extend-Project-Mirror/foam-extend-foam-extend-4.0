@@ -11,6 +11,8 @@ EXE_LIBS = \
     -lengine \
     -lerrorEstimation \
     -lfiniteVolume \
+    -lfiniteArea \
+    $(WM_DECOMP_LIBS) \
     -lforces \
     -lfvMotionSolver \
     -lincompressibleLESModels \
