@@ -91,7 +91,7 @@ bool Foam::polyTopoChanger::reorderCoupledPatches
 
     // faceMap = identity(faces.size());
     // faceMap for boundary faces will be forwarded to polyPatch::order(...)
-    for(label i=0; i<patchStarts[0]; i++)
+    for (label i = 0; i < patchStarts[0]; i++)
     {
         faceMap[i] = i;
     }
@@ -459,7 +459,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
         cfLabels(cells.size() + ref.addedCells().size());
 
     // Insert untouched internal faces
-    for(label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
+    for (label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
     {
         if (!removedFaces.found(faceI))
         {
