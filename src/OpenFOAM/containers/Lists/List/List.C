@@ -35,8 +35,6 @@ License
 #include "BiIndirectList.H"
 #include "contiguous.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
 // Construct with length specified
