@@ -491,7 +491,7 @@ void Foam::multiphaseMixture::solveAlphas
             mesh_,
             alphaTable_,
             phi_,
-            mesh_.divScheme(alphaScheme)
+            mesh_.schemesDict().divScheme(alphaScheme)
         )
     );
 
@@ -544,7 +544,7 @@ void Foam::multiphaseMixture::solveAlphas
                 alphaEqn += fvm::div(phirb12, alpha, alphacScheme);
             }
 
-            alphaEqn.solve(mesh_.solver("alpha"));
+            alphaEqn.solve(mesh_.solutionDict().solver("alpha"));
 
             rhoPhi_ += alphaEqn.flux()*(alpha.rho() - refPhase.rho());
 

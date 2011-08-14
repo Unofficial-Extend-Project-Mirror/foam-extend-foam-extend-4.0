@@ -61,9 +61,9 @@ void edgeInterpolation::clearOut()
 
 edgeInterpolation::edgeInterpolation(const faMesh& fam)
 :
-    faSchemes(fam()),
-    faSolution(fam()),
     faMesh_(fam),
+    schemesDict_(fam()),
+    solutionDict_(fam()),
     lPN_(NULL),
     weightingFactors_(NULL),
     differenceFactors_(NULL),
@@ -190,7 +190,7 @@ const edgeVectorField& edgeInterpolation::skewCorrectionVectors() const
 
 
 // Do what is neccessary if the mesh has moved
-bool edgeInterpolation::movePoints()
+bool edgeInterpolation::movePoints() const
 {
     deleteDemandDrivenData(lPN_);
     deleteDemandDrivenData(weightingFactors_);
@@ -224,8 +224,8 @@ void edgeInterpolation::makeLPN() const
         IOobject
         (
             "lPN",
-            faSolution::time().constant(),
-            faSolution::db(),
+            faMesh_.time().constant(),
+            faMesh_.db(),
             IOobject::NO_READ,
             IOobject::NO_WRITE,
             false
@@ -259,7 +259,7 @@ void edgeInterpolation::makeLPN() const
               - faceCentres[owner[edgeI]]
             );
 
-        scalar lEN = 
+        scalar lEN =
             mag
             (
                 faceCentres[neighbour[edgeI]]
@@ -341,7 +341,7 @@ void edgeInterpolation::makeWeights() const
               - faceCentres[owner[edgeI]]
             );
 
-        scalar lEN = 
+        scalar lEN =
             mag
             (
                 faceCentres[neighbour[edgeI]]
@@ -349,7 +349,7 @@ void edgeInterpolation::makeWeights() const
               + curSkewCorrVec
             );
 
-        weightingFactors.internalField()[edgeI] = 
+        weightingFactors.internalField()[edgeI] =
             lEN
             /(
                 lPE
@@ -439,7 +439,7 @@ void edgeInterpolation::makeDeltaCoeffs() const
 
         // Calc PN arc length
         vector curSkewCorrVec = vector::zero;
-        
+
         if (skew())
         {
             curSkewCorrVec = skewCorrectionVectors()[edgeI];
@@ -453,7 +453,7 @@ void edgeInterpolation::makeDeltaCoeffs() const
               - faceCentres[owner[edgeI]]
             );
 
-        scalar lEN = 
+        scalar lEN =
             mag
             (
                 faceCentres[neighbour[edgeI]]
@@ -660,13 +660,13 @@ void edgeInterpolation::makeSkewCorrectionVectors() const
 
         if (patchSkewCorrVecs.coupled())
         {
-            const unallocLabelList& edgeFaces = 
+            const unallocLabelList& edgeFaces =
                 mesh().boundary()[patchI].edgeFaces();
 
             const edgeList::subList patchEdges =
                 mesh().boundary()[patchI].patchSlice(edges);
 
-            vectorField ngbC = 
+            vectorField ngbC =
                 C.boundaryField()[patchI].patchNeighbourField();
 
             forAll (patchSkewCorrVecs, edgeI)
@@ -681,7 +681,7 @@ void edgeInterpolation::makeSkewCorrectionVectors() const
 
                 vector E = S + alpha*e;
 
-                patchSkewCorrVecs[edgeI] = 
+                patchSkewCorrVecs[edgeI] =
                     Ce.boundaryField()[patchI][edgeI] - E;
             }
         }
@@ -702,14 +702,14 @@ void edgeInterpolation::makeSkewCorrectionVectors() const
         lPN[edgeI] =
             mag
             (
-                Ce[edgeI] 
+                Ce[edgeI]
               - SkewCorrVecs[edgeI]
               - C[owner[edgeI]]
             )
           + mag
             (
                 C[neighbour[edgeI]]
-              - Ce[edgeI] 
+              - Ce[edgeI]
               + SkewCorrVecs[edgeI]
             );
     }

@@ -79,6 +79,9 @@ protected:
         //- Make patch face - neighbour cell distances
         virtual void makeDeltaCoeffs(scalarField&) const;
 
+        //- Make patch face non-orthogonality correction vectors
+        virtual void makeCorrVecs(vectorField&) const;
+
         //- Return contents of transfer buffer
         const labelField& transferBuffer() const
         {

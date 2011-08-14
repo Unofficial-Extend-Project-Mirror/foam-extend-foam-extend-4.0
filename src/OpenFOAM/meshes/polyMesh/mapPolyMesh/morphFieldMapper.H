@@ -75,7 +75,6 @@ public:
 
         //- Return list of inserted objects
         virtual const labelList& insertedObjectLabels() const = 0;
-
 };
 
 

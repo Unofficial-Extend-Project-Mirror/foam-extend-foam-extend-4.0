@@ -228,7 +228,7 @@ void tetFemMatrix<Type>::relax()
 
     if (psi_.mesh().relax(psi_.name()))
     {
-        alpha = psi_.mesh().relaxationFactor(psi_.name());
+        alpha = psi_.mesh().solutionDict().relaxationFactor(psi_.name());
     }
 
     if (alpha > 0)

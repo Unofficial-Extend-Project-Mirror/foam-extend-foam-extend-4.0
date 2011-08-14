@@ -75,10 +75,10 @@ class fvPatchMapper
         //- Is the mapping direct
         mutable bool* directPtr_;
 
-        //- Direct addressing (only one for of addressing is used)
+        //- Direct addressing (only one form of addressing is used)
         mutable labelList* directAddrPtr_;
 
-        //- Interpolated addressing (only one for of addressing is used)
+        //- Interpolated addressing (only one form of addressing is used)
         mutable labelListList* interpolationAddrPtr_;
 
         //- Interpolation weights
@@ -105,8 +105,6 @@ class fvPatchMapper
 
 
 public:
-
-    // Static data members
 
     // Constructors
 
@@ -151,7 +149,6 @@ public:
 
         //- Return interpolaion weights
         virtual const scalarListList& weights() const;
-
 };
 
 

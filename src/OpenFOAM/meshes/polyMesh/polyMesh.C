@@ -705,7 +705,7 @@ void Foam::polyMesh::resetPrimitives
 
 
     // Reset patch sizes and starts
-    forAll(boundary_, patchI)
+    forAll (boundary_, patchI)
     {
         boundary_[patchI] = polyPatch
         (

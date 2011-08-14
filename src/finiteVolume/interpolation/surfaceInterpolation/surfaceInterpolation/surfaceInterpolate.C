@@ -67,7 +67,7 @@ tmp<surfaceInterpolationScheme<Type> > scheme
     (
         faceFlux.mesh(),
         faceFlux,
-        faceFlux.mesh().interpolationScheme(name)
+        faceFlux.mesh().schemesDict().interpolationScheme(name)
     );
 }
 
@@ -99,7 +99,7 @@ tmp<surfaceInterpolationScheme<Type> > scheme
     return surfaceInterpolationScheme<Type>::New
     (
         mesh,
-        mesh.interpolationScheme(name)
+        mesh.schemesDict().interpolationScheme(name)
     );
 }
 

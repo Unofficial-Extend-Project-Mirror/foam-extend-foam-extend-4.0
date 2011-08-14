@@ -171,20 +171,21 @@ template<class Type>
 Foam::autoPtr<typename Foam::fvMatrix<Type>::fvSolver>
 Foam::fvMatrix<Type>::solver()
 {
-    return solver(psi_.mesh().solverDict(psi_.name()));
+    return solver(psi_.mesh().solutionDict().solverDict(psi_.name()));
 }
+
 
 template<class Type>
 Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::fvSolver::solve()
 {
-    return solve(psi_.mesh().solverDict(psi_.name()));
+    return solve(psi_.mesh().solutionDict().solverDict(psi_.name()));
 }
 
 
 template<class Type>
 Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve()
 {
-    return solve(psi_.mesh().solverDict(psi_.name()));
+    return solve(psi_.mesh().solutionDict().solverDict(psi_.name()));
 }
 
 

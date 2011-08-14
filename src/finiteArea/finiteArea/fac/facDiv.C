@@ -22,9 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-    
-
 \*---------------------------------------------------------------------------*/
 
 #include "facDiv.H"
@@ -85,7 +82,7 @@ div
 {
     return fa::divScheme<Type>::New
     (
-        vf.mesh(), vf.mesh().divScheme(name)
+        vf.mesh(), vf.mesh().schemesDict().divScheme(name)
     )().facDiv(vf);
 }
 
@@ -144,7 +141,11 @@ div
 )
 {
     typedef typename innerProduct<vector, Type>::type DivType;
-    tmp<GeometricField<DivType, faPatchField, areaMesh> > Div(fac::div(tvvf()));
+    tmp<GeometricField<DivType, faPatchField, areaMesh> > Div
+    (
+        fac::div(tvvf())
+    );
+
     tvvf.clear();
     return Div;
 }
@@ -163,7 +164,7 @@ div
     (
         vf.mesh(),
         flux,
-        vf.mesh().divScheme(name)
+        vf.mesh().schemesDict().divScheme(name)
     )().facDiv(flux, vf);
 }
 

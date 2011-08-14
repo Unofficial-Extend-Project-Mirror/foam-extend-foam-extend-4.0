@@ -36,7 +36,7 @@ if (transonic)
             && nonOrth == nNonOrthCorr
         )
         {
-            pEqn.solve(mesh.solver("pFinal"));
+            pEqn.solve(mesh.solutionDict().solver("pFinal"));
         }
         else
         {
@@ -75,7 +75,7 @@ else
          && nonOrth == nNonOrthCorr
         )
         {
-            pEqn.solve(mesh.solver("pFinal"));
+            pEqn.solve(mesh.solutionDict().solver("pFinal"));
         }
         else
         {

@@ -81,7 +81,9 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
         scalarField masterWeights(shadow().size());
         shadow().makeWeights(masterWeights);
 
-        w = interpolate(1 - masterWeights);
+        scalarField oneMinusW = 1 - masterWeights;
+
+        w = interpolate(oneMinusW);
 
         if (bridgeOverlap())
         {

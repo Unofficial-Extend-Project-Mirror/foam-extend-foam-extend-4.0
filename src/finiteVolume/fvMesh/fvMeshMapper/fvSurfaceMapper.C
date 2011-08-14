@@ -54,7 +54,7 @@ void Foam::fvSurfaceMapper::calcAddressing() const
     const label oldNInternal = faceMap_.nOldInternalFaces();
 
     // Assemble the maps
-    if (direct())
+    if (faceMap_.direct())
     {
         // Direct mapping - slice to size
         directAddrPtr_ =
@@ -89,7 +89,7 @@ void Foam::fvSurfaceMapper::calcAddressing() const
                 scalarListList::subList(faceMap_.weights(), size())
             );
         scalarListList& w = *weightsPtr_;
-        
+
         // Adjust for creation of an internal face from a boundary face
         forAll (addr, faceI)
         {
@@ -104,7 +104,7 @@ void Foam::fvSurfaceMapper::calcAddressing() const
     // Inserted objects
 
     // If there are, assemble the labels
-    if (insertedObjects())
+    if (faceMap_.insertedObjects())
     {
         const labelList& insFaces = faceMap_.insertedObjectLabels();
 
@@ -241,15 +241,6 @@ const Foam::labelList& Foam::fvSurfaceMapper::insertedObjectLabels() const
 
     return *insertedObjectLabelsPtr_;
 }
-
-
-// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
 
 // ************************************************************************* //

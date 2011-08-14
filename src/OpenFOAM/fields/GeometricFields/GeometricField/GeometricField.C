@@ -44,7 +44,7 @@ if ((gf1).mesh() != (gf2).mesh())                                   \
 }
 
 
-// * * * * * * * * * * * * * Private Member Functions * * * * * * * * * * * * //
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type, template<class> class PatchField, class GeoMesh>
 Foam::tmp
@@ -920,9 +920,9 @@ void Foam::GeometricField<Type, PatchField, GeoMesh>::relax()
 {
     scalar alpha = 0;
 
-    if (this->mesh().relax(this->name()))
+    if (this->mesh().solutionDict().relax(this->name()))
     {
-        alpha = this->mesh().relaxationFactor(this->name());
+        alpha = this->mesh().solutionDict().relaxationFactor(this->name());
     }
 
     if (alpha > 0)

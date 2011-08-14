@@ -183,11 +183,13 @@ void Foam::faMesh::clearOut() const
     deleteDemandDrivenData(globalMeshDataPtr_);
 }
 
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::faMesh::faMesh(const polyMesh& pMesh)
 :
     GeoMesh<polyMesh>(pMesh),
+    MeshObject<polyMesh, faMesh>(pMesh),
     edgeInterpolation(*this),
     faceLabels_
     (
@@ -196,7 +198,7 @@ Foam::faMesh::faMesh(const polyMesh& pMesh)
             "faceLabels",
             time().findInstance(meshDir(), "faceLabels"),
             meshSubDir,
-            mesh_,
+            mesh(),
             IOobject::MUST_READ,
             IOobject::NO_WRITE
         )
@@ -208,7 +210,7 @@ Foam::faMesh::faMesh(const polyMesh& pMesh)
             "faBoundary",
             time().findInstance(meshDir(), "faBoundary"),
             meshSubDir,
-            mesh_,
+            mesh(),
             IOobject::MUST_READ,
             IOobject::NO_WRITE
         ),
@@ -216,6 +218,7 @@ Foam::faMesh::faMesh(const polyMesh& pMesh)
     ),
     patchPtr_(NULL),
     lduPtr_(NULL),
+    curTimeIndex_(time().timeIndex()),
     SPtr_(NULL),
     S0Ptr_(NULL),
     S00Ptr_(NULL),
@@ -230,9 +233,7 @@ Foam::faMesh::faMesh(const polyMesh& pMesh)
     faceCurvaturesPtr_(NULL),
     edgeTransformTensorsPtr_(NULL),
     correctPatchPointNormalsPtr_(NULL),
-    globalMeshDataPtr_(NULL),
-    moving_(false),
-    curMotionTimeIndex_(pMesh.time().timeIndex())
+    globalMeshDataPtr_(NULL)
 {
     if (debug)
     {
@@ -263,7 +264,7 @@ Foam::faMesh::faMesh(const polyMesh& pMesh)
                 "S0",
                 time().timeName(),
                 meshSubDir,
-                mesh_,
+                mesh(),
                 IOobject::MUST_READ,
                 IOobject::AUTO_WRITE
             ),
@@ -281,15 +282,16 @@ Foam::faMesh::faMesh
 )
 :
     GeoMesh<polyMesh>(pMesh),
+    MeshObject<polyMesh, faMesh>(pMesh),
     edgeInterpolation(*this),
     faceLabels_
     (
         IOobject
         (
             "faceLabels",
-            mesh_.facesInstance(),
+            mesh().facesInstance(),
             meshSubDir,
-            mesh_,
+            mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -300,9 +302,9 @@ Foam::faMesh::faMesh
         IOobject
         (
             "faBoundary",
-            mesh_.facesInstance(),
+            mesh().facesInstance(),
             meshSubDir,
-            mesh_,
+            mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -311,6 +313,7 @@ Foam::faMesh::faMesh
     ),
     patchPtr_(NULL),
     lduPtr_(NULL),
+    curTimeIndex_(time().timeIndex()),
     SPtr_(NULL),
     S0Ptr_(NULL),
     S00Ptr_(NULL),
@@ -325,9 +328,7 @@ Foam::faMesh::faMesh
     faceCurvaturesPtr_(NULL),
     edgeTransformTensorsPtr_(NULL),
     correctPatchPointNormalsPtr_(NULL),
-    globalMeshDataPtr_(NULL),
-    moving_(false),
-    curMotionTimeIndex_(pMesh.time().timeIndex())
+    globalMeshDataPtr_(NULL)
 {
     if (debug)
     {
@@ -340,20 +341,21 @@ Foam::faMesh::faMesh
 // Construct from definition field
 Foam::faMesh::faMesh
 (
-    const polyMesh& m,
+    const polyMesh& pMesh,
     const fileName& defFile
 )
 :
-    GeoMesh<polyMesh>(m),
+    GeoMesh<polyMesh>(pMesh),
+    MeshObject<polyMesh, faMesh>(pMesh),
     edgeInterpolation(*this),
     faceLabels_
     (
         IOobject
         (
             "faceLabels",
-            mesh_.facesInstance(),
+            mesh().facesInstance(),
             meshSubDir,
-            mesh_,
+            mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -364,9 +366,9 @@ Foam::faMesh::faMesh
         IOobject
         (
             "faBoundary",
-            mesh_.facesInstance(),
+            mesh().facesInstance(),
             meshSubDir,
-            mesh_,
+            mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -375,6 +377,7 @@ Foam::faMesh::faMesh
     ),
     patchPtr_(NULL),
     lduPtr_(NULL),
+    curTimeIndex_(time().timeIndex()),
     SPtr_(NULL),
     S0Ptr_(NULL),
     S00Ptr_(NULL),
@@ -389,9 +392,7 @@ Foam::faMesh::faMesh
     faceCurvaturesPtr_(NULL),
     edgeTransformTensorsPtr_(NULL),
     correctPatchPointNormalsPtr_(NULL),
-    globalMeshDataPtr_(NULL),
-    moving_(false),
-    curMotionTimeIndex_(m.time().timeIndex())
+    globalMeshDataPtr_(NULL)
 {
     if (debug)
     {
@@ -405,9 +406,9 @@ Foam::faMesh::faMesh
         IOobject
         (
             defFile,
-            mesh_.time().constant(),
+            mesh().time().constant(),
             meshSubDir,
-            mesh_,
+            mesh(),
             IOobject::MUST_READ,
             IOobject::NO_WRITE
         )
@@ -435,13 +436,13 @@ Foam::faMesh::faMesh
             word(curPatchDict.lookup("type"));
 
         faPatches[patchI].ownPolyPatchID_ =
-            mesh_.boundaryMesh().findPatchID
+            mesh().boundaryMesh().findPatchID
             (
                 word(curPatchDict.lookup("ownerPolyPatch"))
             );
 
         faPatches[patchI].ngbPolyPatchID_  =
-            mesh_.boundaryMesh().findPatchID
+            mesh().boundaryMesh().findPatchID
             (
                 word(curPatchDict.lookup("neighbourPolyPatch"))
             );
@@ -456,9 +457,9 @@ Foam::faMesh::faMesh
     forAll (polyMeshPatches, patchI)
     {
         patchIDs[patchI] =
-            mesh_.boundaryMesh().findPatchID(polyMeshPatches[patchI]);
+            mesh().boundaryMesh().findPatchID(polyMeshPatches[patchI]);
 
-        size += mesh_.boundaryMesh()[patchIDs[patchI]].size();
+        size += mesh().boundaryMesh()[patchIDs[patchI]].size();
     }
 
     faceLabels_ = labelList(size, -1);
@@ -471,10 +472,10 @@ Foam::faMesh::faMesh
 
     forAll (polyMeshPatches, patchI)
     {
-        label start = mesh_.boundaryMesh()[patchIDs[patchI]].start();
-        label size  = mesh_.boundaryMesh()[patchIDs[patchI]].size();
+        label start = mesh().boundaryMesh()[patchIDs[patchI]].start();
+        label size  = mesh().boundaryMesh()[patchIDs[patchI]].size();
 
-        for(label i = 0; i < size; i++)
+        for (label i = 0; i < size; i++)
         {
             faceLabels_[++faceI] = start + i;
         }
@@ -489,18 +490,18 @@ Foam::faMesh::faMesh
     {
         label faceID = faceLabels_[faceI];
 
-        faceCells[faceI] = mesh_.faceOwner()[faceID];
+        faceCells[faceI] = mesh().faceOwner()[faceID];
     }
 
     labelList meshEdges =
         patch().meshEdges
         (
-            mesh_.edges(),
-            mesh_.cellEdges(),
+            mesh().edges(),
+            mesh().cellEdges(),
             faceCells
         );
 
-    const labelListList& edgeFaces = mesh_.edgeFaces();
+    const labelListList& edgeFaces = mesh().edgeFaces();
 
     const label nTotalEdges = patch().nEdges();
     const label nInternalEdges = patch().nInternalEdges();
@@ -519,7 +520,7 @@ Foam::faMesh::faMesh
         {
             label curFace = edgeFaces[curMeshEdge][faceI];
 
-            label curPatchID = mesh_.boundaryMesh().whichPatch(curFace);
+            label curPatchID = mesh().boundaryMesh().whichPatch(curFace);
 
             if (curPatchID != -1)
             {
@@ -527,7 +528,7 @@ Foam::faMesh::faMesh
             }
         }
 
-        for(label pI = 0; pI < faPatches.size() - 1; pI++)
+        for (label pI = 0; pI < faPatches.size() - 1; pI++)
         {
             if
             (
@@ -550,7 +551,7 @@ Foam::faMesh::faMesh
 
 
     // Set edgeLabels for each faPatch
-    for(label pI=0; pI<(faPatches.size()-1); pI++)
+    for (label pI = 0; pI < (faPatches.size() - 1); pI++)
     {
         SLList<label> tmpList;
 
@@ -581,42 +582,44 @@ Foam::faMesh::faMesh
         // Check for processor edges
         labelList allUndefEdges = tmpList;
         labelList ngbPolyPatch(allUndefEdges.size(), -1);
-        forAll(ngbPolyPatch, edgeI)
+        forAll (ngbPolyPatch, edgeI)
         {
             label curEdge = allUndefEdges[edgeI];
 
             label curPMeshEdge = meshEdges[curEdge];
 
-            forAll(edgeFaces[curPMeshEdge], faceI)
+            forAll (edgeFaces[curPMeshEdge], faceI)
             {
                 label curFace = edgeFaces[curPMeshEdge][faceI];
-                    
+
                 if (findIndex(faceLabels_, curFace) == -1)
                 {
-                    label polyPatchID = 
-                        m.boundaryMesh().whichPatch(curFace);
-                    
+                    label polyPatchID =
+                        pMesh.boundaryMesh().whichPatch(curFace);
+
                     if (polyPatchID != -1)
                     {
                         ngbPolyPatch[edgeI] = polyPatchID;
                     }
-                }    
+                }
             }
         }
 
-        //Count ngb processorPolyPatch-es
+        // Count ngb processorPolyPatch-es
         labelHashSet processorPatchSet;
-        forAll(ngbPolyPatch, edgeI)
+        forAll (ngbPolyPatch, edgeI)
         {
             if (ngbPolyPatch[edgeI] != -1)
             {
-                if 
+                if
                 (
-                    m.boundaryMesh()[ngbPolyPatch[edgeI]].type()
-                 == processorPolyPatch::typeName
+                    isA<processorPolyPatch>
+                    (
+                        pMesh.boundaryMesh()[ngbPolyPatch[edgeI]]
+                    )
                 )
                 {
-                    if(!processorPatchSet.found(ngbPolyPatch[edgeI]))
+                    if (!processorPatchSet.found(ngbPolyPatch[edgeI]))
                     {
                         processorPatchSet.insert(ngbPolyPatch[edgeI]);
                     }
@@ -626,7 +629,7 @@ Foam::faMesh::faMesh
         labelList processorPatches(processorPatchSet.toc());
         faPatches.setSize(faPatches.size() + processorPatches.size());
 
-        for(label i=0; i<processorPatches.size(); i++)
+        for (label i=0; i<processorPatches.size(); i++)
         {
             SLList<label> tmpLst;
 
@@ -637,31 +640,36 @@ Foam::faMesh::faMesh
                     tmpLst.append(allUndefEdges[eI]);
                 }
             }
-            
+
             faPatches[faPatchNames.size() + i].edgeLabels_ = tmpLst;
-            faPatches[faPatchNames.size() + i].name_ = 
-                m.boundaryMesh()[processorPatches[i]].name();
-            faPatches[faPatchNames.size() + i].type_ = 
+
+            faPatches[faPatchNames.size() + i].name_ =
+                pMesh.boundaryMesh()[processorPatches[i]].name();
+
+            faPatches[faPatchNames.size() + i].type_ =
                 processorFaPatch::typeName;
+
             faPatches[faPatchNames.size() + i].ngbPolyPatchID_ =
                 processorPatches[i];
         }
 
         // Remaining undefined edges
         SLList<label> undefEdges;
-        forAll(ngbPolyPatch, eI)
+        forAll (ngbPolyPatch, eI)
         {
             if (ngbPolyPatch[eI] == -1)
             {
                 undefEdges.append(allUndefEdges[eI]);
             }
-            else if 
+            else if
             (
-                m.boundaryMesh()[ngbPolyPatch[eI]].type()
-             != processorPolyPatch::typeName
+               !isA<processorPolyPatch>
+                (
+                    pMesh.boundaryMesh()[ngbPolyPatch[eI]]
+                )
             )
             {
-                undefEdges.append(allUndefEdges[eI]);                
+                undefEdges.append(allUndefEdges[eI]);
             }
         }
 
@@ -675,46 +683,46 @@ Foam::faMesh::faMesh
         }
         else
         {
-            faPatches.setSize(faPatches.size()-1);
+            faPatches.setSize(faPatches.size() - 1);
         }
     }
     else
     {
-        faPatches.setSize(faPatches.size()-1);
+        faPatches.setSize(faPatches.size() - 1);
     }
-    
 
-    // Reorder processorFaPatch using 
+
+    // Reorder processorFaPatch using
     // ordering of ngb processorPolyPatch
-    forAll(faPatches, patchI)
+    forAll (faPatches, patchI)
     {
         if (faPatches[patchI].type_ == processorFaPatch::typeName)
         {
             labelList ngbFaces(faPatches[patchI].edgeLabels_.size(), -1);
 
-            forAll(ngbFaces, edgeI)
+            forAll (ngbFaces, edgeI)
             {
                 label curEdge = faPatches[patchI].edgeLabels_[edgeI];
 
                 label curPMeshEdge = meshEdges[curEdge];
 
-                forAll(edgeFaces[curPMeshEdge], faceI)
+                forAll (edgeFaces[curPMeshEdge], faceI)
                 {
                     label curFace = edgeFaces[curPMeshEdge][faceI];
-                    
-                    label curPatchID = 
-                        m.boundaryMesh().whichPatch(curFace);
-                    
+
+                    label curPatchID =
+                        pMesh.boundaryMesh().whichPatch(curFace);
+
                     if (curPatchID == faPatches[patchI].ngbPolyPatchID_)
                     {
                         ngbFaces[edgeI] = curFace;
-                    }            
+                    }
                 }
             }
 
             SortableList<label> sortedNgbFaces(ngbFaces);
             labelList reorderedEdgeLabels(ngbFaces.size(), -1);
-            for (label i=0; i<reorderedEdgeLabels.size(); i++)
+            for (label i = 0; i < reorderedEdgeLabels.size(); i++)
             {
                 reorderedEdgeLabels[i] =
                     faPatches[patchI].edgeLabels_
@@ -731,7 +739,7 @@ Foam::faMesh::faMesh
     // Add good patches to faMesh
     SLList<faPatch*> faPatchLst;
 
-    for(label pI = 0; pI < faPatches.size(); pI++)
+    for (label pI = 0; pI < faPatches.size(); pI++)
     {
         faPatches[pI].dict_.add("type", faPatches[pI].type_);
         faPatches[pI].dict_.add("edgeLabels", faPatches[pI].edgeLabels_);
@@ -757,13 +765,13 @@ Foam::faMesh::faMesh
             const processorPolyPatch& procPolyPatch =
                 refCast<const processorPolyPatch>
                 (
-                    m.boundaryMesh()[faPatches[pI].ngbPolyPatchID_]
+                    pMesh.boundaryMesh()[faPatches[pI].ngbPolyPatchID_]
                 );
 
             faPatches[pI].dict_.add("myProcNo", procPolyPatch.myProcNo());
             faPatches[pI].dict_.add
             (
-                "neighbProcNo", 
+                "neighbProcNo",
                 procPolyPatch.neighbProcNo()
             );
         }
@@ -794,7 +802,7 @@ Foam::faMesh::faMesh
     // Calculate the geometry for the patches (transformation tensors etc.)
     boundary_.calcGeometry();
 
-    if (isFile(mesh_.time().timePath()/"S0"))
+    if (isFile(mesh().time().timePath()/"S0"))
     {
         S0Ptr_ = new DimensionedField<scalar, areaMesh>
         (
@@ -803,7 +811,7 @@ Foam::faMesh::faMesh
                 "S0",
                 time().timeName(),
                 meshSubDir,
-                mesh_,
+                mesh(),
                 IOobject::MUST_READ,
                 IOobject::AUTO_WRITE
             ),
@@ -816,33 +824,34 @@ Foam::faMesh::faMesh
 // Construct from polyPatch
 Foam::faMesh::faMesh
 (
-    const polyMesh& m,
+    const polyMesh& pMesh,
     const label polyPatchID
 )
 :
-    GeoMesh<polyMesh>(m),
+    GeoMesh<polyMesh>(pMesh),
+    MeshObject<polyMesh, faMesh>(pMesh),
     edgeInterpolation(*this),
     faceLabels_
     (
         IOobject
         (
             "faceLabels",
-            mesh_.facesInstance(),
+            mesh().facesInstance(),
             meshSubDir,
-            mesh_,
+            mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        labelList(m.boundaryMesh()[polyPatchID].size(), -1)
+        labelList(pMesh.boundaryMesh()[polyPatchID].size(), -1)
     ),
     boundary_
     (
         IOobject
         (
             "faBoundary",
-            mesh_.facesInstance(),
+            mesh().facesInstance(),
             meshSubDir,
-            mesh_,
+            mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -851,6 +860,7 @@ Foam::faMesh::faMesh
     ),
     patchPtr_(NULL),
     lduPtr_(NULL),
+    curTimeIndex_(time().timeIndex()),
     SPtr_(NULL),
     S0Ptr_(NULL),
     S00Ptr_(NULL),
@@ -865,9 +875,7 @@ Foam::faMesh::faMesh
     faceCurvaturesPtr_(NULL),
     edgeTransformTensorsPtr_(NULL),
     correctPatchPointNormalsPtr_(NULL),
-    globalMeshDataPtr_(NULL),
-    moving_(false),
-    curMotionTimeIndex_(m.time().timeIndex())
+    globalMeshDataPtr_(NULL)
 {
     if (debug)
     {
@@ -876,10 +884,10 @@ Foam::faMesh::faMesh
     }
 
     // Set faceLabels
-    forAll(faceLabels_, faceI)
+    forAll (faceLabels_, faceI)
     {
         faceLabels_[faceI] =
-            mesh_.boundaryMesh()[polyPatchID].start() + faceI;
+            mesh().boundaryMesh()[polyPatchID].start() + faceI;
     }
 
     // Add one faPatch
@@ -889,9 +897,9 @@ Foam::faMesh::faMesh
 
     const label nInternalEdges = bp.nInternalEdges();
 
-    labelList edgeLabels(nTotalEdges-nInternalEdges, -1);
+    labelList edgeLabels(nTotalEdges - nInternalEdges, -1);
 
-    forAll(edgeLabels, edgeI)
+    forAll (edgeLabels, edgeI)
     {
         edgeLabels[edgeI] = nInternalEdges + edgeI;
     }
@@ -930,25 +938,25 @@ Foam::faMesh::~faMesh()
 
 Foam::fileName Foam::faMesh::meshDir() const
 {
-    return mesh_.dbDir()/meshSubDir;
+    return mesh().dbDir()/meshSubDir;
 }
 
 
 const Foam::Time& Foam::faMesh::time() const
 {
-    return mesh_.time();
+    return mesh().time();
 }
 
 
 const Foam::fileName& Foam::faMesh::pointsInstance() const
 {
-    return mesh_.pointsInstance();
+    return mesh().pointsInstance();
 }
 
 
 const Foam::fileName& Foam::faMesh::facesInstance() const
 {
-    return mesh_.facesInstance();
+    return mesh().facesInstance();
 }
 
 
@@ -960,10 +968,10 @@ const Foam::indirectPrimitivePatch& Foam::faMesh::patch() const
         (
             IndirectList<face>
             (
-                mesh_.allFaces(),
+                mesh().allFaces(),
                 faceLabels_
             ),
-            mesh_.allPoints()
+            mesh().allPoints()
         );
     }
 
@@ -979,10 +987,10 @@ Foam::indirectPrimitivePatch& Foam::faMesh::patch()
         (
             IndirectList<face>
             (
-                mesh_.allFaces(),
+                mesh().allFaces(),
                 faceLabels_
             ),
-            mesh_.allPoints()
+            mesh().allPoints()
         );
     }
 
@@ -1025,7 +1033,7 @@ void Foam::faMesh::addFaPatches(const List<faPatch*>& p)
 
     boundary_.setSize(p.size());
 
-    forAll(p, patchI)
+    forAll (p, patchI)
     {
         boundary_.set(patchI, p[patchI]);
     }
@@ -1038,7 +1046,7 @@ void Foam::faMesh::addFaPatches(const List<faPatch*>& p)
 
 const Foam::objectRegistry& Foam::faMesh::thisDb() const
 {
-    return mesh_.thisDb();
+    return mesh().thisDb();
 }
 
 
@@ -1140,7 +1148,7 @@ Foam::faMesh::S00() const
             (
                 "S00",
                 time().timeName(),
-                mesh_,
+                mesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -1238,32 +1246,40 @@ const Foam::lduAddressing& Foam::faMesh::lduAddr() const
 }
 
 
-Foam::tmp<Foam::scalarField>
-Foam::faMesh::movePoints(const vectorField& newPoints)
+bool Foam::faMesh::movePoints() const
 {
-    moving_ = true;
+    // Grab point motion from polyMesh
+    const vectorField& newPoints = mesh().allPoints();
 
     // Grab old time areas if the time has been incremented
-    if (curMotionTimeIndex_ < operator()().time().timeIndex())
+    if (curTimeIndex_ < time().timeIndex())
     {
         if (S00Ptr_ && S0Ptr_)
         {
+            Info<< "Copy old-old S" << endl;
             *S00Ptr_ = *S0Ptr_;
         }
 
         if (S0Ptr_)
         {
+            Info<< "Copy old S" << endl;
             *S0Ptr_ = S();
         }
         else
         {
+            if (debug)
+            {
+                InfoIn("bool faMesh::movePoints() const")
+                    << "Creating old cell volumes." << endl;
+            }
+
             S0Ptr_ = new DimensionedField<scalar, areaMesh>
             (
                 IOobject
                 (
                     "S0",
                     time().timeName(),
-                    mesh_,
+                    mesh(),
                     IOobject::NO_READ,
                     IOobject::NO_WRITE,
                     false
@@ -1272,25 +1288,34 @@ Foam::faMesh::movePoints(const vectorField& newPoints)
             );
         }
 
-        curMotionTimeIndex_ = operator()().time().timeIndex();
+        curTimeIndex_ = time().timeIndex();
     }
 
     clearGeomNotAreas();
 
-    patch().movePoints(newPoints);
-    boundary_.movePoints(newPoints);
-    edgeInterpolation::movePoints();
+    // To satisfy the motion interface for MeshObject, const cast is needed
+    // HJ, 5/Aug/2011
+    if (patchPtr_)
+    {
+        patchPtr_->movePoints(newPoints);
+    }
 
-    tmp<scalarField> tresult(new scalarField(nEdges(), 0.0));
+    // Move boundary points
+    const_cast<faBoundaryMesh&>(boundary_).movePoints(newPoints);
 
-    return tresult;
+    // Move interpolation
+    const edgeInterpolation& cei = *this;
+    const_cast<edgeInterpolation&>(cei).edgeInterpolation::movePoints();
+
+    // Fluxes were dummy?  HJ, 28/Jul/2011
+
+    return true;
 }
 
 
-//- Return true if point normals should be corrected for a patch
 bool Foam::faMesh::correctPatchPointNormals(const label patchID) const
 {
-    if((patchID < 0) || (patchID >= boundary().size()))
+    if ((patchID < 0) || (patchID >= boundary().size()))
     {
         FatalErrorIn
         (
@@ -1299,7 +1324,7 @@ bool Foam::faMesh::correctPatchPointNormals(const label patchID) const
             << abort(FatalError);
     }
 
-    if(correctPatchPointNormalsPtr_)
+    if (correctPatchPointNormalsPtr_)
     {
         return (*correctPatchPointNormalsPtr_)[patchID];
     }
@@ -1311,9 +1336,9 @@ bool Foam::faMesh::correctPatchPointNormals(const label patchID) const
 //- Set patch point normals corrections
 Foam::boolList& Foam::faMesh::correctPatchPointNormals() const
 {
-    if(!correctPatchPointNormalsPtr_)
+    if (!correctPatchPointNormalsPtr_)
     {
-        correctPatchPointNormalsPtr_ = 
+        correctPatchPointNormalsPtr_ =
             new boolList(boundary().size(), false);
     }
 

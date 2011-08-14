@@ -37,7 +37,7 @@ Description
 
 void Foam::polyMesh::updateMesh(const mapPolyMesh& mpm)
 {
-    // Update boundaryMesh (note that patches themselves already ok)
+    // Update boundaryMesh (note that patches themselves are already ok)
     boundary_.updateMesh();
 
     // Update zones

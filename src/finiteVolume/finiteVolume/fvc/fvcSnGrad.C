@@ -51,7 +51,7 @@ snGrad
     return fv::snGradScheme<Type>::New
     (
         vf.mesh(),
-        vf.mesh().snGradScheme(name)
+        vf.mesh().schemesDict().snGradScheme(name)
     )().snGrad(vf);
 }
 

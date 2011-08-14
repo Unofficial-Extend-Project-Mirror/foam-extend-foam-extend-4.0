@@ -25,7 +25,7 @@ License
 Description
     Namespace of functions to calculate explicit derivatives.
     Time derivatives are calculated using Euler-implicit, backward differencing
-    or Crank-Nicholson. Spatial derivatives are calculated using Gauss' Theorem.
+    or Crank-Nicholson. Spatial derivatives are calculated using Gauss' Theorem
 
 \*---------------------------------------------------------------------------*/
 
@@ -56,7 +56,7 @@ laplacian
     return fa::laplacianScheme<Type>::New
     (
         vf.mesh(),
-        vf.mesh().laplacianScheme(name)
+        vf.mesh().schemesDict().laplacianScheme(name)
     )().facLaplacian(vf);
 }
 

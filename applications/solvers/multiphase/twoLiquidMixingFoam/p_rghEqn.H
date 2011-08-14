@@ -24,7 +24,7 @@
 
         p_rghEqn.solve
         (
-            mesh.solver
+            mesh.solutionDict().solver
             (
                 p_rgh.name()
               + ((corr == nCorr-1 && nonOrth == nNonOrthCorr) ? "Final" : "")

@@ -28,6 +28,26 @@ License
 #include "fvPatchFieldMapper.H"
 #include "fvMatrix.H"
 
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
+
+template<class Type>
+void Foam::fixedInternalValueFvPatchField<Type>::setInInternalField() const
+{
+    Field<Type>& vf = const_cast<Field<Type>& >
+    (
+        this->internalField()
+    );
+
+    const labelList& faceCells = this->patch().faceCells();
+
+    // Apply the refValue into the cells next to the boundary
+    forAll (faceCells, faceI)
+    {
+        vf[faceCells[faceI]] = refValue_[faceI];
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
@@ -133,20 +153,29 @@ void Foam::fixedInternalValueFvPatchField<Type>::rmap
 template<class Type>
 void Foam::fixedInternalValueFvPatchField<Type>::updateCoeffs()
 {
-    Field<Type>& vf = const_cast<Field<Type>& >
-    (
-        this->internalField()
-    );
-
-    const labelList& faceCells = this->patch().faceCells();
-
-    // Apply the refValue into the cells next to the boundary
-    forAll (faceCells, faceI)
-    {
-        vf[faceCells[faceI]] = refValue_[faceI];
-    }
+    // Set refValue in internal field
+    this->setInInternalField();
 
     fvPatchField<Type>::updateCoeffs();
+}
+
+
+template<class Type>
+void
+Foam::fixedInternalValueFvPatchField<Type>::evaluate
+(
+    const Pstream::commsTypes
+)
+{
+    if (!this->updated())
+    {
+        this->updateCoeffs();
+    }
+
+    // Force reassingment of refValue in internal field
+    this->setInInternalField();
+
+    zeroGradientFvPatchField<Type>::evaluate();
 }
 
 

@@ -54,7 +54,7 @@ adjDiv
     (
         vf.mesh(),
         flux,
-        vf.mesh().divScheme(name)
+        vf.mesh().schemesDict().divScheme(name)
     )().fvmAdjDiv(flux, vf);
 }
 

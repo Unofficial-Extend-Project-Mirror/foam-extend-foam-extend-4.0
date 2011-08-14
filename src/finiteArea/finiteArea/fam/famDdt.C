@@ -22,9 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-    
-
 \*---------------------------------------------------------------------------*/
 
 #include "areaFields.H"
@@ -54,7 +51,7 @@ ddt
     return fa::faDdtScheme<Type>::New
     (
         vf.mesh(),
-        vf.mesh().ddtScheme("ddt(" + vf.name() + ')')
+        vf.mesh().schemesDict().ddtScheme("ddt(" + vf.name() + ')')
     )().famDdt(vf);
 }
 
@@ -70,7 +67,10 @@ ddt
     return fa::faDdtScheme<Type>::New
     (
         vf.mesh(),
-        vf.mesh().ddtScheme("ddt(" + rho.name() + ',' + vf.name() + ')')
+        vf.mesh().schemesDict().ddtScheme
+        (
+            "ddt(" + rho.name() + ',' + vf.name() + ')'
+        )
     )().famDdt(rho, vf);
 }
 
@@ -86,7 +86,10 @@ ddt
     return fa::faDdtScheme<Type>::New
     (
         vf.mesh(),
-        vf.mesh().ddtScheme("ddt(" + rho.name() + ',' + vf.name() + ')')
+        vf.mesh().schemesDict().ddtScheme
+        (
+            "ddt(" + rho.name() + ',' + vf.name() + ')'
+        )
     )().famDdt(rho, vf);
 }
 

@@ -483,7 +483,7 @@ void Foam::fvMesh::mapOldVolumes(const mapPolyMesh& meshMap)
         scalarField savedV0(V0);
         V0.setSize(nCells());
 
-        forAll(V0, i)
+        forAll (V0, i)
         {
             if (cellMap[i] > -1)
             {
@@ -510,7 +510,7 @@ void Foam::fvMesh::mapOldVolumes(const mapPolyMesh& meshMap)
         scalarField savedV00(V00);
         V00.setSize(nCells());
 
-        forAll(V00, i)
+        forAll (V00, i)
         {
             if (cellMap[i] > -1)
             {
@@ -541,7 +541,7 @@ void  Foam::fvMesh::updateMesh(const mapPolyMesh& mpm)
 
     clearAddressing();
 
-    // handleMorph() should also clear out the surfaceInterpolation.
+    // Mesh morphing should also clear out the surfaceInterpolation.
     // This is a temporary solution
     surfaceInterpolation::movePoints();
 
@@ -580,7 +580,7 @@ Foam::tmp<Foam::scalarField> Foam::fvMesh::movePoints(const pointField& p)
         {
             if (debug)
             {
-                InfoIn("void fvMesh::movePoints(const mapPolyMesh& meshMap)")
+                InfoIn("void fvMesh::movePoints(const pointField& p)")
                     << "Grabbing old-old cell volumes." << endl;
             }
 
@@ -591,7 +591,7 @@ Foam::tmp<Foam::scalarField> Foam::fvMesh::movePoints(const pointField& p)
         {
             if (debug)
             {
-                InfoIn("void fvMesh::movePoints(const mapPolyMesh& meshMap)")
+                InfoIn("void fvMesh::movePoints(const pointField& p)")
                     << "Grabbing old cell volumes." << endl;
             }
 
@@ -601,7 +601,7 @@ Foam::tmp<Foam::scalarField> Foam::fvMesh::movePoints(const pointField& p)
         {
             if (debug)
             {
-                InfoIn("void fvMesh::movePoints(const mapPolyMesh& meshMap)")
+                InfoIn("void fvMesh::movePoints(const pointField& p)")
                     << "Creating old cell volumes." << endl;
             }
 

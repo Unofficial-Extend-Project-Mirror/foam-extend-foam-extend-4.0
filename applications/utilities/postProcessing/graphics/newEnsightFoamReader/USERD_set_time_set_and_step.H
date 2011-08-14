@@ -24,7 +24,10 @@ void USERD_set_time_set_and_step
         }
         else
         {
-            runTime.setTime(TimeList[Current_time_step + 1], Current_time_step + 1);
+            runTime.setTime
+            (
+                TimeList[Current_time_step + 1], Current_time_step + 1
+            );
         }
 
         meshPtr->readUpdate();
@@ -34,14 +37,18 @@ void USERD_set_time_set_and_step
             secondMeshPtr->readUpdate();
         }
 
-        if (faMeshPtr)
-        {
-            faMeshPtr->movePoints(meshPtr->points());
-        }
+        // fvMesh motion done via a meshObject.  HJ, 8/Aug/2011
+//         if (faMeshPtr)
+//         {
+//             faMeshPtr->movePoints(meshPtr->points());
+//         }
 
         if (time_step == 0)
         {
-            runTime.setTime(TimeList[Current_time_step + 1], Current_time_step + 1);
+            runTime.setTime
+            (
+                TimeList[Current_time_step + 1], Current_time_step + 1
+            );
         }
 
 //         if (Numparts_available > nPatches+1)

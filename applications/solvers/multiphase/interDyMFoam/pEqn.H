@@ -28,11 +28,11 @@
 
         if (corr == nCorr-1 && nonOrth == nNonOrthCorr)
         {
-            pdEqn.solve(mesh.solver(pd.name() + "Final"));
+            pdEqn.solve(mesh.solutionDict().solver(pd.name() + "Final"));
         }
         else
         {
-            pdEqn.solve(mesh.solver(pd.name()));
+            pdEqn.solve(mesh.solutionDict().solver(pd.name()));
         }
 
         if (nonOrth == nNonOrthCorr)
