@@ -411,6 +411,7 @@ DebugSwitches
     exponential         0;
     extendedLeastSquares    0;
     extendedLeastSquaresVectors 0;
+    faMesh              0;
     face                0;
     faceAreaPair        0;
     faceCoupleInfo      0;
