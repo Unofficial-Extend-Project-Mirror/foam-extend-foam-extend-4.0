@@ -123,21 +123,29 @@ int main(int argc, char *argv[])
                 blockB[i][1] -= alpha.value()*blockX[i][0]*mesh.V()[i];
             }
 
-            //- Transfer the coupled interface list for processor/cyclic/etc. boundaries
-            blockM.interfaces()	= blockT.boundaryField().blockInterfaces();
+            //- Transfer the coupled interface list for processor/cyclic/etc.
+            // boundaries
+            blockM.interfaces() = blockT.boundaryField().blockInterfaces();
 
             //- Transfer the coupled interface coefficients
             forAll(mesh.boundaryMesh(), patchI)
             {
                 if (blockM.interfaces().set(patchI))
                 {
-                    Field<vector2>& coupledLower = blockM.coupleLower()[patchI].asLinear();
-                    Field<vector2>& coupledUpper = blockM.coupleUpper()[patchI].asLinear();
+                    Field<vector2>& coupledLower =
+                        blockM.coupleLower()[patchI].asLinear();
+
+                    Field<vector2>& coupledUpper =
+                        blockM.coupleUpper()[patchI].asLinear();
 
                     const scalarField& TLower = TEqn.internalCoeffs()[patchI];
                     const scalarField& TUpper = TEqn.boundaryCoeffs()[patchI];
-                    const scalarField& TsLower = TsEqn.internalCoeffs()[patchI];
-                    const scalarField& TsUpper = TsEqn.boundaryCoeffs()[patchI];
+
+                    const scalarField& TsLower =
+                        TsEqn.internalCoeffs()[patchI];
+
+                    const scalarField& TsUpper =
+                        TsEqn.boundaryCoeffs()[patchI];
 
                     blockMatrixTools::blockInsert(0, TLower, coupledLower);
                     blockMatrixTools::blockInsert(1, TsLower, coupledLower);
@@ -152,7 +160,7 @@ int main(int argc, char *argv[])
                 (
                     word("blockVar"),
                     blockM,
-                    mesh.solver("blockVar")
+                    mesh.solutionDict().solver("blockVar")
                 )->solve(blockX, blockB);
 
             solverPerf.print();

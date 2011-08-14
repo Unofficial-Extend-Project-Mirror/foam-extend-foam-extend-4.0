@@ -25,7 +25,7 @@ if (momentumPredictor)
 {
     if (oCorr == nOuterCorr-1)
     {
-        solve(UEqn() == -fvc::grad(p), mesh.solver("UFinal"));
+        solve(UEqn() == -fvc::grad(p), mesh.solutionDict().solver("UFinal"));
     }
     else
     {

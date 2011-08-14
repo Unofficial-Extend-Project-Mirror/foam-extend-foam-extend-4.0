@@ -56,35 +56,41 @@ class polyMesh;
 \*---------------------------------------------------------------------------*/
 
 class edgeInterpolation
-:
-    public faSchemes,
-    public faSolution
 {
     // Private data
 
         // Reference to faMesh
         const faMesh& faMesh_;
 
-        //- Geodesic distance between centroides of neighbour finite areas
-        mutable edgeScalarField* lPN_;
+        //- Discretisation schemes
+        faSchemes schemesDict_;
 
-        //- Cenral-differencing weighting factors
-        mutable edgeScalarField* weightingFactors_;
+        //- Solver settings
+        faSolution solutionDict_;
 
-        //- Face-gradient difference factors
-        mutable edgeScalarField* differenceFactors_;
 
-        //- Is mesh orthogonal
-        mutable bool orthogonal_;
+        // Demand-driven data
 
-        //- Non-orthogonality correction vectors
-        mutable edgeVectorField* correctionVectors_;
+            //- Geodesic distance between centroides of neighbour finite areas
+            mutable edgeScalarField* lPN_;
 
-        //- Is mesh skew
-        mutable bool skew_;
+            //- Cenral-differencing weighting factors
+            mutable edgeScalarField* weightingFactors_;
 
-        //- Skew correction vectors
-        mutable edgeVectorField* skewCorrectionVectors_;
+            //- Face-gradient difference factors
+            mutable edgeScalarField* differenceFactors_;
+
+            //- Is mesh orthogonal
+            mutable bool orthogonal_;
+
+            //- Non-orthogonality correction vectors
+            mutable edgeVectorField* correctionVectors_;
+
+            //- Is mesh skew
+            mutable bool skew_;
+
+            //- Skew correction vectors
+            mutable edgeVectorField* skewCorrectionVectors_;
 
 
     // Private member functions
@@ -143,6 +149,18 @@ public:
             return faMesh_;
         }
 
+        //- Return access to schemes
+        const faSchemes& schemesDict() const
+        {
+            return schemesDict_;
+        }
+
+        //- Return access to solver settings
+        const faSolution& solutionDict() const
+        {
+            return solutionDict_;
+        }
+
         //- Return reference to PN geodesic distance
         const edgeScalarField& lPN() const;
 
@@ -166,7 +184,7 @@ public:
 
 
         //- Do what is neccessary if the mesh has moved
-        bool movePoints();
+        bool movePoints() const;
 };
 
 

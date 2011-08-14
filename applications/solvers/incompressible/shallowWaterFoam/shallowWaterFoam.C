@@ -124,7 +124,10 @@ int main(int argc, char *argv[])
                     }
                     else
                     {
-                        hEqn.solve(mesh.solver(h.name() + "Final"));
+                        hEqn.solve
+                        (
+                            mesh.solutionDict().solver(h.name() + "Final")
+                        );
                     }
 
                     if (nonOrth == nNonOrthCorr)

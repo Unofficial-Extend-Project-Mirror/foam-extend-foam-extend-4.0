@@ -91,10 +91,6 @@ public:
 
         // Access
 
-            //- Return the selected sub-dictionary of solvers if the "select"
-            //  keyword is given, otherwise return the complete dictionary
-            const dictionary& solutionDict() const;
-
             //- Return true if the relaxation factor is given for the field
             bool relax(const word& name) const;
 

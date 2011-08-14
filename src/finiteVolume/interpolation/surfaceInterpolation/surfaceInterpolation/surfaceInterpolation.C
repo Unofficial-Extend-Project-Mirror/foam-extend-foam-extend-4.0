@@ -52,9 +52,9 @@ void Foam::surfaceInterpolation::clearOut()
 
 Foam::surfaceInterpolation::surfaceInterpolation(const fvMesh& fvm)
 :
-    fvSchemes(static_cast<const objectRegistry&>(fvm)),
-    fvSolution(static_cast<const objectRegistry&>(fvm)),
     mesh_(fvm),
+    schemesDict_(fvm),
+    solutionDict_(fvm),
     weightingFactors_(NULL),
     differenceFactors_(NULL),
     orthogonal_(false),

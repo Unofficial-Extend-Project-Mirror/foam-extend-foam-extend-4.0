@@ -33,6 +33,6 @@
             (
                 (- ghf*fvc::snGrad(rho) - fvc::snGrad(p_rgh))*mesh.magSf()
             ),
-            mesh.solver(oCorr == nOuterCorr-1 ? "UFinal" : "U")
+            mesh.solutionDict().solver(oCorr == nOuterCorr-1 ? "UFinal" : "U")
         );
     }

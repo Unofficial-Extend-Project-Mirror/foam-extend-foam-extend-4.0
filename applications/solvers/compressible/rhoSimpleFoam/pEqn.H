@@ -26,7 +26,7 @@ if (transonic)
         );
 
         // Relax the pressure equation to ensure diagonal-dominance
-        pEqn.relax(mesh.relaxationFactor("pEqn"));
+        pEqn.relax(mesh.solutionDict().relaxationFactor("pEqn"));
 
         pEqn.setReference(pRefCell, pRefValue);
 

@@ -125,11 +125,14 @@ int main(int argc, char *argv[])
                      && nonOrth == nNonOrthCorr
                     )
                     {
-                        pEqn.solve(mesh.solver(p.name() + "Final"));
+                        pEqn.solve
+                        (
+                            mesh.solutionDict().solver(p.name() + "Final")
+                        );
                     }
                     else
                     {
-                        pEqn.solve(mesh.solver(p.name()));
+                        pEqn.solve(mesh.solutionDict().solver(p.name()));
                     }
 
                     if (nonOrth == nNonOrthCorr)

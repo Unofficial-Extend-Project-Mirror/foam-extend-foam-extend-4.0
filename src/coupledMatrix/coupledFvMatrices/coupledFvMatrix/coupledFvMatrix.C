@@ -225,7 +225,7 @@ Foam::coupledSolverPerformance Foam::coupledFvMatrix<Type>::solve()
     const fvMatrix<Type>& m =
         static_cast<const fvMatrix<Type>& >(this->operator[](0));
 
-    return solve(m.psi().mesh().solver(coupledPsiName()));
+    return solve(m.psi().mesh().solutionDict().solver(coupledPsiName()));
 }
 
 

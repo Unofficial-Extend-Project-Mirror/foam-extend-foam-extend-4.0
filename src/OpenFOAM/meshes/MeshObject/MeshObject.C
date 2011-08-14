@@ -42,7 +42,13 @@ Foam::MeshObject<Mesh, Type>::MeshObject(const Mesh& mesh)
         )
     ),
     mesh_(mesh)
-{}
+{
+    if (Mesh::debug)
+    {
+        InfoIn("MeshObject<Mesh, Type>::MeshObject(const Mesh& mesh)")
+            << "Creating meshObject for type " << Type::typeName << endl;
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //

@@ -18,7 +18,7 @@ if (oCorr == nOuterCorr - 1)
             fvc::interpolate(rho)*(g & mesh.Sf())
           - fvc::snGrad(p)*mesh.magSf()
         ),
-        mesh.solver("UFinal")
+        mesh.solutionDict().solver("UFinal")
     );
 }
 else

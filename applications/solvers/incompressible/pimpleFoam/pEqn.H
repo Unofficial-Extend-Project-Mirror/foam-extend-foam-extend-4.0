@@ -28,7 +28,7 @@ for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
      && nonOrth == nNonOrthCorr
     )
     {
-        pEqn.solve(mesh.solver("pFinal"));
+        pEqn.solve(mesh.solutionDict().solver("pFinal"));
     }
     else
     {

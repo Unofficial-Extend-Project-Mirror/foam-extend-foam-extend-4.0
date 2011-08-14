@@ -38,7 +38,7 @@
              && nonOrth == nNonOrthCorr
             )
             {
-                pEqn.solve(mesh.solver(p.name() + "Final"));
+                pEqn.solve(mesh.solutionDict().solver(p.name() + "Final"));
             }
             else
             {
@@ -76,7 +76,7 @@
              && nonOrth == nNonOrthCorr
             )
             {
-                pEqn.solve(mesh.solver(p.name() + "Final"));
+                pEqn.solve(mesh.solutionDict().solver(p.name() + "Final"));
             }
             else
             {

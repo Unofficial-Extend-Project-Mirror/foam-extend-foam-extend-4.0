@@ -78,6 +78,29 @@ void Foam::regionCoupleFvPatch::makeDeltaCoeffs(scalarField& dc) const
 }
 
 
+// Make patch face non-orthogonality correction vectors
+void Foam::regionCoupleFvPatch::makeCorrVecs(vectorField& cv) const
+{
+    if (rcPolyPatch_.attached())
+    {
+        // Non-orthogonality correction in attached state identical to ggi
+        // interface
+
+        // Calculate correction vectors on coupled patches
+        const scalarField& patchDeltaCoeffs = deltaCoeffs();
+
+        vectorField patchDeltas = delta();
+        vectorField n = nf();
+        cv = n - patchDeltas*patchDeltaCoeffs;
+    }
+    else
+    {
+        // No correction in detached state.  HJ, 26/Jul/2011
+        cv = vector::zero;
+    }
+}
+
+
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 bool Foam::regionCoupleFvPatch::coupled() const

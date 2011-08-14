@@ -22,9 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-    
-
 \*---------------------------------------------------------------------------*/
 
 #include "volFields.H"
@@ -54,7 +51,7 @@ d2dt2
     return fv::d2dt2Scheme<Type>::New
     (
         vf.mesh(),
-        vf.mesh().d2dt2Scheme("d2dt2(" + vf.name() + ')')
+        vf.mesh().schemesDict().d2dt2Scheme("d2dt2(" + vf.name() + ')')
     )().fvmD2dt2(vf);
 }
 
@@ -70,7 +67,10 @@ d2dt2
     return fv::d2dt2Scheme<Type>::New
     (
         vf.mesh(),
-        vf.mesh().d2dt2Scheme("d2dt2(" + rho.name() + ',' + vf.name() + ')')
+        vf.mesh().schemesDict().d2dt2Scheme
+        (
+            "d2dt2(" + rho.name() + ',' + vf.name() + ')'
+        )
     )().fvmD2dt2(rho, vf);
 }
 
@@ -86,7 +86,10 @@ d2dt2
     return fv::d2dt2Scheme<Type>::New
     (
         vf.mesh(),
-        vf.mesh().d2dt2Scheme("d2dt2(" + rho.name() + ',' + vf.name() + ')')
+        vf.mesh().schemesDict().d2dt2Scheme
+        (
+            "d2dt2(" + rho.name() + ',' + vf.name() + ')'
+        )
     )().fvmD2dt2(rho, vf);
 }
 

@@ -83,6 +83,7 @@ private:
             //- Point-edge addressing
             mutable labelListList* pointEdgesPtr_;
 
+
     // Private Member Functions
 
         //- Disallow construct as copy
@@ -90,6 +91,11 @@ private:
 
         //- Disallow assignment
         void operator=(const faPatch&);
+
+
+       //- Clear out topological patch data
+       void clearOut();
+
 
 protected:
 
@@ -194,7 +200,7 @@ public:
 
     // Selectors
 
-        //- Return a pointer to a new patch created 
+        //- Return a pointer to a new patch created
         // on freestore from dictionary
         static autoPtr<faPatch> New
         (
@@ -313,6 +319,12 @@ public:
             const scalarField& deltaCoeffs() const;
 
 
+        // Topological changes
+
+            //- Reset edge list
+            void resetEdges(const labelList&);
+
+
         // Evaluation functions
 
             //- Return given internal field next to patch as patch field
@@ -328,7 +340,7 @@ public:
 
             //- Lookup and return the patchField of the named field from the
             //  local objectRegistry.
-            //  N.B.  The dummy pointer arguments are used if this function is 
+            //  N.B.  The dummy pointer arguments are used if this function is
             //  instantiated within a templated function to avoid a bug in gcc.
             //  See inletOutletFvPatchField.C and outletInletFvPatchField.C
             template<class GeometricField, class Type>

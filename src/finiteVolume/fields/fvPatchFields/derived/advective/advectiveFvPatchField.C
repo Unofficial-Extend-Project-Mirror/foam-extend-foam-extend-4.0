@@ -225,7 +225,10 @@ void advectiveFvPatchField<Type>::updateCoeffs()
 
     word ddtScheme
     (
-        this->dimensionedInternalField().mesh().ddtScheme(field.name())
+        this->dimensionedInternalField().mesh().schemesDict().ddtScheme
+        (
+            field.name()
+        )
     );
 
     // Calculate the advection speed of the field wave

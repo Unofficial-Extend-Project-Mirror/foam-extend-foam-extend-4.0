@@ -74,10 +74,10 @@ class cellMapper
 
     // Demand-driven private data
 
-        //- Direct addressing (only one for of addressing is used)
+        //- Direct addressing (only one form of addressing is used)
         mutable labelList* directAddrPtr_;
 
-        //- Interpolated addressing (only one for of addressing is used)
+        //- Interpolated addressing (only one form of addressing is used)
         mutable labelListList* interpolationAddrPtr_;
 
         //- Interpolation weights

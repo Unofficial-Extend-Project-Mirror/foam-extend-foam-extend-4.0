@@ -319,6 +319,7 @@ void faMesh::calcAreaCentres() const
 
     forAll(centres.boundaryField(), patchI)
     {
+        //HJ: this is wrong!  5/Aug/2011
         if
         (
             isA<processorFaPatchVectorField>
@@ -328,7 +329,7 @@ void faMesh::calcAreaCentres() const
         )
         {
             centres.boundaryField()[patchI].initEvaluate();
-            centres.boundaryField()[patchI].evaluate();            
+            centres.boundaryField()[patchI].evaluate();
         }
     }
 }
@@ -488,7 +489,7 @@ void faMesh::calcFaceAreaNormals() const
 
     forAll(faceAreaNormals.boundaryField(), patchI)
     {
-        if 
+        if
         (
             isA<processorFaPatchVectorField>
             (
@@ -497,7 +498,7 @@ void faMesh::calcFaceAreaNormals() const
         )
         {
             faceAreaNormals.boundaryField()[patchI].initEvaluate();
-            faceAreaNormals.boundaryField()[patchI].evaluate();            
+            faceAreaNormals.boundaryField()[patchI].evaluate();
         }
     }
 }
@@ -1293,11 +1294,11 @@ void faMesh::calcPointAreaNormals() const
             if (boundary()[patchI].ngbPolyPatchIndex() == -1)
             {
                 FatalErrorIn
-                    (
-                        "void faMesh::calcPointAreaNormals const"
-                    )   << "Neighbour polyPatch index is not defined "
-                        << "for faPatch " << boundary()[patchI].name()
-                        << abort(FatalError);
+                (
+                    "void faMesh::calcPointAreaNormals const"
+                )   << "Neighbour polyPatch index is not defined "
+                    << "for faPatch " << boundary()[patchI].name()
+                    << abort(FatalError);
             }
 
             labelList patchPoints = boundary()[patchI].pointLabels();
@@ -1849,7 +1850,7 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                             (
                                 mag
                                 (
-                                    allPoints[i] 
+                                    allPoints[i]
                                   - procLsPoints[procI][pointI]
                                 )
                               < tol
@@ -2015,8 +2016,7 @@ tmp<edgeScalarField> faMesh::edgeLengthCorrection() const
         }
     }
 
-
-	return tcorrection;
+    return tcorrection;
 }
 
 

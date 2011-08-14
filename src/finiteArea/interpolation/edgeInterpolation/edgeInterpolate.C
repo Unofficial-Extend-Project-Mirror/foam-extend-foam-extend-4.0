@@ -69,7 +69,7 @@ tmp<edgeInterpolationScheme<Type> > scheme
     (
         faceFlux.mesh(),
         faceFlux,
-        faceFlux.mesh().interpolationScheme(name)
+        faceFlux.mesh().schemesDict().interpolationScheme(name)
     );
 }
 
@@ -101,14 +101,14 @@ tmp<edgeInterpolationScheme<Type> > scheme
     return edgeInterpolationScheme<Type>::New
     (
         mesh,
-        mesh.interpolationScheme(name)
+        mesh.schemesDict().interpolationScheme(name)
     );
 }
 
 
 // Interpolate field onto faces using scheme given by name in dictionary
 template<class Type>
-tmp<GeometricField<Type, faePatchField, edgeMesh> > 
+tmp<GeometricField<Type, faePatchField, edgeMesh> >
 interpolate
 (
     const GeometricField<Type, faPatchField, areaMesh>& vf,

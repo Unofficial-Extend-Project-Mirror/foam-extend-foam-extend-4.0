@@ -60,6 +60,11 @@ class fixedInternalValueFvPatchField
         Field<Type> refValue_;
 
 
+    // Private Member Functions
+
+        //- Set refValue in internal field
+        void setInInternalField() const;
+
 public:
 
     //- Runtime type information
@@ -165,6 +170,12 @@ public:
 
             //- Update the coefficients associated with the patch field
             virtual void updateCoeffs();
+
+            //- Evaluate the patch field, sets Updated to false
+            virtual void evaluate
+            (
+                const Pstream::commsTypes commsType = Pstream::blocking
+            );
 
             //- Manipulate a matrix
             virtual void manipulateMatrix(fvMatrix<Type>& matrix);

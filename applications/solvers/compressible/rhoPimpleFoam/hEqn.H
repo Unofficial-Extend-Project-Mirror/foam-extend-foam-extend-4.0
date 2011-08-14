@@ -11,7 +11,7 @@
     if (oCorr == nOuterCorr-1)
     {
         hEqn.relax();
-        hEqn.solve(mesh.solver("hFinal"));
+        hEqn.solve(mesh.solutionDict().solver("hFinal"));
     }
     else
     {

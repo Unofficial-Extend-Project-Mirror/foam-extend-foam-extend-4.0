@@ -39,11 +39,11 @@
 
         if (corr == nCorr - 1 && nonOrth == nNonOrthCorr)
         {
-            pEqn.solve(mesh.solver(p.name() + "Final"));
+            pEqn.solve(mesh.solutionDict().solver(p.name() + "Final"));
         }
         else
         {
-            pEqn.solve(mesh.solver(p.name()));
+            pEqn.solve(mesh.solutionDict().solver(p.name()));
         }
 
         if (nonOrth == nNonOrthCorr)

@@ -26,7 +26,7 @@ Class
     Foam::MapFvSurfaceField
 
 Description
-    Map Surface internal field on topology change.  This is a partial
+    Map surface internal field on topology change.  This is a partial
     template specialisation, see MapGeometricFields.
 
 \*---------------------------------------------------------------------------*/
@@ -69,7 +69,8 @@ void MapInternalField<Type, MeshMapper, surfaceMesh>::operator()
     {
         FatalErrorIn
         (
-            "void MapInternalField<Type, MeshMapper, surfaceMesh>::operator()\n"
+            "void MapInternalField<Type, MeshMapper, surfaceMesh>::"
+            "operator()\n"
             "(\n"
             "    Field<Type>& field,\n"
             "    const MeshMapper& mapper\n"

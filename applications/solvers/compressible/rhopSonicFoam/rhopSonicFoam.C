@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
                 mesh,
                 fields,
                 phiv,
-                mesh.divScheme("div(phiv,rhoUH)")
+                mesh.schemesDict().divScheme("div(phiv,rhoUH)")
             );
 
             solve
