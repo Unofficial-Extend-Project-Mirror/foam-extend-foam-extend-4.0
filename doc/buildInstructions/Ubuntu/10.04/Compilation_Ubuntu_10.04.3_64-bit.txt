@@ -106,3 +106,7 @@ simpleFoam >& log.simpleFoam
 paraFoam
 
 # You are done!
+
+--------------------------------------------------------------------------------
+Martin Beaudoin
+August 2011
