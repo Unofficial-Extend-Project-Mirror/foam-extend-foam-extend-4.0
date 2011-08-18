@@ -22,7 +22,7 @@ solvers
         preconditioner   DIC;
         tolerance        1e-06;
         relTol           0;
-    };
+    }
 
     U
     {
@@ -30,7 +30,7 @@ solvers
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
+    }
 
     T+T
     {
@@ -41,7 +41,7 @@ solvers
         maxIter          1000;
         tolerance        1e-6;
         relTol           0.0;
-    };
+    }
 }
 
 PISO
