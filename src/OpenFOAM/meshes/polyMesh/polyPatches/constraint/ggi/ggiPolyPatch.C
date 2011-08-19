@@ -37,6 +37,8 @@ Contributor
 #include "polyPatchID.H"
 #include "ZoneIDs.H"
 #include "SubField.H"
+#include "Time.H"
+#include "indirectPrimitivePatch.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -854,6 +856,52 @@ void Foam::ggiPolyPatch::calcTransforms()
             << "Master: " << name()
             << " Slave: " << shadowName() << endl;
 
+        if (patchToPatch().uncoveredMasterFaces().size() > 0)
+        {
+            // Write uncovered master faces
+            Info<< "Writing uncovered master faces for patch "
+                << name() << " as VTK." << endl;
+
+            const polyMesh& mesh = boundaryMesh().mesh();
+
+            fileName fvPath(mesh.time().path()/"VTK");
+            mkDir(fvPath);
+
+            indirectPrimitivePatch::writeVTK
+            (
+                fvPath/fileName("uncoveredGgiFaces" + name()),
+                IndirectList<face>
+                (
+                    localFaces(),
+                    patchToPatch().uncoveredMasterFaces()
+                ),
+                localPoints()
+            );
+        }
+
+        if (patchToPatch().uncoveredSlaveFaces().size() > 0)
+        {
+            // Write uncovered master faces
+            Info<< "Writing uncovered shadow faces for patch "
+                << shadowName() << " as VTK." << endl;
+
+            const polyMesh& mesh = boundaryMesh().mesh();
+
+            fileName fvPath(mesh.time().path()/"VTK");
+            mkDir(fvPath);
+
+            indirectPrimitivePatch::writeVTK
+            (
+                fvPath/fileName("uncoveredGgiFaces" + shadowName()),
+                IndirectList<face>
+                (
+                    shadow().localFaces(),
+                    patchToPatch().uncoveredSlaveFaces()
+                ),
+                shadow().localPoints()
+            );
+        }
+
         // Check for bridge overlap
         if (!bridgeOverlap())
         {
@@ -864,7 +912,8 @@ void Foam::ggiPolyPatch::calcTransforms()
             )
             {
                 FatalErrorIn("label ggiPolyPatch::shadowIndex() const")
-                    << "ggi patch " << name() << " has "
+                    << "ggi patch " << name() << " with shadow "
+                    << shadowName() << " has "
                     << patchToPatch().uncoveredMasterFaces().size()
                     << " uncovered master faces and "
                     << patchToPatch().uncoveredSlaveFaces().size()
