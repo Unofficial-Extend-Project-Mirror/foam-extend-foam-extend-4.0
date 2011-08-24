@@ -81,7 +81,7 @@ void processorFvPatch::makeDeltaCoeffs(scalarField& dc) const
     {
         vectorField d = delta();
 
-        // Stabilised form for bad meshes
+        // Stabilised form for bad meshes.  HJ, 24/Aug/2011
         dc = 1.0/max((nf() & d), 0.05*mag(d));
     }
     else
