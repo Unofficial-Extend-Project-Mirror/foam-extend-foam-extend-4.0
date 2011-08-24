@@ -191,12 +191,16 @@ void regionCoupleFvPatchField<Type>::evaluate
         scalar mOwn = magFOwn[faceI];
         scalar mNei = magFNei[faceI];
 
-        scalar den = mOwn - mNei;
+        scalar den1 = mOwn + mNei;
+        scalar den2 = mOwn - mNei;
 
-        if (mag(den) > SMALL)
+        // Strange optimisation check: floating point failure if only
+        // checking for den2.  den1 check should not be needed
+        // HJ, 24/Aug/2011
+        if (mag(den1) > SMALL && mag(den2) > SMALL)
         {
-            scalar mean = 2.0*mOwn*mNei/(mOwn + mNei);
-            weights[faceI] = (mean - mNei)/den;
+            scalar mean = 2.0*mOwn*mNei/den1;
+            weights[faceI] = (mean - mNei)/den2;
         }
         else
         {
