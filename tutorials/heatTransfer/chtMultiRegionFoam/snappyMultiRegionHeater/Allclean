@@ -17,5 +17,6 @@ rm -rf constant/topAir/polyMesh
 rm -rf constant/heater/polyMesh
 rm -rf constant/leftSolid/polyMesh
 rm -rf constant/rightSolid/polyMesh
+rm -f snappyMultiRegionHeater/constant/cellLevel snappyMultiRegionHeater/constant/pointLevel snappyMultiRegionHeater/constant/polyMesh/refinementHistory
 
 # -----------------------------------------------------------------------------

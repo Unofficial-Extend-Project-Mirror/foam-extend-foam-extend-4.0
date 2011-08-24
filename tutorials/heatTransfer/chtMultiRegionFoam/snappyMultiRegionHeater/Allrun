@@ -9,6 +9,13 @@ runApplication blockMesh
 runApplication snappyHexMesh -overwrite
 runApplication splitMeshRegions -cellZones
 
+# copy fields
+cp 0/* 0.001/bottomAir/
+cp 0/* 0.001/heater/
+cp 0/* 0.001/leftSolid/
+cp 0/* 0.001/rightSolid/
+cp 0/* 0.001/topAir/
+
 # remove fluid fields from solid regions (important for post-processing)
 for i in heater leftSolid rightSolid
 do
@@ -25,7 +32,6 @@ for i in bottomAir topAir heater leftSolid rightSolid
 do
    changeDictionary -region $i > log.changeDictionary.$i 2>&1
 done
-
 
 #-- Run on single processor
 runApplication chtMultiRegionFoam
