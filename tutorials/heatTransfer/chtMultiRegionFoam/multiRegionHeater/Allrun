@@ -8,6 +8,11 @@ runApplication setSet -batch makeCellSets.setSet
 rm constant/polyMesh/sets/*_old
 runApplication setsToZones -noFlipMap
 runApplication splitMeshRegions -cellZones
+cp 0/* 0.001/bottomAir/
+cp 0/* 0.001/heater/
+cp 0/* 0.001/leftSolid/
+cp 0/* 0.001/rightSolid/
+cp 0/* 0.001/topAir/
 changeDictionary -region bottomAir
 changeDictionary -region topAir
 changeDictionary -region heater
