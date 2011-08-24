@@ -49,7 +49,7 @@ Foam::BlockGaussSeidelSolver<Type>::BlockGaussSeidelSolver
         dict
     ),
     gs_(matrix),
-    nResSweeps_(readLabel(this->dict().lookup("nResSweeps")))
+    nSweeps_(readLabel(this->dict().lookup("nSweeps")))
 {}
 
 
@@ -86,13 +86,13 @@ Foam::BlockGaussSeidelSolver<Type>::solve
 
     // Check convergence, solve if not converged
 
-    if (!solverPerf.checkConvergence(this->tolerance(), this->relTolerance()))
+    if (!stop(solverPerf))
     {
         // Iteration loop
 
         do
         {
-            for (label i = 0; i < nResSweeps_; i++)
+            for (label i = 0; i < nSweeps_; i++)
             {
                 gs_.precondition(x, b);
 

@@ -642,11 +642,11 @@ matrices/blockLduMatrix/BlockLduSmoothers/BlockILUSmoother/blockILUSmoothers.C
 
 matrices/blockLduMatrix/BlockLduSolvers/BlockLduSolver/blockLduSolvers.C
 matrices/blockLduMatrix/BlockLduSolvers/BlockDiagonal/blockDiagonalSolvers.C
-/*HJ matrices/blockLduMatrix/BlockLduSolvers/Segregated/segregatedSolvers.C */
 matrices/blockLduMatrix/BlockLduSolvers/BlockGaussSeidel/blockGaussSeidelSolvers.C
 matrices/blockLduMatrix/BlockLduSolvers/BlockCG/blockCGSolvers.C
 matrices/blockLduMatrix/BlockLduSolvers/BlockBiCGStab/blockBiCGStabSolvers.C
 matrices/blockLduMatrix/BlockLduSolvers/BlockGMRES/blockGMRESSolvers.C
+matrices/blockLduMatrix/BlockLduSolvers/Segregated/segregatedSolvers.C
 
 matrices/blockLduMatrix/BlockLduMatrix/BlockLduInterface/BlockLduInterfaceFields.C
 

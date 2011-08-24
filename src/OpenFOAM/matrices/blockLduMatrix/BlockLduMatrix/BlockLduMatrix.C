@@ -343,7 +343,8 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const BlockLduMatrix<Type>& ldum)
 {
     if (ldum.diagPtr_)
     {
-        os.writeKeyword("diagonal") << *ldum.diagPtr_ <<  token::END_STATEMENT << nl;
+        os.writeKeyword("diagonal")
+            << *ldum.diagPtr_ <<  token::END_STATEMENT << nl;
     }
     else
     {

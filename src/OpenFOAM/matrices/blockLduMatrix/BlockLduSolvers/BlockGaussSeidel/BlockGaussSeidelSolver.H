@@ -64,7 +64,7 @@ class BlockGaussSeidelSolver
         BlockGaussSeidelPrecon<Type> gs_;
 
         //- Number of sweeps before evaluating residual
-        label nResSweeps_;
+        label nSweeps_;
 
 
 
