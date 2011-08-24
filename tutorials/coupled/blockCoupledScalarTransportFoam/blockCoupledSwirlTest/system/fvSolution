@@ -16,7 +16,7 @@ FoamFile
 
 solvers
 {
-    blockVar
+    blockT
     {
         solver           BiCGStab;
         preconditioner   Cholesky;
@@ -26,7 +26,7 @@ solvers
 
         minIter          1;
         maxIter          1000;
-    };
+    }
 }
 
 SIMPLE

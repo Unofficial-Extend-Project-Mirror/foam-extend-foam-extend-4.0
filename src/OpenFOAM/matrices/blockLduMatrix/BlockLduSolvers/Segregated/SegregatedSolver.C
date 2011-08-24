@@ -74,21 +74,6 @@ Foam::BlockSolverPerformance<Type> Foam::SegregatedSolver<Type>::solve
         switchingDiag = true;
     }
 
-    // Check switching upper
-    bool switchingUpper = false;
-
-    if (blockMatrix.thereIsUpper())
-    {
-        if (blockMatrix.upper().activeType() == blockCoeffBase::SCALAR)
-        {
-            scalarMatrix_.upper() = blockMatrix.upper().asScalar();
-        }
-        else
-        {
-            switchingUpper = true;
-        }
-    }
-
     // Check switching lower
     bool switchingLower = false;
 
@@ -101,6 +86,21 @@ Foam::BlockSolverPerformance<Type> Foam::SegregatedSolver<Type>::solve
         else
         {
             switchingLower = true;
+        }
+    }
+
+    // Check switching upper
+    bool switchingUpper = false;
+
+    if (blockMatrix.thereIsUpper())
+    {
+        if (blockMatrix.upper().activeType() == blockCoeffBase::SCALAR)
+        {
+            scalarMatrix_.upper() = blockMatrix.upper().asScalar();
+        }
+        else
+        {
+            switchingUpper = true;
         }
     }
 
@@ -120,7 +120,7 @@ Foam::BlockSolverPerformance<Type> Foam::SegregatedSolver<Type>::solve
     }
 
     // Prepare solver performance
-    word segSolverName(this->dict().lookup("solver"));
+    word segSolverName(this->dict().lookup("segSolver"));
 
     BlockSolverPerformance<Type> solverPerf
     (
@@ -156,20 +156,21 @@ Foam::BlockSolverPerformance<Type> Foam::SegregatedSolver<Type>::solve
             scalarMatrix_.diag() = blockMatrix.diag().component(cmpt);
         }
 
-        if (switchingUpper)
-        {
-            scalarMatrix_.upper() = blockMatrix.upper().component(cmpt);
-        }
-
         if (switchingLower)
         {
             scalarMatrix_.lower() = blockMatrix.lower().component(cmpt);
+        }
+
+        if (switchingUpper)
+        {
+            scalarMatrix_.upper() = blockMatrix.upper().component(cmpt);
         }
 
         // Call the scalar solver
         BlockSolverPerformance<scalar> scalarPerf =
             blockScalarSolver::New
             (
+                segSolverName,
                 this->fieldName(),
                 scalarMatrix_,
                 this->dict()

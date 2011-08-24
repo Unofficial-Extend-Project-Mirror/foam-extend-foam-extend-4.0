@@ -172,9 +172,18 @@ public:
 
     // Selectors
 
-        //- Return a new solver
+        //- Return a new solver from a dictionary
         static autoPtr<BlockLduSolver<Type> > New
         (
+            const word& fieldName,
+            BlockLduMatrix<Type>& matrix,
+            const dictionary& dict
+        );
+
+        //- Return a new solver given type
+        static autoPtr<BlockLduSolver<Type> > New
+        (
+            const word& solverName,
             const word& fieldName,
             BlockLduMatrix<Type>& matrix,
             const dictionary& dict

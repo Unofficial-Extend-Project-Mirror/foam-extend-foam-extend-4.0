@@ -43,6 +43,7 @@ License
 #include "BlockCGSolver.H"
 #include "BlockGaussSeidelSolver.H"
 #include "BlockGMRESSolver.H"
+#include "SegregatedSolver.H"
 
 #include "VectorTensorNFields.H"
 #include "ExpandTensorN.H"
@@ -105,23 +106,29 @@ defineTemplateRunTimeSelectionTable                                           \
 typedef BlockDiagonalSolver<type > block##Type##DiagonalSolver;               \
 defineNamedTemplateTypeNameAndDebug(block##Type##DiagonalSolver, 0);          \
                                                                               \
-typedef BlockBiCGStabSolver<type > block##Type##BiCGStabSolver;               \
-makeBlockSolverTypeName(block##Type##BiCGStabSolver);                         \
-addSolverToBlockMatrix(Type, block##Type##BiCGStabSolver, symMatrix);         \
-addSolverToBlockMatrix(Type, block##Type##BiCGStabSolver, asymMatrix);        \
+typedef BlockGaussSeidelSolver<type > block##Type##GaussSeidelSolver;         \
+makeBlockSolverTypeName(block##Type##GaussSeidelSolver);                      \
+addSolverToBlockMatrix(Type, block##Type##GaussSeidelSolver, symMatrix);      \
+addSolverToBlockMatrix(Type, block##Type##GaussSeidelSolver, asymMatrix);     \
                                                                               \
 typedef BlockCGSolver<type > block##Type##CGSolver;                           \
 makeBlockSolverTypeName(block##Type##CGSolver);                               \
 addSolverToBlockMatrix(Type, block##Type##CGSolver, symMatrix);               \
                                                                               \
-typedef BlockGaussSeidelSolver<type > block##Type##GaussSeidelSolver;         \
-makeBlockSolverTypeName(block##Type##GaussSeidelSolver);                      \
-addSolverToBlockMatrix(Type, block##Type##GaussSeidelSolver, symMatrix);      \
+typedef BlockBiCGStabSolver<type > block##Type##BiCGStabSolver;               \
+makeBlockSolverTypeName(block##Type##BiCGStabSolver);                         \
+addSolverToBlockMatrix(Type, block##Type##BiCGStabSolver, symMatrix);         \
+addSolverToBlockMatrix(Type, block##Type##BiCGStabSolver, asymMatrix);        \
                                                                               \
 typedef BlockGMRESSolver<type > block##Type##GMRESSolver;                     \
 makeBlockSolverTypeName(block##Type##GMRESSolver);                            \
 addSolverToBlockMatrix(Type, block##Type##GMRESSolver, symMatrix);            \
-addSolverToBlockMatrix(Type, block##Type##GMRESSolver, asymMatrix);
+addSolverToBlockMatrix(Type, block##Type##GMRESSolver, asymMatrix);           \
+                                                                              \
+typedef SegregatedSolver<type > block##Type##SegregatedSolver;                \
+makeBlockSolverTypeName(block##Type##SegregatedSolver);                       \
+addSolverToBlockMatrix(Type, block##Type##SegregatedSolver, symMatrix);       \
+addSolverToBlockMatrix(Type, block##Type##SegregatedSolver, asymMatrix);
 
 
 forAllVectorNTypes(makeSolver)
