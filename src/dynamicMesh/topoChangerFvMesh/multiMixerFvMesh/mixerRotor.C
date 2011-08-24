@@ -28,7 +28,6 @@ License
 #include "regionSplit.H"
 #include "polyTopoChanger.H"
 #include "slidingInterface.H"
-#include "ggiPolyPatch.H"
 #include "Time.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -222,17 +221,8 @@ void Foam::mixerRotor::calcMovingMask() const
     const cellList& c = mesh_.cells();
     const faceList& f = mesh_.allFaces();
 
-    label movingCellZoneID =
-        mesh_.cellZones().findZoneID("movingCellsZone" + name_);
-
-    if (movingCellZoneID < 0)
-    {
-        FatalErrorIn("void mixerRotor::calcMovingMask() const")
-            << "Cannot find moving cell zone ID"
-            << abort(FatalError);
-    }
-
-    const labelList& cellAddr = mesh_.cellZones()[movingCellZoneID];
+    const labelList& cellAddr = mesh_.cellZones()
+        [mesh_.cellZones().findZoneID("movingCellsZone" + name_)];
 
     forAll (cellAddr, cellI)
     {
@@ -251,35 +241,8 @@ void Foam::mixerRotor::calcMovingMask() const
     }
 
     // Attempt to enforce motion on sliders if zones exist
-
-    // Master side
-    label msI = -1;
-
-    if (useTopoSliding_)
-    {
-        // For topological changes, find the zone
-        msI = mesh_.faceZones().findZoneID(movingSliderName_ + "Zone" + name_);
-    }
-    else
-    {
-        // For GGI, take face zone from ggi interpolator
-        label movingSliderIndex =
-            mesh_.boundaryMesh().findPatchID(movingSliderName_);
-
-        if (movingSliderIndex > -1)
-        {
-            if (isA<ggiPolyPatch>(mesh_.boundaryMesh()[movingSliderIndex]))
-            {
-                const ggiPolyPatch& movingSliderGgi =
-                    refCast<const ggiPolyPatch>
-                    (
-                        mesh_.boundaryMesh()[movingSliderIndex]
-                    );
-
-                msI = mesh_.faceZones().findZoneID(movingSliderGgi.zoneName());
-            }
-        }
-    }
+    const label msI =
+        mesh_.faceZones().findZoneID(movingSliderName_ + "Zone" + name_);
 
     if (msI > -1)
     {
@@ -296,35 +259,8 @@ void Foam::mixerRotor::calcMovingMask() const
         }
     }
 
-    // Slave side
-    label ssI = -1;
-
-    if (useTopoSliding_)
-    {
-        // For topological changes, find the zone
-        ssI = mesh_.faceZones().findZoneID(staticSliderName_ + "Zone" + name_);
-    }
-    else
-    {
-        // For GGI, take face zone from ggi interpolator
-        label staticSliderIndex =
-            mesh_.boundaryMesh().findPatchID(staticSliderName_);
-
-        if (staticSliderIndex > -1)
-        {
-            if (isA<ggiPolyPatch>(mesh_.boundaryMesh()[staticSliderIndex]))
-            {
-                const ggiPolyPatch& staticSliderGgi =
-                    refCast<const ggiPolyPatch>
-                    (
-                        mesh_.boundaryMesh()[staticSliderIndex]
-                    );
-
-                ssI = mesh_.faceZones().findZoneID(staticSliderGgi.zoneName());
-            }
-        }
-    }
-
+    const label ssI =
+        mesh_.faceZones().findZoneID(staticSliderName_ + "Zone" + name_);
 
     if (ssI > -1)
     {

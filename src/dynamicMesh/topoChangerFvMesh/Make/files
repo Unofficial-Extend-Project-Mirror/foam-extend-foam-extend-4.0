@@ -3,7 +3,7 @@ topoChangerFvMesh/topoChangerFvMesh.C
 linearValveFvMesh/linearValveFvMesh.C
 attachDetachFvMesh/attachDetachFvMesh.C
 linearValveLayersFvMesh/linearValveLayersFvMesh.C
-movingConeTopoFvMesh/movingConeTopoFvMesh.C
+movingBodyTopoFvMesh/movingBodyTopoFvMesh.C
 mixerFvMesh/mixerFvMesh.C
 multiMixerFvMesh/mixerRotor.C
 multiMixerFvMesh/multiMixerFvMesh.C
