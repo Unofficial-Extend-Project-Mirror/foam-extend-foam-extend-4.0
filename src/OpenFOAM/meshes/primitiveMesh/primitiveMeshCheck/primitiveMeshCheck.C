@@ -537,7 +537,7 @@ bool Foam::primitiveMesh::checkFaceOrthogonality
                     << ::acos(minDDotS)/mathematicalConstant::pi*180.0
                     << " average: " <<
                     ::acos(sumDDotS/neiSize)/mathematicalConstant::pi*180.0
-                    << " Threshold = " << nonOrthThreshold_                    
+                    << " Threshold = " << nonOrthThreshold_
                     << endl;
             }
         }

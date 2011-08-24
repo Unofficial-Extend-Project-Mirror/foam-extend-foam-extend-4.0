@@ -276,11 +276,25 @@ public:
                 return source_;
             }
 
+            //- Access to fvBoundary scalar field containing
+            //  pseudo-matrix coeffs for internal cells
+            const FieldField<Field, Type>& internalCoeffs() const
+            {
+                return internalCoeffs_;
+            }
+
             //- fvBoundary scalar field containing pseudo-matrix coeffs
             //  for internal cells
             FieldField<Field, Type>& internalCoeffs()
             {
                 return internalCoeffs_;
+            }
+
+            //- Access to fvBoundary scalar field containing
+            //  pseudo-matrix coeffs for boundary cells
+            const FieldField<Field, Type>& boundaryCoeffs() const
+            {
+                return boundaryCoeffs_;
             }
 
             //- fvBoundary scalar field containing pseudo-matrix coeffs

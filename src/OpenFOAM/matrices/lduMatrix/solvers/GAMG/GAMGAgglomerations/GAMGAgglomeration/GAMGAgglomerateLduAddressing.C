@@ -290,7 +290,7 @@ void Foam::GAMGAgglomeration::agglomerateLduAddressing
                     fineInterfaceAddr[inti]
                 ).ptr()
             );
-            
+
             coarseInterfaceAddr[inti] = coarseInterfaces[inti].faceCells();
         }
     }
