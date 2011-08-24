@@ -14,7 +14,7 @@ cd constant/polyMesh/sets/
 cd ../../..
 
 runApplication setsToZones
-runApplication decomposePar
-#runApplication $application
-runParallel $application 4
-runApplication reconstructParMesh -cellDist
+#runApplication decomposePar
+runApplication $application
+#runParallel $application 4
+#runApplication reconstructParMesh -cellDist
