@@ -53,9 +53,16 @@ void Foam::regionCoupleFvPatch::makeWeights(scalarField& w) const
     if (rcPolyPatch_.attached())
     {
         vectorField n = nf();
-        scalarField nfc = n & (rcPolyPatch_.reconFaceCellCentres() - Cf());
 
-        w = nfc/((n & (Cf() - Cn())) + nfc);
+        // Note: mag in the dot-product.
+        // For all valid meshes, the non-orthogonality will be less that
+        // 90 deg and the dot-product will be positive.  For invalid
+        // meshes (d & s <= 0), this will stabilise the calculation
+        // but the result will be poor.  HJ, 24/Aug/2011
+        scalarField nfc =
+            mag(n & (rcPolyPatch_.reconFaceCellCentres() - Cf()));
+
+        w = nfc/(mag(n & (Cf() - Cn())) + nfc);
     }
     else
     {
@@ -69,7 +76,10 @@ void Foam::regionCoupleFvPatch::makeDeltaCoeffs(scalarField& dc) const
 {
     if (rcPolyPatch_.attached())
     {
-        dc = (1.0 - weights())/(nf() & fvPatch::delta());
+        // Stabilised form for bad meshes.  HJ, 24/Aug/2011
+        vectorField d = delta();
+
+        dc = 1.0/max(nf() & d, 0.05*mag(d));
     }
     else
     {
