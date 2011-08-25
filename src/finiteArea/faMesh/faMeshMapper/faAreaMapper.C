@@ -224,11 +224,6 @@ void Foam::faAreaMapper::calcAddressing() const
             // Get addressing
             const labelList& mo = fff[fffI].masterObjects();
 
-        forAll (ffe, ffeI)
-        {
-            // Get addressing
-            const labelList& mo = ffe[ffeI].masterObjects();
-
             // Check if master objects are in faMesh
             labelList validMo(mo.size());
             label nValidMo = 0;
@@ -256,7 +251,6 @@ void Foam::faAreaMapper::calcAddressing() const
 
                 nNewFaces++;
             }
-        }
         }
 
         // All faces collected.  Reset sizes of lists

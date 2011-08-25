@@ -51,7 +51,7 @@ ddt
     return fa::faDdtScheme<Type>::New
     (
         mesh,
-        mesh.ddtScheme("ddt(" + dt.name() + ')')
+        mesh.schemesDict().ddtScheme("ddt(" + dt.name() + ')')
     )().facDdt(dt);
 }
 
