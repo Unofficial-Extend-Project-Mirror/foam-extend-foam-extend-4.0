@@ -102,7 +102,6 @@ Group: 			Development/Tools
         -opensource --confirm-license=yes \
         -release -shared                  \
         -nomake examples -nomake demos    \
-        -no-separate-debug-info           \
         --prefix=%{_installPrefix}
 
     # Explicitely specify LD_LIBRARY_PATH so it can find QT own libraries
