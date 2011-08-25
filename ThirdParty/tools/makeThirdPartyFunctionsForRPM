@@ -33,15 +33,17 @@
 buildBase=$WM_THIRD_PARTY_DIR/rpmBuild
 architecture=`rpm --eval "%{_target_cpu}"`
 
-# Adjust the rpm command on Ubuntu system
-rpm --force-debian >& /dev/null
+RPM_CMD='rpm' 
+RPM_CMD_XTRA_OPTIONS='' 
+
+# Adjust the rpm command options on Ubuntu/Debian based systems
+${RPM_CMD} --force-debian >& /dev/null
 
 RETVAL=$?
-[ $RETVAL -eq 0 ] && RPM_CMD="rpm --force-debian" #Success : Debian system
-[ $RETVAL -ne 0 ] && RPM_CMD="rpm"                #Failed  : Non-Debian system
+[ $RETVAL -eq 0 ] && RPM_CMD_XTRA_OPTIONS="--force-debian" #Success : Debian system
 
 echo ""
-echo "This system rpm command: $RPM_CMD"
+echo "This system rpm command: ${RPM_CMD} ${RPM_CMD_XTRA_OPTIONS}"
 echo ""
 
 #
@@ -49,13 +51,42 @@ echo ""
 #
 rpm_make()
 {
-    package="$1"
+    # Avoid word splitting on 'space'
+    IFS=$'\n'
+ 
+    # sort arguments
+    _PACKAGE=''
+    _SPECFILE=''
+    _PACKAGE_URL=''
+    _ADDITIONALFLAGS=''
+
+    while getopts p:s:u:a: flags
+      do
+      case $flags in
+	  p)  _PACKAGE=$OPTARG
+	      ;;
+	  u)  _PACKAGE_URL=$OPTARG
+	      ;;
+	  s)  _SPECFILE=$OPTARG
+	      ;;
+	  a)  _ADDITIONALFLAGS=$OPTARG
+	      ;;
+      esac
+    done
+
+    echo "Package name      : $_PACKAGE"
+    echo "Package URL       : $_PACKAGE_URL"
+    echo "RPM spec file name: $_SPECFILE"
+    echo "Additional flags  : $_ADDITIONALFLAGS"
+
+    # Shift options
+    shift `expr $OPTIND - 1`
 
     # Make sure the ThirdParty environment is up-to-date
-    echo "Updating the ThirdParty environment variables before building package $package" 
+    echo "Updating the ThirdParty environment variables before building package $_PACKAGE" 
     . $WM_PROJECT_DIR/etc/settings.sh
 
-    rpmName=$package-$WM_OPTIONS.$architecture
+    rpmName=$_PACKAGE-$WM_OPTIONS.$architecture
     rpmFile=$buildBase/RPMS/$architecture/$rpmName.rpm
 
     # We check immediatly if the RPM binary package is available in the local RPMs vault.
@@ -70,41 +101,36 @@ rpm_make()
         #
 	cd $buildBase
 
-        # Here, the logic is fairly simple: 
-        #    We assume that the 2nd command-line parameter is necessarily the URL for dowmloading the package.
-        #    If more than 2 command-line parameters are supplied, we assume that these additional parameters
-        #    are for the command rpmbuild.
-        #    This is a bit fragile, improvements will come later if necessary.
-        #  
-	[ "$#" -ge 2 ] && {
-            packageURL="$2"
-            packageTarBall=`basename $packageURL`
+        #
+        # Do we need to download the package using the supplied URL
+	if [ -n "$_PACKAGE_URL" ]; then  
+            packageTarBall=`basename $_PACKAGE_URL`
 
             if [ ! -e "SOURCES/$packageTarBall" ]; then
-		echo "Download $packageTarBall from : $packageURL"
-		( cd SOURCES; wget --no-check-certificate $packageURL )
+		echo "Download $packageTarBall from : $_PACKAGE_URL"
+		( cd SOURCES; wget --no-check-certificate $_PACKAGE_URL )
             fi
-	}
+	fi
 
-	[ "$#" -gt 2 ] && {
-        # We will pass the rest of the command-line arguments to rpmbuild
-            shift 2
-	}
-
-        echo "Making package $package using RPM."
-	rpm_build $package "$@"
+        echo "Making package $_PACKAGE using RPM."
+	rpm_build ${_PACKAGE} ${_SPECFILE} ${_ADDITIONALFLAGS} "$@"
     fi
 
     # Install RPM package if not done already
-    if [ ! -e "$WM_THIRD_PARTY_DIR/packages/$package/platforms/$WM_OPTIONS" ]; then
-        echo "Installing package: $package"
-        rpm_uninstall $package
-        rpm_install   $package
+    if [ ! -e "$WM_THIRD_PARTY_DIR/packages/$_PACKAGE/platforms/$WM_OPTIONS" ]; then
+        echo "Installing package: $_PACKAGE"
+        rpm_uninstall $_PACKAGE
+        rpm_install   $_PACKAGE
     else
-        echo "Package $package is already installed"
+        echo "Package $_PACKAGE is already installed"
     fi
 
-    echo "Done installing package $package"
+    unset _PACKAGE
+    unset _SPECFILE
+    unset _PACKAGE_URL
+    unset _ADDITIONALFLAGS
+
+    echo "Done installing package $_PACKAGE"
     echo ""
 }
 
@@ -114,8 +140,8 @@ rpm_make()
 rpm_build()
 {
     package="$1"
-    shift
-    specFile="$package.spec"
+    specFile="$2"
+    shift 2
 
     cd $buildBase
 
@@ -125,7 +151,7 @@ rpm_build()
     }
 
     #Build RPM package
-    echo "Building package $package"
+    echo "Building package $package using SPEC file : $specFile. Optional args: $@"
     #rpmbuild --define "_topdir $buildBase" --dbpath $buildBase/rpmDB --clean -bb ./SPECS/$specFile "$@"
     #
     # Let's keep the compilation directory alive for now in order to facilitate postmortems of failed compilations
@@ -143,7 +169,7 @@ rpm_uninstall()
     cd $buildBase
 
     echo "  Uninstalling $package using RPM: $rpmName"
-    $RPM_CMD -e $rpmName --dbpath $buildBase/rpmDB --norepackage >& /dev/null
+    ${RPM_CMD} ${RPM_CMD_XTRA_OPTIONS} -e $rpmName --dbpath $buildBase/rpmDB --norepackage >& /dev/null
 
     # Note: rpm will rant when uninstalling packages with an error message
     #       starting with "error: LOOP:"
@@ -162,7 +188,7 @@ rpm_install()
     rpmFile=$buildBase/RPMS/$architecture/$rpmName.rpm;
 
     echo "  Installing $package using RPM file: $rpmFile";
-    $RPM_CMD -ivh              \
+    ${RPM_CMD} ${RPM_CMD_XTRA_OPTIONS} -ivh              \
 	$rpmFile          \
 	--dbpath $buildBase/rpmDB --force --nodeps;
 

@@ -37,7 +37,7 @@ diff -ruN libccmio-2.6.1_orig/config/config.system libccmio-2.6.1/config/config.
      i386-apple-darwin8.11.1)
  	echo i386-apple-darwin8 ;;
  
-+    i386-apple-darwin10.5.0)
++    i386-apple-darwin10.5.0 |  i386-apple-darwin10.7.0 | i386-apple-darwin10.8.0)
 +	echo i386-apple-darwin10 ;;
 +
      *)

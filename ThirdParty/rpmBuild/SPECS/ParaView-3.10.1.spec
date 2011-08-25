@@ -23,7 +23,7 @@
 #     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 # Script
-#     RPM spec file for ParaView-3.8.1
+#     RPM spec file for ParaView-3.10.1
 #
 # Description
 #     RPM spec file for creating a relocatable RPM
@@ -63,7 +63,7 @@
 
 %define name		ParaView
 %define release		%{_WM_OPTIONS}
-%define version 	3.8.1
+%define version 	3.10.1
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
@@ -73,11 +73,11 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://www.paraview.org/files/v3.8/
+URL:                    http://www.paraview.org/files/v3.10/
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
-Patch0:                 ParaView-3.8.1.patch_darwin
+Patch0:                 ParaView-3.10.1.patch_darwin
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -89,8 +89,8 @@ Patch0:                 ParaView-3.8.1.patch_darwin
 #
 %{!?_withVerbose:     %define _withVerbose     false}
 %{!?_withMesa:        %define _withMesa        false}
-%{!?_withMPI:         %define _withMPI         false}
-%{!?_withPython:      %define _withPython      false}
+%{!?_withMPI:         %define _withMPI         true}
+%{!?_withPython:      %define _withPython      true}
 %{!?_withQt:          %define _withQt          true}
 %{!?_qmakePath:       %define _qmakePath       Undefined}
 %{!?_mesaIncludePath: %define _mesaIncludePath Undefined}
@@ -149,6 +149,12 @@ Patch0:                 ParaView-3.8.1.patch_darwin
     addCMakeVariable  BUILD_SHARED_LIBS:BOOL=ON  VTK_USE_RPATH:BOOL=OFF
     addCMakeVariable  CMAKE_BUILD_TYPE:STRING=Release
 
+    # HJ, 9/Aug/2011
+    addCMakeVariable  OPENGL_gl_LIBRARY:STRING= 
+
+    # HJ, 9/Aug/2011
+    addCMakeVariable  VTK_USE_OPENGL_LIBRARY:BOOL=ON
+
     # include development files in "make install"
     addCMakeVariable  PARAVIEW_INSTALL_DEVELOPMENT:BOOL=ON
 
@@ -157,7 +163,7 @@ Patch0:                 ParaView-3.8.1.patch_darwin
 
  %ifos darwin
     # Additional installation rules for Mac OS X 
-    addCMakeVariable  PARAVIEW_EXTRA_INSTALL_RULES_FILE:FILEPATH=%{_topdir}/BUILD/%{name}-%{version}/Applications/ParaView-3.8.1_extra_install_Darwin.cmake
+    addCMakeVariable  PARAVIEW_EXTRA_INSTALL_RULES_FILE:FILEPATH=%{_topdir}/BUILD/%{name}-%{version}/Applications/ParaView-3.10.1_extra_install_Darwin.cmake
 %endif
 
     # Add the value of _qmakePath for QT_QMAKE_EXECUTABLE
@@ -217,7 +223,7 @@ export PARAVIEW_VERSION=%{version}
 #     startup of paraview or even make paraview crash on startup.
 export PV_PLUGIN_PATH=\$FOAM_LIBBIN/paraview_plugins
 
-[ -d \$PARAVIEW_LIB_DIR/paraview-3.8 ] && _foamAddLib \$PARAVIEW_LIB_DIR/paraview-3.8
+[ -d \$PARAVIEW_LIB_DIR/paraview-3.10 ] && _foamAddLib \$PARAVIEW_LIB_DIR/paraview-3.10
 
 # Enable access to the package applications if present
 [ -d \$PARAVIEW_BIN_DIR ] && _foamAddPath \$PARAVIEW_BIN_DIR
@@ -251,8 +257,8 @@ if ( -e \$PARAVIEW_BIN_DIR ) then
     _foamAddPath \$PARAVIEW_BIN_DIR
 endif
 
-if ( -e \$PARAVIEW_LIB_DIR/paraview-3.8 ) then
-    _foamAddLib \$PARAVIEW_LIB_DIR/paraview-3.8
+if ( -e \$PARAVIEW_LIB_DIR/paraview-3.10 ) then
+    _foamAddLib \$PARAVIEW_LIB_DIR/paraview-3.10
 endif
 
 
