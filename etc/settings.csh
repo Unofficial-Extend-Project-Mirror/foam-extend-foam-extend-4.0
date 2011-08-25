@@ -425,13 +425,8 @@ endif
 
 # cmake
 # ~~~~~
-<<<<<<< HEAD
-if ( $?CMAKE_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.3/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3/platforms/$WM_OPTIONS/etc/cmake-2.8.3.csh
-=======
 if ( $?CMAKE_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.5 ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.5/platforms/$WM_OPTIONS/etc/cmake-2.8.5.csh
->>>>>>> remotes/origin/hotfix/ThirdParty_scripts
 endif
 
 # Python
@@ -448,8 +443,10 @@ endif
 
 # PARAVIEW
 # ~~~~~
-if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.10.1/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.10.1/platforms/$WM_OPTIONS/etc/ParaView-3.10.1.csh
+#if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.10.1/platforms/$WM_OPTIONS ) then
+#    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.10.1/platforms/$WM_OPTIONS/etc/ParaView-3.10.1.csh
+if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.8.1/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.csh
 endif
 
 if ( $WM_ARCH == "darwinIntel" || $WM_ARCH == "darwinIntel64" ) then
