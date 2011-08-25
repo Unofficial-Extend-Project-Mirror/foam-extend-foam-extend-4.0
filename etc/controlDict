@@ -121,6 +121,7 @@ DebugSwitches
     Gidaspow            0;
     GidaspowErgunWenYu  0;
     GidaspowSchillerNaumann 0;
+    ggi                 0;
     GradientDispersionRAS   0;
     Gulders             0;
     GuldersEGR          0;

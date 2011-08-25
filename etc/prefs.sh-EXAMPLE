@@ -40,7 +40,7 @@ export FOAM_VERBOSE=1
 
 # Specify system compiler
 # ~~~~~~~~~~~~~~~~~~~~~~~
-compilerInstall=system
+compilerInstall=System
 
 # Specify system openmpi
 # ~~~~~~~~~~~~~~~~~~~~~~
@@ -141,6 +141,15 @@ compilerInstall=system
 #export PARAVIEW_SYSTEM=1
 #export PARAVIEW_DIR=path_to_system_installed_paraview
 #export PARAVIEW_BIN_DIR=$PARAVIEW_DIR/bin
+
+# System installed bison
+#export BISON_SYSTEM=1
+
+# System installed flex
+#export FLEX_SYSTEM=1
+
+# System installed m4
+#export M4_SYSTEM=1
 
 # Specify ParaView version
 # ~~~~~~~~~~~~~~~~~~~~~~~~
