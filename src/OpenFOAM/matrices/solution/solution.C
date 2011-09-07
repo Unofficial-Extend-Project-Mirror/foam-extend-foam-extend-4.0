@@ -216,6 +216,15 @@ bool Foam::solution::relax(const word& name) const
     {
         Info<< "Find relax for " << name << endl;
     }
+    bool result=false;
+
+    result=        relaxationFactors_.found(name)
+     || relaxationFactors_.found("default");
+
+    if(!result)
+    {
+        Info << "Relaxation factor for field " << name << " not found!" << endl;
+    }
 
     return
         relaxationFactors_.found(name)
