@@ -46,7 +46,7 @@ export FOAM_DEV=1
 #
 # Location of FOAM installation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-foamInstall=$HOME/$WM_PROJECT
+foamInstall=$HOME/CFD/$WM_PROJECT
 # foamInstall=~$WM_PROJECT
 # foamInstall=/usr/local/$WM_PROJECT
 # foamInstall=/opt/$WM_PROJECT
@@ -72,7 +72,7 @@ fi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 export WM_PROJECT_INST_DIR=$FOAM_INST_DIR
 export WM_PROJECT_DIR=$WM_PROJECT_INST_DIR/$WM_PROJECT-$WM_PROJECT_VERSION
-: ${WM_PROJECT_USER_DIR:=$HOME/$WM_PROJECT/$USER-$WM_PROJECT_VERSION}; export WM_PROJECT_USER_DIR
+: ${WM_PROJECT_USER_DIR:=$HOME/CFD/$WM_PROJECT/$USER-$WM_PROJECT_VERSION}; export WM_PROJECT_USER_DIR
 
 
 # Location of third-party software
