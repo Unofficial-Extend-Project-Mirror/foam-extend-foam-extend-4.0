@@ -211,8 +211,6 @@ void waveTransmissiveFvPatchField<Type>::write(Ostream& os) const
         os.writeKeyword("lInf") << this->lInf_
             << token::END_STATEMENT << nl;
     }
-
-    this->writeEntry("value", os);
 }
 
 
