@@ -444,13 +444,13 @@ void advectiveFvPatchField<Type>::write(Ostream& os) const
             << token::END_STATEMENT << nl;
         os.writeKeyword("lInf") << lInf_
         << token::END_STATEMENT << endl;
+    }
 
     os.writeKeyword("inletOutlet") << inletOutlet_
         << token::END_STATEMENT << nl;
 
     os.writeKeyword("correctSupercritical") << correctSupercritical_
             << token::END_STATEMENT << nl;
-    }
 
     this->writeEntry("value", os);
 }
