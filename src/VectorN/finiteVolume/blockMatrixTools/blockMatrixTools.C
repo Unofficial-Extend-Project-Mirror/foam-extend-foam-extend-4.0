@@ -446,6 +446,45 @@ void insertCoupling
 }
 
 
+template<class BlockType>
+void updateSourceCoupling
+(
+    BlockLduMatrix<BlockType>& blockM,
+    Field<BlockType>& x,
+    Field<BlockType>& b
+)
+{
+    // Eliminate off-diagonal block coefficients from the square diagonal
+    // With this change, the segregated matrix can be assembled with complete
+    // source terms and linearisation can be provided independently.
+    // Once the linearisation coefficients are set (off-diagonal entries
+    // in the square block matrix, they are multiplied by the current value
+    // of the field and subtracted from the source term
+
+    if (blockM.diag().activeType() == blockCoeffBase::SQUARE)
+    {
+        typename CoeffField<BlockType>::squareTypeField& blockDiag =
+            blockM.diag().asSquare();
+
+        typename CoeffField<BlockType>::linearTypeField lf(blockDiag.size());
+        typename CoeffField<BlockType>::squareTypeField sf(blockDiag.size());
+
+        // Expand and contract
+
+        // Take out the diagonal entries from the square coefficient
+        contractLinear(lf, blockDiag);
+
+        // Expand the diagonal for full square, with zeroes in the off-diagonal
+        expandLinear(sf, lf);
+
+        // Subtract from the source the difference between the full block
+        // diagonal and the diagonal terms only
+        // Sign is the same as in the derivative
+        b += (blockDiag - sf) & x;
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace blockMatrixTools

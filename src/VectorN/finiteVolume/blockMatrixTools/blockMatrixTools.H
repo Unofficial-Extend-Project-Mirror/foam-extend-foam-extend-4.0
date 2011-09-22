@@ -153,7 +153,7 @@ namespace blockMatrixTools
         // Subtracts the block-coefficient coupling as specified by the user
         // from the source, leaving the implicit update given by linearisation
         template<class BlockType>
-        void updateCoupling
+        void updateSourceCoupling
         (
             BlockLduMatrix<BlockType>& blockM,
             Field<BlockType>& x,
