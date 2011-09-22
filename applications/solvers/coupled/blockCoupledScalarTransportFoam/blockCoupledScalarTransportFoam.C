@@ -119,8 +119,8 @@ int main(int argc, char *argv[])
             //- Add off-diagonal terms and remove from block source
             forAll(d, i)
             {
-                d[i](0,1) = -alpha.value()*mesh.V()[i];
-                d[i](1,0) = -alpha.value()*mesh.V()[i];
+                d[i](0, 1) = -alpha.value()*mesh.V()[i];
+                d[i](1, 0) = -alpha.value()*mesh.V()[i];
 
                 blockB[i][0] -= alpha.value()*blockX[i][1]*mesh.V()[i];
                 blockB[i][1] -= alpha.value()*blockX[i][0]*mesh.V()[i];
