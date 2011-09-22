@@ -885,7 +885,7 @@ int main(int argc, char *argv[])
 
                 fileName currentDir(cwd());
                 chDir(timePath);
-                if (!exists(parentPath/runTime.timeName()/uniformDir))
+                if (!exists(uniformDir))
                 {
                     ln
                     (
