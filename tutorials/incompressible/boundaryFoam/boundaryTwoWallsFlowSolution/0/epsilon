@@ -1,6 +1,6 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
@@ -10,6 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
+    location    "0";
     object      epsilon;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -22,23 +23,32 @@ boundaryField
 {
     lowerWall
     {
-        type            zeroGradient;
+        type            epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
     }
-
     upperWall
     {
-        type            zeroGradient;
+        type            epsilonWallFunction;
+        refValue        uniform 2.37003e-310;
+        value           uniform 14.855;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
     }
-
     flow
     {
         type            cyclic;
+        value           uniform 14.855;
     }
-
     defaultFaces
     {
         type            empty;
     }
 }
+
 
 // ************************************************************************* //
