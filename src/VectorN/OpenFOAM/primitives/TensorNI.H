@@ -218,6 +218,36 @@ inline TensorN<Cmpt, length> transform
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template <class Cmpt, int length>
+inline direction TensorN<Cmpt, length>::cmpt
+(
+    const direction i,
+    const direction j
+)
+{
+    if
+    (
+        i > TensorN<Cmpt, length>::rowLength - 1
+     || j > TensorN<Cmpt, length>::rowLength - 1
+    )
+    {
+        FatalErrorIn
+        (
+            "direction TensorN<Cmpt, length>::cmpt()\n"
+            "(\n"
+            "    const direction i,\n"
+            "    const direction j\n"
+            ") const"
+        )   << "Direction out of range (0 "
+            << TensorN<Cmpt, length>::rowLength - 1 << ")"
+            << " and (i j) = ("  << i << " " << j << ")"
+            << abort(FatalError);
+    }
+
+    return i*TensorN<Cmpt, length>::rowLength + j;
+}
+
+
+template <class Cmpt, int length>
 inline const Cmpt& TensorN<Cmpt, length>::operator()
 (
     const direction i,
@@ -857,7 +887,11 @@ inline TensorN<Cmpt, length> inv(const TensorN<Cmpt, length>& t)
                 {
                     if (iPivot[k] == 0)
                     {
-                        if ((temp = Foam::mag(result[curRowOffset+k])) >= largestCoeff)
+                        if
+                        (
+                            (temp = Foam::mag(result[curRowOffset+k]))
+                         >= largestCoeff
+                        )
                         {
                             largestCoeff = temp;
                             iRow = j;
