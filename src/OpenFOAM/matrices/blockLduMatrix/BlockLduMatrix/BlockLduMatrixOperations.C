@@ -539,6 +539,8 @@ void Foam::BlockLduMatrix<Type>::relax
                 sumOff[l[coeffI]] += cmptMag(activeUpper[coeffI]);
             }
 
+            // Reconsider under-relaxation of square blocks.
+            // HJ, 23/Sep/2011 (2 places)
             activeDiag = max(activeDiag, sumOff);
             activeDiag *= 1.0/alpha;
 
@@ -655,6 +657,8 @@ void Foam::BlockLduMatrix<Type>::relax
                 sumOff[l[coeffI]] += cmptMag(activeUpper[coeffI]);
             }
 
+            // Reconsider under-relaxation of square blocks.
+            // HJ, 23/Sep/2011 (2 places)
             activeDiag = max(activeDiag, sumOff);
             activeDiag *= 1.0/alpha;
 
