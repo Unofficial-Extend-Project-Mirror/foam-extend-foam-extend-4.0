@@ -172,13 +172,13 @@ public:
             }
 
             //- Return a named shadow patch field
-            template<class GeometricField, class Type2>
-            const typename GeometricField::PatchFieldType&
+            template<class LookupField, class LookupType>
+            const typename LookupField::PatchFieldType&
             lookupShadowPatchField
             (
                 const word& name,
-                const GeometricField* = NULL,
-                const Type2* = NULL
+                const LookupField* = NULL,
+                const LookupType* = NULL
             ) const;
 
 

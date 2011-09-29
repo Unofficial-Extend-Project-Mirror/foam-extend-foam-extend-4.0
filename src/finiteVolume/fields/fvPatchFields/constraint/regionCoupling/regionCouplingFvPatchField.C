@@ -30,6 +30,8 @@ Author
 #include "regionCouplingFvPatchField.H"
 #include "symmTransformField.H"
 #include "magLongDelta.H"
+#include "volFields.H"
+#include "surfaceFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -150,19 +152,19 @@ regionCouplingFvPatchField<Type>::regionCouplingFvPatchField
 
 // Return a named shadow patch field
 template<class Type>
-template<class GeometricField, class Type2>
-const typename GeometricField::PatchFieldType&
+template<class LookupField, class LookupType>
+const typename LookupField::PatchFieldType&
 regionCouplingFvPatchField<Type>::lookupShadowPatchField
 (
     const word& name,
-    const GeometricField*,
-    const Type2*
+    const LookupField*,
+    const LookupType*
 ) const
 {
     // Lookup neighbour field
-    const GeometricField& shadowField =
+    const LookupField& shadowField =
         regionCouplePatch_.shadowRegion().
-        objectRegistry::lookupObject<GeometricField>(name);
+        objectRegistry::lookupObject<LookupField>(name);
 
     return shadowField.boundaryField()[regionCouplePatch_.shadowIndex()];
 }
@@ -183,7 +185,7 @@ regionCouplingFvPatchField<Type>::shadowPatchField() const
 }
 
 
-// Return neighbour field
+// Return neighbour field given internal cell data
 template<class Type>
 tmp<Field<Type> > regionCouplingFvPatchField<Type>::patchNeighbourField() const
 {
@@ -234,6 +236,7 @@ tmp<Field<Type> > regionCouplingFvPatchField<Type>::patchNeighbourField
     // Note: this field is not bridged because local data does not exist
     // for named field.  HJ, 27/Sep/2011
 }
+
 
 
 template<class Type>
