@@ -185,7 +185,7 @@ regionCouplingFvPatchField<Type>::shadowPatchField() const
 }
 
 
-// Return neighbour field given internal cell data
+// Return neighbour field
 template<class Type>
 tmp<Field<Type> > regionCouplingFvPatchField<Type>::patchNeighbourField() const
 {
@@ -238,7 +238,6 @@ tmp<Field<Type> > regionCouplingFvPatchField<Type>::patchNeighbourField
 }
 
 
-
 template<class Type>
 void regionCouplingFvPatchField<Type>::initEvaluate
 (
@@ -288,7 +287,9 @@ void regionCouplingFvPatchField<Type>::initEvaluate
         // HJ, 28/Sep/2011
         if (mag(den) > kSmall)
         {
-            weights[faceI] = (mNei[faceI] - mean[faceI])/den;
+            // Limit weights for round-off safety
+            weights[faceI] =
+                Foam::max(0, Foam::min((mNei[faceI] - mean[faceI])/den, 1));
         }
         else
         {
@@ -340,7 +341,9 @@ void regionCouplingFvPatchField<Type>::initEvaluate
                     pDeltaCoeffs[faceI]
                 );
 
-            weights[faceI] = (magPhiNei[faceI] - mean)/den;
+            // Limit weights for round-off safety
+            weights[faceI] =
+                Foam::max(0, Foam::min((magPhiNei[faceI] - mean)/den, 1));
         }
         else
         {
@@ -411,17 +414,29 @@ void regionCouplingFvPatchField<Type>::initInterfaceMatrixUpdate
     const Pstream::commsTypes
 ) const
 {
-    // Prepare local matrix update buffer for the remote side.
-    // Note that only remote side will have access to its psiInternal
-    // as they are on different regions
+    if (regionCouplePatch_.coupled())
+    {
+        // Prepare local matrix update buffer for the remote side.
+        // Note that only remote side will have access to its psiInternal
+        // as they are on different regions
 
-    // Since interpolation needs to happen on the shadow, and within the
-    // init, prepare interpolation for the other side.
-    matrixUpdateBuffer_ =
-        this->shadowPatchField().regionCouplePatch().interpolate
+        // Since interpolation needs to happen on the shadow, and within the
+        // init, prepare interpolation for the other side.
+        matrixUpdateBuffer_ =
+            this->shadowPatchField().regionCouplePatch().interpolate
+            (
+                this->patch().patchInternalField(psiInternal)
+            );
+    }
+    else
+    {
+        FatalErrorIn
         (
-            this->patch().patchInternalField(psiInternal)
-        );
+            "regionCouplingFvPatchField<Type>::initInterfaceMatrixUpdate"
+        )   << "init matrix update calld in detached state"
+            << abort(FatalError);
+
+    }
 }
 
 
@@ -437,18 +452,30 @@ void regionCouplingFvPatchField<Type>::updateInterfaceMatrix
     const Pstream::commsTypes
 ) const
 {
-    // Note: interpolation involves parallel communications and needs to
-    // happen during init.  This changes the use of matrix update buffer
-    // compared to earlier versions
-    // HJ, 28/Sep/2011
-    scalarField pnf = this->shadowPatchField().matrixUpdateBuffer();
-
-    // Multiply the field by coefficients and add into the result
-    const unallocLabelList& fc = regionCouplePatch_.faceCells();
-
-    forAll(fc, elemI)
+    if (regionCouplePatch_.coupled())
     {
-        result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
+        // Note: interpolation involves parallel communications and needs to
+        // happen during init.  This changes the use of matrix update buffer
+        // compared to earlier versions
+        // HJ, 28/Sep/2011
+        scalarField pnf = this->shadowPatchField().matrixUpdateBuffer();
+
+        // Multiply the field by coefficients and add into the result
+        const unallocLabelList& fc = regionCouplePatch_.faceCells();
+
+        forAll(fc, elemI)
+        {
+            result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
+        }
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "regionCouplingFvPatchField<Type>::updateInterfaceMatrix"
+        )   << "Matrix update calld in detached state"
+            << abort(FatalError);
+
     }
 }
 
