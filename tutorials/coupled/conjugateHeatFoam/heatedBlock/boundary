@@ -29,10 +29,14 @@ left
     nFaces 10;
     startFace 200;
 
+    zone            leftZone;
     shadowRegion    region0;
     shadowPatch     right;
+
+    master          no;
     attached        on;
     isWall          yes;  // Not relevant
+    bridgeOverlap   no;
 }
 
 right
