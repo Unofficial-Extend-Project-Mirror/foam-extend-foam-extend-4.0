@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    regionCoupleFvsPatchField
+    regionCouplingFvsPatchField
 
 Description
     Region couple patch field
@@ -31,13 +31,17 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
+Note
+    The name of the class needs to be different from the name of the patch
+    (regionCouple) to avoid constraint patch behaviour
+
 SourceFiles
-    regionCoupleFvsPatchField.C
+    regionCouplingFvsPatchField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef regionCoupleFvsPatchField_H
-#define regionCoupleFvsPatchField_H
+#ifndef regionCouplingFvsPatchField_H
+#define regionCouplingFvsPatchField_H
 
 #include "coupledFvsPatchField.H"
 #include "regionCoupleLduInterfaceField.H"
@@ -49,17 +53,17 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                 Class regionCoupleFvsPatchField Declaration
+                 Class regionCouplingFvsPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class regionCoupleFvsPatchField
+class regionCouplingFvsPatchField
 :
     public coupledFvsPatchField<Type>
 {
     // Private data
 
-        //- Local reference cast into the regionCouple patch
+        //- Local reference cast into the regionCoupling patch
         const regionCoupleFvPatch& regionCouplePatch_;
 
         //- Name of remote field to couple to
@@ -81,41 +85,40 @@ protected:
 public:
 
     //- Runtime type information
-//     TypeName(regionCoupleFvPatch::typeName_());
     TypeName("regionCoupling");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        regionCoupleFvsPatchField
+        regionCouplingFvsPatchField
         (
             const fvPatch&,
             const DimensionedField<Type, surfaceMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        regionCoupleFvsPatchField
+        regionCouplingFvsPatchField
         (
             const fvPatch&,
             const DimensionedField<Type, surfaceMesh>&,
             const dictionary&
         );
 
-        //- Construct by mapping given regionCoupleFvsPatchField
+        //- Construct by mapping given regionCouplingFvsPatchField
         //  onto a new patch
-        regionCoupleFvsPatchField
+        regionCouplingFvsPatchField
         (
-            const regionCoupleFvsPatchField<Type>&,
+            const regionCouplingFvsPatchField<Type>&,
             const fvPatch&,
             const DimensionedField<Type, surfaceMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy setting internal field reference
-        regionCoupleFvsPatchField
+        regionCouplingFvsPatchField
         (
-            const regionCoupleFvsPatchField<Type>&,
+            const regionCouplingFvsPatchField<Type>&,
             const DimensionedField<Type, surfaceMesh>&
         );
 
@@ -124,7 +127,7 @@ public:
         {
             return tmp<fvsPatchField<Type> >
             (
-                new regionCoupleFvsPatchField<Type>(*this)
+                new regionCouplingFvsPatchField<Type>(*this)
             );
         }
 
@@ -136,7 +139,7 @@ public:
         {
             return tmp<fvsPatchField<Type> >
             (
-                new regionCoupleFvsPatchField<Type>(*this, iF)
+                new regionCouplingFvsPatchField<Type>(*this, iF)
             );
         }
 
@@ -152,7 +155,7 @@ public:
             }
 
             //- Return shadow patch field
-            const regionCoupleFvsPatchField<Type>& shadowPatchField() const;
+            const regionCouplingFvsPatchField<Type>& shadowPatchField() const;
 
 
         //- Write
@@ -168,7 +171,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "regionCoupleFvsPatchField.C"
+#   include "regionCouplingFvsPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

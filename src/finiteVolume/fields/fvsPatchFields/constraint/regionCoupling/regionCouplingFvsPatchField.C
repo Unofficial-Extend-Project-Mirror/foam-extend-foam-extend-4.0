@@ -27,7 +27,7 @@ Author
 
 \*---------------------------------------------------------------------------*/
 
-#include "regionCoupleFvsPatchField.H"
+#include "regionCouplingFvsPatchField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -37,7 +37,7 @@ namespace Foam
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-regionCoupleFvsPatchField<Type>::regionCoupleFvsPatchField
+regionCouplingFvsPatchField<Type>::regionCouplingFvsPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, surfaceMesh>& iF
@@ -51,7 +51,7 @@ regionCoupleFvsPatchField<Type>::regionCoupleFvsPatchField
 
 
 template<class Type>
-regionCoupleFvsPatchField<Type>::regionCoupleFvsPatchField
+regionCouplingFvsPatchField<Type>::regionCouplingFvsPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, surfaceMesh>& iF,
@@ -67,7 +67,7 @@ regionCoupleFvsPatchField<Type>::regionCoupleFvsPatchField
     {
         FatalIOErrorIn
         (
-            "regionCoupleFvsPatchField<Type>::regionCoupleFvsPatchField\n"
+            "regionCouplingFvsPatchField<Type>::regionCouplingFvsPatchField\n"
             "(\n"
             "    const fvPatch& p,\n"
             "    const DimensionedField<Type, surfaceMesh>& iF,\n"
@@ -82,9 +82,9 @@ regionCoupleFvsPatchField<Type>::regionCoupleFvsPatchField
 
 
 template<class Type>
-regionCoupleFvsPatchField<Type>::regionCoupleFvsPatchField
+regionCouplingFvsPatchField<Type>::regionCouplingFvsPatchField
 (
-    const regionCoupleFvsPatchField<Type>& ptf,
+    const regionCouplingFvsPatchField<Type>& ptf,
     const fvPatch& p,
     const DimensionedField<Type, surfaceMesh>& iF,
     const fvPatchFieldMapper& mapper
@@ -99,9 +99,9 @@ regionCoupleFvsPatchField<Type>::regionCoupleFvsPatchField
     {
         FatalErrorIn
         (
-            "regionCoupleFvsPatchField<Type>::regionCoupleFvsPatchField\n"
+            "regionCouplingFvsPatchField<Type>::regionCouplingFvsPatchField\n"
             "(\n"
-            "    const regionCoupleFvsPatchField<Type>& ptf,\n"
+            "    const regionCouplingFvsPatchField<Type>& ptf,\n"
             "    const fvPatch& p,\n"
             "    const DimensionedField<Type, surfaceMesh>& iF,\n"
             "    const fvPatchFieldMapper& mapper\n"
@@ -116,9 +116,9 @@ regionCoupleFvsPatchField<Type>::regionCoupleFvsPatchField
 
 
 template<class Type>
-regionCoupleFvsPatchField<Type>::regionCoupleFvsPatchField
+regionCouplingFvsPatchField<Type>::regionCouplingFvsPatchField
 (
-    const regionCoupleFvsPatchField<Type>& ptf,
+    const regionCouplingFvsPatchField<Type>& ptf,
     const DimensionedField<Type, surfaceMesh>& iF
 )
 :
@@ -133,8 +133,8 @@ regionCoupleFvsPatchField<Type>::regionCoupleFvsPatchField
 
 // Return neighbour field
 template<class Type>
-const regionCoupleFvsPatchField<Type>&
-regionCoupleFvsPatchField<Type>::shadowPatchField() const
+const regionCouplingFvsPatchField<Type>&
+regionCouplingFvsPatchField<Type>::shadowPatchField() const
 {
     // Lookup neighbour field
     typedef GeometricField<Type, fvsPatchField, surfaceMesh> GeoField;
@@ -143,7 +143,7 @@ regionCoupleFvsPatchField<Type>::shadowPatchField() const
         regionCouplePatch_.shadowRegion().
         objectRegistry::lookupObject<GeoField>(remoteFieldName_);
 
-    return refCast<const regionCoupleFvsPatchField<Type> >
+    return refCast<const regionCouplingFvsPatchField<Type> >
     (
         coupleField.boundaryField()[regionCouplePatch_.shadowIndex()]
     );
@@ -152,7 +152,7 @@ regionCoupleFvsPatchField<Type>::shadowPatchField() const
 
 // Write
 template<class Type>
-void regionCoupleFvsPatchField<Type>::write(Ostream& os) const
+void regionCouplingFvsPatchField<Type>::write(Ostream& os) const
 {
     fvsPatchField<Type>::write(os);
     os.writeKeyword("remoteField")

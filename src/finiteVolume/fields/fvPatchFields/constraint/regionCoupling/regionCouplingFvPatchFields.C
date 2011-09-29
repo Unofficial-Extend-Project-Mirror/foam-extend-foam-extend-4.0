@@ -30,7 +30,7 @@ Author
 
 \*---------------------------------------------------------------------------*/
 
-#include "regionCoupleFvPatchFields.H"
+#include "regionCouplingFvPatchFields.H"
 #include "addToRunTimeSelectionTable.H"
 #include "volFields.H"
 
@@ -41,7 +41,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-makePatchFields(regionCouple);
+makePatchFields(regionCoupling);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

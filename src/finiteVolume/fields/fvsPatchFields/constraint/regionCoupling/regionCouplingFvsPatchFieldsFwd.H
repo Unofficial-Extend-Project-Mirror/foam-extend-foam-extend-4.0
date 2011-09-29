@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    regionCoupleFvPatchField
+    regionCouplingFvsPatchField
 
 Description
     Region couple patch field
@@ -33,8 +33,8 @@ Author
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef regionCoupleFvPatchFieldsFwd_H
-#define regionCoupleFvPatchFieldsFwd_H
+#ifndef regionCouplingFvsPatchFieldsFwd_H
+#define regionCouplingFvsPatchFieldsFwd_H
 
 #include "fvPatchField.H"
 #include "fieldTypes.H"
@@ -46,9 +46,9 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class Type> class regionCoupleFvPatchField;
+template<class Type> class regionCouplingFvsPatchField;
 
-makePatchTypeFieldTypedefs(regionCouple)
+makeFvsPatchTypeFieldTypedefs(regionCoupling)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

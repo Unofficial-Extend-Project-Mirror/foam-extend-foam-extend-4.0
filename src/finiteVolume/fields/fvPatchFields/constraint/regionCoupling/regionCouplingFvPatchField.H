@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    regionCoupleFvPatchField
+    regionCouplingFvPatchField
 
 Description
     Region couple patch field
@@ -32,15 +32,15 @@ Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 SourceFiles
-    regionCoupleFvPatchField.C
+    regionCouplingFvPatchField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef regionCoupleFvPatchField_H
-#define regionCoupleFvPatchField_H
+#ifndef regionCouplingFvPatchField_H
+#define regionCouplingFvPatchField_H
 
 #include "coupledFvPatchField.H"
-#include "regionCoupleLduInterfaceField.H"
+#include "ggiLduInterfaceField.H"
 #include "regionCoupleFvPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -49,13 +49,13 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Class regionCoupleFvPatchField Declaration
+                  Class regionCouplingFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class regionCoupleFvPatchField
+class regionCouplingFvPatchField
 :
-    public regionCoupleLduInterfaceField,
+    public ggiLduInterfaceField,
     public coupledFvPatchField<Type>
 {
     // Private data
@@ -69,8 +69,28 @@ class regionCoupleFvPatchField
         //- Matrix update buffer
         mutable scalarField matrixUpdateBuffer_;
 
+        //- Original patch field.  Required for correct evaluation
+        //  in harmonic averaging
+        Field<Type> originalPatchField_;
+
+        //- Current time index used to store originalPatchField_
+        label curTimeIndex_;
+
 
 protected:
+
+        //- Return original patch field
+        const Field<Type>& originalPatchField() const
+        {
+            if (curTimeIndex_ == this->db().time().timeIndex())
+            {
+                return originalPatchField_;
+            }
+            else
+            {
+                return *this;
+            }
+        }
 
         //- Return contents of a matrix update buffer
         const scalarField& matrixUpdateBuffer() const
@@ -82,40 +102,40 @@ protected:
 public:
 
     //- Runtime type information
-//     TypeName(regionCoupleFvPatch::typeName_());
     TypeName("regionCoupling");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        regionCoupleFvPatchField
+        regionCouplingFvPatchField
         (
             const fvPatch&,
             const DimensionedField<Type, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        regionCoupleFvPatchField
+        regionCouplingFvPatchField
         (
             const fvPatch&,
             const DimensionedField<Type, volMesh>&,
             const dictionary&
         );
 
-        //- Construct by mapping given regionCoupleFvPatchField onto a new patch
-        regionCoupleFvPatchField
+        //- Construct by mapping given regionCouplingFvPatchField
+        //  onto a new patch
+        regionCouplingFvPatchField
         (
-            const regionCoupleFvPatchField<Type>&,
+            const regionCouplingFvPatchField<Type>&,
             const fvPatch&,
             const DimensionedField<Type, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy setting internal field reference
-        regionCoupleFvPatchField
+        regionCouplingFvPatchField
         (
-            const regionCoupleFvPatchField<Type>&,
+            const regionCouplingFvPatchField<Type>&,
             const DimensionedField<Type, volMesh>&
         );
 
@@ -124,7 +144,7 @@ public:
         {
             return tmp<fvPatchField<Type> >
             (
-                new regionCoupleFvPatchField<Type>(*this)
+                new regionCouplingFvPatchField<Type>(*this)
             );
         }
 
@@ -136,14 +156,14 @@ public:
         {
             return tmp<fvPatchField<Type> >
             (
-                new regionCoupleFvPatchField<Type>(*this, iF)
+                new regionCouplingFvPatchField<Type>(*this, iF)
             );
         }
 
 
     // Member functions
 
-        // Evaluation functions
+        // Access functions
 
             //- Return remote field name
             const word& remoteFieldName() const
@@ -151,17 +171,51 @@ public:
                 return remoteFieldName_;
             }
 
+            //- Return a named shadow patch field
+            template<class GeometricField, class Type2>
+            const typename GeometricField::PatchFieldType&
+            lookupShadowPatchField
+            (
+                const word& name,
+                const GeometricField* = NULL,
+                const Type2* = NULL
+            ) const;
+
+
+            const regionCoupleFvPatch& regionCouplePatch() const
+            {
+                return regionCouplePatch_;
+            }
+
             //- Return shadow patch field
-            const regionCoupleFvPatchField<Type>& shadowPatchField() const;
+            const regionCouplingFvPatchField<Type>& shadowPatchField() const;
+
+
+        // Evaluation functions
 
             //- Return neighbour field given internal cell data
             virtual tmp<Field<Type> > patchNeighbourField() const;
+
+            //- Return neighbour field given internal cell data
+            virtual tmp<Field<Type> > patchNeighbourField
+            (
+                const word& name
+            ) const;
+
+            //- Initialise the evaluation of the patch field
+            virtual void initEvaluate(const Pstream::commsTypes commsType);
 
             //- Evaluate the patch field
             virtual void evaluate
             (
                 const Pstream::commsTypes commsType
             );
+
+            //- Update the coefficients associated with the patch field
+            virtual void updateCoeffs();
+
+            //- Return patch-normal gradient
+            virtual tmp<Field<Type> > snGrad() const;
 
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate
@@ -186,6 +240,37 @@ public:
             ) const;
 
 
+        // GGI coupled interface functions
+
+            //- Does the patch field perform the transfromation
+            virtual bool doTransform() const
+            {
+                return
+                    !(
+                        regionCouplePatch_.parallel()
+                     || pTraits<Type>::rank == 0
+                    );
+            }
+
+            //- Return face transformation tensor
+            virtual const tensorField& forwardT() const
+            {
+                return regionCouplePatch_.forwardT();
+            }
+
+            //- Return neighbour-cell transformation tensor
+            virtual const tensorField& reverseT() const
+            {
+                return regionCouplePatch_.reverseT();
+            }
+
+            //- Return rank of component for transform
+            virtual int rank() const
+            {
+                return pTraits<Type>::rank;
+            }
+
+
         //- Write
         virtual void write(Ostream&) const;
 
@@ -199,7 +284,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "regionCoupleFvPatchField.C"
+#   include "regionCouplingFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

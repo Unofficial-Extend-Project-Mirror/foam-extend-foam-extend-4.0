@@ -127,6 +127,12 @@ public:
 
     // Member functions
 
+        // Access
+
+            //- Return shadow patch field
+            const ggiFvPatchField<Type>& shadowPatchField() const;
+
+
         // Evaluation functions
 
             //- Return neighbour field given internal cell data

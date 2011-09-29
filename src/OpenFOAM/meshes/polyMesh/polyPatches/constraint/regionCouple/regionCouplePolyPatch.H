@@ -40,7 +40,8 @@ SourceFiles
 #define regionCouplePolyPatch_H
 
 #include "coupledPolyPatch.H"
-#include "patchToPatchInterpolation.H"
+#include "ggiInterpolation.H"
+#include "faceZone.H"
 #include "Switch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -66,32 +67,107 @@ class regionCouplePolyPatch
         //- Shadow patch name
         const word shadowPatchName_;
 
+        //- Interpolation zone name
+        const word zoneName_;
+
         //- Are the regions attached
         mutable Switch attached_;
+
+        //- Master side.  Defined by user, checked for consistency
+        Switch master_;
 
         //- Are the region attached walls
         Switch isWall_;
 
+        //- Use bridging to fix overlap error in interpolation
+        Switch bridgeOverlap_;
+
         //- Shadow patch index.  Delayed evaluation for construction
         mutable label shadowIndex_;
 
+        //- Interpolation zone index.  Delayed evaluation for construction
+        mutable label zoneIndex_;
+
 
         //- Patch-to-patch interpolation
-        mutable patchToPatchInterpolation* patchToPatchPtr_;
+        mutable ggiZoneInterpolation* patchToPatchPtr_;
+
+        //- Patch-to-zone addressing
+        mutable labelList* zoneAddressingPtr_;
+
+        //- Remote zone addressing: data needed for interpolation
+        mutable labelList* remoteZoneAddressingPtr_;
 
         //- Reconstructed patch neighbour cell centres
         mutable vectorField* reconFaceCellCentresPtr_;
 
 
+        // Parallel communication optimisation, stored on master processor
+
+            //- Is the patch localised on a single processor
+            // (single processor in a parallel run)?
+            //  Used for parallel optimisation
+            mutable bool* localParallelPtr_;
+
+            //- List of zone faces indices received from each processor
+            mutable labelListList* receiveAddrPtr_;
+
+            //- List of zone faces indices to send to each processor
+            mutable labelListList* sendAddrPtr_;
+
+
     // Private member functions
 
+        //- Calculate patch-to-zone addressing
+        virtual void calcZoneAddressing() const;
+
+        //- Calculate remote patch-to-zone addressing
+        virtual void calcRemoteZoneAddressing() const;
+
         //- Calculate interpolation
-        void calcInterpolation() const;
+        virtual void calcPatchToPatch() const;
+
+
+        // Geometry
+
+            //- Calculate reconstructed cell centres
+            void calcReconFaceCellCentres() const;
+
+            //- Force calculation of transformation tensors
+            virtual void calcTransforms();
+
+
+        // Parallel communication optimisation, stored on master processor
+
+            //- Calculate local parallel switch
+            void calcLocalParallel() const;
+
+            //- Calculate send and receive addressing
+            void calcSendReceive() const;
+
+
+            //- Return receive addressing
+            const labelListList& receiveAddr() const;
+
+            //- Return send addressing
+            const labelListList& sendAddr() const;
+
+
+        // Memory management
+
+            //- Clear geometry
+             void clearGeom() const;
+
+            //- Clear out
+            void clearOut();
 
 
 protected:
 
     // Protected Member functions
+
+        //- Is the region couple active? (zone and shadow present)
+        bool active() const;
 
         //- Initialise the calculation of the patch addressing
         virtual void initAddressing();
@@ -121,18 +197,6 @@ protected:
         //- Return non-constant access to shadow patch
         regionCouplePolyPatch& shadow();
 
-        //- Return reference to patch-to-patch interpolation
-        const patchToPatchInterpolation& patchToPatch() const;
-
-        //- Calculate reconstructed cell centres
-        void calcReconFaceCellCentres() const;
-
-        //- Clear geometry
-        void clearGeom() const;
-
-        //- Clear out
-        void clearOut() const;
-
 
 public:
 
@@ -149,11 +213,24 @@ public:
             const label size,
             const label start,
             const label index,
+            const polyBoundaryMesh& bm
+        );
+
+        //- Construct from components
+        regionCouplePolyPatch
+        (
+            const word& name,
+            const label size,
+            const label start,
+            const label index,
             const polyBoundaryMesh& bm,
             const word& shadowRegionName,
             const word& shadowPatchName,
+            const word& zoneName,
             const bool attached,
-            const bool attachedWall
+            const bool master,
+            const bool isWall,
+            const bool bridgeOverlap
         );
 
         //- Construct from dictionary
@@ -220,93 +297,143 @@ public:
 
     // Member functions
 
-        //- Return true if coupled
-        virtual bool coupled() const;
+        // Basic info
 
-        //- Return shadow region name
-        const word& shadowRegionName() const
-        {
-            return shadowRegionName_;
-        }
+            //- Return true if coupled
+            virtual bool coupled() const;
 
-        //- Return shadow patch name
-        const word& shadowPatchName() const
-        {
-            return shadowPatchName_;
-        }
+            //- Return shadow region name
+            const word& shadowRegionName() const
+            {
+                return shadowRegionName_;
+            }
 
-        //- Return shadow region
-        const polyMesh& shadowRegion() const;
+            //- Return shadow patch name
+            const word& shadowPatchName() const
+            {
+                return shadowPatchName_;
+            }
 
-        //- Return shadow patch index
-        int shadowIndex() const;
+            //- Return name of interpolation face zone
+            const word& zoneName() const
+            {
+                return zoneName_;
+            }
 
-        //- Return true if regions are attached
-        bool attached() const
-        {
-            return attached_;
-        }
+            //- Return shadow region
+            const polyMesh& shadowRegion() const;
 
-        // Return true if patch is considered a wall
-        bool isWall() const
-        {
-            return isWall_;
-        }
+            //- Return shadow patch index
+            label shadowIndex() const;
 
-        //- Attach regions
-        void attach() const;
+            //- Return zone patch index
+            label zoneIndex() const;
 
-        //- Attach regions
-        void detach() const;
+            // Return true if patch is considered a wall
+            bool isWall() const
+            {
+                return isWall_;
+            }
 
-        //- Return shadow patch
-        const regionCouplePolyPatch& shadow() const;
+            //- Return shadow patch
+            const regionCouplePolyPatch& shadow() const;
 
-        //- Interpolate face field
-        template<class Type>
-        tmp<Field<Type> > interpolate(const Field<Type>& pf) const
-        {
-            return patchToPatch().faceInterpolate(pf);
-        }
+            //- Return interpolation face zone
+            const faceZone& zone() const;
 
-        template<class Type>
-        tmp<Field<Type> > interpolate(const tmp<Field<Type> >& tpf) const
-        {
-            return patchToPatch().faceInterpolate(tpf);
-        }
 
-        //- Return reconstructed cell centres
-        const vectorField& reconFaceCellCentres() const;
+        // Edit state
 
-        //- Force calculation of transformation tensors
-        void calcTransformTensors
-        (
-            const vectorField& Cf,
-            const vectorField& Cr,
-            const vectorField& nf,
-            const vectorField& nr
-        ) const;
+            //- Attach regions
+            void attach() const;
 
-        //- Initialize ordering for primitivePatch. Does not
-        //  refer to *this (except for name() and type() etc.)
-        virtual void initOrder(const primitivePatch&) const;
+            //- Attach regions
+            void detach() const;
 
-        //- Return new ordering for primitivePatch.
-        //  Ordering is -faceMap: for every face
-        //  index of the new face -rotation: for every new face the clockwise
-        //  shift of the original face. Return false if nothing changes
-        //  (faceMap is identity, rotation is 0), true otherwise.
-        virtual bool order
-        (
-            const primitivePatch&,
-            labelList& faceMap,
-            labelList& rotation
-        ) const;
 
-        //- Synchronise communications of ordering for primitivePatch
-        //  Used in cases when no topological change happens locally,
-        //  but is happening on other processors
-        virtual void syncOrder() const;
+        // Interpolation data
+
+            //- Is this the master side?
+            bool master() const
+            {
+                return master_;
+            }
+
+            //- Is this the slave side?
+            bool slave() const
+            {
+                return !master();
+            }
+
+            //- Use bridging to fix overlap error in interpolation
+            bool bridgeOverlap() const
+            {
+                return bridgeOverlap_;
+            }
+
+            //- Return patch-to-zone addressing
+            const labelList& zoneAddressing() const;
+
+            //- Return remote patch-to-zone addressing
+            const labelList& remoteZoneAddressing() const;
+
+            //- Is the patch localised on a single processor
+            bool localParallel() const;
+
+            //- Return reference to patch-to-patch interpolation
+            const ggiZoneInterpolation& patchToPatch() const;
+
+
+        // Interpolation functions
+
+            //- Expand face field to full zone size, including reduction
+            template<class Type>
+            tmp<Field<Type> > fastExpand(const Field<Type>& pf) const;
+
+            //- Interpolate face field
+            template<class Type>
+            tmp<Field<Type> > interpolate(const Field<Type>& pf) const;
+
+            template<class Type>
+            tmp<Field<Type> > interpolate(const tmp<Field<Type> >& tpf) const;
+
+            //- Bridge interpolated face field for uncovered faces
+            template<class Type>
+            void bridge
+            (
+                const Field<Type>& bridgeField,
+                Field<Type>& ff
+            ) const;
+
+
+        // Geometric data
+
+            //- Return reconstructed cell centres
+            const vectorField& reconFaceCellCentres() const;
+
+
+        // Patch ordering
+
+            //- Initialize ordering for primitivePatch. Does not
+            //  refer to *this (except for name() and type() etc.)
+            virtual void initOrder(const primitivePatch&) const;
+
+            //- Return new ordering for primitivePatch.
+            //  Ordering is -faceMap: for every face
+            //  index of the new face -rotation: for every new face the
+            //  clockwise shift of the original face. Return false if nothing
+            //  changes (faceMap is identity, rotation is 0), true otherwise.
+            virtual bool order
+            (
+                const primitivePatch&,
+                labelList& faceMap,
+                labelList& rotation
+            ) const;
+
+            //- Synchronise communications of ordering for primitivePatch
+            //  Used in cases when no topological change happens locally,
+            //  but is happening on other processors
+            virtual void syncOrder() const;
 
 
         //- Write
@@ -317,6 +444,12 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "regionCouplePolyPatchTemplates.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

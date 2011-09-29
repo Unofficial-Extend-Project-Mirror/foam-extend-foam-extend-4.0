@@ -135,6 +135,7 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
 }
 
 
+// Make patch face non-orthogonality correction vectors
 void Foam::ggiFvPatch::makeCorrVecs(vectorField& cv) const
 {
     // Non-orthogonality correction on a ggi interface
@@ -146,14 +147,6 @@ void Foam::ggiFvPatch::makeCorrVecs(vectorField& cv) const
     vectorField patchDeltas = delta();
     vectorField n = nf();
     cv = n - patchDeltas*patchDeltaCoeffs;
-}
-
-
-const Foam::ggiFvPatch& Foam::ggiFvPatch::shadow() const
-{
-    const fvPatch& p = this->boundaryMesh()[ggiPolyPatch_.shadowIndex()];
-
-    return refCast<const ggiFvPatch>(p);
 }
 
 
@@ -189,6 +182,14 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
 
         return tDelta;
     }
+}
+
+
+const Foam::ggiFvPatch& Foam::ggiFvPatch::shadow() const
+{
+    const fvPatch& p = this->boundaryMesh()[ggiPolyPatch_.shadowIndex()];
+
+    return refCast<const ggiFvPatch>(p);
 }
 
 
