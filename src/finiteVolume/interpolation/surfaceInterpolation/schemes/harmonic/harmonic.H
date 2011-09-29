@@ -162,8 +162,9 @@ public:
                 // HJ, 28/Sep/2011
                 if (mag(den) > kSmall)
                 {
-                    // mOwn > mNei
-                    wIn[faceI] = (magPhi[nei] - mean)/den;
+                    // Limit weights for round-off safety
+                    wIn[faceI] =
+                        Foam::max(0, Foam::min((magPhi[nei] - mean)/den, 1));
                 }
                 else
                 {
@@ -209,7 +210,17 @@ public:
                                     pDeltaCoeffs[faceI]
                                 );
 
-                            wp[faceI] = (magPhiNei[faceI] - mean)/den;
+                            // Limit weights for round-off safety
+                            wp[faceI] =
+                                Foam::max
+                                (
+                                    0,
+                                    Foam::min
+                                    (
+                                        (magPhi[faceI] - mean)/den,
+                                        1
+                                    )
+                                );
                         }
                         else
                         {
