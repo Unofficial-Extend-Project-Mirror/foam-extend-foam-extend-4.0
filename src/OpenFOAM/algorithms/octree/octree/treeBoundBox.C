@@ -331,7 +331,10 @@ bool Foam::treeBoundBox::intersects
 
     scalar s;
 
-    static const scalar smallNumber = SMALL;
+    //HJ, experimental: problems with round-off on Intel 12 compiler.
+    // HJ, 29/Sep/2011
+    const scalar smallNumber = SMALL;
+    const scalar kSmall = 1000*SMALL;
 
     while (true)
     {
@@ -356,10 +359,11 @@ bool Foam::treeBoundBox::intersects
         if (ptBits & LEFTBIT)
         {
             // Intersect with plane V=min, n=-1,0,0
-            if (Foam::mag(overallVec.x()) > VSMALL)
+            if (Foam::mag(overallVec.x()) > kSmall)
             {
                 s = (min().x() - overallStart.x())/
-                    stabilise(overallVec.x(), smallNumber);
+                    overallVec.x();
+//                     stabilise(overallVec.x(), smallNumber);
 
                 pt.x() = min().x();
                 pt.y() = overallStart.y() + overallVec.y()*s;
@@ -375,10 +379,11 @@ bool Foam::treeBoundBox::intersects
         else if (ptBits & RIGHTBIT)
         {
             // Intersect with plane V=max, n=1,0,0
-            if (Foam::mag(overallVec.x()) > VSMALL)
+            if (Foam::mag(overallVec.x()) > kSmall)
             {
                 s = (max().x() - overallStart.x())/
-                    stabilise(overallVec.x(), smallNumber);
+                    overallVec.x();
+//                     stabilise(overallVec.x(), smallNumber);
 
                 pt.x() = max().x();
                 pt.y() = overallStart.y() + overallVec.y()*s;
@@ -392,10 +397,11 @@ bool Foam::treeBoundBox::intersects
         else if (ptBits & BOTTOMBIT)
         {
             // Intersect with plane V=min, n=0,-1,0
-            if (Foam::mag(overallVec.y()) > VSMALL)
+            if (Foam::mag(overallVec.y()) > kSmall)
             {
                 s = (min().y() - overallStart.y())/
-                    stabilise(overallVec.y(), smallNumber);
+                    overallVec.y();
+//                     stabilise(overallVec.y(), smallNumber);
 
                 pt.x() = overallStart.x() + overallVec.x()*s;
                 pt.y() = min().y();
@@ -409,10 +415,11 @@ bool Foam::treeBoundBox::intersects
         else if (ptBits & TOPBIT)
         {
             // Intersect with plane V=max, n=0,1,0
-            if (Foam::mag(overallVec.y()) > VSMALL)
+            if (Foam::mag(overallVec.y()) > kSmall)
             {
                 s = (max().y() - overallStart.y())/
-                    stabilise(overallVec.y(), smallNumber);
+                    overallVec.y();
+//                     stabilise(overallVec.y(), smallNumber);
 
                 pt.x() = overallStart.x() + overallVec.x()*s;
                 pt.y() = max().y();
@@ -426,10 +433,12 @@ bool Foam::treeBoundBox::intersects
         else if (ptBits & BACKBIT)
         {
             // Intersect with plane V=min, n=0,0,-1
-            if (Foam::mag(overallVec.z()) > VSMALL)
+            if (Foam::mag(overallVec.z()) > kSmall)
             {
                 s = (min().z() - overallStart.z())/
-                    stabilise(overallVec.z(), smallNumber);
+                    overallVec.z();
+//                     stabilise(overallVec.z(), smallNumber);
+
                 pt.x() = overallStart.x() + overallVec.x()*s;
                 pt.y() = overallStart.y() + overallVec.y()*s;
                 pt.z() = min().z();
@@ -442,10 +451,11 @@ bool Foam::treeBoundBox::intersects
         else if (ptBits & FRONTBIT)
         {
             // Intersect with plane V=max, n=0,0,1
-            if (Foam::mag(overallVec.z()) > VSMALL)
+            if (Foam::mag(overallVec.z()) > kSmall)
             {
                 s = (max().z() - overallStart.z())/
-                    stabilise(overallVec.z(), smallNumber);
+                    overallVec.z();
+//                     stabilise(overallVec.z(), smallNumber);
 
                 pt.x() = overallStart.x() + overallVec.x()*s;
                 pt.y() = overallStart.y() + overallVec.y()*s;
