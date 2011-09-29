@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    regionCouplewFvPatchFields
+    regionCouplingFvPatchField
 
 Description
     Region couple patch field
@@ -31,15 +31,12 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-SourceFiles
-    regionCoupleFvPatchFields.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef regionCoupleFvPatchFields_H
-#define regionCoupleFvPatchFields_H
+#ifndef regionCouplingFvPatchFieldsFwd_H
+#define regionCouplingFvPatchFieldsFwd_H
 
-#include "regionCoupleFvPatchField.H"
+#include "fvPatchField.H"
 #include "fieldTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -49,7 +46,9 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeFieldTypedefs(regionCouple)
+template<class Type> class regionCouplingFvPatchField;
+
+makePatchTypeFieldTypedefs(regionCoupling)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -72,12 +72,6 @@ void Foam::ggiPolyPatch::calcZoneAddressing() const
             << abort(FatalError);
     }
 
-    if (debug)
-    {
-        Pout<< "ggiPolyPatch::calcZoneAddressing() const for patch "
-            << index() << endl;
-    }
-
     // Calculate patch-to-zone addressing
     zoneAddressingPtr_ = new labelList(size());
     labelList& zAddr = *zoneAddressingPtr_;
@@ -195,7 +189,7 @@ void Foam::ggiPolyPatch::calcPatchToPatch() const
             new ggiZoneInterpolation
             (
                 zone()(),           // This zone reference
-                shadow().zone()(),  // This shadow zone reference
+                shadow().zone()(),  // Shadow zone reference
                 forwardT(),
                 reverseT(),
                 shadow().separation(), // Slave-to-master separation. Bug fix
@@ -640,6 +634,7 @@ Foam::label Foam::ggiPolyPatch::zoneIndex() const
         {
             FatalErrorIn("label ggiPolyPatch::zoneIndex() const")
                 << "Face zone name " << zoneName_
+                << " for GGI patch " << name()
                 << " not found.  Please check your GGI interface definition."
                 << abort(FatalError);
         }
