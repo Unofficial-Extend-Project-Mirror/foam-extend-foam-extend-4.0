@@ -61,7 +61,7 @@ class mixerGgiFvMesh
         dictionary dict_;
 
         //- Coordinate system
-        autoPtr<coordinateSystem> csPtr_;
+        cylindricalCS cs_;
 
         // - Rotational speed in rotations per minute (rpm)
         scalar rpm_;
@@ -109,9 +109,9 @@ public:
     // Member Functions
 
         //- Return coordinate system
-        const coordinateSystem& cs() const
+        const cylindricalCS& cs() const
         {
-            return csPtr_();
+            return cs_;
         }
 
         //- Update the mesh for both mesh motion
