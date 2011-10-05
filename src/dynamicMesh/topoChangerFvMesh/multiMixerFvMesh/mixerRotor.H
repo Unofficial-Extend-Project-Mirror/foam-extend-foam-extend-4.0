@@ -67,7 +67,7 @@ class mixerRotor
         const polyMesh& mesh_;
 
         //- Coordinate system
-        autoPtr<coordinateSystem> csPtr_;
+        cylindricalCS cs_;
 
         // - Rotational speed in rotations per minute (rpm)
         const scalar rpm_;
@@ -105,9 +105,9 @@ class mixerRotor
 
 
         //- Return coordinate system
-        const coordinateSystem& cs() const
+        const cylindricalCS& cs() const
         {
-            return csPtr_();
+            return cs_;
         }
 
         //- Calculate moving mask
