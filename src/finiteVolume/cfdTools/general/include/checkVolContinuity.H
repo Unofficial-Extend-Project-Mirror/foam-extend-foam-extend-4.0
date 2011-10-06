@@ -8,10 +8,13 @@ if (mesh.moving())
     scalar sumV = gSum(V);
     scalar sumV0 = gSum(V0);
 
-    scalarField volChange = (1.0 - V0/V)/dt;
+    // Rewrite of mesh motion check based on round-off error problems
+    // Note precision around V and avoiding division with dt
+    // HJ, 4/Oct/2011
+    scalarField volChange = (V - V0)/V;
 
     scalarField divFlux =
-      - fvc::div(mesh.phi())().internalField();
+      - fvc::div(mesh.phi())().internalField()*dt;
 
     scalarField conserve = volChange + divFlux;
 
