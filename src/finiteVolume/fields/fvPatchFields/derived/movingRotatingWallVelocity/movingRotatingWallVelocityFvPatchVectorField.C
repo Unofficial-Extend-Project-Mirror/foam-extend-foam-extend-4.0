@@ -176,7 +176,7 @@ void Foam::movingRotatingWallVelocityFvPatchVectorField::updateCoeffs()
 
     const volVectorField& U =
         db().lookupObject<volVectorField>(dimensionedInternalField().name());
-    scalarField phip = 
+    scalarField phip =
         p.patchField<surfaceScalarField, scalar>(fvc::meshPhi(U));
 
     vectorField n = p.nf();
