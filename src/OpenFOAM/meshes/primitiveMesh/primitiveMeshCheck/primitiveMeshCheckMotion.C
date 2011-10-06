@@ -23,8 +23,8 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    Given a set of points, find out if the mesh resulting from point motion will
-    be valid without actually changing the mesh.
+    Given a set of points, find out if the mesh resulting from point motion
+    will be valid without actually changing the mesh.
 
 \*---------------------------------------------------------------------------*/
 
@@ -32,9 +32,6 @@ Description
 #include "pyramidPointFaceRef.H"
 #include "cell.H"
 #include "mathematicalConstants.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
