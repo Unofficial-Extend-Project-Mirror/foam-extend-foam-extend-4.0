@@ -610,6 +610,13 @@ void Foam::fvMatrix<Type>::relax()
     {
         relax(psi_.mesh().solutionDict().relaxationFactor(psi_.name()));
     }
+    else
+    {
+        FatalErrorIn("void fvMatrix<Type>::relax()")
+            << "Relaxation factor for field " << psi_.name()
+            << " not found"
+            << abort(FatalError);
+    }
 }
 
 
