@@ -208,7 +208,7 @@ int main(int argc, char *argv[])
                         else
                         {
                             FatalErrorIn(args.executable())
-                                << "Pwner or neighbour of internal face "
+                                << "Owner or neighbour of internal face "
                                 << faceI << " should be in cellSet "
                                 << cells.name()
                                 << " to be able to determine orientation."
