@@ -279,20 +279,6 @@ Foam::polyMesh::readUpdateState Foam::polyMesh::readUpdate()
             initMesh(cells);
         }
 
-        // Even if number of patches stayed same still recalculate boundary
-        // data.
-
-        // Calculate topology for the patches (processor-processor comms etc.)
-        boundary_.updateMesh();
-
-        // Calculate the geometry for the patches (transformation tensors etc.)
-        boundary_.calcGeometry();
-
-        // Derived info
-        bounds_ = boundBox(allPoints_);
-        geometricD_ = Vector<label>::zero;
-        solutionD_ = Vector<label>::zero;
-
         // Zones
         pointZoneMesh newPointZones
         (
@@ -413,6 +399,20 @@ Foam::polyMesh::readUpdateState Foam::polyMesh::readUpdate()
         {
             cellZones_.set(czI, newCellZones[czI].clone(cellZones_));
         }
+
+        // Even if number of patches stayed same still recalculate boundary
+        // data.
+
+        // Calculate topology for the patches (processor-processor comms etc.)
+        boundary_.updateMesh();
+
+        // Calculate the geometry for the patches (transformation tensors etc.)
+        boundary_.calcGeometry();
+
+        // Derived info
+        bounds_ = boundBox(allPoints_);
+        geometricD_ = Vector<label>::zero;
+        solutionD_ = Vector<label>::zero;
 
         // Instantiate a dummy mapPolyMesh
         autoPtr<mapPolyMesh> mapPtr(new mapPolyMesh(*this));
