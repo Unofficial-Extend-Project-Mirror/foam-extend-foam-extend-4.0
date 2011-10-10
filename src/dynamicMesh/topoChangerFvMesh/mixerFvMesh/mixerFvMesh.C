@@ -497,7 +497,6 @@ bool Foam::mixerFvMesh::update()
             // Move the sliding interface points to correct position
             movePoints(newPoints);
         }
-
     }
 
     return topoChangeMap->morphing();
