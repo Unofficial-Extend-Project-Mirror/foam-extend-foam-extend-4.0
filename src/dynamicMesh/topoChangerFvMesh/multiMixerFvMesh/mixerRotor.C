@@ -355,6 +355,7 @@ Foam::mixerRotor::mixerRotor
         << "    origin      : " << cs().origin() << nl
         << "    axis        : " << cs().axis() << nl
         << "    rpm         : " << rpm_ << nl
+        << "    invert mask : " << invertMotionMask_ << nl
         << "    topo sliding: " << useTopoSliding_ << endl;
 
     if (useTopoSliding_)
@@ -387,7 +388,7 @@ Foam::tmp<Foam::vectorField> Foam::mixerRotor::pointMotion() const
 
     return cs_.globalPosition
     (
-        // Motion vector in cymindrical coordinate system (x theta z)
+        // Motion vector in cylindrical coordinate system (x theta z)
         cs_.localPosition(mesh_.allPoints())
       + vector(0, rpm_*360.0*mesh_.time().deltaT().value()/60.0, 0)*mpm
     ) - mesh_.allPoints();
