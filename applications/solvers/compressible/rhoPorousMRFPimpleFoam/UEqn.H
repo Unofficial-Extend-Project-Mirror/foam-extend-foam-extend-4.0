@@ -9,7 +9,14 @@ tmp<fvVectorMatrix> UEqn
 
 if (oCorr == nOuterCorr-1)
 {
-    UEqn().relax(1);
+    if (mesh.solutionDict().relax("UFinal"))
+    {
+        UEqn().relax(mesh.solutionDict().relaxationFactor("UFinal"));
+    }
+    else
+    {
+        UEqn().relax(1);
+    }
 }
 else
 {
