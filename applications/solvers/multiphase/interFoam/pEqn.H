@@ -29,7 +29,7 @@
 
         pdEqn.setReference(pdRefCell, pdRefValue);
 
-        if (corr == nCorr-1 && nonOrth == nNonOrthCorr)
+        if (corr == nCorr - 1 && nonOrth == nNonOrthCorr)
         {
             pdEqn.solve(mesh.solutionDict().solver(pd.name() + "Final"));
         }

@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
         {
 #           include "pEqn.H"
 
-            if (correctAlpha && corr<nCorr-1)
+            if (correctAlpha && corr < nCorr - 1)
             {
 #               include "alphaEqn.H"
             }
