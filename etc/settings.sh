@@ -47,10 +47,10 @@ _foamAddLib()
     while [ $# -ge 1 ]
     do
         export LD_LIBRARY_PATH=$1:$LD_LIBRARY_PATH
-	if [ "$WM_ARCH_BASE" == "darwin" ]	    
-	then
-	    export DYLD_LIBRARY_PATH=$1:$DYLD_LIBRARY_PATH
-	fi
+        if [ "$WM_ARCH_BASE" = "darwin" ]
+        then
+            export DYLD_LIBRARY_PATH=$1:$DYLD_LIBRARY_PATH
+        fi
         shift
     done
 }
@@ -70,7 +70,7 @@ _foamSource()
 }
 
 # location of the jobControl directory
-export FOAM_JOB_DIR=$WM_PROJECT_INST_DIR/jobControl
+export FOAM_JOB_DIR=$HOME/$WM_PROJECT/jobControl
 
 # wmake configuration
 export WM_DIR=$WM_PROJECT_DIR/wmake
@@ -85,18 +85,18 @@ export WM_DECOMP_LIBS="-lfaceDecompFiniteElement -lfaceDecompositionMotionSolver
 
 # base configuration
 export FOAM_APP=$WM_PROJECT_DIR/applications
-export FOAM_APPBIN=$WM_PROJECT_DIR/applications/bin/$WM_OPTIONS
+export FOAM_APPBIN=$WM_PROJECT_DIR/applications/bin
 export FOAM_LIB=$WM_PROJECT_DIR/lib
-export FOAM_LIBBIN=$WM_PROJECT_DIR/lib/$WM_OPTIONS
+export FOAM_LIBBIN=$WM_PROJECT_DIR/lib
 export FOAM_SRC=$WM_PROJECT_DIR/src
 
 # shared site configuration - similar naming convention as ~OpenFOAM expansion
-export FOAM_SITE_APPBIN=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/bin/$WM_OPTIONS
-export FOAM_SITE_LIBBIN=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/lib/$WM_OPTIONS
+export FOAM_SITE_APPBIN=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/bin
+export FOAM_SITE_LIBBIN=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/lib
 
 # user configuration
-export FOAM_USER_APPBIN=$WM_PROJECT_USER_DIR/applications/bin/$WM_OPTIONS
-export FOAM_USER_LIBBIN=$WM_PROJECT_USER_DIR/lib/$WM_OPTIONS
+export FOAM_USER_APPBIN=$WM_PROJECT_USER_DIR/applications/bin
+export FOAM_USER_LIBBIN=$WM_PROJECT_USER_DIR/lib
 
 # convenience
 export FOAM_TUTORIALS=$WM_PROJECT_DIR/tutorials
@@ -273,8 +273,8 @@ SYSTEMOPENMPI)
     #          system openmpi installation.
 
     # Set compilation flags here instead of in wmake/rules/../mplibSYSTEMOPENMPI
-    export PINC=$OPENMPI_COMPILE_FLAGS
-    export PLIBS=$OPENMPI_LINK_FLAGS
+    export PINC="${OPENMPI_COMPILE_FLAGS}"
+    export PLIBS="${OPENMPI_LINK_FLAGS}"
 
     # No longer needed, but we keep this as a reference, just in case...
     #libDir=`echo "$PLIBS" | sed -e 's/.*-L\([^ ]*\).*/\1/'`
