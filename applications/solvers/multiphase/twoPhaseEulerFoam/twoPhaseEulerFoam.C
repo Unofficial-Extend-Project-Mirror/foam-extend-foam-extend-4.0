@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 #       include "UEqns.H"
 
         // --- PISO loop
-        for (int corr=0; corr<nCorr; corr++)
+        for (int corr = 0; corr < nCorr; corr++)
         {
 #           include "pEqn.H"
 

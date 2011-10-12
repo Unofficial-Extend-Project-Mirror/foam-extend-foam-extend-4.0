@@ -1,7 +1,7 @@
 {
     // SIMPLE loop
 
-    for (int corr=0; corr<nCorr; corr++)
+    for (int corr = 0; corr < nCorr; corr++)
     {
         fvVectorMatrix UEqn
         (

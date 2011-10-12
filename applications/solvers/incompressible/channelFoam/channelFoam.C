@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 
         volScalarField rUA = 1.0/UEqn.A();
 
-        for (int corr=0; corr<nCorr; corr++)
+        for (int corr = 0; corr < nCorr; corr++)
         {
             U = rUA*UEqn.H();
             phi = (fvc::interpolate(U) & mesh.Sf())
