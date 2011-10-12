@@ -84,6 +84,9 @@ public:
 
         // Access
 
+            //- Return true if interface is coupled
+            virtual bool coupled() const = 0;
+
             //- Return faceCell addressing
             virtual const unallocLabelList& faceCells() const = 0;
 

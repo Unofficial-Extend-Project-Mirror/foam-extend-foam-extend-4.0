@@ -276,6 +276,7 @@ $(GAMGInterfaces)/processorGAMGInterface/processorGAMGInterface.C
 $(GAMGInterfaces)/cyclicGAMGInterface/cyclicGAMGInterface.C
 $(GAMGInterfaces)/ggiGAMGInterface/ggiGAMGInterface.C
 $(GAMGInterfaces)/cyclicGgiGAMGInterface/cyclicGgiGAMGInterface.C
+$(GAMGInterfaces)/regionCoupleGAMGInterface/regionCoupleGAMGInterface.C
 /*$(GAMGInterfaces)/mixingPlaneGAMGInterface/mixingPlaneGAMGInterface.C*/
 
 GAMGInterfaceFields = $(GAMG)/interfaceFields
@@ -285,6 +286,7 @@ $(GAMGInterfaceFields)/processorGAMGInterfaceField/processorGAMGInterfaceField.C
 $(GAMGInterfaceFields)/cyclicGAMGInterfaceField/cyclicGAMGInterfaceField.C
 $(GAMGInterfaceFields)/ggiGAMGInterfaceField/ggiGAMGInterfaceField.C
 $(GAMGInterfaceFields)/cyclicGgiGAMGInterfaceField/cyclicGgiGAMGInterfaceField.C
+$(GAMGInterfaceFields)/regionCoupleGAMGInterfaceField/regionCoupleGAMGInterfaceField.C
 /*$(GAMGInterfaceFields)/mixingPlaneGAMGInterfaceField/mixingPlaneGAMGInterfaceField.C*/
 
 GAMGAgglomerations = $(GAMG)/GAMGAgglomerations
