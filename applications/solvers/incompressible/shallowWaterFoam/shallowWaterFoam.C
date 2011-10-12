@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
                       - fvm::laplacian(ghrUAf, h)
                     );
 
-                    if (ucorr < nOuterCorr-1 || corr < nCorr-1)
+                    if (ucorr < nOuterCorr - 1 || corr < nCorr - 1)
                     {
                         hEqn.solve();
                     }
