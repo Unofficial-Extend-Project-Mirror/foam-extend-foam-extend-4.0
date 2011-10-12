@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 
         // --- PISO loop
 
-        for (int corr=0; corr<nCorr; corr++)
+        for (int corr = 0; corr < nCorr; corr++)
         {
             rAU = 1.0/UEqn.A();
 

@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 #       include "TEqn.H"
 
         // --- PISO loop
-        for (int corr=0; corr<nCorr; corr++)
+        for (int corr = 0; corr < nCorr; corr++)
         {
 #           include "pEqn.H"
         }

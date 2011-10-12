@@ -42,16 +42,16 @@ Description
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCase.H"
+#   include "setRootCase.H"
 
-    #include "createTime.H"
-    #include "createMesh.H"
-    #include "readThermodynamicProperties.H"
-    #include "readControls.H"
-    #include "createFields.H"
-    #include "initContinuityErrs.H"
-    #include "compressibleCourantNo.H"
-    #include "setInitialDeltaT.H"
+#   include "createTime.H"
+#   include "createMesh.H"
+#   include "readThermodynamicProperties.H"
+#   include "readControls.H"
+#   include "createFields.H"
+#   include "initContinuityErrs.H"
+#   include "compressibleCourantNo.H"
+#   include "setInitialDeltaT.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,22 +59,22 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-        #include "readControls.H"
-        #include "CourantNo.H"
-        #include "setDeltaT.H"
+#       include "readControls.H"
+#       include "CourantNo.H"
+#       include "setDeltaT.H"
 
         runTime++;
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        for (int outerCorr=0; outerCorr<nOuterCorr; outerCorr++)
+        for (int outerCorr = 0; outerCorr < nOuterCorr; outerCorr++)
         {
-            #include "rhoEqn.H"
-            #include "gammaPsi.H"
-            #include "UEqn.H"
+#           include "rhoEqn.H"
+#           include "gammaPsi.H"
+#           include "UEqn.H"
 
-            for (int corr=0; corr<nCorr; corr++)
+            for (int corr = 0; corr < nCorr; corr++)
             {
-                #include "pEqn.H"
+#               include "pEqn.H"
             }
         }
 
