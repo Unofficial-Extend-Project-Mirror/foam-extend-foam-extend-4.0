@@ -85,8 +85,12 @@ void Foam::ggiPolyPatch::calcZoneAddressing() const
     // Check zone addressing
     if (zAddr.size() > 0 && min(zAddr) < 0)
     {
+        Info<< "myZone: " << myZone << nl
+            << "my start and size: " << start() << " and " << size() << nl
+            << "zAddr: " << zAddr << endl;
+
         FatalErrorIn("void ggiPolyPatch::calcZoneAddressing() const")
-            << "Problem with patch-to zone addressing: some patch faces "
+            << "Problem with patch-to-zone addressing: some patch faces "
             << "not found in interpolation zone"
             << abort(FatalError);
     }
@@ -438,6 +442,9 @@ void Foam::ggiPolyPatch::clearGeom()
 void Foam::ggiPolyPatch::clearOut()
 {
     clearGeom();
+
+    shadowIndex_ = -1;
+    zoneIndex_ = -1;
 
     deleteDemandDrivenData(zoneAddressingPtr_);
     deleteDemandDrivenData(patchToPatchPtr_);
