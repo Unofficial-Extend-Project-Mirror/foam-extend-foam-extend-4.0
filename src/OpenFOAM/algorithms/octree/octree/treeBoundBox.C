@@ -333,8 +333,8 @@ bool Foam::treeBoundBox::intersects
 
     //HJ, experimental: problems with round-off on Intel 12 compiler.
     // HJ, 29/Sep/2011
-    const scalar smallNumber = SMALL;
-    const scalar kSmall = 1000*SMALL;
+    const scalar smallNumber = VSMALL;
+    const scalar kSmall = 1000*smallNumber;
 
     while (true)
     {
@@ -362,8 +362,7 @@ bool Foam::treeBoundBox::intersects
             if (Foam::mag(overallVec.x()) > kSmall)
             {
                 s = (min().x() - overallStart.x())/
-                    overallVec.x();
-//                     stabilise(overallVec.x(), smallNumber);
+                    stabilise(overallVec.x(), smallNumber);
 
                 pt.x() = min().x();
                 pt.y() = overallStart.y() + overallVec.y()*s;
@@ -382,8 +381,7 @@ bool Foam::treeBoundBox::intersects
             if (Foam::mag(overallVec.x()) > kSmall)
             {
                 s = (max().x() - overallStart.x())/
-                    overallVec.x();
-//                     stabilise(overallVec.x(), smallNumber);
+                    stabilise(overallVec.x(), smallNumber);
 
                 pt.x() = max().x();
                 pt.y() = overallStart.y() + overallVec.y()*s;
@@ -400,8 +398,7 @@ bool Foam::treeBoundBox::intersects
             if (Foam::mag(overallVec.y()) > kSmall)
             {
                 s = (min().y() - overallStart.y())/
-                    overallVec.y();
-//                     stabilise(overallVec.y(), smallNumber);
+                    stabilise(overallVec.y(), smallNumber);
 
                 pt.x() = overallStart.x() + overallVec.x()*s;
                 pt.y() = min().y();
@@ -418,8 +415,7 @@ bool Foam::treeBoundBox::intersects
             if (Foam::mag(overallVec.y()) > kSmall)
             {
                 s = (max().y() - overallStart.y())/
-                    overallVec.y();
-//                     stabilise(overallVec.y(), smallNumber);
+                    stabilise(overallVec.y(), smallNumber);
 
                 pt.x() = overallStart.x() + overallVec.x()*s;
                 pt.y() = max().y();
@@ -436,8 +432,7 @@ bool Foam::treeBoundBox::intersects
             if (Foam::mag(overallVec.z()) > kSmall)
             {
                 s = (min().z() - overallStart.z())/
-                    overallVec.z();
-//                     stabilise(overallVec.z(), smallNumber);
+                    stabilise(overallVec.z(), smallNumber);
 
                 pt.x() = overallStart.x() + overallVec.x()*s;
                 pt.y() = overallStart.y() + overallVec.y()*s;
@@ -454,8 +449,7 @@ bool Foam::treeBoundBox::intersects
             if (Foam::mag(overallVec.z()) > kSmall)
             {
                 s = (max().z() - overallStart.z())/
-                    overallVec.z();
-//                     stabilise(overallVec.z(), smallNumber);
+                    stabilise(overallVec.z(), smallNumber);
 
                 pt.x() = overallStart.x() + overallVec.x()*s;
                 pt.y() = overallStart.y() + overallVec.y()*s;
