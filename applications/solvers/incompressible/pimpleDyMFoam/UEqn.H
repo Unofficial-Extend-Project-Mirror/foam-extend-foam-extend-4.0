@@ -5,9 +5,13 @@
       + turbulence->divDevReff(U)
     );
 
-    if (ocorr != nOuterCorr-1)
+    if (ocorr != nOuterCorr - 1)
     {
         UEqn.relax();
+    }
+    else
+    {
+        UEqn.relax(mesh.solutionDict().relaxationFactor("UFinal"));
     }
 
     if (momentumPredictor)
