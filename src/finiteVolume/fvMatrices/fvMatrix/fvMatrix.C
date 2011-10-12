@@ -612,10 +612,12 @@ void Foam::fvMatrix<Type>::relax()
     }
     else
     {
-        FatalErrorIn("void fvMatrix<Type>::relax()")
-            << "Relaxation factor for field " << psi_.name()
-            << " not found"
-            << abort(FatalError);
+        if (debug)
+        {
+            InfoIn("void fvMatrix<Type>::relax()")
+                << "Relaxation factor for field " << psi_.name()
+                << " not found.  Relaxation will not be used." << endl;
+        }
     }
 }
 
