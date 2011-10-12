@@ -31,7 +31,7 @@
         if
         (
             oCorr == nOuterCorr-1
-         && corr == nCorr-1
+         && corr == nCorr - 1
          && nonOrth == nNonOrthCorr
         )
         {
