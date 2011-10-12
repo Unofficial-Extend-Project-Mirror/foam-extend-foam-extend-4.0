@@ -44,7 +44,7 @@ unsigned int Foam::timer::oldTimeOut_ = 0;
 // * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
 
 void Foam::timer::signalHandler(int)
-{ 
+{
     if (debug)
     {
         Info<< "Foam::timer::signalHandler(int sig) : "
@@ -72,7 +72,7 @@ Foam::timer::timer(const unsigned int newTimeOut)
             (
                 "Foam::timer::timer(const unsigned int)"
             )   << "timer already used."
-                << abort(FatalError);    
+                << abort(FatalError);
         }
 
         // Install alarm signal handler:
@@ -80,7 +80,7 @@ Foam::timer::timer(const unsigned int newTimeOut)
         // - clear list of signals to mask
         struct sigaction newAction;
         newAction.sa_handler = timer::signalHandler;
-	    newAction.sa_flags = SA_NODEFER;
+        newAction.sa_flags = SA_NODEFER;
         sigemptyset(&newAction.sa_mask);
 
         if (sigaction(SIGALRM, &newAction, &oldAction_) < 0)
@@ -89,7 +89,7 @@ Foam::timer::timer(const unsigned int newTimeOut)
             (
                 "Foam::timer::timer(const unsigned int)"
             )   << "sigaction(SIGALRM) error"
-                << abort(FatalError);    
+                << abort(FatalError);
         }
 
         oldTimeOut_ = ::alarm(newTimeOut);
@@ -131,7 +131,7 @@ Foam::timer::~timer()
                 "Foam::timer::~timer(const struct sigaction&"
                 "const struct sigaction&)"
             )   << "sigaction(SIGALRM) error"
-                << abort(FatalError);    
+                << abort(FatalError);
         }
     }
 }
