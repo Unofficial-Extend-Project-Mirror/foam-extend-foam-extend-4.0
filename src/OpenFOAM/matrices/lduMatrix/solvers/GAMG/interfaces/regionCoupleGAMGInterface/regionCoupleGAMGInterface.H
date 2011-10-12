@@ -23,21 +23,23 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::cyclicGAMGInterface
+    Foam::regionCoupleGAMGInterface
 
 Description
-    GAMG agglomerated cyclic interface.
+    GAMG agglomerated regionCouple interface.
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 SourceFiles
-    cyclicGAMGInterface.C
+    regionCoupleGAMGInterface.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef cyclicGAMGInterface_H
-#define cyclicGAMGInterface_H
+#ifndef regionCoupleGAMGInterface_H
+#define regionCoupleGAMGInterface_H
 
-#include "GAMGInterface.H"
-#include "cyclicLduInterface.H"
+#include "ggiGAMGInterface.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,41 +47,31 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class cyclicGAMGInterface Declaration
+                     Class regionCoupleGAMGInterface Declaration
 \*---------------------------------------------------------------------------*/
 
-class cyclicGAMGInterface
+class regionCoupleGAMGInterface
 :
-    public GAMGInterface,
-    virtual public cyclicLduInterface
+    public ggiGAMGInterface
 {
+
     // Private data
 
-        //- Reference tor the cyclicLduInterface from which this is
-        //  agglomerated
-        const cyclicLduInterface& fineCyclicInterface_;
-
-
-    // Private Member Functions
-
-        //- Disallow default bitwise copy construct
-        cyclicGAMGInterface(const cyclicGAMGInterface&);
-
-        //- Disallow default bitwise assignment
-        void operator=(const cyclicGAMGInterface&);
+        //- Is the interface coupled?
+        const bool coupled_;
 
 
 public:
 
     //- Runtime type information
-    TypeName("cyclic");
+    TypeName("regionCouple");
 
 
     // Constructors
 
         //- Construct from fine level interface,
         //  local and neighbour restrict addressing
-        cyclicGAMGInterface
+        regionCoupleGAMGInterface
         (
             const lduPrimitiveMesh& lduMesh,
             const lduInterface& fineInterface,
@@ -90,7 +82,7 @@ public:
 
     // Destructor
 
-        virtual ~cyclicGAMGInterface();
+        virtual ~regionCoupleGAMGInterface();
 
 
     // Member Functions
@@ -99,40 +91,8 @@ public:
 
             //- Return true if interface is coupled
             virtual bool coupled() const
-            {
-                return true;
-            }
-
-
-        // Interface transfer functions
-
-            //- Transfer and return neighbour field
-            virtual tmp<labelField> transfer
-            (
-                const Pstream::commsTypes commsType,
-                const unallocLabelList& interfaceData
-            ) const;
-
-            //- Transfer and return internal field adjacent to the interface
-            virtual tmp<labelField> internalFieldTransfer
-            (
-                const Pstream::commsTypes commsType,
-                const unallocLabelList& iF
-            ) const;
-
-
-        //- Cyclic interface functions
-
-            //- Return face transformation tensor
-            virtual const tensorField& forwardT() const
-            {
-                return fineCyclicInterface_.forwardT();
-            }
-
-            //- Return neighbour-cell transformation tensor
-            virtual const tensorField& reverseT() const
-            {
-                return fineCyclicInterface_.reverseT();
+            {Info<< "BANANA" << endl;
+                return coupled_;
             }
 };
 
