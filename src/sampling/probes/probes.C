@@ -285,15 +285,15 @@ Foam::probes::probes
     name_(name),
     obr_(obr),
     loadFromFiles_(loadFromFiles),
-    fieldNames_(0),
-    probeLocations_(0),
+    fieldNames_(),
+    probeLocations_(),
     scalarFields_(),
     vectorFields_(),
     sphericalTensorFields_(),
     symmTensorFields_(),
     tensorFields_(),
-    cellList_(0),
-    probeFilePtrs_(0)
+    cellList_(),
+    probeFilePtrs_()
 {
     read(dict);
 }
