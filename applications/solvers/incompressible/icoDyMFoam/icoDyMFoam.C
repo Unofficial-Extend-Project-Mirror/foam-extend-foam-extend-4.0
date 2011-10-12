@@ -56,12 +56,12 @@ int main(int argc, char *argv[])
     {
 #       include "readControls.H"
 #       include "checkTotalVolume.H"
-#       include "CourantNo.H"
-
-#       include "setDeltaT.H"
 
         // Make the fluxes absolute
         fvc::makeAbsolute(phi, U);
+
+#       include "CourantNo.H"
+#       include "setDeltaT.H"
 
         runTime++;
 
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
 #       include "volContinuity.H"
 
-        if (correctPhi && meshChanged)
+        if (correctPhi && (mesh.moving() || meshChanged))
         {
             // Fluxes will be corrected to absolute velocity
             // HJ, 6/Feb/2009
@@ -81,9 +81,9 @@ int main(int argc, char *argv[])
         // Make the fluxes relative to the mesh motion
         fvc::makeRelative(phi, U);
 
-        if (meshChanged)
+        if (mesh.moving() && checkMeshCourantNo)
         {
-#           include "CourantNo.H"
+#           include "meshCourantNo.H"
         }
 
 #       include "UEqn.H"
