@@ -1,7 +1,8 @@
 decompositionMethod/decompositionMethod.C
+manualDecomp/manualDecomp.C
 geomDecomp/geomDecomp.C
 simpleGeomDecomp/simpleGeomDecomp.C
 hierarchGeomDecomp/hierarchGeomDecomp.C
-manualDecomp/manualDecomp.C
+patchConstrainedDecomp/patchConstrainedDecomp.C
 
 LIB = $(FOAM_LIBBIN)/libdecompositionMethods

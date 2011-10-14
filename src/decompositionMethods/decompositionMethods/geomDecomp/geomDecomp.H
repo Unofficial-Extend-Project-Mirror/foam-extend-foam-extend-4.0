@@ -37,7 +37,7 @@ SourceFiles
 #define geomDecomp_H
 
 #include "decompositionMethod.H"
-#include "Vector.H"
+#include "labelVector.H"
 
 namespace Foam
 {
@@ -50,16 +50,31 @@ class geomDecomp
 :
     public decompositionMethod
 {
+    // Private Member Functions
+
+        //- Disallow default bitwise copy construct
+        geomDecomp(const geomDecomp&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const geomDecomp&);
+
 
 protected:
 
     // Protected data
 
+        //- Geometric decomposition dictionary
         const dictionary& geomDecomDict_;
 
-        Vector<label> n_;
+        //- Number of splits in the (x y z) direction
+        labelVector n_;
+
+        //- Small rotation to achieve smooth geometric decomposition
         scalar delta_;
+
+        //- Small rotation tensor, calculated from delta
         tensor rotDelta_;
+
 
 public:
 

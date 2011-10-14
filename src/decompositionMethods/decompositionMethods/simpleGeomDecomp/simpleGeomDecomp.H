@@ -41,7 +41,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class simpleGeomDecomp Declaration
+                      Class simpleGeomDecomp Declaration
 \*---------------------------------------------------------------------------*/
 
 class simpleGeomDecomp
@@ -61,9 +61,11 @@ class simpleGeomDecomp
             const scalar summedWeights
         );
 
-        //- Disallow default bitwise copy construct and assignment
-        void operator=(const simpleGeomDecomp&);
+        //- Disallow default bitwise copy construct
         simpleGeomDecomp(const simpleGeomDecomp&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const simpleGeomDecomp&);
 
 
 public:
@@ -75,7 +77,7 @@ public:
     // Constructors
 
         //- Construct given the decomposition dictionary
-        simpleGeomDecomp(const dictionary& decompositionDict);
+        explicit simpleGeomDecomp(const dictionary& decompositionDict);
 
         //- Construct given the decomposition dictionary and mesh
         simpleGeomDecomp
