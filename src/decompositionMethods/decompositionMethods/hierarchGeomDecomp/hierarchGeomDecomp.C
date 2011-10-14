@@ -50,6 +50,7 @@ namespace Foam
     );
 }
 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 void Foam::hierarchGeomDecomp::setDecompOrder()
@@ -157,7 +158,7 @@ void Foam::hierarchGeomDecomp::calculateSortedWeightedSizes
 {
     // Evaluate cumulative weights.
     sortedWeightedSizes[0] = 0;
-    forAll(current, i)
+    forAll (current, i)
     {
         label pointI = current[indices[i]];
         sortedWeightedSizes[i + 1] = sortedWeightedSizes[i] + weights[pointI];
@@ -328,7 +329,7 @@ void Foam::hierarchGeomDecomp::findBinary
 }
 
 
-// Sort points into bins according to one component. Recurses to next component.
+// Sort points into bins according to one component. Recurses to next component
 void Foam::hierarchGeomDecomp::sortComponent
 (
     const label sizeTol,
@@ -351,7 +352,7 @@ void Foam::hierarchGeomDecomp::sortComponent
     // Storage for sorted component compI
     SortableList<scalar> sortedCoord(current.size());
 
-    forAll(current, i)
+    forAll (current, i)
     {
         label pointI = current[i];
 
@@ -458,7 +459,7 @@ void Foam::hierarchGeomDecomp::sortComponent
         // Copy localSize elements starting from leftIndex.
         labelList slice(localSize);
 
-        forAll(slice, i)
+        forAll (slice, i)
         {
             label pointI = current[sortedCoord.indices()[leftIndex+i]];
 
@@ -502,7 +503,7 @@ void Foam::hierarchGeomDecomp::sortComponent
 }
 
 
-// Sort points into bins according to one component. Recurses to next component.
+// Sort points into bins according to one component. Recurses to next component
 void Foam::hierarchGeomDecomp::sortComponent
 (
     const label sizeTol,
@@ -526,7 +527,7 @@ void Foam::hierarchGeomDecomp::sortComponent
     // Storage for sorted component compI
     SortableList<scalar> sortedCoord(current.size());
 
-    forAll(current, i)
+    forAll (current, i)
     {
         label pointI = current[i];
 
@@ -641,7 +642,7 @@ void Foam::hierarchGeomDecomp::sortComponent
         // Copy localSize elements starting from leftIndex.
         labelList slice(localSize);
 
-        forAll(slice, i)
+        forAll (slice, i)
         {
             label pointI = current[sortedCoord.indices()[leftIndex+i]];
 
@@ -725,7 +726,8 @@ Foam::labelList Foam::hierarchGeomDecomp::decompose
 
     // Start off with every point sorted onto itself.
     labelList slice(points.size());
-    forAll(slice, i)
+
+    forAll (slice, i)
     {
         slice[i] = i;
     }
@@ -767,7 +769,8 @@ Foam::labelList Foam::hierarchGeomDecomp::decompose
 
     // Start off with every point sorted onto itself.
     labelList slice(points.size());
-    forAll(slice, i)
+
+    forAll (slice, i)
     {
         slice[i] = i;
     }

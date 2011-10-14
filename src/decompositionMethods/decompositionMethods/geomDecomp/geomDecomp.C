@@ -40,8 +40,7 @@ Foam::geomDecomp::geomDecomp
     delta_(readScalar(geomDecomDict_.lookup("delta"))),
     rotDelta_(I)
 {
-    // check that the case makes sense :
-
+    // Check that the case makes sense
     if (nProcessors_ != n_.x()*n_.y()*n_.z())
     {
         FatalErrorIn
