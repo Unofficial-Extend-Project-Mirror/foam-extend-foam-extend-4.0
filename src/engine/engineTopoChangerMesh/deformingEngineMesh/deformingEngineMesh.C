@@ -24,8 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-
-#include "accordionEngineMesh.H"
+#include "deformingEngineMesh.H"
 #include "componentMixedTetPolyPatchVectorField.H"
 #include "mapPolyMesh.H"
 #include "polyTopoChange.H"
@@ -43,29 +42,17 @@ License
 
 namespace Foam
 {
-    defineTypeNameAndDebug(accordionEngineMesh, 0);
-    addToRunTimeSelectionTable
-    (
-        engineTopoChangerMesh,
-        accordionEngineMesh,
-        IOobject
-    );
+    defineTypeNameAndDebug(deformingEngineMesh, 0);
+    addToRunTimeSelectionTable(engineTopoChangerMesh, deformingEngineMesh, IOobject);
 }
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-
-
-
-bool Foam::accordionEngineMesh::realDeformation() const
+bool Foam::deformingEngineMesh::realDeformation() const
 {
 
-    if
-    (
-        virtualPistonPosition() + engTime().pistonDisplacement().value()
-      > deckHeight_ - SMALL
-    )
+    if (virtualPistonPosition() + engTime().pistonDisplacement().value() > deckHeight_ - SMALL)
     {
         return true;
     }
@@ -78,15 +65,14 @@ bool Foam::accordionEngineMesh::realDeformation() const
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-Foam::accordionEngineMesh::accordionEngineMesh
+Foam::deformingEngineMesh::deformingEngineMesh
 (
     const IOobject& io
-//    bool addZonesAndMods
 )
 :
     engineTopoChangerMesh(io),
     piston_(*this, engTime().engineDict().subDict("piston")),
-    valves_(*this, engTime().engineDict().lookup("accordionEngineMesh")),
+    valves_(*this, engTime().engineDict().lookup("deformingEngineMesh")),
     pistonPosition_(-GREAT),
     virtualPistonPosition_(-GREAT),
     deckHeight_(GREAT),
@@ -101,10 +87,11 @@ Foam::accordionEngineMesh::accordionEngineMesh
 }
 
 
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-
-void Foam::accordionEngineMesh::setBoundaryVelocity(volVectorField& U)
+void Foam::deformingEngineMesh::setBoundaryVelocity(volVectorField& U)
 {
     // Set valve velociaty
     forAll (valves(), valveI)
@@ -120,8 +107,9 @@ void Foam::accordionEngineMesh::setBoundaryVelocity(volVectorField& U)
             U.boundaryField()[valves()[valveI].stemPatchID().index()] ==
                 valveVel;
         }
-    }
-}
 
+    }
+
+}
 
 // ************************************************************************* //

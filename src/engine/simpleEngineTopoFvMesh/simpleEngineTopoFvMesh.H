@@ -27,8 +27,7 @@ License
 #ifndef simpleEngineTopoFvMesh_H
 #define simpleEngineTopoFvMesh_H
 
-#include "topoChangerFvMesh.H"
-#include "engineTime.H"
+#include "engineTopoChangerMesh.H"
 #include "valveBank.H"
 #include "simpleEnginePiston.H"
 #include "motionSolver.H"
@@ -44,12 +43,9 @@ namespace Foam
 
 class simpleEngineTopoFvMesh
 :
-    public topoChangerFvMesh
+    public engineTopoChangerMesh
 {
     // Private data
-
-        //- Engine database
-        const engineTime& engineTime_;
 
         //- Engine valves
         valveBank valves_;
@@ -75,6 +71,9 @@ class simpleEngineTopoFvMesh
         //- Disallow default bitwise assignment
         void operator=(const simpleEngineTopoFvMesh&);
 
+
+        //- Add valve and piston zones and modifiers
+        void addZonesAndModifiers();
 
         //- Make layering modifiers live
         void makeLayersLive();
@@ -140,11 +139,12 @@ public:
              && engineTime_.thetaRevolution() < deformSwitch_;
         }
 
-        //- Add valve and piston zones and modifiers
-        void addZonesAndModifiers();
-
         //- Update the mesh for both mesh motion and topology change
         virtual bool update();
+
+        //- Set boundary velocities
+        virtual void setBoundaryVelocity(volVectorField& U)
+        {}
 };
 
 

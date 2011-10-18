@@ -1,60 +1,144 @@
-{
-    for (label valveI = 0; valveI < nValves(); valveI++)
+
+    // Add the piston points zone
+    if (piston().patchID().active())
+    {
+        IOobject pistonCellsHeader
+        (
+            piston().pistonCellSetName(),
+            time().constant()+"/polyMesh/sets/",
+            *this,
+            IOobject::MUST_READ
+        );
+
+        if(!pistonCellsHeader.headerOk())
+        {
+            WarningIn
+            (
+                "deformingEngineMesh::addZonesAndModifiers()"
+            )   << "cellSet called " << piston().pistonCellSetName()
+                << " does not exist. Continuing mesh motion without piston points" << endl;
+
+            pz.append
+            (
+                new pointZone
+                (
+                    "movingPistonPoints",
+                    labelList(0),
+                    nPointZones,
+                    pointZones()
+                )
+            );
+
+            nPointZones++;
+
+        }
+        else
+        {
+            cellSet movingPistonCells(*this, piston().pistonCellSetName());
+
+            labelList pistonCells = movingPistonCells.toc();
+
+            labelList movingPistonPoints;
+
+            const labelListList& cp = cellPoints();
+
+            boolList count(allPoints().size(), false);
+
+            forAll (pistonCells, cellI)
+            {
+                const labelList& curCellPoints = cp[pistonCells[cellI]];
+
+                forAll (curCellPoints, i)
+                {
+                    count[curCellPoints[i]] = true;
+                }
+            }
+
+            // Count the points
+            label nCounted = 0;
+            forAll (count, pointI)
+            {
+                if (count[pointI] == true)
+                {
+                    nCounted++;
+                }
+            }
+
+            movingPistonPoints.setSize(nCounted);
+
+            // Collect the points
+            nCounted = 0;
+            forAll (count, pointI)
+            {
+                if (count[pointI] == true)
+                {
+                    movingPistonPoints[nCounted] = pointI;
+                    nCounted++;
+                }
+            }
+
+            pz.append
+            (
+                new pointZone
+                (
+                    "movingPistonPoints",
+                    movingPistonPoints,
+                    nPointZones,
+                    pointZones()
+                )
+            );
+
+            nPointZones++;
+
+        }
+
+    }
+
     {
 
-        // for each valve the following zones have to be created:
-        //
-        //  - movingFaceZone 
-        //  - movingPointZone
-        //  - staticFaceZone
-        //  - staticPointZone
-        
-        IOobject movingCellsHeader
+        IOobject headCellsHeader
         (
-            valves_[valveI].movingCellsName(),
+            headCellSetName_,
             time().constant()+"/polyMesh/sets/",
             *this,
             IOobject::MUST_READ
         );
-        
-        if(!movingCellsHeader.headerOk())
+
+        if(!headCellsHeader.headerOk())
         {
             WarningIn
             (
-                "accordionEngineMesh::addZonesAndModifiers()"
-            )   << "cellSet called " << valves_[valveI].movingCellsName()
-                << " does not exist. Continuing mesh motion without rigid motion points for valve " << valves_[valveI].name() << endl;
-
+                "deformingEngineMesh::addZonesAndModifiers()"
+            )   << "cellSet called " << headCellSetName_
+                << " does not exist. Continuing mesh motion without head points" << endl;
             pz.append
             (
                 new pointZone
                 (
-                    "movingPointsV" + Foam::name(valveI + 1),
+                    "headPoints",
                     labelList(0),
                     nPointZones,
                     pointZones()
                 )
             );
-        
-            nPointZones++;        
 
-
+            nPointZones++;
         }
         else
         {
-            cellSet movingCellsSet(*this, valves_[valveI].movingCellsName());
+            cellSet fixedHeadCells(*this, headCellSetName_);
 
-            labelList movingCells = movingCellsSet.toc();
-            
-            labelList movingPoints;
+            labelList headCells = fixedHeadCells.toc();
+
+            labelList fixedHeadPoints;
 
             const labelListList& cp = cellPoints();
 
             boolList count(allPoints().size(), false);
 
-            forAll (movingCells, cellI)
-            {   
-                const labelList& curCellPoints = cp[movingCells[cellI]];
+            forAll (fixedHeadCells, cellI)
+            {
+                const labelList& curCellPoints = cp[headCells[cellI]];
 
                 forAll (curCellPoints, i)
                 {
@@ -70,9 +154,9 @@
                 {
                     nCounted++;
                 }
-            }   
+            }
 
-            movingPoints.setSize(nCounted);
+            fixedHeadPoints.setSize(nCounted);
 
             // Collect the points
             nCounted = 0;
@@ -80,7 +164,7 @@
             {
                 if (count[pointI] == true)
                 {
-                    movingPoints[nCounted] = pointI;
+                    fixedHeadPoints[nCounted] = pointI;
                     nCounted++;
                 }
             }
@@ -89,103 +173,14 @@
             (
                 new pointZone
                 (
-                    "movingPointsV" + Foam::name(valveI + 1),
-                    movingPoints,
+                    "headPoints",
+                    fixedHeadPoints,
                     nPointZones,
                     pointZones()
                 )
             );
-        
-            nPointZones++;        
+
+            nPointZones++;
         }
 
-        IOobject staticCellsHeader
-        (
-            valves_[valveI].staticCellsName(),
-            time().constant()+"/polyMesh/sets/",
-            *this,
-            IOobject::MUST_READ
-        );
-        
-        if(!staticCellsHeader.headerOk())
-        {
-            WarningIn
-            (
-                "accordionEngineMesh::addZonesAndModifiers()"
-            )   << "cellSet called " << valves_[valveI].staticCellsName()
-                << " does not exist. Continuing mesh motion without static points for valve " << valves_[valveI].name() << endl;
-
-            pz.append
-            (
-                new pointZone
-                (
-                    "staticPointsV" + Foam::name(valveI + 1),
-                    labelList(0),
-                    nPointZones,
-                    pointZones()
-                )
-            );
-        
-            nPointZones++;     
-
-        }
-        else
-        {
-            cellSet staticCellSet(*this, valves_[valveI].staticCellsName());
-
-            labelList staticCells = staticCellSet.toc();
-            
-            labelList staticPoints;
-
-            const labelListList& cp = cellPoints();
-
-            boolList count(allPoints().size(), false);
-
-            forAll (staticCells, cellI)
-            {   
-                const labelList& curCellPoints = cp[staticCells[cellI]];
-
-                forAll (curCellPoints, i)
-                {
-                    count[curCellPoints[i]] = true;
-                }
-            }
-
-            // Count the points
-            label nCounted = 0;
-            forAll (count, pointI)
-            {
-                if (count[pointI] == true)
-                {
-                    nCounted++;
-                }
-            }   
-
-            staticPoints.setSize(nCounted);
-
-            // Collect the points
-            nCounted = 0;
-            forAll (count, pointI)
-            {
-                if (count[pointI] == true)
-                {
-                    staticPoints[nCounted] = pointI;
-                    nCounted++;
-                }
-            }
-
-            pz.append
-            (
-                new pointZone
-                (
-                    "staticPointsV" + Foam::name(valveI + 1),
-                    staticPoints,
-                    nPointZones,
-                    pointZones()
-                )
-            );
-        
-            nPointZones++;     
-        }
-    }   
-}
+    }

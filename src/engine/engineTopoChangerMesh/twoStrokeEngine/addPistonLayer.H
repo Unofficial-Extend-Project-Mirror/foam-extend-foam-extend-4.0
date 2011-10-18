@@ -1,6 +1,11 @@
 if (piston().patchID().active())
 {
-    // add faces for piston layering
+    // Add faces for piston layering
+    // Note: because of operation of layer addition/removal
+    // (reduce function in layer addition/removal thickness)
+    // the layering modifier needs to be present on all processors
+    // even if the patch size is zero
+    // HJ, 7/Mar/2011
 
     faceSet pistonFaceSet(*this, piston().pistonFaceSetName());
 
@@ -23,7 +28,7 @@ if (piston().patchID().active())
     Info << "nSet = " << nSet << endl;
     Info << "nFlip = " << nFlip << endl;
 
-    fz.append
+    fz[nFaceZones] =
     (
         new faceZone
         (
@@ -37,27 +42,10 @@ if (piston().patchID().active())
 
     nFaceZones++;
 
-//     {
-//         pointSet movingPistonPoints(*this, piston().pistonPointSetName());
-
-//         pz.append
-//         (
-//             new pointZone
-//             (
-//                 "pistonPoints",
-//                 movingPistonPoints.toc(),
-//                 nPointZones,
-//                 pointZones()
-//             )
-//         );
-
-//         nPointZones++;
-//     }
-
     cellSet movingPistonCells(*this, piston().pistonCellSetName());
 
     Info<< "Adding piston cell set" << endl;
-    cz.append
+    cz[nCellZones] =
     (
         new cellZone
         (

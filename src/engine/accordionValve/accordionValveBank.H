@@ -22,60 +22,87 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Class
+    accordionValveBank
+
 Description
+    A list of valves.
+
 
 \*---------------------------------------------------------------------------*/
+
+#ifndef accordionValveBank_H
+#define accordionValveBank_H
+
+#include "PtrList.H"
+#include "accordionValve.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-inline const enginePiston& accordionEngineMesh::piston() const
+/*---------------------------------------------------------------------------*\
+                           Class accordionValveBank Declaration
+\*---------------------------------------------------------------------------*/
+
+class accordionValveBank
+:
+    public PtrList<accordionValve>
 {
-    return piston_;
-}
+private:
+
+    // Private Member Functions
+
+        //- Disallow default bitwise copy construct
+        accordionValveBank(const accordionValveBank&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const accordionValveBank&);
 
 
-inline const accordionValveBank& accordionEngineMesh::valves() const
-{
-    return valves_;
-}
-                 
+public:
 
-inline const scalar& accordionEngineMesh::pistonPosition() const
-{
-    return pistonPosition_;
-}
+    // Constructors
 
-inline scalar& accordionEngineMesh::pistonPosition()
-{
-    return pistonPosition_;
-}
+        //- Construct from Istream
+        accordionValveBank
+        (
+            const polyMesh& mesh,
+            Istream& is
+        )
+        {
+            PtrList<entry> valveEntries(is);
 
-inline const scalar& accordionEngineMesh::virtualPistonPosition() const
-{
-    return virtualPistonPosition_;
-}
+            setSize(valveEntries.size());
 
-inline scalar& accordionEngineMesh::virtualPistonPosition()
-{
-    return virtualPistonPosition_;
-}
+            forAll (valveEntries, valveI)
+            {
+                set
+                (
+                    valveI,
+                    new accordionValve
+                    (
+                        valveEntries[valveI].keyword(),
+                        mesh,
+                        valveEntries[valveI].dict()
+                    )
+                );
+            }
+        }
 
+    // Destructor - default
 
-inline const scalar& accordionEngineMesh::deckHeight() const
-{
-    return deckHeight_;
-}
+    // Member Functions
+};
 
-inline scalar& accordionEngineMesh::deckHeight()
-{
-    return deckHeight_;
-}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

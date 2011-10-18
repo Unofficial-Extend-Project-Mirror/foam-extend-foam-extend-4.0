@@ -87,5 +87,4 @@
         }
     }
 
-    Pout << "constraintSize = " << constraintSize << endl;
 }

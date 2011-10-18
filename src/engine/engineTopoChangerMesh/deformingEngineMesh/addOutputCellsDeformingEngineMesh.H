@@ -13,7 +13,7 @@
         {
             WarningIn
             (
-                "accordionEngineMesh::addZonesAndModifiers()"
+                "deformingEngineMesh::addZonesAndModifiers()"
             )   << "faceSet called " << cylinderOutputName
                 << " does not exist. Continuing mesh motion without cylinder output cells" << endl;
 
@@ -27,13 +27,13 @@
                 cellZones()
           )
       );
-        
-      nCellZones++;        
-  
+
+      nCellZones++;
+
 
         }
         else
-        {
+    {
 
         cellSet outputCellSet(*this, cylinderOutputName);
 
@@ -50,6 +50,6 @@
           )
       );
 
-      nCellZones++;        
+      nCellZones++;
     }
 }

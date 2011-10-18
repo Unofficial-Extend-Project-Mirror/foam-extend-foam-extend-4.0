@@ -1,6 +1,7 @@
 // use tetrahedral decomposition of the engine mesh
 
 {
+
     Info << "setting valve motion b.c." << endl;
 
     tetPointVectorField& motionU = mSolver.motionU();
@@ -8,8 +9,8 @@
     // Set valve velocity
     forAll (valves_, valveI)
     {
-        Info<< "Valve n. " << valveI + 1 << " velocity = "
-            <<  valves_[valveI].curVelocity() << endl;
+
+        Info << "Valve n. " << valveI + 1 << " velocity = " <<  valves_[valveI].curVelocity() << endl;
 
         vector valveVel =
             valves_[valveI].curVelocity()*valves_[valveI].cs().axis();
@@ -21,7 +22,7 @@
             motionU.boundaryField()[valves_[valveI].bottomPatchID().index()] ==
                 valveVel;
 
-//            if (debug)
+            if (debug)
             {
                 Info<< "Valve " << valveI << " lift: "
                     << valves_[valveI].curLift()
@@ -32,6 +33,7 @@
 
         if (valves_[valveI].poppetPatchID().active())
         {
+
             // Top of the valve does not move
             motionU.boundaryField()[valves_[valveI].poppetPatchID().index()] ==
                 valveVel;
@@ -43,12 +45,12 @@
             motionU.boundaryField()[valves_[valveI].sidePatchID().index()] ==
                 valveVel;
         }
-    }
 
-    //  Setting the boundary position
+    }
+//  Setting the boundary position
+
     {
-        label cylinderHeadIndex =
-            boundaryMesh().findPatchID(cylinderHeadName_);
+        label cylinderHeadIndex = boundaryMesh().findPatchID(cylinderHeadName_);
 
         // Top of the valve does not move
         motionU.boundaryField()[cylinderHeadIndex] ==
@@ -56,4 +58,5 @@
     }
 
     Info << "valve motion boundary conditions set" << endl;
+
 }

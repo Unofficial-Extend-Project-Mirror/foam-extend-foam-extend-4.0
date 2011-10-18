@@ -9,7 +9,6 @@
 
     forAll(valves_, valveI)
     {
-    
         vector valveVel =
             valves_[valveI].curVelocity()*valves_[valveI].cs().axis();
 
@@ -17,10 +16,9 @@
         {
             valveVel = vector::zero;
         }
-    
-    
+
         {
-    
+
 //            label movingPtsIndex = pZones.findZoneID("movingPointsV"+Foam::name(valveI + 1));
 //            const labelList& movingPointsV = pZones[movingPtsIndex];
 /*
@@ -28,17 +26,17 @@
             {
                 constrainedPoints.append(movingPointsV[mpI]);
                 constrainedVelocity.append(valveVel);
-           
+
                 constraintSize++;
             }
 */
-            
+
             label movingCellsIndex = cZones.findZoneID("movingCellsZoneV"+Foam::name(valveI + 1));
             const labelList& movingCellsV = cZones[movingCellsIndex];
-            
+
             labelList movingPointsV;
             boolList count(newPoints.size(), false);
-            
+
             forAll(movingCellsV, cellI)
             {
                 const labelList& curCellPoints = cp[movingCellsV[cellI]];
@@ -76,17 +74,15 @@
             {
                 constrainedPoints.append(movingPointsV[mpI]);
                 constrainedVelocity.append(valveVel);
-           
+
                 constraintSize++;
             }
-    
         }
 
         {
-    
 //            label staticPtsIndex = pZones.findZoneID("staticPointsV"+Foam::name(valveI + 1));
 //            const labelList& staticPointsV = pZones[staticPtsIndex];
-/*    
+/*
             forAll(staticPointsV, spI)
             {
                 constrainedPoints.append(staticPointsV[spI]);
@@ -101,7 +97,7 @@
             labelList staticPointsV;
 
             boolList count(newPoints.size(), false);
-            
+
             forAll(staticCellsV, cellI)
             {
                 const labelList& curCellPoints = cp[staticCellsV[cellI]];
@@ -134,7 +130,7 @@
                     nCounted++;
                 }
             }
-            
+
             forAll(staticPointsV, spI)
             {
                 constrainedPoints.append(staticPointsV[spI]);
@@ -145,16 +141,16 @@
         }
 
     }
-    
+
     if(piston().patchID().active())
     {
         vector pistonVel =
             piston().cs().axis()*engineTime_.pistonSpeed().value();
 
-/*        
+/*
         label pistonPtsIndex = pZones.findZoneID("movingPistonPoints");
         const labelList& movingPointsP = pZones[pistonPtsIndex];
-    
+
         forAll(movingPointsP, mpI)
         {
             constrainedPoints.append(movingPointsP[mpI]);
@@ -165,11 +161,11 @@
 
         label pistonCellsIndex = cZones.findZoneID("movingPistonCells");
         const labelList& movingCellsP = cZones[pistonCellsIndex];
-        
+
         labelList movingPointsP;
-        
+
         boolList count(newPoints.size(), false);
-        
+
         forAll(movingCellsP, cellI)
         {
             const labelList& curCellPoints = cp[movingCellsP[cellI]];
@@ -202,8 +198,7 @@
                 nCounted++;
             }
         }
-        
-        
+
         forAll(movingPointsP, mpI)
         {
             constrainedPoints.append(movingPointsP[mpI]);
@@ -213,6 +208,4 @@
 
 
     }
-    
-
 }
