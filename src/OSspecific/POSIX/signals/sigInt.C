@@ -44,7 +44,7 @@ void Foam::sigInt::sigIntHandler(int)
         (
             "Foam::sigInt::sigIntHandler()"
         )   << "Cannot reset SIGINT trapping"
-            << abort(FatalError);    
+            << abort(FatalError);
     }
 
     // Update jobInfo file
@@ -74,7 +74,7 @@ Foam::sigInt::~sigInt()
         (
             "Foam::sigInt::~sigInt()"
         )   << "Cannot reset SIGINT trapping"
-            << abort(FatalError);    
+            << abort(FatalError);
     }
 }
 
@@ -102,7 +102,7 @@ void Foam::sigInt::set(const bool verbose)
         (
             "Foam::sigInt::set()"
         )   << "Cannot set SIGINT trapping"
-            << abort(FatalError);    
+            << abort(FatalError);
     }
 }
 
