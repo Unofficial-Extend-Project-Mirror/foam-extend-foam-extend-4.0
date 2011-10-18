@@ -24,41 +24,43 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "accordionEngineMesh.H"
-#include "slidingInterface.H"
-#include "layerAdditionRemoval.H"
+#include "deformingEngineMesh.H"
 #include "surfaceFields.H"
 #include "regionSplit.H"
-#include "attachDetach.H"
+#include "directTopoChange.H"
+#include "zeroGradientTetPolyPatchFields.H"
+#include "tetDecompositionMotionSolver.H"
+
+#include "fixedValueTetPolyPatchFields.H"
+#include "mixedTetPolyPatchFields.H"
+#include "slipTetPolyPatchFields.H"
+#include "zeroGradientTetPolyPatchFields.H"
+#include "meshTools.H"
+#include "syncTools.H"
+#include "HashSet.H"
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::accordionEngineMesh::addZonesAndModifiers()
+void Foam::deformingEngineMesh::addMeshZones()
 {
     // Add the zones and mesh modifiers to operate piston motion
+    Switch addBoundary(true);
 
     if
     (
         pointZones().size() > 0
-/*
-     && faceZones().size() > 0
-     && cellZones().size() > 0
-     && topoChanger_.size() > 0
-*/
-    ) 
+    )
     {
         Info<< "Time = " << engTime().theta() << endl;
-        Info<< "void Foam::accordionEngineMesh::addZonesAndModifiers() : "
+        Info<< "void Foam::deformingEngineMesh::addZonesAndModifiers() : "
             << "Zones and modifiers already present.  Skipping."
             << endl;
 
-     //   setVirtualPositions();
         checkAndCalculate();
 
         Info << "Point zones found = " << pointZones().size() << endl;
         Info << "Face zones found = " << faceZones().size() << endl;
         Info << "Cell zones found = " << cellZones().size() << endl;
-
-        return;
 
     }
     else
@@ -67,82 +69,54 @@ void Foam::accordionEngineMesh::addZonesAndModifiers()
         faceZones().setSize(0);
         cellZones().setSize(0);
         topoChanger_.setSize(0);
+
+        Info << "checkAndCalculate()" << endl;
+        checkAndCalculate();
+
+        Info<< "Time = " << engTime().theta() << endl
+            << "Adding zones to the engine mesh" << endl;
+
+        DynamicList<pointZone*> pz;
+
+        DynamicList<faceZone*> fz;
+
+        DynamicList<cellZone*> cz;
+
+        label nPointZones = 0;
+        label nFaceZones = 0;
+        label nCellZones = 0;
+
+
+#       include "addPistonFacesPointZonesDeformingEngineMesh.H"
+
+#       include "addValveFaceZonesDeformingEngineMesh.H"
+
+#       include "addOutputCellsDeformingEngineMesh.H"
+
+
+        Info<< "Adding " << nPointZones << " point, "
+            << nFaceZones << " face zones and "
+            << nCellZones << " cell zones" << endl;
+
+        Info << boundary().size() << endl;
+
+        pz.setSize(nPointZones);
+        Info << "setSize pz" << endl;
+        fz.setSize(nFaceZones);
+        Info << "setSize fz" << endl;
+        cz.setSize(nCellZones);
+        Info << "setSize cz" << endl;
+
+        addZones(pz, fz, cz);
     }
 
-    Info << "checkAndCalculate()" << endl;
-    checkAndCalculate();
-
-    Info<< "Time = " << engTime().theta() << endl
-        << "Adding zones to the engine mesh" << endl;
-
-/*
-    Point zones
-    1) Piston points
-*/
-
-    DynamicList<pointZone*> pz;
-
-/*
-    Face zones
-    1) Piston layer faces
-
-*/
-    DynamicList<faceZone*> fz;
-
-/*
-*/
-
-    DynamicList<cellZone*> cz;
-
-    label nPointZones = 0;
-    label nFaceZones = 0;
-    label nCellZones = 0;
-
-/*
-
-    Adding the following faces zones:
-    1:  pistonLayerFaces
-    nv: movingFaces
-    nv: staticFaces
-    nv: detachFaces
-
-    Adding the following point zones:
-    1:  pistonPoints
-    nv:  movingValvePoints
-    nv:  staticValvePoints
-
-*/
-
-#   include "addPistonFacesPointZonesAccordionEngineMesh.H"
-
-#   include "addAttachDetachFacesAccordionEngineMesh.H"
-#   include "addValveFaceZonesAccordionEngineMesh.H"
-
-#   include "addOutputCellsAccordionEngineMesh.H"
-    Info<< "Adding " << nPointZones << " point, "
-        << nFaceZones << " face zones and "
-        << nCellZones << " cell zones" << endl;
-
-
-    pz.setSize(nPointZones);
-    Info << "setSize pz" << endl;
-    fz.setSize(nFaceZones);
-    Info << "setSize fz" << endl;
-    cz.setSize(nCellZones);
-    Info << "setSize cz" << endl;
-
-    addZones(pz, fz, cz);
-
-#   include "addMeshModifiersAccordionEngineMesh.H"
 
     // Calculating the virtual positions of piston and valves
 
  //   setVirtualPositions();
 
     // Write mesh and modifiers
-    topoChanger_.writeOpt() = IOobject::AUTO_WRITE;
     write();
-
     Info << "virtualPistonPosition = " << virtualPistonPosition() << endl;
     Info << "piston position = " << pistonPosition() << endl;
 }

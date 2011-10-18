@@ -24,7 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "accordionEngineMesh.H"
+#include "deformingEngineMesh.H"
 #include "surfaceFields.H"
 #include "regionSplit.H"
 #include "componentMixedTetPolyPatchVectorField.H"
@@ -50,12 +50,9 @@ License
 #include "slipTetPolyPatchFields.H"
 #include "zeroGradientTetPolyPatchFields.H"
 
-
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-
-bool Foam::accordionEngineMesh::update()
+bool Foam::deformingEngineMesh::update()
 {
     tetDecompositionMotionSolver& mSolver =
         refCast<tetDecompositionMotionSolver>(msPtr_());
@@ -70,8 +67,8 @@ bool Foam::accordionEngineMesh::update()
     pointField newPoints = points();
 
     {
-#       include "setValveMotionBoundaryConditionAccordionEngineMesh.H"
-#       include "setPistonMotionBoundaryConditionAccordionEngineMesh.H"
+#       include "setValveMotionBoundaryConditionDeformingEngineMesh.H"
+#       include "setPistonMotionBoundaryConditionDeformingEngineMesh.H"
         Info << "piston motion" << endl;
 
         DynamicList<label> constrainedPoints(mSolver.curPoints()().size()/100);
@@ -80,7 +77,8 @@ bool Foam::accordionEngineMesh::update()
             mSolver.curPoints()().size()/100
         );
 
-#       include "setAccordionEngineMeshConstraints.H"
+#       include "setDeformingEngineMeshConstraints.H"
+
 
         labelList constrainedPointsList(constrainedPoints.shrink());
         vectorField constrainedVelocityField(constrainedVelocity.shrink());
@@ -96,18 +94,13 @@ bool Foam::accordionEngineMesh::update()
 
         mSolver.solve();
 
-        //set to zero the motion U along the x and y directions
-
-
         newPoints = mSolver.curPoints();
         movePoints(newPoints);
         setVirtualPositions();
-
         mSolver.clearConstraints();
 
     }
 
-//    pointField oldPointsNew = oldPoints();
     pointField oldPointsNew = oldAllPoints();
     newPoints = points();
     movePoints(newPoints);

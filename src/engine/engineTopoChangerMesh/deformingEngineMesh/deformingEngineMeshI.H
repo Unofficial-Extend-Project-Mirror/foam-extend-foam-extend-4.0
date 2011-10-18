@@ -22,15 +22,60 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Description
+
 \*---------------------------------------------------------------------------*/
 
-#include "accordionEngineMesh.H"
-#include "slidingInterface.H"
-#include "layerAdditionRemoval.H"
-#include "surfaceFields.H"
-#include "regionSplit.H"
-#include "componentMixedTetPolyPatchVectorField.H"
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+namespace Foam
+{
+
+inline const enginePiston& deformingEngineMesh::piston() const
+{
+    return piston_;
+}
 
 
+inline const accordionValveBank& deformingEngineMesh::valves() const
+{
+    return valves_;
+}
+
+
+inline const scalar& deformingEngineMesh::pistonPosition() const
+{
+    return pistonPosition_;
+}
+
+inline scalar& deformingEngineMesh::pistonPosition()
+{
+    return pistonPosition_;
+}
+
+inline const scalar& deformingEngineMesh::virtualPistonPosition() const
+{
+    return virtualPistonPosition_;
+}
+
+inline scalar& deformingEngineMesh::virtualPistonPosition()
+{
+    return virtualPistonPosition_;
+}
+
+
+inline const scalar& deformingEngineMesh::deckHeight() const
+{
+    return deckHeight_;
+}
+
+inline scalar& deformingEngineMesh::deckHeight()
+{
+    return deckHeight_;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// ************************************************************************* //

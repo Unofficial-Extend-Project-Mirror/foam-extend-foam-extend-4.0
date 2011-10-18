@@ -23,16 +23,15 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 CLASS
-    accordionEngineMesh
+    deformingEngineMesh
 
 DESCRIPTION
 
 */
 // ------------------------------------------------------------------------- //
 
-
-#ifndef accordionEngineMesh_H
-#define accordionEngineMesh_H
+#ifndef deformingEngineMesh_H
+#define deformingEngineMesh_H
 
 #include "engineTopoChangerMesh.H"
 #include "enginePiston.H"
@@ -57,7 +56,7 @@ namespace Foam
 \*---------------------------------------------------------------------------*/
 class twoDPointCorrector;
 
-class accordionEngineMesh
+class deformingEngineMesh
 :
     public engineTopoChangerMesh
 {
@@ -68,6 +67,7 @@ class accordionEngineMesh
 
         //- Lateral valves
         accordionValveBank valves_;
+
 
         //- Piston Position
         scalar pistonPosition_;
@@ -93,41 +93,36 @@ class accordionEngineMesh
         //- PistonFaceSet
         word headCellSetName_;
 
-
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        accordionEngineMesh(const accordionEngineMesh&);
+        deformingEngineMesh(const deformingEngineMesh&);
 
         //- Disallow default bitwise assignment
-        void operator=(const accordionEngineMesh&);
+        void operator=(const deformingEngineMesh&);
 
         //- Check if all patches exist, then calculate virtualPistonPosition,
         //- pistonPosition and deckHeight for the first time
         void checkAndCalculate();
 
-        //- Calculate the virtualPistonPosition
+        //- Calculate the virtualPistonPosition,
         void setVirtualPositions();
 
         bool realDeformation() const;
 
-
 public:
 
     //- Runtime type information
-    TypeName("accordionEngineMesh");
+    TypeName("deformingEngineMesh");
 
 
     // Constructors
 
         //- Construct from database
-        explicit accordionEngineMesh(const IOobject& io);
+        explicit deformingEngineMesh(const IOobject& io);
 
 
-    // Destructor
-
-        virtual ~accordionEngineMesh()
-        {}
+    // Destructor - default
 
 
     // Member Functions
@@ -173,7 +168,7 @@ public:
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-#include "accordionEngineMeshI.H"
+#include "deformingEngineMeshI.H"
 
 #endif
 

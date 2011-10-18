@@ -44,9 +44,8 @@ void Foam::twoStrokeEngine::checkAndCalculate()
     label cylinderHeadIndex = -1;
     bool foundCylinderHead = false;
 
-    forAll(boundary(), i)
+    forAll (boundary(), i)
     {
-        Info << boundary()[i].name() << endl;
         if (boundary()[i].name() == "piston")
         {
             pistonIndex = i;
@@ -111,34 +110,31 @@ void Foam::twoStrokeEngine::checkAndCalculate()
     }
 }
 
+
 void Foam::twoStrokeEngine::setVirtualPistonPosition()
 {
-
     label pistonFaceIndex = faceZones().findZoneID("pistonLayerFaces");
 
-    bool foundPistonFace = (pistonFaceIndex != -1);
-
-    Info << "piston face index = " << pistonFaceIndex << endl;
-
-    if(!foundPistonFace)
+    if(pistonFaceIndex == -1)
     {
         FatalErrorIn("Foam::twoStrokeEngine::setVirtualPistonPosition()")
-            << " : cannot find the pistonLayerFaces"
-            << exit(FatalError);
+            << "Cannot find the pistonLayerFaces"
+            << abort(FatalError);
     }
 
-    const labelList& pistonFaces = faceZones()[pistonFaceIndex];
-    forAll(pistonFaces, i)
-    {
-        const face& f = faces()[pistonFaces[i]];
+    const labelList& pistonPoints =
+        faceZones()[pistonFaceIndex]().meshPoints();
 
-        // should loop over facepoints...
-        forAll(f, j)
-        {
-            virtualPistonPosition() =
-                Foam::max(virtualPistonPosition(), points()[f[j]].z());
-        }
+    const pointField& p = points();
+
+    forAll (pistonPoints, i)
+    {
+        virtualPistonPosition() =
+            Foam::max(virtualPistonPosition_, p[pistonPoints[i]].z());
     }
 
     reduce(virtualPistonPosition(), maxOp<scalar>());
 }
+
+
+// ************************************************************************* //

@@ -43,7 +43,7 @@ namespace Foam
 
     addToRunTimeSelectionTable
     (
-        topoChangerFvMesh,
+        engineTopoChangerMesh,
         simpleEngineTopoFvMesh,
         IOobject
     );
@@ -211,7 +211,7 @@ bool Foam::simpleEngineTopoFvMesh::attached() const
         {
             if
             (
-                result 
+                result
              != refCast<const slidingInterface>(topoChanger_[modI]).attached()
             )
             {
@@ -458,8 +458,7 @@ Foam::simpleEngineTopoFvMesh::simpleEngineTopoFvMesh
     const IOobject& io
 )
 :
-    topoChangerFvMesh(io),
-    engineTime_(refCast<const engineTime>(time())),
+    engineTopoChangerMesh(io),
     valves_(*this, engineTime_.engineDict().lookup("valves")),
     piston_(*this, engineTime_.engineDict().subDict("piston")),
     msPtr_(motionSolver::New(*this)),
