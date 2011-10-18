@@ -80,7 +80,6 @@ Foam::labelList Foam::patchConstrainedDecomp::decompose
     const scalarField& pointWeights
 )
 {
-
     labelList finalDecomp = baseDecompPtr_->decompose(points, pointWeights);
 
     // Impose the decomposition along patches
