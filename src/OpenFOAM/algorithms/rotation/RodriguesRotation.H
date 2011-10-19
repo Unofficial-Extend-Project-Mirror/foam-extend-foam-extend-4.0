@@ -28,9 +28,10 @@ Class
 Description
     Compute rotation tensor base on Rodrigues' Rotation Formula
     http://mathworld.wolfram.com/RodriguesRotationFormula.html
+    http://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
 
 Author
-    Martin Beaudoin and Robert Magnan, Hydro-Quebec, (2008)
+    Martin Beaudoin, Hydro-Quebec, (2008, 2011)
 
 SourceFiles
     RodriguesRotation.C
@@ -40,8 +41,10 @@ SourceFiles
 #ifndef RodriguesRotation_H
 #define RodriguesRotation_H
 
+#include "tmp.H"
 #include "vector.H"
 #include "tensor.H"
+#include "tensorField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,11 +53,39 @@ namespace Foam
 
 // Compute rotation tensor using Rodrigues' Rotation Formula
 // http://mathworld.wolfram.com/RodriguesRotationFormula.html
+//
+// Requires: rotation axis + rotation angle
 tensor RodriguesRotation
 (
     const vector& rotationAxis,
     const scalar& rotationAngle,
     const bool inDegrees = true
+);
+
+tensor RodriguesRotation2
+(
+    const vector& rotationAxis,
+    const scalar& rotationAngle,
+    const bool inDegrees = true
+);
+
+// Compute rotation tensor using Rodrigues' Rotation Formula
+// http://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+//
+// Requires: rotation axis + initial vector + final vector
+
+tensor RodriguesRotation
+(
+    const vector& rotationAxis,
+    const vector& vi,
+    const vector& vf
+);
+
+Foam::tensorField RodriguesRotation
+(
+    const vector& rotationAxis,
+    const vectorField& vi,
+    const vectorField& vf
 );
 
 
