@@ -67,23 +67,30 @@ const char*
 Foam::NamedEnum
 <
     Foam::MixingPlaneInterpolationName::orientation,
-    7
+    13
 >::names[] =
 {
     "unknown",
-    "dirXspanY",
-    "dirXspanZ",
-    "dirYspanX",
-    "dirYspanZ",
-    "dirZspanX",
-    "dirZspanY",
+    "dirX_spanY",
+    "dirX_spanZ",
+    "dirY_spanX",
+    "dirY_spanZ",
+    "dirZ_spanX",
+    "dirZ_spanY",
+
+    "dirR_spanTheta",
+    "dirR_spanZ",
+    "dirTheta_spanR",
+    "dirTheta_spanZ",
+    "dirZ_spanR",
+    "dirZ_spanTheta"
 };
 
 
 const Foam::NamedEnum
 <
     Foam::MixingPlaneInterpolationName::orientation,
-    7
+    13
 >
 Foam::MixingPlaneInterpolationName::orientationNames_;
 
