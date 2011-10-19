@@ -512,8 +512,8 @@ export MPI_BUFFER_SIZE
 
 # Load zoltan
 # ~~~~~~~~~~
-[ -z "$ZOLTAN_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/zoltan_3.5 ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/zoltan_3.5/platforms/$WM_OPTIONS/etc/zoltan_3.5.sh
+[ -z "$ZOLTAN_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/zoltan-3.5 ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/zoltan-3.5/platforms/$WM_OPTIONS/etc/zoltan-3.5.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    ZOLTAN_DIR is initialized to: $ZOLTAN_DIR"
 
