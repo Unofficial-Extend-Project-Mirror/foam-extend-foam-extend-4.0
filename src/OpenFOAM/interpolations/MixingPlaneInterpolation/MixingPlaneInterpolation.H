@@ -103,6 +103,7 @@ public:
         {
             UNKNOWN,
 
+            // Cartesian coordinate systems
             DIR_X_SPAN_Y,
             DIR_X_SPAN_Z,
 
@@ -111,6 +112,16 @@ public:
 
             DIR_Z_SPAN_X,
             DIR_Z_SPAN_Y,
+
+            // Cylindrical coordinate systems
+            DIR_R_SPAN_THETA,
+            DIR_R_SPAN_Z,
+
+            DIR_THETA_SPAN_R,
+            DIR_THETA_SPAN_Z,
+
+            DIR_Z_SPAN_R,
+            DIR_Z_SPAN_THETA
         };
 
 
@@ -122,7 +133,7 @@ public:
        static const NamedEnum<assembly, 4> assemblyNames_;
 
        //- Orientation names
-       static const NamedEnum<orientation, 7> orientationNames_;
+       static const NamedEnum<orientation, 13> orientationNames_;
 
 
     // Constructors

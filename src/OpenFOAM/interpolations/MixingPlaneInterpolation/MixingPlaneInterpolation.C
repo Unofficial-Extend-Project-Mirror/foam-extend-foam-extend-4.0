@@ -56,6 +56,8 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::spanwiseSwitch() const
     {
         case DIR_Y_SPAN_X:
         case DIR_Z_SPAN_X:
+        case DIR_THETA_SPAN_R: 
+        case DIR_Z_SPAN_R: 
         {
             return vector::X;
         }
@@ -63,6 +65,8 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::spanwiseSwitch() const
 
         case DIR_X_SPAN_Y:
         case DIR_Z_SPAN_Y:
+        case DIR_R_SPAN_THETA:
+        case DIR_Z_SPAN_THETA:
         {
             return vector::Y;
         }
@@ -70,6 +74,8 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::spanwiseSwitch() const
 
         case DIR_X_SPAN_Z:
         case DIR_Y_SPAN_Z:
+        case DIR_R_SPAN_Z:
+        case DIR_THETA_SPAN_Z:
         {
             return vector::Z;
         }
@@ -104,6 +110,8 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::directionalSwitch() const
     {
         case DIR_X_SPAN_Y:
         case DIR_X_SPAN_Z:
+        case DIR_R_SPAN_THETA:
+        case DIR_R_SPAN_Z:
         {
             return vector::X;
         }
@@ -111,6 +119,8 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::directionalSwitch() const
 
         case DIR_Y_SPAN_X:
         case DIR_Y_SPAN_Z:
+        case DIR_THETA_SPAN_R:
+        case DIR_THETA_SPAN_Z:
         {
             return vector::Y;
         }
@@ -118,6 +128,8 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::directionalSwitch() const
 
         case DIR_Z_SPAN_X:
         case DIR_Z_SPAN_Y:
+        case DIR_Z_SPAN_R:
+        case DIR_Z_SPAN_THETA:
         {
             return vector::Z;
         }
