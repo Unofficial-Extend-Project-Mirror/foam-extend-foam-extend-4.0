@@ -95,7 +95,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::computeProfileFromHistograms
         if
         (
             nextMaster == masterHisto.end()
-         || nextSlave  == masterHisto.end()
+         || nextSlave  == slaveHisto.end()
         )
         {
             // We are done
