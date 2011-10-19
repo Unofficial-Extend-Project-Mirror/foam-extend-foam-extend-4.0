@@ -150,6 +150,12 @@ public:
             const dictionary& dict
         );
 
+        //- Return clone
+        virtual autoPtr<coordinateSystem> clone() const
+        {
+            return autoPtr<coordinateSystem>(new ellipticCylindricalCS(*this));
+        }
+
 
     // Member Functions
 

@@ -134,8 +134,12 @@ public:
         //- Construct from dictionary
         cylindricalCS(const word& name, const dictionary&);
 
+        //- Return clone
+        virtual autoPtr<coordinateSystem> clone() const
+        {
+            return autoPtr<coordinateSystem>(new cylindricalCS(*this));
+        }
 
-    // Member Functions
 
     // Member Functions
 

@@ -252,7 +252,7 @@ public:
         coordinateSystem(Istream&);
 
         //- Return clone
-        autoPtr<coordinateSystem> clone() const
+        virtual autoPtr<coordinateSystem> clone() const
         {
             return autoPtr<coordinateSystem>(new coordinateSystem(*this));
         }

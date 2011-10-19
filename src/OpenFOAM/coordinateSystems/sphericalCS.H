@@ -133,6 +133,12 @@ public:
         //- Construct from dictionary
         sphericalCS(const word& name, const dictionary&);
 
+        //- Return clone
+        virtual autoPtr<coordinateSystem> clone() const
+        {
+            return autoPtr<coordinateSystem>(new sphericalCS(*this));
+        }
+
 
     // Member Functions
 

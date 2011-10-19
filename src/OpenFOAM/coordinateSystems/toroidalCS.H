@@ -112,6 +112,12 @@ public:
         //- Construct from dictionary
         toroidalCS(const word& name, const dictionary&);
 
+        //- Return clone
+        virtual autoPtr<coordinateSystem> clone() const
+        {
+            return autoPtr<coordinateSystem>(new toroidalCS(*this));
+        }
+
 
     // Member Functions
 

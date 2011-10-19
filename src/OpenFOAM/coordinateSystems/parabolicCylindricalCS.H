@@ -113,6 +113,12 @@ public:
         //- Construct from dictionary
         parabolicCylindricalCS(const word&, const dictionary&);
 
+        //- Return clone
+        virtual autoPtr<coordinateSystem> clone() const
+        {
+            return autoPtr<coordinateSystem>(new parabolicCylindricalCS(*this));
+        }
+
 
     // Member Functions
 
