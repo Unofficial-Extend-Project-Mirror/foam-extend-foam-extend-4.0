@@ -95,7 +95,7 @@ public:
         ClassName("GGIInterpolation");
 
         //- Quick reject names
-        static const NamedEnum<quickReject, 3> quickRejectNames_;
+        static const NamedEnum<quickReject, 4> quickRejectNames_;
 
 
     // Constructors

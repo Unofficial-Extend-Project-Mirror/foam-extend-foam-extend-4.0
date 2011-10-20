@@ -200,8 +200,7 @@ void Foam::ggiPolyPatch::calcPatchToPatch() const
                 0,             // Non-overlapping face tolerances
                 0,             // HJ, 24/Oct/2008
                 true,          // Rescale weighting factors.  Bug fix, MB.
-//                 ggiInterpolation::AABB
-                ggiInterpolation::BB_OCTREE  // Octree search, MB.
+                reject_        // Quick rejection algorithm, default BB_OCTREE
             );
 
         // Abort immediately if uncovered faces are present and the option
@@ -464,6 +463,7 @@ Foam::ggiPolyPatch::ggiPolyPatch
     shadowName_(word::null),
     zoneName_(word::null),
     bridgeOverlap_(false),
+    reject_(ggiZoneInterpolation::BB_OCTREE),
     shadowIndex_(-1),
     zoneIndex_(-1),
     patchToPatchPtr_(NULL),
@@ -485,13 +485,15 @@ Foam::ggiPolyPatch::ggiPolyPatch
     const polyBoundaryMesh& bm,
     const word& shadowName,
     const word& zoneName,
-    const bool bridgeOverlap
+    const bool bridgeOverlap,
+    const ggiZoneInterpolation::quickReject reject
 )
 :
     coupledPolyPatch(name, size, start, index, bm),
     shadowName_(shadowName),
     zoneName_(zoneName),
     bridgeOverlap_(bridgeOverlap),
+    reject_(reject),
     shadowIndex_(-1),
     zoneIndex_(-1),
     patchToPatchPtr_(NULL),
@@ -516,6 +518,7 @@ Foam::ggiPolyPatch::ggiPolyPatch
     shadowName_(dict.lookup("shadowPatch")),
     zoneName_(dict.lookup("zone")),
     bridgeOverlap_(dict.lookup("bridgeOverlap")),
+    reject_(ggiZoneInterpolation::BB_OCTREE),
     shadowIndex_(-1),
     zoneIndex_(-1),
     patchToPatchPtr_(NULL),
@@ -525,7 +528,15 @@ Foam::ggiPolyPatch::ggiPolyPatch
     localParallelPtr_(NULL),
     receiveAddrPtr_(NULL),
     sendAddrPtr_(NULL)
-{}
+{
+    if (dict.found("quickReject"))
+    {
+        reject_ = ggiZoneInterpolation::quickRejectNames_.read
+        (
+            dict.lookup("quickReject")
+        );
+    }
+}
 
 
 Foam::ggiPolyPatch::ggiPolyPatch
@@ -538,6 +549,7 @@ Foam::ggiPolyPatch::ggiPolyPatch
     shadowName_(pp.shadowName_),
     zoneName_(pp.zoneName_),
     bridgeOverlap_(pp.bridgeOverlap_),
+    reject_(pp.reject_),
     shadowIndex_(-1),
     zoneIndex_(-1),
     patchToPatchPtr_(NULL),
@@ -564,6 +576,7 @@ Foam::ggiPolyPatch::ggiPolyPatch
     shadowName_(pp.shadowName_),
     zoneName_(pp.zoneName_),
     bridgeOverlap_(pp.bridgeOverlap_),
+    reject_(pp.reject_),
     shadowIndex_(-1),
     zoneIndex_(-1),
     patchToPatchPtr_(NULL),
@@ -735,6 +748,11 @@ void Foam::ggiPolyPatch::initAddressing()
     {
         // Calculate transforms for correct GGI cut
         calcTransforms();
+        
+        if(master())
+        {
+            shadow().calcTransforms();
+        }
 
         // Force zone addressing and remote zone addressing
         // (uses GGI interpolator)
