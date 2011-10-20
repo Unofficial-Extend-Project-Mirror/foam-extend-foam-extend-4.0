@@ -277,6 +277,35 @@ void cyclicGgiFvPatchField<Type>::updateInterfaceMatrix
 {}
 
 
+template<class Type>
+void cyclicGgiFvPatchField<Type>::initInterfaceMatrixUpdate
+(
+    const Field<Type>& psiInternal,
+    Field<Type>& result,
+    const BlockLduMatrix<Type>& m,
+    const CoeffField<Type>& coeffs,
+    const Pstream::commsTypes commsType
+) const
+{
+    notImplemented("void cyclicGgiFvPatchField::initInterfaceMatrixUpdate"
+        " for block-coupled matrices of tensor types"
+    )
+}
+
+
+template<class Type>
+void cyclicGgiFvPatchField<Type>::updateInterfaceMatrix
+(
+    const Field<Type>&,
+    Field<Type>&,
+    const BlockLduMatrix<Type>&,
+    const CoeffField<Type>&,
+    const Pstream::commsTypes commsType
+) const
+{
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

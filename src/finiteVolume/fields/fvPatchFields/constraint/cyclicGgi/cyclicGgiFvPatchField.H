@@ -169,7 +169,26 @@ public:
                 const Pstream::commsTypes commsType
             ) const;
 
+            //- Initialise neighbour matrix update
+            virtual void initInterfaceMatrixUpdate
+            (
+                const Field<Type>& psiInternal,
+                Field<Type>& result,
+                const BlockLduMatrix<Type>& m,
+                const CoeffField<Type>& coeffs,
+                const Pstream::commsTypes commsType
+            ) const;
 
+            //- Update result field based on interface functionality
+            virtual void updateInterfaceMatrix
+            (
+                const Field<Type>&,
+                Field<Type>&,
+                const BlockLduMatrix<Type>&,
+                const CoeffField<Type>&,
+                const Pstream::commsTypes commsType
+            ) const;
+            
         //- GGI coupled interface functions
 
             //- Does the patch field perform the transfromation

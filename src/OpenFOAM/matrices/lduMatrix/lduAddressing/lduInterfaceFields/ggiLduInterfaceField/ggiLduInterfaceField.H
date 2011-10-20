@@ -95,12 +95,34 @@ public:
             scalarField& psiInternal,
             const direction cmpt
         ) const;
+        
+        
+        //- Transform given patch internal field
+        template<class Type>
+        void transformCoupleField
+        (
+            Field<Type>& psiInternal
+        ) const;
 };
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//- Transform given patch internal field
+template<>
+void ggiLduInterfaceField::transformCoupleField
+(
+    scalarField& psiInternal
+) const;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "ggiLduInterfaceFieldTemplates.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

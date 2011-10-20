@@ -69,4 +69,12 @@ void Foam::ggiLduInterfaceField::transformCoupleField
 }
 
 
+template<>
+void Foam::ggiLduInterfaceField::transformCoupleField
+(
+    scalarField& pnf
+) const
+{}
+
+
 // ************************************************************************* //
