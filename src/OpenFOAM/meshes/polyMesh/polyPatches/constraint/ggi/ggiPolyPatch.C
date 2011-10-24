@@ -859,7 +859,7 @@ void Foam::ggiPolyPatch::updateMesh()
 }
 
 
-void Foam::ggiPolyPatch::calcTransforms()
+void Foam::ggiPolyPatch::calcTransforms() const
 {
     // Simplest GGI: no transform or separation.  HJ, 24/Oct/2008
     forwardT_.setSize(0);

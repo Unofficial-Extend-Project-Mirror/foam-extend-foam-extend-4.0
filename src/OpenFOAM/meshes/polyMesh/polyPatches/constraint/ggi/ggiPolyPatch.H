@@ -127,7 +127,7 @@ class ggiPolyPatch
             void calcReconFaceCellCentres() const;
 
             //- Force calculation of transformation tensors
-            virtual void calcTransforms();
+            virtual void calcTransforms() const;
 
 
         // Parallel communication optimisation, stored on master processor

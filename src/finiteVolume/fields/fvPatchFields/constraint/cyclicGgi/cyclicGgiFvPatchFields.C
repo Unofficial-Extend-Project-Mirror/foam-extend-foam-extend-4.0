@@ -106,14 +106,7 @@ void cyclicGgiFvPatchField<vector>::initInterfaceMatrixUpdate
         sField[i] = psiInternal[sfc[i]];
     }
 
-    // Transform according to the transformation tensor, using the slave
-    // side transform.  Warning: forwardT() corresponds to the slave
-    // patch.  HJ, 12/Jan/2009
-    transformCoupleField(sField);
-
-    // Note: scalar interpolate does not get a transform, so this is safe
-    // HJ, 12/Jan/2009
-    // TODO - IC, Is this safe for vectors?
+    // Transformation is handled in interpolation.  HJ, 7/Jan/2009
     Field<vector> pnf = cyclicGgiPatch_.interpolate(sField);
 
     if (coeffs.activeType() == blockCoeffBase::SCALAR)                          
