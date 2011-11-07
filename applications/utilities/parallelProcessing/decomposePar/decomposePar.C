@@ -910,8 +910,8 @@ int main(int argc, char *argv[])
 
     IOobject faMeshBoundaryIOobj
     (
-        "boundary",
-        mesh.time().findInstance(mesh.dbDir()/fvMesh::meshSubDir, "boundary"),
+        "faBoundary",
+        mesh.time().findInstance(mesh.dbDir()/faMesh::meshSubDir, "faBoundary"),
         faMesh::meshSubDir,
         mesh,
         IOobject::MUST_READ,
