@@ -15,7 +15,7 @@ cxxtoo      = $(Ctoo)
 cctoo       = $(Ctoo)
 cpptoo      = $(Ctoo)
 
-LINK_LIBS   = $(c++DBUG) -L$(IA64ROOT)/lib
+LINK_LIBS   = $(c++DBUG)
 
 LINKLIBSO   = $(CC) $(c++FLAGS) -shared
 LINKEXE     = $(CC) $(c++FLAGS)

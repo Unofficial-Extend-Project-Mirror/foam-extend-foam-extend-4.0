@@ -62,22 +62,25 @@ void faMeshDecomposition::distributeFaces()
             )
         );
 
-        labelIOList faceProcAddressing
+        labelHashSet faceProcAddressingHash
         (
-            IOobject
+            labelIOList
             (
-                "faceProcAddressing",
-                "constant",
-                procMesh.meshSubDir,
-                procMesh,
-                IOobject::MUST_READ,
-                IOobject::NO_WRITE
+                IOobject
+                (
+                    "faceProcAddressing",
+                    "constant",
+                    procMesh.meshSubDir,
+                    procMesh,
+                    IOobject::MUST_READ,
+                    IOobject::NO_WRITE
+                )
             )
         );
 
         forAll (faceLabels(), faceI)
         {
-            if (findIndex(faceProcAddressing, faceLabels()[faceI] + 1) > -1)
+            if (faceProcAddressingHash.found(faceLabels()[faceI] + 1))
             {
                 faceToProc_[faceI] = procI;
             }
@@ -209,18 +212,30 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
             )
         );
 
-        labelIOList fvFaceProcAddressing
-        (
-            IOobject
+        HashTable<label, label, Hash<label> > fvFaceProcAddressingHash;
+
+        {
+            labelIOList fvFaceProcAddressing
             (
-                "faceProcAddressing",
-                "constant",
-                procFvMesh.meshSubDir,
-                procFvMesh,
-                IOobject::MUST_READ,
-                IOobject::NO_WRITE
-            )
-        );
+                IOobject
+                (
+                    "faceProcAddressing",
+                    "constant",
+                    procFvMesh.meshSubDir,
+                    procFvMesh,
+                    IOobject::MUST_READ,
+                    IOobject::NO_WRITE
+                )
+            );
+
+            forAll(fvFaceProcAddressing, faceI)
+            {
+                 fvFaceProcAddressingHash.insert
+                 (
+                     fvFaceProcAddressing[faceI], faceI
+                 );
+            }
+        };
 
         const labelList& curProcFaceAddressing = procFaceAddressing_[procI];
 
@@ -231,11 +246,10 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
         forAll(curProcFaceAddressing, faceI)
         {
             curFaceLabels[faceI] =
-                findIndex
+                fvFaceProcAddressingHash.find
                 (
-                    fvFaceProcAddressing,
-                    faceLabels()[curProcFaceAddressing[faceI]]+1
-                );
+                    faceLabels()[curProcFaceAddressing[faceI]] + 1
+                )();
         }
 
         // create processor finite area mesh
@@ -248,8 +262,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
         const indirectPrimitivePatch& patch = this->patch();
         const Map<label>& map = patch.meshPointMap();
 
-//         const edgeList& edges = aMesh.edges();
-        edgeList edges(patch.nEdges());
+        HashTable<label, edge, Hash<edge> > edgesHash;
 
         label edgeI = -1;
 
@@ -257,8 +270,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
         for (label curEdge = 0; curEdge < nIntEdges; curEdge++)
         {
-            edges[++edgeI] =
-                patch.edges()[curEdge];
+            edgesHash.insert(patch.edges()[curEdge], ++edgeI);
         }
 
         forAll (boundary(), patchI)
@@ -269,8 +281,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
 
             for(int eI=0; eI<size; eI++)
             {
-                edges[++edgeI] =
-                    patch.edges()[boundary()[patchI][eI]];
+                edgesHash.insert(patch.edges()[boundary()[patchI][eI]], ++edgeI);
             }
         }
 
@@ -298,14 +309,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
             curGlobalEdge[0] = curPatchPointAddressing[curGlobalEdge[0]];
             curGlobalEdge[1] = curPatchPointAddressing[curGlobalEdge[1]];
 
-            forAll(edges, gEdgeI)
-            {
-                if(edges[gEdgeI]==curGlobalEdge)
-                {
-                    curPatchEdgeAddressing[edgeI] = gEdgeI;
-                    break;
-                }
-            }
+            curPatchEdgeAddressing[edgeI] = edgesHash.find(curGlobalEdge)();
         }
 
         Map<label>& curMap = procMeshEdgesMap_[procI];
