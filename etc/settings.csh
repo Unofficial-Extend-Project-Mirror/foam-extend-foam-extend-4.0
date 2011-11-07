@@ -443,15 +443,10 @@ endif
 
 # PARAVIEW
 # ~~~~~
-<<<<<<< HEAD
 #if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.10.1/platforms/$WM_OPTIONS ) then
 #    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.10.1/platforms/$WM_OPTIONS/etc/ParaView-3.10.1.csh
 if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.8.1/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.csh
-=======
-if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.10.1/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.10.1/platforms/$WM_OPTIONS/etc/ParaView-3.10.1.csh
->>>>>>> remotes/origin/hotfix/faMeshDecom
 endif
 
 if ( $WM_ARCH == "darwinIntel" || $WM_ARCH == "darwinIntel64" ) then
