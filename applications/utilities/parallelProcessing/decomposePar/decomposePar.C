@@ -618,6 +618,8 @@ int main(int argc, char *argv[])
 
             rm(timeDir/"mut");
             rm(timeDir/"nut");
+            rm(timeDir/"mut.gz");
+            rm(timeDir/"nut.gz");
         }
 
         // read the mesh
@@ -911,10 +913,10 @@ int main(int argc, char *argv[])
     IOobject faMeshBoundaryIOobj
     (
         "faBoundary",
-        mesh.time().findInstance(mesh.dbDir()/faMesh::meshSubDir, "faBoundary"),
+        mesh.time().findInstance(mesh.dbDir()/faMesh::meshSubDir, "faBoundary", IOobject::READ_IF_PRESENT),
         faMesh::meshSubDir,
         mesh,
-        IOobject::MUST_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::NO_WRITE
     );
 
