@@ -182,7 +182,7 @@ void omegaWallFunctionFvPatchScalarField::updateCoeffs()
     // HJ, 20/Mar/2011
     if (!db().foundObject<volScalarField>(GName_))
     {
-        zeroGradientFvPatchScalarField::evaluate();
+        zeroGradientFvPatchScalarField::updateCoeffs();
 
         return;
     }
