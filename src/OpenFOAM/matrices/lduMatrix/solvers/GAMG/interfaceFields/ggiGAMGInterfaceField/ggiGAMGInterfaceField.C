@@ -111,7 +111,9 @@ void Foam::ggiGAMGInterfaceField::updateInterfaceMatrix
     if (zonePnf.size() != faceCells.size())
     {
         FatalErrorIn("ggiGAMGInterfaceField::updateInterfaceMatrix")
-            << "Bananas!!!"
+            << "Error in interface update: incorrect size of zone fields" << nl
+            << "Field size = " << zonePnf.size()
+            << " Zone size = " << faceCells.size()
             << abort(FatalError);
     }
 
