@@ -885,7 +885,7 @@ int main(int argc, char *argv[])
 
                 fileName currentDir(cwd());
                 chDir(timePath);
-                if (!exists(parentPath/runTime.timeName()/uniformDir))
+                if (!exists(uniformDir))
                 {
                     ln
                     (
@@ -911,7 +911,11 @@ int main(int argc, char *argv[])
     IOobject faMeshBoundaryIOobj
     (
         "faBoundary",
-        mesh.time().findInstance(mesh.dbDir()/faMesh::meshSubDir, "faBoundary"),
+        mesh.time().findInstance
+        (
+            mesh.dbDir()/polyMesh::meshSubDir,
+            "boundary"
+        ),
         faMesh::meshSubDir,
         mesh,
         IOobject::MUST_READ,
