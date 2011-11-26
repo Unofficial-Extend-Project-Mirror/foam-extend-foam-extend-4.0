@@ -4,4 +4,5 @@ EXE_INC = \
 
 LIB_LIBS = \
     -L$(SCOTCH_LIB_DIR) -lscotch \
-    -L$(SCOTCH_LIB_DIR) -lscotcherrexit
+    -L$(SCOTCH_LIB_DIR) -lscotcherrexit \
+    -lrt
