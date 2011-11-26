@@ -1,5 +1,1 @@
-EXE_INC = \
-    -I$(LIB_SRC)/thermophysicalModels/thermophysicalFunctions/lnInclude
-
-LIB_LIBS = \
-    -lthermophysicalFunctions
+EXE_INC = -I$(LIB_SRC)/thermophysicalModels/thermophysicalFunctions/lnInclude
