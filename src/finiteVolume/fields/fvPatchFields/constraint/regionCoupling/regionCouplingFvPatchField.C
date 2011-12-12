@@ -306,8 +306,6 @@ void regionCouplingFvPatchField<Type>::initEvaluate
     // diffusivity (eg wall functions) to operate correctly.
     // HJ, 28/Sep/2011
     Field<Type> f = *this;
-    const regionCouplingFvPatchField<Type>& spf = shadowPatchField();
-    const fvPatch& sp = spf.patch();
 
     // Mag long deltas are identical on both sides.  HJ, 28/Sep/2011
     const magLongDelta& mld = magLongDelta::New(p.boundaryMesh().mesh());
