@@ -104,7 +104,7 @@ public:
         }
 
         //- Return number of points
-        //  Needed because point and elemant fields in FEM share
+        //  Needed because point and element fields in FEM share
         //  templated patch field type(checking of patch size).
         //  HJ, 16/Oct/2008
         label nPoints() const
