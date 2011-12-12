@@ -130,7 +130,7 @@ void Foam::Leonov::correct()
       + fvm::div(phi(), sigma_)
      ==
         twoSymm(C)
-      - 1/etaP_/2*((sigma_ & sigma_) - Foam::pow((etaP_/lambda_), 2)*I_)
+      - 1/etaP_/2*(symm(sigma_ & sigma_) - Foam::pow((etaP_/lambda_), 2)*I_)
       + fvm::Sp
         (
             1/etaP_/6*

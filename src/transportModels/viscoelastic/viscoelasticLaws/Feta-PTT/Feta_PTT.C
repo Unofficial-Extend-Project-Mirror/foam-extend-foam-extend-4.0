@@ -143,7 +143,7 @@ void Foam::Feta_PTT::correct()
      ==
         etaPEff_/lambdaEff_*twoD
       + twoSymm(C)
-      - zeta_/2*((tau_ & twoD) + (twoD & tau_))
+      - zeta_*symm(tau_ & twoD)
       - fvm::Sp(epsilon_/etaPEff_*tr(tau_) + 1/lambdaEff_, tau_)
     );
 

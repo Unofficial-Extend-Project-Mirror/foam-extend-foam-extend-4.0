@@ -133,7 +133,7 @@ void Foam::XPP_SE::correct()
       - (
             1/lambdaOb_*
             (
-                alpha_*lambdaOb_/etaP_*(tau_ & tau_)
+                alpha_*lambdaOb_/etaP_*symm(tau_ & tau_)
               + etaP_/lambdaOb_*(fTau - 1)*I_
             )
         )
