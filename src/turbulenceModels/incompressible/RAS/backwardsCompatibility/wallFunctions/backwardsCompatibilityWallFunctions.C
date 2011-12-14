@@ -31,6 +31,7 @@ License
 #include "nutLowReWallFunctionFvPatchScalarField.H"
 #include "epsilonWallFunctionFvPatchScalarField.H"
 #include "kqRWallFunctionFvPatchField.H"
+#include "RWallFunctionFvPatchSymmTensorField.H"
 #include "omegaWallFunctionFvPatchScalarField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -268,7 +269,8 @@ tmp<volSymmTensorField> autoCreateR
         autoCreateWallFunctionField
         <
             symmTensor,
-            RASModels::kqRWallFunctionFvPatchField<symmTensor>
+            // New wall functions for R.  HJ, 14/Dec/2011
+            RASModels::RWallFunctionFvPatchSymmTensorField
         >
         (
             fieldName,
