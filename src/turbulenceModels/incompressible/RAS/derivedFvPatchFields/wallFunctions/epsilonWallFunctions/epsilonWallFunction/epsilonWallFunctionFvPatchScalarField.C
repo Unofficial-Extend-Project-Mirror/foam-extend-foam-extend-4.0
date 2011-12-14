@@ -63,7 +63,7 @@ epsilonWallFunctionFvPatchScalarField::epsilonWallFunctionFvPatchScalarField
     const DimensionedField<scalar, volMesh>& iF
 )
 :
-    fixedInternalValueFvPatchField<scalar>(p, iF),
+    fixedInternalValueFvPatchScalarField(p, iF),
     UName_("U"),
     kName_("k"),
     GName_("RASModel::G"),
@@ -85,7 +85,7 @@ epsilonWallFunctionFvPatchScalarField::epsilonWallFunctionFvPatchScalarField
     const fvPatchFieldMapper& mapper
 )
 :
-    fixedInternalValueFvPatchField<scalar>(ptf, p, iF, mapper),
+    fixedInternalValueFvPatchScalarField(ptf, p, iF, mapper),
     UName_(ptf.UName_),
     kName_(ptf.kName_),
     GName_(ptf.GName_),
@@ -106,7 +106,7 @@ epsilonWallFunctionFvPatchScalarField::epsilonWallFunctionFvPatchScalarField
     const dictionary& dict
 )
 :
-    fixedInternalValueFvPatchField<scalar>(p, iF, dict),
+    fixedInternalValueFvPatchScalarField(p, iF, dict),
     UName_(dict.lookupOrDefault<word>("U", "U")),
     kName_(dict.lookupOrDefault<word>("k", "k")),
     GName_(dict.lookupOrDefault<word>("G", "RASModel::G")),
@@ -125,7 +125,7 @@ epsilonWallFunctionFvPatchScalarField::epsilonWallFunctionFvPatchScalarField
     const epsilonWallFunctionFvPatchScalarField& ewfpsf
 )
 :
-    fixedInternalValueFvPatchField<scalar>(ewfpsf),
+    fixedInternalValueFvPatchScalarField(ewfpsf),
     UName_(ewfpsf.UName_),
     kName_(ewfpsf.kName_),
     GName_(ewfpsf.GName_),
@@ -145,7 +145,7 @@ epsilonWallFunctionFvPatchScalarField::epsilonWallFunctionFvPatchScalarField
     const DimensionedField<scalar, volMesh>& iF
 )
 :
-    fixedInternalValueFvPatchField<scalar>(ewfpsf, iF),
+    fixedInternalValueFvPatchScalarField(ewfpsf, iF),
     UName_(ewfpsf.UName_),
     kName_(ewfpsf.kName_),
     GName_(ewfpsf.GName_),
@@ -219,11 +219,17 @@ void epsilonWallFunctionFvPatchScalarField::updateCoeffs()
 
         if (yPlus > yPlusLam)
         {
+            // Original OpenFOAM implementation
             G[faceCellI] =
-                (nutw[faceI] + nuw[faceI])
-               *magGradUw[faceI]
-               *Cmu25*sqrt(k[faceCellI])
-               /(kappa_*y[faceI]);
+                (nutw[faceI] + nuw[faceI])*magGradUw[faceI]
+               *Cmu25*sqrt(k[faceCellI])/(kappa_*y[faceI]);
+
+            // Change for consistency with Fluent implementation.
+            // Emil Baric, NUMAP-FOAM 2011
+            // HJ, 13/Dec/2011
+            G[faceCellI] =
+                sqr((nutw[faceI] + nuw[faceI])*magGradUw[faceI])/
+                (Cmu25*sqrt(k[faceCellI])*kappa_*y[faceI]);
         }
         else
         {
@@ -233,7 +239,7 @@ void epsilonWallFunctionFvPatchScalarField::updateCoeffs()
 
     // TODO: perform averaging for cells sharing more than one boundary face
 
-    fixedInternalValueFvPatchField<scalar>::updateCoeffs();
+    fixedInternalValueFvPatchScalarField::updateCoeffs();
 }
 
 
@@ -242,13 +248,13 @@ void epsilonWallFunctionFvPatchScalarField::evaluate
     const Pstream::commsTypes commsType
 )
 {
-    fixedInternalValueFvPatchField<scalar>::evaluate(commsType);
+    fixedInternalValueFvPatchScalarField::evaluate(commsType);
 }
 
 
 void epsilonWallFunctionFvPatchScalarField::write(Ostream& os) const
 {
-    fixedInternalValueFvPatchField<scalar>::write(os);
+    fixedInternalValueFvPatchScalarField::write(os);
     writeEntryIfDifferent<word>(os, "U", "U", UName_);
     writeEntryIfDifferent<word>(os, "k", "k", kName_);
     writeEntryIfDifferent<word>(os, "G", "RASModel::G", GName_);
