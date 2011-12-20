@@ -243,6 +243,17 @@ calcTransformedPatches() const
     correctStraddlingFaces(masterFaces, masterPointsLocalCoord);
     correctStraddlingFaces(slaveFaces, slavePointsLocalCoord);
 
+    if(debug)
+    {
+        Info << "MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcTransformedPatches(): " 
+            << "masterPointsLocalCoord: "
+            << masterPointsLocalCoord << endl;
+
+        Info << "MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcTransformedPatches(): " 
+            << "slavePointsLocalCoord: "
+            << slavePointsLocalCoord << endl;
+    }
+
     // Create the local coords patches
 
     transformedMasterPatchPtr_ =
@@ -372,6 +383,8 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcMixingPlanePatch() const
         mixingPatchFaces[fI] = curFace;
 
 
+#if 0
+        // Work in progress... MB 06_2011
         // Compute face area
         if (spanLimited[spanDir].first() || spanLimited[spanDir].first())
         {
@@ -381,6 +394,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcMixingPlanePatch() const
         }
         else
             mixingPatchFacesArea[fI] = curFace.mag(mixingPatchPoints);
+#endif
     }
 
     mixingPlanePatchPtr_ =
@@ -390,10 +404,10 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcMixingPlanePatch() const
             mixingPatchPoints
         );
 
-    Info << "::calcMixingPlanePatch():mixingPatchFacesArea(): "  << mixingPatchFacesArea << endl;
  
     if (debug > 0)
     {
+        Info << "::calcMixingPlanePatch():mixingPatchFacesArea(): "  << mixingPatchFacesArea << endl;
         InfoIn
         (
             "void MixingPlaneInterpolation::calcMixingPlanePatch()"

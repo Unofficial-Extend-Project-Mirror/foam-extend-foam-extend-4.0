@@ -407,10 +407,14 @@ Foam::label Foam::mixingPlanePolyPatch::shadowIndex() const
 
         if (!shadow.active())
         {
-            FatalErrorIn("label mixingPlanePolyPatch::shadowIndex() const")
+            WarningIn("label mixingPlanePolyPatch::shadowIndex() const")
                 << "Shadow patch name " << shadowName_
-                << " not found.  Please check your MixingPlane definition."
-                << abort(FatalError);
+                << " not found.  Please check your MixingPlane definition.  "
+                << "This may be fine at mesh generation stage."
+                << endl;
+
+            // Return a large label to indicate "undefined" or slave side
+            return 99999;
         }
 
         shadowIndex_ = shadow.index();
@@ -507,7 +511,14 @@ void Foam::mixingPlanePolyPatch::calcGeometry()
     // Reconstruct the cell face centres
     if (patchToPatchPtr_ && master())
     {
+        // Compute the neighbour face cell center
         reconFaceCellCentres();
+
+        // Next, identify which cells are located at these locations
+
+        // Next, compute the weighting factors in order to properly interpolate
+        // the field values at those locations. We will be using an inverse
+        // distance interpolation scheme. 
     }
 
     calcTransforms();
@@ -579,7 +590,7 @@ void Foam::mixingPlanePolyPatch::write(Ostream& os) const
         << token::END_STATEMENT << nl;
 
     // Note: only master writes the data
-    if (master())
+    if (master() || shadowIndex_ == -1)
     {
         // Write coordinate system dictionary.  Check by hand.  HJ, 26/Jan/2011
         os.writeKeyword("coordinateSystem");

@@ -31,6 +31,11 @@ Contributor
 \*---------------------------------------------------------------------------*/
 
 #include "mixingPlaneFvPatchField.H"
+#include "volMesh.H"
+#include "surfaceMesh.H"
+#include "fvsPatchField.H"
+#include "volFields.H"
+#include "interpolationCellPoint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -138,12 +143,12 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
 template<class Type>
 tmp<Field<Type> > mixingPlaneFvPatchField<Type>::patchNeighbourField() const
 {
-    //if(debug == -99)
+    if(debug > 1)
     {
-        Info << "mixingPlaneFvPatchField<Type>::patchNeighbourField():  for field: " << this->dimensionedInternalField().name();
+        Info << "mixingPlaneFvPatchField<Type>::patchNeighbourField(): for field: " << this->dimensionedInternalField().name();
         Info << " on patch: " << this->patch().name() << endl;
+        Info << " surface Area: " << gSum(this->patch().magSf()) << endl;
     }
-
 
     const Field<Type>& iField = this->internalField();
 
@@ -175,6 +180,9 @@ void mixingPlaneFvPatchField<Type>::initEvaluate
     const Pstream::commsTypes commsType
 )
 {
+    if(debug)
+        Info << "Inside mixingPlaneFvPatchField<Type>::initEvaluate: for field: " << this->dimensionedInternalField().name() << endl;
+
     if(this->size() > 0)
     {
         if (!this->updated())
@@ -256,6 +264,30 @@ void mixingPlaneFvPatchField<Type>::updateInterfaceMatrix
     const Pstream::commsTypes
 ) const
 {}
+
+// Return averaged field on patch
+template<class Type>
+tmp<Field<Type> > mixingPlaneFvPatchField<Type>::patchCircumferentialAverageField() const
+{
+    // Compute circum average of self
+    return this->mixingPlanePatch_.circumferentialAverage(*this);
+    
+}
+
+// Return the averaged field for patchInternalField
+template<class Type>
+tmp<Field<Type> > mixingPlaneFvPatchField<Type>::patchInternalField() const
+{
+    tmp<Field<Type> > tpnf(new Field<Type>(this->size()));
+    Field<Type>& pnf = tpnf();
+
+    if (this->size() > 0)
+    {
+        pnf = this->mixingPlanePatch_.circumferentialAverage(fvPatchField<Type>::patchInternalField());
+    }
+
+    return tpnf;
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

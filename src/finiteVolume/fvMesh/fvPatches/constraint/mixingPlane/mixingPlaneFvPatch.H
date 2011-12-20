@@ -127,6 +127,18 @@ public:
                 return mixingPlanePolyPatch_.interpolate(tpf);
             }
 
+            //- Circumferential average face field
+            template<class Type>
+            tmp<Field<Type> > circumferentialAverage(const Field<Type>& pf) const
+            {
+                return mixingPlanePolyPatch_.circumferentialAverage(pf);
+            }
+
+            template<class Type>
+            tmp<Field<Type> > circumferentialAverage(const tmp<Field<Type> >& tpf) const
+            {
+                return mixingPlanePolyPatch_.circumferentialAverage(tpf);
+            }
 
         // Interface transfer functions
 

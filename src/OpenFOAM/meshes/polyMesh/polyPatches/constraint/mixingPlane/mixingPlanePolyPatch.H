@@ -268,6 +268,15 @@ public:
         template<class Type>
         tmp<Field<Type> > interpolate(const tmp<Field<Type> >& tpf) const;
 
+        //- Interpolate face field from average: given field on a the
+        //- master/slave side, create an interpolated field on the same side
+        //- using averaged values
+        template<class Type>
+        tmp<Field<Type> > circumferentialAverage(const Field<Type>& pf) const;
+
+        template<class Type>
+        tmp<Field<Type> > circumferentialAverage(const tmp<Field<Type> >& tpf) const;
+
         //- Return reconstructed cell centres
         const vectorField& reconFaceCellCentres() const;
 

@@ -44,22 +44,35 @@ Description
 #include "face.H"
 #include "SubList.H"
 #include "pointField.H"
+#include "polyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+#if 0
     typedef MixingPlaneInterpolation
     <
         PrimitivePatch<face, SubList, const pointField&>,
         PrimitivePatch<face, SubList, const pointField&>
     >   mixingPlaneInterpolation;
+#else
+    typedef MixingPlaneInterpolation
+    <
+        polyPatch,
+        polyPatch
+    >   mixingPlaneInterpolation;
+#endif
 
+
+#if 0
+    // Activated later, when parallelization
     typedef MixingPlaneInterpolation
     <
         PrimitivePatch<face, List, const pointField&>,
         PrimitivePatch<face, List, const pointField&>
     >   mixingPlaneZoneInterpolation;
+#endif
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

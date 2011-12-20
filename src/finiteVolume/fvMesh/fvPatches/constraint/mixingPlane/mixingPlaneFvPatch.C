@@ -79,6 +79,9 @@ void Foam::mixingPlaneFvPatch::makeWeights(scalarField& w) const
             w = interpolate(1 - masterWeights);
         }
     }
+
+    if (debug)
+        Info << ":mixingPlaneFvPatch::makeWeights: w: " << w << endl;
 }
 
 
@@ -98,6 +101,9 @@ void Foam::mixingPlaneFvPatch::makeDeltaCoeffs(scalarField& dc) const
             dc = interpolate(masterDeltas);
         }
     }
+
+    if (debug)
+        Info << ":mixingPlaneFvPatch::makeDeltaCoeffs: dc: " << dc << endl;
 }
 
 
@@ -105,6 +111,8 @@ void Foam::mixingPlaneFvPatch::makeCorrVecs(vectorField& cv) const
 {
     if(size() > 0)
     {
+        cv = vector::zero;
+#if 0
         // Full non-orthogonality treatment
 
         // Calculate correction vectors on coupled patches
@@ -113,7 +121,11 @@ void Foam::mixingPlaneFvPatch::makeCorrVecs(vectorField& cv) const
         vectorField patchDeltas = delta();
         vectorField n = nf();
         cv = n - patchDeltas*patchDeltaCoeffs;
+#endif
     }
+
+    //if (debug)
+        Info << ":mixingPlaneFvPatch::makeCorrVecs: cv: " << cv << endl;
 }
 
 
@@ -134,6 +146,9 @@ Foam::tmp<Foam::vectorField> Foam::mixingPlaneFvPatch::delta() const
         tmp<vectorField> tDelta =
             mixingPlanePolyPatch_.reconFaceCellCentres() - Cn();
 
+        if(debug)
+            Info << "mixingPlaneFvPatch::delta: tDelta: " << tDelta() << endl;
+
         return tDelta;
     }
     else
@@ -143,6 +158,9 @@ Foam::tmp<Foam::vectorField> Foam::mixingPlaneFvPatch::delta() const
             shadow().Cn()
           - mixingPlanePolyPatch_.shadow().reconFaceCellCentres()
         );
+
+        if(debug)
+            Info << "mixingPlaneFvPatch::delta: tDelta: " << tDelta() << endl;
 
         return tDelta;
     }
@@ -186,6 +204,8 @@ const Foam::labelListList& Foam::mixingPlaneFvPatch::addressing() const
 
 const Foam::scalarListList& Foam::mixingPlaneFvPatch::weights() const
 {
+    Info << "Foam::scalarListList& Foam::mixingPlaneFvPatch::weights()" << endl;
+
     if (mixingPlanePolyPatch_.master())
     {
         return mixingPlanePolyPatch_.patchToPatch().

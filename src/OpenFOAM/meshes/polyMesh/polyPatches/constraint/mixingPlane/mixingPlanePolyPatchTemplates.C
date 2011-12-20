@@ -62,5 +62,33 @@ Foam::tmp<Foam::Field<Type> > Foam::mixingPlanePolyPatch::interpolate
     return tint;
 }
 
+template<class Type>
+Foam::tmp<Foam::Field<Type> > Foam::mixingPlanePolyPatch::circumferentialAverage
+(
+    const Field<Type>& pf
+) const
+{
+    if (master())
+    {
+        return patchToPatch().masterToMaster(pf);
+    }
+    else
+    {
+        return patchToPatch().slaveToSlave(pf);
+    }
+}
+
+
+template<class Type>
+Foam::tmp<Foam::Field<Type> > Foam::mixingPlanePolyPatch::circumferentialAverage
+(
+    const tmp<Field<Type> >& tpf
+) const
+{
+    tmp<Field<Type> > tint = circumferentialAverage(tpf());
+    tpf.clear();
+    return tint;
+}
+
 
 // ************************************************************************* //

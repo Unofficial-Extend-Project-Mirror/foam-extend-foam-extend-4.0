@@ -40,6 +40,7 @@ namespace Foam
 // Temporary hack: useful for tracking balance of phi across interface
 void
 traceMixingPlaneFlux(
+    volVectorField& U,
     surfaceScalarField& phi,
     scalar& masterPatchScaleFactor,
     scalar& shadowPatchScaleFactor,
@@ -78,12 +79,22 @@ traceMixingPlaneFlux(
                 //scalar shadowFluxMag = shadowPatchScaleFactor_ * gSumMag(phi.boundaryField()[shadowPatchI]);
                 scalar shadowFluxMag = mag(shadowFlux);
 
+                scalar phiFromU(mag(gSum(U.boundaryField()[patchI] & U.mesh().Sf().boundaryField()[patchI])));
+                scalar shadowPhiFromU(mag(gSum(U.boundaryField()[shadowPatchI] & U.mesh().Sf().boundaryField()[shadowPatchI])));
+
                 Info<< "====> traceMixingPlaneFlux::: ID: " << traceId << ":  mixingPlane pair (" << mixingPlanePatch.name() << ", " << mixingPlanePatch.shadow().name() << ") : "
                     << " flux: " << localFlux << " " << shadowFlux
-                    << " : mag: " <<  localFluxMag << " " << shadowFluxMag
-                    << " Diff = " << localFlux + shadowFlux << " or "
+                    << " Diff mag = " << localFlux + shadowFlux << " or "
                     << mag(localFlux + shadowFlux)/(localFluxMag + SMALL)*100
-                    << " %" << endl;
+                    << " %"
+                    << " phiFromU: " << phiFromU
+                    << " shadowPhiFromU: " << shadowPhiFromU
+                    << " diff: " << phiFromU - shadowPhiFromU << " or "
+                    << mag(phiFromU - shadowPhiFromU)/(phiFromU + SMALL)*100
+                    << " %"
+                    << endl;
+
+                
 	    }
 	}
     }

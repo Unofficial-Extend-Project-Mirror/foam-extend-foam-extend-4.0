@@ -476,6 +476,36 @@ public:
             ) const;
 
 
+            //- Interpolate from master to master 
+            //- (self circumferential averaging)  
+            template<class Type>
+            tmp<Field<Type> > masterToMaster
+            (
+                const Field<Type>& pf
+            ) const;
+
+            template<class Type>
+            tmp<Field<Type> > masterToMaster
+            (
+                const tmp<Field<Type> >& tpf
+            ) const;
+
+            //- Interpolate from slave to slave
+            //- (self circumferential averaging)  
+            template<class Type>
+            tmp<Field<Type> > slaveToSlave
+            (
+                const Field<Type>& pf
+            ) const;
+
+            template<class Type>
+            tmp<Field<Type> > slaveToSlave
+            (
+                const tmp<Field<Type> >& tpf
+            ) const;
+
+
+
         // Edit
 
             //- Correct weighting factors for moving mesh.

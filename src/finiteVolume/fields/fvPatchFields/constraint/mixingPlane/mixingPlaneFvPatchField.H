@@ -132,6 +132,9 @@ public:
 
         // Evaluation functions
 
+            //- Return my average field given internal cell data
+            virtual tmp<Field<Type> > patchInternalField() const;
+
             //- Return neighbour field given internal cell data
             virtual tmp<Field<Type> > patchNeighbourField() const;
 
@@ -166,10 +169,20 @@ public:
                 const Pstream::commsTypes commsType
             ) const;
 
+            //- Return patch averaged field given internal cell data
+            virtual tmp<Field<Type> > patchCircumferentialAverageField() const;
+
+            //- Return neighbour averaged field given internal cell data
+            virtual tmp<Field<Type> > patchNeighbourAveragedField() const
+            {
+                // Already averaged from patchNeighbourField
+                return patchNeighbourField();
+            }
+  
 
         // MixingPlane coupled interface functions
 
-            //- Does the patch field perform the transfromation
+            //- Does the patch field perform the transformation
             virtual bool doTransform() const
             {
                 return
