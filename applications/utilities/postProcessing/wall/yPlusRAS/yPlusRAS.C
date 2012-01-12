@@ -199,6 +199,24 @@ void calcTwoPhaseYPlus
 
 #   include "createPhi.H"
 
+    IOobject rhoHeader
+    (
+        "gamma",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    );
+
+    if (!rhoHeader.headerOk())
+    {
+        Info<< "    no gamma field" << endl;
+        return;
+    }
+
+    Info << "Reading field gamma\n" << endl;
+    volScalarField gamma(rhoHeader, mesh);
+
     Info<< "Reading transportProperties\n" << endl;
     twoPhaseMixture twoPhaseProperties(U, phi, "gamma");
 
@@ -246,6 +264,7 @@ int main(int argc, char *argv[])
     #include "addRegionOption.H"
 
     argList::validOptions.insert("compressible","");
+    argList::validOptions.insert("twoPhase","");
 
     #include "setRootCase.H"
     #include "createTime.H"
