@@ -199,26 +199,26 @@ void calcTwoPhaseYPlus
 
 #   include "createPhi.H"
 
-    IOobject rhoHeader
+    IOobject alphaHeader
     (
-        "gamma",
+        "alpha1",
         runTime.timeName(),
         mesh,
         IOobject::MUST_READ,
         IOobject::NO_WRITE
     );
 
-    if (!rhoHeader.headerOk())
+    if (!alphaHeader.headerOk())
     {
-        Info<< "    no gamma field" << endl;
+        Info<< "    no alpha1 field" << endl;
         return;
     }
 
-    Info << "Reading field gamma\n" << endl;
-    volScalarField gamma(rhoHeader, mesh);
+    Info << "Reading field alpha1\n" << endl;
+    volScalarField alpha(alphaHeader, mesh);
 
     Info<< "Reading transportProperties\n" << endl;
-    twoPhaseMixture twoPhaseProperties(U, phi, "gamma");
+    twoPhaseMixture twoPhaseProperties(U, phi, "alpha1");
 
     autoPtr<incompressible::RASModel> RASModel
     (
