@@ -119,8 +119,9 @@ void Foam::regionCouplePolyPatch::calcZoneAddressing() const
     if (zAddr.size() > 0 && min(zAddr) < 0)
     {
         FatalErrorIn("void regionCouplePolyPatch::calcZoneAddressing() const")
-            << "Problem with patch-to zone addressing: some patch faces "
-            << "not found in interpolation zone"
+            << "Problem with patch-to-zone addressing for patch "
+            << name()
+            << ": some patch faces not found in interpolation zone"
             << abort(FatalError);
     }
 }
@@ -857,15 +858,15 @@ bool Foam::regionCouplePolyPatch::localParallel() const
 const Foam::ggiZoneInterpolation&
 Foam::regionCouplePolyPatch::patchToPatch() const
 {
-    if (!attached_)
-    {
-        FatalErrorIn
-        (
-            "const patchToPatchInterpolation& "
-            "regionCouplePolyPatch::patchToPatch() const"
-        )   << "Requesting patchToPatchInterpolation in detached state"
-            << abort(FatalError);
-    }
+//     if (!attached_)
+//     {
+//         FatalErrorIn
+//         (
+//             "const patchToPatchInterpolation& "
+//             "regionCouplePolyPatch::patchToPatch() const"
+//         )   << "Requesting patchToPatchInterpolation in detached state"
+//             << abort(FatalError);
+//     }
 
     if (master())
     {
