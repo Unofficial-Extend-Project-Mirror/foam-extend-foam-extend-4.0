@@ -59,16 +59,18 @@ void Foam::polyMesh::removeZones()
             << endl;
     }
 
-    // Remove the zones
+    // Remove the zones and reset writing
     pointZones_.clear();
     pointZones_.setSize(0);
+    pointZones_.writeOpt() = IOobject::NO_WRITE;
 
     faceZones_.clear();
     faceZones_.setSize(0);
+    faceZones_.writeOpt() = IOobject::NO_WRITE;
 
     cellZones_.clear();
     cellZones_.setSize(0);
-
+    cellZones_.writeOpt() = IOobject::NO_WRITE;
     clearOut();
 }
 
