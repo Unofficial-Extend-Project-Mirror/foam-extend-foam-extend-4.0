@@ -53,6 +53,7 @@ void Foam::polyMesh::setInstance(const fileName& inst)
     setTopoWriteOpt(IOobject::AUTO_WRITE);
 }
 
+
 void Foam::polyMesh::setMotionWriteOpt(IOobject::writeOption wOpt)
 {
     if (debug)
