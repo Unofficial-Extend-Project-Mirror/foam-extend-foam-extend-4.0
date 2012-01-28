@@ -56,10 +56,10 @@ echo Starting ThirdParty AllMake: Stage4
 echo ========================================
 echo
 
-# qt-everywhere-opensource-src-4.7.0
+# qt-everywhere-opensource-src-4.7.4
 if [ ! -z "$QT_THIRD_PARTY" ] 
 then
-    ( rpm_make -p qt-everywhere-opensource-src-4.7.0 -s qt-everywhere-opensource-src-4.7.0.spec -u http://get.qt.nokia.com/qt/source/qt-everywhere-opensource-src-4.7.0.tar.gz )
+    ( rpm_make -p qt-everywhere-opensource-src-4.7.4 -s qt-everywhere-opensource-src-4.7.4.spec -u http://get.qt.nokia.com/qt/source/qt-everywhere-opensource-src-4.7.4.tar.gz )
 else
     echo "Using system installed QT"
     echo ""

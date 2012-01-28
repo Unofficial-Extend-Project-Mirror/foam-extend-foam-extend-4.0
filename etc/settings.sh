@@ -480,11 +480,8 @@ export MPI_BUFFER_SIZE
 
 # Load cmake
 # ~~~~~~~~~~
-#[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3 ] && {
-#    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.3/platforms/$WM_OPTIONS/etc/cmake-2.8.3.sh
-#}
-[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.git ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.git/platforms/$WM_OPTIONS/etc/cmake-2.8.git.sh
+[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.6 ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.6/platforms/$WM_OPTIONS/etc/cmake-2.8.6.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    CMAKE_DIR is initialized to: $CMAKE_DIR"
 
@@ -528,8 +525,8 @@ export MPI_BUFFER_SIZE
 
 # Load QT
 # ~~~~~~~
-[ ! -z "$QT_THIRD_PARTY" ] && [ -e $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.0 ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.0/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.7.0.sh
+[ ! -z "$QT_THIRD_PARTY" ] && [ -e $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.4 ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.4/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.7.4.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    QT_DIR is initialized to: $QT_DIR"
 
