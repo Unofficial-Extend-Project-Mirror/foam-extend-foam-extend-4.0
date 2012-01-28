@@ -26,14 +26,45 @@ Class
     MixingPlaneInterpolation
 
 Description
-    Interpolation of face data between two primitivePatches using
-    mixing plane averaging
+    The mixingPlaneInterplation class is implementing the interpolation of face
+    data between two primitivePatches using mixing plane averaging.
+
+    Some overview of this development can be found here:
+
+    OpenFOAM TURBO TOOLS: FROM GENERAL PURPOSE CFD TO TURBOMACHINERY SIMULATIONS 
+    H. Jasak, M. Beaudoin, Proceedings of ASME-JSME-KSME Joint Fluids
+    Engineering Conference 2011, AJK2011-FED, July 24-29, 2011, Hamamatsu,
+    Shizuoka, JAPAN 
+
+    Steady-state capabilities for hydroturbines with OpenFOAM,
+    M. Page, M. Beaudoin, A.-M. Giroux, Internationnal Journal of Fluid
+    Machinery and Systems, 4(1):160–170, Jan-Mar 2011.
+    
+    Development of a General Grid Interface for Turbomachinery simulations with
+    OpenFOAM, M. Beaudoin, H. Jasak, Open Source CFD International Conference,
+    December 2008 
 
 Author
     Martin Beaudoin, Hydro-Quebec, 2009.  All rights reserved
 
 Contributor
     Hrvoje Jasak, Wikki Ltd.
+
+
+Giving credit where credit is due:
+    1: Hakan Nilsson from the Chalmers University of Technology came up with the
+       initial idea of using a combination of 2 GGI interfaces sharing a common,
+       single-face 360 ribbons patch in order to compute the circumferential
+       average of fields. This implementation of the mixingPlane interpolation
+       algorithm is an exploration of this simple, but rather powerful idea.
+
+    2: Maryse Page from Hydro-Quebec provided many test cases and many
+       simulation runs for testing this interpolation algorithm. Testing is
+       obviously an essential part of any new development.
+
+    3: The author also want to acknowledge the usefull comments from many
+       colleagues in the OpenFOAM Turbomachinery Special Interest Group.
+
 
 Nomenclature
     ribbon = face object over which we are averaging

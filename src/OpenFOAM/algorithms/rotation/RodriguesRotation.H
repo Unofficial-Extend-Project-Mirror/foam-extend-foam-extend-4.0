@@ -52,6 +52,7 @@ namespace Foam
 {
 
 // Compute rotation tensor using Rodrigues' Rotation Formula
+// Formulation taken from:
 // http://mathworld.wolfram.com/RodriguesRotationFormula.html
 //
 // Requires: rotation axis + rotation angle
@@ -62,6 +63,11 @@ tensor RodriguesRotation
     const bool inDegrees = true
 );
 
+// Compute rotation tensor using Rodrigues' Rotation Formula
+// Slightly different formulation taken from:
+// http://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+//
+// Requires: rotation axis + rotation angle
 tensor RodriguesRotation2
 (
     const vector& rotationAxis,
@@ -81,6 +87,10 @@ tensor RodriguesRotation
     const vector& vf
 );
 
+// Compute rotation tensorField using Rodrigues' Rotation Formula
+// http://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+//
+// Requires: rotation axis + initial vectorField + final vectorField
 Foam::tensorField RodriguesRotation
 (
     const vector& rotationAxis,
