@@ -49,7 +49,7 @@ namespace Foam
 class dictionary;
 
 /*---------------------------------------------------------------------------*\
-                           Class geometricSurfacePatch Declaration
+                   Class geometricSurfacePatch Declaration
 \*---------------------------------------------------------------------------*/
 
 class geometricSurfacePatch
@@ -64,6 +64,7 @@ class geometricSurfacePatch
 
         //- Index of patch in boundary
         label index_;
+
 
 public:
 
