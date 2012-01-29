@@ -164,7 +164,7 @@ Foam::radiation::greyMeanAbsorptionEmission::aCont(const label bandI) const
             (
                 "a",
                 mesh().time().timeName(),
-                mesh(),
+                mesh(), // HR 101116 -- Todo: Need to bring object registry here!
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -226,7 +226,7 @@ Foam::radiation::greyMeanAbsorptionEmission::eCont(const label bandI) const
             (
                 "e",
                 mesh().time().timeName(),
-                mesh(),
+                mesh(), // HR 101116 -- Todo: Need to bring object registry here!
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -250,7 +250,7 @@ Foam::radiation::greyMeanAbsorptionEmission::ECont(const label bandI) const
             (
                 "E",
                 mesh_.time().timeName(),
-                mesh_,
+                mesh_, // HR 101116 -- Todo: Need to bring object registry here!
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

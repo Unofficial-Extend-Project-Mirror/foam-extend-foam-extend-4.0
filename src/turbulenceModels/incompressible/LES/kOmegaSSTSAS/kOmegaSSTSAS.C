@@ -291,7 +291,7 @@ kOmegaSSTSAS::kOmegaSSTSAS
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -304,7 +304,7 @@ kOmegaSSTSAS::kOmegaSSTSAS
         (
             "omega",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -317,7 +317,7 @@ kOmegaSSTSAS::kOmegaSSTSAS
         (
             "nuSgs",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),

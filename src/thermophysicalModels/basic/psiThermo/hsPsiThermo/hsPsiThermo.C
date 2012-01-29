@@ -97,10 +97,14 @@ void Foam::hsPsiThermo<MixtureType>::calculate()
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class MixtureType>
-Foam::hsPsiThermo<MixtureType>::hsPsiThermo(const fvMesh& mesh)
+Foam::hsPsiThermo<MixtureType>::hsPsiThermo
+(
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
 :
-    basicPsiThermo(mesh),
-    MixtureType(*this, mesh),
+    basicPsiThermo(mesh, obj),
+    MixtureType(*this, mesh, obj),
 
     hs_
     (
@@ -108,7 +112,7 @@ Foam::hsPsiThermo<MixtureType>::hsPsiThermo(const fvMesh& mesh)
         (
             "hs",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -239,7 +243,7 @@ Foam::tmp<Foam::volScalarField> Foam::hsPsiThermo<MixtureType>::Cp() const
             (
                 "Cp",
                 mesh.time().timeName(),
-                mesh,
+                T_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -302,7 +306,7 @@ Foam::tmp<Foam::volScalarField> Foam::hsPsiThermo<MixtureType>::Cv() const
             (
                 "Cv",
                 mesh.time().timeName(),
-                mesh,
+                T_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

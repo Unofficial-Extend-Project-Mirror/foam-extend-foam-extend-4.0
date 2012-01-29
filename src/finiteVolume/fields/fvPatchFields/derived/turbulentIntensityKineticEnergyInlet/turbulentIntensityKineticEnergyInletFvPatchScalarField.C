@@ -128,7 +128,7 @@ updateCoeffs()
     }
 
     const fvPatchField<vector>& Up =
-        patch().lookupPatchField<volVectorField, vector>(UName_);
+        lookupPatchField<volVectorField, vector>(UName_);
 
     operator==(1.5*sqr(intensity_)*magSqr(Up));
 

@@ -80,20 +80,25 @@ public:
             autoPtr,
             hhuCombustionThermo,
             fvMesh,
-            (const fvMesh& mesh),
-            (mesh)
+            (const fvMesh& mesh, const objectRegistry& obj),
+            (mesh, obj)
         );
 
 
     // Constructors
 
         //- Construct from dictionary and mesh
-        hhuCombustionThermo(const fvMesh&);
+        hhuCombustionThermo(const fvMesh&, const objectRegistry&);
 
 
     // Selectors
 
-        static autoPtr<hhuCombustionThermo> New(const fvMesh&);
+        static autoPtr<hhuCombustionThermo> New(const fvMesh&, const objectRegistry&);
+
+        static autoPtr<hhuCombustionThermo> New(const fvMesh& mesh)
+        {
+            return New(mesh, mesh);
+        }
 
 
     //- Destructor

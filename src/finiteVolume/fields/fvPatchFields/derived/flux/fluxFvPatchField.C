@@ -142,7 +142,7 @@ void fluxFvPatchField<Type>::updateCoeffs()
     const Field<Type>& C = *this;
 
     const fvPatchField<scalar>& gammap =
-        this->patch().lookupPatchField
+        this->lookupPatchField
         (
             gammaName_,
             reinterpret_cast<const volScalarField*>(NULL),

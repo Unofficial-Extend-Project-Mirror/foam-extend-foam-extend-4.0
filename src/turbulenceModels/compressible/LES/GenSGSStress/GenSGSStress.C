@@ -80,7 +80,7 @@ GenSGSStress::GenSGSStress
         (
             "B",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -93,7 +93,7 @@ GenSGSStress::GenSGSStress
         (
             "muSgs",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -106,7 +106,7 @@ GenSGSStress::GenSGSStress
         (
             "alphaSgs",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -127,7 +127,7 @@ tmp<volSymmTensorField> GenSGSStress::devRhoBeff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

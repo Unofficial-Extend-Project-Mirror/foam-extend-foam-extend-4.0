@@ -160,7 +160,7 @@ void Foam::MarshakRadiationFixedTMixedFvPatchScalarField::updateCoeffs()
 
     // Diffusion coefficient - created by radiation model's ::updateCoeffs()
     const scalarField& gamma =
-        patch().lookupPatchField<volScalarField, scalar>("gammaRad");
+        lookupPatchField<volScalarField, scalar>("gammaRad");
 
     const scalar Ep = emissivity_/(2.0*(2.0 - emissivity_));
 

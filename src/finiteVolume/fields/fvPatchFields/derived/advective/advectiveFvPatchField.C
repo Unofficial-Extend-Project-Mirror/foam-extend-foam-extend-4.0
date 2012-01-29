@@ -175,7 +175,7 @@ tmp<scalarField> advectiveFvPatchField<Type>::advectionSpeed() const
     const surfaceScalarField& phi =
         this->db().objectRegistry::lookupObject<surfaceScalarField>(phiName_);
 
-    fvsPatchField<scalar> phip = this->patch().lookupPatchField
+    fvsPatchField<scalar> phip = this->lookupPatchField
     (
         phiName_,
         reinterpret_cast<const surfaceScalarField*>(0),
@@ -184,7 +184,7 @@ tmp<scalarField> advectiveFvPatchField<Type>::advectionSpeed() const
 
     if (phi.dimensions() == dimDensity*dimVelocity*dimArea)
     {
-        const fvPatchScalarField& rhop = this->patch().lookupPatchField
+        const fvPatchScalarField& rhop = this->lookupPatchField
         (
             rhoName_,
             reinterpret_cast<const volScalarField*>(0),
@@ -357,7 +357,7 @@ void advectiveFvPatchField<Type>::updateCoeffs()
     }
 
     // Get access to flux field
-    fvsPatchField<scalar> phip = this->patch().lookupPatchField
+    fvsPatchField<scalar> phip = this->lookupPatchField
     (
         phiName_,
         reinterpret_cast<const surfaceScalarField*>(NULL),

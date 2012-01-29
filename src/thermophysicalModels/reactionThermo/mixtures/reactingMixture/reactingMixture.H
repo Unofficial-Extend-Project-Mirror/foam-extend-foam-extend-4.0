@@ -73,7 +73,7 @@ public:
     // Constructors
 
         //- Construct from dictionary and mesh
-        reactingMixture(const dictionary&, const fvMesh&);
+        reactingMixture(const dictionary&, const fvMesh&, const objectRegistry&);
 
 
     // Destructor

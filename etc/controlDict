@@ -629,6 +629,7 @@ DebugSwitches
     nutWallFunction     0;
     obj                 0;
     objectRegistry      0;
+    postfixedSubRegistry 0;
     octree              0;
     octreeDataEdges     0;
     octreeDataFace      0;

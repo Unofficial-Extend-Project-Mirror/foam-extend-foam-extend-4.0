@@ -172,7 +172,7 @@ void tractionDisplacementFvPatchVectorField::updateCoeffs()
     vectorField n = patch().nf();
 
     const fvPatchField<symmTensor>& sigmaD =
-        patch().lookupPatchField<volSymmTensorField, symmTensor>("sigmaD");
+        lookupPatchField<volSymmTensorField, symmTensor>("sigmaD");
 
     gradient() =
     (
@@ -188,7 +188,7 @@ void tractionDisplacementFvPatchVectorField::updateCoeffs()
         dimensionedScalar threeKalpha = threeK*alpha;
 
         const fvPatchField<scalar>& T = 
-            patch().lookupPatchField<volScalarField, scalar>("T");
+            lookupPatchField<volScalarField, scalar>("T");
 
         gradient() += n*threeKalpha.value()*T/twoMuLambda;
     }

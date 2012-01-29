@@ -169,7 +169,7 @@ NonlinearKEShih::NonlinearKEShih
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -182,7 +182,7 @@ NonlinearKEShih::NonlinearKEShih
         (
             "epsilon",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -235,7 +235,7 @@ tmp<volSymmTensorField> NonlinearKEShih::R() const
             (
                 "R",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -256,7 +256,7 @@ tmp<volSymmTensorField> NonlinearKEShih::devReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

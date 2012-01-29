@@ -107,7 +107,8 @@ template
 const objectRegistry&
 PointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>::db() const
 {
-    return patch_.boundaryMesh().mesh()();
+    //HR 12.3.10: Lookup fields from the field DB rather than the mesh
+    return internalField_.db();
 }
 
 

@@ -151,7 +151,7 @@ LienCubicKE::LienCubicKE
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -163,7 +163,7 @@ LienCubicKE::LienCubicKE
         (
             "epsilon",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -191,7 +191,7 @@ LienCubicKE::LienCubicKE
         (
             "nut",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -245,7 +245,7 @@ tmp<volSymmTensorField> LienCubicKE::R() const
             (
                 "R",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -266,7 +266,7 @@ tmp<volSymmTensorField> LienCubicKE::devReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

@@ -72,7 +72,8 @@ public:
         (
             const dictionary&,
             const wordList& specieNames,
-            const fvMesh&
+            const fvMesh&,
+            const objectRegistry&
         );
 
 

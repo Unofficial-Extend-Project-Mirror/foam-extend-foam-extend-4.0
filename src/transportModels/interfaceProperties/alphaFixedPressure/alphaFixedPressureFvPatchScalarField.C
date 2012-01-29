@@ -145,7 +145,7 @@ void Foam::alphaFixedPressureFvPatchScalarField::updateCoeffs()
         db().lookupObject<uniformDimensionedVectorField>("g");
 
     const fvPatchField<scalar>& rho =
-        patch().lookupPatchField<volScalarField, scalar>("rho");
+        lookupPatchField<volScalarField, scalar>("rho");
 
     operator==(p_ - rho*(g.value() & patch().Cf()));
 

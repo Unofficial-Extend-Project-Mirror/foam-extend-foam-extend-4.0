@@ -72,8 +72,8 @@ public:
 
     // Constructors
 
-        //- Construct from dictionary and mesh
-        pureMixture(const dictionary&, const fvMesh&);
+        //- Construct from dictionary, mesh and object registry
+        pureMixture(const dictionary&, const fvMesh&, const objectRegistry&);
 
 
     // Destructor

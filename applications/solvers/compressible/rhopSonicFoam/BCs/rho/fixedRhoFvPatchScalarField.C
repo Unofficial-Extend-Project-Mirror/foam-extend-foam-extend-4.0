@@ -98,10 +98,10 @@ void fixedRhoFvPatchScalarField::updateCoeffs()
     }
 
     const fvPatchField<scalar>& psip =
-        patch().lookupPatchField<volScalarField, scalar>("psi");
+        lookupPatchField<volScalarField, scalar>("psi");
 
     const fvPatchField<scalar>& pp =
-        patch().lookupPatchField<volScalarField, scalar>("p");
+        lookupPatchField<volScalarField, scalar>("p");
 
     operator==(psip*pp);
 

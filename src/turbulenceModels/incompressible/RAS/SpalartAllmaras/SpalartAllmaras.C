@@ -196,7 +196,7 @@ SpalartAllmaras::SpalartAllmaras
         (
             "nuTilda",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -209,7 +209,7 @@ SpalartAllmaras::SpalartAllmaras
         (
             "nut",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -243,7 +243,7 @@ tmp<volScalarField> SpalartAllmaras::k() const
             (
                 "k",
                 runTime_.timeName(),
-                mesh_
+                U_.db()
             ),
             mesh_,
             dimensionedScalar("0", dimensionSet(0, 2, -2, 0, 0), 0)
@@ -262,7 +262,7 @@ tmp<volScalarField> SpalartAllmaras::epsilon() const
             (
                 "epsilon",
                 runTime_.timeName(),
-                mesh_
+                U_.db()
             ),
             mesh_,
             dimensionedScalar("0", dimensionSet(0, 2, -3, 0, 0), 0)
@@ -281,7 +281,7 @@ tmp<volSymmTensorField> SpalartAllmaras::R() const
             (
                 "R",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -301,7 +301,7 @@ tmp<volSymmTensorField> SpalartAllmaras::devReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

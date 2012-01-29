@@ -60,7 +60,7 @@ void vanDriestDelta::calcDelta()
         (
             "ystar",
             mesh_.time().constant(),
-            mesh_
+            U.db()
         ),
         mesh_,
         dimensionedScalar("ystar", dimLength, GREAT)

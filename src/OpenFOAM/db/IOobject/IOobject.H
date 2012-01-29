@@ -183,6 +183,15 @@ public:
         IOobject
         (
             const word& name,
+            const Time& registry,
+            readOption r = NO_READ,
+            writeOption w = NO_WRITE
+        );
+
+        //- Construct from name, instance, registry, io options
+        IOobject
+        (
+            const word& name,
             const fileName& instance,
             const objectRegistry& registry,
             readOption r = NO_READ,

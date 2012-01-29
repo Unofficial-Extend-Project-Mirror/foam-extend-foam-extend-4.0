@@ -151,10 +151,10 @@ void turbulentHeatFluxTemperatureFvPatchScalarField::updateCoeffs()
     }
 
     const scalarField& alphaEffp =
-        patch().lookupPatchField<volScalarField, scalar>(alphaEffName_);
+        lookupPatchField<volScalarField, scalar>(alphaEffName_);
 
     const scalarField& Cpp =
-        patch().lookupPatchField<volScalarField, scalar>(CpName_);
+        lookupPatchField<volScalarField, scalar>(CpName_);
 
     gradient() = q_/(Cpp*alphaEffp);
 

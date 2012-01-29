@@ -30,7 +30,8 @@ License
 
 Foam::autoPtr<Foam::basicPsiThermo> Foam::basicPsiThermo::New
 (
-    const fvMesh& mesh
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 {
     word thermoTypeName;
@@ -45,7 +46,7 @@ Foam::autoPtr<Foam::basicPsiThermo> Foam::basicPsiThermo::New
             (
                 "thermophysicalProperties",
                 mesh.time().constant(),
-                mesh,
+                obj,
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE
             )
@@ -61,14 +62,14 @@ Foam::autoPtr<Foam::basicPsiThermo> Foam::basicPsiThermo::New
 
     if (cstrIter == fvMeshConstructorTablePtr_->end())
     {
-        FatalErrorIn("basicPsiThermo::New(const fvMesh&)")
+        FatalErrorIn("basicPsiThermo::New(const fvMesh&, const objectRegistry&)")
             << "Unknown basicPsiThermo type " << thermoTypeName << nl << nl
             << "Valid basicPsiThermo types are:" << nl
             << fvMeshConstructorTablePtr_->toc() << nl
             << exit(FatalError);
     }
 
-    return autoPtr<basicPsiThermo>(cstrIter()(mesh));
+    return autoPtr<basicPsiThermo>(cstrIter()(mesh, obj));
 }
 
 

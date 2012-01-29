@@ -107,7 +107,7 @@ void rotatingTotalPressureFvPatchScalarField::updateCoeffs()
     vectorField rotationVelocity = 
         omega_ ^ (patch().Cf() - axisHat*(axisHat & patch().Cf()));
 
-    vectorField Up = patch().lookupPatchField<volVectorField, vector>(UName())
+    vectorField Up = lookupPatchField<volVectorField, vector>(UName())
         + rotationVelocity;
 
     totalPressureFvPatchScalarField::updateCoeffs(Up);

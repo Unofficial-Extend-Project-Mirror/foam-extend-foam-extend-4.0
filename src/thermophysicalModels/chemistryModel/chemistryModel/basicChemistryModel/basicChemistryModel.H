@@ -97,7 +97,7 @@ public:
     // Constructors
 
         //- Construct from mesh
-        basicChemistryModel(const fvMesh& mesh);
+        basicChemistryModel(const fvMesh& mesh, const objectRegistry&);
 
 
     //- Destructor

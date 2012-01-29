@@ -81,7 +81,7 @@ wideBandDiffusiveRadiationMixedFvPatchScalarField
     emissivity_(readScalar(dict.lookup("emissivity")))
 {
     const scalarField& Tp =
-        patch().lookupPatchField<volScalarField, scalar>(TName_);
+        lookupPatchField<volScalarField, scalar>(TName_);
 
     refValue() =
         emissivity_*4.0*radiation::sigmaSB.value()*pow4(Tp)

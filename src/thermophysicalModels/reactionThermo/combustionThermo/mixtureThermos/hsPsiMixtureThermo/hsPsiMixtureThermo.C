@@ -31,10 +31,14 @@ License
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class MixtureType>
-Foam::hsPsiMixtureThermo<MixtureType>::hsPsiMixtureThermo(const fvMesh& mesh)
+Foam::hsPsiMixtureThermo<MixtureType>::hsPsiMixtureThermo
+(
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
 :
-    hsCombustionThermo(mesh),
-    MixtureType(*this, mesh)
+    hsCombustionThermo(mesh, obj),
+    MixtureType(*this, mesh, obj)
 {
     scalarField& hCells = hs_.internalField();
     const scalarField& TCells = T_.internalField();
@@ -166,7 +170,7 @@ Foam::hsPsiMixtureThermo<MixtureType>::hc() const
             (
                 "hc",
                 mesh.time().timeName(),
-                mesh,
+                this->T_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -272,7 +276,7 @@ Foam::hsPsiMixtureThermo<MixtureType>::Cp() const
             (
                 "Cp",
                 mesh.time().timeName(),
-                mesh,
+                this->T_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

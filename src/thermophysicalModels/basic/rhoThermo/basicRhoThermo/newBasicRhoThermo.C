@@ -33,7 +33,8 @@ Description
 
 Foam::autoPtr<Foam::basicRhoThermo> Foam::basicRhoThermo::New
 (
-    const fvMesh& mesh
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 {
     word thermoTypeName;
@@ -48,7 +49,7 @@ Foam::autoPtr<Foam::basicRhoThermo> Foam::basicRhoThermo::New
             (
                 "thermophysicalProperties",
                 mesh.time().constant(),
-                mesh,
+                obj,
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE
             )
@@ -64,14 +65,14 @@ Foam::autoPtr<Foam::basicRhoThermo> Foam::basicRhoThermo::New
 
     if (cstrIter == fvMeshConstructorTablePtr_->end())
     {
-        FatalErrorIn("basicRhoThermo::New(const fvMesh&)")
+        FatalErrorIn("basicRhoThermo::New(const fvMesh&, const objectRegistry&)")
             << "Unknown basicRhoThermo type " << thermoTypeName << nl << nl
             << "Valid basicRhoThermo types are:" << nl
             << fvMeshConstructorTablePtr_->toc() << nl
             << exit(FatalError);
     }
 
-    return autoPtr<basicRhoThermo>(cstrIter()(mesh));
+    return autoPtr<basicRhoThermo>(cstrIter()(mesh, obj));
 }
 
 
