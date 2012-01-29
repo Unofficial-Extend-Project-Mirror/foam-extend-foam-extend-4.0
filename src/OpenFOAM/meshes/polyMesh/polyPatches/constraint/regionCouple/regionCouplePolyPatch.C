@@ -858,16 +858,6 @@ bool Foam::regionCouplePolyPatch::localParallel() const
 const Foam::ggiZoneInterpolation&
 Foam::regionCouplePolyPatch::patchToPatch() const
 {
-//     if (!attached_)
-//     {
-//         FatalErrorIn
-//         (
-//             "const patchToPatchInterpolation& "
-//             "regionCouplePolyPatch::patchToPatch() const"
-//         )   << "Requesting patchToPatchInterpolation in detached state"
-//             << abort(FatalError);
-//     }
-
     if (master())
     {
         if (!patchToPatchPtr_)
