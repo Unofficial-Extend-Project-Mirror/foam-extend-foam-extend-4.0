@@ -58,7 +58,7 @@ Foam::fixedInternalValueFvPatchField<Type>::fixedInternalValueFvPatchField
 )
 :
     zeroGradientFvPatchField<Type>(p, iF),
-    refValue_(p.size())
+    refValue_(p.size(), pTraits<Type>::zero)
 {}
 
 

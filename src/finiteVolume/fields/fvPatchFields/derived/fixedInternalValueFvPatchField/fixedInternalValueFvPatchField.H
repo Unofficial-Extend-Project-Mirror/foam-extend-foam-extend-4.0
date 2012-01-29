@@ -65,6 +65,7 @@ class fixedInternalValueFvPatchField
         //- Set refValue in internal field
         void setInInternalField() const;
 
+
 public:
 
     //- Runtime type information
