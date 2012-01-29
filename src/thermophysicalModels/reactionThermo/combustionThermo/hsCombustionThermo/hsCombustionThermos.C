@@ -143,6 +143,14 @@ makeHsCombustionMixtureThermo
     hsCombustionThermo,
     hsPsiMixtureThermo,
     reactingMixture,
+    constGasThermoPhysics
+);
+
+makeHsCombustionMixtureThermo
+(
+    hsCombustionThermo,
+    hsPsiMixtureThermo,
+    reactingMixture,
     gasThermoPhysics
 );
 

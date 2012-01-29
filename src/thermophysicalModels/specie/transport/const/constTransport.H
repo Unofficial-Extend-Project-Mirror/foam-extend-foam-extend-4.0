@@ -120,6 +120,12 @@ public:
         //- Construct from Istream
         constTransport(Istream&);
 
+        //- Construct and return a clone
+        inline autoPtr<constTransport> clone() const;
+
+        // Selector from Istream
+        inline static autoPtr<constTransport> New(Istream& is);
+
 
     // Member functions
 
