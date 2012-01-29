@@ -111,6 +111,26 @@ void buoyantPressureFvPatchScalarField::updateCoeffs()
         return;
     }
 
+    // If variables are not found, evaluate as zero gradient
+    // HJ, 17/Jan/2012
+    if
+    (
+        !db().foundObject<uniformDimensionedVectorField>("g")
+     || !db().foundObject<volScalarField>(rhoName_)
+    )
+    {
+        InfoIn
+        (
+            "void buoyantPressureFvPatchScalarField::updateCoeffs()"
+        )   << "Fields required for evaluation not found for patch " 
+            << patch().name() << endl;
+
+        gradient() = 0;
+        fixedGradientFvPatchScalarField::updateCoeffs();
+
+        return;
+    }
+
     const uniformDimensionedVectorField& g =
         db().lookupObject<uniformDimensionedVectorField>("g");
 
