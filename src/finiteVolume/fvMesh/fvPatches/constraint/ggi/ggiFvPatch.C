@@ -146,7 +146,10 @@ void Foam::ggiFvPatch::makeCorrVecs(vectorField& cv) const
 
     vectorField patchDeltas = delta();
     vectorField n = nf();
-    cv = n - patchDeltas*patchDeltaCoeffs;
+
+    // If non-orthogonality is over 90 deg, kill correction vector
+    // HJ, 6/Jan/2011
+    cv = pos(patchDeltas & n)*(n - patchDeltas*patchDeltaCoeffs);
 }
 
 
