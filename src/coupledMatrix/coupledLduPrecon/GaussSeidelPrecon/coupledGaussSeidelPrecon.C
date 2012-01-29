@@ -31,7 +31,7 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "coupledGaussSeidelPrecon.H"
 #include "addToRunTimeSelectionTable.H"
@@ -413,6 +413,27 @@ void Foam::coupledGaussSeidelPrecon::preconditionT
         forAll (matrix_, rowI)
         {
             forwardSweepTranspose(matrix_[rowI], x[rowI], bPrime_[rowI]);
+        }
+
+        // Parallel boundary update
+        {
+            matrix_.initMatrixInterfaces
+            (
+                mBouCoeffs_,
+                interfaces_,
+                x,
+                bPrime_,
+                cmpt
+            );
+
+            matrix_.updateMatrixInterfaces
+            (
+                mBouCoeffs_,
+                interfaces_,
+                x,
+                bPrime_,
+                cmpt
+            );
         }
 
         // Reverse sweep
