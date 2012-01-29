@@ -48,11 +48,46 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
+defineTemplateTypeNameAndDebug(constGasReaction, 0);
+defineTemplateRunTimeSelectionTable(constGasReaction, Istream);
+
 defineTemplateTypeNameAndDebug(gasReaction, 0);
 defineTemplateRunTimeSelectionTable(gasReaction, Istream);
 
 
 // * * * * * * * * * * * * * Make CHEMKIN reactions  * * * * * * * * * * * * //
+
+// constGasThermoPhysics
+
+makeIRNReactions(constGasThermoPhysics, ArrheniusReactionRate)
+makeIRNReactions(constGasThermoPhysics, LandauTellerReactionRate)
+makeIRNReactions(constGasThermoPhysics, thirdBodyArrheniusReactionRate)
+makeIRReactions(constGasThermoPhysics, JanevReactionRate)
+makeIRReactions(constGasThermoPhysics, powerSeriesReactionRate)
+
+makePressureDependentReactions
+(
+    constGasThermoPhysics,
+    ArrheniusReactionRate,
+    LindemannFallOffFunction
+)
+
+makePressureDependentReactions
+(
+    constGasThermoPhysics,
+    ArrheniusReactionRate,
+    TroeFallOffFunction
+)
+
+makePressureDependentReactions
+(
+    constGasThermoPhysics,
+    ArrheniusReactionRate,
+    SRIFallOffFunction
+)
+
+
+// gasThermoPhysics
 
 makeIRNReactions(gasThermoPhysics, ArrheniusReactionRate)
 makeIRNReactions(gasThermoPhysics, LandauTellerReactionRate)

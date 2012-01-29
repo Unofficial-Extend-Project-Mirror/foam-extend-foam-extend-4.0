@@ -38,6 +38,7 @@ License
 
 namespace Foam
 {
+    makeChemistrySolver(psiChemistryModel, constGasThermoPhysics)
     makeChemistrySolver(psiChemistryModel, gasThermoPhysics)
     makeChemistrySolverType(EulerImplicit, psiChemistryModel, gasThermoPhysics)
     makeChemistrySolverType(ode, psiChemistryModel, gasThermoPhysics)

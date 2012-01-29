@@ -37,9 +37,11 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+makeChemistryReader(constGasThermoPhysics);
 makeChemistryReader(gasThermoPhysics);
 makeChemistryReader(icoPoly8ThermoPhysics);
 
+makeChemistryReaderType(foamChemistryReader, constGasThermoPhysics);
 makeChemistryReaderType(foamChemistryReader, gasThermoPhysics);
 makeChemistryReaderType(foamChemistryReader, icoPoly8ThermoPhysics);
 
