@@ -353,6 +353,19 @@ void regionCouplingFvPatchField<Type>::initEvaluate
 
     // Do interpolation
     Field<Type>::operator=(weights*fOwn + (1.0 - weights)*fNei);
+
+    if (regionCouplePatch_.bridgeOverlap())
+    {
+        // Symmetry treatment used for overlap
+        vectorField nHat = this->patch().nf();
+
+        Field<Type> pif = this->patchInternalField();
+
+        Field<Type> bridgeField =
+            0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
+
+        regionCouplePatch_.bridge(bridgeField, *this);
+    }
 }
 
 
