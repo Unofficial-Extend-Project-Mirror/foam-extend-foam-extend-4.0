@@ -325,8 +325,11 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcMixingPlanePatch() const
             slaveBB.max()[spanDir]
         ) + SMALL;
 
-    Info << "::calcMixingPlanePatch: minSpan from patch BB : " << minSpan << endl;
-    Info << "::calcMixingPlanePatch: maxSpan from patch BB : " << maxSpan << endl;
+    if (debug)
+    {
+        Info << "::calcMixingPlanePatch: minSpan from patch BB : " << minSpan << endl;
+        Info << "::calcMixingPlanePatch: maxSpan from patch BB : " << maxSpan << endl;
+    }
 
     // Correct for limited span
     if (spanLimited[spanDir].first())
@@ -339,9 +342,11 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcMixingPlanePatch() const
         maxSpan = spanBounds.max()[spanDir];
     }
 
-    Info << "::calcMixingPlanePatch: minSpan after checking spanLimited : " << minSpan << endl;
-    Info << "::calcMixingPlanePatch: maxSpan after checking spanLimited : " << maxSpan << endl;
-
+    if (debug)
+    {
+        Info << "::calcMixingPlanePatch: minSpan after checking spanLimited : " << minSpan << endl;
+        Info << "::calcMixingPlanePatch: maxSpan after checking spanLimited : " << maxSpan << endl;
+    }
 
     label nRibbons = profile.size() - 1;
 

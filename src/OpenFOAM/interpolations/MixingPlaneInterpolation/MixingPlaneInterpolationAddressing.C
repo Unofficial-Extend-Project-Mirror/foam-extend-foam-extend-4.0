@@ -90,10 +90,13 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
         )   << "Addressing already calculated"
             << abort(FatalError);
     }
-
-    Info<< "Creating internal GGIs: Large values for the master GGI "
-        << "weighting factor corrections are expected."
-        << endl;
+    
+    if(debug)
+    {
+        Info<< "Creating internal GGIs: Large values for the master GGI "
+            << "weighting factor corrections are expected."
+            << endl;
+    }
 
     // Construct 2 GGIs in order to evaluate the interpolation weighting
     // factors and the addressing

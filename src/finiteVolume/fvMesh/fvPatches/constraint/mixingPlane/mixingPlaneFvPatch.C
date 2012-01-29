@@ -124,7 +124,7 @@ void Foam::mixingPlaneFvPatch::makeCorrVecs(vectorField& cv) const
 #endif
     }
 
-    //if (debug)
+    if (debug)
         Info << ":mixingPlaneFvPatch::makeCorrVecs: cv: " << cv << endl;
 }
 

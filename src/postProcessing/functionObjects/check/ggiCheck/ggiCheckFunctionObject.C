@@ -67,7 +67,7 @@ Foam::ggiCheckFunctionObject::ggiCheckFunctionObject
         dict.lookup("region") >> regionName_;
     }
 
-    Info << "Creating ggi check" << endl;
+    Info << "Creating ggi check function object" << endl;
 }
 
 

@@ -67,7 +67,7 @@ Foam::mixingPlaneCheckFunctionObject::mixingPlaneCheckFunctionObject
         dict.lookup("region") >> regionName_;
     }
 
-    Info << "Creating mixingPlane check" << endl;
+    Info << "Creating mixingPlane check functionObject" << endl;
 }
 
 
@@ -136,7 +136,7 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
                 scalar sumMixingAreas = sum(mixingPlanePatchAreas);
 
 
-                Info<< "Mixing plane area check " << nl
+                Info<< "Mixing plane functionObject: area check " << nl
                     << "     "  << "Master " << mixingMaster.name()
                     << " = " << sumMasterAreas << nl
                     << "     "  << "Shadow  " << mixingMaster.shadow().name()
@@ -217,9 +217,10 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
                     scalar shadowFlux    = shadowPatchScaleFactor_ * sum(phi.boundaryField()[shadowPatchI]);
                     scalar shadowFluxMag = mag(shadowFlux);
 
-                    Info<< "mixingPlane pair " << name() << " (" << mixingMaster.name() << ", " <<  mixingMaster.shadow().name() << ") : "
-                        << " flux: " << localFlux << " " << shadowFlux
-                        << " : mag: " <<  localFluxMag << " " << shadowFluxMag
+                    Info<< "Mixing plane pair " 
+                        << "(" << mixingMaster.name() << ", "
+                        << mixingMaster.shadow().name() << ") : " 
+                        << localFlux << " " << shadowFlux 
                         << " Diff = " << localFlux + shadowFlux << " or "
                         << mag(localFlux + shadowFlux)/(localFluxMag + SMALL)*100
                         << " %" << endl;
