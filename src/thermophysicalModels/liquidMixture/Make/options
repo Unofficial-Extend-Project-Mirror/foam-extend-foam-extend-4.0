@@ -5,3 +5,5 @@ EXE_INC = \
     -I$(LIB_SRC)/thermophysicalModels/combustion/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/thermophysicalFunctions/lnInclude
 
+LIB_LIBS = \
+    -lliquids
