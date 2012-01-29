@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Author
-    Martin Beaudoin, Hydro-Quebec, (2008)
+    Martin Beaudoin, Hydro-Quebec, 2009.  All rights reserved
 
 Contributor:
     Hrvoje Jasak, Wikki Ltd.
