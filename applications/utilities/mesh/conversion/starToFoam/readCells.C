@@ -125,7 +125,7 @@ void starMesh::addSAMMcell
 {
     // get type, reg and permutation flag
     label typeFlag = labels[21];
-//     label regularityFlag = labels[22];  // Not used. 
+//     label regularityFlag = labels[22];  // Not used.  HJ, 10/Jul/2001
     label permutationFlag = labels[23];
 
     // grab the shape from the table
@@ -239,7 +239,7 @@ void starMesh::readCells()
                 }
 
                 // backward compatibility: number of trailing rubbish in
-                // STAR is unknown. 
+                // STAR is unknown.  HJ, 11/Jun/2001
                 // Fixed to cope with missing \n on last line.
                 readToNl(cellsFile);
             }

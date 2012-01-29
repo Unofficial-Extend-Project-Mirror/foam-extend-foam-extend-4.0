@@ -1773,8 +1773,8 @@ int main(int argc, char *argv[])
 
             for (; cg != cellGroupZoneID.end(); ++cg, ++start, ++end)
             {
-                const word& name=patchNameIDs[cg()];
-                const word& type=patchTypeIDs[cg()];
+                const word& name = patchNameIDs[cg()];
+                const word& type = patchTypeIDs[cg()];
 
                 Info<< "Writing cell set: " << name
                     << " of type " << type << " starting at " << start() - 1
