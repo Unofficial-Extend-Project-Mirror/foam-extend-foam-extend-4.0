@@ -176,7 +176,6 @@ timeVaryingMappedFixedValueFvPatchField
 }
 
 
-
 template<class Type>
 timeVaryingMappedFixedValueFvPatchField<Type>::
 timeVaryingMappedFixedValueFvPatchField
