@@ -154,7 +154,7 @@ void Foam::layerAdditionRemoval::addCellLayer
                     -1,           // master edge
                     mf[faceI],    // master face
                     -1,           // master cell
-                    -1            // zone for cell
+                    cellZone_     // zone for cell
                 )
             );
     }

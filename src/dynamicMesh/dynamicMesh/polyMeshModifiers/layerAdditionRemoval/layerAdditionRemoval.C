@@ -167,7 +167,8 @@ Foam::layerAdditionRemoval::layerAdditionRemoval
     const polyTopoChanger& mme,
     const word& zoneName,
     const scalar minThickness,
-    const scalar maxThickness
+    const scalar maxThickness,
+    const label cellZone
 )
 :
     polyMeshModifier(name, index, mme, true),
@@ -178,7 +179,8 @@ Foam::layerAdditionRemoval::layerAdditionRemoval
     pointsPairingPtr_(NULL),
     facesPairingPtr_(NULL),
     triggerRemoval_(-1),
-    triggerAddition_(-1)
+    triggerAddition_(-1),
+    cellZone_(cellZone)
 {
     checkDefinition();
 }
@@ -201,7 +203,8 @@ Foam::layerAdditionRemoval::layerAdditionRemoval
     pointsPairingPtr_(NULL),
     facesPairingPtr_(NULL),
     triggerRemoval_(-1),
-    triggerAddition_(-1)
+    triggerAddition_(-1),
+    cellZone_(-1)
 {
     checkDefinition();
 }
