@@ -74,7 +74,7 @@ namespace Foam
 
 // Forward declaration of classes
 class polyMesh;
-
+class ggiPolyPatch;
 
 /*---------------------------------------------------------------------------*\
                         Class PointEdgeWaveName Declaration
@@ -127,6 +127,9 @@ class PointEdgeWave
 
         //- Number of cyclic patches
         bool nCyclicPatches_;
+
+        //- Number of cyclic patches
+        bool nGgiPatches_;
 
         //- For every cyclic patch two primitivePatches
         PtrList<primitivePatch> cycHalves_;
@@ -228,6 +231,16 @@ class PointEdgeWave
                 List<Type>& patchInfo
             );
 
+            //- Merge data from patch into overall data
+            void updateFromPatchInfo
+            (
+                const ggiPolyPatch& to,
+                const labelListList& addr,
+                const labelList& owner,
+                const labelList& ownerIndex,
+                List<Type>& patchInfo
+            );
+
             //- Merge data from across processor boundaries
             void handleProcPatches();
 
@@ -236,6 +249,9 @@ class PointEdgeWave
 
             //- Merge data from across cyclic boundaries
             void handleCyclicPatches();
+
+            //- Merge data from across cyclic boundaries
+            void handleGgiPatches();
 
 
         //- Disallow default bitwise copy construct
@@ -351,8 +367,21 @@ public:
     }
 };
 
-} // End namespace Foam
 
+//- List update operation
+template <class Type>
+class listAppendOp
+{
+
+public:
+
+    void operator()(List<Type>& x, const List<Type>& y) const
+    {
+        x.append(y);
+    }
+};
+
+} // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

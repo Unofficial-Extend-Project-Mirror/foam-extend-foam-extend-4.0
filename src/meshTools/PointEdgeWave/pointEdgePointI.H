@@ -232,7 +232,7 @@ inline bool Foam::pointEdgePoint::updatePoint
     return 
         update
         (
-            mesh.points()[pointI],
+            mesh.allPoints()[pointI],
             edgeInfo,
             tol
         );
@@ -251,7 +251,7 @@ inline bool Foam::pointEdgePoint::updatePoint
     return
         update
         (
-            mesh.points()[pointI],
+            mesh.allPoints()[pointI],
             newPointInfo,
             tol
         );
