@@ -112,6 +112,11 @@ public:
     //- Selector
     static autoPtr<psiChemistryModel> New(const fvMesh&, const objectRegistry&);
 
+    static autoPtr<psiChemistryModel> New(const fvMesh& mesh)
+    {
+        return New(mesh, mesh);
+    }
+
 
     //- Destructor
     virtual ~psiChemistryModel();
