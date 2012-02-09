@@ -43,6 +43,7 @@ void Foam::realGasHThermo<MixtureType>::calculate()
     scalarField& TCells = this->T_.internalField();
     scalarField& rhoCells= this->rho_.internalField();
     scalarField& psiCells = this->psi_.internalField();
+    scalarField& drhodhCells = this->drhodh_.internalField();
     scalarField& muCells = this->mu_.internalField();
     scalarField& alphaCells = this->alpha_.internalField();
 
@@ -54,6 +55,7 @@ void Foam::realGasHThermo<MixtureType>::calculate()
 
         mixture_.TH(hCells[celli], TCells[celli], pCells[celli], rhoCells[celli]);
         psiCells[celli]=mixture_.psi(rhoCells[celli], TCells[celli]);
+        drhodhCells[celli]=mixture_.drhodH(rhoCells[celli], TCells[celli]);
         muCells[celli] = mixture_.mu(TCells[celli]);
         alphaCells[celli] = mixture_.alpha(rhoCells[celli], TCells[celli]);
     }
@@ -64,9 +66,9 @@ void Foam::realGasHThermo<MixtureType>::calculate()
         fvPatchScalarField& pp = this->p_.boundaryField()[patchi];
         fvPatchScalarField& pT = this->T_.boundaryField()[patchi];
         fvPatchScalarField& ppsi = this->psi_.boundaryField()[patchi];
+        fvPatchScalarField& pdrhodh = this->drhodh_.boundaryField()[patchi];
         fvPatchScalarField& prho = this->rho_.boundaryField()[patchi];
         fvPatchScalarField& ph = h_.boundaryField()[patchi];
-
         fvPatchScalarField& pmu = this->mu_.boundaryField()[patchi];
         fvPatchScalarField& palpha = this->alpha_.boundaryField()[patchi];
 
@@ -81,8 +83,8 @@ void Foam::realGasHThermo<MixtureType>::calculate()
 
                 prho[facei] = mixture_.rho(pp[facei], pT[facei],prho[facei]);
                 ppsi[facei]=mixture_.psi(prho[facei],pT[facei]);
+                pdrhodh[facei]=mixture_.drhodH(prho[facei],pT[facei]);
 		ph[facei] = mixture_.H(prho[facei], pT[facei]);
-
                 pmu[facei] = mixture_.mu(pT[facei]);
                 palpha[facei] = mixture_.alpha(prho[facei],pT[facei]);
             }
@@ -93,9 +95,11 @@ void Foam::realGasHThermo<MixtureType>::calculate()
             {
                 const typename MixtureType::thermoType& mixture_ =
                     this->patchFaceMixture(patchi, facei);
+
                 mixture_.TH(ph[facei], pT[facei],pp[facei],prho[facei]);
                 pmu[facei] = mixture_.mu(pT[facei]);
 		ppsi[facei]=mixture_.psi(prho[facei],pT[facei]);
+		pdrhodh[facei]=mixture_.drhodH(prho[facei],pT[facei]);
                 palpha[facei] = mixture_.alpha(prho[facei],pT[facei]);
             }
         }
@@ -121,11 +125,11 @@ Foam::realGasHThermo<MixtureType>::realGasHThermo(const fvMesh& mesh)
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        mesh,
+        mesh, 
         dimensionSet(0, 2, -2, 0, 0),
         this->hBoundaryTypes()
-    ),
-    
+    ),   
+
     rho_
     (
         IOobject
@@ -138,7 +142,23 @@ Foam::realGasHThermo<MixtureType>::realGasHThermo(const fvMesh& mesh)
         ),
 	mesh,
 	dimDensity
+    ),
+
+    drhodh_
+    (
+        IOobject
+        (
+            "drhodh",
+            mesh.time().timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+	mesh,
+	dimensionSet(1, -5, 2, 0, 0)
     )
+
+
 {
 
     scalarField& hCells = h_.internalField();
@@ -150,15 +170,13 @@ Foam::realGasHThermo<MixtureType>::realGasHThermo(const fvMesh& mesh)
     forAll(rhoCells, celli)
     {
      rhoCells[celli]=this->cellMixture(celli).rho(pCells[celli],TCells[celli]);
-     
     }
 
 
     forAll(rho_.boundaryField(), patchi)
     {
         rho_.boundaryField()[patchi] ==
-            rho(this->T_.boundaryField()[patchi], patchi);
-   
+            rho(this->T_.boundaryField()[patchi], patchi); 
     }
 
 
@@ -218,7 +236,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::h
     const labelList& cells
 ) const
 {
-    //CL: needing the pressure of the internal field to calculate the realGas enthalpy
+    //CL: need the pressure of the internal field to calculate the realGas enthalpy
     //CL: this is done this way to assure compatibility to old OF Thermo-Versions 
     const scalarField& pCells = this->p_.internalField();
 
@@ -240,7 +258,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::h
     const label patchi
 ) const
 {
-    //CL: needing the pressure at the patch to calculate the realGas enthalpy
+    //CL: need the pressure at the patch to calculate the realGas enthalpy
     //CL: this is done this way to assure compatibility to old OF Thermo-Versions 
     const fvPatchScalarField& pp = this->p_.boundaryField()[patchi];
 
@@ -262,7 +280,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::rho
     const label patchi
 ) const
 {
-    //CL: needing the pressure at the patch to calculate the realGas enthalpy
+    //CL: need the pressure at the patch to calculate the realGas enthalpy
     //CL: this is done this way to assure compatibility to old OF Thermo-Versions 
     const fvPatchScalarField& pp = this->p_.boundaryField()[patchi];
 
@@ -284,7 +302,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::Cp
     const label patchi
 ) const
 {
-    //CL: needing the pressure at the patch to calculate the realGas enthalpy
+    //CL: need the pressure at the patch to calculate the realGas enthalpy
     //CL: this is done this way to assure compatibility to old OF Thermo-Versions 
     const fvPatchScalarField& pp = this->p_.boundaryField()[patchi];
 
@@ -352,7 +370,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::Cv
     const label patchi
 ) const
 {
-    //CL: needing the pressure at the patch to calculate the realGas enthalpy
+    //CL: need the pressure at the patch to calculate the realGas enthalpy
     //CL: this is done this way to assure compatibility to old OF Thermo-Versions 
     const fvPatchScalarField& pp = this->p_.boundaryField()[patchi];
 
@@ -374,7 +392,7 @@ Foam::tmp<Foam::volScalarField> Foam::realGasHThermo<MixtureType>::rho()  const
 
     const fvMesh& mesh = this->T_.mesh();
 
-    //CL: create an rho Field, which will be return
+    //CL: create a rho Field, which will be return
     //CL: the problem is that this function is "const", 
     //CL: so a new variabel is needed
       tmp<volScalarField> trho

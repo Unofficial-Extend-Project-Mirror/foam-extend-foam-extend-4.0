@@ -116,6 +116,7 @@ inline scalar constTransport<thermo>::alpha(const scalar T) const
     return Cp_*mu(T)*rPr/CpBar;
 }
 
+// CL: for real gas thermo
 // Thermal conductivity [W/mK]
 template<class thermo>
 inline scalar constTransport<thermo>::kappa(const scalar rho,const scalar T) const
@@ -123,7 +124,7 @@ inline scalar constTransport<thermo>::kappa(const scalar rho,const scalar T) con
     return this->Cp(rho,T)*mu(T)*rPr;
 }
 
-
+// CL: for real gas thermo
 // Thermal diffusivity for enthalpy [kg/ms]
 template<class thermo>
 inline scalar constTransport<thermo>::alpha(const scalar rho,const scalar T) const

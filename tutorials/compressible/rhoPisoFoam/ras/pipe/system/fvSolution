@@ -35,8 +35,6 @@ p
         mergeLevels     1;
 }
 
-
-
     U
     {
         solver          smoothSolver;
@@ -90,10 +88,10 @@ p
 
 PISO
 {
+    realFluid true;
     nNonOrthogonalCorrectors 0;
-    nCorrectors     6;
+    nCorrectors     2;
     momentumPredictor yes;
-   // transonic true;
 }
 
 

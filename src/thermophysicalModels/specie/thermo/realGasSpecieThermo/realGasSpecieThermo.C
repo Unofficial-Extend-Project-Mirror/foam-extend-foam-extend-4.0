@@ -28,9 +28,7 @@ Institut für Thermodynamik
 Technische Universität Braunschweig 
 Germany
 
-
 \*---------------------------------------------------------------------------*/
-
 
 #include "realGasSpecieThermo.H"
 #include "IOstreams.H"

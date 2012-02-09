@@ -40,8 +40,6 @@ SourceFiles
     realGasSpecieThermoI.H
     realGasSpecieThermo.C
 
-
-
 Author
 Christian Lucas
 Institut für Thermodynamik
@@ -100,7 +98,7 @@ Ostream& operator<<
 
 
 /*---------------------------------------------------------------------------*\
-                           Class specieThermo Declaration
+                           Class realGasSpecieThermo Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class thermo>
@@ -120,7 +118,7 @@ class realGasSpecieThermo
     // Private member functions
 
         // return the temperature corresponding to the value of the
-        //  thermodynamic property f, given the function f = F(T) and dF(T)/dT
+        //  thermodynamic property f, given the function f = F(rho,T) and dF(rho,T)/dT
         inline void T
         (
             scalar f,
@@ -131,11 +129,7 @@ class realGasSpecieThermo
             scalar (realGasSpecieThermo::*dFdT)(const scalar,const scalar) const
         ) const;
 
-  
-
 public:
-
-
 
         // Constructors
 
@@ -154,35 +148,17 @@ public:
         // Fundamaental properties
         // (These functions must be provided in derived types)
 
-            // Heat capacity at constant pressure [J/(kmol K)]
-            //scalar cp(const scalar) const;
-
-            // Enthalpy [J/kmol]
-            //scalar h(const scalar) const;
-
             // Sensible enthalpy [J/kmol]
             //virtual scalar hs(const scalar) const;
 
             // Chemical enthalpy [J/kmol]
             //virtual scalar hc(const scalar) const;
 
-            // Entropy [J/(kmol K)]
-            //virtual scalar s(const scalar) const;
-
-
         // Calculate and return derived properties
         // (These functions need not provided in derived types)
 
-            // Mole specific properties
-
-                //- Heat capacity at constant volume [J/(kmol K)]
-                //inline scalar cv(const scalar T, const scalar rho) const;
-
-                //- gamma = cp/cv []
-                //inline scalar gamma(const scalar T, const scalar rho) const;
-
-                // Internal energy [J/kmol]
-                // inline scalar e(const scalar rho, const scalar T) const;
+                //CL: isentropic expansion factor "gamma" (heat capacity ratio for perfect gas) 
+                inline scalar gamma(const scalar T, const scalar rho) const;
 
                 //- Sensible internal energy [J/kmol]
                 // inline scalar es(const scalar p, const scalar rho) const;
@@ -223,7 +199,7 @@ public:
                 //- Helmholtz free energy [J/kg]
                 inline scalar A(const scalar rho, const scalar T) const;
 
-                //Other variables
+                //CL: Other variables
 
 	        //- Return compressibility drho/dp at h=constant [s^2/m^2] 
                 inline scalar psiH(const scalar rho, const scalar T) const;
@@ -231,13 +207,16 @@ public:
                 //- Return compressibility drho/dp at e=constant [s^2/m^2]     
                 inline scalar psiE(const scalar rho, const scalar T) const;
 
+	        //- Return compressibility drho/dH at p=constant 
+                inline scalar drhodH(const scalar rho, const scalar T) const;
+
+	        //- Return compressibility drho/dE at p=constant 
+                inline scalar drhodE(const scalar rho, const scalar T) const;
 
         // Energy->temperature  inversion functions
 
             //- Temperature from Enthalpy given an initial temperature T0
             inline void TH(const scalar H,  scalar &T0,const scalar p, scalar &psi0) const;
-
-
 
             //- Temperature from internal energy given an initial temperature T0
             inline void TE(const scalar E, scalar &T0,const scalar p, scalar &psi0) const;

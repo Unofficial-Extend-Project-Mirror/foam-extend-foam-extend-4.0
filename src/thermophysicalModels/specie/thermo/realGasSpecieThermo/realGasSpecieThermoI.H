@@ -43,11 +43,10 @@ inline Foam::realGasSpecieThermo<thermo>::realGasSpecieThermo
 {}
 
 
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 
-// using two one dimensional newton solvers in a row
+//CL: using two one dimensional newton solvers in a row
 template<class thermo>
 inline void Foam::realGasSpecieThermo<thermo>::T
 (
@@ -76,8 +75,8 @@ inline void Foam::realGasSpecieThermo<thermo>::T
         i=0;
       	do
    	{   
-            // using a stabilizing newton solver 
-            // if the solve is diverging, the time step is reduced until the solver converges
+            //CL: using a stabilizing newton solver 
+            //CL: if the solve is diverging, the time step is reduced until the solver converges
             Tnew = Test - ((this->*F)(rho,Test) - f)/(this->*dFdT)(rho,Test)/(pow(2,i)); 
 	    i++;					
         }while
@@ -103,7 +102,7 @@ inline void Foam::realGasSpecieThermo<thermo>::T
                 << abort(FatalError);
         }
     } while
-    // both fields must converge
+    //CL: both fields must converge
     ( 
         (mag(mag(Tnew) - mag(Test)) > Ttol)
         ||
@@ -130,18 +129,24 @@ inline Foam::realGasSpecieThermo<thermo>::realGasSpecieThermo
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 
+template<class thermo>
+inline Foam::scalar Foam::realGasSpecieThermo<thermo>::gamma(const scalar rho,  const scalar T ) const
+{
+    return -1/(rho*this->p(rho,T))*this->cp(rho,T)/this->cv(rho,T)*this->dpdv(rho,T);
+}
+
 
 template<class thermo>
 inline Foam::scalar Foam::realGasSpecieThermo<thermo>::g(const scalar rho,  const scalar T ) const
 {
-    return this->h(rho, this->pReturn(rho,T)) - T*this->s(rho, this->pReturn(rho,T));
+    return this->h(rho, this->p(rho,T)) - T*this->s(rho, this->p(rho,T));
 }
 
 
 template<class thermo>
 inline Foam::scalar Foam::realGasSpecieThermo<thermo>::a(const scalar rho, const scalar T ) const
 {
-    return this->e(rho,this->pReturn(rho,T)) - T*this->s(rho,this->pReturn(rho,T));
+    return this->e(rho,this->p(rho,T)) - T*this->s(rho,this->p(rho,T));
 }
 
 
@@ -164,9 +169,6 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::H(const scalar rho, const
 {		
     return this->h(rho,  T)/this->W();
 }
-
-
-
 
 
 template<class thermo>
@@ -196,8 +198,8 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::A(const scalar rho,  cons
     return this->a(rho, T)/this->W();
 }
 
-//- Return compressibility drho/dp at h=constant [s^2/m^2]
-//- using Bridgeman's Table
+//CL:- Return compressibility drho/dp at h=constant [s^2/m^2]
+//CL:- using Bridgeman's Table
 template<class thermo>
 inline Foam::scalar Foam::realGasSpecieThermo<thermo>::psiH
 (
@@ -206,17 +208,17 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::psiH
     
 ) const
 {
-
     scalar beta=this->isobarExpCoef(rho,T);
+
     return  
     -(
-        (T*pow(beta,2)-beta)/this->cp(rho,T)
-        -this->isothermalCompressiblity(rho,T)*rho/this->W()
-    )*this->W();
+        (T*beta*beta-beta)/this->Cp(rho,T)
+        -this->isothermalCompressiblity(rho,T)*rho
+    );
 }
 
-//- Return compressibility drho/dp at e=constant [s^2/m^2]
-//- using Bridgeman's Table
+//CL:- Return compressibility drho/dp at e=constant [s^2/m^2]
+//CL:- using Bridgeman's Table
 template<class thermo>
 inline Foam::scalar Foam::realGasSpecieThermo<thermo>::psiE
 (
@@ -225,21 +227,50 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::psiE
     
 ) const
 {
-    scalar Vm = this->W()/rho;
-    scalar cp=this->cp(rho,T);
+    scalar V = 1/rho;
+    scalar cp=this->Cp(rho,T);
     scalar beta=this->isobarExpCoef(rho,T);
+
     return  
     -(
         (
-	    T*pow(beta,2)*Vm
+	    T*pow(beta,2)*V
 	    -this->isothermalCompressiblity(rho,T)*cp
 	)
 	/
 	(
-            cp*Vm
-            -beta*this->p(rho,T)*pow(Vm,2)
+            cp*V
+            -beta*this->p(rho,T)*pow(V,2)
 	)
-    )*this->W();
+    );
+}
+
+//CL:- Returns drho/dH at p=constant 
+//CL:- using Bridgeman's Table
+template<class thermo>
+inline Foam::scalar Foam::realGasSpecieThermo<thermo>::drhodH
+(
+    const scalar rho,
+    const scalar T
+    
+) const
+{
+    return -(rho*this->isobarExpCoef(rho,T))/this->Cp(rho,T);
+}
+
+//CL:- Returns drho/dE at p=constant 
+//CL:- using Bridgeman's Table
+template<class thermo>
+inline Foam::scalar Foam::realGasSpecieThermo<thermo>::drhodE
+(
+    const scalar rho,
+    const scalar T
+    
+) const
+{
+    scalar beta=this->isobarExpCoef(rho,T);
+
+    return -(rho*beta)/(this->Cp(rho,T)-beta*this->p(rho,T)/rho);
 }
 
 template<class thermo>

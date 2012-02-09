@@ -53,7 +53,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                         Class hPsiThermo Declaration
+                         Class realGasHThermo Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class MixtureType>
@@ -70,6 +70,8 @@ class realGasHThermo
         //- DensityField
         volScalarField rho_;
 
+        //- drhodh_Field
+        volScalarField drhodh_;
 
     // Private member functions
 
@@ -126,6 +128,12 @@ public:
             virtual const volScalarField& h() const
             {
                 return h_;
+            }
+
+            //CL: drhodh needed for pressure equation of the real gas solver 
+            virtual const volScalarField& drhodh() const
+            {
+                return drhodh_;
             }
 
         // Fields derived from thermodynamic state variables

@@ -41,13 +41,13 @@ writeCompression uncompressed;
 
 timeFormat      general;
 
-timePrecision   20;
+timePrecision   10;
 
 adjustTimeStep  yes;
 
-maxCo          0.05;
+maxCo          0.5;
 
-maxDeltaT       1e-4;
+maxDeltaT       1e-2;
 
 runTimeModifiable yes;
 

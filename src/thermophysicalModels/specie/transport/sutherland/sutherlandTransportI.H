@@ -155,6 +155,7 @@ inline scalar sutherlandTransport<thermo>::alpha(const scalar T) const
     return mu(T)*Cv_*(1.32 + 1.77*this->R()/Cv_)/CpBar;
 }
 
+// CL: for real gas thermo
 // Thermal conductivity [W/mK]
 template<class thermo>
 inline scalar sutherlandTransport<thermo>::kappa(const scalar rho, const scalar T) const
@@ -163,7 +164,7 @@ inline scalar sutherlandTransport<thermo>::kappa(const scalar rho, const scalar 
     return mu(T)*Cv_*(1.32 + 1.77*this->R()/Cv_);
 }
 
-
+// CL: for real gas thermo
 // Thermal diffusivity for enthalpy [kg/ms]
 template<class thermo>
 inline scalar sutherlandTransport<thermo>::alpha(const scalar rho, const scalar T) const
