@@ -98,6 +98,13 @@ protected:
             return matrixUpdateBuffer_;
         }
 
+        //- Calculate interpolation weights
+        tmp<scalarField> weights
+        (
+            const Field<Type>& fOwn,
+            const Field<Type>& fNei
+        ) const;
+
 
 public:
 

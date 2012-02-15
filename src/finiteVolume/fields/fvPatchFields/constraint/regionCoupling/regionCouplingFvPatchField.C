@@ -38,6 +38,103 @@ Author
 namespace Foam
 {
 
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+template<class Type>
+tmp<scalarField>
+regionCouplingFvPatchField<Type>::weights
+(
+    const Field<Type>& fOwn,
+    const Field<Type>& fNei
+) const
+{
+    tmp<scalarField> tweights(new scalarField(fOwn.size(), 0.5));
+    scalarField& weights = tweights();
+
+    // Larger small for complex arithmetic accuracy
+    const scalar kSmall = 1000*SMALL;
+
+# if 0
+    // Hrv's treatment
+    scalarField mOwn = mag(fOwn);
+    scalarField mNei = mag(fNei);
+    scalarField mean = 2*(mOwn*mNei)/(mOwn + mNei);
+
+    scalar den;
+
+    forAll (weights, faceI)
+    {
+        den = (mNei[faceI] - mOwn[faceI]);
+
+        // Note: complex arithmetic requires extra accuracy
+        // This is a division of two close subtractions
+        // HJ, 28/Sep/2011
+        if (mag(den) > kSmall)
+        {
+            // Limit weights for round-off safety
+            weights[faceI] =
+                Foam::max(0, Foam::min((mNei[faceI] - mean[faceI])/den, 1));
+        }
+        else
+        {
+            // Use 0.5 weights
+        }
+    }
+
+# else
+
+    // Henrik's treatment
+    const fvPatch& p = this->patch();
+
+    // Note: for interpolation, work with face fields, to allow wall-corrected
+    // diffusivity (eg wall functions) to operate correctly.
+    // HJ, 28/Sep/2011
+
+    // Mag long deltas are identical on both sides.  HJ, 28/Sep/2011
+    const magLongDelta& mld = magLongDelta::New(p.boundaryMesh().mesh());
+
+    scalarField magPhiOwn = mag(fOwn);
+    scalarField magPhiNei = mag(fNei);
+
+    const scalarField& pWeights = p.weights();
+    const scalarField& pDeltaCoeffs = p.deltaCoeffs();
+    const scalarField& pLongDelta = mld.magDelta(p.index());
+
+    forAll (weights, faceI)
+    {
+        scalar mOwn = magPhiOwn[faceI]/(1 - pWeights[faceI]);
+        scalar mNei = magPhiNei[faceI]/pWeights[faceI];
+
+        scalar den = magPhiNei[faceI] - magPhiOwn[faceI];
+
+        // Note: complex arithmetic requires extra accuracy
+        // This is a division of two close subtractions
+        // HJ, 28/Sep/2011
+        if (mag(den) > kSmall)
+        {
+            scalar mean = mOwn*mNei/
+                (
+                    (mOwn + mNei)*
+                    pLongDelta[faceI]*
+                    pDeltaCoeffs[faceI]
+                );
+
+            // Limit weights for round-off safety
+            weights[faceI] =
+                Foam::max(0, Foam::min((magPhiNei[faceI] - mean)/den, 1));
+        }
+        else
+        {
+            weights[faceI] = 0.5;
+        }
+    }
+
+#endif
+
+    return tweights;
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
@@ -260,98 +357,14 @@ void regionCouplingFvPatchField<Type>::initEvaluate
     // 5) Use weights to interpolate values
 
     const Field<Type>& fOwn = this->originalPatchField();
-    Field<Type> fNei = regionCouplePatch_.interpolate
+    const Field<Type> fNei = regionCouplePatch_.interpolate
     (
         this->shadowPatchField().originalPatchField()
     );
 
-    // Larger small for complex arithmetic accuracy
-    const scalar kSmall = 1000*SMALL;
-
-# if 0
-    // Hrv's treatment
-    scalarField mOwn = mag(fOwn);
-    scalarField mNei = mag(fNei);
-    scalarField mean = 2*(mOwn*mNei)/(mOwn + mNei);
-
-    scalarField weights(fOwn.size(), 0.5);
-
-    scalar den;
-
-    forAll (weights, faceI)
-    {
-        den = (mNei[faceI] - mOwn[faceI]);
-
-        // Note: complex arithmetic requires extra accuracy
-        // This is a division of two close subtractions
-        // HJ, 28/Sep/2011
-        if (mag(den) > kSmall)
-        {
-            // Limit weights for round-off safety
-            weights[faceI] =
-                Foam::max(0, Foam::min((mNei[faceI] - mean[faceI])/den, 1));
-        }
-        else
-        {
-            // Use 0.5 weights
-        }
-    }
-
-# else
-
-    // Henrik's treatment
-    const fvPatch& p = this->patch();
-
-    // Note: for interpolation, work with face fields, to allow wall-corrected
-    // diffusivity (eg wall functions) to operate correctly.
-    // HJ, 28/Sep/2011
-    Field<Type> f = *this;
-
-    // Mag long deltas are identical on both sides.  HJ, 28/Sep/2011
-    const magLongDelta& mld = magLongDelta::New(p.boundaryMesh().mesh());
-
-    scalarField magPhiOwn = mag(fOwn);
-    scalarField magPhiNei = mag(fNei);
-
-    const scalarField& pWeights = p.weights();
-    const scalarField& pDeltaCoeffs = p.deltaCoeffs();
-    const scalarField& pLongDelta = mld.magDelta(p.index());
-
-    // Calculate internal weights using field magnitude
-    scalarField weights(fOwn.size());
-
-    forAll (weights, faceI)
-    {
-        scalar mOwn = magPhiOwn[faceI]/(1 - pWeights[faceI]);
-        scalar mNei = magPhiNei[faceI]/pWeights[faceI];
-
-        scalar den = magPhiNei[faceI] - magPhiOwn[faceI];
-
-        // Note: complex arithmetic requires extra accuracy
-        // This is a division of two close subtractions
-        // HJ, 28/Sep/2011
-        if (mag(den) > kSmall)
-        {
-            scalar mean = mOwn*mNei/
-                (
-                    (mOwn + mNei)*
-                    pLongDelta[faceI]*
-                    pDeltaCoeffs[faceI]
-                );
-
-            // Limit weights for round-off safety
-            weights[faceI] =
-                Foam::max(0, Foam::min((magPhiNei[faceI] - mean)/den, 1));
-        }
-        else
-        {
-            weights[faceI] = 0.5;
-        }
-    }
-
-#endif
-
     // Do interpolation
+    scalarField weights = this->weights(fOwn, fNei);
+
     Field<Type>::operator=(weights*fOwn + (1.0 - weights)*fNei);
 
     if (regionCouplePatch_.bridgeOverlap())
@@ -387,6 +400,27 @@ void regionCouplingFvPatchField<Type>::updateCoeffs()
     if (this->updated())
     {
         return;
+    }
+
+    Field<Type> fOwn = this->patchInternalField();
+    Field<Type> fNei = this->patchNeighbourField();
+
+    // Do interpolation
+    scalarField weights = this->weights(fOwn, fNei);
+
+    Field<Type>::operator=(weights*fOwn + (1.0 - weights)*fNei);
+
+    if (regionCouplePatch_.bridgeOverlap())
+    {
+        // Symmetry treatment used for overlap
+        vectorField nHat = this->patch().nf();
+
+        Field<Type> pif = this->patchInternalField();
+
+        Field<Type> bridgeField =
+            0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
+
+        regionCouplePatch_.bridge(bridgeField, *this);
     }
 
     // Store original field for symmetric evaluation
