@@ -220,9 +220,9 @@ void epsilonWallFunctionFvPatchScalarField::updateCoeffs()
         if (yPlus > yPlusLam)
         {
             // Original OpenFOAM implementation
-            G[faceCellI] =
-                (nutw[faceI] + nuw[faceI])*magGradUw[faceI]
-               *Cmu25*sqrt(k[faceCellI])/(kappa_*y[faceI]);
+//             G[faceCellI] =
+//                 (nutw[faceI] + nuw[faceI])*magGradUw[faceI]
+//                *Cmu25*sqrt(k[faceCellI])/(kappa_*y[faceI]);
 
             // Change for consistency with Fluent implementation.
             // Emil Baric, NUMAP-FOAM 2011
