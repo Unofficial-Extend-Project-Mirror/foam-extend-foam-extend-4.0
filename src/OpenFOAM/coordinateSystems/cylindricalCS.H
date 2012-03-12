@@ -86,6 +86,7 @@ protected:
             bool translate
         ) const;
 
+
 public:
 
     //- Runtime type information
