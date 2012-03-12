@@ -46,18 +46,26 @@ void processorFvPatch::makeWeights(scalarField& w) const
     if (Pstream::parRun())
     {
         // The face normals point in the opposite direction on the other side
-        scalarField neighbFaceCentresCn
-        (
-            (
-                procPolyPatch_.neighbFaceAreas()
-               /(mag(procPolyPatch_.neighbFaceAreas()) + VSMALL)
-            )
-          & (
-              procPolyPatch_.neighbFaceCentres()
-            - procPolyPatch_.neighbFaceCellCentres())
-        );
 
-        w = neighbFaceCentresCn/((nf() & fvPatch::delta())
+        // Note: mag in the dot-product.
+        // For all valid meshes, the non-orthogonality will be less that
+        // 90 deg and the dot-product will be positive.  For invalid
+        // meshes (d & s <= 0), this will stabilise the calculation
+        // but the result will be poor.  HJ, 24/Aug/2011
+        scalarField neighbFaceCentresCn =
+            mag
+            (
+                (
+                    procPolyPatch_.neighbFaceAreas()/
+                    (mag(procPolyPatch_.neighbFaceAreas()) + VSMALL)
+                )
+              & (
+                    procPolyPatch_.neighbFaceCentres()
+                  - procPolyPatch_.neighbFaceCellCentres()
+                )
+            );
+
+        w = neighbFaceCentresCn/(mag(nf() & fvPatch::delta())
             + neighbFaceCentresCn);
     }
     else
@@ -71,7 +79,10 @@ void processorFvPatch::makeDeltaCoeffs(scalarField& dc) const
 {
     if (Pstream::parRun())
     {
-        dc = (1.0 - weights())/(nf() & fvPatch::delta());
+        vectorField d = delta();
+
+        // Stabilised form for bad meshes.  HJ, 24/Aug/2011
+        dc = 1.0/max((nf() & d), 0.05*mag(d));
     }
     else
     {

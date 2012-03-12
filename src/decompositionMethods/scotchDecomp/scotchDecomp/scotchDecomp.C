@@ -109,7 +109,6 @@ License
 #include "addToRunTimeSelectionTable.H"
 #include "floatScalar.H"
 #include "Time.H"
-#include "cyclicPolyPatch.H"
 #include "OFstream.H"
 
 extern "C"
@@ -465,17 +464,17 @@ Foam::labelList Foam::scotchDecomp::decompose
 
 Foam::labelList Foam::scotchDecomp::decompose
 (
-    const labelList& agglom,
-    const pointField& agglomPoints,
-    const scalarField& pointWeights
+    const labelList& fineToCoarse,
+    const pointField& coarsePoints,
+    const scalarField& coarseWeights
 )
 {
-    if (agglom.size() != mesh_.nCells())
+    if (fineToCoarse.size() != mesh_.nCells())
     {
         FatalErrorIn
         (
             "parMetisDecomp::decompose(const labelList&, const pointField&)"
-        )   << "Size of cell-to-coarse map " << agglom.size()
+        )   << "Size of cell-to-coarse map " << fineToCoarse.size()
             << " differs from number of cells in mesh " << mesh_.nCells()
             << exit(FatalError);
     }
@@ -488,11 +487,12 @@ Foam::labelList Foam::scotchDecomp::decompose
     {
         // Get cellCells on coarse mesh.
         labelListList cellCells;
+
         calcCellCells
         (
             mesh_,
-            agglom,
-            agglomPoints.size(),
+            fineToCoarse,
+            coarsePoints.size(),
             cellCells
         );
 
@@ -501,14 +501,14 @@ Foam::labelList Foam::scotchDecomp::decompose
 
     // Decompose using weights
     List<int> finalDecomp;
-    decompose(adjncy, xadj, pointWeights, finalDecomp);
+    decompose(adjncy, xadj, coarseWeights, finalDecomp);
 
     // Rework back into decomposition for original mesh_
-    labelList fineDistribution(agglom.size());
+    labelList fineDistribution(fineToCoarse.size());
 
     forAll(fineDistribution, i)
     {
-        fineDistribution[i] = finalDecomp[agglom[i]];
+        fineDistribution[i] = finalDecomp[fineToCoarse[i]];
     }
 
     return fineDistribution;
@@ -518,18 +518,18 @@ Foam::labelList Foam::scotchDecomp::decompose
 Foam::labelList Foam::scotchDecomp::decompose
 (
     const labelListList& globalCellCells,
-    const pointField& cellCentres,
+    const pointField& cc,
     const scalarField& cWeights
 )
 {
-    if (cellCentres.size() != globalCellCells.size())
+    if (cc.size() != globalCellCells.size())
     {
         FatalErrorIn
         (
             "scotchDecomp::decompose"
             "(const labelListList&, const pointField&, const scalarField&)"
         )   << "Inconsistent number of cells (" << globalCellCells.size()
-            << ") and number of cell centres (" << cellCentres.size()
+            << ") and number of cell centres (" << cc.size()
             << ")." << exit(FatalError);
     }
 
@@ -548,152 +548,14 @@ Foam::labelList Foam::scotchDecomp::decompose
 
     // Copy back to labelList
     labelList decomp(finalDecomp.size());
+
     forAll(decomp, i)
     {
         decomp[i] = finalDecomp[i];
     }
+
     return decomp;
 }
-
-
-void Foam::scotchDecomp::calcCSR
-(
-    const polyMesh& mesh,
-    List<int>& adjncy,
-    List<int>& xadj
-)
-{
-    // Make Metis CSR (Compressed Storage Format) storage
-    //   adjncy      : contains neighbours (= edges in graph)
-    //   xadj(celli) : start of information in adjncy for celli
-
-    xadj.setSize(mesh.nCells()+1);
-
-    // Initialise the number of internal faces of the cells to twice the
-    // number of internal faces
-    label nInternalFaces = 2*mesh.nInternalFaces();
-
-    // Check the boundary for coupled patches and add to the number of
-    // internal faces
-    const polyBoundaryMesh& pbm = mesh.boundaryMesh();
-
-    forAll(pbm, patchi)
-    {
-        if (isA<cyclicPolyPatch>(pbm[patchi]))
-        {
-            nInternalFaces += pbm[patchi].size();
-        }
-    }
-
-    // Create the adjncy array the size of the total number of internal and
-    // coupled faces
-    adjncy.setSize(nInternalFaces);
-
-    // Fill in xadj
-    // ~~~~~~~~~~~~
-    label freeAdj = 0;
-
-    for (label cellI = 0; cellI < mesh.nCells(); cellI++)
-    {
-        xadj[cellI] = freeAdj;
-
-        const labelList& cFaces = mesh.cells()[cellI];
-
-        forAll(cFaces, i)
-        {
-            label faceI = cFaces[i];
-
-            if
-            (
-                mesh.isInternalFace(faceI)
-             || isA<cyclicPolyPatch>(pbm[pbm.whichPatch(faceI)])
-            )
-            {
-                freeAdj++;
-            }
-        }
-    }
-    xadj[mesh.nCells()] = freeAdj;
-
-
-    // Fill in adjncy
-    // ~~~~~~~~~~~~~~
-
-    labelList nFacesPerCell(mesh.nCells(), 0);
-
-    // Internal faces
-    for (label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
-    {
-        label own = mesh.faceOwner()[faceI];
-        label nei = mesh.faceNeighbour()[faceI];
-
-        adjncy[xadj[own] + nFacesPerCell[own]++] = nei;
-        adjncy[xadj[nei] + nFacesPerCell[nei]++] = own;
-    }
-
-    // Coupled faces. Only cyclics done.
-    forAll(pbm, patchi)
-    {
-        if (isA<cyclicPolyPatch>(pbm[patchi]))
-        {
-            const unallocLabelList& faceCells = pbm[patchi].faceCells();
-
-            label sizeby2 = faceCells.size()/2;
-
-            for (label facei=0; facei<sizeby2; facei++)
-            {
-                label own = faceCells[facei];
-                label nei = faceCells[facei + sizeby2];
-
-                adjncy[xadj[own] + nFacesPerCell[own]++] = nei;
-                adjncy[xadj[nei] + nFacesPerCell[nei]++] = own;
-            }
-        }
-    }
-}
-
-
-// From cell-cell connections to Metis format (like CompactListList)
-void Foam::scotchDecomp::calcCSR
-(
-    const labelListList& cellCells,
-    List<int>& adjncy,
-    List<int>& xadj
-)
-{
-    // Count number of internal faces
-    label nConnections = 0;
-
-    forAll(cellCells, coarseI)
-    {
-        nConnections += cellCells[coarseI].size();
-    }
-
-    // Create the adjncy array as twice the size of the total number of
-    // internal faces
-    adjncy.setSize(nConnections);
-
-    xadj.setSize(cellCells.size()+1);
-
-
-    // Fill in xadj
-    // ~~~~~~~~~~~~
-    label freeAdj = 0;
-
-    forAll(cellCells, coarseI)
-    {
-        xadj[coarseI] = freeAdj;
-
-        const labelList& cCells = cellCells[coarseI];
-
-        forAll(cCells, i)
-        {
-            adjncy[freeAdj++] = cCells[i];
-        }
-    }
-    xadj[cellCells.size()] = freeAdj;
-}
-
 
 
 // ************************************************************************* //

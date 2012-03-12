@@ -51,9 +51,16 @@ void Foam::overlapGgiFvPatch::makeWeights(scalarField& w) const
     if (overlapGgiPolyPatch_.master())
     {
         vectorField n = nf();
+
+        // Note: mag in the dot-product.
+        // For all valid meshes, the non-orthogonality will be less that
+        // 90 deg and the dot-product will be positive.  For invalid
+        // meshes (d & s <= 0), this will stabilise the calculation
+        // but the result will be poor.  HJ, 24/Aug/2011
         scalarField nfc =
-            n & (overlapGgiPolyPatch_.reconFaceCellCentres() - Cf());
-        w = nfc/((n & (Cf() - Cn())) + nfc);
+            mag(n & (overlapGgiPolyPatch_.reconFaceCellCentres() - Cf()));
+
+        w = nfc/(mag(n & (Cf() - Cn())) + nfc);
     }
     else
     {
@@ -71,7 +78,10 @@ void Foam::overlapGgiFvPatch::makeDeltaCoeffs(scalarField& dc) const
 {
     if (overlapGgiPolyPatch_.master())
     {
-        dc = 1.0/max(nf() & delta(), 0.05*mag(delta()));
+        // Stabilised form for bad meshes.  HJ, 24/Aug/2011
+        vectorField d = delta();
+
+        dc = 1.0/max(nf() & d, 0.05*mag(d));
     }
     else
     {

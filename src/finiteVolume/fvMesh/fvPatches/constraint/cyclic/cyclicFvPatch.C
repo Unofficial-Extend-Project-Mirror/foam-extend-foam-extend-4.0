@@ -46,7 +46,12 @@ void cyclicFvPatch::makeWeights(scalarField& w) const
 {
     const scalarField& magFa = magSf();
 
-    scalarField deltas = nf() & fvPatch::delta();
+    // Note: mag in the dot-product.
+    // For all valid meshes, the non-orthogonality will be less that
+    // 90 deg and the dot-product will be positive.  For invalid
+    // meshes (d & s <= 0), this will stabilise the calculation
+    // but the result will be poor.  HJ, 24/Aug/2011
+    scalarField deltas = mag(nf() & fvPatch::delta());
     label sizeby2 = deltas.size()/2;
 
     scalar maxMatchError = 0;
@@ -100,15 +105,14 @@ void cyclicFvPatch::makeWeights(scalarField& w) const
 // Make patch face - neighbour cell distances
 void cyclicFvPatch::makeDeltaCoeffs(scalarField& dc) const
 {
-    scalarField deltas = nf() & fvPatch::delta();
-    label sizeby2 = deltas.size()/2;
+    vectorField d = delta();
+    vectorField n = nf();
+    label sizeby2 = d.size()/2;
 
     for (label facei = 0; facei < sizeby2; facei++)
     {
-        scalar di = deltas[facei];
-        scalar dni = deltas[facei + sizeby2];
-
-        dc[facei] = 1.0/(di + dni);
+        // Stabilised form for bad meshes.  HJ, 24/Aug/2011
+        dc[facei] = 1.0/max(n[facei] & d[facei], 0.05*mag(d[facei]));
         dc[facei + sizeby2] = dc[facei];
     }
 }

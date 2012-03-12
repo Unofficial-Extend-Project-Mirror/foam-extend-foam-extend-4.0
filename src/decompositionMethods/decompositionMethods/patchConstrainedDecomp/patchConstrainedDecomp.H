@@ -23,61 +23,74 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::manualDecomp
+    Foam::patchConstrainedDecomp
 
 Description
-    Decomposition given a cell-to-processor association in a file
+    Base decomposition type is modified by assigning patches to given
+    processors.  This is controlled by the patch entry, giving patch names
+    and processor index for them.
 
 SourceFiles
-    manualDecomp.C
+    patchConstrainedDecomp.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef manualDecomp_H
-#define manualDecomp_H
+#ifndef patchConstrainedDecomp_H
+#define patchConstrainedDecomp_H
 
 #include "decompositionMethod.H"
+#include "Tuple2.H"
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class manualDecomp Declaration
+                   Class patchConstrainedDecomp Declaration
 \*---------------------------------------------------------------------------*/
 
-class manualDecomp
+class patchConstrainedDecomp
 :
     public decompositionMethod
 {
+    // Private data types
+
+    typedef List<Tuple2<word, label> > procWordList;
+
+
     // Private data
 
+        //- Mesh
         const polyMesh& mesh_;
 
-        fileName decompDataFile_;
+        //- Decomposition dictionary
+        dictionary dict_;
+
+        //- Base decomposition method
+        autoPtr<decompositionMethod> baseDecompPtr_;
+
+        //- Patch names to processor association
+        procWordList patchConstraints_;
 
 
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        manualDecomp(const manualDecomp&);
+        patchConstrainedDecomp(const patchConstrainedDecomp&);
 
-        //- Disallow default bitwise assignment
-        void operator=(const manualDecomp&);
+        //- Disallow default bitwise copy construct and assignment
+        void operator=(const patchConstrainedDecomp&);
 
 
 public:
 
     //- Runtime type information
-    TypeName("manual");
+    TypeName("patchConstrained");
 
 
     // Constructors
 
-        //- Construct given the decomposition dictionary
-        manualDecomp(const dictionary& decompositionDict);
-
         //- Construct given the decomposition dictionary and mesh
-        manualDecomp
+        patchConstrainedDecomp
         (
             const dictionary& decompositionDict,
             const polyMesh& mesh
@@ -86,17 +99,16 @@ public:
 
     // Destructor
 
-        virtual ~manualDecomp()
+        virtual ~patchConstrainedDecomp()
         {}
 
 
     // Member Functions
 
-        //- manual decompose does not care about proc boundaries - is all
-        //  up to the user.
+        //- Return parallel aware of base method
         virtual bool parallelAware() const
         {
-            return true;
+            return baseDecompPtr_->parallelAware();
         }
 
         //- Decompose cells with weights

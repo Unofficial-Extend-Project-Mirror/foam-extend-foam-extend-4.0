@@ -26,13 +26,11 @@ License
 
 #include "parMetisDecomp.H"
 #include "metisDecomp.H"
-#include "scotchDecomp.H"
-#include "syncTools.H"
 #include "addToRunTimeSelectionTable.H"
 #include "floatScalar.H"
-#include "polyMesh.H"
 #include "Time.H"
 #include "labelIOField.H"
+#include "syncTools.H"
 #include "globalIndex.H"
 
 #include <mpi.h>
@@ -68,7 +66,6 @@ Foam::label Foam::parMetisDecomp::decompose
     Field<int>& cellWeights,
     Field<int>& faceWeights,
     const List<int>& options,
-
     List<int>& finalDecomp
 )
 {
@@ -406,7 +403,7 @@ Foam::labelList Foam::parMetisDecomp::decompose
     Field<int> adjncy;
     // Offsets into adjncy
     Field<int> xadj;
-    calcMetisDistributedCSR
+    calcDistributedCSR
     (
         mesh_,
         adjncy,
@@ -594,7 +591,6 @@ Foam::labelList Foam::parMetisDecomp::decompose
         cellWeights,
         faceWeights,
         options,
-
         finalDecomp
     );
 
@@ -706,7 +702,11 @@ Foam::labelList Foam::parMetisDecomp::decompose
                     label globalNei = globalNeighbour[bFaceI++];
                     faceI++;
 
-                    if (findIndex(dynRegionRegions[ownRegion], globalNei) == -1)
+                    if
+                    (
+                        findIndex(dynRegionRegions[ownRegion], globalNei)
+                     == -1
+                    )
                     {
                         dynRegionRegions[ownRegion].append(globalNei);
                     }
@@ -738,6 +738,7 @@ Foam::labelList Foam::parMetisDecomp::decompose
     {
         cellDistribution[cellI] = regionDecomp[cellToRegion[cellI]];
     }
+
     return cellDistribution;
 }
 
@@ -763,8 +764,12 @@ Foam::labelList Foam::parMetisDecomp::decompose
     // For running sequential ...
     if (Pstream::nProcs() <= 1)
     {
-        return metisDecomp(decompositionDict_, mesh_)
-            .decompose(globalCellCells, cellCentres, cWeights);
+        return metisDecomp(decompositionDict_, mesh_).decompose
+        (
+            globalCellCells,
+            cellCentres,
+            cWeights
+        );
     }
 
 
@@ -772,9 +777,11 @@ Foam::labelList Foam::parMetisDecomp::decompose
 
     // Connections
     Field<int> adjncy;
+
     // Offsets into adjncy
     Field<int> xadj;
-    scotchDecomp::calcCSR(globalCellCells, adjncy, xadj);
+
+    calcCSR(globalCellCells, adjncy, xadj);
 
     // decomposition options. 0 = use defaults
     List<int> options(3, 0);
@@ -857,7 +864,6 @@ Foam::labelList Foam::parMetisDecomp::decompose
         cellWeights,
         faceWeights,
         options,
-
         finalDecomp
     );
 
@@ -868,148 +874,6 @@ Foam::labelList Foam::parMetisDecomp::decompose
         decomp[i] = finalDecomp[i];
     }
     return decomp;
-}
-
-
-void Foam::parMetisDecomp::calcMetisDistributedCSR
-(
-    const polyMesh& mesh,
-    List<int>& adjncy,
-    List<int>& xadj
-)
-{
-    // Create global cell numbers
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    globalIndex globalCells(mesh.nCells());
-
-
-    //
-    // Make Metis Distributed CSR (Compressed Storage Format) storage
-    //   adjncy      : contains cellCells (= edges in graph)
-    //   xadj(celli) : start of information in adjncy for celli
-    //
-
-
-    const labelList& faceOwner = mesh.faceOwner();
-    const labelList& faceNeighbour = mesh.faceNeighbour();
-    const polyBoundaryMesh& patches = mesh.boundaryMesh();
-
-
-    // Get renumbered owner on other side of coupled faces
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    List<int> globalNeighbour(mesh.nFaces()-mesh.nInternalFaces());
-
-    forAll(patches, patchI)
-    {
-        const polyPatch& pp = patches[patchI];
-
-        if (pp.coupled())
-        {
-            label faceI = pp.start();
-            label bFaceI = pp.start() - mesh.nInternalFaces();
-
-            forAll(pp, i)
-            {
-                globalNeighbour[bFaceI++] = globalCells.toGlobal
-                (
-                    faceOwner[faceI++]
-                );
-            }
-        }
-    }
-
-    // Get the cell on the other side of coupled patches
-    syncTools::swapBoundaryFaceList(mesh, globalNeighbour, false);
-
-
-    // Count number of faces (internal + coupled)
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // Number of faces per cell
-    List<int> nFacesPerCell(mesh.nCells(), 0);
-
-    // Number of coupled faces
-    label nCoupledFaces = 0;
-
-    for (label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
-    {
-        nFacesPerCell[faceOwner[faceI]]++;
-        nFacesPerCell[faceNeighbour[faceI]]++;
-    }
-    // Handle coupled faces
-    forAll(patches, patchI)
-    {
-        const polyPatch& pp = patches[patchI];
-
-        if (pp.coupled())
-        {
-            label faceI = pp.start();
-
-            forAll(pp, i)
-            {
-                nCoupledFaces++;
-                nFacesPerCell[faceOwner[faceI++]]++;
-            }
-        }
-    }
-
-
-    // Fill in xadj
-    // ~~~~~~~~~~~~
-
-    xadj.setSize(mesh.nCells()+1);
-
-    int freeAdj = 0;
-
-    for (label cellI = 0; cellI < mesh.nCells(); cellI++)
-    {
-        xadj[cellI] = freeAdj;
-
-        freeAdj += nFacesPerCell[cellI];
-    }
-    xadj[mesh.nCells()] = freeAdj;
-
-
-
-    // Fill in adjncy
-    // ~~~~~~~~~~~~~~
-
-    adjncy.setSize(2*mesh.nInternalFaces() + nCoupledFaces);
-
-    nFacesPerCell = 0;
-
-    // For internal faces is just offsetted owner and neighbour
-    for (label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
-    {
-        label own = faceOwner[faceI];
-        label nei = faceNeighbour[faceI];
-
-        adjncy[xadj[own] + nFacesPerCell[own]++] = globalCells.toGlobal(nei);
-        adjncy[xadj[nei] + nFacesPerCell[nei]++] = globalCells.toGlobal(own);
-    }
-    // For boundary faces is offsetted coupled neighbour
-    forAll(patches, patchI)
-    {
-        const polyPatch& pp = patches[patchI];
-
-        if (pp.coupled())
-        {
-            label faceI = pp.start();
-            label bFaceI = pp.start()-mesh.nInternalFaces();
-
-            forAll(pp, i)
-            {
-                label own = faceOwner[faceI];
-                adjncy[xadj[own] + nFacesPerCell[own]++] =
-                    globalNeighbour[bFaceI];
-
-                faceI++;
-                bFaceI++;
-            }
-        }
-    }
 }
 
 

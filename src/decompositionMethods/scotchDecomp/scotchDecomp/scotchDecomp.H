@@ -23,69 +23,116 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::geomDecomp
+    Foam::scotchDecomp
 
 Description
-    Geometrical domain decomposition
+    Scotch domain decomposition
 
 SourceFiles
-    geomDecomp.C
+    scotchDecomp.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef geomDecomp_H
-#define geomDecomp_H
+#ifndef scotchDecomp_H
+#define scotchDecomp_H
 
 #include "decompositionMethod.H"
-#include "labelVector.H"
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class geomDecomp Declaration
+                        Class scotchDecomp Declaration
 \*---------------------------------------------------------------------------*/
 
-class geomDecomp
+class scotchDecomp
 :
     public decompositionMethod
 {
+    // Private data
+
+        //- Mesh reference
+        const polyMesh& mesh_;
+
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        geomDecomp(const geomDecomp&);
+        scotchDecomp(const scotchDecomp&);
 
         //- Disallow default bitwise assignment
-        void operator=(const geomDecomp&);
+        void operator=(const scotchDecomp&);
 
 
-protected:
+        //- Check and print error message
+        static void check(const int, const char*);
 
-    // Protected data
-
-        //- Geometric decomposition dictionary
-        const dictionary& geomDecomDict_;
-
-        //- Number of splits in the (x y z) direction
-        labelVector n_;
-
-        //- Small rotation to achieve smooth geometric decomposition
-        scalar delta_;
-
-        //- Small rotation tensor, calculated from delta
-        tensor rotDelta_;
+        label decompose
+        (
+            const List<int>& adjncy,
+            const List<int>& xadj,
+            const scalarField& cWeights,
+            List<int>& finalDecomp
+        );
 
 
 public:
 
+    //- Runtime type information
+    TypeName("scotch");
+
+
     // Constructors
 
-        //- Construct given the decomposition dictionary
-        //  and the derived type name
-        geomDecomp
+        //- Construct given the decomposition dictionary and mesh
+        scotchDecomp
         (
             const dictionary& decompositionDict,
-            const word& derivedType
+            const polyMesh& mesh
+        );
+
+
+    // Destructor
+
+        virtual ~scotchDecomp()
+        {}
+
+
+    // Member Functions
+
+        //- Return mesh
+        const polyMesh& mesh() const
+        {
+            return mesh_;
+        }
+
+        virtual bool parallelAware() const
+        {
+            // Scotch does not know about proc boundaries
+            return false;
+        }
+
+        //- Decompose cells with weights
+        virtual labelList decompose
+        (
+            const pointField& points,
+            const scalarField& pointWeights
+        );
+
+        //- Decompose cell clusters with weights on clusters
+        virtual labelList decompose
+        (
+            const labelList& fineToCoarse,
+            const pointField& coarsePoints,
+            const scalarField& coarseWeights
+        );
+
+        //- Decompose cells with weights with explicitly provided connectivity
+        virtual labelList decompose
+        (
+            const labelListList& globalCellCells,
+            const pointField& cc,
+            const scalarField& cWeights
         );
 };
 

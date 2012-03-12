@@ -54,13 +54,11 @@ namespace Foam
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-// Call Metis with options from dictionary.
 Foam::label Foam::metisDecomp::decompose
 (
     const List<int>& adjncy,
     const List<int>& xadj,
     const scalarField& cWeights,
-
     List<int>& finalDecomp
 )
 {
@@ -133,7 +131,8 @@ Foam::label Foam::metisDecomp::decompose
             if (method != "recursive" && method != "k-way")
             {
                 FatalErrorIn("metisDecomp::decompose()")
-                    << "Method " << method << " in metisCoeffs in dictionary : "
+                    << "Method " << method
+                    << " in metisCoeffs in dictionary : "
                     << decompositionDict_.name()
                     << " should be 'recursive' or 'k-way'"
                     << exit(FatalError);
@@ -340,7 +339,7 @@ Foam::labelList Foam::metisDecomp::decompose
 
     List<int> adjncy;
     List<int> xadj;
-    scotchDecomp::calcCSR
+    calcCSR
     (
         mesh_,
         adjncy,
@@ -363,18 +362,18 @@ Foam::labelList Foam::metisDecomp::decompose
 
 Foam::labelList Foam::metisDecomp::decompose
 (
-    const labelList& agglom,
-    const pointField& agglomPoints,
-    const scalarField& agglomWeights
+    const labelList& fineToCoarse,
+    const pointField& coarsePoints,
+    const scalarField& coarseWeights
 )
 {
-    if (agglom.size() != mesh_.nCells())
+    if (fineToCoarse.size() != mesh_.nCells())
     {
         FatalErrorIn
         (
             "metisDecomp::decompose"
             "(const labelList&, const pointField&, const scalarField&)"
-        )   << "Size of cell-to-coarse map " << agglom.size()
+        )   << "Size of cell-to-coarse map " << fineToCoarse.size()
             << " differs from number of cells in mesh " << mesh_.nCells()
             << exit(FatalError);
     }
@@ -390,25 +389,25 @@ Foam::labelList Foam::metisDecomp::decompose
         calcCellCells
         (
             mesh_,
-            agglom,
-            agglomPoints.size(),
+            fineToCoarse,
+            coarsePoints.size(),
             cellCells
         );
 
-        scotchDecomp::calcCSR(cellCells, adjncy, xadj);
+        calcCSR(cellCells, adjncy, xadj);
     }
 
     // Decompose using default weights
     List<int> finalDecomp;
-    decompose(adjncy, xadj, agglomWeights, finalDecomp);
+    decompose(adjncy, xadj, coarseWeights, finalDecomp);
 
 
     // Rework back into decomposition for original mesh_
-    labelList fineDistribution(agglom.size());
+    labelList fineDistribution(fineToCoarse.size());
 
     forAll(fineDistribution, i)
     {
-        fineDistribution[i] = finalDecomp[agglom[i]];
+        fineDistribution[i] = finalDecomp[fineToCoarse[i]];
     }
 
     return fineDistribution;
@@ -418,18 +417,18 @@ Foam::labelList Foam::metisDecomp::decompose
 Foam::labelList Foam::metisDecomp::decompose
 (
     const labelListList& globalCellCells,
-    const pointField& cellCentres,
-    const scalarField& cellWeights
+    const pointField& cc,
+    const scalarField& cWeights
 )
 {
-    if (cellCentres.size() != globalCellCells.size())
+    if (cc.size() != globalCellCells.size())
     {
         FatalErrorIn
         (
             "metisDecomp::decompose"
             "(const pointField&, const labelListList&, const scalarField&)"
         )   << "Inconsistent number of cells (" << globalCellCells.size()
-            << ") and number of cell centres (" << cellCentres.size()
+            << ") and number of cell centres (" << cc.size()
             << ")." << exit(FatalError);
     }
 
@@ -440,19 +439,20 @@ Foam::labelList Foam::metisDecomp::decompose
 
     List<int> adjncy;
     List<int> xadj;
-    scotchDecomp::calcCSR(globalCellCells, adjncy, xadj);
-
+    calcCSR(globalCellCells, adjncy, xadj);
 
     // Decompose using default weights
     List<int> finalDecomp;
-    decompose(adjncy, xadj, cellWeights, finalDecomp);
+    decompose(adjncy, xadj, cWeights, finalDecomp);
 
     // Copy back to labelList
     labelList decomp(finalDecomp.size());
+
     forAll(decomp, i)
     {
         decomp[i] = finalDecomp[i];
     }
+
     return decomp;
 }
 

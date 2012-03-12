@@ -56,6 +56,12 @@ class metisDecomp
 
     // Private Member Functions
 
+        //- Disallow default bitwise copy construct
+        metisDecomp(const metisDecomp&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const metisDecomp&);
+
         label decompose
         (
             const List<int>& adjncy,
@@ -63,10 +69,6 @@ class metisDecomp
             const scalarField& cellWeights,
             List<int>& finalDecomp
         );
-
-        //- Disallow default bitwise copy construct and assignment
-        void operator=(const metisDecomp&);
-        metisDecomp(const metisDecomp&);
 
 
 public:
@@ -99,44 +101,28 @@ public:
             return false;
         }
 
-        //- Return for every coordinate the wanted processor number. Use the
-        //  mesh connectivity (if needed)
-        //  Weights get normalised so the minimum value is 1 before truncation
-        //  to an integer so the weights should be multiples of the minimum
-        //  value. The overall sum of weights might otherwise overflow.
+        //- Decompose cells with weights
         virtual labelList decompose
         (
             const pointField& points,
             const scalarField& pointWeights
         );
 
-        //- Return for every coordinate the wanted processor number. Gets
-        //  passed agglomeration map (from fine to coarse cells) and coarse cell
-        //  location. Can be overridden by decomposers that provide this
-        //  functionality natively.
-        //  See note on weights above.
+        //- Decompose cell clusters with weights on clusters
         virtual labelList decompose
         (
-            const labelList& agglom,
-            const pointField& regionPoints,
-            const scalarField& regionWeights
+            const labelList& fineToCoarse,
+            const pointField& coarsePoints,
+            const scalarField& coarseWeights
         );
 
-        //- Return for every coordinate the wanted processor number. Explicitly
-        //  provided mesh connectivity.
-        //  The connectivity is equal to mesh.cellCells() except for
-        //  - in parallel the cell numbers are global cell numbers (starting
-        //    from 0 at processor0 and then incrementing all through the
-        //    processors)
-        //  - the connections are across coupled patches
-        //  See note on weights above.
+        //- Decompose cells with weights with explicitly provided connectivity
         virtual labelList decompose
         (
             const labelListList& globalCellCells,
             const pointField& cc,
             const scalarField& cWeights
         );
-
 };
 
 

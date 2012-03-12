@@ -64,9 +64,16 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
     if (ggiPolyPatch_.master())
     {
         vectorField n = nf();
-        scalarField nfc = n & (ggiPolyPatch_.reconFaceCellCentres() - Cf());
 
-        w = nfc/((n & (Cf() - Cn())) + nfc);
+        // Note: mag in the dot-product.
+        // For all valid meshes, the non-orthogonality will be less that
+        // 90 deg and the dot-product will be positive.  For invalid
+        // meshes (d & s <= 0), this will stabilise the calculation
+        // but the result will be poor.  HJ, 24/Aug/2011
+        scalarField nfc =
+            mag(n & (ggiPolyPatch_.reconFaceCellCentres() - Cf()));
+
+        w = nfc/(mag(n & (Cf() - Cn())) + nfc);
 
         if (bridgeOverlap())
         {
@@ -81,7 +88,9 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
         scalarField masterWeights(shadow().size());
         shadow().makeWeights(masterWeights);
 
-        w = interpolate(1 - masterWeights);
+        scalarField oneMinusW = 1 - masterWeights;
+
+        w = interpolate(oneMinusW);
 
         if (bridgeOverlap())
         {
@@ -98,7 +107,10 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
 {
     if (ggiPolyPatch_.master())
     {
-        dc = 1.0/max(nf() & delta(), 0.05*mag(delta()));
+        // Stabilised form for bad meshes.  HJ, 24/Aug/2011
+        vectorField d = delta();
+
+        dc = 1.0/max(nf() & d, 0.05*mag(d));
 
         if (bridgeOverlap())
         {
@@ -123,6 +135,7 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
 }
 
 
+// Make patch face non-orthogonality correction vectors
 void Foam::ggiFvPatch::makeCorrVecs(vectorField& cv) const
 {
     // Non-orthogonality correction on a ggi interface
@@ -133,15 +146,10 @@ void Foam::ggiFvPatch::makeCorrVecs(vectorField& cv) const
 
     vectorField patchDeltas = delta();
     vectorField n = nf();
-    cv = n - patchDeltas*patchDeltaCoeffs;
-}
 
-
-const Foam::ggiFvPatch& Foam::ggiFvPatch::shadow() const
-{
-    const fvPatch& p = this->boundaryMesh()[ggiPolyPatch_.shadowIndex()];
-
-    return refCast<const ggiFvPatch>(p);
+    // If non-orthogonality is over 90 deg, kill correction vector
+    // HJ, 6/Jan/2011
+    cv = pos(patchDeltas & n)*(n - patchDeltas*patchDeltaCoeffs);
 }
 
 
@@ -177,6 +185,14 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
 
         return tDelta;
     }
+}
+
+
+const Foam::ggiFvPatch& Foam::ggiFvPatch::shadow() const
+{
+    const fvPatch& p = this->boundaryMesh()[ggiPolyPatch_.shadowIndex()];
+
+    return refCast<const ggiFvPatch>(p);
 }
 
 

@@ -48,30 +48,64 @@ namespace Foam
 
 class decompositionMethod
 {
-
 protected:
 
     // Protected data
 
+        //- Decomposition dictionary
         const dictionary& decompositionDict_;
+
+        //- Number of processors in decomposition
         label nProcessors_;
 
 
-        //- Helper: determine (non-parallel) cellCells from mesh agglomeration.
+        //- Helper to convert connectivity supplied as cellCells into
+        //  simple CSR (Metis, scotch) storage
+        static void calcCSR
+        (
+            const labelListList& globalCellCells,
+            List<int>& adjncy,
+            List<int>& xadj
+        );
+
+        //- Helper: convert local connectivity from the mesh
+        //  into CSR (Metis, scotch) storage
+        //  Treats cyclics as coupled, but not processor patches
+        static void calcCSR
+        (
+            const polyMesh& mesh,
+            List<int>& adjncy,
+            List<int>& xadj
+        );
+
+        //- Helper: convert mesh connectivity into distributed CSR
+        //  Very dubious coding.  HJ, 1/Mar/2011
+        static void calcDistributedCSR
+        (
+            const polyMesh&,
+            List<int>& adjncy,
+            List<int>& xadj
+        );
+
+        //- Helper: determine (non-parallel) cellCells from mesh
+        // with agglomeration
         static void calcCellCells
         (
             const polyMesh& mesh,
-            const labelList& agglom,
+            const labelList& fineToCoarse,
             const label nCoarse,
             labelListList& cellCells
         );
+
 
 private:
 
     // Private Member Functions
 
-        //- Disallow default bitwise copy construct and assignment
+        //- Disallow default bitwise copy construct
         decompositionMethod(const decompositionMethod&);
+
+        //- Disallow default bitwise assignment
         void operator=(const decompositionMethod&);
 
 
@@ -109,7 +143,7 @@ public:
 
     // Selectors
 
-        //- Return a reference to the selected decomposition method
+        //- Return a pointer to the selected decomposition method
         static autoPtr<decompositionMethod> New
         (
             const dictionary& decompositionDict
@@ -148,59 +182,43 @@ public:
         //  proc boundaries)
         virtual bool parallelAware() const = 0;
 
-        //- Return for every coordinate the wanted processor number. Use the
-        //  mesh connectivity (if needed)
+        //- Decompose cells
+        //  If needed, use connectivity directly from the mesh
+        //  Calls decompose (below) with uniform weights
+        virtual labelList decompose(const pointField&);
+
+        //- Decompose cells with weights
         virtual labelList decompose
         (
             const pointField& points,
             const scalarField& pointWeights
         ) = 0;
 
-        //- Like decompose but with uniform weights on the points
-        virtual labelList decompose(const pointField&);
 
-
-        //- Return for every coordinate the wanted processor number. Gets
-        //  passed agglomeration map (from fine to coarse cells) and coarse cell
-        //  location. Can be overridden by decomposers that provide this
-        //  functionality natively. Coarse cells are local to the processor
-        //  (if in parallel). If you want to have coarse cells spanning
-        //  processors use the globalCellCells instead.
+        //- Decompose cell clusters
+        //  Calls decompose (below) with uniform weights
         virtual labelList decompose
         (
-            const labelList& cellToRegion,
-            const pointField& regionPoints,
-            const scalarField& regionWeights
+            const labelList& fineToCoarse,
+            const pointField& coarsePoints
         );
 
-        //- Like decompose but with uniform weights on the regions
+        //- Decompose cell clusters with weights on clusters
         virtual labelList decompose
         (
-            const labelList& cellToRegion,
-            const pointField& regionPoints
+            const labelList& fineToCoarse,
+            const pointField& coarsePoints,
+            const scalarField& coarseWeights
         );
 
 
-        //- Return for every coordinate the wanted processor number. Explicitly
-        //  provided connectivity - does not use mesh_.
-        //  The connectivity is equal to mesh.cellCells() except for
-        //  - in parallel the cell numbers are global cell numbers (starting
-        //    from 0 at processor0 and then incrementing all through the
-        //    processors)
-        //  - the connections are across coupled patches
+        //- Decompose cells with weights with explicitly provided connectivity
         virtual labelList decompose
         (
             const labelListList& globalCellCells,
             const pointField& cc,
             const scalarField& cWeights
         ) = 0;
-
-        //- Like decompose but with uniform weights on the cells
-        virtual labelList decompose
-        (
-            const labelListList& globalCellCells,
-            const pointField& cc
-        );
 
 };
 
