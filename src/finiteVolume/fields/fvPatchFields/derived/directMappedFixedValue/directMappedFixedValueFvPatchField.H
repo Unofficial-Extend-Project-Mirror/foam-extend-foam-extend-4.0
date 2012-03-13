@@ -62,6 +62,18 @@ class directMappedFixedValueFvPatchField
         //  setAverage_ is set true
         Type average_;
 
+        //- Current time index
+        label curTimeIndex_;
+
+        //- New values from interpolation
+        Field<Type> newValues_;
+
+    // Private member functions
+
+        //- Map field data
+        void mapField();
+
+
 public:
 
     //- Runtime type information
@@ -134,8 +146,19 @@ public:
 
         // Evaluation functions
 
-            //- Update the coefficients associated with the patch field
-            virtual void updateCoeffs();
+            //- Initialise the evaluation of the patch field
+            virtual void initEvaluate
+            (
+                const Pstream::commsTypes commsType = Pstream::blocking
+            );
+
+
+            //- Evaluate the patch field, sets Updated to false
+            virtual void evaluate
+            (
+                const Pstream::commsTypes commsType = Pstream::blocking
+            );
+
 
         //- Write
         virtual void write(Ostream&) const;

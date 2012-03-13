@@ -33,124 +33,12 @@ License
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
-directMappedFixedValueFvPatchField<Type>::directMappedFixedValueFvPatchField
-(
-    const fvPatch& p,
-    const DimensionedField<Type, volMesh>& iF
-)
-:
-    fixedValueFvPatchField<Type>(p, iF),
-    setAverage_(false),
-    average_(pTraits<Type>::zero)
-{}
-
-
-template<class Type>
-directMappedFixedValueFvPatchField<Type>::directMappedFixedValueFvPatchField
-(
-    const directMappedFixedValueFvPatchField<Type>& ptf,
-    const fvPatch& p,
-    const DimensionedField<Type, volMesh>& iF,
-    const fvPatchFieldMapper& mapper
-)
-:
-    fixedValueFvPatchField<Type>(ptf, p, iF, mapper),
-    setAverage_(ptf.setAverage_),
-    average_(ptf.average_)
+void directMappedFixedValueFvPatchField<Type>::mapField()
 {
-    if (!isA<directMappedPatchBase>(this->patch().patch()))
-    {
-        FatalErrorIn
-        (
-            "directMappedFixedValueFvPatchField<Type>::"
-            "directMappedFixedValueFvPatchField\n"
-            "(\n"
-            "    const directMappedFixedValueFvPatchField<Type>&,\n"
-            "    const fvPatch&,\n"
-            "    const Field<Type>&,\n"
-            "    const fvPatchFieldMapper&\n"
-            ")\n"
-        )   << "\n    patch type '" << p.type()
-            << "' not type '" << directMappedPatchBase::typeName << "'"
-            << "\n    for patch " << p.name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
-            << exit(FatalError);
-    }
-}
-
-
-template<class Type>
-directMappedFixedValueFvPatchField<Type>::directMappedFixedValueFvPatchField
-(
-    const fvPatch& p,
-    const DimensionedField<Type, volMesh>& iF,
-    const dictionary& dict
-)
-:
-    fixedValueFvPatchField<Type>(p, iF, dict),
-    setAverage_(readBool(dict.lookup("setAverage"))),
-    average_(pTraits<Type>(dict.lookup("average")))
-{
-    if (!isA<directMappedPatchBase>(this->patch().patch()))
-    {
-        FatalErrorIn
-        (
-            "directMappedFixedValueFvPatchField<Type>::"
-            "directMappedFixedValueFvPatchField\n"
-            "(\n"
-            "    const fvPatch& p,\n"
-            "    const DimensionedField<Type, volMesh>& iF,\n"
-            "    const dictionary& dict\n"
-            ")\n"
-        )   << "\n    patch type '" << p.type()
-            << "' not type '" << directMappedPatchBase::typeName << "'"
-            << "\n    for patch " << p.name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
-            << exit(FatalError);
-    }
-}
-
-
-template<class Type>
-directMappedFixedValueFvPatchField<Type>::directMappedFixedValueFvPatchField
-(
-    const directMappedFixedValueFvPatchField<Type>& ptf
-)
-:
-    fixedValueFvPatchField<Type>(ptf),
-    setAverage_(ptf.setAverage_),
-    average_(ptf.average_)
-{}
-
-
-template<class Type>
-directMappedFixedValueFvPatchField<Type>::directMappedFixedValueFvPatchField
-(
-    const directMappedFixedValueFvPatchField<Type>& ptf,
-    const DimensionedField<Type, volMesh>& iF
-)
-:
-    fixedValueFvPatchField<Type>(ptf, iF),
-    setAverage_(ptf.setAverage_),
-    average_(ptf.average_)
-{}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-template<class Type>
-void directMappedFixedValueFvPatchField<Type>::updateCoeffs()
-{
-    if (this->updated())
-    {
-        return;
-    }
-
     typedef GeometricField<Type, fvPatchField, volMesh> fieldType;
 
     // Get the scheduling information from the directMappedPatchBase
@@ -167,7 +55,11 @@ void directMappedFixedValueFvPatchField<Type>::updateCoeffs()
     const word& fldName = this->dimensionedInternalField().name();
 
     // Result of obtaining remote values
-    Field<Type> newValues;
+    if (debug)
+    {
+        Info<< "direct mapping field "
+            << this->dimensionedInternalField().name() << endl;
+    }
 
     switch (mpp.mode())
     {
@@ -175,11 +67,11 @@ void directMappedFixedValueFvPatchField<Type>::updateCoeffs()
         {
             if (mpp.sameRegion())
             {
-                newValues = this->internalField();
+                newValues_ = this->internalField();
             }
             else
             {
-                newValues = nbrMesh.lookupObject<fieldType>
+                newValues_ = nbrMesh.lookupObject<fieldType>
                 (
                     fldName
                 ).internalField();
@@ -191,7 +83,7 @@ void directMappedFixedValueFvPatchField<Type>::updateCoeffs()
                 distMap.constructSize(),
                 distMap.subMap(),
                 distMap.constructMap(),
-                newValues
+                newValues_
             );
 
             break;
@@ -218,7 +110,7 @@ void directMappedFixedValueFvPatchField<Type>::updateCoeffs()
             (
                 fldName
             );
-            newValues = nbrField.boundaryField()[nbrPatchID];
+            newValues_ = nbrField.boundaryField()[nbrPatchID];
             mapDistribute::distribute
             (
                 Pstream::defaultCommsType,
@@ -226,7 +118,7 @@ void directMappedFixedValueFvPatchField<Type>::updateCoeffs()
                 distMap.constructSize(),
                 distMap.subMap(),
                 distMap.constructMap(),
-                newValues
+                newValues_
             );
 
             break;
@@ -261,7 +153,7 @@ void directMappedFixedValueFvPatchField<Type>::updateCoeffs()
                 allValues
             );
 
-            newValues = this->patch().patchSlice(allValues);
+            newValues_ = this->patch().patchSlice(allValues);
 
             break;
         }
@@ -278,32 +170,174 @@ void directMappedFixedValueFvPatchField<Type>::updateCoeffs()
     if (setAverage_)
     {
         Type averagePsi =
-            gSum(this->patch().magSf()*newValues)
+            gSum(this->patch().magSf()*newValues_)
            /gSum(this->patch().magSf());
 
         if (mag(averagePsi)/mag(average_) > 0.5)
         {
-            newValues *= mag(average_)/mag(averagePsi);
+            newValues_ *= mag(average_)/mag(averagePsi);
         }
         else
         {
-            newValues += (average_ - averagePsi);
+            newValues_ += (average_ - averagePsi);
         }
     }
-
-    this->operator==(newValues);
 
     if (debug)
     {
         Info<< "directMapped on field:" << fldName
             << " patch:" << this->patch().name()
-            << "  avg:" << gAverage(*this)
-            << "  min:" << gMin(*this)
-            << "  max:" << gMax(*this)
+            << "  avg:" << gAverage(newValues_)
+            << "  min:" << gMin(newValues_)
+            << "  max:" << gMax(newValues_)
             << endl;
     }
+}
 
-    fixedValueFvPatchField<Type>::updateCoeffs();
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+template<class Type>
+directMappedFixedValueFvPatchField<Type>::directMappedFixedValueFvPatchField
+(
+    const fvPatch& p,
+    const DimensionedField<Type, volMesh>& iF
+)
+:
+    fixedValueFvPatchField<Type>(p, iF),
+    setAverage_(false),
+    average_(pTraits<Type>::zero),
+    curTimeIndex_(-1)
+{}
+
+
+template<class Type>
+directMappedFixedValueFvPatchField<Type>::directMappedFixedValueFvPatchField
+(
+    const fvPatch& p,
+    const DimensionedField<Type, volMesh>& iF,
+    const dictionary& dict
+)
+:
+    fixedValueFvPatchField<Type>(p, iF, dict),
+    setAverage_(readBool(dict.lookup("setAverage"))),
+    average_(pTraits<Type>(dict.lookup("average"))),
+    curTimeIndex_(-1)
+{
+    if (!isA<directMappedPatchBase>(this->patch().patch()))
+    {
+        FatalErrorIn
+        (
+            "directMappedFixedValueFvPatchField<Type>::"
+            "directMappedFixedValueFvPatchField\n"
+            "(\n"
+            "    const fvPatch& p,\n"
+            "    const DimensionedField<Type, volMesh>& iF,\n"
+            "    const dictionary& dict\n"
+            ")\n"
+        )   << "\n    patch type '" << p.type()
+            << "' not type '" << directMappedPatchBase::typeName << "'"
+            << "\n    for patch " << p.name()
+            << " of field " << this->dimensionedInternalField().name()
+            << " in file " << this->dimensionedInternalField().objectPath()
+            << exit(FatalError);
+    }
+}
+
+
+template<class Type>
+directMappedFixedValueFvPatchField<Type>::directMappedFixedValueFvPatchField
+(
+    const directMappedFixedValueFvPatchField<Type>& ptf,
+    const fvPatch& p,
+    const DimensionedField<Type, volMesh>& iF,
+    const fvPatchFieldMapper& mapper
+)
+:
+    fixedValueFvPatchField<Type>(ptf, p, iF, mapper),
+    setAverage_(ptf.setAverage_),
+    average_(ptf.average_),
+    curTimeIndex_(-1)
+{
+    if (!isA<directMappedPatchBase>(this->patch().patch()))
+    {
+        FatalErrorIn
+        (
+            "directMappedFixedValueFvPatchField<Type>::"
+            "directMappedFixedValueFvPatchField\n"
+            "(\n"
+            "    const directMappedFixedValueFvPatchField<Type>&,\n"
+            "    const fvPatch&,\n"
+            "    const Field<Type>&,\n"
+            "    const fvPatchFieldMapper&\n"
+            ")\n"
+        )   << "\n    patch type '" << p.type()
+            << "' not type '" << directMappedPatchBase::typeName << "'"
+            << "\n    for patch " << p.name()
+            << " of field " << this->dimensionedInternalField().name()
+            << " in file " << this->dimensionedInternalField().objectPath()
+            << exit(FatalError);
+    }
+}
+
+
+template<class Type>
+directMappedFixedValueFvPatchField<Type>::directMappedFixedValueFvPatchField
+(
+    const directMappedFixedValueFvPatchField<Type>& ptf
+)
+:
+    fixedValueFvPatchField<Type>(ptf),
+    setAverage_(ptf.setAverage_),
+    average_(ptf.average_),
+    curTimeIndex_(-1)
+{}
+
+
+template<class Type>
+directMappedFixedValueFvPatchField<Type>::directMappedFixedValueFvPatchField
+(
+    const directMappedFixedValueFvPatchField<Type>& ptf,
+    const DimensionedField<Type, volMesh>& iF
+)
+:
+    fixedValueFvPatchField<Type>(ptf, iF),
+    setAverage_(ptf.setAverage_),
+    average_(ptf.average_),
+    curTimeIndex_(-1)
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+void directMappedFixedValueFvPatchField<Type>::initEvaluate
+(
+    const Pstream::commsTypes commsType
+)
+{
+    // Note: All parallel comms need to happen at this stage
+    // HJ, 13/Mar/2012
+
+    // Only map
+    if (curTimeIndex_ != this->db().time().timeIndex())
+    {
+        mapField();
+
+        curTimeIndex_ = this->db().time().timeIndex();
+    }
+}
+
+
+template<class Type>
+void directMappedFixedValueFvPatchField<Type>::evaluate
+(
+    const Pstream::commsTypes commsType
+)
+{
+    this->operator==(newValues_);
+
+    fixedValueFvPatchField<Type>::evaluate();
 }
 
 

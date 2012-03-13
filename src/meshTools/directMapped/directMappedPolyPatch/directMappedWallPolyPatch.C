@@ -43,10 +43,7 @@ namespace Foam
 }
 
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::directMappedWallPolyPatch::directMappedWallPolyPatch
 (
@@ -164,42 +161,46 @@ Foam::directMappedWallPolyPatch::~directMappedWallPolyPatch()
 void Foam::directMappedWallPolyPatch::initGeometry()
 {
     wallPolyPatch::initGeometry();
-    directMappedPatchBase::clearOut();
 }
 
 //- Calculate the patch geometry
 void Foam::directMappedWallPolyPatch::calcGeometry()
 {
     wallPolyPatch::calcGeometry();
-    directMappedPatchBase::clearOut();
 }
 
 //- Initialise the patches for moving points
 void Foam::directMappedWallPolyPatch::initMovePoints(const pointField& p)
 {
     wallPolyPatch::initMovePoints(p);
+
+    // Force recalculation of mapping with new point position
+    // Note: this uses parallel communications.  HJ, 13/Mar/2012
     directMappedPatchBase::clearOut();
+    directMappedPatchBase::map();
 }
 
 //- Correct patches after moving points
 void Foam::directMappedWallPolyPatch::movePoints(const pointField& p)
 {
     wallPolyPatch::movePoints(p);
-    directMappedPatchBase::clearOut();
 }
 
 //- Initialise the update of the patch topology
 void Foam::directMappedWallPolyPatch::initUpdateMesh()
 {
     wallPolyPatch::initUpdateMesh();
+
+    // Force recalculation of mapping with new point position
+    // Note: this uses parallel communications.  HJ, 13/Mar/2012
     directMappedPatchBase::clearOut();
+    directMappedPatchBase::map();
 }
 
 //- Update of the patch topology
 void Foam::directMappedWallPolyPatch::updateMesh()
 {
     wallPolyPatch::updateMesh();
-    directMappedPatchBase::clearOut();
 }
 
 
