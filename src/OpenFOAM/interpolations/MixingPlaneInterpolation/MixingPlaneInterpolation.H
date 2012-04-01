@@ -156,6 +156,16 @@ public:
         };
 
 
+        //- Define type of mixing for field over patch
+        enum mixingType
+        {
+            averageFromNeighbourPatch,
+            averageFromNeighbourCellCenter,
+            averageFromOwnPatch,
+            zeroGradient,
+            doNothing
+        };
+
     // Static data
 
         ClassName("MixingPlaneInterpolation");
@@ -165,6 +175,9 @@ public:
 
        //- Orientation names
        static const NamedEnum<orientation, 13> orientationNames_;
+
+       //- mixing names
+       static const NamedEnum<mixingType, 5> mixingTypeNames_;
 
 
     // Constructors

@@ -50,7 +50,7 @@ Foam::NamedEnum
     "master",
     "slave",
     "both",
-    "userDefined",
+    "userDefined"
 };
 
 
@@ -94,5 +94,28 @@ const Foam::NamedEnum
 >
 Foam::MixingPlaneInterpolationName::orientationNames_;
 
+
+template<>
+const char*
+Foam::NamedEnum
+<
+    Foam::MixingPlaneInterpolationName::mixingType,
+    5
+>::names[] =
+{
+    "averageFromNeighbourPatch",
+    "averageFromNeighbourCellCenter",
+    "averageFromOwnPatch",
+    "zeroGradient",
+    "doNothing"
+};
+
+
+const Foam::NamedEnum
+<
+    Foam::MixingPlaneInterpolationName::mixingType,
+    5
+>
+Foam::MixingPlaneInterpolationName::mixingTypeNames_;
 
 // ************************************************************************* //
