@@ -53,8 +53,8 @@ Contributor
 
 Giving credit where credit is due:
     1: Hakan Nilsson from the Chalmers University of Technology came up with the
-       initial idea of using a combination of 2 GGI interfaces sharing a common,
-       single-face 360 ribbons patch in order to compute the circumferential
+       initial idea of using a combination of 2 GGI interfaces sharing a common
+       single-face 360 degree ribbons patch in order to compute the circumferential
        average of fields. This implementation of the mixingPlane interpolation
        algorithm is an exploration of this simple, but rather powerful idea.
 
@@ -62,7 +62,7 @@ Giving credit where credit is due:
        simulation runs for testing this interpolation algorithm. Testing is
        obviously an essential part of any new development.
 
-    3: The author also want to acknowledge the usefull comments from many
+    3: The authors also want to acknowledge the useful comments from many
        colleagues in the OpenFOAM Turbomachinery Special Interest Group.
 
 
