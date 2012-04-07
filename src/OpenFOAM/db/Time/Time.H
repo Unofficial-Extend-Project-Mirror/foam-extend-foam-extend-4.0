@@ -187,7 +187,8 @@ public:
             const fileName& rootPath,
             const fileName& caseName,
             const word& systemName = "system",
-            const word& constantName = "constant"
+            const word& constantName = "constant",
+            const bool enableFunctionObjects = true
         );
 
         //- Construct given dictionary, rootPath and casePath
@@ -197,7 +198,8 @@ public:
             const fileName& rootPath,
             const fileName& caseName,
             const word& systemName = "system",
-            const word& constantName = "constant"
+            const word& constantName = "constant",
+            const bool enableFunctionObjects = true
         );
 
         //- Construct given endTime, rootPath and casePath
@@ -206,7 +208,8 @@ public:
             const fileName& rootPath,
             const fileName& caseName,
             const word& systemName = "system",
-            const word& constantName = "constant"
+            const word& constantName = "constant",
+            const bool enableFunctionObjects = true
         );
 
 

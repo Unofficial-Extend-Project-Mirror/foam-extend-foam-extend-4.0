@@ -191,7 +191,8 @@ Foam::Time::Time
     const fileName& rootPath,
     const fileName& caseName,
     const word& systemName,
-    const word& constantName
+    const word& constantName,
+    const bool enableFunctionObjects
 )
 :
     TimePaths
@@ -234,7 +235,7 @@ Foam::Time::Time
     runTimeModifiable_(true),
 
     readLibs_(controlDict_, "libs"),
-    functionObjects_(*this)
+    functionObjects_(*this, enableFunctionObjects)
 {
     setControls();
 }
@@ -246,7 +247,8 @@ Foam::Time::Time
     const fileName& rootPath,
     const fileName& caseName,
     const word& systemName,
-    const word& constantName
+    const word& constantName,
+    const bool enableFunctionObjects
 )
 :
     TimePaths
@@ -290,7 +292,7 @@ Foam::Time::Time
     runTimeModifiable_(true),
 
     readLibs_(controlDict_, "libs"),
-    functionObjects_(*this)
+    functionObjects_(*this, enableFunctionObjects)
 {
     setControls();
 }
@@ -301,7 +303,8 @@ Foam::Time::Time
     const fileName& rootPath,
     const fileName& caseName,
     const word& systemName,
-    const word& constantName
+    const word& constantName,
+    const bool enableFunctionObjects
 )
 :
     TimePaths
@@ -344,7 +347,7 @@ Foam::Time::Time
     runTimeModifiable_(true),
 
     readLibs_(controlDict_, "libs"),
-    functionObjects_(*this)
+    functionObjects_(*this, enableFunctionObjects)
 {}
 
 

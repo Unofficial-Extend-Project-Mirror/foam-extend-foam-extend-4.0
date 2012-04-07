@@ -48,6 +48,7 @@ Foam::argList::initValidTables::initValidTables()
     validOptions.set("case", "dir");
     validOptions.set("parallel", "");
     validParOptions.set("parallel", "");
+    validOptions.set("noFunctionObjects", "");
 
     Pstream::addValidParOptions(validParOptions);
 }
