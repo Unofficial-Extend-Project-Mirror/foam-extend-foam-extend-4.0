@@ -135,7 +135,7 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
                 scalar sumShadowAreas = sum(shadowAreas);
                 scalar sumMixingAreas = sum(mixingPlanePatchAreas);
 
-
+#if 0   // Remove this for now                
                 Info<< "Mixing plane functionObject: area check " << nl
                     << "     "  << "Master " << mixingMaster.name()
                     << " = " << sumMasterAreas << nl
@@ -145,7 +145,7 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
                     << "     "  << "mixingPlanePatchAreas = " << mixingPlanePatchAreas
                     //<< "     "  << "mixingPlanePatchPoints = " << mixingPlanePatchPoints
                     << endl;
-
+#endif
 
                 // Calculate master to strip sum
                 scalarField masterToStripsAreas(mixingPlanePatch.size(), 0);
