@@ -522,6 +522,13 @@ export MPI_BUFFER_SIZE
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PYTHON_DIR is initialized to: $PYTHON_DIR"
 
+# Load PyFoam
+# ~~~~~~~~~~~
+[ -z "$PYFOAM_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/PyFoam-0.5.6 ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.5.6/platforms/noarch/etc/PyFoam-0.5.6.sh
+}
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PYFOAM_DIR is initialized to: $PYFOAM_DIR"
+
 
 # Load QT
 # ~~~~~~~

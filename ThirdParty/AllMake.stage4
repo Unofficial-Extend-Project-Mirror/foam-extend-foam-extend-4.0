@@ -74,7 +74,7 @@ then
     if [ -d "$QT_BIN_DIR" -a -r "$QT_BIN_DIR"/qmake ]
     then
         ( rpm_make -p ParaView-3.8.1 -s ParaView-3.8.1.spec -u http://www.paraview.org/files/v3.8/ParaView-3.8.1.tar.gz \
-            -a --define='_qmakePath $QT_BIN_DIR/qmake'      
+            -f --define='_qmakePath $QT_BIN_DIR/qmake'      
         )
     else
         echo "WARNING: "

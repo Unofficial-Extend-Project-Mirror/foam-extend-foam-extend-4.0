@@ -430,9 +430,15 @@ if ( $?CMAKE_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.3 ) then
 endif
 
 # Python
-# ~~~~~
+# ~~~~~~
 if ( $?PYTHON_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/Python-2.7 ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/Python-2.7/platforms/$WM_OPTIONS/etc/Python-2.7.csh
+endif
+
+# PyFoam
+# ~~~~~~
+if ( $?PYFOAM_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.5.6 ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.5.6/platforms/noarch/etc/PyFoam-0.5.6.csh
 endif
 
 # QT

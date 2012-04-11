@@ -125,6 +125,16 @@ fi
 #    echo ""
 #fi
 
+# PyFoam
+if [ -z "$PYFOAM_SYSTEM" ] 
+then
+    ( rpm_make -p PyFoam-0.5.6 -s PyFoam-0.5.6.spec  -u http://openfoamwiki.net/images/b/b8/PyFoam-0.5.6.tar.gz -n PyFoam-0.5.6-1.noarch -a noarch)
+else
+    echo "Using system installed PyFoam"
+    echo ""
+fi
+
+
 echo ========================================
 echo Done ThirdParty AllMake: Stage3
 echo ========================================
