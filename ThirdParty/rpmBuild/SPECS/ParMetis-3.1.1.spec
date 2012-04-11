@@ -73,7 +73,7 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis
+URL:                    http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis/OLD
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
