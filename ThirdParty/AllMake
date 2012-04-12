@@ -71,6 +71,9 @@ echo
 # Running stage 4
 ./AllMake.stage4
 
+# Running stage 5
+./AllMake.stage5
+
 echo ========================================
 echo Done ThirdParty Allwmake
 echo ========================================

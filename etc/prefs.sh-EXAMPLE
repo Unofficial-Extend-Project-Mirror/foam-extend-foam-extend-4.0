@@ -151,6 +151,12 @@ compilerInstall=System
 # System installed m4
 #export M4_SYSTEM=1
 
+# System installed PyFoam
+#export PYFOAM_SYSTEM=1
+
+# System installed swak4Foam
+#export SWAK4FOAM_SYSTEM=1
+
 # Specify ParaView version
 # ~~~~~~~~~~~~~~~~~~~~~~~~
 #export ParaView_VERSION=git        # eg, cvs/git version

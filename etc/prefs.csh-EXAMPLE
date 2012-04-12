@@ -140,6 +140,20 @@
 #setenv PARAVIEW_DIR path_to_system_installed_paraview
 #setenv PARAVIEW_BIN_DIR $PARAVIEW_DIR/bin
 
+# System installed bison
+#setenv BISON_SYSTEM 1
+
+# System installed flex
+#setenv FLEX_SYSTEM 1
+
+# System installed m4
+#setenv M4_SYSTEM 1
+
+# System installed PyFoam
+#setenv PYFOAM_SYSTEM 1
+
+# System installed swak4Foam
+#setenv SWAK4FOAM_SYSTEM 1
 
 # Specify ParaView version
 # ~~~~~~~~~~~~~~~~~~~~~~~~
