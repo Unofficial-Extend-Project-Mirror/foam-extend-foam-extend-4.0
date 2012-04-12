@@ -166,8 +166,8 @@ rpm_build()
     cd $buildBase
 
     [ -e ./SPECS/$specFile ] || {
-        echo "rpm_build: missing SPEC file for package $package. Aborting."
-        return 1
+        echo "rpm_build: Error: missing SPEC file for package $package. Aborting."
+        exit -1
     }
 
     #Build RPM package
