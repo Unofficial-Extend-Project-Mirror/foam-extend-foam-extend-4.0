@@ -1,0 +1,18 @@
+;; This buffer is for notes you don't want to save, and for Lisp evaluation.
+;; If you want to create a file, visit that file with C-x C-f,
+;; then enter the text in that file's own buffer.
+
+
+4.0	0.74093345
+5.0	0.6357758
+6.0	0.5161266
+7.0	0.4217449
+8.0	0.3340517
+9.0	0.2578775165
+10.0	0.19396550099999998
+11.0	0.141944088
+12.0	0.1021848945
+13.0	0.0761742195
+14.0	0.059824613
+17.0	0.0379013075
+20.0	0.030469678

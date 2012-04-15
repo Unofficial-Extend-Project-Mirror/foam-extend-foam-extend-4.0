@@ -1,0 +1,62 @@
+#!/bin/bash
+# 
+#set -x
+
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+# Load additional RunFunctions 
+. ./RunFunctionsSupplemental
+
+export caseName=`basename $PWD`
+
+#We stop this script when we encounter a problem
+trap "exit -1" ERR
+
+echo "$caseName: Creating the file blockMeshDict using m4"
+(cd constant/polyMesh; m4 -P blockMeshDict.m4 > blockMeshDict)
+
+echo "$caseName: Running blockMesh"
+runApplicationAndReportOnError blockMesh
+
+echo "$caseName: Updating the boundary file"
+#if not using PyFOAM, use this pre-configured boundary file
+cp constant/polyMesh/boundary.preconfigured constant/polyMesh/boundary
+
+# if using PyFOAM, use these commands instead
+# pyFoamModifyMixingPlaneBoundary.py . B_UPSTREAM \
+#     --shadowName B_DOWNSTREAM \
+#     --profileType radial \
+#     --coordinateSystemType cylindrical \
+#     --coordinateSystemOrigin "(0 0 0)" \
+#     --coordinateSystemAxis "(0 0 1)" \
+#     --coordinateSystemDirection "(1 0 0)"
+
+# pyFoamModifyMixingPlaneBoundary.py . B_DOWNSTREAM \
+#     --shadowName B_UPSTREAM \
+#     --profileType radial \
+#     --coordinateSystemType cylindrical \
+#     --coordinateSystemOrigin "(0 0 0)" \
+#     --coordinateSystemAxis "(0 0 1)" \
+#     --coordinateSystemDirection "(1 0 0)"
+
+# pyFoamModifyGGIBoundary.py . sideWallA_BB_cyclic1 \
+#     --shadowName sideWallA_BB_cyclic2 \
+#     --rotationAxis "(0 0 1)" \
+#     --patchZoneName sideWallA_BB_cyclic1Zone \
+#     --rotationAngle 60 
+
+# pyFoamModifyGGIBoundary.py . sideWallA_BB_cyclic2 \
+#     --shadowName sideWallA_BB_cyclic1 \
+#     --rotationAxis "(0 0 1)" \
+#     --patchZoneName sideWallA_BB_cyclic2Zone \
+#     --rotationAngle -60 
+
+echo "$caseName: Creating the starting time directory"
+cp -r 0_orig 0
+
+runApplication setSet -batch setBatchGgi
+runApplication setsToZones -noFlipMap
+
+echo "$caseName: Running laplacianFoam"
+runApplicationAndReportOnError laplacianFoam
+

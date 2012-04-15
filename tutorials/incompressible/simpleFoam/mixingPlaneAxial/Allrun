@@ -1,0 +1,37 @@
+#!/bin/bash
+# 
+#set -x
+
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+# Load additional RunFunctions 
+. ./RunFunctionsSupplemental
+
+export caseName=`basename $PWD`
+
+#We stop this script when we encounter a problem
+trap "exit -1" ERR
+
+echo "$caseName: Creating the file blockMeshDict using m4"
+(cd constant/polyMesh; m4 -P blockMeshDict.m4 > blockMeshDict)
+
+echo "$caseName: Running blockMesh"
+runApplicationAndReportOnError blockMesh
+
+echo "$caseName: Updating the boundary file"
+#if not using PyFOAM, use this pre-configured boundary file
+cp constant/polyMesh/boundary.preconfigured constant/polyMesh/boundary
+
+echo "$caseName: Creating the starting time directory"
+cp -r 0_orig 0
+
+runApplicationAndReportOnError setSet -batch setBatchGGIZone
+runApplicationAndReportOnError setsToZones -noFlipMap
+
+echo "$caseName: Running potentialFoam"
+runApplicationAndReportOnError potentialFoam
+
+echo "$caseName: Running simpleFoam"
+runApplicationAndReportOnError simpleFoam
+
+

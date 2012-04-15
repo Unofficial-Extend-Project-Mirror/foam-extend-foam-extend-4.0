@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Compile addSwirlAndRotation
+wmake addSwirlAndRotation
+
+# Generate the reference test case
+# The GGI and mixingPlane test cases postprocessing results
+# will be compared with the results from this test case
+(cd Case1.1; ./Allrun)
+
+# Generate GGI test cases
+(cd Case1.1_GGI; ./Allrun)
+(cd Case1.1_GGI_sector_90deg; ./Allrun)
+
+# Generate mixingPlane test cases
+(cd Case1.1_mixingPlane; ./Allrun)
+(cd Case1.1_mixingPlane_sector_AB_60deg; ./Allrun)
+(cd Case1.1_mixingPlane_Upstream13_Downstream8; ./Allrun)

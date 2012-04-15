@@ -1,0 +1,27 @@
+#!/bin/bash
+# 
+# Source clean functions
+. $WM_PROJECT_DIR/bin/tools/CleanFunctions
+
+#set -x
+
+cleanTimeZero ()
+{
+  rm -rf 0 > /dev/null 2>&1
+}
+
+cleanPyFoam ()
+{
+  rm PlyParser_FoamFileParser_parsetab.* > /dev/null 2>&1
+}
+
+cleanVTK ()
+{
+  rm -rf VTK > /dev/null 2>&1
+}
+
+# Cleaning up the case
+cleanCase
+cleanTimeZero
+cleanPyFoam
+cleanVTK

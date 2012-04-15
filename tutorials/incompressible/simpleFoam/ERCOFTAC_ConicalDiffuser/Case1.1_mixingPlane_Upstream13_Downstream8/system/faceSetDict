@@ -1,0 +1,55 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      faceSetDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Name of set to operate on
+name f0;
+
+// One of clear/new/invert/add/delete|subset/list
+action new;
+
+// Actions to apply to pointSet. These are all the topoSetSource's ending
+// in ..ToFace (see the meshTools library).
+topoSetSources
+(
+    //  Select by explicitly providing face labels
+    labelToFace
+    {
+        value (
+93981 
+95171
+95173
+95177
+95178
+95179
+95181
+95182
+95185
+95187
+95292
+95293
+95294
+95298
+95301
+95305
+95306
+95307
+);   // labels of faces
+    }
+
+);
+
+// ************************************************************************* //
