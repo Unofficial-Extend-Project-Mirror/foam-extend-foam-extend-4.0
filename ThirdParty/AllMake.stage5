@@ -55,28 +55,31 @@ echo "Starting ThirdParty AllMake: Stage5     "
 echo "========================================"
 echo
 
-# swak4Foam - Version 1.6
+# swak4Foam - Version 0.2.0
+# In fact, we are basically tracking the head branch from the Mercurial repository
+# which is also replicated under the Breeder_1.7 section of the Subversion repository
+#
 if [ -z "$SWAK4FOAM_SYSTEM" ] 
 then
     # Do we need to download the source code?
     # We choose to put the source code under ./rpmBuild/BUILD prior to compiling.
     # We will not generate a rpm package, but all ThirdParty source code will be
     # centralized under the same scratch area
-    if [ ! -e ./rpmBuild/BUILD/swak4Foam-1.6 ]; 
+    if [ ! -e ./rpmBuild/BUILD/swak4Foam-0.2.0 ]; 
     then
 	echo "Checking for a Mercurial client: hg"
         command -v hg >/dev/null
         if [ $? -eq 0 ];
 	then
-	    echo "Using Mercurial/hg to download the source code"
-	    (cd ./rpmBuild/BUILD; hg clone http://openfoam-extend.hg.sourceforge.net:8000/hgroot/openfoam-extend/swak4Foam swak4Foam-1.6)
+	    echo "Using Mercurial/hg to download the source code for swak4Foam"
+	    (cd ./rpmBuild/BUILD; hg clone http://openfoam-extend.hg.sourceforge.net:8000/hgroot/openfoam-extend/swak4Foam swak4Foam-0.2.0)
         else
 	    echo "Warning: Mercurial/hg is not installed. Switching to an alternate Subversion repository"
             command -v svn >/dev/null
             if [ $? -eq 0 ];
 	    then
-		echo "Using Subversion/svn to download the source code"
-		(cd ./rpmBuild/BUILD; svn checkout https://openfoam-extend.svn.sourceforge.net/svnroot/openfoam-extend/trunk/Breeder_1.7/libraries/swak4Foam swak4Foam-1.6)
+		echo "Using Subversion/svn to download the source code for swak4Foam"
+		(cd ./rpmBuild/BUILD; svn checkout https://openfoam-extend.svn.sourceforge.net/svnroot/openfoam-extend/trunk/Breeder_1.7/libraries/swak4Foam swak4Foam-0.2.0)
             else
 		echo "Error: Please install either a Mercurial or Subversion client in order to download the source code for swak4Foam"
 		exit -1
@@ -85,13 +88,13 @@ then
         # We move the compilation results directly to $FOAM_SITE_APPBIN and $FOAM_SITE_LIBBIN
         # If you prefer to keep the libraries and tools under $FOAM_USER_LIBBIN and $FOAM_USER_APPBIN, simply
         # comment out the next two lines
-	(cd ./rpmBuild/BUILD/swak4Foam-1.6; find . -name files   | xargs -n 1 sed -i.old "s/FOAM_USER/FOAM_SITE/g")
-	(cd ./rpmBuild/BUILD/swak4Foam-1.6; find . -name options | xargs -n 1 sed -i.old "s/FOAM_USER/FOAM_SITE/g")
+	(cd ./rpmBuild/BUILD/swak4Foam-0.2.0; find . -name files   | xargs -n 1 sed -i.old "s/FOAM_USER/FOAM_SITE/g")
+	(cd ./rpmBuild/BUILD/swak4Foam-0.2.0; find . -name options | xargs -n 1 sed -i.old "s/FOAM_USER/FOAM_SITE/g")
 
         # We recompile everything
-	(cd ./rpmBuild/BUILD/swak4Foam-1.6; ./Allwclean; ./Allwmake)
+	(cd ./rpmBuild/BUILD/swak4Foam-0.2.0; ./Allwclean; ./Allwmake)
     else
-	echo "The source code for swak4Foam is already present under ./rpmBuild/BUILD/swak4Foam-1.6"
+	echo "The source code for swak4Foam is already present under ./rpmBuild/BUILD/swak4Foam-0.2.0"
 	echo "Please remove this directory if you want to refresh your installation of swak4Foam" 
     fi
     echo ""
