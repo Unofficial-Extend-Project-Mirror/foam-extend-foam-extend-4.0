@@ -437,8 +437,8 @@ endif
 
 # PyFoam
 # ~~~~~~
-if ( $?PYFOAM_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.5.6 ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.5.6/platforms/noarch/etc/PyFoam-0.5.6.csh
+if ( $?PYFOAM_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.5.7 ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.5.7/platforms/noarch/etc/PyFoam-0.5.7.csh
 endif
 
 # QT

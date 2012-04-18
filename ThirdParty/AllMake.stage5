@@ -31,6 +31,8 @@
 #
 # Requirements:
 #     1: Your OpenFOAM environment must be properly initialized
+#     2: OpenFOAM must already been compiled because swak4Foam depends on
+#        OpenFOAM include files and libraries
 #
 # Author:
 #     Martin Beaudoin, Hydro-Quebec, (2012)
