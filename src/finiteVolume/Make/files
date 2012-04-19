@@ -213,6 +213,9 @@ volPointInterpolation = interpolation/volPointInterpolation
 $(volPointInterpolation)/pointPatchInterpolation/pointPatchInterpolation.C
 $(volPointInterpolation)/volPointInterpolation.C
 
+pointVolInterpolation = interpolation/pointVolInterpolation
+$(pointVolInterpolation)/pointVolInterpolation.C
+
 surfaceInterpolation = interpolation/surfaceInterpolation
 $(surfaceInterpolation)/surfaceInterpolation/surfaceInterpolation.C
 $(surfaceInterpolation)/surfaceInterpolationScheme/surfaceInterpolationSchemes.C
