@@ -88,8 +88,8 @@ Group: 			Development/Tools
 %setup -q
 
 %build
-    # Nothing to do
-    # true
+    # Make the shebang line portable
+    python setup.py build --executable "/usr/bin/env python"
 
 %install
     python setup.py install --prefix=$RPM_BUILD_ROOT/%{_installPrefix}
