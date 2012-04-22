@@ -238,8 +238,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
 )
 :
     coupledPolyPatch(name, size, start, index, bm),
-    shadowName_(word::null),
-    zoneName_(word::null),
+    shadowName_("_initialize_me_"),
+    zoneName_("_initialize_me_"),
     bridgeOverlap_(false),
     shadowIndex_(-1),
     zoneIndex_(-1),

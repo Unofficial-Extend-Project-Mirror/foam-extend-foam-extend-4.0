@@ -217,7 +217,7 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
 )
 :
     coupledPolyPatch(name, size, start, index, bm),
-    shadowName_(fileName::null),
+    shadowName_("_initialize_me_"),
     csPtr_
     (
         new coordinateSystem
