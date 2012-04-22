@@ -453,6 +453,10 @@ if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.8.1 
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.csh
 endif
 
+#if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.14.1 ) then
+#    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.14.1/platforms/$WM_OPTIONS/etc/ParaView-3.14.1.csh
+#endif
+
 if ( $WM_ARCH == "darwinIntel" || $WM_ARCH == "darwinIntel64" ) then
     setenv DYLD_LIBRARY_PATH ${LD_LIBRARY_PATH}
 endif

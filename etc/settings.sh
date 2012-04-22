@@ -543,6 +543,10 @@ export MPI_BUFFER_SIZE
 [ -z "$PARAVIEW_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1 ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.sh
 }
+
+#[ -z "$PARAVIEW_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.14.1 ] && {
+#    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.14.1/platforms/$WM_OPTIONS/etc/ParaView-3.14.1.sh
+#}
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARAVIEW_DIR is initialized to: $PARAVIEW_DIR"
 
 

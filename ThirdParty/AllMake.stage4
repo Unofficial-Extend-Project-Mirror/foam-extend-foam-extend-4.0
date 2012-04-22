@@ -76,9 +76,13 @@ then
         ( rpm_make -p ParaView-3.8.1 -s ParaView-3.8.1.spec -u http://www.paraview.org/files/v3.8/ParaView-3.8.1.tar.gz \
             -f --define='_qmakePath $QT_BIN_DIR/qmake'      
         )
+#        ( rpm_make -p ParaView-3.14.1 -s ParaView-3.14.1.spec -u http://www.paraview.org/files/v3.14/ParaView-3.14.1-Source.tar.gz \
+#            -f --define='_qmakePath $QT_BIN_DIR/qmake'      
+#        )
     else
         echo "WARNING: "
         echo "WARNING: Skipping the installation of ParaView-3.8.1."
+#        echo "WARNING: Skipping the installation of ParaView-3.14.1."
         echo "WARNING: Please make sure the QT_BIN_DIR environment variable properly"
         echo "WARNING: initialized in the file prefs.sh or prefs.csh"
         echo "WARNING: The command \$QT_BIN_DIR/qmake needs to be valid"
