@@ -18,11 +18,13 @@ cleanPostProcessing ()
   rm -rf postProcessing/log.gnuplotPlotResiduals > /dev/null 2>&1
   rm -rf postProcessing/log.gnuplotCompareAll > /dev/null 2>&1
   rm -rf postProcessing/logs > /dev/null 2>&1
+  rm -rf postProcessing/compareAll.gplt.old > /dev/null 2>&1
 }
 
 cleanFilesFromM4 ()
 {
-  rm {constant/polyMesh/boundary,constant/polyMesh/blockMeshDict} > /dev/null 2>&1
+  rm constant/polyMesh/boundary > /dev/null 2>&1
+  rm constant/polyMesh/blockMeshDict > /dev/null 2>&1
 }
 
 cleanTimeZero ()

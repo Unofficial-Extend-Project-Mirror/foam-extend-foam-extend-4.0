@@ -18,6 +18,7 @@ cleanPostProcessing ()
   rm -rf postProcessing/log.gnuplotPlotResiduals > /dev/null 2>&1
   rm -rf postProcessing/log.gnuplotCompareAll > /dev/null 2>&1
   rm -rf postProcessing/logs > /dev/null 2>&1
+  rm -rf postProcessing/compareAll.gplt.old > /dev/null 2>&1
 }
 
 cleanFilesFromM4 ()

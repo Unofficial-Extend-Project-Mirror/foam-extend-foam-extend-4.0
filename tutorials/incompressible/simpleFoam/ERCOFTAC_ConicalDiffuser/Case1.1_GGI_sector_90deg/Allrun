@@ -10,7 +10,7 @@
 export caseName=`basename $PWD`
 
 #We stop this script when we encounter a problem
-trap "exit -1" ERR
+#trap "exit -1" ERR
 
 echo "$caseName: Creating the file blockMeshDict using m4"
 (cd constant/polyMesh; m4 -P blockMeshDict.m4 > blockMeshDict)
@@ -19,7 +19,85 @@ echo "$caseName: Running blockMesh"
 runApplicationAndReportOnError blockMesh
 
 echo "$caseName: Updating the boundary file"
-cp constant/polyMesh/boundary.preconfigured constant/polyMesh/boundary
+# Let's see if pyFoamChangeGGIBoundary.py is available
+command -v pyFoamChangeGGIBoundary.py >/dev/null
+if [ $? -eq 0 ];
+then
+    echo "Using pyFoamChangeGGIBoundary.py"
+    pyFoamChangeGGIBoundary.py . B_UPSTREAM       \
+        --shadowPatch            B_DOWNSTREAM     \
+        --zone                   B_UPSTREAMZone   \
+	--bridgeOverlap          false
+
+    pyFoamChangeGGIBoundary.py . B_DOWNSTREAM     \
+        --shadowPatch            B_UPSTREAM       \
+        --zone                   B_DOWNSTREAMZone \
+	--bridgeOverlap          false
+
+    pyFoamChangeGGIBoundary.py . sideWallA_BB_cyclic1    \
+        --shadowPatch            sideWallA_BB_cyclic2    \
+        --rotationAxis           "(0 0 1)"               \
+        --rotationAngle          90                      \
+        --zone                   sideWallA_BB_cyclic1Zone
+
+    pyFoamChangeGGIBoundary.py . sideWallA_BB_cyclic2    \
+        --shadowPatch            sideWallA_BB_cyclic1    \
+        --rotationAxis           "(0 0 1)"               \
+        --rotationAngle          -90                     \
+        --zone                   sideWallA_BB_cyclic2Zone
+
+    pyFoamChangeGGIBoundary.py . sideWallB_C_cyclic1    \
+        --shadowPatch            sideWallB_C_cyclic2    \
+        --rotationAxis           "(0 0 1)"              \
+        --rotationAngle          90                     \
+        --zone                   sideWallB_C_cyclic1Zone
+
+    pyFoamChangeGGIBoundary.py . sideWallB_C_cyclic2    \
+        --shadowPatch            sideWallB_C_cyclic1    \
+        --rotationAxis           "(0 0 1)"              \
+        --rotationAngle          -90                    \
+        --zone                   sideWallB_C_cyclic2Zone
+
+    pyFoamChangeGGIBoundary.py . sideWallC_D_cyclic1    \
+        --shadowPatch            sideWallC_D_cyclic2    \
+        --rotationAxis           "(0 0 1)"              \
+        --rotationAngle          90                     \
+        --zone                   sideWallC_D_cyclic1Zone
+
+    pyFoamChangeGGIBoundary.py . sideWallC_D_cyclic2    \
+        --shadowPatch            sideWallC_D_cyclic1    \
+        --rotationAxis           "(0 0 1)"              \
+        --rotationAngle          -90                    \
+        --zone                   sideWallC_D_cyclic2Zone
+
+    pyFoamChangeGGIBoundary.py . sideWallD_E_cyclic1    \
+        --shadowPatch            sideWallD_E_cyclic2    \
+        --rotationAxis           "(0 0 1)"              \
+        --rotationAngle          90                     \
+        --zone                   sideWallD_E_cyclic1Zone
+
+    pyFoamChangeGGIBoundary.py . sideWallD_E_cyclic2    \
+        --shadowPatch            sideWallD_E_cyclic1    \
+        --rotationAxis           "(0 0 1)"              \
+        --rotationAngle          -90                    \
+        --zone                   sideWallD_E_cyclic2Zone
+
+    pyFoamChangeGGIBoundary.py . sideWallE_F_cyclic1    \
+        --shadowPatch            sideWallE_F_cyclic2    \
+        --rotationAxis           "(0 0 1)"              \
+        --rotationAngle          90                     \
+        --zone                   sideWallE_F_cyclic1Zone
+
+    pyFoamChangeGGIBoundary.py . sideWallE_F_cyclic2    \
+        --shadowPatch            sideWallE_F_cyclic1    \
+        --rotationAxis           "(0 0 1)"              \
+        --rotationAngle          -90                    \
+        --zone                   sideWallE_F_cyclic2Zone
+
+else
+    echo "pyFoamChangeGGIBoundary.py is missing. Using the file constant/polyMesh/boundary.preconfigured"
+    cp constant/polyMesh/boundary.preconfigured constant/polyMesh/boundary
+fi
 
 echo "$caseName: Creating the starting time directory"
 cp -r 0_orig 0

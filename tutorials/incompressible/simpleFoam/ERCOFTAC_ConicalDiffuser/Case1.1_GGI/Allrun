@@ -10,7 +10,7 @@
 export caseName=`basename $PWD`
 
 #We stop this script when we encounter a problem
-trap "exit -1" ERR
+#trap "exit -1" ERR
 
 echo "$caseName: Creating the file blockMeshDict using m4"
 (cd constant/polyMesh; m4 -P blockMeshDict.m4 > blockMeshDict)
@@ -19,7 +19,25 @@ echo "$caseName: Running blockMesh"
 runApplicationAndReportOnError blockMesh
 
 echo "$caseName: Updating the boundary file"
-cp constant/polyMesh/boundary.preconfigured constant/polyMesh/boundary
+# Let's see if pyFoamChangeGGIBoundary.py is available
+command -v pyFoamChangeGGIBoundary.py >/dev/null
+if [ $? -eq 0 ];
+then
+    echo "Using pyFoamChangeGGIBoundary.py"
+    pyFoamChangeGGIBoundary.py . B_UPSTREAM     \
+        --shadowPatch            B_DOWNSTREAM   \
+        --zone                   B_UPSTREAMZone \
+	--bridgeOverlap          false
+
+    pyFoamChangeGGIBoundary.py . B_DOWNSTREAM     \
+        --shadowPatch            B_UPSTREAM       \
+        --zone                   B_DOWNSTREAMZone \
+	--bridgeOverlap          false
+
+else
+    echo "pyFoamChangeGGIBoundary.py is missing. Using the file constant/polyMesh/boundary.preconfigured"
+    cp constant/polyMesh/boundary.preconfigured constant/polyMesh/boundary
+fi
 
 echo "$caseName: Creating the starting time directory"
 cp -r 0_orig 0
