@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
             }
 
             // --- PISO loop
-            for (int corr=0; corr<nCorr; corr++)
+            for (int corr = 0; corr < nCorr; corr++)
             {
                 surfaceScalarField hf = fvc::interpolate(h);
                 volScalarField rUA = 1.0/hUEqn.A();
@@ -118,13 +118,16 @@ int main(int argc, char *argv[])
                       - fvm::laplacian(ghrUAf, h)
                     );
 
-                    if (ucorr < nOuterCorr-1 || corr < nCorr-1)
+                    if (ucorr < nOuterCorr - 1 || corr < nCorr - 1)
                     {
                         hEqn.solve();
                     }
                     else
                     {
-                        hEqn.solve(mesh.solver(h.name() + "Final"));
+                        hEqn.solve
+                        (
+                            mesh.solutionDict().solver(h.name() + "Final")
+                        );
                     }
 
                     if (nonOrth == nNonOrthCorr)

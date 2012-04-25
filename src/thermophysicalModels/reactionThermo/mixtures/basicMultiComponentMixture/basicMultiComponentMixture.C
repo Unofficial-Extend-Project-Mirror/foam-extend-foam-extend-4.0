@@ -32,7 +32,8 @@ Foam::basicMultiComponentMixture::basicMultiComponentMixture
 (
     const dictionary& thermoDict,
     const wordList& specieNames,
-    const fvMesh& mesh
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 :
     species_(specieNames),
@@ -44,7 +45,7 @@ Foam::basicMultiComponentMixture::basicMultiComponentMixture
         (
             species_[i],
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::NO_READ
         );
 
@@ -60,7 +61,7 @@ Foam::basicMultiComponentMixture::basicMultiComponentMixture
                     (
                         species_[i],
                         mesh.time().timeName(),
-                        mesh,
+                        obj,
                         IOobject::MUST_READ,
                         IOobject::AUTO_WRITE
                     ),
@@ -76,7 +77,7 @@ Foam::basicMultiComponentMixture::basicMultiComponentMixture
                 (
                     "Ydefault",
                     mesh.time().timeName(),
-                    mesh,
+                    obj,
                     IOobject::MUST_READ,
                     IOobject::NO_WRITE
                 ),
@@ -92,7 +93,7 @@ Foam::basicMultiComponentMixture::basicMultiComponentMixture
                     (
                         species_[i],
                         mesh.time().timeName(),
-                        mesh,
+                        obj,
                         IOobject::NO_READ,
                         IOobject::AUTO_WRITE
                     ),

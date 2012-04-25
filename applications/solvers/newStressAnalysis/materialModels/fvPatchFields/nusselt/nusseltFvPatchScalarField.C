@@ -195,7 +195,7 @@ void nusseltFvPatchScalarField::updateCoeffs()
 
     // Lookup temperature diffusivity of the patch
     const fvPatchField<scalar>& DT =
-        this->patch().lookupPatchField<volScalarField, scalar>(DTName_);
+        this->lookupPatchField<volScalarField, scalar>(DTName_);
 
     // Calculate flux
     scalarField tempFlux = alpha_*(Tinternal - Tinf_);

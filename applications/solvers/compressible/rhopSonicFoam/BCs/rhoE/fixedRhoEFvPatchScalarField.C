@@ -105,13 +105,13 @@ void fixedRhoEFvPatchScalarField::updateCoeffs()
     dimensionedScalar Cv(thermodynamicProperties.lookup("Cv"));
 
     const fvPatchScalarField& rhop =
-        patch().lookupPatchField<volScalarField, scalar>("rho");
+        lookupPatchField<volScalarField, scalar>("rho");
 
     const fvPatchVectorField& rhoUp =
-        patch().lookupPatchField<volVectorField, vector>("rhoU");
+        lookupPatchField<volVectorField, vector>("rhoU");
 
     const fvPatchScalarField& Tp =
-        patch().lookupPatchField<volScalarField, scalar>("T");
+        lookupPatchField<volScalarField, scalar>("T");
 
     operator==(rhop*(Cv.value()*Tp + 0.5*magSqr(rhoUp/rhop)));
 

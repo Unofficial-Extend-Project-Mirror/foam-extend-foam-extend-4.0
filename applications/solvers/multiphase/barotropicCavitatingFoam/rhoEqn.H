@@ -5,7 +5,7 @@
         (
             mesh,
             phi,
-            mesh.divScheme("div(phi,rho)")
+            mesh.schemesDict().divScheme("div(phi,rho)")
         )
     );
 

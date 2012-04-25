@@ -101,6 +101,13 @@ public:
 
     // Member Functions
 
+        //- Return direction given (i, j) indices
+        static inline direction cmpt
+        (
+            const direction i,
+            const direction j
+        );
+
         //- Return (i, j) component
         inline const Cmpt& operator()
         (

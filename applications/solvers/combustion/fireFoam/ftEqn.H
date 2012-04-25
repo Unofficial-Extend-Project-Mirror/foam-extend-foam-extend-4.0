@@ -5,7 +5,7 @@ tmp<fv::convectionScheme<scalar> > mvConvection
         mesh,
         fields,
         phi,
-        mesh.divScheme("div(phi,ft_b_h)")
+        mesh.schemesDict().divScheme("div(phi,ft_b_h)")
     )
 );
 

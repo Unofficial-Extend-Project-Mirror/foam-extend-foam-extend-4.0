@@ -117,7 +117,7 @@ void alphatWallFunctionFvPatchScalarField::updateCoeffs()
     }
 
     const scalarField& mutw =
-        patch().lookupPatchField<volScalarField, scalar>(mutName_);
+        lookupPatchField<volScalarField, scalar>(mutName_);
 
     operator==(mutw/Prt_);
 

@@ -110,7 +110,7 @@ $(constraintFvPatchFields)/wedge/wedgeFvPatchScalarField.C
 $(constraintFvPatchFields)/ggi/ggiFvPatchFields.C
 $(constraintFvPatchFields)/cyclicGgi/cyclicGgiFvPatchFields.C
 $(constraintFvPatchFields)/overlapGgi/overlapGgiFvPatchFields.C
-$(constraintFvPatchFields)/regionCouple/regionCoupleFvPatchFields.C
+$(constraintFvPatchFields)/regionCoupling/regionCouplingFvPatchFields.C
 
 derivedFvPatchFields = $(fvPatchFields)/derived
 $(derivedFvPatchFields)/activeBaffleVelocity/activeBaffleVelocityFvPatchVectorField.C
@@ -185,7 +185,7 @@ $(constraintFvsPatchFields)/wedge/wedgeFvsPatchFields.C
 $(constraintFvsPatchFields)/ggi/ggiFvsPatchFields.C
 $(constraintFvsPatchFields)/cyclicGgi/cyclicGgiFvsPatchFields.C
 $(constraintFvsPatchFields)/overlapGgi/overlapGgiFvsPatchFields.C
-$(constraintFvsPatchFields)/regionCouple/regionCoupleFvsPatchFields.C
+$(constraintFvsPatchFields)/regionCoupling/regionCouplingFvsPatchFields.C
 
 
 fields/volFields/volFields.C
@@ -227,6 +227,7 @@ $(schemes)/skewCorrected/skewCorrected.C
 $(schemes)/outletStabilised/outletStabilised.C
 $(schemes)/reverseLinear/reverseLinear.C
 $(schemes)/clippedLinear/clippedLinear.C
+$(schemes)/harmonic/magLongDelta.C
 $(schemes)/harmonic/harmonic.C
 $(schemes)/fixedBlended/fixedBlended.C
 $(schemes)/localBlended/localBlended.C

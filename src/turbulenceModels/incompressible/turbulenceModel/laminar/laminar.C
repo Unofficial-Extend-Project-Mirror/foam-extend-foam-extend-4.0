@@ -83,7 +83,7 @@ tmp<volScalarField> laminar::nut() const
             (
                 "nut",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -110,7 +110,7 @@ tmp<volScalarField> laminar::k() const
             (
                 "k",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -131,7 +131,7 @@ tmp<volScalarField> laminar::epsilon() const
             (
                 "epsilon",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -155,7 +155,7 @@ tmp<volSymmTensorField> laminar::R() const
             (
                 "R",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -179,7 +179,7 @@ tmp<volSymmTensorField> laminar::devReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

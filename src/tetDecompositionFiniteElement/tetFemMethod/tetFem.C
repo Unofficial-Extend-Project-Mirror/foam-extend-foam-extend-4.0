@@ -88,7 +88,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacian
 
     // In order to avoid excessive memory allocation and copying,
     // matrix coefficients and addressing are retrieved using a buffer.
-    // 
+    // HJ, 12/May/2001
 
     // Get reference to ldu addressing
     const lduAddressing& lduAddr = fem.lduAddr();
@@ -280,7 +280,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacianTranspose
 
     // In order to avoid excessive memory allocation and copying,
     // matrix coefficients and addressing are retrieved using a buffer.
-    // 
+    // HJ, 12/May/2001
 
     // Get reference to ldu addressing
     const lduAddressing& lduAddr = fem.lduAddr();
@@ -449,7 +449,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacianTrace
 
     // In order to avoid excessive memory allocation and copying,
     // matrix coefficients and addressing are retrieved using a buffer.
-    // HJ, date deleted
+    // HJ, 12/May/2001
 
     // Get reference to ldu addressing
     const lduAddressing& lduAddr = fem.lduAddr();
@@ -528,7 +528,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacianTrace
 
                     u[globalJEdge] += curGamma*tr(curOffDiagCoeff);
 
-                    source[globalI] += 
+                    source[globalI] +=
                         curGamma*
                         (
                             (tr(curOffDiagCoeff)*I - curOffDiagCoeff)

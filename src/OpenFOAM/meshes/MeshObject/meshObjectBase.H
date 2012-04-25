@@ -60,6 +60,7 @@ public:
     //- Runtime type information
     TypeName("meshObject");
 
+
     // Static functions
 
         //- Update topology on all mesh objects
@@ -68,6 +69,16 @@ public:
         {
             HashTable<const meshObjectBase*> tbl =
                 mesh.objectRegistry::lookupClass<meshObjectBase>();
+
+            if (Mesh::debug)
+            {
+                InfoIn
+                (
+                    "static void meshObjectBase::"
+                    "allUpdateTopology(const Mesh& mesh, "
+                    "const mapPolyMesh& mpm)"
+                )   << "Mesh objects to update: " << tbl.toc() << endl;
+            }
 
             for
             (
@@ -84,7 +95,6 @@ public:
                     Info << "Updating object " << obj.type() << endl;
                 }
 
-                // obj.movePoints();
                 obj.updateMesh(mpm);
             }
 
@@ -104,6 +114,15 @@ public:
                 HashTable<const meshObjectBase*> tbl =
                     mesh.objectRegistry::lookupClass<meshObjectBase>();
 
+                if (Mesh::debug)
+                {
+                    InfoIn
+                    (
+                        "static void meshObjectBase::"
+                        "allMovePoints(const Mesh& mesh)"
+                    )   << "Mesh objects to move: " << tbl.toc() << endl;
+                }
+
                 for
                 (
                     HashTable<const meshObjectBase*>::iterator iter =
@@ -116,7 +135,8 @@ public:
 
                     if (Mesh::debug)
                     {
-                        Info << "Moving object " << obj.type() << endl;
+                        Info<< "Moving object "
+                            << " of type " << obj.type() << endl;
                     }
 
                     obj.movePoints();

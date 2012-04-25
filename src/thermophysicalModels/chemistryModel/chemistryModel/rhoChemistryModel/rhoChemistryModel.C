@@ -41,11 +41,12 @@ namespace Foam
 Foam::rhoChemistryModel::rhoChemistryModel
 (
     const fvMesh& mesh,
+    const objectRegistry& obj,
     const word& thermoTypeName
 )
 :
-    basicChemistryModel(mesh),
-    thermo_(hsReactionThermo::NewType(mesh, thermoTypeName))
+    basicChemistryModel(mesh, obj),
+    thermo_(hsReactionThermo::NewType(mesh, obj, thermoTypeName))
 {}
 
 

@@ -31,7 +31,8 @@ License
 
 Foam::autoPtr<Foam::hsCombustionThermo> Foam::hsCombustionThermo::New
 (
-    const fvMesh& mesh
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 {
     word hsCombustionThermoTypeName;
@@ -46,7 +47,7 @@ Foam::autoPtr<Foam::hsCombustionThermo> Foam::hsCombustionThermo::New
             (
                 "thermophysicalProperties",
                 mesh.time().constant(),
-                mesh,
+                obj,
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE
             )
@@ -63,7 +64,7 @@ Foam::autoPtr<Foam::hsCombustionThermo> Foam::hsCombustionThermo::New
 
     if (cstrIter == fvMeshConstructorTablePtr_->end())
     {
-        FatalErrorIn("hsCombustionThermo::New(const fvMesh&)")
+        FatalErrorIn("hsCombustionThermo::New(const fvMesh&, const objectRegistry&)")
             << "Unknown hsCombustionThermo type "
             << hsCombustionThermoTypeName << nl << nl
             << "Valid hsCombustionThermo types are:" << nl
@@ -71,13 +72,14 @@ Foam::autoPtr<Foam::hsCombustionThermo> Foam::hsCombustionThermo::New
             << exit(FatalError);
     }
 
-    return autoPtr<hsCombustionThermo>(cstrIter()(mesh));
+    return autoPtr<hsCombustionThermo>(cstrIter()(mesh, obj));
 }
 
 
 Foam::autoPtr<Foam::hsCombustionThermo> Foam::hsCombustionThermo::NewType
 (
     const fvMesh& mesh,
+    const objectRegistry& obj,
     const word& thermoType
 )
 {
@@ -93,7 +95,7 @@ Foam::autoPtr<Foam::hsCombustionThermo> Foam::hsCombustionThermo::NewType
             (
                 "thermophysicalProperties",
                 mesh.time().constant(),
-                mesh,
+                obj,
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE
             )
@@ -118,6 +120,7 @@ Foam::autoPtr<Foam::hsCombustionThermo> Foam::hsCombustionThermo::NewType
                 "autoPtr<hsCombustionThermo> hsCombustionThermo::NewType"
                 "("
                     "const fvMesh&, "
+                    "const objectRegistry& obj, "
                     "const word&"
                 ")"
             )   << "Inconsistent thermo package selected:" << nl << nl
@@ -136,7 +139,7 @@ Foam::autoPtr<Foam::hsCombustionThermo> Foam::hsCombustionThermo::NewType
 
     if (cstrIter == fvMeshConstructorTablePtr_->end())
     {
-        FatalErrorIn("hsCombustionThermo::New(const fvMesh&)")
+        FatalErrorIn("hsCombustionThermo::New(const fvMesh&, const objectRegistry&)")
             << "Unknown hsCombustionThermo type "
             << hsCombustionThermoTypeName << nl << nl
             << "Valid hsCombustionThermo types are:" << nl
@@ -144,7 +147,7 @@ Foam::autoPtr<Foam::hsCombustionThermo> Foam::hsCombustionThermo::NewType
             << exit(FatalError);
     }
 
-    return autoPtr<hsCombustionThermo>(cstrIter()(mesh));
+    return autoPtr<hsCombustionThermo>(cstrIter()(mesh, obj));
 }
 
 

@@ -79,11 +79,11 @@ int main(int argc, char *argv[])
 #       include "UEqns.H"
 
         // --- PISO loop
-        for (int corr=0; corr<nCorr; corr++)
+        for (int corr = 0; corr < nCorr; corr++)
         {
 #           include "pEqn.H"
 
-            if (correctAlpha && corr<nCorr-1)
+            if (correctAlpha && corr < nCorr - 1)
             {
 #               include "alphaEqn.H"
             }

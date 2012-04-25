@@ -25,8 +25,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "accordionEngineMesh.H"
-#include "slidingInterface.H"
-#include "layerAdditionRemoval.H"
 #include "surfaceFields.H"
 #include "regionSplit.H"
 

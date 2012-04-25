@@ -255,17 +255,30 @@ Foam::mixerGgiFvMesh::mixerGgiFvMesh
             )
         ).subDict(typeName + "Coeffs")
     ),
-    csPtr_
+    cs_
     (
-        coordinateSystem::New
-        (
-            "coordinateSystem",
-            dict_.subDict("coordinateSystem")
-        )
+        "coordinateSystem",
+        dict_.subDict("coordinateSystem")
     ),
     rpm_(readScalar(dict_.lookup("rpm"))),
     movingPointsMaskPtr_(NULL)
 {
+    // Make sure the coordinate system does not operate in degrees
+    // Bug fix, HJ, 3/Oct/2011
+    if (!cs_.inDegrees())
+    {
+        WarningIn("mixerGgiFvMesh::mixerGgiFvMesh(const IOobject& io)")
+            << "Mixer coordinate system is set to operate in radians.  "
+            << "Changing to rad for correct calculation of angular velocity."
+            << nl
+            << "To remove this message please add entry" << nl << nl
+            << "inDegrees true;" << nl << nl
+            << "to the specification of the coordinate system"
+            << endl;
+
+        cs_.inDegrees() = true;
+    }
+
     addZonesAndModifiers();
 
     Info<< "Mixer mesh:" << nl
@@ -299,12 +312,12 @@ const Foam::scalarField& Foam::mixerGgiFvMesh::movingPointsMask() const
 
 bool Foam::mixerGgiFvMesh::update()
 {
-     // Rotational speed needs to be converted from rpm
+    // Rotational speed needs to be converted from rpm
     movePoints
     (
-        csPtr_->globalPosition
+        cs_.globalPosition
         (
-            csPtr_->localPosition(allPoints())
+            cs_.localPosition(allPoints())
           + vector(0, rpm_*360.0*time().deltaT().value()/60.0, 0)
             *movingPointsMask()
         )

@@ -120,7 +120,7 @@ castellatedMeshControls
             // Surface-wise min and max refinement level
             level (1 1);
 
-	    faceZone bottomAir;
+            faceZone bottomAir;
             cellZone bottomAir;
             zoneInside true;
         }
@@ -130,7 +130,7 @@ castellatedMeshControls
             // Surface-wise min and max refinement level
             level (1 1);
 
-	    faceZone topAir;
+            faceZone topAir;
             cellZone topAir;
             zoneInside true;
         }
@@ -140,7 +140,7 @@ castellatedMeshControls
             // Surface-wise min and max refinement level
             level (0 0);
 
-	    faceZone heater;
+            faceZone heater;
             cellZone heater;
             zoneInside true;
         }
@@ -150,7 +150,7 @@ castellatedMeshControls
             // Surface-wise min and max refinement level
             level (1 1);
 
-	    faceZone leftSolid;
+            faceZone leftSolid;
             cellZone leftSolid;
             zoneInside true;
         }
@@ -160,7 +160,7 @@ castellatedMeshControls
             // Surface-wise min and max refinement level
             level (1 1);
 
-	    faceZone rightSolid;
+            faceZone rightSolid;
             cellZone rightSolid;
             zoneInside true;
         }
@@ -230,15 +230,15 @@ addLayersControls
     // Per final patch (so not geometry!) the layer information
     layers
     {
-	//flowAirDuctReagent_flowAirDuctReagent
+        //flowAirDuctReagent_flowAirDuctReagent
         //{
         //    nSurfaceLayers 1;
         //}
-	//flowAirDuctReagent_inlet1
+        //flowAirDuctReagent_inlet1
         //{
         //    nSurfaceLayers 1;
         //}
-	//flowAirDuctReagent_inlet2
+        //flowAirDuctReagent_inlet2
         //{
         //    nSurfaceLayers 1;
         //}

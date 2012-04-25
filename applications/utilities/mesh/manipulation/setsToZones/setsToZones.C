@@ -26,11 +26,11 @@ Description
     Add pointZones/faceZones/cellZones to the mesh from similar named
     pointSets/faceSets/cellSets.
 
-    There is one catch: for faceZones you also need to specify a flip
-    condition which basically denotes the side of the face. In this application
-    it reads a cellSet (xxxCells if 'xxx' is the name of the faceSet) which
+    For faceZones the user needs to specify a flip
+    condition which denotes the side of the face.  This application
+    reads a cellSet (xxxMasterCells if 'xxx' is the name of the faceSet) which
     is the masterCells of the zone.  Master cell is the one IN FRONT of the
-    face, ie. the one into which the face normal points.  If master cells are
+    face, ie. the one INTO which the face normal points.  If master cells are
     not found, take faces without a flip
 
     If one is not interested in sidedness specify the -noFlipMap
@@ -163,7 +163,8 @@ int main(int argc, char *argv[])
             word setName(set.name() + "MasterCells");
 
             Info<< "Using cellSet " << setName
-                << " to determine the master side of the zone." << nl
+                << " to determine the master side of the face zone "
+                << set.name() << nl
                 << endl;
 
             // Load corresponding cells
@@ -208,7 +209,7 @@ int main(int argc, char *argv[])
                         else
                         {
                             FatalErrorIn(args.executable())
-                                << "Pwner or neighbour of internal face "
+                                << "Owner or neighbour of internal face "
                                 << faceI << " should be in cellSet "
                                 << cells.name()
                                 << " to be able to determine orientation."
@@ -331,10 +332,10 @@ int main(int argc, char *argv[])
                     sz,
                     new cellZone
                     (
-                        set.name(),             //name
-                        cellLabels,             //addressing
-                        sz,                     //index
-                        mesh.cellZones()        //pointZoneMesh
+                        set.name(),             // name
+                        cellLabels,             // addressing
+                        sz,                     // index
+                        mesh.cellZones()        // pointZoneMesh
                     )
                 );
                 mesh.cellZones().writeOpt() = IOobject::AUTO_WRITE;
@@ -350,7 +351,6 @@ int main(int argc, char *argv[])
             }
         }
     }
-
 
 
     Info<< "Writing mesh." << endl;

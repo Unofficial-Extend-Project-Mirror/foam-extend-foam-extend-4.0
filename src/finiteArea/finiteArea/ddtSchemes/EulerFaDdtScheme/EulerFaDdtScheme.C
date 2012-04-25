@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-    
 \*---------------------------------------------------------------------------*/
 
 #include "EulerFaDdtScheme.H"
@@ -521,7 +519,7 @@ EulerFaDdtScheme<Type>::famDdt
     scalar rDeltaT = 1.0/mesh().time().deltaT().value();
 
     fam.diag() = rDeltaT*mesh().S();
-    
+
     if (mesh().moving())
     {
         fam.source() = rDeltaT*vf.oldTime().internalField()*mesh().S0();

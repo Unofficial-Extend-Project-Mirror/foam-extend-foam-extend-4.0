@@ -76,7 +76,7 @@ Foam::radiation::absorptionEmissionModel::aCont(const label bandI) const
             (
                 "aCont",
                 mesh_.time().timeName(),
-                mesh_,
+                mesh_, // HR 101116 -- Todo: Need to bring object registry here!
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
@@ -99,7 +99,7 @@ Foam::radiation::absorptionEmissionModel::aDisp(const label bandI) const
             (
                 "aDisp",
                 mesh_.time().timeName(),
-                mesh_,
+                mesh_, // HR 101116 -- Todo: Need to bring object registry here!
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
@@ -129,7 +129,7 @@ Foam::radiation::absorptionEmissionModel::eCont(const label bandI) const
             (
                 "eCont",
                 mesh_.time().timeName(),
-                mesh_,
+                mesh_, // HR 101116 -- Todo: Need to bring object registry here!
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
@@ -152,7 +152,7 @@ Foam::radiation::absorptionEmissionModel::eDisp(const label bandI) const
             (
                 "eDisp",
                 mesh_.time().timeName(),
-                mesh_,
+                mesh_, // HR 101116 -- Todo: Need to bring object registry here!
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
@@ -182,7 +182,7 @@ Foam::radiation::absorptionEmissionModel::ECont(const label bandI) const
             (
                 "ECont",
                 mesh_.time().timeName(),
-                mesh_,
+                mesh_, // HR 101116 -- Todo: Need to bring object registry here!
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
@@ -205,7 +205,7 @@ Foam::radiation::absorptionEmissionModel::EDisp(const label bandI) const
             (
                 "EDisp",
                 mesh_.time().timeName(),
-                mesh_,
+                mesh_, // HR 101116 -- Todo: Need to bring object registry here!
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false

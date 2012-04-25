@@ -610,9 +610,18 @@ void Foam::fvMatrix<Type>::relax(const scalar alpha)
 template<class Type>
 void Foam::fvMatrix<Type>::relax()
 {
-    if (psi_.mesh().relax(psi_.name()))
+    if (psi_.mesh().solutionDict().relax(psi_.name()))
     {
-        relax(psi_.mesh().relaxationFactor(psi_.name()));
+        relax(psi_.mesh().solutionDict().relaxationFactor(psi_.name()));
+    }
+    else
+    {
+        if (debug)
+        {
+            InfoIn("void fvMatrix<Type>::relax()")
+                << "Relaxation factor for field " << psi_.name()
+                << " not found.  Relaxation will not be used." << endl;
+        }
     }
 }
 
@@ -825,7 +834,7 @@ Foam::tmp<Foam::GeometricField<Type, Foam::fvsPatchField, Foam::surfaceMesh> >
 Foam::fvMatrix<Type>::
 flux() const
 {
-    if (!psi_.mesh().fluxRequired(psi_.name()))
+    if (!psi_.mesh().schemesDict().fluxRequired(psi_.name()))
     {
         FatalErrorIn("fvMatrix<Type>::flux()")
             << "flux requested but " << psi_.name()
@@ -1324,7 +1333,10 @@ Foam::lduMatrix::solverPerformance Foam::solve(fvMatrix<Type>& fvm)
 }
 
 template<class Type>
-Foam::lduMatrix::solverPerformance Foam::solve(const tmp<fvMatrix<Type> >& tfvm)
+Foam::lduMatrix::solverPerformance Foam::solve
+(
+    const tmp<fvMatrix<Type> >& tfvm
+)
 {
     lduMatrix::solverPerformance solverPerf =
         const_cast<fvMatrix<Type>&>(tfvm()).solve();
@@ -1346,7 +1358,7 @@ Foam::tmp<Foam::fvMatrix<Type> > Foam::correction
     if
     (
         (A.hasUpper() || A.hasLower())
-     && A.psi().mesh().fluxRequired(A.psi().name())
+     && A.psi().mesh().schemesDict().fluxRequired(A.psi().name())
     )
     {
         tAcorr().faceFluxCorrectionPtr() = (-A.flux()).ptr();
@@ -1370,7 +1382,7 @@ Foam::tmp<Foam::fvMatrix<Type> > Foam::correction
     if
     (
         (A.hasUpper() || A.hasLower())
-     && A.psi().mesh().fluxRequired(A.psi().name())
+     && A.psi().mesh().schemesDict().fluxRequired(A.psi().name())
     )
     {
         tAcorr().faceFluxCorrectionPtr() = (-A.flux()).ptr();

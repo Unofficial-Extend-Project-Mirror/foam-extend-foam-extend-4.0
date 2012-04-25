@@ -4,6 +4,5 @@ EXE_INC = \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude
 
 LIB_LIBS = \
-    -lfiniteVolume \
     -lbasicThermophysicalModels \
-    -lspecie
+    -lfiniteVolume

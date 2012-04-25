@@ -1,0 +1,543 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
+
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
+
+\*---------------------------------------------------------------------------*/
+
+#include "regionCouplingFvPatchField.H"
+#include "symmTransformField.H"
+#include "magLongDelta.H"
+#include "volFields.H"
+#include "surfaceFields.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+template<class Type>
+tmp<scalarField>
+regionCouplingFvPatchField<Type>::weights
+(
+    const Field<Type>& fOwn,
+    const Field<Type>& fNei
+) const
+{
+    tmp<scalarField> tweights(new scalarField(fOwn.size(), 0.5));
+    scalarField& weights = tweights();
+
+    // Larger small for complex arithmetic accuracy
+    const scalar kSmall = 1000*SMALL;
+
+# if 0
+    // Hrv's treatment
+    scalarField mOwn = mag(fOwn);
+    scalarField mNei = mag(fNei);
+    scalarField mean = 2*(mOwn*mNei)/(mOwn + mNei);
+
+    scalar den;
+
+    forAll (weights, faceI)
+    {
+        den = (mNei[faceI] - mOwn[faceI]);
+
+        // Note: complex arithmetic requires extra accuracy
+        // This is a division of two close subtractions
+        // HJ, 28/Sep/2011
+        if (mag(den) > kSmall)
+        {
+            // Limit weights for round-off safety
+            weights[faceI] =
+                Foam::max(0, Foam::min((mNei[faceI] - mean[faceI])/den, 1));
+        }
+        else
+        {
+            // Use 0.5 weights
+        }
+    }
+
+# else
+
+    // Henrik's treatment
+    const fvPatch& p = this->patch();
+
+    // Note: for interpolation, work with face fields, to allow wall-corrected
+    // diffusivity (eg wall functions) to operate correctly.
+    // HJ, 28/Sep/2011
+
+    // Mag long deltas are identical on both sides.  HJ, 28/Sep/2011
+    const magLongDelta& mld = magLongDelta::New(p.boundaryMesh().mesh());
+
+    scalarField magPhiOwn = mag(fOwn);
+    scalarField magPhiNei = mag(fNei);
+
+    const scalarField& pWeights = p.weights();
+    const scalarField& pDeltaCoeffs = p.deltaCoeffs();
+    const scalarField& pLongDelta = mld.magDelta(p.index());
+
+    forAll (weights, faceI)
+    {
+        scalar mOwn = magPhiOwn[faceI]/(1 - pWeights[faceI]);
+        scalar mNei = magPhiNei[faceI]/pWeights[faceI];
+
+        scalar den = magPhiNei[faceI] - magPhiOwn[faceI];
+
+        // Note: complex arithmetic requires extra accuracy
+        // This is a division of two close subtractions
+        // HJ, 28/Sep/2011
+        if (mag(den) > kSmall)
+        {
+            scalar mean = mOwn*mNei/
+                (
+                    (mOwn + mNei)*
+                    pLongDelta[faceI]*
+                    pDeltaCoeffs[faceI]
+                );
+
+            // Limit weights for round-off safety
+            weights[faceI] =
+                Foam::max(0, Foam::min((magPhiNei[faceI] - mean)/den, 1));
+        }
+        else
+        {
+            weights[faceI] = 0.5;
+        }
+    }
+
+#endif
+
+    return tweights;
+}
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+template<class Type>
+regionCouplingFvPatchField<Type>::regionCouplingFvPatchField
+(
+    const fvPatch& p,
+    const DimensionedField<Type, volMesh>& iF
+)
+:
+    coupledFvPatchField<Type>(p, iF),
+    regionCouplePatch_(refCast<const regionCoupleFvPatch>(p)),
+    remoteFieldName_(iF.name()),
+    matrixUpdateBuffer_(),
+    originalPatchField_(),
+    curTimeIndex_(-1)
+{}
+
+
+template<class Type>
+regionCouplingFvPatchField<Type>::regionCouplingFvPatchField
+(
+    const fvPatch& p,
+    const DimensionedField<Type, volMesh>& iF,
+    const dictionary& dict
+)
+:
+    coupledFvPatchField<Type>(p, iF, dict),
+    regionCouplePatch_(refCast<const regionCoupleFvPatch>(p)),
+    remoteFieldName_(dict.lookup("remoteField")),
+    matrixUpdateBuffer_(),
+    originalPatchField_(),
+    curTimeIndex_(-1)
+{
+    if (!isType<regionCoupleFvPatch>(p))
+    {
+        FatalIOErrorIn
+        (
+            "regionCouplingFvPatchField<Type>::regionCouplingFvPatchField\n"
+            "(\n"
+            "    const fvPatch& p,\n"
+            "    const DimensionedField<Type, volMesh>& iF,\n"
+            "    const dictionary& dict\n"
+            ")\n",
+            dict
+        )   << "patch " << this->patch().index() << " not regionCouple type. "
+            << "Patch type = " << p.type()
+            << exit(FatalIOError);
+    }
+
+    if (!dict.found("value"))
+    {
+        // Grab the internal value for initialisation. (?) HJ, 27/Feb/2009
+        fvPatchField<Type>::operator=(this->patchInternalField()());
+    }
+}
+
+
+template<class Type>
+regionCouplingFvPatchField<Type>::regionCouplingFvPatchField
+(
+    const regionCouplingFvPatchField<Type>& ptf,
+    const fvPatch& p,
+    const DimensionedField<Type, volMesh>& iF,
+    const fvPatchFieldMapper& mapper
+)
+:
+    coupledFvPatchField<Type>(ptf, p, iF, mapper),
+    regionCouplePatch_(refCast<const regionCoupleFvPatch>(p)),
+    remoteFieldName_(ptf.remoteFieldName_),
+    matrixUpdateBuffer_(),
+    originalPatchField_(),
+    curTimeIndex_(-1)
+{
+    if (!isType<regionCoupleFvPatch>(this->patch()))
+    {
+        FatalErrorIn
+        (
+            "regionCouplingFvPatchField<Type>::regionCouplingFvPatchField\n"
+            "(\n"
+            "    const regionCouplingFvPatchField<Type>& ptf,\n"
+            "    const fvPatch& p,\n"
+            "    const DimensionedField<Type, volMesh>& iF,\n"
+            "    const fvPatchFieldMapper& mapper\n"
+            ")\n"
+        )   << "Field type does not correspond to patch type for patch "
+            << this->patch().index() << "." << endl
+            << "Field type: " << typeName << endl
+            << "Patch type: " << this->patch().type()
+            << exit(FatalError);
+    }
+}
+
+
+template<class Type>
+regionCouplingFvPatchField<Type>::regionCouplingFvPatchField
+(
+    const regionCouplingFvPatchField<Type>& ptf,
+    const DimensionedField<Type, volMesh>& iF
+)
+:
+    ggiLduInterfaceField(),
+    coupledFvPatchField<Type>(ptf, iF),
+    regionCouplePatch_(refCast<const regionCoupleFvPatch>(ptf.patch())),
+    remoteFieldName_(ptf.remoteFieldName_),
+    matrixUpdateBuffer_(),
+    originalPatchField_(),
+    curTimeIndex_(-1)
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+// Return a named shadow patch field
+template<class Type>
+template<class LookupField, class LookupType>
+const typename LookupField::PatchFieldType&
+regionCouplingFvPatchField<Type>::lookupShadowPatchField
+(
+    const word& name,
+    const LookupField*,
+    const LookupType*
+) const
+{
+    // Lookup neighbour field
+    const LookupField& shadowField =
+        regionCouplePatch_.shadowRegion().
+        objectRegistry::lookupObject<LookupField>(name);
+
+    return shadowField.boundaryField()[regionCouplePatch_.shadowIndex()];
+}
+
+
+// Return shadow patch field
+template<class Type>
+const regionCouplingFvPatchField<Type>&
+regionCouplingFvPatchField<Type>::shadowPatchField() const
+{
+    // Lookup neighbour field
+    typedef GeometricField<Type, fvPatchField, volMesh> GeoField;
+
+    return refCast<const regionCouplingFvPatchField<Type> >
+    (
+        lookupShadowPatchField<GeoField, Type>(remoteFieldName_)
+    );
+}
+
+
+// Return neighbour field
+template<class Type>
+tmp<Field<Type> > regionCouplingFvPatchField<Type>::patchNeighbourField() const
+{
+    Field<Type> sField = shadowPatchField().patchInternalField();
+
+     tmp<Field<Type> > tpnf
+     (
+         regionCouplePatch_.interpolate
+         (
+             shadowPatchField().patchInternalField()
+         )
+    );
+
+    Field<Type>& pnf = tpnf();
+
+    if (regionCouplePatch_.bridgeOverlap())
+    {
+        // Symmetry treatment used for overlap
+        vectorField nHat = this->patch().nf();
+
+        // Use mirrored neighbour field for interpolation
+        // HJ, 21/Jan/2009
+        Field<Type> bridgeField =
+            transform(I - 2.0*sqr(nHat), this->patchInternalField());
+
+        regionCouplePatch_.bridge(bridgeField, pnf);
+    }
+
+    return tpnf;
+}
+
+
+// Return neighbour field given internal cell data
+template<class Type>
+tmp<Field<Type> > regionCouplingFvPatchField<Type>::patchNeighbourField
+(
+    const word& name
+) const
+{
+    // Lookup neighbour field
+    typedef GeometricField<Type, fvPatchField, volMesh> GeoField;
+
+    return regionCouplePatch_.interpolate
+    (
+        lookupShadowPatchField<GeoField, Type>(name).patchInternalField()
+    );
+
+    // Note: this field is not bridged because local data does not exist
+    // for named field.  HJ, 27/Sep/2011
+}
+
+
+template<class Type>
+void regionCouplingFvPatchField<Type>::initEvaluate
+(
+    const Pstream::commsTypes commsType
+)
+{
+    if (!this->updated())
+    {
+        this->updateCoeffs();
+    }
+
+    // Interpolation must happen at init
+    // Implement weights-based stabilised harmonic interpolation using
+    // magnitude of type
+    // Algorithm:
+    // 1) calculate magnitude of internal field and neighbour field
+    // 2) calculate harmonic mean magnitude
+    // 3) express harmonic mean magnitude as: mean = w*mOwn + (1 - w)*mNei
+    // 4) Based on above, calculate w = (mean - mNei)/(mOwn - mNei)
+    // 5) Use weights to interpolate values
+
+    const Field<Type>& fOwn = this->originalPatchField();
+    const Field<Type> fNei = regionCouplePatch_.interpolate
+    (
+        this->shadowPatchField().originalPatchField()
+    );
+
+    // Do interpolation
+    scalarField weights = this->weights(fOwn, fNei);
+
+    Field<Type>::operator=(weights*fOwn + (1.0 - weights)*fNei);
+
+    if (regionCouplePatch_.bridgeOverlap())
+    {
+        // Symmetry treatment used for overlap
+        vectorField nHat = this->patch().nf();
+
+        Field<Type> pif = this->patchInternalField();
+
+        Field<Type> bridgeField =
+            0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
+
+        regionCouplePatch_.bridge(bridgeField, *this);
+    }
+}
+
+
+template<class Type>
+void regionCouplingFvPatchField<Type>::evaluate
+(
+    const Pstream::commsTypes
+)
+{
+    // No interpolation allowed
+
+    fvPatchField<Type>::evaluate();
+}
+
+
+template<class Type>
+void regionCouplingFvPatchField<Type>::updateCoeffs()
+{
+    if (this->updated())
+    {
+        return;
+    }
+
+    Field<Type> fOwn = this->patchInternalField();
+    Field<Type> fNei = this->patchNeighbourField();
+
+    // Do interpolation
+    scalarField weights = this->weights(fOwn, fNei);
+
+    Field<Type>::operator=(weights*fOwn + (1.0 - weights)*fNei);
+
+    if (regionCouplePatch_.bridgeOverlap())
+    {
+        // Symmetry treatment used for overlap
+        vectorField nHat = this->patch().nf();
+
+        Field<Type> pif = this->patchInternalField();
+
+        Field<Type> bridgeField =
+            0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
+
+        regionCouplePatch_.bridge(bridgeField, *this);
+    }
+
+    // Store original field for symmetric evaluation
+    // Henrik Rusche, Aug/2011
+    if (curTimeIndex_ != this->db().time().timeIndex())
+    {
+        originalPatchField_ = *this;
+        curTimeIndex_ = this->db().time().timeIndex();
+    }
+}
+
+
+template<class Type>
+tmp<Field<Type> > regionCouplingFvPatchField<Type>::snGrad() const
+{
+    if (regionCouplePatch_.coupled())
+    {
+        return coupledFvPatchField<Type>::snGrad();
+    }
+    else
+    {
+        return fvPatchField<Type>::snGrad();
+    }
+}
+
+
+// Initialise neighbour processor internal cell data
+template<class Type>
+void regionCouplingFvPatchField<Type>::initInterfaceMatrixUpdate
+(
+    const scalarField& psiInternal,
+    scalarField& result,
+    const lduMatrix&,
+    const scalarField& coeffs,
+    const direction cmpt,
+    const Pstream::commsTypes
+) const
+{
+    if (regionCouplePatch_.coupled())
+    {
+        // Prepare local matrix update buffer for the remote side.
+        // Note that only remote side will have access to its psiInternal
+        // as they are on different regions
+
+        // Since interpolation needs to happen on the shadow, and within the
+        // init, prepare interpolation for the other side.
+        matrixUpdateBuffer_ =
+            this->shadowPatchField().regionCouplePatch().interpolate
+            (
+                this->patch().patchInternalField(psiInternal)
+            );
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "regionCouplingFvPatchField<Type>::initInterfaceMatrixUpdate"
+        )   << "init matrix update calld in detached state"
+            << abort(FatalError);
+
+    }
+}
+
+
+// Return matrix product for coupled boundary
+template<class Type>
+void regionCouplingFvPatchField<Type>::updateInterfaceMatrix
+(
+    const scalarField& psiInternal,
+    scalarField& result,
+    const lduMatrix&,
+    const scalarField& coeffs,
+    const direction ,
+    const Pstream::commsTypes
+) const
+{
+    if (regionCouplePatch_.coupled())
+    {
+        // Note: interpolation involves parallel communications and needs to
+        // happen during init.  This changes the use of matrix update buffer
+        // compared to earlier versions
+        // HJ, 28/Sep/2011
+        scalarField pnf = this->shadowPatchField().matrixUpdateBuffer();
+
+        // Multiply the field by coefficients and add into the result
+        const unallocLabelList& fc = regionCouplePatch_.faceCells();
+
+        forAll(fc, elemI)
+        {
+            result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
+        }
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "regionCouplingFvPatchField<Type>::updateInterfaceMatrix"
+        )   << "Matrix update calld in detached state"
+            << abort(FatalError);
+
+    }
+}
+
+
+// Write
+template<class Type>
+void regionCouplingFvPatchField<Type>::write(Ostream& os) const
+{
+    fvPatchField<Type>::write(os);
+    os.writeKeyword("remoteField")
+        << remoteFieldName_ << token::END_STATEMENT << nl;
+    this->writeEntry("value", os);
+}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// ************************************************************************* //

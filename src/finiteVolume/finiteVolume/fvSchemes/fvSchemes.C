@@ -327,7 +327,10 @@ bool Foam::fvSchemes::read()
         }
 
 
-        divSchemes_ = dict.subDict("divSchemes");
+        if (dict.found("divSchemes"))
+        {
+            divSchemes_ = dict.subDict("divSchemes");
+        }
 
         if
         (
@@ -338,8 +341,10 @@ bool Foam::fvSchemes::read()
             defaultDivScheme_ = divSchemes_.lookup("default");
         }
 
-
-        gradSchemes_ = dict.subDict("gradSchemes");
+        if (dict.found("gradSchemes"))
+        {
+            gradSchemes_ = dict.subDict("gradSchemes");
+        }
 
         if
         (
@@ -370,7 +375,10 @@ bool Foam::fvSchemes::read()
         }
 
 
-        laplacianSchemes_ = dict.subDict("laplacianSchemes");
+        if (dict.found("laplacianSchemes"))
+        {
+            laplacianSchemes_ = dict.subDict("laplacianSchemes");
+        }
 
         if
         (

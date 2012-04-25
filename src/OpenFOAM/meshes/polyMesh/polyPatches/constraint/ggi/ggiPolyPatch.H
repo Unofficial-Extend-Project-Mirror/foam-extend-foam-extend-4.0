@@ -279,116 +279,128 @@ public:
 
     // Member functions
 
-        //- Return shadow patch name
-        const word& shadowName() const
-        {
-            return shadowName_;
-        }
+        // Basic info
 
-        //- Return name of interpolation face zone
-        const word& zoneName() const
-        {
-            return zoneName_;
-        }
+            //- Return shadow patch name
+            const word& shadowName() const
+            {
+                return shadowName_;
+            }
 
-        //- Return shadow patch index
-        label shadowIndex() const;
+            //- Return name of interpolation face zone
+            const word& zoneName() const
+            {
+                return zoneName_;
+            }
 
-        //- Return zone patch index
-        label zoneIndex() const;
+            //- Return shadow patch index
+            label shadowIndex() const;
 
-        //- Return shadow patch
-        const ggiPolyPatch& shadow() const;
+            //- Return zone patch index
+            label zoneIndex() const;
 
-        //- Return interpolation face zone
-        const faceZone& zone() const;
+            //- Return shadow patch
+            const ggiPolyPatch& shadow() const;
 
-        //- Is this the master side?
-        bool master() const
-        {
-            return index() < shadowIndex();
-        }
+            //- Return interpolation face zone
+            const faceZone& zone() const;
 
-        //- Is this the slave side?
-        bool slave() const
-        {
-            return !master();
-        }
+        // Interpolation data
 
-        //- Use bridging to fix overlap error in interpolation
-        bool bridgeOverlap() const
-        {
-            return bridgeOverlap_;
-        }
+            //- Is this the master side?
+            bool master() const
+            {
+                return index() < shadowIndex();
+            }
 
-        //- Return patch-to-zone addressing
-        const labelList& zoneAddressing() const;
+            //- Is this the slave side?
+            bool slave() const
+            {
+                return !master();
+            }
 
-        //- Return remote patch-to-zone addressing
-        const labelList& remoteZoneAddressing() const;
+            //- Use bridging to fix overlap error in interpolation
+            bool bridgeOverlap() const
+            {
+                return bridgeOverlap_;
+            }
 
-        //- Is the patch localised on a single processor
-        bool localParallel() const;
+            //- Return patch-to-zone addressing
+            const labelList& zoneAddressing() const;
 
-        //- Return reference to patch-to-patch interpolation
-        //  Used only for addressing
-        const ggiZoneInterpolation& patchToPatch() const;
+            //- Return remote patch-to-zone addressing
+            const labelList& remoteZoneAddressing() const;
 
-        //- Expand face field to full zone size, including reduction
-        //  New.  HJ, 12/Jun/2011
-        template<class Type>
-        tmp<Field<Type> > fastExpand(const Field<Type>& pf) const;
+            //- Is the patch localised on a single processor
+            bool localParallel() const;
 
-        //- Expand face field to full zone size, including reduction
-        //  Obsolete.  HJ, 12/Jun/2011
-        template<class Type>
-        tmp<Field<Type> > expand(const Field<Type>& pf) const;
-
-        //- Filter zone field to patch size
-        //  Obsolete.  HJ, 12/Jun/2011
-        template<class Type>
-        tmp<Field<Type> > filter(const Field<Type>& zf) const;
+            //- Return reference to patch-to-patch interpolation
+            //  Used only for addressing
+            const ggiZoneInterpolation& patchToPatch() const;
 
 
-        //- Interpolate face field: given field on a the shadow side,
-        //  create an interpolated field on this side
-        template<class Type>
-        tmp<Field<Type> > interpolate(const Field<Type>& pf) const;
+        // Interpolation functions
 
-        template<class Type>
-        tmp<Field<Type> > interpolate(const tmp<Field<Type> >& tpf) const;
+            //- Expand face field to full zone size, including reduction
+            //  New.  HJ, 12/Jun/2011
+            template<class Type>
+            tmp<Field<Type> > fastExpand(const Field<Type>& pf) const;
 
-        //- Bridge interpolated face field for uncovered faces
-        template<class Type>
-        void bridge
-        (
-            const Field<Type>& bridgeField,
-            Field<Type>& ff
-        ) const;
+            //- Expand face field to full zone size, including reduction
+            //  Obsolete.  HJ, 12/Jun/2011
+            template<class Type>
+            tmp<Field<Type> > expand(const Field<Type>& pf) const;
 
-        //- Return reconstructed cell centres
-        const vectorField& reconFaceCellCentres() const;
+            //- Filter zone field to patch size
+            //  Obsolete.  HJ, 12/Jun/2011
+            template<class Type>
+            tmp<Field<Type> > filter(const Field<Type>& zf) const;
 
-        //- Initialize ordering for primitivePatch. Does not
-        //  refer to *this (except for name() and type() etc.)
-        virtual void initOrder(const primitivePatch&) const;
+            //- Interpolate face field: given field on a the shadow side,
+            //  create an interpolated field on this side
+            template<class Type>
+            tmp<Field<Type> > interpolate(const Field<Type>& pf) const;
 
-        //- Return new ordering for primitivePatch.
-        //  Ordering is -faceMap: for every face
-        //  index of the new face -rotation: for every new face the clockwise
-        //  shift of the original face. Return false if nothing changes
-        //  (faceMap is identity, rotation is 0), true otherwise.
-        virtual bool order
-        (
-            const primitivePatch&,
-            labelList& faceMap,
-            labelList& rotation
-        ) const;
+            template<class Type>
+            tmp<Field<Type> > interpolate(const tmp<Field<Type> >& tpf) const;
 
-        //- Synchronise communications of ordering for primitivePatch
-        //  Used in cases when no topological change happens locally,
-        //  but is happening on other processors
-        virtual void syncOrder() const;
+            //- Bridge interpolated face field for uncovered faces
+            template<class Type>
+            void bridge
+            (
+                const Field<Type>& bridgeField,
+                Field<Type>& ff
+            ) const;
+
+
+        // Geometric data
+
+            //- Return reconstructed cell centres
+            const vectorField& reconFaceCellCentres() const;
+
+
+        // Patch ordering
+
+            //- Initialize ordering for primitivePatch. Does not
+            //  refer to *this (except for name() and type() etc.)
+            virtual void initOrder(const primitivePatch&) const;
+
+            //- Return new ordering for primitivePatch.
+            //  Ordering is -faceMap: for every face
+            //  index of the new face -rotation: for every new face the
+            //  clockwise shift of the original face. Return false if nothing
+            //  changes (faceMap is identity, rotation is 0), true otherwise.
+            virtual bool order
+            (
+                const primitivePatch&,
+                labelList& faceMap,
+                labelList& rotation
+            ) const;
+
+            //- Synchronise communications of ordering for primitivePatch
+            //  Used in cases when no topological change happens locally,
+            //  but is happening on other processors
+            virtual void syncOrder() const;
 
 
         //- Write

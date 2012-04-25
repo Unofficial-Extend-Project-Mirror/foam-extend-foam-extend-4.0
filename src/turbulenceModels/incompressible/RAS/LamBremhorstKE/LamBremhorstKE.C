@@ -97,7 +97,7 @@ LamBremhorstKE::LamBremhorstKE
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -110,7 +110,7 @@ LamBremhorstKE::LamBremhorstKE
         (
             "epsilon",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -133,7 +133,7 @@ LamBremhorstKE::LamBremhorstKE
         (
             "nut",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -159,7 +159,7 @@ tmp<volSymmTensorField> LamBremhorstKE::R() const
             (
                 "R",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -180,7 +180,7 @@ tmp<volSymmTensorField> LamBremhorstKE::devReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

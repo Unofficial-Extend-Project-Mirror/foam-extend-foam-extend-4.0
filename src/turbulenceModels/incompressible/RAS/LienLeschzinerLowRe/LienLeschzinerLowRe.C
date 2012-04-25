@@ -143,7 +143,7 @@ LienLeschzinerLowRe::LienLeschzinerLowRe
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -156,7 +156,7 @@ LienLeschzinerLowRe::LienLeschzinerLowRe
         (
             "epsilon",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -173,7 +173,7 @@ LienLeschzinerLowRe::LienLeschzinerLowRe
         (
             "epsilon",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -203,7 +203,7 @@ tmp<volSymmTensorField> LienLeschzinerLowRe::R() const
             (
                 "R",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -224,7 +224,7 @@ tmp<volSymmTensorField> LienLeschzinerLowRe::devReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

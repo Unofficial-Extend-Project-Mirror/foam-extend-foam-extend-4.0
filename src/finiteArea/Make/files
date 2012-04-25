@@ -1,6 +1,7 @@
 faMesh/faGlobalMeshData/faGlobalMeshData.C
 faMesh/faMesh.C
 faMesh/faMeshDemandDrivenData.C
+faMesh/faMeshUpdate.C
 faMesh/faBoundaryMesh/faBoundaryMesh.C
 
 faPatches = faMesh/faPatches
@@ -12,6 +13,12 @@ $(faPatches)/constraint/processor/processorFaPatch.C
 $(faPatches)/constraint/wedge/wedgeFaPatch.C
 $(faPatches)/constraint/cyclic/cyclicFaPatch.C
 $(faPatches)/constraint/symmetry/symmetryFaPatch.C
+
+faMeshMapper = faMesh/faMeshMapper
+$(faMeshMapper)/faMeshMapper.C
+$(faMeshMapper)/faAreaMapper.C
+$(faMeshMapper)/faEdgeMapper.C
+$(faMeshMapper)/faPatchMapper.C
 
 faPatchFields = fields/faPatchFields
 $(faPatchFields)/faPatchField/faPatchFields.C

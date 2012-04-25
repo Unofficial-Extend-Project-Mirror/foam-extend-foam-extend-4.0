@@ -24,9 +24,8 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+
 #include "accordionEngineMesh.H"
-#include "layerAdditionRemoval.H"
-#include "attachDetach.H"
 #include "componentMixedTetPolyPatchVectorField.H"
 #include "mapPolyMesh.H"
 #include "polyTopoChange.H"
@@ -45,7 +44,12 @@ License
 namespace Foam
 {
     defineTypeNameAndDebug(accordionEngineMesh, 0);
-    addToRunTimeSelectionTable(engineTopoChangerMesh, accordionEngineMesh, IOobject);
+    addToRunTimeSelectionTable
+    (
+        engineTopoChangerMesh,
+        accordionEngineMesh,
+        IOobject
+    );
 }
 
 
@@ -53,11 +57,15 @@ namespace Foam
 
 
 
-    
+
 bool Foam::accordionEngineMesh::realDeformation() const
 {
 
-    if (virtualPistonPosition() + engTime().pistonDisplacement().value() > deckHeight_ - SMALL)
+    if
+    (
+        virtualPistonPosition() + engTime().pistonDisplacement().value()
+      > deckHeight_ - SMALL
+    )
     {
         return true;
     }
@@ -73,30 +81,24 @@ bool Foam::accordionEngineMesh::realDeformation() const
 Foam::accordionEngineMesh::accordionEngineMesh
 (
     const IOobject& io
+//    bool addZonesAndMods
 )
 :
     engineTopoChangerMesh(io),
     piston_(*this, engTime().engineDict().subDict("piston")),
     valves_(*this, engTime().engineDict().lookup("accordionEngineMesh")),
-    deformSwitch_(readScalar(engTime().engineDict().lookup("deformAngle"))),
-    delta_(readScalar(engTime().engineDict().lookup("delta"))),
-    offSet_(readScalar(engTime().engineDict().lookup("offSet"))),
     pistonPosition_(-GREAT),
     virtualPistonPosition_(-GREAT),
     deckHeight_(GREAT),
-    msPtr_(motionSolver::New(*this)),
     cylinderHeadName_(engTime().engineDict().lookup("cylinderHeadName")),
     linerName_(engTime().engineDict().lookup("linerName")),
-    pistonAuxPoints_(engTime().engineDict().lookup("pistonAuxPoints")),
-    moveDetach_(engTime().engineDict().lookup("moveDetach"))
+    headCellSetName_(engTime().engineDict().lookup("headCellSetName"))
 
 {
     // Add zones and modifiers if not already there.
-    addZonesAndModifiers();
+    addMeshZones();
+    msPtr_ = motionSolver::New(*this);
 }
-
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -118,32 +120,8 @@ void Foam::accordionEngineMesh::setBoundaryVelocity(volVectorField& U)
             U.boundaryField()[valves()[valveI].stemPatchID().index()] ==
                 valveVel;
         }
-
-        // If valve is present in geometry, set the motion
-        if (valves()[valveI].detachInPortPatchID().active())
-        {
-            // Bottom of the valve moves with given velocity
-            U.boundaryField()[valves()[valveI].detachInPortPatchID().index()] ==
-                vector::zero;
-            U.oldTime().boundaryField()[valves()[valveI].detachInPortPatchID().index()] ==
-                vector::zero;
-        }
-
-        // If valve is present in geometry, set the motion
-        if (valves()[valveI].detachInCylinderPatchID().active())
-        {
-            // Bottom of the valve moves with given velocity
-            U.boundaryField()[valves()[valveI].detachInCylinderPatchID().index()] ==
-               vector::zero;
-            U.oldTime().boundaryField()[valves()[valveI].detachInCylinderPatchID().index()] ==
-               vector::zero;
-        }
-     
     }
-
 }
-
-
 
 
 // ************************************************************************* //

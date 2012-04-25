@@ -102,7 +102,7 @@ public:
 
         // Access
 
-            //- Return true because this patch is coupled
+            //- Return true if patch is coupled
             virtual bool coupled() const
             {
                 return coupledPolyPatch_.coupled();

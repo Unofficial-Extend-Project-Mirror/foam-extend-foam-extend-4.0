@@ -169,13 +169,13 @@ $(regIOobject)/regIOobjectWrite.C
 
 db/IOobjectList/IOobjectList.C
 db/objectRegistry/objectRegistry.C
+db/postfixedSubRegistry/postfixedSubRegistry.C
 db/CallbackRegistry/CallbackRegistryName.C
 db/dlLibraryTable/dlLibraryTable.C
 
 db/functionObjects/functionObject/functionObject.C
 db/functionObjects/functionObjectList/functionObjectList.C
 db/functionObjects/outputFilterOutputControl/outputFilterOutputControl.C
-
 
 Time = db/Time
 $(Time)/TimePaths.C
@@ -276,6 +276,7 @@ $(GAMGInterfaces)/processorGAMGInterface/processorGAMGInterface.C
 $(GAMGInterfaces)/cyclicGAMGInterface/cyclicGAMGInterface.C
 $(GAMGInterfaces)/ggiGAMGInterface/ggiGAMGInterface.C
 $(GAMGInterfaces)/cyclicGgiGAMGInterface/cyclicGgiGAMGInterface.C
+$(GAMGInterfaces)/regionCoupleGAMGInterface/regionCoupleGAMGInterface.C
 /*$(GAMGInterfaces)/mixingPlaneGAMGInterface/mixingPlaneGAMGInterface.C*/
 
 GAMGInterfaceFields = $(GAMG)/interfaceFields
@@ -285,6 +286,7 @@ $(GAMGInterfaceFields)/processorGAMGInterfaceField/processorGAMGInterfaceField.C
 $(GAMGInterfaceFields)/cyclicGAMGInterfaceField/cyclicGAMGInterfaceField.C
 $(GAMGInterfaceFields)/ggiGAMGInterfaceField/ggiGAMGInterfaceField.C
 $(GAMGInterfaceFields)/cyclicGgiGAMGInterfaceField/cyclicGgiGAMGInterfaceField.C
+$(GAMGInterfaceFields)/regionCoupleGAMGInterfaceField/regionCoupleGAMGInterfaceField.C
 /*$(GAMGInterfaceFields)/mixingPlaneGAMGInterfaceField/mixingPlaneGAMGInterfaceField.C*/
 
 GAMGAgglomerations = $(GAMG)/GAMGAgglomerations
@@ -642,11 +644,11 @@ matrices/blockLduMatrix/BlockLduSmoothers/BlockILUSmoother/blockILUSmoothers.C
 
 matrices/blockLduMatrix/BlockLduSolvers/BlockLduSolver/blockLduSolvers.C
 matrices/blockLduMatrix/BlockLduSolvers/BlockDiagonal/blockDiagonalSolvers.C
-/*HJ matrices/blockLduMatrix/BlockLduSolvers/Segregated/segregatedSolvers.C */
 matrices/blockLduMatrix/BlockLduSolvers/BlockGaussSeidel/blockGaussSeidelSolvers.C
 matrices/blockLduMatrix/BlockLduSolvers/BlockCG/blockCGSolvers.C
 matrices/blockLduMatrix/BlockLduSolvers/BlockBiCGStab/blockBiCGStabSolvers.C
 matrices/blockLduMatrix/BlockLduSolvers/BlockGMRES/blockGMRESSolvers.C
+matrices/blockLduMatrix/BlockLduSolvers/Segregated/segregatedSolvers.C
 
 matrices/blockLduMatrix/BlockLduMatrix/BlockLduInterface/BlockLduInterfaceFields.C
 

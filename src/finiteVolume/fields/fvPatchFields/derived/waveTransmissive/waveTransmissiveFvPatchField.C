@@ -114,7 +114,7 @@ template<class Type>
 tmp<scalarField> waveTransmissiveFvPatchField<Type>::advectionSpeed() const
 {
     // Lookup the velocity and compressibility of the patch
-    const fvPatchField<scalar>& psip = this->patch().lookupPatchField
+    const fvPatchField<scalar>& psip = this->lookupPatchField
     (
         psiName_,
         reinterpret_cast<const volScalarField*>(0),
@@ -125,7 +125,7 @@ tmp<scalarField> waveTransmissiveFvPatchField<Type>::advectionSpeed() const
         this->db().objectRegistry::lookupObject<surfaceScalarField>
         (this->phiName_);
 
-    fvsPatchField<scalar> phip = this->patch().lookupPatchField
+    fvsPatchField<scalar> phip = this->lookupPatchField
     (
         this->phiName_,
         reinterpret_cast<const surfaceScalarField*>(0),
@@ -134,7 +134,7 @@ tmp<scalarField> waveTransmissiveFvPatchField<Type>::advectionSpeed() const
 
     if (phi.dimensions() == dimDensity*dimVelocity*dimArea)
     {
-        const fvPatchScalarField& rhop = this->patch().lookupPatchField
+        const fvPatchScalarField& rhop = this->lookupPatchField
         (
             this->rhoName_,
             reinterpret_cast<const volScalarField*>(0),
@@ -155,7 +155,7 @@ template<class Type>
 tmp<scalarField> waveTransmissiveFvPatchField<Type>::supercritical() const
 {
     // Lookup the velocity and compressibility of the patch
-    const fvPatchField<scalar>& psip = this->patch().lookupPatchField
+    const fvPatchField<scalar>& psip = this->lookupPatchField
     (
         psiName_,
         reinterpret_cast<const volScalarField*>(NULL),
@@ -163,7 +163,7 @@ tmp<scalarField> waveTransmissiveFvPatchField<Type>::supercritical() const
     );
 
     const fvPatchVectorField& U =
-        this->patch().lookupPatchField
+        this->lookupPatchField
         (
             UName_,
             reinterpret_cast<const volVectorField*>(NULL),
@@ -211,8 +211,6 @@ void waveTransmissiveFvPatchField<Type>::write(Ostream& os) const
         os.writeKeyword("lInf") << this->lInf_
             << token::END_STATEMENT << nl;
     }
-
-    this->writeEntry("value", os);
 }
 
 

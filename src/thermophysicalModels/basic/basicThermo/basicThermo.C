@@ -145,7 +145,7 @@ void Foam::basicThermo::eBoundaryCorrection(volScalarField& e)
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::basicThermo::basicThermo(const fvMesh& mesh)
+Foam::basicThermo::basicThermo(const fvMesh& mesh, const objectRegistry& obj)
 :
     IOdictionary
     (
@@ -153,7 +153,7 @@ Foam::basicThermo::basicThermo(const fvMesh& mesh)
         (
             "thermophysicalProperties",
             mesh.time().constant(),
-            mesh,
+            obj,
             IOobject::MUST_READ,
             IOobject::NO_WRITE
         )
@@ -165,7 +165,7 @@ Foam::basicThermo::basicThermo(const fvMesh& mesh)
         (
             "p",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -178,7 +178,7 @@ Foam::basicThermo::basicThermo(const fvMesh& mesh)
         (
             "psi",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -192,7 +192,7 @@ Foam::basicThermo::basicThermo(const fvMesh& mesh)
         (
             "T",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -205,7 +205,7 @@ Foam::basicThermo::basicThermo(const fvMesh& mesh)
         (
             "mu",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -219,7 +219,7 @@ Foam::basicThermo::basicThermo(const fvMesh& mesh)
         (
             "alpha",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),

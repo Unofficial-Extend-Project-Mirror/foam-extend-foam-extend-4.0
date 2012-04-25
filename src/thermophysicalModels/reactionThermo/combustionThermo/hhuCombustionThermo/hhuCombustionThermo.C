@@ -100,9 +100,13 @@ void hhuCombustionThermo::huBoundaryCorrection(volScalarField& hu)
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-hhuCombustionThermo::hhuCombustionThermo(const fvMesh& mesh)
+hhuCombustionThermo::hhuCombustionThermo
+(
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
 :
-    hCombustionThermo(mesh),
+    hCombustionThermo(mesh, obj),
 
     Tu_
     (
@@ -110,7 +114,7 @@ hhuCombustionThermo::hhuCombustionThermo(const fvMesh& mesh)
         (
             "Tu",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -123,7 +127,7 @@ hhuCombustionThermo::hhuCombustionThermo(const fvMesh& mesh)
         (
             "hu",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),

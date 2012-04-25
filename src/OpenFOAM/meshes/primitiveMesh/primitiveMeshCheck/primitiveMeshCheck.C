@@ -537,7 +537,7 @@ bool Foam::primitiveMesh::checkFaceOrthogonality
                     << ::acos(minDDotS)/mathematicalConstant::pi*180.0
                     << " average: " <<
                     ::acos(sumDDotS/neiSize)/mathematicalConstant::pi*180.0
-                    << " Threshold = " << nonOrthThreshold_                    
+                    << " Threshold = " << nonOrthThreshold_
                     << endl;
             }
         }
@@ -1353,55 +1353,58 @@ bool Foam::primitiveMesh::checkUpperTriangular
             }
         }
 
-        nbr.sort();
-
-        // Now nbr holds the cellCells in incremental order. Check:
-        // - neighbouring cells appear only once. Since nbr is sorted this
-        //   is simple check on consecutive elements
-        // - faces indexed in same order as nbr are incrementing as well.
-
-        label prevCell = nbr[0];
-        label prevFace = curFaces[nbr.indices()[0]];
-
-        bool hasMultipleFaces = false;
-
-        for (label i = 1; i < nbr.size(); i++)
+        if (!nbr.empty())
         {
-            label thisCell = nbr[i];
-            label thisFace = curFaces[nbr.indices()[i]];
+            nbr.sort();
 
-            if (thisCell == labelMax)
+            // Now nbr holds the cellCells in incremental order. Check:
+            // - neighbouring cells appear only once. Since nbr is sorted this
+            //   is simple check on consecutive elements
+            // - faces indexed in same order as nbr are incrementing as well.
+
+            label prevCell = nbr[0];
+            label prevFace = curFaces[nbr.indices()[0]];
+
+            bool hasMultipleFaces = false;
+
+            for (label i = 1; i < nbr.size(); i++)
             {
-                break;
-            }
+                label thisCell = nbr[i];
+                label thisFace = curFaces[nbr.indices()[i]];
 
-            if (thisCell == prevCell)
-            {
-                hasMultipleFaces = true;
-
-                if (setPtr)
+                if (thisCell == labelMax)
                 {
-                    setPtr->insert(prevFace);
-                    setPtr->insert(thisFace);
+                    break;
                 }
-            }
-            else if (thisFace < prevFace)
-            {
-                error = true;
 
-                if (setPtr)
+                if (thisCell == prevCell)
                 {
-                    setPtr->insert(thisFace);
+                    hasMultipleFaces = true;
+
+                    if (setPtr)
+                    {
+                        setPtr->insert(prevFace);
+                        setPtr->insert(thisFace);
+                    }
                 }
+                else if (thisFace < prevFace)
+                {
+                    error = true;
+
+                    if (setPtr)
+                    {
+                        setPtr->insert(thisFace);
+                    }
+                }
+
+                prevCell = thisCell;
+                prevFace = thisFace;
             }
 
-            prevCell = thisCell;
-            prevFace = thisFace;
-        }
-
-        if (hasMultipleFaces)
-        {
-            nMultipleCells++;
+            if (hasMultipleFaces)
+            {
+                nMultipleCells++;
+            }
         }
     }
 

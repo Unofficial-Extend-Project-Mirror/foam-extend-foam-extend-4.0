@@ -65,7 +65,7 @@ void Foam::BlockLduSolver<Type>::readControl
             ")",
             dict
         )   << "Cannot read control " << controlName
-            << abort(FatalIOError);
+            << exit(FatalIOError);
     }
 }
 
@@ -119,6 +119,52 @@ Foam::BlockLduSolver<Type>::New
             new BlockDiagonalSolver<Type>(fieldName, matrix, dict)
         );
     }
+    else if (matrix.symmetric() || matrix.asymmetric())
+    {
+        return BlockLduSolver<Type>::New
+        (
+            solverName,
+            fieldName,
+            matrix,
+            dict
+        );
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "BlockLduSolver<Type>::New\n"
+            "(\n"
+            "    const word& fieldName,\n"
+            "    BlockLduMatrix<Type>& matrix,\n"
+            "    const dictionary& dict\n"
+            ")"
+        )   << "cannot solve incomplete matrix, "
+               "no diagonal or off-diagonal coefficient"
+            << exit(FatalError);
+
+        return autoPtr<BlockLduSolver<Type> >(NULL);
+    }
+}
+
+
+template<class Type>
+Foam::autoPtr<typename Foam::BlockLduSolver<Type> >
+Foam::BlockLduSolver<Type>::New
+(
+    const word& solverName,
+    const word& fieldName,
+    BlockLduMatrix<Type>& matrix,
+    const dictionary& dict
+)
+{
+    if (matrix.diagonal())
+    {
+        return autoPtr<BlockLduSolver<Type> >
+        (
+            new BlockDiagonalSolver<Type>(fieldName, matrix, dict)
+        );
+    }
     else if (matrix.symmetric())
     {
         if (!symMatrixConstructorTablePtr_)
@@ -143,6 +189,7 @@ Foam::BlockLduSolver<Type>::New
             (
                 "BlockLduSolver<Type>::New\n"
                 "(\n"
+                "    const word& solverName,\n"
                 "    const word& fieldName,\n"
                 "    BlockLduMatrix<Type>& matrix,\n"
                 "    const dictionary& dict\n"
@@ -173,6 +220,7 @@ Foam::BlockLduSolver<Type>::New
             (
                 "BlockLduSolver<Type>::New\n"
                 "(\n"
+                "    const word& solverName,\n"
                 "    const word& fieldName,\n"
                 "    BlockLduMatrix<Type>& matrix,\n"
                 "    const dictionary& dict\n"
@@ -189,6 +237,7 @@ Foam::BlockLduSolver<Type>::New
             (
                 "BlockLduSolver<Type>::New\n"
                 "(\n"
+                "    const word& solverName,\n"
                 "    const word& fieldName,\n"
                 "    BlockLduMatrix<Type>& matrix,\n"
                 "    const dictionary& dict\n"
@@ -217,6 +266,7 @@ Foam::BlockLduSolver<Type>::New
         (
             "BlockLduSolver<Type>::New\n"
             "(\n"
+            "    const word& solverName,\n"
             "    const word& fieldName,\n"
             "    BlockLduMatrix<Type>& matrix,\n"
             "    const dictionary& dict\n"

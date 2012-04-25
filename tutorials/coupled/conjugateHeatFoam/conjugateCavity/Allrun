@@ -6,10 +6,14 @@ application="conjugateHeatFoam"
 
 runApplication blockMesh
 cp boundary constant/polyMesh
+runApplication setSet -batch setBatch
+runApplication setsToZones -noFlipMap
 
 cd ../heatedBlock
 runApplication blockMesh
 cp boundary constant/polyMesh
+runApplication setSet -batch setBatch
+runApplication setsToZones -noFlipMap
 
 cd ../conjugateCavity
 runApplication $application

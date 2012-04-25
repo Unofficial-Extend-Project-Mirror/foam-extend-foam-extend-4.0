@@ -163,13 +163,13 @@ void smoluchowskiJumpTFvPatchScalarField::updateCoeffs()
     }
 
     const fvPatchScalarField& pmu =
-        patch().lookupPatchField<volScalarField, scalar>("mu");
+        lookupPatchField<volScalarField, scalar>("mu");
     const fvPatchScalarField& prho =
-        patch().lookupPatchField<volScalarField, scalar>("rho");
+        lookupPatchField<volScalarField, scalar>("rho");
     const fvPatchField<scalar>& ppsi =
-        patch().lookupPatchField<volScalarField, scalar>("psi");
+        lookupPatchField<volScalarField, scalar>("psi");
     const fvPatchVectorField& pU =
-        patch().lookupPatchField<volVectorField, vector>("U");
+        lookupPatchField<volVectorField, vector>("U");
 
     // Prandtl number reading consistent with rhoCentralFoam
     const dictionary& thermophysicalProperties =

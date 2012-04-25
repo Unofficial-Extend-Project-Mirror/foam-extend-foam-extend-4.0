@@ -56,12 +56,12 @@ int main(int argc, char *argv[])
     {
 #       include "readControls.H"
 #       include "checkTotalVolume.H"
-#       include "CourantNo.H"
-
-#       include "setDeltaT.H"
 
         // Make the fluxes absolute
         fvc::makeAbsolute(phi, U);
+
+#       include "CourantNo.H"
+#       include "setDeltaT.H"
 
         runTime++;
 
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
 #       include "volContinuity.H"
 
-        if (correctPhi && meshChanged)
+        if (correctPhi && (mesh.moving() || meshChanged))
         {
             // Fluxes will be corrected to absolute velocity
             // HJ, 6/Feb/2009
@@ -81,16 +81,16 @@ int main(int argc, char *argv[])
         // Make the fluxes relative to the mesh motion
         fvc::makeRelative(phi, U);
 
-        if (meshChanged)
+        if (mesh.moving() && checkMeshCourantNo)
         {
-#           include "CourantNo.H"
+#           include "meshCourantNo.H"
         }
 
 #       include "UEqn.H"
 
         // --- PISO loop
 
-        for (int corr=0; corr<nCorr; corr++)
+        for (int corr = 0; corr < nCorr; corr++)
         {
             rAU = 1.0/UEqn.A();
 
@@ -111,11 +111,11 @@ int main(int argc, char *argv[])
 
                 if (corr == nCorr - 1 && nonOrth == nNonOrthCorr)
                 {
-                    pEqn.solve(mesh.solver(p.name() + "Final"));
+                    pEqn.solve(mesh.solutionDict().solver(p.name() + "Final"));
                 }
                 else
                 {
-                    pEqn.solve(mesh.solver(p.name()));
+                    pEqn.solve(mesh.solutionDict().solver(p.name()));
                 }
 
                 if (nonOrth == nNonOrthCorr)

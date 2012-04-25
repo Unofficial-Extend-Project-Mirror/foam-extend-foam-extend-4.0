@@ -11,4 +11,5 @@ EXE_LIBS = \
     -lmeshTools \
     -ldynamicMesh \
     -lengine \
-    -lmeshTools
+    -lmeshTools \
+    -llduSolvers

@@ -83,7 +83,7 @@ class turboFvMesh
         dictionary dict_;
 
         //- Coordinate system
-        autoPtr<coordinateSystem> csPtr_;
+        cylindricalCS cs_;
 
         //- Markup field for points.
         mutable vectorField* movingPointsPtr_;
@@ -124,9 +124,9 @@ public:
     // Member Functions
 
         //- Return coordinate system
-        const coordinateSystem& cs() const
+        const cylindricalCS& cs() const
         {
-            return csPtr_();
+            return cs_;
         }
 
         //- Update the mesh for both mesh motion

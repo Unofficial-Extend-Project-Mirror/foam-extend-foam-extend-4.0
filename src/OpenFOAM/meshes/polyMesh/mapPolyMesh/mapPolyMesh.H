@@ -489,7 +489,7 @@ public:
                     }
                     else if (i < -1)
                     {
-                        return -i-2;
+                        return -i - 2;
                     }
                     else
                     {
@@ -498,6 +498,7 @@ public:
                             << " has reverseMap " << i << endl
                             << "Only call mergedPoint for removed points."
                             << abort(FatalError);
+
                         return -1;
                     }
                 }
@@ -520,7 +521,7 @@ public:
                     }
                     else if (i < -1)
                     {
-                        return -i-2;
+                        return -i - 2;
                     }
                     else
                     {
@@ -529,6 +530,7 @@ public:
                             << " has reverseMap " << i << endl
                             << "Only call mergedFace for removed faces."
                             << abort(FatalError);
+
                         return -1;
                     }
                 }
@@ -551,7 +553,7 @@ public:
                     }
                     else if (i < -1)
                     {
-                        return -i-2;
+                        return -i - 2;
                     }
                     else
                     {
@@ -560,6 +562,7 @@ public:
                             << " has reverseMap " << i << endl
                             << "Only call mergedCell for removed cells."
                             << abort(FatalError);
+
                         return -1;
                     }
                 }

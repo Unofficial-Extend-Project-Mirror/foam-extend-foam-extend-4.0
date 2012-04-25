@@ -56,10 +56,11 @@ int main(int argc, char *argv[])
             "U",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
         ),
-        mesh
+        mesh,
+        dimensionedVector("zero", dimVelocity, vector::zero)
     );
 
     volScalarField motionContErr

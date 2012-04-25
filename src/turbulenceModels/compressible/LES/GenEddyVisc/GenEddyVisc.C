@@ -76,7 +76,7 @@ GenEddyVisc::GenEddyVisc
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -89,7 +89,7 @@ GenEddyVisc::GenEddyVisc
         (
             "muSgs",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -102,7 +102,7 @@ GenEddyVisc::GenEddyVisc
         (
             "alphaSgs",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),

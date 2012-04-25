@@ -140,6 +140,15 @@ ggiFvPatchField<Type>::ggiFvPatchField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+// Return shadow field
+template<class Type>
+const Foam::ggiFvPatchField<Type>&
+ggiFvPatchField<Type>::shadowPatchField() const
+{
+    return this->boundaryField()[ggiPatch_.shadowIndex()];
+}
+
+
 // Return neighbour field
 template<class Type>
 tmp<Field<Type> > ggiFvPatchField<Type>::patchNeighbourField() const
@@ -147,6 +156,9 @@ tmp<Field<Type> > ggiFvPatchField<Type>::patchNeighbourField() const
     const Field<Type>& iField = this->internalField();
 
     // Get shadow face-cells and assemble shadow field
+    // This is a patchInternalField of neighbour but access is inconvenient.
+    // Assemble by hand.
+    // HJ, 27/Sep/2011
     const unallocLabelList& sfc = ggiPatch_.shadow().faceCells();
 
     Field<Type> sField(sfc.size());
@@ -198,11 +210,10 @@ void ggiFvPatchField<Type>::initEvaluate
         // Symmetry treatment used for overlap
         vectorField nHat = this->patch().nf();
 
+        Field<Type> pif = this->patchInternalField();
+
         Field<Type> bridgeField =
-        (
-            this->patchInternalField()
-          + transform(I - 2.0*sqr(nHat), this->patchInternalField())
-        )/2.0;
+            0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
 
         ggiPatch_.bridge(bridgeField, pf);
     }

@@ -27,13 +27,13 @@
 
         pdEqn.setReference(pdRefCell, pdRefValue);
 
-        if (corr == nCorr-1)
+        if (corr == nCorr - 1)
         {
-            pdEqn.solve(mesh.solver(pd.name() + "Final"));
+            pdEqn.solve(mesh.solutionDict().solver(pd.name() + "Final"));
         }
         else
         {
-            pdEqn.solve(mesh.solver(pd.name()));
+            pdEqn.solve(mesh.solutionDict().solver(pd.name()));
         }
 
         if (nonOrth == nNonOrthCorr)

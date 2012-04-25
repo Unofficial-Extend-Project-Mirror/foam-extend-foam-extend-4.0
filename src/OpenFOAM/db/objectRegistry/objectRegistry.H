@@ -105,6 +105,14 @@ public:
             const label nIoObjects = 128
         );
 
+        //- Construct a sub-registry given an IObject to describe the registry
+        //  and an initial estimate for the number of entries
+        explicit objectRegistry
+        (
+            const IOobject& io,
+            const fileName& dbDir,
+            const label nIoObjects = 128
+        );
 
     // Destructor
 
@@ -132,6 +140,14 @@ public:
             {
                 return dbDir_;
             }
+
+            fileName& dbDir()
+            {
+                return dbDir_;
+            }
+
+            //- Return mangled fileName
+            virtual fileName mangleFileName (const fileName&) const;
 
             //- Return the list of names of the IOobjects
             wordList names() const;
@@ -168,10 +184,10 @@ public:
             virtual void rename(const word& newName);
 
             //- Add an regIOobject to registry
-            bool checkIn(regIOobject&) const;
+            virtual bool checkIn(regIOobject&) const;
 
             //- Remove an regIOobject from registry
-            bool checkOut(regIOobject&) const;
+            virtual bool checkOut(regIOobject&) const;
 
 
         // Reading

@@ -81,20 +81,24 @@ public:
         autoPtr,
         basicRhoThermo,
         fvMesh,
-        (const fvMesh& mesh),
-        (mesh)
+        (const fvMesh& mesh, const objectRegistry& obj),
+        (mesh, obj)
     );
 
 
     // Constructors
 
-        //- Construct from mesh
-        basicRhoThermo(const fvMesh&);
+        //- Construct from mesh and object registry
+        basicRhoThermo(const fvMesh&, const objectRegistry&);
 
 
     //- Selector
-    static autoPtr<basicRhoThermo> New(const fvMesh&);
+    static autoPtr<basicRhoThermo> New(const fvMesh&, const objectRegistry&);
 
+    static autoPtr<basicRhoThermo> New(const fvMesh& mesh)
+    {
+        return New(mesh, mesh);
+    }
 
     //- Destructor
     virtual ~basicRhoThermo();

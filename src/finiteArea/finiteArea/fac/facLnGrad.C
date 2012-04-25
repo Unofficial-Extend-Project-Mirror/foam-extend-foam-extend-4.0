@@ -22,9 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-Description
-    
-
 \*---------------------------------------------------------------------------*/
 
 #include "facLnGrad.H"
@@ -54,7 +51,7 @@ lnGrad
     return fa::lnGradScheme<Type>::New
     (
         vf.mesh(),
-        vf.mesh().lnGradScheme(name)
+        vf.mesh().schemesDict().lnGradScheme(name)
     )().lnGrad(vf);
 }
 

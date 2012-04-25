@@ -126,7 +126,7 @@ void Foam::fixedFluxPressureFvPatchScalarField::updateCoeffs()
     }
 
     const fvPatchField<vector>& Up =
-        patch().lookupPatchField<volVectorField, vector>(UName_);
+        lookupPatchField<volVectorField, vector>(UName_);
 
     const surfaceScalarField& phi =
         db().lookupObject<surfaceScalarField>(phiName_);
@@ -137,13 +137,13 @@ void Foam::fixedFluxPressureFvPatchScalarField::updateCoeffs()
     if (phi.dimensions() == dimDensity*dimVelocity*dimArea)
     {
         const fvPatchField<scalar>& rhop =
-            patch().lookupPatchField<volScalarField, scalar>(rhoName_);
+            lookupPatchField<volScalarField, scalar>(rhoName_);
 
         phip /= rhop;
     }
 
     const fvPatchField<scalar>& rAp =
-        patch().lookupPatchField<volScalarField, scalar>("(1|A("+UName_+"))");
+        lookupPatchField<volScalarField, scalar>("(1|A("+UName_+"))");
 
     if (adjoint_)
     {

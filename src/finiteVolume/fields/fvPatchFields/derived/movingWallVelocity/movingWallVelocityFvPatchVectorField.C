@@ -112,6 +112,7 @@ void movingWallVelocityFvPatchVectorField::updateCoeffs()
         oldFc[i] = pp[i].centre(oldPoints);
     }
 
+    // Get wall-parallel mesh motion velocity from geometry
     vectorField Up = (pp.faceCentres() - oldFc)/mesh.time().deltaT().value();
 
     const volVectorField& U =
@@ -124,7 +125,7 @@ void movingWallVelocityFvPatchVectorField::updateCoeffs()
     const scalarField& magSf = p.magSf();
     scalarField Un = phip/(magSf + VSMALL);
 
-
+    // Adjust for surface-normal mesh motion flux
     vectorField::operator=(Up + n*(Un - (n & Up)));
 
     fixedValueFvPatchVectorField::updateCoeffs();

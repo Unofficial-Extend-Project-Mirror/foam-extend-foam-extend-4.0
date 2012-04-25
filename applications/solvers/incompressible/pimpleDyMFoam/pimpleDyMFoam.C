@@ -58,11 +58,11 @@ int main(int argc, char *argv[])
     while (runTime.run())
     {
 #       include "readControls.H"
-#       include "CourantNo.H"
 
         // Make the fluxes absolute
         fvc::makeAbsolute(phi, U);
 
+#       include "CourantNo.H"
 #       include "setDeltaT.H"
 
         runTime++;
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 #           include "UEqn.H"
 
             // --- PISO loop
-            for (int corr=0; corr<nCorr; corr++)
+            for (int corr = 0; corr < nCorr; corr++)
             {
                 rAU = 1.0/UEqn.A();
 
@@ -120,16 +120,19 @@ int main(int argc, char *argv[])
 
                     if
                     (
-                        ocorr == nOuterCorr-1
-                     && corr == nCorr-1
+                        ocorr == nOuterCorr - 1
+                     && corr == nCorr - 1
                      && nonOrth == nNonOrthCorr
                     )
                     {
-                        pEqn.solve(mesh.solver(p.name() + "Final"));
+                        pEqn.solve
+                        (
+                            mesh.solutionDict().solver(p.name() + "Final")
+                        );
                     }
                     else
                     {
-                        pEqn.solve(mesh.solver(p.name()));
+                        pEqn.solve(mesh.solutionDict().solver(p.name()));
                     }
 
                     if (nonOrth == nNonOrthCorr)
@@ -141,7 +144,7 @@ int main(int argc, char *argv[])
 #               include "continuityErrs.H"
 
                 // Explicitly relax pressure for momentum corrector
-                if (ocorr != nOuterCorr-1)
+                if (ocorr != nOuterCorr - 1)
                 {
                     p.relax();
                 }

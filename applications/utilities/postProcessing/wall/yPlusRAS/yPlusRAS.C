@@ -199,8 +199,26 @@ void calcTwoPhaseYPlus
 
 #   include "createPhi.H"
 
+    IOobject alphaHeader
+    (
+        "alpha1",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    );
+
+    if (!alphaHeader.headerOk())
+    {
+        Info<< "    no alpha1 field" << endl;
+        return;
+    }
+
+    Info << "Reading field alpha1\n" << endl;
+    volScalarField alpha(alphaHeader, mesh);
+
     Info<< "Reading transportProperties\n" << endl;
-    twoPhaseMixture twoPhaseProperties(U, phi, "gamma");
+    twoPhaseMixture twoPhaseProperties(U, phi, "alpha1");
 
     autoPtr<incompressible::RASModel> RASModel
     (
@@ -246,6 +264,7 @@ int main(int argc, char *argv[])
     #include "addRegionOption.H"
 
     argList::validOptions.insert("compressible","");
+    argList::validOptions.insert("twoPhase","");
 
     #include "setRootCase.H"
     #include "createTime.H"

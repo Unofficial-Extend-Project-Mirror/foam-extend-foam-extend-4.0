@@ -95,6 +95,15 @@ public:
 
     // Member Functions
 
+        // Access
+
+            //- Return true if interface is coupled
+            virtual bool coupled() const
+            {
+                return true;
+            }
+
+
         // Interface transfer functions
 
             //- Initialise interface data transfer

@@ -93,7 +93,7 @@ class OutputFilterFunctionObject
 
         //- Read relevant dictionary entries
         void readDict();
- 
+
         //- Creates most of the data associated with this object.
         void allocateFilter();
 

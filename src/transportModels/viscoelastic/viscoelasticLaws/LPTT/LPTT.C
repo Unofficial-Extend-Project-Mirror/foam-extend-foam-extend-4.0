@@ -103,7 +103,7 @@ void Foam::LPTT::correct()
      ==
         etaP_/lambda_*twoD
       + twoSymm(C)
-      - zeta_/2*((tau_ & twoD) + (twoD & tau_))
+      - zeta_*symm(tau_ & twoD)
       - fvm::Sp(epsilon_/etaP_*tr(tau_) + 1/lambda_, tau_)
     );
 

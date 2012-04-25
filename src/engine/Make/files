@@ -9,9 +9,13 @@ engineVerticalValve/engineVerticalValve.C
 thoboisSlidingValve/thoboisSlidingValve.C
 dieselEngineValve/dieselEngineValve.C
 thoboisValve/thoboisValve.C
+accordionValve/accordionValve.C
 
 simpleEnginePiston/simpleEnginePiston.C
 enginePiston/enginePiston.C
+
+engineTopoChangerMesh/regionSide/regionSide.C
+engineTopoChangerMesh/attachDetachFunctions/attachDetachFunctions.C
 
 engineMesh/engineMesh/engineMesh.C
 engineMesh/engineMesh/newEngineMesh.C
@@ -28,10 +32,14 @@ engineTopoChangerMesh/engineTopoChangerMesh/engineTopoChangerMesh.C
 engineTopoChangerMesh/engineTopoChangerMesh/newEngineTopoChangerMesh.C
 
 engineTopoChangerMesh/accordionEngineMesh/accordionEngineMesh.C
-engineTopoChangerMesh/accordionEngineMesh/accordionEngineMeshCalculate.C
 engineTopoChangerMesh/accordionEngineMesh/accordionEngineMeshInitialize.C
 engineTopoChangerMesh/accordionEngineMesh/accordionEngineMeshMove.C
-engineTopoChangerMesh/accordionEngineMesh/addAccordionEngineMeshModifiers.C
+engineTopoChangerMesh/accordionEngineMesh/addAccordionEngineMeshZones.C
+
+engineTopoChangerMesh/deformingEngineMesh/deformingEngineMesh.C
+engineTopoChangerMesh/deformingEngineMesh/deformingEngineMeshInitialize.C
+engineTopoChangerMesh/deformingEngineMesh/deformingEngineMeshMove.C
+engineTopoChangerMesh/deformingEngineMesh/addDeformingEngineMeshZones.C
 
 engineTopoChangerMesh/engineValveSliding/addEngineValveSlidingMeshModifiers.C
 engineTopoChangerMesh/engineValveSliding/engineValveSliding.C

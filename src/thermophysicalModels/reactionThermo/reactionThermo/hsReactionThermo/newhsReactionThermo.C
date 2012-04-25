@@ -31,7 +31,8 @@ License
 
 Foam::autoPtr<Foam::hsReactionThermo> Foam::hsReactionThermo::New
 (
-    const fvMesh& mesh
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 {
     word hsReactionThermoTypeName;
@@ -46,7 +47,7 @@ Foam::autoPtr<Foam::hsReactionThermo> Foam::hsReactionThermo::New
             (
                 "thermophysicalProperties",
                 mesh.time().constant(),
-                mesh,
+                obj,
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE
             )
@@ -63,7 +64,7 @@ Foam::autoPtr<Foam::hsReactionThermo> Foam::hsReactionThermo::New
 
     if (cstrIter == fvMeshConstructorTablePtr_->end())
     {
-        FatalErrorIn("hsReactionThermo::New(const fvMesh&)")
+        FatalErrorIn("hsReactionThermo::New(const fvMesh&, const objectRegistry& obj)")
             << "Unknown hsReactionThermo type "
             << hsReactionThermoTypeName << nl << nl
             << "Valid hsReactionThermo types are:" << nl
@@ -71,13 +72,14 @@ Foam::autoPtr<Foam::hsReactionThermo> Foam::hsReactionThermo::New
             << exit(FatalError);
     }
 
-    return autoPtr<hsReactionThermo>(cstrIter()(mesh));
+    return autoPtr<hsReactionThermo>(cstrIter()(mesh, obj));
 }
 
 
 Foam::autoPtr<Foam::hsReactionThermo> Foam::hsReactionThermo::NewType
 (
     const fvMesh& mesh,
+    const objectRegistry& obj,
     const word& thermoType
 )
 {
@@ -93,7 +95,7 @@ Foam::autoPtr<Foam::hsReactionThermo> Foam::hsReactionThermo::NewType
             (
                 "thermophysicalProperties",
                 mesh.time().constant(),
-                mesh,
+                obj,
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE
             )
@@ -136,7 +138,7 @@ Foam::autoPtr<Foam::hsReactionThermo> Foam::hsReactionThermo::NewType
 
     if (cstrIter == fvMeshConstructorTablePtr_->end())
     {
-        FatalErrorIn("hsReactionThermo::New(const fvMesh&)")
+        FatalErrorIn("hsReactionThermo::New(const fvMesh&, const objectRegistry& obj)")
             << "Unknown hsReactionThermo type "
             << hsReactionThermoTypeName << nl << nl
             << "Valid hsReactionThermo types are:" << nl
@@ -144,7 +146,7 @@ Foam::autoPtr<Foam::hsReactionThermo> Foam::hsReactionThermo::NewType
             << exit(FatalError);
     }
 
-    return autoPtr<hsReactionThermo>(cstrIter()(mesh));
+    return autoPtr<hsReactionThermo>(cstrIter()(mesh, obj));
 }
 
 

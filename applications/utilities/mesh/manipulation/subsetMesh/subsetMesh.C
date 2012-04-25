@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
     else
     {
         Info<< "Adding exposed internal faces to a patch called"
-            << " \"oldInternalFaces\" (created if nessecary)" << endl
+            << " \"oldInternalFaces\" (created if necessary)" << endl
             << endl;
     }
 

@@ -141,11 +141,11 @@ void maxwellSlipUFvPatchVectorField::updateCoeffs()
     }
 
     const fvPatchScalarField& pmu =
-        patch().lookupPatchField<volScalarField, scalar>("mu");
+        lookupPatchField<volScalarField, scalar>("mu");
     const fvPatchScalarField& prho =
-        patch().lookupPatchField<volScalarField, scalar>("rho");
+        lookupPatchField<volScalarField, scalar>("rho");
     const fvPatchField<scalar>& ppsi =
-        patch().lookupPatchField<volScalarField, scalar>("psi");
+        lookupPatchField<volScalarField, scalar>("psi");
 
     Field<scalar> C1 = sqrt(ppsi*mathematicalConstant::pi/2.0)
         *(2.0 - accommodationCoeff_)/accommodationCoeff_;
@@ -170,7 +170,7 @@ void maxwellSlipUFvPatchVectorField::updateCoeffs()
     if(curvature_)
     {
         const fvPatchTensorField& ptauMC =
-            patch().lookupPatchField<volTensorField, tensor>("tauMC");
+            lookupPatchField<volTensorField, tensor>("tauMC");
         vectorField n = patch().nf();
 
         refValue() -= C1/prho*transform(I - n*n, (n & ptauMC));

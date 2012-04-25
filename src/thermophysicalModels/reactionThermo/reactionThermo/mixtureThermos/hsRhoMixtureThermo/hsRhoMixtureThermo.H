@@ -69,8 +69,8 @@ public:
 
     // Constructors
 
-        //- Construct from mesh
-        hsRhoMixtureThermo(const fvMesh&);
+        //- Construct from dictionary and mesh
+        hsRhoMixtureThermo(const fvMesh&, const objectRegistry&);
 
 
     //- Destructor

@@ -173,16 +173,30 @@ Foam::turboFvMesh::turboFvMesh
             )
         ).subDict(typeName + "Coeffs")
     ),
-    csPtr_
+    cs_
     (
-        coordinateSystem::New
-        (
-            "coordinateSystem",
-            dict_.subDict("coordinateSystem")
-        )
+        "coordinateSystem",
+        dict_.subDict("coordinateSystem")
     ),
     movingPointsPtr_(NULL)
 {
+    // Make sure the coordinate system does not operate in degrees
+    // Bug fix, HJ, 3/Oct/2011
+    if (!cs_.inDegrees())
+    {
+        WarningIn("turboFvMesh::turboFvMesh(const IOobject& io)")
+            << "Mixer coordinate system is set to operate in radians.  "
+            << "Changing to rad for correct calculation of angular velocity."
+            << nl
+            << "To remove this message please add entry" << nl << nl
+            << "inDegrees true;" << nl << nl
+            << "to the specification of the coordinate system"
+            << endl;
+
+        cs_.inDegrees() = true;
+    }
+
+
     Info<< "Turbomachine Mixer mesh:" << nl
         << "    origin: " << cs().origin() << nl
         << "    axis  : " << cs().axis() << endl;
@@ -215,9 +229,9 @@ bool Foam::turboFvMesh::update()
 {
     movePoints
     (
-        csPtr_->globalPosition
+        cs_.globalPosition
         (
-            csPtr_->localPosition(allPoints())
+            cs_.localPosition(allPoints())
           + movingPoints()*time().deltaT().value()
         )
     );

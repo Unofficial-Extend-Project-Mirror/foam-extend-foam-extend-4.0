@@ -95,14 +95,14 @@ patchCorrectedSnGrad<Type>::correction
             mesh.correctionVectors()
           & linear
             <
-                typename 
+                typename
                 outerProduct<vector, typename pTraits<Type>::cmptType>::type
             >(mesh).interpolate
             (
                 gradScheme<typename pTraits<Type>::cmptType>::New
                 (
                     mesh,
-                    mesh.gradScheme(ssf.name())
+                    mesh.schemesDict().gradScheme(ssf.name())
                 )()
                 //gaussGrad<typename pTraits<Type>::cmptType>(mesh)
                .grad(vf.component(cmpt))
@@ -114,15 +114,15 @@ patchCorrectedSnGrad<Type>::correction
     {
         if
         (
-            vf.boundaryField()[patchI].type() 
-         == fixedValueCorrectedFvPatchField<Type>::typeName 
+            vf.boundaryField()[patchI].type()
+         == fixedValueCorrectedFvPatchField<Type>::typeName
         )
         {
             const fixedValueCorrectedFvPatchField<Type>& pField =
                 refCast<const fixedValueCorrectedFvPatchField<Type> >
                 (
                     vf.boundaryField()[patchI]
-                );                
+                );
 
             ssf.boundaryField()[patchI] = pField.snGradCorrection();
         }

@@ -5,7 +5,18 @@
       + turbulence->divDevReff(U)
     );
 
-    if (ocorr != nOuterCorr-1)
+    if (ocorr == nOuterCorr - 1)
+    {
+        if (mesh.solutionDict().relax("UFinal"))
+        {
+            UEqn.relax(mesh.solutionDict().relaxationFactor("UFinal"));
+        }
+        else
+        {
+            UEqn.relax(1);
+        }
+    }
+    else
     {
         UEqn.relax();
     }

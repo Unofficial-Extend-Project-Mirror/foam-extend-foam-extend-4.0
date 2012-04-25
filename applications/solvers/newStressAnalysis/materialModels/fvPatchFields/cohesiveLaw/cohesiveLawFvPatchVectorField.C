@@ -180,15 +180,15 @@ void cohesiveLawFvPatchVectorField::updateCoeffs()
     // Looking up rheology
 
     const fvPatchField<scalar>& mu =
-        patch().lookupPatchField<volScalarField, scalar>("mu");
+        lookupPatchField<volScalarField, scalar>("mu");
 
     const fvPatchField<scalar>& lambda =
-      patch().lookupPatchField<volScalarField, scalar>("lambda");
+      lookupPatchField<volScalarField, scalar>("lambda");
 
     vectorField n = patch().nf();
 
     const fvPatchField<tensor>& gradU =
-        patch().lookupPatchField<volTensorField, tensor>("grad(U)");
+        lookupPatchField<volTensorField, tensor>("grad(U)");
 
     // Patch displacement
     const vectorField& U = *this;

@@ -44,6 +44,7 @@ namespace Foam
 {
 
 class fvMesh;
+class objectRegistry;
 class dictionary;
 
 /*---------------------------------------------------------------------------*\
@@ -61,8 +62,8 @@ public:
 
     // Constructors
 
-        //- Construct from dictionary and mesh
-        basicMixture(const dictionary&, const fvMesh&);
+        //- Construct from dictionary, mesh and object registry
+        basicMixture(const dictionary&, const fvMesh&, const objectRegistry&);
 
 
     // Destructor

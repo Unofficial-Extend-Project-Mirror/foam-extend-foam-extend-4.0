@@ -54,7 +54,7 @@ namespace Foam
 class motionDiff;
 
 /*---------------------------------------------------------------------------*\
-                           Class laplaceTetDecompositionMotionSolver Declaration
+             Class laplaceTetDecompositionMotionSolver Declaration
 \*---------------------------------------------------------------------------*/
 
 class laplaceTetDecompositionMotionSolver

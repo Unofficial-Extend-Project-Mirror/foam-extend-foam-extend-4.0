@@ -76,20 +76,25 @@ public:
         autoPtr,
         basicPsiThermo,
         fvMesh,
-        (const fvMesh& mesh),
-        (mesh)
+        (const fvMesh& mesh, const objectRegistry& obj),
+        (mesh, obj)
     );
 #endif
 
 
     // Constructors
 
-        //- Construct from mesh
-        basicPsiThermo(const fvMesh&);
+        //- Construct from mesh and object registry
+        basicPsiThermo(const fvMesh&, const objectRegistry&);
 
 
     //- Selector
-    static autoPtr<basicPsiThermo> New(const fvMesh&);
+    static autoPtr<basicPsiThermo> New(const fvMesh&, const objectRegistry&);
+
+    static autoPtr<basicPsiThermo> New(const fvMesh& mesh)
+    {
+        return New(mesh, mesh);
+    }
 
     //- Destructor
     virtual ~basicPsiThermo();

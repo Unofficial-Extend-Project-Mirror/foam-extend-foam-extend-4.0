@@ -157,7 +157,9 @@ gaussLaplacianScheme<Type, GType>::fvmLaplacian
     surfaceVectorField Sn = mesh.Sf()/mesh.magSf();
 
     surfaceVectorField SfGamma = mesh.Sf() & gamma;
-    GeometricField<scalar, fvsPatchField, surfaceMesh> SfGammaSn = SfGamma & Sn;
+    GeometricField<scalar, fvsPatchField, surfaceMesh> SfGammaSn =
+        SfGamma & Sn;
+
     surfaceVectorField SfGammaCorr = SfGamma - SfGammaSn*Sn;
 
     tmp<fvMatrix<Type> > tfvm = fvmLaplacianUncorrected(SfGammaSn, vf);
@@ -174,7 +176,7 @@ gaussLaplacianScheme<Type, GType>::fvmLaplacian
 
     fvm.source() -= mesh.V()*fvc::div(tfaceFluxCorrection())().internalField();
 
-    if (mesh.fluxRequired(vf.name()))
+    if (mesh.schemesDict().fluxRequired(vf.name()))
     {
         fvm.faceFluxCorrectionPtr() = tfaceFluxCorrection.ptr();
     }

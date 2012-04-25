@@ -1,4 +1,5 @@
 {
+    boolList isConstrained(points().size(), false);
 
     const pointZoneMesh& pZones = pointZones();
 
@@ -16,31 +17,14 @@
 
             forAll(movingPointsV, mpI)
             {
-                constrainedPoints.append(movingPointsV[mpI]);
-                constrainedVelocity.append(valveVel);
+                if(!isConstrained[movingPointsV[mpI]])
+                {
+                    constrainedPoints.append(movingPointsV[mpI]);
+                    constrainedVelocity.append(valveVel);
 
-                constraintSize++;
-            }
-        }
-
-        {
-
-            label movingInternalPtsIndex =
-                pZones.findZoneID
-                (
-                    "movingInternalPointsV"
-                  + Foam::name(valveI + 1)
-                );
-
-            const labelList& movingInternalPointsV =
-                pZones[movingInternalPtsIndex];
-
-            forAll(movingInternalPointsV, mipI)
-            {
-                constrainedPoints.append(movingInternalPointsV[mipI]);
-                constrainedVelocity.append(valveVel);
-
-                constraintSize++;
+                    constraintSize++;
+                    isConstrained[movingPointsV[mpI]] = true;
+                }
             }
         }
 
@@ -52,10 +36,13 @@
 
             forAll(staticPointsV, spI)
             {
-                constrainedPoints.append(staticPointsV[spI]);
-                constrainedVelocity.append(vector::zero);
-                constraintSize++;
-
+                if(!isConstrained[staticPointsV[spI]])
+                {
+                    constrainedPoints.append(staticPointsV[spI]);
+                    constrainedVelocity.append(vector::zero);
+                    constraintSize++;
+                    isConstrained[staticPointsV[spI]] = true;
+                }
             }
 
         }
@@ -70,14 +57,35 @@
 
             forAll(movingPointsP, mpI)
             {
-                constrainedPoints.append(movingPointsP[mpI]);
-                constrainedVelocity.append(pistonVel);
-//                constrainedVelocity.append(vector::zero);
-                constraintSize++;
+                if(!isConstrained[movingPointsP[mpI]])
+                {
+                    constrainedPoints.append(movingPointsP[mpI]);
+                    constrainedVelocity.append(pistonVel);
+                    constraintSize++;
+                    isConstrained[movingPointsP[mpI]] = true;
+                }
+
+            }
+        }
+
+        {
+
+            label headPtsIndex = pZones.findZoneID("headPoints");
+            const labelList& fixedPointsH = pZones[headPtsIndex];
+
+            forAll(fixedPointsH, fpI)
+            {
+                if(!isConstrained[fixedPointsH[fpI]])
+                {
+                    constrainedPoints.append(fixedPointsH[fpI]);
+                    constrainedVelocity.append(vector::zero);
+                    constraintSize++;
+                    isConstrained[fixedPointsH[fpI]] = true;
+                }
 
             }
         }
     }
 
-    Info << "constraintSize = " << constraintSize << endl;
+    Pout << "constraintSize = " << constraintSize << endl;
 }

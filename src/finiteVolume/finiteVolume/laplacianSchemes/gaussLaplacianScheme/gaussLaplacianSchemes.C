@@ -59,7 +59,7 @@ Foam::fv::gaussLaplacianScheme<Foam::Type, Foam::scalar>::fvmLaplacian       \
                                                                              \
     if (this->tsnGradScheme_().corrected())                                  \
     {                                                                        \
-        if (mesh.fluxRequired(vf.name()))                                    \
+        if (mesh.schemesDict().fluxRequired(vf.name()))                      \
         {                                                                    \
             fvm.faceFluxCorrectionPtr() = new                                \
             GeometricField<Type, fvsPatchField, surfaceMesh>                 \

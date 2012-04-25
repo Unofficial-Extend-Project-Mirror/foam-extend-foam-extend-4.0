@@ -114,7 +114,7 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
 
     fz[0] = new faceZone
     (
-        "insideSliderZone",
+        innerSliderName + "Zone",
         isf,
         boolList(innerSlider.size(), false),
         0,
@@ -139,7 +139,7 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
 
     fz[1] = new faceZone
     (
-        "outsideSliderZone",
+        outerSliderName + "Zone",
         osf,
         boolList(outerSlider.size(), false),
         1,

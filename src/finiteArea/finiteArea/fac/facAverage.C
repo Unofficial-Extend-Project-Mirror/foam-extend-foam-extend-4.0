@@ -68,7 +68,7 @@ average
 
     GeometricField<Type, faPatchField, areaMesh>& av = taverage();
 
-    av.internalField() = 
+    av.internalField() =
     (
         edgeSum(mesh.magLe()*ssf)/edgeSum(mesh.magLe())
     )().internalField();
@@ -111,7 +111,7 @@ average
 }
 
 
-template<class Type> 
+template<class Type>
 tmp<GeometricField<Type, faPatchField, areaMesh> >
 average
 (

@@ -107,7 +107,8 @@ Foam::subsetMotionSolverFvMesh::subsetMotionSolverFvMesh(const IOobject& io)
         (
             "subsetMotionSolverFvMesh::subsetMotionSolverFvMesh"
             "(const IOobject& io)"
-        )   << "Ill-defined motion under-relaxation: should be between 0 and 1."
+        )   << "Ill-defined motion under-relaxation: "
+            << "should be between 0 and 1."
             << "  Alpha = " << alpha_ << abort(FatalError);
     }
 }

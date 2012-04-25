@@ -37,26 +37,11 @@ inline const enginePiston& accordionEngineMesh::piston() const
 }
 
 
-inline const thoboisValveBank& accordionEngineMesh::valves() const
+inline const accordionValveBank& accordionEngineMesh::valves() const
 {
     return valves_;
 }
                  
-inline const scalar& accordionEngineMesh::deformSwitch() const
-{
-    return deformSwitch_;
-}
-
-inline const scalar& accordionEngineMesh::delta() const
-{
-    return delta_;
-}
-
-inline const scalar& accordionEngineMesh::offSet() const
-{
-    return offSet_;
-}
-
 
 inline const scalar& accordionEngineMesh::pistonPosition() const
 {

@@ -541,9 +541,9 @@ void faMatrix<Type>::relax()
 {
     scalar alpha = 0;
 
-    if (psi_.mesh().relax(psi_.name()))
+    if (psi_.mesh().solutionDict().relax(psi_.name()))
     {
-        alpha = psi_.mesh().relaxationFactor(psi_.name());
+        alpha = psi_.mesh().solutionDict().relaxationFactor(psi_.name());
     }
 
     if (alpha > 0)
@@ -634,11 +634,11 @@ template<class Type>
 tmp<GeometricField<Type, faePatchField, edgeMesh> > faMatrix<Type>::
 flux() const
 {
-    if (!psi_.mesh().fluxRequired(psi_.name()))
+    if (!psi_.mesh().schemesDict().fluxRequired(psi_.name()))
     {
         FatalErrorIn("faMatrix<Type>::flux()")
             << "flux requested but " << psi_.name()
-            << " not specified in the fluxRequired sub-dictionary of faSchemes."
+            << " not specified in the fluxRequired sub-dictionary of faSchemes"
             << abort(FatalError);
     }
 

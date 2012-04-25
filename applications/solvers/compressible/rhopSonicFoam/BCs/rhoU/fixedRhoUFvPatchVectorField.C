@@ -98,10 +98,10 @@ void fixedRhoUFvPatchVectorField::updateCoeffs()
     }
 
     const fvPatchScalarField& rhop =
-        patch().lookupPatchField<volScalarField, scalar>("rho");
+        lookupPatchField<volScalarField, scalar>("rho");
 
     const fvPatchVectorField& Up =
-        patch().lookupPatchField<volVectorField, vector>("U");
+        lookupPatchField<volVectorField, vector>("U");
 
     operator==(rhop*Up);
 

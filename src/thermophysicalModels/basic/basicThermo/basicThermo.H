@@ -112,8 +112,8 @@ public:
 
     // Constructors
 
-        //- Construct from mesh
-        basicThermo(const fvMesh&);
+        //- Construct from mesh and object registry
+        basicThermo(const fvMesh&, const objectRegistry&);
 
 
     //- Destructor

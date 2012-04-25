@@ -108,7 +108,7 @@ if ( ! $?WM_OSTYPE ) setenv WM_OSTYPE POSIX
 # Compiler: set to Gcc, Gcc43 or Icc (for Intel's icc)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if ( ! $?WM_COMPILER ) setenv WM_COMPILER Gcc
-#setenv WM_COMPILER Gcc
+setenv WM_COMPILER Gcc
 #setenv WM_COMPILER Icc
 
 setenv WM_COMPILER_ARCH
@@ -126,8 +126,8 @@ if ( ! $?WM_ARCH_OPTION ) setenv WM_ARCH_OPTION 64
 if ( ! $?WM_PRECISION_OPTION ) setenv WM_PRECISION_OPTION DP
 
 # WM_COMPILE_OPTION = Opt | Debug | Prof
-#if ( ! $?WM_COMPILE_OPTION ) setenv WM_COMPILE_OPTION Opt
-setenv WM_COMPILE_OPTION Opt
+if ( ! $?WM_COMPILE_OPTION ) setenv WM_COMPILE_OPTION Opt
+#setenv WM_COMPILE_OPTION Opt
 #setenv WM_COMPILE_OPTION Debug
 
 # WM_MPLIB = | OPENMPI | MPICH | MPICH-GM | HPMPI | GAMMA | MPI | QSMPI

@@ -129,13 +129,13 @@ void inviscidWallPFvPatchScalarField::updateCoeffs()
     }
 
     const fvPatchField<vector>& rhoUp =
-        patch().lookupPatchField<volVectorField, vector>("rhoU");
+        lookupPatchField<volVectorField, vector>("rhoU");
 
     const fvsPatchField<scalar>& phip = 
-        patch().lookupPatchField<surfaceScalarField, scalar>("phi");
+        lookupPatchField<surfaceScalarField, scalar>("phi");
 
     const fvsPatchField<scalar>& rAp =
-        patch().lookupPatchField<surfaceScalarField, scalar>("rrhoUAf");
+        lookupPatchField<surfaceScalarField, scalar>("rrhoUAf");
 
     gradient() = (fluxFraction_*phip - (patch().Sf() & rhoUp))/
                  (rAp*patch().magSf());

@@ -95,64 +95,44 @@ int main(int argc, char *argv[])
             // Prepare block system
             BlockLduMatrix<vector2> blockM(mesh);
 
+            //- Transfer the coupled interface list for processor/cyclic/etc.
+            // boundaries
+            blockM.interfaces() = blockT.boundaryField().blockInterfaces();
+
             // Grab block diagonal and set it to zero
             Field<tensor2>& d = blockM.diag().asSquare();
             d = tensor2::zero;
 
             // Grab linear off-diagonal and set it to zero
-            Field<vector2>& u = blockM.upper().asLinear();
             Field<vector2>& l = blockM.lower().asLinear();
+            Field<vector2>& u = blockM.upper().asLinear();
             u = vector2::zero;
             l = vector2::zero;
 
             vector2Field& blockX = blockT.internalField();
-            // vector2Field blockX(mesh.nCells(), vector2::zero);
             vector2Field blockB(mesh.nCells(), vector2::zero);
 
             //- Inset equations into block Matrix
             blockMatrixTools::insertEquation(0, TEqn, blockM, blockX, blockB);
             blockMatrixTools::insertEquation(1, TsEqn, blockM, blockX, blockB);
 
-            //- Add off-diagonal terms and remove from Block source
+            //- Add off-diagonal terms and remove from block source
             forAll(d, i)
             {
-                d[i](0,1) = -alpha.value()*mesh.V()[i];
-                d[i](1,0) = -alpha.value()*mesh.V()[i];
+                d[i](0, 1) = -alpha.value()*mesh.V()[i];
+                d[i](1, 0) = -alpha.value()*mesh.V()[i];
 
                 blockB[i][0] -= alpha.value()*blockX[i][1]*mesh.V()[i];
                 blockB[i][1] -= alpha.value()*blockX[i][0]*mesh.V()[i];
-            }
-
-            //- Transfer the coupled interface list for processor/cyclic/etc. boundaries
-            blockM.interfaces()	= blockT.boundaryField().blockInterfaces();
-
-            //- Transfer the coupled interface coefficients
-            forAll(mesh.boundaryMesh(), patchI)
-            {
-                if (blockM.interfaces().set(patchI))
-                {
-                    Field<vector2>& coupledLower = blockM.coupleLower()[patchI].asLinear();
-                    Field<vector2>& coupledUpper = blockM.coupleUpper()[patchI].asLinear();
-
-                    const scalarField& TLower = TEqn.internalCoeffs()[patchI];
-                    const scalarField& TUpper = TEqn.boundaryCoeffs()[patchI];
-                    const scalarField& TsLower = TsEqn.internalCoeffs()[patchI];
-                    const scalarField& TsUpper = TsEqn.boundaryCoeffs()[patchI];
-
-                    blockMatrixTools::blockInsert(0, TLower, coupledLower);
-                    blockMatrixTools::blockInsert(1, TsLower, coupledLower);
-                    blockMatrixTools::blockInsert(0, TUpper, coupledUpper);
-                    blockMatrixTools::blockInsert(1, TsUpper, coupledUpper);
-                }
             }
 
             //- Block coupled solver call
             BlockSolverPerformance<vector2> solverPerf =
                 BlockLduSolver<vector2>::New
                 (
-                    word("blockVar"),
+                    blockT.name(),
                     blockM,
-                    mesh.solver("blockVar")
+                    mesh.solutionDict().solver(blockT.name())
                 )->solve(blockX, blockB);
 
             solverPerf.print();

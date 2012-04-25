@@ -109,7 +109,7 @@
     Info<< "Reading contact patch IDs etc.\n" << endl;
     const dictionary& contactPatchDict
     (
-        mesh.fvSolution::subDict("contactPatch")
+        mesh.solutionDict().subDict("contactPatch")
     );
     label gradPatch(readLabel(contactPatchDict.lookup("gradPatchID")));
     label dirPatch(readLabel(contactPatchDict.lookup("dirPatchID")));

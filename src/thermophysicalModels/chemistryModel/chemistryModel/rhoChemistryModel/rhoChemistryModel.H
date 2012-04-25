@@ -90,21 +90,32 @@ public:
         fvMesh,
         (
             const fvMesh& mesh,
+            const objectRegistry& obj,
             const word& compTypeName,
             const word& thermoTypeName
         ),
-        (mesh, compTypeName, thermoTypeName)
+        (mesh, obj, compTypeName, thermoTypeName)
     );
 
 
     // Constructors
 
         //- Construct from mesh
-        rhoChemistryModel(const fvMesh& mesh, const word& thermoTypeName);
+        rhoChemistryModel
+        (
+            const fvMesh& mesh,
+            const objectRegistry& obj,
+            const word& thermoTypeName
+        );
 
 
     //- Selector
-    static autoPtr<rhoChemistryModel> New(const fvMesh& mesh);
+    static autoPtr<rhoChemistryModel> New(const fvMesh&, const objectRegistry&);
+
+    static autoPtr<rhoChemistryModel> New(const fvMesh& mesh)
+    {
+        return New(mesh, mesh);
+    }
 
 
     //- Destructor

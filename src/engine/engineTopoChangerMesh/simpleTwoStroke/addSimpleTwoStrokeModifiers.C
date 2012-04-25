@@ -301,8 +301,6 @@ void Foam::simpleTwoStroke::addZonesAndModifiers()
 
         nFaceZones++;
 
-        Info << "cut p" << endl;
-
         pz[nPointZones] = new pointZone
         (
             "cutPointZone",

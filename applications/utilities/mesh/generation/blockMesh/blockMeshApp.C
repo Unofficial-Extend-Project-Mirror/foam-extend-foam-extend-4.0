@@ -367,6 +367,29 @@ int main(int argc, char *argv[])
             }
 
             attacher.changeMesh();
+
+            // Clean the mesh after attach
+            labelList patchSizes(mesh.boundaryMesh().size());
+            labelList patchStarts(mesh.boundaryMesh().size());
+
+            forAll (mesh.boundaryMesh(), patchI)
+            {
+                patchSizes[patchI] = mesh.boundaryMesh()[patchI].size();
+                patchStarts[patchI] = mesh.boundaryMesh()[patchI].start();
+            }
+
+            mesh.resetPrimitives
+            (
+                xferCopy<pointField>(mesh.points()),
+                xferCopy<faceList>(mesh.faces()),
+                xferCopy<labelList>(mesh.faceOwner()),
+                xferCopy<labelList>(mesh.faceNeighbour()),
+                patchSizes,
+                patchStarts
+            );
+
+            mesh.setInstance(runTime.constant());
+            mesh.removeZones();
         }
     }
     else

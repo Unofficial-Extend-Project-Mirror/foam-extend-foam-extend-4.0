@@ -24,7 +24,17 @@
         pcorrTypes
     );
 
-    for(int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    // Initialise flux with interpolated velocity
+    phi = fvc::interpolate(U) & mesh.Sf();
+
+    if (pcorr.needReference())
+    {
+        fvc::makeRelative(phi, U);
+        adjustPhi(phi, U, pcorr);
+        fvc::makeAbsolute(phi, U);
+    }
+
+    for(int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
     {
         fvScalarMatrix pcorrEqn
         (

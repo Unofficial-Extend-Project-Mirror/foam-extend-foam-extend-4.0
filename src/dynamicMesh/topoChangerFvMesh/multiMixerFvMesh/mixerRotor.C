@@ -308,20 +308,17 @@ Foam::mixerRotor::mixerRotor
 :
     name_(name),
     mesh_(mesh),
-    csPtr_
+    cs_
     (
-        coordinateSystem::New
-        (
-            "coordinateSystem",
-            dict.subDict("coordinateSystem")
-        )
+        "coordinateSystem",
+        dict.subDict("coordinateSystem")
     ),
     rpm_(readScalar(dict.lookup("rpm"))),
     movingSliderName_(dict.lookup("movingPatch")),
     staticSliderName_(dict.lookup("staticPatch")),
     rotatingRegionMarker_
     (
-        dict.lookupOrDefault<point>("rotatingRegionMarker", csPtr_->origin())
+        dict.lookupOrDefault<point>("rotatingRegionMarker", cs_.origin())
     ),
     invertMotionMask_
     (
@@ -331,10 +328,34 @@ Foam::mixerRotor::mixerRotor
     attachDetach_(dict.lookupOrDefault<bool>("attachDetach", true)),
     movingPointsMaskPtr_(NULL)
 {
+    // Make sure the coordinate system does not operate in degrees
+    // Bug fix, HJ, 3/Oct/2011
+    if (!cs_.inDegrees())
+    {
+        WarningIn
+        (
+            "mixerRotor::mixerRotor\n"
+            "(\n"
+            "    const word& name,\n"
+            "    const polyMesh& mesh,\n"
+            "    const dictionary& dict\n"
+            ")"
+        )   << "Mixer coordinate system is set to operate in radians.  "
+            << "Changing to rad for correct calculation of angular velocity."
+            << nl
+            << "To remove this message please add entry" << nl << nl
+            << "inDegrees true;" << nl << nl
+            << "to the specification of the coordinate system"
+            << endl;
+
+        cs_.inDegrees() = true;
+    }
+
     Info<< "Rotor " << name << ":" << nl
         << "    origin      : " << cs().origin() << nl
         << "    axis        : " << cs().axis() << nl
         << "    rpm         : " << rpm_ << nl
+        << "    invert mask : " << invertMotionMask_ << nl
         << "    topo sliding: " << useTopoSliding_ << endl;
 
     if (useTopoSliding_)
@@ -365,10 +386,10 @@ Foam::tmp<Foam::vectorField> Foam::mixerRotor::pointMotion() const
         mpm = 1 - mpm;
     }
 
-    return csPtr_->globalPosition
+    return cs_.globalPosition
     (
-        // Motion vector in cymindrical coordinate system (x theta z)
-        csPtr_->localPosition(mesh_.allPoints())
+        // Motion vector in cylindrical coordinate system (x theta z)
+        cs_.localPosition(mesh_.allPoints())
       + vector(0, rpm_*360.0*mesh_.time().deltaT().value()/60.0, 0)*mpm
     ) - mesh_.allPoints();
 }

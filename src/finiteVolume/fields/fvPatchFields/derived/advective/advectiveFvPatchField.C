@@ -175,7 +175,7 @@ tmp<scalarField> advectiveFvPatchField<Type>::advectionSpeed() const
     const surfaceScalarField& phi =
         this->db().objectRegistry::lookupObject<surfaceScalarField>(phiName_);
 
-    fvsPatchField<scalar> phip = this->patch().lookupPatchField
+    fvsPatchField<scalar> phip = this->lookupPatchField
     (
         phiName_,
         reinterpret_cast<const surfaceScalarField*>(0),
@@ -184,7 +184,7 @@ tmp<scalarField> advectiveFvPatchField<Type>::advectionSpeed() const
 
     if (phi.dimensions() == dimDensity*dimVelocity*dimArea)
     {
-        const fvPatchScalarField& rhop = this->patch().lookupPatchField
+        const fvPatchScalarField& rhop = this->lookupPatchField
         (
             rhoName_,
             reinterpret_cast<const volScalarField*>(0),
@@ -225,7 +225,10 @@ void advectiveFvPatchField<Type>::updateCoeffs()
 
     word ddtScheme
     (
-        this->dimensionedInternalField().mesh().ddtScheme(field.name())
+        this->dimensionedInternalField().mesh().schemesDict().ddtScheme
+        (
+            field.name()
+        )
     );
 
     // Calculate the advection speed of the field wave
@@ -354,7 +357,7 @@ void advectiveFvPatchField<Type>::updateCoeffs()
     }
 
     // Get access to flux field
-    fvsPatchField<scalar> phip = this->patch().lookupPatchField
+    fvsPatchField<scalar> phip = this->lookupPatchField
     (
         phiName_,
         reinterpret_cast<const surfaceScalarField*>(NULL),
@@ -441,13 +444,13 @@ void advectiveFvPatchField<Type>::write(Ostream& os) const
             << token::END_STATEMENT << nl;
         os.writeKeyword("lInf") << lInf_
         << token::END_STATEMENT << endl;
+    }
 
     os.writeKeyword("inletOutlet") << inletOutlet_
         << token::END_STATEMENT << nl;
 
     os.writeKeyword("correctSupercritical") << correctSupercritical_
             << token::END_STATEMENT << nl;
-    }
 
     this->writeEntry("value", os);
 }

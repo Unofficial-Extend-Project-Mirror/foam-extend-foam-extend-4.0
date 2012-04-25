@@ -201,12 +201,12 @@ Foam::turbulentTemperatureCoupledBaffleFvPatchScalarField::K() const
     }
     else if (mesh.objectRegistry::foundObject<volScalarField>(KName_))
     {
-        return patch().lookupPatchField<volScalarField, scalar>(KName_);
+        return lookupPatchField<volScalarField, scalar>(KName_);
     }
     else if (mesh.objectRegistry::foundObject<volSymmTensorField>(KName_))
     {
         const symmTensorField& KWall =
-            patch().lookupPatchField<volSymmTensorField, scalar>(KName_);
+            lookupPatchField<volSymmTensorField, scalar>(KName_);
 
         vectorField n = patch().nf();
 

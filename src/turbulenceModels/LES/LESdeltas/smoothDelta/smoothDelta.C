@@ -84,7 +84,7 @@ void smoothDelta::setChangedFaces
 
     // Insert all faces of coupled patches no matter what. Let FaceCellWave
     // sort it out.
-    forAll(mesh.boundaryMesh(), patchI) 
+    forAll(mesh.boundaryMesh(), patchI)
     {
         const polyPatch& patch = mesh.boundaryMesh()[patchI];
 

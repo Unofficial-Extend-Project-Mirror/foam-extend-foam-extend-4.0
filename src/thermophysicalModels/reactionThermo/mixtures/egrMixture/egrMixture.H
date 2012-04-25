@@ -87,7 +87,7 @@ public:
     // Constructors
 
         //- Construct from dictionary and mesh
-        egrMixture(const dictionary&, const fvMesh&);
+        egrMixture(const dictionary&, const fvMesh&, const objectRegistry&);
 
 
     //- Destructor

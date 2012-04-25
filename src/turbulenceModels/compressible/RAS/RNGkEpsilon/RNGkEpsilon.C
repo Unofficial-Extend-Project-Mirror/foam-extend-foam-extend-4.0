@@ -143,7 +143,7 @@ RNGkEpsilon::RNGkEpsilon
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -155,7 +155,7 @@ RNGkEpsilon::RNGkEpsilon
         (
             "epsilon",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -167,7 +167,7 @@ RNGkEpsilon::RNGkEpsilon
         (
             "mut",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -179,7 +179,7 @@ RNGkEpsilon::RNGkEpsilon
         (
             "alphat",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -208,7 +208,7 @@ tmp<volSymmTensorField> RNGkEpsilon::R() const
             (
                 "R",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -229,7 +229,7 @@ tmp<volSymmTensorField> RNGkEpsilon::devRhoReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

@@ -39,14 +39,16 @@ template<class ThermoType>
 Foam::homogeneousMixture<ThermoType>::homogeneousMixture
 (
     const dictionary& thermoDict,
-    const fvMesh& mesh
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 :
     basicMultiComponentMixture
     (
         thermoDict,
         speciesTable(nSpecies_, specieNames_),
-        mesh
+        mesh,
+        obj
     ),
 
     reactants_(thermoDict.lookup("reactants")),

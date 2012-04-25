@@ -134,7 +134,24 @@ faePatchField<Type>::faePatchField
 template<class Type>
 const objectRegistry& faePatchField<Type>::db() const
 {
-    return patch_.boundaryMesh().mesh();
+    //HR 12.3.10: Lookup fields from the field DB rather than the mesh
+    return internalField_.db();
+}
+
+
+template<class Type>
+template<class GeometricField, class Type2>
+const typename GeometricField::PatchFieldType& Foam::faePatchField<Type>::lookupPatchField
+(
+    const word& name,
+    const GeometricField*,
+    const Type2*
+) const
+{
+    return patch_.patchField<GeometricField, Type2>
+    (
+        internalField_.db().objectRegistry::lookupObject<GeometricField>(name)
+    );
 }
 
 
