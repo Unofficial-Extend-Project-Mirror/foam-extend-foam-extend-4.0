@@ -40,6 +40,8 @@ DebugSwitches
     mixingPlane                           0;
     MixingPlaneInterpolation              0;
 
+    tetFemVectorMatrix        0;
+
     overlapGgi          0;
     cyclicGgi           0;
     coupledLduMatrix    1;

@@ -63,6 +63,8 @@ solvers
 SIMPLE
 {
     nNonOrthogonalCorrectors 0;
+
+    convergence          1e-4;
 }
 
 relaxationFactors

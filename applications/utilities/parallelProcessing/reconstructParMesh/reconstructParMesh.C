@@ -144,8 +144,50 @@ int main(int argc, char *argv[])
 
     // Mesh write will be controlled by hand
     meshPtr->write();
+    procMeshes.writeAddressing();
     meshPtr->setMotionWriteOpt(IOobject::NO_WRITE);
     meshPtr->setTopoWriteOpt(IOobject::NO_WRITE);
+
+    // Write cell decomposition
+    if (writeCellDist)
+    {
+        // Write as volScalarField for post-processing
+        Info<< "Writing cellDist to time " << runTime.timeName()
+            << endl;
+        volScalarField cellDist
+        (
+            IOobject
+            (
+                "cellDist",
+                runTime.timeName(),
+                meshPtr(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            meshPtr(),
+            dimensionedScalar("cellDist", dimless, 0),
+            zeroGradientFvPatchScalarField::typeName
+        );
+        scalarField& cellDistIn = cellDist.internalField();
+
+        label cellI = 0;
+
+        forAll (procMeshes.meshes(), procI)
+        {
+            for
+            (
+                label i = 0;
+                i < procMeshes.meshes()[procI].nCells();
+                i++
+            )
+            {
+                cellDistIn[cellI] = procI;
+                cellI++;
+            }
+        }
+
+        cellDist.write();
+    }
 
     // Get region prefix for lagrangian
     fileName regionPrefix = "";
@@ -221,7 +263,9 @@ int main(int argc, char *argv[])
 
             if (writeCellDist)
             {
-                // Write as volScalarField for postprocessing.
+                // Write as volScalarField for post-processing
+                Info<< "Writing cellDist to time " << runTime.timeName()
+                    << endl;
                 volScalarField cellDist
                 (
                     IOobject

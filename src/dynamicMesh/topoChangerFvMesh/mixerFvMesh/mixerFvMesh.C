@@ -310,10 +310,17 @@ void Foam::mixerFvMesh::calcMovingMask() const
         (
             word(dict_.subDict("slider").lookup("moving")) + "Zone"
         );
+<<<<<<< HEAD
 
         const labelList& movingSliderAddr =
             faceZones()[faceZones().findZoneID(movingSliderZoneName)];
 
+=======
+
+        const labelList& movingSliderAddr =
+            faceZones()[faceZones().findZoneID(movingSliderZoneName)];
+
+>>>>>>> parallelTopo
         forAll (movingSliderAddr, faceI)
         {
             const face& curFace = f[movingSliderAddr[faceI]];
@@ -479,6 +486,7 @@ bool Foam::mixerFvMesh::update()
             mappedOldPointsNew.map(oldPointsNew, topoChangeMap->pointMap());
 
             movePoints(mappedOldPointsNew);
+<<<<<<< HEAD
 
             resetMotion();
             setV0();
@@ -497,6 +505,27 @@ bool Foam::mixerFvMesh::update()
             // Move the sliding interface points to correct position
             movePoints(newPoints);
         }
+=======
+
+            resetMotion();
+            setV0();
+
+            // Move the sliding interface points to correct position
+            movePoints(topoChangeMap->preMotionPoints());
+        }
+        else
+        {
+            pointField newPoints = allPoints();
+            movePoints(oldPointsNew);
+
+            resetMotion();
+            setV0();
+
+            // Move the sliding interface points to correct position
+            movePoints(newPoints);
+        }
+
+>>>>>>> parallelTopo
     }
 
     return topoChangeMap->morphing();

@@ -178,13 +178,10 @@ public:
 
 int main(int argc, char *argv[])
 {
-    timeSelector::addOptions();
-
 #   include "setRootCase.H"
 #   include "createTime.H"
 
-    // Get times list
-    instantList timeDirs = timeSelector::select0(runTime, args);
+    Info<< "Time = " << runTime.timeName() << endl;
 
 #   include "createMesh.H"
 

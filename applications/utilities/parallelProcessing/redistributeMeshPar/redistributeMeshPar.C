@@ -293,7 +293,7 @@ void printMeshData(Ostream& os, const polyMesh& mesh)
 }
 
 
-// Debugging: write volScalarField with decomposition for post processing.
+// Debugging: write volScalarField with decomposition for post-processing.
 void writeDecomposition
 (
     const word& name,
@@ -302,7 +302,7 @@ void writeDecomposition
 )
 {
     Info<< "Writing wanted cell distribution to volScalarField " << name
-        << " for postprocessing purposes." << nl << endl;
+        << " for post-processing purposes." << nl << endl;
 
     volScalarField procCells
     (
