@@ -251,7 +251,7 @@ $(lduAddressing)/lduInterface/processorLduInterface.C
 $(lduAddressing)/lduInterface/cyclicLduInterface.C
 $(lduAddressing)/lduInterface/ggiLduInterface.C
 $(lduAddressing)/lduInterface/overlapGgiLduInterface.C
-/*$(lduAddressing)/lduInterface/mixingPlaneLduInterface.C*/
+$(lduAddressing)/lduInterface/mixingPlaneLduInterface.C
 $(lduAddressing)/lduInterface/regionCoupleLduInterface.C
 
 lduInterfaceFields = $(lduAddressing)/lduInterfaceFields
@@ -259,7 +259,7 @@ $(lduInterfaceFields)/lduInterfaceField/lduInterfaceField.C
 $(lduInterfaceFields)/processorLduInterfaceField/processorLduInterfaceField.C
 $(lduInterfaceFields)/cyclicLduInterfaceField/cyclicLduInterfaceField.C
 $(lduInterfaceFields)/ggiLduInterfaceField/ggiLduInterfaceField.C
-/*$(lduInterfaceFields)/mixingPlaneLduInterfaceField/mixingPlaneLduInterfaceField.C*/
+$(lduInterfaceFields)/mixingPlaneLduInterfaceField/mixingPlaneLduInterfaceField.C
 $(lduInterfaceFields)/overlapGgiLduInterfaceField/overlapGgiLduInterfaceField.C
 $(lduInterfaceFields)/regionCoupleLduInterfaceField/regionCoupleLduInterfaceField.C
 
@@ -277,7 +277,6 @@ $(GAMGInterfaces)/cyclicGAMGInterface/cyclicGAMGInterface.C
 $(GAMGInterfaces)/ggiGAMGInterface/ggiGAMGInterface.C
 $(GAMGInterfaces)/cyclicGgiGAMGInterface/cyclicGgiGAMGInterface.C
 $(GAMGInterfaces)/regionCoupleGAMGInterface/regionCoupleGAMGInterface.C
-/*$(GAMGInterfaces)/mixingPlaneGAMGInterface/mixingPlaneGAMGInterface.C*/
 
 GAMGInterfaceFields = $(GAMG)/interfaceFields
 $(GAMGInterfaceFields)/GAMGInterfaceField/GAMGInterfaceField.C
@@ -287,7 +286,7 @@ $(GAMGInterfaceFields)/cyclicGAMGInterfaceField/cyclicGAMGInterfaceField.C
 $(GAMGInterfaceFields)/ggiGAMGInterfaceField/ggiGAMGInterfaceField.C
 $(GAMGInterfaceFields)/cyclicGgiGAMGInterfaceField/cyclicGgiGAMGInterfaceField.C
 $(GAMGInterfaceFields)/regionCoupleGAMGInterfaceField/regionCoupleGAMGInterfaceField.C
-/*$(GAMGInterfaceFields)/mixingPlaneGAMGInterfaceField/mixingPlaneGAMGInterfaceField.C*/
+$(GAMGInterfaceFields)/mixingPlaneGAMGInterfaceField/mixingPlaneGAMGInterfaceField.C
 
 GAMGAgglomerations = $(GAMG)/GAMGAgglomerations
 
@@ -367,7 +366,7 @@ $(constraintPolyPatches)/ggi/ggiPolyPatch.C
 $(constraintPolyPatches)/cyclicGgi/cyclicGgiPolyPatch.C
 $(constraintPolyPatches)/overlapGgi/overlapGgiPolyPatch.C
 $(constraintPolyPatches)/overlapGgi/overlapGgiPolyPatchGeometry.C
-/*$(constraintPolyPatches)/mixingPlane/mixingPlanePolyPatch.C*/
+$(constraintPolyPatches)/mixingPlane/mixingPlanePolyPatch.C
 $(constraintPolyPatches)/regionCouple/regionCouplePolyPatch.C
 
 derivedPolyPatches = $(polyPatches)/derived
@@ -483,7 +482,7 @@ $(constraintPointPatches)/processor/processorPointPatch.C
 $(constraintPointPatches)/ggi/ggiPointPatch.C
 $(constraintPointPatches)/cyclicGgi/cyclicGgiPointPatch.C
 $(constraintPointPatches)/overlapGgi/overlapGgiPointPatch.C
-/*$(constraintPointPatches)/mixingPlane/mixingPlanePointPatch.C*/
+$(constraintPointPatches)/mixingPlane/mixingPlanePointPatch.C
 $(constraintPointPatches)/regionCouple/regionCouplePointPatch.C
 
 derivedPointPatches = $(pointPatches)/derived
@@ -558,7 +557,7 @@ interpolations = interpolations
 interpolation = $(interpolations)/interpolation
 $(interpolations)/patchToPatchInterpolation/PatchToPatchInterpolationName.C
 $(interpolations)/GGIInterpolation/GGIInterpolationName.C
-/*$(interpolations)/CircumferentialAveragingInterpolation/CircumferentialAveragingInterpolationName.C*/
+$(interpolations)/MixingPlaneInterpolation/MixingPlaneInterpolationName.C
 $(interpolations)/RBFInterpolation/RBFInterpolation.C
 $(interpolations)/RBFInterpolation/RBFFunctions/RBFFunction/RBFFunction.C
 $(interpolations)/RBFInterpolation/RBFFunctions/RBFFunction/newRBFFunction.C

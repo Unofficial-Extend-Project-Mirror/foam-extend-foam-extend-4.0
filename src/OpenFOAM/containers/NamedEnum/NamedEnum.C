@@ -87,4 +87,22 @@ void Foam::NamedEnum<Enum, nEnum>::write(const Enum e, Ostream& os) const
 }
 
 
+// * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
+
+template<class Enum, int nEnum>
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const NamedEnum<Enum, nEnum>& n
+)
+{
+    for (int e = 0; e < nEnum; e++)
+    {
+        os << e << " " << n.names[e] << nl;
+    }
+
+    return os;
+}
+
+
 // ************************************************************************* //

@@ -1,0 +1,16 @@
+diff a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -403,6 +403,12 @@
+       DESTINATION ${PV_INSTALL_CMAKE_DIR}
+       COMPONENT Development)
+       
++  # install ParaViewUse.cmake
++  INSTALL(
++      FILES   ${ParaView_SOURCE_DIR}/ParaViewUse.cmake
++      DESTINATION ${PV_INSTALL_CMAKE_DIR}
++      COMPONENT Development)
++      
+   # Re-configure for the install.
+   SET(SOURCE_TREE                                  ${ParaView_SOURCE_DIR})
+   SET(BUILD_TREE                                   ${ParaView_BINARY_DIR}) 

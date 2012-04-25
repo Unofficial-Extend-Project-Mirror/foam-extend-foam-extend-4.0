@@ -135,8 +135,23 @@ public:
         //- Construct from dictionary
         cylindricalCS(const word& name, const dictionary&);
 
+        //- Return clone
+        virtual autoPtr<coordinateSystem> clone() const
+        {
+            return autoPtr<coordinateSystem>(new cylindricalCS(*this));
+        }
+
 
     // Member Functions
+
+        // Global information about the coordinate system
+
+            //- Directions in which the span is limited
+            virtual spanInfo spanLimited() const;
+
+            //- Span bounds
+            virtual boundBox spanBounds() const;
+
 
         //- Are angles in degrees?
         bool  inDegrees() const;

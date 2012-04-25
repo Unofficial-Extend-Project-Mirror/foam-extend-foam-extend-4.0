@@ -1,0 +1,120 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5.x                                 |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (0 0 11.6);
+
+boundaryField
+{
+    inlet           
+    {
+        type            fixedValue;
+        value           uniform (0 0 11.6);
+
+    }
+
+    outlet          
+    {
+        type            zeroGradient;
+    }
+
+    wallProlongation
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+
+    wallDiffuser
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+
+    statSwirlWallB_C
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+
+    rotSwirlWallA_BB
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+
+    sideWallA_BB_cyclic1
+    {
+        type            cyclicGgi;
+    }
+
+    sideWallA_BB_cyclic2
+    {
+        type            cyclicGgi;
+    }
+
+    B_UPSTREAM
+    {
+        type            ggi;
+    }
+
+    B_DOWNSTREAM
+    {
+        type            ggi;
+    }
+
+    sideWallB_C_cyclic1
+    {
+        type            cyclicGgi;
+    }
+
+    sideWallB_C_cyclic2
+    {
+        type            cyclicGgi;
+    }
+
+    sideWallC_D_cyclic1
+    {
+        type            cyclicGgi;
+    }
+
+    sideWallC_D_cyclic2
+    {
+        type            cyclicGgi;
+    }
+
+    sideWallD_E_cyclic1
+    {
+        type            cyclicGgi;
+    }
+
+    sideWallD_E_cyclic2
+    {
+        type            cyclicGgi;
+    }
+
+    sideWallE_F_cyclic1
+    {
+        type            cyclicGgi;
+    }
+
+    sideWallE_F_cyclic2
+    {
+        type            cyclicGgi;
+    }
+}
+
+// ************************************************************************* //

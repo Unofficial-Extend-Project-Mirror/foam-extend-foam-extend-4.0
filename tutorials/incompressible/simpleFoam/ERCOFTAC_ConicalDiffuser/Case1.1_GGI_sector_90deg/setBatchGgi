@@ -1,0 +1,13 @@
+faceSet sideWallA_BB_cyclic1Zone new patchToFace sideWallA_BB_cyclic1
+faceSet sideWallA_BB_cyclic2Zone new patchToFace sideWallA_BB_cyclic2
+faceSet sideWallB_C_cyclic1Zone new patchToFace sideWallB_C_cyclic1
+faceSet sideWallB_C_cyclic2Zone new patchToFace sideWallB_C_cyclic2
+faceSet sideWallC_D_cyclic1Zone new patchToFace sideWallC_D_cyclic1
+faceSet sideWallC_D_cyclic2Zone new patchToFace sideWallC_D_cyclic2
+faceSet sideWallD_E_cyclic1Zone new patchToFace sideWallD_E_cyclic1
+faceSet sideWallD_E_cyclic2Zone new patchToFace sideWallD_E_cyclic2
+faceSet sideWallE_F_cyclic1Zone new patchToFace sideWallE_F_cyclic1
+faceSet sideWallE_F_cyclic2Zone new patchToFace sideWallE_F_cyclic2
+faceSet B_UPSTREAMZone          new patchToFace B_UPSTREAM
+faceSet B_DOWNSTREAMZone        new patchToFace B_DOWNSTREAM
+quit

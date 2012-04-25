@@ -497,4 +497,50 @@ writeVTKNormals
 }
 
 
+template
+<
+    class Face,
+    template<class> class FaceList,
+    class PointField,
+    class PointType
+>
+void
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+writeVTK
+(
+    const fileName& name
+) const
+{
+    PrimitivePatch<Face, FaceList, PointField, PointType>::writeVTK
+    (
+        name,
+        this->localFaces(),
+        this->localPoints()
+    );
+}
+
+
+template
+<
+    class Face,
+    template<class> class FaceList,
+    class PointField,
+    class PointType
+>
+void
+Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
+writeVTKNormals
+(
+    const fileName& name
+) const
+{
+    PrimitivePatch<Face, FaceList, PointField, PointType>::writeVTKNormals
+    (
+        name,
+        this->localFaces(),
+        this->localPoints()
+    );
+}
+
+
 // ************************************************************************* //

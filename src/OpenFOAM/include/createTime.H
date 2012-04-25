@@ -8,5 +8,8 @@
     (
         Foam::Time::controlDictName,
         args.rootPath(),
-        args.caseName()
+        args.caseName(),
+        "system",
+        "constant",
+        !args.optionFound("noFunctionObjects")
     );

@@ -59,8 +59,9 @@ rpm_make()
     _SPECFILE=''
     _PACKAGE_URL=''
     _ADDITIONALFLAGS=''
+    _RPMFILENAME=''
 
-    while getopts p:s:u:a: flags
+    while getopts p:s:u:f:n:a: flags
       do
       case $flags in
 	  p)  _PACKAGE=$OPTARG
@@ -69,7 +70,11 @@ rpm_make()
 	      ;;
 	  s)  _SPECFILE=$OPTARG
 	      ;;
-	  a)  _ADDITIONALFLAGS=$OPTARG
+	  f)  _ADDITIONALFLAGS=$OPTARG
+	      ;;
+	  n)  _RPMFILENAME=$OPTARG
+	      ;;
+	  a)  architecture=$OPTARG
 	      ;;
       esac
     done
@@ -86,8 +91,16 @@ rpm_make()
     echo "Updating the ThirdParty environment variables before building package $_PACKAGE" 
     . $WM_PROJECT_DIR/etc/settings.sh
 
-    rpmName=$_PACKAGE-$WM_OPTIONS.$architecture
+    if [ "$_RPMFILENAME" = "" ]; then
+	rpmName=$_PACKAGE-$WM_OPTIONS.$architecture
+    else
+	# Filename for the RPM was overridden from the command line
+	rpmName=$_RPMFILENAME
+    fi
+
     rpmFile=$buildBase/RPMS/$architecture/$rpmName.rpm
+
+    echo "RPM file name     : $rpmFile"
 
     # We check immediatly if the RPM binary package is available in the local RPMs vault.
     # If so, we basically uninstall/reinstall the package. This is handy for installation
@@ -117,10 +130,16 @@ rpm_make()
     fi
 
     # Install RPM package if not done already
-    if [ ! -e "$WM_THIRD_PARTY_DIR/packages/$_PACKAGE/platforms/$WM_OPTIONS" ]; then
+    if [ "$architecture" = "noarch" ]; then
+	installDir=$WM_THIRD_PARTY_DIR/packages/$_PACKAGE/platforms/noarch
+    else
+	installDir=$WM_THIRD_PARTY_DIR/packages/$_PACKAGE/platforms/$WM_OPTIONS
+    fi
+
+    if [ ! -e "$installDir" ]; then
         echo "Installing package: $_PACKAGE"
-        rpm_uninstall $_PACKAGE
-        rpm_install   $_PACKAGE
+        rpm_uninstall $_PACKAGE $rpmName
+        rpm_install   $_PACKAGE $rpmName $rpmFile
     else
         echo "Package $_PACKAGE is already installed"
     fi
@@ -129,6 +148,7 @@ rpm_make()
     unset _SPECFILE
     unset _PACKAGE_URL
     unset _ADDITIONALFLAGS
+    unset _RPMFILENAME
 
     echo "Done installing package $_PACKAGE"
     echo ""
@@ -146,8 +166,8 @@ rpm_build()
     cd $buildBase
 
     [ -e ./SPECS/$specFile ] || {
-        echo "rpm_build: missing SPEC file for package $package. Aborting."
-        return 1
+        echo "rpm_build: Error: missing SPEC file for package $package. Aborting."
+        exit -1
     }
 
     #Build RPM package
@@ -164,7 +184,7 @@ rpm_build()
 rpm_uninstall()
 {
     package="$1"
-    rpmName=$package-$WM_OPTIONS.$architecture
+    rpmName="$2"
 
     cd $buildBase
 
@@ -184,14 +204,13 @@ rpm_uninstall()
 rpm_install()
 {
     package="$1";
-    rpmName=$package-$WM_OPTIONS.$architecture;
-    rpmFile=$buildBase/RPMS/$architecture/$rpmName.rpm;
+    rpmName="$2";
+    rpmFile="$3";
 
     echo "  Installing $package using RPM file: $rpmFile";
     ${RPM_CMD} ${RPM_CMD_XTRA_OPTIONS} -ivh              \
 	$rpmFile          \
 	--dbpath $buildBase/rpmDB --force --nodeps;
-
 }
 
 #

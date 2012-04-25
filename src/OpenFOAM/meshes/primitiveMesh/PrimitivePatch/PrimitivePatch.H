@@ -355,8 +355,8 @@ public:
                 //  index.  If the point is not found, return -1
                 label whichPoint(const label gp) const;
 
-                //- Given an edge in local point labels, return its
-                //  index in the edge list.  If the edge is not found, return -1
+                //- Given an edge in local point labels, return its index
+                //  in the edge list.  If the edge is not found, return -1
                 label whichEdge(const edge& e) const;
 
                 //- Return labels of patch edges in the global edge list using
@@ -443,7 +443,7 @@ public:
                 labelHashSet* setPtr = NULL
             ) const;
 
-            //- Write VTK patch, HJ, 14/Jan/2009
+            //- Write generic VTK patch, HJ, 14/Jan/2009
             static void writeVTK
             (
                 const fileName& name,
@@ -451,13 +451,19 @@ public:
                 const Field<PointType>& points
             );
 
-            //- Write VTK patch normals, HJ, 14/Jan/2009
+            //- Write generic VTK patch normals, HJ, 14/Jan/2009
             static void writeVTKNormals
             (
                 const fileName& name,
                 const FaceListType& faces,
                 const Field<PointType>& points
             );
+
+            //- Write VTK patch
+            void writeVTK(const fileName& name) const;
+
+            //- Write VTK patch normals
+            void writeVTKNormals(const fileName& name) const;
 
 
         // Edit

@@ -29,6 +29,7 @@ License
 #include "one.H"
 #include "Switch.H"
 #include "mathematicalConstants.H"
+#include "boundBox.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -112,6 +113,37 @@ Foam::sphericalCS::sphericalCS
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+Foam::coordinateSystem::spanInfo Foam::sphericalCS::spanLimited() const
+{
+    spanInfo b(Pair<bool>(true, true));
+
+    // Upper bound or r is unlimited
+    b[0] = Pair<bool>(true, false);
+
+    return b;
+}
+
+
+Foam::boundBox Foam::sphericalCS::spanBounds() const
+{
+    return boundBox
+    (
+        vector
+        (
+            0,
+            ( inDegrees_ ? -180.0 : -mathematicalConstant::pi ),
+            ( inDegrees_ ? -90.0 : -mathematicalConstant::pi/2 )
+        ),
+        vector
+        (
+            GREAT,
+            ( inDegrees_ ? 180.0 : mathematicalConstant::pi ),
+            ( inDegrees_ ? 90.0 : mathematicalConstant::pi/2 )
+        )
+    );
+}
+
 
 bool Foam::sphericalCS::inDegrees() const
 {

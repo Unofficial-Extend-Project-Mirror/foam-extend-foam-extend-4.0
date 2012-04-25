@@ -31,6 +31,13 @@
 # \*---------------------------------------------------------------------------*/
 
 
+
+
+MAJOR WARNING: THIS TEST HARNESS IS NOT READY YET FOR OPENFOAM-1.6-EXT
+----------------------------------------------------------------------
+
+
+
 Warning #1: Make sure your OpenFOAM environment is properly initialized before
             running the test harness.
 

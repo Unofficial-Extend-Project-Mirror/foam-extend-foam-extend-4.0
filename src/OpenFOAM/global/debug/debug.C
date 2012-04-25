@@ -77,9 +77,19 @@ Foam::dictionary& Foam::debug::controlDict()
 {
     if (!controlDictPtr_)
     {
+        // Allow users to override the location of the global controlDict
+        // dictionary using an environment variable. Using this environment
+        // variable, one can assign a different global controlDict for each
+        // case, without having to modify the "default" ones.
+        fileName globControlDictFileName = getEnv("FOAM_GLOBAL_CONTROLDICT");
+
+        // Fallback to default locations if filename is empty or not valid
+        if( ! isFile(globControlDictFileName) )
+            globControlDictFileName = findEtcFile("controlDict", true);
+            
         controlDictPtr_ = new dictionary
         (
-            IFstream(findEtcFile("controlDict", true))()
+            IFstream(globControlDictFileName)()
         );
     }
 

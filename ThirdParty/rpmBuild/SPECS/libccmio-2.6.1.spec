@@ -99,6 +99,7 @@ Patch0:                 libccmio-2.6.1.patch_0
 %ifos darwin
     # Missing configuration for Mac OS X 10
     [ ! -d configi386-apple-darwin10 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin10
+    [ ! -d configi386-apple-darwin11 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin11
 %endif
     # Warning:
     #  1: The name of the ADF library will be renamed to libadf_ccmio since this

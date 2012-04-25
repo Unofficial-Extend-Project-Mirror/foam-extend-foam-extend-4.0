@@ -25,8 +25,10 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "toroidalCS.H"
-#include "addToRunTimeSelectionTable.H"
 #include "mathematicalConstants.H"
+#include "Switch.H"
+#include "boundBox.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -44,11 +46,13 @@ Foam::toroidalCS::toroidalCS
     const word& name,
     const point& origin,
     const coordinateRotation& cr,
-    const scalar radius
+    const scalar radius,
+    const bool inDegrees
 )
 :
     coordinateSystem(name, origin, cr),
-    radius_(radius)
+    radius_(radius),
+    inDegrees_(inDegrees)
 {}
 
 
@@ -59,11 +63,55 @@ Foam::toroidalCS::toroidalCS
 )
 :
     coordinateSystem(name, dict),
-    radius_(readScalar(dict.lookup("radius")))
+    radius_(readScalar(dict.lookup("radius"))),
+    inDegrees_(dict.lookupOrDefault<Switch>("degrees", true))
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+Foam::coordinateSystem::spanInfo Foam::toroidalCS::spanLimited() const
+{
+    spanInfo b(Pair<bool>(true, true));
+
+    // Upper bound or r is unlimited
+    b[0] = Pair<bool>(true, false);
+
+    return b;
+}
+
+
+Foam::boundBox Foam::toroidalCS::spanBounds() const
+{
+    return boundBox
+    (
+        vector
+        (
+            0,
+            ( inDegrees_ ? -180.0 : -mathematicalConstant::pi ),
+            ( inDegrees_ ? -180.0 : -mathematicalConstant::pi )
+        ),
+        vector
+        (
+            GREAT,
+            ( inDegrees_ ? 180.0 : mathematicalConstant::pi ),
+            ( inDegrees_ ? 180.0 : mathematicalConstant::pi )
+        )
+    );
+}
+
+
+bool Foam::toroidalCS::inDegrees() const
+{
+    return inDegrees_;
+}
+
+
+bool& Foam::toroidalCS::inDegrees()
+{
+    return inDegrees_;
+}
+
 
 Foam::vector Foam::toroidalCS::localToGlobal
 (

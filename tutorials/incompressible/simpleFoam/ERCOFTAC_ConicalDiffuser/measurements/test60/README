@@ -1,0 +1,89 @@
+Main reference
+--------------
+
+CLAUSEN, P.D. and KOH, S.G. and WOOD, D.H.,
+Measurements of a swirling turbulent boundary layer developing in a
+conical diffuser, 
+Exptl. Thermal and Fluid Sci. 6, 39, 1993
+
+Contact
+-------
+
+D.H. Wood
+Mechanical Engineering Dept.
+The University of Newcastle
+New South Wales, 2308
+Australia
+
+Phone      61 49 216198
+Fax        61 49 216 946
+e mail     medhw@cc.newcastle.edu.au
+
+Files
+-----
+
+ Cp.dat		contains the Cp data plotted in fig. 2.
+
+ mma.dat 	contains U, W in m/s (from which fig. 3 was plotted) and 
+         	all the values given in Table 1. The last entry for each
+		x is the extrapolated value at the diffuser centtreline.
+		y is in mm.
+ 
+ The Reynolds stress data are in the files ending 000.dat 025.dat etc
+ corresponding to the x-location given in Table 1. The beginning of the
+ file name should be self-explanatory so the following list of file name
+ against figure no. should be for confirmation
+
+ usq*		fig. 7(a)
+ vsq*		fig. 7(b)
+ wsq*		fig. 7(c)
+ uv*		fig. 7(d)
+ vw*		fig. 7(e)
+ uw*		fig. 7(f)
+
+The data is in the order of y (mm) followed by the particular stress.
+The Reynolds stresses have been normalised by U0**2 and are factored by
+100 so that for example,  the first axial normal stress at the inlet (at
+y = 4.0 mm in usq000.dat) is 0.7647147*10-2
+
+location | Mm     U       W      usq      uv      uw      vsq      vw      wsq 
+------------------------------------------------------------------------------
+-25      | *      *       *       *       *        *       *        *       *
+025      | *      *       *       *       *        *       *        *       *
+060      | *      *       *       *       *        *       *        *       *
+100      | *      *       *       *       *        *       *        *       *
+175      | *      *       *       *       *        *       *        *       *
+250      | *      *       *       *       *        *       *        *       *
+330      | *      *       *       *       *        *       *        *       *
+405      | *      *       *       *       *        *       *        *       *
+------------------------------------------------------------------------------
+
+file names
+----------
+
+README
+Cp.dat
+
+U-25.dat W-25.dat usq-25.dat uv-25.dat uw-25.dat vsq-25.dat vw-25.dat wsq-25.dat
+U025.dat W025.dat usq025.dat uv025.dat uw025.dat vsq025.dat vw025.dat wsq025.dat
+U060.dat W060.dat usq060.dat uv060.dat uw060.dat vsq060.dat vw060.dat wsq060.dat
+U100.dat W100.dat usq100.dat uv100.dat uw100.dat vsq100.dat vw100.dat wsq100.dat
+U175.dat W175.dat usq175.dat uv175.dat uw175.dat vsq175.dat vw175.dat wsq175.dat
+U250.dat W250.dat usq250.dat uv250.dat uw250.dat vsq250.dat vw250.dat wsq250.dat
+U330.dat W330.dat usq330.dat uv330.dat uw330.dat vsq330.dat vw330.dat wsq330.dat
+U405.dat W405.dat usq405.dat uv405.dat uw405.dat vsq405.dat vw405.dat wsq405.dat
+
+Mma.dat  split in
+Mm-25.dat
+Mm025.dat
+Mm060.dat
+Mm100.dat
+Mm175.dat
+Mm250.dat
+Mm330.dat
+Mm405.dat
+
+-----------------------------------------------------------------------------
+Added files:
+k???.dat: Turbulent kinetic energy, derived from ?sq???.dat
+

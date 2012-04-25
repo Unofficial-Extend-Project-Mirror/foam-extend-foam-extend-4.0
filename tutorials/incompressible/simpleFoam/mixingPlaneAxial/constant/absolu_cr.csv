@@ -1,0 +1,9 @@
+Profil radial constant dans le repere absolu
+
+[Spatial Fields]
+Z
+
+[Data]
+ Z [ m ], Velocity Axial [ m s^-1 ], Velocity Radial [ m s^-1 ], Velocity Circumferential [ m s^-1 ], Pressure [ Pa ], Turbulence Kinetic Energy [ m^2 s^-2 ], Turbulence Eddy Dissipation [ m^2 s^-3 ]
+0.0,  0.0, 10.0, 10.0, 0.0, 0.1, 0.1
+10.0,  0.0, 10.0, 10.0, 0.0, 0.1, 0.1

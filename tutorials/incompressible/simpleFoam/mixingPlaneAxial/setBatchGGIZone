@@ -1,0 +1,5 @@
+faceSet upstreamPerio1Zone new patchToFace upstreamPerio1
+faceSet upstreamPerio2Zone new patchToFace upstreamPerio2
+faceSet downstreamPerio1Zone new patchToFace downstreamPerio1
+faceSet downstreamPerio2Zone new patchToFace downstreamPerio2
+quit

@@ -44,6 +44,15 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+
+template<class Enum, int nEnum>
+class NamedEnum;
+
+template<class Enum, int nEnum>
+Ostream& operator<<(Ostream&, const NamedEnum<Enum, nEnum>&);
+
+
 /*---------------------------------------------------------------------------*\
                           Class NamedEnum Declaration
 \*---------------------------------------------------------------------------*/
@@ -111,6 +120,16 @@ public:
         {
             return names[e];
         }
+
+
+    // Friend operators
+
+        friend Ostream& operator<< <Enum, nEnum>
+        (
+            Ostream&,
+            const NamedEnum<Enum, nEnum>&
+        );
+
 };
 
 

@@ -7,6 +7,7 @@
     argList::validArgs.append("root to add");
     argList::validArgs.append("case to add");
     argList::validOptions.insert("addRegion", "name");
+    argList::validOptions.insert("noFunctionObjects", "");
 
     argList args(argc, argv);
 

@@ -71,6 +71,12 @@ echo
 # Running stage 4
 ./AllMake.stage4
 
+# Running stage 5
+# This stage depends on a properly compiled installation
+# of OpenFOAM. On a brand new installation of OpenFOAM-1.6-ext,
+# this stage should be called last in your compilation process
+./AllMake.stage5
+
 echo ========================================
 echo Done ThirdParty Allwmake
 echo ========================================

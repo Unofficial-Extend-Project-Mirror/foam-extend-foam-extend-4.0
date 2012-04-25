@@ -23,6 +23,7 @@ $(constraintFvPatches)/processor/processorFvPatch.C
 $(constraintFvPatches)/ggi/ggiFvPatch.C
 $(constraintFvPatches)/cyclicGgi/cyclicGgiFvPatch.C
 $(constraintFvPatches)/overlapGgi/overlapGgiFvPatch.C
+$(constraintFvPatches)/mixingPlane/mixingPlaneFvPatch.C
 $(constraintFvPatches)/regionCouple/regionCoupleFvPatch.C
 
 derivedFvPatches = $(fvPatches)/derived
@@ -110,7 +111,8 @@ $(constraintFvPatchFields)/wedge/wedgeFvPatchScalarField.C
 $(constraintFvPatchFields)/ggi/ggiFvPatchFields.C
 $(constraintFvPatchFields)/cyclicGgi/cyclicGgiFvPatchFields.C
 $(constraintFvPatchFields)/overlapGgi/overlapGgiFvPatchFields.C
-$(constraintFvPatchFields)/regionCoupling/regionCouplingFvPatchFields.C
+$(constraintFvPatchFields)/mixingPlane/mixingPlaneFvPatchFields.C
+$(constraintFvPatchFields)/regionCouple/regionCoupleFvPatchFields.C
 
 derivedFvPatchFields = $(fvPatchFields)/derived
 $(derivedFvPatchFields)/activeBaffleVelocity/activeBaffleVelocityFvPatchVectorField.C
@@ -185,7 +187,12 @@ $(constraintFvsPatchFields)/wedge/wedgeFvsPatchFields.C
 $(constraintFvsPatchFields)/ggi/ggiFvsPatchFields.C
 $(constraintFvsPatchFields)/cyclicGgi/cyclicGgiFvsPatchFields.C
 $(constraintFvsPatchFields)/overlapGgi/overlapGgiFvsPatchFields.C
+<<<<<<< HEAD
 $(constraintFvsPatchFields)/regionCoupling/regionCouplingFvsPatchFields.C
+=======
+$(constraintFvsPatchFields)/mixingPlane/mixingPlaneFvsPatchFields.C
+$(constraintFvsPatchFields)/regionCouple/regionCoupleFvsPatchFields.C
+>>>>>>> remotes/origin/mixingPlane_RC1
 
 
 fields/volFields/volFields.C
@@ -211,6 +218,9 @@ $(volPointInterpolation)/pointPatchInterpolation/pointPatchInterpolation.C
 $(volPointInterpolation)/volPointInterpolation.C
 interpolation/pointVolInterpolation/pointVolInterpolation.C
 
+
+pointVolInterpolation = interpolation/pointVolInterpolation
+$(pointVolInterpolation)/pointVolInterpolation.C
 
 surfaceInterpolation = interpolation/surfaceInterpolation
 $(surfaceInterpolation)/surfaceInterpolation/surfaceInterpolation.C
