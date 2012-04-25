@@ -55,7 +55,7 @@ class emptyFvPatch
 {
     // Private data
 
-        //- face-cell addressing
+        //- Dummy face-cell addressing
         const labelList::subList faceCells_;
 
 
@@ -80,7 +80,7 @@ public:
                 return 0;
             }
 
-            //- Return faceCells
+            //- Return faceCells of zero size
             virtual const unallocLabelList& faceCells() const;
 };
 

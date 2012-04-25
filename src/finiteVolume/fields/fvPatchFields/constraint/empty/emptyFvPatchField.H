@@ -45,7 +45,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                         Class emptyFvPatch Declaration
+                     Class emptyFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>

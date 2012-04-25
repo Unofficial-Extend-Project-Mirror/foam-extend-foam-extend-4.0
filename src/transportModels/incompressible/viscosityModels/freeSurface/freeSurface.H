@@ -89,26 +89,26 @@ public:
 
     // Destructor
 
-        ~freeSurface()
+        virtual ~freeSurface()
         {}
 
 
     // Member Functions
 
         //- Return the laminar viscosity
-        const volScalarField& nu() const
+        virtual const volScalarField& nu() const
         {
             return nu_;
         }
 
         //- Correct the laminar viscosity
-        void correct()
+        virtual void correct()
         {
             nu_ = gamma_*nu1_ + (scalar(1) - gamma_)*nu2_;
-	}
+        }
 
         //- Read transportProperties dictionary
-        bool read(const dictionary& viscosityProperties);
+        virtual bool read(const dictionary& viscosityProperties);
 };
 
 

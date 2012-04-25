@@ -46,7 +46,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class processorFvPatch Declaration
+                     Class processorFvPatch Declaration
 \*---------------------------------------------------------------------------*/
 
 class processorFvPatch
@@ -56,6 +56,7 @@ class processorFvPatch
 {
     // Private Data
 
+        //- Reference to processor patch
         const processorPolyPatch& procPolyPatch_;
 
 

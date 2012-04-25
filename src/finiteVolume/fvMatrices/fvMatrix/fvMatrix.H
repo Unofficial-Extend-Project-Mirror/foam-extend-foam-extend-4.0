@@ -132,6 +132,8 @@ class fvMatrix
         //  for boundary cells
         FieldField<Field, Type> boundaryCoeffs_;
 
+        //- Has assembly been completed?
+        bool assemblyCompleted_;
 
         //- Face flux field for non-orthogonal correction
         mutable GeometricField<Type, fvsPatchField, surfaceMesh>
@@ -290,6 +292,12 @@ public:
                 return boundaryCoeffs_;
             }
 
+            //- Return true if matrix assemble has been completed
+            bool assemblyCompleted() const
+            {
+                return assemblyCompleted_;
+            }
+
 
             //- Declare return type of the faceFluxCorrectionPtr() function
             typedef GeometricField<Type, fvsPatchField, surfaceMesh>
@@ -315,7 +323,7 @@ public:
             void addBoundarySource
             (
                 Field<Type>& source,
-                const bool couples=true
+                const bool couples = true
             ) const;
 
 
@@ -357,12 +365,9 @@ public:
             //  alpha is read from controlDict
             void relax();
 
-            //- Manipulate based on a boundary field
-            void boundaryManipulate
-            (
-                typename GeometricField<Type, fvPatchField, volMesh>::
-                    GeometricBoundaryField& values
-            );
+            //- Complete matrix assembly for solution:
+            //  Manipulate based on a boundary field
+            void completeAssembly();
 
             //- Construct and return the solver
             //  Use the given solver controls

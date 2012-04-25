@@ -258,26 +258,13 @@ bool Foam::primitiveMesh::checkClosedCells
 
         // Calculate the aspect ration as the maximum of Cartesian component
         // aspect ratio to the total area hydraulic area aspect ratio
-        scalar minCmpt = VGREAT;
-        scalar maxCmpt = -VGREAT;
-        for (direction dir = 0; dir < vector::nComponents; dir++)
-        {
-            if (meshD[dir] == 1)
-            {
-                minCmpt = min(minCmpt, sumMagClosed[cellI][dir]);
-                maxCmpt = max(maxCmpt, sumMagClosed[cellI][dir]);
-            }
-        }
-
-        scalar aspectRatio = maxCmpt/(minCmpt + VSMALL);
-        if (nDims == 3)
-        {
-            aspectRatio = max
-            (
-                aspectRatio,
-                1.0/6.0*cmptSum(sumMagClosed[cellI])/pow(vols[cellI], 2.0/3.0)
-            );
-        }
+        scalar aspectRatio = max
+        (
+            cmptMax(sumMagClosed[cellI])
+           /(cmptMin(sumMagClosed[cellI]) + VSMALL),
+            1.0/6.0*cmptSum(sumMagClosed[cellI])/
+            Foam::pow(Foam::max(vols[cellI], SMALL), 2.0/3.0)
+        );
 
         maxAspectRatio = max(maxAspectRatio, aspectRatio);
 

@@ -166,6 +166,18 @@ void fvsPatchField<Type>::check(const fvsPatchField<Type>& ptf) const
 }
 
 
+template<class Type>
+void fvsPatchField<Type>::check(const fvPatchField<Type>& ptf) const
+{
+    if (&patch_ != &(ptf.patch()))
+    {
+        FatalErrorIn("PatchField<Type>::check(const fvsPatchField<Type>&)")
+            << "different patches for fvsPatchField<Type>s"
+            << abort(FatalError);
+    }
+}
+
+
 // Map from self
 template<class Type>
 void fvsPatchField<Type>::autoMap
@@ -277,6 +289,17 @@ void fvsPatchField<Type>::operator/=
     }
 
     Field<Type>::operator/=(ptf);
+}
+
+
+template<class Type>
+void fvsPatchField<Type>::operator=
+(
+    const fvPatchField<Type>& ptf
+)
+{
+    check(ptf);
+    Field<Type>::operator=(ptf);
 }
 
 

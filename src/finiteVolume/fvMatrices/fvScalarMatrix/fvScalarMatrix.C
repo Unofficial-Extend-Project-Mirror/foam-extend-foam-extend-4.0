@@ -104,6 +104,9 @@ Foam::fvMatrix<Foam::scalar>::fvSolver::solve
     const dictionary& solverControls
 )
 {
+    // Complete matrix assembly.  HJ, 17/Apr/2012
+    fvMat_.completeAssembly();
+
     scalarField saveDiag = fvMat_.diag();
     fvMat_.addBoundaryDiag(fvMat_.diag(), 0);
 
@@ -137,6 +140,9 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Foam::scalar>::solve
                "solving fvMatrix<scalar>"
             << endl;
     }
+
+    // Complete matrix assembly.  HJ, 17/Apr/2012
+    completeAssembly();
 
     scalarField saveDiag = diag();
     addBoundaryDiag(diag(), 0);

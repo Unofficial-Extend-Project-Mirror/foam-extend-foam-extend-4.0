@@ -60,6 +60,8 @@ class dictionary;
 class fvPatchFieldMapper;
 class surfaceMesh;
 
+template<class Type>
+class fvPatchField;
 
 // Forward declaration of friend functions and operators
 
@@ -313,6 +315,23 @@ public:
             );
 
 
+        // Evaluation functions
+
+            //- Initialise the evaluation of the patch field
+            virtual void initEvaluate
+            (
+                const Pstream::commsTypes commsType=Pstream::blocking
+            )
+            {}
+
+            //- Evaluate the patch field, sets Updated to false
+            virtual void evaluate
+            (
+                const Pstream::commsTypes commsType=Pstream::blocking
+            )
+            {}
+
+
         //- Write
         virtual void write(Ostream&) const;
 
@@ -321,6 +340,9 @@ public:
 
             //- Check fvsPatchField<Type> against given fvsPatchField<Type>
             void check(const fvsPatchField<Type>&) const;
+
+            //- Check fvsPatchField<Type> against given fvPatchField<Type>
+            void check(const fvPatchField<Type>&) const;
 
 
     // Member operators
@@ -332,6 +354,8 @@ public:
         virtual void operator-=(const fvsPatchField<Type>&);
         virtual void operator*=(const fvsPatchField<scalar>&);
         virtual void operator/=(const fvsPatchField<scalar>&);
+
+        virtual void operator=(const fvPatchField<Type>&);
 
         virtual void operator+=(const Field<Type>&);
         virtual void operator-=(const Field<Type>&);

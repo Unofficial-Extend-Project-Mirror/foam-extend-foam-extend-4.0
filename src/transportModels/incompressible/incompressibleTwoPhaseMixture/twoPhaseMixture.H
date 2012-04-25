@@ -99,7 +99,7 @@ public:
 
     // Destructor
 
-        ~twoPhaseMixture()
+        virtual ~twoPhaseMixture()
         {}
 
 

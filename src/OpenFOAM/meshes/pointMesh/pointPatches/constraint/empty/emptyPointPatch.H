@@ -72,6 +72,12 @@ public:
         {}
 
 
+    // Destructor
+
+        virtual ~emptyPointPatch()
+        {}
+
+
     // Member Functions
 
         //- Accumulate the effect of constraint direction of this patch
@@ -82,10 +88,6 @@ public:
         ) const;
 
 
-    // Destructor
-
-        virtual ~emptyPointPatch()
-        {}
 };
 
 

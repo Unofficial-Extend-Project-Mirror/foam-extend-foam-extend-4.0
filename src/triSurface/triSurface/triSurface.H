@@ -201,8 +201,9 @@ class triSurface
             const pointField&
         );
 
-        //- read non-comment line
+        //- Read non-comment line
         static string getLineNoComment(IFstream&);
+
 
 protected:
 
@@ -219,6 +220,7 @@ protected:
         {
             return static_cast<List<Face>&>(*this);
         }
+
 
 public:
 

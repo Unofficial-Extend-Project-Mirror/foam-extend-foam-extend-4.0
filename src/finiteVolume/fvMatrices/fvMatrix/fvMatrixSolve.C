@@ -63,6 +63,9 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve
             << endl;
     }
 
+    // Complete matrix assembly.  HJ, 17/Apr/2012
+    this->completeAssembly();
+
     lduSolverPerformance solverPerfVec
     (
         "fvMatrix<Type>::solve",

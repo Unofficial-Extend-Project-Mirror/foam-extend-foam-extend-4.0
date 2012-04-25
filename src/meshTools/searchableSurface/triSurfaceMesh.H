@@ -87,6 +87,7 @@ private:
         //- Is surface closed
         mutable label surfaceClosed_;
 
+
     // Private Member Functions
 
         ////- Helper: find instance of files without header

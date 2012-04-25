@@ -324,7 +324,9 @@ void LRR::correct()
 
     epsEqn().relax();
 
-    epsEqn().boundaryManipulate(epsilon_.boundaryField());
+    // No longer needed: matrix completes at the point of solution
+    // HJ, 17/Apr/2012
+//     epsEqn().completeAssembly();
 
     solve(epsEqn);
     bound(epsilon_, epsilon0_);
@@ -343,8 +345,13 @@ void LRR::correct()
             forAll(curPatch, facei)
             {
                 label faceCelli = curPatch.faceCells()[facei];
-                P[faceCelli]
-                    *= min(G[faceCelli]/(0.5*mag(tr(P[faceCelli])) + SMALL), 1.0);
+
+                P[faceCelli] *=
+                    min
+                    (
+                        G[faceCelli]/(0.5*mag(tr(P[faceCelli])) + SMALL),
+                        1.0
+                    );
             }
         }
     }

@@ -182,6 +182,11 @@ void omegaWallFunctionFvPatchScalarField::updateCoeffs()
     // HJ, 20/Mar/2011
     if (!db().foundObject<volScalarField>(GName_))
     {
+        InfoIn("void omegaWallFunctionFvPatchScalarField::updateCoeffs()")
+            << "Cannot access " << GName_ << " field.  for patch "
+            << patch().name() << ".  Evaluating as zeroGradient"
+            << endl;
+
         zeroGradientFvPatchScalarField::evaluate();
 
         return;

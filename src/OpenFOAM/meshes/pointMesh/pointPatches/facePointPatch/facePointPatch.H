@@ -48,7 +48,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Class facePointPatch Declaration
+                      Class facePointPatch Declaration
 \*---------------------------------------------------------------------------*/
 
 class facePointPatch
@@ -191,7 +191,6 @@ public:
             {
                 return polyPatch_.pointNormals();
             }
-
 };
 
 

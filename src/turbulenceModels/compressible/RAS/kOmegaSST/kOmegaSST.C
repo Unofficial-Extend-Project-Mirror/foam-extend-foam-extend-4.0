@@ -429,7 +429,9 @@ void kOmegaSST::correct()
 
     omegaEqn().relax();
 
-    omegaEqn().boundaryManipulate(omega_.boundaryField());
+    // No longer needed: matrix completes at the point of solution
+    // HJ, 17/Apr/2012
+//     omegaEqn().completeAssembly();
 
     solve(omegaEqn);
     bound(omega_, omega0_);

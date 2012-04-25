@@ -193,6 +193,7 @@ Foam::fvMatrix<Type>::fvMatrix
     source_(psi.size(), pTraits<Type>::zero),
     internalCoeffs_(psi.mesh().boundary().size()),
     boundaryCoeffs_(psi.mesh().boundary().size()),
+    assemblyCompleted_(false),
     faceFluxCorrectionPtr_(NULL)
 {
     if (debug)
@@ -241,6 +242,7 @@ Foam::fvMatrix<Type>::fvMatrix(const fvMatrix<Type>& fvm)
     source_(fvm.source_),
     internalCoeffs_(fvm.internalCoeffs_),
     boundaryCoeffs_(fvm.boundaryCoeffs_),
+    assemblyCompleted_(fvm.assemblyCompleted_),
     faceFluxCorrectionPtr_(NULL)
 {
     if (debug)
@@ -288,6 +290,7 @@ Foam::fvMatrix<Type>::fvMatrix(const tmp<fvMatrix<Type> >& tfvm)
         const_cast<fvMatrix<Type>&>(tfvm()).boundaryCoeffs_,
         tfvm.isTmp()
     ),
+    assemblyCompleted_(tfvm().assemblyCompleted()),
     faceFluxCorrectionPtr_(NULL)
 {
     if (debug)
@@ -332,6 +335,7 @@ Foam::fvMatrix<Type>::fvMatrix
     source_(is),
     internalCoeffs_(psi.mesh().boundary().size()),
     boundaryCoeffs_(psi.mesh().boundary().size()),
+    assemblyCompleted_(false),
     faceFluxCorrectionPtr_(NULL)
 {
     if (debug)
@@ -614,12 +618,25 @@ void Foam::fvMatrix<Type>::relax()
 
 
 template<class Type>
-void Foam::fvMatrix<Type>::boundaryManipulate
-(
-    typename GeometricField<Type, fvPatchField, volMesh>::
-        GeometricBoundaryField& bFields
-)
+void Foam::fvMatrix<Type>::completeAssembly()
 {
+    if (assemblyCompleted_)
+    {
+        return;
+    }
+
+    if (debug)
+    {
+        InfoIn("void Foam::fvMatrix<Type>::completeAssembly()")
+            << "Completing matrix for equation " << this->psi().name()
+                << endl;
+    }
+
+    assemblyCompleted_ = true;
+
+    typename GeometricField<Type, fvPatchField, volMesh>::
+        GeometricBoundaryField& bFields = psi_.boundaryField();
+
     forAll(bFields, patchI)
     {
         bFields[patchI].manipulateMatrix(*this);

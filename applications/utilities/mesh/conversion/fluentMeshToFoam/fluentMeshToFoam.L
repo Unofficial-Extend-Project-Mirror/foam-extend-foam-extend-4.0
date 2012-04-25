@@ -132,7 +132,7 @@ quote                      \"
 dash                       "-"
 dotColonDash               [.:-]
 
-schemeSpecialInitial       [!$%&*/:<=>?~_^#.]
+schemeSpecialInitial       [!$%&*/\\:<=>?~_^#.@']
 schemeSpecialSubsequent    [.+-]
 schemeSymbol               (({some_space}|{alpha}|{quote}|{schemeSpecialInitial})({alpha}|{quote}|{digit}|{schemeSpecialInitial}|{schemeSpecialSubsequent})*)
 
@@ -142,7 +142,7 @@ integer                    {decDigit}+
 label                      [1-9]{decDigit}*
 hexLabel                   {hexDigit}+
 zeroLabel                  {digit}*
-
+signedInteger              [-+]?{integer}
 word                       ({alpha}|{digit}|{dotColonDash})*
 
 exponent_part              [eE][-+]?{digit}+
