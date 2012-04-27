@@ -11,7 +11,7 @@
       + fvc::ddtPhiCorr(rUA, rho, U, phi)
     );
 
-    adjustPhi(phiU, U, p);
+    adjustPhi(phiU, U, pd);
 
     phi = phiU +
         (
