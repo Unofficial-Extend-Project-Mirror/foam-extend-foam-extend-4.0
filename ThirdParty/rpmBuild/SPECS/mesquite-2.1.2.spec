@@ -31,6 +31,9 @@
 # Author:
 #     Martin Beaudoin, Hydro-Quebec, (2010)
 #
+# Contributor:
+#     Philippose Rajan : patch0 for gcc 4.6.x
+#
 #------------------------------------------------------------------------------
 
 # We grab the value of WM_THIRD_PARTY and WM_OPTIONS from the environment variable
@@ -77,6 +80,7 @@ URL:                    http://software.sandia.gov/~jakraft
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
+Patch0:                 mesquite-2.1.2_patch0
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -85,6 +89,8 @@ Group: 			Development/Tools
 
 %prep
 %setup -q
+
+%patch0 -p1
 
 %build
     # export WM settings in a form that GNU configure recognizes
@@ -111,7 +117,7 @@ Group: 			Development/Tools
     [ -e include/Mesquite_all_headers.hpp ] && rm -f include/Mesquite_all_headers.hpp
 
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
-    make -j $WM_NCOMPPROCS
+    make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -mtune=native -fPIC"
 
 %install
     make install DESTDIR=$RPM_BUILD_ROOT
