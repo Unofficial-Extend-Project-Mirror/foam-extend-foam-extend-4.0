@@ -7,11 +7,12 @@ diff -ruN libccmio-2.6.1_orig/config/config.gnu.to.star libccmio-2.6.1/config/co
  
  # $Id: config.gnu.to.star,v 1.4 2006/06/05 21:12:16 geoffp Exp $
  
-@@ -34,6 +34,7 @@
+@@ -34,6 +34,8 @@
      x86_64-unknown-linux-gnu-null)     echo linux64_2.4-x86-glibc_2.2.5     ;;
      ppc64-unknown-linux-gnu-null)      echo linux64_2.6-pwr4-glibc_2.3.3    ;;
      i386-apple-darwin8-null)           echo i386-apple-darwin8              ;;
 +    i386-apple-darwin10-null)          echo i386-apple-darwin10             ;;
++    i386-apple-darwin11-null)          echo i386-apple-darwin11             ;;
      *)                                 echo unknown                         ;;
  esac
  
@@ -33,12 +34,18 @@ diff -ruN libccmio-2.6.1_orig/config/config.system libccmio-2.6.1/config/config.
  
  # $Id: config.system,v 1.2 2005/09/29 22:19:19 geoffp Exp $
  
-@@ -87,6 +87,9 @@
+@@ -87,6 +87,15 @@
      i386-apple-darwin8.11.1)
  	echo i386-apple-darwin8 ;;
  
 +    i386-apple-darwin10.5.0 |  i386-apple-darwin10.7.0 | i386-apple-darwin10.8.0)
 +	echo i386-apple-darwin10 ;;
++
++    i386-apple-darwin11.2.0 )
++	echo i386-apple-darwin11 ;;
++
++    i386-apple-darwin11.3.0 )
++	echo i386-apple-darwin11 ;;
 +
      *)
          echo unknown
