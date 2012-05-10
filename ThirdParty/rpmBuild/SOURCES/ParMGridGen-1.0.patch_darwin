@@ -1,6 +1,18 @@
+diff -ruN ParMGridGen-1.0_orig/MGridGen/IMlib/IMlib.h ParMGridGen-1.0/MGridGen/IMlib/IMlib.h
+--- ParMGridGen-1.0_orig/MGridGen/IMlib/IMlib.h	2001-11-08 18:41:25.000000000 -0500
++++ ParMGridGen-1.0/MGridGen/IMlib/IMlib.h	2011-12-24 13:46:41.000000000 -0500
+@@ -43,7 +43,7 @@
+ #ifdef DMALLOC
+ #include <dmalloc.h>
+ #else
+-#include <malloc.h>
++#include <sys/malloc.h>
+ #endif
+ 
+ /*************************************************************************
 diff -ruN ParMGridGen-1.0_orig/MGridGen/IMlib/Makefile ParMGridGen-1.0/MGridGen/IMlib/Makefile
 --- ParMGridGen-1.0_orig/MGridGen/IMlib/Makefile	2001-12-04 17:46:56.000000000 -0500
-+++ ParMGridGen-1.0/MGridGen/IMlib/Makefile	2010-10-31 17:29:25.000000000 -0400
++++ ParMGridGen-1.0/MGridGen/IMlib/Makefile	2011-12-24 13:24:17.000000000 -0500
 @@ -33,7 +33,7 @@
  .c.o:
  	$(CC) $(CFLAGS) -c $*.c
@@ -16,10 +28,9 @@ diff -ruN ParMGridGen-1.0_orig/MGridGen/IMlib/Makefile ParMGridGen-1.0/MGridGen/
  realclean:
 -	rm -f *.o ; rm -f ./libIMlib.a
 +	rm -f *.o ; rm -f ./libIMlib.$(LIBEXT)
-Binary files ParMGridGen-1.0_orig/MGridGen/IMlib/libIMlib.dylib and ParMGridGen-1.0/MGridGen/IMlib/libIMlib.dylib differ
 diff -ruN ParMGridGen-1.0_orig/MGridGen/Lib/Makefile ParMGridGen-1.0/MGridGen/Lib/Makefile
 --- ParMGridGen-1.0_orig/MGridGen/Lib/Makefile	2001-12-04 18:01:00.000000000 -0500
-+++ ParMGridGen-1.0/MGridGen/Lib/Makefile	2010-10-31 17:29:25.000000000 -0400
++++ ParMGridGen-1.0/MGridGen/Lib/Makefile	2011-12-24 13:24:17.000000000 -0500
 @@ -22,7 +22,7 @@
  INCLUDES = -I./ -I$(IMLIBDIR) $(INCDIR)
  CFLAGS = $(COPTIONS) $(OPTFLAGS) $(DEBUGFLAGS) $(INCLUDES)
@@ -44,10 +55,21 @@ diff -ruN ParMGridGen-1.0_orig/MGridGen/Lib/Makefile ParMGridGen-1.0/MGridGen/Li
  realclean:
 -	rm -f *.o ; rm -f ../../libmgrid.a
 +	rm -f *.o ; rm -f ./libMGridGen.$(LIBEXT)
-Binary files ParMGridGen-1.0_orig/MGridGen/Lib/libMGridGen.dylib and ParMGridGen-1.0/MGridGen/Lib/libMGridGen.dylib differ
+diff -ruN ParMGridGen-1.0_orig/MGridGen/Lib/mgridgen.h ParMGridGen-1.0/MGridGen/Lib/mgridgen.h
+--- ParMGridGen-1.0_orig/MGridGen/Lib/mgridgen.h	2001-11-08 18:41:25.000000000 -0500
++++ ParMGridGen-1.0/MGridGen/Lib/mgridgen.h	2011-12-24 13:48:18.000000000 -0500
+@@ -26,7 +26,7 @@
+ #ifdef DMALLOC
+ #include <dmalloc.h>
+ #else
+-#include <malloc.h>
++#include <sys/malloc.h>
+ #endif
+ 
+ #include "defs.h"
 diff -ruN ParMGridGen-1.0_orig/MGridGen/Programs/Makefile ParMGridGen-1.0/MGridGen/Programs/Makefile
 --- ParMGridGen-1.0_orig/MGridGen/Programs/Makefile	2001-12-04 18:02:26.000000000 -0500
-+++ ParMGridGen-1.0/MGridGen/Programs/Makefile	2010-10-31 17:29:25.000000000 -0400
++++ ParMGridGen-1.0/MGridGen/Programs/Makefile	2011-12-24 13:24:17.000000000 -0500
 @@ -1,6 +1,6 @@
  include ../../Makefile.in
  
@@ -57,8 +79,16 @@ diff -ruN ParMGridGen-1.0_orig/MGridGen/Programs/Makefile ParMGridGen-1.0/MGridG
  ifeq ($(ddmalloc),yes)
    DEBUGFLAGS := $(DEBUGFLAGS) -DDMALLOC -DDEBUG
 diff -ruN ParMGridGen-1.0_orig/Makefile.in ParMGridGen-1.0/Makefile.in
---- ParMGridGen-1.0_orig/Makefile.in	2001-12-04 19:30:33.000000000 -0500
-+++ ParMGridGen-1.0/Makefile.in	2010-10-31 17:30:58.000000000 -0400
+--- ParMGridGen-1.0_orig/Makefile.in	2011-12-24 13:54:44.000000000 -0500
++++ ParMGridGen-1.0/Makefile.in	2011-12-24 13:49:26.000000000 -0500
+@@ -1,6 +1,6 @@
+ #--------------------------------------------------------------------------
+ # Which make to use 
+-make = gmake
++make = make
+ 
+ # Which compiler to use
+ #  CC is the compiler for the serial code
 @@ -12,7 +12,7 @@
  OPTFLAGS = -O3
  
@@ -72,8 +102,9 @@ diff -ruN ParMGridGen-1.0_orig/Makefile.in ParMGridGen-1.0/Makefile.in
  
  # In which directories to look for any additional libraries
  LIBDIR = -L../.. \
+-         -L/usr/lib32/
 +         -L../Lib \
-          -L/usr/lib32/
++         -L/usr/lib/
  
  # Set some flags
  DEBUGFLAGS =
@@ -98,4 +129,3 @@ diff -ruN ParMGridGen-1.0_orig/Makefile.in ParMGridGen-1.0/Makefile.in
  
  #--------------------------------------------------------------------------
  # 
-Binary files ParMGridGen-1.0_orig/mgridgen and ParMGridGen-1.0/mgridgen differ
