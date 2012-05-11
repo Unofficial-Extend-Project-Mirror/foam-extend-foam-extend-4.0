@@ -24,7 +24,7 @@
 #
 # Description
 #     CMakeLists.txt file for implementing a test harness for the compilation
-#     and test of OpenFOAM-1.5-dev using Kitware CTest./CMake/CDash
+#     and test of OpenFOAM-1.6-ext using Kitware CTest./CMake/CDash
 #
 #     The results will be submitted to the CDash server identified by the file
 #     CTestConfig.cmake
@@ -37,7 +37,7 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-PROJECT(OpenFOAM_1.5-dev)
+PROJECT(OpenFOAM_1.6-ext)
 
 #-----------------------------------------------------------------------------
 # Initialization of CTest specific variables
@@ -92,7 +92,7 @@ SET(BUILDNAME "${BUILDNAME}-$ENV{WM_CC}${COMPILER_VERSION}")
 # We will support more compilers eventually.
 # 
 
-# Timeout for running all this: 4 hours: 4 x 3600 seconds
+# Timeout for running every single test: 4 hours: 4 x 3600 seconds
 #SET(
 #    DART_TESTING_TIMEOUT 14400
 #    CACHE STRING "Maximum time allowed (4 hours) before CTest will kill the test."
@@ -133,7 +133,7 @@ if(GIT_FOUND)
        )
        message("Git branch (mercurial): ${GIT_BRANCH_NAME}")
     endif()
-    SET(BUILDNAME "${BUILDNAME}-git-branch:${GIT_BRANCH_NAME}")  
+    SET(BUILDNAME "${BUILDNAME}-git-branch=${GIT_BRANCH_NAME}")  
 endif()
 
 # Some last minute cleanup
