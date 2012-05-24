@@ -102,7 +102,7 @@ Foam::dimensionedVector Foam::sixDOFqODE::OmegaDot
     const dimensionedVector& omega
 ) const
 {
-    return 
+    return
         inv(momentOfInertia_)
       & (
             E(omega)

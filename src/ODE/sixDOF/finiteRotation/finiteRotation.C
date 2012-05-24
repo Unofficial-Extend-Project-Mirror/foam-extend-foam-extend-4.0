@@ -29,7 +29,7 @@ Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
     Update by Hrvoje Jasak
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "finiteRotation.H"
 
@@ -158,7 +158,7 @@ Foam::tensor Foam::finiteRotation::rotTensorAverage() const
     (
         HamiltonRodriguezRot
         (
-            rotIncrementVector(), 
+            rotIncrementVector(),
             0.5*rotIncrementAngle()
         ).R().T()
       & rotTensor_

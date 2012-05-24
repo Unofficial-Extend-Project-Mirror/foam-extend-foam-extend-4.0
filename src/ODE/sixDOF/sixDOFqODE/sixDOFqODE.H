@@ -142,7 +142,7 @@ class sixDOFqODE
 
 
         //- Set ODE coefficients from position and rotation
-        void setCoeffs(); 
+        void setCoeffs();
 
 
         // Variables in relative coordinate system (solved for)
