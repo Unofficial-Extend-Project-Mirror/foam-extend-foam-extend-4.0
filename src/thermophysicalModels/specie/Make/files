@@ -16,5 +16,8 @@ $(equationOfState)/aungierRedlichKwong/aungierRedlichKwong.C
 $(equationOfState)/pengRobinson/pengRobinson.C
 $(equationOfState)/redlichKwong/redlichKwong.C
 $(equationOfState)/soaveRedlichKwong/soaveRedlichKwong.C
+$(equationOfState)/mixtureRedlichKwong/mixtureRedlichKwong.C
+$(equationOfState)/mixturePengRobinson/mixturePengRobinson.C
+$(equationOfState)/mixtureSoaveRedlichKwong/mixtureSoaveRedlichKwong.C
 
 LIB = $(FOAM_LIBBIN)/libspecie

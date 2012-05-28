@@ -28,7 +28,6 @@ Institut für Thermodynamik
 Technische Universität Braunschweig 
 Germany
 
-
 \*---------------------------------------------------------------------------*/
 
 #include "nasaHeatCapacityPolynomial.H"
@@ -65,12 +64,12 @@ template<class equationOfState>
 Foam::Ostream& Foam::operator<<
 (
     Ostream& os,
-    const nasaHeatCapacityPolynomial<equationOfState>& ct
+    const nasaHeatCapacityPolynomial<equationOfState>& np
 )
 {
-    os  << static_cast<const equationOfState&>(ct) << tab
-        << ct.a1_ << tab<< ct.a2_ << tab << ct.a3_ << tab << ct.a4_ << tab << ct.a5_ << tab << ct.a6_ << tab << ct.a7_ ;
-    os.check("Ostream& operator<<(Ostream& os, const nasaHeatCapacityPolynomial& ct)");
+    os  << static_cast<const equationOfState&>(np) << tab
+        << np.a1_ << tab<< np.a2_ << tab << np.a3_ << tab << np.a4_ << tab << np.a5_ << tab << np.a6_ << tab << np.a7_ ;
+    os.check("Ostream& operator<<(Ostream& os, const nasaHeatCapacityPolynomial& np)");
     return os;
 }
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | 
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -43,38 +43,26 @@ namespace Foam
 // Construct from components
 inline soaveRedlichKwong::soaveRedlichKwong
 (
-    const specie& sp,
-    scalar pcrit, 
-    scalar Tcrit,
-    scalar azentricFactor
-    
+    const specie& sp   
 )
 :
-    specie(sp),    
-    pcrit_(pcrit),
-    Tcrit_(Tcrit),
-    azentricFactor_(azentricFactor),
-    a_(0.42747*pow(this->RR,2)*pow(Tcrit_,2)/(pcrit_)),
-    b_(0.08664*this->RR*Tcrit_/pcrit_),
-    n_(0.48508+1.55171*azentricFactor_-0.15613*pow(azentricFactor_,2)),
-        // Starting GUESS for the density by ideal gas law
-        rhostd_(this->rho(Pstd,Tstd,Pstd*this->W()/(Tstd*this->R())))
+    specie(sp),
+    TSave(0)     
 {}
 
 
-
-
 // Construct as named copy
-inline soaveRedlichKwong::soaveRedlichKwong(const word& name,const  soaveRedlichKwong& pg)
+inline soaveRedlichKwong::soaveRedlichKwong(const word& name,const  soaveRedlichKwong& srk)
 :
-    specie(name, pg),
-    pcrit_(pg.pcrit_),
-    Tcrit_(pg.Tcrit_),
-    azentricFactor_(pg.azentricFactor_),
-    a_(pg.a_),
-    b_(pg.b_),
-    n_(pg.n_),
-    rhostd_(pg.rhostd_)
+    specie(name, srk),
+    pcrit_(srk.pcrit_),
+    Tcrit_(srk.Tcrit_),
+    azentricFactor_(srk.azentricFactor_),
+    a0_(srk.a0_),
+    b_(srk.b_),
+    n_(srk.n_),
+    rhostd_(srk.rhostd_),
+    TSave(0) 
 {}
 
 
@@ -94,9 +82,89 @@ inline autoPtr<soaveRedlichKwong> soaveRedlichKwong::New(Istream& is)
 
 // * * * * * * * * * * * * *  Member Functions  * * * * * * * * * * * //
 
+inline void soaveRedlichKwong::updateModelCoefficients(const scalar T)const
+{
+    aSave=a0_*pow(1+n_*(1-pow(T/Tcrit_,0.5)),2);
+    daSave=a0_*n_*(n_*sqrt(T/Tcrit_)-n_-1)*sqrt(T/Tcrit_)/T;
+    d2aSave=a0_*n_*(n_+1)*sqrt(T/Tcrit_)/(2*pow(T,2));
+
+    //CL: saving the temperature at which the coefficients are valid
+    TSave=T;
+}
+
+
 inline scalar soaveRedlichKwong::rhostd()const
 {
     return rhostd_;
+}
+
+
+//CL: Model coefficient a(T)
+inline scalar soaveRedlichKwong::a(const scalar T)const
+{
+    //CL: check if a has already been calculated for this temperature
+    if(TSave==T)
+    { 
+        return aSave;  
+    }
+    //CL: If not, recalculate a(T), dadT(T) and d2adT2(T)
+    else
+    {
+        updateModelCoefficients(T);
+        return aSave;
+    }     
+}
+
+
+//CL: temperature deriviative of model coefficient a(T)
+inline scalar soaveRedlichKwong::dadT(const scalar T)const
+{
+    // check if a has already been calculated for this temperature
+    if(TSave==T)
+    {
+        return daSave;  
+    }
+    //CL: If not, recalculate a(T), dadT(T) and d2adT2(T)
+    else
+    {
+        updateModelCoefficients(T);
+        return daSave;
+    }    
+}
+
+
+//CL: second order temperature deriviative of model coefficient a(T)
+inline scalar soaveRedlichKwong::d2adT2(const scalar T)const
+{
+    // check if a has already been calculated for this temperature
+    if(TSave==T)
+    {
+        return d2aSave;  
+    }
+    //CL: If not, recalculate a(T), dadT(T) and d2adT2(T)
+    else
+    {
+        updateModelCoefficients(T);
+        return d2aSave;
+    }    
+}
+
+
+inline scalar soaveRedlichKwong::a0()const
+{
+    return a0_;
+}
+
+
+inline scalar soaveRedlichKwong::b()const
+{
+    return b_;
+}
+
+
+inline scalar soaveRedlichKwong::n()const
+{
+    return n_;
 }
 
 
@@ -104,11 +172,11 @@ inline scalar soaveRedlichKwong::rhostd()const
 inline scalar soaveRedlichKwong::p(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
+
     return 
     (
         this->RR*T/(Vm-b_)
-        -a_*pow((1+n_*(1-pow((T/Tcrit_),0.5))),2)
-            /(Vm*(Vm+b_))
+        -a(T)/(Vm*(Vm+b_))
     );
 }
 
@@ -118,27 +186,13 @@ inline scalar soaveRedlichKwong::p(const scalar rho,const scalar T) const
 inline scalar soaveRedlichKwong::dpdv(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
+
     return 
-    -(
-        2*a_*n_*Tcrit_*(b_-Vm)*(pow(b_,2)
-        +b_*Vm-2*pow(Vm,2))*(n_+1)*pow((T/Tcrit_),0.5)
-        +Tcrit_*
-        (
-            this->RR*T*pow(Vm,2)*(pow(b_,2)
-                +2*b_*Vm+pow(Vm,2))
-        -a_*
-            (pow(b_,3)-3*b_*pow(Vm,2)+
-            2*pow(Vm,3))
-        *pow((n_+1),2)
-        )
-        -a_*pow(n_,2)*T*(pow(b_,3)
-        -3*b_*pow(Vm,2)+2*pow(Vm,3))
-     )
-     /
-     (
-         pow(Vm,2)*Tcrit_*pow((b_+Vm),2)
-             *pow((b_-Vm),2)
-     );
+    (
+        a(T)*(pow(b_,3)-3*b_*pow(Vm,2)+2*pow(Vm,3))
+        -this->RR*T*pow(Vm,2)*(pow(b_,2)+2*b_*Vm+pow(Vm,2))
+    )
+    /(pow(Vm,2)*pow(b_+Vm,2)*pow(b_-Vm,2));   
 }
 
 
@@ -147,11 +201,12 @@ inline scalar soaveRedlichKwong::dpdv(const scalar rho, const scalar T) const
 inline scalar soaveRedlichKwong::dpdT(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return a_*n_*(n_+1)*pow((T/Tcrit_),0.5)
-        /(T*Vm*(b_+Vm))
-    -a_*pow(n_,2)
-        /(Vm*Tcrit_*(b_+Vm))
-    -this->RR/(b_-Vm);
+ 
+    return 
+    (
+        this->RR/(Vm-b_)
+        -dadT(T)/(Vm*(Vm+b_))
+    );
 }
 
 
@@ -177,19 +232,8 @@ inline scalar soaveRedlichKwong::dvdp(const scalar rho,const scalar T)  const
 inline scalar soaveRedlichKwong::integral_p_dv(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return this->RR*T*log(Vm-b_)
-    -(
-        a_*(2*n_*Tcrit_*(n_+1)*pow(T/Tcrit_,0.5)
-        -Tcrit_*(pow(n_,2)+2*n_+1)
-        -pow(n_,2)*T)*log(b_+Vm)
-     )
-     /(b_*Tcrit_)
-     +a_*
-     (
-         2*n_*Tcrit_*(n_+1)*pow(T/Tcrit_,0.5)
-         -Tcrit_*(pow(n_,2)+2*n_+1)-pow(n_,2)*T
-     )
-     *log(Vm)/(b_*Tcrit_);
+ 
+    return this->RR*T*log(Vm-b_)+a(T)*log(b_+Vm)/b_-a(T)*log(Vm)/b_;
 }
 
 
@@ -198,15 +242,8 @@ inline scalar soaveRedlichKwong::integral_p_dv(const scalar rho,const scalar T) 
 inline scalar soaveRedlichKwong::integral_dpdT_dv(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return this->RR*log(Vm-b_)
-    +(
-        pow(n_,2)*a_/(b_*Tcrit_)
-        -a_*n_*(n_+1)*pow((T/Tcrit_),0.5)
-            /(b_*T)
-    )*log(b_+Vm)
-    +(a_*n_*(n_+1)*pow((T/Tcrit_),0.5)
-        /(b_*T)
-    -a_*pow(n_,2)/(b_*Tcrit_))*log(Vm);
+
+    return this->RR*log(Vm-b_)+dadT(T)*log(b_+Vm)/b_-dadT(T)*log(Vm)/b_;
 }
 
 
@@ -214,8 +251,8 @@ inline scalar soaveRedlichKwong::integral_dpdT_dv(const scalar rho,const scalar 
 inline scalar soaveRedlichKwong::d2pdT2(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return -a_*n_*(n_+1)*pow(T/Tcrit_,0.5)
-        /(2*pow(T,2)*Vm*(b_+Vm));
+
+    return -d2adT2(T)/(Vm*(Vm+b_));
 }
 
 
@@ -223,45 +260,20 @@ inline scalar soaveRedlichKwong::d2pdT2(const scalar rho,const scalar T) const
 inline scalar soaveRedlichKwong::d2pdv2(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
+
     return 
-    2*(
-        2*a_*n_*Tcrit_*(b_-Vm)*
+    2*
+    (
+        a(T)*
         (
-            pow(b_,4)+pow(b_,3)*Vm
-            -2*pow(b_,2)*pow(Vm,2)
-	    -3*b_*pow(Vm,3)
-            +3*pow(Vm,4)
+            pow(b_,5)-3*pow(b_,3)*pow(Vm,2)-pow(b_,2)*pow(Vm,3)+6*b_*pow(Vm,4)-3*pow(Vm,5)
         )
-        *(n_+1)*pow(T/Tcrit_,0.5)
-	-Tcrit_*
+        +this->RR*T*pow(Vm,3)*
         (
-            a_*
-            (
-                pow(b_,5)
-                -3*pow(b_,3)*pow(Vm,2)
-                -pow(b_,2)*pow(Vm,3)
-	        +6*b_*pow(Vm,4)
-                -3*pow(Vm,5)
-            )*pow((n_+1),2)
-	    +this->RR*T*pow(Vm,3)*
-            (
-                pow(b_,3)
-                +3*pow(b_,2)*Vm
-                +3*b_*pow(Vm,2)
-                +pow(Vm,3)
-            )
-        )
-	-a_*pow(n_,2)*T*
-        (
-            pow(b_,5)
-            -3*pow(b_,3)*pow(Vm,2)
-            -pow(b_,2)*pow(Vm,3)
-	    +6*b_*pow(Vm,4)
-            -3*pow(Vm,5)
+            pow(b_,3)+3*pow(b_,2)*Vm+3*b_*pow(Vm,2)+pow(Vm,3)
         )
     )
-    /(pow(Vm,3)*Tcrit_*pow((Vm+b_),3)
-        *pow((b_-Vm),3));
+    /(pow(Vm,3)*pow(b_+Vm,3)*pow(Vm-b_,3));   
 }
 
 
@@ -283,19 +295,13 @@ inline scalar soaveRedlichKwong::d2vdT2(const scalar rho, const scalar T) const
 inline scalar soaveRedlichKwong::d2pdvdT(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return -a_*n_*(b_+2*Vm)*(n_+1)*pow(T/Tcrit_,0.5)
-        /(T*pow(Vm,2)*pow((b_+Vm),2))
-    -(
-        this->RR*pow(Vm,2)*Tcrit_*(pow(b_,2)
-        +2*b_*Vm+pow(Vm,2))
-        -a_*pow(n_,2)*
-        (
-            pow(b_,3)
-            -3*b_*pow(Vm,2)
-            +2*pow(Vm,3)
-        )
+
+    return 
+    (
+        dadT(T)*(pow(b_,3)-3*b_*pow(Vm,2)+2*pow(Vm,3))
+        -this->RR*pow(Vm,2)*(pow(b_,2)+2*b_*Vm+pow(Vm,2))
     )
-  /(pow(Vm,2)*Tcrit_*pow((b_+Vm),2)*pow((b_-Vm),2));
+    /(pow(Vm,2)*pow(b_+Vm,2)*pow(b_-Vm,2)); 
 }
 
 
@@ -304,10 +310,8 @@ inline scalar soaveRedlichKwong::d2pdvdT(const scalar rho, const scalar T) const
 inline scalar soaveRedlichKwong::integral_d2pdT2_dv(const scalar rho,const scalar T) const 
 {    
     scalar Vm = this->W()/rho;
-    return a_*n_*(n_+1)*pow(T/Tcrit_,0.5)*log(b_+Vm)
-        /(2*b_*pow(T,2))
-    -a_*n_*(n_+1)*pow(T/Tcrit_,0.5)*log(Vm)
-        /(2*b_*pow(T,2));
+
+    return d2adT2(T)*log(b_+Vm)/b_-d2adT2(T)*log(Vm)/b_;
 }
 
 
@@ -361,8 +365,9 @@ inline scalar soaveRedlichKwong::rho(
            i++;
            if (i>8) 
            {
-               //using bisection methode as backup,
-               //solution must be between rho=0.001 to rho=1500;
+               //CL: using bisection methode as backup,
+               //CL: solution must be between rho=0.001 to rho=1500;
+               //CL: if not, change rhoMax_ and rhoMin_
                for(i=0; i<200; i++)
                {
                    scalar f1 = this->p(rho1,T) - p;
@@ -419,8 +424,7 @@ inline scalar soaveRedlichKwong::rho(
 //- Return density [kg/m^3]on 
 inline scalar soaveRedlichKwong::rho(const scalar p,const scalar T) const
 {
-
-    //using perfect gas equation as starting point
+    //CL: using perfect gas equation as starting point
     return rho(p,T,p/(this->R()*T));
 }
 
@@ -435,19 +439,19 @@ inline scalar soaveRedlichKwong::psi(const scalar rho, const scalar T) const
 //- Return compression factor []
 inline scalar soaveRedlichKwong::Z( const scalar p, const scalar T,const scalar rho0) const
 {
-    return (p*this->rho(p,T,rho0))/(this->R()*T);
+    return p/(this->R()*T*this->rho(p,T,rho0));
 }
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
-
-inline void soaveRedlichKwong::operator+=(const soaveRedlichKwong& pg)
+/*
+inline void soaveRedlichKwong::operator+=(const soaveRedlichKwong& srk)
 {
-    specie::operator+=(pg);
+    specie::operator+=(srk);
 }
 
-	inline void soaveRedlichKwong::operator-=(const soaveRedlichKwong& pg)
+	inline void soaveRedlichKwong::operator-=(const soaveRedlichKwong& srk)
 {
-    specie::operator-=(pg);
+    specie::operator-=(srk);
 }
 
 inline void soaveRedlichKwong::operator*=(const scalar s)
@@ -455,58 +459,30 @@ inline void soaveRedlichKwong::operator*=(const scalar s)
     specie::operator*=(s);
 }
 
-
+*/
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
-//**************** not working**************//
-/*
+
 inline soaveRedlichKwong operator+
 (
-    const soaveRedlichKwong& pg1,
-    const soaveRedlichKwong& pg2
+    const soaveRedlichKwong& srk1,
+    const soaveRedlichKwong& srk2
 )
 {
     return soaveRedlichKwong
     (
-        static_cast<const specie&>(pg1)
-      + static_cast<const specie&>(pg2)
+        static_cast<const specie&>(srk1)
+      + static_cast<const specie&>(srk2)
     );
 }
-
-
-inline soaveRedlichKwong operator-
-(
-    const soaveRedlichKwong& pg1,
-    const soaveRedlichKwong& pg2
-)
-{
-    return soaveRedlichKwong
-    (
-        static_cast<const specie&>(pg1)
-      - static_cast<const specie&>(pg2)
-    );
-}
-
 
 inline soaveRedlichKwong operator*
 (
     const scalar s,
-    const soaveRedlichKwong& pg
+    const soaveRedlichKwong& srk
 )
 {
-    return soaveRedlichKwong(s*static_cast<const specie&>(pg));
+    return soaveRedlichKwong(s*static_cast<const specie&>(srk));
 }
-
-
-inline soaveRedlichKwong operator==
-(
-    const soaveRedlichKwong& pg1,
-    const soaveRedlichKwong& pg2
-)
-{
-    return pg2 - pg1;
-}
-
-*/
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

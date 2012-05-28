@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | 
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -27,6 +27,11 @@ Class
 
 Description
     Aungier Redlich Kwong equation of state.
+
+    Paper:
+    Title: A Fast, Accurate Real Gas Equation of State for Fluid Dynamic Analysis Applications
+    Authors: R. H. Aungier
+    Journal: Journal of Fluids Engineering, Vol.117, 1995
 
 SourceFiles
     aungierRedlichKwongI.H
@@ -67,17 +72,18 @@ class aungierRedlichKwong
         scalar rhocrit_;
 
     //Aungier Redlich Kwong factors
-        scalar a_;
-        scalar b_;
-        scalar c_;
-        scalar n_;
+        mutable scalar a_;
+        mutable scalar b_;
+        mutable scalar c_;
+        mutable scalar n_;
 
     //Density @STD, initialise after a, b!
         scalar rhostd_;
 
-    // Static Private data
+    //Static Private data
 
     //should be read from the fvSolution file where rhoMax and rhoMin values must be define ( for rhoSimpleFoam)
+    //HR: Don't know, yet. Let's make these static for starters
         static const scalar rhoMax_;
         static const scalar rhoMin_; 
 
@@ -113,9 +119,10 @@ public:
 
 	inline scalar rhostd() const;
 
+        //CL: Equation of state
         inline scalar p(const scalar rho, const scalar T) const;
 
-        //first order derivatives 
+        //CL: first order derivatives 
         inline scalar dpdv(const scalar rho, const  scalar T) const;
 
         inline scalar dpdT(const scalar rho, const scalar T) const;
@@ -132,14 +139,14 @@ public:
             const scalar T
         ) const; 
         
-        // Used for cv
+        //CL: Used for cv
         inline scalar integral_d2pdT2_dv
         (
             const scalar rho,
             const scalar T
         ) const ; 
 
-        // second order derivatives, not Used At The Moment
+        //CL: second order derivatives, not Used At The Moment
         inline scalar d2pdv2(const scalar rho, const  scalar T) const;    
 
 	inline scalar d2pdT2(const scalar rho,   scalar T) const;    
@@ -148,10 +155,10 @@ public:
 
 	inline scalar d2vdT2(const scalar rho, const  scalar T) const;    
 
-        //Used for internal Energy
+        //CL: Used for internal Energy
         inline scalar integral_p_dv(const scalar rho, const  scalar T) const;
 
-        //Used for Entropy
+        //CL: Used for Entropy
         inline scalar integral_dpdT_dv(const scalar rho, const  scalar T) const;  
 
         //- Return density [kg/m^3] 
@@ -172,45 +179,14 @@ public:
         inline scalar Z
         (
             const scalar p,
-            const  scalar T, 
+            const scalar T, 
             const scalar rho0
         ) const;
 
 
     // Member operators
 
-        inline void operator+=(const aungierRedlichKwong&);
-        inline void operator-=(const aungierRedlichKwong&);
-
-        inline void operator*=(const scalar);
-
-
- /*   // Friend operators
-
-        inline friend aungierRedlichKwong operator+
-        (
-            const aungierRedlichKwong&,
-            const aungierRedlichKwong&
-        );
-
-        inline friend aungierRedlichKwong operator-
-        (
-            const aungierRedlichKwong&,
-            const aungierRedlichKwong&
-        );
-
-        inline friend aungierRedlichKwong operator*
-        (
-            const scalar s,
-            const aungierRedlichKwong&
-        );
-
-        inline friend aungierRedlichKwong operator==
-        (
-            const aungierRedlichKwong&,
-            const aungierRedlichKwong&
-        );
-*/
+    // Friend operators
 
     // Ostream Operator
 

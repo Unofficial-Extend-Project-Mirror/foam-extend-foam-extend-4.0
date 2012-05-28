@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | 
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -60,11 +60,11 @@ soaveRedlichKwong::soaveRedlichKwong(Istream& is)
     pcrit_(readScalar(is)),
     Tcrit_(readScalar(is)),
     azentricFactor_(readScalar(is)),
-    a_(0.42747*pow(this->RR,2)*pow(Tcrit_,2)/(pcrit_)),
+    a0_(0.42747*pow(this->RR,2)*pow(Tcrit_,2)/(pcrit_)),
     b_(0.08664*this->RR*Tcrit_/pcrit_),
     n_(0.48508+1.55171*azentricFactor_-0.15613*pow(azentricFactor_,2)),
         // Starting GUESS for the density by ideal gas law
-        rhostd_(this->rho(Pstd,Tstd,Pstd*this->W()/(Tstd*this->R())))
+        rhostd_(this->rho(Pstd,Tstd,Pstd/(Tstd*this->R())))
 {
     is.check("soaveRedlichKwong::soaveRedlichKwong(Istream& is)"); 	
 }
@@ -72,10 +72,10 @@ soaveRedlichKwong::soaveRedlichKwong(Istream& is)
 
 // * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
 
-Ostream& operator<<(Ostream& os, const soaveRedlichKwong& pg)
+Ostream& operator<<(Ostream& os, const soaveRedlichKwong& srk)
 {
-    os  << static_cast<const specie&>(pg)<< tab
-        << pg.pcrit_ << tab<< pg.Tcrit_<<tab<<pg.azentricFactor_;
+    os  << static_cast<const specie&>(srk)<< tab
+        << srk.pcrit_ << tab<< srk.Tcrit_<<tab<<srk.azentricFactor_;
 
     os.check("Ostream& operator<<(Ostream& os, const soaveRedlichKwong& st)");
     return os;

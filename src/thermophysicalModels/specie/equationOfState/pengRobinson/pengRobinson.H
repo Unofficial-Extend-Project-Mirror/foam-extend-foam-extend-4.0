@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | 
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,6 +28,12 @@ Class
 Description
     Peng Robinson equation of state.
 
+    Paper:
+    Title: A New Two-Constant Equation of State
+    Authors: Ding-Yu Peng and Donald B. Robinson
+    Journal: Ind. Eng. Chem., Fundam., Vol. 15, No. 1, 1976
+
+
 SourceFiles
     pengRobinsonI.H
     pengRobinson.C
@@ -38,7 +44,6 @@ Christian Lucas
 Institut für Thermodynamik
 Technische Universität Braunschweig 
 Germany
-
 
 \*---------------------------------------------------------------------------*/
 
@@ -63,19 +68,6 @@ class pengRobinson
     public specie
 
 {
-   //Member Variabels
-    scalar pcrit_;
-    scalar Tcrit_; 
-    scalar azentricFactor_;
-
-    //-Peng Robinson factors
-    scalar a_;
-    scalar b_;
-    scalar n_;
-
-    //- Density @STD, initialise after a, b!
-    scalar rhostd_;
-
     // Static Private data
 
     //should be read from the fvSolution file where rhoMax and rhoMin values must be defined (for rhoSimpleFoam)
@@ -83,6 +75,34 @@ class pengRobinson
     static const scalar rhoMax_;
     static const scalar rhoMin_;
 
+protected:
+    // Protected data
+    scalar pcrit_;
+    scalar Tcrit_; 
+    scalar azentricFactor_;
+
+    //-Peng Robinson factors
+    scalar n_; 
+    scalar a0_;
+    mutable scalar b_;
+
+
+    //CL: Variables to save the values of a, dadT and d2adT2 of the mixture
+    //CL: Variables must corrected for changing temperatures
+    mutable scalar aSave;
+    mutable scalar daSave;
+    mutable scalar d2aSave;
+
+    //CL: save the temperature for which the save coefficients (amix,dadTmix,d2adT2mix) are correct
+    mutable scalar TSave;
+
+    //- Density @STD, initialise after a0, b!
+    mutable scalar rhostd_;
+
+
+    //Protected functions
+    //CL: function updates the coefficients (aSave, daSave, d2aSave)
+    inline void updateModelCoefficients(const  scalar T) const; 
 
 public:
   
@@ -90,11 +110,9 @@ public:
     // Constructors
 
         //- Construct from components
-        inline pengRobinson(
-	const specie& sp, 
-	scalar pcrit, 
-	scalar Tcrit,
-	scalar azentricFactor
+        inline pengRobinson
+        (
+	    const specie& sp
 	);
 
         //- Construct from Istream
@@ -109,15 +127,28 @@ public:
         // Selector from Istream
         inline static autoPtr<pengRobinson> New(Istream& is);
 
-
-	
-
     // Member functions
 	inline scalar rhostd()const;
 
+        //CL: Model coefficient a(T)
+	inline scalar a(const  scalar T)const;
+
+        //CL: temperature deriviative of model coefficient a(T)
+	inline scalar dadT(const  scalar T)const;
+
+        //CL: second order temperature deriviative of model coefficient a(T)
+	inline scalar d2adT2(const  scalar T)const;
+
+	inline scalar a0()const;
+
+	inline scalar b()const;
+
+	inline scalar n()const;
+
+        //CL: Equation of state
         inline scalar p(const scalar rho, const scalar T) const;
 
-        //first order derivatives 
+        //CL: first order derivatives 
         inline scalar dpdv(const scalar rho,const  scalar T) const;
 
         inline scalar dpdT(const scalar rho, const scalar T) const;
@@ -138,14 +169,14 @@ public:
             const  scalar T
         ) const; 
 
-        // Used for cv
+        //CL: Used for cv
         inline scalar integral_d2pdT2_dv
         ( 
             const scalar rho,
             const  scalar T
         ) const ; 
 	
-        // second order derivatives, not Used At The Moment
+        //CL: second order derivatives, not Used At The Moment
         inline scalar d2pdv2(const scalar rho,const  scalar T) const;    		
 	
         inline scalar d2pdT2(const scalar rho,const  scalar T) const;    		
@@ -154,10 +185,10 @@ public:
 	
         inline scalar d2vdT2(const scalar rho,const  scalar T) const;    
 	
-        //Used for internal Energy
+        //CL: Used for internal Energy
         inline scalar integral_p_dv(const scalar rho,const  scalar T) const;
         
-        //Used for Entropy
+        //CL: Used for Entropy
         inline scalar integral_dpdT_dv(const scalar rho,const  scalar T) const;  	
 
         //- Return density [kg/m^3] 
@@ -185,21 +216,18 @@ public:
 
     // Member operators
 
+        /*
         inline void operator+=(const pengRobinson&);
+
         inline void operator-=(const pengRobinson&);
 
         inline void operator*=(const scalar);
+        */
 
 
- /*   // Friend operators
+    // Friend operators
 
         inline friend pengRobinson operator+
-        (
-            const pengRobinson&,
-            const pengRobinson&
-        );
-
-        inline friend pengRobinson operator-
         (
             const pengRobinson&,
             const pengRobinson&
@@ -210,13 +238,6 @@ public:
             const scalar s,
             const pengRobinson&
         );
-
-        inline friend pengRobinson operator==
-        (
-            const pengRobinson&,
-            const pengRobinson&
-        );
-*/
 
     // Ostream Operator
 

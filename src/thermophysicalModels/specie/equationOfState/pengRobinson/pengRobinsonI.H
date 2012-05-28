@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | 
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,6 @@ Institut für Thermodynamik
 Technische Universität Braunschweig 
 Germany
 
-
 \*---------------------------------------------------------------------------*/
 
 #include "pengRobinson.H"
@@ -38,40 +37,31 @@ Germany
 namespace Foam
 {
 
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
 inline pengRobinson::pengRobinson
 (
-    const specie& sp,
-    scalar pcrit, 
-    scalar Tcrit,
-    scalar azentricFactor
-    
+    const specie& sp    
 )
 :
-    specie(sp),    
-    pcrit_(pcrit),
-    Tcrit_(Tcrit),
-    azentricFactor_(azentricFactor),
-    a_(0.457235*pow(this->RR,2)*pow(Tcrit_,2)/pcrit_),
-    b_(0.077796*this->RR*Tcrit_/pcrit_), 
-    n_(0.37464+1.54226*azentricFactor_-0.26992*pow(azentricFactor_,2)), 
-    rhostd_(this->rho(Pstd,Tstd,Pstd*this->W()/(Tstd*this->R()))) 
+    specie(sp),
+    TSave(0) 
 {}
 
+
 // Construct as named copy
-inline pengRobinson::pengRobinson(const word& name, const pengRobinson& pg)
+inline pengRobinson::pengRobinson(const word& name, const pengRobinson& pr)
 :
-    specie(name, pg),
-    pcrit_(pg.pcrit_),
-    Tcrit_(pg.Tcrit_),
-    azentricFactor_(pg.azentricFactor_),
-    a_(pg.a_),
-    b_(pg.b_),
-    n_(pg.n_),
-    rhostd_(pg.rhostd_)
+    specie(name, pr),
+    pcrit_(pr.pcrit_),
+    Tcrit_(pr.Tcrit_),
+    azentricFactor_(pr.azentricFactor_),
+    a0_(pr.a0_),
+    b_(pr.b_),
+    n_(pr.n_),
+    rhostd_(pr.rhostd_),
+    TSave(0) 
 {}
 
 
@@ -91,9 +81,89 @@ inline autoPtr<pengRobinson> pengRobinson::New(Istream& is)
 
 // * * * * * * * * * * * * *  Member Functions  * * * * * * * * * * * //
 
+inline void pengRobinson::updateModelCoefficients(const scalar T)const
+{
+    aSave=a0_*pow(1+n_*(1-pow(T/Tcrit_,0.5)),2);
+    daSave=a0_*n_*(n_*sqrt(T/Tcrit_)-n_-1)*sqrt(T/Tcrit_)/T;
+    d2aSave=a0_*n_*(n_+1)*sqrt(T/Tcrit_)/(2*pow(T,2));
+
+    //CL: saving the temperature at which the coefficients are valid
+    TSave=T;
+}
+
+
 inline scalar pengRobinson::rhostd()const
 {
     return rhostd_;
+}
+
+
+//CL: Model coefficient a(T)
+inline scalar pengRobinson::a(const scalar T)const
+{
+    //CL: check if a has already been calculated for this temperature
+    if(TSave==T)
+    { 
+        return aSave;  
+    }
+    //CL: If not, recalculate a(T), dadT(T) and d2adT2(T)
+    else
+    {
+        updateModelCoefficients(T);
+        return aSave;
+    }     
+}
+
+
+//CL: temperature deriviative of model coefficient a(T)
+inline scalar pengRobinson::dadT(const scalar T)const
+{
+    // check if a has already been calculated for this temperature
+    if(TSave==T)
+    {
+        return daSave;  
+    }
+    //CL: If not, recalculate a(T), dadT(T) and d2adT2(T)
+    else
+    {
+        updateModelCoefficients(T);
+        return daSave;
+    }    
+}
+
+
+//CL: second order temperature deriviative of model coefficient a(T)
+inline scalar pengRobinson::d2adT2(const scalar T)const
+{
+    // check if a has already been calculated for this temperature
+    if(TSave==T)
+    {
+        return d2aSave;  
+    }
+    //CL: If not, recalculate a(T), dadT(T) and d2adT2(T)
+    else
+    {
+        updateModelCoefficients(T);
+        return d2aSave;
+    }    
+}
+
+
+inline scalar pengRobinson::a0()const
+{
+    return a0_;
+}
+
+
+inline scalar pengRobinson::b()const
+{
+    return b_;
+}
+
+
+inline scalar pengRobinson::n()const
+{
+    return n_;
 }
 
 
@@ -101,9 +171,8 @@ inline scalar pengRobinson::rhostd()const
 inline scalar pengRobinson::p(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return  this->RR*T/(Vm-b_)
-        -(a_*pow((1+n_*(1-pow((T/Tcrit_),0.5))),2))
-        /(pow(Vm,2)+2*b_*Vm-pow(b_,2));
+     
+    return this->RR*T/(Vm-b_)-a(T)/(pow(Vm,2)+2*b_*Vm-pow(b_,2));
 }
 
 
@@ -112,20 +181,19 @@ inline scalar pengRobinson::p(const scalar rho,const scalar T) const
 inline scalar pengRobinson::dpdv(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return 
-    -(
-        4*a_*n_*Tcrit_*(b_-Vm)*(pow(b_,2)
-        -pow(Vm,2))*(n_+1)*pow((T/Tcrit_),0.5)
-        +Tcrit_*(-2*a_*pow((n_+1),2)*(pow(b_,3)-pow(b_,2)*Vm
-        -b_*pow(Vm,2)+pow(Vm,3))
-        +this->RR*T*(pow(b_,4)-4*pow(b_,3)*Vm
-        +2*pow(b_,2)*pow(Vm,2)
-        +4*b_*pow(Vm,3)+pow(Vm,4)))
-        -2*a_*pow(n_,2)*T*(pow(b_,3)-pow(b_,2)*Vm
-        -b_*pow(Vm,2)+pow(Vm,3))
-     )
-     /(Tcrit_*pow((b_-Vm),2)*pow((pow(b_,2)
-        -2*b_*Vm-pow(Vm,2)),2));
+
+    return(
+              2*a(T)*
+              (
+                  pow(b_,3)-pow(b_,2)*Vm-b_*pow(Vm,2)+pow(Vm,3)
+              )
+              -this->RR*T*
+              (
+                  pow(b_,4)-4*pow(b_,3)*Vm+2*pow(b_,2)*pow(Vm,2)
+                      +4*b_*pow(Vm,3)+pow(Vm,4)
+              )
+          )
+          /(pow(b_-Vm,2)*pow(pow(b_,2)-2*b_*Vm-pow(Vm,2),2));
 }
 
 
@@ -134,15 +202,8 @@ inline scalar pengRobinson::dpdv(const scalar rho, const scalar T) const
 inline scalar pengRobinson::dpdT(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return 
-    (
-        -a_*n_*(n_+1)*pow((T/Tcrit_),0.5)
-            /(T*(pow(b_,2)
-        -2*b_*Vm-pow(Vm,2)))
-        +a_*pow(n_,2)/(Tcrit_*(pow(b_,2)
-        -2*b_*Vm-pow(Vm,2)))
-        -this->RR/(b_-Vm)
-    );
+
+    return this->RR/(Vm-b_)-dadT(T)/(pow(Vm,2)+2*b_*Vm-pow(b_,2));
 }
 
 
@@ -167,14 +228,8 @@ inline scalar pengRobinson::dvdp(const scalar rho,const scalar T)  const
 inline scalar pengRobinson::integral_p_dv(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return  pow(2,0.5)*a_*(2*n_*Tcrit_*(n_+1)*pow(T/Tcrit_,0.5)
-        -Tcrit_*(pow(n_,2)+2*n_+1)-pow(n_,2)*T)
-            *log(b_*(1-pow(2,0.5))+Vm)/(4*b_*Tcrit_)
-        +this->RR*T*log(Vm-b_)
-        -pow(2,0.5)*a_*(2*n_*Tcrit_*(n_+1)*pow(T/Tcrit_,0.5)
-        -Tcrit_*(pow(n_,2)+2*n_+1)
-        -pow(n_,2)*T)*log(b_*(pow(2,0.5)+1)+Vm)
-            /(4*b_*Tcrit_);
+
+    return -pow(2,0.5)*a(T)*log(b_*(1-pow(2,0.5))+Vm)/(4*b_)+this->RR*T*log(Vm-b_)+pow(2,0.5)*a(T)*log(b_*(pow(2,0.5)+1)+Vm)/(4*b_);
 }
 
 
@@ -183,13 +238,8 @@ inline scalar pengRobinson::integral_p_dv(const scalar rho,const scalar T) const
 inline scalar pengRobinson::integral_dpdT_dv(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return (pow(2,0.5)*a_*n_*(n_+1)*pow(T/Tcrit_,0.5)/(4*b_*T)
-        -pow(2,0.5)*a_*pow(n_,2)/(4*b_*Tcrit_))
-            *log(b_*(1-pow(2,0.5))+Vm)
-        +this->RR*log(Vm-b_)
-        +(pow(2,0.5)*a_*pow(n_,2)/(4*b_*Tcrit_)
-        -pow(2,0.5)*a_*n_*(n_+1)*pow(T/Tcrit_,0.5)/(4*b_*T))
-            *log(b_*(pow(2,0.5)+1)+Vm);
+
+    return -pow(2,0.5)*dadT(T)*log(b_*(1-pow(2,0.5))+Vm)/(4*b_)+this->RR*log(Vm-b_)+pow(2,0.5)*dadT(T)*log(b_*(pow(2,0.5)+1)+Vm)/(4*b_);
 }
 
 
@@ -197,10 +247,8 @@ inline scalar pengRobinson::integral_dpdT_dv(const scalar rho,const scalar T) co
 inline scalar pengRobinson::d2pdT2(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return 
-    a_*n_*(n_+1)*pow((T/Tcrit_),0.5)
-        /(2*pow(T,2)*(pow(b_,2)
-    -2*b_*Vm-pow(Vm,2)));
+
+    return -d2adT2(T)/(pow(Vm,2)+2*b_*Vm-pow(b_,2));
 }
 
 
@@ -208,51 +256,20 @@ inline scalar pengRobinson::d2pdT2(const scalar rho,const scalar T) const
 inline scalar pengRobinson::d2pdv2(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return 
-    2*(
-        2*a_*n_*Tcrit_*(b_-Vm)*(n_+1)*
-        (
-            5*pow(b_,4)-4*pow(b_,3)*Vm
-            -4*pow(b_,2)*pow(Vm,2)
-            +3*pow(Vm,4)
-        )
-        *pow(T/Tcrit_,0.5)
-        +Tcrit_*
-        (
-            this->RR*T*
-            (
-                pow(b_,6)
-                -6*pow(b_,5)*Vm
-                +9*pow(b_,4)*pow(Vm,2)
-                +4*pow(b_,3)*pow(Vm,3)
-                -9*pow(b_,2)*pow(Vm,4)
-                -6*b_*pow(Vm,5)
-                -pow(Vm,6)
-            )
-            -a_*pow((n_+1),2)*
-            (
-                 5*pow(b_,5)
-                 -9*pow(b_,4)*Vm
-                 +4*pow(b_,2)*pow(Vm,3)
-                 +3*b_*pow(Vm,4)-3*pow(Vm,5)
-            )
-         )
-         -a_*pow(n_,2)*T*
-         (
-             5*pow(b_,5)
-             -9*pow(b_,4)*Vm
-             +4*pow(b_,2)*pow(Vm,3)
-             +3*b_*pow(Vm,4)
-             -3*pow(Vm,5)
-         )
-     )
-     /
-     (
-         Tcrit_*
-         pow((pow(b_,2)
-             -2*b_*Vm-pow(Vm,2)),3)
-         *pow((Vm-b_),3)
-     );
+
+    return 2*
+           (
+               a(T)*
+               (
+                   5*pow(b_,5)-9*pow(b_,4)*Vm+4*pow(b_,2)*pow(Vm,3)+3*b_*pow(Vm,4)-3*pow(Vm,5)
+               )
+               -this->RR*T*
+               (
+                   pow(b_,6)-6*pow(b_,5)*Vm+9*pow(b_,4)*pow(Vm,2)+4*pow(b_,3)*pow(Vm,3)
+                       -9*pow(b_,2)*pow(Vm,4)-6*b_*pow(Vm,5)-pow(Vm,6)
+               )
+           )
+           /(pow(b_-Vm,3)*pow(pow(b_,2)-2*b_*Vm-pow(Vm,2),3));
 }
 
 
@@ -274,11 +291,19 @@ inline scalar pengRobinson::d2vdT2(const scalar rho, const scalar T) const
 inline scalar pengRobinson::d2pdvdT(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return -2*a_*n_*(b_+Vm)*(n_+1)*pow(T/Tcrit_,0.5)
-        /(T*pow((pow(b_,2)-2*b_*Vm-pow(Vm,2)),2))
-    +(2*a_*pow(n_,2)*(b_+Vm))
-        /(Tcrit_*pow(pow(b_,2)-2*b_*Vm-pow(Vm,2),2))
-    -this->RR/(pow(b_-Vm,2));
+  
+    return(
+              2*dadT(T)*
+              (
+                  pow(b_,3)-pow(b_,2)*Vm-b_*pow(Vm,2)+pow(Vm,3)
+              )
+              -this->RR*
+              (
+                  pow(b_,4)-4*pow(b_,3)*Vm+2*pow(b_,2)*pow(Vm,2)
+                      +4*b_*pow(Vm,3)+pow(Vm,4)
+              )
+          )
+          /(pow(b_-Vm,2)*pow(pow(b_,2)-2*b_*Vm-pow(Vm,2),2));
 }
 
 
@@ -287,10 +312,8 @@ inline scalar pengRobinson::d2pdvdT(const scalar rho, const scalar T) const
 inline scalar pengRobinson::integral_d2pdT2_dv(const scalar rho,const scalar T) const 
 {
     scalar Vm = this->W()/rho;
-    return pow(2,0.5)*a_*n_*(n_+1)*pow(T/Tcrit_,0.5)
-        *log(b_*(pow(2,0.5)+1)+Vm)/(8*b_*pow(T,2))
-    -pow(2,0.5)*a_*n_*(n_+1)*pow(T/Tcrit_,0.5)
-        *log(b_*(1-pow(2,0.5))+Vm)/(8*b_*pow(T,2));
+
+    return pow(2,0.5)*d2adT2(T)*log(b_*(pow(2,0.5)+1)+Vm)/(4*b_)-pow(2,0.5)*d2adT2(T)*log(b_*(1-pow(2,0.5))+Vm)/(4*b_);
 }
 
 
@@ -307,7 +330,8 @@ inline scalar pengRobinson::isobarExpCoef(const scalar rho,const scalar T)  cons
 inline scalar pengRobinson::isothermalCompressiblity(const scalar rho,const scalar T) const
 {
     return this->isobarExpCoef(rho, T)/this->dpdT(rho, T);
-    //also possible : return -this->dvdp(rho,T)*rho/this->W();
+    //CL: also possible 
+    //CL: return -this->dvdp(rho,T)*rho/this->W();
 }
 
 
@@ -332,7 +356,7 @@ inline scalar pengRobinson::rho(
    do
    {
        molarVolumePrevIteration= molarVolume;
-   
+
        label i=0;
        do
        {
@@ -345,8 +369,9 @@ inline scalar pengRobinson::rho(
            i++;
            if (i>8) 
            {
-               //using bisection methode as backup,
-               //solution must be between rho=0.001 to rho=1500;
+               //CL: using bisection methode as backup,
+               //CL: solution must be between rho=0.001 to rho=1500;
+               //CL: if not, change rhoMax_ and rhoMin_
                for(i=0; i<200; i++)
                {
                    scalar f1 = this->p(rho1,T) - p;
@@ -419,20 +444,21 @@ inline scalar pengRobinson::psi(const scalar rho, const scalar T) const
 //- Return compression factor []
 inline scalar pengRobinson::Z( const scalar p, const scalar T,const scalar rho0) const
 {
-    return (p*this->rho(p,T,rho0))/(this->R()*T);
+    return p/(this->R()*T*this->rho(p,T,rho0));
 }
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
-inline void pengRobinson::operator+=(const pengRobinson& pg)
+/*
+inline void pengRobinson::operator+=(const pengRobinson& pr)
 {
-    specie::operator+=(pg);
+    specie::operator+=(pr);
 }
 
-	inline void pengRobinson::operator-=(const pengRobinson& pg)
+	inline void pengRobinson::operator-=(const pengRobinson& pr)
 {
-    specie::operator-=(pg);
+    specie::operator-=(pr);
 }
 
 inline void pengRobinson::operator*=(const scalar s)
@@ -440,58 +466,30 @@ inline void pengRobinson::operator*=(const scalar s)
     specie::operator*=(s);
 }
 
-
+*/
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
-//****************not working**************//
-/*
+
 inline pengRobinson operator+
 (
-    const pengRobinson& pg1,
-    const pengRobinson& pg2
+    const pengRobinson& pr1,
+    const pengRobinson& pr2
 )
 {
     return pengRobinson
     (
-        static_cast<const specie&>(pg1)
-      + static_cast<const specie&>(pg2)
+        static_cast<const specie&>(pr1)
+      + static_cast<const specie&>(pr2)
     );
 }
-
-
-inline pengRobinson operator-
-(
-    const pengRobinson& pg1,
-    const pengRobinson& pg2
-)
-{
-    return pengRobinson
-    (
-        static_cast<const specie&>(pg1)
-      - static_cast<const specie&>(pg2)
-    );
-}
-
 
 inline pengRobinson operator*
 (
     const scalar s,
-    const pengRobinson& pg
+    const pengRobinson& pr
 )
 {
-    return pengRobinson(s*static_cast<const specie&>(pg));
+    return pengRobinson(s*static_cast<const specie&>(pr));
 }
-
-
-inline pengRobinson operator==
-(
-    const pengRobinson& pg1,
-    const pengRobinson& pg2
-)
-{
-    return pg2 - pg1;
-}
-
-*/
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | 
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,6 @@ Institut für Thermodynamik
 Technische Universität Braunschweig 
 Germany
 
-
 \*---------------------------------------------------------------------------*/
 
 #include "aungierRedlichKwong.H"
@@ -37,8 +36,6 @@ Germany
 
 namespace Foam
 {
-
-
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -62,7 +59,7 @@ inline aungierRedlichKwong::aungierRedlichKwong
     c_(this->RR*Tcrit_/(pcrit_+(a_/(this->W()/rhocrit_*(this->W()/rhocrit_+b_))))+b_-this->W()/rhocrit_),
     n_(0.4986+1.2735*azentricFactor_+0.4754*pow(azentricFactor_,2)),
     // Starting GUESS for the density by ideal gas law
-        rhostd_(this->rho(Pstd,Tstd,Pstd*this->W()/(Tstd*this->R())))
+        rhostd_(this->rho(Pstd,Tstd,Pstd/(Tstd*this->R())))
 {}
 
 
@@ -102,6 +99,7 @@ inline scalar aungierRedlichKwong::rhostd()const
 {
     return rhostd_;
 }
+
 
 //returns the pressure for a given density and temperature    
 inline scalar aungierRedlichKwong::p(const scalar rho,const scalar T) const
@@ -163,7 +161,6 @@ inline scalar aungierRedlichKwong::integral_p_dv
 }
 
 
-
 //needed to calculate the entropy
 //(molar values)
 inline scalar aungierRedlichKwong::integral_dpdT_dv
@@ -186,8 +183,6 @@ inline scalar aungierRedlichKwong::d2pdT2(const scalar rho,const scalar T) const
 }
 
 
-
-
 //(molar values)
 inline scalar aungierRedlichKwong::d2pdv2(const scalar rho,const scalar T) const
 {
@@ -196,8 +191,6 @@ inline scalar aungierRedlichKwong::d2pdv2(const scalar rho,const scalar T) const
         +3*b_*Vm+3*pow(Vm,2))/(pow(Vm,3)*pow((b_+Vm),3))
         -2*this->RR*T/(pow((b_-Vm-c_),3));
 }
-
-
 
 
 //(molar values)
@@ -214,8 +207,6 @@ inline scalar aungierRedlichKwong::d2vdT2(const scalar rho, const scalar T) cons
 }
 
 
-
-
 //(molar values)
 inline scalar aungierRedlichKwong::d2pdvdT(const scalar rho, const scalar T) const
 {
@@ -223,8 +214,6 @@ inline scalar aungierRedlichKwong::d2pdvdT(const scalar rho, const scalar T) con
     return -a_*n_*pow(T,-n_-1)*pow(Tcrit_,n_)*(b_+2*Vm)/(pow(Vm,2)*pow((b_+Vm),2))
         -this->RR/(pow((b_-c_-Vm),2));
 }
-
-
 
 
 // the result of this intergal is needed for the nasa based cp polynomial 
@@ -292,8 +281,9 @@ inline scalar aungierRedlichKwong::rho(
            i++;
            if (i>8) 
            {
-               //using bisection methode as backup,
-               //solution must be between rho=0.001 to rho=1500;
+               //CL: using bisection methode as backup,
+               //CL: solution must be between rho=0.001 to rho=1500;
+               //CL: if not, change rhoMax_ and rhoMin_
                for(i=0; i<200; i++)
                {
                    scalar f1 = this->p(rho1,T) - p;
@@ -347,6 +337,7 @@ inline scalar aungierRedlichKwong::rho(
    return this->W()/molarVolume;
 }
 
+
 //- Return density [kg/m^3]
 inline scalar aungierRedlichKwong::rho(const scalar p,const scalar T) const
 {
@@ -354,88 +345,24 @@ inline scalar aungierRedlichKwong::rho(const scalar p,const scalar T) const
     return rho(p,T,p/(this->R()*T));
 }
 
+
 //- Return compressibility drho/dp at T=constant [s^2/m^2]
 inline scalar aungierRedlichKwong::psi(const scalar rho, const scalar T) const
 {
     return -this->dvdp(rho,T)*pow(rho,2)/this->W();
 }
 
+
 //- Return compression factor []
 inline scalar aungierRedlichKwong::Z( const scalar p, const scalar T,const scalar rho0) const
 {
-    return (p*this->rho(p,T,rho0))/(this->R()*T);
+    return p/(this->R()*T*this->rho(p,T,rho0));
 }
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
-inline void aungierRedlichKwong::operator+=(const aungierRedlichKwong& pg)
-{
-    specie::operator+=(pg);
-}
-
-	inline void aungierRedlichKwong::operator-=(const aungierRedlichKwong& pg)
-{
-    specie::operator-=(pg);
-}
-
-inline void aungierRedlichKwong::operator*=(const scalar s)
-{
-    specie::operator*=(s);
-}
-
-
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
-//****************not working**************//
-/*
-inline aungierRedlichKwong operator+
-(
-    const aungierRedlichKwong& pg1,
-    const aungierRedlichKwong& pg2
-)
-{
-    return aungierRedlichKwong
-    (
-        static_cast<const specie&>(pg1)
-      + static_cast<const specie&>(pg2)
-    );
-}
-
-
-inline aungierRedlichKwong operator-
-(
-    const aungierRedlichKwong& pg1,
-    const aungierRedlichKwong& pg2
-)
-{
-    return aungierRedlichKwong
-    (
-        static_cast<const specie&>(pg1)
-      - static_cast<const specie&>(pg2)
-    );
-}
-
-
-inline aungierRedlichKwong operator*
-(
-    const scalar s,
-    const aungierRedlichKwong& pg
-)
-{
-    return aungierRedlichKwong(s*static_cast<const specie&>(pg));
-}
-
-
-inline aungierRedlichKwong operator==
-(
-    const aungierRedlichKwong& pg1,
-    const aungierRedlichKwong& pg2
-)
-{
-    return pg2 - pg1;
-}
-
-*/
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

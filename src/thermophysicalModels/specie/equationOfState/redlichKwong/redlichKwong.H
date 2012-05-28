@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | 
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -38,7 +38,6 @@ Institut für Thermodynamik
 Technische Universität Braunschweig 
 Germany
 
-
 \*---------------------------------------------------------------------------*/
 
 #ifndef redlichKwong_H
@@ -60,18 +59,6 @@ class redlichKwong
 :
     public specie
 {
-    // Private data
-
-    scalar pcrit_;
-    scalar Tcrit_; 
-
-    //-Redlich Kwong factors
-    scalar a_;
-    scalar b_;
-
-    //- Density @STD, initialise after a, b!
-    scalar rhostd_;
-
     // Static Private data
 
     //should be read from the fvSolution file where rhoMax and rhoMin values must be defined (for rhoSimpleFoam)
@@ -79,18 +66,26 @@ class redlichKwong
     static const scalar rhoMax_;
     static const scalar rhoMin_;
 
+protected:
+    // Protected data
+    scalar pcrit_;
+    scalar Tcrit_; 
+
+    //-Redlich Kwong factors
+    mutable scalar a_;
+    mutable scalar b_;
+
+    //- Density @STD, initialise after a, b!
+    mutable scalar rhostd_;
 
 public:
   
-
     // Constructors
 
         //- Construct from components
         inline redlichKwong
         (
-            const specie& sp, 
-            scalar pcrit, 
-            scalar Tcrit
+            const specie& sp
         );
 
         //- Construct from Istream
@@ -108,6 +103,10 @@ public:
     // Member functions
 
         inline scalar rhostd() const;
+
+        inline scalar a() const;
+
+        inline scalar b() const;
 
         inline scalar p(const scalar rho, const scalar T) const;
 
@@ -173,24 +172,18 @@ public:
             const scalar rho0
         ) const;
 
-
+/*
     // Member operators
 
         inline void operator+=(const redlichKwong&);
         inline void operator-=(const redlichKwong&);
 
         inline void operator*=(const scalar);
+*/
 
-
- /*   // Friend operators
+    // Friend operators
 
         inline friend redlichKwong operator+
-        (
-            const redlichKwong&,
-            const redlichKwong&
-        );
-
-        inline friend redlichKwong operator-
         (
             const redlichKwong&,
             const redlichKwong&
@@ -201,13 +194,6 @@ public:
             const scalar s,
             const redlichKwong&
         );
-
-        inline friend redlichKwong operator==
-        (
-            const redlichKwong&,
-            const redlichKwong&
-        );
-*/
 
     // Ostream Operator
 

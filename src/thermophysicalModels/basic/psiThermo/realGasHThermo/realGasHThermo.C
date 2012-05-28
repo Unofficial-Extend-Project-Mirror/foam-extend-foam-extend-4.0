@@ -157,8 +157,6 @@ Foam::realGasHThermo<MixtureType>::realGasHThermo(const fvMesh& mesh)
 	mesh,
 	dimensionSet(1, -5, 2, 0, 0)
     )
-
-
 {
 
     scalarField& hCells = h_.internalField();

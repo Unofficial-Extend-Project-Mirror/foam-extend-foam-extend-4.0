@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | 
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -61,22 +61,22 @@ pengRobinson::pengRobinson(Istream& is)
     pcrit_(readScalar(is)),
     Tcrit_(readScalar(is)),
     azentricFactor_(readScalar(is)),
-    a_(0.457235*pow(this->RR,2)*pow(Tcrit_,2)/pcrit_),
+    a0_(0.457235*pow(this->RR,2)*pow(Tcrit_,2)/pcrit_),
     b_(0.077796*this->RR*Tcrit_/pcrit_), 
-    n_(0.37464+1.54226*azentricFactor_-0.26992*pow(azentricFactor_,2)), 
-    rhostd_(this->rho(Pstd,Tstd,Pstd*this->W()/(Tstd*this->R())))  	
+    n_(0.37464+1.54226*azentricFactor_-0.26992*pow(azentricFactor_,2)),
+    TSave(0.0), 
+    rhostd_(this->rho(Pstd,Tstd,Pstd/(Tstd*this->R())))  	
 {
     is.check("pengRobinson::pengRobinson(Istream& is)");
-   
 }
 
 
 // * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
 
-Ostream& operator<<(Ostream& os, const pengRobinson& pg)
+Ostream& operator<<(Ostream& os, const pengRobinson& pr)
 {
-    os  << static_cast<const specie&>(pg)<< tab
-        << pg.pcrit_ << tab<< pg.Tcrit_<< tab << pg.azentricFactor_;
+    os  << static_cast<const specie&>(pr)<< tab
+        << pr.pcrit_ << tab<< pr.Tcrit_<< tab << pr.azentricFactor_;
 
     os.check("Ostream& operator<<(Ostream& os, const pengRobinson& st)");
     return os;

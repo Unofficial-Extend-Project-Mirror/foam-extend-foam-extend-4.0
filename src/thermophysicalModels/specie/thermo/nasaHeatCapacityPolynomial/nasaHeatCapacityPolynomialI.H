@@ -70,22 +70,22 @@ template<class equationOfState>
 inline Foam::nasaHeatCapacityPolynomial<equationOfState>::nasaHeatCapacityPolynomial
 (
     const word& name,
-    const nasaHeatCapacityPolynomial& ct
+    const nasaHeatCapacityPolynomial& np
 )
 :
-    equationOfState(name, ct),
-            a1_(ct.a1_),
-	    a2_(ct.a2_),
-	    a3_(ct.a3_),
-	    a4_(ct.a4_),
-	    a5_(ct.a5_),
-	    a6_(ct.a6_),
-            a7_(ct.a7_),
-            e0_std(ct.e0_std),
-            s0_std(ct.s0_std),
-            integral_p_dv_std(ct.integral_p_dv_std),
-            integral_dpdT_dv_std(ct.integral_dpdT_dv_std),
-            cp_std(ct.cp_std)
+    equationOfState(name, np),
+            a1_(np.a1_),
+	    a2_(np.a2_),
+	    a3_(np.a3_),
+	    a4_(np.a4_),
+	    a5_(np.a5_),
+	    a6_(np.a6_),
+            a7_(np.a7_),
+            e0_std(np.e0_std),
+            s0_std(np.s0_std),
+            integral_p_dv_std(np.integral_p_dv_std),
+            integral_dpdT_dv_std(np.integral_dpdT_dv_std),
+            cp_std(np.cp_std)
 {}
 
 
@@ -316,47 +316,47 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::s
 template<class equationOfState>
 inline void Foam::nasaHeatCapacityPolynomial<equationOfState>::operator+=
 (
-    const nasaHeatCapacityPolynomial<equationOfState>& ct
+    const nasaHeatCapacityPolynomial<equationOfState>& np
 )
 {
 	
     scalar molr1 = this->nMoles();
 
-    equationOfState::operator+=(ct);
+    equationOfState::operator+=(np);
 
     molr1 /= this->nMoles();
-    scalar molr2 = ct.nMoles()/this->nMoles();
+    scalar molr2 = np.nMoles()/this->nMoles();
 
-    a1_ = molr1*a1_ + molr2*ct.a1_;
-    a2_ = molr1*a2_ + molr2*ct.a2_;
-    a3_ = molr1*a3_ + molr2*ct.a3_;
-    a4_ = molr1*a4_ + molr2*ct.a4_;
-    a5_ = molr1*a5_ + molr2*ct.a5_;
-    a6_ = molr1*a6_ + molr2*ct.a6_;
-    a7_ = molr1*a7_ + molr2*ct.a7_;
+    a1_ = molr1*a1_ + molr2*np.a1_;
+    a2_ = molr1*a2_ + molr2*np.a2_;
+    a3_ = molr1*a3_ + molr2*np.a3_;
+    a4_ = molr1*a4_ + molr2*np.a4_;
+    a5_ = molr1*a5_ + molr2*np.a5_;
+    a6_ = molr1*a6_ + molr2*np.a6_;
+    a7_ = molr1*a7_ + molr2*np.a7_;
 }
 
 
 template<class equationOfState>
 inline void Foam::nasaHeatCapacityPolynomial<equationOfState>::operator-=
 (
-    const nasaHeatCapacityPolynomial<equationOfState>& ct
+    const nasaHeatCapacityPolynomial<equationOfState>& np
 )
 {
     scalar molr1 = this->nMoles();
 
-    nasaHeatCapacityPolynomial::operator-=(ct);
+    nasaHeatCapacityPolynomial::operator-=(np);
 
     molr1 /= this->nMoles();
-    scalar molr2 = ct.nMoles()/this->nMoles();
+    scalar molr2 = np.nMoles()/this->nMoles();
 
-    a1_ = molr1*a1_ - molr2*ct.a1_;
-    a2_ = molr1*a2_ - molr2*ct.a2_;
-    a3_ = molr1*a3_ - molr2*ct.a3_;
-    a4_ = molr1*a4_ - molr2*ct.a4_;
-    a5_ = molr1*a5_ - molr2*ct.a5_;
-    a6_ = molr1*a6_ - molr2*ct.a6_;
-    a7_ = molr1*a7_ - molr2*ct.a7_;
+    a1_ = molr1*a1_ - molr2*np.a1_;
+    a2_ = molr1*a2_ - molr2*np.a2_;
+    a3_ = molr1*a3_ - molr2*np.a3_;
+    a4_ = molr1*a4_ - molr2*np.a4_;
+    a5_ = molr1*a5_ - molr2*np.a5_;
+    a6_ = molr1*a6_ - molr2*np.a6_;
+    a7_ = molr1*a7_ - molr2*np.a7_;
 }
 
 
@@ -365,33 +365,33 @@ inline void Foam::nasaHeatCapacityPolynomial<equationOfState>::operator-=
 template<class equationOfState>
 inline Foam::nasaHeatCapacityPolynomial<equationOfState> Foam::operator+
 (
-    const nasaHeatCapacityPolynomial<equationOfState>& ct1,
-    const nasaHeatCapacityPolynomial<equationOfState>& ct2
+    const nasaHeatCapacityPolynomial<equationOfState>& np1,
+    const nasaHeatCapacityPolynomial<equationOfState>& np2
 )
 {
     equationOfState eofs
     (
-        static_cast<const equationOfState&>(ct1)
-      + static_cast<const equationOfState&>(ct2)
+        static_cast<const equationOfState&>(np1)
+      + static_cast<const equationOfState&>(np2)
     );
 
     return nasaHeatCapacityPolynomial<equationOfState>
     (
         eofs,
-        ct1.nMoles()/eofs.nMoles()*ct1.a1_
-      + ct2.nMoles()/eofs.nMoles()*ct2.a1_,
-        ct1.nMoles()/eofs.nMoles()*ct1.a2_
-      + ct2.nMoles()/eofs.nMoles()*ct2.a2_,
-	ct1.nMoles()/eofs.nMoles()*ct1.a3_
-      + ct2.nMoles()/eofs.nMoles()*ct2.a3_,
-        ct1.nMoles()/eofs.nMoles()*ct1.a4_
-      + ct2.nMoles()/eofs.nMoles()*ct2.a4_,
-	ct1.nMoles()/eofs.nMoles()*ct1.a5_
-      + ct2.nMoles()/eofs.nMoles()*ct2.a5_,
-        ct1.nMoles()/eofs.nMoles()*ct1.a6_
-      + ct2.nMoles()/eofs.nMoles()*ct2.a6_,    
-	ct1.nMoles()/eofs.nMoles()*ct1.a7_
-      + ct2.nMoles()/eofs.nMoles()*ct2.a7_
+        np1.nMoles()/eofs.nMoles()*np1.a1_
+      + np2.nMoles()/eofs.nMoles()*np2.a1_,
+        np1.nMoles()/eofs.nMoles()*np1.a2_
+      + np2.nMoles()/eofs.nMoles()*np2.a2_,
+	np1.nMoles()/eofs.nMoles()*np1.a3_
+      + np2.nMoles()/eofs.nMoles()*np2.a3_,
+        np1.nMoles()/eofs.nMoles()*np1.a4_
+      + np2.nMoles()/eofs.nMoles()*np2.a4_,
+	np1.nMoles()/eofs.nMoles()*np1.a5_
+      + np2.nMoles()/eofs.nMoles()*np2.a5_,
+        np1.nMoles()/eofs.nMoles()*np1.a6_
+      + np2.nMoles()/eofs.nMoles()*np2.a6_,    
+	np1.nMoles()/eofs.nMoles()*np1.a7_
+      + np2.nMoles()/eofs.nMoles()*np2.a7_
     );
 }
 
@@ -399,33 +399,33 @@ inline Foam::nasaHeatCapacityPolynomial<equationOfState> Foam::operator+
 template<class equationOfState>
 inline Foam::nasaHeatCapacityPolynomial<equationOfState> Foam::operator-
 (
-    const nasaHeatCapacityPolynomial<equationOfState>& ct1,
-    const nasaHeatCapacityPolynomial<equationOfState>& ct2
+    const nasaHeatCapacityPolynomial<equationOfState>& np1,
+    const nasaHeatCapacityPolynomial<equationOfState>& np2
 )
 {
     equationOfState eofs
     (
-        static_cast<const equationOfState&>(ct1)
-      - static_cast<const equationOfState&>(ct2)
+        static_cast<const equationOfState&>(np1)
+      - static_cast<const equationOfState&>(np2)
     );
 
     return nasaHeatCapacityPolynomial<equationOfState>
     (
         eofs,
-        ct1.nMoles()/eofs.nMoles()*ct1.a1_
-      - ct2.nMoles()/eofs.nMoles()*ct2.a1_,
-        ct1.nMoles()/eofs.nMoles()*ct1.a2_
-      - ct2.nMoles()/eofs.nMoles()*ct2.a2_,
-	ct1.nMoles()/eofs.nMoles()*ct1.a3_
-      - ct2.nMoles()/eofs.nMoles()*ct2.a3_,
-        ct1.nMoles()/eofs.nMoles()*ct1.a4_
-      - ct2.nMoles()/eofs.nMoles()*ct2.a4_,
-	ct1.nMoles()/eofs.nMoles()*ct1.a5_
-      - ct2.nMoles()/eofs.nMoles()*ct2.a5_,
-        ct1.nMoles()/eofs.nMoles()*ct1.a6_
-      - ct2.nMoles()/eofs.nMoles()*ct2.a6_,    
-	ct1.nMoles()/eofs.nMoles()*ct1.a7_
-      - ct2.nMoles()/eofs.nMoles()*ct2.a7_
+        np1.nMoles()/eofs.nMoles()*np1.a1_
+      - np2.nMoles()/eofs.nMoles()*np2.a1_,
+        np1.nMoles()/eofs.nMoles()*np1.a2_
+      - np2.nMoles()/eofs.nMoles()*np2.a2_,
+	np1.nMoles()/eofs.nMoles()*np1.a3_
+      - np2.nMoles()/eofs.nMoles()*np2.a3_,
+        np1.nMoles()/eofs.nMoles()*np1.a4_
+      - np2.nMoles()/eofs.nMoles()*np2.a4_,
+	np1.nMoles()/eofs.nMoles()*np1.a5_
+      - np2.nMoles()/eofs.nMoles()*np2.a5_,
+        np1.nMoles()/eofs.nMoles()*np1.a6_
+      - np2.nMoles()/eofs.nMoles()*np2.a6_,    
+	np1.nMoles()/eofs.nMoles()*np1.a7_
+      - np2.nMoles()/eofs.nMoles()*np2.a7_
     );
 }
 
@@ -434,19 +434,19 @@ template<class equationOfState>
 inline Foam::nasaHeatCapacityPolynomial<equationOfState> Foam::operator*
 (
     const scalar s,
-    const nasaHeatCapacityPolynomial<equationOfState>& ct
+    const nasaHeatCapacityPolynomial<equationOfState>& np
 )
 {
     return nasaHeatCapacityPolynomial<equationOfState>
     (
-        s*static_cast<const equationOfState&>(ct),
-        ct.a1_,
-        ct.a2_,
-	ct.a3_,
-        ct.a4_,
-	ct.a5_,
-        ct.a6_,
-	ct.a7_
+        s*static_cast<const equationOfState&>(np),
+        np.a1_,
+        np.a2_,
+	np.a3_,
+        np.a4_,
+	np.a5_,
+        np.a6_,
+	np.a7_
     );
 }
 
@@ -454,11 +454,11 @@ inline Foam::nasaHeatCapacityPolynomial<equationOfState> Foam::operator*
 template<class equationOfState>
 inline Foam::nasaHeatCapacityPolynomial<equationOfState> Foam::operator==
 (
-    const nasaHeatCapacityPolynomial<equationOfState>& ct1,
-    const nasaHeatCapacityPolynomial<equationOfState>& ct2
+    const nasaHeatCapacityPolynomial<equationOfState>& np1,
+    const nasaHeatCapacityPolynomial<equationOfState>& np2
 )
 {
-    return ct2 - ct1;
+    return np2 - np1;
 }
 
 

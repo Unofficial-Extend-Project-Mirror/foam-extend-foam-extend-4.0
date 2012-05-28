@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | 
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,7 +30,6 @@ Christian Lucas
 Institut für Thermodynamik
 Technische Universität Braunschweig 
 Germany
-
 
 \*---------------------------------------------------------------------------*/
 
@@ -64,7 +63,7 @@ redlichKwong::redlichKwong(Istream& is)
     a_(0.42748*pow(this->RR,2)*pow(Tcrit_,2.5)/pcrit_),
     b_(0.08664*this->RR*Tcrit_/pcrit_),
         // Starting GUESS for the density by ideal gas law
-        rhostd_(this->rho(Pstd, Tstd, Pstd*this->W()/(Tstd*this->R())))
+        rhostd_(this->rho(Pstd, Tstd, Pstd/(Tstd*this->R())))
 { 
     is.check("redlichKwong::redlichKwong(Istream& is)");
 }
@@ -72,10 +71,10 @@ redlichKwong::redlichKwong(Istream& is)
 
 // * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
 
-Ostream& operator<<(Ostream& os, const redlichKwong& pg)
+Ostream& operator<<(Ostream& os, const redlichKwong& rk)
 {
-    os  << static_cast<const specie&>(pg)<< tab
-        << pg.pcrit_ << tab<< pg.Tcrit_;
+    os  << static_cast<const specie&>(rk)<< tab
+        << rk.pcrit_ << tab<< rk.Tcrit_;
 
     os.check("Ostream& operator<<(Ostream& os, const redlichKwong& st)");
     return os;

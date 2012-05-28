@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           |
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,6 @@ Institut für Thermodynamik
 Technische Universität Braunschweig 
 Germany
 
-
 \*---------------------------------------------------------------------------*/
 
 #include "redlichKwong.H"
@@ -43,30 +42,22 @@ namespace Foam
 // Construct from components
 inline redlichKwong::redlichKwong
 (
-    const specie& sp,
-    scalar pcrit,
-    scalar Tcrit
+    const specie& sp
 )
 :
-    specie(sp),
-    pcrit_(pcrit),
-    Tcrit_(Tcrit),
-    a_(0.42748*pow(this->RR,2)*pow(Tcrit_,2.5)/pcrit_),
-    b_(0.08664*this->RR*Tcrit_/pcrit_),
-	// Starting GUESS for the density by ideal gas law
-	rhostd_(this->rho(Pstd, Tstd, Pstd*this->W()/(Tstd*this->R())))
+    specie(sp)
 {}
 
 
 // Construct as named copy
-inline redlichKwong::redlichKwong(const word& name, const redlichKwong& pg)
+inline redlichKwong::redlichKwong(const word& name, const redlichKwong& rk)
 :
-    specie(name, pg),
-    pcrit_(pg.pcrit_),
-    Tcrit_(pg.Tcrit_),
-    a_(pg.a_),
-    b_(pg.b_),
-    rhostd_(pg.rhostd_)
+    specie(name, rk),
+    pcrit_(rk.pcrit_),
+    Tcrit_(rk.Tcrit_),
+    a_(rk.a_),
+    b_(rk.b_),
+    rhostd_(rk.rhostd_)
 {}
 
 
@@ -84,9 +75,7 @@ inline autoPtr<redlichKwong> redlichKwong::New(Istream& is)
 }
 
 
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
 
 inline scalar redlichKwong::rhostd()const
 {
@@ -94,10 +83,22 @@ inline scalar redlichKwong::rhostd()const
 }
 
 
+inline scalar redlichKwong::a()const
+{
+    return a_;
+}
+
+
+inline scalar redlichKwong::b()const
+{
+    return b_;
+}
+
+
 //returns the pressure for a given density and temperature    
 inline scalar redlichKwong::p(const scalar rho, const scalar T) const
 {
-    scalar Vm = this->W()/rho;
+    scalar Vm = this->W()/rho;    
     return this->RR*T/(Vm - b_) - a_/(sqrt(T)*Vm*(Vm + b_));
 }
 
@@ -300,8 +301,9 @@ inline scalar redlichKwong::rho
            i++;
            if (i>8) 
            {
-               //using bisection methode as backup,
-               //solution must be between rho=0.001 to rho=1500;
+               //CL: using bisection methode as backup,
+               //CL: solution must be between rho=0.001 to rho=1500;
+               //CL: if not, change rhoMax_ and rhoMin_
                for(i=0; i<200; i++)
                {
                    scalar f1 = this->p(rho1,T) - p;
@@ -379,22 +381,22 @@ inline scalar redlichKwong::Z
     const scalar rho0
 ) const
 {
-    return p*this->rho(p,T,rho0)/(this->R()*T);
+    return p/(this->R()*T*this->rho(p,T,rho0));
 }
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
+/*
 
-
-inline void redlichKwong::operator+=(const redlichKwong& pg)
+inline void redlichKwong::operator+=(const redlichKwong& rk)
 {
-    specie::operator+=(pg);
+    specie::operator+=(rk);
 }
 
 
-inline void redlichKwong::operator-=(const redlichKwong& pg)
+inline void redlichKwong::operator-=(const redlichKwong& rk)
 {
-    specie::operator-=(pg);
+    specie::operator-=(rk);
 }
 
 
@@ -403,58 +405,31 @@ inline void redlichKwong::operator*=(const scalar s)
     specie::operator*=(s);
 }
 
-
+*/
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
-//****************not working**************////
-/*
+
+
 inline redlichKwong operator+
 (
-    const redlichKwong& pg1,
-    const redlichKwong& pg2
+    const redlichKwong& rk1,
+    const redlichKwong& rk2
 )
 {
     return redlichKwong
     (
-        static_cast<const specie&>(pg1)
-      + static_cast<const specie&>(pg2)
+        static_cast<const specie&>(rk1)
+      + static_cast<const specie&>(rk2)
     );
 }
-
-
-inline redlichKwong operator-
-(
-    const redlichKwong& pg1,
-    const redlichKwong& pg2
-)
-{
-    return redlichKwong
-    (
-        static_cast<const specie&>(pg1)
-      - static_cast<const specie&>(pg2)
-    );
-}
-
 
 inline redlichKwong operator*
 (
     const scalar s,
-    const redlichKwong& pg
+    const redlichKwong& rk
 )
 {
-    return redlichKwong(s*static_cast<const specie&>(pg));
+    return redlichKwong(s*static_cast<const specie&>(rk));
 }
-
-
-inline redlichKwong operator==
-(
-    const redlichKwong& pg1,
-    const redlichKwong& pg2
-)
-{
-    return pg2 - pg1;
-}
-
-*/
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -102,28 +102,6 @@ protected:
         //- Construct as copy (not implemented)
         basicThermo(const basicThermo&);
 
-             //- Return the enthalpy field boundary types by interrogating the
-            //  temperature field boundary types
-	    // for real gases
-            wordList hRealBoundaryTypes();
-
-            //- Correct the enthalpy field boundaries
-   	// for real gases
-            void hRealBoundaryCorrection(volScalarField& h);
-
-
-        // Internal energy
-
-            //- Return the internal energy  field boundary types by
-            //  interrogating the temperature field boundary types
- 	   // for real gases
-            wordList eRealBoundaryTypes();
-
-            //- Correct the internal energy field boundaries
-	    // for real gases
-            void eRealBoundaryCorrection(volScalarField& e);
-
-
 public:
 
     //- Runtime type information

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | 
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -27,6 +27,11 @@ Class
 
 Description
     Soave Redlich Kwong equation of state.
+
+    Paper:
+    Title: Equilibrium Constants from a Modified Redlich-Kwong Equation of State
+    Authors: G. Soave
+    Journal: Chemical Engineering Science, vol. 27(6), 1972, pp. 1197-1203
 
 SourceFiles
     soaveRedlichKwongI.H
@@ -61,20 +66,6 @@ class soaveRedlichKwong
     public specie
 
 {
-    // Private data
-
-    scalar pcrit_;
-    scalar Tcrit_; 
-    scalar azentricFactor_;
-
-    //-Soave Redlich Kwong factors
-    scalar a_;
-    scalar b_;
-    scalar n_;
-
-    //- Density @STD, initialise after a, b!
-    scalar rhostd_;
-
     // Static Private data
 
     //should be read from the fvSolution file where rhoMax and rhoMin values must be defined (for rhoSimpleFoam)
@@ -82,18 +73,46 @@ class soaveRedlichKwong
     static const scalar rhoMax_;
     static const scalar rhoMin_;
 
+
+protected:
+    // Protected data
+    scalar pcrit_;
+    scalar Tcrit_; 
+    scalar azentricFactor_;
+
+    //-Soave Redlich Kwong
+    scalar n_; 
+    scalar a0_;
+    mutable scalar b_;
+
+
+    //CL: Variables to save the values of a, dadT and d2adT2 of the mixture
+    //CL: Variables must corrected for changing temperatures
+    mutable scalar aSave;
+    mutable scalar daSave;
+    mutable scalar d2aSave;
+
+    //CL: save the temperature for which the save coefficients (amix,dadTmix,d2adT2mix) are correct
+    mutable scalar TSave;
+
+    //- Density @STD, initialise after a0, b!
+    mutable scalar rhostd_;
+
+
+    //Protected functions
+    //CL: function updates the coefficients (aSave, daSave, d2aSave)
+    inline void updateModelCoefficients(const  scalar T) const; 
+
 public:
   
 
     // Constructors
 
         //- Construct from components
-        inline soaveRedlichKwong(
-		const specie& sp, 
-		scalar pcrit, 
-		scalar Tcrit,
-		scalar azentricFactor
-		);
+        inline soaveRedlichKwong
+        (
+            const specie& s
+        );
 
         //- Construct from Istream
         soaveRedlichKwong(Istream&);
@@ -110,10 +129,25 @@ public:
     // Member functions
 	inline scalar rhostd()const;
 
+        //CL: Model coefficient a(T)
+	inline scalar a(const  scalar T)const;
+
+        //CL: temperature deriviative of model coefficient a(T)
+	inline scalar dadT(const  scalar T)const;
+
+        //CL: second order temperature deriviative of model coefficient a(T)
+	inline scalar d2adT2(const  scalar T)const;
+
+	inline scalar a0()const;
+
+	inline scalar b()const;
+
+	inline scalar n()const;
+
+        //CL: Equation of state
         inline scalar p(const scalar rho, const scalar T) const;
 
-
-        //first order derivatives  
+        //CL: first order derivatives  
         inline scalar dpdv(const scalar rho,const  scalar T) const;
 
         inline scalar dpdT(const scalar rho, const scalar T) const;
@@ -134,10 +168,10 @@ public:
             const scalar T
         ) const; 
 
-        // Used for cv
+        //CL: Used for cv
         inline scalar integral_d2pdT2_dv(const scalar rho,const  scalar T) const ; 
 
-        // second order derivatives, not Used At The Moment
+        //CL: second order derivatives, not Used At The Moment
         inline scalar d2pdv2(const scalar rho,const  scalar T) const;    
 
 	inline scalar d2pdT2(const scalar rho,const  scalar T) const;    
@@ -146,7 +180,7 @@ public:
 
 	inline scalar d2vdT2(const scalar rho,const  scalar T) const;    
 
-        //Used for internal Energy
+        //CL: Used for internal Energy
         inline scalar integral_p_dv(const scalar rho,const  scalar T) const;    
 
         //Used for Entropy
@@ -177,21 +211,17 @@ public:
 
     // Member operators
 
+/*
         inline void operator+=(const soaveRedlichKwong&);
+
         inline void operator-=(const soaveRedlichKwong&);
 
         inline void operator*=(const scalar);
+*/
 
-
- /*   // Friend operators
+    // Friend operators
 
         inline friend soaveRedlichKwong operator+
-        (
-            const soaveRedlichKwong&,
-            const soaveRedlichKwong&
-        );
-
-        inline friend soaveRedlichKwong operator-
         (
             const soaveRedlichKwong&,
             const soaveRedlichKwong&
@@ -202,13 +232,6 @@ public:
             const scalar s,
             const soaveRedlichKwong&
         );
-
-        inline friend soaveRedlichKwong operator==
-        (
-            const soaveRedlichKwong&,
-            const soaveRedlichKwong&
-        );
-*/
 
     // Ostream Operator
 

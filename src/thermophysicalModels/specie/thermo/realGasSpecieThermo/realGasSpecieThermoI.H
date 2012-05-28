@@ -76,7 +76,7 @@ inline void Foam::realGasSpecieThermo<thermo>::T
       	do
    	{   
             //CL: using a stabilizing newton solver 
-            //CL: if the solve is diverging, the time step is reduced until the solver converges
+            //CL: if the solve is diverging, the step is reduced until the solver converges
             Tnew = Test - ((this->*F)(rho,Test) - f)/(this->*dFdT)(rho,Test)/(pow(2,i)); 
 	    i++;					
         }while
@@ -139,14 +139,14 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::gamma(const scalar rho,  
 template<class thermo>
 inline Foam::scalar Foam::realGasSpecieThermo<thermo>::g(const scalar rho,  const scalar T ) const
 {
-    return this->h(rho, this->p(rho,T)) - T*this->s(rho, this->p(rho,T));
+    return this->h(rho, T) - T*this->s(rho, T);
 }
 
 
 template<class thermo>
 inline Foam::scalar Foam::realGasSpecieThermo<thermo>::a(const scalar rho, const scalar T ) const
 {
-    return this->e(rho,this->p(rho,T)) - T*this->s(rho,this->p(rho,T));
+    return this->e(rho,T ) - T*this->s(rho, T);
 }
 
 

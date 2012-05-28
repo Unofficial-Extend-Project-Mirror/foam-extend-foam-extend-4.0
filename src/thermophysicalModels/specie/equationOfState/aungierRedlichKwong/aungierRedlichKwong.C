@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           |
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -31,8 +31,6 @@ Institut für Thermodynamik
 Technische Universität Braunschweig 
 Germany
 
-
-
 \*---------------------------------------------------------------------------*/
 
 #include "aungierRedlichKwong.H"
@@ -42,7 +40,6 @@ Germany
 
 namespace Foam
 {
-
 
 /* * * * * * * * * * * * * * * Private static data * * * * * * * * * * * * * */
 
@@ -70,7 +67,7 @@ aungierRedlichKwong::aungierRedlichKwong(Istream& is)
     c_(this->RR*Tcrit_/(pcrit_+(a_/(this->W()/rhocrit_*(this->W()/rhocrit_+b_))))+b_-this->W()/rhocrit_),
     n_(0.4986+1.2735*azentricFactor_+0.4754*pow(azentricFactor_,2)),
         // Starting GUESS for the density by ideal gas law
-        rhostd_(this->rho(Pstd,Tstd,Pstd*this->W()/(Tstd*this->R())))
+        rhostd_(this->rho(Pstd,Tstd,Pstd/(Tstd*this->R())))
 {
     is.check("aungierRedlichKwong::aungierRedlichKwong(Istream& is)");
 }
@@ -78,10 +75,10 @@ aungierRedlichKwong::aungierRedlichKwong(Istream& is)
 
 // * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
 
-Ostream& operator<<(Ostream& os, const aungierRedlichKwong& pg)
+Ostream& operator<<(Ostream& os, const aungierRedlichKwong& ark)
 {
-    os  << static_cast<const specie&>(pg)<< tab
-        << pg.pcrit_ << tab<< pg.Tcrit_<< tab<<pg.azentricFactor_<< tab<<pg.rhocrit_;
+    os  << static_cast<const specie&>(ark)<< tab
+        << ark.pcrit_ << tab<< ark.Tcrit_<< tab<<ark.azentricFactor_<< tab<<ark.rhocrit_;
 
     os.check("Ostream& operator<<(Ostream& os, const aungierRedlichKwong& st)");
     return os;
