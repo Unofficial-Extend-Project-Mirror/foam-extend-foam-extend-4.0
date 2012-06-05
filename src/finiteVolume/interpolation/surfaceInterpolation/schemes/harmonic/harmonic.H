@@ -217,7 +217,7 @@ public:
                                     0,
                                     Foam::min
                                     (
-                                        (magPhi[faceI] - mean)/den,
+                                        (magPhiNei[faceI] - mean)/den,
                                         1
                                     )
                                 );
