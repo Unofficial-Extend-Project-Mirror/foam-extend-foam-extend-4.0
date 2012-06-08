@@ -71,26 +71,16 @@ class regionCouplingFvPatchField
 
         //- Original patch field.  Required for correct evaluation
         //  in harmonic averaging
-        Field<Type> originalPatchField_;
+        mutable Field<Type> originalPatchField_;
 
         //- Current time index used to store originalPatchField_
-        label curTimeIndex_;
+        mutable label curTimeIndex_;
 
 
 protected:
 
         //- Return original patch field
-        const Field<Type>& originalPatchField() const
-        {
-            if (curTimeIndex_ == this->db().time().timeIndex())
-            {
-                return originalPatchField_;
-            }
-            else
-            {
-                return *this;
-            }
-        }
+        const Field<Type>& originalPatchField() const;
 
         //- Return contents of a matrix update buffer
         const scalarField& matrixUpdateBuffer() const
@@ -213,10 +203,7 @@ public:
             virtual void initEvaluate(const Pstream::commsTypes commsType);
 
             //- Evaluate the patch field
-            virtual void evaluate
-            (
-                const Pstream::commsTypes commsType
-            );
+            virtual void evaluate(const Pstream::commsTypes commsType);
 
             //- Update the coefficients associated with the patch field
             virtual void updateCoeffs();

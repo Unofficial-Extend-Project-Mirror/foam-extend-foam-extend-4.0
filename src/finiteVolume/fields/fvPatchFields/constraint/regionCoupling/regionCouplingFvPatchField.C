@@ -48,6 +48,15 @@ regionCouplingFvPatchField<Type>::weights
     const Field<Type>& fNei
 ) const
 {
+    // Implement weights-based stabilised harmonic interpolation using
+    // magnitude of type
+    // Algorithm:
+    // 1) calculate magnitude of internal field and neighbour field
+    // 2) calculate harmonic mean magnitude
+    // 3) express harmonic mean magnitude as: mean = w*mOwn + (1 - w)*mNei
+    // 4) Based on above, calculate w = (mean - mNei)/(mOwn - mNei)
+    // 5) Use weights to interpolate values
+
     tmp<scalarField> tweights(new scalarField(fOwn.size(), 0.5));
     scalarField& weights = tweights();
 
@@ -125,13 +134,31 @@ regionCouplingFvPatchField<Type>::weights
         }
         else
         {
-            weights[faceI] = 0.5;
+            // Use 0.5 weights
+            //weights[faceI] = 0.5;
         }
     }
 
 #endif
 
     return tweights;
+}
+
+
+template<class Type>
+const Foam::Field<Type>& regionCouplingFvPatchField<Type>::originalPatchField() const
+{
+    if (curTimeIndex_ != this->db().time().timeIndex())
+    {
+        // Store original field for symmetric evaluation
+        // Henrik Rusche, Aug/2011
+        Info << "store original field" << endl;
+
+        originalPatchField_ = *this;
+        curTimeIndex_ = this->db().time().timeIndex();
+    }
+
+    return originalPatchField_;
 }
 
 
@@ -288,8 +315,8 @@ tmp<Field<Type> > regionCouplingFvPatchField<Type>::patchNeighbourField() const
 {
     Field<Type> sField = shadowPatchField().patchInternalField();
 
-     tmp<Field<Type> > tpnf
-     (
+    tmp<Field<Type> > tpnf
+    (
          regionCouplePatch_.interpolate
          (
              shadowPatchField().patchInternalField()
@@ -341,20 +368,24 @@ void regionCouplingFvPatchField<Type>::initEvaluate
     const Pstream::commsTypes commsType
 )
 {
-    if (!this->updated())
+    if(debug)
     {
-        this->updateCoeffs();
+        Info << "In regionCouplingFvPatchField<Type>::initEvaluate() on "
+            << this->dimensionedInternalField().name()
+            << " in " << this->patch().boundaryMesh().mesh().name()
+            << " " << this->updated() << endl;
     }
 
     // Interpolation must happen at init
-    // Implement weights-based stabilised harmonic interpolation using
-    // magnitude of type
-    // Algorithm:
-    // 1) calculate magnitude of internal field and neighbour field
-    // 2) calculate harmonic mean magnitude
-    // 3) express harmonic mean magnitude as: mean = w*mOwn + (1 - w)*mNei
-    // 4) Based on above, calculate w = (mean - mNei)/(mOwn - mNei)
-    // 5) Use weights to interpolate values
+
+    // Note: If used with interpolation - either on explicitly or called by the
+    // laplacian operator, the values set here are overridden by the interpolation
+    // scheme. In order to get the same diffusivities on both sides an identical
+    // interpolation scheme must be used.
+    // Note^2: Even if harmonic used, the interpolation is still wrong for most
+    // CHT cases since (cell values vs. face values)
+    // Note^3: None of this is intuitiv - fix requires low-level changes!
+    // HR, 8/Jun/2012
 
     const Field<Type>& fOwn = this->originalPatchField();
     const Field<Type> fNei = regionCouplePatch_.interpolate
@@ -397,6 +428,14 @@ void regionCouplingFvPatchField<Type>::evaluate
 template<class Type>
 void regionCouplingFvPatchField<Type>::updateCoeffs()
 {
+    if(debug)
+    {
+        Info << "In regionCouplingFvPatchField<Type>::updateCoeffs() on "
+            << this->dimensionedInternalField().name()
+            << " in " << this->patch().boundaryMesh().mesh().name()
+            << " " << this->updated() << endl;
+    }
+
     if (this->updated())
     {
         return;
@@ -421,14 +460,6 @@ void regionCouplingFvPatchField<Type>::updateCoeffs()
             0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
 
         regionCouplePatch_.bridge(bridgeField, *this);
-    }
-
-    // Store original field for symmetric evaluation
-    // Henrik Rusche, Aug/2011
-    if (curTimeIndex_ != this->db().time().timeIndex())
-    {
-        originalPatchField_ = *this;
-        curTimeIndex_ = this->db().time().timeIndex();
     }
 }
 
@@ -479,7 +510,7 @@ void regionCouplingFvPatchField<Type>::initInterfaceMatrixUpdate
         FatalErrorIn
         (
             "regionCouplingFvPatchField<Type>::initInterfaceMatrixUpdate"
-        )   << "init matrix update calld in detached state"
+        )   << "init matrix update called in detached state"
             << abort(FatalError);
 
     }
@@ -530,7 +561,7 @@ void regionCouplingFvPatchField<Type>::updateInterfaceMatrix
         FatalErrorIn
         (
             "regionCouplingFvPatchField<Type>::updateInterfaceMatrix"
-        )   << "Matrix update calld in detached state"
+        )   << "Matrix update called in detached state"
             << abort(FatalError);
 
     }

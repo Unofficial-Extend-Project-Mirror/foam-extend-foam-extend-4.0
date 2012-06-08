@@ -800,7 +800,10 @@ void Foam::regionCouplePolyPatch::attach() const
         // Patch-to-patch interpolation does not need to be cleared,
         // only face/cell centres and interpolation factors
         // HJ, 6/Jun/2011
-        clearGeom();
+
+        // Breaks simple parallel CHT cases
+        // HR, 8/Jun/2012
+        //clearGeom();
     }
 }
 
@@ -815,7 +818,10 @@ void Foam::regionCouplePolyPatch::detach() const
         // Patch-to-patch interpolation does not need to be cleared,
         // only face/cell centres and interpolation factors
         // HJ, 6/Jun/2011
-        clearGeom();
+
+        // Breaks simple parallel CHT cases
+        // HR, 8/Jun/2012
+        //clearGeom();
     }
 }
 
@@ -883,15 +889,17 @@ Foam::regionCouplePolyPatch::patchToPatch() const
 const Foam::vectorField&
 Foam::regionCouplePolyPatch::reconFaceCellCentres() const
 {
-    if (!attached_)
-    {
-        FatalErrorIn
-        (
-            "const vectorField& "
-            "regionCouplePolyPatch::reconFaceCellCentres() const"
-        )   << "Requesting reconFaceCellCentres in detached state"
-            << abort(FatalError);
-    }
+// Breaks simple parallel CHT cases
+// HR, 8/Jun/2012
+//    if (!attached_)
+//    {
+//        FatalErrorIn
+//        (
+//            "const vectorField& "
+//            "regionCouplePolyPatch::reconFaceCellCentres() const"
+//        )   << "Requesting reconFaceCellCentres in detached state"
+//            << abort(FatalError);
+//    }
 
     if (!reconFaceCellCentresPtr_)
     {
@@ -919,6 +927,10 @@ void Foam::regionCouplePolyPatch::initAddressing()
         {
             // Calculate send addressing
             sendAddr();
+
+            // Deferred execution on startup
+            // HR, 8/Jun/2012
+            shadow().sendAddr();
         }
     }
 
@@ -942,6 +954,12 @@ void Foam::regionCouplePolyPatch::initGeometry()
         if (master())
         {
             reconFaceCellCentres();
+        }
+        else
+        {
+            // Deferred execution on startup
+            // HR, 8/Jun/2012
+            shadow().reconFaceCellCentres();
         }
     }
 
@@ -982,9 +1000,13 @@ void Foam::regionCouplePolyPatch::initMovePoints(const pointField& p)
 
         if (Pstream::parRun() && !localParallel())
         {
+            // Calculate send addressing
             sendAddr();
         }
     }
+
+    // Reconsider: Two communication in one function call may not work in parallel
+    // HR, 8/Jun/2012
 
     if (active() && master())
     {
