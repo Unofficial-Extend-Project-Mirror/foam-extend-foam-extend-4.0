@@ -58,7 +58,7 @@ Foam::HashSet<Key, Hash>::HashSet
 template<class Key, class Hash>
 inline bool Foam::HashSet<Key, Hash>::operator[](const Key& key) const
 {
-    return found(key);
+    return this->found(key);
 }
 
 
@@ -144,7 +144,7 @@ void Foam::HashSet<Key, Hash>::operator-=(const HashSet<Key, Hash>& rhs)
     // Remove rhs elements from lhs
     for (const_iterator iter = rhs.cbegin(); iter != rhs.cend(); ++iter)
     {
-        erase(iter.key());
+        this->erase(iter.key());
     }
 }
 

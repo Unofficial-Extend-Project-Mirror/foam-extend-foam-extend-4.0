@@ -249,7 +249,7 @@ void Foam::ReactingMultiphaseParcel<ParcelType>::calc
     scalarField Cs(td.cloud().mcCarrierThermo().species().size(), 0.0);
 
     // Calc mass and enthalpy transfer due to phase change
-    calcPhaseChange
+    this->calcPhaseChange
     (
         td,
         dt,
@@ -299,7 +299,7 @@ void Foam::ReactingMultiphaseParcel<ParcelType>::calc
     );
 
     // Correct surface values due to emitted species
-    correctSurfaceValues(td, cellI, Ts, Cs, rhos, mus, Pr, kappa);
+    this->correctSurfaceValues(td, cellI, Ts, Cs, rhos, mus, Pr, kappa);
 
 
     // Surface reactions
@@ -317,7 +317,7 @@ void Foam::ReactingMultiphaseParcel<ParcelType>::calc
         );
 
     // Clac mass and enthalpy transfer due to surface reactions
-    calcSurfaceReactions
+    this->calcSurfaceReactions
     (
         td,
         dt,
@@ -356,7 +356,7 @@ void Foam::ReactingMultiphaseParcel<ParcelType>::calc
 
     // Calculate new particle temperature
     scalar T1 =
-        calcHeatTransfer
+        this->calcHeatTransfer
         (
             td,
             dt,
@@ -379,7 +379,7 @@ void Foam::ReactingMultiphaseParcel<ParcelType>::calc
 
     // Calculate new particle velocity
     vector U1 =
-        calcVelocity(td, dt, cellI, Re, mus, d0, U0, rho0, mass0, Su, dUTrans);
+        this->calcVelocity(td, dt, cellI, Re, mus, d0, U0, rho0, mass0, Su, dUTrans);
 
     dUTrans += 0.5*(mass0 - mass1)*(U0 + U1);
 

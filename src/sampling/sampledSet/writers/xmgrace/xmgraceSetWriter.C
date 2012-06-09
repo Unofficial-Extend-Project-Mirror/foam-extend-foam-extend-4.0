@@ -79,7 +79,7 @@ void Foam::xmgraceSetWriter<Type>::write
             << valueSetNames[i] << '"' << nl
             << "@target G0.S" << i << nl;
 
-        writeTable(points, *valueSets[i], os);
+        this->writeTable(points, *valueSets[i], os);
 
         os  << '&' << nl;
     }
@@ -120,7 +120,7 @@ void Foam::xmgraceSetWriter<Type>::write
                 os  << "@    s" << sI << " legend " << '"'
                     << valueSetNames[i] << "_track" << i << '"' << nl
                     << "@target G0.S" << sI << nl;
-                writeTable(trackPoints[trackI], valueSets[i][trackI], os);
+                this->writeTable(trackPoints[trackI], valueSets[i][trackI], os);
                 os  << '&' << nl;
 
                 sI++;

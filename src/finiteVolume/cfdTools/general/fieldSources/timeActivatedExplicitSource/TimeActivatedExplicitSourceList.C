@@ -176,7 +176,7 @@ bool Foam::TimeActivatedExplicitSourceList<Type>::readData(Istream& is)
         typename TimeActivatedExplicitSource<Type>::iNew(mesh_, fieldNames_)
     );
 
-    transfer(newSources);
+    this->transfer(newSources);
 
     return is.good();
 }

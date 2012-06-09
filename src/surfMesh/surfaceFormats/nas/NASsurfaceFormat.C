@@ -380,7 +380,7 @@ bool Foam::fileFormats::NASsurfaceFormat<Face>::read
         }
     }
 
-    sortFacesAndStore(dynFaces.xfer(), dynZones.xfer(), sorted);
+    this->sortFacesAndStore(dynFaces.xfer(), dynZones.xfer(), sorted);
 
     // add zones, culling empty ones
     this->addZones(dynSizes, names, true);

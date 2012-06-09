@@ -233,7 +233,7 @@ initAddFieldTempl
     const Field<Type2>& pField
 ) const
 {
-    sendField(patchInternalField(pField), commsType);
+    sendField(this->patchInternalField(pField), commsType);
 }
 
 
@@ -258,7 +258,7 @@ addFieldTempl
 {
     // Get the neighbour side values
     tmp<Field<Type2> > tpNeighbour = receivePointField<Type2>(commsType);
-    addToInternalField(pField, tpNeighbour());
+    this->addToInternalField(pField, tpNeighbour());
 }
 
 
@@ -511,7 +511,7 @@ evaluate
             }
 
             // Average over two sides
-            tpn = 0.5*(patchInternalField(this->internalField()) + tpn);
+            tpn = 0.5*(this->patchInternalField(this->internalField()) + tpn);
 
             // Get internal field to insert values into
             Field<Type>& iF = const_cast<Field<Type>&>(this->internalField());

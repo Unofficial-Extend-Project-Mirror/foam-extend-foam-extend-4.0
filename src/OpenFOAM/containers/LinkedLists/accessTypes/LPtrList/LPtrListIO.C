@@ -61,7 +61,7 @@ void Foam::LPtrList<LListBase, T>::read(Istream& is, const INew& iNew)
             {
                 for (label i=0; i<s; i++)
                 {
-                    append(iNew(is).ptr());
+                    this->append(iNew(is).ptr());
 
                     is.fatalCheck
                     (
@@ -73,7 +73,7 @@ void Foam::LPtrList<LListBase, T>::read(Istream& is, const INew& iNew)
             else
             {
                 T* tPtr = iNew(is).ptr();
-                append(tPtr);
+                this->append(tPtr);
 
                 is.fatalCheck
                 (
@@ -83,7 +83,7 @@ void Foam::LPtrList<LListBase, T>::read(Istream& is, const INew& iNew)
 
                 for (label i=1; i<s; i++)
                 {
-                    append(tPtr->clone().ptr());
+                    this->append(tPtr->clone().ptr());
                 }
             }
         }
@@ -115,7 +115,7 @@ void Foam::LPtrList<LListBase, T>::read(Istream& is, const INew& iNew)
         )
         {
             is.putBack(lastToken);
-            append(iNew(is).ptr());
+            this->append(iNew(is).ptr());
 
             is >> lastToken;
             is.fatalCheck

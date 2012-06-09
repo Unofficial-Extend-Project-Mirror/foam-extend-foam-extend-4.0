@@ -217,7 +217,7 @@ limitedSurfaceInterpolationScheme<Type>::flux
     const GeometricField<Type, fvPatchField, volMesh>& phi
 ) const
 {
-    return faceFlux_*interpolate(phi);
+    return faceFlux_*this->interpolate(phi);
 }
 
 

@@ -142,7 +142,7 @@ bool Foam::fileFormats::OFFsurfaceFormat<Face>::read
     }
 
     // transfer to normal lists, no zone information
-    reset(pointLst.xfer(), dynFaces.xfer(), Xfer<surfZoneList>());
+    this->reset(pointLst.xfer(), dynFaces.xfer(), Xfer<surfZoneList>());
 
     return true;
 }

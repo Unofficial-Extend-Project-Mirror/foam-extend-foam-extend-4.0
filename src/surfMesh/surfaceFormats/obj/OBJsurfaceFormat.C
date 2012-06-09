@@ -203,7 +203,7 @@ bool Foam::fileFormats::OBJsurfaceFormat<Face>::read
     // transfer to normal lists
     this->storedPoints().transfer(dynPoints);
 
-    sortFacesAndStore(dynFaces.xfer(), dynZones.xfer(), sorted);
+    this->sortFacesAndStore(dynFaces.xfer(), dynZones.xfer(), sorted);
 
     // add zones, culling empty ones
     this->addZones(dynSizes, dynNames, true);
@@ -227,7 +227,7 @@ void Foam::fileFormats::OBJsurfaceFormat<Face>::write
     (
         surf.surfZones().size() > 1
       ? surf.surfZones()
-      : oneZone(faceLst, "")
+      : OBJsurfaceFormat::oneZone(faceLst, "")
     );
 
     const bool useFaceMap = (surf.useFaceMap() && zones.size() > 1);

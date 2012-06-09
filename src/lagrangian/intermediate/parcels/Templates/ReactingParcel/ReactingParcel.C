@@ -302,7 +302,7 @@ void Foam::ReactingParcel<ParcelType>::calc
 
     // Calculate new particle temperature
     scalar T1 =
-        calcHeatTransfer
+        this->calcHeatTransfer
         (
             td,
             dt,
@@ -325,7 +325,7 @@ void Foam::ReactingParcel<ParcelType>::calc
 
     // Calculate new particle velocity
     vector U1 =
-        calcVelocity(td, dt, cellI, Re, mus, d0, U0, rho0, mass0, Su, dUTrans);
+        this->calcVelocity(td, dt, cellI, Re, mus, d0, U0, rho0, mass0, Su, dUTrans);
 
     dUTrans += 0.5*(mass0 - mass1)*(U0 + U1);
 
