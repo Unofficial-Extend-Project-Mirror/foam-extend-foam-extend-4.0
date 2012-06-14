@@ -97,12 +97,15 @@ Foam::label Foam::cell::opposingFaceLabel
                 }
                 else
                 {
-                    // There has already been an opposite face.
-                    // Non-prismatic cell
-                    Info<< "Multiple faces not sharing vertex: "
-                        << oppositeFaceLabel << " and "
-                        << curFaceLabels[faceI] << endl;
-                    return -1;
+                    if(debug)
+                    {
+                        // There has already been an opposite face.
+                        // Non-prismatic cell
+                        Info<< "Multiple faces not sharing vertex: "
+                            << oppositeFaceLabel << " and "
+                            << curFaceLabels[faceI] << endl;
+                        return -1;
+                    }
                 }
             }
         }

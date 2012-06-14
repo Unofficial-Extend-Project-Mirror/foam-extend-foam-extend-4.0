@@ -66,6 +66,8 @@ public:
 
         static const char* const typeName;
 
+    //- Debug switch
+        static int debug;
 
     // Constructors
 
