@@ -88,6 +88,7 @@ void Foam::layerAdditionRemoval::addCellLayer
         {
             extrusionDir[mpI] = points[ptc[mpI]] - points[mp[mpI]];
         }
+        extrusionDir *= addDelta_*maxLayerThickness_;
     }
     else
     {
@@ -102,7 +103,7 @@ void Foam::layerAdditionRemoval::addCellLayer
                 << endl;
         }
 
-        extrusionDir = minLayerThickness_*masterFaceLayer.pointNormals();
+        extrusionDir = 1.1*minLayerThickness_*masterFaceLayer.pointNormals();
     }
 
     // Add the new points
@@ -119,7 +120,7 @@ void Foam::layerAdditionRemoval::addCellLayer
                 (
                     points[mp[pointI]]                  // point
 //                   + addDelta_*maxLayerThickness_*extrusionDir[pointI],
-                  + addDelta_*extrusionDir[pointI],
+                  + extrusionDir[pointI],
                     mp[pointI],                         // master point
                     -1,                                 // zone for point
                     true                                // supports a cell
