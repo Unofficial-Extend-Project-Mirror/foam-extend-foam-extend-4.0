@@ -150,10 +150,6 @@ void Foam::extendedLeastSquaresVectors::makeLeastSquaresVectors() const
 
     scalarField detdd = det(dd);
 
-    Info<< "max(detdd) = " << max(detdd) << endl;
-    Info<< "min(detdd) = " << min(detdd) << endl;
-    Info<< "average(detdd) = " << average(detdd) << endl;
-
     label nAddCells = 0;
     label maxNaddCells = 4*detdd.size();
     additionalCellsPtr_ = new List<labelPair>(maxNaddCells);
@@ -220,11 +216,6 @@ void Foam::extendedLeastSquaresVectors::makeLeastSquaresVectors() const
     }
 
     additionalCells_.setSize(nAddCells);
-
-    Info<< "max(detdd) = " << max(detdd) << endl;
-    Info<< "min(detdd) = " << min(detdd) << endl;
-    Info<< "average(detdd) = " << average(detdd) << endl;
-    Info<< "nAddCells/nCells = " << scalar(nAddCells)/mesh().nCells() << endl;
 
     // Invert the dd tensor
     symmTensorField invDd = inv(dd);
