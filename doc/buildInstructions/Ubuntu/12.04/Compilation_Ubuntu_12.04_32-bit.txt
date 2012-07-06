@@ -18,12 +18,13 @@ openmpi: sudo apt-get install openmpi-bin libopenmpi-dev
 libxext: sudo apt-get install libxext-dev
 libxt  : sudo apt-get install libxt-dev
 libXrender: sudo apt-get install libxrender-dev
+libstdc++5: sudo apt-get install libstdc++5
 OpenGL: sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev
 
 # You can also install everything at once:
 sudo apt-get install git flex bison rpm g++ zlib1g-dev binutils-dev \
      openmpi-bin libopenmpi-dev libxext-dev libxt-dev libxrender-dev \
-     libgl1-mesa-dev libglu1-mesa-dev
+     libstdc++5 libgl1-mesa-dev libglu1-mesa-dev
 
 --------------------------------------------------------------------------------
 
@@ -75,7 +76,7 @@ sed -i s/"#export QT_THIRD_PARTY=1"/"export QT_THIRD_PARTY=1"/g ~/OpenFOAM/OpenF
 # This section of the prefs.sh file should now look like this:
 
 export QT_THIRD_PARTY=1
-#export QT_DIR=/usr
+#export QT_DIR=path_to_system_installed_qt
 #export QT_BIN_DIR=$QT_DIR/bin
 
 --------------------------------------------------------------------------------
