@@ -1,4 +1,4 @@
-Installation of OpenFOAM-1.6-ext on Ubuntu 12.04 64-bit
+Installation of OpenFOAM-1.6-ext on Ubuntu 12.04 32-bit
 
 - Proceed with the installation of the OS
 - Update your OS installation using "Update Manager".
