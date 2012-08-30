@@ -153,7 +153,7 @@ Patch0:                 ParaView-3.12.0.patch_darwin
     addCMakeVariable  PARAVIEW_INSTALL_DEVELOPMENT:BOOL=ON
 
     # new alternative to "make HTMLDocumentation"
-    addCMakeVariable  PARAVIEW_GENERATE_PROXY_DOCUMENTATION:BOOL=ON
+    addCMakeVariable  PARAVIEW_GENERATE_PROXY_DOCUMENTATION:BOOL=OFF
 
  %ifos darwin
     # Additional installation rules for Mac OS X 
@@ -206,7 +206,7 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 export PARAVIEW_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 export PARAVIEW_BIN_DIR=\$PARAVIEW_DIR/bin
 export PARAVIEW_LIB_DIR=\$PARAVIEW_DIR/lib
-export PARAVIEW_INCLUDE_DIR=\$PARAVIEW_DIR/include
+export PARAVIEW_INCLUDE_DIR=\$PARAVIEW_DIR/include/paraview-3.12
 
 export PARAVIEW_VERSION=%{version}
 
@@ -236,7 +236,7 @@ cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.cs
 setenv PARAVIEW_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 setenv PARAVIEW_BIN_DIR \$PARAVIEW_DIR/bin
 setenv PARAVIEW_LIB_DIR \$PARAVIEW_DIR/lib
-setenv PARAVIEW_INCLUDE_DIR \$PARAVIEW_DIR/include
+setenv PARAVIEW_INCLUDE_DIR \$PARAVIEW_DIR/include/paraview-3.12
 
 setenv PARAVIEW_VERSION %{version}
 

@@ -151,7 +151,11 @@ Foam::lduSolverPerformance Foam::gmresSolver::solve
     solverPerf.initialResidual() = gSumMag(rA)/normFactor;
     solverPerf.finalResidual() = solverPerf.initialResidual();
 
-    if (!stop(solverPerf))
+    // Note: GMRES cannot be forced to do minIter sweeps
+    // if the residual is zero, due to algorithmic reasons
+    // HJ, 22/Aug/2012
+    if (!converged(solverPerf))
+//     if (!stop(solverPerf))
     {
         // Create the Hesenberg matrix
         scalarSquareMatrix H(nDirs_, 0);

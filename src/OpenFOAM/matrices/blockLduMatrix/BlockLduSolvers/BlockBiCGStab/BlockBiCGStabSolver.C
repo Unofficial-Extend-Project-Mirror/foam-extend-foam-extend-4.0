@@ -146,7 +146,8 @@ Foam::BlockBiCGStabSolver<Type>::solve
                 s[i] = r[i] - alpha*v[i];
             }
 
-            preconPtr_->preconditionT(sh, s);
+            // Bug fix, Alexander Monakov, 11/Jul/2012
+            preconPtr_->precondition(sh, s);
             matrix.Amul(t, sh);
             omega = gSumProd(t, s)/gSumProd(t, t);
 

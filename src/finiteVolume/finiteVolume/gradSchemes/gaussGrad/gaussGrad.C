@@ -164,7 +164,7 @@ void gaussGrad<Type>::correctBoundaryConditions
                 vsf.mesh().Sf().boundaryField()[patchi]
                /vsf.mesh().magSf().boundaryField()[patchi];
 
-            gGrad.boundaryField()[patchi] += n *
+            gGrad.boundaryField()[patchi] += n*
             (
                 vsf.boundaryField()[patchi].snGrad()
               - (n & gGrad.boundaryField()[patchi])

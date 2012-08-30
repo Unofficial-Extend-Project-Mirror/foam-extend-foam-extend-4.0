@@ -12,4 +12,5 @@ EXE_LIBS = \
     -ldynamicFvMesh \
     -ldynamicMesh \
     $(WM_DECOMP_LIBS) \
-    -llduSolvers
+    -llduSolvers \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

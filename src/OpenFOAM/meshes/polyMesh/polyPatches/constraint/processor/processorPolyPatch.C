@@ -217,7 +217,7 @@ void Foam::processorPolyPatch::calcGeometry()
                     << 100*mag(magSf - nbrMagSf)/avSf
                     << "% -- possible face ordering problem." << endl
                     << "patch: " << name()
-                    << " my area:" << magSf
+                    << " my area: " << magSf
                     << " neighbour area: " << nbrMagSf
                     << " matching tolerance: " << polyPatch::matchTol_
                     << endl

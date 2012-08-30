@@ -12,8 +12,7 @@
         mesh
     );
 
-    p = dimensionedScalar("zero", p.dimensions(), 0.0);
-
+    p.internalField() = 0;
 
     Info<< "Reading field U\n" << endl;
     volVectorField U
@@ -29,7 +28,7 @@
         mesh
     );
 
-    U = dimensionedVector("0", U.dimensions(), vector::zero);
+    U.internalField() = vector::zero;
 
     surfaceScalarField phi
     (

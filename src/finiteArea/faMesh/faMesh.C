@@ -582,17 +582,12 @@ Foam::faMesh::faMesh
         // Check for processor edges
         labelList allUndefEdges = tmpList;
         labelList ngbPolyPatch(allUndefEdges.size(), -1);
-<<<<<<< HEAD
         forAll (ngbPolyPatch, edgeI)
-=======
-        forAll(ngbPolyPatch, edgeI)
->>>>>>> parallelTopo
         {
             label curEdge = allUndefEdges[edgeI];
 
             label curPMeshEdge = meshEdges[curEdge];
 
-<<<<<<< HEAD
             forAll (edgeFaces[curPMeshEdge], faceI)
             {
                 label curFace = edgeFaces[curPMeshEdge][faceI];
@@ -602,22 +597,10 @@ Foam::faMesh::faMesh
                     label polyPatchID =
                         pMesh.boundaryMesh().whichPatch(curFace);
 
-=======
-            forAll(edgeFaces[curPMeshEdge], faceI)
-            {
-                label curFace = edgeFaces[curPMeshEdge][faceI];
-                    
-                if (findIndex(faceLabels_, curFace) == -1)
-                {
-                    label polyPatchID = 
-                        m.boundaryMesh().whichPatch(curFace);
-                    
->>>>>>> parallelTopo
                     if (polyPatchID != -1)
                     {
                         ngbPolyPatch[edgeI] = polyPatchID;
                     }
-<<<<<<< HEAD
                 }
             }
         }
@@ -637,25 +620,6 @@ Foam::faMesh::faMesh
                 )
                 {
                     if (!processorPatchSet.found(ngbPolyPatch[edgeI]))
-=======
-                }    
-            }
-        }
-
-        //Count ngb processorPolyPatch-es
-        labelHashSet processorPatchSet;
-        forAll(ngbPolyPatch, edgeI)
-        {
-            if (ngbPolyPatch[edgeI] != -1)
-            {
-                if 
-                (
-                    m.boundaryMesh()[ngbPolyPatch[edgeI]].type()
-                 == processorPolyPatch::typeName
-                )
-                {
-                    if(!processorPatchSet.found(ngbPolyPatch[edgeI]))
->>>>>>> parallelTopo
                     {
                         processorPatchSet.insert(ngbPolyPatch[edgeI]);
                     }
@@ -665,11 +629,7 @@ Foam::faMesh::faMesh
         labelList processorPatches(processorPatchSet.toc());
         faPatches.setSize(faPatches.size() + processorPatches.size());
 
-<<<<<<< HEAD
-        for (label i=0; i<processorPatches.size(); i++)
-=======
-        for(label i=0; i<processorPatches.size(); i++)
->>>>>>> parallelTopo
+        for (label i = 0; i < processorPatches.size(); i++)
         {
             SLList<label> tmpLst;
 
@@ -680,7 +640,6 @@ Foam::faMesh::faMesh
                     tmpLst.append(allUndefEdges[eI]);
                 }
             }
-<<<<<<< HEAD
 
             faPatches[faPatchNames.size() + i].edgeLabels_ = tmpLst;
 
@@ -690,31 +649,18 @@ Foam::faMesh::faMesh
             faPatches[faPatchNames.size() + i].type_ =
                 processorFaPatch::typeName;
 
-=======
-            
-            faPatches[faPatchNames.size() + i].edgeLabels_ = tmpLst;
-            faPatches[faPatchNames.size() + i].name_ = 
-                m.boundaryMesh()[processorPatches[i]].name();
-            faPatches[faPatchNames.size() + i].type_ = 
-                processorFaPatch::typeName;
->>>>>>> parallelTopo
             faPatches[faPatchNames.size() + i].ngbPolyPatchID_ =
                 processorPatches[i];
         }
 
         // Remaining undefined edges
         SLList<label> undefEdges;
-<<<<<<< HEAD
         forAll (ngbPolyPatch, eI)
-=======
-        forAll(ngbPolyPatch, eI)
->>>>>>> parallelTopo
         {
             if (ngbPolyPatch[eI] == -1)
             {
                 undefEdges.append(allUndefEdges[eI]);
             }
-<<<<<<< HEAD
             else if
             (
                !isA<processorPolyPatch>
@@ -724,15 +670,6 @@ Foam::faMesh::faMesh
             )
             {
                 undefEdges.append(allUndefEdges[eI]);
-=======
-            else if 
-            (
-                m.boundaryMesh()[ngbPolyPatch[eI]].type()
-             != processorPolyPatch::typeName
-            )
-            {
-                undefEdges.append(allUndefEdges[eI]);                
->>>>>>> parallelTopo
             }
         }
 
@@ -746,7 +683,6 @@ Foam::faMesh::faMesh
         }
         else
         {
-<<<<<<< HEAD
             faPatches.setSize(faPatches.size() - 1);
         }
     }
@@ -796,60 +732,8 @@ Foam::faMesh::faMesh
             }
 
             faPatches[patchI].edgeLabels_ = reorderedEdgeLabels;
-=======
-            faPatches.setSize(faPatches.size()-1);
->>>>>>> parallelTopo
         }
     }
-    else
-    {
-        faPatches.setSize(faPatches.size()-1);
-    }
-    
-
-    // Reorder processorFaPatch using 
-    // ordering of ngb processorPolyPatch
-    forAll(faPatches, patchI)
-    {
-        if (faPatches[patchI].type_ == processorFaPatch::typeName)
-        {
-            labelList ngbFaces(faPatches[patchI].edgeLabels_.size(), -1);
-
-            forAll(ngbFaces, edgeI)
-            {
-                label curEdge = faPatches[patchI].edgeLabels_[edgeI];
-
-                label curPMeshEdge = meshEdges[curEdge];
-
-                forAll(edgeFaces[curPMeshEdge], faceI)
-                {
-                    label curFace = edgeFaces[curPMeshEdge][faceI];
-                    
-                    label curPatchID = 
-                        m.boundaryMesh().whichPatch(curFace);
-                    
-                    if (curPatchID == faPatches[patchI].ngbPolyPatchID_)
-                    {
-                        ngbFaces[edgeI] = curFace;
-                    }            
-                }
-            }
-
-            SortableList<label> sortedNgbFaces(ngbFaces);
-            labelList reorderedEdgeLabels(ngbFaces.size(), -1);
-            for (label i=0; i<reorderedEdgeLabels.size(); i++)
-            {
-                reorderedEdgeLabels[i] =
-                    faPatches[patchI].edgeLabels_
-                    [
-                        sortedNgbFaces.indices()[i]
-                    ];
-            }
-
-            faPatches[patchI].edgeLabels_ = reorderedEdgeLabels;
-        }
-    }
-
 
 
     // Add good patches to faMesh
@@ -870,7 +754,6 @@ Foam::faMesh::faMesh
             if (faPatches[pI].ngbPolyPatchID_ == -1)
             {
                 FatalErrorIn
-<<<<<<< HEAD
                 (
                     "void faMesh::faMesh(const polyMesh&, const fileName&)"
                 )
@@ -883,30 +766,12 @@ Foam::faMesh::faMesh
                 refCast<const processorPolyPatch>
                 (
                     pMesh.boundaryMesh()[faPatches[pI].ngbPolyPatchID_]
-=======
-                (
-                    "void faMesh::faMesh(const polyMesh&, const fileName&)"
-                )
-                    << "ngbPolyPatch is not defined for processorFaPatch: "
-                        << faPatches[pI].name_
-                        << abort(FatalError);
-            }
-
-            const processorPolyPatch& procPolyPatch =
-                refCast<const processorPolyPatch>
-                (
-                    m.boundaryMesh()[faPatches[pI].ngbPolyPatchID_]
->>>>>>> parallelTopo
                 );
 
             faPatches[pI].dict_.add("myProcNo", procPolyPatch.myProcNo());
             faPatches[pI].dict_.add
             (
-<<<<<<< HEAD
                 "neighbProcNo",
-=======
-                "neighbProcNo", 
->>>>>>> parallelTopo
                 procPolyPatch.neighbProcNo()
             );
         }

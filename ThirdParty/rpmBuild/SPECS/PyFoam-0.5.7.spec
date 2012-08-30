@@ -110,7 +110,7 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export PYFOAM_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/noarch
-export PYTHONPATH=\$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages:\$PYTHONPATH
+export PYTHONPATH=\$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages
 
 # Enable access to the package applications if present
 [ -d \$PYFOAM_DIR/bin ] && _foamAddPath \$PYFOAM_DIR/bin
@@ -125,14 +125,10 @@ cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.cs
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 setenv PYFOAM_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/noarch
 
-setenv PYTHONPATH \$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages:\$PYTHONPATH
+setenv PYTHONPATH \$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages
 
 if ( -e \$PYFOAM_DIR/bin ) then
     _foamAddPath \$PYFOAM_DIR/bin
-endif
-
-if ( -e \$PYFOAM_SITE_DIR/bin ) then
-    _foamAddPath \$PYFOAM_SITE_DIR/bin
 endif
 
 DOT_CSH_EOF
@@ -146,7 +142,7 @@ cat << DOT_HARDCODED_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{ve
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export PYFOAM_DIR=$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/noarch
-export PYTHONPATH=\$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages:\$PYTHONPATH
+export PYTHONPATH=\$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages
 
 # Enable access to the package applications if present
 [ -d \$PYFOAM_DIR/bin ] && export PATH=\$PYFOAM_DIR/bin:\$PATH
@@ -165,7 +161,7 @@ cat << DOT_HARDCODED_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{v
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 setenv PYFOAM_DIR $WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/noarch
 
-setenv PYTHONPATH \$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages:\$PYTHONPATH
+setenv PYTHONPATH \$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages
 
 if ( -e \$PYFOAM_DIR/bin ) then
     setenv PATH \$PYFOAM_DIR/bin:\$PATH

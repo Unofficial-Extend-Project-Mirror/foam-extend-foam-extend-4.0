@@ -277,6 +277,7 @@ $(GAMGInterfaces)/cyclicGAMGInterface/cyclicGAMGInterface.C
 $(GAMGInterfaces)/ggiGAMGInterface/ggiGAMGInterface.C
 $(GAMGInterfaces)/cyclicGgiGAMGInterface/cyclicGgiGAMGInterface.C
 $(GAMGInterfaces)/regionCoupleGAMGInterface/regionCoupleGAMGInterface.C
+$(GAMGInterfaces)/mixingPlaneGAMGInterface/mixingPlaneGAMGInterface.C
 
 GAMGInterfaceFields = $(GAMG)/interfaceFields
 $(GAMGInterfaceFields)/GAMGInterfaceField/GAMGInterfaceField.C

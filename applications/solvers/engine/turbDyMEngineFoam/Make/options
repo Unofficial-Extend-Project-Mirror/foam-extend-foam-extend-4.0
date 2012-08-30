@@ -21,4 +21,5 @@ EXE_LIBS = \
     -lincompressibleTransportModels \
     -lfiniteVolume \
     $(WM_DECOMP_LIBS) \
-    -llduSolvers
+    -llduSolvers \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

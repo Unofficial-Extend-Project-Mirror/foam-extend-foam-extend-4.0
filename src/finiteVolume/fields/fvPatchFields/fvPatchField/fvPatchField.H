@@ -301,8 +301,14 @@ public:
                 return internalField_;
             }
 
-            //- Return the type of the calculated for of fvPatchField
+            //- Return the type of the calculated for type of fvPatchField
             static const word& calculatedType();
+
+            //- Return patch type (optional on read)
+            const word& patchType() const
+            {
+                return patchType_;
+            }
 
             //- Return true if this patch field fixes a value.
             //  Needed to check if a level has to be specified while solving

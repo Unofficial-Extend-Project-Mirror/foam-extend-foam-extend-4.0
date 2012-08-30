@@ -10,4 +10,5 @@ EXE_LIBS = \
     -ldynamicMesh \
     -lengine \
     -lmeshTools \
-    -llduSolvers
+    -llduSolvers \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

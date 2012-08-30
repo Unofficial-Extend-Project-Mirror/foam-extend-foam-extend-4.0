@@ -1,3 +1,0 @@
-faceSet B_UPSTREAMZone          new patchToFace B_UPSTREAM
-faceSet B_DOWNSTREAMZone        new patchToFace B_DOWNSTREAM
-quit

@@ -129,6 +129,10 @@ bool Foam::adjustPhi
           > closedDomainTol*Foam::max(1.0, mag(massIn))
         )
         {
+            phi.write();
+            U.write();
+            p.write();
+
             // Cannot adjust
             FatalErrorIn
             (

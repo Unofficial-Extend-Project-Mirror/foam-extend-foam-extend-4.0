@@ -62,12 +62,12 @@ Foam::Gauss::~Gauss()
 
 Foam::tmp<Foam::scalarField> Foam::Gauss::weights
 (
-    const vectorField& points,
-    const vector& controlPoint
+    const vectorField& controlPoints,
+    const vector& dataPoint
 ) const
 {
     // Algorithmic improvement, Matteo Lombardi.  21/Mar/2011
-    scalarField sqrDist = magSqr(points - controlPoint);
+    scalarField sqrDist = magSqr(controlPoints - dataPoint);
 
     return Foam::exp(-sqr(radius_)*sqrDist);
 }

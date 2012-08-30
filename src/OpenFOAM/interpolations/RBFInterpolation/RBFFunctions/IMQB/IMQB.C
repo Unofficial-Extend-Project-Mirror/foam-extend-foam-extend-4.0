@@ -63,12 +63,12 @@ Foam::IMQB::~IMQB()
 
 Foam::tmp<Foam::scalarField> Foam::IMQB::weights
 (
-    const vectorField& points,
-    const vector& controlPoint
+    const vectorField& controlPoints,
+    const vector& dataPoint
 ) const
 {
     // Algorithmic improvement, Matteo Lombardi.  21/Mar/2011
-    scalarField sqrDist = magSqr(points - controlPoint);
+    scalarField sqrDist = magSqr(controlPoints - dataPoint);
 
     return 1/sqrt(sqrDist + sqr(radius_));
 }

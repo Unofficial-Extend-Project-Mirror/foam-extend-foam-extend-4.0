@@ -232,7 +232,7 @@ int main(int argc, char *argv[])
 #   include "createNamedMesh.H"
     const word oldInstance = mesh.pointsInstance();
 
-    bool split      = args.optionFound("split");
+    bool split = args.optionFound("split");
     bool overwrite  = args.optionFound("overwrite");
     bool detectOnly = args.optionFound("detectOnly");
 

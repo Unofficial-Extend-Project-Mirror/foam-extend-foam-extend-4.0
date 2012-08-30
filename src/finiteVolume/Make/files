@@ -112,7 +112,7 @@ $(constraintFvPatchFields)/ggi/ggiFvPatchFields.C
 $(constraintFvPatchFields)/cyclicGgi/cyclicGgiFvPatchFields.C
 $(constraintFvPatchFields)/overlapGgi/overlapGgiFvPatchFields.C
 $(constraintFvPatchFields)/mixingPlane/mixingPlaneFvPatchFields.C
-$(constraintFvPatchFields)/regionCouple/regionCoupleFvPatchFields.C
+$(constraintFvPatchFields)/regionCoupling/regionCouplingFvPatchFields.C
 
 derivedFvPatchFields = $(fvPatchFields)/derived
 $(derivedFvPatchFields)/activeBaffleVelocity/activeBaffleVelocityFvPatchVectorField.C
@@ -187,13 +187,8 @@ $(constraintFvsPatchFields)/wedge/wedgeFvsPatchFields.C
 $(constraintFvsPatchFields)/ggi/ggiFvsPatchFields.C
 $(constraintFvsPatchFields)/cyclicGgi/cyclicGgiFvsPatchFields.C
 $(constraintFvsPatchFields)/overlapGgi/overlapGgiFvsPatchFields.C
-<<<<<<< HEAD
-$(constraintFvsPatchFields)/regionCoupling/regionCouplingFvsPatchFields.C
-=======
 $(constraintFvsPatchFields)/mixingPlane/mixingPlaneFvsPatchFields.C
-$(constraintFvsPatchFields)/regionCouple/regionCoupleFvsPatchFields.C
->>>>>>> remotes/origin/mixingPlane_RC1
-
+$(constraintFvsPatchFields)/regionCoupling/regionCouplingFvsPatchFields.C
 
 fields/volFields/volFields.C
 fields/surfaceFields/surfaceFields.C
@@ -216,8 +211,6 @@ $(interpolation)/interpolationCellPointWallModified/makeInterpolationCellPointWa
 volPointInterpolation = interpolation/volPointInterpolation
 $(volPointInterpolation)/pointPatchInterpolation/pointPatchInterpolation.C
 $(volPointInterpolation)/volPointInterpolation.C
-interpolation/pointVolInterpolation/pointVolInterpolation.C
-
 
 pointVolInterpolation = interpolation/pointVolInterpolation
 $(pointVolInterpolation)/pointVolInterpolation.C
@@ -350,6 +343,11 @@ $(convectionSchemes)/gaussConvectionScheme/gaussConvectionSchemes.C
 $(convectionSchemes)/noConvectionScheme/noConvectionSchemes.C
 $(convectionSchemes)/explicitConvectionScheme/explicitConvectionSchemes.C
 $(convectionSchemes)/multivariateGaussConvectionScheme/multivariateGaussConvectionSchemes.C
+
+adjConvectionSchemes = finiteVolume/adjConvectionSchemes
+$(adjConvectionSchemes)/adjConvectionScheme/adjConvectionSchemes.C
+$(adjConvectionSchemes)/noAdjConvectionScheme/noAdjConvectionSchemes.C
+$(adjConvectionSchemes)/explicitAdjConvectionScheme/explicitAdjConvectionSchemes.C
 
 laplacianSchemes = finiteVolume/laplacianSchemes
 $(laplacianSchemes)/laplacianScheme/laplacianSchemes.C

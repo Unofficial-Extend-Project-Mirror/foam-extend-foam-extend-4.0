@@ -55,6 +55,8 @@ Description
 #include "fvcSup.H"
 #include "fvcMeshPhi.H"
 
+#include "fvcAdjDiv.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif

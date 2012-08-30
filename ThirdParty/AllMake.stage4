@@ -68,9 +68,6 @@ fi
 # Paraview
 if [ -z "$PARAVIEW_SYSTEM" ] 
 then
-     # Make sure we get the value of QT_BIN_DIR initialized
-     . $WM_PROJECT_DIR/etc/settings.sh
-
     if [ -d "$QT_BIN_DIR" -a -r "$QT_BIN_DIR"/qmake ]
     then
         ( rpm_make -p ParaView-3.12.0 -s ParaView-3.12.0.spec -u http://www.paraview.org/files/v3.12/ParaView-3.12.0.tar.gz \

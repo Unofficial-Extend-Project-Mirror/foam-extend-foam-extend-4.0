@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 
 template<class Type>
@@ -137,8 +138,9 @@ Foam::tmp<Foam::fvPatchField<Type> > Foam::fvPatchField<Type>::New
                 "const DimensionedField<Type, volMesh>&, "
                 "const dictionary&)",
                 dict
-            )   << "inconsistent patch and patchField types for \n"
-                   "    patch type " << p.type()
+            )   << "inconsistent patch and patchField types for field "
+                << iF.name() << "\n"
+                << "    patch type " << p.type()
                 << " and patchField type " << patchFieldType
                 << exit(FatalIOError);
         }

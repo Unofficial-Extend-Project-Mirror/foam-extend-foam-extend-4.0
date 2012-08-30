@@ -10,4 +10,5 @@ EXE_LIBS = \
     -ldecompositionMethods \
     -lmeshTools \
     -ldynamicMesh \
-    -ldynamicFvMesh
+    -ldynamicFvMesh \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

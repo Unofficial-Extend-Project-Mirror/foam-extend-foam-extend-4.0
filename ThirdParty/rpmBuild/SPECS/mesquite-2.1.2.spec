@@ -77,6 +77,7 @@ URL:                    http://software.sandia.gov/~jakraft
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
+Patch0:         mesquite-2.1.2.patch
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -85,6 +86,8 @@ Group: 			Development/Tools
 
 %prep
 %setup -q
+
+%patch0 -p0
 
 %build
     # export WM settings in a form that GNU configure recognizes

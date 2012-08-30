@@ -425,8 +425,8 @@ endif
 
 # cmake
 # ~~~~~
-if ( $?CMAKE_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.5/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.5/platforms/$WM_OPTIONS/etc/cmake-2.8.5.csh
+if ( $?CMAKE_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.6/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.6/platforms/$WM_OPTIONS/etc/cmake-2.8.6.csh
 endif
 
 # Python
@@ -437,7 +437,7 @@ endif
 
 # PyFoam
 # ~~~~~~
-if ( $?PYFOAM_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.5.7 ) then
+if ( $?PYFOAM_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.5.7/platforms/noarch ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.5.7/platforms/noarch/etc/PyFoam-0.5.7.csh
 endif
 

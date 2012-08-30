@@ -44,6 +44,7 @@ Description
 #include "fvmDdt.H"
 #include "fvmD2dt2.H"
 #include "fvmDiv.H"
+#include "fvmAdjDiv.H"
 #include "fvmLaplacian.H"
 #include "fvmSup.H"
 

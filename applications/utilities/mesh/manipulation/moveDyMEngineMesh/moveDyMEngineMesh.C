@@ -36,12 +36,6 @@ Author
 #include "fvCFD.H"
 #include "engineTime.H"
 #include "engineTopoChangerMesh.H"
-<<<<<<< HEAD
-=======
-#include "OFstream.H"
-
-using namespace Foam;
->>>>>>> parallelTopo
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Main program:

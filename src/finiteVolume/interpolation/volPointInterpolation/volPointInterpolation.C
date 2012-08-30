@@ -88,7 +88,7 @@ void volPointInterpolation::makeWeights() const
         forAll(pcp, pointCelli)
         {
             pw[pointCelli] =
-                1.0/mag(points[pointi] - cellCentres[pcp[pointCelli]]);
+                1/mag(points[pointi] - cellCentres[pcp[pointCelli]]);
 
             sumWeights[pointi] += pw[pointCelli];
         }

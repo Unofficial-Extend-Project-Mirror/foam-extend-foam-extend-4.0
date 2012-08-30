@@ -104,7 +104,7 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
             FatalIOErrorIn
             (
                 "lduSolver::New", dict
-            )   << "Unknown asymmetric matrix solver " << solverName << nl << nl
+            )   << "Unknown asymmetric matrix solver " << solverName << nl
                 << "Valid asymmetric matrix solvers are :" << endl
                 << asymMatrixConstructorTablePtr_->toc()
                 << exit(FatalIOError);
@@ -197,6 +197,15 @@ bool Foam::lduMatrix::solver::stop
         return false;
     }
 
+    return converged(solverPerf);
+}
+
+
+bool Foam::lduMatrix::solver::converged
+(
+    lduMatrix::solverPerformance& solverPerf
+) const
+{
     if
     (
         solverPerf.nIterations() >= maxIter_

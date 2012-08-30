@@ -1,3 +1,0 @@
-faceSet sideWallA_BB_cyclic1Zone new patchToFace sideWallA_BB_cyclic1
-faceSet sideWallA_BB_cyclic2Zone new patchToFace sideWallA_BB_cyclic2
-quit

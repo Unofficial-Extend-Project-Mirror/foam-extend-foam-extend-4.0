@@ -208,8 +208,9 @@ Foam::coupledSolverPerformance Foam::coupledBicgStabSolver::solve
                 }
             }
 
-            // Execute preconditioning transpose
-            preconPtr_->preconditionT(sh, s, cmpt);
+            // Execute preconditioning
+            // Bug fix, Alexander Monakov, 11/Jul/2012
+            preconPtr_->precondition(sh, s, cmpt);
             matrix_.Amul(t, sh, bouCoeffs_, interfaces_, cmpt);
             omega = gSumProd(t, s)/gSumProd(t, t);
 

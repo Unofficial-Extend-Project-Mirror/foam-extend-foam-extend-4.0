@@ -52,7 +52,7 @@ fixedValueFvPatchField<Type>::fixedValueFvPatchField
     const dictionary& dict
 )
 :
-    fvPatchField<Type>(p, iF, dict, true)
+    fvPatchField<Type>(p, iF, dict)
 {}
 
 

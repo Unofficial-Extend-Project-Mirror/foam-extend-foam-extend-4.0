@@ -152,14 +152,20 @@ void Foam::tetPolyMeshFaceDecomp::addParallelPointPatch()
             mesh_.globalData().nTotalFaces() + globalFaceOffset;
 
         // Add the cell centres to the lookup list
-        label oldSize = pointProcAddressing.size();
+
+        // Bug fix: only live points/faces/cells included.  HJ, 24/Aug/2012
+        const label oldPointSize = mesh_.nPoints();
+        const label oldFaceSize = mesh_.nFaces();
+        const label oldCellSize = mesh_.nCells();
 
         pointProcAddressing.setSize
         (
-            oldSize + faceProcAddressing.size() + cellProcAddressing.size()
+            oldPointSize + oldFaceSize + oldCellSize
         );
 
-        forAll (faceProcAddressing, faceI)
+        label oldSize = oldPointSize;
+
+        for (label faceI = 0; faceI < oldFaceSize; faceI++)
         {
             pointProcAddressing[oldSize] =
                 faceProcAddressing[faceI] + globalFaceOffset;

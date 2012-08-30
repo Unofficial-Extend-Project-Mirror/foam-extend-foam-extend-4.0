@@ -41,11 +41,11 @@ if (mesh.nInternalFaces())
     surfaceScalarField SfUfbyDelta =
         mesh.surfaceInterpolation::deltaCoeffs()*magPhi;
 
-    CoNum = max(SfUfbyDelta/mesh.magSf())
-        .value()*runTime.deltaT().value();
+    const scalar deltaT = runTime.deltaT().value();
 
-    meanCoNum = (sum(SfUfbyDelta)/sum(mesh.magSf()))
-        .value()*runTime.deltaT().value();
+    CoNum = max(SfUfbyDelta/mesh.magSf()).value()*deltaT;
+
+    meanCoNum = (sum(SfUfbyDelta)/sum(mesh.magSf())).value()*deltaT;
 
     velMag = max(magPhi/mesh.magSf()).value();
 }

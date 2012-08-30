@@ -86,13 +86,10 @@ class RBFInterpolation
 {
     // Private data
 
-        //- Dictionary
-        const dictionary& dict_;
-
         //- Reference to control points
         const vectorField& controlPoints_;
 
-        //- Rerefence to all points
+        //- Reference to all points
         const vectorField& allPoints_;
 
         //- RBF function

@@ -217,7 +217,7 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
 )
 :
     coupledPolyPatch(name, size, start, index, bm),
-    shadowName_("_initialize_me_"),
+    shadowName_(fileName::null),
     csPtr_
     (
         new coordinateSystem
@@ -500,6 +500,18 @@ Foam::mixingPlanePolyPatch::reconFaceCellCentres() const
 }
 
 
+void Foam::mixingPlanePolyPatch::initAddressing()
+{
+    polyPatch::initAddressing();
+}
+
+
+void Foam::mixingPlanePolyPatch::calcAddressing()
+{
+    polyPatch::calcAddressing();
+}
+
+
 void Foam::mixingPlanePolyPatch::initGeometry()
 {
     polyPatch::initGeometry();
@@ -518,7 +530,7 @@ void Foam::mixingPlanePolyPatch::calcGeometry()
 
         // Next, compute the weighting factors in order to properly interpolate
         // the field values at those locations. We will be using an inverse
-        // distance interpolation scheme. 
+        // distance interpolation scheme.
     }
 
     calcTransforms();

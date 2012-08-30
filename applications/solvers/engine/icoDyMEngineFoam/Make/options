@@ -14,4 +14,5 @@ EXE_LIBS = \
     -lmeshTools \
     -lfiniteVolume \
     $(WM_DECOMP_LIBS) \
-    -llduSolvers
+    -llduSolvers \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

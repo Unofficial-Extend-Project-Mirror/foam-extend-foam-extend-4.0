@@ -20,4 +20,5 @@ EXE_LIBS = \
     -lspecie \
     -lmeshTools \
     $(WM_DECOMP_LIBS) \
-    -llduSolvers
+    -llduSolvers \
+    -L$(MESQUITE_LIB_DIR) -lmesquite
