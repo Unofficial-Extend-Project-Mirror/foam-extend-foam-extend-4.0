@@ -1,0 +1,11 @@
+diff -rupN mesquite-2.1.2/include/Mesquite.hpp mesquite-2.1.2_mod/include/Mesquite.hpp
+--- mesquite-2.1.2/include/Mesquite.hpp	2012-05-09 20:53:10.558214520 +0200
++++ mesquite-2.1.2_mod/include/Mesquite.hpp	2012-04-30 10:24:48.000000000 +0200
+@@ -53,6 +53,7 @@
+   #define MESQUITE_EXPORT
+ #endif
+ 
++#include <cstddef>
+ #include <cmath>
+ #include <cfloat>
+ #include <climits>

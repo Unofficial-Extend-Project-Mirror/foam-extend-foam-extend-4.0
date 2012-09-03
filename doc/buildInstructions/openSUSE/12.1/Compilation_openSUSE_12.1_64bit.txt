@@ -1,0 +1,124 @@
+Installation of OpenFOAM-1.6-ext on openSUSE 12.1 64-bit
+--------------------------------------------------------------------------------
+
+We assume you have a fresh installation of openSUSE 12.1 64-bit, with all the
+necessary updates already applied
+
+--------------------------------------------------------------------------------
+
+# Installation of additional system packages:
+
+sudo zypper install git
+sudo zypper install openmpi-devel
+sudo zypper install gnuplot
+sudo zypper install -t  pattern devel_qt4
+
+--------------------------------------------------------------------------------
+
+# Download OpenFOAM-1.6-ext
+
+mkdir ~/OpenFOAM
+cd ~/OpenFOAM
+git clone git://openfoam-extend.git.sourceforge.net/gitroot/openfoam-extend/OpenFOAM-1.6-ext
+
+
+--------------------------------------------------------------------------------
+
+# We need to tweak our OpenFOAM setup using the prefs.sh file
+
+cp ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh-EXAMPLE \
+   ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+
+--------------------------------------------------------------------------------
+
+# We are going to use version system installed version of gcc 4.6.2
+
+# Modify the etc/prefs.sh file to switch to gcc 4.6.2
+sed -i s/"compilerInstall=System"/"compilerInstall=System\nWM_COMPILER=Gcc46"/g ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+
+--------------------------------------------------------------------------------
+
+# We are going to use the system installed version of openmpi-1.4.3
+#
+# No need to run AllMake.stage2
+sed -i s/"#export WM_MPLIB=SYSTEMOPENMPI"/"export WM_MPLIB=SYSTEMOPENMPI"/g ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+sed -i s/"#export OPENMPI_DIR=path_to_system_installed_openmpi"/"export OPENMPI_DIR=\/usr\/lib64\/mpi\/gcc\/openmpi"/g ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+sed -i s/"#export OPENMPI_BIN_DIR=\$OPENMPI_DIR\/bin"/"export OPENMPI_BIN_DIR=\$OPENMPI_DIR\/bin"/g ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+
+
+--------------------------------------------------------------------------------
+
+# We are going to use the system installed development version of Qt (Version: 4.7.4-19.6.1)
+
+# Uncomment and modify the initialization of the variables QT_DIR and QT_BIN_DIR  in the
+# file prefs.sh
+
+sed -i s/"#export QT_DIR=path_to_system_installed_qt"/"export QT_DIR=\/usr"/g ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+sed -i s/"#export QT_BIN_DIR=\$QT_DIR\/bin"/"export QT_BIN_DIR=\$QT_DIR\/bin"/g ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+
+# This section of the prefs.sh file should now look like this:
+
+#export QT_THIRD_PARTY=1
+export QT_DIR=/usr
+export QT_BIN_DIR=$QT_DIR/bin
+
+--------------------------------------------------------------------------------
+
+# ParaView:
+#
+# Version 3.8.1 of ParaView does not compile with gcc 4.6.2 on openSUSE 12.1
+#
+# I suggest you switch to ParaView 12.1
+#
+--------------------------------------------------------------------------------
+
+# Source this initial OpenFOAM environment to get the basic configuration for
+# compilation
+. ~/OpenFOAM/OpenFOAM-1.6-ext/etc/bashrc
+
+# Compile the ThirdParty packages
+
+cd $WM_PROJECT_DIR/ThirdParty
+./AllMake.stage1 >& log.AllMake.stage1 
+./AllMake.stage3 >& log.AllMake.stage3 
+./AllMake.stage4 >& log.AllMake.stage4 
+
+# You can keep an eye on the compilation process with the command tail e.g:
+# tail -f log.AllMake.stage1
+
+--------------------------------------------------------------------------------
+
+# Update your OpenFOAM environment to get the basic configuration from the newly
+# compiled ThirdParty packages
+
+. ~/OpenFOAM/OpenFOAM-1.6-ext/etc/bashrc
+
+# Compile OpenFOAM-1.6-ext
+
+cd $WM_PROJECT_DIR
+./Allwmake >& log.Allwmake &  
+tail -f log.Allwmake          # To keep an eye on the compilation process
+
+--------------------------------------------------------------------------------
+
+# Execute Allwmake a second time because of a bad library building sequence for
+# the library -lfaceDecompositionMotionSolver
+# Warning: Not sure if this is still necessary... MB 05/2012 
+
+./Allwmake >& log.Allwmake2 & 
+tail -f log.Allwmake2          # To keep an eye on the compilation process
+
+--------------------------------------------------------------------------------
+
+# Run a tutorial to check the basic functionality
+
+cd $FOAM_TUTORIAL/incompressible/simpleFoam/pitzDaily
+blockMesh >& log.blockMesh
+simpleFoam >& log.simpleFoam
+paraFoam
+
+# You are done!
+
+--------------------------------------------------------------------------------
+Martin Beaudoin
+May 2012

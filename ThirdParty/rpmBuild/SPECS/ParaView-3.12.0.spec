@@ -29,7 +29,7 @@
 #     RPM spec file for creating a relocatable RPM
 #
 # Author:
-#     Martin Beaudoin, Hydro-Quebec, (2010)
+#     Martin Beaudoin, Hydro-Quebec, (2012)
 #
 #------------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:            http://www.paraview.org/files/v3.12/
+URL:                    http://www.paraview.org/files/v3.12/
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
@@ -89,8 +89,8 @@ Patch0:                 ParaView-3.12.0.patch_darwin
 #
 %{!?_withVerbose:     %define _withVerbose     false}
 %{!?_withMesa:        %define _withMesa        false}
-%{!?_withMPI:         %define _withMPI         false}
-%{!?_withPython:      %define _withPython      false}
+%{!?_withMPI:         %define _withMPI         true}
+%{!?_withPython:      %define _withPython      true}
 %{!?_withQt:          %define _withQt          true}
 %{!?_qmakePath:       %define _qmakePath       Undefined}
 %{!?_mesaIncludePath: %define _mesaIncludePath Undefined}
@@ -266,7 +266,12 @@ DOT_CSH_EOF
     # as a non-root user might be a problem.
     (mkdir -p  %{_topdir}/TGZS/%{_target_cpu}; cd $RPM_BUILD_ROOT/%{_prefix}; tar -zcvf %{_topdir}/TGZS/%{_target_cpu}/%{name}-%{version}.tgz  packages/%{name}-%{version})
 
+    # Make sure we clean the installation directory. Somehow, make install generates files there. Need to revisit this eventually.
+    (rm -rf %{_prefix}/packages/%{name}-%{version}    )
+
 %clean
+rm -rf $RPM_BUILD_ROOT    
+rm -rf %{_prefix}/packages/%{name}-%{version}   
 
 %files
 %defattr(-,root,root)
