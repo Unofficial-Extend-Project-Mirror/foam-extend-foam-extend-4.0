@@ -854,10 +854,6 @@ void Foam::ggiPolyPatch::calcTransforms()
 
     if (debug > 1 && master())
     {
-        Info<< "Writing transformed slave patch as VTK." << nl
-            << "Master: " << name()
-            << " Slave: " << shadowName() << endl;
-
         if (patchToPatch().uncoveredMasterFaces().size() > 0)
         {
             // Write uncovered master faces
