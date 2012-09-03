@@ -117,8 +117,8 @@ public:
         //- Return RBF weights
         virtual tmp<scalarField> weights
         (
-            const vectorField& points,
-            const vector& controlPoint
+            const vectorField& controlPoints,
+            const vector& dataPoint
         ) const = 0;
 };
 
