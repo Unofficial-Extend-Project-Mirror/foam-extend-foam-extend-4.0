@@ -79,7 +79,9 @@ alias _foamSource 'if ($?FOAM_VERBOSE && $?prompt) echo "Sourcing: \!*"; source 
 # Add in preset user or site preferences:
 set foamPrefs=`$WM_PROJECT_DIR/bin/foamEtcFile prefs.csh`
 if ( $status == 0 ) then
-    _foamSource $foamPrefs
+    if ($foamPrefs) then
+        _foamSource $foamPrefs
+     endif
 endif
 unset foamPrefs
 
