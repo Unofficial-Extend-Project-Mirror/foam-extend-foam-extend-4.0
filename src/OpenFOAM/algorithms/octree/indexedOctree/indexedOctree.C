@@ -155,14 +155,14 @@ void Foam::indexedOctree<Type>::divide
 ) const
 {
     List<DynamicList<label> > subIndices(8);
-    for (direction octant = 0; octant < subIndices.size(); octant++)
+    for (label octant = 0; octant < subIndices.size(); octant++)
     {
         subIndices[octant].setCapacity(indices.size()/8);
     }
 
     // Precalculate bounding boxes.
     FixedList<treeBoundBox, 8> subBbs;
-    for (direction octant = 0; octant < subBbs.size(); octant++)
+    for (label octant = 0; octant < subBbs.size(); octant++)
     {
         subBbs[octant] = bb.subBbox(octant);
     }
@@ -171,7 +171,7 @@ void Foam::indexedOctree<Type>::divide
     {
         label shapeI = indices[i];
 
-        for (direction octant = 0; octant < 8; octant++)
+        for (label octant = 0; octant < 8; octant++)
         {
             if (shapes_.overlaps(shapeI, subBbs[octant]))
             {
@@ -181,7 +181,7 @@ void Foam::indexedOctree<Type>::divide
     }
 
     result.setSize(8);
-    for (direction octant = 0; octant < subIndices.size(); octant++)
+    for (label octant = 0; octant < subIndices.size(); octant++)
     {
         result[octant].transfer(subIndices[octant]);
     }
@@ -225,7 +225,7 @@ Foam::indexedOctree<Type>::divide
     // Append the rest.
     bool replaced = false;
 
-    for (direction octant = 0; octant < dividedIndices.size(); octant++)
+    for (label octant = 0; octant < dividedIndices.size(); octant++)
     {
         labelList& subIndices = dividedIndices[octant];
 
@@ -276,7 +276,7 @@ void Foam::indexedOctree<Type>::splitNodes
     {
         for
         (
-            direction octant = 0;
+            label octant = 0;
             octant < nodes[nodeI].subNodes_.size();
             octant++
         )
@@ -303,7 +303,8 @@ void Foam::indexedOctree<Type>::splitNodes
                     subNode.parent_ = nodeI;
                     label sz = nodes.size();
                     nodes.append(subNode);
-                    nodes[nodeI].subNodes_[octant] = nodePlusOctant(sz, octant);
+                    nodes[nodeI].subNodes_[octant] =
+                        nodePlusOctant(sz, octant);
                 }
             }
         }
@@ -332,7 +333,7 @@ Foam::label Foam::indexedOctree<Type>::compactContents
 
     if (level < compactLevel)
     {
-        for (direction octant = 0; octant < nod.subNodes_.size(); octant++)
+        for (label octant = 0; octant < nod.subNodes_.size(); octant++)
         {
             labelBits index = nod.subNodes_[octant];
 
@@ -354,7 +355,7 @@ Foam::label Foam::indexedOctree<Type>::compactContents
     else if (level == compactLevel)
     {
         // Compact all content on this level
-        for (direction octant = 0; octant < nod.subNodes_.size(); octant++)
+        for (label octant = 0; octant < nod.subNodes_.size(); octant++)
         {
             labelBits index = nod.subNodes_[octant];
 
@@ -394,7 +395,7 @@ Foam::indexedOctree<Type>::calcVolumeType
 
     volumeType myType = UNKNOWN;
 
-    for (direction octant = 0; octant < nod.subNodes_.size(); octant++)
+    for (label octant = 0; octant < nod.subNodes_.size(); octant++)
     {
         volumeType subType;
 
@@ -451,7 +452,7 @@ Foam::indexedOctree<Type>::getVolumeType
 {
     const node& nod = nodes_[nodeI];
 
-    direction octant = nod.bb_.subOctant(sample);
+    label octant = nod.bb_.subOctant(sample);
 
     volumeType octantType = volumeType(nodeTypes_.get((nodeI<<3)+octant));
 
@@ -1268,7 +1269,7 @@ bool Foam::indexedOctree<Type>::walkToParent
     // Find octant nodeI is in.
     parentOctant = 255;
 
-    for (direction i = 0; i < parentNode.subNodes_.size(); i++)
+    for (label i = 0; i < parentNode.subNodes_.size(); i++)
     {
         labelBits index = parentNode.subNodes_[i];
 
@@ -2020,7 +2021,7 @@ void Foam::indexedOctree<Type>::findBox
     const node& nod = nodes_[nodeI];
     const treeBoundBox& nodeBb = nod.bb_;
 
-    for (direction octant = 0; octant < nod.subNodes_.size(); octant++)
+    for (label octant = 0; octant < nod.subNodes_.size(); octant++)
     {
         labelBits index = nod.subNodes_[octant];
 
@@ -2072,7 +2073,7 @@ Foam::label Foam::indexedOctree<Type>::countElements
 
         const node& nod = nodes_[nodeI];
 
-        for (direction octant = 0; octant < nod.subNodes_.size(); octant++)
+        for (label octant = 0; octant < nod.subNodes_.size(); octant++)
         {
             nElems += countElements(nod.subNodes_[octant]);
         }
@@ -2583,7 +2584,7 @@ void Foam::indexedOctree<Type>::print
         << "parent:" << nod.parent_ << nl
         << "n:" << countElements(nodePlusOctant(nodeI, 0)) << nl;
 
-    for (direction octant = 0; octant < nod.subNodes_.size(); octant++)
+    for (label octant = 0; octant < nod.subNodes_.size(); octant++)
     {
         const treeBoundBox subBb(bb.subBbox(octant));
 
