@@ -280,6 +280,9 @@ public:
             //- Is the stop criterion reached
             bool stop(lduMatrix::solverPerformance& solverPerf) const;
 
+            //- Is the converrgence criterion reached
+            bool converged(lduMatrix::solverPerformance& solverPerf) const;
+
             //- Read the control parameters from the dictionary
             virtual void readControls();
 
