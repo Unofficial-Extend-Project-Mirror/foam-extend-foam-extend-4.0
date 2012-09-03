@@ -201,12 +201,6 @@ vector eigenValues(const tensor& t)
 
 vector eigenVector(const tensor& t, const scalar lambda)
 {
-    // Not sure if this is OK.  HJ, 9/Jul/2010
-//    if (mag(lambda) < SMALL)
-//    {
-//        return vector::zero;
-//    }
-
     // Construct the matrix for the eigenvector problem
     tensor A(t - lambda*I);
 
