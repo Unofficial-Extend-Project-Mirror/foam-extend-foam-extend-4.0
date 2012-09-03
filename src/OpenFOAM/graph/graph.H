@@ -209,16 +209,15 @@ public:
                     (),
                     ()
                 );
-                
 
                 // Selectors
-                
+
                     //- Return a reference to the selected writer
                     static autoPtr<writer> New
                     (
                         const word& writeFormat
                     );
-                
+
 
                 // Constructors
 

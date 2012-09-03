@@ -357,7 +357,8 @@ types() const
 
 
 template<class Type, template<class> class PatchField, class GeoMesh>
-typename Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricBoundaryField
+typename
+Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricBoundaryField
 Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricBoundaryField::
 boundaryInternalField() const
 {
@@ -402,7 +403,10 @@ typename Foam::BlockLduInterfaceFieldPtrsList<Type>::Type
 Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricBoundaryField::
 blockInterfaces() const
 {
-    typename BlockLduInterfaceFieldPtrsList<Type>::Type interfaces(this->size());
+    typename BlockLduInterfaceFieldPtrsList<Type>::Type interfaces
+    (
+        this->size()
+    );
 
     forAll (interfaces, patchi)
     {
@@ -411,7 +415,10 @@ blockInterfaces() const
             interfaces.set
             (
                 patchi,
-                &refCast<const BlockLduInterfaceField<Type> >(this->operator[](patchi))
+                &refCast<const BlockLduInterfaceField<Type> >
+                (
+                    this->operator[](patchi)
+                )
             );
         }
     }
