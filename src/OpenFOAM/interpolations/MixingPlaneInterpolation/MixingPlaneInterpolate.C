@@ -239,15 +239,15 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToSlave
     Field<Type>& result = tresult();
 
     interpolate
-        (
-            profileFF,                     // Master data in 'profile space'
-            masterPatchToProfileAddr(),    // From master: compute the average
-            masterPatchToProfileWeights(),
-            slaveProfileToPatchAddr(),     // To slave we distribute the average from
-            slaveProfileToPatchWeights(),  // profile to patch
-            result
-        );
-        
+    (
+        profileFF,                     // Master data in 'profile space'
+        masterPatchToProfileAddr(),    // From master: compute the average
+        masterPatchToProfileWeights(),
+        slaveProfileToPatchAddr(),     // To slave we distribute the average from
+        slaveProfileToPatchWeights(),  // profile to patch
+        result
+    );
+
     // Apply transform to bring the slave field back from 'profile space'
     // to 'patch space'
     transform(result, slaveProfileToPatchT(), result); // MB: We need this back
@@ -315,14 +315,14 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveToMaster
     Field<Type>& result = tresult();
         
     interpolate
-        (
-            profileFF,                     // Slave data in 'profile space'
-            slavePatchToProfileAddr(),     // From slave: compute the average
-            slavePatchToProfileWeights(),
-            masterProfileToPatchAddr(),    // To master: distribute the average
-            masterProfileToPatchWeights(),
-            result
-        );
+    (
+        profileFF,                     // Slave data in 'profile space'
+        slavePatchToProfileAddr(),     // From slave: compute the average
+        slavePatchToProfileWeights(),
+        masterProfileToPatchAddr(),    // To master: distribute the average
+        masterProfileToPatchWeights(),
+        result
+    );
         
     // Apply transform to bring the master field back from 'profile space'
     // to 'patch space'
@@ -389,14 +389,14 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToMaster
     Field<Type>& result = tresult();
         
     interpolate
-        (
-            profileFF,                      // Master data in 'profile space'
-            masterPatchToProfileAddr(),     // From master: compute the average
-            masterPatchToProfileWeights(),
-            masterProfileToPatchAddr(),    // To master: distribute the average
-            masterProfileToPatchWeights(),
-            result
-        );
+    (
+        profileFF,                      // Master data in 'profile space'
+        masterPatchToProfileAddr(),     // From master: compute the average
+        masterPatchToProfileWeights(),
+        masterProfileToPatchAddr(),    // To master: distribute the average
+        masterProfileToPatchWeights(),
+        result
+    );
         
     // Apply transform to bring the master field back from 'profile space'
     // to 'patch space'

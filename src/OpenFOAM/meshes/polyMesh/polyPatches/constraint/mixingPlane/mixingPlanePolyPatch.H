@@ -112,6 +112,15 @@ protected:
 
     // Protected Member functions
 
+        //- Is the mixing plane active? (zone and shadow present)
+//         bool active() const;
+
+        //- Initialise the calculation of the patch addressing
+        virtual void initAddressing();
+
+        //- Calculate the patch addressing
+        virtual void calcAddressing();
+
         //- Initialise the calculation of the patch geometry
         virtual void initGeometry();
 
