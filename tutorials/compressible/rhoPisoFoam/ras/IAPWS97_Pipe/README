@@ -1,0 +1,61 @@
+This tutorial is to show how the IAPWSThermo work in OpenFOAM
+
+
+
+
+//***********************INFORMATION TO TEST CASE*******************************//
+
+
+Important files in this case:
+
+1. thermophysicalProperties 
+
+--> see thermotype
+
+1. fvSolution 
+
+PISO subdict --> see the realFluid --> this must be true (see modification in the pEqn of rhoPisoFoam)
+
+2. controlDict: 
+
+the dynamic libraries used for the IAPWS 97 water properties are not directly link into OpenFOAM.
+Therefore, the dynamic libraries need to be defined in controlDict
+
+
+//************************NEW CODE NEEDED FOR THIS CASE*************************//
+
+1. Code in OpenFOAM: $WM_PROJECT_DIR/src/thermophysicalModels/externalMedia/
+   just run wmake libso in the folder
+
+2. FreeSteam: download the code @ http://freesteam.sourceforge.net/example.php
+   get the sourceCode --> I'm not sure of the packages work with this code 
+   see README.txt file to see what libraries you need to compile freeSteam
+
+
+//***********************Problems*******************************//
+
+If problems occur using the IAPWS 97 water properties, please check the following points
+
+
+1. have you suggesfully compiled freeSteam. 
+
+      a: If no, have you installed gsl, scons and so on (see README.txt in the freeSteam)
+      b: If yes, is the libfreesteam.so in a folder where OpenFOAM finds it e.g. $WM_PROJECT_DIR/lib/linux64GccDPOpt 
+         (last folder name depends on your machine, compiler ...)
+
+2. have you compiled the thermophysical models that connect freeSteam to OpenFOAM. They can be found in this folder: $WM_PROJECT_DIR/src/
+     thermophysicalModels/externalMedia/
+
+
+3. IS THE SOLVER STARTIGN TO RUN THE CASE? NO
+ 
+   check b23.c file at line 39 (or at least somewhere in the code:
+
+   if you find the following code:
+       return B23_N[4] + sqrt((pi - B23_N[5])/B23_N[3]) /* * 1{K} */;
+
+   change it to this:
+       return B23_N[4] + sqrt(fabs(pi - B23_N[5])/B23_N[3]) /* * 1{K} */;
+
+
+

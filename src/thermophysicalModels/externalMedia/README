@@ -1,0 +1,5 @@
+CL: 
+In this folder, thermodynamic classes similar to "hPsiThermo" are provided. These classes use external fluid property libraries e.g. freesteam for water.The classes are not directly linked into the basicThermophysicalModels dynamic library (see folder OpenFOAM-x.x/src/thermophysicalModels/basic). To use the code, add the dynamic library (the one you want to use from this folder + the one from the external library) in the controldict of your case
+
+
+
