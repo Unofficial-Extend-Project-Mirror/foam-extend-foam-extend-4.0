@@ -1,0 +1,15 @@
+#!/bin/sh
+
+currDir=`pwd`
+application=`basename $currDir`
+case="slidingBallIncr"
+
+tutorialPath=`dirname $0`/..
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+(cd $case; runApplication blockMesh)
+(cd $case; rm -rf constant/polyMesh/sets)
+(cd $case; rm -rf constant/polyMesh/*Zones)
+(cd $case; runApplication setSet -batch batch.setSet)
+(cd $case; runApplication setsToZones -noFlipMap)
+(cd $case; runApplication $application)

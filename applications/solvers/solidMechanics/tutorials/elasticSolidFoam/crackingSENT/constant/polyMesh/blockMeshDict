@@ -1,0 +1,109 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant/polyMesh";
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 0.001;
+
+vertices
+(
+ (0 0 0)
+ (0.1 0 0)
+ (1 0 0)
+ (0 0.45 0)
+ (0.1 0.5 0)
+ (1 0.5 0)
+ (0 1 0)
+ (0.1 1 0)
+ (1 1 0)
+
+ (0 0 0.1)
+ (0.1 0 0.1)
+ (1 0 0.1)
+ (0 0.45 0.1)
+ (0.1 0.5 0.1)
+ (1 0.5 0.1)
+ (0 1 0.1)
+ (0.1 1 0.1)
+ (1 1 0.1)
+
+ //- extra preCrack points
+ (0 0.55 0)
+ (0 0.55 0.1)
+);
+
+blocks
+(
+ // hex (0 1 4 3 9 10 13 12) (5 25 1) simpleGrading (1 1 1) // bottom left
+ //hex (1 2 5 4 10 11 14 13) (40 25 1) simpleGrading (1 1 1) // bottom right
+ hex (18 4 7 6 19 13 16 15) (5 25 1) simpleGrading (1 1 1) // top left
+ hex (4 5 8 7 13 14 17 16) (40 25 1) simpleGrading (1 1 1) // top right
+);
+
+edges
+(
+);
+
+patches
+(
+     patch cohesive
+     (
+      (4 5 14 13)
+     )
+
+    patch tracFree
+    (
+     (18 19 15 6)
+     //(0 9 12 3)
+     //(2 5 14 11)
+     (5 8 17 14)
+    )
+    patch preCrack
+    (
+     (19 18 4 13)
+     //(13 4 3 12)
+    )
+    patch top
+    (
+     (6 15 16 7)
+     (7 16 17 8)
+    )
+//     patch bottom
+//     (
+//      (0 1 10 9)
+//      (10 1 2 11)
+//     )
+    empty back
+    (
+     //(0 3 4 1)
+     //(1 4 5 2)
+     (18 6 7 4)
+     (4 7 8 5)
+     )
+
+    empty front
+    (
+     //(9 10 13 12)
+     //(10 11 14 13)
+     (19 13 16 15)
+     (13 14 17 16)
+    )
+);
+
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //

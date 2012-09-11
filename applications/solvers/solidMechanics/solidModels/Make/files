@@ -1,0 +1,59 @@
+boundaryConditions = fvPatchFields
+$(boundaryConditions)/solidDirectionMixed/solidDirectionMixedFvPatchVectorField.C
+$(boundaryConditions)/solidTraction/solidTractionFvPatchVectorField.C
+$(boundaryConditions)/solidTractionFree/solidTractionFreeFvPatchVectorField.C
+$(boundaryConditions)/timeVaryingSolidTraction/timeVaryingSolidTractionFvPatchVectorField.C
+
+$(boundaryConditions)/fixedDisplacement/fixedDisplacementFvPatchVectorField.C
+$(boundaryConditions)/fixedDisplacementZeroShear/fixedDisplacementZeroShearFvPatchVectorField.C
+$(boundaryConditions)/fixedRotation/fixedRotationFvPatchVectorField.C
+$(boundaryConditions)/timeVaryingFixedDisplacement/timeVaryingFixedDisplacementFvPatchVectorField.C
+
+$(boundaryConditions)/tractionDisplacement/tractionDisplacementFvPatchVectorField.C
+$(boundaryConditions)/cohesiveLaw/cohesiveLawFvPatchVectorField.C
+$(boundaryConditions)/cohesiveZone/cohesiveZoneFvPatchVectorField.C
+$(boundaryConditions)/cohesiveZoneIncremental/cohesiveZoneIncrementalFvPatchVectorField.C
+
+$(boundaryConditions)/analyticalPlateHoleTraction/analyticalPlateHoleTractionFvPatchVectorField.C
+
+contactModel = contactModel
+$(contactModel)/contactPatchPair.C
+$(contactModel)/contactPatchPairCorrect.C
+$(contactModel)/contactProblem.C
+
+rheologyModel/rheologyModel.C
+rheologyLaws = rheologyModel/rheologyLaws
+$(rheologyLaws)/rheologyLaw/rheologyLaw.C
+$(rheologyLaws)/rheologyLaw/newRheologyLaw.C
+$(rheologyLaws)/linearElastic/linearElastic.C
+$(rheologyLaws)/elasticPlastic/elasticPlastic.C
+$(rheologyLaws)/elasticNLPlastic/elasticNLPlastic.C
+$(rheologyLaws)/nonLinearElasticPlastic/nonLinearElasticPlastic.C
+$(rheologyLaws)/multiMaterial/multiMaterial.C
+$(rheologyLaws)/MaxwellViscoelastic/MaxwellViscoelastic.C
+$(rheologyLaws)/BurgersViscoelastic/BurgersViscoelastic.C
+$(rheologyLaws)/KelvinSLSViscoelastic/KelvinSLSViscoelastic.C
+$(rheologyLaws)/MaxwellSLSViscoelastic/MaxwellSLSViscoelastic.C
+$(rheologyLaws)/MaxwellElasticViscoelastic/MaxwellElasticViscoelastic.C
+$(rheologyLaws)/PronyViscoelastic/PronyViscoelastic.C
+
+plasticityModel/plasticityModel.C
+
+thermalModel/thermalModel.C
+thermalLaws = thermalModel/thermalLaws
+
+$(thermalLaws)/thermalLaw/thermalLaw.C
+$(thermalLaws)/thermalLaw/newThermalLaw.C
+$(thermalLaws)/constantThermal/constantThermal.C
+$(thermalLaws)/multiMaterialThermal/multiMaterialThermal.C
+
+cohesiveLaws/cohesiveLaw/cohesiveLaw.C
+cohesiveLaws/Dugdale/DugdaleCohesiveLaw.C
+cohesiveLaws/linear/linearCohesiveLaw.C
+cohesiveLaws/bilinear/bilinearCohesiveLaw.C
+
+interpolation/leastSquaresVolPointInterpolation/leastSquaresVolPointInterpolation.C
+
+solidInterface/solidInterface.C
+
+LIB = $(FOAM_USER_LIBBIN)/libsolidModels

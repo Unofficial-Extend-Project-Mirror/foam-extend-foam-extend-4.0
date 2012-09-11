@@ -1,0 +1,13 @@
+set terminal postscript enhanced color solid
+
+set output "force.ps"
+set xlabel "Time, t [s]"
+set ylabel "Force, F [N]"
+set grid
+
+plot [0.2:] "./history/0/historySolid.dat" using 1:5 title "Fx" with lines, \
+"./history/0/historySolid.dat" using 1:6 title "Fz" with lines
+
+
+#set output
+#set terminal x11

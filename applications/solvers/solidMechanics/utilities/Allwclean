@@ -1,0 +1,6 @@
+#!/bin/sh
+set -x
+
+wclean foamMeshToAbaqus
+wclean setMatFromCellZones
+wclean patchStressIntegrate

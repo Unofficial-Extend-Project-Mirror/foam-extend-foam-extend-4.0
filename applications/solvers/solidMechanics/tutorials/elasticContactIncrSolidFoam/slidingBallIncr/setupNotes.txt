@@ -1,0 +1,10 @@
+# delete old sets and zones
+rm -rf constant/polyMesh/sets
+rm -rf constant/polyMesh/*Zones
+
+# create new sets for contact patches
+# batch.setSet should have the correct patch names
+setSet -batch batch.setSet
+
+# create zones from sets
+setsToZones -noFlipMap

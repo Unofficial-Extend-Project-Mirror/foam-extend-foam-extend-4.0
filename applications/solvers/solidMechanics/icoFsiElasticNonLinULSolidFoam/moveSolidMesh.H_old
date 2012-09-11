@@ -1,0 +1,36 @@
+    if(min(J.internalField()) > 0)
+    {
+        Info << "\nMove solid mesh" << endl;
+
+        volPointInterpolation pointInterpolation(stressMesh);
+
+        // Calculate mesh points displacement
+        pointInterpolation.interpolate(DU, pointDU);
+
+        const vectorField& pointDUI = pointDU.internalField();
+
+        // Move mesh
+        vectorField newPoints = stressMesh.allPoints();
+
+        forAll(pointDUI, pointI)
+        {
+            newPoints[pointI] += pointDUI[pointI];
+        }
+
+        twoDPointCorrector twoDCorrector(stressMesh);
+        twoDCorrector.correctPoints(newPoints);
+        stressMesh.movePoints(newPoints);
+        stressMesh.V00();
+        stressMesh.moving(false);
+
+        // Rotate stress field (old Cauchy becomes new 2nd Piola)
+        //sigma  = 1/J * symm(F & sigma & F.T()); 
+
+        //rho = rho/J;
+    }
+    else
+    {
+        FatalErrorIn(args.executable())
+            << "Negative Jacobian"
+                << exit(FatalError);
+    }

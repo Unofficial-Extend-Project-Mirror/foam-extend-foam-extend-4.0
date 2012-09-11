@@ -1,0 +1,19 @@
+#!/bin/sh
+
+currDir=`pwd`
+application=`basename $currDir`
+cases="timeVaryingPlateHole plateHole crackingSENT"
+
+tutorialPath=`dirname $0`/..
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+for case in cases
+do
+    (cd $case; runApplication blockMesh)
+    (cd $case; runApplication $application)
+end
+
+case="bimaterialCase"
+(cd $case; runApplication blockMesh)
+(cd $case; runApplication setFields)
+(cd $case; runApplication $application)

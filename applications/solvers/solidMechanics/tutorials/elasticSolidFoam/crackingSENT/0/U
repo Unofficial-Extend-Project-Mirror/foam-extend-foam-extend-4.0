@@ -1,0 +1,71 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    location    "0";
+    object      DU;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+  top
+    {
+      type            timeVaryingFixedDisplacement;
+      fileName        "$FOAM_CASE/constant/timeVsTopDisp";
+      outOfBounds     clamp;
+      value           uniform (0 0 0);
+    }
+
+  cohesive
+    {
+
+      type             cohesiveZone;
+      cohesiveLaw      Dugdale;
+      relaxationFactor 0.9;
+      DugdaleCoeffs
+	{
+	  GIc             GIc [ 1 0 -2 0 0 0 0 ] 10;
+	  sigmaMax        sigmaMax [ 1 -1 -2 0 0 0 0 ] 1000e+06;
+	}
+      value           uniform (0 0 0);
+    }
+
+  bottom
+    {
+      type  fixedDisplacement;
+      value uniform (0 0 0);
+    }
+
+    tracFree
+    {
+        type            solidTractionFree;
+        value           uniform (0 0 0);
+    }
+    preCrack
+    {
+        type            solidTractionFree;
+    }
+    front
+    {
+        type            empty;
+    }
+    back
+    {
+        type            empty;
+    }
+}
+
+// ************************************************************************* //

@@ -1,0 +1,9 @@
+EXE_INC = \
+    -I$(FOAM_SRC)/finiteVolume/lnInclude \
+    -I$(FOAM_SRC)/dynamicMesh/lnInclude \
+    -I../materialModels/lnInclude
+
+EXE_LIBS = \
+    -L$(FOAM_USER_LIBBIN) \
+    -lfiniteVolume \
+    -lmaterialModels_philipc

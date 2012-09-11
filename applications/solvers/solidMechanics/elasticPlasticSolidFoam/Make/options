@@ -1,0 +1,8 @@
+EXE_INC = \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I../solidModels/lnInclude
+
+EXE_LIBS = \
+    -lfiniteVolume \
+    -llduSolvers \
+    -L$(FOAM_USER_LIBBIN) -lsolidModels

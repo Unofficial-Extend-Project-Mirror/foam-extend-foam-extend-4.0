@@ -1,0 +1,15 @@
+EXE_INC = \
+//    -I../../../myLibraries/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I../materialModels/lnInclude \
+    -I./solidInterface
+//    -I./patchToPatchInterpolation
+
+EXE_LIBS = \
+    -L$(FOAM_USER_LIBBIN) \
+//    -lfiniteVolume_philipc \
+//    -lfiniteVolume \
+    -lmaterialModels_philipc \
+    -llduSolvers \
+    -lmeshTools
