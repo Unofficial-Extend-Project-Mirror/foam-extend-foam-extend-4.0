@@ -7,8 +7,6 @@ case="HronTurekFsi"
 tutorialPath=`dirname $0`/..
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
-(cd $case/fluid; tar -xzf polyMesh.tgz)
-(cd $case/solid; tar -xzf polyMesh.tgz)
 (cd $case/fluid; runApplication setSet -case fluid -batch fluid/batch.setSet)
 (cd $case/fluid; runApplication setsToZones -case fluid -noFlipMap)
 (cd $case/solid; runApplication setSet -case solid -batch solid/batch.setSet)

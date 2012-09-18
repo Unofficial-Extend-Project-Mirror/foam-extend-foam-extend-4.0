@@ -7,6 +7,6 @@ case="HronTurekFsi"
 tutorialPath=`dirname $0`/..
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions
 
-(cd $case/fluid; cleanCase)
-(cd $case/solid; cleanCase)
+(cd $case/fluid; cleanTimeDirectories)
+(cd $case/solid; cleanTimeDirectories)
 (cd $case; ./removeSerialLinks fluid solid)
