@@ -3,7 +3,7 @@ EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(FOAM_SRC)/lagrangian/basic/lnInclude \
     -I$(FOAM_SRC)/VectorN/lnInclude \
-    -I../../solidModels/lnInclude
+    -I../solidModels/lnInclude
 
 EXE_LIBS = \
     -lmeshTools \

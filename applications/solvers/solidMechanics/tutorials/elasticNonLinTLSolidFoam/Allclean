@@ -2,7 +2,7 @@
 
 currDir=`pwd`
 application=`basename $currDir`
-cases="nonLinBlock largeStrainCantileverBeam"
+cases="nonLinBlock largeStrainCantileverBeam rotateSphereTL"
 
 tutorialPath=`dirname $0`/..
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions

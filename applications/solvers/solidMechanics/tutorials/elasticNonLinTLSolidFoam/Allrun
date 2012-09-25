@@ -12,3 +12,7 @@ do
     (cd $case; runApplication blockMesh)
     (cd $case; runApplication $application)
 done
+
+case="rotateSphereTL"
+    (cd $case; runApplication fluent3dMeshToFoam rotateSphere.msh)
+    (cd $case; runApplication $application)

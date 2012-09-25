@@ -1,0 +1,46 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    U
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-13;
+        relTol          0.1;
+    }
+}
+
+stressedFoam
+{
+    nCorrectors     10000;
+    U              1e-6;
+
+    divSigmaExp             surface;
+    divSigmaLargeStrainExp  surface;
+    //moveMeshMethod           inverseDistance;
+    moveMeshMethod           leastSquares;
+    solidInterface           no;
+}
+
+// relaxationFactors
+// {
+//   U 0.9;
+//   divDSigmaExpLargeStrain 0.75;
+// }
+// ************************************************************************* //
