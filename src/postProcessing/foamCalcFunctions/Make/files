@@ -1,6 +1,7 @@
 calcType/calcType.C
 calcType/newCalcType.C
 
+field/domainIntegrate/domainIntegrate.C
 field/components/components.C
 field/componentsTurbo/componentsTurbo.C
 field/mag/mag.C
