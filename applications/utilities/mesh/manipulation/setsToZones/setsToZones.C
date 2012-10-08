@@ -30,11 +30,7 @@ Description
     condition which denotes the side of the face.  This application
     reads a cellSet (xxxMasterCells if 'xxx' is the name of the faceSet) which
     is the masterCells of the zone.  Master cell is the one IN FRONT of the
-<<<<<<< HEAD
-    face, ie. the one INTO which the face normal points.  If master cells are
-=======
     face, ie. the one into which the face normal points.  If master cells are
->>>>>>> parallelTopo
     not found, take faces without a flip
 
     If one is not interested in sidedness specify the -noFlipMap
