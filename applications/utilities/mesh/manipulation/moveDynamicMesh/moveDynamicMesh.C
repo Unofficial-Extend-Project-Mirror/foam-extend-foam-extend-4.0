@@ -40,10 +40,15 @@ using namespace Foam;
 
 int main(int argc, char *argv[])
 {
+    argList::validOptions.insert("checkFrequency", "");
 
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createDynamicFvMesh.H"
+
+    // Read check frequency
+    label checkFrequency = 1;
+    args.optionReadIfPresent("checkFrequency", checkFrequency);
 
     while (runTime.loop())
     {

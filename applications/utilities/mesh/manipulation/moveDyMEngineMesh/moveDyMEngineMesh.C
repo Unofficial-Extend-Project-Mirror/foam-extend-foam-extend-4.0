@@ -42,13 +42,19 @@ Author
 
 int main(int argc, char *argv[])
 {
+    argList::validOptions.insert("checkFrequency", "");
+
 #   include "setRootCase.H"
 #   include "createEngineTime.H"
 #   include "createEngineDynamicMesh.H"
 
+    // Read check frequency
+    label checkFrequency = 1;
+
+    args.optionReadIfPresent("checkFrequency", checkFrequency);
 
     fileName path = runTime.caseName();
-    OFstream volFile(path+"/totVol.Cyl");
+    OFstream volFile(path + "/totVol.Cyl");
 
     while (runTime.loop())
     {
@@ -66,7 +72,11 @@ int main(int argc, char *argv[])
 
 #       include "checkVolContinuity.H"
 
-        if(checkEngineMesh)
+        if
+        (
+            checkEngineMesh
+         && (runTime.timeIndex() % checkFrequency == 0)
+        )
         {
             mesh.checkMesh(true);
         }
