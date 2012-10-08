@@ -40,7 +40,7 @@ using namespace Foam;
 
 int main(int argc, char *argv[])
 {
-    argList::validOptions.insert("checkFrequency", "");
+    argList::validOptions.insert("checkFrequency", "int");
 
 #   include "setRootCase.H"
 #   include "createTime.H"
@@ -64,7 +64,10 @@ int main(int argc, char *argv[])
 
 #       include "checkVolContinuity.H"
 
-        mesh.checkMesh(true);
+        if (runTime.timeIndex() % checkFrequency == 0)
+        {
+            mesh.checkMesh(true);
+        }
 
         runTime.write();
 

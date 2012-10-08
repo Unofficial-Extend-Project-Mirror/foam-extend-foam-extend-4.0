@@ -42,7 +42,7 @@ Author
 
 int main(int argc, char *argv[])
 {
-    argList::validOptions.insert("checkFrequency", "");
+    argList::validOptions.insert("checkFrequency", "int");
 
 #   include "setRootCase.H"
 #   include "createEngineTime.H"
@@ -50,7 +50,6 @@ int main(int argc, char *argv[])
 
     // Read check frequency
     label checkFrequency = 1;
-
     args.optionReadIfPresent("checkFrequency", checkFrequency);
 
     fileName path = runTime.caseName();
