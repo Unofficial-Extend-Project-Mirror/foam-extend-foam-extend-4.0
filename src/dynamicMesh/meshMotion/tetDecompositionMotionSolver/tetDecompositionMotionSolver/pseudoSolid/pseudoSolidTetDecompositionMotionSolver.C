@@ -105,7 +105,7 @@ void Foam::pseudoSolidTetDecompositionMotionSolver::solve()
           + tetFem::laplacianTranspose(diffusion().motionGamma(), motionU())
           + tetFem::laplacianTrace
             (
-                (2*nu_/(1+2*nu_))*diffusion().motionGamma(), 
+                (2*nu_/(1 + 2*nu_))*diffusion().motionGamma(), 
                 motionU()
             )
         );
