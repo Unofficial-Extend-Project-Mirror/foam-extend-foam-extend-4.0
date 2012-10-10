@@ -55,7 +55,7 @@ int mapVertex(::List<int>& collapse_map, int a, int mx)
     }
     while (a >= mx)
     {  
-	a = collapse_map[a];
+        a = collapse_map[a];
     }
     return a;
 }
