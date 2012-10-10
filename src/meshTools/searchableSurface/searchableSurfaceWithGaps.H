@@ -66,7 +66,7 @@ private:
 
     // Private Member Data
 
-        //- gap size in meter
+        //- Gap size in meter
         const scalar gap_;
 
         //- Underlying geometry (size 1)
