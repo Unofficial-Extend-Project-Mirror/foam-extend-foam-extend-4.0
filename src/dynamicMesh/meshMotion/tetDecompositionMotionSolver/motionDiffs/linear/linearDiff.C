@@ -94,11 +94,10 @@ Foam::tmp<Foam::scalarField> Foam::linearDiff::L() const
 
     if (patchSet.size() > 0)
     {
-        return
-            tmp<scalarField>
-            (
-                new scalarField(patchWave(m, patchSet, false).distance())
-            );
+        return tmp<scalarField>
+        (
+            new scalarField(patchWave(m, patchSet, false).distance())
+        );
     }
     else
     {
