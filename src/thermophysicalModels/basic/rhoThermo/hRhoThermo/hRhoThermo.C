@@ -102,7 +102,11 @@ void Foam::hRhoThermo<MixtureType>::calculate()
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class MixtureType>
-Foam::hRhoThermo<MixtureType>::hRhoThermo(const fvMesh& mesh, const objectRegistry& obj)
+Foam::hRhoThermo<MixtureType>::hRhoThermo
+(
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
 :
     basicRhoThermo(mesh, obj),
     MixtureType(*this, mesh, obj),
