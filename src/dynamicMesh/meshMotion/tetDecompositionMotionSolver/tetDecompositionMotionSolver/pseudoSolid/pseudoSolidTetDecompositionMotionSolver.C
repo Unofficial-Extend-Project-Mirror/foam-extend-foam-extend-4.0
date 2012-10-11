@@ -99,13 +99,16 @@ void Foam::pseudoSolidTetDecompositionMotionSolver::solve()
     {
         Pout << "Correction: " << ++iCorr << endl;
 
+        tetPointVectorField& U = motionU();
+        const elementScalarField& mu = diffusion().motionGamma();
+
         tetFemVectorMatrix motionEqn
         (
-            tetFem::laplacian(diffusion().motionGamma(), motionU())
-          + tetFem::laplacianTranspose(diffusion().motionGamma(), motionU())
+            tetFem::laplacian(mu, U)
+          + tetFem::laplacianTranspose(mu, U)
           + tetFem::laplacianTrace
             (
-                (2*nu_/(1 + 2*nu_))*diffusion().motionGamma(), 
+                (2*nu_/(1 - 2*nu_))*mu, 
                 motionU()
             )
         );
