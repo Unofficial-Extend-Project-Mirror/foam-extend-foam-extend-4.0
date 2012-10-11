@@ -27,6 +27,7 @@ License
 #include "MRFZones.H"
 #include "Time.H"
 #include "fvMesh.H"
+#include "fvc.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -85,9 +86,9 @@ Foam::tmp<Foam::surfaceScalarField> Foam::MRFZones::fluxCorrection() const
     return tMRFZonesPhiCorr;
 }
 
-Foam::tmp<Foam::surfaceVectorField> Foam::MRFZones::faceU() const
+Foam::tmp<Foam::surfaceVectorField> Foam::MRFZones::meshPhi() const
 {
-    tmp<surfaceVectorField> tMRFZonesFaceU
+    tmp<surfaceVectorField> tMRFZonesPhiCorr
     (
         new surfaceVectorField
         (
@@ -103,14 +104,14 @@ Foam::tmp<Foam::surfaceVectorField> Foam::MRFZones::faceU() const
             dimensionedVector("zero", dimVelocity, vector::zero)
         )
     );
-    surfaceVectorField& MRFZonesFaceU = tMRFZonesFaceU();
+    surfaceVectorField& MRFZonesPhiCorr = tMRFZonesPhiCorr();
 
     forAll(*this, i)
     {
-        operator[](i).faceU(MRFZonesFaceU);
+        operator[](i).meshPhi(MRFZonesPhiCorr);
     }
 
-    return tMRFZonesFaceU;
+    return tMRFZonesPhiCorr;
 }
 
 void Foam::MRFZones::addCoriolis(fvVectorMatrix& UEqn) const
@@ -205,5 +206,74 @@ void Foam::MRFZones::correctBoundaryVelocity(volVectorField& U) const
     }
 }
 
+
+Foam::tmp<Foam::volScalarField> Foam::MRFZones::Su
+(
+    const volScalarField& phi
+) const
+{
+    tmp<volScalarField> tPhiSource
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                phi.name() + "Source",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimensionedScalar("zero", phi.dimensions()/dimTime, 0),
+            zeroGradientFvPatchScalarField::typeName
+        )
+    );
+    volScalarField& source = tPhiSource();
+
+    volVectorField gradPhi = fvc::grad(phi);
+
+    forAll(*this, i)
+    {
+        operator[](i).Su(phi, gradPhi, source);
+    }
+
+    return tPhiSource;
+}
+
+
+Foam::tmp<Foam::volVectorField> Foam::MRFZones::Su
+(
+    const volVectorField& phi
+) const
+{
+    tmp<volVectorField> tPhiSource
+    (
+        new volVectorField
+        (
+            IOobject
+            (
+                phi.name() + "Source",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimensionedVector("zero", phi.dimensions()/dimTime, vector::zero),
+            zeroGradientFvPatchVectorField::typeName
+        )
+    );
+    volVectorField& source = tPhiSource();
+
+    volTensorField gradPhi = fvc::grad(phi);
+
+    forAll(*this, i)
+    {
+        operator[](i).Su(phi, gradPhi, source);
+    }
+
+    return tPhiSource;
+}
 
 // ************************************************************************* //
