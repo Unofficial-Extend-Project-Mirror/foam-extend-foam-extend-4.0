@@ -47,7 +47,7 @@ namespace Foam
 // Forward declaration of classes
 
 /*---------------------------------------------------------------------------*\
-                           Class searchableSurfaces Declaration
+                      Class searchableSurfaces Declaration
 \*---------------------------------------------------------------------------*/
 
 class searchableSurfaces
