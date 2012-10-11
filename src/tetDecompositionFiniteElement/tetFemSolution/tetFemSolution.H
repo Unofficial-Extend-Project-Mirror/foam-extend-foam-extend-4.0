@@ -44,13 +44,17 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class tetFemSolution Declaration
+                        Class tetFemSolution Declaration
 \*---------------------------------------------------------------------------*/
 
 class tetFemSolution
-:
-    public solution
 {
+    // Private data
+
+        //- Solver settings
+        solution solutionDict_;
+
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct and assignment
@@ -65,8 +69,18 @@ public:
         //- Construct from objectRegistry
         tetFemSolution(const objectRegistry& obr)
         :
-            solution(obr, "tetFemSolution")
+            solutionDict_(obr, "tetFemSolution")
         {}
+
+
+    // Member functions
+
+        //- Return access to solver settings
+        const solution& solutionDict() const
+        {
+            return solutionDict_;
+        }
+
 };
 
 

@@ -300,17 +300,24 @@ tmp<Field<Type> > tetFemMatrix<Type>::distributeSource
     const tetPolyMesh& mesh = psi().mesh();
 
     // Make a field over all points
-    tmp<Field<Type> > tdistSu(mesh.nPoints(), pTraits<Type>::zero);
+    tmp<Field<Type> > tdistSu
+    (
+        new Field<Type>
+        (
+            mesh.nPoints(),
+            pTraits<Type>::zero
+        )
+    );
     Field<Type>& distSu = tdistSu();
 
     // Go through all the tets and add a quarter of the volume times ef
     // into each of the vertices. The cell integrals are prepared by the mesh
     labelList localToGlobalBuffer(mesh.maxNPointsForCell());
-    labelList globalToLocalBuffer(lduAddr.size(), -1);
+    labelList globalToLocalBuffer(lduAddr().size(), -1);
 
     scalarField coeffsBuffer
     (
-        this->mesh.maxNTetsForCell()*tetPointRef::nVertices
+        mesh.maxNPointsForCell()*tetPointRef::nVertices
     );
 
     for (label cellI = 0; cellI < mesh.nCells(); cellI++)

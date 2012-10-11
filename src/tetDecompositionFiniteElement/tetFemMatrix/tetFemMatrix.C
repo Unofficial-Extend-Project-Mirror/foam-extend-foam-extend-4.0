@@ -226,7 +226,7 @@ void tetFemMatrix<Type>::relax()
 {
     scalar alpha = 0;
 
-    if (psi_.mesh().relax(psi_.name()))
+    if (psi_.mesh().solutionDict().relax(psi_.name()))
     {
         alpha = psi_.mesh().solutionDict().relaxationFactor(psi_.name());
     }
@@ -310,7 +310,7 @@ void tetFemMatrix<Type>::operator+=
 )
 {
     checkMethod(*this, su, "+=");
-    source() -= distributeField(su.internalField());
+    source() -= distributeSource(su.internalField());
 }
 
 
@@ -351,7 +351,7 @@ void tetFemMatrix<Type>::operator-=
 )
 {
     checkMethod(*this, su, "-=");
-    source() += distributeField(su.internalField());
+    source() += distributeSource(su.internalField());
 }
 
 
@@ -373,7 +373,7 @@ void tetFemMatrix<Type>::operator+=
 )
 {
     checkMethod(*this, su, "+=");
-    source() -= distributeField(Field<Type>(psi.mesh().nCells(), su.value()));
+    source() -= distributeSource(Field<Type>(psi.mesh().nCells(), su.value()));
 }
 
 
@@ -384,7 +384,7 @@ void tetFemMatrix<Type>::operator-=
 )
 {
     checkMethod(*this, su, "-=");
-    source() += distributeField(Field<Type>(psi.mesh().nCells(), su.value()));
+    source() += distributeSource(Field<Type>(psi.mesh().nCells(), su.value()));
 }
 
 
@@ -453,7 +453,7 @@ void checkMethod
     if
     (
         dimensionSet::debug
-     && tetFem.dimensions()/dimVolume != vf.dimensions()
+     && tetFem.dimensions() != vf.dimensions()
     )
     {
         FatalErrorIn
@@ -483,7 +483,7 @@ void checkMethod
     if
     (
         dimensionSet::debug
-     && tetFem.dimensions()/dimVolume != dt.dimensions()
+     && tetFem.dimensions() != dt.dimensions()
     )
     {
         FatalErrorIn

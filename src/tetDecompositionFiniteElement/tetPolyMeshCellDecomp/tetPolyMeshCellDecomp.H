@@ -209,6 +209,12 @@ public:
 
         // Access
 
+            //- Return the top-level database
+            const Time& time() const
+            {
+                return mesh_.time();
+            }
+
             //- Return the object registry
             virtual const objectRegistry& thisDb() const
             {
