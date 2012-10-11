@@ -74,7 +74,7 @@ void Foam::fanFvPatchField<Foam::scalar>::updateCoeffs()
                 );
         }
 
-        for(label i=1; i<f_.size(); i++)
+        for (label i = 1; i < f_.size(); i++)
         {
             jump_ += f_[i]*pow(Un, i);
         }

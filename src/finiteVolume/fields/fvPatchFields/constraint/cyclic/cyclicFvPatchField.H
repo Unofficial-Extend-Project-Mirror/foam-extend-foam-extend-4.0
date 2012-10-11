@@ -165,6 +165,7 @@ public:
                 const Pstream::commsTypes commsType
             ) const;
 
+
         // Block coupled interface functionality
 
             //- Update result field based on interface functionality
@@ -177,8 +178,13 @@ public:
                 const Pstream::commsTypes commsType
             ) const
             {
-                notImplemented("cyclicFvPatchField<Type>::updateInterfaceMatrix for block matrices")
+                notImplemented
+                (
+                    "cyclicFvPatchField<Type>::"
+                    "updateInterfaceMatrix for block matrices"
+                );
             }
+
 
         //- Cyclic coupled interface functions
 

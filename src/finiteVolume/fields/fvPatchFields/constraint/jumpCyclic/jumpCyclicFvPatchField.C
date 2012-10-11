@@ -112,7 +112,7 @@ tmp<Field<Type> > jumpCyclicFvPatchField<Type>::patchNeighbourField() const
 
     if (this->doTransform())
     {
-        for (label facei=0; facei<sizeby2; facei++)
+        for (label facei = 0; facei < sizeby2; facei++)
         {
             pnf[facei] = transform
             (
@@ -127,7 +127,7 @@ tmp<Field<Type> > jumpCyclicFvPatchField<Type>::patchNeighbourField() const
     }
     else
     {
-        for (label facei=0; facei<sizeby2; facei++)
+        for (label facei = 0; facei < sizeby2; facei++)
         {
             pnf[facei] = iField[faceCells[facei + sizeby2]] - jf[facei];
             pnf[facei + sizeby2] = iField[faceCells[facei]] + jf[facei];
@@ -159,7 +159,7 @@ void jumpCyclicFvPatchField<Type>::updateInterfaceMatrix
         // Get component of jump.  HJ, 11/Aug/2009
         const Field<scalar> jf = jump()().component(cmpt);
 
-        for (label facei=0; facei<sizeby2; facei++)
+        for (label facei = 0; facei < sizeby2; facei++)
         {
             pnf[facei] = psiInternal[faceCells[facei + sizeby2]] - jf[facei];
             pnf[facei + sizeby2] = psiInternal[faceCells[facei]] + jf[facei];
@@ -167,7 +167,7 @@ void jumpCyclicFvPatchField<Type>::updateInterfaceMatrix
     }
     else
     {
-        for (label facei=0; facei<sizeby2; facei++)
+        for (label facei = 0; facei < sizeby2; facei++)
         {
             pnf[facei] = psiInternal[faceCells[facei + sizeby2]];
             pnf[facei + sizeby2] = psiInternal[faceCells[facei]];
