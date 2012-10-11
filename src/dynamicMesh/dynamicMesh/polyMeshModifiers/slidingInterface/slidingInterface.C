@@ -30,7 +30,7 @@ Description
     Sliding interface
 
 Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved.  Copyright Hrvoje Jasak.
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
