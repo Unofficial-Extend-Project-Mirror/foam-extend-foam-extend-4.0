@@ -124,6 +124,7 @@ class nasaHeatCapacityPolynomial
     // Private member functions
 
         //- Construct from components
+        //CL: used for the operator+
         inline nasaHeatCapacityPolynomial
         (
             const equationOfState& st,
@@ -136,6 +137,24 @@ class nasaHeatCapacityPolynomial
             const scalar a7
 	);
 
+        //- Construct from components
+        //CL: used for the operator*
+        inline nasaHeatCapacityPolynomial
+        (
+            const equationOfState& st,
+            const scalar a1,
+            const scalar a2,
+            const scalar a3,
+            const scalar a4,
+            const scalar a5,
+            const scalar a6,
+            const scalar a7,
+            const scalar e0_std_,
+            const scalar s0_std_,
+            const scalar integral_p_dv_std_,
+            const scalar integral_dpdT_dv_std_,
+            const scalar cp_std_
+        );
 
 public:
 

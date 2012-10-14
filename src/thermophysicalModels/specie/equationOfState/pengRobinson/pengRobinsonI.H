@@ -450,13 +450,14 @@ inline scalar pengRobinson::Z( const scalar p, const scalar T,const scalar rho0)
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
-/*
+
 inline void pengRobinson::operator+=(const pengRobinson& pr)
 {
     specie::operator+=(pr);
 }
 
-	inline void pengRobinson::operator-=(const pengRobinson& pr)
+/*
+inline void pengRobinson::operator-=(const pengRobinson& pr)
 {
     specie::operator-=(pr);
 }

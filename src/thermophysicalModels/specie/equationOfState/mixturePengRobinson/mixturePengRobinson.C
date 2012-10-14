@@ -49,8 +49,18 @@ mixturePengRobinson::mixturePengRobinson(Istream& is)
     numOfComp(1),
     singleComponent(1)
 { 
-    //CL: Save a pointer of this object in the mixtureComponents array
-    mixtureComponents.push_back(this);
+    //CL: set size of weigths, mixtureComponents ... to 10,
+    //CL: when more mixture componentents are used
+    //CL: size of the DynamicLis increases automatically
+    weigths.setSize(10);
+    mixtureComponents.setSize(10);
+    aComponents.setSize(10);
+    daComponents.setSize(10);
+    d2aComponents.setSize(10);
+
+    //Save a pointer of this object in the mixtureComponents array
+    mixtureComponents[0]=this;
+
     is.check("mixturePengRobinson::mixturePengRobinson(Istream& is)");
 }
 

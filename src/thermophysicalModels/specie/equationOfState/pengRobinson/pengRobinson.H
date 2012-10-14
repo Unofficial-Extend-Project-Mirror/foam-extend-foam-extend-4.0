@@ -216,9 +216,9 @@ public:
 
     // Member operators
 
-        /*
         inline void operator+=(const pengRobinson&);
 
+        /*
         inline void operator-=(const pengRobinson&);
 
         inline void operator*=(const scalar);

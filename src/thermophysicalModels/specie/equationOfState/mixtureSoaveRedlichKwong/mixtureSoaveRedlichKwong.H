@@ -52,8 +52,8 @@ Germany
 #include "specie.H"
 #include "autoPtr.H"
 #include "soaveRedlichKwong.H"
+#include "DynamicList.H"
 #include "scalarList.H"
-#include <vector>
 #include "label.H"
 #include "List.H"
 #include "dictionary.H"
@@ -81,19 +81,19 @@ protected:
   
     //CL: save the concentrations of each component of the mixture
     //CL: needs to be multiplied by this->W() to get the molar fractions
-    mutable std::vector<scalar> weigths;
+    mutable DynamicList<scalar> weigths;
     
     //CL: stores the values of a(T) of all componentes
-    mutable std::vector<scalar> aComponents;
+    mutable DynamicList<scalar> aComponents;
 
     //CL: stores the values of the derivatives of da/dT of all componentes
-    mutable std::vector<scalar> daComponents;
+    mutable DynamicList<scalar> daComponents;
 
     //CL: stores the values of the second order derivatives of d2a/dT2 of all componentes
-    mutable std::vector<scalar> d2aComponents;
+    mutable DynamicList<scalar> d2aComponents;
     
     //CL: saves a pointer to the pure component classes of the mixture
-    mutable std::vector<mixtureSoaveRedlichKwong*> mixtureComponents;
+    mutable DynamicList<mixtureSoaveRedlichKwong*> mixtureComponents;
    
     //CL: counts the number of components
     mutable label numOfComp;
@@ -113,8 +113,8 @@ public:
         (
             const soaveRedlichKwong& srk,
             label numOfComp,
-            std::vector<scalar> weigths,
-            std::vector<mixtureSoaveRedlichKwong*> mixtureComponents,
+            DynamicList<scalar> weigths,
+            DynamicList<mixtureSoaveRedlichKwong*> mixtureComponents,
             scalar a0, 
             scalar b,
             scalar Tcrit,
@@ -128,8 +128,8 @@ public:
         (
             const soaveRedlichKwong& srk,
             label numOfComp,
-            std::vector<scalar> weigths,
-            std::vector<mixtureSoaveRedlichKwong*> mixtureComponents
+            DynamicList<scalar> weigths,
+            DynamicList<mixtureSoaveRedlichKwong*> mixtureComponents
         );
 
         //- Construct from Istream
@@ -209,6 +209,9 @@ public:
             const scalar rho0
         ) const;
 
+  // Member operators
+
+        inline void operator+=(const mixtureSoaveRedlichKwong&);
 
   // Friend operators
 

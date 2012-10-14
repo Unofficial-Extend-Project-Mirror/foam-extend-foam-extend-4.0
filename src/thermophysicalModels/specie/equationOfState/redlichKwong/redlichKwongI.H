@@ -386,14 +386,14 @@ inline scalar redlichKwong::Z
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
-/*
+
 
 inline void redlichKwong::operator+=(const redlichKwong& rk)
 {
     specie::operator+=(rk);
 }
 
-
+/*
 inline void redlichKwong::operator-=(const redlichKwong& rk)
 {
     specie::operator-=(rk);

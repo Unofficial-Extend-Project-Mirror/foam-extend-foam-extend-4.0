@@ -45,8 +45,8 @@ inline mixturePengRobinson::mixturePengRobinson
 (
     const pengRobinson& pr,
     label numOfComp,
-    std::vector<scalar> weigths,
-    std::vector<mixturePengRobinson*> mixtureComponents,
+    DynamicList<scalar> weigths,
+    DynamicList<mixturePengRobinson*> mixtureComponents,
     scalar a0,
     scalar b,
     scalar Tcrit,
@@ -73,8 +73,8 @@ inline mixturePengRobinson::mixturePengRobinson
 (
     const pengRobinson& pr,
     label numOfComp,
-    std::vector<scalar> weigths,
-    std::vector<mixturePengRobinson*> mixtureComponents
+    DynamicList<scalar> weigths,
+    DynamicList<mixturePengRobinson*> mixtureComponents
 )
 : 
     pengRobinson(pr),
@@ -85,6 +85,8 @@ inline mixturePengRobinson::mixturePengRobinson
     
 {
     TSave=0.0;
+    //CL: following three DynamicList have no size in the new object
+    //CL: resize DynamicList
     aComponents.resize(numOfComp);
     daComponents.resize(numOfComp);
     d2aComponents.resize(numOfComp);
@@ -133,9 +135,9 @@ inline void mixturePengRobinson::updateModelCoefficients(const  scalar T) const
             //CL: filling vector a, dadT and d2adT2
             for (i=0;i<numOfComp;i++)
             {
-                aComponents.at(i)=mixtureComponents[i]->a(T);
-                daComponents.at(i)=mixtureComponents[i]->dadT(T);
-                d2aComponents.at(i)=mixtureComponents[i]->d2adT2(T);
+                aComponents[i]=mixtureComponents[i]->a(T);
+                daComponents[i]=mixtureComponents[i]->dadT(T);
+                d2aComponents[i]=mixtureComponents[i]->d2adT2(T);
             }
 
             for (i=0;i<numOfComp;i++)
@@ -177,6 +179,7 @@ inline void mixturePengRobinson::updateModelCoefficients(const  scalar T) const
             }
         }
     }
+
 }
 
 
@@ -330,7 +333,6 @@ inline scalar mixturePengRobinson::rho
 ) const
 {
     updateModelCoefficients(T);
-
     return pengRobinson::rho(p,T,rho0);
 }
 
@@ -363,6 +365,39 @@ inline scalar mixturePengRobinson::Z
     return pengRobinson::Z(p,T,rho0);
 }
 
+// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
+
+
+inline void mixturePengRobinson::operator+=(const mixturePengRobinson& pr)
+{
+    //CL: Resizes the DynamicList if number of compontens is larger than the DynamicList
+    if((weigths.size()<numOfComp+1)||(mixtureComponents.size()<numOfComp+1))
+    {
+        weigths.setSize(2*numOfComp);
+        mixtureComponents.setSize(2*numOfComp);
+    }
+  
+    //Cl: oldClass+=pr 
+    //CL: Saving the object pointer and weigths of pr (which is @ mixtureComponents[0] and weigths[0]) at the numOfComp's value of the oldClass 
+    weigths[numOfComp]=pr.weigths[0];
+    mixtureComponents[numOfComp]=pr.mixtureComponents[0];
+
+    pengRobinson::operator+=(pr);
+
+    //CL: increase number of Components by 1
+    numOfComp=numOfComp+1;
+
+    //CL: resize DynamicList so that they have a defined size in the mixture object
+    aComponents.resize(numOfComp);
+    daComponents.resize(numOfComp);
+    d2aComponents.resize(numOfComp);
+
+    //CL: setting TSave=0--> results that all coefficients (a, da, d2a) are calculated in updateModelCoefficients
+    TSave=0.0;
+    singleComponent=0;
+    rhostd_=this->rho(Pstd, Tstd, Pstd*this->W()/(Tstd*this->R()));
+}
+
 
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
@@ -373,13 +408,20 @@ inline mixturePengRobinson operator+
 )
 {
     //CL:save both a pointer to the objector pr1 and pr2 and the weights in the new object
-    std::vector<scalar> weigths=pr1.weigths;
-    std::vector<mixturePengRobinson*> mixtureComponents=pr1.mixtureComponents;
+    DynamicList<scalar> weigths=pr1.weigths;
+    DynamicList<mixturePengRobinson*> mixtureComponents=pr1.mixtureComponents;
+
+    //CL: Resizes the DynamicList if number of compontens is larger than the DynamicList
+    if((weigths.size()<pr1.numOfComp+1)||(mixtureComponents.size()<pr1.numOfComp+1))
+    {
+        weigths.setSize(2*pr1.numOfComp);
+        mixtureComponents.setSize(2*pr1.numOfComp);
+    }
 
     //CL: Getting the new weigths and mixtureComponents lists, 
     //CL: Saving the object pointer and weigths of pr2 (which is @ mixtureComponents[0] and weigths[0]) at the numOfComp's value of the new object
-    weigths.push_back(pr2.weigths[0]);
-    mixtureComponents.push_back(pr2.mixtureComponents[0]);
+    weigths[pr1.numOfComp]=pr2.weigths[0];
+    mixtureComponents[pr1.numOfComp]=pr2.mixtureComponents[0];
 
     return mixturePengRobinson(static_cast<const pengRobinson&>(pr1)+static_cast<const pengRobinson&>(pr2),
         pr1.numOfComp+1, weigths, mixtureComponents);
@@ -393,8 +435,9 @@ inline mixturePengRobinson operator*
 )
 {
     //CL: saving the "concentraction" of the component of the mixture in the vector weights
-    std::vector<scalar> weigths=pr.weigths;
-    weigths.push_back(s*pr.nMoles()); 
+    //CL: saved at the Position "numOfComp-1"
+    DynamicList<scalar> weigths=pr.weigths;
+    weigths[pr.numOfComp-1]=s*pr.nMoles(); 
 
    return mixturePengRobinson(s*static_cast<const pengRobinson&>(pr), pr.numOfComp, weigths,
        pr.mixtureComponents,pr.a0_,pr.b_,pr.Tcrit_,pr.n_,pr.rhostd_);

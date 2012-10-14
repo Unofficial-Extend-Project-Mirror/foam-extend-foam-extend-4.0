@@ -35,34 +35,70 @@ Germany
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
+//- Construct from components
+//CL: used for the operator+
 template<class equationOfState>
 inline Foam::nasaHeatCapacityPolynomial<equationOfState>::nasaHeatCapacityPolynomial
 (
     const equationOfState& st,
-             const scalar a1,
-	     const scalar a2,
-             const scalar a3,
-	     const scalar a4,
-	     const scalar a5,
-             const scalar a6,
-             const scalar a7
+    const scalar a1,
+    const scalar a2,
+    const scalar a3,
+    const scalar a4,
+    const scalar a5,
+    const scalar a6,
+    const scalar a7
 )
 :
     equationOfState(st),
-            a1_(a1),
-	    a2_(a2),
-	    a3_(a3),
-	    a4_(a4),
-	    a5_(a5),
-	    a6_(a6),
-            a7_(a7),
-            e0_std(e0(this->Tstd)),
-	    s0_std(s0(this->Tstd)),
-            integral_p_dv_std(this->integral_p_dv(this->rhostd(),this->Tstd)),
-            integral_dpdT_dv_std(this->integral_dpdT_dv(this->rhostd(),this->Tstd)),
-            cp_std(this->cp_nonLimited(this->rhostd(),this->Tstd)) 
+    a1_(a1),
+    a2_(a2),
+    a3_(a3),
+    a4_(a4),
+    a5_(a5),
+    a6_(a6),
+    a7_(a7),
+    e0_std(e0(this->Tstd)),
+    s0_std(s0(this->Tstd)),
+    integral_p_dv_std(this->integral_p_dv(this->rhostd(),this->Tstd)),
+    integral_dpdT_dv_std(this->integral_dpdT_dv(this->rhostd(),this->Tstd)),
+    cp_std(this->cp_nonLimited(this->rhostd(),this->Tstd)) 
 {}
 
+//- Construct from components
+//CL: used for the operator*
+template<class equationOfState>
+inline Foam::nasaHeatCapacityPolynomial<equationOfState>::nasaHeatCapacityPolynomial
+(
+    const equationOfState& st,
+    const scalar a1,
+    const scalar a2,
+    const scalar a3,
+    const scalar a4,
+    const scalar a5,
+    const scalar a6,
+    const scalar a7,
+    const scalar e0_std_,
+    const scalar s0_std_,
+    const scalar integral_p_dv_std_,
+    const scalar integral_dpdT_dv_std_,
+    const scalar cp_std_
+)
+:
+    equationOfState(st),
+    a1_(a1),
+    a2_(a2),
+    a3_(a3),
+    a4_(a4),
+    a5_(a5),
+    a6_(a6),
+    a7_(a7),
+    e0_std(e0_std_),
+    s0_std(s0_std_),
+    integral_p_dv_std(integral_p_dv_std_),
+    integral_dpdT_dv_std(integral_dpdT_dv_std_),
+    cp_std(cp_std_) 
+{}
 
 
 
@@ -74,18 +110,18 @@ inline Foam::nasaHeatCapacityPolynomial<equationOfState>::nasaHeatCapacityPolyno
 )
 :
     equationOfState(name, np),
-            a1_(np.a1_),
-	    a2_(np.a2_),
-	    a3_(np.a3_),
-	    a4_(np.a4_),
-	    a5_(np.a5_),
-	    a6_(np.a6_),
-            a7_(np.a7_),
-            e0_std(np.e0_std),
-            s0_std(np.s0_std),
-            integral_p_dv_std(np.integral_p_dv_std),
-            integral_dpdT_dv_std(np.integral_dpdT_dv_std),
-            cp_std(np.cp_std)
+    a1_(np.a1_),
+    a2_(np.a2_),
+    a3_(np.a3_),
+    a4_(np.a4_),
+    a5_(np.a5_),
+    a6_(np.a6_),
+    a7_(np.a7_),
+    e0_std(np.e0_std),
+    s0_std(np.s0_std),
+    integral_p_dv_std(np.integral_p_dv_std),
+    integral_dpdT_dv_std(np.integral_dpdT_dv_std),
+    cp_std(np.cp_std)
 {}
 
 
@@ -288,7 +324,6 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::e
 }
 
 
-
 //function to calculate real gas entropy
 // important assumption used: the Entropy is 0 at STD conditions.
 // equation: ds= cv0/T * dT +  dp/dT *dv
@@ -306,9 +341,6 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::s
     -this->RR*log(T/this->Tstd)
     + this->integral_dpdT_dv(rho,T);
 }
-
-
-
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
@@ -375,6 +407,9 @@ inline Foam::nasaHeatCapacityPolynomial<equationOfState> Foam::operator+
       + static_cast<const equationOfState&>(np2)
     );
 
+    //CL: Important, calls a different constructor as operator*
+    //CL: the coefficients as well as the EOS (coefficients) changed
+    //CL: therefore, the values at STD needs to be recalculated
     return nasaHeatCapacityPolynomial<equationOfState>
     (
         eofs,
@@ -437,6 +472,8 @@ inline Foam::nasaHeatCapacityPolynomial<equationOfState> Foam::operator*
     const nasaHeatCapacityPolynomial<equationOfState>& np
 )
 {
+    //CL: values at STD don't need to be recalculated, 
+    //CL: therefore, providing the values in the constructor 
     return nasaHeatCapacityPolynomial<equationOfState>
     (
         s*static_cast<const equationOfState&>(np),
@@ -446,7 +483,12 @@ inline Foam::nasaHeatCapacityPolynomial<equationOfState> Foam::operator*
         np.a4_,
 	np.a5_,
         np.a6_,
-	np.a7_
+	np.a7_,
+        np.e0_std,
+        np.s0_std,
+        np.integral_p_dv_std,
+        np.integral_dpdT_dv_std,
+        np.cp_std
     );
 }
 

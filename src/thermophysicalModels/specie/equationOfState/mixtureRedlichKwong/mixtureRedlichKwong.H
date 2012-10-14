@@ -30,7 +30,7 @@ Description
 
     Mixing Rule --> see Paper
 
-    Title: Van der eaals mixting rules for cublic equations of state. Applications for supercritical fluids extraction modelling
+    Title: Van der waals mixing rules for cublic equations of state. Applications for supercritical fluids extraction modelling
     Authors: T.Y. Kwak and G.A. Mansoori
     Journal: Chemical Engineering Science, Vol 41, No. 5, pp. 1303-1309, 1986
 
@@ -53,7 +53,7 @@ Germany
 #include "autoPtr.H"
 #include "redlichKwong.H"
 #include "scalarList.H"
-#include <vector>
+#include "DynamicList.H"
 #include "label.H"
 #include "List.H"
 #include "dictionary.H"
@@ -83,10 +83,10 @@ protected:
     
     //CL: save the concentrations of each component of the mixture
     //CL: needs to be multiplied by this->W() to get the molar fractions
-    mutable std::vector<scalar> weigths;
+    mutable DynamicList<scalar> weigths;
     
     //CL: saves a pointer to the pure component classes of the mixture
-    mutable std::vector<mixtureRedlichKwong*> mixtureComponents;
+    mutable DynamicList<mixtureRedlichKwong*> mixtureComponents;
    
     //CL: counts the number of components
     mutable label numOfComp;
@@ -101,8 +101,8 @@ public:
         (
             const redlichKwong& rK,
             label numOfComp,
-            std::vector<scalar> weigths,
-            std::vector<mixtureRedlichKwong*> mixtureComponents,
+            DynamicList<scalar> weigths,
+            DynamicList<mixtureRedlichKwong*> mixtureComponents,
             scalar a, 
             scalar b,
             scalar rhostd
@@ -114,8 +114,8 @@ public:
         (
             const redlichKwong& rK,
             label numOfComp,
-            std::vector<scalar> weigths,
-            std::vector<mixtureRedlichKwong*> mixtureComponents
+            DynamicList<scalar> weigths,
+            DynamicList<mixtureRedlichKwong*> mixtureComponents
         );
 
         //- Construct from Istream
@@ -130,7 +130,10 @@ public:
         // Selector from Istream
         inline static autoPtr<mixtureRedlichKwong> New(Istream& is);
 
- 
+  // Member operators
+
+        inline void operator+=(const mixtureRedlichKwong&);
+
   // Friend operators
 
         inline friend mixtureRedlichKwong operator+

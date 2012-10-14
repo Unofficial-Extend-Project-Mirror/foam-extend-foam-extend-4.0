@@ -48,8 +48,14 @@ mixtureRedlichKwong::mixtureRedlichKwong(Istream& is)
     redlichKwong(is),
     numOfComp(1)
 { 
+    //CL: set size of weigths and mixtureComponents to 10
+    //CL: when more mixture componentents are used
+    //CL: size of the DynamicLis increases automatically
+    weigths.setSize(10);
+    mixtureComponents.setSize(10);
+
     //Save a pointer of this object in the mixtureComponents array
-    mixtureComponents.push_back(this);
+    mixtureComponents[0]=this;
     is.check("mixtureRedlichKwong::mixtureRedlichKwong(Istream& is)");
 }
 

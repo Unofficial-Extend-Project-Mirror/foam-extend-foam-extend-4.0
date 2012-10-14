@@ -45,8 +45,8 @@ inline mixtureSoaveRedlichKwong::mixtureSoaveRedlichKwong
 (
     const soaveRedlichKwong& srk,
     label numOfComp,
-    std::vector<scalar> weigths,
-    std::vector<mixtureSoaveRedlichKwong*> mixtureComponents,
+    DynamicList<scalar> weigths,
+    DynamicList<mixtureSoaveRedlichKwong*> mixtureComponents,
     scalar a0,
     scalar b,
     scalar Tcrit,
@@ -74,8 +74,8 @@ inline mixtureSoaveRedlichKwong::mixtureSoaveRedlichKwong
 (
     const soaveRedlichKwong& srk,
     label numOfComp,
-    std::vector<scalar> weigths,
-    std::vector<mixtureSoaveRedlichKwong*> mixtureComponents
+    DynamicList<scalar> weigths,
+    DynamicList<mixtureSoaveRedlichKwong*> mixtureComponents
 )
 : 
     soaveRedlichKwong(srk),
@@ -86,6 +86,8 @@ inline mixtureSoaveRedlichKwong::mixtureSoaveRedlichKwong
     
 {
     TSave=0.0;
+    //CL: following three DynamicList have no size in the new object
+    //CL: resize DynamicList
     aComponents.resize(numOfComp);
     daComponents.resize(numOfComp);
     d2aComponents.resize(numOfComp);
@@ -136,9 +138,9 @@ inline void mixtureSoaveRedlichKwong::updateModelCoefficients(const  scalar T) c
             //CL: filling vector a, dadT and d2adT2
             for (i=0;i<numOfComp;i++)
             {
-                aComponents.at(i)=mixtureComponents[i]->a(T);
-                daComponents.at(i)=mixtureComponents[i]->dadT(T);
-                d2aComponents.at(i)=mixtureComponents[i]->d2adT2(T);
+                aComponents[i]=mixtureComponents[i]->a(T);
+                daComponents[i]=mixtureComponents[i]->dadT(T);
+                d2aComponents[i]=mixtureComponents[i]->d2adT2(T);
             }
 
             for (i=0;i<numOfComp;i++)
@@ -366,6 +368,39 @@ inline scalar mixtureSoaveRedlichKwong::Z
     return soaveRedlichKwong::Z(p,T,rho0);
 }
 
+// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
+
+
+inline void mixtureSoaveRedlichKwong::operator+=(const mixtureSoaveRedlichKwong& srk)
+{
+    //CL: Resizes the DynamicList if number of compontens is larger than the DynamicList
+    if((weigths.size()<numOfComp+1)||(mixtureComponents.size()<numOfComp+1))
+    {
+        weigths.setSize(2*numOfComp);
+        mixtureComponents.setSize(2*numOfComp);
+    }
+
+    //Cl: oldClass+=srk 
+    //CL: Saving the object pointer and weigths of pr (which is @ mixtureComponents[0] and weigths[0]) at the numOfComp's value of the oldClass 
+    weigths[numOfComp]=srk.weigths[0];
+    mixtureComponents[numOfComp]=srk.mixtureComponents[0];
+
+    soaveRedlichKwong::operator+=(srk);
+
+    //CL: increase number of Components by 1
+    numOfComp=numOfComp+1;
+
+    //CL: resize DynamicList so that they have a defined size in the mixture object
+    aComponents.resize(numOfComp);
+    daComponents.resize(numOfComp);
+    d2aComponents.resize(numOfComp);
+
+    //CL: setting TSave=0--> results that all coefficients (a, da, d2a) are calculated in updateModelCoefficients
+    TSave=0.0;
+    singleComponent=0;
+    rhostd_=this->rho(Pstd, Tstd, Pstd*this->W()/(Tstd*this->R()));
+}
+
 
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
@@ -377,13 +412,20 @@ inline mixtureSoaveRedlichKwong operator+
 )
 {
     //CL:save both a pointer to the objector srk1 and srk2 and the weights in the new object
-    std::vector<scalar> weigths=srk1.weigths;
-    std::vector<mixtureSoaveRedlichKwong*> mixtureComponents=srk1.mixtureComponents;
+    DynamicList<scalar> weigths=srk1.weigths;
+    DynamicList<mixtureSoaveRedlichKwong*> mixtureComponents=srk1.mixtureComponents;
+
+    //CL: Resizes the DynamicList if number of compontens is larger than the DynamicList
+    if((weigths.size()<srk1.numOfComp+1)||(mixtureComponents.size()<srk1.numOfComp+1))
+    {
+        weigths.setSize(2*srk1.numOfComp);
+        mixtureComponents.setSize(2*srk1.numOfComp);
+    }
 
     //CL: Getting the new weigths and mixtureComponents lists, 
     //CL: Saving the object pointer and weigths of srk2 (which is @ mixtureComponents[0] and weigths[0]) at the numOfComp's value of the new object
-    weigths.push_back(srk2.weigths[0]);
-    mixtureComponents.push_back(srk2.mixtureComponents[0]);
+    weigths[srk1.numOfComp]=srk2.weigths[0];
+    mixtureComponents[srk1.numOfComp]=srk2.mixtureComponents[0];
 
     return mixtureSoaveRedlichKwong(static_cast<const soaveRedlichKwong&>(srk1)+static_cast<const soaveRedlichKwong&>(srk2),
         srk1.numOfComp+1, weigths, mixtureComponents);
@@ -397,8 +439,9 @@ inline mixtureSoaveRedlichKwong operator*
 )
 {
     //CL: saving the "concentraction" of the component of the mixture in the vector weights
-    std::vector<scalar> weigths=srk.weigths;
-    weigths.push_back(s*srk.nMoles()); 
+    //CL: saved at the Position "numOfComp-1"
+    DynamicList<scalar> weigths=srk.weigths;
+    weigths[srk.numOfComp-1]=s*srk.nMoles(); 
 
    return mixtureSoaveRedlichKwong(s*static_cast<const soaveRedlichKwong&>(srk), srk.numOfComp, weigths,
        srk.mixtureComponents,srk.a0_,srk.b_,srk.Tcrit_,srk.n_,srk.rhostd_);

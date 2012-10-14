@@ -45,8 +45,8 @@ inline mixtureRedlichKwong::mixtureRedlichKwong
 (
     const redlichKwong& rK,
     label numOfComp,
-    std::vector<scalar> weigths,
-    std::vector<mixtureRedlichKwong*> mixtureComponents,
+    DynamicList<scalar> weigths,
+    DynamicList<mixtureRedlichKwong*> mixtureComponents,
     scalar a,
     scalar b,
     scalar rhostd
@@ -68,8 +68,8 @@ inline mixtureRedlichKwong::mixtureRedlichKwong
 (
     const redlichKwong& rK,
     label numOfComp,
-    std::vector<scalar> weigths,
-    std::vector<mixtureRedlichKwong*> mixtureComponents
+    DynamicList<scalar> weigths,
+    DynamicList<mixtureRedlichKwong*> mixtureComponents
 )
 : 
     redlichKwong(rK),
@@ -131,6 +131,32 @@ inline void mixtureRedlichKwong::updateModelCoefficients() const
     }
 }
 
+// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
+
+
+inline void mixtureRedlichKwong::operator+=(const mixtureRedlichKwong& rK)
+{
+    //CL: Resizes the DynamicList if number of compontens is larger than the DynamicList
+    if((weigths.size()<numOfComp+1)||(mixtureComponents.size()<numOfComp+1))
+    {
+        weigths.setSize(2*numOfComp);
+        mixtureComponents.setSize(2*numOfComp);
+    }
+
+    //Cl: oldClass+=rK 
+    //CL: Saving the object pointer and weigths of rK (which is @ mixtureComponents[0] and weigths[0]) at the numOfComp's value of the oldClass 
+    weigths[numOfComp]=rK.weigths[0];
+    mixtureComponents[numOfComp]=rK.mixtureComponents[0];
+
+    redlichKwong::operator+=(rK);
+
+    //CL: increase number of Components by 1
+    numOfComp=numOfComp+1;
+
+    //CL: update model coefficients
+    updateModelCoefficients();
+    rhostd_=this->rho(Pstd, Tstd, Pstd/(Tstd*this->R()));
+}
 
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
@@ -142,13 +168,20 @@ inline mixtureRedlichKwong operator+
 )
 {
     //CL:save both a pointer to the objector rK1 and rK2 and the weights in the new object
-    std::vector<scalar> weigths=rK1.weigths;
-    std::vector<mixtureRedlichKwong*> mixtureComponents=rK1.mixtureComponents;
+    DynamicList<scalar> weigths=rK1.weigths;
+    DynamicList<mixtureRedlichKwong*> mixtureComponents=rK1.mixtureComponents;
+
+    //CL: Resizes the DynamicList if number of compontens is larger than the DynamicList
+    if((weigths.size()<rK1.numOfComp+1)||(mixtureComponents.size()<rK1.numOfComp+1))
+    {
+        weigths.setSize(2*rK1.numOfComp);
+        mixtureComponents.setSize(2*rK1.numOfComp);
+    }
 
     //CL: Getting the new weigths and mixtureComponents lists, 
     //CL: Saving the object pointer and weigths of rK2 (which is @ mixtureComponents[0] and weigths[0]) at the numOfComp's value of the new object
-    weigths.push_back(rK2.weigths[0]);
-    mixtureComponents.push_back(rK2.mixtureComponents[0]);
+    weigths[rK1.numOfComp]=rK2.weigths[0];
+    mixtureComponents[rK1.numOfComp]=rK2.mixtureComponents[0];
 
     return mixtureRedlichKwong(static_cast<const redlichKwong&>(rK1)+static_cast<const redlichKwong&>(rK2),
         rK1.numOfComp+1, weigths, mixtureComponents);
@@ -162,8 +195,8 @@ inline mixtureRedlichKwong operator*
 )
 {
     //CL: saving the "concentraction" of the component of the mixture in the vector weights
-    std::vector<scalar> weigths=rK.weigths;
-    weigths.push_back(s*rK.nMoles()); 
+    DynamicList<scalar> weigths=rK.weigths;
+    weigths[rK.numOfComp-1]=s*rK.nMoles(); 
 
    return mixtureRedlichKwong(s*static_cast<const redlichKwong&>(rK), rK.numOfComp, weigths, rK.mixtureComponents,rK.a_,rK.b_,rK.rhostd_);
 }

@@ -211,9 +211,10 @@ public:
 
     // Member operators
 
-/*
+
         inline void operator+=(const soaveRedlichKwong&);
 
+/* 
         inline void operator-=(const soaveRedlichKwong&);
 
         inline void operator*=(const scalar);

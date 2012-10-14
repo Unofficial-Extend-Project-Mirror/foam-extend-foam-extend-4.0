@@ -30,7 +30,7 @@ Description
 
     Mixing Rule --> see Paper
 
-    Title: Van der eaals mixting rules for cublic equations of state. Applications for supercritical fluids extraction modelling
+    Title: Van der waals mixing rules for cublic equations of state. Applications for supercritical fluids extraction modelling
     Authors: T.Y. Kwak and G.A. Mansoori
     Journal: Chemical Engineering Science, Vol 41, No. 5, pp. 1303-1309, 1986
 
@@ -53,7 +53,7 @@ Germany
 #include "autoPtr.H"
 #include "pengRobinson.H"
 #include "scalarList.H"
-#include <vector>
+#include "DynamicList.H"
 #include "label.H"
 #include "List.H"
 #include "dictionary.H"
@@ -81,19 +81,19 @@ protected:
   
     //CL: save the concentrations of each component of the mixture
     //CL: needs to be multiplied by this->W() to get the molar fractions
-    mutable std::vector<scalar> weigths;
+    mutable DynamicList<scalar> weigths;
     
     //CL: stores the values of a(T) of all componentes
-    mutable std::vector<scalar> aComponents;
+    mutable DynamicList<scalar> aComponents;
 
     //CL: stores the values of the derivatives da/dT of all componentes
-    mutable std::vector<scalar> daComponents;
+    mutable DynamicList<scalar> daComponents;
 
     //CL: stores the values of the second order derivatives d2a/dT2 of all componentes
-    mutable std::vector<scalar> d2aComponents;
+    mutable DynamicList<scalar> d2aComponents;
     
     //CL: saves a pointer to the pure component classes of the mixture
-    mutable std::vector<mixturePengRobinson*> mixtureComponents;
+    mutable DynamicList<mixturePengRobinson*> mixtureComponents;
    
     //CL: counts the number of components
     mutable label numOfComp;
@@ -113,8 +113,8 @@ public:
         (
             const pengRobinson& pr,
             label numOfComp,
-            std::vector<scalar> weigths,
-            std::vector<mixturePengRobinson*> mixtureComponents,
+            DynamicList<scalar> weigths,
+            DynamicList<mixturePengRobinson*> mixtureComponents,
             scalar a0, 
             scalar b,
             scalar Tcrit,
@@ -128,8 +128,8 @@ public:
         (
             const pengRobinson& pr,
             label numOfComp,
-            std::vector<scalar> weigths,
-            std::vector<mixturePengRobinson*> mixtureComponents
+            DynamicList<scalar> weigths,
+            DynamicList<mixturePengRobinson*> mixtureComponents
         );
 
         //- Construct from Istream
@@ -209,6 +209,9 @@ public:
             const scalar rho0
         ) const;
 
+  // Member operators
+
+        inline void operator+=(const mixturePengRobinson&);
 
   // Friend operators
 

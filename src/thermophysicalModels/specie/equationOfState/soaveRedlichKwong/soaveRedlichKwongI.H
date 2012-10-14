@@ -443,13 +443,14 @@ inline scalar soaveRedlichKwong::Z( const scalar p, const scalar T,const scalar 
 }
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
-/*
+
 inline void soaveRedlichKwong::operator+=(const soaveRedlichKwong& srk)
 {
     specie::operator+=(srk);
 }
 
-	inline void soaveRedlichKwong::operator-=(const soaveRedlichKwong& srk)
+/*
+inline void soaveRedlichKwong::operator-=(const soaveRedlichKwong& srk)
 {
     specie::operator-=(srk);
 }

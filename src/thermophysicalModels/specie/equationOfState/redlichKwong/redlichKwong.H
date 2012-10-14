@@ -172,12 +172,12 @@ public:
             const scalar rho0
         ) const;
 
-/*
+
     // Member operators
 
         inline void operator+=(const redlichKwong&);
+/*        
         inline void operator-=(const redlichKwong&);
-
         inline void operator*=(const scalar);
 */
 
