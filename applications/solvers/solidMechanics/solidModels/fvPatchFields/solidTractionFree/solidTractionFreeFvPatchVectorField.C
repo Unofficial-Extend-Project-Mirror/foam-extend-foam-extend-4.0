@@ -244,9 +244,8 @@ void solidTractionFreeFvPatchVectorField::updateCoeffs()
 	const fvPatchField<scalar>& T =
 	  patch().lookupPatchField<volScalarField, scalar>("T");
       
-	const scalarField threeKalpha =
-	  (3*lambda + 2*mu)*
-	  thermo.alpha()().boundaryField()[patch().index()];
+        const fvPatchField<scalar>& threeKalpha =
+          patch().lookupPatchField<volScalarField, scalar>("((threeK*rho)*alpha)");
       
 	const scalarField T0 = thermo.T0()().boundaryField()[patch().index()];
 	

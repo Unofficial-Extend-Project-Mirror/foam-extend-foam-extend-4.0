@@ -51,14 +51,14 @@ bottom
     value uniform (0 0 0);
 }
 
-wedge-p
+front
 {
-    type wedge;
+    type solidTractionFree;
 }
 
-wedge-n
+back
 {
-    type wedge;
+    type solidTractionFree;
 }
 
 }

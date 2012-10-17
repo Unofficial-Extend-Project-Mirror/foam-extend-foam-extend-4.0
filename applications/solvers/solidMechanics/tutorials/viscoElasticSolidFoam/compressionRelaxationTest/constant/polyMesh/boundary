@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5-dev                               |
-|   \\  /    A nd           | Revision: 1629                                  |
-|    \\/     M anipulation  | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -17,15 +17,15 @@ FoamFile
 
 6
 (
-    wedge-n
+    front
     {
-        type            wedge;
+        type            patch;
         nFaces          3950;
         startFace       7771;
     }
-    wedge-p
+    back
     {
-        type            wedge;
+        type            patch;
         nFaces          3950;
         startFace       11721;
     }
@@ -37,19 +37,19 @@ FoamFile
     }
     freeSurface
     {
-        type            wall;
+        type            patch;
         nFaces          50;
         startFace       15721;
     }
     bottom
     {
-        type            wall;
+        type            patch;
         nFaces          79;
         startFace       15771;
     }
     loading
     {
-        type            wall;
+        type            patch;
         nFaces          79;
         startFace       15850;
     }

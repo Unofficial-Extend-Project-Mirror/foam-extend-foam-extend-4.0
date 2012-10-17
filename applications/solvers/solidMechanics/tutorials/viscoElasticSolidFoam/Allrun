@@ -8,4 +8,5 @@ tutorialPath=`dirname $0`/..
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
 (cd $case; runApplication blockMesh)
+(cd $case; runApplication fluent3DMeshToFoam compressionRelaxationTest.msh)
 (cd $case; runApplication $application)

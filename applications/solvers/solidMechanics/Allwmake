@@ -6,6 +6,7 @@ wmake libso solidModels
 wmake elasticContactSolidFoam
 wmake elasticContactIncrSolidFoam
 wmake elasticContactNonLinULSolidFoam
+wmake elasticGravitySolidFoam
 wmake elasticIncrSolidFoam
 wmake elasticNonLinTLSolidFoam
 wmake elasticNonLinULSolidFoam

@@ -89,6 +89,6 @@ thermalModel thermal(T);
 
 volScalarField C = thermal.C();
 volScalarField k = thermal.k();
-volScalarField threeKalpha = (3*lambda + 2*mu)*thermal.alpha();
+volScalarField threeKalpha = rheology.threeK()*rho*thermal.alpha();
 volScalarField T0 = thermal.T0();
 volScalarField rhoC = rho*C;
