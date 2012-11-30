@@ -58,6 +58,19 @@ laminar::laminar
 {}
 
 
+// * * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * //
+
+autoPtr<laminar> laminar::New
+(
+    const volVectorField& U,
+    const surfaceScalarField& phi,
+    transportModel& lamTransportModel
+)
+{
+    return autoPtr<laminar>(new laminar(U, phi, lamTransportModel));
+}
+
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 tmp<volScalarField> laminar::nut() const
@@ -70,7 +83,7 @@ tmp<volScalarField> laminar::nut() const
             (
                 "nut",
                 runTime_.timeName(),
-                U_.db(),
+                mesh_,
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -97,7 +110,7 @@ tmp<volScalarField> laminar::k() const
             (
                 "k",
                 runTime_.timeName(),
-                U_.db(),
+                mesh_,
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -118,7 +131,7 @@ tmp<volScalarField> laminar::epsilon() const
             (
                 "epsilon",
                 runTime_.timeName(),
-                U_.db(),
+                mesh_,
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -142,7 +155,7 @@ tmp<volSymmTensorField> laminar::R() const
             (
                 "R",
                 runTime_.timeName(),
-                U_.db(),
+                mesh_,
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -166,7 +179,7 @@ tmp<volSymmTensorField> laminar::devReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                U_.db(),
+                mesh_,
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
