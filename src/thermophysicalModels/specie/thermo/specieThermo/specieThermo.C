@@ -32,7 +32,7 @@ Description
 #include "specieThermo.H"
 #include "IOstreams.H"
 
-/* * * * * * * * * * * * * * * Private static data * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * Private Static Data * * * * * * * * * * * * * */
 
 template<class thermo>
 const Foam::scalar Foam::specieThermo<thermo>::tol_

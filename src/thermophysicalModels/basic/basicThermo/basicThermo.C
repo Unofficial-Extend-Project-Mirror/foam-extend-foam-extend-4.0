@@ -35,7 +35,7 @@ License
 #include "gradientInternalEnergyFvPatchScalarField.H"
 #include "mixedInternalEnergyFvPatchScalarField.H"
 
-/* * * * * * * * * * * * * * * private static data * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * Private Static Data * * * * * * * * * * * * * * */
 
 namespace Foam
 {

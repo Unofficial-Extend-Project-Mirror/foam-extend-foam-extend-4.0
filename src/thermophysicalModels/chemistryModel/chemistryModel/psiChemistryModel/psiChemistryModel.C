@@ -28,7 +28,7 @@ License
 #include "fvMesh.H"
 #include "Time.H"
 
-/* * * * * * * * * * * * * * * private static data * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * Private Static Data * * * * * * * * * * * * * */
 
 namespace Foam
 {

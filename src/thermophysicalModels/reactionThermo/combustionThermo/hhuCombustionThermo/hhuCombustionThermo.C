@@ -36,7 +36,7 @@ License
 namespace Foam
 {
 
-/* * * * * * * * * * * * * * * private static data * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * Private Static Data * * * * * * * * * * * * * */
 
 defineTypeNameAndDebug(hhuCombustionThermo, 0);
 defineRunTimeSelectionTable(hhuCombustionThermo, fvMesh);
