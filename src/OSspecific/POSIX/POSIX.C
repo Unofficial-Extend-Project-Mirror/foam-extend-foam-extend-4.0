@@ -216,7 +216,6 @@ bool Foam::chDir(const fileName& dir)
 Foam::fileName Foam::findEtcFile(const fileName& name, bool mandatory)
 {
     // Search user files:
-    // ~~~~~~~~~~~~~~~~~~
     fileName searchDir = home()/".OpenFOAM";
     if (isDir(searchDir))
     {
@@ -237,7 +236,6 @@ Foam::fileName Foam::findEtcFile(const fileName& name, bool mandatory)
 
 
     // Search site files:
-    // ~~~~~~~~~~~~~~~~~~
     searchDir = getEnv("WM_PROJECT_INST_DIR");
     if (isDir(searchDir))
     {
@@ -257,7 +255,6 @@ Foam::fileName Foam::findEtcFile(const fileName& name, bool mandatory)
     }
 
     // Search installation files:
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~
     searchDir = getEnv("WM_PROJECT_DIR");
     if (isDir(searchDir))
     {
@@ -571,7 +568,7 @@ Foam::fileNameList Foam::readDir
         {
             fileName fName(list->d_name);
 
-            // ignore files begining with ., i.e. '.', '..' and '.*'
+            // Ignore files begining with ., i.e. '.', '..' and '.*'
             if (fName.size() && fName[0] != '.')
             {
                 word fExt = fName.ext();
@@ -582,7 +579,8 @@ Foam::fileNameList Foam::readDir
                  ||
                     (
                         type == fileName::FILE
-                     && fName[fName.size()-1] != '~'
+                     && fName[fName.size() - 1] != '~'
+                     && fExt != "vtk"
                      && fExt != "bak"
                      && fExt != "BAK"
                      && fExt != "old"
