@@ -1,0 +1,112 @@
+Installation of OpenFOAM-1.6-ext on Ubuntu 10.04.3 64-bit
+
+- Proceed with the installation of the OS
+- Update your OS installation using "Update Manager".
+- If asked to reboot your system, please do so.
+
+--------------------------------------------------------------------------------
+
+# Installation of additional system packages:
+git:   sudo apt-get install git-core
+flex:  sudo apt-get install flex
+bison: sudo apt-get install bison
+rpm:   sudo apt-get install rpm
+g++:   sudo apt-get install g++ 
+libz:  sudo apt-get install zlib1g-dev
+binutils-dev : sudo apt-get install binutils-dev
+qt4:   sudo apt-get install libqt4-dev qt4-dev-tools
+
+libxext: sudo apt-get install libxext-dev
+libxt  : sudo apt-get install libxt-dev
+
+# You can also install everything at once:
+sudo apt-get install git-core flex bison rpm g++ zlib1g-dev binutils-dev \
+     libqt4-dev qt4-dev-tools libxext-dev libxt-dev
+
+--------------------------------------------------------------------------------
+
+# Minor correction for make/gmake
+sudo ln -s /usr/bin/make /usr/bin/gmake
+
+--------------------------------------------------------------------------------
+
+# Installation of libstdc++.so.5:
+
+For Ubuntu 64bit:
+-----------------
+Grab the package libstdc++5_3.3.6-24_amd64.deb from one of the sites listed here:
+http://packages.debian.org/lenny/amd64/Libstdc++5/download
+
+wget http://ftp.us.debian.org/debian/pool/main/g/gcc-3.3/libstdc++5_3.3.6-24_amd64.deb
+dpkg-deb -x ./libstdc++5_3.3.6-24_amd64.deb /tmp/tmp_dir
+
+sudo cp /tmp/tmp_dir/usr/lib/libstdc++.so.5.0.7 /usr/lib/
+sudo ln -s /usr/lib/libstdc++.so.5.0.7 /usr/lib/libstdc++.so.5
+rm -rf /tmp/tmp_dir
+
+--------------------------------------------------------------------------------
+
+# Download OpenFOAM-1.6-ext
+mkdir ~/OpenFOAM
+cd ~/OpenFOAM
+git clone git://openfoam-extend.git.sourceforge.net/gitroot/openfoam-extend/OpenFOAM-1.6-ext
+
+--------------------------------------------------------------------------------
+
+# We are going to use the system installed version of QT4
+cp ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh-EXAMPLE ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+
+#Uncomment and modify the initialization of the variables QT_DIR and QT_BIN_DIR in the file prefs.sh
+
+sed -i s/"#export QT_DIR=path_to_system_installed_qt"/"export QT_DIR=\/usr"/g ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+sed -i s/"#export QT_BIN_DIR=\$QT_DIR\/bin"/"export QT_BIN_DIR=\$QT_DIR\/bin"/g ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+
+# This section of the prefs.sh file should now look like this:
+
+#export QT_THIRD_PARTY=1
+export QT_DIR=/usr
+export QT_BIN_DIR=$QT_DIR/bin
+
+--------------------------------------------------------------------------------
+
+# Source your OpenFOAM environment to get the basic configuration for
+# compilation
+. ~/OpenFOAM/OpenFOAM-1.6-ext/etc/bashrc
+
+# Compile the ThirdParty packages
+cd $WM_PROJECT_DIR/ThirdParty
+./AllMake >& log.AllMake &
+tail -f log.AllMake   # To keep an eye on the compilation process
+
+--------------------------------------------------------------------------------
+
+# Update your OpenFOAM environment to get the basic configuration from the newly
+# compiled ThirdParty packages
+. ~/OpenFOAM/OpenFOAM-1.6-ext/etc/bashrc
+
+# Compile OpenFOAM-1.6-ext
+cd $WM_PROJECT_DIR
+./Allwmake >& log.Allwmake &  
+tail -f log.Allwmake          # To keep an eye on the compilation process
+
+--------------------------------------------------------------------------------
+
+# Execute Allwmake a second time because of a bad library building sequence for
+# the library -lfaceDecompositionMotionSolver 
+
+./Allwmake >& log.Allwmake2 & 
+tail -f log.Allwmake2          # To keep an eye on the compilation process
+
+--------------------------------------------------------------------------------
+
+# Run a tutorial to check the basic functionality
+cd $FOAM_TUTORIAL/incompressible/simpleFoam/pitzDaily
+blockMesh >& log.blockMesh
+simpleFoam >& log.simpleFoam
+paraFoam
+
+# You are done!
+
+--------------------------------------------------------------------------------
+Martin Beaudoin
+August 2011

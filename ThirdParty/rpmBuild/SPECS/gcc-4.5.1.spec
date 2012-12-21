@@ -166,12 +166,5 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%{_installPrefix}/bin
-%{_installPrefix}/etc
-%{_installPrefix}/include
-%{_installPrefix}/info
-%{_installPrefix}/lib
-%{_installPrefix}/libexec
-%{_installPrefix}/man
-%{_installPrefix}/share
+%{_installPrefix}
 

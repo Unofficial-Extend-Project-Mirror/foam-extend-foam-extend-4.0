@@ -101,15 +101,16 @@ Patch0:                 mesquite-2.1.2_patch0
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
     ./configure     \
-        --prefix=%{_installPrefix}  \
-	--enable-release            \
-	--disable-debug-assertions  \
-	--disable-igeom             \
-	--disable-imesh             \
-	--disable-irel              \
-	--enable-shared             \
-	--without-cppunit           \
-	--enable-trap-fpe           \
+        --prefix=%{_installPrefix}     \
+        --libdir=%{_installPrefix}/lib \
+	--enable-release               \
+	--disable-debug-assertions     \
+	--disable-igeom                \
+	--disable-imesh                \
+	--disable-irel                 \
+	--enable-shared                \
+	--without-cppunit              \
+	--enable-trap-fpe              \
 	--disable-function-timers
 
     # Remove the file include/Mesquite_all_headers.hpp

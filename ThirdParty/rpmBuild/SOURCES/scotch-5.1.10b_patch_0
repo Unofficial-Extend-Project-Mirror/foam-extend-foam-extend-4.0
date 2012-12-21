@@ -39,7 +39,7 @@ diff -ruN scotch_5.1.10b_orig/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib sco
 -CCD		= gcc
 -CFLAGS		= -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME -DSCOTCH_RENAME_PARSER -DSCOTCH_PTHREAD -Drestrict=__restrict
 -CLIBFLAGS	= -shared -fPIC
-+CCD		= gcc -I$(MPI_HOME)/include
++CCD		= mpicc -I$(MPI_HOME)/include
 +CFLAGS		= -O3 -fPIC -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME -DSCOTCH_RENAME_PARSER -DSCOTCH_PTHREAD -Drestrict=__restrict
 +CLIBFLAGS	= -shared 
  LDFLAGS		= -lz -lm -lrt

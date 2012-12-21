@@ -1,0 +1,120 @@
+Installation of OpenFOAM-1.6-ext on Ubuntu 12.04 32-bit
+
+- Proceed with the installation of the OS
+- Update your OS installation using "Update Manager".
+- If asked to reboot your system, please do so.
+
+--------------------------------------------------------------------------------
+
+# Installation of additional system packages:
+git:   sudo apt-get install git
+flex:  sudo apt-get install flex
+bison: sudo apt-get install bison
+rpm:   sudo apt-get install rpm
+g++:   sudo apt-get install g++
+libz:  sudo apt-get install zlib1g-dev
+binutils-dev : sudo apt-get install binutils-dev
+openmpi: sudo apt-get install openmpi-bin libopenmpi-dev
+libxext: sudo apt-get install libxext-dev
+libxt  : sudo apt-get install libxt-dev
+libXrender: sudo apt-get install libxrender-dev
+libstdc++5: sudo apt-get install libstdc++5
+OpenGL: sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev
+
+# You can also install everything at once:
+sudo apt-get install git flex bison rpm g++ zlib1g-dev binutils-dev \
+     openmpi-bin libopenmpi-dev libxext-dev libxt-dev libxrender-dev \
+     libstdc++5 libgl1-mesa-dev libglu1-mesa-dev
+
+--------------------------------------------------------------------------------
+
+# If you need to compile swak4Foam, it is a good idea to install Mercurial (hg)
+# sudo apt-get install mercurial
+
+--------------------------------------------------------------------------------
+
+# Minor correction for make/gmake
+sudo ln -s /usr/bin/make /usr/bin/gmake
+
+--------------------------------------------------------------------------------
+
+# Download OpenFOAM-1.6-ext
+mkdir ~/OpenFOAM
+cd ~/OpenFOAM
+git clone git://openfoam-extend.git.sourceforge.net/gitroot/openfoam-extend/OpenFOAM-1.6-ext
+
+--------------------------------------------------------------------------------
+
+# Create the file etc/prefs.sh
+cp ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh-EXAMPLE ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+
+--------------------------------------------------------------------------------
+
+# Use the system compiler
+sed -i s/"compilerInstall=System"/"compilerInstall=System\nWM_COMPILER=Gcc46"/g ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+
+--------------------------------------------------------------------------------
+
+# Use the system installation of OpenMPI
+sed -i s/"#export WM_MPLIB=SYSTEMOPENMPI"/"export WM_MPLIB=SYSTEMOPENMPI"/g ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+sed -i s/"#export OPENMPI_DIR=path_to_system_installed_openmpi"/"export OPENMPI_DIR=\/usr"/g ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+sed -i s/"#export OPENMPI_BIN_DIR=\$OPENMPI_DIR\/bin"/"export OPENMPI_BIN_DIR=\$OPENMPI_DIR\/bin"/g ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+
+--------------------------------------------------------------------------------
+
+# About QT4
+#
+# Ubuntu 12.04 comes with QT4 version 4.8.1
+# Even thoug ParaView will compile with this version of QT, ParaView will also generate a bunch of
+# warnings on the console at runtime. So we will be using the version of QT4 supplied with the
+# ThirdParty packages.
+
+#Uncomment the variable QT_THIRD_PARTY in the file prefs.sh
+
+sed -i s/"#export QT_THIRD_PARTY=1"/"export QT_THIRD_PARTY=1"/g ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+
+# This section of the prefs.sh file should now look like this:
+
+export QT_THIRD_PARTY=1
+#export QT_DIR=path_to_system_installed_qt
+#export QT_BIN_DIR=$QT_DIR/bin
+
+--------------------------------------------------------------------------------
+
+# Source your OpenFOAM environment to get the basic configuration for
+# compilation
+. ~/OpenFOAM/OpenFOAM-1.6-ext/etc/bashrc
+
+--------------------------------------------------------------------------------
+
+# Compile the ThirdParty packages
+cd $WM_PROJECT_DIR/ThirdParty
+./AllMake.stage1 >& log.AllMake.stage1 
+#./AllMake.stage2 >& log.AllMake.stage2   # No need for this one
+./AllMake.stage3 >& log.AllMake.stage3 
+./AllMake.stage4 >& log.AllMake.stage4 
+
+--------------------------------------------------------------------------------
+
+# Update your OpenFOAM environment to get the basic configuration from the newly
+# compiled ThirdParty packages
+. ~/OpenFOAM/OpenFOAM-1.6-ext/etc/bashrc
+
+# Compile OpenFOAM-1.6-ext
+cd $WM_PROJECT_DIR
+./Allwmake >& log.Allwmake &  
+tail -f log.Allwmake          # To keep an eye on the compilation process
+
+--------------------------------------------------------------------------------
+
+# Run a tutorial to check the basic functionality
+cd $FOAM_TUTORIAL/incompressible/simpleFoam/pitzDaily
+blockMesh >& log.blockMesh
+simpleFoam >& log.simpleFoam
+paraFoam
+
+# You are done!
+
+--------------------------------------------------------------------------------
+Martin Beaudoin
+May 2012

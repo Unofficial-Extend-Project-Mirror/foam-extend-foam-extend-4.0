@@ -1,0 +1,164 @@
+Installation of OpenFOAM-1.6-ext on Centos 5.5 64-bit
+--------------------------------------------------------------------------------
+
+Network download and installation from:
+ftp://mirrors.usc.edu/pub/linux/distributions/centos/5.5/os/x86_64/
+
+Basic configuration:
+    Desktop - Gnome
+    Packages from CentOS Extras: unchecked
+
+    Complete installation log: /root/install.log
+
+Run Package updater to update your installation
+
+--------------------------------------------------------------------------------
+
+Add your user as a valid user for the command 'sudo'. 
+
+You will need to use the command 'visudo' as the user root for this. 
+
+I won't go into the details for this, there is a lot of info all over the Net
+for doing this relatively minor adjustment. 
+
+In doubt, simply ask your local Unix guru.
+
+--------------------------------------------------------------------------------
+
+# Add the EPEL package repository:
+sudo rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm
+
+--------------------------------------------------------------------------------
+
+# Installation of additional system packages:
+
+sudo yum install git-1.7.4.1-1.el5.x86_64
+sudo yum install gcc.x86_64 gcc-c++.x86_64
+sudo yum install bison.x86_64
+sudo yum install flex.x86_64
+sudo yum install rpm-build-4.4.2.3-22.el5.x86_64
+sudo yum install zlib-devel-1.2.3-3.x86_64
+sudo yum install libX11-devel.x86_64
+sudo yum install libXext-devel.x86_64
+sudo yum install libXrender-devel.x86_64
+sudo yum install libXt-devel-1.0.2-3.2.el5.x86_64
+
+# You can also install everything at once:
+
+sudo yum install \
+    git-1.7.4.1-1.el5.x86_64   \
+    gcc.x86_64 gcc-c++.x86_64  \
+    bison.x86_64               \
+    flex.x86_64                \
+    rpm-build-4.4.2.3-22.el5.x86_64 \
+    zlib-devel-1.2.3-3.x86_64 \
+    libX11-devel.x86_64 \
+    libXext-devel.x86_64 \
+    libXrender-devel.x86_64 \
+    libXt-devel-1.0.2-3.2.el5.x86_64
+
+--------------------------------------------------------------------------------
+
+# Download OpenFOAM-1.6-ext
+
+mkdir ~/OpenFOAM
+cd ~/OpenFOAM
+git clone git://openfoam-extend.git.sourceforge.net/gitroot/openfoam-extend/OpenFOAM-1.6-ext
+
+
+--------------------------------------------------------------------------------
+
+# We need to tweak our OpenFOAM setup using the prefs.sh file
+
+cp ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh-EXAMPLE \
+   ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+
+--------------------------------------------------------------------------------
+
+# We are going to use version 4.4.5 of gcc, provided by the ThirdParty packages
+#
+# The versions provided by Centos 5.5 are either too old, or a just a preview
+# version of gcc 4.4.0, which is a bit 'green'.
+# 
+# So the system installed compiler will only serve to compile gcc 4.4.5.
+
+# Modify the etc/prefs.sh file to switch to gcc 4.4.5
+sed -i s/"compilerInstall=System"/"compilerInstall=OpenFOAM\nWM_COMPILER=Gcc44"/g ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+
+# Activate the compilation of gcc 4.4.5 in the ThirdParty/AllMake.stage1 file
+sed -i 0,/"#( rpm_make -p gmp-5.0.1"/s//"( rpm_make -p gmp-5.0.1"/ ~/OpenFOAM/OpenFOAM-1.6-ext/ThirdParty/AllMake.stage1
+sed -i 0,/"#( rpm_make -p mpfr-3.0.1"/s//"( rpm_make -p mpfr-3.0.1"/ ~/OpenFOAM/OpenFOAM-1.6-ext/ThirdParty/AllMake.stage1
+sed -i 0,/"#( rpm_make -p gcc-4.4.5"/s//"( rpm_make -p gcc-4.4.5"/ ~/OpenFOAM/OpenFOAM-1.6-ext/ThirdParty/AllMake.stage1
+
+# Add the wmake rules set for Gcc44
+ln -s ~/OpenFOAM/OpenFOAM-1.6-ext/wmake/rules/linux64Gcc ~/OpenFOAM/OpenFOAM-1.6-ext/wmake/rules/linux64Gcc44
+
+--------------------------------------------------------------------------------
+
+
+# We are going to use the version of QT4 provided by the ThirdParty packages
+
+# Uncomment and modify the initialization of the variables QT_THIRD_PARTY in the
+# file prefs.sh
+
+sed -i s/"#export QT_THIRD_PARTY=1"/"export QT_THIRD_PARTY=1"/g ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh
+
+# This section of the prefs.sh file should now look like this:
+
+export QT_THIRD_PARTY=1
+#export QT_DIR=path_to_system_installed_qt
+#export QT_BIN_DIR=$QT_DIR/bin
+
+
+--------------------------------------------------------------------------------
+
+# Source this initial OpenFOAM environment to get the basic configuration for
+# compilation
+. ~/OpenFOAM/OpenFOAM-1.6-ext/etc/bashrc
+
+# You will get some warnings about missing file for gcc-4.4.5, and problem with
+# your compiler installation.
+# This is quite normal, your gcc-4.4.5 compiler is not even compiled and
+# installed yet. Patience patience...
+
+# Compile the ThirdParty packages, including the gcc 4.4.5 compiler
+
+cd $WM_PROJECT_DIR/ThirdParty
+./AllMake >& log.AllMake &
+tail -f log.AllMake   # To keep an eye on the compilation process
+
+--------------------------------------------------------------------------------
+
+# Update your OpenFOAM environment to get the basic configuration from the newly
+# compiled ThirdParty packages
+
+. ~/OpenFOAM/OpenFOAM-1.6-ext/etc/bashrc
+
+# Compile OpenFOAM-1.6-ext
+
+cd $WM_PROJECT_DIR
+./Allwmake >& log.Allwmake &  
+tail -f log.Allwmake          # To keep an eye on the compilation process
+
+--------------------------------------------------------------------------------
+
+# Execute Allwmake a second time because of a bad library building sequence for
+# the library -lfaceDecompositionMotionSolver 
+
+./Allwmake >& log.Allwmake2 & 
+tail -f log.Allwmake2          # To keep an eye on the compilation process
+
+--------------------------------------------------------------------------------
+
+# Run a tutorial to check the basic functionality
+
+cd $FOAM_TUTORIAL/incompressible/simpleFoam/pitzDaily
+blockMesh >& log.blockMesh
+simpleFoam >& log.simpleFoam
+paraFoam
+
+# You are done!
+
+--------------------------------------------------------------------------------
+Martin Beaudoin
+August 2011

@@ -130,9 +130,11 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 
 export QT_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 export QT_BIN_DIR=\$QT_DIR/bin
+export QT_LIB_DIR=\$QT_DIR/lib
 
 # Enable access to the runtime package applications
 [ -d \$QT_BIN_DIR ] && _foamAddPath \$QT_BIN_DIR
+[ -d \$QT_LIB_DIR ] && _foamAddLib  \$QT_LIB_DIR
 DOT_SH_EOF
 
     #
@@ -143,9 +145,14 @@ cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.cs
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 setenv QT_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 setenv QT_BIN_DIR \$QT_DIR/bin
+setenv QT_LIB_DIR \$QT_DIR/lib
 
 if ( -e \$QT_BIN_DIR ) then
     _foamAddPath \$QT_BIN_DIR
+endif
+
+if ( -e \$QT_LIB_DIR ) then
+    _foamAddLib \$QT_LIB_DIR
 endif
 DOT_CSH_EOF
 
