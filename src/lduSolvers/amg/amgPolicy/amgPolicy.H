@@ -168,7 +168,6 @@ public:
             scalarField& x,
             const scalarField& coarseX
         ) const = 0;
-
 };
 
 
