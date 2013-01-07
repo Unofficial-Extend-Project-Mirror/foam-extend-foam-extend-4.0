@@ -88,6 +88,11 @@ DeferredCorrectionLimitedScheme<Type, Limiter, LimitFunc>::limiter
     GeometricField<typename Limiter::gradPhiType, fvPatchField, volMesh>
         gradc(fvc::grad(lPhi));
 
+    // Note: in order for the patchNeighbourField to be correct on coupled
+    // boundaries, correctBoundaryConditions needs to be called.
+    // The call shall be moved into the library fvc operators
+    gradc.correctBoundaryConditions(); 
+
     const surfaceScalarField& CDweights = mesh.surfaceInterpolation::weights();
 
     const unallocLabelList& owner = mesh.owner();
