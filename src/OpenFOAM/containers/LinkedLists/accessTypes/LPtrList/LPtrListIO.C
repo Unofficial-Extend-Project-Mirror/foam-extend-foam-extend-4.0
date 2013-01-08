@@ -61,7 +61,7 @@ void Foam::LPtrList<LListBase, T>::read(Istream& is, const INew& iNew)
             {
                 for (label i=0; i<s; i++)
                 {
-                    append(iNew(is).ptr());
+                    this->append(iNew(is).ptr());
 
                     is.fatalCheck
                     (
@@ -73,7 +73,7 @@ void Foam::LPtrList<LListBase, T>::read(Istream& is, const INew& iNew)
             else
             {
                 T* tPtr = iNew(is).ptr();
-                append(tPtr);
+                this->append(tPtr);
 
                 is.fatalCheck
                 (
@@ -83,7 +83,7 @@ void Foam::LPtrList<LListBase, T>::read(Istream& is, const INew& iNew)
 
                 for (label i=1; i<s; i++)
                 {
-                    append(tPtr->clone().ptr());
+                    this->append(tPtr->clone().ptr());
                 }
             }
         }
@@ -115,7 +115,7 @@ void Foam::LPtrList<LListBase, T>::read(Istream& is, const INew& iNew)
         )
         {
             is.putBack(lastToken);
-            append(iNew(is).ptr());
+            this->append(iNew(is).ptr());
 
             is >> lastToken;
             is.fatalCheck
@@ -145,14 +145,14 @@ template<class LListBase, class T>
 template<class INew>
 Foam::LPtrList<LListBase, T>::LPtrList(Istream& is, const INew& iNew)
 {
-    read(is, iNew);
+    this->read(is, iNew);
 }
 
 
 template<class LListBase, class T>
 Foam::LPtrList<LListBase, T>::LPtrList(Istream& is)
 {
-    read(is, INew<T>());
+    this->read(is, INew<T>());
 }
 
 

@@ -208,7 +208,7 @@ bool Foam::fileFormats::STARCDsurfaceFormat<Face>::read
     }
     mapPointId.clear();
 
-    sortFacesAndStore(dynFaces.xfer(), dynZones.xfer(), sorted);
+    this->sortFacesAndStore(dynFaces.xfer(), dynZones.xfer(), sorted);
 
     // add zones, culling empty ones
     this->addZones(dynSizes, dynNames, true);
@@ -231,7 +231,7 @@ void Foam::fileFormats::STARCDsurfaceFormat<Face>::write
     (
         surf.surfZones().size() > 1
       ? surf.surfZones()
-      : oneZone(faceLst)
+      : STARCDsurfaceFormat::oneZone(faceLst)
     );
 
     const bool useFaceMap = (surf.useFaceMap() && zones.size() > 1);

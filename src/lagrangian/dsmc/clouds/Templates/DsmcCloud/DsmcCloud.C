@@ -586,7 +586,7 @@ void Foam::DsmcCloud<ParcelType>::addNewParcel
         typeId
     );
 
-    addParticle(pPtr);
+    this->addParticle(pPtr);
 }
 
 

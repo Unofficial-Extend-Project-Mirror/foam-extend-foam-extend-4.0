@@ -87,7 +87,7 @@ Foam::label Foam::Cloud<ParticleType>::getNewParticleID() const
 template<class ParticleType>
 void Foam::Cloud<ParticleType>::addParticle(ParticleType* pPtr)
 {
-    append(pPtr);
+    this->append(pPtr);
 }
 
 

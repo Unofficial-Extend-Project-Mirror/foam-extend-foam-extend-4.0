@@ -240,7 +240,7 @@ Foam::BlockGMRESSolver<Type>::solve
 
             solverPerf.finalResidual() = gSum(cmptMag(rA))/norm;
             solverPerf.nIterations()++;
-        } while (!stop(solverPerf));
+        } while (!this->stop(solverPerf));
     }
 
     return solverPerf;

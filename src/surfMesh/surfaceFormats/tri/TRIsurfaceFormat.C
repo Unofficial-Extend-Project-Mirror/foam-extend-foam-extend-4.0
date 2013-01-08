@@ -141,7 +141,7 @@ void Foam::fileFormats::TRIsurfaceFormat<Face>::write
     (
         surf.surfZones().size() > 1
       ? surf.surfZones()
-      : oneZone(faceLst)
+      : TRIsurfaceFormat::oneZone(faceLst)
     );
 
     const bool useFaceMap = (surf.useFaceMap() && zones.size() > 1);

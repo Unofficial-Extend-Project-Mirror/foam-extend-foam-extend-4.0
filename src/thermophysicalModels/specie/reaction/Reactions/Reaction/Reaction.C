@@ -51,7 +51,7 @@ void Reaction<ReactionThermo>::setThermo
 
     for (label i=1; i<rhs_.size(); i++)
     {
-        operator+=
+        this->operator+=
         (
             rhs_[i].stoichCoeff*(*thermoDatabase[species_[rhs_[i].index]])
         );
@@ -59,7 +59,7 @@ void Reaction<ReactionThermo>::setThermo
 
     for (label i=0; i<lhs_.size(); i++)
     {
-        operator-=
+        this->operator-=
         (
             lhs_[i].stoichCoeff*(*thermoDatabase[species_[lhs_[i].index]])
         );

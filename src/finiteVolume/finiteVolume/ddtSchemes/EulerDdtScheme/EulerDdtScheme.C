@@ -395,7 +395,7 @@ EulerDdtScheme<Type>::fvcDdtPhiCorr
         new fluxFieldType
         (
             ddtIOobject,
-            fvcDdtPhiCoeff(U.oldTime(), phiAbs.oldTime(), phiCorr())
+            this->fvcDdtPhiCoeff(U.oldTime(), phiAbs.oldTime(), phiCorr())
            *fvc::interpolate(rDeltaT*rA)*phiCorr
         )
     );
@@ -437,7 +437,7 @@ EulerDdtScheme<Type>::fvcDdtPhiCorr
             (
                 ddtIOobject,
                 rDeltaT
-               *fvcDdtPhiCoeff(U.oldTime(), phiAbs.oldTime())
+               *this->fvcDdtPhiCoeff(U.oldTime(), phiAbs.oldTime())
                *(
                    fvc::interpolate(rA*rho.oldTime())*phiAbs.oldTime()
                  - (fvc::interpolate(rA*rho.oldTime()*U.oldTime())
@@ -458,7 +458,7 @@ EulerDdtScheme<Type>::fvcDdtPhiCorr
             (
                 ddtIOobject,
                 rDeltaT
-               *fvcDdtPhiCoeff
+               *this->fvcDdtPhiCoeff
                 (
                     U.oldTime(),
                     phiAbs.oldTime()/fvc::interpolate(rho.oldTime())
@@ -488,7 +488,7 @@ EulerDdtScheme<Type>::fvcDdtPhiCorr
             (
                 ddtIOobject,
                 rDeltaT
-               *fvcDdtPhiCoeff(rho.oldTime(), U.oldTime(), phiAbs.oldTime())
+               *this->fvcDdtPhiCoeff(rho.oldTime(), U.oldTime(), phiAbs.oldTime())
                *(
                    fvc::interpolate(rA)*phiAbs.oldTime()
                  - (fvc::interpolate(rA*U.oldTime()) & mesh().Sf())
