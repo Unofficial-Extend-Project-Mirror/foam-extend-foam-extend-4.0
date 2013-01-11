@@ -548,6 +548,7 @@ $(derivedPointPatchFields)/slip/slipPointPatchFields.C
 $(derivedPointPatchFields)/global/globalPointPatchFields.C
 $(derivedPointPatchFields)/uniformFixedValue/uniformFixedValuePointPatchFields.C
 $(derivedPointPatchFields)/timeVaryingUniformFixedValue/timeVaryingUniformFixedValuePointPatchFields.C
+$(derivedPointPatchFields)/oscillatingFixedValue/oscillatingFixedValuePointPatchFields.C
 
 fields/GeometricFields/pointFields/pointFields.C
 

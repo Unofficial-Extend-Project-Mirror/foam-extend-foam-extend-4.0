@@ -69,7 +69,7 @@ class UniformFixedValuePointPatchField
 public:
 
     //- Runtime type information
-    TypeName("oscillatingFixedValue");
+    TypeName("uniformFixedValue");
 
 
     // Constructors
