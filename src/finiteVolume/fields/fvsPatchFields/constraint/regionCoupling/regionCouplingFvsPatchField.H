@@ -72,14 +72,30 @@ class regionCouplingFvsPatchField
         //- Matrix update buffer
         mutable scalarField matrixUpdateBuffer_;
 
+        //- Original patch field.  Required for correct evaluation
+        //  in harmonic averaging
+        mutable Field<Type> originalPatchField_;
+
+        //- Current time index used to store originalPatchField_
+        mutable label curTimeIndex_;
+
 
 protected:
 
-        //- Return contents of a matrix update buffer
-        const scalarField& matrixUpdateBuffer() const
+        //- Set remote field name
+        void setRemoteFieldName(const word& name)
         {
-            return matrixUpdateBuffer_;
+            remoteFieldName_ = name;
         }
+
+        //- Return non-const access to matrixUpdateBuffer
+        void setMatrixUpdateBuffer(const scalarField& field) const
+        {
+            matrixUpdateBuffer_ = field;
+        }
+
+        //- Return original patch field
+        const Field<Type>& originalPatchField() const;
 
 
 public:
@@ -146,7 +162,7 @@ public:
 
     // Member functions
 
-        // Evaluation functions
+        // Access functions
 
             //- Return remote field name
             const word& remoteFieldName() const
@@ -154,8 +170,33 @@ public:
                 return remoteFieldName_;
             }
 
+            //- Return contents of a matrix update buffer
+            const scalarField& matrixUpdateBuffer() const
+            {
+                return matrixUpdateBuffer_;
+            }
+
+            //- Return a named shadow patch field
+            template<class LookupField, class LookupType>
+            const typename LookupField::PatchFieldType&
+            lookupShadowPatchField
+            (
+                const word& name,
+                const LookupField* = NULL,
+                const LookupType* = NULL
+            ) const;
+
+            //- Return a shadow patch
+            const regionCoupleFvPatch& regionCouplePatch() const
+            {
+                return regionCouplePatch_;
+            }
+
             //- Return shadow patch field
             const regionCouplingFvsPatchField<Type>& shadowPatchField() const;
+
+
+        // Evaluation functions
 
 
         //- Write
