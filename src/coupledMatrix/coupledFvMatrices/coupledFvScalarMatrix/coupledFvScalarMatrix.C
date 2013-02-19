@@ -70,7 +70,10 @@ coupledSolverPerformance coupledFvMatrix<scalar>::solve
             static_cast<fvScalarMatrix&>(matrices[rowI]);
 
         saveDiag.set(rowI, new scalarField(curMatrix.diag()));
-        psi.set(rowI, new scalarField(curMatrix.psi()));
+        // HR 17/Feb/2013
+        // Need to be able to compare references to support hacks such as in jumpCyclic
+        // psi.set(rowI, new scalarField(curMatrix.psi()));
+        psi.set(rowI, &curMatrix.psi());
         source.set(rowI, new scalarField(curMatrix.source()));
 
         curMatrix.addBoundarySource(source[rowI], 0);
@@ -111,22 +114,30 @@ coupledSolverPerformance coupledFvMatrix<scalar>::solve
 
     solverPerf.print();
 
+    // HR 17/Feb/2013
+    // Not needed since reference is used
     // Update solution
-    forAll (matrices, rowI)
-    {
-        fvScalarMatrix& curMatrix =
-            static_cast<fvScalarMatrix&>(matrices[rowI]);
+    //forAll (matrices, rowI)
+    //{
+    //    fvScalarMatrix& curMatrix =
+    //        static_cast<fvScalarMatrix&>(matrices[rowI]);
+    //
+    //    curMatrix.psi().internalField() = psi[rowI];
+    //}
 
-        curMatrix.psi().internalField() = psi[rowI];
-    }
-
-    // Correct boundart conditions
+    // Correct boundary conditions
     forAll (matrices, rowI)
     {
         fvScalarMatrix& curMatrix =
             static_cast<fvScalarMatrix&>(matrices[rowI]);
 
         curMatrix.psi().correctBoundaryConditions();
+    }
+
+    //HR 17.2.2013: Clear references to internal field without deleting the objects
+    forAll (matrices, rowI)
+    {
+	psi.set(rowI, NULL).ptr();
     }
 
     return solverPerf;

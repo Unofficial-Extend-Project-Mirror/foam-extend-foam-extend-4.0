@@ -204,7 +204,7 @@ Foam::coupledFvMatrix<Type>::solve(const dictionary& solverControls)
         }
     }
 
-    // Correct boundart conditions
+    // Correct boundary conditions
     forAll (matrices, rowI)
     {
         fvMatrix<Type>& curMatrix =
