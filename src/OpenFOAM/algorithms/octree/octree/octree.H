@@ -134,7 +134,7 @@ class octree
         //- Top treeNode. Modified by lower levels.
         treeNode<Type>* topNode_;
 
-        //- all shapes
+        //- All shapes
         const Type shapes_;
 
         //- Overall bb of octree
