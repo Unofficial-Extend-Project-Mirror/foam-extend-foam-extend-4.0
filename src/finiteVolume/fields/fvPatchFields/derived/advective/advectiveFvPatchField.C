@@ -450,7 +450,7 @@ void advectiveFvPatchField<Type>::write(Ostream& os) const
         << token::END_STATEMENT << nl;
 
     os.writeKeyword("correctSupercritical") << correctSupercritical_
-            << token::END_STATEMENT << nl;
+        << token::END_STATEMENT << nl;
 
     this->writeEntry("value", os);
 }
