@@ -182,6 +182,9 @@ public:
             //- Evaluate boundary conditions
             void evaluate();
 
+            //- Evaluate coupled boundary conditions only
+            void evaluateCoupled();
+
             //- Return a list of the patch types
             wordList types() const;
 
