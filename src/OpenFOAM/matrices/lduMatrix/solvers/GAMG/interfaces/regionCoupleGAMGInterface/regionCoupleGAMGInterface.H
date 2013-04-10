@@ -91,7 +91,7 @@ public:
 
             //- Return true if interface is coupled
             virtual bool coupled() const
-            {Info<< "BANANA" << endl;
+            {
                 return coupled_;
             }
 };
