@@ -580,6 +580,12 @@ void Foam::Time::setTime(const scalar newTime, const label newIndex)
 }
 
 
+void Foam::Time::setStopAt(const stopAtControls& sa)
+{
+    stopAt_ = sa;
+}
+
+
 void Foam::Time::setEndTime(const dimensionedScalar& endTime)
 {
     setEndTime(endTime.value());
@@ -606,9 +612,15 @@ void Foam::Time::setDeltaT(const scalar deltaT)
 }
 
 
-void Foam::Time::setWriteInterval(const scalar& deltaTheta)
+void Foam::Time::setWriteControl(const writeControls& wc)
 {
-    writeInterval_ = deltaTheta;
+    writeControl_ = wc;
+}
+
+
+void Foam::Time::setWriteInterval(const scalar writeInterval)
+{
+    writeInterval_ = writeInterval;
 }
 
 

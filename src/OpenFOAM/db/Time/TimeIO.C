@@ -38,10 +38,22 @@ void Foam::Time::readDict()
 
     if (controlDict_.found("writeControl"))
     {
-        writeControl_ = writeControlNames_.read
-        (
-            controlDict_.lookup("writeControl")
-        );
+        word wcName(controlDict_.lookup("writeControl"));
+
+        if (writeControlNames_.found(wcName))
+        {
+            writeControl_ = writeControlNames_[wcName];
+        }
+        else
+        {
+            WarningIn("void Time::readDict()")
+                << wcName << " not found in enumeration "
+                << writeControlNames_.toc() << nl
+                << " setting writeControl to runTime" << endl;
+
+            writeControl_ = wcTimeStep;
+        }
+                
     }
 
     scalar oldWriteInterval = writeInterval_;
@@ -49,9 +61,12 @@ void Foam::Time::readDict()
     {
         if (writeControl_ == wcTimeStep && label(writeInterval_) < 1)
         {
-            FatalIOErrorIn("Time::readDict()", controlDict_)
-                << "writeInterval < 1 for writeControl timeStep"
-                << exit(FatalIOError);
+            WarningIn("Time::readDict()")
+                << "writeInterval < 1 for writeControl timeStep.  "
+                << "Re-setting to 1."
+                << endl;
+
+            writeInterval_ = 1;
         }
     }
     else
@@ -111,7 +126,7 @@ void Foam::Time::readDict()
         }
         else
         {
-            WarningIn("Time::readDict()")
+            WarningIn("void Time::readDict()")
                 << "unsupported time format " << formatName
                 << endl;
         }
@@ -123,7 +138,24 @@ void Foam::Time::readDict()
     // if nothing is specified, the endTime is zero
     if (controlDict_.found("stopAt"))
     {
-        stopAt_ = stopAtControlNames_.read(controlDict_.lookup("stopAt"));
+        word saName(controlDict_.lookup("stopAt"));
+
+        if (stopAtControlNames_.found(saName))
+        {
+            stopAt_ = stopAtControlNames_[saName];
+        }
+        else
+        {
+            WarningIn("void Time::readDict()")
+                << saName << " not found in enumeration "
+                << stopAtControlNames_.toc() << nl
+                << "Setting to writeNow" << endl;
+
+            stopAt_ = saWriteNow;
+
+            // Set output time
+            outputTime_ = true;
+        }
 
         if (stopAt_ == saEndTime)
         {
