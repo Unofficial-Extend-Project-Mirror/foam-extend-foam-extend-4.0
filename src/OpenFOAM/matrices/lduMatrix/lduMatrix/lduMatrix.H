@@ -53,6 +53,7 @@ SourceFiles
 #define lduMatrix_H
 
 #include "lduMesh.H"
+#include "HashSet.H"
 #include "primitiveFieldsFwd.H"
 #include "FieldField.H"
 #include "lduInterfaceFieldPtrsList.H"
@@ -81,6 +82,10 @@ class lduMatrix
 
         //- LDU mesh reference
         const lduMesh& lduMesh_;
+
+        //- Eliminated equations
+        //  Consider adding solo cells on construction.  HJ, 26/Oct/2012
+        labelHashSet eliminatedEqns_;
 
         //- Coefficients (not including interfaces)
         scalarField *lowerPtr_, *diagPtr_, *upperPtr_;
@@ -782,6 +787,18 @@ public:
             const lduMesh& mesh() const
             {
                 return lduMesh_;
+            }
+
+            //- Return eliminated equations
+            const labelHashSet& eliminatedEqns() const
+            {
+                return eliminatedEqns_;
+            }
+
+            //- Return access to eliminated equations
+            labelHashSet& eliminatedEqns()
+            {
+                return eliminatedEqns_;
             }
 
             //- Return the LDU addressing

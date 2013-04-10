@@ -158,6 +158,9 @@ void constraint<Type>::eliminateEquation
     const Type& value
 )
 {
+    // Record equation as eliminated
+    matrix.eliminatedEqns().insert(rowID);
+
     Field<Type>& source = matrix.source();
 
     const label startFaceOwn =
@@ -278,6 +281,9 @@ void constraint<Type>::eliminateEquation
     scalarField& sourceCmpt
 ) const
 {
+    // Record equation as eliminated
+    matrix.eliminatedEqns().insert(rowID_);
+
     const Type& fc = fixedComponents();
 
     const scalar fcOfD = componentOfValue(fc, d);

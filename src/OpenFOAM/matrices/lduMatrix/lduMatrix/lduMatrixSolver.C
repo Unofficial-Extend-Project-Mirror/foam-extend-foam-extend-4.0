@@ -48,7 +48,8 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
     const dictionary& dict
 )
 {
-    word solverName(dict.lookup("solver"));
+    // Insist of solver name look-up only for complete matrices
+    // HJ, 5/Dec/2012
 
     if (matrix.diagonal())
     {
@@ -67,6 +68,8 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
     }
     else if (matrix.symmetric())
     {
+        word solverName(dict.lookup("solver"));
+
         symMatrixConstructorTable::iterator constructorIter =
             symMatrixConstructorTablePtr_->find(solverName);
 
@@ -96,6 +99,8 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
     }
     else if (matrix.asymmetric())
     {
+        word solverName(dict.lookup("solver"));
+
         asymMatrixConstructorTable::iterator constructorIter =
             asymMatrixConstructorTablePtr_->find(solverName);
 
@@ -154,11 +159,25 @@ Foam::scalar Foam::lduMatrix::solver::normFactor
 
     // Calculate normalisation factor using full multiplication
     // with mean value.  HJ, 5/Nov/2007
-    scalar xRef = gAverage(x);
+    scalarField xRef(x.size(), gAverage(x));
+
+    // Eliminated equations are removed from residual normalisation
+    if (!matrix_.eliminatedEqns().empty())
+    {
+        labelList elim = matrix_.eliminatedEqns().toc();
+
+        forAll (elim, elimI)
+        {
+            // Set the value of xRef to be identical to the value of x
+            // to eliminate the residual
+            xRef[elim[elimI]] = x[elim[elimI]];
+        }
+    }
+
     matrix_.Amul
     (
         tmpField,
-        scalarField(x.size(), xRef),
+        xRef,
         coupleBouCoeffs_,
         interfaces_,
         cmpt
