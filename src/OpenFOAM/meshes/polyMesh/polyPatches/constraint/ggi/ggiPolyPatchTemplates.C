@@ -52,7 +52,7 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
     // Notes:
     // A) If the size of zone addressing is zero, data is not sent
     // B) Communicated data on each processor has the size of live faces
-    // C) Expanded data will be equal to actual data fronm other processors
+    // C) Expanded data will be equal to actual data from other processors
     //    only for the faces marked in remote; for other faces, it will be
     //    equal to zero
     // D) On processor zero, complete data is available
@@ -197,95 +197,6 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
 }
 
 
-// Obsolete.  HJ, 12/Jun/2011
-template<class Type>
-Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::expand
-(
-    const Field<Type>& ff
-) const
-{
-    // Check and expand the field from patch size to zone size
-    if (ff.size() != size())
-    {
-        FatalErrorIn
-        (
-            "tmp<Field<Type> > ggiPolyPatch::expand"
-            "("
-            "    const Field<Type>& ff"
-            ") const"
-        )   << "Incorrect patch field size.  Field size: "
-            << ff.size() << " patch size: " << size()
-            << abort(FatalError);
-    }
-
-    // Expand the field to zone size
-    tmp<Field<Type> > texpandField
-    (
-        new Field<Type>(zone().size(), pTraits<Type>::zero)
-    );
-
-    Field<Type>& expandField = texpandField();
-
-    const labelList& addr = zoneAddressing();
-
-    forAll (addr, i)
-    {
-        expandField[addr[i]] = ff[i];
-    }
-
-    // Parallel data exchange: update surface field on all processors
-    // Operation is performed if the patch is not localised
-    // HJ, 8/Dec/2009
-
-    if (!localParallel())
-    {
-        reduce(expandField, sumOp<Field<Type> >());
-    }
-
-    return texpandField;
-}
-
-
-// Obsolete.  HJ, 12/Jun/2011
-template<class Type>
-Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::filter
-(
-    const Field<Type>& ef
-) const
-{
-    // Check and expand the field from patch size to zone size
-    if (ef.size() != zone().size())
-    {
-        FatalErrorIn
-        (
-            "tmp<Field<Type> > ggiPolyPatch::filter"
-            "("
-            "    const Field<Type>& ef"
-            ") const"
-        )   << "Incorrect patch field size.  Field size: "
-            << ef.size() << " patch size: " << zone().size()
-            << abort(FatalError);
-    }
-
-    // Filter the field to zone size
-    tmp<Field<Type> > tfilterField
-    (
-        new Field<Type>(size(), pTraits<Type>::zero)
-    );
-
-    Field<Type>& filterField = tfilterField();
-
-    const labelList& addr = zoneAddressing();
-
-    forAll (addr, i)
-    {
-        filterField[i] = ef[addr[i]];
-    }
-
-    return tfilterField;
-}
-
-
 template<class Type>
 Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::interpolate
 (
@@ -305,8 +216,6 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::interpolate
             << ff.size() << " patch size: " << shadow().size()
             << abort(FatalError);
     }
-
-#   if 1
 
     // New.  HJ, 12/Jun/2011
     if (localParallel())
@@ -358,30 +267,6 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::interpolate
 
         return tresult;
     }
-
-#   else
-
-    // Old treatment
-    // Obsolete.  HJ, 12/Jun/2011
-
-    // Expand the field to zone size
-    Field<Type> expandField = shadow().expand(ff);
-
-    Field<Type> zoneField;
-
-    // Interpolate expanded field
-    if (master())
-    {
-        zoneField = patchToPatch().slaveToMaster(expandField);
-    }
-    else
-    {
-        zoneField = patchToPatch().masterToSlave(expandField);
-    }
-
-    return this->filter(zoneField);
-
-#   endif
 }
 
 
@@ -421,8 +306,6 @@ void Foam::ggiPolyPatch::bridge
 
     if (bridgeOverlap())
     {
-#       if 1
-
         if (empty())
         {
             // Patch empty, no bridging
@@ -462,31 +345,6 @@ void Foam::ggiPolyPatch::bridge
                 );
             }
         }
-
-#       else
-
-        // Expand the field to zone size
-        Field<Type> expandBridge = this->expand(bridgeField);
-        Field<Type> expandField = this->expand(ff);
-
-        if (master())
-        {
-            patchToPatch().bridgeMaster(expandBridge, expandField);
-        }
-        else
-        {
-            patchToPatch().bridgeSlave(expandBridge, expandField);
-        }
-
-        // Contract the field from zone size to patch size
-        const labelList& addr = zoneAddressing();
-
-        forAll (addr, i)
-        {
-            ff[i] = expandField[addr[i]];
-        }
-
-#       endif
     }
 }
 

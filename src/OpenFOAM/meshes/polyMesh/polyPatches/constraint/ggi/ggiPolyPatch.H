@@ -73,23 +73,25 @@ class ggiPolyPatch
         //- Use bridging to fix overlap error in interpolation
         Switch bridgeOverlap_;
 
-        //- Shadow patch index.  Delayed evaluation for construction
-        mutable label shadowIndex_;
+        // Demand-driven data
 
-        //- Interpolation zone index.  Delayed evaluation for construction
-        mutable label zoneIndex_;
+            //- Shadow patch index.  Delayed evaluation for construction
+            mutable label shadowIndex_;
 
-        //- Patch-to-patch interpolation
-        mutable ggiZoneInterpolation* patchToPatchPtr_;
+            //- Interpolation zone index.  Delayed evaluation for construction
+            mutable label zoneIndex_;
 
-        //- Patch-to-zone addressing
-        mutable labelList* zoneAddressingPtr_;
+            //- Patch-to-patch interpolation
+            mutable ggiZoneInterpolation* patchToPatchPtr_;
 
-        //- Remote zone addressing: data needed for interpolation
-        mutable labelList* remoteZoneAddressingPtr_;
+            //- Patch-to-zone addressing
+            mutable labelList* zoneAddressingPtr_;
 
-        //- Reconstructed patch neighbour cell centres
-        mutable vectorField* reconFaceCellCentresPtr_;
+            //- Remote zone addressing: data needed for interpolation
+            mutable labelList* remoteZoneAddressingPtr_;
+
+            //- Reconstructed patch neighbour cell centres
+            mutable vectorField* reconFaceCellCentresPtr_;
 
 
         // Parallel communication optimisation, stored on master processor
@@ -305,6 +307,7 @@ public:
             //- Return interpolation face zone
             const faceZone& zone() const;
 
+
         // Interpolation data
 
             //- Is this the master side?
@@ -342,19 +345,8 @@ public:
         // Interpolation functions
 
             //- Expand face field to full zone size, including reduction
-            //  New.  HJ, 12/Jun/2011
             template<class Type>
             tmp<Field<Type> > fastExpand(const Field<Type>& pf) const;
-
-            //- Expand face field to full zone size, including reduction
-            //  Obsolete.  HJ, 12/Jun/2011
-            template<class Type>
-            tmp<Field<Type> > expand(const Field<Type>& pf) const;
-
-            //- Filter zone field to patch size
-            //  Obsolete.  HJ, 12/Jun/2011
-            template<class Type>
-            tmp<Field<Type> > filter(const Field<Type>& zf) const;
 
             //- Interpolate face field: given field on a the shadow side,
             //  create an interpolated field on this side

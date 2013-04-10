@@ -464,8 +464,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
 )
 :
     coupledPolyPatch(name, size, start, index, bm),
-    shadowName_("_initialize_me_"),
-    zoneName_("_initialize_me_"),
+    shadowName_("initializeMe"),
+    zoneName_("initializeMe"),
     bridgeOverlap_(false),
     shadowIndex_(-1),
     zoneIndex_(-1),
@@ -847,7 +847,7 @@ void Foam::ggiPolyPatch::updateMesh()
 
 void Foam::ggiPolyPatch::calcTransforms()
 {
-    // Simplest GGI: no transform or separation.  HJ, 24/Oct/2008
+    // Simplest mixing plane: no transform or separation.  HJ, 24/Oct/2008
     forwardT_.setSize(0);
     reverseT_.setSize(0);
     separation_.setSize(0);
