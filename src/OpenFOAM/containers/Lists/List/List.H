@@ -89,9 +89,15 @@ protected:
 
 public:
 
+    // Static data members
+
+        //- Empty list
+        static const List<T> zero;
+
+
     // Static Member Functions
 
-        //- Return a null List
+        //- Return a null list
         inline static const List<T>& null();
 
     // Constructors

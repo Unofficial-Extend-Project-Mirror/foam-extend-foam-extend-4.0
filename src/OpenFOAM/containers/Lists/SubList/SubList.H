@@ -62,6 +62,7 @@ public:
     // Static Member Functions
 
         //- Return a null SubList
+        //  Dangerous, but no null constructor.  Reconsider.  HJ, 10/Apr/2013
         inline static const SubList<T>& null();
 
 

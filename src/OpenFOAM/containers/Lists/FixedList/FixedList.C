@@ -27,7 +27,12 @@ License
 #include "FixedList.H"
 #include "ListLoopM.H"
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Static Members  * * * * * * * * * * * * * * //
+
+template<class T, unsigned Size>
+const Foam::FixedList<T, Size> Foam::FixedList<T, Size>::zero =
+    Foam::FixedList<T, Size>();
+
 
 // * * * * * * * * * * * * * * STL Member Functions  * * * * * * * * * * * * //
 

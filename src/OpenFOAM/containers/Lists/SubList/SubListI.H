@@ -128,6 +128,7 @@ inline const Foam::SubList<T>& Foam::SubList<T>::null()
 template<class T>
 inline Foam::SubList<T>::operator const Foam::List<T>&() const
 {
+    // Dangerous, but no null constructor.  Reconsider.  HJ, 10/Apr/2013
     return *reinterpret_cast< const List<T>* >(this);
 }
 

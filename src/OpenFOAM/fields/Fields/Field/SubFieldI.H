@@ -85,6 +85,7 @@ inline Foam::SubField<Type>::SubField
 template<class Type>
 inline const Foam::SubField<Type>& Foam::SubField<Type>::null()
 {
+    // Dangerous, but no null constructor.  Reconsider.  HJ, 10/Apr/2013
     SubField<Type>* nullPtr = reinterpret_cast<SubField<Type>*>(NULL);
     return *nullPtr;
 }

@@ -69,6 +69,13 @@ public:
     typedef typename pTraits<Type>::cmptType cmptType;
 
 
+    // Static Member Functions
+
+        //- Return a null SubField
+        //  Dangerous, but no null constructor.  Reconsider.  HJ, 10/Apr/2013
+        static inline const SubField<Type>& null();
+
+
     // Constructors
 
         //- Construct from a SubList
@@ -97,9 +104,6 @@ public:
 
 
     // Member functions
-
-        //- Return a null SubField
-        static inline const SubField<Type>& null();
 
         //- Return a component field of the field
         inline tmp<Field<cmptType> > component(const direction) const;

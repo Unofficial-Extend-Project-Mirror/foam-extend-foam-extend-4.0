@@ -93,6 +93,12 @@ class Xfer
 
 public:
 
+    // Static data members
+
+        //- Empty Xfer
+        static const Xfer<T> zero;
+
+
     // Constructors
 
         //- Store object pointer and manage its deletion

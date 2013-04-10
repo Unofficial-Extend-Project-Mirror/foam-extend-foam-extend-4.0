@@ -26,6 +26,12 @@ License
 
 #include "Matrix.H"
 
+// * * * * * * * * * * * * * * * Static Members  * * * * * * * * * * * * * * //
+
+template<class Form, class Type>
+const Foam::Matrix<Form, Type> Foam::Matrix<Form, Type>::zero =
+    Foam::Matrix<Form, Type>();
+
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
 template<class Form, class Type>

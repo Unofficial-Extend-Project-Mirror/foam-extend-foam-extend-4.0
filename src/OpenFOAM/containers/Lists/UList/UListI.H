@@ -28,6 +28,12 @@ License
 #include "pTraits.H"
 #include "Swap.H"
 
+// * * * * * * * * * * * * * * * Static Members  * * * * * * * * * * * * * * //
+
+template<class T>
+const Foam::UList<T> Foam::UList<T>::zero = UList<T>();
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class T>
@@ -51,7 +57,7 @@ inline Foam::UList<T>::UList(T* __restrict__ v, label size)
 template<class T>
 inline const Foam::UList<T>& Foam::UList<T>::null()
 {
-    return *reinterpret_cast< UList<T>* >(0);
+    return zero;
 }
 
 

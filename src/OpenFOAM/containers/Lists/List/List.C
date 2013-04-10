@@ -35,6 +35,12 @@ License
 #include "BiIndirectList.H"
 #include "contiguous.H"
 
+// * * * * * * * * * * * * * * * Static Members  * * * * * * * * * * * * * * //
+
+template<class Type>
+const Foam::List<Type> Foam::List<Type>::zero = Foam::List<Type>();
+
+
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
 // Construct with length specified
