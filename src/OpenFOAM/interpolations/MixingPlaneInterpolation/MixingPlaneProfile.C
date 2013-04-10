@@ -220,12 +220,12 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcProfile() const
     pointField slaveGlobalProfile =
         cs_.localPosition(slavePatch_.localPoints());
 
-    // Collapse all points in the span direction
+    // Collapse all points in the sweep direction
 
-    const direction spanDir = spanwiseSwitch();
+    const direction sweepDir = sweepAxisSwitch();
 
-    masterGlobalProfile.replace(spanDir, 0);
-    slaveGlobalProfile.replace(spanDir, 0);
+    masterGlobalProfile.replace(sweepDir, 0);
+    slaveGlobalProfile.replace(sweepDir, 0);
 
     if (debug)
     {
@@ -284,8 +284,8 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcProfile() const
     profileHistogram masterHistogram;
     profileHistogram slaveHistogram;
 
-    // Directional switch
-    const direction dirDir = directionalSwitch();
+    // stackingDir switch
+    const direction stackingDir = stackAxisSwitch();
 
     // Master side
     forAll (masterGlobalProfile, mI)
@@ -294,7 +294,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcProfile() const
         (
             masterHistogram,
             masterGlobalProfile[mI],
-            dirDir,
+            stackingDir,
             halfMinSizeBin
         );
     }
@@ -306,7 +306,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcProfile() const
         (
             slaveHistogram,
             slaveGlobalProfile[sI],
-            dirDir,
+            stackingDir,
             halfMinSizeBin
         );
     }
@@ -330,11 +330,11 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcProfile() const
     pointField profileBeforeClip;
 
     // Select which type of profile we need
-    switch (assemblyType_)
+    switch (discretisationType_)
     {
         // To Do: add uniform mixing plane
 
-        case MASTER:
+        case MASTER_PATCH:
         {
             profileBeforeClip = computeProfileFromHistograms
             (
@@ -345,7 +345,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcProfile() const
         }
         break;
 
-        case SLAVE:
+        case SLAVE_PATCH:
         {
             profileBeforeClip = computeProfileFromHistograms
             (
@@ -356,7 +356,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcProfile() const
         }
         break;
 
-        case BOTH:
+        case BOTH_PATCHES:
         {
             profileBeforeClip = computeProfileFromHistograms
             (
@@ -367,6 +367,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcProfile() const
         }
         break;
 
+        case UNIFORM:
         case USER_DEFINED:
         default:
         {
@@ -374,10 +375,10 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcProfile() const
             (
                 "tmp<pointField> MixingPlaneInterpolation<MasterPatch, "
                 "SlavePatch>::calcProfile() const"
-            )   << "Bad type of mixing plane assembly: "
-                << MixingPlaneInterpolationName::assemblyNames_[assemblyType_]
+            )   << "Bad type of mixing plane discretisation: "
+                << discretisationNames_[discretisationType_]
                 << nl << "Available types are: " << nl
-                << MixingPlaneInterpolationName::assemblyNames_
+                << MixingPlaneInterpolationName::discretisationNames_
                 << abort(FatalError);
         }
     }
@@ -400,15 +401,15 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcProfile() const
         false
     );
 
-    // Expand the bounding box in the spanwise direction
-    // Note: All points are collapsed to zero in spanDir
+    // Expand the bounding box in the sweepAxis-wise direction
+    // Note: All points are collapsed to zero in sweepDir
     // It is sufficient to expand the box by 1 in this direction
 
-    masterBB.min().replace(spanDir, -1);
-    masterBB.max().replace(spanDir, 1);
+    masterBB.min().replace(sweepDir, -1);
+    masterBB.max().replace(sweepDir, 1);
 
-    slaveBB.min().replace(spanDir, -1);
-    slaveBB.max().replace(spanDir, 1);
+    slaveBB.min().replace(sweepDir, -1);
+    slaveBB.max().replace(sweepDir, 1);
 
     boundBox globSpanBB
     (

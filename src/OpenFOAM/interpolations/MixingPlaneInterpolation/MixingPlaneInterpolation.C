@@ -49,33 +49,26 @@ namespace Foam
 
 template<class MasterPatch, class SlavePatch>
 Foam::direction
-MixingPlaneInterpolation<MasterPatch, SlavePatch>::spanwiseSwitch() const
+MixingPlaneInterpolation<MasterPatch, SlavePatch>::sweepAxisSwitch() const
 {
-    // Spanwise switch
-    switch (orientationType_)
+    // SweepAxis switch
+    switch (sweepAxisType_)
     {
-        case DIR_Y_SPAN_X:
-        case DIR_Z_SPAN_X:
-        case DIR_THETA_SPAN_R: 
-        case DIR_Z_SPAN_R: 
+        case SWEEP_X:
+        case SWEEP_R:
         {
             return vector::X;
         }
         break;
 
-        case DIR_X_SPAN_Y:
-        case DIR_Z_SPAN_Y:
-        case DIR_R_SPAN_THETA:
-        case DIR_Z_SPAN_THETA:
+        case SWEEP_Y:
+        case SWEEP_THETA:
         {
             return vector::Y;
         }
         break;
 
-        case DIR_X_SPAN_Z:
-        case DIR_Y_SPAN_Z:
-        case DIR_R_SPAN_Z:
-        case DIR_THETA_SPAN_Z:
+        case SWEEP_Z:
         {
             return vector::Z;
         }
@@ -86,12 +79,12 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::spanwiseSwitch() const
             FatalErrorIn
             (
                 "direction MixingPlaneInterpolation<MasterPatch, "
-                "SlavePatch>::spanwiseSwitch() const"
-            )   << "Bad orientation type: "
-                << MixingPlaneInterpolationName::orientationNames_
-                       [orientationType_]
+                "SlavePatch>::sweepAxisSwitch() const"
+            )   << "Bad sweepAxis type: "
+                << MixingPlaneInterpolationName::sweepAxisNames_
+                       [sweepAxisType_]
                 << "Available types: "
-                << MixingPlaneInterpolationName::orientationNames_
+                << MixingPlaneInterpolationName::sweepAxisNames_
                 << abort(FatalError);
 
             // Dummy return
@@ -103,33 +96,26 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::spanwiseSwitch() const
 
 template<class MasterPatch, class SlavePatch>
 Foam::direction
-MixingPlaneInterpolation<MasterPatch, SlavePatch>::directionalSwitch() const
+MixingPlaneInterpolation<MasterPatch, SlavePatch>::stackAxisSwitch() const
 {
-    // Directional switch
-    switch (orientationType_)
+    // stackAxis switch
+    switch (stackAxisType_)
     {
-        case DIR_X_SPAN_Y:
-        case DIR_X_SPAN_Z:
-        case DIR_R_SPAN_THETA:
-        case DIR_R_SPAN_Z:
+        case STACK_X:
+        case STACK_R:
         {
             return vector::X;
         }
         break;
 
-        case DIR_Y_SPAN_X:
-        case DIR_Y_SPAN_Z:
-        case DIR_THETA_SPAN_R:
-        case DIR_THETA_SPAN_Z:
+        case STACK_Y:
+        case STACK_THETA:
         {
             return vector::Y;
         }
         break;
 
-        case DIR_Z_SPAN_X:
-        case DIR_Z_SPAN_Y:
-        case DIR_Z_SPAN_R:
-        case DIR_Z_SPAN_THETA:
+        case STACK_Z:
         {
             return vector::Z;
         }
@@ -139,13 +125,13 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::directionalSwitch() const
         {
             FatalErrorIn
             (
-                "tmp<pointField> MixingPlaneInterpolation<MasterPatch, "
-                "SlavePatch>::directionalSwitch() const"
-            )   << "Bad orientation type: "
-                << MixingPlaneInterpolationName::orientationNames_
-                       [orientationType_]
+                "direction MixingPlaneInterpolation<MasterPatch, "
+                "SlavePatch>::stackAxisSwitch() const"
+            )   << "Bad stackAxis type: "
+                << MixingPlaneInterpolationName::stackAxisNames_
+                       [stackAxisType_]
                 << "Available types: "
-                << MixingPlaneInterpolationName::orientationNames_
+                << MixingPlaneInterpolationName::stackAxisNames_
                 << abort(FatalError);
 
             // Dummy return
@@ -175,16 +161,18 @@ MixingPlaneInterpolation
     const MasterPatch& masterPatch,
     const SlavePatch& slavePatch,
     const coordinateSystem& cs,
-    const MixingPlaneInterpolationName::assembly& assemblyType,
-    const MixingPlaneInterpolationName::orientation& orientationType,
+    const MixingPlaneInterpolationName::discretisation& discretisationType,
+    const MixingPlaneInterpolationName::sweepAxis& sweepAxisType,
+    const MixingPlaneInterpolationName::stackAxis& stackAxisType,
     const pointField& interpolationProfile
 )
 :
     masterPatch_(masterPatch),
     slavePatch_(slavePatch),
     cs_(cs),
-    assemblyType_(assemblyType),
-    orientationType_(orientationType),
+    discretisationType_(discretisationType),
+    sweepAxisType_(sweepAxisType),
+    stackAxisType_(stackAxisType),
     interpolationProfile_(interpolationProfile),
 
     forwardT_(),
@@ -431,8 +419,7 @@ masterProfileToPatchT() const
 
 template<class MasterPatch, class SlavePatch>
 const tensorField&
-MixingPlaneInterpolation<MasterPatch, SlavePatch>::
-slavePatchToProfileT() const
+MixingPlaneInterpolation<MasterPatch, SlavePatch>::slavePatchToProfileT() const
 {
     if (!slavePatchToProfileTPtr_)
     {
@@ -445,8 +432,7 @@ slavePatchToProfileT() const
 
 template<class MasterPatch, class SlavePatch>
 const tensorField&
-MixingPlaneInterpolation<MasterPatch, SlavePatch>::
-slaveProfileToPatchT() const
+MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveProfileToPatchT() const
 {
     if (!slaveProfileToPatchTPtr_)
     {
@@ -458,8 +444,7 @@ slaveProfileToPatchT() const
 
 
 template<class MasterPatch, class SlavePatch>
-bool
-MixingPlaneInterpolation<MasterPatch, SlavePatch>::movePoints()
+bool MixingPlaneInterpolation<MasterPatch, SlavePatch>::movePoints()
 {
     clearOut();
 

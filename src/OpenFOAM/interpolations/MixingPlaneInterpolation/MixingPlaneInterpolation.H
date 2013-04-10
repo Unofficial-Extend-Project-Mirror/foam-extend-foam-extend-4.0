@@ -31,7 +31,8 @@ Description
 
     Some overview of this development can be found here:
 
-    OpenFOAM TURBO TOOLS: FROM GENERAL PURPOSE CFD TO TURBOMACHINERY SIMULATIONS 
+    OpenFOAM TURBO TOOLS: FROM GENERAL PURPOSE CFD TO TURBOMACHINERY
+    SIMULATIONS 
     H. Jasak, M. Beaudoin, Proceedings of ASME-JSME-KSME Joint Fluids
     Engineering Conference 2011, AJK2011-FED, July 24-29, 2011, Hamamatsu,
     Shizuoka, JAPAN 
@@ -52,11 +53,12 @@ Contributor
 
 
 Giving credit where credit is due:
-    1: Hakan Nilsson from the Chalmers University of Technology came up with the
-       initial idea of using a combination of 2 GGI interfaces sharing a common
-       single-face 360 degree ribbons patch in order to compute the circumferential
-       average of fields. This implementation of the mixingPlane interpolation
-       algorithm is an exploration of this simple, but rather powerful idea.
+    1: Hakan Nilsson from the Chalmers University of Technology came up with
+        the initial idea of using a combination of 2 GGI interfaces sharing a
+        common single-face 360 degree ribbons patch in order to compute the
+        circumferential average of fields. This implementation of the
+        mixingPlane interpolation algorithm is an exploration of this simple
+        but rather powerful idea.
 
     2: Maryse Page from Hydro-Quebec provided many test cases and many
        simulation runs for testing this interpolation algorithm. Testing is
@@ -120,41 +122,45 @@ public:
 
     // Public enumerations
 
-        //- Define profile assembly rule
-        enum assembly
+        //- Define profile discretisation rule
+        enum discretisation
         {
-            MASTER,
-            SLAVE,
-            BOTH,
+            MASTER_PATCH,
+            SLAVE_PATCH,
+            BOTH_PATCHES,
+            UNIFORM,
             USER_DEFINED // User-defined through a file
         };
 
-        //- Define orientation of profile used to generate the mixing patch
-        enum orientation
+        //- Define the sweepAxis used to generate the mixing ribbon patch
+        enum sweepAxis
         {
-            UNKNOWN,
+            // Cartesian coordinate system
+            SWEEP_X,
+            SWEEP_Y,
+            SWEEP_Z,
 
-            // Cartesian coordinate systems
-            DIR_X_SPAN_Y,
-            DIR_X_SPAN_Z,
-
-            DIR_Y_SPAN_X,
-            DIR_Y_SPAN_Z,
-
-            DIR_Z_SPAN_X,
-            DIR_Z_SPAN_Y,
-
-            // Cylindrical coordinate systems
-            DIR_R_SPAN_THETA,
-            DIR_R_SPAN_Z,
-
-            DIR_THETA_SPAN_R,
-            DIR_THETA_SPAN_Z,
-
-            DIR_Z_SPAN_R,
-            DIR_Z_SPAN_THETA
+            // Cylindrical coordinate system
+            SWEEP_R,
+            SWEEP_THETA,
+            // SWEEP_Z is already defined for the Cartesian coordinate system
+            SWEEP_UNKNOWN
         };
 
+        //- Define the stackAxis used to generate the mixing ribbon patch
+        enum stackAxis
+        {
+            // Cartesian coordinate system
+            STACK_X,
+            STACK_Y,
+            STACK_Z,
+
+            // Cylindrical coordinate system
+            STACK_R,
+            STACK_THETA,
+            // STACK_Z is already defined for the Cartesian coordinate system
+            STACK_UNKNOWN
+        };
 
         //- Define type of mixing for field over patch
         enum mixingType
@@ -166,15 +172,20 @@ public:
             doNothing
         };
 
+
     // Static data
 
         ClassName("MixingPlaneInterpolation");
 
-       //- Assembly names
-       static const NamedEnum<assembly, 4> assemblyNames_;
 
-       //- Orientation names
-       static const NamedEnum<orientation, 13> orientationNames_;
+       //- Discretisation names
+       static const NamedEnum<discretisation, 5> discretisationNames_;
+
+       //- Sweep axis names
+       static const NamedEnum<sweepAxis, 6> sweepAxisNames_;
+
+       //- Stack axis names
+       static const NamedEnum<stackAxis, 6> stackAxisNames_;
 
        //- mixing names
        static const NamedEnum<mixingType, 5> mixingTypeNames_;
@@ -185,7 +196,6 @@ public:
         //- Construct null
         MixingPlaneInterpolationName()
         {}
-
 };
 
 
@@ -218,13 +228,14 @@ class MixingPlaneInterpolation
         //- Coordinate system for averaging
         const coordinateSystem& cs_;
 
-        //- Type of mixing plane assembly algorithm
-        assembly assemblyType_;
+        //- Type of mixing plane discretisation algorithm
+        discretisation discretisationType_;
 
-        //- Orientation of the mixing plane
-        //  direction = axis in which ribbon width is measured
-        //  span = axis in which ribbon length is measured
-        orientation orientationType_;
+        //- Orientation of the mixing plane ribbon patch
+        //  sweepAxis = axis in which ribbon length is measured
+        //  stackAxis = axis in which ribbon width/height is measured
+        sweepAxis sweepAxisType_;
+        stackAxis stackAxisType_;
 
         //- Interpolation profile
         //  This list of points defines the profile generating the 'n'
@@ -305,11 +316,11 @@ class MixingPlaneInterpolation
 
     // Helper functions for demand-driven data
 
-        //- Return span
-        direction spanwiseSwitch() const;
+        //- Return ribbon sweep direction
+        direction sweepAxisSwitch() const;
 
-        //- Return direction
-        direction directionalSwitch() const;
+        //- Return ribbon stack direction
+        direction stackAxisSwitch() const;
 
         //- Construct profile histogram
         void updateProfileHistogram
@@ -358,7 +369,7 @@ class MixingPlaneInterpolation
         //- Calculate addressing and weights
         void calcAddressing() const;
 
-        //- Calculate Cartesian to Cylindrical tranformation tensor field for
+        //- Calculate Cartesian to cylindrical tranformation tensor field for
         //  master and slave patches
         void calcTransforms() const;
 
@@ -383,6 +394,48 @@ class MixingPlaneInterpolation
 
 
     // Interpolation data access
+
+        //- Distribute to profile given addressing and weights
+        template<class Type>
+        static void toProfile
+        (
+            const Field<Type>& srcF,
+            const labelListList& srcAddr,
+            const scalarListList& srcWeights,
+            Field<Type>& profileBandValues
+        );
+
+        //- Collect from profile given addressing and weights
+        template<class Type>
+        static void fromProfile
+        (
+            const Field<Type>& profileBandValues,
+            const labelListList& dstAddr,
+            const scalarListList& dstWeights,
+            Field<Type>& dstResultF
+        );
+
+        //- Collect from profile given addressing and weights
+        //  for masked faces only
+        template<class Type>
+        static void maskedFromProfile
+        (
+            const Field<Type>& profileBandValues,
+            const labelListList& dstAddr,
+            const scalarListList& dstWeights,
+            Field<Type>& dstResultF,
+            const labelList& mask
+        );
+
+        //- Execute transform for masked faces only
+        template<class Type>
+        static void maskedTransform
+        (
+            Field<Type>& transField,
+            const tensorField& t,
+            const Field<Type>& inField,
+            const labelList& mask
+        );
 
         //- Interpolate given source and target, addressing and weights
         template<class Type>
@@ -420,8 +473,9 @@ public:
             const MasterPatch& masterPatch,
             const SlavePatch& slavePatch,
             const coordinateSystem& cs,
-            const MixingPlaneInterpolationName::assembly& assemblyType,
-            const MixingPlaneInterpolationName::orientation& orientationType,
+            const discretisation& discretisationType,
+            const sweepAxis& sweepAxisType,
+            const stackAxis& stackAxisType,
             const pointField& interpolationProfile
         );
 
@@ -447,8 +501,14 @@ public:
                 return slavePatch_;
             }
 
-           //- Return interpolation profile
-           const pointField& interpolationProfile() const;
+            //- Return number of profile bands
+            label nProfileBands() const
+            {
+                return interpolationProfile().size() - 1;
+            }
+
+            //- Return interpolation profile
+            const pointField& interpolationProfile() const;
 
 
             //- Return mixing plane patch
@@ -520,8 +580,78 @@ public:
             ) const;
 
 
+            //- Interpolate from master to profile
+            template<class Type>
+            tmp<Field<Type> > masterToProfile
+            (
+                const Field<Type>& pf
+            ) const;
+
+            template<class Type>
+            tmp<Field<Type> > masterToProfile
+            (
+                const tmp<Field<Type> >& tpf
+            ) const;
+
+            //- Interpolate from slave to profile
+            template<class Type>
+            tmp<Field<Type> > slaveToProfile
+            (
+                const Field<Type>& pf
+            ) const;
+
+            template<class Type>
+            tmp<Field<Type> > slaveToProfile
+            (
+                const tmp<Field<Type> >& tpf
+            ) const;
+
+
+            //- Interpolate from profile to master
+            template<class Type>
+            tmp<Field<Type> > profileToMaster
+            (
+                const Field<Type>& pf
+            ) const;
+
+            template<class Type>
+            tmp<Field<Type> > profileToMaster
+            (
+                const tmp<Field<Type> >& tpf
+            ) const;
+
+            template<class Type>
+            void maskedProfileToMaster
+            (
+                const Field<Type>& profileFF,
+                Field<Type>& result,
+                const labelList& mask
+            ) const;
+
+            //- Interpolate from profile to slave
+            template<class Type>
+            tmp<Field<Type> > profileToSlave
+            (
+                const Field<Type>& pf
+            ) const;
+
+            template<class Type>
+            tmp<Field<Type> > profileToSlave
+            (
+                const tmp<Field<Type> >& tpf
+            ) const;
+
+
+            template<class Type>
+            void maskedProfileToSlave
+            (
+                const Field<Type>& profileFF,
+                Field<Type>& result,
+                const labelList& mask
+            ) const;
+
             //- Interpolate from master to master 
-            //- (self circumferential averaging)  
+            //- (self circumferential averaging)
             template<class Type>
             tmp<Field<Type> > masterToMaster
             (
@@ -535,7 +665,7 @@ public:
             ) const;
 
             //- Interpolate from slave to slave
-            //- (self circumferential averaging)  
+            //- (self circumferential averaging)
             template<class Type>
             tmp<Field<Type> > slaveToSlave
             (
@@ -547,7 +677,6 @@ public:
             (
                 const tmp<Field<Type> >& tpf
             ) const;
-
 
 
         // Edit

@@ -37,6 +37,7 @@ Contributor
 #include "polyPatchID.H"
 #include "polyBoundaryMesh.H"
 #include "polyMesh.H"
+#include "ZoneIDs.H"
 #include "Time.H"
 #include "SubField.H"
 
@@ -52,6 +53,50 @@ namespace Foam
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+bool Foam::mixingPlanePolyPatch::active() const
+{
+    polyPatchID shadow(shadowName_, boundaryMesh());
+    faceZoneID zone(zoneName_, boundaryMesh().mesh().faceZones());
+
+    return shadow.active() && zone.active();
+}
+
+
+void Foam::mixingPlanePolyPatch::calcZoneAddressing() const
+{
+    // Calculate patch-to-zone addressing
+    if (zoneAddressingPtr_)
+    {
+        FatalErrorIn("void mixingPlanePolyPatch::calcZoneAddressing() const")
+            << "Patch to zone addressing already calculated"
+            << abort(FatalError);
+    }
+
+    // Calculate patch-to-zone addressing
+    zoneAddressingPtr_ = new labelList(size());
+    labelList& zAddr = *zoneAddressingPtr_;
+    const faceZone& myZone = zone();
+
+    for (label i = 0; i < size(); i++)
+    {
+        zAddr[i] = myZone.whichFace(start() + i);
+    }
+
+    // Check zone addressing
+    if (zAddr.size() > 0 && min(zAddr) < 0)
+    {
+        Info<< "myZone: " << myZone << nl
+            << "my start and size: " << start() << " and " << size() << nl
+            << "zAddr: " << zAddr << endl;
+
+        FatalErrorIn("void mixingPlanePolyPatch::calcZoneAddressing() const")
+            << "Problem with patch-to-zone addressing: some patch faces "
+            << "not found in interpolation zone"
+            << abort(FatalError);
+    }
+}
+
 
 void Foam::mixingPlanePolyPatch::calcPatchToPatch() const
 {
@@ -70,8 +115,7 @@ void Foam::mixingPlanePolyPatch::calcPatchToPatch() const
 
         if
         (
-            assemblyType_
-         == MixingPlaneInterpolationName::USER_DEFINED
+            discretisationType_ == mixingPlaneInterpolation::USER_DEFINED
         )
         {
             Info<< "Reading interpolation profile from file: "
@@ -104,25 +148,29 @@ void Foam::mixingPlanePolyPatch::calcPatchToPatch() const
         {
             Info<< "Creating mixingPlaneInterpolation for patch "
                 << name() << " with shadow " << shadowName() << nl
-                << "assemblyType = "
-                << MixingPlaneInterpolationName::assemblyNames_[assemblyType_]
-                << " " << assemblyType_
-                << " orientationType = "
-                << MixingPlaneInterpolationName::orientationNames_
-                   [orientationType_]
-                << " " << orientationType_
+                << "discretisationType = "
+                << mixingPlaneInterpolation::discretisationNames_
+                       [discretisationType_]
+                << " " << discretisationType_
+                << " sweepAxisType = "
+                << mixingPlaneInterpolation::sweepAxisNames_[sweepAxisType_]
+                << " " << sweepAxisType_
+                << " stackAxisType = "
+                << mixingPlaneInterpolation::stackAxisNames_[stackAxisType_]
+                << " " << stackAxisType_
                 << endl;
 
         }
 
         patchToPatchPtr_ =
-            new mixingPlaneInterpolation
+            new mixingPlaneZoneInterpolation
             (
-                *this,
-                shadow(),
+                zone()(),
+                shadow().zone()(),
                 csPtr_(),
-                assemblyType_,
-                orientationType_,
+                discretisationType_,
+                sweepAxisType_,
+                stackAxisType_,
                 iProfile
             );
     }
@@ -174,18 +222,30 @@ void Foam::mixingPlanePolyPatch::calcPatchToPatch() const
 
 void Foam::mixingPlanePolyPatch::calcReconFaceCellCentres() const
 {
+    if (reconFaceCellCentresPtr_)
+    {
+        FatalErrorIn
+        (
+            "void mixingPlanePolyPatch::calcReconFaceCellCentres() const"
+        )   << "Reconstructed cell centres already calculated"
+            << abort(FatalError);
+    }
+
     // Create neighbouring face centres using interpolation
     if (master())
     {
-        reconFaceCellCentresPtr_ = new vectorField
-        (
-            interpolate
+        const label shadowID = shadowIndex();
+
+        reconFaceCellCentresPtr_ =
+            new vectorField
             (
-                shadow().faceCellCentres()
-              - shadow().faceCentres()
-            )
-          + faceCentres()
-        );
+                interpolate
+                (
+                    boundaryMesh()[shadowID].faceCellCentres()
+                  - boundaryMesh()[shadowID].faceCentres()
+                )
+              + faceCentres()
+            );
     }
     else
     {
@@ -198,10 +258,158 @@ void Foam::mixingPlanePolyPatch::calcReconFaceCellCentres() const
 }
 
 
+void Foam::mixingPlanePolyPatch::calcLocalParallel() const
+{
+    // Calculate patch-to-zone addressing
+    if (localParallelPtr_)
+    {
+        FatalErrorIn("void mixingPlanePolyPatch::calcLocalParallel() const")
+            << "Local parallel switch already calculated"
+            << abort(FatalError);
+    }
+
+    localParallelPtr_ = new bool(false);
+    bool& emptyOrComplete = *localParallelPtr_;
+
+    // If running in serial, all mixingPlanes are expanded to zone size.
+    // This happens on decomposition and reconstruction where
+    // size and shadow size may be zero, but zone size may not
+    // HJ, 1/Jun/2011
+    if (!Pstream::parRun())
+    {
+        emptyOrComplete = false;
+    }
+    else
+    {
+        // Calculate localisation on master and shadow
+        emptyOrComplete =
+            (
+                zone().size() == size()
+             && shadow().zone().size() == shadow().size()
+            )
+         || (size() == 0 && shadow().size() == 0);
+
+        reduce(emptyOrComplete, andOp<bool>());
+    }
+
+    if (debug && Pstream::parRun())
+    {
+        Info<< "mixingPlane patch Master: " << name()
+            << " Slave: " << shadowName() << " is ";
+
+        if (emptyOrComplete)
+        {
+           Info<< "local parallel" << endl;
+        }
+        else
+        {
+            Info<< "split between multiple processors" << endl;
+        }
+    }
+}
+
+
+void Foam::mixingPlanePolyPatch::calcReceive() const
+{
+    // Note: all processors will execute calcReceive but only master will
+    // hold the information.  Therefore, pointers on slave processors
+    // will remain meaningless, but for purposes of consistency
+    // (of the calc-call) they will be set to zero-sized array
+    // HJ, 4/Jun/2011
+
+    if (receiveAddrPtr_)
+    {
+        FatalErrorIn("void mixingPlanePolyPatch::calcReceive() const")
+            << "Receive addressing already calculated"
+            << abort(FatalError);
+    }
+
+    if (debug)
+    {
+        Pout<< "mixingPlanePolyPatch::calcReceive() const for patch "
+            << index() << endl;
+    }
+
+    if (!Pstream::parRun())
+    {
+        FatalErrorIn("void mixingPlanePolyPatch::calcReceive() const")
+            << "Requested calculation of send-receive addressing for a "
+            << "serial run.  This is not allowed"
+            << abort(FatalError);
+    }
+
+    // Master will receive and store the maps
+    if (Pstream::master())
+    {
+        receiveAddrPtr_ = new labelListList(Pstream::nProcs());
+        labelListList& rAddr = *receiveAddrPtr_;
+
+        // Insert master
+        rAddr[0] = zoneAddressing();
+
+        for (label procI = 1; procI < Pstream::nProcs(); procI++)
+        {
+            // Note: must use normal comms because the size of the
+            // communicated lists is unknown on the receiving side
+            // HJ, 4/Jun/2011
+
+            // Opt: reconsider mode of communication
+            IPstream ip(Pstream::scheduled, procI);
+
+            rAddr[procI] = labelList(ip);
+        }
+    }
+    else
+    {
+        // Create dummy pointers: only master processor stores maps
+        receiveAddrPtr_ = new labelListList();
+
+        // Send information to master
+        const labelList& za = zoneAddressing();
+
+        // Note: must use normal comms because the size of the
+        // communicated lists is unknown on the receiving side
+        // HJ, 4/Jun/2011
+
+        // Opt: reconsider mode of communication
+        OPstream op(Pstream::scheduled, Pstream::masterNo());
+
+        // Send local and remote addressing to master
+        op << za;
+    }
+}
+
+
+const Foam::labelListList& Foam::mixingPlanePolyPatch::receiveAddr() const
+{
+    if (!receiveAddrPtr_)
+    {
+        calcReceive();
+    }
+
+    return *receiveAddrPtr_;
+}
+
+
+void Foam::mixingPlanePolyPatch::clearGeom()
+{
+    deleteDemandDrivenData(reconFaceCellCentresPtr_);
+}
+
+
 void Foam::mixingPlanePolyPatch::clearOut()
 {
+    clearGeom();
+
+    shadowIndex_ = -1;
+    zoneIndex_ = -1;
+
+    // Receive maps do not depend on the local position
+    deleteDemandDrivenData(receiveAddrPtr_);
+
+    deleteDemandDrivenData(zoneAddressingPtr_);
     deleteDemandDrivenData(patchToPatchPtr_);
-    deleteDemandDrivenData(reconFaceCellCentresPtr_);
+    deleteDemandDrivenData(localParallelPtr_);
 }
 
 
@@ -218,6 +426,7 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
 :
     coupledPolyPatch(name, size, start, index, bm),
     shadowName_(fileName::null),
+    zoneName_("initializeMe"),
     csPtr_
     (
         new coordinateSystem
@@ -228,12 +437,17 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
             vector(1, 0, 0)
         )
     ),
-    assemblyType_(mixingPlaneInterpolation::USER_DEFINED),
-    orientationType_(mixingPlaneInterpolation::UNKNOWN),
+    discretisationType_(mixingPlaneInterpolation::USER_DEFINED),
+    sweepAxisType_(mixingPlaneInterpolation::SWEEP_UNKNOWN),
+    stackAxisType_(mixingPlaneInterpolation::STACK_UNKNOWN),
     userProfileFile_(fileName::null),
     shadowIndex_(-1),
+    zoneIndex_(-1),
     patchToPatchPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    zoneAddressingPtr_(NULL),
+    reconFaceCellCentresPtr_(NULL),
+    localParallelPtr_(NULL),
+    receiveAddrPtr_(NULL)
 {}
 
 
@@ -245,21 +459,28 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
     const label index,
     const polyBoundaryMesh& bm,
     const word& shadowName,
+    const word& zoneName,
     const coordinateSystem& cs,
-    const mixingPlaneInterpolation::assembly assemblyType,
-    const mixingPlaneInterpolation::orientation orientationType,
+    const mixingPlaneInterpolation::discretisation discretisationType,
+    const mixingPlaneInterpolation::sweepAxis sweepAxisType,
+    const mixingPlaneInterpolation::stackAxis stackAxisType,
     const fileName& userProfileFile
 )
 :
     coupledPolyPatch(name, size, start, index, bm),
     shadowName_(shadowName),
+    zoneName_(zoneName),
     csPtr_(cs.clone()),
-    assemblyType_(assemblyType),
-    orientationType_(orientationType),
+    discretisationType_(discretisationType),
+    sweepAxisType_(sweepAxisType),
+    stackAxisType_(stackAxisType),
     userProfileFile_(fileName::null),
     shadowIndex_(-1),
     patchToPatchPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    zoneAddressingPtr_(NULL),
+    reconFaceCellCentresPtr_(NULL),
+    localParallelPtr_(NULL),
+    receiveAddrPtr_(NULL)
 {}
 
 
@@ -273,6 +494,7 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
 :
     coupledPolyPatch(name, dict, index, bm),
     shadowName_(dict.lookup("shadowPatch")),
+    zoneName_(dict.lookup("zone")),
     csPtr_
     (
         new coordinateSystem
@@ -283,12 +505,16 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
             vector(1, 0, 0)
         )
     ),
-    assemblyType_(mixingPlaneInterpolation::USER_DEFINED),
-    orientationType_(mixingPlaneInterpolation::UNKNOWN),
+    discretisationType_(mixingPlaneInterpolation::USER_DEFINED),
+    sweepAxisType_(mixingPlaneInterpolation::SWEEP_UNKNOWN),
+    stackAxisType_(mixingPlaneInterpolation::STACK_UNKNOWN),
     userProfileFile_(fileName::null),
     shadowIndex_(-1),
     patchToPatchPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    zoneAddressingPtr_(NULL),
+    reconFaceCellCentresPtr_(NULL),
+    localParallelPtr_(NULL),
+    receiveAddrPtr_(NULL)
 {
     // When construting from dictionary, only master side information will be
     // read and used.  This requires special check, because polyBoundaryMesh
@@ -309,19 +535,27 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
                 dict.subDict("coordinateSystem")
             );
 
-        assemblyType_ =
-            MixingPlaneInterpolationName::assemblyNames_.read
+        const dictionary& ribbonPatchSubDict = dict.subDict("ribbonPatch");
+
+        discretisationType_ =
+            mixingPlaneInterpolation::discretisationNames_.read
             (
-                dict.lookup("assembly")
+                ribbonPatchSubDict.lookup("discretisation")
             );
 
-        orientationType_ =
-            MixingPlaneInterpolationName::orientationNames_.read
+        sweepAxisType_ =
+            mixingPlaneInterpolation::sweepAxisNames_.read
             (
-                dict.lookup("orientation")
+                ribbonPatchSubDict.lookup("sweepAxis")
             );
 
-        if (assemblyType_ == MixingPlaneInterpolationName::USER_DEFINED)
+        stackAxisType_ =
+            mixingPlaneInterpolation::stackAxisNames_.read
+            (
+                ribbonPatchSubDict.lookup("stackAxis")
+            );
+
+        if (discretisationType_ == mixingPlaneInterpolation::USER_DEFINED)
         {
             if (dict.found("userProfileFile"))
             {
@@ -356,13 +590,18 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
 :
     coupledPolyPatch(pp, bm),
     shadowName_(pp.shadowName_),
+    zoneName_(pp.zoneName_),
     csPtr_(pp.csPtr_->clone()),
-    assemblyType_(pp.assemblyType_),
-    orientationType_(pp.orientationType_),
+    discretisationType_(pp.discretisationType_),
+    sweepAxisType_(pp.sweepAxisType_),
+    stackAxisType_(pp.stackAxisType_),
     userProfileFile_(pp.userProfileFile_),
     shadowIndex_(-1),
     patchToPatchPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    zoneAddressingPtr_(NULL),
+    reconFaceCellCentresPtr_(NULL),
+    localParallelPtr_(NULL),
+    receiveAddrPtr_(NULL)
 {}
 
 
@@ -378,13 +617,18 @@ Foam::mixingPlanePolyPatch::mixingPlanePolyPatch
 :
     coupledPolyPatch(pp, bm, index, newSize, newStart),
     shadowName_(pp.shadowName_),
+    zoneName_(pp.zoneName_),
     csPtr_(pp.csPtr_->clone()),
-    assemblyType_(pp.assemblyType_),
-    orientationType_(pp.orientationType_),
+    discretisationType_(pp.discretisationType_),
+    sweepAxisType_(pp.sweepAxisType_),
+    stackAxisType_(pp.stackAxisType_),
     userProfileFile_(pp.userProfileFile_),
     shadowIndex_(-1),
     patchToPatchPtr_(NULL),
-    reconFaceCellCentresPtr_(NULL)
+    zoneAddressingPtr_(NULL),
+    reconFaceCellCentresPtr_(NULL),
+    localParallelPtr_(NULL),
+    receiveAddrPtr_(NULL)
 {}
 
 
@@ -407,14 +651,11 @@ Foam::label Foam::mixingPlanePolyPatch::shadowIndex() const
 
         if (!shadow.active())
         {
-            WarningIn("label mixingPlanePolyPatch::shadowIndex() const")
+            FatalErrorIn("label mixingPlanePolyPatch::shadowIndex() const")
                 << "Shadow patch name " << shadowName_
                 << " not found.  Please check your MixingPlane definition.  "
                 << "This may be fine at mesh generation stage."
                 << endl;
-
-            // Return a large label to indicate "undefined" or slave side
-            return 99999;
         }
 
         shadowIndex_ = shadow.index();
@@ -444,12 +685,6 @@ Foam::label Foam::mixingPlanePolyPatch::shadowIndex() const
 }
 
 
-const Foam::mixingPlanePolyPatch& Foam::mixingPlanePolyPatch::shadow() const
-{
-    return refCast<const mixingPlanePolyPatch>(boundaryMesh()[shadowIndex()]);
-}
-
-
 const Foam::coordinateSystem& Foam::mixingPlanePolyPatch::cs() const
 {
     if (master())
@@ -463,7 +698,66 @@ const Foam::coordinateSystem& Foam::mixingPlanePolyPatch::cs() const
 }
 
 
-const Foam::mixingPlaneInterpolation&
+Foam::label Foam::mixingPlanePolyPatch::zoneIndex() const
+{
+    if (zoneIndex_ == -1 && zoneName_ != Foam::word::null)
+    {
+        // Grab zone patch index
+        faceZoneID zone(zoneName_, boundaryMesh().mesh().faceZones());
+
+        if (!zone.active())
+        {
+            FatalErrorIn("label mixingPlanePolyPatch::zoneIndex() const")
+                << "Face zone name " << zoneName_
+                << " for mixingPlane patch " << name()
+                << " not found.  "
+                << "Please check mixingPlane interface definition."
+                << abort(FatalError);
+        }
+
+        zoneIndex_ = zone.index();
+    }
+
+    return zoneIndex_;
+}
+
+
+const Foam::mixingPlanePolyPatch& Foam::mixingPlanePolyPatch::shadow() const
+{
+    return refCast<const mixingPlanePolyPatch>(boundaryMesh()[shadowIndex()]);
+}
+
+
+const Foam::faceZone& Foam::mixingPlanePolyPatch::zone() const
+{
+    return boundaryMesh().mesh().faceZones()[zoneIndex()];
+}
+
+
+const Foam::labelList& Foam::mixingPlanePolyPatch::zoneAddressing() const
+{
+    if (!zoneAddressingPtr_)
+    {
+        calcZoneAddressing();
+    }
+
+    return *zoneAddressingPtr_;
+}
+
+
+bool Foam::mixingPlanePolyPatch::localParallel() const
+{
+    // Calculate patch-to-zone addressing
+    if (!localParallelPtr_)
+    {
+        calcLocalParallel();
+    }
+
+    return *localParallelPtr_;
+}
+
+
+const Foam::mixingPlaneZoneInterpolation&
 Foam::mixingPlanePolyPatch::patchToPatch() const
 {
     if (master())
@@ -502,6 +796,23 @@ Foam::mixingPlanePolyPatch::reconFaceCellCentres() const
 
 void Foam::mixingPlanePolyPatch::initAddressing()
 {
+    if (active())
+    {
+        // Calculate transforms for correct mixingPlane cut
+        calcTransforms();
+
+        // Force zone addressing and remote zone addressing
+        // (uses mixingPlane interpolator)
+        zoneAddressing();
+
+        // Force local parallel
+        if (Pstream::parRun() && !localParallel())
+        {
+            // Calculate send addressing
+            receiveAddr();
+        }
+    }
+
     polyPatch::initAddressing();
 }
 
@@ -514,32 +825,62 @@ void Foam::mixingPlanePolyPatch::calcAddressing()
 
 void Foam::mixingPlanePolyPatch::initGeometry()
 {
+    // Communication is allowed either before or after processor
+    // patch comms.  HJ, 11/Jul/2011
+    if (active())
+    {
+        // Note: Only master calculates recon; slave uses master interpolation
+        if (master())
+        {
+            reconFaceCellCentres();
+        }
+    }
+
     polyPatch::initGeometry();
 }
 
 
 void Foam::mixingPlanePolyPatch::calcGeometry()
 {
-    // Reconstruct the cell face centres
-    if (patchToPatchPtr_ && master())
-    {
-        // Compute the neighbour face cell center
-        reconFaceCellCentres();
-
-        // Next, identify which cells are located at these locations
-
-        // Next, compute the weighting factors in order to properly interpolate
-        // the field values at those locations. We will be using an inverse
-        // distance interpolation scheme.
-    }
-
-    calcTransforms();
     polyPatch::calcGeometry();
+
+    // Note: Calculation of transforms must be forced before the
+    // reconFaceCellCentres in order to correctly set the transformation
+    // in the interpolation routines.
+    // HJ, 3/Jul/2009
 }
 
 
 void Foam::mixingPlanePolyPatch::initMovePoints(const pointField& p)
 {
+    clearGeom();
+
+    // Calculate transforms on mesh motion?
+    calcTransforms();
+
+    // Update interpolation for new relative position of mixingPlane interfaces
+    if (patchToPatchPtr_)
+    {
+        patchToPatchPtr_->movePoints();
+    }
+
+    // Recalculate send and receive maps
+    if (active())
+    {
+        // Force zone addressing first
+        zoneAddressing();
+
+        if (Pstream::parRun() && !localParallel())
+        {
+            receiveAddr();
+        }
+    }
+
+    if (active() && master())
+    {
+        reconFaceCellCentres();
+    }
+
     polyPatch::initMovePoints(p);
 }
 
@@ -547,7 +888,6 @@ void Foam::mixingPlanePolyPatch::initMovePoints(const pointField& p)
 void Foam::mixingPlanePolyPatch::movePoints(const pointField& p)
 {
     polyPatch::movePoints(p);
-    clearOut();
 }
 
 
@@ -600,6 +940,8 @@ void Foam::mixingPlanePolyPatch::write(Ostream& os) const
     polyPatch::write(os);
     os.writeKeyword("shadowPatch") << shadowName_
         << token::END_STATEMENT << nl;
+    os.writeKeyword("zone") << zoneName_
+        << token::END_STATEMENT << nl;
 
     // Note: only master writes the data
     if (master() || shadowIndex_ == -1)
@@ -608,14 +950,28 @@ void Foam::mixingPlanePolyPatch::write(Ostream& os) const
         os.writeKeyword("coordinateSystem");
         csPtr_().writeDict(os, true);
 
-        os.writeKeyword("assembly")
-            << MixingPlaneInterpolationName::assemblyNames_[assemblyType_]
-                << token::END_STATEMENT << nl;
+        dictionary ribbonPatchDict("ribbonPatch");
 
-        os.writeKeyword("orientation")
-            << MixingPlaneInterpolationName::orientationNames_
-                   [orientationType_]
-            << token::END_STATEMENT << nl;
+        ribbonPatchDict.add
+        (
+            "sweepAxis",
+            mixingPlaneInterpolation::sweepAxisNames_[sweepAxisType_]
+        );
+
+        ribbonPatchDict.add
+        (
+            "stackAxis",
+            mixingPlaneInterpolation::stackAxisNames_[stackAxisType_]
+        );
+
+        ribbonPatchDict.add
+        (
+            "discretisation",
+            mixingPlaneInterpolation::discretisationNames_[discretisationType_]
+        );
+
+        os.writeKeyword("ribbonPatch")
+            << ribbonPatchDict << nl;
 
         if (userProfileFile_ != fileName::null)
         {

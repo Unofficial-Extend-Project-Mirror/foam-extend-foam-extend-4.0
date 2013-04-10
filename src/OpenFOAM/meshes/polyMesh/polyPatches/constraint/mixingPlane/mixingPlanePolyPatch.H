@@ -26,7 +26,7 @@ Class
     mixingPlanePolyPatch
 
 Description
-    MixingPlane patch.
+    Mixing plane patch
 
 Author
     Martin Beaudoin, Hydro-Quebec, 2009.  All rights reserved
@@ -46,6 +46,7 @@ SourceFiles
 #include "mixingPlaneInterpolation.H"
 #include "transform.H"
 #include "word.H"
+#include "faceZone.H"
 #include "coordinateSystem.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -66,16 +67,20 @@ class mixingPlanePolyPatch
         //- Shadow patch name
         const word shadowName_;
 
+        //- Interpolation zone name
+        const word zoneName_;
+
         //- Coordinate system for the mixing plane
         autoPtr<coordinateSystem> csPtr_;
 
-        //- Type of mixing plane assembly algorithm
-        MixingPlaneInterpolationName::assembly assemblyType_;
+        //- Type of mixing plane discretisation algorithm
+        mixingPlaneInterpolation::discretisation discretisationType_;
 
-        //- Orientation of the mixing plane
-        //  direction = axis in which ribbon width is measured
-        //  span = axis in which ribbon length is measured
-        MixingPlaneInterpolationName::orientation orientationType_;
+        //- Orientation of the mixing plane ribbon patch
+        //  sweepAxis = axis in which ribbon length is measured
+        //  stackAxis = axis in which ribbon width/height is measured
+        mixingPlaneInterpolation::sweepAxis sweepAxisType_;
+        mixingPlaneInterpolation::stackAxis stackAxisType_;
 
         //- User-defined interpolation profile file name
         fileName userProfileFile_;
@@ -86,26 +91,68 @@ class mixingPlanePolyPatch
             //- Shadow patch index.  Delayed evaluation for construction
             mutable label shadowIndex_;
 
+            //- Interpolation zone index.  Delayed evaluation for construction
+            mutable label zoneIndex_;
+
             //- Patch-to-patch interpolation
-            mutable mixingPlaneInterpolation* patchToPatchPtr_;
+            mutable mixingPlaneZoneInterpolation* patchToPatchPtr_;
+
+            //- Patch-to-zone addressing
+            mutable labelList* zoneAddressingPtr_;
 
             //- Reconstructed patch neighbour cell centres
             mutable vectorField* reconFaceCellCentresPtr_;
 
 
+        // Parallel communication optimisation, stored on master processor
+
+            //- Is the patch localised on a single processor
+            // (single processor in a parallel run)?
+            //  Used for parallel optimisation
+            mutable bool* localParallelPtr_;
+
+            //- List of zone faces indices received from each processor
+            mutable labelListList* receiveAddrPtr_;
+
+
     // Private member functions
+
+        //- Calculate patch-to-zone addressing
+        virtual void calcZoneAddressing() const;
 
         //- Calculate interpolation
         virtual void calcPatchToPatch() const;
 
-        //- Calculate reconstructed cell centres
-        void calcReconFaceCellCentres() const;
 
-        //- Force calculation of transformation tensors
-        virtual void calcTransforms();
+        // Geometry
 
-        //- Clear out
-        void clearOut();
+            //- Calculate reconstructed cell centres
+            void calcReconFaceCellCentres() const;
+
+            //- Force calculation of transformation tensors
+            virtual void calcTransforms();
+
+
+        // Parallel communication optimisation, stored on master processor
+
+            //- Calculate local parallel switch
+            void calcLocalParallel() const;
+
+            //- Calculate receive addressing
+            void calcReceive() const;
+
+
+            //- Return receive addressing
+            const labelListList& receiveAddr() const;
+
+
+        // Memory management
+
+            //- Clear geometry
+             void clearGeom();
+
+            //- Clear out
+            void clearOut();
 
 
 protected:
@@ -113,7 +160,7 @@ protected:
     // Protected Member functions
 
         //- Is the mixing plane active? (zone and shadow present)
-//         bool active() const;
+        bool active() const;
 
         //- Initialise the calculation of the patch addressing
         virtual void initAddressing();
@@ -167,9 +214,11 @@ public:
             const label index,
             const polyBoundaryMesh& bm,
             const word& shadowName,
+            const word& zoneName,
             const coordinateSystem& cs,
-            const mixingPlaneInterpolation::assembly assemblyType,
-            const mixingPlaneInterpolation::orientation orientationType,
+            const mixingPlaneInterpolation::discretisation discretisationType,
+            const mixingPlaneInterpolation::sweepAxis sweepAxisType,
+            const mixingPlaneInterpolation::stackAxis stackAxisType,
             const fileName& userProfileFile
         );
 
@@ -199,7 +248,6 @@ public:
             const label newSize,
             const label newStart
         );
-
 
         //- Construct and return a clone, resetting the boundary mesh
         virtual autoPtr<polyPatch> clone(const polyBoundaryMesh& bm) const
@@ -238,77 +286,151 @@ public:
 
     // Member functions
 
-        //- Return shadow patch name
-        const word& shadowName() const
-        {
-            return shadowName_;
-        }
+        // Basic info
 
-        //- Return shadow patch index
-        label shadowIndex() const;
+            //- Return shadow patch name
+            const word& shadowName() const
+            {
+                return shadowName_;
+            }
 
-        //- Return shadow patch
-        const mixingPlanePolyPatch& shadow() const;
+            //- Return name of interpolation face zone
+            const word& zoneName() const
+            {
+                return zoneName_;
+            }
 
-        //- Is this the master side?
-        bool master() const
-        {
-            return index() < shadowIndex();
-        }
+            //- Return shadow patch index
+            label shadowIndex() const;
 
-        //- Is this the slave side?
-        bool slave() const
-        {
-            return !master();
-        }
+            //- Return zone patch index
+            label zoneIndex() const;
 
-        //- Return coordinate system
-        const coordinateSystem& cs() const;
+            //- Return shadow patch
+            const mixingPlanePolyPatch& shadow() const;
 
-        //- Return reference to patch-to-patch interpolation
-        //  Used only for addressing
-        const mixingPlaneInterpolation& patchToPatch() const;
+            //- Return interpolation face zone
+            const faceZone& zone() const;
 
-        //- Interpolate face field: given field on a the shadow side,
-        //  create an interpolated field on this side
-        template<class Type>
-        tmp<Field<Type> > interpolate(const Field<Type>& pf) const;
 
-        template<class Type>
-        tmp<Field<Type> > interpolate(const tmp<Field<Type> >& tpf) const;
+        // Interpolation data
 
-        //- Interpolate face field from average: given field on a the
-        //- master/slave side, create an interpolated field on the same side
-        //- using averaged values
-        template<class Type>
-        tmp<Field<Type> > circumferentialAverage(const Field<Type>& pf) const;
+            //- Is this the master side?
+            bool master() const
+            {
+                return index() < shadowIndex();
+            }
 
-        template<class Type>
-        tmp<Field<Type> > circumferentialAverage(const tmp<Field<Type> >& tpf) const;
+            //- Is this the slave side?
+            bool slave() const
+            {
+                return !master();
+            }
 
-        //- Return reconstructed cell centres
-        const vectorField& reconFaceCellCentres() const;
+            //- Return coordinate system
+            const coordinateSystem& cs() const;
 
-        //- Initialize ordering for primitivePatch. Does not
-        //  refer to *this (except for name() and type() etc.)
-        virtual void initOrder(const primitivePatch&) const;
+            //- Return number of profile bands
+            label nProfileBands() const
+            {
+                return patchToPatch().nProfileBands();
+            }
 
-        //- Return new ordering for primitivePatch.
-        //  Ordering is -faceMap: for every face
-        //  index of the new face -rotation: for every new face the clockwise
-        //  shift of the original face. Return false if nothing changes
-        //  (faceMap is identity, rotation is 0), true otherwise.
-        virtual bool order
-        (
-            const primitivePatch&,
-            labelList& faceMap,
-            labelList& rotation
-        ) const;
+            //- Return patch-to-zone addressing
+            const labelList& zoneAddressing() const;
 
-        //- Synchronise communications of ordering for primitivePatch
-        //  Used in cases when no topological change happens locally,
-        //  but is happening on other processors
-        virtual void syncOrder() const;
+            //- Is the patch localised on a single processor
+            bool localParallel() const;
+
+            //- Return reference to patch-to-patch interpolation
+            //  Used only for addressing
+            const mixingPlaneZoneInterpolation& patchToPatch() const;
+
+
+        // Interpolation functions
+
+            //- Interpolate face field to profile: given field on a
+            //- master/slave side, create a profile field
+            template<class Type>
+            tmp<Field<Type> > toProfile
+            (
+                const Field<Type>& pf
+            ) const;
+
+            template<class Type>
+            tmp<Field<Type> > toProfile
+            (
+                const tmp<Field<Type> >& tpf
+            ) const;
+
+            //- Interpolate profile to face field: given field on a profile,
+            //  create a patch field
+            template<class Type>
+            tmp<Field<Type> > fromProfile
+            (
+                const Field<Type>& pf
+            ) const;
+
+            template<class Type>
+            tmp<Field<Type> > fromProfile
+            (
+                const tmp<Field<Type> >& tpf
+            ) const;
+
+            //- Interpolate face field: given field on a the shadow side,
+            //  create an interpolated field on this side
+            template<class Type>
+            tmp<Field<Type> > interpolate(const Field<Type>& pf) const;
+
+            template<class Type>
+            tmp<Field<Type> > interpolate(const tmp<Field<Type> >& tpf) const;
+
+            //- Interpolate face field from average: given field on a the
+            //  master/slave side, create interpolated field on the same side
+            //  using averaged values
+            template<class Type>
+            tmp<Field<Type> > circumferentialAverage
+            (
+                const Field<Type>& pf
+            ) const;
+
+            template<class Type>
+            tmp<Field<Type> > circumferentialAverage
+            (
+                const tmp<Field<Type> >& tpf
+            ) const;
+
+
+        // Geometric data
+
+            //- Return reconstructed cell centres
+            const vectorField& reconFaceCellCentres() const;
+
+
+        // Patch ordering
+
+            //- Initialize ordering for primitivePatch. Does not
+            //  refer to *this (except for name() and type() etc.)
+            virtual void initOrder(const primitivePatch&) const;
+
+            //- Return new ordering for primitivePatch.
+            //  Ordering is -faceMap: for every face
+            //  index of the new face -rotation: for every new face the
+            //   clockwise shift of the original face.
+            //   Return false if nothing changes
+            //  (faceMap is identity, rotation is 0), true otherwise.
+            virtual bool order
+            (
+                const primitivePatch&,
+                labelList& faceMap,
+                labelList& rotation
+            ) const;
+
+            //- Synchronise communications of ordering for primitivePatch
+            //  Used in cases when no topological change happens locally,
+            //  but is happening on other processors
+            virtual void syncOrder() const;
+
 
         //- Write
         virtual void write(Ostream&) const;

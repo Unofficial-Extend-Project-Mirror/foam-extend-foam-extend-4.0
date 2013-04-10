@@ -76,8 +76,7 @@ namespace Foam
 //  cylindrical coordinates.
 template<class MasterPatch, class SlavePatch>
 void
-MixingPlaneInterpolation<MasterPatch, SlavePatch>::
-correctStraddlingFaces
+MixingPlaneInterpolation<MasterPatch, SlavePatch>::correctStraddlingFaces
 (
     faceList& localCoordFaces,
     pointField& localCoordFacesPoint
@@ -93,18 +92,18 @@ correctStraddlingFaces
 
     label newPointLabel = localCoordFacesPoint.size();
 
-    // Collect data on span limiting frm coordinate system
+    // Collect data on span limiting from coordinate system
     coordinateSystem::spanInfo spanLimited = cs_.spanLimited();
     boundBox spanBounds = cs_.spanBounds();
 
-    const direction spanDir = spanwiseSwitch();
+    const direction sweepDir = sweepAxisSwitch();
 
     // If there are no limits on both sides of the span,
     // adjustment can be skipped
     if
     (
-        !spanLimited[spanDir].first()
-     || !spanLimited[spanDir].second()
+        !spanLimited[sweepDir].first()
+     || !spanLimited[sweepDir].second()
     )
     {
         // Nothing to do
@@ -112,11 +111,11 @@ correctStraddlingFaces
     }
 
     // Check if coordinate system is limited in spanwise range
-    scalar maxSpan = spanBounds.max().component(spanDir);
+    scalar maxSpan = spanBounds.max().component(sweepDir);
 
     if (debug)
     {
-        Info<< "Fixing span straddle in direction " << spanDir
+        Info<< "Fixing span straddle in direction " << sweepDir
             << " for span " << maxSpan << endl;
     }
 
@@ -129,7 +128,7 @@ correctStraddlingFaces
             localCoordFaces[sFi].points
             (
                 localCoordFacesPoint
-            ).component(spanDir);
+            ).component(sweepDir);
 
         for (label i = 0; i < pointsAngleValues.size(); i++)
         {
@@ -156,13 +155,13 @@ correctStraddlingFaces
                         point ptCoord = localCoordFacesPoint[pointLbls[ptI]];
 
                         // Switch point across the +0 angle axis
-                        if (ptCoord[spanDir] < 0.0)
+                        if (ptCoord[sweepDir] < 0.0)
                         {
-                            ptCoord[spanDir] = ptCoord[spanDir] + maxSpan;
+                            ptCoord[sweepDir] = ptCoord[sweepDir] + maxSpan;
                         }
                         else
                         {
-                            ptCoord[spanDir] = ptCoord[spanDir] - maxSpan;
+                            ptCoord[sweepDir] = ptCoord[sweepDir] - maxSpan;
                         }
 
                         // Memorize data in order to reallocate
@@ -245,11 +244,12 @@ calcTransformedPatches() const
 
     if(debug)
     {
-        Info << "MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcTransformedPatches(): " 
-            << "masterPointsLocalCoord: "
-            << masterPointsLocalCoord << endl;
-
-        Info << "MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcTransformedPatches(): " 
+        InfoIn
+        (
+            "MixingPlaneInterpolation<MasterPatch, SlavePatch>::"
+            "calcTransformedPatches()" 
+        )   << "masterPointsLocalCoord: "
+            << masterPointsLocalCoord << nl
             << "slavePointsLocalCoord: "
             << slavePointsLocalCoord << endl;
     }
@@ -308,44 +308,52 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcMixingPlanePatch() const
     coordinateSystem::spanInfo spanLimited = cs_.spanLimited();
     boundBox spanBounds = cs_.spanBounds();
 
-    const direction spanDir = spanwiseSwitch();
+    const direction sweepDir = sweepAxisSwitch();
 
     // Get span from bounding boxes
     scalar minSpan =
         Foam::min
         (
-            masterBB.min()[spanDir],
-            slaveBB.min()[spanDir]
+            masterBB.min()[sweepDir],
+            slaveBB.min()[sweepDir]
         ) - SMALL;
 
     scalar maxSpan =
         Foam::max
         (
-            masterBB.max()[spanDir],
-            slaveBB.max()[spanDir]
+            masterBB.max()[sweepDir],
+            slaveBB.max()[sweepDir]
         ) + SMALL;
 
     if (debug)
     {
-        Info << "::calcMixingPlanePatch: minSpan from patch BB : " << minSpan << endl;
-        Info << "::calcMixingPlanePatch: maxSpan from patch BB : " << maxSpan << endl;
+        InfoIn
+        (
+            "MixingPlaneInterpolation<MasterPatch, SlavePatch>::"
+            "calcMixingPlanePatch() const"
+        )   << "minSpan from patch BB : " << minSpan << nl
+            << "maxSpan from patch BB : " << maxSpan << endl;
     }
 
     // Correct for limited span
-    if (spanLimited[spanDir].first())
+    if (spanLimited[sweepDir].first())
     {
-        minSpan = spanBounds.min()[spanDir];
+        minSpan = spanBounds.min()[sweepDir];
     }
 
-    if (spanLimited[spanDir].second())
+    if (spanLimited[sweepDir].second())
     {
-        maxSpan = spanBounds.max()[spanDir];
+        maxSpan = spanBounds.max()[sweepDir];
     }
 
     if (debug)
     {
-        Info << "::calcMixingPlanePatch: minSpan after checking spanLimited : " << minSpan << endl;
-        Info << "::calcMixingPlanePatch: maxSpan after checking spanLimited : " << maxSpan << endl;
+        InfoIn
+        (
+            "MixingPlaneInterpolation<MasterPatch, SlavePatch>::"
+            "calcMixingPlanePatch() const"
+        )   << "minSpan after checking spanLimited: " << minSpan << nl
+            << "maxSpan after checking spanLimited: " << maxSpan << endl;
     }
 
     label nRibbons = profile.size() - 1;
@@ -359,10 +367,10 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcMixingPlanePatch() const
 
     // Insert lower bound points and expand to bounds
     mixingPatchPoints[0] = profile[0];
-    mixingPatchPoints[0].replace(spanDir, minSpan);
+    mixingPatchPoints[0].replace(sweepDir, minSpan);
 
     mixingPatchPoints[1] = profile[0];
-    mixingPatchPoints[1].replace(spanDir, maxSpan);
+    mixingPatchPoints[1].replace(sweepDir, maxSpan);
     nextPointID = 2;
 
 
@@ -372,11 +380,11 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcMixingPlanePatch() const
         label fi2 = 2*fI;
         // Add top bound points and expand to bounds
         mixingPatchPoints[nextPointID] = profile[fI + 1];
-        mixingPatchPoints[nextPointID].replace(spanDir, minSpan);
+        mixingPatchPoints[nextPointID].replace(sweepDir, minSpan);
         nextPointID++;
 
         mixingPatchPoints[nextPointID] = profile[fI + 1];
-        mixingPatchPoints[nextPointID].replace(spanDir, maxSpan);
+        mixingPatchPoints[nextPointID].replace(sweepDir, maxSpan);
         nextPointID++;
 
         face curFace(4);
@@ -386,20 +394,6 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcMixingPlanePatch() const
         curFace[3] = fi2 + 2;
 
         mixingPatchFaces[fI] = curFace;
-
-
-#if 0
-        // Work in progress... MB 06_2011
-        // Compute face area
-        if (spanLimited[spanDir].first() || spanLimited[spanDir].first())
-        {
-            scalar ribbonWidth = mag(profile[fI + 1] - profile[fI]);
-
-            mixingPatchFacesArea[fI] = 0.0;
-        }
-        else
-            mixingPatchFacesArea[fI] = curFace.mag(mixingPatchPoints);
-#endif
     }
 
     mixingPlanePatchPtr_ =
@@ -412,10 +406,10 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcMixingPlanePatch() const
  
     if (debug > 0)
     {
-        Info << "::calcMixingPlanePatch():mixingPatchFacesArea(): "  << mixingPatchFacesArea << endl;
         InfoIn
         (
-            "void MixingPlaneInterpolation::calcMixingPlanePatch()"
+            "MixingPlaneInterpolation<MasterPatch, SlavePatch>::"
+            "calcMixingPlanePatch() const"
         )   << "mixingPatch: "
             << *mixingPlanePatchPtr_ << nl
             << "mixingPatch.points : "

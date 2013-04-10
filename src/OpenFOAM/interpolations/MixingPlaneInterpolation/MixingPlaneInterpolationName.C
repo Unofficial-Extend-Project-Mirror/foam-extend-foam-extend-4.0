@@ -43,56 +43,73 @@ template<>
 const char*
 Foam::NamedEnum
 <
-    Foam::MixingPlaneInterpolationName::assembly,
-    4
+    Foam::MixingPlaneInterpolationName::discretisation,
+    5
 >::names[] =
 {
-    "master",
-    "slave",
-    "both",
+    "masterPatch",
+    "slavePatch",
+    "bothPatches",
+    "uniform",
     "userDefined"
 };
 
 
 const Foam::NamedEnum
 <
-    Foam::MixingPlaneInterpolationName::assembly,
-    4
+    Foam::MixingPlaneInterpolationName::discretisation,
+    5
 >
-Foam::MixingPlaneInterpolationName::assemblyNames_;
+Foam::MixingPlaneInterpolationName::discretisationNames_;
 
 
 template<>
 const char*
 Foam::NamedEnum
 <
-    Foam::MixingPlaneInterpolationName::orientation,
-    13
+    Foam::MixingPlaneInterpolationName::sweepAxis,
+    6
 >::names[] =
 {
-    "unknown",
-    "dirX_spanY",
-    "dirX_spanZ",
-    "dirY_spanX",
-    "dirY_spanZ",
-    "dirZ_spanX",
-    "dirZ_spanY",
-
-    "dirR_spanTheta",
-    "dirR_spanZ",
-    "dirTheta_spanR",
-    "dirTheta_spanZ",
-    "dirZ_spanR",
-    "dirZ_spanTheta"
+    "X",
+    "Y",
+    "Z",
+    "R",
+    "Theta",
+    "Unknown"
 };
 
 
 const Foam::NamedEnum
 <
-    Foam::MixingPlaneInterpolationName::orientation,
-    13
+    Foam::MixingPlaneInterpolationName::sweepAxis,
+    6
 >
-Foam::MixingPlaneInterpolationName::orientationNames_;
+Foam::MixingPlaneInterpolationName::sweepAxisNames_;
+
+template<>
+const char*
+Foam::NamedEnum
+<
+    Foam::MixingPlaneInterpolationName::stackAxis,
+    6
+>::names[] =
+{
+    "X",
+    "Y",
+    "Z",
+    "R",
+    "Theta",
+    "Unknown"
+};
+
+
+const Foam::NamedEnum
+<
+    Foam::MixingPlaneInterpolationName::stackAxis,
+    6
+>
+Foam::MixingPlaneInterpolationName::stackAxisNames_;
 
 
 template<>
@@ -117,5 +134,6 @@ const Foam::NamedEnum
     5
 >
 Foam::MixingPlaneInterpolationName::mixingTypeNames_;
+
 
 // ************************************************************************* //
