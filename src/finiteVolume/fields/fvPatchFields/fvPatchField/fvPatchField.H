@@ -74,7 +74,7 @@ Ostream& operator<<(Ostream&, const fvPatchField<Type>&);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class patch Declaration
+                           Class fvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
