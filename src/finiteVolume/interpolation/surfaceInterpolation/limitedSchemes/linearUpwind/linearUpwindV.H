@@ -46,7 +46,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class linearUpwindV Declaration
+                      Class linearUpwindV Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>

@@ -65,6 +65,10 @@ Foam::reconCentral<Type>::interpolate
         <typename outerProduct<vector, Type>::type, fvPatchField, volMesh>
         gradVf = gradScheme_().grad(vf);
 
+    // Since grad is used on coupled boundaries, correctBoundaryConditions
+    // needs to be called.  HJ, 1/Nov/2012
+    gradVf.correctBoundaryConditions();
+
     Field<Type>& sfIn = sf.internalField();
 
     forAll(sfIn, facei)
