@@ -403,6 +403,12 @@ void Foam::fvMatrix<Type>::setValues
 {
     const fvMesh& mesh = psi_.mesh();
 
+    // Record cell labels of eliminated equations
+    forAll (cellLabels, i)
+    {
+        eliminatedEqns().insert(cellLabels[i]);
+    }
+
     const cellList& cells = mesh.cells();
     const unallocLabelList& own = mesh.owner();
     const unallocLabelList& nei = mesh.neighbour();
