@@ -493,7 +493,7 @@ void Foam::triSurfaceMesh::movePoints(const pointField& newPoints)
 
 
 const Foam::indexedOctree<Foam::treeDataTriSurface>&
-    Foam::triSurfaceMesh::tree() const
+Foam::triSurfaceMesh::tree() const
 {
     if (tree_.empty())
     {
