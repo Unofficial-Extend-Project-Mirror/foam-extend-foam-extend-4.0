@@ -156,7 +156,7 @@ void gaussGrad<Type>::correctBoundaryConditions
     >& gGrad
 )
 {
-    forAll(vsf.boundaryField(), patchi)
+    forAll (vsf.boundaryField(), patchi)
     {
         if (!vsf.boundaryField()[patchi].coupled())
         {
@@ -171,6 +171,10 @@ void gaussGrad<Type>::correctBoundaryConditions
             );
         }
      }
+
+    // Note: coupled boundaries provide patchNeighbourField, which is only
+    // updated on correct boundary conditions.  Therefore, evaluateCoupled()
+    // should be called here
 }
 
 
