@@ -6,7 +6,7 @@ CC          = g++ -m64 -mcpu=power5+
 
 include $(RULES)/c++$(WM_COMPILE_OPTION)
 
-ptFLAGS     = -DNoRepository -ftemplate-depth-40
+ptFLAGS     = -DNoRepository -ftemplate-depth-200
 
 c++FLAGS    = $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) $(LIB_HEADER_DIRS) -fPIC
 
