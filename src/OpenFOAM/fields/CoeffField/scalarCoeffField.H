@@ -58,10 +58,13 @@ public:
         //- Component type
         typedef scalar scalarType;
         typedef scalar linearType;
+        typedef scalar squareType;
+
 
         //- Field type
         typedef scalarField scalarTypeField;
         typedef scalarField linearTypeField;
+        typedef scalarField squareTypeField;
 
 
     // Static data members
@@ -108,6 +111,10 @@ public:
             //- Return as linear field.  Equal to scalar field
             const scalarField& asLinear() const;
             scalarField& asLinear();
+
+            //- Return as square field.  Equal to scalar field
+            const scalarField& asSquare() const;
+            scalarField& asSquare();
 
 
         //- Return coefficient as a block

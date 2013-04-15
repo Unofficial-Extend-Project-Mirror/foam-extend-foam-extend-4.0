@@ -104,6 +104,18 @@ public:
             inline Cmpt& x();
             inline Cmpt& y();
 
+            //- Return i-th component.  Consistency with VectorN
+            inline const Cmpt& operator()
+            (
+                const direction i
+            ) const;
+
+            //- Return i-th component.  Consistency with VectorN
+            inline  Cmpt& operator()
+            (
+                const direction i
+            );
+
 
         // Operators
 

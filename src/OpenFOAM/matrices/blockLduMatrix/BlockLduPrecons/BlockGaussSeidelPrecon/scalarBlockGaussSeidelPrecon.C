@@ -37,6 +37,7 @@ Author
 #define scalarBlockGaussSeidelPrecon_H
 
 #include "BlockGaussSeidelPrecon.H"
+#include "scalarBlockGaussSeidelPrecon.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,7 +45,43 @@ namespace Foam
 {
 
 template<>
-void Foam::BlockGaussSeidelPrecon<scalar>::precondition
+template<>
+void BlockGaussSeidelPrecon<scalar>::BlockSweep
+(
+    Field<scalar>& x,
+    const Field<scalar>& dD,
+    const Field<scalar>& upper,
+    const Field<scalar>& b
+) const
+{
+    FatalErrorIn
+    (
+        "BlockGaussSeidelPrecon<scalar>::BlockSweep(...)"
+    )   << "Function not implemented for Type=scalar. " << endl
+        << abort(FatalError);
+}
+
+template<>
+template<>
+void BlockGaussSeidelPrecon<scalar>::BlockSweep
+(
+    Field<scalar>& x,
+    const Field<scalar>& dD,
+    const Field<scalar>& upper,
+    const Field<scalar>& lower,
+    const Field<scalar>& b
+) const
+{
+    FatalErrorIn
+    (
+        "BlockGaussSeidelPrecon<scalar>::BlockSweep(...)"
+    )   << "Function not implemented for Type=scalar. " << endl
+        << abort(FatalError);
+}
+
+
+template<>
+void BlockGaussSeidelPrecon<scalar>::precondition
 (
     scalarField& x,
     const scalarField& b
@@ -78,7 +115,7 @@ void Foam::BlockGaussSeidelPrecon<scalar>::precondition
 
 
 template<>
-void Foam::BlockGaussSeidelPrecon<scalar>::preconditionT
+void BlockGaussSeidelPrecon<scalar>::preconditionT
 (
     scalarField& xT,
     const scalarField& bT

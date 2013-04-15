@@ -27,6 +27,7 @@ License
 #ifndef symmTensorBlockLduMatrix_H
 #define symmTensorBlockLduMatrix_H
 
+#include "coeffFields.H"
 #include "BlockLduMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

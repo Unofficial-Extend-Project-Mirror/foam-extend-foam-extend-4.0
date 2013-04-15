@@ -54,6 +54,7 @@ SourceFiles
 #include "lduInterface.H"
 #include "autoPtr.H"
 #include "lduPrimitiveMesh.H"
+#include "CoeffField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -201,6 +202,14 @@ public:
             virtual tmp<scalarField> agglomerateCoeffs
             (
                 const scalarField& fineCoeffs
+            ) const;
+
+            // Klas Jareteg: 2013-02-06
+            //- Agglomerating for the CoeffField fine-level coefficients
+            template<class Type>
+            tmp<CoeffField<Type> > agglomerateBlockCoeffs
+            (
+                const CoeffField<Type>& fineCoeffs
             ) const;
 };
 

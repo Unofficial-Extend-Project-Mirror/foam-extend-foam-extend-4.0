@@ -53,10 +53,62 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
 
     // Create multiplication function object
     typename BlockCoeff<Type>::multiply mult;
+    
+    // Klas Jareteg: 2013-02-10:
+    // Must transfer data between the different CPUs. Notes on the Jacobi
+    // iteration style can be seen in GaussSeidelSolver.C
+    typedef CoeffField<Type> TypeCoeffField;
+    typedef Field<Type> TypeField;
+
+    typedef typename TypeCoeffField::scalarTypeField scalarTypeField;
+    typedef typename TypeCoeffField::linearTypeField linearTypeField;
+    typedef typename TypeCoeffField::squareTypeField squareTypeField;
+
+    FieldField<CoeffField, Type> mBouCoeffs(this->matrix_.coupleUpper().size());
+    forAll(mBouCoeffs, patchi)
+    {
+        const FieldField<CoeffField,Type>& coupleUpperTemp(this->matrix_.coupleUpper());
+        if (const_cast<BlockLduMatrix<Type>& >(this->matrix_).interfaces().set(patchi))
+        {
+            mBouCoeffs.set(patchi, coupleUpperTemp[patchi]);
+            
+            if (mBouCoeffs[patchi].activeType() == blockCoeffBase::SQUARE)
+            {
+                squareTypeField& activeMBouCoeffs = mBouCoeffs[patchi].asSquare();
+                forAll (activeMBouCoeffs, intI)
+                {
+                    activeMBouCoeffs[intI] = -activeMBouCoeffs[intI];
+                }
+            } 
+            else if (mBouCoeffs[patchi].activeType() == blockCoeffBase::LINEAR)
+            {
+                linearTypeField& activeMBouCoeffs = mBouCoeffs[patchi].asLinear();
+                forAll (activeMBouCoeffs, intI)
+                {
+                    activeMBouCoeffs[intI] = -activeMBouCoeffs[intI];
+                }
+            }
+        }
+    }
+
 
     for (label sweep = 0; sweep < nSweeps_; sweep++)
     {
         bPrime_ = b;
+        
+        this->matrix_.initInterfaces
+        (
+            mBouCoeffs,
+            bPrime_,
+            x
+        );
+
+        this->matrix_.updateInterfaces
+        (
+            mBouCoeffs,
+            bPrime_,
+            x
+        );
 
         register label fStart, fEnd, curCoeff;
 
@@ -143,9 +195,60 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
     // Create multiplication function object
     typename BlockCoeff<Type>::multiply mult;
 
+    // Klas Jareteg: 2013-02-10:
+    // Must transfer data between the different CPUs. Notes on the Jacobi
+    // iteration style can be seen in GaussSeidelSolver.C
+    typedef CoeffField<Type> TypeCoeffField;
+    typedef Field<Type> TypeField;
+
+    typedef typename TypeCoeffField::scalarTypeField scalarTypeField;
+    typedef typename TypeCoeffField::linearTypeField linearTypeField;
+    typedef typename TypeCoeffField::squareTypeField squareTypeField;
+
+    FieldField<CoeffField, Type> mBouCoeffs(this->matrix_.coupleUpper().size());
+    forAll(mBouCoeffs, patchi)
+    {
+        const FieldField<CoeffField,Type>& coupleUpperTemp(this->matrix_.coupleUpper());
+        if (const_cast<BlockLduMatrix<Type>& >(this->matrix_).interfaces().set(patchi))
+        {
+            mBouCoeffs.set(patchi, coupleUpperTemp[patchi]);
+            
+            if (mBouCoeffs[patchi].activeType() == blockCoeffBase::SQUARE)
+            {
+                squareTypeField& activeMBouCoeffs = mBouCoeffs[patchi].asSquare();
+                forAll (activeMBouCoeffs, intI)
+                {
+                    activeMBouCoeffs[intI] = -activeMBouCoeffs[intI];
+                }
+            } 
+            else if (mBouCoeffs[patchi].activeType() == blockCoeffBase::LINEAR)
+            {
+                linearTypeField& activeMBouCoeffs = mBouCoeffs[patchi].asLinear();
+                forAll (activeMBouCoeffs, intI)
+                {
+                    activeMBouCoeffs[intI] = -activeMBouCoeffs[intI];
+                }
+            }
+        }
+    }
+
     for (label sweep = 0; sweep < nSweeps_; sweep++)
     {
         bPrime_ = b;
+
+        this->matrix_.initInterfaces
+        (
+            mBouCoeffs,
+            bPrime_,
+            x
+        );
+
+        this->matrix_.updateInterfaces
+        (
+            mBouCoeffs,
+            bPrime_,
+            x
+        );
 
         register label fStart, fEnd, curCoeff;
 

@@ -116,6 +116,19 @@ public:
             inline Cmpt& y();
             inline Cmpt& z();
 
+            //- Return i-th component.  Consistency with VectorN
+            inline const Cmpt& operator()
+            (
+                const direction i
+            ) const;
+
+            //- Return i-th component.  Consistency with VectorN
+            inline  Cmpt& operator()
+            (
+                const direction i
+            );
+
+
         //- Return *this (used for point which is a typedef to Vector<scalar>.
         inline const Vector<Cmpt>& centre
         (

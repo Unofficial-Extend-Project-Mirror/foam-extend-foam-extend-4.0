@@ -40,6 +40,7 @@ SourceFiles
 #define tensorBlockGaussSeidelPrecon_H
 
 #include "BlockGaussSeidelPrecon.H"
+#include "tensorBlockGaussSeidelPrecon.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,26 +48,63 @@ namespace Foam
 {
 
 template<>
-void Foam::BlockGaussSeidelPrecon<tensor>::precondition
+template<>
+void BlockGaussSeidelPrecon<tensor>::BlockSweep
+(
+    Field<tensor>& x,
+    const Field<tensor>& dD,
+    const Field<tensor>& upper,
+    const Field<tensor>& b
+) const
+{
+    FatalErrorIn
+    (
+        "Foam::BlockGaussSeidelPrecon<tensor>::BlockSweep(...)"
+    )   << "Function not implemented for Type=tensor. " << endl
+        << abort(FatalError);
+}
+
+
+template<>
+template<>
+void BlockGaussSeidelPrecon<tensor>::BlockSweep
+(
+    Field<tensor>& x,
+    const Field<tensor>& dD,
+    const Field<tensor>& upper,
+    const Field<tensor>& lower,
+    const Field<tensor>& b
+) const
+{
+    FatalErrorIn
+    (
+        "Foam::BlockGaussSeidelPrecon<tensor>::BlockSweep(...)"
+    )   << "Function not implemented for Type=tensor. " << endl
+        << abort(FatalError);
+}
+
+
+template<>
+void BlockGaussSeidelPrecon<tensor>::precondition
 (
     tensorField& x,
     const tensorField& b
 ) const
 {
     // Decoupled version
-    decoupledPrecondition(x, b);
+//     decoupledPrecondition(x, b);
 }
 
 
 template<>
-void Foam::BlockGaussSeidelPrecon<tensor>::preconditionT
+void BlockGaussSeidelPrecon<tensor>::preconditionT
 (
     tensorField& xT,
     const tensorField& bT
 ) const
 {
     // Decoupled version
-    decoupledPreconditionT(xT, bT);
+//     decoupledPreconditionT(xT, bT);
 }
 
 

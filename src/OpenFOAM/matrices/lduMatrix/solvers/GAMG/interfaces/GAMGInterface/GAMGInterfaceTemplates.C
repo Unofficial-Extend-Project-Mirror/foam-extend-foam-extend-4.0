@@ -25,6 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "GAMGInterface.H"
+#include "scalarCoeffField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,5 +46,59 @@ Foam::tmp<Foam::Field<Type> > Foam::GAMGInterface::interfaceInternalField
     return tresult;
 }
 
+template<class Type>
+Foam::tmp<Foam::CoeffField<Type> > Foam::GAMGInterface::agglomerateBlockCoeffs
+(
+    const Foam::CoeffField<Type>& fineCoeffs
+) const
+{
+    tmp<CoeffField<Type> > tcoarseCoeffs(new CoeffField<Type>(size()));
+    CoeffField<Type>& coarseCoeffs = tcoarseCoeffs();
 
-// ************************************************************************* //
+    typedef CoeffField<Type> TypeCoeffField;
+    typedef Field<Type> TypeField;
+
+    typedef typename TypeCoeffField::scalarTypeField scalarTypeField;
+    typedef typename TypeCoeffField::linearTypeField linearTypeField;
+    typedef typename TypeCoeffField::squareTypeField squareTypeField;
+
+    if (fineCoeffs.activeType() == blockCoeffBase::SQUARE)
+    {
+        squareTypeField& activeCoarseCoeffs = coarseCoeffs.asSquare();
+        const squareTypeField& activeFineCoeffs = fineCoeffs.asSquare();
+
+        activeCoarseCoeffs *= 0.0;
+
+        // Added weights to account for non-integral matching
+        forAll(restrictAddressing_, ffi)
+        {
+            activeCoarseCoeffs[restrictAddressing_[ffi]] +=
+                restrictWeights_[ffi]*activeFineCoeffs[fineAddressing_[ffi]];
+        }
+    }
+    else if (fineCoeffs.activeType() == blockCoeffBase::LINEAR)
+    {
+        linearTypeField& activeCoarseCoeffs = coarseCoeffs.asLinear();
+        const linearTypeField& activeFineCoeffs = fineCoeffs.asLinear();
+        
+        activeCoarseCoeffs *= 0.0;
+
+        // Added weights to account for non-integral matching
+        forAll(restrictAddressing_, ffi)
+        {
+            activeCoarseCoeffs[restrictAddressing_[ffi]] +=
+                restrictWeights_[ffi]*activeFineCoeffs[fineAddressing_[ffi]];
+        } 
+    }
+
+    return tcoarseCoeffs;
+}
+
+namespace Foam
+{
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

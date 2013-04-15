@@ -80,6 +80,20 @@ Foam::CoeffField<Foam::scalar>::asLinear()
 }
 
 
+const Foam::scalarField&
+Foam::CoeffField<Foam::scalar>::asSquare() const
+{
+    return *this;
+}
+
+
+Foam::scalarField&
+Foam::CoeffField<Foam::scalar>::asSquare()
+{
+    return *this;
+}
+
+
 Foam::BlockCoeff<Foam::scalar>
 Foam::CoeffField<Foam::scalar>::getCoeff(const label index) const
 {

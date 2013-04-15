@@ -154,6 +154,21 @@ public:
             inline const Vector<Cmpt> y() const;
             inline const Vector<Cmpt> z() const;
 
+            //- Return (i, j) component.  Consistency with VectorN
+            inline const Cmpt& operator()
+            (
+                const direction i,
+                const direction j
+            ) const;
+
+            //- Return access to (i, j) component.  Consistency with VectorN
+            inline Cmpt& operator()
+            (
+                const direction i,
+                const direction j
+            );
+
+
         //- Transpose
         inline Tensor<Cmpt> T() const;
 

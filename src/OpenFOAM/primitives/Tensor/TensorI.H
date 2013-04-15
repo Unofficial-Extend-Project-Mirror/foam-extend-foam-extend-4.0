@@ -253,6 +253,28 @@ inline Tensor<Cmpt> Tensor<Cmpt>::T() const
 }
 
 
+template <class Cmpt>
+inline const Cmpt& Tensor<Cmpt>::operator()
+(
+    const direction i,
+    const direction j
+) const
+{
+    return this->operator[](i*Tensor<Cmpt>::dim + j);
+}
+
+
+template <class Cmpt>
+inline Cmpt& Tensor<Cmpt>::operator()
+(
+    const direction i,
+    const direction j
+)
+{
+    return this->operator[](i*Tensor<Cmpt>::dim + j);
+}
+
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template <class Cmpt>

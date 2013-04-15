@@ -1,17 +1,9 @@
-OpenFOAM/Lists/VectorNLists.C
+OpenFOAM/DimensionedTypes/dimensionedVectorTensorN.C
 
 OpenFOAM/DimensionedTypes/dimensionedVectorTensorN.C
 
-OpenFOAM/Fields/VectorNFields.C
-OpenFOAM/Fields/TensorNFields.C
 OpenFOAM/Fields/DiagTensorNFields.C
 OpenFOAM/Fields/SphericalTensorNFields.C
-
-OpenFOAM/expandContract/ExpandTensorNField.C
-
-OpenFOAM/BlockLduMatrices/blockVectorNSolvers.C
-OpenFOAM/BlockLduMatrices/blockVectorNMatrices.C
-OpenFOAM/BlockLduMatrices/blockVectorNLduInterfaceFields.C
 
 finiteVolume/fields/fvPatchFields/fvPatchVectorNFields.C
 finiteVolume/fields/fvPatchFields/genericFvPatchVectorNFields.C

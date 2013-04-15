@@ -130,6 +130,21 @@ public:
             inline Vector2D<Cmpt> x() const;
             inline Vector2D<Cmpt> y() const;
 
+            //- Return (i, j) component.  Consistency with VectorN
+            inline const Cmpt& operator()
+            (
+                const direction i,
+                const direction j
+            ) const;
+
+            //- Return access to (i, j) component.  Consistency with VectorN
+            inline Cmpt& operator()
+            (
+                const direction i,
+                const direction j
+            );
+
+
         //- Transpose
         inline Tensor2D<Cmpt> T() const;
 
