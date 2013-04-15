@@ -401,6 +401,7 @@ void kOmegaSST::correct()
 
     // Re-calculate viscosity
     nut_ = a1_*k_/max(a1_*omega_, F2()*sqrt(2*S2));
+    nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 }
 

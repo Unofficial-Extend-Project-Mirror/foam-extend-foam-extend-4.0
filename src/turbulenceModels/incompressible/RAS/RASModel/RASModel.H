@@ -101,6 +101,9 @@ protected:
         //- Small omega value used to avoid divide by zero
         dimensionedScalar omegaSmall_;
 
+        //- Laminar to turbulent viscosity ratio
+        scalar nuRatio_;
+
         //- Near wall distance boundary field
         nearWallDist y_;
 
@@ -211,6 +214,12 @@ public:
                 return omegaSmall_;
             }
 
+            //- Return maximum allowed ratio of laminar to turbulent viscosity
+            scalar nuRatio() const
+            {
+                return nuRatio_;
+            }
+
             //- Allow k0 to be changed
             dimensionedScalar& k0()
             {
@@ -241,6 +250,12 @@ public:
                 return omegaSmall_;
             }
 
+            //- Allow nuRatio to be modified
+            scalar& nuRatio()
+            {
+                return nuRatio_;
+            }
+
             //- Return the near wall distances
             const nearWallDist& y() const
             {
@@ -260,13 +275,7 @@ public:
         virtual tmp<volScalarField> nut() const = 0;
 
         //- Return the effective viscosity
-        virtual tmp<volScalarField> nuEff() const
-        {
-            return tmp<volScalarField>
-            (
-                new volScalarField("nuEff", nut() + nu())
-            );
-        }
+        virtual tmp<volScalarField> nuEff() const;
 
         //- Return the turbulence kinetic energy
         virtual tmp<volScalarField> k() const = 0;
