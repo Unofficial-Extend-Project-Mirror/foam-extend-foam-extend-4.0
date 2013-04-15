@@ -60,6 +60,7 @@ class multiMaterialThermal
         //- Material indicator field
         volScalarField materials_;
 
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
