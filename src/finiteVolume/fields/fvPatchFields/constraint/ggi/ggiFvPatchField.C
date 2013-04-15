@@ -140,16 +140,22 @@ ggiFvPatchField<Type>::ggiFvPatchField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Return shadow field
 template<class Type>
-const Foam::ggiFvPatchField<Type>&
-ggiFvPatchField<Type>::shadowPatchField() const
+const ggiFvPatchField<Type>& ggiFvPatchField<Type>::shadowPatchField() const
 {
-    return this->boundaryField()[ggiPatch_.shadowIndex()];
+    const GeometricField<Type, fvPatchField, volMesh>& fld =
+    static_cast<const GeometricField<Type, fvPatchField, volMesh>&>
+    (
+        this->internalField()
+    );
+
+    return refCast<const ggiFvPatchField<Type> >
+    (
+        fld.boundaryField()[ggiPatch_.shadowIndex()]
+    );
 }
 
 
-// Return neighbour field
 template<class Type>
 tmp<Field<Type> > ggiFvPatchField<Type>::patchNeighbourField() const
 {
@@ -228,10 +234,7 @@ void ggiFvPatchField<Type>::evaluate
     const Pstream::commsTypes
 )
 {
-    if (!this->updated())
-    {
-        this->updateCoeffs();
-    }
+    fvPatchField<Type>::evaluate();
 }
 
 
