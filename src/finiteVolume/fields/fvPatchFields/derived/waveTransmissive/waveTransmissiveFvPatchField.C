@@ -184,7 +184,7 @@ tmp<scalarField> waveTransmissiveFvPatchField<Type>::supercritical() const
 template<class Type>
 void waveTransmissiveFvPatchField<Type>::write(Ostream& os) const
 {
-    advectiveFvPatchField<Type>::write(os);
+    fvPatchField<Type>::write(os);
     if (this->phiName_ != "phi")
     {
         os.writeKeyword("phi") << this->phiName_ << token::END_STATEMENT << nl;
