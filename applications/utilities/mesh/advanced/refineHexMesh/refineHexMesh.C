@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 #   include "createMesh.H"
     const word oldInstance = mesh.pointsInstance();
 
-    pointMesh pMesh(mesh);
+    const pointMesh& pMesh = pointMesh::New(mesh);
 
     word cellSetName(args.args()[1]);
     bool overwrite = args.optionFound("overwrite");
