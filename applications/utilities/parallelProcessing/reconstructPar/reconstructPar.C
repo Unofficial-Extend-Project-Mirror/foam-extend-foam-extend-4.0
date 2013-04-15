@@ -171,7 +171,6 @@ int main(int argc, char *argv[])
         // Get list of objects from processor0 database
         IOobjectList objects(procMeshes.meshes()[0], databases[0].timeName());
 
-
         // If there are any FV fields, reconstruct them
 
         if

@@ -239,9 +239,9 @@ int main(int argc, char *argv[])
     // Collect all boundary faces
     labelList boundaryFaces(mesh.nFaces() - mesh.nInternalFaces());
 
-    forAll(boundaryFaces, i)
+    forAll (boundaryFaces, i)
     {
-        boundaryFaces[i] = i+mesh.nInternalFaces();
+        boundaryFaces[i] = i + mesh.nInternalFaces();
     }
 
 
