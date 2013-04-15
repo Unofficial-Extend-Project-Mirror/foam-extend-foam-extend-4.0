@@ -31,7 +31,7 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "crAddressing.H"
 
@@ -176,8 +176,10 @@ void Foam::crAddressing::operator=(const crAddressing& rhs)
     // Check for assignment to self
     if (this == &rhs)
     {
-        FatalErrorIn("Foam::crAddressing::operator=(const Foam::crAddressing&)")
-            << "Attempted assignment to self"
+        FatalErrorIn
+        (
+            "Foam::crAddressing::operator=(const Foam::crAddressing&)"
+        )   << "Attempted assignment to self"
             << abort(FatalError);
     }
 
