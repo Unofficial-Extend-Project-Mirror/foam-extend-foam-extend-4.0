@@ -198,7 +198,11 @@ gaussLaplacianScheme<Type, GType>::fvcLaplacian
     surfaceVectorField Sn = mesh.Sf()/mesh.magSf();
 
     surfaceVectorField SfGamma = mesh.Sf() & gamma;
-    GeometricField<scalar, fvsPatchField, surfaceMesh> SfGammaSn = SfGamma & Sn;
+    GeometricField<scalar, fvsPatchField, surfaceMesh> SfGammaSn
+    (
+        SfGamma & Sn
+    );
+
     surfaceVectorField SfGammaCorr = SfGamma - SfGammaSn*Sn;
 
     tmp<GeometricField<Type, fvPatchField, volMesh> > tLaplacian
