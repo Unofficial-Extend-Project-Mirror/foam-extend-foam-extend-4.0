@@ -35,12 +35,116 @@ Contributor
 #include "surfaceMesh.H"
 #include "fvsPatchField.H"
 #include "volFields.H"
-#include "interpolationCellPoint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+template<class Type>
+void mixingPlaneFvPatchField<Type>::calcFluxMask() const
+{
+    // Find the flux field and calculate flux mask
+    if (fluxAveraging_)
+    {
+        if (!this->db().objectRegistry::found(phiName_))
+        {
+            InfoIn
+            (
+                "void mixingPlaneFvPatchField<Type>::calcFluxMask()"
+                ""
+            )   << "Flux not found for flux averaging mixing plane on "
+                << this->patch().name() << ".  Flux field: " << phiName_
+                << endl;
+
+            fluxMask_.setSize(mixingPlanePatch_.nProfileBands(), 0);
+        }
+        else
+        {
+            // Get flux field.  Used in decision for which faces
+            // see the average and for flux-based weights
+            const scalarField& phip = this->lookupPatchField
+            (
+                phiName_,
+                reinterpret_cast<const surfaceScalarField*>(0),
+                reinterpret_cast<const scalar*>(0)
+            );
+
+            if (mixingPlanePatch_.master())
+            {
+                // Calculate flux masks.  Master fluxes are used for the mask
+                // Flux mask behaves like valueFraction:
+                //     1 = use interpolated value
+                //     0 = use patch internal field
+
+                // Note: only master calculates the flux mask, as it is
+                // contained on the profile.  Shadow will use the flux mask
+                // from master.  HJ, 14/Feb/2013
+                fluxMask_ = neg(mixingPlanePatch_.toProfile(phip));
+            }
+            else
+            {
+                // On the shadow side, flux mask is opposite from master
+                fluxMask_ = 1 - shadowPatchField().fluxMask_;
+            }
+
+            // Calculate flux weights via circumferential average
+            // Note: for zero flux, weights must be uniform and not zero
+            // HJ, 4/Feb/2013
+
+            // Note: flux weights exist on both master and slave
+            scalar maxPhiP = 0;
+
+            if (!phip.empty())
+            {
+                maxPhiP = max(phip);
+            }
+
+            reduce(maxPhiP, maxOp<scalar>());
+
+            if (maxPhiP > SMALL)
+            {
+                fluxWeights_ = Foam::max(phip, scalar(0));
+                fluxWeights_ /=
+                    mixingPlanePatch_.circumferentialAverage(fluxWeights_)
+                  + SMALL;
+           }
+            else
+            {
+                fluxWeights_ = 1;
+            }
+        }
+    }
+}
+
+
+template<class Type>
+const scalarField& mixingPlaneFvPatchField<Type>::fluxMask() const
+{
+    if (!this->updated())
+    {
+        // Force recalculation of flux masks
+        calcFluxMask();        
+    }
+
+    return fluxMask_;
+}
+
+
+template<class Type>
+const scalarField& mixingPlaneFvPatchField<Type>::fluxWeights() const
+{
+    if (!this->updated())
+    {
+        // Force recalculation of flux masks
+        calcFluxMask();
+    }
+
+    return fluxWeights_;
+}
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -52,7 +156,11 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
 )
 :
     coupledFvPatchField<Type>(p, iF),
-    mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(p))
+    mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(p)),
+    fluxAveraging_(false),
+    phiName_("phi"),
+    fluxMask_(),
+    fluxWeights_(p.size(), 0)
 {}
 
 
@@ -65,7 +173,11 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
 )
 :
     coupledFvPatchField<Type>(p, iF, dict, false),
-    mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(p))
+    mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(p)),
+    fluxAveraging_(dict.lookup("fluxAveraging")),
+    phiName_(dict.lookupOrDefault<word>("phi", "phi")),
+    fluxMask_(),
+    fluxWeights_(p.size(), 0)
 {
     if (!isType<mixingPlaneFvPatch>(p))
     {
@@ -88,7 +200,6 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
         // Grab the internal value for initialisation.
         fvPatchField<Type>::operator=(this->patchInternalField()());
     }
-
 }
 
 
@@ -102,7 +213,11 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
 )
 :
     coupledFvPatchField<Type>(ptf, p, iF, mapper),
-    mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(p))
+    mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(p)),
+    fluxAveraging_(ptf.fluxAveraging_),
+    phiName_(ptf.phiName_),
+    fluxMask_(),
+    fluxWeights_(ptf.fluxWeights_, mapper)
 {
     if (!isType<mixingPlaneFvPatch>(this->patch()))
     {
@@ -127,50 +242,130 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
 template<class Type>
 mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
 (
+    const mixingPlaneFvPatchField<Type>& ptf
+)
+:
+    mixingPlaneLduInterfaceField(),
+    coupledFvPatchField<Type>(ptf),
+    mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(ptf.patch())),
+    fluxAveraging_(ptf.fluxAveraging_),
+    phiName_(ptf.phiName_),
+    fluxMask_(),
+    fluxWeights_(ptf.fluxWeights_)
+{}
+
+
+template<class Type>
+mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
+(
     const mixingPlaneFvPatchField<Type>& ptf,
     const DimensionedField<Type, volMesh>& iF
 )
 :
     mixingPlaneLduInterfaceField(),
     coupledFvPatchField<Type>(ptf, iF),
-    mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(ptf.patch()))
+    mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(ptf.patch())),
+    fluxAveraging_(ptf.fluxAveraging_),
+    phiName_(ptf.phiName_),
+    fluxMask_(),
+    fluxWeights_(ptf.fluxWeights_)
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Return neighbour field
+// Return shadow field
+template<class Type>
+const mixingPlaneFvPatchField<Type>&
+mixingPlaneFvPatchField<Type>::shadowPatchField() const
+{
+    const GeometricField<Type, fvPatchField, volMesh>& fld =
+        static_cast<const GeometricField<Type, fvPatchField, volMesh>&>
+        (
+            this->internalField()
+        );
+
+    return refCast<const mixingPlaneFvPatchField<Type> >
+    (
+        fld.boundaryField()[mixingPlanePatch_.shadowIndex()]
+    );
+}
+
+
+template<class Type>
+void mixingPlaneFvPatchField<Type>::autoMap
+(
+    const fvPatchFieldMapper& m
+)
+{
+    fluxMask_.setSize(0),
+    fluxWeights_.autoMap(m);
+}
+
+
+template<class Type>
+void mixingPlaneFvPatchField<Type>::rmap
+(
+    const fvPatchField<Type>& ptf,
+    const labelList& addr
+)
+{
+    fvPatchField<Type>::rmap(ptf, addr);
+
+    fluxMask_.setSize(0);
+
+    const mixingPlaneFvPatchField<Type>& tiptf =
+        refCast<const mixingPlaneFvPatchField<Type> >(ptf);
+
+    fluxWeights_.rmap(tiptf.fluxWeights_, addr);
+}
+
+
+template<class Type>
+void mixingPlaneFvPatchField<Type>::updateCoeffs()
+{
+    // Force recalculation of flux masks
+    calcFluxMask();
+
+    fvPatchField<Type>::updateCoeffs();
+}
+
+
 template<class Type>
 tmp<Field<Type> > mixingPlaneFvPatchField<Type>::patchNeighbourField() const
 {
-    if(debug > 1)
+    // Get shadow patch internalField field
+    Field<Type> sField = this->shadowPatchField().patchInternalField();
+
+    if (fluxAveraging_)
     {
-        Info << "mixingPlaneFvPatchField<Type>::patchNeighbourField(): for field: " << this->dimensionedInternalField().name();
-        Info << " on patch: " << this->patch().name() << endl;
-        Info << " surface Area: " << gSum(this->patch().magSf()) << endl;
+        // Flux averaging
+        // - for outgoing flux, use zero gradient condition
+        // - for incoming flux, use interpolated flux-weighted value
+
+        const scalarField& mask = fluxMask();
+
+        const scalarField& shadowFluxWeights =
+            shadowPatchField().fluxWeights();
+
+        // For outgoing flux, the value is identical to internal value
+        // For incoming flux, calculate the average value of the
+        // flux-weight shadow values coming out
+        return
+            mixingPlanePatch_.fromProfile
+            (
+                mask*mixingPlanePatch_.shadow().toProfile
+                (
+                    sField*shadowFluxWeights
+                )
+            )
+          + mixingPlanePatch_.fromProfile(1 - mask)*this->patchInternalField();
     }
-
-    const Field<Type>& iField = this->internalField();
-
-    // Get shadow face-cells and assemble shadow field
-    const unallocLabelList& sfc = mixingPlanePatch_.shadow().faceCells();
-
-    Field<Type> sField(sfc.size());
-
-    forAll (sField, i)
+    else
     {
-        sField[i] = iField[sfc[i]];
+        // No flux averaging
+        return mixingPlanePatch_.interpolate(sField);
     }
-
-    tmp<Field<Type> > tpnf(new Field<Type>(this->size()));
-    Field<Type>& pnf = tpnf();
-
-    if (this->size() > 0)
-    {
-        pnf = mixingPlanePatch_.interpolate(sField);
-    }
-
-    return tpnf;
 }
 
 
@@ -180,24 +375,22 @@ void mixingPlaneFvPatchField<Type>::initEvaluate
     const Pstream::commsTypes commsType
 )
 {
-    if(debug)
-        Info << "Inside mixingPlaneFvPatchField<Type>::initEvaluate: for field: " << this->dimensionedInternalField().name() << endl;
-
-    if(this->size() > 0)
+    if (!this->updated())
     {
-        if (!this->updated())
-        {
-            this->updateCoeffs();
-        }
-
-        Field<Type> pf
-            (
-                this->patch().weights()*this->patchInternalField()
-                + (1.0 - this->patch().weights())*this->patchNeighbourField()
-            );
-
-        Field<Type>::operator=(pf);
+        this->updateCoeffs();
     }
+
+    // Evaluation is identical with or without flux averaging
+    // as the masking and weighting is taken into account in
+    // patchNeighbourField.  HJ, 4/Feb/2013
+
+    const scalarField& w = this->patch().weights();            
+
+    Field<Type>::operator=
+    (
+        w*this->patchInternalField()
+      + (1 - w)*this->patchNeighbourField()
+    );
 }
 
 
@@ -207,12 +400,56 @@ void mixingPlaneFvPatchField<Type>::evaluate
     const Pstream::commsTypes
 )
 {
-    if(this->size() > 0)
+    fvPatchField<Type>::evaluate();
+}
+
+
+template<class Type>
+tmp<Field<Type> > mixingPlaneFvPatchField<Type>::valueInternalCoeffs
+(
+    const tmp<scalarField>& w
+) const
+{
+    if (fluxAveraging_)
     {
-        if (!this->updated())
-        {
-            this->updateCoeffs();
-        }
+        // Flux averaging.
+        // When flux averaging indicates outgoing flux,
+        // use zero gradient condition: evaluating as internal field
+        // When flux averaging indicates incoming flux,
+        // use normal interpolation
+        // Note that each face may have elements in multiple bands and
+        // therefore interpolation from profile to patch is required
+        // HJ, 11/Feb/2013
+        const scalarField& mask = fluxMask();
+
+        scalarField oneMFluxMask = mixingPlanePatch_.fromProfile(1 - mask);
+
+        return pTraits<Type>::one*oneMFluxMask;
+    }
+    else
+    {
+        return Type(pTraits<Type>::one)*w;
+    }
+}
+
+template<class Type>
+tmp<Field<Type> > mixingPlaneFvPatchField<Type>::valueBoundaryCoeffs
+(
+    const tmp<scalarField>& w
+) const
+{
+    if (fluxAveraging_)
+    {
+        // Flux averaging
+        const scalarField& mask = fluxMask();
+
+        scalarField fluxMask = mixingPlanePatch_.fromProfile(mask);
+
+        return pTraits<Type>::one*fluxMask;
+    }
+    else
+    {
+        return Type(pTraits<Type>::one)*(1.0 - w);
     }
 }
 
@@ -228,27 +465,28 @@ void mixingPlaneFvPatchField<Type>::initInterfaceMatrixUpdate
     const Pstream::commsTypes commsType
 ) const
 {
-    if(this->size() > 0)
+    // Communication is allowed either before or after processor
+    // patch comms.  HJ, 11/Jul/2011
+
+    // Get shadow face-cells and assemble shadow field
+    const unallocLabelList& sfc = mixingPlanePatch_.shadow().faceCells();
+
+    scalarField sField(sfc.size());
+
+    forAll (sField, i)
     {
-        // Get shadow face-cells and assemble shadow field
-        const unallocLabelList& sfc = mixingPlanePatch_.shadow().faceCells();
+        sField[i] = psiInternal[sfc[i]];
+    }
 
-        scalarField sField(sfc.size());
+    // Get local faceCells
+    const unallocLabelList& fc = mixingPlanePatch_.faceCells();
 
-        forAll (sField, i)
-        {
-            sField[i] = psiInternal[sfc[i]];
-        }
+    scalarField pnf = mixingPlanePatch_.interpolate(sField);
 
-        scalarField pnf = mixingPlanePatch_.interpolate(sField);
-
-        // Multiply the field by coefficients and add into the result
-        const unallocLabelList& fc = mixingPlanePatch_.faceCells();
-
-        forAll(fc, elemI)
-        {
-            result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
-        }
+    // Multiply the field by coefficients and add into the result
+    forAll(fc, elemI)
+    {
+        result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
     }
 }
 
@@ -265,28 +503,17 @@ void mixingPlaneFvPatchField<Type>::updateInterfaceMatrix
 ) const
 {}
 
-// Return averaged field on patch
+
 template<class Type>
-tmp<Field<Type> > mixingPlaneFvPatchField<Type>::patchCircumferentialAverageField() const
+void mixingPlaneFvPatchField<Type>::write(Ostream& os) const
 {
-    // Compute circum average of self
-    return this->mixingPlanePatch_.circumferentialAverage(*this);
-    
-}
+    fvPatchField<Type>::write(os);
 
-// Return the averaged field for patchInternalField
-template<class Type>
-tmp<Field<Type> > mixingPlaneFvPatchField<Type>::patchInternalField() const
-{
-    tmp<Field<Type> > tpnf(new Field<Type>(this->size()));
-    Field<Type>& pnf = tpnf();
+    os.writeKeyword("fluxAveraging")
+        << fluxAveraging_ << token::END_STATEMENT << nl;
 
-    if (this->size() > 0)
-    {
-        pnf = this->mixingPlanePatch_.circumferentialAverage(fvPatchField<Type>::patchInternalField());
-    }
-
-    return tpnf;
+    this->writeEntryIfDifferent(os, "phi", word("phi"), phiName_);
+    this->writeEntry("value", os);
 }
 
 

@@ -45,6 +45,7 @@ SourceFiles
 #include "coupledFvPatchField.H"
 #include "mixingPlaneLduInterfaceField.H"
 #include "mixingPlaneFvPatch.H"
+#include "Switch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -52,7 +53,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class mixingPlaneFvPatchField Declaration
+                    Class mixingPlaneFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -65,6 +66,35 @@ class mixingPlaneFvPatchField
 
         //- Local reference cast into the mixingPlane patch
         const mixingPlaneFvPatch& mixingPlanePatch_;
+
+        //- Perform flux averaging
+        Switch fluxAveraging_;
+
+        //- Name of flux field
+        word phiName_;
+
+        //- Flux mask for averaging.  Size is equal to the number of bands
+        //  Flux mask behaves live valueFraction:
+        //      1 = use interpolated value from mixing plane interpolator
+        //      0 = use patch internal field to mimic zero gradient behaviour
+        mutable scalarField fluxMask_;
+
+        //- Flux weights for averaging
+        mutable scalarField fluxWeights_;
+
+
+    // Private member functions
+
+        //- Calculate flux mask and weights
+        void calcFluxMask() const;
+
+        // Return flux mask.  Flux mask is calculated from master fluxes
+        //  and relates to the mixing plane profile
+        const scalarField& fluxMask() const;
+
+        // Return flux weights.  Flux weights relate to local faces and are
+        //  used in weighted interpolation
+        const scalarField& fluxWeights() const;
 
 
 public:
@@ -99,6 +129,12 @@ public:
             const fvPatchFieldMapper&
         );
 
+        //- Construct as copy
+        mixingPlaneFvPatchField
+        (
+            const mixingPlaneFvPatchField&
+        );
+
         //- Construct as copy setting internal field reference
         mixingPlaneFvPatchField
         (
@@ -130,13 +166,36 @@ public:
 
     // Member functions
 
+        // Mapping functions
+
+            //- Map (and resize as needed) from self given a mapping object
+            virtual void autoMap
+            (
+                const fvPatchFieldMapper&
+            );
+
+            //- Reverse map the given fvPatchField onto this fvPatchField
+            virtual void rmap
+            (
+                const fvPatchField<Type>&,
+                const labelList&
+            );
+
+
+        // Access
+
+            //- Return shadow patch field
+            const mixingPlaneFvPatchField<Type>& shadowPatchField() const;
+
+
         // Evaluation functions
 
-            //- Return my average field given internal cell data
-            virtual tmp<Field<Type> > patchInternalField() const;
+            //- Update the coefficients associated with the patch field
+            virtual void updateCoeffs();
 
-            //- Return neighbour field given internal cell data
+            //- Return neighbour patch field
             virtual tmp<Field<Type> > patchNeighbourField() const;
+
 
             //- Initialise the evaluation of the patch field
             virtual void initEvaluate(const Pstream::commsTypes commsType);
@@ -146,6 +205,26 @@ public:
             (
                 const Pstream::commsTypes commsType
             );
+
+
+        // Mixing plane discretisation support
+
+            //- Return the matrix diagonal coefficients corresponding to the
+            //  evaluation of the value of this patchField with given weights
+            virtual tmp<Field<Type> > valueInternalCoeffs
+            (
+                const tmp<scalarField>&
+            ) const;
+
+            //- Return the matrix source coefficients corresponding to the
+            //  evaluation of the value of this patchField with given weights
+            virtual tmp<Field<Type> > valueBoundaryCoeffs
+            (
+                const tmp<scalarField>&
+            ) const;
+
+            // Gradient coefficients remain unchanged.  HJ, 8/Feb/2013
+
 
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate
@@ -169,16 +248,6 @@ public:
                 const Pstream::commsTypes commsType
             ) const;
 
-            //- Return patch averaged field given internal cell data
-            virtual tmp<Field<Type> > patchCircumferentialAverageField() const;
-
-            //- Return neighbour averaged field given internal cell data
-            virtual tmp<Field<Type> > patchNeighbourAveragedField() const
-            {
-                // Already averaged from patchNeighbourField
-                return patchNeighbourField();
-            }
-  
 
         // MixingPlane coupled interface functions
 
@@ -186,10 +255,10 @@ public:
             virtual bool doTransform() const
             {
                 return
-                   !(
-                        mixingPlanePatch_.parallel()
-                     || pTraits<Type>::rank == 0
-                    );
+               !(
+                    mixingPlanePatch_.parallel()
+                 || pTraits<Type>::rank == 0
+                );
             }
 
             //- Return face transformation tensor
@@ -211,7 +280,7 @@ public:
             }
 
              //- Write
-//              virtual void write(Ostream&) const;
+             virtual void write(Ostream&) const;
 };
 
 

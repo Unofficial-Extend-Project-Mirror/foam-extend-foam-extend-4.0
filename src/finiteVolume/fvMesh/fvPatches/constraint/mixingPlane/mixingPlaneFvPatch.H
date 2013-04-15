@@ -108,6 +108,12 @@ public:
             //- Return shadow patch
             const mixingPlaneFvPatch& shadow() const;
 
+            //- Return number of profile bands
+            label nProfileBands() const
+            {
+                return mixingPlanePolyPatch_.nProfileBands();
+            }
+
             //- Return delta (P to N) vectors across coupled patch
             virtual tmp<vectorField> delta() const;
 
@@ -127,18 +133,65 @@ public:
                 return mixingPlanePolyPatch_.interpolate(tpf);
             }
 
+            //- Profile average field.  Return field size is equal to
+            //  the number of bands
+            template<class Type>
+            tmp<Field<Type> > toProfile
+            (
+                const Field<Type>& pf
+            ) const
+            {
+                return mixingPlanePolyPatch_.toProfile(pf);
+            }
+
+            template<class Type>
+            tmp<Field<Type> > toProfile
+            (
+                const tmp<Field<Type> >& tpf
+            ) const
+            {
+                return mixingPlanePolyPatch_.toProfile(tpf);
+            }
+
+            //- Field from profile field.  Return field size is equal to
+            //  patch size
+            template<class Type>
+            tmp<Field<Type> > fromProfile
+            (
+                const Field<Type>& pf
+            ) const
+            {
+                return mixingPlanePolyPatch_.fromProfile(pf);
+            }
+
+            template<class Type>
+            tmp<Field<Type> > fromProfile
+            (
+                const tmp<Field<Type> >& tpf
+            ) const
+            {
+                return mixingPlanePolyPatch_.fromProfile(tpf);
+            }
+
             //- Circumferential average face field
             template<class Type>
-            tmp<Field<Type> > circumferentialAverage(const Field<Type>& pf) const
+            tmp<Field<Type> > circumferentialAverage
+            (
+                const Field<Type>& pf
+            ) const
             {
                 return mixingPlanePolyPatch_.circumferentialAverage(pf);
             }
 
             template<class Type>
-            tmp<Field<Type> > circumferentialAverage(const tmp<Field<Type> >& tpf) const
+            tmp<Field<Type> > circumferentialAverage
+            (
+                const tmp<Field<Type> >& tpf
+            ) const
             {
                 return mixingPlanePolyPatch_.circumferentialAverage(tpf);
             }
+
 
         // Interface transfer functions
 

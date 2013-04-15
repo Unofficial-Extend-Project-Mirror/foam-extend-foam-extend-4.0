@@ -58,74 +58,66 @@ Foam::mixingPlaneFvPatch::~mixingPlaneFvPatch()
 // Make patch weighting factors
 void Foam::mixingPlaneFvPatch::makeWeights(scalarField& w) const
 {
-    if(size() > 0)
+    // Calculation of weighting factors is performed from the master
+    // position, using reconstructed shadow cell centres
+    if (mixingPlanePolyPatch_.master())
     {
-        // Calculation of weighting factors is performed from the master
-        // position, using reconstructed shadow cell centres
-        if (mixingPlanePolyPatch_.master())
-        {
-            vectorField n = nf();
-            scalarField nfc =
-                n & (mixingPlanePolyPatch_.reconFaceCellCentres() - Cf());
+        vectorField n = nf();
 
-            w = nfc/((n & (Cf() - Cn())) + nfc);
-        }
-        else
-        {
-            // Pick up weights from the master side
-            scalarField masterWeights(shadow().size());
-            shadow().makeWeights(masterWeights);
+        // Note: mag in the dot-product.
+        // For all valid meshes, the non-orthogonality will be less that
+        // 90 deg and the dot-product will be positive.  For invalid
+        // meshes (d & s <= 0), this will stabilise the calculation
+        // but the result will be poor.  HJ, 24/Aug/2011
+        scalarField nfc =
+            mag(n & (mixingPlanePolyPatch_.reconFaceCellCentres() - Cf()));
 
-            w = interpolate(1 - masterWeights);
-        }
+        w = nfc/(mag(n & (Cf() - Cn())) + nfc);
     }
+    else
+    {
+        // Pick up weights from the master side
+        scalarField masterWeights(shadow().size());
+        shadow().makeWeights(masterWeights);
 
-    if (debug)
-        Info << ":mixingPlaneFvPatch::makeWeights: w: " << w << endl;
+        scalarField oneMinusW = 1 - masterWeights;
+
+        w = interpolate(oneMinusW);
+    }
 }
 
 
-// Make patch face - neighbour cell distances
 void Foam::mixingPlaneFvPatch::makeDeltaCoeffs(scalarField& dc) const
 {
-    if(size() > 0)
+    if (mixingPlanePolyPatch_.master())
     {
-        if (mixingPlanePolyPatch_.master())
-        {
-            dc = 1.0/max(nf() & delta(), 0.05*mag(delta()));
-        }
-        else
-        {
-            scalarField masterDeltas(shadow().size());
-            shadow().makeDeltaCoeffs(masterDeltas);
-            dc = interpolate(masterDeltas);
-        }
-    }
+        // Stabilised form for bad meshes.  HJ, 24/Aug/2011
+        vectorField d = delta();
 
-    if (debug)
-        Info << ":mixingPlaneFvPatch::makeDeltaCoeffs: dc: " << dc << endl;
+        dc = 1.0/max(nf() & d, 0.05*mag(d));
+    }
+    else
+    {
+        scalarField masterDeltas(shadow().size());
+        shadow().makeDeltaCoeffs(masterDeltas);
+        dc = interpolate(masterDeltas);
+    }
 }
 
 
 void Foam::mixingPlaneFvPatch::makeCorrVecs(vectorField& cv) const
 {
-    if(size() > 0)
-    {
-        cv = vector::zero;
+    cv = vector::zero;
 #if 0
-        // Full non-orthogonality treatment
+    // Full non-orthogonality treatment
 
-        // Calculate correction vectors on coupled patches
-        const scalarField& patchDeltaCoeffs = deltaCoeffs();
+    // Calculate correction vectors on coupled patches
+    const scalarField& patchDeltaCoeffs = deltaCoeffs();
 
-        vectorField patchDeltas = delta();
-        vectorField n = nf();
-        cv = n - patchDeltas*patchDeltaCoeffs;
+    vectorField patchDeltas = delta();
+    vectorField n = nf();
+    cv = n - patchDeltas*patchDeltaCoeffs;
 #endif
-    }
-
-    if (debug)
-        Info << ":mixingPlaneFvPatch::makeCorrVecs: cv: " << cv << endl;
 }
 
 
@@ -143,13 +135,7 @@ Foam::tmp<Foam::vectorField> Foam::mixingPlaneFvPatch::delta() const
 {
     if (mixingPlanePolyPatch_.master())
     {
-        tmp<vectorField> tDelta =
-            mixingPlanePolyPatch_.reconFaceCellCentres() - Cn();
-
-        if(debug)
-            Info << "mixingPlaneFvPatch::delta: tDelta: " << tDelta() << endl;
-
-        return tDelta;
+        return mixingPlanePolyPatch_.reconFaceCellCentres() - Cn();
     }
     else
     {
@@ -158,9 +144,6 @@ Foam::tmp<Foam::vectorField> Foam::mixingPlaneFvPatch::delta() const
             shadow().Cn()
           - mixingPlanePolyPatch_.shadow().reconFaceCellCentres()
         );
-
-        if(debug)
-            Info << "mixingPlaneFvPatch::delta: tDelta: " << tDelta() << endl;
 
         return tDelta;
     }
@@ -204,8 +187,6 @@ const Foam::labelListList& Foam::mixingPlaneFvPatch::addressing() const
 
 const Foam::scalarListList& Foam::mixingPlaneFvPatch::weights() const
 {
-    Info << "Foam::scalarListList& Foam::mixingPlaneFvPatch::weights()" << endl;
-
     if (mixingPlanePolyPatch_.master())
     {
         return mixingPlanePolyPatch_.patchToPatch().
@@ -266,7 +247,6 @@ Foam::tmp<Foam::labelField> Foam::mixingPlaneFvPatch::internalFieldTransfer
 {
     return shadow().labelTransferBuffer();
 }
-
 
 
 // ************************************************************************* //
