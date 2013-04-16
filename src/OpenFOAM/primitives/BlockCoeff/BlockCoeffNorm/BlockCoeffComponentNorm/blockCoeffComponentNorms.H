@@ -39,8 +39,6 @@ SourceFiles
 #ifndef blockCoeffComponentNorms_H
 #define blockCoeffComponentNorms_H
 
-#include "scalarBlockCoeffComponentNorm.H"
-#include "tensorBlockCoeffComponentNorm.H"
 #include "BlockCoeffComponentNorm.H"
 
 
