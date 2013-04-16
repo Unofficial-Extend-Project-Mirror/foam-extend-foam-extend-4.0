@@ -41,6 +41,7 @@ void Foam::SortableList<T>::sortIndices(List<label>& order) const
     {
         order[elemI] = elemI;
     }
+
     Foam::stableSort(order, typename UList<T>::less(*this));
 }
 
@@ -173,6 +174,5 @@ inline void Foam::SortableList<T>::operator=(const SortableList<T>& rhs)
     indices_ = rhs.indices();
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // ************************************************************************* //
