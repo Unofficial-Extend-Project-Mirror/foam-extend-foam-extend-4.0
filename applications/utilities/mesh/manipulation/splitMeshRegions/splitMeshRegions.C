@@ -816,9 +816,6 @@ autoPtr<mapPolyMesh> createRegionMesh
         }
     }
 
-    polyBoundaryMesh& polyPatches =
-        const_cast<polyBoundaryMesh&>(mesh.boundaryMesh());
-
     // Reorder polyPatches and trim empty patches from the end
     // of the list
     newPatches.reorder(oldToNew);
