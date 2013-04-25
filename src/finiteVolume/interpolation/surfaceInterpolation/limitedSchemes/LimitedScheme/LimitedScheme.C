@@ -67,7 +67,8 @@ tmp<surfaceScalarField> LimitedScheme<Type, Limiter, LimitFunc>::limiter
         lPhi = tlPhi();
 
     GeometricField<typename Limiter::gradPhiType, fvPatchField, volMesh>
-        gradc(fvc::grad(lPhi));
+        gradc = fvc::grad(lPhi);
+    gradc.correctBoundaryConditions();
 
     const surfaceScalarField& CDweights = mesh.surfaceInterpolation::weights();
 
