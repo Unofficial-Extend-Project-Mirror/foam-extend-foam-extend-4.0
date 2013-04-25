@@ -62,7 +62,7 @@ bool Foam::adjustPhi
 
             // Bug fix: All coupled patches should also be unaffected
             // HJ, 12/Feb/2010
-            if (!phip.coupled())
+            if (!Up.coupled())
             {
                 if
                 (
@@ -169,7 +169,7 @@ bool Foam::adjustPhi
 
             // Bug fix: All coupled patches should also be unaffected
             // HJ, 12/Feb/2010
-            if (!phip.coupled())
+            if (!Up.coupled())
             {
                 if
                 (
