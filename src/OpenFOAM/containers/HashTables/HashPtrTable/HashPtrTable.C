@@ -52,7 +52,7 @@ HashPtrTable<T, Key, Hash>::HashPtrTable(const HashPtrTable<T, Key, Hash>& ht)
     for (const_iterator iter = ht.begin(); iter != ht.end(); ++iter)
     {
         // Bug fix, Microsoft port.  HJ, 21/Mar/2011
-        insert(iter.key(), iter()->clone().ptr());
+        this->insert(iter.key(), iter()->clone().ptr());
     }
 }
 
