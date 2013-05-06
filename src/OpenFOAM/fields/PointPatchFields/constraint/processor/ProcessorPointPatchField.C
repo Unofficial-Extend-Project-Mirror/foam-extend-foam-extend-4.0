@@ -233,7 +233,7 @@ initAddFieldTempl
     const Field<Type2>& pField
 ) const
 {
-    sendField(patchInternalField(pField), commsType);
+    this->sendField(patchInternalField(pField), commsType);
 }
 
 
@@ -258,7 +258,7 @@ addFieldTempl
 {
     // Get the neighbour side values
     tmp<Field<Type2> > tpNeighbour = receivePointField<Type2>(commsType);
-    addToInternalField(pField, tpNeighbour());
+    this->addToInternalField(pField, tpNeighbour());
 }
 
 

@@ -247,7 +247,7 @@ void GlobalPointPatchField
 {
     // Set the values from the global sum
     tmp<Field<Type2> > trpf =
-        reduceExtractPoint<Type2>(patchInternalField(pField));
+        this->reduceExtractPoint<Type2>(patchInternalField(pField));
 
     Field<Type2>& rpf = trpf();
 
