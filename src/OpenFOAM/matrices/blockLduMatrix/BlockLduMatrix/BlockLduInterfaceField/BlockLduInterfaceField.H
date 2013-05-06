@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-\    /   O peration     |
- \  /    A nd           | Copyright held by original author
-  \/     M anipulation  |
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -58,18 +58,11 @@ class CoeffField;
                            Class BlockLduInterfaceField Declaration
 \*---------------------------------------------------------------------------*/
 
-
-// KRJ: 2013-02-08: Inheritance on lduInterfaceField removed
-
 template<class Type>
 class BlockLduInterfaceField
+:
+    public lduInterfaceField
 {
-    // Private data
-
-        //- Reference to the coupled patch this field is defined for
-        const lduInterface& interface_;
-
-
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -89,7 +82,7 @@ public:
         //- Construct given coupled patch
         BlockLduInterfaceField(const lduInterface& patch)
         :
-            interface_(patch)
+            lduInterfaceField(patch)
         {}
 
 
@@ -102,22 +95,7 @@ public:
 
     // Member Functions
 
-        // Access
-
-            //- Return the interface
-            const lduInterface& interface() const
-            {
-                return interface_;
-            }
-            
-            //- Return the interface type
-            virtual const word& interfaceFieldType() const
-            {
-                return type();
-            }
-
-
-        // Coupled interface matrix update
+        // Block coupled interface matrix update
 
             // KRJ: 2013-02-08: Must be virtual!
             //- Initialise neighbour matrix update
@@ -129,7 +107,6 @@ public:
                 const CoeffField<Type>&,
                 const Pstream::commsTypes commsType
             ) const = 0;
-            //{}
 
             //- Update result field based on interface functionality
             virtual void updateInterfaceMatrix

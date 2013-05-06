@@ -67,6 +67,12 @@ Foam::BlockCoeff<Foam::scalar>::activeType() const
 }
 
 
+Foam::scalar Foam::BlockCoeff<Foam::scalar>::component(const direction) const
+{
+    return scalarCoeff_;
+}
+
+
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 void Foam::BlockCoeff<Foam::scalar>::operator=(const BlockCoeff<scalar>& f)

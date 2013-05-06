@@ -124,6 +124,33 @@ public:
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate
             (
+                const scalarField&,
+                scalarField&,
+                const lduMatrix&,
+                const scalarField&,
+                const direction,
+                const Pstream::commsTypes commsType
+            ) const
+            {}
+
+            //- Update result field based on interface functionality
+            virtual void updateInterfaceMatrix
+            (
+                const scalarField&,
+                scalarField&,
+                const lduMatrix&,
+                const scalarField&,
+                const direction,
+                const Pstream::commsTypes commsType
+            ) const
+            {}
+
+
+        // Interface block matrix update
+ 
+            //- Initialise neighbour matrix update
+            virtual void initInterfaceMatrixUpdate
+            (
                 const Field<Type>&,
                 Field<Type>&,
                 const BlockLduMatrix<Type>&,

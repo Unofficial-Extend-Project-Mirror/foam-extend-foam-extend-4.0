@@ -70,7 +70,10 @@ class processorBlockGAMGInterfaceField
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        processorBlockGAMGInterfaceField(const processorBlockGAMGInterfaceField&);
+        processorBlockGAMGInterfaceField
+        (
+            const processorBlockGAMGInterfaceField&
+        );
 
         //- Disallow default bitwise assignment
         void operator=(const processorBlockGAMGInterfaceField&);
