@@ -456,9 +456,6 @@ public:
             //- Reset time step
             virtual void setDeltaT(const scalar);
 
-            //- Set write interval
-            void setWriteInterval(const scalar& deltaTheta);
-
             //- Set time to sub-cycle for the given number of steps
             virtual TimeState subCycle(const label nSubCycles);
 
