@@ -82,6 +82,12 @@ class pamgPolicy
         void calcChild();
 
 
+    // Private Static Data
+
+        //- Diagonal scaling factor
+        static const scalar diagFactor_;
+
+
 public:
 
         //- Runtime type information
