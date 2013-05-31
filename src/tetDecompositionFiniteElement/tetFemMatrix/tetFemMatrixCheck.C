@@ -128,7 +128,8 @@ void tetFemMatrix<Type>::check()
                     *this,
                     coupledBouCoeffs[interfaceI],
                     0,
-                    Pstream::defaultCommsType
+                    Pstream::defaultCommsType,
+                    false                       // Do not switch to lhs
                 );
             }
         }
@@ -145,7 +146,8 @@ void tetFemMatrix<Type>::check()
                     *this,
                     coupledBouCoeffs[interfaceI],
                     0,
-                    Pstream::defaultCommsType
+                    Pstream::defaultCommsType,
+                    false                       // Do not switch to lhs
                 );
             }
         }
