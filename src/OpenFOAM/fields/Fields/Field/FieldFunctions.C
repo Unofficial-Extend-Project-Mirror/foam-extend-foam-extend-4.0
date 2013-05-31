@@ -477,7 +477,7 @@ template<class Type>                                                          \
 ReturnType gFunc(const UList<Type>& f)                                        \
 {                                                                             \
     ReturnType res = Func(f);                                                 \
-    reduce(res, rFunc##Op<Type>());                                           \
+    reduce(res, rFunc##Op<ReturnType>());                                     \
     return res;                                                               \
 }                                                                             \
 TMP_UNARY_FUNCTION(ReturnType, gFunc)
