@@ -29,7 +29,6 @@ Description
 
 #include "volFields.H"
 #include "surfaceFields.H"
-#include "fvMatrix.H"
 #include "ddtScheme.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
