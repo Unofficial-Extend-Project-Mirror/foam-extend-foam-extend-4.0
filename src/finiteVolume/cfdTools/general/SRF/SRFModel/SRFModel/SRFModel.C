@@ -25,6 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "SRFModel.H"
+#include "fvPatchFields.H"
 #include "SRFVelocityFvPatchVectorField.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
