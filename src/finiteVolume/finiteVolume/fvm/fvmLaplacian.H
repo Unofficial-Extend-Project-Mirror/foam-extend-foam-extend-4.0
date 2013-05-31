@@ -38,7 +38,7 @@ SourceFiles
 
 #include "volFieldsFwd.H"
 #include "surfaceFieldsFwd.H"
-#include "fvMatrix.H"
+#include "fvMatrices.H"
 #include "geometricOneField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

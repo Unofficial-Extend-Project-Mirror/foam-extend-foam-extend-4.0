@@ -26,7 +26,6 @@ License
 
 #include "fvmDiv.H"
 #include "fvMesh.H"
-#include "fvMatrix.H"
 #include "convectionScheme.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

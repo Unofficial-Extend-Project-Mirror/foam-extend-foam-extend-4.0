@@ -25,8 +25,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "fvmAdjDiv.H"
-#include "fvMesh.H"
-#include "fvMatrix.H"
 #include "adjConvectionScheme.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

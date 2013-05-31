@@ -42,7 +42,8 @@ void processorFvPatchField<Type>::initInterfaceMatrixUpdate                   \
     Field<Type>&,                                                             \
     const BlockLduMatrix<Type>&,                                              \
     const CoeffField<Type>&,                                                  \
-    const Pstream::commsTypes commsType                                       \
+    const Pstream::commsTypes commsType,                                      \
+    const bool switchToLhs                                                    \
 ) const                                                                       \
 {                                                                             \
     procPatch_.compressedSend                                                 \
@@ -59,7 +60,8 @@ void processorFvPatchField<Type>::updateInterfaceMatrix                       \
     Field<Type>& result,                                                      \
     const BlockLduMatrix<Type>&,                                              \
     const CoeffField<Type>& coeffs,                                           \
-    const Pstream::commsTypes commsType                                       \
+    const Pstream::commsTypes commsType,                                      \
+    const bool switchToLhs                                                    \
 ) const                                                                       \
 {                                                                             \
     Field<Type> pnf(this->size());                                            \
@@ -83,9 +85,19 @@ void processorFvPatchField<Type>::updateInterfaceMatrix                       \
                                                                               \
     const unallocLabelList& faceCells = this->patch().faceCells();            \
                                                                               \
-    forAll(faceCells, facei)                                                  \
+    if (switchToLhs)                                                          \
     {                                                                         \
-        result[faceCells[facei]] -= pnf[facei];                               \
+        forAll(faceCells, elemI)                                              \
+        {                                                                     \
+            result[faceCells[elemI]] += pnf[elemI];                           \
+        }                                                                     \
+    }                                                                         \
+    else                                                                      \
+    {                                                                         \
+        forAll(faceCells, elemI)                                              \
+        {                                                                     \
+            result[faceCells[elemI]] -= pnf[elemI];                           \
+        }                                                                     \
     }                                                                         \
 }
 

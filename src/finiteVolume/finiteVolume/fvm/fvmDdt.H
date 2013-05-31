@@ -37,7 +37,7 @@ SourceFiles
 #define fvmDdt_H
 
 #include "volFieldsFwd.H"
-#include "fvMatrix.H"
+#include "fvMatrices.H"
 #include "geometricOneField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

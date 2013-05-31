@@ -37,7 +37,7 @@ SourceFiles
 #define fvmD2dt2_H
 
 #include "volFieldsFwd.H"
-#include "fvMatrix.H"
+#include "fvMatrices.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

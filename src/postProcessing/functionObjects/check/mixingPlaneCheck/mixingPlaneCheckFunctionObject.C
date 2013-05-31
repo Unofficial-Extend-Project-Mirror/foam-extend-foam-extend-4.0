@@ -133,7 +133,7 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
                 // single processor when running in parallel
                 scalar sumMasterAreas = sum(masterAreas);
                 scalar sumShadowAreas = sum(shadowAreas);
-                scalar sumMixingAreas = sum(mixingPlanePatchAreas);
+//                 scalar sumMixingAreas = sum(mixingPlanePatchAreas);
 
 #if 0   // Remove this for now                
                 Info<< "Mixing plane functionObject: area check " << nl
@@ -215,7 +215,7 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
                     scalar localFluxMag = mag(localFlux);
 
                     scalar shadowFlux    = shadowPatchScaleFactor_ * sum(phi.boundaryField()[shadowPatchI]);
-                    scalar shadowFluxMag = mag(shadowFlux);
+//                     scalar shadowFluxMag = mag(shadowFlux);
 
                     Info<< "Mixing plane pair " 
                         << "(" << mixingMaster.name() << ", "

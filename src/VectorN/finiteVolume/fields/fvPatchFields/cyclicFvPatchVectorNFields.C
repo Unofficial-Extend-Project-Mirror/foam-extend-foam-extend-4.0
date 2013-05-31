@@ -34,51 +34,62 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-#define VectorNMatrixInterfaceFunc(Type)                                        \
-template<>																		\
-void cyclicFvPatchField<Type>::updateInterfaceMatrix							\
-(																				\
-    const Field<Type>& psiInternal,                                             \
-    Field<Type>& result,                                                        \
-    const BlockLduMatrix<Type>&,                                                \
-    const CoeffField<Type>& coeffs,                                             \
-    const Pstream::commsTypes commsType                                         \
-) const																			\
-{																				\
-    Field<Type> pnf(this->size());												\
-																				\
-    label sizeby2 = this->size()/2;												\
-    const unallocLabelList& faceCells = cyclicPatch_.faceCells();				\
-																				\
-    for (label facei=0; facei<sizeby2; facei++)									\
-    {																			\
-        pnf[facei] = psiInternal[faceCells[facei + sizeby2]];					\
-        pnf[facei + sizeby2] = psiInternal[faceCells[facei]];					\
-    }																			\
-																				\
-    if (coeffs.activeType() == blockCoeffBase::SCALAR)                          \
-    {                                                                           \
-        pnf = coeffs.asScalar() * pnf;                                          \
-    }                                                                           \
-    else if (coeffs.activeType() == blockCoeffBase::LINEAR)                     \
-    {                                                                           \
-        pnf = cmptMultiply(coeffs.asLinear(), pnf);								\
-    }                                                                           \
-    else if (coeffs.activeType() == blockCoeffBase::SQUARE)                     \
-    {                                                                           \
-        pnf = coeffs.asSquare() & pnf;											\
-    }                                                                           \
-                                                                                \
-    forAll(faceCells, elemI)													\
-    {																			\
-        result[faceCells[elemI]] -= pnf[elemI];									\
-    }																			\
+#define VectorNMatrixInterfaceFunc(Type)                                      \
+template<>                                                                    \
+void cyclicFvPatchField<Type>::updateInterfaceMatrix                          \
+(                                                                             \
+    const Field<Type>& psiInternal,                                           \
+    Field<Type>& result,                                                      \
+    const BlockLduMatrix<Type>&,                                              \
+    const CoeffField<Type>& coeffs,                                           \
+    const Pstream::commsTypes commsType,                                      \
+    const bool switchToLhs                                                    \
+) const                                                                       \
+{                                                                             \
+    Field<Type> pnf(this->size());                                            \
+                                                                              \
+    label sizeby2 = this->size()/2;                                           \
+    const unallocLabelList& faceCells = cyclicPatch_.faceCells();             \
+                                                                              \
+    for (label facei=0; facei<sizeby2; facei++)                               \
+    {                                                                         \
+        pnf[facei] = psiInternal[faceCells[facei + sizeby2]];                 \
+        pnf[facei + sizeby2] = psiInternal[faceCells[facei]];                 \
+    }                                                                         \
+                                                                              \
+    if (coeffs.activeType() == blockCoeffBase::SCALAR)                        \
+    {                                                                         \
+        pnf = coeffs.asScalar() * pnf;                                        \
+    }                                                                         \
+    else if (coeffs.activeType() == blockCoeffBase::LINEAR)                   \
+    {                                                                         \
+        pnf = cmptMultiply(coeffs.asLinear(), pnf);                           \
+    }                                                                         \
+    else if (coeffs.activeType() == blockCoeffBase::SQUARE)                   \
+    {                                                                         \
+        pnf = coeffs.asSquare() & pnf;                                        \
+    }                                                                         \
+                                                                              \
+    if (switchToLhs)                                                          \
+    {                                                                         \
+        forAll(faceCells, elemI)                                              \
+        {                                                                     \
+            result[faceCells[elemI]] += pnf[elemI];                           \
+        }                                                                     \
+    }                                                                         \
+    else                                                                      \
+    {                                                                         \
+        forAll(faceCells, elemI)                                              \
+        {                                                                     \
+            result[faceCells[elemI]] -= pnf[elemI];                           \
+        }                                                                     \
+    }                                                                         \
 }
 
 
-#define doMakePatchTypeField(type, Type, args...)                               \
-    VectorNMatrixInterfaceFunc(type)                                            \
-                                                                                \
+#define doMakePatchTypeField(type, Type, args...)                             \
+    VectorNMatrixInterfaceFunc(type)                                          \
+                                                                              \
     makePatchTypeField(fvPatch##Type##Field, cyclicFvPatch##Type##Field);
 
 forAllVectorNTypes(doMakePatchTypeField)

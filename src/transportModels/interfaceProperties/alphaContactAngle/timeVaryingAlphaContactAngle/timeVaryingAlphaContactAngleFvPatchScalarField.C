@@ -24,9 +24,9 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "fvPatchFields.H"
 #include "timeVaryingAlphaContactAngleFvPatchScalarField.H"
 #include "addToRunTimeSelectionTable.H"
-#include "fvPatchFieldMapper.H"
 #include "volMesh.H"
 #include "Time.H"
 
