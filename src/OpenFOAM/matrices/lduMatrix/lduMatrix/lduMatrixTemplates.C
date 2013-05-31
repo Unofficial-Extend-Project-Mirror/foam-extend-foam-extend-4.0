@@ -79,7 +79,10 @@ template<class Type>
 Foam::tmp<Foam::Field<Type> >
 Foam::lduMatrix::faceH(const Field<Type>& psi) const
 {
-    tmp<Field<Type> > tfaceHpsi(new Field<Type> (lduAddr().lowerAddr().size()));
+    tmp<Field<Type> > tfaceHpsi
+    (
+        new Field<Type> (lduAddr().lowerAddr().size())
+    );
     Field<Type>& faceHpsi = tfaceHpsi();
 
     if (lowerPtr_ || upperPtr_)

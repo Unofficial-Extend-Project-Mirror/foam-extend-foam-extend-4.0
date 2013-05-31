@@ -40,32 +40,40 @@ License
 namespace Foam
 {
 
-template<>                                                                     
-void processorBlockGAMGInterfaceField<tensor>::initInterfaceMatrixUpdate                     
-(                                                                               
-    const Field<tensor>& psiInternal,                                             
-    Field<tensor>&,                                                               
-    const BlockLduMatrix<tensor>&,                                                
-    const CoeffField<tensor>&,                                                    
-    const Pstream::commsTypes commsType                                         
-) const                                                                         
-{                                                                               
-    FatalErrorIn("Foam::tensor Foam::processorBlockGAMGInterfaceField<tensor>::initInterafaceMatrix(...)")
-        << "Not implemented" << abort(FatalError);
-}                                                                               
-                                                                                
-template<>                                                                     
-void processorBlockGAMGInterfaceField<tensor>::updateInterfaceMatrix                         
-(                                                                               
-    const Field<tensor>& psiInternal,                                             
-    Field<tensor>& result,                                                        
-    const BlockLduMatrix<tensor>&,                                                
-    const CoeffField<tensor>& coeffs,                                             
-    const Pstream::commsTypes commsType                                         
-) const                                                                         
-{                                                                               
-    FatalErrorIn("Foam::tensor Foam::processorBlockGAMGInterfaceField<tensor>::initInterafaceMatrix(...)")
-        << "Not implemented" << abort(FatalError);
+template<>
+void processorBlockGAMGInterfaceField<tensor>::initInterfaceMatrixUpdate
+(
+    const Field<tensor>& psiInternal,
+    Field<tensor>&,
+    const BlockLduMatrix<tensor>&,
+    const CoeffField<tensor>&,
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
+) const
+{
+    FatalErrorIn
+    (
+        "tensor processorBlockGAMGInterfaceField<tensor>::"
+        "initInterafaceMatrix(...)"
+    )   << "Not implemented" << abort(FatalError);
+}
+
+template<>
+void processorBlockGAMGInterfaceField<tensor>::updateInterfaceMatrix
+(
+    const Field<tensor>& psiInternal,
+    Field<tensor>& result,
+    const BlockLduMatrix<tensor>&,
+    const CoeffField<tensor>& coeffs,
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
+) const
+{
+    FatalErrorIn
+    (
+        "tensor processorBlockGAMGInterfaceField<tensor>::"
+        "updateInterfaceMatrix(...)"
+    )   << "Not implemented" << abort(FatalError);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

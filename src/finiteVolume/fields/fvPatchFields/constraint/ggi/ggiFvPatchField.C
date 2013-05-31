@@ -246,7 +246,8 @@ void ggiFvPatchField<Type>::initInterfaceMatrixUpdate
     const lduMatrix&,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     // Communication is allowed either before or after processor
@@ -267,9 +268,19 @@ void ggiFvPatchField<Type>::initInterfaceMatrixUpdate
     // Multiply the field by coefficients and add into the result
     const unallocLabelList& fc = ggiPatch_.faceCells();
 
-    forAll(fc, elemI)
+    if (switchToLhs)
     {
-        result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
+        forAll(fc, elemI)
+        {
+            result[fc[elemI]] += coeffs[elemI]*pnf[elemI];
+        }
+    }
+    else
+    {
+        forAll(fc, elemI)
+        {
+            result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
+        }
     }
 }
 
@@ -282,7 +293,8 @@ void ggiFvPatchField<Type>::updateInterfaceMatrix
     const lduMatrix&,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes
+    const Pstream::commsTypes,
+    const bool switchToLhs
 ) const
 {}
 

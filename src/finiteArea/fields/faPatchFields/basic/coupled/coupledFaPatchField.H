@@ -45,7 +45,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class coupledFaPatch Declaration
+                  Class coupledFaPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -183,7 +183,8 @@ public:
                 const lduMatrix&,
                 const scalarField& coeffs,
                 const direction,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const = 0;
 
         //- Write

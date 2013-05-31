@@ -195,6 +195,10 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve()
 template<class Type>
 Foam::tmp<Foam::Field<Type> > Foam::fvMatrix<Type>::residual() const
 {
+    // Complete matrix assembly.  HJ, 17/Apr/2012
+    fvMatrix& m = const_cast<fvMatrix&>(*this);
+    m.completeAssembly();
+
     // Bug fix: Creating a tmp out of a const reference will change the field
     // HJ, 15/Apr/2011
     tmp<Field<Type> > tres(new Field<Type>(source_));

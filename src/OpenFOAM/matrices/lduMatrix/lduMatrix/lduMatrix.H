@@ -937,7 +937,8 @@ public:
                 const lduInterfaceFieldPtrsList& interfaces,
                 const scalarField& xif,
                 scalarField& result,
-                const direction cmpt
+                const direction cmpt,
+                const bool switchToLhs = false
             ) const;
 
             //- Update coupled interfaces for matrix operations
@@ -947,7 +948,8 @@ public:
                 const lduInterfaceFieldPtrsList& interfaces,
                 const scalarField& xif,
                 scalarField& result,
-                const direction cmpt
+                const direction cmpt,
+                const bool switchToLhs = false
             ) const;
 
             //- Initialise the update of coupled interfaces
@@ -958,7 +960,8 @@ public:
                 const lduInterfaceFieldPtrsList& interfaces,
                 const scalarField& xif,
                 scalarField& result,
-                const direction cmpt
+                const direction cmpt,
+                const bool switchToLhs = false
             ) const;
 
             //- Update coupled interfaces for matrix operations
@@ -969,7 +972,8 @@ public:
                 const lduInterfaceFieldPtrsList& interfaces,
                 const scalarField& xif,
                 scalarField& result,
-                const direction cmpt
+                const direction cmpt,
+                const bool switchToLhs = false
             ) const;
 
 

@@ -157,6 +157,7 @@ tmp<Field<Type> > coupledFvPatchField<Type>::valueInternalCoeffs
     return Type(pTraits<Type>::one)*w;
 }
 
+
 template<class Type>
 tmp<Field<Type> > coupledFvPatchField<Type>::valueBoundaryCoeffs
 (

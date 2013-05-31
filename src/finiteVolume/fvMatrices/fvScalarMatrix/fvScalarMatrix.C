@@ -167,6 +167,7 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Foam::scalar>::solve
 
     solverPerf.print();
 
+    // Diagonal has been restored, clear complete assembly flag?
     diag() = saveDiag;
 
     psi_.correctBoundaryConditions();
@@ -178,6 +179,10 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Foam::scalar>::solve
 template<>
 Foam::tmp<Foam::scalarField> Foam::fvMatrix<Foam::scalar>::residual() const
 {
+    // Complete matrix assembly.  HJ, 17/Apr/2012
+    fvMatrix<scalar>& m = const_cast<fvMatrix<scalar>&>(*this);
+    m.completeAssembly();
+
     scalarField boundaryDiag(psi_.size(), 0.0);
     addBoundaryDiag(boundaryDiag, 0);
 

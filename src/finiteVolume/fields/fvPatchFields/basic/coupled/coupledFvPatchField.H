@@ -38,6 +38,8 @@ SourceFiles
 
 #include "BlockLduInterfaceField.H"
 #include "CoeffField.H"
+
+#include "lduInterfaceField.H"
 #include "fvPatchField.H"
 #include "coupledFvPatch.H"
 
@@ -47,7 +49,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class coupledFvPatch Declaration
+                    Class coupledFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -186,8 +188,10 @@ public:
                 const lduMatrix&,
                 const scalarField& coeffs,
                 const direction,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const = 0;
+
 
         // Block coupled interface functionality
 
@@ -198,7 +202,8 @@ public:
                 Field<Type>&,
                 const BlockLduMatrix<Type>&,
                 const CoeffField<Type>&,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const
             {}
 
@@ -209,10 +214,14 @@ public:
                 Field<Type>&,
                 const BlockLduMatrix<Type>&,
                 const CoeffField<Type>&,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const
             {
-                notImplemented("coupledFvPatchField<Type>::updateInterfaceMatrix for block matrices")
+                notImplemented
+                (
+                    "coupledFvPatchField<Type>::updateInterfaceMatrix"
+                );
             }
             
         //- Write

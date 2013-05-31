@@ -41,7 +41,8 @@ void processorFaPatchField<scalar>::initInterfaceMatrixUpdate
     const lduMatrix&,
     const scalarField&,
     const direction,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     procPatch_.compressedSend
@@ -60,7 +61,8 @@ void processorFaPatchField<scalar>::updateInterfaceMatrix
     const lduMatrix&,
     const scalarField& coeffs,
     const direction,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     scalarField pnf
@@ -70,9 +72,19 @@ void processorFaPatchField<scalar>::updateInterfaceMatrix
 
     const unallocLabelList& edgeFaces = patch().edgeFaces();
 
-    forAll(edgeFaces, facei)
+    if (switchToLhs)
     {
-        result[edgeFaces[facei]] -= coeffs[facei]*pnf[facei];
+        forAll(edgeFaces, facei)
+        {
+            result[edgeFaces[facei]] -= coeffs[facei]*pnf[facei];
+        }
+    }
+    else
+    {
+        forAll(edgeFaces, facei)
+        {
+            result[edgeFaces[facei]] -= coeffs[facei]*pnf[facei];
+        }
     }
 }
 

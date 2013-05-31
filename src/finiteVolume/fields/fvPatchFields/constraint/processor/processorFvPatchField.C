@@ -218,7 +218,8 @@ void processorFvPatchField<Type>::initInterfaceMatrixUpdate
     const lduMatrix&,
     const scalarField&,
     const direction,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     procPatch_.compressedSend
@@ -237,7 +238,8 @@ void processorFvPatchField<Type>::updateInterfaceMatrix
     const lduMatrix&,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     scalarField pnf
@@ -249,12 +251,21 @@ void processorFvPatchField<Type>::updateInterfaceMatrix
     transformCoupleField(pnf, cmpt);
 
     // Multiply the field by coefficients and add into the result
-
     const unallocLabelList& faceCells = this->patch().faceCells();
 
-    forAll(faceCells, elemI)
+    if (switchToLhs)
     {
-        result[faceCells[elemI]] -= coeffs[elemI]*pnf[elemI];
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] += coeffs[elemI]*pnf[elemI];
+        }
+    }
+    else
+    {
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] -= coeffs[elemI]*pnf[elemI];
+        }
     }
 }
 

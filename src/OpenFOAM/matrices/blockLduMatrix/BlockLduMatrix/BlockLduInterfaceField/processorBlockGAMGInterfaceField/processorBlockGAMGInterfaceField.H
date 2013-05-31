@@ -120,7 +120,8 @@ public:
                 Field<Type>&,
                 const BlockLduMatrix<Type>&,
                 const CoeffField<Type>&,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const;
 
             //- Update result field based on interface functionality
@@ -130,7 +131,8 @@ public:
                 Field<Type>&,
                 const BlockLduMatrix<Type>&,
                 const CoeffField<Type>&,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const;
             
 

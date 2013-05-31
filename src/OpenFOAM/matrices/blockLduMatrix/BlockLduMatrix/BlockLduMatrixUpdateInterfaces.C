@@ -36,7 +36,8 @@ void Foam::BlockLduMatrix<Type>::initInterfaces
 (
     const FieldField<CoeffField, Type>& interfaceCoeffs,
     TypeField& result,
-    const TypeField& psi
+    const TypeField& psi,
+    const bool switchToLhs
 ) const
 {
     if
@@ -55,7 +56,8 @@ void Foam::BlockLduMatrix<Type>::initInterfaces
                     result,
                     *this,
                     interfaceCoeffs[interfaceI],
-                    Pstream::defaultCommsType
+                    Pstream::defaultCommsType,
+                    switchToLhs
                 );
             }
         }
@@ -81,7 +83,8 @@ void Foam::BlockLduMatrix<Type>::initInterfaces
                     result,
                     *this,
                     interfaceCoeffs[interfaceI],
-                    Pstream::blocking
+                    Pstream::blocking,
+                    switchToLhs
                 );
             }
         }
@@ -101,7 +104,8 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
 (
     const FieldField<CoeffField, Type>& interfaceCoeffs,
     TypeField& result,
-    const TypeField& psi
+    const TypeField& psi,
+    const bool switchToLhs
 ) const
 {
     if
@@ -127,7 +131,8 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
                     result,
                     *this,
                     interfaceCoeffs[interfaceI],
-                    Pstream::defaultCommsType
+                    Pstream::defaultCommsType,
+                    switchToLhs
                 );
             }
         }
@@ -151,7 +156,8 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
                         result,
                         *this,
                         interfaceCoeffs[interfaceI],
-                        Pstream::scheduled
+                        Pstream::scheduled,
+                        switchToLhs
                     );
                 }
                 else
@@ -162,7 +168,8 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
                         result,
                         *this,
                         interfaceCoeffs[interfaceI],
-                        Pstream::scheduled
+                        Pstream::scheduled,
+                        switchToLhs
                     );
                 }
             }
@@ -185,14 +192,15 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
                     result,
                     *this,
                     interfaceCoeffs[interfaceI],
-                    Pstream::blocking
+                    Pstream::blocking,
+                    switchToLhs
                 );
             }
         }
     }
     else
     {
-        FatalErrorIn("BlockLduMatrix<Type>::updateMatrixInterfaces")
+        FatalErrorIn("BlockLduMatrix<Type>::updateInterfaces")
             << "Unsuported communications type "
             << Pstream::commsTypeNames[Pstream::defaultCommsType]
             << exit(FatalError);

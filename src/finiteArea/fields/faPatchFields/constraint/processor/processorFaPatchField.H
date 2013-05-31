@@ -178,7 +178,8 @@ public:
                 const lduMatrix& m,
                 const scalarField& coeffs,
                 const direction cmpt,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const;
 
             //- Update result field based on interface functionality
@@ -189,7 +190,8 @@ public:
                 const lduMatrix& m,
                 const scalarField& coeffs,
                 const direction cmpt,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const;
 
         //- Processor coupled interface functions

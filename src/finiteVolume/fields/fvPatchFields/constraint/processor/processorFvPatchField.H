@@ -180,7 +180,8 @@ public:
                 const lduMatrix& m,
                 const scalarField& coeffs,
                 const direction cmpt,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const;
 
             //- Update result field based on interface functionality
@@ -191,8 +192,10 @@ public:
                 const lduMatrix& m,
                 const scalarField& coeffs,
                 const direction cmpt,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const;
+
 
         // Block coupled interface functionality
 
@@ -203,7 +206,8 @@ public:
                 Field<Type>&,
                 const BlockLduMatrix<Type>&,
                 const CoeffField<Type>&,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const
             {}
 
@@ -214,11 +218,17 @@ public:
                 Field<Type>&,
                 const BlockLduMatrix<Type>&,
                 const CoeffField<Type>&,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const
             {
-                notImplemented("processorFvPatchField<Type>::updateInterfaceMatrix for block matrices")
+                notImplemented
+                (
+                    "processorFvPatchField<Type>::updateInterfaceMatrix "
+                    "for block matrices"
+                );
             }
+
             
         //- Processor coupled interface functions
 

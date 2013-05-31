@@ -41,6 +41,7 @@ SourceFiles
 #include "fvPatchField.H"
 #include "volFieldsFwd.H"
 #include "calculatedFvPatchFields.H"
+#include "fvMatrices.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

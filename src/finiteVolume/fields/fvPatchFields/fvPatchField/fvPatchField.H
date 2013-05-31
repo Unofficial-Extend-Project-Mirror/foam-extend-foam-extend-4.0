@@ -59,12 +59,18 @@ class objectRegistry;
 class dictionary;
 class fvPatchFieldMapper;
 class volMesh;
-
+class surfaceMesh;
 
 // Forward declaration of friend functions and operators
 
 template<class Type>
 class fvPatchField;
+
+template<class Type>
+class fvsPatchField;
+
+template<class Type, template<class> class PatchField, class GeoMesh>
+class GeometricField;
 
 template<class Type>
 class fvMatrix;
@@ -432,6 +438,13 @@ public:
 
             //- Manipulate matrix
             virtual void manipulateMatrix(fvMatrix<Type>& matrix);
+
+            //- Calculate patch flux
+            virtual void patchFlux
+            (
+                GeometricField<Type, fvsPatchField, surfaceMesh>& pFlux,
+                const fvMatrix<Type>& matrix
+            ) const;
 
 
         // I-O

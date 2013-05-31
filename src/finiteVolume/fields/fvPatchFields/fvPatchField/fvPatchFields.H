@@ -30,6 +30,10 @@ License
 #include "fvPatchField.H"
 #include "fvPatchFieldsFwd.H"
 
+// Added for instantiation of patchFlux templates.  HJ, 29/May/2013
+#include "fvMatrices.H"
+#include "surfaceFields.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif

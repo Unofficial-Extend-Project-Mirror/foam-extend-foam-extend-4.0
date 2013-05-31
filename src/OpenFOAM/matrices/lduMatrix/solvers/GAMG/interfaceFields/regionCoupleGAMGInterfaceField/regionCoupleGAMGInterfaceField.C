@@ -72,7 +72,8 @@ void Foam::regionCoupleGAMGInterfaceField::initInterfaceMatrixUpdate
     const lduMatrix& m,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     // This must have a reduce in it.  HJ, 15/May/2009
@@ -85,7 +86,8 @@ void Foam::regionCoupleGAMGInterfaceField::initInterfaceMatrixUpdate
             m,
             coeffs,
             cmpt,
-            commsType
+            commsType,
+            switchToLhs
         );
     }
 }
@@ -98,7 +100,8 @@ void Foam::regionCoupleGAMGInterfaceField::updateInterfaceMatrix
     const lduMatrix& m,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     // Get expanded data to zone size.  No global reduce allowed
@@ -112,7 +115,8 @@ void Foam::regionCoupleGAMGInterfaceField::updateInterfaceMatrix
             m,
             coeffs,
             cmpt,
-            commsType
+            commsType,
+            switchToLhs
         );
     }
 }

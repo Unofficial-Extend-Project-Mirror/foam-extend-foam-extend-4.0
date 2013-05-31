@@ -129,7 +129,8 @@ public:
                 const lduMatrix&,
                 const scalarField&,
                 const direction,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const
             {}
 
@@ -141,7 +142,8 @@ public:
                 const lduMatrix&,
                 const scalarField&,
                 const direction,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const
             {}
 
@@ -155,7 +157,8 @@ public:
                 Field<Type>&,
                 const BlockLduMatrix<Type>&,
                 const CoeffField<Type>&,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const = 0;
 
             //- Update result field based on interface functionality
@@ -165,7 +168,8 @@ public:
                 Field<Type>&,
                 const BlockLduMatrix<Type>&,
                 const CoeffField<Type>&,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const = 0;
 };
 
@@ -180,17 +184,18 @@ public:
 #   include "BlockGAMGInterfaceField.C"
 #endif
 
-#define makeBlockGAMGInterfaceField(BlockGAMGInterfaceFieldType, typeBlockGAMGInterfaceFieldType)  \
-                                                                                                \
-defineNamedTemplateTypeNameAndDebug(typeBlockGAMGInterfaceFieldType, 0);                         \
-                                                                                                \
+#define makeBlockGAMGInterfaceField(BlockGAMGInterfaceFieldType, typeBlockGAMGInterfaceFieldType) \
+                                                                              \
+defineNamedTemplateTypeNameAndDebug(typeBlockGAMGInterfaceFieldType, 0);      \
+                                                                              \
 addToRunTimeSelectionTable(BlockGAMGInterfaceFieldType, typeBlockGAMGInterfaceFieldType, lduInterface);
 
-#define makeBlockGAMGInterfaceFields(blockGAMGInterfaceFieldType)                                 \
-                                                                                                \
-makeBlockGAMGInterfaceField(blockScalarGAMGInterfaceField, blockGAMGInterfaceFieldType##Scalar);   \
-makeBlockGAMGInterfaceField(blockVectorGAMGInterfaceField, blockGAMGInterfaceFieldType##Vector);   \
+#define makeBlockGAMGInterfaceFields(blockGAMGInterfaceFieldType)             \
+                                                                              \
+makeBlockGAMGInterfaceField(blockScalarGAMGInterfaceField, blockGAMGInterfaceFieldType##Scalar); \
+makeBlockGAMGInterfaceField(blockVectorGAMGInterfaceField, blockGAMGInterfaceFieldType##Vector); \
 makeBlockGAMGInterfaceField(blockTensorGAMGInterfaceField, blockGAMGInterfaceFieldType##Tensor);
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

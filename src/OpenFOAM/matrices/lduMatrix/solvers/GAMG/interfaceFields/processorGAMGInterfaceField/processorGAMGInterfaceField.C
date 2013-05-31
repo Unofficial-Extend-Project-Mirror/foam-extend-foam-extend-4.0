@@ -78,7 +78,8 @@ void Foam::processorGAMGInterfaceField::initInterfaceMatrixUpdate
     const lduMatrix&,
     const scalarField&,
     const direction,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     procInterface_.compressedSend
@@ -96,7 +97,8 @@ void Foam::processorGAMGInterfaceField::updateInterfaceMatrix
     const lduMatrix&,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     scalarField pnf
@@ -107,9 +109,19 @@ void Foam::processorGAMGInterfaceField::updateInterfaceMatrix
 
     const unallocLabelList& faceCells = procInterface_.faceCells();
 
-    forAll(faceCells, elemI)
+    if (switchToLhs)
     {
-        result[faceCells[elemI]] -= coeffs[elemI]*pnf[elemI];
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] += coeffs[elemI]*pnf[elemI];
+        }
+    }
+    else
+    {
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] -= coeffs[elemI]*pnf[elemI];
+        }
     }
 }
 

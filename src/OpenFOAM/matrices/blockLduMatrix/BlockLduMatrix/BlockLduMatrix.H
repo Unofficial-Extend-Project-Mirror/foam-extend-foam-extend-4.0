@@ -421,7 +421,8 @@ public:
             (
                 const FieldField<CoeffField, Type>& interfaceCoeffs,
                 TypeField& result,
-                const TypeField& psi
+                const TypeField& psi,
+                const bool switchToLhs = false
             ) const;
 
             //- Update coupled interfaces
@@ -429,7 +430,8 @@ public:
             (
                 const FieldField<CoeffField, Type>& interfaceCoeffs,
                 TypeField& result,
-                const TypeField& psi
+                const TypeField& psi,
+                const bool switchToLhs = false
             ) const;
 
 

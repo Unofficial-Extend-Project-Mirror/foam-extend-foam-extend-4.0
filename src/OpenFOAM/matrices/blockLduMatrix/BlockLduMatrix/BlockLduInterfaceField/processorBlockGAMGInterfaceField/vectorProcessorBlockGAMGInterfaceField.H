@@ -39,48 +39,62 @@ License
 namespace Foam
 {
 
-template<>                                                                     
-void processorBlockGAMGInterfaceField<vector>::initInterfaceMatrixUpdate                     
-(                                                                               
-    const Field<vector>& psiInternal,                                             
-    Field<vector>&,                                                               
-    const BlockLduMatrix<vector>&,                                                
-    const CoeffField<vector>&,                                                    
-    const Pstream::commsTypes commsType                                         
-) const                                                                         
-{                                                                               
-    procInterface_.compressedSend                                                   
-    (                                                                           
-        commsType,                                                              
+template<>
+void processorBlockGAMGInterfaceField<vector>::initInterfaceMatrixUpdate
+(
+    const Field<vector>& psiInternal,
+    Field<vector>&,
+    const BlockLduMatrix<vector>&,
+    const CoeffField<vector>&,
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
+) const
+{
+    procInterface_.compressedSend
+    (
+        commsType,
         procInterface_.interfaceInternalField(psiInternal)()
-    );                                                                          
-}                                                                               
-                                                                                
-template<>                                                                     
-void processorBlockGAMGInterfaceField<vector>::updateInterfaceMatrix                         
-(                                                                               
-    const Field<vector>& psiInternal,                                             
-    Field<vector>& result,                                                        
-    const BlockLduMatrix<vector>&,                                                
-    const CoeffField<vector>& coeffs,                                             
-    const Pstream::commsTypes commsType                                         
-) const                                                                         
-{                                                                               
+    );
+}
+
+template<>
+void processorBlockGAMGInterfaceField<vector>::updateInterfaceMatrix
+(
+    const Field<vector>& psiInternal,
+    Field<vector>& result,
+    const BlockLduMatrix<vector>&,
+    const CoeffField<vector>& coeffs,
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
+) const
+{
     Field<vector> pnf
     (
         coeffs.size()
-    );                                                                           
-    
-    pnf = cmptMultiply(coeffs.asLinear(),                                   
-        procInterface_.compressedReceive<vector>(commsType, this->size())());       
-                                                                                
-    const unallocLabelList& faceCells = procInterface_.faceCells();              
-    
-    forAll(faceCells, elemI)
+    );
+
+    pnf = cmptMultiply(coeffs.asLinear(),
+        procInterface_.compressedReceive<vector>(commsType, this->size())());
+
+    const unallocLabelList& faceCells = procInterface_.faceCells();
+
+    if (switchToLhs)
     {
-        result[faceCells[elemI]] -= pnf[elemI];
-    }                                                                                
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] += pnf[elemI];
+        }
+    }
+    else
+    {
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] -= pnf[elemI];
+        }
+
+    }
 }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -182,7 +182,8 @@ public:
                 const lduMatrix&,
                 const scalarField&,
                 const direction,
-                const bool
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const
             {}
 
@@ -194,7 +195,8 @@ public:
                 const lduMatrix&,
                 const scalarField&,
                 const direction,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const = 0;
 };
 

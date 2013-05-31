@@ -47,17 +47,20 @@ Foam::processorBlockGAMGInterfaceField<Type>::processorBlockGAMGInterfaceField
 {
     // If the interface based on a patch this must be taken care specially of
     if (isA<processorBlockLduInterfaceField<Type> >(fineInterfaceField))
-    { 
+    {
         const processorBlockLduInterfaceField<Type>& p =
-            refCast<const processorBlockLduInterfaceField<Type> >(fineInterfaceField);
+            refCast<const processorBlockLduInterfaceField<Type> >
+            (
+                fineInterfaceField
+            );
 
         doTransform_ = p.doTransform();
         rank_ = p.rank();
     }
     else
     {
-        FatalErrorIn("Foam::processorBlockGAMGInterfaceField<Type> Constructor")
-            << "fineInterface must be of processor type and either" << endl 
+        FatalErrorIn("processorBlockGAMGInterfaceField<Type> Constructor")
+            << "fineInterface must be of processor type and either" << endl
             << "    processorBlockLduInterfaceField<Type> or " << endl
             << "    processorFvPatchField<Type> " << endl
             << abort(FatalError);
@@ -68,67 +71,82 @@ Foam::processorBlockGAMGInterfaceField<Type>::processorBlockGAMGInterfaceField
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::processorBlockGAMGInterfaceField<Type>::~processorBlockGAMGInterfaceField()
+Foam::processorBlockGAMGInterfaceField<Type>::
+~processorBlockGAMGInterfaceField()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-template<class Type>                                                                     
-void Foam::processorBlockGAMGInterfaceField<Type>::initInterfaceMatrixUpdate                     
-(                                                                               
-    const Field<Type>& psiInternal,                                             
-    Field<Type>&,                                                               
-    const BlockLduMatrix<Type>&,                                                
-    const CoeffField<Type>&,                                                    
-    const Pstream::commsTypes commsType                                         
-) const                                                                         
-{                                                                               
-    procInterface_.compressedSend                                                   
-    (                                                                           
-        commsType,                                                              
+template<class Type>
+void Foam::processorBlockGAMGInterfaceField<Type>::initInterfaceMatrixUpdate
+(
+    const Field<Type>& psiInternal,
+    Field<Type>&,
+    const BlockLduMatrix<Type>&,
+    const CoeffField<Type>&,
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
+) const
+{
+    procInterface_.compressedSend
+    (
+        commsType,
         procInterface_.interfaceInternalField(psiInternal)()
-    );                                                                          
-}                                                                               
-                                                                                
-template<class Type>                                                                     
-void Foam::processorBlockGAMGInterfaceField<Type>::updateInterfaceMatrix                         
-(                                                                               
-    const Field<Type>& psiInternal,                                             
-    Field<Type>& result,                                                        
-    const BlockLduMatrix<Type>&,                                                
-    const CoeffField<Type>& coeffs,                                             
-    const Pstream::commsTypes commsType                                         
-) const                                                                         
-{                                                                               
+    );
+}
+
+template<class Type>
+void Foam::processorBlockGAMGInterfaceField<Type>::updateInterfaceMatrix
+(
+    const Field<Type>& psiInternal,
+    Field<Type>& result,
+    const BlockLduMatrix<Type>&,
+    const CoeffField<Type>& coeffs,
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
+) const
+{
     Field<Type> pnf
     (
         coeffs.size()
-    );                                                                           
- 
-    if (coeffs.activeType() == blockCoeffBase::SCALAR)                          
-    {                                                                           
-        pnf = coeffs.asScalar() *                                               
-            procInterface_.compressedReceive<Type>(commsType, this->size())();      
-    }                                                                           
-    else if (coeffs.activeType() == blockCoeffBase::LINEAR)                     
-    {                                                                           
-        pnf = cmptMultiply(coeffs.asLinear(),                                   
-            procInterface_.compressedReceive<Type>(commsType, this->size())()       
-        );                                                                      
-    }                                                                           
-    else if (coeffs.activeType() == blockCoeffBase::SQUARE)                     
-    {                                                                           
-        pnf = coeffs.asSquare() &                                               
-            procInterface_.compressedReceive<Type>(commsType, this->size())();      
-    }                                                                           
-                                                                                
-    const unallocLabelList& faceCells = procInterface_.faceCells();              
-    
-    forAll(faceCells, elemI)
+    );
+
+    if (coeffs.activeType() == blockCoeffBase::SCALAR)
     {
-        result[faceCells[elemI]] -= pnf[elemI];
-    }                                                                                
+        pnf = coeffs.asScalar()*
+            procInterface_.compressedReceive<Type>(commsType, this->size())();
+    }
+    else if (coeffs.activeType() == blockCoeffBase::LINEAR)
+    {
+        pnf = cmptMultiply
+        (
+            coeffs.asLinear(),
+            procInterface_.compressedReceive<Type>(commsType, this->size())()
+        );
+    }
+    else if (coeffs.activeType() == blockCoeffBase::SQUARE)
+    {
+        pnf = coeffs.asSquare() &
+            procInterface_.compressedReceive<Type>(commsType, this->size())();
+    }
+
+    const unallocLabelList& faceCells = procInterface_.faceCells();
+
+    if (switchToLhs)
+    {
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] += pnf[elemI];
+        }
+    }
+    else
+    {
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] -= pnf[elemI];
+        }
+    }
 }
 
 

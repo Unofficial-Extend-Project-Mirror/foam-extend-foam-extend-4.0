@@ -185,7 +185,8 @@ void cyclicFaPatchField<Type>::updateInterfaceMatrix
     const lduMatrix&,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes
+    const Pstream::commsTypes,
+    const bool switchToLhs
 ) const
 {
     scalarField pnf(this->size());
@@ -203,9 +204,19 @@ void cyclicFaPatchField<Type>::updateInterfaceMatrix
     transformCoupleField(pnf, cmpt);
 
     // Multiply the field by coefficients and add into the result
-    forAll(faceCells, elemI)
+    if (switchToLhs)
     {
-        result[faceCells[elemI]] -= coeffs[elemI]*pnf[elemI];
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] += coeffs[elemI]*pnf[elemI];
+        }
+    }
+    else
+    {
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] -= coeffs[elemI]*pnf[elemI];
+        }
     }
 }
 

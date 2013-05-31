@@ -24,8 +24,8 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "basicSymmetryFvPatchFields.H"
 #include "fvPatchFields.H"
+#include "basicSymmetryFvPatchFields.H"
 #include "volMesh.H"
 #include "addToRunTimeSelectionTable.H"
 

@@ -40,48 +40,64 @@ License
 namespace Foam
 {
 
-template<>                                                                     
-void processorBlockGAMGInterfaceField<scalar>::initInterfaceMatrixUpdate                     
-(                                                                               
-    const Field<scalar>& psiInternal,                                             
-    Field<scalar>&,                                                               
-    const BlockLduMatrix<scalar>&,                                                
-    const CoeffField<scalar>&,                                                    
-    const Pstream::commsTypes commsType                                         
-) const                                                                         
-{                                                                               
-    procInterface_.compressedSend                                                   
-    (                                                                           
-        commsType,                                                              
+template<>
+void processorBlockGAMGInterfaceField<scalar>::initInterfaceMatrixUpdate
+(
+    const Field<scalar>& psiInternal,
+    Field<scalar>&,
+    const BlockLduMatrix<scalar>&,
+    const CoeffField<scalar>&,
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
+) const
+{
+    procInterface_.compressedSend
+    (
+        commsType,
         procInterface_.interfaceInternalField(psiInternal)()
-    );                                                                          
-}                                                                               
-                                                                                
-template<>                                                                     
-void processorBlockGAMGInterfaceField<scalar>::updateInterfaceMatrix                         
-(                                                                               
-    const Field<scalar>& psiInternal,                                             
-    Field<scalar>& result,                                                        
-    const BlockLduMatrix<scalar>&,                                                
-    const CoeffField<scalar>& coeffs,                                             
-    const Pstream::commsTypes commsType                                         
-) const                                                                         
-{                                                                               
+    );
+}
+
+
+template<>
+void processorBlockGAMGInterfaceField<scalar>::updateInterfaceMatrix
+(
+    const Field<scalar>& psiInternal,
+    Field<scalar>& result,
+    const BlockLduMatrix<scalar>&,
+    const CoeffField<scalar>& coeffs,
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
+) const
+{
     Field<scalar> pnf
     (
         procInterface_.compressedReceive<scalar>(commsType, coeffs.size())
-    );                                                                           
-    
-    pnf = coeffs.asScalar() *                                               
-        procInterface_.compressedReceive<scalar>(commsType, this->size())();      
-                                                                                
-    const unallocLabelList& faceCells = procInterface_.faceCells();              
-    
-    forAll(faceCells, elemI)
+    );
+
+    pnf = coeffs.asScalar() *
+        procInterface_.compressedReceive<scalar>(commsType, this->size())();
+
+    const unallocLabelList& faceCells = procInterface_.faceCells();
+
+
+    if (switchToLhs)
     {
-        result[faceCells[elemI]] -= coeffs[elemI]*pnf[elemI];
-    }                                                                                
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] += coeffs[elemI]*pnf[elemI];
+        }
+    }
+    else
+    {
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] -= coeffs[elemI]*pnf[elemI];
+        }
+
+    }
 }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -877,37 +877,16 @@ flux() const
         );
     }
 
-    FieldField<Field, Type> InternalContrib = internalCoeffs_;
-
-    forAll(InternalContrib, patchI)
+    // This needs to go into virtual functions for all coupled patches
+    // in order to simplify handling of overset meshes
+    // HJ, 29/May/2013
+    forAll (psi_.boundaryField(), patchI)
     {
-        InternalContrib[patchI] =
-            cmptMultiply
-            (
-                InternalContrib[patchI],
-                psi_.boundaryField()[patchI].patchInternalField()
-            );
-    }
-
-    FieldField<Field, Type> NeighbourContrib = boundaryCoeffs_;
-
-    forAll(NeighbourContrib, patchI)
-    {
-        if (psi_.boundaryField()[patchI].coupled())
-        {
-            NeighbourContrib[patchI] =
-                cmptMultiply
-                (
-                    NeighbourContrib[patchI],
-                    psi_.boundaryField()[patchI].patchNeighbourField()
-                );
-        }
-    }
-
-    forAll(fieldFlux.boundaryField(), patchI)
-    {
-        fieldFlux.boundaryField()[patchI] =
-            InternalContrib[patchI] - NeighbourContrib[patchI];
+        psi_.boundaryField()[patchI].patchFlux
+        (
+            fieldFlux,
+            *this
+        );
     }
 
     if (faceFluxCorrectionPtr_)

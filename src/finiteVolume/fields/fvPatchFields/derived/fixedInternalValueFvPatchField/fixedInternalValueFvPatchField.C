@@ -26,7 +26,7 @@ License
 
 #include "fixedInternalValueFvPatchField.H"
 #include "fvPatchFieldMapper.H"
-#include "fvMatrix.H"
+#include "fvMatrices.H"
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 

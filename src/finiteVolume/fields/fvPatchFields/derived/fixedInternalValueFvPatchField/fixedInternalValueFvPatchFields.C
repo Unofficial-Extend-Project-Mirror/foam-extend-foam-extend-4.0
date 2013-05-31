@@ -24,8 +24,8 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "fixedInternalValueFvPatchFields.H"
 #include "fvPatchFields.H"
+#include "fixedInternalValueFvPatchFields.H"
 #include "addToRunTimeSelectionTable.H"
 #include "volFields.H"
 

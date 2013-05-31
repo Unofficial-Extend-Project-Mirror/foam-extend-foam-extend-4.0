@@ -24,11 +24,9 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "fvPatchFields.H"
 #include "syringePressureFvPatchScalarField.H"
-#include "volMesh.H"
 #include "addToRunTimeSelectionTable.H"
-#include "fvPatchFieldMapper.H"
-#include "surfaceFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
