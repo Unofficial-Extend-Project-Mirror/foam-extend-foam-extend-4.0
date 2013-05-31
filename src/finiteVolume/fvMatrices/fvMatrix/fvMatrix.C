@@ -178,6 +178,35 @@ void Foam::fvMatrix<Type>::addBoundarySource
 }
 
 
+template<class Type>
+void Foam::fvMatrix<Type>::correctImplicitBoundarySource
+(
+    const FieldField<Field, scalar>& bouCoeffsCmpt,
+    scalarField& sourceCmpt,
+    const direction cmpt
+) const
+{
+    forAll(psi_.boundaryField(), patchI)
+    {
+        const fvPatchField<Type>& ptf = psi_.boundaryField()[patchI];
+        const scalarField& pbc = bouCoeffsCmpt[patchI];
+
+        if (ptf.coupled())
+        {
+            scalarField pnf = ptf.patchNeighbourField()().component(cmpt);
+
+            const unallocLabelList& addr = lduAddr().patchAddr(patchI);
+
+            forAll (addr, facei)
+            {
+                // Note opposite sign of the one in addBoundarySource
+                sourceCmpt[addr[facei]] -= pbc[facei]*pnf[facei];
+            }
+        }
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>

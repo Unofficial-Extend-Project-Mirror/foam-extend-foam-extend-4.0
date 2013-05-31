@@ -326,6 +326,7 @@ public:
 
         // Matrix completion functionality
 
+            //- Add the diagonal contribution from boundary
             void addBoundaryDiag
             (
                 scalarField& diag,
@@ -334,12 +335,21 @@ public:
 
             void addCmptAvBoundaryDiag(scalarField& diag) const;
 
+            //- Add the source coefficient from boundary
             void addBoundarySource
             (
                 Field<Type>& source,
                 const bool couples = true
             ) const;
 
+            //- Correct the boundary source by removing the implicit part
+            //  of boundary source for the solving component
+            void correctImplicitBoundarySource
+            (
+                const FieldField<Field, scalar>& bouCoeffsCmpt,
+                scalarField& sourceCmpt,
+                const direction cmpt
+            ) const;
 
         // Operations
 

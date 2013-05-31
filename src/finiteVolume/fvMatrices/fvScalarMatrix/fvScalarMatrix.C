@@ -104,6 +104,13 @@ Foam::fvMatrix<Foam::scalar>::fvSolver::solve
     const dictionary& solverControls
 )
 {
+    if (debug)
+    {
+        Info<< "fvScalarMatrix::solve(const dictionary&) : "
+               "solving fvScalarMatrix"
+            << endl;
+    }
+
     // Complete matrix assembly.  HJ, 17/Apr/2012
     fvMat_.completeAssembly();
 
