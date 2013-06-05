@@ -57,7 +57,7 @@ echo ========================================
 echo
 
 # Metis
-if [ -z "$METIS_SYSTEM" ] 
+if [ -z "$METIS_SYSTEM" ]
 then
     ( rpm_make -p metis-5.0pre2 -s metis-5.0pre2.spec -u http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/OLD/metis-5.0pre2.tar.gz      )
 else
@@ -66,7 +66,7 @@ else
 fi
 
 # ParMGridGen
-if [ -z "$PARMGRIDGEN_SYSTEM" ] 
+if [ -z "$PARMGRIDGEN_SYSTEM" ]
 then
     ( rpm_make -p ParMGridGen-1.0 -s ParMGridGen-1.0.spec -u http://www.mgnet.org/mgnet/Codes/parmgridgen/ParMGridGen-1.0.tar.gz       )
 else
@@ -75,16 +75,16 @@ else
 fi
 
 # Libccmio
-if [ -z "$LIBCCMIO_SYSTEM" ] 
+if [ -z "$LIBCCMIO_SYSTEM" ]
 then
-    ( rpm_make -p libccmio-2.6.1 -s libccmio-2.6.1.spec -u https://wci.llnl.gov/codes/visit/3rd_party/libccmio-2.6.1.tar.gz          )
+    ( rpm_make -p libccmio-2.6.1 -s libccmio-2.6.1.spec -u http://portal.nersc.gov/svn/visit/tags/2.4.2/third_party/libccmio-2.6.1.tar.gz )
 else
     echo "Using system installed Libccmio"
     echo ""
 fi
 
 # Mesquite
-if [ -z "$MESQUITE_SYSTEM" ] 
+if [ -z "$MESQUITE_SYSTEM" ]
 then
     ( rpm_make -p mesquite-2.1.2 -s mesquite-2.1.2.spec -u http://software.sandia.gov/~jakraft/mesquite-2.1.2.tar.gz                 )
 else
@@ -94,12 +94,12 @@ fi
 
 # The following three packages depends on the availability of OpenMPI
 # The macro rpm_make() will make sure to update the ThirdParty environment variables before starting
-# the compilation. 
+# the compilation.
 # Just make sure the OpenMPI environment variables are properly initialized, or that
-# the AllMake.stage2 script completed correctly 
+# the AllMake.stage2 script completed correctly
 #
 # Scotch
-if [ -z "$SCOTCH_SYSTEM" ] 
+if [ -z "$SCOTCH_SYSTEM" ]
 then
     ( rpm_make -p scotch-5.1.10b -s scotch-5.1.10b.spec -u https://gforge.inria.fr/frs/download.php/27583/scotch-5.1.10b.tar.gz  )
 else
@@ -108,7 +108,7 @@ else
 fi
 
 # ParMetis
-if [ -z "$PARMETIS_SYSTEM" ] 
+if [ -z "$PARMETIS_SYSTEM" ]
 then
     ( rpm_make -p ParMetis-3.1.1 -s ParMetis-3.1.1.spec -u http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis/OLD/ParMetis-3.1.1.tar.gz )
 else
@@ -117,7 +117,7 @@ else
 fi
 
 ## Zoltan
-#if [ -z "$ZOLTAN_SYSTEM" ] 
+#if [ -z "$ZOLTAN_SYSTEM" ]
 #then
 #    ( rpm_make -p zoltan-3.5 -s zoltan-3.5.spec -u http://www.cs.sandia.gov/~kddevin/Zoltan_Distributions/zoltan_distrib_v3.5.tar.gz )
 #else
