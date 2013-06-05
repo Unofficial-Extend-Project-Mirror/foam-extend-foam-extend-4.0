@@ -4,18 +4,10 @@ diff -ruN libccmio-2.6.1_orig/config/config.gnu.to.star libccmio-2.6.1/config/co
 @@ -1,4 +1,4 @@
 -#!/bin/sh
 +#!/bin/bash
- 
+
  # $Id: config.gnu.to.star,v 1.4 2006/06/05 21:12:16 geoffp Exp $
- 
-@@ -24,6 +24,7 @@
-     mips-sgi-irix64_6-null)            echo irix64_6.5-mips4                ;;
-     i586-unknown-linux_2.2-glibc-null) echo linux_2.2-x86-glibc_2.2.0       ;;
-     i586-unknown-linux_2.4-glibc-null) echo linux_2.4-x86-glibc_2.3.2       ;;
-+    i586-unknown-linux-libc5-null)     echo linux_2.4-x86-glibc_2.3.2       ;;
-     ia64-unknown-linux-null)           echo linux64_2.4-itanium-glibc_2.2.4 ;;
-     alpha-dec-osf3-null)               echo osf1_4.0-com                    ;;
-     alpha-dec-osf5-null)               echo osf1_5.1-com                    ;;
-@@ -34,6 +35,8 @@
+
+@@ -34,6 +34,8 @@
      x86_64-unknown-linux-gnu-null)     echo linux64_2.4-x86-glibc_2.2.5     ;;
      ppc64-unknown-linux-gnu-null)      echo linux64_2.6-pwr4-glibc_2.3.3    ;;
      i386-apple-darwin8-null)           echo i386-apple-darwin8              ;;
@@ -23,7 +15,7 @@ diff -ruN libccmio-2.6.1_orig/config/config.gnu.to.star libccmio-2.6.1/config/co
 +    i386-apple-darwin11-null)          echo i386-apple-darwin11             ;;
      *)                                 echo unknown                         ;;
  esac
- 
+
 diff -ruN libccmio-2.6.1_orig/config/config.guess libccmio-2.6.1/config/config.guess
 --- libccmio-2.6.1_orig/config/config.guess	2006-06-30 14:00:19.000000000 -0400
 +++ libccmio-2.6.1/config/config.guess	2010-12-18 14:50:49.000000000 -0500
@@ -39,13 +31,13 @@ diff -ruN libccmio-2.6.1_orig/config/config.system libccmio-2.6.1/config/config.
 @@ -1,4 +1,4 @@
 -#! /bin/sh
 +#! /bin/bash
- 
+
  # $Id: config.system,v 1.2 2005/09/29 22:19:19 geoffp Exp $
- 
-@@ -87,6 +87,15 @@
+
+@@ -87,6 +87,18 @@
      i386-apple-darwin8.11.1)
  	echo i386-apple-darwin8 ;;
- 
+
 +    i386-apple-darwin10.5.0 |  i386-apple-darwin10.7.0 | i386-apple-darwin10.8.0)
 +	echo i386-apple-darwin10 ;;
 +
@@ -54,6 +46,9 @@ diff -ruN libccmio-2.6.1_orig/config/config.system libccmio-2.6.1/config/config.
 +
 +    i386-apple-darwin11.3.0 )
 +	echo i386-apple-darwin11 ;;
++
++    i386-apple-darwin11.4.2 )
++       echo i386-apple-darwin11 ;;
 +
      *)
          echo unknown
@@ -64,7 +59,7 @@ diff -ruN libccmio-2.6.1_orig/config/runqmake libccmio-2.6.1/config/runqmake
 @@ -1,4 +1,4 @@
 -#!/bin/sh
 +#!/bin/bash
- 
+
  PATHTOSRC=$1
  shift
 diff -ruN libccmio-2.6.1_orig/libadf/adf.pro libccmio-2.6.1/libadf/adf.pro
@@ -77,7 +72,7 @@ diff -ruN libccmio-2.6.1_orig/libadf/adf.pro libccmio-2.6.1/libadf/adf.pro
 -TARGET = adf
 +TARGET = adf_ccmio
  PATHTOSRC = ../
- 
+
  include($$PATHTOSRC/config/ccm.pro)
 diff -ruN libccmio-2.6.1_orig/libcgns/cgns.pro libccmio-2.6.1/libcgns/cgns.pro
 --- libccmio-2.6.1_orig/libcgns/cgns.pro	2006-06-30 14:00:18.000000000 -0400
@@ -89,5 +84,5 @@ diff -ruN libccmio-2.6.1_orig/libcgns/cgns.pro libccmio-2.6.1/libcgns/cgns.pro
 -TARGET = cgns
 +TARGET = cgns_ccmio
  PATHTOSRC = ../
- 
+
  include($$PATHTOSRC/config/ccm.pro)
