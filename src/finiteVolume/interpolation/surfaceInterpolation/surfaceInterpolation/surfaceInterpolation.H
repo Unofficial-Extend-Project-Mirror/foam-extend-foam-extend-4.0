@@ -123,14 +123,26 @@ public:
 
     // Member functions
 
-        //- Return access to schemes
+        //- Return schemes
         const fvSchemes& schemesDict() const
         {
             return schemesDict_;
         }
 
-        //- Return access to solver settings
+        //- Return access to schemes
+        fvSchemes& schemesDict()
+        {
+            return schemesDict_;
+        }
+
+        //- Return solver settings
         const fvSolution& solutionDict() const
+        {
+            return solutionDict_;
+        }
+
+        //- Return access to solver settings
+        fvSolution& solutionDict()
         {
             return solutionDict_;
         }
