@@ -54,8 +54,11 @@ class fluxFvPatchField
 {
     // Private data
 
+        //- Flux
+        Field<Type> flux_;
+
         //- Reactivity
-        scalar reactivity_;
+        scalarField reactivity_;
 
         //- Name of diffusion field
         word gammaName_;
