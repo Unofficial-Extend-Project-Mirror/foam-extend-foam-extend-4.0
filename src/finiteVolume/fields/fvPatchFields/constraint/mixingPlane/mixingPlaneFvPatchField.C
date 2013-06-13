@@ -158,6 +158,7 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
     coupledFvPatchField<Type>(p, iF),
     mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(p)),
     fluxAveraging_(false),
+    surfaceAveraging_(true),
     phiName_("phi"),
     fluxMask_(),
     fluxWeights_(p.size(), 0)
@@ -175,6 +176,7 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
     coupledFvPatchField<Type>(p, iF, dict, false),
     mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(p)),
     fluxAveraging_(dict.lookup("fluxAveraging")),
+    surfaceAveraging_(dict.lookup("surfaceAveraging")),
     phiName_(dict.lookupOrDefault<word>("phi", "phi")),
     fluxMask_(),
     fluxWeights_(p.size(), 0)
@@ -215,6 +217,7 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
     coupledFvPatchField<Type>(ptf, p, iF, mapper),
     mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(p)),
     fluxAveraging_(ptf.fluxAveraging_),
+    surfaceAveraging_(ptf.surfaceAveraging_),
     phiName_(ptf.phiName_),
     fluxMask_(),
     fluxWeights_(ptf.fluxWeights_, mapper)
@@ -249,6 +252,7 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
     coupledFvPatchField<Type>(ptf),
     mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(ptf.patch())),
     fluxAveraging_(ptf.fluxAveraging_),
+    surfaceAveraging_(ptf.surfaceAveraging_),
     phiName_(ptf.phiName_),
     fluxMask_(),
     fluxWeights_(ptf.fluxWeights_)
@@ -266,6 +270,7 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
     coupledFvPatchField<Type>(ptf, iF),
     mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(ptf.patch())),
     fluxAveraging_(ptf.fluxAveraging_),
+    surfaceAveraging_(ptf.surfaceAveraging_),
     phiName_(ptf.phiName_),
     fluxMask_(),
     fluxWeights_(ptf.fluxWeights_)
@@ -517,12 +522,70 @@ void mixingPlaneFvPatchField<Type>::updateInterfaceMatrix
 
 
 template<class Type>
+void mixingPlaneFvPatchField<Type>::patchInterpolate
+(
+    GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+    const scalarField& pL
+) const
+{
+    // Code moved from surfaceInterpolationScheme.C
+    // HJ, 13/Jun/2013
+    const label patchI = this->patch().index();
+
+    // Use circumferential average of internal field when interpolating to
+    // patch
+    // HJ and MB, 13/Jun/2013
+    if (surfaceAveraging_)
+    {
+        fField.boundaryField()[patchI] =
+            pL*this->mixingPlanePatch_.circumferentialAverage
+            (
+                this->patchInternalField()
+            )
+          + (1 - pL)*this->patchNeighbourField();
+    }
+    else
+    {
+        fField.boundaryField()[patchI] =
+            pL*this->patchInternalField()
+          + (1 - pL)*this->patchNeighbourField();
+    }
+}
+
+
+template<class Type>
+void mixingPlaneFvPatchField<Type>::patchInterpolate
+(
+    GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+    const scalarField& pL,
+    const scalarField& pY
+) const
+{
+    // Code moved from surfaceInterpolationScheme.C
+    // HJ, 13/Jun/2013
+    const label patchI = this->patch().index();
+    ::abort(); //HJ, HERE!!!
+    // Use circumferential average of internal field
+    // HJ and MB, 13/Jun/2013
+    fField.boundaryField()[patchI] =
+        pL*this->mixingPlanePatch_.circumferentialAverage
+        (
+            this->patchInternalField()
+        )
+      + pY*this->patchNeighbourField();
+}
+
+
+template<class Type>
 void mixingPlaneFvPatchField<Type>::write(Ostream& os) const
 {
     fvPatchField<Type>::write(os);
 
     os.writeKeyword("fluxAveraging")
         << fluxAveraging_ << token::END_STATEMENT << nl;
+
+    os.writeKeyword("surfaceAveraging")
+        << surfaceAveraging_ << token::END_STATEMENT << nl;
 
     this->writeEntryIfDifferent(os, "phi", word("phi"), phiName_);
     this->writeEntry("value", os);

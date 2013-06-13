@@ -80,7 +80,7 @@ Ostream& operator<<(Ostream&, const fvPatchField<Type>&);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class fvPatchField Declaration
+                        Class fvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -436,15 +436,35 @@ public:
             }
 
 
-            //- Manipulate matrix
-            virtual void manipulateMatrix(fvMatrix<Type>& matrix);
+        // Patch interpolation and patch flux
+
+            //- Calculate patch face interpolate given weighting factors
+            virtual void patchInterpolate
+            (
+                GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+                const scalarField& pL
+            ) const;
+
+            //- Calculate patch face interpolate given two weighting factors
+            virtual void patchInterpolate
+            (
+                GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+                const scalarField& pL,
+                const scalarField& pY
+            ) const;
 
             //- Calculate patch flux
             virtual void patchFlux
             (
-                GeometricField<Type, fvsPatchField, surfaceMesh>& pFlux,
+                GeometricField<Type, fvsPatchField, surfaceMesh>& flux,
                 const fvMatrix<Type>& matrix
             ) const;
+
+
+        // Matrix manipulation
+
+            //- Manipulate matrix
+            virtual void manipulateMatrix(fvMatrix<Type>& matrix);
 
 
         // I-O

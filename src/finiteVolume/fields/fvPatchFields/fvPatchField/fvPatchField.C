@@ -28,6 +28,7 @@ License
 #include "dictionary.H"
 #include "fvMesh.H"
 #include "fvPatchFieldMapper.H"
+#include "GeometricField.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -249,9 +250,64 @@ void Foam::fvPatchField<Type>::manipulateMatrix(fvMatrix<Type>& matrix)
 
 
 template<class Type>
+void Foam::fvPatchField<Type>::patchInterpolate
+(
+    GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+    const scalarField& pL
+) const
+{
+    // Code moved from surfaceInterpolationScheme.C
+    // HJ, 29/May/2013
+    const label patchI = this->patch().index();
+
+     // Virtual function for patch face interpolate.  HJ, 13/Jun/2013
+     if (this->coupled())
+     {
+         // Coupled patch
+         fField.boundaryField()[patchI] =
+             pL*this->patchInternalField()
+           + (1 - pL)*this->patchNeighbourField();
+     }
+     else
+     {
+         // Uncoupled patch, re-use face values
+         fField.boundaryField()[patchI] = *this;
+     }
+}
+
+
+template<class Type>
+void Foam::fvPatchField<Type>::patchInterpolate
+(
+    GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+    const scalarField& pL,
+    const scalarField& pY
+) const
+{
+    // Code moved from surfaceInterpolationScheme.C
+    // HJ, 29/May/2013
+    const label patchI = this->patch().index();
+
+    // Virtual function for patch face interpolate.  HJ, 13/Jun/2013
+    if (this->coupled())
+    {
+        // Coupled patch
+        fField.boundaryField()[patchI] =
+            pL*this->patchInternalField()
+          + pY*this->patchNeighbourField();
+    }
+    else
+    {
+        // Uncoupled patch, re-used face values
+        fField.boundaryField()[patchI] = *this;
+    }
+}
+
+
+template<class Type>
 void Foam::fvPatchField<Type>::patchFlux
 (
-    GeometricField<Type, fvsPatchField, surfaceMesh>& pFlux,
+    GeometricField<Type, fvsPatchField, surfaceMesh>& flux,
     const fvMatrix<Type>& matrix
 ) const
 {
@@ -263,7 +319,7 @@ void Foam::fvPatchField<Type>::patchFlux
     if (this->coupled())
     {
         // Coupled patch
-        pFlux.boundaryField()[patchI] =
+        flux.boundaryField()[patchI] =
             cmptMultiply
             (
                 matrix.internalCoeffs()[patchI],
@@ -278,7 +334,7 @@ void Foam::fvPatchField<Type>::patchFlux
     else
     {
         // Uncoupled patch
-        pFlux.boundaryField()[patchI] =
+        flux.boundaryField()[patchI] =
             cmptMultiply
             (
                 matrix.internalCoeffs()[patchI],

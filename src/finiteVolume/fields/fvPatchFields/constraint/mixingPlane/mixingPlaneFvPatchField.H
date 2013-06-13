@@ -70,6 +70,9 @@ class mixingPlaneFvPatchField
         //- Perform flux averaging
         Switch fluxAveraging_;
 
+        //- Perform surface averaging
+        Switch surfaceAveraging_;
+
         //- Name of flux field
         word phiName_;
 
@@ -196,7 +199,6 @@ public:
             //- Return neighbour patch field
             virtual tmp<Field<Type> > patchNeighbourField() const;
 
-
             //- Initialise the evaluation of the patch field
             virtual void initEvaluate(const Pstream::commsTypes commsType);
 
@@ -225,6 +227,26 @@ public:
 
             // Gradient coefficients remain unchanged.  HJ, 8/Feb/2013
 
+
+        // Patch interpolation and patch flux
+
+            //- Calculate patch face interpolate given weighting factors
+            virtual void patchInterpolate
+            (
+                GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+                const scalarField& pL
+            ) const;
+
+            //- Calculate patch face interpolate given two weighting factors
+            virtual void patchInterpolate
+            (
+                GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+                const scalarField& pL,
+                const scalarField& pY
+            ) const;
+
+
+        // Matrix manipulation
 
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate
