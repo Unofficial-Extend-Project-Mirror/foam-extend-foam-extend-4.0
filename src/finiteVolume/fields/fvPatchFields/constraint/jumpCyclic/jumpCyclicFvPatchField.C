@@ -155,7 +155,13 @@ void jumpCyclicFvPatchField<Type>::updateInterfaceMatrix
     label sizeby2 = this->size()/2;
     const unallocLabelList& faceCells = this->cyclicPatch().faceCells();
 
-    if (&psiInternal == &this->internalField())
+    // Add void pointer cast to keep compiler happy when instantiated
+    // for vector/tensor fields.  HJ, 4/Jun/2013
+    if
+    (
+        reinterpret_cast<const void*>(&psiInternal)
+     == reinterpret_cast<const void*>(&this->internalField())
+    )
     {
         // Get component of jump.  HJ, 11/Aug/2009
         const Field<scalar> jf = jump()().component(cmpt);
