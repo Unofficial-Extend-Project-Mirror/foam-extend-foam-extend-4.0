@@ -146,38 +146,6 @@ gaussGrad<Type>::grad
 }
 
 
-template<class Type>
-void gaussGrad<Type>::correctBoundaryConditions
-(
-    const GeometricField<Type, fvPatchField, volMesh>& vsf,
-    GeometricField
-    <
-        typename outerProduct<vector, Type>::type, fvPatchField, volMesh
-    >& gGrad
-)
-{
-    forAll (vsf.boundaryField(), patchi)
-    {
-        if (!vsf.boundaryField()[patchi].coupled())
-        {
-            vectorField n =
-                vsf.mesh().Sf().boundaryField()[patchi]
-               /vsf.mesh().magSf().boundaryField()[patchi];
-
-            gGrad.boundaryField()[patchi] += n*
-            (
-                vsf.boundaryField()[patchi].snGrad()
-              - (n & gGrad.boundaryField()[patchi])
-            );
-        }
-     }
-
-    // Note: coupled boundaries provide patchNeighbourField, which is only
-    // updated on correct boundary conditions.  Therefore, evaluateCoupled()
-    // should be called here
-}
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace fv
