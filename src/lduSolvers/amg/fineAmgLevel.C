@@ -35,8 +35,8 @@ Author
 
 #include "fineAmgLevel.H"
 #include "coarseAmgLevel.H"
-#include "ICCG.H"
-#include "BICCG.H"
+#include "cgSolver.H"
+#include "bicgStabSolver.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -183,30 +183,42 @@ void Foam::fineAmgLevel::solve
 
     lduSolverPerformance coarseSolverPerf;
 
+    dictionary fineLevelDict;
+    fineLevelDict.add("minIter", 1);
+    fineLevelDict.add("maxIter", 1000);
+    fineLevelDict.add("tolerance", tolerance);
+    fineLevelDict.add("relTol", relTol);
+
+    // Avoid issues with round-off on strict tolerance setup
+    // HJ, 27/Jun/2013
+    x = b/matrix_.diag();
+
     if (matrix_.symmetric())
     {
-        coarseSolverPerf = ICCG
+        fineLevelDict.add("preconditioner", "Cholesky");
+
+        coarseSolverPerf = cgSolver
         (
-            "topLevelCorr",
+            "fineLevelCorr",
             matrix_,
             coupleBouCoeffs_,
             coupleIntCoeffs_,
             interfaceFields_,
-            tolerance,
-            relTol
+            fineLevelDict
         ).solve(x, b, cmpt);
     }
     else
     {
-        coarseSolverPerf = BICCG
+        fineLevelDict.add("preconditioner", "ILU0");
+
+        coarseSolverPerf = bicgStabSolver
         (
-            "topLevelCorr",
+            "fineLevelCorr",
             matrix_,
             coupleBouCoeffs_,
             coupleIntCoeffs_,
             interfaceFields_,
-            tolerance,
-            relTol
+            fineLevelDict
         ).solve(x, b, cmpt);
     }
 

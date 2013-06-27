@@ -35,8 +35,7 @@ Author
 
 #include "coarseAmgLevel.H"
 #include "SubField.H"
-#include "ICCG.H"
-#include "BICCG.H"
+#include "gmresSolver.H"
 #include "vector2D.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -188,31 +187,64 @@ void Foam::coarseAmgLevel::solve
 {
     lduSolverPerformance coarseSolverPerf;
 
+    label maxIter = Foam::min(2*policyPtr_->minCoarseEqns(), 1000);
+
+    dictionary topLevelDict;
+    topLevelDict.add("nDirections", "5");
+    topLevelDict.add("minIter", 1);
+    topLevelDict.add("maxIter", maxIter);
+    topLevelDict.add("tolerance", tolerance);
+    topLevelDict.add("relTol", relTol);
+
+    // Avoid issues with round-off on strict tolerance setup
+    // HJ, 27/Jun/2013
+    x = b/matrixPtr_->matrix().diag();
+
     if (matrixPtr_->matrix().symmetric())
     {
-        coarseSolverPerf = ICCG
+        topLevelDict.add("preconditioner", "Cholesky");
+
+        coarseSolverPerf = gmresSolver
         (
             "topLevelCorr",
             matrixPtr_->matrix(),
             matrixPtr_->coupleBouCoeffs(),
             matrixPtr_->coupleIntCoeffs(),
             matrixPtr_->interfaceFields(),
-            tolerance,
-            relTol
+            topLevelDict
         ).solve(x, b, cmpt);
     }
     else
     {
-        coarseSolverPerf = BICCG
+        topLevelDict.add("preconditioner", "ILU0");
+
+        coarseSolverPerf = gmresSolver
         (
             "topLevelCorr",
             matrixPtr_->matrix(),
             matrixPtr_->coupleBouCoeffs(),
             matrixPtr_->coupleIntCoeffs(),
             matrixPtr_->interfaceFields(),
-            tolerance,
-            relTol
+            topLevelDict
         ).solve(x, b, cmpt);
+    }
+
+    // Escape cases of solver divergence
+    if
+    (
+        coarseSolverPerf.nIterations() == maxIter
+     && (
+            coarseSolverPerf.finalResidual()
+         >= coarseSolverPerf.initialResidual()
+        )
+    )
+    {
+        // Top-level solution failed.  Attempt rescue
+        // HJ, 27/Jul/2013
+        x = b/matrixPtr_->matrix().diag();
+
+        // Print top level correction failure as info for user
+        coarseSolverPerf.print();
     }
 
     if (lduMatrix::debug >= 2)
