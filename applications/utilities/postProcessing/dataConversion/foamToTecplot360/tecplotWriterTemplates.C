@@ -148,7 +148,7 @@ void Foam::tecplotWriter::getTecplotNames
             varNames += " ";
         }
 
-        label nCmpts = pTraits<Type>::nComponents;
+        direction nCmpts = pTraits<Type>::nComponents;
 
         if (nCmpts == 1)
         {
