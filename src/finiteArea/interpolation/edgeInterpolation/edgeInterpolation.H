@@ -149,14 +149,26 @@ public:
             return faMesh_;
         }
 
-        //- Return access to schemes
+        //- Return schemes
         const faSchemes& schemesDict() const
         {
             return schemesDict_;
         }
 
-        //- Return access to solver settings
+        //- Return access to schemes
+        faSchemes& schemesDict()
+        {
+            return schemesDict_;
+        }
+
+        //- Return solver settings
         const faSolution& solutionDict() const
+        {
+            return solutionDict_;
+        }
+
+        //- Return access to solver settings
+        faSolution& solutionDict()
         {
             return solutionDict_;
         }
