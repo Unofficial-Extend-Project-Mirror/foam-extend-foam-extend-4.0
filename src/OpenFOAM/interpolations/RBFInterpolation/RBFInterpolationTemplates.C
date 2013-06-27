@@ -110,7 +110,7 @@ Foam::tmp<Foam::Field<Type> > Foam::RBFInterpolation::interpolate
     forAll (dataPoints_, flPoint)
     {
         // Cut-off function to justify neglecting outer boundary points
-        t = (Foam::mag(dataPoints_[flPoint] - focalPoint_) - innerRadius_)/
+        t = (mag(dataPoints_[flPoint] - focalPoint_) - innerRadius_)/
             (outerRadius_ - innerRadius_);
 
         if (t >= 1)
