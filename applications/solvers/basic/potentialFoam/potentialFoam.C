@@ -38,6 +38,7 @@ Description
 
 int main(int argc, char *argv[])
 {
+    argList::validOptions.insert("resetU", "");
     argList::validOptions.insert("writep", "");
 
 #   include "setRootCase.H"

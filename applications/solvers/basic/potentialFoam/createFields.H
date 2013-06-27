@@ -28,7 +28,10 @@
         mesh
     );
 
-    U.internalField() = vector::zero;
+    if (args.optionFound("resetU"))
+    {
+        U.internalField() = vector::zero;
+    }
 
     surfaceScalarField phi
     (
