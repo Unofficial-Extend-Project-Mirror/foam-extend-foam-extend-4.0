@@ -200,6 +200,13 @@ void Foam::coarseAmgLevel::solve
     // HJ, 27/Jun/2013
     x = b/matrixPtr_->matrix().diag();
 
+    // Do not solve if the number of equations is smaller than 5
+    if (policyPtr_->minCoarseEqns() < 5)
+    {
+        return;
+    }
+
+
     if (matrixPtr_->matrix().symmetric())
     {
         topLevelDict.add("preconditioner", "Cholesky");
