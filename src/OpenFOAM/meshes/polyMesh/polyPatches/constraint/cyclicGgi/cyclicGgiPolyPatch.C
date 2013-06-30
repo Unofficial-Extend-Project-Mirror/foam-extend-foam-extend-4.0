@@ -85,13 +85,29 @@ void Foam::cyclicGgiPolyPatch::checkDefinition() const
     )
     {
         FatalErrorIn("void cyclicGgiPolyPatch::check() const")
-            << "    The rotation angle for patch name           : "
-            << name() << " is: " << rotationAngle() << " axis: "
-            << cyclicShadow().rotationAxis() << nl
-            << "    The rotation angle for the shadow patch name: "
+            << "    Rotation angle for patch name           : "
+            << name() << " is: " << rotationAngle()
+            << " axis: " << rotationAxis() << nl
+            << "    Rotation angle for shadow patch name: "
             << shadowName() << " is: "
             << cyclicShadow().rotationAngle() << " axis: "
             << cyclicShadow().rotationAxis() << nl
+            << "    Both values need to be opposite in "
+            << "the boundary file. "
+            << abort(FatalError);
+    }
+
+    if
+    (
+        (mag(separationOffset() + cyclicShadow().separationOffset())) > SMALL
+    )
+    {
+        FatalErrorIn("void cyclicGgiPolyPatch::check() const")
+            << "Separation offset for patch name           : "
+            << name() << " is: " << separationOffset()
+            << "    Separation offset for shadow patch name: "
+            << shadowName() << " is: "
+            << cyclicShadow().separationOffset() << " axis: "
             << "    Both values need to be opposite in "
             << "the boundary file. "
             << abort(FatalError);

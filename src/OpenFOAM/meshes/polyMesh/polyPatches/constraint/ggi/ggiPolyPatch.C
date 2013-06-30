@@ -196,7 +196,9 @@ void Foam::ggiPolyPatch::calcPatchToPatch() const
                 shadow().zone()(),  // Shadow zone reference
                 forwardT(),
                 reverseT(),
-                shadow().separation(), // Slave-to-master separation. Bug fix
+                -separation(), // Slave-to-master separation: Use - localValue
+                // Bug fix, delayed slave evaluation causes error
+                // HJ, 30/Jun/2013
                 0,             // Non-overlapping face tolerances
                 0,             // HJ, 24/Oct/2008
                 true,          // Rescale weighting factors.  Bug fix, MB.
