@@ -67,11 +67,8 @@ class mixingPlaneFvPatchField
         //- Local reference cast into the mixingPlane patch
         const mixingPlaneFvPatch& mixingPlanePatch_;
 
-        //- Perform flux averaging
-        Switch fluxAveraging_;
-
-        //- Perform surface averaging
-        Switch surfaceAveraging_;
+        //- Interpolation type
+        mutable mixingPlaneInterpolation::mixingType mixing_;
 
         //- Name of flux field
         word phiName_;
@@ -87,6 +84,9 @@ class mixingPlaneFvPatchField
 
 
     // Private member functions
+
+        //- Read mixing type
+        void readMixingType() const;
 
         //- Calculate flux mask and weights
         void calcFluxMask() const;
@@ -225,7 +225,13 @@ public:
                 const tmp<scalarField>&
             ) const;
 
-            // Gradient coefficients remain unchanged.  HJ, 8/Feb/2013
+//             //- Return the matrix diagonal coefficients corresponding to the
+//             //  evaluation of the gradient of this patchField
+//             virtual tmp<Field<Type> > gradientInternalCoeffs() const;
+
+//             //- Return the matrix source coefficients corresponding to the
+//             //  evaluation of the gradient of this patchField
+//             virtual tmp<Field<Type> > gradientBoundaryCoeffs() const;
 
 
         // Patch interpolation and patch flux
@@ -243,6 +249,13 @@ public:
                 GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
                 const scalarField& pL,
                 const scalarField& pY
+            ) const;
+
+            //- Calculate patch flux
+            virtual void patchFlux
+            (
+                GeometricField<Type, fvsPatchField, surfaceMesh>& flux,
+                const fvMatrix<Type>& matrix
             ) const;
 
 

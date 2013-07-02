@@ -117,21 +117,22 @@ const char*
 Foam::NamedEnum
 <
     Foam::MixingPlaneInterpolationName::mixingType,
-    5
+    6
 >::names[] =
 {
-    "averageFromNeighbourPatch",
-    "averageFromNeighbourCellCenter",
-    "averageFromOwnPatch",
+    "areaAveraging",
+    "fluxAveraging",
+    "uniformValue",
+    "uniformGradient",
     "zeroGradient",
-    "doNothing"
+    "unknown"
 };
 
 
 const Foam::NamedEnum
 <
     Foam::MixingPlaneInterpolationName::mixingType,
-    5
+    6
 >
 Foam::MixingPlaneInterpolationName::mixingTypeNames_;
 

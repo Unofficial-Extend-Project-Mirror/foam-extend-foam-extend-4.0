@@ -44,10 +44,55 @@ namespace Foam
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
+void mixingPlaneFvPatchField<Type>::readMixingType() const
+{
+    const dictionary& dict =
+        this->patch().boundaryMesh().mesh().schemesDict().subDict
+        (
+            "mixingPlane"
+        );
+
+    // Try reading field type
+    word fieldName = this->dimensionedInternalField().name();
+
+    if (dict.found(fieldName))
+    {
+        mixing_ = mixingPlaneInterpolation::mixingTypeNames_.read
+        (
+            dict.lookup(fieldName)
+        );
+        Info<< "Custom mixing type for " << fieldName << ": "
+            << mixingPlaneInterpolation::mixingTypeNames_[mixing_] << endl;
+    }
+    else if (dict.found("default"))
+    {
+        mixing_ = mixingPlaneInterpolation::mixingTypeNames_.read
+        (
+            dict.lookup("default")
+        );
+    }
+    else
+    {
+        FatalIOErrorIn
+        (
+            "void mixingPlaneFvPatchField<Type>::readMixingType() const",
+            dict
+        )   << "Cannot find mixing type for field "
+            <<  this->dimensionedInternalField().name() << nl
+            << "Please specify in fvSchemes in mixingPlane, "
+            << "under field name " << nl
+            << "Available types are "
+            << mixingPlaneInterpolation::mixingTypeNames_.toc()
+            << abort(FatalIOError);
+    }
+}
+
+
+template<class Type>
 void mixingPlaneFvPatchField<Type>::calcFluxMask() const
 {
     // Find the flux field and calculate flux mask
-    if (fluxAveraging_)
+    if (mixing_ == mixingPlaneInterpolation::FLUX_AVERAGING)
     {
         if (!this->db().objectRegistry::found(phiName_))
         {
@@ -56,7 +101,9 @@ void mixingPlaneFvPatchField<Type>::calcFluxMask() const
                 "void mixingPlaneFvPatchField<Type>::calcFluxMask()"
                 ""
             )   << "Flux not found for flux averaging mixing plane on "
-                << this->patch().name() << ".  Flux field: " << phiName_
+                << this->patch().name() << " for field "
+                << this->dimensionedInternalField().name()
+                << ".  Flux field: " << phiName_
                 << endl;
 
             fluxMask_.setSize(mixingPlanePatch_.nProfileBands(), 0);
@@ -157,8 +204,7 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
 :
     coupledFvPatchField<Type>(p, iF),
     mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(p)),
-    fluxAveraging_(false),
-    surfaceAveraging_(true),
+    mixing_(mixingPlaneInterpolation::MIXING_UNKNOWN),
     phiName_("phi"),
     fluxMask_(),
     fluxWeights_(p.size(), 0)
@@ -175,8 +221,7 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
 :
     coupledFvPatchField<Type>(p, iF, dict, false),
     mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(p)),
-    fluxAveraging_(dict.lookup("fluxAveraging")),
-    surfaceAveraging_(dict.lookup("surfaceAveraging")),
+    mixing_(mixingPlaneInterpolation::MIXING_UNKNOWN),
     phiName_(dict.lookupOrDefault<word>("phi", "phi")),
     fluxMask_(),
     fluxWeights_(p.size(), 0)
@@ -202,6 +247,9 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
         // Grab the internal value for initialisation.
         fvPatchField<Type>::operator=(this->patchInternalField()());
     }
+
+    // Read mixing type
+    readMixingType();
 }
 
 
@@ -216,8 +264,7 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
 :
     coupledFvPatchField<Type>(ptf, p, iF, mapper),
     mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(p)),
-    fluxAveraging_(ptf.fluxAveraging_),
-    surfaceAveraging_(ptf.surfaceAveraging_),
+    mixing_(ptf.mixing_),
     phiName_(ptf.phiName_),
     fluxMask_(),
     fluxWeights_(ptf.fluxWeights_, mapper)
@@ -251,8 +298,7 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
     mixingPlaneLduInterfaceField(),
     coupledFvPatchField<Type>(ptf),
     mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(ptf.patch())),
-    fluxAveraging_(ptf.fluxAveraging_),
-    surfaceAveraging_(ptf.surfaceAveraging_),
+    mixing_(ptf.mixing_),
     phiName_(ptf.phiName_),
     fluxMask_(),
     fluxWeights_(ptf.fluxWeights_)
@@ -269,8 +315,7 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
     mixingPlaneLduInterfaceField(),
     coupledFvPatchField<Type>(ptf, iF),
     mixingPlanePatch_(refCast<const mixingPlaneFvPatch>(ptf.patch())),
-    fluxAveraging_(ptf.fluxAveraging_),
-    surfaceAveraging_(ptf.surfaceAveraging_),
+    mixing_(ptf.mixing_),
     phiName_(ptf.phiName_),
     fluxMask_(),
     fluxWeights_(ptf.fluxWeights_)
@@ -303,7 +348,7 @@ void mixingPlaneFvPatchField<Type>::autoMap
     const fvPatchFieldMapper& m
 )
 {
-    fluxMask_.setSize(0),
+    fluxMask_.clear();
     fluxWeights_.autoMap(m);
 }
 
@@ -317,7 +362,7 @@ void mixingPlaneFvPatchField<Type>::rmap
 {
     fvPatchField<Type>::rmap(ptf, addr);
 
-    fluxMask_.setSize(0);
+    fluxMask_.clear();
 
     const mixingPlaneFvPatchField<Type>& tiptf =
         refCast<const mixingPlaneFvPatchField<Type> >(ptf);
@@ -329,6 +374,9 @@ void mixingPlaneFvPatchField<Type>::rmap
 template<class Type>
 void mixingPlaneFvPatchField<Type>::updateCoeffs()
 {
+    // Read mixing type
+    readMixingType();
+
     // Force recalculation of flux masks
     calcFluxMask();
 
@@ -342,7 +390,12 @@ tmp<Field<Type> > mixingPlaneFvPatchField<Type>::patchNeighbourField() const
     // Get shadow patch internalField field
     Field<Type> sField = this->shadowPatchField().patchInternalField();
 
-    if (fluxAveraging_)
+    if (mixing_ == mixingPlaneInterpolation::AREA_AVERAGING)
+    {
+        // Area-weighted averaging
+        return mixingPlanePatch_.interpolate(sField);
+    }
+    else if (mixing_ == mixingPlaneInterpolation::FLUX_AVERAGING)
     {
         // Flux averaging
         // - for outgoing flux, use zero gradient condition
@@ -366,11 +419,24 @@ tmp<Field<Type> > mixingPlaneFvPatchField<Type>::patchNeighbourField() const
             )
           + mixingPlanePatch_.fromProfile(1 - mask)*this->patchInternalField();
     }
+    else if (mixing_ == mixingPlaneInterpolation::ZERO_GRADIENT)
+    {
+        return this->patchInternalField();
+    }
     else
     {
-        // No flux averaging
-        return mixingPlanePatch_.interpolate(sField);
+        FatalErrorIn
+        (
+            "tmp<Field<Type> > mixingPlaneFvPatchField<Type>::"
+            "patchNeighbourField() const"
+        )   << "Unknown mixing type for patch " << this->patch().name()
+            << " for field "
+            <<  this->dimensionedInternalField().name()
+            << abort(FatalError);
     }
+
+    // Dummy return to keep compiler happy
+    return this->patchInternalField();
 }
 
 
@@ -391,11 +457,38 @@ void mixingPlaneFvPatchField<Type>::initEvaluate
 
     const scalarField& w = this->patch().weights();            
 
-    Field<Type>::operator=
+    if
     (
-        w*this->patchInternalField()
-      + (1 - w)*this->patchNeighbourField()
-    );
+        mixing_ == mixingPlaneInterpolation::AREA_AVERAGING
+     || mixing_ == mixingPlaneInterpolation::FLUX_AVERAGING
+    )
+    {
+        Field<Type>::operator=
+        (
+            w*this->mixingPlanePatch_.circumferentialAverage
+            (
+                this->patchInternalField()
+            )
+          + (1 - w)*this->patchNeighbourField()
+        );
+    }
+    else if (mixing_ == mixingPlaneInterpolation::ZERO_GRADIENT)
+    {
+        Field<Type>::operator=(this->patchInternalField());
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "void mixingPlaneFvPatchField<Type>::initEvaluate\n"
+            "(\n"
+            "    const Pstream::commsTypes commsType\n"
+            ")"
+        )   << "Unknown mixing type for patch " << this->patch().name()
+            << " for field "
+            <<  this->dimensionedInternalField().name()
+            << abort(FatalError);
+    }
 }
 
 
@@ -415,7 +508,11 @@ tmp<Field<Type> > mixingPlaneFvPatchField<Type>::valueInternalCoeffs
     const tmp<scalarField>& w
 ) const
 {
-    if (fluxAveraging_)
+    if (mixing_ == mixingPlaneInterpolation::AREA_AVERAGING)
+    {
+        return pTraits<Type>::one*w;
+    }
+    else if (mixing_ == mixingPlaneInterpolation::FLUX_AVERAGING)
     {
         // Flux averaging.
         // When flux averaging indicates outgoing flux,
@@ -431,11 +528,34 @@ tmp<Field<Type> > mixingPlaneFvPatchField<Type>::valueInternalCoeffs
 
         return pTraits<Type>::one*oneMFluxMask;
     }
+    else if (mixing_ == mixingPlaneInterpolation::ZERO_GRADIENT)
+    {
+        return tmp<Field<Type> >
+        (
+            new Field<Type>(this->size(), pTraits<Type>::one)
+        );
+    }
     else
     {
-        return Type(pTraits<Type>::one)*w;
+        FatalErrorIn
+        (
+            "void mixingPlaneFvPatchField<Type>::valueInternalCoeffs\n"
+            "(\n"
+            "    const tmp<scalarField>& w\n"
+            ") const"
+        )   << "Unknown mixing type for patch " << this->patch().name()
+            << " for field "
+            <<  this->dimensionedInternalField().name()
+            << abort(FatalError);
     }
+
+    // Dummy return to keep compiler happy
+    return tmp<Field<Type> >
+    (
+        new Field<Type>(this->size(), pTraits<Type>::zero)
+    );
 }
+
 
 template<class Type>
 tmp<Field<Type> > mixingPlaneFvPatchField<Type>::valueBoundaryCoeffs
@@ -443,7 +563,11 @@ tmp<Field<Type> > mixingPlaneFvPatchField<Type>::valueBoundaryCoeffs
     const tmp<scalarField>& w
 ) const
 {
-    if (fluxAveraging_)
+    if (mixing_ == mixingPlaneInterpolation::AREA_AVERAGING)
+    {
+        return pTraits<Type>::one*(1.0 - w);
+    }
+    else if (mixing_ == mixingPlaneInterpolation::FLUX_AVERAGING)
     {
         // Flux averaging
         const scalarField& mask = fluxMask();
@@ -452,9 +576,281 @@ tmp<Field<Type> > mixingPlaneFvPatchField<Type>::valueBoundaryCoeffs
 
         return pTraits<Type>::one*fluxMask;
     }
+    else if (mixing_ == mixingPlaneInterpolation::ZERO_GRADIENT)
+    {
+        return  tmp<Field<Type> >
+        (
+            new Field<Type>(this->size(), pTraits<Type>::zero)
+        );
+    }
     else
     {
-        return Type(pTraits<Type>::one)*(1.0 - w);
+        FatalErrorIn
+        (
+            "void mixingPlaneFvPatchField<Type>::valueBoundaryCoeffs\n"
+            "(\n"
+            "    const tmp<scalarField>& w\n"
+            ") const"
+        )   << "Unknown mixing type for patch " << this->patch().name()
+            << " for field "
+            <<  this->dimensionedInternalField().name()
+            << abort(FatalError);
+    }
+
+    // Dummy return to keep compiler happy
+    return tmp<Field<Type> >
+    (
+        new Field<Type>(this->size(), pTraits<Type>::zero)
+    );
+}
+
+
+// template<class Type>
+// tmp<Field<Type> >
+// mixingPlaneFvPatchField<Type>::gradientInternalCoeffs() const
+// {
+//     if
+//     (
+//         mixing_ == mixingPlaneInterpolation::AREA_AVERAGING
+//      || mixing_ == mixingPlaneInterpolation::FLUX_AVERAGING
+//     )
+//     {
+//         return -Type(pTraits<Type>::one)*this->patch().deltaCoeffs();
+//     }
+//     else if (mixing_ == mixingPlaneInterpolation::ZERO_GRADIENT)
+//     {
+//         return tmp<Field<Type> >
+//         (
+//             new Field<Type>(this->size(), pTraits<Type>::zero)
+//         );
+//     }
+//     else
+//     {
+//         FatalErrorIn
+//         (
+//             "void mixingPlaneFvPatchField<Type>::gradientInternalCoeffs"
+//             "gradientInternalCoeffs() const"
+//         )   << "Unknown mixing type for patch " << this->patch().name()
+//             << " for field "
+//             <<  this->dimensionedInternalField().name()
+//             << abort(FatalError);
+//     }
+
+//     // Dummy return to keep compiler happy
+//     return tmp<Field<Type> >
+//     (
+//         new Field<Type>(this->size(), pTraits<Type>::zero)
+//     );
+// }
+
+
+// template<class Type>
+// tmp<Field<Type> >
+// mixingPlaneFvPatchField<Type>::gradientBoundaryCoeffs() const
+// {
+//     if
+//     (
+//         mixing_ == mixingPlaneInterpolation::AREA_AVERAGING
+//      || mixing_ == mixingPlaneInterpolation::FLUX_AVERAGING
+//     )
+//     {
+//         -this->gradientInternalCoeffs();
+//     }
+//     else if (mixing_ == mixingPlaneInterpolation::ZERO_GRADIENT)
+//     {
+//         return tmp<Field<Type> >
+//         (
+//             new Field<Type>(this->size(), pTraits<Type>::zero)
+//         );
+//     }
+//     else
+//     {
+//         FatalErrorIn
+//         (
+//             "void mixingPlaneFvPatchField<Type>::gradientBoundaryCoeffs"
+//             "gradientBoundaryCoeffs() const"
+//         )   << "Unknown mixing type for patch " << this->patch().name()
+//             << " for field "
+//             <<  this->dimensionedInternalField().name()
+//             << abort(FatalError);
+//     }
+
+//     // Dummy return to keep compiler happy
+//     return tmp<Field<Type> >
+//     (
+//         new Field<Type>(this->size(), pTraits<Type>::zero)
+//     );
+// }
+
+
+template<class Type>
+void mixingPlaneFvPatchField<Type>::patchInterpolate
+(
+    GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+    const scalarField& pL
+) const
+{
+    // Code moved from surfaceInterpolationScheme.C
+    // HJ, 13/Jun/2013
+    const label patchI = this->patch().index();
+
+    // Read mixing type
+    readMixingType();
+
+    // Use circumferential average of internal field when interpolating to
+    // patch.  HJ and MB, 13/Jun/2013
+    if
+    (
+        mixing_ == mixingPlaneInterpolation::AREA_AVERAGING
+     || mixing_ == mixingPlaneInterpolation::FLUX_AVERAGING
+    )
+    {
+        fField.boundaryField()[patchI] =
+            pL*this->mixingPlanePatch_.circumferentialAverage
+            (
+                this->patchInternalField()
+            )
+          + (1 - pL)*this->patchNeighbourField();
+    }
+    else if (mixing_ == mixingPlaneInterpolation::ZERO_GRADIENT)
+    {
+        fField.boundaryField()[patchI] = this->patchInternalField();
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "void mixingPlaneFvPatchField<Type>::patchInterpolate\n"
+            "(\n"
+            "    GeometricField<Type, fvsPatchField, surfaceMesh>& fField,\n"
+            "    const scalarField& pL\n"
+            ") const"
+        )   << "Unknown mixing type for patch " << this->patch().name()
+            << " for field "
+            <<  this->dimensionedInternalField().name()
+            << abort(FatalError);
+    }
+}
+
+
+template<class Type>
+void mixingPlaneFvPatchField<Type>::patchInterpolate
+(
+    GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+    const scalarField& pL,
+    const scalarField& pY
+) const
+{
+    // Code moved from surfaceInterpolationScheme.C
+    // HJ, 13/Jun/2013
+    const label patchI = this->patch().index();
+
+    // Read mixing type
+    readMixingType();
+
+    // Use circumferential average of internal field when interpolating to
+    // patch.  HJ and MB, 13/Jun/2013
+    if
+    (
+        mixing_ == mixingPlaneInterpolation::AREA_AVERAGING
+     || mixing_ == mixingPlaneInterpolation::FLUX_AVERAGING
+    )
+    {
+        fField.boundaryField()[patchI] =
+            pL*this->mixingPlanePatch_.circumferentialAverage
+            (
+                this->patchInternalField()
+            )
+            + pY*this->patchNeighbourField();
+    }
+    else if (mixing_ == mixingPlaneInterpolation::ZERO_GRADIENT)
+    {
+        fField.boundaryField()[patchI] = this->patchInternalField();
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "void mixingPlaneFvPatchField<Type>::patchInterpolate\n"
+            "(\n"
+            "    GeometricField<Type, fvsPatchField, surfaceMesh>& fField,\n"
+            "    const scalarField& pL,\n"
+            "    const scalarField& pY\n"
+            ") const"
+        )   << "Unknown mixing type for patch " << this->patch().name()
+            << " for field "
+            <<  this->dimensionedInternalField().name()
+            << abort(FatalError);
+    }
+}
+
+
+template<class Type>
+void mixingPlaneFvPatchField<Type>::patchFlux
+(
+    GeometricField<Type, fvsPatchField, surfaceMesh>& flux,
+    const fvMatrix<Type>& matrix
+) const
+{
+    const label patchI = this->patch().index();
+
+    // Read mixing type
+    readMixingType();
+
+    if
+    (
+        mixing_ == mixingPlaneInterpolation::AREA_AVERAGING
+     || mixing_ == mixingPlaneInterpolation::FLUX_AVERAGING
+    )
+    {
+//         flux.boundaryField()[patchI] =
+//             cmptMultiply
+//             (
+//                 matrix.internalCoeffs()[patchI],
+//                 this->mixingPlanePatch_.circumferentialAverage
+//                 (
+//                     this->patchInternalField()
+//                 )
+//             )
+//           - cmptMultiply
+//             (
+//                 matrix.boundaryCoeffs()[patchI],
+//                 mixingPlanePatch_.shadow().circumferentialAverage
+//                 (
+//                     this->patchNeighbourField()
+//                 )
+//             );
+
+        //  Alternative, not sure which is correct
+        flux.boundaryField()[patchI] =
+            cmptMultiply
+            (
+                matrix.internalCoeffs()[patchI],
+                this->patchInternalField()
+            )
+          - cmptMultiply
+            (
+                matrix.boundaryCoeffs()[patchI],
+                this->patchNeighbourField()
+            );
+    }
+    else if (mixing_ == mixingPlaneInterpolation::ZERO_GRADIENT)
+    {
+        flux.boundaryField()[patchI] = pTraits<Type>::zero;
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "void mixingPlaneFvPatchField<Type>::patchFlux\n"
+            "(\n"
+            "    GeometricField<Type, fvsPatchField, surfaceMesh>& fField,\n"
+            "    const fvMatrix<Type>& matrix\n"
+            ") const"
+        )   << "Unknown mixing type for patch " << this->patch().name()
+            << " for field "
+            <<  this->dimensionedInternalField().name()
+            << abort(FatalError);
     }
 }
 
@@ -474,36 +870,67 @@ void mixingPlaneFvPatchField<Type>::initInterfaceMatrixUpdate
     // Communication is allowed either before or after processor
     // patch comms.  HJ, 11/Jul/2011
 
-    // Get shadow face-cells and assemble shadow field
-    const unallocLabelList& sfc = mixingPlanePatch_.shadow().faceCells();
-
-    scalarField sField(sfc.size());
-
-    forAll (sField, i)
+    if
+    (
+        mixing_ == mixingPlaneInterpolation::AREA_AVERAGING
+     || mixing_ == mixingPlaneInterpolation::FLUX_AVERAGING
+    )
     {
-        sField[i] = psiInternal[sfc[i]];
-    }
+        // Get shadow face-cells and assemble shadow field
+        const unallocLabelList& sfc = mixingPlanePatch_.shadow().faceCells();
 
-    // Get local faceCells
-    const unallocLabelList& fc = mixingPlanePatch_.faceCells();
+        scalarField sField(sfc.size());
 
-    scalarField pnf = mixingPlanePatch_.interpolate(sField);
-
-    // Multiply the field by coefficients and add into the result
-    if (switchToLhs)
-    {
-        forAll(fc, elemI)
+        forAll (sField, i)
         {
-            result[fc[elemI]] += coeffs[elemI]*pnf[elemI];
+            sField[i] = psiInternal[sfc[i]];
         }
+
+        // Get local faceCells
+        const unallocLabelList& fc = mixingPlanePatch_.faceCells();
+
+        scalarField pnf = mixingPlanePatch_.interpolate(sField);
+
+        // Multiply the field by coefficients and add into the result
+        if (switchToLhs)
+        {
+            forAll(fc, elemI)
+            {
+                result[fc[elemI]] += coeffs[elemI]*pnf[elemI];
+            }
+        }
+        else
+        {
+            forAll(fc, elemI)
+            {
+                result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
+            }
+        }
+    }
+    else if (mixing_ == mixingPlaneInterpolation::ZERO_GRADIENT)
+    {
+        // Do nothing
     }
     else
     {
-        forAll(fc, elemI)
-        {
-            result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
-        }
+        FatalErrorIn
+        (
+            "void mixingPlaneFvPatchField<Type>::initInterfaceMatrixUpdate\n"
+            "(\n"
+            "    const scalarField& psiInternal,\n"
+            "    scalarField& result,\n"
+            "    const lduMatrix&,\n"
+            "    const scalarField& coeffs,\n"
+            "    const direction cmpt,\n"
+            "    const Pstream::commsTypes commsType,\n"
+            "    const bool switchToLhs\n"
+            ") const"
+        )   << "Unknown mixing type for patch " << this->patch().name()
+            << " for field "
+            <<  this->dimensionedInternalField().name()
+            << abort(FatalError);
     }
+
 }
 
 
@@ -522,70 +949,9 @@ void mixingPlaneFvPatchField<Type>::updateInterfaceMatrix
 
 
 template<class Type>
-void mixingPlaneFvPatchField<Type>::patchInterpolate
-(
-    GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
-    const scalarField& pL
-) const
-{
-    // Code moved from surfaceInterpolationScheme.C
-    // HJ, 13/Jun/2013
-    const label patchI = this->patch().index();
-
-    // Use circumferential average of internal field when interpolating to
-    // patch
-    // HJ and MB, 13/Jun/2013
-    if (surfaceAveraging_)
-    {
-        fField.boundaryField()[patchI] =
-            pL*this->mixingPlanePatch_.circumferentialAverage
-            (
-                this->patchInternalField()
-            )
-          + (1 - pL)*this->patchNeighbourField();
-    }
-    else
-    {
-        fField.boundaryField()[patchI] =
-            pL*this->patchInternalField()
-          + (1 - pL)*this->patchNeighbourField();
-    }
-}
-
-
-template<class Type>
-void mixingPlaneFvPatchField<Type>::patchInterpolate
-(
-    GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
-    const scalarField& pL,
-    const scalarField& pY
-) const
-{
-    // Code moved from surfaceInterpolationScheme.C
-    // HJ, 13/Jun/2013
-    const label patchI = this->patch().index();
-    ::abort(); //HJ, HERE!!!
-    // Use circumferential average of internal field
-    // HJ and MB, 13/Jun/2013
-    fField.boundaryField()[patchI] =
-        pL*this->mixingPlanePatch_.circumferentialAverage
-        (
-            this->patchInternalField()
-        )
-      + pY*this->patchNeighbourField();
-}
-
-
-template<class Type>
 void mixingPlaneFvPatchField<Type>::write(Ostream& os) const
 {
     fvPatchField<Type>::write(os);
-
-    os.writeKeyword("fluxAveraging")
-        << fluxAveraging_ << token::END_STATEMENT << nl;
-
-    os.writeKeyword("surfaceAveraging")
-        << surfaceAveraging_ << token::END_STATEMENT << nl;
 
     this->writeEntryIfDifferent(os, "phi", word("phi"), phiName_);
     this->writeEntry("value", os);

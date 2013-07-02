@@ -165,11 +165,12 @@ public:
         //- Define type of mixing for field over patch
         enum mixingType
         {
-            averageFromNeighbourPatch,
-            averageFromNeighbourCellCenter,
-            averageFromOwnPatch,
-            zeroGradient,
-            doNothing
+            AREA_AVERAGING,
+            FLUX_AVERAGING,
+            UNIFORM_VALUE,
+            UNIFORM_GRADIENT,
+            ZERO_GRADIENT,
+            MIXING_UNKNOWN
         };
 
 
@@ -187,8 +188,8 @@ public:
        //- Stack axis names
        static const NamedEnum<stackAxis, 6> stackAxisNames_;
 
-       //- mixing names
-       static const NamedEnum<mixingType, 5> mixingTypeNames_;
+       //- Mixing names
+       static const NamedEnum<mixingType, 6> mixingTypeNames_;
 
 
     // Constructors
