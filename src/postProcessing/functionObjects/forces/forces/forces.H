@@ -77,7 +77,8 @@ public:
     // pressure/viscous forces Tuples.
     typedef Tuple2<pressureViscous, pressureViscous> forcesMoments;
 
-    //- Sum operation class to accumulate the pressure, viscous forces and moments
+    //- Sum operation class to accumulate the pressure, viscous forces
+    //  and moments
     class sumOp
     {
     public:

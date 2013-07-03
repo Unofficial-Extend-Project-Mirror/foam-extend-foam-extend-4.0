@@ -127,6 +127,12 @@ public:
 
     // Member functions
 
+        // Access
+
+            //- Return shadow patch field
+            const ggiFvPatchField<Type>& shadowPatchField() const;
+
+
         // Evaluation functions
 
             //- Return neighbour field given internal cell data
@@ -149,7 +155,8 @@ public:
                 const lduMatrix& m,
                 const scalarField& coeffs,
                 const direction cmpt,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const;
 
             //- Update result field based on interface functionality
@@ -160,7 +167,8 @@ public:
                 const lduMatrix&,
                 const scalarField& coeffs,
                 const direction cmpt,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const;
 
 

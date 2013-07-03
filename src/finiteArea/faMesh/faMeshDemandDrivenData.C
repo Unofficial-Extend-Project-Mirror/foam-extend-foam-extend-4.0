@@ -122,9 +122,9 @@ void faMesh::calcLe() const
             IOobject
             (
                 "Le",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimLength
@@ -226,9 +226,9 @@ void faMesh::calcMagLe() const
             IOobject
             (
                 "magLe",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimLength
@@ -287,9 +287,9 @@ void faMesh::calcAreaCentres() const
             IOobject
             (
                 "centres",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimLength
@@ -319,6 +319,7 @@ void faMesh::calcAreaCentres() const
 
     forAll(centres.boundaryField(), patchI)
     {
+        //HJ: this is wrong!  5/Aug/2011
         if
         (
             isA<processorFaPatchVectorField>
@@ -328,7 +329,7 @@ void faMesh::calcAreaCentres() const
         )
         {
             centres.boundaryField()[patchI].initEvaluate();
-            centres.boundaryField()[patchI].evaluate();            
+            centres.boundaryField()[patchI].evaluate();
         }
     }
 }
@@ -357,9 +358,9 @@ void faMesh::calcEdgeCentres() const
             IOobject
             (
                 "edgeCentres",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimLength
@@ -417,12 +418,12 @@ void faMesh::calcS() const
         (
             "S",
             time().timeName(),
-            mesh_,
+            mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
         *this,
-        dimVolume
+        dimArea
     );
     DimensionedField<scalar, areaMesh>& S = *SPtr_;
 
@@ -459,9 +460,9 @@ void faMesh::calcFaceAreaNormals() const
             IOobject
             (
                 "faceAreaNormals",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimless
@@ -488,7 +489,7 @@ void faMesh::calcFaceAreaNormals() const
 
     forAll(faceAreaNormals.boundaryField(), patchI)
     {
-        if 
+        if
         (
             isA<processorFaPatchVectorField>
             (
@@ -497,7 +498,7 @@ void faMesh::calcFaceAreaNormals() const
         )
         {
             faceAreaNormals.boundaryField()[patchI].initEvaluate();
-            faceAreaNormals.boundaryField()[patchI].evaluate();            
+            faceAreaNormals.boundaryField()[patchI].evaluate();
         }
     }
 }
@@ -526,9 +527,9 @@ void faMesh::calcEdgeAreaNormals() const
             IOobject
             (
                 "edgeAreaNormals",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimless
@@ -666,9 +667,9 @@ void faMesh::calcFaceCurvatures() const
             IOobject
             (
                 "faceCurvatures",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimless/dimLength
@@ -1293,11 +1294,11 @@ void faMesh::calcPointAreaNormals() const
             if (boundary()[patchI].ngbPolyPatchIndex() == -1)
             {
                 FatalErrorIn
-                    (
-                        "void faMesh::calcPointAreaNormals const"
-                    )   << "Neighbour polyPatch index is not defined "
-                        << "for faPatch " << boundary()[patchI].name()
-                        << abort(FatalError);
+                (
+                    "void faMesh::calcPointAreaNormals const"
+                )   << "Neighbour polyPatch index is not defined "
+                    << "for faPatch " << boundary()[patchI].name()
+                    << abort(FatalError);
             }
 
             labelList patchPoints = boundary()[patchI].pointLabels();
@@ -1849,7 +1850,7 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                             (
                                 mag
                                 (
-                                    allPoints[i] 
+                                    allPoints[i]
                                   - procLsPoints[procI][pointI]
                                 )
                               < tol
@@ -1968,9 +1969,9 @@ tmp<edgeScalarField> faMesh::edgeLengthCorrection() const
             IOobject
             (
                 "edgeLengthCorrection",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimless
@@ -2015,8 +2016,7 @@ tmp<edgeScalarField> faMesh::edgeLengthCorrection() const
         }
     }
 
-
-	return tcorrection;
+    return tcorrection;
 }
 
 

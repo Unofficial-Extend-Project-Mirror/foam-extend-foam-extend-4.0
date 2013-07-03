@@ -91,10 +91,10 @@ public:
     // Member Functions
 
         //- Return the laminar viscosity
-        const volScalarField& nu() const;
+        virtual const volScalarField& nu() const;
 
         //- Correct the laminar viscosity
-        void correct();
+        virtual void correct();
 
         //- Read transportProperties dictionary
         virtual bool read();

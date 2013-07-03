@@ -69,6 +69,7 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         bool meshChanged = mesh.update();
+        reduce(meshChanged, orOp<bool>());
 
 #       include "volContinuity.H"
 
@@ -120,11 +121,11 @@ int main(int argc, char *argv[])
                  && nonOrth == nNonOrthCorr
                 )
                 {
-                    pEqn.solve(mesh.solver(p.name() + "Final"));
+                    pEqn.solve(mesh.solutionDict().solver(p.name() + "Final"));
                 }
                 else
                 {
-                    pEqn.solve(mesh.solver(p.name()));
+                    pEqn.solve(mesh.solutionDict().solver(p.name()));
                 }
 
                 if (nonOrth == nNonOrthCorr)

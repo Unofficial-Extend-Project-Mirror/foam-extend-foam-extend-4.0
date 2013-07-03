@@ -62,7 +62,7 @@ Foam::radiation::P1::P1(const volScalarField& T)
         (
             "G",
             mesh_.time().timeName(),
-            mesh_,
+            T.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -87,7 +87,7 @@ Foam::radiation::P1::P1(const volScalarField& T)
         (
             "a",
             mesh_.time().timeName(),
-            mesh_,
+            T.db(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -100,7 +100,7 @@ Foam::radiation::P1::P1(const volScalarField& T)
         (
             "e",
             mesh_.time().timeName(),
-            mesh_,
+            T.db(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -113,7 +113,7 @@ Foam::radiation::P1::P1(const volScalarField& T)
         (
             "E",
             mesh_.time().timeName(),
-            mesh_,
+            T.db(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),

@@ -162,8 +162,10 @@ public:
                 const lduMatrix&,
                 const scalarField& coeffs,
                 const direction cmpt,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const;
+
 
         // Block coupled interface functionality
 
@@ -174,11 +176,17 @@ public:
                 Field<Type>&,
                 const BlockLduMatrix<Type>&,
                 const CoeffField<Type>&,
-                const Pstream::commsTypes commsType
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
             ) const
             {
-                notImplemented("cyclicFvPatchField<Type>::updateInterfaceMatrix for block matrices")
+                notImplemented
+                (
+                    "cyclicFvPatchField<Type>::"
+                    "updateInterfaceMatrix for block matrices"
+                );
             }
+
 
         //- Cyclic coupled interface functions
 

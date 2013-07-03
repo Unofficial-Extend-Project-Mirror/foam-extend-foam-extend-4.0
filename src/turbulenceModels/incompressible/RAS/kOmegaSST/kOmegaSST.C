@@ -205,11 +205,11 @@ kOmegaSST::kOmegaSST
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        autoCreateK("k", mesh_)
+        autoCreateK("k", mesh_, U_.db())
     ),
     omega_
     (
@@ -217,11 +217,11 @@ kOmegaSST::kOmegaSST
         (
             "omega",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        autoCreateOmega("omega", mesh_)
+        autoCreateOmega("omega", mesh_, U_.db())
     ),
     nut_
     (
@@ -229,11 +229,11 @@ kOmegaSST::kOmegaSST
         (
             "nut",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        autoCreateNut("nut", mesh_)
+        autoCreateNut("nut", mesh_, U_.db())
     )
 {
     bound(omega_, omega0_);
@@ -257,7 +257,7 @@ tmp<volSymmTensorField> kOmegaSST::R() const
             (
                 "R",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -278,7 +278,7 @@ tmp<volSymmTensorField> kOmegaSST::devReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -375,7 +375,9 @@ void kOmegaSST::correct()
 
     omegaEqn().relax();
 
-    omegaEqn().boundaryManipulate(omega_.boundaryField());
+    // No longer needed: matrix completes at the point of solution
+    // HJ, 17/Apr/2012
+//     omegaEqn().completeAssembly();
 
     solve(omegaEqn);
     bound(omega_, omega0_);
@@ -399,6 +401,7 @@ void kOmegaSST::correct()
 
     // Re-calculate viscosity
     nut_ = a1_*k_/max(a1_*omega_, F2()*sqrt(2*S2));
+    nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 }
 

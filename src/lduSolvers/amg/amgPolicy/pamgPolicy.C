@@ -31,10 +31,11 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "pamgPolicy.H"
 #include "amgMatrix.H"
+#include "boolList.H"
 #include "addToRunTimeSelectionTable.H"
 #include "GAMGInterfaceField.H"
 
@@ -47,6 +48,12 @@ namespace Foam
     addToRunTimeSelectionTable(amgPolicy, pamgPolicy, matrix);
 
 } // End namespace Foam
+
+
+const Foam::scalar Foam::pamgPolicy::diagFactor_
+(
+    debug::tolerances("pamgDiagFactor", 1e-8)
+);
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -117,12 +124,91 @@ void Foam::pamgPolicy::calcChild()
         }
     }
 
+    // Reset child array
+    child_ = -1;
 
-    // Go through the off-diagonal and create clusters, marking the child array
-    child_ = labelField(nEqns, -1);
+    // Calculate agglomeration
+
+    // Get matrix coefficients
+    const scalarField& diag = matrix_.diag();
+
+    scalarField magOffDiag;
+
+    if (matrix_.asymmetric())
+    {
+        magOffDiag = Foam::max(mag(matrix_.upper()), mag(matrix_.lower()));
+    }
+    else if (matrix_.symmetric())
+    {
+        magOffDiag = mag(matrix_.upper());
+    }
+    else
+    {
+        // Diag only matrix.  Reset and return
+        child_ = 0;
+        nCoarseEqns_ = 1;
+
+        return;
+    }
 
     nCoarseEqns_ = 0;
 
+    // Gather disconnected and weakly connected equations into cluster zero
+    // Weak connection is assumed to be the one where the off-diagonal
+    // coefficient is smaller than diagFactor_*diag
+    {
+        // Algorithm
+        // Mark all cells to belong to zero cluster
+        // Go through all upper and lower coefficients and for the ones
+        // larger than threshold mark the equations out of cluster zero
+
+        scalarField magScaledDiag = diagFactor_*mag(diag);
+
+        boolList zeroCluster(diag.size(), true);
+
+        forAll (magOffDiag, coeffI)
+        {
+            if (magOffDiag[coeffI] > magScaledDiag[upperAddr[coeffI]])
+            {
+                zeroCluster[upperAddr[coeffI]] = false;
+            }
+
+            if (magOffDiag[coeffI] > magScaledDiag[lowerAddr[coeffI]])
+            {
+                zeroCluster[lowerAddr[coeffI]] = false;
+            }
+        }
+
+        // Collect solo equations
+        label nSolo = 0;
+
+        forAll (zeroCluster, eqnI)
+        {
+            if (zeroCluster[eqnI])
+            {
+                // Found solo equation
+                nSolo++;
+
+                child_[eqnI] = nCoarseEqns_;
+            }
+        }
+
+        reduce(nSolo, sumOp<label>());
+
+        if (nSolo > 0)
+        {
+            // Found solo equations
+            nCoarseEqns_++;
+
+            if (lduMatrix::debug >= 2)
+            {
+                Info<< "Found " << nSolo << " weakly connected equations."
+                    << endl;
+            }
+        }
+    }
+
+    // Go through the off-diagonal and create clusters, marking the child array
     for (label eqnI = 0; eqnI < nEqns; eqnI++)
     {
         if (child_[eqnI] < 0)

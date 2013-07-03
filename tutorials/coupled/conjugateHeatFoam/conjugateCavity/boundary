@@ -1,6 +1,6 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
@@ -10,51 +10,52 @@ FoamFile
     version     2.0;
     format      ascii;
     class       polyBoundaryMesh;
+    location    "constant/polyMesh";
     object      boundary;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 5
 (
-movingWall
-{
-    type wall;
-    nFaces 10;
-    startFace 180;
-}
+    movingWall
+    {
+        type            wall;
+        nFaces          15;
+        startFace       420;
+    }
+    left
+    {
+        type            wall;
+        nFaces          15;
+        startFace       435;
+    }
+    right
+    {
+        type            regionCouple;
+        nFaces          15;
+        startFace       450;
 
-left
-{
-    type wall;
-    nFaces 10;
-    startFace 190;
-}
+        zone            rightZone;
+        shadowRegion    solid;
+        shadowPatch     left;
 
-right
-{
-    type regionCouple;
-    nFaces 10;
-    startFace 200;
-
-    shadowRegion    solid;
-    shadowPatch     left;
-    attached        on;
-    isWall          yes;
-}
-
-bottom
-{
-    type wall;
-    nFaces 10;
-    startFace 210;
-}
-
-frontAndBack
-{
-    type empty;
-    nFaces 200;
-    startFace 220;
-}
+        master          yes;
+        attached        on;
+        isWall          yes;
+        bridgeOverlap   no;
+    }
+    bottom
+    {
+        type            wall;
+        nFaces          15;
+        startFace       465;
+    }
+    frontAndBack
+    {
+        type            empty;
+        nFaces          450;
+        startFace       480;
+    }
 )
 
 // ************************************************************************* //

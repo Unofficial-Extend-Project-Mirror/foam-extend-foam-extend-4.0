@@ -23,6 +23,7 @@ $(constraintFvPatches)/processor/processorFvPatch.C
 $(constraintFvPatches)/ggi/ggiFvPatch.C
 $(constraintFvPatches)/cyclicGgi/cyclicGgiFvPatch.C
 $(constraintFvPatches)/overlapGgi/overlapGgiFvPatch.C
+$(constraintFvPatches)/mixingPlane/mixingPlaneFvPatch.C
 $(constraintFvPatches)/regionCouple/regionCoupleFvPatch.C
 
 derivedFvPatches = $(fvPatches)/derived
@@ -110,7 +111,8 @@ $(constraintFvPatchFields)/wedge/wedgeFvPatchScalarField.C
 $(constraintFvPatchFields)/ggi/ggiFvPatchFields.C
 $(constraintFvPatchFields)/cyclicGgi/cyclicGgiFvPatchFields.C
 $(constraintFvPatchFields)/overlapGgi/overlapGgiFvPatchFields.C
-$(constraintFvPatchFields)/regionCouple/regionCoupleFvPatchFields.C
+$(constraintFvPatchFields)/mixingPlane/mixingPlaneFvPatchFields.C
+$(constraintFvPatchFields)/regionCoupling/regionCouplingFvPatchFields.C
 
 derivedFvPatchFields = $(fvPatchFields)/derived
 $(derivedFvPatchFields)/activeBaffleVelocity/activeBaffleVelocityFvPatchVectorField.C
@@ -185,8 +187,8 @@ $(constraintFvsPatchFields)/wedge/wedgeFvsPatchFields.C
 $(constraintFvsPatchFields)/ggi/ggiFvsPatchFields.C
 $(constraintFvsPatchFields)/cyclicGgi/cyclicGgiFvsPatchFields.C
 $(constraintFvsPatchFields)/overlapGgi/overlapGgiFvsPatchFields.C
-$(constraintFvsPatchFields)/regionCouple/regionCoupleFvsPatchFields.C
-
+$(constraintFvsPatchFields)/mixingPlane/mixingPlaneFvsPatchFields.C
+$(constraintFvsPatchFields)/regionCoupling/regionCouplingFvsPatchFields.C
 
 fields/volFields/volFields.C
 fields/surfaceFields/surfaceFields.C
@@ -209,8 +211,9 @@ $(interpolation)/interpolationCellPointWallModified/makeInterpolationCellPointWa
 volPointInterpolation = interpolation/volPointInterpolation
 $(volPointInterpolation)/pointPatchInterpolation/pointPatchInterpolation.C
 $(volPointInterpolation)/volPointInterpolation.C
-interpolation/pointVolInterpolation/pointVolInterpolation.C
 
+pointVolInterpolation = interpolation/pointVolInterpolation
+$(pointVolInterpolation)/pointVolInterpolation.C
 
 surfaceInterpolation = interpolation/surfaceInterpolation
 $(surfaceInterpolation)/surfaceInterpolation/surfaceInterpolation.C
@@ -227,6 +230,7 @@ $(schemes)/skewCorrected/skewCorrected.C
 $(schemes)/outletStabilised/outletStabilised.C
 $(schemes)/reverseLinear/reverseLinear.C
 $(schemes)/clippedLinear/clippedLinear.C
+$(schemes)/harmonic/magLongDelta.C
 $(schemes)/harmonic/harmonic.C
 $(schemes)/fixedBlended/fixedBlended.C
 $(schemes)/localBlended/localBlended.C
@@ -339,6 +343,11 @@ $(convectionSchemes)/gaussConvectionScheme/gaussConvectionSchemes.C
 $(convectionSchemes)/noConvectionScheme/noConvectionSchemes.C
 $(convectionSchemes)/explicitConvectionScheme/explicitConvectionSchemes.C
 $(convectionSchemes)/multivariateGaussConvectionScheme/multivariateGaussConvectionSchemes.C
+
+adjConvectionSchemes = finiteVolume/adjConvectionSchemes
+$(adjConvectionSchemes)/adjConvectionScheme/adjConvectionSchemes.C
+$(adjConvectionSchemes)/noAdjConvectionScheme/noAdjConvectionSchemes.C
+$(adjConvectionSchemes)/explicitAdjConvectionScheme/explicitAdjConvectionSchemes.C
 
 laplacianSchemes = finiteVolume/laplacianSchemes
 $(laplacianSchemes)/laplacianScheme/laplacianSchemes.C

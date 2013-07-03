@@ -30,7 +30,8 @@ License
 
 Foam::autoPtr<Foam::psiChemistryModel> Foam::psiChemistryModel::New
 (
-    const fvMesh& mesh
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 {
     word psiChemistryModelType;
@@ -47,7 +48,7 @@ Foam::autoPtr<Foam::psiChemistryModel> Foam::psiChemistryModel::New
             (
                 "chemistryProperties",
                 mesh.time().constant(),
-                mesh,
+                obj,
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE
             )
@@ -83,7 +84,7 @@ Foam::autoPtr<Foam::psiChemistryModel> Foam::psiChemistryModel::New
     {
         if (debug)
         {
-            FatalErrorIn("psiChemistryModelBase::New(const mesh&)")
+            FatalErrorIn("psiChemistryModelBase::New(const mesh&, const obejctRegistry&)")
                 << "Unknown psiChemistryModel type " << psiChemistryModelType
                 << nl << nl << "Valid psiChemistryModel types are:" << nl
                 << fvMeshConstructorTablePtr_->toc() << nl << exit(FatalError);
@@ -96,7 +97,7 @@ Foam::autoPtr<Foam::psiChemistryModel> Foam::psiChemistryModel::New
                 models[i] = models[i].replace(typeName + ',', "");
             }
 
-            FatalErrorIn("psiChemistryModelBase::New(const mesh&)")
+            FatalErrorIn("psiChemistryModelBase::New(const mesh&, const obejctRegistry&)")
                 << "Unknown psiChemistryModel type " << userModel
                 << nl << nl << "Valid psiChemistryModel types are:" << nl
                 << models << nl << exit(FatalError);
@@ -104,7 +105,7 @@ Foam::autoPtr<Foam::psiChemistryModel> Foam::psiChemistryModel::New
     }
 
     return autoPtr<psiChemistryModel>
-        (cstrIter()(mesh, typeName, thermoTypeName));
+        (cstrIter()(mesh, obj, typeName, thermoTypeName));
 }
 
 

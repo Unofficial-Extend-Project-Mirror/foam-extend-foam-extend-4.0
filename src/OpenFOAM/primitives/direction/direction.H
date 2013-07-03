@@ -27,21 +27,24 @@ Primitive
 
 Description
     Direction is an integer type used to represent the Cartesian directions
-    etc.  Currently it is a typedef to char which is limited to the range
-    (0, 255) which should be adequate.
+    etc.  Due to the extension of block matrix with lots of components
+    this is upgraded to unsigned int.  Request by David Gaden, 25/Nov/2012
+    HJ, 31/May/2012
 
 \*---------------------------------------------------------------------------*/
 
 #ifndef direction_H
 #define direction_H
 
-#include "char.H"
+#include "int.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    typedef unsigned char direction;
+//     typedef unsigned char direction;
+    // HJ, 31/May/2012
+    typedef unsigned int direction;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

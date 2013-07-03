@@ -79,7 +79,9 @@ alias _foamSource 'if ($?FOAM_VERBOSE && $?prompt) echo "Sourcing: \!*"; source 
 # Add in preset user or site preferences:
 set foamPrefs=`$WM_PROJECT_DIR/bin/foamEtcFile prefs.csh`
 if ( $status == 0 ) then
-    _foamSource $foamPrefs
+    if ($foamPrefs) then
+        _foamSource $foamPrefs
+     endif
 endif
 unset foamPrefs
 
@@ -108,7 +110,7 @@ if ( ! $?WM_OSTYPE ) setenv WM_OSTYPE POSIX
 # Compiler: set to Gcc, Gcc43 or Icc (for Intel's icc)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if ( ! $?WM_COMPILER ) setenv WM_COMPILER Gcc
-#setenv WM_COMPILER Gcc
+setenv WM_COMPILER Gcc
 #setenv WM_COMPILER Icc
 
 setenv WM_COMPILER_ARCH
@@ -126,7 +128,7 @@ if ( ! $?WM_ARCH_OPTION ) setenv WM_ARCH_OPTION 64
 if ( ! $?WM_PRECISION_OPTION ) setenv WM_PRECISION_OPTION DP
 
 # WM_COMPILE_OPTION = Opt | Debug | Prof
-#if ( ! $?WM_COMPILE_OPTION ) setenv WM_COMPILE_OPTION Opt
+if ( ! $?WM_COMPILE_OPTION ) setenv WM_COMPILE_OPTION Opt
 setenv WM_COMPILE_OPTION Opt
 #setenv WM_COMPILE_OPTION Debug
 

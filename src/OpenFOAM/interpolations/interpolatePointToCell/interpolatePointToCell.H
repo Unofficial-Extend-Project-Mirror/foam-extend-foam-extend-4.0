@@ -26,7 +26,7 @@ Global
     interpolatePointToCell
 
 Description
-    Interpolates (averages) the vertex values to the cell center.
+    Interpolates (averages) the vertex values to the cell centre.
 
 SourceFiles
     interpolatePointToCell.C
@@ -47,7 +47,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Interpolate field to cell center
+// Interpolate field to cell centre
 template<class Type>
 Type interpolatePointToCell
 (

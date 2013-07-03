@@ -108,7 +108,7 @@ dynSmagorinsky::dynSmagorinsky
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),

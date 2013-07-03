@@ -62,7 +62,7 @@ SourceFiles
 #include "IOPtrList.H"
 
 #include "volFieldsFwd.H"
-#include "fvMatrix.H"
+#include "fvMatrices.H"
 #include "geometricOneField.H"
 
 

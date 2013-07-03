@@ -38,7 +38,7 @@ SourceFiles
 #ifndef epsilonWallFunctionFvPatchScalarField_H
 #define epsilonWallFunctionFvPatchScalarField_H
 
-#include "fixedInternalValueFvPatchField.H"
+#include "fixedInternalValueFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,7 +55,7 @@ namespace RASModels
 
 class epsilonWallFunctionFvPatchScalarField
 :
-    public fixedInternalValueFvPatchField<scalar>
+    public fixedInternalValueFvPatchScalarField
 {
     // Private data
 
@@ -167,7 +167,10 @@ public:
             virtual void updateCoeffs();
 
             //- Evaluate the patchField
-            virtual void evaluate(const Pstream::commsTypes);
+            virtual void evaluate
+            (
+                const Pstream::commsTypes  = Pstream::blocking
+            );
 
 
         // I-O

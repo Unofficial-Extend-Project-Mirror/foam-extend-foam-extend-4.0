@@ -192,7 +192,7 @@ void Foam::sigFpe::set(const bool verbose)
     {
         if (verbose)
         {
-            Info<< "SigFpe : Enabling floating point exception trapping"
+            Info<< "SigFpe   : Enabling floating point exception trapping"
                 << " (FOAM_SIGFPE)." << endl;
         }
 

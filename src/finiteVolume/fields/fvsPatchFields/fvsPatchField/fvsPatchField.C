@@ -150,7 +150,24 @@ fvsPatchField<Type>::fvsPatchField
 template<class Type>
 const objectRegistry& fvsPatchField<Type>::db() const
 {
-    return patch_.boundaryMesh().mesh();
+    //HR 12.3.10: Lookup fields from the field DB rather than the mesh
+    return internalField_.db();
+}
+
+
+template<class Type>
+template<class GeometricField, class Type2>
+const typename GeometricField::PatchFieldType& Foam::fvsPatchField<Type>::lookupPatchField
+(
+    const word& name,
+    const GeometricField*,
+    const Type2*
+) const
+{
+    return patch_.patchField<GeometricField, Type2>
+    (
+        internalField_.db().objectRegistry::lookupObject<GeometricField>(name)
+    );
 }
 
 
@@ -158,6 +175,18 @@ template<class Type>
 void fvsPatchField<Type>::check(const fvsPatchField<Type>& ptf) const
 {
     if (&patch_ != &(ptf.patch_))
+    {
+        FatalErrorIn("PatchField<Type>::check(const fvsPatchField<Type>&)")
+            << "different patches for fvsPatchField<Type>s"
+            << abort(FatalError);
+    }
+}
+
+
+template<class Type>
+void fvsPatchField<Type>::check(const fvPatchField<Type>& ptf) const
+{
+    if (&patch_ != &(ptf.patch()))
     {
         FatalErrorIn("PatchField<Type>::check(const fvsPatchField<Type>&)")
             << "different patches for fvsPatchField<Type>s"
@@ -277,6 +306,17 @@ void fvsPatchField<Type>::operator/=
     }
 
     Field<Type>::operator/=(ptf);
+}
+
+
+template<class Type>
+void fvsPatchField<Type>::operator=
+(
+    const fvPatchField<Type>& ptf
+)
+{
+    check(ptf);
+    Field<Type>::operator=(ptf);
 }
 
 

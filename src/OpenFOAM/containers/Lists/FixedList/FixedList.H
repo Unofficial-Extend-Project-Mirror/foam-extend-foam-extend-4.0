@@ -102,6 +102,12 @@ public:
         ) const;
     };
 
+    // Static data members
+
+        //- Empty list
+        static const FixedList<T, Size> zero;
+
+
     // Static Member Functions
 
         //- Return a null FixedList

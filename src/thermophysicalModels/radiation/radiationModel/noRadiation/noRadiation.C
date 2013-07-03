@@ -86,7 +86,7 @@ Foam::tmp<Foam::volScalarField> Foam::radiation::noRadiation::Rp() const
             (
                 "Rp",
                 mesh_.time().timeName(),
-                mesh_,
+                T_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -113,7 +113,7 @@ Foam::radiation::noRadiation::Ru() const
             (
                 "Ru",
                 mesh_.time().timeName(),
-                mesh_,
+                T_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

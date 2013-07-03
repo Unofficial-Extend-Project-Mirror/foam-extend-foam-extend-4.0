@@ -104,6 +104,16 @@ Foam::fvMatrix<Foam::scalar>::fvSolver::solve
     const dictionary& solverControls
 )
 {
+    if (debug)
+    {
+        Info<< "fvScalarMatrix::solve(const dictionary&) : "
+               "solving fvScalarMatrix"
+            << endl;
+    }
+
+    // Complete matrix assembly.  HJ, 17/Apr/2012
+    fvMat_.completeAssembly();
+
     scalarField saveDiag = fvMat_.diag();
     fvMat_.addBoundaryDiag(fvMat_.diag(), 0);
 
@@ -138,6 +148,9 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Foam::scalar>::solve
             << endl;
     }
 
+    // Complete matrix assembly.  HJ, 17/Apr/2012
+    completeAssembly();
+
     scalarField saveDiag = diag();
     addBoundaryDiag(diag(), 0);
 
@@ -161,6 +174,7 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Foam::scalar>::solve
 
     solverPerf.print();
 
+    // Diagonal has been restored, clear complete assembly flag?
     diag() = saveDiag;
 
     psi_.correctBoundaryConditions();
@@ -172,6 +186,10 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Foam::scalar>::solve
 template<>
 Foam::tmp<Foam::scalarField> Foam::fvMatrix<Foam::scalar>::residual() const
 {
+    // Complete matrix assembly.  HJ, 17/Apr/2012
+    fvMatrix<scalar>& m = const_cast<fvMatrix<scalar>&>(*this);
+    m.completeAssembly();
+
     scalarField boundaryDiag(psi_.size(), 0.0);
     addBoundaryDiag(boundaryDiag, 0);
 

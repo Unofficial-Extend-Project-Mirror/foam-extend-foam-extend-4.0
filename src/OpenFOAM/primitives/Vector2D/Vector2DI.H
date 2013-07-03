@@ -90,6 +90,26 @@ inline Cmpt& Vector2D<Cmpt>::y()
 }
 
 
+template <class Cmpt>
+inline const Cmpt& Vector2D<Cmpt>::operator()
+(
+    const direction i
+) const
+{
+    return this->operator[](i);
+}
+
+
+template <class Cmpt>
+inline Cmpt& Vector2D<Cmpt>::operator()
+(
+    const direction i
+)
+{
+    return this->operator[](i);
+}
+
+
 // * * * * * * * * * * * * * * * Global Operators  * * * * * * * * * * * * * //
 
 template <class Cmpt>

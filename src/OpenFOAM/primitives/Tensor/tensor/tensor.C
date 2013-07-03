@@ -201,12 +201,6 @@ vector eigenValues(const tensor& t)
 
 vector eigenVector(const tensor& t, const scalar lambda)
 {
-    // Not sure if this is OK.  HJ, 9/Jul/2010
-//    if (mag(lambda) < SMALL)
-//    {
-//        return vector::zero;
-//    }
-
     // Construct the matrix for the eigenvector problem
     tensor A(t - lambda*I);
 
@@ -278,6 +272,59 @@ tensor eigenVectors(const tensor& t)
         (mag(evals.y()) < SMALL) ? vector(0, 1, 0) : eigenVector(t, evals.y()),
         (mag(evals.z()) < SMALL) ? vector(1, 0, 0) : eigenVector(t, evals.z())
     );
+
+    // Test for null eigen values to return a not null eigen vector.
+    // Jovani Favero, 18/Nov/2009. Adjusted by HJ, to correct for multiple zero
+    // entries in eigenvalues
+
+    // Start with largest eigen-value: if this is zero, all are zero
+    // and xyz tensor is returned
+    if (mag(evals.z()) < SMALL)
+    {
+        return evs;
+    }
+
+    // One valid eigen-vector.  Manufacture second and third direction
+    // as orthogonal vectors onto the first one with arbitrary orientation
+    if (mag(evals.y()) < SMALL)
+    {
+        // Take the z eigenvector and find a non-zero component
+        vector zVec = evs.z();
+
+        vector yVec;
+
+        if (mag(zVec.z()) > 0)
+        {
+            // Rotate z into y
+            yVec = vector(zVec.x(), -zVec.z(), zVec.y());
+        }
+        else if (mag(zVec.y()) > 0)
+        {
+            // Rotate y into x
+            yVec = vector(-zVec.y(), zVec.x(), zVec.z());
+        }
+        else
+        {
+            // Rotate x into z
+            yVec = vector(zVec.z(), zVec.y(), -zVec.x());
+        }
+            
+        vector xVec = yVec ^ zVec;
+
+        // Note different return
+        return tensor(xVec, yVec, zVec);
+    }
+
+    if (mag(evals.x()) < SMALL)
+    {
+        // Calculate the third eigen-vector as the cross-product of the others
+        vector xCross = evs.y() ^ evs.z();
+        xCross /= mag(xCross);
+
+        evs.xx() = xCross.x();
+        evs.xy() = xCross.y();
+        evs.xz() = xCross.z();
+    }
 
     return evs;
 }
@@ -463,6 +510,9 @@ tensor eigenVectors(const symmTensor& t)
 
     // Modification for strict-aliasing compliance.
     // Sandeep Menon, 01/Dec/2010
+
+    // Test for null eigen values to return a not null eigen vector
+    // Jovani Favero, 18/Nov/2009
     tensor evs
     (
         (mag(evals.x()) < SMALL) ? vector(0, 0, 1) : eigenVector(t, evals.x()),
@@ -470,36 +520,54 @@ tensor eigenVectors(const symmTensor& t)
         (mag(evals.z()) < SMALL) ? vector(1, 0, 0) : eigenVector(t, evals.z())
     );
 
-    /*
-    // Test for null eigen values to return a not null eigen vector.
-    // Jovani Favero, 18/Nov/2009
-    if (mag(evals.x()) < SMALL)
-    {
-        evs.x() = vector(0, 0, 1);
-    }
-    else
-    {
-        evs.x() = eigenVector(t, evals.x());
-    }
-
-    if (mag(evals.y()) < SMALL)
-    {
-        evs.y() = vector(0, 1, 0);
-    }
-    else
-    {
-        evs.y() = eigenVector(t, evals.y());
-    }
-
+    // Start with largest eigen-value: if this is zero, all are zero
+    // and original tensor is returned
     if (mag(evals.z()) < SMALL)
     {
-        evs.z() = vector(1, 0, 0);
+        return evs;
     }
-    else
+
+    // One valid eigen-vector.  Manufacture second and third direction
+    // as orthogonal vectors onto the first one with arbitrary orientation
+    if (mag(evals.y()) < SMALL)
     {
-        evs.z() = eigenVector(t, evals.z());
+        // Take the z eigenvector and find a non-zero component
+        vector zVec = evs.z();
+
+        vector yVec;
+
+        if (mag(zVec.z()) > 0)
+        {
+            // Rotate z into y
+            yVec = vector(zVec.x(), -zVec.z(), zVec.y());
+        }
+        else if (mag(zVec.y()) > 0)
+        {
+            // Rotate y into x
+            yVec = vector(-zVec.y(), zVec.x(), zVec.z());
+        }
+        else
+        {
+            // Rotate x into z
+            yVec = vector(zVec.z(), zVec.y(), -zVec.x());
+        }
+            
+        vector xVec = yVec ^ zVec;
+
+        // Note different return
+        return tensor(xVec, yVec, zVec);
     }
-    */
+
+    if (mag(evals.x()) < SMALL)
+    {
+        // Calculate the third eigen-vector as the cross-product of the others
+        vector xCross = evs.y() ^ evs.z();
+        xCross /= mag(xCross);
+
+        evs.xx() = xCross.x();
+        evs.xy() = xCross.y();
+        evs.xz() = xCross.z();
+    }
 
     return evs;
 }
@@ -520,32 +588,34 @@ tensor hinv(const tensor& t)
         vector eig = eigenValues(t);
         tensor eigVecs = eigenVectors(t);
 
-        tensor zeroInv(tensor::zero);
+        tensor zeroInv = tensor::zero;
 
         // Test if all eigen values are zero.
         // If this happens then eig.z() = SMALL, and hinv(t)
         // returns a zero tensor.
         // Jovani Favero, 18/Nov/2009
+        // Further bug fix: replace > with == and add SMALL to zeroInv
+        // Dominik Christ, 7/Aug/2012
         if (mag(eig.z()) == large*mag(eig.z()))
         {
-            zeroInv +=
-                tensor(sqr(vector(eigVecs.zx(), eigVecs.zy(), eigVecs.zz())));
-
-            eig.z() += SMALL;
+            // Three zero eigen values (z is largest in magnitude).
+            // Return zero inverse
+            return zeroInv;
         }
+
+        // Compare smaller eigen values and if out of range of large
+        // consider them singular
 
         if (mag(eig.z()) > large*mag(eig.x()))
         {
             // Make a tensor out of symmTensor sqr.  HJ, 24/Oct/2009
-            zeroInv +=
-                tensor(sqr(vector(eigVecs.xx(), eigVecs.xy(), eigVecs.xz())));
+            zeroInv += tensor(sqr(eigVecs.x()));
         }
 
         if (mag(eig.z()) > large*mag(eig.y()))
         {
             // Make a tensor out of symmTensor sqr.  HJ, 24/Oct/2009
-            zeroInv +=
-                tensor(sqr(vector(eigVecs.yx(), eigVecs.yy(), eigVecs.yz())));
+            zeroInv += tensor(sqr(eigVecs.y()));
         }
 
         return inv(t + zeroInv) - zeroInv;
@@ -567,27 +637,32 @@ symmTensor hinv(const symmTensor& t)
         vector eig = eigenValues(t);
         tensor eigVecs = eigenVectors(t);
 
-        symmTensor zeroInv(symmTensor::zero);
+        symmTensor zeroInv = symmTensor::zero;
 
         // Test if all eigen values are zero,
         // If this happens then eig.z() = SMALL
         // and hinv(t) return a zero tensor.
         // Jovani Favero, 18/Nov/2009
+        // Further bug fix: replace > with == and add SMALL to zeroInv
+        // Dominik Christ, 7/Aug/2012
         if (mag(eig.z()) == large*mag(eig.z()))
         {
-            zeroInv += sqr(vector(eigVecs.zx(), eigVecs.zy(), eigVecs.zz()));
-            eig.z() += SMALL;
+            // Three zero eigen values (z is largest in magnitude).
+            // Return zero inverse
+            return zeroInv;
         }
+
+        // Compare smaller eigen values and if out of range of large
+        // consider them singular
 
         if (mag(eig.z()) > large*mag(eig.x()))
         {
-            zeroInv += sqr(vector(eigVecs.xx(), eigVecs.xy(), eigVecs.xz()));
+            zeroInv += sqr(eigVecs.x());
         }
 
         if (mag(eig.z()) > large*mag(eig.y()))
         {
-            // singular direction 1
-            zeroInv += sqr(vector(eigVecs.yx(), eigVecs.yy(), eigVecs.yz()));
+            zeroInv += sqr(eigVecs.y());
         }
 
         return inv(t + zeroInv) - zeroInv;

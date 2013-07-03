@@ -69,12 +69,12 @@ void Foam::fanFvPatchField<Foam::scalar>::updateCoeffs()
             Un /=
                 scalarField::subField
                 (
-                    patch().lookupPatchField<volScalarField, scalar>("rho"),
+                    lookupPatchField<volScalarField, scalar>("rho"),
                     size()/2
                 );
         }
 
-        for(label i=1; i<f_.size(); i++)
+        for (label i = 1; i < f_.size(); i++)
         {
             jump_ += f_[i]*pow(Un, i);
         }

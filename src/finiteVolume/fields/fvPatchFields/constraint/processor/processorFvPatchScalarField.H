@@ -45,7 +45,8 @@ void processorFvPatchField<scalar>::initInterfaceMatrixUpdate
     const lduMatrix&,
     const scalarField&,
     const direction,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const;
 
 
@@ -57,7 +58,8 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
     const lduMatrix&,
     const scalarField& coeffs,
     const direction,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const;
 
 
@@ -68,7 +70,8 @@ void processorFvPatchField<scalar>::initInterfaceMatrixUpdate
     scalarField&,
     const BlockLduMatrix<scalar>&,
     const CoeffField<scalar>&,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const;
 
 
@@ -79,7 +82,8 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
     scalarField& result,
     const BlockLduMatrix<scalar>&,
     const CoeffField<scalar>& coeffs,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

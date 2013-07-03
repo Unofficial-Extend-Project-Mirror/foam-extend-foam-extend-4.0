@@ -86,16 +86,15 @@ correctedLnGrad<Type>::correction
             mesh.correctionVectors()
           & linearEdgeInterpolation
             <
-                typename 
+                typename
                 outerProduct<vector, typename pTraits<Type>::cmptType>::type
             >(mesh).interpolate
             (
                 gradScheme<typename pTraits<Type>::cmptType>::New
                 (
                     mesh,
-                    mesh.gradScheme(ssf.name())
+                    mesh.schemesDict().gradScheme(ssf.name())
                 )()
-//                 gaussGrad<typename pTraits<Type>::cmptType>(mesh)
                .grad(vf.component(cmpt))
             )
         );

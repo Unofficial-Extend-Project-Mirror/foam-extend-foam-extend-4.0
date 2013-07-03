@@ -95,13 +95,16 @@ public:
 
         static const char* const typeName;
 
+        //- Empty field
+        static const Field<Type> zero;
+
 
     // Static Member Functions
 
         //- Return a null field
         inline static const Field<Type>& null()
         {
-            return *reinterpret_cast< Field<Type>* >(0);
+            return zero;
         }
 
 

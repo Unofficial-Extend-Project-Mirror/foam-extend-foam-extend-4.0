@@ -44,7 +44,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class fanFvPatchField Declaration
+                          Class fanFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>

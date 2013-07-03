@@ -132,6 +132,8 @@ class fvMatrix
         //  for boundary cells
         FieldField<Field, Type> boundaryCoeffs_;
 
+        //- Has assembly been completed?
+        bool assemblyCompleted_;
 
         //- Face flux field for non-orthogonal correction
         mutable GeometricField<Type, fvsPatchField, surfaceMesh>
@@ -276,6 +278,13 @@ public:
                 return source_;
             }
 
+            //- Access to fvBoundary scalar field containing
+            //  pseudo-matrix coeffs for internal cells
+            const FieldField<Field, Type>& internalCoeffs() const
+            {
+                return internalCoeffs_;
+            }
+
             //- fvBoundary scalar field containing pseudo-matrix coeffs
             //  for internal cells
             FieldField<Field, Type>& internalCoeffs()
@@ -283,11 +292,24 @@ public:
                 return internalCoeffs_;
             }
 
+            //- Access to fvBoundary scalar field containing
+            //  pseudo-matrix coeffs for boundary cells
+            const FieldField<Field, Type>& boundaryCoeffs() const
+            {
+                return boundaryCoeffs_;
+            }
+
             //- fvBoundary scalar field containing pseudo-matrix coeffs
             //  for boundary cells
             FieldField<Field, Type>& boundaryCoeffs()
             {
                 return boundaryCoeffs_;
+            }
+
+            //- Return true if matrix assemble has been completed
+            bool assemblyCompleted() const
+            {
+                return assemblyCompleted_;
             }
 
 
@@ -304,6 +326,7 @@ public:
 
         // Matrix completion functionality
 
+            //- Add the diagonal contribution from boundary
             void addBoundaryDiag
             (
                 scalarField& diag,
@@ -312,12 +335,21 @@ public:
 
             void addCmptAvBoundaryDiag(scalarField& diag) const;
 
+            //- Add the source coefficient from boundary
             void addBoundarySource
             (
                 Field<Type>& source,
-                const bool couples=true
+                const bool couples = true
             ) const;
 
+            //- Correct the boundary source by removing the implicit part
+            //  of boundary source for the solving component
+            void correctImplicitBoundarySource
+            (
+                const FieldField<Field, scalar>& bouCoeffsCmpt,
+                scalarField& sourceCmpt,
+                const direction cmpt
+            ) const;
 
         // Operations
 
@@ -357,12 +389,9 @@ public:
             //  alpha is read from controlDict
             void relax();
 
-            //- Manipulate based on a boundary field
-            void boundaryManipulate
-            (
-                typename GeometricField<Type, fvPatchField, volMesh>::
-                    GeometricBoundaryField& values
-            );
+            //- Complete matrix assembly for solution:
+            //  Manipulate based on a boundary field
+            void completeAssembly();
 
             //- Construct and return the solver
             //  Use the given solver controls

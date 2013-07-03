@@ -41,26 +41,12 @@ fluxFvPatchField<Type>::fluxFvPatchField
 )
 :
     fixedGradientFvPatchField<Type>(p, iF),
-    reactivity_(0),
+    flux_(p.size(), pTraits<Type>::zero),
+    reactivity_(p.size(), 0),
     gammaName_("gamma")
 {
     this->gradient() = pTraits<Type>::zero;
 }
-
-
-template<class Type>
-fluxFvPatchField<Type>::fluxFvPatchField
-(
-    const fluxFvPatchField<Type>& ptf,
-    const fvPatch& p,
-    const DimensionedField<Type, volMesh>& iF,
-    const fvPatchFieldMapper& mapper
-)
-:
-    fixedGradientFvPatchField<Type>(ptf, p, iF, mapper),
-    reactivity_(ptf.reactivity_),
-    gammaName_(ptf.gammaName_)
-{}
 
 
 template<class Type>
@@ -72,7 +58,8 @@ fluxFvPatchField<Type>::fluxFvPatchField
 )
 :
     fixedGradientFvPatchField<Type>(p, iF),
-    reactivity_(readScalar(dict.lookup("reactivity"))),
+    flux_("flux", dict, p.size()),
+    reactivity_("reactivity", dict, p.size()),
     gammaName_(dict.lookup("gamma"))
 {
     // Set dummy gradient
@@ -107,10 +94,27 @@ fluxFvPatchField<Type>::fluxFvPatchField
 template<class Type>
 fluxFvPatchField<Type>::fluxFvPatchField
 (
+    const fluxFvPatchField<Type>& ptf,
+    const fvPatch& p,
+    const DimensionedField<Type, volMesh>& iF,
+    const fvPatchFieldMapper& mapper
+)
+:
+    fixedGradientFvPatchField<Type>(ptf, p, iF, mapper),
+    flux_(ptf.flux_),
+    reactivity_(ptf.reactivity_),
+    gammaName_(ptf.gammaName_)
+{}
+
+
+template<class Type>
+fluxFvPatchField<Type>::fluxFvPatchField
+(
     const fluxFvPatchField<Type>& ptf
 )
 :
     fixedGradientFvPatchField<Type>(ptf),
+    flux_(ptf.flux_),
     reactivity_(ptf.reactivity_),
     gammaName_(ptf.gammaName_)
 {}
@@ -124,6 +128,7 @@ fluxFvPatchField<Type>::fluxFvPatchField
 )
 :
     fixedGradientFvPatchField<Type>(ptf, iF),
+    flux_(ptf.flux_),
     reactivity_(ptf.reactivity_),
     gammaName_(ptf.gammaName_)
 {}
@@ -139,17 +144,15 @@ void fluxFvPatchField<Type>::updateCoeffs()
         return;
     }
 
-    const Field<Type>& C = *this;
-
     const fvPatchField<scalar>& gammap =
-        this->patch().lookupPatchField
+        this->lookupPatchField
         (
             gammaName_,
             reinterpret_cast<const volScalarField*>(NULL),
             reinterpret_cast<const scalar*>(NULL)
         );
 
-    this->gradient() = reactivity_*C/gammap;
+    this->gradient() = reactivity_*flux_/gammap;
 
     fixedGradientFvPatchField<Type>::updateCoeffs();
 }
@@ -159,10 +162,8 @@ template<class Type>
 void fluxFvPatchField<Type>::write(Ostream& os) const
 {
     fixedGradientFvPatchField<Type>::write(os);
-    os.writeKeyword("reactivity")
-        << reactivity_ << token::END_STATEMENT << nl;
-    os.writeKeyword("gamma")
-        << gammaName_ << token::END_STATEMENT << nl;
+    flux_.writeEntry("flux", os);
+    reactivity_.writeEntry("reactivity", os);
     this->writeEntry("value", os);
 }
 

@@ -67,24 +67,24 @@ void Foam::skewCorrectionVectors::makeSkewCorrectionVectors() const
         IOobject
         (
             "skewCorrectionVectors",
-            mesh_.pointsInstance(),
-            mesh_,
+            mesh().pointsInstance(),
+            mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE,
             false
         ),
-        mesh_,
+        mesh(),
         dimLength
     );
     surfaceVectorField& SkewCorrVecs = *skewCorrectionVectors_;
 
     // Set local references to mesh data
-    const volVectorField& C = mesh_.C();
-    const surfaceVectorField& Cf = mesh_.Cf();
-    const surfaceVectorField& Sf = mesh_.Sf();
+    const volVectorField& C = mesh().C();
+    const surfaceVectorField& Cf = mesh().Cf();
+    const surfaceVectorField& Sf = mesh().Sf();
 
-    const unallocLabelList& owner = mesh_.owner();
-    const unallocLabelList& neighbour = mesh_.neighbour();
+    const unallocLabelList& owner = mesh().owner();
+    const unallocLabelList& neighbour = mesh().neighbour();
 
     // Build the d-vectors.  Changed to exact vectors.  HJ, 24/Apr/2010
 

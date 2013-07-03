@@ -180,7 +180,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "R",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -192,7 +192,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -204,7 +204,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "epsilon",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -216,7 +216,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "nut",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -254,7 +254,7 @@ tmp<volSymmTensorField> LaunderGibsonRSTM::devReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -345,6 +345,7 @@ void LaunderGibsonRSTM::correct()
     }
 
     volSymmTensorField P = -twoSymm(R_ & fvc::grad(U_));
+    volSymmTensorField C = -fvc::div(phi_, R_);
     volScalarField G("RASModel::G", 0.5*mag(tr(P)));
 
     // Update epsilon and G at the wall
@@ -365,7 +366,9 @@ void LaunderGibsonRSTM::correct()
 
     epsEqn().relax();
 
-    epsEqn().boundaryManipulate(epsilon_.boundaryField());
+    // No longer needed: matrix completes at the point of solution
+    // HJ, 17/Apr/2012
+//     epsEqn().completeAssembly();
 
     solve(epsEqn);
     bound(epsilon_, epsilon0_);
@@ -403,7 +406,10 @@ void LaunderGibsonRSTM::correct()
       ==
         P
       + (2.0/3.0*(Clg1_ - 1)*I)*epsilon_
-      - Clg2_*dev(P)
+        // Change for consistency with Fluent implementation.
+        // Emil Baric, NUMAP-FOAM 2011
+        // HJ, 13/Dec/2011
+      - Clg2_*(dev(P) - dev(C))
 
         // wall reflection terms
       + symm
@@ -441,42 +447,8 @@ void LaunderGibsonRSTM::correct()
     nut_.correctBoundaryConditions();
 
 
-    // Correct wall shear stresses
-
-    forAll(patches, patchi)
-    {
-        const fvPatch& curPatch = patches[patchi];
-
-        if (curPatch.isWall())
-        {
-            symmTensorField& Rw = R_.boundaryField()[patchi];
-
-            const scalarField& nutw = nut_.boundaryField()[patchi];
-
-            vectorField snGradU = U_.boundaryField()[patchi].snGrad();
-
-            const vectorField& faceAreas
-                = mesh_.Sf().boundaryField()[patchi];
-
-            const scalarField& magFaceAreas
-                = mesh_.magSf().boundaryField()[patchi];
-
-            forAll(curPatch, facei)
-            {
-                // Calculate near-wall velocity gradient
-                tensor gradUw
-                    = (faceAreas[facei]/magFaceAreas[facei])*snGradU[facei];
-
-                // Calculate near-wall shear-stress tensor
-                tensor tauw = -nutw[facei]*2*symm(gradUw);
-
-                // Reset the shear components of the stress tensor
-                Rw[facei].xy() = tauw.xy();
-                Rw[facei].xz() = tauw.xz();
-                Rw[facei].yz() = tauw.yz();
-            }
-        }
-    }
+    // Correct wall shear stresses.  Moved to wall functions with anisotropy
+    // HJ, 14/Dec/2011
 }
 
 

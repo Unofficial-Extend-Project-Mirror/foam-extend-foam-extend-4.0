@@ -61,21 +61,26 @@ void Foam::twoStrokeEngine::calcMovingMasks() const
     const cellList& c = cells();
     const faceList& f = allFaces();
 
-    const labelList& cellAddr =
-        cellZones()[cellZones().findZoneID("movingCells")];
+    const label movingCellsID = cellZones().findZoneID("movingCells");
 
-    forAll (cellAddr, cellI)
+    // If moving cell zone is found, mark the vertices
+    if (movingCellsID > -1)
     {
-        const cell& curCell = c[cellAddr[cellI]];
+        const labelList& cellAddr = cellZones()[movingCellsID];
 
-        forAll (curCell, faceI)
+        forAll (cellAddr, cellI)
         {
-            // Mark all the points as moving
-            const face& curFace = f[curCell[faceI]];
+            const cell& curCell = c[cellAddr[cellI]];
 
-            forAll (curFace, pointI)
+            forAll (curCell, faceI)
             {
-                movingPointsMask[curFace[pointI]] = 1;
+                // Mark all the points as moving
+                const face& curFace = f[curCell[faceI]];
+
+                forAll (curFace, pointI)
+                {
+                    movingPointsMask[curFace[pointI]] = 1;
+                }
             }
         }
     }

@@ -149,8 +149,9 @@ tmp<fvsPatchField<Type> > fvsPatchField<Type>::New
                 "const DimensionedField<Type, surfaceMesh>&, "
                 "const dictionary&)",
                 dict
-            )   << "inconsistent patch and patchField types for \n"
-                   "    patch type " << p.type()
+            )   << "inconsistent patch and patchField types for field "
+                << iF.name() << "\n"
+                << "    patch type " << p.type()
                 << " and patchField type " << patchFieldType
                 << exit(FatalIOError);
         }

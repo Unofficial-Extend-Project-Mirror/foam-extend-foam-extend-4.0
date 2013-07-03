@@ -46,9 +46,14 @@ void Foam::GAMGSolver::agglomerateMatrix(const label fineLevelIndex)
     const labelList& faceRestrictAddr =
         agglomeration_.faceRestrictAddressing(fineLevelIndex);
 
-    // Coarse matrix diagonal initialised by restricting the finer mesh diagonal
+    // Coarse matrix diagonal initialised by restricting the fine mesh diagonal
     scalarField& coarseDiag = coarseMatrix.diag();
-    agglomeration_.restrictField(coarseDiag, fineMatrix.diag(), fineLevelIndex);
+    agglomeration_.restrictField
+    (
+        coarseDiag,
+        fineMatrix.diag(),
+        fineLevelIndex
+    );
 
     // Get reference to fine-level interfaces
     const lduInterfaceFieldPtrsList& fineInterfaces =
@@ -96,7 +101,7 @@ void Foam::GAMGSolver::agglomerateMatrix(const label fineLevelIndex)
     {
         if (fineInterfaces.set(inti))
         {
-            const GAMGInterface& coarseInterface = 
+            const GAMGInterface& coarseInterface =
                 refCast<const GAMGInterface>
                 (
                     agglomeration_.interfaceLevel(fineLevelIndex + 1)[inti]
@@ -182,7 +187,7 @@ void Foam::GAMGSolver::agglomerateMatrix(const label fineLevelIndex)
             }
         }
     }
-    else // ... Otherwise it is symmetric so agglomerate just the upper 
+    else // ... Otherwise it is symmetric so agglomerate just the upper
     {
         // Get off-diagonal matrix coefficients
         const scalarField& fineUpper = fineMatrix.upper();

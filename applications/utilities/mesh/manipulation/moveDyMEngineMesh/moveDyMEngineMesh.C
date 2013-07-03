@@ -26,7 +26,7 @@ Application
     moveDynamicMesh
 
 Description
-    Mesh motion and topological mesh changes run for an engine geometry
+    Mesh motion and topological mesh changes utility for an engine geometry
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
@@ -38,53 +38,49 @@ Author
 #include "engineTopoChangerMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Main program:
 
 int main(int argc, char *argv[])
 {
+    argList::validOptions.insert("checkFrequency", "int");
 
 #   include "setRootCase.H"
 #   include "createEngineTime.H"
 #   include "createEngineDynamicMesh.H"
 
-    scalar totalVolume = sum(mesh.V()).value();
+    // Read check frequency
+    label checkFrequency = 1;
+    args.optionReadIfPresent("checkFrequency", checkFrequency);
 
-    Info<< "Reading field U\n" << endl;
-    volVectorField U
-    (
-        IOobject
-        (
-            "U",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-    );
-
-    volScalarField motionContErr
-    (
-        IOobject
-        (
-            "motionContErr",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        fvc::ddt(dimensionedScalar("1", dimless, 1.0), mesh),
-        zeroGradientFvPatchScalarField::typeName
-    );
-
+    fileName path = runTime.caseName();
+    OFstream volFile(path + "/totVol.Cyl");
 
     while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << endl;
 
-        mesh.update();
-//         mesh.checkMesh(true);
+        volFile << runTime.timeName() << "\t" << sum(mesh.V()).value() << endl;
 
-#       include "checkTotalVolume.H"
+        if (isDir(runTime.path()/"VTK"))
+        {
+            Info << "Clear VTK directory" << endl;
+            rmDir(runTime.path()/"VTK");
+        }
+
+        mesh.update();
+
+#       include "checkVolContinuity.H"
+
+        if
+        (
+            checkEngineMesh
+         && (runTime.timeIndex() % checkFrequency == 0)
+        )
+        {
+            mesh.checkMesh(true);
+        }
+
+        volFile << runTime.timeName() << tab << sum(mesh.V()).value() << endl;
 
         runTime.write();
 

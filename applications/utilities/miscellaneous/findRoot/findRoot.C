@@ -61,14 +61,14 @@ public:
 
     scalar operator()(const scalar& x) const
     {
-        return 0.5*Foam::pow(x,-1.5) - Foam::cos(x);
+        return 0.5*Foam::pow(x, -1.5) - Foam::cos(x);
     }
 };
 
 
 int main(int argc, char *argv[])
 {
-    testFunction           tf;
+    testFunction tf;
     testFunctionDerivative df;
 
     Info<< setprecision(10)
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
         << "Ridders root "
         << RiddersRoot<testFunction>(tf, 1e-5).root(0, 10) << nl
         << "NewtonSecant root "
-        << NewtonSecantRoot<testFunction,testFunctionDerivative>
+        << NewtonSecantRoot<testFunction, testFunctionDerivative>
            (
                tf,
                df,

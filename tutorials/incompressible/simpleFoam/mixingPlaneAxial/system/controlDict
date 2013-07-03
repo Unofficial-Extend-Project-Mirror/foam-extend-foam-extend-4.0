@@ -1,0 +1,90 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.3                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+// FoamX Case Dictionary.
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "/home/page/OpenFOAM/bk3421-1.3/run/calculs/simpleFoam/MFR/sector_1on1";
+    case            "dom1Dom2";
+    instance        "system";
+    local           "";
+
+    class           dictionary;
+    object          controlDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     potentialFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         50;
+
+deltaT          1;
+
+writeControl    timeStep;
+
+writeInterval   1;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+graphFormat     raw;
+
+runTimeModifiable yes;
+
+libs ( "libOpenFoamTurbo.so" );
+
+// ************************************************************************* //
+// Compute the flux value on each side of a GGI interface
+functions
+(
+    ggiCheck
+    {
+        // Type of functionObject
+        type ggiCheck;
+
+        phi phi;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libcheckFunctionObjects.so");
+    }
+
+    // Compute the flux value on each side of a mixingPlane interface
+    mixingPlaneCheck
+    {
+        // Type of functionObject
+        type mixingPlaneCheck;
+
+        masterPatchName         upstreamMixingPlanePatch;
+        masterPatchScaleFactor  10.0;
+        shadowPatchScaleFactor  4.0;
+        phi               phi;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libcheckFunctionObjects.so");
+    }
+);

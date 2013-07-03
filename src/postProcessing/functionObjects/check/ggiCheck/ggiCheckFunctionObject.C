@@ -67,7 +67,7 @@ Foam::ggiCheckFunctionObject::ggiCheckFunctionObject
         dict.lookup("region") >> regionName_;
     }
 
-    Info << "Creating ggi check" << endl;
+    Info << "Creating ggi check function object" << endl;
 }
 
 
@@ -123,7 +123,10 @@ bool Foam::ggiCheckFunctionObject::execute()
                     << " %" << endl;
             }
         }
-        else if (isA<cyclicGgiFvsPatchScalarField>(phi.boundaryField()[patchI]))
+        else if
+        (
+            isA<cyclicGgiFvsPatchScalarField>(phi.boundaryField()[patchI])
+        )
         {
             if (!visited[patchI])
             {

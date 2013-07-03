@@ -240,7 +240,7 @@ updateCoeffs()
         // Get internal field to insert values into
         Field<Type>& iF = const_cast<Field<Type>&>(this->internalField());
 
-        setInInternalField(iF, values);
+        this->setInInternalField(iF, values);
     }
 
     PointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>::
@@ -263,7 +263,7 @@ ValuePointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>::evaluate
 )
 {
     // Evaluate boundary condition
-    updateBoundaryField();
+    this->updateBoundaryField();
 
     if (this->isPointField())
     {
@@ -273,7 +273,7 @@ ValuePointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>::evaluate
         // Get internal field to insert values into
         Field<Type>& iF = const_cast<Field<Type>&>(this->internalField());
 
-        setInInternalField(iF, values);
+        this->setInInternalField(iF, values);
     }
 
     PointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>::evaluate

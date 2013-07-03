@@ -102,7 +102,7 @@ void Foam::Giesekus::correct()
      ==
         etaP_/lambda_*twoD
       + twoSymm(C)
-      - (alpha_/etaP_)*(tau_ & tau_)
+      - (alpha_/etaP_)*symm(tau_ & tau_)
       - fvm::Sp(1/lambda_, tau_)
     );
 

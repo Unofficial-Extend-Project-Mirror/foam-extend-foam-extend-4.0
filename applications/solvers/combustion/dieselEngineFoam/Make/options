@@ -34,4 +34,5 @@ EXE_LIBS = \
     -lchemistryModel \
     -lODE \
     -lpdf \
-    -llduSolvers
+    -llduSolvers \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

@@ -89,7 +89,7 @@ div
 {
     return fv::divScheme<Type>::New
     (
-        vf.mesh(), vf.mesh().divScheme(name)
+        vf.mesh(), vf.mesh().schemesDict().divScheme(name)
     )().fvcDiv(vf);
 }
 
@@ -167,7 +167,7 @@ div
     (
         vf.mesh(),
         flux,
-        vf.mesh().divScheme(name)
+        vf.mesh().schemesDict().divScheme(name)
     )().fvcDiv(flux, vf);
 }
 

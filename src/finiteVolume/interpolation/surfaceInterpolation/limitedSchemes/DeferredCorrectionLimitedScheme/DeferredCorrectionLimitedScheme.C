@@ -86,7 +86,13 @@ DeferredCorrectionLimitedScheme<Type, Limiter, LimitFunc>::limiter
         lPhi = tlPhi();
 
     GeometricField<typename Limiter::gradPhiType, fvPatchField, volMesh>
-        gradc(fvc::grad(lPhi));
+        gradc = fvc::grad(lPhi);
+    gradc.correctBoundaryConditions();
+
+    // Note: in order for the patchNeighbourField to be correct on coupled
+    // boundaries, correctBoundaryConditions needs to be called.
+    // The call shall be moved into the library fvc operators
+    gradc.correctBoundaryConditions();
 
     // Note: in order for the patchNeighbourField to be correct on coupled
     // boundaries, correctBoundaryConditions needs to be called.

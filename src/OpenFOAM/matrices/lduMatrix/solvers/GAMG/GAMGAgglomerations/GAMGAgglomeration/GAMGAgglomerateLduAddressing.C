@@ -217,11 +217,14 @@ void Foam::GAMGAgglomeration::agglomerateLduAddressing
     {
         if (fineInterfaces.set(inti))
         {
-            fineInterfaces[inti].initInternalFieldTransfer
-            (
-                Pstream::blocking,
-                restrictMap
-            );
+            if (fineInterfaces[inti].coupled())
+            {
+                fineInterfaces[inti].initInternalFieldTransfer
+                (
+                    Pstream::blocking,
+                    restrictMap
+                );
+            }
         }
     }
 
@@ -233,18 +236,21 @@ void Foam::GAMGAgglomeration::agglomerateLduAddressing
     {
         if (fineInterfaces.set(inti))
         {
-            fineInterfaceAddr.set
-            (
-                inti,
-                new labelField
+            if (fineInterfaces[inti].coupled())
+            {
+                fineInterfaceAddr.set
                 (
-                    fineInterfaces[inti].internalFieldTransfer
+                    inti,
+                    new labelField
                     (
-                        Pstream::blocking,
-                        restrictMap
+                        fineInterfaces[inti].internalFieldTransfer
+                        (
+                            Pstream::blocking,
+                            restrictMap
+                        )
                     )
-                )
-            );
+                );
+            }
         }
     }
 
@@ -279,19 +285,25 @@ void Foam::GAMGAgglomeration::agglomerateLduAddressing
     {
         if (fineInterfaces.set(inti))
         {
-            coarseInterfaces.set
-            (
-                inti,
-                GAMGInterface::New
+            if (fineInterfaces[inti].coupled())
+            {
+                coarseInterfaces.set
                 (
-                    meshLevels_[fineLevelIndex],
-                    fineInterfaces[inti],
-                    fineInterfaces[inti].interfaceInternalField(restrictMap),
-                    fineInterfaceAddr[inti]
-                ).ptr()
-            );
-            
-            coarseInterfaceAddr[inti] = coarseInterfaces[inti].faceCells();
+                    inti,
+                    GAMGInterface::New
+                    (
+                        meshLevels_[fineLevelIndex],
+                        fineInterfaces[inti],
+                        fineInterfaces[inti].interfaceInternalField
+                        (
+                            restrictMap
+                        ),
+                        fineInterfaceAddr[inti]
+                    ).ptr()
+                );
+
+                coarseInterfaceAddr[inti] = coarseInterfaces[inti].faceCells();
+            }
         }
     }
 

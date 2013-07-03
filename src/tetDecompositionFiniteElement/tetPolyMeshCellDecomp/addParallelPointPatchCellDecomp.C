@@ -56,7 +56,7 @@ public:
 
         for
         (
-            typename SLList<Type>::const_iterator myObjectsIter = 
+            typename SLList<Type>::const_iterator myObjectsIter =
                 myObjects.begin();
             myObjectsIter != myObjects.end();
             ++myObjectsIter
@@ -68,7 +68,7 @@ public:
 
             for
             (
-                typename SLList<Type>::iterator globalObjectsIter = 
+                typename SLList<Type>::iterator globalObjectsIter =
                     globalObjects.begin();
                 globalObjectsIter != globalObjects.end();
                 ++globalObjectsIter
@@ -149,10 +149,15 @@ void Foam::tetPolyMeshCellDecomp::addParallelPointPatch()
         const label globalCellOffset = mesh_.globalData().nTotalPoints();
 
         // Add the cell centres to the lookup list
-        label oldSize = pointProcAddressing.size();
-        pointProcAddressing.setSize(oldSize + cellProcAddressing.size());
 
-        forAll (cellProcAddressing, cellI)
+        // Bug fix: only live points included.  HJ, 24/Aug/2012
+        const label oldPointSize = mesh_.nPoints();
+        const label oldCellSize = mesh_.nCells();
+        pointProcAddressing.setSize(oldPointSize + oldCellSize);
+
+        label oldSize = oldPointSize;
+
+        for (label cellI = 0; cellI < oldCellSize; cellI++)
         {
             pointProcAddressing[oldSize + cellI] =
                 cellProcAddressing[cellI] + globalCellOffset;

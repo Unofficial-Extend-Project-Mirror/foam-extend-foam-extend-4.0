@@ -407,7 +407,7 @@ Foam::BlockCoeff<Type>::component(const direction dir) const
         return contractLinear
         (
             *squareCoeffPtr_
-        )().component(dir);
+        ).component(dir);
     }
     else
     {

@@ -157,7 +157,7 @@ realizableKE::realizableKE
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -169,7 +169,7 @@ realizableKE::realizableKE
         (
             "epsilon",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -181,7 +181,7 @@ realizableKE::realizableKE
         (
             "mut",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -193,7 +193,7 @@ realizableKE::realizableKE
         (
             "alphat",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -225,7 +225,7 @@ tmp<volSymmTensorField> realizableKE::R() const
             (
                 "R",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -246,7 +246,7 @@ tmp<volSymmTensorField> realizableKE::devRhoReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -346,7 +346,9 @@ void realizableKE::correct()
 
     epsEqn().relax();
 
-    epsEqn().boundaryManipulate(epsilon_.boundaryField());
+    // No longer needed: matrix completes at the point of solution
+    // HJ, 17/Apr/2012
+//     epsEqn().completeAssembly();
 
     solve(epsEqn);
     bound(epsilon_, epsilon0_);

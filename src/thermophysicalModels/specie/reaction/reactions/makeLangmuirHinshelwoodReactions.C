@@ -34,6 +34,7 @@ Description
 
 namespace Foam
 {
+    makeIRReactions(constGasThermoPhysics, LangmuirHinshelwoodReactionRate)
     makeIRReactions(gasThermoPhysics, LangmuirHinshelwoodReactionRate)
     makeIRReactions(icoPoly8ThermoPhysics, LangmuirHinshelwoodReactionRate)
 }

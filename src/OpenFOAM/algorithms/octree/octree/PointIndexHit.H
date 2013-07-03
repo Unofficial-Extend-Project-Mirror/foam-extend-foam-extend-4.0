@@ -62,7 +62,7 @@ class PointIndexHit
         //- Point of hit; invalid for misses
         Point hitPoint_;
 
-        //- label of face hit
+        //- Label of face hit
         label index_;
 
 

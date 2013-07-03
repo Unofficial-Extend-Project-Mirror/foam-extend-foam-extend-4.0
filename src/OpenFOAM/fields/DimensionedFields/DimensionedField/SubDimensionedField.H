@@ -68,6 +68,13 @@ public:
         typedef typename Field<Type>::cmptType cmptType;
 
 
+    // Static Member Functions
+
+        //- Return a null SubDimensionedField
+        //  Dangerous, but no null constructor.  Reconsider.  HJ, 10/Apr/2013
+        static inline const SubDimensionedField<Type, GeoMesh>& null();
+
+
     // Constructors
 
         //- Construct from a SubField
@@ -99,9 +106,6 @@ public:
 
 
     // Member functions
-
-        //- Return a null SubDimensionedField
-        static inline const SubDimensionedField<Type, GeoMesh>& null();
 
         //- Return a component field of the field
         inline tmp<DimensionedField<cmptType, GeoMesh> > component

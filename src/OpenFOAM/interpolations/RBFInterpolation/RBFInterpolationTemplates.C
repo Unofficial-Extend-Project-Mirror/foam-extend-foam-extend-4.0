@@ -43,7 +43,7 @@ Foam::tmp<Foam::Field<Type> > Foam::RBFInterpolation::interpolate
 {
     // HJ and FB (05 Jan 2009)
     // Collect the values from ALL control points to all CPUs
-    // Then, each CPU will do interpolation only on local allPoints_
+    // Then, each CPU will do interpolation only on local dataPoints_
 
     if (ctrlField.size() != controlPoints_.size())
     {
@@ -60,7 +60,7 @@ Foam::tmp<Foam::Field<Type> > Foam::RBFInterpolation::interpolate
 
     tmp<Field<Type> > tresult
     (
-        new Field<Type>(allPoints_.size(), pTraits<Type>::zero)
+        new Field<Type>(dataPoints_.size(), pTraits<Type>::zero)
     );
 
     Field<Type>& result = tresult();
@@ -107,10 +107,10 @@ Foam::tmp<Foam::Field<Type> > Foam::RBFInterpolation::interpolate
 
     // Algorithmic improvement, Matteo Lombardi.  21/Mar/2011
 
-    forAll (allPoints_, flPoint)
+    forAll (dataPoints_, flPoint)
     {
         // Cut-off function to justify neglecting outer boundary points
-        t = (Foam::mag(allPoints_[flPoint] - focalPoint_) - innerRadius_)/
+        t = (mag(dataPoints_[flPoint] - focalPoint_) - innerRadius_)/
             (outerRadius_ - innerRadius_);
 
         if (t >= 1)
@@ -122,7 +122,7 @@ Foam::tmp<Foam::Field<Type> > Foam::RBFInterpolation::interpolate
         {
             // Full calculation of weights
             scalarField weights =
-                RBF_->weights(controlPoints_, allPoints_[flPoint]);
+                RBF_->weights(controlPoints_, dataPoints_[flPoint]);
 
             forAll (controlPoints_, i)
             {
@@ -133,9 +133,9 @@ Foam::tmp<Foam::Field<Type> > Foam::RBFInterpolation::interpolate
             {
                 result[flPoint] +=
                     beta[0]
-                  + beta[1]*allPoints_[flPoint].x()
-                  + beta[2]*allPoints_[flPoint].y()
-                  + beta[3]*allPoints_[flPoint].z();
+                  + beta[1]*dataPoints_[flPoint].x()
+                  + beta[2]*dataPoints_[flPoint].y()
+                  + beta[3]*dataPoints_[flPoint].z();
             }
 
             scalar w;
@@ -146,7 +146,7 @@ Foam::tmp<Foam::Field<Type> > Foam::RBFInterpolation::interpolate
             }
             else
             {
-                w = 1 - sqr(t)*(3-2*t);
+                w = 1 - sqr(t)*(3 - 2*t);
             }
 
             result[flPoint] = w*result[flPoint];

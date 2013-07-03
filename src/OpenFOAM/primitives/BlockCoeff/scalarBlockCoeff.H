@@ -132,6 +132,9 @@ public:
 
     // Member functions
 
+        //- Return active type
+        blockCoeffBase::activeLevel activeType() const;
+
         //- Return as scalar
         const scalar& asScalar() const
         {
@@ -139,6 +142,28 @@ public:
         }
 
         scalar& asScalar()
+        {
+            return scalarCoeff_;
+        }
+
+        //- Return as linear
+        const scalar& asLinear() const
+        {
+            return scalarCoeff_;
+        }
+
+        scalar& asLinear()
+        {
+            return scalarCoeff_;
+        }
+
+        //- Return as square
+        const scalar& asSquare() const
+        {
+            return scalarCoeff_;
+        }
+
+        scalar& asSquare()
         {
             return scalarCoeff_;
         }

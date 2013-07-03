@@ -259,7 +259,8 @@ bool domainDecomposition::writeDecomposition()
             time().rootPath(),
             processorCasePath,
             "system",
-            "constant"
+            "constant",
+	    true
         );
 
         // Create the mesh

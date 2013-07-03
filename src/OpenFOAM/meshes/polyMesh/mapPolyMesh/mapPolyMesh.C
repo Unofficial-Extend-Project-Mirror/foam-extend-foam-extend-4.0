@@ -29,8 +29,6 @@ Description
 #include "mapPolyMesh.H"
 #include "polyMesh.H"
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from mesh.  No morphing data: the mesh has not changed

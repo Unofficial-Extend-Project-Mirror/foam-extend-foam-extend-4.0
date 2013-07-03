@@ -78,7 +78,7 @@ public:
     // Constructors
 
         //- Construct from mesh
-        hPsiThermo(const fvMesh&);
+        hPsiThermo(const fvMesh&, const objectRegistry& obj);
 
 
     //- Destructor
@@ -165,7 +165,7 @@ public:
 
 } // End namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
 #   include "hPsiThermo.C"

@@ -318,7 +318,23 @@ bool Foam::treeBoundBox::intersects
 ) const
 {
     const direction endBits = posBits(end);
+
     pt = start;
+
+    // Note
+    // Optimising compilers (Intel 12) reorganises the code in
+    // a way which executes all divisions before doing the if-check.
+    // This causes a floating point exception of division by zero.
+    // Furthermore, division by VSMALL (first number larger than zero) may
+    // in some cases cause floating point exception overflow, and stabilisation
+    // is required.  Added by HJ, 21/Sep/2011
+
+    scalar s;
+
+    //HJ, experimental: problems with round-off on Intel 12 compiler.
+    // HJ, 29/Sep/2011
+    const scalar smallNumber = VSMALL;
+    const scalar kSmall = 1000*smallNumber;
 
     while (true)
     {
@@ -328,6 +344,7 @@ bool Foam::treeBoundBox::intersects
         {
             // pt inside bb
             ptOnFaces = faceBits(pt);
+
             return true;
         }
 
@@ -335,15 +352,18 @@ bool Foam::treeBoundBox::intersects
         {
             // pt and end in same block outside of bb
             ptOnFaces = faceBits(pt);
+
             return false;
         }
 
         if (ptBits & LEFTBIT)
         {
             // Intersect with plane V=min, n=-1,0,0
-            if (Foam::mag(overallVec.x()) > VSMALL)
+            if (Foam::mag(overallVec.x()) > kSmall)
             {
-                scalar s = (min().x() - overallStart.x())/overallVec.x();
+                s = (min().x() - overallStart.x())/
+                    stabilise(overallVec.x(), smallNumber);
+
                 pt.x() = min().x();
                 pt.y() = overallStart.y() + overallVec.y()*s;
                 pt.z() = overallStart.z() + overallVec.z()*s;
@@ -358,9 +378,11 @@ bool Foam::treeBoundBox::intersects
         else if (ptBits & RIGHTBIT)
         {
             // Intersect with plane V=max, n=1,0,0
-            if (Foam::mag(overallVec.x()) > VSMALL)
+            if (Foam::mag(overallVec.x()) > kSmall)
             {
-                scalar s = (max().x() - overallStart.x())/overallVec.x();
+                s = (max().x() - overallStart.x())/
+                    stabilise(overallVec.x(), smallNumber);
+
                 pt.x() = max().x();
                 pt.y() = overallStart.y() + overallVec.y()*s;
                 pt.z() = overallStart.z() + overallVec.z()*s;
@@ -373,9 +395,11 @@ bool Foam::treeBoundBox::intersects
         else if (ptBits & BOTTOMBIT)
         {
             // Intersect with plane V=min, n=0,-1,0
-            if (Foam::mag(overallVec.y()) > VSMALL)
+            if (Foam::mag(overallVec.y()) > kSmall)
             {
-                scalar s = (min().y() - overallStart.y())/overallVec.y();
+                s = (min().y() - overallStart.y())/
+                    stabilise(overallVec.y(), smallNumber);
+
                 pt.x() = overallStart.x() + overallVec.x()*s;
                 pt.y() = min().y();
                 pt.z() = overallStart.z() + overallVec.z()*s;
@@ -388,9 +412,11 @@ bool Foam::treeBoundBox::intersects
         else if (ptBits & TOPBIT)
         {
             // Intersect with plane V=max, n=0,1,0
-            if (Foam::mag(overallVec.y()) > VSMALL)
+            if (Foam::mag(overallVec.y()) > kSmall)
             {
-                scalar s = (max().y() - overallStart.y())/overallVec.y();
+                s = (max().y() - overallStart.y())/
+                    stabilise(overallVec.y(), smallNumber);
+
                 pt.x() = overallStart.x() + overallVec.x()*s;
                 pt.y() = max().y();
                 pt.z() = overallStart.z() + overallVec.z()*s;
@@ -403,9 +429,11 @@ bool Foam::treeBoundBox::intersects
         else if (ptBits & BACKBIT)
         {
             // Intersect with plane V=min, n=0,0,-1
-            if (Foam::mag(overallVec.z()) > VSMALL)
+            if (Foam::mag(overallVec.z()) > kSmall)
             {
-                scalar s = (min().z() - overallStart.z())/overallVec.z();
+                s = (min().z() - overallStart.z())/
+                    stabilise(overallVec.z(), smallNumber);
+
                 pt.x() = overallStart.x() + overallVec.x()*s;
                 pt.y() = overallStart.y() + overallVec.y()*s;
                 pt.z() = min().z();
@@ -418,9 +446,11 @@ bool Foam::treeBoundBox::intersects
         else if (ptBits & FRONTBIT)
         {
             // Intersect with plane V=max, n=0,0,1
-            if (Foam::mag(overallVec.z()) > VSMALL)
+            if (Foam::mag(overallVec.z()) > kSmall)
             {
-                scalar s = (max().z() - overallStart.z())/overallVec.z();
+                s = (max().z() - overallStart.z())/
+                    stabilise(overallVec.z(), smallNumber);
+
                 pt.x() = overallStart.x() + overallVec.x()*s;
                 pt.y() = overallStart.y() + overallVec.y()*s;
                 pt.z() = max().z();
@@ -442,7 +472,8 @@ bool Foam::treeBoundBox::intersects
 ) const
 {
     direction ptBits;
-    return intersects(start, end-start, start, end, pt, ptBits);
+
+    return intersects(start, end - start, start, end, pt, ptBits);
 }
 
 
@@ -458,7 +489,7 @@ bool Foam::treeBoundBox::contains(const vector& dir, const point& pt) const
     //
     // Compare all components against min and max of bb
     //
-    for (direction cmpt=0; cmpt<3; cmpt++)
+    for (direction cmpt = 0; cmpt < 3; cmpt++)
     {
         if (pt[cmpt] < min()[cmpt])
         {
@@ -496,6 +527,7 @@ bool Foam::treeBoundBox::contains(const vector& dir, const point& pt) const
 Foam::direction Foam::treeBoundBox::faceBits(const point& pt) const
 {
     direction faceBits = 0;
+
     if (pt.x() == min().x())
     {
         faceBits |= LEFTBIT;
@@ -522,6 +554,7 @@ Foam::direction Foam::treeBoundBox::faceBits(const point& pt) const
     {
         faceBits |= FRONTBIT;
     }
+
     return faceBits;
 }
 
@@ -557,6 +590,7 @@ Foam::direction Foam::treeBoundBox::posBits(const point& pt) const
     {
         posBits |= FRONTBIT;
     }
+
     return posBits;
 }
 

@@ -50,6 +50,7 @@ namespace Foam
 
 // Forward declaration of classes
 class fvMesh;
+class objectRegistry;
 
 template<class CompType, class ThermoType>
 class chemistrySolver;
@@ -118,6 +119,7 @@ public:
         ODEChemistryModel
         (
             const fvMesh& mesh,
+            const objectRegistry& obj,
             const word& compTypeName,
             const word& thermoTypeName
         );

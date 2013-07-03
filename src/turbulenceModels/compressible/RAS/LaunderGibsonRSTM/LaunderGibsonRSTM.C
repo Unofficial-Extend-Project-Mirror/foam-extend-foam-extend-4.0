@@ -190,7 +190,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "R",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -202,7 +202,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -214,7 +214,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "epsilon",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -226,7 +226,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "mut",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -238,7 +238,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "alphat",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -279,7 +279,7 @@ tmp<volSymmTensorField> LaunderGibsonRSTM::devRhoReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -382,6 +382,7 @@ void LaunderGibsonRSTM::correct()
     }
 
     volSymmTensorField P = -twoSymm(R_ & fvc::grad(U_));
+    volSymmTensorField C = -fvc::div(phi_, R_);
     volScalarField G("RASModel::G", 0.5*mag(tr(P)));
 
     // Update epsilon and G at the wall
@@ -401,7 +402,9 @@ void LaunderGibsonRSTM::correct()
 
     epsEqn().relax();
 
-    epsEqn().boundaryManipulate(epsilon_.boundaryField());
+    // No longer needed: matrix completes at the point of solution
+    // HJ, 17/Apr/2012
+//     epsEqn().completeAssembly();
 
     solve(epsEqn);
     bound(epsilon_, epsilon0_);
@@ -421,7 +424,8 @@ void LaunderGibsonRSTM::correct()
             {
                 label faceCelli = curPatch.faceCells()[facei];
                 P[faceCelli] *=
-                    min(G[faceCelli]/(0.5*mag(tr(P[faceCelli])) + SMALL), 100.0);
+                    // Bug fix.  HJ, 13/Dec/2011
+                    min(G[faceCelli]/(0.5*mag(tr(P[faceCelli])) + SMALL), 1.0);
             }
         }
     }
@@ -438,7 +442,10 @@ void LaunderGibsonRSTM::correct()
      ==
         rho_*P
       + (2.0/3.0*(Clg1_ - 1)*I)*rho_*epsilon_
-      - Clg2_*rho_*dev(P)
+        // Change for consistency with Fluent implementation.
+        // Emil Baric, NUMAP-FOAM 2011
+        // HJ, 13/Dec/2011
+      - Clg2_*(dev(P) - dev(C))
 
         // wall reflection terms
       + symm

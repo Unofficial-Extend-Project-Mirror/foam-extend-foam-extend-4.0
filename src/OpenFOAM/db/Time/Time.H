@@ -75,6 +75,7 @@ class Time
         //- The controlDict
         IOdictionary controlDict_;
 
+
 public:
 
         //- Write control options
@@ -121,10 +122,10 @@ protected:
 
         scalar writeInterval_;
 
-        label  purgeWrite_;
+        label purgeWrite_;
         mutable FIFOStack<word> previousOutputTimes_;
 
-        //- Is the time currently being sub-cycled?
+        //- Is the time currently being sub-cycled
         bool subCycling_;
 
         //- If time is being sub-cycled this is the previous TimeState
@@ -187,7 +188,8 @@ public:
             const fileName& rootPath,
             const fileName& caseName,
             const word& systemName = "system",
-            const word& constantName = "constant"
+            const word& constantName = "constant",
+            const bool enableFunctionObjects = true
         );
 
         //- Construct given dictionary, rootPath and casePath
@@ -197,7 +199,8 @@ public:
             const fileName& rootPath,
             const fileName& caseName,
             const word& systemName = "system",
-            const word& constantName = "constant"
+            const word& constantName = "constant",
+            const bool enableFunctionObjects = true
         );
 
         //- Construct given endTime, rootPath and casePath
@@ -206,7 +209,8 @@ public:
             const fileName& rootPath,
             const fileName& caseName,
             const word& systemName = "system",
-            const word& constantName = "constant"
+            const word& constantName = "constant",
+            const bool enableFunctionObjects = true
         );
 
 
@@ -238,6 +242,13 @@ public:
                 return rootPath()/caseName();
             }
 
+            //- Return access to controlDict
+            IOdictionary& controlDict()
+            {
+                return controlDict_;
+            }
+
+            //- Return controlDict
             const dictionary& controlDict() const
             {
                 return controlDict_;
@@ -425,6 +436,9 @@ public:
             //- Reset the time and time-index
             virtual void setTime(const scalar, const label newIndex);
 
+            //- Reset stop-run control
+            virtual void setStopAt(const stopAtControls&);
+
             //- Reset end time
             virtual void setEndTime(const dimensionedScalar&);
 
@@ -434,11 +448,14 @@ public:
             //- Reset time step
             virtual void setDeltaT(const dimensionedScalar&);
 
+            //- Reset write control
+            virtual void setWriteControl(const writeControls&);
+
+            //- Reset write interval
+            virtual void setWriteInterval(const scalar);
+
             //- Reset time step
             virtual void setDeltaT(const scalar);
-
-            //- Set write interval
-            void setWriteInterval(const scalar& deltaTheta);
 
             //- Set time to sub-cycle for the given number of steps
             virtual TimeState subCycle(const label nSubCycles);

@@ -25,6 +25,9 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "parabolicCylindricalCS.H"
+#include "mathematicalConstants.H"
+#include "Switch.H"
+#include "boundBox.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -43,9 +46,10 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::parabolicCylindricalCS::parabolicCylindricalCS()
+Foam::parabolicCylindricalCS::parabolicCylindricalCS(const bool inDegrees)
 :
-    coordinateSystem()
+    coordinateSystem(),
+    inDegrees_(inDegrees)
 {}
 
 
@@ -53,10 +57,12 @@ Foam::parabolicCylindricalCS::parabolicCylindricalCS
 (
     const word& name,
     const point& origin,
-    const coordinateRotation& cr
+    const coordinateRotation& cr,
+    const bool inDegrees
 )
 :
-    coordinateSystem(name, origin, cr)
+    coordinateSystem(name, origin, cr),
+    inDegrees_(inDegrees)
 {}
 
 
@@ -66,11 +72,59 @@ Foam::parabolicCylindricalCS::parabolicCylindricalCS
     const dictionary& dict
 )
 :
-    coordinateSystem(name, dict)
+    coordinateSystem(name, dict),
+    inDegrees_(dict.lookupOrDefault<Switch>("degrees", true))
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+Foam::coordinateSystem::spanInfo
+Foam::parabolicCylindricalCS::spanLimited() const
+{
+    spanInfo b(Pair<bool>(true, true));
+
+    // Upper bound or r is unlimited
+    b[0] = Pair<bool>(true, false);
+
+    // z is unlimited
+    b[2] = Pair<bool>(false, false);
+
+    return b;
+}
+
+
+Foam::boundBox Foam::parabolicCylindricalCS::spanBounds() const
+{
+    return boundBox
+    (
+        vector
+        (
+            0,
+            ( inDegrees_ ? -180.0 : -mathematicalConstant::pi ),
+            -GREAT
+        ),
+        vector
+        (
+            GREAT,
+            ( inDegrees_ ? 180.0 : mathematicalConstant::pi ),
+            GREAT
+        )
+    );
+}
+
+
+bool Foam::parabolicCylindricalCS::inDegrees() const
+{
+    return inDegrees_;
+}
+
+
+bool& Foam::parabolicCylindricalCS::inDegrees()
+{
+    return inDegrees_;
+}
+
 
 Foam::vector Foam::parabolicCylindricalCS::localToGlobal
 (

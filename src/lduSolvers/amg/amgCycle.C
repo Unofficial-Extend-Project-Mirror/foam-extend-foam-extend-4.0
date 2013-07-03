@@ -197,7 +197,13 @@ void Foam::amgCycle::fixedCycle
         {
             // Calculate scaling factor using a buffer
 
-            coarseLevelPtr_->levelPtr_->scaleX(xCoarse, bCoarse, cmpt, xBuffer);
+            coarseLevelPtr_->levelPtr_->scaleX
+            (
+                xCoarse,
+                bCoarse,
+                cmpt,
+                xBuffer
+            );
         }
 
         levelPtr_->prolongateCorrection(x, xCoarse);
@@ -208,7 +214,9 @@ void Foam::amgCycle::fixedCycle
     else
     {
         // Call direct solver
-        levelPtr_->solve(x, b, cmpt, 1e-9, 0);
+        // Changed tolerance because a better guess will be used on coarsest
+        // mesh level.  HJ, 27/Jun/2013
+        levelPtr_->solve(x, b, cmpt, 1e-6, 0);
     }
 }
 

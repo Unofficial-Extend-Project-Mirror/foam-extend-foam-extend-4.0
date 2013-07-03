@@ -119,10 +119,13 @@ private:
 
     // Private member functions
 
-        //- Find amongst selected faces the one with the largest area
-        static label findMaxArea(const pointField&, const faceList&);
+        // Geometry
 
-        void calcTransforms();
+            //- Find amongst selected faces the one with the largest area
+            static label findMaxArea(const pointField&, const faceList&);
+
+            //- Force calculation of transformation tensors
+            virtual void calcTransforms();
 
 
         // Face ordering

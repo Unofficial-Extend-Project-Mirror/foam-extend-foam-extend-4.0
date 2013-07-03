@@ -62,11 +62,11 @@ Foam::TPS::~TPS()
 
 Foam::tmp<Foam::scalarField> Foam::TPS::weights
 (
-    const vectorField& points,
-    const vector& controlPoint
+    const vectorField& controlPoints,
+    const vector& dataPoint
 ) const
 {
-    scalarField dist = mag(points - controlPoint);
+    scalarField dist = mag(controlPoints - dataPoint);
     scalarField RBF(dist.size());
 
     forAll(RBF, i)

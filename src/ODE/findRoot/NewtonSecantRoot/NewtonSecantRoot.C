@@ -40,13 +40,13 @@ Author
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<typename Func, typename Deriv>
-const Foam::label Foam::NewtonSecantRoot<Func,Deriv>::maxIter = 60;
+const Foam::label Foam::NewtonSecantRoot<Func, Deriv>::maxIter = 60;
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<typename Func, typename Deriv>
-Foam::NewtonSecantRoot<Func,Deriv>::NewtonSecantRoot
+Foam::NewtonSecantRoot<Func, Deriv>::NewtonSecantRoot
 (
     const Func& f,
     const Deriv& d,
@@ -62,7 +62,7 @@ Foam::NewtonSecantRoot<Func,Deriv>::NewtonSecantRoot
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<typename Func, typename Deriv>
-Foam::scalar Foam::NewtonSecantRoot<Func,Deriv>::root
+Foam::scalar Foam::NewtonSecantRoot<Func, Deriv>::root
 (
     scalar xN
 ) const
@@ -71,7 +71,7 @@ Foam::scalar Foam::NewtonSecantRoot<Func,Deriv>::root
     {
         FatalErrorIn
         (
-            "Foam::scalar Foam::NewtonSecantRoot<Func,Deriv>::root\n"
+            "Foam::scalar Foam::NewtonSecantRoot<Func, Deriv>::root\n"
             "(\n"
             "    const scalar xN,\n"
             ") const"
@@ -90,6 +90,7 @@ Foam::scalar Foam::NewtonSecantRoot<Func,Deriv>::root
         scalar xBar = xN - dx;
 
         xNp1 = xN - fN*fN/(dN*(fN - f_(xBar)));
+
         if (mag(xN - xNp1) <= this->eps_)
         {
             return xNp1;

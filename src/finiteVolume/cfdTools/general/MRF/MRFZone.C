@@ -452,9 +452,9 @@ void Foam::MRFZone::absoluteFlux
     absoluteRhoFlux(rho, phi);
 }
 
-void Foam::MRFZone::faceU
+void Foam::MRFZone::meshPhi
 (
-    surfaceVectorField& zoneFaceU
+    surfaceVectorField& phi
 ) const
 {
     const surfaceVectorField& Cf = mesh_.Cf();
@@ -466,7 +466,7 @@ void Foam::MRFZone::faceU
     forAll(internalFaces_, i)
     {
         label facei = internalFaces_[i];
-        zoneFaceU[facei] = (Omega ^ (Cf[facei] - origin));
+        phi[facei] = (Omega ^ (Cf[facei] - origin));
     }
 
     // Included patches
@@ -476,7 +476,7 @@ void Foam::MRFZone::faceU
         {
             label patchFacei = includedFaces_[patchi][i];
 
-            zoneFaceU.boundaryField()[patchi][patchFacei] =
+            phi.boundaryField()[patchi][patchFacei] =
                 (Omega ^ (Cf.boundaryField()[patchi][patchFacei] - origin));
         }
     }
@@ -488,7 +488,7 @@ void Foam::MRFZone::faceU
         {
             label patchFacei = excludedFaces_[patchi][i];
 
-            zoneFaceU.boundaryField()[patchi][patchFacei] =
+            phi.boundaryField()[patchi][patchFacei] =
                 (Omega ^ (Cf.boundaryField()[patchi][patchFacei] - origin));
         }
     }
@@ -514,6 +514,49 @@ void Foam::MRFZone::correctBoundaryVelocity(volVectorField& U) const
         }
 
         U.boundaryField()[patchi] == pfld;
+    }
+}
+
+
+void Foam::MRFZone::Su
+(
+    const volScalarField& phi,
+    const volVectorField& gradPhi,
+    volScalarField& source
+) const
+{
+    const labelList& cells = mesh_.cellZones()[cellZoneID_];
+    const volVectorField& C = mesh_.C();
+
+    const vector& origin = origin_.value();
+    const vector& Omega = Omega_.value();
+
+    forAll(cells, i)
+    {
+        source[cells[i]] =
+            (Omega ^ (C[cells[i]] - origin)) & gradPhi[cells[i]];
+    }
+}
+
+
+void Foam::MRFZone::Su
+(
+    const volVectorField& phi,
+    const volTensorField& gradPhi,
+    volVectorField& source
+) const
+{
+    const labelList& cells = mesh_.cellZones()[cellZoneID_];
+    const volVectorField& C = mesh_.C();
+
+    const vector& origin = origin_.value();
+    const vector& Omega = Omega_.value();
+
+    forAll(cells, i)
+    {
+        source[cells[i]] =
+            ((Omega ^ (C[cells[i]] - origin)) & gradPhi[cells[i]])
+          - (Omega ^ phi[cells[i]]);
     }
 }
 

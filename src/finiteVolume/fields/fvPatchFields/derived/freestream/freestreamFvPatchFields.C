@@ -24,8 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "volFields.H"
-#include "surfaceFields.H"
+#include "fvPatchFields.H"
 #include "freestreamFvPatchFields.H"
 #include "addToRunTimeSelectionTable.H"
 

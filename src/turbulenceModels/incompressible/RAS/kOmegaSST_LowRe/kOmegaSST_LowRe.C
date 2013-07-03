@@ -226,7 +226,7 @@ kOmegaSST_LowRe::kOmegaSST_LowRe
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -239,7 +239,7 @@ kOmegaSST_LowRe::kOmegaSST_LowRe
         (
             "omega",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
@@ -251,7 +251,7 @@ kOmegaSST_LowRe::kOmegaSST_LowRe
         (
             "nut",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -279,7 +279,7 @@ tmp<volSymmTensorField> kOmegaSST_LowRe::R() const
             (
                 "R",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -300,7 +300,7 @@ tmp<volSymmTensorField> kOmegaSST_LowRe::devReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),

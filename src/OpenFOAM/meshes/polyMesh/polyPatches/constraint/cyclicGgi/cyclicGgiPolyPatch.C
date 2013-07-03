@@ -39,6 +39,7 @@ Contributor
 #include "polyMesh.H"
 #include "Time.H"
 #include "standAlonePatch.H"
+#include "indirectPrimitivePatch.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -84,13 +85,29 @@ void Foam::cyclicGgiPolyPatch::checkDefinition() const
     )
     {
         FatalErrorIn("void cyclicGgiPolyPatch::check() const")
-            << "    The rotation angle for patch name           : "
-            << name() << " is: " << rotationAngle() << " axis: "
-            << cyclicShadow().rotationAxis() << nl
-            << "    The rotation angle for the shadow patch name: "
+            << "    Rotation angle for patch name           : "
+            << name() << " is: " << rotationAngle()
+            << " axis: " << rotationAxis() << nl
+            << "    Rotation angle for shadow patch name: "
             << shadowName() << " is: "
             << cyclicShadow().rotationAngle() << " axis: "
             << cyclicShadow().rotationAxis() << nl
+            << "    Both values need to be opposite in "
+            << "the boundary file. "
+            << abort(FatalError);
+    }
+
+    if
+    (
+        (mag(separationOffset() + cyclicShadow().separationOffset())) > SMALL
+    )
+    {
+        FatalErrorIn("void cyclicGgiPolyPatch::check() const")
+            << "Separation offset for patch name           : "
+            << name() << " is: " << separationOffset()
+            << "    Separation offset for shadow patch name: "
+            << shadowName() << " is: "
+            << cyclicShadow().separationOffset() << " axis: "
             << "    Both values need to be opposite in "
             << "the boundary file. "
             << abort(FatalError);
@@ -124,8 +141,7 @@ void Foam::cyclicGgiPolyPatch::checkDefinition() const
                 cyclicShadow().localFaces(),
                 transformedPoints
             );
-        }
-
+    }
 }
 
 
@@ -301,6 +317,75 @@ void Foam::cyclicGgiPolyPatch::calcTransforms()
     else
     {
         separation_.setSize(0);
+    }
+
+    if (debug > 1 && master())
+    {
+        if (patchToPatch().uncoveredMasterFaces().size() > 0)
+        {
+            // Write uncovered master faces
+            Info<< "Writing uncovered master faces for patch "
+                << name() << " as VTK." << endl;
+
+            const polyMesh& mesh = boundaryMesh().mesh();
+
+            fileName fvPath(mesh.time().path()/"VTK");
+            mkDir(fvPath);
+
+            indirectPrimitivePatch::writeVTK
+            (
+                fvPath/fileName("uncoveredCyclicGgiFaces" + name()),
+                IndirectList<face>
+                (
+                    localFaces(),
+                    patchToPatch().uncoveredMasterFaces()
+                ),
+                localPoints()
+            );
+        }
+
+        if (patchToPatch().uncoveredSlaveFaces().size() > 0)
+        {
+            // Write uncovered master faces
+            Info<< "Writing uncovered shadow faces for patch "
+                << shadowName() << " as VTK." << endl;
+
+            const polyMesh& mesh = boundaryMesh().mesh();
+
+            fileName fvPath(mesh.time().path()/"VTK");
+            mkDir(fvPath);
+
+            indirectPrimitivePatch::writeVTK
+            (
+                fvPath/fileName("uncoveredCyclicGgiFaces" + shadowName()),
+                IndirectList<face>
+                (
+                    shadow().localFaces(),
+                    patchToPatch().uncoveredSlaveFaces()
+                ),
+                shadow().localPoints()
+            );
+        }
+
+        // Check for bridge overlap
+        if (!bridgeOverlap())
+        {
+            if
+            (
+                patchToPatch().uncoveredMasterFaces().size() > 0
+             || patchToPatch().uncoveredSlaveFaces().size() > 0
+            )
+            {
+                FatalErrorIn("label cyclicGgiPolyPatch::shadowIndex() const")
+                    << "cyclic ggi patch " << name() << " with shadow "
+                    << shadowName() << " has "
+                    << patchToPatch().uncoveredMasterFaces().size()
+                    << " uncovered master faces and "
+                    << patchToPatch().uncoveredSlaveFaces().size()
+                    << " uncovered slave faces.  Bridging is switched off. "
+                    << abort(FatalError);
+            }
+        }
     }
 }
 

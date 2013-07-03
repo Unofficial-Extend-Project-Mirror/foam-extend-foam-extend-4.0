@@ -42,14 +42,15 @@ tmp<GeometricField<Type, fvPatchField, volMesh> >
 autoCreateWallFunctionField
 (
     const word& fieldName,
-    const fvMesh& mesh
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 {
     IOobject mutHeader
     (
         "mut",
         mesh.time().timeName(),
-        mesh,
+        obj,
         IOobject::MUST_READ
     );
 
@@ -65,7 +66,7 @@ autoCreateWallFunctionField
                 (
                     fieldName,
                     mesh.time().timeName(),
-                    mesh,
+                    obj,
                     IOobject::MUST_READ,
                     IOobject::NO_WRITE,
                     false
@@ -84,7 +85,7 @@ autoCreateWallFunctionField
         (
             fieldName,
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::MUST_READ,
             IOobject::NO_WRITE,
             false
@@ -140,7 +141,7 @@ autoCreateWallFunctionField
                 (
                     fieldName,
                     mesh.time().timeName(),
-                    mesh,
+                    obj,
                     IOobject::NO_READ,
                     IOobject::NO_WRITE,
                     false

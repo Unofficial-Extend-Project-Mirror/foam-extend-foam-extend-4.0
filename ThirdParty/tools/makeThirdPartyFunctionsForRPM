@@ -60,7 +60,7 @@ rpm_make()
     _PACKAGE_URL=''
     _ADDITIONALFLAGS=''
 
-    while getopts p:s:u:a: flags
+    while getopts p:s:u:f:n:a: flags
       do
       case $flags in
 	  p)  _PACKAGE=$OPTARG
@@ -69,7 +69,11 @@ rpm_make()
 	      ;;
 	  s)  _SPECFILE=$OPTARG
 	      ;;
-	  a)  _ADDITIONALFLAGS=$OPTARG
+	  f)  _ADDITIONALFLAGS=$OPTARG
+	      ;;
+	  n)  _RPMFILENAME=$OPTARG
+	      ;;
+	  a)  architecture=$OPTARG
 	      ;;
       esac
     done
@@ -82,12 +86,10 @@ rpm_make()
     # Shift options
     shift `expr $OPTIND - 1`
 
-    # Make sure the ThirdParty environment is up-to-date
-    echo "Updating the ThirdParty environment variables before building package $_PACKAGE" 
-    . $WM_PROJECT_DIR/etc/settings.sh
-
     rpmName=$_PACKAGE-$WM_OPTIONS.$architecture
     rpmFile=$buildBase/RPMS/$architecture/$rpmName.rpm
+
+    echo "RPM file name     : $rpmFile"
 
     # We check immediatly if the RPM binary package is available in the local RPMs vault.
     # If so, we basically uninstall/reinstall the package. This is handy for installation
@@ -184,7 +186,7 @@ rpm_uninstall()
 rpm_install()
 {
     package="$1";
-    rpmName=$package-$WM_OPTIONS.$architecture;
+    rpmName=$package.$architecture;
     rpmFile=$buildBase/RPMS/$architecture/$rpmName.rpm;
 
     echo "  Installing $package using RPM file: $rpmFile";

@@ -74,7 +74,7 @@ Foam::linearUpwind<Type>::correction
     // Note: in order for the patchNeighbourField to be correct on coupled
     // boundaries, correctBoundaryConditions needs to be called.
     // The call shall be moved into the library fvc operators
-    gradVf.correctBoundaryConditions(); 
+    gradVf.correctBoundaryConditions();
 
     forAll(faceFlux, facei)
     {
@@ -98,7 +98,7 @@ Foam::linearUpwind<Type>::correction
     {
         fvsPatchField<Type>& pSfCorr = bSfCorr[patchi];
 
-        if (pSfCorr.coupled())
+        if (pSfCorr.coupled() && pSfCorr.size())
         {
             const fvPatch& p = mesh.boundary()[patchi];
 

@@ -199,12 +199,27 @@ public:
             surfaceScalarField& phi
         ) const;
 
-        //- Compute the pseudo face velocity of the MRF region
-        void faceU(surfaceVectorField& zoneFaceU) const;
+        //- Compute the pseudo mesh phi of the MRF region
+        void meshPhi(surfaceVectorField& phi) const;
 
         //- Correct the boundary velocity for the roation of the MRF region
         void correctBoundaryVelocity(volVectorField& U) const;
 
+        //- Compute source term for volScalarFields in each cellZone
+        void Su
+        (
+            const volScalarField& phi,
+            const volVectorField& gradPhi,
+            volScalarField& source
+        ) const;
+
+        //- Compute source term for volVectorFields in each cellZone
+        void Su
+        (
+            const volVectorField& phi,
+            const volTensorField& gradPhi,
+            volVectorField& source
+        ) const;
 
     // Ostream Operator
 

@@ -59,7 +59,7 @@ Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
         (
             "G",
             mesh_.time().timeName(),
-            mesh_,
+            T.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -72,7 +72,7 @@ Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
         (
             "Qr",
             mesh_.time().timeName(),
-            mesh_,
+            T.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -85,7 +85,7 @@ Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
         (
             "a",
             mesh_.time().timeName(),
-            mesh_,
+            T.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -98,7 +98,7 @@ Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
         (
             "e",
             mesh_.time().timeName(),
-            mesh_,
+            T.db(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -111,7 +111,7 @@ Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
         (
             "E",
             mesh_.time().timeName(),
-            mesh_,
+            T.db(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -239,7 +239,7 @@ Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
                 (
                     "aLambda_" + Foam::name(lambdaI) ,
                     mesh_.time().timeName(),
-                    mesh_,
+                    T.db(),
                     IOobject::NO_READ,
                     IOobject::NO_WRITE
                 ),

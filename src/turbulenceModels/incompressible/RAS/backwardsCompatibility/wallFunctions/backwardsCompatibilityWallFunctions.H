@@ -50,10 +50,24 @@ namespace incompressible
     tmp<volScalarField> autoCreateNut
     (
         const word& fieldName,
+        const fvMesh& mesh,
+        const objectRegistry& obj
+    );
+
+    tmp<volScalarField> autoCreateNut
+    (
+        const word& fieldName,
         const fvMesh& mesh
     );
 
     //- nut for Low-Reynolds number models
+    tmp<volScalarField> autoCreateLowReNut
+    (
+        const word& fieldName,
+        const fvMesh& mesh,
+        const objectRegistry& obj
+    );
+
     tmp<volScalarField> autoCreateLowReNut
     (
         const word& fieldName,
@@ -64,10 +78,24 @@ namespace incompressible
     tmp<volScalarField> autoCreateEpsilon
     (
         const word& fieldName,
+        const fvMesh& mesh,
+        const objectRegistry& obj
+    );
+
+    tmp<volScalarField> autoCreateEpsilon
+    (
+        const word& fieldName,
         const fvMesh& mesh
     );
 
     //- omega
+    tmp<volScalarField> autoCreateOmega
+    (
+        const word& fieldName,
+        const fvMesh& mesh,
+        const objectRegistry& obj
+    );
+
     tmp<volScalarField> autoCreateOmega
     (
         const word& fieldName,
@@ -78,6 +106,13 @@ namespace incompressible
     tmp<volScalarField> autoCreateK
     (
         const word& fieldName,
+        const fvMesh& mesh,
+        const objectRegistry& obj
+    );
+
+    tmp<volScalarField> autoCreateK
+    (
+        const word& fieldName,
         const fvMesh& mesh
     );
 
@@ -85,10 +120,24 @@ namespace incompressible
     tmp<volScalarField> autoCreateQ
     (
         const word& fieldName,
+        const fvMesh& mesh,
+        const objectRegistry& obj
+    );
+
+    tmp<volScalarField> autoCreateQ
+    (
+        const word& fieldName,
         const fvMesh& mesh
     );
 
     //- R
+    tmp<volSymmTensorField> autoCreateR
+    (
+        const word& fieldName,
+        const fvMesh& mesh,
+        const objectRegistry& obj
+    );
+
     tmp<volSymmTensorField> autoCreateR
     (
         const word& fieldName,
@@ -101,7 +150,8 @@ namespace incompressible
     autoCreateWallFunctionField
     (
         const word& fieldName,
-        const fvMesh& mesh
+        const fvMesh& mesh,
+        const objectRegistry& obj
     );
 
 

@@ -154,7 +154,7 @@ void Foam::XPP_DE::correct()
             S_
         )
         - 1/lambdaOb_/Foam::sqr(Lambda_)*
-        (3*alpha_*Foam::pow(Lambda_, 4)*(S_ & S_) - (1 - alpha_)/3*I_)
+        (3*alpha_*Foam::pow(Lambda_, 4)*symm(S_ & S_) - (1 - alpha_)/3*I_)
     );
 
     SEqn().relax();

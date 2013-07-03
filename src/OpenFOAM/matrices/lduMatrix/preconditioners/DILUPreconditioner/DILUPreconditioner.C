@@ -33,6 +33,10 @@ namespace Foam
     defineTypeNameAndDebug(DILUPreconditioner, 0);
 
     lduPreconditioner::
+        addsymMatrixConstructorToTable<DILUPreconditioner>
+        addDILUPreconditionerSymMatrixConstructorToTable_;
+
+    lduPreconditioner::
         addasymMatrixConstructorToTable<DILUPreconditioner>
         addDILUPreconditionerAsymMatrixConstructorToTable_;
 }

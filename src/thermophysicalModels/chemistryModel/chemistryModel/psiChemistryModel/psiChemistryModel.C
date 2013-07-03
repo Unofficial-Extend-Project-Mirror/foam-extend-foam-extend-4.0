@@ -28,7 +28,7 @@ License
 #include "fvMesh.H"
 #include "Time.H"
 
-/* * * * * * * * * * * * * * * private static data * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * Private Static Data * * * * * * * * * * * * * */
 
 namespace Foam
 {
@@ -41,11 +41,12 @@ namespace Foam
 Foam::psiChemistryModel::psiChemistryModel
 (
     const fvMesh& mesh,
+    const objectRegistry& obj,
     const word& thermoTypeName
 )
 :
-    basicChemistryModel(mesh),
-    thermo_(hsCombustionThermo::NewType(mesh, thermoTypeName))
+    basicChemistryModel(mesh, obj),
+    thermo_(hsCombustionThermo::NewType(mesh, obj, thermoTypeName))
 {}
 
 

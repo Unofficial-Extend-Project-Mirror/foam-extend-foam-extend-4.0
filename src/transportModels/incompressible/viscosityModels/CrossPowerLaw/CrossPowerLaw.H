@@ -92,26 +92,26 @@ public:
 
     // Destructor
 
-        ~CrossPowerLaw()
+        virtual ~CrossPowerLaw()
         {}
 
 
     // Member Functions
 
         //- Return the laminar viscosity
-        const volScalarField& nu() const
+        virtual const volScalarField& nu() const
         {
             return nu_;
         }
 
         //- Correct the laminar viscosity
-        void correct()
+        virtual void correct()
         {
             nu_ = calcNu();
         }
 
         //- Read transportProperties dictionary
-        bool read(const dictionary& viscosityProperties);
+        virtual bool read(const dictionary& viscosityProperties);
 };
 
 

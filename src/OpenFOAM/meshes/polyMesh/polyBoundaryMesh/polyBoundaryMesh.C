@@ -353,9 +353,13 @@ Foam::label Foam::polyBoundaryMesh::findPatchID(const word& patchName) const
 
     forAll (patches, patchI)
     {
-        if (patches[patchI].name() == patchName)
+        // Check only if pointer is set.  HJ, 28/Jan/2011
+        if (patches.set(patchI))
         {
-            return patchI;
+            if (patches[patchI].name() == patchName)
+            {
+                return patchI;
+            }
         }
     }
 
@@ -619,6 +623,29 @@ void Foam::polyBoundaryMesh::updateMesh()
     forAll(patches, patchi)
     {
         patches[patchi].updateMesh();
+    }
+
+    // Calculation of addressing, with communication
+    // HJ, 12/Jun/2011
+    forAll(*this, patchi)
+    {
+        operator[](patchi).initAddressing();
+    }
+
+    forAll(*this, patchi)
+    {
+        operator[](patchi).calcAddressing();
+    }
+
+    // Calculation of geometry with communications
+    forAll(*this, patchi)
+    {
+        operator[](patchi).initGeometry();
+    }
+
+    forAll(*this, patchi)
+    {
+        operator[](patchi).calcGeometry();
     }
 }
 

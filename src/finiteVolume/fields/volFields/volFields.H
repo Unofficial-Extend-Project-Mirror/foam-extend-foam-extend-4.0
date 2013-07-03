@@ -38,9 +38,10 @@ SourceFiles
 #include "GeometricFields.H"
 #include "volMesh.H"
 #include "fvMesh.H"
-#include "fvPatchField.H"
+#include "fvPatchFields.H"
 #include "volFieldsFwd.H"
 #include "calculatedFvPatchFields.H"
+#include "fvMatrices.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

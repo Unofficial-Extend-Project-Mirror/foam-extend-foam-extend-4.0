@@ -75,7 +75,7 @@ class ILU0
 public:
 
     //- Runtime type information
-    TypeName("Cholesky");
+    TypeName("ILU0");
 
 
     // Constructors

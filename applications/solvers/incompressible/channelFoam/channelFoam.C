@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 
         volScalarField rUA = 1.0/UEqn.A();
 
-        for (int corr=0; corr<nCorr; corr++)
+        for (int corr = 0; corr < nCorr; corr++)
         {
             U = rUA*UEqn.H();
             phi = (fvc::interpolate(U) & mesh.Sf())
@@ -99,11 +99,11 @@ int main(int argc, char *argv[])
 
                 if (corr == nCorr-1 && nonOrth == nNonOrthCorr)
                 {
-                    pEqn.solve(mesh.solver(p.name() + "Final"));
+                    pEqn.solve(mesh.solutionDict().solver(p.name() + "Final"));
                 }
                 else
                 {
-                    pEqn.solve(mesh.solver(p.name()));
+                    pEqn.solve(mesh.solutionDict().solver(p.name()));
                 }
 
                 if (nonOrth == nNonOrthCorr)

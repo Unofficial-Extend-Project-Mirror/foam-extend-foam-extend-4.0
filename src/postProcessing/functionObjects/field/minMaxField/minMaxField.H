@@ -26,7 +26,7 @@ Class
     minMaxField
 
 Description
-    FunctionObject reports min and max of a volScalarField
+    FunctionObject reports min and max of a volField
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved

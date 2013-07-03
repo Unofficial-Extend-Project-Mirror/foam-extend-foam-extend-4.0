@@ -70,7 +70,7 @@ public:
     // Constructors
 
         //- Construct from mesh
-        hRhoMixtureThermo(const fvMesh&);
+        hRhoMixtureThermo(const fvMesh&, const objectRegistry&);
 
 
     //- Destructor

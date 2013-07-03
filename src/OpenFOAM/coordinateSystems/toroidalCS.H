@@ -60,6 +60,10 @@ class toroidalCS
         //- Radius of the torus
         scalar radius_;
 
+        //- Are angles in degrees? (default = true)
+        bool inDegrees_;
+
+
     // Private Member Functions
 
         //- Convert from local coordinate system to the global Cartesian system
@@ -100,15 +104,37 @@ public:
             const word& name,
             const point& origin,
             const coordinateRotation&,
-            const scalar radius
+            const scalar radius,
+            const bool inDegrees = true
         );
 
 
         //- Construct from dictionary
         toroidalCS(const word& name, const dictionary&);
 
+        //- Return clone
+        virtual autoPtr<coordinateSystem> clone() const
+        {
+            return autoPtr<coordinateSystem>(new toroidalCS(*this));
+        }
+
 
     // Member Functions
+
+        // Global information about the coordinate system
+
+            //- Directions in which the span is limited
+            virtual spanInfo spanLimited() const;
+
+            //- Span bounds
+            virtual boundBox spanBounds() const;
+
+
+        //- Are angles in degrees?
+        bool  inDegrees() const;
+
+        //- Non-const access to inDegrees
+        bool& inDegrees();
 
         //- Return radius
         scalar radius() const

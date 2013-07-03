@@ -45,7 +45,17 @@ void setFieldType
     Istream& fieldValueStream
 )
 {
+    // Read field and value together; otherwise there will be an input error
+    // when a field is not found.  HJ, 3/Aug/2011
     word fieldName(fieldValueStream);
+
+    typename GeoField::value_type value
+    (
+        static_cast<const typename GeoField::value_type&>
+        (
+            pTraits<typename GeoField::value_type>(fieldValueStream)
+        )
+    );
 
     IOobject fieldHeader
     (
@@ -63,27 +73,19 @@ void setFieldType
 
         GeoField field(fieldHeader, mesh);
 
-        typename GeoField::value_type value
-        (
-            static_cast<const typename GeoField::value_type&>
-            (
-                pTraits<typename GeoField::value_type>(fieldValueStream)
-            )
-        );
-
         if (selectedCells.size() == field.size())
         {
             field.internalField() = value;
         }
         else
         {
-            forAll(selectedCells, celli)
+            forAll (selectedCells, celli)
             {
                 field[selectedCells[celli]] = value;
             }
         }
 
-        forAll(field.boundaryField(), patchi)
+        forAll (field.boundaryField(), patchi)
         {
             // Forced patch assignment.  HJ, 1/Aug/2010
             field.boundaryField()[patchi] ==
@@ -176,13 +178,10 @@ public:
 
 int main(int argc, char *argv[])
 {
-    timeSelector::addOptions();
-
 #   include "setRootCase.H"
 #   include "createTime.H"
 
-    // Get times list
-    instantList timeDirs = timeSelector::select0(runTime, args);
+    Info<< "Time = " << runTime.timeName() << endl;
 
 #   include "createMesh.H"
 
@@ -216,7 +215,7 @@ int main(int argc, char *argv[])
 
     PtrList<entry> regions(setFieldsDict.lookup("regions"));
 
-    forAll(regions, regionI)
+    forAll (regions, regionI)
     {
         const entry& region = regions[regionI];
 

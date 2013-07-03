@@ -40,6 +40,9 @@ $(omegaWallFunctions)/omegaWallFunction/omegaWallFunctionFvPatchScalarField.C
 kqRWallFunctions = $(wallFunctions)/kqRWallFunctions
 $(kqRWallFunctions)/kqRWallFunction/kqRWallFunctionFvPatchFields.C
 
+RWallFunctions = $(wallFunctions)/RWallFunctions
+$(RWallFunctions)/RWallFunction/RWallFunctionFvPatchSymmTensorField.C
+
 
 /* Patch fields */
 derivedFvPatchFields/turbulentHeatFluxTemperature/turbulentHeatFluxTemperatureFvPatchScalarField.C

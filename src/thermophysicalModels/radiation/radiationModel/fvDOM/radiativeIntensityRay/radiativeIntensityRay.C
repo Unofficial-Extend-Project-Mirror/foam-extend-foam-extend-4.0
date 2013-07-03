@@ -208,7 +208,7 @@ Foam::scalar Foam::radiation::radiativeIntensityRay::correct()
         scalar eqnResidual = solve
         (
             IiEq,
-            mesh_.solver("Ii")
+            mesh_.solutionDict().solver("Ii")
         ).initialResidual();
 
         maxResidual = max(eqnResidual, maxResidual);

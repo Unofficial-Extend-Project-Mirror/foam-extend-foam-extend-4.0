@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
 #       include "setDeltaT.H"
 
-        for (int outerCorr=0; outerCorr<nOuterCorr; outerCorr++)
+        for (int outerCorr = 0; outerCorr < nOuterCorr; outerCorr++)
         {
             magRhoU = mag(rhoU);
             H = (rhoE + p)/rho;
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
                 mesh,
                 fields,
                 phiv,
-                mesh.divScheme("div(phiv,rhoUH)")
+                mesh.schemesDict().divScheme("div(phiv,rhoUH)")
             );
 
             solve
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
             psi = 1.0/(R*T);
             p = rho/psi;
 
-            for (int corr=0; corr<nCorr; corr++)
+            for (int corr = 0; corr < nCorr; corr++)
             {
                 volScalarField rrhoUA = 1.0/rhoUEqn.A();
                 surfaceScalarField rrhoUAf("rrhoUAf", fvc::interpolate(rrhoUA));

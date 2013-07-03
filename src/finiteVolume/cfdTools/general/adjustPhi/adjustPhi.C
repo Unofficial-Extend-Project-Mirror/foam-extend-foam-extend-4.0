@@ -62,7 +62,7 @@ bool Foam::adjustPhi
 
             // Bug fix: All coupled patches should also be unaffected
             // HJ, 12/Feb/2010
-            if (!phip.coupled())
+            if (!Up.coupled())
             {
                 if
                 (
@@ -129,6 +129,10 @@ bool Foam::adjustPhi
           > closedDomainTol*Foam::max(1.0, mag(massIn))
         )
         {
+            phi.write();
+            U.write();
+            p.write();
+
             // Cannot adjust
             FatalErrorIn
             (
@@ -165,7 +169,7 @@ bool Foam::adjustPhi
 
             // Bug fix: All coupled patches should also be unaffected
             // HJ, 12/Feb/2010
-            if (!phip.coupled())
+            if (!Up.coupled())
             {
                 if
                 (

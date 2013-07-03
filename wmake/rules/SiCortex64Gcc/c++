@@ -7,7 +7,7 @@ CC          = g++ -mabi=64
 
 include $(RULES)/c++$(WM_COMPILE_OPTION)
 
-ptFLAGS     = -DNoRepository -ftemplate-depth-40
+ptFLAGS     = -DNoRepository -ftemplate-depth-200
 
 c++FLAGS    = -G0 $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) $(LIB_HEADER_DIRS) -fPIC
 

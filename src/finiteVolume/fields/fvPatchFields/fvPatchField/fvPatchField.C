@@ -28,6 +28,7 @@ License
 #include "dictionary.H"
 #include "fvMesh.H"
 #include "fvPatchFieldMapper.H"
+#include "GeometricField.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -157,7 +158,25 @@ Foam::fvPatchField<Type>::fvPatchField
 template<class Type>
 const Foam::objectRegistry& Foam::fvPatchField<Type>::db() const
 {
-    return patch_.boundaryMesh().mesh();
+    //HR 12.3.10: Lookup fields from the field DB rather than the mesh
+    return internalField_.db();
+}
+
+
+template<class Type>
+template<class GeometricField, class Type2>
+const typename GeometricField::PatchFieldType&
+Foam::fvPatchField<Type>::lookupPatchField
+(
+    const word& name,
+    const GeometricField*,
+    const Type2*
+) const
+{
+    return patch_.patchField<GeometricField, Type2>
+    (
+        internalField_.db().objectRegistry::lookupObject<GeometricField>(name)
+    );
 }
 
 
@@ -227,6 +246,102 @@ template<class Type>
 void Foam::fvPatchField<Type>::manipulateMatrix(fvMatrix<Type>& matrix)
 {
     // do nothing
+}
+
+
+template<class Type>
+void Foam::fvPatchField<Type>::patchInterpolate
+(
+    GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+    const scalarField& pL
+) const
+{
+    // Code moved from surfaceInterpolationScheme.C
+    // HJ, 29/May/2013
+    const label patchI = this->patch().index();
+
+     // Virtual function for patch face interpolate.  HJ, 13/Jun/2013
+     if (this->coupled())
+     {
+         // Coupled patch
+         fField.boundaryField()[patchI] =
+             pL*this->patchInternalField()
+           + (1 - pL)*this->patchNeighbourField();
+     }
+     else
+     {
+         // Uncoupled patch, re-use face values
+         fField.boundaryField()[patchI] = *this;
+     }
+}
+
+
+template<class Type>
+void Foam::fvPatchField<Type>::patchInterpolate
+(
+    GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+    const scalarField& pL,
+    const scalarField& pY
+) const
+{
+    // Code moved from surfaceInterpolationScheme.C
+    // HJ, 29/May/2013
+    const label patchI = this->patch().index();
+
+    // Virtual function for patch face interpolate.  HJ, 13/Jun/2013
+    if (this->coupled())
+    {
+        // Coupled patch
+        fField.boundaryField()[patchI] =
+            pL*this->patchInternalField()
+          + pY*this->patchNeighbourField();
+    }
+    else
+    {
+        // Uncoupled patch, re-used face values
+        fField.boundaryField()[patchI] = *this;
+    }
+}
+
+
+template<class Type>
+void Foam::fvPatchField<Type>::patchFlux
+(
+    GeometricField<Type, fvsPatchField, surfaceMesh>& flux,
+    const fvMatrix<Type>& matrix
+) const
+{
+    // Code moved from fvMatrix.C
+    // HJ, 29/May/2013
+    const label patchI = this->patch().index();
+
+    // Virtual function for patch flux.  HJ, 29/May/2013
+    if (this->coupled())
+    {
+        // Coupled patch
+        flux.boundaryField()[patchI] =
+            cmptMultiply
+            (
+                matrix.internalCoeffs()[patchI],
+                this->patchInternalField()
+            )
+          - cmptMultiply
+            (
+                matrix.boundaryCoeffs()[patchI],
+                this->patchNeighbourField()
+            );
+    }
+    else
+    {
+        // Uncoupled patch
+        flux.boundaryField()[patchI] =
+            cmptMultiply
+            (
+                matrix.internalCoeffs()[patchI],
+                this->patchInternalField()
+            )
+          - matrix.boundaryCoeffs()[patchI];
+    }
 }
 
 

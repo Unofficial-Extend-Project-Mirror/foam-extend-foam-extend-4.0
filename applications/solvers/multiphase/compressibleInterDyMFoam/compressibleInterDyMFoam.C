@@ -82,28 +82,23 @@ int main(int argc, char *argv[])
 
             scalar timeBeforeMeshUpdate = runTime.elapsedCpuTime();
 
-            // Do any mesh changes
-            mesh.update();
+            bool meshChanged = mesh.update();
+            reduce(meshChanged, orOp<bool>());
 
-            if (mesh.changing())
-            {
-                Info<< "Execution time for mesh.update() = "
-                    << runTime.elapsedCpuTime() - timeBeforeMeshUpdate
-                    << " s" << endl;
-            }
+#           include "volContinuity.H"
 
-            if (mesh.changing() && correctPhi)
+            if (correctPhi && meshChanged)
             {
-                #include "correctPhi.H"
+#               include "correctPhi.H"
             }
         }
 
         // Make the fluxes relative to the mesh motion
         fvc::makeRelative(phi, U);
 
-        if (mesh.changing() && checkMeshCourantNo)
+        if (checkMeshCourantNo)
         {
-            #include "meshCourantNo.H"
+#           include "meshCourantNo.H"
         }
 
         turbulence->correct();
@@ -118,7 +113,7 @@ int main(int argc, char *argv[])
             #include "UEqn.H"
 
             // --- PISO loop
-            for (int corr=0; corr<nCorr; corr++)
+            for (int corr = 0; corr < nCorr; corr++)
             {
                 #include "pEqn.H"
             }

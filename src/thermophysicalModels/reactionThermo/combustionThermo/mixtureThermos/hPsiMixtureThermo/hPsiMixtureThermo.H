@@ -69,8 +69,8 @@ public:
 
     // Constructors
 
-        //- Construct from mesh
-        hPsiMixtureThermo(const fvMesh&);
+        //- Construct from mesh and object registry
+        hPsiMixtureThermo(const fvMesh&, const objectRegistry&);
 
 
     //- Destructor

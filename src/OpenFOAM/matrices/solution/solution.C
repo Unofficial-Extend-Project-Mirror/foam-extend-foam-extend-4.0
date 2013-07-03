@@ -175,18 +175,16 @@ bool Foam::solution::read()
 
     if (readOk)
     {
-        const dictionary& dict = solutionDict();
-
-        if (dict.found("relaxationFactors"))
+        if (found("relaxationFactors"))
         {
-            relaxationFactors_ = dict.subDict("relaxationFactors");
+            relaxationFactors_ = subDict("relaxationFactors");
         }
 
         relaxationFactors_.readIfPresent("default", defaultRelaxationFactor_);
 
-        if (dict.found("solvers"))
+        if (found("solvers"))
         {
-            solvers_ = dict.subDict("solvers");
+            solvers_ = subDict("solvers");
             upgradeSolverDict(solvers_);
         }
 
@@ -194,19 +192,6 @@ bool Foam::solution::read()
     }
 
     return readOk;
-}
-
-
-const Foam::dictionary& Foam::solution::solutionDict() const
-{
-    if (found("select"))
-    {
-        return subDict(word(lookup("select")));
-    }
-    else
-    {
-        return *this;
-    }
 }
 
 

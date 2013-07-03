@@ -27,7 +27,7 @@ License
 #include "fv.H"
 #include "HashTable.H"
 #include "linear.H"
-#include "fvMatrix.H"
+#include "fvMatrices.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

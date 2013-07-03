@@ -132,7 +132,7 @@ quote                      \"
 dash                       "-"
 dotColonDash               [.:-]
 
-schemeSpecialInitial       [!$%&*/:<=>?~_^#.]
+schemeSpecialInitial       [!$%&*/\\:<=>?~_^#.@']
 schemeSpecialSubsequent    [.+-]
 schemeSymbol               (({some_space}|{alpha}|{quote}|{schemeSpecialInitial})({alpha}|{quote}|{digit}|{schemeSpecialInitial}|{schemeSpecialSubsequent})*)
 
@@ -142,7 +142,7 @@ integer                    {decDigit}+
 label                      [1-9]{decDigit}*
 hexLabel                   {hexDigit}+
 zeroLabel                  {digit}*
-
+signedInteger              [-+]?{integer}
 word                       ({alpha}|{digit}|{dotColonDash})*
 
 exponent_part              [eE][-+]?{digit}+
@@ -252,11 +252,11 @@ endOfSection               {space}")"{space}
 %}
 
 
- /* ------------------------------------------------------------------------- *\
+ /* ------------------------------------------------------------------------ *\
                             ------ Start Lexing ------
- \* ------------------------------------------------------------------------- */
+ \* ------------------------------------------------------------------------ */
 
- /*                      ------ Reading control header ------                 */
+ /*                     ------ Reading control header ------                 */
 
 {comment} {
         yy_push_state(readComment);
@@ -1773,8 +1773,8 @@ int main(int argc, char *argv[])
 
             for (; cg != cellGroupZoneID.end(); ++cg, ++start, ++end)
             {
-                const word& name=patchNameIDs[cg()];
-                const word& type=patchTypeIDs[cg()];
+                const word& name = patchNameIDs[cg()];
+                const word& type = patchTypeIDs[cg()];
 
                 Info<< "Writing cell set: " << name
                     << " of type " << type << " starting at " << start() - 1

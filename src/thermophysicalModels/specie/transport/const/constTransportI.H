@@ -60,6 +60,32 @@ inline constTransport<thermo>::constTransport
 {}
 
 
+// Construct and return a clone
+template<class thermo>
+inline autoPtr<constTransport<thermo> > constTransport<thermo>::clone
+() const
+{
+    return autoPtr<constTransport<thermo> >
+    (
+        new constTransport<thermo>(*this)
+    );
+}
+
+
+// Selector from Istream
+template<class thermo>
+inline autoPtr<constTransport<thermo> > constTransport<thermo>::New
+(
+    Istream& is
+)
+{
+    return autoPtr<constTransport<thermo> >
+    (
+        new constTransport<thermo>(is)
+    );
+}
+
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 // Dynamic viscosity [kg/ms]

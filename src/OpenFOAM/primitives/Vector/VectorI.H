@@ -103,6 +103,26 @@ inline Cmpt& Vector<Cmpt>::z()
 }
 
 
+template <class Cmpt>
+inline const Cmpt& Vector<Cmpt>::operator()
+(
+    const direction i
+) const
+{
+    return this->operator[](i);
+}
+
+
+template <class Cmpt>
+inline Cmpt& Vector<Cmpt>::operator()
+(
+    const direction i
+)
+{
+    return this->operator[](i);
+}
+
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template <class Cmpt>

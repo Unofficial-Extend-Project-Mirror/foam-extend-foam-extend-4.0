@@ -64,10 +64,8 @@ Description
     your first call to one of the access functions synchronous amongst all
     processors!
 
-
 SourceFiles
     globalMeshData.C
-    globalMeshDataMorph.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -297,7 +295,7 @@ public:
 
         // Processor patch addressing (be careful when not running in parallel)
 
-            //- Return list of processor patch labels 
+            //- Return list of processor patch labels
             //  (size of list = number of processor patches)
             const labelList& processorPatches() const
             {
@@ -360,7 +358,7 @@ public:
             pointField sharedPoints() const;
 
             //- Like sharedPoints but keeps cyclic points separate.
-            //  (does geometric merging; uses matchTol_*bb as merging tolerance)
+            //  (does geometric merging; uses matchTol_*bb as merge tolerance)
             //  Use sharedPoints() instead.
             pointField geometricSharedPoints() const;
 

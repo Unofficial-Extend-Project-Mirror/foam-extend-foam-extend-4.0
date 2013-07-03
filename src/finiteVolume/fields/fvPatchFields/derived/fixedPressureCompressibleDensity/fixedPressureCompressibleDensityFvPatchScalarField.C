@@ -109,7 +109,7 @@ void fixedPressureCompressibleDensityFvPatchScalarField::updateCoeffs()
     }
 
     const fvPatchField<scalar>& pp =
-        patch().lookupPatchField<volScalarField, scalar>(pName_);
+        lookupPatchField<volScalarField, scalar>(pName_);
 
     const dictionary& thermoProps =
         db().lookupObject<IOdictionary>("thermodynamicProperties");

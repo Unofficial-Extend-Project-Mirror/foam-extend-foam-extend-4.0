@@ -69,7 +69,7 @@ class sampledSurfaces
         public:
 
             //- Surface formatter
-            autoPtr< surfaceWriter<Type> > formatter;
+            autoPtr<surfaceWriter<Type> > formatter;
 
             //- Construct null
             fieldGroup()
@@ -101,7 +101,7 @@ class sampledSurfaces
             {
                 formatter.clear();
                 DynamicList<word>::setCapacity(nElem);
-                DynamicList<word>::clear(); 
+                DynamicList<word>::clear();
             }
 
             void operator=(const word& writeFormat)
@@ -179,7 +179,7 @@ class sampledSurfaces
         // Calculated
 
             //- Generic surface formatter
-            autoPtr< surfaceWriter<bool> > genericFormatter_;
+            autoPtr<surfaceWriter<bool> > genericFormatter_;
 
             //- Categorized scalar/vector/tensor fields
             fieldGroup<scalar> scalarFields_;

@@ -91,7 +91,7 @@ bool Foam::polyTopoChanger::reorderCoupledPatches
 
     // faceMap = identity(faces.size());
     // faceMap for boundary faces will be forwarded to polyPatch::order(...)
-    for(label i=0; i<patchStarts[0]; i++)
+    for (label i = 0; i < patchStarts[0]; i++)
     {
         faceMap[i] = i;
     }
@@ -459,7 +459,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
         cfLabels(cells.size() + ref.addedCells().size());
 
     // Insert untouched internal faces
-    for(label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
+    for (label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
     {
         if (!removedFaces.found(faceI))
         {
@@ -1014,8 +1014,10 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
                 )   << "Face " << faceI << " in the new mesh is not "
                     << "mapped correctly." << nl
                     << "It uses a removed or a non-existing vertex or "
-                    << "has been skipped ." << nl
-                    << "Face before mapping: " << oldFace << nl
+                    << "has been skipped." << nl
+                    << "Face before mapping: " << oldFace << " with points "
+                    << oldFace.points(newPointsZeroVol) << nl
+                    << mesh.allPoints().size() << nl
                     << "Face after mapping: " << renumberedFace << nl
                     << "Max new vertex index: "
                     << newPointsZeroVol.size() - 1 << "." << nl
@@ -1098,6 +1100,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
 
             if (rotate != 0)
             {
+                Info<< "Rotating face" << endl;
                 newFaces[faceI] = rotateFace(newFaces[faceI], rotate);
             }
         }

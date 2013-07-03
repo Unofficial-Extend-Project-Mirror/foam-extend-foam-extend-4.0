@@ -170,12 +170,11 @@ Foam::RBFInterpolation::RBFInterpolation
 (
     const dictionary& dict,
     const vectorField& controlPoints,
-    const vectorField& allPoints
+    const vectorField& dataPoints
 )
 :
-    dict_(dict),
     controlPoints_(controlPoints),
-    allPoints_(allPoints),
+    dataPoints_(dataPoints),
     RBF_(RBFFunction::New(word(dict.lookup("RBF")), dict)),
     BPtr_(NULL),
     focalPoint_(dict.lookup("focalPoint")),
@@ -190,9 +189,8 @@ Foam::RBFInterpolation::RBFInterpolation
     const RBFInterpolation& rbf
 )
 :
-    dict_(rbf.dict_),
     controlPoints_(rbf.controlPoints_),
-    allPoints_(rbf.allPoints_),
+    dataPoints_(rbf.dataPoints_),
     RBF_(rbf.RBF_->clone()),
     BPtr_(NULL),
     focalPoint_(rbf.focalPoint_),

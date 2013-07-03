@@ -60,6 +60,18 @@ Foam::BlockCoeff<Foam::scalar>::~BlockCoeff()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+Foam::blockCoeffBase::activeLevel
+Foam::BlockCoeff<Foam::scalar>::activeType() const
+{
+    return blockCoeffBase::SCALAR;
+}
+
+
+Foam::scalar Foam::BlockCoeff<Foam::scalar>::component(const direction) const
+{
+    return scalarCoeff_;
+}
+
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 

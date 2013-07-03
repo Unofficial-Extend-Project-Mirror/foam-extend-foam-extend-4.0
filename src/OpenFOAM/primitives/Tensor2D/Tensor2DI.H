@@ -103,17 +103,20 @@ inline const Cmpt& Tensor2D<Cmpt>::xx() const
     return this->v_[XX];
 }
 
+
 template <class Cmpt>
 inline const Cmpt& Tensor2D<Cmpt>::xy() const
 {
     return this->v_[XY];
 }
 
+
 template <class Cmpt>
 inline const Cmpt& Tensor2D<Cmpt>::yx() const
 {
     return this->v_[YX];
 }
+
 
 template <class Cmpt>
 inline const Cmpt& Tensor2D<Cmpt>::yy() const
@@ -128,11 +131,13 @@ inline Cmpt& Tensor2D<Cmpt>::xx()
     return this->v_[XX];
 }
 
+
 template <class Cmpt>
 inline Cmpt& Tensor2D<Cmpt>::xy()
 {
     return this->v_[XY];
 }
+
 
 template <class Cmpt>
 inline Cmpt& Tensor2D<Cmpt>::yx()
@@ -140,10 +145,33 @@ inline Cmpt& Tensor2D<Cmpt>::yx()
     return this->v_[YX];
 }
 
+
 template <class Cmpt>
 inline Cmpt& Tensor2D<Cmpt>::yy()
 {
     return this->v_[YY];
+}
+
+
+template <class Cmpt>
+inline const Cmpt& Tensor2D<Cmpt>::operator()
+(
+    const direction i,
+    const direction j
+) const
+{
+    return this->operator[](i*Tensor2D<Cmpt>::dim + j);
+}
+
+
+template <class Cmpt>
+inline Cmpt& Tensor2D<Cmpt>::operator()
+(
+    const direction i,
+    const direction j
+)
+{
+    return this->operator[](i*Tensor2D<Cmpt>::dim + j);
 }
 
 

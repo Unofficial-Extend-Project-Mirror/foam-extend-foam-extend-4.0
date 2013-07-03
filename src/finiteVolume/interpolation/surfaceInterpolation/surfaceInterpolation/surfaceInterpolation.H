@@ -54,14 +54,18 @@ namespace Foam
 \*---------------------------------------------------------------------------*/
 
 class surfaceInterpolation
-:
-    public fvSchemes,
-    public fvSolution
 {
     // Private data
 
         // Reference to fvMesh
         const fvMesh& mesh_;
+
+        //- Discretisation schemes
+        fvSchemes schemesDict_;
+
+        //- Solver settings
+        fvSolution solutionDict_;
+
 
         // Demand-driven data
 
@@ -118,6 +122,30 @@ public:
 
 
     // Member functions
+
+        //- Return schemes
+        const fvSchemes& schemesDict() const
+        {
+            return schemesDict_;
+        }
+
+        //- Return access to schemes
+        fvSchemes& schemesDict()
+        {
+            return schemesDict_;
+        }
+
+        //- Return solver settings
+        const fvSolution& solutionDict() const
+        {
+            return solutionDict_;
+        }
+
+        //- Return access to solver settings
+        fvSolution& solutionDict()
+        {
+            return solutionDict_;
+        }
 
         //- Return reference to weighting factors array
         const surfaceScalarField& weights() const;

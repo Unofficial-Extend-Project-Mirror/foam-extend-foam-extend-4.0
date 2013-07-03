@@ -53,6 +53,7 @@ SourceFiles
 #define lduMatrix_H
 
 #include "lduMesh.H"
+#include "HashSet.H"
 #include "primitiveFieldsFwd.H"
 #include "FieldField.H"
 #include "lduInterfaceFieldPtrsList.H"
@@ -81,6 +82,10 @@ class lduMatrix
 
         //- LDU mesh reference
         const lduMesh& lduMesh_;
+
+        //- Eliminated equations
+        //  Consider adding solo cells on construction.  HJ, 26/Oct/2012
+        labelHashSet eliminatedEqns_;
 
         //- Coefficients (not including interfaces)
         scalarField *lowerPtr_, *diagPtr_, *upperPtr_;
@@ -279,6 +284,9 @@ public:
 
             //- Is the stop criterion reached
             bool stop(lduMatrix::solverPerformance& solverPerf) const;
+
+            //- Is the converrgence criterion reached
+            bool converged(lduMatrix::solverPerformance& solverPerf) const;
 
             //- Read the control parameters from the dictionary
             virtual void readControls();
@@ -781,6 +789,18 @@ public:
                 return lduMesh_;
             }
 
+            //- Return eliminated equations
+            const labelHashSet& eliminatedEqns() const
+            {
+                return eliminatedEqns_;
+            }
+
+            //- Return access to eliminated equations
+            labelHashSet& eliminatedEqns()
+            {
+                return eliminatedEqns_;
+            }
+
             //- Return the LDU addressing
             const lduAddressing& lduAddr() const
             {
@@ -917,7 +937,8 @@ public:
                 const lduInterfaceFieldPtrsList& interfaces,
                 const scalarField& xif,
                 scalarField& result,
-                const direction cmpt
+                const direction cmpt,
+                const bool switchToLhs = false
             ) const;
 
             //- Update coupled interfaces for matrix operations
@@ -927,7 +948,8 @@ public:
                 const lduInterfaceFieldPtrsList& interfaces,
                 const scalarField& xif,
                 scalarField& result,
-                const direction cmpt
+                const direction cmpt,
+                const bool switchToLhs = false
             ) const;
 
             //- Initialise the update of coupled interfaces
@@ -938,7 +960,8 @@ public:
                 const lduInterfaceFieldPtrsList& interfaces,
                 const scalarField& xif,
                 scalarField& result,
-                const direction cmpt
+                const direction cmpt,
+                const bool switchToLhs = false
             ) const;
 
             //- Update coupled interfaces for matrix operations
@@ -949,7 +972,8 @@ public:
                 const lduInterfaceFieldPtrsList& interfaces,
                 const scalarField& xif,
                 scalarField& result,
-                const direction cmpt
+                const direction cmpt,
+                const bool switchToLhs = false
             ) const;
 
 

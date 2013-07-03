@@ -29,6 +29,7 @@ Description
 
 #include "fv.H"
 #include "HashTable.H"
+#include "primitiveFieldsFwd.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -94,6 +95,39 @@ tmp<gradScheme<Type> > gradScheme<Type>::New
 template<class Type>
 gradScheme<Type>::~gradScheme()
 {}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+void gradScheme<Type>::correctBoundaryConditions
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vsf,
+    GeometricField
+    <
+        typename outerProduct<vector, Type>::type, fvPatchField, volMesh
+    >& gGrad
+)
+{
+    forAll (vsf.boundaryField(), patchi)
+    {
+        if (!vsf.boundaryField()[patchi].coupled())
+        {
+            vectorField n = vsf.mesh().boundary()[patchi].nf();
+
+            gGrad.boundaryField()[patchi] += n*
+            (
+                vsf.boundaryField()[patchi].snGrad()
+              - (n & gGrad.boundaryField()[patchi])
+            );
+        }
+    }
+
+    // Note: coupled boundaries provide patchNeighbourField, which is only
+    // updated on correct boundary conditions.  Therefore, evaluateCoupled()
+    // should be called here. HJ, Apr/2013
+    gGrad.boundaryField().evaluateCoupled();
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -107,7 +107,8 @@ Foam::subsetMotionSolverFvMesh::subsetMotionSolverFvMesh(const IOobject& io)
         (
             "subsetMotionSolverFvMesh::subsetMotionSolverFvMesh"
             "(const IOobject& io)"
-        )   << "Ill-defined motion under-relaxation: should be between 0 and 1."
+        )   << "Ill-defined motion under-relaxation: "
+            << "should be between 0 and 1."
             << "  Alpha = " << alpha_ << abort(FatalError);
     }
 }
@@ -133,7 +134,7 @@ bool Foam::subsetMotionSolverFvMesh::update()
     pointField subsetPoints = motionPtr_->newPoints();
 
     //- Get copy of mesh points
-    pointField p = points();
+    pointField p = allPoints();
 
     //- Map the moving part
     const labelList& subsetPointAddr = subsetMesh_.pointMap();
@@ -146,7 +147,7 @@ bool Foam::subsetMotionSolverFvMesh::update()
     subsetMesh_.subMesh().movePoints(subsetPoints);
 
     // Under-relax mesh motion
-    p = alpha_*p + (1 - alpha_)*points();
+    p = alpha_*p + (1 - alpha_)*allPoints();
 
     fvMesh::movePoints(p);
 

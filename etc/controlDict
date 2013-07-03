@@ -40,6 +40,8 @@ DebugSwitches
     mixingPlane                           0;
     MixingPlaneInterpolation              0;
 
+    tetFemVectorMatrix        0;
+
     overlapGgi          0;
     cyclicGgi           0;
     coupledLduMatrix    1;
@@ -629,6 +631,7 @@ DebugSwitches
     nutWallFunction     0;
     obj                 0;
     objectRegistry      0;
+    postfixedSubRegistry 0;
     octree              0;
     octreeDataEdges     0;
     octreeDataFace      0;

@@ -139,21 +139,21 @@ emptyFvPatchField<Type>::emptyFvPatchField
 template<class Type>
 void emptyFvPatchField<Type>::updateCoeffs()
 {
-    if
-    (
-        this->dimensionedInternalField().mesh().nCells() > 0
-     && (
-            this->patch().patch().size()
-          % this->dimensionedInternalField().mesh().nCells()
-        )
-    )
-    {
-        FatalErrorIn("emptyFvPatchField<Type>::updateCoeffs()")
-            << "This mesh contains patches of type empty but is not 1D or 2D\n"
-               "    by virtue of the fact that the number of faces of this\n"
-               "    empty patch is not divisible by the number of cells."
-            << exit(FatalError);
-    }
+    //- Check moved to checkMesh. Test here breaks down if multiple empty
+    //  patches.
+    //if
+    //(
+    //    this->patch().patch().size()
+    //  % this->dimensionedInternalField().mesh().nCells()
+    //)
+    //{
+    //    FatalErrorIn("emptyFvPatchField<Type>::updateCoeffs()")
+    //        << "This mesh contains patches of type empty but is not"
+    //        << "1D or 2D\n"
+    //           "    by virtue of the fact that the number of faces of this\n"
+    //           "    empty patch is not divisible by the number of cells."
+    //        << exit(FatalError);
+    //}
 }
 
 

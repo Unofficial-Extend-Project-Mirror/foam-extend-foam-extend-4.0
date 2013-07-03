@@ -8,12 +8,12 @@ EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude
 
 EXE_LIBS = \
+    -lbasicThermophysicalModels \
     -lcompressibleTurbulenceModel \
     -lcompressibleRASModels \
     -lcompressibleLESModels \
     -lreactionThermophysicalModels \
     -lspecie \
-    -lbasicThermophysicalModels \
     -lchemistryModel \
     -lODE \
     -lfiniteVolume \

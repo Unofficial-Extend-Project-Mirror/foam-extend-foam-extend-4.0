@@ -61,7 +61,7 @@ Foam::OFstreamAllocator::OFstreamAllocator
             rm(pathname);
         }
 
-        ofPtr_ = new ogzstream((pathname + ".gz").c_str());
+        ofPtr_ = new ogzstream((pathname + ".gz").c_str(), mode);
     }
     else
     {
@@ -71,7 +71,7 @@ Foam::OFstreamAllocator::OFstreamAllocator
             rm(pathname + ".gz");
         }
 
-        ofPtr_ = new ofstream(pathname.c_str());
+        ofPtr_ = new ofstream(pathname.c_str(), mode);
     }
 }
 

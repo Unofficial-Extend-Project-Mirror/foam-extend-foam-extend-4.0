@@ -16,7 +16,14 @@ FoamFile
 
 solvers
 {
-    motionU ICCG 1e-9 0.001;
+    motionU
+    {
+        solver           CG;
+        preconditioner   Cholesky;
+
+        tolerance        1e-09;
+        relTol           0.001;
+    }
 }
 
 // ************************************************************************* //

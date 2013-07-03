@@ -6,7 +6,7 @@ tmp<fv::convectionScheme<scalar> > mvConvection
         mesh,
         fields,
         phi,
-        mesh.divScheme("div(phi,Yi_h)")
+        mesh.schemesDict().divScheme("div(phi,Yi_h)")
     )
 );
 
@@ -29,7 +29,7 @@ tmp<fv::convectionScheme<scalar> > mvConvection
                 parcels.Srho(i)
               + kappa*chemistry.RR(i)().dimensionedInternalField()
               + massSource.Su(i),
-                mesh.solver("Yi")
+                mesh.solutionDict().solver("Yi")
             );
 
             Yi.max(0.0);

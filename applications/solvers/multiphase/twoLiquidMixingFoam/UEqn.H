@@ -16,7 +16,14 @@
 
     if (oCorr == nOuterCorr-1)
     {
-        UEqn.relax(1);
+        if (mesh.solutionDict().relax("UFinal"))
+        {
+            UEqn.relax(mesh.solutionDict().relaxationFactor("UFinal"));
+        }
+        else
+        {
+            UEqn.relax(1);
+        }
     }
     else
     {
@@ -33,6 +40,6 @@
             (
                 (- ghf*fvc::snGrad(rho) - fvc::snGrad(p_rgh))*mesh.magSf()
             ),
-            mesh.solver(oCorr == nOuterCorr-1 ? "UFinal" : "U")
+            mesh.solutionDict().solver(oCorr == nOuterCorr-1 ? "UFinal" : "U")
         );
     }

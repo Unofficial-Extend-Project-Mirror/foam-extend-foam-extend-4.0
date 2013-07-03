@@ -13,4 +13,5 @@ EXE_LIBS = \
     -lmeshTools \
     -lfiniteVolume \
     -lfiniteArea \
-    -llduSolvers
+    -llduSolvers \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

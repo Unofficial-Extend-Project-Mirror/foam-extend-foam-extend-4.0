@@ -81,7 +81,8 @@ void Foam::ggiGAMGInterfaceField::initInterfaceMatrixUpdate
     const lduMatrix&,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     // This must have a reduce in it.  HJ, 15/May/2009
@@ -96,7 +97,8 @@ void Foam::ggiGAMGInterfaceField::updateInterfaceMatrix
     const lduMatrix&,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     // Get expanded data to zone size.  No global reduce allowed
@@ -111,25 +113,26 @@ void Foam::ggiGAMGInterfaceField::updateInterfaceMatrix
     if (zonePnf.size() != faceCells.size())
     {
         FatalErrorIn("ggiGAMGInterfaceField::updateInterfaceMatrix")
-            << "Bananas!!!"
+            << "Error in interface update: incorrect size of zone fields" << nl
+            << "Field size = " << zonePnf.size()
+            << " Zone size = " << faceCells.size()
             << abort(FatalError);
     }
 
-    forAll(faceCells, elemI)
+    if (switchToLhs)
     {
-        result[faceCells[elemI]] -= coeffs[elemI]*zonePnf[elemI];
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] += coeffs[elemI]*zonePnf[elemI];
+        }
     }
-
-
-    // Old treatment
-#if(0)
-    const labelList& za = ggiInterface_.zoneAddressing();
-
-    forAll(faceCells, elemI)
+    else
     {
-        result[faceCells[elemI]] -= coeffs[elemI]*zonePnf[za[elemI]];
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] -= coeffs[elemI]*zonePnf[elemI];
+        }
     }
-#endif
 }
 
 

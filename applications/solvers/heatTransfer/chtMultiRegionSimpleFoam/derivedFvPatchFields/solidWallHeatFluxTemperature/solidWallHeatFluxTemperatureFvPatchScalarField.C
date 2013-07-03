@@ -132,7 +132,7 @@ void Foam::solidWallHeatFluxTemperatureFvPatchScalarField::updateCoeffs()
         return;
     }
 
-    const scalarField& Kw = patch().lookupPatchField<volScalarField, scalar>
+    const scalarField& Kw = lookupPatchField<volScalarField, scalar>
     (
         KName_
     );

@@ -214,21 +214,14 @@ surfaceInterpolationScheme<Type>::interpolate
 
     // Interpolate across coupled patches using given lambdas and ys
 
-    forAll (lambdas.boundaryField(), pi)
+    forAll (vf.boundaryField(), patchI)
     {
-        const fvsPatchScalarField& pLambda = lambdas.boundaryField()[pi];
-        const fvsPatchScalarField& pY = ys.boundaryField()[pi];
-
-        if (vf.boundaryField()[pi].coupled())
-        {
-            sf.boundaryField()[pi] =
-                pLambda*vf.boundaryField()[pi].patchInternalField()
-              + pY*vf.boundaryField()[pi].patchNeighbourField();
-        }
-        else
-        {
-            sf.boundaryField()[pi] = vf.boundaryField()[pi];
-        }
+        vf.boundaryField()[patchI].patchInterpolate
+        (
+            sf,
+            lambdas.boundaryField()[patchI],
+            ys.boundaryField()[patchI]
+        );
     }
 
     tlambdas.clear();
@@ -291,21 +284,15 @@ surfaceInterpolationScheme<Type>::interpolate
     }
 
     // Interpolate across coupled patches using given lambdas
-
-    forAll (lambdas.boundaryField(), pi)
+    // Code moved under virtual functions into fvPatchField
+    // HJ, 13/Jun/2013
+    forAll (vf.boundaryField(), patchI)
     {
-        const fvsPatchScalarField& pLambda = lambdas.boundaryField()[pi];
-
-        if (vf.boundaryField()[pi].coupled())
-        {
-            tsf().boundaryField()[pi] =
-                pLambda*vf.boundaryField()[pi].patchInternalField()
-             + (1.0 - pLambda)*vf.boundaryField()[pi].patchNeighbourField();
-        }
-        else
-        {
-            sf.boundaryField()[pi] = vf.boundaryField()[pi];
-        }
+        vf.boundaryField()[patchI].patchInterpolate
+        (
+            sf,
+            lambdas.boundaryField()[patchI]
+        );
     }
 
     tlambdas.clear();

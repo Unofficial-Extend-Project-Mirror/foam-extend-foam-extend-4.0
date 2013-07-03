@@ -76,6 +76,7 @@ class UList
         //- Number of elements in UList.
         label size_;
 
+
 protected:
 
     // Protected member functions
@@ -94,6 +95,12 @@ public:
 
         //- Declare friendship with the SubList class
         friend class SubList<T>;
+
+
+    // Static data members
+
+        //- Empty list
+        static const UList<T> zero;
 
 
     // Static Member Functions

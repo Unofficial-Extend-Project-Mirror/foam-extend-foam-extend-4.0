@@ -486,8 +486,8 @@ const Foam::indexedOctree<Foam::treeDataFace>& Foam::meshSearch::boundaryTree()
 }
 
 
-const Foam::indexedOctree<Foam::treeDataCell>& Foam::meshSearch::cellTree()
- const
+const Foam::indexedOctree<Foam::treeDataCell>&
+Foam::meshSearch::cellTree() const
 {
     if (!cellTreePtr_)
     {

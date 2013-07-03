@@ -51,7 +51,7 @@ SourceFiles
 #include "coeffFields.H"
 #include "FieldField.H"
 #include "lduMesh.H"
-// #include "BlockLduInterfaceField.H"
+#include "HashSet.H"
 #include "BlockLduInterfaceFieldPtrsList.H"
 #include "Map.H"
 
@@ -96,6 +96,10 @@ private:
 
         // LDU mesh reference
         const lduMesh& lduMesh_;
+
+        //- Eliminated equations
+        //  Consider adding solo cells on construction.  HJ, 26/Oct/2012
+        labelHashSet eliminatedEqns_;
 
 
         // Block matrix elements
@@ -236,6 +240,18 @@ public:
             const lduMesh& mesh() const
             {
                 return lduMesh_;
+            }
+
+            //- Return eliminated equations
+            const labelHashSet& eliminatedEqns() const
+            {
+                return eliminatedEqns_;
+            }
+
+            //- Return access to eliminated equations
+            labelHashSet& eliminatedEqns()
+            {
+                return eliminatedEqns_;
             }
 
             //- Return the LDU addressing
@@ -405,7 +421,8 @@ public:
             (
                 const FieldField<CoeffField, Type>& interfaceCoeffs,
                 TypeField& result,
-                const TypeField& psi
+                const TypeField& psi,
+                const bool switchToLhs = false
             ) const;
 
             //- Update coupled interfaces
@@ -413,7 +430,8 @@ public:
             (
                 const FieldField<CoeffField, Type>& interfaceCoeffs,
                 TypeField& result,
-                const TypeField& psi
+                const TypeField& psi,
+                const bool switchToLhs = false
             ) const;
 
 

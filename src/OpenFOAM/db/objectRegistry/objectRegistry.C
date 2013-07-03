@@ -45,11 +45,9 @@ Foam::objectRegistry::objectRegistry
         IOobject
         (
             string::validate<word>(t.caseName()),
-            "",
             t,
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE,
-            false
+            IOobject::AUTO_WRITE
         ),
         true    // to flag that this is the top-level regIOobject
     ),
@@ -72,6 +70,24 @@ Foam::objectRegistry::objectRegistry
     time_(io.time()),
     parent_(io.db()),
     dbDir_(parent_.dbDir()/local()/name()),
+    event_(1)
+{
+    writeOpt() = IOobject::AUTO_WRITE;
+}
+
+
+Foam::objectRegistry::objectRegistry
+(
+    const IOobject& io,
+    const fileName& dbDir,
+    const label nIoObjects
+)
+:
+    regIOobject(io),
+    HashTable<regIOobject*>(nIoObjects),
+    time_(io.time()),
+    parent_(io.db()),
+    dbDir_(dbDir),
     event_(1)
 {
     writeOpt() = IOobject::AUTO_WRITE;
@@ -132,6 +148,12 @@ Foam::wordList Foam::objectRegistry::names(const word& ClassName) const
     objectNames.setSize(count);
 
     return objectNames;
+}
+
+
+Foam::fileName Foam::objectRegistry::mangleFileName(const fileName& fName) const
+{
+    return fName;
 }
 
 

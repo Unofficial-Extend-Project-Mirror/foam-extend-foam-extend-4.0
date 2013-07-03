@@ -152,13 +152,13 @@ void Foam::twoStrokeEngine::setBoundaryVelocity(volVectorField& U)
 
     //  On the piston movingWallVelocity is used.
     // There is no need to update the piston velocity
-//    U.boundaryField()[piston().patchID().index()] = pistonVel;
 
-    forAll(scavInPortPatches_, patchi)
+    forAll (scavInPortPatches_, patchi)
     {
-        U.boundaryField()
-            [boundaryMesh().findPatchID(scavInPortPatches_[patchi])] ==
-            pistonVel;
+        const label curPatchID =
+            boundaryMesh().findPatchID(scavInPortPatches_[patchi]);
+
+        U.boundaryField()[curPatchID] == pistonVel;
     }
 }
 

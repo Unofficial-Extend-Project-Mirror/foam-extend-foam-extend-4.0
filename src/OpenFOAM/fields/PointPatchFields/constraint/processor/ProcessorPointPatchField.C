@@ -48,7 +48,8 @@ template
     class Type
 >
 void ProcessorPointPatchField
-<PatchField, Mesh, PointPatch, ProcessorPointPatch, MatrixType, Type>::resizeBuf
+<PatchField, Mesh, PointPatch, ProcessorPointPatch, MatrixType, Type>::
+resizeBuf
 (
     List<char>& buf, 
     const label size
@@ -233,7 +234,7 @@ initAddFieldTempl
     const Field<Type2>& pField
 ) const
 {
-    sendField(patchInternalField(pField), commsType);
+    this->sendField(patchInternalField(pField), commsType);
 }
 
 
@@ -258,7 +259,7 @@ addFieldTempl
 {
     // Get the neighbour side values
     tmp<Field<Type2> > tpNeighbour = receivePointField<Type2>(commsType);
-    addToInternalField(pField, tpNeighbour());
+    this->addToInternalField(pField, tpNeighbour());
 }
 
 
@@ -961,7 +962,8 @@ initInterfaceMatrixUpdate
     const lduMatrix& m,
     const scalarField& coeffs,
     const direction,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     tmp<scalarField> tlocalMult(new scalarField(this->size(), 0));
@@ -985,93 +987,189 @@ initInterfaceMatrixUpdate
     // use the counter.  
     label coeffI = 0;
 
-    // Owner side
-    // ~~~~~~~~~~
+    if (switchToLhs)
     {
-        const labelList& cutOwn = procPatch_.cutEdgeOwnerIndices();
-        const labelList& cutOwnStart = procPatch_.cutEdgeOwnerStart();
-
-        forAll (mp, pointI)
+        // Owner side
+        // ~~~~~~~~~~
         {
-            label ownIndex = cutOwnStart[pointI];
-            label endOwn = cutOwnStart[pointI + 1];
+            const labelList& cutOwn = procPatch_.cutEdgeOwnerIndices();
+            const labelList& cutOwnStart = procPatch_.cutEdgeOwnerStart();
 
-            for (; ownIndex < endOwn; ownIndex++)
+            forAll (mp, pointI)
             {
-                localMult[pointI] +=
-                    coeffs[coeffI]*psiInternal[U[cutOwn[ownIndex]]];
+                label ownIndex = cutOwnStart[pointI];
+                label endOwn = cutOwnStart[pointI + 1];
 
-                // Multiply the internal side as well using the cut mask
-                result[U[cutOwn[ownIndex]]] +=
-                    cutMask[coeffI]*coeffs[coeffI]*psiInternal[mp[pointI]];
+                for (; ownIndex < endOwn; ownIndex++)
+                {
+                    localMult[pointI] +=
+                        coeffs[coeffI]*psiInternal[U[cutOwn[ownIndex]]];
 
+                    // Multiply the internal side as well using the cut mask
+                    result[U[cutOwn[ownIndex]]] -=
+                        cutMask[coeffI]*coeffs[coeffI]*psiInternal[mp[pointI]];
+
+                    coeffI++;
+                }
+            }
+        }
+
+        // Neighbour side
+        // ~~~~~~~~~~~~~~
+        {
+            const labelList& cutNei = procPatch_.cutEdgeNeighbourIndices();
+            const labelList& cutNeiStart = procPatch_.cutEdgeNeighbourStart();
+
+            forAll (mp, pointI)
+            {
+                label neiIndex = cutNeiStart[pointI];
+                label endNei = cutNeiStart[pointI + 1];
+
+                for (; neiIndex < endNei; neiIndex++)
+                {
+                    localMult[pointI] +=
+                        coeffs[coeffI]*psiInternal[L[cutNei[neiIndex]]];
+
+                    // Multiply the internal side as well using the cut mask
+                    result[L[cutNei[neiIndex]]] -=
+                        cutMask[coeffI]*coeffs[coeffI]*psiInternal[mp[pointI]];
+
+                    coeffI++;
+                }
+            }
+        }
+
+        // Doubly cut coefficients
+        // ~~~~~~~~~~~~~~~~~~~~~~~
+
+        // There exists a possibility of having an internal edge for a
+        // point on the processor patch which is in fact connected to
+        // another point of the same patch.  This particular nastiness
+        // introduces a deformation in the solution because the edge is
+        // either multiplied twice or not at all.  For this purpose, the
+        // offending edges need to be separated out and multiplied
+        // appropriately.  This will only happen for cell tetrahedral
+        // decomposition and is generally nasty.  
+        // No need for cut mask here
+        {
+            const labelList& doubleCut = procPatch_.doubleCutEdgeIndices();
+
+            const labelList& doubleCutOwner = procPatch_.doubleCutOwner();
+            const labelList& doubleCutNeighbour =
+                procPatch_.doubleCutNeighbour();
+
+            forAll (doubleCut, edgeI)
+            {
+                // Owner side
+                localMult[doubleCutOwner[edgeI]] +=
+                    coeffs[coeffI]*psiInternal[U[doubleCut[edgeI]]];
+                coeffI++;
+
+                // Neighbour side
+                localMult[doubleCutNeighbour[edgeI]] +=
+                    coeffs[coeffI]*psiInternal[L[doubleCut[edgeI]]];
                 coeffI++;
             }
         }
-    }
 
-    // Neighbour side
-    // ~~~~~~~~~~~~~~
-    {
-        const labelList& cutNei = procPatch_.cutEdgeNeighbourIndices();
-        const labelList& cutNeiStart = procPatch_.cutEdgeNeighbourStart();
+        // Add the local multiplication to this side as well
 
         forAll (mp, pointI)
         {
-            label neiIndex = cutNeiStart[pointI];
-            label endNei = cutNeiStart[pointI + 1];
+            result[mp[pointI]] -= localMult[pointI];
+        }
+    }
+    else
+    {
+        // Owner side
+        // ~~~~~~~~~~
+        {
+            const labelList& cutOwn = procPatch_.cutEdgeOwnerIndices();
+            const labelList& cutOwnStart = procPatch_.cutEdgeOwnerStart();
 
-            for (; neiIndex < endNei; neiIndex++)
+            forAll (mp, pointI)
             {
-                localMult[pointI] +=
-                    coeffs[coeffI]*psiInternal[L[cutNei[neiIndex]]];
+                label ownIndex = cutOwnStart[pointI];
+                label endOwn = cutOwnStart[pointI + 1];
 
-                // Multiply the internal side as well using the cut mask
-                result[L[cutNei[neiIndex]]] +=
-                    cutMask[coeffI]*coeffs[coeffI]*psiInternal[mp[pointI]];
+                for (; ownIndex < endOwn; ownIndex++)
+                {
+                    localMult[pointI] +=
+                        coeffs[coeffI]*psiInternal[U[cutOwn[ownIndex]]];
 
+                    // Multiply the internal side as well using the cut mask
+                    result[U[cutOwn[ownIndex]]] +=
+                        cutMask[coeffI]*coeffs[coeffI]*psiInternal[mp[pointI]];
+
+                    coeffI++;
+                }
+            }
+        }
+
+        // Neighbour side
+        // ~~~~~~~~~~~~~~
+        {
+            const labelList& cutNei = procPatch_.cutEdgeNeighbourIndices();
+            const labelList& cutNeiStart = procPatch_.cutEdgeNeighbourStart();
+
+            forAll (mp, pointI)
+            {
+                label neiIndex = cutNeiStart[pointI];
+                label endNei = cutNeiStart[pointI + 1];
+
+                for (; neiIndex < endNei; neiIndex++)
+                {
+                    localMult[pointI] +=
+                        coeffs[coeffI]*psiInternal[L[cutNei[neiIndex]]];
+
+                    // Multiply the internal side as well using the cut mask
+                    result[L[cutNei[neiIndex]]] +=
+                        cutMask[coeffI]*coeffs[coeffI]*psiInternal[mp[pointI]];
+
+                    coeffI++;
+                }
+            }
+        }
+
+        // Doubly cut coefficients
+        // ~~~~~~~~~~~~~~~~~~~~~~~
+
+        // There exists a possibility of having an internal edge for a
+        // point on the processor patch which is in fact connected to
+        // another point of the same patch.  This particular nastiness
+        // introduces a deformation in the solution because the edge is
+        // either multiplied twice or not at all.  For this purpose, the
+        // offending edges need to be separated out and multiplied
+        // appropriately.  This will only happen for cell tetrahedral
+        // decomposition and is generally nasty.  
+        // No need for cut mask here
+        {
+            const labelList& doubleCut = procPatch_.doubleCutEdgeIndices();
+
+            const labelList& doubleCutOwner = procPatch_.doubleCutOwner();
+            const labelList& doubleCutNeighbour =
+                procPatch_.doubleCutNeighbour();
+
+            forAll (doubleCut, edgeI)
+            {
+                // Owner side
+                localMult[doubleCutOwner[edgeI]] +=
+                    coeffs[coeffI]*psiInternal[U[doubleCut[edgeI]]];
+                coeffI++;
+
+                // Neighbour side
+                localMult[doubleCutNeighbour[edgeI]] +=
+                    coeffs[coeffI]*psiInternal[L[doubleCut[edgeI]]];
                 coeffI++;
             }
         }
-    }
 
-    // Doubly cut coefficients
-    // ~~~~~~~~~~~~~~~~~~~~~~~
+        // Add the local multiplication to this side as well
 
-    // There exists a possibility of having an internal edge for a
-    // point on the processor patch which is in fact connected to
-    // another point of the same patch.  This particular nastiness
-    // introduces a deformation in the solution because the edge is
-    // either multiplied twice or not at all.  For this purpose, the
-    // offending edges need to be separated out and multiplied
-    // appropriately.  This will only happen for cell tetrahedral
-    // decomposition and is generally nasty.  
-    // No need for cut mask here
-    {
-        const labelList& doubleCut = procPatch_.doubleCutEdgeIndices();
-
-        const labelList& doubleCutOwner = procPatch_.doubleCutOwner();
-        const labelList& doubleCutNeighbour = procPatch_.doubleCutNeighbour();
-
-        forAll (doubleCut, edgeI)
+        forAll (mp, pointI)
         {
-            // Owner side
-            localMult[doubleCutOwner[edgeI]] +=
-                coeffs[coeffI]*psiInternal[U[doubleCut[edgeI]]];
-            coeffI++;
-
-            // Neighbour side
-            localMult[doubleCutNeighbour[edgeI]] +=
-                coeffs[coeffI]*psiInternal[L[doubleCut[edgeI]]];
-            coeffI++;
+            result[mp[pointI]] += localMult[pointI];
         }
-    }
-
-    // Add the local multiplication to this side as well
-
-    forAll (mp, pointI)
-    {
-        result[mp[pointI]] += localMult[pointI];
     }
 
     // Send the localMult
@@ -1099,9 +1197,13 @@ updateInterfaceMatrix
     const lduMatrix&,
     const scalarField&,
     const direction,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
+    // Switch to lhs handled in init
+    // HJ, 22/May/2013
+
     // Get the neighbour side multiplication
     tmp<scalarField> tneiMult = receivePointField<scalar>(commsType);
     this->addToInternalField(result, tneiMult());

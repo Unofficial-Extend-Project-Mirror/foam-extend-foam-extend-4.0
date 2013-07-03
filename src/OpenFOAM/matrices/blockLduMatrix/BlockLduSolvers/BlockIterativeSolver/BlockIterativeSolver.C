@@ -82,7 +82,8 @@ Foam::scalar Foam::BlockIterativeSolver<Type>::normFactor
 
     if (BlockLduMatrix<Type>::debug >= 2)
     {
-        Info<< "Iterative solver normalisation factor = " << normFactor << endl;
+        Info<< "Iterative solver normalisation factor = "
+            << normFactor << endl;
     }
 
     return normFactor;

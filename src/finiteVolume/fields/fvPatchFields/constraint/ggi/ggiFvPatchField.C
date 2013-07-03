@@ -140,13 +140,31 @@ ggiFvPatchField<Type>::ggiFvPatchField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Return neighbour field
+template<class Type>
+const ggiFvPatchField<Type>& ggiFvPatchField<Type>::shadowPatchField() const
+{
+    const GeometricField<Type, fvPatchField, volMesh>& fld =
+    static_cast<const GeometricField<Type, fvPatchField, volMesh>&>
+    (
+        this->internalField()
+    );
+
+    return refCast<const ggiFvPatchField<Type> >
+    (
+        fld.boundaryField()[ggiPatch_.shadowIndex()]
+    );
+}
+
+
 template<class Type>
 tmp<Field<Type> > ggiFvPatchField<Type>::patchNeighbourField() const
 {
     const Field<Type>& iField = this->internalField();
 
     // Get shadow face-cells and assemble shadow field
+    // This is a patchInternalField of neighbour but access is inconvenient.
+    // Assemble by hand.
+    // HJ, 27/Sep/2011
     const unallocLabelList& sfc = ggiPatch_.shadow().faceCells();
 
     Field<Type> sField(sfc.size());
@@ -198,11 +216,10 @@ void ggiFvPatchField<Type>::initEvaluate
         // Symmetry treatment used for overlap
         vectorField nHat = this->patch().nf();
 
+        Field<Type> pif = this->patchInternalField();
+
         Field<Type> bridgeField =
-        (
-            this->patchInternalField()
-          + transform(I - 2.0*sqr(nHat), this->patchInternalField())
-        )/2.0;
+            0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
 
         ggiPatch_.bridge(bridgeField, pf);
     }
@@ -217,10 +234,7 @@ void ggiFvPatchField<Type>::evaluate
     const Pstream::commsTypes
 )
 {
-    if (!this->updated())
-    {
-        this->updateCoeffs();
-    }
+    fvPatchField<Type>::evaluate();
 }
 
 
@@ -232,7 +246,8 @@ void ggiFvPatchField<Type>::initInterfaceMatrixUpdate
     const lduMatrix&,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     // Communication is allowed either before or after processor
@@ -253,9 +268,19 @@ void ggiFvPatchField<Type>::initInterfaceMatrixUpdate
     // Multiply the field by coefficients and add into the result
     const unallocLabelList& fc = ggiPatch_.faceCells();
 
-    forAll(fc, elemI)
+    if (switchToLhs)
     {
-        result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
+        forAll(fc, elemI)
+        {
+            result[fc[elemI]] += coeffs[elemI]*pnf[elemI];
+        }
+    }
+    else
+    {
+        forAll(fc, elemI)
+        {
+            result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
+        }
     }
 }
 
@@ -268,7 +293,8 @@ void ggiFvPatchField<Type>::updateInterfaceMatrix
     const lduMatrix&,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes
+    const Pstream::commsTypes,
+    const bool switchToLhs
 ) const
 {}
 

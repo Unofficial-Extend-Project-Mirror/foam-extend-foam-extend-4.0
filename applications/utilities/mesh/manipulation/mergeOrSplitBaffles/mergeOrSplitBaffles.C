@@ -232,16 +232,16 @@ int main(int argc, char *argv[])
 #   include "createNamedMesh.H"
     const word oldInstance = mesh.pointsInstance();
 
-    bool split      = args.optionFound("split");
+    bool split = args.optionFound("split");
     bool overwrite  = args.optionFound("overwrite");
     bool detectOnly = args.optionFound("detectOnly");
 
     // Collect all boundary faces
     labelList boundaryFaces(mesh.nFaces() - mesh.nInternalFaces());
 
-    forAll(boundaryFaces, i)
+    forAll (boundaryFaces, i)
     {
-        boundaryFaces[i] = i+mesh.nInternalFaces();
+        boundaryFaces[i] = i + mesh.nInternalFaces();
     }
 
 

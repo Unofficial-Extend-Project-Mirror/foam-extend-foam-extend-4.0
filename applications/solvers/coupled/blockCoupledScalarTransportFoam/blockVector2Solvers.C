@@ -113,6 +113,7 @@ addSolverToBlockMatrix(Vector2, blockCGSolverVector2, symMatrix);
 typedef BlockGaussSeidelSolver<vector2> blockGaussSeidelSolverVector2;
 makeBlockSolverTypeName(blockGaussSeidelSolverVector2);
 addSolverToBlockMatrix(Vector2, blockGaussSeidelSolverVector2, symMatrix);
+addSolverToBlockMatrix(Vector2, blockGaussSeidelSolverVector2, asymMatrix);
 
 typedef BlockGMRESSolver<vector2> blockGMRESSolverVector2;
 makeBlockSolverTypeName(blockGMRESSolverVector2);

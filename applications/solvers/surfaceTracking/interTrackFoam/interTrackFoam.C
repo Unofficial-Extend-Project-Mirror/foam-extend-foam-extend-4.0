@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 
         interface.predictPoints();
 
-        Pout<< "\nMax surface Courant Number = "
+        Info<< "\nMax surface Courant Number = "
             << interface.maxCourantNumber() << endl << endl;
 
         for (int corr=0; corr<nOuterCorr; corr++)

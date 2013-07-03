@@ -85,6 +85,7 @@ RASModel::RASModel
     epsilonSmall_("epsilonSmall", epsilon0_.dimensions(), SMALL),
     omega0_("omega0", dimless/dimTime, SMALL),
     omegaSmall_("omegaSmall", omega0_.dimensions(), SMALL),
+    muRatio_(lookupOrDefault<scalar>("muRatio", 1e4)),
 
     y_(mesh_)
 {
@@ -166,6 +167,15 @@ scalar RASModel::yPlusLam(const scalar kappa, const scalar E) const
 }
 
 
+tmp<volScalarField> RASModel::muEff() const
+{
+    return tmp<volScalarField>
+    (
+        new volScalarField("muEff", mut() + mu())
+    );
+}
+
+
 tmp<scalarField> RASModel::yPlus(const label patchNo, const scalar Cmu) const
 {
     const fvPatch& curPatch = mesh_.boundary()[patchNo];
@@ -223,6 +233,7 @@ bool RASModel::read()
         epsilonSmall_.readIfPresent(*this);
         omega0_.readIfPresent(*this);
         omegaSmall_.readIfPresent(*this);
+        readIfPresent("muRatio", muRatio_);
 
         return true;
     }

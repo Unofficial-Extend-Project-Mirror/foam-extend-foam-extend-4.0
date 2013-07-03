@@ -175,7 +175,7 @@ lduSolverPerformance tetFemMatrix<Type>::solve
 template<class Type>
 lduSolverPerformance tetFemMatrix<Type>::solve()
 {
-    return solve(psi_.mesh().solver(psi_.name()));
+    return solve(psi_.mesh().solutionDict().solver(psi_.name()));
 }
 
 

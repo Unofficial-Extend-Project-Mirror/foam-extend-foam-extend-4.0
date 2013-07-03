@@ -53,10 +53,36 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
 
     // Create multiplication function object
     typename BlockCoeff<Type>::multiply mult;
+    
+    // Klas Jareteg: 2013-02-10:
+    // Must transfer data between the different CPUs. Notes on the Jacobi
+    // iteration style can be seen in GaussSeidelSolver.C
+    typedef CoeffField<Type> TypeCoeffField;
+    typedef Field<Type> TypeField;
+
+    typedef typename TypeCoeffField::scalarTypeField scalarTypeField;
+    typedef typename TypeCoeffField::linearTypeField linearTypeField;
+    typedef typename TypeCoeffField::squareTypeField squareTypeField;
 
     for (label sweep = 0; sweep < nSweeps_; sweep++)
     {
         bPrime_ = b;
+        
+        this->matrix_.initInterfaces
+        (
+            this->matrix_.coupleUpper(),
+            bPrime_,
+            x,
+            true             // switch to lhs of system
+        );
+
+        this->matrix_.updateInterfaces
+        (
+            this->matrix_.coupleUpper(),
+            bPrime_,
+            x,
+            true             // switch to lhs of system
+        );
 
         register label fStart, fEnd, curCoeff;
 
@@ -143,9 +169,35 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
     // Create multiplication function object
     typename BlockCoeff<Type>::multiply mult;
 
+    // Klas Jareteg: 2013-02-10:
+    // Must transfer data between the different CPUs. Notes on the Jacobi
+    // iteration style can be seen in GaussSeidelSolver.C
+    typedef CoeffField<Type> TypeCoeffField;
+    typedef Field<Type> TypeField;
+
+    typedef typename TypeCoeffField::scalarTypeField scalarTypeField;
+    typedef typename TypeCoeffField::linearTypeField linearTypeField;
+    typedef typename TypeCoeffField::squareTypeField squareTypeField;
+
     for (label sweep = 0; sweep < nSweeps_; sweep++)
     {
         bPrime_ = b;
+
+        this->matrix_.initInterfaces
+        (
+            this->matrix_.coupleUpper(),
+            bPrime_,
+            x,
+            true             // switch to lhs of system
+        );
+
+        this->matrix_.updateInterfaces
+        (
+            this->matrix_.coupleUpper(),
+            bPrime_,
+            x,
+            true             // switch to lhs of system
+        );
 
         register label fStart, fEnd, curCoeff;
 

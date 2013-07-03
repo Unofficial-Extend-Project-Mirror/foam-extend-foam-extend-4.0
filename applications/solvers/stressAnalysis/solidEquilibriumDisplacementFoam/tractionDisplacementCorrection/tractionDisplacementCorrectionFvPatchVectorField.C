@@ -169,10 +169,10 @@ void tractionDisplacementCorrectionFvPatchVectorField::updateCoeffs()
     vectorField n = patch().nf();
 
     const fvPatchField<symmTensor>& sigmaD =
-        patch().lookupPatchField<volSymmTensorField, symmTensor>("sigmaD");
+        lookupPatchField<volSymmTensorField, symmTensor>("sigmaD");
 
     const fvPatchField<tensor>& sigmaExp = 
-        patch().lookupPatchField<volTensorField, tensor>("sigmaExp");
+        lookupPatchField<volTensorField, tensor>("sigmaExp");
 
     gradient() =
     (

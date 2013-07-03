@@ -39,7 +39,7 @@ SourceFiles
 #include "volFieldsFwd.H"
 #include "surfaceFieldsFwd.H"
 #include "surfaceInterpolationScheme.H"
-#include "fvMatrix.H"
+#include "fvMatrices.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,7 +55,7 @@ namespace fvm
     template<class Type>
     tmp<fvMatrix<Type> > adjDiv
     (
-        const surfaceScalarField&,
+        const volVectorField&,
         GeometricField<Type, fvPatchField, volMesh>&,
         const word& name
     );
@@ -63,7 +63,7 @@ namespace fvm
     template<class Type>
     tmp<fvMatrix<Type> > adjDiv
     (
-        const tmp<surfaceScalarField>&,
+        const tmp<volVectorField>&,
         GeometricField<Type, fvPatchField, volMesh>&,
         const word& name
     );
@@ -72,14 +72,14 @@ namespace fvm
     template<class Type>
     tmp<fvMatrix<Type> > adjDiv
     (
-        const surfaceScalarField&,
+        const volVectorField&,
         GeometricField<Type, fvPatchField, volMesh>&
     );
 
     template<class Type>
     tmp<fvMatrix<Type> > adjDiv
     (
-        const tmp<surfaceScalarField>&,
+        const tmp<volVectorField>&,
         GeometricField<Type, fvPatchField, volMesh>&
     );
 }

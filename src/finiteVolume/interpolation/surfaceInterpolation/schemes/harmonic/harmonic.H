@@ -42,6 +42,7 @@ SourceFiles
 #include "surfaceInterpolationScheme.H"
 #include "volFields.H"
 #include "surfaceFields.H"
+#include "magLongDelta.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -124,6 +125,12 @@ public:
                 )
             );
 
+            const surfaceScalarField& deltaCoeffs = this->mesh().deltaCoeffs();
+            const surfaceScalarField& weights = this->mesh().weights();
+
+            const magLongDelta& mld = magLongDelta::New(this->mesh());
+            const surfaceScalarField& longDelta = mld.magDelta();
+
             surfaceScalarField& w = tw();
 
             const unallocLabelList& owner = this->mesh().owner();
@@ -133,18 +140,31 @@ public:
 
             scalarField& wIn = w.internalField();
 
+            // Larger small for complex arithmetic accuracy
+            const scalar kSmall = 1000*SMALL;
+
             // Calculate internal weights using field magnitude
             forAll (owner, faceI)
             {
-                scalar mOwn = magPhi[owner[faceI]];
-                scalar mNei = magPhi[neighbour[faceI]];
+                label own = owner[faceI];
+                label nei = neighbour[faceI];
 
-                scalar den = mOwn - mNei;
+                scalar mOwn = magPhi[own]/(1 - weights[faceI]);
+                scalar mNei = magPhi[nei]/weights[faceI];
 
-                if (mag(den) > SMALL)
+                scalar den = magPhi[nei] - magPhi[own];
+
+                scalar mean = mOwn*mNei/
+                    ((mOwn + mNei)*longDelta[faceI]*deltaCoeffs[faceI]);
+
+                // Note: complex arithmetic requires extra accuracy
+                // This is a division of two close subtractions
+                // HJ, 28/Sep/2011
+                if (mag(den) > kSmall)
                 {
-                    scalar mean = 2.0*mOwn*mNei/(mOwn + mNei);
-                    wIn[faceI] = (mean - mNei)/den;
+                    // Limit weights for round-off safety
+                    wIn[faceI] =
+                        Foam::max(0, Foam::min((magPhi[nei] - mean)/den, 1));
                 }
                 else
                 {
@@ -156,29 +176,55 @@ public:
             {
                 fvsPatchScalarField& wp = w.boundaryField()[pi];
 
-                const fvPatchField<Type>& patchPhi = phi.boundaryField()[pi];
+                const fvPatchField<Type>& pPhi = phi.boundaryField()[pi];
 
-                if (patchPhi.coupled())
+                if (pPhi.coupled())
                 {
-                    scalarField magPhiOwn = mag(patchPhi.patchInternalField());
-                    scalarField magPhiNei = mag(patchPhi.patchNeighbourField());
+                    const scalarField& pWeights = weights.boundaryField()[pi];
+
+                    scalarField magPhiOwn = mag(pPhi.patchInternalField());
+                    scalarField magPhiNei = mag(pPhi.patchNeighbourField());
+
+                    const scalarField& pDeltaCoeffs =
+                        deltaCoeffs.boundaryField()[pi];
+
+                    const scalarField& pLongDelta = mld.magDelta(pi);
 
                     // Calculate internal weights using field magnitude
-                    forAll (patchPhi, faceI)
+                    forAll (pPhi, faceI)
                     {
-                        scalar mOwn = magPhiOwn[faceI];
-                        scalar mNei = magPhiNei[faceI];
+                        scalar mOwn = magPhiOwn[faceI]/(1 - pWeights[faceI]);
+                        scalar mNei = magPhiNei[faceI]/pWeights[faceI];
 
-                        scalar den = mOwn - mNei;
+                        scalar den = magPhiNei[faceI] - magPhiOwn[faceI];
 
-                        if (mag(den) > SMALL)
+                        // Note: complex arithmetic requires extra accuracy
+                        // This is a division of two close subtractions
+                        // HJ, 28/Sep/2011
+                        if (mag(den) > kSmall)
                         {
-                             scalar mean = 2.0*mOwn*mNei/(mOwn + mNei);
-                             wp[faceI] = (mean - mNei)/den;
+                            scalar mean = mOwn*mNei/
+                                (
+                                    (mOwn + mNei)*
+                                    pLongDelta[faceI]*
+                                    pDeltaCoeffs[faceI]
+                                );
+
+                            // Limit weights for round-off safety
+                            wp[faceI] =
+                                Foam::max
+                                (
+                                    0,
+                                    Foam::min
+                                    (
+                                        (magPhiNei[faceI] - mean)/den,
+                                        1
+                                    )
+                                );
                         }
                         else
                         {
-                             wp[faceI] = 0.5;
+                            wp[faceI] = 0.5;
                         }
                     }
                 }

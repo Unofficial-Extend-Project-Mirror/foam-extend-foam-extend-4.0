@@ -60,6 +60,8 @@ class dictionary;
 class fvPatchFieldMapper;
 class surfaceMesh;
 
+template<class Type>
+class fvPatchField;
 
 // Forward declaration of friend functions and operators
 
@@ -260,6 +262,19 @@ public:
             //- Return local objectRegistry
             const objectRegistry& db() const;
 
+            //- Lookup and return the patchField of the named field from the
+            //  field's objectRegistry.
+            //  N.B.  The dummy pointer arguments are used if this function is
+            //  instantiated within a templated function to avoid a bug in gcc.
+            //  See inletOutletFvPatchField.C and outletInletFvPatchField.C
+            template<class GeometricField, class Type2>
+            const typename GeometricField::PatchFieldType& lookupPatchField
+            (
+                const word& name,
+                const GeometricField* = NULL,
+                const Type2* = NULL
+            ) const;
+
             //- Return patch
             const fvPatch& patch() const
             {
@@ -313,6 +328,23 @@ public:
             );
 
 
+        // Evaluation functions
+
+            //- Initialise the evaluation of the patch field
+            virtual void initEvaluate
+            (
+                const Pstream::commsTypes commsType=Pstream::blocking
+            )
+            {}
+
+            //- Evaluate the patch field, sets Updated to false
+            virtual void evaluate
+            (
+                const Pstream::commsTypes commsType=Pstream::blocking
+            )
+            {}
+
+
         //- Write
         virtual void write(Ostream&) const;
 
@@ -321,6 +353,9 @@ public:
 
             //- Check fvsPatchField<Type> against given fvsPatchField<Type>
             void check(const fvsPatchField<Type>&) const;
+
+            //- Check fvsPatchField<Type> against given fvPatchField<Type>
+            void check(const fvPatchField<Type>&) const;
 
 
     // Member operators
@@ -332,6 +367,8 @@ public:
         virtual void operator-=(const fvsPatchField<Type>&);
         virtual void operator*=(const fvsPatchField<scalar>&);
         virtual void operator/=(const fvsPatchField<scalar>&);
+
+        virtual void operator=(const fvPatchField<Type>&);
 
         virtual void operator+=(const Field<Type>&);
         virtual void operator-=(const Field<Type>&);

@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-    
 \*---------------------------------------------------------------------------*/
 
 #include "gaussFaLaplacianScheme.H"
@@ -75,12 +73,13 @@ gaussLaplacianScheme<Type>::famLaplacian
             gammaMagSf.boundaryField()[patchI];
 
         fam.internalCoeffs()[patchI] = patchGamma*psf.gradientInternalCoeffs();
-        fam.boundaryCoeffs()[patchI] = -patchGamma*psf.gradientBoundaryCoeffs();
+        fam.boundaryCoeffs()[patchI] =
+            -patchGamma*psf.gradientBoundaryCoeffs();
     }
 
     if (this->tlnGradScheme_().corrected())
     {
-        if (this->mesh().fluxRequired(vf.name()))
+        if (this->mesh().schemesDict().fluxRequired(vf.name()))
         {
             fam.faceFluxCorrectionPtr() = new
             GeometricField<Type, faePatchField, edgeMesh>

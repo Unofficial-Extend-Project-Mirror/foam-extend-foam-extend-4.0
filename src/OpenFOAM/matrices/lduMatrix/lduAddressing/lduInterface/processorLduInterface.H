@@ -139,7 +139,8 @@ public:
                 UList<Type>&
             ) const;
 
-            //- Raw field receive function with data compression returning field
+            //- Raw field receive function with data compression,
+            //  returning a field
             template<class Type>
             tmp<Field<Type> > compressedReceive
             (

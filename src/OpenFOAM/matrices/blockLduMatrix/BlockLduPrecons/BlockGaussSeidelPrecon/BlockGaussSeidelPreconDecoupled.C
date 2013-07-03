@@ -23,8 +23,8 @@ License
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 Description
-    Gauss-Seidel sweep as a preconditioner.  Decoupled version, used in template
-    specialisation.
+    Gauss-Seidel sweep as a preconditioner.  Decoupled version, used in
+     template specialisation.
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved

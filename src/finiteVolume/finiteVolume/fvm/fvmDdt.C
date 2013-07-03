@@ -24,9 +24,9 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "fvmDdt.H"
 #include "volFields.H"
 #include "surfaceFields.H"
-#include "fvMatrix.H"
 #include "ddtScheme.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -51,7 +51,7 @@ ddt
     return fv::ddtScheme<Type>::New
     (
         vf.mesh(),
-        vf.mesh().ddtScheme("ddt(" + vf.name() + ')')
+        vf.mesh().schemesDict().ddtScheme("ddt(" + vf.name() + ')')
     )().fvmDdt(vf);
 }
 
@@ -79,7 +79,10 @@ ddt
     return fv::ddtScheme<Type>::New
     (
         vf.mesh(),
-        vf.mesh().ddtScheme("ddt(" + rho.name() + ',' + vf.name() + ')')
+        vf.mesh().schemesDict().ddtScheme
+        (
+            "ddt(" + rho.name() + ',' + vf.name() + ')'
+        )
     )().fvmDdt(rho, vf);
 }
 
@@ -95,7 +98,10 @@ ddt
     return fv::ddtScheme<Type>::New
     (
         vf.mesh(),
-        vf.mesh().ddtScheme("ddt(" + rho.name() + ',' + vf.name() + ')')
+        vf.mesh().schemesDict().ddtScheme
+        (
+            "ddt(" + rho.name() + ',' + vf.name() + ')'
+        )
     )().fvmDdt(rho, vf);
 }
 

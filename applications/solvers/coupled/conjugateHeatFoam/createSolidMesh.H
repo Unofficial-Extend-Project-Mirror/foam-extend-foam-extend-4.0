@@ -1,3 +1,5 @@
+Info << "s1" << endl;
+
     fvMesh solidMesh
     (
         IOobject
@@ -8,3 +10,6 @@
             IOobject::MUST_READ
         )
     );
+
+Info << "s2" << endl;
+

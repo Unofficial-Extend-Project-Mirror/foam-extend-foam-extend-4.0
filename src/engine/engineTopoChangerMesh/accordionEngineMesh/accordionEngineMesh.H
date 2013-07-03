@@ -26,12 +26,10 @@ CLASS
     accordionEngineMesh
 
 DESCRIPTION
-    Engine mesh class for canted valves engine. Layers are added/removed on the
-    piston, while mesh is deformed close to the valves. Attach/detach boundary
-    is used. There are no sliding interfaces.
 
 */
 // ------------------------------------------------------------------------- //
+
 
 #ifndef accordionEngineMesh_H
 #define accordionEngineMesh_H
@@ -40,7 +38,7 @@ DESCRIPTION
 #include "enginePiston.H"
 #include "motionSolver.H"
 #include "polyPatchID.H"
-#include "thoboisValveBank.H"
+#include "accordionValveBank.H"
 #include "twoDPointCorrector.H"
 
 #include "faceSet.H"
@@ -67,19 +65,10 @@ class accordionEngineMesh
 
         //- Piston patch
         enginePiston piston_;
-        
-        //- Lateral valves
-        thoboisValveBank valves_;
-                         
-        //- Layering-to-deformation switch in crank-angle degrees
-        scalar deformSwitch_;
-        
-        //- Tolerance used when the piston faceZone is created
-        scalar delta_;
 
-        //- Distance from the piston patch
-        scalar offSet_;
-        
+        //- Lateral valves
+        accordionValveBank valves_;
+
         //- Piston Position
         scalar pistonPosition_;
 
@@ -88,21 +77,23 @@ class accordionEngineMesh
 
         //- deckHeight
         scalar deckHeight_;
-                               
+
         //- Motion solver
         autoPtr<motionSolver> msPtr_;
 
         //- Cylinder head name
-        word cylinderHeadName_;               
-        
+        word cylinderHeadName_;
+
         //- Cylinder head name
-        word linerName_;               
-        
+        word linerName_;
+
         //- PistonFaceSet
-        word pistonAuxPoints_;
-        
-	Switch moveDetach_;
-        
+//        word pistonAuxPoints_;
+
+        //- PistonFaceSet
+        word headCellSetName_;
+
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -111,30 +102,16 @@ class accordionEngineMesh
         //- Disallow default bitwise assignment
         void operator=(const accordionEngineMesh&);
 
-        //- Make layering modifiers live
-        void makeLayersLive();
-
-        //- Make attach-detach live
-        void makeDetachLive();
-       
-        //- Prepare valve attach/detach
-        void valveDetach();
-
-        //- Prepare valve attach/detach
-        void valveAttach();
-
-        //- Prepare valve attach/detach
-        void prepareValveDetach();
-
-        //- Check if all patches exist, then calculate virtualPistonPosition, 
+        //- Check if all patches exist, then calculate virtualPistonPosition,
         //- pistonPosition and deckHeight for the first time
         void checkAndCalculate();
-        
-        //- Calculate the virtualPistonPosition, 
+
+        //- Calculate the virtualPistonPosition
         void setVirtualPositions();
-                
+
         bool realDeformation() const;
-                                                
+
+
 public:
 
     //- Runtime type information
@@ -147,16 +124,16 @@ public:
         explicit accordionEngineMesh(const IOobject& io);
 
 
-    // Destructor - default
+    // Destructor
+
+        virtual ~accordionEngineMesh()
+        {}
 
 
     // Member Functions
 
         inline const enginePiston& piston() const;
-        inline const thoboisValveBank& valves() const;
-        inline const scalar& deformSwitch() const;
-        inline const scalar& delta() const;
-        inline const scalar& offSet() const;
+        inline const accordionValveBank& valves() const;
         inline const scalar& pistonPosition() const;
         inline scalar& pistonPosition();
         inline const scalar& virtualPistonPosition() const;
@@ -168,9 +145,7 @@ public:
         //- Return true for mesh deformation mode
         bool deformation() const
         {
-            return
-                engTime().thetaRevolution() > -deformSwitch_
-             && engTime().thetaRevolution() < deformSwitch_;
+            return true;
         }
 
         //- Return number of valves
@@ -180,7 +155,7 @@ public:
         }
 
         //- Add valve and piston zones and modifiers
-        void addZonesAndModifiers();
+        void addMeshZones();
 
         //- Move and morph
         virtual bool update();

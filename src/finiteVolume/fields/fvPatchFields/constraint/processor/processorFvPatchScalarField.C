@@ -41,7 +41,8 @@ void processorFvPatchField<scalar>::initInterfaceMatrixUpdate
     const lduMatrix&,
     const scalarField&,
     const direction,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     procPatch_.compressedSend
@@ -60,7 +61,8 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
     const lduMatrix&,
     const scalarField& coeffs,
     const direction,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     scalarField pnf
@@ -70,9 +72,19 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
 
     const unallocLabelList& faceCells = patch().faceCells();
 
-    forAll(faceCells, facei)
+    if (switchToLhs)
     {
-        result[faceCells[facei]] -= coeffs[facei]*pnf[facei];
+        forAll (faceCells, facei)
+        {
+            result[faceCells[facei]] += coeffs[facei]*pnf[facei];
+        }
+    }
+    else
+    {
+        forAll (faceCells, facei)
+        {
+            result[faceCells[facei]] -= coeffs[facei]*pnf[facei];
+        }
     }
 }
 
@@ -84,7 +96,8 @@ void processorFvPatchField<scalar>::initInterfaceMatrixUpdate
     scalarField&,
     const BlockLduMatrix<scalar>&,
     const CoeffField<scalar>&,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     procPatch_.compressedSend
@@ -102,7 +115,8 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
     scalarField& result,
     const BlockLduMatrix<scalar>&,
     const CoeffField<scalar>& coeffs,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {  
     scalarField pnf
@@ -113,11 +127,22 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
     const unallocLabelList& faceCells = patch().faceCells();
     const scalarField& scalarCoeffs = coeffs.asScalar();
     
-    forAll(faceCells, facei)
+    if (switchToLhs)
     {
-        result[faceCells[facei]] -= scalarCoeffs[facei]*pnf[facei];
+        forAll (faceCells, facei)
+        {
+            result[faceCells[facei]] += scalarCoeffs[facei]*pnf[facei];
+        }
+    }
+    else
+    {
+        forAll (faceCells, facei)
+        {
+            result[faceCells[facei]] -= scalarCoeffs[facei]*pnf[facei];
+        }
     }
 }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

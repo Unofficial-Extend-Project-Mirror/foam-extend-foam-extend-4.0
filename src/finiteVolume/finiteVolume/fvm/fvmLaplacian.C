@@ -24,9 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "volFields.H"
-#include "surfaceFields.H"
-#include "fvMatrix.H"
+#include "fvmLaplacian.H"
 #include "laplacianScheme.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -216,7 +214,7 @@ laplacian
     return fv::laplacianScheme<Type, GType>::New
     (
         vf.mesh(),
-        vf.mesh().laplacianScheme(name)
+        vf.mesh().schemesDict().laplacianScheme(name)
     )().fvmLaplacian(gamma, vf);
 }
 
@@ -281,7 +279,7 @@ laplacian
     return fv::laplacianScheme<Type, GType>::New
     (
         vf.mesh(),
-        vf.mesh().laplacianScheme(name)
+        vf.mesh().schemesDict().laplacianScheme(name)
     )().fvmLaplacian(gamma, vf);
 }
 

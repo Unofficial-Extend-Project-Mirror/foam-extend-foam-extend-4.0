@@ -4,12 +4,18 @@
     (
         Time::controlDictName,
         rootDirMaster,
-        caseDirMaster
+        caseDirMaster,
+        "system",
+        "constant",
+        !args.optionFound("noFunctionObjects")
     );
 
     Time runTimeToAdd
     (
         Time::controlDictName,
         rootDirToAdd,
-        caseDirToAdd
+        caseDirToAdd,
+        "system",
+        "constant",
+        !args.optionFound("noFunctionObjects")
     );

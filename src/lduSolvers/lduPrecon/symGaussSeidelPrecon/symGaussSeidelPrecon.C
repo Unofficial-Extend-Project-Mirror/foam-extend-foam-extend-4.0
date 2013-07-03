@@ -69,17 +69,8 @@ Foam::symGaussSeidelPrecon::symGaussSeidelPrecon
         coupleIntCoeffs,
         interfaces
     ),
-    mBouCoeffs_(coupleBouCoeffs.size()),
     bPrime_(matrix.lduAddr().size())
-{
-    forAll(mBouCoeffs_, i)
-    {
-        if (interfaces_.set(i))
-        {
-            mBouCoeffs_.set(i, -coupleBouCoeffs_[i]);
-        }
-    }
-}
+{}
 
 
 Foam::symGaussSeidelPrecon::symGaussSeidelPrecon
@@ -98,17 +89,8 @@ Foam::symGaussSeidelPrecon::symGaussSeidelPrecon
         coupleIntCoeffs,
         interfaces
     ),
-    mBouCoeffs_(coupleBouCoeffs.size()),
     bPrime_(matrix.lduAddr().size())
-{
-    forAll(mBouCoeffs_, i)
-    {
-        if (interfaces_.set(i))
-        {
-            mBouCoeffs_.set(i, -coupleBouCoeffs_[i]);
-        }
-    }
-}
+{}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -152,20 +134,22 @@ void Foam::symGaussSeidelPrecon::precondition
         {
             matrix_.initMatrixInterfaces
             (
-                mBouCoeffs_,
+                coupleBouCoeffs_,
                 interfaces_,
                 x,
                 bPrime_,
-                cmpt
+                cmpt,
+                true             // switch to lhs of system
             );
 
             matrix_.updateMatrixInterfaces
             (
-                mBouCoeffs_,
+                coupleBouCoeffs_,
                 interfaces_,
                 x,
                 bPrime_,
-                cmpt
+                cmpt,
+                true             // switch to lhs of system
             );
         }
 
@@ -269,20 +253,22 @@ void Foam::symGaussSeidelPrecon::preconditionT
         {
             matrix_.initMatrixInterfaces
             (
-                mBouCoeffs_,
+                coupleBouCoeffs_,
                 interfaces_,
                 x,
                 bPrime_,
-                cmpt
+                cmpt,
+                true             // switch to lhs of system
             );
 
             matrix_.updateMatrixInterfaces
             (
-                mBouCoeffs_,
+                coupleBouCoeffs_,
                 interfaces_,
                 x,
                 bPrime_,
-                cmpt
+                cmpt,
+                true             // switch to lhs of system
             );
         }
 

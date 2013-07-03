@@ -90,6 +90,7 @@ $(primitiveLists)/vectorList.C
 $(primitiveLists)/sphericalTensorList.C
 $(primitiveLists)/symmTensorList.C
 $(primitiveLists)/tensorList.C
+$(primitiveLists)/VectorNLists.C
 $(primitiveLists)/wordIOList.C
 
 Streams = db/IOstreams
@@ -169,13 +170,13 @@ $(regIOobject)/regIOobjectWrite.C
 
 db/IOobjectList/IOobjectList.C
 db/objectRegistry/objectRegistry.C
+db/postfixedSubRegistry/postfixedSubRegistry.C
 db/CallbackRegistry/CallbackRegistryName.C
 db/dlLibraryTable/dlLibraryTable.C
 
 db/functionObjects/functionObject/functionObject.C
 db/functionObjects/functionObjectList/functionObjectList.C
 db/functionObjects/outputFilterOutputControl/outputFilterOutputControl.C
-
 
 Time = db/Time
 $(Time)/TimePaths.C
@@ -251,7 +252,7 @@ $(lduAddressing)/lduInterface/processorLduInterface.C
 $(lduAddressing)/lduInterface/cyclicLduInterface.C
 $(lduAddressing)/lduInterface/ggiLduInterface.C
 $(lduAddressing)/lduInterface/overlapGgiLduInterface.C
-/*$(lduAddressing)/lduInterface/mixingPlaneLduInterface.C*/
+$(lduAddressing)/lduInterface/mixingPlaneLduInterface.C
 $(lduAddressing)/lduInterface/regionCoupleLduInterface.C
 
 lduInterfaceFields = $(lduAddressing)/lduInterfaceFields
@@ -259,7 +260,7 @@ $(lduInterfaceFields)/lduInterfaceField/lduInterfaceField.C
 $(lduInterfaceFields)/processorLduInterfaceField/processorLduInterfaceField.C
 $(lduInterfaceFields)/cyclicLduInterfaceField/cyclicLduInterfaceField.C
 $(lduInterfaceFields)/ggiLduInterfaceField/ggiLduInterfaceField.C
-/*$(lduInterfaceFields)/mixingPlaneLduInterfaceField/mixingPlaneLduInterfaceField.C*/
+$(lduInterfaceFields)/mixingPlaneLduInterfaceField/mixingPlaneLduInterfaceField.C
 $(lduInterfaceFields)/overlapGgiLduInterfaceField/overlapGgiLduInterfaceField.C
 $(lduInterfaceFields)/regionCoupleLduInterfaceField/regionCoupleLduInterfaceField.C
 
@@ -276,7 +277,8 @@ $(GAMGInterfaces)/processorGAMGInterface/processorGAMGInterface.C
 $(GAMGInterfaces)/cyclicGAMGInterface/cyclicGAMGInterface.C
 $(GAMGInterfaces)/ggiGAMGInterface/ggiGAMGInterface.C
 $(GAMGInterfaces)/cyclicGgiGAMGInterface/cyclicGgiGAMGInterface.C
-/*$(GAMGInterfaces)/mixingPlaneGAMGInterface/mixingPlaneGAMGInterface.C*/
+$(GAMGInterfaces)/regionCoupleGAMGInterface/regionCoupleGAMGInterface.C
+$(GAMGInterfaces)/mixingPlaneGAMGInterface/mixingPlaneGAMGInterface.C
 
 GAMGInterfaceFields = $(GAMG)/interfaceFields
 $(GAMGInterfaceFields)/GAMGInterfaceField/GAMGInterfaceField.C
@@ -285,7 +287,8 @@ $(GAMGInterfaceFields)/processorGAMGInterfaceField/processorGAMGInterfaceField.C
 $(GAMGInterfaceFields)/cyclicGAMGInterfaceField/cyclicGAMGInterfaceField.C
 $(GAMGInterfaceFields)/ggiGAMGInterfaceField/ggiGAMGInterfaceField.C
 $(GAMGInterfaceFields)/cyclicGgiGAMGInterfaceField/cyclicGgiGAMGInterfaceField.C
-/*$(GAMGInterfaceFields)/mixingPlaneGAMGInterfaceField/mixingPlaneGAMGInterfaceField.C*/
+$(GAMGInterfaceFields)/regionCoupleGAMGInterfaceField/regionCoupleGAMGInterfaceField.C
+$(GAMGInterfaceFields)/mixingPlaneGAMGInterfaceField/mixingPlaneGAMGInterfaceField.C
 
 GAMGAgglomerations = $(GAMG)/GAMGAgglomerations
 
@@ -365,7 +368,7 @@ $(constraintPolyPatches)/ggi/ggiPolyPatch.C
 $(constraintPolyPatches)/cyclicGgi/cyclicGgiPolyPatch.C
 $(constraintPolyPatches)/overlapGgi/overlapGgiPolyPatch.C
 $(constraintPolyPatches)/overlapGgi/overlapGgiPolyPatchGeometry.C
-/*$(constraintPolyPatches)/mixingPlane/mixingPlanePolyPatch.C*/
+$(constraintPolyPatches)/mixingPlane/mixingPlanePolyPatch.C
 $(constraintPolyPatches)/regionCouple/regionCouplePolyPatch.C
 
 derivedPolyPatches = $(polyPatches)/derived
@@ -481,7 +484,7 @@ $(constraintPointPatches)/processor/processorPointPatch.C
 $(constraintPointPatches)/ggi/ggiPointPatch.C
 $(constraintPointPatches)/cyclicGgi/cyclicGgiPointPatch.C
 $(constraintPointPatches)/overlapGgi/overlapGgiPointPatch.C
-/*$(constraintPointPatches)/mixingPlane/mixingPlanePointPatch.C*/
+$(constraintPointPatches)/mixingPlane/mixingPlanePointPatch.C
 $(constraintPointPatches)/regionCouple/regionCouplePointPatch.C
 
 derivedPointPatches = $(pointPatches)/derived
@@ -511,6 +514,11 @@ $(Fields)/diagTensorField/diagTensorField.C
 $(Fields)/symmTensorField/symmTensorField.C
 $(Fields)/tensorField/tensorField.C
 $(Fields)/complexFields/complexFields.C
+$(Fields)/VectorNFields/VectorNFields.C
+$(Fields)/VectorNFields/SphericalTensorNFields.C
+$(Fields)/VectorNFields/DiagTensorNFields.C
+$(Fields)/VectorNFields/TensorNFields.C
+$(Fields)/VectorNFields/expandContract/ExpandTensorNField.C
 
 $(Fields)/labelField/labelIOField.C
 $(Fields)/scalarField/scalarIOField.C
@@ -546,6 +554,7 @@ $(derivedPointPatchFields)/slip/slipPointPatchFields.C
 $(derivedPointPatchFields)/global/globalPointPatchFields.C
 $(derivedPointPatchFields)/uniformFixedValue/uniformFixedValuePointPatchFields.C
 $(derivedPointPatchFields)/timeVaryingUniformFixedValue/timeVaryingUniformFixedValuePointPatchFields.C
+$(derivedPointPatchFields)/oscillatingFixedValue/oscillatingFixedValuePointPatchFields.C
 
 fields/GeometricFields/pointFields/pointFields.C
 
@@ -556,7 +565,7 @@ interpolations = interpolations
 interpolation = $(interpolations)/interpolation
 $(interpolations)/patchToPatchInterpolation/PatchToPatchInterpolationName.C
 $(interpolations)/GGIInterpolation/GGIInterpolationName.C
-/*$(interpolations)/CircumferentialAveragingInterpolation/CircumferentialAveragingInterpolationName.C*/
+$(interpolations)/MixingPlaneInterpolation/MixingPlaneInterpolationName.C
 $(interpolations)/RBFInterpolation/RBFInterpolation.C
 $(interpolations)/RBFInterpolation/RBFFunctions/RBFFunction/RBFFunction.C
 $(interpolations)/RBFInterpolation/RBFFunctions/RBFFunction/newRBFFunction.C
@@ -607,6 +616,12 @@ primitives/BlockCoeff/sphericalTensorBlockCoeff.C
 primitives/BlockCoeff/symmTensorBlockCoeff.C
 primitives/BlockCoeff/tensorBlockCoeff.C
 
+BlockCoeffNorm = primitives/BlockCoeff/BlockCoeffNorm
+$(BlockCoeffNorm)/BlockCoeffNorm/blockCoeffNorms.C
+$(BlockCoeffNorm)/BlockCoeffTwoNorm/blockCoeffTwoNorms.C
+$(BlockCoeffNorm)/BlockCoeffMaxNorm/blockCoeffMaxNorms.C
+$(BlockCoeffNorm)/BlockCoeffComponentNorm/blockCoeffComponentNorms.C
+
 fields/expandContract/expandTensorField.C
 
 fields/CoeffField/scalarCoeffField.C
@@ -619,7 +634,21 @@ matrices/blockLduMatrix/BlockLduMatrix/scalarBlockLduMatrix.C
 matrices/blockLduMatrix/BlockLduMatrix/sphericalTensorBlockLduMatrix.C
 matrices/blockLduMatrix/BlockLduMatrix/symmTensorBlockLduMatrix.C
 matrices/blockLduMatrix/BlockLduMatrix/tensorBlockLduMatrix.C
+matrices/blockLduMatrix/BlockLduMatrix/blockVectorNMatrices.C
 matrices/blockLduMatrix/BlockLduMatrix/BlockConstraint/scalarBlockConstraint.C
+
+BlockLduInterfaceField = matrices/blockLduMatrix/BlockLduMatrix/BlockLduInterfaceField
+$(BlockLduInterfaceField)/BlockLduInterfaceFields.C
+$(BlockLduInterfaceField)/processorBlockLduInterfaceField/processorBlockLduInterfaceFields.C
+$(BlockLduInterfaceField)/BlockGAMGInterfaceField/blockGAMGInterfaceFields.C
+$(BlockLduInterfaceField)/processorBlockGAMGInterfaceField/processorBlockGAMGInterfaceFields.C
+$(BlockLduInterfaceField)/blockVectorNLduInterfaceFields.C
+$(BlockLduInterfaceField)/blockVectorNGAMGInterfaceFields.C
+
+matrices/blockLduMatrix/BlockAmg/blockAmgCycles.C
+matrices/blockLduMatrix/BlockAmg/blockAmgLevels.C
+matrices/blockLduMatrix/BlockAmg/BlockAmgPolicy/blockAmgPolicies.C
+matrices/blockLduMatrix/BlockAmg/BlockAmgPolicy/blockAamgPolicies.C
 
 matrices/blockLduMatrix/BlockLduPrecons/BlockLduPrecon/blockLduPrecons.C
 matrices/blockLduMatrix/BlockLduPrecons/BlockNoPrecon/blockNoPrecons.C
@@ -635,6 +664,7 @@ matrices/blockLduMatrix/BlockLduPrecons/BlockGaussSeidelPrecon/blockGaussSeidelP
 matrices/blockLduMatrix/BlockLduPrecons/BlockCholeskyPrecon/scalarBlockCholeskyPrecon.C
 matrices/blockLduMatrix/BlockLduPrecons/BlockCholeskyPrecon/tensorBlockCholeskyPrecon.C
 matrices/blockLduMatrix/BlockLduPrecons/BlockCholeskyPrecon/blockCholeskyPrecons.C
+matrices/blockLduMatrix/BlockLduPrecons/BlockAmgPrecon/blockAmgPrecons.C
 
 matrices/blockLduMatrix/BlockLduSmoothers/BlockLduSmoother/blockLduSmoothers.C
 matrices/blockLduMatrix/BlockLduSmoothers/BlockGaussSeidelSmoother/blockGaussSeidelSmoothers.C
@@ -642,12 +672,13 @@ matrices/blockLduMatrix/BlockLduSmoothers/BlockILUSmoother/blockILUSmoothers.C
 
 matrices/blockLduMatrix/BlockLduSolvers/BlockLduSolver/blockLduSolvers.C
 matrices/blockLduMatrix/BlockLduSolvers/BlockDiagonal/blockDiagonalSolvers.C
-/*HJ matrices/blockLduMatrix/BlockLduSolvers/Segregated/segregatedSolvers.C */
 matrices/blockLduMatrix/BlockLduSolvers/BlockGaussSeidel/blockGaussSeidelSolvers.C
 matrices/blockLduMatrix/BlockLduSolvers/BlockCG/blockCGSolvers.C
 matrices/blockLduMatrix/BlockLduSolvers/BlockBiCGStab/blockBiCGStabSolvers.C
 matrices/blockLduMatrix/BlockLduSolvers/BlockGMRES/blockGMRESSolvers.C
+matrices/blockLduMatrix/BlockLduSolvers/BlockAmgSolver/blockAmgSolvers.C
+matrices/blockLduMatrix/BlockLduSolvers/Segregated/segregatedSolvers.C
 
-matrices/blockLduMatrix/BlockLduMatrix/BlockLduInterface/BlockLduInterfaceFields.C
+matrices/blockLduMatrix/BlockLduSolvers/blockVectorNSolvers.C
 
 LIB = $(FOAM_LIBBIN)/libOpenFOAM

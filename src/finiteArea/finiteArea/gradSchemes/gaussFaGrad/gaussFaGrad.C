@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-    
 \*---------------------------------------------------------------------------*/
 
 #include "gaussFaGrad.H"
@@ -69,12 +67,12 @@ gaussGrad<Type>::grad
 
     GeometricField<GradType, faPatchField, areaMesh>& gGrad = tgGrad();
 
+    gGrad -= vsf*fac::edgeIntegrate(vsf.mesh().Le());
+
     // Remove component of gradient normal to surface (area)
     const areaVectorField& n = vsf.mesh().faceAreaNormals();
-//     const areaScalarField& K = vsf.mesh().faceCurvatures();
 
     gGrad -= n*(n & gGrad);
-//     gGrad -= K*(n*vsf);
     gGrad.correctBoundaryConditions();
 
     gGrad.rename("grad(" + vsf.name() + ')');

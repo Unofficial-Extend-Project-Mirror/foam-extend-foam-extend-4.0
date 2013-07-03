@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 
             // --- PISO loop
 
-            for (int corr=0; corr<nCorr; corr++)
+            for (int corr = 0; corr < nCorr; corr++)
             {
                 volScalarField rUA = 1.0/UEqn.A();
 
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
                      && nonOrth == nNonOrthCorr
                     )
                     {
-                        pEqn.solve(mesh.solver("pFinal"));
+                        pEqn.solve(mesh.solutionDict().solver("pFinal"));
                     }
                     else
                     {

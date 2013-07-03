@@ -77,8 +77,8 @@ public:
 
     // Constructors
 
-        //- Construct from mesh
-        hsRhoThermo(const fvMesh&);
+        //- Construct from mesh and object registry
+        hsRhoThermo(const fvMesh&, const objectRegistry&);
 
 
     //- Destructor
@@ -165,7 +165,7 @@ public:
 
 } // End namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
 #   include "hsRhoThermo.C"

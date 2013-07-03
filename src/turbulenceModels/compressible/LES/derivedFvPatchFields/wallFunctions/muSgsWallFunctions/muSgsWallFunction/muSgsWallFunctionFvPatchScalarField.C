@@ -128,15 +128,15 @@ void muSgsWallFunctionFvPatchScalarField::evaluate
     const scalarField& ry = patch().deltaCoeffs();
 
     const fvPatchVectorField& U =
-        patch().lookupPatchField<volVectorField, vector>(UName_);
+        lookupPatchField<volVectorField, vector>(UName_);
 
     scalarField magUp = mag(U.patchInternalField() - U);
 
     const scalarField& muw =
-        patch().lookupPatchField<volScalarField, scalar>(muName_);
+        lookupPatchField<volScalarField, scalar>(muName_);
 
     const scalarField& rhow =
-        patch().lookupPatchField<volScalarField, scalar>(rhoName_);
+        lookupPatchField<volScalarField, scalar>(rhoName_);
 
     scalarField& muSgsw = *this;
 

@@ -109,7 +109,10 @@ public:
         inline const cellModel& model() const;
 
         //- Mesh face labels of this cell (in order of model)
-        inline labelList meshFaces(const faceList& allFaces, const cell&) const;
+        inline labelList meshFaces
+        (
+            const faceList& allFaces, const cell&
+        ) const;
 
         //- Mesh edge labels of this cell (in order of model)
         inline labelList meshEdges

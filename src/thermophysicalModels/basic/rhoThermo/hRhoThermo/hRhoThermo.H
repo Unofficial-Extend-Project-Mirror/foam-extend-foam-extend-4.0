@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::hPsiThermo
+    Foam::hRhoThermo
 
 Description
     Enthalpy for a mixture based on density
@@ -78,7 +78,7 @@ public:
     // Constructors
 
         //- Construct from mesh
-        hRhoThermo(const fvMesh&);
+        hRhoThermo(const fvMesh&, const objectRegistry&);
 
 
     //- Destructor
@@ -165,7 +165,7 @@ public:
 
 } // End namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
 #   include "hRhoThermo.C"

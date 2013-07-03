@@ -77,8 +77,8 @@ public:
 
     // Constructors
 
-        //- Construct from mese
-        ePsiThermo(const fvMesh&);
+        //- Construct from mesh and object registry
+        ePsiThermo(const fvMesh&, const objectRegistry&);
 
 
     //- Destructor
@@ -165,7 +165,7 @@ public:
 
 } // End namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
 #   include "ePsiThermo.C"

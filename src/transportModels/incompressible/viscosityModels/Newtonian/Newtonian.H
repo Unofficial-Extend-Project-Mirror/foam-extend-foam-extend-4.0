@@ -82,24 +82,24 @@ public:
 
     // Destructor
 
-        ~Newtonian()
+        virtual ~Newtonian()
         {}
 
 
     // Member Functions
 
         //- Return the laminar viscosity
-        const volScalarField& nu() const
+        virtual const volScalarField& nu() const
         {
             return nu_;
         }
 
         //- Correct the laminar viscosity (not appropriate, viscosity constant)
-        void correct()
+        virtual void correct()
         {}
 
         //- Read transportProperties dictionary
-        bool read(const dictionary& viscosityProperties);
+        virtual bool read(const dictionary& viscosityProperties);
 };
 
 

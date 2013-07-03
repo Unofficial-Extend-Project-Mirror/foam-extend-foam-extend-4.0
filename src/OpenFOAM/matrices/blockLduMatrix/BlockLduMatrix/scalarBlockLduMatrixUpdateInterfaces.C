@@ -32,14 +32,16 @@ Description
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // TODO - This code is currently not called so we have specialized
-// initInterfaceMatrixUpdate in processorFvPatchScalarfield. This needs to be fixed
+// initInterfaceMatrixUpdate in processorFvPatchScalarfield
+// This needs to be fixed
 
 template<>
 void Foam::BlockLduMatrix<scalar>::initInterfaces
 (
     const FieldField<CoeffField, scalar>& coupleCoeffs,
     scalarField& result,
-    const scalarField& psi
+    const scalarField& psi,
+    const bool switchToLhs
 ) const
 {
     if
@@ -58,7 +60,8 @@ void Foam::BlockLduMatrix<scalar>::initInterfaces
                     result,
                     *this,
                     coupleCoeffs[interfaceI].asScalar(),
-                    Pstream::defaultCommsType
+                    Pstream::defaultCommsType,
+                    switchToLhs
                 );
             }
         }
@@ -84,7 +87,8 @@ void Foam::BlockLduMatrix<scalar>::initInterfaces
                     result,
                     *this,
                     coupleCoeffs[interfaceI].asScalar(),
-                    Pstream::blocking
+                    Pstream::blocking,
+                    switchToLhs
                 );
             }
         }
@@ -104,7 +108,8 @@ void Foam::BlockLduMatrix<scalar>::updateInterfaces
 (
     const FieldField<CoeffField, scalar>& coupleCoeffs,
     scalarField& result,
-    const scalarField& psi
+    const scalarField& psi,
+    const bool switchToLhs
 ) const
 {
     if
@@ -130,7 +135,8 @@ void Foam::BlockLduMatrix<scalar>::updateInterfaces
                     result,
                     *this,
                     coupleCoeffs[interfaceI].asScalar(),
-                    Pstream::defaultCommsType
+                    Pstream::defaultCommsType,
+                    switchToLhs
                 );
             }
         }
@@ -154,7 +160,8 @@ void Foam::BlockLduMatrix<scalar>::updateInterfaces
                         result,
                         *this,
                         coupleCoeffs[interfaceI].asScalar(),
-                        Pstream::scheduled
+                        Pstream::scheduled,
+                        switchToLhs
                     );
                 }
                 else
@@ -165,7 +172,8 @@ void Foam::BlockLduMatrix<scalar>::updateInterfaces
                         result,
                         *this,
                         coupleCoeffs[interfaceI].asScalar(),
-                        Pstream::scheduled
+                        Pstream::scheduled,
+                        switchToLhs
                     );
                 }
             }
@@ -188,7 +196,8 @@ void Foam::BlockLduMatrix<scalar>::updateInterfaces
                     result,
                     *this,
                     coupleCoeffs[interfaceI].asScalar(),
-                    Pstream::blocking
+                    Pstream::blocking,
+                    switchToLhs
                 );
             }
         }

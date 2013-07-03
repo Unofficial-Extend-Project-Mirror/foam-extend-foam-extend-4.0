@@ -49,7 +49,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class NewtonSecantRoot Declaration
+                      Class NewtonSecantRoot Declaration
 \*---------------------------------------------------------------------------*/
 
 template<typename Func, typename Deriv>

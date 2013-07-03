@@ -25,3 +25,8 @@ faceSet rightZone add setToFace rightWallSet
 cellSet rightZoneMasterCells new zoneToCell right
 
 quit
+
+cd constant/polyMesh/sets/
+\rm leftCentre leftCentre_old leftWallSet leftWallSet_old leftZone_old rightCentre rightCentre_old rightWallSet rightWallSet_old rightZone_old wallSet
+
+setsToZones

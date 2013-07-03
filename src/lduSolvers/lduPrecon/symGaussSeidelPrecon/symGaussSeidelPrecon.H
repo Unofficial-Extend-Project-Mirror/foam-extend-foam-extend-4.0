@@ -56,20 +56,6 @@ class symGaussSeidelPrecon
 {
     // Private Data
 
-        // NOTE: Coupled boundary is treated as an effective Jacobi
-        // interface in the boundary.  Note: there is a change of sign
-        // in the coupled interface update.  The reason for this is
-        // that the internal coefficients are all located at the
-        // l.h.s. of the matrix whereas the "implicit" coefficients on
-        // the coupled boundaries are all created as if the
-        // coefficient contribution is of a source-kind (i.e. they
-        // have a sign as if they are on the r.h.s. of the matrix.  To
-        // compensate for this, it is necessary to turn the sign of
-        // the contribution.
-
-        //- Negative boundary coefficients
-        FieldField<Field, scalar> mBouCoeffs_;
-
         //- Temporary space for solution intermediate
         mutable scalarField bPrime_;
 

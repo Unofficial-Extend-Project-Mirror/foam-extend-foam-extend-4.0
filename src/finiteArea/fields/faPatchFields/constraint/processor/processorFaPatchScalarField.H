@@ -44,7 +44,8 @@ void processorFaPatchField<scalar>::initInterfaceMatrixUpdate
     const lduMatrix&,
     const scalarField&,
     const direction,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhsswitchToLhs
 ) const;
 
 
@@ -56,7 +57,8 @@ void processorFaPatchField<scalar>::updateInterfaceMatrix
     const lduMatrix&,
     const scalarField& coeffs,
     const direction,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const;
 
 

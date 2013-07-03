@@ -26,7 +26,6 @@ License
 
 #include "fvmDiv.H"
 #include "fvMesh.H"
-#include "fvMatrix.H"
 #include "convectionScheme.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -54,7 +53,7 @@ div
     (
         vf.mesh(),
         flux,
-        vf.mesh().divScheme(name)
+        vf.mesh().schemesDict().divScheme(name)
     )().fvmDiv(flux, vf);
 }
 

@@ -37,6 +37,8 @@ Contributor
 #include "polyPatchID.H"
 #include "ZoneIDs.H"
 #include "SubField.H"
+#include "Time.H"
+#include "indirectPrimitivePatch.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -70,12 +72,6 @@ void Foam::ggiPolyPatch::calcZoneAddressing() const
             << abort(FatalError);
     }
 
-    if (debug)
-    {
-        Pout<< "ggiPolyPatch::calcZoneAddressing() const for patch "
-            << index() << endl;
-    }
-
     // Calculate patch-to-zone addressing
     zoneAddressingPtr_ = new labelList(size());
     labelList& zAddr = *zoneAddressingPtr_;
@@ -89,8 +85,12 @@ void Foam::ggiPolyPatch::calcZoneAddressing() const
     // Check zone addressing
     if (zAddr.size() > 0 && min(zAddr) < 0)
     {
+        Info<< "myZone: " << myZone << nl
+            << "my start and size: " << start() << " and " << size() << nl
+            << "zAddr: " << zAddr << endl;
+
         FatalErrorIn("void ggiPolyPatch::calcZoneAddressing() const")
-            << "Problem with patch-to zone addressing: some patch faces "
+            << "Problem with patch-to-zone addressing: some patch faces "
             << "not found in interpolation zone"
             << abort(FatalError);
     }
@@ -193,10 +193,12 @@ void Foam::ggiPolyPatch::calcPatchToPatch() const
             new ggiZoneInterpolation
             (
                 zone()(),           // This zone reference
-                shadow().zone()(),  // This shadow zone reference
+                shadow().zone()(),  // Shadow zone reference
                 forwardT(),
                 reverseT(),
-                shadow().separation(), // Slave-to-master separation. Bug fix
+                -separation(), // Slave-to-master separation: Use - localValue
+                // Bug fix, delayed slave evaluation causes error
+                // HJ, 30/Jun/2013
                 0,             // Non-overlapping face tolerances
                 0,             // HJ, 24/Oct/2008
                 true,          // Rescale weighting factors.  Bug fix, MB.
@@ -443,6 +445,9 @@ void Foam::ggiPolyPatch::clearOut()
 {
     clearGeom();
 
+    shadowIndex_ = -1;
+    zoneIndex_ = -1;
+
     deleteDemandDrivenData(zoneAddressingPtr_);
     deleteDemandDrivenData(patchToPatchPtr_);
     deleteDemandDrivenData(localParallelPtr_);
@@ -461,8 +466,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
 )
 :
     coupledPolyPatch(name, size, start, index, bm),
-    shadowName_(word::null),
-    zoneName_(word::null),
+    shadowName_("initializeMe"),
+    zoneName_("initializeMe"),
     bridgeOverlap_(false),
     shadowIndex_(-1),
     zoneIndex_(-1),
@@ -638,6 +643,7 @@ Foam::label Foam::ggiPolyPatch::zoneIndex() const
         {
             FatalErrorIn("label ggiPolyPatch::zoneIndex() const")
                 << "Face zone name " << zoneName_
+                << " for GGI patch " << name()
                 << " not found.  Please check your GGI interface definition."
                 << abort(FatalError);
         }
@@ -843,16 +849,58 @@ void Foam::ggiPolyPatch::updateMesh()
 
 void Foam::ggiPolyPatch::calcTransforms()
 {
-    // Simplest GGI: no transform or separation.  HJ, 24/Oct/2008
+    // Simplest mixing plane: no transform or separation.  HJ, 24/Oct/2008
     forwardT_.setSize(0);
     reverseT_.setSize(0);
     separation_.setSize(0);
 
     if (debug > 1 && master())
     {
-        Info<< "Writing transformed slave patch as VTK." << nl
-            << "Master: " << name()
-            << " Slave: " << shadowName() << endl;
+        if (patchToPatch().uncoveredMasterFaces().size() > 0)
+        {
+            // Write uncovered master faces
+            Info<< "Writing uncovered master faces for patch "
+                << name() << " as VTK." << endl;
+
+            const polyMesh& mesh = boundaryMesh().mesh();
+
+            fileName fvPath(mesh.time().path()/"VTK");
+            mkDir(fvPath);
+
+            indirectPrimitivePatch::writeVTK
+            (
+                fvPath/fileName("uncoveredGgiFaces" + name()),
+                IndirectList<face>
+                (
+                    localFaces(),
+                    patchToPatch().uncoveredMasterFaces()
+                ),
+                localPoints()
+            );
+        }
+
+        if (patchToPatch().uncoveredSlaveFaces().size() > 0)
+        {
+            // Write uncovered master faces
+            Info<< "Writing uncovered shadow faces for patch "
+                << shadowName() << " as VTK." << endl;
+
+            const polyMesh& mesh = boundaryMesh().mesh();
+
+            fileName fvPath(mesh.time().path()/"VTK");
+            mkDir(fvPath);
+
+            indirectPrimitivePatch::writeVTK
+            (
+                fvPath/fileName("uncoveredGgiFaces" + shadowName()),
+                IndirectList<face>
+                (
+                    shadow().localFaces(),
+                    patchToPatch().uncoveredSlaveFaces()
+                ),
+                shadow().localPoints()
+            );
+        }
 
         // Check for bridge overlap
         if (!bridgeOverlap())
@@ -864,7 +912,8 @@ void Foam::ggiPolyPatch::calcTransforms()
             )
             {
                 FatalErrorIn("label ggiPolyPatch::shadowIndex() const")
-                    << "ggi patch " << name() << " has "
+                    << "ggi patch " << name() << " with shadow "
+                    << shadowName() << " has "
                     << patchToPatch().uncoveredMasterFaces().size()
                     << " uncovered master faces and "
                     << patchToPatch().uncoveredSlaveFaces().size()

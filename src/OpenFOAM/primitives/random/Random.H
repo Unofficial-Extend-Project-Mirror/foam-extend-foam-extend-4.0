@@ -89,8 +89,8 @@ public:
         void randomise(symmTensor&);
         void randomise(tensor&);
 
-        //- Return a normal Gaussian randon number
-        //  with zero mean and unity variance N(0, 1)
+        //- Return a normal Gaussian random number
+        //  with zero mean and unit variance N(0, 1)
         scalar GaussNormal();
 };
 

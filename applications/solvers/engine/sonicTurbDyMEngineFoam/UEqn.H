@@ -6,6 +6,13 @@
       + turbulence->divDevRhoReff(U)
     );
 
-    UEqn.relax();
+    if (oCorr == nOuterCorr - 1)
+    {
+        UEqn.relax(1);
+    }
+    else
+    {
+        UEqn.relax();
+    }
 
     solve(UEqn == -fvc::grad(p));

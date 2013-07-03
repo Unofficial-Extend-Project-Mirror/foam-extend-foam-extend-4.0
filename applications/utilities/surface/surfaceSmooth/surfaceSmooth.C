@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     const labelListList& pointEdges = surf1.pointEdges();
 
 
-    for(label iter = 0; iter < iters; iter++)
+    for (label iter = 0; iter < iters; iter++)
     {
         forAll(pointEdges, vertI)
         {

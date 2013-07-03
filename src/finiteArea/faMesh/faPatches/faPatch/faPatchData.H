@@ -26,7 +26,7 @@ Class
     faPatchData
 
 Description
-    Clas which holds data needed for faPatch construction
+    Class which holds data needed for faPatch construction
 
 SourceFiles
 
@@ -46,9 +46,8 @@ namespace Foam
                            Class faPatchData Declaration
 \*---------------------------------------------------------------------------*/
 
-class faPatchData
+struct faPatchData
 {
-public:
     word name_;
     word type_;
     dictionary dict_;
@@ -63,6 +62,7 @@ public:
         ngbPolyPatchID_(-1)
     {}
 };
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

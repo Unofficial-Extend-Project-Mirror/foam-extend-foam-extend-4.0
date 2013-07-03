@@ -25,9 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "fvmAdjDiv.H"
-#include "fvMesh.H"
-#include "fvMatrix.H"
-#include "adjointConvectionScheme.H"
+#include "adjConvectionScheme.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,30 +43,30 @@ template<class Type>
 tmp<fvMatrix<Type> >
 adjDiv
 (
-    const surfaceScalarField& flux,
+    const volVectorField& Up,
     GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
 )
 {
-    return fv::adjointConvectionScheme<Type>::New
+    return fv::adjConvectionScheme<Type>::New
     (
         vf.mesh(),
-        flux,
-        vf.mesh().divScheme(name)
-    )().fvmAdjDiv(flux, vf);
+        Up,
+        vf.mesh().schemesDict().divScheme(name)
+    )().fvmAdjDiv(Up, vf);
 }
 
 template<class Type>
 tmp<fvMatrix<Type> >
 adjDiv
 (
-    const tmp<surfaceScalarField>& tflux,
+    const tmp<volVectorField>& tUp,
     GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
 )
 {
-    tmp<fvMatrix<Type> > AdjDiv(fvm::adjDiv(tflux(), vf, name));
-    tflux.clear();
+    tmp<fvMatrix<Type> > AdjDiv(fvm::adjDiv(tUp(), vf, name));
+    tUp.clear();
     return AdjDiv;
 }
 
@@ -77,23 +75,23 @@ template<class Type>
 tmp<fvMatrix<Type> >
 adjDiv
 (
-    const surfaceScalarField& flux,
+    const volVectorField& Up,
     GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
-    return fvm::adjDiv(flux, vf, "adjDiv("+flux.name()+','+vf.name()+')');
+    return fvm::adjDiv(Up, vf, "adjDiv("+Up.name()+','+vf.name()+')');
 }
 
 template<class Type>
 tmp<fvMatrix<Type> >
 adjDiv
 (
-    const tmp<surfaceScalarField>& tflux,
+    const tmp<volVectorField>& tUp,
     GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
-    tmp<fvMatrix<Type> > AdjDiv(fvm::adjDiv(tflux(), vf));
-    tflux.clear();
+    tmp<fvMatrix<Type> > AdjDiv(fvm::adjDiv(tUp(), vf));
+    tUp.clear();
     return AdjDiv;
 }
 

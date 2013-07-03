@@ -440,6 +440,10 @@ void readCells
             {
                 lineStr >> regPhys >> regElem >> partition;
             }
+            else if (nTags == 2)
+            {
+                lineStr >> regPhys >> regElem;
+            }
             else
             {
                 regPhys = 0;

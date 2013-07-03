@@ -29,9 +29,6 @@ License
 #include "polyMesh.H"
 #include "mapPolyMesh.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 void Foam::faceMapper::calcAddressing() const
@@ -169,7 +166,7 @@ void Foam::faceMapper::calcAddressing() const
         }
 
 
-        // Grab inserted points (for them the size of addressing is still zero)
+        // Grab inserted faces (for them the size of addressing is still zero)
 
         insertedFaceLabelsPtr_ = new labelList(mesh_.nFaces());
         labelList& insertedFaces = *insertedFaceLabelsPtr_;
@@ -220,7 +217,7 @@ Foam::faceMapper::faceMapper(const mapPolyMesh& mpm)
     // Check for possibility of direct mapping
     if
     (
-        mpm_.facesFromPointsMap().empty() 
+        mpm_.facesFromPointsMap().empty()
      && mpm_.facesFromEdgesMap().empty()
      && mpm_.facesFromFacesMap().empty()
     )

@@ -89,11 +89,17 @@ public:
             const dictionary&,
             const wordList& specieNames,
             const HashPtrTable<ThermoType>& specieThermoData,
-            const fvMesh&
+            const fvMesh&,
+            const objectRegistry&
         );
 
         //- Construct from dictionary and mesh
-        multiComponentMixture(const dictionary&, const fvMesh&);
+        multiComponentMixture
+        (
+            const dictionary&,
+            const fvMesh&,
+            const objectRegistry&
+        );
 
 
     //- Destructor

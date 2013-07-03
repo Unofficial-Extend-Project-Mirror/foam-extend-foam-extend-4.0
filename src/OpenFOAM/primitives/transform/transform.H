@@ -33,7 +33,7 @@ Description
 #ifndef transform_H
 #define transform_H
 
-#include "tensor.H"
+#include "tensorField.H"
 #include "mathematicalConstants.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -47,6 +47,19 @@ inline tensor rotationTensor
 (
     const vector& n1,
     const vector& n2
+)
+{
+    return
+        (n1 & n2)*I
+      + (1 - (n1 & n2))*sqr(n1 ^ n2)/(magSqr(n1 ^ n2) + VSMALL)
+      + (n2*n1 - n1*n2);
+}
+
+
+inline tmp<tensorField> rotationTensor
+(
+    const vectorField& n1,
+    const vectorField& n2
 )
 {
     return
@@ -104,7 +117,7 @@ inline Tensor<Cmpt> transform(const tensor& tt, const Tensor<Cmpt>& t)
         (tt.yx()*t.xx() + tt.yy()*t.yx() + tt.yz()*t.zx())*tt.zx()
       + (tt.yx()*t.xy() + tt.yy()*t.yy() + tt.yz()*t.zy())*tt.zy()
       + (tt.yx()*t.xz() + tt.yy()*t.yz() + tt.yz()*t.zz())*tt.zz(),
-        
+
         (tt.zx()*t.xx() + tt.zy()*t.yx() + tt.zz()*t.zx())*tt.xx()
       + (tt.zx()*t.xy() + tt.zy()*t.yy() + tt.zz()*t.zy())*tt.xy()
       + (tt.zx()*t.xz() + tt.zy()*t.yz() + tt.zz()*t.zz())*tt.xz(),
@@ -155,7 +168,7 @@ inline SymmTensor<Cmpt> transform(const tensor& tt, const SymmTensor<Cmpt>& st)
         (tt.yx()*st.xx() + tt.yy()*st.xy() + tt.yz()*st.xz())*tt.zx()
       + (tt.yx()*st.xy() + tt.yy()*st.yy() + tt.yz()*st.yz())*tt.zy()
       + (tt.yx()*st.xz() + tt.yy()*st.yz() + tt.yz()*st.zz())*tt.zz(),
-        
+
         (tt.zx()*st.xx() + tt.zy()*st.xy() + tt.zz()*st.xz())*tt.zx()
       + (tt.zx()*st.xy() + tt.zy()*st.yy() + tt.zz()*st.yz())*tt.zy()
       + (tt.zx()*st.xz() + tt.zy()*st.yz() + tt.zz()*st.zz())*tt.zz()

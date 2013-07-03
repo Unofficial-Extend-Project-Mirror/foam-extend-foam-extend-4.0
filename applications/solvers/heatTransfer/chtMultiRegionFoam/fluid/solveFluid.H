@@ -8,7 +8,7 @@ if (oCorr == 0)
 #include "hEqn.H"
 
 // --- PISO loop
-for (int corr=0; corr<nCorr; corr++)
+for (int corr = 0; corr < nCorr; corr++)
 {
     #include "pEqn.H"
 }

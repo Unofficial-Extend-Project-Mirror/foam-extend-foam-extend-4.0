@@ -11,6 +11,8 @@ EXE_LIBS = \
     -lengine \
     -lerrorEstimation \
     -lfiniteVolume \
+    -lfiniteArea \
+    $(WM_DECOMP_LIBS) \
     -lforces \
     -lfvMotionSolver \
     -lincompressibleLESModels \
@@ -39,4 +41,5 @@ EXE_LIBS = \
     -lthermophysicalFunctions \
     -ltopoChangerFvMesh \
     -ltriSurface \
-    -lautoMesh
+    -lautoMesh \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

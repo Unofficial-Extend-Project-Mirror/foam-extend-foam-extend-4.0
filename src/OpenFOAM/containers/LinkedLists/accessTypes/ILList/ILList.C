@@ -63,7 +63,7 @@ Foam::ILList<LListBase, T>::ILList
         ++iter
     )
     {
-        append(iter().clone(cloneArg).ptr());
+        this->append(iter().clone(cloneArg).ptr());
     }
 }
 #endif

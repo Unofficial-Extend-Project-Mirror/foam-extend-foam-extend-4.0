@@ -14,7 +14,8 @@
 
     phi = phiU +
         (
-            fvc::interpolate(interface.sigmaK())*fvc::snGrad(alpha1)*mesh.magSf()
+            fvc::interpolate(interface.sigmaK())*
+            fvc::snGrad(alpha1)*mesh.magSf()
           + fvc::interpolate(rho)*(g & mesh.Sf())
         )*rUAf;
     adjustPhi(phi, U, p);
@@ -30,11 +31,11 @@
 
         if (corr == nCorr-1 && nonOrth == nNonOrthCorr)
         {
-            pdEqn.solve(mesh.solver(pd.name() + "Final"));
+            pdEqn.solve(mesh.solutionDict().solver(pd.name() + "Final"));
         }
         else
         {
-            pdEqn.solve(mesh.solver(pd.name()));
+            pdEqn.solve(mesh.solutionDict().solver(pd.name()));
         }
 
         if (nonOrth == nNonOrthCorr)

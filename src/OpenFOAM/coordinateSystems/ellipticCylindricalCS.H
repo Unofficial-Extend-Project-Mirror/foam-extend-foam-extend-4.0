@@ -150,9 +150,29 @@ public:
             const dictionary& dict
         );
 
+        //- Return clone
+        virtual autoPtr<coordinateSystem> clone() const
+        {
+            return autoPtr<coordinateSystem>(new ellipticCylindricalCS(*this));
+        }
+
 
     // Member Functions
 
+        // Global information about the coordinate system
+
+            //- Directions in which the span is limited
+            virtual spanInfo spanLimited() const;
+
+            //- Span bounds
+            virtual boundBox spanBounds() const;
+
+
+        //- Are angles in degrees?
+        bool  inDegrees() const;
+
+        //- Non-const access to inDegrees
+        bool& inDegrees();
 };
 
 

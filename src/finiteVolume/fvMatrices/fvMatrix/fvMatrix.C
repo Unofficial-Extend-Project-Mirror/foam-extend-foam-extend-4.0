@@ -178,6 +178,35 @@ void Foam::fvMatrix<Type>::addBoundarySource
 }
 
 
+template<class Type>
+void Foam::fvMatrix<Type>::correctImplicitBoundarySource
+(
+    const FieldField<Field, scalar>& bouCoeffsCmpt,
+    scalarField& sourceCmpt,
+    const direction cmpt
+) const
+{
+    forAll(psi_.boundaryField(), patchI)
+    {
+        const fvPatchField<Type>& ptf = psi_.boundaryField()[patchI];
+        const scalarField& pbc = bouCoeffsCmpt[patchI];
+
+        if (ptf.coupled())
+        {
+            scalarField pnf = ptf.patchNeighbourField()().component(cmpt);
+
+            const unallocLabelList& addr = lduAddr().patchAddr(patchI);
+
+            forAll (addr, facei)
+            {
+                // Note opposite sign of the one in addBoundarySource
+                sourceCmpt[addr[facei]] -= pbc[facei]*pnf[facei];
+            }
+        }
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
@@ -193,6 +222,7 @@ Foam::fvMatrix<Type>::fvMatrix
     source_(psi.size(), pTraits<Type>::zero),
     internalCoeffs_(psi.mesh().boundary().size()),
     boundaryCoeffs_(psi.mesh().boundary().size()),
+    assemblyCompleted_(false),
     faceFluxCorrectionPtr_(NULL)
 {
     if (debug)
@@ -241,6 +271,7 @@ Foam::fvMatrix<Type>::fvMatrix(const fvMatrix<Type>& fvm)
     source_(fvm.source_),
     internalCoeffs_(fvm.internalCoeffs_),
     boundaryCoeffs_(fvm.boundaryCoeffs_),
+    assemblyCompleted_(fvm.assemblyCompleted_),
     faceFluxCorrectionPtr_(NULL)
 {
     if (debug)
@@ -288,6 +319,7 @@ Foam::fvMatrix<Type>::fvMatrix(const tmp<fvMatrix<Type> >& tfvm)
         const_cast<fvMatrix<Type>&>(tfvm()).boundaryCoeffs_,
         tfvm.isTmp()
     ),
+    assemblyCompleted_(tfvm().assemblyCompleted()),
     faceFluxCorrectionPtr_(NULL)
 {
     if (debug)
@@ -332,6 +364,7 @@ Foam::fvMatrix<Type>::fvMatrix
     source_(is),
     internalCoeffs_(psi.mesh().boundary().size()),
     boundaryCoeffs_(psi.mesh().boundary().size()),
+    assemblyCompleted_(false),
     faceFluxCorrectionPtr_(NULL)
 {
     if (debug)
@@ -398,6 +431,12 @@ void Foam::fvMatrix<Type>::setValues
 )
 {
     const fvMesh& mesh = psi_.mesh();
+
+    // Record cell labels of eliminated equations
+    forAll (cellLabels, i)
+    {
+        eliminatedEqns().insert(cellLabels[i]);
+    }
 
     const cellList& cells = mesh.cells();
     const unallocLabelList& own = mesh.owner();
@@ -606,20 +645,42 @@ void Foam::fvMatrix<Type>::relax(const scalar alpha)
 template<class Type>
 void Foam::fvMatrix<Type>::relax()
 {
-    if (psi_.mesh().relax(psi_.name()))
+    if (psi_.mesh().solutionDict().relax(psi_.name()))
     {
-        relax(psi_.mesh().relaxationFactor(psi_.name()));
+        relax(psi_.mesh().solutionDict().relaxationFactor(psi_.name()));
+    }
+    else
+    {
+        if (debug)
+        {
+            InfoIn("void fvMatrix<Type>::relax()")
+                << "Relaxation factor for field " << psi_.name()
+                << " not found.  Relaxation will not be used." << endl;
+        }
     }
 }
 
 
 template<class Type>
-void Foam::fvMatrix<Type>::boundaryManipulate
-(
-    typename GeometricField<Type, fvPatchField, volMesh>::
-        GeometricBoundaryField& bFields
-)
+void Foam::fvMatrix<Type>::completeAssembly()
 {
+    if (assemblyCompleted_)
+    {
+        return;
+    }
+
+    if (debug)
+    {
+        InfoIn("void Foam::fvMatrix<Type>::completeAssembly()")
+            << "Completing matrix for equation " << this->psi().name()
+                << endl;
+    }
+
+    assemblyCompleted_ = true;
+
+    typename GeometricField<Type, fvPatchField, volMesh>::
+        GeometricBoundaryField& bFields = psi_.boundaryField();
+
     forAll(bFields, patchI)
     {
         bFields[patchI].manipulateMatrix(*this);
@@ -808,7 +869,7 @@ Foam::tmp<Foam::GeometricField<Type, Foam::fvsPatchField, Foam::surfaceMesh> >
 Foam::fvMatrix<Type>::
 flux() const
 {
-    if (!psi_.mesh().fluxRequired(psi_.name()))
+    if (!psi_.mesh().schemesDict().fluxRequired(psi_.name()))
     {
         FatalErrorIn("fvMatrix<Type>::flux()")
             << "flux requested but " << psi_.name()
@@ -845,37 +906,16 @@ flux() const
         );
     }
 
-    FieldField<Field, Type> InternalContrib = internalCoeffs_;
-
-    forAll(InternalContrib, patchI)
+    // This needs to go into virtual functions for all coupled patches
+    // in order to simplify handling of overset meshes
+    // HJ, 29/May/2013
+    forAll (psi_.boundaryField(), patchI)
     {
-        InternalContrib[patchI] =
-            cmptMultiply
-            (
-                InternalContrib[patchI],
-                psi_.boundaryField()[patchI].patchInternalField()
-            );
-    }
-
-    FieldField<Field, Type> NeighbourContrib = boundaryCoeffs_;
-
-    forAll(NeighbourContrib, patchI)
-    {
-        if (psi_.boundaryField()[patchI].coupled())
-        {
-            NeighbourContrib[patchI] =
-                cmptMultiply
-                (
-                    NeighbourContrib[patchI],
-                    psi_.boundaryField()[patchI].patchNeighbourField()
-                );
-        }
-    }
-
-    forAll(fieldFlux.boundaryField(), patchI)
-    {
-        fieldFlux.boundaryField()[patchI] =
-            InternalContrib[patchI] - NeighbourContrib[patchI];
+        psi_.boundaryField()[patchI].patchFlux
+        (
+            fieldFlux,
+            *this
+        );
     }
 
     if (faceFluxCorrectionPtr_)
@@ -1307,7 +1347,10 @@ Foam::lduMatrix::solverPerformance Foam::solve(fvMatrix<Type>& fvm)
 }
 
 template<class Type>
-Foam::lduMatrix::solverPerformance Foam::solve(const tmp<fvMatrix<Type> >& tfvm)
+Foam::lduMatrix::solverPerformance Foam::solve
+(
+    const tmp<fvMatrix<Type> >& tfvm
+)
 {
     lduMatrix::solverPerformance solverPerf =
         const_cast<fvMatrix<Type>&>(tfvm()).solve();
@@ -1329,7 +1372,7 @@ Foam::tmp<Foam::fvMatrix<Type> > Foam::correction
     if
     (
         (A.hasUpper() || A.hasLower())
-     && A.psi().mesh().fluxRequired(A.psi().name())
+     && A.psi().mesh().schemesDict().fluxRequired(A.psi().name())
     )
     {
         tAcorr().faceFluxCorrectionPtr() = (-A.flux()).ptr();
@@ -1353,7 +1396,7 @@ Foam::tmp<Foam::fvMatrix<Type> > Foam::correction
     if
     (
         (A.hasUpper() || A.hasLower())
-     && A.psi().mesh().fluxRequired(A.psi().name())
+     && A.psi().mesh().schemesDict().fluxRequired(A.psi().name())
     )
     {
         tAcorr().faceFluxCorrectionPtr() = (-A.flux()).ptr();

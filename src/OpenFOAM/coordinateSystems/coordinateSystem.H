@@ -130,6 +130,7 @@ SourceFiles
 #define coordinateSystem_H
 
 #include "vector.H"
+#include "Pair.H"
 #include "point.H"
 #include "tensor.H"
 #include "vectorField.H"
@@ -142,6 +143,9 @@ SourceFiles
 
 namespace Foam
 {
+
+// Forward declaration of friend functions and operators
+class boundBox;
 
 /*---------------------------------------------------------------------------*\
                      Class coordinateSystem Declaration
@@ -200,6 +204,9 @@ public:
     //- Runtime type information
     TypeName("coordinateSystem");
 
+    //- Type reporting on min-max bounds on coordinate span
+    typedef FixedList<Pair<bool>, 3> spanInfo;
+
 
     // Constructors
 
@@ -245,7 +252,7 @@ public:
         coordinateSystem(Istream&);
 
         //- Return clone
-        autoPtr<coordinateSystem> clone() const
+        virtual autoPtr<coordinateSystem> clone() const
         {
             return autoPtr<coordinateSystem>(new coordinateSystem(*this));
         }
@@ -308,6 +315,15 @@ public:
 
 
     // Member Functions
+
+        // Global information about the coordinate system
+
+            //- Directions in which the span is limited
+            virtual spanInfo spanLimited() const;
+
+            //- Span bounds
+            virtual boundBox spanBounds() const;
+
 
       // Access
 
@@ -468,7 +484,7 @@ public:
 
     // Member Operators
 
-        //- assign from dictionary
+        //- Assign from dictionary
         void operator=(const dictionary&);
 
 

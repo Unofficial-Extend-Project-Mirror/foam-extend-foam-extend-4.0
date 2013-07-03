@@ -1,0 +1,113 @@
+#!/bin/bash
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Script
+#     AllMake.stage5
+#
+# Description
+#     Build script for ThirdParty packages not requiring rpm packaging
+#
+#
+# Requirements:
+#     1: Your OpenFOAM environment must be properly initialized
+#     2: OpenFOAM must already been compiled because swak4Foam depends on
+#        OpenFOAM include files and libraries
+#
+# Author:
+#     Martin Beaudoin, Hydro-Quebec, (2012)
+#
+#------------------------------------------------------------------------------
+# run from Third-party directory only
+cd ${0%/*} || exit 1
+
+wmakeCheckPwd "$WM_THIRD_PARTY_DIR" || {
+    echo "Error: Current directory is not \$WM_THIRD_PARTY_DIR"
+    echo "    The environment variables are inconsistent with the installation."
+    echo "    Check the OpenFOAM entries in your dot-files and source them."
+    exit 1
+}
+
+#------------------------------------------------------------------------------
+
+echo "========================================"
+echo "Starting ThirdParty AllMake: Stage5     "
+echo "========================================"
+echo
+
+# swak4Foam - Version 0.2.0
+# In fact, we are basically tracking the head branch from the Mercurial repository
+# which is also replicated under the Breeder_1.7 section of the Subversion repository
+#
+if [ -z "$SWAK4FOAM_SYSTEM" ] 
+then
+    # Do we need to download the source code?
+    # We choose to put the source code under ./rpmBuild/BUILD prior to compiling.
+    # We will not generate a rpm package, but all ThirdParty source code will be
+    # centralized under the same scratch area
+    if [ ! -e ./rpmBuild/BUILD/swak4Foam-0.2.0 ]; 
+    then
+	echo "Checking for a Mercurial client: hg"
+        command -v hg >/dev/null
+        if [ $? -eq 0 ];
+	then
+	    echo "Using Mercurial/hg to download the source code for swak4Foam"
+	    (cd ./rpmBuild/BUILD; hg clone http://openfoam-extend.hg.sourceforge.net:8000/hgroot/openfoam-extend/swak4Foam swak4Foam-0.2.0)
+        else
+	    echo "Warning: Mercurial/hg is not installed. Switching to an alternate Subversion repository"
+            command -v svn >/dev/null
+            if [ $? -eq 0 ];
+	    then
+		echo "Using Subversion/svn to download the source code for swak4Foam"
+		(cd ./rpmBuild/BUILD; svn checkout https://openfoam-extend.svn.sourceforge.net/svnroot/openfoam-extend/trunk/Breeder_1.7/libraries/swak4Foam swak4Foam-0.2.0)
+            else
+		echo "Error: Please install either a Mercurial or Subversion client in order to download the source code for swak4Foam"
+		exit -1
+	    fi
+	fi
+        # We move the compilation results directly to $FOAM_SITE_APPBIN and $FOAM_SITE_LIBBIN
+        # If you prefer to keep the libraries and tools under $FOAM_USER_LIBBIN and $FOAM_USER_APPBIN, simply
+        # comment out the next two lines
+	(cd ./rpmBuild/BUILD/swak4Foam-0.2.0; find . -name files   | xargs -n 1 sed -i.old "s/FOAM_USER/FOAM_SITE/g")
+	(cd ./rpmBuild/BUILD/swak4Foam-0.2.0; find . -name options | xargs -n 1 sed -i.old "s/FOAM_USER/FOAM_SITE/g")
+
+        # We recompile everything
+	(cd ./rpmBuild/BUILD/swak4Foam-0.2.0; ./Allwclean; ./Allwmake)
+    else
+	echo "The source code for swak4Foam is already present under ./rpmBuild/BUILD/swak4Foam-0.2.0"
+	echo "Please remove this directory if you want to refresh your installation of swak4Foam" 
+    fi
+    echo ""
+else
+    echo "Using system installed swak4Foam"
+    echo ""
+fi
+
+echo "========================================"
+echo "Done ThirdParty AllMake: Stage5         "
+echo "========================================"
+echo
+
+# ----------------------------------------------------------------- end-of-file
+
+

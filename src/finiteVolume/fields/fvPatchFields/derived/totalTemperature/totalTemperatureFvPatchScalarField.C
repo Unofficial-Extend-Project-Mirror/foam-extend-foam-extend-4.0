@@ -30,8 +30,6 @@ License
 #include "volFields.H"
 #include "surfaceFields.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
@@ -82,14 +80,14 @@ Foam::totalTemperatureFvPatchScalarField::totalTemperatureFvPatchScalarField
 {
     if (dict.found("value"))
     {
-        fvPatchField<scalar>::operator=
+        fvPatchScalarField::operator=
         (
             scalarField("value", dict, p.size())
         );
     }
     else
     {
-        fvPatchField<scalar>::operator=(T0_);
+        fvPatchScalarField::operator=(T0_);
     }
 }
 
@@ -158,13 +156,13 @@ void Foam::totalTemperatureFvPatchScalarField::updateCoeffs()
     }
 
     const fvPatchVectorField& Up =
-        patch().lookupPatchField<volVectorField, vector>(UName_);
+        lookupPatchField<volVectorField, vector>(UName_);
 
-    const fvsPatchField<scalar>& phip =
-        patch().lookupPatchField<surfaceScalarField, scalar>(phiName_);
+    const fvsPatchScalarField& phip =
+        lookupPatchField<surfaceScalarField, scalar>(phiName_);
 
-    const fvPatchField<scalar>& psip =
-        patch().lookupPatchField<volScalarField, scalar>(psiName_);
+    const fvPatchScalarField& psip =
+        lookupPatchField<volScalarField, scalar>(psiName_);
 
     scalar gM1ByG = (gamma_ - 1.0)/gamma_;
 

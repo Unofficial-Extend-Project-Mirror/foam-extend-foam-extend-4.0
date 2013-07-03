@@ -133,7 +133,7 @@ solidWallMixedTemperatureCoupledFvPatchScalarField
 const Foam::fvPatchScalarField&
 Foam::solidWallMixedTemperatureCoupledFvPatchScalarField::K() const
 {
-    return this->patch().lookupPatchField<volScalarField, scalar>(KName_);
+    return this->lookupPatchField<volScalarField, scalar>(KName_);
 }
 
 

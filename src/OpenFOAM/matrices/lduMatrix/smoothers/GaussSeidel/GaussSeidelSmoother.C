@@ -93,7 +93,7 @@ void Foam::GaussSeidelSmoother::smooth
         matrix_.lduAddr().ownerStartAddr().begin();
 
 
-    // Parallel boundary initialisation.  The parallel boundary is treated
+    // Coupled boundary initialisation.  The coupled boundary is treated
     // as an effective jacobi interface in the boundary.
     // Note: there is a change of sign in the coupled
     // interface update.  The reason for this is that the
@@ -105,43 +105,40 @@ void Foam::GaussSeidelSmoother::smooth
     // To compensate for this, it is necessary to turn the
     // sign of the contribution.
 
-    FieldField<Field, scalar> mBouCoeffs(coupleBouCoeffs_.size());
-
-    forAll(mBouCoeffs, patchi)
-    {
-        if (interfaces_.set(patchi))
-        {
-            mBouCoeffs.set(patchi, -coupleBouCoeffs_[patchi]);
-        }
-    }
+    // Handled by LHS switch on initMatrixInterfaces and updateMatrixInterfaces
+    // HJ, 22/May/2013
 
     for (label sweep = 0; sweep < nSweeps; sweep++)
     {
         bPrime = b;
 
+        // Update from lhs
         matrix_.initMatrixInterfaces
         (
-            mBouCoeffs,
+            coupleBouCoeffs_,
             interfaces_,
             x,
             bPrime,
-            cmpt
+            cmpt,
+            true         // switch to lhs
         );
 
+        // Update from lhs
         matrix_.updateMatrixInterfaces
         (
-            mBouCoeffs,
+            coupleBouCoeffs_,
             interfaces_,
             x,
             bPrime,
-            cmpt
+            cmpt,
+            true         // switch to lhs
         );
 
         register scalar curX;
         register label fStart;
         register label fEnd = ownStartPtr[0];
 
-        for (register label cellI=0; cellI<nCells; cellI++)
+        for (register label cellI = 0; cellI < nCells; cellI++)
         {
             // Start and end of this row
             fStart = fEnd;
@@ -151,7 +148,7 @@ void Foam::GaussSeidelSmoother::smooth
             curX = bPrimePtr[cellI];
 
             // Accumulate the owner product side
-            for (register label curFace=fStart; curFace<fEnd; curFace++)
+            for (register label curFace = fStart; curFace < fEnd; curFace++)
             {
                 curX -= upperPtr[curFace]*xPtr[uPtr[curFace]];
             }
@@ -160,7 +157,7 @@ void Foam::GaussSeidelSmoother::smooth
             curX /= diagPtr[cellI];
 
             // Distribute the neighbour side using current x
-            for (register label curFace=fStart; curFace<fEnd; curFace++)
+            for (register label curFace = fStart; curFace < fEnd; curFace++)
             {
                 bPrimePtr[uPtr[curFace]] -= lowerPtr[curFace]*curX;
             }

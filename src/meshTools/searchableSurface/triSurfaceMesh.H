@@ -87,6 +87,7 @@ private:
         //- Is surface closed
         mutable label surfaceClosed_;
 
+
     // Private Member Functions
 
         ////- Helper: find instance of files without header
@@ -174,7 +175,7 @@ public:
         //- Move points
         virtual void movePoints(const pointField&);
 
-        //- Demand driven contruction of octree
+        //- Demand driven construction of octree
         const indexedOctree<treeDataTriSurface>& tree() const;
 
         //- Demand driven contruction of octree for boundary edges

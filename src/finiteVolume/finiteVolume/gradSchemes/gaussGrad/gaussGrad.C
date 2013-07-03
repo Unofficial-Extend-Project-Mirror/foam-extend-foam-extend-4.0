@@ -146,34 +146,6 @@ gaussGrad<Type>::grad
 }
 
 
-template<class Type>
-void gaussGrad<Type>::correctBoundaryConditions
-(
-    const GeometricField<Type, fvPatchField, volMesh>& vsf,
-    GeometricField
-    <
-        typename outerProduct<vector, Type>::type, fvPatchField, volMesh
-    >& gGrad
-)
-{
-    forAll(vsf.boundaryField(), patchi)
-    {
-        if (!vsf.boundaryField()[patchi].coupled())
-        {
-            vectorField n =
-                vsf.mesh().Sf().boundaryField()[patchi]
-               /vsf.mesh().magSf().boundaryField()[patchi];
-
-            gGrad.boundaryField()[patchi] += n *
-            (
-                vsf.boundaryField()[patchi].snGrad()
-              - (n & gGrad.boundaryField()[patchi])
-            );
-        }
-     }
-}
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace fv

@@ -39,7 +39,7 @@ Description
 
 void starMesh::readBoundary()
 {
-    label nPatches=0, nFaces=0;
+    label nPatches = 0, nFaces = 0;
     labelList nPatchFaces(1000);
 
     label lineIndex, starLabel;
@@ -186,8 +186,8 @@ void starMesh::readBoundary()
                 boundary_[patchLabel][nPatchFaces[patchLabel]]
                     = face(pointLabels);
             }
-            
-            // increment counter of faces in current patch
+
+            // Increment counter of faces in current patch
             nPatchFaces[patchLabel]++;
         }
 

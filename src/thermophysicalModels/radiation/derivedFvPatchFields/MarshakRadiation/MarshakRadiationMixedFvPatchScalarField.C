@@ -77,7 +77,7 @@ Foam::MarshakRadiationFvPatchScalarField::MarshakRadiationFvPatchScalarField
     emissivity_(readScalar(dict.lookup("emissivity")))
 {
     const scalarField& Tp =
-        patch().lookupPatchField<volScalarField, scalar>(TName_);
+        lookupPatchField<volScalarField, scalar>(TName_);
 
     refValue() = 4.0*radiation::sigmaSB.value()*pow4(Tp);
     refGrad() = 0.0;
@@ -149,14 +149,14 @@ void Foam::MarshakRadiationFvPatchScalarField::updateCoeffs()
 
     // Temperature field
     const scalarField& Tp =
-        patch().lookupPatchField<volScalarField, scalar>(TName_);
+        lookupPatchField<volScalarField, scalar>(TName_);
 
     // Re-calc reference value
     refValue() = 4.0*radiation::sigmaSB.value()*pow4(Tp);
 
     // Diffusion coefficient - created by radiation model's ::updateCoeffs()
     const scalarField& gamma =
-        patch().lookupPatchField<volScalarField, scalar>("gammaRad");
+        lookupPatchField<volScalarField, scalar>("gammaRad");
 
     const scalar Ep = emissivity_/(2.0*(2.0 - emissivity_));
 

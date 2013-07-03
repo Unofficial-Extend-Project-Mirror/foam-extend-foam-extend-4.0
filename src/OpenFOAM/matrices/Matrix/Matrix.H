@@ -88,6 +88,12 @@ class Matrix
 
 public:
 
+    // Static data members
+
+        //- Empty matrix
+        static const Matrix<Form, Type> zero;
+
+
     // Static Member Functions
 
         //- Return a null Matrix

@@ -16,4 +16,5 @@ EXE_LIBS = \
     -lbasicThermophysicalModels \
     -lspecie \
     -lfiniteVolume \
-    -llduSolvers
+    -llduSolvers \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

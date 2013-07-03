@@ -91,7 +91,7 @@ void Foam::boundMinMax
             ),
             vsf0.value()
         );
-
+        Info<< "new min: " << gMin(vsf.internalField()) << endl;
         vsf.correctBoundaryConditions();
         vsf.boundaryField() = max(vsf.boundaryField(), vsf0.value());
     }
@@ -111,7 +111,7 @@ void Foam::boundMinMax
             ),
             vsf1.value()
         );
-
+        Info<< "new max: " << gMax(vsf.internalField()) << endl;
         vsf.correctBoundaryConditions();
         vsf.boundaryField() = min(vsf.boundaryField(), vsf1.value());
     }

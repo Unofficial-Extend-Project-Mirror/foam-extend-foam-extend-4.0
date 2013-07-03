@@ -223,7 +223,7 @@ const Foam::lduMesh& Foam::GAMGAgglomeration::meshLevel
 {
     if (i == 0)
     {
-        return mesh_;
+        return mesh();
     }
     else
     {

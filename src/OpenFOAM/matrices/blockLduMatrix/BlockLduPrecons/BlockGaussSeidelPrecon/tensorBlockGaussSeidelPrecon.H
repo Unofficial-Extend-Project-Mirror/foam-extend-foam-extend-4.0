@@ -44,7 +44,30 @@ namespace Foam
 {
 
 template<>
-void Foam::BlockGaussSeidelPrecon<tensor>::precondition
+template<>
+void BlockGaussSeidelPrecon<tensor>::BlockSweep
+(
+    Field<tensor>& x,
+    const Field<tensor>& dD,
+    const Field<tensor>& upper,
+    const Field<tensor>& b
+) const;
+
+
+template<>
+template<>
+void BlockGaussSeidelPrecon<tensor>::BlockSweep
+(
+    Field<tensor>& x,
+    const Field<tensor>& dD,
+    const Field<tensor>& upper,
+    const Field<tensor>& lower,
+    const Field<tensor>& b
+) const;
+
+
+template<>
+void BlockGaussSeidelPrecon<tensor>::precondition
 (
     tensorField& x,
     const tensorField& b
@@ -52,7 +75,7 @@ void Foam::BlockGaussSeidelPrecon<tensor>::precondition
 
 
 template<>
-void Foam::BlockGaussSeidelPrecon<tensor>::preconditionT
+void BlockGaussSeidelPrecon<tensor>::preconditionT
 (
     tensorField& xT,
     const tensorField& bT

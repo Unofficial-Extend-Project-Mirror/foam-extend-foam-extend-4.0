@@ -92,7 +92,7 @@ explicitConvectionScheme<Type>::fvmDiv
 
     const fvMesh& mesh = this->mesh();
 
-    if (mesh.fluxRequired(vf.name()))
+    if (mesh.schemesDict().fluxRequired(vf.name()))
     {
         fvm.faceFluxCorrectionPtr() = tfaceFluxCorrection.ptr();
     }

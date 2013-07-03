@@ -30,8 +30,6 @@ License
 #include "volFields.H"
 #include "surfaceFields.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::fluxCorrectedVelocityFvPatchVectorField::
@@ -50,21 +48,6 @@ fluxCorrectedVelocityFvPatchVectorField
 Foam::fluxCorrectedVelocityFvPatchVectorField::
 fluxCorrectedVelocityFvPatchVectorField
 (
-    const fluxCorrectedVelocityFvPatchVectorField& ptf,
-    const fvPatch& p,
-    const DimensionedField<vector, volMesh>& iF,
-    const fvPatchFieldMapper& mapper
-)
-:
-    zeroGradientFvPatchVectorField(ptf, p, iF, mapper),
-    phiName_(ptf.phiName_),
-    rhoName_(ptf.rhoName_)
-{}
-
-
-Foam::fluxCorrectedVelocityFvPatchVectorField::
-fluxCorrectedVelocityFvPatchVectorField
-(
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF,
     const dictionary& dict
@@ -76,6 +59,21 @@ fluxCorrectedVelocityFvPatchVectorField
 {
     fvPatchVectorField::operator=(patchInternalField());
 }
+
+
+Foam::fluxCorrectedVelocityFvPatchVectorField::
+fluxCorrectedVelocityFvPatchVectorField
+(
+    const fluxCorrectedVelocityFvPatchVectorField& ptf,
+    const fvPatch& p,
+    const DimensionedField<vector, volMesh>& iF,
+    const fvPatchFieldMapper& mapper
+)
+:
+    zeroGradientFvPatchVectorField(ptf, p, iF, mapper),
+    phiName_(ptf.phiName_),
+    rhoName_(ptf.rhoName_)
+{}
 
 
 Foam::fluxCorrectedVelocityFvPatchVectorField::
@@ -121,7 +119,7 @@ void Foam::fluxCorrectedVelocityFvPatchVectorField::evaluate
     else if (phi.dimensions() == dimDensity*dimVelocity*dimArea)
     {
         const fvPatchField<scalar>& rhop =
-            patch().lookupPatchField<volScalarField, scalar>(rhoName_);
+            lookupPatchField<volScalarField, scalar>(rhoName_);
 
         operator==(*this - n*(n & *this) + n*phip/(rhop*magS));
     }

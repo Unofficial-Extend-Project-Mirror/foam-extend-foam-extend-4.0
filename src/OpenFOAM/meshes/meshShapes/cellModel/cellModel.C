@@ -38,7 +38,7 @@ Foam::vector Foam::cellModel::centre
     // Estimate centre of cell
     vector cEst = vector::zero;
 
-    // Sum the points idicated by the label list
+    // Sum the points indicated by the label list
     forAll(pointLabels, i)
     {
         cEst += points[pointLabels[i]];

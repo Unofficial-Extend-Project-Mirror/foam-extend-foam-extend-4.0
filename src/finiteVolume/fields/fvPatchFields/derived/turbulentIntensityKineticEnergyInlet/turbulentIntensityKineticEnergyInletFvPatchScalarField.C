@@ -44,6 +44,7 @@ turbulentIntensityKineticEnergyInletFvPatchScalarField
     intensity_(0.05)
 {}
 
+
 Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
 turbulentIntensityKineticEnergyInletFvPatchScalarField
 (
@@ -57,6 +58,7 @@ turbulentIntensityKineticEnergyInletFvPatchScalarField
     UName_(ptf.UName_),
     intensity_(ptf.intensity_)
 {}
+
 
 Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
 turbulentIntensityKineticEnergyInletFvPatchScalarField
@@ -87,6 +89,7 @@ turbulentIntensityKineticEnergyInletFvPatchScalarField
             << exit(FatalError);
     }
 }
+
 
 Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
 turbulentIntensityKineticEnergyInletFvPatchScalarField
@@ -125,7 +128,7 @@ updateCoeffs()
     }
 
     const fvPatchField<vector>& Up =
-        patch().lookupPatchField<volVectorField, vector>(UName_);
+        lookupPatchField<volVectorField, vector>(UName_);
 
     operator==(1.5*sqr(intensity_)*magSqr(Up));
 

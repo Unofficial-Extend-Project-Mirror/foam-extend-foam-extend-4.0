@@ -62,11 +62,11 @@ Foam::W2::~W2()
 
 Foam::tmp<Foam::scalarField> Foam::W2::weights
 (
-    const vectorField& points,
-    const vector& controlPoint
+    const vectorField& controlPoints,
+    const vector& dataPoint
 ) const
 {
-    scalarField dist = mag(points - controlPoint);
+    scalarField dist = mag(controlPoints - dataPoint);
 
     scalarField RBF(dist.size());
 

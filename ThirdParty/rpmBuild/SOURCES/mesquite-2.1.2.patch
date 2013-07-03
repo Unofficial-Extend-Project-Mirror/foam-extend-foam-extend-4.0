@@ -1,0 +1,12 @@
+*** include/Mesquite.hpp	2009-12-07 22:48:45.000000000 +0000
+--- /home/hjasak/OpenFOAM/OpenFOAM-1.6-ext/ThirdParty/rpmBuild/BUILD/mesquite-2.1.2/include/Mesquite.hpp	2011-11-03 21:59:55.734930462 +0000
+***************
+*** 69,74 ****
+--- 69,75 ----
+  namespace MESQUITE_NS { }
+  namespace Mesquite = MESQUITE_NS;
+  
++ using std::size_t;
+  
+  /*! \file Mesquite.hpp
+   */

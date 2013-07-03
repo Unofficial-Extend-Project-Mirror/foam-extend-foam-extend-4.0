@@ -138,6 +138,15 @@ public:
 
     // Member Functions
 
+        // Access
+
+            //- Return true if interface is coupled
+            virtual bool coupled() const
+            {
+                return true;
+            }
+
+
         // Agglomeration
 
             //- Agglomerating the given fine-level coefficients and return

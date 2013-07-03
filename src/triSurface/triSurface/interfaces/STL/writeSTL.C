@@ -44,10 +44,15 @@ void triSurface::writeSTLASCII(Ostream& os) const
     surfacePatchList myPatches(calcPatches(faceMap));
 
     label faceIndex = 0;
-    forAll(myPatches, patchI)
+    forAll (myPatches, patchI)
     {
         // Print all faces belonging to this region
         const surfacePatch& patch = myPatches[patchI];
+
+        if (patch.size() == 0)
+        {
+            continue;
+        }
 
         os << "solid " << patch.name() << endl;
 

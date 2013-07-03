@@ -1,3 +1,4 @@
+
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -385,7 +386,7 @@ SLTSDdtScheme<Type>::fvmDdt
 
     scalarField rDeltaT = SLrDeltaT()().internalField();
 
-    Info<< "max/min rDeltaT " << max(rDeltaT) << " " << min(rDeltaT) << endl;
+    Info<< "max/min rDeltaT " << gMax(rDeltaT) << " " << gMin(rDeltaT) << endl;
 
     fvm.diag() = rDeltaT*mesh().V();
 

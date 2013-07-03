@@ -28,7 +28,7 @@ License
 #include "fvMesh.H"
 #include "Time.H"
 
-/* * * * * * * * * * * * * * * private static data * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * Private Static Data * * * * * * * * * * * * * */
 
 namespace Foam
 {
@@ -37,7 +37,11 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::basicChemistryModel::basicChemistryModel(const fvMesh& mesh)
+Foam::basicChemistryModel::basicChemistryModel
+(
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
 :
     IOdictionary
     (
@@ -45,7 +49,7 @@ Foam::basicChemistryModel::basicChemistryModel(const fvMesh& mesh)
         (
             "chemistryProperties",
             mesh.time().constant(),
-            mesh,
+            obj,
             IOobject::MUST_READ,
             IOobject::NO_WRITE
         )

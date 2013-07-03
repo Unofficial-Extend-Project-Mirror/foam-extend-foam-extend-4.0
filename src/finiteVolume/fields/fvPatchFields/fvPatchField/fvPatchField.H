@@ -59,12 +59,18 @@ class objectRegistry;
 class dictionary;
 class fvPatchFieldMapper;
 class volMesh;
-
+class surfaceMesh;
 
 // Forward declaration of friend functions and operators
 
 template<class Type>
 class fvPatchField;
+
+template<class Type>
+class fvsPatchField;
+
+template<class Type, template<class> class PatchField, class GeoMesh>
+class GeometricField;
 
 template<class Type>
 class fvMatrix;
@@ -74,7 +80,7 @@ Ostream& operator<<(Ostream&, const fvPatchField<Type>&);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class patch Declaration
+                        Class fvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -269,6 +275,19 @@ public:
             //- Return local objectRegistry
             const objectRegistry& db() const;
 
+            //- Lookup and return the patchField of the named field from the
+            //  field's objectRegistry.
+            //  N.B.  The dummy pointer arguments are used if this function is
+            //  instantiated within a templated function to avoid a bug in gcc.
+            //  See inletOutletFvPatchField.C and outletInletFvPatchField.C
+            template<class GeometricField, class Type2>
+            const typename GeometricField::PatchFieldType& lookupPatchField
+            (
+                const word& name,
+                const GeometricField* = NULL,
+                const Type2* = NULL
+            ) const;
+
             //- Return patch
             const fvPatch& patch() const
             {
@@ -288,8 +307,14 @@ public:
                 return internalField_;
             }
 
-            //- Return the type of the calculated for of fvPatchField
+            //- Return the type of the calculated for type of fvPatchField
             static const word& calculatedType();
+
+            //- Return patch type (optional on read)
+            const word& patchType() const
+            {
+                return patchType_;
+            }
 
             //- Return true if this patch field fixes a value.
             //  Needed to check if a level has to be specified while solving
@@ -410,6 +435,33 @@ public:
                 return *this;
             }
 
+
+        // Patch interpolation and patch flux
+
+            //- Calculate patch face interpolate given weighting factors
+            virtual void patchInterpolate
+            (
+                GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+                const scalarField& pL
+            ) const;
+
+            //- Calculate patch face interpolate given two weighting factors
+            virtual void patchInterpolate
+            (
+                GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+                const scalarField& pL,
+                const scalarField& pY
+            ) const;
+
+            //- Calculate patch flux
+            virtual void patchFlux
+            (
+                GeometricField<Type, fvsPatchField, surfaceMesh>& flux,
+                const fvMatrix<Type>& matrix
+            ) const;
+
+
+        // Matrix manipulation
 
             //- Manipulate matrix
             virtual void manipulateMatrix(fvMatrix<Type>& matrix);

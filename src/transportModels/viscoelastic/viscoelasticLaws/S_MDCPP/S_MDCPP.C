@@ -129,7 +129,7 @@ void Foam::S_MDCPP::correct()
      ==
         etaP_/lambdaOb_*twoD
       + twoSymm(C)
-      - zeta_/2*((tau_ & twoD) + (twoD & tau_))
+      - zeta_*symm(tau_ & twoD)
       - fvm::Sp(1/lambdaOb_*fTau, tau_)
       - (
             1/lambdaOb_*(etaP_/lambdaOb_/(1 - zeta_)*(fTau - aux)*I_)

@@ -186,6 +186,7 @@ schemeSymbolList           ({schemeSymbolListElement}+{space})
 starStar                   ("**")
 text                       ({space}({word}*{space})*)
 anythingInBlock            ([^)]*)
+gridgenComment             (({space}|{cspace})({word}*{space})*)
 
 dateDDMMYYYY               ({digit}{digit}"/"{digit}{digit}"/"{digit}{digit}{digit}{digit})
 dateDDMonYYYY              ((({digit}{digit}{space})|({digit}{space})){alpha}*{space}{digit}{digit}{digit}{digit})
@@ -726,6 +727,9 @@ endOfSection               {space}")"{space}
     }
 
 <ignoreBlock,ignoreEmbeddedBlock>{space}{text} {
+    }
+
+<ignoreBlock,ignoreEmbeddedBlock>{gridgenComment} {
     }
 
 

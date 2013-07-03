@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
         (
             "HrvsVar",
             blockMatrix,
-            mesh.solver("HrvsVar")
+            mesh.solutionDict().solver("HrvsVar")
         )->solve(psi, source);
 
     Info << "Psi: " << psi << endl;

@@ -380,22 +380,35 @@ Foam::mixerFvMesh::mixerFvMesh
             )
         ).subDict(typeName + "Coeffs")
     ),
-    csPtr_
+    cs_
     (
-        coordinateSystem::New
-        (
-            "coordinateSystem",
-            dict_.subDict("coordinateSystem")
-        )
+        "coordinateSystem",
+        dict_.subDict("coordinateSystem")
     ),
     rpm_(readScalar(dict_.lookup("rpm"))),
     rotatingRegionMarker_
     (
-        dict_.lookupOrDefault<point>("rotatingRegionMarker", csPtr_->origin())
+        dict_.lookupOrDefault<point>("rotatingRegionMarker", cs_.origin())
     ),
     attachDetach_(dict_.lookupOrDefault<bool>("attachDetach", false)),
     movingPointsMaskPtr_(NULL)
 {
+    // Make sure the coordinate system does not operate in degrees
+    // Bug fix, HJ, 3/Oct/2011
+    if (!cs_.inDegrees())
+    {
+        WarningIn("mixerFvMesh::mixerFvMesh(const IOobject& io)")
+            << "Mixer coordinate system is set to operate in radians.  "
+            << "Changing to rad for correct calculation of angular velocity."
+            << nl
+            << "To remove this message please add entry" << nl << nl
+            << "inDegrees true;" << nl << nl
+            << "to the specification of the coordinate system"
+            << endl;
+
+        cs_.inDegrees() = true;
+    }
+
     Info<< "Rotating region marker point: " << rotatingRegionMarker_
         << "  Attach-detach action = " << attachDetach_ << endl;
 
@@ -438,9 +451,9 @@ bool Foam::mixerFvMesh::update()
     // Move points.  Rotational speed needs to be converted from rpm
     movePoints
     (
-        csPtr_->globalPosition
+        cs_.globalPosition
         (
-            csPtr_->localPosition(allPoints())
+            cs_.localPosition(allPoints())
           + vector(0, rpm_*360.0*time().deltaT().value()/60.0, 0)
             *movingPointsMask()
         )
@@ -484,7 +497,6 @@ bool Foam::mixerFvMesh::update()
             // Move the sliding interface points to correct position
             movePoints(newPoints);
         }
-
     }
 
     return topoChangeMap->morphing();

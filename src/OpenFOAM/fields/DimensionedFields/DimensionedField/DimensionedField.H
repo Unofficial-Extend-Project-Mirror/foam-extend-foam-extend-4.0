@@ -100,9 +100,11 @@ public:
     //- Runtime type information
     TypeName("DimensionedField");
 
+
     // Static Member Functions
 
         //- Return a null DimensionedField
+        //  Dangerous, but no null constructor.  Reconsider.  HJ, 10/Apr/2013
         inline static const DimensionedField<Type, GeoMesh>& null();
 
 
