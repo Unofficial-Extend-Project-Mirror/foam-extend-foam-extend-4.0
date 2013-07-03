@@ -317,7 +317,7 @@ void Foam::ReactingMultiphaseParcel<ParcelType>::calc
         );
 
     // Clac mass and enthalpy transfer due to surface reactions
-    calcSurfaceReactions
+    this->calcSurfaceReactions
     (
         td,
         dt,
