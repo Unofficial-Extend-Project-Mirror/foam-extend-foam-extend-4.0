@@ -247,7 +247,7 @@ void GlobalPointPatchField
 {
     // Set the values from the global sum
     tmp<Field<Type2> > trpf =
-        this->reduceExtractPoint<Type2>(patchInternalField(pField));
+        reduceExtractPoint<Type2>(this->patchInternalField(pField));
 
     Field<Type2>& rpf = trpf();
 
@@ -1024,8 +1024,7 @@ void GlobalPointPatchField
     const lduMatrix& m,
     const scalarField& coeffs,
     const direction,
-    const Pstream::commsTypes commsType,
-    const bool switchToLhs
+    const Pstream::commsTypes commsType
 ) const
 {
     tmp<scalarField> tlocalMult(new scalarField(this->size(), 0));
@@ -1048,261 +1047,125 @@ void GlobalPointPatchField
     label coeffI = 0;
     scalarField sumOffDiag(this->size(), 0);
 
-    if (switchToLhs)
+    // Owner side
+    // ~~~~~~~~~~
     {
-        // Owner side
-        // ~~~~~~~~~~
+        const labelList& cutOwn = globalPointPatch_.cutEdgeOwnerIndices();
+        const labelList& cutOwnStart = globalPointPatch_.cutEdgeOwnerStart();
+
+        forAll (mp, pointI)
         {
-            const labelList& cutOwn = globalPointPatch_.cutEdgeOwnerIndices();
-            const labelList& cutOwnStart =
-                globalPointPatch_.cutEdgeOwnerStart();
+            label ownIndex = cutOwnStart[pointI];
+            label endOwn = cutOwnStart[pointI + 1];
 
-            forAll (mp, pointI)
+            for (; ownIndex < endOwn; ownIndex++)
             {
-                label ownIndex = cutOwnStart[pointI];
-                label endOwn = cutOwnStart[pointI + 1];
+                localMult[pointI] +=
+                    cutMask[coeffI]*coeffs[coeffI]
+                    *psiInternal[U[cutOwn[ownIndex]]];
 
-                for (; ownIndex < endOwn; ownIndex++)
-                {
-                    localMult[pointI] +=
-                        cutMask[coeffI]*coeffs[coeffI]
-                        *psiInternal[U[cutOwn[ownIndex]]];
+                sumOffDiag[pointI] += cutMask[coeffI]*coeffs[coeffI];
 
-                    sumOffDiag[pointI] += cutMask[coeffI]*coeffs[coeffI];
-
-                    // Multiply the internal side as well
-                    result[U[cutOwn[ownIndex]]] -=
-                        coeffs[coeffI]*psiInternal[mp[pointI]];
-
-                    coeffI++;
-                }
-            }
-        }
-
-        // Neighbour side
-        // ~~~~~~~~~~~~~~
-        {
-            const labelList& cutNei =
-                globalPointPatch_.cutEdgeNeighbourIndices();
-            const labelList& cutNeiStart =
-                globalPointPatch_.cutEdgeNeighbourStart();
-
-            forAll (mp, pointI)
-            {
-                label neiIndex = cutNeiStart[pointI];
-                label endNei = cutNeiStart[pointI + 1];
-
-                for (; neiIndex < endNei; neiIndex++)
-                {
-                    localMult[pointI] +=
-                        cutMask[coeffI]*coeffs[coeffI]
-                        *psiInternal[L[cutNei[neiIndex]]];
-
-                    sumOffDiag[pointI] += cutMask[coeffI]*coeffs[coeffI];
-
-                    // Multiply the internal side as well
-                    result[L[cutNei[neiIndex]]] -=
-                        coeffs[coeffI]*psiInternal[mp[pointI]];
-
-                    coeffI++;
-                }
-            }
-        }
-
-        // Doubly cut coefficients
-        // ~~~~~~~~~~~~~~~~~~~~~~~
-
-        // There exists a possibility of having an internal edge for a
-        // point on the processor patch which is in fact connected to
-        // another point of the same patch.  This particular nastiness
-        // introduces a deformation in the solution because the edge is
-        // either multiplied twice or not at all.  For this purpose, the
-        // offending edges need to be separated out and multiplied
-        // appropriately.
-        {
-            const labelList& doubleCut =
-                globalPointPatch_.doubleCutEdgeIndices();
-
-            const labelList& doubleCutOwner =
-                globalPointPatch_.doubleCutOwner();
-
-            const labelList& doubleCutNeighbour =
-                globalPointPatch_.doubleCutNeighbour();
-
-            forAll (doubleCut, edgeI)
-            {
-                // Owner side
-                localMult[doubleCutOwner[edgeI]] +=
-                    cutMask[coeffI]*coeffs[coeffI]*
-                    psiInternal[U[doubleCut[edgeI]]];
-
-                sumOffDiag[doubleCutOwner[edgeI]] +=
-                    cutMask[coeffI]*coeffs[coeffI];
-
-                coeffI++;
-
-                // Neighbour side
-                localMult[doubleCutNeighbour[edgeI]] +=
-                    cutMask[coeffI]*coeffs[coeffI]*
-                    psiInternal[L[doubleCut[edgeI]]];
-
-                sumOffDiag[doubleCutNeighbour[edgeI]] +=
-                    cutMask[coeffI]*coeffs[coeffI];
+                // Multiply the internal side as well
+                result[U[cutOwn[ownIndex]]] +=
+                    coeffs[coeffI]*psiInternal[mp[pointI]];
 
                 coeffI++;
             }
-        }
-
-        // Reduce/extract the result and enforce over all processors
-
-        // Requires global sync points to flush buffers before gather-scatter
-        // communications.  Reconsider.  HJ, 29/Mar/2011
-        if (Pstream::defaultCommsType == Pstream::nonBlocking)
-        {
-            IPstream::waitRequests();
-            OPstream::waitRequests();
-        }
-
-        tmp<Field<scalar> > trpf =
-            reduceExtractPoint<scalar>(localMult);
-
-        Field<scalar>& rpf = trpf();
-
-        // Get addressing
-        const labelList& addr = globalPointPatch_.meshPoints();
-
-        forAll (addr, i)
-        {
-            result[addr[i]] -= rpf[i];
         }
     }
-    else
+
+    // Neighbour side
+    // ~~~~~~~~~~~~~~
     {
-        // Owner side
-        // ~~~~~~~~~~
+        const labelList& cutNei = globalPointPatch_.cutEdgeNeighbourIndices();
+        const labelList& cutNeiStart =
+            globalPointPatch_.cutEdgeNeighbourStart();
+
+        forAll (mp, pointI)
         {
-            const labelList& cutOwn = globalPointPatch_.cutEdgeOwnerIndices();
-            const labelList& cutOwnStart =
-                globalPointPatch_.cutEdgeOwnerStart();
+            label neiIndex = cutNeiStart[pointI];
+            label endNei = cutNeiStart[pointI + 1];
 
-            forAll (mp, pointI)
+            for (; neiIndex < endNei; neiIndex++)
             {
-                label ownIndex = cutOwnStart[pointI];
-                label endOwn = cutOwnStart[pointI + 1];
+                localMult[pointI] +=
+                    cutMask[coeffI]*coeffs[coeffI]
+                    *psiInternal[L[cutNei[neiIndex]]];
 
-                for (; ownIndex < endOwn; ownIndex++)
-                {
-                    localMult[pointI] +=
-                        cutMask[coeffI]*coeffs[coeffI]
-                        *psiInternal[U[cutOwn[ownIndex]]];
+                sumOffDiag[pointI] += cutMask[coeffI]*coeffs[coeffI];
 
-                    sumOffDiag[pointI] += cutMask[coeffI]*coeffs[coeffI];
-
-                    // Multiply the internal side as well
-                    result[U[cutOwn[ownIndex]]] +=
-                        coeffs[coeffI]*psiInternal[mp[pointI]];
-
-                    coeffI++;
-                }
-            }
-        }
-
-        // Neighbour side
-        // ~~~~~~~~~~~~~~
-        {
-            const labelList& cutNei =
-                globalPointPatch_.cutEdgeNeighbourIndices();
-            const labelList& cutNeiStart =
-                globalPointPatch_.cutEdgeNeighbourStart();
-
-            forAll (mp, pointI)
-            {
-                label neiIndex = cutNeiStart[pointI];
-                label endNei = cutNeiStart[pointI + 1];
-
-                for (; neiIndex < endNei; neiIndex++)
-                {
-                    localMult[pointI] +=
-                        cutMask[coeffI]*coeffs[coeffI]
-                        *psiInternal[L[cutNei[neiIndex]]];
-
-                    sumOffDiag[pointI] += cutMask[coeffI]*coeffs[coeffI];
-
-                    // Multiply the internal side as well
-                    result[L[cutNei[neiIndex]]] +=
-                        coeffs[coeffI]*psiInternal[mp[pointI]];
-
-                    coeffI++;
-                }
-            }
-        }
-
-        // Doubly cut coefficients
-        // ~~~~~~~~~~~~~~~~~~~~~~~
-
-        // There exists a possibility of having an internal edge for a
-        // point on the processor patch which is in fact connected to
-        // another point of the same patch.  This particular nastiness
-        // introduces a deformation in the solution because the edge is
-        // either multiplied twice or not at all.  For this purpose, the
-        // offending edges need to be separated out and multiplied
-        // appropriately.
-        {
-            const labelList& doubleCut =
-                globalPointPatch_.doubleCutEdgeIndices();
-
-            const labelList& doubleCutOwner =
-                globalPointPatch_.doubleCutOwner();
-
-            const labelList& doubleCutNeighbour =
-                globalPointPatch_.doubleCutNeighbour();
-
-            forAll (doubleCut, edgeI)
-            {
-                // Owner side
-                localMult[doubleCutOwner[edgeI]] +=
-                    cutMask[coeffI]*coeffs[coeffI]*
-                    psiInternal[U[doubleCut[edgeI]]];
-
-                sumOffDiag[doubleCutOwner[edgeI]] +=
-                    cutMask[coeffI]*coeffs[coeffI];
-
-                coeffI++;
-
-                // Neighbour side
-                localMult[doubleCutNeighbour[edgeI]] +=
-                    cutMask[coeffI]*coeffs[coeffI]*
-                    psiInternal[L[doubleCut[edgeI]]];
-
-                sumOffDiag[doubleCutNeighbour[edgeI]] +=
-                    cutMask[coeffI]*coeffs[coeffI];
+                // Multiply the internal side as well
+                result[L[cutNei[neiIndex]]] +=
+                    coeffs[coeffI]*psiInternal[mp[pointI]];
 
                 coeffI++;
             }
         }
+    }
 
-        // Reduce/extract the result and enforce over all processors
+    // Doubly cut coefficients
+    // ~~~~~~~~~~~~~~~~~~~~~~~
 
-        // Requires global sync points to flush buffers before gather-scatter
-        // communications.  Reconsider.  HJ, 29/Mar/2011
-        if (Pstream::defaultCommsType == Pstream::nonBlocking)
+    // There exists a possibility of having an internal edge for a
+    // point on the processor patch which is in fact connected to
+    // another point of the same patch.  This particular nastiness
+    // introduces a deformation in the solution because the edge is
+    // either multiplied twice or not at all.  For this purpose, the
+    // offending edges need to be separated out and multiplied
+    // appropriately.
+    {
+        const labelList& doubleCut = globalPointPatch_.doubleCutEdgeIndices();
+
+        const labelList& doubleCutOwner = globalPointPatch_.doubleCutOwner();
+        const labelList& doubleCutNeighbour =
+            globalPointPatch_.doubleCutNeighbour();
+
+        forAll (doubleCut, edgeI)
         {
-            IPstream::waitRequests();
-            OPstream::waitRequests();
+            // Owner side
+            localMult[doubleCutOwner[edgeI]] +=
+                cutMask[coeffI]*coeffs[coeffI]*
+                psiInternal[U[doubleCut[edgeI]]];
+
+            sumOffDiag[doubleCutOwner[edgeI]] +=
+                cutMask[coeffI]*coeffs[coeffI];
+
+            coeffI++;
+
+            // Neighbour side
+            localMult[doubleCutNeighbour[edgeI]] +=
+                cutMask[coeffI]*coeffs[coeffI]*
+                psiInternal[L[doubleCut[edgeI]]];
+
+            sumOffDiag[doubleCutNeighbour[edgeI]] +=
+                cutMask[coeffI]*coeffs[coeffI];
+
+            coeffI++;
         }
+    }
 
-        tmp<Field<scalar> > trpf =
-            reduceExtractPoint<scalar>(localMult);
+    // Reduce/extract the result and enforce over all processors
 
-        Field<scalar>& rpf = trpf();
+    // Requires global sync points to flush buffers before gather-scatter
+    // communications.  Reconsider.  HJ, 29/Mar/2011
+    if (Pstream::defaultCommsType == Pstream::nonBlocking)
+    {
+        IPstream::waitRequests();
+        OPstream::waitRequests();
+    }
 
-        // Get addressing
-        const labelList& addr = globalPointPatch_.meshPoints();
+    tmp<Field<scalar> > trpf =
+        reduceExtractPoint<scalar>(localMult);
 
-        forAll (addr, i)
-        {
-            result[addr[i]] += rpf[i];
-        }
+    Field<scalar>& rpf = trpf();
+
+    // Get addressing
+    const labelList& addr = globalPointPatch_.meshPoints();
+
+    forAll (addr, i)
+    {
+        result[addr[i]] += rpf[i];
     }
 }
 

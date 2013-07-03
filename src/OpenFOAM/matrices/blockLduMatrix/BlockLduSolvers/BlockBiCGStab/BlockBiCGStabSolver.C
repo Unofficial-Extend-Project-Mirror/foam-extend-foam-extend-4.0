@@ -163,7 +163,7 @@ Foam::BlockBiCGStabSolver<Type>::solve
 
             solverPerf.finalResidual() = gSum(cmptMag(r))/norm;
             solverPerf.nIterations()++;
-        } while (!stop(solverPerf));
+        } while (!this->stop(solverPerf));
     }
 
     return solverPerf;

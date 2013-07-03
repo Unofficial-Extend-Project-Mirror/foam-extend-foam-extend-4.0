@@ -48,7 +48,7 @@ Foam::HashSet<Key, Hash>::HashSet
         ++cit
     )
     {
-        insert(cit.key());
+        this->insert(cit.key());
     }
 }
 
@@ -58,7 +58,7 @@ Foam::HashSet<Key, Hash>::HashSet
 template<class Key, class Hash>
 inline bool Foam::HashSet<Key, Hash>::operator[](const Key& key) const
 {
-    return found(key);
+    return this->found(key);
 }
 
 
@@ -77,7 +77,7 @@ bool Foam::HashSet<Key, Hash>::operator==(const HashSet<Key, Hash>& rhs) const
     // Are all rhs elements in lhs?
     for (const_iterator iter = rhs.cbegin(); iter != rhs.cend(); ++iter)
     {
-        if (!found(iter.key()))
+        if (!this->found(iter.key()))
         {
             return false;
         }
@@ -90,7 +90,7 @@ bool Foam::HashSet<Key, Hash>::operator==(const HashSet<Key, Hash>& rhs) const
 template<class Key, class Hash>
 bool Foam::HashSet<Key, Hash>::operator!=(const HashSet<Key, Hash>& rhs) const
 {
-    return !(operator==(rhs));
+    return !(this->operator==(rhs));
 }
 
 
@@ -100,7 +100,7 @@ void Foam::HashSet<Key, Hash>::operator|=(const HashSet<Key, Hash>& rhs)
     // Add rhs elements into lhs
     for (const_iterator iter = rhs.cbegin(); iter != rhs.cend(); ++iter)
     {
-        insert(iter.key());
+        this->insert(iter.key());
     }
 }
 
@@ -113,7 +113,7 @@ void Foam::HashSet<Key, Hash>::operator&=(const HashSet<Key, Hash>& rhs)
     {
         if (!rhs.found(iter.key()))
         {
-            erase(iter);
+            this->erase(iter);
         }
     }
 }
@@ -127,11 +127,11 @@ void Foam::HashSet<Key, Hash>::operator^=(const HashSet<Key, Hash>& rhs)
     {
         if (found(iter.key()))
         {
-            erase(iter.key());
+            this->erase(iter.key());
         }
         else
         {
-            insert(iter.key());
+            this->insert(iter.key());
         }
     }
 }
@@ -144,7 +144,7 @@ void Foam::HashSet<Key, Hash>::operator-=(const HashSet<Key, Hash>& rhs)
     // Remove rhs elements from lhs
     for (const_iterator iter = rhs.cbegin(); iter != rhs.cend(); ++iter)
     {
-        erase(iter.key());
+        this->erase(iter.key());
     }
 }
 

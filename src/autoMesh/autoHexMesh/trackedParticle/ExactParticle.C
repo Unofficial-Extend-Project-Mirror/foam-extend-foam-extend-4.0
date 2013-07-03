@@ -165,7 +165,7 @@ Foam::scalar Foam::ExactParticle<ParticleType>::trackToFace
             this->position_ = endPosition;
         }
 
-        label patchi = patch(this->facei_);
+        label patchi = this->patch(this->facei_);
         const polyPatch& patch = mesh.boundaryMesh()[patchi];
 
         if (isA<wedgePolyPatch>(patch))

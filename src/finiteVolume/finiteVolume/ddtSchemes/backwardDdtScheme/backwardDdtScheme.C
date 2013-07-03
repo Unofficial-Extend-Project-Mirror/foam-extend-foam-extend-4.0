@@ -545,7 +545,7 @@ backwardDdtScheme<Type>::fvcDdtPhiCorr
         new fluxFieldType
         (
             ddtIOobject,
-            rDeltaT*fvcDdtPhiCoeff(U.oldTime(), phi.oldTime())
+            rDeltaT*this->fvcDdtPhiCoeff(U.oldTime(), phi.oldTime())
            *(
                 fvc::interpolate(rA)
                *(
@@ -609,7 +609,7 @@ backwardDdtScheme<Type>::fvcDdtPhiCorr
             new fluxFieldType
             (
                 ddtIOobject,
-                rDeltaT*fvcDdtPhiCoeff(U.oldTime(), phiAbs.oldTime())
+                rDeltaT*this->fvcDdtPhiCoeff(U.oldTime(), phiAbs.oldTime())
                *(
                     coefft0*fvc::interpolate(rA*rho.oldTime())
                    *phiAbs.oldTime()
@@ -642,7 +642,7 @@ backwardDdtScheme<Type>::fvcDdtPhiCorr
             (
                 ddtIOobject,
                 rDeltaT
-               *fvcDdtPhiCoeff
+               *this->fvcDdtPhiCoeff
                 (
                     U.oldTime(),
                     phiAbs.oldTime()/fvc::interpolate(rho.oldTime())
@@ -681,7 +681,7 @@ backwardDdtScheme<Type>::fvcDdtPhiCorr
             (
                 ddtIOobject,
                 rDeltaT
-               *fvcDdtPhiCoeff(rho.oldTime(), U.oldTime(), phiAbs.oldTime())
+               *this->fvcDdtPhiCoeff(rho.oldTime(), U.oldTime(), phiAbs.oldTime())
                *(
                     fvc::interpolate(rA)
                    *(

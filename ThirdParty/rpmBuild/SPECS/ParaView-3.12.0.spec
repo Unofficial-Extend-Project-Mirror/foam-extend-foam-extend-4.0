@@ -78,6 +78,7 @@ Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
 Patch0:                 ParaView-3.12.0.patch_darwin
+Patch1:                 paraview-gcc47.patch
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -108,6 +109,8 @@ Patch0:                 ParaView-3.12.0.patch_darwin
 %ifos darwin
 %patch0 -p1
 %endif
+
+%patch1 -p1
 
 %build
 #

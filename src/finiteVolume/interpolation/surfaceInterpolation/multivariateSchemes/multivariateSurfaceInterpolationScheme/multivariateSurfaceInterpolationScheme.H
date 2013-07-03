@@ -68,7 +68,7 @@ public:
 
         void add(const GeometricField<Type, fvPatchField, volMesh>& f)
         {
-            insert(f.name(), &f);
+            this->insert(f.name(), &f);
         }
     };
 

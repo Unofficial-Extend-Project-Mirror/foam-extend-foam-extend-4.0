@@ -448,7 +448,7 @@ void DimensionedField<Type, GeoMesh>::operator=
     checkField(*this, df, "=");
 
     dimensions_ = df.dimensions();
-    transfer(const_cast<DimensionedField<Type, GeoMesh>&>(df));
+    this->transfer(const_cast<DimensionedField<Type, GeoMesh>&>(df));
     tdf.clear();
 }
 

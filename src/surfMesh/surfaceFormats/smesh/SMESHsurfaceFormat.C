@@ -54,7 +54,7 @@ void Foam::fileFormats::SMESHsurfaceFormat<Face>::write
     (
         surf.surfZones().size() > 1
       ? surf.surfZones()
-      : oneZone(faceLst)
+      : SMESHsurfaceFormat::oneZone(faceLst)
     );
 
     const bool useFaceMap = (surf.useFaceMap() && zones.size() > 1);

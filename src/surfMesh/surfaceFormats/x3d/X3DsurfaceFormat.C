@@ -57,7 +57,7 @@ void Foam::fileFormats::X3DsurfaceFormat<Face>::write
     (
         surf.surfZones().size() > 1
       ? surf.surfZones()
-      : oneZone(faceLst, "")
+      : X3DsurfaceFormat::oneZone(faceLst, "")
     );
 
     const bool useFaceMap = (surf.useFaceMap() && zones.size() > 1);
