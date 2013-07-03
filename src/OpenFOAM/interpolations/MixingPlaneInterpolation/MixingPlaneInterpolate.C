@@ -33,6 +33,10 @@ Contributor
 
 \*---------------------------------------------------------------------------*/
 
+#include <sys/time.h>
+#include <sstream>
+#include <iomanip>
+
 namespace Foam
 {
 
@@ -40,13 +44,17 @@ namespace Foam
 
 template<class MasterPatch, class SlavePatch>
 template<class Type>
-void MixingPlaneInterpolation<MasterPatch, SlavePatch>::toProfile
+void
+MixingPlaneInterpolation<MasterPatch, SlavePatch>::
+interpolate
 (
     const Field<Type>& srcF,
     const labelListList& srcAddr,
     const scalarListList& srcWeights,
-    Field<Type>& profileBandValues
-)
+    const labelListList& dstAddr,
+    const scalarListList& dstWeights,
+    Field<Type>& dstResultF
+) const
 {
     // The src to profile transfer is done using weighted averaging
     // evaluation of srcF.
@@ -68,130 +76,118 @@ void MixingPlaneInterpolation<MasterPatch, SlavePatch>::toProfile
     //
     //         average(phi)  ==  sum(w*phi)
 
+
+    int nbrProfileBands = interpolationProfile_.size() - 1;
+
+    List<Type> profileBandValues(nbrProfileBands, pTraits<Type>::zero);
+    scalarField srcScalingValues(nbrProfileBands, 0.0);
+
     forAll (srcAddr, bandI)
     {
         forAll (srcAddr[bandI], faceI)
         {
             profileBandValues[bandI] +=
                 srcF[srcAddr[bandI][faceI]]*srcWeights[bandI][faceI];
+
+            // NB: The next operation should be computed only
+            // once... and should sum up to 1.0 Let's keep this
+            // operation for now, until the mixingPlane interface is
+            // fully debugged (MB, 07/2010)
+            srcScalingValues[bandI] += srcWeights[bandI][faceI];
+
+            if (debug <= -200)
+            {
+                Info << "bande: " << bandI
+                    << "  src valeur: " << srcF[srcAddr[bandI][faceI]]
+                    << "  src weight: " << srcWeights[bandI][faceI] << endl;
+            }
         }
     }
-}
 
+    // We don't need to divide the profileBandValues by the
+    // srcScalingValues because the srcScalingValues are identically
+    // equal to 1.0, thanks to the conservativeness of the GGI
+    // weighting factors
+    //profileBandValues = profileBandValues/srcScalingValues;
 
-template<class MasterPatch, class SlavePatch>
-template<class Type>
-void MixingPlaneInterpolation<MasterPatch, SlavePatch>::fromProfile
-(
-    const Field<Type>& profileBandValues,
-    const labelListList& dstAddr,
-    const scalarListList& dstWeights,
-    Field<Type>& dstResultF
-)
-{
-    // The profile to dst transfer is done by distributing the
+    // profileBandValues are now the circumferentially averaged values
+
+    // The profile to dst transfer is done by simply distributing the
     // average value accordingly to the dst weighting factors
     forAll (dstAddr, faceI)
     {
         const labelList& curAddr = dstAddr[faceI];
         const scalarList& curW = dstWeights[faceI];
 
-        dstResultF[faceI] = pTraits<Type>::zero;
-
         forAll (curAddr, bandI)
         {
             dstResultF[faceI] += profileBandValues[curAddr[bandI]]*curW[bandI];
+
+            if (debug <= -200)
+            {
+                Info<< "bande: " << dstAddr[faceI][bandI]
+                    << "  dst valeur: " << dstResultF[faceI]
+                    << "  dst weight: " << dstWeights[faceI][bandI] << endl;
+            }
         }
     }
-}
 
-
-template<class MasterPatch, class SlavePatch>
-template<class Type>
-void MixingPlaneInterpolation<MasterPatch, SlavePatch>::maskedFromProfile
-(
-    const Field<Type>& profileBandValues,
-    const labelListList& dstAddr,
-    const scalarListList& dstWeights,
-    Field<Type>& dstResultF,
-    const labelList& mask
-)
-{
-    // The profile to dst transfer is done by distributing the
-    // average value accordingly to the dst weighting factors
-    forAll (mask, maskI)
+    if (debug <= -500)
     {
-        // Pick the masked face
-        const label faceI = mask[maskI];
+        error::printStack(Info);
 
-        const labelList& curAddr = dstAddr[faceI];
-        const scalarList& curW = dstWeights[faceI];
+        Info<< "srcF      :  " << srcF << nl
+            << "srcAddr   :  " << srcAddr << nl
+            << "srcWeights:  " << srcWeights << nl
+            << "profileBandValues:  " << profileBandValues << nl
+            << "srcScalingValues:  " << srcScalingValues << nl
+            << "dstAddr   :  " << dstAddr << nl
+            << "dstWeights:  " << dstWeights << nl
+            << "dstResultF:  " << dstResultF << nl
+            << "srcScalingValues: " << srcScalingValues << endl;
+    }
 
-        dstResultF[maskI] = pTraits<Type>::zero;
+    if (debug <= -999)
+    {
+        fileName traceFileDir("./mixingPlaneTraceFiles");
 
-        forAll (curAddr, bandI)
+        if (!exists(traceFileDir))
         {
-            dstResultF[maskI] += profileBandValues[curAddr[bandI]]*curW[bandI];
+            mkDir(traceFileDir);
         }
+
+        struct timeval tod;
+        gettimeofday(&tod, NULL);
+
+        //struct timespec tp;
+        //clock_gettime(CLOCK_MONOTONIC,  &tp);
+        std::ostringstream osBuffer;
+
+        osBuffer
+            << Foam::name(tod.tv_sec)
+            << "." << std::setfill('0') << std::setw(6)
+            <<  Foam::name(tod.tv_usec);
+
+        fileName traceFileName(traceFileDir/"profileValues_" + osBuffer.str());
+        OFstream dumpFileSrc(traceFileName + "_orig");
+        OFstream dumpFileDst(traceFileName + "_interpolated");
+        OFstream dumpFileProfile(traceFileName + "_profile");
+
+        //Foam::error::printStack(Info);
+
+        InfoIn
+        (
+            "MixingPlaneInterpolation::interpolate"
+        )   << "Dumping src profiles to: " << traceFileName + "_orig" << nl
+            << "Dumping interpolated profiles to : "
+            << traceFileName + "_interpolated" << nl
+            << "Dumping profile values to: "
+            << traceFileName + "_profile" << endl;
+
+        dumpFileDst << dstResultF << endl;
+        dumpFileSrc << srcF << endl;
+        dumpFileProfile << profileBandValues << endl;
     }
-}
-
-
-template<class MasterPatch, class SlavePatch>
-template<class Type>
-void MixingPlaneInterpolation<MasterPatch, SlavePatch>::maskedTransform
-(
-    Field<Type>& transField,
-    const tensorField& t,
-    const Field<Type>& inField,
-    const labelList& mask
-)
-{
-    // The profile to dst transfer is done by distributing the
-    // average value accordingly to the dst weighting factors
-    forAll (mask, maskI)
-    {
-        // Pick the masked face
-        const label faceI = mask[maskI];
-
-        transField[maskI] = transform(t[faceI], inField[maskI]);
-    }
-}
-
-
-template<class MasterPatch, class SlavePatch>
-template<class Type>
-void MixingPlaneInterpolation<MasterPatch, SlavePatch>::interpolate
-(
-    const Field<Type>& srcF,
-    const labelListList& srcAddr,
-    const scalarListList& srcWeights,
-    const labelListList& dstAddr,
-    const scalarListList& dstWeights,
-    Field<Type>& dstResultF
-) const
-{
-    Field<Type> profileBandValues(nProfileBands(), pTraits<Type>::zero);
-
-    // Interpolate from patch to profile
-    toProfile
-    (
-        srcF,
-        srcAddr,
-        srcWeights,
-        profileBandValues
-    );
-
-    // profileBandValues are now the circumferentially averaged values
-
-    // Collect from profile to patch
-    fromProfile
-    (
-        profileBandValues,
-        dstAddr,
-        dstWeights,
-        dstResultF
-    );
 }
 
 
@@ -210,7 +206,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToSlave
         FatalErrorIn
         (
             "MixingPlaneInterpolation::masterToSlave("
-            "const Field<Type> ff) const"
+            "const Field<Type> ff)"
         )   << "given field does not correspond to patch. Patch size: "
             << masterPatch_.size() << " field size: " << patchFF.size()
             << abort(FatalError);
@@ -219,6 +215,16 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToSlave
     // Move master data from 'patch space' to 'profile space'
     // MB: We need this back
     Field<Type> profileFF = transform(masterPatchToProfileT(), patchFF);
+
+    if (debug > 1)
+    {
+        Info << "MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToSlave: "
+            << "patchFF: " << patchFF << endl
+            << "profileFF: " << profileFF << endl
+            << "masterPatchToProfileT(): " << masterPatchToProfileT() << endl
+            << "slaveProfileToPatchT():  " << slaveProfileToPatchT() << endl
+            << endl;
+    }
 
     // Do interpolation
     tmp<Field<Type> > tresult
@@ -237,14 +243,14 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToSlave
         profileFF,                     // Master data in 'profile space'
         masterPatchToProfileAddr(),    // From master: compute the average
         masterPatchToProfileWeights(),
-        slaveProfileToPatchAddr(),     // To slave distribute average from
+        slaveProfileToPatchAddr(),     // To slave we distribute the average from
         slaveProfileToPatchWeights(),  // profile to patch
         result
     );
 
     // Apply transform to bring the slave field back from 'profile space'
     // to 'patch space'
-    transform(result, slaveProfileToPatchT(), result);
+    transform(result, slaveProfileToPatchT(), result); // MB: We need this back
 
     return tresult;
 }
@@ -277,7 +283,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveToMaster
         FatalErrorIn
         (
             "MixingPlaneInterpolation::slaveToMaster("
-            "const Field<Type> ff) const"
+            "const Field<Type> ff)"
         )   << "given field does not correspond to patch. Patch size: "
             << slavePatch_.size() << " field size: " << patchFF.size()
             << abort(FatalError);
@@ -285,6 +291,16 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveToMaster
 
     // Move slave data from 'patch space' to 'profile space'
      Field<Type> profileFF = transform(slavePatchToProfileT(), patchFF);
+
+    if (debug > 1)
+    {
+        Info << "MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveToMaster: "
+            << "patchFF: " << patchFF << endl
+            << "profileFF: " << profileFF << endl
+            << "slavePatchToProfileT(): " << slavePatchToProfileT() << endl
+            << "masterProfileToPatchT(): " << masterProfileToPatchT() << endl
+            << endl;
+    }
 
     // Do interpolation
     tmp<Field<Type> > tresult
@@ -329,334 +345,6 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveToMaster
     return tint;
 }
 
-
-template<class MasterPatch, class SlavePatch>
-template<class Type>
-tmp<Field<Type> >
-MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToProfile
-(
-    const Field<Type>& patchFF
-) const
-{
-    if (patchFF.size() != masterPatch_.size())
-    {
-        FatalErrorIn
-        (
-            "MixingPlaneInterpolation::masterToProfile("
-            "const Field<Type> ff) const"
-        )   << "given field does not correspond to patch. Patch size: "
-            << masterPatch_.size() << " field size: " << patchFF.size()
-            << abort(FatalError);
-    }
-
-    // Move master data from 'patch space' to 'profile space'
-    Field<Type> profileFF = transform(masterPatchToProfileT(), patchFF);
-
-    // Do interpolation
-    tmp<Field<Type> > tresult
-    (
-        new Field<Type>
-        (
-            nProfileBands(),
-            pTraits<Type>::zero
-        )
-    );
-
-    Field<Type>& result = tresult();
-        
-    toProfile
-    (
-        profileFF,                      // Master data in 'profile space'
-        masterPatchToProfileAddr(),     // From master: compute the average
-        masterPatchToProfileWeights(),
-        result
-    );
-        
-    return tresult;
-}
-
-
-template<class MasterPatch, class SlavePatch>
-template<class Type>
-tmp<Field<Type> >
-MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToProfile
-(
-    const tmp<Field<Type> >& tff
-) const
-{
-    tmp<Field<Type> > tint = masterToProfile(tff());
-    tff.clear();
-    return tint;
-}
-
-
-template<class MasterPatch, class SlavePatch>
-template<class Type>
-tmp<Field<Type> >
-MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveToProfile
-(
-    const Field<Type>& patchFF
-) const
-{
-    if (patchFF.size() != slavePatch_.size())
-    {
-        FatalErrorIn
-        (
-            "MixingPlaneInterpolation::slaveToProfile("
-            "const Field<Type> ff) const"
-        )   << "given field does not correspond to patch. Patch size: "
-            << slavePatch_.size() << " field size: " << patchFF.size()
-            << abort(FatalError);
-    }
-
-    // Move slave data from 'patch space' to 'profile space'
-    Field<Type> profileFF = transform(slavePatchToProfileT(), patchFF);
-
-    // Do interpolation
-    tmp<Field<Type> > tresult
-    (
-        new Field<Type>
-        (
-            nProfileBands(),
-            pTraits<Type>::zero
-        )
-    );
-
-    Field<Type>& result = tresult();
-
-    toProfile
-    (
-        profileFF,                     // Slave data in 'profile space'
-        slavePatchToProfileAddr(),     // From slave: compute the average
-        slavePatchToProfileWeights(),
-        result
-    );
-        
-    return tresult;
-}
-
-
-template<class MasterPatch, class SlavePatch>
-template<class Type>
-tmp<Field<Type> >
-MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveToProfile
-(
-    const tmp<Field<Type> >& tff
-) const
-{
-    tmp<Field<Type> > tint = slaveToProfile(tff());
-    tff.clear();
-    return tint;
-}
-
-
-template<class MasterPatch, class SlavePatch>
-template<class Type>
-tmp<Field<Type> >
-MixingPlaneInterpolation<MasterPatch, SlavePatch>::profileToMaster
-(
-    const Field<Type>& profileFF
-) const
-{
-    if (profileFF.size() != nProfileBands())
-    {
-        FatalErrorIn
-        (
-            "MixingPlaneInterpolation::profileToMaster("
-            "const Field<Type> ff) const"
-        )   << "given field does not correspond to profile.  Profile size: "
-            << nProfileBands() << " field size: " << profileFF.size()
-            << abort(FatalError);
-    }
-
-    // Do interpolation
-    tmp<Field<Type> > tresult
-    (
-        new Field<Type>
-        (
-            masterPatch_.size(),
-            pTraits<Type>::zero
-        )
-    );
-
-    Field<Type>& result = tresult();
-        
-    fromProfile
-    (
-        profileFF,                      // Master data in 'profile space'
-        masterProfileToPatchAddr(),     // To master: distribute the average
-        masterProfileToPatchWeights(),
-        result
-    );
-        
-    // Apply transform to bring the master field back from 'profile space'
-    // to 'patch space'
-    transform(result, masterProfileToPatchT(), result);
-
-    return tresult;
-}
-
-
-template<class MasterPatch, class SlavePatch>
-template<class Type>
-tmp<Field<Type> >
-MixingPlaneInterpolation<MasterPatch, SlavePatch>::profileToMaster
-(
-    const tmp<Field<Type> >& tff
-) const
-{
-    tmp<Field<Type> > tint = profileToMaster(tff());
-    tff.clear();
-    return tint;
-}
-
-
-template<class MasterPatch, class SlavePatch>
-template<class Type>
-void MixingPlaneInterpolation<MasterPatch, SlavePatch>::maskedProfileToMaster
-(
-    const Field<Type>& profileFF,
-    Field<Type>& result,
-    const labelList& mask
-) const
-{
-    if (profileFF.size() != nProfileBands() || result.size() != mask.size())
-    {
-        FatalErrorIn
-        (
-            "bvoid MixingPlaneInterpolation<MasterPatch, SlavePatch>::"
-            "maskedProfileToMaster\n"
-            "(\n"
-            "    const Field<Type>& profileFF,\n"
-            "    Field<Type>& result,\n"
-            "    const labelList& mask\n"
-            ") const"
-        )   << "given field does not correspond to profile.  Profile size: "
-            << nProfileBands() << " field size: " << profileFF.size()
-            << " result size: " << result.size()
-            << " mask size: " << mask.size()
-            << abort(FatalError);
-    }
-
-    // Do interpolation
-    maskedFromProfile
-    (
-        profileFF,                      // Master data in 'profile space'
-        masterProfileToPatchAddr(),     // To master: distribute the average
-        masterProfileToPatchWeights(),
-        result,
-        mask
-    );
-        
-    // Apply transform to bring the master field back from 'profile space'
-    // to 'patch space'
-    maskedTransform(result, masterProfileToPatchT(), result, mask);
-}
-
-
-template<class MasterPatch, class SlavePatch>
-template<class Type>
-tmp<Field<Type> >
-MixingPlaneInterpolation<MasterPatch, SlavePatch>::profileToSlave
-(
-    const Field<Type>& profileFF
-) const
-{
-    if (profileFF.size() != nProfileBands())
-    {
-        FatalErrorIn
-        (
-            "MixingPlaneInterpolation::profileToSlave("
-            "const Field<Type> ff) const"
-        )   << "given field does not correspond to profile.  Profile size: "
-            << nProfileBands() << " field size: " << profileFF.size()
-            << abort(FatalError);
-    }
-
-    // Do interpolation
-    tmp<Field<Type> > tresult
-    (
-        new Field<Type>
-        (
-            slavePatch_.size(),
-            pTraits<Type>::zero
-        )
-    );
-
-    Field<Type>& result = tresult();
-
-    fromProfile
-    (
-        profileFF,                     // Slave data in 'profile space'
-        slaveProfileToPatchAddr(),     // To slave distribute average from
-        slaveProfileToPatchWeights(),  // profile to patch
-        result
-    );
-        
-    // Apply transform to bring the slave field back from 'profile space'
-    // to 'patch space'
-    transform(result, slaveProfileToPatchT(), result);
-
-    return tresult;
-}
-
-
-template<class MasterPatch, class SlavePatch>
-template<class Type>
-tmp<Field<Type> >
-MixingPlaneInterpolation<MasterPatch, SlavePatch>::profileToSlave
-(
-    const tmp<Field<Type> >& tff
-) const
-{
-    tmp<Field<Type> > tint = profileToSlave(tff());
-    tff.clear();
-    return tint;
-}
-
-
-template<class MasterPatch, class SlavePatch>
-template<class Type>
-void MixingPlaneInterpolation<MasterPatch, SlavePatch>::maskedProfileToSlave
-(
-    const Field<Type>& profileFF,
-    Field<Type>& result,
-    const labelList& mask
-) const
-{
-    if (profileFF.size() != nProfileBands() || result.size() != mask.size())
-    {
-        FatalErrorIn
-        (
-            "void MixingPlaneInterpolation<MasterPatch, SlavePatch>::"
-            "maskedProfileToSlave\n"
-            "(\n"
-            "    const Field<Type>& profileFF,\n"
-            "    Field<Type>& result,\n"
-            "    const labelList& mask\n"
-            ") const"
-        )   << "given field does not correspond to profile.  Profile size: "
-            << nProfileBands() << " field size: " << profileFF.size()
-            << " result size: " << result.size()
-            << " mask size: " << mask.size()
-            << abort(FatalError);
-    }
-
-    maskedFromProfile
-    (
-        profileFF,                     // Slave data in 'profile space'
-        slaveProfileToPatchAddr(),     // To slave distribute average from
-        slaveProfileToPatchWeights(),  // profile to patch
-        result,
-        mask
-    );
-        
-    // Apply transform to bring the slave field back from 'profile space'
-    // to 'patch space'
-    maskedTransform(result, slaveProfileToPatchT(), result, mask);
-}
-
-
 template<class MasterPatch, class SlavePatch>
 template<class Type>
 tmp<Field<Type> >
@@ -679,6 +367,15 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToMaster
     // Move master data from 'patch space' to 'profile space'
     Field<Type> profileFF = transform(masterPatchToProfileT(), patchFF);
 
+    if (debug > 1)
+    {
+        Info << "MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToMaster: "
+            << "patchFF: " << patchFF << endl
+            << "profileFF: " << profileFF << endl
+            << "masterPatchToProfileT(): " << masterPatchToProfileT() << endl
+            << endl;
+    }
+
     // Do interpolation
     tmp<Field<Type> > tresult
     (
@@ -696,7 +393,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToMaster
         profileFF,                      // Master data in 'profile space'
         masterPatchToProfileAddr(),     // From master: compute the average
         masterPatchToProfileWeights(),
-        masterProfileToPatchAddr(),     // To master: distribute the average
+        masterProfileToPatchAddr(),    // To master: distribute the average
         masterProfileToPatchWeights(),
         result
     );
@@ -707,7 +404,6 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToMaster
 
     return tresult;
 }
-
 
 template<class MasterPatch, class SlavePatch>
 template<class Type>
@@ -721,7 +417,6 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToMaster
     tff.clear();
     return tint;
 }
-
 
 template<class MasterPatch, class SlavePatch>
 template<class Type>
@@ -745,6 +440,15 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveToSlave
     // Move slave data from 'patch space' to 'profile space'
     Field<Type> profileFF = transform(slavePatchToProfileT(), patchFF);
 
+    if (debug > 1)
+    {
+        Info << "MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveToSlave: "
+            << "patchFF: " << patchFF << endl
+            << "profileFF: " << profileFF << endl
+            << "slavePatchToProfileT(): " << slavePatchToProfileT() << endl
+            << endl;
+    }
+
     // Do interpolation
     tmp<Field<Type> > tresult
     (
@@ -758,14 +462,14 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveToSlave
     Field<Type>& result = tresult();
 
     interpolate
-    (
-        profileFF,                     // Slave data in 'profile space'
-        slavePatchToProfileAddr(),     // From slave: compute the average
-        slavePatchToProfileWeights(),
-        slaveProfileToPatchAddr(),     // To slave: distribute the average
-        slaveProfileToPatchWeights(),
-        result
-    );
+        (
+            profileFF,                     // Slave data in 'profile space'
+            slavePatchToProfileAddr(),     // From slave: compute the average
+            slavePatchToProfileWeights(),
+            slaveProfileToPatchAddr(),     // To slave: distribute the average
+            slaveProfileToPatchWeights(),
+            result
+        );
         
     // Apply transform to bring the slave field back from 'profile space'
     // to 'patch space'
@@ -773,7 +477,6 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveToSlave
 
     return tresult;
 }
-
 
 template<class MasterPatch, class SlavePatch>
 template<class Type>

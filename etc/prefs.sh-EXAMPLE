@@ -162,7 +162,6 @@ compilerInstall=System
 #export ParaView_VERSION=git        # eg, cvs/git version
 #export ParaView_MAJOR=3.7
 
-
 # System identifier for the OpenFOAM CDash test harness on openfoam-extend
 #
 # By default, your system FQN/hostname will be used as the system identifier

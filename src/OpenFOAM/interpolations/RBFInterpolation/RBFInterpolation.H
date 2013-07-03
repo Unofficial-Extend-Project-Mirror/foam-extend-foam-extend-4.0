@@ -29,8 +29,8 @@ Description
     Radial basis function interpolation class
 
 Description
-    Interpolation class which uses Radial Basis Functions to interpolate
-    field from given data points to arbitrary set of points.
+    Interpolation class which uses Radial Basis Functions to interpolate the
+    fluid displacements for given boundary displacements.
 
 	The coefficient vectors, alpha and beta are determined by solving
     the system:
@@ -38,17 +38,25 @@ Description
 	| db | = | Mbb Pb | | alpha |
 	| 0  |   | Pb  0  | |  beta |
 
-	where db are the given field values at data carrier points.
+	where db are the given boundary displacements,
 	Mbb the boundary RBF correlation matrix (NbxNb), containing RBF evaluations
     at the boundary nodes, and Pb some linear polynomial matrix (Nbx4).
 
-    In cases where far field data is not of interest, a cutoff function
-    is used to eliminate unnecessary data points in the far field
+	Those coefficients are calculated every timestep, with the current
+    boundary displacements db, with the inverse of Mbb. Using those
+    coefficients, the RBF is evaluated at all fluid points every
+    timestep.
+
+	The efficiency of this method is increased by:
+		1) using control points which is a subset of the moving
+           boundary points. Those control points are selected by
+		   a coarsening function.
+		2) The outer boundary points are neglected since a cutoff function
+           is used toward the outer boundaries.
 
 Author
     Frank Bos, TU Delft.  All rights reserved.
     Dubravko Matijasevic, FSB Zagreb.
-    Reorganisation by Hrvoje Jasak, Wikki Ltd.
 
 SourceFiles
     RBFInterpolation.C
@@ -82,7 +90,7 @@ class RBFInterpolation
         const vectorField& controlPoints_;
 
         //- Reference to all points
-        const vectorField& dataPoints_;
+        const vectorField& allPoints_;
 
         //- RBF function
         autoPtr<RBFFunction> RBF_;
@@ -128,7 +136,7 @@ public:
         (
             const dictionary& dict,
             const vectorField& controlPoints,
-            const vectorField& dataPoints
+            const vectorField& allPoints
         );
 
         //- Construct as copy
@@ -141,18 +149,6 @@ public:
 
 
     // Member Functions
-
-        //- Return reference to control points
-        const vectorField& controlPoints() const
-        {
-            return controlPoints_;
-        }
-
-        //- Reference to all points
-        const vectorField& dataPoints() const
-        {
-            return dataPoints_;
-        }
 
         //- Interpolate
         template<class Type>
