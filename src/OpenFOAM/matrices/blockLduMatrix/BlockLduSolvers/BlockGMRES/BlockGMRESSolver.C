@@ -128,7 +128,7 @@ Foam::BlockGMRESSolver<Type>::solve
 
     // Check convergence, solve if not converged
 
-    if (!stop(solverPerf))
+    if (!this->stop(solverPerf))
     {
         // Create the Hesenberg matrix
         scalarSquareMatrix H(nDirs_, 0);

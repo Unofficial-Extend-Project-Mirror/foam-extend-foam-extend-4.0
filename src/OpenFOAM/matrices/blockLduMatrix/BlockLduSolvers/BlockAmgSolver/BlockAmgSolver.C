@@ -105,7 +105,7 @@ Foam::BlockAmgSolver<Type>::solve
             solverPerf.finalResidual() = gSum(cmptMag(wA))/norm;
             solverPerf.nIterations()++;
 
-        } while (!stop(solverPerf));
+        } while (!this->stop(solverPerf));
     }
 
     return solverPerf;

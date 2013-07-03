@@ -93,7 +93,7 @@ Foam::BlockBiCGStabSolver<Type>::solve
 
     // Check convergence, solve if not converged
 
-    if (!stop(solverPerf))
+    if (!this->stop(solverPerf))
     {
         scalar rho = this->great_;
         scalar rhoOld = rho;

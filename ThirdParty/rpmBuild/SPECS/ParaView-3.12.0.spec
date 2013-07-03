@@ -77,8 +77,8 @@ URL:            http://www.paraview.org/files/v3.12/
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
-Patch0:                 ParaView-3.12.0.patch_darwin
-Patch1:                 paraview-gcc47.patch
+Patch0:         ParaView-3.12.0.patch_darwin
+Patch1:         paraview-gcc47.patch
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 

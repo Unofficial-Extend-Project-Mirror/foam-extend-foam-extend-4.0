@@ -79,9 +79,9 @@ alias _foamSource 'if ($?FOAM_VERBOSE && $?prompt) echo "Sourcing: \!*"; source 
 # Add in preset user or site preferences:
 set foamPrefs=`$WM_PROJECT_DIR/bin/foamEtcFile prefs.csh`
 if ( $status == 0 ) then
-    if ($foamPrefs) then
+    if ( $?foamPrefs ) then
         _foamSource $foamPrefs
-     endif
+    endif
 endif
 unset foamPrefs
 
@@ -110,7 +110,7 @@ if ( ! $?WM_OSTYPE ) setenv WM_OSTYPE POSIX
 # Compiler: set to Gcc, Gcc43 or Icc (for Intel's icc)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if ( ! $?WM_COMPILER ) setenv WM_COMPILER Gcc
-setenv WM_COMPILER Gcc
+#setenv WM_COMPILER Gcc
 #setenv WM_COMPILER Icc
 
 setenv WM_COMPILER_ARCH
@@ -129,7 +129,7 @@ if ( ! $?WM_PRECISION_OPTION ) setenv WM_PRECISION_OPTION DP
 
 # WM_COMPILE_OPTION = Opt | Debug | Prof
 if ( ! $?WM_COMPILE_OPTION ) setenv WM_COMPILE_OPTION Opt
-setenv WM_COMPILE_OPTION Opt
+#setenv WM_COMPILE_OPTION Opt
 #setenv WM_COMPILE_OPTION Debug
 
 # WM_MPLIB = | OPENMPI | MPICH | MPICH-GM | HPMPI | GAMMA | MPI | QSMPI
@@ -247,20 +247,20 @@ case Darwin:
     # Use Mac-Ports-Compiler instead of Apple-gcc-4.2
     if ( ! $?compilerInstall ) setenv compilerInstall System
     if ( $compilerInstall == "System" ) then 
-	switch ($WM_COMPILER)
-	case Gcc43:
-	    setenv WM_CC 'gcc-mp-4.3'
-	    setenv WM_CXX 'g++-mp-4.3'
-	    breaksw;
-	case Gcc44:
-	    setenv WM_CC 'gcc-mp-4.4'
-	    setenv WM_CXX 'g++-mp-4.4'
-	    breaksw;
-	case Gcc45:
-	    setenv WM_CC 'gcc-mp-4.5'
-	    setenv WM_CXX 'g++-mp-4.5'
-	    breaksw;
-	endsw
+    switch ($WM_COMPILER)
+    case Gcc43:
+        setenv WM_CC 'gcc-mp-4.3'
+        setenv WM_CXX 'g++-mp-4.3'
+        breaksw;
+    case Gcc44:
+        setenv WM_CC 'gcc-mp-4.4'
+        setenv WM_CXX 'g++-mp-4.4'
+        breaksw;
+    case Gcc45:
+        setenv WM_CC 'gcc-mp-4.5'
+        setenv WM_CXX 'g++-mp-4.5'
+        breaksw;
+    endsw
         #setenv WM_COMPILER ""
     endif
 

@@ -140,7 +140,7 @@ gaussGrad<Type>::grad
     GeometricField<GradType, fvPatchField, volMesh>& gGrad = tgGrad();
 
     gGrad.rename("grad(" + vsf.name() + ')');
-    correctBoundaryConditions(vsf, gGrad);
+    this->correctBoundaryConditions(vsf, gGrad);
 
     return tgGrad;
 }

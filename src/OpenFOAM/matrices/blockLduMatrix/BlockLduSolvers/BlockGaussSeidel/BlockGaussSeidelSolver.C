@@ -86,7 +86,7 @@ Foam::BlockGaussSeidelSolver<Type>::solve
 
     // Check convergence, solve if not converged
 
-    if (!stop(solverPerf))
+    if (!this->stop(solverPerf))
     {
         // Iteration loop
 

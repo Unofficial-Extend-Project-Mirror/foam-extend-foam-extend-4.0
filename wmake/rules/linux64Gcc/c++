@@ -2,7 +2,7 @@
 
 c++WARN     = -Wall -Wextra -Wno-unused-parameter -Wold-style-cast -Wnon-virtual-dtor
 
-CC          = ccache g++ -m64
+CC          = g++ -m64
 
 include $(RULES)/c++$(WM_COMPILE_OPTION)
 
