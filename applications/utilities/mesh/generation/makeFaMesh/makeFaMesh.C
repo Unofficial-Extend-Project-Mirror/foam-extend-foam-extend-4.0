@@ -102,19 +102,30 @@ int main(int argc, char *argv[])
         faPatches[patchI].type_ = 
             word(curPatchDict.lookup("type"));
 
+        word ownName = curPatchDict.lookup("ownerPolyPatch");
+
         faPatches[patchI].ownPolyPatchID_ =
-            mesh.boundaryMesh().findPatchID
-            (
-                word(curPatchDict.lookup("ownerPolyPatch"))
-            );
+            mesh.boundaryMesh().findPatchID(ownName);
+
+        if ( faPatches[patchI].ownPolyPatchID_ < 0 )
+        {
+            FatalErrorIn("makeFaMesh:")
+                << "neighbourPolyPatch " << ownName << " does not exist"
+                << exit(FatalError);
+        }
+
+        word neiName = curPatchDict.lookup("neighbourPolyPatch");
 
         faPatches[patchI].ngbPolyPatchID_  =
-            mesh.boundaryMesh().findPatchID
-            (
-                word(curPatchDict.lookup("neighbourPolyPatch"))
-            );
-    }
+            mesh.boundaryMesh().findPatchID(neiName);
 
+        if ( faPatches[patchI].ngbPolyPatchID_ < 0 )
+        {
+            FatalErrorIn("makeFaMesh:")
+                << "neighbourPolyPatch " << neiName << " does not exist"
+                << exit(FatalError);
+        }
+    }
 
     // Setting faceLabels list size
     label size = 0;
@@ -125,6 +136,13 @@ int main(int argc, char *argv[])
     {
         patchIDs[patchI] =
             mesh.boundaryMesh().findPatchID(polyMeshPatches[patchI]);
+
+        if ( patchIDs[patchI] < 0 )
+        {
+            FatalErrorIn("makeFaMesh:")
+                << "Patch " << polyMeshPatches[patchI] << " does not exist"
+                << exit(FatalError);
+        }
 
         size += mesh.boundaryMesh()[patchIDs[patchI]].size();
     }
