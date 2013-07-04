@@ -228,12 +228,12 @@ OPENMPI)
 SYSTEMOPENMPI)
     mpi_version=openmpi-system
 
-    # make sure not the "old" mpi is used 
+    # make sure not the "old" mpi is used
     # Not sure if this is necessary anymore.
     # export OPAL_PREFIX=
 
     # Make sure OPENMPI_BIN_DIR is set and valid
-    if [ -n "${OPENMPI_BIN_DIR}" ] && [ -d "${OPENMPI_BIN_DIR}" ] 
+    if [ -n "${OPENMPI_BIN_DIR}" ] && [ -d "${OPENMPI_BIN_DIR}" ]
     then
 	# User defined value specified for OPENMPI_BIN_DIR
 	#
@@ -251,14 +251,14 @@ SYSTEMOPENMPI)
 	# Here, we assume your environment is already set for running
 	# and developping with openmpi.
 	#
-	# Initialize OPENMPI_BIN_DIR using the path to mpicc 
+	# Initialize OPENMPI_BIN_DIR using the path to mpicc
 	export OPENMPI_BIN_DIR=$(dirname `which mpicc`)
     fi
 
     # Make sure OPENMPI_LIB_DIR is set
     if [ ! -n "${OPENMPI_LIB_DIR}" ]
     then
-	# Initialize OPENMPI_LIB_DIR using the path to mpicc 
+	# Initialize OPENMPI_LIB_DIR using the path to mpicc
 	export OPENMPI_LIB_DIR="`mpicc --showme:libdirs`"
     fi
 
@@ -437,7 +437,7 @@ export MPI_BUFFER_SIZE
 # appropriate XXX_SYSTEM environment variable for a given package in your prefs.sh
 # file in order to disable the sourcing of the ThirdParty version of the same package.
 
-# Load Mesquite library 
+# Load Mesquite library
 # ~~~~~~~~~~~~~~~~~~~~~~
 [ -z "$MESQUITE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS/etc/mesquite-2.1.2.sh
@@ -445,7 +445,7 @@ export MPI_BUFFER_SIZE
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    MESQUITE_DIR is initialized to: $MESQUITE_DIR"
 
 
-# Load Metis library 
+# Load Metis library
 # ~~~~~~~~~~~~~~~~~~
 [ -z "$METIS_SYSTEM" ] && [ -d $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS/etc/metis-5.0pre2.sh
@@ -461,7 +461,7 @@ export MPI_BUFFER_SIZE
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARMETIS_DIR is initialized to: $PARMETIS_DIR"
 
 
-# Load ParMGridGen library 
+# Load ParMGridGen library
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 [ -z "$PARMGRIDGEN_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS/etc/ParMGridGen-1.0.sh
@@ -469,7 +469,7 @@ export MPI_BUFFER_SIZE
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARMGRIDGEN_DIR is initialized to: $PARMGRIDGEN_DIR"
 
 
-# Load Libccmio library 
+# Load Libccmio library
 # ~~~~~~~~~~~~~~~~~~~~~
 [ -z "$LIBCCMIO_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1/platforms/$WM_OPTIONS/etc/libccmio-2.6.1.sh
@@ -487,10 +487,8 @@ export MPI_BUFFER_SIZE
 
 # Load cmake
 # ~~~~~~~~~~
-[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.8/platforms/$WM_OPTIONS ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.8/platforms/$WM_OPTIONS/etc/cmake-2.8.8.sh
-#[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.6/platforms/$WM_OPTIONS ] && {
-#    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.6/platforms/$WM_OPTIONS/etc/cmake-2.8.6.sh
+[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.11/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.11/platforms/$WM_OPTIONS/etc/cmake-2.8.11.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    CMAKE_DIR is initialized to: $CMAKE_DIR"
 
