@@ -49,7 +49,7 @@
 
 # Will install the package directly $WM_THIRD_PARTY_DIR
 #   Some comments about package relocation:
-#   By using this prefix for the Prefix:  parameter in thi file, you will make this 
+#   By using this prefix for the Prefix:  parameter in this file, you will make this 
 #   package relocatable. 
 #
 #   This is fine, as long as your software is itself relocatable.
