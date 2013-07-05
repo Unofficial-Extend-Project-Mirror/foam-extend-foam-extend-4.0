@@ -119,7 +119,7 @@ setenv WM_COMPILER_LIB_ARCH
 
 # Compilation options (architecture, precision, optimised, debug or profiling)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-setenv WM_NCOMPPROCS 4
+if ( ! $?WM_NCOMPPROCS ) setenv WM_NCOMPPROCS=`grep -c processor /proc/cpuinfo`
 
 # WM_ARCH_OPTION = 32 | 64
 if ( ! $?WM_ARCH_OPTION ) setenv WM_ARCH_OPTION 64
