@@ -58,18 +58,21 @@ Change MixingPlane boundary condition parameters
                                dest="coordinateSystemE3",
                                default=None,
                                help='axis E3 for coordinate system of mixingPlane')
-        self.parser.add_option("--assembly",
+        self.parser.add_option("--ribbonPatchSweepAxis",
                                action="store",
-                               dest="assembly",
+                               dest="ribbonPatchSweepAxis",
                                default=None,
-                               help='Assembly (master|slave|both|userdefined')
-        self.parser.add_option("--orientation",
+                               help='ribbonPatch sweepAxis (X|Y|Z|R|Theta')
+        self.parser.add_option("--ribbonPatchStackAxis",
                                action="store",
-                               dest="orientation",
+                               dest="ribbonPatchStackAxis",
                                default=None,
-                               help='Orientation of profile (\
-dirX_spanY| \
-dirX_spanZ|dirY_spanX|dirY_spanZ|dirZ_spanX|dirZ_spanY|dirR_spanTheta|dirR_spanZ|dirTheta_spanZ|dirTheta_spanR|dirZ_spanTheta|dirZ_spanR|unknown)')
+                               help='ribbonPatch stackAxis (X|Y|Z|R|Theta')
+        self.parser.add_option("--ribbonPatchDiscretization",
+                               action="store",
+                               dest="ribbonPatchDiscretization",
+                               default=None,
+                               help='ribbonPatch discretization (masterPatch|slavePatch|bothPatches|uniform|userDefined)')
         
         self.parser.add_option("--test",
                                action="store_true",
@@ -99,9 +102,6 @@ dirX_spanZ|dirY_spanX|dirY_spanZ|dirZ_spanX|dirZ_spanY|dirR_spanTheta|dirR_spanZ
                     if self.parser.getOptions().shadowPatch!=None:
                         val["shadowPatch"]=self.parser.getOptions().shadowPatch
 
-                    if self.parser.getOptions().orientation!=None:
-                        val["orientation"]=self.parser.getOptions().orientation
-
                     if val.has_key("coordinateSystem")==False:
                         val["coordinateSystem"]={}
 
@@ -120,11 +120,17 @@ dirX_spanZ|dirY_spanX|dirY_spanZ|dirZ_spanX|dirZ_spanY|dirR_spanTheta|dirR_spanZ
                     if self.parser.getOptions().coordinateSystemE3!=None:
                         val["coordinateSystem"]["e3"]=self.parser.getOptions().coordinateSystemE3
 
-                    if self.parser.getOptions().assembly!=None:
-                        val["assembly"]=self.parser.getOptions().assembly
+                    if val.has_key("ribbonPatch")==False:
+                        val["ribbonPatch"]={}
 
-                    if self.parser.getOptions().orientation!=None:
-                        val["orientation"]=self.parser.getOptions().orientation
+                    if self.parser.getOptions().ribbonPatchSweepAxis!=None:
+                        val["ribbonPatch"]["sweepAxis"]=self.parser.getOptions().ribbonPatchSweepAxis
+
+                    if self.parser.getOptions().ribbonPatchStackAxis!=None:
+                        val["ribbonPatch"]["stackAxis"]=self.parser.getOptions().ribbonPatchStackAxis
+
+                    if self.parser.getOptions().ribbonPatchDiscretization!=None:
+                        val["ribbonPatch"]["discretization"]=self.parser.getOptions().ribbonPatchDiscretization
 
                 break
 

@@ -62,6 +62,18 @@ cp ChangeMixingPlaneBoundary.py $PYFOAM_DIR/lib/python$pythonVersion/site-packag
 cp pyFoamChangeGGIBoundary.py $PYFOAM_DIR/bin
 cp ChangeGGIBoundary.py $PYFOAM_DIR/lib/python$pythonVersion/site-packages/PyFoam/Applications
 
+# pyFoamInitializeMixingPlane.py
+cp pyFoamInitMixingPlaneInterface.py $PYFOAM_DIR/bin
+cp InitMixingPlaneInterface.py $PYFOAM_DIR/lib/python$pythonVersion/site-packages/PyFoam/Applications
+
+# pyFoamInitializeGGI.py
+cp pyFoamInitGgiInterface.py $PYFOAM_DIR/bin
+cp InitGgiInterface.py $PYFOAM_DIR/lib/python$pythonVersion/site-packages/PyFoam/Applications
+
+# pyFoamConvertMixingPlaneBoundaryToNewSyntax.py
+cp pyFoamConvertMixingPlaneBoundaryToNewSyntax.py $PYFOAM_DIR/bin
+cp ConvertMixingPlaneBoundaryToNewSyntax.py $PYFOAM_DIR/lib/python$pythonVersion/site-packages/PyFoam/Applications
+
 set +x
 echo ========================================
 echo Done
