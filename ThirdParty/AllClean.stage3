@@ -70,6 +70,9 @@ uninstallPackage ParMetis-3.1.1
 # Zoltan
 # uninstallPackage zoltan-3.6
 
+# PyFoam
+uninstallPackage PyFoam-0.5.7
+
 echo
 echo ========================================
 echo Done ThirdParty AllClean: Stage3
