@@ -119,8 +119,6 @@ setenv WM_COMPILER_LIB_ARCH
 
 # Compilation options (architecture, precision, optimised, debug or profiling)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if ( ! $?WM_NCOMPPROCS ) setenv WM_NCOMPPROCS=`grep -c processor /proc/cpuinfo`
-
 # WM_ARCH_OPTION = 32 | 64
 if ( ! $?WM_ARCH_OPTION ) setenv WM_ARCH_OPTION 64
 
@@ -134,6 +132,20 @@ if ( ! $?WM_COMPILE_OPTION ) setenv WM_COMPILE_OPTION Opt
 
 # WM_MPLIB = | OPENMPI | MPICH | MPICH-GM | HPMPI | GAMMA | MPI | QSMPI
 if ( ! $?WM_MPLIB ) setenv WM_MPLIB OPENMPI
+
+# WM_NCOMPPROCS = <number of processes to use>
+if ( ! $?WM_NCOMPPROCS ) then
+   switch (`uname -s`)
+   case Linux:
+       setenv WM_NCOMPPROCS `grep -c processor /proc/cpuinfo`
+       breaksw
+
+   case Darwin:
+       setenv WM_NCOMPPROCS `sysctl -n hw.ncpu`
+       breaksw
+
+   endsw
+endif
 
 
 # Run options (floating-point signal handling and memory initialisation)
