@@ -19,7 +19,7 @@ sudo zypper install -t  pattern devel_qt4
 
 mkdir ~/OpenFOAM
 cd ~/OpenFOAM
-git clone git://openfoam-extend.git.sourceforge.net/gitroot/openfoam-extend/OpenFOAM-1.6-ext
+git clone git://git.code.sf.net/p/openfoam-extend/OpenFOAM-1.6-ext
 
 
 --------------------------------------------------------------------------------

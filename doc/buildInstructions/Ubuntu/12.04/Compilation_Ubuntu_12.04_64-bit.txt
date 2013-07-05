@@ -40,7 +40,7 @@ sudo ln -s /usr/bin/make /usr/bin/gmake
 # Download OpenFOAM-1.6-ext
 mkdir ~/OpenFOAM
 cd ~/OpenFOAM
-git clone git://openfoam-extend.git.sourceforge.net/gitroot/openfoam-extend/OpenFOAM-1.6-ext
+git clone git://git.code.sf.net/p/openfoam-extend/OpenFOAM-1.6-ext
 
 --------------------------------------------------------------------------------
 
