@@ -85,21 +85,18 @@ caseName=${PWD##*/}
 
 if [ -n "$useNativeReader" ]
 then
-    caseFile="$caseName.foam"
+    caseFileExt=".foam"
 else
-    caseFile="$caseName.OpenFOAM"
+    caseFileExt=".OpenFOAM"
 fi
+
+caseFile="$caseName$caseFileExt"
 
 fvControls="system"
 
 if [ -n "$regionName" ]
 then
-    if [ -n "$useNativeReader" ]
-    then
-	caseFile="$caseName{$regionName}.foam"
-    else
-	caseFile="$caseName{$regionName}.OpenFOAM"
-    fi
+    caseFile="$caseName{$regionName}$caseFileExt"
     fvControls="$fvControls/$regionName"
 fi
 
