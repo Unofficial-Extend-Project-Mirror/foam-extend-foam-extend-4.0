@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #------------------------------------------------------------------------------
 # =========                 |
 # \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -38,7 +38,8 @@ usage: ${0##*/} [OPTION]
 options:
   -case   dir    specify alternative case directory
   -region name   specify mesh region name
-  -touch         only create the .OpenFOAM file
+  -touch         only create the .OpenFOAM or .foam file
+  -nativeReader  use the paraview native reader for OpenFOAM
 
 * start paraview $ParaView_VERSION with the OpenFOAM libraries
 
@@ -46,7 +47,7 @@ USAGE
     exit 1
 }
 
-unset regionName touchOnly
+unset regionName touchOnly useNativeReader
 
 # parse options
 while [ "$#" -gt 0 ]
@@ -69,6 +70,10 @@ do
         touchOnly=true
         shift
         ;;
+    -nativeReader)
+        useNativeReader=true
+        shift
+        ;;
     *)
         usage "unknown option/argument: '$*'"
         ;;
@@ -77,12 +82,24 @@ done
 
 # get a sensible caseName
 caseName=${PWD##*/}
-caseFile="$caseName.OpenFOAM"
+
+if [ -n "$useNativeReader" ]
+then
+    caseFile="$caseName.foam"
+else
+    caseFile="$caseName.OpenFOAM"
+fi
+
 fvControls="system"
 
 if [ -n "$regionName" ]
 then
-    caseFile="$caseName{$regionName}.OpenFOAM"
+    if [ -n "$useNativeReader" ]
+    then
+	caseFile="$caseName{$regionName}.foam"
+    else
+	caseFile="$caseName{$regionName}.OpenFOAM"
+    fi
     fvControls="$fvControls/$regionName"
 fi
 
