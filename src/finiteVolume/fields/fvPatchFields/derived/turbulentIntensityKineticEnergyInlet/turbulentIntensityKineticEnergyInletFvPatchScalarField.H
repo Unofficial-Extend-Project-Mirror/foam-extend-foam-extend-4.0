@@ -30,7 +30,7 @@ Description
     fraction of the mean velocity
 
     Example of the boundary condition specification:
-    @verbatim
+    \verbatim
         inlet
         {
             type        turbulentIntensityKineticEnergyInlet;
@@ -38,7 +38,7 @@ Description
             intensity   0.05;           // 5% turbulence
             value       uniform 1;      // placeholder
         }
-    @endverbatim
+    \endverbatim
 
 SourceFiles
     turbulentIntensityKineticEnergyInletFvPatchScalarField.C
@@ -48,7 +48,7 @@ SourceFiles
 #ifndef turbulentIntensityKineticEnergyInletFvPatchScalarField_H
 #define turbulentIntensityKineticEnergyInletFvPatchScalarField_H
 
-#include "fixedValueFvPatchFields.H"
+#include "inletOutletFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -61,15 +61,18 @@ namespace Foam
 
 class turbulentIntensityKineticEnergyInletFvPatchScalarField
 :
-    public fixedValueFvPatchScalarField
+    public inletOutletFvPatchScalarField
 {
     // Private data
 
-        //- Name of velocity field
-        word UName_;
-
         //- Turbulent intensity as fraction of mean velocity
         scalar intensity_;
+
+        //- Name of the velocity field
+        word UName_;
+
+        //- Name of the flux field
+        word phiName_;
 
 
 public:
