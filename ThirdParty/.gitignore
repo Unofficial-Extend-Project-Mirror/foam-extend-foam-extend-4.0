@@ -14,6 +14,7 @@
 rpmBuild/BUILD
 rpmBuild/RPMS
 rpmBuild/rpmDB
+packages
 rpmBuild/tmp
 
 # end-of-file
