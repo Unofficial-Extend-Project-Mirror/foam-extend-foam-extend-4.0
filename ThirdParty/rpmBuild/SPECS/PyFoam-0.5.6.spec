@@ -125,16 +125,22 @@ cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.cs
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 setenv PYFOAM_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/noarch
 
-setenv PYTHONPATH \$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages:\$PYTHONPATH
+if ! \$?PYTHONPATH then
+    setenv PYTHONPATH \$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages
+else
+    setenv PYTHONPATH \$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages:\$PYTHONPATH
+endif
+
 
 if ( -e \$PYFOAM_DIR/bin ) then
     _foamAddPath \$PYFOAM_DIR/bin
 endif
 
-if ( -e \$PYFOAM_SITE_DIR/bin ) then
-    _foamAddPath \$PYFOAM_SITE_DIR/bin
+if \$?PYFOAM_SITE_DIR then
+    if ( -e \$PYFOAM_SITE_DIR/bin ) then
+        _foamAddPath \$PYFOAM_SITE_DIR/bin
+    endif
 endif
-
 DOT_CSH_EOF
 
 cat << DOT_HARDCODED_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}_hardcoded.sh
@@ -165,12 +171,22 @@ cat << DOT_HARDCODED_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{v
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 setenv PYFOAM_DIR $WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/noarch
 
-setenv PYTHONPATH \$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages:\$PYTHONPATH
-
-if ( -e \$PYFOAM_DIR/bin ) then
-    setenv PATH \$PYFOAM_DIR/bin:\$PATH
+if ! \$?PYTHONPATH then
+    setenv PYTHONPATH \$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages
+else
+    setenv PYTHONPATH \$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages:\$PYTHONPATH
 endif
 
+
+if ( -e \$PYFOAM_DIR/bin ) then
+     _foamAddPath \$PYFOAM_DIR/bin
+endif
+
+if \$?PYFOAM_SITE_DIR then
+    if ( -e \$PYFOAM_SITE_DIR/bin ) then
+        _foamAddPath \$PYFOAM_SITE_DIR/bin
+    endif
+endif
 DOT_HARDCODED_CSH_EOF
 
     #finally, generate a .tgz file for systems where using rpm for installing packages
