@@ -157,14 +157,12 @@ Patch2:                 ParaView-3.14.1.patch_darwin
     # start with these general settings
     addCMakeVariable  VTK_USE_TK:BOOL=OFF
     addCMakeVariable  PARAVIEW_ENABLE_PYTHON:BOOL=ON
-    addCMakeVariable  BUILD_SHARED_LIBS:BOOL=ON  VTK_USE_RPATH:BOOL=OFF
+    addCMakeVariable  PARAVIEW_USE_MPI:BOOL=ON
+    addCMakeVariable  BUILD_SHARED_LIBS:BOOL=ON
     addCMakeVariable  CMAKE_BUILD_TYPE:STRING=Release
 
     # include development files in "make install"
     addCMakeVariable  PARAVIEW_INSTALL_DEVELOPMENT:BOOL=ON
-
-    # new alternative to "make HTMLDocumentation"
-    addCMakeVariable  PARAVIEW_GENERATE_PROXY_DOCUMENTATION:BOOL=OFF
 
  %ifos darwin
     # Additional installation rules for Mac OS X
@@ -175,6 +173,16 @@ Patch2:                 ParaView-3.14.1.patch_darwin
     addCMakeVariable  QT_QMAKE_EXECUTABLE:FILEPATH=%{_qmakePath}
 
     echo "CMAKE_VARIABLES: $CMAKE_VARIABLES"
+
+%ifos darwin
+    # For Mac OSX:
+    # The configuration of Paraview will be using the environment variable MACOSX_DEPLOYMENT_TARGET.
+    # This variable was initialized using 'sw_vers -productVersion' in etc/bashrc.
+    # We need to get rid of the revision number from this string. eg turn "10.7.5" into "10.7"
+    v=( ${MACOSX_DEPLOYMENT_TARGET//./ } )
+    export MACOSX_DEPLOYMENT_TARGET="${v[0]}.${v[1]}"
+    echo "Resetting MACOSX_DEPLOYMENT_TARGET to ${MACOSX_DEPLOYMENT_TARGET}"
+%endif
 
     mkdir -p ./buildObj
     cd ./buildObj

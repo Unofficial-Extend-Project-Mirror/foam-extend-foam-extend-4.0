@@ -168,6 +168,16 @@ Patch1:         paraview-gcc47.patch
 
     echo "CMAKE_VARIABLES: $CMAKE_VARIABLES"
 
+%ifos darwin
+    # For Mac OSX:
+    # The configuration of Paraview will be using the environment variable MACOSX_DEPLOYMENT_TARGET.
+    # This variable was initialized using 'sw_vers -productVersion' in etc/bashrc.
+    # We need to get rid of the revision number from this string. eg turn "10.7.5" into "10.7"
+    v=( ${MACOSX_DEPLOYMENT_TARGET//./ } )
+    export MACOSX_DEPLOYMENT_TARGET="${v[0]}.${v[1]}"
+    echo "Resetting MACOSX_DEPLOYMENT_TARGET to ${MACOSX_DEPLOYMENT_TARGET}"
+%endif
+
     mkdir -p ./buildObj
     cd ./buildObj
 
