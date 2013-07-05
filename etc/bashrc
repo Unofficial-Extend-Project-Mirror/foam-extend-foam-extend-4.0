@@ -150,7 +150,7 @@ then
         ;;
 
     Darwin)
-        export WM_NCOMPPROCS=`sysctl -n hw.ncpu`
+        export WM_NCOMPPROCS=`sysctl -n hw.physicalcpu`
         ;;
     esac
 fi

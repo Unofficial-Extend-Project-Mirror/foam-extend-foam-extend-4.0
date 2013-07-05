@@ -141,7 +141,7 @@ if ( ! $?WM_NCOMPPROCS ) then
        breaksw
 
    case Darwin:
-       setenv WM_NCOMPPROCS `sysctl -n hw.ncpu`
+       setenv WM_NCOMPPROCS `sysctl -n hw.physicalcpu`
        breaksw
 
    endsw
