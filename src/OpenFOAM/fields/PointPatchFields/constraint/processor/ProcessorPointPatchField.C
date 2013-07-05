@@ -51,7 +51,7 @@ void ProcessorPointPatchField
 <PatchField, Mesh, PointPatch, ProcessorPointPatch, MatrixType, Type>::
 resizeBuf
 (
-    List<char>& buf, 
+    List<char>& buf,
     const label size
 ) const
 {
@@ -793,7 +793,7 @@ cutBouCoeffs
     scalarField& cutCoeffs = tcutCoeffs();
 
     label coeffI = 0;
-        
+
     // Owner side
 
     forAll (cutOwn, edgeI)
@@ -962,7 +962,8 @@ initInterfaceMatrixUpdate
     const lduMatrix& m,
     const scalarField& coeffs,
     const direction,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     tmp<scalarField> tlocalMult(new scalarField(this->size(), 0));
@@ -983,7 +984,7 @@ initInterfaceMatrixUpdate
     const scalarField& cutMask = procPatch_.ownNeiDoubleMask();
 
     // Coefficients are already ordered in the appropriate way. Just
-    // use the counter.  
+    // use the counter.
     label coeffI = 0;
 
     // Owner side
@@ -1046,7 +1047,7 @@ initInterfaceMatrixUpdate
     // either multiplied twice or not at all.  For this purpose, the
     // offending edges need to be separated out and multiplied
     // appropriately.  This will only happen for cell tetrahedral
-    // decomposition and is generally nasty.  
+    // decomposition and is generally nasty.
     // No need for cut mask here
     {
         const labelList& doubleCut = procPatch_.doubleCutEdgeIndices();
@@ -1100,7 +1101,8 @@ updateInterfaceMatrix
     const lduMatrix&,
     const scalarField&,
     const direction,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     // Get the neighbour side multiplication
