@@ -242,11 +242,13 @@ case Darwin:
     endsw
 
     # Make sure that binaries use the best features of the used OS-Version
-    setenv MACOSX_DEPLOYMENT_TARGET `sw_vers -productVersion`
+    # We need to get rid of the revision number from this string. eg turn "10.7.5" into "10.7"
+    set v=`sw_vers -productVersion | sed 's/\./ /g'`
+    setenv MACOSX_DEPLOYMENT_TARGET "$v[1].$v[2]"
 
     # Use Mac-Ports-Compiler instead of Apple-gcc-4.2
     if ( ! $?compilerInstall ) setenv compilerInstall System
-    if ( $compilerInstall == "System" ) then 
+    if ( $compilerInstall == "System" ) then
     switch ($WM_COMPILER)
     case Gcc43:
         setenv WM_CC 'gcc-mp-4.3'

@@ -245,7 +245,9 @@ Darwin)
     esac
 
     # Make sure that binaries use the best features of the used OS-Version
-    export MACOSX_DEPLOYMENT_TARGET=`sw_vers -productVersion`
+    # We need to get rid of the revision number from this string. eg turn "10.7.5" into "10.7"
+    v=( ${MACOSX_DEPLOYMENT_TARGET//./ } )
+    export MACOSX_DEPLOYMENT_TARGET="${v[0]}.${v[1]}"
 
     if [ "$compilerInstall" == "System" ]
     then
@@ -301,7 +303,7 @@ cleanEnv=`$cleanProg "$PATH" "$foamOldDirs"` && PATH="$cleanEnv"
 cleanEnv=`$cleanProg "$LD_LIBRARY_PATH" "$foamOldDirs"` && LD_LIBRARY_PATH="$cleanEnv"
 
 #- Clean DYLD_LIBRARY_PATH
-if [[ "$WM_ARCH_BASE" == "darwin" ]] 
+if [[ "$WM_ARCH_BASE" == "darwin" ]]
 then
     cleanEnv=`$cleanProg "$DYLD_LIBRARY_PATH" "$foamOldDirs"` && DYLD_LIBRARY_PATH="$cleanEnv"
 fi
