@@ -193,12 +193,12 @@ case OPENMPI:
 case SYSTEMOPENMPI:
     set mpi_version=openmpi-system
 
-    # make sure not the "old" mpi is used 
+    # make sure not the "old" mpi is used
     # Not sure if this is necessary anymore.
     # export OPAL_PREFIX=
 
     # Make sure OPENMPI_BIN_DIR is set and valid
-    if ($?OPENMPI_BIN_DIR != 0 ) then 
+    if ($?OPENMPI_BIN_DIR != 0 ) then
         if (-d "${OPENMPI_BIN_DIR}" ) then
 	    # User defined value specified for OPENMPI_BIN_DIR
 	    #
@@ -225,7 +225,7 @@ case SYSTEMOPENMPI:
 
     # Make sure OPENMPI_LIB_DIR is set
     if ( $?OPENMPI_LIB_DIR == 0 ) then
-	# Initialize OPENMPI_LIB_DIR using the path to mpicc 
+	# Initialize OPENMPI_LIB_DIR using the path to mpicc
 	setenv OPENMPI_LIB_DIR "`mpicc --showme:libdirs`"
     endif
 
@@ -417,7 +417,7 @@ if ( $?PARMGRIDGEN_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS/etc/ParMGridGen-1.0.csh
 endif
 
-# Load Libccmio library 
+# Load Libccmio library
 # ~~~~~~~~~~~~~~~~~~~~~
 if ( $?LIBCCMIO_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1/platforms/$WM_OPTIONS/etc/libccmio-2.6.1.csh
@@ -452,8 +452,8 @@ endif
 
 # PyFoam
 # ~~~~~~
-if ( $?PYFOAM_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.5.7/platforms/noarch ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.5.7/platforms/noarch/etc/PyFoam-0.5.7.csh
+if ( $?PYFOAM_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.6.1/platforms/noarch ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.1/platforms/noarch/etc/PyFoam-0.6.1.csh
 endif
 
 # QT
