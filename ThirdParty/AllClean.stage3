@@ -71,7 +71,7 @@ uninstallPackage ParMetis-3.1.1
 # uninstallPackage zoltan-3.6
 
 # PyFoam
-uninstallPackage PyFoam-0.5.7
+uninstallPackage PyFoam-0.6.1
 
 echo
 echo ========================================
