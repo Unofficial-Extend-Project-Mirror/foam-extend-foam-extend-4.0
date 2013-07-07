@@ -134,19 +134,7 @@ if ( ! $?WM_COMPILE_OPTION ) setenv WM_COMPILE_OPTION Opt
 if ( ! $?WM_MPLIB ) setenv WM_MPLIB OPENMPI
 
 # WM_NCOMPPROCS = <number of processes to use>
-if ( ! $?WM_NCOMPPROCS ) then
-   switch (`uname -s`)
-   case Linux:
-       setenv WM_NCOMPPROCS `grep -c processor /proc/cpuinfo`
-       breaksw
-
-   case Darwin:
-       setenv WM_NCOMPPROCS `sysctl -n hw.physicalcpu`
-       breaksw
-
-   endsw
-endif
-
+if ( ! $?WM_NCOMPPROCS ) setenv WM_NCOMPPROCS `foamGetSystemInfo -nbrCores`
 
 # Run options (floating-point signal handling and memory initialisation)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

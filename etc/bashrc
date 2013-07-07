@@ -142,18 +142,7 @@ export WM_COMPILER_LIB_ARCH=
 : ${WM_MPLIB:=OPENMPI}; export WM_MPLIB
 
 # WM_NCOMPPROCS = <number of processes to use>
-if [ -z "${WM_NCOMPPROCS+xxx}" ]
-then
-    case `uname -s` in
-    Linux)
-        export WM_NCOMPPROCS=`grep -c processor /proc/cpuinfo`
-        ;;
-
-    Darwin)
-        export WM_NCOMPPROCS=`sysctl -n hw.physicalcpu`
-        ;;
-    esac
-fi
+: ${WM_NCOMPPROCS:=`foamGetSystemInfo -nbrCores`}; export WM_NCOMPPROCS
 
 
 # Run options (floating-point signal handling and memory initialisation)
