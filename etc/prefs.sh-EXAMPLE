@@ -46,7 +46,7 @@ compilerInstall=System
 # ~~~~~~~~~~~~~~~~~~~~~~
 #
 # Normally, you don't need to set more than these 3 env. variables
-# The other openmpi related variables will be initialized using 
+# The other openmpi related variables will be initialized using
 # the command mpicc --showme:
 #
 #export WM_MPLIB=SYSTEMOPENMPI
@@ -60,7 +60,7 @@ compilerInstall=System
 
 # Specify system installed ThirdParty packages/libraries
 # NB: The packages installed under $WM_THIRD_PARTY_DIR
-#     will always override these values. 
+#     will always override these values.
 #     So build your ThirdParty directory accordingly.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -116,6 +116,16 @@ compilerInstall=System
 #export PYTHON_DIR=path_to_system_installed_python
 #export PYTHON_BIN_DIR=$PYTHON_DIR/bin
 
+# System installed PyFoam
+#export PYFOAM_SYSTEM=1
+#export PYFOAM_DIR=path_to_system_installed_python
+#export PYFOAM_BIN_DIR=$PYFOAM_DIR/bin
+
+# System installed hwloc
+#export HWLOC_SYSTEM=1
+#export HWLOC_DIR=path_to_system_installed_hwloc
+#export HWLOC_BIN_DIR=$HWLOC_DIR/bin
+
 # System installed Qt
 # This is the only package we assume is system installed by default.
 # So we don't use a variable called QT_SYSTEM, but instead a variable
@@ -128,9 +138,9 @@ compilerInstall=System
 # properly initialized.
 #
 # If you choose instead to use the ThirdParty version of QT, only uncomment
-# the variable QT_THIRD_PARTY and set it to 1. Keep the initialization 
+# the variable QT_THIRD_PARTY and set it to 1. Keep the initialization
 # of the variables QT_DIR nd QT_BIN_DIR commented. The QT ThirdParty scripts
-# will take care of setting the variables QT_DIR and QT_BIN_DIR to the 
+# will take care of setting the variables QT_DIR and QT_BIN_DIR to the
 # proper values.
 #
 #export QT_THIRD_PARTY=1

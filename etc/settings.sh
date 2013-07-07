@@ -545,6 +545,12 @@ export MPI_BUFFER_SIZE
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PYFOAM_DIR is initialized to: $PYFOAM_DIR"
 
+# Load hwloc
+# ~~~~~~~~~~~
+[ -z "$HWLOC_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.1/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.1/platforms/$WM_OPTIONS/etc/hwloc-1.7.1.sh
+}
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    HWLOC_DIR is initialized to: $HWLOC_DIR"
 
 # Load QT
 # ~~~~~~~

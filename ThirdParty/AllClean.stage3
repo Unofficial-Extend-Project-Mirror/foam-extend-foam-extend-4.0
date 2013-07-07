@@ -73,6 +73,9 @@ uninstallPackage ParMetis-3.1.1
 # PyFoam
 uninstallPackage PyFoam-0.6.1
 
+# hwloc
+uninstallPackage hwloc-1.7.1
+
 echo
 echo ========================================
 echo Done ThirdParty AllClean: Stage3
