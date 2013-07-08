@@ -31,6 +31,8 @@ License
 #include "slicedVolFields.H"
 #include "slicedSurfaceFields.H"
 #include "SubField.H"
+#include "cyclicFvPatchField.H"
+#include "cyclicGgiFvPatchField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -147,7 +149,25 @@ void fvMesh::makeC() const
         faceCentres()
     );
 
-/* HJ, I think this is wrong.  HJ, 6/Jul/2010
+    // This piece of code is necessary for cyclic and cyclicGgi interfaces
+    // using a separationOffset transform.
+    // Those two interfaces will be using the method ::patchNeighbourField()
+    // to evaluate the field C on the shadow patch. For cyclic and cyclicGgi
+    // translational-only interfaces, the separationOffset transform is never
+    // applied directly in ::patchNeighbourField() because this transform is
+    // only pertinent for 3D coordinates, and the method ::patchNeighbourField()
+    // does not discriminate the type of field it is operating on.
+    // So, because the separationOffset transform is not applied, the evaluation
+    // of a 3D position field like 'C' will always be wrong on the shadow patches
+    // of translational cyclic and cyclicGgi interfaces.
+    // For cyclic and cyclicGgi interfaces using a rotational transform, the
+    // evaluation of the field C will be valid, but since we are only
+    // interested in the patch face centers for these interfaces, we can override
+    // those values as well.
+    // See also:
+    //    https://sourceforge.net/apps/mantisbt/openfoam-extend/view.php?id=42
+    // MB, 12/Dec/2010
+    //
     // Need to correct for cyclics transformation since absolute quantity.
     // Ok on processor patches since hold opposite cell centre (no
     // transformation)
@@ -155,7 +175,11 @@ void fvMesh::makeC() const
 
     forAll(C.boundaryField(), patchi)
     {
-        if (isA<cyclicFvPatchVectorField>(C.boundaryField()[patchi]))
+        if
+        (
+            isA<cyclicFvPatchVectorField>(C.boundaryField()[patchi])
+         || isA<cyclicGgiFvPatchVectorField>(C.boundaryField()[patchi])
+        )
         {
             // Note: cyclic is not slice but proper field
             C.boundaryField()[patchi] == static_cast<const vectorField&>
@@ -167,7 +191,6 @@ void fvMesh::makeC() const
             );
         }
     }
-*/
 }
 
 
