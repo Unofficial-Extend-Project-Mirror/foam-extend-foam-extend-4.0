@@ -1,0 +1,32 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5-dev                               |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      multiTransportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+dictionaryName  transportProperties;
+
+multiSolver
+{
+    scalarTransportFoam
+    {
+        DT           DT [0 2 -1 0 0 0 0] 0.0;
+    }
+    icoFoam1
+    {
+        nu              nu [0 2 -1 0 0 0 0] 0.01;
+    }
+    icoFoam2
+    {
+        nu              nu [0 2 -1 0 0 0 0] 0.01;
+    }
+}

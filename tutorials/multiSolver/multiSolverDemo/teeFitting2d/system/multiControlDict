@@ -1,0 +1,70 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5-dev                               |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      multiSolverDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+multiSolverControl
+{
+    initialStartFrom    startTime;
+    startTime           0;
+    finalStopAt         endSuperLoop;
+    endSuperLoop        3;
+    timeFormat          scientific;
+    timePrecision       6;
+}
+
+solverDomains
+{
+    icoFoam1
+    {
+        application     icoFoam;
+        startFrom       startTime;
+        startTime       0;
+        stopAt          endTime;
+        endTime         0.1;
+        deltaT          0.01;
+        writeControl    timeStep;
+        writeInterval   1;
+        storeFields     ( T );
+    }
+    icoFoam2
+    {
+        application     icoFoam;
+        startFrom       startTime;
+        startTime       0;
+        stopAt          endTime;
+        endTime         0.1;
+        deltaT          0.01;
+        writeControl    timeStep;
+        writeInterval   1;
+        storeFields     ( T );
+    }
+    scalarTransportFoam
+    {
+        application     scalarTransportFoam;
+        startFrom       latestTimeAllDomains;
+        stopAt          elapsedTime;
+        elapsedTime     1;
+        deltaT          0.1;
+        writeControl    timeStep;
+        writeInterval   1;
+        storeFields     ( p );
+    }
+    default
+    {
+        writeFormat         ascii;
+        writePrecision      6;
+        writeCompression    uncompressed;
+        runTimeModifiable   yes;
+    }
+}
