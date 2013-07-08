@@ -80,9 +80,8 @@ public:
 
         // New formulation.  Oliver Borm and Aleks Jemcov
         // HJ, 13/Jan/2011
-        return (r + 1)/(r + 1/stabilise(r, VSMALL));
+        return max((r + 1)/(r + 1/stabilise(r, SMALL)), 0);
 
-//         return r*(r + 1)/(sqr(r) + 1);
     }
 };
 

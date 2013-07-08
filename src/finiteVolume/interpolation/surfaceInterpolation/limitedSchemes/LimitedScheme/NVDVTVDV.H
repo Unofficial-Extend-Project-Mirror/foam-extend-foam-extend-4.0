@@ -120,8 +120,6 @@ public:
             // New formulation.  Oliver Borm and Aleks Jemcov
             // HJ, 13/Jan/2011
             return max(2*(gradcf/gradf) - 1, 0);
-
-//             return 2*(gradcf/gradf) - 1;
         }
 };
 
