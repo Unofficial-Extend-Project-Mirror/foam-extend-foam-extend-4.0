@@ -80,14 +80,14 @@ Foam::engineMesh::engineMesh(const IOobject& io)
     }
 
     if (!foundLiner)
-    { 
+    {
         FatalErrorIn("engineMesh::engineMesh(const IOobject& io)")
             << "cannot find liner patch"
             << exit(FatalError);
     }
 
     if (!foundCylinderHead)
-    { 
+    {
         FatalErrorIn("engineMesh::engineMesh(const IOobject& io)")
             << "cannot find cylinderHead patch"
             << exit(FatalError);

@@ -40,7 +40,7 @@ inline const verticalValveBank& verticalValves::valves() const
 {
     return valves_;
 }
-                 
+
 inline const scalar& verticalValves::deformSwitch() const
 {
     return deformSwitch_;

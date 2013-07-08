@@ -4,11 +4,11 @@
 
         // for each valve the following zones have to be created:
         //
-        //  - movingFaceZone 
+        //  - movingFaceZone
         //  - movingPointZone
         //  - staticFaceZone
         //  - staticPointZone
-        
+
         IOobject movingCellsHeader
         (
             valves_[valveI].movingCellsName(),
@@ -16,7 +16,7 @@
             *this,
             IOobject::MUST_READ
         );
-        
+
         if(!movingCellsHeader.headerOk())
         {
             WarningIn
@@ -35,8 +35,8 @@
                     pointZones()
                 )
             );
-        
-            nPointZones++;        
+
+            nPointZones++;
 
 
         }
@@ -45,7 +45,7 @@
             cellSet movingCellsSet(*this, valves_[valveI].movingCellsName());
 
             labelList movingCells = movingCellsSet.toc();
-            
+
             labelList movingPoints;
 
             const labelListList& cp = cellPoints();
@@ -53,7 +53,7 @@
             boolList count(allPoints().size(), false);
 
             forAll (movingCells, cellI)
-            {   
+            {
                 const labelList& curCellPoints = cp[movingCells[cellI]];
 
                 forAll (curCellPoints, i)
@@ -70,7 +70,7 @@
                 {
                     nCounted++;
                 }
-            }   
+            }
 
             movingPoints.setSize(nCounted);
 
@@ -95,8 +95,8 @@
                     pointZones()
                 )
             );
-        
-            nPointZones++;        
+
+            nPointZones++;
         }
 
         IOobject staticCellsHeader
@@ -106,7 +106,7 @@
             *this,
             IOobject::MUST_READ
         );
-        
+
         if(!staticCellsHeader.headerOk())
         {
             WarningIn
@@ -125,8 +125,8 @@
                     pointZones()
                 )
             );
-        
-            nPointZones++;     
+
+            nPointZones++;
 
         }
         else
@@ -134,7 +134,7 @@
             cellSet staticCellSet(*this, valves_[valveI].staticCellsName());
 
             labelList staticCells = staticCellSet.toc();
-            
+
             labelList staticPoints;
 
             const labelListList& cp = cellPoints();
@@ -142,7 +142,7 @@
             boolList count(allPoints().size(), false);
 
             forAll (staticCells, cellI)
-            {   
+            {
                 const labelList& curCellPoints = cp[staticCells[cellI]];
 
                 forAll (curCellPoints, i)
@@ -159,7 +159,7 @@
                 {
                     nCounted++;
                 }
-            }   
+            }
 
             staticPoints.setSize(nCounted);
 
@@ -184,8 +184,8 @@
                     pointZones()
                 )
             );
-        
-            nPointZones++;     
+
+            nPointZones++;
         }
-    }   
+    }
 }

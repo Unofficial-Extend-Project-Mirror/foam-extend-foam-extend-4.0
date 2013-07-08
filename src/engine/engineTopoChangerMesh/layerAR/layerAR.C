@@ -127,7 +127,7 @@ void Foam::layerAR::checkAndCalculate()
     }
 
     if (!foundCylinderHead)
-    { 
+    {
         FatalErrorIn("Foam::layerAR::checkAndCalculate()")
             << " : cannot find cylinderHead patch"
             << exit(FatalError);

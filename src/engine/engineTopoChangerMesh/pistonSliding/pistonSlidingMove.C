@@ -250,7 +250,7 @@ void Foam::pistonSliding::valveAttach()
             }
 
             ad.setAttach();
-            
+
         }
     }
 }
@@ -318,8 +318,6 @@ bool Foam::pistonSliding::update()
 
     tetDecompositionMotionSolver& mSolver =
         refCast<tetDecompositionMotionSolver>(msPtr_());
-
-     tetPointVectorField& motionU = mSolver.motionU();
 
     // Detaching the interfacethobois2DSlidingDeform
     if (attached())

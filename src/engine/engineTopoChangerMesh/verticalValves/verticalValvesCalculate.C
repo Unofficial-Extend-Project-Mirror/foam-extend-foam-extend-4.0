@@ -62,8 +62,6 @@ void Foam::verticalValves::calcMovingMaskTop(const label i) const
 
     const labelList& cellAddr =
         cellZones()[cellZones().findZoneID("movingCellsTopV"+ Foam::name(i+1))];
-    
-    bool foundOne(false);
 
     forAll (cellAddr, cellI)
     {
@@ -76,20 +74,14 @@ void Foam::verticalValves::calcMovingMaskTop(const label i) const
 
             forAll (curFace, pointI)
             {
-                {
-                    foundOne = true;  
-                    movingPointsMaskTop[curFace[pointI]] = 1;
-                }
+                movingPointsMaskTop[curFace[pointI]] = 1;
             }
-            
         }
-        
     }
-    
-    
+
+
     if(valves_[i].poppetPatchID().active())
     {
-
         const word curtainCylZoneName
         (
             "curtainCylZoneV" + Foam::name(i + 1)
@@ -107,9 +99,7 @@ void Foam::verticalValves::calcMovingMaskTop(const label i) const
                 movingPointsMaskTop[curFace[pointI]] = 0;
             }
         }
-    
     }
-    
 }
 
 // Return moving points mask.  Moving points marked with 1
@@ -119,7 +109,7 @@ const Foam::scalarField& Foam::verticalValves::movingPointsMaskTop(const label i
     {
         movingPointsMaskTopPtr_ = NULL;
     }
-    
+
     if (!movingPointsMaskTopPtr_)
     {
         calcMovingMaskTop(i);
@@ -173,7 +163,7 @@ void Foam::verticalValves::calcMovingMaskBottom(const label i) const
         }
     }
 
-    
+
     if(valves_[i].bottomPatchID().active())
     {
 
@@ -194,9 +184,7 @@ void Foam::verticalValves::calcMovingMaskBottom(const label i) const
                 movingPointsMaskBottom[curFace[pointI]] = 0;
             }
         }
-    
     }
-    
 }
 
 // Return moving points mask.  Moving points marked with 1
@@ -206,7 +194,7 @@ const Foam::scalarField& Foam::verticalValves::movingPointsMaskBottom(const labe
     {
         movingPointsMaskBottomPtr_ = NULL;
     }
-    
+
     if (!movingPointsMaskBottomPtr_)
     {
         calcMovingMaskBottom(i);
@@ -241,8 +229,6 @@ void Foam::verticalValves::calcMovingMaskPiston() const
 
     const labelList& cellAddr =
         cellZones()[cellZones().findZoneID("movingCellsPiston")];
-    
-    bool foundOne(false);
 
     forAll (cellAddr, cellI)
     {
@@ -255,17 +241,10 @@ void Foam::verticalValves::calcMovingMaskPiston() const
 
             forAll (curFace, pointI)
             {
-                {
-                    foundOne = true;  
-                    movingPointsMaskPiston[curFace[pointI]] = 1;
-                }
+                movingPointsMaskPiston[curFace[pointI]] = 1;
             }
-            
         }
-        
     }
-    
-        
 }
 
 // Return moving points mask.  Moving points marked with 1
@@ -275,7 +254,7 @@ const Foam::scalarField& Foam::verticalValves::movingPointsMaskPiston() const
     {
         movingPointsMaskPistonPtr_ = NULL;
     }
-    
+
     if (!movingPointsMaskPistonPtr_)
     {
         calcMovingMaskPiston();
@@ -311,8 +290,6 @@ void Foam::verticalValves::calcMovingMaskPistonValves(const label i) const
 
     const labelList& cellAddr =
         cellZones()[cellZones().findZoneID("movingCellsPistonV" + Foam::name(i+1))];
-    
-    bool foundOne(false);
 
     forAll (cellAddr, cellI)
     {
@@ -325,20 +302,10 @@ void Foam::verticalValves::calcMovingMaskPistonValves(const label i) const
 
             forAll (curFace, pointI)
             {
-                
-
-                {
-                    foundOne = true;  
-                    movingPointsMaskPistonValves[curFace[pointI]] = 1;
-                }
-                
-                
+                movingPointsMaskPistonValves[curFace[pointI]] = 1;
             }
-            
         }
-        
     }
-        
 }
 
 // Return moving points mask.  Moving points marked with 1
@@ -348,7 +315,7 @@ const Foam::scalarField& Foam::verticalValves::movingPointsMaskPistonValves(cons
     {
         movingPointsMaskPistonValvesPtr_ = NULL;
     }
-    
+
     if (!movingPointsMaskPistonValvesPtr_)
     {
         calcMovingMaskPistonValves(i);

@@ -81,7 +81,7 @@ void Foam::simpleTwoStroke::calcMovingMasks() const
         }
     }
 
-    
+
     if(foundScavPorts())
     {
 
@@ -120,9 +120,9 @@ void Foam::simpleTwoStroke::calcMovingMasks() const
                 movingPointsMask[curFace[pointI]] = 0;
             }
         }
-    
+
     }
-           
+
 }
 
 // Return moving points mask.  Moving points marked with 1
@@ -132,7 +132,7 @@ const Foam::scalarField& Foam::simpleTwoStroke::movingPointsMask() const
     {
         movingPointsMaskPtr_ = NULL;
     }
-    
+
     if (!movingPointsMaskPtr_)
     {
         calcMovingMasks();

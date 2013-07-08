@@ -142,7 +142,7 @@ void Foam::layerSmooth::addZonesAndModifiers()
     label nFaceZones = 0;
     label nCellZones = 0;
 
-/* 
+/*
 
     Adding the following faces zones:
     1:  pistonLayerFaces

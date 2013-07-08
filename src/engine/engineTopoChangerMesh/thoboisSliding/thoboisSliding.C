@@ -56,28 +56,28 @@ namespace Foam
 
 
 
-    
+
 bool Foam::thoboisSliding::realDeformation() const
 {
 
     bool deformationValve = false;
     forAll(valves(), valveI)
     {
-        
+
         scalar maxLayer = piston().minLayer();
-            
+
         if(valves()[valveI].bottomPatchID().active())
         {
             maxLayer = max(maxLayer, valves()[valveI].minBottomLayer());
         }
-    
+
         scalar valveDisplacement = valves_[valveI].curVelocity()*valves_[valveI].cs().axis().z()*engTime().deltaT().value()  ;
         if(valvePistonPosition()[valveI] + engTime().pistonDisplacement().value() >
         valveBottomPosition_[valveI] + valveDisplacement - 5.0*maxLayer - 0.001 )
         {
             deformationValve = true;
         }
-    }    
+    }
 
     if(deformationValve)
     {
@@ -111,8 +111,8 @@ Foam::thoboisSliding::thoboisSliding
     pistonPosition_(-GREAT),
     virtualPistonPosition_(-GREAT),
     valveTopPosition_(nValves(),-GREAT),
-    valveBottomPosition_(nValves(),GREAT), 
-    valvePistonPosition_(nValves(),GREAT), 
+    valveBottomPosition_(nValves(),GREAT),
+    valvePistonPosition_(nValves(),GREAT),
     deckHeight_(GREAT),
     minValveZ_(nValves()),
     poppetValveTol_(readScalar(engTime().engineDict().lookup("poppetValveTol"))),
@@ -121,7 +121,7 @@ Foam::thoboisSliding::thoboisSliding
     isReallyClosed_(valves().size(), false),
     correctPointsMotion_(engTime().engineDict().lookup("correctPointsMotion"))
 
-    
+
 {
     // Add zones and modifiers if not already there.
     addZonesAndModifiers();
@@ -136,12 +136,12 @@ Foam::thoboisSliding::thoboisSliding
 
 void Foam::thoboisSliding::setBoundaryVelocity(volVectorField& U)
 {
-    
-    
+
+
     // Set valve velociaty
     forAll (valves(), valveI)
     {
-            
+
         vector valveVel =
             valves()[valveI].curVelocity()*valves()[valveI].cs().axis();
 
@@ -178,7 +178,7 @@ void Foam::thoboisSliding::setBoundaryVelocity(volVectorField& U)
                 valveVel;
         }
 
-        
+
         // If valve is present in geometry, set the motion
         if (valves()[valveI].stemPatchID().active())
         {
@@ -187,7 +187,7 @@ void Foam::thoboisSliding::setBoundaryVelocity(volVectorField& U)
                 valveVel;
         }
 
-     
+
     }
 
 }
@@ -209,7 +209,7 @@ bool Foam::thoboisSliding::inPiston(const point& p) const
 
 bool Foam::thoboisSliding::isACylinderHeadFace
 (
-    const labelList& cylHeadFaces, 
+    const labelList& cylHeadFaces,
     const label face
 )
 {
@@ -220,7 +220,7 @@ bool Foam::thoboisSliding::isACylinderHeadFace
             return true;
         }
     }
-    
+
     return false;
 }
 

@@ -51,7 +51,7 @@ namespace Foam
 
 void Foam::pistonDeform::checkAndCalculate()
 {
-    
+
     label pistonIndex = -1;
     bool foundPiston = false;
 
@@ -60,8 +60,8 @@ void Foam::pistonDeform::checkAndCalculate()
 
     label cylinderHeadIndex = -1;
     bool foundCylinderHead = false;
-    
-    
+
+
     forAll(boundary(), i)
     {
         Info << boundary()[i].name() << endl;
@@ -81,7 +81,7 @@ void Foam::pistonDeform::checkAndCalculate()
             foundCylinderHead = true;
         }
     }
-    
+
     reduce(foundPiston, orOp<bool>());
     reduce(foundLiner, orOp<bool>());
     reduce(foundCylinderHead, orOp<bool>());
@@ -94,14 +94,14 @@ void Foam::pistonDeform::checkAndCalculate()
     }
 
     if (!foundLiner)
-    { 
+    {
         FatalErrorIn("Foam::pistonDeform::checkAndCalculate()")
             << " : cannot find liner patch"
             << abort(FatalError);
     }
 
     if (!foundCylinderHead)
-    { 
+    {
         FatalErrorIn("Foam::pistonDeform::checkAndCalculate()")
             << " : cannot find cylinderHead patch"
             << exit(FatalError);
@@ -127,7 +127,7 @@ void Foam::pistonDeform::checkAndCalculate()
         Info<< "deckHeight: " << deckHeight() << nl
             << "piston position: " << pistonPosition() << endl;
     }
-    
+
 
 }
 
@@ -162,10 +162,10 @@ bool Foam::pistonDeform::update()
 {
     scalar deltaZ = engTime().pistonDisplacement().value();
     Info<< "deltaZ = " << deltaZ << endl;
-    
+
     Info << "pistonPosition = " << pistonPosition_ << endl;
     Info << "deckHeight = " << deckHeight_ << endl;
-    
+
 
     // Position of the top of the static mesh layers above the piston
     scalar pistonPlusLayers = pistonPosition_; //+ pistonLayers_.value();
@@ -182,7 +182,7 @@ bool Foam::pistonDeform::update()
         }
         else if (p.z() < deckHeight_)   // In liner region
         {
-            p.z() += 
+            p.z() +=
                 deltaZ
                *(deckHeight_ - p.z())
                /(deckHeight_ - pistonPlusLayers);
@@ -209,9 +209,9 @@ void Foam::pistonDeform::setBoundaryVelocity(volVectorField& U)
 // Does nothing, using the movingWallVelocity boundary condition for U in the piston patch...
 
 
-    
+
 //    vector pistonVel = piston().cs().axis()*engTime().pistonSpeed().value();
-    
+
     //mean piston velocityy
 /*
     vector pistonVel = 0.5 * piston().cs().axis()*

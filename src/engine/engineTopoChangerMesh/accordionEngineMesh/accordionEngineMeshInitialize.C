@@ -32,7 +32,7 @@ License
 
 void Foam::accordionEngineMesh::checkAndCalculate()
 {
-    
+
     label pistonIndex = -1;
     bool foundPiston = false;
 
@@ -41,8 +41,8 @@ void Foam::accordionEngineMesh::checkAndCalculate()
 
     label cylinderHeadIndex = -1;
     bool foundCylinderHead = false;
-    
-    
+
+
     forAll(boundary(), i)
     {
         if (boundary()[i].name() == piston().patchID().name())
@@ -62,7 +62,7 @@ void Foam::accordionEngineMesh::checkAndCalculate()
             foundCylinderHead = true;
         }
     }
-    
+
     reduce(foundPiston, orOp<bool>());
     reduce(foundLiner, orOp<bool>());
     reduce(foundCylinderHead, orOp<bool>());
@@ -75,14 +75,14 @@ void Foam::accordionEngineMesh::checkAndCalculate()
     }
 
     if (!foundLiner)
-    { 
+    {
         FatalErrorIn("Foam::accordionEngineMesh::checkAndCalculate()")
             << " : cannot find liner patch"
             << abort(FatalError);
     }
 
     if (!foundCylinderHead)
-    { 
+    {
         FatalErrorIn("Foam::accordionEngineMesh::checkAndCalculate()")
             << " : cannot find cylinderHead patch"
             << exit(FatalError);
@@ -103,21 +103,21 @@ void Foam::accordionEngineMesh::checkAndCalculate()
                 boundary()[cylinderHeadIndex].patch().localPoints()
             ).z();
 
- /*        
+ /*
            deckHeight() = max
             (
                 boundary()[linerIndex].patch().localPoints()
             ).z();
-*/                        
+*/
         }
         reduce(deckHeight(), minOp<scalar>());
 
         Info<< "deckHeight: " << deckHeight() << nl
             << "piston position: " << pistonPosition() << endl;
     }
-        
-    
-} 
+
+
+}
 
 void Foam::accordionEngineMesh::setVirtualPositions()
 {

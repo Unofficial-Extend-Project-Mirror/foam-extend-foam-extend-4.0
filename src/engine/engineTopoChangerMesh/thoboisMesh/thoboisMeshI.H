@@ -41,7 +41,7 @@ inline const thoboisValveBank& thoboisMesh::valves() const
 {
     return valves_;
 }
-                 
+
 inline const scalar& thoboisMesh::deformSwitch() const
 {
     return deformSwitch_;

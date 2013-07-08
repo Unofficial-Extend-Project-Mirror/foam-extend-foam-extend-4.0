@@ -36,7 +36,7 @@
                         );
                 }
                 break;
-            
+
                 case 2:
                 {
                     // Assume it is part-circular

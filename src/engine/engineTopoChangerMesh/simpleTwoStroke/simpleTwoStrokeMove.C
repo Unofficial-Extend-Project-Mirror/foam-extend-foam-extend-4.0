@@ -208,7 +208,7 @@ bool Foam::simpleTwoStroke::update()
 
 //    label pistonPtsIndex = pointZones().findZoneID("pistonPoints");
 //    const labelList& pistonPoints = pointZones()[pistonPtsIndex];
-    
+
     labelList pistonPoints;
 
     {

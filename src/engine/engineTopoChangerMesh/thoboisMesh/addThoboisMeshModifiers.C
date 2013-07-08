@@ -42,20 +42,20 @@ void Foam::thoboisMesh::addZonesAndModifiers()
      && faceZones().size() > 0
      && topoChanger_.size() > 0
 
-    ) 
+    )
     {
         Info<< "Time = " << engTime().theta() << endl;
         Info<< "void Foam::thoboisMesh::addZonesAndModifiers() : "
             << "Zones and modifiers already present.  Skipping."
             << endl;
-        
+
         setVirtualPositions();
         checkAndCalculate();
 
         Info << "Point zones found = " << pointZones().size() << endl;
         Info << "Face zones found = " << faceZones().size() << endl;
         Info << "Cell zones found = " << cellZones().size() << endl;
-        
+
         return;
 
     }
@@ -67,7 +67,7 @@ void Foam::thoboisMesh::addZonesAndModifiers()
         topoChanger_.setSize(0);
     }
 
-    
+
     Info << "checkAndCalculate()" << endl;
     checkAndCalculate();
 
@@ -78,9 +78,9 @@ void Foam::thoboisMesh::addZonesAndModifiers()
     Point zones
     1) Piston points
 */
-    
+
     DynamicList<pointZone*> pz;
- 
+
 /*
     Face zones
     1) Piston layer faces
@@ -97,7 +97,7 @@ void Foam::thoboisMesh::addZonesAndModifiers()
     label nFaceZones = 0;
     label nCellZones = 0;
 
-/* 
+/*
 
     Adding the following faces zones:
     1:  pistonLayerFaces

@@ -220,7 +220,7 @@ void engineTimeVaryingTotalPressureFvPatchScalarField::updateCoeffs(const vector
     {
         return;
     }
-    
+
     checkTable();
 
     p0_=

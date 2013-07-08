@@ -35,7 +35,7 @@ License
 
 void Foam::simpleTwoStroke::checkAndCalculate()
 {
-    
+
     label pistonIndex = -1;
     bool foundPiston = false;
 
@@ -44,8 +44,8 @@ void Foam::simpleTwoStroke::checkAndCalculate()
 
     label cylinderHeadIndex = -1;
     bool foundCylinderHead = false;
-    
-    
+
+
     forAll(boundary(), i)
     {
         Info << boundary()[i].name() << endl;
@@ -65,7 +65,7 @@ void Foam::simpleTwoStroke::checkAndCalculate()
             foundCylinderHead = true;
         }
     }
-    
+
     reduce(foundPiston, orOp<bool>());
     reduce(foundLiner, orOp<bool>());
     reduce(foundCylinderHead, orOp<bool>());
@@ -78,14 +78,14 @@ void Foam::simpleTwoStroke::checkAndCalculate()
     }
 
     if (!foundLiner)
-    { 
+    {
         FatalErrorIn("Foam::simpleTwoStroke::checkAndCalculate()")
             << " : cannot find liner patch"
             << abort(FatalError);
     }
 
     if (!foundCylinderHead)
-    { 
+    {
         FatalErrorIn("Foam::simpleTwoStroke::checkAndCalculate()")
             << " : cannot find cylinderHead patch"
             << exit(FatalError);
@@ -111,39 +111,39 @@ void Foam::simpleTwoStroke::checkAndCalculate()
         Info<< "deckHeight: " << deckHeight() << nl
             << "piston position: " << pistonPosition() << endl;
     }
-        
 
-} 
+
+}
 
 void Foam::simpleTwoStroke::setVirtualPistonPosition()
 {
 
     label pistonFaceIndex = faceZones().findZoneID("pistonLayerFaces");
-         
+
     bool foundPistonFace = (pistonFaceIndex != -1);
-    
-    Info << "piston face index = " << pistonFaceIndex << endl; 
-    
+
+    Info << "piston face index = " << pistonFaceIndex << endl;
+
     if(!foundPistonFace)
     {
         FatalErrorIn("Foam::simpleTwoStroke::setVirtualPistonPosition()")
             << " : cannot find the pistonLayerFaces"
             << exit(FatalError);
-    
+
     }
-        
+
     const labelList& pistonFaces = faceZones()[pistonFaceIndex];
     forAll(pistonFaces, i)
     {
         const face& f = faces()[pistonFaces[i]];
-        
+
         // should loop over facepoints...
         forAll(f, j)
         {
             virtualPistonPosition() = max(virtualPistonPosition(), points()[f[j]].z());
         }
     }
-    
+
     reduce(virtualPistonPosition(), maxOp<scalar>());
 
 }

@@ -52,7 +52,7 @@
 
                     valveTopPoint[layeringVPoints[i]] = true;
                 }
-*/                
+*/
 
                 label layeringVCellsIndex =
                     cellZones().findZoneID
@@ -62,11 +62,11 @@
 
                 const labelList& layeringVCells =
                     cellZones()[layeringVCellsIndex];
-                
+
                 labelList layeringVPoints;
-                
+
                 boolList count(newPoints.size(), false);
-            
+
                 forAll(layeringVCells, cellI)
                 {
                     const labelList& curCellPoints = cp[layeringVCells[cellI]];
@@ -99,7 +99,7 @@
                         nCounted++;
                     }
                 }
-                
+
 
                 forAll(layeringVPoints, i)
                 {
@@ -109,7 +109,7 @@
 
                     valveTopPoint[layeringVPoints[i]] = true;
                 }
-                
+
 /*
                 label movingTopPtsVIndex =
                     pointZones().findZoneID
@@ -144,7 +144,7 @@
                 labelList movingTopPointsV;
 
                 boolList count2(newPoints.size(), false);
-            
+
                 forAll(movingTopCellsV, cellI)
                 {
                     const labelList& curCellPoints = cp[movingTopCellsV[cellI]];
@@ -189,7 +189,7 @@
                     }
                 }
 
-                
+
             }
             else
             {

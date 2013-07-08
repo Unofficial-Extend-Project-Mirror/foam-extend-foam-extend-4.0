@@ -40,7 +40,7 @@ inline const thoboisSlidingValveBank& pistonSliding::valves() const
 {
     return valves_;
 }
-                 
+
 inline const scalar& pistonSliding::deformSwitch() const
 {
     return deformSwitch_;

@@ -9,34 +9,34 @@
 
     forAll(valves(), valveI)
     {
-        
-        
-        
-                
+
+
+
+
     }
 
-    forAll(valves(), valveI)    
+    forAll(valves(), valveI)
     {
 
-    
+
         if
         (
             valves_[valveI].detachInCylinderPatchID().active()
          && valves_[valveI].detachInPortPatchID().active()
         )
         {
-        
-            
-        
+
+
+
             Info<< "Adding detach boundary for valve "
                 << valveI + 1 << endl;
 
             const vectorField& areas = Sf().internalField();
-            
+
             DynamicList<label> df;
-            
+
             {
-    
+
                 label headFaces = 0;
                 label ndf = 0;
                 DynamicList<label> headList;
@@ -46,11 +46,11 @@
                 boundaryMesh()[valves()[valveI].poppetPatchID().index()];
 
                 pointField detachPoints(detachPatch.faceCentres());
-                detachPoints += valves()[valveI].cs().axis() * valves()[valveI].detachDistance(); 
+                detachPoints += valves()[valveI].cs().axis() * valves()[valveI].detachDistance();
 
                 forAll(faceCentres(), faceI)
                 {
-                      
+
                     if
                     (
                         min(mag(detachPoints - faceCentres()[faceI])) < valves()[valveI].detachTol()
@@ -70,14 +70,14 @@
                             ndf++;
                         }
                     }
-                }        
+                }
 
-                
-                Info << "Found " << ndf << " internal faces and " 
-                << nHead << " head faces for the valve n. " << valveI + 1 <<  endl ;          
-                
+
+                Info << "Found " << ndf << " internal faces and "
+                << nHead << " head faces for the valve n. " << valveI + 1 <<  endl ;
+
                 df.setSize(ndf);
-                            
+
             }
 
             boolList flip(df.size(), false);
@@ -123,29 +123,29 @@
 /*
 
 
-    
-    forAll(valves(), valveI)    
+
+    forAll(valves(), valveI)
     {
 
-    
+
         if
         (
             valves_[valveI].detachInCylinderPatchID().active()
          && valves_[valveI].detachInPortPatchID().active()
         )
         {
-        
-            
-        
+
+
+
             Info<< "Adding detach boundary for valve "
                 << valveI + 1 << endl;
 
             const vectorField& areas = Sf().internalField();
-            
+
             DynamicList<label> df;
-            
+
             {
-    
+
                 label headFaces = 0;
                 label ndf = 0;
                 DynamicList<label> headList;
@@ -165,36 +165,36 @@
                     scalar xFacePatch = pFacePatch.x();
                     scalar yFacePatch = pFacePatch.y();
                     scalar zFacePatch = pFacePatch.z();
-            
+
                     forAll(faceCentres(),faceI)
                     {
-                
+
                         vector n = faceAreas()[faceI]/mag(faceAreas()[faceI]);
 
 
                         scalar dd = n & valves()[valveI].cs().axis();
-                        
+
 //                        if (mag(dd) > 0.1)
-                        {   
-                
+                        {
+
                             point pFaceMesh = valves()[valveI].cs().toLocal(faceCentres()[faceI]);
 
                             scalar xFaceMesh = pFaceMesh.x();
                             scalar yFaceMesh = pFaceMesh.y();
                             scalar zFaceMesh = pFaceMesh.z();
-                            
+
 //                            Info <<  "mag(xFaceMesh-xFacePatch) = " << mag(xFaceMesh-xFacePatch) << endl;
-                            
-                                                 
+
+
                             if
                             (
-                                mag(xFaceMesh-xFacePatch) < valvePlaneTol_ && 
-                                mag(yFaceMesh-yFacePatch) < valvePlaneTol_ && 
-                                mag(zFaceMesh-zFacePatch) < 
-                                valves()[valveI].detachDistance() + valves()[valveI].detachTol() && 
-                                mag(zFaceMesh-zFacePatch) >  
-                                valves()[valveI].detachDistance() - valves()[valveI].detachTol()  
-//                                && (zFaceMesh-zFacePatch) >  SMALL                          
+                                mag(xFaceMesh-xFacePatch) < valvePlaneTol_ &&
+                                mag(yFaceMesh-yFacePatch) < valvePlaneTol_ &&
+                                mag(zFaceMesh-zFacePatch) <
+                                valves()[valveI].detachDistance() + valves()[valveI].detachTol() &&
+                                mag(zFaceMesh-zFacePatch) >
+                                valves()[valveI].detachDistance() - valves()[valveI].detachTol()
+//                                && (zFaceMesh-zFacePatch) >  SMALL
                             )
                             {
                                 bool isHead = isACylinderHeadFace(cylinderHeadFaces, faceI);
@@ -210,18 +210,18 @@
                                     ndf++;
                                 }
                             }
-                
+
                         }
-                
+
                     }
-        
+
                 }
-                
-                Info << "Found " << ndf << " internal faces and " 
-                << nHead << " head faces for the valve n. " << valveI + 1 <<  endl ;          
-                
+
+                Info << "Found " << ndf << " internal faces and "
+                << nHead << " head faces for the valve n. " << valveI + 1 <<  endl ;
+
                 df.setSize(ndf);
-                            
+
             }
 
             boolList flip(df.size(), false);
@@ -271,6 +271,6 @@
 
 */
     }
-    
+
     Info << "Added attach/detach faces zones for valves" << endl;
-    
+

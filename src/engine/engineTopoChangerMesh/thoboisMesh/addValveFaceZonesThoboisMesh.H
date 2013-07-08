@@ -4,14 +4,14 @@
 
         // for each valve the following zones have to be created:
         //
-        //  - movingFaceZone 
+        //  - movingFaceZone
         //  - movingPointZone
         //  - staticFaceZone
         //  - staticPointZone
-        
+
 /*
         faceSet movingFaces(*this, valves_[valveI].movingFacesName());
-        
+
         fz.append
         (
             new faceZone
@@ -23,11 +23,11 @@
                 faceZones()
             )
         );
-        
+
         nFaceZones++;
-        
+
         faceSet staticFaces(*this, valves_[valveI].staticFacesName());
-        
+
         fz.append
         (
             new faceZone
@@ -39,12 +39,12 @@
                 faceZones()
             )
         );
-        
+
         nFaceZones++;
 */
 
         cellSet movingCells(*this, valves_[valveI].movingCellsName());
-        
+
         cz.append
         (
             new cellZone
@@ -55,11 +55,11 @@
                 cellZones()
             )
         );
-        
+
         nCellZones++;
-        
+
         cellSet staticCells(*this, valves_[valveI].staticCellsName());
-        
+
         cz.append
         (
             new cellZone
@@ -70,9 +70,9 @@
                 cellZones()
             )
         );
-        
+
         nCellZones++;
-        
+
 
         pointSet movingPoints(*this, valves_[valveI].movingPointsName());
 
@@ -86,9 +86,9 @@
                 pointZones()
             )
         );
-        
-        nPointZones++;        
-        
+
+        nPointZones++;
+
         pointSet staticPoints(*this, valves_[valveI].staticPointsName());
 
         pz.append
@@ -101,8 +101,8 @@
                 pointZones()
             )
         );
-        
-        nPointZones++;     
+
+        nPointZones++;
 
         pointSet movingInternalPoints(*this, valves_[valveI].movingInternalPointsName());
 
@@ -116,7 +116,7 @@
                 pointZones()
             )
         );
-        
-        nPointZones++;     
-    }   
+
+        nPointZones++;
+    }
 }

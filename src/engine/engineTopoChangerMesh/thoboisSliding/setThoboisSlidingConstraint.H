@@ -1,12 +1,11 @@
 {
-
-    const pointZoneMesh& pZones = pointZones();
+    // currently unused - commented out below
+    //const pointZoneMesh& pZones = pointZones();
 
     label constraintSize = 0;
 
     forAll(valves_, valveI)
     {
-    
         vector valveVel =
             valves_[valveI].curVelocity()*valves_[valveI].cs().axis();
 
@@ -14,27 +13,26 @@
         {
             valveVel = vector::zero;
         }
-    
-    
+
         {
-    
+
 //          label movingPtsIndex = pZones.findZoneID("movingPointsV"+Foam::name(valveI + 1));
 //          const labelList& movingPointsV = pZones[movingPtsIndex];
 
             labelList movingPointsV;
-          
-            {   
+
+            {
                 label valveMovingCellsIndex = cellZones().findZoneID("movingCellsZoneV" + Foam::name(valveI + 1));
-          
+
                 if (valveMovingCellsIndex < 0)
-                {      
+                {
                     FatalErrorIn("bool verticalValves::update()")
                         << "movingCellsZoneV"+ Foam::name(valveI+1)
                         << abort(FatalError);
                 }
 
                 const labelList& movingCellsZoneV = cellZones()[valveMovingCellsIndex];
-    
+
                 const labelListList& cp = cellPoints();
 
                 boolList count(newPoints.size(), false);
@@ -71,17 +69,17 @@
                         nCounted++;
                     }
                 }
-              
+
             }
-    
+
             forAll(movingPointsV, mpI)
             {
                 constrainedPoints.append(movingPointsV[mpI]);
                 constrainedVelocity.append(valveVel);
-           
+
                 constraintSize++;
             }
-    
+
         }
 
         {
@@ -90,19 +88,19 @@
 //        const labelList& staticPointsV = pZones[staticPtsIndex];
 
             labelList staticPointsV;
-          
-            {   
+
+            {
                 label valveStaticCellsIndex = cellZones().findZoneID("staticCellsZoneV" + Foam::name(valveI + 1));
-          
+
                 if (valveStaticCellsIndex < 0)
-                {      
+                {
                     FatalErrorIn("bool verticalValves::update()")
                         << "staticCellsZoneV"+ Foam::name(valveI+1)
                         << abort(FatalError);
                 }
 
                 const labelList& staticCellsZoneV = cellZones()[valveStaticCellsIndex];
-    
+
                 const labelListList& cp = cellPoints();
 
                 boolList count(newPoints.size(), false);
@@ -139,10 +137,10 @@
                         nCounted++;
                     }
                 }
-              
+
             }
 
-    
+
             forAll(staticPointsV, spI)
             {
                 constrainedPoints.append(staticPointsV[spI]);

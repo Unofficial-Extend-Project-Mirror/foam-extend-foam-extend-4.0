@@ -383,7 +383,7 @@ autoPtr<mapPolyMesh> pistonRefine::refine
                 }
             }
         }
-    }            
+    }
 
 
 
@@ -417,7 +417,7 @@ autoPtr<mapPolyMesh> pistonRefine::unrefine
     const labelList& splitPoints
 )
 {
-    directTopoChange meshMod(*this);  
+    directTopoChange meshMod(*this);
 
     // Play refinement commands into mesh changer.
     meshCutter_.setUnrefinement(splitPoints, meshMod);
@@ -467,7 +467,7 @@ autoPtr<mapPolyMesh> pistonRefine::unrefine
 
 
     // Move mesh
-    
+
     pointField newPoints;
     if (map().hasMotionPoints())
     {
@@ -869,7 +869,7 @@ void pistonRefine::extendMarkedCells(PackedList<1>& markedCell) const
 
 void Foam::pistonRefine::checkAndCalculate()
 {
-    
+
     label pistonIndex = -1;
     bool foundPiston = false;
 
@@ -878,8 +878,8 @@ void Foam::pistonRefine::checkAndCalculate()
 
     label cylinderHeadIndex = -1;
     bool foundCylinderHead = false;
-    
-    
+
+
     forAll(boundary(), i)
     {
         Info << boundary()[i].name() << endl;
@@ -899,7 +899,7 @@ void Foam::pistonRefine::checkAndCalculate()
             foundCylinderHead = true;
         }
     }
-    
+
     reduce(foundPiston, orOp<bool>());
     reduce(foundLiner, orOp<bool>());
     reduce(foundCylinderHead, orOp<bool>());
@@ -912,14 +912,14 @@ void Foam::pistonRefine::checkAndCalculate()
     }
 
     if (!foundLiner)
-    { 
+    {
         FatalErrorIn("Foam::pistonRefine::checkAndCalculate()")
             << " : cannot find liner patch"
             << abort(FatalError);
     }
 
     if (!foundCylinderHead)
-    { 
+    {
         FatalErrorIn("Foam::pistonRefine::checkAndCalculate()")
             << " : cannot find cylinderHead patch"
             << exit(FatalError);
@@ -945,7 +945,7 @@ void Foam::pistonRefine::checkAndCalculate()
         Info<< "deckHeight: " << deckHeight() << nl
             << "piston position: " << pistonPosition() << endl;
     }
-    
+
 
 }
 
@@ -1314,10 +1314,10 @@ bool Foam::pistonRefine::update()
 
     scalar deltaZ = engTime().pistonDisplacement().value();
     Info<< "deltaZ = " << deltaZ << endl;
-    
+
     Info << "pistonPosition = " << pistonPosition_ << endl;
     Info << "deckHeight = " << deckHeight_ << endl;
-    
+
 
     // Position of the top of the static mesh layers above the piston
     scalar pistonPlusLayers = pistonPosition_; //+ pistonLayers_.value();
@@ -1334,7 +1334,7 @@ bool Foam::pistonRefine::update()
         }
         else if (p.z() < deckHeight_)   // In liner region
         {
-            p.z() += 
+            p.z() +=
                 deltaZ
                *(deckHeight_ - p.z())
                /(deckHeight_ - pistonPlusLayers);
@@ -1354,7 +1354,7 @@ bool Foam::pistonRefine::update()
 //    return false;
 //    return hasChanged;
     return true;
-    
+
 }
 
 void Foam::pistonRefine::setBoundaryVelocity(volVectorField& U)
@@ -1362,9 +1362,9 @@ void Foam::pistonRefine::setBoundaryVelocity(volVectorField& U)
 // Does nothing, using the movingWallVelocity boundary condition for U in the piston patch...
 
 
-    
+
 //    vector pistonVel = piston().cs().axis()*engTime().pistonSpeed().value();
-    
+
     //mean piston velocityy
 /*
     vector pistonVel = 0.5 * piston().cs().axis()*

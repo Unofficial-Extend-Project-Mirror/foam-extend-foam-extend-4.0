@@ -37,7 +37,7 @@ Class
 
 void Foam::pistonSliding::checkAndCalculate()
 {
-    
+
     label pistonIndex = -1;
     bool foundPiston = false;
 
@@ -46,8 +46,8 @@ void Foam::pistonSliding::checkAndCalculate()
 
     label cylinderHeadIndex = -1;
     bool foundCylinderHead = false;
-    
-    
+
+
     forAll(boundary(), i)
     {
         if (boundary()[i].name() == "piston")
@@ -66,7 +66,7 @@ void Foam::pistonSliding::checkAndCalculate()
             foundCylinderHead = true;
         }
     }
-    
+
     reduce(foundPiston, orOp<bool>());
     reduce(foundLiner, orOp<bool>());
     reduce(foundCylinderHead, orOp<bool>());
@@ -79,14 +79,14 @@ void Foam::pistonSliding::checkAndCalculate()
     }
 
     if (!foundLiner)
-    { 
+    {
         FatalErrorIn("Foam::verticalValvesGambit::checkAndCalculate()")
             << " : cannot find liner patch"
             << abort(FatalError);
     }
 
     if (!foundCylinderHead)
-    { 
+    {
         FatalErrorIn("Foam::verticalValvesGambit::checkAndCalculate()")
             << " : cannot find cylinderHead patch"
             << exit(FatalError);
@@ -113,9 +113,9 @@ void Foam::pistonSliding::checkAndCalculate()
         Info<< "deckHeight: " << deckHeight() << nl
             << "piston position: " << pistonPosition() << endl;
     }
-        
-    
-} 
+
+
+}
 
 void Foam::pistonSliding::setVirtualPositions()
 {
@@ -124,121 +124,121 @@ void Foam::pistonSliding::setVirtualPositions()
         virtualPistonPosition() = -GREAT;
 
         label pistonFaceIndex = faceZones().findZoneID("pistonLayerFaces");
-         
+
         bool foundPistonFace = (pistonFaceIndex != -1);
-        
+
         if(!foundPistonFace)
         {
             FatalErrorIn("Foam::verticalValvesGambit::setVirtualPistonPosition()")
                 << " : cannot find the pistonLayerFaces"
                 << exit(FatalError);
-    
+
         }
-        
+
         const labelList& pistonFaces = faceZones()[pistonFaceIndex];
         forAll(pistonFaces, i)
         {
             const face& f = faces()[pistonFaces[i]];
-        
+
             // should loop over facepoints...
             forAll(f, j)
             {
                 virtualPistonPosition() = max(virtualPistonPosition(), points()[f[j]].z());
             }
         }
-    
+
         reduce(virtualPistonPosition(), maxOp<scalar>());
-    
+
     }
-*/    
+*/
     forAll(valves_, valveI)
     {
         if(valves_[valveI].poppetPatchID().active())
         {
 
             valveTopPosition_[valveI] = -GREAT;
-        
+
             label valveFaceIndex = faceZones().findZoneID("layeringFacesTopZoneV" + Foam::name(valveI + 1));
-         
+
             bool foundValveFace = (valveFaceIndex != -1);
-        
+
             if(!foundValveFace)
             {
                 FatalErrorIn("Foam::verticalValvesGambit::setVirtualPositions()")
                     << " : cannot find the poppetValveFaces"
                     << exit(FatalError);
             }
-        
+
             const labelList& valvePoppetFaces = faceZones()[valveFaceIndex];
-            
+
             forAll(valvePoppetFaces, i)
             {
                 const face& f = faces()[valvePoppetFaces[i]];
-        
+
                 // should loop over facepoints...
                 forAll(f, j)
                 {
                     valveTopPosition_[valveI] = max(valveTopPosition_[valveI], points()[f[j]].z());
                 }
             }
-    
+
             reduce(valveTopPosition_[valveI], maxOp<scalar>());
-            
-            
+
+
         }
         if(valves_[valveI].bottomPatchID().active())
         {
             valveBottomPosition_[valveI] = GREAT;
-        
+
             label valveFaceIndex = faceZones().findZoneID("layeringFacesBottomZoneV" + Foam::name(valveI + 1));
-         
+
             bool foundValveFace = (valveFaceIndex != -1);
-        
+
             if(!foundValveFace)
             {
                 FatalErrorIn("Foam::verticalValvesGambit::setVirtualPositions()")
                     << " : cannot find the bottomValveFaces"
                     << exit(FatalError);
             }
-        
+
             const labelList& valveBottomFaces = faceZones()[valveFaceIndex];
             forAll(valveBottomFaces, i)
             {
                 const face& f = faces()[valveBottomFaces[i]];
-        
+
                 // should loop over facepoints...
                 forAll(f, j)
                 {
-                    valveBottomPosition_[valveI] = min(valveBottomPosition_[valveI], points()[f[j]].z());                    
+                    valveBottomPosition_[valveI] = min(valveBottomPosition_[valveI], points()[f[j]].z());
                 }
             }
-   
-        
+
+
         }
-        
+
 /*        {
             valvePistonPosition_[valveI] = -GREAT;
-            
+
             label valveFaceIndex = faceZones().findZoneID("pistonLayerFacesV" + Foam::name(valveI + 1));
-                 
+
             const labelList& valvePistonFaces = faceZones()[valveFaceIndex];
             forAll(valvePistonFaces, i)
             {
                 const face& f = faces()[valvePistonFaces[i]];
-        
+
                 // should loop over facepoints...
                 forAll(f, j)
                 {
                     valvePistonPosition_[valveI] = max(valvePistonPosition_[valveI], points()[f[j]].z());
                 }
             }
-    
+
             reduce(valvePistonPosition_[valveI], maxOp<scalar>());
-        
+
         }
-*/    
+*/
     }
-    
-    
+
+
 
 }

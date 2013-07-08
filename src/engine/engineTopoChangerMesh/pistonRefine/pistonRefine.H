@@ -58,7 +58,7 @@ class pistonRefine
 protected:
 
          //- Piston patch
-        simpleEnginePiston piston_;        
+        simpleEnginePiston piston_;
 
         //- Piston Position
         scalar pistonPosition_;
@@ -168,7 +168,7 @@ private:
 
 ////////////////////////////////////////////////    // Private data
 
-               
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -176,11 +176,11 @@ private:
 
         //- Disallow default bitwise assignment
         void operator=(const pistonRefine&);
-        
-        //- Check if all patches exist, then calculate virtualPistonPosition, 
+
+        //- Check if all patches exist, then calculate virtualPistonPosition,
         //- pistonPosition and deckHeight for the first time
         void checkAndCalculate();
-        
+
         //- Add valve and piston zones and modifiers
 //        void addZonesAndModifiers(){}
 
@@ -196,7 +196,7 @@ public:
         explicit pistonRefine(const IOobject& io);
 
 
-    // Destructor 
+    // Destructor
 
         virtual ~pistonRefine();
 
@@ -222,28 +222,28 @@ public:
 
     // Member Functions
 
-        
+
         const scalar& pistonPosition() const
         {
             return pistonPosition_;
         }
 
-        scalar& pistonPosition() 
+        scalar& pistonPosition()
         {
             return pistonPosition_;
         }
-        
-        
+
+
         const scalar& deckHeight() const
         {
             return deckHeight_;
         }
 
-        scalar& deckHeight() 
+        scalar& deckHeight()
         {
             return deckHeight_;
         }
-        
+
 
         const simpleEnginePiston& piston() const
         {
@@ -253,10 +253,10 @@ public:
 
         //- Move and morph
         virtual bool update();
-        
+
         //- Set boundary velocities
         void setBoundaryVelocity(volVectorField& U);
-        
+
     // Writing
 
         //- Write using given format, version and compression

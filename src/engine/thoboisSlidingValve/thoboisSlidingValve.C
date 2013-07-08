@@ -195,7 +195,7 @@ Foam::thoboisSlidingValve::thoboisSlidingValve
     liftProfileEnd_(max(liftProfile_.x())),
     minLift_(readScalar(dict.lookup("minLift"))),
     diameter_(readScalar(dict.lookup("diameter"))),
-    deformationLift_(readScalar(dict.lookup("deformationLift"))),    
+    deformationLift_(readScalar(dict.lookup("deformationLift"))),
     layeringFacesTopName_(dict.lookup("layeringFacesTop")),
     layeringFacesBottomName_(dict.lookup("layeringFacesBottom")),
     movingCellsTopName_(dict.lookup("movingCellsTop")),

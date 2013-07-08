@@ -1,6 +1,6 @@
-    
+
     // adding face zones for the vertical valves
-    
+
     for (label valveI = 0; valveI < nValves(); valveI++)
     {
         // If both sides of the interface exist, add sliding interface
@@ -22,9 +22,9 @@
                     labelList(0),
                     nPointZones,
                     pointZones()
-                )            
+                )
             );
-                            
+
             nPointZones++;
 
             const polyPatch& cylCurtain =
@@ -49,7 +49,7 @@
                     faceZones()
                 )
             );
-                
+
             nFaceZones++;
 
             const polyPatch& portCurtain =
@@ -68,7 +68,7 @@
             }
 
             fz.append
-            (                
+            (
                 new faceZone
                 (
                     "curtainPortZoneV" + Foam::name(valveI + 1),
@@ -78,7 +78,7 @@
                     faceZones()
                 )
             );
-                
+
             nFaceZones++;
 
             // Add empty zone for cut faces
@@ -92,7 +92,7 @@
                     boolList(0, false),
                     nFaceZones,
                     faceZones()
-                )    
+                )
             );
 
             nFaceZones++;
@@ -102,16 +102,16 @@
         {
             Info << "No valve curtain for valve " << valveI + 1 << endl;
         }
-        
-     
+
+
 
         // for each valve the following zones have to be created:
         //
-        //  - movingFaceZone 
+        //  - movingFaceZone
         //  - movingPointZone
         //  - staticFaceZone
         //  - staticPointZone
-        
+
 
         faceSet layeringFacesTop(*this, valves_[valveI].layeringFacesTopName());
 /*
@@ -120,13 +120,13 @@
             Info << "Adding face zone for valve top patch layer addition/removal" << endl;
 
 //            label valvePatchID = valves_[valveI].poppetPatchID().index();
-                    
+
 //            const polyPatch& valveTopPatch = boundaryMesh()[valvePatchID];
-            
+
 //            labelList valveTopLayerFaces(0);
 //            boolList flipZone1(0);
             boolList flipZone1(layeringFacesTop.size(), false);
-            
+
             forAll(layeringFacesTop.toc(), faceI)
             {
 
@@ -135,8 +135,8 @@
                     scalar dd = n & vector(0,0,1);
 
                     if (mag(dd) > SMALL)
-                    {   
-                            
+                    {
+
                             if ((faceAreas()[faceI] & vector(0,0,1)) > 0)
                             {
                                 flipZone1[faceI] = true;
@@ -146,12 +146,12 @@
                                 flipZone1[faceI] = false;
                             }
                    }
-                
-                
+
+
             }
 */
-//        } 
-        
+//        }
+
 	fz.append
         (
             new faceZone
@@ -163,7 +163,7 @@
                 faceZones()
             )
         );
-	
+
         nFaceZones++;
 
         faceSet layeringFacesBottom(*this, valves_[valveI].layeringFacesBottomName());
@@ -179,11 +179,11 @@
                 faceZones()
             )
         );
-	
+
         nFaceZones++;
 
         cellSet movingCellsTop(*this, valves_[valveI].movingCellsTopName());
-        
+
         cz.append
         (
             new cellZone
@@ -194,11 +194,11 @@
                 cellZones()
             )
         );
-        
+
         nCellZones++;
 
         cellSet movingCellsBottom(*this, valves_[valveI].movingCellsBottomName());
-        
+
         cz.append
         (
             new cellZone
@@ -209,7 +209,7 @@
                 cellZones()
             )
         );
-        
+
         nCellZones++;
 
         pointSet movingPointsTop(*this, valves_[valveI].movingPointsTopName());
@@ -224,7 +224,7 @@
                 pointZones()
             )
         );
-	
+
         nPointZones++;
 
         pointSet movingPointsBottom(*this, valves_[valveI].movingPointsBottomName());
@@ -239,11 +239,11 @@
                 pointZones()
             )
         );
-	
+
         nPointZones++;
 
         cellSet movingCells(*this, valves_[valveI].movingCellsName());
-        
+
         cz.append
         (
             new cellZone
@@ -254,11 +254,11 @@
                 cellZones()
             )
         );
-        
+
         nCellZones++;
-        
+
         cellSet staticCells(*this, valves_[valveI].staticCellsName());
-        
+
         cz.append
         (
             new cellZone
@@ -269,9 +269,9 @@
                 cellZones()
             )
         );
-        
+
         nCellZones++;
-        
+
 
         pointSet movingPoints(*this, valves_[valveI].movingPointsName());
 
@@ -285,9 +285,9 @@
                 pointZones()
             )
         );
-        
-        nPointZones++;        
-        
+
+        nPointZones++;
+
         pointSet staticPoints(*this, valves_[valveI].staticPointsName());
 
         pz.append
@@ -300,8 +300,8 @@
                 pointZones()
             )
         );
-        
-        nPointZones++;     
+
+        nPointZones++;
 /*
         pointSet movingInternalPoints(*this, valves_[valveI].movingInternalPointsName());
 
@@ -315,10 +315,10 @@
                 pointZones()
             )
         );
-        
-        nPointZones++;     
+
+        nPointZones++;
 */
-    
- }   
+
+ }
 
 

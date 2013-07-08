@@ -61,7 +61,7 @@ Class
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void Foam::verticalValves::makeLayersLive()
-{ 
+{
     // Enable layering
     forAll (topoChanger_, modI)
     {
@@ -89,7 +89,7 @@ void Foam::verticalValves::makeLayersLive()
 
 void Foam::verticalValves::makeSlidersLive()
 {
- 
+
     // Enable sliding interface
     forAll (topoChanger_, modI)
     {
@@ -139,7 +139,7 @@ bool Foam::verticalValves::attached() const
         {
             if
             (
-                result 
+                result
              != refCast<const slidingInterface>(morphs[modI]).attached()
             )
             {
@@ -200,7 +200,7 @@ void Foam::verticalValves::valveDetach()
             }
 
             ad.setDetach();
-            
+
         }
     }
 }
@@ -251,7 +251,7 @@ void Foam::verticalValves::valveAttach()
             }
 
             ad.setAttach();
-            
+
         }
     }
 }

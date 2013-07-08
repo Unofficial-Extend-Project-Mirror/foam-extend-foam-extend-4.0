@@ -4,17 +4,17 @@
     {
 
         // Piston position
-        
+
         label pistonPatchID = piston().patchID().index();
-        
+
         scalar zPist = max(boundary()[pistonPatchID].patch().localPoints()).z();
-        
+
         Info << "zPist = " << zPist << endl;
 
         scalar zPistV = zPist + offSet();
 
         Info << "zPistV = " << zPistV << endl;
-        
+
         labelList zone1(faceCentres().size());
         boolList flipZone1(faceCentres().size(), false);
         label nZoneFaces1 = 0;
@@ -38,13 +38,13 @@
                     zLower = zc;
                     dl = zPistV - zc;
                 }
-            
+
                 if (zc - zPistV > 0 && zc - zPistV < dh)
                 {
                     zHigher = zc;
                     dh = zc - zHigher;
                 }
-            
+
                 if
                 (
                     zc > zPistV - delta()
@@ -56,23 +56,23 @@
                     {
                         flipZone1[nZoneFaces1] = true;
                     }
-                
+
                     zone1[nZoneFaces1] = faceI;
                     nZoneFaces1++;
                 }
             }
         }
-        
+
         Info << "Gambit mesh, found " << nZoneFaces1 << " faces for layer addition removal" << endl;
         Info << "Piston patch size = " << boundaryMesh()[piston().patchID().index()].size() << endl;
 
         // if no cut was found use the layer above
         if (!foundAtLeastOne)
         {
-            
+
             Info << "NOT FOUND AT LEAST ONE" << endl;
             Info << "zHigher = " << zHigher << endl;
-            
+
             zPistV = zHigher;
 
             forAll (faceCentres(), faceI)
@@ -93,7 +93,7 @@
                         {
                             flipZone1[nZoneFaces1] = true;
                         }
-                    
+
                         zone1[nZoneFaces1] = faceI;
                         nZoneFaces1++;
                     }
@@ -104,7 +104,7 @@
 
         zone1.setSize(nZoneFaces1);
         flipZone1.setSize(nZoneFaces1);
-    
+
 //        fz[nFaceZones]=
         fz.append
         (
@@ -115,18 +115,18 @@
                 flipZone1,
                 nFaceZones,
                 faceZones()
-            )                
+            )
         );
-        
+
         nFaceZones++;
 
 
         // Construct point zones
 
-            
+
         // Points below the piston which moves with the piston displacement
         DynamicList<label> pistonPoints(nPoints() / 10);
-        
+
         forAll (points(), pointI)
         {
             scalar zCoord = points()[pointI].z();
@@ -141,7 +141,7 @@
                 //    << endl;
             }
         }
-                    
+
 
         pz.append
         (
@@ -160,7 +160,7 @@
     else if(piston().patchID().active() && offSet() <= SMALL)
     {
         label pistonPatchID = piston().patchID().index();
-        
+
         const polyPatch& pistonPatch =
             boundaryMesh()[piston().patchID().index()];
 
@@ -187,10 +187,10 @@
         // Construct point zones
 
         scalar zPistV = max(boundary()[pistonPatchID].patch().localPoints()).z();
-            
+
         // Points below the piston which moves with the piston displacement
         DynamicList<label> pistonPoints(nPoints() / 10);
-        
+
         forAll (points(), pointI)
         {
             scalar zCoord = points()[pointI].z();
@@ -205,7 +205,7 @@
                 //    << endl;
             }
         }
-                    
+
         pz.append
         (
             new pointZone
@@ -218,5 +218,5 @@
         );
 
         nPointZones++;
-    
+
     }

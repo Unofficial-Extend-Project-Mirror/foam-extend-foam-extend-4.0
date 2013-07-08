@@ -67,19 +67,19 @@ class thoboisMesh
 
         //- Piston patch
         enginePiston piston_;
-        
+
         //- Lateral valves
         thoboisValveBank valves_;
-                         
+
         //- Layering-to-deformation switch in crank-angle degrees
         scalar deformSwitch_;
-        
+
         //- Tolerance used when the piston faceZone is created
         scalar delta_;
 
         //- Distance from the piston patch
         scalar offSet_;
-        
+
         //- Piston Position
         scalar pistonPosition_;
 
@@ -88,13 +88,13 @@ class thoboisMesh
 
         //- deckHeight
         scalar deckHeight_;
-                               
+
         //- Motion solver
         autoPtr<motionSolver> msPtr_;
 
         //- Cylinder head name
-        word cylinderHeadName_;               
-        
+        word cylinderHeadName_;
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -105,7 +105,7 @@ class thoboisMesh
 
         //- Make layering modifiers live
         void makeLayersLive();
-        
+
         //- Prepare valve attach/detach
         void valveDetach();
 
@@ -115,15 +115,15 @@ class thoboisMesh
         //- Prepare valve attach/detach
         void prepareValveDetach();
 
-        //- Check if all patches exist, then calculate virtualPistonPosition, 
+        //- Check if all patches exist, then calculate virtualPistonPosition,
         //- pistonPosition and deckHeight for the first time
         void checkAndCalculate();
-        
-        //- Calculate the virtualPistonPosition, 
+
+        //- Calculate the virtualPistonPosition,
         void setVirtualPositions();
-                
+
         bool realDeformation() const;
-                                                
+
 public:
 
     //- Runtime type information

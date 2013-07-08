@@ -46,20 +46,20 @@ void Foam::engineValveSliding::addZonesAndModifiers()
      || faceZones().size() > 0
      || cellZones().size() > 0
      || topoChanger_.size() > 0
-    ) 
+    )
     {
         Info<< "Time = " << engTime().theta() << endl;
         Info<< "void Foam::verticalValvesGambit::addZonesAndModifiers() : "
             << "Zones and modifiers already present.  Skipping."
             << endl;
-        
+
         setVirtualPositions();
 //        checkAndCalculate();
 
         Info << "Point zones found = " << pointZones().size() << endl;
         Info << "Face zones found = " << faceZones().size() << endl;
         Info << "Cell zones found = " << cellZones().size() << endl;
-        
+
         return;
 
     }
@@ -75,13 +75,13 @@ void Foam::engineValveSliding::addZonesAndModifiers()
     1) Cut point zone for liner in head
 
     nValves*
-    1) cutPointsV            
+    1) cutPointsV
     2) valveTopPoints
     3) valveBottomPoints
 */
-    
+
     DynamicList<pointZone*> pz;
- 
+
 /*
     Face zones
     1) Piston layer faces
@@ -110,15 +110,15 @@ void Foam::engineValveSliding::addZonesAndModifiers()
     label nFaceZones = 0;
     label nCellZones = 0;
 
-/* 
+/*
     Adding the following faces zones:
     1:  pistonLayerFaces
     nV: pistonLayerFacesV
-    
+
     Adding the following cell zones:
     1:  movingCellsPiston
     nV:  movingCellsPistonV
-    
+
     Adding the following point zones:
     1: pistonPoints
     nV: valvePistonPointsV
@@ -129,25 +129,25 @@ void Foam::engineValveSliding::addZonesAndModifiers()
 
 /*
     Adding the following face zones:
-    
+
     nV: curtainCylZoneV
     nV: curtainPortZoneV
     nV: cutFaceZoneV
     nV: poppetZoneV
     nV: bottomZoneV
-    
+
     Adding the following point zones:
 
     nV: cutPointsV
-    
+
 */
 
 #   include "addValvesFacesPointZonesEngineValveSliding.H"
 
 /*
-    
+
     Adding the following point zones:
-    
+
     nV: valveTopPointsV
     nV: valveBottomPointsV
 

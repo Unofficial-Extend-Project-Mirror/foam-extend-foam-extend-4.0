@@ -53,7 +53,7 @@ namespace Foam
 
 
 
-    
+
 bool Foam::thoboisMesh::realDeformation() const
 {
 
@@ -134,7 +134,7 @@ void Foam::thoboisMesh::setBoundaryVelocity(volVectorField& U)
             U.oldTime().boundaryField()[valves()[valveI].detachInCylinderPatchID().index()] ==
                vector::zero;
         }
-     
+
     }
 
 }

@@ -27,9 +27,9 @@
                 cellZones()
           )
       );
-        
-      nCellZones++;        
-  
+
+      nCellZones++;
+
 
         }
         else
@@ -50,6 +50,6 @@
           )
       );
 
-      nCellZones++;        
+      nCellZones++;
     }
 }

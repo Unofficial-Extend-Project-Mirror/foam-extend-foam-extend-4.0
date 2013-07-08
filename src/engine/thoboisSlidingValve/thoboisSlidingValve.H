@@ -130,28 +130,28 @@ class thoboisSlidingValve
 
         // Mesh motion data
 
-                    
-           //- Name of the faceSet for the valveTop layer 
+
+           //- Name of the faceSet for the valveTop layer
             word layeringFacesTopName_;
-            
-            //- Name of thefaceSet for the valveBottom layer 
+
+            //- Name of thefaceSet for the valveBottom layer
             word layeringFacesBottomName_;
 
 
-            //- Name of thefaceSet for the valveBottom layer 
+            //- Name of thefaceSet for the valveBottom layer
             word movingCellsTopName_;
 
-            //- Name of thefaceSet for the valveBottom layer 
+            //- Name of thefaceSet for the valveBottom layer
             word movingCellsBottomName_;
 
-            //- Name of thefaceSet for the valveBottom layer 
+            //- Name of thefaceSet for the valveBottom layer
             word movingPointsTopName_;
 
-            //- Name of thefaceSet for the valveBottom layer 
+            //- Name of thefaceSet for the valveBottom layer
             word movingPointsBottomName_;
 
             const scalar minTopLayer_;
-   
+
             const scalar maxTopLayer_;
 
             const scalar minBottomLayer_;
@@ -160,19 +160,19 @@ class thoboisSlidingValve
 
             //- Name of the pointSet for the static points
             word staticPointsName_;
-            
+
             //- Name of the pointSet for the moving points
             word movingPointsName_;
 
             //- Name of the pointSet for the moving internal points
 //            word movingInternalPointsName_;
-            
+
             //- Name of the cellSet for the static cells
             word staticCellsName_;
-            
+
             //- Name of the cellSet for the moving cells
             word movingCellsName_;
-        
+
 
     // Private Member Functions
 
@@ -198,7 +198,7 @@ public:
             const polyMesh& mesh,
             const autoPtr<coordinateSystem>& valveCS,
             const word& bottomPatchName,
-	    const word& sidePatchName,    
+	    const word& sidePatchName,
             const word& poppetPatchName,
             const word& stemPatchName,
             const word& curtainInPortPatchName,
@@ -419,7 +419,7 @@ public:
             {
                 return movingCellsName_;
             }
-        
+
 
 
         //- Write dictionary

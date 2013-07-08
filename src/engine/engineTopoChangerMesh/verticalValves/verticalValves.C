@@ -106,8 +106,8 @@ Foam::verticalValves::verticalValves
     pistonPosition_(-GREAT),
     virtualPistonPosition_(-GREAT),
     valveTopPosition_(nValves(),-GREAT),
-    valveBottomPosition_(nValves(),GREAT), 
-    valvePistonPosition_(nValves(),GREAT), 
+    valveBottomPosition_(nValves(),GREAT),
+    valvePistonPosition_(nValves(),GREAT),
     deckHeight_(GREAT),
     minValveZ_(nValves()),
     poppetValveTol_(readScalar(engTime().engineDict().lookup("poppetValveTol"))),
@@ -183,7 +183,7 @@ void Foam::verticalValves::setBoundaryVelocity(volVectorField& U)
                 valveVel;
         }
 
-        
+
         // If valve is present in geometry, set the motion
         if (valves()[valveI].stemPatchID().active())
         {
@@ -211,7 +211,7 @@ void Foam::verticalValves::setBoundaryVelocity(volVectorField& U)
             U.oldTime().boundaryField()[valves()[valveI].detachInCylinderPatchID().index()] ==
                vector::zero;
         }
-     
+
     }
 
 }
@@ -233,7 +233,7 @@ bool Foam::verticalValves::inPiston(const point& p) const
 
 bool Foam::verticalValves::isACylinderHeadFace
 (
-    const labelList& cylHeadFaces, 
+    const labelList& cylHeadFaces,
     const label face
 )
 {
@@ -244,7 +244,7 @@ bool Foam::verticalValves::isACylinderHeadFace
             return true;
         }
     }
-    
+
     return false;
 }
 

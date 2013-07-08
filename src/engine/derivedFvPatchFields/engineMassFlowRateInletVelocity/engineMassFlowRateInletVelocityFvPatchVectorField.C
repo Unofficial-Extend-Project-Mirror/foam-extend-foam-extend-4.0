@@ -176,8 +176,8 @@ void Foam::engineMassFlowRateInletVelocityFvPatchVectorField::updateCoeffs()
 
     // a simpler way of doing this would be nice
     checkTable();
-    
-    scalar massFlowRate = 
+
+    scalar massFlowRate =
     (
         interpolateXY
         (

@@ -104,7 +104,7 @@ class dieselEngineValve
 
             //- Faces to detach
             labelList detachFaces_;
-           
+
             //- detach tolerance
             scalar detachTol_;
 
@@ -126,7 +126,7 @@ class dieselEngineValve
             //- Valve diameter
             const scalar diameter_;
 
-           
+
 
     // Private Member Functions
 

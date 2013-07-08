@@ -4,7 +4,7 @@
     // Mesh in three parts:
     // - pistonPoints - move with deltaZ
     // - headPoints - do not move
-    
+
     const pointZoneMesh& pZones = pointZones();
     label headPtsIndex = pZones.findZoneID("headPoints");
     label pistonPtsIndex = pZones.findZoneID("pistonPoints");
@@ -23,14 +23,14 @@
         label pointI = pistonPoints[i];
         pistonPoint[pointI] = true;
         point& p = newPoints[pointI];
-                
+
         if (p.z() < pistonPosition() - 1.0e-6)
         {
             scaleDisp[pointI] = false;
             nScaled--;
         }
     }
-    
+
 
     forAll(headPoints, i)
     {
@@ -38,7 +38,7 @@
         scaleDisp[headPoints[i]] = false;
         nScaled--;
     }
-    
+
 /*
     Info<< "Mesh nPoints:" << nPoints()
         << " inside:" << nScaled
@@ -55,8 +55,8 @@
             point& p = newPoints[pointI];
 
             if (scaleDisp[pointI])
-            {                
-                p.z() += 
+            {
+                p.z() +=
                     deltaZ
                   * (deckHeight() - p.z())/(deckHeight() - pistonPosition());
             }
@@ -100,7 +100,7 @@
     }
 
     movePoints(newPoints);
-            
+
     pistonPosition() += deltaZ;
     scalar pistonSpeed = deltaZ/engTime().deltaT().value();
 

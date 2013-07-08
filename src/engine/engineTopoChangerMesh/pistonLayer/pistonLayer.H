@@ -65,13 +65,13 @@ class pistonLayer
 
         //- Piston patch
         enginePiston piston_;
-        
+
         //- Layering-to-deformation switch in crank-angle degrees
         scalar deformSwitch_;
-        
+
         //- name of the head pointSet
         word headPointsSetName_;
-        
+
         //- Piston Position
         scalar pistonPosition_;
 
@@ -80,13 +80,13 @@ class pistonLayer
 
         //- deckHeight
         scalar deckHeight_;
-               
+
         //- deckHeight
         Switch scalePoints_;
 
         //- deckHeight
         Switch movePointsBelowPiston_;
-        
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -97,12 +97,12 @@ class pistonLayer
 
         //- Make layering modifiers live
         void makeLayersLive();
-        
-        //- Check if all patches exist, then calculate virtualPistonPosition, 
+
+        //- Check if all patches exist, then calculate virtualPistonPosition,
         //- pistonPosition and deckHeight for the first time
         void checkAndCalculate();
-        
-        //- Calculate the virtualPistonPosition, 
+
+        //- Calculate the virtualPistonPosition,
         void setVirtualPistonPosition();
 
         //- Add valve and piston zones and modifiers
@@ -120,43 +120,43 @@ public:
         explicit pistonLayer(const IOobject& io);
 
 
-    // Destructor 
+    // Destructor
 
         virtual ~pistonLayer();
 
     // Member Functions
 
-        
+
         const scalar& pistonPosition() const
         {
             return pistonPosition_;
         }
 
-        scalar& pistonPosition() 
+        scalar& pistonPosition()
         {
             return pistonPosition_;
         }
-        
+
         const scalar& virtualPistonPosition() const
         {
             return virtualPistonPosition_;
         }
 
-        scalar& virtualPistonPosition() 
+        scalar& virtualPistonPosition()
         {
             return virtualPistonPosition_;
         }
-        
+
         const scalar& deckHeight() const
         {
             return deckHeight_;
         }
 
-        scalar& deckHeight() 
+        scalar& deckHeight()
         {
             return deckHeight_;
         }
-        
+
 
         const enginePiston& piston() const
         {
@@ -174,7 +174,7 @@ public:
 
         //- Move and morph
         virtual bool update();
-        
+
         //- Set boundary velocities
         void setBoundaryVelocity(volVectorField& U);
 
