@@ -1,0 +1,67 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.2                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version 2.0;
+    format ascii;
+
+    root "/home/coyote/hjasak/OpenFOAM/OpenFOAM-1.2/tutorials/newStressedFoam";
+    case "plateHole";
+    instance ""0"";
+    local "";
+
+    class volVectorField;
+    object DU;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+
+axis
+{
+    type symmetryPlane;
+}
+
+loading
+{
+    type fixedDisplacement;
+    value uniform (0 -0.00025 0);
+}
+
+freeSurface
+{
+    type solidTractionFree;
+}
+
+bottom
+{
+    type fixedDisplacement;
+    value uniform (0 0 0);
+}
+
+front
+{
+    type solidTractionFree;
+}
+
+back
+{
+    type solidTractionFree;
+}
+
+}
+
+
+// ************************************************************************* //

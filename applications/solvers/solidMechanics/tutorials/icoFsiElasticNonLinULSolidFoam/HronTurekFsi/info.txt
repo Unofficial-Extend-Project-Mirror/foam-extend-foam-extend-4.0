@@ -1,0 +1,45 @@
+Solver
+	icoFsiElasticNonLinSolidFoam
+
+Description
+	This solver is for fluid-structure interaction of an incompressible
+	fluid and a large deformation solid.
+
+OpenFOAM versions
+	 1.6-ext
+
+Parallelised
+	yes
+
+Tutorial Case
+	HronTurekFsi2
+
+Case setup notes
+     	setSet -case fluid
+
+	faceSet plateZone new patchToFace plate
+	quit
+
+	setsToZones -case fluid -noFlipMap
+
+	//- for parallel runs
+	decomposePar -case fluid -cellDist
+
+	
+
+	setSet -case solid
+
+	faceSet plateZone new patchToFace plate
+	quit
+	setsToZones -case solid -noFlipMap
+
+	//- for parallel runs
+	decomposePar -case solid -cellDist
+
+	
+	//- for serial runs
+	./removeSerialLinks fluid solid
+	./makeSerialLinks fluid solid
+
+	//- for parallel runs
+	./makeLinks fluid solid

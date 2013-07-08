@@ -1,0 +1,15 @@
+#!/bin/sh
+
+currDir=`pwd`
+application=`basename $currDir`
+case="HronTurekFsi"
+
+tutorialPath=`dirname $0`/..
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+(cd $case/fluid; runApplication setSet -case fluid -batch fluid/batch.setSet)
+(cd $case/fluid; runApplication setsToZones -case fluid -noFlipMap)
+(cd $case/solid; runApplication setSet -case solid -batch solid/batch.setSet)
+(cd $case/solid; runApplication setsToZones -case solid -noFlipMap)
+(cd $case; ./makeSerialLinks fluid solid)
+(cd $case/fluid; runApplication $application)

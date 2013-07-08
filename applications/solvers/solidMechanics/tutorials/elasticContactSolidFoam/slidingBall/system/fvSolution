@@ -1,0 +1,64 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.0                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          fvSolution;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+	U
+	{
+		solver          GAMG;
+		tolerance       1e-09;
+    		relTol          0.99;
+    		smoother        GaussSeidel;
+    		cacheAgglomeration true;
+    		nCellsInCoarsestLevel 63;
+    		agglomerator    faceAreaPair;
+    		mergeLevels     1;
+	}
+
+
+/*	U
+	{
+    		solver          PCG;
+    		preconditioner  DIC;
+    		tolerance       1e-09;
+    		relTol          0.99;
+	}*/
+}
+
+stressedFoam
+{
+	nCorrectors		7000;
+	U			1e-8;
+
+	divSigmaExp	surface;
+	predictor       yes;
+}
+
+relaxationFactors
+{
+	U			0.95;
+}
+
+
+// ************************************************************************* //

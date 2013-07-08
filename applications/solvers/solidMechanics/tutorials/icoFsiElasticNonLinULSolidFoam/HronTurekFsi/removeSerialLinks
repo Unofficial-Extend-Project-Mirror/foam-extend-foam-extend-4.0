@@ -1,0 +1,17 @@
+#!/bin/tcsh
+
+# Check for proper number of command line args.                                                                                                               
+if ($#argv != 2) then
+  echo "Usage: makeLinks fluidCase solidCase"
+  goto done
+endif
+
+cd $1
+
+rm -rf 0/solid
+
+rm -rf constant/solid
+
+rm -rf system/solid
+
+cd ..

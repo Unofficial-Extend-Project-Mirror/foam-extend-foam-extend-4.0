@@ -1,0 +1,14 @@
+# delete old sets and zones
+rm -rf constant/polyMesh/sets
+rm -rf constant/polyMesh/*Zones
+
+# create new sets
+setSet
+faceSet bottomBrickUpFaceZone new patchToFace bottomBrickUp
+faceSet topBrickDownFaceZone new patchToFace topBrickDown
+pointSet bottomBrickUpPointZone new faceToPoint bottomBrickUpFaceZone all
+pointSet topBrickDownPointZone new faceToPoint topBrickDownFaceZone all
+quit
+
+# create zones from sets
+setsToZones -noFlipMap

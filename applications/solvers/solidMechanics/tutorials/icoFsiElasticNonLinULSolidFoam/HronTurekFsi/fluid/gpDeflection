@@ -1,0 +1,17 @@
+set terminal postscript enhanced color solid
+
+set output "deflection.ps"
+set xlabel "Time, t [s]"
+set ylabel "Deflection, d [m]"
+set grid
+
+plot [0:] "./history/3.8/historySolid.dat" using 1:($3 - 0.2) title "UL" with lines
+
+
+#plot [0:] "../../totalLagrangian/fluid-rho10-2/history/0/historySolid.dat" using 1:($3) title "TL" with lines, \
+#"../fluid-rho10-corr/history/0/historySolid.dat" using 1:($3 - 0.2) title "UL-corr" with lines, \
+#"./history/0/historySolid.dat" using 1:($3 - 0.2) title "UL" with lines, \
+#"../../incrementalTotalLagrangian/fluid-rho10-2/history/0/historySolid.dat" using 1:($3) title "ITL" with lines
+
+#set output
+#set terminal x11

@@ -1,0 +1,49 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      contactProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+nContactCorrectors              1;
+contactSolTolerance             1e-8;
+innerContactCorrectFreq         10;
+
+contacts
+1
+(
+    ballAndBrickContact
+    {
+      contactActive                   yes;
+      masterPatch                     bottomBrickUp;
+      slavePatch                      topBrickDown;
+      contactGapTol                   5e-8;
+      
+      rigidMaster                     no;
+      interpolationMethod             patchToPatch;
+      //interpolationMethod             ggi;;
+      
+      penaltyScaleFactor              4e5;
+      returnScaleFactor               1.5;
+      
+      projectionDir  contactSphere;
+      projectionAlgo visible;
+      penetrationLimit                -0.03;
+      nContactSettleIterations        0;
+      
+      smoothContactPatches            no;
+      shearCorrection                 no;
+      shearFactor                     1e9;
+    }
+);
+
+// ************************************************************************* //

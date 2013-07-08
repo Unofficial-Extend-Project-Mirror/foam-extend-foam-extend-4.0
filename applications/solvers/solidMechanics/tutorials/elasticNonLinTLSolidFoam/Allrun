@@ -1,0 +1,18 @@
+#!/bin/sh                                                                                                                                                     
+
+currDir=`pwd`
+application=`basename $currDir`
+cases="nonLinBlock largeStrainCantileverBeam"
+
+tutorialPath=`dirname $0`/..
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+for case in $cases
+do
+    (cd $case; runApplication blockMesh)
+    (cd $case; runApplication $application)
+done
+
+case="rotateSphereTL"
+    (cd $case; runApplication fluent3dMeshToFoam rotateSphere.msh)
+    (cd $case; runApplication $application)

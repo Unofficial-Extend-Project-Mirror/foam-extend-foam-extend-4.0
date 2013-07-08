@@ -1,0 +1,5 @@
+faceSet sphereContactFaceZone new patchToFace sphereContact
+faceSet brickTopFaceZone new patchToFace brickTop
+pointSet brickTopPointZone new faceToPoint brickTopFaceZone all
+pointSet sphereContactPointZone new faceToPoint sphereContactFaceZone all
+quit

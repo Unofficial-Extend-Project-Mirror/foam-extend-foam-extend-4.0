@@ -1,0 +1,10 @@
+EXE_INC = \
+    -I$(LIB_SRC)/finiteArea/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(WM_PROJECT_USER_DIR)/src/finiteVolume/lnInclude \
+    -I../solidModels/lnInclude
+
+EXE_LIBS = \
+    -L$(FOAM_USER_LIBBIN) -lsolidModels \
+    -lfiniteArea \
+    -lfiniteVolume

@@ -1,0 +1,82 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+10
+(
+    bottomBrickDown
+    {
+        type            patch;
+        nFaces          40;
+        startFace       1500;
+    }
+    bottomBrickUp
+    {
+        type            patch;
+        nFaces          40;
+        startFace       1540;
+    }
+    topBrickDown
+    {
+        type            patch;
+        nFaces          40;
+        startFace       1580;
+    }
+    topBrickUp
+    {
+        type            patch;
+        nFaces          40;
+        startFace       1620;
+    }
+    bottomBrickLeft
+    {
+        type            patch;
+        nFaces          10;
+        startFace       1660;
+    }
+    bottomBrickRight
+    {
+        type            patch;
+        nFaces          10;
+        startFace       1670;
+    }
+    topBrickLeft
+    {
+        type            patch;
+        nFaces          10;
+        startFace       1680;
+    }
+    topBrickRight
+    {
+        type            patch;
+        nFaces          10;
+        startFace       1690;
+    }
+    back
+    {
+        type            empty;
+        nFaces          800;
+        startFace       1700;
+    }
+    front
+    {
+        type            empty;
+        nFaces          800;
+        startFace       2500;
+    }
+)
+
+// ************************************************************************* //

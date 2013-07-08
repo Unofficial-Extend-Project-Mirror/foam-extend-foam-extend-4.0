@@ -1,0 +1,47 @@
+// Mesh decomposition control dictionary
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+FoamFile
+{
+    version 0.5;
+    format ascii;
+
+    root     "ROOT";
+    case     "CASE";
+    instance "system";
+    local    "";
+
+    class dictionary;
+
+    object decompositionDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+numberOfSubdomains   4;
+
+method               simple;
+//method               hierarchical;
+//method               metis;
+//method               manual;
+
+simpleCoeffs
+{
+    n                    (2 2 1);
+    delta                0;
+}
+
+hierarchicalCoeffs
+{
+    n                    (2 2 1);
+    delta                0.001;
+    order                xyz;
+}
+
+manualCoeffs
+{
+    dataFile             "decompositionData";
+}
+
+// ************************************************************************* //

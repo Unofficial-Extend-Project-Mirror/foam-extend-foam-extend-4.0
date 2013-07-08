@@ -1,0 +1,17 @@
+#!/bin/sh
+
+currDir=`pwd`
+application=`basename $currDir`
+
+tutorialPath=`dirname $0`/..
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+case="timeVaryingNonLinPlateHole"
+
+(cd $case; runApplication blockMesh)
+(cd $case; runApplication $application)
+
+case="rotateSphere"
+
+(cd $case; runApplication fluent3DMeshToFoam rotateSphere.msh)
+(cd $case; runApplication $application)
