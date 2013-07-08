@@ -4,5 +4,6 @@
 
 application="surfactantFoam"
 
+runApplication blockMesh
 runApplication makeFaMesh
 runApplication $application
