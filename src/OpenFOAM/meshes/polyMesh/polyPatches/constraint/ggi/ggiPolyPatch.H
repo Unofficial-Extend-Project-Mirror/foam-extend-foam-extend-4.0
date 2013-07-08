@@ -73,6 +73,10 @@ class ggiPolyPatch
         //- Use bridging to fix overlap error in interpolation
         Switch bridgeOverlap_;
 
+        //- Quick reject algorithm
+        ggiZoneInterpolation::quickReject reject_;
+
+
         // Demand-driven data
 
             //- Shadow patch index.  Delayed evaluation for construction
@@ -214,7 +218,9 @@ public:
             const polyBoundaryMesh& bm,
             const word& shadowName,
             const word& zoneName,
-            const bool bridgeOverlap
+            const bool bridgeOverlap,
+            const ggiZoneInterpolation::quickReject
+                reject = ggiZoneInterpolation::BB_OCTREE
         );
 
         //- Construct from dictionary
@@ -307,6 +313,11 @@ public:
             //- Return interpolation face zone
             const faceZone& zone() const;
 
+        //- Is this the slave side?
+        bool slave() const
+        {
+            return !master();
+        }
 
         // Interpolation data
 

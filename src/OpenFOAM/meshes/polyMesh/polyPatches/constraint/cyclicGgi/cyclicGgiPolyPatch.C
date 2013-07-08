@@ -257,7 +257,7 @@ const Foam::cyclicGgiPolyPatch& Foam::cyclicGgiPolyPatch::cyclicShadow() const
 }
 
 
-void Foam::cyclicGgiPolyPatch::calcTransforms()
+void Foam::cyclicGgiPolyPatch::calcTransforms() const
 {
     if (active() && debug)
     {

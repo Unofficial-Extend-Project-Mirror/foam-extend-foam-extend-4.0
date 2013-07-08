@@ -248,37 +248,53 @@ void BlockLduMatrix<scalar>::AmulCore
     const scalarField& x
 ) const
 {
-    const scalarField& Diag = diag();
-
-    for (register label rowI = 0; rowI < x.size(); rowI++)
-    {
-        Ax[rowI] = Diag[rowI]*x[rowI];
-    }
-
     // Note: pointer looping
     const label* const __restrict__ U = lduAddr().upperAddr().begin();
     const label* const __restrict__ L = lduAddr().lowerAddr().begin();
+    
+    const scalar* const __restrict__ X = x.begin();
+    scalar* __restrict__ AX = Ax.begin();
+    
+    if (thereIsDiag())
+    {
+        const scalar* const __restrict__ diagPtr = diag().begin();
 
+        register const label nCells = diag().size();
+        for (register label cell=0; cell<nCells; cell++)
+        {
+            // AmulCore must be additive to account for initialisation step
+            // in ldu interfaces.  HJ, 6/Nov/2007
+            AX[cell] += diagPtr[cell]*X[cell];
+        }
+    }
+    
     if (symmetric())
     {
-        const scalar* const __restrict__ Upper = upper().begin();
-        const scalar* const __restrict__ X = x.begin();
-
-        scalar* __restrict__ AX = Ax.begin();
-
-        for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+        if (thereIsUpper())
         {
-            AX[U[coeffI]] += Upper[coeffI]*X[L[coeffI]];
-            AX[L[coeffI]] += Upper[coeffI]*X[U[coeffI]];
+            const scalar* const __restrict__ Upper = upper().begin();
+
+            for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+            {
+                AX[U[coeffI]] += Upper[coeffI]*X[L[coeffI]];
+                AX[L[coeffI]] += Upper[coeffI]*X[U[coeffI]];
+            }
+        }
+        else
+        {
+            const scalar* const __restrict__ Lower = lower().begin();
+
+            for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+            {
+                AX[U[coeffI]] += Lower[coeffI]*X[L[coeffI]];
+                AX[L[coeffI]] += Lower[coeffI]*X[U[coeffI]];
+            }
         }
     }
     else if (asymmetric())
     {
         const scalar* const __restrict__ Lower = lower().begin();
         const scalar* const __restrict__  Upper = upper().begin();
-        const scalar* const __restrict__ X = x.begin();
-
-        scalar* __restrict__ AX = Ax.begin();
 
         for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
         {
@@ -296,37 +312,53 @@ void BlockLduMatrix<scalar>::TmulCore
     const scalarField& x
 ) const
 {
-    const scalarField& Diag = diag();
-
-    for (register label rowI = 0; rowI < x.size(); rowI++)
-    {
-        Tx[rowI] = Diag[rowI]*x[rowI];
-    }
-
     // Note: pointer looping
     const label* const __restrict__ U = lduAddr().upperAddr().begin();
     const label* const __restrict__ L = lduAddr().lowerAddr().begin();
+    
+    const scalar* const __restrict__ X = x.begin();
+    scalar* __restrict__ TX = Tx.begin();
+    
+    if (thereIsDiag())
+    {
+        const scalar* const __restrict__ diagPtr = diag().begin();
+
+        register const label nCells = diag().size();
+        for (register label cell=0; cell<nCells; cell++)
+        {
+            // AmulCore must be additive to account for initialisation step
+            // in ldu interfaces.  HJ, 6/Nov/2007
+            TX[cell] += diagPtr[cell]*X[cell];
+        }
+    }
 
     if (symmetric())
     {
-        const scalar* const __restrict__ Upper = upper().begin();
-        const scalar* const __restrict__ X = x.begin();
-
-        scalar* __restrict__ TX = Tx.begin();
-
-        for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+        if (thereIsUpper())
         {
-            TX[U[coeffI]] += Upper[coeffI]*X[L[coeffI]];
-            TX[L[coeffI]] += Upper[coeffI]*X[U[coeffI]];
+            const scalar* const __restrict__ Upper = upper().begin();
+
+            for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+            {
+                TX[U[coeffI]] += Upper[coeffI]*X[L[coeffI]];
+                TX[L[coeffI]] += Upper[coeffI]*X[U[coeffI]];
+            }
+        }
+        else
+        {
+            const scalar* const __restrict__ Lower = lower().begin();
+
+            for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+            {
+                TX[U[coeffI]] += Lower[coeffI]*X[L[coeffI]];
+                TX[L[coeffI]] += Lower[coeffI]*X[U[coeffI]];
+            }
         }
     }
     else if (asymmetric())
     {
         const scalar* const __restrict__ Lower = lower().begin();
         const scalar* const __restrict__ Upper = upper().begin();
-        const scalar* const __restrict__ X = x.begin();
-
-        scalar* __restrict__ TX = Tx.begin();
 
         for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
         {
@@ -368,23 +400,62 @@ tmp<scalarField> BlockLduMatrix<scalar>::H(const scalarField& x) const
         const label* const __restrict__ U = lduAddr().upperAddr().begin();
         const label* const __restrict__ L = lduAddr().lowerAddr().begin();
 
-        const scalar* const __restrict__ Lower = lower().begin();
-        const scalar* const __restrict__ Upper = upper().begin();
         const scalar* const __restrict__ X = x.begin();
-
-        scalar* __restrict__ R = result.begin();
-
-        for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+        
+        if (symmetric())
         {
-            R[U[coeffI]] -= Upper[coeffI]*X[U[coeffI]];
+            if (thereIsUpper())
+            {
+                const scalar* const __restrict__ Upper = upper().begin();
+            
+                scalar* __restrict__ R = result.begin();
+        
+                for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+                {
+                    R[U[coeffI]] -= Upper[coeffI]*X[U[coeffI]];
+                }
+
+                for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+                {
+                    R[L[coeffI]] -= Upper[coeffI]*X[L[coeffI]];
+                }
+            }
+            else if (thereIsLower())
+            {
+                const scalar* const __restrict__ Lower = lower().begin();
+                
+                scalar* __restrict__ R = result.begin();
+
+                for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+                {
+                    R[U[coeffI]] -= Lower[coeffI]*X[U[coeffI]];
+                }
+
+                for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+                {
+                    R[L[coeffI]] -= Lower[coeffI]*X[L[coeffI]];
+                }
+            }
         }
-
-        for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+        else
         {
-            R[L[coeffI]] -= Lower[coeffI]*X[L[coeffI]];
+            const scalar* const __restrict__ Lower = lower().begin();
+            const scalar* const __restrict__ Upper = upper().begin();
+            
+            scalar* __restrict__ R = result.begin();
+
+            for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+            {
+                R[U[coeffI]] -= Upper[coeffI]*X[U[coeffI]];
+            }
+
+            for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+            {
+                R[L[coeffI]] -= Lower[coeffI]*X[L[coeffI]];
+            }
         }
     }
-
+    
     return tresult;
 }
 
@@ -397,19 +468,57 @@ tmp<scalarField> BlockLduMatrix<scalar>::faceH(const scalarField& x) const
 
     if (thereIsUpper() || thereIsLower())
     {
-        // Note: pointer looping
-        const label* const __restrict__ U = lduAddr().upperAddr().begin();
-        const label* const __restrict__ L = lduAddr().lowerAddr().begin();
-
-        const scalar* const __restrict__ Lower = lower().begin();
-        const scalar* const __restrict__ Upper = upper().begin();
-        const scalar* const __restrict__ X = x.begin();
-
-        scalar* __restrict__ R = result.begin();
-
-        for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+        if (symmetric())
         {
-            R[coeffI] = Upper[coeffI]*X[U[coeffI]] - Lower[coeffI]*X[L[coeffI]];
+            if (thereIsUpper())
+            {
+                // Note: pointer looping
+                const label* const __restrict__ U = lduAddr().upperAddr().begin();
+                const label* const __restrict__ L = lduAddr().lowerAddr().begin();
+
+                const scalar* const __restrict__ Upper = upper().begin();
+                const scalar* const __restrict__ X = x.begin();
+
+                scalar* __restrict__ R = result.begin();
+
+                for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+                {
+                    R[coeffI] = Upper[coeffI]*(X[U[coeffI]] - X[L[coeffI]]);
+                }
+            }
+            else if (thereIsLower())
+            {
+                // Note: pointer looping
+                const label* const __restrict__ U = lduAddr().upperAddr().begin();
+                const label* const __restrict__ L = lduAddr().lowerAddr().begin();
+
+                const scalar* const __restrict__ Lower = lower().begin();
+                const scalar* const __restrict__ X = x.begin();
+
+                scalar* __restrict__ R = result.begin();
+
+                for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+                {
+                    R[coeffI] = Lower[coeffI]*(X[U[coeffI]] - X[L[coeffI]]);
+                }
+            }
+        }
+        else
+        {
+            // Note: pointer looping
+            const label* const __restrict__ U = lduAddr().upperAddr().begin();
+            const label* const __restrict__ L = lduAddr().lowerAddr().begin();
+
+            const scalar* const __restrict__ Lower = lower().begin();
+            const scalar* const __restrict__ Upper = upper().begin();
+            const scalar* const __restrict__ X = x.begin();
+
+            scalar* __restrict__ R = result.begin();
+
+            for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
+            {
+                R[coeffI] = Upper[coeffI]*X[U[coeffI]] - Lower[coeffI]*X[L[coeffI]];
+            }
         }
     }
 

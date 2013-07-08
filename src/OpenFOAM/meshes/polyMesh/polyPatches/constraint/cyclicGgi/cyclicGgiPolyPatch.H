@@ -75,7 +75,7 @@ class cyclicGgiPolyPatch
 
         //- Calculate cyclic transforms (rotation and translation)
         //  Virtual over-ride for base GGI patch.  HJ, 14/Jan/2009
-        virtual void calcTransforms();
+        virtual void calcTransforms() const;
 
         //- Check definition: angles and offsets
         void checkDefinition() const;

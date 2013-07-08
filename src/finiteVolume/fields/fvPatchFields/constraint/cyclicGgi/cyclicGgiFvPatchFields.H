@@ -53,6 +53,30 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+template<>
+void cyclicGgiFvPatchField<scalar>::initInterfaceMatrixUpdate
+(
+    const Field<scalar>& psiInternal,
+    Field<scalar>& result,
+    const BlockLduMatrix<scalar>& m,
+    const CoeffField<scalar>& coeffs,
+    const Pstream::commsTypes commsType
+) const;
+
+
+template<>
+void cyclicGgiFvPatchField<vector>::initInterfaceMatrixUpdate
+(
+    const Field<vector>& psiInternal,
+    Field<vector>& result,
+    const BlockLduMatrix<vector>& m,
+    const CoeffField<vector>& coeffs,
+    const Pstream::commsTypes commsType
+) const;
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 makePatchTypeFieldTypedefs(cyclicGgi)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
