@@ -82,6 +82,9 @@ class layerAdditionRemoval
         //- Layer addition trigger  time index
         mutable label triggerAddition_;
 
+        //- cell zone for new cells
+        label cellZone_;
+
 
     // Private Member Functions
 
@@ -150,7 +153,8 @@ public:
             const polyTopoChanger& mme,
             const word& zoneName,
             const scalar minThickness,
-            const scalar maxThickness
+            const scalar maxThickness,
+            const label cellZone = -1
         );
 
         //- Construct from dictionary

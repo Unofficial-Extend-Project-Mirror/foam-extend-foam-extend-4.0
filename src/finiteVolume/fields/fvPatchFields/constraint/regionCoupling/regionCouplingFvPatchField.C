@@ -29,7 +29,7 @@ Author
 
 #include "regionCouplingFvPatchField.H"
 #include "symmTransformField.H"
-#include "magLongDelta.H"
+#include "harmonic.H"
 #include "volFields.H"
 #include "surfaceFields.H"
 
@@ -41,97 +41,18 @@ namespace Foam
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
-tmp<scalarField>
-regionCouplingFvPatchField<Type>::weights
-(
-    const Field<Type>& fOwn,
-    const Field<Type>& fNei
-) const
+const Foam::Field<Type>& regionCouplingFvPatchField<Type>::originalPatchField() const
 {
-    tmp<scalarField> tweights(new scalarField(fOwn.size(), 0.5));
-    scalarField& weights = tweights();
-
-    // Larger small for complex arithmetic accuracy
-    const scalar kSmall = 1000*SMALL;
-
-# if 0
-    // Hrv's treatment
-    scalarField mOwn = mag(fOwn);
-    scalarField mNei = mag(fNei);
-    scalarField mean = 2*(mOwn*mNei)/(mOwn + mNei);
-
-    scalar den;
-
-    forAll (weights, faceI)
+    if (curTimeIndex_ != this->db().time().timeIndex())
     {
-        den = (mNei[faceI] - mOwn[faceI]);
+        // Store original field for symmetric evaluation
+        // Henrik Rusche, Aug/2011
 
-        // Note: complex arithmetic requires extra accuracy
-        // This is a division of two close subtractions
-        // HJ, 28/Sep/2011
-        if (mag(den) > kSmall)
-        {
-            // Limit weights for round-off safety
-            weights[faceI] =
-                Foam::max(0, Foam::min((mNei[faceI] - mean[faceI])/den, 1));
-        }
-        else
-        {
-            // Use 0.5 weights
-        }
+        originalPatchField_ = *this;
+        curTimeIndex_ = this->db().time().timeIndex();
     }
 
-# else
-
-    // Henrik's treatment
-    const fvPatch& p = this->patch();
-
-    // Note: for interpolation, work with face fields, to allow wall-corrected
-    // diffusivity (eg wall functions) to operate correctly.
-    // HJ, 28/Sep/2011
-
-    // Mag long deltas are identical on both sides.  HJ, 28/Sep/2011
-    const magLongDelta& mld = magLongDelta::New(p.boundaryMesh().mesh());
-
-    scalarField magPhiOwn = mag(fOwn);
-    scalarField magPhiNei = mag(fNei);
-
-    const scalarField& pWeights = p.weights();
-    const scalarField& pDeltaCoeffs = p.deltaCoeffs();
-    const scalarField& pLongDelta = mld.magDelta(p.index());
-
-    forAll (weights, faceI)
-    {
-        scalar mOwn = magPhiOwn[faceI]/(1 - pWeights[faceI]);
-        scalar mNei = magPhiNei[faceI]/pWeights[faceI];
-
-        scalar den = magPhiNei[faceI] - magPhiOwn[faceI];
-
-        // Note: complex arithmetic requires extra accuracy
-        // This is a division of two close subtractions
-        // HJ, 28/Sep/2011
-        if (mag(den) > kSmall)
-        {
-            scalar mean = mOwn*mNei/
-                (
-                    (mOwn + mNei)*
-                    pLongDelta[faceI]*
-                    pDeltaCoeffs[faceI]
-                );
-
-            // Limit weights for round-off safety
-            weights[faceI] =
-                Foam::max(0, Foam::min((magPhiNei[faceI] - mean)/den, 1));
-        }
-        else
-        {
-            weights[faceI] = 0.5;
-        }
-    }
-
-#endif
-
-    return tweights;
+    return originalPatchField_;
 }
 
 
@@ -288,8 +209,8 @@ tmp<Field<Type> > regionCouplingFvPatchField<Type>::patchNeighbourField() const
 {
     Field<Type> sField = shadowPatchField().patchInternalField();
 
-     tmp<Field<Type> > tpnf
-     (
+    tmp<Field<Type> > tpnf
+    (
          regionCouplePatch_.interpolate
          (
              shadowPatchField().patchInternalField()
@@ -341,20 +262,24 @@ void regionCouplingFvPatchField<Type>::initEvaluate
     const Pstream::commsTypes commsType
 )
 {
-    if (!this->updated())
+    if(debug)
     {
-        this->updateCoeffs();
+        Info << "In regionCouplingFvPatchField<Type>::initEvaluate() on "
+            << this->dimensionedInternalField().name()
+            << " in " << this->patch().boundaryMesh().mesh().name()
+            << " " << this->updated() << endl;
     }
 
     // Interpolation must happen at init
-    // Implement weights-based stabilised harmonic interpolation using
-    // magnitude of type
-    // Algorithm:
-    // 1) calculate magnitude of internal field and neighbour field
-    // 2) calculate harmonic mean magnitude
-    // 3) express harmonic mean magnitude as: mean = w*mOwn + (1 - w)*mNei
-    // 4) Based on above, calculate w = (mean - mNei)/(mOwn - mNei)
-    // 5) Use weights to interpolate values
+
+    // Note: If used with interpolation - either on explicitly or called by the
+    // laplacian operator, the values set here are overridden by the interpolation
+    // scheme. In order to get the same diffusivities on both sides an identical
+    // interpolation scheme must be used.
+    // Note^2: Even if harmonic used, the interpolation is still wrong for most
+    // CHT cases since (cell values vs. face values)
+    // Note^3: None of this is intuitiv - fix requires low-level changes!
+    // HR, 8/Jun/2012
 
     const Field<Type>& fOwn = this->originalPatchField();
     const Field<Type> fNei = regionCouplePatch_.interpolate
@@ -363,7 +288,9 @@ void regionCouplingFvPatchField<Type>::initEvaluate
     );
 
     // Do interpolation
-    scalarField weights = this->weights(fOwn, fNei);
+    harmonic<Type> interp(this->patch().boundaryMesh().mesh());
+
+    scalarField weights = interp.weights(fOwn, fNei, this->patch());
 
     Field<Type>::operator=(weights*fOwn + (1.0 - weights)*fNei);
 
@@ -397,6 +324,14 @@ void regionCouplingFvPatchField<Type>::evaluate
 template<class Type>
 void regionCouplingFvPatchField<Type>::updateCoeffs()
 {
+    if(debug)
+    {
+        Info << "In regionCouplingFvPatchField<Type>::updateCoeffs() on "
+            << this->dimensionedInternalField().name()
+            << " in " << this->patch().boundaryMesh().mesh().name()
+            << " " << this->updated() << endl;
+    }
+
     if (this->updated())
     {
         return;
@@ -406,7 +341,9 @@ void regionCouplingFvPatchField<Type>::updateCoeffs()
     Field<Type> fNei = this->patchNeighbourField();
 
     // Do interpolation
-    scalarField weights = this->weights(fOwn, fNei);
+    harmonic<Type> interp(this->patch().boundaryMesh().mesh());
+
+    scalarField weights = interp.weights(fOwn, fNei, this->patch());
 
     Field<Type>::operator=(weights*fOwn + (1.0 - weights)*fNei);
 
@@ -421,14 +358,6 @@ void regionCouplingFvPatchField<Type>::updateCoeffs()
             0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
 
         regionCouplePatch_.bridge(bridgeField, *this);
-    }
-
-    // Store original field for symmetric evaluation
-    // Henrik Rusche, Aug/2011
-    if (curTimeIndex_ != this->db().time().timeIndex())
-    {
-        originalPatchField_ = *this;
-        curTimeIndex_ = this->db().time().timeIndex();
     }
 }
 
@@ -479,7 +408,7 @@ void regionCouplingFvPatchField<Type>::initInterfaceMatrixUpdate
         FatalErrorIn
         (
             "regionCouplingFvPatchField<Type>::initInterfaceMatrixUpdate"
-        )   << "init matrix update calld in detached state"
+        )   << "init matrix update called in detached state"
             << abort(FatalError);
 
     }
@@ -530,7 +459,7 @@ void regionCouplingFvPatchField<Type>::updateInterfaceMatrix
         FatalErrorIn
         (
             "regionCouplingFvPatchField<Type>::updateInterfaceMatrix"
-        )   << "Matrix update calld in detached state"
+        )   << "Matrix update called in detached state"
             << abort(FatalError);
 
     }

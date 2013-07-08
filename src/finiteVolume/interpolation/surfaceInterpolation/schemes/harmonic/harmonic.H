@@ -1,4 +1,4 @@
-/*---------------------------------------------------------------------------*\
+/*---------------------------------------------------------------------------* \
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
@@ -108,141 +108,28 @@ public:
         virtual tmp<surfaceScalarField> weights
         (
             const GeometricField<Type, fvPatchField, volMesh>& phi
-        ) const
-        {
-            tmp<surfaceScalarField> tw
-            (
-                new surfaceScalarField
-                (
-                    IOobject
-                    (
-                        "harmonicWeightingFactors" + phi.name(),
-                        this->mesh().time().timeName(),
-                        this->mesh()
-                    ),
-                    this->mesh() ,
-                    dimless
-                )
-            );
+        ) const;
 
-            const surfaceScalarField& deltaCoeffs = this->mesh().deltaCoeffs();
-            const surfaceScalarField& weights = this->mesh().weights();
+        //- Return the interpolation weighting factors for a patch
+        tmp<scalarField> weights
+        (
+            const Field<Type>& fOwn,
+            const Field<Type>& fNei,
+            const fvPatch& patch
+        ) const;
 
-            const magLongDelta& mld = magLongDelta::New(this->mesh());
-            const surfaceScalarField& longDelta = mld.magDelta();
-
-            surfaceScalarField& w = tw();
-
-            const unallocLabelList& owner = this->mesh().owner();
-            const unallocLabelList& neighbour = this->mesh().neighbour();
-
-            scalarField magPhi = mag(phi);
-
-            scalarField& wIn = w.internalField();
-
-            // Larger small for complex arithmetic accuracy
-            const scalar kSmall = 1000*SMALL;
-
-            // Calculate internal weights using field magnitude
-            forAll (owner, faceI)
-            {
-                label own = owner[faceI];
-                label nei = neighbour[faceI];
-
-                scalar mOwn = magPhi[own]/(1 - weights[faceI]);
-                scalar mNei = magPhi[nei]/weights[faceI];
-
-                scalar den = magPhi[nei] - magPhi[own];
-
-                scalar mean = mOwn*mNei/
-                    ((mOwn + mNei)*longDelta[faceI]*deltaCoeffs[faceI]);
-
-                // Note: complex arithmetic requires extra accuracy
-                // This is a division of two close subtractions
-                // HJ, 28/Sep/2011
-                if (mag(den) > kSmall)
-                {
-                    // Limit weights for round-off safety
-                    wIn[faceI] =
-                        Foam::max(0, Foam::min((magPhi[nei] - mean)/den, 1));
-                }
-                else
-                {
-                    wIn[faceI] = 0.5;
-                }
-            }
-
-            forAll (phi.boundaryField(), pi)
-            {
-                fvsPatchScalarField& wp = w.boundaryField()[pi];
-
-                const fvPatchField<Type>& pPhi = phi.boundaryField()[pi];
-
-                if (pPhi.coupled())
-                {
-                    const scalarField& pWeights = weights.boundaryField()[pi];
-
-                    scalarField magPhiOwn = mag(pPhi.patchInternalField());
-                    scalarField magPhiNei = mag(pPhi.patchNeighbourField());
-
-                    const scalarField& pDeltaCoeffs =
-                        deltaCoeffs.boundaryField()[pi];
-
-                    const scalarField& pLongDelta = mld.magDelta(pi);
-
-                    // Calculate internal weights using field magnitude
-                    forAll (pPhi, faceI)
-                    {
-                        scalar mOwn = magPhiOwn[faceI]/(1 - pWeights[faceI]);
-                        scalar mNei = magPhiNei[faceI]/pWeights[faceI];
-
-                        scalar den = magPhiNei[faceI] - magPhiOwn[faceI];
-
-                        // Note: complex arithmetic requires extra accuracy
-                        // This is a division of two close subtractions
-                        // HJ, 28/Sep/2011
-                        if (mag(den) > kSmall)
-                        {
-                            scalar mean = mOwn*mNei/
-                                (
-                                    (mOwn + mNei)*
-                                    pLongDelta[faceI]*
-                                    pDeltaCoeffs[faceI]
-                                );
-
-                            // Limit weights for round-off safety
-                            wp[faceI] =
-                                Foam::max
-                                (
-                                    0,
-                                    Foam::min
-                                    (
-                                        (magPhiNei[faceI] - mean)/den,
-                                        1
-                                    )
-                                );
-                        }
-                        else
-                        {
-                            wp[faceI] = 0.5;
-                        }
-                    }
-                }
-                else
-                {
-                    // Boundary weights for uncoupled patches are 1
-                    wp = 1;
-                }
-            }
-
-            return tw;
-        }
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "harmonicTemplates.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

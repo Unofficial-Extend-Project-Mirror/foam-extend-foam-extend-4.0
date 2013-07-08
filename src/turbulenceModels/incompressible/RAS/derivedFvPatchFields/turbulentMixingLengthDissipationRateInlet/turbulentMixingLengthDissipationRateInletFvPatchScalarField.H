@@ -30,14 +30,14 @@ Description
     Calculate epsilon via the mixing length [m]
 
     Example of the boundary condition specification:
-    @verbatim
+    \verbatim
         inlet
         {
             type            turbulentMixingLengthDissipationRateInlet;
             mixingLength    0.005;         // 5 mm
             value           uniform 200;   // placeholder
         }
-    @endverbatim
+    \endverbatim
 
 SourceFiles
     turbulentMixingLengthDissipationRateInletFvPatchScalarField.C
@@ -47,7 +47,7 @@ SourceFiles
 #ifndef incompressibleturbulentMixingLengthDissipationRateInlet_H
 #define incompressibleturbulentMixingLengthDissipationRateInlet_H
 
-#include "fixedValueFvPatchFields.H"
+#include "inletOutletFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -62,12 +62,19 @@ namespace incompressible
 
 class turbulentMixingLengthDissipationRateInletFvPatchScalarField
 :
-    public fixedValueFvPatchScalarField
+    public inletOutletFvPatchScalarField
 {
     // Private data
 
         //- turbulent length scale
         scalar mixingLength_;
+
+        //- Name of the flux field
+        word phiName_;
+
+        //- Name of the turbulent kinetic energy field
+        word kName_;
+
 
 public:
 

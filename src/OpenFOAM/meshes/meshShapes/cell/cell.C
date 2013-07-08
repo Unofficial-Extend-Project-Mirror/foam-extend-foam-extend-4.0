@@ -31,6 +31,8 @@ License
 
 const char* const Foam::cell::typeName = "cell";
 
+int Foam::cell::debug(debug::debugSwitch("cell", 0));
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 Foam::labelList Foam::cell::labels(const unallocFaceList& f) const

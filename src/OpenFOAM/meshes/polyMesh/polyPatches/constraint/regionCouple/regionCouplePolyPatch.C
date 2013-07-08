@@ -982,6 +982,7 @@ void Foam::regionCouplePolyPatch::initMovePoints(const pointField& p)
 
         if (Pstream::parRun() && !localParallel())
         {
+            // Calculate send addressing
             sendAddr();
         }
     }
