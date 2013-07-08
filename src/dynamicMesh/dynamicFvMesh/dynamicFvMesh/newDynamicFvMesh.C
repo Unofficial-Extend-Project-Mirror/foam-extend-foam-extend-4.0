@@ -41,6 +41,7 @@ Foam::autoPtr<Foam::dynamicFvMesh> Foam::dynamicFvMesh::New(const IOobject& io)
         (
             "dynamicMeshDict",
             io.time().constant(),
+            (io.name() == dynamicFvMesh::defaultRegion ? "" : io.name() ),
             io.db(),
             IOobject::MUST_READ,
             IOobject::NO_WRITE,
