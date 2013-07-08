@@ -1,0 +1,27 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      testDict7;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Sa..Sl; DSa..DSo; Aa..Af; Pa..Pf
+
+sevena  sevena [0 0 0 0 0 0 0] 1.0;
+sevenb  sevenb [0 0 0 0 0 0 0] 1.0;
+sevenc  sevenc [0 0 0 0 0 0 0] 1.0;
+sevend  sevend [0 0 0 0 0 0 0] 1.0;
+sevene  sevene [0 0 0 0 0 0 0] 1.0;
+sevenf  sevenf [0 0 0 0 0 0 0] 1.0;
+seveng  seveng [0 0 0 0 0 0 0] 1.0;
+sevenh  sevenh [0 0 0 0 0 0 0] 1.0;
+seveni  seveni [0 0 0 0 0 0 0] 1.0;
+sevenj  sevenj [0 0 0 0 0 0 0] 1.0;

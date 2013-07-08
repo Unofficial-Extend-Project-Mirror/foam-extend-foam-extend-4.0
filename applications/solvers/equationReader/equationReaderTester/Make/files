@@ -1,0 +1,3 @@
+equationReaderTester.C
+
+EXE = $(FOAM_APPBIN)/equationReaderTester

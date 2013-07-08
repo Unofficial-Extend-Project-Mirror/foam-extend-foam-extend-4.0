@@ -1,0 +1,27 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      testDict4;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Sa..Sl; DSa..DSo; Aa..Af; Pa..Pf
+
+foura    "1";
+fourb    "1";
+fourc    "1";
+fourd    "1";
+foure    "1";
+fourf    "1";
+fourg    "1";
+fourh    "1";
+fouri    "1";
+fourj    "1";
