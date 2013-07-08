@@ -1,0 +1,6 @@
+These are additional changes to the original mesquite src code, with two adapted Mesh Quality metrics:
+
+- AspectRatioGamma is now also working for Prism, Hexahedra and Pyramids
+- VolumeRatio is a new metric, which computes the relative volume change between two adjacent cells
+
+In order to use these source codes, you'll need to copy these files in a proper place of your local mesquite copy, reconfigure, recompile and install the mesquite library as well the header file in a proper place. A simple compile.sh script is shipped with this additional files, maybe it is helpfull.

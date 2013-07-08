@@ -42,9 +42,16 @@ SourceFiles
 #include "Map.H"
 #include "Switch.H"
 #include "edgeList.H"
+#include "labelPair.H"
 #include "pointIOField.H"
 #include "MeshObject.H"
 #include "HashSet.H"
+
+// Have gcc ignore certain warnings while including mesquite headers
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#   pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
+
 #include "Mesquite_all_headers.hpp"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -113,13 +120,16 @@ class mesquiteMotionSolver
         scalar relax_;
 
         //- Vertex coordinate array passed into Mesquite
-        mutable double* vtxCoords_;
+        mutable List<double> vtxCoords_;
 
         //- Connectivity array passed into mesquite
-        mutable unsigned long* cellToNode_;
+        mutable List<unsigned long> cellToNode_;
 
         //- Flag array for vertices (fixed/free)
-        mutable int* fixFlags_;
+        mutable List<int> fixFlags_;
+
+        //- Array with element types
+        mutable List<Mesquite::EntityTopology> mixedTypes_;
 
         //- Reference points
         mutable pointIOField refPoints_;
@@ -127,8 +137,8 @@ class mesquiteMotionSolver
         //- Original points prior to surface-smoothing
         mutable pointField origPoints_;
 
-        //- The quality metric
-        word qMetric_;
+        //- Quality metric list
+        wordList qMetrics_;
 
         //- Pointers to base element metric class
         HashTable<autoPtr<Mesquite::QualityMetric> > qMetricTable_;
@@ -155,7 +165,9 @@ class mesquiteMotionSolver
         labelList procIndices_;
         scalarField pointFractions_;
         labelListList procPointLabels_;
+        List<List<labelPair> > globalProcPoints_;
 
+        List<Map<label> > unmatchedRecvPoints_;
         List<vectorField> sendSurfFields_, recvSurfFields_;
         List<Map<label> > sendSurfPointMap_, recvSurfPointMap_;
 
@@ -207,7 +219,7 @@ class mesquiteMotionSolver
         // Component-wise sumMag
         scalar cmptSumMag(const vectorField& field);
 
-        // Transfer buffers after divergence compute.
+        // Transfer buffers for surface point fields
         void transferBuffers(vectorField &field);
 
         // Apply boundary conditions
@@ -283,9 +295,6 @@ class mesquiteMotionSolver
             scalar& beta
         );
 
-        // Clear out addressing
-        void clearOut();
-
         // Update on topology change
         void update(const mapPolyMesh&);
 
@@ -341,4 +350,3 @@ public:
 #endif
 
 // ************************************************************************* //
-
