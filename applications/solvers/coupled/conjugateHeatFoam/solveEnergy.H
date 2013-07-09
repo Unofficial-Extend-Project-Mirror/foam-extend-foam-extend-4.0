@@ -1,7 +1,4 @@
 {
-    // Decoupled patches
-#   include "attachPatches.H"
-
     // Solid side
 #   include "readSolidControls.H"
 
@@ -9,27 +6,39 @@
     {
         coupledFvScalarMatrix TEqns(2);
 
-        // Add fluid equation
-        TEqns.set
+        fvScalarMatrix* TFluidEqn = new fvScalarMatrix
         (
-            0,
-            new fvScalarMatrix
+            rho*Cp*
             (
                 fvm::ddt(T)
               + fvm::div(phi, T)
-              - fvm::laplacian(DT, T)
             )
+          - fvm::laplacian(kappaEff, T)
+            ==
+            radiation->Ru()
+          - fvm::Sp(4.0*radiation->Rp()*pow3(T), T)
+          + 3.0*radiation->Rp()*pow4(T)
         );
 
-        // Add solid equation
-        TEqns.set
+        //Done automatically in 1.6.1-ext
+        //TFluidEqn->boundaryManipulate(T.boundaryField());
+
+        fvScalarMatrix* TSolidEqn = new fvScalarMatrix
         (
-            1,
-            new fvScalarMatrix
-            (
-                fvm::ddt(Tsolid) - fvm::laplacian(DTsolid, Tsolid)
-            )
+            fvm::ddt(rhoCpsolid, Tsolid)
+          - fvm::laplacian(ksolidf, Tsolid, "laplacian(k,T)")
+          + fvm::SuSp(-solidThermo.S()/Tsolid, Tsolid)
         );
+
+        //Done automatically in 1.6.1-ext
+        //TSolidEqn->boundaryManipulate(Tsolid.boundaryField());
+
+
+        // Add fluid equation
+        TEqns.set(0, TFluidEqn);
+
+        // Add solid equation
+        TEqns.set(1, TSolidEqn);
 
         TEqns.solve();
     }

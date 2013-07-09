@@ -1,0 +1,61 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      G;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [1 0 -3 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    movingWall
+    {
+        type            MarshakRadiation;
+        T               T;
+        emissivity      1;
+        value           uniform 0;
+    }
+
+    left
+    {
+        type            MarshakRadiation;
+        T               T;
+        emissivity      1;
+        value           uniform 0;
+    }
+
+    right
+    {
+        type            MarshakRadiation;
+        T               T;
+        emissivity      1;
+        value           uniform 0;
+    }
+
+    bottom
+    {
+        type            MarshakRadiation;
+        T               T;
+        emissivity      1;
+        value           uniform 0;
+    }
+
+    frontAndBack
+    {
+        type            empty;
+    }
+}
+
+// ************************************************************************* //
