@@ -754,7 +754,7 @@ void Foam::ggiPolyPatch::initAddressing()
     {
         // Calculate transforms for correct GGI cut
         calcTransforms();
-        
+
         if (master())
         {
             shadow().calcTransforms();

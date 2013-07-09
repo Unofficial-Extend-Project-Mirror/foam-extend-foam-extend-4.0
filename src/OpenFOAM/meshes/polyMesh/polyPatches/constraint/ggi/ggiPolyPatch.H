@@ -130,7 +130,7 @@ class ggiPolyPatch
             void calcReconFaceCellCentres() const;
 
             //- Force calculation of transformation tensors
-            virtual void calcTransforms();
+            virtual void calcTransforms() const;
 
 
         // Parallel communication optimisation, stored on master processor
@@ -312,12 +312,6 @@ public:
 
             //- Return interpolation face zone
             const faceZone& zone() const;
-
-        //- Is this the slave side?
-        bool slave() const
-        {
-            return !master();
-        }
 
         // Interpolation data
 

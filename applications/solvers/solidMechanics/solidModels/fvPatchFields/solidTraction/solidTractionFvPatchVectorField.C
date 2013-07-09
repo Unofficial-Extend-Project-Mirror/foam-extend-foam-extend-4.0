@@ -77,31 +77,40 @@ solidTractionFvPatchVectorField
 	 << "\tTraction boundary field: " << fieldName_ << endl;
 
     //- check if traction boundary is for non linear solver
-    if(dict.found("nonLinear"))
-      {
-	nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));;
+    if (dict.found("nonLinear"))
+    {
+	    nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));
 
-	if(nonLinear_ == UPDATED_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to updated Lagrangian"
-		 << endl;
-	  }
-	else if(nonLinear_ == TOTAL_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to total Lagrangian"
-		 << endl;
-	  }
-      }
+	    if (nonLinear_ == UPDATED_LAGRANGIAN)
+	    {
+	        Info << "\tnonLinear set to updated Lagrangian"
+		    << endl;
+	    }
+	    else if (nonLinear_ == TOTAL_LAGRANGIAN)
+	    {
+	        Info << "\tnonLinear set to total Lagrangian"
+		    << endl;
+	    }
+    }
 
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-    if(Foam::word(dimensionedInternalField().mesh().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares")
-      {
-	Warning << "The gradScheme for " << fieldName_
+    if 
+    (
+        Foam::word
+        (
+            dimensionedInternalField().mesh().schemesDict().gradScheme
+            (
+                "grad(" + fieldName_ + ")"
+            )
+        ) != "extendedLeastSquares"
+    )
+    {
+	    Warning << "The gradScheme for " << fieldName_
 		<< " should be \"extendedLeastSquares 0\" for the boundary "
 		<< "non-orthogonal correction to be right" << endl;
-      }
+    }
 }
 
 

@@ -86,56 +86,65 @@ fixedDisplacementZeroShearFvPatchVectorField::fixedDisplacementZeroShearFvPatchV
 {
 
     //- check if traction boundary is for non linear solver
-    if(dict.found("nonLinear"))
-      {
-	nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));;
+    if (dict.found("nonLinear"))
+    {
+        nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));;
 
-	if(nonLinear_ == UPDATED_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to updated Lagrangian"
-		 << endl;
-	  }
-	else if(nonLinear_ == TOTAL_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to total Lagrangian"
-		 << endl;
-	  }
-      }
+	    if (nonLinear_ == UPDATED_LAGRANGIAN)
+	    {
+	        Info << "\tnonLinear set to updated Lagrangian"
+		    << endl;
+	    }
+	    else if (nonLinear_ == TOTAL_LAGRANGIAN)
+	    {
+	        Info << "\tnonLinear set to total Lagrangian" << endl;
+	    }
+    }
 
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-    if(Foam::word(dimensionedInternalField().mesh().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares")
-      {
-	Warning << "The gradScheme for " << fieldName_
+    if
+    (
+        Foam::word
+            (
+                dimensionedInternalField().mesh().schemesDict().gradScheme
+                (
+                    "grad(" + fieldName_ + ")"
+                )
+            ) != "extendedLeastSquares"
+    )
+    {
+	    Warning << "The gradScheme for " << fieldName_
 		<< " should be \"extendedLeastSquares 0\" for the boundary "
 		<< "non-orthogonal correction to be right" << endl;
-      }
-
-  this->refGrad() = vector::zero;
-  
-  vectorField n = patch().nf();      
-  this->valueFraction() = sqr(n);
-
-  if (dict.found("value"))
-    {
-      Field<vector>::operator=(vectorField("value", dict, p.size()));
     }
-  else
-    {
-      FatalError << "value entry not found for patch " << patch().name() << endl;
-    }
-  this->refValue() = *this;
 
-  Field<vector> normalValue = transform(valueFraction(), refValue());
-  
-  Field<vector> gradValue =
-    this->patchInternalField() + refGrad()/this->patch().deltaCoeffs();
-  
-  Field<vector> transformGradValue =
-    transform(I - valueFraction(), gradValue);
-  
-  Field<vector>::operator=(normalValue + transformGradValue);
+    this->refGrad() = vector::zero;
+
+    vectorField n = patch().nf();
+    this->valueFraction() = sqr(n);
+
+    if (dict.found("value"))
+    {
+        Field<vector>::operator=(vectorField("value", dict, p.size()));
+    }
+    else
+    {
+        FatalError << "value entry not found for patch "
+        << patch().name() << endl;
+    }
+    this->refValue() = *this;
+
+    Field<vector> normalValue = transform(valueFraction(), refValue());
+
+    Field<vector> gradValue =
+        this->patchInternalField() + refGrad()/this->patch().deltaCoeffs();
+
+    Field<vector> transformGradValue =
+        transform(I - valueFraction(), gradValue);
+
+    Field<vector>::operator=(normalValue + transformGradValue);
 }
 
 

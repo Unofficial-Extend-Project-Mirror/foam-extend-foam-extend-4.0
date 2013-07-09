@@ -55,25 +55,34 @@ timeVaryingSolidTractionFvPatchVectorField
     const dictionary& dict
 )
 :
-  solidTractionFvPatchVectorField(p, iF),
-  timeSeries_(dict)
+solidTractionFvPatchVectorField(p, iF),
+timeSeries_(dict)
 {
-  fieldName() = dimensionedInternalField().name();
-  traction() = vector::zero;
-  pressure() = 0.0;
+    fieldName() = dimensionedInternalField().name();
+    traction() = vector::zero;
+    pressure() = 0.0;
 
-  nonLinear() =
-    nonLinearNames().read(dict.lookup("nonLinear"));
+    nonLinear() =
+        nonLinearNames().read(dict.lookup("nonLinear"));
 
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-  if(Foam::word(dimensionedInternalField().mesh().gradScheme("grad(" + fieldName() + ")")) != "extendedLeastSquares")
-      {
-	Warning << "The gradScheme for " << fieldName()
+    if
+    (
+      Foam::word
+      (
+          dimensionedInternalField().mesh().schemesDict().gradScheme
+          (
+              "grad(" + fieldName() + ")"
+          )
+      ) != "extendedLeastSquares"
+    )
+    {
+	    Warning << "The gradScheme for " << fieldName()
 		<< " should be \"extendedLeastSquares 0\" for the boundary "
 		<< "non-orthogonal correction to be right" << endl;
-      }
+    }
 }
 
 

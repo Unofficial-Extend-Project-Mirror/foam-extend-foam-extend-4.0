@@ -31,8 +31,8 @@ License
 #include "slicedVolFields.H"
 #include "slicedSurfaceFields.H"
 #include "SubField.H"
-#include "cyclicFvPatchField.H"
-#include "cyclicGgiFvPatchField.H"
+#include "cyclicFvPatchFields.H"
+#include "cyclicGgiFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
