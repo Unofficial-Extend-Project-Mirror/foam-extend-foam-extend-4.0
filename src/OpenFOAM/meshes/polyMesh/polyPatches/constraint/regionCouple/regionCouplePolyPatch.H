@@ -155,11 +155,14 @@ class regionCouplePolyPatch
 
         // Memory management
 
+            //- Clear delta coefficients
+            void clearDeltas() const;
+
             //- Clear geometry
-             void clearGeom() const;
+            void clearGeom() const;
 
             //- Clear out
-            void clearOut();
+            void clearOut() const;
 
 
 protected:
