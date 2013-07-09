@@ -49,10 +49,10 @@ namespace Foam
 
 
 
-    
+
 bool Foam::simpleTwoStroke::realDeformation() const
 {
- 
+
 
     if (virtualPistonPosition()+ engTime().pistonDisplacement().value() > deckHeight()-engTime().clearance().value()-SMALL)
     {

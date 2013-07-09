@@ -5,8 +5,8 @@
 
     for (label valveI = 0; valveI < nValves(); valveI++)
     {
-        
-        
+
+
         // Add attach-detach for valve
         if
         (
@@ -17,7 +17,7 @@
 
             Info << "Adding a attach/detach boundary mesh modifier to the valve " <<
             valveI + 1 << endl;
-        
+
             topoChanger_.setSize(nMods+1);
             topoChanger_.set
             (
@@ -32,12 +32,12 @@
                     valves_[valveI].detachInPortPatchID().name(),
                     scalarField(0),
                     true                // Manual triggering
-                )    
+                )
             );
             nMods++;
             Info << "Attach detach" << endl;
-        }        
-                   
+        }
+
     }
 
     // Add piston layer addition
@@ -45,7 +45,7 @@
     {
 
         Info << "Adding a layer addition/removal mesh modifier to the piston" << endl;
-    
+
         topoChanger_.setSize(nMods+1);
         topoChanger_.set
         (
@@ -58,11 +58,11 @@
                 "pistonLayerFaces",
                 piston().minLayer(),
                 piston().maxLayer()
-            )    
+            )
         );
         nMods++;
         Info << "pistonLayer" << endl;
-        Info << nMods << endl;            
+        Info << nMods << endl;
     }
 
     Info << "Adding " << nMods << " topology modifiers" << endl;

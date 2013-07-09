@@ -53,10 +53,10 @@ class layerAR
 
         //- Piston patch
         simpleEnginePiston piston_;
-        
+
         //- Layering-to-deformation switch in crank-angle degrees
         scalar deformSwitch_;
-        
+
         //- Tolerance used when the piston faceZone is created
         scalar delta_;
 
@@ -162,7 +162,7 @@ public:
         {
             return deckHeight_;
         }
-        
+
 
         const simpleEnginePiston& piston() const
         {
@@ -180,7 +180,7 @@ public:
 
         //- Move and morph
         virtual bool update();
-        
+
         //- Set boundary velocities
         void setBoundaryVelocity(volVectorField& U);
 

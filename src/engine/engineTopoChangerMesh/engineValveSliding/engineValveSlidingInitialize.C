@@ -37,7 +37,7 @@ Class
 
 void Foam::engineValveSliding::checkAndCalculate()
 {
-    
+
     label pistonIndex = -1;
     bool foundPiston = false;
 
@@ -46,8 +46,8 @@ void Foam::engineValveSliding::checkAndCalculate()
 
     label cylinderHeadIndex = -1;
     bool foundCylinderHead = false;
-    
-    
+
+
     forAll(boundary(), i)
     {
         if (boundary()[i].name() == "piston")
@@ -66,7 +66,7 @@ void Foam::engineValveSliding::checkAndCalculate()
             foundCylinderHead = true;
         }
     }
-    
+
     reduce(foundPiston, orOp<bool>());
     reduce(foundLiner, orOp<bool>());
     reduce(foundCylinderHead, orOp<bool>());
@@ -79,14 +79,14 @@ void Foam::engineValveSliding::checkAndCalculate()
     }
 
     if (!foundLiner)
-    { 
+    {
         FatalErrorIn("Foam::verticalValvesGambit::checkAndCalculate()")
             << " : cannot find liner patch"
             << abort(FatalError);
     }
 
     if (!foundCylinderHead)
-    { 
+    {
         FatalErrorIn("Foam::verticalValvesGambit::checkAndCalculate()")
             << " : cannot find cylinderHead patch"
             << exit(FatalError);
@@ -113,9 +113,9 @@ void Foam::engineValveSliding::checkAndCalculate()
         Info<< "deckHeight: " << deckHeight() << nl
             << "piston position: " << pistonPosition() << endl;
     }
-        
-    
-} 
+
+
+}
 
 void Foam::engineValveSliding::setVirtualPositions()
 {}

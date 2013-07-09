@@ -88,14 +88,14 @@ void fvMotionSolverEngineMesh::move()
 
     if (engineDB_.foundObject<surfaceScalarField>("phi"))
     {
-        surfaceScalarField& phi = 
+        surfaceScalarField& phi =
             const_cast<surfaceScalarField&>
             (engineDB_.lookupObject<surfaceScalarField>("phi"));
 
         const volScalarField& rho =
             engineDB_.lookupObject<volScalarField>("rho");
 
-        const volVectorField& U = 
+        const volVectorField& U =
             engineDB_.lookupObject<volVectorField>("U");
 
         bool absolutePhi = false;

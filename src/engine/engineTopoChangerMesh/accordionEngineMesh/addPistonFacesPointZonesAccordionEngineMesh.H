@@ -9,7 +9,7 @@
             *this,
             IOobject::MUST_READ
         );
-        
+
         if(!pistonCellsHeader.headerOk())
         {
             WarningIn
@@ -28,16 +28,16 @@
                     pointZones()
                 )
             );
-        
-            nPointZones++;        
-                
+
+            nPointZones++;
+
         }
         else
         {
             cellSet movingPistonCells(*this, piston().pistonCellSetName());
 
             labelList pistonCells = movingPistonCells.toc();
-            
+
             labelList movingPistonPoints;
 
             const labelListList& cp = cellPoints();
@@ -45,7 +45,7 @@
             boolList count(allPoints().size(), false);
 
             forAll (pistonCells, cellI)
-            {   
+            {
                 const labelList& curCellPoints = cp[pistonCells[cellI]];
 
                 forAll (curCellPoints, i)
@@ -62,7 +62,7 @@
                 {
                     nCounted++;
                 }
-            }   
+            }
 
             movingPistonPoints.setSize(nCounted);
 
@@ -87,11 +87,11 @@
                     pointZones()
                 )
             );
-        
-            nPointZones++;        
-                        
+
+            nPointZones++;
+
         }
-                           
+
     }
 
     {
@@ -121,15 +121,15 @@
                     pointZones()
                 )
             );
-        
-            nPointZones++;        
+
+            nPointZones++;
         }
         else
         {
             cellSet fixedHeadCells(*this, headCellSetName_);
 
             labelList headCells = fixedHeadCells.toc();
-            
+
             labelList fixedHeadPoints;
 
             const labelListList& cp = cellPoints();
@@ -137,7 +137,7 @@
             boolList count(allPoints().size(), false);
 
             forAll (fixedHeadCells, cellI)
-            {   
+            {
                 const labelList& curCellPoints = cp[headCells[cellI]];
 
                 forAll (curCellPoints, i)
@@ -154,7 +154,7 @@
                 {
                     nCounted++;
                 }
-            }   
+            }
 
             fixedHeadPoints.setSize(nCounted);
 
@@ -179,8 +179,8 @@
                     pointZones()
                 )
             );
-        
-            nPointZones++;        
+
+            nPointZones++;
         }
-    
+
     }

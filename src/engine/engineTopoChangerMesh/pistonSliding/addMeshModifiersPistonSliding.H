@@ -13,9 +13,9 @@
     )
     {
             Info << "Adding a sliding interface mesh modifier to the piston bowl " << endl;
-            
+
             topoChanger_.setSize(nMods+1);
-            
+
             topoChanger_.set
             (
                 nMods,
@@ -33,12 +33,12 @@
                     slidingInterface::INTEGRAL, // always integral
                     true,  // attach-detach action
                     intersection::VISIBLE
-                )    
+                )
             );
             nMods++;
-            
+
             Info << "pistonBowl" << endl;
-            Info << nMods << endl;            
+            Info << nMods << endl;
     }
 
     for (label valveI = 0; valveI < nValves(); valveI++)
@@ -50,12 +50,12 @@
          && valves_[valveI].curtainInPortPatchID().active()
         )
         {
-            
+
             Info << "Adding a sliding interface mesh modifier to the valve " <<
             valveI + 1 << endl;
-            
+
             topoChanger_.setSize(nMods+1);
-            
+
             topoChanger_.set
             (
                 nMods,
@@ -73,23 +73,23 @@
                     slidingInterface::INTEGRAL, // always integral
                     true,  // attach-detach action
                     intersection::VISIBLE
-                )    
+                )
             );
             nMods++;
-            
+
             Info << "valveSlider" + Foam::name(valveI + 1) << endl;
-            Info << nMods << endl;            
+            Info << nMods << endl;
         }
-        
+
         // Add valve poppet layer addition
         if (valves_[valveI].poppetPatchID().active())
         {
 
             Info << "Adding a layer addition/removal mesh modifier to the poppet of the valve " <<
             valveI + 1 << endl;
-        
+
             topoChanger_.setSize(nMods+1);
-            
+
             topoChanger_.set
             (
                 nMods,
@@ -101,23 +101,23 @@
                     "layeringFacesTopZoneV" + Foam::name(valveI + 1),
                     valves_[valveI].minTopLayer(),
                     valves_[valveI].maxTopLayer()
-                )    
+                )
             );
             nMods++;
             Info << "valvePoppetLayer" + Foam::name(valveI + 1) << endl;
-            Info << nMods << endl;            
-            
+            Info << nMods << endl;
+
         }
 
         // Add valve bottom layer addition
         if (valves_[valveI].bottomPatchID().active())
         {
-        
+
             Info << "Adding a layer addition/removal mesh modifier to the bottom of the valve " <<
             valveI + 1 << endl;
-        
+
             topoChanger_.setSize(nMods+1);
-            
+
             topoChanger_.set
             (
                 nMods,
@@ -129,18 +129,18 @@
                     "layeringFacesBottomZoneV" + Foam::name(valveI + 1),
                     valves_[valveI].minBottomLayer(),
                     valves_[valveI].maxBottomLayer()
-                )    
+                )
             );
             nMods++;
             Info << "valveBottomLayer" + Foam::name(valveI + 1) << endl;
-            Info << nMods << endl;            
-            
+            Info << nMods << endl;
+
         }
-        
-    }	
+
+    }
 
 #   include "addPistonLayerAdditionRemovalMeshModifier.H"
-    
 
-    
+
+
     Info << "Adding " << nMods << " topology modifiers" << endl;

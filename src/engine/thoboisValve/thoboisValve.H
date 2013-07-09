@@ -95,7 +95,7 @@ class thoboisValve
             //- Faces to detach
             //labelList detachFaces_;
 	    word detachFacesName_;
-           
+
         // Valve lift data
 
             //- Valve lift profile
@@ -114,23 +114,23 @@ class thoboisValve
             const scalar diameter_;
 
         // Mesh motion data
-            
+
             //- Name of the pointSet for the static points
             word staticPointsName_;
-            
+
             //- Name of the pointSet for the moving points
             word movingPointsName_;
 
             //- Name of the pointSet for the moving internal points
             word movingInternalPointsName_;
-            
+
             //- Name of the cellSet for the static cells
             word staticCellsName_;
-            
+
             //- Name of the cellSet for the moving cells
             word movingCellsName_;
-        
-        
+
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -255,7 +255,7 @@ public:
             {
                 return detachFacesName_;
             }
-            
+
             const word& staticPointsName() const
             {
                 return staticPointsName_;

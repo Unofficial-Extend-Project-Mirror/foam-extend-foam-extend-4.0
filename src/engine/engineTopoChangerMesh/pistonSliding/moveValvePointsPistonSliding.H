@@ -1,24 +1,22 @@
     // valves
-    label constraintSize = 0;
+    // currently unused - commented out below
+    // label constraintSize = 0;
 
     forAll(valves_,valveI)
     {
-
-          vector valveVel =
-               valves_[valveI].curVelocity()*valves_[valveI].cs().axis();
+        // currently unused - commented out below
+        //vector valveVel =
+        //    valves_[valveI].curVelocity()*valves_[valveI].cs().axis();
 
         scalar valveDeltaZ = valves_[valveI].curVelocity()*
             valves_[valveI].cs().axis().z()*engTime().deltaT().value() ;
 
         if(valves_[valveI].curLift() > valves_[valveI].deformationLift())
         {
-            bool isMoving(false);
-
             if(mag(valves_[valveI].curVelocity()) > 0)
             {
                 Info<< "Valve n. " << valveI << " is moving with velocity = "
                     << valves_[valveI].curVelocity() << endl;
-                isMoving = true;
             }
 
             Info<< "Valve displacement for valve " << valveI << " = "
@@ -108,9 +106,6 @@
 
        if (valves_[valveI].bottomPatchID().active())
        {
-           const scalarField& movingPointsBottom =
-               movingPointsMaskBottom(valveI);
-
            {
                List<bool> valveBottomPoint(newPoints.size(), false);
 

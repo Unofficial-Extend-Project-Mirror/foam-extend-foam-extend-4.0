@@ -62,7 +62,7 @@ void Foam::layerAR::addZonesAndModifiers()
     }
 
     checkAndCalculate();
-    
+
     Info<< "Time = " << engTime().theta() << endl
         << "Adding zones to the engine mesh" << endl;
 
@@ -81,13 +81,13 @@ void Foam::layerAR::addZonesAndModifiers()
     {
 
         // Piston position
-        
+
         label pistonPatchID = piston().patchID().index();
-        
+
         scalar zPist = max(boundary()[pistonPatchID].patch().localPoints()).z();
-        
+
         scalar zPistV = zPist + offSet();
-        
+
         labelList zone1(faceCentres().size());
         boolList flipZone1(faceCentres().size(), false);
         label nZoneFaces1 = 0;
@@ -111,13 +111,13 @@ void Foam::layerAR::addZonesAndModifiers()
                     zLower = zc;
                     dl = zPistV - zc;
                 }
-            
+
                 if (zc - zPistV > 0 && zc - zPistV < dh)
                 {
                     zHigher = zc;
                     dh = zc - zHigher;
                 }
-            
+
                 if
                 (
                     zc > zPistV - delta()
@@ -129,7 +129,7 @@ void Foam::layerAR::addZonesAndModifiers()
                     {
                         flipZone1[nZoneFaces1] = true;
                     }
-                
+
                     zone1[nZoneFaces1] = faceI;
                     nZoneFaces1++;
                 }
@@ -139,7 +139,7 @@ void Foam::layerAR::addZonesAndModifiers()
         // if no cut was found use the layer above
         if (!foundAtLeastOne)
         {
-                        
+
             zPistV = zHigher;
 
             forAll (faceCentres(), faceI)
@@ -160,7 +160,7 @@ void Foam::layerAR::addZonesAndModifiers()
                         {
                             flipZone1[nZoneFaces1] = true;
                         }
-                    
+
                         zone1[nZoneFaces1] = faceI;
                         nZoneFaces1++;
                     }
@@ -171,7 +171,7 @@ void Foam::layerAR::addZonesAndModifiers()
 
         zone1.setSize(nZoneFaces1);
         flipZone1.setSize(nZoneFaces1);
-    
+
         fz[nFaceZones]=
             new faceZone
             (
@@ -181,21 +181,21 @@ void Foam::layerAR::addZonesAndModifiers()
                 nFaceZones,
                 faceZones()
             );
-        
+
         nFaceZones++;
 
 
         // Construct point zones
 
-            
+
         // Points which don't move (= cylinder head)
         DynamicList<label> headPoints(nPoints() / 10);
 
         // Points below the piston which moves with the piston displacement
         DynamicList<label> pistonPoints(nPoints() / 10);
-        
+
         label nHeadPoints = 0;
-            
+
         forAll (points(), pointI)
         {
             scalar zCoord = points()[pointI].z();
@@ -203,18 +203,18 @@ void Foam::layerAR::addZonesAndModifiers()
             if (zCoord > deckHeight() - delta())
             {
                 headPoints.append(pointI);
-                nHeadPoints++; 
+                nHeadPoints++;
             }
             else if (zCoord < zPistV + delta())
             {
                 pistonPoints.append(pointI);
             }
         }
-        
+
         Info << "Number of head points = " << nHeadPoints << endl;
-            
-            
-        pz[nPointZones] = 
+
+
+        pz[nPointZones] =
             new pointZone
             (
                 "headPoints",
@@ -240,7 +240,7 @@ void Foam::layerAR::addZonesAndModifiers()
     else if(piston().patchID().active() && offSet() <= SMALL)
     {
         label pistonPatchID = piston().patchID().index();
-        
+
         const polyPatch& pistonPatch =
             boundaryMesh()[piston().patchID().index()];
 
@@ -264,15 +264,15 @@ void Foam::layerAR::addZonesAndModifiers()
         // Construct point zones
 
         scalar zPistV = max(boundary()[pistonPatchID].patch().localPoints()).z();
-            
+
         // Points which don't move (= cylinder head)
         DynamicList<label> headPoints(nPoints() / 10);
 
         // Points below the piston which moves with the piston displacement
         DynamicList<label> pistonPoints(nPoints() / 10);
-        
+
         label nHeadPoints = 0;
-            
+
         forAll (points(), pointI)
         {
             scalar zCoord = points()[pointI].z();
@@ -280,18 +280,18 @@ void Foam::layerAR::addZonesAndModifiers()
             if (zCoord > deckHeight() - delta())
             {
                 headPoints.append(pointI);
-                nHeadPoints++; 
+                nHeadPoints++;
             }
             else if (zCoord < zPistV + delta())
             {
                 pistonPoints.append(pointI);
             }
         }
-        
+
         Info << "Number of head points = " << nHeadPoints << endl;
-            
-            
-        pz[nPointZones] = 
+
+
+        pz[nPointZones] =
             new pointZone
             (
                 "headPoints",

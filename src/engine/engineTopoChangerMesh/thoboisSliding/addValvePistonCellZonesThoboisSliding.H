@@ -4,39 +4,39 @@
 
         for(label i = 1; i <= nValves(); i++)
         {
-            
-            
+
+
             if(valves_[i-1].poppetPatchID().active())
             {
-            
+
                 labelList movingCells(nCells());
-                                
+
                 label nMovingCells = 0;
-        
+
                 label valvePatchID = valves_[i-1].poppetPatchID().index();
                 const polyPatch& valveTopPatch = boundaryMesh()[valvePatchID];
                 scalar minPopZ = min(boundary()[valvePatchID].patch().localPoints()).z();
-                        
+
                 forAll(cellCentres(),cellI)
                 {
                     const vector& v = cellCentres()[cellI];
-                        
+
                     if
                     (
                         inValve(v, i-1)
                         &&
-                        v.z() > minPopZ 
+                        v.z() > minPopZ
                     )
                     {
                         movingCells[nMovingCells] = cellI;
                         nMovingCells++;
                     }
-            
+
                 }
-                
+
                 movingCells.setSize(nMovingCells);
                 Info << "Number of cells in the moving region poppet valve: " << nMovingCells << endl;
-                                                
+
                 cz.append
                 (
                     new cellZone
@@ -54,7 +54,7 @@
                 DynamicList<label> valveTopPoints(nPoints() / 10);
                 List<bool> valveTopPoint(nPoints(), false);
                 bool foundOne = false;
-                
+
                 const cellList& c = cells();
                 const faceList& f = allFaces();
 
@@ -71,13 +71,13 @@
                         {
 
                             const point& p = points()[curFace[pointI]];
-                        
+
                             forAll(valveTopPatch.localPoints(), j)
                             {
                                 scalar xFacePatch = valveTopPatch.localPoints()[j].x();
                                 scalar yFacePatch = valveTopPatch.localPoints()[j].y();
                                 scalar zFacePatch = valveTopPatch.localPoints()[j].z();
-                                
+
                                 if
                                 (
                                     mag(p.x() - xFacePatch) < poppetValveTol_
@@ -88,17 +88,17 @@
                                     valves_[i-1].topLayerTol()
                                 )
                                 {
-                                    foundOne = true;  
+                                    foundOne = true;
                                     valveTopPoint[curFace[pointI]] = true;
                                 }
                             }
-                
+
                         }
-            
+
                     }
-        
+
                 }
-                
+
                 forAll(valveTopPoint, pointI)
                 {
                     if(valveTopPoint[pointI])
@@ -106,7 +106,7 @@
                         valveTopPoints.append(pointI);
                     }
                 }
-                                                
+
                 pz.append
                 (
                     new pointZone
@@ -117,18 +117,18 @@
                         pointZones()
                     )
                 );
-                
+
                 nPointZones++;
 
             }
-            
+
             if(valves_[i-1].bottomPatchID().active())
             {
-            
+
                 labelList movingCells(nCells());
-                                
+
                 label nMovingCells = 0;
-                
+
                 label valvePatchID = valves_[i-1].bottomPatchID().index();
                 const polyPatch& valveBottomPatch = boundaryMesh()[valvePatchID];
                 scalar maxPopZ = max(boundary()[valvePatchID].patch().localPoints()).z();
@@ -137,7 +137,7 @@
                 forAll(cellCentres(),cellI)
                 {
                     const vector& v = cellCentres()[cellI];
-                        
+
                     if
                     (
                         inValve(v, i-1)
@@ -148,9 +148,9 @@
                         movingCells[nMovingCells] = cellI;
                         nMovingCells++;
                     }
-            
+
                 }
-                
+
                 movingCells.setSize(nMovingCells);
                 Info << "Number of cells in the moving region bottom valve: " << nMovingCells << endl;
 
@@ -166,13 +166,13 @@
                 );
 
                 nCellZones++;
-                
-                
+
+
                 // valve bottom points (move all with valve displacement)
                 DynamicList<label> valveBottomPoints(nPoints() / 10);
                 List<bool> valveBottomPoint(nPoints(), false);
                 bool foundOne = false;
-                
+
 
                 const cellList& c = cells();
                 const faceList& f = allFaces();
@@ -193,9 +193,9 @@
                                 scalar xFacePatch = valveBottomPatch.localPoints()[j].x();
                                 scalar yFacePatch = valveBottomPatch.localPoints()[j].y();
                                 scalar zFacePatch = valveBottomPatch.localPoints()[j].z();
-                                
+
                                 const point& p = points()[curFace[pointI]];
-                                
+
                                 if
                                 (
                                     mag(p.x() - xFacePatch) < bottomValveTol_
@@ -206,15 +206,15 @@
                                     valves_[i-1].bottomLayerTol()
                                 )
                                 {
-                                    foundOne = true;  
+                                    foundOne = true;
                                     valveBottomPoint[curFace[pointI]] = true;
                                 }
                             }
-                
+
                         }
-            
+
                     }
-        
+
                 }
 
                 forAll(valveBottomPoint, pointI)
@@ -224,9 +224,9 @@
                         valveBottomPoints.append(pointI);
                     }
                 }
-                
+
                 // Add point zone
-                                
+
                 pz.append
                 (
                     new pointZone
@@ -242,7 +242,7 @@
 
             }
 
-        
+
         }
-        
+
     }

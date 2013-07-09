@@ -41,7 +41,7 @@ inline const accordionValveBank& accordionEngineMesh::valves() const
 {
     return valves_;
 }
-                 
+
 
 inline const scalar& accordionEngineMesh::pistonPosition() const
 {

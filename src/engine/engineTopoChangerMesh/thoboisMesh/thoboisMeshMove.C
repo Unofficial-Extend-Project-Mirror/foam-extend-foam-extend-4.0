@@ -57,7 +57,7 @@ License
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 void Foam::thoboisMesh::makeLayersLive()
-{ 
+{
     // Enable layering
     forAll (topoChanger_, modI)
     {
@@ -131,7 +131,7 @@ void Foam::thoboisMesh::valveDetach()
             }
 
             ad.setDetach();
-            
+
         }
     }
 }
@@ -182,10 +182,10 @@ void Foam::thoboisMesh::valveAttach()
             }
 
             ad.setAttach();
-            
+
         }
     }
- 
+
 }
 
 void Foam::thoboisMesh::prepareValveDetach()

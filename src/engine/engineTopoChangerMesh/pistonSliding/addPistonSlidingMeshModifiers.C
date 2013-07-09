@@ -47,7 +47,7 @@ void Foam::pistonSliding::addZonesAndModifiers()
      || faceZones().size() > 0
      || cellZones().size() > 0
      || topoChanger_.size() > 0
-    ) 
+    )
     {
         Info<< "Time = " << engTime().theta() << endl;
         Info<< "void Foam::verticalValvesGambit::addZonesAndModifiers() : "

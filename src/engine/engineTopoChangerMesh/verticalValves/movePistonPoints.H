@@ -1,16 +1,12 @@
     {
-        
+
         Info << "moving piston points" << endl;
-    
+
         boolList scaleDisp(nPoints(), true);
-        label nScaled = nPoints();
 
         List<bool> pistonPoint(newPoints.size(), false);
 
-        label pistonPtsIndex = pointZones().findZoneID("pistonPoints");
-//        const labelList& pistonPoints = pointZones()[pistonPtsIndex];
-         
-        const scalarField& movingPointsMPiston = movingPointsMaskPiston(); 
+        const scalarField& movingPointsMPiston = movingPointsMaskPiston();
 
         labelList pistonPoints;
 
@@ -65,10 +61,10 @@
 
         }
 
-        
-           
+
+
         {
-                        
+
             // Always move piston
             scalar pistonTopZ = -GREAT;
             forAll(pistonPoints, i)
@@ -86,51 +82,41 @@
                 {
                     if (!pistonPoint[i])
                     {
-                        bool foundLow = false;
                         if (virtualPistonPosition() > newPoints[i].z())
                         {
-
-                            foundLow = true;
-                            
-                            newPoints[i].z() 
-                            = 
-                            (1.0 - movingPointsMPiston[i])*newPoints[i].z() 
-                            +
-                            movingPointsMPiston[i] *
-                            (
-                                pistonTopZ 
-                            +   
+                            newPoints[i].z() =
+                                (1.0 - movingPointsMPiston[i])*newPoints[i].z()
+                                +
+                                movingPointsMPiston[i]*
                                 (
-                                    0.9*minLayerThickness
-                                )
-                            );
-                            
+                                    pistonTopZ + 0.9*minLayerThickness
+                                );
                         }
                     }
                 }
             }
         }
-        
+
         deleteDemandDrivenData(movingPointsMaskPistonPtr_);
-        
+
         forAll(valves(), valveI)
         {
 
             Info << "moving valve points valve n. " << valveI << endl;
-        
+
             boolList scaleDisp(nPoints(), true);
             label nScaled = nPoints();
 
-            const scalarField& movingPointsMPistonValves = movingPointsMaskPistonValves(valveI); 
+            const scalarField& movingPointsMPistonValves = movingPointsMaskPistonValves(valveI);
 
             List<bool> pistonPointValve(newPoints.size(), false);
             labelList pistonPointsV;
 
             {
                 label pistonCellVIndex = cellZones().findZoneID("movingCellsPistonV"+ Foam::name(valveI + 1));
-                
+
                 if (pistonCellVIndex < 0)
-                {      
+                {
                     FatalErrorIn("bool verticalValves::update()")
                         << "movingCellsPistonV"+ Foam::name(valveI + 1)
                         << abort(FatalError);
@@ -174,7 +160,7 @@
                         nCounted++;
                     }
                 }
-                            
+
             }
 
 
@@ -183,22 +169,22 @@
                 label pointI = pistonPointsV[i];
                 pistonPointValve[pointI] = true;
                 point& p = newPoints[pointI];
-            
+
                 if (p.z() < pistonPosition() - 1.0e-6)
                 {
                     scaleDisp[pointI] = false;
                     nScaled--;
                 }
             }
-           
+
             {
-                        
+
                 // Always move piston
                 scalar pistonTopZ = -GREAT;
                 forAll(pistonPointsV, i)
                 {
                     point& p = newPoints[pistonPointsV[i]];
-                    
+
                     p.z() = p.z() + deltaZ*movingPointsMPistonValves[pistonPointsV[i]];
                     pistonTopZ = max(pistonTopZ, p.z());
                 }
@@ -211,32 +197,27 @@
                     {
                         if (!pistonPointValve[i])
                         {
-                            bool foundLow = false;
                             if (virtualPistonPosition() > newPoints[i].z())
                             {
-
-                                foundLow = true;
-                            
-                                newPoints[i].z() 
-                                = 
-                                (1.0 - movingPointsMPistonValves[i])*newPoints[i].z() 
+                                newPoints[i].z()
+                                =
+                                (1.0 - movingPointsMPistonValves[i])*newPoints[i].z()
                                 +
                                 movingPointsMPistonValves[i] *
                                 (
-                                    pistonTopZ 
-                                +      
+                                    pistonTopZ
+                                +
                                     (
                                         0.9*minLayerThickness
                                     )
                                 );
-                            
+
                             }
-                        }   
+                        }
                     }
                 }
             }
-            
+
             deleteDemandDrivenData(movingPointsMaskPistonValvesPtr_);
         }
-    
     }

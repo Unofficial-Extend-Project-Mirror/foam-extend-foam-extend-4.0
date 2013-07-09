@@ -63,22 +63,22 @@ class engineVerticalValve
 
         //- Valve head patch
         polyPatchID valveHeadPatch_;
-        
+
         //- Offset for layer Addition/Removal
         scalar topLayerOffset_;
-        
+
         //- Tolerance for adding layer face zone
         scalar topLayerTol_;
 
         //- Offset for layer Addition/Removal
         scalar bottomLayerOffset_;
-        
+
         //- Tolerance for adding layer face zone
         scalar bottomLayerTol_;
 
         //- Distance for attach/detach boundary
         scalar detachDistance_;
-        
+
         //- Tolerance for attach/detach boundary faces
         scalar detachTol_;
 
@@ -147,7 +147,7 @@ public:
 
     // Member Functions
 
-        
+
         const scalar& topLayerOffset() const
         {
             return topLayerOffset_;

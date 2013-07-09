@@ -138,7 +138,7 @@ bool Foam::thoboisSliding::attached() const
         {
             if
             (
-                result 
+                result
              != refCast<const slidingInterface>(morphs[modI]).attached()
             )
             {
@@ -250,7 +250,7 @@ void Foam::thoboisSliding::valveAttach()
             }
 
             ad.setAttach();
-            
+
         }
     }
 }

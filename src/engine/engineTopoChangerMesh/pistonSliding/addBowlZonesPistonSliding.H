@@ -9,10 +9,10 @@
         piston().bowlInCylinderPatchID().active()
     )
     {
-        
+
         Info << "Add sliding interface zones for the piston bowl" << endl;
-        
-        
+
+
         pz.append
         (
             new pointZone
@@ -21,9 +21,9 @@
                 labelList(0),
                 nPointZones,
                 pointZones()
-            )            
+            )
         );
-                            
+
         nPointZones++;
 
         const polyPatch& bowlInPistonPatch =
@@ -48,7 +48,7 @@
                 faceZones()
             )
         );
-            
+
         nFaceZones++;
 
 
@@ -75,7 +75,7 @@
                 faceZones()
             )
         );
-            
+
         nFaceZones++;
 
 
@@ -91,11 +91,11 @@
                 boolList(0, false),
                 nFaceZones,
                 faceZones()
-            )    
+            )
         );
 
-        nFaceZones++;        
-    
+        nFaceZones++;
+
     }
-    
+
 }

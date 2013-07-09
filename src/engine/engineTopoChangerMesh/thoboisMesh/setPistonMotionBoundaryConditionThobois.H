@@ -5,7 +5,7 @@
 
 {
     tetPointVectorField& motionU = mSolver.motionU();
-    
+
     Info << "setting the piston velocity" << endl;
 
     // Set piston velocity
@@ -24,7 +24,7 @@
             );
 
         pp.refValue() = vector::zero;
-        
+
     }
-        
+
 }

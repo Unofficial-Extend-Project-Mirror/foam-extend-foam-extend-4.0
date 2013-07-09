@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-        
+
 
 Description
 
@@ -32,7 +32,7 @@ SourceFiles
 
 Author
 	Tommaso Lucchini
-	
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef engineValveSliding_H
@@ -67,19 +67,19 @@ class engineValveSliding
 
         //- Piston patch
         enginePiston piston_;
-        
+
         //- vertical valves
         thoboisSlidingValveBank valves_;
-                         
+
         //- Layering-to-deformation switch in crank-angle degrees
         scalar deformSwitch_;
-        
+
         //- Top valve tolerance, when valve lift < tol, valve top layering is disabled
         scalar valveTopTol_;
 
         //- Piston Position
         scalar pistonPosition_;
-        
+
         //- Virtual position of the bottom of the valves
         scalarField valveBottomPosition_;
 
@@ -88,22 +88,22 @@ class engineValveSliding
 
         //- deckHeight
         scalar deckHeight_;
-        
+
         //- min valveHead z
         scalarField minValveZ_;
-                        
+
         //- tolerance for valve poppet faces (used to create a faceZone)
         scalar poppetValveTol_;
-        
+
         //- tolerance for valve poppet faces (used to create a faceZone)
         scalar bottomValveTol_;
-        
+
         //- Motion solver
         autoPtr<motionSolver> msPtr_;
-        
+
         //- Is the valve really closed
         boolList isReallyClosed_;
-       
+
         //- correct points motion after attach
         Switch correctPointsMotion_;
 
@@ -123,7 +123,7 @@ class engineValveSliding
 
         //- Is the sliding interface attached?
         bool attached() const;
-        
+
         //- Prepare valve attach/detach
         void valveDetach();
 
@@ -133,23 +133,23 @@ class engineValveSliding
         //- Prepare valve attach/detach
         void prepareValveDetach();
 
-        //- Check if all patches exist, then calculate virtualPistonPosition, 
+        //- Check if all patches exist, then calculate virtualPistonPosition,
         //- pistonPosition and deckHeight for the first time
         void checkAndCalculate();
-        
-        //- Calculate the virtualPistonPosition, 
+
+        //- Calculate the virtualPistonPosition,
         void setVirtualPositions();
-        
-        //- Correct the vertical motion for the points below the "virtual piston", 
+
+        //- Correct the vertical motion for the points below the "virtual piston",
         void correctVerticalMotion();
-        
+
         bool realDeformation() const;
-                        
+
         bool inValve(const point& p, const label& i) const;
         bool inPiston(const point& p) const;
 
         bool isACylinderHeadFace(const labelList& cylHeadFaces, const label face);
-                        
+
 public:
 
     //- Runtime type information
@@ -189,7 +189,7 @@ public:
                 engTime().thetaRevolution() > -deformSwitch_
              && engTime().thetaRevolution() < deformSwitch_;
         }
-        
+
         //- Return number of valves
         label nValves() const
         {
@@ -201,10 +201,10 @@ public:
 
         //- Move and morph
         virtual bool update();
-        
+
         //- Set boundary velocities
         void setBoundaryVelocity(volVectorField& U);
-        
+
 };
 
 

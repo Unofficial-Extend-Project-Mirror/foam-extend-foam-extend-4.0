@@ -71,17 +71,17 @@ class engineTimeVaryingTotalPressureFvPatchScalarField
 
         //- Total pressure
         scalarField p0_;
-        
+
         // time data file
         fileName timeDataFileName_;
-        
+
         // time data
         autoPtr<graph> timeDataPtr_;
 
         // engine time reference
         const engineTime& engineDB_;
 
-        // check the table to see if the 
+        // check the table to see if the
         // time step is included in the graph
         void checkTable();
 

@@ -34,7 +34,7 @@ License
 
 void Foam::thoboisMesh::checkAndCalculate()
 {
-    
+
     label pistonIndex = -1;
     bool foundPiston = false;
 
@@ -43,8 +43,8 @@ void Foam::thoboisMesh::checkAndCalculate()
 
     label cylinderHeadIndex = -1;
     bool foundCylinderHead = false;
-    
-    
+
+
     forAll(boundary(), i)
     {
         if (boundary()[i].name() == "piston")
@@ -64,7 +64,7 @@ void Foam::thoboisMesh::checkAndCalculate()
             foundCylinderHead = true;
         }
     }
-    
+
     reduce(foundPiston, orOp<bool>());
     reduce(foundLiner, orOp<bool>());
     reduce(foundCylinderHead, orOp<bool>());
@@ -77,14 +77,14 @@ void Foam::thoboisMesh::checkAndCalculate()
     }
 
     if (!foundLiner)
-    { 
+    {
         FatalErrorIn("Foam::thoboisMesh::checkAndCalculate()")
             << " : cannot find liner patch"
             << abort(FatalError);
     }
 
     if (!foundCylinderHead)
-    { 
+    {
         FatalErrorIn("Foam::thoboisMesh::checkAndCalculate()")
             << " : cannot find cylinderHead patch"
             << exit(FatalError);
@@ -105,21 +105,21 @@ void Foam::thoboisMesh::checkAndCalculate()
                 boundary()[cylinderHeadIndex].patch().localPoints()
             ).z();
 
- /*        
+ /*
            deckHeight() = max
             (
                 boundary()[linerIndex].patch().localPoints()
             ).z();
-*/                        
+*/
         }
         reduce(deckHeight(), minOp<scalar>());
 
         Info<< "deckHeight: " << deckHeight() << nl
             << "piston position: " << pistonPosition() << endl;
     }
-        
-    
-} 
+
+
+}
 
 void Foam::thoboisMesh::setVirtualPositions()
 {
@@ -128,32 +128,32 @@ void Foam::thoboisMesh::setVirtualPositions()
         virtualPistonPosition() = -GREAT;
 
         label pistonFaceIndex = faceZones().findZoneID("pistonLayerFaces");
-         
+
         bool foundPistonFace = (pistonFaceIndex != -1);
-        
+
         if(!foundPistonFace)
         {
             FatalErrorIn("Foam::thoboisMesh::setVirtualPistonPosition()")
                 << " : cannot find the pistonLayerFaces"
                 << exit(FatalError);
-    
+
         }
-        
+
         const labelList& pistonFaces = faceZones()[pistonFaceIndex];
         forAll(pistonFaces, i)
         {
             const face& f = faces()[pistonFaces[i]];
-        
+
             // should loop over facepoints...
             forAll(f, j)
             {
                 virtualPistonPosition() = max(virtualPistonPosition(), points()[f[j]].z());
             }
         }
-    
+
         reduce(virtualPistonPosition(), maxOp<scalar>());
-    
+
     }
-    
+
 
 }

@@ -1,8 +1,5 @@
 {
-
-    const faceZoneMesh& fZones = faceZones();
     const pointZoneMesh& pZones = pointZones();
-    const cellZoneMesh& cZones = cellZones();
 
     label constraintSize = 0;
 

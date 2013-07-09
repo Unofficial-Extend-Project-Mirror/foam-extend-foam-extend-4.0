@@ -62,8 +62,6 @@ void Foam::thoboisSliding::calcMovingMaskTop(const label i) const
 
     const labelList& cellTopVAddr =
         cellZones()[cellZones().findZoneID("movingCellsTopZoneV"+ Foam::name(i+1))];
-    
-    bool foundOne(false);
 
     forAll (cellTopVAddr, cellI)
     {
@@ -76,23 +74,14 @@ void Foam::thoboisSliding::calcMovingMaskTop(const label i) const
 
             forAll (curFace, pointI)
             {
-                
-
-                {
-                    foundOne = true;  
-                    movingPointsMaskTop[curFace[pointI]] = 1;
-                }
-                
-                
+                movingPointsMaskTop[curFace[pointI]] = 1;
             }
-            
         }
-        
     }
-    
+
     const labelList& cellTopAddr =
         cellZones()[cellZones().findZoneID("movingCellsZoneV"+ Foam::name(i+1))];
-    
+
     forAll (cellTopAddr, cellI)
     {
         const cell& curCell = c[cellTopAddr[cellI]];
@@ -104,23 +93,14 @@ void Foam::thoboisSliding::calcMovingMaskTop(const label i) const
 
             forAll (curFace, pointI)
             {
-                
-
-                {
-                    foundOne = true;  
-                    movingPointsMaskTop[curFace[pointI]] = 1;
-                }
-                
-                
+                movingPointsMaskTop[curFace[pointI]] = 1;
             }
-            
         }
-        
     }
-    
-    
-    
-/*    
+
+
+
+/*
     if(valves_[i].poppetPatchID().active())
     {
 
@@ -141,9 +121,9 @@ void Foam::thoboisSliding::calcMovingMaskTop(const label i) const
                 movingPointsMaskTop[curFace[pointI]] = 0;
             }
         }
-    
+
     }
-*/    
+*/
 }
 
 // Return moving points mask.  Moving points marked with 1
@@ -153,7 +133,7 @@ const Foam::scalarField& Foam::thoboisSliding::movingPointsMaskTop(const label i
     {
         movingPointsMaskTopPtr_ = NULL;
     }
-    
+
     if (!movingPointsMaskTopPtr_)
     {
         calcMovingMaskTop(i);
@@ -207,7 +187,7 @@ void Foam::thoboisSliding::calcMovingMaskBottom(const label i) const
         }
     }
 
-/*    
+/*
     if(valves_[i].bottomPatchID().active())
     {
 
@@ -228,9 +208,9 @@ void Foam::thoboisSliding::calcMovingMaskBottom(const label i) const
                 movingPointsMaskBottom[curFace[pointI]] = 0;
             }
         }
-    
+
     }
-*/    
+*/
 }
 
 // Return moving points mask.  Moving points marked with 1
@@ -240,7 +220,7 @@ const Foam::scalarField& Foam::thoboisSliding::movingPointsMaskBottom(const labe
     {
         movingPointsMaskBottomPtr_ = NULL;
     }
-    
+
     if (!movingPointsMaskBottomPtr_)
     {
         calcMovingMaskBottom(i);
@@ -275,8 +255,6 @@ void Foam::thoboisSliding::calcMovingMaskPiston() const
 
     const labelList& cellAddr =
         cellZones()[cellZones().findZoneID("movingCellsPiston")];
-    
-    bool foundOne(false);
 
     forAll (cellAddr, cellI)
     {
@@ -289,21 +267,10 @@ void Foam::thoboisSliding::calcMovingMaskPiston() const
 
             forAll (curFace, pointI)
             {
-                
-
-                {
-                    foundOne = true;  
-                    movingPointsMaskPiston[curFace[pointI]] = 1;
-                }
-                
-                
+                movingPointsMaskPiston[curFace[pointI]] = 1;
             }
-            
         }
-        
     }
-    
-        
 }
 
 // Return moving points mask.  Moving points marked with 1
@@ -313,7 +280,7 @@ const Foam::scalarField& Foam::thoboisSliding::movingPointsMaskPiston() const
     {
         movingPointsMaskPistonPtr_ = NULL;
     }
-    
+
     if (!movingPointsMaskPistonPtr_)
     {
         calcMovingMaskPiston();
@@ -349,8 +316,6 @@ void Foam::thoboisSliding::calcMovingMaskPistonValves(const label i) const
 
     const labelList& cellAddr =
         cellZones()[cellZones().findZoneID("movingCellsPistonV" + Foam::name(i+1))];
-    
-    bool foundOne(false);
 
     forAll (cellAddr, cellI)
     {
@@ -363,21 +328,10 @@ void Foam::thoboisSliding::calcMovingMaskPistonValves(const label i) const
 
             forAll (curFace, pointI)
             {
-                
-
-                {
-                    foundOne = true;  
-                    movingPointsMaskPistonValves[curFace[pointI]] = 1;
-                }
-                
-                
+                movingPointsMaskPistonValves[curFace[pointI]] = 1;
             }
-            
         }
-        
     }
-
-        
 }
 
 // Return moving points mask.  Moving points marked with 1
@@ -387,7 +341,7 @@ const Foam::scalarField& Foam::thoboisSliding::movingPointsMaskPistonValves(cons
     {
         movingPointsMaskPistonValvesPtr_ = NULL;
     }
-    
+
     if (!movingPointsMaskPistonValvesPtr_)
     {
         calcMovingMaskPistonValves(i);

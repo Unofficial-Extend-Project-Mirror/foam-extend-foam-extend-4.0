@@ -89,11 +89,11 @@ void Foam::pistonLayer::addZonesAndModifiers()
 #   include "addPistonLayerFaces.H"
 
     {
-        
+
         pointSet headPointSet(*this, headPointsSetName_);
-    
+
         Info << "Number of head points = " << headPointSet.size() << endl;
-        pz[nPointZones] = 
+        pz[nPointZones] =
             new pointZone
             (
                 "headPoints",
@@ -103,9 +103,9 @@ void Foam::pistonLayer::addZonesAndModifiers()
             );
 
         nPointZones++;
-        
+
     }
-    
+
     Info<< "Adding " << nPointZones << " point and "
         << nFaceZones << " face zones" << endl;
 
@@ -117,21 +117,21 @@ void Foam::pistonLayer::addZonesAndModifiers()
     label nMods = 0;
 
     // Add piston layer addition
-    Info << "Adding Layer Addition/Removal Mesh Modifier" << endl; 
- 
+    Info << "Adding Layer Addition/Removal Mesh Modifier" << endl;
+
 #   include "addPistonLayerAdditionRemovalMeshModifier.H"
 
     topoChanger_.writeOpt() = IOobject::AUTO_WRITE;
     topoChanger_.write();
-    
+
     write();
-    
+
     // Calculating the virtual piston position
     setVirtualPistonPosition();
-        
+
     Info << "virtualPistonPosition = " << virtualPistonPosition() << endl;
     Info << "piston position = " << pistonPosition() << endl;
-    
+
 }
 
 
