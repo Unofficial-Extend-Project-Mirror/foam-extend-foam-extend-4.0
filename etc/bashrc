@@ -249,7 +249,7 @@ Darwin)
 
     # Make sure that binaries use the best features of the used OS-Version
     # We need to get rid of the revision number from this string. eg turn "10.7.5" into "10.7"
-    v=( ${MACOSX_DEPLOYMENT_TARGET//./ } )
+    v=(`sw_vers -productVersion | sed 's/\./ /g'`)
     export MACOSX_DEPLOYMENT_TARGET="${v[0]}.${v[1]}"
 
     if [ "$compilerInstall" == "System" ]
