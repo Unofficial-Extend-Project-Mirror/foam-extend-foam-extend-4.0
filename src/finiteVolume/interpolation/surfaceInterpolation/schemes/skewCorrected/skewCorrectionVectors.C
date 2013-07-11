@@ -147,7 +147,7 @@ void Foam::skewCorrectionVectors::makeSkewCorrectionVectors() const
             << "skew coefficient = " << skewCoeff << endl;
     }
 
-    //skewCoeff = 0.0;
+    reduce(skewCoeff, maxOp<scalar>());
 
     if (skewCoeff < 1e-5)
     {
