@@ -142,7 +142,9 @@ export WM_COMPILER_LIB_ARCH=
 : ${WM_MPLIB:=OPENMPI}; export WM_MPLIB
 
 # WM_NCOMPPROCS = <number of processes to use>
-: ${WM_NCOMPPROCS:=`foamGetSystemInfo -nbrCores`}; export WM_NCOMPPROCS
+# Warning: Need to use a complete path for foamGetSystemInfo because the PATH
+# environment variable is not properly initialized yet.
+: ${WM_NCOMPPROCS:=`$WM_PROJECT_DIR/bin/foamGetSystemInfo -nbrCores`}; export WM_NCOMPPROCS
 
 
 # Run options (floating-point signal handling and memory initialisation)

@@ -134,7 +134,9 @@ if ( ! $?WM_COMPILE_OPTION ) setenv WM_COMPILE_OPTION Opt
 if ( ! $?WM_MPLIB ) setenv WM_MPLIB OPENMPI
 
 # WM_NCOMPPROCS = <number of processes to use>
-if ( ! $?WM_NCOMPPROCS ) setenv WM_NCOMPPROCS `foamGetSystemInfo -nbrCores`
+# Warning: Need to use a complete path for foamGetSystemInfo because the PATH
+# environment variable is not properly initialized yet.
+if ( ! $?WM_NCOMPPROCS ) setenv WM_NCOMPPROCS `$WM_PROJECT_DIR/bin/foamGetSystemInfo -nbrCores`
 
 # Run options (floating-point signal handling and memory initialisation)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
