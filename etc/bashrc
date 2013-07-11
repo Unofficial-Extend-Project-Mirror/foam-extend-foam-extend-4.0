@@ -265,12 +265,6 @@ Darwin)
     # We need to get rid of the revision number from this string. eg turn "10.7.5" into "10.7"
     export MACOSX_DEPLOYMENT_TARGET=`sw_vers -productVersion | sed -e "s/\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)/\1.\2/g"`
 
-    # this gives strange results with some shells
-    #    v=(`sw_vers -productVersion | sed 's/\./ /g'`)
-    #    export MACOSX_DEPLOYMENT_TARGET="${v[0]}.${v[1]}"
-
-    export MACOSX_DEPLOYMENT_TARGET=`sw_vers -productVersion | sed -e "s/\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)/\1.\2/g"`
-
     which -s port >/dev/null
     if [ $? -eq "0" -a -d '/opt/local/etc/macports' ]
     then
