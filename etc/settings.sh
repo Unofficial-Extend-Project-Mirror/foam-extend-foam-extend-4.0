@@ -49,7 +49,11 @@ _foamAddLib()
         export LD_LIBRARY_PATH=$1:$LD_LIBRARY_PATH
         if [ "$WM_ARCH_BASE" = "darwin" ]
         then
-            export DYLD_LIBRARY_PATH=$1:$DYLD_LIBRARY_PATH
+            # do NOT add the lib of MacPort as this might break programs
+            if [ "$1" != "/opt/local/lib" ]
+            then
+		export DYLD_LIBRARY_PATH=$1:$DYLD_LIBRARY_PATH
+	    fi
         fi
         shift
     done
