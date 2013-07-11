@@ -42,6 +42,10 @@ fi
 
 export WM_PROJECT=OpenFOAM
 export WM_PROJECT_VERSION=1.6-ext
+if [ -n "$WM_PROJECT_VERSION_ADDITION" ]
+then
+    export WM_PROJECT_VERSION=$WM_PROJECT_VERSION-$WM_PROJECT_VERSION_ADDITION
+fi
 
 # helps to easily write #ifdefs to detect a dev-version
 export FOAM_DEV=1
