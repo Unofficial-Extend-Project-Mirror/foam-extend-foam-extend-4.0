@@ -187,17 +187,19 @@ fi
 unset compilerBin compilerLib compilerInstall
 
 
-case "$WM_COMPILER" in
-Gcc*)
-    export WM_CC='gcc'
-    export WM_CXX='g++'
-    ;;
-Icc)
-    export WM_CC='icc'
-    export WM_CXX='icpc'
-    ;;
-esac
-
+if [ -z "$WM_CC" ]
+then
+    case "$WM_COMPILER" in
+	Gcc*)
+	    export WM_CC='gcc'
+	    export WM_CXX='g++'
+	    ;;
+	Icc)
+	    export WM_CC='icc'
+	    export WM_CXX='icpc'
+	    ;;
+    esac
+fi
 
 # Communications library
 # ~~~~~~~~~~~~~~~~~~~~~~

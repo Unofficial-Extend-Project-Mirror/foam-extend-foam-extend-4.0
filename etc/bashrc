@@ -268,26 +268,68 @@ Darwin)
 
     export MACOSX_DEPLOYMENT_TARGET=`sw_vers -productVersion | sed -e "s/\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)/\1.\2/g"`
 
-    if [ "$compilerInstall" == "System" ]
+    which -s port >/dev/null
+    if [ $? -eq "0" -a -d '/opt/local/etc/macports' ]
     then
-        # Use Mac-Ports-Compiler instead of Apple-gcc-4.2
-	case $WM_COMPILER in
-        Gcc43)
-            export WM_CC='gcc-mp-4.3'
-            export WM_CXX='g++-mp-4.3'
-            ;;
-        Gcc44)
-            export WM_CC='gcc-mp-4.4'
-            export WM_CXX='g++-mp-4.4'
-            ;;
-        Gcc45)
-            export WM_CC='gcc-mp-4.5'
-            export WM_CXX='g++-mp-4.5'
-            ;;
-        *)
-            export WM_COMPILER=
-            ;;
-        esac
+       if [ "$FOAM_VERBOSE" -a "$PS1" ]
+       then
+           echo "Using Macports binaries"
+       fi
+
+       export WM_USE_MACPORT=1
+
+       if [ "$compilerInstall" == "System" ]
+       then
+           # Use Mac-Ports-Compiler instead of Apple-gcc-4.2
+	   case $WM_COMPILER in
+               Gcc42)
+		   export WM_MACPORT_VERSION=4.2
+		   ;;
+               Gcc43)
+		   export WM_MACPORT_VERSION=4.3
+		   ;;
+               Gcc44)
+		   export WM_MACPORT_VERSION=4.4
+		   ;;
+               Gcc45)
+		   export WM_MACPORT_VERSION=4.5
+		   ;;
+               Gcc46)
+		   export WM_MACPORT_VERSION=4.6
+		   ;;
+               Gcc47)
+		   export WM_MACPORT_VERSION=4.7
+		   ;;
+               Gcc48)
+		   export WM_MACPORT_VERSION=4.8
+		   ;;
+               Gcc)
+		   ;;
+               *)
+		   echo "Unsupported MacPorts-Compiler $WM_COMPILER"
+		   ;;
+           esac
+	   if [ "$WM_COMPILER" != "Gcc" ]
+	   then
+               export WM_CC="gcc-mp-$WM_MACPORT_VERSION"
+               export WM_CXX="g++-mp-$WM_MACPORT_VERSION"
+
+	       ruleDirBase=$WM_DIR/rules/$WM_ARCH
+	       ruleDir=$ruleDirBase$WM_COMPILER
+	       if [ ! -e $ruleDir ]
+	       then
+		   echo "Rule directory $ruleDir not existing. Linking to $ruleDirBase"
+		   ln -s $ruleDirBase $ruleDir
+	       fi
+	       unset ruleDir ruleDirBase
+	   fi
+       fi
+    fi
+    if [ -z "$WM_CC" ]
+    then
+	# nobody set the compiler
+	export WM_CC="gcc"
+	export WM_CXX="g++"
     fi
     ;;
 
