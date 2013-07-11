@@ -32,6 +32,14 @@
 #
 #------------------------------------------------------------------------------
 
+prefSettingFile=$0.preset
+if [ -f $prefSettingFile ]
+then
+    #    echo "Found presettings $prefSettingFile"
+    . $prefSettingFile
+fi
+
+
 export WM_PROJECT=OpenFOAM
 export WM_PROJECT_VERSION=1.6-ext
 
