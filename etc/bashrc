@@ -275,6 +275,19 @@ Darwin)
 
        export WM_USE_MACPORT=1
 
+       if [ -e '/opt/local/bin/openmpicc' ]
+       then
+           export WM_MPLIB=MACPORTOPENMPI
+       else
+           if [ -z "$WM_CHOSEN_MAC_MPI" ]
+           then
+               echo "WM_CHOSEN_MAC_MPI unset. Using OPENMPI"
+               export WM_MPLIB=OPENMPI
+           else
+               export WM_MPLIB=$WM_CHOSEN_MAC_MPI
+           fi
+        fi
+
        if [ "$compilerInstall" == "System" ]
        then
            # Use Mac-Ports-Compiler instead of Apple-gcc-4.2

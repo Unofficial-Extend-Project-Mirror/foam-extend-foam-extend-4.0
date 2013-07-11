@@ -240,6 +240,20 @@ OPENMPI)
     unset mpi_version
     ;;
 
+MACPORTOPENMPI)
+       unset OPAL_PREFIX
+
+       export FOAM_MPI=openmpi-macport
+       libDir=`openmpicc --showme:link | sed -e 's/.*-L\([^ ]*\).*/\1/'`
+
+       # Bit of a hack: strip off 'lib' and hope this is the path to openmpi
+       # include files and libraries.
+       export MPI_ARCH_PATH="${libDir%/*}"
+
+       _foamAddLib     $libDir
+       unset libDir
+       ;;
+
 SYSTEMOPENMPI)
     mpi_version=openmpi-system
 
