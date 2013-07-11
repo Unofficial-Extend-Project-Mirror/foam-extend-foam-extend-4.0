@@ -78,12 +78,6 @@ export WM_PROJECT_INST_DIR=$FOAM_INST_DIR
 export WM_PROJECT_DIR=$WM_PROJECT_INST_DIR/$WM_PROJECT-$WM_PROJECT_VERSION
 : ${WM_PROJECT_USER_DIR:=$HOME/$WM_PROJECT/$USER-$WM_PROJECT_VERSION}; export WM_PROJECT_USER_DIR
 
-
-# Location of third-party software
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#: ${WM_THIRD_PARTY_DIR=$WM_PROJECT_INST_DIR/ThirdParty-$WM_PROJECT_VERSION}; export WM_THIRD_PARTY_DIR
-: ${WM_THIRD_PARTY_DIR=$WM_PROJECT_DIR/ThirdParty}; export WM_THIRD_PARTY_DIR
-
 # Source files, possibly with some verbosity
 _foamSource()
 {
@@ -98,6 +92,12 @@ _foamSource()
 # Add in preset user or site preferences:
 foamPrefs=`$WM_PROJECT_DIR/bin/foamEtcFile prefs.sh` && _foamSource $foamPrefs
 unset foamPrefs
+
+
+# Location of third-party software
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#: ${WM_THIRD_PARTY_DIR=$WM_PROJECT_INST_DIR/ThirdParty-$WM_PROJECT_VERSION}; export WM_THIRD_PARTY_DIR
+: ${WM_THIRD_PARTY_DIR=$WM_PROJECT_DIR/ThirdParty}; export WM_THIRD_PARTY_DIR
 
 # Evaluate command-line parameters
 while [ $# -gt 0 ]
