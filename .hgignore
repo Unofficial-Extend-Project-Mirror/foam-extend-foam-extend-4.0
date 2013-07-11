@@ -77,6 +77,9 @@ PlyParser_FoamFileParser_parsetab.py
 # .gitignore
 .timeStamp
 
+# make sure that this settings file is not used
+etc/bashrc.preset
+
 #Test-Harness generated stuff
 testHarness/OpenFOAM/1.6-ext/runDir/tutorialsTestSuites_oneTimeStep
 testHarness/OpenFOAM/1.6-ext/runDir/Testing
