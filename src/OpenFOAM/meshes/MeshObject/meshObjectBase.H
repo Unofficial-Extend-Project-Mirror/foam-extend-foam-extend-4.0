@@ -68,7 +68,7 @@ public:
         static void allUpdateTopology(const Mesh& mesh, const mapPolyMesh& mpm)
         {
             HashTable<const meshObjectBase*> tbl =
-                mesh.objectRegistry::lookupClass<meshObjectBase>();
+                mesh.objectRegistry::template lookupClass<meshObjectBase>();
 
             if (Mesh::debug)
             {
@@ -112,7 +112,7 @@ public:
             if (mesh.moving())
             {
                 HashTable<const meshObjectBase*> tbl =
-                    mesh.objectRegistry::lookupClass<meshObjectBase>();
+                    mesh.objectRegistry::template lookupClass<meshObjectBase>();
 
                 if (Mesh::debug)
                 {
@@ -154,7 +154,7 @@ public:
         static void allDelete(const Mesh& mesh)
         {
             HashTable<const meshObjectBase*> tbl =
-                mesh.objectRegistry::lookupClass<meshObjectBase>();
+                mesh.objectRegistry::template lookupClass<meshObjectBase>();
 
             for
             (
