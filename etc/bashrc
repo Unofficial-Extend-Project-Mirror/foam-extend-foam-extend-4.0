@@ -325,7 +325,7 @@ Darwin)
                export WM_CXX="g++-mp-$WM_MACPORT_VERSION"
                export WM_FC="gfortran-mp-$WM_MACPORT_VERSION"
 
-	       ruleDirBase=$WM_DIR/rules/$WM_ARCH
+	       ruleDirBase=$WM_PROJECT_DIR/wmake/rules/$WM_ARCH
 	       ruleDir=$ruleDirBase$WM_COMPILER
 	       if [ ! -e $ruleDir ]
 	       then
