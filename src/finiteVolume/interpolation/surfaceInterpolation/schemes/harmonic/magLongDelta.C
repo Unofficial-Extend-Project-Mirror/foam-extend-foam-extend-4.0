@@ -59,18 +59,13 @@ Foam::magLongDelta::~magLongDelta()
 
 void Foam::magLongDelta::clearData() const
 {
-    if (magLongDeltaPtr_)
+    deleteDemandDrivenData(magLongDeltaPtr_);
+
+    forAll (magLongDeltaBnd_, i)
     {
-        delete magLongDeltaPtr_;
-    }
-    else
-    {
-        forAll (magLongDeltaBnd_, i)
+        if (magLongDeltaBnd_[i])
         {
-            if (magLongDeltaBnd_[i])
-            {
-                delete magLongDeltaBnd_[i];
-            }
+            deleteDemandDrivenData(magLongDeltaBnd_[i]);
         }
     }
 }
@@ -120,22 +115,15 @@ void Foam::magLongDelta::makeMagLongDistance() const
 
     forAll (mldp.boundaryField(), patchi)
     {
-        const fvPatch& p = mesh().boundary()[patchi];
-
-        if (p.coupled())
+        if(magLongDeltaBnd_[patchi])
         {
-            if (!magLongDeltaBnd_[patchi])
-            {
-                makeMagLongDistance(patchi);
-            }
-
+            // Reuse already existing boundary data;
             mldp.boundaryField()[patchi] = *magLongDeltaBnd_[patchi];
-            delete magLongDeltaBnd_[patchi];
-            magLongDeltaBnd_[patchi] = &mldp.boundaryField()[patchi];
+            deleteDemandDrivenData(magLongDeltaBnd_[patchi]);
         }
         else
         {
-            delete magLongDeltaBnd_[patchi];
+            mldp.boundaryField()[patchi] = calcMagLongDistance(patchi);
         }
     }
 
@@ -148,30 +136,42 @@ void Foam::magLongDelta::makeMagLongDistance() const
 }
 
 
-void Foam::magLongDelta::makeMagLongDistance(label patchi) const
+void Foam::magLongDelta::makeMagLongDistance(const label patchi) const
 {
     if (debug)
     {
-        Info<< "magLongDelta::makeMagLongDistanceBnd(label patchi) :"
+        Info<< "magLongDelta::makeMagLongDistance(label patchi) :"
             << "Constructing magnitude of long cell distance"
             << endl;
     }
 
+    magLongDeltaBnd_[patchi] = new scalarField(calcMagLongDistance(patchi));
+
+    if (debug)
+    {
+        Info<< "magLongDelta::makeMagLongDistance(label patchi) :"
+            << "Finished magnitude of long cell distance"
+            << endl;
+    }
+}
+
+
+Foam::tmp<Foam::scalarField> Foam::magLongDelta::calcMagLongDistance
+(
+    const label patchi
+) const
+{
     const fvPatch& p = mesh().boundary()[patchi];
 
     vectorField d = p.fvPatch::delta();
 
-    magLongDeltaBnd_[patchi] =
-        new scalarField
-        (
-            (mag(p.Sf() & d) + mag(p.Sf() & (p.delta() - d)))/p.magSf()
-        );
-
-    if (debug)
+    if (p.coupled())
     {
-        Info<< "magLongDelta::makeMagLongDistanceBnd(label patchi) :"
-            << "Finished magnitude of long cell distance"
-            << endl;
+        return (mag(p.Sf() & d) + mag(p.Sf() & (p.delta() - d)))/p.magSf();
+    }
+    else
+    {
+        return mag(p.Sf() & d)/p.magSf();
     }
 }
 
@@ -192,18 +192,15 @@ const Foam::scalarField& Foam::magLongDelta::magDelta
     const label patchi
 ) const
 {
-    if (!mesh().boundary()[patchi].coupled())
+    // complete field exists - return boundary
+    if(magLongDeltaPtr_)
     {
-        FatalErrorIn
-        (
-            "const Foam::scalarField& Foam::magLongDelta::magDelta("
-            "const label patchi) const"
-        )   << "patch is not a coupled. Cannot calculate long distance"
-            << abort(FatalError);
+        return magLongDeltaPtr_->boundaryField()[patchi];
     }
 
     if (!magLongDeltaBnd_[patchi])
     {
+        // boundary data does not exist - make it
         makeMagLongDistance(patchi);
     }
 
@@ -221,8 +218,6 @@ bool Foam::magLongDelta::movePoints() const
 
     clearData();
 
-    magLongDeltaBnd_.setSize(mesh().boundary().size(), NULL);
-
     return true;
 }
 
@@ -237,7 +232,11 @@ bool Foam::magLongDelta::updateMesh(const mapPolyMesh& mpm) const
 
     clearData();
 
-    magLongDeltaBnd_.setSize(mesh().boundary().size(), NULL);
+    // Resize if necessary
+    if(mesh().boundary().size() != magLongDeltaBnd_.size())
+    {
+        magLongDeltaBnd_.setSize(mesh().boundary().size(), NULL);
+    }
 
     return true;
 }

@@ -68,11 +68,14 @@ class magLongDelta
 
     // Private member functions
 
-        //- Construct Long distance
+        //- Construct long distance
         void makeMagLongDistance() const;
 
-        //- Construct Long distance
-        void makeMagLongDistance(label patchi) const;
+        //- Construct long distance for patch
+        void makeMagLongDistance(const label patchi) const;
+
+        //- Calculate long distance for patch
+        tmp<scalarField> calcMagLongDistance(const label patchi) const;
 
         //- Clear Data
         void clearData() const;
