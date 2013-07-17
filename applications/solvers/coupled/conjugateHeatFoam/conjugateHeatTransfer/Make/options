@@ -1,0 +1,13 @@
+EXE_INC = \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/radiation/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/VectorN/lnInclude
+
+LIB_LIBS = \
+    -lfiniteVolume \
+    -lspecie \
+    -lbasicThermophysicalModels \
+    -lradiation \
+    -lVectorN
+

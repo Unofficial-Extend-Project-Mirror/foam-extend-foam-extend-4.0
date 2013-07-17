@@ -282,6 +282,26 @@ Foam::tmp<Foam::scalarField> Foam::hhuMixtureThermo<MixtureType>::Cp
 
 
 template<class MixtureType>
+Foam::tmp<Foam::scalarField>
+Foam::hhuMixtureThermo<MixtureType>::Cp
+(
+    const scalarField& T,
+    const labelList& cells
+) const
+{
+    tmp<scalarField> tCp(new scalarField(T.size()));
+    scalarField& cp = tCp();
+
+    forAll(T, celli)
+    {
+        cp[celli] = this->cellMixture(cells[celli]).Cp(T[celli]);
+    }
+
+    return tCp;
+}
+
+
+template<class MixtureType>
 Foam::tmp<Foam::volScalarField>
 Foam::hhuMixtureThermo<MixtureType>::Cp() const
 {

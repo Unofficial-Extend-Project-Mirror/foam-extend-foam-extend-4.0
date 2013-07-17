@@ -346,7 +346,7 @@ void Foam::regionCouplePolyPatch::calcLocalParallel() const
 
         if (emptyOrComplete)
         {
-           Info<< "local parallel" << endl;
+            Info<< "local parallel" << endl;
         }
         else
         {
@@ -499,7 +499,6 @@ void Foam::regionCouplePolyPatch::clearOut() const
 
     deleteDemandDrivenData(zoneAddressingPtr_);
     deleteDemandDrivenData(patchToPatchPtr_);
-    deleteDemandDrivenData(localParallelPtr_);
 }
 
 
@@ -810,6 +809,7 @@ void Foam::regionCouplePolyPatch::attach() const
         // Patch-to-patch interpolation does not need to be cleared,
         // only face/cell centres and interpolation factors
         // HJ, 6/Jun/2011
+        //clearGeom()
 
         // Clear delta coefficients, but keep the rest.
         // HR, 10/Jul/2013
@@ -828,6 +828,7 @@ void Foam::regionCouplePolyPatch::detach() const
         // Patch-to-patch interpolation does not need to be cleared,
         // only face/cell centres and interpolation factors
         // HJ, 6/Jun/2011
+        //clearGeom()
 
         // Clear delta coefficients, but keep the rest.
         // HR, 10/Jul/2013
