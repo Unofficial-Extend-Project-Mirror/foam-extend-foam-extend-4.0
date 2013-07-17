@@ -85,7 +85,7 @@ Foam::label Foam::cyclicPolyPatch::findMaxArea
 }
 
 
-void Foam::cyclicPolyPatch::calcTransforms()
+void Foam::cyclicPolyPatch::calcTransforms() const
 {
     if (size())
     {
@@ -243,7 +243,7 @@ void Foam::cyclicPolyPatch::calcTransforms()
             {
                 SeriousErrorIn
                 (
-                    "void cyclicPolyPatch::calcTransforms()"
+                    "void cyclicPolyPatch::calcTransforms() const"
                 )   << "Transformation tensor is not constant for the cyclic "
                     << "patch " << name()
                     << ".  Please reconsider your setup and definition of "

@@ -51,7 +51,7 @@ Foam::tmp<Foam::Field<Type> > Foam::regionCouplePolyPatch::fastExpand
     // Notes:
     // A) If the size of zone addressing is zero, data is not sent
     // B) Communicated data on each processor has the size of live faces
-    // C) Expanded data will be equal to actual data fronm other processors
+    // C) Expanded data will be equal to actual data from other processors
     //    only for the faces marked in remote; for other faces, it will be
     //    equal to zero
     // D) On processor zero, complete data is available
@@ -79,6 +79,15 @@ Foam::tmp<Foam::Field<Type> > Foam::regionCouplePolyPatch::fastExpand
             ") const"
         )   << "Requested expand on local parallel.  This is not allowed"
             << abort(FatalError);
+    }
+
+    // This function requires send-receive-addressing, but usage is not
+    // symmetric across processors. Hence trigger re-calculate at this point
+    // HR, 10/Jul/2013
+    if (Pstream::parRun() && !localParallel())
+    {
+        receiveAddr();
+        shadow().receiveAddr();
     }
 
     // Expand the field to zone size

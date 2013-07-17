@@ -414,7 +414,7 @@ void Foam::overlapGgiPolyPatch::updateMesh()
 }
 
 
-void Foam::overlapGgiPolyPatch::calcTransforms()
+void Foam::overlapGgiPolyPatch::calcTransforms() const
 {
     forwardT_.setSize(0);
     reverseT_.setSize(0);

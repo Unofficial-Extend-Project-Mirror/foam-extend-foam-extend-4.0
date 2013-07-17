@@ -125,7 +125,7 @@ private:
             static label findMaxArea(const pointField&, const faceList&);
 
             //- Force calculation of transformation tensors
-            virtual void calcTransforms();
+            virtual void calcTransforms() const;
 
 
         // Face ordering

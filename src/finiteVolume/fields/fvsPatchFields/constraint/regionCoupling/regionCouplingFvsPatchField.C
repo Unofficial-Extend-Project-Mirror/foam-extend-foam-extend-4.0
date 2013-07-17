@@ -34,6 +34,24 @@ Author
 namespace Foam
 {
 
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+template<class Type>
+const Foam::Field<Type>& regionCouplingFvsPatchField<Type>::originalPatchField() const
+{
+    if (curTimeIndex_ != this->db().time().timeIndex())
+    {
+        // Store original field for symmetric evaluation
+        // Henrik Rusche, Aug/2011
+
+        originalPatchField_ = *this;
+        curTimeIndex_ = this->db().time().timeIndex();
+    }
+
+    return originalPatchField_;
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
@@ -131,21 +149,37 @@ regionCouplingFvsPatchField<Type>::regionCouplingFvsPatchField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Return neighbour field
+// Return a named shadow patch field
+template<class Type>
+template<class LookupField, class LookupType>
+const typename LookupField::PatchFieldType&
+regionCouplingFvsPatchField<Type>::lookupShadowPatchField
+(
+    const word& name,
+    const LookupField*,
+    const LookupType*
+) const
+{
+    // Lookup neighbour field
+    const LookupField& shadowField =
+        regionCouplePatch_.shadowRegion().
+        objectRegistry::lookupObject<LookupField>(name);
+
+    return shadowField.boundaryField()[regionCouplePatch_.shadowIndex()];
+}
+
+
+// Return shadow patch field
 template<class Type>
 const regionCouplingFvsPatchField<Type>&
 regionCouplingFvsPatchField<Type>::shadowPatchField() const
 {
     // Lookup neighbour field
-    typedef GeometricField<Type, fvsPatchField, surfaceMesh> GeoField;
-
-    const GeoField& coupleField =
-        regionCouplePatch_.shadowRegion().
-        objectRegistry::lookupObject<GeoField>(remoteFieldName_);
+    typedef GeometricField<Type, fvPatchField, volMesh> GeoField;
 
     return refCast<const regionCouplingFvsPatchField<Type> >
     (
-        coupleField.boundaryField()[regionCouplePatch_.shadowIndex()]
+        lookupShadowPatchField<GeoField, Type>(remoteFieldName_)
     );
 }
 

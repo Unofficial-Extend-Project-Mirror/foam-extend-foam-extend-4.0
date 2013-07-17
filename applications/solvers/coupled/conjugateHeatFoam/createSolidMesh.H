@@ -11,5 +11,22 @@ Info << "s1" << endl;
         )
     );
 
-Info << "s2" << endl;
+{
+    const polyPatchList& patches = solidMesh.boundaryMesh();
+
+    forAll (patches, patchI)
+    {
+        if (isType<regionCouplePolyPatch>(patches[patchI]))
+        {
+            const regionCouplePolyPatch& rcp =
+                refCast<const regionCouplePolyPatch>(patches[patchI]);
+
+            // Attach it here
+            rcp.attach();
+        }
+    }
+
+    // Force recalculation of weights
+    solidMesh.surfaceInterpolation::movePoints(); 
+}
 
