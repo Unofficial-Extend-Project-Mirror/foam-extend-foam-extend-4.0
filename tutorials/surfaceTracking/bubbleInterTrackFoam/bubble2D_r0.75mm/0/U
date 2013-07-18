@@ -36,7 +36,7 @@ boundaryField
     {
         type            fixedGradient;
         gradient        uniform (0 0 0);
-	    value           uniform ( 0 0 0 );
+        value           uniform ( 0 0 0 );
     }
     frontAndBackPlanes
     {

@@ -90,8 +90,8 @@ public:
         //- Read constructor
         contactProblem
         (
-	 volVectorField& U
-	 );
+           volVectorField& U
+        );
 
 
     // Destructor

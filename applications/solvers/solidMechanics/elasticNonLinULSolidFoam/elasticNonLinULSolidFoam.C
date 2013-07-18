@@ -53,131 +53,131 @@ Author
 
 int main(int argc, char *argv[])
 {
-# include "setRootCase.H"
+#   include "setRootCase.H"
 
-# include "createTime.H"
+#   include "createTime.H"
 
-# include "createMesh.H"
+#   include "createMesh.H"
 
-# include "createFields.H"
+#   include "createFields.H"
 
-# include "readDivDSigmaExpMethod.H"
+#   include "readDivDSigmaExpMethod.H"
 
-# include "readDivDSigmaLargeStrainExpMethod.H"
+#   include "readDivDSigmaLargeStrainExpMethod.H"
 
-# include "readMoveMeshMethod.H"
+#   include "readMoveMeshMethod.H"
 
-# include "createSolidInterface.H"
+#   include "createSolidInterface.H"
 
 //* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-  Info << "\nStarting time loop\n" << endl;
+    Info << "\nStarting time loop\n" << endl;
 
-  for (runTime++; !runTime.end(); runTime++)
+    for (runTime++; !runTime.end(); runTime++)
     {
-      Info<< "Time = " << runTime.timeName() << nl << endl;
+        Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#     include "readStressedFoamControls.H"
+#       include "readStressedFoamControls.H"
 
-      int iCorr = 0;
-      lduMatrix::solverPerformance solverPerf;
-      scalar initialResidual = 0;
-      scalar relativeResidual = GREAT;
-      lduMatrix::debug = 0;
+        int iCorr = 0;
+        lduMatrix::solverPerformance solverPerf;
+        scalar initialResidual = 0;
+        scalar relativeResidual = GREAT;
+        lduMatrix::debug = 0;
 
-      do
-	{
-	  DU.storePrevIter();
-
-	  divDSigmaLargeStrainExp.storePrevIter();
-
-#         include "calculateDivDSigmaExp.H"
-
-#         include "calculateDivDSigmaLargeStrainExp.H"
-
-	  //----------------------------------------------------//
-	  //- updated lagrangian large strain momentum equation
-	  //----------------------------------------------------//
-	  fvVectorMatrix DUEqn
-	    (
-	     fvm::d2dt2(rho,DU)
-	     ==
-	     fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
-	     + divDSigmaExp
-	     + divDSigmaLargeStrainExp
-	     );
-
-	  if(solidInterfaceCorr)
-	    {
-	      solidInterfacePtr->correct(DUEqn);
-	    }
-
-	  solverPerf = DUEqn.solve();
-
-	  if(iCorr == 0)
-            {
-	      initialResidual = solverPerf.initialResidual();
-            }
-
-	  DU.relax();
-
-	  if(solidInterfaceCorr)
-	    {
-	      gradDU = solidInterfacePtr->grad(DU);
-	    }
-	  else
-	    {
-	      gradDU = fvc::grad(DU);
-	    }
-
-#         include "calculateDEpsilonDSigma.H"
-
-#         include "calculateRelativeResidual.H"
-
-	  Info << "\tTime " << runTime.value()
-	       << ", Corrector " << iCorr
-	       << ", Solving for " << DU.name()
-	       << " using " << solverPerf.solverName()
-	       << ", residual = " << solverPerf.initialResidual()
-	       << ", residualDU = " << relativeResidual
-	       << ", inner iterations " << solverPerf.nIterations() << endl;
-        }
-      while
-        (
-	 //solverPerf.initialResidual() > convergenceTolerance
-	 relativeResidual > convergenceTolerance
-         && ++iCorr < nCorr
-	 );
-
-      lduMatrix::debug = 1;
-
-      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name()
-	   << ", Initial residual = " << initialResidual
-	   << ", Final residual = " << solverPerf.initialResidual()
-	   << ", No outer iterations " << iCorr << endl;
-
-#     include "rotateFields.H"
-
-#     include "moveMesh.H"
-
-#     include "writeFields.H"
-
-      //- total force
-      forAll(mesh.boundary(), patchi)
+        do
         {
+            DU.storePrevIter();
+
+            divDSigmaLargeStrainExp.storePrevIter();
+
+#           include "calculateDivDSigmaExp.H"
+
+#           include "calculateDivDSigmaLargeStrainExp.H"
+
+            //----------------------------------------------------//
+            //- updated lagrangian large strain momentum equation
+            //----------------------------------------------------//
+            fvVectorMatrix DUEqn
+            (
+                fvm::d2dt2(rho,DU)
+              ==
+                fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
+              + divDSigmaExp
+              + divDSigmaLargeStrainExp
+         );
+
+         if(solidInterfaceCorr)
+         {
+             solidInterfacePtr->correct(DUEqn);
+         }
+
+         solverPerf = DUEqn.solve();
+
+         if(iCorr == 0)
+         {
+             initialResidual = solverPerf.initialResidual();
+         }
+
+         DU.relax();
+
+         if(solidInterfaceCorr)
+         {
+             gradDU = solidInterfacePtr->grad(DU);
+         }
+         else
+         {
+             gradDU = fvc::grad(DU);
+         }
+
+#        include "calculateDEpsilonDSigma.H"
+
+#        include "calculateRelativeResidual.H"
+
+         Info << "\tTime " << runTime.value()
+             << ", Corrector " << iCorr
+             << ", Solving for " << DU.name()
+             << " using " << solverPerf.solverName()
+             << ", residual = " << solverPerf.initialResidual()
+             << ", residualDU = " << relativeResidual
+             << ", inner iterations " << solverPerf.nIterations() << endl;
+      }
+      while
+      (
+          //solverPerf.initialResidual() > convergenceTolerance
+          relativeResidual > convergenceTolerance
+          && ++iCorr < nCorr
+      );
+
+     lduMatrix::debug = 1;
+
+     Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name()
+         << ", Initial residual = " << initialResidual
+         << ", Final residual = " << solverPerf.initialResidual()
+         << ", No outer iterations " << iCorr << endl;
+
+#    include "rotateFields.H"
+
+#    include "moveMesh.H"
+
+#    include "writeFields.H"
+
+     //- total force
+     forAll(mesh.boundary(), patchi)
+     {
           vector force = sum(mesh.Sf().boundaryField()[patchi] & sigma.boundaryField()[patchi]);
           Info << "force on " << mesh.boundary()[patchi].name()
-               << " is " << force << endl;
-        }
+              << " is " << force << endl;
+     }
 
-      Info << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	   << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-	   << endl;
+     Info << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+         << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+         << endl;
     }
 
-  Info<< "End\n" << endl;
+    Info<< "End\n" << endl;
 
-  return(0);
+    return(0);
 }
 
 // ************************************************************************* //

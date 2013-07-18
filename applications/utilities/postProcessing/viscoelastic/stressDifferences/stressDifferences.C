@@ -81,33 +81,33 @@ int main(int argc, char *argv[])
             volSymmTensorField tau(tauHeader, mesh);
 
 
-	   Info<< "    Calculating N1"<< endl;
- 	   volScalarField N1
- 	   (
- 	       IOobject
-  	      (
-   	         "N1",
-    	         runTime.timeName(),
-     	         mesh,
-		 IOobject::NO_READ
-     	   ),
-     	   tau.component(symmTensor::XX) - tau.component(symmTensor::YY)
-  	  );
-	  N1.write();
+            Info<< "    Calculating N1"<< endl;
+            volScalarField N1
+            (
+                IOobject
+                (
+                    "N1",
+                     runTime.timeName(),
+                     mesh,
+                     IOobject::NO_READ
+                ),
+                tau.component(symmTensor::XX) - tau.component(symmTensor::YY)
+            );
+            N1.write();
 
-	  Info<< "    Calculating N2"<< endl;
-  	  volScalarField N2
-  	  (
-  	      IOobject
-   	     (
-    	        "N2",
-   	         runTime.timeName(),
-   	         mesh,
-		 IOobject::NO_READ
-    	    ),
-   	     tau.component(symmTensor::YY) - tau.component(symmTensor::ZZ)
-   	 );
-	 N2.write();
+            Info<< "    Calculating N2"<< endl;
+            volScalarField N2
+            (
+                IOobject
+                (
+                    "N2",
+                    runTime.timeName(),
+                    mesh,
+                    IOobject::NO_READ
+                ),
+                tau.component(symmTensor::YY) - tau.component(symmTensor::ZZ)
+            );
+            N2.write();
         }
         else
         {

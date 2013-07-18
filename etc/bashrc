@@ -233,32 +233,32 @@ Darwin)
 
     case `uname -p` in
     powerpc)
-	export WM_ARCH=darwinPpc
-	;;
+        export WM_ARCH=darwinPpc
+    ;;
     i386)
-	export WM_ARCH=darwinIntel
-	;;
+        export WM_ARCH=darwinIntel
+    ;;
     *)
         echo "This seems to be neither an Intel-Mac nor a PPC-Mac please tell me the output of 'uname -p'. Bernhard."
-	export WM_ARCH=darwinUnknown
-	;;
+        export WM_ARCH=darwinUnknown
+    ;;
     esac
 
     case $WM_ARCH_OPTION in
     32)
-	export WM_CFLAGS='-m32 -fPIC'
-	export WM_CXXFLAGS='-m32 -fPIC'
-	export WM_LDFLAGS='-m32'
-	;;
+        export WM_CFLAGS='-m32 -fPIC'
+        export WM_CXXFLAGS='-m32 -fPIC'
+        export WM_LDFLAGS='-m32'
+    ;;
     64)
         export WM_ARCH=${WM_ARCH}64
-	export WM_CFLAGS='-m64 -fPIC'
-	export WM_CXXFLAGS='-m64 -fPIC'
-	export WM_LDFLAGS='-m64'
-	;;
+        export WM_CFLAGS='-m64 -fPIC'
+        export WM_CXXFLAGS='-m64 -fPIC'
+        export WM_LDFLAGS='-m64'
+    ;;
     *)
-	echo Unknown WM_ARCH_OPTION $WM_ARCH_OPTION, should be 32 or 64
-	;;
+        echo Unknown WM_ARCH_OPTION $WM_ARCH_OPTION, should be 32 or 64
+    ;;
     esac
 
     # Make sure that binaries use the best features of the used OS-Version
@@ -268,7 +268,7 @@ Darwin)
     if [ "$compilerInstall" == "System" ]
     then
         # Use Mac-Ports-Compiler instead of Apple-gcc-4.2
-	case $WM_COMPILER in
+    case $WM_COMPILER in
         Gcc43)
             export WM_CC='gcc-mp-4.3'
             export WM_CXX='g++-mp-4.3'
@@ -297,7 +297,7 @@ SunOS)
     export WM_MPLIB=FJMPI
     ;;
 
-*)    	# an unsupported operating system
+*)  # an unsupported operating system
     cat <<USAGE
 
     Your "$WM_ARCH" operating system is not supported by this release

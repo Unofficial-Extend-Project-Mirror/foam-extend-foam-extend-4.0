@@ -63,18 +63,18 @@ getNbrCores()
 
     # First choice above all: using lstopo from the hwloc package
     if command -v lstopo >/dev/null; then
-	nbrCores=`lstopo --of console | grep -c Core`
+        nbrCores=`lstopo --of console | grep -c Core`
     else
         # Using some architecture specific heuristics
-	case `uname -s` in
-	    Linux)
-	        # Warning: this will be wrong if Hyperthreading is enable
-		nbrCores=`grep -c processor /proc/cpuinfo`
-		;;
-	    Darwin)
-		nbrCores=`sysctl -n hw.physicalcpu`
-		;;
-	esac
+    case `uname -s` in
+        Linux)
+            # Warning: this will be wrong if Hyperthreading is enable
+            nbrCores=`grep -c processor /proc/cpuinfo`
+        ;;
+        Darwin)
+            nbrCores=`sysctl -n hw.physicalcpu`
+        ;;
+    esac
     fi
     echo $nbrCores
 }

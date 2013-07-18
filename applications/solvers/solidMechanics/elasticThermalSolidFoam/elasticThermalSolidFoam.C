@@ -45,110 +45,110 @@ Description
 
 int main(int argc, char *argv[])
 {
-# include "setRootCase.H"
+#   include "setRootCase.H"
 
-# include "createTime.H"
+#   include "createTime.H"
 
-# include "createMesh.H"
+#   include "createMesh.H"
 
-# include "createFields.H"
+#   include "createFields.H"
 
-# include "readSigmaExpMethod.H"
+#   include "readSigmaExpMethod.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-  Info<< "\nCalculating displacement field\n" << endl;
+    Info<< "\nCalculating displacement field\n" << endl;
 
-  while(runTime.loop())
+    while(runTime.loop())
     {
-      Info<< "Time: " << runTime.timeName() << nl << endl;
+        Info<< "Time: " << runTime.timeName() << nl << endl;
 
-#     include "readStressedFoamControls.H"
+#       include "readStressedFoamControls.H"
 
-      int iCorr = 0;
-      scalar initialResidual = GREAT;
-      scalar residual = GREAT;
-      lduMatrix::solverPerformance solverPerfU;
-      lduMatrix::solverPerformance solverPerfT;
+        int iCorr = 0;
+        scalar initialResidual = GREAT;
+        scalar residual = GREAT;
+        lduMatrix::solverPerformance solverPerfU;
+        lduMatrix::solverPerformance solverPerfT;
 
-      lduMatrix::debug=0;
+        lduMatrix::debug=0;
 
-      do
+        do
         {
-	  U.storePrevIter();
+            U.storePrevIter();
 
-#         include "calculateSigmaExp.H"
+#           include "calculateSigmaExp.H"
 
-	  //- energy equation
-	  fvScalarMatrix TEqn
-	    (
-	     fvm::ddt(rhoC, T) == fvm::laplacian(k, T, "laplacian(k,T)")
-	     );
-
-	  solverPerfT = TEqn.solve();
-
-	  T.relax();
-
-	  Info << "\tTime " << runTime.value()
-	       << ", Corrector " << iCorr << nl
-	       << "\t\tSolving for " << T.name()
-	       << " using " << solverPerfT.solverName()
-	       << ", residual = " << solverPerfT.initialResidual() << endl;
-
-	  //- linear momentum equaiton
-	  fvVectorMatrix UEqn
+            //- energy equation
+            fvScalarMatrix TEqn
             (
-	     fvm::d2dt2(rho, U)
-	     ==
-	     fvm::laplacian(2*mu + lambda, U, "laplacian(DU,U)")
-	     + sigmaExp
-	     - fvc::grad(threeKalpha*(T-T0),"grad(threeKalphaDeltaT)")
-	     );
+                fvm::ddt(rhoC, T) == fvm::laplacian(k, T, "laplacian(k,T)")
+            );
 
-	  solverPerfU = UEqn.solve();
+            solverPerfT = TEqn.solve();
 
-	  if(iCorr == 0)
-	    {
-	      initialResidual = max
-		(
-		 solverPerfU.initialResidual(),
-		 solverPerfT.initialResidual()
-		 );
-	    }
+            T.relax();
 
-	  residual = max
-	    (
-	     solverPerfU.initialResidual(),
-	     solverPerfT.initialResidual()
-	     );
+            Info << "\tTime " << runTime.value()
+                << ", Corrector " << iCorr << nl
+                << "\t\tSolving for " << T.name()
+                << " using " << solverPerfT.solverName()
+                << ", residual = " << solverPerfT.initialResidual() << endl;
 
-	  U.relax();
+            //- linear momentum equaiton
+            fvVectorMatrix UEqn
+            (
+                fvm::d2dt2(rho, U)
+              ==
+                fvm::laplacian(2*mu + lambda, U, "laplacian(DU,U)")
+              + sigmaExp
+              - fvc::grad(threeKalpha*(T-T0),"grad(threeKalphaDeltaT)")
+            );
 
-	  gradU = fvc::grad(U);
+            solverPerfU = UEqn.solve();
 
-	  Info << "\t\tSolving for " << U.name()
-	       << " using " << solverPerfU.solverName()
-	       << ", residual = " << solverPerfU.initialResidual() << endl;
+            if(iCorr == 0)
+            {
+                initialResidual = max
+                (
+                    solverPerfU.initialResidual(),
+                    solverPerfT.initialResidual()
+                );
+            }
+
+            residual = max
+            (
+                solverPerfU.initialResidual(),
+                solverPerfT.initialResidual()
+            );
+
+            U.relax();
+
+            gradU = fvc::grad(U);
+
+            Info << "\t\tSolving for " << U.name()
+                << " using " << solverPerfU.solverName()
+                << ", residual = " << solverPerfU.initialResidual() << endl;
         }
-	while
-	  (
-	   residual > convergenceTolerance
-	   &&
-	   ++iCorr < nCorr
-	   );
+        while
+        (
+            residual > convergenceTolerance
+            &&
+            ++iCorr < nCorr
+        );
 
         Info << nl << "Time " << runTime.value()
-	     << ", Solving for " << U.name()
-	     << ", Solving for " << T.name()
-	     << ", Initial residual = " << initialResidual
-	     << ", Final U residual = " << solverPerfU.initialResidual()
-	     << ", Final T residual = " << solverPerfT.initialResidual()
-	     << ", No outer iterations " << iCorr
-	     << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	     << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-	     << endl;
+            << ", Solving for " << U.name()
+            << ", Solving for " << T.name()
+            << ", Initial residual = " << initialResidual
+            << ", Final U residual = " << solverPerfU.initialResidual()
+            << ", Final T residual = " << solverPerfT.initialResidual()
+            << ", No outer iterations " << iCorr
+            << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << endl;
 
-	lduMatrix::debug=0;
+        lduMatrix::debug=0;
 
 #       include "calculateEpsilonSigma.H"
 

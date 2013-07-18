@@ -49,7 +49,7 @@ IF (NOT $ENV{CDASH_SUBMIT_LOCAL_HOST_ID} STREQUAL "")
     # $CDASH_SUBMIT_LOCAL_HOST_ID
     SET(
           SITENAME $ENV{CDASH_SUBMIT_LOCAL_HOST_ID}
-	  CACHE STRING "Name of the local site"
+          CACHE STRING "Name of the local site"
     )
 ELSE (NOT $ENV{CDASH_SUBMIT_LOCAL_HOST_ID} STREQUAL "")
     # Grab the hostname FQN; will be used for the sitename

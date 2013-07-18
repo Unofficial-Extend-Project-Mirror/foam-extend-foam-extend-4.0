@@ -321,8 +321,8 @@ void Foam::reduce(scalar& Value, const sumOp<scalar>& bop)
                         << Foam::abort(FatalError);
                 }
 
-	            Value = bop(Value, value);
-	        }
+                Value = bop(Value, value);
+            }
 
             level++;
             thisLevelOffset <<= 1;

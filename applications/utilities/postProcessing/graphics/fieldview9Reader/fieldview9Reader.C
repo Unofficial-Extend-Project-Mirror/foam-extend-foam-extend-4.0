@@ -1195,10 +1195,10 @@ void register_data_readers()
     ** like this for combined unstructured grids & results in a single file
     */
     reg_single_unstruct_reader (
-	"Foam Reader",		       /* title you want for data reader */
-	user_query_file_function,      /* whatever you called this */
-	user_read_one_grid_function    /* whatever you called this */
-	);
+        "Foam Reader",               /* title you want for data reader */
+        user_query_file_function,      /* whatever you called this */
+        user_read_one_grid_function    /* whatever you called this */
+    );
 }
 
 

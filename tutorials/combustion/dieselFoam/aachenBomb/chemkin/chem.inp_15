@@ -2,14 +2,14 @@ ELEMENTS
  H   O    C   N   AR
 END
 SPECIE
-C7H16 	O2 		N2 		CO 	H2O
-O		CO2   	OH		H	H2
-HO2		H2O2	N		NO	C
+C7H16     O2         N2         CO     H2O
+O        CO2       OH        H    H2
+HO2        H2O2    N        NO    C
 END
 REACTIONS
  C7H16 + 11O2            => 7CO2 + 8H2O        1.00E+8  0.0   15780.0! 1
-	FORD	/ C7H16	0.25 /
-	FORD	/ O2 1.5 /
+    FORD    / C7H16    0.25 /
+    FORD    / O2 1.5 /
  CO    + O     + M     = CO2   + M            6.170E+14  0.00   3000. ! 96
  CO    + OH            = CO2   + H            3.510E+07  1.30   -758. ! 97
  CO    + O2            = CO2   + O            1.600E+13  0.00  41000. ! 98

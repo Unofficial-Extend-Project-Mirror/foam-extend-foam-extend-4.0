@@ -74,11 +74,11 @@ Foam::definedInjector::definedInjector
     forAll(massFlowRateProfile_, i)
     {
         massFlowRateProfile_[i][0] = t.userTimeToTime(massFlowRateProfile_[i][0]);
-	    // dummy
-	    injectionPressureProfile_[i][0] = massFlowRateProfile_[i][0];
-	    injectionPressureProfile_[i][1] = 0.0;
-	    CdProfile_[i][0] = massFlowRateProfile_[i][0];
-	    CdProfile_[i][1] = 1.0;
+        // dummy
+        injectionPressureProfile_[i][0] = massFlowRateProfile_[i][0];
+        injectionPressureProfile_[i][1] = 0.0;
+        CdProfile_[i][0] = massFlowRateProfile_[i][0];
+        CdProfile_[i][1] = 1.0;
     }
 
     forAll(velocityProfile_, i)

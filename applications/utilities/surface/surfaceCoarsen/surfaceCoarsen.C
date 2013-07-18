@@ -25,10 +25,10 @@ License
 Description
     Surface coarsening using 'bunnylod':
 
-	Polygon Reduction Demo
-	By Stan Melax (c) 1998
-	mailto:melax@cs.ualberta.ca
-	http://www.cs.ualberta.ca/~melax
+    Polygon Reduction Demo
+    By Stan Melax (c) 1998
+    mailto:melax@cs.ualberta.ca
+    http://www.cs.ualberta.ca/~melax
 
 
 \*---------------------------------------------------------------------------*/

@@ -163,7 +163,7 @@
 
         }
 
-	}
+    }
 
 //  Setting the boundary position
     Info << "valve motion boundary conditions set" << endl;

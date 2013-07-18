@@ -216,27 +216,27 @@ case Darwin:
 
     switch (`uname -p`)
     case powerpc:
-	setenv WM_ARCH darwinPpc
+        setenv WM_ARCH darwinPpc
         breaksw
     case i386:
-	setenv WM_ARCH darwinIntel
+        setenv WM_ARCH darwinIntel
         breaksw
     default:
         echo "This seems to be an Intel-Mac please tell me the output of 'uname -p'. Bernhard."
-	setenv WM_ARCH darwinIntel
+        setenv WM_ARCH darwinIntel
         breaksw
     endsw
     switch ($WM_ARCH_OPTION)
     case 32:
-	setenv WM_CFLAGS '-m32 -fPIC'
-	setenv WM_CXXFLAGS '-m32 -fPIC'
-	setenv WM_LDFLAGS '-m32'
+        setenv WM_CFLAGS '-m32 -fPIC'
+        setenv WM_CXXFLAGS '-m32 -fPIC'
+        setenv WM_LDFLAGS '-m32'
         breaksw;
     case 64:
         setenv WM_ARCH ${WM_ARCH}64
-	setenv WM_CFLAGS '-m64 -fPIC'
-	setenv WM_CXXFLAGS '-m64 -fPIC'
-	setenv WM_LDFLAGS '-m64'
+        setenv WM_CFLAGS '-m64 -fPIC'
+        setenv WM_CXXFLAGS '-m64 -fPIC'
+        setenv WM_LDFLAGS '-m64'
         breaksw;
     default:
         echo "Unknown WM_ARCH_OPTION $WM_ARCH_OPTION, should be 32 or 64"

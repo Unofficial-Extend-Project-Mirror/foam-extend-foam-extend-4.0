@@ -21,32 +21,31 @@ internalField   uniform (0 0 0);
 
 boundaryField
 {
-  top
+    top
     {
-      type            timeVaryingFixedDisplacement;
-      fileName        "$FOAM_CASE/constant/timeVsTopDisp";
-      outOfBounds     clamp;
-      value           uniform (0 0 0);
+        type            timeVaryingFixedDisplacement;
+        fileName        "$FOAM_CASE/constant/timeVsTopDisp";
+        outOfBounds     clamp;
+        value           uniform (0 0 0);
     }
 
-  cohesive
+    cohesive
     {
-
-      type             cohesiveZone;
-      cohesiveLaw      Dugdale;
-      relaxationFactor 0.9;
-      DugdaleCoeffs
-	{
-	  GIc             GIc [ 1 0 -2 0 0 0 0 ] 10;
-	  sigmaMax        sigmaMax [ 1 -1 -2 0 0 0 0 ] 1000e+06;
-	}
-      value           uniform (0 0 0);
+        type             cohesiveZone;
+        cohesiveLaw      Dugdale;
+        relaxationFactor 0.9;
+        DugdaleCoeffs
+        {
+            GIc             GIc [ 1 0 -2 0 0 0 0 ] 10;
+            sigmaMax        sigmaMax [ 1 -1 -2 0 0 0 0 ] 1000e+06;
+        }
+        value           uniform (0 0 0);
     }
 
-  bottom
+    bottom
     {
-      type  fixedDisplacement;
-      value uniform (0 0 0);
+        type  fixedDisplacement;
+        value uniform (0 0 0);
     }
 
     tracFree

@@ -103,7 +103,7 @@ enum {
   XF_RF_DATA_KTC=105,
   XF_RF_DATA_VGS_DTRM=106,
   XF_RF_DATA_VGF_DTRM=107,
-  XF_RF_DATA_RSTRESS=108,	/* V4 reynolds stress model */
+  XF_RF_DATA_RSTRESS=108,    /* V4 reynolds stress model */
   XF_RF_DATA_THREAD_RAD_FLUX=109,
 
   /* mass absorption term for absorbing porous media model */
@@ -133,12 +133,12 @@ enum {
   XF_RF_DATA_TKE_M2=126,
   XF_RF_DATA_TED_M2=127,
 
-  XF_RF_DATA_RUU=128,	/* V5 reynolds stress model */
-  XF_RF_DATA_RVV=129,	/* V5 reynolds stress model */
-  XF_RF_DATA_RWW=130,	/* V5 reynolds stress model */
-  XF_RF_DATA_RUV=131,	/* V5 reynolds stress model */
-  XF_RF_DATA_RVW=132,	/* V5 reynolds stress model */
-  XF_RF_DATA_RUW=133,	/* V5 reynolds stress model */
+  XF_RF_DATA_RUU=128,    /* V5 reynolds stress model */
+  XF_RF_DATA_RVV=129,    /* V5 reynolds stress model */
+  XF_RF_DATA_RWW=130,    /* V5 reynolds stress model */
+  XF_RF_DATA_RUV=131,    /* V5 reynolds stress model */
+  XF_RF_DATA_RVW=132,    /* V5 reynolds stress model */
+  XF_RF_DATA_RUW=133,    /* V5 reynolds stress model */
 
   XF_RF_DATA_DPMS_EROSION=134,
   XF_RF_DATA_DPMS_ACCRETION=135,
@@ -271,9 +271,9 @@ chunk.
 
   EXPAND_50_EQUAL(XF_RF_DATA_UDS_,700), /* user defined scalar */
   EXPAND_50(XF_RF_DATA_UDS_,_M1=, 750), /* user defined scalar
-				         * at fist time level */
+                         * at fist time level */
   EXPAND_50(XF_RF_DATA_UDS_,_M2=, 800),  /* user defined scalar
-					 * at second time level */
+                     * at second time level */
   XF_RF_DATA_GRANULAR_PRESSURE=910,
   XF_RF_DATA_GRANULAR_PRESSURE_M1=0,/* never stored but symbol is
 required */

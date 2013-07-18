@@ -87,9 +87,9 @@ public:
     //- Construct from case name
     starMeshReader
     (
-	const fileName& prefix,
-	const Time& runtime,
-	const scalar scaleFactor = 1.0
+        const fileName& prefix,
+        const Time& runtime,
+        const scalar scaleFactor = 1.0
     );
 
     // Destructor
@@ -100,7 +100,7 @@ public:
     //- Return mesh points
     virtual const pointField & points() const
     {
-	return points_;
+        return points_;
     }
 
 private:

@@ -67,7 +67,7 @@ pseudoSolidTetDecompositionMotionSolver
     nCorrectors_ =  readInt(pseudoSolidDic.lookup("nCorrectors"));
 
     convergenceTolerance_ =
-	readScalar(pseudoSolidDic.lookup("convergenceTolerance"));
+        readScalar(pseudoSolidDic.lookup("convergenceTolerance"));
 }
 
 

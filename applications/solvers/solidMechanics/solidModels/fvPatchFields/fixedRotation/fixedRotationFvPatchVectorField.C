@@ -97,8 +97,8 @@ fixedRotationFvPatchVectorField::fixedRotationFvPatchVectorField
     )
     {
         Warning << "The gradScheme for " << fieldName_
-	    << " should be \"extendedLeastSquares 0\" for the boundary "
-	    << "non-orthogonal correction to be right" << endl;
+            << " should be \"extendedLeastSquares 0\" for the boundary "
+            << "non-orthogonal correction to be right" << endl;
     }
 }
 
@@ -169,8 +169,8 @@ void fixedRotationFvPatchVectorField::updateCoeffs()
 
     //- create rotation matrix
     // tensor rotMat(::cos(theta), -(::sin(theta)), 0,
-    // 		  ::sin(theta), ::cos(theta),    0,
-    // 		  0,            0,               1);
+    //               ::sin(theta), ::cos(theta),    0,
+    //               0,            0,               1);
 
     tensor rotMat = RodriguesRotation(rotationAxis_, rotationAngle_);
 

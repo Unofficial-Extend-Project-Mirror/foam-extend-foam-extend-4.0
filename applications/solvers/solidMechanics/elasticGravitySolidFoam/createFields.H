@@ -42,19 +42,19 @@
         dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
     );
 
-      volVectorField divSigmaExp
-      (
+    volVectorField divSigmaExp
+    (
         IOobject
         (
-	 "divSigmaExp",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::NO_READ,
-	 IOobject::NO_WRITE
-	 ),
+            "divSigmaExp",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
         mesh,
         dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
-       );
+    );
 
     rheologyModel rheology(sigma);
 

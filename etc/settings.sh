@@ -52,8 +52,8 @@ _foamAddLib()
             # do NOT add the lib of MacPort as this might break programs
             if [ "$1" != "/opt/local/lib" ]
             then
-		export DYLD_LIBRARY_PATH=$1:$DYLD_LIBRARY_PATH
-	    fi
+                export DYLD_LIBRARY_PATH=$1:$DYLD_LIBRARY_PATH
+            fi
         fi
         shift
     done
@@ -146,7 +146,7 @@ OpenFOAM)
         _foamSource  $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.sh
         _foamSource  $WM_THIRD_PARTY_DIR/packages/mpc-0.8.2/platforms/$WM_OPTIONS/etc/mpc-0.8.2.sh
         _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.5.1/platforms/$WM_OPTIONS/etc/gcc-4.5.1.sh
-	;;
+    ;;
     Gcc44)
         _foamSource  $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.sh
         _foamSource  $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.sh
@@ -248,31 +248,31 @@ SYSTEMOPENMPI)
     # Make sure OPENMPI_BIN_DIR is set and valid
     if [ -n "${OPENMPI_BIN_DIR}" ] && [ -d "${OPENMPI_BIN_DIR}" ]
     then
-	# User defined value specified for OPENMPI_BIN_DIR
-	#
-	# WARNING:
-	#          We assume this path specified by $OPENMPI_BIN_DIR is valid
-	#          We assume the command mpicc is located somewhere under this path
-	#          We assume the file mpi.h is located somewhere under this path
-	#
-        #          Otherwise, please double check your openmpi installation, you are
-	#          probably missing the openmpi runtime and/or development packages
-	#          available for your system.
-	#
-	_foamAddPath $OPENMPI_BIN_DIR
+    # User defined value specified for OPENMPI_BIN_DIR
+    #
+    # WARNING:
+    #          We assume this path specified by $OPENMPI_BIN_DIR is valid
+    #          We assume the command mpicc is located somewhere under this path
+    #          We assume the file mpi.h is located somewhere under this path
+    #
+    #          Otherwise, please double check your openmpi installation, you are
+    #          probably missing the openmpi runtime and/or development packages
+    #          available for your system.
+    #
+    _foamAddPath $OPENMPI_BIN_DIR
     else
-	# Here, we assume your environment is already set for running
-	# and developping with openmpi.
-	#
-	# Initialize OPENMPI_BIN_DIR using the path to mpicc
-	export OPENMPI_BIN_DIR=$(dirname `which mpicc`)
+    # Here, we assume your environment is already set for running
+    # and developping with openmpi.
+    #
+    # Initialize OPENMPI_BIN_DIR using the path to mpicc
+    export OPENMPI_BIN_DIR=$(dirname `which mpicc`)
     fi
 
     # Make sure OPENMPI_LIB_DIR is set
     if [ ! -n "${OPENMPI_LIB_DIR}" ]
     then
-	# Initialize OPENMPI_LIB_DIR using the path to mpicc
-	export OPENMPI_LIB_DIR="`mpicc --showme:libdirs`"
+        # Initialize OPENMPI_LIB_DIR using the path to mpicc
+        export OPENMPI_LIB_DIR="`mpicc --showme:libdirs`"
     fi
 
     # Make sure the dynamic libraries are accessible
@@ -437,9 +437,9 @@ export MPI_BUFFER_SIZE
 #then
 #    if [ -z "$DYLD_INSERT_LIBRARIES" ]
 #    then
-#	export DYLD_INSERT_LIBRARIES=$FOAM_LIBBIN/libhoard.dylib
+#        export DYLD_INSERT_LIBRARIES=$FOAM_LIBBIN/libhoard.dylib
 #    else
-#	export DYLD_INSERT_LIBRARIES=$FOAM_LIBBIN/libhoard.dylib:$DYLD_INSERT_LIBRARIES
+#        export DYLD_INSERT_LIBRARIES=$FOAM_LIBBIN/libhoard.dylib:$DYLD_INSERT_LIBRARIES
 #    fi
 #fi
 

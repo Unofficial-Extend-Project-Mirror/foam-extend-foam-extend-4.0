@@ -44,103 +44,102 @@ Description
 
 int main(int argc, char *argv[])
 {
-# include "setRootCase.H"
+#   include "setRootCase.H"
 
-# include "createTime.H"
+#   include "createTime.H"
 
-# include "createMesh.H"
+#   include "createMesh.H"
 
-# include "createFields.H"
+#   include "createFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-  Info<< "\nCalculating displacement field\n" << endl;
+    Info<< "\nCalculating displacement field\n" << endl;
 
-  lduMatrix::debug = 0;
+    lduMatrix::debug = 0;
 
-  scalar m = 0.5;
+    scalar m = 0.5;
 
-  for (runTime++; !runTime.end(); runTime++)
+    for (runTime++; !runTime.end(); runTime++)
     {
-      Info<< "Time: " << runTime.timeName() << nl << endl;
+        Info<< "Time: " << runTime.timeName() << nl << endl;
 
-#     include "readStressedFoamControls.H"
+#       include "readStressedFoamControls.H"
 
-      volScalarField mu =
-	rheology.mu(m*runTime.deltaT().value());
-      volScalarField lambda =
-	rheology.lambda(m*runTime.deltaT().value());
+        volScalarField mu =
+            rheology.mu(m*runTime.deltaT().value());
+        volScalarField lambda =
+            rheology.lambda(m*runTime.deltaT().value());
 
-      Info << "mu = " << average(mu.internalField()) << endl;
-      Info << "lambda = " << average(lambda.internalField()) << endl;
+        Info << "mu = " << average(mu.internalField()) << endl;
+        Info << "lambda = " << average(lambda.internalField()) << endl;
 
-      int iCorr = 0;
-      lduMatrix::solverPerformance solverPerf;
-      scalar initialResidual = 0;
-      scalar residual = GREAT;
+        int iCorr = 0;
+        lduMatrix::solverPerformance solverPerf;
+        scalar initialResidual = 0;
+        scalar residual = GREAT;
 
-      do
+        do
         {
-	  DU.storePrevIter();
+            DU.storePrevIter();
 
-	  fvVectorMatrix DUEqn
+            fvVectorMatrix DUEqn
             (
-	     fvm::d2dt2(rho,DU)
-             ==
-	     fvm::laplacian(2*mu+lambda, DU, "laplacian(DDU,DU)")
-	     + fvc::div
-	     (
-	      mu*gradDU.T()
-	      + lambda*(I*tr(gradDU))
-	      - (mu + lambda)*gradDU
-	      + DSigmaCorr,
-	      "div(sigma)"
-	      )
-	     );
+                fvm::d2dt2(rho,DU)
+              ==
+                fvm::laplacian(2*mu+lambda, DU, "laplacian(DDU,DU)")
+              + fvc::div
+                (
+                    mu*gradDU.T()
+                  + lambda*(I*tr(gradDU))
+                  - (mu + lambda)*gradDU
+                  + DSigmaCorr,
+                  "div(sigma)"
+                )
+            );
 
-	  solverPerf = DUEqn.solve();
+            solverPerf = DUEqn.solve();
 
-	  DU.relax();
+            DU.relax();
 
-	  if(iCorr == 0)
+            if(iCorr == 0)
             {
-	      initialResidual = solverPerf.initialResidual();
+                initialResidual = solverPerf.initialResidual();
             }
 
-	  gradDU = fvc::grad(DU);
+            gradDU = fvc::grad(DU);
 
-#         include "calculateDEpsilonDSigma.H"
-
+#           include "calculateDEpsilonDSigma.H"
         }
-      while
+        while
         (
-	 solverPerf.initialResidual() > convergenceTolerance
-         && ++iCorr < nCorr
-	 );
+            solverPerf.initialResidual() > convergenceTolerance
+            && ++iCorr < nCorr
+        );
 
-      Info << "Solving for " << DU.name() << " using "
-	   << solverPerf.solverName() << " solver"
-	   << ", Initial residual = " << initialResidual
-	   << ", Final residual = " << solverPerf.initialResidual()
-	   << ", No outer iterations " << iCorr
-	   << ", Relative error: " << residual << endl;
+        Info << "Solving for " << DU.name() << " using "
+            << solverPerf.solverName() << " solver"
+            << ", Initial residual = " << initialResidual
+            << ", Final residual = " << solverPerf.initialResidual()
+            << ", No outer iterations " << iCorr
+            << ", Relative error: " << residual << endl;
 
-      U += DU;
+        U += DU;
 
-      epsilon += DEpsilon;
+        epsilon += DEpsilon;
 
-#     include "calculateSigmaDSigmaCorr.H"
+#       include "calculateSigmaDSigmaCorr.H"
 
-#     include "writeFields.H"
+#       include "writeFields.H"
 
-      Info<< "ExecutionTime = "
-	  << runTime.elapsedCpuTime()
-	  << " s\n\n" << endl;
+        Info<< "ExecutionTime = "
+            << runTime.elapsedCpuTime()
+            << " s\n\n" << endl;
     }
 
-  Info<< "End\n" << endl;
+    Info<< "End\n" << endl;
 
-  return(0);
+    return(0);
 }
 
 

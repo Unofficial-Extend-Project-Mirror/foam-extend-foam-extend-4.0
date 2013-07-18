@@ -101,7 +101,7 @@ private:
         //contact iteration number
         int contactIterNum_;
 
-	// file that contains contact information
+    // file that contains contact information
         OFstream* contactFilePtr_;
 
         // slave face zone name - needed to define zoneToZoneInterp
@@ -228,13 +228,13 @@ public:
         Switch contactActive()
         {
              return contactActive_;
-	};
+        };
 
         //- set contactActive_ to on or off
         void setContactActive(bool trueOrFalse)
         {
-	  contactActive_ = trueOrFalse;
-	};
+            contactActive_ = trueOrFalse;
+        };
 
         //- Write dictionary
         void writeDict(Ostream&) const;

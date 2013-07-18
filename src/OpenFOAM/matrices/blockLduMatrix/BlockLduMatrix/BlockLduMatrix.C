@@ -375,9 +375,9 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const BlockLduMatrix<Type>& ldum)
             (ldum.lduAddr().lowerAddr().size()) <<  token::END_STATEMENT << nl;
     }
 
-	os.writeKeyword("coupleUpper") << ldum.coupleUpper_ << token::END_STATEMENT << endl;
+    os.writeKeyword("coupleUpper") << ldum.coupleUpper_ << token::END_STATEMENT << endl;
 
-	os.writeKeyword("coupleLower") << ldum.coupleLower_ << token::END_STATEMENT << endl;
+    os.writeKeyword("coupleLower") << ldum.coupleLower_ << token::END_STATEMENT << endl;
 
     os.check("Ostream& operator<<(Ostream&, const BlockLduMatrix<Type>&");
 

@@ -24,35 +24,35 @@ FoamFile
 
 d2dt2Schemes
 {
-    	default       steadyState;
+    default       steadyState;
 }
 
 gradSchemes
 {
-	default		extendedLeastSquares 0;
+    default        extendedLeastSquares 0;
 }
 
 divSchemes
 {
-	default         none;
- 	div(sigma)      Gauss linear;
+    default         none;
+    div(sigma)      Gauss linear;
 }
 
 laplacianSchemes
 {
-	default         none;
-	laplacian(DU,U) Gauss linear corrected;
+    default         none;
+    laplacian(DU,U) Gauss linear corrected;
 }
 
 
 snGradSchemes
 {
-	snGrad(U)     corrected;
+    snGrad(U)     corrected;
 }
 
 interpolationSchemes
 {
-	default			linear;
+    default            linear;
 }
 
 // ************************************************************************* //

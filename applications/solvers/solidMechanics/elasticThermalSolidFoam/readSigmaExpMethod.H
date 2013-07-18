@@ -4,6 +4,6 @@ Info << sigmaExpMethod << " method chosen for calculation of sigmaExp" << endl;
 if(sigmaExpMethod != "standard" && sigmaExpMethod != "surface" && sigmaExpMethod != "decompose")
   {
     FatalError << "sigmaExp method " << sigmaExpMethod << " not found!" << nl
-	       << "valid methods are:\nstandard\nsurface\ndecompose"
-	       << exit(FatalError);
+        << "valid methods are:\nstandard\nsurface\ndecompose"
+        << exit(FatalError);
   }

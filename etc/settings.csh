@@ -162,28 +162,28 @@ set mpi_version=unknown
 switch ("$WM_MPLIB")
 case OPENMPI:
     if (-d $WM_THIRD_PARTY_DIR/packages/openmpi-1.6.3/platforms/$WM_OPTIONS ) then
-	set mpi_version=openmpi-1.6.3
+        set mpi_version=openmpi-1.6.3
 
-	if ($?FOAM_VERBOSE && $?prompt) then
+        if ($?FOAM_VERBOSE && $?prompt) then
             echo "Using openmpi-1.6.3 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
         endif
-	_foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
 
     else if (-d $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3/platforms/$WM_OPTIONS ) then
-	set mpi_version=openmpi-1.4.3
+        set mpi_version=openmpi-1.4.3
 
-	if ($?FOAM_VERBOSE && $?prompt) then
+        if ($?FOAM_VERBOSE && $?prompt) then
             echo "Using openmpi-1.4.3 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
         endif
-	_foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
 
     else if (-d $WM_THIRD_PARTY_DIR/packages/openmpi-1.5/platforms/$WM_OPTIONS ) then
-	set mpi_version=openmpi-1.5
+        set mpi_version=openmpi-1.5
 
-	if ($?FOAM_VERBOSE && $?prompt) then
+        if ($?FOAM_VERBOSE && $?prompt) then
             echo "Using openmpi-1.5 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
         endif
-	_foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
     endif
 
     setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/$mpi_version
@@ -200,33 +200,33 @@ case SYSTEMOPENMPI:
     # Make sure OPENMPI_BIN_DIR is set and valid
     if ($?OPENMPI_BIN_DIR != 0 ) then
         if (-d "${OPENMPI_BIN_DIR}" ) then
-	    # User defined value specified for OPENMPI_BIN_DIR
-	    #
-	    # WARNING:
-	    #          We assume this path specified by $OPENMPI_BIN_DIR is valid
-	    #          We assume the command mpicc is located somewhere under this path
-	    #          We assume the file mpi.h is located somewhere under this path
-	    #
+        # User defined value specified for OPENMPI_BIN_DIR
+        #
+        # WARNING:
+        #          We assume this path specified by $OPENMPI_BIN_DIR is valid
+        #          We assume the command mpicc is located somewhere under this path
+        #          We assume the file mpi.h is located somewhere under this path
+        #
             #          Otherwise, please double check your openmpi installation, you are
-	    #          probably missing the openmpi runtime and/or development packages
-	    #          available for your system.
-	    #
-	    _foamAddPath $OPENMPI_BIN_DIR
+        #          probably missing the openmpi runtime and/or development packages
+        #          available for your system.
+        #
+        _foamAddPath $OPENMPI_BIN_DIR
          endif
     else
-	# Here, we assume your environment is already set for running
-	# and developping with openmpi.
-	#
-	# Initialize OPENMPI_BIN_DIR using the path to mpicc
+    # Here, we assume your environment is already set for running
+    # and developping with openmpi.
+    #
+    # Initialize OPENMPI_BIN_DIR using the path to mpicc
         set mpicc_cmd=`which mpicc`
-	setenv OPENMPI_BIN_DIR `dirname $mpicc_cmd`
+    setenv OPENMPI_BIN_DIR `dirname $mpicc_cmd`
         unset mpicc_cmd
     endif
 
     # Make sure OPENMPI_LIB_DIR is set
     if ( $?OPENMPI_LIB_DIR == 0 ) then
-	# Initialize OPENMPI_LIB_DIR using the path to mpicc
-	setenv OPENMPI_LIB_DIR "`mpicc --showme:libdirs`"
+        # Initialize OPENMPI_LIB_DIR using the path to mpicc
+        setenv OPENMPI_LIB_DIR "`mpicc --showme:libdirs`"
     endif
 
     # Make sure the dynamic libraries are accessible

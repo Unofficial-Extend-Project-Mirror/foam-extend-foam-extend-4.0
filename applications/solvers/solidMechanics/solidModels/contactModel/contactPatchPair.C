@@ -57,125 +57,131 @@ Foam::contactPatchPair::contactPatchPair
     masterFaceZoneName_(masterPatch_.name() + "FaceZone"),
     slavePointZoneName_(slavePatch_.name() + "PointZone"),
     totalSlavePointForce_(
-  			  cp_.mesh().boundaryMesh()[slavePatch_.index()].pointNormals().size(), vector::zero),
-			  // IOobject
-			  // (
-			  //  "totalSlavePointForce",
-			  //  cp_.mesh().time().timeName(),
-			  //  cp_.mesh(),
-			  //  IOobject::READ_IF_PRESENT,
-			  //  IOobject::AUTO_WRITE
-			  //  ),
-    			  // vectorField(cp_.mesh().boundaryMesh()[slavePatch_.index()].pointNormals().size(), vector::zero)
-			  // ),
-    slavePointPenetration_(
-			   cp_.mesh().boundaryMesh()[slavePatch_.index()].pointNormals().size(),
-			   0.0
-			   ),
-    masterPointPenetration_(
-			    cp_.mesh().boundaryMesh()[masterPatch_.index()].pointNormals().size(),
-			    0.0
-			    ),
-    globalSlavePointPenetration_(
-				 cp_.mesh().pointZones()[cp_.mesh().faceZones().findZoneID(slaveFaceZoneName_)].size(),
-				 0.0
-				 ),
-    globalMasterPointPenetration_(
-				  cp_.mesh().pointZones()[cp_.mesh().faceZones().findZoneID(masterFaceZoneName_)].size(),
-				  0.0
-				  ),
-    oldTotalSlavePointForce_(
-    			     cp_.mesh().boundaryMesh()[slavePatch_.index()].pointNormals().size(),
-    			     vector::zero
-    			     ),
+    cp_.mesh().boundaryMesh()[slavePatch_.index()].pointNormals().size(), vector::zero),
+    // IOobject
+    // (
+    //  "totalSlavePointForce",
+    //  cp_.mesh().time().timeName(),
+    //  cp_.mesh(),
+    //  IOobject::READ_IF_PRESENT,
+    //  IOobject::AUTO_WRITE
+    //  ),
+    // vectorField(cp_.mesh().boundaryMesh()[slavePatch_.index()].pointNormals().size(), vector::zero)
+    // ),
+    slavePointPenetration_
+    (
+        cp_.mesh().boundaryMesh()[slavePatch_.index()].pointNormals().size(),
+        0.0
+    ),
+    masterPointPenetration_
+    (
+        cp_.mesh().boundaryMesh()[masterPatch_.index()].pointNormals().size(),
+        0.0
+    ),
+    globalSlavePointPenetration_
+    (
+        cp_.mesh().pointZones()[cp_.mesh().faceZones().findZoneID(slaveFaceZoneName_)].size(),
+        0.0
+    ),
+    globalMasterPointPenetration_
+    (
+        cp_.mesh().pointZones()[cp_.mesh().faceZones().findZoneID(masterFaceZoneName_)].size(),
+        0.0
+    ),
+    oldTotalSlavePointForce_
+    (
+        cp_.mesh().boundaryMesh()[slavePatch_.index()].pointNormals().size(),
+        vector::zero
+    ),
     oldMinSlavePointPenetration_(0.0),
     penetrationLimit_(readScalar(dict.lookup("penetrationLimit"))),
     rigidMaster_(dict.lookup("rigidMaster")),
     interpolationMethod_(dict.lookup("interpolationMethod")),
-    faceZoneMasterToSlaveInterpolator_(
-				       cp_.mesh().faceZones()[cp_.mesh().faceZones().findZoneID(masterFaceZoneName_)](), // from
-				       cp_.mesh().faceZones()[cp_.mesh().faceZones().findZoneID(slaveFaceZoneName_)](), // to zone
-				       alg_,
-				       dir_
-				       ),
+    faceZoneMasterToSlaveInterpolator_
+    (
+        cp_.mesh().faceZones()[cp_.mesh().faceZones().findZoneID(masterFaceZoneName_)](), // from
+        cp_.mesh().faceZones()[cp_.mesh().faceZones().findZoneID(slaveFaceZoneName_)](), // to zone
+        alg_,
+        dir_
+    ),
     faceZoneSlaveToMasterInterpolatorPtr_(NULL),
     faceZoneGgiInterpolatorPtr_(NULL),
     slaveInterpolator_(cp_.mesh().boundaryMesh()[slavePatch_.index()])
 {
-  Info << "\tConstructing contact patch pair"
-       << "\n\t\tmaster patch:\t" << masterPatch_.name()
-       << "\n\t\tslave patch:\t" << slavePatch_.name()
-       << endl;
+    Info << "\tConstructing contact patch pair"
+        << "\n\t\tmaster patch:\t" << masterPatch_.name()
+        << "\n\t\tslave patch:\t" << slavePatch_.name()
+        << endl;
 
-  if(rigidMaster_)
+    if(rigidMaster_)
     Info << "\t\tThe master surface is considered rigid and is set as traction-free" << endl;
 
-  //- Check interpolation scheme for passing tractions from slave to master
-  if(interpolationMethod_ == "patchToPatch")
+    //- Check interpolation scheme for passing tractions from slave to master
+    if(interpolationMethod_ == "patchToPatch")
     {
-      Info << "\t\tMethod for interpolation of traction from slave to master: patchToPatch" << endl;
-      label masterFaceZoneID = cp_.mesh().faceZones().findZoneID(masterFaceZoneName_);
-      label slaveFaceZoneID = cp_.mesh().faceZones().findZoneID(slaveFaceZoneName_);
-      faceZoneSlaveToMasterInterpolatorPtr_ =
-	new zoneToZoneInterpolation
-	(
-	 cp_.mesh().faceZones()[slaveFaceZoneID](), // from zone
-	 cp_.mesh().faceZones()[masterFaceZoneID](), // to zone
-	 alg_,
-	 dir_
-	 );
+        Info << "\t\tMethod for interpolation of traction from slave to master: patchToPatch" << endl;
+        label masterFaceZoneID = cp_.mesh().faceZones().findZoneID(masterFaceZoneName_);
+        label slaveFaceZoneID = cp_.mesh().faceZones().findZoneID(slaveFaceZoneName_);
+        faceZoneSlaveToMasterInterpolatorPtr_ =
+        new zoneToZoneInterpolation
+        (
+            cp_.mesh().faceZones()[slaveFaceZoneID](), // from zone
+            cp_.mesh().faceZones()[masterFaceZoneID](), // to zone
+            alg_,
+            dir_
+        );
     }
-  else if(interpolationMethod_ == "ggi")
+    else if(interpolationMethod_ == "ggi")
     {
-      Info << "\t\tMethod for interpolation of traction from slave to master: ggi" << endl;
-      label masterFaceZoneID = cp_.mesh().faceZones().findZoneID(masterFaceZoneName_);
-      label slaveFaceZoneID = cp_.mesh().faceZones().findZoneID(slaveFaceZoneName_);
-      faceZoneGgiInterpolatorPtr_ =
-	new ggiZoneInterpolation
-	(
-	 cp_.mesh().faceZones()[masterFaceZoneID](), // master zone
-	 cp_.mesh().faceZones()[slaveFaceZoneID](), // slave zone
-	 tensorField(0),
-	 tensorField(0),
-	 vectorField(0),
-	 0.0,
-	 0.0,
-	 true,
-	 ggiInterpolation::AABB
-	 );
+        Info << "\t\tMethod for interpolation of traction from slave to master: ggi" << endl;
+        label masterFaceZoneID = cp_.mesh().faceZones().findZoneID(masterFaceZoneName_);
+        label slaveFaceZoneID = cp_.mesh().faceZones().findZoneID(slaveFaceZoneName_);
+        faceZoneGgiInterpolatorPtr_ =
+        new ggiZoneInterpolation
+        (
+            cp_.mesh().faceZones()[masterFaceZoneID](), // master zone
+            cp_.mesh().faceZones()[slaveFaceZoneID](), // slave zone
+            tensorField(0),
+            tensorField(0),
+            vectorField(0),
+            0.0,
+            0.0,
+            true,
+            ggiInterpolation::AABB
+        );
     }
-  else
+    else
     {
-      SeriousError << "\n\nTraction interpolation method '"
-		   << interpolationMethod_ << "' not found!\n"
-		   << "\nValid interpolation methods are:\n"
-		   << "ggi\n"
-		   << "patchToPatch"
-		   << endl
-		   << exit(FatalError);
+        SeriousError << "\n\nTraction interpolation method '"
+            << interpolationMethod_ << "' not found!\n"
+            << "\nValid interpolation methods are:\n"
+            << "ggi\n"
+            << "patchToPatch"
+            << endl
+            << exit(FatalError);
     }
 
-  //- only the master should create a contactInfo file
-  if(Pstream::master())
+    //- only the master should create a contactInfo file
+    if(Pstream::master())
     {
-      contactFilePtr_ = new OFstream(name_);
-      OFstream& contactFile = *contactFilePtr_;
-      int width = 20;
-      contactFile << "Time";
-      contactFile.width(width);
-      contactFile << "ContactIter";
-      contactFile.width(width);
-      contactFile << "PenaltyScale";
-      contactFile.width(width);
-      contactFile << "slaveContactVer";
-      contactFile.width(width);
-      contactFile << "penetration";
-      contactFile.width(width);
-      contactFile << "slaveVerReduce";
-      contactFile.width(width);
-      contactFile << "maxSlaveTrac" << endl;
+        contactFilePtr_ = new OFstream(name_);
+        OFstream& contactFile = *contactFilePtr_;
+        int width = 20;
+        contactFile << "Time";
+        contactFile.width(width);
+        contactFile << "ContactIter";
+        contactFile.width(width);
+        contactFile << "PenaltyScale";
+        contactFile.width(width);
+        contactFile << "slaveContactVer";
+        contactFile.width(width);
+        contactFile << "penetration";
+        contactFile.width(width);
+        contactFile << "slaveVerReduce";
+        contactFile.width(width);
+        contactFile << "maxSlaveTrac" << endl;
     }
-  Info << "\tContact patch pair constructed" << endl;
+    Info << "\tContact patch pair constructed" << endl;
 }
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
@@ -267,24 +273,24 @@ Foam::contactPatchPair::slaveTouchFraction() const
 Foam::tmp<Foam::scalarField>
 Foam::contactPatchPair::masterGapPoints() const
 {
-  scalarField globalMasterPointPenetration
+    scalarField globalMasterPointPenetration
     (
-     cp_.mesh().boundaryMesh()[masterPatch_.index()].meshPoints().size(),
-     0.0
-     );
+        cp_.mesh().boundaryMesh()[masterPatch_.index()].meshPoints().size(),
+        0.0
+    );
 
-  scalarField vertexMasterGap = masterPointPenetration_;
-  //globalMasterPointPenetration;
+    scalarField vertexMasterGap = masterPointPenetration_;
+    //globalMasterPointPenetration;
 
     tmp<scalarField> tcontactGapPoints
     (
-	  new scalarField(vertexMasterGap.size(), 0)
+        new scalarField(vertexMasterGap.size(), 0)
     );
     scalarField& contactGapPoints = tcontactGapPoints();
 
     forAll (vertexMasterGap, pointI)
     {
-      contactGapPoints[pointI] = vertexMasterGap[pointI];
+        contactGapPoints[pointI] = vertexMasterGap[pointI];
     }
 
     return tcontactGapPoints;
@@ -296,17 +302,17 @@ Foam::contactPatchPair::masterGapPoints() const
 Foam::tmp<Foam::scalarField>
 Foam::contactPatchPair::slaveGapPoints() const
 {
-  const scalarField& slavePointPenetration = slavePointPenetration_;
+    const scalarField& slavePointPenetration = slavePointPenetration_;
 
-  tmp<scalarField> tcontactGapPoints
+    tmp<scalarField> tcontactGapPoints
     (
-     new scalarField(slavePointPenetration.size(), 0)
+        new scalarField(slavePointPenetration.size(), 0)
     );
     scalarField& contactGapPoints = tcontactGapPoints();
 
     forAll (slavePointPenetration, pointI)
     {
-      contactGapPoints[pointI] = slavePointPenetration[pointI];
+        contactGapPoints[pointI] = slavePointPenetration[pointI];
     }
 
     return tcontactGapPoints;
@@ -318,25 +324,25 @@ Foam::contactPatchPair::slaveGapPoints() const
 Foam::tmp<Foam::vectorField>
 Foam::contactPatchPair::masterPointForce() const
 {
-  //- returns zero at the moment
-  vectorField masterPointForce
+    //- returns zero at the moment
+    vectorField masterPointForce
     (
-     cp_.mesh().boundaryMesh()[masterPatch_.index()].meshPoints().size(),
-     vector::zero
-     );
+        cp_.mesh().boundaryMesh()[masterPatch_.index()].meshPoints().size(),
+        vector::zero
+    );
 
-  tmp<vectorField> tcontactPointForce
+    tmp<vectorField> tcontactPointForce
     (
-     new vectorField(masterPointForce.size(), vector::zero)
-     );
-  vectorField& contactPointForce = tcontactPointForce();
+        new vectorField(masterPointForce.size(), vector::zero)
+    );
+    vectorField& contactPointForce = tcontactPointForce();
 
-  forAll (contactPointForce, pointI)
+    forAll (contactPointForce, pointI)
     {
       contactPointForce[pointI] = masterPointForce[pointI];
     }
 
-  return tcontactPointForce;
+    return tcontactPointForce;
 }
 
 
@@ -345,21 +351,21 @@ Foam::contactPatchPair::masterPointForce() const
 Foam::tmp<Foam::vectorField>
 Foam::contactPatchPair::slavePointForce() const
 {
-  vectorField slavePointForce = totalSlavePointForce_;
+    vectorField slavePointForce = totalSlavePointForce_;
 
-  tmp<vectorField> tcontactPointForce
+    tmp<vectorField> tcontactPointForce
     (
-     new vectorField(slavePointForce.size(), vector::zero)
-     );
+        new vectorField(slavePointForce.size(), vector::zero)
+    );
 
-  vectorField& contactPointForce = tcontactPointForce();
+    vectorField& contactPointForce = tcontactPointForce();
 
-  forAll (contactPointForce, pointI)
+    forAll (contactPointForce, pointI)
     {
-      contactPointForce[pointI] = slavePointForce[pointI];
+        contactPointForce[pointI] = slavePointForce[pointI];
     }
 
-  return tcontactPointForce;
+    return tcontactPointForce;
 }
 
 
@@ -386,7 +392,7 @@ Foam::contactPatchPair::masterContactPressure() const
 
     forAll (masterPressure, faceI)
     {
-      contactPressure[faceI] = max(-1*masterPressure[faceI],0);
+        contactPressure[faceI] = max(-1*masterPressure[faceI],0);
     }
 
     return tcontactPressure;
@@ -416,7 +422,7 @@ Foam::contactPatchPair::slaveContactPressure() const
 
     forAll (slavePressure, faceI)
     {
-      contactPressure[faceI] = max(-1*slavePressure[faceI],0);
+        contactPressure[faceI] = max(-1*slavePressure[faceI],0);
     }
 
     return tcontactPressure;

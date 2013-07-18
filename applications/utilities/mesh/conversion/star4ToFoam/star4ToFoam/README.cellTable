@@ -16,7 +16,7 @@ that they are unique and start with a character in the set [A-Za-z].
 Here is a sample sub-dictionary:
 
 
-<word>	                        // arbitrary tag - must be unique
+<word>                            // arbitrary tag - must be unique
 {
     Id              <int>;      // mandatory - must be unique
     Label           <word>;     // optional

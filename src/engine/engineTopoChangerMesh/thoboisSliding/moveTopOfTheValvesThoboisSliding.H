@@ -30,11 +30,11 @@
                             valveTopPoint[pointI] = true;
                         }
 
-                Info << " valve Delta Z = " << valveDeltaZ << endl;
+                        Info << " valve Delta Z = " << valveDeltaZ << endl;
                         forAll(valveTopPoints, i)
                         {
 
-			    point& p = newPoints[valveTopPoints[i]];
+                            point& p = newPoints[valveTopPoints[i]];
                             p.z() +=    valveDeltaZ*
                                 (valves_[valveI].cs().axis().z()/mag(valves_[valveI].cs().axis()))*
                                 movingPointsTop[valveTopPoints[i]];

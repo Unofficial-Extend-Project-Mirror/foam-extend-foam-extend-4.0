@@ -91,9 +91,9 @@ cohesiveZoneFvPatchVectorField::cohesiveZoneFvPatchVectorField
   if(fieldName_ != "U")
     {
       FatalError << "cohesiveZone boundary condition can only be used"
-		 << " with U solvers\n"
-		 << "For small strain DU (incremental) solvers, use cohesiveZoneIncremental"
-		 << exit(FatalError);
+          << " with U solvers\n"
+          << "For small strain DU (incremental) solvers, use cohesiveZoneIncremental"
+          << exit(FatalError);
     }
 
     if (dict.found("refValue"))

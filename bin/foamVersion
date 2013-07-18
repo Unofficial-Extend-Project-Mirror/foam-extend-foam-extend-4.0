@@ -88,7 +88,7 @@ fi
 case "$1" in
     -revision)
         shift
-	# Only output the svn version number. Handy when called from Makefiles or scripts
+    # Only output the svn version number. Handy when called from Makefiles or scripts
         echo $FOAM_DEV_SVN_REVISION_NUMBER
         ;;
     -help)
@@ -97,13 +97,13 @@ case "$1" in
         ;;
 *)
 
-	if [ $FOAM_DEV_SVN_REVISION_NUMBER ]
-	then
-	    echo "OpenFOAM version $WM_PROJECT_VERSION, revision $FOAM_DEV_SVN_REVISION_NUMBER"
-	else
-	    echo "OpenFOAM version $WM_PROJECT_VERSION"
-	fi
-	;;
+    if [ $FOAM_DEV_SVN_REVISION_NUMBER ]
+    then
+        echo "OpenFOAM version $WM_PROJECT_VERSION, revision $FOAM_DEV_SVN_REVISION_NUMBER"
+    else
+        echo "OpenFOAM version $WM_PROJECT_VERSION"
+    fi
+    ;;
 esac
 
 

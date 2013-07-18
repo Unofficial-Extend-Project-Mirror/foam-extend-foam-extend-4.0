@@ -113,7 +113,7 @@ void ensightParticlePositions
     os.newline();
     os.write("particle coordinates");
     os.newline();
-    os.write(parcels.size(), 8);	// unusual width
+    os.write(parcels.size(), 8);    // unusual width
     os.newline();
 
     // binary write is Ensight6 - first ids, then positions
@@ -141,7 +141,7 @@ void ensightParticlePositions
         {
             const vector& p = elmnt().position();
 
-            os.write(++nParcels, 8);	// unusual width
+            os.write(++nParcels, 8);    // unusual width
             os.write(p.x());
             os.write(p.y());
             os.write(p.z());

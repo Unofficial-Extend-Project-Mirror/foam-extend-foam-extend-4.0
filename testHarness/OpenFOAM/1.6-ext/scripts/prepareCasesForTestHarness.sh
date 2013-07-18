@@ -48,10 +48,10 @@ do
     # Replace the macro runApplication with runApplicationAndReportOnError
     mv ${AR} ${AR}.org
     sed \
-	-e s/"#!\/bin\/sh"/"#!\/bin\/bash"/g \
-	-e s/"runApplication "/"runApplicationAndReportOnError "/g \
-        -e /RunFunctions/r${ADDITIONAL_SHELL_FUNCTIONS} \
-	${AR}.org > ${AR}
+    -e s/"#!\/bin\/sh"/"#!\/bin\/bash"/g \
+    -e s/"runApplication "/"runApplicationAndReportOnError "/g \
+    -e /RunFunctions/r${ADDITIONAL_SHELL_FUNCTIONS} \
+    ${AR}.org > ${AR}
 
     # Make sure the Allrun file is executable
     chmod +x ${AR}

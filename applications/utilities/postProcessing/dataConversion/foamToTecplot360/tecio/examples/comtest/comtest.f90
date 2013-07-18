@@ -102,7 +102,7 @@
       SolTime = 10.0
       StrandID = 1
       ParentZn = 0
-	I = TECZNE112('Ordered Zone 1'//NULCHAR, &
+    I = TECZNE112('Ordered Zone 1'//NULCHAR, &
                      0,  & ! ZONETYPE
                      IMax, &
                      JMax, &

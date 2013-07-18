@@ -103,7 +103,7 @@ bool Foam::RBFMotionFunctionObject::execute()
             mesh.lookupObject<RBFMotionSolver>("dynamicMeshDict")
         );
 
-#	include "kinematicModel.H"
+#   include "kinematicModel.H"
 
     ms.setMotion(motion);
     movePoints(ms.newPoints());

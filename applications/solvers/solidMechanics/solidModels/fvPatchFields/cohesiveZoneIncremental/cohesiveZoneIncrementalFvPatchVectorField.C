@@ -267,9 +267,9 @@ void cohesiveZoneIncrementalFvPatchVectorField::updateCoeffs()
         DEpsilonP =
             plasticity.DEpsilonP().boundaryField()[patch().index()];
 
-	mu = plasticity.newMu().boundaryField()[patch().index()];
+        mu = plasticity.newMu().boundaryField()[patch().index()];
 
-	lambda = plasticity.newLambda().boundaryField()[patch().index()];
+        lambda = plasticity.newLambda().boundaryField()[patch().index()];
     }
 
     // Patch stress increment
@@ -323,7 +323,7 @@ void cohesiveZoneIncrementalFvPatchVectorField::updateCoeffs()
             if(Un > law().deltaC().value()/2)
             {
                 // Traction free
-	        cohesiveTractionIncrement =
+                cohesiveTractionIncrement =
                     vector::zero
                   - n[faceI]*oldSigmaN[faceI];
 
@@ -332,15 +332,15 @@ void cohesiveZoneIncrementalFvPatchVectorField::updateCoeffs()
             }
             else
             {
-	        // Calculate cohesive traction from cohesive zone model
-	        cohesiveTractionIncrement =
-		    law().traction(2*Un)*n[faceI]
+                // Calculate cohesive traction from cohesive zone model
+                cohesiveTractionIncrement =
+                    law().traction(2*Un)*n[faceI]
                   - n[faceI]*oldSigmaN[faceI];
 
-		if (crackIndicator_[faceI] == 1)
-		{
-		    Pout << "Return to craze, face: " << faceI << endl;
-		}
+                if (crackIndicator_[faceI] == 1)
+                {
+                    Pout << "Return to craze, face: " << faceI << endl;
+                }
 
                 crazeIndicator_[faceI] = 1;
                 crackIndicator_[faceI] = 0;
@@ -363,8 +363,8 @@ void cohesiveZoneIncrementalFvPatchVectorField::updateCoeffs()
 //             {
 //                 // Traction free
 //                 cohesiveTractionIncrement =
-// 		   vector::zero
-//                  - n[faceI]*oldSigmaN[faceI];
+//                     vector::zero
+//                   - n[faceI]*oldSigmaN[faceI];
 
 //                 crazeIndicator_[faceI] = 0;
 //                 crackIndicator_[faceI] = 1;

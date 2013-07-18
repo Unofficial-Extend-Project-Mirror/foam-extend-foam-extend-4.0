@@ -52,52 +52,52 @@ int main(int argc, char *argv[])
 
 #   include "createMesh.H"
 
-  runTime++;
+    runTime++;
 
-  Info << "Writing analytical solution for an infinite plate with a circular hole,\nwhere"
-       << "\n\tradius = 0.5"
-       << "\n\tdistant traction = (10,000 0 0 )"
-       << nl << endl;
+    Info << "Writing analytical solution for an infinite plate with a circular hole,\nwhere"
+        << "\n\tradius = 0.5"
+        << "\n\tdistant traction = (10,000 0 0 )"
+        << nl << endl;
 
-  volSymmTensorField sigma
+    volSymmTensorField sigma
     (
-     IOobject
-     (
-      "analyticalSigma",
-      runTime.timeName(),
-      mesh,
-      IOobject::NO_READ,
-      IOobject::AUTO_WRITE
-      ),
-     mesh,
-     dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
-     );
+        IOobject
+        (
+            "analyticalSigma",
+           runTime.timeName(),
+           mesh,
+           IOobject::NO_READ,
+           IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
+    );
 
-  const volVectorField& C = mesh.C();
+    const volVectorField& C = mesh.C();
 
-  forAll(sigma.internalField(), celli)
+    forAll(sigma.internalField(), celli)
     {
-      vector curR = vector(C[celli].x(), C[celli].y(), 0);
+        vector curR = vector(C[celli].x(), C[celli].y(), 0);
 
-      sigma.internalField()[celli] = plateHoleSolution(curR);
+        sigma.internalField()[celli] = plateHoleSolution(curR);
     }
 
-  forAll(sigma.boundaryField(), patchi)
+    forAll(sigma.boundaryField(), patchi)
     {
-      forAll(sigma.boundaryField()[patchi], facei)
-	{
-	  vector curR = vector(C.boundaryField()[patchi][facei].x(), C.boundaryField()[patchi][facei].y(), 0);
+        forAll(sigma.boundaryField()[patchi], facei)
+        {
+            vector curR = vector(C.boundaryField()[patchi][facei].x(), C.boundaryField()[patchi][facei].y(), 0);
 
-	  sigma.boundaryField()[patchi][facei] = plateHoleSolution(curR);
-	}
+            sigma.boundaryField()[patchi][facei] = plateHoleSolution(curR);
+        }
     }
 
-  Info << "Writing analytical sigma tensor" << endl;
-  sigma.write();
+    Info << "Writing analytical sigma tensor" << endl;
+    sigma.write();
 
-  Info << nl << "End" << endl;
+    Info << nl << "End" << endl;
 
-  return 0;
+    return 0;
 }
 
 // ************************************************************************* //

@@ -45,11 +45,11 @@ for CD in `find . -name "controlDict*"`
 do
     mv ${CD} ${CD}.org
     sed \
-	-e s/"\(startFrom[ \d9]*\)\([a-zA-Z]*\);"/"\1 latestTime;"/g \
-	-e s/"\(stopAt[ \d9]*\)\([a-zA-Z]*\);"/"\1 nextWrite;"/g \
-	-e s/"\(writeControl[ \d9]*\)\([a-zA-Z]*\);"/"\1 timeStep;"/g \
-	-e s/"\(writeInterval[ \d9]*\)\([0-9a-zA-Z.-]*\);"/"\1 1;"/g \
-	${CD}.org > ${CD}
+    -e s/"\(startFrom[ \d9]*\)\([a-zA-Z]*\);"/"\1 latestTime;"/g \
+    -e s/"\(stopAt[ \d9]*\)\([a-zA-Z]*\);"/"\1 nextWrite;"/g \
+    -e s/"\(writeControl[ \d9]*\)\([a-zA-Z]*\);"/"\1 timeStep;"/g \
+    -e s/"\(writeInterval[ \d9]*\)\([0-9a-zA-Z.-]*\);"/"\1 1;"/g \
+    ${CD}.org > ${CD}
 done
 popd >& /dev/null
 

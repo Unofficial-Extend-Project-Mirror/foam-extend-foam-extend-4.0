@@ -155,25 +155,25 @@ void analyticalPlateHoleTractionFvPatchVectorField::updateCoeffs()
     const vectorField& Cf = patch().Cf();
 
     forAll(Traction, faceI)
-      {
-	vector curC(Cf[faceI].x(), Cf[faceI].y(), 0);
-	vector curN = n[faceI];
+    {
+        vector curC(Cf[faceI].x(), Cf[faceI].y(), 0);
+        vector curN = n[faceI];
 
-	if (patch().name() == "hole")
-	  {
-	    curC /= mag(curC);
-	    curC *= 0.5;
+        if (patch().name() == "hole")
+        {
+             curC /= mag(curC);
+             curC *= 0.5;
 
-	    curN = -curC/mag(curC);
-	  }
+             curN = -curC/mag(curC);
+        }
 
-	Traction[faceI] =
-	  (n[faceI] & plateHoleSolution(curC));
-      }
+        Traction[faceI] =
+            (n[faceI] & plateHoleSolution(curC));
+    }
 
     //- set patch gradient
     vectorField newGradient =
-      Traction
+        Traction
       - (n & (mu*gradU.T() - (mu + lambda)*gradU))
       - n*lambda*tr(gradU);
 

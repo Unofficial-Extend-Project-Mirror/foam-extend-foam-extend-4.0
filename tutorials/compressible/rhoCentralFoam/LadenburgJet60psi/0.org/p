@@ -46,7 +46,7 @@ boundaryField
         type            totalPressure;
         value           uniform 101325;
         p0              uniform 101325;
-		U               U;
+        U               U;
         phi             phi;
         rho             none;
         psi             psi;

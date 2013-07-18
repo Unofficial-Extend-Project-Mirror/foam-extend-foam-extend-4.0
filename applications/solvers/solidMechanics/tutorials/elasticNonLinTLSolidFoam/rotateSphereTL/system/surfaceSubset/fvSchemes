@@ -25,20 +25,20 @@ FoamFile
 
 gradSchemes
 {
-	default		none;
+    default        none;
 
- 	snGradCorr(DU) leastSquares;
- 	snGradCorr(DUan) leastSquares;
- 	snGradCorr(alpha) leastSquares;
+    snGradCorr(DU) leastSquares;
+    snGradCorr(DUan) leastSquares;
+    snGradCorr(alpha) leastSquares;
 }
 
 divSchemes
 {
-	default none;
+    default none;
 }
 
 laplacianSchemes
 {
-	default none;
+    default none;
 }
 // ************************************************************************* //

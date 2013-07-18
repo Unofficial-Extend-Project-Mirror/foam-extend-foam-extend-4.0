@@ -22,22 +22,22 @@ if [ $? -eq 0 ];
 then
     echo "Using pyFoamChangeMixingPlaneBoundary.py"
     pyFoamChangeMixingPlaneBoundary.py . mixpLeftOut      \
-	--shadowPatch                    mixpRightIn      \
-	--assembly                       both             \
-	--orientation                    dirY_spanZ       \
-	--coordinateSystemType           coordinateSystem \
-	--coordinateSystemOrigin         "(0 0 0.005)"    \
-	--coordinateSystemE1             "(1 0 0)"        \
-	--coordinateSystemE3             "(0 0 1)"
+    --shadowPatch                    mixpRightIn      \
+    --assembly                       both             \
+    --orientation                    dirY_spanZ       \
+    --coordinateSystemType           coordinateSystem \
+    --coordinateSystemOrigin         "(0 0 0.005)"    \
+    --coordinateSystemE1             "(1 0 0)"        \
+    --coordinateSystemE3             "(0 0 1)"
 
     pyFoamChangeMixingPlaneBoundary.py . mixpRightIn      \
-	--shadowPatch                    mixpLeftOut      \
-	--assembly                       both             \
-	--orientation                    dirY_spanZ       \
-	--coordinateSystemType           coordinateSystem \
-	--coordinateSystemOrigin         "(0 0 0.005)"    \
-	--coordinateSystemE1             "(1 0 0)"        \
-	--coordinateSystemE3             "(0 0 1)"
+    --shadowPatch                    mixpLeftOut      \
+    --assembly                       both             \
+    --orientation                    dirY_spanZ       \
+    --coordinateSystemType           coordinateSystem \
+    --coordinateSystemOrigin         "(0 0 0.005)"    \
+    --coordinateSystemE1             "(1 0 0)"        \
+    --coordinateSystemE3             "(0 0 1)"
 else
     echo "pyFoamChangeMixingPlaneBoundary.py is missing. Using the file constant/polyMesh/boundary.preconfigured"
     cp constant/polyMesh/boundary.preconfigured constant/polyMesh/boundary

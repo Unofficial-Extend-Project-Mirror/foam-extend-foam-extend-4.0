@@ -143,7 +143,7 @@ E(const volScalarField& epsEq) const
 
         // Correction of initial modulus to avoid infinity/GREAT
         // for small strains and for unloading
-	// strain of 0.1% might be wrong for some materials
+        // strain of 0.1% might be wrong for some materials
 
         if(epsEqI[cellI] < 0.001)
         {

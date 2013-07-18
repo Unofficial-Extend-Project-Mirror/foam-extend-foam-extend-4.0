@@ -43,8 +43,8 @@ divSchemes
 
 laplacianSchemes
 {
-    default         	none;
-    laplacian(mu,DU) 	Gauss linear corrected;
+    default           none;
+    laplacian(mu,DU)  Gauss linear corrected;
     laplacian(DDU,DU) Gauss linear corrected;
 }
 

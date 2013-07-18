@@ -24,19 +24,19 @@ FoamFile
 
 solvers
 {
-	DU
-	{
-	    solver          PCG;
-	    preconditioner  DIC;
-	    tolerance       1e-09;
-	    relTol          0.001;
-	}
+    DU
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-09;
+        relTol          0.001;
+    }
 }
 
 stressedFoam
 {
-    nCorrectors     	5000;
-    DU               	1e-06;
+    nCorrectors         5000;
+    DU                  1e-06;
 }
 
 

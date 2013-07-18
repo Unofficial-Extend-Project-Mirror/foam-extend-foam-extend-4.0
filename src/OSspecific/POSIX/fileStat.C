@@ -43,7 +43,7 @@ License
 # define major(dev) ((int)(((dev) >> 8) & 0xff))
 # define minor(dev) ((int)((dev) & 0xff))
 # define makedev(major, minor) ((((unsigned int) (major)) << 8) \
-				| ((unsigned int) (minor)))
+                | ((unsigned int) (minor)))
 */
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

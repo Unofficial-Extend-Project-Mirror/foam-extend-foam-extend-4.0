@@ -260,7 +260,7 @@ bool domainDecomposition::writeDecomposition()
             processorCasePath,
             "system",
             "constant",
-	    true
+            true
         );
 
         // Create the mesh

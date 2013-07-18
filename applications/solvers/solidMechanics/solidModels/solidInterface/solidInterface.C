@@ -426,13 +426,13 @@ void solidInterface::makeIndicator() const
 
             if (materials[owner[curFace]] < materials[neighbour[curFace]])
             {
-	      curPair.first() = int(materials[owner[curFace]]);
-	      curPair.second() = int(materials[neighbour[curFace]]);
+                curPair.first() = int(materials[owner[curFace]]);
+                curPair.second() = int(materials[neighbour[curFace]]);
             }
             else
             {
-	      curPair.second() = int(materials[owner[curFace]]);
-	      curPair.first() = int(materials[neighbour[curFace]]);
+                curPair.second() = int(materials[owner[curFace]]);
+                curPair.first() = int(materials[neighbour[curFace]]);
             }
         }
     }

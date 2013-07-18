@@ -199,7 +199,7 @@ do
             ;;
         l)  LISTONLY='yes'
             ;;
-	    \?) printUsage
+        \?) printUsage
             exit 1
             ;;
     esac

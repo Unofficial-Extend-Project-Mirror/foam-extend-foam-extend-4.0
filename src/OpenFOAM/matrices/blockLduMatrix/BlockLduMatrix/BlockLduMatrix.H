@@ -313,11 +313,11 @@ public:
                 return coupleLower_;
             }
 
-			//- Access to coupled interfaces
-			typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces()
-			{
-				return interfaces_;
-			}
+            //- Access to coupled interfaces
+            typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces()
+            {
+                return interfaces_;
+            }
 
 
         // Matrix structure

@@ -24,9 +24,9 @@ License
 
 Description
     Calculates the total forces on a patch:
-            total force vector
-	    total normal force
-	    total force in each direction (x, y and z)
+        total force vector
+        total normal force
+        total force in each direction (x, y and z)
 
 Author
     philip.cardiff@ucd.ie
@@ -78,9 +78,9 @@ int main(int argc, char *argv[])
       vector totalShearForce = sum((I -sqr(n)) & (Sf & sigmaPatch));
 
       Info << "Patch: " << mesh.boundary()[patchID].name() << nl
-	   << "\tTotal Force:\t\t" << totalForce << " N\n"
-	   << "\tTotal Normal Force:\t" << totalNormalForce <<  " N\n"
-	   << "\tTotal Shear Force:\t" << totalShearForce <<  " N\n" << endl;
+          << "\tTotal Force:\t\t" << totalForce << " N\n"
+          << "\tTotal Normal Force:\t" << totalNormalForce <<  " N\n"
+          << "\tTotal Shear Force:\t" << totalShearForce <<  " N\n" << endl;
     }
 
   Info << nl << "Net force on model is " << netForce << " N" << endl;

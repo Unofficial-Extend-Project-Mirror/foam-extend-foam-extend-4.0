@@ -43,7 +43,7 @@ Warning #1: Make sure your OpenFOAM environment is properly initialized before
 
 Warning #2: Make sure to create an environment variable called $BREEDER_15_DIR
             This environment variable must point to the Breeder_1.5 directory
-	    of your local working copy of the openfoam-extend Subversion repository
+            of your local working copy of the openfoam-extend Subversion repository
 
             Something like: export BREEDER_15_DIR=/someAbsolutePath/Breeder_1.5
 

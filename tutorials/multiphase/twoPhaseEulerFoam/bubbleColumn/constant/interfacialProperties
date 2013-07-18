@@ -14,9 +14,9 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dragModela       		SchillerNaumann;
-dragModelb       		SchillerNaumann;
+dragModela               SchillerNaumann;
+dragModelb               SchillerNaumann;
 
-dragPhase				blended;
+dragPhase                blended;
 
 // ************************************************************************* //

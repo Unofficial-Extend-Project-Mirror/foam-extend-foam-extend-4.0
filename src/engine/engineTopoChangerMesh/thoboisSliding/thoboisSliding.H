@@ -50,7 +50,7 @@ SourceFiles
     verticalValvesGambitMove.C
 
 Author
-	Tommaso Lucchini
+    Tommaso Lucchini
 
 \*---------------------------------------------------------------------------*/
 

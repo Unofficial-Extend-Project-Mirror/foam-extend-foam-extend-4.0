@@ -131,12 +131,12 @@ int main(int argc, char *argv[])
 
 #       include "rotateSolidFields.H"
 
-	//#       include "moveSolidMesh.H"
+//#       include "moveSolidMesh.H"
 #       include "moveSolidMeshLeastSquares.H"
 
 #       include "calculateStress.H"
 
-	//#       include "calculateLiftAndDrag.H"
+//#       include "calculateLiftAndDrag.H"
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"

@@ -37,8 +37,8 @@ Description
     inlet
     {
         type            timeVaryingSolidTraction;
-	field           U; // or DU
-	nonLinear       no;
+    field           U; // or DU
+    nonLinear       no;
         fileName        "$FOAM_CASE/time-series";
         outOfBounds     clamp;           // (error|warn|clamp|repeat)
     }
