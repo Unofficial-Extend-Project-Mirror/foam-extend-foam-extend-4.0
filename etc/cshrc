@@ -30,9 +30,21 @@
 #     Sourced from ~/.login or ~/.cshrc
 #
 #------------------------------------------------------------------------------
+set called=($_)
+set prefSettingFile=$called[2].preset
+
+if ( -r $prefSettingFile ) then
+    #    echo "Found presettings $prefSettingFile"
+    source $prefSettingFile
+endif
+unset prefSettingFile,called
 
 setenv WM_PROJECT OpenFOAM
 setenv WM_PROJECT_VERSION 1.6-ext
+
+if ( "$WM_PROJECT_VERSION_ADDITION" != "" ) then
+    setenv WM_PROJECT_VERSION $WM_PROJECT_VERSION-$WM_PROJECT_VERSION_ADDITION
+endif
 
 # helps to easily write #ifdefs to detect a dev-version
 setenv FOAM_DEV 1
@@ -357,4 +369,3 @@ unset cleanEnv cleanProg colonPath foamInstall foamOldDirs
 unalias _foamSource
 
 # -----------------------------------------------------------------------------
-
