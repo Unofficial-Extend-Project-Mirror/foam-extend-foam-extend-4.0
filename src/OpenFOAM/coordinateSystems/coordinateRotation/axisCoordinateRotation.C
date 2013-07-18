@@ -112,12 +112,6 @@ Foam::axisCoordinateRotation::axisCoordinateRotation
     scalar theta = readScalar(dict.lookup("theta"));
     scalar psi = readScalar(dict.lookup("psi"));
 
-    bool inDegrees = true;
-    if (dict.found("degrees"))
-    {
-        inDegrees = Switch(dict.lookup("degrees"));
-    }
-
     calcTransform
     (
         phi,

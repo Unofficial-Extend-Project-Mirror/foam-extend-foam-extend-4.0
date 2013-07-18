@@ -14,13 +14,10 @@
 
         if(valves_[valveI].curLift() >= valves_[valveI].deformationLift())
         {
-            bool isMoving(false);
-
             if(mag(valves_[valveI].curVelocity()) > 0)
             {
                 Info<< "Valve n. " << valveI << " is moving with velocity = "
                     << valves_[valveI].curVelocity() << endl;
-                isMoving = true;
             }
 
             Info<< "Valve displacement for valve " << valveI << " = "

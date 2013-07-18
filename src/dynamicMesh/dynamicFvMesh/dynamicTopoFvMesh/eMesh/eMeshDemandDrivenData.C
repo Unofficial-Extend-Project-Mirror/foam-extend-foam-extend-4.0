@@ -180,7 +180,8 @@ void eMesh::calcEdgePoints() const
     // NOTE: Will work only on tetrahedral meshes!
 
     bool found;
-    label faceIndex = -1, cellIndex = -1;
+    label faceIndex = -1
+    label cellIndex = -1;
     const labelList& owner = mesh_.faceOwner();
     const labelList& neighbour = mesh_.faceNeighbour();
     const cellList& cells = mesh_.cells();

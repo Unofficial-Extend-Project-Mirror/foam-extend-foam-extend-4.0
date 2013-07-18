@@ -27,6 +27,7 @@ License
 #include "dimensionedScalar.H"
 #include "equationReader.H"
 #include "equationOperation.H"
+#include "error.H"
 //#include "equationOperationList.H"
 
 class dimensionedScalar;
@@ -396,6 +397,16 @@ Foam::word Foam::equationOperation::opName
             return "min";
         case otstabilise:
             return "stabilise";
+        default:
+            FatalErrorIn
+            (
+                "Foam::word Foam::equationOperation::opName"
+                "(const Foam::equationOperation::operationType& op)"
+            )
+                << "invalid operation"
+                << exit(FatalError);
+
+            return "invalid";
     }
 }
 
@@ -423,6 +434,16 @@ Foam::word Foam::equationOperation::sourceName
             return "equation";
         case slstorage:
             return "memory";
+        default:
+            FatalErrorIn
+            (
+                "Foam::word Foam::equationOperation::opName"
+                "(const Foam::equationOperation::operationType& op)"
+            )
+                << "invalid source"
+                << exit(FatalError);
+
+            return "invalid";
     }
 }
 

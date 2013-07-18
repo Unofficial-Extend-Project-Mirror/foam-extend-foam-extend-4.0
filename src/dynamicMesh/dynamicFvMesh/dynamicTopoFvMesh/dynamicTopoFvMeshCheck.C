@@ -57,7 +57,8 @@ bool dynamicTopoFvMesh::meshQuality
     label nCells = 0, minCell = -1;
     scalar maxQuality = -GREAT;
     scalar minQuality =  GREAT;
-    scalar cQuality, meanQuality = 0.0;
+    scalar cQuality = 0.0;
+    scalar meanQuality = 0.0;
 
     // Track slivers
     bool sliversAbsent = true;
@@ -1682,7 +1683,8 @@ bool dynamicTopoFvMesh::checkCollapse
 ) const
 {
     label faceIndex = -1;
-    scalar cQuality = 0.0, oldVolume = 0.0;
+    scalar cQuality = 0.0;
+    scalar oldVolume = 0.0;
     const cell& cellToCheck = cells_[cellIndex];
 
     // Look for a face that doesn't contain 'pointIndex'

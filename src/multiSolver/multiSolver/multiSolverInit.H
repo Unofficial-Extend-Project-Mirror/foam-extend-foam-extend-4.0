@@ -1,6 +1,8 @@
 // Common elements in the constructor initialization list for multiSolver
 
-    multiDicts_(NULL),
+    // Quenching compiler warning
+    // HR, 18/Jul/2013
+    multiDicts_(0),
 
     multiSolverControl_(multiControlDict_.subDict("multiSolverControl")),
     solverDomains_(multiControlDict_.subDict("solverDomains")),

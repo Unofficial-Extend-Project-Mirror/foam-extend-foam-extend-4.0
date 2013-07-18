@@ -179,10 +179,12 @@ void Foam::multiSolver::synchronizeParallel() const
     }
     else
     {
-        // Recieve go signal
+        // Receive go signal
         {
             IPstream fromMaster(Pstream::blocking, Pstream::masterNo());
-            bool okayToGo(readBool(fromMaster));
+            // Quenching compiler warning
+            // HR, 18/Jul/2013
+            readBool(fromMaster);
         }
     }
 }

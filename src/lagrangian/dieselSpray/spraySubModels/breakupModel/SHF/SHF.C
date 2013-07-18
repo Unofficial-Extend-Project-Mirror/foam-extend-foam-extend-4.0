@@ -124,9 +124,6 @@ void SHF::breakupParcel
     scalar reLiquid   = p.Re(rhoLiquid, vel, muLiquid);
     scalar ohnesorge  = sqrt(weLiquid)/(reLiquid + VSMALL);
 
-    vector acceleration = p.Urel(vel)/p.tMom();
-    vector trajectory = p.U()/mag(p.U());
-
     vector vRel = p.Urel(vel);
 
     scalar weGasCorr = weGas/(1.0 + weCorrCoeff_ * ohnesorge);

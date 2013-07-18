@@ -2955,7 +2955,6 @@ char *timestring ( void )
 # define TIME_SIZE 29
 
   const struct tm *tm;
-  size_t len;
   time_t now;
   char *s;
 
@@ -2964,7 +2963,7 @@ char *timestring ( void )
 
   s = new char[TIME_SIZE];
 
-  len = strftime ( s, TIME_SIZE, "%d %B %Y %I:%M:%S %p", tm );
+  strftime ( s, TIME_SIZE, "%d %B %Y %I:%M:%S %p", tm );
 
   return s;
 # undef TIME_SIZE

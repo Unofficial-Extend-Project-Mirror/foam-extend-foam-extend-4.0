@@ -81,7 +81,6 @@ Foam::tmp<Foam::scalarField> Foam::mixingPlaneGAMGInterface::agglomerateCoeffs
     // AMG agglomeration missing
     notImplemented("mixingPlaneGAMGInterface::agglomerateCoeffs");
     tmp<scalarField> tcoarseCoeffs(new scalarField(size(), 0.0));
-    scalarField& coarseCoeffs = tcoarseCoeffs();
 
     return tcoarseCoeffs;
 }

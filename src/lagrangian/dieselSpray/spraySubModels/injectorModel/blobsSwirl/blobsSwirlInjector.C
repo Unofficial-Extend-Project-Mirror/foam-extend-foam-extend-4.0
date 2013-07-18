@@ -256,9 +256,6 @@ void blobsSwirlInjector::calculateHX
         )
     );
 
-    scalar hOLD = -100.0;
-    scalar xOLD = -100.0;
-
     label i;
 
     for(i=0; i<20; i++)
@@ -286,9 +283,6 @@ void blobsSwirlInjector::calculateHX
         );
 
         x_ = sqr(1.0 - 2.0 * h_/injectorDiameter);
-
-        hOLD = h_;
-        xOLD = x_;
 
     }
 
