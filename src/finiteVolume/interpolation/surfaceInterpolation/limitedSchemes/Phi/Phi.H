@@ -99,7 +99,7 @@ public:
         //scalar PLimiter =
         //    (1.0 - k_) + k_*(faceFlux - phiU)/stabilise(phiCD - phiU, SMALL);
 
-        scalar PLimiter = 
+        scalar PLimiter =
             ((faceFlux - phiU)/stabilise(phiCD - phiU, SMALL) + k_);
 
         // Limit the limiter between upwind and central

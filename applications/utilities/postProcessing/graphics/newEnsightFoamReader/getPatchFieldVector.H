@@ -1,8 +1,8 @@
 label patchi = which_part - 2;
 
-if 
+if
 (
-    nVar >= Num_variables - nSprayVariables 
+    nVar >= Num_variables - nSprayVariables
   - nSecondMeshVariables - nFaMeshVariables
 )
 {

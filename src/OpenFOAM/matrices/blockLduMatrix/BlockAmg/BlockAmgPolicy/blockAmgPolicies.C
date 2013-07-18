@@ -33,27 +33,27 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineNamedTemplateTypeNameAndDebug(blockScalarAmgPolicy, 0);                 
-defineNamedTemplateTypeNameAndDebug(blockVectorAmgPolicy, 0);                 
-defineNamedTemplateTypeNameAndDebug(blockTensorAmgPolicy, 0);                 
-                                                                              
-defineTemplateRunTimeSelectionTable                                           
-(                                                                             
-    blockScalarAmgPolicy,                                                     
-    matrix                                                                    
-);                                                                             
-                                                                              
-defineTemplateRunTimeSelectionTable                                           
-(                                                                             
-    blockVectorAmgPolicy,                                                     
-    matrix                                                                    
-);                                                                            
-                                                                              
-defineTemplateRunTimeSelectionTable                                           
-(                                                                             
-    blockTensorAmgPolicy,                                                     
-    matrix                                                                    
-);                                                                            
+defineNamedTemplateTypeNameAndDebug(blockScalarAmgPolicy, 0);
+defineNamedTemplateTypeNameAndDebug(blockVectorAmgPolicy, 0);
+defineNamedTemplateTypeNameAndDebug(blockTensorAmgPolicy, 0);
+
+defineTemplateRunTimeSelectionTable
+(
+    blockScalarAmgPolicy,
+    matrix
+);
+
+defineTemplateRunTimeSelectionTable
+(
+    blockVectorAmgPolicy,
+    matrix
+);
+
+defineTemplateRunTimeSelectionTable
+(
+    blockTensorAmgPolicy,
+    matrix
+);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

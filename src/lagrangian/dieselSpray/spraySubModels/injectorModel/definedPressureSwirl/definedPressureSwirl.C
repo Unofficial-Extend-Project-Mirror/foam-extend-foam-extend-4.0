@@ -85,7 +85,7 @@ definedPressureSwirlInjector::~definedPressureSwirlInjector()
 
 scalar definedPressureSwirlInjector::d0
 (
-    const label n, 
+    const label n,
     const scalar t
 ) const
 {
@@ -95,38 +95,38 @@ scalar definedPressureSwirlInjector::d0
     scalar coneAngle = it.getTableValue(coneAngle_, t);
     scalar coneInterval = it.getTableValue(coneInterval_, t);
     angle_ = coneAngle ;
-    
+
 //  modifications to take account of flash boiling....
 
     const liquidMixture& fuels = sm_.fuels();
     scalar chi = 0.0;
     scalar Tinj = it.T(t);
-    label Nf = fuels.components().size();  
+    label Nf = fuels.components().size();
     scalar temperature = sm_.ambientTemperature();
     scalar pressure = sm_.ambientPressure();
-    
-          
+
+
     for(label i = 0; i < Nf ; i++)
     {
-    
+
         if(fuels.properties()[i].pv(sm_.ambientPressure(), Tinj) >= 0.999*sm_.ambientPressure())
         {
 
 //          The fuel is boiling.....
-//          Calculation of the boiling temperature            
-            
+//          Calculation of the boiling temperature
+
             scalar tBoilingSurface = Tinj ;
-                        
+
             label Niter = 200;
-            
+
             for(label k=0; k< Niter ; k++)
             {
 
                 scalar pBoil = fuels.properties()[i].pv(pressure, tBoilingSurface);
-                    
+
                 if(pBoil > pressure)
                 {
-                    tBoilingSurface = tBoilingSurface - (Tinj-temperature)/Niter;   
+                    tBoilingSurface = tBoilingSurface - (Tinj-temperature)/Niter;
                 }
                 else
                 {
@@ -134,21 +134,21 @@ scalar definedPressureSwirlInjector::d0
                 }
 
             }
-            
+
             scalar hl = fuels.properties()[i].hl(sm_.ambientPressure(), tBoilingSurface);
             scalar iTp = fuels.properties()[i].h(sm_.ambientPressure(), Tinj) - sm_.ambientPressure()/fuels.properties()[i].rho(sm_.ambientPressure(), Tinj);
             scalar iTb = fuels.properties()[i].h(sm_.ambientPressure(), tBoilingSurface) - sm_.ambientPressure()/fuels.properties()[i].rho(sm_.ambientPressure(), tBoilingSurface);
-            
+
             chi += it.X()[i]*(iTp-iTb)/hl;
-                   
+
         }
-    }    
-    
+    }
+
     //  bounding chi
-    
+
     chi = max(chi, 0.0);
     chi = min(chi, 1.0);
-    
+
     angle_ = angle_ + (144.0 - angle_) * sqr(chi) + 2.0 * coneInterval * (0.5 - c);
 
 //  end modifications
@@ -156,20 +156,20 @@ scalar definedPressureSwirlInjector::d0
     angle_ *= mathematicalConstant::pi/360.0;
 
     scalar injectedMassFlow = it.massFlowRate(t);
-    
-    scalar cosAngle = cos(angle_);   
 
-    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), it.T(t), it.X()); 
-    scalar injectorDiameter = it.d();  
-     
+    scalar cosAngle = cos(angle_);
+
+    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), it.T(t), it.X());
+    scalar injectorDiameter = it.d();
+
     scalar deltaPressure = deltaPressureInj(t,n);
-    
+
     scalar kV = kv(n, injectedMassFlow, deltaPressure, t);
-    
-    scalar v = kV * sqrt(2.0*deltaPressure/rhoFuel);    
+
+    scalar v = kV * sqrt(2.0*deltaPressure/rhoFuel);
 
     u_ = v * cosAngle;
-    
+
     scalar A = injectedMassFlow/(mathematicalConstant::pi*rhoFuel*u_);
 
 /*
@@ -182,7 +182,7 @@ scalar definedPressureSwirlInjector::d0
 */
 
     scalar angleT = angle_;
-    return (injectorDiameter-sqrt(pow(injectorDiameter,2.0)-4.0*A))*cos(angleT)/2.0;         
+    return (injectorDiameter-sqrt(pow(injectorDiameter,2.0)-4.0*A))*cos(angleT)/2.0;
 
 //  original implementation
 
@@ -190,7 +190,7 @@ scalar definedPressureSwirlInjector::d0
     return (injectorDiameter-sqrt(pow(injectorDiameter,2)-4.0*A))/2.0;
 */
 
-    
+
 }
 
 vector definedPressureSwirlInjector::direction
@@ -208,7 +208,7 @@ vector definedPressureSwirlInjector::direction
 
     // randomly distributed vector normal to the injection vector
     vector normal = vector::zero;
-    
+
     if (sm_.twoD())
     {
         scalar reduce = 0.01;
@@ -231,7 +231,7 @@ vector definedPressureSwirlInjector::direction
             injectors_[n].properties()->tan2(hole)*sin(beta)
         );
     }
-    
+
     // set the direction of injection by adding the normal vector
     vector dir = dcorr*injectors_[n].properties()->direction(hole, time) + normal;
     dir /= mag(dir);
@@ -253,7 +253,7 @@ scalar definedPressureSwirlInjector::averageVelocity
 (
     const label i
 ) const
-{    
+{
 
     const injectorType& it = sm_.injectors()[i].properties();
 
@@ -264,7 +264,7 @@ scalar definedPressureSwirlInjector::averageVelocity
     scalar injectionPressure = averagePressure(i);
 
     scalar Tav = it.integrateTable(it.T())/dt;
-    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), Tav, it.X());  
+    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), Tav, it.X());
 
     scalar kV = kv(i, injectedMassFlow, injectionPressure, 0);
 
@@ -291,12 +291,12 @@ scalar definedPressureSwirlInjector::kv
     scalar cosAngle = cos(coneAngle);
     scalar Tav = it.integrateTable(it.T())/(it.teoi()-it.tsoi());
 
-    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), Tav, it.X()); 
-    scalar injectorDiameter = it.d();  
-     
+    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), Tav, it.X());
+    scalar injectorDiameter = it.d();
+
     scalar kv = max
     (
-        it.getTableValue(maxKv_, t), 
+        it.getTableValue(maxKv_, t),
         4.0*massFlow
         *
         sqrt(rhoFuel/2.0/dPressure)
@@ -304,7 +304,7 @@ scalar definedPressureSwirlInjector::kv
         (mathematicalConstant::pi*pow(injectorDiameter, 2.0)*rhoFuel*cosAngle)
     );
 
-    return min(1.0,kv);   
+    return min(1.0,kv);
 }
 
 
@@ -312,7 +312,7 @@ scalar definedPressureSwirlInjector::kv
 
 scalar definedPressureSwirlInjector::deltaPressureInj(const scalar time, const label inj) const
 {
-    return injectors_[inj].properties()->injectionPressure(time) - sm_.ambientPressure();   
+    return injectors_[inj].properties()->injectionPressure(time) - sm_.ambientPressure();
 }
 
 scalar definedPressureSwirlInjector::averagePressure(const label inj) const

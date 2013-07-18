@@ -8,7 +8,7 @@ skipcompile=n
 if test $# -ge 1 ; then
   Platname=$1
   shift
-  while test $# -ge 1 
+  while test $# -ge 1
   do
     if test "$1" = "-release" ; then
       isrelease=y
@@ -60,7 +60,7 @@ else
 
   read choice
 
-  if test $choice -eq 1 ;then 
+  if test $choice -eq 1 ;then
     MAKEWHAT=tecio.a
   fi
 fi
@@ -118,38 +118,38 @@ case $Platname in
                ARFLAGS="-X64 qv"
                ;;
    compaq.51)  CCOMP=cxx
-               FINALCFLAGS="-DCOMPAQX -I/usr/include -ieee_with_inexact" 
+               FINALCFLAGS="-DCOMPAQX -I/usr/include -ieee_with_inexact"
                ;;
    decalpha.32)CCOMP=cc
-               FINALCFLAGS="-DDECALPHAX -I/usr/include -ieee_with_inexact" 
+               FINALCFLAGS="-DDECALPHAX -I/usr/include -ieee_with_inexact"
                ;;
    hp7xx.*-64) CCOMP=aCC
-               FINALCFLAGS="+DD64 +DS2.0 -AA -DHPX -DLONGIS64 -I/usr/include/X11R6 -I/usr/include/Motif2.1" 
+               FINALCFLAGS="+DD64 +DS2.0 -AA -DHPX -DLONGIS64 -I/usr/include/X11R6 -I/usr/include/Motif2.1"
                LINKFLAGS="+DA2.0W +DD64 +DS2.0W"
                ;;
    hp7xx64.11) CCOMP=aCC
-               FINALCFLAGS="+DA2.0W +DD64 +DS2.0W -AA -DHPX -DLONGIS64 -I/usr/include/X11R6 -I/usr/include/Motif2.1" 
+               FINALCFLAGS="+DA2.0W +DD64 +DS2.0W -AA -DHPX -DLONGIS64 -I/usr/include/X11R6 -I/usr/include/Motif2.1"
                LINKFLAGS="+DA2.0W +DD64 +DS2.0W"
                ;;
      hpi64.11) CCOMP=aCC
-               FINALCFLAGS="+DD64 -AA -DHPX -DLONGIS64 -I/usr/include/X11R6 -I/usr/include/Motif2.1" 
+               FINALCFLAGS="+DD64 -AA -DHPX -DLONGIS64 -I/usr/include/X11R6 -I/usr/include/Motif2.1"
                LINKFLAGS="+DD64"
                ;;
    hp7xx.11)   CCOMP=aCC
-               FINALCFLAGS="+DAportable -AA -DHPX -I/usr/include/X11R6 -I/usr/include/Motif2.1" 
+               FINALCFLAGS="+DAportable -AA -DHPX -I/usr/include/X11R6 -I/usr/include/Motif2.1"
                LINKFLAGS="+DAportable"
                ;;
    crayc90)    CCOMP=cc
-               FINALCFLAGS="-DCRAY -DUNIXX" 
+               FINALCFLAGS="-DCRAY -DUNIXX"
                ;;
    linux*i64.*)CCOMP=g++
-               FINALCFLAGS="-fPIC -DLINUX -DLINUXI64" 
+               FINALCFLAGS="-fPIC -DLINUX -DLINUXI64"
                ;;
    linux*64.*) CCOMP=g++
-               FINALCFLAGS="-fPIC -DLINUX -DLINUX64" 
+               FINALCFLAGS="-fPIC -DLINUX -DLINUX64"
                ;;
    linux*)     CCOMP=g++
-               FINALCFLAGS="-fPIC -DLINUX" 
+               FINALCFLAGS="-fPIC -DLINUX"
                ;;
    sun4.54)    CCOMP=/opt/SUNWspro/bin/CC
                FINALCFLAGS="-DSUN -DSUNSOLARISX -I/usr/openwin/include -I/usr/dt/include -library=libC -library=Cstd -library=no%rwtools7 -library=no%rwtools7_dbg -xO1"
@@ -194,7 +194,7 @@ case $Platname in
                ARFLAGS="-xar -o"
                ;;
    sun86.54)   CCOMP=/opt/SUNWspro/bin/CC
-               FINALCFLAGS="-DSUN -DSUNSOLARISX -I/usr/openwin/include -I/usr/dt/include" 
+               FINALCFLAGS="-DSUN -DSUNSOLARISX -I/usr/openwin/include -I/usr/dt/include"
                MAKECMD=/usr/ccs/bin/make
                AR=/opt/SUNWspro/bin/CC
                ARFLAGS="-xar -o"
@@ -223,7 +223,7 @@ FINALCFLAGS="$FINALCFLAGS $EXTRAFLAGS -DUSEENUM -DTHREED"
 # NOTE: Used to use make here but had problems with using remsh to run
 #       make multiple times to get 64 bit and 32 bit versions of libraries....
 #
-# $MAKECMD $MAKEWHAT AR=$AR CC=$CCOMP LINKFLAGS="$LINKFLAGS" STRIPFLAG=$STRIPFLAG CFLAGS="$EXTRAFLAGS -DUSEENUM -DTHREED $FINALCFLAGS" 
+# $MAKECMD $MAKEWHAT AR=$AR CC=$CCOMP LINKFLAGS="$LINKFLAGS" STRIPFLAG=$STRIPFLAG CFLAGS="$EXTRAFLAGS -DUSEENUM -DTHREED $FINALCFLAGS"
 #
 #
 #
@@ -262,12 +262,12 @@ pwd
 
 echo "$AR $ARFLAGS tecio.a $OBJLIST"
 $AR $ARFLAGS tecio.a $OBJLIST
-if test  -f /bin/ranlib ; then 
-    /bin/ranlib tecio.a; 
-elif test -f /usr/bin/ranlib ; then 
-    /usr/bin/ranlib tecio.a; 
-elif test -f /usr/ucb/ranlib ; then 
-    /usr/ucb/ranlib tecio.a; 
+if test  -f /bin/ranlib ; then
+    /bin/ranlib tecio.a;
+elif test -f /usr/bin/ranlib ; then
+    /usr/bin/ranlib tecio.a;
+elif test -f /usr/ucb/ranlib ; then
+    /usr/ucb/ranlib tecio.a;
 fi
 
 echo "$CCOMP -I./tecsrc -DMAKEARCHIVE $FINALCFLAGS -c pltview.cpp"

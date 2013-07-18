@@ -26,7 +26,7 @@ Class
     BlockCoeffMaxNorm
 
 Description
-    Specilization for scalar. Implemented to avoid issues with asScalar, 
+    Specilization for scalar. Implemented to avoid issues with asScalar,
     asSquare etc.
     This is basically needed since there are specializations of the BlockCoeff
     class.
@@ -85,7 +85,7 @@ inline void BlockCoeffMaxNorm<scalar>::coeffMag
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif

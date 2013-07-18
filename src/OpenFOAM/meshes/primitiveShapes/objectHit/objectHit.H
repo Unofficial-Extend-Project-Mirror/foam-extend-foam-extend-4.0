@@ -111,7 +111,7 @@ public:
         {
             return ((a.hit_ == b.hit_) && (a.hitObject_ == b.hitObject_));
         }
-            
+
         friend bool operator!=(const objectHit& a, const objectHit& b)
         {
             return (!(a == b));

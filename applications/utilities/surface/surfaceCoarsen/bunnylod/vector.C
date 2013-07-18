@@ -65,13 +65,13 @@ matrix operator*(matrix m1,matrix m2){
 	return matrix(m1*m2.x,m1*m2.y,m1*m2.z);
 }
 
-//Quaternion Implementation    
+//Quaternion Implementation
 Quaternion operator*(Quaternion a,Quaternion b) {
 	Quaternion c;
-	c.r = a.r*b.r - a.x*b.x - a.y*b.y - a.z*b.z; 
-	c.x = a.r*b.x + a.x*b.r + a.y*b.z - a.z*b.y; 
-	c.y = a.r*b.y - a.x*b.z + a.y*b.r + a.z*b.x; 
-	c.z = a.r*b.z + a.x*b.y - a.y*b.x + a.z*b.r; 
+	c.r = a.r*b.r - a.x*b.x - a.y*b.y - a.z*b.z;
+	c.x = a.r*b.x + a.x*b.r + a.y*b.z - a.z*b.y;
+	c.y = a.r*b.y - a.x*b.z + a.y*b.r + a.z*b.x;
+	c.z = a.r*b.z + a.x*b.y - a.y*b.x + a.z*b.r;
 	return c;
 }
 Quaternion operator-(Quaternion q) {
@@ -92,7 +92,7 @@ Quaternion operator+(Quaternion a,Quaternion b) {
 	return Quaternion(a.r+b.r, a.x+b.x, a.y+b.y, a.z+b.z);
 }
 float operator^(Quaternion a,Quaternion b) {
-	return  (a.r*b.r + a.x*b.x + a.y*b.y + a.z*b.z); 
+	return  (a.r*b.r + a.x*b.x + a.y*b.y + a.z*b.z);
 }
 Quaternion slerp(Quaternion a,Quaternion b,float interp){
 	if((a^b) <0.0) {

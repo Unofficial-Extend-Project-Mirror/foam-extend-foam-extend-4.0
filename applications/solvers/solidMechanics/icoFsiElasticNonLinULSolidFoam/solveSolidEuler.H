@@ -46,15 +46,15 @@
             DF = gradDU.T();
 
 #           include "calculateDSigma.H"
-        } 
+        }
         while
         (
-            solverPerf.initialResidual() > convergenceTolerance 
+            solverPerf.initialResidual() > convergenceTolerance
          && ++iCorr < nCorr
         );
 
-        Info << "Solving for " << DU.name() 
-            << ", Initial residual = " << initialResidual 
+        Info << "Solving for " << DU.name()
+            << ", Initial residual = " << initialResidual
             << ", Final residual = " << solverPerf.initialResidual()
             << ", No outer iterations " << iCorr << endl;
 

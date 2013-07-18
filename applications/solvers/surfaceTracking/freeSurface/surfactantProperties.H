@@ -51,7 +51,7 @@ namespace Foam
 class surfactantProperties
 {
     // Private data
-    
+
         //- Surfactant concetration in the bulk of fluid
         dimensionedScalar surfactBulkConc_;
 
@@ -99,7 +99,7 @@ public:
         (
             surfactSaturatedConc_
            /(
-                1.0 
+                1.0
               + surfactDesorptionCoeff_
                /surfactBulkConc_
             )

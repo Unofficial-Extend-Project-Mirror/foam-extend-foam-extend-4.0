@@ -91,7 +91,7 @@ bool Foam::XiModels::algebraic::read(const dictionary& XiProperties)
     XiModel::read(XiProperties);
 
     XiModelCoeffs_.lookup("XiShapeCoef") >> XiShapeCoef;
-    
+
     return true;
 }
 

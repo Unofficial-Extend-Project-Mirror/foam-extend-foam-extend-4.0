@@ -297,7 +297,7 @@ bool Foam::triangleFuncs::intersectBb
 //            return true;
 //        }
 //        if (tri.intersectionExact(cube3, cube0).hit())
-//        {   
+//        {
 //            return true;
 //        }
 //

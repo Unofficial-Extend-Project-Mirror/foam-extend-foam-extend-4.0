@@ -52,7 +52,7 @@ Foam::labelList Foam::fieldviewTopology::calcFaceAddressing
     const label cellI
 )
 {
-    // return value. 
+    // return value.
     labelList shapeToMesh(shape.nFaces(), -1);
 
     const faceList modelFaces(shape.faces());
@@ -125,7 +125,7 @@ Foam::fieldviewTopology::fieldviewTopology
         forAll (mesh.boundaryMesh(), patchI)
         {
             const polyPatch& currPatch = mesh.boundaryMesh()[patchI];
-            if 
+            if
             (
                 isA<wallPolyPatch>(currPatch)
              || isA<symmetryPolyPatch>(currPatch)
@@ -424,7 +424,7 @@ Foam::fieldviewTopology::fieldviewTopology
                 faceLabels[labelI++] = patchFace[1] + 1;
                 faceLabels[labelI++] = patchFace[2] + 1;
                 faceLabels[labelI++] = patchFace[3] + 1;
-            } 
+            }
         }
 
         faceLabels.setSize(labelI);

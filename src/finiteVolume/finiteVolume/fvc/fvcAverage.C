@@ -112,7 +112,7 @@ average
 }
 
 
-template<class Type> 
+template<class Type>
 tmp<GeometricField<Type, fvPatchField, volMesh> >
 average
 (

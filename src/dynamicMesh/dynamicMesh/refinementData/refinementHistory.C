@@ -406,7 +406,7 @@ Foam::refinementHistory::refinementHistory
     )
     {
         readStream(typeName) >> *this;
-        close();        
+        close();
     }
     else
     {
@@ -491,7 +491,7 @@ void Foam::refinementHistory::resize(const label size)
     }
 }
 
-    
+
 void Foam::refinementHistory::updateMesh(const mapPolyMesh& map)
 {
     if (active())
@@ -983,7 +983,7 @@ void Foam::refinementHistory::compact()
 
 
     // Now oldToNew is fully complete and compacted elements are in
-    // newSplitCells. 
+    // newSplitCells.
     // Renumber contents of newSplitCells and visibleCells.
     forAll(newSplitCells, index)
     {

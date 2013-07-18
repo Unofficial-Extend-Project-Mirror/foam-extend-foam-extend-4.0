@@ -76,7 +76,7 @@ boundaryField
     topBrickRight
     {
         type            solidTraction;
-	traction        uniform ( 0 0 0 );
+        traction        uniform ( 0 0 0 );
         pressure        uniform 0;
         value           uniform (0 0 0);
     }

@@ -56,7 +56,7 @@ struct BlockLduInterfaceFieldPtrsListList
 {
     typedef List<typename BlockLduInterfaceFieldPtrsList<T>::Type> Type;
 };
-  
+
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

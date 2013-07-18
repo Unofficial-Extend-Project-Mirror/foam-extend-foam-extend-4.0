@@ -1,4 +1,4 @@
 tractionDisplacement/tractionDisplacementFvPatchVectorField.C
-icoFsiFoam.C  
+icoFsiFoam.C
 
 EXE = $(FOAM_APPBIN)/icoFsiFoam

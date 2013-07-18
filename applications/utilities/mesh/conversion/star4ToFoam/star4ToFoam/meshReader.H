@@ -56,7 +56,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-			Class meshReader Declaration
+            Class meshReader Declaration
 \*---------------------------------------------------------------------------*/
 
 class meshReader
@@ -151,9 +151,9 @@ private:
 
         void writeAux(const polyMesh& mesh)
         {
-	    writeCellTable(mesh);
-	    writeInterfaces(mesh);
-	}
+            writeCellTable(mesh);
+            writeInterfaces(mesh);
+        }
 
         //- Calculate pointCells
         void calcPointCells() const;
@@ -166,10 +166,10 @@ private:
         //- add in boundary face
         void addPolyBoundaryFace
         (
-	    const label cellId,
-	    const label cellFaceId,
-	    const label nCreatedFaces
-	);
+            const label cellId,
+            const label cellFaceId,
+            const label nCreatedFaces
+        );
 
         //- Make polyhedral boundary from shape boundary
         // (adds more faces to the face list)
@@ -189,9 +189,9 @@ public:
     // Constructors
     meshReader
     (
-	const fileName& file_or_prefix,
-	const Time& runtime,
-	const scalar scaleFactor = 1.0
+        const fileName& file_or_prefix,
+        const Time& runtime,
+        const scalar scaleFactor = 1.0
     );
 
     // Destructor
@@ -203,9 +203,9 @@ public:
     virtual const pointField& points() const = 0;
 
     //- Return list of faces for every cell
-    const faceListList & cellFaces() const 
+    const faceListList & cellFaces() const
     {
-	return cellFaces_;
+        return cellFaces_;
     }
 
     //- Write mesh

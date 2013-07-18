@@ -60,7 +60,7 @@ void sammMesh::purgeCellShapes()
                 break;
             }
         }
-    }   
+    }
 }
 
 

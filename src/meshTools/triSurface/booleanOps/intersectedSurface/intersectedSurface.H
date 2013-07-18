@@ -36,7 +36,7 @@ Description
     - split the edges of the surface
     - construct a new edgeList with (in this order) the edges from the
       intersection ('cuts', i.e. the edges shared with the other surface)
-      and the (split) edges from the original triangles (from 0 .. 
+      and the (split) edges from the original triangles (from 0 ..
       nSurfaceEdges)
     - construct face-edge addressing for above edges
     - for each face do a right-handed walk to reconstruct faces (splitFace)

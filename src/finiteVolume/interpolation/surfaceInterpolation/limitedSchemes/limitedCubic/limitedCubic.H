@@ -105,7 +105,7 @@ public:
         }
 
         // Calculate the face value using cubic interpolation
-        scalar phif = 
+        scalar phif =
             cdWeight*(phiP - 0.25*(d & gradcN))
           + (1 - cdWeight)*(phiN + 0.25*(d & gradcP));
 

@@ -119,7 +119,7 @@ inline scalar& multiSolver::globalTimeOffset()
     return globalTimeOffset_;
 }
 
-        
+
 inline const multiSolver::startFromControls& multiSolver::startFrom() const
 {
     return startFrom_;
@@ -135,7 +135,7 @@ inline const scalar& multiSolver::startTime() const
 {
     return startTime_;
 }
-        
+
 inline const scalar& multiSolver::endTime() const
 {
     return endTime_;

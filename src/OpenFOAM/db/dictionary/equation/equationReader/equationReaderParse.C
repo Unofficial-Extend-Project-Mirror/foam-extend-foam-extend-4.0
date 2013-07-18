@@ -41,7 +41,7 @@ void Foam::equationReader::parse(label index)
             << eqns_.size() - 1 << ")"
             << abort(FatalError);
     }
-    
+
     eqns_[index].clear();
 
     // First, ensure there are no ':' or '&' characters.  This is to
@@ -64,7 +64,7 @@ void Foam::equationReader::parse(label index)
     // Precondition the string, and load it into a stream
     IStringStream rawStream(stringPreconditioner(eqns_[index].rawText()));
     tokenList tl;
-    
+
     // Read tokens from raw equation string stream
     while (!rawStream.eof())
     {
@@ -84,7 +84,7 @@ void Foam::equationReader::parse(label index)
     // - operation: conatains operation number only (last field)
     // - brackets, comma: all are zero
     equationOperationList map(tl.size());
-    
+
     // opLvl: level of operation precedence
     // 0. variable
     // 1. + -
@@ -93,10 +93,10 @@ void Foam::equationReader::parse(label index)
     // 4. ( ) and functions; special case -4 indicates close bracket ')'
     // 5. , used only in functions
     labelList opLvl(tl.size());
-    
+
     // parenthesis level, negative means function root
     labelList pl(tl.size());
-    
+
     createMap(index, tl, map, opLvl, pl);
 
 /* Useful for debugging, left in
@@ -176,7 +176,7 @@ Info << "Map is: " << map << endl;
                 // Not a function, first bracket is first index
                 trimListWithParent(eqnIndices, subEqnIndices, 0, 0);
             }
-            
+
             // Trimming trailing bracket
             trimListWithParent
             (
@@ -192,7 +192,7 @@ Info << "Map is: " << map << endl;
 
         label commaIndex(-1);
         label commaPos(-1);
-                
+
         // Look for a comma
         forAll(subEqnIndices, i)
         {
@@ -249,7 +249,7 @@ Info << "Map is: " << map << endl;
             {
                 // This is a single parameter function call - evaluate it
                 eqns_[index].setSize(eqns_[index].size() + 3);
-                
+
                 // retrieve parameter value
                 eqns_[index].ops()[eqns_[index].size() - 3] = equationOperation
                 (
@@ -274,11 +274,11 @@ Info << "Map is: " << map << endl;
                 (
                     equationOperation::slstorage,
                     storeIndex + 1,
-                    0,                        
+                    0,
                     equationOperation::otstore
                 );
 
-                // Set term in map to store location                    
+                // Set term in map to store location
                 map[resultIndex] =
                     eqns_[index].ops()[eqns_[index].ops().size() - 1];
                 map[resultIndex].operation() = equationOperation::otnone;
@@ -308,7 +308,7 @@ Info << "Map is: " << map << endl;
                 }
             }
         } // end standard parenthesis / single parameter function
-        else if 
+        else if
         (
             (commaIndex < 1) || (commaIndex >= (subEqnIndices.size() - 1))
         )
@@ -360,7 +360,7 @@ Info << "Map is: " << map << endl;
                     storeIndex
                 )
             );
-            
+
             trimListWithParent
             (
                 eqnIndices,
@@ -413,21 +413,21 @@ Info << "Map is: " << map << endl;
                 map[resultIndex2].dictLookupIndex(),
                 map[eqnIndices[currentIndex - 1]].operation()
             );
-            
+
             // store result
             storeIndex++;
             eqns_[index].ops()[eqns_[index].size() - 1] = equationOperation
             (
                 equationOperation::slstorage,
                 storeIndex + 1,
-                0,                        
+                0,
                 equationOperation::otstore
             );
-            
-            // Set term in map to store location                    
+
+            // Set term in map to store location
             map[resultIndex] = eqns_[index].ops()[eqns_[index].size() - 1];
             map[resultIndex].operation() = equationOperation::otnone;
-            
+
             // trim function call from indices list
             trimList(eqnIndices, currentIndex - 1, currentIndex - 1);
 
@@ -482,12 +482,12 @@ Info << "Map is: " << map << endl;
                 description
             );
         }
-        
+
         // Add two operations - the first retrieves the variable, the second
         // is a dummy because the last operation is trimmed before exitting
         // equationReader::parse
         eqns_[index].setSize(eqns_[index].size() + 2);
-        
+
         // retrieve parameter value
         eqns_[index].ops()[eqns_[index].size() - 2] = equationOperation
         (
@@ -496,13 +496,13 @@ Info << "Map is: " << map << endl;
             map[subEqnIndices[0]].dictLookupIndex(),
             equationOperation::otretrieve
         );
-        
+
         // Store this result
         eqns_[index].ops()[eqns_[index].size() - 1] = equationOperation
         (
             equationOperation::slstorage,
             storeIndex + 1,
-            0,                        
+            0,
             equationOperation::otstore
         );
 
@@ -615,7 +615,7 @@ Foam::label Foam::equationReader::parseExpression
                 );
             }
             eqns_[index].setSize(eqns_[index].size() + 1);
-            
+
             eqns_[index].ops()[eqns_[index].size() - 1] = equationOperation
             (
                 map[opIndices[0]].sourceList(),
@@ -653,7 +653,7 @@ Foam::label Foam::equationReader::parseExpression
                         (
                             equationOperation::slstorage,
                             storeIndex + 1,
-                            0,                        
+                            0,
                             equationOperation::otstore
                         );
 

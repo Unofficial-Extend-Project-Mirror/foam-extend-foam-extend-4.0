@@ -177,7 +177,7 @@ void Foam::cellMatcher::calcEdgeAddressing(const label numVert)
         {
             label start = f[prevVertI];
             label end = f[fp];
-            
+
             label key1 = edgeKey(numVert, start, end);
             label key2 = edgeKey(numVert, end, start);
 

@@ -19,7 +19,7 @@
                 List<bool> valveTopPoint(newPoints.size(), false);
 
 //                label layeringVPtsIndex = pointZones().findZoneID("movingPointsTopZoneV"+ Foam::name(valveI+1));
-//		        const labelList& layeringVPoints = pointZones()[layeringVPtsIndex];
+//                const labelList& layeringVPoints = pointZones()[layeringVPtsIndex];
 
                 labelList layeringVPoints;
 
@@ -110,7 +110,7 @@
            {
 
 //               label valveBottomPtsIndex = pointZones().findZoneID("movingPointsBottomZoneV"+ Foam::name(valveI+1));
-//	           const labelList& valveBottomPoints = pointZones()[valveBottomPtsIndex];
+//               const labelList& valveBottomPoints = pointZones()[valveBottomPtsIndex];
 
                 labelList valveBottomPoints;
                 {

@@ -41,7 +41,7 @@ Description
              processors whereas f[0] should correspond to f[0] on other side)
 
     The rule is that if the label is set (-1 or higher) it is used
-    (topological information only), otherwise the vector is used. This makes 
+    (topological information only), otherwise the vector is used. This makes
     sure that we use topological information as much as possible and so a
     hex mesh is cut purely topologically. All other shapes are cut
     geometrically.
@@ -84,7 +84,7 @@ class directionInfo
         // Local n axis
         vector n_;
 
-        
+
     // Private Member Functions
 
         //- edge uses two labels

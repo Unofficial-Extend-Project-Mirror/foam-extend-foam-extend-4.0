@@ -92,7 +92,7 @@ public:
             PhiLimiter(weight)
         {}
 
-        //- Construct from mesh and Istream. 
+        //- Construct from mesh and Istream.
         //  The name of the flux field is read from the Istream and looked-up
         //  from the mesh objectRegistry
         PhiScheme

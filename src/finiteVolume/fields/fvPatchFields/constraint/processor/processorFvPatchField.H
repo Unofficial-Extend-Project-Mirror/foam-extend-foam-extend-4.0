@@ -229,7 +229,7 @@ public:
                 );
             }
 
-            
+
         //- Processor coupled interface functions
 
             //- Return processor number

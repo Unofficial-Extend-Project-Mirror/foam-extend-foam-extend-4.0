@@ -196,7 +196,7 @@ Foam::tetPolyMeshLduAddressingCellDecomp::tetPolyMeshLduAddressingCellDecomp
             "tetPolyMeshLduAddressingCellDecomp\n"
             "(\n"
             "    const tetPolyMeshCellDecomp& mesh\n"
-            ")" 
+            ")"
         )   << "Problem with edge counting in lduAddressing: "
             << "the cell decomposition is multiply connected or otherwise "
             << "invalid.  Please Use face decomposition instead.  "

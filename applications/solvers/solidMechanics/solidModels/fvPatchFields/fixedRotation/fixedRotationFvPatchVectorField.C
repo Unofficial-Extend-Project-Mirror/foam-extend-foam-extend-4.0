@@ -97,8 +97,8 @@ fixedRotationFvPatchVectorField::fixedRotationFvPatchVectorField
     )
     {
         Warning << "The gradScheme for " << fieldName_
-	    << " should be \"extendedLeastSquares 0\" for the boundary "
-	    << "non-orthogonal correction to be right" << endl;
+            << " should be \"extendedLeastSquares 0\" for the boundary "
+            << "non-orthogonal correction to be right" << endl;
     }
 }
 
@@ -137,7 +137,7 @@ snGrad() const
 {
   //- fixedValue snGrad with no correction
   //  return (*this - patchInternalField())*this->patch().deltaCoeffs();
-  
+
     const fvPatchField<tensor>& gradField =
         patch().lookupPatchField<volTensorField, tensor>
         (
@@ -150,9 +150,9 @@ snGrad() const
     //- correction vector
     vectorField k = delta - n*(n&delta);
 
-    return 
+    return
     (
-        *this 
+        *this
       - (patchInternalField() + (k&gradField.patchInternalField()))
       )*this->patch().deltaCoeffs();
 }
@@ -169,15 +169,15 @@ void fixedRotationFvPatchVectorField::updateCoeffs()
 
     //- create rotation matrix
     // tensor rotMat(::cos(theta), -(::sin(theta)), 0,
-    // 		  ::sin(theta), ::cos(theta),    0,
-    // 		  0,            0,               1);
+    //               ::sin(theta), ::cos(theta),    0,
+    //               0,            0,               1);
 
     tensor rotMat = RodriguesRotation(rotationAxis_, rotationAngle_);
 
     const vectorField& oldFaceCentres = dimensionedInternalField().mesh().C().boundaryField()[patch().index()];
-	  
+
     vectorField newFaceCentres = (rotMat & (oldFaceCentres - rotationOrigin_)) + rotationOrigin_;
-    
+
     fvPatchField<vector>::operator==
     (
         newFaceCentres - oldFaceCentres

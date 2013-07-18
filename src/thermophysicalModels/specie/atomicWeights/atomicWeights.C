@@ -29,7 +29,7 @@ License
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 const Foam::atomicWeightTable::atomicWeight
-Foam::atomicWeightTable::atomicWeights[atomicWeightTable::nElements] = 
+Foam::atomicWeightTable::atomicWeights[atomicWeightTable::nElements] =
 {
     {"E",    0},
     {"H",    1.00797},

@@ -40,7 +40,7 @@ inline bool Foam::HormannAgathos::equalWithTol
     const scalar& b
 ) const
 {
-    return (a <= b + epsilon_) && (a >= b - epsilon_); 
+    return (a <= b + epsilon_) && (a >= b - epsilon_);
 }
 
 

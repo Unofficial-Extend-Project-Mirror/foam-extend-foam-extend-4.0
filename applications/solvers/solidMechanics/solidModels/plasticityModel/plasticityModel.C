@@ -61,7 +61,7 @@ plasticityModel::plasticityModel
         ),
         sigma.mesh(),
         dimensionedScalar("0", dimless, 0)
-	),
+    ),
     sigmaY_
     (
         IOobject
@@ -125,7 +125,7 @@ void plasticityModel::correct()
 //    rheologyModel::correct();
     Info << "\tCorrecting plasticity model ... " << flush;
 
-    const volSymmTensorField DEpsilon = 
+    const volSymmTensorField DEpsilon =
         symm(gradDU_)
       + dimensioned<symmTensor>
         (
@@ -135,7 +135,7 @@ void plasticityModel::correct()
         );
 
     const volScalarField epsilonEq =
-        sqrt((2.0/3.0)*magSqr(dev(epsilon_ + DEpsilon))) 
+        sqrt((2.0/3.0)*magSqr(dev(epsilon_ + DEpsilon)))
       + dimensionedScalar("SMALL", dimless, SMALL);
 
     scalarField& sigmaYI = sigmaY_.internalField();
@@ -164,7 +164,7 @@ void plasticityModel::correct()
       - sqrt((2.0/3.0)*magSqr(dev(epsilon_)))
       + dimensionedScalar("SMALL", dimless, SMALL);
 
-    const volSymmTensorField DSigma = 
+    const volSymmTensorField DSigma =
         2*mu_*(DEpsilon - DEpsilonP_) + I*(lambda_*tr(DEpsilon));
 
     const volSymmTensorField& oldSigma = sigma();
@@ -173,7 +173,7 @@ void plasticityModel::correct()
 
     const volSymmTensorField sigma_ = sigma() + DSigma;
 
-    const volScalarField sigmaEq = 
+    const volScalarField sigmaEq =
         sqrt(1.5*magSqr(dev(sigma_)))
       + dimensionedScalar("SMALL", dimPressure, SMALL);
 
@@ -226,9 +226,9 @@ void plasticityModel::correct()
         {
             betaI[cellI] = 0.0;
             curDEpsEPred = DEpsilonI[cellI];
- 
+
             if
-            ( 
+            (
                 (DEpsilonEqI[cellI] >= 0)
              && (sigmaEqEI[cellI] >= sigmaYI[cellI])
             )
@@ -236,133 +236,132 @@ void plasticityModel::correct()
                 scalar C = sqr(oldSigmaEqI[cellI]) - sqr(sigmaYI[cellI]);
                 scalar B = 3.0*(dev(oldSigmaI[cellI]) && dev(DSigmaEI[cellI]));
                 scalar A = sqr(DSigmaEqEI[cellI]);
- 
-		scalar alpha = (-B + ::sqrt(mag(B*B - 4*A*C)))/(2*A + SMALL);
-                //   scalar alpha = (-B + ::sqrt((B*B - 4*A*C)))/(2*A + SMALL); 
+
+                scalar alpha = (-B + ::sqrt(mag(B*B - 4*A*C)))/(2*A + SMALL);
+                //   scalar alpha = (-B + ::sqrt((B*B - 4*A*C)))/(2*A + SMALL);
                 curDEpsEPred =
                     alpha/(2.0*muI[cellI] + SMALL)
                    *(
-                        DSigmaEI[cellI] 
+                        DSigmaEI[cellI]
                       - (lambdaI[cellI]/(2*muI[cellI] + 3*lambdaI[cellI] + SMALL))
                        *tr(DSigmaEI[cellI])*I
                     );
- 
+
                 betaI[cellI] =
                     1.0
                   - (devSigmaI[cellI] && curDEpsEPred)
-		   /((devSigmaI[cellI] && DEpsilonI[cellI]) + SMALL);
+                    /((devSigmaI[cellI] && DEpsilonI[cellI]) + SMALL);
             }
         }
- 
+
         betaI[cellI] = max(betaI[cellI], 0.0);
         betaI[cellI] = min(betaI[cellI], 1.0);
     }
 
- 
+
     // Update beta at boundary
     forAll(beta_.boundaryField(), patchI)
     {
         if (!beta_.boundaryField()[patchI].coupled())
-	{
-        const scalarField& muPatch = mu_.boundaryField()[patchI];
-        const scalarField& lambdaPatch = lambda_.boundaryField()[patchI];
-
-        const scalarField& sigmaYPatch = sigmaY_.boundaryField()[patchI];
-
-        const symmTensorField& DEpsilonPatch = 
-            DEpsilon.boundaryField()[patchI];
-
-        const scalarField DEpsilonEqPatch = 
-            DEpsilonEq.boundaryField()[patchI];
-
-        const symmTensorField& oldSigmaPatch = 
-            oldSigma.boundaryField()[patchI];
-
-        const scalarField& oldSigmaEqPatch = 
-            oldSigmaEq.boundaryField()[patchI];
-
-        const symmTensorField& devSigmaPatch = 
-            devSigma.boundaryField()[patchI];
-
-        const symmTensorField& DSigmaEPatch = DSigmaE.boundaryField()[patchI]; 
-
-        const scalarField& sigmaEqEPatch = sigmaEqE.boundaryField()[patchI];
-
-        const scalarField& DSigmaEqEPatch = DSigmaEqE.boundaryField()[patchI];
-
-        const scalarField& oldBetaPatch = 
-            beta_.oldTime().boundaryField()[patchI];
-
-        scalarField& betaPatch = beta_.boundaryField()[patchI];
-        
-        forAll(betaPatch, faceI)
         {
-            tensor curDEpsEPred = tensor::zero;
+            const scalarField& muPatch = mu_.boundaryField()[patchI];
+            const scalarField& lambdaPatch = lambda_.boundaryField()[patchI];
 
-            if
-            ( 
-                (DEpsilonEqPatch[faceI] >= 0) 
-             && (oldBetaPatch[faceI] > SMALL) 
-            )
+            const scalarField& sigmaYPatch = sigmaY_.boundaryField()[patchI];
+
+            const symmTensorField& DEpsilonPatch =
+                DEpsilon.boundaryField()[patchI];
+
+            const scalarField DEpsilonEqPatch =
+                DEpsilonEq.boundaryField()[patchI];
+
+            const symmTensorField& oldSigmaPatch =
+                oldSigma.boundaryField()[patchI];
+
+            const scalarField& oldSigmaEqPatch =
+                oldSigmaEq.boundaryField()[patchI];
+
+            const symmTensorField& devSigmaPatch =
+                devSigma.boundaryField()[patchI];
+
+            const symmTensorField& DSigmaEPatch = DSigmaE.boundaryField()[patchI];
+
+            const scalarField& sigmaEqEPatch = sigmaEqE.boundaryField()[patchI];
+
+            const scalarField& DSigmaEqEPatch = DSigmaEqE.boundaryField()[patchI];
+
+            const scalarField& oldBetaPatch =
+                beta_.oldTime().boundaryField()[patchI];
+
+            scalarField& betaPatch = beta_.boundaryField()[patchI];
+
+            forAll(betaPatch, faceI)
             {
-                betaPatch[faceI] = 1;
-                curDEpsEPred = tensor::zero;
-            }
-            else
-            {
-                betaPatch[faceI] = 0;
-                curDEpsEPred = DEpsilonPatch[faceI];
- 
+                tensor curDEpsEPred = tensor::zero;
+
                 if
-                ( 
+                (
                     (DEpsilonEqPatch[faceI] >= 0)
-                 && (sigmaEqEPatch[faceI] >= sigmaYPatch[faceI]) 
+                 && (oldBetaPatch[faceI] > SMALL)
                 )
                 {
-                    scalar C = 
-                        sqr(oldSigmaEqPatch[faceI]) 
-                      - sqr(sigmaYPatch[faceI]);
-                    scalar B = 
-                        3.0
-                       *(
-                            dev(oldSigmaPatch[faceI])
-                         && dev(DSigmaEPatch[faceI])
-                        );
-                    scalar A = sqr(DSigmaEqEPatch[faceI]);
-
-                    scalar alpha = (-B + ::sqrt(mag(B*B-4*A*C)))/(2*A + SMALL);
-
-                    //scalar alpha = (-B + ::sqrt((B*B-4*A*C)))/(2*A + SMALL);
-
-                    curDEpsEPred = 
-                        alpha/(2.0*muPatch[faceI] + SMALL)
-                       *(
-                            DSigmaEPatch[faceI]
-                          - (
-                                lambdaPatch[faceI]
-                               /(2*muPatch[faceI] + 3*lambdaPatch[faceI] + SMALL)
-                            )
-                           *tr(DSigmaEPatch[faceI])*I
-                        );
-
-                    betaPatch[faceI] =
-                        1.0 
-                      - (devSigmaPatch[faceI] && curDEpsEPred)
-		       /((devSigmaPatch[faceI] && DEpsilonPatch[faceI]) + SMALL);
+                    betaPatch[faceI] = 1;
+                    curDEpsEPred = tensor::zero;
                 }
+                else
+                {
+                    betaPatch[faceI] = 0;
+                    curDEpsEPred = DEpsilonPatch[faceI];
+                    if
+                    (
+                        (DEpsilonEqPatch[faceI] >= 0)
+                     && (sigmaEqEPatch[faceI] >= sigmaYPatch[faceI])
+                    )
+                    {
+                        scalar C =
+                            sqr(oldSigmaEqPatch[faceI])
+                          - sqr(sigmaYPatch[faceI]);
+                        scalar B =
+                            3.0
+                           *(
+                                dev(oldSigmaPatch[faceI])
+                             && dev(DSigmaEPatch[faceI])
+                            );
+                        scalar A = sqr(DSigmaEqEPatch[faceI]);
+
+                        scalar alpha = (-B + ::sqrt(mag(B*B-4*A*C)))/(2*A + SMALL);
+
+                        //scalar alpha = (-B + ::sqrt((B*B-4*A*C)))/(2*A + SMALL);
+
+                        curDEpsEPred =
+                            alpha/(2.0*muPatch[faceI] + SMALL)
+                           *(
+                                DSigmaEPatch[faceI]
+                              - (
+                                    lambdaPatch[faceI]
+                                   /(2*muPatch[faceI] + 3*lambdaPatch[faceI] + SMALL)
+                                )
+                               *tr(DSigmaEPatch[faceI])*I
+                            );
+
+                        betaPatch[faceI] =
+                            1.0
+                          - (devSigmaPatch[faceI] && curDEpsEPred)
+                            /((devSigmaPatch[faceI] && DEpsilonPatch[faceI]) + SMALL);
+                    }
+                }
+
+                betaPatch[faceI] = max(betaPatch[faceI], 0.0);
+                betaPatch[faceI] = min(betaPatch[faceI], 1.0);
             }
- 
-            betaPatch[faceI] = max(betaPatch[faceI], 0.0); 
-            betaPatch[faceI] = min(betaPatch[faceI], 1.0);
         }
-	}
     }
- 
+
     // Update plastic strain increment
-    scalar rf = 
+    scalar rf =
         readScalar(plasticityModelCoeffs_.lookup("relaxationFactor"));
 
-    volSymmTensorField newDEpsilonP = 
+    volSymmTensorField newDEpsilonP =
         4.5*beta_*mu_*(devSigma && DEpsilon)*devSigma
        /(
             (Ep_ + 3*mu_)*sqr(sigmaEq)
@@ -409,9 +408,9 @@ void plasticityModel::updateYieldStress()
             {
                 sigmaYI[cellI] = sigmaEqI[cellI];
 
-                Info << " Internal cell " << cellI 
+                Info << " Internal cell " << cellI
                     << " Yield stress updated to Sy= "
-                    << sigmaEqI[cellI] * 1.0E-06 << " MPa" 
+                    << sigmaEqI[cellI] * 1.0E-06 << " MPa"
                     << endl;
             }
         }
@@ -420,35 +419,34 @@ void plasticityModel::updateYieldStress()
     forAll(sigmaY_.boundaryField(), patchI)
     {
         if (!sigmaY_.boundaryField()[patchI].coupled())
-	{
-        const scalarField& EpPatch = Ep_.boundaryField()[patchI];
-        const scalarField& sigmaEqPatch = sigmaEq.boundaryField()[patchI];
-        scalarField& sigmaYPatch = sigmaY_.boundaryField()[patchI];
-
-        forAll(sigmaYPatch, faceI)
         {
-            if(EpPatch[faceI] != 0)
-            {
-                if(sigmaEqPatch[faceI] > sigmaYPatch[faceI])
-                {
-                    sigmaYPatch[faceI] = sigmaEqPatch[faceI];
+            const scalarField& EpPatch = Ep_.boundaryField()[patchI];
+            const scalarField& sigmaEqPatch = sigmaEq.boundaryField()[patchI];
+            scalarField& sigmaYPatch = sigmaY_.boundaryField()[patchI];
 
-                    Info << "Boundary cell " << patchI << " " << faceI
-                        << " Yield stress updated to Sy= "
-                        << sigmaEqPatch[faceI] * 1.0E-06 << " MPa" 
-                        << endl;
-                }	
+            forAll(sigmaYPatch, faceI)
+            {
+                if(EpPatch[faceI] != 0)
+                {
+                    if(sigmaEqPatch[faceI] > sigmaYPatch[faceI])
+                    {
+                        sigmaYPatch[faceI] = sigmaEqPatch[faceI];
+
+                        Info << "Boundary cell " << patchI << " " << faceI
+                            << " Yield stress updated to Sy= "
+                            << sigmaEqPatch[faceI] * 1.0E-06 << " MPa"
+                            << endl;
+                    }
+                }
             }
         }
-	}
-    }	
+    }
 
     Info << "done" << endl;
 }
 
 bool plasticityModel::read()
 {
-
     if (regIOobject::read())
     {
         return true;

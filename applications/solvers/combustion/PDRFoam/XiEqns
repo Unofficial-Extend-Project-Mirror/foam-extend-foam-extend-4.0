@@ -22,7 +22,7 @@
         volScalarField GEta = GEtaCoef/tauEta;
         volScalarField XiEqEta = 1.0 + XiCoef*sqrt(up/(Su + SuMin))*Reta;
 
-        volScalarField R = 
+        volScalarField R =
             GEta*XiEqEta/(XiEqEta - 0.999) + GIn*XiIn/(XiIn - 0.999);
 
         volScalarField XiEqStar = R/(R - GEta - GIn);
@@ -42,7 +42,7 @@
         volScalarField GEta = GEtaCoef/tauEta;
         volScalarField XiEqEta = 1.0 + XiCoef*sqrt(up/(Su + SuMin))*Reta;
 
-        volScalarField R = 
+        volScalarField R =
             GEta*XiEqEta/(XiEqEta - 0.999) + GIn*XiIn/(XiIn - 0.999);
 
         volScalarField XiEqStar = R/(R - GEta - GIn);

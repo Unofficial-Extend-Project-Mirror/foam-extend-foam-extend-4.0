@@ -24,41 +24,41 @@ FoamFile
 
 solvers
 {
-	U
-	{
-    		tolerance       1e-09;
-    		relTol          0.1;
+    U
+    {
+        tolerance       1e-09;
+        relTol          0.1;
 
-    		//solver          PCG;
-    		//preconditioner  DIC;
+        //solver          PCG;
+        //preconditioner  DIC;
 
-		solver                GAMG;
-        	smoother              GaussSeidel;
-        	nPreSweeps            0;
-        	nPostSweeps           2;
-        	nFinestSweeps         2;
-        	scaleCorrection       true;
-        	directSolveCoarsest   false;
-        	cacheAgglomeration    true;
-        	nCellsInCoarsestLevel 292;
-        	agglomerator          faceAreaPair;
-        	mergeLevels           1;
-       }
+        solver                GAMG;
+        smoother              GaussSeidel;
+        nPreSweeps            0;
+        nPostSweeps           2;
+        nFinestSweeps         2;
+        scaleCorrection       true;
+        directSolveCoarsest   false;
+        cacheAgglomeration    true;
+        nCellsInCoarsestLevel 292;
+        agglomerator          faceAreaPair;
+        mergeLevels           1;
+    }
 }
 
 stressedFoam
 {
-	nCorrectors     10000;
-	U               1e-8;
+    nCorrectors     10000;
+    U               1e-8;
 
-	divSigmaExp     standard;
-	solidInterface  no;
-	predictor       no;
+    divSigmaExp     standard;
+    solidInterface  no;
+    predictor       no;
 }
 
 relaxationFactors
 {
-	U		0.95;
+    U        0.95;
 }
 
 // ************************************************************************* //

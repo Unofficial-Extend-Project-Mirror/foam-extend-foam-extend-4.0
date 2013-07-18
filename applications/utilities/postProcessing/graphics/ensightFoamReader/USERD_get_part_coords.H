@@ -8,7 +8,7 @@ int USERD_get_part_coords
 {
 
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_part_coords" << endl << 
+    Info << "Entering: USERD_get_part_coords" << endl <<
         "part_number = " << part_number << endl << flush;
 #endif
 
@@ -19,7 +19,7 @@ int USERD_get_part_coords
 
         const vectorField& points = meshPtr->points();
         label nPoints = points.size();
-        
+
         for (label indx=0; indx<nPoints; indx++)
         {
             coord_array[0][indx+1] = (float)points[indx].x();
@@ -36,7 +36,7 @@ int USERD_get_part_coords
         const polyBoundaryMesh& bMesh = meshPtr->boundaryMesh();
         const vectorField& points = bMesh[patchi].points();
         label nPoints = points.size();
-        
+
         for (label indx=0; indx<nPoints; indx++)
         {
             coord_array[0][indx+1] = (float)points[indx].x();

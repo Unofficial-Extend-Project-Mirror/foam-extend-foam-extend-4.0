@@ -122,7 +122,7 @@ linearEdgeInterpolate
     const tmp<GeometricField<Type, faPatchField, areaMesh> >& tvf
 )
 {
-    tmp<GeometricField<Type, faePatchField, edgeMesh> > tinterp = 
+    tmp<GeometricField<Type, faePatchField, edgeMesh> > tinterp =
         linearEdgeInterpolate(tvf());
     tvf.clear();
     return tinterp;

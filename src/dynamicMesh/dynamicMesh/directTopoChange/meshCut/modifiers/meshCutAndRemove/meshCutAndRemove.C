@@ -121,7 +121,7 @@ Foam::label Foam::meshCutAndRemove::findCutCell
             return cellI;
         }
     }
-    return -1;        
+    return -1;
 }
 
 
@@ -740,7 +740,7 @@ void Foam::meshCutAndRemove::setRefinement
                 {
                     usedPoint[cPoints[i]] = true;
                 }
-            }   
+            }
         }
 
 
@@ -918,7 +918,7 @@ void Foam::meshCutAndRemove::setRefinement
 
         // Renumber face to include split edges.
         face newFace(addEdgeCutsToFace(faceI));
-        
+
         // Edge splitting the face. Convert edge to new vertex numbering.
         const edge& splitEdge = iter();
 
@@ -1097,7 +1097,7 @@ void Foam::meshCutAndRemove::setRefinement
         bool modifiedFaceI = false;
 
         if (f0Own == -1)
-        {   
+        {
             if (f0Nei != -1)
             {
                 // f0 becomes external face (note:modFace will reverse face)
@@ -1125,7 +1125,7 @@ void Foam::meshCutAndRemove::setRefinement
         // f1 is added face (if at all)
 
         if (f1Own == -1)
-        {   
+        {
             if (f1Nei == -1)
             {
                 // f1 not needed.
@@ -1225,7 +1225,7 @@ void Foam::meshCutAndRemove::setRefinement
         {
             const labelList& eFaces = mesh().edgeFaces()[edgeI];
 
-            forAll(eFaces, i)    
+            forAll(eFaces, i)
             {
                 label faceI = eFaces[i];
 
@@ -1397,7 +1397,7 @@ void Foam::meshCutAndRemove::updateMesh(const mapPolyMesh& map)
                     (debug & 2)
                  && (e != newE || newAddedPointI != addedPointI)
                 )
-                {        
+                {
                     Pout<< "meshCutAndRemove::updateMesh :"
                         << " updating addedPoints for edge " << e
                         << " from " << addedPointI

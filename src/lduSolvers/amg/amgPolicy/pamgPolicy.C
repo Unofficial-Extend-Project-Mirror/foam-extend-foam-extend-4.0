@@ -623,7 +623,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
     {
         if (interfaceFields.set(intI))
         {
-            const GAMGInterface& coarseInterface = 
+            const GAMGInterface& coarseInterface =
                 refCast<const GAMGInterface>(coarseInterfaces[intI]);
 
             coarseInterfaceFields.set
@@ -699,7 +699,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
             }
         }
     }
-    else // ... Otherwise it is symmetric so agglomerate just the upper 
+    else // ... Otherwise it is symmetric so agglomerate just the upper
     {
         // Get off-diagonal matrix coefficients
         const scalarField& fineUpper = matrix_.upper();

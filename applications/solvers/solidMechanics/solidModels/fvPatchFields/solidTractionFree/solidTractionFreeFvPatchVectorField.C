@@ -70,29 +70,29 @@ solidTractionFreeFvPatchVectorField
     gradient() = vector::zero;
 
     Info << "Patch " << patch().name()
-	 << "\tTraction boundary field: " << fieldName_ << endl;
+        << "\tTraction boundary field: " << fieldName_ << endl;
 
     //- check if traction boundary is for non linear solver
     if(dict.found("nonLinear"))
-      {
-	nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));;
+    {
+        nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));;
 
-	if(nonLinear_ == UPDATED_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to updated Lagrangian"
-		 << endl;
-	  }
-	else if(nonLinear_ == TOTAL_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to total Lagrangian"
-		 << endl;
-	  }
-      }
+        if(nonLinear_ == UPDATED_LAGRANGIAN)
+        {
+            Info << "\tnonLinear set to updated Lagrangian"
+                << endl;
+        }
+        else if(nonLinear_ == TOTAL_LAGRANGIAN)
+        {
+            Info << "\tnonLinear set to total Lagrangian"
+                << endl;
+        }
+    }
 
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-    if 
+    if
     (
         Foam::word
         (
@@ -103,9 +103,9 @@ solidTractionFreeFvPatchVectorField
         ) != "extendedLeastSquares"
     )
     {
-	    Warning << "The gradScheme for " << fieldName_
-		<< " should be \"extendedLeastSquares 0\" for the boundary "
-		<< "non-orthogonal correction to be right" << endl;
+        Warning << "The gradScheme for " << fieldName_
+            << " should be \"extendedLeastSquares 0\" for the boundary "
+            << "non-orthogonal correction to be right" << endl;
     }
 }
 
@@ -185,18 +185,18 @@ void solidTractionFreeFvPatchVectorField::updateCoeffs()
     //---------------------------//
     const rheologyModel& rheology =
         this->db().objectRegistry::lookupObject<rheologyModel>("rheologyProperties");
-    scalarField mu = 
+    scalarField mu =
         rheology.mu()().boundaryField()[patch().index()];
     scalarField lambda =
         rheology.lambda()().boundaryField()[patch().index()];
 
     if(rheology.type() == plasticityModel::typeName)
     {
-        const plasticityModel& plasticity = 
+        const plasticityModel& plasticity =
             refCast<const plasticityModel>(rheology);
 
-	mu = plasticity.newMu().boundaryField()[patch().index()];
-	lambda = plasticity.newLambda().boundaryField()[patch().index()];
+        mu = plasticity.newMu().boundaryField()[patch().index()];
+        lambda = plasticity.newLambda().boundaryField()[patch().index()];
     }
 
 
@@ -217,19 +217,19 @@ void solidTractionFreeFvPatchVectorField::updateCoeffs()
 
     //- incremental solvers
     if(fieldName_ == "DU")
-      {
-	const fvPatchField<symmTensor>& sigma =
-	  patch().lookupPatchField<volSymmTensorField, symmTensor>("sigma");
-	
-	//- increment of traction
-	Traction = - (n & sigma);
-      }
+    {
+        const fvPatchField<symmTensor>& sigma =
+           patch().lookupPatchField<volSymmTensorField, symmTensor>("sigma");
+
+        //- increment of traction
+        Traction = - (n & sigma);
+    }
 
 
     //---------------------------//
     //- calculate the normal gradient based on the traction
     //---------------------------//
-    vectorField newGradient = 
+    vectorField newGradient =
       Traction
       - (n & (mu*gradField.T() - (mu + lambda)*gradField))
       - n*lambda*tr(gradField);
@@ -237,39 +237,39 @@ void solidTractionFreeFvPatchVectorField::updateCoeffs()
     //- if there is plasticity
     if(rheology.type() == plasticityModel::typeName)
     {
-        const plasticityModel& plasticity = 
+        const plasticityModel& plasticity =
             refCast<const plasticityModel>(rheology);
 
         newGradient +=
-	  2*mu*(n & plasticity.DEpsilonP().boundaryField()[patch().index()]);
+            2*mu*(n & plasticity.DEpsilonP().boundaryField()[patch().index()]);
     }
 
     //- if there are thermal effects
     if(this->db().objectRegistry::foundObject<thermalModel>("thermalProperties"))
-      {
-	const thermalModel& thermo =
-	  this->db().objectRegistry::lookupObject<thermalModel>("thermalProperties");
-    
-	const fvPatchField<scalar>& T =
-	  patch().lookupPatchField<volScalarField, scalar>("T");
-      
+    {
+        const thermalModel& thermo =
+            this->db().objectRegistry::lookupObject<thermalModel>("thermalProperties");
+
+        const fvPatchField<scalar>& T =
+            patch().lookupPatchField<volScalarField, scalar>("T");
+
         const fvPatchField<scalar>& threeKalpha =
-          patch().lookupPatchField<volScalarField, scalar>("((threeK*rho)*alpha)");
-      
-	const scalarField T0 = thermo.T0()().boundaryField()[patch().index()];
-	
-	newGradient +=  (n*threeKalpha*(T - T0));
+            patch().lookupPatchField<volScalarField, scalar>("((threeK*rho)*alpha)");
+
+        const scalarField T0 = thermo.T0()().boundaryField()[patch().index()];
+
+        newGradient +=  (n*threeKalpha*(T - T0));
     }
 
     //- higher order non-linear terms
     if(nonLinear_ == UPDATED_LAGRANGIAN || nonLinear_ == TOTAL_LAGRANGIAN)
-      {
-	newGradient -=
-	  (n & (mu*(gradField & gradField.T())))
-	  + 0.5*n*lambda*(gradField && gradField);
-	//- tensorial identity
-	//- tr(gradField & gradField.T())*I == (gradField && gradField)*I
-      }
+    {
+        newGradient -=
+            (n & (mu*(gradField & gradField.T())))
+          + 0.5*n*lambda*(gradField && gradField);
+          //- tensorial identity
+          //- tr(gradField & gradField.T())*I == (gradField && gradField)*I
+    }
 
     newGradient /= (2.0*mu + lambda);
 
@@ -317,11 +317,11 @@ void solidTractionFreeFvPatchVectorField::write(Ostream& os) const
 
 template<>
 const char* Foam::NamedEnum<Foam::solidTractionFreeFvPatchVectorField::nonLinearType, 3>::names[] =
-  {
+{
     "off",
     "updatedLagrangian",
     "totalLagrangian"
-  };
+};
 
 const Foam::NamedEnum<Foam::solidTractionFreeFvPatchVectorField::nonLinearType, 3>
 Foam::solidTractionFreeFvPatchVectorField::nonLinearNames_;

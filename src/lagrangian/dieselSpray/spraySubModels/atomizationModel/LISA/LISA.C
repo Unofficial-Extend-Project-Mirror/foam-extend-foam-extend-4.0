@@ -119,11 +119,6 @@ void LISA::atomizeParcel
     scalar rhoFuel = fuels.rho(1.0e+5, p.T(), p.X());
     scalar nuFuel = muFuel/rhoFuel;
 
-    vector uDir = p.U()/mag(p.U());
-
-    scalar uGas = mag(vel & uDir);
-    vector Ug = uGas*uDir;
-
 /*
     TL
     It might be the relative velocity between Liquid and Gas, but I use the

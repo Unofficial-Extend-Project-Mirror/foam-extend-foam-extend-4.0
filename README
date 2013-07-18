@@ -59,7 +59,7 @@
     Then update the environment variables by sourcing the $HOME/.bashrc file by
     typing in the terminal:
 
-	+ . $HOME/.bashrc
+    + . $HOME/.bashrc
 
   2) OR, if running tcsh or csh, source the etc/cshrc file by adding the
     following line to the end of your $HOME/.cshrc file:
@@ -69,7 +69,7 @@
     Then update the environment variables by sourcing the $HOME/.cshrc file by
     typing in the terminal:
 
-	+ source $HOME/.cshrc
+    + source $HOME/.cshrc
 
 *** Installation in alternative locations
     OpenFOAM may also be installed in alternative locations. However, the
@@ -79,13 +79,13 @@
     The environment variable 'FOAM_INST_DIR' can be used to find and source the
     appropriate resource file. Here is a bash/ksh/sh example:
 
-	+ export FOAM_INST_DIR=/data/app/OpenFOAM
+    + export FOAM_INST_DIR=/data/app/OpenFOAM
         + foamDotFile=$FOAM_INST_DIR/OpenFOAM-<VERSION>/etc/bashrc
         + [ -f $foamDotFile ] && . $foamDotFile
 
     and a csh/tcsh example:
 
-	+ setenv FOAM_INST_DIR /data/app/OpenFOAM
+    + setenv FOAM_INST_DIR /data/app/OpenFOAM
         + set foamDotFile=$FOAM_INST_DIR/OpenFOAM-<VERSION>/etc/cshrc
         + if ( -f $foamDotFile ) source $foamDotFile
 
@@ -93,7 +93,7 @@
     of the OpenFOAM installation.
 
 * Building the ThirdParty packages from Sources
-   A new way of compiling and installing the ThirdParty suite of packages is proposed with OpenFOAM-1.6-ext. 
+   A new way of compiling and installing the ThirdParty suite of packages is proposed with OpenFOAM-1.6-ext.
    Please consult the file ThirdParty/README.ThirdParty a for more information.
 
 * Building from Sources (Optional)
@@ -154,7 +154,7 @@
 
 * Reporting Bugs in OpenFOAM
   Please report all bugs and feature requests using our bug tracking system:
-  http://sourceforge.net/apps/mantisbt/openfoam-extend/main_page.php or 
+  http://sourceforge.net/apps/mantisbt/openfoam-extend/main_page.php or
   http://www.extend-project.de/project-final/openfoam-extend-bug-tracker
   Please also report bugs at the CFD-Online User Forum.
 
@@ -188,7 +188,7 @@
     David Hill
     Niklas Wikstrom
     Dubravko Matijasevic
-    Darrin Stephens 
+    Darrin Stephens
     Christian Beck
     Oliver Borm
     James Criner

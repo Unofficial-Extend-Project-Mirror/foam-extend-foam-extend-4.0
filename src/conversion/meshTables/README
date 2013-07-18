@@ -13,7 +13,7 @@ chosen to match those used by the ccm-format.
 
 Here is a sample dictionary entry:
 
-<int>	                        // unique positive int
+<int>                           // unique positive int
 {
     Label           <word>;     // optional
     MaterialType    <word>;     // optional (fluid|solid)

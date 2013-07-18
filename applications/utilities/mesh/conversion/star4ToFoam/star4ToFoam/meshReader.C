@@ -114,7 +114,7 @@ void meshReader::writeMesh()
     Info << "Writing polyMesh" << endl;
     mesh.write();
 
-    volFieldCellTableId(mesh);    
+    volFieldCellTableId(mesh);
     writeAux(mesh);
 }
 

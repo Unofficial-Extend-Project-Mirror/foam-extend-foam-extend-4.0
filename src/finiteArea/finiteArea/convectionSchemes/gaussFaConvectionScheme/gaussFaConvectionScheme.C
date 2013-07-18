@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    
+
 \*---------------------------------------------------------------------------*/
 
 #include "gaussFaConvectionScheme.H"
@@ -88,19 +88,19 @@ gaussConvectionScheme<Type>::famDiv
         fam.internalCoeffs()[patchI] = patchFlux*psf.valueInternalCoeffs(pw);
         fam.boundaryCoeffs()[patchI] = -patchFlux*psf.valueBoundaryCoeffs(pw);
     }
-    
+
 //     if (tinterpScheme_().corrected())
 //     {
 //         fam += fac::edgeIntegrate(faceFlux*tinterpScheme_().correction(vf));
 //     }
 
     // Non-euclidian and other corrections
-    GeometricField<Type, faePatchField, edgeMesh> convFluxCorr = 
+    GeometricField<Type, faePatchField, edgeMesh> convFluxCorr =
         flux(faceFlux, vf)
       - faceFlux*tinterpScheme_().euclidianInterpolate(vf);;
 
     fam += fac::edgeIntegrate(convFluxCorr);
-    
+
     return tfam;
 }
 

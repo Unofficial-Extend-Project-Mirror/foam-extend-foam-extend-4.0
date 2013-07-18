@@ -68,13 +68,13 @@ const Foam::faMesh& Foam::faGlobalMeshData::mesh() const
 // Update all data after morph
 void Foam::faGlobalMeshData::updateMesh()
 {
-    label polyMeshNGlobalPoints = 
+    label polyMeshNGlobalPoints =
         mesh_().globalData().nGlobalPoints();
 
-    const labelList& polyMeshSharedPointLabels = 
+    const labelList& polyMeshSharedPointLabels =
         mesh_().globalData().sharedPointLabels();
 
-    const labelList& polyMeshSharedPointAddr = 
+    const labelList& polyMeshSharedPointAddr =
         mesh_().globalData().sharedPointAddr();
 
     labelHashSet sharedPointLabels;
@@ -85,15 +85,15 @@ void Foam::faGlobalMeshData::updateMesh()
     {
         if(mesh_.boundary()[patchI].type() == processorFaPatch::typeName)
         {
-            const labelList& localPointLabels = 
+            const labelList& localPointLabels =
                 mesh_.boundary()[patchI].pointLabels();
 
             forAll(localPointLabels, pointI)
             {
-                label polyMeshPoint = 
+                label polyMeshPoint =
                     mesh_.patch().meshPoints()[localPointLabels[pointI]];
-                
-                label sharedPolyMeshPoint = 
+
+                label sharedPolyMeshPoint =
                     findIndex(polyMeshSharedPointLabels, polyMeshPoint);
 
                 if
@@ -102,7 +102,7 @@ void Foam::faGlobalMeshData::updateMesh()
                  && !sharedPointLabels.found(localPointLabels[pointI])
                 )
                 {
-                    globalList[polyMeshSharedPointAddr[sharedPolyMeshPoint]] 
+                    globalList[polyMeshSharedPointAddr[sharedPolyMeshPoint]]
                         += 1;
 
                     sharedPointLabels.insert(localPointLabels[pointI]);
@@ -134,7 +134,7 @@ void Foam::faGlobalMeshData::updateMesh()
         );
 
         sharedPointAddr_[pointI] =
-            globalList[polyMeshSharedPointAddr[polyMeshSharedPointIndex]] 
+            globalList[polyMeshSharedPointAddr[polyMeshSharedPointIndex]]
           - 1;
     }
 }

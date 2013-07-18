@@ -198,7 +198,7 @@ public:
             const polyMesh& mesh,
             const autoPtr<coordinateSystem>& valveCS,
             const word& bottomPatchName,
-	    const word& sidePatchName,
+            const word& sidePatchName,
             const word& poppetPatchName,
             const word& stemPatchName,
             const word& curtainInPortPatchName,
@@ -224,7 +224,7 @@ public:
             const word& movingPointsName,
             const word& staticCellsName,
             const word& movingCellsName
-	);
+    );
 
         //- Construct from dictionary
         thoboisSlidingValve

@@ -15,7 +15,7 @@ if(runTime.timeIndex() > 1)
 
     spacePhi += pos(spacePhi)*spacePhi*(outflowScaling - 1.0);
 
-//     Info<< "Space patch continuity: " 
+//     Info<< "Space patch continuity: "
 //         << gSum(phi.boundaryField()[spacePatchID]) << endl;
 
 //     U.boundaryField()[spacePatchID] ==

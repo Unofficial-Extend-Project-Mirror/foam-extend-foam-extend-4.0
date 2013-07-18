@@ -66,140 +66,140 @@ Author
 
 int main(int argc, char *argv[])
 {
-# include "setRootCase.H"
+#   include "setRootCase.H"
 
-# include "createTime.H"
+#   include "createTime.H"
 
-# include "createMesh.H"
+#   include "createMesh.H"
 
-# include "createFields.H"
+#   include "createFields.H"
 
-# include "readDivSigmaExpMethod.H"
+#   include "readDivSigmaExpMethod.H"
 
-# include "createGlobalToLocalFaceZonePointMap.H"
+#   include "createGlobalToLocalFaceZonePointMap.H"
 
-  // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-  
-  Info<< "\nStarting time loop\n" << endl;
-  
-  for (runTime++; !runTime.end(); runTime++)
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+    Info<< "\nStarting time loop\n" << endl;
+
+    for (runTime++; !runTime.end(); runTime++)
     {
-      Info<< "Time: " << runTime.timeName() << endl;
-      
-#     include "readContactControls.H"
+        Info<< "Time: " << runTime.timeName() << endl;
 
-#     include "readStressedFoamControls.H"
-  
-      //-- for moving the mesh and then back again
-      vectorField oldMeshPoints = mesh.allPoints();
-      
-      int iCorr = 0;
-      lduMatrix::solverPerformance solverPerf;
-      word solverName;
-      lduMatrix::debug = 0;
-      scalar residual = GREAT;
-      scalar initialResidual = 0;
-      scalar relativeResidual = GREAT;
+#       include "readContactControls.H"
 
-      //- Predictor step
-      if (predictor)
+#       include "readStressedFoamControls.H"
+
+        //-- for moving the mesh and then back again
+        vectorField oldMeshPoints = mesh.allPoints();
+
+        int iCorr = 0;
+        lduMatrix::solverPerformance solverPerf;
+        word solverName;
+        lduMatrix::debug = 0;
+        scalar residual = GREAT;
+        scalar initialResidual = 0;
+        scalar relativeResidual = GREAT;
+
+        //- Predictor step
+        if (predictor)
         {
-	  Info << "\nPredicting U, gradU and snGradU based on V, gradV and snGradV\n" << endl;
-	  U += V*runTime.deltaT();
-	  gradU += gradV*runTime.deltaT();
-	  snGradU += snGradV*runTime.deltaT();
+            Info << "\nPredicting U, gradU and snGradU based on V, gradV and snGradV\n" << endl;
+            U += V*runTime.deltaT();
+            gradU += gradV*runTime.deltaT();
+            snGradU += snGradV*runTime.deltaT();
         }
 
-      do //- start of momentum loop
-	{
-	  U.storePrevIter();
-	  
-	  //- correct the contact boundaries 
-          if(iCorr % uEqnContactCorrFreq == 0)
-	    {
-	      Info << "\t\tCorrecting contact in the momentum loop "
-		   << "iteration: " << iCorr
-		   << ", residual: " << residual
-		   << endl;
-	      //#                 include "moveMeshLeastSquares.H"
-#             include "moveSolidMesh.H"
-	      contact.correct();
-	      mesh.movePoints(oldMeshPoints);
-	    }
-  
-#         include "calculateDivSigmaExp.H"
+        do //- start of momentum loop
+        {
+            U.storePrevIter();
 
-	  fvVectorMatrix UEqn
-	    (
-	     fvm::d2dt2(rho, U)
-	     ==
-	     fvm::laplacian(2*mu + lambda, U, "laplacian(DU,U)")
-	     + divSigmaExp
-	     );
-	  
-	  solverPerf = UEqn.solve();
-	  
-	  U.relax();
-	  
-	  solverName = solverPerf.solverName();
-	  
-	  gradU = fvc::grad(U);
-	  snGradU = fvc::snGrad(U);
+            //- correct the contact boundaries
+            if(iCorr % uEqnContactCorrFreq == 0)
+            {
+                Info << "\t\tCorrecting contact in the momentum loop "
+                    << "iteration: " << iCorr
+                    << ", residual: " << residual
+                    << endl;
+//#               include "moveMeshLeastSquares.H"
+#               include "moveSolidMesh.H"
+                contact.correct();
+                mesh.movePoints(oldMeshPoints);
+            }
 
-	  residual = solverPerf.initialResidual();
-	  
-	  if(iCorr == 0)
-	    {
-	      initialResidual = solverPerf.initialResidual();
-	    }
-	  
-#         include "calculateRelativeResidual.H"	      
+#           include "calculateDivSigmaExp.H"
 
-	  Info << "\tTime " << runTime.value()
-	       << ", Corrector " << iCorr
-	       << ", Solving for " << U.name()
-	       << " using " << solverPerf.solverName()
-	       << ", residual = " << solverPerf.initialResidual()
-	       << ", relative residual = " << relativeResidual << endl;
-	} //- end of momentum loop
-      while
-	(
-	 //relativeResidual > convergenceTolerance
-	 residual > convergenceTolerance
-	 &&
-	 ++iCorr < nCorr
-	 );
-      
-      // Print out info per contact iteration
-      Info << "\t\tSolving for " << U.name()
-	   << " using " << solverName
-	   << ", Initial residual = " << initialResidual
-	   << ", Final residual = " << solverPerf.initialResidual()
-	   << ", No outer iterations " << iCorr << endl;
-      
-      lduMatrix::debug = 1;
-      
-      V = fvc::ddt(U);
-      gradV = fvc::ddt(gradU);
-      snGradV = (snGradU - snGradU.oldTime())/runTime.deltaT();
+            fvVectorMatrix UEqn
+            (
+                fvm::d2dt2(rho, U)
+              ==
+                fvm::laplacian(2*mu + lambda, U, "laplacian(DU,U)")
+              + divSigmaExp
+            );
 
-#     include "calculateEpsilonSigma.H"
-      
-#     include "writeFields.H"
-        
-      //#     include "moveMeshLeastSquares.H"
-      //#     include "moveSolidMesh.H"
-      //#     include "printContactResults.H"
-      //mesh.movePoints(oldMeshPoints);
-      
-      Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	  << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-	  << endl << endl;
+            solverPerf = UEqn.solve();
+
+            U.relax();
+
+            solverName = solverPerf.solverName();
+
+            gradU = fvc::grad(U);
+            snGradU = fvc::snGrad(U);
+
+            residual = solverPerf.initialResidual();
+
+            if(iCorr == 0)
+            {
+                initialResidual = solverPerf.initialResidual();
+            }
+
+#           include "calculateRelativeResidual.H"
+
+           Info << "\tTime " << runTime.value()
+               << ", Corrector " << iCorr
+               << ", Solving for " << U.name()
+               << " using " << solverPerf.solverName()
+               << ", residual = " << solverPerf.initialResidual()
+               << ", relative residual = " << relativeResidual << endl;
+        } //- end of momentum loop
+        while
+        (
+            //relativeResidual > convergenceTolerance
+            residual > convergenceTolerance
+            &&
+            ++iCorr < nCorr
+        );
+
+        // Print out info per contact iteration
+        Info << "\t\tSolving for " << U.name()
+           << " using " << solverName
+           << ", Initial residual = " << initialResidual
+           << ", Final residual = " << solverPerf.initialResidual()
+           << ", No outer iterations " << iCorr << endl;
+
+        lduMatrix::debug = 1;
+
+        V = fvc::ddt(U);
+        gradV = fvc::ddt(gradU);
+        snGradV = (snGradU - snGradU.oldTime())/runTime.deltaT();
+
+#       include "calculateEpsilonSigma.H"
+
+#       include "writeFields.H"
+
+//#       include "moveMeshLeastSquares.H"
+//#       include "moveSolidMesh.H"
+//#       include "printContactResults.H"
+//        mesh.movePoints(oldMeshPoints);
+
+        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << endl << endl;
     }
-  
-  Info<< "End\n" << endl;
-  
-  return(0);
+
+    Info<< "End\n" << endl;
+
+    return(0);
 }
 
 

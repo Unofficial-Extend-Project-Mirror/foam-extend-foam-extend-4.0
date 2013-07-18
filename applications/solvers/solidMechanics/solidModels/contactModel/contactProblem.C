@@ -69,48 +69,48 @@ contactProblem::contactProblem
     contactPatchPairList(),
     U_(U)
 {
-  Info << "\nConstructing contact problem" << endl;
-  Info << "\t*************************************************************************************\n"
-       << "\t** MAKE SURE MASTER AND SLAVE FACE AND POINT ZONES HAVE BEEN DEFINED               **\n"
-       << "\t** To define, use the 'setSet' utility:                                            **\n"
-       << "\t** faceSet <slaveName>FaceZone new patchToFace <slaveName>                         **\n"
-       << "\t** faceSet <masterName>FaceZone new patchToFace <masterName>                       **\n"
-       << "\t** pointSet <masterName>PointZone new faceToPoint <masterName>FaceZone all         **\n"
-       << "\t** pointSet <slaveName>PointZone new faceToPoint <slaveName>FaceZone all           **\n"
-       << "\t** Then use the 'setsToZone -noFlipMap' command                                    **\n"
-       << "\t** For parallel runs, 'globalFaceZones (<slaveName>FaceZone <masterName>FaceZone)' **\n"
-       << "\t** must be included in the decomposeParDict                                        **\n"
-       << "\t** <slaveName> and <masterName> are replaced with the slave and master patch names **\n"
-       << "\t*************************************************************************************"
-       << endl;
+    Info << "\nConstructing contact problem" << endl;
+    Info << "\t*************************************************************************************\n"
+        << "\t** MAKE SURE MASTER AND SLAVE FACE AND POINT ZONES HAVE BEEN DEFINED               **\n"
+        << "\t** To define, use the 'setSet' utility:                                            **\n"
+        << "\t** faceSet <slaveName>FaceZone new patchToFace <slaveName>                         **\n"
+        << "\t** faceSet <masterName>FaceZone new patchToFace <masterName>                       **\n"
+        << "\t** pointSet <masterName>PointZone new faceToPoint <masterName>FaceZone all         **\n"
+        << "\t** pointSet <slaveName>PointZone new faceToPoint <slaveName>FaceZone all           **\n"
+        << "\t** Then use the 'setsToZone -noFlipMap' command                                    **\n"
+        << "\t** For parallel runs, 'globalFaceZones (<slaveName>FaceZone <masterName>FaceZone)' **\n"
+        << "\t** must be included in the decomposeParDict                                        **\n"
+        << "\t** <slaveName> and <masterName> are replaced with the slave and master patch names **\n"
+        << "\t*************************************************************************************"
+        << endl;
 
-  //- Read contactPatchPairList
-  Istream& is = lookup("contacts");
+    //- Read contactPatchPairList
+    Istream& is = lookup("contacts");
 
-  PtrList<entry> contactEntries(is);
-  
-  contactPatchPairList& contacts = *this;
-  
-  contacts.setSize(contactEntries.size());
-  
-  forAll(contacts, contactI)
+    PtrList<entry> contactEntries(is);
+
+    contactPatchPairList& contacts = *this;
+
+    contacts.setSize(contactEntries.size());
+
+    forAll(contacts, contactI)
     {
-      contacts.set
+        contacts.set
         (
-	 contactI,
-	 new contactPatchPair
-	 (
-	  contactEntries[contactI].keyword(),
-	  *this,
-	  contactEntries[contactI].dict()
-	  )
-	 );
-     }
+            contactI,
+            new contactPatchPair
+            (
+                contactEntries[contactI].keyword(),
+                *this,
+                contactEntries[contactI].dict()
+            )
+         );
+    }
 
-  Info << "Contact problem constructed"
-       << endl;
+    Info << "Contact problem constructed"
+        << endl;
 }
-  
+
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
@@ -121,32 +121,30 @@ contactProblem::contactProblem
 //**********************CORRECT FUNCTION*************************************//
 void contactProblem::correct()
 {
-  contactPatchPairList& contacts = *this;
+    contactPatchPairList& contacts = *this;
 
-  // Collect patches involved in contact
-  boolList contactPatches(U().boundaryField().size(), false);
+    // Collect patches involved in contact
+    boolList contactPatches(U().boundaryField().size(), false);
 
-  forAll (contacts, contactI)
+    forAll (contacts, contactI)
     {
-      contactPatches[contacts[contactI].masterPatch().index()] = true;
-      contactPatches[contacts[contactI].slavePatch().index()] = true;
+        contactPatches[contacts[contactI].masterPatch().index()] = true;
+        contactPatches[contacts[contactI].slavePatch().index()] = true;
     }
 
-  // Calculate contact trcations
-  forAll (contacts, contactI)
+    // Calculate contact trcations
+    forAll (contacts, contactI)
     {
-      if(contacts[contactI].contactActive())
-	{
-	  contacts[contactI].correct();
-	}
-      else
-	{
-	  Info << "\t\t\tContact " << contacts[contactI].name() << " not active" << endl;
-	}
+        if(contacts[contactI].contactActive())
+        {
+            contacts[contactI].correct();
+        }
+        else
+        {
+            Info << "\t\t\tContact " << contacts[contactI].name() << " not active" << endl;
+        }
     }
 }
-
-
 
 
 //**********************CONTACT AREA FUNCTION***********************************//
@@ -189,27 +187,27 @@ tmp<volScalarField> contactProblem::contactArea() const
     label slaveIndex = contacts[contactI].slavePatch().index();
     scalarField masterFrac = contacts[contactI].masterTouchFraction();
     scalarField slaveFrac = contacts[contactI].slaveTouchFraction();
-    scalar contactAreaMaster =
-      gSum
-      (
-       masterFrac *
-       mag(
-	   mesh().Sf().boundaryField()[masterIndex]
-	   )
-       );
-    scalar contactAreaSlave =
-      gSum
-      (
+    scalar contactAreaMaster = gSum
+    (
+        masterFrac *
+        mag
+        (
+            mesh().Sf().boundaryField()[masterIndex]
+        )
+   );
+   scalar contactAreaSlave = gSum
+   (
        slaveFrac *
-       mag(
-	   mesh().Sf().boundaryField()[slaveIndex]
-	   )
-       );  
-    Info << "\nContact area of master patch is: "
-	 << contactAreaMaster << " m^2"
-	 << "\nContact area of slave patch is: "
-	 << contactAreaSlave << " m^2"
-	 << endl << endl;
+       mag
+       (
+           mesh().Sf().boundaryField()[slaveIndex]
+       )
+   );
+   Info << "\nContact area of master patch is: "
+       << contactAreaMaster << " m^2"
+       << "\nContact area of slave patch is: "
+       << contactAreaSlave << " m^2"
+       << endl << endl;
     //------------------------------------------------------//
     }
 
@@ -222,26 +220,26 @@ tmp<volScalarField> contactProblem::contactArea() const
 //tmp<pointScalarField> contactProblem::contactGapPoints() const
 void contactProblem::contactGapPoints(pointScalarField& cGapPoints)
 {
-  const  contactPatchPairList& contacts = *this;
-  
-  scalarField& cGapPointsInternal = cGapPoints.internalField();
-  
-  forAll (contacts, contactI)
-    {
-      scalarField masterGapPoints = contacts[contactI].masterGapPoints();
-      labelList masterBoundaryLabels = mesh().boundaryMesh()[contacts[contactI].masterPatch().index()].meshPoints();       
-      
-      scalarField slaveGapPoints = contacts[contactI].slaveGapPoints();
-      labelList slaveBoundaryLabels = mesh().boundaryMesh()[contacts[contactI].slavePatch().index()].meshPoints();       
+    const  contactPatchPairList& contacts = *this;
 
-      forAll(masterBoundaryLabels, pointI)
-	{
-	  cGapPointsInternal[masterBoundaryLabels[pointI]] = masterGapPoints[pointI];
-	}
-      forAll(slaveBoundaryLabels, pointI)
-	{
-	  cGapPointsInternal[slaveBoundaryLabels[pointI]] = slaveGapPoints[pointI];
-	}
+    scalarField& cGapPointsInternal = cGapPoints.internalField();
+
+    forAll (contacts, contactI)
+    {
+        scalarField masterGapPoints = contacts[contactI].masterGapPoints();
+        labelList masterBoundaryLabels = mesh().boundaryMesh()[contacts[contactI].masterPatch().index()].meshPoints();
+
+        scalarField slaveGapPoints = contacts[contactI].slaveGapPoints();
+        labelList slaveBoundaryLabels = mesh().boundaryMesh()[contacts[contactI].slavePatch().index()].meshPoints();
+
+        forAll(masterBoundaryLabels, pointI)
+        {
+            cGapPointsInternal[masterBoundaryLabels[pointI]] = masterGapPoints[pointI];
+        }
+        forAll(slaveBoundaryLabels, pointI)
+        {
+          cGapPointsInternal[slaveBoundaryLabels[pointI]] = slaveGapPoints[pointI];
+        }
     }
 }
 
@@ -250,31 +248,29 @@ void contactProblem::contactGapPoints(pointScalarField& cGapPoints)
 
 void contactProblem::contactPointForce(pointVectorField& cPointForce)
 {
-  pointMesh pMesh(mesh());
-  const contactPatchPairList& contacts = *this;
-  
-  vectorField& cPointForceInternal = cPointForce.internalField();
-  
-  forAll (contacts, contactI)
+    pointMesh pMesh(mesh());
+    const contactPatchPairList& contacts = *this;
+
+    vectorField& cPointForceInternal = cPointForce.internalField();
+
+    forAll (contacts, contactI)
     {
-      vectorField masterContactPointForce = contacts[contactI].masterPointForce();
-      labelList masterBoundaryLabels = pMesh.boundary()[contacts[contactI].masterPatch().index()].meshPoints();
-      
-      vectorField slaveContactPointForce = contacts[contactI].slavePointForce();
-      labelList slaveBoundaryLabels = pMesh.boundary()[contacts[contactI].slavePatch().index()].meshPoints();
-      
-      forAll(masterBoundaryLabels, pointI)
-	{
-	  cPointForceInternal[masterBoundaryLabels[pointI]] = masterContactPointForce[pointI];
-	}
-      forAll(slaveBoundaryLabels, pointI)
-	{
-	  cPointForceInternal[slaveBoundaryLabels[pointI]] = slaveContactPointForce[pointI];
-	}
+        vectorField masterContactPointForce = contacts[contactI].masterPointForce();
+        labelList masterBoundaryLabels = pMesh.boundary()[contacts[contactI].masterPatch().index()].meshPoints();
+
+        vectorField slaveContactPointForce = contacts[contactI].slavePointForce();
+        labelList slaveBoundaryLabels = pMesh.boundary()[contacts[contactI].slavePatch().index()].meshPoints();
+
+        forAll(masterBoundaryLabels, pointI)
+        {
+            cPointForceInternal[masterBoundaryLabels[pointI]] = masterContactPointForce[pointI];
+        }
+        forAll(slaveBoundaryLabels, pointI)
+        {
+            cPointForceInternal[slaveBoundaryLabels[pointI]] = slaveContactPointForce[pointI];
+        }
     }
 }
-
-
 
 
 tmp<volScalarField> contactProblem::contactPressure() const

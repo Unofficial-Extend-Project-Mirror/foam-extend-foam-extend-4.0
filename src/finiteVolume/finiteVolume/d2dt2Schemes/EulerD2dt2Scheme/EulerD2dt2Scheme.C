@@ -21,7 +21,7 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-    
+
 \*---------------------------------------------------------------------------*/
 
 #include "EulerD2dt2Scheme.H"
@@ -181,7 +181,7 @@ EulerD2dt2Scheme<Type>::fvcD2dt2
                     coefft
                    *(rho.boundaryField() + rho.oldTime().boundaryField())
                    *vf.boundaryField()
-                        
+
                   - (
                         coefft
                        *(

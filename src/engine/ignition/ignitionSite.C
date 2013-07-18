@@ -57,7 +57,6 @@ void ignitionSite::findIgnitionCells(const fvMesh& mesh)
     cellVolumes_[0] = vols[ignCell];
 
     scalar minDist = GREAT;
-    label nearestCell = 0;
     label nIgnCells = 1;
 
     forAll(centres, celli)
@@ -66,7 +65,6 @@ void ignitionSite::findIgnitionCells(const fvMesh& mesh)
 
         if (dist < minDist)
         {
-            nearestCell = celli;
             minDist = dist;
         }
 

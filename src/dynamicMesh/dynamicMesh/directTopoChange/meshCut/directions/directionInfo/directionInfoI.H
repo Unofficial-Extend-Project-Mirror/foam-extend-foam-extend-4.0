@@ -93,7 +93,7 @@ inline void Foam::directionInfo::leaveDomain
 
 // index_ is offset in face on other side. So reverse it here.
 // (Note: f[0] on other domain is connected to f[0] in this domain,
-//        f[1]      ,,                         f[size-1]   ,, 
+//        f[1]      ,,                         f[size-1]   ,,
 // etc.)
 inline void Foam::directionInfo::enterDomain
 (

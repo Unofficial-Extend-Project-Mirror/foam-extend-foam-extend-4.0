@@ -4,7 +4,7 @@ nVar -= Num_variables - nSprayVariables;
 
 if (nVar >= 0)
 {
-    
+
     word name = lagrangianScalarNames[nVar];
 
     IOField<scalar> s

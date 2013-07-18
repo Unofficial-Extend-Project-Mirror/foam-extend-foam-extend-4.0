@@ -68,14 +68,14 @@ void Foam::meshTriangulation::getFaces
     label& nFaces,
     label& nInternalFaces
 )
-{    
-    // All faces to be triangulated.     
+{
+    // All faces to be triangulated.
     faceIsCut.setSize(mesh.nFaces());
     faceIsCut = false;
 
     nFaces = 0;
     nInternalFaces = 0;
-    
+
     forAll(includedCell, cellI)
     {
         // Include faces of cut cells only.
@@ -176,7 +176,7 @@ Foam::meshTriangulation::meshTriangulation
     const pointField& points = mesh.points();
     const polyBoundaryMesh& patches = mesh.boundaryMesh();
 
-    // All faces to be triangulated.     
+    // All faces to be triangulated.
     boolList faceIsCut;
     label nFaces, nInternalFaces;
 

@@ -50,127 +50,127 @@ Author
 
 int main(int argc, char *argv[])
 {
-# include "setRootCase.H"
+#   include "setRootCase.H"
 
-# include "createTime.H"
+#   include "createTime.H"
 
-# include "createMesh.H"
+#   include "createMesh.H"
 
-# include "createFields.H"
+#   include "createFields.H"
 
-# include "readDivDSigmaExpMethod.H"
+#   include "readDivDSigmaExpMethod.H"
 
-# include "createSolidInterface.H"
+#   include "createSolidInterface.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-  
-  Info<< "\nCalculating displacement field\n" << endl;
-  
-  for (runTime++; !runTime.end(); runTime++)
+
+    Info<< "\nCalculating displacement field\n" << endl;
+
+    for (runTime++; !runTime.end(); runTime++)
     {
-      Info<< "Time: " << runTime.timeName() << nl << endl;
-      
-#     include "readStressedFoamControls.H"
-      
-      int iCorr = 0;
-      scalar initialResidual = 0;
-      scalar relativeResidual = GREAT;
-      lduMatrix::solverPerformance solverPerf;
-      lduMatrix::debug = 0;
-      
-      const volSymmTensorField& DEpsilonP = rheology.DEpsilonP();
-      
-      do
-	{          
-	  DU.storePrevIter();
+        Info<< "Time: " << runTime.timeName() << nl << endl;
 
-#         include "calculateDivDSigmaExp.H"
-	  	  
-	  fvVectorMatrix DUEqn
-	    (
-	     fvm::d2dt2(rho, DU)
-	     ==
-	     fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
-	     + divDSigmaExp
-	     - fvc::div(2*muf*(mesh.Sf() & fvc::interpolate(DEpsilonP)))
-	     );
+#       include "readStressedFoamControls.H"
 
-	  if(solidInterfaceCorr)
-	    {
-	      solidInterfacePtr->correct(DUEqn);
-	    }
-	  
-	  solverPerf = DUEqn.solve();
-	  
-	  if(iCorr == 0)
+        int iCorr = 0;
+        scalar initialResidual = 0;
+        scalar relativeResidual = GREAT;
+        lduMatrix::solverPerformance solverPerf;
+        lduMatrix::debug = 0;
+
+        const volSymmTensorField& DEpsilonP = rheology.DEpsilonP();
+
+        do
+        {
+            DU.storePrevIter();
+
+#           include "calculateDivDSigmaExp.H"
+
+            fvVectorMatrix DUEqn
+            (
+                fvm::d2dt2(rho, DU)
+              ==
+                fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
+              + divDSigmaExp
+              - fvc::div(2*muf*(mesh.Sf() & fvc::interpolate(DEpsilonP)))
+            );
+
+            if(solidInterfaceCorr)
             {
-	      initialResidual = solverPerf.initialResidual();
+                solidInterfacePtr->correct(DUEqn);
             }
-	  
-	  DU.relax();
-	  
-	  if(solidInterfaceCorr)
-	    {
-	      gradDU = solidInterfacePtr->grad(DU);
-	    }
-	  else
-	    {
-	      gradDU = fvc::grad(DU);
-	    }
 
-#         include "calculateRelativeResidual.H"
-	  
-	  rheology.correct();
-	  mu = rheology.newMu();
-	  lambda = rheology.newLambda();
-	  muf = fvc::interpolate(rheology.newMu());
-	  lambdaf = fvc::interpolate(rheology.newLambda());
-	  if(solidInterfaceCorr)
-	    {
-	      solidInterfacePtr->modifyProperties(muf, lambdaf);
-	    }
+            solverPerf = DUEqn.solve();
 
-	  Info << "\tTime " << runTime.value()
-	       << ", Corrector " << iCorr
-	       << ", Solving for " << DU.name()
-	       << " using " << solverPerf.solverName()
-	       << ", residual = " << solverPerf.initialResidual() << endl;
-	}
-      while
-	(
-	 solverPerf.initialResidual() > convergenceTolerance 
-	 && ++iCorr < nCorr
-	 );
-      
-      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name() 
-	   << ", Initial residual = " << initialResidual 
-	   << ", Final residual = " << solverPerf.initialResidual()
-	   << ", No outer iterations " << iCorr << endl;
-      
-      lduMatrix::debug = 1;
-      
-#     include "calculateDEpsilonDSigma.H"
+            if(iCorr == 0)
+            {
+                initialResidual = solverPerf.initialResidual();
+            }
 
-      U += DU;
-      
-      epsilon += DEpsilon;
-      
-      epsilonP += rheology.DEpsilonP();
-      
-      sigma += DSigma;
-      
-      rheology.updateYieldStress();
-      
-#     include "writeFields.H"
-      
-      Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	  << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-	  << nl << endl;
+            DU.relax();
+
+            if(solidInterfaceCorr)
+            {
+                gradDU = solidInterfacePtr->grad(DU);
+            }
+            else
+            {
+                gradDU = fvc::grad(DU);
+            }
+
+#           include "calculateRelativeResidual.H"
+
+            rheology.correct();
+            mu = rheology.newMu();
+            lambda = rheology.newLambda();
+            muf = fvc::interpolate(rheology.newMu());
+            lambdaf = fvc::interpolate(rheology.newLambda());
+            if(solidInterfaceCorr)
+            {
+                solidInterfacePtr->modifyProperties(muf, lambdaf);
+            }
+
+            Info << "\tTime " << runTime.value()
+                << ", Corrector " << iCorr
+                << ", Solving for " << DU.name()
+                << " using " << solverPerf.solverName()
+                << ", residual = " << solverPerf.initialResidual() << endl;
+        }
+        while
+        (
+            solverPerf.initialResidual() > convergenceTolerance
+            && ++iCorr < nCorr
+        );
+
+        Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name()
+            << ", Initial residual = " << initialResidual
+            << ", Final residual = " << solverPerf.initialResidual()
+            << ", No outer iterations " << iCorr << endl;
+
+        lduMatrix::debug = 1;
+
+#       include "calculateDEpsilonDSigma.H"
+
+        U += DU;
+
+        epsilon += DEpsilon;
+
+        epsilonP += rheology.DEpsilonP();
+
+        sigma += DSigma;
+
+        rheology.updateYieldStress();
+
+#       include "writeFields.H"
+
+        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << nl << endl;
     }
-  
-  Info<< "End\n" << endl;
-  
-  return(0);
+
+    Info<< "End\n" << endl;
+
+    return(0);
 }
 
 

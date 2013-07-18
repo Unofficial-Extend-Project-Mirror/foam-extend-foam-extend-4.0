@@ -107,10 +107,10 @@ void gradientUnburntEnthalpyFvPatchScalarField::updateCoeffs()
     (
         "thermophysicalProperties"
     );
-    
+
     const label patchi = patch().index();
 
-    fvPatchScalarField& Tw = 
+    fvPatchScalarField& Tw =
         const_cast<fvPatchScalarField&>(thermo.Tu().boundaryField()[patchi]);
 
     Tw.evaluate();

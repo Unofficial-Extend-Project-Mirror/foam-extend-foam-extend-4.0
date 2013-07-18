@@ -92,7 +92,7 @@ class fineBlockAmgLevel
 
 
 public:
-    
+
     //- Runtime type information
         TypeName("fineBlockAmgLevel");
 

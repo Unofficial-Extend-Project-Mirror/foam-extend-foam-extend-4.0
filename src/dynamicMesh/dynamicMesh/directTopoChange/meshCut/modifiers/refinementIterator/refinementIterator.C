@@ -118,7 +118,7 @@ Foam::Map<Foam::label> Foam::refinementIterator::setRefinement
             if (debug)
             {
                 Pout<< "refinementIterator : exiting iteration since no valid"
-                    << " loops found for " << currentRefCells.size() 
+                    << " loops found for " << currentRefCells.size()
                     << " cells" << endl;
 
 

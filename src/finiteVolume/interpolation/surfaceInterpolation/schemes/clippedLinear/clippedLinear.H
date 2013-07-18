@@ -153,7 +153,7 @@ public:
             );
             surfaceScalarField& clippedLinearWeights = tclippedLinearWeights();
 
-            clippedLinearWeights.internalField() = 
+            clippedLinearWeights.internalField() =
                 max(min(cdWeights.internalField(), 1 - wfLimit_), wfLimit_);
 
             forAll (mesh.boundary(), patchi)

@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    
+
 \*---------------------------------------------------------------------------*/
 
 #include "backwardFaDdtScheme.H"
@@ -567,7 +567,7 @@ backwardFaDdtScheme<Type>::facDdt
 
     scalar deltaT = deltaT_();
     scalar deltaT0 = deltaT0_(vf);
- 
+
     scalar coefft   = 1 + deltaT/(deltaT + deltaT0);
     scalar coefft00 = deltaT*deltaT/(deltaT0*(deltaT + deltaT0));
     scalar coefft0  = coefft + coefft00;

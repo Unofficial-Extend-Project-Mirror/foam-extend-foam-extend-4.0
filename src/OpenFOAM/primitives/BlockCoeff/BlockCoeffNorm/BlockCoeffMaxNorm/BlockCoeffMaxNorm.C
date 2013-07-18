@@ -37,7 +37,7 @@ Foam::BlockCoeffMaxNorm<Type>::BlockCoeffMaxNorm
     const dictionary& dict
 )
 :
-    BlockCoeffNorm<Type>(dict),    
+    BlockCoeffNorm<Type>(dict),
     dict_(dict)
 {}
 
@@ -49,7 +49,7 @@ Foam::scalar Foam::BlockCoeffMaxNorm<Type>::normalize
 (
     const Foam::BlockCoeff<Type>& a
 )
-{ 
+{
     if (a.activeType() == BlockCoeff<Type>::SCALAR)
     {
         return mag(a.asScalar());
@@ -68,7 +68,7 @@ Foam::scalar Foam::BlockCoeffMaxNorm<Type>::normalize
         (
             "scalar BlockCoeffMaxNorm<Type>(const BlockCoeff<Type>& b)"
         )   << "Unknown type" << abort(FatalError);
-    
+
         return 0;
     }
 }

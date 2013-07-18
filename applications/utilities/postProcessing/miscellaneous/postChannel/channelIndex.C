@@ -82,7 +82,7 @@ void Foam::channelIndex::walkOppositeFaces
         }
         syncTools::swapBoundaryFaceList(mesh, isFrontBndFace, false);
 
-        // Add 
+        // Add
         forAll(isFrontBndFace, i)
         {
             label faceI = mesh.nInternalFaces()+i;

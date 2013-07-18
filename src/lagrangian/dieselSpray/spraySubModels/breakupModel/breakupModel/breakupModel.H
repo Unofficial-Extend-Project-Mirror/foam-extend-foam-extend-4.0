@@ -58,16 +58,16 @@ protected:
 
         spray& spray_;
         Random& rndGen_;
-        
+
         Switch includeOscillation_;
-        
+
         dictionary TABcoeffsDict_;
         scalar y0_;
         scalar yDot0_;
         scalar TABComega_;
         scalar TABCmu_;
         scalar TABWeCrit_;
-        
+
 
 public:
 
@@ -142,7 +142,7 @@ public:
             const vector& vel,
             const liquidMixture& fuels
         ) const = 0;
-        
+
 };
 
 

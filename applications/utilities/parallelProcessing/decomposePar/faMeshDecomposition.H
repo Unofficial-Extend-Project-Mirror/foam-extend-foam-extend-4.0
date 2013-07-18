@@ -76,7 +76,7 @@ class faMeshDecomposition
         //- Face labels for each processor mesh
         labelListList procFaceLabels_;
 
-        //- 
+        //-
         List<Map<label> > procMeshEdgesMap_;
 
         //- Number of internal edges for each processor mesh

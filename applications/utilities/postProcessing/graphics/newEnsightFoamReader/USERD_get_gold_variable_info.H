@@ -15,11 +15,11 @@ int USERD_get_gold_variable_info
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_gold_variable_info" << endl 
+    Info << "Entering: USERD_get_gold_variable_info" << endl
         << flush;
 #endif
 
-    label offset = Num_variables - nSprayVariables 
+    label offset = Num_variables - nSprayVariables
         - nSecondMeshVariables - nFaMeshVariables;
 
     // scalars first ...
@@ -247,7 +247,7 @@ int USERD_get_gold_variable_info
     }
 
 #ifdef ENSIGHTDEBUG
-    Info << "Leaving: USERD_get_gold_variable_info" << endl 
+    Info << "Leaving: USERD_get_gold_variable_info" << endl
         << flush;
 #endif
 

@@ -54,7 +54,7 @@ public:
 
   // Description:
   // Adds a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
+  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu,
                                          vtkPVAnimationInterfaceEntry *ai);
 
   // Description:
@@ -87,7 +87,7 @@ public:
   // Description:
   // Creates and returns a copy of this widget. It will create
   // a new instance of the same type as the current object
-  // using NewInstance() and then copy some necessary state 
+  // using NewInstance() and then copy some necessary state
   // parameters.
   vtkPVFoamSelectTimeSet* ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
@@ -101,20 +101,20 @@ public:
   // Set/get the property to use with this widget.
   virtual void SetProperty(vtkPVWidgetProperty *prop);
   virtual vtkPVWidgetProperty* GetProperty();
-  
+
   // Description:
   // Create the right property for use with this widget.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
-  
+
   // Description:
   // Set/get the command to pass the value to VTK.
   vtkSetStringMacro(SetCommand);
   vtkGetStringMacro(SetCommand);
-  
+
   // Description:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
- 
+
 protected:
   vtkPVFoamSelectTimeSet();
   ~vtkPVFoamSelectTimeSet();
@@ -125,7 +125,7 @@ protected:
   vtkPVScalarListWidgetProperty *Property;
 
   char *SetCommand;
-  
+
   vtkSetStringMacro(FrameLabel);
   vtkGetStringMacro(FrameLabel);
 
@@ -135,7 +135,7 @@ protected:
   vtkKWLabeledFrame* LabeledFrame;
 
   void AddRootNode(const char* name, const char* text);
-  void AddChildNode(const char* parent, const char* name, 
+  void AddChildNode(const char* parent, const char* name,
                     const char* text, const char* data);
 
   float TimeValue;
@@ -151,7 +151,7 @@ protected:
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
-  
+
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 

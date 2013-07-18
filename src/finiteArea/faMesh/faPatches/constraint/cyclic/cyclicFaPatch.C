@@ -60,7 +60,7 @@ void Foam::cyclicFaPatch::calcTransforms()
 
         vectorField half0Normals(size()/2);
         vectorField half1Normals(size()/2);
- 
+
         vectorField eN = edgeNormals()*magEdgeLengths();
 
         scalar maxMatchError = 0;

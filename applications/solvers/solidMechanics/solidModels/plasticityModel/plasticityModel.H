@@ -111,17 +111,17 @@ public:
         {
             return DEpsilonP_;
         }
-    
+
         const volScalarField& newMu() const
         {
             return mu_;
         }
-    
+
         const volScalarField& newLambda() const
         {
             return lambda_;
         }
-    
+
         //- Correct plastic strain increment
         virtual void correct();
 

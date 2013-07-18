@@ -65,11 +65,11 @@ sub wanted {
                 if (@trailing) {
                     $found{-trailing}++;
                 }
-                
+
                 # the next line should be blank
                 $_ = <>;
                 $_ ||= '';
-                
+
                 if (not /^\s*$/) {
                     $found{-spacing}++;
                 }

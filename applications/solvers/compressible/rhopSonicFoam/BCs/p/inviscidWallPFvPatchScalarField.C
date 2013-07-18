@@ -131,7 +131,7 @@ void inviscidWallPFvPatchScalarField::updateCoeffs()
     const fvPatchField<vector>& rhoUp =
         lookupPatchField<volVectorField, vector>("rhoU");
 
-    const fvsPatchField<scalar>& phip = 
+    const fvsPatchField<scalar>& phip =
         lookupPatchField<surfaceScalarField, scalar>("phi");
 
     const fvsPatchField<scalar>& rAp =
@@ -147,7 +147,7 @@ void inviscidWallPFvPatchScalarField::updateCoeffs()
 void inviscidWallPFvPatchScalarField::write(Ostream& os) const
 {
     fixedGradientFvPatchScalarField::write(os);
-    os.writeKeyword("fluxFraction") 
+    os.writeKeyword("fluxFraction")
         << fluxFraction_ << token::END_STATEMENT << nl;
     writeEntry("value", os);
 }

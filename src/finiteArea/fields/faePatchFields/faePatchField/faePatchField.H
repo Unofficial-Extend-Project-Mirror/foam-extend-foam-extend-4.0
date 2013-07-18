@@ -93,7 +93,7 @@ public:
     //- Runtime type information
     TypeName("faePatchField");
 
-    //- Debug switch to disallow the use of 
+    //- Debug switch to disallow the use of
     static int disallowDefaultFaePatchField;
 
 

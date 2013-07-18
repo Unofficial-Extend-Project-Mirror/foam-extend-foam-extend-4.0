@@ -34,7 +34,7 @@ Foam::labelList Foam::multiSolver::findSuperLoops(const fileName& path)
 
     labelList superLoopList(dirEntries.size());
     label nSuperLoops(0);
-    
+
     // Loop through dirEntries, checking for valid integers, sort entries
     forAll(dirEntries, de)
     {
@@ -47,7 +47,7 @@ Foam::labelList Foam::multiSolver::findSuperLoops(const fileName& path)
 
         IStringStream superLoopStream(dirEntries[de]);
         token superLoopToken(superLoopStream);
-        
+
         // Check if directory is an integer
         if (superLoopToken.isLabel() && superLoopStream.eof())
         {
@@ -72,7 +72,7 @@ Foam::timeCluster Foam::multiSolver::findClosestGlobalTime
     label underShoot(-1);
     label best(-1);
     label initial(-1);
-    
+
     // Find closest global minimum that does not exceed value
     forAll(tcl, i)
     {
@@ -117,7 +117,7 @@ Foam::timeCluster Foam::multiSolver::findClosestGlobalTime
         }
         else
         {
-        
+
             FatalErrorIn("multiSolver::findClosestGlobalTime")
                 << "The timeClusterList passed to this function has no non-"
                 << "empty instantLists.  Use timeClusterList::purgeEmpties "
@@ -125,7 +125,7 @@ Foam::timeCluster Foam::multiSolver::findClosestGlobalTime
                 << abort(FatalError);
         }
     }
-    
+
     label timeIndex
     (
         Time::findClosestTimeIndex
@@ -133,7 +133,7 @@ Foam::timeCluster Foam::multiSolver::findClosestGlobalTime
             tcl[best].times(), value - tcl[best].globalOffset()
         )
     );
-    
+
     if (exact && (maxDiff < -VSMALL))
     {
         FatalErrorIn("multiSolver::findClosestGlobalTime")
@@ -169,7 +169,7 @@ Foam::timeCluster Foam::multiSolver::findClosestLocalTime
         tclDummy = tcl.selectiveSubList(findMaxSuperLoopIndices(tcl));
         tclPtr = & tclDummy;
     }
-    
+
     for (label i = 0; i < tclPtr->size(); i++)
     {
         if (!tclPtr->operator[](i).times().size()) continue;
@@ -205,7 +205,7 @@ Foam::timeCluster Foam::multiSolver::findClosestLocalTime
         // "initial" directory is the only match
         best = initial;
     }
-    
+
     if (best == -1)
     {
         if (minDiff != -1)
@@ -215,7 +215,7 @@ Foam::timeCluster Foam::multiSolver::findClosestLocalTime
         }
         else
         {
-        
+
             FatalErrorIn("multiSolver::findClosestLocalTime")
                 << "The timeClusterList passed to this function has no non-"
                 << "empty instantLists.  Use timeClusterList::purgeEmpties "
@@ -223,7 +223,7 @@ Foam::timeCluster Foam::multiSolver::findClosestLocalTime
                 << abort(FatalError);
         }
     }
-    
+
     label timeIndex
     (
         Time::findClosestTimeIndex
@@ -251,13 +251,13 @@ Foam::timeCluster Foam::multiSolver::findLatestGlobalTime
     timeCluster bestMax(0);
 
     timeCluster currentMax;
-    
+
     forAll(tcl, i)
     {
         if (tcl[i].times().size() == 0) continue;
-        
+
         currentMax = tcl[i](tcl[i].globalMaxIndex());
-        if 
+        if
         (
             (currentMax.globalValue(0) > bestMax.globalValue(0))
          || (
@@ -306,7 +306,7 @@ Foam::timeCluster Foam::multiSolver::findLatestLocalTime
     {
         if (tclPtr->operator[](i).times().size() == 0) continue;
 
-        currentMax = 
+        currentMax =
             tclPtr->operator[](i)(tclPtr->operator[](i).localMaxIndex());
 
         if
@@ -330,7 +330,7 @@ Foam::timeCluster Foam::multiSolver::findLatestLocalTime
             << " return value to prevent this."
             << abort(FatalError);
     }
-    
+
     return bestMax;
 }
 
@@ -507,7 +507,7 @@ Foam::timeCluster Foam::multiSolver::readSuperLoopTimes
         currentPath/"multiSolverTime"
     );
     IFstream mstFile(mstFileName);
-    
+
     bool mstFileGood(false);
     scalar globalOffset(0);
 
@@ -549,7 +549,7 @@ Foam::timeClusterList Foam::multiSolver::readSolverDomainTimes
 {
     timeClusterList tcl(0);
     label nTimeClusters(0);
-    
+
     fileName locale;
     if (processor.size())
     {
@@ -563,9 +563,9 @@ Foam::timeClusterList Foam::multiSolver::readSolverDomainTimes
     (
         multiDictRegistry_.path()/locale/solverDomain
     );
-    
+
     labelList superLoopList(multiSolver::findSuperLoops(currentPath));
-    
+
     // Loop through superLoopList, check for valid data, store in tcl
     forAll(superLoopList, sl)
     {
@@ -576,7 +576,7 @@ Foam::timeClusterList Foam::multiSolver::readSolverDomainTimes
 
         // If there are no time directories, ignore this superLoop
         if (tc.times().size() == 0) continue;
-        
+
         // Store timeCluster
         tcl.setSize(++nTimeClusters);
         tcl[nTimeClusters - 1] = tc;
@@ -627,7 +627,7 @@ bool Foam::multiSolver::loadTimeClusterList
         (
             currentPath/il[Time::findClosestTimeIndex(il, -1.0)].name()
         );
-        
+
         if
         (
             loadStoreFields
@@ -644,14 +644,14 @@ bool Foam::multiSolver::loadTimeClusterList
         {
             storeFields.clear();
         }
-        
+
         forAll(tcl[i].times(), j)
         {
             fileName storeFieldsDestination
             (
                 multiDictRegistry_.path()/tcl[i].times()[j].name()
             );
-            
+
             cp
             (
                 currentPath/tcl[i].times()[j].name(),
@@ -664,7 +664,7 @@ bool Foam::multiSolver::loadTimeClusterList
                 (
                     tcl[i].globalValue(j)
                 );
-                
+
                 mv
                 (
                     multiDictRegistry_.path()/tcl[i].times()[j].name(),
@@ -719,14 +719,14 @@ void Foam::multiSolver::archiveTimeDirs
     {
         labelList allSL(findSuperLoops(archivePath.path()));
         label currentSL(atoi(archivePath.name().c_str()));
-        
+
         sort(allSL);
         label i = 0;
         while (allSL[i] < currentSL)
         {
             i++;
         }
-        
+
         for (label j = 1; j <= (i - purgeWrite); j++)
         {
             rmDir(archivePath.path()/name(allSL[j]));

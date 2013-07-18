@@ -128,7 +128,7 @@ tmp<fvsPatchField<Type> > fvsPatchField<Type>::New
         }
     }
 
-    if 
+    if
     (
         !dict.found("patchType")
      || word(dict.lookup("patchType")) != p.type()

@@ -26,7 +26,7 @@ Class
     volSurfaceMapping
 
 Description
-    Volume to surface and surface to volume mapping 
+    Volume to surface and surface to volume mapping
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved

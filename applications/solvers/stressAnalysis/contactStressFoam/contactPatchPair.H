@@ -26,7 +26,7 @@ Class
     contactPatchPair
 
 Description
-    
+
 SourceFiles
     contactPatchPair.C
     contactPatchPairSlavePressure.C

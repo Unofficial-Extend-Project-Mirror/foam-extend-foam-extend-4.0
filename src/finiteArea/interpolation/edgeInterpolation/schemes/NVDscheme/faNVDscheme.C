@@ -162,15 +162,15 @@ tmp<edgeScalarField> faNVDscheme<Type,NVDweight>::weights
             vectorField CP = mesh.areaCentres().boundaryField()[patchI]
                 .patchInternalField();
 
-            vectorField CN = 
+            vectorField CN =
                 mesh.areaCentres().boundaryField()[patchI]
                 .patchNeighbourField();
 
-            vectorField nP = 
+            vectorField nP =
                 mesh.faceAreaNormals().boundaryField()[patchI]
                .patchInternalField();
 
-            vectorField nN = 
+            vectorField nN =
                 mesh.faceAreaNormals().boundaryField()[patchI]
                .patchNeighbourField();
 
@@ -180,7 +180,7 @@ tmp<edgeScalarField> faNVDscheme<Type,NVDweight>::weights
             forAll(pWeights, edgeI)
             {
                 vector d = vector::zero;
-                
+
                 if(pEdgeFlux[edgeI] > 0)
                 {
                     d = CN[edgeI] - CP[edgeI];

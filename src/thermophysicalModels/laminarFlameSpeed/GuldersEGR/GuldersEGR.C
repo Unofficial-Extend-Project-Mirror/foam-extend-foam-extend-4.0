@@ -209,7 +209,7 @@ Foam::laminarFlameSpeedModels::GuldersEGR::Su0pTphi
 Foam::tmp<Foam::volScalarField>
 Foam::laminarFlameSpeedModels::GuldersEGR::operator()() const
 {
-    if 
+    if
     (
         hhuCombustionThermo_.composition().contains("ft")
      && hhuCombustionThermo_.composition().contains("egr")

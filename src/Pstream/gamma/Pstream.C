@@ -307,10 +307,10 @@ bool Pstream::init(int& argc, char**& argv)
                 gamma_my_par_pid(), //unsigned char dest_par_pid,
                 myProcNo_,          //unsigned short dest_port,
                 handler,            //callback
-	        procNo,             //unsigned short semaphore,
-	        GO_BACK,            //unsigned char buffer_kind,
+                procNo,             //unsigned short semaphore,
+                GO_BACK,            //unsigned char buffer_kind,
                 buf.begin(),
-	        buf.size()
+                buf.size()
             );
         }
     }

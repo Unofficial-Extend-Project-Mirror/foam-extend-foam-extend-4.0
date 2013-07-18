@@ -128,7 +128,7 @@ tmp<Field<Type> > transformFaPatchField<Type>::gradientInternalCoeffs() const
 template<class Type>
 tmp<Field<Type> > transformFaPatchField<Type>::gradientBoundaryCoeffs() const
 {
-    return 
+    return
         snGrad()
       - cmptMultiply(gradientInternalCoeffs(), this->patchInternalField());
 }

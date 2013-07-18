@@ -130,7 +130,7 @@ public:
         // Evaluation functions
 
             //- Return neighbour field given internal cell data
-            //  This is a dummy function: returning patch values 
+            //  This is a dummy function: returning patch values
             //  due to scheduling issues in parallel communication.
             //  See processofFvPatchField for details HJ, 11/May/2009
             virtual tmp<Field<Type> > patchNeighbourField() const;

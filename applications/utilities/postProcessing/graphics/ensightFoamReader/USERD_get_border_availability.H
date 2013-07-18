@@ -8,8 +8,8 @@ int USERD_get_border_availability
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_border_availability for part_number " 
-        << part_number << endl 
+    Info << "Entering: USERD_get_border_availability for part_number "
+        << part_number << endl
         << flush;
 #endif
 

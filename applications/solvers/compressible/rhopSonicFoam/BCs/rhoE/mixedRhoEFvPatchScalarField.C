@@ -145,7 +145,7 @@ void mixedRhoEFvPatchScalarField::updateCoeffs()
 
     const volScalarField& T = db().lookupObject<volScalarField>("T");
     const label patchi = patch().index();
-    fvPatchScalarField& Tp = 
+    fvPatchScalarField& Tp =
         const_cast<fvPatchScalarField&>(T.boundaryField()[patchi]);
 
     Tp.evaluate();
@@ -164,7 +164,7 @@ void mixedRhoEFvPatchScalarField::updateCoeffs()
     refGrad() =
         rhop*Cv.value()*Tp.snGrad()
       + (
-            refValue() 
+            refValue()
           - (0.5*rhop.patchInternalField()*
                 magSqr(rhoUp.patchInternalField()/rhop.patchInternalField()))
         )*patch().deltaCoeffs();

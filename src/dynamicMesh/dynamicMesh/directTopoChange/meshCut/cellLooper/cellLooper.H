@@ -173,7 +173,7 @@ public:
         //  Cut along circumference is expressed as cellVertCut,
         //  cellEdgeToWeight. Returns true if succesfull. Still might not
         //  be compatible with existing cuts but this should be handled by
-        //  caller). 
+        //  caller).
         virtual bool cut
         (
             const vector& refDir,

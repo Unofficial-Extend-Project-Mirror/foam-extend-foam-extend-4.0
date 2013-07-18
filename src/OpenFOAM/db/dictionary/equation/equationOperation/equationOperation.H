@@ -149,7 +149,7 @@ private:
 
     // List to read the data from
     sourceListType sourceList_;
-    
+
     // Index in the list where the data is located.  Note, the
     // equationOperationLists created by equationReader make this variable a
     // 1-indexed (i.e. starts from 1, not zero) in order to use its sign to
@@ -157,16 +157,16 @@ private:
     // equationReader will constantly be adding / subtracting 1 to get these
     // to match
     label sourceIndex_;
-    
+
     // Rather than store the keywords that have to be searched in a dictionary,
     // equationReader keeps its own list of keywords, and the dictLookupIndex
     // is the index in this list.  This is only applicable if the sourceList is
     // of type sldictSource
     label dictLookupIndex_;
-    
+
     // The operation to be performed (+ - sin exp min, etc...)
     operationType operation_;
-    
+
     // A pointer to the source data retrieval function
     dimensionedScalar (Foam::equationReader::*getSourceFunction_)
     (
@@ -193,14 +193,14 @@ private:
 public:
 
     // Static data members
-    
+
         static const char* const typeName;
 
     // Constructors
 
         //- Construct null
         equationOperation();
-        
+
         //- Construct from components
         equationOperation
         (
@@ -235,33 +235,33 @@ public:
     // Member functions
 
         // Access
-        
+
             //- Const access to source list
             inline const sourceListType& sourceList() const;
-            
+
             //- Access to source list
             inline sourceListType& sourceList();
 
             //- Const access to source index
             inline const label& sourceIndex() const;
-            
+
             //- Access to source index
             inline label& sourceIndex();
 
             //- Const access to dictionary lookup name index
             inline const label& dictLookupIndex() const;
-            
+
             //- Access to dictionary lookup name index
             inline label& dictLookupIndex();
 
             //- Const access to operation
             inline const operationType& operation() const;
-            
+
             //- Access to operation
             inline operationType& operation();
 
         // Function pointers
-            
+
             //- Assign the operation function
             void assignSourceFunction
             (
@@ -288,7 +288,7 @@ public:
                     dimensionedScalar
                 )
             );
-            
+
             //- Call the getSource function
             dimensionedScalar getSourceFunction
             (
@@ -312,7 +312,7 @@ public:
             );
 
         // Convenience
-                    
+
             //- Look up operation number, given a word
             static operationType findOp(const word& opName);
 
@@ -322,12 +322,12 @@ public:
             //- Look up sourceList name
             static word sourceName(const sourceListType& sl);
 
-    
+
     // Friend IOstream Operators
 
         friend Istream& operator>>(Istream&, equationOperation&);
         friend Ostream& operator<<(Ostream&, const equationOperation&);
-      
+
 };
 
 

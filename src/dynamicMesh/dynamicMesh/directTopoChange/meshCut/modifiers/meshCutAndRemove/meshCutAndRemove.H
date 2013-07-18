@@ -27,7 +27,7 @@ Class
 
 Description
     like meshCutter but also removes non-anchor side of cell.
-    
+
 SourceFiles
     meshCutAndRemove.C
 
@@ -130,7 +130,7 @@ class meshCutAndRemove
             const label patchID
         );
 
-        //- Modifies existing faceI for either new owner/neighbour or 
+        //- Modifies existing faceI for either new owner/neighbour or
         //  new face points. Checks if anything changed and flips face
         //  if owner>neighbour
         void modFace

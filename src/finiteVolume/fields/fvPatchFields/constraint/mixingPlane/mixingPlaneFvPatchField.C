@@ -173,7 +173,7 @@ const scalarField& mixingPlaneFvPatchField<Type>::fluxMask() const
     if (!this->updated())
     {
         // Force recalculation of flux masks
-        calcFluxMask();        
+        calcFluxMask();
     }
 
     return fluxMask_;
@@ -455,7 +455,7 @@ void mixingPlaneFvPatchField<Type>::initEvaluate
     // as the masking and weighting is taken into account in
     // patchNeighbourField.  HJ, 4/Feb/2013
 
-    const scalarField& w = this->patch().weights();            
+    const scalarField& w = this->patch().weights();
 
     if
     (

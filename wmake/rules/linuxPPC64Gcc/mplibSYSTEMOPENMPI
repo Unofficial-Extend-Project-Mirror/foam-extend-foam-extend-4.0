@@ -1,1 +1,1 @@
-../linux64Gcc/mplibSYSTEMOPENMPI
+PFLAGS     = -DOMPI_SKIP_MPICXX

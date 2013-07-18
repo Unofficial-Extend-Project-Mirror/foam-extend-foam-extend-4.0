@@ -105,7 +105,6 @@ void Foam::simpleTwoStroke::addZonesAndModifiers()
 
         bool foundAtLeastOne = false;
         scalar zHigher = GREAT;
-        scalar zLower = GREAT;
         scalar dh = GREAT;
         scalar dl = GREAT;
 
@@ -127,7 +126,6 @@ void Foam::simpleTwoStroke::addZonesAndModifiers()
                 {
                     if (zPistV - zc > 0 && zPistV - zc < dl)
                     {
-                        zLower = zc;
                         dl = zPistV - zc;
                     }
 

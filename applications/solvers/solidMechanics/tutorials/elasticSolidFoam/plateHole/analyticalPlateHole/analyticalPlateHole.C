@@ -26,7 +26,7 @@ Description
     Generate analytical solution for a infinite plaste with a circular
     hole.
     Stress field sigma is generated.
-    Based on solution outlined in Timoshenko, Theory of Elasticity. 
+    Based on solution outlined in Timoshenko, Theory of Elasticity.
 
 Author
     plateHoleSolution function by Z. Tukovic
@@ -52,52 +52,52 @@ int main(int argc, char *argv[])
 
 #   include "createMesh.H"
 
-  runTime++;
+    runTime++;
 
-  Info << "Writing analytical solution for an infinite plate with a circular hole,\nwhere"
-       << "\n\tradius = 0.5"
-       << "\n\tdistant traction = (10,000 0 0 )"
-       << nl << endl;
- 
-  volSymmTensorField sigma
+    Info << "Writing analytical solution for an infinite plate with a circular hole,\nwhere"
+        << "\n\tradius = 0.5"
+        << "\n\tdistant traction = (10,000 0 0 )"
+        << nl << endl;
+
+    volSymmTensorField sigma
     (
-     IOobject
-     (
-      "analyticalSigma",
-      runTime.timeName(),
-      mesh,
-      IOobject::NO_READ,
-      IOobject::AUTO_WRITE
-      ),
-     mesh,
-     dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
-     );
+        IOobject
+        (
+            "analyticalSigma",
+           runTime.timeName(),
+           mesh,
+           IOobject::NO_READ,
+           IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
+    );
 
-  const volVectorField& C = mesh.C();
+    const volVectorField& C = mesh.C();
 
-  forAll(sigma.internalField(), celli)
+    forAll(sigma.internalField(), celli)
     {
-      vector curR = vector(C[celli].x(), C[celli].y(), 0);
+        vector curR = vector(C[celli].x(), C[celli].y(), 0);
 
-      sigma.internalField()[celli] = plateHoleSolution(curR);
+        sigma.internalField()[celli] = plateHoleSolution(curR);
     }
 
-  forAll(sigma.boundaryField(), patchi)
+    forAll(sigma.boundaryField(), patchi)
     {
-      forAll(sigma.boundaryField()[patchi], facei)
-	{
-	  vector curR = vector(C.boundaryField()[patchi][facei].x(), C.boundaryField()[patchi][facei].y(), 0);
+        forAll(sigma.boundaryField()[patchi], facei)
+        {
+            vector curR = vector(C.boundaryField()[patchi][facei].x(), C.boundaryField()[patchi][facei].y(), 0);
 
-	  sigma.boundaryField()[patchi][facei] = plateHoleSolution(curR);
-	}
+            sigma.boundaryField()[patchi][facei] = plateHoleSolution(curR);
+        }
     }
 
-  Info << "Writing analytical sigma tensor" << endl;
-  sigma.write();
+    Info << "Writing analytical sigma tensor" << endl;
+    sigma.write();
 
-  Info << nl << "End" << endl;
-      
-  return 0;
+    Info << nl << "End" << endl;
+
+    return 0;
 }
 
 // ************************************************************************* //
@@ -116,7 +116,7 @@ symmTensor plateHoleSolution(const vector& C)
     coordinateSystem cs("polarCS", C, vector(0, 0, 1), C/mag(C));
 
     sigma.xx() =
-        T*(1 - sqr(a)/sqr(r))/2 
+        T*(1 - sqr(a)/sqr(r))/2
       + T*(1 + 3*pow(a,4)/pow(r,4) - 4*sqr(a)/sqr(r))*::cos(2*theta)/2;
 
     sigma.xy() =
@@ -125,7 +125,7 @@ symmTensor plateHoleSolution(const vector& C)
     sigma.yx() = sigma.xy();
 
     sigma.yy() =
-        T*(1 + sqr(a)/sqr(r))/2 
+        T*(1 + sqr(a)/sqr(r))/2
       - T*(1 + 3*pow(a,4)/pow(r,4))*::cos(2*theta)/2;
 
 
@@ -137,6 +137,6 @@ symmTensor plateHoleSolution(const vector& C)
     S.xx() = sigma.xx();
     S.xy() = sigma.xy();
     S.yy() = sigma.yy();
-    
+
     return S;
 }

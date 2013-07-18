@@ -48,7 +48,7 @@ void starMesh::mergeCoupleFacePoints()
     // merge set.  Once all cells (and thus points) are visited, go
     // through the renumbering list and for each merging point use the
     // label of the merge set as the new point label.
-    // This is VERY fancy. Use care if/when changing. 
+    // This is VERY fancy. Use care if/when changing.
 
     Info << endl << "Creating merge sets" << endl;
 
@@ -327,7 +327,7 @@ void starMesh::mergeCoupleFacePoints()
             // This should be OK as the compressed points list will always
             // have less points that the original lists.  Even if there is
             // no points removed, this will copy the list back onto itself
-            // 
+            //
             renumberPoints[pointI] = nUsedPoints;
             points_[nUsedPoints] = points_[pointI];
 

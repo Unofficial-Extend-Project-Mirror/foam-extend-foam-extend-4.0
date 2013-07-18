@@ -1,4 +1,4 @@
-/* ***************************************************************** 
+/* *****************************************************************
     MESQUITE -- The Mesh Quality Improvement Toolkit
 
     Copyright 2011 Oliver Borm
@@ -13,10 +13,10 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License 
+    You should have received a copy of the GNU Lesser General Public License
     (lgpl.txt) along with this library; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- 
+
     oli.borm@web.de
 
   ***************************************************************** */
@@ -45,7 +45,7 @@ namespace MESQUITE_NS
      */
    class VolumeRatioQualityMetric : public ElementQM
    {
-   public:     
+   public:
      VolumeRatioQualityMetric() {}
 
        //! virtual destructor ensures use of polymorphism during destruction
@@ -56,9 +56,9 @@ namespace MESQUITE_NS
 
      int get_negate_flag() const;
 
-     bool evaluate( PatchData& pd, 
-                    size_t handle, 
-                    double& value, 
+     bool evaluate( PatchData& pd,
+                    size_t handle,
+                    double& value,
                     MsqError& err );
 
    private:

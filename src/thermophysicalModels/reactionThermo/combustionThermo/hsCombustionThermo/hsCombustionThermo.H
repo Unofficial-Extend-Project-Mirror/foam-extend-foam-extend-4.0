@@ -93,7 +93,7 @@ public:
 
         static autoPtr<hsCombustionThermo> New(const fvMesh& mesh)
         {
-	        return New(mesh, mesh);
+            return New(mesh, mesh);
         }
 
         //- Select and check that package contains 'thermoType'

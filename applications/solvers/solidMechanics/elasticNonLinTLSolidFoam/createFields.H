@@ -25,7 +25,7 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-	symm(gradU) + 0.5*symm(gradU.T() & gradU)
+        symm(gradU) + 0.5*symm(gradU.T() & gradU)
     );
 
 //- second Piloa-Kirchhoff stress tensor

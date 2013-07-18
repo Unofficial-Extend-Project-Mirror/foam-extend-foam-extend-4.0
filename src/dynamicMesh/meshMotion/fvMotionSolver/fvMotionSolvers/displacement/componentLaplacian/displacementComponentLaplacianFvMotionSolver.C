@@ -328,7 +328,7 @@ void Foam::displacementComponentLaplacianFvMotionSolver::updateMesh
     forAll(newPoints0, pointI)
     {
         label oldPointI = mpm.pointMap()[pointI];
-    
+
         if (oldPointI >= 0)
         {
             label masterPointI = mpm.reversePointMap()[oldPointI];

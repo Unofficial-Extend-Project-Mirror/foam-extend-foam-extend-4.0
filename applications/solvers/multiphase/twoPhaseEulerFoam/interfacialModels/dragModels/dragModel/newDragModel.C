@@ -41,7 +41,7 @@ Foam::autoPtr<Foam::dragModel> Foam::dragModel::New
         interfaceDict.lookup("dragModel" + phasea.name())
     );
 
-    Info << "Selecting dragModel for phase " 
+    Info << "Selecting dragModel for phase "
         << phasea.name()
         << ": "
         << dragModelType << endl;

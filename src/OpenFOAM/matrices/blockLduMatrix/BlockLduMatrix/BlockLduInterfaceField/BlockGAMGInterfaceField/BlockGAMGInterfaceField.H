@@ -116,11 +116,11 @@ public:
             BlockLduInterfaceField<Type>(GAMGCp),
             interface_(GAMGCp)
         {}
-            
+
     // Member Functions
 
         // Interface matrix update
- 
+
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate
             (
@@ -149,7 +149,7 @@ public:
 
 
         // Interface block matrix update
- 
+
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate
             (

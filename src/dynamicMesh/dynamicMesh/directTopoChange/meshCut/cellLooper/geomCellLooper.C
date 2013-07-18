@@ -360,7 +360,7 @@ bool Foam::geomCellLooper::cut
                 }
                 else
                 {
-                    // Cut through edge end point. Might be duplicate 
+                    // Cut through edge end point. Might be duplicate
                     // since connected edge might also be snapped to same
                     // endpoint so only insert if unique.
                     label cut = vertToEVert(cutVertI);

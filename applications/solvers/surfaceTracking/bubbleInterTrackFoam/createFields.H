@@ -88,9 +88,9 @@ volScalarField& fluidIndicator = *fluidIndicatorPtr;
 
 rho = fluidIndicator
    *(
-        interface.rhoFluidA() 
+        interface.rhoFluidA()
       - interface.rhoFluidB()
-    ) 
+    )
   + interface.rhoFluidB();
 
 
@@ -106,9 +106,9 @@ volScalarField mu
     ),
     fluidIndicator
    *(
-        interface.muFluidA() 
+        interface.muFluidA()
       - interface.muFluidB()
-    ) 
+    )
   + interface.muFluidB()
 );
 

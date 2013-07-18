@@ -75,13 +75,13 @@ if (which_type == Z_PEN06)
 if (which_type == Z_PYR05)
 {
     const cellModel& pyr = *(cellModeller::lookup("pyr"));
-            
+
     label counter = 1;
     for (label n=0; n<nCells; n++)
     {
         const cellShape& cellShape = cellShapes[n];
         const cellModel& cellModel = cellShape.model();
-        
+
         if (cellModel == pyr)
         {
             var_array[counter++] = scalarField[n];

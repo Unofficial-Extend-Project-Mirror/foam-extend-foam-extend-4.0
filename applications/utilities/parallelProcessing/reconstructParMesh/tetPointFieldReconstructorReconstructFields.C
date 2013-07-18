@@ -260,7 +260,7 @@ tetPointFieldReconstructor::reconstructElementField
                     forAll(cp, faceI)
                     {
                         // Subtract one to take into account offsets for
-                        // face direction.  
+                        // face direction.
                         reverseAddressing[faceI] = cp[faceI] - 1
                             - curPatchStart;
                     }

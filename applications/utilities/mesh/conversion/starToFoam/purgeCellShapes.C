@@ -60,7 +60,7 @@ void starMesh::purgeCellShapes()
                 break;
             }
         }
-    }   
+    }
 }
 
 

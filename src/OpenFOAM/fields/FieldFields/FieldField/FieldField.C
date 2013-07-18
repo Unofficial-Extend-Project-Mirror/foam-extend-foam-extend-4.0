@@ -212,7 +212,7 @@ tmp<FieldField<Field, Type> > FieldField<Field, Type>::NewCalculatedType
     );
 
     forAll(*nffPtr, i)
-    { 
+    {
         nffPtr->set(i, Field<Type>::NewCalculatedType(ff[i]).ptr());
     }
 

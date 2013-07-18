@@ -160,7 +160,7 @@ inline Cmpt det(const SphericalTensor2D<Cmpt>& st)
 template <class Cmpt>
 inline SphericalTensor2D<Cmpt> inv(const SphericalTensor2D<Cmpt>& st)
 {
-    return SphericalTensor2D<Cmpt>(1.0/st.ii()); 
+    return SphericalTensor2D<Cmpt>(1.0/st.ii());
 }
 
 

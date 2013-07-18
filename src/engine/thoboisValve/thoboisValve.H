@@ -94,7 +94,7 @@ class thoboisValve
 
             //- Faces to detach
             //labelList detachFaces_;
-	    word detachFacesName_;
+            word detachFacesName_;
 
         // Valve lift data
 

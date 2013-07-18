@@ -27,19 +27,19 @@ contacts
       masterPatch                     bottomBrickUp;
       slavePatch                      topBrickDown;
       contactGapTol                   5e-8;
-      
+
       rigidMaster                     no;
       interpolationMethod             patchToPatch;
       //interpolationMethod             ggi;;
-      
+
       penaltyScaleFactor              4e5;
       returnScaleFactor               1.5;
-      
+
       projectionDir  contactSphere;
       projectionAlgo visible;
       penetrationLimit                -0.03;
       nContactSettleIterations        0;
-      
+
       smoothContactPatches            no;
       shearCorrection                 no;
       shearFactor                     1e9;

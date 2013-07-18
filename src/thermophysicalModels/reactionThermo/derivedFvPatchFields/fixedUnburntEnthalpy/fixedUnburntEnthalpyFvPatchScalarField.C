@@ -102,10 +102,10 @@ void fixedUnburntEnthalpyFvPatchScalarField::updateCoeffs()
     (
         "thermophysicalProperties"
     );
-    
+
     const label patchi = patch().index();
 
-    fvPatchScalarField& Tw = 
+    fvPatchScalarField& Tw =
         const_cast<fvPatchScalarField&>(thermo.Tu().boundaryField()[patchi]);
     Tw.evaluate();
     operator==(thermo.hu(Tw, patchi));

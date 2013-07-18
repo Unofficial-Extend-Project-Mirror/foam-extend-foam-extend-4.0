@@ -8,7 +8,7 @@ use File::Find ();
 #     find-junkFiles
 #
 # Description
-#     Search for "junk" files left over from editor, core, CVS, etc. 
+#     Search for "junk" files left over from editor, core, CVS, etc.
 #
 #     - print filename only
 #
@@ -16,12 +16,12 @@ use File::Find ();
 
 sub wanted {
     return unless -f $_;
-        
+
     if (
         m{^\.?.+~$} ## editor backup
         or m{^\#.+\#$}  ## editor autosave
         or m{^\.\#.+$}  ## cvs replace update (eg, ".#test.c.1.3")
-        or m{^core(\.\d+)?$} ## core dump        
+        or m{^core(\.\d+)?$} ## core dump
     ) {
         print "$File::Find::name\n";
     }

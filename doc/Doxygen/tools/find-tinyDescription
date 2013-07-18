@@ -46,7 +46,7 @@ sub wanted {
         if (/^Description\s*$/) {
             $_ = <>;
             ( $description = $_ ) =~ s{^\s+|\s+$}{}g;
-            
+
             # remove trailing punctuation as being noise
             $description =~ s{\s*[.,:]+$}{};
             last;
@@ -60,9 +60,9 @@ sub wanted {
         # description doesnt looks like a class name
         if (
             $description !~ m{^\w+(::\w+)+$}
-            and 
+            and
             (length $description < $minLength or $description =~ m{^\S+$})
-        ) {            
+        ) {
             print "$File::Find::name # $description\n";
         }
     }

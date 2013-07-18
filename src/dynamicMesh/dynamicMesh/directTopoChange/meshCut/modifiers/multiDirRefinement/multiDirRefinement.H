@@ -92,7 +92,7 @@ class multiDirRefinement
         //- Given map from original to added cell set the refineCell for
         //  the added cells to be equal to the one on the original cells.
         static void addCells(const Map<label>&, List<refineCell>&);
-        
+
         //- Given map from original to added cell set the vectorField for
         //  the added cells to be equal to the one on the original cells.
         static void update(const Map<label>&, vectorField&);

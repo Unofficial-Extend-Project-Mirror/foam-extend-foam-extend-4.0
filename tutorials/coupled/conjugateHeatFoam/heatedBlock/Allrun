@@ -3,6 +3,6 @@
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
 # Disabling the tutorial.
-# Using an exit code != 0 will still flag the tutorial as failed 
+# Using an exit code != 0 will still flag the tutorial as failed
 echo "Warning: This tutorial is disabled, as it is a part of another tutorial."
 exit 0

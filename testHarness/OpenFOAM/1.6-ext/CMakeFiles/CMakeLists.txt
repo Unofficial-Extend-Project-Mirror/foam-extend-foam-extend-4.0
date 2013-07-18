@@ -49,7 +49,7 @@ IF (NOT $ENV{CDASH_SUBMIT_LOCAL_HOST_ID} STREQUAL "")
     # $CDASH_SUBMIT_LOCAL_HOST_ID
     SET(
           SITENAME $ENV{CDASH_SUBMIT_LOCAL_HOST_ID}
-	  CACHE STRING "Name of the local site"
+          CACHE STRING "Name of the local site"
     )
 ELSE (NOT $ENV{CDASH_SUBMIT_LOCAL_HOST_ID} STREQUAL "")
     # Grab the hostname FQN; will be used for the sitename
@@ -81,16 +81,16 @@ SET(
 )
 
 # Find out the version of the compiler being used.
-# Add this information to the buildname 
+# Add this information to the buildname
 # This is for gcc or icc because they both support the -dumpversion option
 EXEC_PROGRAM($ENV{WM_CC}
   ARGS -dumpversion
   OUTPUT_VARIABLE COMPILER_VERSION
 )
-SET(BUILDNAME "${BUILDNAME}-$ENV{WM_CC}${COMPILER_VERSION}")  
+SET(BUILDNAME "${BUILDNAME}-$ENV{WM_CC}${COMPILER_VERSION}")
 #
 # We will support more compilers eventually.
-# 
+#
 
 # Timeout for running every single test: 4 hours: 4 x 3600 seconds
 #SET(
@@ -128,12 +128,12 @@ if(GIT_FOUND)
     if (GIT_BRANCH_NAME STREQUAL "")
        message("No git-branch. Mercurial?")
        EXEC_PROGRAM(hg
-	 ARGS branch
+     ARGS branch
          OUTPUT_VARIABLE GIT_BRANCH_NAME
        )
        message("Git branch (mercurial): ${GIT_BRANCH_NAME}")
     endif()
-    SET(BUILDNAME "${BUILDNAME}-git-branch=${GIT_BRANCH_NAME}")  
+    SET(BUILDNAME "${BUILDNAME}-git-branch=${GIT_BRANCH_NAME}")
 endif()
 
 # Some last minute cleanup
@@ -158,7 +158,7 @@ set_property(
 # Compile the OpenFOAM unit tests located under applications/test
 # This part will not be compiled and run by default.
 # This would be a good candidate for a sub-project
-add_custom_target (OpenFOAM-$ENV{WM_PROJECT_VERSION}_unitTests 
+add_custom_target (OpenFOAM-$ENV{WM_PROJECT_VERSION}_unitTests
   wmake all ${OF_ROOT}/applications/test
 )
 
@@ -184,7 +184,7 @@ IF(BUILD_TESTING)
 
     # Modify this variable if you want the full length test case simulations
     # Beware, this might take a long time to execute.
-    # Otherwise, the default behaviour is to run each tutorial for 1 "timestep" 
+    # Otherwise, the default behaviour is to run each tutorial for 1 "timestep"
     #SET(RUN_FROM_ONE_TIMESTEP 0)
     SET(RUN_FROM_ONE_TIMESTEP 1)
 

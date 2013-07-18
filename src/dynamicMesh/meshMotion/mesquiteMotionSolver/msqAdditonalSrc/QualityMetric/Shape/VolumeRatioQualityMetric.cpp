@@ -1,4 +1,4 @@
-/* ***************************************************************** 
+/* *****************************************************************
     MESQUITE -- The Mesh Quality Improvement Toolkit
 
     Copyright 2011 Oliver Borm
@@ -13,16 +13,16 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License 
+    You should have received a copy of the GNU Lesser General Public License
     (lgpl.txt) along with this library; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- 
+
     oli.borm@web.de
-   
+
   ***************************************************************** */
 /*!
   \file   VolumeRatioQualityMetric.cpp
-   
+
   \brief Evaluates the Volume Expansion Ratio metric for two- and
   three-diminsional elements.
   \author Oliver Borm
@@ -41,7 +41,7 @@ using namespace Mesquite;
 
 std::string VolumeRatioQualityMetric::get_name() const
   { return "VolumeRatio"; }
-  
+
 int VolumeRatioQualityMetric::get_negate_flag() const
   { return -1; }
 
@@ -80,7 +80,7 @@ bool VolumeRatioQualityMetric::evaluate(PatchData &pd,
 //   // 1 = connected by lines for 2D elements; 2 = connected by faces for 3D elements
 //   pd.get_adjacent_entities_via_n_dim(connectDimension,elem_index,neighbourElementsNew,err);
 //   MSQ_ERRZERO(err);
-// 
+//
 //   std::cout << "neighbourElementsNew: ";
 //   for (size_t cellI=0; cellI < neighbourElementsNew.size(); cellI++)
 //   {

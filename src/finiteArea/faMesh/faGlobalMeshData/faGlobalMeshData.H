@@ -125,7 +125,7 @@ public:
                 return sharedPointAddr_;
             }
 
-            //- Change global mesh data given a topological change. 
+            //- Change global mesh data given a topological change.
             void updateMesh();
 };
 

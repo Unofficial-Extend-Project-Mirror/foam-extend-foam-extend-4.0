@@ -394,7 +394,7 @@ void Foam::meshWriters::STARCD::writeBoundary(const fileName& prefix) const
         label regionId = patchI;
         if (regionId == defaultId)
         {
-            continue;	// skip - already written
+            continue;    // skip - already written
         }
         else if (defaultId == -1 || regionId < defaultId)
         {

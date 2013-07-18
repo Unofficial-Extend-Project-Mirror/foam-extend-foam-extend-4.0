@@ -35,9 +35,9 @@ Foam::autoPtr<Foam::radialModel> Foam::radialModel::New
 {
     word radialModelType(dict.lookup("radialModel"));
 
-    Info<< "Selecting radialModel " 
+    Info<< "Selecting radialModel "
         << radialModelType << endl;
-        
+
     dictionaryConstructorTable::iterator cstrIter =
         dictionaryConstructorTablePtr_->find(radialModelType);
 

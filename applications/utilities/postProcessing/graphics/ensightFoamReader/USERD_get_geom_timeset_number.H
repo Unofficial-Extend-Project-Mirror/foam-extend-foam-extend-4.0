@@ -4,7 +4,7 @@ int USERD_get_geom_timeset_number
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_geom_timeset_number" << endl 
+    Info << "Entering: USERD_get_geom_timeset_number" << endl
         << flush;
 #endif
 

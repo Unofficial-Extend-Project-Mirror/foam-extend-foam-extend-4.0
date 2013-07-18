@@ -35,9 +35,9 @@ Foam::autoPtr<Foam::frictionalStressModel> Foam::frictionalStressModel::New
 {
     word frictionalStressModelType(dict.lookup("frictionalStressModel"));
 
-    Info<< "Selecting frictionalStressModel " 
+    Info<< "Selecting frictionalStressModel "
         << frictionalStressModelType << endl;
-        
+
     dictionaryConstructorTable::iterator cstrIter =
         dictionaryConstructorTablePtr_->find(frictionalStressModelType);
 

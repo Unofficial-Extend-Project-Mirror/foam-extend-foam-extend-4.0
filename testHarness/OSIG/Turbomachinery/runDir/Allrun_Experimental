@@ -35,10 +35,10 @@
 
 # Environment variable : BREEDER_15_DIR:
 #
-# This environment variable must point to the location of the Breeder_1.5 section 
+# This environment variable must point to the location of the Breeder_1.5 section
 # of your local working copy of the openfoam-extend Subversion repository
 #
-# Something like this: 
+# Something like this:
 #
 # export BREEDER_15_DIR=/someAbsolutePath/Breeder_1.5
 
@@ -54,7 +54,7 @@ export FOAM_TEST_HARNESS_DIR=$(dirname $PWD)
 if [ ! -n "${BREEDER_15_DIR}" ]
 then
     echo "Warning:"
-    echo "  Missing environment variable \$BREEDER_15_DIR. Stopping." 
+    echo "  Missing environment variable \$BREEDER_15_DIR. Stopping."
     echo "  Please make sure to initialize this environment variable to "
     echo "  the directory where you have installed the Breeder_1.5 section "
     echo "  of the openfoam-extend Subversion repository"
@@ -65,7 +65,7 @@ fi
 if [ -z "$WM_PROJECT_DIR" ]
 then
     echo "Warning:"
-    echo "  Missing environment variable \$WM_PROJECT_DIR. Stopping." 
+    echo "  Missing environment variable \$WM_PROJECT_DIR. Stopping."
     echo "  Please make sure your OpenFOAM environment is properly set up."
     exit -1
 fi
@@ -74,8 +74,8 @@ fi
 if [ ! -e $BREEDER_OSIG_TURBOMACHINERY_DIR/CMakeLists.txt ]
 then
     echo "Warning:"
-    echo "  Missing file: CMakeLists.txt under \$BREEDER_15_DIR/OSIG/TurboMachinery. Stopping." 
-    echo "  A copy of CMakeLists.txt is available under $FOAM_TEST_HARNESS_DIR/CMakeFiles." 
+    echo "  Missing file: CMakeLists.txt under \$BREEDER_15_DIR/OSIG/TurboMachinery. Stopping."
+    echo "  A copy of CMakeLists.txt is available under $FOAM_TEST_HARNESS_DIR/CMakeFiles."
     echo "  Please make a copy of this file under the directory \$BREEDER_15_DIR/OSIG/TurboMachinery."
     exit -1
 fi
@@ -84,9 +84,9 @@ fi
 if [ ! -e $BREEDER_OSIG_TURBOMACHINERY_DIR/CTestConfig.cmake ]
 then
     echo "Warning:"
-    echo "  Missing file: CTestConfig.cmake under \$BREEDER_OSIG_TURBOMACHINERY_DIR. Stopping." 
-    echo "  A copy of CTestConfig.cmake for openfoam-extend is available under $FOAM_TEST_HARNESS_DIR/CMakeFiles." 
-    echo "  For a copy of CTestConfig.cmake for your local CDash server, contact your local CDash admin." 
+    echo "  Missing file: CTestConfig.cmake under \$BREEDER_OSIG_TURBOMACHINERY_DIR. Stopping."
+    echo "  A copy of CTestConfig.cmake for openfoam-extend is available under $FOAM_TEST_HARNESS_DIR/CMakeFiles."
+    echo "  For a copy of CTestConfig.cmake for your local CDash server, contact your local CDash admin."
     echo "  Please make a copy of this file under \$BREEDER_OSIG_TURBOMACHINERY_DIR/CTestConfig.cmake."
     exit -1
 fi
@@ -103,7 +103,7 @@ cmake $BREEDER_OSIG_TURBOMACHINERY_DIR
 # Will do: ExperimentalConfigure + ExperimentalBuild + ExperimentalTest + ExperimentalSubmit
 make Experimental
 
-# Nightly testing 
+# Nightly testing
 # Will do: NightlyUpdate + NightylConfigure + NightlyBuild + NightlyTest + NightlySubmit
 # make Nightly
 

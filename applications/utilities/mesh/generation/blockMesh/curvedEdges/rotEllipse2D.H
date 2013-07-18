@@ -67,7 +67,7 @@ class rotEllipse2D
     // Scaling Factor
     scalar scale_;
 
-    class func 
+    class func
     {
         scalar x1_, x2_, y1_, y2_, eFactor_;
 

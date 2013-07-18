@@ -5,7 +5,7 @@ int USERD_get_number_of_materials
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_number_of_materials" << endl 
+    Info << "Entering: USERD_get_number_of_materials" << endl
         << flush;
 #endif
 

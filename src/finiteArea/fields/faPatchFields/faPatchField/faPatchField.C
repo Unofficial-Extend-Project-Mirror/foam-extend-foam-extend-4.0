@@ -217,7 +217,7 @@ void faPatchField<Type>::evaluate(const Pstream::commsTypes)
     {
         updateCoeffs();
     }
-    
+
     updated_ = false;
 }
 

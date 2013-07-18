@@ -29,7 +29,7 @@ boundaryField
     {
         type            fixedGradient;
         gradient        uniform 0;
-	    value           uniform 0;
+        value           uniform 0;
     }
     freeSurface
     {

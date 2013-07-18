@@ -16,9 +16,9 @@ object              faSolution;
 
 solvers
 {
-	p ICCG  1e-6 0.0;
-	U BICCG 1e-5 0.0;
-	Cs BICCG  1e-6 0.0;
+    p ICCG  1e-6 0.0;
+    U BICCG 1e-5 0.0;
+    Cs BICCG  1e-6 0.0;
 }
 
 PISO

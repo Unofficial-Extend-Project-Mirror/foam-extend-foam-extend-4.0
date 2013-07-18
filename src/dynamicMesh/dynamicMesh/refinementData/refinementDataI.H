@@ -223,7 +223,7 @@ inline bool Foam::refinementData::updateFace
 
         return true;
     }
-}    
+}
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //

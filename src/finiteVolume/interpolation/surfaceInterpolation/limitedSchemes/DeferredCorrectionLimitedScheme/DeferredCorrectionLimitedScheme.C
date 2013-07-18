@@ -97,7 +97,7 @@ DeferredCorrectionLimitedScheme<Type, Limiter, LimitFunc>::limiter
     // Note: in order for the patchNeighbourField to be correct on coupled
     // boundaries, correctBoundaryConditions needs to be called.
     // The call shall be moved into the library fvc operators
-    gradc.correctBoundaryConditions(); 
+    gradc.correctBoundaryConditions();
 
     const surfaceScalarField& CDweights = mesh.surfaceInterpolation::weights();
 

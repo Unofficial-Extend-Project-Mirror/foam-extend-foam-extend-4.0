@@ -308,7 +308,7 @@ tensor eigenVectors(const tensor& t)
             // Rotate x into z
             yVec = vector(zVec.z(), zVec.y(), -zVec.x());
         }
-            
+
         vector xVec = yVec ^ zVec;
 
         // Note different return
@@ -551,7 +551,7 @@ tensor eigenVectors(const symmTensor& t)
             // Rotate x into z
             yVec = vector(zVec.z(), zVec.y(), -zVec.x());
         }
-            
+
         vector xVec = yVec ^ zVec;
 
         // Note different return

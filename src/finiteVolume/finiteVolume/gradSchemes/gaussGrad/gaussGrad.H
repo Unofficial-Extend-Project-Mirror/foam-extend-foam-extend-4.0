@@ -116,7 +116,7 @@ public:
 
     // Member Functions
 
-        //- Return the gradient of the given field 
+        //- Return the gradient of the given field
         //  calculated using Gauss' theorem on the given surface field
         static
         tmp

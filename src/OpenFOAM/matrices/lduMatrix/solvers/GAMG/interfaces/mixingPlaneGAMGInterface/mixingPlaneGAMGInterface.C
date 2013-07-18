@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved  
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 Contributor
     Martin Beaudoin, Hydro-Quebec, 2009.
@@ -81,7 +81,6 @@ Foam::tmp<Foam::scalarField> Foam::mixingPlaneGAMGInterface::agglomerateCoeffs
     // AMG agglomeration missing
     notImplemented("mixingPlaneGAMGInterface::agglomerateCoeffs");
     tmp<scalarField> tcoarseCoeffs(new scalarField(size(), 0.0));
-    scalarField& coarseCoeffs = tcoarseCoeffs();
 
     return tcoarseCoeffs;
 }

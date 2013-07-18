@@ -89,7 +89,7 @@ Foam::scalar Foam::bilinearCohesiveLaw::traction(scalar delta) const
 
     else if (delta > delta1().value())
     {
-        return sigma1().value()*(1.0 - (delta-delta1().value())/(deltaC().value()-delta1().value()));      
+        return sigma1().value()*(1.0 - (delta-delta1().value())/(deltaC().value()-delta1().value()));
     }
 
     return sigmaMax().value() + (sigma1().value()-sigmaMax().value())*delta/delta1().value();

@@ -52,11 +52,11 @@ int main(int argc, char *argv[])
     const cellZoneMesh& cellZones = mesh.cellZones();
 
     forAll(cellZones, zonei)
-      {
-	Info << "\tCell zone " << cellZones[zonei].name()
-	     << " with " << cellZones[zonei].size() << " cells"
-	     << endl;
-      }
+    {
+        Info << "\tCell zone " << cellZones[zonei].name()
+            << " with " << cellZones[zonei].size() << " cells"
+            << endl;
+    }
 
     Info << "\nCreating materials field\n" << endl;
 
@@ -79,27 +79,27 @@ int main(int argc, char *argv[])
     //- and so on and then any cell not in a cellZone will be left as
     //- cellZones.size()
     scalarField& materialsI = materials.internalField();
-    
-    forAll(cellZones, zonei)
-      {
-	labelList zoneCells = cellZones[zonei];
 
-	forAll(zoneCells, celli)
-	  {
-	    const label& ci = zoneCells[celli];
-	    materialsI[ci] = zonei;
-	  }
-      }
+    forAll(cellZones, zonei)
+    {
+        labelList zoneCells = cellZones[zonei];
+
+        forAll(zoneCells, celli)
+        {
+            const label& ci = zoneCells[celli];
+            materialsI[ci] = zonei;
+        }
+    }
 
     materials.correctBoundaryConditions();
 
     //- check all cells have been set
     if(max(materialsI) == cellZones.size())
-      {
-	Warning << "There are cells which are not in a cellZone"
-		", their material field is set to "
-		<< cellZones.size() << endl;
-      }
+    {
+        Warning << "There are cells which are not in a cellZone"
+            ", their material field is set to "
+            << cellZones.size() << endl;
+    }
 
     Info << "\nWriting materials field\n" << endl;
     materials.write();

@@ -23,7 +23,7 @@
 #     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 # Description
-#        CMakeLists.txt file for implementing a test harness for the 
+#        CMakeLists.txt file for implementing a test harness for the
 #        Turbomachinery OSIG test cases
 #
 #        The results will be submitted to the CDash server identified by the file
@@ -49,7 +49,7 @@ IF (NOT $ENV{CDASH_SUBMIT_LOCAL_HOST_ID} STREQUAL "")
     # $CDASH_SUBMIT_LOCAL_HOST_ID
     SET(
           SITENAME $ENV{CDASH_SUBMIT_LOCAL_HOST_ID}
-	  CACHE STRING "Name of the local site"
+          CACHE STRING "Name of the local site"
     )
 ELSE (NOT $ENV{CDASH_SUBMIT_LOCAL_HOST_ID} STREQUAL "")
     # Grab the hostname FQN; will be used for the sitename
@@ -81,18 +81,18 @@ SET(
 )
 
 # Find out the version of the compiler being used.
-# Add this information to the buildname 
-# This is for gcc 
+# Add this information to the buildname
+# This is for gcc
 IF(CMAKE_COMPILER_IS_GNUCC)
   EXEC_PROGRAM(${CMAKE_CXX_COMPILER}
     ARGS -dumpversion
     OUTPUT_VARIABLE COMPILER_VERSION
   )
-  SET(BUILDNAME "${BUILDNAME}-gcc${COMPILER_VERSION}")  
+  SET(BUILDNAME "${BUILDNAME}-gcc${COMPILER_VERSION}")
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
 #
 # We will support more compilers eventually.
-# 
+#
 
 # Timeout for running all this: 4 hours: 4 x 3600 seconds
 SET(
@@ -165,7 +165,7 @@ set_property(
 )
 
 add_custom_target (Turbo_Apps-SingleChannelPump-initalizeRotation-$ENV{WM_PROJECT_VERSION} ALL
-  wmake 
+  wmake
   WORKING_DIRECTORY ${TURBOMACHINERY_OSIG_ROOT}/singleChannelPump/initializeRotation
 )
 set_property(
@@ -200,7 +200,7 @@ IF(BUILD_TESTING)
 
     # Modify this variable if you want the full length test case simulations
     # Beware, this might take a long time to execute.
-    # Otherwise, the default behaviour is to run each test case for 1 "timestep" 
+    # Otherwise, the default behaviour is to run each test case for 1 "timestep"
     #SET(RUN_FROM_ONE_TIMESTEP 0)
     SET(RUN_FROM_ONE_TIMESTEP 1)
 

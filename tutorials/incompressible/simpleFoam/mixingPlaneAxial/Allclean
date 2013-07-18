@@ -1,5 +1,5 @@
 #!/bin/bash
-# 
+#
 # Source clean functions
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions
 

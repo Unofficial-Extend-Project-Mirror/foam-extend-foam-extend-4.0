@@ -61,151 +61,151 @@ Author
 
 int main(int argc, char *argv[])
 {
-# include "setRootCase.H"
+#   include "setRootCase.H"
 
-# include "createTime.H"
+#   include "createTime.H"
 
-# include "createMesh.H"
+#   include "createMesh.H"
 
-# include "createFields.H"
+#   include "createFields.H"
 
-# include "readDivDSigmaExpMethod.H"
+#   include "readDivDSigmaExpMethod.H"
 
-# include "readDivDSigmaLargeStrainExpMethod.H"
+#   include "readDivDSigmaLargeStrainExpMethod.H"
 
-# include "readMoveMeshMethod.H"
+#   include "readMoveMeshMethod.H"
 
-# include "createSolidInterface.H"
+#   include "createSolidInterface.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-  Info << "\nStarting time loop\n" << endl;
-     
-  for (runTime++; !runTime.end(); runTime++)
+    Info << "\nStarting time loop\n" << endl;
+
+    for (runTime++; !runTime.end(); runTime++)
     {
-      Info<< "Time: " << runTime.timeName() << nl << endl;
-      
-#     include "readStressedFoamControls.H"
+        Info<< "Time: " << runTime.timeName() << nl << endl;
 
-      int iCorr = 0;
-      lduMatrix::solverPerformance solverPerf;
-      scalar initialResidual = 0;
-      scalar relativeResidual = GREAT;
-      lduMatrix::debug = 0;
-      
-      const volSymmTensorField& DEpsilonP = rheology.DEpsilonP();
-            
-      do
-	{
-	  DU.storePrevIter();
+#       include "readStressedFoamControls.H"
 
-	  divDSigmaLargeStrainExp.storePrevIter();
+        int iCorr = 0;
+        lduMatrix::solverPerformance solverPerf;
+        scalar initialResidual = 0;
+        scalar relativeResidual = GREAT;
+        lduMatrix::debug = 0;
 
-#         include "calculateDivDSigmaExp.H"
-	  
-#         include "calculateDivDSigmaLargeStrainExp.H"
-	  	  
-	  //----------------------------------------------------//
-	  //- updated lagrangian large strain momentum equation
-	  //----------------------------------------------------//	  
-	  fvVectorMatrix DUEqn
-	    (
-	     fvm::d2dt2(rho, DU)
-	     ==
-	     fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
-	     + divDSigmaExp
-	     + divDSigmaLargeStrainExp
-	     - fvc::div(2*muf*(mesh.Sf() & fvc::interpolate(DEpsilonP)))
-	     );
-	  
-	  if(solidInterfaceCorr)
-	    {
-	      solidInterfacePtr->correct(DUEqn);
-	    }
+        const volSymmTensorField& DEpsilonP = rheology.DEpsilonP();
 
-	  solverPerf = DUEqn.solve();
-	  
-	  if(iCorr == 0)
-	    {
-	      initialResidual = solverPerf.initialResidual();
-	    }
-	  
-	  DU.relax();
-	  
-	  if(solidInterfaceCorr)
-	    {
-	      gradDU = solidInterfacePtr->grad(DU);
-	    }
-	  else
-	    {
-	      gradDU = fvc::grad(DU);
-	    }
-	  
-	  DF = gradDU.T();
-	  
-#         include "calculateRelativeResidual.H"
-	  
-	  rheology.correct();
-	  mu = rheology.newMu();
-	  lambda = rheology.newLambda();
-	  muf = fvc::interpolate(rheology.newMu());
-	  lambdaf = fvc::interpolate(rheology.newLambda());
-	  if(solidInterfaceCorr)
-	    {
-	      solidInterfacePtr->modifyProperties(muf, lambdaf);
-	    }
-	  
-#         include "calculateDEpsilonDSigma.H"
+        do
+        {
+            DU.storePrevIter();
 
-	  Info << "\tTime " << runTime.value()
-	       << ", Corrector " << iCorr
-	       << ", Solving for " << DU.name()
-	       << " using " << solverPerf.solverName()
-	       << ", residual = " << solverPerf.initialResidual()
-	       << ", relative residual = " << relativeResidual << endl;
-	}
-      while
-	(
-	 //relativeResidual
-	 solverPerf.initialResidual() > convergenceTolerance 
-	 && ++iCorr < nCorr
-	 );
-      
-      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name() 
-	   << ", Initial residual = " << initialResidual 
-	   << ", Final residual = " << solverPerf.initialResidual()
-	   << ", No outer iterations " << iCorr << endl;
-      
-      lduMatrix::debug = 1;
-      
-      U += DU;
-      
-      epsilon += DEpsilon;
-      
-      epsilonP += DEpsilonP;
-      
-      volSymmTensorField DEpsilonE = DEpsilon - DEpsilonP;
-      
-      epsilonE += DEpsilonE;
-      
-      sigma += DSigma;
-      
-      rheology.updateYieldStress();
-      
-#     include "rotateFields.H"
-      
-#     include "moveMesh.H"
-      
-#     include "writeFields.H"
-      
-      Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	  << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-	  << nl << endl;
+            divDSigmaLargeStrainExp.storePrevIter();
+
+#           include "calculateDivDSigmaExp.H"
+
+#           include "calculateDivDSigmaLargeStrainExp.H"
+
+            //----------------------------------------------------//
+            //- updated lagrangian large strain momentum equation
+            //----------------------------------------------------//
+            fvVectorMatrix DUEqn
+            (
+                fvm::d2dt2(rho, DU)
+              ==
+                fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
+              + divDSigmaExp
+              + divDSigmaLargeStrainExp
+              - fvc::div(2*muf*(mesh.Sf() & fvc::interpolate(DEpsilonP)))
+            );
+
+            if(solidInterfaceCorr)
+            {
+                solidInterfacePtr->correct(DUEqn);
+            }
+
+            solverPerf = DUEqn.solve();
+
+            if(iCorr == 0)
+            {
+                initialResidual = solverPerf.initialResidual();
+            }
+
+            DU.relax();
+
+            if(solidInterfaceCorr)
+            {
+                gradDU = solidInterfacePtr->grad(DU);
+            }
+            else
+            {
+                gradDU = fvc::grad(DU);
+            }
+
+            DF = gradDU.T();
+
+#           include "calculateRelativeResidual.H"
+
+            rheology.correct();
+            mu = rheology.newMu();
+            lambda = rheology.newLambda();
+            muf = fvc::interpolate(rheology.newMu());
+            lambdaf = fvc::interpolate(rheology.newLambda());
+            if(solidInterfaceCorr)
+            {
+                solidInterfacePtr->modifyProperties(muf, lambdaf);
+            }
+
+#           include "calculateDEpsilonDSigma.H"
+
+            Info << "\tTime " << runTime.value()
+                << ", Corrector " << iCorr
+                << ", Solving for " << DU.name()
+                << " using " << solverPerf.solverName()
+                << ", residual = " << solverPerf.initialResidual()
+                << ", relative residual = " << relativeResidual << endl;
+        }
+        while
+        (
+            //relativeResidual
+            solverPerf.initialResidual() > convergenceTolerance
+            && ++iCorr < nCorr
+        );
+
+        Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name()
+            << ", Initial residual = " << initialResidual
+            << ", Final residual = " << solverPerf.initialResidual()
+            << ", No outer iterations " << iCorr << endl;
+
+        lduMatrix::debug = 1;
+
+        U += DU;
+
+        epsilon += DEpsilon;
+
+        epsilonP += DEpsilonP;
+
+        volSymmTensorField DEpsilonE = DEpsilon - DEpsilonP;
+
+        epsilonE += DEpsilonE;
+
+        sigma += DSigma;
+
+        rheology.updateYieldStress();
+
+#       include "rotateFields.H"
+
+#       include "moveMesh.H"
+
+#       include "writeFields.H"
+
+        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << nl << endl;
     }
-  
-  Info<< "End\n" << endl;
-  
-  return(0);
+
+    Info<< "End\n" << endl;
+
+    return(0);
 }
 
 

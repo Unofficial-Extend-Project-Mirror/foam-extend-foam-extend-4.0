@@ -73,7 +73,7 @@ tmp<surfaceScalarField> PhiScheme<Type, PhiLimiter>::limiter
 
     if (this->faceFlux_.dimensions() == dimDensity*dimVelocity*dimArea)
     {
-        const volScalarField& rho = 
+        const volScalarField& rho =
             phi.db().objectRegistry::lookupObject<volScalarField>("rho");
         tUflux = this->faceFlux_/fvc::interpolate(rho);
     }

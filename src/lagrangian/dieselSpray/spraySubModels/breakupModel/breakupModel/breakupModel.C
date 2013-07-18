@@ -87,23 +87,23 @@ void breakupModel::updateParcelProperties
 
     if(includeOscillation_)
     {
-    
+
         scalar T = p.T();
         scalar pc = spray_.p()[p.cell()];
         scalar r = 0.5 * p.d();
         scalar r2 = r*r;
         scalar r3 = r*r2;
-    
+
         scalar rho = fuels.rho(pc, T, p.X());
         scalar sigma = fuels.sigma(pc, T, p.X());
         scalar mu = fuels.mu(pc, T, p.X());
-    
-        // inverse of characteristic viscous damping time    
+
+        // inverse of characteristic viscous damping time
         scalar rtd = 0.5*TABCmu_*mu/(rho*r2);
-        
+
         // oscillation frequency (squared)
         scalar omega2 = TABComega_ * sigma /(rho*r3) - rtd*rtd;
-        
+
         if(omega2 > 0)
         {
 
@@ -114,20 +114,20 @@ void breakupModel::updateParcelProperties
 
             scalar y1 = p.dev() - Wetmp;
             scalar y2 = p.ddev()/omega;
-                       
+
             // update distortion parameters
             scalar c = cos(omega*deltaT);
             scalar s = sin(omega*deltaT);
             scalar e = exp(-rtd*deltaT);
             y2 = (p.ddev() + y1*rtd)/omega;
-            
+
             p.dev() = Wetmp + e*(y1*c + y2*s);
             if (p.dev() < 0)
             {
                 p.dev() = 0.0;
                 p.ddev() = 0.0;
             }
-            else 
+            else
             {
                 p.ddev() = (Wetmp-p.dev())*rtd + e*omega*(y2*c - y1*s);
             }
@@ -140,7 +140,7 @@ void breakupModel::updateParcelProperties
         }
 
     }
-    
+
 }
 
 

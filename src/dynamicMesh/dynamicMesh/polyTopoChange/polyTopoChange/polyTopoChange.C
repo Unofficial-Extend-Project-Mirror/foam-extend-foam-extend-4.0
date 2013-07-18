@@ -386,7 +386,7 @@ bool Foam::polyTopoChange::check() const
         }
     }
 
-    // Check cells?  
+    // Check cells?
 
     if (nErrors == 0)
     {

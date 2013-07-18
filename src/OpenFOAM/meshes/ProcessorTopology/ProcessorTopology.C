@@ -49,7 +49,7 @@ Foam::labelList Foam::ProcessorTopology<Patch, ProcPatch>::procNeighbours
 
         if (isA<ProcPatch>(patch))
         {
-            const ProcPatch& procPatch = 
+            const ProcPatch& procPatch =
                 refCast<const ProcPatch>(patch);
 
             nNeighbours++;
@@ -71,7 +71,7 @@ Foam::labelList Foam::ProcessorTopology<Patch, ProcPatch>::procNeighbours
 
         if (isA<ProcPatch>(patch))
         {
-            const ProcPatch& procPatch = 
+            const ProcPatch& procPatch =
                 refCast<const ProcPatch>(patch);
 
             neighbours[nNeighbours++] = procPatch.neighbProcNo();

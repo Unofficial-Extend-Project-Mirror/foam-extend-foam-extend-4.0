@@ -28,10 +28,10 @@ Class
 Description
     Algebraic Multigrid solver with run-time selection of policy and cycle
     adjusted for BlockLduMatrix.
-    
+
 Author
     Klas Jareteg, 2012-12-13
-    
+
 SourceFiles
     BlockAmgSolver.C
 

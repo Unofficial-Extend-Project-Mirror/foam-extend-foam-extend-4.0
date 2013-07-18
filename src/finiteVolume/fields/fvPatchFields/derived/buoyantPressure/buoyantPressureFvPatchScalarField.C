@@ -122,7 +122,7 @@ void buoyantPressureFvPatchScalarField::updateCoeffs()
         InfoIn
         (
             "void buoyantPressureFvPatchScalarField::updateCoeffs()"
-        )   << "Fields required for evaluation not found for patch " 
+        )   << "Fields required for evaluation not found for patch "
             << patch().name() << endl;
 
         gradient() = 0;

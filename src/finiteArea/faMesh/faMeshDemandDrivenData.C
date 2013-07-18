@@ -1374,11 +1374,11 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
             {
                 const labelList& curFaceFaces =
                     patch().faceFaces()[curFaces[faceI]];
-                
+
                 forAll(curFaceFaces, fI)
                 {
                     label curFaceFace = curFaceFaces[fI];
-                        
+
                     if(!faceSet.found(curFaceFace))
                     {
                         faceSet.insert(curFaceFace);
@@ -1490,7 +1490,7 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
             labelList toNgbProcLsPointStarts(patchPointLabels.size(), 0);
             vectorField toNgbProcLsPoints
             (
-                10*patchPointLabels.size(), 
+                10*patchPointLabels.size(),
                 vector::zero
             );
             label nPoints = 0;
@@ -1527,13 +1527,13 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
 
                 for (label i=0; i<curPoints.size(); i++)
                 {
-                    toNgbProcLsPoints[nPoints++] = 
+                    toNgbProcLsPoints[nPoints++] =
                         points[curPoints[i]];
                 }
             }
 
             toNgbProcLsPoints.setSize(nPoints);
-            
+
             {
                 OPstream toNeighbProc
                 (
@@ -1561,7 +1561,7 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
 
             labelList fromNgbProcLsPointStarts(patchPointLabels.size(), 0);
             vectorField fromNgbProcLsPoints;
-                
+
             {
                 IPstream fromNeighbProc
                 (
@@ -1581,11 +1581,11 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
 
             forAll(nonGlobalPatchPoints, pointI)
             {
-                label curPoint = 
+                label curPoint =
                     patchPointLabels[nonGlobalPatchPoints[pointI]];
-                label curNgbPoint = 
+                label curNgbPoint =
                     procPatch.neighbPoints()[nonGlobalPatchPoints[pointI]];
-                
+
                 labelHashSet faceSet;
                 forAll(pointFaces[curPoint], faceI)
                 {
@@ -1636,8 +1636,8 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                 {
                     for
                     (
-                        label i=fromNgbProcLsPointStarts[curNgbPoint]; 
-                        i<fromNgbProcLsPoints.size(); 
+                        label i=fromNgbProcLsPointStarts[curNgbPoint];
+                        i<fromNgbProcLsPoints.size();
                         i++
                     )
                     {
@@ -1648,8 +1648,8 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                 {
                     for
                     (
-                        label i=fromNgbProcLsPointStarts[curNgbPoint]; 
-                        i<fromNgbProcLsPointStarts[curNgbPoint+1]; 
+                        label i=fromNgbProcLsPointStarts[curNgbPoint];
+                        i<fromNgbProcLsPointStarts[curNgbPoint+1];
                         i++
                     )
                     {
@@ -1672,7 +1672,7 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                         (
                             mag
                             (
-                                allPoints[i] 
+                                allPoints[i]
                               - allPointsExt[pI]
                             )
                           < tol
@@ -1825,11 +1825,11 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
 
             Pstream::gatherList(procLsPoints);
             Pstream::scatterList(procLsPoints);
-                
+
             if (curSharedPointIndex != -1)
             {
                 label curPoint = spLabels[curSharedPointIndex];
-                
+
                 label nAllPoints = 0;
                 forAll(procLsPoints, procI)
                 {

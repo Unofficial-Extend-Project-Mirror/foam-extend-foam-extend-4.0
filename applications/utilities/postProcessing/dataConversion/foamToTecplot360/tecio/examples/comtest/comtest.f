@@ -1,8 +1,8 @@
-C 
+C
 C  Complex example FORTRAN program to write a
 C  binary data file for Tecplot. This example
 C  does the following:
-C 
+C
 C    1.  Open a data file called "field.plt."
 C    2.  Open a data file called "line.plt."
 C    3.  Assign values for X, Y and P. These will be used
@@ -16,12 +16,12 @@ C    8.  Write out a text record to "field.plt."
 C    9.  Write out a geometry (circle) record to "field.plt."
 C   10.  Close file 1.
 C   11.  Close file 2.
-C  
+C
       Program ComplexTest
 
       Include "tecio.inc"
 
-      REAL*4      X(4,5),  Y(4,5), P(4,5)  
+      REAL*4      X(4,5),  Y(4,5), P(4,5)
       REAL*8      XL(50), YL(50)
       REAL*4      XLDummy(1), YLDummy(1)
       EQUIVALENCE (XLDummy(1), XL(1))
@@ -56,7 +56,7 @@ C
       NullPtr   = 0
 C
 C Open field.plt and write the header information.
-C 
+C
       I = TECINI112('DATASET WITH 1 ORDERED ZONE, '//
      &              '1 QUAD ZONE OVER 2 TIME STEPS'//NULCHAR,
      &              'X Y P'//NULCHAR,
@@ -65,9 +65,9 @@ C
      &               FileType,
      &               Debug,
      &               VIsDouble)
-C  
+C
 C  Open line.plt and write the header information.
-C  
+C
       VIsDouble = 1
       I = TECINI112('DATASET WITH ONE I-ORDERED ZONE'//NULCHAR,
      &              'X Y'//NULCHAR,
@@ -77,9 +77,9 @@ C
      &               Debug,
      &               VIsDouble)
 
-C  
+C
 C  Calculate values for the field variables.
-C  
+C
       Do 10 J = 1,5
       Do 10 I = 1,4
           X(I,J) = I
@@ -87,15 +87,15 @@ C
           P(I,J) = I*J
    10 Continue
 
-C  
+C
 C  Make sure writing to file #1.
-C  
+C
       III = 1
       I = TECFIL112(III)
 
-C  
+C
 C  Write the zone header information for the ordered zone.
-C  
+C
       IMax = 4
       JMax = 5
       KMax = 1
@@ -124,31 +124,31 @@ C
      &               Null,  ! ShareVarFromZone
      &               0)     ! ShareConnectivityFromZone)
 
-C  
+C
 C  Write out the field data for the ordered zone.
-C  
+C
       III = IMax*JMax
       I   = TECDAT112(III,X,DIsDouble)
       I   = TECDAT112(III,Y,DIsDouble)
       I   = TECDAT112(III,P,DIsDouble)
 
-C   
+C
 C  Calculate values for the I-ordered zone.
-C  
+C
 
       Do 20 I = 1,50
          XL(I) = I
          YL(I) = sin(I/20.0)
    20 Continue
-C  
+C
 C  Switch to the 'line.plt' file (file number 2)
 C  and write out the line plot data.
-C  
+C
       III = 2
       I = TECFIL112(III)
-C  
+C
 C  Write the zone header information for the XY-data.
-C  
+C
       IMax = 50
       JMax = 1
       KMax = 1
@@ -175,18 +175,18 @@ C
      &              Null,
      &              Null,
      &              0)
-C  
+C
 C  Write out the line plot.
-C  
+C
       DIsDouble = 1
       III = IMax
       I   = TECDAT112(III,XLDummy,DIsDouble)
       I   = TECDAT112(III,YLDummy,DIsDouble)
 
-C  
+C
 C  Switch back to the field plot file and write out
 C  the finite-element zone.
-C  
+C
       III = 1
       I = TECFIL112(III)
 C
@@ -198,12 +198,12 @@ C
           Y(I,J) = J
           P(I,J) = I*J
    30 Continue
-C  
+C
 C  Write the zone header information for the finite-element zone.
-C  
-      NPts      = 20 
-      NElm      = 12 
-      KMax      = 1  
+C
+      NPts      = 20
+      NElm      = 12
+      KMax      = 1
       SolTime   = 10.0
       StrandID  = 2
       I = TECZNE112('Finite Zone 1'//NULCHAR,
@@ -227,9 +227,9 @@ C
      &              Null,
      &              Null,
      &              0)
-C  
+C
 C  Write out the field data for the finite-element zone.
-C  
+C
       IMax      = 4
       JMax      = 5
       III       = IMax*JMax
@@ -238,11 +238,11 @@ C
       I    = TECDAT112(III,Y,DIsDouble)
       I    = TECDAT112(III,P,DIsDouble)
 
-C  
+C
 C  Calculate and then write out the connectivity list.
 C  Note: The NM array references cells starting with
 C        offset of 1.
-C  
+C
 
       Do 40 I = 1,IMax-1
       Do 40 J = 1,JMax-1
@@ -348,30 +348,30 @@ C
       DIsDouble = 0
       I   = TECDAT112(III,P,DIsDouble)
 
-C  
+C
 C  Prepare to write out text record. Text is positioned
 C  at 50, 50 in frame units and has a height 5 frame units.
-C  
-      XP               = 50 
-      YP               = 50 
+C
+      XP               = 50
+      YP               = 50
       FH               = 5
-      Scope            = 1 
+      Scope            = 1
       Clipping         = 0
-      PositionCoordSys = 1 
-      FontType         = 1 
-      HeightUnits      = 1 
+      PositionCoordSys = 1
+      FontType         = 1
+      HeightUnits      = 1
       AttachToZone     = 0
       Zone             = 0
-      BoxType          = 0 
+      BoxType          = 0
       BoxMargin        = 5.0
       BoxLineThickness = 0.5
       BoxColor         = 3
       BoxFillColor     = 7
       TextAngle        = 0.0
-      Anchor           = 0 
+      Anchor           = 0
       LineSpacing      = 1.5
-      TextColor        = 0 
-    
+      TextColor        = 0
+
       III =  TECTXT112(XP,
      &                 YP,
      &                 0.0d0,
@@ -395,11 +395,11 @@ C
      &                'Hi Mom'//NULCHAR,
      &                NULCHAR)
 
-C  
-C  Prepare to write out geometry record (circle). Circle is 
+C
+C  Prepare to write out geometry record (circle). Circle is
 C  positioned at 25, 25 in frame units and has a radius of 30.
 C  Circle is drawn using a dashed line pattern.
-C  
+C
 
 
       XP                  = 25
@@ -408,8 +408,8 @@ C
       IsFilled            = 0
       Color               = 0
       FillColor           = 7
-      GeomType            = 2 
-      LinePattern         = 1 
+      GeomType            = 2
+      LinePattern         = 1
       LineThickness       = 0.3
       PatternLength       = 1
       NumEllipsePts       = 72
@@ -419,12 +419,12 @@ C
       ArrowheadAngle      = 15.0
       NumSegments         = 1
       NumSegPts(1)        = 1
-    
+
       XGeomData(1) = 30
       YGeomData(1) = 0.0
       ZGeomData(1) = 0.0
-    
-    
+
+
       III =  TECGEO112(XP,
      &                 YP,
      &                 ZP,
@@ -451,17 +451,17 @@ C
      &                 YGeomData,
      &                 ZGeomData,
      &                 NULCHAR)
-          
-C 
-C  Close out file 1.
-C 
-      I = TECEND112() 
 
-C  
+C
+C  Close out file 1.
+C
+      I = TECEND112()
+
+C
 C  Close out file 2.
-C  
+C
       III = 2
       I = TECFIL112(III)
-      I = TECEND112() 
+      I = TECEND112()
       STOP
       END

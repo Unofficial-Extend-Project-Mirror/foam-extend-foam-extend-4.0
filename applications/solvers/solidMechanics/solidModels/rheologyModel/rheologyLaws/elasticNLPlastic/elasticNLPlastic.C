@@ -89,11 +89,11 @@ Foam::tmp<Foam::volScalarField> Foam::elasticNLPlastic::rho() const
 
 Foam::tmp<Foam::volScalarField> Foam::elasticNLPlastic::E() const
 {
-    // Correction of modulus of elasticity to account for 
+    // Correction of modulus of elasticity to account for
     // stress-strain curve continuity!
-    // Done according to yield stress value - E = sigmaY/epsY! 
+    // Done according to yield stress value - E = sigmaY/epsY!
 
-    dimensionedScalar Ecorr = 
+    dimensionedScalar Ecorr =
         sigmaY_
        /::exp
         (
@@ -103,7 +103,7 @@ Foam::tmp<Foam::volScalarField> Foam::elasticNLPlastic::E() const
                /bCf_.value()
             )
            /nCf_.value()
-        ); 
+        );
 
     return tmp<volScalarField>
     (
@@ -217,7 +217,7 @@ Ep(const volScalarField& sigmaEq) const
     scalar epsY =  exp ( log ( log(matStrength_/(matStrength_ -
         sigmaY_)).value() /bCf_.value() ) /nCf_.value() );
 
-    dimensionedScalar Ecorr =  sigmaY_ /epsY; 
+    dimensionedScalar Ecorr =  sigmaY_ /epsY;
 
     forAll(sigmaEqI, cellI)
     {
@@ -227,7 +227,7 @@ Ep(const volScalarField& sigmaEq) const
       dimensionedScalar Ep = matStrength_*bCf_*nCf_ *pow(epsCurrI, nCf_ - 1.0)
         *exp(-bCf_*pow(epsCurrI, nCf_));
 
-      tresult().internalField()[cellI] = 
+      tresult().internalField()[cellI] =
             Ep.value()/(1.0 - Ep.value()/Ecorr.value());
     }
 

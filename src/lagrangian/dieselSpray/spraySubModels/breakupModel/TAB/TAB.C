@@ -101,7 +101,7 @@ void TAB::breakupParcel
 
     // inverse of characteristic viscous damping time
     scalar rtd = 0.5*Cmu_*mu/(rho*r2);
-    
+
     // oscillation frequency (squared)
     scalar omega2 = Comega_*sigma/(rho*r3) - rtd*rtd;
 
@@ -132,9 +132,9 @@ void TAB::breakupParcel
             {
                 phi = 2*mathematicalConstant::pi - phit;
             }
-            
+
             scalar tb = 0;
-            
+
             if (mag(p.dev()) < 1.0)
             {
                 scalar coste = 1.0;
@@ -146,9 +146,9 @@ void TAB::breakupParcel
                 {
                     coste = -1.0;
                 }
-                
+
                 scalar theta = acos((coste-Wetmp)/a);
-                
+
                 if (theta < phi)
                 {
                     if (2*mathematicalConstant::pi-theta >= phi)
@@ -173,11 +173,11 @@ void TAB::breakupParcel
             {
                 scalar rs = r/
                 (
-                    1 
+                    1
                   + (4.0/3.0)*pow(p.dev(), 2)
                   + rho*r3/(8*sigma)*pow(p.ddev(), 2)
                 );
-                
+
                 label n = 0;
                 bool found = false;
                 scalar random = rndGen_.scalar01();
@@ -201,7 +201,7 @@ void TAB::breakupParcel
             }
 
         }
-       
+
     }
     else
     {

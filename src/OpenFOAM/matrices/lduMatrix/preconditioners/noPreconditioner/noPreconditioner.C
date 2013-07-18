@@ -50,7 +50,7 @@ Foam::noPreconditioner::noPreconditioner
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    const dictionary& 
+    const dictionary&
 )
 :
     lduPreconditioner

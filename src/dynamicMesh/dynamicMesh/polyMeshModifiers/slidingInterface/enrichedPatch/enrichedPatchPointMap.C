@@ -56,7 +56,7 @@ void Foam::enrichedPatch::completePointMap() const
 
     forAll (masterMeshPoints, pointI)
     {
-        if 
+        if
         (
             !pmm.found(masterMeshPoints[pointI])
          && !pointMap_.found(masterMeshPoints[pointI])

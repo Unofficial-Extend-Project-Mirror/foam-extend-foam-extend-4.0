@@ -24,7 +24,7 @@ faPatchFields = fields/faPatchFields
 $(faPatchFields)/faPatchField/faPatchFields.C
 
 basicFaPatchFields = $(faPatchFields)/basic
-$(basicFaPatchFields)/basicSymmetry/basicSymmetryFaPatchFields.C 
+$(basicFaPatchFields)/basicSymmetry/basicSymmetryFaPatchFields.C
 $(basicFaPatchFields)/basicSymmetry/basicSymmetryFaPatchScalarField.C
 $(basicFaPatchFields)/calculated/calculatedFaPatchFields.C
 $(basicFaPatchFields)/coupled/coupledFaPatchFields.C
@@ -41,12 +41,12 @@ $(constraintFaPatchFields)/processor/processorFaPatchFields.C
 $(constraintFaPatchFields)/processor/processorFaPatchScalarField.C
 $(constraintFaPatchFields)/wedge/wedgeFaPatchFields.C
 $(constraintFaPatchFields)/wedge/wedgeFaPatchScalarField.C
-$(constraintFaPatchFields)/cyclic/cyclicFaPatchFields.C 
-$(constraintFaPatchFields)/symmetry/symmetryFaPatchFields.C 
+$(constraintFaPatchFields)/cyclic/cyclicFaPatchFields.C
+$(constraintFaPatchFields)/symmetry/symmetryFaPatchFields.C
 
 derivedFaPatchFields = $(faPatchFields)/derived
 $(derivedFaPatchFields)/fixedValueOutflow/fixedValueOutflowFaPatchFields.C
-$(derivedFaPatchFields)/inletOutlet/inletOutletFaPatchFields.C 
+$(derivedFaPatchFields)/inletOutlet/inletOutletFaPatchFields.C
 $(derivedFaPatchFields)/slip/slipFaPatchFields.C
 
 faePatchFields = fields/faePatchFields
@@ -62,7 +62,7 @@ $(constraintFaePatchFields)/empty/emptyFaePatchFields.C
 $(constraintFaePatchFields)/processor/processorFaePatchFields.C
 $(constraintFaePatchFields)/wedge/wedgeFaePatchFields.C
 $(constraintFaePatchFields)/cyclic/cyclicFaePatchFields.C
-$(constraintFaePatchFields)/symmetry/symmetryFaePatchFields.C 
+$(constraintFaePatchFields)/symmetry/symmetryFaePatchFields.C
 
 fields/areaFields/areaFields.C
 fields/edgeFields/edgeFields.C

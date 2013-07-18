@@ -124,4 +124,4 @@
 
     Info<< "Creating rheology\n" << endl;
     rheologyModel rheology(sigma);
-    volScalarField rho = rheology.rho(); 
+    volScalarField rho = rheology.rho();

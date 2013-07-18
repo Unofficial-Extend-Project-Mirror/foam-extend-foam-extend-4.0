@@ -95,7 +95,7 @@ Foam::Xfer<Foam::faceList> Foam::extrudedMesh::extrudedFaces
 
     const label nLayers = model.nLayers();
 
-    label nFaces = 
+    label nFaces =
         (nLayers + 1)*surfaceFaces.size() + nLayers*surfaceEdges.size();
 
     faceList eFaces(nFaces);

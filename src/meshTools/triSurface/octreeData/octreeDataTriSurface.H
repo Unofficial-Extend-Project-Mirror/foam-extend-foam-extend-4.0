@@ -181,7 +181,7 @@ public:
                 treeBoundBox& tightest
             ) const;
 
-            //- Given index get unit normal and calculate (numerical) sign 
+            //- Given index get unit normal and calculate (numerical) sign
             //  of sample.
             //  Used to determine accuracy of calcNearest or inside/outside.
             scalar calcSign

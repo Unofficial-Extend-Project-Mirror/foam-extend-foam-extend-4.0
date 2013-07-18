@@ -66,7 +66,7 @@ limitedLnGrad<Type>::correction
     const GeometricField<Type, faPatchField, areaMesh>& vf
 ) const
 {
-    GeometricField<Type, faePatchField, edgeMesh> corr = 
+    GeometricField<Type, faePatchField, edgeMesh> corr =
         correctedLnGrad<Type>(this->mesh()).correction(vf);
 
     edgeScalarField limiter

@@ -171,7 +171,7 @@ bool Foam::octreeDataCell::findTightest
     else
     {
         // Construct bb around sample and myFar
-        const point dist2(fabs(dist.x()), fabs(dist.y()), fabs(dist.z())); 
+        const point dist2(fabs(dist.x()), fabs(dist.y()), fabs(dist.z()));
 
         tightest.min() = sample - dist2;
         tightest.max() = sample + dist2;
@@ -225,7 +225,7 @@ Foam::scalar Foam::octreeDataCell::calcNearest
     );
     return GREAT;
 }
-    
+
 
 void Foam::octreeDataCell::write
 (

@@ -88,7 +88,7 @@ class coarseBlockAmgLevel
 
 
 public:
-    
+
     //- Runtime type information
         TypeName("coarseBlockAmgLevel");
 

@@ -26,7 +26,7 @@ Application
     interfaceTrackinFoam
 
 Description
-    Incompressible laminar CFD code for simulation of a single bubble rising 
+    Incompressible laminar CFD code for simulation of a single bubble rising
     in a stil liquid. Interface between fluid phases is tracked using moving
     mesh.
 
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
         {
             // Update interface bc
             interface.updateBoundaryConditions();
-            
+
             // Make the fluxes relative
             phi -= fvc::meshPhi(rho, U);
 
@@ -132,12 +132,12 @@ int main(int argc, char *argv[])
         }
 
 #       include "volContinuity.H"
-    
+
         Info << "Total surface tension force: "
             << interface.totalSurfaceTensionForce() << endl;
 
         vector totalForce =
-            interface.totalViscousForce() 
+            interface.totalViscousForce()
           + interface.totalPressureForce();
 
         Info << "Total force: " << totalForce << endl;

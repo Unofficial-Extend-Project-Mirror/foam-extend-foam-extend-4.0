@@ -76,7 +76,7 @@ multiSolver
             pRefValue       0;
         }
     }
-    
+
     scalarTransportFoam
     {
         solvers

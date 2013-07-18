@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
 
     // In order to ensure robust merging, it is necessary to traverse
     // the patch glueing list until the pointMergeList stops changing.
-    // 
+    //
 
     // For efficiency, create merge pairs in the first pass
     labelListListList glueMergePairs(glueMasterPatches.size());
@@ -396,7 +396,7 @@ int main(int argc, char *argv[])
                     )
                     {
                         changedPointMerge = true;
-                            
+
                         pointMergeList[PpointLabel]
                       = pointMergeList[NpointLabel]
                       = min

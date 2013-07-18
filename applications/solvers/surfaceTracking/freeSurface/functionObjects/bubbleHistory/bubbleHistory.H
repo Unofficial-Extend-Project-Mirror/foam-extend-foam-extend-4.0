@@ -69,7 +69,7 @@ class bubbleHistory
         word regionName_;
 
         //- Initial bubble volume
-        scalar V0_;        
+        scalar V0_;
 
         //- Output file stream
         OFstream* historyFilePtr_;

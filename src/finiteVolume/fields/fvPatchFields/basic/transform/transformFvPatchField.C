@@ -130,7 +130,7 @@ tmp<Field<Type> > transformFvPatchField<Type>::gradientInternalCoeffs() const
 template<class Type>
 tmp<Field<Type> > transformFvPatchField<Type>::gradientBoundaryCoeffs() const
 {
-    return 
+    return
         snGrad()
       - cmptMultiply(gradientInternalCoeffs(), this->patchInternalField());
 }

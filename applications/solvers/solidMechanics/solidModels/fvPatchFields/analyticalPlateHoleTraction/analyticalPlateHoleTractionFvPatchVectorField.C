@@ -142,7 +142,7 @@ void analyticalPlateHoleTractionFvPatchVectorField::updateCoeffs()
 
     const rheologyModel& rheology =
         this->db().objectRegistry::lookupObject<rheologyModel>("rheologyProperties");
-    scalarField mu = 
+    scalarField mu =
         rheology.mu()().boundaryField()[patch().index()];
     scalarField lambda =
         rheology.lambda()().boundaryField()[patch().index()];
@@ -155,25 +155,25 @@ void analyticalPlateHoleTractionFvPatchVectorField::updateCoeffs()
     const vectorField& Cf = patch().Cf();
 
     forAll(Traction, faceI)
-      {
-	vector curC(Cf[faceI].x(), Cf[faceI].y(), 0);
-	vector curN = n[faceI];
-        
-	if (patch().name() == "hole")
-	  {
-	    curC /= mag(curC);
-	    curC *= 0.5;
-	    
-	    curN = -curC/mag(curC);
-	  }
-	
-	Traction[faceI] = 
-	  (n[faceI] & plateHoleSolution(curC));
-      }
+    {
+        vector curC(Cf[faceI].x(), Cf[faceI].y(), 0);
+        vector curN = n[faceI];
+
+        if (patch().name() == "hole")
+        {
+             curC /= mag(curC);
+             curC *= 0.5;
+
+             curN = -curC/mag(curC);
+        }
+
+        Traction[faceI] =
+            (n[faceI] & plateHoleSolution(curC));
+    }
 
     //- set patch gradient
-    vectorField newGradient = 
-      Traction
+    vectorField newGradient =
+        Traction
       - (n & (mu*gradU.T() - (mu + lambda)*gradU))
       - n*lambda*tr(gradU);
 
@@ -233,7 +233,7 @@ symmTensor analyticalPlateHoleTractionFvPatchVectorField::plateHoleSolution(cons
     coordinateSystem cs("polarCS", C, vector(0, 0, 1), C/mag(C));
 
     sigma.xx() =
-        T*(1 - sqr(a)/sqr(r))/2 
+        T*(1 - sqr(a)/sqr(r))/2
       + T*(1 + 3*pow(a,4)/pow(r,4) - 4*sqr(a)/sqr(r))*::cos(2*theta)/2;
 
     sigma.xy() =
@@ -242,7 +242,7 @@ symmTensor analyticalPlateHoleTractionFvPatchVectorField::plateHoleSolution(cons
     sigma.yx() = sigma.xy();
 
     sigma.yy() =
-        T*(1 + sqr(a)/sqr(r))/2 
+        T*(1 + sqr(a)/sqr(r))/2
       - T*(1 + 3*pow(a,4)/pow(r,4))*::cos(2*theta)/2;
 
 
@@ -254,7 +254,7 @@ symmTensor analyticalPlateHoleTractionFvPatchVectorField::plateHoleSolution(cons
     S.xx() = sigma.xx();
     S.xy() = sigma.xy();
     S.yy() = sigma.yy();
-    
+
     return S;
 }
 

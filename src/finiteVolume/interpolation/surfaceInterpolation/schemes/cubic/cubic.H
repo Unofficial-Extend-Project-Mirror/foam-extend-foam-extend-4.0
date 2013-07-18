@@ -119,7 +119,7 @@ public:
             // calculate the appropriate interpolation factors
             const surfaceScalarField& lambda = mesh.weights();
 
-            surfaceScalarField kSc = 
+            surfaceScalarField kSc =
                 lambda*(scalar(1) - lambda*(scalar(3) - scalar(2)*lambda));
 
             surfaceScalarField kVecP = sqr(scalar(1) - lambda)*lambda;

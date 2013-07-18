@@ -92,7 +92,7 @@ public:
         (
             const dictionary& dict
         );
-        
+
     // Destructor
 
         virtual ~BlockCoeffTwoNorm()
@@ -106,7 +106,7 @@ public:
         (
             const BlockCoeff<Type>& a
         );
-        
+
         virtual void coeffMag
         (
             const CoeffField<Type>& a,
@@ -124,7 +124,7 @@ public:
 #ifdef NoRepository
 #   include "BlockCoeffTwoNorm.C"
 #endif
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif

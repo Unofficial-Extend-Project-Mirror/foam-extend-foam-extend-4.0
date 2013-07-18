@@ -528,7 +528,7 @@ inline pointHit triangle<Point, PointRef>::ray
 
     Point pInter;
 
-    
+
     //HJ: this does not work.  HJ, 23/Oct/2008
 //     bool hit;
 //     {

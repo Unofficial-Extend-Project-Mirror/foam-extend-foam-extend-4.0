@@ -120,7 +120,7 @@ public:
             {
                 return 1.0/c;
             }
-                
+
             linearType inverse(const linearType& c) const
             {
                 return cmptDivide(pTraits<linearType>::one, c);

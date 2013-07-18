@@ -223,10 +223,10 @@ private:
         //- List of patch field decomposers
         List<patchFieldDecomposer*> patchFieldDecomposerPtrs_;
 
-        List<processorVolPatchFieldDecomposer*> 
+        List<processorVolPatchFieldDecomposer*>
             processorVolPatchFieldDecomposerPtrs_;
 
-        List<processorSurfacePatchFieldDecomposer*> 
+        List<processorSurfacePatchFieldDecomposer*>
             processorSurfacePatchFieldDecomposerPtrs_;
 
 

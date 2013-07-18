@@ -36,7 +36,7 @@ metisCoeffs
     processorWeights
     (
         1
-	    3
+        3
     );
 }
 

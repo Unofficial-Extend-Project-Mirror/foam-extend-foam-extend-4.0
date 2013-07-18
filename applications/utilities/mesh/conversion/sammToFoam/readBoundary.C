@@ -188,7 +188,7 @@ void sammMesh::readBoundary()
                 boundary_[patchLabel][nPatchFaces[patchLabel]]
                     = face(pointLabels);
             }
-            
+
             // increment counter of faces in current patch
             nPatchFaces[patchLabel]++;
         }

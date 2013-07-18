@@ -87,7 +87,7 @@ const label starMesh::sammAddressingTable[9][12] =
 // (first index) and STAR face number
 // - first column is always -1
 // - last column is -1 for all but hexagonal prism
-// WARNING: Possible bug for sammTrim2 
+// WARNING: Possible bug for sammTrim2
 // The lookup table for SAMM shapes is based on the rotation of the
 // shape. This would imply that the table below needs to be split between
 // the regular shapes (3-9), which are OK, and the SAMM shapes, for which
@@ -95,7 +95,7 @@ const label starMesh::sammAddressingTable[9][12] =
 // cell, firts find out the face index in the normal rotation using the cell
 // face permutation table and then use the index from the shape face lookup.
 // Additionally, have in mind that this silliness does not allow matches
-// on face 7 and 8 of the samm cell. 
+// on face 7 and 8 of the samm cell.
 
 const label starMesh::sammFacePermutationTable[24][8] =
 {
@@ -180,7 +180,7 @@ const label starMesh::shapeFaceLookup[19][9] =
 // samm trim 8:
 // star number: 1 2 3 4 5 6 7 8  In ROTATION 0
 // foam number: 2 5 4 7 1 0 3 6
-// confirmed:   1 0 6 
+// confirmed:   1 0 6
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

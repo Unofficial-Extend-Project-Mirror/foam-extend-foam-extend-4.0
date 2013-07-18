@@ -2,11 +2,11 @@ if(interface.twoFluids() && pNeedRef)
 {
     phi.boundaryField()[interface.bPatchID()] =
         (
-            U.boundaryField()[interface.bPatchID()] 
+            U.boundaryField()[interface.bPatchID()]
           & mesh.Sf().boundaryField()[interface.bPatchID()]
         );
-        
-    scalarField weights = 
+
+    scalarField weights =
         mag(phi.boundaryField()[interface.bPatchID()]);
 
     if(mag(gSum(weights)) > VSMALL)

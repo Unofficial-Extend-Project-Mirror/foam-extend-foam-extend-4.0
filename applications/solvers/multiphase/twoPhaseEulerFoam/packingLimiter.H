@@ -14,12 +14,12 @@
 
             // Initializing neighbouring cells contribution
             scalar neighboursEx = 0.0;
-           
+
             forAll (neighbourCell, cellj)
             {
                 labelList neighboursNeighbour = neighbour[neighbourCell[cellj]];
                 scalar neighboursNeighbourCellVolumes = 0.0;
-        
+
                 forAll (neighboursNeighbour, cellk)
                 {
                     neighboursNeighbourCellVolumes +=

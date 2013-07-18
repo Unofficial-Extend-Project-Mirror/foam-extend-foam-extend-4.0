@@ -28,7 +28,7 @@ for(label indx=0;indx<cells.size();indx++)
         gmvFile << "hex     " << 8 << " ";
         for(label ip=0; ip<nNodes; ip++)
         {
-            gmvFile << cells[indx][ip] + 1 << " ";        
+            gmvFile << cells[indx][ip] + 1 << " ";
         }
         gmvFile << nl;
     }
@@ -37,7 +37,7 @@ for(label indx=0;indx<cells.size();indx++)
         gmvFile << "tet     " << 4 << " ";
         for(label ip=0; ip<nNodes; ip++)
         {
-            gmvFile << cells[indx][ip] + 1 << " ";        
+            gmvFile << cells[indx][ip] + 1 << " ";
         }
         gmvFile << nl;
     }
@@ -46,7 +46,7 @@ for(label indx=0;indx<cells.size();indx++)
         gmvFile << "prism   " << 6 << " ";
         for(label ip=0; ip<nNodes; ip++)
         {
-            gmvFile << cells[indx][ip] + 1 << " ";        
+            gmvFile << cells[indx][ip] + 1 << " ";
         }
         gmvFile << nl;
     }

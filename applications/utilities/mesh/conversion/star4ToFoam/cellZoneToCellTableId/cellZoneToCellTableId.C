@@ -119,7 +119,7 @@ void cellZoneToCellTableId
         cellTable_.insert(id, dict);
     }
 
-    forAll(zoneNames, zoneI) 
+    forAll(zoneNames, zoneI)
     {
         label id = zoneI + typeOffset;
 
@@ -135,7 +135,7 @@ void cellZoneToCellTableId
     {
         calculatedField[iter.key()] = iter() + typeOffset;
     }
-    
+
     Info<<"Writing the " << mesh.cellZones().size() << " cellZones as "
         << propertyName << " to " << calculatedField.objectPath()
         << endl;

@@ -41,7 +41,7 @@ Description
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Iterate, propagating changedFacesInfo across mesh, until no change (or 
+// Iterate, propagating changedFacesInfo across mesh, until no change (or
 // maxIter reached).
 template <class Type>
 Foam::MeshWave<Type>::MeshWave
@@ -66,7 +66,7 @@ Foam::MeshWave<Type>::MeshWave
 {}
 
 
-// Iterate, propagating changedFacesInfo across mesh, until no change (or 
+// Iterate, propagating changedFacesInfo across mesh, until no change (or
 // maxIter reached). Initial cell values specified.
 template <class Type>
 Foam::MeshWave<Type>::MeshWave

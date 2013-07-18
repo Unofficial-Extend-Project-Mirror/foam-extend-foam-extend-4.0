@@ -62,7 +62,7 @@ class injector
 public:
 
     // Constructors
-    
+
         //- Constructor from Istream
         injector(const Time& t, Istream& is);
 

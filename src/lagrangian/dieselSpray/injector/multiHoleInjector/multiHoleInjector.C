@@ -103,7 +103,7 @@ Foam::multiHoleInjector::multiHoleInjector
         velocityProfile_[i][0] = massFlowRateProfile_[i][0];
         injectionPressureProfile_[i][0] = massFlowRateProfile_[i][0];
     }
-    
+
     forAll(TProfile_, i)
     {
         TProfile_[i][0] = t.userTimeToTime(TProfile_[i][0]);
@@ -115,7 +115,7 @@ Foam::multiHoleInjector::multiHoleInjector
     {
         // correct the massFlowRateProfile to match the injected mass
         massFlowRateProfile_[i][1] *= mass_/integratedMFR;
-        
+
         CdProfile_[i][0] = massFlowRateProfile_[i][0];
         CdProfile_[i][1] = Cd_;
     }
@@ -195,7 +195,7 @@ void Foam::multiHoleInjector::setTangentialVectors()
         while (magV < SMALL)
         {
             vector testThis = rndGen.vector01();
-            
+
             tangent = testThis - (testThis & direction_[i])*direction_[i];
             magV = mag(tangent);
         }
@@ -203,7 +203,7 @@ void Foam::multiHoleInjector::setTangentialVectors()
         tangentialInjectionVector1_[i] = tangent/magV;
         tangentialInjectionVector2_[i] = direction_[i] ^ tangentialInjectionVector1_[i];
 
-    }   
+    }
 }
 
 
@@ -216,7 +216,7 @@ Foam::label Foam::multiHoleInjector::nParcelsToInject
 
     scalar mInj = mass_*(fractionOfInjection(time1)-fractionOfInjection(time0));
     label nParcels = label(mInj/averageParcelMass_ + 0.49);
-    
+
     return nParcels;
 }
 
@@ -256,7 +256,7 @@ Foam::vector Foam::multiHoleInjector::position
         scalar iAngle = 2.0*mathematicalConstant::pi*rndGen.scalar01();
 
         return
-        ( 
+        (
             position_[n]
           + iRadius
           * (
@@ -264,7 +264,7 @@ Foam::vector Foam::multiHoleInjector::position
             + tangentialInjectionVector2_[n]*sin(iAngle)
           )
         );
-        
+
     }
     return position_[0];
 }
@@ -298,7 +298,7 @@ Foam::scalar Foam::multiHoleInjector::mass
 {
     scalar mInj = mass_*(fractionOfInjection(time1)-fractionOfInjection(time0));
 
-    // correct mass if calculation is 2D 
+    // correct mass if calculation is 2D
     if (twoD)
     {
         mInj *= 0.5*angleOfWedge/mathematicalConstant::pi;

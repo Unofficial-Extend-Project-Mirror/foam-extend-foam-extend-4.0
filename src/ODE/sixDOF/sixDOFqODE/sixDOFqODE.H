@@ -161,7 +161,7 @@ class sixDOFqODE
             //  given current values for relative rotational velocity
             dimensionedVector OmegaDot
             (
-			    const HamiltonRodriguezRot& rotation,
+                const HamiltonRodriguezRot& rotation,
                 const dimensionedVector& omega
             ) const;
 

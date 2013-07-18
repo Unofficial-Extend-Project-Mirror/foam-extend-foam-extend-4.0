@@ -202,7 +202,7 @@ bool domainDecomposition::writeDecomposition()
                 procOwner[faceI] = cellLookup[nei[curF]];
             }
         }
- 
+
         labelList procNeighbour(nInternalProcFaces_[procI]);
 
         // Note: loop over neighbour, not all faces: sizes are different
@@ -260,7 +260,7 @@ bool domainDecomposition::writeDecomposition()
             processorCasePath,
             "system",
             "constant",
-	    true
+            true
         );
 
         // Create the mesh

@@ -39,7 +39,7 @@ boundaryField
     bottomBrickUp
     {
         type            solidTraction;
-	nonLinear       updatedLagrangian;
+        nonLinear       updatedLagrangian;
         traction        uniform ( 0 0 0 );
         pressure        uniform 0;
         value           uniform (0 0 0);
@@ -48,7 +48,7 @@ boundaryField
     topBrickDown
     {
         type            solidTraction;
-	nonLinear       updatedLagrangian;
+        nonLinear       updatedLagrangian;
         traction        uniform ( 0 0 0 );
         pressure        uniform 0;
         value           uniform (0 0 0);
@@ -57,7 +57,7 @@ boundaryField
     bottomBrickLeft
     {
         type            solidTraction;
-	nonLinear       updatedLagrangian;
+        nonLinear       updatedLagrangian;
         traction        uniform ( 0 0 0 );
         pressure        uniform 0;
         value           uniform (0 0 0);
@@ -66,7 +66,7 @@ boundaryField
     bottomBrickRight
     {
         type            solidTraction;
-	nonLinear       updatedLagrangian;
+        nonLinear       updatedLagrangian;
         traction        uniform ( 0 0 0 );
         pressure        uniform 0;
         value           uniform (0 0 0);
@@ -74,7 +74,7 @@ boundaryField
     topBrickLeft
     {
         type            solidTraction;
-	nonLinear       updatedLagrangian;
+        nonLinear       updatedLagrangian;
         traction        uniform ( 0 0 0 );
         pressure        uniform 0;
         value           uniform (0 0 0);
@@ -82,7 +82,7 @@ boundaryField
     topBrickRight
     {
         type            solidTraction;
-	nonLinear       updatedLagrangian;
+        nonLinear       updatedLagrangian;
         traction        uniform ( 0 0 0 );
         pressure        uniform 0;
         value           uniform (0 0 0);

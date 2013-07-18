@@ -14,7 +14,6 @@
                 label nMovingCells = 0;
 
                 label valvePatchID = valves_[i-1].poppetPatchID().index();
-                const polyPatch& valveTopPatch = boundaryMesh()[valvePatchID];
                 scalar minPopZ = min(boundary()[valvePatchID].patch().localPoints()).z();
 
                 forAll(cellCentres(),cellI)
@@ -60,7 +59,6 @@
                 label nMovingCells = 0;
 
                 label valvePatchID = valves_[i-1].bottomPatchID().index();
-                const polyPatch& valveBottomPatch = boundaryMesh()[valvePatchID];
                 scalar maxPopZ = max(boundary()[valvePatchID].patch().localPoints()).z();
 
 

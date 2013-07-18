@@ -48,7 +48,7 @@ void fvBoundaryMesh::addPatches(const polyBoundaryMesh& basicBdry)
     }
 }
 
-    
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 fvBoundaryMesh::fvBoundaryMesh

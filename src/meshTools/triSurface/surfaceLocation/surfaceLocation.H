@@ -85,7 +85,7 @@ public:
 
         //- Construct from components
         surfaceLocation
-        (   
+        (
             const pointIndexHit& pih,
             const triPointRef::proxType elementType,
             const label triangle
@@ -111,7 +111,7 @@ public:
         {
             return elementType_;
         }
-        
+
         triPointRef::proxType elementType() const
         {
             return elementType_;
@@ -121,7 +121,7 @@ public:
         {
             return triangle_;
         }
-        
+
         label triangle() const
         {
             return triangle_;
@@ -150,7 +150,7 @@ public:
         friend Ostream& operator<<
         (
             Ostream&,
-            const InfoProxy<surfaceLocation>& 
+            const InfoProxy<surfaceLocation>&
         );
 };
 

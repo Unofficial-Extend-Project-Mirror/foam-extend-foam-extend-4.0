@@ -314,7 +314,7 @@ Foam::argList::argList
     string timeString = clock::clockTime();
     fileName ctrlDict = debug::controlDict().name();
     string ctrlDictString = ctrlDict.path()/ctrlDict.name();
- 
+
     // Print the banner once only for parallel runs
     if (Pstream::master() && bannerEnabled)
     {

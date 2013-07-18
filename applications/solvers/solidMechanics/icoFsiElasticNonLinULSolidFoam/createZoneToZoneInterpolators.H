@@ -27,17 +27,17 @@ if(!interpolatorFluidSolidPtr || !interpolatorSolidFluidPtr)
     Info << "Check fluid-to-solid and solid-to-fluid interpolators" << endl;
 
     {
-        vectorField fluidPatchFaceCentres = 
+        vectorField fluidPatchFaceCentres =
             vectorField(mesh.boundaryMesh()[fluidPatchID].faceCentres());
 
         vectorField fluidZoneFaceCentres
         (
-            mesh.faceZones()[fluidZoneID].size(), 
+            mesh.faceZones()[fluidZoneID].size(),
             vector::zero
         );
 
-        
-        const label fluidPatchStart = 
+
+        const label fluidPatchStart =
             mesh.boundaryMesh()[fluidPatchID].start();
 
         forAll (fluidPatchFaceCentres, i)
@@ -45,7 +45,7 @@ if(!interpolatorFluidSolidPtr || !interpolatorSolidFluidPtr)
             fluidZoneFaceCentres
             [
                 mesh.faceZones()[fluidZoneID].whichFace(fluidPatchStart + i)
-            ] = 
+            ] =
                 fluidPatchFaceCentres[i];
         }
 
@@ -60,11 +60,11 @@ if(!interpolatorFluidSolidPtr || !interpolatorSolidFluidPtr)
 
         vectorField solidPatchFaceCentres
             (
-                stressMesh.boundaryMesh()[solidPatchID].size(), 
+                stressMesh.boundaryMesh()[solidPatchID].size(),
                 vector::zero
             );
 
-        const label solidPatchStart = 
+        const label solidPatchStart =
             stressMesh.boundaryMesh()[solidPatchID].start();
 
         forAll(solidPatchFaceCentres, i)
@@ -86,23 +86,23 @@ if(!interpolatorFluidSolidPtr || !interpolatorSolidFluidPtr)
             )
         );
 
-        Info << "Fluid-to-solid face interpolation error: " << maxDist 
+        Info << "Fluid-to-solid face interpolation error: " << maxDist
             << endl;
     }
 
 
 
     {
-        vectorField solidPatchFaceCentres = 
+        vectorField solidPatchFaceCentres =
             vectorField(stressMesh.boundaryMesh()[solidPatchID].faceCentres());
 
         vectorField solidZoneFaceCentres
         (
-            stressMesh.faceZones()[solidZoneID].size(), 
+            stressMesh.faceZones()[solidZoneID].size(),
             vector::zero
         );
 
-        const label solidPatchStart = 
+        const label solidPatchStart =
             stressMesh.boundaryMesh()[solidPatchID].start();
 
         forAll (solidPatchFaceCentres, i)
@@ -111,7 +111,7 @@ if(!interpolatorFluidSolidPtr || !interpolatorSolidFluidPtr)
             [
                 stressMesh.faceZones()[solidZoneID]
                .whichFace(solidPatchStart + i)
-            ] = 
+            ] =
                 solidPatchFaceCentres[i];
         }
 
@@ -126,11 +126,11 @@ if(!interpolatorFluidSolidPtr || !interpolatorSolidFluidPtr)
 
         vectorField fluidPatchFaceCentres
         (
-            mesh.boundaryMesh()[fluidPatchID].size(), 
+            mesh.boundaryMesh()[fluidPatchID].size(),
             vector::zero
         );
 
-        const label fluidPatchStart = 
+        const label fluidPatchStart =
             mesh.boundaryMesh()[fluidPatchID].start();
 
         forAll(fluidPatchFaceCentres, i)
@@ -157,9 +157,9 @@ if(!interpolatorFluidSolidPtr || !interpolatorSolidFluidPtr)
     }
 }
 
-zoneToZoneInterpolation& interpolatorFluidSolid = 
+zoneToZoneInterpolation& interpolatorFluidSolid =
     *interpolatorFluidSolidPtr;
 
-zoneToZoneInterpolation& interpolatorSolidFluid = 
+zoneToZoneInterpolation& interpolatorSolidFluid =
     *interpolatorSolidFluidPtr;
 

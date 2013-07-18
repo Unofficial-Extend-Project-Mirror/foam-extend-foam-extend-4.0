@@ -53,7 +53,7 @@ bool interpolationCellPointFace<Type>::findTriangle
         }
 
         vector triangleFaceNormal = edge[1] ^ edge[2];
-        
+
         // calculate edge normal (pointing inwards)
         for(label i=0; i<3; i++)
         {

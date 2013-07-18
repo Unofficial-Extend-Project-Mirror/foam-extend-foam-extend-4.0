@@ -88,7 +88,7 @@ tmp<GeometricField<Type, PatchField, GeoMesh> > transform
     const tmp<GeometricField<Type, PatchField, GeoMesh> >& ttf
 )
 {
-    tmp<GeometricField<Type, PatchField, GeoMesh> > tranf = 
+    tmp<GeometricField<Type, PatchField, GeoMesh> > tranf =
         transform(trf, ttf());
     ttf.clear();
     return tranf;
@@ -102,7 +102,7 @@ tmp<GeometricField<Type, PatchField, GeoMesh> > transform
     const GeometricField<Type, PatchField, GeoMesh>& tf
 )
 {
-    tmp<GeometricField<Type, PatchField, GeoMesh> > tranf = 
+    tmp<GeometricField<Type, PatchField, GeoMesh> > tranf =
         transform(ttrf(), tf);
     ttrf.clear();
     return tranf;
@@ -116,7 +116,7 @@ tmp<GeometricField<Type, PatchField, GeoMesh> > transform
     const tmp<GeometricField<Type, PatchField, GeoMesh> >& ttf
 )
 {
-    tmp<GeometricField<Type, PatchField, GeoMesh> > tranf = 
+    tmp<GeometricField<Type, PatchField, GeoMesh> > tranf =
         transform(ttrf(), ttf());
     ttf.clear();
     ttrf.clear();
@@ -174,7 +174,7 @@ tmp<GeometricField<Type, PatchField, GeoMesh> > transform
     const tmp<GeometricField<Type, PatchField, GeoMesh> >& ttf
 )
 {
-    tmp<GeometricField<Type, PatchField, GeoMesh> > tranf = 
+    tmp<GeometricField<Type, PatchField, GeoMesh> > tranf =
         transform(t, ttf());
     ttf.clear();
     return tranf;

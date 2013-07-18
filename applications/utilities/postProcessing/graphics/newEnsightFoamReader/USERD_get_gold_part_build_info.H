@@ -35,7 +35,7 @@ int USERD_get_gold_part_build_info
     for(label i=0; i<nPatches; i++)
     {
         word patchName(meshPtr->boundary()[i].name());
-        strncpy(part_descriptions[i+1], patchName.c_str(), Z_BUFL);   
+        strncpy(part_descriptions[i+1], patchName.c_str(), Z_BUFL);
     }
 
     label nHex08 = 0;
@@ -101,7 +101,7 @@ int USERD_get_gold_part_build_info
         */
 
     number_of_nodes[0] = meshPtr->nPoints();
-    
+
     const polyBoundaryMesh& bMesh = meshPtr->boundaryMesh();
 
     for(label i=0; i<nPatches; i++)
@@ -144,7 +144,7 @@ int USERD_get_gold_part_build_info
     }
 
 
-    
+
     // Second mesh
     if(secondMeshPtr)
     {
@@ -155,8 +155,8 @@ int USERD_get_gold_part_build_info
 
         strncpy
         (
-            part_descriptions[secondMeshPartNum-1], 
-            secondMeshName, 
+            part_descriptions[secondMeshPartNum-1],
+            secondMeshName,
             Z_BUFL
         );
 
@@ -165,10 +165,10 @@ int USERD_get_gold_part_build_info
             word patchName(secondMeshPtr->boundary()[i].name());
             strncpy
             (
-                part_descriptions[i+secondMeshPartNum], 
-                patchName.c_str(), 
+                part_descriptions[i+secondMeshPartNum],
+                patchName.c_str(),
                 Z_BUFL
-            );   
+            );
         }
 
         label nHex08 = 0;
@@ -216,10 +216,10 @@ int USERD_get_gold_part_build_info
         number_of_elements[secondMeshPartNum-1][Z_HEX08] = nHex08;
         number_of_elements[secondMeshPartNum-1][Z_PEN06] = nPen06;
         number_of_elements[secondMeshPartNum-1][Z_NFACED] = nFaced;
-        
+
 
         number_of_nodes[secondMeshPartNum-1] = secondMeshPtr->nPoints();
-    
+
         const polyBoundaryMesh& bMesh = secondMeshPtr->boundaryMesh();
 
         for(label i=0; i<nSecondMeshPatches; i++)
@@ -227,7 +227,7 @@ int USERD_get_gold_part_build_info
             label nTri03 = 0;
             label nQuad04 = 0;
             label nPoly = 0;
-            
+
             forAll(bMesh[i], n)
             {
                 label nPoints = bMesh[i][n].size();
@@ -245,11 +245,11 @@ int USERD_get_gold_part_build_info
                     nPoly++;
                 }
             }
-            
+
             number_of_elements[i+secondMeshPartNum][Z_TRI03] = nTri03;
             number_of_elements[i+secondMeshPartNum][Z_QUA04] = nQuad04;
             number_of_elements[i+secondMeshPartNum][Z_NSIDED] = nPoly;
-            
+
             number_of_nodes[i+secondMeshPartNum] = bMesh[i].points().size();
         }
     }
@@ -267,8 +267,8 @@ int USERD_get_gold_part_build_info
 
         strncpy
         (
-            part_descriptions[faMeshPartNum-1], 
-            faMeshName, 
+            part_descriptions[faMeshPartNum-1],
+            faMeshName,
             Z_BUFL
         );
 
@@ -277,7 +277,7 @@ int USERD_get_gold_part_build_info
         label nPoly = 0;
 
         for (label n=0; n<nFaces; n++)
-        {    
+        {
             label nPoints = faces[n].size();
 
             if (nPoints == 3)

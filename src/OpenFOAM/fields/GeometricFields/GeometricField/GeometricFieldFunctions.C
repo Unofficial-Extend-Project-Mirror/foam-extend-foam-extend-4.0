@@ -446,7 +446,7 @@ tmp
 >
 cmptAv(const tmp<GeometricField<Type, PatchField, GeoMesh> >& tgf)
 {
-    typedef typename GeometricField<Type, PatchField, GeoMesh>::cmptType 
+    typedef typename GeometricField<Type, PatchField, GeoMesh>::cmptType
         cmptType;
 
     const GeometricField<Type, PatchField, GeoMesh>& gf = tgf();

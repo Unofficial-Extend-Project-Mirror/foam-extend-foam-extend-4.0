@@ -41,17 +41,17 @@ divSchemes
 
 laplacianSchemes
 {
-    default         		none;
-    laplacian(nu,U) 		Gauss linear corrected;
-    laplacian(rUA,pcorr) 	Gauss linear corrected;
-    laplacian(rUA,p)		Gauss linear corrected;
+    default                 none;
+    laplacian(nu,U)         Gauss linear corrected;
+    laplacian(rUA,pcorr)    Gauss linear corrected;
+    laplacian(rUA,p)        Gauss linear corrected;
 }
 
 interpolationSchemes
 {
-    default         	linear;
-    interpolate(HbyA) 	linear;
-    interpolate(1|A) 	linear;
+    default             linear;
+    interpolate(HbyA)   linear;
+    interpolate(1|A)    linear;
 }
 
 snGradSchemes

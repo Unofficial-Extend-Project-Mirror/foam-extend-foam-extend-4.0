@@ -26,7 +26,7 @@ Class
     BlockAamgPolicy
 
 Description
-    Specialisation of the BlockAamgPolicy for vectors. 
+    Specialisation of the BlockAamgPolicy for vectors.
 
 Author
     Klas Jareteg, 2013-01-31
@@ -75,7 +75,7 @@ inline autoPtr<BlockLduMatrix<vector> > BlockAamgPolicy<vector>::restrictMatrix
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif

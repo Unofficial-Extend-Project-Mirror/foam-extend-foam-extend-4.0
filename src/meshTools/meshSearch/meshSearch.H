@@ -204,7 +204,7 @@ public:
             //- Find nearest cell in terms of cell centre.
             // - use octree
             // - use linear search
-            // - if seed is provided walk. (uses findNearestCellWalk; 
+            // - if seed is provided walk. (uses findNearestCellWalk;
             //   does not handle holes in domain)
             label findNearestCell
             (

@@ -94,7 +94,7 @@ static bool readUpto
 
         if (space != string::npos && line.substr(0, space) == cmd)
         {
-            args = line.substr(space+1);            
+            args = line.substr(space+1);
             return true;
         }
     }
@@ -283,7 +283,7 @@ bool triSurface::readAC(const fileName& ACfileName)
 
                     faces.append
                     (
-                        labelledTri 
+                        labelledTri
                         (
                             v0 + patchStartVert,
                             v1 + patchStartVert,

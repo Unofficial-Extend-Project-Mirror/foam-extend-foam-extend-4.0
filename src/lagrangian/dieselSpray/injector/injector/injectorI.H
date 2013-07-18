@@ -30,7 +30,7 @@ namespace Foam
 {
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-        
+
 //- Return clone
 inline autoPtr<injector> injector::clone() const
 {

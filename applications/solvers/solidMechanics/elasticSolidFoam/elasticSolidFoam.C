@@ -52,111 +52,111 @@ int main(int argc, char *argv[])
 {
 # include "setRootCase.H"
 
-# include "createTime.H"
+#   include "createTime.H"
 
-# include "createMesh.H"
+#   include "createMesh.H"
 
-# include "createFields.H"
+#   include "createFields.H"
 
-# include "readDivSigmaExpMethod.H"
+#   include "readDivSigmaExpMethod.H"
 
-# include "createSolidInterface.H"
+#   include "createSolidInterface.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-  Info<< "\nCalculating displacement field\n" << endl;
+    Info<< "\nCalculating displacement field\n" << endl;
 
-  while(runTime.loop())
+    while(runTime.loop())
     {
-      Info<< "Time: " << runTime.timeName() << nl << endl;
-      
-#     include "readStressedFoamControls.H"
+        Info<< "Time: " << runTime.timeName() << nl << endl;
 
-      int iCorr = 0;
-      scalar initialResidual = 0;
-      lduMatrix::solverPerformance solverPerf;
-      scalar relativeResidual = GREAT;
+#       include "readStressedFoamControls.H"
 
-      lduMatrix::debug=0;
+        int iCorr = 0;
+        scalar initialResidual = 0;
+        lduMatrix::solverPerformance solverPerf;
+        scalar relativeResidual = GREAT;
 
-      do
+        lduMatrix::debug=0;
+
+        do
         {
-	  U.storePrevIter();
-	  
-#         include "calculateDivSigmaExp.H"
+            U.storePrevIter();
 
-	  //- linear momentum equation
-	  fvVectorMatrix UEqn
+#           include "calculateDivSigmaExp.H"
+
+            //- linear momentum equation
+            fvVectorMatrix UEqn
             (
-	     fvm::d2dt2(rho, U)
-	     ==
-	     fvm::laplacian(2*muf + lambdaf, U, "laplacian(DU,U)")
-	     + divSigmaExp
-	     );
+                fvm::d2dt2(rho, U)
+              ==
+                fvm::laplacian(2*muf + lambdaf, U, "laplacian(DU,U)")
+              + divSigmaExp
+            );
 
-	  if(solidInterfaceCorr)
-	    {
-	      solidInterfacePtr->correct(UEqn);
-	    }
+            if(solidInterfaceCorr)
+            {
+                solidInterfacePtr->correct(UEqn);
+            }
 
-	  solverPerf = UEqn.solve();
+            solverPerf = UEqn.solve();
 
-	  if(iCorr == 0)
-	    {
-	      initialResidual = solverPerf.initialResidual();
-	    }
-	  
-	  U.relax();
+            if(iCorr == 0)
+            {
+                initialResidual = solverPerf.initialResidual();
+            }
 
-	  if(solidInterfaceCorr)
-	    {
-	      gradU = solidInterfacePtr->grad(U);
-	    }
-	  else
-	    {
-	      gradU = fvc::grad(U);
-	    }
+            U.relax();
 
-#         include "calculateRelativeResidual.H"
-	  
-	  Info << "\tTime " << runTime.value()
-	       << ", Corrector " << iCorr
-	       << ", Solving for " << U.name()
-	       << " using " << solverPerf.solverName()
-	       << ", residual = " << solverPerf.initialResidual()
-	       << ", relative residual = " << relativeResidual << endl;
+            if(solidInterfaceCorr)
+            {
+                gradU = solidInterfacePtr->grad(U);
+            }
+            else
+            {
+                gradU = fvc::grad(U);
+            }
+
+#           include "calculateRelativeResidual.H"
+
+            Info << "\tTime " << runTime.value()
+                << ", Corrector " << iCorr
+                << ", Solving for " << U.name()
+                << " using " << solverPerf.solverName()
+                << ", residual = " << solverPerf.initialResidual()
+                << ", relative residual = " << relativeResidual << endl;
         }
-	while
-	  (
-	   //solverPerf.initialResidual() > convergenceTolerance
-	   relativeResidual > convergenceTolerance
-	   &&
-	   ++iCorr < nCorr
-	   );
-	
-      Info << nl << "Time " << runTime.value() << ", Solving for " << U.name() 
-	   << ", Initial residual = " << initialResidual 
-	   << ", Final residual = " << solverPerf.initialResidual()
-	   << ", Relative residual = " << relativeResidual
-	   << ", No outer iterations " << iCorr
-	   << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	   << "  ClockTime = " << runTime.elapsedClockTime() << " s" 
-	   << endl;
-      
-      lduMatrix::debug=0;
+        while
+        (
+            //solverPerf.initialResidual() > convergenceTolerance
+            relativeResidual > convergenceTolerance
+            &&
+            ++iCorr < nCorr
+       );
 
-#     include "calculateEpsilonSigma.H"
+      Info << nl << "Time " << runTime.value() << ", Solving for " << U.name()
+          << ", Initial residual = " << initialResidual
+          << ", Final residual = " << solverPerf.initialResidual()
+          << ", Relative residual = " << relativeResidual
+          << ", No outer iterations " << iCorr
+          << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+          << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+          << endl;
 
-#     include "writeFields.H"
+     lduMatrix::debug=0;
 
-      Info<< "ExecutionTime = "
-	  << runTime.elapsedCpuTime()
-	  << " s\n\n" << endl;
+#    include "calculateEpsilonSigma.H"
+
+#    include "writeFields.H"
+
+     Info<< "ExecutionTime = "
+         << runTime.elapsedCpuTime()
+         << " s\n\n" << endl;
     }
-  
-  Info<< "End\n" << endl;
-  
-  return(0);
+
+    Info<< "End\n" << endl;
+
+    return(0);
 }
 
 

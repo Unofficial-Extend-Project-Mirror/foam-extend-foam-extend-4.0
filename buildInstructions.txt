@@ -96,7 +96,7 @@ mkdir ~/OpenFOAM/linux/paraview-2.4.4/include
 cp ./paraview-2.4.4/VTK/Common/vtk* ~/OpenFOAM/linux/paraview-2.4.4/include/
 cp ./paraview-2.4.4/VTK/Filtering/vtk* ~/OpenFOAM/linux/paraview-2.4.4/include/
 cp ./paraview-2.4.4-obj/VTK/vtk* ~/OpenFOAM/linux/paraview-2.4.4/include/
-cp ./paraview-2.4.4-obj/ParaViewConfig.cmake ~/OpenFOAM/linux/paraview-2.4.4/lib/paraview-2.4/ 
+cp ./paraview-2.4.4-obj/ParaViewConfig.cmake ~/OpenFOAM/linux/paraview-2.4.4/lib/paraview-2.4/
 
 linux64 copy commands
 
@@ -104,7 +104,7 @@ mkdir ~/OpenFOAM/linux64/paraview-2.4.4/include
 cp ./paraview-2.4.4/VTK/Common/vtk* ~/OpenFOAM/linux64/paraview-2.4.4/include/
 cp ./paraview-2.4.4/VTK/Filtering/vtk* ~/OpenFOAM/linux64/paraview-2.4.4/include/
 cp ./paraview-2.4.4-obj/VTK/vtk* ~/OpenFOAM/linux64/paraview-2.4.4/include/
-cp ./paraview-2.4.4-obj/ParaViewConfig.cmake ~/OpenFOAM/linux64/paraview-2.4.4/lib/paraview-2.4/ 
+cp ./paraview-2.4.4-obj/ParaViewConfig.cmake ~/OpenFOAM/linux64/paraview-2.4.4/lib/paraview-2.4/
 
 
 4) build OpenFOAM

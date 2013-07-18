@@ -171,7 +171,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighbours3D
 
         boundBox bbSlave(curFacePoints, false);
 
-        scalar tmpValue = Foam::magSqr(bbSlave.max() - bbSlave.min())/4.0; 
+        scalar tmpValue = Foam::magSqr(bbSlave.max() - bbSlave.min())/4.0;
 
         // We will compare squared distances, so save the sqrt() if value > 1.0.
         if (tmpValue < 1.0)
@@ -181,7 +181,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighbours3D
         }
         else
         {
-            slaveRadius2[faceSi] = tmpValue;  
+            slaveRadius2[faceSi] = tmpValue;
         }
     }
 
@@ -786,7 +786,7 @@ bool GGIInterpolation<MasterPatch, SlavePatch>::detect2dPolygonsOverlap
         //
         //
         //    P1 -------------                       p1_min + epsilon < p2_max  &&  p2_min + epsilon < p1_max  == true
-        //    P2 ------------- 
+        //    P2 -------------
         //
         //    P2 -------------                       p1_min + epsilon < p2_max  &&  p2_min + epsilon < p1_max  == true
         //    P1 -------------

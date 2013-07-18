@@ -41,7 +41,7 @@ Warning #2: It is recommended to use cmake version 2.8.0 or newer for
 
 a) You can set your local system identifier using the environment variable
    $CDASH_SUBMIT_LOCAL_HOST_ID.  Please try using a unique identifier like
-   your machine's hostname. Otherwise, the fully qualified name of your system 
+   your machine's hostname. Otherwise, the fully qualified name of your system
    will be used.
 
 
@@ -68,10 +68,10 @@ cd ./runDir; ./Allclean
 
 Both Allrun_Experimental and Allrun_Nightly scripts will submit their results
 to the CDash server of your choice, as specified by the file
-$WM_PROJECT_DIR/CTestConfig.cmake. 
+$WM_PROJECT_DIR/CTestConfig.cmake.
 
 To submit your results to the CDash server on openfoam-extend, just use
-the file CTestConfig.cmake.openfoam-extend. 
+the file CTestConfig.cmake.openfoam-extend.
 
 If submitted to the CDash server on openfoam-extend, your results will be displayed here:
 http://openfoam-extend.sourceforge.net/CDash/index.php?project=OpenFOAM-1.6-ext

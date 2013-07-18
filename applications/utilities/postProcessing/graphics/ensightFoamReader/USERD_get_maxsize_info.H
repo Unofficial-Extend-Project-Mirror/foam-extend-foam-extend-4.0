@@ -5,7 +5,7 @@ int USERD_get_maxsize_info
     int *max_ijk_dimensions[3]
 )
 {
-    return Z_ERR; 
+    return Z_ERR;
 
 #ifdef ENSIGHTDEBUG
     Info << "Entering: USERD_get_maxsize_info" << endl;
@@ -34,10 +34,10 @@ int USERD_get_maxsize_info
         Info<< "Checking time = " << runTimePtr->timeName() << endl;
 
         const cellShapeList& cells = meshPtr->cellShapes();
-        
+
         const label nPoints = meshPtr->nPoints();
         const label nCells  = cells.size();
-        
+
         maxNPoints = max(maxNPoints, nPoints);
 
         for (label n=0; n<nCells;n++)

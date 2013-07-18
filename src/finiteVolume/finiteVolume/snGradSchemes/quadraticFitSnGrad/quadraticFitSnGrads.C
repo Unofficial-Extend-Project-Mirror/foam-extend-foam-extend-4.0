@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    Simple central-difference snGrad scheme with quadratic fit correction from 
+    Simple central-difference snGrad scheme with quadratic fit correction from
     a larger stencil.
 
 \*---------------------------------------------------------------------------*/

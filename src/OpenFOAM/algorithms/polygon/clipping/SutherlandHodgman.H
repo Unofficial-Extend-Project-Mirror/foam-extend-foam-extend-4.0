@@ -29,11 +29,11 @@ Description
     This is an implementation of the Sutherland Hodgman algorithm:
     Reentrant Polygon Clipping, Sutherland, Hodgman,
     Communications of the ACM, 1974
-  
+
     Wikipedia has a very simple Pseudo-Code example of this algorithm
     http://en.wikipedia.org/wiki/Sutherland-Hodgeman.
-  
-    The subject polygon will be clipped by the clipping polygon. 
+
+    The subject polygon will be clipped by the clipping polygon.
 
 Author
     Martin Beaudoin, Hydro-Quebec, (2008)
@@ -118,7 +118,7 @@ public:
 
     // Constructors
 
-        //- Construct from component 
+        //- Construct from component
         SutherlandHodgman
         (
             const List<point2D>& clippingPolygon,

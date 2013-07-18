@@ -34,7 +34,7 @@ diffusivity quadratic inverseDistance 1(plate);
 
 frozenDiffusion yes;
 
-distancePatches 
+distancePatches
 (
     plate
 );

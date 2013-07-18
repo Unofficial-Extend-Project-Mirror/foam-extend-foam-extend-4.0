@@ -28,7 +28,7 @@ Application
 Description
     Sample application testing the equationReader in a finite volume solver
     environment.
-    
+
 Author
     David L. F. Gaden
 
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
     eqns.addDataSource(Sj, "Sj");
     eqns.addDataSource(Sk, "Sk");
     eqns.addDataSource(Sl, "Sl");
-    
+
     label listIndex(0);
     eqns.addDataSource(p);
     eqns.addDataSource(dummy);
@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
     scalar saD(readScalar(testDict1.lookup("saD")));
     scalar saE(readScalar(testDict1.lookup("saE")));
     scalar saF(readScalar(testDict1.lookup("saF")));
-    
+
     dimensionedScalar dsaA(testDict1.lookup("dsaA"));
     dimensionedScalar dsaB(testDict1.lookup("dsaB"));
     dimensionedScalar dsaC(testDict1.lookup("dsaC"));
@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
         DStime.value() = runTime.value();
-        
+
         Info << "Moving p index to ";
         listIndex++;
         if (listIndex == p.size())
@@ -313,7 +313,7 @@ int main(int argc, char *argv[])
             volScalarField rUA = 1.0/UEqn.A();
 
             U = rUA*UEqn.H();
-            phi = (fvc::interpolate(U) & mesh.Sf()) 
+            phi = (fvc::interpolate(U) & mesh.Sf())
                 + fvc::ddtPhiCorr(rUA, U, phi);
 
             adjustPhi(phi, U, p);

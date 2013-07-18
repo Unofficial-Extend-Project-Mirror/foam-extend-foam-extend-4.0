@@ -1170,7 +1170,7 @@ bool Foam::polyMeshGeometry::checkVolRatio
     {
         label face0 = baffles[i].first();
         label face1 = baffles[i].second();
-        
+
         scalar ownVol = mag(cellVolumes[own[face0]]);
 
         scalar neiVol = mag(cellVolumes[own[face1]]);
@@ -1823,7 +1823,7 @@ bool Foam::polyMeshGeometry::checkCellDeterminant
         forAll(cFaces, cFaceI)
         {
             label faceI = cFaces[cFaceI];
-    
+
             scalar magArea = mag(faceAreas[faceI]);
 
             magAreaSum += magArea;
@@ -1850,7 +1850,7 @@ bool Foam::polyMeshGeometry::checkCellDeterminant
             nWarnDet++;
         }
     }
-    
+
     reduce(minDet, minOp<scalar>());
     reduce(sumDet, sumOp<scalar>());
     reduce(nSumDet, sumOp<label>());

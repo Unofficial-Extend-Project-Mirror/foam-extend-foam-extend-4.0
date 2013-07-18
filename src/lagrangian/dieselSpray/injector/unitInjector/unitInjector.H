@@ -220,7 +220,7 @@ public:
         {
             return velocityProfile_;
         }
-        
+
         scalar velocity(const scalar time) const;
 
         List<pair> CdProfile() const;

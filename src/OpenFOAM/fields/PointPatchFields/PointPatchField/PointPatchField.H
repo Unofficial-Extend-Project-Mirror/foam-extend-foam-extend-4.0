@@ -654,7 +654,7 @@ makePointPatchTypeField                                                       \
     pointPatch##TensorField,                                                  \
     type##pointPatchType##TensorField                                         \
 );
-             
+
 
 #define makePointPatchFieldTypedefs(type, Type, mesh, pointPatch, patchPatch, matrixType, pointPatchType) \
                                                                               \

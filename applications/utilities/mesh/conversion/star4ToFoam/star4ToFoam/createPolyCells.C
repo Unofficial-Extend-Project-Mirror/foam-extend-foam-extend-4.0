@@ -107,10 +107,10 @@ void meshReader::createPolyCells()
         forAll(curNeighbours, neiI)
         {
             label curNei = curNeighbours[neiI];
-        
+
             // get the list of search faces
             const faceList& searchFaces = cFaces[curNei];
-        
+
             forAll(searchFaces, neiFaceI)
             {
                 if (searchFaces[neiFaceI] == curFace)
@@ -122,11 +122,11 @@ void meshReader::createPolyCells()
                     // - attached faces with the opposite normal as the baffle
 
                     label side = 0;
-                    if (curFace[1] == searchFaces[neiFaceI][1]) 
+                    if (curFace[1] == searchFaces[neiFaceI][1])
                     {
                         side = 1;
                     }
-            
+
 #ifdef DEBUG_FACE_ORDERING
                     Info<< "match " << baffleI
                         << " against cell " << curNei
@@ -158,14 +158,14 @@ void meshReader::createPolyCells()
             {
                 label neiCell = baffleCellIds_[baffleI][side];
                 label neiFace = baffleFaceIds_[baffleI][side];
-        
+
                 if (neiCell >= 0 && neiFace >= 0)
                 {
                     cellPolys_[neiCell][neiFace] = cellI;
                 }
             }
         }
-        else 
+        else
         {
             Info<< "drop baffle " << baffleI
                 << " (original cell "
@@ -177,7 +177,7 @@ void meshReader::createPolyCells()
             baffleFaceIds_[baffleI].clear();
         }
     }
-    
+
 #ifdef DEBUG_CELLPOLY
     Info<< "cellPolys_" << cellPolys_ << endl;
     Info<< "baffleFaces_" << baffleFaces_ << endl;
@@ -232,7 +232,7 @@ void meshReader::createPolyCells()
                     label curNei = curNeighbours[neiI];
 
                     // reject neighbours with the lower label. This should
-                    // also reject current cell. 
+                    // also reject current cell.
                     if (curNei > cellI)
                     {
                         // get the list of search faces
@@ -314,7 +314,7 @@ void meshReader::createPolyCells()
 #ifdef DEBUG_CELLPOLY
     Info<< "cellPolys = " << cellPolys_ << endl;
 #endif
-    
+
     // I won't reset the size of internal faces, because more faces will be
     // added in createPolyBoundary()
 }

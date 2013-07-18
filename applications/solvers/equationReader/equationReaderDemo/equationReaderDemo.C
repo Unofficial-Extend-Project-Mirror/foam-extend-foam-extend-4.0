@@ -28,7 +28,7 @@ Application
 Description
     Sample application testing the equationReader extension, and demonstrating
     its use.
-    
+
 Author
     David L. F. Gaden
 
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
     Info << "Reading equation b from testDict, linking an output variable"
         << endl;
     eqns.readEquation(testDict, "b", activeOutB);
-    
+
     Info << "Output variable before update() = " << activeOutB << endl;
     Info << "Begining .update() - this evaluates all equations with active "
         << "output..." << endl;
@@ -161,11 +161,11 @@ int main(int argc, char *argv[])
     Info << "done.  Evaluating equation f ... ";
     passiveOutF = eqns.evaluate("f");
     Info << "done." << token::NL << "The result is: " << passiveOutF << endl;
-    
+
     Info << token::NL << "Creating output..." << endl;
     OFstream os(path/"outputDict");
     os << eqns;
     eqns.dataSourceStatus(os);
-    
+
     return(0);
 }

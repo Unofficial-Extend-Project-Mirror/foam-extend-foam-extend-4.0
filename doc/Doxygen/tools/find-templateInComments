@@ -34,7 +34,7 @@ sub wanted {
             if (m{\<\s*\w+\s*\>}) {
                 print "$File::Find::name  line=$.\n";
             }
-            
+
             if (m{\*/}) {
                 last;
             }

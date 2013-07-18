@@ -54,7 +54,7 @@ inline thirdBodyArrheniusReactionRate::thirdBodyArrheniusReactionRate
 :
     ArrheniusReactionRate
     (
-        species, 
+        species,
         is.readBegin("thirdBodyArrheniusReactionRate(Istream&)")
     ),
     thirdBodyEfficiencies_(species, is)
@@ -72,7 +72,7 @@ inline scalar thirdBodyArrheniusReactionRate::operator()
     const scalarField& c
 ) const
 {
-    return 
+    return
         thirdBodyEfficiencies_.M(c)
        *ArrheniusReactionRate::operator()(T, p, c);
 }

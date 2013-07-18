@@ -75,7 +75,7 @@ Foam::tmp<Foam::volScalarField> Foam::GidaspowConductivity::kappa
     (
         2.0*sqr(alpha)*g0*(1.0 + e)/sqrtPi
       + (9.0/8.0)*sqrtPi*g0*0.5*(1.0 + e)*sqr(alpha)
-      + (15.0/16.0)*sqrtPi*alpha 
+      + (15.0/16.0)*sqrtPi*alpha
       + (25.0/64.0)*sqrtPi/((1.0 + e)*g0)
     );
 }

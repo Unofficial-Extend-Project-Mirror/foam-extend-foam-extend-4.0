@@ -87,7 +87,7 @@ patches
 
 mergePatchPairs
 (
-    ( lowerWallInterface interface )	
+    ( lowerWallInterface interface )
 );
 
 // ************************************************************************* //

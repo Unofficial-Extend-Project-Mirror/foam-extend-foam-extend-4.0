@@ -171,7 +171,7 @@ public:
         {
             checkPatchFace(mesh);
         }
-        
+
 
         //- Construct from dictionary
         componentReference

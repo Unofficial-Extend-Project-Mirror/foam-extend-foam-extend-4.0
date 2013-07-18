@@ -4,18 +4,18 @@
 FoamFile
 {
  version 2.0;
- format ascii; 	
- root "/home/math/OpenFOAM/test_MATH/test_GGI/simpleFoam_MFR_stitch/MFR/360deg_1on1"; 	
- case "dom1_dom2_GGI"; 	
- instance "0"; 	
- local ""; 	
- class surfaceScalarField; 	
- object phi; 	
+ format ascii;
+ root "/home/math/OpenFOAM/test_MATH/test_GGI/simpleFoam_MFR_stitch/MFR/360deg_1on1";
+ case "dom1_dom2_GGI";
+ instance "0";
+ local "";
+ class surfaceScalarField;
+ object phi;
 }
 
 dimensions [ 0 3 -1 0 0 0 0 ];
 
-internalField uniform 0; 	
+internalField uniform 0;
 
 boundaryField
 {
@@ -58,12 +58,12 @@ boundaryField
   inflow
   {
     type fixedValue;
-    value uniform 0; 	
+    value uniform 0;
   }
   outflow
   {
     type fixedValue;
-    value uniform 0; 	
+    value uniform 0;
   }
 } 	// ************************************************************************* //
 

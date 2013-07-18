@@ -561,7 +561,7 @@ bool Foam::primitiveMeshGeometry::checkFaceSkewness
                 cellCentres[own[faceI]]*dNei/(dOwn+dNei)
               + cellCentres[nei[faceI]]*dOwn/(dOwn+dNei);
 
-            scalar skewness = 
+            scalar skewness =
                 mag(faceCentres[faceI] - faceIntersection)
               / (
                     mag(cellCentres[nei[faceI]]-cellCentres[own[faceI]])
@@ -1248,7 +1248,7 @@ bool Foam::primitiveMeshGeometry::checkCellDeterminant
         forAll(cFaces, cFaceI)
         {
             label faceI = cFaces[cFaceI];
-    
+
             scalar magArea = mag(faceAreas[faceI]);
 
             magAreaSum += magArea;
@@ -1275,7 +1275,7 @@ bool Foam::primitiveMeshGeometry::checkCellDeterminant
             nWarnDet++;
         }
     }
-    
+
     reduce(minDet, minOp<scalar>());
     reduce(sumDet, sumOp<scalar>());
     reduce(nSumDet, sumOp<label>());

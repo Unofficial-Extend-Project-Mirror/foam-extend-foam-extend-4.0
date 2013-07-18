@@ -467,7 +467,6 @@ void Foam::parcel::updateParcelProperties
     scalar oldhv = fuels.hl(pg, T(), X());
     scalar Np = N(oldDensity);
 
-    scalar newDensity = oldDensity;
     scalar newMass    = oldMass;
     scalar newhg      = oldhg;
     scalar newhv      = oldhv;
@@ -496,7 +495,6 @@ void Foam::parcel::updateParcelProperties
         // the first time
         if (n > 1)
         {
-            newDensity = fuels.rho(pg, Tnew, X());
             newMass = m();
             newhg = 0.0;
             scalarField Ynew(fuels.Y(X()));

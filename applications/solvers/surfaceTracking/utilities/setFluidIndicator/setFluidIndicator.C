@@ -26,7 +26,7 @@ Application
     interfaceTrackinFoam
 
 Description
-    Incompressible laminar CFD code for simulation of a single bubble rising 
+    Incompressible laminar CFD code for simulation of a single bubble rising
     in a stil liquid. Interface between fluid phases is tracked using moving
     mesh.
 
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
     Info << "ExecutionTime = "
         << scalar(runTime.elapsedCpuTime())
         << " s\n" << endl << endl;
-    
+
     Info << "End\n" << endl;
 
     return(0);

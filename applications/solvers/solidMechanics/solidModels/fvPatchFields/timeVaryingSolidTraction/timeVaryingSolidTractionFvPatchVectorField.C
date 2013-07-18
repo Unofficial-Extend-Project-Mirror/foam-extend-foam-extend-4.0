@@ -79,9 +79,9 @@ timeSeries_(dict)
       ) != "extendedLeastSquares"
     )
     {
-	    Warning << "The gradScheme for " << fieldName()
-		<< " should be \"extendedLeastSquares 0\" for the boundary "
-		<< "non-orthogonal correction to be right" << endl;
+        Warning << "The gradScheme for " << fieldName()
+            << " should be \"extendedLeastSquares 0\" for the boundary "
+            << "non-orthogonal correction to be right" << endl;
     }
 }
 

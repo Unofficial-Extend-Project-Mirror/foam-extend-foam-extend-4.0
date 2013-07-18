@@ -10,13 +10,13 @@
  *
  *  The windows 95 specific code for this application was taken from
  *  an example of processing mouse events in an OpenGL program using
- *  the Win32 API from the www.opengl.org web site. 
- *  
+ *  the Win32 API from the www.opengl.org web site.
+ *
  *  Under Project->Settings, Link Options, General Category
- *  Add:  
- *        Opengl32.lib glu32.lib winmm.lib 
+ *  Add:
+ *        Opengl32.lib glu32.lib winmm.lib
  *  to the Object/Library Modules
- *  
+ *
  *  You will need have OpenGL libs and include files to compile this
  *  Go to the www.opengl.org web site if you need help with this.
  */
@@ -36,8 +36,8 @@
 // Functions and Variables from bunny module
 extern void       InitModel();
 extern void       RenderModel();
-extern Vector     model_position;      // position of bunny 
-extern Quaternion model_orientation;   // orientation of bunny 
+extern Vector     model_position;      // position of bunny
+extern Quaternion model_orientation;   // orientation of bunny
 
 // Global Variables
 float   DeltaT = 0.1f;
@@ -74,9 +74,9 @@ void CalcFPSDeltaT(){
 		frame  = frame2;
 		start2 = timeGetTime();
 		frame2 = 0;
-	}		   
+	}
 	DeltaT = (float)(current-last)/CLOCKS_PER_SEC;
-	if(current==last) { 
+	if(current==last) {
 		DeltaT = 0.1f/CLOCKS_PER_SEC;  // it just cant be 0
 	}
 	// if(DeltaT>1.0) DeltaT=1.0;
@@ -87,10 +87,10 @@ void CalcFPSDeltaT(){
 
 void ComputeMouseVector(){
 	OldMouseVector=MouseVector;
-	float spread = (float)tan(ViewAngle/2*3.14/180);  
+	float spread = (float)tan(ViewAngle/2*3.14/180);
 	float y = spread * ((Height-MouseY)-Height/2.0f) /(Height/2.0f);
     float x = spread * (MouseX-Width/2.0f)  /(Height/2.0f);
-    Vector v(x ,y,-1); 
+    Vector v(x ,y,-1);
     // v=UserOrientation *v;
     v=normalize(v);
 	MouseVector = v;
@@ -100,13 +100,13 @@ Quaternion VirtualTrackBall(Vector cop,Vector cor,Vector dir1,Vector dir2) {
 	// Implement track ball functionality to spin stuf on the screen
 	//  cop   center of projection
 	//  cor   center of rotation
-	//  dir1  old mouse direction 
+	//  dir1  old mouse direction
 	//  dir2  new mouse direction
 	// pretend there is a sphere around cor.  Then find the points
 	// where dir1 and dir2 intersect that sphere.  Find the
 	// rotation that takes the first point to the second.
 	float m;
-	// compute plane 
+	// compute plane
 	Vector nrml = cor - cop;
 	float fudgefactor = 1.0f/(magnitude(nrml) * 0.25f); // since trackball proportional to distance from cop
 	nrml = normalize(nrml);
@@ -181,7 +181,7 @@ void Display(){
 
 
 LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{ 
+{
     static PAINTSTRUCT ps;
     static GLboolean left  = GL_FALSE;	/* left button currently down? */
     static GLboolean right = GL_FALSE;	/* right button currently down? */
@@ -256,8 +256,8 @@ LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		PostQuitMessage(0);
 		return 0;
     }
-    return DefWindowProc(hWnd, uMsg, wParam, lParam); 
-} 
+    return DefWindowProc(hWnd, uMsg, wParam, lParam);
+}
 
 HWND CreateOpenGLWindow(char* title)
 {
@@ -315,15 +315,15 @@ HWND CreateOpenGLWindow(char* title)
     pf = ChoosePixelFormat(hDC, &pfd);
     if (pf == 0) {
 		MessageBox(NULL, "ChoosePixelFormat() failed:  "
-			   "Cannot find a suitable pixel format.", "Error", MB_OK); 
+			   "Cannot find a suitable pixel format.", "Error", MB_OK);
 		return 0;
-    } 
- 
+    }
+
     if (SetPixelFormat(hDC, pf, &pfd) == FALSE) {
 		MessageBox(NULL, "SetPixelFormat() failed:  "
 			   "Cannot set format specified.", "Error", MB_OK);
 		return 0;
-    } 
+    }
 
     DescribePixelFormat(hDC, pf, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
 
@@ -340,7 +340,7 @@ HWND CreateOpenGLWindow(char* title)
 		lpPal->palNumEntries = n;
 
 		GetSystemPaletteEntries(hDC, 0, n, &lpPal->palPalEntry[0]);
-    
+
 		/* if the pixel type is RGBA, then we want to make an RGB ramp,
 		   otherwise (color index) set individual colors. */
 		if (pfd.iPixelType == PFD_TYPE_RGBA) {
@@ -351,11 +351,11 @@ HWND CreateOpenGLWindow(char* title)
 
 			/* fill in the entries with an RGB color ramp. */
 			for (i = 0; i < n; ++i) {
-			lpPal->palPalEntry[i].peRed = 
+			lpPal->palPalEntry[i].peRed =
 				(((i >> pfd.cRedShift)   & redMask)   * 255)/redMask;
-			lpPal->palPalEntry[i].peGreen = 
+			lpPal->palPalEntry[i].peGreen =
 				(((i >> pfd.cGreenShift) & greenMask) * 255)/greenMask;
-			lpPal->palPalEntry[i].peBlue = 
+			lpPal->palPalEntry[i].peBlue =
 				(((i >> pfd.cBlueShift)  & blueMask)  * 255)/blueMask;
 			lpPal->palPalEntry[i].peFlags = 0;
 			}
@@ -389,7 +389,7 @@ HWND CreateOpenGLWindow(char* title)
 
     ReleaseDC(hDC, hWnd);
     return hWnd;
-}    
+}
 
 int APIENTRY WinMain(HINSTANCE hCurrentInst, HINSTANCE hPreviousInst,
 	LPSTR lpszCmdLine, int nCmdShow)

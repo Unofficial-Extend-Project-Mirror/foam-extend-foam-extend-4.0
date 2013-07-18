@@ -2,8 +2,8 @@
 // This module contains a bunch of well understood functions
 // I apologise if the conventions used here are slightly
 // different than what you are used to.
-// 
- 
+//
+
 #ifndef GENERIC_VECTOR_H
 #define GENERIC_VECTOR_H
 

@@ -34,4 +34,4 @@
 # \*---------------------------------------------------------------------------*/
 
 #set -x
-ls -d * | grep -v Allrun | grep -v Allclean | xargs rm -rf 
+ls -d * | grep -v Allrun | grep -v Allclean | xargs rm -rf

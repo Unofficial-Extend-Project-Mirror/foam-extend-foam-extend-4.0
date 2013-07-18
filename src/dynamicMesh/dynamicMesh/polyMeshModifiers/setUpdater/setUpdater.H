@@ -55,7 +55,7 @@ class setUpdater
 {
     // Private Member Functions
 
-        //- Updates all sets 
+        //- Updates all sets
         template<class Type>
         void updateSets(const mapPolyMesh& morphMap) const;
 

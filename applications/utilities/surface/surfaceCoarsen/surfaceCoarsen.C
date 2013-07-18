@@ -25,10 +25,10 @@ License
 Description
     Surface coarsening using 'bunnylod':
 
-	Polygon Reduction Demo
-	By Stan Melax (c) 1998
-	mailto:melax@cs.ualberta.ca
-	http://www.cs.ualberta.ca/~melax
+    Polygon Reduction Demo
+    By Stan Melax (c) 1998
+    mailto:melax@cs.ualberta.ca
+    http://www.cs.ualberta.ca/~melax
 
 
 \*---------------------------------------------------------------------------*/
@@ -54,7 +54,7 @@ int mapVertex(::List<int>& collapse_map, int a, int mx)
         return 0;
     }
     while (a >= mx)
-    {  
+    {
         a = collapse_map[a];
     }
     return a;
@@ -122,14 +122,14 @@ int main(int argc, char *argv[])
         td.v[1]=f[1];
         td.v[2]=f[2];
         tri.Add(td);
-    }        
+    }
 
     ::List<int> collapse_map;   // to which neighbor each vertex collapses
     ::List<int> permutation;
 
     ::ProgressiveMesh(vert,tri,collapse_map,permutation);
 
-    // rearrange the vertex list 
+    // rearrange the vertex list
     ::List< ::Vector> temp_list;
     for(int i=0;i<vert.num;i++)
     {
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
         int p2 = mapVertex(collapse_map, tri[i].v[2], render_num);
 
         // note:  serious optimization opportunity here,
-        //  by sorting the triangles the following "continue" 
+        //  by sorting the triangles the following "continue"
         //  could have been made into a "break" statement.
         if (p0 == p1 || p1 == p2 || p2 == p0)
         {

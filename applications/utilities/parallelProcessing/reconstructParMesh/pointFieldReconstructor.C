@@ -68,7 +68,7 @@ Foam::pointFieldReconstructor::pointFieldReconstructor
                 {
                     pointMap[patchPointLabels[pointi]] = pointi;
                 }
-            
+
                 const labelList& procPatchPoints =
                     procMesh.boundary()[patchi].meshPoints();
 

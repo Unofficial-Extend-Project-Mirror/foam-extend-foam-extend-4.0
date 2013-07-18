@@ -38,8 +38,8 @@ namespace Foam
 {
 
 // Temporary hack: useful for tracking balance of phi across interface
-void
-traceMixingPlaneFlux(
+void traceMixingPlaneFlux
+(
     volVectorField& U,
     surfaceScalarField& phi,
     scalar& masterPatchScaleFactor,
@@ -52,7 +52,7 @@ traceMixingPlaneFlux(
     forAll (phi.boundaryField(), patchI)
     {
         if (isA<mixingPlaneFvsPatchScalarField>(phi.boundaryField()[patchI]))
-	{
+        {
             word patchName = phi.boundaryField()[patchI].patch().name();
 
             const mixingPlanePolyPatch& mixingPlanePatch =
@@ -62,7 +62,7 @@ traceMixingPlaneFlux(
                 );
 
             if (mixingPlanePatch.master() && !visited[patchI])
-	    {
+            {
                 visited[patchI] = true;
 
                 // Calculate local and shadow flux
@@ -93,12 +93,9 @@ traceMixingPlaneFlux(
                     << mag(phiFromU - shadowPhiFromU)/(phiFromU + SMALL)*100
                     << " %"
                     << endl;
-
-                
-	    }
-	}
+            }
+        }
     }
-
 }
 
 }

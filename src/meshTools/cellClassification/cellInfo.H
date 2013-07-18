@@ -26,7 +26,7 @@ Class
     Foam::cellInfo
 
 Description
-    Holds information regarding type of cell. Used in inside/outside 
+    Holds information regarding type of cell. Used in inside/outside
     determination in cellClassification.
 
 SourceFiles
@@ -58,7 +58,7 @@ class cellInfo
     // Private data
 
         label type_;
-        
+
     // Private Member Functions
 
         //- Update current cell/face type with neighbouring

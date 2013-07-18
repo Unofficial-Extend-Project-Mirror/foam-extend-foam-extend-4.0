@@ -21,7 +21,6 @@
 
         bool foundAtLeastOne = false;
         scalar zHigher = GREAT;
-        scalar zLower = GREAT;
         scalar dh = GREAT;
         scalar dl = GREAT;
 
@@ -35,7 +34,6 @@
             {
                 if (zPistV - zc > 0 && zPistV - zc < dl)
                 {
-                    zLower = zc;
                     dl = zPistV - zc;
                 }
 

@@ -85,9 +85,9 @@ fixedDisplacementFvPatchVectorField::fixedDisplacementFvPatchVectorField
         ) != "extendedLeastSquares"
     )
     {
-	    Warning << "The gradScheme for " << fieldName_
-		<< " should be \"extendedLeastSquares 0\" for the boundary "
-		<< "non-orthogonal correction to be right" << endl;
+        Warning << "The gradScheme for " << fieldName_
+            << " should be \"extendedLeastSquares 0\" for the boundary "
+            << "non-orthogonal correction to be right" << endl;
     }
 }
 
@@ -120,7 +120,7 @@ snGrad() const
 {
   //- fixedValue snGrad with no correction
   //  return (*this - patchInternalField())*this->patch().deltaCoeffs();
-  
+
     const fvPatchField<tensor>& gradField =
         patch().lookupPatchField<volTensorField, tensor>
         (
@@ -133,9 +133,9 @@ snGrad() const
     //- correction vector
     vectorField k = delta - n*(n&delta);
 
-    return 
+    return
     (
-        *this 
+        *this
       - (patchInternalField() + (k&gradField.patchInternalField()))
       )*this->patch().deltaCoeffs();
 }

@@ -152,7 +152,7 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
     if (sourcePath.path().path().name() != currentSolverDomain_)
     {
         superLoop_++;
-        
+
         switch (startFrom_)
         {
             case mtsFirstTime:
@@ -182,7 +182,7 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
     startTime_ = localStartTime;
 
     globalTimeOffset_ = globalTime - startTime_;
-    
+
     // Give multiDictRegistry a time value (required for regIOobject::write()
     // to case/[timeValue]
     multiDictRegistry_.setTime(startTime_, 0);
@@ -222,7 +222,7 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
         ),
         currentSolverDomainDict_
     );
-    
+
     // Remove multiSolver-specific values from dictionary
     newControlDict.remove("startFrom");
     newControlDict.remove("startTime");
@@ -234,14 +234,14 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
     newControlDict.remove("timePrecision");
     newControlDict.remove("storeFields");
     newControlDict.remove("elapsedTime");
-    
+
     // Add values to obtain the desired behaviour
     newControlDict.set("startFrom", "startTime");
     newControlDict.set("startTime", startTime_);
     newControlDict.set("stopAt", stopAtSetting);
     newControlDict.set("endTime", endTime_);
     if (multiSolverControl_.found("timeFormat"))
-    {    
+    {
         newControlDict.set
         (
             "timeFormat",
@@ -249,7 +249,7 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
         );
     }
     if (multiSolverControl_.found("timePrecision"))
-    {    
+    {
         newControlDict.set
         (
             "timePrecision",

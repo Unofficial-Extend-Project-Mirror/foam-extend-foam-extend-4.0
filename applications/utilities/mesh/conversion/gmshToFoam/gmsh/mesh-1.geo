@@ -9,13 +9,13 @@ h4 = 1900/1000;
 
 // Parametres de maillage
 // selon le rayon
-rCells = 10/2; 	rRatio = 0.85;
+rCells = 10/2;     rRatio = 0.85;
 // selon S1
-S1Cells = 30/2; 	S1ratio = 1;
+S1Cells = 30/2;     S1ratio = 1;
 // selon S2
-S2Cells = 35/2;	S2ratio = 0.95;
+S2Cells = 35/2;    S2ratio = 0.95;
 // selon S3
-S3Cells = 20/2;	S3ratio = 1;
+S3Cells = 20/2;    S3ratio = 1;
 
 Point(1) = {r1, r1, h4};
 Point(2) = {r1, r1, h3};

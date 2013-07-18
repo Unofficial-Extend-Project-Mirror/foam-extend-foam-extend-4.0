@@ -69,7 +69,7 @@ multivariateScheme<Type, Scheme>::multivariateScheme
     typename multivariateSurfaceInterpolationScheme<Type>::
         fieldTable::const_iterator iter = this->fields().begin();
 
-    surfaceScalarField limiter = 
+    surfaceScalarField limiter =
         Scheme(mesh, faceFlux_, *this).limiter(*iter());
 
     for (++iter; iter != this->fields().end(); ++iter)
@@ -81,7 +81,7 @@ multivariateScheme<Type, Scheme>::multivariateScheme
         );
     }
 
-    weights_ = 
+    weights_ =
         limiter*mesh.surfaceInterpolation::weights()
       + (scalar(1) - limiter)*upwind<Type>(mesh, faceFlux_).weights();
 }

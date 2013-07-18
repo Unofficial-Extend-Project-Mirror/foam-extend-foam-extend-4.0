@@ -554,7 +554,7 @@ EulerFaDdtScheme<Type>::famDdt
     scalar rDeltaT = 1.0/mesh().time().deltaT().value();
 
     fam.diag() = rDeltaT*rho.value()*mesh().S();
-    
+
     if (mesh().moving())
     {
         fam.source() = rDeltaT

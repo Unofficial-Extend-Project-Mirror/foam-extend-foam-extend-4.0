@@ -23,11 +23,11 @@ solvers
       relTol          0.1;
       //minIter         0;
       //maxIter         1000;
-      
+
       solver          PCG;
       preconditioner  DIC;
-      
-      /*      
+
+      /*
       solver                GAMG;
       smoother              GaussSeidel;
       nPreSweeps            0;
@@ -39,7 +39,7 @@ solvers
       nCellsInCoarsestLevel 120;
       agglomerator          faceAreaPair;
       mergeLevels           1;
-      */      
+      */
       /*
       solver          amgSolver;
       cycle           W-cycle;

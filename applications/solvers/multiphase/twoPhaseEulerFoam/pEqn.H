@@ -42,7 +42,7 @@
 
     phib = (fvc::interpolate(Ub) & mesh.Sf()) + fvc::ddtPhiCorr(rUbA, Ub, phib)
          + phiDragb;
-    
+
     phi = alphaf*phia + betaf*phib;
 
     surfaceScalarField Dp("(rho*(1|A(U)))", alphaf*rUaAf/rhoa + betaf*rUbAf/rhob);

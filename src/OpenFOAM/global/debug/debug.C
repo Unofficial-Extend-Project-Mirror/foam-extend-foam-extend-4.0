@@ -86,7 +86,7 @@ Foam::dictionary& Foam::debug::controlDict()
         // Fallback to default locations if filename is empty or not valid
         if( ! isFile(globControlDictFileName) )
             globControlDictFileName = findEtcFile("controlDict", true);
-            
+
         controlDictPtr_ = new dictionary
         (
             IFstream(globControlDictFileName)()

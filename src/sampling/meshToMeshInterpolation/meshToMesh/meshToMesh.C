@@ -163,7 +163,7 @@ meshToMesh::meshToMesh
                 << exit(FatalError);
         }
 
-        if 
+        if
         (
             fromMesh_.boundaryMesh()[patchi].type()
          != toMesh_.boundaryMesh()[patchi].type()

@@ -92,7 +92,7 @@ void Foam::BlockAmgCycle<Type>::makeCoarseLevels(const label nMaxLevels)
 
             if (addCoarse)
             {
-                curCyclePtr->coarseLevelPtr_ = 
+                curCyclePtr->coarseLevelPtr_ =
                     new BlockAmgCycle<Type>(coarsePtr);
 
                 // Point to the next coarse level
@@ -128,7 +128,7 @@ void Foam::BlockAmgCycle<Type>::fixedCycle
     {
         // Pre-smoothing
         levelPtr_->smooth(x, b, nPreSweeps);
-    
+
         // Get reference to coarse level
         Field<Type>& xCoarse = coarseLevelPtr_->levelPtr_->x();
         Field<Type>& bCoarse = coarseLevelPtr_->levelPtr_->b();
@@ -148,7 +148,7 @@ void Foam::BlockAmgCycle<Type>::fixedCycle
             bCoarse,
             nPreSweeps > 0 || cycle != V_CYCLE
         );
-        
+
         coarseLevelPtr_->fixedCycle
         (
             xCoarse,
@@ -194,7 +194,7 @@ void Foam::BlockAmgCycle<Type>::fixedCycle
         }
 
         levelPtr_->prolongateCorrection(x, xCoarse);
-        
+
         // Post-smoothing
         levelPtr_->smooth(x, b, nPostSweeps);
     }

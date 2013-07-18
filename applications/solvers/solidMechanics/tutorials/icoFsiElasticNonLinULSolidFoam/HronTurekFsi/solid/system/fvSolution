@@ -26,7 +26,7 @@ solvers
 {
     DU
     {
-	solver GAMG;
+        solver GAMG;
         tolerance        1e-8;
         relTol           0.01;
         minIter          1;
@@ -37,9 +37,9 @@ solvers
         nPostSweeps      2;
         nFinestSweeps    2;
 
-	scaleCorrection true;
+        scaleCorrection true;
         directSolveCoarsest false;
-			   		      
+
 
         cacheAgglomeration true;
 
@@ -50,7 +50,7 @@ solvers
 
 //    DU
 //    {
-//	  solver amgSolver;
+//        solver amgSolver;
 //        cycle           W-cycle;
 //        policy          AAMG;
 //        nPreSweeps      0;
@@ -73,9 +73,9 @@ solvers
 
 stressedFoam
 {
-    nCorrectors     	1000;
-    DU               	1e-06;
-    historyPointID	62;
+    nCorrectors         1000;
+    DU                   1e-06;
+    historyPointID    62;
 }
 
 relaxationFactors

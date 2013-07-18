@@ -63,7 +63,7 @@ blobsSwirlInjector::blobsSwirlInjector
     cD_(blobsSwirlInjectorDict_.lookup("cD")),
     cTau_(blobsSwirlInjectorDict_.lookup("cTau")),
     A_(blobsSwirlInjectorDict_.lookup("A")),
-    
+
     angle_(0.0),
     u_(0.0),
     x_(0.0),
@@ -99,7 +99,7 @@ blobsSwirlInjector::~blobsSwirlInjector()
 
 scalar blobsSwirlInjector::d0
 (
-    const label n, 
+    const label n,
     const scalar t
 ) const
 {
@@ -112,23 +112,23 @@ scalar blobsSwirlInjector::d0
     angle_ *= mathematicalConstant::pi/180.0;
 
     scalar injectedMassFlow = it.massFlowRate(t);
-    
-    scalar cosAngle = cos(angle_);   
 
-    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), it.T(t), it.X()); 
-     
+    scalar cosAngle = cos(angle_);
+
+    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), it.T(t), it.X());
+
     scalar deltaPressure = deltaPressureInj(t,n);
 
     calculateHX(n, injectedMassFlow, deltaPressure, t);
-    
+
     scalar kV = kv(n);
-    
-    scalar v = kV * sqrt(2.0*deltaPressure/rhoFuel);    
+
+    scalar v = kV * sqrt(2.0*deltaPressure/rhoFuel);
 
     u_ = v * cosAngle;
-    
+
     return h_;
-    
+
 }
 
 vector blobsSwirlInjector::direction
@@ -146,7 +146,7 @@ vector blobsSwirlInjector::direction
 
     // randomly distributed vector normal to the injection vector
     vector normal = vector::zero;
-    
+
     if (sm_.twoD())
     {
         scalar reduce = 0.01;
@@ -169,7 +169,7 @@ vector blobsSwirlInjector::direction
             injectors_[n].properties()->tan2(hole)*sin(beta)
         );
     }
-    
+
     // set the direction of injection by adding the normal vector
     vector dir = dcorr*injectors_[n].properties()->direction(hole, time) + normal;
     dir /= mag(dir);
@@ -191,7 +191,7 @@ scalar blobsSwirlInjector::averageVelocity
 (
     const label i
 ) const
-{    
+{
 
     const injectorType& it = sm_.injectors()[i].properties();
 
@@ -201,7 +201,7 @@ scalar blobsSwirlInjector::averageVelocity
     scalar injectionPressure = averagePressure(i);
 
     scalar Tav = it.integrateTable(it.T())/dt;
-    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), Tav, it.X());  
+    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), Tav, it.X());
 
     scalar kV = kv(i);
 
@@ -215,7 +215,7 @@ scalar blobsSwirlInjector::kv
     const label inj
 ) const
 {
-    return cD_[inj]/cos(angle_) * sqrt((1.0 - x_)/(1.0 + x_));    
+    return cD_[inj]/cos(angle_) * sqrt((1.0 - x_)/(1.0 + x_));
 }
 
 void blobsSwirlInjector::calculateHX
@@ -230,13 +230,13 @@ void blobsSwirlInjector::calculateHX
     const injectorType& it = injectors_[inj].properties();
 
     scalar Tfuel = it.T(time);
-    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), Tfuel, it.X()); 
-    scalar muFuel = sm_.fuels().mu(sm_.ambientPressure(), Tfuel, it.X()); 
-    scalar injectorDiameter = it.d();  
+    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), Tfuel, it.X());
+    scalar muFuel = sm_.fuels().mu(sm_.ambientPressure(), Tfuel, it.X());
+    scalar injectorDiameter = it.d();
 
     x_ = 0.0;
-    
-    h_ = 
+
+    h_ =
     sqrt
     (
         (
@@ -255,17 +255,14 @@ void blobsSwirlInjector::calculateHX
             sqr(1.0 - x_)
         )
     );
-    
-    scalar hOLD = -100.0;
-    scalar xOLD = -100.0;
-    
+
     label i;
-    
+
     for(i=0; i<20; i++)
     {
 
 
-        h_ = 
+        h_ =
         sqrt
         (
             (
@@ -287,20 +284,17 @@ void blobsSwirlInjector::calculateHX
 
         x_ = sqr(1.0 - 2.0 * h_/injectorDiameter);
 
-        hOLD = h_;
-        xOLD = x_;
-                   
     }
 
     x_ = sqr(1.0 - 2.0 * h_/injectorDiameter);
-      
+
 }
 
 
 
 scalar blobsSwirlInjector::deltaPressureInj(const scalar time, const label inj) const
 {
-    return injectors_[inj].properties()->injectionPressure(time) - sm_.ambientPressure();   
+    return injectors_[inj].properties()->injectionPressure(time) - sm_.ambientPressure();
 }
 
 scalar blobsSwirlInjector::averagePressure(const label inj) const

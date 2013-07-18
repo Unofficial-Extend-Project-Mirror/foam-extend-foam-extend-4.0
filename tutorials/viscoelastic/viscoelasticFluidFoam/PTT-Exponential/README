@@ -6,15 +6,15 @@
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 #
-#+TITLE: *PTT-Exponential viscoelastic constitutive model README file for version 1.6-ext* 
-#+AUTHOR: Jovani                
+#+TITLE: *PTT-Exponential viscoelastic constitutive model README file for version 1.6-ext*
+#+AUTHOR: Jovani
 #+DATE:  05 October 2010
 
 
 
 * This is a simulation case for a viscoelastic fluid described by the Exponential form of
   the Phan-Thien-Tanner constitutive model (PTT-Exponential).
-  The simulation is about the flow past by a cylinder. 
+  The simulation is about the flow past by a cylinder.
 
 *** This is only an illustrative case for the PTT-Exponential constitutive model. Therefore,
     there are not more details published until now for this model using this geometry

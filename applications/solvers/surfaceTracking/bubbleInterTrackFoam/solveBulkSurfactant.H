@@ -3,17 +3,17 @@ if(CPtr)
 {
     volScalarField& C = *CPtr;
 
-    const dimensionedScalar& D 
+    const dimensionedScalar& D
         = interface.surfactant().surfactBulkDiffusion();
 
     scalar ka = interface.surfactant().surfactAdsorptionCoeff().value();
     scalar kb = interface.surfactant().surfactDesorptionCoeff().value();
     scalar CsInf = interface.surfactant().surfactSaturatedConc().value();
 
-    scalarField& Cs = 
+    scalarField& Cs =
         interface.surfactantConcentration().internalField();
 
-    scalarField CP = 
+    scalarField CP =
         C.boundaryField()[interface.aPatchID()].patchInternalField();
 
     const scalarField& Cfs = C.boundaryField()[interface.aPatchID()];
@@ -22,7 +22,7 @@ if(CPtr)
 
     if
     (
-        C.boundaryField()[interface.aPatchID()].type() 
+        C.boundaryField()[interface.aPatchID()].type()
      == fixedGradientFvPatchScalarField::typeName
     )
     {
@@ -42,7 +42,7 @@ if(CPtr)
                 << fixedGradientFvPatchScalarField::typeName
                 << exit(FatalError);
     }
-    
+
     solve
     (
         fvm::ddt(C)

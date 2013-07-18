@@ -44,7 +44,7 @@ void setUpdater::updateSets(const mapPolyMesh& morphMap) const
     // Update all sets in memory.
     //
 
-    HashTable<const Type*> memSets = 
+    HashTable<const Type*> memSets =
         morphMap.mesh().objectRegistry::lookupClass<Type>();
 
     for

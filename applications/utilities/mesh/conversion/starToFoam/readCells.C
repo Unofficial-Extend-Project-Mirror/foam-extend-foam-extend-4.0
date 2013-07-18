@@ -265,7 +265,7 @@ void starMesh::readCells()
     }
 
     starCellLabelLookup_.setSize(maxLabel+1);
-    
+
     // reset point labels to invalid value
     forAll (starCellLabelLookup_, i)
     {
@@ -285,7 +285,7 @@ void starMesh::readCells()
 
             label addOnToCell = 0;
 
-            // reset the labels to -1. Debugging. 
+            // reset the labels to -1. Debugging.
             forAll (labels, i)
             {
                 labels[i] = -1;
@@ -342,7 +342,7 @@ void starMesh::readCells()
                 }
 
                 // backward compatibility: number of trailing rubbish in
-                // STAR is unknown. 
+                // STAR is unknown.
                 readToNl(cellsFile);
 
                 addOnToCell--;
@@ -373,7 +373,7 @@ void starMesh::readCells()
                 {
                     FatalErrorIn("starMesh::readCells()")
                         << "Invalid vertex found in cell " << cellI
-                        << ". STAR cell no: " << lineLabel 
+                        << ". STAR cell no: " << lineLabel
                         << " labels: " << curShapeLabels
                         << abort(FatalError);
                 }

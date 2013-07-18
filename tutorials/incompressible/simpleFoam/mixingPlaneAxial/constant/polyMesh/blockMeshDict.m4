@@ -51,7 +51,7 @@ convertToMeters 1;
 
 vertices
 (
-//Plane A: 
+//Plane A:
 //Bottom of curved block
 (calc(r1*cos(angleB)) calc(r1*sin(angleB)) zA) vlabel(A0)
 (calc(r2*cos(angleB)) calc(r2*sin(angleB)) zA) vlabel(A1)
@@ -79,13 +79,13 @@ vertices
 
 );
 
-blocks          
+blocks
 (
     hex ( A0 A1 A3 A2 B0 B1 B3 B2 ) (BLOCKSIZE_UPSTREAM)   simpleGrading (1 1 grading)
     hex ( B4 B5 B7 B6 C0 C1 C3 C2 ) (BLOCKSIZE_DOWNSTREAM) simpleGrading (1 1 grading)
 );
 
-edges           
+edges
 (
     // --- PLANE A: Bottom of curved block
     arc  A0 A2  (calc(r1*cos((angleB+angleD)/2)) calc(r1*sin((angleB+angleD)/2)) zA)
@@ -104,11 +104,11 @@ edges
     arc  C1 C3  (calc(r3*cos((angleA+angleC)/2)) calc(r3*sin((angleA+angleC)/2)) zB)
 );
 
-patches         
+patches
 (
     patch outflow
     (
-	( B5 B7 C3 C1 )
+    ( B5 B7 C3 C1 )
     )
     patch inflow
     (
@@ -128,7 +128,7 @@ patches
 
     mixingPlane upstreamMixingPlanePatch
     (
-	( B4 C0 C2 B6 )  
+    ( B4 C0 C2 B6 )
     )
 
     mixingPlane downstreamMixingPlanePatch
@@ -139,13 +139,13 @@ patches
 
     symmetryPlane downstreamWall
     (
-	( A0 A2 A3 A1 )
+    ( A0 A2 A3 A1 )
         ( B0 B1 B3 B2 )
     )
 
     symmetryPlane upstreamWall
     (
-	( C1 C3 C2 C0)   
+    ( C1 C3 C2 C0)
        (B4 B6 B7 B5)
     )
 
@@ -156,7 +156,7 @@ patches
 
     cyclicGgi downstreamPerio2
     (
-	(A2 B2 B3 A3)
+    (A2 B2 B3 A3)
     )
 
 );

@@ -132,7 +132,7 @@ public:
 
         // Access
 
-            //- Return the "jump" across the patch as a "half" field 
+            //- Return the "jump" across the patch as a "half" field
             virtual tmp<Field<Type> > jump() const
             {
                 return jump_;

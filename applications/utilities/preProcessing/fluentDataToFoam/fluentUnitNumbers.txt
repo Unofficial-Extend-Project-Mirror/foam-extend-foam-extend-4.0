@@ -56,7 +56,7 @@ enum {
   XF_RF_DATA_PREMIXC_RATE=44,
   XF_RF_DATA_POLLUT2=45,
   XF_RF_DATA_POLLUT3=46,
-  
+
   XF_RF_DATA_MASS_FLUX_M1=47,
   XF_RF_DATA_MASS_FLUX_M2=48,
   XF_RF_DATA_GRID_FLUX=49,
@@ -78,7 +78,7 @@ enum {
   XF_RF_DATA_SLIP_W=62,
 
   XF_RF_DATA_SDR=63,          /* omega in the k-w model */
-  XF_RF_DATA_SDR_M1=64, 
+  XF_RF_DATA_SDR_M1=64,
   XF_RF_DATA_SDR_M2=65,
 
   XF_RF_DATA_POLLUT4=66,
@@ -86,7 +86,7 @@ enum {
   XF_RF_DATA_GRANULAR_TEMPERATURE_M1 = 68,
   XF_RF_DATA_GRANULAR_TEMPERATURE_M2 = 69,
 
-  XF_RF_DATA_VFLUX=70,     
+  XF_RF_DATA_VFLUX=70,
 
   XF_RF_DATA_VFLUX_M1=80,
 
@@ -103,7 +103,7 @@ enum {
   XF_RF_DATA_KTC=105,
   XF_RF_DATA_VGS_DTRM=106,
   XF_RF_DATA_VGF_DTRM=107,
-  XF_RF_DATA_RSTRESS=108,	/* V4 reynolds stress model */
+  XF_RF_DATA_RSTRESS=108,    /* V4 reynolds stress model */
   XF_RF_DATA_THREAD_RAD_FLUX=109,
 
   /* mass absorption term for absorbing porous media model */
@@ -118,7 +118,7 @@ enum {
   XF_RF_DATA_X_VELOCITY_M1=115,
   XF_RF_DATA_Y_VELOCITY_M1=116,
   XF_RF_DATA_Z_VELOCITY_M1=117,
-  
+
   XF_RF_DATA_PHASE_MASS=118,    /* cavitation mass source */
   XF_RF_DATA_TEMPERATURE_M1=0,  /* never stored but symbol is required
 */
@@ -133,13 +133,13 @@ enum {
   XF_RF_DATA_TKE_M2=126,
   XF_RF_DATA_TED_M2=127,
 
-  XF_RF_DATA_RUU=128,	/* V5 reynolds stress model */
-  XF_RF_DATA_RVV=129,	/* V5 reynolds stress model */
-  XF_RF_DATA_RWW=130,	/* V5 reynolds stress model */
-  XF_RF_DATA_RUV=131,	/* V5 reynolds stress model */
-  XF_RF_DATA_RVW=132,	/* V5 reynolds stress model */
-  XF_RF_DATA_RUW=133,	/* V5 reynolds stress model */
-  
+  XF_RF_DATA_RUU=128,    /* V5 reynolds stress model */
+  XF_RF_DATA_RVV=129,    /* V5 reynolds stress model */
+  XF_RF_DATA_RWW=130,    /* V5 reynolds stress model */
+  XF_RF_DATA_RUV=131,    /* V5 reynolds stress model */
+  XF_RF_DATA_RVW=132,    /* V5 reynolds stress model */
+  XF_RF_DATA_RUW=133,    /* V5 reynolds stress model */
+
   XF_RF_DATA_DPMS_EROSION=134,
   XF_RF_DATA_DPMS_ACCRETION=135,
 
@@ -162,17 +162,17 @@ enum {
   XF_RF_DATA_PREMIXC_M2=149,
 
   /*vof 1,2,3,4 kept for v5 compatibility */
-  XF_RF_DATA_VOF = 150, 
-  XF_RF_DATA_VOF_1 = 151, 
-  XF_RF_DATA_VOF_2 = 152, 
-  XF_RF_DATA_VOF_3 = 153, 
-  XF_RF_DATA_VOF_4 = 154, 
+  XF_RF_DATA_VOF = 150,
+  XF_RF_DATA_VOF_1 = 151,
+  XF_RF_DATA_VOF_2 = 152,
+  XF_RF_DATA_VOF_3 = 153,
+  XF_RF_DATA_VOF_4 = 154,
 
-  XF_RF_DATA_VOF_M1 = 160 , 
-  XF_RF_DATA_VOF_1_M1 = 161 , 
-  XF_RF_DATA_VOF_2_M1 = 162 , 
+  XF_RF_DATA_VOF_M1 = 160 ,
+  XF_RF_DATA_VOF_1_M1 = 161 ,
+  XF_RF_DATA_VOF_2_M1 = 162 ,
   XF_RF_DATA_VOF_3_M1 = 163 ,
-  XF_RF_DATA_VOF_4_M1 = 164 , 
+  XF_RF_DATA_VOF_4_M1 = 164 ,
 
   XF_RF_DATA_VOF_M2 = 170 ,
   XF_RF_DATA_VOF_1_M2 = 171 ,
@@ -194,7 +194,7 @@ coefficient for particles */
   XF_RF_DATA_NRBC_DC=194,                    /* change in char. var for
 nrbc*/
 
-  
+
   EXPAND_50_EQUAL(XF_RF_DATA_Y_,       200), /* species */
   EXPAND_50(XF_RF_DATA_Y_,_M1=,        250), /* species at fist time
 level */
@@ -219,26 +219,26 @@ level */
   XF_RF_DATA_VOF_MEAN=410,
   XF_RF_DATA_VOF_RMS=411,
   EXPAND_50_EQUAL(XF_RF_DATA_DPMS_Y_,450),
-  
+
   /* Don't add section ids here unless you need a large contiguous
 chunk.
    * Use id's 40-100 first! */
   XF_RF_DATA_NUT=500,
   XF_RF_DATA_NUT_M1=501,
   XF_RF_DATA_NUT_M2=502,
-  
-  XF_RF_DATA_RUU_M1=503,	
-  XF_RF_DATA_RVV_M1=504,	
-  XF_RF_DATA_RWW_M1=505,	
-  XF_RF_DATA_RUV_M1=506,	
-  XF_RF_DATA_RVW_M1=507,	
+
+  XF_RF_DATA_RUU_M1=503,
+  XF_RF_DATA_RVV_M1=504,
+  XF_RF_DATA_RWW_M1=505,
+  XF_RF_DATA_RUV_M1=506,
+  XF_RF_DATA_RVW_M1=507,
   XF_RF_DATA_RUW_M1=508,
-  
-  XF_RF_DATA_RUU_M2=509,	
-  XF_RF_DATA_RVV_M2=510,	
-  XF_RF_DATA_RWW_M2=511,	
-  XF_RF_DATA_RUV_M2=512,	
-  XF_RF_DATA_RVW_M2=513,	
+
+  XF_RF_DATA_RUU_M2=509,
+  XF_RF_DATA_RVV_M2=510,
+  XF_RF_DATA_RWW_M2=511,
+  XF_RF_DATA_RUV_M2=512,
+  XF_RF_DATA_RVW_M2=513,
   XF_RF_DATA_RUW_M2=514,
 
   XF_RF_DATA_ENERGY_M1=515,
@@ -246,7 +246,7 @@ chunk.
 
   XF_RF_DATA_DENSITY_M1=517,
   XF_RF_DATA_DENSITY_M2=518,
-  
+
   XF_RF_DATA_DPMS_PDF_1=519,
   XF_RF_DATA_DPMS_PDF_2=520,
 
@@ -271,9 +271,9 @@ chunk.
 
   EXPAND_50_EQUAL(XF_RF_DATA_UDS_,700), /* user defined scalar */
   EXPAND_50(XF_RF_DATA_UDS_,_M1=, 750), /* user defined scalar
-				         * at fist time level */
+                         * at fist time level */
   EXPAND_50(XF_RF_DATA_UDS_,_M2=, 800),  /* user defined scalar
-					 * at second time level */
+                     * at second time level */
   XF_RF_DATA_GRANULAR_PRESSURE=910,
   XF_RF_DATA_GRANULAR_PRESSURE_M1=0,/* never stored but symbol is
 required */

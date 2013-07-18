@@ -57,7 +57,7 @@ class vtkCallbackCommand;
 \*---------------------------------------------------------------------------*/
 
 class VTK_IO_EXPORT vtkFoamReader
-: 
+:
     public vtkDataSetSource
 {
 
@@ -122,7 +122,7 @@ public:
     int GetNumberOfPointFieldArrays();
     const char* GetPointFieldArrayName(int index);
     int GetPointFieldArrayStatus(const char* name);
-    void SetPointFieldArrayStatus(const char* name, int status);  
+    void SetPointFieldArrayStatus(const char* name, int status);
 
     // SetNthOutput provided so that vtkFoam can access it
     void SetNthOutput(int num, vtkDataObject *output)

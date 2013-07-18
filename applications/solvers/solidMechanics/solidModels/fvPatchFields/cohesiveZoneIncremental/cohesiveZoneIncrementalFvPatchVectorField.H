@@ -106,7 +106,7 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given 
+        //- Construct by mapping given
         //  cohesiveZoneIncrementalFvPatchVectorField onto
         //  a new patch
         cohesiveZoneIncrementalFvPatchVectorField
@@ -196,7 +196,7 @@ public:
 
             //- Update the coefficients associated with the patch field
             virtual void updateCoeffs();
-    
+
 //             //- Evaluate the patch field
 //             virtual void evaluate();
 

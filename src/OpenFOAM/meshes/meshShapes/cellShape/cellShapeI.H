@@ -211,7 +211,7 @@ inline Foam::faceList Foam::cellShape::collapsedFaces() const
     }
     newFaces.setSize(newFaceI);
 
-    return newFaces;    
+    return newFaces;
 }
 
 

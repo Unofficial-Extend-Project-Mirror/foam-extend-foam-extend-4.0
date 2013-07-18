@@ -135,7 +135,7 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
                 scalar sumShadowAreas = sum(shadowAreas);
 //                 scalar sumMixingAreas = sum(mixingPlanePatchAreas);
 
-#if 0   // Remove this for now                
+#if 0   // Remove this for now
                 Info<< "Mixing plane functionObject: area check " << nl
                     << "     "  << "Master " << mixingMaster.name()
                     << " = " << sumMasterAreas << nl
@@ -217,10 +217,10 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
                     scalar shadowFlux    = shadowPatchScaleFactor_ * sum(phi.boundaryField()[shadowPatchI]);
 //                     scalar shadowFluxMag = mag(shadowFlux);
 
-                    Info<< "Mixing plane pair " 
+                    Info<< "Mixing plane pair "
                         << "(" << mixingMaster.name() << ", "
-                        << mixingMaster.shadow().name() << ") : " 
-                        << localFlux << " " << shadowFlux 
+                        << mixingMaster.shadow().name() << ") : "
+                        << localFlux << " " << shadowFlux
                         << " Diff = " << localFlux + shadowFlux << " or "
                         << mag(localFlux + shadowFlux)/(localFluxMag + SMALL)*100
                         << " %" << endl;
@@ -231,7 +231,7 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
 
 
 //         {
-//	    word patchName = phi.boundaryField()[patchI].patch().name();
+//             word patchName = phi.boundaryField()[patchI].patch().name();
 
 //             if (patchName == masterPatchName_ && !visited[patchI])
 //             {
@@ -240,7 +240,7 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
 //                 // Calculate local and shadow flux
 //                 scalar localFlux    = masterPatchScaleFactor_ * sum(phi.boundaryField()[patchI]);
 //                 //scalar localFluxMag = masterPatchScaleFactor_ * sumMag(phi.boundaryField()[patchI]);
-// 		scalar localFluxMag = mag(localFlux);
+//                 scalar localFluxMag = mag(localFlux);
 
 //                 const mixingPlanePolyPatch& mixingPlanePatch =
 //                     refCast<const mixingPlanePolyPatch>
@@ -254,11 +254,11 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
 
 //                 scalar shadowFlux    = shadowPatchScaleFactor_ * sum(phi.boundaryField()[shadowPatchI]);
 //                 //scalar shadowFluxMag = shadowPatchScaleFactor_ * sumMag(phi.boundaryField()[shadowPatchI]);
-// 		scalar shadowFluxMag = mag(shadowFlux);
+//                 scalar shadowFluxMag = mag(shadowFlux);
 
 //                 Info<< "mixingPlane pair " << name_ << " (" << mixingPlanePatch.name() << ", " << mixingPlanePatch.shadow().name() << ") : "
-// 		    << " flux: " << localFlux << " " << shadowFlux
-// 		    << " : mag: " <<  localFluxMag << " " << shadowFluxMag
+//                     << " flux: " << localFlux << " " << shadowFlux
+//                     << " : mag: " <<  localFluxMag << " " << shadowFluxMag
 //                     << " Diff = " << localFlux + shadowFlux << " or "
 //                     << mag(localFlux + shadowFlux)/(localFluxMag + SMALL)*100
 //                     << " %" << endl;

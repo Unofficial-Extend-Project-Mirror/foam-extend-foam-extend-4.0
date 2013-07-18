@@ -27,9 +27,9 @@ my %config = (
 #     @ARGV >= 2 or usage();
 #     ( $rootDir = shift @ARGV ) =~ s{/+$}{};
 #     ( $caseDir = shift @ARGV ) =~ s{/+$}{};
-# 
+#
 #     $caseDir = $rootDir . "/" . $caseDir;
-# 
+#
 #     -d $rootDir or die qq{cannot open root directory "$rootDir"\n};
 #     -d $caseDir or die qq{cannot open case directory "$caseDir"\n};
 # }
@@ -83,48 +83,48 @@ while (<>) {
     my ( $tag, $id ) = /^(CTAB\w*|CTNA\w*)[\s,]+(\d+)/i or next;
 
     if (/,/) {
-	warn "missing support for comma-delimited fields\n";
-	next;
+    warn "missing support for comma-delimited fields\n";
+    next;
     }
 
     my %extract;
 
     if ( $tag =~ /CTAB/i ) {
-	$_ = lc;
+    $_ = lc;
 
-	(
-	    $tag,                     $id,
-	    $extract{MaterialType}, undef,
-	    $extract{PorosityId},   $extract{MaterialId},
-	    $extract{SpinId},       $extract{GroupId}
-	  )
-	  = split;
+    (
+        $tag,                     $id,
+        $extract{MaterialType}, undef,
+        $extract{PorosityId},   $extract{MaterialId},
+        $extract{SpinId},       $extract{GroupId}
+      )
+      = split;
 
-	for ( $extract{MaterialType} ||= "" ) {
-	    s/^flui.*$/fluid/
-	      or s/^soli.*$/solid/
-	      or delete $extract{MaterialType};
-	}
+    for ( $extract{MaterialType} ||= "" ) {
+        s/^flui.*$/fluid/
+          or s/^soli.*$/solid/
+          or delete $extract{MaterialType};
+    }
 
-	for ( keys %extract ) {
-	    if ( defined $extract{$_} ) {
-		$cellTableInfo{$id}{$_} = $extract{$_};
-	    }
-	}
+    for ( keys %extract ) {
+        if ( defined $extract{$_} ) {
+        $cellTableInfo{$id}{$_} = $extract{$_};
+        }
+    }
     }
     else {
-	( $tag, $id, $extract{Label} ) = split;
-	for ( $extract{Label} ||= "" ) {
-	    s{[,./]}{}g;
-	    $extract{Label} or delete $extract{Label};
-	}
+    ( $tag, $id, $extract{Label} ) = split;
+    for ( $extract{Label} ||= "" ) {
+        s{[,./]}{}g;
+        $extract{Label} or delete $extract{Label};
+    }
     }
 
     # add extracted information into cellTableInfo
     for ( keys %extract ) {
-	if ( defined $extract{$_} and length $extract{$_} ) {
-	    $cellTableInfo{$id}{$_} = $extract{$_};
-	}
+    if ( defined $extract{$_} and length $extract{$_} ) {
+        $cellTableInfo{$id}{$_} = $extract{$_};
+    }
     }
 }
 
@@ -133,11 +133,11 @@ while (<>) {
 # remove any spaces, supress output for empty values
 sub output_entry {
     my ($k, $v) = @_;
-    
+
     $v =~ s/\s+//g;
     if (length $v) {
-	printf "    %-16s", $k;
-	print $v, ";\n";
+    printf "    %-16s", $k;
+    print $v, ";\n";
     }
 }
 
@@ -149,7 +149,7 @@ my $header = do { local $/; <DATA> };
 {
     my %var = ( CASE => $config{caseDir} || "", OBJECT => "cellTable" );
     ( my $text = $header ) =~ s/%{\s*([_A-Z]+)\s*}/ $var{$1} || '' /eg;
-    
+
     print $text;
 }
 
@@ -166,9 +166,9 @@ for my $id ( sort { $a <=> $b } keys %cellTableInfo) {
 
     print "cellTableId_$id\n";
     print "{\n";
-    
+
     for my $k (@keys) {
-	output_entry( $k, $subDict->{$k} );
+    output_entry( $k, $subDict->{$k} );
     }
 
     print "}\n\n";

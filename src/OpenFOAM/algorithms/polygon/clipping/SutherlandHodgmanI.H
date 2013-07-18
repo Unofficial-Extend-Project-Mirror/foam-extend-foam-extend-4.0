@@ -60,7 +60,7 @@ inline bool Foam::SutherlandHodgman::isPointVisibleFromCuttingSegment
     //  y2 = clippingPolygon_[currentClipEdgeP2_][1]
     //  x3 = p[0]
     //  y3 = p[1]
-    
+
     // return ((x2 - x1)*(y3 - y1) - (y2 - y1)*(x3 - x1) >= 0);
     return
     (

@@ -223,7 +223,7 @@ public:
                     "coupledFvPatchField<Type>::updateInterfaceMatrix"
                 );
             }
-            
+
         //- Write
         virtual void write(Ostream&) const;
 };

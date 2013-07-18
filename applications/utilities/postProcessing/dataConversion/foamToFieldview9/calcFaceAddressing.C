@@ -42,7 +42,7 @@ labelList calcFaceAddressing
     const label cellI
 )
 {
-    // return value. 
+    // return value.
     labelList shapeToMesh(shape.nFaces(), -1);
 
     const faceList modelFaces(shape.faces());

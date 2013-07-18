@@ -52,9 +52,9 @@ void Foam::equationReader::assignFunctionPointers(const label index)
                         << dictSources_.size() - 1 << ")"
                         << abort(FatalError);
                 }
-                
+
                 word varName(dictLookups_[eqOp.dictLookupIndex()]);
-                
+
                 ITstream srcStrm
                 (
                     dictSources_[zeroSourceIndex].lookup(varName)

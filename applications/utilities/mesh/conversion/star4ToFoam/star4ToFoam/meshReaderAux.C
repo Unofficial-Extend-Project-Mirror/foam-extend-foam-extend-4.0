@@ -70,7 +70,7 @@ void Foam::meshReader::writeCellTable(const polyMesh& mesh)
     }
 
     os  << "// ************************************************************************* //"
-	<< endl;
+        << endl;
 }
 
 
@@ -99,8 +99,8 @@ void Foam::meshReader::writeInterfaces(const polyMesh& mesh)
     ioObj.writeHeader(os);
 
     os  << interfaces_
-	<< "// ************************************************************************* //"
-	<< endl;
+        << "// ************************************************************************* //"
+        << endl;
 
 }
 

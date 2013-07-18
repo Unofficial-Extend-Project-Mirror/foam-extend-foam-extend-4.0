@@ -788,7 +788,7 @@ void starMeshReader::readBoundary
                 if (cellId < cellShapes_.size())
                 {
                     label index = cellShapes_[cellId].model().index();
-                    
+
                     if (faceLookupIndex.found(index))
                     {
                         index = faceLookupIndex[index];

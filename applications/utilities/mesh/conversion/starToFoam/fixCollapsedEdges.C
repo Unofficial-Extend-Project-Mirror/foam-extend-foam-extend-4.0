@@ -84,7 +84,7 @@ void starMesh::fixCollapsedEdges()
                 // here as the shape is still needed to determine which face
                 // of the shape is used in potential couple matches.  This
                 // will be done in the end using the purgeShapes()
-                // 
+                //
 
                 // create a new face without duplicates and replace original
                 face newFace(vertexLabels.size());

@@ -49,7 +49,7 @@ void parseOptions
     IStringStream optionsStream(options);
     label nSolverDomains(0);
     label nSuperLoops(0);
-    
+
     // Get solverDomainNames, if any
     while (not optionsStream.eof())
     {
@@ -76,7 +76,7 @@ void parseOptions
                 << abort(FatalError);
         }
     }
-    
+
     // Get superLoopList
     while (not optionsStream.eof())
     {
@@ -87,7 +87,7 @@ void parseOptions
             ptrSuperLoops->operator[](nSuperLoops - 1)
                 = nextOption.labelToken();
         }
-        else if (nSuperLoops > 0) 
+        else if (nSuperLoops > 0)
         {
             // might be a range -> label : label
 
@@ -104,7 +104,7 @@ void parseOptions
                         (
                             ptrSuperLoops->operator[](nSuperLoops - 1)
                         );
-                        
+
                         if (toValue > fromValue)
                         {
                             // correct range format
@@ -182,20 +182,20 @@ int main(int argc, char *argv[])
     argList::validOptions.insert("postDecompose", "");
     argList::validOptions.insert("preReconstruct", "");
     argList::validOptions.insert("postReconstruct", "");
-    
+
     argList::validOptions.insert("global","");
     argList::validOptions.insert("local","");
-    
+
     // default behaviour is purge the case/[time] directory before '-load'
     // command.  '-noPurge' prevents this.  Allows for more complicated
     // load data selections by executing multiSolver several times
     argList::validOptions.insert("noPurge","");
-    
+
     // default behaviour is: if there is only one solverDomain specified, use
     // setSolverDomain() on it.  Same as multiSolver -set solverDomain.
     // '-noSet' prevents this.
     argList::validOptions.insert("noSet","");
-    
+
     // default behaviour is: if there are storeFields defined, when loading, it
     // will copy the store fields into every time instance where they are
     // absent.  '-noStore' will prevent this.
@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
     bool noSet = false;
     bool noStore = false;
     label nCommands(0);
-    
+
     // Read arguments
     if (args.optionFound("list"))
     {
@@ -331,7 +331,7 @@ int main(int argc, char *argv[])
         args.rootPath(),
         args.caseName()
     );
-    
+
     const IOdictionary& mcd(multiRun.multiControlDict());
     wordList solverDomains(0);
     labelList superLoops(0);
@@ -504,7 +504,7 @@ int main(int argc, char *argv[])
                 << "No data found with specified parameters."
                 << abort(FatalError);
         }
-    }    
+    }
 
     switch (command)
     {
@@ -517,7 +517,7 @@ int main(int argc, char *argv[])
             (
                 multiRun.multiDictRegistry().path()/"multiSolver"
             );
-            
+
             forAll(solverDomains, i)
             {
                 if (solverDomains[i] == "default") continue;
@@ -561,7 +561,7 @@ int main(int argc, char *argv[])
                     << endl;
                 multiRun.purgeTimeDirs(multiRun.multiDictRegistry().path());
             }
-            
+
             Info << "Loading data from multiSolver directories to case root"
                 << endl;
             if
@@ -634,7 +634,7 @@ int main(int argc, char *argv[])
                     (
                         dirEntries[de]
                     );
-                    
+
                     // Copy system to processorN
                     cp
                     (
@@ -642,7 +642,7 @@ int main(int argc, char *argv[])
                             /multiRun.multiDictRegistry().system(),
                         multiRun.multiDictRegistry().path()/dirEntries[de]
                     );
-                    
+
                     // Copy constant/files to processorN/constant
                     fileNameList constantContents
                     (
@@ -664,7 +664,7 @@ int main(int argc, char *argv[])
                                 /multiRun.multiDictRegistry().constant()
                         );
                     }
-                    
+
                     // Copy constant/directories to processorN/constant
                     constantContents = readDir
                     (
@@ -731,7 +731,7 @@ int main(int argc, char *argv[])
 
             Info << "Purging preconditioned time directories"
                 << endl;
-            
+
             // Clean up extra time directories
             fileNameList dirEntries
             (
@@ -758,7 +758,7 @@ int main(int argc, char *argv[])
     // Execute set command - either from an explicit '-set' or from a '-load'
     // with only one solverDomain as an option
 
-    if 
+    if
     (
         (command == set)
      || (

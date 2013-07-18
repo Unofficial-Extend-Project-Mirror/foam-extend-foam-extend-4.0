@@ -4,18 +4,18 @@
 FoamFile
 {
  version 2.0;
- format ascii; 	
- root "."; 	
- case "dom3_sFoam"; 	
- instance "0"; 	
- local ""; 	
- class volScalarField; 	
- object epsilon; 	
+ format ascii;
+ root ".";
+ case "dom3_sFoam";
+ instance "0";
+ local "";
+ class volScalarField;
+ object epsilon;
 }
 
 dimensions [ 0 2 -3 0 0 0 0 ];
 
-internalField uniform 0.1; 	
+internalField uniform 0.1;
 
 boundaryField
 {
@@ -57,10 +57,10 @@ boundaryField
   inflow
   {
     type profile1DfixedValue;
-    fileName "absolu_cr.csv"; 	
-    fileFormat "turboCSV"; 	
-    interpolateCoord "Z"; 	
-    fieldName "Epsilon"; 	
+    fileName "absolu_cr.csv";
+    fileFormat "turboCSV";
+    interpolateCoord "Z";
+    fieldName "Epsilon";
   }
   outflow
   {

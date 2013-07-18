@@ -363,7 +363,7 @@ PointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>::evaluate
     {
         this->updateCoeffs();
     }
-    
+
     updated_ = false;
 }
 

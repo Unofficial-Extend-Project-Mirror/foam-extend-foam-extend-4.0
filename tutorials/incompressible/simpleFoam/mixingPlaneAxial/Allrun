@@ -1,10 +1,10 @@
 #!/bin/bash
-# 
+#
 #set -x
 
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
-# Load additional RunFunctions 
+# Load additional RunFunctions
 . ./RunFunctionsSupplemental
 
 export caseName=`basename $PWD`
@@ -25,22 +25,22 @@ if [ $? -eq 0 ];
 then
     echo "Using pyFoamChangeMixingPlaneBoundary.py"
     pyFoamChangeMixingPlaneBoundary.py . upstreamMixingPlanePatch   \
-	--shadowPatch                    downstreamMixingPlanePatch \
-	--assembly                       both                       \
-	--orientation                    dirZ_spanTheta             \
-	--coordinateSystemType           cylindrical                \
-	--coordinateSystemOrigin         "(0 0 0)"                  \
-	--coordinateSystemE1             "(1 0 0)"                  \
-	--coordinateSystemE3             "(0 0 1)"        
+    --shadowPatch                    downstreamMixingPlanePatch \
+    --assembly                       both                       \
+    --orientation                    dirZ_spanTheta             \
+    --coordinateSystemType           cylindrical                \
+    --coordinateSystemOrigin         "(0 0 0)"                  \
+    --coordinateSystemE1             "(1 0 0)"                  \
+    --coordinateSystemE3             "(0 0 1)"
 
     pyFoamChangeMixingPlaneBoundary.py . downstreamMixingPlanePatch \
-	--shadowPatch                    upstreamMixingPlanePatch   \
-	--assembly                       both                       \
-	--orientation                    dirZ_spanTheta             \
-	--coordinateSystemType           cylindrical                \
-	--coordinateSystemOrigin         "(0 0 0)"                  \
-	--coordinateSystemE1             "(1 0 0)"                  \
-	--coordinateSystemE3             "(0 0 1)"        
+    --shadowPatch                    upstreamMixingPlanePatch   \
+    --assembly                       both                       \
+    --orientation                    dirZ_spanTheta             \
+    --coordinateSystemType           cylindrical                \
+    --coordinateSystemOrigin         "(0 0 0)"                  \
+    --coordinateSystemE1             "(1 0 0)"                  \
+    --coordinateSystemE3             "(0 0 1)"
 
 
     echo "Using pyFoamChangeGGIBoundary.py"

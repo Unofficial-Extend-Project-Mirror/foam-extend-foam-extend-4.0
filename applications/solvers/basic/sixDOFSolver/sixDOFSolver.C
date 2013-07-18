@@ -62,12 +62,12 @@ int main(int argc, char *argv[])
 
         forAll (structure.names(), bodyI)
         {
-            Info<< nl << "Average velocity of " << structure.names()[bodyI] 
+            Info<< nl << "Average velocity of " << structure.names()[bodyI]
                 << " in time step = "
                 << structure()[bodyI].Uaverage().value() << nl
                 << "Current velocity in time instant = "
                 << structure()[bodyI].U().value() << nl
-                << "Average omega of " << structure.names()[bodyI] 
+                << "Average omega of " << structure.names()[bodyI]
                 << " in time step = "
                 << structure()[bodyI].omegaAverage().value() << nl
                 << "Current omega in time instant = "

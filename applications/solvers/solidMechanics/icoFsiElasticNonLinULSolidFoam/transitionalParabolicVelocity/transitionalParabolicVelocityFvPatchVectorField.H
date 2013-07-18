@@ -100,7 +100,7 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given 
+        //- Construct by mapping given
         //  transitionalParabolicVelocityFvPatchVectorField
         //  onto a new patch
         transitionalParabolicVelocityFvPatchVectorField

@@ -118,7 +118,7 @@ public:
         void interpolate
         (
             const GeometricField<vector, fvPatchField, volMesh>& vf,
-	    GeometricField<vector, pointPatchField, pointMesh>& pf
+            GeometricField<vector, pointPatchField, pointMesh>& pf
         ) const;
 
 };

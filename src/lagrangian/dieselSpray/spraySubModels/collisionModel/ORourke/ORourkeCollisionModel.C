@@ -100,14 +100,14 @@ void ORourkeCollisionModel::collideParcels(const scalar dt) const
             } // if - parcels in same cell
 
             // remove coalesced droplet
-            if (p2().m() < VSMALL) 
+            if (p2().m() < VSMALL)
             {
                 spray::iterator tmpElmnt = p2;
                 ++tmpElmnt;
                 spray_.deleteParticle(p2());
                 p2 = tmpElmnt;
             }
-            else 
+            else
             {
                 ++p2;
             }
@@ -115,14 +115,14 @@ void ORourkeCollisionModel::collideParcels(const scalar dt) const
         } // inner loop
 
         // remove coalesced droplet
-        if (p1().m() < VSMALL) 
+        if (p1().m() < VSMALL)
         {
             spray::iterator tmpElmnt = p1;
             ++tmpElmnt;
             spray_.deleteParticle(p1());
             p1 = tmpElmnt;
         }
-        else 
+        else
         {
             ++p1;
         }

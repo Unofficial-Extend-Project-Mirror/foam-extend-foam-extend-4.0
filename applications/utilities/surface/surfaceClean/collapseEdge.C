@@ -58,7 +58,7 @@ static triSurface pack
 {
     List<labelledTri> newTriangles(surf.size());
     label newTriangleI = 0;
-    
+
     forAll(surf, faceI)
     {
         const labelledTri& f = surf.localFaces()[faceI];

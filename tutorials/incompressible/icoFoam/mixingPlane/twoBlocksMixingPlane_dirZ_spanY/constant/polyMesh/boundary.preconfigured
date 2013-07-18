@@ -41,8 +41,8 @@ FoamFile
         nFaces          10;
         startFace       410;
         shadowPatch     mixpRightIn;
-        orientation dirZ_spanY;         
-        assembly both;      
+        orientation dirZ_spanY;
+        assembly both;
         coordinateSystem
         {
             type coordinateSystem;
@@ -57,8 +57,8 @@ FoamFile
         nFaces          10;
         startFace       420;
         shadowPatch     mixpLeftOut;
-        orientation dirZ_spanY;         
-        assembly both;      
+        orientation dirZ_spanY;
+        assembly both;
         coordinateSystem
         {
             type coordinateSystem;

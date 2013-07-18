@@ -1,5 +1,5 @@
 
-template<int N, int I> 
+template<int N, int I>
 class VectorSpaceOps
 {
 public:
@@ -94,7 +94,7 @@ public:
     template<class V, class V1, class Op>
     static inline void op(V& vs, const V1&, const V1&, Op)
     {}
-    
+
     template<class V, class V1, class V2, class Op>
     static inline void opVV(V& vs, const V1& vs1, const V2& vs2, Op o)
     {}

@@ -1,5 +1,5 @@
 {
-    mul = muc + 
+    mul = muc +
         plasticViscosity
         (
             plasticViscosityCoeff,

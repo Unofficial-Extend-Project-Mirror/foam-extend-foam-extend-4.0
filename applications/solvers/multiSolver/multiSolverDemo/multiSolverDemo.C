@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 #   include "solverScalarTransportFoam.H"
 
     multiRun++;
-    
+
 // * * * * * * * * * * * * * * * * icoFoam2  * * * * * * * * * * * * * * * * //
 
     Info << "*** Switching to icoFoam2 ***\n" << endl;

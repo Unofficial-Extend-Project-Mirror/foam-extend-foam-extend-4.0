@@ -96,7 +96,7 @@ constInjector::~constInjector()
 
 scalar constInjector::d0
 (
-    const label n, 
+    const label n,
     const scalar
 ) const
 {
@@ -119,7 +119,7 @@ vector constInjector::direction
         alpha = radius of the two normal vectors,
         = maximum sin(sprayAngle/2)
         beta = angle in the normal plane
-        
+
                         o                    / (beta)
                         |\                  /
                         | \                /)
@@ -136,7 +136,7 @@ vector constInjector::direction
 
     // randomly distributed vector normal to the injection vector
     vector normal = vector::zero;
-    
+
     if (sm_.twoD())
     {
         scalar reduce = 0.01;
@@ -160,7 +160,7 @@ vector constInjector::direction
             injectors_[n].properties()->tan2(hole)*sin(beta)
         );
     }
-    
+
     // set the direction of injection by adding the normal vector
     vector dir = dcorr*injectors_[n].properties()->direction(n, time) + normal;
     dir /= mag(dir);
@@ -193,7 +193,7 @@ scalar constInjector::averageVelocity
 (
     const label i
 ) const
-{    
+{
     const injectorType& it = sm_.injectors()[i].properties();
     scalar dt = it.teoi() - it.tsoi();
 

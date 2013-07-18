@@ -32,18 +32,18 @@ Description
     Some overview of this development can be found here:
 
     OpenFOAM TURBO TOOLS: FROM GENERAL PURPOSE CFD TO TURBOMACHINERY
-    SIMULATIONS 
+    SIMULATIONS
     H. Jasak, M. Beaudoin, Proceedings of ASME-JSME-KSME Joint Fluids
     Engineering Conference 2011, AJK2011-FED, July 24-29, 2011, Hamamatsu,
-    Shizuoka, JAPAN 
+    Shizuoka, JAPAN
 
     Steady-state capabilities for hydroturbines with OpenFOAM,
     M. Page, M. Beaudoin, A.-M. Giroux, Internationnal Journal of Fluid
     Machinery and Systems, 4(1):160–170, Jan-Mar 2011.
-    
+
     Development of a General Grid Interface for Turbomachinery simulations with
     OpenFOAM, M. Beaudoin, H. Jasak, Open Source CFD International Conference,
-    December 2008 
+    December 2008
 
 Author
     Martin Beaudoin, Hydro-Quebec, 2009.  All rights reserved
@@ -651,7 +651,7 @@ public:
                 const labelList& mask
             ) const;
 
-            //- Interpolate from master to master 
+            //- Interpolate from master to master
             //- (self circumferential averaging)
             template<class Type>
             tmp<Field<Type> > masterToMaster

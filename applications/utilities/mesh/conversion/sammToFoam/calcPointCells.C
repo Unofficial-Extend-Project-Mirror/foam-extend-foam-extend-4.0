@@ -67,7 +67,7 @@ void sammMesh::calcPointCells() const
     // do not come from the cell shape, but from the slaves of the coupled
     // match. It is also adventageous to remove the duplicates from the
     // point-cell addressing, because this removes a lot of waste later.
-    // 
+    //
 
     // For each cell
     forAll(cellShapes_, cellI)

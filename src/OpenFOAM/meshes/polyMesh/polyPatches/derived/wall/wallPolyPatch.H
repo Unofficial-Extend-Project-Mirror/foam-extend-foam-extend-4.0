@@ -117,7 +117,7 @@ public:
         // Virtual function for wall handling of derived class
         virtual bool isWall() const
         {
-	    return true;
+            return true;
         }
 
     // Destructor

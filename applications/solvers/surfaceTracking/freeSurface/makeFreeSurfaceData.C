@@ -50,9 +50,9 @@ void freeSurface::makeInterpolators()
 
     // It is an error to attempt to recalculate
     // if the pointer is already set
-    if 
+    if
     (
-        interpolatorBAPtr_ ||  
+        interpolatorBAPtr_ ||
         interpolatorABPtr_
     )
     {
@@ -95,8 +95,8 @@ void freeSurface::makeInterpolators()
         // intersection::HALF_RAY
     );
 
-    
-    const scalarField& faceDistBA = 
+
+    const scalarField& faceDistBA =
         interpolatorBAPtr_->faceDistanceToIntersection();
 
     forAll(faceDistBA, faceI)
@@ -105,11 +105,11 @@ void freeSurface::makeInterpolators()
         {
             FatalErrorIn("freeSurface::makeInterpolators()")
                 << "Error in B-to-A face patchToPatchInterpolation."
-                << abort(FatalError);            
+                << abort(FatalError);
         }
     }
 
-    const scalarField& pointDistBA = 
+    const scalarField& pointDistBA =
         interpolatorBAPtr_->pointDistanceToIntersection();
 
     forAll(pointDistBA, pointI)
@@ -118,7 +118,7 @@ void freeSurface::makeInterpolators()
         {
             FatalErrorIn("freeSurface::makeInterpolators()")
                 << "Error in B-to-A point patchToPatchInterpolation."
-                << abort(FatalError);            
+                << abort(FatalError);
         }
     }
 
@@ -140,7 +140,7 @@ void freeSurface::makeInterpolators()
     );
 
 
-    const scalarField& faceDistAB = 
+    const scalarField& faceDistAB =
         interpolatorABPtr_->faceDistanceToIntersection();
 
     forAll(faceDistAB, faceI)
@@ -149,11 +149,11 @@ void freeSurface::makeInterpolators()
         {
             FatalErrorIn("freeSurface::makeInterpolators()")
                 << "Error in A-to-B face patchToPatchInterpolation."
-                << abort(FatalError);            
+                << abort(FatalError);
         }
     }
 
-    const scalarField& pointDistAB = 
+    const scalarField& pointDistAB =
         interpolatorABPtr_->pointDistanceToIntersection();
 
     forAll(pointDistAB, pointI)
@@ -162,7 +162,7 @@ void freeSurface::makeInterpolators()
         {
             FatalErrorIn("freeSurface::makeInterpolators()")
                 << "Error in A-to-B point patchToPatchInterpolation."
-                << abort(FatalError);            
+                << abort(FatalError);
         }
     }
 
@@ -346,9 +346,9 @@ void freeSurface::makeDirections()
 
     // It is an error to attempt to recalculate
     // if the pointer is already set
-    if 
+    if
     (
-        pointsDisplacementDirPtr_ ||  
+        pointsDisplacementDirPtr_ ||
         facesDisplacementDirPtr_
     )
     {
@@ -367,14 +367,14 @@ void freeSurface::makeDirections()
     }
 
 
-    pointsDisplacementDirPtr_ = 
+    pointsDisplacementDirPtr_ =
         new vectorField
         (
             mesh().boundaryMesh()[aPatchID()].nPoints(),
             vector::zero
         );
 
-    facesDisplacementDirPtr_ = 
+    facesDisplacementDirPtr_ =
         new vectorField
         (
             mesh().boundaryMesh()[aPatchID()].size(),
@@ -430,12 +430,12 @@ void freeSurface::makeTotalDisplacement()
             ),
             vectorField
             (
-                mesh().boundaryMesh()[aPatchID()].nPoints(), 
+                mesh().boundaryMesh()[aPatchID()].nPoints(),
                 vector::zero
             )
         );
 }
- 
+
 
 void freeSurface::readTotalDisplacement()
 {
@@ -478,9 +478,9 @@ void freeSurface::readTotalDisplacement()
                     mesh(),
                     IOobject::MUST_READ,
                     IOobject::AUTO_WRITE
-                )     
+                )
             );
-    }           
+    }
 }
 
 
@@ -539,12 +539,12 @@ void freeSurface::makeUs() const
          == wedgeFaPatch::typeName
         )
         {
-            patchFieldTypes[patchI] = 
+            patchFieldTypes[patchI] =
                 wedgeFaPatchVectorField::typeName;
         }
         else
         {
-            label ngbPolyPatchID = 
+            label ngbPolyPatchID =
                 aMesh().boundary()[patchI].ngbPolyPatchIndex();
 
             if (ngbPolyPatchID != -1)
@@ -625,7 +625,7 @@ void freeSurface::makeSurfactConc() const
     }
 
 
-    // It is an error to attempt to recalculate    
+    // It is an error to attempt to recalculate
     // if the pointer is already set
     if (surfactConcPtr_)
     {
@@ -709,7 +709,7 @@ void freeSurface::makeSurfactant() const
     }
 
 
-    const dictionary& surfactProp = 
+    const dictionary& surfactProp =
         this->subDict("surfactantProperties");
 
     surfactantPtr_ = new surfactantProperties(surfactProp);
@@ -794,7 +794,7 @@ const IOpatchToPatchInterpolation& freeSurface::interpolatorAB()
     {
         makeInterpolators();
     }
-    
+
     return *interpolatorABPtr_;
 }
 
@@ -805,7 +805,7 @@ const IOpatchToPatchInterpolation& freeSurface::interpolatorBA()
     {
         makeInterpolators();
     }
-    
+
     return *interpolatorBAPtr_;
 }
 
@@ -871,7 +871,7 @@ faMesh& freeSurface::aMesh()
     {
         makeFaMesh();
     }
-    
+
     return *aMeshPtr_;
 }
 
@@ -881,7 +881,7 @@ const faMesh& freeSurface::aMesh() const
     {
         makeFaMesh();
     }
-    
+
     return *aMeshPtr_;
 }
 
@@ -891,7 +891,7 @@ areaVectorField& freeSurface::Us()
     {
         makeUs();
     }
-    
+
     return *UsPtr_;
 }
 
@@ -901,7 +901,7 @@ const areaVectorField& freeSurface::Us() const
     {
         makeUs();
     }
-    
+
     return *UsPtr_;
 }
 
@@ -911,7 +911,7 @@ edgeScalarField& freeSurface::Phis()
     {
         makePhis();
     }
-    
+
     return *phisPtr_;
 }
 
@@ -921,7 +921,7 @@ areaScalarField& freeSurface::surfactantConcentration()
     {
         makeSurfactConc();
     }
-    
+
     return *surfactConcPtr_;
 }
 
@@ -931,7 +931,7 @@ const areaScalarField& freeSurface::surfactantConcentration() const
     {
         makeSurfactConc();
     }
-    
+
     return *surfactConcPtr_;
 }
 
@@ -941,7 +941,7 @@ areaScalarField& freeSurface::surfaceTension()
     {
         makeSurfaceTension();
     }
-    
+
     return *surfaceTensionPtr_;
 }
 
@@ -951,7 +951,7 @@ const areaScalarField& freeSurface::surfaceTension() const
     {
         makeSurfaceTension();
     }
-    
+
     return *surfaceTensionPtr_;
 }
 
@@ -961,13 +961,13 @@ const surfactantProperties& freeSurface::surfactant() const
     {
         makeSurfactant();
     }
-    
+
     return *surfactantPtr_;
 }
 
 
 const volScalarField& freeSurface::fluidIndicator()
-{    
+{
     if (!fluidIndicatorPtr_)
     {
         makeFluidIndicator();
@@ -997,7 +997,7 @@ tmp<areaVectorField> freeSurface::surfaceTensionGrad()
             surfactant().surfactSaturatedConc()))()
         )
     );
-    
+
     return tgrad;
 }
 

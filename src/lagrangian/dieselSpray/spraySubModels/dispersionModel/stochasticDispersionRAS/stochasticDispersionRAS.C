@@ -90,7 +90,7 @@ void stochasticDispersionRAS::disperseParcels() const
 
         scalar Tturb = min
         (
-            k[celli]/epsilon[celli], 
+            k[celli]/epsilon[celli],
             cps*pow(k[celli], 1.5)/epsilon[celli]/(UrelMag + SMALL)
         );
 
@@ -102,7 +102,7 @@ void stochasticDispersionRAS::disperseParcels() const
             if (elmnt().tTurb() > Tturb)
             {
                 elmnt().tTurb() = 0.0;
-                
+
                 scalar sigma = sqrt(2.0*k[celli]/3.0);
                 vector dir = 2.0*spray_.rndGen().vector01() - vector::one;
                 dir /= mag(dir) + SMALL;

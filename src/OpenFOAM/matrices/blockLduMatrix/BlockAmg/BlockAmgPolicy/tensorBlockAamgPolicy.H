@@ -75,7 +75,7 @@ inline autoPtr<BlockLduMatrix<tensor> > BlockAamgPolicy<tensor>::restrictMatrix
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif

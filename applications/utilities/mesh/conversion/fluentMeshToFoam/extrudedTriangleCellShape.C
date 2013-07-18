@@ -102,7 +102,7 @@ cellShape extrudedTriangleCellShape
         {
             // Reverse the face.  Note: it is necessary to reverse by
             // hand to preserve connectivity of a 2-D mesh.
-            // 
+            //
             localFaces[faceI].setSize(curFace.size());
 
             forAllReverse(curFace, i)

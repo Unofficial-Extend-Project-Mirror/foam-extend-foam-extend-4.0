@@ -58,7 +58,7 @@ void FUNC(Field<typeF1>& f1, const tmp<Field<typeF2> >& tf2)                 \
      FUNC(f1,tf2());                                                         \
      tf2.clear();                                                            \
 }
-   
+
 #define ExpandFieldFunctions(tensorType, diagTensorType, sphericalTensorType, \
         vectorType, cmptType, args...)                                        \
                                                                               \

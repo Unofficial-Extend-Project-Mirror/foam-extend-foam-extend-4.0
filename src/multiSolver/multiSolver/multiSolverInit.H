@@ -1,6 +1,8 @@
 // Common elements in the constructor initialization list for multiSolver
 
-    multiDicts_(NULL),
+    // Quenching compiler warning
+    // HR, 18/Jul/2013
+    multiDicts_(0),
 
     multiSolverControl_(multiControlDict_.subDict("multiSolverControl")),
     solverDomains_(multiControlDict_.subDict("solverDomains")),
@@ -9,7 +11,7 @@
     finished_(false),
     noSaveSinceSuperLoopIncrement_(false),
     manageLocalRoot_(false),
-    
+
     superLoop_(0),
     currentSolverDomain_("default"),
 
@@ -22,11 +24,11 @@
     finalEndTime_(0),
 
     endSuperLoop_(0),
-    
+
     multiDictsRunTimeModifiable_(true),
 
     globalTimeOffset_(0),
-    
+
     purgeWriteSuperLoops_(prefixes_.size()),
 
 //    timeValueStartFrom_,

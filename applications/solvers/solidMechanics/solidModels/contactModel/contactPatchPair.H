@@ -27,7 +27,7 @@ Class
 
 Description
     A pair of surfaces in contact.
-    
+
 SourceFiles
     contactPatchPair.C
 
@@ -76,7 +76,7 @@ private:
 
         //- Reference to contact problem
         contactProblem& cp_;
- 
+
         //- patch to patch algorithm
         const intersection::algorithm alg_;
 
@@ -101,7 +101,7 @@ private:
         //contact iteration number
         int contactIterNum_;
 
-	// file that contains contact information
+    // file that contains contact information
         OFstream* contactFilePtr_;
 
         // slave face zone name - needed to define zoneToZoneInterp
@@ -143,12 +143,12 @@ private:
 
         //- interpolation method for passing traction from slave to master
         word interpolationMethod_;
-  
+
        //- zoneToZoneInterpolation for the calculation of pointDistanceToIntersection
        zoneToZoneInterpolation faceZoneMasterToSlaveInterpolator_;
 
        //- zoneToZone or ggiZone for interpolation of traction from slave to master
-       zoneToZoneInterpolation* faceZoneSlaveToMasterInterpolatorPtr_;  
+       zoneToZoneInterpolation* faceZoneSlaveToMasterInterpolatorPtr_;
        ggiZoneInterpolation* faceZoneGgiInterpolatorPtr_;
 
        //- interpolation from slave vertices to slave face centres
@@ -223,18 +223,18 @@ public:
 
         //- Correct contact data
         void correct();
-      
+
         //- if contact correction on or off
         Switch contactActive()
         {
              return contactActive_;
-	};
+        };
 
         //- set contactActive_ to on or off
         void setContactActive(bool trueOrFalse)
         {
-	  contactActive_ = trueOrFalse;
-	};
+            contactActive_ = trueOrFalse;
+        };
 
         //- Write dictionary
         void writeDict(Ostream&) const;

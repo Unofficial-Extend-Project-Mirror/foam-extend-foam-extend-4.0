@@ -44,7 +44,7 @@ SourceFiles
 \*---------------------------------------------------------------------------*/
 
 class VTK_IO_EXPORT vtkFoamData
-: 
+:
     public vtkDataSetSource
 {
 

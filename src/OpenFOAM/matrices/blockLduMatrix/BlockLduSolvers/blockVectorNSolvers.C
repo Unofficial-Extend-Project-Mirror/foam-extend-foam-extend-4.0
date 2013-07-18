@@ -159,7 +159,7 @@ addSolverToBlockMatrix(Type, block##Type##AmgSolver, asymMatrix);             \
                                                                               \
 typedef BlockAmgPrecon<type > block##Type##AmgPrecon;                         \
 makeBlockPrecon(block##Type##Precon, block##Type##AmgPrecon);                 \
-                                                                              
+
 forAllVectorNTypes(makeSolver)
 
 #undef makeSolver

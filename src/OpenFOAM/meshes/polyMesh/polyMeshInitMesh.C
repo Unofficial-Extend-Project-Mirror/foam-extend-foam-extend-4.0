@@ -102,7 +102,6 @@ void Foam::polyMesh::initMesh()
     nCells++;
 
     label nUsedFaces = 0;
-    label nIntFaces = 0;
 
     // Use patch info if provided, use all faces otherwise
     if (boundary_.size())
@@ -110,13 +109,11 @@ void Foam::polyMesh::initMesh()
         nUsedFaces =
             boundary_[boundary_.size() - 1].start()
           + boundary_[boundary_.size() - 1].size();
-        nIntFaces = boundary_[0].start();
     }
     else
     {
         // No patch info. Assume all faces are used.
         nUsedFaces = owner_.size();
-        nIntFaces = neighbour_.size();
     }
 
 

@@ -76,7 +76,7 @@ inline scalar BlockCoeffMaxNorm<tensor>::normalize
         (
             "scalar BlockCoeffMaxNorm<tensor>(const BlockCoeff<tensor>& a)"
         )   << "Unknown type" << abort(FatalError);
-    
+
         return 0;
     }
 }
@@ -113,7 +113,7 @@ inline void BlockCoeffMaxNorm<tensor>::coeffMag
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif

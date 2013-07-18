@@ -56,11 +56,11 @@ do
     # Check if an Allrun file is present
     if [ ! -e $caseDir/Allrun ]; then
 
-        # Sometimes, a global Allrun file is located at the tutorial level 
+        # Sometimes, a global Allrun file is located at the tutorial level
         if [ ! -e $tutDir/Allrun ]; then
-	    # No Allrun file for this case. Let's add one. 
+            # No Allrun file for this case. Let's add one.
             echo "Adding a default Allrun file for tutorial : $caseDir"
-	    cp $DEFAULT_ALLRUN_FILE $caseDir/Allrun
+            cp $DEFAULT_ALLRUN_FILE $caseDir/Allrun
         fi
     fi
 done

@@ -92,7 +92,7 @@ void Foam::BlockLduMatrix<scalar>::initInterfaces
                 );
             }
         }
-    }    
+    }
     else
     {
         FatalErrorIn("BlockLduMatrix<scalar>::initMatrixInterfaces")

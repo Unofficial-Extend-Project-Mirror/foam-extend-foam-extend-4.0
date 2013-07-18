@@ -63,7 +63,7 @@ chemPoint::chemPoint
     logT_(logT),
     deltaT_(deltaT),
     timeEOA_(0)
-    
+
 {
 
 
@@ -75,10 +75,10 @@ chemPoint::chemPoint
         }
         else
         {
-            EOA_[i] = absErr * tolerances[i];        
+            EOA_[i] = absErr * tolerances[i];
         }
     }
-    
+
     forAll(tolerancesSolutions, i)
     {
         if(tolerances[i] == 0)
@@ -87,10 +87,10 @@ chemPoint::chemPoint
         }
         else
         {
-            solutionsEOA_[i] = absErr * tolerancesSolutions[i];        
+            solutionsEOA_[i] = absErr * tolerancesSolutions[i];
         }
     }
-    
+
 }
 
 
@@ -126,10 +126,10 @@ chemPoint::chemPoint
         }
         else
         {
-            EOA_[i] = absErr * tolerances[i];        
+            EOA_[i] = absErr * tolerances[i];
         }
-    }    
-    
+    }
+
     forAll(tolerancesSolutions, i)
     {
         if(tolerancesSolutions[i] == 0)
@@ -138,7 +138,7 @@ chemPoint::chemPoint
         }
         else
         {
-            solutionsEOA_[i] = absErr * tolerancesSolutions[i];        
+            solutionsEOA_[i] = absErr * tolerancesSolutions[i];
         }
     }
 
@@ -161,7 +161,7 @@ chemPoint::chemPoint
     logT_(p.logT()),
     deltaT_(p.deltaT()),
     timeEOA_(p.timeEOA())
-{}    
+{}
 
 chemPoint::chemPoint
 (
@@ -178,31 +178,31 @@ chemPoint::chemPoint
     logT_(p.logT()),
     deltaT_(p.deltaT()),
     timeEOA_(p.timeEOA())
-{}    
+{}
 
 bool chemPoint::inEOA
 (
     const scalarField& point,
     const scalarField& Wi,
-    const scalar& rhoi, 
+    const scalar& rhoi,
     const scalar& deltaT,
-    const scalarField& scaleFactor 
+    const scalarField& scaleFactor
 )
 {
-    
+
     if(nUsed_ < INT_MAX)
     {
         nUsed_++;
     }
 
-    label size = point.size();    
-        
+    label size = point.size();
+
     scalar eps2 = 0.0;
 
     for(label i=0; i < size; i++)
     {
 
-//      Temperature    
+//      Temperature
         if(i == size-2 && logT_)
         {
             scalar diffAxis = sqr(Foam::scalar(mag(log(point[i])-log(v0_[i]))))/sqr(EOA_[i]) ;
@@ -211,31 +211,31 @@ bool chemPoint::inEOA
         else if(i == size-2 && !logT_)
         {
             scalar diffAxis = sqr(Foam::scalar(mag((point[i])-(v0_[i])))) / sqr(EOA_[i]) ;
-            eps2 += diffAxis;                        
+            eps2 += diffAxis;
         }
         if(i == size-1)
         {
             scalar diffAxis = sqr(Foam::scalar(mag((point[i]-v0_[i])))) / sqr(EOA_[i]) ;
             eps2 += diffAxis;
         }
-//      Species                
+//      Species
         else
         {
             scalar diffAxis = sqr(Foam::scalar(mag((point[i]-v0_[i])))) / sqr(EOA_[i]) ;
             eps2 += diffAxis;
         }
     }
-       
-    
+
+
     if(eps2 > 1.0)
     {
         return false;
     }
     else
-    {            
+    {
         return true;
     }
-    
+
 }
 
 void chemPoint::grow
@@ -243,13 +243,13 @@ void chemPoint::grow
     const scalarField& v0,
     const scalarField& Wi,
     const scalar& rhoi,
-    const scalarField& v, 
+    const scalarField& v,
     const scalar& deltaT
 )
 {
 
     label size = v.size();
-    
+
     for(label i=0; i < size-2; i++)
     {
         if(i == size-2 && logT_)
@@ -258,7 +258,7 @@ void chemPoint::grow
 
             if(diffAxis > Foam::VSMALL)
             {
-                EOA_[i] = mag(log(v0[i])-log(v0_[i]));  
+                EOA_[i] = mag(log(v0[i])-log(v0_[i]));
             }
         }
         else if(i == size-2 && !logT_)
@@ -267,7 +267,7 @@ void chemPoint::grow
 
             if(diffAxis > Foam::VSMALL)
             {
-                EOA_[i] = mag((v0[i])-(v0_[i]));  
+                EOA_[i] = mag((v0[i])-(v0_[i]));
             }
         }
         else
@@ -276,14 +276,14 @@ void chemPoint::grow
 
             if(diffAxis > Foam::VSMALL)
             {
-                EOA_[i] = mag((v0[i]-v0_[i]));  
+                EOA_[i] = mag((v0[i]-v0_[i]));
             }
-            
+
         }
     }
-    
+
     timeEOA_ = Foam::scalar(mag(deltaT_ - deltaT));
-        
+
 }
 
 bool chemPoint::checkSolution
@@ -291,7 +291,7 @@ bool chemPoint::checkSolution
     const scalarField& v0,
     const scalarField& v,
     const scalarField& Wi,
-    const scalar& rhoi, 
+    const scalar& rhoi,
     const scalar& T,
     const scalar& p,
     const scalar& deltaT,
@@ -300,7 +300,7 @@ bool chemPoint::checkSolution
 {
 
     label size = v.size();
-    
+
     scalarField s = v;
 
     s.setSize(size+2);
@@ -311,7 +311,7 @@ bool chemPoint::checkSolution
     s[s.size()-2] = T;
     s[s.size()-1] = p;
     size = s.size();
-    
+
     scalar eps2 = 0.0;
 
 
@@ -320,18 +320,18 @@ bool chemPoint::checkSolution
         if(i == size-2 && logT_)
         {
             scalar diffAxis = (Foam::scalar(mag(log(s[i])-log(r_[i])))) / (solutionsEOA_[i]) ;
-            eps2 += sqr(diffAxis);            
+            eps2 += sqr(diffAxis);
         }
         else if(i == size-2 && !logT_)
         {
             scalar diffAxis = (Foam::scalar(mag(s[i]-r_[i]))) / (solutionsEOA_[i]) ;
-            eps2 += sqr(diffAxis);                        
-        }        
+            eps2 += sqr(diffAxis);
+        }
         else if(i == size-1)
         {
             scalar diffAxis = (Foam::scalar(mag(s[i]-r_[i]))) / (solutionsEOA_[i]) ;
-            eps2 += sqr(diffAxis);                        
-        }        
+            eps2 += sqr(diffAxis);
+        }
         else
         {
             scalar diffAxis = (Foam::scalar(mag((s[i]*Wi[i]/rhoi-r_[i])))) / (solutionsEOA_[i]) ;
@@ -347,7 +347,7 @@ bool chemPoint::checkSolution
     {
         // if the solution is in the ellipsoid of accuracy, grow it!
         grow(v0, Wi, rhoi, s, deltaT);
-        return true;    
+        return true;
     }
 
 
@@ -358,26 +358,26 @@ void chemPoint::setFree()
     node_ = NULL;
     nUsed_ = 0;
     /*
-        v0_.clear();        
+        v0_.clear();
         r_.clear();
-        EOA_.clear();        
+        EOA_.clear();
         solutionsEOA_.clear();
         absErr_ = 0;
         logT_ = 0;
         deltaT_ = 0;
-        timeEOA_ = 0; 
-    */        
+        timeEOA_ = 0;
+    */
 }
 
 void chemPoint::clearData()
 {
         nUsed_ = 0;
-//        Info << "nUsed" << endl;       
-        v0_.clear();        
-//        Info << "v0.clear" << endl;       
+//        Info << "nUsed" << endl;
+        v0_.clear();
+//        Info << "v0.clear" << endl;
         r_.clear();
 //        Info << "r_.clear()" << endl;
-        EOA_.clear();        
+        EOA_.clear();
 //        Info << "EOA_.clear()" << endl;
         solutionsEOA_.clear();
 //        Info << "solutionsEOA_.clear()" << endl;
@@ -387,7 +387,7 @@ void chemPoint::clearData()
 //        Info << "logT_ = 0" << endl;
         deltaT_ = 0;
 //        Info << "deltaT_ = 0;" << endl;
-        timeEOA_ = 0; 
+        timeEOA_ = 0;
 //        node_ = NULL;
 //        Info << "chemPoint::clearData():: ENDDDDDD!" << endl;
 

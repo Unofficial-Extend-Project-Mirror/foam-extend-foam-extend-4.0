@@ -43,7 +43,7 @@ Foam::autoPtr<Foam::BlockAmgPolicy<Type> > Foam::BlockAmgPolicy<Type>::New
 {
     typename matrixConstructorTable::iterator constructorIter =
         matrixConstructorTablePtr_->find(policyType);
-    
+
     if (constructorIter == matrixConstructorTablePtr_->end())
     {
         FatalErrorIn

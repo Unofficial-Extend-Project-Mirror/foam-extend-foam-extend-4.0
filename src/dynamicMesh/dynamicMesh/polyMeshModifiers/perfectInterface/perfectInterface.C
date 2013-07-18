@@ -180,10 +180,10 @@ void Foam::perfectInterface::setRefinement(polyTopoChange& ref) const
         // Some aliases
         const edgeList& edges0 = pp0.edges();
         const pointField& pts0 = pp0.localPoints();
-        const pointField& pts1 = pp1.localPoints();    
+        const pointField& pts1 = pp1.localPoints();
         const labelList& meshPts0 = pp0.meshPoints();
         const labelList& meshPts1 = pp1.meshPoints();
-                        
+
 
         // Get local dimension as fraction of minimum edge length
 

@@ -100,10 +100,10 @@ public:
             (
                 new emptyFaPatch
                 (
-                    name(), 
-                    edgeLabels, 
-                    index, 
-                    bm, 
+                    name(),
+                    edgeLabels,
+                    index,
+                    bm,
                     ngbPolyPatchIndex
                 )
             );
@@ -117,7 +117,7 @@ public:
         }
 
         //- Return face normals. Over-riding base class return to get zero size
-        // 
+        //
 //         virtual const vectorField& edgeNormals() const;
 
 };

@@ -45,7 +45,7 @@ faFieldDecomposer::patchFieldDecomposer::patchFieldDecomposer
 {
     forAll (directAddressing_, i)
     {
-        // Subtract one to align addressing.  
+        // Subtract one to align addressing.
         // directAddressing_[i] -= addressingOffset + 1;
         // ZT, 12/Nov/2010
         directAddressing_[i] -= addressingOffset;
@@ -70,7 +70,7 @@ processorAreaPatchFieldDecomposer
 
     forAll (addressing_, i)
     {
-        // Subtract one to align addressing.  
+        // Subtract one to align addressing.
         label ai = addressingSlice[i];
 //         label ai = mag(addressingSlice[i]) - 1;
 
@@ -95,7 +95,7 @@ processorAreaPatchFieldDecomposer
             // do the interpolation properly (I would need to look
             // up the different (edge) list of data), so I will
             // just grab the value from the owner face
-            // 
+            //
             addressing_[i].setSize(1);
             weights_[i].setSize(1);
 
@@ -176,14 +176,14 @@ faFieldDecomposer::faFieldDecomposer
         }
         else
         {
-            processorAreaPatchFieldDecomposerPtrs_[patchi] = 
+            processorAreaPatchFieldDecomposerPtrs_[patchi] =
                 new processorAreaPatchFieldDecomposer
                 (
                     completeMesh_,
                     procMesh_.boundary()[patchi].patchSlice(edgeAddressing_)
                 );
 
-            processorEdgePatchFieldDecomposerPtrs_[patchi] = 
+            processorEdgePatchFieldDecomposerPtrs_[patchi] =
                 new processorEdgePatchFieldDecomposer
                 (
                     procMesh_.boundary()[patchi].size(),

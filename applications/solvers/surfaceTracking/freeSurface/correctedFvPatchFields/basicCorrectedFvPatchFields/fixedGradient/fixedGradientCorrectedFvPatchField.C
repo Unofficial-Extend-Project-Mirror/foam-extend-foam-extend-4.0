@@ -84,7 +84,7 @@ fixedGradientCorrectedFvPatchField<Type>::fixedGradientCorrectedFvPatchField
     {
         Field<Type>::operator=
         (
-            this->patchInternalField() 
+            this->patchInternalField()
           + gradient_/this->patch().deltaCoeffs()
           + this->corrVecGrad()
         );

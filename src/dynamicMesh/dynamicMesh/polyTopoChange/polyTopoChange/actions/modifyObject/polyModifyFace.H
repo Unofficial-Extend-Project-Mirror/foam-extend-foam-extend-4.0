@@ -53,7 +53,7 @@ class polyModifyFace
 {
     // Private data
 
-        //- Face 
+        //- Face
         face face_;
 
         //- Master face ID

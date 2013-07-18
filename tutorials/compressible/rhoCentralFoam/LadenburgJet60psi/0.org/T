@@ -36,7 +36,7 @@ boundaryField
         type            totalTemperature;
         value           uniform 297;
         T0              uniform 297;
-		U               U;
+        U               U;
         phi             phi;
         rho             none;
         psi             psi;

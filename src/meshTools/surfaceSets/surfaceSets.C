@@ -67,7 +67,7 @@ Description
 //}
 //
 //
-//// Returns true if cell uses at least one selected point 
+//// Returns true if cell uses at least one selected point
 //bool Foam::surfaceSets::usesPoint
 //(
 //    const primitiveMesh& mesh,
@@ -149,7 +149,7 @@ Description
 //                    newPoints[pointI] = tnearest()[0];
 //                }
 //            }
-//        }               
+//        }
 //    }
 //
 //
@@ -163,7 +163,7 @@ Description
 //    )
 //    {
 //        label cellI = iter.key();
-//    
+//
 //        const cell& cll = cells[cellI];
 //
 //        scalar newVol = cll.mag(newPoints, faces);
@@ -286,7 +286,7 @@ void Foam::surfaceSets::getSurfaceSets
         cellType.trimCutCells
         (
             nCutLayers,
-            cellClassification::OUTSIDE, 
+            cellClassification::OUTSIDE,
             cellClassification::INSIDE
         );
     }
@@ -505,7 +505,7 @@ Foam::labelHashSet Foam::surfaceSets::getHangingCells
 //        mesh,
 //        surfName,
 //        surf,
-//        querySurf, 
+//        querySurf,
 //        outsidePts,
 //        false,          // includeCut
 //        false,          // includeInside
@@ -628,7 +628,7 @@ Foam::labelHashSet Foam::surfaceSets::getHangingCells
 //            << endl;
 //    }
 //    while (nRemoved != 0);
-//    
+//
 //
 //    //
 //    // Write
@@ -644,7 +644,7 @@ Foam::labelHashSet Foam::surfaceSets::getHangingCells
 //    Pout<< "Writing outside cells (" << outside.size() << ") to cellSet "
 //        << outside.instance()/outside.local()/outside.name()
 //        << endl << endl;
-//    
+//
 //    outside.write();
 //}
 

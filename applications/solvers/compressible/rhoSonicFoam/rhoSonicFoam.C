@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
         (
             fvm::ddt(rhoU)
           + fvm::div(phiv, rhoU)
-         == 
+         ==
           - fvc::grad(p)
         );
 

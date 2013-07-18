@@ -32,14 +32,14 @@ Description
     Interpolation class which uses Radial Basis Functions to interpolate
     field from given data points to arbitrary set of points.
 
-	The coefficient vectors, alpha and beta are determined by solving
+    The coefficient vectors, alpha and beta are determined by solving
     the system:
 
-	| db | = | Mbb Pb | | alpha |
-	| 0  |   | Pb  0  | |  beta |
+    | db | = | Mbb Pb | | alpha |
+    | 0  |   | Pb  0  | |  beta |
 
-	where db are the given field values at data carrier points.
-	Mbb the boundary RBF correlation matrix (NbxNb), containing RBF evaluations
+    where db are the given field values at data carrier points.
+    Mbb the boundary RBF correlation matrix (NbxNb), containing RBF evaluations
     at the boundary nodes, and Pb some linear polynomial matrix (Nbx4).
 
     In cases where far field data is not of interest, a cutoff function

@@ -113,7 +113,7 @@ void cellMotionFvPatchField<Type>::updateCoeffs()
     word pfName = this->dimensionedInternalField().name();
     pfName.replace("cell", "point");
 
-    const GeometricField<Type, pointPatchField, pointMesh>& pointMotion = 
+    const GeometricField<Type, pointPatchField, pointMesh>& pointMotion =
         this->db().objectRegistry::
         lookupObject<GeometricField<Type, pointPatchField, pointMesh> >
         (

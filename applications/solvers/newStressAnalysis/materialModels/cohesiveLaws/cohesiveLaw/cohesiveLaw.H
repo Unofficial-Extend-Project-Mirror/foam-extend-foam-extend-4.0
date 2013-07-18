@@ -97,7 +97,7 @@ public:
         static autoPtr<cohesiveLaw> New
         (
             const word& cohesiveLawName,
-            const dictionary& dict            
+            const dictionary& dict
         );
 
 
@@ -107,7 +107,7 @@ public:
         cohesiveLaw
         (
             const word& cohesiveLawName,
-            const dictionary& dict            
+            const dictionary& dict
         );
 
         //- Construct as copy
@@ -124,7 +124,7 @@ public:
 
 
     // Member Functions
-    
+
         //- Return cohesive law coefficients
         const dictionary& cohesiveLawCoeffs() const
         {

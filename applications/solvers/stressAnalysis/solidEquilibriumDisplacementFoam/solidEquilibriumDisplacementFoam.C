@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
         {
             volTensorField gradDcorr = fvc::grad(Dcorr);
 
-            sigmaExp = 
+            sigmaExp =
                 (lambda - mu)*gradDcorr + mu*gradDcorr.T()
               + (lambda*I)*tr(gradDcorr);
 

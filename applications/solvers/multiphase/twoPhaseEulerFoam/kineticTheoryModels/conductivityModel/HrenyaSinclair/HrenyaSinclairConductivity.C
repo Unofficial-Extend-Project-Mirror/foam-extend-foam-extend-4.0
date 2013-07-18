@@ -76,7 +76,7 @@ Foam::tmp<Foam::volScalarField> Foam::HrenyaSinclairConductivity::kappa
 {
     const scalar sqrtPi = sqrt(mathematicalConstant::pi);
 
-    volScalarField lamda = 
+    volScalarField lamda =
         scalar(1) + da/(6.0*sqrt(2.0)*(alpha + scalar(1.0e-5)))/L_;
 
     return rhoa*da*sqrt(Theta)*

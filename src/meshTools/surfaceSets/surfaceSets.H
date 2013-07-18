@@ -79,7 +79,7 @@ class surfaceSets
         ////- Min length of connected mesh edges
         //static scalar minEdgeLen(const primitiveMesh& mesh, const label pointI);
         //
-        ////- Returns true if cell uses at least one selected point 
+        ////- Returns true if cell uses at least one selected point
         //static bool usesPoint
         //(
         //    const primitiveMesh& mesh,
@@ -93,7 +93,7 @@ class surfaceSets
         ////  removed cells.
         //static label removeHangingCells
         //(
-        //    const primitiveMesh&, 
+        //    const primitiveMesh&,
         //    const triSurfaceSearch& querySurf,
         //    labelHashSet& internalCells
         //);
