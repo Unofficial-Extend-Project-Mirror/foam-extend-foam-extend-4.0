@@ -42,7 +42,7 @@ void Foam::BlockLduMatrix<Type>::Amul
 
     // Initialise the update of coupled interfaces
     initInterfaces(coupleUpper_, Ax, x);
-    
+
     AmulCore(Ax, x);
 
     // Update coupled interfaces
@@ -64,13 +64,13 @@ void Foam::BlockLduMatrix<Type>::AmulCore
     const unallocLabelList& u = lduAddr().upperAddr();
     const unallocLabelList& l = lduAddr().lowerAddr();
 
-    
+
     const TypeCoeffField& Diag = this->diag();
     const TypeCoeffField& Upper = this->upper();
 
     // Create multiplication function object
     typename BlockCoeff<Type>::multiply mult;
-    
+
     // AmulCore must be additive to account for initialisation step
     // in ldu interfaces.  HJ, 6/Nov/2007
     // Fixed by IC 19/Oct/2011
@@ -78,7 +78,7 @@ void Foam::BlockLduMatrix<Type>::AmulCore
     {
         const scalarTypeField& activeDiag = Diag.asScalar();
 
-        for (register label cellI = 0; cellI < u.size(); cellI++)
+        for (register label cellI = 0; cellI < activeDiag.size(); cellI++)
         {
             Ax[cellI] += mult(activeDiag[cellI], x[cellI]);
         }
@@ -87,7 +87,7 @@ void Foam::BlockLduMatrix<Type>::AmulCore
     {
         const linearTypeField& activeDiag = Diag.asLinear();
 
-        for (register label cellI = 0; cellI < u.size(); cellI++)
+        for (register label cellI = 0; cellI < activeDiag.size(); cellI++)
         {
             Ax[cellI] += mult(activeDiag[cellI], x[cellI]);
         }
@@ -96,7 +96,7 @@ void Foam::BlockLduMatrix<Type>::AmulCore
     {
         const squareTypeField& activeDiag = Diag.asSquare();
 
-        for (register label cellI = 0; cellI < u.size(); cellI++)
+        for (register label cellI = 0; cellI < activeDiag.size(); cellI++)
         {
             Ax[cellI] += mult(activeDiag[cellI], x[cellI]);
         }
@@ -248,7 +248,7 @@ void Foam::BlockLduMatrix<Type>::TmulCore
     {
         const scalarTypeField& activeDiag = Diag.asScalar();
 
-        for (register label cellI = 0; cellI < u.size(); cellI++)
+        for (register label cellI = 0; cellI < activeDiag.size(); cellI++)
         {
             Tx[cellI] += mult(activeDiag[cellI], x[cellI]);
         }
@@ -257,7 +257,7 @@ void Foam::BlockLduMatrix<Type>::TmulCore
     {
         const linearTypeField& activeDiag = Diag.asLinear();
 
-        for (register label cellI = 0; cellI < u.size(); cellI++)
+        for (register label cellI = 0; cellI < activeDiag.size(); cellI++)
         {
             Tx[cellI] += mult(activeDiag[cellI], x[cellI]);
         }
@@ -266,12 +266,12 @@ void Foam::BlockLduMatrix<Type>::TmulCore
     {
         const squareTypeField& activeDiag = Diag.asSquare();
 
-        for (register label cellI = 0; cellI < u.size(); cellI++)
+        for (register label cellI = 0; cellI < activeDiag.size(); cellI++)
         {
             Tx[cellI] += mult(activeDiag[cellI].T(), x[cellI]);
         }
     }
-    
+
     // Upper multiplication
 
     if (Upper.activeType() == blockCoeffBase::SCALAR)
