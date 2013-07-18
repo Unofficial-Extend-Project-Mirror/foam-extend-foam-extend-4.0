@@ -77,7 +77,7 @@ Foam::tmp<Foam::scalarField> Foam::cellQuality::nonOrthogonality() const
 
     forAll (mesh_.boundaryMesh(), patchI)
     {
-        const unallocLabelList& faceCells = 
+        const unallocLabelList& faceCells =
             mesh_.boundaryMesh()[patchI].faceCells();
 
         const vectorField::subField faceCentres =
@@ -126,7 +126,7 @@ Foam::tmp<Foam::scalarField> Foam::cellQuality::skewness() const
 
     forAll (nei, faceI)
     {
-        scalar dOwn = 
+        scalar dOwn =
 	    mag
 	    (
 		(faceCtrs[faceI] - cellCtrs[own[faceI]])
@@ -134,7 +134,7 @@ Foam::tmp<Foam::scalarField> Foam::cellQuality::skewness() const
 	    )
 	    /mag(areas[faceI]);
 
-        scalar dNei = 
+        scalar dNei =
 	    mag
 	    (
 		(cellCtrs[nei[faceI]] - faceCtrs[faceI])
@@ -147,7 +147,7 @@ Foam::tmp<Foam::scalarField> Foam::cellQuality::skewness() const
 	  + (dOwn/(dOwn+dNei))*
 	    (cellCtrs[nei[faceI]] - cellCtrs[own[faceI]]);
 
-        scalar skewness = 
+        scalar skewness =
             mag(faceCtrs[faceI] - faceIntersection)
             /(mag(cellCtrs[nei[faceI]] - cellCtrs[own[faceI]]) + VSMALL);
 
@@ -158,7 +158,7 @@ Foam::tmp<Foam::scalarField> Foam::cellQuality::skewness() const
 
     forAll (mesh_.boundaryMesh(), patchI)
     {
-	const unallocLabelList& faceCells = 
+	const unallocLabelList& faceCells =
 	    mesh_.boundaryMesh()[patchI].faceCells();
 
 	const vectorField::subField faceCentres =
@@ -175,10 +175,10 @@ Foam::tmp<Foam::scalarField> Foam::cellQuality::skewness() const
 		cellCtrs[faceCells[faceI]]
 	      + ((faceCentres[faceI] - cellCtrs[faceCells[faceI]])&n)*n;
 
-	    scalar skewness = 
+	    scalar skewness =
 		mag(faceCentres[faceI] - faceIntersection)/
 		(
-		    mag(faceCentres[faceI] - cellCtrs[faceCells[faceI]]) 
+		    mag(faceCentres[faceI] - cellCtrs[faceCells[faceI]])
 		  + VSMALL
 		);
 
@@ -225,7 +225,7 @@ Foam::tmp<Foam::scalarField> Foam::cellQuality::faceNonOrthogonality() const
 
     forAll (mesh_.boundaryMesh(), patchI)
     {
-	const unallocLabelList& faceCells = 
+	const unallocLabelList& faceCells =
 	    mesh_.boundaryMesh()[patchI].faceCells();
 
 	const vectorField::subField faceCentres =
@@ -273,7 +273,7 @@ Foam::tmp<Foam::scalarField> Foam::cellQuality::faceSkewness() const
 
     forAll (nei, faceI)
     {
-        scalar dOwn = 
+        scalar dOwn =
 	    mag
 	    (
 		(faceCtrs[faceI] - cellCtrs[own[faceI]])
@@ -281,7 +281,7 @@ Foam::tmp<Foam::scalarField> Foam::cellQuality::faceSkewness() const
 	    )
 	    /mag(areas[faceI]);
 
-        scalar dNei = 
+        scalar dNei =
 	    mag
 	    (
 		(cellCtrs[nei[faceI]] - faceCtrs[faceI])
@@ -294,7 +294,7 @@ Foam::tmp<Foam::scalarField> Foam::cellQuality::faceSkewness() const
 	  + (dOwn/(dOwn+dNei))*
 	    (cellCtrs[nei[faceI]] - cellCtrs[own[faceI]]);
 
-        result[faceI] = 
+        result[faceI] =
             mag(faceCtrs[faceI] - faceIntersection)
             /(mag(cellCtrs[nei[faceI]] - cellCtrs[own[faceI]]) + VSMALL);
     }
@@ -304,7 +304,7 @@ Foam::tmp<Foam::scalarField> Foam::cellQuality::faceSkewness() const
 
     forAll (mesh_.boundaryMesh(), patchI)
     {
-	const unallocLabelList& faceCells = 
+	const unallocLabelList& faceCells =
 	    mesh_.boundaryMesh()[patchI].faceCells();
 
 	const vectorField::subField faceCentres =
@@ -321,10 +321,10 @@ Foam::tmp<Foam::scalarField> Foam::cellQuality::faceSkewness() const
 		cellCtrs[faceCells[faceI]]
 	      + ((faceCentres[faceI] - cellCtrs[faceCells[faceI]])&n)*n;
 
-	    result[globalFaceI++] = 
+	    result[globalFaceI++] =
 		mag(faceCentres[faceI] - faceIntersection)/
 		(
-		    mag(faceCentres[faceI] - cellCtrs[faceCells[faceI]]) 
+		    mag(faceCentres[faceI] - cellCtrs[faceCells[faceI]])
 		  + VSMALL
 		);
 	}

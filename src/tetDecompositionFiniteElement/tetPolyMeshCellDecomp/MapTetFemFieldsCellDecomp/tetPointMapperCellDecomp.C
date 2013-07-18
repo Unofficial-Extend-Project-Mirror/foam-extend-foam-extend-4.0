@@ -147,7 +147,7 @@ void Foam::tetPointMapperCellDecomp::calcAddressing() const
             const labelListList& mappedCells = cellMap_.addressing();
             const scalarListList& cellWeights = cellMap_.weights();
 
-            // Do cell addressing, 
+            // Do cell addressing,
 
             // Insert cells
             forAll (mappedCells, cellI)

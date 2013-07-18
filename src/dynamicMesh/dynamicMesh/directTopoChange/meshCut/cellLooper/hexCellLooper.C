@@ -207,7 +207,7 @@ bool Foam::hexCellLooper::cut
     }
     else
     {
-        success = 
+        success =
             geomCellLooper::cut
             (
                 refDir,

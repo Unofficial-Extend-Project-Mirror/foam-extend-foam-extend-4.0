@@ -379,7 +379,7 @@ void Foam::cellCuts::calcFaceCuts() const
         label cutI = 0;
 
         // Do point-edge-point walk over face and collect all cuts.
-        // Problem is that we want to start from one of the endpoints of a 
+        // Problem is that we want to start from one of the endpoints of a
         // string of connected cuts; we don't want to start somewhere in the
         // middle.
 
@@ -395,7 +395,7 @@ void Foam::cellCuts::calcFaceCuts() const
                 label fpMin1 = (fp == 0 ? f.size()-1 : fp-1);
                 label vMin1 = f[fpMin1];
 
-                if 
+                if
                 (
                     !pointIsCut_[vMin1]
                  && !edgeIsCut_[findEdge(faceI, v0, vMin1)]
@@ -664,7 +664,7 @@ bool Foam::cellCuts::crossEdge
         return true;
     }
     else
-    {    
+    {
         // No success. Restore state (i.e. backtrack)
         nVisited = oldNVisited;
 
@@ -799,7 +799,7 @@ bool Foam::cellCuts::walkFace
 
 
 
-// Walk across cuts (cut edges or cut vertices) of cell. Stops when hit cut 
+// Walk across cuts (cut edges or cut vertices) of cell. Stops when hit cut
 // already visited. Returns true when loop of 3 or more vertices found.
 bool Foam::cellCuts::walkCell
 (
@@ -1207,7 +1207,7 @@ Foam::labelList Foam::cellCuts::nonAnchorPoints
 
         if
         (
-            findIndex(anchorPoints, pointI) == -1 
+            findIndex(anchorPoints, pointI) == -1
          && findIndex(loop, vertToEVert(pointI)) == -1
         )
         {
@@ -1561,7 +1561,7 @@ bool Foam::cellCuts::calcAnchors
                 }
                 prevStat = eStat;
             }
-        }        
+        }
     }
 
 
@@ -2140,7 +2140,7 @@ bool Foam::cellCuts::setFromCellLoop
         // Storage for points on one side of cell
         labelList anchorPoints;
 
-        okLoop = 
+        okLoop =
             validLoop(cellI, loop, loopWeights, faceSplitCuts, anchorPoints);
 
         if (okLoop)
@@ -3016,7 +3016,7 @@ void Foam::cellCuts::flip(const label cellI)
             mesh().cellPoints()[cellI],
             cellAnchorPoints_[cellI],
             loop
-        );  
+        );
 }
 
 

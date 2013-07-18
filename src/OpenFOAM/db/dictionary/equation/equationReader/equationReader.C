@@ -92,7 +92,7 @@ Foam::string Foam::equationReader::stringPreconditioner(const string& rawText)
         strTemp2.append("&");
         stringReplaceAll(rawWorking, strTemp, strTemp2);
     }
-    
+
     stringReplaceAll(rawWorking, "^", " : ");
     stringReplaceAll(rawWorking, "(", " ( ");
     stringReplaceAll(rawWorking, ")", " ) ");
@@ -102,7 +102,7 @@ Foam::string Foam::equationReader::stringPreconditioner(const string& rawText)
     stringReplaceAll(rawWorking, "*", " * ");
     stringReplaceAll(rawWorking, "/", " / ");
     stringReplaceAll(rawWorking, ",", " , ");
-    
+
     // Leading negative workaround
     // This solution leads to dimensional problems
 /*    IStringStream rawStream(rawWorking);
@@ -263,7 +263,7 @@ void Foam::equationReader::absorbNegatives
                     description
                 );
             }
-            map[subEqnIndices[i + 1]].sourceIndex() = 
+            map[subEqnIndices[i + 1]].sourceIndex() =
                 -map[subEqnIndices[i + 1]].sourceIndex();
 
             trimListWithParent(eqnIndices, subEqnIndices, i, i);
@@ -357,7 +357,7 @@ void Foam::equationReader::trimList
 
     if (!(exceptFor == from && from == to))
     {
-        
+
         if (exceptFor == from)
         {
             from++;
@@ -424,7 +424,7 @@ Foam::equationOperation Foam::equationReader::findSource
             );
         }
     }
-    
+
     forAll(externalDScalars_, i)
     {
         if (externalDScalars_[i].name() == varName)
@@ -438,7 +438,7 @@ Foam::equationOperation Foam::equationReader::findSource
             );
         }
     }
-    
+
     if (externalScalars_.size() != externalScalarNames_.size())
     {
         FatalErrorIn("equationReader::findSource")
@@ -447,7 +447,7 @@ Foam::equationOperation Foam::equationReader::findSource
             << externalScalarNames_.size() << "."
             << abort(FatalError);
     }
-    
+
     forAll(externalScalars_, j)
     {
         if (externalScalarNames_[j] == varName)
@@ -461,7 +461,7 @@ Foam::equationOperation Foam::equationReader::findSource
             );
         }
     }
-    
+
     forAll(externalScalarListNames_, i)
     {
         if (externalScalarListNames_[i] == varName)
@@ -508,7 +508,7 @@ Foam::equationOperation Foam::equationReader::findSource
                     );
                     dictLookupIndex = dictLookups_.size() - 1;
                 }
-                
+
                 return equationOperation
                 (
                     equationOperation::sldictSource,
@@ -884,13 +884,13 @@ void Foam::equationReader::addDataSource
             << equationOperation::sourceName(source.sourceList()) << " source."
             << abort(FatalError);
     }
-    
+
     label newSize(externalScalars_.size() + 1);
-    
+
     externalScalars_.setSize(newSize);
     externalScalarNames_.setSize(newSize);
     externalScalarDimensions_.setSize(newSize);
-    
+
     externalScalars_.set(newSize - 1, &value);
     externalScalarNames_[newSize - 1] = name;
     externalScalarDimensions_.set(newSize - 1, new dimensionSet(dimensions));
@@ -925,7 +925,7 @@ void Foam::equationReader::addDataSource
     }
 
     label newSize(externalScalarLists_.size() + 1);
-    
+
     externalScalarLists_.setSize(newSize);
     externalScalarListNames_.setSize(newSize);
     externalScalarListDimensions_.setSize(newSize);
@@ -938,7 +938,7 @@ void Foam::equationReader::addDataSource
         newSize - 1,
         new dimensionSet(dimensions)
     );
-    externalScalarListIndex_[newSize - 1] = 0;    
+    externalScalarListIndex_[newSize - 1] = 0;
 }
 
 
@@ -988,7 +988,7 @@ void Foam::equationReader::createEquation
                 << eqns_.size() << endl;
         }
         label newSize(eqns_.size() + 1);
-        
+
         eqns_.setSize(newSize);
         outputScalars_.setSize(newSize);
         outputScalarNames_.setSize(newSize);
@@ -1481,7 +1481,7 @@ void Foam::equationReader::update(const label& index)
     {
         dimensionedScalar eval = evaluate(index);
         outputScalars_[index] = eval.value();
-        
+
         if
         (
             !eqns_[index].changeDimensions()
@@ -1571,7 +1571,7 @@ void Foam::equationReader::deleteEquation(const label& index)
     {
         eqns_[i] = eqns_[i + 1];
     }
-    
+
     eqns_.setSize(eqns_.size() - 1);
 }
 

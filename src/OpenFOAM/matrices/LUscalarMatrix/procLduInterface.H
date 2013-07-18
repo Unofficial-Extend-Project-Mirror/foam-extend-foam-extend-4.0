@@ -91,7 +91,7 @@ public:
         {
             return autoPtr<procLduInterface>(new procLduInterface(is));
         }
-            
+
 
     // Ostream operator
 

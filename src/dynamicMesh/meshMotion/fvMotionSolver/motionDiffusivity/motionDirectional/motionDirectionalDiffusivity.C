@@ -73,7 +73,7 @@ void Foam::motionDirectionalDiffusivity::correct()
 
     if (!first)
     {
-        const volVectorField& cellMotionU = 
+        const volVectorField& cellMotionU =
             mesh.lookupObject<volVectorField>("cellMotionU");
 
         volVectorField D

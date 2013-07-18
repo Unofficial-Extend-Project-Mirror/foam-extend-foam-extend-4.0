@@ -94,7 +94,7 @@ traceMixingPlaneFlux(
                     << " %"
                     << endl;
 
-                
+
 	    }
 	}
     }

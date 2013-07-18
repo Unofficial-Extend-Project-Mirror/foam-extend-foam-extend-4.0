@@ -1,2 +1,2 @@
-cDBUG       = 
+cDBUG       =
 cOPT        = -O2 -fno-schedule-insns

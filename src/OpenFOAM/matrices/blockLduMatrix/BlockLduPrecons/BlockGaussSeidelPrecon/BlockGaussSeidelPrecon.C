@@ -53,7 +53,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
 
     // Create multiplication function object
     typename BlockCoeff<Type>::multiply mult;
-    
+
     // Klas Jareteg: 2013-02-10:
     // Must transfer data between the different CPUs. Notes on the Jacobi
     // iteration style can be seen in GaussSeidelSolver.C
@@ -67,7 +67,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
     for (label sweep = 0; sweep < nSweeps_; sweep++)
     {
         bPrime_ = b;
-        
+
         this->matrix_.initInterfaces
         (
             this->matrix_.coupleUpper(),

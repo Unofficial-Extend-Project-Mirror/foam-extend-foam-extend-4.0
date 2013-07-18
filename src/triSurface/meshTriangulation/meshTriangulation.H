@@ -113,7 +113,7 @@ public:
 
         //- Construct from selected mesh cell and region number to be used
         //  for triangles resulting from internal faces. (all boundary triangles
-        //  get polyMesh patch id). 
+        //  get polyMesh patch id).
         //  faceCentreDecomposition = true  : decomposition around face centre
         //                            false : decomposition using
         //                                    existing vertices

@@ -32,7 +32,7 @@ Description
     In this setup, the finite element is considered to be the complete cell
     and the decomposition into tets is done just as an auxiliary tool.
     Therefore, all element-based fields are defined "per polyhedron" rather
-    that per-tet.  
+    that per-tet.
 
 \*---------------------------------------------------------------------------*/
 

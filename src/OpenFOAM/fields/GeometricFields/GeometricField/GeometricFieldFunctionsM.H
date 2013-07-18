@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------------*\
-  =========                 | 
+  =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
     \\  /    A nd           | Copyright held by original author

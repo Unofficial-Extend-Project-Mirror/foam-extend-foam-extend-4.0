@@ -74,7 +74,7 @@ class equation
     // Private data
 
         word equationName_;
-        
+
         //- raw text read from the dictionary
         string rawText_;
 
@@ -83,24 +83,24 @@ class equation
 
         //- Constants appearing in the equation are stored here
 //        scalarList * internalScalars_;
-        
+
         //- Names of variables that need to be read from a dictionary are
         //  stored here
 //        wordList dictLookups_;
-        
+
         //- Override dimensions - if read from a dictionary with dimensions,
         //  eg:  nu      nu [0 2 -1 0 0 0 0] "sin(theta)";
         //  the dimensionedScalar resulting from evaluate() is given these
         //  dimensions
         dimensionSet overrideDimensions_;
-        
+
         //- true if there is a dimension override
         bool changeDimensions_;
 
 public:
 
     // Static data members
-    
+
         static const char* const typeName;
 
 
@@ -108,10 +108,10 @@ public:
 
         //- Construct null
         equation();
-        
+
         //- Construct from Istream with optional name
         equation(Istream& is, const word& name = word::null);
-        
+
         //- Construct from components
         equation
         (
@@ -125,7 +125,7 @@ public:
     ~equation();
 
     // Member functions
-    
+
         // Access
 
             //- Equation name
@@ -133,16 +133,16 @@ public:
 
             //- Change the equation name
             inline word& equationName();
-            
+
             //- Equation text
             inline const string& rawText() const;
-            
+
             //- Set the equation text
             inline string& rawText();
 
             //- Last result
             inline const dimensionedScalar& lastResult() const;
-            
+
             //- Set the last result
             inline dimensionedScalar& lastResult();
 
@@ -150,19 +150,19 @@ public:
             inline const equationOperationList& ops() const;
 
             inline equationOperationList& ops();
-            
+
             //- Locally stored constants
 //            inline const scalarList * internalScalars() const;
 
             //- Set the locally stored constants
 //            inline scalarList * internalScalars();
-            
+
             //- Dictionary variable lookup names
 //            inline const wordList& dictLookups() const;
 
             //- Set the dictionary variable lookup names
 //            inline wordList& dictLookups();
-            
+
             //- Dimension override
             inline const dimensionSet& overrideDimensions() const;
 
@@ -179,12 +179,12 @@ public:
         // Copy only the header info - rawText, equationName, dimensionOverride
         // and changeDimensions
         void operator=(equation&);
-      
+
     // Friend IOstream Operators
 
         friend Istream& operator>>(Istream&, equation&);
         friend Ostream& operator<<(Ostream&, const equation&);
-      
+
 };
 
 

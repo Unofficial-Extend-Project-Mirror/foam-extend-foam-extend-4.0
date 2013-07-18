@@ -86,7 +86,7 @@ void Foam::cellMapper::calcAddressing() const
 
         weightsPtr_ = new scalarListList(mesh_.nCells());
         scalarListList& w = *weightsPtr_;
-        
+
         const List<objectMap>& cfp = mpm_.cellsFromPointsMap();
 
         forAll (cfp, cfpI)
@@ -415,6 +415,6 @@ const Foam::labelList& Foam::cellMapper::insertedObjectLabels() const
 
     return *insertedCellLabelsPtr_;
 }
-        
+
 
 // ************************************************************************* //

@@ -92,7 +92,7 @@ solidTractionFreeFvPatchVectorField
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-    if 
+    if
     (
         Foam::word
         (
@@ -185,14 +185,14 @@ void solidTractionFreeFvPatchVectorField::updateCoeffs()
     //---------------------------//
     const rheologyModel& rheology =
         this->db().objectRegistry::lookupObject<rheologyModel>("rheologyProperties");
-    scalarField mu = 
+    scalarField mu =
         rheology.mu()().boundaryField()[patch().index()];
     scalarField lambda =
         rheology.lambda()().boundaryField()[patch().index()];
 
     if(rheology.type() == plasticityModel::typeName)
     {
-        const plasticityModel& plasticity = 
+        const plasticityModel& plasticity =
             refCast<const plasticityModel>(rheology);
 
 	mu = plasticity.newMu().boundaryField()[patch().index()];
@@ -220,7 +220,7 @@ void solidTractionFreeFvPatchVectorField::updateCoeffs()
       {
 	const fvPatchField<symmTensor>& sigma =
 	  patch().lookupPatchField<volSymmTensorField, symmTensor>("sigma");
-	
+
 	//- increment of traction
 	Traction = - (n & sigma);
       }
@@ -229,7 +229,7 @@ void solidTractionFreeFvPatchVectorField::updateCoeffs()
     //---------------------------//
     //- calculate the normal gradient based on the traction
     //---------------------------//
-    vectorField newGradient = 
+    vectorField newGradient =
       Traction
       - (n & (mu*gradField.T() - (mu + lambda)*gradField))
       - n*lambda*tr(gradField);
@@ -237,7 +237,7 @@ void solidTractionFreeFvPatchVectorField::updateCoeffs()
     //- if there is plasticity
     if(rheology.type() == plasticityModel::typeName)
     {
-        const plasticityModel& plasticity = 
+        const plasticityModel& plasticity =
             refCast<const plasticityModel>(rheology);
 
         newGradient +=
@@ -249,15 +249,15 @@ void solidTractionFreeFvPatchVectorField::updateCoeffs()
       {
 	const thermalModel& thermo =
 	  this->db().objectRegistry::lookupObject<thermalModel>("thermalProperties");
-    
+
 	const fvPatchField<scalar>& T =
 	  patch().lookupPatchField<volScalarField, scalar>("T");
-      
+
         const fvPatchField<scalar>& threeKalpha =
           patch().lookupPatchField<volScalarField, scalar>("((threeK*rho)*alpha)");
-      
+
 	const scalarField T0 = thermo.T0()().boundaryField()[patch().index()];
-	
+
 	newGradient +=  (n*threeKalpha*(T - T0));
     }
 

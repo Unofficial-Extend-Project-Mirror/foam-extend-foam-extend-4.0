@@ -137,7 +137,7 @@ snGrad() const
 {
   //- fixedValue snGrad with no correction
   //  return (*this - patchInternalField())*this->patch().deltaCoeffs();
-  
+
     const fvPatchField<tensor>& gradField =
         patch().lookupPatchField<volTensorField, tensor>
         (
@@ -150,9 +150,9 @@ snGrad() const
     //- correction vector
     vectorField k = delta - n*(n&delta);
 
-    return 
+    return
     (
-        *this 
+        *this
       - (patchInternalField() + (k&gradField.patchInternalField()))
       )*this->patch().deltaCoeffs();
 }
@@ -175,9 +175,9 @@ void fixedRotationFvPatchVectorField::updateCoeffs()
     tensor rotMat = RodriguesRotation(rotationAxis_, rotationAngle_);
 
     const vectorField& oldFaceCentres = dimensionedInternalField().mesh().C().boundaryField()[patch().index()];
-	  
+
     vectorField newFaceCentres = (rotMat & (oldFaceCentres - rotationOrigin_)) + rotationOrigin_;
-    
+
     fvPatchField<vector>::operator==
     (
         newFaceCentres - oldFaceCentres

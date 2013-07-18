@@ -71,7 +71,7 @@ public:
         linearCohesiveLaw
         (
             const word& cohesiveLawName,
-            const dictionary& dict            
+            const dictionary& dict
         );
 
         //- Construct as copy

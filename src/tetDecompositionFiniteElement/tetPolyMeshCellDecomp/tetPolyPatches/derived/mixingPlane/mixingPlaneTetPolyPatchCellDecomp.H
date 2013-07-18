@@ -32,7 +32,7 @@ Author
     Martin Beaudoin, Hydro-Quebec, 2009.  All rights reserved
 
 Contributor
-    Hrvoje Jasak, Wikki Ltd.  
+    Hrvoje Jasak, Wikki Ltd.
 
 SourceFiles
     mixingPlaneTetPolyPatchCellDecomp.C

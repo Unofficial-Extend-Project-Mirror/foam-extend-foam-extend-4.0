@@ -33,7 +33,7 @@ Description
     communication where you do all but these shared points with patch to
     patch communication but need to do a reduce on these shared points)
 
-    Works purely topological and using local communication only. 
+    Works purely topological and using local communication only.
     Needs:
       - domain to be one single domain (i.e. all faces can be reached through
         face-cell walk).
@@ -84,7 +84,7 @@ Description
         - mark indices for which information has changed
      endloop until nothing changes.
 
- 
+
 SourceFiles
     globalPoints.C
 

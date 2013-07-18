@@ -41,7 +41,7 @@ inline float y1f(float x) { return float(y1(double(x)));}
 inline float jnf(const int n, const float s) { return float(jn(n, double(s))); }
 inline float ynf(const int n, const float s) { return float(yn(n, double(s))); }
 #endif
- 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

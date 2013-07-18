@@ -64,7 +64,7 @@ class gaussGrad
     // Private data
 
         tmp<edgeInterpolationScheme<Type> > tinterpScheme_;
- 
+
 
     // Private Member Functions
 

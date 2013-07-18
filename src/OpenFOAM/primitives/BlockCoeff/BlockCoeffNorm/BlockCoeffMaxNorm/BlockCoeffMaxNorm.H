@@ -66,7 +66,7 @@ class BlockCoeffMaxNorm
 
         //- Control data dictionary
         dictionary dict_;
-        
+
 protected:
 
     // Protected data types
@@ -96,7 +96,7 @@ public:
         (
             const dictionary& dict
         );
-        
+
     // Destructor
 
         virtual ~BlockCoeffMaxNorm()
@@ -110,7 +110,7 @@ public:
         (
             const BlockCoeff<Type>& a
         );
-        
+
         virtual void coeffMag
         (
             const CoeffField<Type>& a,
@@ -128,7 +128,7 @@ public:
 #ifdef NoRepository
 #   include "BlockCoeffMaxNorm.C"
 #endif
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif

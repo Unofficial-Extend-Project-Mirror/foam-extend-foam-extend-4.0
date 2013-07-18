@@ -28,7 +28,7 @@ License
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::phase::phase 
+Foam::phase::phase
 (
     const word& name,
     const dictionary& phaseDict,

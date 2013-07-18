@@ -104,7 +104,7 @@ Foam::dynamicBodyFvMesh::dynamicBodyFvMesh(const IOobject& io)
         FatalErrorIn
         (
             "dynamicBodyFvMesh::dynamicBodyFvMesh(const IOobject& io)"
-        )   
+        )
             << "Can't find patch: " << bodyPatchName_
                 << exit(FatalError);
     }
@@ -134,7 +134,7 @@ bool Foam::dynamicBodyFvMesh::update()
      == laplaceTetDecompositionMotionSolver::typeName
     )
     {
-        tetDecompositionMotionSolver& mSolver = 
+        tetDecompositionMotionSolver& mSolver =
             dynamic_cast<tetDecompositionMotionSolver&>
             (
                 motionPtr_()
@@ -156,7 +156,7 @@ bool Foam::dynamicBodyFvMesh::update()
               - sin(2*mathematicalConstant::pi*rotationFrequency_*oldTime)
             );
 
-        vector curRotationOrigin = 
+        vector curRotationOrigin =
             initialRotationOrigin_
           + translationDirection_
            *translationAmplitude_
@@ -170,15 +170,15 @@ bool Foam::dynamicBodyFvMesh::update()
         r0 /= mag(r0);
 
         // http://mathworld.wolfram.com/RotationFormula.html
-        vector r1 = 
+        vector r1 =
             r0*cos(rotAngle)
           + rotationAxis_*(rotationAxis_ & r0)*(1 - cos(rotAngle))
           + (r0 ^ rotationAxis_)*sin(rotAngle);
 
         tensor T = rotationTensor(r0, r1);
 
-        vectorField rot = 
-            transform(T, oldPoints - curRotationOrigin) 
+        vectorField rot =
+            transform(T, oldPoints - curRotationOrigin)
           + curRotationOrigin
           - oldPoints;
 
@@ -201,21 +201,21 @@ bool Foam::dynamicBodyFvMesh::update()
         }
         else
         {
-            FatalErrorIn("dynamicBodyFvMesh::update()")   
-                << "Bounary condition on " << motionU.name() 
-                    <<  " for " << bodyPatchName_ << " patch is " 
-                    << motionU.boundaryField()[bodyPatchID_].type() 
-                    << ", instead " 
+            FatalErrorIn("dynamicBodyFvMesh::update()")
+                << "Bounary condition on " << motionU.name()
+                    <<  " for " << bodyPatchName_ << " patch is "
+                    << motionU.boundaryField()[bodyPatchID_].type()
+                    << ", instead "
                     << fixedValueTetPolyPatchVectorField::typeName
                     << exit(FatalError);
         }
     }
     else
     {
-        FatalErrorIn("dynamicBodyFvMesh::update()")   
+        FatalErrorIn("dynamicBodyFvMesh::update()")
             << "Selected mesh motion solver is "
                 << motionPtr_->type()
-                << ", instead " 
+                << ", instead "
                 << tetDecompositionMotionSolver::typeName
                 << exit(FatalError);
     }

@@ -162,12 +162,12 @@ void correctedFvPatchField<Type>::updateCoeffs()
 
 
 template<class Type>
-const GeometricField<Type, fvPatchField, volMesh>& 
+const GeometricField<Type, fvPatchField, volMesh>&
 correctedFvPatchField<Type>::volField() const
 {
     return this->db().objectRegistry::lookupObject
         <
-            GeometricField<Type, fvPatchField, volMesh> 
+            GeometricField<Type, fvPatchField, volMesh>
         >
         (this->dimensionedInternalField().name());
 }
@@ -252,7 +252,7 @@ void correctedFvPatchField<Type>::makePatchSubMesh() const
         cellSet.insert(faceCells[faceI]);
     }
 
-    const labelListList& cellCells = 
+    const labelListList& cellCells =
         this->patch().boundaryMesh().mesh().cellCells();
 
     for(label faceI=0; faceI<faceCells.size(); faceI++)
@@ -280,7 +280,7 @@ const fvMeshSubset& correctedFvPatchField<Type>::patchSubMesh() const
         (
             this->patch().name()
         );
-    
+
     if(foundPatchSubMesh)
     {
         return this->db().objectRegistry::lookupObject<fvMeshSubset>
@@ -339,7 +339,7 @@ void correctedFvPatchField<Type>::movePatchSubMesh()
         const fvMesh& mesh = this->patch().boundaryMesh().mesh();
 
         vectorField newPoints(mesh.points(), patchSubMeshPtr_->pointMap());
-        
+
         patchSubMeshPtr_->subMesh().movePoints(newPoints);
     }
 }
@@ -351,8 +351,8 @@ void correctedFvPatchField<Type>::updateCorrVecGrad()
     GeometricField<Type, fvPatchField, volMesh> subVolField =
         patchSubMesh().interpolate(volField());
 
-    typedef typename 
-        outerProduct<vector, typename pTraits<Type>::cmptType>::type 
+    typedef typename
+        outerProduct<vector, typename pTraits<Type>::cmptType>::type
         GradCmptType;
 
     vectorField n = this->patch().nf();

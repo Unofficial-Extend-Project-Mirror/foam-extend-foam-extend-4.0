@@ -69,7 +69,7 @@ Foam::vtkTopo::vtkTopo(const polyMesh& mesh)
     {
         const cellModel& model = cellShapes[cellI].model();
 
-        if 
+        if
         (
             model != hex
 //         && model != wedge            // See above.

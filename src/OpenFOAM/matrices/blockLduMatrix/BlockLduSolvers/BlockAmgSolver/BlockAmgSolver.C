@@ -68,20 +68,20 @@ Foam::BlockAmgSolver<Type>::solve
 (
     Field<Type>& x,
     const Field<Type>& b
-) 
+)
 {
     // Prepare solver performance
     BlockSolverPerformance<Type> solverPerf
     (
-        typeName, 
+        typeName,
         this->fieldName()
     );
-    
+
     // Create local references to avoid the spread this-> ugliness
     const BlockLduMatrix<Type>& matrix = this->matrix_;
 
     scalar norm = this->normFactor(x, b);
-    
+
     Field<Type> wA(x.size());
 
     // Calculate residual.  Note: sign of residual swapped for efficiency

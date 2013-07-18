@@ -321,7 +321,7 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
                         SLList<label>::iterator curInterProcBdrsOwnIter =
                             interProcBoundaries[ownerProc].begin();
 
-                        SLList<SLList<label> >::iterator 
+                        SLList<SLList<label> >::iterator
                             curInterProcBFacesOwnIter =
                             interProcBFaces[ownerProc].begin();
 

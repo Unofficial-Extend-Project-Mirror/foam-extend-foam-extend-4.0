@@ -230,7 +230,7 @@ public:
         //- Return the set of labels of the processor patch points which are
         //  non-global, i.e. present in this processorFaPatch
         const labelList& nonGlobalPatchPoints() const;
-    
+
 
         // Interface transfer functions
 

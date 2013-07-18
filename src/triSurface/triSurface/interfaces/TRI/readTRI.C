@@ -28,7 +28,7 @@ Description
     Is converted into regions: regions numbered from 0 up, each colour is
     region.
     Most of reading/stitching taken from STL reader.
-    
+
 \*---------------------------------------------------------------------------*/
 
 #include "triSurface.H"

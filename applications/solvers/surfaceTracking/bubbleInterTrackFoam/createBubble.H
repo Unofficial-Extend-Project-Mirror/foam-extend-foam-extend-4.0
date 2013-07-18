@@ -78,12 +78,12 @@
         else
         {
             scalar Va = gSum(mesh.V().field());
-            vector Ra = 
+            vector Ra =
                 gSum(mesh.C().internalField()*mesh.V().field())
                /gSum(mesh.V().field());
 
             Info << "Ra = " << Ra << endl;
-            
+
             scalar Vb =
               - gSum
                 (
@@ -96,7 +96,7 @@
             Cb = (V*Ra - Va*Ra)/Vb;
 
             Info << "Current bubble centre: " << Cb << endl;
-            
+
             if (mesh.nGeometricD() != 3)
             {
                 FatalErrorIn(args.executable())
@@ -119,7 +119,7 @@
         );
     }
     else
-    { 
+    {
         Cbf = Cb;
 
         movingReferenceFrame.add("Cbf", Cbf);
@@ -204,7 +204,7 @@
         if (!interface.twoFluids())
         {
             scalar Va = gSum(mesh.V().field());
-            
+
             boundBox box(mesh.C().boundaryField()[spacePatchID]);
             scalar r = (box.max().x() - box.min().x())/2;
 

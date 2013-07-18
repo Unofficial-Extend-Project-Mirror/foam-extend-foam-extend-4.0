@@ -57,32 +57,32 @@ int main(int argc, char *argv[])
   Info<< "\nCalculating displacement field\n" << endl;
 
   lduMatrix::debug = 0;
-  
+
   scalar m = 0.5;
-  
+
   for (runTime++; !runTime.end(); runTime++)
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
-      
+
 #     include "readStressedFoamControls.H"
 
-      volScalarField mu = 
+      volScalarField mu =
 	rheology.mu(m*runTime.deltaT().value());
-      volScalarField lambda = 
+      volScalarField lambda =
 	rheology.lambda(m*runTime.deltaT().value());
-      
+
       Info << "mu = " << average(mu.internalField()) << endl;
       Info << "lambda = " << average(lambda.internalField()) << endl;
-      
+
       int iCorr = 0;
       lduMatrix::solverPerformance solverPerf;
       scalar initialResidual = 0;
       scalar residual = GREAT;
-      
+
       do
         {
 	  DU.storePrevIter();
-	  
+
 	  fvVectorMatrix DUEqn
             (
 	     fvm::d2dt2(rho,DU)
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 	     fvm::laplacian(2*mu+lambda, DU, "laplacian(DDU,DU)")
 	     + fvc::div
 	     (
-	      mu*gradDU.T() 
+	      mu*gradDU.T()
 	      + lambda*(I*tr(gradDU))
 	      - (mu + lambda)*gradDU
 	      + DSigmaCorr,
@@ -99,36 +99,36 @@ int main(int argc, char *argv[])
 	     );
 
 	  solverPerf = DUEqn.solve();
-	  
+
 	  DU.relax();
-	  
+
 	  if(iCorr == 0)
             {
 	      initialResidual = solverPerf.initialResidual();
             }
-	  
+
 	  gradDU = fvc::grad(DU);
-	  
+
 #         include "calculateDEpsilonDSigma.H"
-            
+
         }
       while
         (
 	 solverPerf.initialResidual() > convergenceTolerance
          && ++iCorr < nCorr
 	 );
-      
+
       Info << "Solving for " << DU.name() << " using "
 	   << solverPerf.solverName() << " solver"
 	   << ", Initial residual = " << initialResidual
 	   << ", Final residual = " << solverPerf.initialResidual()
 	   << ", No outer iterations " << iCorr
 	   << ", Relative error: " << residual << endl;
-      
+
       U += DU;
 
       epsilon += DEpsilon;
-      
+
 #     include "calculateSigmaDSigmaCorr.H"
 
 #     include "writeFields.H"
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
     }
 
   Info<< "End\n" << endl;
-  
+
   return(0);
 }
 

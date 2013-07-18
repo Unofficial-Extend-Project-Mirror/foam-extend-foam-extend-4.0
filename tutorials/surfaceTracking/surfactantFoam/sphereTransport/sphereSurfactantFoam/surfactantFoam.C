@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 #   include "createFaFields.H"
 #   include "createVolFields.H"
 
-    Info<< "Total mass of surfactant: " 
+    Info<< "Total mass of surfactant: "
         << sum(Cs.internalField()*aMesh.S()) << endl;
 
     Info << "\nStarting time loop\n" << endl;
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
             runTime.write();
         }
 
-        Info<< "Total mass of surfactant: " 
+        Info<< "Total mass of surfactant: "
             << sum(Cs.internalField()*aMesh.S()) << endl;
 
         Info << "ExecutionTime = "

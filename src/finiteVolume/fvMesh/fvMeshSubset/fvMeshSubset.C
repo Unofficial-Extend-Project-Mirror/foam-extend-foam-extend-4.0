@@ -161,11 +161,11 @@ void Foam::fvMeshSubset::doCoupledPatches
                         nCellsUsingFace[pp.start()+i] = 3;
                         nUncoupled++;
                     }
-                }       
+                }
             }
         }
     }
- 
+
     // Do same for cyclics.
     forAll (oldPatches, oldPatchI)
     {

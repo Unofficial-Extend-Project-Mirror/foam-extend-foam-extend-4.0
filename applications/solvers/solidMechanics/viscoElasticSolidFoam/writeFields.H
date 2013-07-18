@@ -12,10 +12,10 @@ if (runTime.outputTime())
         ),
        sqrt((2.0/3.0)*magSqr(dev(epsilon)))
        );
-    
+
     Info<< "Max epsilonEq = " << max(epsilonEq).value()
         << endl;
-    
+
     volScalarField sigmaEq
       (
        IOobject
@@ -28,10 +28,10 @@ if (runTime.outputTime())
 	),
        sqrt((3.0/2.0)*magSqr(dev(sigma)))
        );
-    
+
     Info<< "Max sigmaEq = " << max(sigmaEq).value()
 	<< endl;
-    
+
     volScalarField sigmaHyd
       (
        IOobject
@@ -48,9 +48,9 @@ if (runTime.outputTime())
 	+ sigma.component(symmTensor::ZZ)
 	)/3
        );
-    
+
     Info<< "Max sigmaHyd = " << max(sigmaHyd).value()
 	<< endl;
-    
+
     runTime.write();
   }

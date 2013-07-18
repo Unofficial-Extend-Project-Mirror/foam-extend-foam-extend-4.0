@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 
                 U = rUA*UEqn.H();
 
-                phi = (fvc::interpolate(U) & mesh.Sf()) 
+                phi = (fvc::interpolate(U) & mesh.Sf())
                     + fvc::ddtPhiCorr(rUA, U, phi);
 
                 for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)

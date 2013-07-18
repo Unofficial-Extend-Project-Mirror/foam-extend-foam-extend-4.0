@@ -93,7 +93,7 @@
     of the OpenFOAM installation.
 
 * Building the ThirdParty packages from Sources
-   A new way of compiling and installing the ThirdParty suite of packages is proposed with OpenFOAM-1.6-ext. 
+   A new way of compiling and installing the ThirdParty suite of packages is proposed with OpenFOAM-1.6-ext.
    Please consult the file ThirdParty/README.ThirdParty a for more information.
 
 * Building from Sources (Optional)
@@ -154,7 +154,7 @@
 
 * Reporting Bugs in OpenFOAM
   Please report all bugs and feature requests using our bug tracking system:
-  http://sourceforge.net/apps/mantisbt/openfoam-extend/main_page.php or 
+  http://sourceforge.net/apps/mantisbt/openfoam-extend/main_page.php or
   http://www.extend-project.de/project-final/openfoam-extend-bug-tracker
   Please also report bugs at the CFD-Online User Forum.
 
@@ -188,7 +188,7 @@
     David Hill
     Niklas Wikstrom
     Dubravko Matijasevic
-    Darrin Stephens 
+    Darrin Stephens
     Christian Beck
     Oliver Borm
     James Criner

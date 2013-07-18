@@ -51,7 +51,7 @@ int USERD_get_part_elements_by_type
     if (part_number == 1)
     {
         const cellShapeList& cellShapes = meshPtr->cellShapes();
-        
+
         //================================
         // hexahedron
         //================================
@@ -64,7 +64,7 @@ int USERD_get_part_elements_by_type
             {
                 const cellShape& cellShape = cellShapes[celli];
                 const cellModel& cellModel = cellShape.model();
-                
+
                 if (cellModel == hex)
                 {
                     forAll(cellShape, ip)
@@ -87,7 +87,7 @@ int USERD_get_part_elements_by_type
             {
                 const cellShape& cellShape = cellShapes[celli];
                 const cellModel& cellModel = cellShape.model();
-                
+
                 if (cellModel == prism)
                 {
                     forAll(cellShape, ip)
@@ -110,7 +110,7 @@ int USERD_get_part_elements_by_type
             {
                 const cellShape& cellShape = cellShapes[celli];
                 const cellModel& cellModel = cellShape.model();
-                
+
                 if (cellModel == pyr)
                 {
                     forAll(cellShape, ip)
@@ -133,7 +133,7 @@ int USERD_get_part_elements_by_type
             {
                 const cellShape& cellShape = cellShapes[celli];
                 const cellModel& cellModel = cellShape.model();
-                
+
                 if (cellModel == tet)
                 {
                     forAll(cellShape, ip)

@@ -23,7 +23,7 @@ else if (isA<wedgePolyPatch>(pbMesh[patch(face())]))
     scalar Un = U() & nf;
     if (Un > 0)
     {
-        scalar Un2 = U() & n(); 
+        scalar Un2 = U() & n();
         U() -= 2.0*Un2*n();
     }
 }

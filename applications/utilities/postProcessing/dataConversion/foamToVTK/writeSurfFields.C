@@ -71,7 +71,7 @@ void writeSurfFields
 
     for (label faceI = 0; faceI < mesh.nFaces(); faceI++)
     {
-        writeFuns::insert(fc[faceI], pField);   
+        writeFuns::insert(fc[faceI], pField);
     }
 
     writeFuns::write(str, binary, pField);

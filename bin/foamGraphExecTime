@@ -27,7 +27,7 @@
 #     foamGraphExecTime
 #
 # Description
-#     
+#
 #------------------------------------------------------------------------------
 
 set tmpTime = newTime$$.dat
@@ -41,7 +41,7 @@ cat << EOF > executionTime.dat
 Solver Performance
 iterations
 time/iteration
-0 0 
+0 0
 0 0
 1
 EOF

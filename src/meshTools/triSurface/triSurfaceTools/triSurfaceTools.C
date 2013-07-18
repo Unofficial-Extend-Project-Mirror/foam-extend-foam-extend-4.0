@@ -158,7 +158,7 @@ void Foam::triSurfaceTools::greenRefine
 }
 
 
-// Refine all triangles marked for refinement. 
+// Refine all triangles marked for refinement.
 Foam::triSurface Foam::triSurfaceTools::doRefine
 (
     const triSurface& surf,
@@ -358,7 +358,7 @@ void Foam::triSurfaceTools::protectNeighbours
         forAll(myFaces, myFaceI)
         {
             label faceI = myFaces[myFaceI];
- 
+
             if ((faceStatus[faceI] == ANYEDGE) || (faceStatus[faceI] >= 0))
             {
                 faceStatus[faceI] = NOEDGE;
@@ -392,10 +392,10 @@ Foam::labelHashSet Foam::triSurfaceTools::getCollapsedFaces
     {
         facesToBeCollapsed.insert(myFaces[myFaceI]);
     }
-    
+
     // From faces using v1 check if they share an edge with faces
     // using v2.
-    //  - share edge: are part of 'splay' tree and will collapse if edge    
+    //  - share edge: are part of 'splay' tree and will collapse if edge
     //    collapses
     const labelList& v1Faces = surf.pointFaces()[v1];
 
@@ -795,7 +795,7 @@ bool Foam::triSurfaceTools::collapseCreatesFold
 //
 //    // Now neighbours contains first layer of triangles outside of
 //    // collapseFaces
-//    // There should be 
+//    // There should be
 //    // -two if edgeI is a boundary edge
 //    // since the outside 'edge' of collapseFaces should
 //    // form a triangle and the face connected to edgeI is not inserted.
@@ -816,7 +816,7 @@ bool Foam::triSurfaceTools::collapseCreatesFold
 //        for (label j = i+1; j < neighbourList.size(); i++)
 //        {
 //            const labelList& faceJEdges = surf.faceEdges()[neighbourList[j]];
-//            
+//
 //            // Check if faceI and faceJ share an edge
 //            forAll(faceIEdges, fI)
 //            {
@@ -1194,7 +1194,7 @@ Foam::surfaceLocation Foam::triSurfaceTools::visitFaces
                 nearest.setHit();
                 nearest.triangle() = triI;
                 break;
-            }            
+            }
             else
             {
                // Which edge is cut.
@@ -1913,7 +1913,7 @@ Foam::triSurface Foam::triSurfaceTools::greenRefine
 
     // Storage for new faces
     DynamicList<labelledTri> newFaces(0);
-    
+
     pointField newPoints(surf.localPoints());
     newPoints.setSize(surf.nPoints() + surf.nEdges());
     label newPointI = surf.nPoints();
@@ -2635,7 +2635,7 @@ Foam::triSurface Foam::triSurfaceTools::delaunay2D(const List<vector2D>& pts)
 //    // ~~~~~~~~~~~~~~~
 //
 //    label vertI = 0;
-//    for 
+//    for
 //    (
 //        Vertex_iterator it = T.vertices_begin();
 //        it != T.vertices_end();
@@ -2849,7 +2849,7 @@ Foam::surfaceLocation Foam::triSurfaceTools::classify
 
     // Nearest point could be on point or edge. Retest.
     label index, elemType;
-    //bool inside = 
+    //bool inside =
     triPointRef(s[triI].tri(s.points())).classify
     (
         trianglePoint,
@@ -2865,7 +2865,7 @@ Foam::surfaceLocation Foam::triSurfaceTools::classify
         nearest.setHit();
         nearest.setIndex(triI);
         nearest.elementType() = triPointRef::NONE;
-    }    
+    }
     else if (elemType == triPointRef::EDGE)
     {
         nearest.setMiss();

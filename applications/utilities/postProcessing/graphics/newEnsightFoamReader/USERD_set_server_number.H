@@ -5,7 +5,7 @@ void USERD_set_server_number
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_set_server_number" << endl 
+    Info << "Entering: USERD_set_server_number" << endl
         << flush;
 #endif
 

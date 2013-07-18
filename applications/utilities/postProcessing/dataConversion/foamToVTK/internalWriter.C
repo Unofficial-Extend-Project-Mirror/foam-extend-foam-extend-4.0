@@ -53,7 +53,7 @@ Foam::internalWriter::internalWriter
     //------------------------------------------------------------------
     //
     // Write topology
-    // 
+    //
     //------------------------------------------------------------------
 
     const labelList& addPointCellLabels = topo.addPointCellLabels();

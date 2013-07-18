@@ -175,7 +175,7 @@ public:
         booleanSurface();
 
         //- Construct from surfaces and face labels to keep.
-        //  Walks from provided seed faces without crossing intersection line 
+        //  Walks from provided seed faces without crossing intersection line
         //  to determine faces to keep.
         booleanSurface
         (

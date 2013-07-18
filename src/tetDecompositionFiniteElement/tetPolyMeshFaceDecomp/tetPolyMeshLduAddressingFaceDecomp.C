@@ -152,7 +152,7 @@ Foam::tetPolyMeshLduAddressingFaceDecomp::tetPolyMeshLduAddressingFaceDecomp
             "tetPolyMeshLduAddressingFaceDecomp\n"
             "(\n"
             "    const tetPolyMeshFaceDecomp& mesh\n"
-            ")" 
+            ")"
         )   << "Problem with edge counting in lduAddressing.  nCreatedEdges: "
             << nCreatedEdges << " nEdges: " << mesh.nEdges()
             << abort(FatalError);

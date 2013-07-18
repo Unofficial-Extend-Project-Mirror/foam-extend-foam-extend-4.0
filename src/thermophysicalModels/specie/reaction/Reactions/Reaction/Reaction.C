@@ -207,7 +207,7 @@ Reaction<ReactionThermo>::Reaction
     setLRhs(is);
     setThermo(thermoDatabase);
 }
-    
+
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 

@@ -26,7 +26,7 @@ Class
     Foam::regionSide
 
 Description
-    Determines the 'side' for every face and connected to a 
+    Determines the 'side' for every face and connected to a
     singly-connected (through edges) region of faces. Gets set of faces and
     a list of mesh edges ('fenceEdges') which should not be crossed.
     Used in splitting a mesh region.

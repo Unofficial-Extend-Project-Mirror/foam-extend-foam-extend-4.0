@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     //- and so on and then any cell not in a cellZone will be left as
     //- cellZones.size()
     scalarField& materialsI = materials.internalField();
-    
+
     forAll(cellZones, zonei)
       {
 	labelList zoneCells = cellZones[zonei];

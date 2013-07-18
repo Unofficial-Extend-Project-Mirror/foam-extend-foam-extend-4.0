@@ -26,7 +26,7 @@ Application
     solidStress
 
 Description
-    Calculates and writes the scalar fields of the six components of the stress 
+    Calculates and writes the scalar fields of the six components of the stress
     tensor sigma for each time for linear stress analysis calculations.
 
 \*---------------------------------------------------------------------------*/
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
                 ),
                 sigma.component(symmTensor::YZ)
             );
-            sigmayz.write(); 
+            sigmayz.write();
        }
         else
         {

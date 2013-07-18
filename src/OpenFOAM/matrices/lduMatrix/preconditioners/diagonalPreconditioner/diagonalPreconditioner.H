@@ -56,7 +56,7 @@ class diagonalPreconditioner
 {
     // Private data
 
-        //- The reciprocal diagonal 
+        //- The reciprocal diagonal
         scalarField rD;
 
 

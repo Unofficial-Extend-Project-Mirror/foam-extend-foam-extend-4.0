@@ -97,7 +97,7 @@ bool Foam::hexMatcher::matchShape
     faceLabels_.setSize(facePerCell);
 
     //
-    // Try bottom face (face 4). 
+    // Try bottom face (face 4).
     // Only need to try one orientation of this face since hex is
     // rotation symmetric
     //

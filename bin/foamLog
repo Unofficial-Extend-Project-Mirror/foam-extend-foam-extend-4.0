@@ -72,7 +72,7 @@ The program will generate and run an awk script which writes a set of
 files, logs/<var>_<subIter>, for every <var> specified, for every
 occurrence inside a time step.
 
-For variables that are 'Solved for' the initial residual name will 
+For variables that are 'Solved for' the initial residual name will
 be <var>, the final residual will get name <var>FinalRes,
 
 The files are a simple xy format with the first column Time (default)
@@ -80,7 +80,7 @@ and the second the extracted values. Option -n creates single column
 files with the extracted data only.
 
 
-The query database is a simple text format with three entries per line, 
+The query database is a simple text format with three entries per line,
 separated with '/'. Column 1 is the name of the variable (cannot contain
 spaces), column 2 is the extended regular expression (egrep) to select
 the line and column 3 is the string (fgrep) to select the column inside the
@@ -361,19 +361,19 @@ cat <<LABSOLVE >> $AWKFILE
 
     varName=varNameVal[1]
     file=varName "_" subIter[varName]++
-    file="$CASEDIR/logs/" file 
+    file="$CASEDIR/logs/" file
     extract(\$0, "Initial residual = ", val)
     print $TIMENAME "\t" val[1] > file
 
     varName=varNameVal[1] "FinalRes"
     file=varName "_" subIter[varName]++
-    file="$CASEDIR/logs/" file 
+    file="$CASEDIR/logs/" file
     extract(\$0, "Final residual = ", val)
     print $TIMENAME "\t" val[1] > file
 
     varName=varNameVal[1] "Iters"
     file=varName "_" subIter[varName]++
-    file="$CASEDIR/logs/" file 
+    file="$CASEDIR/logs/" file
     extract(\$0, "No Iterations ", val)
     print $TIMENAME "\t" val[1] > file
 }

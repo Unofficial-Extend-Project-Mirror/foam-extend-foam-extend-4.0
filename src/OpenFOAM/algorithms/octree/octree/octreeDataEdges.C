@@ -169,7 +169,7 @@ bool Foam::octreeDataEdges::findTightest
     else
     {
         // Construct bb around sample and myFar
-        const point dist2(fabs(dist.x()), fabs(dist.y()), fabs(dist.z())); 
+        const point dist2(fabs(dist.x()), fabs(dist.y()), fabs(dist.z()));
 
         tightest.min() = sample - dist2;
         tightest.max() = sample + dist2;
@@ -226,7 +226,7 @@ Foam::scalar Foam::octreeDataEdges::calcNearest
 
     return edgeLine.nearestDist(sampleLine, shapePt, sampleLinePt);
 }
-    
+
 
 void Foam::octreeDataEdges::write
 (

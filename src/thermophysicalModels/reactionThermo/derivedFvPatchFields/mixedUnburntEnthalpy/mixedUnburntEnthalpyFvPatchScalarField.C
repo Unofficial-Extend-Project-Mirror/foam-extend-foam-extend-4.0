@@ -106,7 +106,7 @@ void mixedUnburntEnthalpyFvPatchScalarField::updateCoeffs()
     (
         "thermophysicalProperties"
     );
-    
+
     const label patchi = patch().index();
 
     mixedFvPatchScalarField& Tw = refCast<mixedFvPatchScalarField>

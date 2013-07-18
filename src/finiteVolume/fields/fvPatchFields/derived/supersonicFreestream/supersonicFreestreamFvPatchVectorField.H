@@ -179,7 +179,7 @@ public:
                 return TInf_;
             }
 
-            //- Return reference to the temperature at infinity 
+            //- Return reference to the temperature at infinity
             //  to allow adjustment
             scalar& TInf()
             {

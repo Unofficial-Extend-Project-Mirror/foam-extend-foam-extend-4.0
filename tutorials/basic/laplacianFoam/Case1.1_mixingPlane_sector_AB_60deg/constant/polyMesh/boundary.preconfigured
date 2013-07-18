@@ -4,10 +4,10 @@
 FoamFile
 {
  version 2.0;
- format ascii; 	
- class polyBoundaryMesh; 	
- location "constant/polyMesh"; 	
- object boundary; 	
+ format ascii;
+ class polyBoundaryMesh;
+ location "constant/polyMesh";
+ object boundary;
 }
 
 (
@@ -15,111 +15,111 @@ FoamFile
 
   {
     type patch;
-    nFaces 500; 	
-    startFace 308050; 	
+    nFaces 500;
+    startFace 308050;
 
   }
   outlet
 
   {
     type patch;
-    nFaces 2000; 	
-    startFace 308550; 	
+    nFaces 2000;
+    startFace 308550;
 
   }
   wallProlongation
 
   {
     type wall;
-    nFaces 800; 	
-    startFace 310550; 	
+    nFaces 800;
+    startFace 310550;
 
   }
   wallDiffuser
 
   {
     type wall;
-    nFaces 2400; 	
-    startFace 311350; 	
+    nFaces 2400;
+    startFace 311350;
 
   }
   statSwirlWallB_C
 
   {
     type wall;
-    nFaces 800; 	
-    startFace 313750; 	
+    nFaces 800;
+    startFace 313750;
 
   }
   rotSwirlWallA_BB
 
   {
     type wall;
-    nFaces 200; 	
-    startFace 314550; 	
+    nFaces 200;
+    startFace 314550;
 
   }
   sideWallA_BB_cyclic1
 
   {
     type cyclicGgi;
-    nFaces 250; 	
-    startFace 314750; 	
-    shadowPatch sideWallA_BB_cyclic2; 	
-    zone sideWallA_BB_cyclic1Zone; 	
-    bridgeOverlap off; 	
-    rotationAxis (0 0 1); 	
-    rotationAngle 60; 	
-    separationOffset (0 0 0); 	
+    nFaces 250;
+    startFace 314750;
+    shadowPatch sideWallA_BB_cyclic2;
+    zone sideWallA_BB_cyclic1Zone;
+    bridgeOverlap off;
+    rotationAxis (0 0 1);
+    rotationAngle 60;
+    separationOffset (0 0 0);
 
   }
   sideWallA_BB_cyclic2
 
   {
     type cyclicGgi;
-    nFaces 250; 	
-    startFace 315000; 	
-    shadowPatch sideWallA_BB_cyclic1; 	
-    zone sideWallA_BB_cyclic2Zone; 	
-    bridgeOverlap off; 	
-    rotationAxis (0 0 1); 	
-    rotationAngle -60; 	
-    separationOffset (0 0 0); 	
+    nFaces 250;
+    startFace 315000;
+    shadowPatch sideWallA_BB_cyclic1;
+    zone sideWallA_BB_cyclic2Zone;
+    bridgeOverlap off;
+    rotationAxis (0 0 1);
+    rotationAngle -60;
+    separationOffset (0 0 0);
 
   }
   B_UPSTREAM
 
   {
     type mixingPlane;
-    nFaces 500; 	
-    startFace 315250; 	
-    shadowPatch B_DOWNSTREAM; 	
+    nFaces 500;
+    startFace 315250;
+    shadowPatch B_DOWNSTREAM;
     coordinateSystem
     {
       type cylindrical;
-      origin (0 0 0); 	
-      axis (0 0 1); 	
-      direction (1 0 0); 	
-    } 	
-    orientation dirR_spanTheta;         
-    assembly both;      
+      origin (0 0 0);
+      axis (0 0 1);
+      direction (1 0 0);
+    }
+    orientation dirR_spanTheta;
+    assembly both;
 
   }
   B_DOWNSTREAM
 
   {
     type mixingPlane;
-    nFaces 2000; 	
-    startFace 315750; 	
-    shadowPatch B_UPSTREAM; 	
+    nFaces 2000;
+    startFace 315750;
+    shadowPatch B_UPSTREAM;
     coordinateSystem
     {
       type cylindrical;
-      origin (0 0 0); 	
-      axis (0 0 1); 	
-      direction (1 0 0); 	
-    } 	
-    orientation dirR_spanTheta;         
-    assembly both;      
+      origin (0 0 0);
+      axis (0 0 1);
+      direction (1 0 0);
+    }
+    orientation dirR_spanTheta;
+    assembly both;
   }
 )

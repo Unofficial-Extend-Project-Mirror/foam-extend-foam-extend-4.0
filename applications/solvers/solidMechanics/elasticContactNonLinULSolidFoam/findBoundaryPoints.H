@@ -21,7 +21,7 @@ forAll (bm, patchI)
      )
     {
       const labelList& bp = bm[patchI].patch().boundaryPoints();
-      
+
       const labelList& meshPoints = bm[patchI].patch().meshPoints();
 
       forAll (bp, pointI)

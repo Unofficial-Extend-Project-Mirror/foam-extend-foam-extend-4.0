@@ -124,7 +124,7 @@ Foam::wordList Foam::ReadFields
             )
         );
     }
-    return masterNames;    
+    return masterNames;
 }
 
 

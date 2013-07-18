@@ -90,7 +90,7 @@ class CrankNicholsonDdtScheme
 
             //- Return the start-time index
             label startTimeIndex() const;
-            
+
             //- Cast to the underlying GeoField
             GeoField& operator()();
 

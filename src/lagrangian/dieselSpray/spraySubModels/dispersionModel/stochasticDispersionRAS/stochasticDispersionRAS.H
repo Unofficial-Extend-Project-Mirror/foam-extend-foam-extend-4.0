@@ -28,7 +28,7 @@ Class
 Description
     The velocity is perturbed in random direction, with a
     Gaussian random number distribution with variance sigma.
-    where sigma is defined below 
+    where sigma is defined below
 
 \*---------------------------------------------------------------------------*/
 

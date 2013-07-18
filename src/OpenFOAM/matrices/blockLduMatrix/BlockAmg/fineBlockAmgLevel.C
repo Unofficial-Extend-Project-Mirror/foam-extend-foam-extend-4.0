@@ -62,10 +62,10 @@ Foam::fineBlockAmgLevel<Type>::fineBlockAmgLevel
     (
         BlockAmgPolicy<Type>::New
         (
-            policyType, 
-            matrix_, 
+            policyType,
+            matrix_,
             dict_,
-            groupSize, 
+            groupSize,
             minCoarseEqns
         )
     ),
@@ -187,14 +187,14 @@ void Foam::fineBlockAmgLevel<Type>::solve
 
     if (matrix_.symmetric())
     {
-        BlockSolverPerformance<Type> coarseSolverPerf = 
+        BlockSolverPerformance<Type> coarseSolverPerf =
             BlockCGSolver<Type>
             (
                 "topLevelCorr",
                 matrix_,
                 dict_
             ).solve(x, b);
-        
+
         if (lduMatrix::debug >= 2)
         {
             coarseSolverPerf.print();
@@ -202,14 +202,14 @@ void Foam::fineBlockAmgLevel<Type>::solve
     }
     else
     {
-        BlockSolverPerformance<Type> coarseSolverPerf = 
+        BlockSolverPerformance<Type> coarseSolverPerf =
             BlockBiCGStabSolver<Type>
             (
                 "topLevelCorr",
                 matrix_,
                 dict_
             ).solve(x, b);
-        
+
         if (lduMatrix::debug >= 2)
         {
             coarseSolverPerf.print();
@@ -226,7 +226,7 @@ void Foam::fineBlockAmgLevel<Type>::scaleX
     Field<Type>& xBuffer
 ) const
 {
-   
+
     // KRJ: 2013-02-05: Removed subfield, creating a new field
     Field<Type> Ax(x.size());
 
@@ -235,13 +235,13 @@ void Foam::fineBlockAmgLevel<Type>::scaleX
         reinterpret_cast<Field<Type>&>(Ax),
         x
     );
-    
+
     scalar scalingFactorNum = sumProd(x,b);
     scalar scalingFactorDenom = sumProd(x,Ax);
-    
+
     vector scalingVector(scalingFactorNum, scalingFactorDenom, 0);
     reduce(scalingVector, sumOp<vector>());
-    
+
     // Scale x
     if
     (
@@ -265,7 +265,7 @@ void Foam::fineBlockAmgLevel<Type>::scaleX
 
 
 template<class Type>
-Foam::autoPtr<Foam::BlockAmgLevel<Type> > 
+Foam::autoPtr<Foam::BlockAmgLevel<Type> >
 Foam::fineBlockAmgLevel<Type>::makeNextLevel() const
 {
     if (policyPtr_->coarsen())

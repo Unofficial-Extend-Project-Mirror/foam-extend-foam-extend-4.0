@@ -8,7 +8,7 @@ int USERD_get_part_coords
 {
 
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_part_coords" << endl << 
+    Info << "Entering: USERD_get_part_coords" << endl <<
         "part_number = " << part_number << endl << flush;
 #endif
 
@@ -18,7 +18,7 @@ int USERD_get_part_coords
 
         const vectorField& points = meshPtr->points();
         label nPoints = points.size();
-        
+
         for (label indx=0; indx<nPoints; indx++)
         {
             coord_array[0][indx+1] = scalingFactor*(float)points[indx].x();
@@ -34,7 +34,7 @@ int USERD_get_part_coords
         const polyBoundaryMesh& bMesh = meshPtr->boundaryMesh();
         const vectorField& points = bMesh[patchi].points();
         label nPoints = points.size();
-        
+
         for (label indx=0; indx<nPoints; indx++)
         {
             coord_array[0][indx+1] = scalingFactor*(float)points[indx].x();
@@ -63,12 +63,12 @@ int USERD_get_part_coords
     else if
     (
         secondMeshPtr
-     && part_number == secondMeshPartNum 
+     && part_number == secondMeshPartNum
     )
     {
         const vectorField& points = secondMeshPtr->points();
         label nPoints = points.size();
-        
+
         for (label indx=0; indx<nPoints; indx++)
         {
             coord_array[0][indx+1] = scalingFactor*(float)points[indx].x();
@@ -87,7 +87,7 @@ int USERD_get_part_coords
         const polyBoundaryMesh& bMesh = secondMeshPtr->boundaryMesh();
         const vectorField& points = bMesh[patchi].points();
         label nPoints = points.size();
-        
+
         for (label indx=0; indx<nPoints; indx++)
         {
             coord_array[0][indx+1] = scalingFactor*(float)points[indx].x();
@@ -103,7 +103,7 @@ int USERD_get_part_coords
     {
         const vectorField& points = faMeshPtr->points();
         label nPoints = points.size();
-        
+
         for (label indx=0; indx<nPoints; indx++)
         {
             coord_array[0][indx+1] = scalingFactor*(float)points[indx].x();

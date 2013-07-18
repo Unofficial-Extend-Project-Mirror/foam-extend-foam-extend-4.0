@@ -41,11 +41,11 @@ namespace Foam
 {
     addToRunTimeSelectionTable(ODESolver, KRR4, ODE);
 
-const scalar 
+const scalar
     KRR4::safety = 0.9, KRR4::grow = 1.5, KRR4::pgrow = -0.25,
     KRR4::shrink = 0.5, KRR4::pshrink = (-1.0/3.0), KRR4::errcon = 0.1296;
 
-const scalar 
+const scalar
     KRR4::gamma = 1.0/2.0,
     KRR4::a21 = 2.0, KRR4::a31 = 48.0/25.0, KRR4::a32 = 6.0/25.0,
     KRR4::c21 = -8.0, KRR4::c31 = 372.0/25.0, KRR4::c32 = 12.0/5.0,
@@ -85,8 +85,8 @@ void Foam::KRR4::solve
 (
     scalar& x,
     scalarField& y,
-    scalarField& dydx, 
-    const scalar eps, 
+    scalarField& dydx,
+    const scalar eps,
     const scalarField& yScale,
     const scalar hTry,
     scalar& hDid,

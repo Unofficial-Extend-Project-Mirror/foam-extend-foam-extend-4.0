@@ -22,11 +22,11 @@ setDamBreakFine ()
 }
 
 # Do damBreak
-cd damBreak 
+cd damBreak
    application=`getApplication`
-      
-   runApplication blockMesh   
-   runApplication setFields   
+
+   runApplication blockMesh
+   runApplication setFields
    runApplication $application
 cd ..
 

@@ -45,7 +45,7 @@ if (which_type == Z_HEX08)
     {
         const cellShape& cellShape = cellShapes[n];
         const cellModel& cellModel = cellShape.model();
-        
+
         if (cellModel == hex) // || (cellModel == wedge))
         {
             var_array[counter++] = vectorField[n][component];
@@ -58,7 +58,7 @@ if (which_type == Z_PEN06)
 {
     const cellModel& prism = *(cellModeller::lookup("prism"));
 
-    label counter = 1;    
+    label counter = 1;
     for (label n=0; n<nCells; n++)
     {
         const cellShape& cellShape = cellShapes[n];
@@ -76,12 +76,12 @@ if (which_type == Z_PYR05)
 {
     const cellModel& pyr = *(cellModeller::lookup("pyr"));
 
-    label counter = 1;    
+    label counter = 1;
     for (label n=0; n<nCells; n++)
     {
         const cellShape& cellShape = cellShapes[n];
         const cellModel& cellModel = cellShape.model();
-        
+
         if (cellModel == pyr)
         {
             var_array[counter++] = vectorField[n][component];
@@ -95,7 +95,7 @@ if (which_type == Z_TET04)
 {
     const cellModel& tet = *(cellModeller::lookup("tet"));
 
-    label counter = 1;    
+    label counter = 1;
     for (label n=0; n<nCells; n++)
     {
         const cellShape& cellShape = cellShapes[n];

@@ -145,7 +145,7 @@ int USERD_set_filenames
         }
         isTensor[n] = isitTensor;
     }
-    
+
     bool lagrangianNamesFound = false;
     label n = 0;
     while ((!lagrangianNamesFound) && (n<Num_time_steps))
@@ -202,7 +202,7 @@ int USERD_set_filenames
     Num_variables = nVar + nSprayVariables;
 
 
-    // Check if second mesh (region) exist. 
+    // Check if second mesh (region) exist.
     IOobject ensightReaderDictHeader
     (
         IOobject
@@ -278,7 +278,7 @@ int USERD_set_filenames
                 runTime,
                 IOobject::MUST_READ
             )
-        );        
+        );
     }
 
     if(secondMeshPtr)
@@ -438,7 +438,7 @@ int USERD_set_filenames
     }
 
 
-    Numparts_available = Num_unstructured_parts + Num_structured_parts 
+    Numparts_available = Num_unstructured_parts + Num_structured_parts
         + nPatches + nSecondMeshPatches;
 
 

@@ -40,14 +40,14 @@ if (vAlign > 0)
         beta /= v2Mag*dt;
 
         // is collision possible within this timestep
-        if ((alpha>0) && (alpha<1.0) && (beta>0) && (beta<1.0)) 
+        if ((alpha>0) && (alpha<1.0) && (beta>0) && (beta<1.0))
         {
             vector p1c = p1().position() + alpha*v1*dt;
             vector p2c = p2().position() + beta*v2*dt;
 
             scalar closestDist = mag(p1c-p2c);
 
-            scalar collProb = 
+            scalar collProb =
                 pow(0.5*sumD/max(0.5*sumD, closestDist), cSpace_)
                *exp(-cTime_*mag(alpha-beta));
 
@@ -90,7 +90,7 @@ if (vAlign > 0)
                 // use mass-averaged temperature to calculate We number
                 scalar averageTemp = (pMax().T()*mMax + pMin().T()*mMin)/mTot;
                 // and mass averaged mole fractions ...
-                scalarField 
+                scalarField
                     Xav((pMax().m()*pMax().X()+pMin().m()*pMin().X())
                    /(pMax().m() + pMin().m()));
 
@@ -99,7 +99,7 @@ if (vAlign > 0)
                 scalar rho = spray_.fuels().rho(pc, averageTemp, Xav);
 
                 scalar dMean = sqrt(dMin*dMax);
-                scalar WeColl = 
+                scalar WeColl =
                     max(1.0e-12, 0.5*rho*magVRel*magVRel*dMean/sigma);
 
                 // coalescence only possible when parcels are close enoug
@@ -109,7 +109,7 @@ if (vAlign > 0)
                 scalar prob = rndGen_.scalar01();
 
                 // Coalescence
-                if ( prob < coalesceProb && coalescence_) 
+                if ( prob < coalesceProb && coalescence_)
                 {
                     // How 'many' of the droplets coalesce
                     scalar nProb = prob*nMin/nMax;
@@ -122,18 +122,18 @@ if (vAlign > 0)
                     scalar newMaxMass = mMax + (mMin - newMinMass);
                     pMax().m() = newMaxMass;
 
-                    pMax().T() = 
+                    pMax().T() =
                         (averageTemp*mTot - newMinMass*pMin().T())/newMaxMass;
                     rhoMax = spray_.fuels().rho(pc, pMax().T(), pMax().X());
 
-                    pMax().d() = 
+                    pMax().d() =
                         pow
                         (
                             6.0*newMaxMass/(rhoMax*mathematicalConstant::pi*nMax),
                             1.0/3.0
                         );
 
-                    pMax().U() = 
+                    pMax().U() =
                         (momMax + (1.0-newMinMass/mMin)*momMin)/newMaxMass;
 
                     // update the liquid molar fractions
@@ -147,7 +147,7 @@ if (vAlign > 0)
                     }
                     forAll(Ynew, i)
                     {
-                        pMax().X()[i] = 
+                        pMax().X()[i] =
                             Ynew[i]/(spray_.fuels().properties()[i].W()*Wlinv);
                     }
 

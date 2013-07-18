@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 
         faPatches[patchI].name_ = faPatchNames[patchI];
 
-        faPatches[patchI].type_ = 
+        faPatches[patchI].type_ =
             word(curPatchDict.lookup("type"));
 
         word ownName = curPatchDict.lookup("ownerPolyPatch");
@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
     forAll (polyMeshPatches, patchI)
     {
         label start = mesh.boundaryMesh()[patchIDs[patchI]].start();
-        
+
         label size  = mesh.boundaryMesh()[patchIDs[patchI]].size();
 
         for(label i = 0; i < size; i++)

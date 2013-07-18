@@ -79,7 +79,7 @@ public:
             (t, dict)
         );
 
-    
+
     // Constructors
 
         //- Construct from components
@@ -105,7 +105,7 @@ public:
 
 
     // Member Functions
-    
+
         //- Return number of particles to inject
         virtual label nParcelsToInject
         (
@@ -131,14 +131,14 @@ public:
 
         //- Return the number of holes
         virtual label nHoles() const = 0;
-    
+
         //- Return the injector diameter
         virtual scalar d() const = 0;
 
         //- Return the injection direction for hole i
         virtual const vector& direction
         (
-            const label i, 
+            const label i,
             const scalar time
         ) const = 0;
 
@@ -172,7 +172,7 @@ public:
         //- Return the instantaneous velocity
         virtual scalar velocity(const scalar time) const = 0;
 
-        //- Return the discharge coefficient        
+        //- Return the discharge coefficient
         virtual List<pair> CdProfile() const = 0;
 
         //- Return the instantaneous discharge coefficient

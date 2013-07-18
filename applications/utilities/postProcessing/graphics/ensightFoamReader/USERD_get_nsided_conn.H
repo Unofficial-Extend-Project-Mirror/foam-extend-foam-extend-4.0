@@ -2,13 +2,13 @@
 int USERD_get_nsided_conn
 (
     int part_number,
-    int *nsided_conn_array 
+    int *nsided_conn_array
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_nsided_conn" 
+    Info << "Entering: USERD_get_nsided_conn"
         << ", part_number = " << part_number
-        << endl 
+        << endl
         << flush;
 #endif
     if (part_number == 1)
@@ -42,7 +42,7 @@ int USERD_get_nsided_conn
         return Z_ERR;
     }
 #ifdef ENSIGHTDEBUG
-    Info << "Exiting: USERD_get_nsided_conn" << endl 
+    Info << "Exiting: USERD_get_nsided_conn" << endl
         << flush;
 #endif
     return Z_OK;

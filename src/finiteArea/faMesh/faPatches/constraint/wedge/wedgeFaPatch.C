@@ -50,7 +50,7 @@ void wedgeFaPatch::findAxisPoint() const
     // Find axis point
 
     labelList ptLabels = pointLabels();
-    
+
     labelListList ptEdges = pointEdges();
 
     const vectorField& points = boundaryMesh().mesh().points();

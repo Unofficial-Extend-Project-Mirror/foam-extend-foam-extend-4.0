@@ -62,21 +62,21 @@ int main(int argc, char *argv[])
   while(runTime.loop())
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
-      
+
 #     include "readStressedFoamControls.H"
-      
+
       int iCorr = 0;
       scalar initialResidual = GREAT;
       scalar residual = GREAT;
       lduMatrix::solverPerformance solverPerfU;
       lduMatrix::solverPerformance solverPerfT;
-     
+
       lduMatrix::debug=0;
 
       do
         {
 	  U.storePrevIter();
-	 
+
 #         include "calculateSigmaExp.H"
 
 	  //- energy equation
@@ -123,9 +123,9 @@ int main(int argc, char *argv[])
 	     );
 
 	  U.relax();
-	  
+
 	  gradU = fvc::grad(U);
-	  
+
 	  Info << "\t\tSolving for " << U.name()
 	       << " using " << solverPerfU.solverName()
 	       << ", residual = " << solverPerfU.initialResidual() << endl;
@@ -136,18 +136,18 @@ int main(int argc, char *argv[])
 	   &&
 	   ++iCorr < nCorr
 	   );
-	
+
         Info << nl << "Time " << runTime.value()
-	     << ", Solving for " << U.name() 
-	     << ", Solving for " << T.name() 
-	     << ", Initial residual = " << initialResidual 
+	     << ", Solving for " << U.name()
+	     << ", Solving for " << T.name()
+	     << ", Initial residual = " << initialResidual
 	     << ", Final U residual = " << solverPerfU.initialResidual()
 	     << ", Final T residual = " << solverPerfT.initialResidual()
 	     << ", No outer iterations " << iCorr
 	     << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	     << "  ClockTime = " << runTime.elapsedClockTime() << " s" 
+	     << "  ClockTime = " << runTime.elapsedClockTime() << " s"
 	     << endl;
-	
+
 	lduMatrix::debug=0;
 
 #       include "calculateEpsilonSigma.H"

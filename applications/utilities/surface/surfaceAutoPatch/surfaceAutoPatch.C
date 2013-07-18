@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     Info<< "Read surface:" << endl;
     surf.writeStats(Info);
     Info<< endl;
-    
+
 
 
     // Construct features from surface&featureangle

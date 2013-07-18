@@ -28,7 +28,7 @@ def rmEmpty(d):
             if not debugmode:
                 system("rmdir "+d)
         return isEmpty
-    
+
 start=sys.argv[1]
 
 rmEmpty(start)

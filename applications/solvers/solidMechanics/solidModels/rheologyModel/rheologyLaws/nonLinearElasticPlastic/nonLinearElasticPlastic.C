@@ -129,7 +129,7 @@ E(const volScalarField& epsEq) const
             zeroGradientFvPatchScalarField::typeName
         )
     );
-    
+
     scalar epsY =  exp ( log ( log(matStrength_/(matStrength_ -
     sigmaY_)).value() /bCf_.value() ) /nCf_.value() );
 
@@ -141,7 +141,7 @@ E(const volScalarField& epsEq) const
         dimensionedScalar E =  matStrength_*bCf_*nCf_ *pow(epsEqI[cellI], nCf_
             - 1.0) *exp(-bCf_*pow(epsEqI[cellI], nCf_));
 
-        // Correction of initial modulus to avoid infinity/GREAT 
+        // Correction of initial modulus to avoid infinity/GREAT
         // for small strains and for unloading
 	// strain of 0.1% might be wrong for some materials
 
@@ -152,7 +152,7 @@ E(const volScalarField& epsEq) const
         }
 
         if(epsEqI[cellI] > epsY)
-        { 
+        {
             E = matStrength_*bCf_*nCf_*pow(epsY, nCf_ - 1.0)
                *exp(-bCf_*pow(epsY, nCf_));
         }
@@ -269,7 +269,7 @@ Ep(const volScalarField& sigmaEq) const
       dimensionedScalar Ep = matStrength_*bCf_*nCf_ *pow(epsCurrI, nCf_ - 1.0)
         *exp(-bCf_*pow(epsCurrI, nCf_));
 
-        tresult().internalField()[cellI] = 
+        tresult().internalField()[cellI] =
             Ep.value()/(1.0 - Ep.value()/E.value());
     }
 

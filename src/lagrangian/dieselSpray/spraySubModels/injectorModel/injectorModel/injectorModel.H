@@ -28,7 +28,7 @@ Class
 
 Description
     The injectormodel is used to set initial droplet size and the
-    velocity direction 
+    velocity direction
 
 \*---------------------------------------------------------------------------*/
 
@@ -62,7 +62,7 @@ protected:
         const dictionary& dict_;
         spray& sm_;
 
-        const PtrList<injector>& injectors_;    
+        const PtrList<injector>& injectors_;
         Random& rndGen_;
 
 public:
@@ -117,7 +117,7 @@ public:
         //- Return the spray angle of the injector
         virtual vector direction
         (
-            const label injector, 
+            const label injector,
             const label hole,
             const scalar time,
             const scalar d
@@ -128,7 +128,7 @@ public:
             const label i,
             const scalar time
         ) const = 0;
-        
+
         virtual scalar averageVelocity
         (
             const label i

@@ -2420,7 +2420,7 @@ Foam::dimensionedScalar Foam::equationReader::evaluate
             << abort(FatalError);
     }
 #   endif
-    
+
     if (eqns_[index].size() == 0)
     {
         parse(index);
@@ -2452,7 +2452,7 @@ Foam::dimensionedScalar Foam::equationReader::evaluate
 #       endif
 
         dimensionedScalar source("noSource", dimless, 0);
-        
+
         // Execute getSource function
         dsEqual
         (
@@ -2472,7 +2472,7 @@ Foam::dimensionedScalar Foam::equationReader::evaluate
         // information to the console.  Otherwise, reportOperationDiabled is
         // called, which does nothing.
         (*this.*reportOperationFunction_)(index, i, ds);
-        
+
         // Execute the eval function to which this operation points
         eqns_[index].ops()[i].opFunction
         (
@@ -2484,20 +2484,20 @@ Foam::dimensionedScalar Foam::equationReader::evaluate
             ds,
             source
         );
-        
+
         // If debug level > 1 this will print the result to the console;
-        // otherwise, does nothing.        
+        // otherwise, does nothing.
         (*this.*reportResultFunction_)(ds);
     }
 
 
     ds.name() = eqns_[index].equationName();
-    
+
     //Move one level back up on the dependents_ list
     if (dependents_.size())
     {
         dependents_.setSize(dependents_.size() - 1);
-    }    
+    }
 
     storage_.setSize(storageOffset);
     if (debug)

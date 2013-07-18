@@ -247,7 +247,7 @@ calcTransformedPatches() const
         InfoIn
         (
             "MixingPlaneInterpolation<MasterPatch, SlavePatch>::"
-            "calcTransformedPatches()" 
+            "calcTransformedPatches()"
         )   << "masterPointsLocalCoord: "
             << masterPointsLocalCoord << nl
             << "slavePointsLocalCoord: "
@@ -403,7 +403,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcMixingPlanePatch() const
             mixingPatchPoints
         );
 
- 
+
     if (debug > 0)
     {
         InfoIn

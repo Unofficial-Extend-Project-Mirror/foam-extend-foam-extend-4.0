@@ -28,10 +28,10 @@ if (runTime.outputTime())
 	),
        sqrt((3.0/2.0)*magSqr(dev(sigma)))
        );
-    
+
     Info<< "Max sigmaEq = " << max(sigmaEq).value()
 	<< endl;
-    
+
     //- Calculate Cauchy stress
     volTensorField F = I + gradU;
     volScalarField J = det(F);
@@ -65,7 +65,7 @@ if (runTime.outputTime())
 	),
        sqrt((3.0/2.0)*magSqr(dev(sigmaCauchy)))
        );
-    
+
     Info<< "Max sigmaCauchyEq = " << max(sigmaCauchyEq).value()
 	<< endl;
 
@@ -82,7 +82,7 @@ if (runTime.outputTime())
 
 	vector force = sum( totalForce );
 	Info << "\ttotal force is " << force << " N" << endl;
-	
+
 	tensorField Finv = inv(F);
 	vectorField nCurrent = Finv & n.boundaryField()[patchi];
 	nCurrent /= mag(nCurrent);
@@ -96,7 +96,7 @@ if (runTime.outputTime())
     //- move mesh for visualisation and move it back after writing
     vectorField oldPoints = mesh.allPoints();
     #include "moveMeshLeastSquares.H"
-    
+
     runTime.write();
 
     //- move mesh back

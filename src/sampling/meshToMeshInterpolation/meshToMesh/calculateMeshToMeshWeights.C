@@ -93,7 +93,7 @@ void meshToMesh::calculateInverseDistanceWeights() const
                     invDistCoeffs[celli][ni + 1] = invDist;
                     sumInvDist += invDist;
                 }
-                
+
                 // divide by the total inverse-distance
                 forAll (invDistCoeffs[celli], i)
                 {
@@ -113,7 +113,7 @@ const scalarListList& meshToMesh::inverseDistanceWeights() const
     {
         calculateInverseDistanceWeights();
     }
-    
+
     return *inverseDistanceWeightsPtr_;
 }
 

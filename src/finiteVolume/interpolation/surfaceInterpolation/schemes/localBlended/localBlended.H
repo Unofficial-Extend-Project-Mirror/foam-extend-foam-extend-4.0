@@ -141,10 +141,10 @@ public:
         tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
         interpolate(const GeometricField<Type, fvPatchField, volMesh>& vf) const
         {
-            const surfaceScalarField& blendingFactor = 
+            const surfaceScalarField& blendingFactor =
             (
                 this->mesh().objectRegistry::
-                lookupObject<const surfaceScalarField> 
+                lookupObject<const surfaceScalarField>
                 (
                     word(vf.name() + "BlendingFactor")
                 )

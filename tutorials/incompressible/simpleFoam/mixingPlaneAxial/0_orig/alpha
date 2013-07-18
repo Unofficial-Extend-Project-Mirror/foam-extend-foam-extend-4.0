@@ -4,18 +4,18 @@
 FoamFile
 {
  version 2.0;
- format ascii; 	
- root "/home/page/OpenFOAM/bk3421-1.3/run/calculs/simpleFoam/MFR"; 	
- case "secteur360"; 	
- instance ""      0 "" ; 	
- local ""; 	
- class volScalarField; 	
- object alpha; 	
+ format ascii;
+ root "/home/page/OpenFOAM/bk3421-1.3/run/calculs/simpleFoam/MFR";
+ case "secteur360";
+ instance ""      0 "" ;
+ local "";
+ class volScalarField;
+ object alpha;
 }
 
 dimensions [ 0 0 0 0 0 0 0 ];
 
-internalField uniform 1; 	
+internalField uniform 1;
 
 boundaryField
 {
@@ -64,5 +64,5 @@ boundaryField
   {
     type zeroGradient;
   }
-} 	
+}
 

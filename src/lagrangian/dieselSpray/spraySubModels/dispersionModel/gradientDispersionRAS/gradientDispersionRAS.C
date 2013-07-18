@@ -90,7 +90,7 @@ void gradientDispersionRAS::disperseParcels() const
 
         scalar Tturb = min
         (
-            k[celli]/epsilon[celli], 
+            k[celli]/epsilon[celli],
             cps*pow(k[celli], 1.5)/epsilon[celli]/(UrelMag + SMALL)
         );
         // parcel is perturbed by the turbulence
@@ -115,9 +115,9 @@ void gradientDispersionRAS::disperseParcels() const
                     x2 = 2.0*spray_.rndGen().scalar01() - 1.0;
                     rsq = x1*x1 + x2*x2;
                 }
-                
+
                 scalar fac = sqrt(-2.0*log(rsq)/rsq);
-                
+
                 // in 2D calculations the -grad(k) is always
                 // away from the axis of symmetry
                 // This creates a 'hole' in the spray and to
@@ -130,7 +130,7 @@ void gradientDispersionRAS::disperseParcels() const
                 {
                     fac *= mag(x1);
                 }
-                
+
                 elmnt().Uturb() = sigma*fac*dir;
             }
         }

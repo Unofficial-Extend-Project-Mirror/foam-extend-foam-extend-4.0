@@ -415,10 +415,10 @@ void faMatrix<Type>::setValues
 
                     if (internalCoeffs_[patchi].size())
                     {
-                        label patchEdgei = 
+                        label patchEdgei =
                             mesh.boundary()[patchi].whichEdge(edgei);
 
-                        internalCoeffs_[patchi][patchEdgei] = 
+                        internalCoeffs_[patchi][patchEdgei] =
                             pTraits<Type>::zero;
 
                         boundaryCoeffs_[patchi][patchEdgei] =
@@ -701,7 +701,7 @@ flux() const
 
     forAll(fieldFlux.boundaryField(), patchI)
     {
-        fieldFlux.boundaryField()[patchI] = 
+        fieldFlux.boundaryField()[patchI] =
             InternalContrib[patchI] - NeighbourContrib[patchI];
     }
 
@@ -1062,7 +1062,7 @@ lduSolverPerformance solve
     Istream& solverControls
 )
 {
-    lduSolverPerformance solverPerf = 
+    lduSolverPerformance solverPerf =
         const_cast<faMatrix<Type>&>(tfam()).solve(solverControls);
 
     tfam.clear();

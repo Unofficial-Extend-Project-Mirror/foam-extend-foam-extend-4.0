@@ -79,7 +79,7 @@ void meshToMesh::interpolateField
         {
             const labelList& neighbours = cc[adr[celli]];
             const scalarList& w = weights[celli];
-            
+
             toF[celli] = fromVf[adr[celli]]*w[0];
 
             for (label ni = 1; ni < w.size(); ni++)
@@ -160,7 +160,7 @@ void meshToMesh::interpolateInternalField
         case INTERPOLATE:
             interpolateField
             (
-                toF, 
+                toF,
                 fromVf,
                 cellAddressing_,
                 inverseDistanceWeights()
@@ -170,7 +170,7 @@ void meshToMesh::interpolateInternalField
         case CELL_POINT_INTERPOLATE:
             interpolateField
             (
-                toF, 
+                toF,
                 fromVf,
                 cellAddressing_,
                 toMesh_.cellCentres()
@@ -268,7 +268,7 @@ void meshToMesh::interpolate
                 ).refValue() = toVf.boundaryField()[patchi];
             }
         }
-        else if 
+        else if
         (
             patchMap_.found(toPatch.name())
          && fromMeshPatches_.found(patchMap_.find(toPatch.name())())

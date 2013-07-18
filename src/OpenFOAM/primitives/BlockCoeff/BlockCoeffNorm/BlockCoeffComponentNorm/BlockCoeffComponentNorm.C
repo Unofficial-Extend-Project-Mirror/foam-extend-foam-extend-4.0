@@ -37,7 +37,7 @@ Foam::BlockCoeffComponentNorm<Type>::BlockCoeffComponentNorm
     const dictionary& dict
 )
 :
-    BlockCoeffNorm<Type>(dict),    
+    BlockCoeffNorm<Type>(dict),
     dict_(dict),
     cmpt_(readInt(this->dict().lookup("normComponent")))
 {}
@@ -50,7 +50,7 @@ Foam::scalar Foam::BlockCoeffComponentNorm<Type>::normalize
 (
     const Foam::BlockCoeff<Type>& a
 )
-{ 
+{
     return mag(a.component(cmpt_));
 }
 

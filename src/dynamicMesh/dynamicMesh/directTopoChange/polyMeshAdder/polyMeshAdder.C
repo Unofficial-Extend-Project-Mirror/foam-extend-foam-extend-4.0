@@ -957,7 +957,7 @@ void Foam::polyMeshAdder::mergeFaceZones
 )
 {
     zoneNames.setSize(fz0.size() + fz1.size());
-    
+
     append(fz0.names(), zoneNames);
 
     from1ToAll.setSize(fz1.size());
@@ -1039,7 +1039,7 @@ void Foam::polyMeshAdder::mergeCellZones
 )
 {
     zoneNames.setSize(cz0.size() + cz1.size());
-    
+
     append(cz0.names(), zoneNames);
 
     from1ToAll.setSize(cz1.size());
@@ -1166,7 +1166,7 @@ void Foam::polyMeshAdder::addZones
             mesh.pointZones()
         );
     }
-    
+
     List<faceZone*> fZones(fzFaces.size());
     forAll(fZones, i)
     {
@@ -1555,7 +1555,7 @@ Foam::autoPtr<Foam::mapAddedPolyMesh> Foam::polyMeshAdder::add
 
     // Inplace extend mesh0 patches (note that patches0.size() now also
     // has changed)
-    polyBoundaryMesh& allPatches = 
+    polyBoundaryMesh& allPatches =
         const_cast<polyBoundaryMesh&>(mesh0.boundaryMesh());
     allPatches.setSize(allPatchNames.size());
 

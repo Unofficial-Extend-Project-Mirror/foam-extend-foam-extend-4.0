@@ -237,7 +237,7 @@ bool Foam::polyMeshZipUpCells(polyMesh& mesh)
 
             // Go through the points and start from the point used twice
             // check all the edges to find the edges starting from this point
-            // add the 
+            // add the
 
             labelListList edgesToInsert(singleEdges.size());
             label nEdgesToInsert = 0;
@@ -678,7 +678,7 @@ bool Foam::polyMeshZipUpCells(polyMesh& mesh)
                                 << oldFaces[currentFaceIndex] << nl
                                 << "newFace: " << newFace << endl;
 #                           endif
- 
+
                             // Check for duplicate points in the new face
                             forAll (newFace, checkI)
                             {

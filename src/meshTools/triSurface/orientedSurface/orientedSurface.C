@@ -110,7 +110,7 @@ Foam::labelList Foam::orientedSurface::edgeToFace
     // Rewrite uses cached local faces for efficiency
     // HJ, 24/Aug/2010
     const List<labelledTri> lf =  s.localFaces();
-    
+
     forAll(changedEdges, i)
     {
         label edgeI = changedEdges[i];
@@ -128,7 +128,7 @@ Foam::labelList Foam::orientedSurface::edgeToFace
 
             const labelledTri& f0 = lf[face0];
             const labelledTri& f1 = lf[face1];
-            
+
             // Old.  HJ, 24/Aug/2010
 //            const labelledTri& f0 = s[face0];
 //            const labelledTri& f1 = s[face1];

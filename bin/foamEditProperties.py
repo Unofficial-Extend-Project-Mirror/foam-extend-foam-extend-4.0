@@ -39,29 +39,29 @@ def addToListProperty(fName,property,value):
 
 def addKeyword(fName,keyword):
     return addToListProperty(fName,"svn:keywords",keyword)
-    
+
 def addIgnore(fName,keyword):
     return addToListProperty(fName,"svn:ignore",keyword)
-    
+
 def recursivlyDoToFiles(directory,fileFilter,function,isDir=False,testSvn=True):
     if testSvn and not isSVK:
         if not path.exists(path.join(directory,".svn")):
             return
-        
+
     for f in glob.glob(path.join(directory,fileFilter)):
         if not path.isfile(f) and not path.isdir(f):
             continue
-        
+
         if (isDir and path.isfile(f)) or (not isDir and path.isdir(f)):
             continue
-        
+
         if isDir and testSvn and not isSVK:
             if not path.exists(path.join(f,".svn")):
                 continue
-                
+
         if function(f):
             print "....",f
-                
+
     for f in listdir(directory):
         if f not in [".svn","lnInclude"]:
             tmp=path.join(directory,f)
@@ -71,7 +71,7 @@ def recursivlyDoToFiles(directory,fileFilter,function,isDir=False,testSvn=True):
 if not path.exists(path.join(sys.argv[1],".svn")):
     svnCommand="svk"
     isSVK=True
-    
+
 print "\nAdding Id-keyword to Python-files"
 recursivlyDoToFiles(sys.argv[1],"*.py",lambda x:addKeyword(x,"Id"))
 

@@ -17,166 +17,166 @@ FoamFile
 
 
 {
-    equations       
+    equations
     {
-        Pa              
+        Pa
         {
             Pa              "twoa";
             lastResult      Pa [ 0 0 0 0 0 0 0 ] 1;
         }
-        twoa            
+        twoa
         {
             twoa            "1";
             lastResult      twoa [ 0 0 0 0 0 0 0 ] 1;
         }
-        Pb              
+        Pb
         {
             Pb              "sign(Sa)*cosh(twoa)";
             lastResult      Pb [ 0 0 0 0 0 0 0 ] 1.54308;
         }
-        Pc              
+        Pc
         {
             Pc              "DStime * 1e2 / sinh(foura + fivea / sixa^(sevena-eighta/ninea^inv(tena)))";
             lastResult      Pc [ 0 0 0 0 0 0 0 ] 2.75721;
         }
-        foura           
+        foura
         {
             foura           "1";
             lastResult      foura [ 0 0 0 0 0 0 0 ] 1;
         }
-        ninea           
+        ninea
         {
             ninea           "nineb";
             lastResult      ninea [ 0 0 0 0 0 0 0 ] 1;
         }
-        Pd              
+        Pd
         {
             Pd              "Pa+Pb+Pc+Pe+Pf+Aa+Ab+Ac+Ad+Ae+Af";
             lastResult      Pd [ 0 0 0 0 0 0 0 ] 586.516;
         }
-        Pe              
+        Pe
         {
             Pe              "Sa+(Sb*Sc^(Sd-Se/Sf^(Sg+Sh^Si)))";
             lastResult      Pe [ 0 0 0 0 0 0 0 ] 0.411732;
         }
-        Pf              
+        Pf
         {
             Pf              "DSa+(DSb*DSc^(DSd-DSe/DSf^inv(DSg+DSh^DSi)))";
             lastResult      Pf [ 0 0 0 0 0 0 0 ] 1.66667;
         }
-        Aa              
+        Aa
         {
             Aa              "twob/log10(twoc*10)+cosh(threef) * DStime/Sa+fiveg^max(sixf,sevenj)";
             lastResult      Aa [ 0 0 0 0 0 0 0 ] 3.54308;
             outputVar       Aa [ 0 0 0 0 0 0 0 ] 3.54308;
         }
-        Ab              
+        Ab
         {
             Ab              "fourf*log(pos(sevend))*inv(stabilise(Af, SMALL_))";
             lastResult      Ab [ 0 0 0 0 0 0 0 ] 0;
             outputVar       Ab [ 0 0 0 0 0 0 0 ] 0;
         }
-        Ac              
+        Ac
         {
             Ac              "DSo + DSm * erf(e_^0) + Ad*Ae+Ad";
             lastResult      Ac [ 0 0 0 0 0 0 0 ] 523.335;
             outputVar       Ac [ 0 0 0 0 0 0 0 ] 523.335;
         }
-        Ad              
+        Ad
         {
             Ad              "Ae+Ae*Af+Pb*inv(stabilise(Af, SMALL_))^Pe+DStime^DSa*twog+sevenh";
             lastResult      Ad [ 0 0 0 0 0 0 0 ] 38.26;
             outputVar       Ad [ 0 0 0 0 0 0 0 ] 38.26;
         }
-        Ae              
+        Ae
         {
             Ae              "threej + eightg / nineb*DSk - lgamma(ninej)";
             lastResult      Ae [ 0 0 0 0 0 0 0 ] 12;
             outputVar       Ae [ 0 0 0 0 0 0 0 ] 12;
         }
-        Af              
+        Af
         {
             Af              "fiveg^fivec+eighti";
             lastResult      Af [ 0 0 0 0 0 0 0 ] 2;
             outputVar       Af [ 0 0 0 0 0 0 0 ] 2;
         }
-        twob            
+        twob
         {
             twob            "1";
             lastResult      twob [ 0 0 0 0 0 0 0 ] 1;
         }
-        twoc            
+        twoc
         {
             twoc            "1";
             lastResult      twoc [ 0 0 0 0 0 0 0 ] 1;
         }
-        threef          
+        threef
         {
             threef          "1";
             lastResult      threef [ 0 0 0 0 0 0 0 ] 1;
         }
-        fourf           
+        fourf
         {
             fourf           "1";
             lastResult      fourf [ 0 0 0 0 0 0 0 ] 1;
         }
-        twog            
+        twog
         {
             twog            "1";
             lastResult      twog [ 0 0 0 0 0 0 0 ] 1;
         }
-        threej          
+        threej
         {
             threej          "1";
             lastResult      threej [ 0 0 0 0 0 0 0 ] 1;
         }
-        nineb           
+        nineb
         {
             nineb           "ninec";
             lastResult      nineb [ 0 0 0 0 0 0 0 ] 1;
         }
-        nu              
+        nu
         {
             nu              [ 0 2 -1 0 0 0 0 ] "0.01 + nuAdd";
             lastResult      nu [ 0 2 -1 0 0 0 0 ] 0.01001;
             outputVar       nu [ 0 2 -1 0 0 0 0 ] 0.01001;
         }
-        nuAdd           
+        nuAdd
         {
             nuAdd           [ 0 2 -1 0 0 0 0 ] "DStime / 10000";
             lastResult      nuAdd [ 0 2 -1 0 0 0 0 ] 1e-05;
         }
-        ninec           
+        ninec
         {
             ninec           "nined";
             lastResult      ninec [ 0 0 0 0 0 0 0 ] 1;
         }
-        nined           
+        nined
         {
             nined           "ninee";
             lastResult      nined [ 0 0 0 0 0 0 0 ] 1;
         }
-        ninee           
+        ninee
         {
             ninee           "ninef";
             lastResult      ninee [ 0 0 0 0 0 0 0 ] 1;
         }
-        ninef           
+        ninef
         {
             ninef           "nineg";
             lastResult      ninef [ 0 0 0 0 0 0 0 ] 1;
         }
-        nineg           
+        nineg
         {
             nineg           "nineh";
             lastResult      nineg [ 0 0 0 0 0 0 0 ] 1;
         }
-        nineh           
+        nineh
         {
             nineh           "ninei";
             lastResult      nineh [ 0 0 0 0 0 0 0 ] 1;
         }
-        ninei           
+        ninei
         {
             ninei           "ninej";
             lastResult      ninei [ 0 0 0 0 0 0 0 ] 1;
@@ -185,7 +185,7 @@ FoamFile
 }
 
 {
-    dataSources     
+    dataSources
     {
         dictSources     10 ( "/home/dave/OpenFOAM/dave-1.5-dev/run/tutorials/equationReaderTester/testDict1" "/home/dave/OpenFOAM/dave-1.5-dev/run/tutorials/equationReaderTester/testDict2" "/home/dave/OpenFOAM/dave-1.5-dev/run/tutorials/equationReaderTester/testDict3" "/home/dave/OpenFOAM/dave-1.5-dev/run/tutorials/equationReaderTester/testDict4" "/home/dave/OpenFOAM/dave-1.5-dev/run/tutorials/equationReaderTester/testDict5" "/home/dave/OpenFOAM/dave-1.5-dev/run/tutorials/equationReaderTester/testDict6" "/home/dave/OpenFOAM/dave-1.5-dev/run/tutorials/equationReaderTester/testDict7" "/home/dave/OpenFOAM/dave-1.5-dev/run/tutorials/equationReaderTester/testDict8" "/home/dave/OpenFOAM/dave-1.5-dev/run/tutorials/equationReaderTester/testDict9" "/home/dave/OpenFOAM/dave-1.5-dev/run/tutorials/equationReaderTester/testDict10" );
         dictLookups     14 ( fivea sixa sevena eighta tena fiveg sixf sevenj sevend sevenh eightg ninej fivec eighti );

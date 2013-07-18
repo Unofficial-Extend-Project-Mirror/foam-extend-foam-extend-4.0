@@ -87,13 +87,13 @@ Foam::sloshingHistory::sloshingHistory
         if (!time_.processorCase())
         {
             mkDir
-            ( 
+            (
                 time_.path()
                /"history"
                /time_.timeName()
             );
-        
-            historyFilePtr_ = 
+
+            historyFilePtr_ =
                 new OFstream
                 (
                     time_.path()
@@ -105,12 +105,12 @@ Foam::sloshingHistory::sloshingHistory
         else
         {
             mkDir
-            ( 
+            (
                 time_.path()/".."/"history"
                /time_.timeName()
             );
-        
-            historyFilePtr_ = 
+
+            historyFilePtr_ =
                 new OFstream
                 (
                     time_.path()/".."
@@ -120,8 +120,8 @@ Foam::sloshingHistory::sloshingHistory
                 );
         }
 
-        (*historyFilePtr_) 
-            << "Time" << tab 
+        (*historyFilePtr_)
+            << "Time" << tab
                 << "Yleft" << tab
                 << "Yright" << endl;
     }
@@ -129,7 +129,7 @@ Foam::sloshingHistory::sloshingHistory
     const fvMesh& mesh =
         time_.lookupObject<fvMesh>(regionName_);
 
-    freeSurfacePatchID_ = 
+    freeSurfacePatchID_ =
         mesh.boundaryMesh().findPatchID("freeSurface");
 
     if (freeSurfacePatchID_ == -1)
@@ -169,14 +169,14 @@ bool Foam::sloshingHistory::start()
     const fvMesh& mesh =
         time_.lookupObject<fvMesh>(regionName_);
 
-    const vectorField& fsPoints = 
+    const vectorField& fsPoints =
         mesh.boundaryMesh()[freeSurfacePatchID_].localPoints();
 
     if (Pstream::master())
     {
         historyFilePtr_->precision(12);
 
-        (*historyFilePtr_) << time_.value() << tab 
+        (*historyFilePtr_) << time_.value() << tab
             << fsPoints[leftPointID_].y() << tab
             << fsPoints[rightPointID_].y() << endl;
 
@@ -192,14 +192,14 @@ bool Foam::sloshingHistory::execute()
     const fvMesh& mesh =
         time_.lookupObject<fvMesh>(regionName_);
 
-    const vectorField& fsPoints = 
+    const vectorField& fsPoints =
         mesh.boundaryMesh()[freeSurfacePatchID_].localPoints();
 
     if (Pstream::master() && time_.outputTime())
     {
         historyFilePtr_->precision(12);
 
-        (*historyFilePtr_) << time_.value() << tab 
+        (*historyFilePtr_) << time_.value() << tab
             << fsPoints[leftPointID_].y() << tab
             << fsPoints[rightPointID_].y() << endl;
 

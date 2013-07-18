@@ -94,8 +94,8 @@ cohesiveZoneIncrementalFvPatchVectorField::cohesiveZoneIncrementalFvPatchVectorF
     (
         cohesiveLaw::New(dict.lookup("cohesiveLaw"), dict).ptr()
     ),
-    crackIndicator_(p.size(), 0.0),    
-    crazeIndicator_(p.size(), 0.0),    
+    crackIndicator_(p.size(), 0.0),
+    crazeIndicator_(p.size(), 0.0),
     relaxationFactor_(readScalar(dict.lookup("relaxationFactor")))
 {
     if (dict.found("refValue"))
@@ -106,7 +106,7 @@ cohesiveZoneIncrementalFvPatchVectorField::cohesiveZoneIncrementalFvPatchVectorF
     {
         this->refValue() = vector::zero;
     }
-    
+
     if (dict.found("refGradient"))
     {
         this->refGrad() = vectorField("refGradient", dict, p.size());
@@ -118,7 +118,7 @@ cohesiveZoneIncrementalFvPatchVectorField::cohesiveZoneIncrementalFvPatchVectorF
 
     if (dict.found("valueFraction"))
     {
-        this->valueFraction() = 
+        this->valueFraction() =
             symmTensorField("valueFraction", dict, p.size());
     }
     else
@@ -229,7 +229,7 @@ void cohesiveZoneIncrementalFvPatchVectorField::updateCoeffs()
     const rheologyModel& rheology =
         this->db().objectRegistry::lookupObject<rheologyModel>("rheologyProperties");
 
-    scalarField mu = 
+    scalarField mu =
         rheology.mu()().boundaryField()[patch().index()];
 
     scalarField lambda =
@@ -261,10 +261,10 @@ void cohesiveZoneIncrementalFvPatchVectorField::updateCoeffs()
     symmTensorField DEpsilonP(size(), symmTensor::zero);
     if(rheology.type() == plasticityModel::typeName)
     {
-        const plasticityModel& plasticity = 
+        const plasticityModel& plasticity =
             refCast<const plasticityModel>(rheology);
 
-        DEpsilonP = 
+        DEpsilonP =
             plasticity.DEpsilonP().boundaryField()[patch().index()];
 
 	mu = plasticity.newMu().boundaryField()[patch().index()];
@@ -273,7 +273,7 @@ void cohesiveZoneIncrementalFvPatchVectorField::updateCoeffs()
     }
 
     // Patch stress increment
-    symmTensorField DSigma = 
+    symmTensorField DSigma =
         2*mu*(DEpsilon - DEpsilonP) + I*(lambda*tr(DEpsilon));
 
 
@@ -307,11 +307,11 @@ void cohesiveZoneIncrementalFvPatchVectorField::updateCoeffs()
             valueFraction()[faceI] = symmTensor::zero;
             crazeIndicator_[faceI] = 1;
             crackIndicator_[faceI] = 0;
-            
+
             Pout << "Crack started at face: " << faceI << endl;
 
             // Cohesive traction
-            cohesiveTractionIncrement = 
+            cohesiveTractionIncrement =
                 n[faceI]*law().sigmaMax().value()
               - n[faceI]*oldSigmaN[faceI];
         }
@@ -333,7 +333,7 @@ void cohesiveZoneIncrementalFvPatchVectorField::updateCoeffs()
             else
             {
 	        // Calculate cohesive traction from cohesive zone model
-	        cohesiveTractionIncrement = 
+	        cohesiveTractionIncrement =
 		    law().traction(2*Un)*n[faceI]
                   - n[faceI]*oldSigmaN[faceI];
 
@@ -372,7 +372,7 @@ void cohesiveZoneIncrementalFvPatchVectorField::updateCoeffs()
 //             else
 //             {
 //                 // Calculate cohesive traction from cohesive zone model
-//                 cohesiveTractionIncrement = 
+//                 cohesiveTractionIncrement =
 //                     law().traction(2*Un)*n[faceI]
 //                   - n[faceI]*oldSigmaN[faceI];
 
@@ -383,17 +383,17 @@ void cohesiveZoneIncrementalFvPatchVectorField::updateCoeffs()
 
         if(magSqr(valueFraction()[faceI]) < SMALL)
         {
-            cohesiveTractionIncrement = 
-                relaxationFactor_*cohesiveTractionIncrement 
+            cohesiveTractionIncrement =
+                relaxationFactor_*cohesiveTractionIncrement
               + (1.0 - relaxationFactor_)*DSigmaN[faceI]*n[faceI];
 
             refGrad()[faceI] =
             (
                 cohesiveTractionIncrement
               - (
-                    n[faceI] 
+                    n[faceI]
                   & (
-                        mu[faceI]*gradDU[faceI].T() 
+                        mu[faceI]*gradDU[faceI].T()
                       - (mu[faceI] + lambda[faceI])*gradDU[faceI]
                     )
                 )
@@ -427,7 +427,7 @@ void cohesiveZoneIncrementalFvPatchVectorField::updateCoeffs()
 //     vectorField nGradUp = (n&gradU.patchInternalField());
 
 //     Field<vector> gradValue =
-//         this->patchInternalField() 
+//         this->patchInternalField()
 //       + 0.5*nGradUp/this->patch().deltaCoeffs()
 //       + 0.5*refGrad()/this->patch().deltaCoeffs();
 
@@ -446,7 +446,7 @@ void cohesiveZoneIncrementalFvPatchVectorField::write(Ostream& os) const
     directionMixedFvPatchVectorField::write(os);
     // os.writeKeyword("fieldName") << fieldName_ << token::END_STATEMENT << nl;
     // os.writeKeyword("fieldIncrName") << fieldIncrName_ << token::END_STATEMENT << nl;
-    os.writeKeyword("cohesiveLaw") << law().type() 
+    os.writeKeyword("cohesiveLaw") << law().type()
         << token::END_STATEMENT << nl;
     crazeIndicator_.writeEntry("crazeIndicator", os);
     crackIndicator_.writeEntry("crackIndicator", os);
@@ -460,7 +460,7 @@ void cohesiveZoneIncrementalFvPatchVectorField::write(Ostream& os) const
 
 makePatchTypeField
 (
-    fvPatchVectorField, 
+    fvPatchVectorField,
     cohesiveZoneIncrementalFvPatchVectorField
 );
 

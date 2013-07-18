@@ -41,7 +41,7 @@ runApplication ()
         LOG_NAME=$OPTARG
         shift $((OPTIND-1)) ; OPTIND=1
     done
-        
+
     APP_RUN=$1; shift
     APP_NAME=${APP_RUN##*/}
 
@@ -64,7 +64,7 @@ runParallel ()
         LOG_NAME=$OPTARG
         shift $((OPTIND-1)) ; OPTIND=1
     done
-    
+
     APP_RUN=$1; shift
     APP_NAME=${APP_RUN##*/}
 

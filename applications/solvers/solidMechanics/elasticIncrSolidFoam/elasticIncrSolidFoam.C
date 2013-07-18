@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
   while(runTime.loop())
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
-      
+
 #     include "readStressedFoamControls.H"
 
       int iCorr = 0;
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 	    {
 	      initialResidual = solverPerf.initialResidual();
 	    }
-	  
+
 	  DU.relax();
 
 	  if(solidInterfaceCorr)
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
 	    }
 
 #         include "calculateRelativeResidual.H"
-	  
+
 	  Info << "\tTime " << runTime.value()
 	       << ", Corrector " << iCorr
 	       << ", Solving for " << DU.name()
@@ -133,16 +133,16 @@ int main(int argc, char *argv[])
 	   &&
 	   ++iCorr < nCorr
 	   );
-	
-      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name() 
-	   << ", Initial residual = " << initialResidual 
+
+      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name()
+	   << ", Initial residual = " << initialResidual
 	   << ", Final residual = " << solverPerf.initialResidual()
 	   << ", Relative residual = " << relativeResidual
 	   << ", No outer iterations " << iCorr
 	   << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	   << "  ClockTime = " << runTime.elapsedClockTime() << " s" 
+	   << "  ClockTime = " << runTime.elapsedClockTime() << " s"
 	   << endl;
-      
+
       lduMatrix::debug=0;
 
 #     include "calculateDEpsilonDSigma.H"
@@ -159,9 +159,9 @@ int main(int argc, char *argv[])
 	  << runTime.elapsedCpuTime()
 	  << " s\n\n" << endl;
     }
-  
+
   Info<< "End\n" << endl;
-  
+
   return(0);
 }
 

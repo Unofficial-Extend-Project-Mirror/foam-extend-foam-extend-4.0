@@ -66,7 +66,7 @@ pseudoSolidTetDecompositionMotionSolver
 
     nCorrectors_ =  readInt(pseudoSolidDic.lookup("nCorrectors"));
 
-    convergenceTolerance_ = 
+    convergenceTolerance_ =
 	readScalar(pseudoSolidDic.lookup("convergenceTolerance"));
 }
 
@@ -108,7 +108,7 @@ void Foam::pseudoSolidTetDecompositionMotionSolver::solve()
           + tetFem::laplacianTranspose(mu, U)
           + tetFem::laplacianTrace
             (
-                (2*nu_/(1 - 2*nu_))*mu, 
+                (2*nu_/(1 - 2*nu_))*mu,
                 motionU()
             )
         );

@@ -304,7 +304,7 @@ void Foam::multiDirRefinement::refineHex8
             hexCellSet.insert(hexCells[i], 1);
         }
 
-        // Increment count 
+        // Increment count
         forAll(consistentCells, i)
         {
             label cellI = consistentCells[i];
@@ -494,7 +494,7 @@ void Foam::multiDirRefinement::refineFromDict
         cellWalker.reset(new hexCellLooper(mesh));
     }
 
-    // Construct undoable refinement topology modifier. 
+    // Construct undoable refinement topology modifier.
     //Note: undoability switched off.
     // Might want to reconsider if needs to be possible. But then can always
     // use other constructor.

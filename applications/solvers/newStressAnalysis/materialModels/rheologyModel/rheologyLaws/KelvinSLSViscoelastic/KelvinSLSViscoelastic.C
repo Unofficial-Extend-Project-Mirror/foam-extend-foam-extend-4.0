@@ -102,14 +102,14 @@ Foam::tmp<Foam::volScalarField> Foam::KelvinSLSViscoelastic::E(scalar t) const
     if(t>=0)
     {
         scalar p1 = eta2_.value()/(k1_.value() + k2_.value());
- 
+
         scalar q0 = k1_.value()*k2_.value()/(k1_.value() + k2_.value());
 
         scalar q1 = k1_.value()*eta2_.value()/(k1_.value() + k2_.value());
 
         E = q0 + (q1/p1 - q0)*exp(-t/p1);
     }
-    
+
 
     tmp<volScalarField> tresult
     (
@@ -168,7 +168,7 @@ Foam::tmp<Foam::volScalarField> Foam::KelvinSLSViscoelastic::J(scalar t) const
     if(t >= 0)
     {
         scalar p1 = eta2_.value()/(k1_.value() + k2_.value());
- 
+
         scalar q0 = k1_.value()*k2_.value()/(k1_.value() + k2_.value());
 
         scalar q1 = k1_.value()*eta2_.value()/(k1_.value() + k2_.value());

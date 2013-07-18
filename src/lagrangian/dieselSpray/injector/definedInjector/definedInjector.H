@@ -146,7 +146,7 @@ public:
             const vector& axisOfWedgeNormal,
             Random& rndGen
         ) const;
-    
+
         //- Return the number of holes
         label nHoles() const;
 
@@ -201,14 +201,14 @@ public:
         {
             return injectionPressureProfile_;
         }
-    
+
         scalar injectionPressure(const scalar time) const;
 
         List<pair> velocityProfile() const
         {
             return velocityProfile_;
         }
-        
+
         scalar velocity(const scalar time) const;
 
         List<pair> CdProfile() const

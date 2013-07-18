@@ -620,7 +620,7 @@ SLTSDdtScheme<Type>::fvcDdtPhiCorr
                 )
             );
         }
-        else if 
+        else if
         (
             U.dimensions() == dimDensity*dimVelocity
          && phi.dimensions() == dimDensity*dimVelocity*dimArea

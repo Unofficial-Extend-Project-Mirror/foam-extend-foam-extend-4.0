@@ -26,7 +26,7 @@ Class
     Foam::definedPressureSwirlInjector
 
 Description
-    Pressure swirl injector model with user-defined 
+    Pressure swirl injector model with user-defined
     cone-angle/interval vs. time
 
 \*---------------------------------------------------------------------------*/

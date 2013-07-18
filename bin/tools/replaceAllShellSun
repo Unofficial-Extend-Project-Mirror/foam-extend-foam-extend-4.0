@@ -1,6 +1,6 @@
 #!/usr/xpg4/bin/sh
 
-# Replace all shell script headers with 
+# Replace all shell script headers with
 if [ $# -ne 1 -o ! -d "$1" ]; then
     echo "Usage: `basename $0` <dir>"
     echo ""

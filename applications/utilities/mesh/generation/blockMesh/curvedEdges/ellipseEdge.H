@@ -26,7 +26,7 @@ Class
     Foam::ellipseEdge
 
 Description
-    ellipseEdge class : defines the edge of an ellipse in terms of two 
+    ellipseEdge class : defines the edge of an ellipse in terms of two
     points on the ellipse, its centre and eccentricity, for example:
 
     @verbatim

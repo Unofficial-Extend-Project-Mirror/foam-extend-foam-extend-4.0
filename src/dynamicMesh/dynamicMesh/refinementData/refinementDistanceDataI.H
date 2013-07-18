@@ -241,7 +241,7 @@ inline bool Foam::refinementDistanceData::updateFace
     const point& pos = mesh.faceCentres()[thisFaceI];
 
     return update(pos, neighbourInfo, tol);
-}    
+}
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //

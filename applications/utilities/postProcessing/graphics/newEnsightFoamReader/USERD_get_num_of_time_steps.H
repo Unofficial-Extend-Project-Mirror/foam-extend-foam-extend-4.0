@@ -7,7 +7,7 @@ int USERD_get_num_of_time_steps
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_num_of_time_steps" << endl 
+    Info << "Entering: USERD_get_num_of_time_steps" << endl
         << flush;
 #endif
 

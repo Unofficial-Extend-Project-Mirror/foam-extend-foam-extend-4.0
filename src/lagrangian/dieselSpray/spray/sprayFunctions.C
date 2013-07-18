@@ -137,7 +137,7 @@ scalar spray::liquidEnthalpy() const
         {
             label k = liquidToGasIndex_[j];
 
-            hg += 
+            hg +=
                 gasProperties()[k].H(T)*gasProperties()[k].W()*elmnt().X()[j]
                /Wl;
         }
@@ -180,7 +180,7 @@ scalar spray::liquidTotalEnthalpy() const
         for(label j=0; j<Nf; j++)
         {
             label k = liquidToGasIndex_[j];
-            hg += 
+            hg +=
                 gasProperties()[k].H(T)*gasProperties()[k].W()*elmnt().X()[j]
                /Wl;
         }
@@ -267,7 +267,7 @@ scalar spray::liquidPenetration
     scalar mTot = 0.0;
 
     label Np = size();
-    
+
     // arrays containing the parcels mass and
     // distance from injector in ascending order
     scalarField m(Np);
@@ -303,8 +303,8 @@ scalar spray::liquidPenetration
             bool found = false;
 
             // insert the parcel in the correct place
-            // and move the others 
-            while ( ( i < n-1 ) && ( !found ) ) 
+            // and move the others
+            while ( ( i < n-1 ) && ( !found ) )
             {
                 if (de < dist[i])
                 {

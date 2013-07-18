@@ -48,7 +48,7 @@ addToRunTimeSelectionTable(faPatch, emptyFaPatch, dictionary);
 // and it should not be duplicated as before.  However, to ensure everything
 // in the empty patch is sized to zero, we shall here return a regerence to
 // a zero-sized field (it does not matter what the field is
-// 
+//
 // const vectorField& emptyFaPatch::edgeNormals() const
 // {
 //     return faceAreas();

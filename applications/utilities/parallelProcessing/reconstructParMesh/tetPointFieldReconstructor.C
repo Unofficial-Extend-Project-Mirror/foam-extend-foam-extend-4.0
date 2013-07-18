@@ -108,7 +108,7 @@ labelList tetPointFieldReconstructor::procPatchAddressing
     }
 
     // Gather the information
-    
+
     const labelList& procPatchPoints =
         procMeshes_[procNo].boundary()[patchNo].meshPoints();
 

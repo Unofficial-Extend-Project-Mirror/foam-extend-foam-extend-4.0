@@ -73,7 +73,7 @@ frictionalPressure
 ) const
 {
 
-    return 
+    return
         Fr*pow(max(alpha - alphaMinFriction, scalar(0)), eta)
        /pow(max(alphaMax - alpha, scalar(5.0e-2)), p);
 }
@@ -104,9 +104,9 @@ Foam::tmp<Foam::volScalarField> Foam::JohnsonJacksonFrictionalStress::muf
     const dimensionedScalar& alphaMax,
     const volScalarField& pf,
     const volTensorField& D,
-    const dimensionedScalar& phi            
+    const dimensionedScalar& phi
 ) const
-{    
+{
     return dimensionedScalar("0.5", dimTime, 0.5)*pf*sin(phi);
 }
 

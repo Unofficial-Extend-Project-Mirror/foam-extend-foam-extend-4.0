@@ -39,7 +39,7 @@ inline bool smoothDelta::deltaData::update
     const scalar scale,
     const scalar tol
 )
-{   
+{
     if (!valid() || (delta_ < VSMALL))
     {
         // My delta not set. Take over neighbour.
@@ -63,7 +63,7 @@ inline bool smoothDelta::deltaData::update
         return false;
     }
 }
-    
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -142,7 +142,7 @@ inline bool smoothDelta::deltaData::updateCell
 {
     // Take over info from face if more than deltaRatio larger.
     return update(neighbourWallInfo, maxDeltaRatio, tol);
-}    
+}
 
 
 // Update this (face) with cell information.
@@ -157,7 +157,7 @@ inline bool smoothDelta::deltaData::updateFace
 {
     // Take over information from cell without any scaling (scale = 1.0)
     return update(neighbourWallInfo, 1.0, tol);
-}    
+}
 
 
 // Update this (face) with coupled face information.
@@ -171,7 +171,7 @@ inline bool smoothDelta::deltaData::updateFace
 {
     // Take over information from coupled face without any scaling (scale = 1.0)
     return update(neighbourWallInfo, 1.0, tol);
-}    
+}
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //

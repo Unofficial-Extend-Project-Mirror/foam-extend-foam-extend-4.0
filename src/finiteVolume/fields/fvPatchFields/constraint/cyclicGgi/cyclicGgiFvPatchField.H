@@ -187,13 +187,13 @@ public:
                 const CoeffField<Type>&,
                 const Pstream::commsTypes commsType
             ) const;
-            
+
         //- GGI coupled interface functions
 
             //- Does the patch field perform the transfromation
             virtual bool doTransform() const
             {
-                return 
+                return
                     !(cyclicGgiPatch_.parallel() || pTraits<Type>::rank == 0);
             }
 

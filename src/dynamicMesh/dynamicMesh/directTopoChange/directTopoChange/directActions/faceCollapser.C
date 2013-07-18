@@ -71,7 +71,7 @@ Foam::label Foam::faceCollapser::findEdge
         label edgeI = edgeLabels[i];
 
         const edge& e = edges[edgeI];
-    
+
         if
         (
             (e[0] == v0 && e[1] == v1)

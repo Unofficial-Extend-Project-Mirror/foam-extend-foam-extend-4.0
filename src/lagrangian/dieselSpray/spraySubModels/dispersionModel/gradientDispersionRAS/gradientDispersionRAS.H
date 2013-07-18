@@ -28,7 +28,7 @@ Class
 Description
     The velocity is perturbed in the direction of -grad(k), with a
     Gaussian random number distribution with variance sigma.
-    where sigma is defined below 
+    where sigma is defined below
 
 \*---------------------------------------------------------------------------*/
 

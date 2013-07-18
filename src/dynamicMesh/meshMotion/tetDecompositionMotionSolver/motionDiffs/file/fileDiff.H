@@ -54,7 +54,7 @@ class fileDiff
 private:
 
     // Private data
-    
+
         elementScalarField motionGamma_;
 
 

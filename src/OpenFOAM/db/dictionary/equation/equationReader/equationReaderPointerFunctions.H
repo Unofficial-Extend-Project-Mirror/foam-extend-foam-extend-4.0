@@ -117,7 +117,7 @@ License
         const label maxStoreIndex,
         const label storageOffset
     );
-    
+
 
     // Evaluation pointer functions
     void evalNone

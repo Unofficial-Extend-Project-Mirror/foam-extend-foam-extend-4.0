@@ -59,18 +59,18 @@ forAll(Tpatches, patchI)
     {
         fixedValueFvPatchScalarField& Tpatch =
             refCast<fixedValueFvPatchScalarField>(Tpatches[patchI]);
-        
-        const vectorField& faceCentres = 
+
+        const vectorField& faceCentres =
             mesh.Cf().boundaryField()[patchI];
 
         forAll(faceCentres, facei)
         {
-            if 
+            if
             (
-                (faceCentres[facei].x() > 4.5) && 
-                (faceCentres[facei].x() < 5.5) && 
-                (faceCentres[facei].z() > 4.5) && 
-                (faceCentres[facei].z() < 5.5) 
+                (faceCentres[facei].x() > 4.5) &&
+                (faceCentres[facei].x() < 5.5) &&
+                (faceCentres[facei].z() > 4.5) &&
+                (faceCentres[facei].z() < 5.5)
             )
             {
                 Tpatch[facei] = 600;

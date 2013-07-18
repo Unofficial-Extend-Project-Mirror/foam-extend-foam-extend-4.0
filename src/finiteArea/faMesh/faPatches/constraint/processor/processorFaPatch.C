@@ -62,7 +62,7 @@ void processorFaPatch::makeNonGlobalPatchPoints() const
     // create a 1->1 map
 
     // Can not use faGlobalMeshData at this point yet
-    
+
     if
     (
         !Pstream::parRun()
@@ -89,7 +89,7 @@ void processorFaPatch::makeNonGlobalPatchPoints() const
 
         const labelList& faMeshPatchPoints = pointLabels();
 
-        const labelList& meshPoints = 
+        const labelList& meshPoints =
             boundaryMesh().mesh().patch().meshPoints();
 
         label noFiltPoints = 0;
@@ -164,7 +164,7 @@ void processorFaPatch::initGeometry()
         OPstream toNeighbProc
         (
             Pstream::blocking,
-            neighbProcNo(), 
+            neighbProcNo(),
             3*(sizeof(label) + size()*sizeof(vector))
         );
 
@@ -184,7 +184,7 @@ void processorFaPatch::calcGeometry()
             IPstream fromNeighbProc
             (
                 Pstream::blocking,
-                neighbProcNo(), 
+                neighbProcNo(),
                 3*(sizeof(label) + size()*sizeof(vector))
             );
             fromNeighbProc
@@ -250,7 +250,7 @@ void processorFaPatch::initUpdateMesh()
         labelList patchEdge(nPoints());
         labelList indexInEdge(nPoints());
 
-        const edgeList::subList patchEdges = 
+        const edgeList::subList patchEdges =
             patchSlice(boundaryMesh().mesh().edges());
 
         const labelListList& ptEdges = pointEdges();
@@ -263,7 +263,7 @@ void processorFaPatch::initUpdateMesh()
 
             const edge& e = patchEdges[edgeI];
 
-            indexInEdge[patchPointI] = 
+            indexInEdge[patchPointI] =
                 findIndex
                 (
                     e,
@@ -316,7 +316,7 @@ void processorFaPatch::updateMesh()
             neighbPointsPtr_ = new labelList(nPoints());
             labelList& neighbPoints = *neighbPointsPtr_;
 
-            const edgeList::subList patchEdges = 
+            const edgeList::subList patchEdges =
                 patchSlice(boundaryMesh().mesh().edges());
 
             forAll(nbrPatchEdge, nbrPointI)
@@ -359,7 +359,7 @@ const labelList& processorFaPatch::neighbPoints() const
             << " part of a cyclic patch."
             << abort(FatalError);
     }
- 
+
    return *neighbPointsPtr_;
 }
 

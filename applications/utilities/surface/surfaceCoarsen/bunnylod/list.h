@@ -1,6 +1,6 @@
 /*
- *  A generic template list class.  
- *  Fairly typical of the list example you would 
+ *  A generic template list class.
+ *  Fairly typical of the list example you would
  *  find in any c++ book.
  */
 #ifndef GENERIC_LIST_H

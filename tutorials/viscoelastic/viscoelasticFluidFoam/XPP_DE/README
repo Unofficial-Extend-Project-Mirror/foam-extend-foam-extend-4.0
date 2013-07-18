@@ -6,21 +6,21 @@
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 #
-#+TITLE: *XPP_DE viscoelastic constitutive model README file for version 1.6-ext* 
-#+AUTHOR: Jovani                
+#+TITLE: *XPP_DE viscoelastic constitutive model README file for version 1.6-ext*
+#+AUTHOR: Jovani
 #+DATE:  05 October 2010
 
 
 
-* This is a simulation case for a viscoelastic fluid described by the 
+* This is a simulation case for a viscoelastic fluid described by the
   Extended Pom-Pom Double Equation constitutive model (XPP_DE).
-  The geometry was the 4:1 plane contraction. 
+  The geometry was the 4:1 plane contraction.
 
 
 
 *** This is only an illustrative case for the PP constitutive model. Therefore,
     there are not more details published until now for this model using this geometry
-    and viscoelasticFluidFoam solver. 
+    and viscoelasticFluidFoam solver.
 
 *** The parameters for the constitutive model was obtained from:
     VERBEETEN,W. M. H.; PETERS, G.W. M.; BAAIJENS, F. P. T. Differential constitutive

@@ -20,19 +20,19 @@ internalField   uniform (0 0 0);
 
 boundaryField
 {
-    movingWall      
+    movingWall
     {
         type            fixedValue;
         value           uniform (1 0 0);
     }
 
-    fixedWalls      
+    fixedWalls
     {
         type            fixedValue;
         value           uniform (0 0 0);
     }
 
-    frontAndBack    
+    frontAndBack
     {
         type            empty;
     }

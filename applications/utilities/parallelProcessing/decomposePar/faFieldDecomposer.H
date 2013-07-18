@@ -228,10 +228,10 @@ private:
         //- List of patch field decomposers
         List<patchFieldDecomposer*> patchFieldDecomposerPtrs_;
 
-        List<processorAreaPatchFieldDecomposer*> 
+        List<processorAreaPatchFieldDecomposer*>
             processorAreaPatchFieldDecomposerPtrs_;
 
-        List<processorEdgePatchFieldDecomposer*> 
+        List<processorEdgePatchFieldDecomposer*>
             processorEdgePatchFieldDecomposerPtrs_;
 
 

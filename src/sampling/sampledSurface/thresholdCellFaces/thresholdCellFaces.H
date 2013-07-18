@@ -67,7 +67,7 @@ class thresholdCellFaces
 
         void calculate
         (
-            const scalarField&, 
+            const scalarField&,
             const scalar lowerThreshold,
             const scalar upperThreshold,
             const bool triangulate

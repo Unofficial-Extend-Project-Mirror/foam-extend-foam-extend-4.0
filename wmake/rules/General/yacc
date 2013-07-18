@@ -1,8 +1,8 @@
 .SUFFIXES: .y .Y
 
-ytoo = yacc -v -d $$SOURCE ; mv y.tab.c $*.c ; mv y.tab.h $(@D)/parser.h ; $(CC) $(c++FLAGS) -c $*.c -o $@ 
+ytoo = yacc -v -d $$SOURCE ; mv y.tab.c $*.c ; mv y.tab.h $(@D)/parser.h ; $(CC) $(c++FLAGS) -c $*.c -o $@
 
-Ytoo = yacc -v -d $$SOURCE ; mv y.tab.c $*.C ; mv y.tab.h $(@D)/parser.H ; $(CC) $(c++FLAGS) -c $*.C -o $@ 
+Ytoo = yacc -v -d $$SOURCE ; mv y.tab.c $*.C ; mv y.tab.h $(@D)/parser.H ; $(CC) $(c++FLAGS) -c $*.C -o $@
 
 .y.dep:
 	$(MAKE_DEP)

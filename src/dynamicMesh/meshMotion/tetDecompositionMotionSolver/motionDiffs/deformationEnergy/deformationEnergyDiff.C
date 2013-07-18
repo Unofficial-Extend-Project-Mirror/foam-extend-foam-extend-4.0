@@ -85,7 +85,7 @@ Foam::deformationEnergyDiff::~deformationEnergyDiff()
 
 void Foam::deformationEnergyDiff::correct()
 {
-    motionGamma_.internalField() = 
+    motionGamma_.internalField() =
         pow(mSolver().totDeformationEnergy()().internalField(), exponent_)
       + SMALL;
 

@@ -14,8 +14,8 @@ then
          cmake ../..
 	 if [ "$WM_ARCH_BASE" == "darwin" ]
 	 then
-	     sed -i bak -e 's/-dynamiclib /& -undefined dynamic_lookup /' CMakeFiles/PV3FoamReader.dir/link.txt	 
-	     sed -i bak -e 's/-dynamiclib /& -undefined dynamic_lookup /' CMakeFiles/PV3FoamReader_SM.dir/link.txt	 
+	     sed -i bak -e 's/-dynamiclib /& -undefined dynamic_lookup /' CMakeFiles/PV3FoamReader.dir/link.txt
+	     sed -i bak -e 's/-dynamiclib /& -undefined dynamic_lookup /' CMakeFiles/PV3FoamReader_SM.dir/link.txt
 	 fi
          make
       )

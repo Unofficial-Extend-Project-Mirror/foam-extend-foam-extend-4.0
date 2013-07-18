@@ -118,7 +118,7 @@ class BlockAmgCycle
 
 
 public:
-    
+
     //- Runtime type information
     TypeName("BlockAmgCycle");
 

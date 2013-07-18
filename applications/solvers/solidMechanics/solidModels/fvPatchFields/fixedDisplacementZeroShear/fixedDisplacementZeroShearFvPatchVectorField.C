@@ -195,14 +195,14 @@ void fixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
     //---------------------------//
     const rheologyModel& rheology =
         this->db().objectRegistry::lookupObject<rheologyModel>("rheologyProperties");
-    scalarField mu = 
+    scalarField mu =
         rheology.mu()().boundaryField()[patch().index()];
     scalarField lambda =
         rheology.lambda()().boundaryField()[patch().index()];
 
     if(rheology.type() == plasticityModel::typeName)
     {
-        const plasticityModel& plasticity = 
+        const plasticityModel& plasticity =
             refCast<const plasticityModel>(rheology);
 
 	mu = plasticity.newMu().boundaryField()[patch().index()];
@@ -247,7 +247,7 @@ void fixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
       {
 	const fvPatchField<symmTensor>& sigma =
 	  patch().lookupPatchField<volSymmTensorField, symmTensor>("sigma");
-	
+
 	//- increment of traction
 	Traction = -(n & sigma);
       }
@@ -255,7 +255,7 @@ void fixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
     //---------------------------//
     //- calculate the normal gradient based on the traction
     //---------------------------//
-    vectorField newGradient = 
+    vectorField newGradient =
       Traction
       - (n & (mu*gradField.T() - (mu + lambda)*gradField))
       - n*lambda*tr(gradField);
@@ -263,7 +263,7 @@ void fixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
     //- if there is plasticity
     if(rheology.type() == plasticityModel::typeName)
     {
-        const plasticityModel& plasticity = 
+        const plasticityModel& plasticity =
             refCast<const plasticityModel>(rheology);
 
         newGradient +=
@@ -275,16 +275,16 @@ void fixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
       {
 	const thermalModel& thermo =
 	  this->db().objectRegistry::lookupObject<thermalModel>("thermalProperties");
-    
+
 	const fvPatchField<scalar>& T =
 	  patch().lookupPatchField<volScalarField, scalar>("T");
-      
+
 	const scalarField threeKalpha =
 	  (3*lambda + 2*mu)*
 	  thermo.alpha()().boundaryField()[patch().index()];
-      
+
 	const scalarField T0 = thermo.T0()().boundaryField()[patch().index()];
-	
+
 	newGradient +=  (n*threeKalpha*(T - T0));
     }
 

@@ -88,7 +88,7 @@ public:
         //- Return the spray angle of the injector
         vector direction
         (
-            const label injector, 
+            const label injector,
             const label hole,
             const scalar time,
             const scalar d
@@ -99,7 +99,7 @@ public:
             const label i,
             const scalar time
         ) const;
-        
+
         scalar averageVelocity
         (
             const label i

@@ -86,7 +86,7 @@ Foam::distortionEnergyDiff::~distortionEnergyDiff()
 
 void Foam::distortionEnergyDiff::correct()
 {
-    motionGamma_.internalField() = 
+    motionGamma_.internalField() =
         pow(mSolver().totDistortionEnergy()().internalField(), exponent_)
       + SMALL;
 

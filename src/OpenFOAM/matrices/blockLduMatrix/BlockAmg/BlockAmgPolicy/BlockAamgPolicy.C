@@ -182,7 +182,7 @@ void Foam::BlockAamgPolicy<Type>::calcChild()
 
                     magColDiag = magDiag[colI];
 
-                    weight = (magUpper[cIndex[rowCoeffI]] 
+                    weight = (magUpper[cIndex[rowCoeffI]]
                         / max(magRowDiag, magColDiag));
 
                     if (child_[colI] == -1)
@@ -481,10 +481,10 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
     coarseCoeffMap.setSize(0);
 
     // Create coarse-level coupled interfaces
-     
+
     // Create coarse interfaces, addressing and coefficients
     const label interfaceSize =
-        const_cast<BlockLduMatrix<Type>& >(matrix_).interfaces().size(); 
+        const_cast<BlockLduMatrix<Type>& >(matrix_).interfaces().size();
 
     const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
         interfaceFields =
@@ -494,7 +494,7 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
     lduInterfacePtrsList* coarseInterfacesPtr =
         new lduInterfacePtrsList(interfaceSize);
     lduInterfacePtrsList& coarseInterfaces = *coarseInterfacesPtr;
-    
+
     labelListList coarseInterfaceAddr(interfaceSize);
 
     // Add the coarse level
@@ -507,8 +507,8 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
             coarseOwner,
             coarseNeighbour,
             true
-        ); 
-   
+        );
+
     // Initialise transfer of restrict addressing on the interface
     forAll (interfaceFields, intI)
     {
@@ -569,7 +569,7 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
             );
         }
     }
-    
+
     forAll (interfaceFields, intI)
     {
         if (interfaceFields.set(intI))
@@ -588,14 +588,14 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
         coarseInterfaceAddr,
         matrix_.patchSchedule()
     );
-    
+
     // Set the coarse level matrix
     BlockLduMatrix<Type>* coarseMatrixPtr =
         new BlockLduMatrix<Type>(*coarseAddrPtr);
     BlockLduMatrix<Type>& coarseMatrix = *coarseMatrixPtr;
-    
+
     typename BlockLduInterfaceFieldPtrsList<Type>::Type&
-        coarseInterfaceFieldsTransfer = 
+        coarseInterfaceFieldsTransfer =
           coarseMatrix.interfaces();
 
     // Aggolmerate the upper and lower coupled coefficients
@@ -605,7 +605,7 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
         {
             const GAMGInterface& coarseInterface =
                 refCast<const GAMGInterface>(coarseInterfaces[intI]);
-            
+
             coarseInterfaceFieldsTransfer.set
             (
                 intI,
@@ -614,28 +614,28 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
                     coarseInterface,
                     (interfaceFields[intI])
                 ).ptr()
-            );             
-    
+            );
+
             coarseMatrix.coupleUpper().set
             (
-                intI, 
+                intI,
                 coarseInterface.agglomerateBlockCoeffs
                 (
                     matrix_.coupleUpper()[intI]
                 )
             );
-            
+
             coarseMatrix.coupleLower().set
             (
-                intI, 
+                intI,
                 coarseInterface.agglomerateBlockCoeffs
                 (
                     matrix_.coupleLower()[intI]
                 )
-            );     
+            );
         }
     }
-     
+
     // Matrix restriction done!
 
     typedef CoeffField<Type> TypeCoeffField;
@@ -649,13 +649,13 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
     TypeCoeffField& coarseDiag = coarseMatrix.diag();
     const TypeCoeffField& fineUpper = matrix_.upper();
     const TypeCoeffField& fineDiag = matrix_.diag();
-    
+
     // KRJ: 2013-01-31: Many cases needed as there are different combinations
     if (matrix_.asymmetric())
     {
         TypeCoeffField& coarseLower = coarseMatrix.lower();
         const TypeCoeffField& fineLower = matrix_.lower();
-        
+
         if (fineDiag.activeType() == blockCoeffBase::SQUARE)
         {
             if (fineUpper.activeType() == blockCoeffBase::SQUARE)
@@ -663,10 +663,10 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
                 squareTypeField& activeCoarseUpper = coarseUpper.asSquare();
                 squareTypeField& activeCoarseDiag = coarseDiag.asSquare();
                 const squareTypeField& activeFineUpper = fineUpper.asSquare();
-                
+
                 squareTypeField& activeCoarseLower = coarseLower.asSquare();
                 const squareTypeField& activeFineLower = fineLower.asSquare();
-                
+
                 restrictResidual(fineDiag, coarseDiag);
 
                 forAll(coeffRestrictAddr, fineCoeffI)
@@ -690,7 +690,7 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
             {
                 FatalErrorIn("autoPtr<amgMatrix> BlockAamgPolicy<Type>::restrictMatrix() const")
                     << "Matrix diagonal of square type and upper of linear type is not implemented"
-                    << abort(FatalError);            
+                    << abort(FatalError);
             }
             else
             {
@@ -721,7 +721,7 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
                 squareTypeField& activeCoarseUpper = coarseUpper.asSquare();
                 squareTypeField& activeCoarseDiag = coarseDiag.asSquare();
                 const squareTypeField& activeFineUpper = fineUpper.asSquare();
-                
+
                 restrictResidual(fineDiag, coarseDiag);
 
                 forAll(coeffRestrictAddr, fineCoeffI)
@@ -737,13 +737,13 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
                         // Add the fine face coefficient into the diagonal.
                         activeCoarseDiag[-1 - cCoeff] += 2*activeFineUpper[fineCoeffI];
                     }
-                } 
+                }
             }
             else if (fineUpper.activeType() == blockCoeffBase::LINEAR)
             {
                 FatalErrorIn("autoPtr<amgMatrix> BlockAamgPolicy<Type>::restrictMatrix() const")
                     << "Matrix diagonal of square type and upper of linear type is not implemented"
-                    << abort(FatalError);            
+                    << abort(FatalError);
             }
             else
             {
@@ -751,7 +751,7 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
                     << "Matrix diagonal of square type and upper of scalar type is not implemented"
                     << abort(FatalError);
             }
-        
+
         }
         else if (fineDiag.activeType() == blockCoeffBase::LINEAR)
         {
@@ -771,7 +771,7 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
                 )   << "Matrix diagonal of scalar type not implemented"
                     << abort(FatalError);
         }
-    }    
+    }
 
     return autoPtr<BlockLduMatrix<Type> >
     (
@@ -791,8 +791,8 @@ void Foam::BlockAamgPolicy<Type>::restrictResidual
 ) const
 {
     typedef CoeffField<Type> TypeCoeffField;
-    
-    if (res.activeType() == blockCoeffBase::SQUARE && 
+
+    if (res.activeType() == blockCoeffBase::SQUARE &&
             coarseRes.activeType() == blockCoeffBase::SQUARE)
     {
         typedef typename TypeCoeffField::squareTypeField squareTypeField;
@@ -805,13 +805,13 @@ void Foam::BlockAamgPolicy<Type>::restrictResidual
         {
             activeCoarseRes[i] *= 0.0;
         }
-                   
+
         forAll (res, i)
         {
             activeCoarseRes[child_[i]] += activeRes[i];
-        } 
+        }
     }
-    else 
+    else
     {
         FatalErrorIn("void  BlockAamgPolicy<Type>::restrictResidual() const")
             << "Only present for square type coeff type"
@@ -828,11 +828,11 @@ void Foam::BlockAamgPolicy<Type>::restrictResidual
 ) const
 {
     coarseRes = pTraits<Type>::zero;
-    
+
     forAll (res, i)
     {
         coarseRes[child_[i]] += res[i];
-    }    
+    }
 }
 
 

@@ -61,13 +61,13 @@ class BlockAamgPolicy
     public BlockAmgPolicy<Type>
 {
 
-public: 
-    
+public:
+
     // Private Data
 
         //- Reference to matrix
         const BlockLduMatrix<Type>& matrix_;
-        
+
         //- Reference to a templated norm calculator
         autoPtr<BlockCoeffNorm<Type> > normPtr_;
 
@@ -134,7 +134,7 @@ public:
         //- Restrict matrix
         virtual autoPtr<BlockLduMatrix<Type> > restrictMatrix
         ()  const;
-        
+
         //- Restrict residual
         virtual void restrictResidual
         (

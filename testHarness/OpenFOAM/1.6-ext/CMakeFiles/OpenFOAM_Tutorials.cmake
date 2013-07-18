@@ -51,7 +51,7 @@ MESSAGE("Creation of the new test directory: ${TEST_CASE_DIR}")
 file(COPY $ENV{FOAM_TUTORIALS}/ DESTINATION ${TEST_CASE_DIR})
 
 # Add a default Allrun file for the cases that don't have one.
-# The test harness relies on the presence of an Allrun file for 
+# The test harness relies on the presence of an Allrun file for
 # running the case
 MESSAGE("${testRunTimeDirectory}: Checking for missing Allrun file in tutorials")
 EXECUTE_PROCESS(
@@ -69,7 +69,7 @@ SET(testId "Allclean_cases${testIdSuffix}")
 ADD_TEST(${testId} bash -c "cd ${TEST_CASE_DIR}; ./Allclean")
 
 # Next, recurse through the test cases root directory,
-# find all the Allrun files, and add them as a new CTest test case 
+# find all the Allrun files, and add them as a new CTest test case
 FILE(GLOB_RECURSE listofCasesWithAllrun ${TEST_CASE_DIR}/Allrun)
 LIST(SORT listofCasesWithAllrun)
 

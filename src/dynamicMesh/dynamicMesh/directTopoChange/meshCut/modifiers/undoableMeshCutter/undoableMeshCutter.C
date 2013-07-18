@@ -193,7 +193,7 @@ Foam::undoableMeshCutter::undoableMeshCutter
     liveSplitCells_(mesh.nCells()/100 + 100),
     faceRemover_
     (
-        mesh,   
+        mesh,
         Foam::cos(30./180. * mathematicalConstant::pi)
     )
 {}

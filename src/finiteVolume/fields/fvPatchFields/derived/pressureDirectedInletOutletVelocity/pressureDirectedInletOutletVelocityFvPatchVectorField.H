@@ -59,7 +59,7 @@ class pressureDirectedInletOutletVelocityFvPatchVectorField
 
         //- Name of flux field
         word phiName_;
-        
+
         //- Name of density field
         word rhoName_;
 

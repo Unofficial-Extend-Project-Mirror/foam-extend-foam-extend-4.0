@@ -48,7 +48,7 @@ bool globalFaceZoneMappingSet = false;
 if(gMax(procToGlobalFZmap[0]) > 0 && gMax(pointOnLocalProcPatch[0]) > 0)
   {
     Info << "Reading procToGlobalFZmap and pointOnLocalProcPatch allowing restart of contact cases"
-	 << endl; 
+	 << endl;
     globalFaceZoneMappingSet = true;
   }
  else
@@ -65,23 +65,23 @@ if(Pstream::parRun())
 	forAll(mesh.faceZones(), faceZoneI)
 	  {
 	    vectorField globalFZpoints = mesh.faceZones()[faceZoneI]().localPoints();
-	    
+
 	    procToGlobalFZmap[faceZoneI].setSize(globalFZpoints.size(), 0);
-	
+
 	    //- set all slave points to zero because only the master order is used
 	    if(!Pstream::master())
 	      globalFZpoints *= 0.0;
-	    
+
 	    //- pass points to all procs
 	    reduce(globalFZpoints, sumOp<vectorField>());
-	    
-	    
+
+
 	    //- now every proc has the master's list of FZ points
 	    //- every proc must now find the mapping from their local FZpoints to
 	    //- the globalFZpoints
-	    
+
 	    vectorField procFZpoints = mesh.faceZones()[faceZoneI]().localPoints();
-	    
+
 	    forAll(globalFZpoints, globalPointI)
 	      {
 		forAll(procFZpoints, procPointI)
@@ -95,10 +95,10 @@ if(Pstream::parRun())
 	      }
 	    //- procToGlobalFZmap now contains the local FZpoint label for each
 	    //- global FZ point label - for each faceZone
-	    
+
 	    //- check what points are on the current proc patch
 	    pointOnLocalProcPatch[faceZoneI].setSize(globalFZpoints.size(), 0);
-	    
+
 	    //- find corresponding patch
 	    string faceZoneName = mesh.faceZones().names()[faceZoneI];
 	    //- remove the string FaceZone from the end of the face zone name to get the patch name
@@ -109,7 +109,7 @@ if(Pstream::parRun())
 		FatalError << "Patch " << patchName << " not found corresponding for faceZone"
 			   << faceZoneName << exit(FatalError);
 	      }
-	    
+
 	    forAll(mesh.faceZones()[faceZoneI]().localPoints(), fzpi)
 	      {
 		forAll(mesh.boundaryMesh()[patchID].localPoints(), pi)
@@ -126,7 +126,7 @@ if(Pstream::parRun())
   }
 
 //- write to disk to allow restart of cases
-//- because it is not possible to calculate the 
+//- because it is not possible to calculate the
 //- mapping after the meshes have moved
 if(!globalFaceZoneMappingSet)
   {

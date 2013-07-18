@@ -312,7 +312,7 @@ public:
             {
                 return coupleLower_;
             }
-			
+
 			//- Access to coupled interfaces
 			typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces()
 			{

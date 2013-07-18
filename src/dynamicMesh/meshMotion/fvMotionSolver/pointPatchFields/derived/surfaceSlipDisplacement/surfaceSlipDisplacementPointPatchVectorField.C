@@ -307,7 +307,7 @@ void surfaceSlipDisplacementPointPatchVectorField::evaluate
                 rightHit
             );
         }
-        
+
         List<pointIndexHit> leftHit;
         {
             labelList leftSurf;

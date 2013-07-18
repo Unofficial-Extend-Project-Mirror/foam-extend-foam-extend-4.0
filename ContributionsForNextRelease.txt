@@ -14,7 +14,7 @@ Contributions:
 - TU Braunschweig: real gas thermo
 - Kornev, Rostock: inlet turbulence generator; locDynV2F hybrid turbulence model
 - Christoph Goniva: and multi-mixer dynamic mesh class
-- 
+-
 
 
 - segregated pressure-based turbomachinery (Wikki)

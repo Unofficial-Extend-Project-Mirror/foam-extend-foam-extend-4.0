@@ -52,7 +52,7 @@ do
 	-e s/"runApplication "/"runApplicationAndReportOnError "/g \
         -e /RunFunctions/r${ADDITIONAL_SHELL_FUNCTIONS} \
 	${AR}.org > ${AR}
-	
+
     # Make sure the Allrun file is executable
     chmod +x ${AR}
 done

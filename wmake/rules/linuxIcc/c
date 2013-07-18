@@ -1,6 +1,6 @@
 .SUFFIXES: .c .h
 
-cWARN        = 
+cWARN        =
 
 cc          = icc
 

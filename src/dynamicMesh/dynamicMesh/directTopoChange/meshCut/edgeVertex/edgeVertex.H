@@ -118,7 +118,7 @@ public:
                     << (mesh.nPoints() + mesh.nEdges() - 1)
                     << abort(FatalError);
             }
-            
+
             return eVert >= mesh.nPoints();
         }
         bool isEdge(const label eVert) const
@@ -154,7 +154,7 @@ public:
                     "edgeVertex::getVertex(const primitiveMesh&, const label)"
                 )   << "EdgeVertex " << eVert << " not a vertex"
                     << abort(FatalError);
-            }            
+            }
             return eVert;
         }
         label getVertex(const label eVert) const
@@ -210,7 +210,7 @@ public:
             return coord(mesh_, cut, weight);
         }
 
-        //- Find mesh edge (or -1) between two cuts. 
+        //- Find mesh edge (or -1) between two cuts.
         static label cutPairToEdge
         (
             const primitiveMesh&,

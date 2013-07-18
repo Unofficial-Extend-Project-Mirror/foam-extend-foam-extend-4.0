@@ -37,7 +37,7 @@ void Foam::equationReader::createMap
 )
 {
 //    equation * eqn(&this->operator[](index));
-    
+
     // current parenthesis level - note, a negative parenthesis value indicates
     // that this is the root level of a function, and therefore ',' is allowed
     label p(0);
@@ -101,7 +101,7 @@ void Foam::equationReader::createMap
                     0,
                     equationOperation::findOp(tl[i].wordToken())
                 );
-                    
+
                 if (map[i].operation() == equationOperation::otnone)
                 {
                     OStringStream description;
@@ -117,7 +117,7 @@ void Foam::equationReader::createMap
                         description
                     );
                 }
-                
+
                 // Set next token as well (function opening parenthesis)
                 i++;
                 opLvl[i] = 4;
@@ -142,10 +142,10 @@ void Foam::equationReader::createMap
              || (tl[i].wordToken() == "SMALL_")
              || (tl[i].wordToken() == "VSMALL_")
              || (tl[i].wordToken() == "ROOTVSMALL_")
-            )             
+            )
             {
                 // Mathematical constant
-                
+
                 //Bug fix
 //                eqn = &this->operator[](index);
 
@@ -166,7 +166,7 @@ void Foam::equationReader::createMap
                         << " mathematical constant. The mathematical constant "
                         << "will be used." << endl;
                 }
-                
+
 /*                eqn->internalScalars()->setSize
                 (
                     eqn->internalScalars()->size() + 1
@@ -386,7 +386,7 @@ void Foam::equationReader::createMap
                             break;
                         }
                     }
-                    
+
                     map[i] = equationOperation
                     (
                         equationOperation::slnone,
@@ -515,7 +515,7 @@ void Foam::equationReader::createMap
             );
         }
     } // mapping loop
-    
+
     if (p)
     {
         OStringStream description;
@@ -531,7 +531,7 @@ void Foam::equationReader::createMap
             description
         );
     }
-    
+
     // Assign negatives (distinguish these from subtraction)
     // The difference is characterized by the preceding character:
     // -preceeded by an operator = negative '+' '-' '*' '/' '^'

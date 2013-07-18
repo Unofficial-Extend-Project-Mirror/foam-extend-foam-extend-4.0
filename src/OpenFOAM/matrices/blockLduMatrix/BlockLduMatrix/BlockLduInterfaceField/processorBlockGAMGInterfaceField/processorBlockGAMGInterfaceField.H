@@ -112,7 +112,7 @@ public:
 
 
         // Interface matrix update
- 
+
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate
             (
@@ -134,7 +134,7 @@ public:
                 const Pstream::commsTypes commsType,
                 const bool switchToLhs
             ) const;
-            
+
 
         //- Processor interface functions
 

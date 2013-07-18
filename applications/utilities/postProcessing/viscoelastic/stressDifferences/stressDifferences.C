@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
             Info<< "    Reading tau" << endl;
             volSymmTensorField tau(tauHeader, mesh);
 
-    
+
 	   Info<< "    Calculating N1"<< endl;
  	   volScalarField N1
  	   (

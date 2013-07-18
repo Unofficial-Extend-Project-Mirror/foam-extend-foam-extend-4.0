@@ -137,7 +137,7 @@ void Foam::RK::solve
 
     forAll(yerr, i)
     {
-    	yerr[i] = 
+    	yerr[i] =
             h*
             (
                 dc1*dydx[i] + dc3*ak3_[i] + dc4*ak4_[i]

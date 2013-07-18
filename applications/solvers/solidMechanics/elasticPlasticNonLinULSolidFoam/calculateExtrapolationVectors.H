@@ -24,9 +24,9 @@ FieldField<Field, vector> extraVecs(ptc.size());
   forAll (ptc, pointI)
     {
       const label curPoint = ptc[pointI];
-      
+
       const labelList& curFaces = pfaces[curPoint];
-      
+
       // extraVecs.hook(new vectorField(curFaces.size())); //- no hook function
        extraVecs.set
        (
@@ -35,11 +35,11 @@ FieldField<Field, vector> extraVecs(ptc.size());
 	);
 
       vectorField& curExtraVectors = extraVecs[pointI];
-      
+
       label nFacesAroundPoint = 0;
 
       const vector& pointLoc = mesh.points()[curPoint];
-      
+
       // Go through all the faces
       forAll (curFaces, faceI)
 	{
@@ -49,7 +49,7 @@ FieldField<Field, vector> extraVecs(ptc.size());
 	      // or coupled calculate the extrapolation vector
 	      label patchID =
 		mesh.boundaryMesh().whichPatch(curFaces[faceI]);
-	      
+
 	      if
 		(
 		 !isA<emptyFvPatch>(bm[patchID])
@@ -61,12 +61,12 @@ FieldField<Field, vector> extraVecs(ptc.size());
 		    pointLoc
 		    - centres.boundaryField()[patchID]
 		    [bm[patchID].patch().whichFace(curFaces[faceI])];
-		  
+
 		  nFacesAroundPoint++;
 		}
 	    }
 	}
-      
+
       curExtraVectors.setSize(nFacesAroundPoint);
     }
 

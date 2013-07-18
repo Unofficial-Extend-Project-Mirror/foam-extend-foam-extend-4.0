@@ -1,6 +1,6 @@
 // Parametrized test case for the ERCOFTAC diffuser.
 
-// Created by Omar Bounous 
+// Created by Omar Bounous
 
 // Modified by Martin Beaudoin (11/2009)
 
@@ -37,7 +37,7 @@ m4_define(rIn,0.13)
 m4_define(rOut, calc(rIn+diffuserLength*tan(openingAngle*pi/180.0)))
 
 //Grid points (integers!):
-// For a better mesh resolution in the radial and tangential direction, 
+// For a better mesh resolution in the radial and tangential direction,
 // play with rNumberOfCells and tNumberOfCells
 m4_define(rNumberOfCells, 25)
 m4_define(tNumberOfCells, 20)
@@ -158,79 +158,79 @@ vertices
 blocks
 (
     //Blocks between plane A and plane BB:
-    // block0 - positive x and y 
+    // block0 - positive x and y
     hex (A0 A1 A2 A0 BB0 BB1 BB2 BB0) ABB
     (rNumberOfCells tNumberOfCells zABnumberOfCells)
     simpleGrading (rGrading 1 1)
 
     //Blocks between plane B and plane C:
-    // block0 - positive x and y 
+    // block0 - positive x and y
     hex (B0 B1 B2 B0 C0 C1 C2 C0) BC
     (rNumberOfCells tNumberOfCells zBCnumberOfCells)
     simpleGrading (rGrading 1 1)
-    // block1 - negative x positive y 
+    // block1 - negative x positive y
     hex (B0 B2 B3 B0 C0 C2 C3 C0) BC
     (rNumberOfCells tNumberOfCells zBCnumberOfCells)
     simpleGrading (rGrading 1 1)
-    // block2 - negative x and  y 
+    // block2 - negative x and  y
     hex (B0 B3 B4 B0 C0 C3 C4 C0) BC
     (rNumberOfCells tNumberOfCells zBCnumberOfCells)
     simpleGrading (rGrading 1 1)
-    // block3 - positive x negative y 
+    // block3 - positive x negative y
     hex (B0 B4 B1 B0 C0 C4 C1 C0) BC
     (rNumberOfCells tNumberOfCells zBCnumberOfCells)
     simpleGrading (rGrading 1 1)
 
     //Blocks between plane C and plane D:
-    // block0 - positive x and y 
+    // block0 - positive x and y
     hex (C0 C1 C2 C0 D0 D1 D2 D0) CD
     (rNumberOfCells tNumberOfCells zCDnumberOfCells)
     simpleGrading (rGrading 1 1)
-    // block1 - negative x positive y 
+    // block1 - negative x positive y
     hex (C0 C2 C3 C0 D0 D2 D3 D0) CD
     (rNumberOfCells tNumberOfCells zCDnumberOfCells)
     simpleGrading (rGrading 1 1)
-    // block2 - negative x and  y 
+    // block2 - negative x and  y
     hex (C0 C3 C4 C0 D0 D3 D4 D0) CD
     (rNumberOfCells tNumberOfCells zCDnumberOfCells)
     simpleGrading (rGrading 1 1)
-    // block3 - positive x negative y 
+    // block3 - positive x negative y
     hex (C0 C4 C1 C0 D0 D4 D1 D0) CD
     (rNumberOfCells tNumberOfCells zCDnumberOfCells)
     simpleGrading (rGrading 1 1)
 
     //Blocks between plane D and plane E:
-    // block0 - positive x and y 
+    // block0 - positive x and y
     hex (D0 D1 D2 D0 E0 E1 E2 E0) DE
     (rNumberOfCells tNumberOfCells zDEnumberOfCells)
     simpleGrading (rGrading 1 1)
-    // block1 - negative x positive y 
+    // block1 - negative x positive y
     hex (D0 D2 D3 D0 E0 E2 E3 E0) DE
     (rNumberOfCells tNumberOfCells zDEnumberOfCells)
     simpleGrading (rGrading 1 1)
-    // block2 - negative x and  y 
+    // block2 - negative x and  y
     hex (D0 D3 D4 D0 E0 E3 E4 E0) DE
     (rNumberOfCells tNumberOfCells zDEnumberOfCells)
     simpleGrading (rGrading 1 1)
-    // block3 - positive x negative y 
+    // block3 - positive x negative y
     hex (D0 D4 D1 D0 E0 E4 E1 E0) DE
     (rNumberOfCells tNumberOfCells zDEnumberOfCells)
     simpleGrading (rGrading 1 1)
 
     //Blocks between plane E and plane F:
-    // block0 - positive x and y 
+    // block0 - positive x and y
     hex (E0 E1 E2 E0 F0 F1 F2 F0) EF
     (rNumberOfCells tNumberOfCells zEFnumberOfCells)
     simpleGrading (rGrading 1 1)
-    // block1 - negative x positive y 
+    // block1 - negative x positive y
     hex (E0 E2 E3 E0 F0 F2 F3 F0) EF
     (rNumberOfCells tNumberOfCells zEFnumberOfCells)
     simpleGrading (rGrading 1 1)
-    // block2 - negative x and  y 
+    // block2 - negative x and  y
     hex (E0 E3 E4 E0 F0 F3 F4 F0) EF
     (rNumberOfCells tNumberOfCells zEFnumberOfCells)
     simpleGrading (rGrading 1 1)
-    // block3 - positive x negative y 
+    // block3 - positive x negative y
     hex (E0 E4 E1 E0 F0 F4 F1 F0) EF
     (rNumberOfCells tNumberOfCells zEFnumberOfCells)
     simpleGrading (rGrading 1 1)
@@ -239,7 +239,7 @@ blocks
 edges
 (
     //Plane A:
-    arc A1 A2 (calc(rA*cos(startAngleOffset + (angleSpanSectionA_BB)/2)) calc(rA*sin(startAngleOffset + (angleSpanSectionA_BB)/2)) zA) 
+    arc A1 A2 (calc(rA*cos(startAngleOffset + (angleSpanSectionA_BB)/2)) calc(rA*sin(startAngleOffset + (angleSpanSectionA_BB)/2)) zA)
 
     //Plane BB:
     arc BB1 BB2 (calc(rBB*cos(startAngleOffset + (angleSpanSectionA_BB)/2)) calc(rBB*sin(startAngleOffset + (angleSpanSectionA_BB)/2)) zBB)
@@ -346,7 +346,7 @@ patches
 
 );
 
-mergePatchPairs 
+mergePatchPairs
 (
 );
 

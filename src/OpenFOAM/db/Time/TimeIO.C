@@ -53,7 +53,7 @@ void Foam::Time::readDict()
 
             writeControl_ = wcTimeStep;
         }
-                
+
     }
 
     scalar oldWriteInterval = writeInterval_;

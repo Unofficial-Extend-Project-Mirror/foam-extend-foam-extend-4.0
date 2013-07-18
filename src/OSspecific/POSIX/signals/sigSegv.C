@@ -44,7 +44,7 @@ void Foam::sigSegv::sigSegvHandler(int)
         (
             "Foam::sigSegv::sigSegvHandler()"
         )   << "Cannot reset SIGSEGV trapping"
-            << abort(FatalError);    
+            << abort(FatalError);
     }
 
     // Update jobInfo file
@@ -76,7 +76,7 @@ Foam::sigSegv::~sigSegv()
         (
             "Foam::sigSegv::~sigSegv()"
         )   << "Cannot reset SIGSEGV trapping"
-            << abort(FatalError);    
+            << abort(FatalError);
     }
 }
 
@@ -104,7 +104,7 @@ void Foam::sigSegv::set(const bool verbose)
         (
             "Foam::sigSegv::set()"
         )   << "Cannot set SIGSEGV trapping"
-            << abort(FatalError);    
+            << abort(FatalError);
     }
 }
 

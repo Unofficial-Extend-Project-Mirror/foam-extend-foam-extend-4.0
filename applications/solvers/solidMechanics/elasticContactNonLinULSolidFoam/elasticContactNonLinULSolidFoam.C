@@ -83,20 +83,20 @@ int main(int argc, char *argv[])
 # include "createGlobalToLocalFaceZonePointMap.H"
 
   // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-  
+
   Info<< "\nStarting time loop\n" << endl;
-  
+
   for (runTime++; !runTime.end(); runTime++)
     {
       Info<< "Time: " << runTime.timeName() << endl;
-      
+
 #     include "readContactControls.H"
 
 #     include "readStressedFoamControls.H"
-  
+
       //-- for moving the mesh and then back again
       vectorField oldMeshPoints = mesh.allPoints();
-      
+
       int iCorr = 0;
       lduMatrix::solverPerformance solverPerf;
       word solverName;
@@ -104,14 +104,14 @@ int main(int argc, char *argv[])
       scalar residual = GREAT;
       scalar initialResidual = 0;
       scalar relativeResidual = GREAT;
-            
+
       do //- start of momentum loop
 	{
 	  DU.storePrevIter();
-	  
+
 	  divDSigmaLargeStrainExp.storePrevIter();
 
-	  //- correct the contact boundaries 
+	  //- correct the contact boundaries
 	  if(iCorr % uEqnContactCorrFreq == 0)
 	    {
 	      Info << "\t\tCorrecting contact in the momentum loop "
@@ -123,9 +123,9 @@ int main(int argc, char *argv[])
 	      contact.correct();
 	      mesh.movePoints(oldMeshPoints);
 	    }
-	  
+
 #         include "calculateDivDSigmaExp.H"
-	  
+
 #         include "calculateDivDSigmaExpLargeStrain.H"
 
 	  fvVectorMatrix DUEqn
@@ -137,28 +137,28 @@ int main(int argc, char *argv[])
 	     + divDSigmaLargeStrainExp
 
 	     );
-	  
+
 	  solverPerf = DUEqn.solve();
-	  
+
 	  DU.relax();
-	  
+
 	  solverName = solverPerf.solverName();
-	  
+
 	  gradDU = fvc::grad(DU);
-	  
+
 	  DF = gradDU.T();
 
 #         include "calculateDEpsilonDSigma.H"
 
 	  residual = solverPerf.initialResidual();
-	  
+
 	  if(iCorr == 0)
 	    {
 	      initialResidual = solverPerf.initialResidual();
 	    }
-	  
-#         include "calculateRelativeResidual.H"	      
-	  
+
+#         include "calculateRelativeResidual.H"
+
 	  Info << "\tTime " << runTime.value()
 	       << ", Corrector " << iCorr
 	       << ", Solving for " << DU.name()
@@ -173,29 +173,29 @@ int main(int argc, char *argv[])
 	 &&
 	 ++iCorr < nCorr
 	 );
-      
+
       // Print out info per contact iteration
       Info << "\t\tSolving for " << DU.name()
 	   << " using " << solverName
-	   << ", Initial residual = " << initialResidual 
+	   << ", Initial residual = " << initialResidual
 	   << ", Final residual = " << solverPerf.initialResidual()
 	   << ", No outer iterations " << iCorr << endl;
-      
+
       lduMatrix::debug = 1;
-      
+
 #     include "rotateFields.H"
 
 #     include "moveMesh.H"
 
 #     include "writeFields.H"
-        
+
       Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
 	  << "  ClockTime = " << runTime.elapsedClockTime() << " s"
 	  << endl << endl;
     }
-  
+
   Info<< "End\n" << endl;
-  
+
   return(0);
 }
 

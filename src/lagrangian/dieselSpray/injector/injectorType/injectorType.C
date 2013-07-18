@@ -120,7 +120,7 @@ Foam::scalar Foam::injectorType::getTableValue
             i++;
         }
         // value sits bewteen table[i][0] and table[i+1][0]
-        return table[i][1] 
+        return table[i][1]
                + (value-table[i][0])/(table[i+1][0]-table[i][0])
                * (table[i+1][1]-table[i][1]);
     }

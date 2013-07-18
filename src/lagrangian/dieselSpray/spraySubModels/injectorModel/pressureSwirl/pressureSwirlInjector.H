@@ -61,22 +61,22 @@ private:
         scalarList coneAngle_;
         scalarList coneInterval_;
         scalarList maxKv_;
-        
-    // The initial spray angle for the parcels    
+
+    // The initial spray angle for the parcels
         mutable scalar angle_;
-        
-    // The initial velocity for the parcels           
+
+    // The initial velocity for the parcels
         mutable scalar u_;
 
     // private member functions
-        
+
         scalar kv
         (
-            const label inj, 
+            const label inj,
             const scalar massFlow,
             const scalar dPressure
         ) const;
-        
+
         scalar deltaPressureInj(const scalar time, const label inj) const;
         scalar averagePressure(const label inj) const;
 
@@ -110,22 +110,22 @@ public:
         vector direction
         (
             const label injector,
-            const label hole, 
+            const label hole,
             const scalar time,
             const scalar d
         ) const;
-    
+
         scalar velocity
         (
             const label i,
             const scalar time
         ) const;
-        
+
         scalar averageVelocity
         (
             const label i
         ) const;
-        
+
 
 };
 

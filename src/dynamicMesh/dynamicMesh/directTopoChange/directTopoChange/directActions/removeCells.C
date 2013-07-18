@@ -482,7 +482,7 @@ void Foam::removeCells::setRefinement
                 faceI++;
             }
         }
-    }    
+    }
 
 
     // Remove points that are no longer used.

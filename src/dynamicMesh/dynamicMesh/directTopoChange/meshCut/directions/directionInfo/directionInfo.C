@@ -170,7 +170,7 @@ Foam::label Foam::directionInfo::edgeToFaceIndex
         {
             // Both not in face.
             // e is on opposite face. Determine corresponding edge on this face:
-            // - determine two faces using edge (one is the opposite face, 
+            // - determine two faces using edge (one is the opposite face,
             //   one is 'side' face
             // - walk on both these faces to opposite edge
             // - check if this opposite edge is on faceI
@@ -264,7 +264,7 @@ bool Foam::directionInfo::updateCell
             const edge& e = mesh.edges()[edgeI];
 
             // Find face connected to face through edgeI and on same cell.
-            label faceI = 
+            label faceI =
                 meshTools::otherFace
                 (
                     mesh,
@@ -304,7 +304,7 @@ bool Foam::directionInfo::updateCell
     n_ = neighbourInfo.n();
 
     return true;
-}    
+}
 
 
 // Update this face with neighbouring cell information
@@ -351,7 +351,7 @@ bool Foam::directionInfo::updateFace
     n_ = neighbourInfo.n();
 
     return true;
-}    
+}
 
 
 // Merge this with information on same face
@@ -376,7 +376,7 @@ bool Foam::directionInfo::updateFace
 
         return true;
     }
-}    
+}
 
 
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //

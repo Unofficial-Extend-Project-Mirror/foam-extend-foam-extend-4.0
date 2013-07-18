@@ -251,10 +251,10 @@ void BlockLduMatrix<scalar>::AmulCore
     // Note: pointer looping
     const label* const __restrict__ U = lduAddr().upperAddr().begin();
     const label* const __restrict__ L = lduAddr().lowerAddr().begin();
-    
+
     const scalar* const __restrict__ X = x.begin();
     scalar* __restrict__ AX = Ax.begin();
-    
+
     if (thereIsDiag())
     {
         const scalar* const __restrict__ diagPtr = diag().begin();
@@ -267,7 +267,7 @@ void BlockLduMatrix<scalar>::AmulCore
             AX[cell] += diagPtr[cell]*X[cell];
         }
     }
-    
+
     if (symmetric())
     {
         if (thereIsUpper())
@@ -315,10 +315,10 @@ void BlockLduMatrix<scalar>::TmulCore
     // Note: pointer looping
     const label* const __restrict__ U = lduAddr().upperAddr().begin();
     const label* const __restrict__ L = lduAddr().lowerAddr().begin();
-    
+
     const scalar* const __restrict__ X = x.begin();
     scalar* __restrict__ TX = Tx.begin();
-    
+
     if (thereIsDiag())
     {
         const scalar* const __restrict__ diagPtr = diag().begin();
@@ -401,15 +401,15 @@ tmp<scalarField> BlockLduMatrix<scalar>::H(const scalarField& x) const
         const label* const __restrict__ L = lduAddr().lowerAddr().begin();
 
         const scalar* const __restrict__ X = x.begin();
-        
+
         if (symmetric())
         {
             if (thereIsUpper())
             {
                 const scalar* const __restrict__ Upper = upper().begin();
-            
+
                 scalar* __restrict__ R = result.begin();
-        
+
                 for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
                 {
                     R[U[coeffI]] -= Upper[coeffI]*X[U[coeffI]];
@@ -423,7 +423,7 @@ tmp<scalarField> BlockLduMatrix<scalar>::H(const scalarField& x) const
             else if (thereIsLower())
             {
                 const scalar* const __restrict__ Lower = lower().begin();
-                
+
                 scalar* __restrict__ R = result.begin();
 
                 for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
@@ -441,7 +441,7 @@ tmp<scalarField> BlockLduMatrix<scalar>::H(const scalarField& x) const
         {
             const scalar* const __restrict__ Lower = lower().begin();
             const scalar* const __restrict__ Upper = upper().begin();
-            
+
             scalar* __restrict__ R = result.begin();
 
             for (register label coeffI = 0; coeffI < upper().size(); coeffI++)
@@ -455,7 +455,7 @@ tmp<scalarField> BlockLduMatrix<scalar>::H(const scalarField& x) const
             }
         }
     }
-    
+
     return tresult;
 }
 

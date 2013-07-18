@@ -55,7 +55,7 @@ getNumberedLine() {
 # getLine dictionary entry
 # Prints dictionary entry line (without lineno)
 getLine() {
-    getNumberedLine $1 "$2" | sed -e 's/^[^:]*://' 
+    getNumberedLine $1 "$2" | sed -e 's/^[^:]*://'
 }
 
 # getRawEntry dictionary entry
@@ -67,7 +67,7 @@ getRawEntry() {
 # getEntry dictionary entry
 # Like getRawEntry but strips " and ending ';'
 getEntry() {
-    getRawEntry $1 "$2" | sed -e 's/^"//'  -e 's/;$//' -e 's/"$//' 
+    getRawEntry $1 "$2" | sed -e 's/^"//'  -e 's/;$//' -e 's/"$//'
 }
 
 # getKey entryLine
@@ -78,7 +78,7 @@ getKey() {
 
 
 # setRawEntry dictionary entry newValue
-# Replaces value of entry 
+# Replaces value of entry
 setRawEntry() {
     oldNumLine=`getNumberedLine $1 "$2"`
     lineNo=`echo "$oldNumLine" | sed -e 's/:.*//'`

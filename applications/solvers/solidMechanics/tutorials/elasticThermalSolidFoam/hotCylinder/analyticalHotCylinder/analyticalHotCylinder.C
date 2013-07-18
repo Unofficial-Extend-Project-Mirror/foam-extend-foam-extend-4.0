@@ -26,7 +26,7 @@ Description
     Generate analytical solution for a thick-walled cylinder with a
     temperature gradient.
     Temperature field T and stress field sigma and generated.
-    Based on solution outlined in Timoshenko, Theory of Elasticity. 
+    Based on solution outlined in Timoshenko, Theory of Elasticity.
 
 Author
     philip.cardiff@ucd.ie
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
        << "\n\tu = 0.3"
        << "\n\talpha = 1e-5"
        << nl << endl;
- 
+
   //- inner and outer radii and temperatures
   scalar a = 0.5;
   scalar b = 0.7;
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
      mesh,
      dimensionedScalar("zero", dimTemperature, 0.0)
      );
-  
+
   const volVectorField& C = mesh.C();
 
   //- radial coordinate
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
       forAll(sigmaR.boundaryField()[patchi], facei)
 	{
 	  const scalar& r = radii.boundaryField()[patchi][facei];
-	  
+
 	  sigmaR.boundaryField()[patchi][facei] =
 	    ( (alpha*E*(Ti-To))/(2*(1-nu)*Foam::log(b/a)) ) *
 	    ( -Foam::log(b/r) - ( a*a/(b*b - a*a))*(1 - (b*b)/(r*r))*Foam::log(b/a) );
@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
       forAll(sigmaTheta.boundaryField()[patchi], facei)
 	{
 	  const scalar& r = radii.boundaryField()[patchi][facei];
-	  
+
 	  sigmaTheta.boundaryField()[patchi][facei] =
 	    ( (alpha*E*(Ti-To))/(2*(1-nu)*Foam::log(b/a)) ) *
 	    (1 -Foam::log(b/r) - ( a*a/(b*b - a*a))*(1 + (b*b)/(r*r))*Foam::log(b/a) );
@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
       // 	( (alpha*E*(Ti-To))/(2*(1-nu)*Foam::log(b/a)) ) *
       // 	(1 - 2*Foam::log(b/r) - ( 2*a*a/(b*b - a*a))*Foam::log(b/a));
 
-      sigmaZ.internalField()[celli] = 
+      sigmaZ.internalField()[celli] =
 	0.3*(sigmaR.internalField()[celli] + sigmaTheta.internalField()[celli])
 	- E*alpha*(T.internalField()[celli]);
     }
@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
 	  //(1 - 2*Foam::log(b/r) - ( 2*a*a/(b*b - a*a))*Foam::log(b/a));
 
 	  //-for general 2-D plain strain problems, the axial stress is given by this:
-	  sigmaZ.boundaryField()[patchi][facei] = 
+	  sigmaZ.boundaryField()[patchi][facei] =
 	    nu*(sigmaR.boundaryField()[patchi][facei] + sigmaTheta.boundaryField()[patchi][facei])
 	    - E*alpha*(T.boundaryField()[patchi][facei]);
 	}
@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
 	{
 	  const scalar& x = mesh.C().boundaryField()[patchi][facei][vector::X];
 	  const scalar& y = mesh.C().boundaryField()[patchi][facei][vector::Y];
-	  
+
 	  theta.boundaryField()[patchi][facei] = Foam::atan(y/x);
 	}
     }
@@ -321,7 +321,7 @@ int main(int argc, char *argv[])
       forAll(rotMat.boundaryField()[patchi], facei)
 	{
 	  const scalar& t = theta.boundaryField()[patchi][facei];
-	  
+
 	  rotMat.boundaryField()[patchi][facei] =  tensor(::cos(t), ::sin(t), 0,
 					     -::sin(t), ::cos(t), 0,
 					     0, 0, 1);
@@ -359,7 +359,7 @@ int main(int argc, char *argv[])
 
       //-for general 2-D plain strain problems, the axial stress is given by this:
       //- (which is not equal to the solution by Timoshenko... hmmmnn)
-//       sigma.internalField()[celli][symmTensor::ZZ] = 
+//       sigma.internalField()[celli][symmTensor::ZZ] =
 // 	0.3*(sigma.internalField()[celli][symmTensor::XX] + sigma.internalField()[celli][symmTensor::YY])
 // 	- E*alpha*(T.internalField()[celli]);
     }
@@ -388,7 +388,7 @@ int main(int argc, char *argv[])
   sigma.write();
 
   Info << nl << "End" << endl;
-      
+
   return 0;
 }
 

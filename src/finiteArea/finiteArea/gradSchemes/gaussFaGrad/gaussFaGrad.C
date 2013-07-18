@@ -101,7 +101,7 @@ void gaussGrad<Type>::correctBoundaryConditions
                 /vsf.mesh().magLe().boundaryField()[patchI];
 
             // Zeljko Tukovic
-//             gGrad.boundaryField()[patchI] = 
+//             gGrad.boundaryField()[patchI] =
 //                 m*vsf.boundaryField()[patchI].snGrad();
 
             //HJ Not sure: should this be a complete correction or just the

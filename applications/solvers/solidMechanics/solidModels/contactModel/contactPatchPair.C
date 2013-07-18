@@ -106,7 +106,7 @@ Foam::contactPatchPair::contactPatchPair
        << "\n\t\tmaster patch:\t" << masterPatch_.name()
        << "\n\t\tslave patch:\t" << slavePatch_.name()
        << endl;
-  
+
   if(rigidMaster_)
     Info << "\t\tThe master surface is considered rigid and is set as traction-free" << endl;
 
@@ -193,9 +193,9 @@ Foam::contactPatchPair::masterTouchFraction() const
 
   scalarField pDistToInter(cp_.mesh().boundaryMesh()[masterPatch_.index()].size(), 0.0);
   //    = slaveToMasterInterpolateDeformed.pointDistanceToIntersection();
-  
+
   scalarField vertexMasterGap =  pDistToInter;
- 
+
 // Calculate area in contact
     const faceList& masterPatchLocalFaces =
         mesh.boundaryMesh()[masterPatch_.index()].localFaces();
@@ -234,7 +234,7 @@ Foam::contactPatchPair::slaveTouchFraction() const
 
   scalarField vertexSlaveGap = slavePointPenetration_;
   //    (cp_.mesh().boundaryMesh()[slavePatch_.index()].size(), 0.0);
-    
+
   // Calculate area in contact
     const faceList& slavePatchLocalFaces =
       mesh.boundaryMesh()[slavePatch_.index()].localFaces();
@@ -275,7 +275,7 @@ Foam::contactPatchPair::masterGapPoints() const
 
   scalarField vertexMasterGap = masterPointPenetration_;
   //globalMasterPointPenetration;
-   
+
     tmp<scalarField> tcontactGapPoints
     (
 	  new scalarField(vertexMasterGap.size(), 0)
@@ -324,18 +324,18 @@ Foam::contactPatchPair::masterPointForce() const
      cp_.mesh().boundaryMesh()[masterPatch_.index()].meshPoints().size(),
      vector::zero
      );
-  
+
   tmp<vectorField> tcontactPointForce
     (
      new vectorField(masterPointForce.size(), vector::zero)
      );
   vectorField& contactPointForce = tcontactPointForce();
-  
+
   forAll (contactPointForce, pointI)
     {
       contactPointForce[pointI] = masterPointForce[pointI];
     }
-  
+
   return tcontactPointForce;
 }
 
@@ -344,21 +344,21 @@ Foam::contactPatchPair::masterPointForce() const
 
 Foam::tmp<Foam::vectorField>
 Foam::contactPatchPair::slavePointForce() const
-{ 
+{
   vectorField slavePointForce = totalSlavePointForce_;
-  
+
   tmp<vectorField> tcontactPointForce
     (
      new vectorField(slavePointForce.size(), vector::zero)
      );
-  
+
   vectorField& contactPointForce = tcontactPointForce();
 
   forAll (contactPointForce, pointI)
     {
       contactPointForce[pointI] = slavePointForce[pointI];
     }
-  
+
   return tcontactPointForce;
 }
 

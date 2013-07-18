@@ -30,7 +30,7 @@ Description
     or one set of directions per cell.
 
     Used in splitting cells.
-    Either all cells have similar refinement direction ('global') or 
+    Either all cells have similar refinement direction ('global') or
     direction is dependent on local cell geometry. Controlled by dictionary.
 
 SourceFiles

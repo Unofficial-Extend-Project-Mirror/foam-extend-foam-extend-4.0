@@ -27,7 +27,7 @@ Class
 
 Description
     jplot graph output
-  
+
 SourceFiles
     jplotGraph.C
 

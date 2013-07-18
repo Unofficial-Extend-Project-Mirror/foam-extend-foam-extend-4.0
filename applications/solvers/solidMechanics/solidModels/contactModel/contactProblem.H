@@ -135,7 +135,7 @@ public:
 
         //- Return contact pressure field
         tmp<volScalarField> contactPressure() const;
-        
+
          //- Return a list of contact patch pair names
          wordList names() const;
 

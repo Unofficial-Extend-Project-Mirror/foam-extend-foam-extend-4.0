@@ -77,7 +77,7 @@ Foam::HormannAgathos::evaluate(const point2D& R) const
 
     label indexI   = P_.size()-1;
     label indexIp1 = indexI;
- 
+
     // if P[0].y == R.y) &&  P[0].x == R.x
     if
     (
@@ -95,7 +95,7 @@ Foam::HormannAgathos::evaluate(const point2D& R) const
             indexI = indexIp1;
             indexIp1 = i;
 
-            // if P[i+1].y == R.y 
+            // if P[i+1].y == R.y
             if(equalWithTol(P_[indexIp1].y(), R.y()))
             {
                 // if P[i+1].x == R.x
@@ -117,7 +117,7 @@ Foam::HormannAgathos::evaluate(const point2D& R) const
                     retVal = POINT_ON_EDGE;
                     break;
                 }
-                    
+
             }
 
             // From here, I am not sure if I still need to use the
@@ -166,10 +166,10 @@ Foam::HormannAgathos::evaluate(const point2D& R) const
                         // from an edge, the smallest determinant
                         // should be of the order of
                         // 2*(2*epsilon*2epsilon) = 8*epsilon^2
-                        if(mag(detI) < determinantTol)  
+                        if(mag(detI) < determinantTol)
                         {
                             retVal = POINT_ON_EDGE;
-                            break;    
+                            break;
                         }
 
                         // if right_crossing
@@ -208,8 +208,8 @@ Foam::HormannAgathos::evaluate(const point2D& R) const
                     // of 2*(2*epsilon*2epsilon) = 8*epsilon^2
                     if (mag(detI) < determinantTol)
                     {
-                        retVal = POINT_ON_EDGE; 
-                        break;    
+                        retVal = POINT_ON_EDGE;
+                        break;
                     }
 
                     // if right_crossing

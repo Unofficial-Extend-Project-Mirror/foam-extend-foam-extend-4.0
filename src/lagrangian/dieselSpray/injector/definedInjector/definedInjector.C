@@ -112,7 +112,7 @@ Foam::definedInjector::definedInjector
 
     // Normalize the direction vector
     direction_ /= mag(direction_);
-    
+
     setTangentialVectors();
 
     // check molar fractions
@@ -174,7 +174,7 @@ Foam::label Foam::definedInjector::nParcelsToInject
 
     scalar mInj = mass_*(fractionOfInjection(time1)-fractionOfInjection(time0));
     label nParcels = label(mInj/averageParcelMass_ + 0.49);
-    
+
     return nParcels;
 }
 
@@ -214,7 +214,7 @@ Foam::vector Foam::definedInjector::position
         scalar iAngle = 2.0*mathematicalConstant::pi*rndGen.scalar01();
 
         return
-        ( 
+        (
             position_
           + iRadius
           * (
@@ -222,7 +222,7 @@ Foam::vector Foam::definedInjector::position
             + tangentialInjectionVector2_*sin(iAngle)
           )
         );
-        
+
     }
 
     return position_;
@@ -257,7 +257,7 @@ Foam::scalar Foam::definedInjector::mass
 {
     scalar mInj = mass_*(fractionOfInjection(time1)-fractionOfInjection(time0));
 
-    // correct mass if calculation is 2D 
+    // correct mass if calculation is 2D
     if (twoD)
     {
         mInj *= 0.5*angleOfWedge/mathematicalConstant::pi;

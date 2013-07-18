@@ -89,10 +89,10 @@ export QT_THIRD_PARTY=1
 
 # Compile the ThirdParty packages
 cd $WM_PROJECT_DIR/ThirdParty
-./AllMake.stage1 >& log.AllMake.stage1 
+./AllMake.stage1 >& log.AllMake.stage1
 #./AllMake.stage2 >& log.AllMake.stage2   # No need for this one
-./AllMake.stage3 >& log.AllMake.stage3 
-./AllMake.stage4 >& log.AllMake.stage4 
+./AllMake.stage3 >& log.AllMake.stage3
+./AllMake.stage4 >& log.AllMake.stage4
 
 --------------------------------------------------------------------------------
 
@@ -102,7 +102,7 @@ cd $WM_PROJECT_DIR/ThirdParty
 
 # Compile OpenFOAM-1.6-ext
 cd $WM_PROJECT_DIR
-./Allwmake >& log.Allwmake &  
+./Allwmake >& log.Allwmake &
 tail -f log.Allwmake          # To keep an eye on the compilation process
 
 --------------------------------------------------------------------------------

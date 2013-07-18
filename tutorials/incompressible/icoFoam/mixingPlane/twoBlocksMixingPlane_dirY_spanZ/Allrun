@@ -1,10 +1,10 @@
 #!/bin/bash
-# 
+#
 #set -x
 
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
-# Load additional RunFunctions 
+# Load additional RunFunctions
 . ./RunFunctionsSupplemental
 
 export caseName=`basename $PWD`
@@ -28,7 +28,7 @@ then
 	--coordinateSystemType           coordinateSystem \
 	--coordinateSystemOrigin         "(0 0 0.005)"    \
 	--coordinateSystemE1             "(1 0 0)"        \
-	--coordinateSystemE3             "(0 0 1)"        
+	--coordinateSystemE3             "(0 0 1)"
 
     pyFoamChangeMixingPlaneBoundary.py . mixpRightIn      \
 	--shadowPatch                    mixpLeftOut      \
@@ -37,7 +37,7 @@ then
 	--coordinateSystemType           coordinateSystem \
 	--coordinateSystemOrigin         "(0 0 0.005)"    \
 	--coordinateSystemE1             "(1 0 0)"        \
-	--coordinateSystemE3             "(0 0 1)"        
+	--coordinateSystemE3             "(0 0 1)"
 else
     echo "pyFoamChangeMixingPlaneBoundary.py is missing. Using the file constant/polyMesh/boundary.preconfigured"
     cp constant/polyMesh/boundary.preconfigured constant/polyMesh/boundary

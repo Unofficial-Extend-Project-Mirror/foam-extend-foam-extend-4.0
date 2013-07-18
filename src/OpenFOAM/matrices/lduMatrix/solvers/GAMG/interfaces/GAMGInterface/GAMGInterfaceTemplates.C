@@ -80,7 +80,7 @@ Foam::tmp<Foam::CoeffField<Type> > Foam::GAMGInterface::agglomerateBlockCoeffs
     {
         linearTypeField& activeCoarseCoeffs = coarseCoeffs.asLinear();
         const linearTypeField& activeFineCoeffs = fineCoeffs.asLinear();
-        
+
         activeCoarseCoeffs *= 0.0;
 
         // Added weights to account for non-integral matching
@@ -88,7 +88,7 @@ Foam::tmp<Foam::CoeffField<Type> > Foam::GAMGInterface::agglomerateBlockCoeffs
         {
             activeCoarseCoeffs[restrictAddressing_[ffi]] +=
                 restrictWeights_[ffi]*activeFineCoeffs[fineAddressing_[ffi]];
-        } 
+        }
     }
 
     return tcoarseCoeffs;

@@ -24,7 +24,7 @@
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedVector("zero", dimLength, vector::zero)	
+        dimensionedVector("zero", dimLength, vector::zero)
     );
 
     volSymmTensorField DEpsilon

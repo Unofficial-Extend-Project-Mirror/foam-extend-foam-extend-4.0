@@ -64,7 +64,7 @@ SET(testId "ECD_Allclean_cases${testIdSuffix}")
 ADD_TEST(${testId} bash -c "cd ${TEST_CASE_DIR}/${TESTCASES_SUBDIR}; ./Allclean")
 
 # Next, recurse through the case root directory,
-# find all the Allrun files, and execute them 
+# find all the Allrun files, and execute them
 FILE(GLOB_RECURSE listofCasesWithAllrun ${TEST_CASE_DIR}/Allrun)
 LIST(SORT listofCasesWithAllrun)
 

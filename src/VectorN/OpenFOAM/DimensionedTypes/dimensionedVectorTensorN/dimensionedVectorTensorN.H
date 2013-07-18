@@ -78,7 +78,7 @@ inline dimensioned< returnType > fun(const dimensioned< type >& t);
 dimensioned< returnType > op(const dimensioned< type1 >&,                           \
     const dimensioned< type2 >&);
 
-    
+
 #define dimensionedType_Funs(tensorType, diagTensorType,                            \
     sphericalTensorType, vectorType, cmptType, args...)                             \
                                                                                     \
@@ -105,7 +105,7 @@ BINARY_OPERATOR(tensorType, tensorType, sphericalTensorType, operator-, -)      
 BINARY_OPERATOR(tensorType, sphericalTensorType, tensorType, operator-, -)          \
 BINARY_OPERATOR(diagTensorType, diagTensorType, sphericalTensorType, operator-, -)  \
 BINARY_OPERATOR(diagTensorType, sphericalTensorType, diagTensorType, operator-, -)
-                                                                                    
+
 
 forAllVectorTensorNTypes(dimensionedType_Funs)
 

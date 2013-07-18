@@ -75,7 +75,7 @@ void Foam::vtkFoam::addInternalMesh
     {
         const cellModel& model = cellShapes[cellI].model();
 
-        if 
+        if
         (
             model != hex
          && model != wedge

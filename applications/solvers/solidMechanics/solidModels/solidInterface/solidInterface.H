@@ -62,7 +62,7 @@ namespace Foam
 class solidInterface
 {
     // Private data
-    
+
         const fvMesh& mesh_;
 
         const rheologyModel& rheology_;
@@ -102,7 +102,7 @@ class solidInterface
     // Private Member Functions
 
         // Make demand-driven data
-    
+
         //- Make sub-mesh
         void makeSubMesh() const;
 
@@ -149,11 +149,11 @@ public:
     );
 
     // Destructor
-    ~solidInterface();  
+    ~solidInterface();
 
     // Member Functions
 
-    const fvMeshSubset& subMesh() const;    
+    const fvMeshSubset& subMesh() const;
 
     const labelList& globalInterFaces() const;
 
@@ -175,7 +175,7 @@ public:
 
     void modifyProperties
     (
-        surfaceScalarField& muf, 
+        surfaceScalarField& muf,
         surfaceScalarField& lambdaf
     ) const;
 

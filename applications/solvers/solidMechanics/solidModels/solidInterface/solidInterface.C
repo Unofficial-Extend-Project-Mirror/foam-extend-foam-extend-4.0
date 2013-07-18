@@ -66,8 +66,8 @@ void solidInterface::makeSubMesh() const
             << "sub-mesh already exist"
             << abort(FatalError);
     }
-    
-    const volScalarField& materials = 
+
+    const volScalarField& materials =
         mesh_.lookupObject<volScalarField>("materials");
 
     const scalarField& materialsI = materials.internalField();
@@ -79,9 +79,9 @@ void solidInterface::makeSubMesh() const
 
     forAll(neighbour, faceI)
     {
-        if 
+        if
         (
-            mag(materialsI[neighbour[faceI]] - materialsI[owner[faceI]]) 
+            mag(materialsI[neighbour[faceI]] - materialsI[owner[faceI]])
           > SMALL
         )
         {
@@ -141,10 +141,10 @@ void solidInterface::makeGlobalInterFaces() const
             << "global inter-faces addressing already exist"
             << abort(FatalError);
     }
-    
+
     if (mesh_.foundObject<volScalarField>("materials"))
     {
-        const volScalarField& materials = 
+        const volScalarField& materials =
             mesh_.lookupObject<volScalarField>("materials");
 
         const scalarField& materialsI = materials.internalField();
@@ -153,19 +153,19 @@ void solidInterface::makeGlobalInterFaces() const
         const unallocLabelList& neighbour = mesh_.neighbour();
 
         labelHashSet interFacesSet;
-        
+
         forAll(neighbour, faceI)
         {
-            if 
+            if
             (
-                mag(materialsI[neighbour[faceI]] - materialsI[owner[faceI]]) 
+                mag(materialsI[neighbour[faceI]] - materialsI[owner[faceI]])
               > SMALL
             )
             {
                 interFacesSet.insert(faceI);
             }
         }
-        
+
         globalInterFacesPtr_ = new labelList(interFacesSet.toc());
 
         faceSet faMeshSet(mesh_, "faMeshSet", interFacesSet);
@@ -195,8 +195,8 @@ void solidInterface::makeLocalInterFaces() const
             << "local inter-faces addressing already exist"
             << abort(FatalError);
     }
-    
-    const volScalarField& materials = 
+
+    const volScalarField& materials =
         mesh_.lookupObject<volScalarField>("materials");
 
     volScalarField subMaterials = subMesh().interpolate(materials);
@@ -212,9 +212,9 @@ void solidInterface::makeLocalInterFaces() const
 
     forAll(neighbour, faceI)
     {
-        if 
+        if
         (
-            mag(materialsI[neighbour[faceI]] - materialsI[owner[faceI]]) 
+            mag(materialsI[neighbour[faceI]] - materialsI[owner[faceI]])
           > SMALL
         )
         {
@@ -243,7 +243,7 @@ void solidInterface::makeInterfaceDisplacement() const
             << "interface displacement field already exist"
             << abort(FatalError);
     }
-    
+
     interfaceUPtr_ = new vectorField(globalInterFaces().size(), vector::zero);
 }
 
@@ -268,7 +268,7 @@ void solidInterface::makeProcessorPatches() const
 
     if (mesh_.foundObject<volScalarField>("materials"))
     {
-        const volScalarField& materials = 
+        const volScalarField& materials =
             mesh_.lookupObject<volScalarField>("materials");
 
         labelHashSet processorPatches;
@@ -277,7 +277,7 @@ void solidInterface::makeProcessorPatches() const
         {
             if (mesh_.boundary()[patchI].type() == processorFvPatch::typeName)
             {
-                scalarField ownMat = 
+                scalarField ownMat =
                     materials.boundaryField()[patchI].patchInternalField();
 
                 scalarField ngbMat =
@@ -328,17 +328,17 @@ void solidInterface::makeProcessorPatchFaces() const
 
     forAll(procPatches, patchI)
     {
-        const volScalarField& materials = 
+        const volScalarField& materials =
             mesh_.lookupObject<volScalarField>("materials");
 
         label curProcPatch = procPatches[patchI];
 
-        scalarField ownMat = 
+        scalarField ownMat =
             materials.boundaryField()[curProcPatch].patchInternalField();
 
         scalarField ngbMat =
             materials.boundaryField()[curProcPatch].patchNeighbourField();
-        
+
         labelHashSet curProcPatchFaces;
 
         forAll(ownMat, faceI)
@@ -346,7 +346,7 @@ void solidInterface::makeProcessorPatchFaces() const
             if (mag(ownMat[faceI] - ngbMat[faceI]) > SMALL)
             {
                 curProcPatchFaces.insert(faceI);
-            }    
+            }
         }
 
         processorPatchFaces[patchI] = labelList(curProcPatchFaces.toc());
@@ -372,7 +372,7 @@ void solidInterface::makeProcessorInterfaceDisplacement() const
             << abort(FatalError);
     }
 
-    processorInterfaceUPtr_ = 
+    processorInterfaceUPtr_ =
         new FieldField<Field, vector>(processorPatches().size());
     FieldField<Field, vector>& processorInterfaceU = *processorInterfaceUPtr_;
 
@@ -380,7 +380,7 @@ void solidInterface::makeProcessorInterfaceDisplacement() const
     {
         processorInterfaceU.set
         (
-            patchI, 
+            patchI,
             new vectorField(processorPatchFaces()[patchI].size(), vector::zero)
         );
     }
@@ -405,17 +405,17 @@ void solidInterface::makeIndicator() const
             << abort(FatalError);
     }
 
-    indicatorPtr_ = 
+    indicatorPtr_ =
         new List<labelPair>(globalInterFaces().size(), labelPair(0, 0));
 
-    List<labelPair>& indicator = *indicatorPtr_;    
+    List<labelPair>& indicator = *indicatorPtr_;
 
     const unallocLabelList& owner = mesh_.owner();
     const unallocLabelList& neighbour = mesh_.neighbour();
 
     if (mesh_.foundObject<volScalarField>("materials"))
     {
-        const volScalarField& materials = 
+        const volScalarField& materials =
             mesh_.lookupObject<volScalarField>("materials");
 
         forAll(globalInterFaces(), faceI)
@@ -423,7 +423,7 @@ void solidInterface::makeIndicator() const
             label curFace = globalInterFaces()[faceI];
 
             labelPair& curPair = indicator[faceI];
-            
+
             if (materials[owner[curFace]] < materials[neighbour[curFace]])
             {
 	      curPair.first() = int(materials[owner[curFace]]);
@@ -601,7 +601,7 @@ void solidInterface::correct(fvVectorMatrix& UEqn)
     const volVectorField& U = UEqn.psi();
     const vectorField& UI = U.internalField();
 
-    const volTensorField& gradU = 
+    const volTensorField& gradU =
         mesh_.lookupObject<volTensorField>("grad(" + U.name() + ')');
     const tensorField& gradUI = gradU.internalField();
 
@@ -717,7 +717,7 @@ void solidInterface::correct(fvVectorMatrix& UEqn)
 
         // Interface displacement
 
-        vector curInterUt = 
+        vector curInterUt =
             (
                 ownMu*ownUt*ngbDn + ngbMu*ngbUt*ownDn
               + ownDn*ngbDn*(ngbMu*ngbSGradUn - ownMu*ownSGradUn)
@@ -759,12 +759,12 @@ void solidInterface::correct(fvVectorMatrix& UEqn)
 
         source[curOwner] +=
             (
-                ownK*ngbDn*ngbLambda*ngbTrSGradUt 
+                ownK*ngbDn*ngbLambda*ngbTrSGradUt
               + ngbK*ownDn*ownLambda*ownTrSGradUt
             )*ownN*magS
            /(ownK*ngbDn + ngbK*ownDn)
           + (
-              ownMu*ngbMu*ngbDn*ngbSGradUn 
+              ownMu*ngbMu*ngbDn*ngbSGradUn
             + ownMu*ngbMu*ownDn*ownSGradUn
             )*magS
            /(ownMu*ngbDn + ngbMu*ownDn);
@@ -778,12 +778,12 @@ void solidInterface::correct(fvVectorMatrix& UEqn)
 
         source[curNeighbour] -=
             (
-                ownK*ngbDn*ngbLambda*ngbTrSGradUt 
+                ownK*ngbDn*ngbLambda*ngbTrSGradUt
               + ngbK*ownDn*ownLambda*ownTrSGradUt
             )*ownN*magS
            /(ownK*ngbDn + ngbK*ownDn)
           + (
-              ownMu*ngbMu*ngbDn*ngbSGradUn 
+              ownMu*ngbMu*ngbDn*ngbSGradUn
             + ownMu*ngbMu*ownDn*ownSGradUn
             )*magS
            /(ownMu*ngbDn + ngbMu*ownDn);
@@ -792,12 +792,12 @@ void solidInterface::correct(fvVectorMatrix& UEqn)
 
 
     // Processor faces
-    
+
     forAll(processorPatchFaces(), patchI)
     {
         label curPatch = processorPatches()[patchI];
 
-        vectorField& curProcInterU = 
+        vectorField& curProcInterU =
             processorInterfaceDisplacement()[patchI];
 
         const vectorField curProcOwnU =
@@ -828,7 +828,7 @@ void solidInterface::correct(fvVectorMatrix& UEqn)
             lambda.boundaryField()[curPatch].patchInternalField();
         const scalarField curProcNgbLambda =
             lambda.boundaryField()[curPatch].patchNeighbourField();
-        
+
         const unallocLabelList& curProcFaceCells =
             mesh_.boundary()[curPatch].faceCells();
 
@@ -868,7 +868,7 @@ void solidInterface::correct(fvVectorMatrix& UEqn)
 
             // Interface displacement
 
-            vector curInterUt = 
+            vector curInterUt =
             (
                 ownMu*ownUt/ownDn + ngbMu*ngbUt/ngbDn
               - (ngbMu*ngbSGradUn + ownMu*ownSGradUn)
@@ -889,13 +889,13 @@ void solidInterface::correct(fvVectorMatrix& UEqn)
             // Implicit coupling
 
             scalar wRevLin = 1.0 - curProcW[curFace];
-                
+
             scalar ownK = (2*ownMu + ownLambda);
             scalar ngbK = (2*ngbMu + ngbLambda);
-                
+
             scalar Kf = 1.0/(wRevLin/ownK + (1.0-wRevLin)/ngbK);
             scalar muf = 1.0/(wRevLin/ownMu + (1.0-wRevLin)/ngbMu);
-                
+
             scalar Dnf = 1.0/curProcDeltaCoeffs[curFace];
 
             // Owner
@@ -922,14 +922,14 @@ void solidInterface::correct(fvVectorMatrix& UEqn)
 
 void solidInterface::modifyProperties
 (
-    surfaceScalarField& muf, 
+    surfaceScalarField& muf,
     surfaceScalarField& lambdaf
 ) const
 {
     forAll(globalInterFaces(), faceI)
     {
         label curGlobalFace = globalInterFaces()[faceI];
-        
+
         muf.internalField()[curGlobalFace] = 0;
         lambdaf.internalField()[curGlobalFace] = 0;
     }
@@ -964,7 +964,7 @@ tmp<volTensorField> solidInterface::grad(volVectorField& U) const
                 IOobject::NO_WRITE
             ),
             mesh_,
-            dimensionedTensor("zero", dimless, tensor::zero)        
+            dimensionedTensor("zero", dimless, tensor::zero)
         )
     );
     volTensorField& gradU = tGradU();
@@ -978,10 +978,10 @@ tmp<volTensorField> solidInterface::grad(volVectorField& U) const
     {
         const skewCorrectionVectors& scv = skewCorrectionVectors::New(mesh_);
 
-        const volTensorField& gradU = 
+        const volTensorField& gradU =
             mesh_.lookupObject<volTensorField>("grad(" + U.name() + ')');
 
-        Uf += 
+        Uf +=
         (
             scv()
           & linear<tensor>(mesh_).interpolate
@@ -990,7 +990,7 @@ tmp<volTensorField> solidInterface::grad(volVectorField& U) const
             )
         );
 
-//         Uf += 
+//         Uf +=
 //         (
 //             scv()
 //           & linear<tensor>(mesh_).interpolate
@@ -1043,11 +1043,11 @@ tmp<symmTensorField> solidInterface::sigmaA() const
     const unallocLabelList& owner = mesh_.owner();
     const unallocLabelList& neighbour = mesh_.neighbour();
 
-    const volVectorField& U = 
+    const volVectorField& U =
         mesh_.lookupObject<volVectorField>("U");
     const vectorField& UI = U.internalField();
 
-    const volTensorField& gradU = 
+    const volTensorField& gradU =
         mesh_.lookupObject<volTensorField>("grad(" + U.name() + ')');
     const tensorField& gradUI = gradU.internalField();
 
@@ -1069,7 +1069,7 @@ tmp<symmTensorField> solidInterface::sigmaA() const
 
     if (mesh_.foundObject<volScalarField>("materials"))
     {
-        const volScalarField& materials = 
+        const volScalarField& materials =
             mesh_.lookupObject<volScalarField>("materials");
 
         tensorField gradUA(sigmaA.size(), tensor::zero);
@@ -1108,7 +1108,7 @@ tmp<symmTensorField> solidInterface::sigmaA() const
 //             {
 //                 label curFace = globalInterFaces()[faceI];
 //                 label index = findIndex(faceLabels, curFace);
-                
+
 //                 Us.internalField()[index] = interU[faceI];
 //             }
 //             Us.correctBoundaryConditions();
@@ -1118,7 +1118,7 @@ tmp<symmTensorField> solidInterface::sigmaA() const
 //             {
 //                 label curFace = globalInterFaces()[faceI];
 //                 label index = findIndex(faceLabels, curFace);
-                
+
 //                 interSGradU[faceI] = sGradU[index];
 //             }
 //         }
@@ -1162,11 +1162,11 @@ tmp<symmTensorField> solidInterface::sigmaB() const
     const unallocLabelList& owner = mesh_.owner();
     const unallocLabelList& neighbour = mesh_.neighbour();
 
-    const volVectorField& U = 
+    const volVectorField& U =
         mesh_.lookupObject<volVectorField>("U");
     const vectorField& UI = U.internalField();
 
-    const volTensorField& gradU = 
+    const volTensorField& gradU =
         mesh_.lookupObject<volTensorField>("grad(" + U.name() + ')');
     const tensorField& gradUI = gradU.internalField();
 
@@ -1188,13 +1188,13 @@ tmp<symmTensorField> solidInterface::sigmaB() const
 
     if (mesh_.foundObject<volScalarField>("materials"))
     {
-        const volScalarField& materials = 
+        const volScalarField& materials =
             mesh_.lookupObject<volScalarField>("materials");
 
         tensorField gradUB(sigmaB.size(), tensor::zero);
         scalarField muB(sigmaB.size(), 0);
         scalarField lambdaB(sigmaB.size(), 0);
-        
+
 //         // Calc surface gradient using FAM
 //         tensorField interSGradU(interU.size(), tensor::zero);
 //         {
@@ -1227,7 +1227,7 @@ tmp<symmTensorField> solidInterface::sigmaB() const
 //             {
 //                 label curFace = globalInterFaces()[faceI];
 //                 label index = findIndex(faceLabels, curFace);
-                
+
 //                 Us.internalField()[index] = interU[faceI];
 //             }
 //             Us.correctBoundaryConditions();
@@ -1237,7 +1237,7 @@ tmp<symmTensorField> solidInterface::sigmaB() const
 //             {
 //                 label curFace = globalInterFaces()[faceI];
 //                 label index = findIndex(faceLabels, curFace);
-                
+
 //                 interSGradU[faceI] = sGradU[index];
 //             }
 //         }
@@ -1289,7 +1289,7 @@ const List<labelPair>& solidInterface::indicator() const
 
 void solidInterface::correctGrad
 (
-    const volVectorField& U, 
+    const volVectorField& U,
     volTensorField& gradU
 ) const
 {
@@ -1311,11 +1311,11 @@ void solidInterface::correctGrad
         Us.internalField()[curFace] = interU[faceI];
     }
 
-    volTensorField gaussGradU = 
+    volTensorField gaussGradU =
         fv::gaussGrad<vector>(sMesh).grad(Us);
     fv::gaussGrad<vector>(sMesh).correctBoundaryConditions
     (
-        subU, 
+        subU,
         gaussGradU
     );
 
@@ -1324,7 +1324,7 @@ void solidInterface::correctGrad
         label curFace = localInterFaces()[faceI];
 
         gradU.internalField()
-            [subMesh().cellMap()[owner[curFace]]] = 
+            [subMesh().cellMap()[owner[curFace]]] =
             gaussGradU.internalField()[owner[curFace]];
 
         gradU.internalField()

@@ -145,7 +145,7 @@ public:
 #ifdef NoRepository
 #   include "BlockCoeffNorm.C"
 #endif
-    
+
 #define makeBlockCoeffNorm(BlockCoeffNormType, typeBlockCoeffNormType)        \
                                                                               \
 defineNamedTemplateTypeNameAndDebug(typeBlockCoeffNormType, 0);               \
@@ -156,7 +156,7 @@ addToRunTimeSelectionTable(BlockCoeffNormType, typeBlockCoeffNormType, dictionar
                                                                               \
 makeBlockCoeffNorm(blockScalarCoeffNorm, blockCoeffNormType##Scalar);         \
 makeBlockCoeffNorm(blockVectorCoeffNorm, blockCoeffNormType##Vector);         \
-makeBlockCoeffNorm(blockTensorCoeffNorm, blockCoeffNormType##Tensor);          
+makeBlockCoeffNorm(blockTensorCoeffNorm, blockCoeffNormType##Tensor);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

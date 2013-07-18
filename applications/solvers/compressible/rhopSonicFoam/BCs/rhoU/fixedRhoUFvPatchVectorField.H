@@ -66,7 +66,7 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given fixedRhoUFvPatchVectorField 
+        //- Construct by mapping given fixedRhoUFvPatchVectorField
         //  onto a new patch
         fixedRhoUFvPatchVectorField
         (

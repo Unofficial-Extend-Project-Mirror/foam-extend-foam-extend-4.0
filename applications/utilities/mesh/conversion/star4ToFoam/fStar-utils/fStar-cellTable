@@ -27,9 +27,9 @@ my %config = (
 #     @ARGV >= 2 or usage();
 #     ( $rootDir = shift @ARGV ) =~ s{/+$}{};
 #     ( $caseDir = shift @ARGV ) =~ s{/+$}{};
-# 
+#
 #     $caseDir = $rootDir . "/" . $caseDir;
-# 
+#
 #     -d $rootDir or die qq{cannot open root directory "$rootDir"\n};
 #     -d $caseDir or die qq{cannot open case directory "$caseDir"\n};
 # }
@@ -133,7 +133,7 @@ while (<>) {
 # remove any spaces, supress output for empty values
 sub output_entry {
     my ($k, $v) = @_;
-    
+
     $v =~ s/\s+//g;
     if (length $v) {
 	printf "    %-16s", $k;
@@ -149,7 +149,7 @@ my $header = do { local $/; <DATA> };
 {
     my %var = ( CASE => $config{caseDir} || "", OBJECT => "cellTable" );
     ( my $text = $header ) =~ s/%{\s*([_A-Z]+)\s*}/ $var{$1} || '' /eg;
-    
+
     print $text;
 }
 
@@ -166,7 +166,7 @@ for my $id ( sort { $a <=> $b } keys %cellTableInfo) {
 
     print "cellTableId_$id\n";
     print "{\n";
-    
+
     for my $k (@keys) {
 	output_entry( $k, $subDict->{$k} );
     }

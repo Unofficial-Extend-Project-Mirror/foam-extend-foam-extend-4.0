@@ -46,7 +46,7 @@ inline bool Foam::pointEdgePoint::update
         origin_ = w2.origin();
 
         return true;
-    }        
+    }
 
     scalar diff = distSqr_ - dist2;
 
@@ -71,7 +71,7 @@ inline bool Foam::pointEdgePoint::update
     }
 }
 
-    
+
 // Update this with w2 (information on same point)
 inline bool Foam::pointEdgePoint::update
 (
@@ -86,7 +86,7 @@ inline bool Foam::pointEdgePoint::update
         origin_ = w2.origin();
 
         return true;
-    }        
+    }
 
     scalar diff = distSqr_ - w2.distSqr();
 
@@ -124,7 +124,7 @@ inline Foam::pointEdgePoint::pointEdgePoint()
 // Construct from origin, distance
 inline Foam::pointEdgePoint::pointEdgePoint
 (
-    const point& origin, 
+    const point& origin,
     const scalar distSqr
 )
 :
@@ -229,14 +229,14 @@ inline bool Foam::pointEdgePoint::updatePoint
     const scalar tol
 )
 {
-    return 
+    return
         update
         (
             mesh.allPoints()[pointI],
             edgeInfo,
             tol
         );
-    }    
+    }
 
 
 // Update this with new information on same point
@@ -255,7 +255,7 @@ inline bool Foam::pointEdgePoint::updatePoint
             newPointInfo,
             tol
         );
-}    
+}
 
 
 // Update this with new information on same point. No extra information.
@@ -266,7 +266,7 @@ inline bool Foam::pointEdgePoint::updatePoint
 )
 {
     return update(newPointInfo, tol);
-}    
+}
 
 
 // Update this with information from connected point
@@ -292,7 +292,7 @@ inline bool Foam::pointEdgePoint::updateEdge
             pointInfo,
             tol
         );
-}    
+}
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //

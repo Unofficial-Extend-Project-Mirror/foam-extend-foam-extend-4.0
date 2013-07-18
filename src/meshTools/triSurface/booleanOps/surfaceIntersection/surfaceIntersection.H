@@ -171,7 +171,7 @@ class surfaceIntersection
         //    const point& eStart,
         //    const point& eEnd
         //);
-    
+
 
         //- Debugging: Dump intersected edges to stream
         void writeIntersectedEdges

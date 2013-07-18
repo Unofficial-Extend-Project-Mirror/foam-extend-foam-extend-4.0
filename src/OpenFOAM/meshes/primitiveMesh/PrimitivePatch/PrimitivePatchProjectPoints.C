@@ -446,11 +446,11 @@ projectFaceCentres
 
                     // Calculate the miss point.  This is
                     // cooked (illogical!) for fastest surface walk.
-                    // 
+                    //
                     PointType missPlanePoint =
                         curFaceCentre + curProjectionDir*curHit.distance();
 
-                    sqrDistance = 
+                    sqrDistance =
                         magSqr(missPlanePoint - masterFaceCentres[curFace]);
 
                     const labelList& masterNbrs = masterFaceFaces[curFace];

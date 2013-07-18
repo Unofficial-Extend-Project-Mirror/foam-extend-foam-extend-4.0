@@ -203,7 +203,7 @@ public:
     virtual const pointField& points() const = 0;
 
     //- Return list of faces for every cell
-    const faceListList & cellFaces() const 
+    const faceListList & cellFaces() const
     {
 	return cellFaces_;
     }

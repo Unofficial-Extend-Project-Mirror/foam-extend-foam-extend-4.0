@@ -28,7 +28,7 @@ Class
 Description
     saturate evaporation model.
     Characteristic time is calculated to immediately saturate the cell
-    It should be mentioned that this is coupled with the (implicit) way 
+    It should be mentioned that this is coupled with the (implicit) way
     evaporation is done in parcel, since the evaporation time depends
     on the integration step
 
@@ -115,15 +115,15 @@ public:
             const scalar Nusselt,
             const scalar deltaTemp,
             const scalar diameter,
-            const scalar, 
-            const scalar, 
-            const scalar, 
-            const scalar, 
-            const scalar, 
-            const scalar, 
-            const scalar, 
-            const scalar, 
-            const scalar 
+            const scalar,
+            const scalar,
+            const scalar,
+            const scalar,
+            const scalar,
+            const scalar,
+            const scalar,
+            const scalar,
+            const scalar
         ) const;
 
         inline label nEvapIter() const;

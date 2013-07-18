@@ -78,7 +78,7 @@ inline bool wallPointYPlus::update
         }
     }
 }
-    
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -124,7 +124,7 @@ inline bool wallPointYPlus::updateCell
         neighbourWallInfo,
         tol
     );
-}    
+}
 
 
 // Update this with w2 if w2 nearer to pt.
@@ -145,7 +145,7 @@ inline bool wallPointYPlus::updateFace
         neighbourWallInfo,
         tol
     );
-}    
+}
 
 
 // Update this with w2 if w2 nearer to pt.
@@ -165,7 +165,7 @@ inline bool wallPointYPlus::updateFace
         neighbourWallInfo,
         tol
     );
-}    
+}
 
 
 // ************************************************************************* //

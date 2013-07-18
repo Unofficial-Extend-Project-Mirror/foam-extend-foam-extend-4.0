@@ -32,7 +32,7 @@ namespace Foam
 {
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-    
+
 pointFieldDecomposer::patchFieldDecomposer::patchFieldDecomposer
 (
     const pointPatch& completeMeshPatch,

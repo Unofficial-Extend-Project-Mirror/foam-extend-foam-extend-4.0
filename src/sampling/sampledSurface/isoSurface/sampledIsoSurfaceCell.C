@@ -243,7 +243,7 @@ bool Foam::sampledIsoSurfaceCell::expire()
     {
         return false;
     }
-    
+
     // force update
     prevTimeIndex_ = -1;
     return true;

@@ -53,7 +53,7 @@ inline bool Foam::wallPoint::update
         origin_ = w2.origin();
 
         return true;
-    }        
+    }
 
     scalar diff = distSqr_ - dist2;
 
@@ -77,7 +77,7 @@ inline bool Foam::wallPoint::update
         return true;
     }
 }
-    
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -211,14 +211,14 @@ inline bool Foam::wallPoint::updateCell
     const scalar tol
 )
 {
-    return 
+    return
         update
         (
             mesh.cellCentres()[thisCellI],
             neighbourWallInfo,
             tol
         );
-    }    
+    }
 
 
 // Update this with w2 if w2 nearer to pt.
@@ -238,7 +238,7 @@ inline bool Foam::wallPoint::updateFace
             neighbourWallInfo,
             tol
         );
-}    
+}
 
 // Update this with w2 if w2 nearer to pt.
 inline bool Foam::wallPoint::updateFace
@@ -256,7 +256,7 @@ inline bool Foam::wallPoint::updateFace
             neighbourWallInfo,
             tol
         );
-}    
+}
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //

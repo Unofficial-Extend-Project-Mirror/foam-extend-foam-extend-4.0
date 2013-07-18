@@ -56,7 +56,7 @@ class uniformDiff
 private:
 
     // Private data
-    
+
         elementScalarField motionGamma_;
 
 

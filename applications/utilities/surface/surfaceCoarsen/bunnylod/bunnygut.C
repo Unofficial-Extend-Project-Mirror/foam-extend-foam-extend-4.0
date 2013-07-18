@@ -11,7 +11,7 @@
  */
 
 #include <windows.h>
-#include <stdio.h>  
+#include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -46,11 +46,11 @@ Quaternion model_orientation;  // orientation of bunny
 //       Map()
 //
 // When the model is rendered using a maximum of mx vertices
-// then it is vertices 0 through mx-1 that are used.  
-// We are able to do this because the vertex list 
+// then it is vertices 0 through mx-1 that are used.
+// We are able to do this because the vertex list
 // gets sorted according to the collapse order.
 // The Map() routine takes a vertex number 'a' and the
-// maximum number of vertices 'mx' and returns the 
+// maximum number of vertices 'mx' and returns the
 // appropriate vertex in the range 0 to mx-1.
 // When 'a' is greater than 'mx' the Map() routine
 // follows the chain of edge collapses until a vertex
@@ -64,9 +64,9 @@ Quaternion model_orientation;  // orientation of bunny
 //   to vertex number 7.  This number would have been stored
 //   in the collapse_map array (i.e. collapse_map[12]==7).
 //   Since vertex 7 is in range (less than max of 10) we
-//   will want to render the triangle 1,3,7.  
+//   will want to render the triangle 1,3,7.
 //   Pretend now that we want to limit ourselves to 5 vertices.
-//   and vertex 7 was collapsed to vertex 3 
+//   and vertex 7 was collapsed to vertex 3
 //   (i.e. collapse_map[7]==3).  Then triangle 1,3,12 would now be
 //   triangle 1,3,3.  i.e. this polygon was removed by the
 //   progressive mesh polygon reduction algorithm by the time
@@ -74,7 +74,7 @@ Quaternion model_orientation;  // orientation of bunny
 //   No need to draw a one dimensional polygon. :-)
 int Map(int a,int mx) {
 	if(mx<=0) return 0;
-	while(a>=mx) {  
+	while(a>=mx) {
 		a=collapse_map[a];
 	}
 	return a;
@@ -89,7 +89,7 @@ void DrawModelTriangles() {
 		int p1= Map(tri[i].v[1],render_num);
 		int p2= Map(tri[i].v[2],render_num);
 		// note:  serious optimization opportunity here,
-		//  by sorting the triangles the following "continue" 
+		//  by sorting the triangles the following "continue"
 		//  could have been made into a "break" statement.
 		if(p0==p1 || p1==p2 || p2==p0) continue;
 		renderpolycount++;
@@ -98,7 +98,7 @@ void DrawModelTriangles() {
 		int q0= Map(p0,(int)(render_num*lodbase));
 		int q1= Map(p1,(int)(render_num*lodbase));
 		int q2= Map(p2,(int)(render_num*lodbase));
-		Vector v0,v1,v2; 
+		Vector v0,v1,v2;
 		v0 = vert[p0]*morph + vert[q0]*(1-morph);
 		v1 = vert[p1]*morph + vert[q1]*(1-morph);
 		v2 = vert[p2]*morph + vert[q2]*(1-morph);
@@ -118,7 +118,7 @@ void DrawModelTriangles() {
 
 
 void PermuteVertices(List<int> &permutation) {
-	// rearrange the vertex list 
+	// rearrange the vertex list
 	List<Vector> temp_list;
 	int i;
 	assert(permutation.num==vert.num);
@@ -157,12 +157,12 @@ void GetRabbitData(){
 
 void InitModel() {
 	List<int> permutation;
-	GetRabbitData();  
+	GetRabbitData();
 	ProgressiveMesh(vert,tri,collapse_map,permutation);
 	PermuteVertices(permutation);
 	model_position    = Vector(0,0,-3);
 	Quaternion yaw(Vector(0,1,0),-3.14f/4);    // 45 degrees
-	Quaternion pitch(Vector(1,0,0),3.14f/12);  // 15 degrees 
+	Quaternion pitch(Vector(1,0,0),3.14f/12);  // 15 degrees
 	model_orientation = pitch*yaw;
 }
 
@@ -258,7 +258,7 @@ void AnimateParameters() {
 
 void RenderModel() {
 	AnimateParameters();
-	
+
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glColor3f(1,1,1);
@@ -276,7 +276,7 @@ void RenderModel() {
 	sprintf(buf,"Polys: %d  Vertices: %d ",renderpolycount,render_num);
 	if(morph<1.0) {
 		sprintf(buf+strlen(buf),"<-> %d  morph: %4.2f ",
-		        (int)(lodbase *render_num),morph); 
+		        (int)(lodbase *render_num),morph);
 	}
 	PostString(buf,0,-2,5);
 }

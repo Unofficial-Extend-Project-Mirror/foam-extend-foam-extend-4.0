@@ -53,7 +53,7 @@ inline bool wallPointData<Type>::update
         data_ = w2.data();
 
         return true;
-    }        
+    }
 
     scalar diff = distSqr() - dist2;
 
@@ -78,7 +78,7 @@ inline bool wallPointData<Type>::update
         return true;
     }
 }
-    
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -140,7 +140,7 @@ inline bool wallPointData<Type>::updateCell
         neighbourWallInfo,
         tol
     );
-}    
+}
 
 
 // Update this with w2 if w2 nearer to pt.
@@ -162,7 +162,7 @@ inline bool wallPointData<Type>::updateFace
         neighbourWallInfo,
         tol
     );
-}    
+}
 
 
 // Update this with w2 if w2 nearer to pt.
@@ -183,7 +183,7 @@ inline bool wallPointData<Type>::updateFace
         neighbourWallInfo,
         tol
     );
-}    
+}
 
 
 // ************************************************************************* //

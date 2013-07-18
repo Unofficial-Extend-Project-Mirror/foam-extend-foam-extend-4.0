@@ -91,7 +91,7 @@ public:
 	const Time& runtime,
 	const scalar scaleFactor = 1.0
     );
-    
+
     // Destructor
     virtual ~starMeshReader();
 

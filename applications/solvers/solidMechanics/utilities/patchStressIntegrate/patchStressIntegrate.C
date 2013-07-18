@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
       vectorField n = mesh.boundary()[patchID].nf();
       const vectorField& Sf = mesh.boundary()[patchID].Sf();
       const symmTensorField& sigmaPatch = sigma.boundaryField()[patchID];
-      
+
       vector totalForce = sum(Sf & sigmaPatch);
       netForce += totalForce;
       scalar totalNormalForce = sum(n & (Sf & sigmaPatch));
@@ -84,11 +84,11 @@ int main(int argc, char *argv[])
     }
 
   Info << nl << "Net force on model is " << netForce << " N" << endl;
-	
+
     }
 
   Info << nl << "End" << endl;
-      
+
   return 0;
 }
 

@@ -27,7 +27,7 @@
 #     foamGraphResKE
 #
 # Description
-#     
+#
 #------------------------------------------------------------------------------
 
 set tmpK = newK$$.dat
@@ -53,7 +53,7 @@ cat << EOF > residualKE.dat
 Solver Performance
 number of iterations
 residual
-0 0 
+0 0
 0 0
 $ngraphs
 EOF

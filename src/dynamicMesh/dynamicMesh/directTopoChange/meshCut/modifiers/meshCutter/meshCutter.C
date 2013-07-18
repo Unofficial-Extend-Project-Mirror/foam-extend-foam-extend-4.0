@@ -116,7 +116,7 @@ Foam::label Foam::meshCutter::findCutCell
             return cellI;
         }
     }
-    return -1;        
+    return -1;
 }
 
 
@@ -769,7 +769,7 @@ void Foam::meshCutter::setRefinement
 
         // Renumber face to include split edges.
         face newFace(addEdgeCutsToFace(faceI));
-        
+
         // Edge splitting the face. Convert cuts to new vertex numbering.
         const edge& splitEdge = iter();
 
@@ -935,7 +935,7 @@ void Foam::meshCutter::setRefinement
         {
             const labelList& eFaces = mesh().edgeFaces()[edgeI];
 
-            forAll(eFaces, i)    
+            forAll(eFaces, i)
             {
                 label faceI = eFaces[i];
 
@@ -991,7 +991,7 @@ void Foam::meshCutter::setRefinement
                             ", directTopoChange&)"
                         )   << "Problem: edges added to face which does "
                             << " not use a marked cut" << endl
-                            << "faceI:" << faceI << endl    
+                            << "faceI:" << faceI << endl
                             << "face:" << f << endl
                             << "newFace:" << addEdgeCutsToFace(faceI)
                             << abort(FatalError);
@@ -1000,7 +1000,7 @@ void Foam::meshCutter::setRefinement
                     // Get (new or original) owner and neighbour of faceI
                     label own, nei;
                     faceCells(cuts, faceI, own, nei);
-                    
+
                     modFace
                     (
                         meshMod,
@@ -1142,7 +1142,7 @@ void Foam::meshCutter::updateMesh(const mapPolyMesh& morphMap)
                     (debug & 2)
                  && (e != newE || newAddedPointI != addedPointI)
                 )
-                {        
+                {
                     Pout<< "meshCutter::updateMesh :"
                         << " updating addedPoints for edge " << e
                         << " from " << addedPointI

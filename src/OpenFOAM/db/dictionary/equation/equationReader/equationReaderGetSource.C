@@ -55,7 +55,7 @@ Foam::dimensionedScalar Foam::equationReader::getSourceDictSourceDScalar
     label zeroSourceIndex = mag(eqOp.sourceIndex()) - 1;
 
     word varName(dictLookups_[eqOp.dictLookupIndex()]);
-    
+
     ITstream srcStrm
     (
         dictSources_[zeroSourceIndex].lookup(varName)
@@ -81,7 +81,7 @@ Foam::dimensionedScalar Foam::equationReader::getSourceDictSourceScalar
     label zeroSourceIndex = mag(eqOp.sourceIndex()) - 1;
 
     word varName(dictLookups_[eqOp.dictLookupIndex()]);
-    
+
     returnMe.name() = varName;
     returnMe.value() = readScalar
     (
@@ -241,7 +241,7 @@ Foam::dimensionedScalar Foam::equationReader::getSourceEquationCircRefDetect
         if (dependents_[i] == zeroSourceIndex)
         {
             // Circular reference detected
-            
+
             string dependencies;
             for (label j(i); j < dependents_.size(); j++)
             {

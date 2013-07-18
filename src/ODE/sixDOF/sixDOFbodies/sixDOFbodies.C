@@ -52,7 +52,7 @@ void Foam::sixDOFbodies::setBodies()
             if (names_[bodyI] == names_[otherBody])
             {
                 FatalErrorIn("sixDOFbodies::setBodies()")
-                    << "Duplicate names of bodies: this is not allowed" 
+                    << "Duplicate names of bodies: this is not allowed"
                     << exit(FatalError);
             }
         }
@@ -127,7 +127,7 @@ void Foam::sixDOFbodies::solve()
 
     forAll (odes_, bodyI)
     {
-        Info << "Solving 6-DOF for " << names_[bodyI] << " in time" 
+        Info << "Solving 6-DOF for " << names_[bodyI] << " in time"
          << tab << "T = " << runTime_.value() << " s" << endl;
 
         solvers_[bodyI].solve

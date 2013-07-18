@@ -7,7 +7,7 @@ int USERD_bkup
     int backup_type)
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_bkup" << endl 
+    Info << "Entering: USERD_bkup" << endl
         << flush;
 #endif
     return Z_ERR;

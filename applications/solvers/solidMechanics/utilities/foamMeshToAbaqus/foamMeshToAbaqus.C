@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
 	  forAll(faces[globalFaceLabel], pointi)
 	    {
 	      label globalPointLabel = faces[globalFaceLabel][pointi];
- 
+
 	      //- compare each point with all the refFace points
 	      forAll(faces[refFace], refFacePointi)
 		{
@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
 
       //- Now find out the which point on oppFace is attached
       //- to each point of the refFace
-      
+
       //- for all the oppFace points
       forAll(faces[oppFace], pointi)
 	{
@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
 
       //- Node set name
       abaqusInp << "*Nset, nset=nodeSet" << mesh.boundaryMesh()[patchi].name() << endl;
-      
+
       //- Node labels
       forAll(mesh.boundaryMesh()[patchi].meshPoints(), pointi)
 	{
@@ -286,7 +286,7 @@ int main(int argc, char *argv[])
 
       //- Element set name
       abaqusInp << "*Elset, elset=elementSet" << mesh.boundaryMesh()[patchi].name() << endl;
-      
+
       //- Element labels
       forAll(mesh.boundaryMesh()[patchi].faceCells(), celli)
 	{
@@ -323,15 +323,15 @@ int main(int argc, char *argv[])
      IOobject::MUST_READ
      );
 
-  // Check U exists                                                                                                                             
+  // Check U exists
   if (materialsHeader.headerOk())
     {
       Info << "Reading materials field and writing each material to an element set"
 	   << endl;
-      
+
       volScalarField materials(materialsHeader, mesh);
       const scalarField& materialsI = materials.internalField();
-      
+
       //- order the material into groups and record their cell numbers
       label numberOfMaterials = round(max(materials).value()) + 1;
       labelList cellsOfEachMaterial(numberOfMaterials,0);
@@ -435,7 +435,7 @@ int main(int argc, char *argv[])
       abaqusFaceConvention[5][1] = 8;
       abaqusFaceConvention[5][2] = 5;
       abaqusFaceConvention[5][3] = 1;
-      
+
       //- Element labels and the free face label
       forAll(mesh.boundaryMesh()[patchi], facei)
 	{

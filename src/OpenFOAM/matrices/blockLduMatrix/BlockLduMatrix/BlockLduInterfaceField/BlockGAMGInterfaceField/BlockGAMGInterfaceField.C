@@ -40,7 +40,7 @@ Foam::autoPtr<Foam::BlockGAMGInterfaceField<Type> > Foam::BlockGAMGInterfaceFiel
 
     typename lduInterfaceConstructorTable::iterator cstrIter =
         lduInterfaceConstructorTablePtr_->find(coupleType);
-    
+
     if (cstrIter == lduInterfaceConstructorTablePtr_->end())
     {
         FatalErrorIn
@@ -58,7 +58,7 @@ Foam::autoPtr<Foam::BlockGAMGInterfaceField<Type> > Foam::BlockGAMGInterfaceFiel
     (
         cstrIter()
         (
-            GAMGCp, 
+            GAMGCp,
             fineInterface
         )
     );

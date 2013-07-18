@@ -19,7 +19,7 @@
     forAll( pZones, zoneI )
     {
         const label & zoneId( pZones[zoneI].zoneId() );
-        
+
         const labelList & cells(mesh.cellZones()[zoneId]);
 
         const scalar & zonePorosity( pZones[zoneI].porosity() );

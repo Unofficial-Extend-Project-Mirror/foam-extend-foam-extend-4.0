@@ -87,7 +87,7 @@ inline bool Foam::cellInfo::update
 
     return false;
 }
-    
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -182,7 +182,7 @@ inline bool Foam::cellInfo::updateCell
         neighbourFaceI,
         -1
     );
-}    
+}
 
 
 // Update this with neighbour information
@@ -203,7 +203,7 @@ inline bool Foam::cellInfo::updateFace
         -1,
         neighbourCellI
     );
-}    
+}
 
 // Update this with neighbour information
 inline bool Foam::cellInfo::updateFace
@@ -222,7 +222,7 @@ inline bool Foam::cellInfo::updateFace
         -1,
         -1
     );
-}    
+}
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //

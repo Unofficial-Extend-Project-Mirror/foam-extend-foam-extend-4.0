@@ -23,7 +23,7 @@
 #     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 # Description:
-#              README file for the CMake/CTest/CDash test harness for 
+#              README file for the CMake/CTest/CDash test harness for
 #              the TurboMachinery OSIG
 #
 # Author:
@@ -57,7 +57,7 @@ Warning #3: It is recommended to use cmake version 2.8.0 or newer for
 
 a) You can set your local system identifier using the environment variable
    $CDASH_SUBMIT_LOCAL_HOST_ID.  Please try using a unique identifier like
-   your machine's hostname. Otherwise, the fully qualified name of your system 
+   your machine's hostname. Otherwise, the fully qualified name of your system
    will be used.
 
 
@@ -87,7 +87,7 @@ to the CDash server of your choice, as specified by the file
 $BREEDER_15_DIR/OSIG/TurboMachinery/CTestConfig.cmake
 
 To submit your results to the CDash server on openfoam-extend, just use
-the file CTestConfig.cmake.openfoam-extend. 
+the file CTestConfig.cmake.openfoam-extend.
 
 If submitted to the CDash server on openfoam-extend, your results will be displayed here:
 http://openfoam-extend.sourceforge.net/CDash/index.php?project=Turbomachinery-1.5-dev

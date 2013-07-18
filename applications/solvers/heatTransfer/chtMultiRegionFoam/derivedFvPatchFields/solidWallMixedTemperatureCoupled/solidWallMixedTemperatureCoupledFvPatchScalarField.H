@@ -71,7 +71,7 @@ class solidWallMixedTemperatureCoupledFvPatchScalarField
 
         //- Name of field on the neighbour region
         const word neighbourFieldName_;
-        
+
         //- Name of thermal conductivity field
         const word KName_;
 

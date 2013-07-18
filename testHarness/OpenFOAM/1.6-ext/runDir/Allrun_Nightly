@@ -45,17 +45,17 @@ export FOAM_TEST_HARNESS_DIR=$(dirname $PWD)
 if [ -z "$WM_PROJECT_DIR" ]
 then
     echo "Warning:"
-    echo "  Missing environment variable \$WM_PROJECT_DIR. Stopping." 
+    echo "  Missing environment variable \$WM_PROJECT_DIR. Stopping."
     echo "  Please make sure your OpenFOAM environment is properly set up."
     exit -1
 fi
 
-# We need $WM_PROJECT_DIR/CMakeLists.txt 
+# We need $WM_PROJECT_DIR/CMakeLists.txt
 if [ ! -e $WM_PROJECT_DIR/CMakeLists.txt ]
 then
     echo "Warning:"
-    echo "  Missing file: CMakeLists.txt under \$WM_PROJECT_DIR. Stopping." 
-    echo "  A copy of CMakeLists.txt is available under $FOAM_TEST_HARNESS_DIR/CMakeFiles." 
+    echo "  Missing file: CMakeLists.txt under \$WM_PROJECT_DIR. Stopping."
+    echo "  A copy of CMakeLists.txt is available under $FOAM_TEST_HARNESS_DIR/CMakeFiles."
     echo "  Please make a copy of this file under your OpenFOAM installation directory \$WM_PROJECT_DIR."
     exit -1
 fi
@@ -64,16 +64,16 @@ fi
 if [ ! -e $WM_PROJECT_DIR/CTestConfig.cmake ]
 then
     echo "Warning:"
-    echo "  Missing file: CTestConfig.cmake under \$WM_PROJECT_DIR. Stopping." 
-    echo "  A copy of CTestConfig.cmake for openfoam-extend is available under $FOAM_TEST_HARNESS_DIR/CMakeFiles." 
-    echo "  For a copy of CTestConfig.cmake for your local CDash server, contact your local CDash admin." 
+    echo "  Missing file: CTestConfig.cmake under \$WM_PROJECT_DIR. Stopping."
+    echo "  A copy of CTestConfig.cmake for openfoam-extend is available under $FOAM_TEST_HARNESS_DIR/CMakeFiles."
+    echo "  For a copy of CTestConfig.cmake for your local CDash server, contact your local CDash admin."
     echo "  Please make a copy of this file under \$WM_PROJECT_DIR/CTestConfig.cmake."
     exit -1
 fi
 
 # Make sure the CMake and tutorials runtime files are updated
 # We need cmake version 2.8.0 at least
-cmake $WM_PROJECT_DIR 
+cmake $WM_PROJECT_DIR
 
 # All set. Now we can run the available test harness
 #
@@ -83,7 +83,7 @@ cmake $WM_PROJECT_DIR
 # Will do: ExperimentalConfigure + ExperimentalBuild + ExperimentalTest + ExperimentalSubmit
 # make Experimental
 
-# Nightly testing 
+# Nightly testing
 # Will do: NightlyUpdate + NightylConfigure + NightlyBuild + NightlyTest + NightlySubmit
 make Nightly
 

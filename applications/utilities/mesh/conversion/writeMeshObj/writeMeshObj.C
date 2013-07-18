@@ -506,7 +506,7 @@ int main(int argc, char *argv[])
             }
             else if
             (
-                !patchFaces 
+                !patchFaces
              && !patchEdges
              && !doCell
              && !doPoint

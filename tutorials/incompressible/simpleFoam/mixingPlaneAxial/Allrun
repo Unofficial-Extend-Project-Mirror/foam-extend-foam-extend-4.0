@@ -1,10 +1,10 @@
 #!/bin/bash
-# 
+#
 #set -x
 
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
-# Load additional RunFunctions 
+# Load additional RunFunctions
 . ./RunFunctionsSupplemental
 
 export caseName=`basename $PWD`
@@ -31,7 +31,7 @@ then
 	--coordinateSystemType           cylindrical                \
 	--coordinateSystemOrigin         "(0 0 0)"                  \
 	--coordinateSystemE1             "(1 0 0)"                  \
-	--coordinateSystemE3             "(0 0 1)"        
+	--coordinateSystemE3             "(0 0 1)"
 
     pyFoamChangeMixingPlaneBoundary.py . downstreamMixingPlanePatch \
 	--shadowPatch                    upstreamMixingPlanePatch   \
@@ -40,7 +40,7 @@ then
 	--coordinateSystemType           cylindrical                \
 	--coordinateSystemOrigin         "(0 0 0)"                  \
 	--coordinateSystemE1             "(1 0 0)"                  \
-	--coordinateSystemE3             "(0 0 1)"        
+	--coordinateSystemE3             "(0 0 1)"
 
 
     echo "Using pyFoamChangeGGIBoundary.py"

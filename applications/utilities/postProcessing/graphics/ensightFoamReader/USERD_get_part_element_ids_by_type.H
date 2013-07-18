@@ -7,8 +7,8 @@ int USERD_get_part_element_ids_by_type
 {
 
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_part_element_ids_by_type" << endl 
-        << "part_number = " << part_number << endl 
+    Info << "Entering: USERD_get_part_element_ids_by_type" << endl
+        << "part_number = " << part_number << endl
         << "element_type = " << element_type << endl << flush;
 #endif
 
@@ -31,7 +31,7 @@ int USERD_get_part_element_ids_by_type
             {
                 label nFaces = cells[n].size();
                 labelList points = cellShapes[n];
-                
+
                 if ((nFaces == 6) && (points.size() == 8))
                 {
                     elemid_array[nHex08++] = n + 1;
@@ -44,7 +44,7 @@ int USERD_get_part_element_ids_by_type
             {
                 label nFaces = cells[n].size();
                 labelList points = cellShapes[n];
-                
+
                 if ((nFaces == 5) && (points.size() == 6))
                 {
                     elemid_array[nPen06++] = n + 1;
@@ -57,7 +57,7 @@ int USERD_get_part_element_ids_by_type
             {
                 label nFaces = cells[n].size();
                 labelList points = cellShapes[n];
-                
+
                 if ((nFaces == 5) && (points.size() == 5))
                 {
                     elemid_array[nPyr05++] = n + 1;
@@ -70,7 +70,7 @@ int USERD_get_part_element_ids_by_type
             {
                 label nFaces = cells[n].size();
                 labelList points = cellShapes[n];
-                
+
                 if ((nFaces == 4) && (points.size() == 4))
                 {
                     elemid_array[nTet04++] = n + 1;
@@ -101,7 +101,7 @@ int USERD_get_part_element_ids_by_type
     }
     else if (part_number < nPatches+2)
     {
-     
+
         const polyBoundaryMesh& bMesh = meshPtr->boundaryMesh();
         label patchi = part_number - 2;
 
@@ -127,7 +127,7 @@ int USERD_get_part_element_ids_by_type
                 {
                     elemid_array[nQuad04++] = facei + 1;
                 }
-            }            
+            }
         }
         else if (element_type == Z_NSIDED)
         {

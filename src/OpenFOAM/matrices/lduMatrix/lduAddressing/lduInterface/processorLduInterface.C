@@ -38,7 +38,7 @@ namespace Foam
 
 void Foam::processorLduInterface::resizeBuf
 (
-    List<char>& buf, 
+    List<char>& buf,
     const label size
 ) const
 {

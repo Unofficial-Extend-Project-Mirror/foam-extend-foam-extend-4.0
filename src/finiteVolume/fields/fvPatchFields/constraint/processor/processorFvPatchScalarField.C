@@ -118,7 +118,7 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
     const Pstream::commsTypes commsType,
     const bool switchToLhs
 ) const
-{  
+{
     scalarField pnf
     (
         procPatch_.compressedReceive<scalar>(commsType, this->size())()
@@ -126,7 +126,7 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
 
     const unallocLabelList& faceCells = patch().faceCells();
     const scalarField& scalarCoeffs = coeffs.asScalar();
-    
+
     if (switchToLhs)
     {
         forAll (faceCells, facei)

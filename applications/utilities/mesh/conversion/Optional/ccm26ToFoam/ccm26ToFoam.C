@@ -272,7 +272,7 @@ void ReadProblem
 
     // ... walk through each region description and print it...
 
-    
+
     CCMIOID boundary;
     label regionI = 0;
     int k = 0;
@@ -365,7 +365,7 @@ void ReadProblem
 	    }
             else
             {
-                foamPatchNames[foamPatchI] = 
+                foamPatchNames[foamPatchI] =
                     foamPatchTypes[foamPatchI]
                   + Foam::name(foamPatchI);
                 Pout<< "Made up name:" << foamPatchNames[foamPatchI]

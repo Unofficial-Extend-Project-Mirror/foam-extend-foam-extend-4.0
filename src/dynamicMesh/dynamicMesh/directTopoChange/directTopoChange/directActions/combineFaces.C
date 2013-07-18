@@ -725,7 +725,7 @@ void Foam::combineFaces::setRefinement
     }
     else
     {
-        // Count removed points 
+        // Count removed points
         label n = 0;
         forAll(nPointFaces, pointI)
         {

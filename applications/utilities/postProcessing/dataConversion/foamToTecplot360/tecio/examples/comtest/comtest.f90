@@ -1,8 +1,8 @@
-! 
+!
 !  Complex example FORTRAN program to write a
 !  binary data file for Tecplot. This example
 !  does the following:
-! 
+!
 !    1.  Open a data file called "field.plt."
 !    2.  Open a data file called "line.plt."
 !    3.  Assign values for X, Y and P. These will be used
@@ -16,19 +16,19 @@
 !    9.  Write out a geometry (circle) record to "field.plt."
 !   10.  Close file 1.
 !   11.  Close file 2.
-!  
+!
       Program ComplexTest
 
       Include "tecio.f90"
 
-      REAL*4      X(4,5),  Y(4,5), P(4,5)  
+      REAL*4      X(4,5),  Y(4,5), P(4,5)
       REAL*8      XL(50), YL(50)
       REAL*4      XLDummy(1), YLDummy(1)
       EQUIVALENCE (XLDummy(1), XL(1))
       EQUIVALENCE (YLDummy(1), YL(1))
       REAL*8      SolTime
       INTEGER*4   Debug,I,J,K,L,III,NPts,NElm,DIsDouble,VIsDouble,FileType
-      INTEGER*4   IMax,JMax,KMax,NM(4,12)   
+      INTEGER*4   IMax,JMax,KMax,NM(4,12)
       INTEGER*4   StrandID,ParentZn
       INTEGER*4   SharingZone(3)
       REAL*8      XP, YP, ZP, FH, LineSpacing, PatternLength
@@ -56,7 +56,7 @@
       NullPtr   = 0
 !
 ! Open field.plt and write the header information.
-! 
+!
       I = TECINI112('DATASET WITH 1 ORDERED ZONE, '// &
                     '1 QUAD ZONE OVER 2 TIME STEPS'//NULCHAR, &
                     'X Y P'//NULCHAR, &
@@ -65,9 +65,9 @@
                      FileType, &
                      Debug, &
                      VIsDouble)
-!  
+!
 !  Open line.plt and write the header information.
-!  
+!
       VIsDouble = 1
       I = TECINI112('DATASET WITH ONE I-ORDERED ZONE'//NULCHAR, &
                     'X Y'//NULCHAR, &
@@ -77,9 +77,9 @@
                      Debug, &
                      VIsDouble)
 
-!  
+!
 !  Calculate values for the field variables.
-!  
+!
       Do 10 J = 1,5
       Do 10 I = 1,4
           X(I,J) = I
@@ -87,15 +87,15 @@
           P(I,J) = I*J
    10 Continue
 
-!  
+!
 !  Make sure writing to file #1.
-!  
+!
       III = 1
       I = TECFIL112(III)
 
-!  
+!
 !  Write the zone header information for the ordered zone.
-!  
+!
       IMax = 4
       JMax = 5
       KMax = 1
@@ -124,31 +124,31 @@
                      Null, &  ! ShareVarFromZone
                      0)       ! ShareConnectivityFromZone)
 
-!  
+!
 !  Write out the field data for the ordered zone.
-!  
+!
       III = IMax*JMax
       I   = TECDAT112(III,X,DIsDouble)
       I   = TECDAT112(III,Y,DIsDouble)
       I   = TECDAT112(III,P,DIsDouble)
 
-!   
+!
 !  Calculate values for the I-ordered zone.
-!  
+!
 
       Do 20 I = 1,50
          XL(I) = I
          YL(I) = sin(I/20.0)
    20 Continue
-!  
+!
 !  Switch to the 'line.plt' file (file number 2)
 !  and write out the line plot data.
-!  
+!
       III = 2
       I = TECFIL112(III)
-!  
+!
 !  Write the zone header information for the XY-data.
-!  
+!
       IMax = 50
       JMax = 1
       KMax = 1
@@ -175,18 +175,18 @@
                     Null, &
                     Null, &
                     0)
-!  
+!
 !  Write out the line plot.
-!  
+!
       DIsDouble = 1
       III = IMax
       I   = TECDAT112(III,XLDummy,DIsDouble)
       I   = TECDAT112(III,YLDummy,DIsDouble)
 
-!  
+!
 !  Switch back to the field plot file and write out
 !  the finite-element zone.
-!  
+!
       III = 1
       I = TECFIL112(III)
 !
@@ -198,12 +198,12 @@
           Y(I,J) = J
           P(I,J) = I*J
    30 Continue
-!  
+!
 !  Write the zone header information for the finite-element zone.
-!  
-      NPts      = 20 
-      NElm      = 12 
-      KMax      = 1  
+!
+      NPts      = 20
+      NElm      = 12
+      KMax      = 1
       SolTime   = 10.0
       StrandID  = 2
       I = TECZNE112('Finite Zone 1'//NULCHAR, &
@@ -227,9 +227,9 @@
                     Null, &
                     Null, &
                     0)
-!  
+!
 !  Write out the field data for the finite-element zone.
-!  
+!
       IMax      = 4
       JMax      = 5
       III       = IMax*JMax
@@ -238,11 +238,11 @@
       I    = TECDAT112(III,Y,DIsDouble)
       I    = TECDAT112(III,P,DIsDouble)
 
-!  
+!
 !  Calculate and then write out the connectivity list.
 !  Note: The NM array references cells starting with
 !        offset of 1.
-!  
+!
 
       Do 40 I = 1,IMax-1
       Do 40 J = 1,JMax-1
@@ -348,30 +348,30 @@
       DIsDouble = 0
       I   = TECDAT112(III,P,DIsDouble)
 
-!  
+!
 !  Prepare to write out text record. Text is positioned
 !  at 50, 50 in frame units and has a height 5 frame units.
-!  
-      XP               = 50 
-      YP               = 50 
+!
+      XP               = 50
+      YP               = 50
       FH               = 5
-      Scope            = 1 
+      Scope            = 1
       Clipping         = 0
-      PositionCoordSys = 1 
-      FontType         = 1 
-      HeightUnits      = 1 
+      PositionCoordSys = 1
+      FontType         = 1
+      HeightUnits      = 1
       AttachToZone     = 0
       Zone             = 0
-      BoxType          = 0 
+      BoxType          = 0
       BoxMargin        = 5.0
       BoxLineThickness = 0.5
       BoxColor         = 3
       BoxFillColor     = 7
       TextAngle        = 0.0
-      Anchor           = 0 
+      Anchor           = 0
       LineSpacing      = 1.5
-      TextColor        = 0 
-    
+      TextColor        = 0
+
       III =  TECTXT112(XP, &
                        YP, &
                        0.0d0, &
@@ -395,11 +395,11 @@
                       'Hi Mom'//NULCHAR, &
                       NULCHAR)
 
-!  
-!  Prepare to write out geometry record (circle). Circle is 
+!
+!  Prepare to write out geometry record (circle). Circle is
 !  positioned at 25, 25 in frame units and has a radius of 30.
 !  Circle is drawn using a dashed line pattern.
-!  
+!
 
 
       XP                  = 25
@@ -408,8 +408,8 @@
       IsFilled            = 0
       Color               = 0
       FillColor           = 7
-      GeomType            = 2 
-      LinePattern         = 1 
+      GeomType            = 2
+      LinePattern         = 1
       LineThickness       = 0.3
       PatternLength       = 1
       NumEllipsePts       = 72
@@ -419,12 +419,12 @@
       ArrowheadAngle      = 15.0
       NumSegments         = 1
       NumSegPts(1)        = 1
-    
+
       XGeomData(1) = 30
       YGeomData(1) = 0.0
       ZGeomData(1) = 0.0
-    
-    
+
+
       III =  TECGEO112(XP, &
                        YP, &
                        ZP, &
@@ -451,17 +451,17 @@
                        YGeomData, &
                        ZGeomData, &
                        NULCHAR)
-          
-! 
-!  Close out file 1.
-! 
-      I = TECEND112() 
 
-!  
+!
+!  Close out file 1.
+!
+      I = TECEND112()
+
+!
 !  Close out file 2.
-!  
+!
       III = 2
       I = TECFIL112(III)
-      I = TECEND112() 
+      I = TECEND112()
       STOP
       END

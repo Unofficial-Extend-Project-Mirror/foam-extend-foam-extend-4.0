@@ -28,13 +28,13 @@ Application
 Description
     Finite volume structural solver employing a total strain total
     Lagrangian approach.
-    
+
     Valid for finite strains, finite displacements and finite rotations.
 
 Author
     Micheal Leonard
     Philip Cardiff
-    
+
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
   while(runTime.loop())
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
-      
+
 #     include "readStressedFoamControls.H"
 
       int iCorr = 0;
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 	  U.storePrevIter();
 
 #         include "correctDirectionMixedTL.H"
-	  
+
 	  fvVectorMatrix UEqn
             (
 	     fvm::d2dt2(rho, U)
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 	    {
 	      initialResidual = solverPerf.initialResidual();
 	    }
-	  
+
 	  U.relax();
 
 	  gradU = fvc::grad(U);
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 #         include "calculateEpsilonSigma.H"
 
 #         include "calculateRelativeResidual.H"
-	  
+
 	  Info << "\tTime " << runTime.value()
 	       << ", Corrector " << iCorr
 	       << ", Solving for " << U.name()
@@ -123,16 +123,16 @@ int main(int argc, char *argv[])
 	 &&
 	 ++iCorr < nCorr
 	 );
-      
-      Info << nl << "Time " << runTime.value() << ", Solving for " << U.name() 
-	   << ", Initial residual = " << initialResidual 
+
+      Info << nl << "Time " << runTime.value() << ", Solving for " << U.name()
+	   << ", Initial residual = " << initialResidual
 	   << ", Final residual = " << solverPerf.initialResidual()
 	   << ", Relative residual = " << relativeResidual
 	   << ", No outer iterations " << iCorr
 	   << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	   << "  ClockTime = " << runTime.elapsedClockTime() << " s" 
+	   << "  ClockTime = " << runTime.elapsedClockTime() << " s"
 	   << endl;
-      
+
       lduMatrix::debug=0;
 
 #     include "writeFields.H"
@@ -141,9 +141,9 @@ int main(int argc, char *argv[])
 	  << runTime.elapsedCpuTime()
 	  << " s\n\n" << endl;
     }
-  
+
   Info<< "End\n" << endl;
-  
+
   return(0);
 }
 

@@ -10,7 +10,7 @@ int USERD_get_var_by_component
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_var_by_component" << endl 
+    Info << "Entering: USERD_get_var_by_component" << endl
         << "which_variable = " << which_variable << endl
         << "which_part = " << which_part << endl
         << "var_type = " << var_type << endl
@@ -32,7 +32,7 @@ int USERD_get_var_by_component
     {
         if (which_part == 1)
         {
-#           include "getFieldScalar.H"            
+#           include "getFieldScalar.H"
         }
         else if (which_part < nPatches+2)
         {
@@ -45,10 +45,10 @@ int USERD_get_var_by_component
         else if
         (
             secondMeshPtr
-         && which_part == secondMeshPartNum 
+         && which_part == secondMeshPartNum
         )
         {
-#           include "getSecondMeshFieldScalar.H"            
+#           include "getSecondMeshFieldScalar.H"
         }
         else if
         (
@@ -74,7 +74,7 @@ int USERD_get_var_by_component
     {
         if (which_part == 1)
         {
-#           include "getFieldVector.H"            
+#           include "getFieldVector.H"
         }
         else if (which_part < nPatches+2)
         {
@@ -90,7 +90,7 @@ int USERD_get_var_by_component
          && which_part == secondMeshPartNum
         )
         {
-#           include "getSecondMeshFieldVector.H"            
+#           include "getSecondMeshFieldVector.H"
         }
         else if
         (
@@ -116,10 +116,10 @@ int USERD_get_var_by_component
     else if (var_type == Z_TENSOR9)
     {
         // all tensor are treated as asymmetric tensors here
-        
+
         if (which_part == 1)
         {
-#           include "getFieldTensor.H"            
+#           include "getFieldTensor.H"
         }
         else if (which_part < nPatches+2)
         {
@@ -132,10 +132,10 @@ int USERD_get_var_by_component
         else if
         (
             secondMeshPtr
-         && which_part == secondMeshPartNum 
+         && which_part == secondMeshPartNum
         )
         {
-#           include "getSecondMeshFieldTensor.H"            
+#           include "getSecondMeshFieldTensor.H"
         }
         else if
         (
@@ -158,13 +158,13 @@ int USERD_get_var_by_component
         }
 
     }
-    else 
+    else
     {
         return Z_UNDEF;
     }
 
 #ifdef ENSIGHTDEBUG
-    Info << "Leaving: USERD_get_var_by_component" << endl 
+    Info << "Leaving: USERD_get_var_by_component" << endl
         << flush;
 #endif
 

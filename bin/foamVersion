@@ -31,7 +31,7 @@
 #     This implementation is using the Subversion revision control system
 #     for retrieving the revision number.
 #
-# Author: 
+# Author:
 #     Martin Beaudoin, Hydro-Quebec, (2009)
 #
 #------------------------------------------------------------------------------
@@ -45,10 +45,10 @@ Usage: $Script [-revision] [-help]
 
  Report on the version of OpenFOAM, and if available, the source code revision number.
 
- If the source code revision number is not directly available, then the string 
+ If the source code revision number is not directly available, then the string
  "exported" will be reported for the revision number.
 
- Options: 
+ Options:
      -revision : Report only the revision number
      -help     : this help
 

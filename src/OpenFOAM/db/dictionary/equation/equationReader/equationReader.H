@@ -77,10 +77,10 @@ Ostream& operator<<(Ostream&, const equationReader&);
 class equationReader
 {
     // Private data
-    
+
         //- Dependency backtrace, used for circular-reference detection
         labelList dependents_;
-        
+
         //- Equations
         equationList eqns_;
 
@@ -102,42 +102,42 @@ class equationReader
 
         // Sources - these are locations where variables appearing in the
         // equations can be retrieved
-        
+
             //- Variables that can be looked up in a dictionary
             UPtrList<const dictionary> dictSources_;
-            
+
             //- Words to be looked up in a dictionary (equation operation only
             //  gives indices; this is necessary if the source is a dictionary)
             PtrList<word> dictLookups_;
-            
+
             //- Pointers to source scalarLists, used for lists, fields, etc..
             UPtrList<const scalarList> externalScalarLists_;
-            
+
             //- Dimensions associated with the externalScalarLists
             PtrList<dimensionSet> externalScalarListDimensions_;
-            
+
             //- Names associated with the externalScalarLists
             wordList externalScalarListNames_;
-            
+
             //- Current index associated with the externalScalarLists
             labelList externalScalarListIndex_;
-            
+
             //- Pointers to external dimensionedScalars
             UPtrList<const dimensionedScalar> externalDScalars_;
-            
+
             //- Pointers to external scalars
             UPtrList<const scalar> externalScalars_;
-            
+
             //- Names associated with the external scalars
             wordList externalScalarNames_;
 
             //- Dimensions associated with the external scalars
             PtrList<dimensionSet> externalScalarDimensions_;
-            
+
             //- The output of each equation in the equationList is sent here,
             //  indexed according to the equationList
             UPtrList<scalar> outputScalars_;
-            
+
             //- Names associated with the output scalars
             wordList outputScalarNames_;
 
@@ -146,18 +146,18 @@ class equationReader
 
             //- Pointers to output scalarLists, used for lists, fields, etc..
             UPtrList<scalarList> outputScalarLists_;
-            
+
             //- Dimensions associated with the outputScalarLists
             PtrList<dimensionSet> outputScalarListDimensions_;
-            
+
             //- Temporary storage during evaluation declared a member
             //  variable as a bug fix for dropped references and pointers
             PtrList<dimensionedScalar> storage_;
-            
+
             //- Internal scalars for storing constants read from equations.
             //  Moved from equation members to equationReader as a bug fix
             PtrList<scalar> internalScalars_;
-            
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -166,14 +166,14 @@ class equationReader
         //- Disallow default bitwise assignment
         void operator=(const equationReader&);
 
-    
+
         // Main parser functions
-        
+
             //- Parse an equation
             //  *** Located in equationReaderParse.C ***
             void parse(label index);
 
-            // Parses a segment of an equation, used after parenthesis 
+            // Parses a segment of an equation, used after parenthesis
             // precedence is determined.  Returns the map index that holds the
             // source info for the result
             //  *** Located in equationReaderParse.C ***
@@ -189,7 +189,7 @@ class equationReader
 
 
         // General parser support functions
-            
+
             //- Post an error related to equation parsing. Reports the exact
             //  position of the error in the equation string.
             void fatalParseError
@@ -238,7 +238,7 @@ class equationReader
             );
 
             // Returns a labelList with the indices of the maximum parenthesis
-            // level.  If more than one grouping exists, returns the first one.        
+            // level.  If more than one grouping exists, returns the first one.
             labelList findMaxParenthesis
             (
                 const labelList& parenthesisList,
@@ -256,7 +256,7 @@ class equationReader
                 equationOperationList& map,
                 labelList& opLvl
             );
-            
+
             // Sets the first dimensionedScalar equal to the second one without
             // tripping dimension checking errors
             void dsEqual(dimensionedScalar& dso, const dimensionedScalar& dsi);
@@ -382,7 +382,7 @@ class equationReader
 public:
 
     // Static data members
-    
+
 //        static const char* const typeName;
     TypeName("equationReader");
 
@@ -394,12 +394,12 @@ public:
     virtual ~equationReader();
 
     // Member functions
-    
+
         // Adding data sources
-        
+
             //- Add a dictionary
             void addDataSource(const dictionary& dict);
-            
+
             //- Add an external scalar
             void addDataSource
             (
@@ -407,7 +407,7 @@ public:
                 const word& name,
                 const dimensionSet& dimensions = dimless
             );
-            
+
             //- Add an external dimensionedScalar
             void addDataSource(const dimensionedScalar& ds);
 
@@ -426,21 +426,21 @@ public:
             (
                 const DimensionedField<scalar, GeoMesh>& dfield
             );
-            
+
             //- Change the index for a scalarList source
             void setListIndex(const word& name, label newIndex);
-            
+
             //- Change the index for all scalarList sources
             void setListIndex(label newIndex);
 
         // Data source access
-        
+
             //- Equations (const only)
             inline const equationList& eqns() const;
-        
+
             //- Dictionary source pointers
             inline const UPtrList<const dictionary>& dictSources() const;
-            
+
             //- Access to dictionary source pointers
             inline UPtrList<const dictionary>& dictSources();
 
@@ -453,20 +453,20 @@ public:
 
             //- Access to external scalarList pointers
             inline UPtrList<const scalarList>& externalScalarLists();
-            
+
             //- Dimensions associated with external scalarLists
             inline const
                 PtrList<dimensionSet>& externalScalarListDimensions() const;
 
             //- Access to dimensions associated with external scalarLists
             inline PtrList<dimensionSet>& externalScalarListDimensions();
-            
+
             //- Names associated with the external scalarLists
             inline const wordList& externalScalarListNames() const;
 
             //- Access to names associated with the external scalarLists
             inline wordList& externalScalarListNames();
-            
+
             //- Current index associated with the externalScalarLists
             inline const labelList& externalScalarListIndex() const;
 
@@ -476,13 +476,13 @@ public:
             //- External dimensioned scalar data source pointers
             inline const
                 UPtrList<const dimensionedScalar>& externalDScalars() const;
-            
+
             //- Access external dimensioned scalar data source pointers
             inline UPtrList<const dimensionedScalar>& externalDScalars();
 
             //- External scalar data source pointers
             inline const UPtrList<const scalar>& externalScalars() const;
-            
+
             //- Access external scalar data source pointers
             inline UPtrList<const scalar>& externalScalars();
 
@@ -502,21 +502,21 @@ public:
             //- Const access to output scalar data pointers
             inline const
                 UPtrList<scalar>& outputScalars() const;
-            
+
             //- Access output scalar data pointers
             inline UPtrList<scalar>& outputScalars();
 
             //- Const access to output scalar names
             inline const
                 wordList& outputScalarNames() const;
-            
+
             //- Access output scalar names
             inline wordList& outputScalarNames();
 
             //- Const access to output scalar dimensions
             inline const
                 PtrList<dimensionSet>& outputScalarDimensions() const;
-            
+
             //- Access output scalar dimensions
             inline PtrList<dimensionSet>& outputScalarDimensions();
 
@@ -525,7 +525,7 @@ public:
 
             //- Access to pointers to output scalarLists
             inline UPtrList<scalarList>& outputScalarLists();
-            
+
             //- Const access to dimensions associated with outputScalarLists
             inline const
                 PtrList<dimensionSet>& outputScalarListDimensions() const;
@@ -535,7 +535,7 @@ public:
 
 
         // Equations
-        
+
             //- Creates a new equation but does not parse it.  If equation
             //  exists, throws an error.
             void createEquation
@@ -586,7 +586,7 @@ public:
                     label index,
                     dimensionedScalar& outputDVar
                 );
-                
+
                 //- Given the equation index, and dimensionedScalar components
                 void linkOutput
                 (
@@ -639,7 +639,7 @@ public:
                     const word& name,
                     const dimensionSet& dimensions = dimless
                 );
-                
+
                 //- Given an equation and linkOutput to a DimensionedField
                 //  *** Located in equationReaderTemplates.C ***
                 template<class GeoMesh>
@@ -688,7 +688,7 @@ public:
             //  new value.  Do not set the associated output variable
             //  *** Located in equationReaderEvaluate.C ***
             dimensionedScalar evaluate(const word& equationName);
-            
+
             //- Evaluate a single equation, given an index number, and return
             //  new value.  Does not set the associated output variable.
             //  storageOffset is for internal use only, do not use this.
@@ -698,7 +698,7 @@ public:
                 const label& index,
                 label storageOffset = 0
             );
-            
+
             //- Evaluate the equation and output the result as a Field, cycling
             //  through all the source field indices (setFieldIndex)
             //  Given an index and DimensionedField
@@ -709,7 +709,7 @@ public:
                 const label& index,
                 DimensionedField<scalar, GeoMesh>& dfield
             );
-            
+
             //- Evaluate the equation and output the result as a scalarList,
             //  cycling through all the source field indices (setFieldIndex)
             //  Given an index and scalarList components
@@ -732,19 +732,19 @@ public:
             //- Evaluate all equations, setting the associated output variables
             //  as they are calculated
             void update();
-            
+
             //- Returns true if equationName exists in equationList
             bool found(const word& equationName);
-            
+
             //- Returns the index of a given equationName, -1 if not found
             label lookup(const word& equationName);
-            
+
             //- Delete an equation, given a name
             void deleteEquation(const word& equationName);
-            
+
             //- Delete an equation, given an index number
             void deleteEquation(const label& index);
-      
+
         // Input / output related functions
         // *** Located in equationReaderIO.C ***
 

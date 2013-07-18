@@ -55,7 +55,7 @@ class deformationEnergyDiff
 private:
 
     // Private data
-    
+
         //- Value of exponent
         label exponent_;
 

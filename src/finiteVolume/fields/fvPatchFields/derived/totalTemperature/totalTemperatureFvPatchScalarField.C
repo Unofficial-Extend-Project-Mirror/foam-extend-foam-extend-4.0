@@ -202,7 +202,7 @@ namespace Foam
 {
     makePatchTypeField
     (
-        fvPatchScalarField, 
+        fvPatchScalarField,
         totalTemperatureFvPatchScalarField
     );
 }

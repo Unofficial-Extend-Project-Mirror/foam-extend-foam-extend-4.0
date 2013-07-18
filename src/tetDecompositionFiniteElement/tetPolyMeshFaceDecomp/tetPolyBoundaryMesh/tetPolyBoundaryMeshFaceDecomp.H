@@ -93,7 +93,7 @@ public:
             {
                 return mesh_;
             }
-    
+
             //- Return a list of pointers for each patch
             //  with only those pointing to interfaces being set
             lduInterfacePtrsList interfaces() const;

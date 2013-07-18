@@ -53,7 +53,7 @@ Foam::IPstream::IPstream
          "IPsream::IPstream"
          "("
              "const commsTypes,"
-             "const int fromProcNo," 
+             "const int fromProcNo,"
              "const label bufSize,"
              "streamFormat, versionNumber"
          ")"

@@ -29,7 +29,7 @@ boundaryField
     {
         type            symmetryPlane;
     }
-     
+
     inside
     {
       type fixedValue;

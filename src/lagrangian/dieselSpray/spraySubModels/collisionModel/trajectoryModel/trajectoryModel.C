@@ -91,14 +91,14 @@ void trajectoryCollisionModel::collideParcels(const scalar dt) const
 #           include "trajectoryCM.H"
 
             // remove coalesced droplets
-            if (p2().m() < VSMALL) 
+            if (p2().m() < VSMALL)
             {
                 spray::iterator tmpElmnt = p2;
                 ++tmpElmnt;
                 spray_.deleteParticle(p2());
                 p2 = tmpElmnt;
             }
-            else 
+            else
             {
                 ++p2;
             }

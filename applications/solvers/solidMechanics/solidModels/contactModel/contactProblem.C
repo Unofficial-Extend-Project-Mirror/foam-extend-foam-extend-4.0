@@ -88,11 +88,11 @@ contactProblem::contactProblem
   Istream& is = lookup("contacts");
 
   PtrList<entry> contactEntries(is);
-  
+
   contactPatchPairList& contacts = *this;
-  
+
   contacts.setSize(contactEntries.size());
-  
+
   forAll(contacts, contactI)
     {
       contacts.set
@@ -110,7 +110,7 @@ contactProblem::contactProblem
   Info << "Contact problem constructed"
        << endl;
 }
-  
+
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
@@ -204,7 +204,7 @@ tmp<volScalarField> contactProblem::contactArea() const
        mag(
 	   mesh().Sf().boundaryField()[slaveIndex]
 	   )
-       );  
+       );
     Info << "\nContact area of master patch is: "
 	 << contactAreaMaster << " m^2"
 	 << "\nContact area of slave patch is: "
@@ -223,16 +223,16 @@ tmp<volScalarField> contactProblem::contactArea() const
 void contactProblem::contactGapPoints(pointScalarField& cGapPoints)
 {
   const  contactPatchPairList& contacts = *this;
-  
+
   scalarField& cGapPointsInternal = cGapPoints.internalField();
-  
+
   forAll (contacts, contactI)
     {
       scalarField masterGapPoints = contacts[contactI].masterGapPoints();
-      labelList masterBoundaryLabels = mesh().boundaryMesh()[contacts[contactI].masterPatch().index()].meshPoints();       
-      
+      labelList masterBoundaryLabels = mesh().boundaryMesh()[contacts[contactI].masterPatch().index()].meshPoints();
+
       scalarField slaveGapPoints = contacts[contactI].slaveGapPoints();
-      labelList slaveBoundaryLabels = mesh().boundaryMesh()[contacts[contactI].slavePatch().index()].meshPoints();       
+      labelList slaveBoundaryLabels = mesh().boundaryMesh()[contacts[contactI].slavePatch().index()].meshPoints();
 
       forAll(masterBoundaryLabels, pointI)
 	{
@@ -252,17 +252,17 @@ void contactProblem::contactPointForce(pointVectorField& cPointForce)
 {
   pointMesh pMesh(mesh());
   const contactPatchPairList& contacts = *this;
-  
+
   vectorField& cPointForceInternal = cPointForce.internalField();
-  
+
   forAll (contacts, contactI)
     {
       vectorField masterContactPointForce = contacts[contactI].masterPointForce();
       labelList masterBoundaryLabels = pMesh.boundary()[contacts[contactI].masterPatch().index()].meshPoints();
-      
+
       vectorField slaveContactPointForce = contacts[contactI].slavePointForce();
       labelList slaveBoundaryLabels = pMesh.boundary()[contacts[contactI].slavePatch().index()].meshPoints();
-      
+
       forAll(masterBoundaryLabels, pointI)
 	{
 	  cPointForceInternal[masterBoundaryLabels[pointI]] = masterContactPointForce[pointI];

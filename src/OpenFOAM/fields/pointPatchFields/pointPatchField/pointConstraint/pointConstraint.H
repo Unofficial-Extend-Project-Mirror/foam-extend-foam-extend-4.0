@@ -71,7 +71,7 @@ public:
 
     // Member Functions
 
-        //- Apply and accumulate the effect of the given constraint direction 
+        //- Apply and accumulate the effect of the given constraint direction
         inline void applyConstraint(const vector& cd);
 
         //- Return the accumulated constraint transformation tensor

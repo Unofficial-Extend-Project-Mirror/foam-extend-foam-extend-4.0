@@ -52,7 +52,7 @@ inline bool Foam::wallNormalInfo::update(const wallNormalInfo& w2)
         return true;
     }
 }
-    
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -172,7 +172,7 @@ inline bool Foam::wallNormalInfo::updateFace
 )
 {
     return update(neighbourWallInfo);
-}    
+}
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //

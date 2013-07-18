@@ -66,7 +66,7 @@ Foam::surfacePatchIOList::surfacePatchIOList
             label patchSize = readLabel(dict.lookup("nFaces"));
             label startFaceI = readLabel(dict.lookup("startFace"));
 
-            patches[patchI] = 
+            patches[patchI] =
                 surfacePatch
                 (
                     word(dict.lookup("geometricType")),
@@ -101,7 +101,7 @@ Foam::surfacePatchIOList::surfacePatchIOList
 Foam::surfacePatchIOList::surfacePatchIOList
 (
     const IOobject& io,
-    const surfacePatchList& patches    
+    const surfacePatchList& patches
 )
 :
     surfacePatchList(patches),

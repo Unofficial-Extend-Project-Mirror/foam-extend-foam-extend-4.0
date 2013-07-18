@@ -46,7 +46,7 @@ void Foam::calcTypes::componentsTurbo::writeComponentFields
         cellCentres.replace(vector::Z, scalar(0));
 
         const scalarField r = mag(cellCentres);
-        
+
         forAll(turboField, fI)
         {
             turboField[fI].replace(vector::X,
@@ -71,7 +71,7 @@ void Foam::calcTypes::componentsTurbo::writeComponentFields
             fvPatchField<Type>& tbf = turboField.boundaryField()[patchI];
 
             vectorField faceCentres(tbf.patch().Cf());
-            
+
             faceCentres.replace(vector::Z, scalar(0));
 
             const scalarField r = mag(faceCentres);

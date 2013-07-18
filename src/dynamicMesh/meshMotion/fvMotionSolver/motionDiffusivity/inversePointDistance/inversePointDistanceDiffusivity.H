@@ -52,7 +52,7 @@ class inversePointDistanceDiffusivity
     public uniformDiffusivity
 {
     // Private data
-        
+
         //- Patches selected to base the distance on
         wordList patchNames_;
 

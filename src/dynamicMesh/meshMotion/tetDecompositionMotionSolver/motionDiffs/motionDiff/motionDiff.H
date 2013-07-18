@@ -119,7 +119,7 @@ public:
         //- Return diffusivity field
         virtual const elementScalarField& motionGamma() const = 0;
 
-       
+
         //- Correct the motion diffusivity
         virtual void correct() = 0;
 };

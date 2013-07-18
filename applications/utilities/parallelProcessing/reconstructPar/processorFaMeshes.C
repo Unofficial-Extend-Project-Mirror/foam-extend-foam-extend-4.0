@@ -49,7 +49,7 @@ void Foam::processorFaMeshes::read()
                     "pointProcAddressing",
                     meshes_[procI].time().findInstance
                     (
-                        meshes_[procI].meshDir(), 
+                        meshes_[procI].meshDir(),
                         "pointProcAddressing"
                     ),
                     meshes_[procI].meshSubDir,
@@ -70,7 +70,7 @@ void Foam::processorFaMeshes::read()
                     "edgeProcAddressing",
                     meshes_[procI].time().findInstance
                     (
-                        meshes_[procI].meshDir(), 
+                        meshes_[procI].meshDir(),
                         "edgeProcAddressing"
                     ),
                     meshes_[procI].meshSubDir,
@@ -91,7 +91,7 @@ void Foam::processorFaMeshes::read()
                     "faceProcAddressing",
                     meshes_[procI].time().findInstance
                     (
-                        meshes_[procI].meshDir(), 
+                        meshes_[procI].meshDir(),
                         "faceProcAddressing"
                     ),
                     meshes_[procI].meshSubDir,
@@ -112,7 +112,7 @@ void Foam::processorFaMeshes::read()
                     "boundaryProcAddressing",
                     meshes_[procI].time().findInstance
                     (
-                        meshes_[procI].meshDir(), 
+                        meshes_[procI].meshDir(),
                         "faceProcAddressing"
                     ),
                     meshes_[procI].meshSubDir,

@@ -26,7 +26,7 @@ Application
     analyticalCylinder
 
 Description
-    Generates an analytical solution for potential flow around a cylinder.  
+    Generates an analytical solution for potential flow around a cylinder.
     Can be compared with the solution from the potentialFlow/cylinder example.
 
 \*---------------------------------------------------------------------------*/
@@ -54,12 +54,12 @@ int main(int argc, char *argv[])
     volScalarField theta = acos((centres & vector(1,0,0))/magCentres);
 
     volVectorField cs2theta =
-        cos(2*theta)*vector(1,0,0) 
+        cos(2*theta)*vector(1,0,0)
       + sin(2*theta)*vector(0,1,0);
 
     UA = uInfX*(dimensionedVector(vector(1,0,0))
       - pow((radius/magCentres),2)*cs2theta);
-    
+
     runTime.write();
 
     Info<< "end" << endl;

@@ -331,7 +331,7 @@ public:
 
             //- Access mesh
             const polyMesh& mesh() const
-            {   
+            {
                 return mesh_;
             }
 

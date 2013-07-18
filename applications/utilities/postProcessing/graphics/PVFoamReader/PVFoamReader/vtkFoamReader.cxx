@@ -255,7 +255,7 @@ void vtkFoamReader::PrintSelf(ostream& os, vtkIndent indent)
 {
     Superclass::PrintSelf(os,indent);
 
-    os  << indent << "File Name: " 
+    os  << indent << "File Name: "
         << (FileName ? FileName : "(none)") << "\n";
 }
 

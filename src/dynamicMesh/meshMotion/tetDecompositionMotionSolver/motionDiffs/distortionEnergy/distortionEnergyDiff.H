@@ -55,7 +55,7 @@ class distortionEnergyDiff
 private:
 
     // Private data
-    
+
         //- Value of exponent
         label exponent_;
 

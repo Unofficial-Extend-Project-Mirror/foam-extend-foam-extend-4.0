@@ -100,7 +100,7 @@ Foam::faFieldReconstructor::reconstructFaAreaField
             faceProcAddressing_[procI]
         );
 
-        
+
 
         // Set the boundary patch values in the reconstructed field
 
@@ -113,8 +113,8 @@ Foam::faFieldReconstructor::reconstructFaAreaField
 
         for(label i=1; i<procMeshes_[procI].boundary().size(); i++)
         {
-            starts[i] = 
-                starts[i-1] 
+            starts[i] =
+                starts[i-1]
               + procMeshes_[procI].boundary()[i-1].labelList::size();
         }
 
@@ -134,8 +134,8 @@ Foam::faFieldReconstructor::reconstructFaAreaField
             const labelList::subList cp =
                 labelList::subList
                 (
-                    edgeProcAddressing_[procI], 
-                    procMeshes_[procI].boundary()[patchI].size(), 
+                    edgeProcAddressing_[procI],
+                    procMeshes_[procI].boundary()[patchI].size(),
                     starts[patchI]
                 );
 
@@ -171,7 +171,7 @@ Foam::faFieldReconstructor::reconstructFaAreaField
                 forAll(cp, edgeI)
                 {
                     // Subtract one to take into account offsets for
-                    // face direction.  
+                    // face direction.
 //                     reverseAddressing[edgeI] = cp[edgeI] - 1 - curPatchStart;
                     reverseAddressing[edgeI] = cp[edgeI] - curPatchStart;
                 }
@@ -192,7 +192,7 @@ Foam::faFieldReconstructor::reconstructFaAreaField
                 forAll(cp, edgeI)
                 {
                     // Subtract one to take into account offsets for
-                    // face direction.  
+                    // face direction.
 //                     label curE = cp[edgeI] - 1;
                     label curE = cp[edgeI];
 
@@ -207,9 +207,9 @@ Foam::faFieldReconstructor::reconstructFaAreaField
                             if
                             (
                                 curE >= gStarts[pI]
-                             && curE < 
+                             && curE <
                                 (
-                                    gStarts[pI] 
+                                    gStarts[pI]
                                   + mesh_.boundary()[pI].labelList::size()
                                 )
                             )
@@ -356,7 +356,7 @@ Foam::faFieldReconstructor::reconstructFaEdgeField
 
         // It is necessary to create a copy of the addressing array to
         // take care of the face direction offset trick.
-        // 
+        //
         {
             labelList curAddr(edgeProcAddressing_[procI]);
 
@@ -383,8 +383,8 @@ Foam::faFieldReconstructor::reconstructFaEdgeField
 
         for(label i=1; i<procMeshes_[procI].boundary().size(); i++)
         {
-            starts[i] = 
-                starts[i-1] 
+            starts[i] =
+                starts[i-1]
               + procMeshes_[procI].boundary()[i-1].labelList::size();
         }
 
@@ -404,8 +404,8 @@ Foam::faFieldReconstructor::reconstructFaEdgeField
             const labelList::subList cp =
                 labelList::subList
                 (
-                    edgeProcAddressing_[procI], 
-                    procMeshes_[procI].boundary()[patchI].size(), 
+                    edgeProcAddressing_[procI],
+                    procMeshes_[procI].boundary()[patchI].size(),
                     starts[patchI]
                 );
 
@@ -441,7 +441,7 @@ Foam::faFieldReconstructor::reconstructFaEdgeField
                 forAll(cp, edgeI)
                 {
                     // Subtract one to take into account offsets for
-                    // face direction.  
+                    // face direction.
 //                     reverseAddressing[faceI] = cp[faceI] - 1 - curPatchStart;
                     reverseAddressing[edgeI] = cp[edgeI] - curPatchStart;
                 }
@@ -480,9 +480,9 @@ Foam::faFieldReconstructor::reconstructFaEdgeField
                                 if
                                 (
                                     curE >= gStarts[pI]
-                                 && curE < 
+                                 && curE <
                                     (
-                                        gStarts[pI] 
+                                        gStarts[pI]
                                       + mesh_.boundary()[pI].labelList::size()
                                     )
                                 )

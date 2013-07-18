@@ -26,7 +26,7 @@ Description
     Reverse-central-differencing interpolation scheme class which is a linear
     scheme but uses 1 - weighting factors.
 
-    Currently the sole use of this scheme is as the basis of 
+    Currently the sole use of this scheme is as the basis of
     harmonic interpolation.
 
 \*---------------------------------------------------------------------------*/

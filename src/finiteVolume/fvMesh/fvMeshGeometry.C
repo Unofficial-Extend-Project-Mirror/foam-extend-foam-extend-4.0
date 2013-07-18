@@ -552,7 +552,7 @@ const surfaceScalarField& fvMesh::phi() const
         makePhi();
     }
 
-    // Set zero current time 
+    // Set zero current time
     // mesh motion fluxes if the time has been incremented
     if (phiPtr_->timeIndex() != time().timeIndex())
     {

@@ -66,7 +66,7 @@ class BlockCoeffComponentNorm
 
         //- Control data dictionary
         dictionary dict_;
-        
+
         //- Component from which the norm is determined
         const direction cmpt_;
 
@@ -95,7 +95,7 @@ public:
         (
             const dictionary& dict
         );
-        
+
     // Destructor
 
         virtual ~BlockCoeffComponentNorm()
@@ -109,7 +109,7 @@ public:
         (
             const BlockCoeff<Type>& a
         );
-        
+
         virtual void coeffMag
         (
             const CoeffField<Type>& a,
@@ -127,7 +127,7 @@ public:
 #ifdef NoRepository
 #   include "BlockCoeffComponentNorm.C"
 #endif
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif

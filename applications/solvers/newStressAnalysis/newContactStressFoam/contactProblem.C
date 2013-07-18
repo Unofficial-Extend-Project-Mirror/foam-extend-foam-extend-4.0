@@ -241,7 +241,7 @@ void contactProblem::correct()
                 (
                     lambdaPatches[patchI]*tr(gradUpatches[patchI])
                 )
-        
+
             )/(2.0*muPatches[patchI] + lambdaPatches[patchI]);
 
             // Set the value fractions

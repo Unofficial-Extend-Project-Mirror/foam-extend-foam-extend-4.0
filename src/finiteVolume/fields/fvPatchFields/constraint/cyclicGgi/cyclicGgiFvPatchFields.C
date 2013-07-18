@@ -72,7 +72,7 @@ void cyclicGgiFvPatchField<scalar>::initInterfaceMatrixUpdate
     // Note: scalar interpolate does not get a transform, so this is safe
     // HJ, 12/Jan/2009
     scalarField pnf = cyclicGgiPatch_.interpolate(sField);
-    
+
     // Multiply the field by coefficients and add into the result
     const unallocLabelList& fc = cyclicGgiPatch_.faceCells();
 
@@ -109,14 +109,14 @@ void cyclicGgiFvPatchField<vector>::initInterfaceMatrixUpdate
     // Transformation is handled in interpolation.  HJ, 7/Jan/2009
     Field<vector> pnf = cyclicGgiPatch_.interpolate(sField);
 
-    if (coeffs.activeType() == blockCoeffBase::SCALAR)                          
-    {                                                                           
+    if (coeffs.activeType() == blockCoeffBase::SCALAR)
+    {
         pnf = coeffs.asScalar() * pnf;
     }
-    else if (coeffs.activeType() == blockCoeffBase::LINEAR)                     
-    {                                                                           
-        pnf = cmptMultiply(coeffs.asLinear(), pnf);                             
-    }                                                                           
+    else if (coeffs.activeType() == blockCoeffBase::LINEAR)
+    {
+        pnf = cmptMultiply(coeffs.asLinear(), pnf);
+    }
     else if (coeffs.activeType() == blockCoeffBase::SQUARE)
     {
         pnf = coeffs.asSquare() & pnf;
@@ -124,7 +124,7 @@ void cyclicGgiFvPatchField<vector>::initInterfaceMatrixUpdate
 
     // Multiply the field by coefficients and add into the result
     const unallocLabelList& fc = cyclicGgiPatch_.faceCells();
-    
+
     // Multiply the field by coefficients and add into the result
     forAll(fc, elemI)
     {

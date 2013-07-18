@@ -67,7 +67,7 @@ class edgeStats
 
         //- If 2d get component of normal dir.
         direction getNormalDir(const twoDPointCorrector*) const;
-        
+
 
         //- Disallow default bitwise copy construct
         edgeStats(const edgeStats&);

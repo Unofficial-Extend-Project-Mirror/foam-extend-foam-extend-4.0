@@ -27,7 +27,7 @@
 #     foamGraphResUVWP
 #
 # Description
-#     
+#
 #------------------------------------------------------------------------------
 
 set tmpU = newU$$.dat
@@ -70,7 +70,7 @@ EOF
 #Solver Performance
 #number of iterations
 #residual
-#0 0 
+#0 0
 #0 0
 #$ngraphs
 #EOF

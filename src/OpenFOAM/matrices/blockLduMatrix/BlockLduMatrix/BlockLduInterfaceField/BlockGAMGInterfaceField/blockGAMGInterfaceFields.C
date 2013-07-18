@@ -33,27 +33,27 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineNamedTemplateTypeNameAndDebug(blockScalarGAMGInterfaceField, 0);                 
-defineNamedTemplateTypeNameAndDebug(blockVectorGAMGInterfaceField, 0);                 
-defineNamedTemplateTypeNameAndDebug(blockTensorGAMGInterfaceField, 0);                 
-                                                                              
-defineTemplateRunTimeSelectionTable                                           
-(                                                                             
-    blockScalarGAMGInterfaceField,                                                     
-    lduInterface                                                                    
-);                                                                             
-                                                                              
-defineTemplateRunTimeSelectionTable                                           
-(                                                                             
-    blockVectorGAMGInterfaceField,                                                     
-    lduInterface                                                                    
-);                                                                            
-                                                                              
-defineTemplateRunTimeSelectionTable                                           
-(                                                                             
-    blockTensorGAMGInterfaceField,                                                     
-    lduInterface                                                                    
-);                                                                            
+defineNamedTemplateTypeNameAndDebug(blockScalarGAMGInterfaceField, 0);
+defineNamedTemplateTypeNameAndDebug(blockVectorGAMGInterfaceField, 0);
+defineNamedTemplateTypeNameAndDebug(blockTensorGAMGInterfaceField, 0);
+
+defineTemplateRunTimeSelectionTable
+(
+    blockScalarGAMGInterfaceField,
+    lduInterface
+);
+
+defineTemplateRunTimeSelectionTable
+(
+    blockVectorGAMGInterfaceField,
+    lduInterface
+);
+
+defineTemplateRunTimeSelectionTable
+(
+    blockTensorGAMGInterfaceField,
+    lduInterface
+);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

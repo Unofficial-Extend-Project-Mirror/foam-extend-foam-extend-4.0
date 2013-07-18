@@ -376,7 +376,7 @@ void Foam::regionSide::walkAllPointConnectedFaces
             // Get the face 'perpendicular' to faceI on region.
             label otherFaceI = otherFace(mesh, cellI, faceI, edgeI);
 
-            // Edge 
+            // Edge
             const edge& e = mesh.edges()[edgeI];
 
             if (!visitedPoint.found(e.start()))

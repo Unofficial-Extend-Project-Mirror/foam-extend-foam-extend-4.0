@@ -11,7 +11,7 @@ int USERD_get_border_elements_by_type
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_border_elements_by_type" << endl 
+    Info << "Entering: USERD_get_border_elements_by_type" << endl
         << flush;
 #endif
 

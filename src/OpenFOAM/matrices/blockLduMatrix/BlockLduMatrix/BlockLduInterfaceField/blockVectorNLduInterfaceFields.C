@@ -46,7 +46,7 @@ namespace Foam
     defineTemplateTypeNameAndDebug(BlockLduInterfaceField<type>, 0);           \
                                                                                \
     defineTemplateTypeNameAndDebug(processorBlockLduInterfaceField<type>, 0);  \
-    
+
 forAllVectorNTypes(makeTemplateTypeNameAndDebug);
 
 #undef makeTemplateTypeNameAndDebug

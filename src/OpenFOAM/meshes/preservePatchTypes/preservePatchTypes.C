@@ -74,7 +74,7 @@ void Foam::preservePatchTypes
         {
             if (patchDictionary.found(patchNames[patchi]))
             {
-                const dictionary& patchDict = 
+                const dictionary& patchDict =
                     patchDictionary.subDict(patchNames[patchi]);
 
                 patchDict.lookup("type") >> patchTypes[patchi];
@@ -90,7 +90,7 @@ void Foam::preservePatchTypes
 
         if (patchDictionary.found(defaultFacesName))
         {
-            const dictionary& patchDict = 
+            const dictionary& patchDict =
                 patchDictionary.subDict(defaultFacesName);
 
             patchDict.readIfPresent("geometricType", defaultFacesType);

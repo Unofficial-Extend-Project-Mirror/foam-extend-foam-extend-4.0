@@ -358,7 +358,7 @@ public:
             void transformProperties(const vector& separation);
 
             //- Fix the 2D plane normal,
-            //  when particle hits a face it is slightly perturbed 
+            //  when particle hits a face it is slightly perturbed
             //  towards the face centre and n_ will no longer be valid
             inline void correctNormal(const vector& sym);
 

@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
         scalar sumFieldRelError = sumFieldError/measure;
 
         Info<< "Field error: absolute = " << sumFieldError
-            << " relative = " << sumFieldRelError 
+            << " relative = " << sumFieldRelError
             << " measure = " << measure << endl;
 
         pReconstruct.write();

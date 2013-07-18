@@ -149,31 +149,31 @@ scalar syringePressureFvPatchScalarField::Vs(const scalar t) const
     }
     else if (t < tae_)
     {
-        return 
+        return
             VsI_
           + 0.5*Ap_*Sp_*sqr(t - tas_)/(tae_ - tas_);
     }
     else if (t < tds_)
     {
-        return 
-            VsI_ 
+        return
+            VsI_
           + 0.5*Ap_*Sp_*(tae_ - tas_)
           + Ap_*Sp_*(t - tae_);
     }
     else if (t < tde_)
     {
-        return 
-            VsI_ 
-          + 0.5*Ap_*Sp_*(tae_ - tas_) 
+        return
+            VsI_
+          + 0.5*Ap_*Sp_*(tae_ - tas_)
           + Ap_*Sp_*(tds_ - tae_)
           + Ap_*Sp_*(t - tds_)
           - 0.5*Ap_*Sp_*sqr(t - tds_)/(tde_ - tds_);
     }
     else
     {
-        return 
-            VsI_ 
-          + 0.5*Ap_*Sp_*(tae_ - tas_) 
+        return
+            VsI_
+          + 0.5*Ap_*Sp_*(tae_ - tas_)
           + Ap_*Sp_*(tds_ - tae_)
           + 0.5*Ap_*Sp_*(tde_ - tds_);
     }

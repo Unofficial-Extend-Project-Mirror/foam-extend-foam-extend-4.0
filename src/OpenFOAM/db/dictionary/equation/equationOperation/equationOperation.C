@@ -532,7 +532,7 @@ Foam::Istream& Foam::operator>>(Istream& is, equationOperation& I)
 {
     label sl(I.sourceList_);
     label op(I.operation_);
-    
+
     is >> sl >> I.sourceIndex_ >> I.dictLookupIndex_ >> op;
     return is;
 }

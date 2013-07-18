@@ -40,9 +40,9 @@ Reading equation c from testDict... done.
 Evaluating c will force an evaluate of a.
 Evaluating ... done.  Result = c [0 0 0 0 0 0 0] 0.805821
 
-Equation d depends on equation e, but equation e is never explicitly 
-read by equationReaderDemo.  Reading equation d will automatically 
-create equation e on-the-fly. 
+Equation d depends on equation e, but equation e is never explicitly
+read by equationReaderDemo.  Reading equation d will automatically
+create equation e on-the-fly.
 Reading equation d from testDict ... done.
 Again, evaluating d will force an evaluate of e.
 Evaluating d ... done.  The result is = d [0 0 0 0 0 0 0] 2.04124

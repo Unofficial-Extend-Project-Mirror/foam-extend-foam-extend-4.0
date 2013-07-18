@@ -214,7 +214,7 @@ edgeInterpolationScheme<Type>::interpolate
         const tensor& TP = curT[1];
         const tensor& TN = curT[2];
 
-        sfi[fi] = 
+        sfi[fi] =
             transform
             (
                 Te.T(),
@@ -243,7 +243,7 @@ edgeInterpolationScheme<Type>::interpolate
 
             for (label i=0; i<size; i++)
             {
-                const tensorField& curT = 
+                const tensorField& curT =
                     mesh.edgeTransformTensors()[start + i];
 
                 const tensor& Te = curT[0];
@@ -332,11 +332,11 @@ edgeInterpolationScheme<Type>::interpolate
         const tensor& TP = curT[1];
         const tensor& TN = curT[2];
 
-        sfi[eI] = 
+        sfi[eI] =
             transform
             (
                 Te.T(),
-                lambda[eI]*transform(TP, vfi[P[eI]]) 
+                lambda[eI]*transform(TP, vfi[P[eI]])
               + (1 - lambda[eI])*transform(TN, vfi[N[eI]])
             );
     }

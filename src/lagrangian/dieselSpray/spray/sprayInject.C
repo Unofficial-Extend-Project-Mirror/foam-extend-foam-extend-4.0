@@ -113,7 +113,7 @@ void spray::inject()
                     scalar ddev = breakup().yDot0();
 
                     label injectorCell = mesh_.findCell(injectionPosition);
-                
+
 #                   include "findInjectorCell.H"
 
                     if (injectorCell >= 0)

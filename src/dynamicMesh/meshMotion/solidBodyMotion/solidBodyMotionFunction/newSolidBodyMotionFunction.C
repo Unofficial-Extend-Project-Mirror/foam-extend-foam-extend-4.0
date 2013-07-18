@@ -34,7 +34,7 @@ Foam::autoPtr<Foam::solidBodyMotionFunction> Foam::solidBodyMotionFunction::New
     const Time& runTime
 )
 {
-    word solidBodyMotionFunctionTypeName = 
+    word solidBodyMotionFunctionTypeName =
         SBMFCoeffs.lookup("solidBodyMotionFunction");
 
     Info<< "Selecting solid-body motion function "

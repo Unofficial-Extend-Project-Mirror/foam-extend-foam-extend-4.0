@@ -99,7 +99,7 @@ public:
         //- Interpolate field to the given point in the given cell
         Type interpolate
         (
-            const vector& position, 
+            const vector& position,
             const label nCell,
             const label facei = -1
         ) const;

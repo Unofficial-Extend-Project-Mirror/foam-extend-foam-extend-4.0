@@ -26,29 +26,29 @@ boundaryField
 
 consoleFluid
 {
-    type fixedValue;    
+    type fixedValue;
     value uniform (0 0 0);
 }
 
 topWall
 {
-    type slip;    
+    type slip;
 }
 
 bottomWall
 {
-    type slip;    
+    type slip;
 }
 
 outlet
 {
-    type fixedValue;    
+    type fixedValue;
     value uniform (0 0 0);
 }
 
 inlet
 {
-    type fixedValue;    
+    type fixedValue;
     value uniform (0 0 0);
 }
 

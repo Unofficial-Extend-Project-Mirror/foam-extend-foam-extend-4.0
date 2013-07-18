@@ -172,7 +172,7 @@ public:
         //- Restrict matrix
         virtual autoPtr<BlockLduMatrix<Type> > restrictMatrix
         () const = 0;
- 
+
         //- Restrict residual
         virtual void restrictResidual
         (

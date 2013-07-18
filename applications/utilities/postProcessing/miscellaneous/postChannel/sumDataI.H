@@ -202,7 +202,7 @@ inline bool Foam::sumData::updateFace
     {
         return false;
     }
-}    
+}
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //

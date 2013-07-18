@@ -63,7 +63,7 @@ SET(TESTCASES_SUBDIR ".")
 #ADD_TEST(${testId} bash -c "cd ${TEST_CASE_DIR}/${TESTCASES_SUBDIR}; ./Allclean")
 
 # Next, recurse through the case root directory,
-# find all the Allrun files, and execute them 
+# find all the Allrun files, and execute them
 FILE(GLOB_RECURSE listofCasesWithAllrun ${TEST_CASE_DIR}/${TESTCASES_SUBDIR}/Allrun*)
 LIST(SORT listofCasesWithAllrun)
 
@@ -73,7 +73,7 @@ FOREACH(caseWithAllrun ${listofCasesWithAllrun})
   get_filename_component(thisCaseAllrunName ${caseWithAllrun} NAME)
 
   # We need to skip the .svn files
-  IF(NOT ${thisCasePath} MATCHES .svn) 
+  IF(NOT ${thisCasePath} MATCHES .svn)
     MESSAGE("Found Allrun file in directory: ${thisCasePath}")
 
     # Grab the parent name of the case directory
@@ -89,7 +89,7 @@ FOREACH(caseWithAllrun ${listofCasesWithAllrun})
     # Use this entry instead for testing
     #ADD_TEST(${testId} bash -c "cd ${thisCasePath}; true")
 
-  ENDIF(NOT ${thisCasePath} MATCHES .svn) 
+  ENDIF(NOT ${thisCasePath} MATCHES .svn)
 ENDFOREACH(caseWithAllrun)
 
 # Modify the cases Allrun file for additional shell functions

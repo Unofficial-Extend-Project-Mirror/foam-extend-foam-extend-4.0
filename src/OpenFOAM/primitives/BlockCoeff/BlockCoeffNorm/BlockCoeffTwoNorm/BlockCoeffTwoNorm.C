@@ -37,7 +37,7 @@ Foam::BlockCoeffTwoNorm<Type>::BlockCoeffTwoNorm
     const dictionary& dict
 )
 :
-    BlockCoeffNorm<Type>(dict),    
+    BlockCoeffNorm<Type>(dict),
     dict_(dict)
 {}
 
@@ -49,7 +49,7 @@ Foam::scalar Foam::BlockCoeffTwoNorm<Type>::normalize
 (
     const Foam::BlockCoeff<Type>& a
 )
-{ 
+{
     if (a.activeType() == Foam::BlockCoeff<Type>::SCALAR)
     {
         return mag(a.asScalar());
@@ -60,7 +60,7 @@ Foam::scalar Foam::BlockCoeffTwoNorm<Type>::normalize
     }
     else if (a.activeType() == Foam::BlockCoeff<Type>::SQUARE)
     {
-        return mag(a.asSquare()); 
+        return mag(a.asSquare());
     }
     else
     {
@@ -68,7 +68,7 @@ Foam::scalar Foam::BlockCoeffTwoNorm<Type>::normalize
         (
             "scalar BlockCoeffTwoNorm<Type>(const BlockCoeff<Type>& a)"
         )   << "Unknown type" << abort(FatalError);
-    
+
         return 0;
     }
 

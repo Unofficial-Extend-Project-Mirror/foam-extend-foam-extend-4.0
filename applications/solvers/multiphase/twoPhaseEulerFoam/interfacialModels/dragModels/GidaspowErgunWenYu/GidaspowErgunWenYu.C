@@ -83,7 +83,7 @@ Foam::tmp<Foam::volScalarField> Foam::GidaspowErgunWenYu::K
             Cds[celli] = 0.44;
         }
     }
-    
+
     // Wen and Yu (1966)
     tmp<volScalarField> tKWenYu = 0.75*Cds*phaseb_.rho()*Ur*bp/phasea_.d();
     volScalarField& KWenYu = tKWenYu();

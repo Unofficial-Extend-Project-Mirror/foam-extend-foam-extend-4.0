@@ -117,7 +117,7 @@ inline Foam::scalar Foam::laminarFlameSpeedModels::SCOPE::polyPhi
 {
     scalar x = phi - 1.0;
 
-    return 
+    return
         a[0]
        *(
            scalar(1)

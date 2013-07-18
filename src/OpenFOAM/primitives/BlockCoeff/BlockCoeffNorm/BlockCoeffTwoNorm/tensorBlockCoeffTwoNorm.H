@@ -78,7 +78,7 @@ inline scalar BlockCoeffTwoNorm<tensor>::normalize
         (
             "scalar BlockCoeffTwoNorm<Type>(const BlockCoeff<Type>& a)"
         )   << "Unknown type" << abort(FatalError);
-    
+
         return 0;
     }
 }
@@ -115,7 +115,7 @@ inline void BlockCoeffTwoNorm<tensor>::coeffMag
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif

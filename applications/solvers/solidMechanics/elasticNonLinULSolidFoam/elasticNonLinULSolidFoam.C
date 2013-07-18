@@ -28,9 +28,9 @@ Application
 Description
     Finite volume structural solver employing a incremental strain updated
     Lagrangian approach.
-    
+
     Valid for small strains, finite displacements and finite rotations.
-    
+
 Author
     Philip Cardiff
 
@@ -72,11 +72,11 @@ int main(int argc, char *argv[])
 //* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
   Info << "\nStarting time loop\n" << endl;
-  
+
   for (runTime++; !runTime.end(); runTime++)
     {
       Info<< "Time = " << runTime.timeName() << nl << endl;
-      	  
+
 #     include "readStressedFoamControls.H"
 
       int iCorr = 0;
@@ -84,15 +84,15 @@ int main(int argc, char *argv[])
       scalar initialResidual = 0;
       scalar relativeResidual = GREAT;
       lduMatrix::debug = 0;
-      
+
       do
-	{ 
+	{
 	  DU.storePrevIter();
 
 	  divDSigmaLargeStrainExp.storePrevIter();
 
 #         include "calculateDivDSigmaExp.H"
-	  
+
 #         include "calculateDivDSigmaLargeStrainExp.H"
 
 	  //----------------------------------------------------//
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 	     + divDSigmaExp
 	     + divDSigmaLargeStrainExp
 	     );
-	  
+
 	  if(solidInterfaceCorr)
 	    {
 	      solidInterfacePtr->correct(DUEqn);
@@ -118,9 +118,9 @@ int main(int argc, char *argv[])
             {
 	      initialResidual = solverPerf.initialResidual();
             }
-	 
+
 	  DU.relax();
-	  
+
 	  if(solidInterfaceCorr)
 	    {
 	      gradDU = solidInterfacePtr->grad(DU);
@@ -129,11 +129,11 @@ int main(int argc, char *argv[])
 	    {
 	      gradDU = fvc::grad(DU);
 	    }
-	  
+
 #         include "calculateDEpsilonDSigma.H"
 
 #         include "calculateRelativeResidual.H"
-	  	  
+
 	  Info << "\tTime " << runTime.value()
 	       << ", Corrector " << iCorr
 	       << ", Solving for " << DU.name()
@@ -144,18 +144,18 @@ int main(int argc, char *argv[])
         }
       while
         (
-	 //solverPerf.initialResidual() > convergenceTolerance 
+	 //solverPerf.initialResidual() > convergenceTolerance
 	 relativeResidual > convergenceTolerance
          && ++iCorr < nCorr
 	 );
 
       lduMatrix::debug = 1;
-            
-      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name() 
-	   << ", Initial residual = " << initialResidual 
+
+      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name()
+	   << ", Initial residual = " << initialResidual
 	   << ", Final residual = " << solverPerf.initialResidual()
 	   << ", No outer iterations " << iCorr << endl;
-            
+
 #     include "rotateFields.H"
 
 #     include "moveMesh.H"
@@ -171,12 +171,12 @@ int main(int argc, char *argv[])
         }
 
       Info << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	   << "  ClockTime = " << runTime.elapsedClockTime() << " s" 
+	   << "  ClockTime = " << runTime.elapsedClockTime() << " s"
 	   << endl;
     }
-  
+
   Info<< "End\n" << endl;
-  
+
   return(0);
 }
 

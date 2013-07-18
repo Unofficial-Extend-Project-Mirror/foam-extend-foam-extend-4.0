@@ -28,7 +28,7 @@ if (runTime.outputTime())
 	),
        sqrt((3.0/2.0)*magSqr(dev(sigma)))
        );
-    
+
     Info<< "Max sigmaEq = " << max(sigmaEq).value()
 	<< endl;
 
@@ -71,7 +71,7 @@ if (runTime.outputTime())
        );
     contact.contactGapPoints(cGapPoints);
     cGapPoints.write();
-    mesh.movePoints(oldMeshPoints);  
+    mesh.movePoints(oldMeshPoints);
 
     runTime.write();
   }

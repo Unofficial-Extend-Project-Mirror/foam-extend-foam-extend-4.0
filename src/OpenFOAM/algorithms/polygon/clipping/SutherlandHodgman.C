@@ -48,15 +48,15 @@ bool Foam::SutherlandHodgman::lineSegmentIntersection
 ) const
 {
     bool segmentDoIntersect = false;
-    
+
     intersectionPoint[0] = 0.0;
     intersectionPoint[1] = 0.0;
 
     vector2D delta21(p2 - p1);
     vector2D delta43(p4 - p3);
-    vector2D delta13(p1 - p3);   
+    vector2D delta13(p1 - p3);
 
-    scalar denom = delta43[1]*delta21[0] - delta43[0]*delta21[1]; 
+    scalar denom = delta43[1]*delta21[0] - delta43[0]*delta21[1];
 
     // Comparison with 0 and 1...  Floating point precision
     // issue. Cannot compare with 0 and 1 exactly.  VSMALL is too
@@ -81,12 +81,12 @@ bool Foam::SutherlandHodgman::lineSegmentIntersection
 
     if (mag(denom) > tolFactor)
     {
-        scalar ua = (delta43[0]*delta13[1] - delta43[1]*delta13[0])/denom; 
-        scalar ub = (delta21[0]*delta13[1] - delta21[1]*delta13[0])/denom; 
+        scalar ua = (delta43[0]*delta13[1] - delta43[1]*delta13[0])/denom;
+        scalar ub = (delta21[0]*delta13[1] - delta21[1]*delta13[0])/denom;
 
         //- Adjust tolFactor because of division:
-        //  (y +- epsilon)/(x +- epsilon) = y/x +- 2*epsilon (rough estimation) 
-        tolFactor *= 2.0;  
+        //  (y +- epsilon)/(x +- epsilon) = y/x +- 2*epsilon (rough estimation)
+        tolFactor *= 2.0;
 
         // Check for end points outside of range 0..1
         //if (ua >= 0.0 && ua <= 1.0 || ub >= 0.0 && ub <= 1.0)
@@ -108,7 +108,7 @@ bool Foam::SutherlandHodgman::lineSegmentIntersection
                     "Foam::SutherlandHodgman::lineSegmentIntersection()"
                 )   << "ua does not match with ub: delta: "
                     << mag(intersectionPoint - (p3 + ub*delta43))
-                    << " : epsilon: " << epsilon 
+                    << " : epsilon: " << epsilon
                     << endl;
             }
         }
@@ -125,7 +125,7 @@ bool Foam::SutherlandHodgman::lineSegmentIntersection
                     "Foam::SutherlandHodgman::lineSegmentIntersection()"
                 )   << "ub does not match with ua: delta: "
                     << mag(intersectionPoint - (p1 + ua*delta21))
-                    << " : epsilon: " << epsilon 
+                    << " : epsilon: " << epsilon
                     << endl;
             }
         }
@@ -169,10 +169,10 @@ Foam::List<Foam::point2D> Foam::SutherlandHodgman::evaluate()
         label P  = sPI;
 
         // if P is inside or visible from cutting edge
-        if (isPointVisibleFromCuttingSegment(subjectPolygon_[P]))   
+        if (isPointVisibleFromCuttingSegment(subjectPolygon_[P]))
         {
             // if S is inside or visible from cutting edge
-            if (isPointVisibleFromCuttingSegment(subjectPolygon_[S]))  
+            if (isPointVisibleFromCuttingSegment(subjectPolygon_[S]))
             {
                 clippedPolygon.append(subjectPolygon_[P]);  // Output P
             }
@@ -226,7 +226,7 @@ Foam::List<Foam::point2D> Foam::SutherlandHodgman::evaluate()
                 // Output intersection point
                 clippedPolygon.append(interSectPt);
 
-                // Build the inside/outside list 
+                // Build the inside/outside list
                 clippedVertexInside.append(true);
             }
             else

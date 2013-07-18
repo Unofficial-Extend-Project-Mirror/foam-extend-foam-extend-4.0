@@ -79,7 +79,7 @@ class solidTractionFvPatchVectorField
 	    UPDATED_LAGRANGIAN,
 	    TOTAL_LAGRANGIAN
 	  };
-  
+
         static const NamedEnum<nonLinearType, 3> nonLinearNames_;
 
         //- if it is a non linear solver

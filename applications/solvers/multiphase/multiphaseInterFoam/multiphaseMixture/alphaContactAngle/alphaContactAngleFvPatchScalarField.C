@@ -63,7 +63,7 @@ Ostream& operator<<
 )
 {
     os  << tp.theta0_ << token::SPACE
-        << tp.uTheta_ << token::SPACE 
+        << tp.uTheta_ << token::SPACE
         << tp.thetaA_ << token::SPACE
         << tp.thetaR_;
 

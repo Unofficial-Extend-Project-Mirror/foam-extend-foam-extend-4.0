@@ -79,20 +79,20 @@ int main(int argc, char *argv[])
 # include "createGlobalToLocalFaceZonePointMap.H"
 
   // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-  
+
   Info<< "\nStarting time loop\n" << endl;
-  
+
   for (runTime++; !runTime.end(); runTime++)
     {
       Info<< "Time: " << runTime.timeName() << endl;
-      
+
 #     include "readContactControls.H"
 
 #     include "readStressedFoamControls.H"
-  
+
       //-- for moving the mesh and then back again
       vectorField oldMeshPoints = mesh.allPoints();
-      
+
       int iCorr = 0;
       lduMatrix::solverPerformance solverPerf;
       word solverName;
@@ -113,8 +113,8 @@ int main(int argc, char *argv[])
       do //- start of momentum loop
 	{
 	  U.storePrevIter();
-	  
-	  //- correct the contact boundaries 
+
+	  //- correct the contact boundaries
           if(iCorr % uEqnContactCorrFreq == 0)
 	    {
 	      Info << "\t\tCorrecting contact in the momentum loop "
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
 	      contact.correct();
 	      mesh.movePoints(oldMeshPoints);
 	    }
-  
+
 #         include "calculateDivSigmaExp.H"
 
 	  fvVectorMatrix UEqn
@@ -136,24 +136,24 @@ int main(int argc, char *argv[])
 	     fvm::laplacian(2*mu + lambda, U, "laplacian(DU,U)")
 	     + divSigmaExp
 	     );
-	  
+
 	  solverPerf = UEqn.solve();
-	  
+
 	  U.relax();
-	  
+
 	  solverName = solverPerf.solverName();
-	  
+
 	  gradU = fvc::grad(U);
 	  snGradU = fvc::snGrad(U);
 
 	  residual = solverPerf.initialResidual();
-	  
+
 	  if(iCorr == 0)
 	    {
 	      initialResidual = solverPerf.initialResidual();
 	    }
-	  
-#         include "calculateRelativeResidual.H"	      
+
+#         include "calculateRelativeResidual.H"
 
 	  Info << "\tTime " << runTime.value()
 	       << ", Corrector " << iCorr
@@ -169,36 +169,36 @@ int main(int argc, char *argv[])
 	 &&
 	 ++iCorr < nCorr
 	 );
-      
+
       // Print out info per contact iteration
       Info << "\t\tSolving for " << U.name()
 	   << " using " << solverName
 	   << ", Initial residual = " << initialResidual
 	   << ", Final residual = " << solverPerf.initialResidual()
 	   << ", No outer iterations " << iCorr << endl;
-      
+
       lduMatrix::debug = 1;
-      
+
       V = fvc::ddt(U);
       gradV = fvc::ddt(gradU);
       snGradV = (snGradU - snGradU.oldTime())/runTime.deltaT();
 
 #     include "calculateEpsilonSigma.H"
-      
+
 #     include "writeFields.H"
-        
+
       //#     include "moveMeshLeastSquares.H"
       //#     include "moveSolidMesh.H"
       //#     include "printContactResults.H"
       //mesh.movePoints(oldMeshPoints);
-      
+
       Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
 	  << "  ClockTime = " << runTime.elapsedClockTime() << " s"
 	  << endl << endl;
     }
-  
+
   Info<< "End\n" << endl;
-  
+
   return(0);
 }
 

@@ -31,9 +31,9 @@ rheology
     kDimensions     [1 -1 -2 0 0 0 0];
     tauDimensions   [0 0 1 0 0 0 0];
     size 6;
-    k nonuniform List<scalar> 
+    k nonuniform List<scalar>
     6
-    ( 
+    (
        249.764
        13.2808
        155.824

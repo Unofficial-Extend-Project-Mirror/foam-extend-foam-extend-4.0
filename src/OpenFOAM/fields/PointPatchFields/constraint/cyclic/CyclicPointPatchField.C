@@ -84,7 +84,7 @@ CyclicPointPatchField
     CoupledPointPatchField
     <
         PatchField,
-        Mesh, 
+        Mesh,
         PointPatch,
         typename CyclicPointPatch::CoupledPointPatch,
         MatrixType,

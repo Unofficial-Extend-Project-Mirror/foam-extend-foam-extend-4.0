@@ -49,7 +49,7 @@ if (pNeedRef)
         procHasRef = true;
     }
 
-    pRefValue = 
+    pRefValue =
         readScalar(mesh.solutionDict().subDict("PISO").lookup("pRefValue"));
 }
 

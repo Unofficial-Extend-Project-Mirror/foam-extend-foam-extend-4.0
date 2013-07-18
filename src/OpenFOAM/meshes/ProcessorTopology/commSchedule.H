@@ -28,11 +28,11 @@ Class
 Description
     Determines the order in which a set of processors should communicate
     with one another.
- 
-    The communication order should 
+
+    The communication order should
       - have maximum overlap
       - allow blocking communication without deadlock
- 
+
     Does a very simple scheduling which assumes same time for all operations.
 
     After construction:

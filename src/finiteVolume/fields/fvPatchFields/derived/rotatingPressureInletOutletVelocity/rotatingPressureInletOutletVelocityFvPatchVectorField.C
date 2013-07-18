@@ -40,7 +40,7 @@ void rotatingPressureInletOutletVelocityFvPatchVectorField::
 calcTangentialVelocity()
 {
     vector axisHat = omega_/mag(omega_);
-    vectorField tangentialVelocity = 
+    vectorField tangentialVelocity =
         (-omega_) ^ (patch().Cf() - axisHat*(axisHat & patch().Cf()));
 
     vectorField n = patch().nf();

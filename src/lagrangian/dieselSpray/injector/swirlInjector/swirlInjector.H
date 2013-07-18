@@ -160,7 +160,7 @@ public:
             const vector& axisOfWedgeNormal,
             Random& rndGen
         ) const;
-    
+
         //- Return the number of holes
         label nHoles() const;
 
@@ -204,7 +204,7 @@ public:
         //- Return the instantaneous velocity
         scalar velocity(const scalar time) const;
 
-        //- Return the discharge coefficient    
+        //- Return the discharge coefficient
         List<pair> CdProfile() const;
 
         //- Return the instantaneous discharge coefficient
@@ -236,7 +236,7 @@ public:
             const liquidMixture& fuel,
             const scalar referencePressure
         );
-        
+
         bool pressureIndependentVelocity() const
         {
             return pressureIndependentVelocity_;

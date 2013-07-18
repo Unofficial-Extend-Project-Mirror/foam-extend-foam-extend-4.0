@@ -73,7 +73,7 @@ class cyclicGAMGInterfaceField
 
         //- Disallow default bitwise assignment
         void operator=(const cyclicGAMGInterfaceField&);
-    
+
 
 public:
 

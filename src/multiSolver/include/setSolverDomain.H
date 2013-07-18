@@ -1,7 +1,7 @@
         } // previous solver domain goes out of scope
         multiRun.setSolverDomain(solverDomain);
 
-// Clear defines that may interfere with other solver domains 
+// Clear defines that may interfere with other solver domains
 #undef createPhi_H
 #undef createPhiV_H
 #undef initContinuityErrs_H

@@ -408,7 +408,7 @@ template<class T, class Key, class Hash>
 void Foam::StaticHashTable<T, Key, Hash>::resize(const label sz)
 {
     label newSize = canonicalSize(sz);
-    
+
     if (newSize == keys_.size())
     {
 #       ifdef FULLDEBUG

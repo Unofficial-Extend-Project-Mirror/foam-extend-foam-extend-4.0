@@ -10,7 +10,7 @@
 	    (
 	     U.boundaryField()[patchID]
 	     );
-	  
+
 	  tensorField Finv = inv(I + gradU);
 	  vectorField newN = Finv & n.boundaryField()[patchID];
 	  newN /= mag(newN);

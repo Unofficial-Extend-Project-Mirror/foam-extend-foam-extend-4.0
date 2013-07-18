@@ -75,7 +75,7 @@
                 triFace[(ti++)%3] = quadFace[i];
             }
         }
-        
+
         if (ti == 4)
         {
             pFaces[bcIndex][regionIndex].append(quadFace);

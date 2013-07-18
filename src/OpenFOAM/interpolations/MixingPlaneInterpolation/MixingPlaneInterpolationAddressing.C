@@ -89,7 +89,7 @@ void MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
         )   << "Addressing already calculated"
             << abort(FatalError);
     }
-    
+
     if (debug)
     {
         InfoIn
@@ -235,7 +235,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcTransforms() const
         // tensors can be computed
         // Use face cell centers cause the fields are taken from cell centers
         vectorField globalMasterVectors =
-            masterPatch_.faceCentres() - cs_.origin(); 
+            masterPatch_.faceCentres() - cs_.origin();
 
         // We need unit vectors for computing rotation tensor
         // We also need vectors lying into the plane normal to the rotation
@@ -295,9 +295,9 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcTransforms() const
         // Warning: Face normals are not a good choice here. We need a vector
         // that will intersect the rotation axis. Furthermore, if the surface
         // normals are all parallel with the rotation axis, no valid rotation
-        // tensors can be computed 
+        // tensors can be computed
         vectorField globalSlaveVectors =
-            slavePatch_.faceCentres() - cs_.origin(); 
+            slavePatch_.faceCentres() - cs_.origin();
 
         // We need unit vectors for computing rotation tensor
         // We also need vectors lying into the plane normal to the rotation

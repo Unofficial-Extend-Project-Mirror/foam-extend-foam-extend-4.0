@@ -240,7 +240,7 @@ bool Foam::tetWedgeMatcher::faceSizeMatch
 
     label nTris = 0;
     label nQuads = 0;
-    
+
     forAll(myFaces, myFaceI)
     {
         label size = faces[myFaces[myFaceI]].size();

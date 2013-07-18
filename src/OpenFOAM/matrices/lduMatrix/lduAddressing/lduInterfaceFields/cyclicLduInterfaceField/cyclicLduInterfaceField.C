@@ -53,7 +53,7 @@ void Foam::cyclicLduInterfaceField::transformCoupleField
     {
         label sizeby2 = pnf.size()/2;
 
-        scalar forwardScale = 
+        scalar forwardScale =
             pow(diag(forwardT()[0]).component(cmpt), rank());
 
         scalar reverseScale =

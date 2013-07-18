@@ -125,7 +125,7 @@ void Foam::coarseBlockAmgLevel<Type>::residual
     forAll (b, i)
     {
         res[i] = b[i] - res[i];
-    }    
+    }
 }
 
 
@@ -225,7 +225,7 @@ void Foam::coarseBlockAmgLevel<Type>::solve
             coarseSolverPerf.print();
         }
     }
-    
+
 }
 
 
@@ -236,7 +236,7 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
     const Field<Type>& b,
     Field<Type>& xBuffer
 ) const
-{ 
+{
 
     // KRJ: 2013-02-05: Creating a new field not re-using
     Field<Type> Ax(x.size());
@@ -246,10 +246,10 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
         reinterpret_cast<Field<Type>&>(Ax),
         x
     );
-    
+
     scalar scalingFactorNum = sumProd(x,b);
     scalar scalingFactorDenom = sumProd(x,Ax);
- 
+
     vector2D scalingVector(scalingFactorNum, scalingFactorDenom);
     reduce(scalingVector, sumOp<vector2D>());
 

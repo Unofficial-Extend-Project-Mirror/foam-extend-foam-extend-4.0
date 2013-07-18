@@ -16,7 +16,7 @@ $(rheologyLaws)/PronyViscoelastic/PronyViscoelastic.C
 thermalModel/thermalModel.C
 thermalLaws          = thermalModel/thermalLaws
 
-$(thermalLaws)/thermalLaw/thermalLaw.C 
+$(thermalLaws)/thermalLaw/thermalLaw.C
 $(thermalLaws)/thermalLaw/newThermalLaw.C
 $(thermalLaws)/constantThermal/constantThermal.C
 $(thermalLaws)/multiMaterialThermal/multiMaterialThermal.C

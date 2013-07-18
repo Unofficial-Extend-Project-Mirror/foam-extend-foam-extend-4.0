@@ -668,7 +668,7 @@ int main(int argc, char *argv[])
         {
             U.replace
             (
-                vector::X, 
+                vector::X,
                 fdc.convertField
                 (
                     "Ux",   // field name
@@ -682,7 +682,7 @@ int main(int argc, char *argv[])
         {
             U.replace
             (
-                vector::Y, 
+                vector::Y,
                 fdc.convertField
                 (
                     "Uy",   // field name
@@ -696,7 +696,7 @@ int main(int argc, char *argv[])
         {
             U.replace
             (
-                vector::Z, 
+                vector::Z,
                 fdc.convertField
                 (
                     "Uz",   // field name

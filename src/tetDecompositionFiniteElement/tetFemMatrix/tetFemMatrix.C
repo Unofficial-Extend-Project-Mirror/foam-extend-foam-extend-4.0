@@ -518,7 +518,7 @@ lduSolverPerformance solve
     Istream& solverControls
 )
 {
-    lduSolverPerformance solverPerf = 
+    lduSolverPerformance solverPerf =
         const_cast<tetFemMatrix<Type>&>(ttetFem()).solve(solverControls);
 
     ttetFem.clear();

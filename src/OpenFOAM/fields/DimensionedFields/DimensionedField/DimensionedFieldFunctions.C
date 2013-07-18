@@ -282,7 +282,7 @@ tmp
 >
 cmptAv(const tmp<DimensionedField<Type, GeoMesh> >& tdf)
 {
-    typedef typename DimensionedField<Type, GeoMesh>::cmptType 
+    typedef typename DimensionedField<Type, GeoMesh>::cmptType
         cmptType;
 
     const DimensionedField<Type, GeoMesh>& df = tdf();

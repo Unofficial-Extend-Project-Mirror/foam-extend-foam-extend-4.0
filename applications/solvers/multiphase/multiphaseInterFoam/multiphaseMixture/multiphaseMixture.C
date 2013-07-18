@@ -166,13 +166,13 @@ Foam::tmp<Foam::surfaceScalarField> Foam::multiphaseMixture::muf() const
 {
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
-    tmp<surfaceScalarField> tmuf = 
+    tmp<surfaceScalarField> tmuf =
         fvc::interpolate(iter().limitedAlpha())*iter().rho()*
         fvc::interpolate(iter().nu());
 
     for(++iter; iter != phases_.end(); ++iter)
     {
-        tmuf() += 
+        tmuf() +=
             fvc::interpolate(iter().limitedAlpha())*iter().rho()*
             fvc::interpolate(iter().nu());
     }

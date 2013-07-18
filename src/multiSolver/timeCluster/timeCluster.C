@@ -222,7 +222,7 @@ Foam::timeCluster Foam::timeCluster::operator()(const Foam::label index) const
 
 Foam::Istream& Foam::operator>>(Istream& is, timeCluster& I)
 {
-    return is   >> I.globalOffset_ 
+    return is   >> I.globalOffset_
                 >> I.superLoop_
                 >> I.solverDomainName_
                 >> I.preConName_

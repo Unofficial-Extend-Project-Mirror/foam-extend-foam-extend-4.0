@@ -84,7 +84,7 @@ inline Tensor<Cmpt> transform(const symmTensor& stt, const Tensor<Cmpt>& t)
         (stt.xy()*t.xx() + stt.yy()*t.yx() + stt.yz()*t.zx())*stt.xz()
       + (stt.xy()*t.xy() + stt.yy()*t.yy() + stt.yz()*t.zy())*stt.yz()
       + (stt.xy()*t.xz() + stt.yy()*t.yz() + stt.yz()*t.zz())*stt.zz(),
-        
+
         (stt.xz()*t.xx() + stt.yz()*t.yx() + stt.zz()*t.zx())*stt.xx()
       + (stt.xz()*t.xy() + stt.yz()*t.yy() + stt.zz()*t.zy())*stt.xy()
       + (stt.xz()*t.xz() + stt.yz()*t.yz() + stt.zz()*t.zz())*stt.xz(),
@@ -139,7 +139,7 @@ inline SymmTensor<Cmpt> transform
         (stt.xy()*st.xx() + stt.yy()*st.xy() + stt.yz()*st.xz())*stt.xz()
       + (stt.xy()*st.xy() + stt.yy()*st.yy() + stt.yz()*st.yz())*stt.yz()
       + (stt.xy()*st.xz() + stt.yy()*st.yz() + stt.yz()*st.zz())*stt.zz(),
-        
+
         (stt.xz()*st.xx() + stt.yz()*st.xy() + stt.zz()*st.xz())*stt.xz()
       + (stt.xz()*st.xy() + stt.yz()*st.yy() + stt.zz()*st.yz())*stt.yz()
       + (stt.xz()*st.xz() + stt.yz()*st.yz() + stt.zz()*st.zz())*stt.zz()

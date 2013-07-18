@@ -297,7 +297,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveToMaster
     );
 
     Field<Type>& result = tresult();
-        
+
     interpolate
     (
         profileFF,                     // Slave data in 'profile space'
@@ -307,7 +307,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveToMaster
         masterProfileToPatchWeights(),
         result
     );
-        
+
     // Apply transform to bring the master field back from 'profile space'
     // to 'patch space'
     transform(result, masterProfileToPatchT(), result);
@@ -363,7 +363,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToProfile
     );
 
     Field<Type>& result = tresult();
-        
+
     toProfile
     (
         profileFF,                      // Master data in 'profile space'
@@ -371,7 +371,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToProfile
         masterPatchToProfileWeights(),
         result
     );
-        
+
     return tresult;
 }
 
@@ -431,7 +431,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveToProfile
         slavePatchToProfileWeights(),
         result
     );
-        
+
     return tresult;
 }
 
@@ -480,7 +480,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::profileToMaster
     );
 
     Field<Type>& result = tresult();
-        
+
     fromProfile
     (
         profileFF,                      // Master data in 'profile space'
@@ -488,7 +488,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::profileToMaster
         masterProfileToPatchWeights(),
         result
     );
-        
+
     // Apply transform to bring the master field back from 'profile space'
     // to 'patch space'
     transform(result, masterProfileToPatchT(), result);
@@ -547,7 +547,7 @@ void MixingPlaneInterpolation<MasterPatch, SlavePatch>::maskedProfileToMaster
         result,
         mask
     );
-        
+
     // Apply transform to bring the master field back from 'profile space'
     // to 'patch space'
     maskedTransform(result, masterProfileToPatchT(), result, mask);
@@ -592,7 +592,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::profileToSlave
         slaveProfileToPatchWeights(),  // profile to patch
         result
     );
-        
+
     // Apply transform to bring the slave field back from 'profile space'
     // to 'patch space'
     transform(result, slaveProfileToPatchT(), result);
@@ -650,7 +650,7 @@ void MixingPlaneInterpolation<MasterPatch, SlavePatch>::maskedProfileToSlave
         result,
         mask
     );
-        
+
     // Apply transform to bring the slave field back from 'profile space'
     // to 'patch space'
     maskedTransform(result, slaveProfileToPatchT(), result, mask);
@@ -690,7 +690,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToMaster
     );
 
     Field<Type>& result = tresult();
-        
+
     interpolate
     (
         profileFF,                      // Master data in 'profile space'
@@ -700,7 +700,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::masterToMaster
         masterProfileToPatchWeights(),
         result
     );
-        
+
     // Apply transform to bring the master field back from 'profile space'
     // to 'patch space'
     transform(result, masterProfileToPatchT(), result);
@@ -766,7 +766,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::slaveToSlave
         slaveProfileToPatchWeights(),
         result
     );
-        
+
     // Apply transform to bring the slave field back from 'profile space'
     // to 'patch space'
     transform(result, slaveProfileToPatchT(), result);

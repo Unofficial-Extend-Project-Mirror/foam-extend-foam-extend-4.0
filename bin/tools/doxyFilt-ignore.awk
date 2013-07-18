@@ -38,7 +38,7 @@ BEGIN {
 }
 
 { print }
-        
+
 END {
    print "//! @endcond OpenFOAMIgnoreAppDoxygen"
 }

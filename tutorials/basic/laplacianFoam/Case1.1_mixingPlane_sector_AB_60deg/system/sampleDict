@@ -23,7 +23,7 @@ interpolationScheme cellPoint;
 setFormat     raw;
 //setFormat     jplot;
 
-sets      
+sets
 (
     Comp-25_Y //Resulting file name
     {
@@ -94,7 +94,7 @@ sets
 surfaces
 ();
 
-fields          
+fields
 (
     U
     p

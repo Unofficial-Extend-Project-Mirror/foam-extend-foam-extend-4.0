@@ -42,7 +42,7 @@ void Foam::BlockLduMatrix<Type>::Amul
 
     // Initialise the update of coupled interfaces
     initInterfaces(coupleUpper_, Ax, x);
-    
+
     AmulCore(Ax, x);
 
     // Update coupled interfaces
@@ -64,13 +64,13 @@ void Foam::BlockLduMatrix<Type>::AmulCore
     const unallocLabelList& u = lduAddr().upperAddr();
     const unallocLabelList& l = lduAddr().lowerAddr();
 
-    
+
     const TypeCoeffField& Diag = this->diag();
     const TypeCoeffField& Upper = this->upper();
 
     // Create multiplication function object
     typename BlockCoeff<Type>::multiply mult;
-    
+
     // AmulCore must be additive to account for initialisation step
     // in ldu interfaces.  HJ, 6/Nov/2007
     // Fixed by IC 19/Oct/2011
@@ -271,7 +271,7 @@ void Foam::BlockLduMatrix<Type>::TmulCore
             Tx[cellI] += mult(activeDiag[cellI].T(), x[cellI]);
         }
     }
-    
+
     // Upper multiplication
 
     if (Upper.activeType() == blockCoeffBase::SCALAR)

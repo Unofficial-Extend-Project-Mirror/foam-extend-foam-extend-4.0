@@ -132,7 +132,7 @@ tetPolyPatchFieldDecomposer::calcPatchAddressing() const
     }
 
     // Gather the information
-    
+
     const labelList& targetPatchPoints = targetPatch().meshPoints();
 
     forAll (targetPatchPoints, pointI)

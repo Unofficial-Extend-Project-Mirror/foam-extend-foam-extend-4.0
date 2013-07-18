@@ -34,7 +34,7 @@ hierarchicalCoeffs
 
 metisCoeffs
 {
-    processorWeights 
+    processorWeights
     (
         1
         1
@@ -52,7 +52,7 @@ manualCoeffs
 
 distributed     no;
 
-roots           
+roots
 (
 );
 

@@ -14,7 +14,7 @@ solidInterface* solidInterfacePtr(NULL);
 	solidInterfacePtr = new solidInterface(mesh, rheology);
 	solidInterfacePtr->modifyProperties(muf, lambdaf);
 	gradDU = solidInterfacePtr->grad(DU);
-	
+
 	//- solidInterface needs muf and lambdaf to be used for divSigmaExp
 	if(divDSigmaExpMethod != "surface" && divDSigmaExpMethod != "decompose")
 	  {

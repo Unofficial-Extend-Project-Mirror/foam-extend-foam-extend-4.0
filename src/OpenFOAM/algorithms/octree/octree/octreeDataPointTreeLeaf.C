@@ -83,7 +83,7 @@ bool Foam::treeLeaf<Foam::octreeDataPoint>::findNearest
     if (minIndex != -1)
     {
         tightestDist = sqrt(minDist2);
-    
+
         // New nearer. Update 'tightest' bounding box
         tMin.x() = sample.x() - tightestDist;
         tMin.y() = sample.y() - tightestDist;

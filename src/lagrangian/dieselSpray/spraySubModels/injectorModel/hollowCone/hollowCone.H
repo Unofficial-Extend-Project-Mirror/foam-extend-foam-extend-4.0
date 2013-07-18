@@ -97,13 +97,13 @@ public:
             const scalar time,
             const scalar d
         ) const;
-    
+
         scalar velocity
         (
             const label i,
             const scalar time
         ) const;
-        
+
         scalar averageVelocity
         (
             const label i

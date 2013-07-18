@@ -84,7 +84,7 @@ Foam::Pair<Foam::vector> Foam::searchableSurfaceWithGaps::offsetVecs
         offsets[1] *= gap_;
     }
 
-    return offsets;    
+    return offsets;
 }
 
 

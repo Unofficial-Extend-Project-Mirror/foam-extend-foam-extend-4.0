@@ -48,7 +48,7 @@ Foam::autoPtr<Foam::dynamicFvMesh> Foam::dynamicFvMesh::New(const IOobject& io)
             false
         )
     );
-    
+
     word dynamicFvMeshTypeName(dynamicMeshDict.lookup("dynamicFvMesh"));
 
     Info<< "Selecting dynamicFvMesh " << dynamicFvMeshTypeName << endl;

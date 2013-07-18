@@ -150,7 +150,7 @@ class GAMGSolver
         //- Calculate and return the scaling factor from Acf, coarseSource
         //  and coarseField.
         //  At the same time do a Jacobi iteration on the coarseField using
-        //  the Acf provided after the coarseField values are used for the 
+        //  the Acf provided after the coarseField values are used for the
         //  scaling factor.
         scalar scalingFactor
         (

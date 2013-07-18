@@ -26,12 +26,12 @@ if(Pstream::parRun())
   {
     //***** FIX INCORRECT POINT ON PATCHES WITH FACEZONE *****//
     contactPatchPairList& contacts = contact;
-    
+
     forAll(contacts, contactI)
       {
 	label masterID = contacts[contactI].masterPatch().index();
 	label slaveID = contacts[contactI].slavePatch().index();
-	
+
 	primitivePatchInterpolation masterInterpolator
 	  (mesh.boundaryMesh()[masterID]);
 	primitivePatchInterpolation slaveInterpolator
@@ -49,17 +49,17 @@ if(Pstream::parRun())
 	  (
 	   DU.boundaryField()[slaveID]
 	   );
-	
+
 	vectorField oldMasterPoints =
 	  mesh.boundaryMesh()[masterID].localPoints();
 	vectorField oldSlavePoints =
 	  mesh.boundaryMesh()[slaveID].localPoints();
-	
+
 	labelList masterPointLabels =
 	  mesh.boundaryMesh()[masterID].meshPoints();
 	labelList slavePointLabels =
 	  mesh.boundaryMesh()[slaveID].meshPoints();
-	
+
 	//- correct the patch newPoints
 	forAll(masterPointLabels, pointI)
 	  {
@@ -79,7 +79,7 @@ if(Pstream::parRun())
 	  }
       }
 
-    
+
 
 
     //***** NOW FIX AND SYNCHRONISE ALL THE FACEZONE POINTS *****//
@@ -97,21 +97,21 @@ if(Pstream::parRun())
 	    FatalError << "Patch " << patchName << " not found corresponding for faceZone"
 		       << faceZoneName << exit(FatalError);
 	  }
-	    
+
 	vectorField globalFZpoints =
 	  mesh.faceZones()[faceZoneI]().localPoints();
-	
+
 	//- new points for the face zone
 	vectorField globalFZnewPoints(globalFZpoints.size(), vector::zero);
-	
+
 	//- inter-proc points are shared by multiple procs
 	//- pointNumProc is the number of procs which a point lies on
 	scalarField pointNumProcs(globalFZpoints.size(), 0.0);
-	
+
 	forAll(globalFZnewPoints, globalPointI)
 	  {
 	    label localPoint = procToGlobalFZmap[faceZoneI][globalPointI];
-	    
+
 	    //if(localPoint < mesh.boundaryMesh()[patchID].localPoints().size())
 	    if(pointOnLocalProcPatch[faceZoneI][localPoint])
 	      {
@@ -120,36 +120,36 @@ if(Pstream::parRun())
 		globalFZnewPoints[globalPointI] =
 		  newPoints[procPoint];
 		pointNumProcs[globalPointI] = 1;
-	      }		
+	      }
 	  }
-	
+
 	reduce(globalFZnewPoints, sumOp<vectorField>());
 	reduce(pointNumProcs, sumOp<scalarField>());
-	
+
 	//- now average the newPoints between all procs
 	if(min(pointNumProcs) < 1)
 	  {
 	    FatalError << "pointNumProc has not been set for all points" << exit(FatalError);
 	  }
 	globalFZnewPoints /= pointNumProcs;
-	
+
 	//- the globalFZnewPoints now contains the correct FZ new points in
 	//- a global order, now convert them back into the local proc order
-	
+
 	vectorField procFZnewPoints(globalFZpoints.size(), vector::zero);
-	
+
 	forAll(globalFZnewPoints, globalPointI)
 	  {
 	    label localPoint = procToGlobalFZmap[faceZoneI][globalPointI];
-	    
+
 	    procFZnewPoints[localPoint] =
 	      globalFZnewPoints[globalPointI];
 	  }
-	
+
 	//- now fix the newPoints points on the globalFaceZones
 	labelList procFZmeshPoints =
 	  mesh.faceZones()[faceZoneI]().meshPoints();
-	
+
 	forAll(procFZmeshPoints, pointI)
 	  {
 	    label procPoint = procFZmeshPoints[pointI];

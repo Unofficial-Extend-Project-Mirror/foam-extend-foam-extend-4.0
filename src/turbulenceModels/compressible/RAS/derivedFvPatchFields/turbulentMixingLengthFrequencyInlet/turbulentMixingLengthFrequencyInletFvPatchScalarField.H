@@ -36,7 +36,7 @@ Description
         \f[
             \omega_p = \frac{k^{0.5}}{C_{\mu}^{0.25} L}
         \f]
-   
+
     where
 
     \vartable

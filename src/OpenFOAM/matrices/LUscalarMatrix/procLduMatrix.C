@@ -97,7 +97,7 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const procLduMatrix& cldum)
         << cldum.upper_
         << cldum.lower_
         << cldum.interfaces_;
-    
+
     return os;
 }
 

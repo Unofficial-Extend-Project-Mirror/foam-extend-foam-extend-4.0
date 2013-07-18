@@ -14,12 +14,12 @@ Run Package updater to update your installation
 
 --------------------------------------------------------------------------------
 
-Add your user as a valid user for the command 'sudo'. 
+Add your user as a valid user for the command 'sudo'.
 
-You will need to use the command 'visudo' as the user root for this. 
+You will need to use the command 'visudo' as the user root for this.
 
 I won't go into the details for this, there is a lot of info all over the Net
-for doing this relatively minor adjustment. 
+for doing this relatively minor adjustment.
 
 In doubt, simply ask your local Unix guru.
 
@@ -79,7 +79,7 @@ cp ~/OpenFOAM/OpenFOAM-1.6-ext/etc/prefs.sh-EXAMPLE \
 #
 # The versions provided by Centos 5.5 are either too old, or a just a preview
 # version of gcc 4.4.0, which is a bit 'green'.
-# 
+#
 # So the system installed compiler will only serve to compile gcc 4.4.5.
 
 # Modify the etc/prefs.sh file to switch to gcc 4.4.5
@@ -137,15 +137,15 @@ tail -f log.AllMake   # To keep an eye on the compilation process
 # Compile OpenFOAM-1.6-ext
 
 cd $WM_PROJECT_DIR
-./Allwmake >& log.Allwmake &  
+./Allwmake >& log.Allwmake &
 tail -f log.Allwmake          # To keep an eye on the compilation process
 
 --------------------------------------------------------------------------------
 
 # Execute Allwmake a second time because of a bad library building sequence for
-# the library -lfaceDecompositionMotionSolver 
+# the library -lfaceDecompositionMotionSolver
 
-./Allwmake >& log.Allwmake2 & 
+./Allwmake >& log.Allwmake2 &
 tail -f log.Allwmake2          # To keep an eye on the compilation process
 
 --------------------------------------------------------------------------------

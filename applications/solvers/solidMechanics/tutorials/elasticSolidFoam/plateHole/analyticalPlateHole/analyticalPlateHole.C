@@ -26,7 +26,7 @@ Description
     Generate analytical solution for a infinite plaste with a circular
     hole.
     Stress field sigma is generated.
-    Based on solution outlined in Timoshenko, Theory of Elasticity. 
+    Based on solution outlined in Timoshenko, Theory of Elasticity.
 
 Author
     plateHoleSolution function by Z. Tukovic
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
        << "\n\tradius = 0.5"
        << "\n\tdistant traction = (10,000 0 0 )"
        << nl << endl;
- 
+
   volSymmTensorField sigma
     (
      IOobject
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
   sigma.write();
 
   Info << nl << "End" << endl;
-      
+
   return 0;
 }
 
@@ -116,7 +116,7 @@ symmTensor plateHoleSolution(const vector& C)
     coordinateSystem cs("polarCS", C, vector(0, 0, 1), C/mag(C));
 
     sigma.xx() =
-        T*(1 - sqr(a)/sqr(r))/2 
+        T*(1 - sqr(a)/sqr(r))/2
       + T*(1 + 3*pow(a,4)/pow(r,4) - 4*sqr(a)/sqr(r))*::cos(2*theta)/2;
 
     sigma.xy() =
@@ -125,7 +125,7 @@ symmTensor plateHoleSolution(const vector& C)
     sigma.yx() = sigma.xy();
 
     sigma.yy() =
-        T*(1 + sqr(a)/sqr(r))/2 
+        T*(1 + sqr(a)/sqr(r))/2
       - T*(1 + 3*pow(a,4)/pow(r,4))*::cos(2*theta)/2;
 
 
@@ -137,6 +137,6 @@ symmTensor plateHoleSolution(const vector& C)
     S.xx() = sigma.xx();
     S.xy() = sigma.xy();
     S.yy() = sigma.yy();
-    
+
     return S;
 }

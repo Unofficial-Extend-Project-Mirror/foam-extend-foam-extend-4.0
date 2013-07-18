@@ -8,7 +8,7 @@
   F = I + DF;
   volTensorField Finv = inv(F);
   J = det(F);
-  
+
   rho = rho/J;
   sigma = 1/J * symm(F & sigma & F.T());
   epsilon = symm(Finv.T() & epsilon & Finv);

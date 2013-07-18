@@ -71,7 +71,7 @@ class KRR4
 
         static const scalar safety, grow, pgrow, shrink, pshrink, errcon;
 
-        static const scalar 
+        static const scalar
             gamma,
             a21, a31, a32,
             c21, c31, c32, c41, c42, c43,

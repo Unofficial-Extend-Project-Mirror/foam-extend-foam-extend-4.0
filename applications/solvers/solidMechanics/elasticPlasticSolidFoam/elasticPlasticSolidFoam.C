@@ -63,29 +63,29 @@ int main(int argc, char *argv[])
 # include "createSolidInterface.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-  
+
   Info<< "\nCalculating displacement field\n" << endl;
-  
+
   for (runTime++; !runTime.end(); runTime++)
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
-      
+
 #     include "readStressedFoamControls.H"
-      
+
       int iCorr = 0;
       scalar initialResidual = 0;
       scalar relativeResidual = GREAT;
       lduMatrix::solverPerformance solverPerf;
       lduMatrix::debug = 0;
-      
+
       const volSymmTensorField& DEpsilonP = rheology.DEpsilonP();
-      
+
       do
-	{          
+	{
 	  DU.storePrevIter();
 
 #         include "calculateDivDSigmaExp.H"
-	  	  
+
 	  fvVectorMatrix DUEqn
 	    (
 	     fvm::d2dt2(rho, DU)
@@ -99,16 +99,16 @@ int main(int argc, char *argv[])
 	    {
 	      solidInterfacePtr->correct(DUEqn);
 	    }
-	  
+
 	  solverPerf = DUEqn.solve();
-	  
+
 	  if(iCorr == 0)
             {
 	      initialResidual = solverPerf.initialResidual();
             }
-	  
+
 	  DU.relax();
-	  
+
 	  if(solidInterfaceCorr)
 	    {
 	      gradDU = solidInterfacePtr->grad(DU);
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 	    }
 
 #         include "calculateRelativeResidual.H"
-	  
+
 	  rheology.correct();
 	  mu = rheology.newMu();
 	  lambda = rheology.newLambda();
@@ -138,38 +138,38 @@ int main(int argc, char *argv[])
 	}
       while
 	(
-	 solverPerf.initialResidual() > convergenceTolerance 
+	 solverPerf.initialResidual() > convergenceTolerance
 	 && ++iCorr < nCorr
 	 );
-      
-      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name() 
-	   << ", Initial residual = " << initialResidual 
+
+      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name()
+	   << ", Initial residual = " << initialResidual
 	   << ", Final residual = " << solverPerf.initialResidual()
 	   << ", No outer iterations " << iCorr << endl;
-      
+
       lduMatrix::debug = 1;
-      
+
 #     include "calculateDEpsilonDSigma.H"
 
       U += DU;
-      
+
       epsilon += DEpsilon;
-      
+
       epsilonP += rheology.DEpsilonP();
-      
+
       sigma += DSigma;
-      
+
       rheology.updateYieldStress();
-      
+
 #     include "writeFields.H"
-      
+
       Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
 	  << "  ClockTime = " << runTime.elapsedClockTime() << " s"
 	  << nl << endl;
     }
-  
+
   Info<< "End\n" << endl;
-  
+
   return(0);
 }
 

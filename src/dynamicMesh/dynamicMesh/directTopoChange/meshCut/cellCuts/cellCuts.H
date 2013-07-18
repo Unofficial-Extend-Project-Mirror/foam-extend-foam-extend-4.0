@@ -61,7 +61,7 @@ Description
       - cellAnchorPoints : per cell the vertices on one side which are
         considered the anchor points.
 
-    AnchorPoints: connected loops have to be oriented in the same way to 
+    AnchorPoints: connected loops have to be oriented in the same way to
     be able to grow new internal faces out of the same bottom faces.
     (limitation of the mapping procedure). The loop is cellLoop is oriented
     such that the normal of it points towards the anchorPoints.
@@ -435,7 +435,7 @@ class cellCuts
 
             //- Set orientation of loops
             void orientPlanesAndLoops();
-            
+
             //- top level driver: adressing calculation and loop detection
             void calcLoopsAndAddressing(const labelList& cutCells);
 
@@ -592,7 +592,7 @@ public:
             //- Returns coordinates of points on loop for given cell.
             //  Uses cellLoops_ and edgeWeight_
             pointField loopPoints(const label cellI) const;
-  
+
             //- Invert anchor point selection.
             labelList nonAnchorPoints
             (

@@ -62,7 +62,7 @@ surfaceFormat vtk;
 //      cloud               specified points, uses findCell
 //
 //
-// axis: how to write point coordinate. Choice of 
+// axis: how to write point coordinate. Choice of
 // - x/y/z: x/y/z coordinate only
 // - xyz: three columns
 //  (probably does not make sense for anything but raw)
