@@ -94,9 +94,12 @@ Foam::sixDoFRigidBodyMotionRestraints::linearAxialAngularSpring::restrain
 
         refDir = rotationTensor(vector(1, 0 ,0), axis_) & vector(0, 0, 1);
 
-        vector oldDir = refQ_ & refDir;
+        // Must update existing variables - not create new ones
+        // HR 18/Jul/2013
 
-        vector newDir = motion.orientation() & refDir;
+        oldDir = refQ_ & refDir;
+
+        newDir = motion.orientation() & refDir;
     }
 
     // Removing any axis component from oldDir and newDir and normalising
