@@ -138,26 +138,6 @@ Foam::tmp<Foam::scalarField> Foam::magLongDelta::calcMagLongDistance
 }
 
 
-Foam::tmp<Foam::scalarField> Foam::magLongDelta::calcMagLongDistance
-(
-    const label patchi
-) const
-{
-    const fvPatch& p = mesh().boundary()[patchi];
-
-    vectorField d = p.fvPatch::delta();
-
-    if (p.coupled())
-    {
-        return (mag(p.Sf() & d) + mag(p.Sf() & (p.delta() - d)))/p.magSf();
-    }
-    else
-    {
-        return mag(p.Sf() & d)/p.magSf();
-    }
-}
-
-
 const Foam::surfaceScalarField& Foam::magLongDelta::magDelta() const
 {
     if (!magLongDeltaPtr_)

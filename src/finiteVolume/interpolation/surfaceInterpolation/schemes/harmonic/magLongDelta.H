@@ -67,6 +67,12 @@ class magLongDelta
         //- Construct long distance
         void makeMagLongDistance() const;
 
+        //- Construct long distance for patch
+        tmp<scalarField> calcMagLongDistance
+        (
+            const label patchi
+        ) const;
+
         //- Clear data
         void clearData() const;
 
