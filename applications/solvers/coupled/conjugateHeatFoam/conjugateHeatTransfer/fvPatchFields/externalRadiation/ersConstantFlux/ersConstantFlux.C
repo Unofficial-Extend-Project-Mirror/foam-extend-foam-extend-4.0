@@ -24,39 +24,46 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "planeToCylinder.H"
+#include "ersConstantFlux.H"
 #include "addToRunTimeSelectionTable.H"
 
 namespace Foam
 {
 
-defineTypeNameAndDebug(planeToCylinder, 0);
-addToRunTimeSelectionTable(externalRadiationSource, planeToCylinder, dictionary);
+defineTypeNameAndDebug(ersConstantFlux, 0);
+addToRunTimeSelectionTable(externalRadiationSource, ersConstantFlux, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-planeToCylinder::planeToCylinder
+ersConstantFlux::ersConstantFlux
 (
     const word& name,
     const dictionary& dict,
     const fvPatch& p
 )
 :
-    viewFactor(name, dict),
-    direction_(dict.lookup("direction"))
-{
-    scalarField cosBeta = (direction_ & p.Sf()/p.magSf());
+    externalRadiationSource(name),
+    q_("q", dict, p.size())
+{}
 
-    F() = 0.5 - 0.5*cosBeta;
-}
+ersConstantFlux::ersConstantFlux
+(
+    const word& name
+)
+:
+    externalRadiationSource(name)
+{}
+
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void planeToCylinder::write(Ostream& os) const
+void ersConstantFlux::write(Ostream& os) const
 {
-    viewFactor::write(os);
-    os.writeKeyword("direction") << direction_ << token::END_STATEMENT << nl;
+    externalRadiationSource::write(os);
+
+    q_.writeEntry("q", os);
 }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

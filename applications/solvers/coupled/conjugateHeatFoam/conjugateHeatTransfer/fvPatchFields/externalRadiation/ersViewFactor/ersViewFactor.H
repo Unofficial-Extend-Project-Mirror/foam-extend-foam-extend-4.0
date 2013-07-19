@@ -23,19 +23,19 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::viewFactor
+    Foam::ersViewFactor
 
 Description
     helper class to sum up external radiation sources
 
       
 SourceFiles
-    viewFactor.C
+    ersViewFactor.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef viewFactor_H
-#define viewFactor_H
+#ifndef ersViewFactor_H
+#define ersViewFactor_H
 
 #include "externalRadiationSource.H"
 
@@ -48,7 +48,7 @@ namespace Foam
                   Class wallHeatTransferFvPatch Declaration
 \*---------------------------------------------------------------------------*/
 
-class viewFactor
+class ersViewFactor
 :
     public externalRadiationSource
 {
@@ -72,7 +72,7 @@ public:
     // Constructors
 
         //- Construct from components
-        explicit viewFactor
+        explicit ersViewFactor
         (
             const word& name,
             const dictionary& dict,
@@ -81,7 +81,7 @@ public:
 
 
         //- Construct from components
-        explicit viewFactor
+        explicit ersViewFactor
         (
             const word& name,
             const dictionary& dict
@@ -93,13 +93,13 @@ public:
         {
             return autoPtr<externalRadiationSource>
             (
-                new viewFactor(*this)
+                new ersViewFactor(*this)
             );
         }
 
     // Destructor
 
-        virtual ~viewFactor()
+        virtual ~ersViewFactor()
         {};
 
 

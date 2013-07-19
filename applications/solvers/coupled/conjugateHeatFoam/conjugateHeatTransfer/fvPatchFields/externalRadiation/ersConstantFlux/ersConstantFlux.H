@@ -23,19 +23,19 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::constantFlux
+    Foam::ersConstantFlux
 
 Description
     helper class to sum up external radiation sources
 
       
 SourceFiles
-    constantFlux.C
+    ersConstantFlux.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef constantFlux_H
-#define constantFlux_H
+#ifndef ersConstantFlux_H
+#define ersConstantFlux_H
 
 #include "externalRadiationSource.H"
 
@@ -48,7 +48,7 @@ namespace Foam
                   Class wallHeatTransferFvPatch Declaration
 \*---------------------------------------------------------------------------*/
 
-class constantFlux
+class ersConstantFlux
 :
     public externalRadiationSource
 {
@@ -67,14 +67,14 @@ public:
     // Constructors
 
         //- Construct from components
-        explicit constantFlux
+        explicit ersConstantFlux
         (
             const word& name,
             const dictionary& dict,
             const fvPatch& p
         );
 
-        explicit constantFlux
+        explicit ersConstantFlux
         (
             const word& name
         );
@@ -84,13 +84,13 @@ public:
         {
             return autoPtr<externalRadiationSource>
             (
-                new constantFlux(*this)
+                new ersConstantFlux(*this)
             );
         }
 
     // Destructor
 
-        virtual ~constantFlux()
+        virtual ~ersConstantFlux()
         {};
 
 

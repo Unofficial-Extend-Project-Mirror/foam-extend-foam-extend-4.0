@@ -23,21 +23,21 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::pointSource
+    Foam::ersPlaneToCylinder
 
 Description
     helper class to sum up external radiation sources
 
       
 SourceFiles
-    pointSource.C
+    ersPlaneToCylinder.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef pointSource_H
-#define pointSource_H
+#ifndef ersPlaneToCylinder_H
+#define ersPlaneToCylinder_H
 
-#include "constantFlux.H"
+#include "ersViewFactor.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,31 +48,26 @@ namespace Foam
                   Class wallHeatTransferFvPatch Declaration
 \*---------------------------------------------------------------------------*/
 
-class pointSource
+class ersPlaneToCylinder
 :
-    public constantFlux
+    public ersViewFactor
 {
     // Private data
 
-        //- Strenght of the point source
-        scalar qmax_;
-
-        //- radiation absorptivity
-        scalar alpha_;
-
-        //- Direction of the pointSource
+        //- Direction of infinite plane
         vector direction_;
+
 
 public:
 
     //- Runtime type information
-    TypeName("pointSource");
+    TypeName("planeToCylinder");
 
 
     // Constructors
 
         //- Construct from components
-        explicit pointSource
+        explicit ersPlaneToCylinder
         (
             const word& name,
             const dictionary& dict,
@@ -85,13 +80,13 @@ public:
         {
             return autoPtr<externalRadiationSource>
             (
-                new pointSource(*this)
+                new ersPlaneToCylinder(*this)
             );
         }
 
     // Destructor
 
-        virtual ~pointSource()
+        virtual ~ersPlaneToCylinder()
         {};
 
 

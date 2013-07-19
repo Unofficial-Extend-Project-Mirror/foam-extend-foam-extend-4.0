@@ -24,18 +24,19 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "constantFlux.H"
+#include "ersViewFactor.H"
 #include "addToRunTimeSelectionTable.H"
+#include "radiationConstants.H"
 
 namespace Foam
 {
 
-defineTypeNameAndDebug(constantFlux, 0);
-addToRunTimeSelectionTable(externalRadiationSource, constantFlux, dictionary);
+defineTypeNameAndDebug(ersViewFactor, 0);
+addToRunTimeSelectionTable(externalRadiationSource, ersViewFactor, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-constantFlux::constantFlux
+ersViewFactor::ersViewFactor
 (
     const word& name,
     const dictionary& dict,
@@ -43,25 +44,41 @@ constantFlux::constantFlux
 )
 :
     externalRadiationSource(name),
-    q_("q", dict, p.size())
+    Tinf_(readScalar(dict.lookup("Tinf"))),
+    F_("F", dict, p.size()),
+    epsilon_(readScalar(dict.lookup("epsilon")))
 {}
 
-constantFlux::constantFlux
+ersViewFactor::ersViewFactor
 (
-    const word& name
+    const word& name,
+    const dictionary& dict
 )
 :
-    externalRadiationSource(name)
+    externalRadiationSource(name),
+    Tinf_(readScalar(dict.lookup("Tinf"))),
+    epsilon_(readScalar(dict.lookup("epsilon")))
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void constantFlux::write(Ostream& os) const
+tmp<scalarField> ersViewFactor::q
+(
+    const scalarField& Tw
+) const
+{
+    return epsilon_*F_*radiation::sigmaSB.value()*(pow4(Tw) - pow4(Tinf_));
+}
+
+
+void ersViewFactor::write(Ostream& os) const
 {
     externalRadiationSource::write(os);
 
-    q_.writeEntry("q", os);
+    os.writeKeyword("Tinf") << Tinf_ << token::END_STATEMENT << nl;
+    F_.writeEntry("F", os);
+    os.writeKeyword("epsilon") << epsilon_ << token::END_STATEMENT << nl;
 }
 
 

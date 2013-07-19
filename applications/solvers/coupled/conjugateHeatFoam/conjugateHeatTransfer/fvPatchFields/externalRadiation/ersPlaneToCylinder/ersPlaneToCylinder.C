@@ -24,43 +24,39 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "pointSource.H"
+#include "ersPlaneToCylinder.H"
 #include "addToRunTimeSelectionTable.H"
 
 namespace Foam
 {
 
-defineTypeNameAndDebug(pointSource, 0);
-addToRunTimeSelectionTable(externalRadiationSource, pointSource, dictionary);
+defineTypeNameAndDebug(ersPlaneToCylinder, 0);
+addToRunTimeSelectionTable(externalRadiationSource, ersPlaneToCylinder, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-pointSource::pointSource
+ersPlaneToCylinder::ersPlaneToCylinder
 (
     const word& name,
     const dictionary& dict,
     const fvPatch& p
 )
 :
-    constantFlux(name),
-    qmax_(readScalar(dict.lookup("qmax"))),
-    alpha_(readScalar(dict.lookup("alpha"))),
+    ersViewFactor(name, dict),
     direction_(dict.lookup("direction"))
 {
-    q() = -alpha_*qmax_*min(direction_ & p.Sf()/p.magSf(), 0.0);
-}
+    scalarField cosBeta = (direction_ & p.Sf()/p.magSf());
 
+    F() = 0.5 - 0.5*cosBeta;
+}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void pointSource::write(Ostream& os) const
+void ersPlaneToCylinder::write(Ostream& os) const
 {
-    constantFlux::write(os);
-    os.writeKeyword("qmax") << qmax_ << token::END_STATEMENT << nl;
-    os.writeKeyword("alpha") << alpha_ << token::END_STATEMENT << nl;
+    ersViewFactor::write(os);
     os.writeKeyword("direction") << direction_ << token::END_STATEMENT << nl;
 }
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

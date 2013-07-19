@@ -34,10 +34,10 @@ $(BCs)/extendedWallHeatTransfer/extendedWallHeatTransferFvPatchScalarField.C
 
 $(BCs)/externalRadiation/externalRadiationSource/externalRadiationSource.C
 $(BCs)/externalRadiation/externalRadiationSource/newExternalRadiationSource.C
-$(BCs)/externalRadiation/constantFlux/constantFlux.C
-$(BCs)/externalRadiation/viewFactor/viewFactor.C
-$(BCs)/externalRadiation/planeToCylinder/planeToCylinder.C
-$(BCs)/externalRadiation/pointSource/pointSource.C
+$(BCs)/externalRadiation/ersConstantFlux/ersConstantFlux.C
+$(BCs)/externalRadiation/ersViewFactor/ersViewFactor.C
+$(BCs)/externalRadiation/ersPlaneToCylinder/ersPlaneToCylinder.C
+$(BCs)/externalRadiation/ersPointSource/ersPointSource.C
 $(BCs)/solidWallHeatFluxTemperature/solidWallHeatFluxTemperatureFvPatchScalarField.C
 $(BCs)/adiabatic/adiabaticFvPatchScalarField.C
 
