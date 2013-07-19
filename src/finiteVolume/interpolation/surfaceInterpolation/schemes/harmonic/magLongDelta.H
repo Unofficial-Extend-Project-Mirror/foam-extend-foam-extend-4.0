@@ -61,20 +61,19 @@ class magLongDelta
         //- Magnitude of the normal distances to the face
         mutable surfaceScalarField* magLongDeltaPtr_;
 
-        //- Magnitude of the normal distances on coupled patches
-        //- Data in magLongDeltaPtr_ is reused, if it exists
-        mutable List<scalarField*> magLongDeltaBnd_;
-
 
     // Private member functions
 
-        //- Construct Long distance
+        //- Construct long distance
         void makeMagLongDistance() const;
 
-        //- Construct Long distance
-        void makeMagLongDistance(label patchi) const;
+        //- Construct long distance for patch
+        tmp<scalarField> calcMagLongDistance
+        (
+            const label patchi
+        ) const;
 
-        //- Clear Data
+        //- Clear data
         void clearData() const;
 
 public:

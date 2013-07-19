@@ -519,35 +519,38 @@ void Foam::fvMatrix<Type>::setReference
     const bool forceReference
 )
 {
-    if (celli >= 0 && (psi_.needReference() || forceReference))
+    if ((forceReference || psi_.needReference()) && celli >= 0)
     {
-        // Bug fix: force reference only on master for parallel runs
-        // HJ, 12/Feb/2010
-        if (Pstream::parRun())
-        {
-            // Parallel run:
-            // - only set reference on master processor: one place is enough
-            // - make sure that cellI is not out of range
-            if (Pstream::master())
-            {
-                label parCelli = celli;
+        // HR, 9/Jul/2013
+        // Very early versions could produce memory violations if celli is read 
+        // from dictionary, however, the proposed fix produced unpredictable
+        // results in parallel. Keeping in mind that topologically changing
+        // meshes will complicate the matter to level that cannot possibly be
+        // dealt with at this point, we will simply raise an error if celli
+        // is out of bound.
 
-                while (parCelli >= diag().size())
-                {
-                    // Out of range, pick a local cell
-                    parCelli /= Pstream::nProcs();
-                }
+        // In essence: The user of this function needs to make sure that celli
+        // is set only on one processor and that it is updated if the mesh
+        // changes. We should be doing better than this! Consider mesh object
+        // to hold reference cell and associated data.
 
-                source()[parCelli] += diag()[parCelli]*value;
-                diag()[parCelli] += diag()[parCelli];
-            }
-        }
-        else
+        if (celli >= diag().size())
         {
-            // Serial run, standard practice
-            source()[celli] += diag()[celli]*value;
-            diag()[celli] += diag()[celli];
+            FatalErrorIn
+            (
+                "fvMatrix<Type>::setReference"
+                "("
+                "const label celli, "
+                "const Type& value, "
+                "const bool forceReference"
+                ")"
+            )
+                << "celli out of bound"
+                << abort(FatalError);
         }
+
+        source()[celli] += diag()[celli]*value;
+        diag()[celli] += diag()[celli];
     }
 }
 

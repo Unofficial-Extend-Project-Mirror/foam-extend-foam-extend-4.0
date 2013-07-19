@@ -42,8 +42,7 @@ namespace Foam
 Foam::magLongDelta::magLongDelta(const fvMesh& mesh)
 :
     MeshObject<fvMesh, magLongDelta>(mesh),
-    magLongDeltaPtr_(NULL),
-    magLongDeltaBnd_(mesh.boundary().size(), NULL)
+    magLongDeltaPtr_(NULL)
 {}
 
 
@@ -59,20 +58,7 @@ Foam::magLongDelta::~magLongDelta()
 
 void Foam::magLongDelta::clearData() const
 {
-    if (magLongDeltaPtr_)
-    {
-        delete magLongDeltaPtr_;
-    }
-    else
-    {
-        forAll (magLongDeltaBnd_, i)
-        {
-            if (magLongDeltaBnd_[i])
-            {
-                delete magLongDeltaBnd_[i];
-            }
-        }
-    }
+    deleteDemandDrivenData(magLongDeltaPtr_);
 }
 
 
@@ -120,23 +106,7 @@ void Foam::magLongDelta::makeMagLongDistance() const
 
     forAll (mldp.boundaryField(), patchi)
     {
-        const fvPatch& p = mesh().boundary()[patchi];
-
-        if (p.coupled())
-        {
-            if (!magLongDeltaBnd_[patchi])
-            {
-                makeMagLongDistance(patchi);
-            }
-
-            mldp.boundaryField()[patchi] = *magLongDeltaBnd_[patchi];
-            delete magLongDeltaBnd_[patchi];
-            magLongDeltaBnd_[patchi] = &mldp.boundaryField()[patchi];
-        }
-        else
-        {
-            delete magLongDeltaBnd_[patchi];
-        }
+        mldp.boundaryField()[patchi] = calcMagLongDistance(patchi);
     }
 
     if (debug)
@@ -148,30 +118,22 @@ void Foam::magLongDelta::makeMagLongDistance() const
 }
 
 
-void Foam::magLongDelta::makeMagLongDistance(label patchi) const
+Foam::tmp<Foam::scalarField> Foam::magLongDelta::calcMagLongDistance
+(
+    const label patchi
+) const
 {
-    if (debug)
-    {
-        Info<< "magLongDelta::makeMagLongDistanceBnd(label patchi) :"
-            << "Constructing magnitude of long cell distance"
-            << endl;
-    }
-
     const fvPatch& p = mesh().boundary()[patchi];
 
     vectorField d = p.fvPatch::delta();
 
-    magLongDeltaBnd_[patchi] =
-        new scalarField
-        (
-            (mag(p.Sf() & d) + mag(p.Sf() & (p.delta() - d)))/p.magSf()
-        );
-
-    if (debug)
+    if (p.coupled())
     {
-        Info<< "magLongDelta::makeMagLongDistanceBnd(label patchi) :"
-            << "Finished magnitude of long cell distance"
-            << endl;
+        return (mag(p.Sf() & d) + mag(p.Sf() & (p.delta() - d)))/p.magSf();
+    }
+    else
+    {
+        return mag(p.Sf() & d)/p.magSf();
     }
 }
 
@@ -182,8 +144,6 @@ const Foam::surfaceScalarField& Foam::magLongDelta::magDelta() const
     {
         makeMagLongDistance();
     }
-
-    return *magLongDeltaPtr_;
 }
 
 
@@ -192,22 +152,7 @@ const Foam::scalarField& Foam::magLongDelta::magDelta
     const label patchi
 ) const
 {
-    if (!mesh().boundary()[patchi].coupled())
-    {
-        FatalErrorIn
-        (
-            "const Foam::scalarField& Foam::magLongDelta::magDelta("
-            "const label patchi) const"
-        )   << "patch is not a coupled. Cannot calculate long distance"
-            << abort(FatalError);
-    }
-
-    if (!magLongDeltaBnd_[patchi])
-    {
-        makeMagLongDistance(patchi);
-    }
-
-    return *magLongDeltaBnd_[patchi];
+    return magDelta().boundaryField()[patchi];
 }
 
 
@@ -220,8 +165,6 @@ bool Foam::magLongDelta::movePoints() const
     }
 
     clearData();
-
-    magLongDeltaBnd_.setSize(mesh().boundary().size(), NULL);
 
     return true;
 }
@@ -236,8 +179,6 @@ bool Foam::magLongDelta::updateMesh(const mapPolyMesh& mpm) const
     }
 
     clearData();
-
-    magLongDeltaBnd_.setSize(mesh().boundary().size(), NULL);
 
     return true;
 }

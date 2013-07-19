@@ -142,6 +142,13 @@ public:
                 const label patchi
             ) const;
 
+            //- Heat capacity at constant pressure for cell-set [J/kg/K]
+            virtual tmp<scalarField> Cp
+            (
+                const scalarField& T,
+                const labelList& cells
+            ) const;
+
             //- Heat capacity at constant pressure [J/kg/K]
             virtual tmp<volScalarField> Cp() const;
 

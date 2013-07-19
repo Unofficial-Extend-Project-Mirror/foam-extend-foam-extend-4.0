@@ -2,8 +2,8 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
-     \\/     M anipulation  |
+    \\  /    A nd           | Copyright (C) 2008-2011 H. Jasak & H. Rusche
+     \\/     M anipulation  | All rights reserved
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -25,44 +25,91 @@ License
 Application
     conjugateHeatFoam
 
-Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
-
 Description
-    Transient solver for incompressible, laminar flow of Newtonian fluids
-    with conjugate heat transfer
+    Transient solver for buoyancy-driven turbulent flow of incompressible
+    Newtonian fluids with conjugate heat transfer, complex heat conduction
+    and radiation
 
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
 #include "coupledFvMatrices.H"
 #include "regionCouplePolyPatch.H"
+#include "radiationModel.H"
+#include "thermalModel.H"
+#include "singlePhaseTransportModel.H"
+#include "RASModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
 #   include "setRootCase.H"
-
 #   include "createTime.H"
 #   include "createFluidMesh.H"
-#   include "attachPatches.H"
 #   include "createSolidMesh.H"
+#   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
 #   include "createSolidFields.H"
-
 #   include "initContinuityErrs.H"
+#   include "readTimeControls.H"
+#   include "CourantNo.H"
+#   include "setInitialDeltaT.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nStarting time loop\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "solveFluid.H"
+#       include "readTimeControls.H"
+#       include "readPISOControls.H"
+#       include "CourantNo.H"
+#       include "setDeltaT.H"
+
+        // Detach patches
+#       include "detachPatches.H"
+
+#       include "UEqn.H"
+
+        p_rgh.storePrevIter();
+
+        for (int corr = 0; corr < nCorr; corr++)
+        {
+#           include "pEqn.H"
+        }
+
+        // Update turbulent quantities
+        turbulence->correct();
+
+        radiation->correct();
+
+        // Update thermal conductivity in the fluid
+        kappaEff = rho*Cp*(turbulence->nu()/Pr + turbulence->nut()/Prt);
+
+        // Update thermal conductivity in the solid
+        solidThermo.correct();
+        ksolid = solidThermo.k();
+
+        rhoCpsolid.oldTime();
+        rhoCpsolid = solidThermo.rho()*solidThermo.C();
+
+        // Coupled patches
+#       include "attachPatches.H"
+
+        kappaEff.correctBoundaryConditions();
+        ksolid.correctBoundaryConditions();
+
+        // Interpolate to the faces and add thermal resistance
+        surfaceScalarField ksolidf = fvc::interpolate(ksolid);
+        solidThermo.modifyResistance(ksolidf);
+
 #       include "solveEnergy.H"
+
+        // Update density according to Boussinesq approximation
+        rhok = 1.0 - beta*(T - TRef);
 
         runTime.write();
 

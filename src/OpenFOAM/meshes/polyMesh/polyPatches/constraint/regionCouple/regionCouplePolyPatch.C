@@ -318,13 +318,13 @@ void Foam::regionCouplePolyPatch::calcLocalParallel() const
     localParallelPtr_ = new bool(false);
     bool& emptyOrComplete = *localParallelPtr_;
 
-    // If running in serial, all GGIs are expanded to zone size.
+    // If running in parallel, all GGIs are expanded to zone size.
     // This happens on decomposition and reconstruction where
     // size and shadow size may be zero, but zone size may not
     // HJ, 1/Jun/2011
     if (!Pstream::parRun())
     {
-        emptyOrComplete = false;
+        emptyOrComplete = true;
     }
     else
     {
@@ -346,7 +346,7 @@ void Foam::regionCouplePolyPatch::calcLocalParallel() const
 
         if (emptyOrComplete)
         {
-           Info<< "local parallel" << endl;
+            Info<< "local parallel" << endl;
         }
         else
         {
@@ -468,9 +468,15 @@ Foam::regionCouplePolyPatch& Foam::regionCouplePolyPatch::shadow()
 }
 
 
-void Foam::regionCouplePolyPatch::clearGeom() const
+void Foam::regionCouplePolyPatch::clearDeltas() const
 {
     deleteDemandDrivenData(reconFaceCellCentresPtr_);
+}
+
+
+void Foam::regionCouplePolyPatch::clearGeom() const
+{
+    clearDeltas();
 
     // Remote addressing and send-receive maps depend on the local
     // position.  Therefore, it needs to be recalculated at mesh motion.
@@ -480,16 +486,19 @@ void Foam::regionCouplePolyPatch::clearGeom() const
 
     deleteDemandDrivenData(receiveAddrPtr_);
     deleteDemandDrivenData(sendAddrPtr_);
+
+    // localParallel depends on geometry - must be cleared!
+    // HR, 11/Jul/2013
+    deleteDemandDrivenData(localParallelPtr_);
 }
 
 
-void Foam::regionCouplePolyPatch::clearOut()
+void Foam::regionCouplePolyPatch::clearOut() const
 {
     clearGeom();
 
     deleteDemandDrivenData(zoneAddressingPtr_);
     deleteDemandDrivenData(patchToPatchPtr_);
-    deleteDemandDrivenData(localParallelPtr_);
 }
 
 
@@ -800,7 +809,11 @@ void Foam::regionCouplePolyPatch::attach() const
         // Patch-to-patch interpolation does not need to be cleared,
         // only face/cell centres and interpolation factors
         // HJ, 6/Jun/2011
-        clearGeom();
+        //clearGeom()
+
+        // Clear delta coefficients, but keep the rest.
+        // HR, 10/Jul/2013
+        clearDeltas();
     }
 }
 
@@ -815,7 +828,11 @@ void Foam::regionCouplePolyPatch::detach() const
         // Patch-to-patch interpolation does not need to be cleared,
         // only face/cell centres and interpolation factors
         // HJ, 6/Jun/2011
-        clearGeom();
+        //clearGeom()
+
+        // Clear delta coefficients, but keep the rest.
+        // HR, 10/Jul/2013
+        clearDeltas();
     }
 }
 
@@ -1015,7 +1032,7 @@ void Foam::regionCouplePolyPatch::updateMesh()
 }
 
 
-void Foam::regionCouplePolyPatch::calcTransforms()
+void Foam::regionCouplePolyPatch::calcTransforms() const
 {
     // No transform or separation
     forwardT_.setSize(0);

@@ -12,13 +12,15 @@
         solidMesh
     );
 
-    Info<< "Reading solid diffusivity DT\n" << endl;
+    Info<< "Reading solid thermal properties" << endl;
+    thermalModel solidThermo(Tsolid);
 
-    volScalarField DTsolid
+    Info<< "Reading solid diffusivity k\n" << endl;
+    volScalarField ksolid
     (
         IOobject
         (
-            "DT",
+            "k",
             runTime.timeName(),
             solidMesh,
             IOobject::MUST_READ,
@@ -27,6 +29,17 @@
         solidMesh
     );
 
-    // On creation of both diffusivities, couple the sides
-    DT.correctBoundaryConditions();
-    DTsolid.correctBoundaryConditions();
+    Info<< "Constructing rhoCp\n" << endl;
+    volScalarField rhoCpsolid
+    (
+        IOobject
+        (
+            "rhoCpsolid",
+            runTime.timeName(),
+            solidMesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        solidThermo.rho()*solidThermo.C()
+    );
+    rhoCpsolid.oldTime();

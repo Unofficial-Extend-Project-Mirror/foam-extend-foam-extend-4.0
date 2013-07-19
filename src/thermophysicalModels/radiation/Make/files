@@ -10,6 +10,7 @@ radiationModel/fvDOM/fvDOM/fvDOM.C
 radiationModel/fvDOM/radiativeIntensityRay/radiativeIntensityRay.C
 radiationModel/fvDOM/blackBodyEmission/blackBodyEmission.C
 radiationModel/fvDOM/absorptionCoeffs/absorptionCoeffs.C
+radiationModel/viewFactor/viewFactor.C
 
 /* Scatter model */
 submodels/scatterModel/scatterModel/scatterModel.C
@@ -32,5 +33,6 @@ derivedFvPatchFields/MarshakRadiation/MarshakRadiationMixedFvPatchScalarField.C
 derivedFvPatchFields/MarshakRadiationFixedT/MarshakRadiationFixedTMixedFvPatchScalarField.C
 derivedFvPatchFields/greyDiffusiveRadiation/greyDiffusiveRadiationMixedFvPatchScalarField.C
 derivedFvPatchFields/wideBandDiffusiveRadiation/wideBandDiffusiveRadiationMixedFvPatchScalarField.C
+derivedFvPatchFields/greyDiffusiveViewFactor/greyDiffusiveViewFactorFixedValueFvPatchScalarField.C
 
 LIB = $(FOAM_LIBBIN)/libradiation

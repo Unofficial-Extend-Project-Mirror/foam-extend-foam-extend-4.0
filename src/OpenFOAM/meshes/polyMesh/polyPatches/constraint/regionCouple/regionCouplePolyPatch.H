@@ -134,7 +134,7 @@ class regionCouplePolyPatch
             void calcReconFaceCellCentres() const;
 
             //- Force calculation of transformation tensors
-            virtual void calcTransforms();
+            virtual void calcTransforms() const;
 
 
         // Parallel communication optimisation, stored on master processor
@@ -155,11 +155,14 @@ class regionCouplePolyPatch
 
         // Memory management
 
+            //- Clear delta coefficients
+            void clearDeltas() const;
+
             //- Clear geometry
-             void clearGeom() const;
+            void clearGeom() const;
 
             //- Clear out
-            void clearOut();
+            void clearOut() const;
 
 
 protected:

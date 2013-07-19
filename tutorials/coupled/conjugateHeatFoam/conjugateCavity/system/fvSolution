@@ -16,21 +16,38 @@ FoamFile
 
 solvers
 {
-    p
+    p_rgh
     {
         solver           PCG;
         preconditioner   DIC;
-        tolerance        1e-06;
+
+        minIter          0;
+        maxIter          1000;
+        tolerance        1e-25;
+        relTol           0.01;
+    };
+
+    p_rghFinal
+    {
+        solver           PCG;
+        preconditioner   DIC;
+
+        minIter          0;
+        maxIter          1000;
+        tolerance        1e-25;
         relTol           0;
-    }
+    };
 
     U
     {
         solver           PBiCG;
         preconditioner   DILU;
-        tolerance        1e-05;
-        relTol           0;
-    }
+
+        minIter          1;
+        maxIter          1000;
+        tolerance        1e-25;
+        relTol           0.01;
+    };
 
     T+T
     {
@@ -39,17 +56,54 @@ solvers
 
         minIter          0;
         maxIter          1000;
-        tolerance        1e-6;
-        relTol           0.0;
-    }
+        tolerance        1e-25;
+        relTol           0.1;
+    };
+
+    G
+    {
+        solver           PCG;
+        preconditioner   DIC;
+
+        minIter          1;
+        maxIter          1000;
+        tolerance        1e-25;
+        relTol           0.1;
+    };
+
+    epsilon
+    {
+        solver           PBiCG;
+        preconditioner   DILU;
+
+        minIter          1;
+        maxIter          100;
+        tolerance        1e-25;
+        relTol           0.01;
+    };
+
+    k
+    {
+        solver           PBiCG;
+        preconditioner   DILU;
+
+        minIter          1;
+        maxIter          100;
+        tolerance        1e-25;
+        relTol           0.01;
+    };
 }
 
 PISO
 {
-    nCorrectors     2;
+    nCorrectors         2;
     nNonOrthogonalCorrectors 0;
-    pRefCell        0;
-    pRefValue       0;
+    p_rghRefCell        0;
+    p_rghRefValue       0;
+}
+
+relaxationFactors
+{
 }
 
 // ************************************************************************* //

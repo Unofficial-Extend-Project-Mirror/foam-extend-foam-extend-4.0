@@ -410,7 +410,6 @@ void regionCouplingFvPatchField<Type>::initInterfaceMatrixUpdate
             "regionCouplingFvPatchField<Type>::initInterfaceMatrixUpdate"
         )   << "init matrix update called in detached state"
             << abort(FatalError);
-
     }
 }
 
@@ -461,7 +460,6 @@ void regionCouplingFvPatchField<Type>::updateInterfaceMatrix
             "regionCouplingFvPatchField<Type>::updateInterfaceMatrix"
         )   << "Matrix update called in detached state"
             << abort(FatalError);
-
     }
 }
 
