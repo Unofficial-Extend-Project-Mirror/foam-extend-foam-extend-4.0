@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Application
-    chipAirCoolingFoam
+    conjugateHeatFoam
 
 Description
     Transient solver for buoyancy-driven turbulent flow of incompressible
