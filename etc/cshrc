@@ -30,6 +30,11 @@
 #     Sourced from ~/.login or ~/.cshrc
 #
 #------------------------------------------------------------------------------
+
+# make sure that this variable is set un purpose
+unset WM_PROJECT_VERSION_ADDITION
+unsetenv WM_PROJECT_VERSION_ADDITION
+
 set called=($_)
 set prefSettingFile=$called[2].preset
 
@@ -42,7 +47,7 @@ unset prefSettingFile,called
 setenv WM_PROJECT OpenFOAM
 setenv WM_PROJECT_VERSION 1.6-ext
 
-if ( "$WM_PROJECT_VERSION_ADDITION" != "" ) then
+if ( $?WM_PROJECT_VERSION_ADDITION ) then
     setenv WM_PROJECT_VERSION $WM_PROJECT_VERSION-$WM_PROJECT_VERSION_ADDITION
 endif
 
