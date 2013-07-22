@@ -42,10 +42,35 @@ if ( -r $prefSettingFile ) then
     #    echo "Found presettings $prefSettingFile"
     source $prefSettingFile
 endif
-unset prefSettingFile,called
 
 setenv WM_PROJECT OpenFOAM
 setenv WM_PROJECT_VERSION 1.6-ext
+
+if( ! $?WM_PROJECT_VERSION_ADDITION ) then
+    set fullScriptPath = `pwd`"/$called[2]"
+    set canonicalFullScriptPath = `readlink -f $fullScriptPath |& cat`
+    if( $? != 0 ) then
+	# System with simpler readlink (BSD, Darwin) try replacement
+	set canonicalFullScriptPath=`greadlink -f $fullScriptPath |& cat`
+	if ( $? != 0 ) then
+	    # we give up
+            set canonicalFullScriptPath=""
+         endif
+    endif
+
+    if ( "$canonicalFullScriptPath" != "" ) then
+	set pathHere=`dirname $canonicalFullScriptPath`
+	set pathHere=`dirname $pathHere`
+	set dirName=`basename $pathHere`
+	set rest=`echo $dirName | sed -e "s/OpenFOAM-$WM_PROJECT_VERSION//"`
+	if ( "$rest" != "" ) then
+            setenv WM_PROJECT_VERSION_ADDITION `echo $rest | sed -e "s/-//"`
+	endif
+	unset dirName pathHere rest
+    endif
+    unset fullScriptPath canonicalFullScriptPath
+endif
+unset prefSettingFile called
 
 if ( $?WM_PROJECT_VERSION_ADDITION ) then
     setenv WM_PROJECT_VERSION $WM_PROJECT_VERSION-$WM_PROJECT_VERSION_ADDITION
