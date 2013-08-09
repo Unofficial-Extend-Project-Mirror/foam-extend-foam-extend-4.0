@@ -131,7 +131,7 @@ class overlapGgiPolyPatch
         void calcReconFaceCellCentres() const;
 
         //- Force calculation of transformation tensors
-        void calcTransforms();
+        void calcTransforms() const;
 
         //- Check definition: angles and offsets
         void checkDefinition() const;

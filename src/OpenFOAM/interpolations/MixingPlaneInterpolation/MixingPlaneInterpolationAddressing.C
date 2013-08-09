@@ -356,7 +356,7 @@ MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcTransforms() const
             InfoIn
             (
                 "MixingPlaneInterpolation"
-                "<SlavePatch, SlavePatch>::calcTransforms()"
+                "<SlavePatch, SlavePatch>::calcTransforms() const"
             )   << "slave face centre transformation check: "
                 << "(should be zero!) mag = "
                 << mag(transformedFaceCentre2 - slaveFaceCntr) << nl

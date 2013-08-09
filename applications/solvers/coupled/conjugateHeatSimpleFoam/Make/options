@@ -1,0 +1,22 @@
+EXE_INC = \
+    -I../conjugateHeatFoam/conjugateHeatTransfer/lnInclude \
+    -I$(LIB_SRC)/turbulenceModels \
+    -I$(LIB_SRC)/turbulenceModels/incompressible/RAS/RASModel \
+    -I$(LIB_SRC)/turbulenceModels/incompressible/turbulenceModel \
+    -I$(LIB_SRC)/transportModels \
+    -I$(LIB_SRC)/transportModels/incompressible/singlePhaseTransportModel \
+    -I$(LIB_SRC)/coupledMatrix/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/radiation/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude
+
+EXE_LIBS = \
+    -lincompressibleTurbulenceModel \
+    -lincompressibleRASModels \
+    -lincompressibleTransportModels \
+    -lcoupledLduMatrix \
+    -lfiniteVolume \
+    -lradiation \
+    -lbasicThermophysicalModels \
+    -lspecie \
+    -lconjugateHeatTransfer

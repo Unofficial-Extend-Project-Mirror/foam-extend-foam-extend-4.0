@@ -79,7 +79,8 @@ Prefix: 		%{_prefix}
 Group: 			Development/Tools
 Patch0:                 ParaView-3.14.1.patch_0_ParaView.git_0f43430
 Patch1:                 ParaView-3.14.1.patch_1
-Patch2:                 ParaView-3.14.1.patch_darwin
+Patch2:                 ParaView-3.14.1.patch_2
+Patch3:                 ParaView-3.14.1.patch_darwin
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -114,9 +115,12 @@ Patch2:                 ParaView-3.14.1.patch_darwin
 # Correction to BUG #13065.
 %patch1 -p1
 
+# Correction to BUG #13101.
+%patch2 -p1
+
 %ifos darwin
 # Patch for proper install of paraview binary under Mac OS X
-%patch2 -p1
+%patch3 -p1
 %endif
 
 %build

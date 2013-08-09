@@ -79,14 +79,20 @@ class regionCouplingFvPatchField
 
 protected:
 
+        //- Set remote field name
+        void setRemoteFieldName(const word& name)
+        {
+            remoteFieldName_ = name;
+        }
+
+        //- Return non-const access to matrixUpdateBuffer
+        void setMatrixUpdateBuffer(const scalarField& field) const
+        {
+            matrixUpdateBuffer_ = field;
+        }
+
         //- Return original patch field
         const Field<Type>& originalPatchField() const;
-
-        //- Return contents of a matrix update buffer
-        const scalarField& matrixUpdateBuffer() const
-        {
-            return matrixUpdateBuffer_;
-        }
 
 
 public:
@@ -161,6 +167,12 @@ public:
                 return remoteFieldName_;
             }
 
+            //- Return contents of a matrix update buffer
+            const scalarField& matrixUpdateBuffer() const
+            {
+                return matrixUpdateBuffer_;
+            }
+
             //- Return a named shadow patch field
             template<class LookupField, class LookupType>
             const typename LookupField::PatchFieldType&
@@ -171,7 +183,7 @@ public:
                 const LookupType* = NULL
             ) const;
 
-
+            //- Return a shadow patch
             const regionCoupleFvPatch& regionCouplePatch() const
             {
                 return regionCouplePatch_;
@@ -186,7 +198,7 @@ public:
             //- Return neighbour field given internal cell data
             virtual tmp<Field<Type> > patchNeighbourField() const;
 
-            //- Return neighbour field given internal cell data
+            //- Return named neighbour field given internal cell data
             virtual tmp<Field<Type> > patchNeighbourField
             (
                 const word& name

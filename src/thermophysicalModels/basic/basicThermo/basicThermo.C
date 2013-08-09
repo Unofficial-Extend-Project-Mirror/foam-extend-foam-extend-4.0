@@ -415,6 +415,21 @@ Foam::tmp<Foam::scalarField> Foam::basicThermo::Cp
 }
 
 
+Foam::tmp<Foam::scalarField> Foam::basicThermo::Cp
+(
+    const scalarField& T,
+    const labelList& cells
+) const
+{
+    notImplemented
+    (
+        "basicThermo::Cp"
+        "(const scalarField& T, const labelList& cells) const"
+    );
+    return tmp<scalarField>(NULL);
+}
+
+
 Foam::tmp<Foam::volScalarField> Foam::basicThermo::Cp() const
 {
     notImplemented("basicThermo::Cp() const");

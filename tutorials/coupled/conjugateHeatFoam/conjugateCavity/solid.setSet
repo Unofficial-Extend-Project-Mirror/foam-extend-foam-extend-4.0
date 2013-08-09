@@ -1,0 +1,4 @@
+cellSet solidBlock new boxToCell (0.1 0 0) (0.2 0.1 0.01);
+faceSet contactSurface new boxToFace (0.1499 0 0) (0.1501 0.1 0.01);
+faceSet leftZone new patchToFace left;
+quit;

@@ -82,6 +82,15 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
             << abort(FatalError);
     }
 
+    // HR, 10/Jul/2013
+    // This function requires send-receive-addressing, but usage is not
+    // symmetric across processors. Hence trigger re-calculate at this point
+    if (Pstream::parRun() && !localParallel())
+    {
+        receiveAddr();
+        shadow().receiveAddr();
+    }
+
     // Expand the field to zone size
     tmp<Field<Type> > texpandField
     (

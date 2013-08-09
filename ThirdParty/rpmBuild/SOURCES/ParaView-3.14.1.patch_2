@@ -1,0 +1,41 @@
+From 1d6745888bcc34b260410a3cdbba49ecf0084ba2 Mon Sep 17 00:00:00 2001
+From: Utkarsh Ayachit <utkarsh.ayachit@kitware.com>
+Date: Tue, 17 Apr 2012 14:54:05 -0400
+Subject: [PATCH] BUG #13101. STL ascii reader was report failures prematurely.
+
+STL ascii reader was reporting error when eof was reached at an expected
+location. This was causing the reader to fail for the STL file attached with the
+bug report.
+
+Change-Id: I734d2c8d8c85854df3d2a63bae6ba23bccf7a9c2
+---
+ IO/vtkSTLReader.cxx |   13 ++++++++-----
+ 1 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/IO/vtkSTLReader.cxx b/IO/vtkSTLReader.cxx
+index 189ea1b..34ee3e0 100644
+--- a/VTK/IO/vtkSTLReader.cxx
++++ b/VTK/IO/vtkSTLReader.cxx
+@@ -442,12 +442,15 @@ int vtkSTLReader::ReadASCIISTL(FILE *fp, vtkPoints *newPts,
+         {
+         if (!fgets(line, 255, fp))
+           {
+-          vtkErrorMacro ("STLReader error reading file: " << this->FileName
+-                         << " Premature EOF while reading end solid.");
+-          fclose(fp);
+-          return 0;
++          done = feof(fp);
++          if (!done)
++            {
++            vtkErrorMacro ("STLReader error reading file: " << this->FileName
++              << " Premature EOF while reading end solid.");
++            fclose(fp);
++            return 0;
++            }
+           }
+-
+         done = feof(fp);
+         }
+ 
+-- 
+1.7.4.1

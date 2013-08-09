@@ -904,7 +904,7 @@ void Foam::mixingPlanePolyPatch::updateMesh()
 }
 
 
-void Foam::mixingPlanePolyPatch::calcTransforms()
+void Foam::mixingPlanePolyPatch::calcTransforms() const
 {
     forwardT_.setSize(0);
     reverseT_.setSize(0);

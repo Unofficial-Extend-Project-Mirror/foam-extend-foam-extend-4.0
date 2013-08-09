@@ -229,6 +229,25 @@ Foam::tmp<Foam::scalarField> Foam::ePsiThermo<MixtureType>::Cp
 
 
 template<class MixtureType>
+Foam::tmp<Foam::scalarField> Foam::ePsiThermo<MixtureType>::Cp
+(
+    const scalarField& T,
+    const labelList& cells
+) const
+{
+    tmp<scalarField> tCp(new scalarField(T.size()));
+    scalarField& cp = tCp();
+
+    forAll(T, celli)
+    {
+        cp[celli] = this->cellMixture(cells[celli]).Cp(T[celli]);
+    }
+
+    return tCp;
+}
+
+
+template<class MixtureType>
 Foam::tmp<Foam::volScalarField> Foam::ePsiThermo<MixtureType>::Cp() const
 {
     const fvMesh& mesh = this->T_.mesh();
