@@ -261,7 +261,8 @@ Foam::lduMatrix::solver::solver
     matrix_(matrix),
     coupleBouCoeffs_(coupleBouCoeffs),
     coupleIntCoeffs_(coupleIntCoeffs),
-    interfaces_(interfaces)
+    interfaces_(interfaces),
+    profile_("lduMatrix::solver_"+fieldName)
 {
     readControls();
 }

@@ -27,6 +27,8 @@ License
 #include "fvScalarMatrix.H"
 #include "zeroGradientFvPatchFields.H"
 
+#include "Profiling.H"
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<>
@@ -141,6 +143,8 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Foam::scalar>::solve
     const dictionary& solverControls
 )
 {
+    ProfilingTrigger profSolve("fvMatrix::solve_"+psi_.name());
+
     if (debug)
     {
         Info<< "fvMatrix<scalar>::solve(const dictionary& solverControls) : "

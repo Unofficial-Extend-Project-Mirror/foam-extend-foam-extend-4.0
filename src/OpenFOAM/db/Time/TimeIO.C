@@ -27,6 +27,8 @@ License
 #include "Time.H"
 #include "PstreamReduceOps.H"
 
+#include "Profiling.H"
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void Foam::Time::readDict()

@@ -27,6 +27,8 @@ License
 #include "functionObjectList.H"
 #include "Time.H"
 
+#include "Profiling.H"
+
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
 Foam::functionObject*
@@ -149,6 +151,8 @@ bool Foam::functionObjectList::execute()
             iter
         )
         {
+            addProfile2(fo,"FO::"+(*iter).name()+"::execute");
+
             ok = iter().execute() && ok;
         }
     }
@@ -175,6 +179,8 @@ bool Foam::functionObjectList::end()
             iter
         )
         {
+            addProfile2(fo,"FO::"+(*iter).name()+"::end");
+
             ok = iter().end() && ok;
         }
     }
@@ -187,6 +193,8 @@ bool Foam::functionObjectList::read()
 {
     bool ok = true;
     updated_ = execution_;
+
+    addProfile2(fo,"functionObjectList::read");
 
     // avoid reading/initializing if execution is off
     if (!execution_)
@@ -231,6 +239,8 @@ bool Foam::functionObjectList::read()
                     // an existing functionObject, and dictionary changed
                     if (newDigs[nFunc] != digests_[oldIndex])
                     {
+                        addProfile2(fo,"FO::"+objPtr->name()+"::read");
+
                         ok = objPtr->read(dict) && ok;
                     }
                 }
@@ -238,6 +248,9 @@ bool Foam::functionObjectList::read()
                 {
                     // new functionObject
                     objPtr = functionObject::New(key, time_, dict).ptr();
+
+                    addProfile2(fo,"FO::"+objPtr->name()+"::start");
+
                     ok = objPtr->start() && ok;
                 }
 

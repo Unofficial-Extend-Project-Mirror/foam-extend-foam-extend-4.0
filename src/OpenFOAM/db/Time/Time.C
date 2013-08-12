@@ -27,6 +27,9 @@ License
 #include "Time.H"
 #include "PstreamReduceOps.H"
 
+#include "ProfilingPool.H"
+#include "Profiling.H"
+
 #include <sstream>
 
 // * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * * * //
@@ -238,6 +241,17 @@ Foam::Time::Time
     functionObjects_(*this, enableFunctionObjects)
 {
     setControls();
+
+    ProfilingPool::initProfiling(
+        IOobject(
+            "profilingInfo",
+            timeName(),
+            "uniform",
+            *this,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        )
+    );
 }
 
 
@@ -295,6 +309,17 @@ Foam::Time::Time
     functionObjects_(*this, enableFunctionObjects)
 {
     setControls();
+
+    ProfilingPool::initProfiling(
+        IOobject(
+            "profilingInfo",
+            timeName(),
+            "uniform",
+            *this,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        )
+    );
 }
 
 
@@ -348,7 +373,18 @@ Foam::Time::Time
 
     readLibs_(controlDict_, "libs"),
     functionObjects_(*this, enableFunctionObjects)
-{}
+{
+    ProfilingPool::initProfiling(
+        IOobject(
+            "profilingInfo",
+            timeName(),
+            "uniform",
+            *this,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        )
+    );
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -500,6 +536,8 @@ bool Foam::Time::run() const
         // ie, when exiting the control loop
         if (!running && timeIndex_ != startTimeIndex_)
         {
+            addProfile2(fo,"functionObjects_.end()");
+
             // Note, end() also calls an indirect start() as required
             functionObjects_.end();
         }
@@ -672,10 +710,14 @@ Foam::Time& Foam::Time::operator++()
     {
         if (timeIndex_ == startTimeIndex_)
         {
+            addProfile2(fo,"functionObjects_.start()");
+
             functionObjects_.start();
         }
         else
         {
+            addProfile2(fo,"functionObjects_.execute()");
+
             functionObjects_.execute();
         }
     }
