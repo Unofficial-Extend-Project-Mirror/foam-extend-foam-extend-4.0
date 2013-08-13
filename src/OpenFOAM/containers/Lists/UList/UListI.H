@@ -162,7 +162,7 @@ namespace Foam
 
     // Template specialization for bool
     template<>
-    inline const bool& Foam::UList<bool>::operator[](const label i) const
+    inline const bool& UList<bool>::operator[](const label i) const
     {
         // lazy evaluation - return false for out-of-range
         if (i < size_)
@@ -171,7 +171,7 @@ namespace Foam
         }
         else
         {
-            return Foam::pTraits<bool>::zero;
+            return pTraits<bool>::zero;
         }
     }
 
