@@ -48,7 +48,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class solidBodyMotionFvMesh Declaration
+                  Class solidBodyMotionFvMesh Declaration
 \*---------------------------------------------------------------------------*/
 
 class solidBodyMotionFvMesh
