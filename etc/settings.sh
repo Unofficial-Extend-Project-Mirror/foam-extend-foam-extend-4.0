@@ -82,11 +82,6 @@ export WM_LINK_LANGUAGE=c++
 export WM_OPTIONS=$WM_ARCH$WM_COMPILER$WM_PRECISION_OPTION$WM_COMPILE_OPTION
 export PATH=$WM_DIR:$PATH
 
-#export WM_DECOMP_INC=-DCELL_DECOMP
-#export WM_DECOMP_LIBS="-lcellDecompFiniteElement -lcellDecompositionMotionSolver"
-export WM_DECOMP_INC=-DFACE_DECOMP
-export WM_DECOMP_LIBS="-lfaceDecompFiniteElement -lfaceDecompositionMotionSolver"
-
 # base configuration
 export FOAM_APP=$WM_PROJECT_DIR/applications
 export FOAM_APPBIN=$WM_PROJECT_DIR/applications/bin/$WM_OPTIONS

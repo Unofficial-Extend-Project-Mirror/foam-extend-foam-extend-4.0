@@ -45,7 +45,7 @@ License
 #include "wedgeFvPatch.H"
 #include "emptyFvPatch.H"
 #include "zeroGradientTetPolyPatchFields.H"
-#include "tetDecompositionMotionSolver.H"
+#include "tetMotionSolver.H"
 
 #include "fixedValueTetPolyPatchFields.H"
 #include "mixedTetPolyPatchFields.H"
@@ -243,8 +243,8 @@ bool Foam::layerSmooth::update()
 
     Info << "bool Foam::layerSmooth::update()" << endl;
 
-    tetDecompositionMotionSolver& mSolver =
-        refCast<tetDecompositionMotionSolver>(msPtr_());
+    tetMotionSolver& mSolver =
+        refCast<tetMotionSolver>(msPtr_());
 
     tetPointVectorField& motionU = mSolver.motionU();
 

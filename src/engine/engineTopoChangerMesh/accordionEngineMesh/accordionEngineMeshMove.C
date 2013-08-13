@@ -43,7 +43,7 @@ License
 #include "wedgeFvPatch.H"
 #include "emptyFvPatch.H"
 #include "zeroGradientTetPolyPatchFields.H"
-#include "tetDecompositionMotionSolver.H"
+#include "tetMotionSolver.H"
 
 #include "fixedValueTetPolyPatchFields.H"
 #include "mixedTetPolyPatchFields.H"
@@ -57,8 +57,8 @@ License
 
 bool Foam::accordionEngineMesh::update()
 {
-    tetDecompositionMotionSolver& mSolver =
-        refCast<tetDecompositionMotionSolver>(msPtr_());
+    tetMotionSolver& mSolver =
+        refCast<tetMotionSolver>(msPtr_());
 
     scalar deltaZ = engTime().pistonDisplacement().value();
 

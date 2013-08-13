@@ -41,7 +41,7 @@ Class
 #include "fvPatchField.H"
 #include "Switch.H"
 #include "symmetryFvPatch.H"
-#include "tetDecompositionMotionSolver.H"
+#include "tetMotionSolver.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 

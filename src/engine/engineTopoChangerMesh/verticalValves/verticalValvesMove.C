@@ -48,7 +48,7 @@ Class
 #include "wedgeFvPatch.H"
 #include "emptyFvPatch.H"
 #include "zeroGradientTetPolyPatchFields.H"
-#include "tetDecompositionMotionSolver.H"
+#include "tetMotionSolver.H"
 
 #include "fixedValueTetPolyPatchFields.H"
 #include "mixedTetPolyPatchFields.H"
@@ -317,8 +317,8 @@ void Foam::verticalValves::prepareValveDetach()
 bool Foam::verticalValves::update()
 {
 
-    tetDecompositionMotionSolver& mSolver =
-        refCast<tetDecompositionMotionSolver>(msPtr_());
+    tetMotionSolver& mSolver =
+        refCast<tetMotionSolver>(msPtr_());
 
     // Detaching the interface
     if (attached())
