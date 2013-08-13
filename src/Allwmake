@@ -41,7 +41,7 @@ wmake libso finiteArea
 wmake libso lduSolvers
 wmake libso VectorN
 
-(cd tetDecompositionFiniteElement ; ./Allwmake)
+wmake libso tetFiniteElement
 
 # Make dynamicMesh tools
 dynamicMesh/AllwmakeLnInclude

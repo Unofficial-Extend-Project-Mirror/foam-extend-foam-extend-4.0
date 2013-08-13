@@ -48,7 +48,7 @@ Class
 #include "wedgeFvPatch.H"
 #include "emptyFvPatch.H"
 #include "zeroGradientTetPolyPatchFields.H"
-#include "tetDecompositionMotionSolver.H"
+#include "tetMotionSolver.H"
 
 #include "fixedValueTetPolyPatchFields.H"
 #include "mixedTetPolyPatchFields.H"
@@ -316,8 +316,8 @@ void Foam::pistonSliding::prepareValveDetach()
 bool Foam::pistonSliding::update()
 {
 
-    tetDecompositionMotionSolver& mSolver =
-        refCast<tetDecompositionMotionSolver>(msPtr_());
+    tetMotionSolver& mSolver =
+        refCast<tetMotionSolver>(msPtr_());
 
     // Detaching the interfacethobois2DSlidingDeform
     if (attached())

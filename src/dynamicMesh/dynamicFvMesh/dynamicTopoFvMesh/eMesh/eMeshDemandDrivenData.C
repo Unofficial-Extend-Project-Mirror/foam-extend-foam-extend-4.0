@@ -259,7 +259,8 @@ void eMesh::calcEdgePoints() const
                 )
                 {
                     faceIndex = cellToCheck[0];
-                    found = true; break;
+                    found = true;
+                    break;
                 }
 
                 if
@@ -269,7 +270,8 @@ void eMesh::calcEdgePoints() const
                 )
                 {
                     faceIndex = cellToCheck[1];
-                    found = true; break;
+                    found = true;
+                    break;
                 }
 
                 if
@@ -279,7 +281,8 @@ void eMesh::calcEdgePoints() const
                 )
                 {
                     faceIndex = cellToCheck[2];
-                    found = true; break;
+                    found = true;
+                    break;
                 }
 
                 if
@@ -289,7 +292,8 @@ void eMesh::calcEdgePoints() const
                 )
                 {
                     faceIndex = cellToCheck[3];
-                    found = true; break;
+                    found = true;
+                    break;
                 }
             }
 

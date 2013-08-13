@@ -4,9 +4,8 @@ EXE_INC = \
     -I$(LIB_SRC)/dynamicMesh/dynamicMesh/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/meshMotion/solidBodyMotion/lnInclude \
-    -I$(LIB_SRC)/dynamicMesh/meshMotion/tetDecompositionMotionSolver/lnInclude \
-    -I$(LIB_SRC)/tetDecompositionFiniteElement/lnInclude \
-    $(WM_DECOMP_INC) \
+    -I$(LIB_SRC)/dynamicMesh/meshMotion/tetMotionSolver/lnInclude \
+    -I$(LIB_SRC)/tetFiniteElement/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/meshMotion/fvMotionSolver/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/meshMotion/RBFMotionSolver/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/meshMotion/mesquiteMotionSolver/lnInclude
@@ -17,7 +16,8 @@ LIB_LIBS = \
     -ldynamicMesh \
     -lfiniteVolume \
     -lsolidBodyMotion \
-    $(WM_DECOMP_LIBS) \
+    -ltetFiniteElement \
+    -ltetMotionSolver \
     -lfvMotionSolver \
     -lRBFMotionSolver \
     -lmesquiteMotionSolver

@@ -29,8 +29,8 @@ License
 #include "motionSolver.H"
 #include "volFields.H"
 #include "mathematicalConstants.H"
-#include "tetDecompositionMotionSolver.H"
-#include "laplaceTetDecompositionMotionSolver.H"
+#include "tetMotionSolver.H"
+#include "laplaceTetMotionSolver.H"
 #include "fixedValueTetPolyPatchFields.H"
 #include "transformField.H"
 
@@ -131,11 +131,11 @@ bool Foam::dynamicBodyFvMesh::update()
     if
     (
         motionPtr_->type()
-     == laplaceTetDecompositionMotionSolver::typeName
+     == laplaceTetMotionSolver::typeName
     )
     {
-        tetDecompositionMotionSolver& mSolver =
-            dynamic_cast<tetDecompositionMotionSolver&>
+        tetMotionSolver& mSolver =
+            dynamic_cast<tetMotionSolver&>
             (
                 motionPtr_()
             );
@@ -216,7 +216,7 @@ bool Foam::dynamicBodyFvMesh::update()
             << "Selected mesh motion solver is "
                 << motionPtr_->type()
                 << ", instead "
-                << tetDecompositionMotionSolver::typeName
+                << tetMotionSolver::typeName
                 << exit(FatalError);
     }
 

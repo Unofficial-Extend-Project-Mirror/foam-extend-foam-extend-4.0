@@ -429,14 +429,8 @@ void advectiveFvPatchField<Type>::write(Ostream& os) const
 {
     fvPatchField<Type>::write(os);
 
-    if (phiName_ != "phi")
-    {
-        os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
-    }
-    if (rhoName_ != "rho")
-    {
-        os.writeKeyword("rho") << rhoName_ << token::END_STATEMENT << nl;
-    }
+    this->writeEntryIfDifferent(os, "phi", word("phi"), phiName_);
+    this->writeEntryIfDifferent(os, "rho", word("rho"), rhoName_);
 
     if (lInf_ > SMALL)
     {

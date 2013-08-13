@@ -29,7 +29,7 @@ License
 #include "regionSplit.H"
 #include "directTopoChange.H"
 #include "zeroGradientTetPolyPatchFields.H"
-#include "tetDecompositionMotionSolver.H"
+#include "tetMotionSolver.H"
 
 #include "fixedValueTetPolyPatchFields.H"
 #include "mixedTetPolyPatchFields.H"

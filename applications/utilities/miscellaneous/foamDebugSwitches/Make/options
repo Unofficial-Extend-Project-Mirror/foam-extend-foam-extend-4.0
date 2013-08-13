@@ -12,7 +12,8 @@ EXE_LIBS = \
     -lerrorEstimation \
     -lfiniteVolume \
     -lfiniteArea \
-    $(WM_DECOMP_LIBS) \
+    -ltetFiniteElement \
+    -ltetMotionSolver \
     -lforces \
     -lfvMotionSolver \
     -lincompressibleLESModels \
