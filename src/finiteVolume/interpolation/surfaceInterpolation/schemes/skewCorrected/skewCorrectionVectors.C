@@ -141,13 +141,13 @@ void Foam::skewCorrectionVectors::makeSkewCorrectionVectors() const
         }
     }
 
+    reduce(skewCoeff, maxOp<scalar>());
+
     if (debug)
     {
         Info<< "surfaceInterpolation::makeSkewCorrectionVectors() : "
             << "skew coefficient = " << skewCoeff << endl;
     }
-
-    reduce(skewCoeff, maxOp<scalar>());
 
     if (skewCoeff < 1e-5)
     {

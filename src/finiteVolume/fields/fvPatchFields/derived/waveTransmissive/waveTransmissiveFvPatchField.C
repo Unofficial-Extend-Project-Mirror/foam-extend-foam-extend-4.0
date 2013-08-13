@@ -185,14 +185,9 @@ template<class Type>
 void waveTransmissiveFvPatchField<Type>::write(Ostream& os) const
 {
     advectiveFvPatchField<Type>::write(os);
-    if (this->UName_ != "U")
-    {
-        os.writeKeyword("U") << this->UName_ << token::END_STATEMENT << nl;
-    }
-    if (psiName_ != "psi")
-    {
-        os.writeKeyword("psi") << psiName_ << token::END_STATEMENT << nl;
-    }
+
+    this->writeEntryIfDifferent(os, "U", word("U"), UName_);
+    this->writeEntryIfDifferent(os, "psi", word("psi"), psiName_);
 
     os.writeKeyword("gamma") << gamma_ << token::END_STATEMENT << nl;
 }
