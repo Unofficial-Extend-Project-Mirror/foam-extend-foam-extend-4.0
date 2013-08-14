@@ -20,20 +20,7 @@ solvers
     p
     {
         solver          PCG;
-        preconditioner
-        {
-//          preconditioner  Cholesky;
-            preconditioner  AMG;
-            cycle           W-cycle;
-            policy          AAMG;
-            nPreSweeps      0;
-            nPostSweeps     2;
-            groupSize       4;
-            minCoarseEqns   20;
-            nMaxLevels      100;
-            scale           off;
-            smoother        ILU;
-        }
+        preconditioner  Cholesky
 
         tolerance        1e-07;
         relTol           0;
@@ -43,12 +30,8 @@ solvers
 
     U
     {
-
         solver           BiCGStab;
-        preconditioner
-        {
-            preconditioner Cholesky;
-        }
+        preconditioner   ILU0;
 
         tolerance         1e-6;
         relTol            0;
@@ -60,10 +43,7 @@ solvers
     {
 
         solver           BiCGStab;
-        preconditioner
-        {
-            preconditioner Cholesky;
-        }
+        preconditioner   ILU0;
 
         tolerance         1e-6;
         relTol            0;

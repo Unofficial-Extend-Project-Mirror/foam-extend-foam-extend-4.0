@@ -21,7 +21,7 @@ twoDMotion yes;
 
 motionPlaneNormal (0 0 1);
 
-solver laplaceFaceDecomposition;
+solver laplace;
 
 diffusivity quadratic;
 
