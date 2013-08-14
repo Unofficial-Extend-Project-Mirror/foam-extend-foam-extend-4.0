@@ -30,7 +30,7 @@ solvers
     U
     {
         solver           BiCGStab;
-        preconditioner   Cholesky;
+        preconditioner   ILU0;
 
         tolerance        1e-05;
         relTol           0;
