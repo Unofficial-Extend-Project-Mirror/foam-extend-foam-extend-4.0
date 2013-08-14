@@ -23,5 +23,5 @@ EXE_LIBS = \
     -llduSolvers \
     -ltetFiniteElement \
     -ltetMotionSolver \
-    -L$(FOAM_USER_LIBBIN) -lsolidModels \
+    -lsolidModels \
     -lVectorN
