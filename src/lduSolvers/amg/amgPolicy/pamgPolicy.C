@@ -30,7 +30,6 @@ Description
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
-
 \*---------------------------------------------------------------------------*/
 
 #include "pamgPolicy.H"
@@ -125,7 +124,7 @@ void Foam::pamgPolicy::calcChild()
     }
 
     // Reset child array
-    child_ = -1;
+    child_.setSize(nEqns, -1);
 
     // Calculate agglomeration
 
