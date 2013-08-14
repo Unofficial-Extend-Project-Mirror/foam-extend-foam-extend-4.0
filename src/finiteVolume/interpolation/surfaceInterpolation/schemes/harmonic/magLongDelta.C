@@ -50,13 +50,13 @@ Foam::magLongDelta::magLongDelta(const fvMesh& mesh)
 
 Foam::magLongDelta::~magLongDelta()
 {
-    clearData();
+    clearOut();
 }
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::magLongDelta::clearData() const
+void Foam::magLongDelta::clearOut() const
 {
     deleteDemandDrivenData(magLongDeltaPtr_);
 }
@@ -64,7 +64,14 @@ void Foam::magLongDelta::clearData() const
 
 void Foam::magLongDelta::makeMagLongDistance() const
 {
-    if (debug)
+    if (magLongDeltaPtr_)
+    {
+        FatalErrorIn("void magLongDelta::makeMagLongDistance() const")
+            << "Long cell distances already calculated"
+            << abort(FatalError);
+    }
+
+//     if (debug)
     {
         Info<< "magLongDelta::makeMagLongDistance() :"
             << "Constructing magnitude of long cell distance"
@@ -144,6 +151,8 @@ const Foam::surfaceScalarField& Foam::magLongDelta::magDelta() const
     {
         makeMagLongDistance();
     }
+
+    return *magLongDeltaPtr_;
 }
 
 
@@ -164,7 +173,7 @@ bool Foam::magLongDelta::movePoints() const
             << "Clearing long cell distance data" << endl;
     }
 
-    clearData();
+    clearOut();
 
     return true;
 }
@@ -178,7 +187,7 @@ bool Foam::magLongDelta::updateMesh(const mapPolyMesh& mpm) const
             << "Clearing long cell distance data" << endl;
     }
 
-    clearData();
+    clearOut();
 
     return true;
 }

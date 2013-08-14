@@ -74,7 +74,8 @@ class magLongDelta
         ) const;
 
         //- Clear data
-        void clearData() const;
+        void clearOut() const;
+
 
 public:
 

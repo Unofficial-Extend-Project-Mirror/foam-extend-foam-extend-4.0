@@ -22,8 +22,6 @@ Pstream/Allwmake
 wmake libo  OSspecific/$WM_OSTYPE
 wmake libso OpenFOAM
 
-wmake libso multiSolver
-
 # Decomposition methods needed by meshTools
 decompositionMethods/AllwmakeLnInclude
 decompositionMethods/Allwmake
@@ -67,5 +65,7 @@ wmake libso errorEstimation
 fvAgglomerationMethods/Allwmake
 
 wmake libso engine
+
+wmake libso multiSolver
 
 # ----------------------------------------------------------------- end-of-file
