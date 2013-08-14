@@ -5,6 +5,5 @@ EXE_INC = \
 
 EXE_LIBS = \
     -lfiniteVolume \
-    -L$(FOAM_USER_LIBBIN) \
     -lmultiSolver
 
