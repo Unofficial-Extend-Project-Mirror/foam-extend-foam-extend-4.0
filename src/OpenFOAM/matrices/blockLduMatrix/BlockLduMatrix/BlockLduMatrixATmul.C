@@ -64,43 +64,14 @@ void Foam::BlockLduMatrix<Type>::AmulCore
     const unallocLabelList& u = lduAddr().upperAddr();
     const unallocLabelList& l = lduAddr().lowerAddr();
 
-
     const TypeCoeffField& Diag = this->diag();
     const TypeCoeffField& Upper = this->upper();
 
+    // Diagonal multiplication, no indirection
+    multiply(Ax, Diag, x);
+
     // Create multiplication function object
     typename BlockCoeff<Type>::multiply mult;
-
-    // AmulCore must be additive to account for initialisation step
-    // in ldu interfaces.  HJ, 6/Nov/2007
-    // Fixed by IC 19/Oct/2011
-    if (Diag.activeType() == blockCoeffBase::SCALAR)
-    {
-        const scalarTypeField& activeDiag = Diag.asScalar();
-
-        for (register label cellI = 0; cellI < u.size(); cellI++)
-        {
-            Ax[cellI] += mult(activeDiag[cellI], x[cellI]);
-        }
-    }
-    else if (Diag.activeType() == blockCoeffBase::LINEAR)
-    {
-        const linearTypeField& activeDiag = Diag.asLinear();
-
-        for (register label cellI = 0; cellI < u.size(); cellI++)
-        {
-            Ax[cellI] += mult(activeDiag[cellI], x[cellI]);
-        }
-    }
-    else if (Diag.activeType() == blockCoeffBase::SQUARE)
-    {
-        const squareTypeField& activeDiag = Diag.asSquare();
-
-        for (register label cellI = 0; cellI < u.size(); cellI++)
-        {
-            Ax[cellI] += mult(activeDiag[cellI], x[cellI]);
-        }
-    }
 
     // Lower multiplication
 
@@ -238,39 +209,11 @@ void Foam::BlockLduMatrix<Type>::TmulCore
     const TypeCoeffField& Diag = this->diag();
     const TypeCoeffField& Upper = this->upper();
 
+    // Diagonal multiplication, no indirection
+    multiply(Tx, Diag, x);
+
     // Create multiplication function object
     typename BlockCoeff<Type>::multiply mult;
-
-    // AmulCore must be additive to account for initialisation step
-    // in ldu interfaces.  HJ, 6/Nov/2007
-    // Fixed by IC 19/Oct/2011
-    if (Diag.activeType() == blockCoeffBase::SCALAR)
-    {
-        const scalarTypeField& activeDiag = Diag.asScalar();
-
-        for (register label cellI = 0; cellI < u.size(); cellI++)
-        {
-            Tx[cellI] += mult(activeDiag[cellI], x[cellI]);
-        }
-    }
-    else if (Diag.activeType() == blockCoeffBase::LINEAR)
-    {
-        const linearTypeField& activeDiag = Diag.asLinear();
-
-        for (register label cellI = 0; cellI < u.size(); cellI++)
-        {
-            Tx[cellI] += mult(activeDiag[cellI], x[cellI]);
-        }
-    }
-    else if (Diag.activeType() == blockCoeffBase::SQUARE)
-    {
-        const squareTypeField& activeDiag = Diag.asSquare();
-
-        for (register label cellI = 0; cellI < u.size(); cellI++)
-        {
-            Tx[cellI] += mult(activeDiag[cellI].T(), x[cellI]);
-        }
-    }
 
     // Upper multiplication
 
