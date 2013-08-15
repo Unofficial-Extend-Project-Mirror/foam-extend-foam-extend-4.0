@@ -20,7 +20,7 @@ solvers
     p
     {
         solver          PCG;
-        preconditioner  DIC;
+        preconditioner  Cholesky;
 
         tolerance        1e-07;
         relTol           0;
