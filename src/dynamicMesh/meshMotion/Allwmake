@@ -7,5 +7,6 @@ wmake libso fvMotionSolver
 wmake libso RBFMotionSolver
 wmake libso mesquiteMotionSolver
 wmake libso tetMotionSolver
+wmake libso solidBodyMotion
 
 # ----------------------------------------------------------------- end-of-file
