@@ -12,12 +12,13 @@ $(reactions)/makeChemkinReactions.C
 $(reactions)/makeReactionThermoReactions.C
 $(reactions)/makeLangmuirHinshelwoodReactions.C
 
-$(equationOfState)/aungierRedlichKwong/aungierRedlichKwong.C
-$(equationOfState)/pengRobinson/pengRobinson.C
-$(equationOfState)/redlichKwong/redlichKwong.C
-$(equationOfState)/soaveRedlichKwong/soaveRedlichKwong.C
-$(equationOfState)/mixtureRedlichKwong/mixtureRedlichKwong.C
-$(equationOfState)/mixturePengRobinson/mixturePengRobinson.C
-$(equationOfState)/mixtureSoaveRedlichKwong/mixtureSoaveRedlichKwong.C
+$(equationOfState)/cubicEquationOfState/aungierRedlichKwong/aungierRedlichKwong.C
+$(equationOfState)/cubicEquationOfState/pengRobinson/pengRobinson.C
+$(equationOfState)/cubicEquationOfState/redlichKwong/redlichKwong.C
+$(equationOfState)/cubicEquationOfState/soaveRedlichKwong/soaveRedlichKwong.C
+$(equationOfState)/cubicEquationOfState/mixtures/mixtureRedlichKwong/mixtureRedlichKwong.C
+$(equationOfState)/cubicEquationOfState/mixtures/mixturePengRobinson/mixturePengRobinson.C
+$(equationOfState)/cubicEquationOfState/mixtures/mixtureSoaveRedlichKwong/mixtureSoaveRedlichKwong.C
+
 
 LIB = $(FOAM_LIBBIN)/libspecie

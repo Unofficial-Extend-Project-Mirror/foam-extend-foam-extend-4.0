@@ -9,6 +9,9 @@
     volScalarField& p = thermo.p();
     volScalarField& h = thermo.h();
     const volScalarField& psi = thermo.psi();
+    const volScalarField& drhodh = thermo.drhodh();
+
+    bool realFluid=mesh.solutionDict().subDict("PISO").lookupOrDefault<bool>("realFluid",false);
 
     volScalarField rho
     (

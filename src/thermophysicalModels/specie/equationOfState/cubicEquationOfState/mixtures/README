@@ -1,0 +1,11 @@
+CL: Real gas mixture classes using mixture models.
+CL: other models are possible 
+
+
+CL: Mixtures based on a pseudo critical point approach
+--> mixtureAungierRedlichKwong
+
+CL: Mixtures using the van der waals mixing rule
+--> mixtureSoaveRedlichKwong
+--> mixturePengRobinson
+--> mixtureRedlichKwong
