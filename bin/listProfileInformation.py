@@ -1,4 +1,7 @@
-#! /usr/bin/python
+#! /usr/bin/env python
+
+# Lists the profiling information in time directories (uniform/profilingInfo)
+# in a human readable form
 
 from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
 import sys
@@ -14,6 +17,11 @@ for p in pf["profilingInfo"]:
     if p["id"] in data:
         print "Duplicate definition of",p["id"]
         sys.exit(-1)
+    if p["description"][0]=='"':
+        p["description"]=p["description"][1:]
+    if p["description"][-1]=='"':
+        p["description"]=p["description"][:-1]
+
     data[p["id"]]=p
     if "parentId" in p:
         if p["parentId"] in children:
@@ -36,7 +44,7 @@ def depth(i):
 #make sure that children are printed in the correct order
 for i in children:
     children[i].sort()
-    
+
 maxdepth=depth(root)
 
 depths={}
@@ -46,7 +54,7 @@ def nameLen(i,d=0):
     maxi=len(data[i]["description"])
     if i in children:
         maxi=max(maxi,max([nameLen(j,d+1) for j in children[i]]))
-    return maxi+2
+    return maxi+3
 
 maxLen=nameLen(root)
 
@@ -62,7 +70,7 @@ def printItem(i):
     if depths[i]>1:
         result+="  "*(depths[i]-1)
     if depths[i]>0:
-        result+="|-"
+        result+="|- "
     result+=data[i]["description"]
     result+=" "*(maxLen-len(result)+1)+"| "
 
@@ -72,7 +80,7 @@ def printItem(i):
 
     tt=data[i]["totalTime"]
     ct=data[i]["childTime"]
-    
+
     result+=format % (100*tt/parentTime,
                       100*(tt-ct)/totalTime,
                       100*(tt-ct)/tt,
@@ -83,5 +91,5 @@ def printItem(i):
     if i in children:
         for c in children[i]:
             printItem(c)
-            
+
 printItem(root)

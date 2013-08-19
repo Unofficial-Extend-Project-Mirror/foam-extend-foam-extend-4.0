@@ -27,6 +27,9 @@ Class
 Description
     Add everything necessary for Profiling plus a macro
 
+    Originally proposed in
+    http://www.cfd-online.com/Forums/openfoam-bugs/64081-feature-proposal-application-level-profiling.html
+
 SourceFiles
 
 \*---------------------------------------------------------------------------*/
@@ -36,9 +39,14 @@ SourceFiles
 
 #include "ProfilingTrigger.H"
 
+// to be used at the beginning of a section to be profiled
+// profiling ends automatically at the end of a block
 #define addProfile(name) Foam::ProfilingTrigger profileTriggerFor##name (#name)
+
 // Use this if a description with spaces, colons etc should be added
 #define addProfile2(name,descr) Foam::ProfilingTrigger profileTriggerFor##name (descr)
+
+// this is only needed if profiling should end before the end of a block
 #define endProfile(name) profileTriggerFor##name.stop()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
