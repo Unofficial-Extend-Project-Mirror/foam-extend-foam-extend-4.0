@@ -72,11 +72,11 @@ Init MixingPlane boundary condition parameters
                                dest="ribbonPatchStackAxis",
                                default=None,
                                help='ribbonPatch stackAxis (X|Y|Z|R|Theta')
-        self.parser.add_option("--ribbonPatchDiscretization",
+        self.parser.add_option("--ribbonPatchDiscretisation",
                                action="store",
-                               dest="ribbonPatchDiscretization",
+                               dest="ribbonPatchDiscretisation",
                                default=None,
-                               help='ribbonPatch discretization (masterPatch|slavePatch|bothPatches|uniform|userDefined)')
+                               help='ribbonPatch discretisation (masterPatch|slavePatch|bothPatches|uniform|userDefined)')
 
         self.parser.add_option("--timeDirs",
                                action="store",
@@ -111,7 +111,7 @@ the current definition
             'ribbonPatch' : {
                 'sweepAxis'      : 'Theta',
                 'stackAxis'      : 'Z',
-                'discretization' : 'bothPatches',
+                'discretisation' : 'bothPatches',
                 }
             }
         return newPatch
@@ -151,8 +151,8 @@ Modify the definition of a mixingPlane patch
         if self.parser.getOptions().ribbonPatchStackAxis!=None:
             patch["ribbonPatch"]["stackAxis"]=self.parser.getOptions().ribbonPatchStackAxis
 
-        if self.parser.getOptions().ribbonPatchDiscretization!=None:
-            patch["ribbonPatch"]["discretization"]=self.parser.getOptions().ribbonPatchDiscretization
+        if self.parser.getOptions().ribbonPatchDiscretisation!=None:
+            patch["ribbonPatch"]["discretisation"]=self.parser.getOptions().ribbonPatchDiscretisation
 
 
 
