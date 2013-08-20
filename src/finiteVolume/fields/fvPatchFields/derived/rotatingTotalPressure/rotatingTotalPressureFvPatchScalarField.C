@@ -37,7 +37,8 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-rotatingTotalPressureFvPatchScalarField::rotatingTotalPressureFvPatchScalarField
+rotatingTotalPressureFvPatchScalarField::
+rotatingTotalPressureFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
@@ -100,6 +101,14 @@ void rotatingTotalPressureFvPatchScalarField::updateCoeffs()
 {
     if (updated())
     {
+        return;
+    }
+
+    if (!this->db().objectRegistry::found(UName()))
+    {
+        // U not available, do not update
+        totalPressureFvPatchScalarField::updateCoeffs();
+
         return;
     }
 

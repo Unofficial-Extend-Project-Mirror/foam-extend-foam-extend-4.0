@@ -160,6 +160,14 @@ void Foam::totalPressureFvPatchScalarField::updateCoeffs(const vectorField& Up)
         return;
     }
 
+    if (!this->db().objectRegistry::found(phiName_))
+    {
+        // Flux not available, do not update
+        fixedValueFvPatchScalarField::updateCoeffs();
+
+        return;
+    }
+
     const fvsPatchField<scalar>& phip =
         lookupPatchField<surfaceScalarField, scalar>(phiName_);
 
@@ -169,6 +177,14 @@ void Foam::totalPressureFvPatchScalarField::updateCoeffs(const vectorField& Up)
     }
     else if (rhoName_ == "none")
     {
+        if (!this->db().objectRegistry::found(psiName_))
+        {
+            // psi not available, do not update
+            fixedValueFvPatchScalarField::updateCoeffs();
+
+            return;
+        }
+
         const fvPatchScalarField& psip =
             lookupPatchField<volScalarField, scalar>(psiName_);
 
@@ -193,6 +209,14 @@ void Foam::totalPressureFvPatchScalarField::updateCoeffs(const vectorField& Up)
     }
     else if (psiName_ == "none")
     {
+        if (!this->db().objectRegistry::found(rhoName_))
+        {
+            // rho not available, do not update
+            fixedValueFvPatchScalarField::updateCoeffs();
+
+            return;
+        }
+
         const fvPatchScalarField& rho =
             lookupPatchField<volScalarField, scalar>(rhoName_);
 

@@ -122,6 +122,15 @@ void pressureNormalInletOutletVelocityFvPatchVectorField::updateCoeffs()
         return;
     }
 
+
+    if (!this->db().objectRegistry::found(phiName_))
+    {
+        // Flux not available, do not update
+        mixedFvPatchVectorField::updateCoeffs();
+
+        return;
+    }
+
     const surfaceScalarField& phi =
         db().lookupObject<surfaceScalarField>(phiName_);
 
@@ -137,6 +146,14 @@ void pressureNormalInletOutletVelocityFvPatchVectorField::updateCoeffs()
     }
     else if (phi.dimensions() == dimDensity*dimVelocity*dimArea)
     {
+        if (!this->db().objectRegistry::found(rhoName_))
+        {
+            // Rho not available, do not update
+            mixedFvPatchVectorField::updateCoeffs();
+
+            return;
+        }
+
         const fvPatchField<scalar>& rhop =
             lookupPatchField<volScalarField, scalar>(rhoName_);
 
