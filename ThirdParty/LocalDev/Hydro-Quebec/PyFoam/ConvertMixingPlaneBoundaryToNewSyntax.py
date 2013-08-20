@@ -118,21 +118,24 @@ Change MixingPlane boundary condition parameters
 
                 if bnd[indexDefPatch].has_key("ribbonPatch")==False:
                     bnd[indexDefPatch]["ribbonPatch"]={}
+                    
+                if bnd[indexDefPatch].has_key("zone")==False:
+                    bnd[indexDefPatch]["zone"]=bnd[index] + "Zone"
 
                 if oldAssembly != "":
-                    # Converting "assembly" to ribbonPatch/discretization    
+                    # Converting "assembly" to ribbonPatch/discretisation    
                     for case in switch(oldAssembly):
                         if case('master'):
-                            bnd[indexDefPatch]["ribbonPatch"]["discretization"]="masterPatch"
+                            bnd[indexDefPatch]["ribbonPatch"]["discretisation"]="masterPatch"
                             break
                         if case('slave'):
-                            bnd[indexDefPatch]["ribbonPatch"]["discretization"]="slavePatch"
+                            bnd[indexDefPatch]["ribbonPatch"]["discretisation"]="slavePatch"
                             break
                         if case('both'):
-                            bnd[indexDefPatch]["ribbonPatch"]["discretization"]="bothPatches"
+                            bnd[indexDefPatch]["ribbonPatch"]["discretisation"]="bothPatches"
                             break
                         if case('userdefined'):
-                            bnd[indexDefPatch]["ribbonPatch"]["discretization"]="userDefined"
+                            bnd[indexDefPatch]["ribbonPatch"]["discretisation"]="userDefined"
                             break
                         if case(): # default
                             print "Unsupported assembly type: ", oldAssembly
