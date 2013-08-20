@@ -180,7 +180,7 @@ tmp<Field<Type> > mixedFvPatchField<Type>::valueInternalCoeffs
     const tmp<scalarField>&
 ) const
 {
-    return Type(pTraits<Type>::one)*(1.0 - valueFraction_);
+    return pTraits<Type>::one*(1.0 - valueFraction_);
 
 }
 
@@ -200,7 +200,7 @@ tmp<Field<Type> > mixedFvPatchField<Type>::valueBoundaryCoeffs
 template<class Type>
 tmp<Field<Type> > mixedFvPatchField<Type>::gradientInternalCoeffs() const
 {
-    return -Type(pTraits<Type>::one)*valueFraction_*this->patch().deltaCoeffs();
+    return -pTraits<Type>::one*valueFraction_*this->patch().deltaCoeffs();
 }
 
 

@@ -74,7 +74,7 @@ class mixingPlaneFvPatchField
         word phiName_;
 
         //- Flux mask for averaging.  Size is equal to the number of bands
-        //  Flux mask behaves live valueFraction:
+        //  Flux mask behaves like valueFraction:
         //      1 = use interpolated value from mixing plane interpolator
         //      0 = use patch internal field to mimic zero gradient behaviour
         mutable scalarField fluxMask_;

@@ -61,8 +61,6 @@ void mixingPlaneFvPatchField<Type>::readMixingType() const
         (
             dict.lookup(fieldName)
         );
-        Info<< "Custom mixing type for " << fieldName << ": "
-            << mixingPlaneInterpolation::mixingTypeNames_[mixing_] << endl;
     }
     else if (dict.found("default"))
     {
@@ -615,7 +613,7 @@ tmp<Field<Type> > mixingPlaneFvPatchField<Type>::valueBoundaryCoeffs
 //      || mixing_ == mixingPlaneInterpolation::FLUX_AVERAGING
 //     )
 //     {
-//         return -Type(pTraits<Type>::one)*this->patch().deltaCoeffs();
+//         return -pTraits<Type>::one*this->patch().deltaCoeffs();
 //     }
 //     else if (mixing_ == mixingPlaneInterpolation::ZERO_GRADIENT)
 //     {
@@ -761,7 +759,7 @@ void mixingPlaneFvPatchField<Type>::patchInterpolate
             (
                 this->patchInternalField()
             )
-            + pY*this->patchNeighbourField();
+          + pY*this->patchNeighbourField();
     }
     else if (mixing_ == mixingPlaneInterpolation::ZERO_GRADIENT)
     {
