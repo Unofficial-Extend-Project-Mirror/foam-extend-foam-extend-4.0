@@ -24,7 +24,7 @@ then
     pyFoamChangeMixingPlaneBoundary.py . mixpLeftOut      \
     --shadowPatch                    mixpRightIn      \
     --zone                           mixpLeftOutZone  \
-    --ribbonPatchDiscretisation      bothPatches      \    
+    --ribbonPatchDiscretisation      bothPatches      \
     --ribbonPatchStackAxis           Y                \
     --ribbonPatchSweepAxis           Z                \
     --coordinateSystemType           coordinateSystem \
