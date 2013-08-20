@@ -47,6 +47,10 @@ export WM_PROJECT_VERSION=1.6-ext
 if [ -z "$WM_PROJECT_VERSION_ADDITION" ]
 then
     fullScriptPath=`pwd`"/$0"
+    if [ ! -e $fullScriptPath ]
+    then
+	fullScriptPath=$0
+    fi
     canonicalFullScriptPath="$(readlink 2>&1 -f $fullScriptPath)"
     if [ $? != 0 ]
     then
