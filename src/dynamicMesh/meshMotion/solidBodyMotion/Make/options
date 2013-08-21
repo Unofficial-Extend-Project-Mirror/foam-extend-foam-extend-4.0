@@ -1,21 +1,4 @@
 EXE_INC = \
-    -I$(LIB_SRC)/triSurface/lnInclude \
-    -I$(LIB_SRC)/meshTools/lnInclude \
-    -I$(LIB_SRC)/dynamicMesh/dynamicMesh/lnInclude \
-    -I$(LIB_SRC)/finiteVolume/lnInclude \
-    -I$(LIB_SRC)/tetFiniteElement/lnInclude \
-    -I$(LIB_SRC)/dynamicMesh/meshMotion/tetMotionSolver/lnInclude \
-    -I$(LIB_SRC)/dynamicMesh/meshMotion/fvMotionSolver/lnInclude \
-    -I$(LIB_SRC)/dynamicMesh/meshMotion/RBFMotionSolver/lnInclude \
-    -I$(LIB_SRC)/dynamicMesh/meshMotion/mesquiteMotionSolver/lnInclude
+    -I$(LIB_SRC)/dynamicMesh/dynamicMesh/lnInclude
 
-LIB_LIBS = \
-    -ltriSurface \
-    -lmeshTools \
-    -ldynamicMesh \
-    -lfiniteVolume \
-    -ltetFiniteElement \
-    -ltetMotionSolver \
-    -lfvMotionSolver \
-    -lRBFMotionSolver \
-    -lmesquiteMotionSolver
+LIB_LIBS =
