@@ -20,6 +20,7 @@ EXE_LIBS = \
     -lincompressibleLESModels \
     -lincompressibleTransportModels \
     -lfiniteVolume \
-    $(WM_DECOMP_LIBS) \
+    -ltetFiniteElement \
+    -ltetMotionSolver \
     -llduSolvers \
     -L$(MESQUITE_LIB_DIR) -lmesquite

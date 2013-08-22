@@ -33,6 +33,11 @@ Change MixingPlane boundary condition parameters
                                dest="shadowPatch",
                                default=None,
                                help='Name of the shadowPatch')
+        self.parser.add_option("--zone",
+                               action="store",
+                               dest="zone",
+                               default=None,
+                               help='Name of the zone for mixingPlanePatch')                                     
         self.parser.add_option("--coordinateSystemName",
                                action="store",
                                dest="coordinateSystemName",
@@ -68,11 +73,11 @@ Change MixingPlane boundary condition parameters
                                dest="ribbonPatchStackAxis",
                                default=None,
                                help='ribbonPatch stackAxis (X|Y|Z|R|Theta')
-        self.parser.add_option("--ribbonPatchDiscretization",
+        self.parser.add_option("--ribbonPatchDiscretisation",
                                action="store",
-                               dest="ribbonPatchDiscretization",
+                               dest="ribbonPatchDiscretisation",
                                default=None,
-                               help='ribbonPatch discretization (masterPatch|slavePatch|bothPatches|uniform|userDefined)')
+                               help='ribbonPatch discretisation (masterPatch|slavePatch|bothPatches|uniform|userDefined)')
         
         self.parser.add_option("--test",
                                action="store_true",
@@ -102,6 +107,9 @@ Change MixingPlane boundary condition parameters
                     if self.parser.getOptions().shadowPatch!=None:
                         val["shadowPatch"]=self.parser.getOptions().shadowPatch
 
+                    if self.parser.getOptions().zone!=None:
+                        val["zone"]=self.parser.getOptions().zone
+
                     if val.has_key("coordinateSystem")==False:
                         val["coordinateSystem"]={}
 
@@ -129,8 +137,8 @@ Change MixingPlane boundary condition parameters
                     if self.parser.getOptions().ribbonPatchStackAxis!=None:
                         val["ribbonPatch"]["stackAxis"]=self.parser.getOptions().ribbonPatchStackAxis
 
-                    if self.parser.getOptions().ribbonPatchDiscretization!=None:
-                        val["ribbonPatch"]["discretization"]=self.parser.getOptions().ribbonPatchDiscretization
+                    if self.parser.getOptions().ribbonPatchDiscretisation!=None:
+                        val["ribbonPatch"]["discretisation"]=self.parser.getOptions().ribbonPatchDiscretisation
 
                 break
 

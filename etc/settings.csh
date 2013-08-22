@@ -45,11 +45,6 @@ setenv WM_LINK_LANGUAGE c++
 setenv WM_OPTIONS $WM_ARCH$WM_COMPILER$WM_PRECISION_OPTION$WM_COMPILE_OPTION
 set path=($WM_DIR $path)
 
-#setenv WM_DECOMP_INC -DCELL_DECOMP
-#setenv WM_DECOMP_LIBS "-lcellDecompFiniteElement -lcellDecompositionMotionSolver"
-setenv WM_DECOMP_INC -DFACE_DECOMP
-setenv WM_DECOMP_LIBS "-lfaceDecompFiniteElement -lfaceDecompositionMotionSolver"
-
 # base configuration
 setenv FOAM_APP $WM_PROJECT_DIR/applications
 setenv FOAM_APPBIN $WM_PROJECT_DIR/applications/bin/$WM_OPTIONS

@@ -5,4 +5,4 @@ EXE_INC = \
 EXE_LIBS = \
     -lfiniteVolume \
     -llduSolvers \
-    -L$(FOAM_USER_LIBBIN) -lsolidModels
+    -lsolidModels

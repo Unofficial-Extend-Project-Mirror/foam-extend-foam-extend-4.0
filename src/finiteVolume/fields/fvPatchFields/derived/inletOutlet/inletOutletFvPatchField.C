@@ -127,6 +127,14 @@ void inletOutletFvPatchField<Type>::updateCoeffs()
         return;
     }
 
+    if (!this->db().objectRegistry::found(phiName_))
+    {
+        // Flux not available, do not update
+        mixedFvPatchField<Type>::updateCoeffs();
+
+        return;
+    }
+
     const scalarField& phip = this->lookupPatchField
     (
         phiName_,

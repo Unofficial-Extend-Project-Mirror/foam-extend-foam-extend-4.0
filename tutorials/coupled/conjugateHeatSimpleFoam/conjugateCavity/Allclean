@@ -4,7 +4,7 @@
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions
 
 cleanCase
-rm constant/polyMesh/boundary
+\rm -f constant/polyMesh/boundary
 
-rm constant/solid/polyMesh/boundary
-rm -r constant/solid/polyMesh/[c-z]*
+\rm -f constant/solid/polyMesh/boundary
+\rm -rf constant/solid/polyMesh/[c-z]*

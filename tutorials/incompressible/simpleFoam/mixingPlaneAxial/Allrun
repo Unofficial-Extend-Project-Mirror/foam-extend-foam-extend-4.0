@@ -26,8 +26,10 @@ then
     echo "Using pyFoamChangeMixingPlaneBoundary.py"
     pyFoamChangeMixingPlaneBoundary.py . upstreamMixingPlanePatch   \
     --shadowPatch                    downstreamMixingPlanePatch \
-    --assembly                       both                       \
-    --orientation                    dirZ_spanTheta             \
+    --zone                           upstreamMixingPlaneZone    \
+    --ribbonPatchDiscretisation      bothPatches                \
+    --ribbonPatchStackAxis           Z                          \
+    --ribbonPatchSweepAxis           Theta                      \
     --coordinateSystemType           cylindrical                \
     --coordinateSystemOrigin         "(0 0 0)"                  \
     --coordinateSystemE1             "(1 0 0)"                  \
@@ -35,8 +37,10 @@ then
 
     pyFoamChangeMixingPlaneBoundary.py . downstreamMixingPlanePatch \
     --shadowPatch                    upstreamMixingPlanePatch   \
-    --assembly                       both                       \
-    --orientation                    dirZ_spanTheta             \
+    --zone                           downstreamMixingPlaneZone  \
+    --ribbonPatchDiscretisation      bothPatches                \
+    --ribbonPatchStackAxis           Z                          \
+    --ribbonPatchSweepAxis           Theta                      \
     --coordinateSystemType           cylindrical                \
     --coordinateSystemOrigin         "(0 0 0)"                  \
     --coordinateSystemE1             "(1 0 0)"                  \
@@ -75,9 +79,16 @@ fi
 
 echo "$caseName: Creating the starting time directory"
 cp -r 0_orig 0
+echo "$caseName: Creating zones for the mixingPlane"
+runApplicationAndReportOnError setSet -batch setBatchMixingPlane
+runApplicationAndReportOnError setsToZones -noFlipMap
+mv log.setSet log.setSet_MixingPlane
+mv log.setsToZones log.setsToZones_MixingPlane
 
 runApplicationAndReportOnError setSet -batch setBatchGGIZone
 runApplicationAndReportOnError setsToZones -noFlipMap
+mv log.setSet log.setSet_GGIZone
+mv log.setsToZones log.setsToZones_GGIZone
 
 echo "$caseName: Running potentialFoam"
 runApplicationAndReportOnError potentialFoam

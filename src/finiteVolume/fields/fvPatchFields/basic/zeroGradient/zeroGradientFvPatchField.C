@@ -135,7 +135,8 @@ tmp<Field<Type> > zeroGradientFvPatchField<Type>::valueBoundaryCoeffs
 
 
 template<class Type>
-tmp<Field<Type> > zeroGradientFvPatchField<Type>::gradientInternalCoeffs() const
+tmp<Field<Type> >
+zeroGradientFvPatchField<Type>::gradientInternalCoeffs() const
 {
     return tmp<Field<Type> >
     (
@@ -145,7 +146,8 @@ tmp<Field<Type> > zeroGradientFvPatchField<Type>::gradientInternalCoeffs() const
 
 
 template<class Type>
-tmp<Field<Type> > zeroGradientFvPatchField<Type>::gradientBoundaryCoeffs() const
+tmp<Field<Type> >
+zeroGradientFvPatchField<Type>::gradientBoundaryCoeffs() const
 {
     return tmp<Field<Type> >
     (

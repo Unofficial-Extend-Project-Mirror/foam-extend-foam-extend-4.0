@@ -23,8 +23,10 @@ then
     echo "Using pyFoamChangeMixingPlaneBoundary.py"
     pyFoamChangeMixingPlaneBoundary.py . mixpLeftOut      \
     --shadowPatch                    mixpRightIn      \
-    --assembly                       both             \
-    --orientation                    dirY_spanZ       \
+    --zone                           mixpLeftOutZone  \
+    --ribbonPatchDiscretisation      bothPatches      \
+    --ribbonPatchStackAxis           Y                \
+    --ribbonPatchSweepAxis           Z                \
     --coordinateSystemType           coordinateSystem \
     --coordinateSystemOrigin         "(0 0 0.005)"    \
     --coordinateSystemE1             "(1 0 0)"        \
@@ -32,8 +34,10 @@ then
 
     pyFoamChangeMixingPlaneBoundary.py . mixpRightIn      \
     --shadowPatch                    mixpLeftOut      \
-    --assembly                       both             \
-    --orientation                    dirY_spanZ       \
+    --zone                           mixpRightInZone  \
+    --ribbonPatchDiscretisation      bothPatches      \
+    --ribbonPatchStackAxis           Y                \
+    --ribbonPatchSweepAxis           Z                \
     --coordinateSystemType           coordinateSystem \
     --coordinateSystemOrigin         "(0 0 0.005)"    \
     --coordinateSystemE1             "(1 0 0)"        \
@@ -43,6 +47,9 @@ else
     cp constant/polyMesh/boundary.preconfigured constant/polyMesh/boundary
 fi
 
+echo "$caseName: Creating zones for the mixingPlane"
+runApplicationAndReportOnError setSet -batch setBatch
+runApplicationAndReportOnError setsToZones -noFlipMap
 
 echo "$caseName: Creating the starting time directory"
 cp -r 0_orig 0

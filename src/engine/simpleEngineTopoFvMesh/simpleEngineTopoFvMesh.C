@@ -31,7 +31,7 @@ License
 #include "componentMixedTetPolyPatchVectorField.H"
 #include "mapPolyMesh.H"
 #include "polyTopoChange.H"
-#include "tetDecompositionMotionSolver.H"
+#include "tetMotionSolver.H"
 #include "volMesh.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -252,8 +252,8 @@ void Foam::simpleEngineTopoFvMesh::setBoundaryMotion()
         Info << "Setting boundary motion" << endl;
     }
 
-    tetDecompositionMotionSolver& mSolver =
-        refCast<tetDecompositionMotionSolver>(msPtr_());
+    tetMotionSolver& mSolver =
+        refCast<tetMotionSolver>(msPtr_());
 
     tetPointVectorField& motionU = mSolver.motionU();
 
@@ -390,8 +390,8 @@ void Foam::simpleEngineTopoFvMesh::setBoundaryPosition()
         Info << "Setting boundary position" << endl;
     }
 
-    tetDecompositionMotionSolver& mSolver =
-        refCast<tetDecompositionMotionSolver>(msPtr_());
+    tetMotionSolver& mSolver =
+        refCast<tetMotionSolver>(msPtr_());
 
     tetPointVectorField& motionU = mSolver.motionU();
 
@@ -477,8 +477,8 @@ Foam::simpleEngineTopoFvMesh::simpleEngineTopoFvMesh
 
 bool Foam::simpleEngineTopoFvMesh::update()
 {
-    tetDecompositionMotionSolver& mSolver =
-        refCast<tetDecompositionMotionSolver>(msPtr_());
+    tetMotionSolver& mSolver =
+        refCast<tetMotionSolver>(msPtr_());
 
     // Detaching the interface
     if (attached())

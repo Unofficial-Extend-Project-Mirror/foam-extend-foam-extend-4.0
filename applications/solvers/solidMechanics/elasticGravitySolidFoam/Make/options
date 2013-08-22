@@ -5,7 +5,7 @@ EXE_INC = \
     -I../solidModels/lnInclude
 
 EXE_LIBS = \
-    -L$(FOAM_USER_LIBBIN) -lsolidModels \
+    -lsolidModels \
     -lfiniteVolume \
     -llduSolvers \
     -lmeshTools \

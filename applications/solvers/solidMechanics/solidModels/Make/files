@@ -56,4 +56,4 @@ interpolation/leastSquaresVolPointInterpolation/leastSquaresVolPointInterpolatio
 
 solidInterface/solidInterface.C
 
-LIB = $(FOAM_USER_LIBBIN)/libsolidModels
+LIB = $(FOAM_LIBBIN)/libsolidModels

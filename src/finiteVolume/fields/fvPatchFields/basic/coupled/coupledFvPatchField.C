@@ -154,7 +154,7 @@ tmp<Field<Type> > coupledFvPatchField<Type>::valueInternalCoeffs
     const tmp<scalarField>& w
 ) const
 {
-    return Type(pTraits<Type>::one)*w;
+    return pTraits<Type>::one*w;
 }
 
 
@@ -164,14 +164,14 @@ tmp<Field<Type> > coupledFvPatchField<Type>::valueBoundaryCoeffs
     const tmp<scalarField>& w
 ) const
 {
-    return Type(pTraits<Type>::one)*(1.0 - w);
+    return pTraits<Type>::one*(1.0 - w);
 }
 
 
 template<class Type>
 tmp<Field<Type> > coupledFvPatchField<Type>::gradientInternalCoeffs() const
 {
-    return -Type(pTraits<Type>::one)*this->patch().deltaCoeffs();
+    return -pTraits<Type>::one*this->patch().deltaCoeffs();
 }
 
 

@@ -103,6 +103,12 @@ void Foam::fluxCorrectedVelocityFvPatchVectorField::evaluate
 
     zeroGradientFvPatchVectorField::evaluate();
 
+    if (!this->db().objectRegistry::found(phiName_))
+    {
+        // Flux not available, do not update
+        return;
+    }
+
     const surfaceScalarField& phi =
         db().lookupObject<surfaceScalarField>(phiName_);
 
@@ -118,6 +124,12 @@ void Foam::fluxCorrectedVelocityFvPatchVectorField::evaluate
     }
     else if (phi.dimensions() == dimDensity*dimVelocity*dimArea)
     {
+        if (!this->db().objectRegistry::found(rhoName_))
+        {
+            // Rho not available, do not update
+            return;
+        }
+
         const fvPatchField<scalar>& rhop =
             lookupPatchField<volScalarField, scalar>(rhoName_);
 

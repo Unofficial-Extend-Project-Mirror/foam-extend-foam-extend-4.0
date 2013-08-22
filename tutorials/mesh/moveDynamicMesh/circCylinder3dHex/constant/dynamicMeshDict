@@ -20,7 +20,7 @@ FoamFile
 dynamicFvMesh           dynamicMotionSolverFvMesh;
 
 solver                  mesquiteMotionSolver;
-//solver                  laplaceFaceDecomposition;
+//solver                  laplace;
 //diffusivity             uniform 1.0;
 //diffusivity             quadratic;
 //distancePatches         (topWall);

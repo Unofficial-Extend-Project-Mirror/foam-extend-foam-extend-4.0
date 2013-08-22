@@ -18,7 +18,7 @@ dynamicFvMesh dynamicMotionSolverFvMesh;
 
 twoDMotion yes;
 
-solver laplaceFaceDecomposition;
+solver laplace;
 
 diffusivity uniform 1.0;
 

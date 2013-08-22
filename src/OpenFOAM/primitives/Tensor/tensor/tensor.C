@@ -252,7 +252,24 @@ vector eigenVector(const tensor& t, const scalar lambda)
     }
     else
     {
-        return vector::zero;
+        // Double identical eigen-value
+        if (mag(A.xx()) > SMALL)
+        {
+            return vector(0, 1, 0);
+        }
+        else if (mag(A.yy()) > SMALL)
+        {
+            return vector(0, 0, 1);
+        }
+        else if (mag(A.zz()) > SMALL)
+        {
+            return vector(1, 0, 0);
+        }
+        else
+        {
+            // Everything is zero.  Return arbitrary vector
+            return vector(1, 0, 0);
+        }
     }
 }
 
@@ -264,15 +281,6 @@ tensor eigenVectors(const tensor& t)
     // Modification for strict-aliasing compliance.
     // Sandeep Menon, 01/Dec/2010
 
-    // Test for null eigen values to return a not null eigen vector
-    // Jovani Favero, 18/Nov/2009
-    tensor evs
-    (
-        (mag(evals.x()) < SMALL) ? vector(0, 0, 1) : eigenVector(t, evals.x()),
-        (mag(evals.y()) < SMALL) ? vector(0, 1, 0) : eigenVector(t, evals.y()),
-        (mag(evals.z()) < SMALL) ? vector(1, 0, 0) : eigenVector(t, evals.z())
-    );
-
     // Test for null eigen values to return a not null eigen vector.
     // Jovani Favero, 18/Nov/2009. Adjusted by HJ, to correct for multiple zero
     // entries in eigenvalues
@@ -281,7 +289,7 @@ tensor eigenVectors(const tensor& t)
     // and xyz tensor is returned
     if (mag(evals.z()) < SMALL)
     {
-        return evs;
+        return I;
     }
 
     // One valid eigen-vector.  Manufacture second and third direction
@@ -289,7 +297,7 @@ tensor eigenVectors(const tensor& t)
     if (mag(evals.y()) < SMALL)
     {
         // Take the z eigenvector and find a non-zero component
-        vector zVec = evs.z();
+        vector zVec = eigenVector(t, evals.z());
 
         vector yVec;
 
@@ -311,22 +319,31 @@ tensor eigenVectors(const tensor& t)
 
         vector xVec = yVec ^ zVec;
 
-        // Note different return
         return tensor(xVec, yVec, zVec);
     }
 
     if (mag(evals.x()) < SMALL)
     {
-        // Calculate the third eigen-vector as the cross-product of the others
-        vector xCross = evs.y() ^ evs.z();
-        xCross /= mag(xCross);
+        vector xVec = eigenVector(t, evals.x());
+        vector yVec = eigenVector(t, evals.y());
+        vector zVec = eigenVector(t, evals.z());
 
-        evs.xx() = xCross.x();
-        evs.xy() = xCross.y();
-        evs.xz() = xCross.z();
+        // If second and third eigen value is the same, the two vectors
+        // will be identical.  Fix this
+        if (mag(evals.z() - evals.y()) < SMALL)
+        {
+            zVec = xVec ^ yVec;
+        }
+
+        return tensor(xVec, yVec, zVec);
     }
 
-    return evs;
+    return tensor
+    (
+        eigenVector(t, evals.x()),
+        eigenVector(t, evals.y()),
+        eigenVector(t, evals.z())
+    );
 }
 
 
@@ -442,12 +459,6 @@ vector eigenValues(const symmTensor& t)
 
 vector eigenVector(const symmTensor& t, const scalar lambda)
 {
-    // HJ, I think this is wrong.  HJ, 9/Jul/2010
-//     if (mag(lambda) < SMALL)
-//     {
-//         return vector::zero;
-//     }
-
     // Construct the matrix for the eigenvector problem
     symmTensor A(t - lambda*I);
 
@@ -499,7 +510,24 @@ vector eigenVector(const symmTensor& t, const scalar lambda)
     }
     else
     {
-        return vector::zero;
+        // Double identical eigen-value
+        if (mag(A.xx()) > SMALL)
+        {
+            return vector(0, 1, 0);
+        }
+        else if (mag(A.yy()) > SMALL)
+        {
+            return vector(0, 0, 1);
+        }
+        else if (mag(A.zz()) > SMALL)
+        {
+            return vector(1, 0, 0);
+        }
+        else
+        {
+            // Everything is zero.  Return arbitrary vector
+            return vector(1, 0, 0);
+        }
     }
 }
 
@@ -513,18 +541,12 @@ tensor eigenVectors(const symmTensor& t)
 
     // Test for null eigen values to return a not null eigen vector
     // Jovani Favero, 18/Nov/2009
-    tensor evs
-    (
-        (mag(evals.x()) < SMALL) ? vector(0, 0, 1) : eigenVector(t, evals.x()),
-        (mag(evals.y()) < SMALL) ? vector(0, 1, 0) : eigenVector(t, evals.y()),
-        (mag(evals.z()) < SMALL) ? vector(1, 0, 0) : eigenVector(t, evals.z())
-    );
 
     // Start with largest eigen-value: if this is zero, all are zero
     // and original tensor is returned
     if (mag(evals.z()) < SMALL)
     {
-        return evs;
+        return I;
     }
 
     // One valid eigen-vector.  Manufacture second and third direction
@@ -532,7 +554,7 @@ tensor eigenVectors(const symmTensor& t)
     if (mag(evals.y()) < SMALL)
     {
         // Take the z eigenvector and find a non-zero component
-        vector zVec = evs.z();
+        vector zVec = eigenVector(t, evals.z());
 
         vector yVec;
 
@@ -560,16 +582,26 @@ tensor eigenVectors(const symmTensor& t)
 
     if (mag(evals.x()) < SMALL)
     {
-        // Calculate the third eigen-vector as the cross-product of the others
-        vector xCross = evs.y() ^ evs.z();
-        xCross /= mag(xCross);
+        vector xVec = eigenVector(t, evals.x());
+        vector yVec = eigenVector(t, evals.y());
+        vector zVec = eigenVector(t, evals.z());
 
-        evs.xx() = xCross.x();
-        evs.xy() = xCross.y();
-        evs.xz() = xCross.z();
+        // If second and third eigen value is the same, the two vectors
+        // will be identical.  Fix this
+        if (mag(evals.z() - evals.y()) < SMALL)
+        {
+            zVec = xVec ^ yVec;
+        }
+
+        return tensor(xVec, yVec, zVec);
     }
 
-    return evs;
+    return tensor
+    (
+        eigenVector(t, evals.x()),
+        eigenVector(t, evals.y()),
+        eigenVector(t, evals.z())
+    );
 }
 
 

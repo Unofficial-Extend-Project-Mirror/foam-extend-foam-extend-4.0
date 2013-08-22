@@ -27,21 +27,25 @@ then
     echo "Using pyFoamChangeMixingPlaneBoundary.py"
     pyFoamChangeMixingPlaneBoundary.py . B_UPSTREAM   \
 	--shadowPatch                    B_DOWNSTREAM \
+	--zone                           B_UPSTREAMZone  \
+	--ribbonPatchDiscretisation      bothPatches  \
+	--ribbonPatchStackAxis           R            \
+	--ribbonPatchSweepAxis           Theta        \
 	--coordinateSystemType           cylindrical  \
 	--coordinateSystemOrigin         "(0 0 0)"    \
 	--coordinateSystemE1             "(1 0 0)"    \
 	--coordinateSystemE3             "(0 0 1)"    \
-	--assembly                       both         \
-	--orientation                    dirR_spanTheta
 
     pyFoamChangeMixingPlaneBoundary.py . B_DOWNSTREAM \
 	--shadowPatch                    B_UPSTREAM   \
+	--zone                           B_DOWNSTREAMZone  \
+	--ribbonPatchDiscretisation      bothPatches  \
+	--ribbonPatchStackAxis           R            \
+	--ribbonPatchSweepAxis           Theta        \
 	--coordinateSystemType           cylindrical  \
 	--coordinateSystemOrigin         "(0 0 0)"    \
 	--coordinateSystemE1             "(1 0 0)"    \
 	--coordinateSystemE3             "(0 0 1)"    \
-	--assembly                       both         \
-	--orientation                    dirR_spanTheta
 
     echo "Using pyFoamChangeGGIBoundary.py"
     pyFoamChangeGGIBoundary.py . sideWallA_BB_cyclic1   \
@@ -64,8 +68,17 @@ fi
 echo "$caseName: Creating the starting time directory"
 cp -r 0_orig 0
 
-runApplication setSet -batch setBatchGgi
-runApplication setsToZones -noFlipMap
+echo "$caseName: Creating zones for the mixingPlane"
+runApplicationAndReportOnError setSet -batch setBatchMixingPlane
+runApplicationAndReportOnError setsToZones -noFlipMap
+mv log.setSet log.setSet_MixingPlane
+mv log.setsToZones log.setsToZones_MixingPlane
+
+echo "$caseName: Creating zones for the Ggi"
+runApplicationAndReportOnError setSet -batch setBatchGgi
+runApplicationAndReportOnError setsToZones -noFlipMap
+mv log.setSet log.setSet_Ggi
+mv log.setsToZones log.setsToZones_Ggi
 
 echo "$caseName: Running laplacianFoam"
 runApplicationAndReportOnError laplacianFoam
