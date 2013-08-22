@@ -46,8 +46,8 @@
 
 # Will install the package directly $WM_THIRD_PARTY_DIR
 #   Some comments about package relocation:
-#   By using this prefix for the Prefix:  parameter in this file, you will make this 
-#   package relocatable. 
+#   By using this prefix for the Prefix:  parameter in this file, you will make this
+#   package relocatable.
 #
 #   This is fine, as long as your software is itself relocatable.
 #
@@ -56,7 +56,7 @@
 #   Ref: http://sourceware.org/autobook/autobook/autobook_80.html
 #
 #   In that case, if you ever change the value of the $WM_THIRD_PARTY_DIR, you will
-#   not be able to reutilize this RPM, even though it is relocatable. You will need to 
+#   not be able to reutilize this RPM, even though it is relocatable. You will need to
 #   regenerate the RPM.
 #
 %define _prefix         %{_WM_THIRD_PARTY_DIR}
@@ -90,16 +90,19 @@ Patch0:                 libccmio-2.6.1.patch_0
 
 %build
     [ -n "$WM_CC" ]         &&  export CC="$WM_CC"
+    [ -n "$WM_FC" ]         &&  export FC="$WM_FC"
     [ -n "$WM_CXX" ]        &&  export CXX="$WM_CXX"
     [ -n "$WM_CFLAGS" ]     &&  export CFLAGS="$WM_CFLAGS"
+    [ -n "$WM_FCFLAGS" ]    &&  export FCFLAGS="$WM_FCFLAGS"
     [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
 
 %ifos darwin
-    # Missing configuration files for Mac OS X 
+    # Missing configuration files for Mac OS X
     [ ! -d config/i386-apple-darwin10 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin10
     [ ! -d config/i386-apple-darwin11 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin11
+    [ ! -d config/i386-apple-darwin12 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin12
 %endif
     # Warning:
     #  1: The name of the ADF library will be renamed to libadf_ccmio since this
@@ -109,7 +112,7 @@ Patch0:                 libccmio-2.6.1.patch_0
     #
     #  This way, the libraries libadf_ccmio and libcgns_ccmio will not get in
     #  conflict with any other packages that might depend on a newer version
-    #  of libadf or libcgns 
+    #  of libadf or libcgns
     #
     unset RELEASE
     unset DEBUG
@@ -184,7 +187,3 @@ rm -rf %{buildroot}
 %Files
 %defattr(-,root,root)
 %{_installPrefix}/*
-
-
-
-

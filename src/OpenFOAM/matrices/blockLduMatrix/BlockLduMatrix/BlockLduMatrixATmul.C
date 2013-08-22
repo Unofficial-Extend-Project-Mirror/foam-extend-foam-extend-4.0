@@ -70,9 +70,6 @@ void Foam::BlockLduMatrix<Type>::AmulCore
     // Diagonal multiplication, no indirection
     multiply(Ax, Diag, x);
 
-    // Create multiplication function object
-    typename BlockCoeff<Type>::multiply mult;
-
     // Lower multiplication
 
     if (symmetric())
@@ -211,9 +208,6 @@ void Foam::BlockLduMatrix<Type>::TmulCore
 
     // Diagonal multiplication, no indirection
     multiply(Tx, Diag, x);
-
-    // Create multiplication function object
-    typename BlockCoeff<Type>::multiply mult;
 
     // Upper multiplication
 

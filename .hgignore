@@ -88,3 +88,13 @@ testHarness/OpenFOAM/1.6-ext/runDir/CTestTestfile.cmake
 testHarness/OpenFOAM/1.6-ext/runDir/DartConfiguration.tcl
 testHarness/OpenFOAM/1.6-ext/runDir/Makefile
 testHarness/OpenFOAM/1.6-ext/runDir/cmake_install.cmake
+
+# The following files are blacklisted because of a DMCA complaint by ANSYS.
+src/lduSolvers/tools/PriorityArray.C
+src/lduSolvers/tools/PriorityArray.H
+src/lduSolvers/amg/amgPolicy/samgPolicy.C
+src/lduSolvers/amg/amgPolicy/samgPolicy.H
+src/lduSolvers/amg/amgPolicy/aamgPolicy.C
+src/lduSolvers/amg/amgPolicy/aamgPolicy.H
+
+# end-of-file

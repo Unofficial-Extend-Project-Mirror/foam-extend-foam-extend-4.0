@@ -3,6 +3,11 @@ global/dimensionedConstants/dimensionedConstants.C
 global/argList/argList.C
 global/clock/clock.C
 
+global/Profiling/ProfilingInfo.C
+global/Profiling/ProfilingPool.C
+global/Profiling/ProfilingStack.C
+global/Profiling/ProfilingTrigger.C
+
 bools = primitives/bools
 $(bools)/bool/bool.C
 $(bools)/bool/boolIO.C

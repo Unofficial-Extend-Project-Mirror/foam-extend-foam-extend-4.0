@@ -61,6 +61,8 @@ SourceFiles
 #include "autoPtr.H"
 #include "runTimeSelectionTables.H"
 
+#include "ProfilingTrigger.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -274,6 +276,8 @@ public:
             const lduInterfaceFieldPtrsList& interfaces_;
 
 
+            ProfilingTrigger profile_;
+ 
         // Protected Member Functions
 
             //- Return dictionary

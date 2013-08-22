@@ -32,6 +32,8 @@ License
 #include "Time.H"
 #include "OFstream.H"
 
+#include "Profiling.H"
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class ParticleType>
@@ -125,6 +127,8 @@ template<class ParticleType>
 template<class TrackingData>
 void Foam::Cloud<ParticleType>::move(TrackingData& td)
 {
+    addProfile2(moveProfile,"Cloud<ParticleType>::move_"+this->name());
+
     const globalMeshData& pData = polyMesh_.globalData();
     const labelList& processorPatches = pData.processorPatches();
     const labelList& processorPatchIndices = pData.processorPatchIndices();

@@ -27,6 +27,8 @@ License
 #include "Time.H"
 #include "PstreamReduceOps.H"
 
+#include "Profiling.H"
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void Foam::Time::readDict()
@@ -279,8 +281,12 @@ bool Foam::Time::writeObject
     IOstream::compressionType cmp
 ) const
 {
+    addProfile2(getCalled,"Foam::Time::writeObject");
+
     if (outputTime())
     {
+        addProfile2(actualOutput,"Foam::Time::writeObject - outputTime");
+
         IOdictionary timeDict
         (
             IOobject
