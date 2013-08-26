@@ -66,60 +66,79 @@ class profilingPool
 :
     public regIOobject
 {
+    // Private typedefs
+
+        typedef std::multimap<Foam::string,Foam::profilingInfo*> mapType;
+        typedef std::pair<Foam::string,Foam::profilingInfo*> mapValues;
+        typedef mapType::iterator mapIterator;
+        typedef mapType::const_iterator mapConstIterator;
+
+
     // Private data
 
-    typedef std::multimap<Foam::string,Foam::profilingInfo*> mapType;
-    typedef std::pair<Foam::string,Foam::profilingInfo*> mapValues;
-    typedef mapType::iterator mapIterator;
-    typedef mapType::const_iterator mapConstIterator;
+        mapType allInfo_;
 
-    mapType allInfo_;
+        profilingStack theStack_;
 
-    profilingStack theStack_;
+        clockTime globalTime_;
 
-    clockTime globalTime_;
 
     // Private Member Functions
 
-    //- Disallow default bitwise copy construct
-    profilingPool(const profilingPool&);
+        //- Disallow default bitwise copy construct
+        profilingPool(const profilingPool&);
     
-    //- Disallow default bitwise assignment
-    void operator=(const profilingPool&);
+        //- Disallow default bitwise assignment
+        void operator=(const profilingPool&);
     
+
     // Static data members
 
-    //- the only possible Pool-Object
-    static profilingPool *thePool_;
+        //- The only possible Pool-Object
+        static profilingPool *thePool_;
 
-    //- Construct null
-    profilingPool(const IOobject &);
 
-    // Destructor
-    
+    // Constructors
+
+        //- Construct null
+        profilingPool(const IOobject&);
+
+
+    //- Destructor
     ~profilingPool();
 
-    mapType &map() 
-        { return allInfo_; }
+    
+    // Member functions
 
-    const mapType &map() const
-        { return allInfo_; }
+        mapType &map()
+        {
+            return allInfo_;
+        }
 
-    profilingStack &stack() 
-        { return theStack_; }
+        const mapType &map() const
+        {
+            return allInfo_;
+        }
 
-    const profilingStack &stack() const
-        { return theStack_; }
+        profilingStack &stack() 
+        {
+            return theStack_;
+        }
+
+        const profilingStack &stack() const
+        {
+            return theStack_;
+        }
 
 public:
 
     static void initprofiling(const IOobject &);
 
-    static profilingInfo &getInfo(const string &name);
+    static profilingInfo& getInfo(const string &name);
 
     static void remove(const profilingInfo &info);
 
-    static void rememberTimer(const profilingInfo &info,clockTime &timer);
+    static void rememberTimer(const profilingInfo &info, clockTime &timer);
 
     virtual bool writeData(Ostream &) const;
 };
