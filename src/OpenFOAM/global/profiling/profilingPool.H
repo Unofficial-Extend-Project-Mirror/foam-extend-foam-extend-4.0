@@ -110,37 +110,37 @@ class profilingPool
     
     // Member functions
 
-        mapType &map()
+        mapType& map()
         {
             return allInfo_;
         }
 
-        const mapType &map() const
+        const mapType& map() const
         {
             return allInfo_;
         }
 
-        profilingStack &stack() 
+        profilingStack& stack() 
         {
             return theStack_;
         }
 
-        const profilingStack &stack() const
+        const profilingStack& stack() const
         {
             return theStack_;
         }
 
 public:
 
-    static void initprofiling(const IOobject &);
+    static void initprofiling(const IOobject&);
 
-    static profilingInfo& getInfo(const string &name);
+    static profilingInfo& getInfo(const string& name);
 
-    static void remove(const profilingInfo &info);
+    static void remove(const profilingInfo& info);
 
-    static void rememberTimer(const profilingInfo &info, clockTime &timer);
+    static void rememberTimer(const profilingInfo& info, clockTime& timer);
 
-    virtual bool writeData(Ostream &) const;
+    virtual bool writeData(Ostream&) const;
 };
 
 
