@@ -175,10 +175,22 @@ void pressureInletOutletVelocityFvPatchVectorField::updateCoeffs()
         return;
     }
 
-    const fvsPatchField<scalar>& phip =
-        lookupPatchField<surfaceScalarField, scalar>(phiName_);
+    if (this->db().objectRegistry::found(phiName_))
+    {
+        const fvsPatchField<scalar>& phip =
+            lookupPatchField<surfaceScalarField, scalar>(phiName_);
 
-    valueFraction() = neg(phip)*(I - sqr(patch().nf()));
+        valueFraction() = neg(phip)*(I - sqr(patch().nf()));
+    }
+    else
+    {
+        InfoIn
+        (
+            "pressureInletOutletVelocityFvPatchVectorField::updateCoeffs()"
+        )<< "Cannot find phi.  Return" << endl;
+
+        valueFraction() = symmTensor::one;
+    }
 
     directionMixedFvPatchVectorField::updateCoeffs();
     directionMixedFvPatchVectorField::evaluate();
