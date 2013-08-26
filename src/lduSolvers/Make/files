@@ -30,5 +30,7 @@ $(amg)/coarseAmgLevel.C
 amgPolicy = $(amg)/amgPolicy
 $(amgPolicy)/amgPolicy.C
 $(amgPolicy)/pamgPolicy.C
+$(amgPolicy)/aamgPolicy.C
+$(amgPolicy)/samgPolicy.C
 
 LIB = $(FOAM_LIBBIN)/liblduSolvers

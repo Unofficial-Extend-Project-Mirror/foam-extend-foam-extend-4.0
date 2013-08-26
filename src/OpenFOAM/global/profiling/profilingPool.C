@@ -24,18 +24,18 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "ProfilingPool.H"
+#include "profilingPool.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-Foam::ProfilingPool* Foam::ProfilingPool::thePool_(NULL);
+Foam::profilingPool* Foam::profilingPool::thePool_(NULL);
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::ProfilingPool::ProfilingPool(const IOobject &ob)
+Foam::profilingPool::profilingPool(const IOobject &ob)
     :
     regIOobject(ob),
     globalTime_()
@@ -45,7 +45,7 @@ Foam::ProfilingPool::ProfilingPool(const IOobject &ob)
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::ProfilingPool::~ProfilingPool()
+Foam::profilingPool::~profilingPool()
 {
     for(mapIterator it=map().begin();it!=map().end();++it) {
         delete it->second;
@@ -56,32 +56,32 @@ Foam::ProfilingPool::~ProfilingPool()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::ProfilingPool::initProfiling(const IOobject &ob)
+void Foam::profilingPool::initprofiling(const IOobject &ob)
 {
     if(thePool_!=NULL) {
-        WarningIn("Foam::ProfilingPool::initProfiling(const IOobject &)")
+        WarningIn("Foam::profilingPool::initprofiling(const IOobject &)")
             << "Singleton already initialized\n" << endl;
     } else {
-        thePool_=new ProfilingPool(ob);
-        ProfilingInfo *master=new ProfilingInfo();
+        thePool_=new profilingPool(ob);
+        profilingInfo *master=new profilingInfo();
         thePool_->map().insert(make_pair(master->description(),master));
         thePool_->stack().push(*master);
-        ProfilingPool::rememberTimer(*master,thePool_->globalTime_);
+        profilingPool::rememberTimer(*master,thePool_->globalTime_);
     }
 }
 
-Foam::ProfilingInfo &Foam::ProfilingPool::getInfo(const string &name)
+Foam::profilingInfo &Foam::profilingPool::getInfo(const string &name)
 {
     if(thePool_==NULL) {
-        FatalErrorIn("Foam::ProfilingPool::addInfo(const string &name)")
+        FatalErrorIn("Foam::profilingPool::addInfo(const string &name)")
             << "Sinleton not initialized\n" << endl
                 << abort(FatalError);
     } 
 
-    ProfilingStack &stack=thePool_->stack();
+    profilingStack &stack=thePool_->stack();
     mapType &map=thePool_->map();
 
-    ProfilingInfo *found=NULL;
+    profilingInfo *found=NULL;
 
     for(mapIterator it=map.lower_bound(name);it!=map.upper_bound(name);++it) {
         if(it->second->parent().id()==stack.top().id()) {
@@ -91,7 +91,7 @@ Foam::ProfilingInfo &Foam::ProfilingPool::getInfo(const string &name)
     }
 
     if(found==NULL) {
-        found=new ProfilingInfo(stack.top(),name);
+        found=new profilingInfo(stack.top(),name);
 
         map.insert(make_pair(name,found));
     }
@@ -100,10 +100,10 @@ Foam::ProfilingInfo &Foam::ProfilingPool::getInfo(const string &name)
     return *found;
 }
 
-void Foam::ProfilingPool::rememberTimer(const ProfilingInfo &info,clockTime &timer)
+void Foam::profilingPool::rememberTimer(const profilingInfo &info,clockTime &timer)
 {
     if(thePool_==NULL) {
-        FatalErrorIn("Foam::ProfilingPool::rememberTimer(const ProfilingInfo &info,clockTime &timer)")
+        FatalErrorIn("Foam::profilingPool::rememberTimer(const profilingInfo &info,clockTime &timer)")
             << "Singleton not initialized\n" << endl
                 << abort(FatalError);
     } 
@@ -111,18 +111,18 @@ void Foam::ProfilingPool::rememberTimer(const ProfilingInfo &info,clockTime &tim
     thePool_->stack().addTimer(info,timer);
 }
 
-void Foam::ProfilingPool::remove(const ProfilingInfo &info)
+void Foam::profilingPool::remove(const profilingInfo &info)
 {
     if(thePool_==NULL) {
-        FatalErrorIn("Foam::ProfilingPool::addInfo(const string &name)")
+        FatalErrorIn("Foam::profilingPool::addInfo(const string &name)")
             << "Singleton not initialized\n" << endl
                 << abort(FatalError);
     } 
 
-    ProfilingStack &stack=thePool_->stack();
+    profilingStack &stack=thePool_->stack();
 
     if(info.id()!=stack.top().id()) {
-        FatalErrorIn("Foam::ProfilingPool::update(const string &name)")
+        FatalErrorIn("Foam::profilingPool::update(const string &name)")
             << "The id " << info.id() << " of the updated info " << info.description()
                 << " is no the same as the one on top of the stack: " 
                 << stack.top().id() << " (" << stack.top().description() << ")\n" << endl
@@ -132,7 +132,7 @@ void Foam::ProfilingPool::remove(const ProfilingInfo &info)
     stack.pop();
 }
 
-bool Foam::ProfilingPool::writeData(Ostream &os) const
+bool Foam::profilingPool::writeData(Ostream &os) const
 {
     os << "profilingInfo" << nl << indent << token::BEGIN_LIST << incrIndent << nl;
 

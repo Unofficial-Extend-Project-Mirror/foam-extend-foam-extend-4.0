@@ -23,26 +23,26 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::ProfilingPool
+    Foam::profilingPool
 
 Description
-    Collects all the data for Profiling 
+    Collects all the data for profiling 
 
 SourceFiles
-    ProfilingPool.C
+    profilingPool.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef ProfilingPool_H
-#define ProfilingPool_H
+#ifndef profilingPool_H
+#define profilingPool_H
 
 #include "regIOobject.H"
 #include "clockTime.H"
 
 #include <map>
 
-#include "ProfilingInfo.H"
-#include "ProfilingStack.H"
+#include "profilingInfo.H"
+#include "profilingStack.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -54,50 +54,50 @@ namespace Foam
 class Ostream;
 
 // // Forward declaration of friend functions and operators
-// Istream& operator>>(Istream&, ProfilingPool&);
-// Ostream& operator<<(Ostream&, const ProfilingPool&);
+// Istream& operator>>(Istream&, profilingPool&);
+// Ostream& operator<<(Ostream&, const profilingPool&);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class ProfilingPool Declaration
+                           Class profilingPool Declaration
 \*---------------------------------------------------------------------------*/
 
-class ProfilingPool
+class profilingPool
 :
     public regIOobject
 {
     // Private data
 
-    typedef std::multimap<Foam::string,Foam::ProfilingInfo*> mapType;
-    typedef std::pair<Foam::string,Foam::ProfilingInfo*> mapValues;
+    typedef std::multimap<Foam::string,Foam::profilingInfo*> mapType;
+    typedef std::pair<Foam::string,Foam::profilingInfo*> mapValues;
     typedef mapType::iterator mapIterator;
     typedef mapType::const_iterator mapConstIterator;
 
     mapType allInfo_;
 
-    ProfilingStack theStack_;
+    profilingStack theStack_;
 
     clockTime globalTime_;
 
     // Private Member Functions
 
     //- Disallow default bitwise copy construct
-    ProfilingPool(const ProfilingPool&);
+    profilingPool(const profilingPool&);
     
     //- Disallow default bitwise assignment
-    void operator=(const ProfilingPool&);
+    void operator=(const profilingPool&);
     
     // Static data members
 
     //- the only possible Pool-Object
-    static ProfilingPool *thePool_;
+    static profilingPool *thePool_;
 
     //- Construct null
-    ProfilingPool(const IOobject &);
+    profilingPool(const IOobject &);
 
     // Destructor
     
-    ~ProfilingPool();
+    ~profilingPool();
 
     mapType &map() 
         { return allInfo_; }
@@ -105,21 +105,21 @@ class ProfilingPool
     const mapType &map() const
         { return allInfo_; }
 
-    ProfilingStack &stack() 
+    profilingStack &stack() 
         { return theStack_; }
 
-    const ProfilingStack &stack() const
+    const profilingStack &stack() const
         { return theStack_; }
 
 public:
 
-    static void initProfiling(const IOobject &);
+    static void initprofiling(const IOobject &);
 
-    static ProfilingInfo &getInfo(const string &name);
+    static profilingInfo &getInfo(const string &name);
 
-    static void remove(const ProfilingInfo &info);
+    static void remove(const profilingInfo &info);
 
-    static void rememberTimer(const ProfilingInfo &info,clockTime &timer);
+    static void rememberTimer(const profilingInfo &info,clockTime &timer);
 
     virtual bool writeData(Ostream &) const;
 };
