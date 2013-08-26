@@ -55,7 +55,7 @@ echo "Starting ThirdParty AllMake: Stage5     "
 echo "========================================"
 echo
 
-# swak4Foam - Version 0.2.0
+# swak4Foam - Version 0.2.4
 # In fact, we are basically tracking the head branch from the Mercurial repository
 # which is also replicated under the Breeder_1.7 section of the Subversion repository
 #
