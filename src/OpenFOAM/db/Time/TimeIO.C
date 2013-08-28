@@ -27,7 +27,7 @@ License
 #include "Time.H"
 #include "PstreamReduceOps.H"
 
-#include "Profiling.H"
+#include "profiling.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 

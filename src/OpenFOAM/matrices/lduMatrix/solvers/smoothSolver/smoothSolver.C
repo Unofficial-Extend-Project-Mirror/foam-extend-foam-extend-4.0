@@ -26,7 +26,7 @@ License
 
 #include "smoothSolver.H"
 
-#include "Profiling.H"
+#include "profiling.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -90,7 +90,7 @@ Foam::lduSolverPerformance Foam::smoothSolver::solve
     // If the nSweeps_ is negative do a fixed number of sweeps
     if (nSweeps_ < 0)
     {
-        ProfilingTrigger smoothProfile("lduMatrix::smoother_"+fieldName());
+        profilingTrigger smoothProfile("lduMatrix::smoother_"+fieldName());
 
         autoPtr<lduMatrix::smoother> smootherPtr = lduMatrix::smoother::New
         (
@@ -139,7 +139,7 @@ Foam::lduSolverPerformance Foam::smoothSolver::solve
     // Check convergence, solve if not converged
     if (!stop(solverPerf))
     {
-        ProfilingTrigger smoothProfile("lduMatrix::smoother_"+fieldName());
+        profilingTrigger smoothProfile("lduMatrix::smoother_"+fieldName());
 
         autoPtr<lduMatrix::smoother> smootherPtr =
             lduMatrix::smoother::New

@@ -24,7 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Profiling.H"
+#include "profiling.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -58,7 +58,7 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve
     const dictionary& solverControls
 )
 {
-    ProfilingTrigger profSolve("fvMatrix::solve_"+psi_.name());
+    profilingTrigger profSolve("fvMatrix::solve_"+psi_.name());
 
     if (debug)
     {

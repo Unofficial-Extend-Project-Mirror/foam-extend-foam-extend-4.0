@@ -27,8 +27,8 @@ License
 #include "Time.H"
 #include "PstreamReduceOps.H"
 
-#include "ProfilingPool.H"
-#include "Profiling.H"
+#include "profilingPool.H"
+#include "profiling.H"
 
 #include <sstream>
 
@@ -242,8 +242,10 @@ Foam::Time::Time
 {
     setControls();
 
-    ProfilingPool::initProfiling(
-        IOobject(
+    profilingPool::initprofiling
+    (
+        IOobject
+        (
             "profilingInfo",
             timeName(),
             "uniform",
@@ -310,8 +312,10 @@ Foam::Time::Time
 {
     setControls();
 
-    ProfilingPool::initProfiling(
-        IOobject(
+    profilingPool::initprofiling
+    (
+        IOobject
+        (
             "profilingInfo",
             timeName(),
             "uniform",
@@ -374,8 +378,10 @@ Foam::Time::Time
     readLibs_(controlDict_, "libs"),
     functionObjects_(*this, enableFunctionObjects)
 {
-    ProfilingPool::initProfiling(
-        IOobject(
+    profilingPool::initprofiling
+    (
+        IOobject
+        (
             "profilingInfo",
             timeName(),
             "uniform",

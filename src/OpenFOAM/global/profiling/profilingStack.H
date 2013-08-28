@@ -23,18 +23,18 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::ProfilingStack
+    Foam::profilingStack
 
 Description
-    Stack of the ProfilingInfo-items that are currently used
+    Stack of the profilingInfo-items that are currently used
 
 SourceFiles
-    ProfilingStack.C
+    profilingStack.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef ProfilingStack_H
-#define ProfilingStack_H
+#ifndef profilingStack_H
+#define profilingStack_H
 
 #include "LIFOStack.H"
 #include "clockTime.H"
@@ -45,57 +45,57 @@ namespace Foam
 {
 
 // Forward declaration of classes
-    class ProfilingInfo;
-    class ProfilingPool;
+    class profilingInfo;
+    class profilingPool;
     class Ostream;
 
 /*---------------------------------------------------------------------------*\
-                           Class ProfilingStack Declaration
+                           Class profilingStack Declaration
 \*---------------------------------------------------------------------------*/
 
-class ProfilingStack
+class profilingStack
 :
-    private LIFOStack<ProfilingInfo *>
+    private LIFOStack<profilingInfo *>
 {
 
     // Private Member Functions
 
     //- Disallow default bitwise copy construct
-    ProfilingStack(const ProfilingStack&);
+    profilingStack(const profilingStack&);
     
     //- Disallow default bitwise assignment
-    void operator=(const ProfilingStack&);
+    void operator=(const profilingStack&);
 
     //- remember the timers for the correct stack-output
     HashTable<clockTime *,label> timers_;
 protected:
     void writeStackContents(Ostream &) const;
 
-    void addTimer(const ProfilingInfo &info,clockTime &timer);
+    void addTimer(const profilingInfo &info,clockTime &timer);
 public:
 
     // Constructors
 
     //- Construct null
-    ProfilingStack();
+    profilingStack();
 
     // Destructor
     
-    ~ProfilingStack();
+    ~profilingStack();
 
 
     // Members that encapsulate the original stack-class
-    ProfilingInfo &top() const;
+    profilingInfo &top() const;
 
-    ProfilingInfo &bottom() const;
+    profilingInfo &bottom() const;
     
     bool empty() const;
 
-    void push(ProfilingInfo &);
+    void push(profilingInfo &);
 
-    ProfilingInfo &pop();
+    profilingInfo &pop();
 
-    friend class ProfilingPool;
+    friend class profilingPool;
 };
 
 

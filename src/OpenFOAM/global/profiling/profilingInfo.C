@@ -24,76 +24,87 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "ProfilingStack.H"
-#include "ProfilingInfo.H"
+#include "profilingInfo.H"
+
+#include "dictionary.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+Foam::label Foam::profilingInfo::nextId_(0);
+
+Foam::label Foam::profilingInfo::getID()
+{
+    nextId_++;
+    return nextId_;
+}
+
+void Foam::profilingInfo::raiseID(label maxVal)
+{
+    if(maxVal>nextId_) {
+        nextId_=maxVal;
+    }
+}
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::ProfilingStack::ProfilingStack()
+Foam::profilingInfo::profilingInfo()
 :
-    LIFOStack<ProfilingInfo*>()
+    calls_(0),
+    totalTime_(0.),
+    childTime_(0.),
+    id_(getID()),
+    parent_(*this),
+    description_("application::main"),
+    onStack_(false)
 {}
 
 
+Foam::profilingInfo::profilingInfo(profilingInfo &parent,const string &descr)
+:
+    calls_(0),
+    totalTime_(0.),
+    childTime_(0.),
+    id_(getID()),
+    parent_(parent),
+    description_(descr),
+    onStack_(false)
+{}
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::ProfilingStack::~ProfilingStack()
+Foam::profilingInfo::~profilingInfo()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::ProfilingInfo &Foam::ProfilingStack::top() const
+void Foam::profilingInfo::update(scalar elapsedTimee)
 {
-    return *LIFOStack<ProfilingInfo*>::top();
-}
-
-Foam::ProfilingInfo &Foam::ProfilingStack::bottom() const
-{
-    return *LIFOStack<ProfilingInfo*>::bottom();
-}
-
-bool Foam::ProfilingStack::empty() const
-{
-    return LIFOStack<ProfilingInfo*>::empty();
-}
-
-void Foam::ProfilingStack::push(ProfilingInfo &a)
-{
-    LIFOStack<ProfilingInfo*>::push(&a);
-    top().addedToStack();
-}
-
-Foam::ProfilingInfo &Foam::ProfilingStack::pop()
-{
-    top().removedFromStack();
-    return *LIFOStack<ProfilingInfo*>::pop();
-}
-
-void Foam::ProfilingStack::writeStackContents(Ostream &os) const
-{
-    if(empty()) {
-        return;
+    calls_++;
+    totalTime_+=elapsedTimee;
+    if(id()!=parent().id()) {
+        parent_.childTime_+=elapsedTimee;
     }
-    const_iterator it=begin();
-    scalar oldElapsed=0;
-    do {
-        const ProfilingInfo &info=*(*it);
-        scalar elapsed=timers_[info.id()]->elapsedTime();
-
-        info.writeWithOffset(os,true,elapsed,oldElapsed);
-
-        oldElapsed=elapsed;
-        ++it;
-    } while(it!=end());
 }
 
-void Foam::ProfilingStack::addTimer(const ProfilingInfo &info,clockTime &timer)
+void Foam::profilingInfo::writeWithOffset(Ostream &os,bool offset,scalar time,scalar childTimes) const
 {
-    timers_.insert(info.id(),&timer);
+    dictionary tmp;
+    
+    tmp.add("id",id());
+    if(id()!=parent().id()) {
+        tmp.add("parentId",parent().id());
+    }
+    tmp.add("description",description());
+    tmp.add("calls",calls()+(offset ? 1 : 0));
+    tmp.add("totalTime",totalTime()+time);
+    tmp.add("childTime",childTime()+childTimes);
+    tmp.add("onStack",onStack());
+
+    os << tmp;  
 }
 
 // * * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * //
@@ -101,5 +112,11 @@ void Foam::ProfilingStack::addTimer(const ProfilingInfo &info,clockTime &timer)
 
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
+Foam::Ostream& Foam::operator<<(Ostream& os, const profilingInfo& info)
+{
+    info.writeWithOffset(os);
+
+    return os;
+}
 
 // ************************************************************************* //

@@ -60,8 +60,7 @@ SourceFiles
 #include "typeInfo.H"
 #include "autoPtr.H"
 #include "runTimeSelectionTables.H"
-
-#include "ProfilingTrigger.H"
+#include "profilingTrigger.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -276,7 +275,7 @@ public:
             const lduInterfaceFieldPtrsList& interfaces_;
 
 
-            ProfilingTrigger profile_;
+            profilingTrigger profile_;
  
         // Protected Member Functions
 

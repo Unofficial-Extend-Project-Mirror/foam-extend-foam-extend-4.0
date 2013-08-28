@@ -32,7 +32,7 @@ License
 #include "Time.H"
 #include "OFstream.H"
 
-#include "Profiling.H"
+#include "profiling.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

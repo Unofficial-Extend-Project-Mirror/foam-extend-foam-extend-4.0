@@ -243,7 +243,7 @@ steadyStateDdtScheme<Type>::fvcDdtPhiCorr
             mesh(),
             dimensioned<typename flux<Type>::type>
             (
-                "0",
+                "zero",
                 rA.dimensions()*phi.dimensions()/dimTime,
                 pTraits<typename flux<Type>::type>::zero
             )
@@ -278,7 +278,7 @@ steadyStateDdtScheme<Type>::fvcDdtPhiCorr
             dimensioned<typename flux<Type>::type>
             (
                 "0",
-                rA.dimensions()*phi.dimensions()/dimTime,
+                rA.dimensions()*rho.dimensions()*phi.dimensions()/dimTime,
                 pTraits<typename flux<Type>::type>::zero
             )
         )

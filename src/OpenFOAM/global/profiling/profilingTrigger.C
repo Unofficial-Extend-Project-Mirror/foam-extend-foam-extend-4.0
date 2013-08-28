@@ -24,28 +24,28 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "ProfilingTrigger.H"
+#include "profilingTrigger.H"
 
-#include "ProfilingPool.H"
+#include "profilingPool.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::ProfilingTrigger::ProfilingTrigger(const string &name)
+Foam::profilingTrigger::profilingTrigger(const string &name)
 :
     clock_(),
-    info_(ProfilingPool::getInfo(name)),
+    info_(profilingPool::getInfo(name)),
     running_(true)
 {
-    ProfilingPool::rememberTimer(info(),clock());
+    profilingPool::rememberTimer(info(),clock());
 }
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::ProfilingTrigger::~ProfilingTrigger()
+Foam::profilingTrigger::~profilingTrigger()
 {
     stop();
 }
@@ -53,12 +53,12 @@ Foam::ProfilingTrigger::~ProfilingTrigger()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::ProfilingTrigger::stop()
+void Foam::profilingTrigger::stop()
 {
     if(running_) {
         scalar elapsed=clock_.elapsedTime();
         info_.update(elapsed);
-        ProfilingPool::remove(info_);
+        profilingPool::remove(info_);
         running_=false;
     }
 }

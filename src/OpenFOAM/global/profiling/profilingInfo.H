@@ -23,18 +23,18 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::ProfilingInfo
+    Foam::profilingInfo
 
 Description
     Information needed for profiling
 
 SourceFiles
-    ProfilingInfo.C
+    profilingInfo.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef ProfilingInfo_H
-#define ProfilingInfo_H
+#ifndef profilingInfo_H
+#define profilingInfo_H
 
 #include "label.H"
 #include "scalar.H"
@@ -45,19 +45,20 @@ namespace Foam
 {
 
 // Forward declaration of classes
-    // class Istream;
-    class Ostream;
-    class ProfilingStack;
-    class ProfilingPool;
-    class ProfilingInfo;
 
-    Ostream& operator<<(Ostream&, const ProfilingInfo&);
+// class Istream;
+class Ostream;
+class profilingStack;
+class profilingPool;
+class profilingInfo;
+
+Ostream& operator<<(Ostream&, const profilingInfo&);
 
 /*---------------------------------------------------------------------------*\
-                           Class ProfilingInfo Declaration
+                           Class profilingInfo Declaration
 \*---------------------------------------------------------------------------*/
 
-class ProfilingInfo
+class profilingInfo
 {
     // Private data
 
@@ -74,7 +75,7 @@ class ProfilingInfo
     label id_;
 
     // pointer to the parent object (if there is any)
-    ProfilingInfo &parent_;
+    profilingInfo &parent_;
 
     // what this does
     string description_;
@@ -85,10 +86,10 @@ class ProfilingInfo
     // Private Member Functions
 
     //- Disallow default bitwise copy construct
-    ProfilingInfo(const ProfilingInfo&);
+    profilingInfo(const profilingInfo&);
     
     //- Disallow default bitwise assignment
-    void operator=(const ProfilingInfo&);
+    void operator=(const profilingInfo&);
 
     // Static data members
     
@@ -110,7 +111,7 @@ protected:
         { onStack_=false; }
 
     //- Construct null - only the master-element
-    ProfilingInfo();
+    profilingInfo();
 
     void writeWithOffset(Ostream &os,bool offset=false,scalar time=0,scalar childTime=0) const; 
 
@@ -119,14 +120,14 @@ public:
     // Constructors
     
     //- Construct from components
-    ProfilingInfo(ProfilingInfo &parent,const string &descr);
+    profilingInfo(profilingInfo &parent,const string &descr);
 
 //     //- Construct from Istream
-//     ProfilingInfo(Istream&);
+//     profilingInfo(Istream&);
 
     // Destructor
 
-    ~ProfilingInfo();
+    ~profilingInfo();
 
 
     // Member Functions
@@ -151,19 +152,19 @@ public:
     const string &description() const
         { return description_; }
 
-    const ProfilingInfo &parent() const
+    const profilingInfo &parent() const
         { return parent_; }
 
     //- Update it with a new timing information
     void update(scalar elapsedTime);
 
-    friend class ProfilingStack;
-    friend class ProfilingPool;
+    friend class profilingStack;
+    friend class profilingPool;
 
     // IOstream Operators
 
-    //        friend Istream& operator>>(Istream&, ProfilingInfo&);
-    friend Ostream& operator<<(Ostream&, const ProfilingInfo&);
+    //        friend Istream& operator>>(Istream&, profilingInfo&);
+    friend Ostream& operator<<(Ostream&, const profilingInfo&);
 };
 
 

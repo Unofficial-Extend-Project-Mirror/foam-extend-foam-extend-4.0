@@ -27,7 +27,7 @@ License
 #include "functionObjectList.H"
 #include "Time.H"
 
-#include "Profiling.H"
+#include "profiling.H"
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 

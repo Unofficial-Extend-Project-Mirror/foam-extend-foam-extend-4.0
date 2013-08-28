@@ -57,6 +57,10 @@ fluxRequired
 
 mixingPlane
 {
-    default        zeroGradient;
+    default        areaAveraging;
+    p              areaAveraging;
+    U              fluxAveraging;
 }
+
+
 // ************************************************************************* //

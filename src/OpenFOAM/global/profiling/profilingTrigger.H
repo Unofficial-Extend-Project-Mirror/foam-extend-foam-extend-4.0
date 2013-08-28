@@ -23,18 +23,18 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::ProfilingTrigger
+    Foam::profilingTrigger
 
 Description
     The object that does the actual measuring
 
 SourceFiles
-    ProfilingTrigger.C
+    profilingTrigger.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef ProfilingTrigger_H
-#define ProfilingTrigger_H
+#ifndef profilingTrigger_H
+#define profilingTrigger_H
 
 #include "clockTime.H"
 #include "string.H"
@@ -44,50 +44,50 @@ SourceFiles
 namespace Foam
 {
 
-    class ProfilingInfo;
-    class ProfilingPool;
+    class profilingInfo;
+    class profilingPool;
 
 /*---------------------------------------------------------------------------*\
-                           Class ProfilingTrigger Declaration
+                           Class profilingTrigger Declaration
 \*---------------------------------------------------------------------------*/
 
-class ProfilingTrigger
+class profilingTrigger
 {
     // Private data
 
     clockTime clock_;
 
-    ProfilingInfo &info_;
+    profilingInfo &info_;
 
     bool running_;
 
     // Private Member Functions
 
     //- Disallow default bitwise copy construct
-    ProfilingTrigger(const ProfilingTrigger&);
+    profilingTrigger(const profilingTrigger&);
 
     //- Disallow default bitwise assignment
-    void operator=(const ProfilingTrigger&);
+    void operator=(const profilingTrigger&);
 
 protected:
 
     clockTime &clock() 
         { return clock_; }
 
-    const ProfilingInfo &info() const
+    const profilingInfo &info() const
         { return info_; }
 
 public:
 
     // Constructors
 
-    ProfilingTrigger(const string &name);
+    profilingTrigger(const string &name);
         
-    ~ProfilingTrigger();
+    ~profilingTrigger();
 
     void stop();
 
-    friend class ProfilingPool;
+    friend class profilingPool;
 };
 
 
