@@ -26,8 +26,6 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "equationReader.H"
-
 namespace Foam
 {
 
@@ -81,20 +79,6 @@ Istream& operator>>(Istream& is, Scalar& s)
     if (t.isNumber())
     {
         s = t.number();
-    }
-    else if (t.isString())
-    {
-        // DLFG 2011-07-04 Modifications for equationReader
-        equationReader eqn;
-        eqn.readEquation
-        (
-            equation
-            (
-                "fromScalar",
-                t.stringToken()
-            )
-        );
-        s = eqn.evaluate(0).value();
     }
     else
     {
