@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,7 +10,8 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volVectorField;
-    object      U;
+    location    "-1";
+    object      icoFoam1@-1@0@U;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -30,16 +31,16 @@ boundaryField
         type            fixedValue;
         value           uniform (0 0 0);
     }
-    westStreet // closed
+    westStreet
     {
         type            fixedValue;
         value           uniform (0 0 0);
     }
-    eastStreet // outlet
+    eastStreet
     {
         type            zeroGradient;
     }
-    northBranch // inlet
+    northBranch
     {
         type            fixedValue;
         value           uniform (0 -1 0);
@@ -49,5 +50,6 @@ boundaryField
         type            empty;
     }
 }
+
 
 // ************************************************************************* //
