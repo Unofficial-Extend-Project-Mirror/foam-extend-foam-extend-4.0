@@ -11,4 +11,4 @@ equationReader/equationReaderIO.C
 IOEquationReader/IOEquationReader.C
 IOEquationReader/IOEquationReaderIO.C
 
-LIB = $(FOAM_USER_LIBBIN)/libequationReader
+LIB = $(FOAM_LIBBIN)/libequationReader
