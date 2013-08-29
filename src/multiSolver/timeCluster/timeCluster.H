@@ -72,9 +72,10 @@ class timeCluster
     // Private data
 
         scalar globalOffset_;
+        label globalIndex_;
         label superLoop_;
         word solverDomainName_;
-
+        
         // PreConditioned file name - used only for pre and post conditioning
         // a data set for parallel runs
         word preConName_;
@@ -110,6 +111,7 @@ public:
         (
             const instantList& times,
             const scalar globalOffset,
+            const label globalIndex,
             const label superLoop,
             const word& solverDomainName,
             const word& preConName = word::null
@@ -123,7 +125,7 @@ public:
             const timeCluster& tc,
             const label index
         );
-
+        
         //- Construct a time cluster given a scalar value.  This constructs
         //  a timeCluster with a single instant of time at value t, and whose
         //  other values are zero or empty.
@@ -143,6 +145,11 @@ public:
 
             inline scalar& globalOffset();
 
+            //- Global index
+            inline label globalIndex() const;
+
+            inline label& globalIndex();
+
             //- SuperLoop
             inline label superLoop() const;
 
@@ -159,43 +166,43 @@ public:
             inline word& preConName();
 
         // Derived values
-
+        
             //- Global value at index
             scalar globalValue(const label& index) const;
 
             //- Search for and return global min value.  If empty,
             //  returns VGREAT.
             scalar globalMinValue() const;
-
+            
             //- Search for and return global max value.  If empty,
             //  returns 0.
             scalar globalMaxValue() const;
 
             //- Search for and return index of global min value
             label globalMinIndex() const;
-
+            
             //- Search for and return index of global max value
             label globalMaxIndex() const;
-
+            
             //- Global closest time
             scalar globalFindClosestTimeValue(const scalar) const;
-
+            
             //- Global closest time index
             label globalFindClosestTimeIndex(const scalar) const;
-
+            
             //- Local value at index
             scalar localValue(const label& index) const;
 
             //- Search for and return local min value
             scalar localMinValue() const;
-
+            
             //- Search for and return local max value
             scalar localMaxValue() const;
 
             //- Search for and return index of global min value.  If empty,
             //  returns VGREAT
             label localMinIndex() const;
-
+            
             //- Search for and return index of global max value.  If empty,
             //  returns 0.
             label localMaxIndex() const;
@@ -205,9 +212,9 @@ public:
 
             //-Local closest time index
             label localFindClosestTimeIndex(const scalar) const;
-
+            
         // Operators
-
+        
             //- Chip off a single instant given an index, return as timeCluster
                 // This retains superLoop, solverDomain, etc.. with a timevalue
             timeCluster operator()(const label index) const;
@@ -227,6 +234,8 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "timeClusterI.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
 

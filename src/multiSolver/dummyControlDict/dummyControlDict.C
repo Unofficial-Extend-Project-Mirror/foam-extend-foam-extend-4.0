@@ -108,4 +108,3 @@ Foam::dummyControlDict::~dummyControlDict()
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-

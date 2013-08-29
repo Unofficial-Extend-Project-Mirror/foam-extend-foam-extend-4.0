@@ -72,7 +72,7 @@ public:
 
         //- Construct, reading the multiControlDict data from a file
         explicit dummyControlDict(const fileName&);
-
+        
         //- Construct given the multiControlDict dictionary
         explicit dummyControlDict(const dictionary&);
 
@@ -90,3 +90,5 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -67,5 +67,4 @@ fvAgglomerationMethods/Allwmake
 wmake libso engine
 
 wmake libso multiSolver
-
 # ----------------------------------------------------------------- end-of-file
