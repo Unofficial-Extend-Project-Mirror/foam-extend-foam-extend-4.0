@@ -23,28 +23,23 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::dummyControlDict
+    Foam::multiTime
 
 Description
-    This class is a workaround that allows a class to have its own independent
-    objectRegistry.  That requires the creation of a new Time object, which
-    requires a controlDict for construction.  dummyControlDict creates a dummy
-    controlDict to feed the new Time object.  The only dictionary values it
-    handles are deltaT, writeFrequency, and optionally, the Time class statics,
-    format and precision.
+    Gives read access to time directory format and precision.
 
 SourceFiles
-    dummyControlDict.C
+    multiTime.C
 
 Author
     David L. F. Gaden
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef dummyControlDict_H
-#define dummyControlDict_H
+#ifndef multiTime_H
+#define multiTime_H
 
-#include "dictionary.H"
+#include "Time.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -52,33 +47,70 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class dummyControlDict Declaration
+                           Class multiTime Declaration
 \*---------------------------------------------------------------------------*/
 
-class dummyControlDict
+class multiTime
 :
-    public dictionary
+    public Time
 {
 
 public:
 
-    TypeName("dummyControlDict");
+    TypeName("multiTime");
 
 
     // Constructors
 
-        //- Construct, creating the bare minimum controlDict
-        dummyControlDict();
+        //- Construct given name, rootPath and casePath
+        multiTime
+        (
+            const word& name,
+            const fileName& rootPath,
+            const fileName& caseName,
+            const word& systemName = "system",
+            const word& constantName = "constant"
+        );
 
-        //- Construct, reading the multiControlDict data from a file
-        explicit dummyControlDict(const fileName&);
-        
-        //- Construct given the multiControlDict dictionary
-        explicit dummyControlDict(const dictionary&);
+        //- Construct given dictionary, rootPath and casePath
+        multiTime
+        (
+            const dictionary& dict,
+            const fileName& rootPath,
+            const fileName& caseName,
+            const word& systemName = "system",
+            const word& constantName = "constant"
+        );
+
+        //- Construct given endTime, rootPath and casePath
+        multiTime
+        (
+            const fileName& rootPath,
+            const fileName& caseName,
+            const word& systemName = "system",
+            const word& constantName = "constant"
+        );
 
 
     // Destructor
-    virtual ~dummyControlDict();
+    virtual ~multiTime();
+
+
+    // Member functions
+    
+        // Access
+        
+            //- Time directory precision
+            inline const int& precision() const
+            {
+                return Time::precision_;
+            }
+            
+            //- Time directory format
+            inline const Time::fmtflags& format() const
+            {
+                return Time::format_;
+            }
 
 };
 

@@ -45,7 +45,8 @@ Author
 #ifndef multiSolver_H
 #define multiSolver_H
 
-#include "Time.H"
+#include "multiSolverVersion.H"
+#include "multiTime.H"
 #include "dummyControlDict.H"
 #include "timeClusterList.H"
 #include "IFstream.H"
@@ -63,53 +64,56 @@ class multiSolver
 {
 
     // Private data
-
+    
         // A dummy controlDict, required to initialize multiDictRegistry
         dummyControlDict dcd_;
 
         // A mini-objectRegistry for the dictionaries - done this way to allow
         // run-time modification of dictionaries
-        Time multiDictRegistry_;
+        multiTime multiDictRegistry_;
 
         // Main control dictionary for multiSolver
         IOdictionary multiControlDict_;
-
+        
         // All multiDicts contained in the case directory
         PtrList<IOdictionary> multiDicts_;
 
         // Reference to multiSolverControl subdictionary in multiControlDict
         dictionary& multiSolverControl_;
-
+        
         // Reference to solverDomains subdictionary in multiControlDict
         dictionary& solverDomains_;
-
+        
         // Current solverDomain dictionary
         dictionary currentSolverDomainDict_;
 
         // List of all the solver domain prefixes
         wordList prefixes_;
-
-        // True when the end condition has been met
-        bool finished_;
-
+        
+        // True when setInitialSolverDomain has been run
+        bool initialized_;
+        
+        // Set by the solver to force a global end
+        bool forcedEnd_;
+        
         // True when superLoop++ just happened, but the previous solverDomain
         // has not yet been saved (to prevent the first solverDomain from
         // saving to the *next* superLoop.
         bool noSaveSinceSuperLoopIncrement_;
-
+        
         // True if this is the lowest number on a local shared drive - parallel
         // only.
         bool manageLocalRoot_;
 
 
     // Private member functions
-
+    
         // Set manageLocalRoot_ flags on all processors (parallel only)
         void setUpParallel();
-
+        
         // Ensure all processors are synchronized (parallel only)
         void synchronizeParallel() const;
-
+    
         // Load initial data and controls
         // *** Located in multiSolverSetInitialSolverDomain.C ***
         void setInitialSolverDomain(const word& solverDomainName);
@@ -122,7 +126,7 @@ class multiSolver
         // multiControlDict
         // *** Located in multiSolverSetControls.C ***
         void setMultiSolverControls();
-
+        
         // Sets controls from the solverDomains subdictionary in the
         // multiControlDict
         // *** Located in multiSolverSetControls.C ***
@@ -130,16 +134,31 @@ class multiSolver
 
         // Use stopAt and finalStopAt settings to determine the endTime for
         // the current solverDomain.  Returns the controlDict's stopAt word,
-        // which may differ from that in multiControlDict.  Sets finished_ to
-        // true if the end condition will be met.
+        // which may differ from that in multiControlDict.
         word setLocalEndTime();
+        
+        // If the current solver domain should not start, returns true.
+        bool checkGlobalEnd() const;
 
         // Looks for case/multiSolver/solverDomain/initial/0.  Fail if missing.
         void checkTimeDirectories() const;
 
+        // Creates a solverDomain's dictionary from a multiDict format:
+        // -Merges "default" if available
+        // -Merge "sameAs" or "multiLoad" dicts, recursively
+        // -Merges inputDict.subDict("solverDomainName") last
+        // outputDict - overwrites any existing entries
+        // inputDict - the "multiSolver" subdict
+        void buildDictionary
+        (
+            dictionary& outputDict,
+            const dictionary& inputDict,
+            const word& solverDomainName
+        );
+
         // Change all catalogued multiDicts to another solverDomain
         void swapDictionaries(const word& solverDomainName);
-
+        
         // When setting up for a different solverDomain, the boundary
         // conditions are allowed to change.  This function copies all valid
         // case/intoSolverDomain/inital/0 files, and overwrites the
@@ -167,9 +186,9 @@ class multiSolver
 
         // Rereads modified dictionaries and sets the controls
         void readIfModified();
-
+        
         // Converts a fileName with the naming convention:
-        //      solverDomain@superLoop@globalOffset@fileName
+        //      solverDomain@superLoop@globalOffset@globalIndex@fileName
         // to a timeCluster
         timeCluster parseConditionedFile
         (
@@ -196,7 +215,7 @@ public:
             misLatestTimeInStartDomainInStartSuperLoop
         };
 
-        //- Final stop at control options
+        //- Final stop at control options    
         enum finalStopAtControls
         {
             mfsEndTime,
@@ -209,7 +228,7 @@ public:
         };
 
     // solverDomains enumerations
-
+        
         //- Time value start from control options
         enum startFromControls
         {
@@ -218,7 +237,7 @@ public:
             mtsLatestTimeThisDomain,
             mtsLatestTimeAllDomains
         };
-
+        
         //- Stop at control options
         enum stopAtControls
         {
@@ -234,67 +253,71 @@ public:
 protected:
 
     // multiSolverControl data
-
+    
         label superLoop_;
-
+        
         word currentSolverDomain_;
 
         static const NamedEnum<initialStartFromControls, 9>
             initialStartFromControlsNames_;
         initialStartFromControls initialStartFrom_;
-
+        
         scalar initialStartTime_;
 
         word startDomain_;
 
         label startSuperLoop_;
-
+        
         static const NamedEnum<finalStopAtControls, 7>
             finalStopAtControlsNames_;
         finalStopAtControls finalStopAt_;
 
         word endDomain_;
-
+        
         scalar finalEndTime_;
 
         label endSuperLoop_;
-
+        
         bool multiDictsRunTimeModifiable_;
 
         scalar globalTimeOffset_;
 
+        //- Each solverDomain / superLoop combination is assigned a unique
+        //  index that increments chronologically
+        label globalIndex_;
+
 
     // solverDomains data
     // This data is transient, changing between solver domains
-
+        
         static const NamedEnum<startFromControls, 4>
             startFromControlsNames_;
         startFromControls startFrom_;
-
+        
         scalar startTime_;
-
+        
         static const NamedEnum<stopAtControls, 7> stopAtControlsNames_;
         stopAtControls stopAt_;
-
+        
         scalar endTime_;
-
+        
         label purgeWriteSuperLoops_;
 
         scalar deltaT_;
-
+        
         label iterations_;
-
+        
         scalar elapsedTime_;
-
+        
         wordList storeFields_;
-
+        
 public:
 
     TypeName("multiSolver");
-
+    
     //- The default multiSolver dictionary name
     static word multiControlDictName;
-
+    
 /* Not implemented yet
     //- Indicates whether the 'solverSignal' option for the finalStopAt setting
     //  in the multiControlDict is permitted.  Default false.  Set this to true
@@ -311,7 +334,8 @@ public:
             const fileName& rootPath,
             const fileName& caseName,
             const word& systemName = "system",
-            const word& constantName = "constant"
+            const word& constantName = "constant",
+            bool showSplash = true
         );
 
         //- Construct reading the multiControlDict from file
@@ -321,7 +345,8 @@ public:
             const fileName& rootPath,
             const fileName& caseName,
             const word& systemName = "system",
-            const word& constantName = "constant"
+            const word& constantName = "constant",
+            bool showSplash = true
         );
 
 
@@ -330,16 +355,20 @@ public:
 
 
     // Member functions
-
+    
         // Access
 
-            // Database
+            //- Version number
+            word version() const;
 
+            // Database
+            
             inline const Time& multiDictRegistry() const;
 
-            inline const IOdictionary multiControlDict() const;
-
-
+            inline const IOdictionary& multiControlDict() const;
+            
+            inline const wordList& prefixes() const;
+        
             // multiSolverControl data
 
             inline const label& superLoop() const;
@@ -347,7 +376,7 @@ public:
             inline const word& currentSolverDomain() const;
 
             inline const initialStartFromControls& initialStartFrom() const;
-
+            
             inline const word& startDomain() const;
 
             inline const scalar& initialStartTime() const;
@@ -355,39 +384,43 @@ public:
             inline const finalStopAtControls& finalStopAt() const;
 
             inline const word& endDomain() const;
-
+            
             inline const scalar& finalEndTime() const;
 
             inline const label& startSuperLoop() const;
-
+            
             inline const label& endSuperLoop() const;
-
+            
             inline const bool& multiDictsRunTimeModifiable() const;
 
             inline const scalar& globalTimeOffset() const;
 
             // Write permission
             inline scalar& globalTimeOffset();
-
+            
+            inline const label& globalIndex() const;
+            
             // solverDomains data
             inline const startFromControls& startFrom() const;
-
+            
             inline const stopAtControls& stopAt() const;
-
+            
             inline const scalar& startTime() const;
 
             inline const scalar& endTime() const;
-
+            inline scalar& endTime();
+            
             inline const label& iterations() const;
-
+            
             inline const scalar& elapsedTime() const;
-
+            
             inline const wordList& storeFields() const;
-
+            
             inline const label& purgeWriteSuperLoops() const;
 
             inline const scalar& deltaT() const;
-
+            inline scalar& deltaT();
+            
 
         // Solver (and pre/post-processor) interface functions
 
@@ -398,6 +431,11 @@ public:
             // reconstructPar
             void postCondition(const word& processor = word::null);
 
+            // Return the source data that multiControlDict currently points to
+            // Returns "default" solverDomain if initial conditions are to be
+            // used and no solverDomain is set yet.
+            timeCluster initialDataSource() const;
+
             // Switch to another solver domain
             void setSolverDomain(const word& solverDomainName);
 
@@ -407,6 +445,9 @@ public:
             // Stop the run at the next setSolverDomain
             inline void setFinished();
 
+            // Archive the last set of data into case/multiSolver
+            void finalize();
+            
             // Increment the superLoop (prefix)
             multiSolver& operator++();
 
@@ -421,7 +462,7 @@ public:
 
             //- Return true if end of run
             bool end() const;
-
+            
 
         // Time functions
             // The multiSolver time directory structure should have the form:
@@ -431,22 +472,22 @@ public:
             //    | |-initial  {initial directory, superLoop -1}
             //    | |-0 {superLoop}
             //    | |-1 {superLoop}
-            //    | | '-multiSolverTime {auto-generated dictionary}
+            //    | | |-multiSolverTime {auto-generated file}
+            //    | | '-0.01, etc.. {time directories}
             //    | '-2, etc..
             //    |-prefix2, etc..
-            //
-            // *** All time functions are located in ***
-            // ***    multiSolverTimeFunctions.C     ***
 
             // Create a list of all superLoops in a directory, (usually in
             // case/prefix). Only looks for integer directory names, does not
             // check for valid time subdirectories.
+            // *** Located in multiSolverTimeFunctions.C ***
             static labelList findSuperLoops(const fileName& path);
 
             // Find the closest global time to a given value in a
             // timeClusterList. Assumes timeClusters do not overlap global time
             // values (as they shouldn't).  If exact is true, this function
             // throws a FatalError when no exact match is found.
+            // *** Located in multiSolverTimeFunctions.C ***
             static timeCluster findClosestGlobalTime
             (
                 const scalar value,
@@ -459,6 +500,7 @@ public:
             // If overlaps exist, it uses only the latest superloop.  If exact
             // is true, this function throws a FatalError when no exact match
             // is found.
+            // *** Located in multiSolverTimeFunctions.C ***
             static timeCluster findClosestLocalTime
             (
                 const scalar value,
@@ -467,18 +509,37 @@ public:
            );
 
             // Find the latest global time
+            // *** Located in multiSolverTimeFunctions.C ***
             static timeCluster findLatestGlobalTime
             (
                 const timeClusterList& tcl
             );
 
             // Find the latest global time
+            // *** Located in multiSolverTimeFunctions.C ***
             static timeCluster findLatestLocalTime
             (
                 const timeClusterList& tcl
             );
 
+            // Find the timeCluster with the given globalIndex.  Returns an
+            // empty timeCluster if not found.
+            // *** Located in multiSolverTimeFunctions.C ***
+            static timeCluster findGlobalIndex
+            (
+                const label& index,
+                const timeClusterList& tcl
+            );
+
+            // Adds all earlier times in the same superLoop directory to the
+            // time cluster
+            void includePreviousTimes
+            (
+                timeCluster& tc
+            ) const;
+
             // Find the path to a specific entry in a time cluster
+            // *** Located in multiSolverTimeFunctions.C ***
             fileName findInstancePath
             (
                 const timeCluster& tc,
@@ -486,15 +547,21 @@ public:
             ) const;
 
             // Find the largest superLoop
+            // *** Located in multiSolverTimeFunctions.C ***
             static label findMaxSuperLoopValue(const timeClusterList& tcl);
 
             // Find the timeClusterList index for the timeClusterList that has
             // the largest superLoop
-            static labelList findMaxSuperLoopIndices(const timeClusterList& tcl);
+            // *** Located in multiSolverTimeFunctions.C ***
+            static labelList findMaxSuperLoopIndices
+            (
+                const timeClusterList& tcl
+            );
 
             // Checks if any of the time ranges overlap one another in a
             // timeClusterList.  (If startTime = previous end, this is okay.)
             // True means they do not overlap.
+            // *** Located in multiSolverTimeFunctions.C ***
             static bool nonOverlapping
             (
                 const timeClusterList& tcl,
@@ -503,15 +570,17 @@ public:
 
             // Maps the time directories in a single superLoop directory
             // Include a processor name, and it uses the processorN directory
+            // *** Located in multiSolverTimeFunctions.C ***
             timeCluster readSuperLoopTimes
             (
                 const word& solverDomain,
                 const label superLoop,
                 const word& processor = word::null
             ) const;
-
+            
             // Maps the time directories in a single solverDomain
             // Include a processor name, and it uses the processorN directory
+            // *** Located in multiSolverTimeFunctions.C ***
             timeClusterList readSolverDomainTimes
             (
                 const word& solverDomain,
@@ -521,6 +590,7 @@ public:
             // Create a snapshot of all the multiSolver time directories
             // Give it a processor name, and it searches instead in the
             // processor directory
+            // *** Located in multiSolverTimeFunctions.C ***
             timeClusterList readAllTimes
             (
                 const word processor = word::null
@@ -531,14 +601,16 @@ public:
             // time values overlap when forced to useGlobalTime.
             // loadStoreFields will copy storeFields into every time folder
             // even though they do not change.
+            // *** Located in multiSolverTimeFunctions.C ***
             bool loadTimeClusterList
             (
                 const timeClusterList& tcl,
                 const bool useGlobalTime = true,
                 const bool loadStoreFields = true
-            ) const;
+            );
 
             // Move all the time directories from sourcePath to archivePath
+            // *** Located in multiSolverTimeFunctions.C ***
             static void archiveTimeDirs
             (
                 const fileName& sourcePath,
@@ -547,6 +619,7 @@ public:
             );
 
             // Delete all time directories in path, do not delete "constant"
+            // *** Located in multiSolverTimeFunctions.C ***
             static void purgeTimeDirs(const fileName& path);
 };
 
@@ -559,4 +632,8 @@ public:
 
 #include "multiSolverI.H"
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #endif
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -26,7 +26,8 @@ Application
     multiSolverDemo
 
 Description
-    Demonstration multiSolver-enabled application.
+    Combination of icoFoam and scalarTransportFoam for testing of new multiTime
+    framework.
 
 Author
     David L. F. Gaden
@@ -61,8 +62,10 @@ int main(int argc, char *argv[])
 
 #   include "solverScalarTransportFoam.H"
 
+    // Only necessary if we revisit the same solver domain twice in the same
+    // superLoop (scalarTransportFoam, in this case)
     multiRun++;
-
+    
 // * * * * * * * * * * * * * * * * icoFoam2  * * * * * * * * * * * * * * * * //
 
     Info << "*** Switching to icoFoam2 ***\n" << endl;

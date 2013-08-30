@@ -12,7 +12,13 @@
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readSIMPLEControls.H"
+    dictionary simple = mesh.solutionDict().subDict("SIMPLE");
+
+    int nNonOrthCorr =
+        simple.lookupOrDefault<int>("nNonOrthogonalCorrectors", 0);
+
+    bool momentumPredictor =
+        simple.lookupOrDefault<Switch>("momentumPredictor", true);
 
         for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
         {

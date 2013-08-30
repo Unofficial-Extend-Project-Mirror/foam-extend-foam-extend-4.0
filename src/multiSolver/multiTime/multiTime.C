@@ -24,75 +24,80 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "multiTime.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-inline const instantList& timeCluster::times() const
-{
-    const instantList& times(*this);
-    return times;
-}
-
-inline instantList& timeCluster::times()
-{
-    instantList& times(*this);
-    return times;
-}
-
-inline scalar timeCluster::globalOffset() const
-{
-    return globalOffset_;
-}
-
-inline scalar& timeCluster::globalOffset()
-{
-    return globalOffset_;
-}
-
-inline label timeCluster::globalIndex() const
-{
-    return globalIndex_;
-}
-
-inline label& timeCluster::globalIndex()
-{
-    return globalIndex_;
-}
-
-inline label timeCluster::superLoop() const
-{
-    return superLoop_;
-}
-
-inline label& timeCluster::superLoop()
-{
-    return superLoop_;
-}
-
-inline const word& timeCluster::solverDomainName() const
-{
-    return solverDomainName_;
-}
-
-inline word& timeCluster::solverDomainName()
-{
-    return solverDomainName_;
-}
-
-inline const word& timeCluster::preConName() const
-{
-    return preConName_;
-}
-
-inline word& timeCluster::preConName()
-{
-    return preConName_;
+    defineTypeNameAndDebug(multiTime, 0);
 }
 
 
-} // End namespace Foam
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::multiTime::multiTime
+(
+    const word& name,
+    const fileName& rootPath,
+    const fileName& caseName,
+    const word& systemName,
+    const word& constantName
+)
+:
+    Time
+    (
+        name,
+        rootPath,
+        caseName,
+        systemName,
+        constantName
+    )
+{}
+
+
+Foam::multiTime::multiTime
+(
+    const dictionary& dict,
+    const fileName& rootPath,
+    const fileName& caseName,
+    const word& systemName,
+    const word& constantName
+)
+:
+    Time
+    (
+        dict,
+        rootPath,
+        caseName,
+        systemName,
+        constantName
+    )
+{}
+
+
+Foam::multiTime::multiTime
+(
+    const fileName& rootPath,
+    const fileName& caseName,
+    const word& systemName,
+    const word& constantName
+)
+:
+    Time
+    (
+        rootPath,
+        caseName,
+        systemName,
+        constantName
+    )
+{}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+Foam::multiTime::~multiTime()
+{}
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
