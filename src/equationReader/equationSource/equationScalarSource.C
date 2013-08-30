@@ -24,89 +24,66 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+//#include "equationScalarSource.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-const char* const pTraits<Scalar>::typeName = "scalar";
-const Scalar pTraits<Scalar>::zero = 0.0;
-const Scalar pTraits<Scalar>::one = 1.0;
-const Scalar pTraits<Scalar>::min = -ScalarVGREAT;
-const Scalar pTraits<Scalar>::max = ScalarVGREAT;
-
-const char* pTraits<Scalar>::componentNames[] = { "x" };
-
-pTraits<Scalar>::pTraits(Istream& is)
+template<>
+label Foam::equationSource<scalar>::lookupComponentIndex
+(
+    const word& componentName
+) const
 {
-    is >> p_;
-}
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-word name(const Scalar val)
-{
-    std::ostringstream buf;
-    buf << val;
-    return buf.str();
-}
-
-
-// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
-
-Scalar readScalar(Istream& is)
-{
-    Scalar rs;
-    is >> rs;
-
-    return rs;
-}
-
-
-Istream& operator>>(Istream& is, Scalar& s)
-{
-    token t(is);
-
-    if (!t.good())
+    // scalar specialization: also returns 0 if word::null is given
+    if ((componentName == word::null) || componentName == "x")
     {
-        is.setBad();
-        return is;
+        return 0;
     }
 
-    if (t.isNumber())
-    {
-        s = t.number();
-    }
-    else
-    {
-        is.setBad();
-        FatalIOErrorIn("operator>>(Istream&, Scalar&)", is)
-            << "wrong token type - expected Scalar found " << t.info()
-            << exit(FatalIOError);
-
-        return is;
-    }
-
-    // Check state of Istream
-    is.check("Istream& operator>>(Istream&, Scalar&)");
-
-    return is;
+    return -1;
 }
 
 
-Ostream& operator<<(Ostream& os, const Scalar s)
+template<>
+const scalar& equationSource<scalar>::singleValue
+(
+    label sourceIndex,
+    label componentIndex
+) const
 {
-    os.write(s);
-    os.check("Ostream& operator<<(Ostream&, const Scalar&)");
-    return os;
+    return singles_[sourceIndex];
 }
 
+template<>
+const scalar& equationSource<scalar>::fieldValue
+(
+    label sourceIndex,
+    label componentIndex,
+    label cellIndex,
+    label geoIndex
+) const
+{
+    return fields_[sourceIndex][geoIndex][cellIndex];
+}
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+template<>
+void equationSource<scalar>::fullFieldValue
+(
+    scalarField& result,
+    label sourceIndex,
+    label componentIndex,
+    label geoIndex
+) const
+{
+    //result.setSize(fields_[sourceIndex][geoIndex].size());
+    result = fields_[sourceIndex][geoIndex];
+}
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // ************************************************************************* //
