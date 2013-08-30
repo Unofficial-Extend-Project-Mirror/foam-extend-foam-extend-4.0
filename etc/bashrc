@@ -125,7 +125,7 @@ _foamSource()
 {
    while [ $# -ge 1 ]
    do
-      [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "Sourcing: $1"
+      [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "Sourcing: $1" 1>&2
       . $1
       shift
    done
