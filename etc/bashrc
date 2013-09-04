@@ -46,34 +46,7 @@ export WM_PROJECT_VERSION=1.6-ext
 
 if [ -z "$WM_PROJECT_VERSION_ADDITION" ]
 then
-    fullScriptPath=`pwd`"/$0"
-    if [ ! -e $fullScriptPath ]
-    then
-	fullScriptPath=$0
-    fi
-    canonicalFullScriptPath="$(readlink 2>&1 -f $fullScriptPath)"
-    if [ $? != 0 ]
-    then
-	# System with simpler readlink (BSD, Darwin) try replacement
-	canonicalFullScriptPath="$(greadlink 2>&1 -f $fullScriptPath)"
-	if [ $? != 0 ]
-	then
-	    # we give up
-	    canonicalFullScriptPath=""
-	fi
-    fi
-
-    if [ -n "$canonicalFullScriptPath" ]
-    then
-	dirName="$(basename $(dirname $(dirname $canonicalFullScriptPath)))"
-	rest="$(echo $dirName | sed -e "s/OpenFOAM-$WM_PROJECT_VERSION//")"
-	if [ -n $rest ]
-	then
-	    export WM_PROJECT_VERSION_ADDITION="$(echo $rest | sed -e "s/-//")"
-	fi
-	unset dirName rest
-    fi
-    unset fullScriptPath canonicalFullScriptPath
+    export WM_PROJECT_VERSION_ADDITION=`python -c "from os.path import *;print abspath(join(curdir,'$0')).split(sep)[-3][len('OpenFOAM-$WM_PROJECT_VERSION')+1:]"`
 fi
 
 if [ -n "$WM_PROJECT_VERSION_ADDITION" ]
