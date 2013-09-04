@@ -16,9 +16,9 @@ then
     apt-get -y install python-software-properties
 
     add-apt-repository ppa:mercurial-ppa/releases
-
-    apt-get update -y
 fi
+
+apt-get update -y
 
 echo
 echo "Installing additional packages"
@@ -76,6 +76,7 @@ done
 OFDIR=/home/vagrant/OpenFOAM/
 
 mkdir -vp $OFDIR
+chown -R vagrant:vagrant $OFDIR
 
 OFClone=$OFDIR/OpenFOAM-1.6-ext
 OFReference=$OFDIR/OpenFOAM-1.6-ext-parent
