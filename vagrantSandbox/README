@@ -1,0 +1,34 @@
+# -*- mode: org -*-
+#+TITLE: Virtual machines for testing and Packaging
+* Prerequisites
+  These virtual machines require
+  - VirtualBox :: for running from [[https://www.virtualbox.org]]
+  - Vagrant :: to automatically set them up from [[http://www.vagrantup.com]]
+* Starting
+  A virtual machine is set up with
+: vagrant up <machineName>
+  will download a virtual machine image and set it up. It will then
+  modify the image:
+  - add packages required to compile OpenFOAM and package it
+  - mount the directory of the sources
+  - from this directory clone it to the local disc with mercurial or
+    git (whatever the parent uses)
+  One can then connect to the virtual machine with
+: vagrant ssh <machinName>
+  and will be in the =$HOME= directory of the user =vagrant= where in
+  the directory =~/OpenFOAM/OpenFOAM-1.6-ext= the sources are
+  available. Modifications can be pushed "outside" the virtual machine
+  with
+: hg push
+  There is also a symbolic link =~/OpenFOAM/OpenFOAM-1.6-ext-parent=
+  to the sources if you want to edit there directly. Use with care
+  and don't compile in that directory unless you know what you're
+  doing
+* Virtual machines
+  Currently existing virtual machines are
+  - precise :: Latest LTS Ubuntu.
+  - lucid :: Previous LTS Ubuntu. Currently problems
+             with automatic setting up (something with the
+             =postfix=-package)
+  - maverick :: Tries to fix the problems with the
+                =lucid=-machine. Not yet working
