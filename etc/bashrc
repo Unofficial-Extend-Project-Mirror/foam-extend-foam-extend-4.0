@@ -46,7 +46,14 @@ export WM_PROJECT_VERSION=1.6-ext
 
 if [ -z "$WM_PROJECT_VERSION_ADDITION" ]
 then
-    export WM_PROJECT_VERSION_ADDITION=`python -c "from os.path import *;print abspath(join(curdir,'$0')).split(sep)[-3][len('OpenFOAM-$WM_PROJECT_VERSION')+1:]"`
+    thisScript="${BASH_SOURCE[0]}"
+    if [ ! -n "$thisScript" ]
+    then
+	# this is vor bash version < 4 and zsh
+	thisScript=$0
+    fi
+    export WM_PROJECT_VERSION_ADDITION=`python -c "from os.path import *;print abspath(join(curdir,'$thisScript')).split(sep)[-3][len('OpenFOAM-$WM_PROJECT_VERSION')+1:]"`
+    unset thisScript
 fi
 
 if [ -n "$WM_PROJECT_VERSION_ADDITION" ]
