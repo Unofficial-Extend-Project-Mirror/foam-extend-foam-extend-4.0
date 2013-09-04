@@ -44,11 +44,11 @@ then
 	echo
 	echo "Parent is mercurial. Hello Bernhard"
 	echo
-	su vagrant - -c "hg clone $OFParent $OFClone"
 	branchName=`hg branch -R $OFParent`
-	echo
+
 	echo "Parent is on branch $branchName"
-	su vagrant - -c "hg update -R $OFClone $branchName"
+	su vagrant - -c "hg clone -r $branchName $OFParent $OFClone"
+	echo
     else
 	echo
 	echo "Problem. Parent $OFParent is neither git nor mercurial"
