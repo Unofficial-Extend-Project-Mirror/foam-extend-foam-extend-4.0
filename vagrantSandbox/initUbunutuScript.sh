@@ -37,6 +37,9 @@ apt-get -y install csh
 apt-get -y install tcsh
 apt-get -y install zsh
 
+# to make the ThirdParty-Stuff work
+apt-get -y install rpm
+
 # this is needed for the packaging stuff
 echo
 echo "Setting for postfix"
