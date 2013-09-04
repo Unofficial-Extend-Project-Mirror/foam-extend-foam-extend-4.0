@@ -32,6 +32,11 @@ apt-get -y install make
 #apt-get -y install python-dev
 apt-get -y install ccache
 
+# test scripts with different shells
+apt-get -y install csh
+apt-get -y install tcsh
+apt-get -y install zsh
+
 # this is needed for the packaging stuff
 echo
 echo "Setting for postfix"
