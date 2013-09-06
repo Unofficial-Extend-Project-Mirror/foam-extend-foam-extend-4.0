@@ -47,7 +47,7 @@ then
 	branchName=`hg branch -R $OFParent`
 
 	echo "Parent is on branch $branchName"
-	su vagrant - -c "hg clone -r $branchName $OFParent $OFClone"
+	su vagrant - -c "hg clone -u $branchName $OFParent $OFClone"
 	echo
     else
 	echo
