@@ -32,54 +32,9 @@
 #
 #------------------------------------------------------------------------------
 
-unset WM_PROJECT_VERSION_ADDITION
-prefSettingFile=$0.preset
-if [ -f $prefSettingFile ]
-then
-    #    echo "Found presettings $prefSettingFile"
-    . $prefSettingFile
-fi
-unset prefSettingFile
-
 export WM_PROJECT=OpenFOAM
 export WM_PROJECT_VERSION=1.6-ext
 
-if [ -z "$WM_PROJECT_VERSION_ADDITION" ]
-then
-    fullScriptPath=`pwd`"/$0"
-    if [ ! -e $fullScriptPath ]
-    then
-	fullScriptPath=$0
-    fi
-    canonicalFullScriptPath="$(readlink 2>&1 -f $fullScriptPath)"
-    if [ $? != 0 ]
-    then
-	# System with simpler readlink (BSD, Darwin) try replacement
-	canonicalFullScriptPath="$(greadlink 2>&1 -f $fullScriptPath)"
-	if [ $? != 0 ]
-	then
-	    # we give up
-	    canonicalFullScriptPath=""
-	fi
-    fi
-
-    if [ -n "$canonicalFullScriptPath" ]
-    then
-	dirName="$(basename $(dirname $(dirname $canonicalFullScriptPath)))"
-	rest="$(echo $dirName | sed -e "s/OpenFOAM-$WM_PROJECT_VERSION//")"
-	if [ -n $rest ]
-	then
-	    export WM_PROJECT_VERSION_ADDITION="$(echo $rest | sed -e "s/-//")"
-	fi
-	unset dirName rest
-    fi
-    unset fullScriptPath canonicalFullScriptPath
-fi
-
-if [ -n "$WM_PROJECT_VERSION_ADDITION" ]
-then
-    export WM_PROJECT_VERSION=$WM_PROJECT_VERSION-$WM_PROJECT_VERSION_ADDITION
-fi
 
 # helps to easily write #ifdefs to detect a dev-version
 export FOAM_DEV=1
@@ -118,7 +73,12 @@ fi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 export WM_PROJECT_INST_DIR=$FOAM_INST_DIR
 export WM_PROJECT_DIR=$WM_PROJECT_INST_DIR/$WM_PROJECT-$WM_PROJECT_VERSION
-: ${WM_PROJECT_USER_DIR:=$HOME/$WM_PROJECT/$USER-$WM_PROJECT_VERSION}; export WM_PROJECT_USER_DIR
+export WM_PROJECT_USER_DIR=$HOME/$WM_PROJECT/$USER-$WM_PROJECT_VERSION
+
+# Location of third-party software
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#: ${WM_THIRD_PARTY_DIR=$WM_PROJECT_INST_DIR/ThirdParty-$WM_PROJECT_VERSION}; export WM_THIRD_PARTY_DIR
+export WM_THIRD_PARTY_DIR=$WM_PROJECT_DIR/ThirdParty
 
 # Source files, possibly with some verbosity
 _foamSource()
@@ -134,12 +94,6 @@ _foamSource()
 # Add in preset user or site preferences:
 foamPrefs=`$WM_PROJECT_DIR/bin/foamEtcFile prefs.sh` && _foamSource $foamPrefs
 unset foamPrefs
-
-
-# Location of third-party software
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#: ${WM_THIRD_PARTY_DIR=$WM_PROJECT_INST_DIR/ThirdParty-$WM_PROJECT_VERSION}; export WM_THIRD_PARTY_DIR
-: ${WM_THIRD_PARTY_DIR=$WM_PROJECT_DIR/ThirdParty}; export WM_THIRD_PARTY_DIR
 
 # Evaluate command-line parameters
 while [ $# -gt 0 ]
