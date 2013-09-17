@@ -113,7 +113,7 @@ Foam::mirrorFvMesh::mirrorFvMesh(const IOobject& io)
 
     // Algorithm:
     // During mirroring, the faces that were previously boundary faces
-    // in the mirror plane may become ineternal faces. In order to
+    // in the mirror plane may become internal faces. In order to
     // deal with the ordering of the faces, the algorithm is split
     // into two parts.  For original faces, the internal faces are
     // distributed to their owner cells.  Once all internal faces are

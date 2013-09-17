@@ -1,3 +1,3 @@
 elasticNonLinTLSolidFoam.C
 
-EXE = $(FOAM_USER_APPBIN)/elasticNonLinTLSolidFoam
+EXE = $(FOAM_APPBIN)/elasticNonLinTLSolidFoam

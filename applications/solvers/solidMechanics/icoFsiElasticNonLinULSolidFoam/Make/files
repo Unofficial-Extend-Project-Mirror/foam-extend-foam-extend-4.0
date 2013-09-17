@@ -2,4 +2,4 @@
 
 icoFsiElasticNonLinULSolidFoam.C
 
-EXE = $(FOAM_USER_APPBIN)/icoFsiElasticNonLinULSolidFoam
+EXE = $(FOAM_APPBIN)/icoFsiElasticNonLinULSolidFoam
