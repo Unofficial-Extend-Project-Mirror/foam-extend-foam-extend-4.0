@@ -40,7 +40,8 @@ template<class Type>
 const char* const Field<Type>::typeName("Field");
 
 template<class Type>
-const Field<Type> Field<Type>::zero = Field<Type>();
+const Field<Type> Field<Type>::zero;
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

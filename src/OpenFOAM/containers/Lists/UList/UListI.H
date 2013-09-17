@@ -31,7 +31,7 @@ License
 // * * * * * * * * * * * * * * * Static Members  * * * * * * * * * * * * * * //
 
 template<class T>
-const Foam::UList<T> Foam::UList<T>::zero = UList<T>();
+const Foam::UList<T> Foam::UList<T>::zero;
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
