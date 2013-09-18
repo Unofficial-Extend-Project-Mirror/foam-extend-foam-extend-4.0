@@ -40,7 +40,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-makePointPatchTypeField
+makeTemplatePointPatchTypeField
 (
     tetPolyPatchVectorField,
     componentMixedTetPolyPatchVectorField

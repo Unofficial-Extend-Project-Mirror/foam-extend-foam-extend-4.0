@@ -73,7 +73,7 @@ void surfaceDisplacementPointPatchVectorField::calcProjection
     const scalar projectLen = mag(mesh.bounds().max()-mesh.bounds().min());
 
     // For case of fixed projection vector:
-    vector projectVec;
+    vector projectVec(vector::zero);
     if (projectMode_ == FIXEDNORMAL)
     {
         vector n = projectDir_/mag(projectDir_);

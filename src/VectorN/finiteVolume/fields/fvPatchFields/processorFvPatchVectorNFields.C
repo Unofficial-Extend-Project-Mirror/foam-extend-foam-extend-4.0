@@ -103,9 +103,14 @@ void processorFvPatchField<Type>::updateInterfaceMatrix                       \
 
 
 #define doMakePatchTypeField(type, Type, args...)                             \
-    VectorNMatrixInterfaceFunc(type)                                          \
                                                                               \
-    makePatchTypeField(fvPatch##Type##Field, processorFvPatch##Type##Field);
+VectorNMatrixInterfaceFunc(type)                                              \
+                                                                              \
+makeTemplatePatchTypeField                                                    \
+(                                                                             \
+    fvPatch##Type##Field,                                                     \
+    processorFvPatch##Type##Field                                             \
+);
 
 forAllVectorNTypes(doMakePatchTypeField)
 

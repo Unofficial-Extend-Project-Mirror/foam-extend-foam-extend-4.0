@@ -34,44 +34,49 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-#define makeVectorTensorNWedgeFuncDefs(Type)                    \
-template<>                                                      \
-tmp<Field<Type> > wedgeFvPatchField<Type>::snGrad() const       \
-{                                                               \
-    return tmp<Field<Type> >                                    \
-    (                                                           \
-        new Field<Type>(size(), pTraits<Type>::zero)            \
-    );                                                          \
-}                                                               \
-                                                                \
-template<>                                                      \
-void wedgeFvPatchField<Type>::evaluate(                         \
-    const Pstream::commsTypes commsType                         \
-)                                                               \
-{                                                               \
-    if (!updated())                                             \
-    {                                                           \
-        updateCoeffs();                                         \
-    }                                                           \
-                                                                \
-    operator==(patchInternalField());                           \
-}                                                               \
-                                                                \
-template<>                                                      \
-tmp<Field<Type> > wedgeFvPatchField<Type>::snGradTransformDiag()\
-const                                                           \
-{                                                               \
-    return tmp<Field<Type> >                                    \
-    (                                                           \
-        new Field<Type>(this->size(), pTraits<Type>::zero)      \
-    );                                                          \
+#define makeVectorTensorNWedgeFuncDefs(Type)                                  \
+template<>                                                                    \
+tmp<Field<Type> > wedgeFvPatchField<Type>::snGrad() const                     \
+{                                                                             \
+    return tmp<Field<Type> >                                                  \
+    (                                                                         \
+        new Field<Type>(size(), pTraits<Type>::zero)                          \
+    );                                                                        \
+}                                                                             \
+                                                                              \
+template<>                                                                    \
+void wedgeFvPatchField<Type>::evaluate(                                       \
+    const Pstream::commsTypes commsType                                       \
+)                                                                             \
+{                                                                             \
+    if (!updated())                                                           \
+    {                                                                         \
+        updateCoeffs();                                                       \
+    }                                                                         \
+                                                                              \
+    operator==(patchInternalField());                                         \
+}                                                                             \
+                                                                              \
+template<>                                                                    \
+tmp<Field<Type> > wedgeFvPatchField<Type>::snGradTransformDiag()              \
+const                                                                         \
+{                                                                             \
+    return tmp<Field<Type> >                                                  \
+    (                                                                         \
+        new Field<Type>(this->size(), pTraits<Type>::zero)                    \
+    );                                                                        \
 }
 
 
-#define doMakePatchTypeField(type, Type, args...)                           \
-    makeVectorTensorNWedgeFuncDefs(type)                                    \
-                                                                            \
-    makePatchTypeField(fvPatch##Type##Field, wedgeFvPatch##Type##Field);
+#define doMakePatchTypeField(type, Type, args...)                             \
+                                                                              \
+makeVectorTensorNWedgeFuncDefs(type)                                          \
+                                                                              \
+makeTemplatePatchTypeField                                                    \
+(                                                                             \
+    fvPatch##Type##Field,                                                     \
+    wedgeFvPatch##Type##Field                                                 \
+);
 
 
 forAllVectorNTypes(doMakePatchTypeField)

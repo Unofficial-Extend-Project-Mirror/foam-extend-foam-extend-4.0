@@ -88,9 +88,14 @@ void cyclicFvPatchField<Type>::updateInterfaceMatrix                          \
 
 
 #define doMakePatchTypeField(type, Type, args...)                             \
-    VectorNMatrixInterfaceFunc(type)                                          \
                                                                               \
-    makePatchTypeField(fvPatch##Type##Field, cyclicFvPatch##Type##Field);
+VectorNMatrixInterfaceFunc(type)                                              \
+                                                                              \
+makeTemplatePatchTypeField                                                    \
+(                                                                             \
+    fvPatch##Type##Field,                                                     \
+    cyclicFvPatch##Type##Field                                                \
+);
 
 forAllVectorNTypes(doMakePatchTypeField)
 

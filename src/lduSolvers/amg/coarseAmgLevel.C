@@ -140,7 +140,7 @@ void Foam::coarseAmgLevel::restrictResidual
         // Calculate residual
         scalarField::subField resBuf(xBuffer, x.size());
 
-        scalarField& res = reinterpret_cast<scalarField&>(resBuf);
+        scalarField& res = const_cast<scalarField&>(resBuf.operator const scalarField&());
 
         residual(x, b, cmpt, res);
 
@@ -274,7 +274,7 @@ void Foam::coarseAmgLevel::scaleX
 
     matrixPtr_->matrix().Amul
     (
-        reinterpret_cast<scalarField&>(Ax),
+        const_cast<scalarField&>(Ax.operator const scalarField&()),
         x,
         matrixPtr_->coupleBouCoeffs(),
         matrixPtr_->interfaceFields(),

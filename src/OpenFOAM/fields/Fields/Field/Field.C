@@ -689,8 +689,7 @@ template<class Type>
 template<class Form, class Cmpt, int nCmpt>
 void Field<Type>::operator=(const VectorSpace<Form,Cmpt,nCmpt>& vs)
 {
-    typedef VectorSpace<Form,Cmpt,nCmpt> VSType;
-    TFOR_ALL_F_OP_S(Type, *this, =, VSType, vs)
+    TFOR_ALL_F_OP_S(Type, *this, =, (VectorSpace<Form,Cmpt,nCmpt>), vs)
 }
 
 
