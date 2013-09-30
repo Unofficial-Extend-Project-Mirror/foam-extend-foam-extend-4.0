@@ -153,13 +153,20 @@ void Foam::attachDetach::attachInterface
 
     // Grab all the faces off the points in the slave patch.  If the face has
     //  not been removed, add it to the map of faces to renumber
+
+    // Must also exclude faces from master!
+    // HR 26/9/2013
     forAll (slaveMeshPoints, pointI)
     {
         const labelList& curFaces = pf[slaveMeshPoints[pointI]];
 
         forAll (curFaces, faceI)
         {
-            if (!ref.faceRemoved(curFaces[faceI]))
+            if
+            (
+                !ref.faceRemoved(curFaces[faceI])
+             && mesh.boundaryMesh().whichPatch(curFaces[faceI]) != masterPatchID_.index()
+            )
             {
                 facesToModifyMap.insert(curFaces[faceI]);
             }
