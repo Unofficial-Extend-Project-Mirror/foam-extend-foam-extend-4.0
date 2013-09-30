@@ -48,7 +48,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                          Class singleCellFvMesh Declaration
+                      Class singleCellFvMesh Declaration
 \*---------------------------------------------------------------------------*/
 
 class singleCellFvMesh
@@ -94,19 +94,34 @@ public:
         {
             // Private data
 
+                //- Mapping
                 const UList<label>& directAddressing_;
+
+                //- Size before mapping
+                const label sizeBeforeMapping_;
+
 
         public:
 
                 //- Construct given addressing
-                directPatchFieldMapper(const UList<label>& directAddressing)
+                directPatchFieldMapper
+                (
+                    const UList<label>& directAddressing,
+                    const label sizeBeforeMapping
+                )
                 :
-                    directAddressing_(directAddressing)
+                    directAddressing_(directAddressing),
+                    sizeBeforeMapping_(sizeBeforeMapping)
                 {}
 
                 virtual label size() const
                 {
                     return directAddressing_.size();
+                }
+
+                virtual label sizeBeforeMapping() const
+                {
+                    return sizeBeforeMapping_;
                 }
 
                 virtual bool direct() const
