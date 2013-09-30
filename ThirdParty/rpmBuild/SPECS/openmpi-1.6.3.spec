@@ -127,7 +127,8 @@ Group: 			Development/Tools
         --disable-mpi-f90 \
         --disable-mpi-cxx \
         --without-slurm \
-        --enable-mpi-profile $mpiWith
+        --enable-mpi-profile $mpiWith \
+        --disable-vt
 
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
     make -j $WM_NCOMPPROCS
