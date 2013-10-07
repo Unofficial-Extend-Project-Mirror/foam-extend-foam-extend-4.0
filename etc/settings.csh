@@ -101,6 +101,13 @@ case OpenFOAM:
         _foamAddLib $WM_THIRD_PARTY_DIR/mpfr-2.4.1/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
         _foamAddLib $WM_THIRD_PARTY_DIR/gmp-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
     breaksw
+    case Gcc46:
+        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.6.4/platforms/$WM_OPTIONS
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/gmp-5.1.2/platforms/$WM_OPTIONS/etc/gmp-5.1.2.csh
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/mpfr-3.1.2/platforms/$WM_OPTIONS/etc/mpfr-3.1.2.csh
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/mpc-1.0.1/platforms/$WM_OPTIONS/etc/mpc-1.0.1.csh
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.6.4/platforms/$WM_OPTIONS/etc/gcc-4.6.4.csh
+    breaksw
     case Gcc45:
         setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.5.1/platforms/$WM_OPTIONS
         _foamSource  $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.csh
@@ -432,8 +439,8 @@ endif
 
 # cmake
 # ~~~~~
-if ( $?CMAKE_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.8/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.8/platforms/$WM_OPTIONS/etc/cmake-2.8.8.csh
+if ( $?CMAKE_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.11/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.11/platforms/$WM_OPTIONS/etc/cmake-2.8.11.csh
 endif
 
 # Python

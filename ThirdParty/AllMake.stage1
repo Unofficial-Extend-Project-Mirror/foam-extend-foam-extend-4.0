@@ -75,6 +75,12 @@ echo
 #( rpm_make -p mpc-0.8.2  -s mpc-0.8.2.spec  -u http://www.multiprecision.org/mpc/download/mpc-0.8.2.tar.gz )
 #( rpm_make -p gcc-4.5.1  -s gcc-4.5.1.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.5.1/gcc-4.5.1.tar.gz        )
 
+# Uncomment the following 4 lines for gcc-4.6.4. You need gmp, mpfr and mpc for gcc-4.6.4
+#( rpm_make -p gmp-5.1.2  -s gmp-5.1.2.spec  -u ftp://ftp.gnu.org/gnu/gmp/gmp-5.1.2.tar.bz2                 )
+#( rpm_make -p mpfr-3.1.2 -s mpfr-3.1.2.spec -u http://www.mpfr.org/mpfr-current/mpfr-3.1.2.tar.gz          )
+#( rpm_make -p mpc-1.0.1  -s mpc-1.0.1.spec  -u http://www.multiprecision.org/mpc/download/mpc-1.0.1.tar.gz )
+#( rpm_make -p gcc-4.6.4  -s gcc-4.6.4.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.6.4/gcc-4.6.4.tar.gz        )
+
 # Python
 #( rpm_make -p Python-2.7  -s Python-2.7.spec -u http://www.python.org/ftp/python/2.7/Python-2.7.tgz        )
 
@@ -89,7 +95,7 @@ echo
 #( rpm_make -p flex-2.5.35 -s flex-2.5.35.spec -u http://downloads.sourceforge.net/project/flex/flex/flex-2.5.35/flex-2.5.35.tar.gz )
 
 # cmake
-( rpm_make -p cmake-2.8.8 -s cmake-2.8.8.spec -u http://www.cmake.org/files/v2.8/cmake-2.8.8.tar.gz        )
+( rpm_make -p cmake-2.8.11 -s cmake-2.8.11.spec -u http://www.cmake.org/files/v2.8/cmake-2.8.11.tar.gz        )
 
 echo ========================================
 echo Done ThirdParty AllMake: Stage1
