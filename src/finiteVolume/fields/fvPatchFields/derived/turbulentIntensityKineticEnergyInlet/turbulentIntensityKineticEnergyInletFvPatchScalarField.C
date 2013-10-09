@@ -140,10 +140,10 @@ updateCoeffs()
     }
 
     const fvPatchVectorField& Up =
-        patch().lookupPatchField<volVectorField, vector>(UName_);
+        lookupPatchField<volVectorField, vector>(UName_);
 
     const fvsPatchScalarField& phip =
-        patch().lookupPatchField<surfaceScalarField, scalar>(phiName_);
+        lookupPatchField<surfaceScalarField, scalar>(phiName_);
 
     this->refValue() = SMALL + 1.5*sqr(intensity_)*magSqr(Up);
     this->valueFraction() = neg(phip);

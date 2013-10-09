@@ -136,10 +136,10 @@ void turbulentMixingLengthDissipationRateInletFvPatchScalarField::updateCoeffs()
     const scalar Cmu75 = pow(Cmu, 0.75);
 
     const fvPatchScalarField& kp =
-        patch().lookupPatchField<volScalarField, scalar>(kName_);
+        lookupPatchField<volScalarField, scalar>(kName_);
 
     const fvsPatchScalarField& phip =
-        patch().lookupPatchField<surfaceScalarField, scalar>(phiName_);
+        lookupPatchField<surfaceScalarField, scalar>(phiName_);
 
     this->refValue() = Cmu75*kp*sqrt(kp)/mixingLength_;
     this->valueFraction() = neg(phip);
