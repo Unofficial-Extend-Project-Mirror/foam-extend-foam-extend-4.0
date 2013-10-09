@@ -6,8 +6,6 @@
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 
-// FoamX Case Dictionary.
-
 FoamFile
 {
     version         2.0;
@@ -26,58 +24,42 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         50;
+endTime         2000;
 
 deltaT          1;
 
 writeControl    timeStep;
 
-writeInterval   10;
+writeInterval   100;
 
-purgeWrite      0;
+cycleWrite      0;
 
 writeFormat     ascii;
 
 writePrecision  6;
 
-writeCompression uncompressed;
+writeCompression compressed;
 
 timeFormat      general;
 
 timePrecision   6;
 
-graphFormat     raw;
-
 runTimeModifiable yes;
 
-// Compute the flux value on each side of a GGI interface
+
 functions
 (
-    ggiCheck
+    mixingPlaneCheck
     {
         // Type of functionObject
-        type ggiCheck;
+        type mixingPlaneCheck;
 
         phi phi;
 
         // Where to load it from (if not already in solver)
         functionObjectLibs ("libcheckFunctionObjects.so");
     }
-
-    // Compute the flux value on each side of a mixingPlane interface
-    mixingPlaneCheck
-    {
-        // Type of functionObject
-        type mixingPlaneCheck;
-
-        masterPatchName         upstreamMixingPlanePatch;
-        masterPatchScaleFactor  10.0;
-        shadowPatchScaleFactor  4.0;
-        phi                     phi;
-
-        // Where to load it from (if not already in solver)
-        functionObjectLibs ("libcheckFunctionObjects.so");
-    }
 );
+
 
 // ************************************************************************* //

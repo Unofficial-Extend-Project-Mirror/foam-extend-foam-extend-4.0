@@ -1,22 +1,11 @@
 #!/bin/bash
-#
-#set -x
-
+# Source tutorial run functions
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
-
-# Load additional RunFunctions
-. ./RunFunctionsSupplemental
-
-export caseName=`basename $PWD`
-
-#We stop this script when we encounter a problem
-#trap "exit -1" ERR
 
 echo "$caseName: Creating the file blockMeshDict using m4"
 (cd constant/polyMesh; m4 -P blockMeshDict.m4 > blockMeshDict)
 
-echo "$caseName: Running blockMesh"
-runApplicationAndReportOnError blockMesh
+runApplication blockMesh
 
 echo "$caseName: Updating the boundary file"
 # Let's see if pyFoamChangeMixingPlaneBoundary.py is available
@@ -78,22 +67,15 @@ fi
 
 
 echo "$caseName: Creating the starting time directory"
-cp -r 0_orig 0
+cp -r save 0
 echo "$caseName: Creating zones for the mixingPlane"
-runApplicationAndReportOnError setSet -batch setBatchMixingPlane
-runApplicationAndReportOnError setsToZones -noFlipMap
-mv log.setSet log.setSet_MixingPlane
-mv log.setsToZones log.setsToZones_MixingPlane
-
-runApplicationAndReportOnError setSet -batch setBatchGGIZone
-runApplicationAndReportOnError setsToZones -noFlipMap
-mv log.setSet log.setSet_GGIZone
-mv log.setsToZones log.setsToZones_GGIZone
+runApplication setSet -batch setBatch.batch
+runApplication setsToZones -noFlipMap
 
 echo "$caseName: Running potentialFoam"
-runApplicationAndReportOnError potentialFoam
+runApplication potentialFoam
 
 echo "$caseName: Running simpleFoam"
-runApplicationAndReportOnError simpleFoam
+runApplication simpleFoam
 
 

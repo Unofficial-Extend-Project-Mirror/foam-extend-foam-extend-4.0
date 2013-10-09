@@ -1,3 +1,0 @@
-faceSet upstreamMixingPlaneZone new patchToFace upstreamMixingPlanePatch
-faceSet downstreamMixingPlaneZone new patchToFace downstreamMixingPlanePatch
-quit
