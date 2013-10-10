@@ -143,6 +143,7 @@ OpenFOAM)
         _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.5.1/platforms/$WM_OPTIONS/etc/gcc-4.5.1.sh
     ;;
     Gcc44)
+        export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS
         _foamSource  $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.sh
         _foamSource  $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.sh
         _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS/etc/gcc-4.4.5.sh
