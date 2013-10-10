@@ -51,7 +51,7 @@ if (ign.ignited())
         fvm::ddt(rho, b)
       + mvConvection->fvmDiv(phi, b)
       + fvm::div(phiSt, b, "div(phiSt,b)")
-      - fvm::Sp(fvc::div(phiSt), b)
+      + fvm::SuSp(-fvc::div(phiSt), b)
       - fvm::laplacian(turbulence->alphaEff(), b)
     );
 
@@ -65,7 +65,8 @@ if (ign.ignited())
     // ~~~~~~~~~~~
     bEqn.solve();
 
-    Info<< "min(b) = " << min(b).value() << endl;
+    Info<< "min(b) = " << min(b).value()
+        << " max(b) = " << max(b).value() << endl;
 
 
     // Calculate coefficients for Gulder's flame speed correlation
@@ -138,7 +139,7 @@ if (ign.ignited())
         (
             fvm::ddt(rho, Su)
           + fvm::div(phi + phiXi, Su, "div(phiXi,Su)")
-          - fvm::Sp(fvc::div(phiXi), Su)
+          + fvm::SuSp(-fvc::div(phiXi), Su)
           ==
           - fvm::SuSp(-rho*Rc*Su0/Su, Su)
           - fvm::SuSp(rho*(sigmas + Rc), Su)
@@ -203,7 +204,7 @@ if (ign.ignited())
         (
             fvm::ddt(rho, Xi)
           + fvm::div(phi + phiXi, Xi, "div(phiXi,Xi)")
-          - fvm::Sp(fvc::div(phiXi), Xi)
+          + fvm::SuSp(-fvc::div(phiXi), Xi)
          ==
             rho*R
           - fvm::Sp(rho*(R - G), Xi)

@@ -90,8 +90,8 @@ int main(int argc, char *argv[])
         // --- Pressure-velocity PIMPLE corrector loop
         for (int oCorr=0; oCorr<nOuterCorr; oCorr++)
         {
-#       include "rhoEqn.H"
-#       include "UEqn.H"
+#           include "rhoEqn.H"
+#           include "UEqn.H"
 
 #           include "ftEqn.H"
 #           include "bEqn.H"
@@ -106,8 +106,8 @@ int main(int argc, char *argv[])
             // --- PISO loop
             for (int corr=1; corr<=nCorr; corr++)
             {
-#           include "pEqn.H"
-        }
+#              include "pEqn.H"
+            }
 
             turbulence->correct();
         }
