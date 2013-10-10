@@ -129,6 +129,10 @@ public:
         //- Solve for motion
         virtual void solve() = 0;
 
+        //- Clear constraints
+        virtual void clearConstraints()
+        {}
+
         //- Update topology
         virtual void updateMesh(const mapPolyMesh&) = 0;
 };
