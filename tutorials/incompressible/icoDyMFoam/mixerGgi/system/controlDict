@@ -14,7 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     icoTopoFoam;
+application     icoDyMFoam;
 
 startFrom       startTime;
 
@@ -34,7 +34,7 @@ cycleWrite      0;
 
 writeFormat     ascii;
 
-writePrecision  6;
+writePrecision  10;
 
 writeCompression uncompressed;
 

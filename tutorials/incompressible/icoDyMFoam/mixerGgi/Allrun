@@ -5,7 +5,9 @@
 application="icoDyMFoam"
 
 runApplication blockMesh
-cp boundary constant/polyMesh
-runApplication setSet -batch setBatch
+\cp -f boundary constant/polyMesh/boundary
+runApplication regionCellSets
+runApplication setSet -batch setBatch.batch
+\rm -f constant/polyMesh/sets/cellRegion*
 runApplication setsToZones -noFlipMap
 runApplication $application
