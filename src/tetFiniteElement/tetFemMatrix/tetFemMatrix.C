@@ -161,7 +161,7 @@ tetFemMatrix<Type>::~tetFemMatrix()
 // }
 
 
-// Set reference level for solution
+// Set constrained equation
 template<class Type>
 void tetFemMatrix<Type>::addConstraint
 (
