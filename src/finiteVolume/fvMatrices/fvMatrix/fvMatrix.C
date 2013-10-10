@@ -195,6 +195,11 @@ void Foam::fvMatrix<Type>::correctImplicitBoundarySource
         {
             scalarField pnf = ptf.patchNeighbourField()().component(cmpt);
 
+            const lduInterfaceField& lf =
+                refCast<const lduInterfaceField>(ptf);
+
+            lf.transformCoupleField(pnf, cmpt);
+
             const unallocLabelList& addr = lduAddr().patchAddr(patchI);
 
             forAll (addr, facei)

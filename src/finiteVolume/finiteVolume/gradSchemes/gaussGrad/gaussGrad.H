@@ -52,7 +52,7 @@ namespace fv
 {
 
 /*---------------------------------------------------------------------------*\
-                       Class gaussGrad Declaration
+                           Class gaussGrad Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>

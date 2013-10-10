@@ -26,7 +26,7 @@ License
 
 #include "processorBlockLduInterfaceField.H"
 #include "diagTensorField.H"
-
+#include "transformField.H"
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
@@ -40,6 +40,27 @@ Foam::processorBlockLduInterfaceField<Type>::~processorBlockLduInterfaceField()
 template<class Type>
 void Foam::processorBlockLduInterfaceField<Type>::transformCoupleField
 (
+    scalarField& f,
+    const direction cmpt
+) const
+{
+    // KRJ: 2013-02-08: Transform not tested
+    if (doTransform())
+    {
+        if (forwardT().size() == 1)
+        {
+            f *= pow(diag(forwardT()[0]).component(cmpt), rank());
+        }
+        else
+        {
+            f *= pow(diag(forwardT())().component(cmpt), rank());
+        }
+    }
+}
+
+template<class Type>
+void Foam::processorBlockLduInterfaceField<Type>::transformCoupleField
+(
     Field<Type>& f
 ) const
 {
@@ -48,11 +69,11 @@ void Foam::processorBlockLduInterfaceField<Type>::transformCoupleField
     {
         if (forwardT().size() == 1)
         {
-            f *= pow(diag(forwardT()[0]), rank());
+            transform(f, forwardT()[0], f);
         }
         else
         {
-            f *= pow(diag(forwardT())(), rank());
+            transform(f, forwardT(), f);
         }
     }
 }

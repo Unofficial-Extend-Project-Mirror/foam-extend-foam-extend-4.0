@@ -31,7 +31,7 @@ Description
 Author
     Ivor Clifford, ivor.clifford@gmail.com
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "BlockLduInterfaceField.H"
 

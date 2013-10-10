@@ -46,7 +46,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class processorFvPatch Declaration
+                      Class processorFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -172,6 +172,16 @@ public:
             //- Return patch-normal gradient
             virtual tmp<Field<Type> > snGrad() const;
 
+            //- Transform given patch component field
+            virtual void transformCoupleField
+            (
+                scalarField& f,
+                const direction cmpt
+            ) const
+            {
+                processorLduInterfaceField::transformCoupleField(f, cmpt);
+            }
+
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate
             (
@@ -198,6 +208,15 @@ public:
 
 
         // Block coupled interface functionality
+
+//             //- Transform given patch field
+//             virtual void transformCoupleField
+//             (
+//                 Field<Type>& f
+//             ) const
+//             {
+//                 processorLduInterfaceField::transformCoupleField(f);
+//             }
 
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate

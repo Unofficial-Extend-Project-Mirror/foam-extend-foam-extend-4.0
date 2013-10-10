@@ -117,9 +117,17 @@ public:
             interface_(GAMGCp)
         {}
 
+
     // Member Functions
 
-        // Interface matrix update
+        // Coupled interface matrix update, scalar matrices
+
+            //- Transform given patch component field
+            virtual void transformCoupleField
+            (
+                scalarField& f,
+                const direction cmpt
+            ) const = 0;
 
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate
@@ -149,6 +157,12 @@ public:
 
 
         // Interface block matrix update
+
+            //- Transform neighbour field
+            virtual void transformCoupleField
+            (
+                Field<Type>& pnf
+            ) const = 0;
 
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate

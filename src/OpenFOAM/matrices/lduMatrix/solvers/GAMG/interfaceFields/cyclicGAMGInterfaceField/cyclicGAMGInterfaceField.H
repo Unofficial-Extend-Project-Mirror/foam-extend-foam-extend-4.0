@@ -107,7 +107,17 @@ public:
             }
 
 
-        // Interface matrix update
+        // Coupled interface matrix update
+
+            //- Transform neighbour field
+            virtual void transformCoupleField
+            (
+                scalarField& pnf,
+                const direction cmpt
+            ) const
+            {
+                cyclicLduInterfaceField::transformCoupleField(pnf, cmpt);
+            }
 
             //- Update result field based on interface functionality
             virtual void updateInterfaceMatrix

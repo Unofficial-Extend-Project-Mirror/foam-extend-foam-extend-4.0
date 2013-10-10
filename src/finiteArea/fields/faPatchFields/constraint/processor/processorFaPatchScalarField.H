@@ -36,6 +36,15 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+
+template<>
+void processorFaPatchField<scalar>::transformCoupleField
+(
+    scalarField& f,
+    const direction cmpt
+) const;
+
+
 template<>
 void processorFaPatchField<scalar>::initInterfaceMatrixUpdate
 (

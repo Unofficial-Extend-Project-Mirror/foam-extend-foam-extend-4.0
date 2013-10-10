@@ -83,7 +83,7 @@ public:
 
     // Member Functions
 
-        // Interface matrix update
+        // Coupled interface matrix update
 
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate

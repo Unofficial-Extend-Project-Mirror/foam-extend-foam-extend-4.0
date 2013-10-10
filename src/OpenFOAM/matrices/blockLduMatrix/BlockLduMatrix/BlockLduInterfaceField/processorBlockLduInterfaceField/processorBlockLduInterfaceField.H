@@ -97,6 +97,13 @@ public:
         //- Transform given patch component field
         void transformCoupleField
         (
+            scalarField& f,
+            const direction cmpt
+        ) const;
+
+        //- Transform given patch field
+        void transformCoupleField
+        (
             Field<Type>& f
         ) const;
 };

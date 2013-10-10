@@ -147,6 +147,16 @@ public:
                 const Pstream::commsTypes commsType
             );
 
+            //- Transform neighbour field
+            virtual void transformCoupleField
+            (
+                scalarField& f,
+                const direction cmpt
+            ) const
+            {
+                ggiLduInterfaceField::transformCoupleField(f, cmpt);
+            }
+
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate
             (
