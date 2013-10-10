@@ -22,7 +22,10 @@
             labelList movingPointsV;
 
             {
-                label valveMovingCellsIndex = cellZones().findZoneID("movingCellsZoneV" + Foam::name(valveI + 1));
+                label valveMovingCellsIndex = cellZones().findZoneID
+                (
+                    "movingCellsZoneV" + Foam::name(valveI + 1)
+                );
 
                 if (valveMovingCellsIndex < 0)
                 {
@@ -31,7 +34,8 @@
                         << abort(FatalError);
                 }
 
-                const labelList& movingCellsZoneV = cellZones()[valveMovingCellsIndex];
+                const labelList& movingCellsZoneV =
+                    cellZones()[valveMovingCellsIndex];
 
                 const labelListList& cp = cellPoints();
 
@@ -39,7 +43,8 @@
 
                 forAll (movingCellsZoneV, cellI)
                 {
-                    const labelList& curCellPoints = cp[movingCellsZoneV[cellI]];
+                    const labelList& curCellPoints =
+                        cp[movingCellsZoneV[cellI]];
 
                     forAll (curCellPoints, i)
                     {
