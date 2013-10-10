@@ -133,18 +133,18 @@ defineTemplateRunTimeSelectionTable(chemistryReader<Thermo>, dictionary);
 
 #define makeChemistryReaderType(SS, Thermo)                                   \
                                                                               \
-    defineNamedTemplateTypeNameAndDebug(SS<Thermo>, 0);                       \
+defineNamedTemplateTypeNameAndDebug(SS<Thermo>, 0);                           \
                                                                               \
-    chemistryReader<Thermo>::adddictionaryConstructorToTable<SS<Thermo> >     \
-        add##SS##Thermo##ConstructorToTable_;
+chemistryReader<Thermo>::adddictionaryConstructorToTable<SS<Thermo> >         \
+    add##SS##Thermo##ConstructorToTable_;
 
 
 #define addChemistryReaderType(SS, Thermo)                                    \
                                                                               \
-    defineNamedTemplateTypeNameAndDebug(SS, 0);                               \
+defineTypeNameAndDebug(SS, 0);                                                \
                                                                               \
-    chemistryReader<Thermo>::adddictionaryConstructorToTable<SS>              \
-        add##SS##Thermo##ConstructorToTable_;
+chemistryReader<Thermo>::adddictionaryConstructorToTable<SS>                  \
+    add##SS##Thermo##ConstructorToTable_;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

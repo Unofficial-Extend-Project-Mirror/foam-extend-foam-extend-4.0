@@ -34,8 +34,13 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-#define doMakePatchTypeField(type, Type, args...)               \
-    makePatchTypeField(fvPatch##Type##Field, fixedValueFvPatch##Type##Field);
+#define doMakePatchTypeField(type, Type, args...)                             \
+                                                                              \
+makeTemplatePatchTypeField                                                    \
+(                                                                             \
+    fvPatch##Type##Field,                                                     \
+    fixedValueFvPatch##Type##Field                                            \
+);
 
 forAllVectorNTypes(doMakePatchTypeField)
 

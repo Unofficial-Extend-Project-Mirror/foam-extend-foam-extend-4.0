@@ -1,7 +1,0 @@
-#!/bin/sh
-set -x
-
-
-wmake foamMeshToAbaqus
-wmake setMatFromCellZones
-wmake patchStressIntegrate

@@ -57,12 +57,6 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
     // Klas Jareteg: 2013-02-10:
     // Must transfer data between the different CPUs. Notes on the Jacobi
     // iteration style can be seen in GaussSeidelSolver.C
-    typedef CoeffField<Type> TypeCoeffField;
-    typedef Field<Type> TypeField;
-
-    typedef typename TypeCoeffField::scalarTypeField scalarTypeField;
-    typedef typename TypeCoeffField::linearTypeField linearTypeField;
-    typedef typename TypeCoeffField::squareTypeField squareTypeField;
 
     for (label sweep = 0; sweep < nSweeps_; sweep++)
     {
@@ -172,12 +166,6 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
     // Klas Jareteg: 2013-02-10:
     // Must transfer data between the different CPUs. Notes on the Jacobi
     // iteration style can be seen in GaussSeidelSolver.C
-    typedef CoeffField<Type> TypeCoeffField;
-    typedef Field<Type> TypeField;
-
-    typedef typename TypeCoeffField::scalarTypeField scalarTypeField;
-    typedef typename TypeCoeffField::linearTypeField linearTypeField;
-    typedef typename TypeCoeffField::squareTypeField squareTypeField;
 
     for (label sweep = 0; sweep < nSweeps_; sweep++)
     {

@@ -33,7 +33,7 @@ License
 
 namespace Foam
 {
-    makePatchTypeField(fvPatchScalarField, fanFvPatchScalarField);
+    makeTemplatePatchTypeField(fvPatchScalarField, fanFvPatchScalarField);
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //

@@ -52,6 +52,16 @@ inline scalar& timeCluster::globalOffset()
     return globalOffset_;
 }
 
+inline label timeCluster::globalIndex() const
+{
+    return globalIndex_;
+}
+
+inline label& timeCluster::globalIndex()
+{
+    return globalIndex_;
+}
+
 inline label timeCluster::superLoop() const
 {
     return superLoop_;

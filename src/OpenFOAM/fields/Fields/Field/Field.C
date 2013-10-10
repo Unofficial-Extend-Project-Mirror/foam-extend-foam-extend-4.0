@@ -40,7 +40,8 @@ template<class Type>
 const char* const Field<Type>::typeName("Field");
 
 template<class Type>
-const Field<Type> Field<Type>::zero = Field<Type>();
+const Field<Type> Field<Type>::zero;
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -688,8 +689,7 @@ template<class Type>
 template<class Form, class Cmpt, int nCmpt>
 void Field<Type>::operator=(const VectorSpace<Form,Cmpt,nCmpt>& vs)
 {
-    typedef VectorSpace<Form,Cmpt,nCmpt> VSType;
-    TFOR_ALL_F_OP_S(Type, *this, =, VSType, vs)
+    TFOR_ALL_F_OP_S(Type, *this, =, (VectorSpace<Form,Cmpt,nCmpt>), vs)
 }
 
 

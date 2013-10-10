@@ -41,6 +41,7 @@ Foam::timeCluster::timeCluster
 (
     const instantList& times,
     const scalar globalOffset,
+    const label globalIndex,
     const label superLoop,
     const word& solverDomainName,
     const word& preConName
@@ -48,6 +49,7 @@ Foam::timeCluster::timeCluster
 :
     instantList(times),
     globalOffset_(globalOffset),
+    globalIndex_(globalIndex),
     superLoop_(superLoop),
     solverDomainName_(solverDomainName),
     preConName_(preConName)
@@ -61,6 +63,7 @@ Foam::timeCluster::timeCluster
 :
     instantList(1, tc[index]),
     globalOffset_(tc.globalOffset_),
+    globalIndex_(tc.globalIndex_),
     superLoop_(tc.superLoop_),
     solverDomainName_(tc.solverDomainName_),
     preConName_(tc.preConName_)
@@ -71,6 +74,7 @@ Foam::timeCluster::timeCluster(const Foam::scalar t)
 :
     instantList(1, instant(0)),
     globalOffset_(0),
+    globalIndex_(0),
     superLoop_(0),
     solverDomainName_(word::null),
     preConName_(word::null)
@@ -223,6 +227,7 @@ Foam::timeCluster Foam::timeCluster::operator()(const Foam::label index) const
 Foam::Istream& Foam::operator>>(Istream& is, timeCluster& I)
 {
     return is   >> I.globalOffset_
+                >> I.globalIndex_
                 >> I.superLoop_
                 >> I.solverDomainName_
                 >> I.preConName_
@@ -233,11 +238,11 @@ Foam::Istream& Foam::operator>>(Istream& is, timeCluster& I)
 Foam::Ostream& Foam::operator<<(Ostream& os, const timeCluster& I)
 {
     return os   << "/* globalOffset: */\t" << I.globalOffset_ << nl
+                << "/* globalIndex:  */\t" << I.globalIndex_ << nl
                 << "/* superLoop:    */\t" << I.superLoop_ << nl
                 << "/* solverDomain: */\t" << I.solverDomainName_ << nl
                 << "/* preConName:   */\t" << I.preConName_ << nl
                 << "/* Instant list: */\t" << I.times();
 }
-
 
 // ************************************************************************* //

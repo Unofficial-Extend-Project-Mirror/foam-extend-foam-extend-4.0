@@ -98,7 +98,7 @@ class janafThermo
 public:
 
         static const int nCoeffs_ = 7;
-        typedef scalar coeffArray[7];
+        typedef FixedList<scalar, nCoeffs_> coeffArray;
 
 private:
 

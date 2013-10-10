@@ -43,6 +43,17 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
 
     // Purge all time directories from case directory root
     purgeTimeDirs(multiDictRegistry_.path());
+    
+    // Purge any constant/superLoopData/
+    fileName superLoopDataPath
+    (
+        multiDictRegistry_.path()/multiDictRegistry_.constant()
+            /"superLoopData"
+    );
+    if (exists(superLoopDataPath))
+    {
+        rmDir(superLoopDataPath);
+    }
 
     // Read initial settings and determine data source (from which path the
     // initial data is copied, the starting superLoop_, and the current
@@ -59,100 +70,26 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
     //          subdictionary.
     //   4. endTime is determined by the solverDomains subdictionary
     //       a. unless the finalStopAt trumps it
-    timeCluster tcSource;
-    switch (initialStartFrom_)
-    {
-        case misFirstTime:
-            tcSource = findClosestGlobalTime
-            (
-                0, readSuperLoopTimes(currentSolverDomain_, -1)
-            );
-            break;
-        case misFirstTimeInStartDomain:
-            tcSource = findClosestGlobalTime
-            (
-                0, readSuperLoopTimes(startDomain_, -1)
-            );
-            break;
-        case misFirstTimeInStartDomainInStartSuperLoop:
-            tcSource = findClosestGlobalTime
-            (
-                0, readSuperLoopTimes(startDomain_, startSuperLoop_)
-            );
-            break;
-        case misStartTime:
-            if (initialStartTime_ == 0)
-            {
-                tcSource = findClosestGlobalTime
-                (
-                    initialStartTime_,
-                    readSuperLoopTimes(currentSolverDomain_, -1)
-                );
-            }
-            else
-            {
-                tcSource = findClosestGlobalTime
-                (
-                    initialStartTime_, readAllTimes()
-                );
-            }
-            break;
-        case misStartTimeInStartDomain:
-            tcSource = findClosestLocalTime
-            (
-                initialStartTime_, readSolverDomainTimes(startDomain_)
-            );
-            break;
-        case misStartTimeInStartDomainInStartSuperLoop:
-            tcSource = findClosestLocalTime
-            (
-                initialStartTime_,
-                readSuperLoopTimes(startDomain_, startSuperLoop_)
-            );
-            break;
-        case misLatestTime:
-            tcSource = findLatestGlobalTime(readAllTimes());
-            break;
-        case misLatestTimeInStartDomain:
-            tcSource = findLatestLocalTime(readSolverDomainTimes(startDomain_));
-            break;
-        case misLatestTimeInStartDomainInStartSuperLoop:
-            tcSource = findLatestLocalTime
-            (
-                readSuperLoopTimes(startDomain_, startSuperLoop_)
-            );
-            break;
-    }
 
-    if (!tcSource.times().size())
-    {
-        // No relevant data found, set to initial conditions
-        tcSource = timeCluster
-        (
-            Time::findTimes
-            (
-                multiDictRegistry_.path()/"multiSolver"/currentSolverDomain_
-                    /"initial"
-            ),
-            0,
-            -1, // superLoop of -1 signifies "initial" directory
-            currentSolverDomain_
-        );
-    }
+    // Find initial data source
+    timeCluster tcSource(initialDataSource());
 
-    fileName sourcePath(findInstancePath(tcSource, 0));
+    fileName sourcePath(findInstancePath(tcSource, tcSource.size() - 1));
     superLoop_ = tcSource.superLoop();
+    globalIndex_ = tcSource.globalIndex();
+    
     // If starting from initial conditions, superLoop_ = -1
     if (superLoop_ < 0) superLoop_ = 0;
-    scalar globalTime(tcSource.globalValue(0));
-    scalar localStartTime(tcSource.localValue(0));
+    scalar globalTime(tcSource.globalValue(tcSource.size() - 1));
+    scalar localStartTime(tcSource.localValue(tcSource.size() -1));
 
     // Now to apply the exceptions if currentSolverDomain_ != data source
     // solverDomain (see long comment above).
     if (sourcePath.path().path().name() != currentSolverDomain_)
     {
         superLoop_++;
-
+        globalIndex_++;
+        
         switch (startFrom_)
         {
             case mtsFirstTime:
@@ -182,13 +119,18 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
     startTime_ = localStartTime;
 
     globalTimeOffset_ = globalTime - startTime_;
-
+    
     // Give multiDictRegistry a time value (required for regIOobject::write()
     // to case/[timeValue]
     multiDictRegistry_.setTime(startTime_, 0);
 
-    // Copy the source data to case/[localTime]
-    cp(sourcePath, multiDictRegistry_.path());
+    // Copy the source data and any previous time directories to
+    // case/[localTime]
+    forAll(tcSource, i)
+    {
+        fileName copyMe(findInstancePath(tcSource, i));
+        cp(copyMe, multiDictRegistry_.path());
+    }
     mv
     (
         multiDictRegistry_.path()/sourcePath.name(),
@@ -222,7 +164,7 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
         ),
         currentSolverDomainDict_
     );
-
+    
     // Remove multiSolver-specific values from dictionary
     newControlDict.remove("startFrom");
     newControlDict.remove("startTime");
@@ -234,8 +176,31 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
     newControlDict.remove("timePrecision");
     newControlDict.remove("storeFields");
     newControlDict.remove("elapsedTime");
-
+    
     // Add values to obtain the desired behaviour
+    // Start with timePrecision, it may affect writePrecision, which affects
+    // all other settings
+    if (multiSolverControl_.found("timePrecision"))
+    {    
+        unsigned int newPrecision
+        (
+            readUint(multiSolverControl_.lookup("timePrecision"))
+        );
+        
+        // Increase writePrecision if less than timePrecision, otherwise
+        // resuming a run will fail
+        if (IOstream::defaultPrecision() < (newPrecision + 1))
+        {
+            IOstream::defaultPrecision(newPrecision + 1);
+        }
+    
+        newControlDict.set
+        (
+            "timePrecision",
+            newPrecision
+        );
+    }
+
     newControlDict.set("startFrom", "startTime");
     newControlDict.set("startTime", startTime_);
     newControlDict.set("stopAt", stopAtSetting);
@@ -248,18 +213,20 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
             word(multiSolverControl_.lookup("timeFormat"))
         );
     }
-    if (multiSolverControl_.found("timePrecision"))
-    {
-        newControlDict.set
-        (
-            "timePrecision",
-            readScalar(multiSolverControl_.lookup("timePrecision"))
-        );
-    }
 
     // Write the dictionary to the case directory
     newControlDict.regIOobject::write();
 
+    // Copy files in the superLoop/superLoopData directory of tcSource to
+    // constant/superLoopData
+    cp
+    (
+        sourcePath.path()/"superLoopData",
+        multiDictRegistry_.path()/multiDictRegistry_.constant()
+    );
+
     swapDictionaries(currentSolverDomain_);
+    initialized_ = true;
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

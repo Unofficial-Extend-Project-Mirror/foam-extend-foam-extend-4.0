@@ -29,8 +29,8 @@ License
 // * * * * * * * * * * * * * * * Static Members  * * * * * * * * * * * * * * //
 
 template<class Form, class Type>
-const Foam::Matrix<Form, Type> Foam::Matrix<Form, Type>::zero =
-    Foam::Matrix<Form, Type>();
+const Foam::Matrix<Form, Type> Foam::Matrix<Form, Type>::zero;
+
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 

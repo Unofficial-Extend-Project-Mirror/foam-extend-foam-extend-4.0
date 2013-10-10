@@ -84,6 +84,8 @@ etc/cshrc
 etc/bashrc
 etc/settings.csh
 etc/settings.sh
+etc/pref.csh
+etc/pref.sh
 
 # make sure that this settings file is not used
 etc/bashrc.preset

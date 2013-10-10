@@ -27,7 +27,7 @@ License
 // * * * * * * * * * * * * * * * Static Members  * * * * * * * * * * * * * * //
 
 template<class T>
-const Foam::Xfer<T> Foam::Xfer<T>::zero = Foam::Xfer<T>();
+const Foam::Xfer<T> Foam::Xfer<T>::zero;
 
 
 // * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * * //

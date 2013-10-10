@@ -35,8 +35,17 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-makePatchTypeField(fvPatchVectorField, fixedNormalSlipFvPatchVectorField);
-makePatchTypeField(fvPatchTensorField, fixedNormalSlipFvPatchTensorField);
+makeTemplatePatchTypeField
+(
+    fvPatchVectorField,
+    fixedNormalSlipFvPatchVectorField
+);
+
+makeTemplatePatchTypeField
+(
+    fvPatchTensorField,
+    fixedNormalSlipFvPatchTensorField
+);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

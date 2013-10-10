@@ -30,8 +30,7 @@ License
 // * * * * * * * * * * * * * * * Static Members  * * * * * * * * * * * * * * //
 
 template<class T, unsigned Size>
-const Foam::FixedList<T, Size> Foam::FixedList<T, Size>::zero =
-    Foam::FixedList<T, Size>();
+const Foam::FixedList<T, Size> Foam::FixedList<T, Size>::zero;
 
 
 // * * * * * * * * * * * * * * STL Member Functions  * * * * * * * * * * * * //

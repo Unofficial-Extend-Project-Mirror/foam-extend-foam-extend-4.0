@@ -639,10 +639,7 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
     // Matrix restriction done!
 
     typedef CoeffField<Type> TypeCoeffField;
-    typedef Field<Type> TypeField;
 
-    typedef typename TypeCoeffField::scalarTypeField scalarTypeField;
-    typedef typename TypeCoeffField::linearTypeField linearTypeField;
     typedef typename TypeCoeffField::squareTypeField squareTypeField;
 
     TypeCoeffField& coarseUpper = coarseMatrix.upper();

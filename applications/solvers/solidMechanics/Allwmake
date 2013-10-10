@@ -1,11 +1,13 @@
 #!/bin/sh
+cd ${0%/*} || exit 1    # run from this directory
+
 set -x
 
 wmake libso solidModels
 
-wmake elasticContactSolidFoam
 wmake elasticContactIncrSolidFoam
 wmake elasticContactNonLinULSolidFoam
+wmake elasticContactSolidFoam
 wmake elasticGravitySolidFoam
 wmake elasticIncrSolidFoam
 wmake elasticNonLinTLSolidFoam
@@ -16,5 +18,3 @@ wmake elasticSolidFoam
 wmake elasticThermalSolidFoam
 wmake icoFsiElasticNonLinULSolidFoam
 wmake viscoElasticSolidFoam
-
-(cd utilities && ./Allwmake)

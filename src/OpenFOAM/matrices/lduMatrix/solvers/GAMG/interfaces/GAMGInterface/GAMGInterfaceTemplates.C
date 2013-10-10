@@ -56,9 +56,7 @@ Foam::tmp<Foam::CoeffField<Type> > Foam::GAMGInterface::agglomerateBlockCoeffs
     CoeffField<Type>& coarseCoeffs = tcoarseCoeffs();
 
     typedef CoeffField<Type> TypeCoeffField;
-    typedef Field<Type> TypeField;
 
-    typedef typename TypeCoeffField::scalarTypeField scalarTypeField;
     typedef typename TypeCoeffField::linearTypeField linearTypeField;
     typedef typename TypeCoeffField::squareTypeField squareTypeField;
 

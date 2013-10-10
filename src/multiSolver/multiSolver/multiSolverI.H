@@ -36,9 +36,15 @@ inline const Time& multiSolver::multiDictRegistry() const
 }
 
 
-inline const IOdictionary multiSolver::multiControlDict() const
+inline const IOdictionary& multiSolver::multiControlDict() const
 {
     return multiControlDict_;
+}
+
+
+inline const wordList& multiSolver::prefixes() const
+{
+    return prefixes_;
 }
 
 
@@ -54,7 +60,8 @@ inline const word& multiSolver::currentSolverDomain() const
 }
 
 
-inline const multiSolver::initialStartFromControls& multiSolver::initialStartFrom() const
+inline const multiSolver::initialStartFromControls&
+    multiSolver::initialStartFrom() const
 {
     return initialStartFrom_;
 }
@@ -120,6 +127,12 @@ inline scalar& multiSolver::globalTimeOffset()
 }
 
 
+inline const label& multiSolver::globalIndex() const
+{
+    return globalIndex_;
+}
+
+        
 inline const multiSolver::startFromControls& multiSolver::startFrom() const
 {
     return startFrom_;
@@ -135,8 +148,14 @@ inline const scalar& multiSolver::startTime() const
 {
     return startTime_;
 }
-
+        
 inline const scalar& multiSolver::endTime() const
+{
+    return endTime_;
+}
+
+
+inline scalar& multiSolver::endTime()
 {
     return endTime_;
 }
@@ -172,9 +191,15 @@ inline const scalar& multiSolver::deltaT() const
 }
 
 
+inline scalar& multiSolver::deltaT()
+{
+    return deltaT_;
+}
+
+
 void Foam::multiSolver::setFinished()
 {
-    finished_ = true;
+    forcedEnd_ = true;
 }
 
 } // End namespace Foam

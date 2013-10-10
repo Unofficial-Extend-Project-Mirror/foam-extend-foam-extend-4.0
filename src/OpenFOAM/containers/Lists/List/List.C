@@ -38,7 +38,7 @@ License
 // * * * * * * * * * * * * * * * Static Members  * * * * * * * * * * * * * * //
 
 template<class Type>
-const Foam::List<Type> Foam::List<Type>::zero = Foam::List<Type>();
+const Foam::List<Type> Foam::List<Type>::zero;
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
