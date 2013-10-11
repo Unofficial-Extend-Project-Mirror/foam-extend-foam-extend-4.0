@@ -68,4 +68,7 @@ wmake libso engine
 
 wmake libso equationReader
 wmake libso multiSolver
+
+( cd cudaSolvers ; ./Allwmake )
+
 # ----------------------------------------------------------------- end-of-file

@@ -1,0 +1,12 @@
+cudaSolver/cudaSolver.C
+
+cudaCG/cgDiag.cu
+cudaCG/cgAmg.cu
+cudaCG/cgAinv.cu
+cudaCG/cudaCG.C
+
+cudaBiCGStab/bicgDiag.cu
+cudaBiCGStab/bicgAinv.cu
+cudaBiCGStab/cudaBiCGStab.C
+
+LIB = $(FOAM_LIBBIN)/libcudaSolvers

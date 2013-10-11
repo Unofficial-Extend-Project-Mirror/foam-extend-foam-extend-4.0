@@ -432,6 +432,18 @@ fi
 export MPI_BUFFER_SIZE
 
 
+# CUDA if available
+# ~~~~~~~~~~~~~~~~~
+[ -z "$CUDA_SYSTEM" ] && [ -e /usr/local/cuda-5.5/bin/nvcc ] && {
+    export CUDA_DIR=/usr/local/cuda-5.5
+    export CUDA_BIN_DIR=$CUDA_DIR/bin
+    export CUDA_LIB_DIR=$CUDA_DIR/lib64
+    export CUDA_INCLUDE_DIR=$CUDA_DIR/include
+}
+
+[ -d "$CUDA_LIB_DIR" ] && _foamAddPath $CUDA_BIN_DIR && _foamAddLib $CUDA_LIB_DIR
+
+
 # CGAL library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 [ -d "$CGAL_LIB_DIR" ] && _foamAddLib $CGAL_LIB_DIR
@@ -472,7 +484,7 @@ export MPI_BUFFER_SIZE
 
 # Load Metis library
 # ~~~~~~~~~~~~~~~~~~
-[ -z "$METIS_SYSTEM" ] && [ -d $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS ] && {
+[ -z "$METIS_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS/etc/metis-5.0pre2.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    METIS_DIR is initialized to: $METIS_DIR"

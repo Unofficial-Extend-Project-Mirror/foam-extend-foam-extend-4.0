@@ -211,11 +211,11 @@ case SYSTEMOPENMPI:
          endif
     else
     # Here, we assume your environment is already set for running
-    # and developping with openmpi.
+    # and developing with openmpi.
     #
     # Initialize OPENMPI_BIN_DIR using the path to mpicc
         set mpicc_cmd=`which mpicc`
-    setenv OPENMPI_BIN_DIR `dirname $mpicc_cmd`
+        setenv OPENMPI_BIN_DIR `dirname $mpicc_cmd`
         unset mpicc_cmd
     endif
 
@@ -382,6 +382,23 @@ else
     setenv MPI_BUFFER_SIZE $minBufferSize
 endif
 
+# CUDA library
+# ~~~~~~~~~~~~
+if ( $?CUDA_SYSTEM == 0 && -e /usr/local/cuda-5.5/bin/nvcc ) then
+    setenv CUDA_DIR /usr/local/cuda-5.5
+    setenv CUDA_BIN_DIR $CUDA_DIR/bin
+    setenv CUDA_LIB_DIR $CUDA_DIR/lib64
+    setenv CUDA_INCLUDE_DIR $CUDA_DIR/include
+    setenv CUDA_ARCH sm_20
+endif
+
+if ( $?CUDA_BIN_DIR ) then
+    _foamAddPath $CUDA_BIN_DIR
+endif
+
+if ( $?CUDA_LIB_DIR ) then
+    _foamAddLib $CUDA_LIB_DIR
+endif
 
 # CGAL library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
