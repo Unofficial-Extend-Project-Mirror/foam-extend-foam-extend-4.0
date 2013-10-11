@@ -34,124 +34,165 @@ Description
     also generating the strain tensor field epsilon and stress tensor
     field sigma and temperature field T.
 
+Author
+   Philip Cardiff UCD
 
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "rheologyModel.H"
+#include "constitutiveModel.H"
 #include "thermalModel.H"
+#include "solidInterface.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
-#   include "setRootCase.H"
-
-#   include "createTime.H"
-
-#   include "createMesh.H"
-
-#   include "createFields.H"
-
-#   include "readSigmaExpMethod.H"
+# include "setRootCase.H"
+# include "createTime.H"
+# include "createMesh.H"
+# include "createFields.H"
+# include "readDivSigmaExpMethod.H"
+# include "createSolidInterfaceThermal.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    Info<< "\nCalculating displacement field\n" << endl;
+  Info<< "\nStarting time loop\n" << endl;
 
-    while(runTime.loop())
+  while(runTime.loop())
     {
-        Info<< "Time: " << runTime.timeName() << nl << endl;
+      Info<< "Time: " << runTime.timeName() << nl << endl;
+      
+#     include "readStressedFoamControls.H"
+      
+      int iCorr = 0;
+      scalar initialResidual = 1.0;
+      scalar relResT = 1.0;
+      scalar relResU = 1.0;
+      lduMatrix::solverPerformance solverPerfU;
+      lduMatrix::solverPerformance solverPerfT;
+      lduMatrix::debug = 0;
 
-#       include "readStressedFoamControls.H"
+      // solve energy equation for temperature
+      // the loop is for non-orthogonal corrections
+      Info << "Solving for " << T.name() << nl;
+      do
+	{
+	  T.storePrevIter();
 
-        int iCorr = 0;
-        scalar initialResidual = GREAT;
-        scalar residual = GREAT;
-        lduMatrix::solverPerformance solverPerfU;
-        lduMatrix::solverPerformance solverPerfT;
+	  fvScalarMatrix TEqn
+	    (
+	     rhoC*fvm::ddt(T) == fvm::laplacian(k, T, "laplacian(k,T)")
+	     );
+	  
+	  solverPerfT = TEqn.solve();
 
-        lduMatrix::debug=0;
+	  T.relax();
 
-        do
-        {
-            U.storePrevIter();
+#         include "calculateRelResT.H"
 
-#           include "calculateSigmaExp.H"
-
-            //- energy equation
-            fvScalarMatrix TEqn
-            (
-                fvm::ddt(rhoC, T) == fvm::laplacian(k, T, "laplacian(k,T)")
-            );
-
-            solverPerfT = TEqn.solve();
-
-            T.relax();
-
-            Info << "\tTime " << runTime.value()
-                << ", Corrector " << iCorr << nl
-                << "\t\tSolving for " << T.name()
-                << " using " << solverPerfT.solverName()
-                << ", residual = " << solverPerfT.initialResidual() << endl;
-
-            //- linear momentum equaiton
-            fvVectorMatrix UEqn
-            (
-                fvm::d2dt2(rho, U)
-              ==
-                fvm::laplacian(2*mu + lambda, U, "laplacian(DU,U)")
-              + sigmaExp
-              - fvc::grad(threeKalpha*(T-T0),"grad(threeKalphaDeltaT)")
-            );
-
-            solverPerfU = UEqn.solve();
-
-            if(iCorr == 0)
+          if(iCorr % infoFrequency == 0)
             {
-                initialResidual = max
-                (
-                    solverPerfU.initialResidual(),
-                    solverPerfT.initialResidual()
-                );
+	      Info << "\tCorrector " << iCorr
+		   << ", residual = " << solverPerfT.initialResidual()
+		   << ", relative res = " << relResT
+		   << ", inner iters = " << solverPerfT.nIterations() << endl;
+	    }
+	}
+      while
+	(
+	 relResT > convergenceToleranceT
+	 &&
+	 ++iCorr < nCorr
+	 );
+
+      Info << "Solved for " << T.name()
+	   << " using " << solverPerfT.solverName()
+	   << " in " << iCorr << " iterations"
+	   << ", residual = " << solverPerfT.initialResidual()
+	   << ", relative res = " << relResT << nl
+	   << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+	   << ", ClockTime = " << runTime.elapsedClockTime() << " s" 
+	   << endl;
+	
+      // solve momentum equation for displacement
+      iCorr = 0;
+      volVectorField gradThreeKalphaDeltaT = fvc::grad(threeKalpha*(T-T0), "grad(threeKalphaDeltaT)");
+      surfaceVectorField threeKalphaDeltaTf = mesh.Sf()*threeKalphaf*fvc::interpolate(T-T0, "deltaT");
+
+      Info << "Solving for " << U.name() << nl;
+      do
+        {
+	  U.storePrevIter();
+
+#         include "calculateDivSigmaExp.H"
+
+	  // linear momentum equaiton
+	  fvVectorMatrix UEqn
+            (
+	     rho*fvm::d2dt2(U)
+	     ==
+	     fvm::laplacian(2*muf + lambdaf, U, "laplacian(DU,U)")
+	     + divSigmaExp
+	     );
+
+	  if(solidInterfaceCorr)
+	    {
+	      solidInterfacePtr->correct(UEqn);
+	    }
+
+	  solverPerfU = UEqn.solve();
+
+	  //U.relax();
+	  if(aitkenRelax)
+            {
+#             include "aitkenRelaxation.H"
+            }
+          else
+            {
+              U.relax();
             }
 
-            residual = max
-            (
-                solverPerfU.initialResidual(),
-                solverPerfT.initialResidual()
-            );
+	  gradU = fvc::grad(U);
+	  //gradU = solidInterfacePtr->grad(U); // Gauss grad
 
-            U.relax();
+#         include "calculateRelResU.H"
 
-            gradU = fvc::grad(U);
+	  if(iCorr == 0)
+	    {
+	      initialResidual = solverPerfU.initialResidual();
+	    }
 
-            Info << "\t\tSolving for " << U.name()
-                << " using " << solverPerfU.solverName()
-                << ", residual = " << solverPerfU.initialResidual() << endl;
-        }
-        while
-        (
-            residual > convergenceTolerance
-            &&
-            ++iCorr < nCorr
-        );
-
-        Info << nl << "Time " << runTime.value()
-            << ", Solving for " << U.name()
-            << ", Solving for " << T.name()
-            << ", Initial residual = " << initialResidual
-            << ", Final U residual = " << solverPerfU.initialResidual()
-            << ", Final T residual = " << solverPerfT.initialResidual()
-            << ", No outer iterations " << iCorr
-            << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-            << endl;
-
-        lduMatrix::debug=0;
-
+          if(iCorr % infoFrequency == 0)
+            {
+	      Info << "\tCorrector " << iCorr
+		   << ", residual = " << solverPerfU.initialResidual()
+		   << ", relative res = " << relResU;
+              if(aitkenRelax) Info << ", aitken = " << aitkenTheta;
+              Info << ", inner iters = " << solverPerfU.nIterations() << endl;
+	    }
+	}
+      while
+	(
+         iCorr++ == 0
+         ||
+         (//solverPerfU.initialResidual() > convergenceTolerance
+	  relResU > convergenceToleranceU
+	  &&
+          iCorr < nCorr)
+	 );
+	
+      Info << "Solved for " << U.name()
+	   << " using " << solverPerfU.solverName()
+	   << " in " << iCorr << " iterations"
+	   << ", initial res = " << initialResidual
+	   << ", final res = " << solverPerfU.initialResidual()
+	   << ", final rel res = " << relResU << nl
+	   << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+	   << ", ClockTime = " << runTime.elapsedClockTime() << " s" 
+	   << endl;
+	
 #       include "calculateEpsilonSigma.H"
-
 #       include "writeFields.H"
 
         Info<< "ExecutionTime = "

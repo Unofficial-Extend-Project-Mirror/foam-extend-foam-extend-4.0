@@ -29,7 +29,7 @@ Description
     Transient solver for fluid-solid interaction for an incompressible
     fluid and a large strain solid
     solid mesh is moved using U interpolated using least squares method
-
+    
 Author
     Zeljko Tukovic FSB Zagreb
     adapted by Philip Cardiff
@@ -39,7 +39,7 @@ Author
 #include "fvCFD.H"
 #include "dynamicFvMesh.H"
 
-#include "rheologyModel.H"
+#include "constitutiveModel.H"
 #include "solidTractionFvPatchVectorField.H"
 #include "volPointInterpolation.H"
 #include "pointPatchInterpolation.H"
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
         }
         while
         (
-            (fsiResidualNorm > outerCorrTolerance)
+            (fsiResidualNorm > outerCorrTolerance) 
          && (outerCorr < nOuterCorr)
         );
 
@@ -131,12 +131,12 @@ int main(int argc, char *argv[])
 
 #       include "rotateSolidFields.H"
 
-//#       include "moveSolidMesh.H"
+	//#       include "moveSolidMesh.H"
 #       include "moveSolidMeshLeastSquares.H"
 
 #       include "calculateStress.H"
 
-//#       include "calculateLiftAndDrag.H"
+	//#       include "calculateLiftAndDrag.H"
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"

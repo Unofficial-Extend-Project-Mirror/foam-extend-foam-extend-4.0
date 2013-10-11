@@ -14,7 +14,7 @@
 
     volTensorField gradU = fvc::grad(U);
 
-//- Green finite strain tensor
+    //- Green finite strain tensor
     volSymmTensorField epsilon
     (
         IOobject
@@ -25,10 +25,11 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        symm(gradU) + 0.5*symm(gradU.T() & gradU)
+	mesh,
+	dimensionedSymmTensor("zero", dimless, symmTensor::zero)
     );
 
-//- second Piloa-Kirchhoff stress tensor
+    //- second Piola-Kirchhoff stress tensor
     volSymmTensorField sigma
     (
         IOobject
@@ -43,21 +44,9 @@
         dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
     );
 
-    rheologyModel rheology(sigma);
+    constitutiveModel rheology(sigma, U);
 
-    volScalarField rho
-    (
-        IOobject
-        (
-            "rho",
-            runTime.timeName(),
-            mesh,
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-        ),
-        rheology.rho()
-    );
-
+    volScalarField rho = rheology.rho();
     volScalarField mu = rheology.mu();
     volScalarField lambda = rheology.lambda();
     surfaceScalarField muf = fvc::interpolate(mu, "mu");

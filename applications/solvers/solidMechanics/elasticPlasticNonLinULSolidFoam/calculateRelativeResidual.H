@@ -1,5 +1,5 @@
 {
-    scalarField magDU = mag(DU.internalField() - DU.oldTime().internalField());
+    scalarField magDU = mag(DU.internalField());
 
     forAll(magDU, cellI)
     {
@@ -19,4 +19,6 @@
             )
            /magDU
         );
+
+    resid = (DU - DU.prevIter())/mag(DU);
 }

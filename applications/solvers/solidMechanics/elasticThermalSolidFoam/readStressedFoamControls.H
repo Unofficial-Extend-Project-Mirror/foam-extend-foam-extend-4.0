@@ -1,5 +1,12 @@
-    const dictionary& stressControl =
-        mesh.solutionDict().subDict("stressedFoam");
+const dictionary& stressControl =
+  mesh.solutionDict().subDict("stressedFoam");
 
-    int nCorr(readInt(stressControl.lookup("nCorrectors")));
-    scalar convergenceTolerance(readScalar(stressControl.lookup("U")));
+int nCorr(readInt(stressControl.lookup("nCorrectors")));
+
+scalar convergenceToleranceU(readScalar(stressControl.lookup("U")));
+
+scalar convergenceToleranceT(readScalar(stressControl.lookup("U")));
+
+int infoFrequency(readInt(stressControl.lookup("infoFrequency")));
+
+Switch aitkenRelax(stressControl.lookup("aitkenRelaxation"));

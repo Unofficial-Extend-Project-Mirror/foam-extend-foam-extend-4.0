@@ -44,125 +44,116 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "rheologyModel.H"
+#include "constitutiveModel.H"
 #include "solidInterface.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
-#   include "setRootCase.H"
-
-#   include "createTime.H"
-
-#   include "createMesh.H"
-
-#   include "createFields.H"
-
-#   include "readDivDSigmaExpMethod.H"
-
-#   include "createSolidInterface.H"
+# include "setRootCase.H"
+# include "createTime.H"
+# include "createMesh.H"
+# include "createFields.H"
+# include "readDivDSigmaExpMethod.H"
+# include "createSolidInterfaceIncr.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    Info<< "\nCalculating displacement field\n" << endl;
+  Info<< "\nStarting time loop\n" << endl;
 
-    while(runTime.loop())
+  while(runTime.loop())
     {
-        Info<< "Time: " << runTime.timeName() << nl << endl;
+      Info<< "Time: " << runTime.timeName() << nl << endl;
+      
+#     include "readStressedFoamControls.H"
 
-#       include "readStressedFoamControls.H"
+      int iCorr = 0;
+      scalar initialResidual = 0;
+      scalar relativeResidual = 1.0;
+      lduMatrix::solverPerformance solverPerf;
+      lduMatrix::debug = 0;
 
-        int iCorr = 0;
-        scalar initialResidual = 0;
-        scalar relativeResidual = GREAT;
-        lduMatrix::solverPerformance solverPerf;
-        lduMatrix::debug = 0;
-
-        do
+      do
         {
-            DU.storePrevIter();
+	  DU.storePrevIter();
 
-#           include "calculateDivDSigmaExp.H"
+#         include "calculateDivDSigmaExp.H"
 
-            //- linear momentum equation
-            fvVectorMatrix DUEqn
+	  //- linear momentum equation
+	  fvVectorMatrix DUEqn
             (
-                fvm::d2dt2(rho, DU)
-              ==
-                fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
-              + divDSigmaExp
-            );
+	     fvm::d2dt2(rho, DU)
+	     ==
+	     fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
+	     + divDSigmaExp
+	     );
 
-            if(solidInterfaceCorr)
+	  if(solidInterfaceCorr)
+	    {
+	      solidInterfacePtr->correct(DUEqn);
+	    }
+
+	  solverPerf = DUEqn.solve();
+
+	  if(iCorr == 0)
+	    {
+	      //initialResidual = solverPerf.initialResidual();
+	      // force at least two outer correctors
+	      initialResidual = 1.0;
+	    }
+	  
+	  DU.relax();
+
+	  //gradDU = solidInterfacePtr->grad(DU);
+	  gradDU = fvc::grad(DU);
+
+#         include "calculateRelativeResidual.H"
+	  
+          if(iCorr % infoFrequency == 0)
             {
-                solidInterfacePtr->correct(DUEqn);
+              Info << "\tTime " << runTime.value()
+                   << ", Corrector " << iCorr
+                   << ", Solving for " << U.name()
+		   << " using " << solverPerf.solverName()
+                   << ", res = " << solverPerf.initialResidual()
+                   << ", rel res = " << relativeResidual
+                   << ", inner iters = " << solverPerf.nIterations() << endl;
             }
-
-            solverPerf = DUEqn.solve();
-
-            if(iCorr == 0)
-            {
-                initialResidual = solverPerf.initialResidual();
-            }
-
-            DU.relax();
-
-            if(solidInterfaceCorr)
-            {
-                gradDU = solidInterfacePtr->grad(DU);
-            }
-            else
-            {
-                gradDU = fvc::grad(DU);
-            }
-
-#           include "calculateRelativeResidual.H"
-
-            Info << "\tTime " << runTime.value()
-                << ", Corrector " << iCorr
-                << ", Solving for " << DU.name()
-                << " using " << solverPerf.solverName()
-                << ", residual = " << solverPerf.initialResidual()
-                << ", relative residual = " << relativeResidual << endl;
         }
-        while
-        (
-            //solverPerf.initialResidual() > convergenceTolerance
-            relativeResidual > convergenceTolerance
-            &&
-            ++iCorr < nCorr
-        );
+	while
+	  (
+	   solverPerf.initialResidual() > convergenceTolerance
+	   //relativeResidual > convergenceTolerance
+	   &&
+	   ++iCorr < nCorr
+	   );
+	
+      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name() 
+	   << ", Initial residual = " << initialResidual 
+	   << ", Final residual = " << solverPerf.initialResidual()
+	   << ", Relative residual = " << relativeResidual
+	   << ", No outer iterations " << iCorr
+	   << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+	   << "  ClockTime = " << runTime.elapsedClockTime() << " s" 
+	   << endl;
+      
+#     include "calculateDEpsilonDSigma.H"
 
-        Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name()
-            << ", Initial residual = " << initialResidual
-            << ", Final residual = " << solverPerf.initialResidual()
-            << ", Relative residual = " << relativeResidual
-            << ", No outer iterations " << iCorr
-            << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-            << endl;
+      U += DU;
+      sigma += DSigma;
+      epsilon += DEpsilon;
 
-        lduMatrix::debug=0;
+#     include "writeFields.H"
 
-#       include "calculateDEpsilonDSigma.H"
-
-        U += DU;
-        sigma += DSigma;
-        epsilon += DEpsilon;
-
-#       include "writeFields.H"
-
-#       include "calculateNetForces.H"
-
-        Info<< "ExecutionTime = "
-            << runTime.elapsedCpuTime()
-            << " s\n\n" << endl;
+      Info<< "ExecutionTime = "
+	  << runTime.elapsedCpuTime()
+	  << " s\n\n" << endl;
     }
-
-    Info<< "End\n" << endl;
-
-    return(0);
+  
+  Info<< "End\n" << endl;
+  
+  return(0);
 }
 
 

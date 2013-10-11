@@ -1,13 +1,10 @@
-    const dictionary& stressControl =
-        mesh.solutionDict().subDict("stressedFoam");
+const dictionary& stressControl =
+  mesh.solutionDict().subDict("stressedFoam");
 
-    int nCorr(readInt(stressControl.lookup("nCorrectors")));
-    scalar convergenceTolerance(readScalar(stressControl.lookup("DU")));
+int nCorr(readInt(stressControl.lookup("nCorrectors")));
+scalar convergenceTolerance(readScalar(stressControl.lookup("DU")));
 
-//     scalar interfaceRelax(readScalar(stressControl.lookup("interfaceRelaxation")));
+Switch aitkenRelax(stressControl.lookup("aitkenRelaxation"));
 
-//     componentReferenceList cr
-//     (
-//         stressControl.lookup("componentReference"),
-//         componentReference::iNew(mesh)
-//    );
+int infoFrequency(readInt(stressControl.lookup("infoFrequency")));
+Switch nonLinearSemiImplicit(stressControl.lookup("nonLinearSemiImplicit"));

@@ -23,42 +23,42 @@ License
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 Application
-    viscoElasticStressedFoam
+    viscoElasticSolidFoam
 
 Description
-    Transient/steady-state segregated finite-volume solver for small strain
-    visco elastic solid bodies.
+    visco-elastic small strain solver using finite volume method,
+    using an incremental approach
 
-    Displacement increment field DU is solved for using a total Lagrangian
-    approach, also generating the strain tensor field epsilon and stress
-    tensor field sigma.
-
+Author
+    Zeljko Tukovic FSB Zagreb
 
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "rheologyModel.H"
-#include "OFstream.H"
+#include "constitutiveModel.H"
+#include "componentReferenceList.H"
+//#include "patchToPatchInterpolation.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
 #   include "setRootCase.H"
-
 #   include "createTime.H"
-
 #   include "createMesh.H"
-
 #   include "createFields.H"
+#   include "createHistory.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    Info<< "\nCalculating displacement field\n" << endl;
+    Info<< "\nStarting time loop\n" << endl;
+
+    Info << "Note that the results must be written for every time-step"
+	 << " as they are used to calculate the current stress" << endl;
 
     lduMatrix::debug = 0;
-
     scalar m = 0.5;
+    surfaceVectorField n = mesh.Sf()/mesh.magSf();
 
     for (runTime++; !runTime.end(); runTime++)
     {
@@ -66,71 +66,101 @@ int main(int argc, char *argv[])
 
 #       include "readStressedFoamControls.H"
 
-        volScalarField mu =
-            rheology.mu(m*runTime.deltaT().value());
-        volScalarField lambda =
-            rheology.lambda(m*runTime.deltaT().value());
-
-        Info << "mu = " << average(mu.internalField()) << endl;
-        Info << "lambda = " << average(lambda.internalField()) << endl;
+        volScalarField mu = rheology.mu(m*runTime.deltaT().value());
+        volScalarField lambda = rheology.lambda(m*runTime.deltaT().value());
+        surfaceScalarField muf = fvc::interpolate(mu);
+        surfaceScalarField lambdaf = fvc::interpolate(lambda);
+        Info << "average mu = " << average(muf.internalField()) << endl;
+        Info << "average lambda = " << average(lambdaf.internalField()) << endl;
 
         int iCorr = 0;
         lduMatrix::solverPerformance solverPerf;
         scalar initialResidual = 0;
-        scalar residual = GREAT;
+        scalar residual = 1.0;
+        surfaceSymmTensorField DSigmaCorrf = fvc::interpolate(DSigmaCorr);
+	label nCrackedFaces = 0;
+        
+	// cracking loop if you use cohesive boundaries
+	//do
+	//{
+            do
+	      {
+                surfaceTensorField sGradDU =
+		  (I - n*n)&fvc::interpolate(gradDU);
+		
+                DU.storePrevIter();
+		
+                fvVectorMatrix DUEqn
+		  (
+		   rho*fvm::d2dt2(DU)
+		   ==
+		   fvm::laplacian(2*muf+lambdaf, DU, "laplacian(DDU,DU)")
+		   + fvc::div
+		   (
+		    mesh.magSf()
+		    *(
+		      - (muf + lambdaf)*(fvc::snGrad(DU)&(I - n*n))
+		      + lambdaf*tr(sGradDU&(I - n*n))*n
+		      + muf*(sGradDU&n)
+		      + (n&DSigmaCorrf)
+		      )
+                    )
+		   );
+		
+// 		// add an increment of gravity on the first time-step
+// 		if(runTime.timeIndex() == 1)
+// 		  {
+// 		    DUEqn -= (rho*g);
+// 		  }
 
-        do
-        {
-            DU.storePrevIter();
+                solverPerf = DUEqn.solve();
+		
+                DU.relax();
+		
+                if(iCorr == 0)
+		  {
+                    initialResidual = solverPerf.initialResidual();
+                }
 
-            fvVectorMatrix DUEqn
-            (
-                fvm::d2dt2(rho,DU)
-              ==
-                fvm::laplacian(2*mu+lambda, DU, "laplacian(DDU,DU)")
-              + fvc::div
-                (
-                    mu*gradDU.T()
-                  + lambda*(I*tr(gradDU))
-                  - (mu + lambda)*gradDU
-                  + DSigmaCorr,
-                  "div(sigma)"
-                )
-            );
+                gradDU = fvc::grad(DU);
+                
+#               include "calculateDSigma.H"
+#               include "calcResidual.H"
 
-            solverPerf = DUEqn.solve();
-
-            DU.relax();
-
-            if(iCorr == 0)
-            {
-                initialResidual = solverPerf.initialResidual();
+		if(iCorr % infoFrequency == 0)
+		  {
+		    Info << "\tTime " << runTime.value()
+			 << ", Corrector " << iCorr
+			 << ", Solving for " << U.name()
+			 << " using " << solverPerf.solverName()
+			 << ", res = " << solverPerf.initialResidual()
+			 << ", rel res = " << residual
+			 << ", inner iters = " << solverPerf.nIterations() << endl;
+		  }
             }
+            while
+            (
+	     // solverPerf.initialResidual() > convergenceTolerance
+	     residual > convergenceTolerance 
+             && ++iCorr < nCorr
+            );
+	    
+            Info << "Solving for " << DU.name() << " using "
+		 << solverPerf.solverName() << " solver"
+		 << ", Initial residula = " << initialResidual
+		 << ", Final residual = " << solverPerf.initialResidual()
+		 << ", No outer iterations " << iCorr
+		 << ", Relative error: " << residual << endl;
 
-            gradDU = fvc::grad(DU);
+	    //#           include "updateCrack.H"
+	    //}
+	    //while(nCrackedFaces > 0);
 
-#           include "calculateDEpsilonDSigma.H"
-        }
-        while
-        (
-            solverPerf.initialResidual() > convergenceTolerance
-            && ++iCorr < nCorr
-        );
-
-        Info << "Solving for " << DU.name() << " using "
-            << solverPerf.solverName() << " solver"
-            << ", Initial residual = " << initialResidual
-            << ", Final residual = " << solverPerf.initialResidual()
-            << ", No outer iterations " << iCorr
-            << ", Relative error: " << residual << endl;
-
-        U += DU;
-
-        epsilon += DEpsilon;
-
-#       include "calculateSigmaDSigmaCorr.H"
-
+	U += DU;
+	    
+#       include "calculateSigma.H"
 #       include "writeFields.H"
+#       include "writeHistory.H"
 
         Info<< "ExecutionTime = "
             << runTime.elapsedCpuTime()

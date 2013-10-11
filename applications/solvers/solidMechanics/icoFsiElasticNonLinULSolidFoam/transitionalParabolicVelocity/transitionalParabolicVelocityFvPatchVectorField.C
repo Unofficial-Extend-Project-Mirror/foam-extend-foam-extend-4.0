@@ -140,7 +140,7 @@ void transitionalParabolicVelocityFvPatchVectorField::updateCoeffs()
 
 //     // Get range and orientation
 //     boundBox bb(patch().patch().localPoints(), true);
-
+    
 //     boundBox bb(vector(0, 0, -0.025334), vector(0, 0.41, 0.025334));
 
     vector ctr = 0.5*(boundBoxMax_ + boundBoxMin_);

@@ -24,7 +24,7 @@
         stressMesh.moving(false);
 
         // Rotate stress field (old Cauchy becomes new 2nd Piola)
-        //sigma  = 1/J * symm(F & sigma & F.T());
+        //sigma  = 1/J * symm(F & sigma & F.T()); 
 
         //rho = rho/J;
     }

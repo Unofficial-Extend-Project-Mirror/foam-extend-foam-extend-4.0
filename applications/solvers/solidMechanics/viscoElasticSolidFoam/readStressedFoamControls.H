@@ -15,3 +15,7 @@
 //     (
 //         mesh.solutionDict().subDict("stressedFoam").lookup("K")
 //     );
+
+int infoFrequency(readInt(stressControl.lookup("infoFrequency")));
+
+dimensionedVector g("gravity", dimLength/(dimTime*dimTime), stressControl.lookup("gravity"));

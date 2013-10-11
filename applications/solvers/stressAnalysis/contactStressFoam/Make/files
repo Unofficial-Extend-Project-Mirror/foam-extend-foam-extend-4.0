@@ -1,6 +1,0 @@
-contactPatchPair.C
-contactPatchPairUpdateContact.C
-contactPatchPairSlavePressure.C
-contactStressFoam.C
-
-EXE = $(FOAM_APPBIN)/contactStressFoam
