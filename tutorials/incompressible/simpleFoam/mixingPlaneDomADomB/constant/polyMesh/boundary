@@ -62,7 +62,6 @@ FoamFile
             stackAxis       Z;
             discretisation  bothPatches;
         }
-
     }
     inletDomB
     {
