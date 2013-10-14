@@ -91,7 +91,7 @@ fixedDisplacementFixedRotationFvPatchVectorField::fixedDisplacementFixedRotation
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-    if(Foam::word(dimensionedInternalField().mesh().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares")
+  if(Foam::word(dimensionedInternalField().mesh().schemesDict().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares")
       {
 	Warning << "The gradScheme for " << fieldName_
 		<< " should be \"extendedLeastSquares 0\" for the boundary "

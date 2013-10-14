@@ -638,6 +638,16 @@ makePointPatchTypeFieldTypeName                                               \
                                                                               \
 makePointPatchTypeFieldTypeName                                               \
 (                                                                             \
+    typePatchField##pointPatchType##SymmTensor4thOrderField                   \
+);                                                                            \
+                                                                              \
+makePointPatchTypeFieldTypeName                                               \
+(                                                                             \
+    typePatchField##pointPatchType##DiagTensorField                           \
+);                                                                            \
+                                                                              \
+makePointPatchTypeFieldTypeName                                               \
+(                                                                             \
     typePatchField##pointPatchType##TensorField                               \
 );
 
@@ -689,6 +699,18 @@ makeTemplatePointPatchTypeField                                               \
                                                                               \
 makeTemplatePointPatchTypeField                                               \
 (                                                                             \
+    pointPatch##SymmTensor4thOrderField,                                      \
+    type##pointPatchType##SymmTensor4thOrderField                             \
+);                                                                            \
+                                                                              \
+makeTemplatePointPatchTypeField                                               \
+(                                                                             \
+    pointPatch##DiagTensorField,                                              \
+    type##pointPatchType##DiagTensorField                                     \
+);                                                                            \
+                                                                              \
+makeTemplatePointPatchTypeField                                               \
+(                                                                             \
     pointPatch##TensorField,                                                  \
     type##pointPatchType##TensorField                                         \
 );
@@ -709,6 +731,12 @@ typedef Type##PointPatchField                                                 \
     <pointPatch##Field, mesh, patchPatch, matrixType, symmTensor>             \
     type##pointPatchType##SymmTensorField;                                    \
 typedef Type##PointPatchField                                                 \
+    <pointPatch##Field, mesh, patchPatch, matrixType, symmTensor4thOrder>     \
+    type##pointPatchType##SymmTensor4thOrderField;                            \
+typedef Type##PointPatchField                                                 \
+ <pointPatch##Field, mesh, patchPatch, matrixType, diagTensor>                \
+ type##pointPatchType##DiagTensorField;                                       \
+typedef Type##PointPatchField	                                              \
     <pointPatch##Field, mesh, patchPatch, matrixType, tensor>                 \
     type##pointPatchType##TensorField;
 
@@ -740,6 +768,26 @@ typedef Type##PointPatchField                                                 \
         symmTensor                                                            \
     >                                                                         \
     type##pointPatchType##SymmTensorField;                                    \
+typedef Type##PointPatchField                                                 \
+    <                                                                         \
+        pointPatch##Field,                                                    \
+        mesh,                                                                 \
+        patchPatch,                                                           \
+        typePointPatch,                                                       \
+        matrixType,                                                           \
+        symmTensor4thOrder                                                    \
+    >                                                                         \
+    type##pointPatchType##SymmTensor4thOrderField;                            \
+typedef Type##PointPatchField                                                 \
+    <                                                                         \
+        pointPatch##Field,                                                    \
+        mesh,                                                                 \
+        patchPatch,                                                           \
+        typePointPatch,                                                       \
+        matrixType,                                                           \
+        diagTensor                                                            \
+    >                                                                         \
+    type##pointPatchType##DiagTensorField;                                    \
 typedef Type##PointPatchField                                                 \
     <pointPatch##Field, mesh, patchPatch, typePointPatch, matrixType, tensor> \
     type##pointPatchType##TensorField;

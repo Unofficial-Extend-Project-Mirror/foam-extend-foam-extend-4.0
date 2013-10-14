@@ -340,6 +340,88 @@ GenericPointPatchField
 
                         tensorFields_.insert(iter().keyword(), fPtr);
                     }
+                    else if
+		      (
+		       fieldToken.compoundToken().type()
+		       == token::Compound<List<symmTensor4thOrder> >::typeName
+		       )
+		      {
+                        symmTensor4thOrderField* fPtr = new symmTensor4thOrderField;
+                        fPtr->transfer
+			  (
+                            dynamicCast
+                            <
+			    token::Compound<List<symmTensor4thOrder> >
+                            >
+			      (
+			       fieldToken.transferCompoundToken()
+			       )
+			   );
+
+                        if (fPtr->size() != this->size())
+			  {
+                            FatalIOErrorIn
+			      (
+                                "GenericPointPatchField<Type>::"
+                                "GenericPointPatchField"
+                                "(const pointPatch&, const Field<Type>&, "
+                                "const dictionary&)",
+                                dict
+			       )   << "\n    size of field " << iter().keyword()
+				   << " (" << fPtr->size() << ')'
+				   << " is not the same size as the patch ("
+				   << this->size() << ')'
+				   << "\n    on patch " << this->patch().name()
+				   << " of field "
+				   << this->dimensionedInternalField().name()
+				   << " in file "
+				   << this->dimensionedInternalField().objectPath()
+				   << exit(FatalIOError);
+			  }
+
+                        symmTensor4thOrderFields_.insert(iter().keyword(), fPtr);
+		      }
+                    else if
+		      (
+		       fieldToken.compoundToken().type()
+		       == token::Compound<List<diagTensor> >::typeName
+		       )
+		      {
+                        diagTensorField* fPtr = new diagTensorField;
+                        fPtr->transfer
+			  (
+                            dynamicCast
+                            <
+			    token::Compound<List<diagTensor> >
+                            >
+			      (
+			       fieldToken.transferCompoundToken()
+			       )
+			   );
+
+                        if (fPtr->size() != this->size())
+			  {
+                            FatalIOErrorIn
+			      (
+                                "GenericPointPatchField<Type>::"
+                                "GenericPointPatchField"
+                                "(const pointPatch&, const Field<Type>&, "
+                                "const dictionary&)",
+                                dict
+			       )   << "\n    size of field " << iter().keyword()
+				   << " (" << fPtr->size() << ')'
+				   << " is not the same size as the patch ("
+				   << this->size() << ')'
+				   << "\n    on patch " << this->patch().name()
+				   << " of field "
+				   << this->dimensionedInternalField().name()
+				   << " in file "
+				   << this->dimensionedInternalField().objectPath()
+				   << exit(FatalIOError);
+			  }
+
+                        diagTensorFields_.insert(iter().keyword(), fPtr);
+		      }
                     else
                     {
                         FatalIOErrorIn
@@ -448,6 +530,36 @@ GenericPointPatchField
     {
         tensorFields_.insert(iter.key(), new tensorField(*iter(), mapper));
     }
+
+    for
+      (
+       HashPtrTable<symmTensor4thOrderField>::const_iterator iter =
+	 ptf.symmTensor4thOrderFields_.begin();
+       iter != ptf.symmTensor4thOrderFields_.end();
+        ++iter
+       )
+      {
+        symmTensor4thOrderFields_.insert
+	  (
+	   iter.key(),
+	   new symmTensor4thOrderField(*iter(), mapper)
+	   );
+      }
+
+    for
+      (
+       HashPtrTable<diagTensorField>::const_iterator iter =
+	 ptf.diagTensorFields_.begin();
+       iter != ptf.diagTensorFields_.end();
+        ++iter
+       )
+      {
+        diagTensorFields_.insert
+	  (
+	   iter.key(),
+	   new diagTensorField(*iter(), mapper)
+	   );
+      }
 }
 
 
@@ -474,7 +586,9 @@ GenericPointPatchField
     vectorFields_(ptf.vectorFields_),
     sphericalTensorFields_(ptf.sphericalTensorFields_),
     symmTensorFields_(ptf.symmTensorFields_),
-    tensorFields_(ptf.tensorFields_)
+    tensorFields_(ptf.tensorFields_),
+    symmTensor4thOrderFields_(ptf.symmTensor4thOrderFields_),
+    diagTensorFields_(ptf.diagTensorFields_)
 {}
 
 
@@ -502,7 +616,9 @@ GenericPointPatchField
     vectorFields_(ptf.vectorFields_),
     sphericalTensorFields_(ptf.sphericalTensorFields_),
     symmTensorFields_(ptf.symmTensorFields_),
-    tensorFields_(ptf.tensorFields_)
+    tensorFields_(ptf.tensorFields_),
+    symmTensor4thOrderFields_(ptf.symmTensor4thOrderFields_),
+    diagTensorFields_(ptf.diagTensorFields_)
 {}
 
 

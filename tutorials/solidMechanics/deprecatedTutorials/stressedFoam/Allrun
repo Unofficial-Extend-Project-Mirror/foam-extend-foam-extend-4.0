@@ -1,0 +1,12 @@
+#!/bin/sh
+
+currDir=`pwd`
+application=`basename $currDir`
+case="plateHole"
+
+tutorialPath=`dirname $0`/..
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+(cd $case; runApplication blockMesh)
+(cd $case; runApplication $application)
+(cd $case; runApplication sample)

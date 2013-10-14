@@ -71,7 +71,8 @@ class GenericPointPatchField
         HashPtrTable<sphericalTensorField> sphericalTensorFields_;
         HashPtrTable<symmTensorField> symmTensorFields_;
         HashPtrTable<tensorField> tensorFields_;
-
+        HashPtrTable<symmTensor4thOrderField> symmTensor4thOrderFields_;
+        HashPtrTable<diagTensorField> diagTensorFields_;
 
 public:
 

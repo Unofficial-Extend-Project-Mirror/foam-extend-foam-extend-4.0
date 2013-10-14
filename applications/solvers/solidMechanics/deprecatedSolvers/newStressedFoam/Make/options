@@ -1,0 +1,8 @@
+EXE_INC = \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I../materialModels/lnInclude
+
+EXE_LIBS = \
+    -lfiniteVolume \
+    -lmaterialModels \
+    -llduSolvers

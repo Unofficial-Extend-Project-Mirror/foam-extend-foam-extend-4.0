@@ -29,6 +29,3 @@ if(divDSigmaLargeStrainExpMethod == "standard")
        << "divDSigmaLargeStrainMethod not found!"
        << exit(FatalError);
    }
-
-//- relax
-divDSigmaLargeStrainExp.relax();

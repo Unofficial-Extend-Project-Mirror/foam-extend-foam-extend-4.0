@@ -36,7 +36,7 @@ Author
 
 #include "fvCFD.H"
 #include "constitutiveModel.H"
-#include "componentReferenceList.H"
+//#include "componentReferenceList.H"
 //#include "patchToPatchInterpolation.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    Info << "Note that the results must be written for every time-step"
+    Info << "Note: the results must be written for every time-step"
 	 << " as they are used to calculate the current stress" << endl;
 
     lduMatrix::debug = 0;
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     {
         Info<< "Time: " << runTime.timeName() << nl << endl;
 
-#       include "readStressedFoamControls.H"
+#       include "readSolidMechanicsControls.H"
 
         volScalarField mu = rheology.mu(m*runTime.deltaT().value());
         volScalarField lambda = rheology.lambda(m*runTime.deltaT().value());
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 
         int iCorr = 0;
         lduMatrix::solverPerformance solverPerf;
-        scalar initialResidual = 0;
+        scalar initialResidual = 1.0;
         scalar residual = 1.0;
         surfaceSymmTensorField DSigmaCorrf = fvc::interpolate(DSigmaCorr);
 	label nCrackedFaces = 0;

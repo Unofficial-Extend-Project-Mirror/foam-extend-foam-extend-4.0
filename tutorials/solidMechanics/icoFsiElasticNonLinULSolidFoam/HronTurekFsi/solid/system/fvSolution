@@ -1,32 +1,25 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.0                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           dictionary;
-    object          fvSolution;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 solvers
 {
     DU
     {
-        solver GAMG;
+	solver GAMG;
         tolerance        1e-8;
         relTol           0.01;
         minIter          1;
@@ -37,9 +30,9 @@ solvers
         nPostSweeps      2;
         nFinestSweeps    2;
 
-        scaleCorrection true;
+	scaleCorrection true;
         directSolveCoarsest false;
-
+			   		      
 
         cacheAgglomeration true;
 
@@ -50,7 +43,7 @@ solvers
 
 //    DU
 //    {
-//        solver amgSolver;
+//	  solver amgSolver;
 //        cycle           W-cycle;
 //        policy          AAMG;
 //        nPreSweeps      0;
@@ -71,11 +64,11 @@ solvers
 //    DU               ICCG 1e-07 0.01;
 }
 
-stressedFoam
+solidMechanics
 {
-    nCorrectors         1000;
-    DU                   1e-06;
-    historyPointID    62;
+    nCorrectors     	1000;
+    DU               	1e-06;
+    historyPointID	62;
 }
 
 relaxationFactors

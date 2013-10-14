@@ -40,6 +40,8 @@ defineTemplateRunTimeSelectionTable(interpolation<scalar>, dictionary);
 defineTemplateRunTimeSelectionTable(interpolation<vector>, dictionary);
 defineTemplateRunTimeSelectionTable(interpolation<sphericalTensor>, dictionary);
 defineTemplateRunTimeSelectionTable(interpolation<symmTensor>, dictionary);
+defineTemplateRunTimeSelectionTable(interpolation<symmTensor4thOrder>, dictionary);
+defineTemplateRunTimeSelectionTable(interpolation<diagTensor>, dictionary);
 defineTemplateRunTimeSelectionTable(interpolation<tensor>, dictionary);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

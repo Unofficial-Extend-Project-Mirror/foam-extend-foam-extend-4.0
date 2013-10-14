@@ -74,12 +74,12 @@ timeVaryingSolidTractionFvPatchVectorField
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-  if(Foam::word(dimensionedInternalField().mesh().gradScheme("grad(" + fieldName() + ")")) != "extendedLeastSquares")
-      {
-	Warning << "The gradScheme for " << fieldName()
-		<< " should be \"extendedLeastSquares 0\" for the boundary "
-		<< "non-orthogonal correction to be right" << endl;
-      }
+//   if(Foam::word(dimensionedInternalField().mesh().gradScheme("grad(" + fieldName() + ")")) != "extendedLeastSquares")
+//       {
+// 	Warning << "The gradScheme for " << fieldName()
+// 		<< " should be \"extendedLeastSquares 0\" for the boundary "
+// 		<< "non-orthogonal correction to be right" << endl;
+//       }
 }
 
 

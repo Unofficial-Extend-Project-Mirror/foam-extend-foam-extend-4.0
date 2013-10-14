@@ -187,7 +187,7 @@ skewCorrectedSnGrad<Type>::correction
             gradScheme<typename pTraits<Type>::cmptType>::New
             (
                 mesh,
-                mesh.gradScheme(ssf.name())
+                mesh.schemesDict().gradScheme(ssf.name())
             )()
            .grad(vf.component(cmpt));
 

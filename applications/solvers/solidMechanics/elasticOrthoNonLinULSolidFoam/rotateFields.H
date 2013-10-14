@@ -45,5 +45,4 @@
       K[celli].zz() = C[celli].zzzz();
     }
   K.correctBoundaryConditions();
-  //K.write();
 }

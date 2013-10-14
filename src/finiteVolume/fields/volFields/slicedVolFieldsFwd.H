@@ -74,6 +74,14 @@ SlicedGeometricField<symmTensor, fvPatchField, slicedFvPatchField, volMesh>
     slicedVolSymmTensorField;
 
 typedef
+SlicedGeometricField<symmTensor4thOrder, fvPatchField, slicedFvPatchField, volMesh>
+    slicedVolSymmTensor4thOrderField;
+
+typedef
+SlicedGeometricField<diagTensor, fvPatchField, slicedFvPatchField, volMesh>
+    slicedVolDiagTensorField;
+
+typedef
 SlicedGeometricField<tensor, fvPatchField, slicedFvPatchField, volMesh>
     slicedVolTensorField;
 

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+currDir=`pwd`
+application=`basename $currDir`
+cases="ballAndBrickFriction"
+
+tutorialPath=`dirname $0`/..
+. $WM_PROJECT_DIR/bin/tools/CleanFunctions
+
+for case in $cases
+do
+    (cd $case; cleanCase)
+    cp $case/0/materials.org $case/0/materials
+    rm -rf $case/0/polyMesh
+done
+

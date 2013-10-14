@@ -58,6 +58,10 @@ typedef GeometricField<sphericalTensor, fvsPatchField, surfaceMesh>
     surfaceSphericalTensorField;
 typedef GeometricField<symmTensor, fvsPatchField, surfaceMesh>
     surfaceSymmTensorField;
+typedef GeometricField<symmTensor4thOrder, fvsPatchField, surfaceMesh>
+    surfaceSymmTensor4thOrderField;
+typedef GeometricField<diagTensor, fvsPatchField, surfaceMesh>
+    surfaceDiagTensorField;
 typedef GeometricField<tensor, fvsPatchField, surfaceMesh> surfaceTensorField;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

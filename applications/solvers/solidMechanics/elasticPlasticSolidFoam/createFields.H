@@ -124,6 +124,8 @@
 
     surfaceVectorField n = mesh.Sf()/mesh.magSf();
 
+   // plastic strain increment
+   const volSymmTensorField& DEpsilonP = rheology.DEpsilonP();
 
    // for aitken relaxation
    volVectorField aitkenDelta
@@ -141,7 +143,3 @@
     );
    scalar aitkenInitialRes = 1.0;
    scalar aitkenTheta = 0.1;
-   if(mesh.relax(DU.name()))
-   {
-     aitkenTheta = mesh.relaxationFactor(DU.name());
-   }

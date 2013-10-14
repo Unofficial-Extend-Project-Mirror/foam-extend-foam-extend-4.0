@@ -1,5 +1,3 @@
-./transitionalParabolicVelocity/transitionalParabolicVelocityFvPatchVectorField.C
-
 icoFsiElasticNonLinULSolidFoam.C
 
 EXE = $(FOAM_APPBIN)/icoFsiElasticNonLinULSolidFoam

@@ -42,6 +42,8 @@ typedef pointPatchField<scalar> pointPatchScalarField;
 typedef pointPatchField<vector> pointPatchVectorField;
 typedef pointPatchField<sphericalTensor> pointPatchSphericalTensorField;
 typedef pointPatchField<symmTensor> pointPatchSymmTensorField;
+typedef pointPatchField<symmTensor4thOrder> pointPatchSymmTensor4thOrderField;
+typedef pointPatchField<diagTensor> pointPatchDiagTensorField;
 typedef pointPatchField<tensor> pointPatchTensorField;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

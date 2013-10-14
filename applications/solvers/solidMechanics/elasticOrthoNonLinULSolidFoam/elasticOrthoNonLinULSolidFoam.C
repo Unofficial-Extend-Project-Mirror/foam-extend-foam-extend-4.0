@@ -76,13 +76,12 @@ int main(int argc, char *argv[])
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
       
-#     include "readStressedFoamControls.H"
+#     include "readSolidMechanicsControls.H"
 
       int iCorr = 0;
-      scalar initialResidual = 0;
       lduMatrix::solverPerformance solverPerf;
-      label counter=0;
-      lduMatrix::debug=0;
+      scalar initialResidual = 1.00;
+      lduMatrix::debug = 0;
 
       //- div(sigmaOld) should be zero but I will include
       //- it to make sure errors don't accumulate
@@ -98,8 +97,6 @@ int main(int argc, char *argv[])
 
       do
         {
-	  counter++;
-
 	  DU.storePrevIter();
 
 	  //- updated lagrangian large strain momentum equation
@@ -109,10 +106,13 @@ int main(int argc, char *argv[])
 	     + fvc::d2dt2(rho, U)
 	     ==
  	     fvm::laplacian(K, DU, "laplacian(K,DU)") 
- 	     + fvc::div(DSigma)
+ 	     + fvc::div(
+			DSigma
+			- (K & gradDU)
+			+ ( (sigma + DSigma) & gradDU ),
+			"div(sigma)"
+			)
  	     //- fvc::laplacian(K, DU)
- 	     - fvc::div(K & gradDU)
- 	     + fvc::div( (sigma + DSigma) & gradDU )
 	     );
 
           if(ensureTotalEquilibrium)

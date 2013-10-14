@@ -42,7 +42,6 @@ Author
 #include "fvCFD.H"
 #include "constitutiveModel.H"
 #include "thermalModel.H"
-#include "solidInterface.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,7 +52,6 @@ int main(int argc, char *argv[])
 # include "createMesh.H"
 # include "createFields.H"
 # include "readDivSigmaExpMethod.H"
-# include "createSolidInterfaceThermal.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -63,7 +61,7 @@ int main(int argc, char *argv[])
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
       
-#     include "readStressedFoamControls.H"
+#     include "readSolidMechanicsControls.H"
       
       int iCorr = 0;
       scalar initialResidual = 1.0;
@@ -136,14 +134,8 @@ int main(int argc, char *argv[])
 	     + divSigmaExp
 	     );
 
-	  if(solidInterfaceCorr)
-	    {
-	      solidInterfacePtr->correct(UEqn);
-	    }
-
 	  solverPerfU = UEqn.solve();
 
-	  //U.relax();
 	  if(aitkenRelax)
             {
 #             include "aitkenRelaxation.H"
@@ -154,7 +146,6 @@ int main(int argc, char *argv[])
             }
 
 	  gradU = fvc::grad(U);
-	  //gradU = solidInterfacePtr->grad(U); // Gauss grad
 
 #         include "calculateRelResU.H"
 

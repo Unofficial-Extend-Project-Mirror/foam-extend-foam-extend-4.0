@@ -2,7 +2,7 @@
     {
         Info<< "Time: " << runTime.timeName() << nl << endl;
 
-#       include "readStressedFoamControls.H"
+#       include "readSolidMechanicsControls.H"
 
         volScalarField mu = rheology.mu(0);
         volScalarField lambda = rheology.lambda(0);

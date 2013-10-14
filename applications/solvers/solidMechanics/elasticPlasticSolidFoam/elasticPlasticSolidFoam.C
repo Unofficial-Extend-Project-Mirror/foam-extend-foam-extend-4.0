@@ -34,13 +34,13 @@ Description
     strain field epsilonP and stress tensor field sigma.
 
 Author
-    A. Karac, A. Ivankovic,
+    A. Karac UCD/Zenica
     P. Cardiff UCD
+    Aitken relaxation by T. Tang DTU
 
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-//#include "plasticityModel.H"
 #include "constitutiveModel.H"
 #include "solidContactFvPatchVectorField.H"
 
@@ -63,34 +63,18 @@ int main(int argc, char *argv[])
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
       
-#     include "readStressedFoamControls.H"
+#     include "readSolidMechanicsControls.H"
       
       int iCorr = 0;
-      scalar initialResidual = 0;
+      lduMatrix::solverPerformance solverPerf;
+      scalar initialResidual = 1.0;
       scalar relativeResidual = 1.0;
       scalar plasticResidual = 1.0;
-      lduMatrix::solverPerformance solverPerf;
       lduMatrix::debug = 0;
       
-      const volSymmTensorField& DEpsilonP = rheology.DEpsilonP();
-      
-//       volVectorField* oldErrorPtr = NULL;
-//       if(ensureTotalEquilibrium)
-// 	{
-	  //const volScalarField& beta =
-	  //mesh.objectRegistry::lookupObject<volScalarField>("beta");
-// 	  oldErrorPtr = new volVectorField
-// 	    (
-// 	     rho*fvc::d2dt2(U.oldTime())
-// // 	     - fvc::div(sigma.oldTime())
-// 	     - fvc::div(mesh.Sf() & fvc::interpolate(sigma.oldTime()))
-// 	     );
-// 	}
-
       do
 	{
 	  DU.storePrevIter();
-	  DEpsilonP.storePrevIter();
 
 #         include "calculateDivDSigmaExp.H"
 	  	  
@@ -102,19 +86,6 @@ int main(int argc, char *argv[])
 	     + divDSigmaExp
 	     - fvc::div(2*muf*(mesh.Sf() & fvc::interpolate(DEpsilonP)))
 	     );
-
-	  // if(ensureTotalEquilibrium)
-	  //   {
-	      // 	      const volScalarField& beta =
-	      // 		mesh.objectRegistry::lookupObject<volScalarField>("beta");
-	      // 	      oldErrorPtr = new volVectorField
-	      // 		(
-	      // 		 rho*fvc::d2dt2(U.oldTime())
-	      // 		 - fvc::div(sigma.oldTime())
-	      // 		 );
-	      // 	      DUEqn += *oldErrorPtr;
-	      //DUEqn -= fvc::div(mesh.Sf() & fvc::interpolate(sigma, "sigma"));
-	    // }
 
 	  solverPerf = DUEqn.solve();
 	  
@@ -137,21 +108,17 @@ int main(int argc, char *argv[])
 #         include "calculateRelativeResidual.H"
 #         include "calculateDEpsilonDSigma.H"
 
-	  // correct plasticity
+	  // correct plastic strain increment
 	  rheology.correct();
 
-	  // update mu and lambda for non-linear elastic
-	  //mu = rheology.newMu();
-	  //lambda = rheology.newLambda();
-	  //muf = fvc::interpolate(mu);
-	  //lambdaf = fvc::interpolate(lambda);
+#         include "calculatePlasticResidual.H"
 
           if(iCorr % infoFrequency == 0)
             {
               Info << "\tTime " << runTime.value()
-                   << ", Corrector " << iCorr
-                   << ", Solving for " << DU.name()
-		   << " using " << solverPerf.solverName()
+                   << ", Corr " << iCorr
+		//<< ", Solving for " << DU.name()
+		// << " using " << solverPerf.solverName()
                    << ", res = " << solverPerf.initialResidual()
                    << ", rel res = " << relativeResidual
                    << ", plastic res = " << plasticResidual;
@@ -175,15 +142,13 @@ int main(int argc, char *argv[])
 	   << ", Final rel residual = " << relativeResidual
 	   << ", No outer iterations " << iCorr << endl;
       
-      lduMatrix::debug = 1;
-      
-      // update total quantities
+      // Update total quantities
       U += DU;
       epsilon += DEpsilon;
       epsilonP += rheology.DEpsilonP();
       sigma += DSigma;
 
-      // update yields stresses
+      // Update yields stresses
       rheology.updateYieldStress();
       
 #     include "writeFields.H"

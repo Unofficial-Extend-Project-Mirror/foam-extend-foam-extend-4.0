@@ -73,6 +73,14 @@ SlicedGeometricField<symmTensor, fvsPatchField, slicedFvsPatchField, surfaceMesh
     slicedSurfaceSymmTensorField;
 
 typedef
+SlicedGeometricField<symmTensor4thOrder, fvsPatchField, slicedFvsPatchField, surfaceMesh>
+    slicedSurfaceSymmTensor4thOrderField;
+
+typedef
+SlicedGeometricField<diagTensor, fvsPatchField, slicedFvsPatchField, surfaceMesh>
+    slicedSurfaceDiagTensorField;
+
+typedef
 SlicedGeometricField<tensor, fvsPatchField, slicedFvsPatchField, surfaceMesh>
     slicedSurfaceTensorField;
 

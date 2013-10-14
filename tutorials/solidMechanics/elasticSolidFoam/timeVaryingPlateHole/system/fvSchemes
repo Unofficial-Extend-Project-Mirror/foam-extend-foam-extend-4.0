@@ -17,7 +17,12 @@ FoamFile
 
 d2dt2Schemes
 {
-    default     Euler;
+    default         Euler;
+}
+
+ddtSchemes
+{
+    default         Euler;
 }
 
 gradSchemes
@@ -36,7 +41,7 @@ divSchemes
 laplacianSchemes
 {
     default         none;
-    laplacian(DU,U) Gauss harmonic corrected;
+    laplacian(DU,U) Gauss linear corrected;
 }
 
 snGradSchemes
@@ -46,9 +51,7 @@ snGradSchemes
 
 interpolationSchemes
 {
-    default                  linear;
-    interpolate(sigma)       linear;
-    interpolate(muLambda)    harmonic;
+    default         linear;
 }
 
 // ************************************************************************* //

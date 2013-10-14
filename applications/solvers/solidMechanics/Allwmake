@@ -3,18 +3,21 @@ cd ${0%/*} || exit 1    # run from this directory
 
 set -x
 
-wmake libso solidModels
-
-wmake elasticContactIncrSolidFoam
-wmake elasticContactNonLinULSolidFoam
-wmake elasticContactSolidFoam
-wmake elasticGravitySolidFoam
+wmake elasticAcpSolidFoam
+wmake elasticIncrAcpSolidFoam
 wmake elasticIncrSolidFoam
+wmake elasticNonLinIncrTLSolidFoam
 wmake elasticNonLinTLSolidFoam
 wmake elasticNonLinULSolidFoam
-wmake elasticPlasticNonLinULSolidFoam
+wmake elasticOrthoAcpSolidFoam
+wmake elasticOrthoNonLinULSolidFoam
+wmake elasticOrthoSolidFoam
 wmake elasticPlasticSolidFoam
+wmake elasticPlasticNonLinTLSolidFoam
+wmake elasticPlasticNonLinULSolidFoam
 wmake elasticSolidFoam
 wmake elasticThermalSolidFoam
 wmake icoFsiElasticNonLinULSolidFoam
 wmake viscoElasticSolidFoam
+
+(cd utilities; wmake all)

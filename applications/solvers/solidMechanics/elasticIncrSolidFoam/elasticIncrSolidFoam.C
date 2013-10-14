@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
       
-#     include "readStressedFoamControls.H"
+#     include "readSolidMechanicsControls.H"
 
       int iCorr = 0;
       scalar initialResidual = 0;

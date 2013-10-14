@@ -26,14 +26,24 @@ solvers
     }
 }
 
-stressedFoam
+solidMechanics
 {
-    nCorrectors     50000;
-    DU              1e-06;
-
-    divDSigmaExp    surface;
-
-    solidInterface  no;
+    nCorrectors           10000;
+    DU                     1e-06;
+    //divSigmaExp           standard;
+    divSigmaExp           surface;
+    //divSigmaExp           decompose;
+    //divSigmaExp           laplacian;
+    historyPatch          right;
+    solidInterfaceMethod  none;
+    predictor             yes;
+    infoFrequency         1;
+    aitkenRelaxation      yes;
 }
 
+relaxationFactors
+{
+  //DU   0.9;
+  DEpsilonP 0.1;
+}
 // ************************************************************************* //

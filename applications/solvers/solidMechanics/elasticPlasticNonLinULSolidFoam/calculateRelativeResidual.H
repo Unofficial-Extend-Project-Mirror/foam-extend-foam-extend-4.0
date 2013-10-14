@@ -20,5 +20,5 @@
            /magDU
         );
 
-    resid = (DU - DU.prevIter())/mag(DU);
+//     resid = (DU - DU.prevIter())/mag(DU);
 }

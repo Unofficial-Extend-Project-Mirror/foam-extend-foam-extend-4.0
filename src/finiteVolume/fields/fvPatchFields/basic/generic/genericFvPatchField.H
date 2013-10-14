@@ -62,6 +62,8 @@ class genericFvPatchField
         HashPtrTable<vectorField> vectorFields_;
         HashPtrTable<sphericalTensorField> sphericalTensorFields_;
         HashPtrTable<symmTensorField> symmTensorFields_;
+        HashPtrTable<symmTensor4thOrderField> symmTensor4thOrderFields_;
+        HashPtrTable<diagTensorField> diagTensorFields_;
         HashPtrTable<tensorField> tensorFields_;
 
 

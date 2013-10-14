@@ -29,12 +29,12 @@ boundaryField
     {
         type            symmetryPlane;
     }
-
+     
     inside
     {
       type            solidTraction;
       traction        uniform ( 0 0 0 );
-      pressure        uniform 0;
+      pressure        uniform 50e6;
       value           uniform (0 0 0);
     }
 
@@ -42,7 +42,7 @@ boundaryField
     {
         type            solidTraction;
         traction        uniform ( 0 0 0 );
-        pressure        uniform 0;
+        pressure        uniform 0.1e6;
         value           uniform (0 0 0);
     }
 

@@ -23,16 +23,12 @@ License
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 Application
-    elasticOrthoGenDirSolidFoam
+    elasticOrthoSolidFoam
 
 Description
     Transient/steady-state segregated finite-volume solver for small strain
     elastic orthotropic solid bodies allowing for general principal material
     directions.
-
-    Note: fvm::laplacian(tensor, vector) has a bug
-    (bug report 0000305 http://www.openfoam.com/mantisbt/view.php?id=305)
-    It is an easy fix in OpenFOAM-1.6-ext.
 
     Please cite:
     Cardiff P, Karac A & Ivankovic A, A Large Strain Finite Volume Method for
@@ -48,7 +44,6 @@ Author
 #include "fvCFD.H"
 #include "constitutiveModel.H"
 #include "solidInterface.H"
-#include "clipGauge.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -70,19 +65,16 @@ int main(int argc, char *argv[])
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
       
-#     include "readStressedFoamControls.H"
+#     include "readSolidMechanicsControls.H"
 
       int iCorr = 0;
-      scalar initialResidual = 1;
-      scalar relativeResidual = 1;
       lduMatrix::solverPerformance solverPerf;
-      label counter = 0;
+      scalar initialResidual = 1.0;
+      scalar relativeResidual = 1.0;
       lduMatrix::debug = 0;
 
       do
         {
-	  counter++;
-
 	  U.storePrevIter();
 
 #         include "calculateDivSigmaExp.H"
@@ -110,7 +102,6 @@ int main(int argc, char *argv[])
 	  
 	  U.relax();
 
-	  //gradU = solidInterfacePtr->grad(U);
 	  gradU = fvc::grad(U); // use leastSquaresSolidInterface
 
 	  //#         include "setPlaneStressGradU.H"

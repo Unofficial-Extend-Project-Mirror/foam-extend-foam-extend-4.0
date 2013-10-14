@@ -47,6 +47,8 @@ typedef elementPatchField<scalar> elementPatchScalarField;
 typedef elementPatchField<vector> elementPatchVectorField;
 typedef elementPatchField<sphericalTensor> elementPatchSphericalTensorField;
 typedef elementPatchField<symmTensor> elementPatchSymmTensorField;
+typedef elementPatchField<symmTensor4thOrder> elementPatchSymmTensor4thOrderField;
+typedef elementPatchField<diagTensor> elementPatchDiagTensorField;
 typedef elementPatchField<tensor> elementPatchTensorField;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

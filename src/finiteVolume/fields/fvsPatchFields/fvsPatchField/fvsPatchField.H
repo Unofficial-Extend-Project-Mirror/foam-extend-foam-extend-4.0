@@ -424,6 +424,8 @@ makeFvsPatchTypeFieldTypeName(type##FvsPatchScalarField);                  \
 makeFvsPatchTypeFieldTypeName(type##FvsPatchVectorField);                  \
 makeFvsPatchTypeFieldTypeName(type##FvsPatchSphericalTensorField);         \
 makeFvsPatchTypeFieldTypeName(type##FvsPatchSymmTensorField);              \
+makeFvsPatchTypeFieldTypeName(type##FvsPatchSymmTensor4thOrderField);      \
+makeFvsPatchTypeFieldTypeName(type##FvsPatchDiagTensorField);              \
 makeFvsPatchTypeFieldTypeName(type##FvsPatchTensorField);
 
 #define makeFvsPatchTypeField(PatchTypeField, typePatchTypeField)          \
@@ -458,6 +460,16 @@ makeFvsPatchTypeField                                                      \
     type##FvsPatchSphericalTensorField                                     \
 );                                                                         \
 makeFvsPatchTypeField(fvsPatchSymmTensorField, type##FvsPatchSymmTensorField); \
+makeFvsPatchTypeField                                                      \
+(                                                                          \
+    fvsPatchSymmTensor4thOrderField,                                       \
+    type##FvsPatchSymmTensor4thOrderField                                  \
+);                                                                         \
+makeFvsPatchTypeField                                                      \
+(                                                                          \
+    fvsPatchDiagTensorField,                                               \
+    type##FvsPatchDiagTensorField                                          \
+);                                                                         \
 makeFvsPatchTypeField(fvsPatchTensorField, type##FvsPatchTensorField);
 
 
@@ -468,6 +480,10 @@ typedef type##FvsPatchField<vector> type##FvsPatchVectorField;             \
 typedef type##FvsPatchField<sphericalTensor>                               \
     type##FvsPatchSphericalTensorField;                                    \
 typedef type##FvsPatchField<symmTensor> type##FvsPatchSymmTensorField;     \
+typedef type##FvsPatchField<symmTensor4thOrder>                            \
+    type##FvsPatchSymmTensor4thOrderField;                                 \
+typedef type##FvsPatchField<diagTensor>                                    \
+    type##FvsPatchDiagTensorField;                                         \
 typedef type##FvsPatchField<tensor> type##FvsPatchTensorField;
 
 

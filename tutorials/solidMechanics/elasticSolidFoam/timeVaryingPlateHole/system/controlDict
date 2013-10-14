@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     newStressedFoam;
+application     elasticSolidFoam;
 
 startFrom       startTime;
 

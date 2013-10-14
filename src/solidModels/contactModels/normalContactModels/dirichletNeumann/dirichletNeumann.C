@@ -93,7 +93,7 @@ dirichletNeumann::dirichletNeumann
   oscillationCorr_(normalContactModelDict_.lookup("oscillationCorrection")),
   //oscillationCorrFac_(readScalar(normalContactModelDict_.lookup("oscillationCorrectionFactor"))),
   smoothingSteps_(readInt(normalContactModelDict_.lookup("smoothingSteps"))),
-  //infoFreq_(readInt(mesh_.solutionDict().subDict("stressedFoam").lookup("infoFrequency"))),
+  //infoFreq_(readInt(mesh_.solutionDict().subDict("solidMechanics").lookup("infoFrequency"))),
   infoFreq_(readInt(normalContactModelDict_.lookup("infoFrequency"))),
   //debugFilePtr_(NULL),
   contactFilePtr_(NULL)

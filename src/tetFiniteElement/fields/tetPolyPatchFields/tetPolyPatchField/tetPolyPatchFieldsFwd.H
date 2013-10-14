@@ -47,6 +47,8 @@ typedef tetPolyPatchField<scalar> tetPolyPatchScalarField;
 typedef tetPolyPatchField<vector> tetPolyPatchVectorField;
 typedef tetPolyPatchField<sphericalTensor> tetPolyPatchSphericalTensorField;
 typedef tetPolyPatchField<symmTensor> tetPolyPatchSymmTensorField;
+typedef tetPolyPatchField<symmTensor4thOrder> tetPolyPatchSymmTensor4thOrderField;
+typedef tetPolyPatchField<diagTensor> tetPolyPatchDiagTensorField;
 typedef tetPolyPatchField<tensor> tetPolyPatchTensorField;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

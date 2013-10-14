@@ -47,6 +47,8 @@ defineTemplateTypeNameAndDebug(BlockLduInterfaceField<vector>, 0);
 defineTemplateTypeNameAndDebug(BlockLduInterfaceField<tensor>, 0);
 defineTemplateTypeNameAndDebug(BlockLduInterfaceField<sphericalTensor>, 0);
 defineTemplateTypeNameAndDebug(BlockLduInterfaceField<symmTensor>, 0);
+defineTemplateTypeNameAndDebug(BlockLduInterfaceField<symmTensor4thOrder>, 0);
+defineTemplateTypeNameAndDebug(BlockLduInterfaceField<diagTensor>, 0);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

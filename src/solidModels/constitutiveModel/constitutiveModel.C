@@ -91,7 +91,7 @@ constitutiveModel::constitutiveModel
       //word solIntType("smallStrain");
       solidInterfaceActive_ = true;
 
-      word solIntType(sigma.mesh().solutionDict().subDict("stressedFoam").lookup("solidInterfaceMethod"));
+      word solIntType(sigma.mesh().solutionDict().subDict("solidMechanics").lookup("solidInterfaceMethod"));
       solidInterfacePtr_ = 
 	solidInterface::New(solIntType, sigma.mesh(), *this);
 

@@ -1,0 +1,4 @@
+tractionDisplacement/tractionDisplacementFvPatchVectorField.C
+stressedFoam.C
+
+EXE = $(FOAM_APPBIN)/stressedFoam

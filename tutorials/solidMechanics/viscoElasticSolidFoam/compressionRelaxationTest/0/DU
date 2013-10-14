@@ -1,25 +1,18 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.2                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version 2.0;
-    format ascii;
-
-    root "/home/coyote/hjasak/OpenFOAM/OpenFOAM-1.2/tutorials/newStressedFoam";
-    case "plateHole";
-    instance ""0"";
-    local "";
-
-    class volVectorField;
-    object DU;
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    location    "0";
+    object      DU;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 dimensions      [0 1 0 0 0 0 0];
@@ -31,34 +24,36 @@ boundaryField
 
 axis
 {
-    type symmetryPlane;
+    type          symmetryPlane;
 }
 
 loading
 {
-    type fixedDisplacement;
-    value uniform (0 -0.00025 0);
+    type          timeVaryingFixedDisplacement;
+    outOfBounds   clamp;
+    fileName      "$FOAM_CASE/constant/timeVsLoadingDisp";
+    value         uniform (0 0 0);
 }
 
 freeSurface
 {
-    type solidTractionFree;
+    type          solidTractionFree;
 }
 
 bottom
 {
-    type fixedDisplacement;
-    value uniform (0 0 0);
+    type          fixedDisplacement;
+    value         uniform (0 0 0);
 }
 
 front
 {
-    type solidTractionFree;
+    type          wedge;
 }
 
 back
 {
-    type solidTractionFree;
+    type          wedge;
 }
 
 }

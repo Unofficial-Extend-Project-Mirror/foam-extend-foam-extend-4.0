@@ -9,10 +9,6 @@ aitkenDelta = (U - U.prevIter()) / aitkenInitialRes;
 if(iCorr == 0)
   {
     aitkenTheta = 0.1;
-    if(mesh.relax(U.name()))
-      {
-	aitkenTheta = mesh.relaxationFactor(U.name());
-      }
   }
  else
    {

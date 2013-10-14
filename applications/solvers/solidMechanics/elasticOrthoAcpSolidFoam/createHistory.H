@@ -1,5 +1,5 @@
 OFstream * filePtr(NULL);
-word historyPatchName(mesh.solutionDict().subDict("stressedFoam").lookup("historyPatch"));
+word historyPatchName(mesh.solutionDict().subDict("solidMechanics").lookup("historyPatch"));
 label historyPatchID = mesh.boundaryMesh().findPatchID(historyPatchName);
 if(historyPatchID == -1)
   {
@@ -14,9 +14,7 @@ if(historyPatchID == -1)
 	    << endl;
     word hisDirName("history");
     mkDir(hisDirName);
-    filePtr = new OFstream(hisDirName/"forceDisp.dat");
+    filePtr = new OFstream(hisDirName/historyPatchName+"forceDisp.dat");
     OFstream& forceDispFile = *filePtr;
     forceDispFile << "#Disp(mm)\tForce(N)" << endl;
   }
-
-clipGauge clipG("clipGauge1", U);

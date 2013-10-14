@@ -96,12 +96,12 @@ timeVaryingFixedRotationFvPatchVectorField::timeVaryingFixedRotationFvPatchVecto
   //- on the boundary
   //- so the gradient scheme should be extendedLeastSquares
   //Info <<"timeSeries_ is" <<timeSeries_<<endl;
-  if(Foam::word(dimensionedInternalField().mesh().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares")
-    {
-      Warning << "The gradScheme for " << fieldName_
-	      << " should be \"extendedLeastSquares 0\" for the boundary "
-	      << "non-orthogonal correction to be right" << endl;
-    }
+  // if(Foam::word(dimensionedInternalField().mesh().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares")
+//     {
+//       Warning << "The gradScheme for " << fieldName_
+// 	      << " should be \"extendedLeastSquares 0\" for the boundary "
+// 	      << "non-orthogonal correction to be right" << endl;
+//     }
 }
 
 

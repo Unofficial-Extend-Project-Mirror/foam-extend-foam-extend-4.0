@@ -33,8 +33,3 @@ if(historyPatchID != -1)
 		       << force.x() << " " << force.y() << " " << force.z() << endl;
        }
    }
-
-if(clipGPtr)
-  {
-    clipGPtr->write();
-  }

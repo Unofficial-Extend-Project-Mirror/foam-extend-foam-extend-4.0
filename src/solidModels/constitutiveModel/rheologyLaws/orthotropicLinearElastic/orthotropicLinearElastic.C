@@ -214,11 +214,9 @@ Foam::orthotropicLinearElastic::orthotropicLinearElastic
   //R.write();
 
   //- rotate C to global corrdinate system
-  //Info << "C_ local is " << C_.internalField() << endl;
-  C_.correctBoundaryConditions();
+  //C_.correctBoundaryConditions();
   C_ = transform(R, C_);
   C_.correctBoundaryConditions();
-  //Info << "C_ global is " << C_.internalField() << endl;
 }
 
 
@@ -388,8 +386,8 @@ Foam::tmp<Foam::volDiagTensorField> Foam::orthotropicLinearElastic::K() const
       K[celli].zz() = C_[celli].zzzz();
     }
 
-  tresult().correctBoundaryConditions();
-  
+  K.correctBoundaryConditions();
+
   return tresult;
 }
 

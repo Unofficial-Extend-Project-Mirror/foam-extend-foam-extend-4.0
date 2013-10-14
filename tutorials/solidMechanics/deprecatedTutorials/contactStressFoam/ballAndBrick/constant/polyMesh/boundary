@@ -1,0 +1,92 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+10
+(
+    bottomBrickDown
+    {
+        type            symmetryPlane;
+        physicalType    symmetryPlane;
+        nFaces          20;
+        startFace       740;
+    }
+    bottomBrickUp
+    {
+        type            patch;
+        physicalType    masterContact;
+        nFaces          20;
+        startFace       760;
+    }
+    topBrickDown
+    {
+        type            patch;
+        physicalType    slaveContact;
+        nFaces          20;
+        startFace       780;
+    }
+    topBrickUp
+    {
+        type            patch;
+        physicalType    traction;
+        nFaces          20;
+        startFace       800;
+    }
+    bottomBrickLeft
+    {
+        type            patch;
+        physicalType    traction;
+        nFaces          10;
+        startFace       820;
+    }
+    bottomBrickRight
+    {
+        type            patch;
+        physicalType    traction;
+        nFaces          10;
+        startFace       830;
+    }
+    topBrickLeft
+    {
+        type            patch;
+        physicalType    traction;
+        nFaces          10;
+        startFace       840;
+    }
+    topBrickRight
+    {
+        type            patch;
+        physicalType    traction;
+        nFaces          10;
+        startFace       850;
+    }
+    back
+    {
+        type            empty;
+        physicalType    empty;
+        nFaces          400;
+        startFace       860;
+    }
+    front
+    {
+        type            empty;
+        physicalType    empty;
+        nFaces          400;
+        startFace       1260;
+    }
+)
+
+// ************************************************************************* //

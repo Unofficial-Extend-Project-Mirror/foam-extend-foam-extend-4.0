@@ -1,0 +1,57 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    D GAMG
+    {
+        tolerance        1e-06;
+        relTol           0.99;
+
+        smoother         GaussSeidel;
+
+        cacheAgglomeration true;
+
+        nCellsInCoarsestLevel 6;
+
+        agglomerator     faceAreaPair;
+        mergeLevels      1;
+    };
+
+    Dcorr GAMG
+    {
+        tolerance        1e-06;
+        relTol           0.99;
+
+        smoother         GaussSeidel;
+
+        cacheAgglomeration true;
+
+        nCellsInCoarsestLevel 6;
+
+        agglomerator     faceAreaPair;
+        mergeLevels      1;
+    };
+}
+
+stressAnalysis
+{
+    nCorrectors        1;
+    D                  1e-10;
+    accelerationFactor 2;
+}
+
+// ************************************************************************* //

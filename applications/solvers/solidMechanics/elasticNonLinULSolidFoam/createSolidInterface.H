@@ -4,7 +4,7 @@ solidInterface* solidInterfacePtr(NULL);
 
 {
     const dictionary& stressControl =
-      mesh.solutionDict().subDict("stressedFoam");
+      mesh.solutionDict().subDict("solidMechanics");
 
     solidInterfaceCorr = Switch(stressControl.lookup("solidInterface"));
 

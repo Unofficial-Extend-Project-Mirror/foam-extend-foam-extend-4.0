@@ -47,6 +47,7 @@ Author
 #include "leastSquaresVolPointInterpolation.H"
 #include "processorFvPatchFields.H"
 #include "transformGeometricField.H"
+#include "symmetryPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -60,6 +61,7 @@ int main(int argc, char *argv[])
 # include "readDivDSigmaLargeStrainExpMethod.H"
 # include "readMoveMeshMethod.H"
 # include "createSolidInterfaceNonLin.H"
+# include "findGlobalFaceZones.H"
 
 //* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -69,25 +71,22 @@ int main(int argc, char *argv[])
     {
       Info<< "Time = " << runTime.timeName() << nl << endl;
       	  
-#     include "readStressedFoamControls.H"
+#     include "readSolidMechanicsControls.H"
 
       int iCorr = 0;
       lduMatrix::solverPerformance solverPerf;
-      scalar initialResidual = 0;
+      scalar initialResidual = 1.0;
       scalar relativeResidual = 1.0;
       lduMatrix::debug = 0;
       
       do
 	{ 
 	  DU.storePrevIter();
-	  divDSigmaLargeStrainExp.storePrevIter();
 
 #         include "calculateDivDSigmaExp.H"
 #         include "calculateDivDSigmaLargeStrainExp.H"
 
-	  //----------------------------------------------------//
 	  //- updated lagrangian large strain momentum equation
-	  //----------------------------------------------------//
 	  fvVectorMatrix DUEqn
 	    (
 	     fvm::d2dt2(rho,DU)
@@ -111,7 +110,6 @@ int main(int argc, char *argv[])
 	 
 	  DU.relax();
 	  
-	  //gradDU = solidInterfacePtr->grad(DU);
 	  gradDU = fvc::grad(DU);
 	  
 #         include "calculateDEpsilonDSigma.H"

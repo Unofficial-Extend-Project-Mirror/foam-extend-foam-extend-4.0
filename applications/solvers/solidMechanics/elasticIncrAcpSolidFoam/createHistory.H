@@ -1,5 +1,5 @@
 OFstream * filePtr(NULL);
-word historyPatchName(mesh.solutionDict().subDict("stressedFoam").lookup("historyPatch"));
+word historyPatchName(mesh.solutionDict().subDict("solidMechanics").lookup("historyPatch"));
 label historyPatchID = mesh.boundaryMesh().findPatchID(historyPatchName);
 if(historyPatchID == -1)
   {

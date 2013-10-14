@@ -47,6 +47,8 @@ typedef fvsPatchField<scalar> fvsPatchScalarField;
 typedef fvsPatchField<vector> fvsPatchVectorField;
 typedef fvsPatchField<sphericalTensor> fvsPatchSphericalTensorField;
 typedef fvsPatchField<symmTensor> fvsPatchSymmTensorField;
+typedef fvsPatchField<symmTensor4thOrder> fvsPatchSymmTensor4thOrderField;
+typedef fvsPatchField<diagTensor> fvsPatchDiagTensorField;
 typedef fvsPatchField<tensor> fvsPatchTensorField;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

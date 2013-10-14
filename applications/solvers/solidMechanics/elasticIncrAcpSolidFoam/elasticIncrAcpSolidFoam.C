@@ -35,11 +35,9 @@ Author
     Philip Cardiff UCD
 
 \*---------------------------------------------------------------------------*/
-//#define DEBUG Info<<"In file "<<__FILE__<<" at line "<<__LINE__<<endl;
-
 #include "fvCFD.H"
 #include "constitutiveModel.H"
-#include "componentReferenceList.H"
+//#include "componentReferenceList.H"
 #include "crackerFvMesh.H"
 #include "processorPolyPatch.H"
 #include "SortableList.H"
@@ -71,7 +69,7 @@ int main(int argc, char *argv[])
   
   while (runTime.run())
     {
-#     include "readStressedFoamControls.H"
+#     include "readSolidMechanicsControls.H"
 #     include "setDeltaT.H"
       
       runTime++;

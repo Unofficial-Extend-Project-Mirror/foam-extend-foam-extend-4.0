@@ -74,13 +74,13 @@ void Foam::leastSquaresSolidInterfaceVectors::makeLeastSquaresVectors() const
         IOobject
         (
             "LeastSquaresP",
-            mesh_.pointsInstance(),
-            mesh_,
+            mesh().pointsInstance(),
+            mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE,
             false
         ),
-        mesh_,
+        mesh(),
         dimensionedVector("zero", dimless/dimLength, vector::zero)
     );
     surfaceVectorField& lsP = *pVectorsPtr_;
@@ -90,34 +90,34 @@ void Foam::leastSquaresSolidInterfaceVectors::makeLeastSquaresVectors() const
         IOobject
         (
             "LeastSquaresN",
-            mesh_.pointsInstance(),
-            mesh_,
+            mesh().pointsInstance(),
+            mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE,
             false
         ),
-        mesh_,
+        mesh(),
         dimensionedVector("zero", dimless/dimLength, vector::zero)
     );
     surfaceVectorField& lsN = *nVectorsPtr_;
 
     // Set local references to mesh data
-    const unallocLabelList& owner = mesh_.owner();
-    const unallocLabelList& neighbour = mesh_.neighbour();
+    const unallocLabelList& owner = mesh().owner();
+    const unallocLabelList& neighbour = mesh().neighbour();
 
-    const volVectorField& C = mesh_.C();
-    const surfaceScalarField& w = mesh_.weights();
-    //const surfaceScalarField& magSf = mesh_.magSf();
-    const surfaceVectorField& Cf = mesh_.Cf();
+    const volVectorField& C = mesh().C();
+    const surfaceScalarField& w = mesh().weights();
+    //const surfaceScalarField& magSf = mesh().magSf();
+    const surfaceVectorField& Cf = mesh().Cf();
 
     // interface fields
     const solidInterface& solInt =
-      mesh_.objectRegistry::lookupObject<IOReferencer<solidInterface> >("solidInterface")();
+      mesh().objectRegistry::lookupObject<IOReferencer<solidInterface> >("solidInterface")();
     const labelList& interfaceFacesMap = solInt.indicatorFieldMap();
     const labelListList& interfaceProcPatchFacesMap = solInt.processorPatchFacesMap();
 
     // Set up temporary storage for the dd tensor (before inversion)
-    symmTensorField dd(mesh_.nCells(), symmTensor::zero);
+    symmTensorField dd(mesh().nCells(), symmTensor::zero);
 
     forAll(owner, facei)
     {
@@ -162,16 +162,16 @@ void Foam::leastSquaresSolidInterfaceVectors::makeLeastSquaresVectors() const
 
         // Original version: closest distance to boundary
 	// vectorField pd =
-//             mesh_.Sf().boundaryField()[patchi]
+//             mesh().Sf().boundaryField()[patchi]
 //            /(
-//                mesh_.magSf().boundaryField()[patchi]
-//               *mesh_.deltaCoeffs().boundaryField()[patchi]
+//                mesh().magSf().boundaryField()[patchi]
+//               *mesh().deltaCoeffs().boundaryField()[patchi]
 //            );
 
-//         if (!mesh_.orthogonal())
+//         if (!mesh().orthogonal())
 //         {
-//             pd -= mesh_.correctionVectors().boundaryField()[patchi]
-//                 /mesh_.deltaCoeffs().boundaryField()[patchi];
+//             pd -= mesh().correctionVectors().boundaryField()[patchi]
+//                 /mesh().deltaCoeffs().boundaryField()[patchi];
 // 		}
 
         // Better version of d-vectors: Zeljko Tukovic, 25/Apr/2010

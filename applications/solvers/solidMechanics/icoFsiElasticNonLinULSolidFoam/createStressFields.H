@@ -103,7 +103,7 @@
 
     word solidDdtScheme
     (
-        stressMesh.ddtScheme("ddt(" + DU.name() +')')
+     stressMesh.schemesDict().ddtScheme("ddt(" + DU.name() +')')
     );
 
 //     if

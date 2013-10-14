@@ -1,0 +1,36 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    U               ICCG 1e-05 0.01;
+}
+
+stressedFoam
+{
+    nCorrectors     1;
+    U               1e-06;
+}
+
+contactPatch
+{
+    contactUnderrelaxation 0.2;
+    touchTolerance  5e-06;
+    gradPatchID     1;
+    dirPatchID      2;
+}
+
+// ************************************************************************* //

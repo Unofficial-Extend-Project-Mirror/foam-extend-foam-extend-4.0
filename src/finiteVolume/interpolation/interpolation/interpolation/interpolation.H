@@ -158,6 +158,8 @@ makeInterpolationType(SS, scalar)                                              \
 makeInterpolationType(SS, vector)                                              \
 makeInterpolationType(SS, sphericalTensor)                                     \
 makeInterpolationType(SS, symmTensor)                                          \
+makeInterpolationType(SS, symmTensor4thOrder)                                  \
+makeInterpolationType(SS, diagTensor)                                          \
 makeInterpolationType(SS, tensor)
 
 

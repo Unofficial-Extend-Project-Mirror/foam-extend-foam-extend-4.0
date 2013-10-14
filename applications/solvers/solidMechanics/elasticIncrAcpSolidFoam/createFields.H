@@ -160,7 +160,3 @@ constitutiveModel rheology(sigma, DU);
 // aitken relaxation factor
 scalar aitkenInitialRes = 1.0;
 scalar aitkenTheta = 0.1;
-if(mesh.relax(DU.name()))
-  {
-    aitkenTheta = mesh.relaxationFactor(DU.name());
-  }

@@ -51,6 +51,9 @@ typedef fixedValueCorrectedFvPatchField<vector> fixedValueCorrectedFvPatchVector
 typedef fixedValueCorrectedFvPatchField<tensor> fixedValueCorrectedFvPatchTensorField;
 typedef fixedValueCorrectedFvPatchField<sphericalTensor> fixedValueCorrectedFvPatchSphericalTensorField;
 typedef fixedValueCorrectedFvPatchField<symmTensor> fixedValueCorrectedFvPatchSymmTensorField;
+typedef fixedValueCorrectedFvPatchField<symmTensor4thOrder>
+    fixedValueCorrectedFvPatchSymmTensor4thOrderField;
+typedef fixedValueCorrectedFvPatchField<diagTensor> fixedValueCorrectedFvPatchDiagTensorField;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

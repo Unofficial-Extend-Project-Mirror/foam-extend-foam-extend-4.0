@@ -177,6 +177,12 @@ template<>
 void engineTimeVaryingUniformFixedValueFvPatchField<symmTensor>::updateCoeffs();
 
 template<>
+void engineTimeVaryingUniformFixedValueFvPatchField<symmTensor4thOrder>::updateCoeffs();
+
+template<>
+void engineTimeVaryingUniformFixedValueFvPatchField<diagTensor>::updateCoeffs();
+
+template<>
 void engineTimeVaryingUniformFixedValueFvPatchField<tensor>::updateCoeffs();
 
 

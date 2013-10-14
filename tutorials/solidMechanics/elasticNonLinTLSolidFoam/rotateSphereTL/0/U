@@ -23,11 +23,12 @@ boundaryField
 {
   surface
     {
-      type            fixedRotation;
-      rotationAngle   1;
+      type            timeVaryingFixedRotation;
       rotationAxis    ( 0 0 1 );
       rotationOrigin  ( 0 0 0 );
-      value uniform   ( 0 0 0 );
+      fileName        "$FOAM_CASE/constant/timeVsAngle";
+      outOfBounds     clamp;
+      value           uniform   ( 0 0 0 );
     }
 }
 

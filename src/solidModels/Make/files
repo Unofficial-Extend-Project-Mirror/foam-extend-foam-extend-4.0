@@ -21,6 +21,7 @@ $(boundaryConditions)/timeVaryingSolidTraction/timeVaryingSolidTractionFvPatchVe
 $(boundaryConditions)/timeVaryingFixedDisplacement/timeVaryingFixedDisplacementFvPatchVectorField.C
 $(boundaryConditions)/timeVaryingFixedDisplacementZeroShear/timeVaryingFixedDisplacementZeroShearFvPatchVectorField.C
 $(boundaryConditions)/timeVaryingFixedRotation/timeVaryingFixedRotationFvPatchVectorField.C
+$(boundaryConditions)/transitionalParabolicVelocity/transitionalParabolicVelocityFvPatchVectorField.C
 
 cohesiveLaws = $(constitutiveModel)/cohesiveLaws
 $(cohesiveLaws)/cohesiveLaw/cohesiveLaw.C

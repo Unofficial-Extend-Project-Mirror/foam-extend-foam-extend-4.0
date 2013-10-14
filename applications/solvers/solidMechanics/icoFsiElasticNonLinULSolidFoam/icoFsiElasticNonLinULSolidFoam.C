@@ -64,28 +64,22 @@ Author
 #include "twoDPointCorrector.H"
 #include "scalarIOField.H"
 #include "leastSquaresVolPointInterpolation.H"
+#include "symmetryPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
 #   include "setRootCase.H"
-
 #   include "createTime.H"
-
 #   include "createDynamicFvMesh.H"
-
 #   include "createFields.H"
-
 #   include "createStressMesh.H"
-
 #   include "createStressFields.H"
-
 #   include "readCouplingProperties.H"
-
 #   include "createZoneToZoneInterpolators.H"
-
 #   include "initContinuityErrs.H"
+#   include "findGlobalFaceZones.H"
 
 //* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -130,10 +124,7 @@ int main(int argc, char *argv[])
         Vs += DV;
 
 #       include "rotateSolidFields.H"
-
-	//#       include "moveSolidMesh.H"
 #       include "moveSolidMeshLeastSquares.H"
-
 #       include "calculateStress.H"
 
 	//#       include "calculateLiftAndDrag.H"

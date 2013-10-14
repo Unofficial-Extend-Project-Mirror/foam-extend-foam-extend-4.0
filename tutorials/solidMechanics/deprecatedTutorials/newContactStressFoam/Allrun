@@ -1,0 +1,13 @@
+#!/bin/sh
+
+currDir=`pwd`
+application=`basename $currDir`
+case="ballAndBrickFriction"
+
+tutorialPath=`dirname $0`/..
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+(cd $case; runApplication blockMesh)
+(cd $case; runApplication setFields)
+(cd $case; runApplication $application)
+(cd $case; runApplication deformedGeom  1.0)

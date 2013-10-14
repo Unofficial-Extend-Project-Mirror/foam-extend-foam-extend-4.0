@@ -1,9 +1,3 @@
-if(mesh.relax(divDSigmaNonLinExp.name()))
-  {
-    divDSigmaNonLinExp.storePrevIter();
-    gradDU.storePrevIter();
-  }
-
 if(divDSigmaNonLinExpMethod == "standard")
   {
     divDSigmaNonLinExp = fvc::div
@@ -30,5 +24,3 @@ if(divDSigmaNonLinExpMethod == "standard")
    {
      FatalError << "divDSigmaExp method " << divDSigmaExpMethod << " not found!" << endl;
    }
-
-divDSigmaNonLinExp.relax();

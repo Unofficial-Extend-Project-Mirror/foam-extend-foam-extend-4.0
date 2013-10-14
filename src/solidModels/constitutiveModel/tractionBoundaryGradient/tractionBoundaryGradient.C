@@ -443,61 +443,61 @@ defineTypeNameAndDebug(tractionBoundaryGradient, 0);
 
 	    // lookup gradUPrevIter
 	    // NOTE: grad(DU/U).storePrevIter() must be present in the solver
-	    if(mesh.relax("divDSigmaNonLinExp"))
-	      {
-		const tensorField& gradFieldPrevIter =
-		  mesh.objectRegistry::lookupObject<volTensorField>("grad("+fieldName+")PrevIter").boundaryField()[patch.index()];
+	    // if(mesh.relax("divDSigmaNonLinExp"))
+// 	      {
+// 		const tensorField& gradFieldPrevIter =
+// 		  mesh.objectRegistry::lookupObject<volTensorField>("grad("+fieldName+")PrevIter").boundaryField()[patch.index()];
 		
-		// lookup relaxation factor
-		//scalar relaxFactorNonLin = 1.0;
-		//if(mesh.relax("divDSigmaNonLinExp"))
-		//{
-		scalar relaxFactorNonLin = mesh.relaxationFactor("divDSigmaNonLinExp");
-		    //Info << "relaxFactorNonLin is " << relaxFactorNonLin << endl;
-		//  }
+// 		// lookup relaxation factor
+// 		//scalar relaxFactorNonLin = 1.0;
+// 		//if(mesh.relax("divDSigmaNonLinExp"))
+// 		//{
+// 		scalar relaxFactorNonLin = mesh.relaxationFactor("divDSigmaNonLinExp");
+// 		    //Info << "relaxFactorNonLin is " << relaxFactorNonLin << endl;
+// 		//  }
 
-		vectorField newHigherOrderTerm =
-		  -(n & (mu*(gradField & gradField.T())))
-		  - 0.5*n*lambda*(gradField && gradField);
+// 		vectorField newHigherOrderTerm =
+// 		  -(n & (mu*(gradField & gradField.T())))
+// 		  - 0.5*n*lambda*(gradField && gradField);
 		
-		vectorField prevHigherOrderTerm =
-		  -(n & (mu*(gradFieldPrevIter & gradFieldPrevIter.T())))
-		  - 0.5*n*lambda*(gradFieldPrevIter && gradFieldPrevIter);
+// 		vectorField prevHigherOrderTerm =
+// 		  -(n & (mu*(gradFieldPrevIter & gradFieldPrevIter.T())))
+// 		  - 0.5*n*lambda*(gradFieldPrevIter && gradFieldPrevIter);
 		
-		if(fieldName == "DU" && nonLinear == "totalLagrangian") // for incr TL
-		  {
-		    // gradU is const in a time step
-		    const fvPatchField<tensor>& gradU =
-		      patch.lookupPatchField<volTensorField, tensor>("grad(U)");
+// 		if(fieldName == "DU" && nonLinear == "totalLagrangian") // for incr TL
+// 		  {
+// 		    // gradU is const in a time step
+// 		    const fvPatchField<tensor>& gradU =
+// 		      patch.lookupPatchField<volTensorField, tensor>("grad(U)");
 		    
-		    // gradient -=
-		    //   (n &
-		    //    (mu*( (gradField & gradU.T())
-		    // 	 + (gradU & gradField.T()) ))
-		    //    )
-		    //   + 0.5*n*lambda*tr( (gradField & gradU.T())
-		    // 		     + (gradU & gradField.T()) );
+// 		    // gradient -=
+// 		    //   (n &
+// 		    //    (mu*( (gradField & gradU.T())
+// 		    // 	 + (gradU & gradField.T()) ))
+// 		    //    )
+// 		    //   + 0.5*n*lambda*tr( (gradField & gradU.T())
+// 		    // 		     + (gradU & gradField.T()) );
 		    
-		    newHigherOrderTerm -=
-		      (n &
-		       (mu*( (gradField & gradU.T())
-			     + (gradU & gradField.T()) ))
-		       )
-		      + 0.5*n*lambda*tr( (gradField & gradU.T())
-					 + (gradU & gradField.T()) );
+// 		    newHigherOrderTerm -=
+// 		      (n &
+// 		       (mu*( (gradField & gradU.T())
+// 			     + (gradU & gradField.T()) ))
+// 		       )
+// 		      + 0.5*n*lambda*tr( (gradField & gradU.T())
+// 					 + (gradU & gradField.T()) );
 		    
-		    prevHigherOrderTerm -=
-		      (n &
-		       (mu*( (gradFieldPrevIter & gradU.T())
-			     + (gradU & gradFieldPrevIter.T()) ))
-		       )
-		      + 0.5*n*lambda*tr( (gradFieldPrevIter & gradU.T())
-					 + (gradU & gradFieldPrevIter.T()) );
-		  }
+// 		    prevHigherOrderTerm -=
+// 		      (n &
+// 		       (mu*( (gradFieldPrevIter & gradU.T())
+// 			     + (gradU & gradFieldPrevIter.T()) ))
+// 		       )
+// 		      + 0.5*n*lambda*tr( (gradFieldPrevIter & gradU.T())
+// 					 + (gradU & gradFieldPrevIter.T()) );
+// 		  }
 
-		gradient += relaxFactorNonLin*newHigherOrderTerm + (1.0-relaxFactorNonLin)*prevHigherOrderTerm;
-	      }
-	    else
+// 		gradient += relaxFactorNonLin*newHigherOrderTerm + (1.0-relaxFactorNonLin)*prevHigherOrderTerm;
+// 	      }
+// 	    else
 	      {
 		// no extra relaxation
 		gradient -=

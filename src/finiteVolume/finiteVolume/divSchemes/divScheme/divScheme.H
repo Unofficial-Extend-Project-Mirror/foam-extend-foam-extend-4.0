@@ -179,6 +179,8 @@ divScheme<Type>::addIstreamConstructorToTable<SS<Type> >                      \
 makeFvDivTypeScheme(SS, vector)                                               \
 makeFvDivTypeScheme(SS, sphericalTensor)                                      \
 makeFvDivTypeScheme(SS, symmTensor)                                           \
+makeFvDivTypeScheme(SS, symmTensor4thOrder)                                   \
+makeFvDivTypeScheme(SS, diagTensor)                                           \
 makeFvDivTypeScheme(SS, tensor)
 
 

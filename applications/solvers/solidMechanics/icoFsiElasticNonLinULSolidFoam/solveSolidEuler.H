@@ -1,5 +1,5 @@
     {
-#       include "readStressedFoamControls.H"
+#       include "readSolidMechanicsControls.H"
 
         int iCorr = 0;
         lduMatrix::solverPerformance solverPerf;

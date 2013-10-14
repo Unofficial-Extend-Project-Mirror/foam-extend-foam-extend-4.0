@@ -7,11 +7,7 @@ aitkenDelta = (U - U.prevIter()) / aitkenInitialRes;
 // update relaxation factor
 if(iCorr == 0)
   {
-    aitkenTheta = 0.01;
-    if(mesh.relax(U.name()))
-      {
-	aitkenTheta = mesh.relaxationFactor(U.name());
-      }
+    aitkenTheta = 0.1;
   }
  else
    {

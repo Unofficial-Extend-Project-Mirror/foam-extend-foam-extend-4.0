@@ -38,7 +38,7 @@ Description
     
 Author
     Philip Cardiff UCD
-    philip.cardiff@gmail.com
+    Aitken relaxation by T. Tang DTU 
 
 \*---------------------------------------------------------------------------*/
 
@@ -53,6 +53,7 @@ Author
 #include "transformGeometricField.H"
 #include "solidContactFvPatchVectorField.H"
 #include "pointMesh.H"
+#include "symmetryPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -66,6 +67,7 @@ int main(int argc, char *argv[])
 # include "readDivDSigmaExpMethod.H"
 # include "readDivDSigmaNonLinExpMethod.H"
 # include "readMoveMeshMethod.H"
+# include "findGlobalFaceZones.H"
 
 //* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -75,7 +77,7 @@ int main(int argc, char *argv[])
     {
       Info<< "Time = " << runTime.timeName() << nl << endl;
       	  
-#     include "readStressedFoamControls.H"
+#     include "readSolidMechanicsControls.H"
 
       int iCorr = 0;
       lduMatrix::solverPerformance solverPerf;

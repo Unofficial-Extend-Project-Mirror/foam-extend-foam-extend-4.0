@@ -1,0 +1,100 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    location    "0";
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    bottomBrickDown
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+    bottomBrickUp
+    {
+        type            directionMixed;
+        refValue        uniform (0 0 0);
+        refGradient     uniform (0 0 0);
+        valueFraction   uniform (0 0 0 0 0 0);
+        value           uniform (0 0 0);
+    }
+    topBrickDown
+    {
+        type            directionMixed;
+        refValue        uniform (0 0 0);
+        refGradient     uniform (0 0 0);
+        valueFraction   uniform (0 0 0 0 0 0);
+        value           uniform (0 0 0);
+    }
+    topBrickUp
+    {
+        type            tractionDisplacement;
+        U               U;
+        rheology        rheologyProperties;
+        traction        uniform ( 1.4e+08 0 0 );
+        pressure        uniform 1e+09;
+        value           uniform (0 0 0);
+    }
+    bottomBrickLeft
+    {
+        type            tractionDisplacement;
+        U               U;
+        rheology        rheologyProperties;
+        traction        uniform ( 0 0 0 );
+        pressure        uniform 0;
+        value           uniform (0 0 0);
+    }
+    bottomBrickRight
+    {
+        type            tractionDisplacement;
+        U               U;
+        rheology        rheologyProperties;
+        traction        uniform ( 0 0 0 );
+        pressure        uniform 0;
+        value           uniform (0 0 0);
+    }
+    topBrickLeft
+    {
+        type            tractionDisplacement;
+        U               U;
+        rheology        rheologyProperties;
+        traction        uniform ( 0 0 0 );
+        pressure        uniform 0;
+        value           uniform (0 0 0);
+    }
+    topBrickRight
+    {
+        type            tractionDisplacement;
+        U               U;
+        rheology        rheologyProperties;
+        traction        uniform ( 0 0 0 );
+        pressure        uniform 0;
+        value           uniform (0 0 0);
+    }
+    back
+    {
+        type            empty;
+    }
+    front
+    {
+        type            empty;
+    }
+}
+
+// ************************************************************************* //

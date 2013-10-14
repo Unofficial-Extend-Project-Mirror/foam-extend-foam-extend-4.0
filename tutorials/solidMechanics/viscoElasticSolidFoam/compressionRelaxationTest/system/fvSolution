@@ -1,25 +1,18 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.0                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           dictionary;
-    object          fvSolution;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 solvers
@@ -28,22 +21,29 @@ solvers
     {
         solver          PCG;
         preconditioner  DIC;
-        tolerance       1e-09;
-        relTol          0.001;
+        tolerance       1e-07;
+        relTol          0.1;
     }
 }
 
-stressedFoam
+solidMechanics
 {
-    nCorrectors         5000;
-    DU                  1e-06;
+    nCorrectors           10000;
+    DU                     1e-06;
+    //divSigmaExp           standard;
+    divSigmaExp           surface;
+    //divSigmaExp           decompose;
+    //divSigmaExp           laplacian;
+    historyPatch          loading;
+    solidInterfaceMethod  none;
+    predictor             yes;
+    infoFrequency         100;
+    aitkenRelaxation      yes;
+    gravity               ( 0 -9.81 0 );
 }
-
 
 relaxationFactors
 {
-//    DU 0.7;
+  //DU   0.9;
 }
-
-
 // ************************************************************************* //

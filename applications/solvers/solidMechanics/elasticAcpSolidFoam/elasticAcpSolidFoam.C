@@ -50,7 +50,6 @@ Author
 #include "solidInterface.H"
 #include "solidCohesiveFvPatchVectorField.H"
 #include "solidCohesiveFixedModeMixFvPatchVectorField.H"
-#include "clipGauge.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -83,7 +82,7 @@ int main(int argc, char *argv[])
   
   while (runTime.run())
     {
-#     include "readStressedFoamControls.H"
+#     include "readSolidMechanicsControls.H"
 #     include "setDeltaT.H"
       
       runTime++;

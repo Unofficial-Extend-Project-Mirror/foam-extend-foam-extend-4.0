@@ -227,6 +227,8 @@ makeSurfaceInterpolationTypeScheme(SS, scalar)                                 \
 makeSurfaceInterpolationTypeScheme(SS, vector)                                 \
 makeSurfaceInterpolationTypeScheme(SS, sphericalTensor)                        \
 makeSurfaceInterpolationTypeScheme(SS, symmTensor)                             \
+makeSurfaceInterpolationTypeScheme(SS, symmTensor4thOrder)                     \
+makeSurfaceInterpolationTypeScheme(SS, diagTensor)                             \
 makeSurfaceInterpolationTypeScheme(SS, tensor)
 
 

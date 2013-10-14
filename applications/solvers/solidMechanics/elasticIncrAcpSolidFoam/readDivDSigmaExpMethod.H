@@ -1,5 +1,5 @@
 //- how explicit component of sigma is to be calculated
-word divDSigmaExpMethod(mesh.solutionDict().subDict("stressedFoam").lookup("divDSigmaExp"));
+word divDSigmaExpMethod(mesh.solutionDict().subDict("solidMechanics").lookup("divDSigmaExp"));
 Info << "Selecting divDSigmaExp calculation method " << divDSigmaExpMethod <<  endl;
 if(divDSigmaExpMethod != "standard" && divDSigmaExpMethod != "surface" && divDSigmaExpMethod != "decompose" && divDSigmaExpMethod != "laplacian")
   {

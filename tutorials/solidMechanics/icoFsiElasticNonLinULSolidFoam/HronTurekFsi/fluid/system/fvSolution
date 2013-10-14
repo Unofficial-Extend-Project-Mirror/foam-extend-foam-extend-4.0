@@ -1,79 +1,72 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.3                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           dictionary;
-    object          fvSolution;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 solvers
 {
 
-    p
-    {
-        solver          GAMG;
-        tolerance       1e-06;
-        relTol          0;
-        minIter         1;
-        maxIter         1000;
-        smoother        GaussSeidel;
-        nPreSweeps      0;
-        nPostSweeps     2;
-        nFinestSweeps   2;
-        scaleCorrection true;
-        directSolveCoarsest false;
-        cacheAgglomeration true;
-        nCellsInCoarsestLevel 20;
-        agglomerator    faceAreaPair;
-        mergeLevels     1;
-    };
+	p
+	{
+		solver          GAMG;
+    		tolerance       1e-06;
+    		relTol          0;
+    		minIter         1;
+    		maxIter         1000;
+    		smoother        GaussSeidel;
+    		nPreSweeps      0;
+    		nPostSweeps     2;
+    		nFinestSweeps   2;
+    		scaleCorrection true;
+    		directSolveCoarsest false;
+    		cacheAgglomeration true;
+    		nCellsInCoarsestLevel 20;
+    		agglomerator    faceAreaPair;
+    		mergeLevels     1;
+	};
 
-    cellMotionU
-    {
-        solver          GAMG;
-        tolerance        1e-6;
-        relTol           1e-3;
-        minIter          1;
-        maxIter          1000;
+	cellMotionU
+    	{
+		solver          GAMG;
+        	tolerance        1e-6;
+        	relTol           1e-3;
+        	minIter          1;
+        	maxIter          1000;
 
-        smoother         GaussSeidel;
-        nPreSweeps       0;
-        nPostSweeps      2;
-        nFinestSweeps    2;
+        	smoother         GaussSeidel;
+        	nPreSweeps       0;
+        	nPostSweeps      2;
+        	nFinestSweeps    2;
+		
+        	scaleCorrection true;
+        	directSolveCoarsest false;
+				   		      
+        	 cacheAgglomeration true;
 
-        scaleCorrection true;
-        directSolveCoarsest false;
+		 nCellsInCoarsestLevel 20;
+        	 agglomerator     faceAreaPair;
+        	 mergeLevels      1;
+        };
 
-         cacheAgglomeration true;
-
-         nCellsInCoarsestLevel 20;
-         agglomerator     faceAreaPair;
-         mergeLevels      1;
-    };
-
-    U
-    {
-        solver PBiCG;
-        preconditioner   DILU;
-        tolerance        1e-06;
-        relTol           0;
-    };
+    	U
+    	{
+		solver PBiCG;
+		preconditioner   DILU;
+        	tolerance        1e-06;
+        	relTol           0;
+    	};
 }
 
 PISO

@@ -1,0 +1,7 @@
+EXE_INC = \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -ItractionDisplacement/lnInclude
+
+EXE_LIBS = \
+    -lfiniteVolume \
+    -llduSolvers

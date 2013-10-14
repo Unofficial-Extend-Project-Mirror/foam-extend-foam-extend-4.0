@@ -1,0 +1,82 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+10
+(
+    bottomBrickDown
+    {
+        type            patch;
+        nFaces          20;
+        startFace       740;
+    }
+    bottomBrickUp
+    {
+        type            patch;
+        nFaces          20;
+        startFace       760;
+    }
+    topBrickDown
+    {
+        type            patch;
+        nFaces          20;
+        startFace       780;
+    }
+    topBrickUp
+    {
+        type            patch;
+        nFaces          20;
+        startFace       800;
+    }
+    bottomBrickLeft
+    {
+        type            patch;
+        nFaces          10;
+        startFace       820;
+    }
+    bottomBrickRight
+    {
+        type            patch;
+        nFaces          10;
+        startFace       830;
+    }
+    topBrickLeft
+    {
+        type            patch;
+        nFaces          10;
+        startFace       840;
+    }
+    topBrickRight
+    {
+        type            patch;
+        nFaces          10;
+        startFace       850;
+    }
+    back
+    {
+        type            empty;
+        nFaces          400;
+        startFace       860;
+    }
+    front
+    {
+        type            empty;
+        nFaces          400;
+        startFace       1260;
+    }
+)
+
+// ************************************************************************* //

@@ -557,15 +557,15 @@ solidInterface::solidInterface
   processorPatchFacesPtr_(NULL),
   processorInterfaceUPtr_(NULL),
   indicatorPtr_(NULL),
-  //nonOrthogonalCorrection_(mesh_.solutionDict().subDict("stressedFoam").subDict("solidInterfaceDict").lookup("nonOrthogonalCorrection")),
-  //thermalStress_(mesh_.solutionDict().subDict("stressedFoam").subDict("solidInterfaceDict").lookup("thermalStress")),
-  //nonLinear_(mesh_.solutionDict().subDict("stressedFoam").subDict("solidInterfaceDict").lookup("nonLinear")),
+  //nonOrthogonalCorrection_(mesh_.solutionDict().subDict("solidMechanics").subDict("solidInterfaceDict").lookup("nonOrthogonalCorrection")),
+  //thermalStress_(mesh_.solutionDict().subDict("solidMechanics").subDict("solidInterfaceDict").lookup("thermalStress")),
+  //nonLinear_(mesh_.solutionDict().subDict("solidMechanics").subDict("solidInterfaceDict").lookup("nonLinear")),
   indicatorFieldMapPtr_(NULL),
   processorPatchMapPtr_(NULL),
   processorPatchFacesMapPtr_(NULL) //,
   // tangGradMethod_
   // (
-  //    tangGradMethodNames_.read(mesh_.solutionDict().subDict("stressedFoam").subDict("solidInterfaceDict").lookup("tangentialGradientMethod"))
+  //    tangGradMethodNames_.read(mesh_.solutionDict().subDict("solidMechanics").subDict("solidInterfaceDict").lookup("tangentialGradientMethod"))
   //  )
 {
   //muPtr_ = new volScalarField(rheology_.mu());

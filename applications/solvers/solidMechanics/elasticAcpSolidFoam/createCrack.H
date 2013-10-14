@@ -66,7 +66,7 @@
     // limit crack to specified boxes
     {
       const dictionary& stressControl =
-	mesh.solutionDict().subDict("stressedFoam");
+	mesh.solutionDict().subDict("solidMechanics");
       
       List<boundBox> userBoxes(stressControl.lookup("crackLimitingBoxes"));
       const surfaceVectorField& Cf = mesh.Cf();
@@ -151,14 +151,14 @@
 
     if 
     (
-        mesh.solutionDict().subDict("stressedFoam")
+        mesh.solutionDict().subDict("solidMechanics")
        .found("initialiseSolution")
     )
     {
         initialiseSolution =
             Switch
             (
-                mesh.solutionDict().subDict("stressedFoam").lookup
+                mesh.solutionDict().subDict("solidMechanics").lookup
                 (
                     "initialiseSolution"
                 )
@@ -170,14 +170,14 @@
 
     if 
     (
-        mesh.solutionDict().subDict("stressedFoam")
+        mesh.solutionDict().subDict("solidMechanics")
        .found("breakOnlyOneFacePerTopologyChange")
     )
     {
         breakOnlyOneFacePerTopologyChange =
             Switch
             (
-                mesh.solutionDict().subDict("stressedFoam").lookup
+                mesh.solutionDict().subDict("solidMechanics").lookup
                 (
                     "breakOnlyOneFacePerTopologyChange"
                 )
@@ -187,7 +187,7 @@
 
     Switch crackPropagationFromSpecifiedPatches
     (
-        mesh.solutionDict().subDict("stressedFoam").lookup
+        mesh.solutionDict().subDict("solidMechanics").lookup
         (
             "crackPropagationFromSpecifiedPatches"
         )
@@ -195,7 +195,7 @@
 
     wordList crackPropagationPatchNames
     (
-        mesh.solutionDict().subDict("stressedFoam").lookup
+        mesh.solutionDict().subDict("solidMechanics").lookup
         (
             "crackPropagationPatches"
         )

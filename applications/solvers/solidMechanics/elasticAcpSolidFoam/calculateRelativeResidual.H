@@ -8,5 +8,5 @@
            /(maxDU + SMALL)
         );
 
-    resid = (U - U.prevIter())/(max(mag(U-U.oldTime()))+dimensionedScalar("SMALL", dimLength, SMALL));
+    //resid = (U - U.prevIter())/(max(mag(U-U.oldTime()))+dimensionedScalar("SMALL", dimLength, SMALL));
 }

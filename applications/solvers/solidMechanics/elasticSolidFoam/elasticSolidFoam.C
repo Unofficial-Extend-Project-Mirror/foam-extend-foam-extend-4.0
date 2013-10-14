@@ -45,7 +45,6 @@ Author
 #include "fvCFD.H"
 #include "constitutiveModel.H"
 #include "solidInterface.H"
-#include "clipGauge.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -67,13 +66,13 @@ int main(int argc, char *argv[])
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
       
-#     include "readStressedFoamControls.H"
+#     include "readSolidMechanicsControls.H"
 
       int iCorr = 0;
-      scalar initialResidual = 0;
       lduMatrix::solverPerformance solverPerf;
-      scalar relativeResidual = 1;
-      lduMatrix::debug=0;
+      scalar initialResidual = 1.0;
+      scalar relativeResidual = 1.0;
+      lduMatrix::debug = 0;
 
       if (predictor)
         {
