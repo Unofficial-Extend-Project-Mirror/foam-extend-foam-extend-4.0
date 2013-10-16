@@ -105,8 +105,8 @@ Patch0:                 metis-5.0pre2_patch_darwin
     (cd GKlib/trunk && make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC")
     (cd libmetis    && make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC") 
 %else
-    (cd GKlib/trunk && make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC -D_POSIX_C_SOURCE=200809")
-    (cd libmetis    && make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC -D_POSIX_C_SOURCE=200809") 
+    (cd GKlib/trunk && make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC -D_POSIX_C_SOURCE=200809" CC=$CC)
+    (cd libmetis    && make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC -D_POSIX_C_SOURCE=200809"  CC=$CC)
 %endif
 
 %install

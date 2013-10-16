@@ -95,8 +95,15 @@ Patch1:                 ParMGridGen-1.0.patch
 %endif
 
 %build
+    [ -n "$WM_CC" ]         &&  export CC="$WM_CC"
+    [ -n "$WM_CXX" ]        &&  export CXX="$WM_CXX"
+    [ -n "$WM_CFLAGS" ]     &&  export CFLAGS="$WM_CFLAGS"
+    [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
+    [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
+
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
-    make -j $WM_NCOMPPROCS
+
+    make -j $WM_NCOMPPROCS CC=$CC
 
 %install
     # Manual installation
