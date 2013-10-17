@@ -119,7 +119,8 @@ void Foam::cyclicGgiPolyPatch::checkDefinition() const
             << "Master: " << name()
             << " Slave: " << shadowName()
             << " Angle (master to slave): " << rotationAngle() << " deg"
-            << " Axis: " << rotationAxis() << endl;
+            << " Axis: " << rotationAxis()
+            << " Separation: " << separationOffset() << endl;
 
             const polyMesh& mesh = boundaryMesh().mesh();
 
