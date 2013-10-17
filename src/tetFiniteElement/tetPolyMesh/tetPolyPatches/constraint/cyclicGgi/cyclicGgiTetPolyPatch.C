@@ -22,66 +22,31 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Class
-    ggiTetPolyPatch
-
-Description
-    GGI patch.
-
-Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
-
-SourceFiles
-    ggiTetPolyPatch.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef ggiTetPolyPatch_H
-#define ggiTetPolyPatch_H
-
-#include "faceTetPolyPatch.H"
-#include "ggiPolyPatch.H"
+#include "cyclicGgiTetPolyPatch.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-               Class ggiTetPolyPatch Declaration
-\*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-class ggiTetPolyPatch
-:
-    public faceTetPolyPatch
-{
+defineTypeNameAndDebug(cyclicGgiTetPolyPatch, 0);
 
-public:
-
-    //- Runtime type information
-    TypeName(ggiPolyPatch::typeName_());
-
-
-    // Constructors
-
-        //- Construct from polyPatch
-        ggiTetPolyPatch
-        (
-            const polyPatch& patch,
-            const tetPolyBoundaryMesh& bm
-        )
-        :
-            faceTetPolyPatch(patch, bm)
-        {}
-};
+// Add the patch constructor functions to the hash tables
+addToRunTimeSelectionTable
+(
+    faceTetPolyPatch,
+    cyclicGgiTetPolyPatch,
+    polyPatch
+);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

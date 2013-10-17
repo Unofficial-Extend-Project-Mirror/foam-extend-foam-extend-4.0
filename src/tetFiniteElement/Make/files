@@ -12,9 +12,11 @@ emptyTetPolyPatch     = $(constraintTetPolyPatches)/empty
 symmetryTetPolyPatch  = $(constraintTetPolyPatches)/symmetry
 wedgeTetPolyPatch     = $(constraintTetPolyPatches)/wedge
 processorTetPolyPatch = $(constraintTetPolyPatches)/processor
+ggiTetPolyPatch       = $(constraintTetPolyPatches)/ggi
+cyclicGgiTetPolyPatch = $(constraintTetPolyPatches)/cyclicGgi
+mixingPlaneTetPolyPatch = $(constraintTetPolyPatches)/mixingPlane
 globalTetPolyPatch    = $(constraintTetPolyPatches)/global
 wallTetPolyPatch      = $(derivedTetPolyPatches)/wall
-ggiTetPolyPatch       = $(derivedTetPolyPatches)/ggi
 
 MapTetFemFields       = $(tetPolyMesh)/MapTetFemFields
 
@@ -31,10 +33,12 @@ $(coupledFaceTetPolyPatch)/coupledFaceTetPolyPatch.C
 $(processorTetPolyPatch)/processorTetPolyPatchM.C
 $(processorTetPolyPatch)/calcProcessorTetPolyPatchAddr.C
 $(processorTetPolyPatch)/calcProcessorTetPolyPatchPointAddr.C
+$(ggiTetPolyPatch)/ggiTetPolyPatch.C
+$(cyclicGgiTetPolyPatch)/cyclicGgiTetPolyPatch.C
+$(mixingPlaneTetPolyPatch)/mixingPlaneTetPolyPatch.C
 $(globalTetPolyPatch)/globalTetPolyPatch.C
 $(globalTetPolyPatch)/calcGlobalTetPolyPatchAddr.C
 $(wallTetPolyPatch)/wallTetPolyPatch.C
-$(ggiTetPolyPatch)/ggiTetPolyPatch.C
 $(tetPolyBoundaryMesh)/tetPolyBoundaryMesh.C
 $(tetPolyMesh)/tetPolyMeshLduAddressing.C
 $(tetPolyMesh)/tetPolyMesh.C
