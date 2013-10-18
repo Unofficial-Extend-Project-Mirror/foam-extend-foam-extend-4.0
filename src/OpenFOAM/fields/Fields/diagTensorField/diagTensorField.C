@@ -28,6 +28,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "diagTensorField.H"
+#include "transformField.H"
 
 #define TEMPLATE
 #include "FieldFunctionsM.C"
@@ -55,6 +56,61 @@ BINARY_TYPE_OPERATOR(tensor, diagTensor, tensor, -, subtract)
 BINARY_OPERATOR(vector, vector, diagTensor, /, divide)
 BINARY_TYPE_OPERATOR(vector, vector, diagTensor, /, divide)
 
+
+template<>
+tmp<Field<diagTensor> > transformFieldMask<diagTensor>
+(
+    const tensorField& tf
+)
+{
+    tmp<Field<diagTensor> > ret(new Field<diagTensor>(tf.size()));
+
+    ret().component(diagTensor::XX) = tf.component(tensor::XX);
+    ret().component(diagTensor::YY) = tf.component(tensor::YY);
+    ret().component(diagTensor::ZZ) = tf.component(tensor::ZZ);
+
+    return ret;
+}
+
+template<>
+tmp<Field<diagTensor> > transformFieldMask<diagTensor>
+(
+    const tmp<tensorField>& ttf
+)
+{
+    tmp<Field<diagTensor> > ret =
+        transformFieldMask<diagTensor>(ttf());
+    ttf.clear();
+    return ret;
+}
+
+
+template<>
+tmp<Field<diagTensor> > transformFieldMask<diagTensor>
+(
+    const symmTensorField& stf
+)
+{
+    tmp<Field<diagTensor> > ret(new Field<diagTensor>(stf.size()));
+
+    ret().component(diagTensor::XX) = stf.component(symmTensor::XX);
+    ret().component(diagTensor::YY) = stf.component(symmTensor::YY);
+    ret().component(diagTensor::ZZ) = stf.component(symmTensor::ZZ);
+
+    return ret;
+}
+
+template<>
+tmp<Field<diagTensor> > transformFieldMask<diagTensor>
+(
+    const tmp<symmTensorField>& tstf
+)
+{
+    tmp<Field<diagTensor> > ret =
+        transformFieldMask<diagTensor>(tstf());
+    tstf.clear();
+    return ret;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
