@@ -568,6 +568,7 @@ meshes/preservePatchTypes/preservePatchTypes.C
 
 interpolations = interpolations
 interpolation = $(interpolations)/interpolation
+$(interpolations)/splineInterpolateXY/splineInterpolateXY.C
 $(interpolations)/patchToPatchInterpolation/PatchToPatchInterpolationName.C
 $(interpolations)/GGIInterpolation/GGIInterpolationName.C
 $(interpolations)/MixingPlaneInterpolation/MixingPlaneInterpolationName.C
