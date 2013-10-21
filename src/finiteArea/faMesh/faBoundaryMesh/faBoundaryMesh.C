@@ -223,12 +223,13 @@ label faBoundaryMesh::whichPatch(const label edgeIndex) const
 
     forAll (*this, patchI)
     {
-        const faPatch& bp = operator[](patchI);
+        label start = mesh_.patchStarts()[patchI];
+        label size = operator[](patchI).faPatch::size();
 
         if
         (
-            edgeIndex >= bp.start()
-         && edgeIndex < bp.start() + bp.size()
+            edgeIndex >= start
+         && edgeIndex < start + size
         )
         {
             return patchI;
