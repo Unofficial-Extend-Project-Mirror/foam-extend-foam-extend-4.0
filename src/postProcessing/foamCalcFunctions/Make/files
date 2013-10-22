@@ -12,5 +12,6 @@ field/randomise/randomise.C
 field/interpolate/interpolate.C
 
 basic/addSubtract/addSubtract.C
+basic/scalarMult/scalarMult.C
 
 LIB = $(FOAM_LIBBIN)/libfoamCalcFunctions
