@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 #   include "createTime.H"
 #   include "createDynamicFvMesh.H"
 #   include "readGravitationalAcceleration.H"
-#   include "readPISOControls.H"
+#   include "readPIMPLEControls.H"
 #   include "initContinuityErrs.H"
 #   include "createFields.H"
 #   include "readTimeControls.H"
@@ -96,31 +96,36 @@ int main(int argc, char *argv[])
 #           include "meshCourantNo.H"
         }
 
-        twoPhaseProperties.correct();
-
-#       include "alphaEqnSubCycle.H"
-
-#       include "UEqn.H"
-
-        // --- PISO loop
-        for (int corr = 0; corr < nCorr; corr++)
+        // Pressure-velocity corrector
+        int oCorr = 0;
+        do
         {
-#           include "pEqn.H"
-        }
+            twoPhaseProperties.correct();
 
-        p = pd + rho*gh;
+#           include "alphaEqnSubCycle.H"
 
-        if (pd.needReference())
-        {
-            p += dimensionedScalar
-            (
-                "p",
-                p.dimensions(),
-                pRefValue - getRefCellValue(p, pdRefCell)
-            );
-        }
+#           include "UEqn.H"
 
-        turbulence->correct();
+            // --- PISO loop
+            for (int corr = 0; corr < nCorr; corr++)
+            {
+                    #           include "pEqn.H"
+            }
+
+            p = pd + rho*gh;
+
+            if (pd.needReference())
+            {
+                p += dimensionedScalar
+                (
+                    "p",
+                    p.dimensions(),
+                    pRefValue - getRefCellValue(p, pdRefCell)
+                );
+            }
+
+            turbulence->correct();
+        } while (++oCorr < nOuterCorr);
 
         runTime.write();
 

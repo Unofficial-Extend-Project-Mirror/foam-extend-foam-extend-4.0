@@ -1,14 +1,14 @@
 #   include "readTimeControls.H"
-#   include "readPISOControls.H"
+#   include "readPIMPLEControls.H"
 
     bool correctPhi = true;
-    if (piso.found("correctPhi"))
+    if (pimple.found("correctPhi"))
     {
-        correctPhi = Switch(piso.lookup("correctPhi"));
+        correctPhi = Switch(pimple.lookup("correctPhi"));
     }
 
     bool checkMeshCourantNo = false;
-    if (piso.found("checkMeshCourantNo"))
+    if (pimple.found("checkMeshCourantNo"))
     {
-        checkMeshCourantNo = Switch(piso.lookup("checkMeshCourantNo"));
+        checkMeshCourantNo = Switch(pimple.lookup("checkMeshCourantNo"));
     }

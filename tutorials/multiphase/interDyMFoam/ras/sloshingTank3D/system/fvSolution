@@ -91,12 +91,17 @@ solvers
 
 PISO
 {
-    momentumPredictor no;
-    nCorrectors     2;
+    cAlpha          1;
+}
+PIMPLE
+{
+    momentumPredictor yes;
+    
+    nOuterCorrectors 1;
+    nCorrectors     4;
     nNonOrthogonalCorrectors 0;
     nAlphaCorr      1;
     nAlphaSubCycles 3;
-    cAlpha          1.5;
     correctPhi      no;
 
     pdRefPoint      (0 0 0.15);
