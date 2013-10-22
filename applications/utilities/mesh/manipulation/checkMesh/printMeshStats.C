@@ -15,11 +15,11 @@ void Foam::printMeshStats(const polyMesh& mesh, const bool allTopology)
     Info<< "Mesh stats" << nl
         << "    all points:           "
         << returnReduce(mesh.allPoints().size(), sumOp<label>()) << nl
-        << "    live points:           "
+        << "    live points:          "
         << returnReduce(mesh.points().size(), sumOp<label>()) << nl
         << "    all faces:            "
         << returnReduce(mesh.allFaces().size(), sumOp<label>()) << nl
-        << "    live faces:            "
+        << "    live faces:           "
         << returnReduce(mesh.faces().size(), sumOp<label>()) << nl
         << "    internal faces:   "
         << returnReduce(mesh.faceNeighbour().size(), sumOp<label>()) << nl
