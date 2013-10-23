@@ -102,11 +102,11 @@ Patch0:                 metis-5.0pre2_patch_darwin
 
 %ifos darwin
     # The parameter -D_POSIX_C_SOURCE=200809 has a side effect on Mac OS X
-    (cd GKlib/trunk && make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC")
-    (cd libmetis    && make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC") 
+    (cd GKlib/trunk && make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC" CC=$CC)
+    (cd libmetis    && make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC" CC=$CC) 
 %else
-    (cd GKlib/trunk && make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC -D_POSIX_C_SOURCE=200809")
-    (cd libmetis    && make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC -D_POSIX_C_SOURCE=200809") 
+    (cd GKlib/trunk && make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC -D_POSIX_C_SOURCE=200809" CC=$CC)
+    (cd libmetis    && make -j $WM_NCOMPPROCS OPTFLAGS="-O3 -fPIC -D_POSIX_C_SOURCE=200809" CC=$CC) 
 %endif
 
 %install

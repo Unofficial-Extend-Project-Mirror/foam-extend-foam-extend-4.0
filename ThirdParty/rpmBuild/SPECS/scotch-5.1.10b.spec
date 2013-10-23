@@ -106,8 +106,8 @@ Patch0:                 scotch-5.1.10b_patch_0
 %endif
 
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
-    make -j $WM_NCOMPPROCS scotch
-    make -j $WM_NCOMPPROCS ptscotch
+    make -j $WM_NCOMPPROCS scotch CC="$WM_CC" CXX="$WM_CXX" CCD="$WM_CC" CCS="$WM_CC" AR="$WM_CC"
+    make -j $WM_NCOMPPROCS ptscotch AR="$WM_CC"
 
 %install
     cd src
