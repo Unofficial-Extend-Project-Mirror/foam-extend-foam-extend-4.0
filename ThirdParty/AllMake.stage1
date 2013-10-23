@@ -93,7 +93,7 @@ echo
 #( rpm_make -p flex-2.5.35 -s flex-2.5.35.spec -u http://downloads.sourceforge.net/project/flex/flex/flex-2.5.35/flex-2.5.35.tar.gz )
 
 # cmake
-( rpm_make -p cmake-2.8.11 -s cmake-2.8.11.spec -u http://www.cmake.org/files/v2.8/cmake-2.8.11.tar.gz        )
+( rpm_make -p cmake-2.8.12 -s cmake-2.8.12.spec -u http://www.cmake.org/files/v2.8/cmake-2.8.12.tar.gz        )
 
 echo ========================================
 echo Done ThirdParty AllMake: Stage1
