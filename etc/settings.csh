@@ -471,8 +471,8 @@ endif
 
 # hwloc
 # ~~~~~
-if ( $?HWLOC_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/hwloc-1.7.1/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.1/platforms/$WM_OPTIONS/etc/hwloc-1.7.1.csh
+if ( $?HWLOC_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/hwloc-1.7.2/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.2/platforms/$WM_OPTIONS/etc/hwloc-1.7.2.csh
 endif
 
 # QT
