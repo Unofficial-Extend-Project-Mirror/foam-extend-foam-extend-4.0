@@ -43,16 +43,14 @@ SourceFiles
 #ifndef topoPatchMapper_H
 #define topoPatchMapper_H
 
-#include "morphFieldMapper.H"
+#include "vectorList.H"
+#include "topoMapper.H"
+#include "fvPatchFieldMapper.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// Class forward declarations
-class topoMapper;
-class mapPolyMesh;
 
 /*---------------------------------------------------------------------------*\
                     Class topoPatchMapper Declaration
@@ -76,6 +74,12 @@ class topoPatchMapper
         //- Is the mapping direct
         bool direct_;
 
+        //- Size before mapping
+        mutable label sizeBeforeMapping_;
+
+        //- Is the mapping conservative
+        mutable bool conservative_;
+
     // Demand-driven private data
 
         //- Direct addressing
@@ -97,10 +101,10 @@ class topoPatchMapper
         mutable labelListList* insertedFaceAddressingPtr_;
 
         //- Interpolation areas
-        mutable List<scalarField>* areasPtr_;
+        mutable List<scalarList>* areasPtr_;
 
         //- Interpolation centres
-        mutable List<vectorField>* centresPtr_;
+        mutable List<vectorList>* centresPtr_;
 
     // Private Member Functions
 
@@ -123,10 +127,10 @@ class topoPatchMapper
         void calcIntersectionWeightsAndCentres() const;
 
         //- Return intersection area weights
-        const List<scalarField>& intersectionWeights() const;
+        const List<scalarList>& intersectionWeights() const;
 
         //- Return intersection area centres
-        const List<vectorField>& intersectionCentres() const;
+        const List<vectorList>& intersectionCentres() const;
 
         //- Clear out local storage
         void clearOut();
@@ -196,8 +200,10 @@ public:
 
 } // End namespace Foam
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #ifdef NoRepository
-#include "topoPatchMapper.C"
+#   include "topoPatchMapperTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

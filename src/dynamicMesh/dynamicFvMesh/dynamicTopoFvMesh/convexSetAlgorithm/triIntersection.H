@@ -23,26 +23,29 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    fluxCorrector
+    triIntersection
 
 Description
-    Virtual base class that deals with flux-correction after topo-changes.
+    Implementation of the triangle intersection algorithm
 
-Author
+Implemented by
     Sandeep Menon
     University of Massachusetts Amherst
     All rights reserved
 
 SourceFiles
-    fluxCorrector.C
+    triIntersectionI.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef fluxCorrector_H
-#define fluxCorrector_H
+#ifndef triIntersection_H
+#define triIntersection_H
 
-#include "fvMesh.H"
-#include "runTimeSelectionTables.H"
+#include "point.H"
+#include "label.H"
+#include "Tuple2.H"
+#include "FixedList.H"
+#include "DynamicList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,95 +53,79 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                         Class fluxCorrector Declaration
+                       Class triIntersection Declaration
 \*---------------------------------------------------------------------------*/
 
-class fluxCorrector
+class triIntersection
 {
     // Private data
 
-        //- Reference to fvMesh
-        const fvMesh& mesh_;
+        //- Const reference to clipping triangle
+        const FixedList<point, 3>& clipTri_;
 
-        //- Reference to dictionary
-        const dictionary& dict_;
+        //- Clip triangle normal
+        vector tNorm_;
+
+        //- Hessian-normal plane definition
+        typedef Tuple2<vector, scalar> hPlane;
+
+        FixedList<hPlane, 3> clipPlanes_;
+
+        //- Triangles used as temporaries
+        DynamicList<FixedList<point, 3> > inside_;
+
+        //- All intersection tris
+        DynamicList<FixedList<point, 3> > allTris_;
 
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        fluxCorrector(const fluxCorrector&);
+        triIntersection(const triIntersection&);
 
         //- Disallow default bitwise assignment
-        void operator=(const fluxCorrector&);
+        void operator=(const triIntersection&);
+
+        //- Compute clip-planes
+        inline void computeClipPlanes();
+
+        //- Split and decompose
+        inline void splitAndDecompose
+        (
+            const label triPlaneIndex,
+            FixedList<point, 3>& tri,
+            DynamicList<FixedList<point, 3> >& decompTris
+        ) const;
 
 public:
 
-    //- Runtime type information
-    TypeName("fluxCorrector");
-
-
-    // Declare run-time constructor selection tables
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            fluxCorrector,
-            mesh,
-            (
-                const fvMesh& mesh,
-                const dictionary& dict
-            ),
-            (mesh, dict)
-        );
-
-
-    // Selectors
-
-        //- Select constructed from fvMesh
-        static autoPtr<fluxCorrector> New
-        (
-            const fvMesh& mesh,
-            const dictionary& dict
-        );
-
-
     // Constructors
 
-        //- Construct from fvMesh and dictionary
-        fluxCorrector(const fvMesh& mesh, const dictionary& dict)
-        :
-            mesh_(mesh),
-            dict_(dict)
-        {}
-
+        //- Construct from components
+        inline triIntersection(const FixedList<point, 3>& clipTri);
 
     // Destructor
 
-        virtual ~fluxCorrector()
-        {}
-
+        inline ~triIntersection();
 
     // Member Functions
 
-        //- Return reference to mesh
-        const fvMesh& mesh() const;
+        //- Evaluate for intersections against input triangle
+        inline bool evaluate(const FixedList<point, 3>& subjectTri);
 
-        //- Return reference to dictionary
-        const dictionary& dict() const;
+        //- Return intersections
+        inline const DynamicList<FixedList<point, 3> >& getIntersection() const;
 
-        //- Is flux-correction required?
-        virtual bool required() const;
-
-        //- Interpolate fluxes to a specified list of faces
-        virtual void interpolateFluxes(const labelList& faces) const;
-
-        //- Update fluxes in the registry
-        virtual void updateFluxes() const;
+        //- Evaluate and return area / centroid
+        inline void getAreaAndCentre(scalar& area, vector& centre) const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "triIntersectionI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -40,4 +40,18 @@ dynamicTopoFvMesh/edgeSwap.C
 dynamicTopoFvMesh/edgeBisect.C
 dynamicTopoFvMesh/edgeCollapse.C
 
+dynamicTopoFvMesh/coupleMap.C
+
+convexSetAlgorithm = dynamicTopoFvMesh/convexSetAlgorithm
+$(convexSetAlgorithm)/convexSetAlgorithm.C
+$(convexSetAlgorithm)/faceSetAlgorithm.C
+$(convexSetAlgorithm)/cellSetAlgorithm.C
+
+fieldMapping = dynamicTopoFvMesh/fieldMapping
+$(fieldMapping)/topoMapper.C
+$(fieldMapping)/fluxCorrector.C
+$(fieldMapping)/topoCellMapper.C
+$(fieldMapping)/topoPatchMapper.C
+$(fieldMapping)/topoSurfaceMapper.C
+
 LIB = $(FOAM_LIBBIN)/libdynamicFvMesh

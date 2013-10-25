@@ -33,9 +33,8 @@ Author
     University of Massachusetts Amherst
     All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
-#include "IOmanip.H"
 #include "topoMapper.H"
 #include "mapPolyMesh.H"
 #include "topoCellMapper.H"
@@ -306,6 +305,7 @@ const List<vectorField>& topoCellMapper::intersectionCentres() const
     return *centresPtr_;
 }
 
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
@@ -319,6 +319,7 @@ topoCellMapper::topoCellMapper
     mpm_(mpm),
     tMapper_(mapper),
     direct_(false),
+    sizeBeforeMapping_(mpm.nOldCells()),
     directAddrPtr_(NULL),
     interpolationAddrPtr_(NULL),
     weightsPtr_(NULL),
@@ -326,6 +327,18 @@ topoCellMapper::topoCellMapper
     volumesPtr_(NULL),
     centresPtr_(NULL)
 {
+    // Fetch offset sizes from topoMapper
+    const labelList& sizes = tMapper_.cellSizes();
+
+    // Add offset sizes
+    if (sizes.size())
+    {
+        forAll(sizes, pI)
+        {
+            sizeBeforeMapping_ += sizes[pI];
+        }
+    }
+
     // Check for possibility of direct mapping
     if
     (
@@ -363,7 +376,7 @@ label topoCellMapper::size() const
 //- Return size before mapping
 label topoCellMapper::sizeBeforeMapping() const
 {
-    return mpm_.nOldCells();
+    return sizeBeforeMapping_;
 }
 
 
@@ -456,99 +469,6 @@ const labelList& topoCellMapper::insertedObjectLabels() const
     }
 
     return *insertedCellLabelsPtr_;
-}
-
-
-//- Conservatively map the internal field
-template <class Type, class gradType>
-void topoCellMapper::mapInternalField
-(
-    const word& fieldName,
-    const Field<gradType>& gF,
-    Field<Type>& iF
-) const
-{
-    if (iF.size() != sizeBeforeMapping() || gF.size() != sizeBeforeMapping())
-    {
-        FatalErrorIn
-        (
-            "\n\n"
-            "void topoCellMapper::mapInternalField<Type>\n"
-            "(\n"
-            "    const word& fieldName,\n"
-            "    const Field<gradType>& gF,\n"
-            "    Field<Type>& iF\n"
-            ") const\n"
-        )  << "Incompatible size before mapping." << nl
-           << " Field: " << fieldName << nl
-           << " Field size: " << iF.size() << nl
-           << " Gradient Field size: " << gF.size() << nl
-           << " map size: " << sizeBeforeMapping() << nl
-           << abort(FatalError);
-    }
-
-    // Fetch addressing
-    const labelListList& cAddressing = addressing();
-    const List<scalarField>& wC = intersectionWeights();
-    const List<vectorField>& xC = intersectionCentres();
-
-    // Fetch geometry
-    const vectorField& centres = tMapper_.internalCentres();
-
-    // Compute the integral of the source field
-    Type intSource = sum(iF * tMapper_.cellVolumes());
-
-    // Copy the original field
-    Field<Type> fieldCpy(iF);
-
-    // Resize to current dimensions
-    iF.setSize(size());
-
-    // Map the internal field
-    forAll(iF, cellI)
-    {
-        const labelList& addr = cAddressing[cellI];
-
-        iF[cellI] = pTraits<Type>::zero;
-
-        forAll(addr, cellJ)
-        {
-            // Accumulate volume-weighted Taylor-series interpolate
-            iF[cellI] +=
-            (
-                wC[cellI][cellJ] *
-                (
-                    fieldCpy[addr[cellJ]]
-                  + (
-                        gF[addr[cellJ]] &
-                        (
-                            xC[cellI][cellJ]
-                          - centres[addr[cellJ]]
-                        )
-                    )
-                )
-            );
-        }
-    }
-
-    // Compute the integral of the target field
-    Type intTarget = sum(iF * mesh_.cellVolumes());
-
-    if (polyMesh::debug)
-    {
-        int oldP = Info().precision();
-
-        // Compare the global integral
-        Info << " Field : " << fieldName
-             << " integral errors : "
-             << setprecision(15)
-             << " source : " << mag(intSource)
-             << " target : " << mag(intTarget)
-             << " norm : "
-             << (mag(intTarget - intSource) / (mag(intSource) + VSMALL))
-             << setprecision(oldP)
-             << endl;
-    }
 }
 
 

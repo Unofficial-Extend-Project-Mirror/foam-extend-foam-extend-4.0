@@ -42,7 +42,9 @@ SourceFiles
 #ifndef topoMapper_H
 #define topoMapper_H
 
-#include "fluxCorrector.H"
+#include "autoPtr.H"
+#include "IOmanip.H"
+#include "volFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,10 +52,10 @@ namespace Foam
 {
 
 // Class forward declarations
+class fluxCorrector;
 class topoCellMapper;
 class topoSurfaceMapper;
 class topoBoundaryMeshMapper;
-class mapPolyMesh;
 
 /*---------------------------------------------------------------------------*\
                          Class topoMapper Declaration
@@ -88,18 +90,23 @@ class topoMapper
         mutable HashTable<autoPtr<volTensorField> > vGrads_;
 
         //- Geometric information on the old mesh
-        mutable scalarField* cellVolumesPtr_;
-        mutable vectorField* cellCentresPtr_;
-        mutable PtrList<scalarField> patchAreasPtr_;
-        mutable PtrList<vectorField> patchCentresPtr_;
+        mutable volVectorField* cellCentresPtr_;
 
-        //- Intersection volume weights
+        //- Intersection weights
         mutable List<scalarField> faceWeights_;
         mutable List<scalarField> cellWeights_;
 
-        //- Intersection centre weights
+        //- Intersection centres
         mutable List<vectorField> faceCentres_;
         mutable List<vectorField> cellCentres_;
+
+        //- Sizes / starts for mapping
+        mutable labelList cellSizes_;
+        mutable labelList cellStarts_;
+        mutable labelList faceSizes_;
+        mutable labelList faceStarts_;
+        mutable labelListList patchSizes_;
+        mutable labelListList patchStarts_;
 
     // Private Member Functions
 
@@ -117,10 +124,6 @@ class topoMapper
             HashTable<autoPtr<gradType> >& gradTable
         ) const;
 
-        //- Fetch the gradient field
-        template <class Type>
-        const Type& gradient(const word& name) const;
-
         //- Store gradients prior to mesh reset
         void storeGradients() const;
 
@@ -132,19 +135,7 @@ public:
     // Constructors
 
         //- Construct from mesh and dictionary
-        topoMapper(const fvMesh& mesh, const dictionary& dict)
-        :
-            mesh_(mesh),
-            dict_(dict),
-            cellMap_(NULL),
-            surfaceMap_(NULL),
-            boundaryMap_(NULL),
-            fluxCorrector_(fluxCorrector::New(mesh, dict)),
-            cellVolumesPtr_(NULL),
-            cellCentresPtr_(NULL),
-            patchAreasPtr_(mesh.boundary().size()),
-            patchCentresPtr_(mesh.boundary().size())
-        {}
+        topoMapper(const fvMesh& mesh, const dictionary& dict);
 
     // Destructor
 
@@ -175,6 +166,17 @@ public:
             const Xfer<List<vectorField> >& centres
         ) const;
 
+        //- Set cell / patch offset information
+        void setOffsets
+        (
+            const labelList& cellSizes,
+            const labelList& cellStarts,
+            const labelList& faceSizes,
+            const labelList& faceStarts,
+            const labelListList& patchSizes,
+            const labelListList& patchStarts
+        ) const;
+
         //- Fetch face weights
         const List<scalarField>& faceWeights() const;
 
@@ -187,28 +189,45 @@ public:
         //- Fetch cell centres
         const List<vectorField>& cellCentres() const;
 
+        //- Fetch cell sizes
+        const labelList& cellSizes() const;
+
+        //- Fetch face sizes
+        const labelList& faceSizes() const;
+
+        //- Fetch patch sizes
+        const labelListList& patchSizes() const;
+
+        //- Fetch cell starts
+        const labelList& cellStarts() const;
+
+        //- Fetch face starts
+        const labelList& faceStarts() const;
+
+        //- Fetch patch starts
+        const labelListList& patchStarts() const;
+
         //- Store mesh information for the mapping stage
         void storeMeshInformation() const;
 
-        //- Return stored cell volume information
-        const scalarField& cellVolumes() const;
+        //- Return non-const access to cell centres
+        volVectorField& volCentres() const;
 
         //- Return stored cell centre information
         const vectorField& internalCentres() const;
 
-        //- Return stored patch area information
-        const scalarField& patchAreas(const label i) const;
-
         //- Return stored patch centre information
         const vectorField& patchCentres(const label i) const;
 
-        // Conservatively map all volFields in the registry
-        template <class Type>
-        void conservativeMapVolFields() const;
+        //- Return names of stored scalar gradients
+        const wordList scalarGrads() const;
 
-        // Conservatively map all surfaceFields in the registry
+        //- Return names of stored vector gradients
+        const wordList vectorGrads() const;
+
+        //- Fetch the gradient field
         template <class Type>
-        void conservativeMapSurfaceFields() const;
+        Type& gradient(const word& name) const;
 
         //- Correct fluxes after topology change
         void correctFluxes() const;
@@ -226,7 +245,7 @@ public:
         const fluxCorrector& surfaceFluxCorrector() const;
 
         //- Clear out member data
-        void clear();
+        void clear() const;
 };
 
 
@@ -234,8 +253,10 @@ public:
 
 } // End namespace Foam
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #ifdef NoRepository
-#include "topoMapper.C"
+#   include "topoMapperTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
