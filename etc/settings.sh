@@ -204,12 +204,12 @@ unset MPI_ARCH_PATH
 mpi_version=unknown
 case "$WM_MPLIB" in
 OPENMPI)
-    if [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.6.3/platforms/$WM_OPTIONS ]
+    if [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.6.5/platforms/$WM_OPTIONS ]
         then
-        mpi_version=openmpi-1.6.3
+        mpi_version=openmpi-1.6.5
         if [ "$FOAM_VERBOSE" -a "$PS1" ]
         then
-            echo "Using openmpi-1.6.3 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
+            echo "Using openmpi-1.6.5 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
         fi
         _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.sh
 
@@ -524,8 +524,8 @@ export MPI_BUFFER_SIZE
 
 # Load cmake
 # ~~~~~~~~~~
-[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.11/platforms/$WM_OPTIONS ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.11/platforms/$WM_OPTIONS/etc/cmake-2.8.11.sh
+[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.12/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.12/platforms/$WM_OPTIONS/etc/cmake-2.8.12.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    CMAKE_DIR is initialized to: $CMAKE_DIR"
 
@@ -575,8 +575,8 @@ export MPI_BUFFER_SIZE
 
 # Load hwloc
 # ~~~~~~~~~~~
-[ -z "$HWLOC_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.1/platforms/$WM_OPTIONS ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.1/platforms/$WM_OPTIONS/etc/hwloc-1.7.1.sh
+[ -z "$HWLOC_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.2/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.2/platforms/$WM_OPTIONS/etc/hwloc-1.7.2.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    HWLOC_DIR is initialized to: $HWLOC_DIR"
 

@@ -23,13 +23,13 @@
 #     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 # Script
-#     RPM spec file for scotch-5.1.10b
+#     RPM spec file for hwloc-1.7.2
 #
 # Description
 #     RPM spec file for creating a relocatable RPM
 #
 # Author:
-#     Martin Beaudoin, Hydro-Quebec, (2010)
+#     Martin Beaudoin, Hydro-Quebec, (2013)
 #
 #------------------------------------------------------------------------------
 
@@ -46,8 +46,8 @@
 
 # Will install the package directly $WM_THIRD_PARTY_DIR
 #   Some comments about package relocation:
-#   By using this prefix for the Prefix:  parameter in this file, you will make this 
-#   package relocatable. 
+#   By using this prefix for the Prefix:  parameter in this file, you will make this
+#   package relocatable.
 #
 #   This is fine, as long as your software is itself relocatable.
 #
@@ -56,28 +56,28 @@
 #   Ref: http://sourceware.org/autobook/autobook/autobook_80.html
 #
 #   In that case, if you ever change the value of the $WM_THIRD_PARTY_DIR, you will
-#   not be able to reutilize this RPM, even though it is relocatable. You will need to 
+#   not be able to reutilize this RPM, even though it is relocatable. You will need to
 #   regenerate the RPM.
 #
 %define _prefix         %{_WM_THIRD_PARTY_DIR}
 
-%define name		scotch
+%define name		hwloc
 %define release		%{_WM_OPTIONS}
-%define version 	5.1.10b
+%define version 	1.7.2
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
 BuildRoot:	        %{buildroot}
-Summary: 		scotch
-License: 		Unkown
+Summary: 		hwloc
+License: 		the New BSD license
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    https://gforge.inria.fr/frs/download.php/27583
+URL:                    http://www.open-mpi.org/software/hwloc/v1.7/downloads/hwloc-1.7.2.tar.gz
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
-Patch0:                 scotch-5.1.10b_patch_0
+
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -85,9 +85,7 @@ Patch0:                 scotch-5.1.10b_patch_0
 %{summary}
 
 %prep
-%setup -q -n %{name}_%{version}
-
-%patch0 -p1
+%setup -q
 
 %build
     # export WM settings in a form that GNU configure recognizes
@@ -97,22 +95,14 @@ Patch0:                 scotch-5.1.10b_patch_0
     [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
-    cd src
-    # Here, unfortunately, some hand tweaking might be necessary if your system is not running Linux or MacOS X
-%ifos darwin
-        ln -s Make.inc/Makefile.inc.i686_mac_darwin10.shlib Makefile.inc
-%else
-        ln -s Make.inc/Makefile.inc.i686_pc_linux2.shlib Makefile.inc
-%endif
+    ./configure     \
+        --prefix=%{_installPrefix}
 
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
-    make -j $WM_NCOMPPROCS scotch CC="$WM_CC" CXX="$WM_CXX" CCD="$WM_CC" CCS="$WM_CC" AR="$WM_CC"
-    make -j $WM_NCOMPPROCS ptscotch AR="$WM_CC"
+    make -j $WM_NCOMPPROCS
 
 %install
-    cd src
-    mkdir -p $RPM_BUILD_ROOT%{_installPrefix}
-    make install prefix=$RPM_BUILD_ROOT%{_installPrefix}
+    make install DESTDIR=$RPM_BUILD_ROOT
 
     # Creation of OpenFOAM specific .csh and .sh files"
 
@@ -127,14 +117,11 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export SCOTCH_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
-export SCOTCH_BIN_DIR=\$SCOTCH_DIR/bin
-export SCOTCH_LIB_DIR=\$SCOTCH_DIR/lib
-export SCOTCH_INCLUDE_DIR=\$SCOTCH_DIR/include
+export HWLOC_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+export HWLOC_BIN_DIR=\$HWLOC_DIR/bin
 
-# Enable access to the runtime package applications and libraries
-[ -d \$SCOTCH_BIN_DIR ] && _foamAddPath \$SCOTCH_BIN_DIR
-[ -d \$SCOTCH_LIB_DIR ] && _foamAddLib  \$SCOTCH_LIB_DIR
+# Enable access to the runtime package applications
+[ -d \$HWLOC_BIN_DIR ] && _foamAddPath \$HWLOC_BIN_DIR
 DOT_SH_EOF
 
     #
@@ -143,17 +130,11 @@ DOT_SH_EOF
 cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.csh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-setenv SCOTCH_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
-setenv SCOTCH_BIN_DIR \$SCOTCH_DIR/bin
-setenv SCOTCH_LIB_DIR \$SCOTCH_DIR/lib
-setenv SCOTCH_INCLUDE_DIR \$SCOTCH_DIR/include
+setenv HWLOC_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+setenv HWLOC_BIN_DIR \$HWLOC_DIR/bin
 
-if ( -e \$SCOTCH_BIN_DIR ) then
-    _foamAddPath \$SCOTCH_BIN_DIR
-endif
-
-if ( -e \$SCOTCH_LIB_DIR ) then
-    _foamAddLib \$SCOTCH_LIB_DIR
+if ( -e \$HWLOC_BIN_DIR ) then
+    _foamAddPath \$HWLOC_BIN_DIR
 endif
 DOT_CSH_EOF
 
@@ -161,10 +142,10 @@ DOT_CSH_EOF
     # as a non-root user might be a problem.
     (mkdir -p  %{_topdir}/TGZS/%{_target_cpu}; cd $RPM_BUILD_ROOT/%{_prefix}; tar -zcvf %{_topdir}/TGZS/%{_target_cpu}/%{name}-%{version}.tgz  packages/%{name}-%{version})
 
-
 %clean
 rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%{_installPrefix}/*
+%{_installPrefix}
+
