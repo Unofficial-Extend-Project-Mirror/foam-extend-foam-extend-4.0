@@ -159,7 +159,6 @@ bool faceSetAlgorithm::computeIntersection
         DynamicList<FixedList<point, 3> > subjectTris(15);
 
         label ntOld = 0, ntNew = 0;
-        vector oldCentre = vector::zero, newCentre = vector::zero;
 
         if (oldFace.size() == 3)
         {

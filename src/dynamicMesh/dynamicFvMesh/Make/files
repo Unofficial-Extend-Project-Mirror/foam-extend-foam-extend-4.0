@@ -36,6 +36,7 @@ dynamicTopoFvMesh/dynamicTopoFvMesh.C
 dynamicTopoFvMesh/dynamicTopoFvMeshCheck.C
 dynamicTopoFvMesh/dynamicTopoFvMeshReOrder.C
 dynamicTopoFvMesh/dynamicTopoFvMeshMapping.C
+dynamicTopoFvMesh/dynamicTopoFvMeshCoupled.C
 dynamicTopoFvMesh/edgeSwap.C
 dynamicTopoFvMesh/edgeBisect.C
 dynamicTopoFvMesh/edgeCollapse.C

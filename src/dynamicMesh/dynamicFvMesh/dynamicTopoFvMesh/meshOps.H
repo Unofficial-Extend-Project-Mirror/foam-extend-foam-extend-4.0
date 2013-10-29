@@ -94,7 +94,7 @@ namespace meshOps
 
     // Utility method to build a hull of cells
     // connected to the edge (for 2D simplical meshes)
-    inline void constructPrismHull
+    void constructPrismHull
     (
         const label eIndex,
         const UList<face>& faces,
@@ -108,7 +108,7 @@ namespace meshOps
 
     // Utility method to build a hull of cells (and faces)
     // around an edge (for 3D simplical meshes)
-    inline void constructHull
+    void constructHull
     (
         const label eIndex,
         const UList<face>& faces,
@@ -182,7 +182,7 @@ namespace meshOps
     );
 
     // Dijkstra's algorithm for the shortest path problem
-    inline bool Dijkstra
+    bool Dijkstra
     (
         const Map<point>& points,
         const Map<edge>& edges,
@@ -283,7 +283,7 @@ namespace meshOps
 
     // Select a list of elements from connectivity,
     // and output to a VTK format
-    inline void writeVTK
+    void writeVTK
     (
         const polyMesh& mesh,
         const word& name,
@@ -300,7 +300,7 @@ namespace meshOps
     );
 
     // Actual routine to write out the VTK file
-    inline void writeVTK
+    void writeVTK
     (
         const polyMesh& mesh,
         const word& name,
@@ -324,6 +324,8 @@ namespace meshOps
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "meshOpsI.H"
 
 #ifdef NoRepository
 #    include "meshOpsTemplates.C"
