@@ -31,7 +31,7 @@ Description
     element access using xxxx(), xxyy() etc. member functions
     and double dot product with a second order tensor.
 
-    It is assumed that the 4th order tensor takes the form (in 6x6 matrix form):
+    It is assumed that the 4th order tensor takes the form (6x6 matrix form):
     / xxxx xxyy xxzz                \
     |      yyyy yyzz                |
     |           zzzz                |
@@ -40,11 +40,16 @@ Description
     \                          zxzx /
     where the tensor is symmetric and unspecified entries are zero.
 
+Note:
+    Order is currently hacked due to missing operations on symmetry planes
+    HJ, 29/Oct/2013
+
 SourceFiles
     SymmTensor4thOrderI.H
 
 Author
     Philip Cardiff UCD
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef SymmTensor4thOrder_H
@@ -59,7 +64,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class SymmTensor4thOrder Declaration
+                       Class SymmTensor4thOrder Declaration
 \*---------------------------------------------------------------------------*/
 
 template <class Cmpt>
@@ -78,7 +83,7 @@ public:
 
         enum
         {
-            rank = 2 // check: Rank of SymmTensor4thOrder is 4
+            rank = 2 // Hacked by PC: Actual rank of SymmTensor4thOrder is 4
         };
 
 
@@ -93,8 +98,19 @@ public:
         static const SymmTensor4thOrder min;
 
 
-    //- Component labeling enumeration
-        enum components { XXXX, XXYY, XXZZ, YYYY, YYZZ, ZZZZ, XYXY, YZYZ, ZXZX };
+        //- Component labeling enumeration
+        enum components
+        {
+            XXXX,
+            XXYY,
+            XXZZ,
+            YYYY,
+            YYZZ,
+            ZZZZ,
+            XYXY,
+            YZYZ,
+            ZXZX
+        };
 
 
     // Constructors
@@ -103,7 +119,10 @@ public:
         inline SymmTensor4thOrder();
 
         //- Construct given VectorSpace
-        inline SymmTensor4thOrder(const VectorSpace<SymmTensor4thOrder<Cmpt>, Cmpt, 9>&);
+        inline SymmTensor4thOrder
+        (
+            const VectorSpace<SymmTensor4thOrder<Cmpt>, Cmpt, 9>&
+        );
 
         //- Construct given SymmTensor (for compilation)
         inline SymmTensor4thOrder(const SymmTensor<Cmpt>&);
@@ -112,11 +131,11 @@ public:
         inline SymmTensor4thOrder
         (
             const Cmpt txxxx, const Cmpt txxyy, const Cmpt txxzz,
-	                      const Cmpt tyyyy, const Cmpt tyyzz,
-	                                        const Cmpt tzzzz,
-	                                                   	  const Cmpt txyxy,
-	                                        	                            const Cmpt tyzyz,
-	                                        	                                              const Cmpt tzxzx
+	                          const Cmpt tyyyy, const Cmpt tyyzz,
+	                                            const Cmpt tzzzz,
+            const Cmpt txyxy,
+                              const Cmpt tyzyz,
+	                                            const Cmpt tzxzx
         );
 
         //- Construct from Istream

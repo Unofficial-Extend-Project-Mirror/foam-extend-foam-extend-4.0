@@ -30,7 +30,7 @@ Description
     interfaces between cells of differing material properties.
 
     Tukovic et al. Int. J. Numer. Meth. Engng (2012) DOI: 10.1002/nme.4390
-    
+
     This is the abstract base class and there are different specific
     implmentations depending on if there are thermal terms, nonlinear terms,
     non-orthogonal correction, orthotropic solver, etc.
@@ -81,6 +81,7 @@ class solidInterface
         const fvMesh& mesh_;
 
         const constitutiveModel& rheology_;
+
 
     // Demand-driven data
 
@@ -135,10 +136,11 @@ class solidInterface
         // -1 for non-interface faces
         mutable labelListList* processorPatchFacesMapPtr_;
 
+
     // Private Member Functions
 
         // Make demand-driven data
-    
+
         //- Make sub-mesh
         void makeSubMesh() const;
 
@@ -196,9 +198,9 @@ public:
             solidInterface,
             dictionary,
             (
-	     const word& name,
-	     const fvMesh& mesh,
-	     const constitutiveModel& rheology
+                const word& name,
+                const fvMesh& mesh,
+                const constitutiveModel& rheology
             ),
             (name, mesh, rheology)
         );
@@ -209,9 +211,9 @@ public:
         //- Return a reference to the selected rheology model
         static autoPtr<solidInterface> New
         (
-	 const word& name,
-	 const fvMesh& mesh,
-	 const constitutiveModel& rheology
+            const word& name,
+            const fvMesh& mesh,
+            const constitutiveModel& rheology
         );
 
 
@@ -220,9 +222,9 @@ public:
         //- Construct from dictionary
         solidInterface
         (
-	 const word& name,
-	 const fvMesh& mesh,
-	 const constitutiveModel& rheology
+            const word& name,
+            const fvMesh& mesh,
+            const constitutiveModel& rheology
         );
 
 
@@ -245,82 +247,70 @@ public:
             return mesh_;
         }
 
-    const fvMeshSubset& subMesh() const;    
-  
-    const labelList& globalInterFaces() const;
+        const fvMeshSubset& subMesh() const;
 
-    const labelList& localInterFaces() const;
+        const labelList& globalInterFaces() const;
 
-    vectorField& interfaceDisplacement();
+        const labelList& localInterFaces() const;
 
-    const vectorField& interfaceDisplacement() const;
+        vectorField& interfaceDisplacement();
 
-    const labelList& processorPatches() const;
+        const vectorField& interfaceDisplacement() const;
 
-    const labelListList& processorPatchFaces() const;
+        const labelList& processorPatches() const;
 
-    const FieldField<Field, vector>& processorInterfaceDisplacement() const;
+        const labelListList& processorPatchFaces() const;
 
-    FieldField<Field, vector>& processorInterfaceDisplacement();
+        const FieldField<Field, vector>&
+        processorInterfaceDisplacement() const;
 
-    virtual void correct(fvVectorMatrix& UEqn) = 0;
+        FieldField<Field, vector>& processorInterfaceDisplacement();
 
-  // things get messy with a template so we will define all three options here
-  // modify property field (ie mu, lambda or K, C for orthotropic)
-  // virtual void modifyProperties
-  // (
-  //  GeometricField<Type, fvsPatchField, surfaceMesh>& A, 
-  //  GeometricField<Type, fvsPatchField, surfaceMesh>& B
-  //  ) const = 0;
+        virtual void correct(fvVectorMatrix& UEqn) = 0;
 
-    virtual void modifyProperties
-    (
-     surfaceScalarField& s
-     ) const;
+        virtual void modifyProperties
+        (
+            surfaceScalarField& s
+        ) const;
 
-    virtual void modifyProperties
-    (
-     surfaceSymmTensor4thOrderField& st
-     ) const;
+        virtual void modifyProperties
+        (
+            surfaceSymmTensor4thOrderField& st
+        ) const;
 
-    virtual void modifyProperties
-    (
-     surfaceDiagTensorField& dt
-     ) const;
+        virtual void modifyProperties
+        (
+            surfaceDiagTensorField& dt
+        ) const;
 
-    virtual void modifyProperties
-    (
-     surfaceScalarField& mu,
-     surfaceScalarField& lambda
-     ) const;
+        virtual void modifyProperties
+        (
+            surfaceScalarField& mu,
+            surfaceScalarField& lambda
+        ) const;
 
-    virtual void modifyProperties
-    (
-     surfaceScalarField& mu, 
-     surfaceScalarField& lambda,
-     surfaceScalarField& threeKalpha
-     ) const;
+        virtual void modifyProperties
+        (
+            surfaceScalarField& mu,
+            surfaceScalarField& lambda,
+            surfaceScalarField& threeKalpha
+        ) const;
 
-    virtual void modifyProperties
-    (
-     surfaceSymmTensor4thOrderField& C,
-     surfaceDiagTensorField& K
-     ) const;
+        virtual void modifyProperties
+        (
+            surfaceSymmTensor4thOrderField& C,
+            surfaceDiagTensorField& K
+        ) const;
 
-    // leastSquaresSolidInterface gradScheme should now be used
-    // instead of this gauss grad
-    //tmp<volTensorField> grad(volVectorField& U) const;
+        const List<labelPair>& indicator() const;
 
-    const List<labelPair>& indicator() const;
+        const labelList& indicatorFieldMap() const;
 
-    const labelList& indicatorFieldMap() const;
+        const labelList& processorPatchMap() const;
 
-    const labelList& processorPatchMap() const;
+        const labelListList& processorPatchFacesMap() const;
 
-    const labelListList& processorPatchFacesMap() const;
-
-    virtual void clearOut();
-
+        virtual void clearOut();
 };
 
 

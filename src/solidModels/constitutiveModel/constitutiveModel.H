@@ -87,8 +87,8 @@ class constitutiveModel
         autoPtr<solidInterface> solidInterfacePtr_;
         
         // we use IOReferencer to allow lookup of solidInterface object in
-        // the objectRegistry, for instance to be used by leastSquaresSolidInterface
-        // gradScheme
+        // the objectRegistry, for instance to be used by
+        // leastSquaresSolidInterface gradScheme
         IOReferencer<solidInterface>* solidInterfaceRefPtr_;
 
         // if solidInterface is on/off

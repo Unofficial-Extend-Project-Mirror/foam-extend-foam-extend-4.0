@@ -63,12 +63,12 @@ inline SymmTensor4thOrder<Cmpt>::SymmTensor4thOrder
  const Cmpt tzxzx
 )
 {
-  this->v_[XXXX] = txxxx; this->v_[XXYY] = txxyy; this->v_[XXZZ] = txxzz;
-                          this->v_[YYYY] = tyyyy; this->v_[YYZZ] = tyyzz;
-			                          this->v_[ZZZZ] = tzzzz;
-  this->v_[XYXY] = txyxy;
-  this->v_[YZYZ] = tyzyz;
-  this->v_[ZXZX] = tzxzx;
+    this->v_[XXXX] = txxxx; this->v_[XXYY] = txxyy; this->v_[XXZZ] = txxzz;
+                            this->v_[YYYY] = tyyyy; this->v_[YYZZ] = tyyzz;
+                                                    this->v_[ZZZZ] = tzzzz;
+    this->v_[XYXY] = txyxy;
+                            this->v_[YZYZ] = tyzyz;
+                                                    this->v_[ZXZX] = tzxzx;
 }
 
 
@@ -195,7 +195,8 @@ inline Cmpt& SymmTensor4thOrder<Cmpt>::zxzx()
 // * * * * * * * * * * * * * * * Global Operators  * * * * * * * * * * * * * //
 
 
-//- Double-dot-product between a fourth order symmetric tensor and a symmetric tensor
+//- Double-dot-product between a fourth order symmetric tensor and
+//  a symmetric tensor
 template <class Cmpt>
 inline SymmTensor<Cmpt>
 operator&&(const SymmTensor4thOrder<Cmpt>& t4th, const SymmTensor<Cmpt>& st)
@@ -203,18 +204,19 @@ operator&&(const SymmTensor4thOrder<Cmpt>& t4th, const SymmTensor<Cmpt>& st)
   //- s_ij = C_ijkl E_kl
     return SymmTensor<Cmpt>
     (
-     t4th.xxxx()*st.xx() + t4th.xxyy()*st.yy() + t4th.xxzz()*st.zz(),
-     t4th.xyxy()*st.xy(),
-     t4th.zxzx()*st.xz(),
+        t4th.xxxx()*st.xx() + t4th.xxyy()*st.yy() + t4th.xxzz()*st.zz(),
+        t4th.xyxy()*st.xy(),
+        t4th.zxzx()*st.xz(),
      
-     t4th.xxyy()*st.xx() + t4th.yyyy()*st.yy() + t4th.yyzz()*st.zz(),
-     t4th.yzyz()*st.yz(),
+        t4th.xxyy()*st.xx() + t4th.yyyy()*st.yy() + t4th.yyzz()*st.zz(),
+        t4th.yzyz()*st.yz(),
      
-     t4th.xxzz()*st.xx() + t4th.yyzz()*st.yy() + t4th.zzzz()*st.zz()
+        t4th.xxzz()*st.xx() + t4th.yyzz()*st.yy() + t4th.zzzz()*st.zz()
      );
 }
 
-//- Double-dot-product between a symmetric tensor and a symmetric fourth order tensor
+//- Double-dot-product between a symmetric tensor and a symmetric
+//  fourth order tensor
 template <class Cmpt>
 inline SymmTensor<Cmpt>
 operator&&(const SymmTensor<Cmpt>& st, const SymmTensor4thOrder<Cmpt>& t4th)
@@ -224,19 +226,19 @@ operator&&(const SymmTensor<Cmpt>& st, const SymmTensor4thOrder<Cmpt>& t4th)
   //- then s_ij = C_ijkl E_kl
     return SymmTensor<Cmpt>
     (
-     t4th.xxxx()*st.xx() + t4th.xxyy()*st.yy() + t4th.xxzz()*st.zz(),
-     t4th.xyxy()*st.xy(),
-     t4th.zxzx()*st.xz(),
+        t4th.xxxx()*st.xx() + t4th.xxyy()*st.yy() + t4th.xxzz()*st.zz(),
+        t4th.xyxy()*st.xy(),
+        t4th.zxzx()*st.xz(),
      
-     t4th.xxyy()*st.xx() + t4th.yyyy()*st.yy() + t4th.yyzz()*st.zz(),
-     t4th.yzyz()*st.yz(),
+        t4th.xxyy()*st.xx() + t4th.yyyy()*st.yy() + t4th.yyzz()*st.zz(),
+        t4th.yzyz()*st.yz(),
      
-     t4th.xxzz()*st.xx() + t4th.yyzz()*st.yy() + t4th.zzzz()*st.zz()
-     );
+        t4th.xxzz()*st.xx() + t4th.yyzz()*st.yy() + t4th.zzzz()*st.zz()
+    );
 }
 
 //- Inner-product between a symmTensor4thOrder and a vector
-//- this is not implemented
+//  this is not implemented
 template <class Cmpt>
 inline Vector<Cmpt>
 operator&(const SymmTensor4thOrder<Cmpt>& st, const Vector<Cmpt>& v)
@@ -257,7 +259,7 @@ operator&(const SymmTensor4thOrder<Cmpt>& st, const Vector<Cmpt>& v)
 
 
 //- Inner-product between a vector and a symmTensor4thOrder
-//- this is not implemented
+//  this is not implemented
 template <class Cmpt>
 inline Vector<Cmpt>
 operator&(const Vector<Cmpt>& v, const SymmTensor4thOrder<Cmpt>& st)

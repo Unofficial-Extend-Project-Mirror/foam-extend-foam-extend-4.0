@@ -29,11 +29,11 @@ Description
     Interpolate volVectorField to mesh points using least squares best fit
     planes.
 
-Please cite:                                                                                                                                              
+Please cite:
     Cardiff P, Karac A & Ivankovic A, A Large Strain Finite Volume Method for
     Orthotropic Bodies with General Material Orientations, Computer Methods
     in Applied Mechanics & Engineering, 2013,
-    http://dx.doi.org/10.1016/j.cma.2013.09.008.    
+    http://dx.doi.org/10.1016/j.cma.2013.09.008.
 
 SourceFiles
     leastSquaresVolPointInterpolation.C
@@ -47,7 +47,6 @@ Author
 #define leastSquaresVolPointInterpolation_H
 
 #include "MeshObject.H"
-//#include "fvMesh.H"
 #include "volFields.H"
 #include "pointFields.H"
 #include "simpleMatrix.H"
@@ -61,7 +60,7 @@ class fvMesh;
 class pointMesh;
 
 /*---------------------------------------------------------------------------*\
-                       Class leastSquaresVolPointInterpolation Declaration
+             Class leastSquaresVolPointInterpolation Declaration
 \*---------------------------------------------------------------------------*/
 class leastSquaresVolPointInterpolation
 :

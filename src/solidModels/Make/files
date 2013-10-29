@@ -64,11 +64,8 @@ $(constitutiveModel)/solidInterfaces/none/noneSolidInterface.C
 $(constitutiveModel)/tractionBoundaryGradient/tractionBoundaryGradient.C
 
 finiteVolume = finiteVolume
-$(finiteVolume)/d2dt2Schemes/backwardD2dt2Scheme/backwardD2dt2Schemes.C 
-$(finiteVolume)/snGradSchemes/skewCorrectedSnGrad/skewCorrectedSnGrads.C
 $(finiteVolume)/gradSchemes/leastSquaresSolidInterfaceGrad/leastSquaresSolidInterfaceGrads.C
 $(finiteVolume)/gradSchemes/leastSquaresSolidInterfaceGrad/leastSquaresSolidInterfaceVectors.C
-$(finiteVolume)/interpolation/leastSquaresVolPointInterpolation/leastSquaresVolPointInterpolation.C
 
 rheologyLaws = $(constitutiveModel)/rheologyLaws
 $(rheologyLaws)/rheologyLaw/rheologyLaw.C
