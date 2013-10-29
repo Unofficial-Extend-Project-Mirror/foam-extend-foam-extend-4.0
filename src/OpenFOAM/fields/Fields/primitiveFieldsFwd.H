@@ -50,6 +50,8 @@ typedef Field<scalar> scalarField;
 typedef Field<vector> vectorField;
 typedef Field<sphericalTensor> sphericalTensorField;
 typedef Field<symmTensor> symmTensorField;
+typedef Field<symmTensor4thOrder> symmTensor4thOrderField;
+typedef Field<diagTensor> diagTensorField;
 typedef Field<tensor> tensorField;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

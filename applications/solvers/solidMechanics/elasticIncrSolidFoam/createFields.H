@@ -24,7 +24,7 @@
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedVector("zero", dimLength, vector::zero)
+        dimensionedVector("zero", dimLength, vector::zero)	
     );
 
     volSymmTensorField DEpsilon
@@ -83,21 +83,21 @@
         dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
     );
 
-    volVectorField divDSigmaExp
-    (
+      volVectorField divDSigmaExp
+      (
         IOobject
         (
-            "divDSigmaExp",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
+	 "divDSigmaExp",
+	 runTime.timeName(),
+	 mesh,
+	 IOobject::NO_READ,
+	 IOobject::NO_WRITE
+	 ),
         mesh,
         dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
-    );
+       );
 
-    rheologyModel rheology(sigma);
+    constitutiveModel rheology(sigma, DU);
 
     volScalarField rho = rheology.rho();
 

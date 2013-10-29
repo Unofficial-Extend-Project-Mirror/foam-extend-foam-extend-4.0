@@ -1,9 +1,0 @@
-EXE_INC = \
-    -IfemStress/Traction \
-    -I$(LIB_SRC)/finiteVolume/lnInclude \
-    -I$(LIB_SRC)/tetFiniteElement/lnInclude
-
-EXE_LIBS = \
-    -lfiniteVolume \
-    -ltetFiniteElement \
-    -llduSolvers

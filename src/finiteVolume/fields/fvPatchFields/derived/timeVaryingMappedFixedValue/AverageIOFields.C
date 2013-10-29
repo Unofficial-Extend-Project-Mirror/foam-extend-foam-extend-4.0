@@ -38,6 +38,8 @@ typedef AverageIOField<scalar> scalarAverageIOField;
 typedef AverageIOField<vector> vectorAverageIOField;
 typedef AverageIOField<sphericalTensor> sphericalTensorAverageIOField;
 typedef AverageIOField<symmTensor> symmTensorAverageIOField;
+typedef AverageIOField<symmTensor4thOrder> symmTensor4thOrderAverageIOField;
+typedef AverageIOField<diagTensor> diagTensorAverageIOField;
 typedef AverageIOField<tensor> tensorAverageIOField;
 
 defineTemplateTypeNameAndDebugWithName
@@ -64,6 +66,18 @@ defineTemplateTypeNameAndDebugWithName
     "symmTensorAverageField",
     0
 );
+defineTemplateTypeNameAndDebugWithName
+(
+ symmTensor4thOrderAverageIOField,
+ "symmTensor4thOrderAverageField",
+    0
+ );
+defineTemplateTypeNameAndDebugWithName
+(
+ diagTensorAverageIOField,
+ "diagTensorAverageField",
+    0
+ );
 defineTemplateTypeNameAndDebugWithName
 (
     tensorAverageIOField,

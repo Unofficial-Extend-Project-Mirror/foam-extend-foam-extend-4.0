@@ -51,6 +51,8 @@ typedef correctedFvPatchField<vector> correctedFvPatchVectorField;
 typedef correctedFvPatchField<tensor> correctedFvPatchTensorField;
 typedef correctedFvPatchField<sphericalTensor> correctedFvPatchSphericalTensorField;
 typedef correctedFvPatchField<symmTensor> correctedFvPatchSymmTensorField;
+typedef correctedFvPatchField<symmTensor4thOrder> correctedFvPatchSymmTensor4thOrderField;
+typedef correctedFvPatchField<diagTensor> correctedFvPatchDiagTensorField;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -128,6 +128,30 @@ symmTensor Random::symmTensor01()
 }
 
 
+symmTensor4thOrder Random::symmTensor4thOrder01()
+{
+  symmTensor4thOrder rndTen;
+  for (direction cmpt=0; cmpt<symmTensor4thOrder::nComponents; cmpt++)
+    {
+      rndTen.component(cmpt) = scalar01();
+    }
+
+  return rndTen;
+}
+
+
+diagTensor Random::diagTensor01()
+{
+  diagTensor rndTen;
+  for (direction cmpt=0; cmpt<diagTensor::nComponents; cmpt++)
+    {
+      rndTen.component(cmpt) = scalar01();
+    }
+
+  return rndTen;
+}
+
+
 tensor Random::tensor01()
 {
     tensor rndTen;
@@ -185,6 +209,18 @@ void Random::randomise(sphericalTensor& st)
 void Random::randomise(symmTensor& st)
 {
     st = symmTensor01();
+}
+
+
+void Random::randomise(symmTensor4thOrder& st)
+{
+    st = symmTensor4thOrder01();
+}
+
+
+void Random::randomise(diagTensor& dt)
+{
+    dt = diagTensor01();
 }
 
 

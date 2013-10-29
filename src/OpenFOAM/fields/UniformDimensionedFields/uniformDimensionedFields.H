@@ -49,6 +49,8 @@ typedef UniformDimensionedField<scalar> uniformDimensionedScalarField;
 typedef UniformDimensionedField<vector> uniformDimensionedVectorField;
 typedef UniformDimensionedField<sphericalTensor> uniformDimensionedSphericalTensorField;
 typedef UniformDimensionedField<symmTensor> uniformDimensionedSymmTensorField;
+typedef UniformDimensionedField<symmTensor4thOrder> uniformDimensionedSymmTensor4thOrderField;
+typedef UniformDimensionedField<diagTensor> uniformDimensionedDiagTensorField;
 typedef UniformDimensionedField<tensor> uniformDimensionedTensorField;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

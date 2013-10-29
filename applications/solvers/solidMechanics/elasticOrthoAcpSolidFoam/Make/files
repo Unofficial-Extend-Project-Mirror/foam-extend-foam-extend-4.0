@@ -1,0 +1,3 @@
+elasticOrthoAcpSolidFoam.C
+
+EXE = $(FOAM_APPBIN)/elasticOrthoAcpSolidFoam

@@ -33,144 +33,135 @@ Description
     approach, also generating the strain tensor field epsilon, the plastic
     strain field epsilonP and stress tensor field sigma.
 
-    With optional multi-material solid interface correction ensuring
-    correct tractions on multi-material interfaces.
-
 Author
-    A. Karac, A. Ivankovic. Solver re-organised by P. Cardiff
-    Multi-material correction by Tukovic et al. 2012
+    A. Karac UCD/Zenica
+    P. Cardiff UCD
+    Aitken relaxation by T. Tang DTU
 
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "plasticityModel.H"
-#include "solidInterface.H"
+#include "constitutiveModel.H"
+#include "solidContactFvPatchVectorField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
-#   include "setRootCase.H"
-
-#   include "createTime.H"
-
-#   include "createMesh.H"
-
-#   include "createFields.H"
-
-#   include "readDivDSigmaExpMethod.H"
-
-#   include "createSolidInterface.H"
+# include "setRootCase.H"
+# include "createTime.H"
+# include "createMesh.H"
+# include "createFields.H"
+# include "createHistory.H"
+# include "readDivDSigmaExpMethod.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-    Info<< "\nCalculating displacement field\n" << endl;
-
-    for (runTime++; !runTime.end(); runTime++)
+  
+  Info<< "\nStarting time loop\n" << endl;
+  
+  for (runTime++; !runTime.end(); runTime++)
     {
-        Info<< "Time: " << runTime.timeName() << nl << endl;
+      Info<< "Time: " << runTime.timeName() << nl << endl;
+      
+#     include "readSolidMechanicsControls.H"
+      
+      int iCorr = 0;
+      lduMatrix::solverPerformance solverPerf;
+      scalar initialResidual = 1.0;
+      scalar relativeResidual = 1.0;
+      scalar plasticResidual = 1.0;
+      lduMatrix::debug = 0;
+      
+      do
+	{
+	  DU.storePrevIter();
 
-#       include "readStressedFoamControls.H"
+#         include "calculateDivDSigmaExp.H"
+	  	  
+	  fvVectorMatrix DUEqn
+	    (
+	     rho*fvm::d2dt2(DU)
+	     ==
+	     fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
+	     + divDSigmaExp
+	     - fvc::div(2*muf*(mesh.Sf() & fvc::interpolate(DEpsilonP)))
+	     );
 
-        int iCorr = 0;
-        scalar initialResidual = 0;
-        scalar relativeResidual = GREAT;
-        lduMatrix::solverPerformance solverPerf;
-        lduMatrix::debug = 0;
-
-        const volSymmTensorField& DEpsilonP = rheology.DEpsilonP();
-
-        do
-        {
-            DU.storePrevIter();
-
-#           include "calculateDivDSigmaExp.H"
-
-            fvVectorMatrix DUEqn
-            (
-                fvm::d2dt2(rho, DU)
-              ==
-                fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
-              + divDSigmaExp
-              - fvc::div(2*muf*(mesh.Sf() & fvc::interpolate(DEpsilonP)))
-            );
-
-            if(solidInterfaceCorr)
+	  solverPerf = DUEqn.solve();
+	  
+	  if(iCorr == 0)
             {
-                solidInterfacePtr->correct(DUEqn);
+	      initialResidual = solverPerf.initialResidual();
             }
+	  
+	  if(aitkenRelax)
+	    {
+#             include "aitkenRelaxation.H"
+	    }
+	  else
+	    {	  
+	      DU.relax();
+	    }
+	  
+	  gradDU = fvc::grad(DU);
 
-            solverPerf = DUEqn.solve();
+#         include "calculateRelativeResidual.H"
+#         include "calculateDEpsilonDSigma.H"
 
-            if(iCorr == 0)
+	  // correct plastic strain increment
+	  rheology.correct();
+
+#         include "calculatePlasticResidual.H"
+
+          if(iCorr % infoFrequency == 0)
             {
-                initialResidual = solverPerf.initialResidual();
+              Info << "\tTime " << runTime.value()
+                   << ", Corr " << iCorr
+		//<< ", Solving for " << DU.name()
+		// << " using " << solverPerf.solverName()
+                   << ", res = " << solverPerf.initialResidual()
+                   << ", rel res = " << relativeResidual
+                   << ", plastic res = " << plasticResidual;
+	      if(aitkenRelax) Info << ", aitken = " << aitkenTheta;
+	      Info << ", inner iters = " << solverPerf.nIterations() << endl;
             }
+	}
+      while
+	(
+	 iCorr++ < 2
+	 ||
+	 (//solverPerf.initialResidual() > convergenceTolerance
+	  relativeResidual > convergenceTolerance
+	  &&
+	  iCorr < nCorr)
+	 );
+      
+      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name() 
+	   << ", Initial residual = " << initialResidual 
+	   << ", Final residual = " << solverPerf.initialResidual()
+	   << ", Final rel residual = " << relativeResidual
+	   << ", No outer iterations " << iCorr << endl;
+      
+      // Update total quantities
+      U += DU;
+      epsilon += DEpsilon;
+      epsilonP += rheology.DEpsilonP();
+      sigma += DSigma;
 
-            DU.relax();
-
-            if(solidInterfaceCorr)
-            {
-                gradDU = solidInterfacePtr->grad(DU);
-            }
-            else
-            {
-                gradDU = fvc::grad(DU);
-            }
-
-#           include "calculateRelativeResidual.H"
-
-            rheology.correct();
-            mu = rheology.newMu();
-            lambda = rheology.newLambda();
-            muf = fvc::interpolate(rheology.newMu());
-            lambdaf = fvc::interpolate(rheology.newLambda());
-            if(solidInterfaceCorr)
-            {
-                solidInterfacePtr->modifyProperties(muf, lambdaf);
-            }
-
-            Info << "\tTime " << runTime.value()
-                << ", Corrector " << iCorr
-                << ", Solving for " << DU.name()
-                << " using " << solverPerf.solverName()
-                << ", residual = " << solverPerf.initialResidual() << endl;
-        }
-        while
-        (
-            solverPerf.initialResidual() > convergenceTolerance
-            && ++iCorr < nCorr
-        );
-
-        Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name()
-            << ", Initial residual = " << initialResidual
-            << ", Final residual = " << solverPerf.initialResidual()
-            << ", No outer iterations " << iCorr << endl;
-
-        lduMatrix::debug = 1;
-
-#       include "calculateDEpsilonDSigma.H"
-
-        U += DU;
-
-        epsilon += DEpsilon;
-
-        epsilonP += rheology.DEpsilonP();
-
-        sigma += DSigma;
-
-        rheology.updateYieldStress();
-
-#       include "writeFields.H"
-
-        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-            << nl << endl;
+      // Update yields stresses
+      rheology.updateYieldStress();
+      
+#     include "writeFields.H"
+#     include "writeHistory.H"
+      
+      Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+	  << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+	  << nl << endl;
     }
-
-    Info<< "End\n" << endl;
-
-    return(0);
+  
+  Info<< "End\n" << endl;
+  
+  return(0);
 }
 
 

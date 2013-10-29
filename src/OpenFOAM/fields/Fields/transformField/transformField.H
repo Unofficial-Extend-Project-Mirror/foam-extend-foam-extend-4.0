@@ -107,6 +107,54 @@ tmp<Field<sphericalTensor> > transformFieldMask<sphericalTensor>
     const tmp<tensorField>&
 );
 
+template<>
+tmp<Field<symmTensor4thOrder> > transformFieldMask<symmTensor4thOrder>
+(
+    const tensorField&
+ );
+
+template<>
+tmp<Field<symmTensor4thOrder> > transformFieldMask<symmTensor4thOrder>
+(
+    const tmp<tensorField>&
+ );
+ 
+template<>
+tmp<Field<symmTensor4thOrder> > transformFieldMask<symmTensor4thOrder>
+(
+     const symmTensorField&
+ );
+ 
+ template<>
+ tmp<Field<symmTensor4thOrder> > transformFieldMask<symmTensor4thOrder>
+ (
+    const tmp<symmTensorField>&
+  );
+
+template<>
+tmp<Field<diagTensor> > transformFieldMask<diagTensor>
+(
+     const tensorField&
+ );
+
+template<>
+tmp<Field<diagTensor> > transformFieldMask<diagTensor>
+(
+    const tmp<tensorField>&
+ );
+ 
+template<>
+tmp<Field<diagTensor> > transformFieldMask<diagTensor>
+(
+     const symmTensorField&
+ );
+
+template<>
+tmp<Field<diagTensor> > transformFieldMask<diagTensor>
+(
+     const tmp<symmTensorField>&
+ );
+
 
 //- Rotate given vectorField with the given quaternion
 void transform(vectorField&, const quaternion&, const vectorField&);

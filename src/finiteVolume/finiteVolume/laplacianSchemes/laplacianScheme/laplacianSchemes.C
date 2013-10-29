@@ -46,12 +46,14 @@ namespace fv
 #define makeLaplacianScheme(Type)                                             \
     makeLaplacianGTypeScheme(Type, scalar);                                   \
     makeLaplacianGTypeScheme(Type, symmTensor);                               \
+    makeLaplacianGTypeScheme(Type, diagTensor);                               \
     makeLaplacianGTypeScheme(Type, tensor);
 
 makeLaplacianScheme(scalar);
 makeLaplacianScheme(vector);
 makeLaplacianScheme(sphericalTensor);
 makeLaplacianScheme(symmTensor);
+makeLaplacianScheme(diagTensor);
 makeLaplacianScheme(tensor);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

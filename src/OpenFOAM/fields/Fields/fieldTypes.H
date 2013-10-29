@@ -36,6 +36,8 @@ Description
 #include "vector.H"
 #include "sphericalTensor.H"
 #include "symmTensor.H"
+#include "symmTensor4thOrder.H"
+#include "diagTensor.H"
 #include "tensor.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -52,6 +52,8 @@ typedef fvMatrix<scalar> fvScalarMatrix;
 typedef fvMatrix<vector> fvVectorMatrix;
 typedef fvMatrix<sphericalTensor> fvSphericalTensorMatrix;
 typedef fvMatrix<symmTensor> fvSymmTensorMatrix;
+typedef fvMatrix<symmTensor4thOrder> fvSymmTensor4thOrderMatrix;
+typedef fvMatrix<diagTensor> fvDiagTensorMatrix;
 typedef fvMatrix<tensor> fvTensorMatrix;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

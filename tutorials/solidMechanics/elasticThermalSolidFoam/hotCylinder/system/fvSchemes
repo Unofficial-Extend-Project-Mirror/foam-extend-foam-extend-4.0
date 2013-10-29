@@ -17,20 +17,20 @@ FoamFile
 
 d2dt2Schemes
 {
-    default     steadyState;
+    default         Euler;
 }
 
 ddtSchemes
 {
-    default     steadyState;
+    default         Euler;
 }
 
 gradSchemes
 {
-    default         none;
-    grad(U)         extendedLeastSquares 0;
-    snGradCorr(U)   extendedLeastSquares 0;
-    grad(T)         extendedLeastSquares 0;
+    default                 none;
+    grad(U)                 extendedLeastSquares 0;
+    snGradCorr(U)           extendedLeastSquares 0;
+    grad(T)                 extendedLeastSquares 0;
     grad(threeKalphaDeltaT) extendedLeastSquares 0;
 }
 
@@ -43,19 +43,19 @@ divSchemes
 
 laplacianSchemes
 {
-    default         none;
-    laplacian(DU,U) Gauss linear corrected;
-    laplacian(k,T)  Gauss linear corrected;
+    default                none;
+    laplacian(DU,U)        Gauss linear corrected;
+    laplacian(k,T)         Gauss linear corrected;
 }
 
 snGradSchemes
 {
-    snGrad(U)       corrected;
+    snGrad(U)              corrected;
 }
 
 interpolationSchemes
 {
-    default                  linear;
+    default                linear;
 }
 
 // ************************************************************************* //

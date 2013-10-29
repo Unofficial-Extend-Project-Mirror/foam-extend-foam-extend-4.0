@@ -224,6 +224,8 @@ makelimitedSurfaceInterpolationTypeScheme(SS, scalar)                         \
 makelimitedSurfaceInterpolationTypeScheme(SS, vector)                         \
 makelimitedSurfaceInterpolationTypeScheme(SS, sphericalTensor)                \
 makelimitedSurfaceInterpolationTypeScheme(SS, symmTensor)                     \
+makelimitedSurfaceInterpolationTypeScheme(SS, symmTensor4thOrder)             \
+makelimitedSurfaceInterpolationTypeScheme(SS, diagTensor)                     \
 makelimitedSurfaceInterpolationTypeScheme(SS, tensor)
 
 

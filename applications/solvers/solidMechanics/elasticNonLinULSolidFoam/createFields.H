@@ -91,53 +91,39 @@
 
     //- explicit terms in the momentum equation
     volVectorField divDSigmaExp
-    (
-        IOobject
-        (
-            "divDSigmaExp",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh,
-        dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
-     );
+	(
+	 IOobject
+	 (
+	  "divDSigmaExp",
+	  runTime.timeName(),
+	  mesh,
+	  IOobject::NO_READ,
+	  IOobject::NO_WRITE
+	  ),
+	 mesh,
+ 	 dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
+	 );
 
      volVectorField divDSigmaLargeStrainExp
-     (
-         IOobject
-         (
-             "divDSigmaLargeStrainExp",
-             runTime.timeName(),
-             mesh,
-             IOobject::NO_READ,
-             IOobject::AUTO_WRITE
-         ),
-         mesh,
-         dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
-    );
+	(
+	 IOobject
+	 (
+	  "divDSigmaLargeStrainExp",
+	  runTime.timeName(),
+	  mesh,
+	  IOobject::NO_READ,
+	  IOobject::NO_WRITE
+	  ),
+	 mesh,
+ 	 dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
+	 );
 
-    rheologyModel rheology(sigma);
+    constitutiveModel rheology(sigma, DU);
+
+    volScalarField rho = rheology.rho();
     volScalarField mu = rheology.mu();
     volScalarField lambda = rheology.lambda();
     surfaceScalarField muf = fvc::interpolate(rheology.mu());
     surfaceScalarField lambdaf = fvc::interpolate(rheology.lambda());
 
     surfaceVectorField n = mesh.Sf()/mesh.magSf();
-
-    volScalarField rho
-    (
-        IOobject
-        (
-            "rho",
-            runTime.timeName(),
-            mesh,
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-        ),
-        rheology.rho()
-    );
-
-    volTensorField F = I + gradDU;
-    volScalarField J = det(F);

@@ -37,6 +37,8 @@ defineTemplateTypeNameAndDebug(uniformDimensionedScalarField, 0);
 defineTemplateTypeNameAndDebug(uniformDimensionedVectorField, 0);
 defineTemplateTypeNameAndDebug(uniformDimensionedSphericalTensorField, 0);
 defineTemplateTypeNameAndDebug(uniformDimensionedSymmTensorField, 0);
+defineTemplateTypeNameAndDebug(uniformDimensionedSymmTensor4thOrderField, 0);
+defineTemplateTypeNameAndDebug(uniformDimensionedDiagTensorField, 0);
 defineTemplateTypeNameAndDebug(uniformDimensionedTensorField, 0);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

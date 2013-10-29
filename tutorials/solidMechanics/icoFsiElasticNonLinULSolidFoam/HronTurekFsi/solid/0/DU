@@ -1,23 +1,17 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.2                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version 2.0;
-    format ascii;
-
-    root "/home/coyote/hjasak/OpenFOAM/OpenFOAM-1.2/tutorials/newStressedFoam";
-    case "plateHole";
-    instance ""0"";
-    local "";
-
-    class volVectorField;
-    object DU;
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    location    "0";
+    object      DU;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -31,7 +25,7 @@ boundaryField
     plate
     {
         type solidTraction;
-        nonLinear updatedLagrangian;
+	nonLinear updatedLagrangian;
         traction uniform ( 0 0 0 );
         pressure uniform 0;
         value uniform (0 0 0);
@@ -39,7 +33,7 @@ boundaryField
 
     plateFix
     {
-       type            fixedDisplacement;
+       type            fixedValue;
        value           uniform (0 0 0);
     }
 

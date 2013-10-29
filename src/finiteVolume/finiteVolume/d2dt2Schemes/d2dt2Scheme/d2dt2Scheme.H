@@ -196,6 +196,8 @@ makeFvD2dt2TypeScheme(SS, scalar)                                              \
 makeFvD2dt2TypeScheme(SS, vector)                                              \
 makeFvD2dt2TypeScheme(SS, sphericalTensor)                                     \
 makeFvD2dt2TypeScheme(SS, symmTensor)                                          \
+makeFvD2dt2TypeScheme(SS, symmTensor4thOrder)                                  \
+makeFvD2dt2TypeScheme(SS, diagTensor)                                          \
 makeFvD2dt2TypeScheme(SS, tensor)
 
 

@@ -1,36 +1,33 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.0                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           dictionary;
-    object          fvSchemes;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 d2dt2Schemes
 {
-    default     none;
-    d2dt2(rho,DU) Euler;
+    default         Euler;
+}
+
+ddtSchemes
+{
+    default         Euler;
 }
 
 gradSchemes
 {
-    default          none;
+    default         none;
     grad(DU)         extendedLeastSquares 0;
     snGradCorr(DU)   extendedLeastSquares 0;
 }
@@ -38,13 +35,12 @@ gradSchemes
 divSchemes
 {
     default         none;
-    div(sigma)      Gauss linear;
+    div(sigma)      Gauss skewCorrected linear;
 }
 
 laplacianSchemes
 {
-    default           none;
-    laplacian(mu,DU)  Gauss linear corrected;
+    default         none;
     laplacian(DDU,DU) Gauss linear corrected;
 }
 
@@ -55,8 +51,7 @@ snGradSchemes
 
 interpolationSchemes
 {
-    default                  none;
-    interpolate(sigma)       linear;
+    default         linear;
 }
 
 // ************************************************************************* //

@@ -53,6 +53,8 @@ makeBaseSurfaceInterpolationScheme(scalar)
 makeBaseSurfaceInterpolationScheme(vector)
 makeBaseSurfaceInterpolationScheme(sphericalTensor)
 makeBaseSurfaceInterpolationScheme(symmTensor)
+makeBaseSurfaceInterpolationScheme(symmTensor4thOrder)
+makeBaseSurfaceInterpolationScheme(diagTensor)
 makeBaseSurfaceInterpolationScheme(tensor)
 
 

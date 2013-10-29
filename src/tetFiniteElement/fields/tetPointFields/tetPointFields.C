@@ -41,12 +41,16 @@ defineTemplateTypeNameAndDebug(tetPointScalarField::DimensionedInternalField, 0)
 defineTemplateTypeNameAndDebug(tetPointVectorField::DimensionedInternalField, 0);
 defineTemplateTypeNameAndDebug(tetPointSphericalTensorField::DimensionedInternalField, 0);
 defineTemplateTypeNameAndDebug(tetPointSymmTensorField::DimensionedInternalField, 0);
+defineTemplateTypeNameAndDebug(tetPointSymmTensor4thOrderField::DimensionedInternalField, 0);
+defineTemplateTypeNameAndDebug(tetPointDiagTensorField::DimensionedInternalField, 0);
 defineTemplateTypeNameAndDebug(tetPointTensorField::DimensionedInternalField, 0);
 
 defineTemplateTypeNameAndDebug(tetPointScalarField, 0);
 defineTemplateTypeNameAndDebug(tetPointVectorField, 0);
 defineTemplateTypeNameAndDebug(tetPointSphericalTensorField, 0);
 defineTemplateTypeNameAndDebug(tetPointSymmTensorField, 0);
+defineTemplateTypeNameAndDebug(tetPointSymmTensor4thOrderField, 0);
+defineTemplateTypeNameAndDebug(tetPointDiagTensorField, 0);
 defineTemplateTypeNameAndDebug(tetPointTensorField, 0);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

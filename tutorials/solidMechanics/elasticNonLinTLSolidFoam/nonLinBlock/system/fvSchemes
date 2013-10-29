@@ -17,7 +17,12 @@ FoamFile
 
 d2dt2Schemes
 {
-    default     steadyState;
+    default         Euler;
+}
+
+ddtSchemes
+{
+    default         Euler;
 }
 
 gradSchemes
@@ -30,7 +35,7 @@ gradSchemes
 divSchemes
 {
     default         none;
-    div(sigma)      Gauss linear;
+    div(sigma)      Gauss skewCorrected linear;
 }
 
 laplacianSchemes
@@ -46,7 +51,7 @@ snGradSchemes
 
 interpolationSchemes
 {
-    default                  linear;
+    default         linear;
 }
 
 // ************************************************************************* //

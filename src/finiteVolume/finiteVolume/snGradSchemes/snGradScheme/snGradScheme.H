@@ -195,6 +195,8 @@ makeSnGradTypeScheme(SS, scalar)                                               \
 makeSnGradTypeScheme(SS, vector)                                               \
 makeSnGradTypeScheme(SS, sphericalTensor)                                      \
 makeSnGradTypeScheme(SS, symmTensor)                                           \
+makeSnGradTypeScheme(SS, symmTensor4thOrder)                                   \
+makeSnGradTypeScheme(SS, diagTensor)                                           \
 makeSnGradTypeScheme(SS, tensor)
 
 

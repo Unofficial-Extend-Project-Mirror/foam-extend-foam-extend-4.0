@@ -46,6 +46,9 @@ template<class Type> class correctedFvPatchField;
 typedef correctedFvPatchField<scalar> correctedFvPatchScalarField;
 typedef correctedFvPatchField<vector> correctedFvPatchVectorField;
 typedef correctedFvPatchField<tensor> correctedFvPatchTensorField;
+typedef correctedFvPatchField<symmTensor>
+    correctedFvPatchSymmTensor4thOrderField;
+typedef correctedFvPatchField<diagTensor> correctedFvPatchDiagTensorField;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

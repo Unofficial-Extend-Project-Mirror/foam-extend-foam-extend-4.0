@@ -1,56 +1,107 @@
-if (runTime.outputTime())
-{
-    volScalarField epsilonEq
-    (
-        IOobject
+    if (runTime.outputTime())
+    {
+        volScalarField sigmaCauchyEq
         (
-            "epsilonEq",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        sqrt((2.0/3.0)*magSqr(dev(epsilon)))
-    );
+            IOobject
+            (
+                "sigmaCauchyEq",
+                runTime.timeName(),
+                mesh,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            ),
+            sqrt((3.0/2.0)*magSqr(dev(sigma)))
+        );
 
-    Info<< "Max epsilonEq = " << max(epsilonEq).value()
-        << endl;
+        Info<< "Max sigmaCauchyEq = " << max(sigmaCauchyEq).value()
+            << endl;
 
-    volScalarField sigmaEq
-    (
-        IOobject
-        (
-            "sigmaEq",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        sqrt((3.0/2.0)*magSqr(dev(sigma)))
-    );
+//         volScalarField sigmaCauchyxx
+//         (
+//             IOobject
+//             (
+//                 "sigmaCauchyxx",
+//                 runTime.timeName(),
+//                 mesh,
+//                 IOobject::NO_READ,
+//                 IOobject::AUTO_WRITE
+//             ),
+//             sigma.component(symmTensor::XX)
+//         );
 
-    Info<< "Max sigmaEq = " << max(sigmaEq).value()
-        << endl;
+//         Info<< "Max sigmaCauchyxx = " << max(sigmaCauchyxx).value()
+//             << endl;
 
-    volScalarField sigmaHyd
-    (
-        IOobject
-        (
-            "sigmaHyd",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        (
-            sigma.component(symmTensor::XX)
-          + sigma.component(symmTensor::YY)
-          + sigma.component(symmTensor::ZZ)
-        )/3
-    );
+//         volScalarField sigmaCauchyyy
+//         (
+//             IOobject
+//             (
+//                 "sigmaCauchyyy",
+//                 runTime.timeName(),
+//                 mesh,
+//                 IOobject::NO_READ,
+//                 IOobject::AUTO_WRITE
+//             ),
+//             sigma.component(symmTensor::YY)
+//         );
 
-    Info<< "Max sigmaHyd = " << max(sigmaHyd).value()
-        << endl;
+//         Info<< "Max sigmaCauchyyy = " << max(sigmaCauchyyy).value()
+//             << endl;
 
-    runTime.write();
-}
+//         volScalarField sigmaCauchyzz
+//         (
+//             IOobject
+//             (
+//                 "sigmaCauchyzz",
+//                 runTime.timeName(),
+//                 mesh,
+//                 IOobject::NO_READ,
+//                 IOobject::AUTO_WRITE
+//             ),
+//             sigma.component(symmTensor::ZZ)
+//         );
+
+//         Info<< "Max sigmaCauchyzz = " << max(sigmaCauchyzz).value()
+//             << endl;
+
+//         volScalarField sigmaCauchyxy
+//         (
+//             IOobject
+//             (
+//                 "sigmaCauchyxy",
+//                 runTime.timeName(),
+//                 mesh,
+//                 IOobject::NO_READ,
+//                 IOobject::AUTO_WRITE
+//             ),
+//             sigma.component(symmTensor::XY)
+//         );
+
+//         volScalarField sigmaCauchyxz
+//         (
+//             IOobject
+//             (
+//                 "sigmaCauchyxz",
+//                 runTime.timeName(),
+//                 mesh,
+//                 IOobject::NO_READ,
+//                 IOobject::AUTO_WRITE
+//             ),
+//             sigma.component(symmTensor::XZ)
+//         );
+
+//         volScalarField sigmaCauchyyz
+//         (
+//             IOobject
+//             (
+//                 "sigmaCauchyyz",
+//                 runTime.timeName(),
+//                 mesh,
+//                 IOobject::NO_READ,
+//                 IOobject::AUTO_WRITE
+//             ),
+//             sigma.component(symmTensor::YZ)
+//         );
+
+        runTime.write();
+    }

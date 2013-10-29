@@ -36,6 +36,8 @@ Description
 //#include "GeometricVectorField.H"
 #include "GeometricTensorField.H"
 #include "GeometricSphericalTensorField.H"
+#include "GeometricSymmTensor4thOrderField.H"
+#include "GeometricDiagTensorField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

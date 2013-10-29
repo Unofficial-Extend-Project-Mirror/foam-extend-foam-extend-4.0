@@ -1,4 +1,4 @@
-    Info<< "Reading field DU\n" << endl;
+    Info<< "Reading incremental displacement field DU\n" << endl;
     volVectorField DU
     (
         IOobject
@@ -14,7 +14,7 @@
 
     volTensorField gradDU = fvc::grad(DU);
 
-    Info<< "Creating field U\n" << endl;
+    Info<< "Reading accumulated displacement field U\n" << endl;
     volVectorField U
     (
         IOobject
@@ -29,67 +29,27 @@
         dimensionedVector("zero", dimLength, vector::zero)
     );
 
-    volSymmTensorField DSigma
-    (
-        IOobject
-        (
-            "DSigma",
-            runTime.timeName(),
-            mesh,
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
-    );
-
-    volSymmTensorField sigma
-    (
-        IOobject
-        (
-            "sigma",
-            runTime.timeName(),
-            mesh,
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
-    );
-
-    volVectorField divDSigmaExp
-    (
-        IOobject
-        (
-            "divDSigmaExp",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
-    );
-
-    volVectorField divDSigmaLargeStrainExp
-    (
-        IOobject
-        (
-           "divDSigmaLargeStrainExp",
-           runTime.timeName(),
-           mesh,
-           IOobject::NO_READ,
-           IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
-    );
-
+    Info << "Reading accumulated strain field epsilon\n" << endl;
     volSymmTensorField epsilon
     (
         IOobject
         (
             "epsilon",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+    );
+
+    // total plastic strain
+    volSymmTensorField epsilonP
+    (
+        IOobject
+        (
+            "epsilonP",
             runTime.timeName(),
             mesh,
             IOobject::READ_IF_PRESENT,
@@ -113,56 +73,108 @@
         dimensionedSymmTensor("zero", dimless, symmTensor::zero)
     );
 
-    volSymmTensorField epsilonE
+    Info << "Reading accumulated stress field sigma\n" << endl;
+    volSymmTensorField sigma
     (
         IOobject
         (
-            "epsilonE",
+            "sigma",
             runTime.timeName(),
             mesh,
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+        dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
     );
 
-    volSymmTensorField epsilonP
+
+    Info << "Reading incremental stress field DSigma\n" << endl;
+    volSymmTensorField DSigma
     (
         IOobject
         (
-            "epsilonP",
+            "DSigma",
             runTime.timeName(),
             mesh,
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+        dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
     );
 
-    plasticityModel rheology(gradDU, epsilon, sigma);
+    //- explicit terms in the momentum equation
+    volVectorField divDSigmaExp
+	(
+	 IOobject
+	 (
+	  "divDSigmaExp",
+	  runTime.timeName(),
+	  mesh,
+	  IOobject::NO_READ,
+	  IOobject::NO_WRITE
+	  ),
+	 mesh,
+ 	 dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
+	 );
 
-    volScalarField mu = rheology.newMu();
-    volScalarField lambda = rheology.newLambda();
-    surfaceScalarField muf = fvc::interpolate(rheology.newMu());
-    surfaceScalarField lambdaf = fvc::interpolate(rheology.newLambda());
+      volVectorField divDSigmaNonLinExp
+      (
+        IOobject
+        (
+	 "divDSigmaNonLinExp",
+	 runTime.timeName(),
+	 mesh,
+	 IOobject::NO_READ,
+	 IOobject::NO_WRITE
+	 ),
+        mesh,
+        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
+       );
+
+    constitutiveModel rheology(sigma, DU);
+
+    volScalarField rho = rheology.rho();
+
+    volScalarField mu = rheology.mu();
+    volScalarField lambda = rheology.lambda();
+    surfaceScalarField muf = fvc::interpolate(rheology.mu());
+    surfaceScalarField lambdaf = fvc::interpolate(rheology.lambda());
 
     surfaceVectorField n = mesh.Sf()/mesh.magSf();
 
-    volScalarField rho
-    (
+   // plastic strain increment
+   const volSymmTensorField& DEpsilonP = rheology.DEpsilonP();
+
+   // for aitken relaxation
+   volVectorField aitkenDelta
+   (
         IOobject
         (
-            "rho",
-            runTime.timeName(),
-            mesh,
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-        ),
-        rheology.rho()
-     );
+	 "aitkenDelta",
+	 runTime.timeName(),
+	 mesh,
+	 IOobject::NO_READ,
+	 IOobject::NO_WRITE
+	 ),
+        mesh,
+        dimensionedVector("zero", dimLength, vector::zero)
+	);
+// aitken relaxation factor
+scalar aitkenInitialRes = 1.0;
+scalar aitkenTheta = 0.1;
 
-    volTensorField DF = gradDU.T();
-    volTensorField F = I + DF;
-    volScalarField J = det(F);
+//    volVectorField resid
+//    (
+//         IOobject
+//         (
+// 	 "resid",
+// 	 runTime.timeName(),
+// 	 mesh,
+// 	 IOobject::NO_READ,
+// 	 IOobject::AUTO_WRITE
+// 	 ),
+//         mesh,
+//         dimensionedVector("zero", dimless, vector::zero)
+//     );

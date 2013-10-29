@@ -31,6 +31,8 @@ License
 //#include "DimensionedVectorField.H"
 #include "DimensionedTensorField.H"
 #include "DimensionedSphericalTensorField.H"
+#include "DimensionedSymmTensor4thOrderField.H"
+#include "DimensionedDiagTensorField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

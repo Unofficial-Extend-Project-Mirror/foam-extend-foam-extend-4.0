@@ -1,4 +1,3 @@
 DEpsilon = symm(gradDU);
 
-DSigma = 2*rheology.newMu()*(DEpsilon - DEpsilonP)
-  + rheology.newLambda()*(I*tr(DEpsilon));
+DSigma = 2*mu*(DEpsilon - DEpsilonP) + lambda*(I*tr(DEpsilon));

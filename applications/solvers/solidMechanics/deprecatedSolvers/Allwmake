@@ -1,0 +1,19 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # run from this directory
+
+set -x
+
+wmake libso materialModels
+
+wmake stressedFoam
+wmake contactStressFoam
+
+wmake newStressedFoam
+wmake newContactStressFoam
+
+wmake stressFemFoam
+
+wmake icoFsiFoam
+
+wmake solidDisplacementFoam
+wmake solidEquilibriumDisplacementFoam

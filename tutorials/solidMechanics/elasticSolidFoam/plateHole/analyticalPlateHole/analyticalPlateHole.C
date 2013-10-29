@@ -47,9 +47,7 @@ symmTensor plateHoleSolution(const vector& C);
 int main(int argc, char *argv[])
 {
 #   include "setRootCase.H"
-
 #   include "createTime.H"
-
 #   include "createMesh.H"
 
     runTime++;
@@ -63,7 +61,7 @@ int main(int argc, char *argv[])
     (
         IOobject
         (
-            "analyticalSigma",
+            "sigmaAnalyticalCylin",
            runTime.timeName(),
            mesh,
            IOobject::NO_READ,

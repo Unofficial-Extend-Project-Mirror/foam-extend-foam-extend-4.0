@@ -29,10 +29,13 @@ primitives/Scalar/doubleScalar/doubleScalar.C
 primitives/Scalar/floatScalar/floatScalar.C
 primitives/Scalar/scalar/scalar.C
 primitives/DiagTensor/diagTensor/diagTensor.C
+primitives/DiagTensor/labelDiagTensor/labelDiagTensor.C
 primitives/SphericalTensor/sphericalTensor/sphericalTensor.C
 primitives/SphericalTensor/labelSphericalTensor/labelSphericalTensor.C
 primitives/SymmTensor/labelSymmTensor/labelSymmTensor.C
 primitives/SymmTensor/symmTensor/symmTensor.C
+primitives/SymmTensor4thOrder/labelSymmTensor4thOrder/labelSymmTensor4thOrder.C
+primitives/SymmTensor4thOrder/symmTensor4thOrder/symmTensor4thOrder.C
 primitives/Tensor/labelTensor/labelTensor.C
 primitives/Tensor/tensor/tensor.C
 primitives/Vector/complexVector/complexVector.C
@@ -88,12 +91,14 @@ containers/LinkedLists/linkTypes/DLListBase/DLListBase.C
 
 primitiveLists = primitives/Lists
 $(primitiveLists)/boolList.C
+$(primitiveLists)/diagTensorList.C
 $(primitiveLists)/labelIOList.C
 $(primitiveLists)/scalarList.C
 $(primitiveLists)/scalarIOList.C
 $(primitiveLists)/vectorList.C
 $(primitiveLists)/sphericalTensorList.C
 $(primitiveLists)/symmTensorList.C
+$(primitiveLists)/symmTensor4thOrderList.C
 $(primitiveLists)/tensorList.C
 $(primitiveLists)/VectorNLists.C
 $(primitiveLists)/wordIOList.C
@@ -205,6 +210,7 @@ dimensionedTypes/dimensionedScalar/dimensionedScalar.C
 dimensionedTypes/dimensionedSphericalTensor/dimensionedSphericalTensor.C
 dimensionedTypes/dimensionedDiagTensor/dimensionedDiagTensor.C
 dimensionedTypes/dimensionedSymmTensor/dimensionedSymmTensor.C
+dimensionedTypes/dimensionedSymmTensor4thOrder/dimensionedSymmTensor4thOrder.C
 dimensionedTypes/dimensionedTensor/dimensionedTensor.C
 
 matrices/solution/solution.C
@@ -517,6 +523,7 @@ $(Fields)/scalarField/scalarField.C
 $(Fields)/sphericalTensorField/sphericalTensorField.C
 $(Fields)/diagTensorField/diagTensorField.C
 $(Fields)/symmTensorField/symmTensorField.C
+$(Fields)/symmTensor4thOrderField/symmTensor4thOrderField.C
 $(Fields)/tensorField/tensorField.C
 $(Fields)/complexFields/complexFields.C
 $(Fields)/VectorNFields/VectorNFields.C
@@ -532,6 +539,7 @@ $(Fields)/vector2DField/vector2DIOField.C
 $(Fields)/sphericalTensorField/sphericalTensorIOField.C
 $(Fields)/diagTensorField/diagTensorIOField.C
 $(Fields)/symmTensorField/symmTensorIOField.C
+$(Fields)/symmTensor4thOrderField/symmTensor4thOrderIOField.C
 $(Fields)/tensorField/tensorIOField.C
 $(Fields)/transformField/transformField.C
 
