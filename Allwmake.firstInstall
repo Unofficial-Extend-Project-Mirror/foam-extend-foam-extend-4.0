@@ -33,7 +33,32 @@ then
     then
         exit 0
     fi
-fi  
+fi 
+
+# Check whether we will be compiling cudaSolvers
+if [ -f $CUDA_BIN_DIR/nvcc ]
+then
+    echo
+    echo "Cuda compiler detected at $CUDA_BIN_DIR/nvcc;"
+    echo "cudaSolvers will be compiled by default."
+    echo
+
+    # If yes, check presence of $CUDA_ARCH 
+    if [ -z "$CUDA_ARCH" ]
+    then
+        echo
+        echo "\$CUDA_ARCH is required by nvcc compiler but not set."
+        echo "Check section '-gpu-architecture' in 'man nvcc' for details." 
+        echo
+        read -r -p "Proceed without compiling cudaSolvers? [Y/n] " response
+        if [[ $response =~ ^([nN][oO]|[nN])$ ]]
+        then
+            exit 0
+        fi
+        export CUDA_IGNORE
+    fi
+    echo "Cuda architecture set to: $CUDA_ARCH"
+fi
 
 # wmake is required for subsequent targets
 ( cd wmake/src && make )
