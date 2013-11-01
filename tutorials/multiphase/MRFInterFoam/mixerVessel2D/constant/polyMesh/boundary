@@ -1,6 +1,6 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
@@ -9,28 +9,38 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    location    "0.001";
-    object      alpha1.org;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 0 0 0 0];
-
-internalField   uniform 0;
-
-boundaryField
-{
-    atmosphere
+4
+(
+    rotor
     {
-        type            inletOutlet;
-        inletValue      uniform 0;
-        value           uniform 0;
+        type            wall;
+        nFaces          192;
+        startFace       5952;
     }
-    walls
+    stator
     {
-        type            zeroGradient;
+        type            wall;
+        nFaces          192;
+        startFace       6144;
     }
-}
+    front
+    {
+        type            empty;
+        nFaces          3072;
+        startFace       6336;
+    }
+    back
+    {
+        type            empty;
+        nFaces          3072;
+        startFace       9408;
+    }
+)
 
 // ************************************************************************* //

@@ -92,6 +92,10 @@ solvers
 PISO
 {
     cAlpha          1;
+    pdRefPoint       (0 0 0.15);
+    pdRefValue       1e5;
+    pRefPoint       (0 0 0.15);
+    pRefValue       1e5;
 }
 PIMPLE
 {
@@ -102,11 +106,6 @@ PIMPLE
     nAlphaCorr      1;
     nAlphaSubCycles 3;
     correctPhi      no;
-
-    pdRefPoint       (0 0 0.15);
-    pdRefValue       1e5;
-    pRefPoint       (0 0 0.15);
-    pRefValue       1e5;
 }
 
 relaxationFactors

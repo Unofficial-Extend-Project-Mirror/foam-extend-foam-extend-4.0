@@ -1,6 +1,6 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
 |  \\    /   O peration     | Version:  1.6-ext                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
@@ -17,6 +17,17 @@ FoamFile
 
 solvers
 {
+    cellDisplacement
+    {
+        solver          GAMG;
+        tolerance       1e-05;
+        relTol          0;
+        smoother        GaussSeidel;
+        cacheAgglomeration true;
+        nCellsInCoarsestLevel 10;
+        agglomerator    faceAreaPair;
+        mergeLevels     1;
+    }
     pcorr
     {
         solver          PCG;
@@ -34,12 +45,10 @@ solvers
             agglomerator    faceAreaPair;
             mergeLevels     1;
         }
-
         tolerance       1e-05;
         relTol          0;
         maxIter         100;
     }
-
     pd
     {
         solver          GAMG;
@@ -54,14 +63,13 @@ solvers
         agglomerator    faceAreaPair;
         mergeLevels     1;
     }
-
     pdFinal
     {
         solver          PCG;
         preconditioner
         {
             preconditioner  GAMG;
-            tolerance       2e-09;
+            tolerance       1e-08;
             relTol          0;
             nVcycles        2;
             smoother        DICGaussSeidel;
@@ -73,12 +81,10 @@ solvers
             agglomerator    faceAreaPair;
             mergeLevels     1;
         }
-
-        tolerance       2e-09;
+        tolerance       1e-08;
         relTol          0;
         maxIter         20;
     }
-
     U
     {
         solver          smoothSolver;
@@ -87,29 +93,36 @@ solvers
         relTol          0;
         nSweeps         1;
     }
+    "(k|epsilon|omega|R|nuTilda)"
+    {
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-08;
+        relTol          0;
+    }
 }
 
 PISO
 {
-    cAlpha          1.5;
-    pdRefPoint      (0 0 0.15);
-    pdRefValue      0;
-    pRefValue       1e5;
+    cAlpha          1;
 }
+
 PIMPLE
 {
     momentumPredictor yes;
     nOuterCorrectors 1;
     nCorrectors     4;
     nNonOrthogonalCorrectors 0;
-            nAlphaCorr      1;
-            nAlphaSubCycles 3;
-    correctPhi      no;
+    nAlphaCorr      1;
+    nAlphaSubCycles 3;
+    cAlpha          1;
+    correctPhi      yes;
 }
 
 relaxationFactors
 {
-    U               1;
+    "(U|k|epsilon|omega|R|nuTilda)" 1;
 }
+
 
 // ************************************************************************* //
