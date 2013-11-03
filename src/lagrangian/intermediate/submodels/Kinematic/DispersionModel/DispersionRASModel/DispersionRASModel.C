@@ -38,7 +38,8 @@ Foam::DispersionRASModel<CloudType>::DispersionRASModel
     DispersionModel<CloudType>(dict, owner),
     turbulence_
     (
-        owner.mesh().objectRegistry::lookupObject<compressible::RASModel>
+        owner.mesh().objectRegistry::template
+        lookupObject<compressible::RASModel>
         (
             "RASProperties"
         )

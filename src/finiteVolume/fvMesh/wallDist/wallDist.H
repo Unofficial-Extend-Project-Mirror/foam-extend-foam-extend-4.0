@@ -62,6 +62,7 @@ SourceFiles
 #ifndef wallDist_H
 #define wallDist_H
 
+#include "objectRegistry.H"
 #include "volFields.H"
 #include "cellDistFuncs.H"
 

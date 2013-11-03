@@ -39,6 +39,8 @@ SourceFiles
 #ifndef polyMeshGeometry_H
 #define polyMeshGeometry_H
 
+#include "objectRegistry.H"
+#include "Time.H"
 #include "pointFields.H"
 #include "HashSet.H"
 

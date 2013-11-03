@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "OFFsurfaceFormat.H"
 
 #include "addToRunTimeSelectionTable.H"

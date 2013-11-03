@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "volFields.H"
 #include "surfaceFields.H"
 #include "timeVaryingUniformInletOutletFvPatchFields.H"

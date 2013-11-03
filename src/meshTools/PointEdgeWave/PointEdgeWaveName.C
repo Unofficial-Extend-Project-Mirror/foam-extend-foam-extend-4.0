@@ -26,6 +26,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "PointEdgeWave.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

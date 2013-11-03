@@ -114,7 +114,7 @@ void cellMotionFvPatchField<Type>::updateCoeffs()
     pfName.replace("cell", "point");
 
     const GeometricField<Type, pointPatchField, pointMesh>& pointMotion =
-        this->db().objectRegistry::
+        this->db().objectRegistry::template
         lookupObject<GeometricField<Type, pointPatchField, pointMesh> >
         (
             pfName

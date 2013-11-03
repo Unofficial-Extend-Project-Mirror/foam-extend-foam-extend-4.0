@@ -36,6 +36,7 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "translationODE.H"
+#include "objectRegistry.H"
 #include "Time.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

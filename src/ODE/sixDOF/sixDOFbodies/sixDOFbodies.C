@@ -33,6 +33,7 @@ Author
 
 \*----------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "sixDOFbodies.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

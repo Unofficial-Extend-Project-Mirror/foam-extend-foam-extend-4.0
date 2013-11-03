@@ -37,10 +37,16 @@ License
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template <class Type>
-const Foam::scalar Foam::FaceCellWave<Type>::geomTol_ = 1e-6;
+Foam::scalar Foam::FaceCellWave<Type>::geomTol_
+(
+    debug::tolerances("FaceCellWaveGeomTol", 1e-6)
+);
 
 template <class Type>
-const Foam::scalar Foam::FaceCellWave<Type>::propagationTol_ = 0.01;
+Foam::scalar Foam::FaceCellWave<Type>::propagationTol_
+(
+    debug::tolerances("FaceCellWavePropagationTol", 0.01)
+);
 
 // Write to ostream
 template <class Type>

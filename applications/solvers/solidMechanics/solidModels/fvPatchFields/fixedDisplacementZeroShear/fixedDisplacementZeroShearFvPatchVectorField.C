@@ -55,7 +55,7 @@ fixedDisplacementZeroShearFvPatchVectorField::fixedDisplacementZeroShearFvPatchV
 :
     directionMixedFvPatchVectorField(p, iF),
     fieldName_("undefined"),
-    nonLinear_(OFF)
+    nonLinear_(nonLinearGeometry::OFF)
 {}
 
 
@@ -82,23 +82,26 @@ fixedDisplacementZeroShearFvPatchVectorField::fixedDisplacementZeroShearFvPatchV
 :
     directionMixedFvPatchVectorField(p, iF),
     fieldName_(dimensionedInternalField().name()),
-    nonLinear_(OFF)
+    nonLinear_(nonLinearGeometry::OFF)
 {
 
     //- check if traction boundary is for non linear solver
     if (dict.found("nonLinear"))
     {
-        nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));;
+	nonLinear_ = nonLinearGeometry::nonLinearNames_.read
+	(
+	    dict.lookup("nonLinear")
+	);
 
-        if (nonLinear_ == UPDATED_LAGRANGIAN)
-        {
-            Info << "\tnonLinear set to updated Lagrangian"
-            << endl;
-        }
-        else if (nonLinear_ == TOTAL_LAGRANGIAN)
-        {
-            Info << "\tnonLinear set to total Lagrangian" << endl;
-        }
+	if (nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
+	{
+	    Info << "\tnonLinear set to updated Lagrangian"
+	    << endl;
+	}
+	else if (nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
+	{
+	    Info << "\tnonLinear set to total Lagrangian" << endl;
+	}
     }
 
     //- the leastSquares has zero non-orthogonal correction
@@ -106,18 +109,18 @@ fixedDisplacementZeroShearFvPatchVectorField::fixedDisplacementZeroShearFvPatchV
     //- so the gradient scheme should be extendedLeastSquares
     if
     (
-        Foam::word
-            (
-                dimensionedInternalField().mesh().schemesDict().gradScheme
-                (
-                    "grad(" + fieldName_ + ")"
-                )
-            ) != "extendedLeastSquares"
+	Foam::word
+	    (
+		dimensionedInternalField().mesh().schemesDict().gradScheme
+		(
+		    "grad(" + fieldName_ + ")"
+		)
+	    ) != "extendedLeastSquares"
     )
     {
-        Warning << "The gradScheme for " << fieldName_
-        << " should be \"extendedLeastSquares 0\" for the boundary "
-        << "non-orthogonal correction to be right" << endl;
+	Warning << "The gradScheme for " << fieldName_
+	<< " should be \"extendedLeastSquares 0\" for the boundary "
+	<< "non-orthogonal correction to be right" << endl;
     }
 
     this->refGrad() = vector::zero;
@@ -127,22 +130,22 @@ fixedDisplacementZeroShearFvPatchVectorField::fixedDisplacementZeroShearFvPatchV
 
     if (dict.found("value"))
     {
-        Field<vector>::operator=(vectorField("value", dict, p.size()));
+	Field<vector>::operator=(vectorField("value", dict, p.size()));
     }
     else
     {
-        FatalError << "value entry not found for patch "
-        << patch().name() << endl;
+	FatalError << "value entry not found for patch "
+	<< patch().name() << endl;
     }
     this->refValue() = *this;
 
     Field<vector> normalValue = transform(valueFraction(), refValue());
 
     Field<vector> gradValue =
-        this->patchInternalField() + refGrad()/this->patch().deltaCoeffs();
+	this->patchInternalField() + refGrad()/this->patch().deltaCoeffs();
 
     Field<vector> transformGradValue =
-        transform(I - valueFraction(), gradValue);
+	transform(I - valueFraction(), gradValue);
 
     Field<vector>::operator=(normalValue + transformGradValue);
 }
@@ -187,23 +190,23 @@ void fixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
 {
     if (this->updated())
     {
-        return;
+	return;
     }
 
     //---------------------------//
     //- material properties
     //---------------------------//
     const rheologyModel& rheology =
-        this->db().objectRegistry::lookupObject<rheologyModel>("rheologyProperties");
+	this->db().objectRegistry::lookupObject<rheologyModel>("rheologyProperties");
     scalarField mu =
-        rheology.mu()().boundaryField()[patch().index()];
+	rheology.mu()().boundaryField()[patch().index()];
     scalarField lambda =
-        rheology.lambda()().boundaryField()[patch().index()];
+	rheology.lambda()().boundaryField()[patch().index()];
 
     if(rheology.type() == plasticityModel::typeName)
     {
-        const plasticityModel& plasticity =
-            refCast<const plasticityModel>(rheology);
+	const plasticityModel& plasticity =
+	    refCast<const plasticityModel>(rheology);
 
     mu = plasticity.newMu().boundaryField()[patch().index()];
     lambda = plasticity.newLambda().boundaryField()[patch().index()];
@@ -217,7 +220,7 @@ void fixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
 
     //- gradient of the field
     const fvPatchField<tensor>& gradField =
-        patch().lookupPatchField<volTensorField, tensor>("grad(" + fieldName_ + ")");
+	patch().lookupPatchField<volTensorField, tensor>("grad(" + fieldName_ + ")");
 
 
 
@@ -226,15 +229,15 @@ void fixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
     //---------------------------//
     this->valueFraction() = sqr(n);
 
-    if(nonLinear_ != OFF)
-      {
-        tensorField F = I + gradField;
-        tensorField Finv = inv(F);
-    scalarField J = det(F);
-        vectorField nCurrent = Finv & n;
-        nCurrent /= mag(nCurrent);
-    this->valueFraction() = sqr(nCurrent);
-      }
+    if (nonLinear_ != nonLinearGeometry::OFF)
+    {
+	tensorField F = I + gradField;
+	tensorField Finv = inv(F);
+	scalarField J = det(F);
+	vectorField nCurrent = Finv & n;
+	nCurrent /= mag(nCurrent);
+	this->valueFraction() = sqr(nCurrent);
+    }
 
     //---------------------------//
     //- calculate the traction to apply
@@ -263,10 +266,10 @@ void fixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
     //- if there is plasticity
     if(rheology.type() == plasticityModel::typeName)
     {
-        const plasticityModel& plasticity =
-            refCast<const plasticityModel>(rheology);
+	const plasticityModel& plasticity =
+	    refCast<const plasticityModel>(rheology);
 
-        newGradient +=
+	newGradient +=
       2*mu*(n & plasticity.DEpsilonP().boundaryField()[patch().index()]);
     }
 
@@ -289,11 +292,15 @@ void fixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
     }
 
     //- higher order non-linear terms
-    if(nonLinear_ == UPDATED_LAGRANGIAN || nonLinear_ == TOTAL_LAGRANGIAN)
+    if
+    (
+	nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN
+     || nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN
+    )
       {
-    newGradient -=
-      (n & (mu*(gradField & gradField.T())))
-      + 0.5*n*lambda*(gradField && gradField);
+	newGradient -=
+	    (n & (mu*(gradField & gradField.T())))
+	  + 0.5*n*lambda*(gradField && gradField);
     //- tensorial identity
     //- tr(gradField & gradField.T())*I == (gradField && gradField)*I
       }
@@ -310,24 +317,11 @@ void fixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
 void fixedDisplacementZeroShearFvPatchVectorField::write(Ostream& os) const
 {
     directionMixedFvPatchVectorField::write(os);
-    os.writeKeyword("nonLinear") << nonLinearNames_[nonLinear_] << token::END_STATEMENT << nl;
+    os.writeKeyword("nonLinear")
+	<< nonLinearGeometry::nonLinearNames_[nonLinear_]
+	<< token::END_STATEMENT << nl;
 }
 
-
-template<>
-const char* Foam::NamedEnum<Foam::fixedDisplacementZeroShearFvPatchVectorField::nonLinearType, 3>::names[] =
-  {
-    "off",
-    "updatedLagrangian",
-    "totalLagrangian"
-  };
-
-const Foam::NamedEnum<Foam::fixedDisplacementZeroShearFvPatchVectorField::nonLinearType, 3>
-Foam::fixedDisplacementZeroShearFvPatchVectorField::nonLinearNames_;
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-makePatchTypeField(fvPatchVectorField, fixedDisplacementZeroShearFvPatchVectorField);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

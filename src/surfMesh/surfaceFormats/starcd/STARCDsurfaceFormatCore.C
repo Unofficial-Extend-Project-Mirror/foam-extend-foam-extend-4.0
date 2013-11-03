@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "STARCDsurfaceFormatCore.H"
 #include "clock.H"
 #include "IStringStream.H"

@@ -47,7 +47,7 @@ solidTractionFreeFvPatchVectorField
 :
     fixedGradientFvPatchVectorField(p, iF),
     fieldName_("undefined"),
-    nonLinear_(OFF)
+    nonLinear_(nonLinearGeometry::OFF)
 {
     fvPatchVectorField::operator=(patchInternalField());
     gradient() = vector::zero;
@@ -64,7 +64,7 @@ solidTractionFreeFvPatchVectorField
 :
     fixedGradientFvPatchVectorField(p, iF),
     fieldName_(dimensionedInternalField().name()),
-    nonLinear_(OFF)
+    nonLinear_(nonLinearGeometry::OFF)
 {
     fvPatchVectorField::operator=(patchInternalField());
     gradient() = vector::zero;
@@ -75,14 +75,17 @@ solidTractionFreeFvPatchVectorField
     //- check if traction boundary is for non linear solver
     if(dict.found("nonLinear"))
     {
-        nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));;
+        nonLinear_ = nonLinearGeometry::nonLinearNames_.read
+        (
+	     dict.lookup("nonLinear")
+	);
 
-        if(nonLinear_ == UPDATED_LAGRANGIAN)
+        if (nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
         {
             Info << "\tnonLinear set to updated Lagrangian"
                 << endl;
         }
-        else if(nonLinear_ == TOTAL_LAGRANGIAN)
+        else if (nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
         {
             Info << "\tnonLinear set to total Lagrangian"
                 << endl;
@@ -262,7 +265,11 @@ void solidTractionFreeFvPatchVectorField::updateCoeffs()
     }
 
     //- higher order non-linear terms
-    if(nonLinear_ == UPDATED_LAGRANGIAN || nonLinear_ == TOTAL_LAGRANGIAN)
+    if
+    (
+        nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN
+     || nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN
+    )
     {
         newGradient -=
             (n & (mu*(gradField & gradField.T())))
@@ -311,20 +318,12 @@ void solidTractionFreeFvPatchVectorField::evaluate(const Pstream::commsTypes)
 void solidTractionFreeFvPatchVectorField::write(Ostream& os) const
 {
     fvPatchVectorField::write(os);
-    os.writeKeyword("nonLinear") << nonLinearNames_[nonLinear_] << token::END_STATEMENT << nl;
+    os.writeKeyword("nonLinear")
+        << nonLinearGeometry::nonLinearNames_[nonLinear_]
+	<< token::END_STATEMENT << nl;
     writeEntry("value", os);
 }
 
-template<>
-const char* Foam::NamedEnum<Foam::solidTractionFreeFvPatchVectorField::nonLinearType, 3>::names[] =
-{
-    "off",
-    "updatedLagrangian",
-    "totalLagrangian"
-};
-
-const Foam::NamedEnum<Foam::solidTractionFreeFvPatchVectorField::nonLinearType, 3>
-Foam::solidTractionFreeFvPatchVectorField::nonLinearNames_;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

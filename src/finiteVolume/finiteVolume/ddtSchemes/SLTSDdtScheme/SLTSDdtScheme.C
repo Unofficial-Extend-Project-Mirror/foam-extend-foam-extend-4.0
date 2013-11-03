@@ -92,7 +92,8 @@ template<class Type>
 tmp<volScalarField> SLTSDdtScheme<Type>::SLrDeltaT() const
 {
     const surfaceScalarField& phi =
-        mesh().objectRegistry::lookupObject<surfaceScalarField>(phiName_);
+        mesh().objectRegistry::template
+        lookupObject<surfaceScalarField>(phiName_);
 
     const dimensionedScalar& deltaT = mesh().time().deltaT();
 
@@ -127,7 +128,8 @@ tmp<volScalarField> SLTSDdtScheme<Type>::SLrDeltaT() const
     else if (phi.dimensions() == dimensionSet(1, 0, -1, 0, 0))
     {
         const volScalarField& rho =
-            mesh().objectRegistry::lookupObject<volScalarField>(rhoName_)
+            mesh().objectRegistry::template
+            lookupObject<volScalarField>(rhoName_)
            .oldTime();
 
         rDeltaT.internalField() = max

@@ -373,7 +373,7 @@ void tetFemMatrix<Type>::operator+=
 )
 {
     checkMethod(*this, su, "+=");
-    source() -= distributeSource(Field<Type>(psi.mesh().nCells(), su.value()));
+    source() -= distributeSource(Field<Type>(psi_.mesh().nCells(), su.value()));
 }
 
 
@@ -384,7 +384,7 @@ void tetFemMatrix<Type>::operator-=
 )
 {
     checkMethod(*this, su, "-=");
-    source() += distributeSource(Field<Type>(psi.mesh().nCells(), su.value()));
+    source() += distributeSource(Field<Type>(psi_.mesh().nCells(), su.value()));
 }
 
 

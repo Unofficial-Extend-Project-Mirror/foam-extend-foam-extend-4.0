@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "vtkSurfaceWriter.H"
 #include "surfaceWriters.H"
 #include "addToRunTimeSelectionTable.H"

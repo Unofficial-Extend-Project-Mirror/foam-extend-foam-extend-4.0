@@ -37,6 +37,7 @@ SourceFiles
 #define processorMeshesReconstructor_H
 
 #include "PtrList.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "fvMesh.H"
 #include "labelIOList.H"

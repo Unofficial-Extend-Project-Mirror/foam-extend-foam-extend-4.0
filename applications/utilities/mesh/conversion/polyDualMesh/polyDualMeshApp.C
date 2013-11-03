@@ -56,6 +56,7 @@ Usage
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "timeSelector.H"
 #include "fvMesh.H"

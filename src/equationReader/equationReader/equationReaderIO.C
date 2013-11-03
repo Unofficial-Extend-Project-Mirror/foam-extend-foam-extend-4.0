@@ -24,6 +24,8 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
+#include "Time.H"
 #include "equation.H"
 #include "equationOperation.H"
 #include "equationReader.H"

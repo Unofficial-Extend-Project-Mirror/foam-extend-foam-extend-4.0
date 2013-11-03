@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "GTSsurfaceFormat.H"
 
 #include "addToRunTimeSelectionTable.H"

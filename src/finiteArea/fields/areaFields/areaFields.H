@@ -35,6 +35,7 @@ SourceFiles
 #ifndef areaFields_H
 #define areaFields_H
 
+#include "objectRegistry.H"
 #include "GeometricFields.H"
 #include "areaMesh.H"
 #include "faMesh.H"

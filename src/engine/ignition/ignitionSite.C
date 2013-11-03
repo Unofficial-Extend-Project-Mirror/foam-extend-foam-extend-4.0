@@ -25,6 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "ignitionSite.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "volFields.H"
 

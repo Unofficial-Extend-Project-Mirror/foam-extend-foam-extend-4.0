@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "VTKsurfaceFormat.H"
 
 #include "addToRunTimeSelectionTable.H"

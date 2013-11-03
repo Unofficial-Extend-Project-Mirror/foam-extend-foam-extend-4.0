@@ -30,6 +30,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "contactProblem.H"
 #include "fvMesh.H"
 #include "FieldFields.H"

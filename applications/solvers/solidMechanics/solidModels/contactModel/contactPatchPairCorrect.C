@@ -26,6 +26,8 @@ Description
     corrects the contact boundary conditions
 
 \*---------------------------------------------------------------------------*/
+
+#include "objectRegistry.H"
 #include "contactPatchPair.H"
 #include "contactProblem.H"
 #include "solidTractionFvPatchVectorField.H"

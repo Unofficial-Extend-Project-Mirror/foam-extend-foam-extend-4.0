@@ -44,6 +44,7 @@ Author
 
 #include "fvPatchFields.H"
 #include "directionMixedFvPatchFields.H"
+#include "nonLinearGeometry.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -63,21 +64,8 @@ class fixedDisplacementZeroShearFvPatchVectorField
         //- Name of the displacement field
         const word fieldName_;
 
-        //- non-linear solver options
-        enum nonLinearType
-        {
-            OFF,
-            UPDATED_LAGRANGIAN,
-            TOTAL_LAGRANGIAN
-        };
-
-        static const NamedEnum<nonLinearType, 3> nonLinearNames_;
-
-        //- if it is a non linear solver
-        nonLinearType nonLinear_;
-
-
-    // Private Member Functions
+        //- Is it a non linear solver
+        nonLinearGeometry::nonLinearType nonLinear_;
 
 
 public:

@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "X3DsurfaceFormatCore.H"
 #include "clock.H"
 

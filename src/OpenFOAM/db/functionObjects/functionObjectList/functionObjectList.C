@@ -25,7 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "functionObjectList.H"
-#include "Time.H"
+#include "objectRegistry.H"
 
 #include "profiling.H"
 

@@ -45,7 +45,7 @@ SourceFiles
 
 #include "fvPatchFields.H"
 #include "fixedGradientFvPatchFields.H"
-#include "NamedEnum.H"
+#include "nonLinearGeometry.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -60,24 +60,13 @@ class solidTractionFreeFvPatchVectorField
 :
     public fixedGradientFvPatchVectorField
 {
-
     // Private Data
 
         //- Name of the displacement field
         const word fieldName_;
 
-        //- non-linear solver options
-        enum nonLinearType
-        {
-            OFF,
-            UPDATED_LAGRANGIAN,
-            TOTAL_LAGRANGIAN
-        };
-
-        static const NamedEnum<nonLinearType, 3> nonLinearNames_;
-
         //- if it is a non linear solver
-        nonLinearType nonLinear_;
+        nonLinearGeometry::nonLinearType nonLinear_;
 
 public:
 

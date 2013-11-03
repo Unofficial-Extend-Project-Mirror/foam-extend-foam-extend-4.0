@@ -43,6 +43,7 @@ Description
 
 #include "argList.H"
 #include "timeSelector.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "volFields.H"
 #include "surfaceFields.H"

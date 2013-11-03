@@ -116,7 +116,7 @@ constraint<Type>::constraint(const constraint& e)
 template<class Type>
 constraint<Type>::constraint(Istream& is)
 :
-    rowID_(is),
+    rowID_(readLabel(is)),
     value_(is),
     fixedComponents_(is),
     matrixCoeffsSet_(false),

@@ -1,3 +1,5 @@
+nonLinearGeometry/nonLinearGeometry.C
+
 boundaryConditions = fvPatchFields
 $(boundaryConditions)/solidDirectionMixed/solidDirectionMixedFvPatchVectorField.C
 $(boundaryConditions)/solidTraction/solidTractionFvPatchVectorField.C

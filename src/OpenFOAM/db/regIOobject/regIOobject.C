@@ -25,7 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "regIOobject.H"
-#include "Time.H"
+#include "objectRegistry.H"
 #include "polyMesh.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

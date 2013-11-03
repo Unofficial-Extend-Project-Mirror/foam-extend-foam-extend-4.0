@@ -39,7 +39,7 @@ SourceFiles
 #include "refCount.H"
 #include <cstddef>
 
-#if defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(darwin)
 #   define ConstructFromTmp
 #endif
 

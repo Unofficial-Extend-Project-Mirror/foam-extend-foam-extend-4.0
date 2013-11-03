@@ -45,6 +45,7 @@ SourceFiles
 #ifndef compressibleturbulenceModel_H
 #define compressibleturbulenceModel_H
 
+#include "objectRegistry.H"
 #include "primitiveFieldsFwd.H"
 #include "volFieldsFwd.H"
 #include "surfaceFieldsFwd.H"

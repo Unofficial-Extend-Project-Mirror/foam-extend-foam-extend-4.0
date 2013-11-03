@@ -38,6 +38,7 @@ SourceFiles
 #ifndef extendedFaceToCellStencil_H
 #define extendedFaceToCellStencil_H
 
+#include "objectRegistry.H"
 #include "mapDistribute.H"
 #include "volFields.H"
 #include "surfaceFields.H"

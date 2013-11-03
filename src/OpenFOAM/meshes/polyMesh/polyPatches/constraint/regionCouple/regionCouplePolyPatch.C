@@ -31,7 +31,7 @@ Author
 #include "polyBoundaryMesh.H"
 #include "addToRunTimeSelectionTable.H"
 #include "demandDrivenData.H"
-#include "Time.H"
+#include "objectRegistry.H"
 #include "polyMesh.H"
 #include "polyPatchID.H"
 #include "ZoneIDs.H"

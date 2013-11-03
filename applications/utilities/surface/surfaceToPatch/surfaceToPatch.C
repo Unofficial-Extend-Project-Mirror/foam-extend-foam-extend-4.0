@@ -29,6 +29,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "boundaryMesh.H"
 #include "polyMesh.H"

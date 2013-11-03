@@ -36,6 +36,7 @@ SourceFiles
 #ifndef eMesh_H
 #define eMesh_H
 
+#include "objectRegistry.H"
 #include "Time.H"
 #include "polyMesh.H"
 #include "edgeIOList.H"

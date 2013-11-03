@@ -63,7 +63,7 @@ timeSeries_(dict)
     pressure() = 0.0;
 
     nonLinear() =
-        nonLinearNames().read(dict.lookup("nonLinear"));
+        nonLinearGeometry::nonLinearNames_.read(dict.lookup("nonLinear"));
 
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary

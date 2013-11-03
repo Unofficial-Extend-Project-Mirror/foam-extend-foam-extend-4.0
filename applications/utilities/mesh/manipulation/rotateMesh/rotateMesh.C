@@ -32,6 +32,7 @@ Description
 
 #include "argList.H"
 #include "timeSelector.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "fvMesh.H"
 #include "volFields.H"

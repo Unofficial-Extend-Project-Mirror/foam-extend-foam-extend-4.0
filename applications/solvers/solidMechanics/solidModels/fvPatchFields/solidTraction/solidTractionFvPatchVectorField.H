@@ -45,7 +45,7 @@ SourceFiles
 
 #include "fvPatchFields.H"
 #include "fixedGradientFvPatchFields.H"
-#include "NamedEnum.H"
+#include "nonLinearGeometry.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,13 +53,14 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-             Class solidTractionFvPatchVectorField Declaration
+                Class solidTractionFvPatchVectorField Declaration
 \*---------------------------------------------------------------------------*/
 
 class solidTractionFvPatchVectorField
 :
     public fixedGradientFvPatchVectorField
 {
+private:
 
     // Private Data
 
@@ -72,18 +73,8 @@ class solidTractionFvPatchVectorField
         //- Pressure
         scalarField pressure_;
 
-        //- non-linear solver options
-        enum nonLinearType
-        {
-            OFF,
-            UPDATED_LAGRANGIAN,
-            TOTAL_LAGRANGIAN
-        };
-
-        static const NamedEnum<nonLinearType, 3> nonLinearNames_;
-
-        //- if it is a non linear solver
-        nonLinearType nonLinear_;
+        //- Type of geometrical non-linearity
+       nonLinearGeometry::nonLinearType nonLinear_;
 
 
 public:
@@ -184,14 +175,14 @@ public:
                 return fieldName_;
             }
 
-            virtual nonLinearType& nonLinear()
+            const nonLinearGeometry::nonLinearType& nonLinear() const
             {
                 return nonLinear_;
             }
 
-            virtual const NamedEnum<nonLinearType, 3>& nonLinearNames()
+            nonLinearGeometry::nonLinearType& nonLinear()
             {
-                return nonLinearNames_;
+                return nonLinear_;
             }
 
 

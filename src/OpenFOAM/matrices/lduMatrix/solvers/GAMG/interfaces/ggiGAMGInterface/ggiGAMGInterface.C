@@ -255,9 +255,9 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
                     for
                     (
                         ;
-                        nbrsIter != curNbrs.end(),
-                        faceFacesIter != curFaceFaces.end(),
-                        faceFaceWeightsIter != curFaceWeights.end();
+                        nbrsIter != curNbrs.end()
+                     && faceFacesIter != curFaceFaces.end()
+                     && faceFaceWeightsIter != curFaceWeights.end();
                         ++nbrsIter, ++faceFacesIter, ++faceFaceWeightsIter
                     )
                     {
@@ -362,9 +362,9 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
                 for
                 (
                     ;
-                    nbrsIter != curNbrs.end(),
-                    faceFacesIter != curFaceFaces.end(),
-                    faceFaceWeightsIter != curFaceWeights.end();
+                    nbrsIter != curNbrs.end()
+                 && faceFacesIter != curFaceFaces.end()
+                 && faceFaceWeightsIter != curFaceWeights.end();
                     ++nbrsIter, ++faceFacesIter, ++faceFaceWeightsIter
                 )
                 {
@@ -465,9 +465,9 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
             for
             (
                 ;
-                nbrsIter != curNbrs.end(),
-                faceFacesIter != curFaceFaces.end(),
-                faceFaceWeightsIter != curFaceWeights.end();
+                nbrsIter != curNbrs.end()
+             && faceFacesIter != curFaceFaces.end()
+             && faceFaceWeightsIter != curFaceWeights.end();
                 ++nbrsIter, ++faceFacesIter, ++faceFaceWeightsIter
             )
             {
@@ -492,8 +492,8 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
                     for
                     (
                         ;
-                        facesIter != faceFacesIter().end(),
-                        weightsIter != faceFaceWeightsIter().end();
+                        facesIter != faceFacesIter().end()
+                     && weightsIter != faceFaceWeightsIter().end();
                         ++facesIter, ++weightsIter
                     )
                     {
@@ -542,9 +542,9 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
             for
             (
                 ;
-                nbrsIter != curNbrs.end(),
-                faceFacesIter != curFaceFaces.end(),
-                faceFaceWeightsIter != curFaceWeights.end();
+                nbrsIter != curNbrs.end()
+             && faceFacesIter != curFaceFaces.end()
+             && faceFaceWeightsIter != curFaceWeights.end();
                 ++nbrsIter, ++faceFacesIter, ++faceFaceWeightsIter
             )
             {
@@ -570,8 +570,8 @@ Foam::ggiGAMGInterface::ggiGAMGInterface
                     for
                     (
                         ;
-                        facesIter != faceFacesIter().end(),
-                        weightsIter != faceFaceWeightsIter().end();
+                        facesIter != faceFacesIter().end()
+                     && weightsIter != faceFaceWeightsIter().end();
                         ++facesIter, ++weightsIter
                     )
                     {

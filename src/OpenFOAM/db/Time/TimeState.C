@@ -25,7 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "TimeState.H"
-#include "Time.H"
+#include "objectRegistry.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

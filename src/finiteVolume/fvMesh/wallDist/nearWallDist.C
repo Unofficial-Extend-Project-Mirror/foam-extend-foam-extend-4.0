@@ -25,6 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "nearWallDist.H"
+#include "Time.H"
 #include "fvMesh.H"
 #include "cellDistFuncs.H"
 #include "surfaceFields.H"

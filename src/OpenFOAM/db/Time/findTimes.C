@@ -29,6 +29,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "Time.H"
 #include "OSspecific.H"
 #include "IStringStream.H"

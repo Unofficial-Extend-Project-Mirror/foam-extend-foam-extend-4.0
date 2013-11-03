@@ -41,6 +41,7 @@ Note
 #include "treeBoundBox.H"
 #include "FixedList.H"
 #include "argList.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "polyMesh.H"
 #include "distributedTriSurfaceMesh.H"
