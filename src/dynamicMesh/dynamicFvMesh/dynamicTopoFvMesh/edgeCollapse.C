@@ -25,6 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "Stack.H"
+#include "objectRegistry.H"
 #include "triFace.H"
 #include "objectMap.H"
 #include "changeMap.H"

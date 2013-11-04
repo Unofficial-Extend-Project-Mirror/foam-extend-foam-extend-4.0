@@ -108,31 +108,31 @@ class solidContactFvPatchVectorField
         // pointField slaveFaceZonePatchPoints_;
         // faceList masterFaceZonePatchFaces_;
         // faceList slaveFaceZonePatchFaces_;
-        // PrimitivePatch<face, List, const pointField&>* masterFaceZonePatchPtr_;
-        // PrimitivePatch<face, List, const pointField&>* slaveFaceZonePatchPtr_;
+        // PrimitivePatch<face, Foam::List, const pointField&>* masterFaceZonePatchPtr_;
+        // PrimitivePatch<face, Foam::List, const pointField&>* slaveFaceZonePatchPtr_;
         // these patches keep a local copy of the points and faces
-        PrimitivePatch<face, List, pointField>* masterFaceZonePatchPtr_;
-        PrimitivePatch<face, List, pointField>* slaveFaceZonePatchPtr_;
+        PrimitivePatch<face, Foam::List, pointField>* masterFaceZonePatchPtr_;
+        PrimitivePatch<face, Foam::List, pointField>* slaveFaceZonePatchPtr_;
 
         // method to interpolate traction from slave to master
         word interpolationMethod_;
 
        //- zoneToZone or ggiZone for interpolation of traction from slave to master
        //zoneToZoneInterpolation* slaveToMasterPatchToPatchInterpolatorPtr_;
-       PatchToPatchInterpolation< PrimitivePatch<face, List, pointField>,
-				  PrimitivePatch<face, List, pointField>
+       PatchToPatchInterpolation< PrimitivePatch<face, Foam::List, pointField>,
+				  PrimitivePatch<face, Foam::List, pointField>
 				  >* slaveToMasterPatchToPatchInterpolatorPtr_;
        // we call it slaveToMasterGgi but it can interpolate either direction
        // ggiZoneInterpolation* slaveToMasterGgiInterpolatorPtr_;
-       GGIInterpolation< PrimitivePatch< face, List, pointField >,
-			 PrimitivePatch< face, List, pointField >
+       GGIInterpolation< PrimitivePatch< face, Foam::List, pointField >,
+			 PrimitivePatch< face, Foam::List, pointField >
 			 >* slaveToMasterGgiInterpolatorPtr_;
 
        // To interpolate value for the face zone patch faces to vertices
        // and vice versa
-       PrimitivePatchInterpolation< PrimitivePatch<face, List, pointField>
+       PrimitivePatchInterpolation< PrimitivePatch<face, Foam::List, pointField>
 				    >* masterFaceZonePatchInterpolatorPtr_;
-       PrimitivePatchInterpolation< PrimitivePatch<face, List, pointField>
+       PrimitivePatchInterpolation< PrimitivePatch<face, Foam::List, pointField>
 				    >* slaveFaceZonePatchInterpolatorPtr_;
 
         //- old face zone points
@@ -273,32 +273,38 @@ public:
 	    }
 
             //- Return masterFaceZonePatch pointer
-            PrimitivePatch<face, List, pointField>* masterFaceZonePatchPtr() const
+            PrimitivePatch<face, Foam::List, pointField>*
+	    masterFaceZonePatchPtr() const
             {
 	      return masterFaceZonePatchPtr_;
 	    }
 
             //- Return masterFaceZonePatch pointer
-            PrimitivePatch<face, List, pointField>* slaveFaceZonePatchPtr() const
+            PrimitivePatch<face, Foam::List, pointField>*
+	    slaveFaceZonePatchPtr() const
             {
 	      return slaveFaceZonePatchPtr_;
 	    }
 
             //- Return patchToPatch interpolator pointer
-            PatchToPatchInterpolation< PrimitivePatch<face, List, pointField>,
-				       PrimitivePatch<face, List, pointField>
-				       >* slaveToMasterPatchToPatchInterpolatorPtr() const
-				       {
-					 return slaveToMasterPatchToPatchInterpolatorPtr_;
-				       }
+            PatchToPatchInterpolation
+	    <
+	         PrimitivePatch<face, Foam::List, pointField>,
+	         PrimitivePatch<face, Foam::List, pointField>
+	    >* slaveToMasterPatchToPatchInterpolatorPtr() const
+            {
+	        return slaveToMasterPatchToPatchInterpolatorPtr_;
+	    }
 
             //- Return GGI interpolator pointer
-            GGIInterpolation< PrimitivePatch< face, List, pointField >,
-			      PrimitivePatch< face, List, pointField >
-			      >* slaveToMasterGgiInterpolatorPtr() const
-			      {
-				return slaveToMasterGgiInterpolatorPtr_;
-			      }
+            GGIInterpolation
+	    <
+                PrimitivePatch< face, Foam::List, pointField >,
+	        PrimitivePatch< face, Foam::List, pointField >
+            >* slaveToMasterGgiInterpolatorPtr() const
+            {
+	        return slaveToMasterGgiInterpolatorPtr_;
+	    }
 
             //- Return correction frequency
             label correctionFreq() const
@@ -365,13 +371,13 @@ public:
             // Return const reference to stickSlipField
             const scalarField& stickSlipField() const
             {
-	      if(!stickSlipFieldPtr_)
+	        if (!stickSlipFieldPtr_)
 		{
 		  FatalError << "solidContact::stickSlipField() pointer"
 			     << " is NULL" << exit(FatalError);
 		}
 
-	      return stickSlipFieldPtr_->boundaryField()[patch().index()];
+		return stickSlipFieldPtr_->boundaryField()[patch().index()];
 	    }
 
             //- Write

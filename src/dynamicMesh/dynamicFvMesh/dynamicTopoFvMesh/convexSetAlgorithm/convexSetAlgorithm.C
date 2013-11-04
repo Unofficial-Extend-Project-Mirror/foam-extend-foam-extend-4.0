@@ -35,6 +35,7 @@ Author
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "Time.H"
 #include "IOMap.H"
 #include "meshOps.H"

@@ -158,39 +158,61 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
     slaveFaceZoneID_(patch().boundaryMesh().mesh().faceZones().findZoneID(slaveFaceZoneName_)),
     masterFaceZonePatchPtr_
     (
-     master_ ?
-     new PrimitivePatch<face, List, pointField>
+         master_ ?
+         new PrimitivePatch<face, Foam::List, pointField>
+         (
+             patch().boundaryMesh().mesh().faceZones()[masterFaceZoneID_]()
+	         .localFaces(),
+             patch().boundaryMesh().mesh().faceZones()[masterFaceZoneID_]()
+                 .localPoints()
+	  )
+	 :
+	 NULL
+     ),
+     slaveFaceZonePatchPtr_
      (
-      patch().boundaryMesh().mesh().faceZones()[masterFaceZoneID_]().localFaces(),
-      patch().boundaryMesh().mesh().faceZones()[masterFaceZoneID_]().localPoints()
-      )
-     :
-     NULL),
-    slaveFaceZonePatchPtr_
-    (
-     master_ ?
-     new PrimitivePatch<face, List, pointField>
+         master_ ?
+	 new PrimitivePatch<face, Foam::List, pointField>
+         (
+             patch().boundaryMesh().mesh().faceZones()[slaveFaceZoneID_]()
+	         .localFaces(),
+             patch().boundaryMesh().mesh().faceZones()[slaveFaceZoneID_]()
+	         .localPoints()
+	  )
+	 :
+	 NULL
+     ),
+     interpolationMethod_
      (
-      patch().boundaryMesh().mesh().faceZones()[slaveFaceZoneID_]().localFaces(),
-      patch().boundaryMesh().mesh().faceZones()[slaveFaceZoneID_]().localPoints()
-      )
-     :
-     NULL),
-    interpolationMethod_( master_ ? dict.lookup("interpolationMethod") : word("interpolationMethodUndefinedForSlave")),
-    slaveToMasterPatchToPatchInterpolatorPtr_(NULL),
-    slaveToMasterGgiInterpolatorPtr_(NULL),
-    masterFaceZonePatchInterpolatorPtr_
-    (
-     master_ ?
-     new PrimitivePatchInterpolation< PrimitivePatch<face, List, pointField> >(*masterFaceZonePatchPtr_)
-     :
-     NULL),
-    slaveFaceZonePatchInterpolatorPtr_
-    (
-     master_ ?
-     new PrimitivePatchInterpolation< PrimitivePatch<face, List, pointField> >(*slaveFaceZonePatchPtr_)
-     :
-     NULL),
+         master_ ?
+	 dict.lookup("interpolationMethod")
+	 :
+	 word("interpolationMethodUndefinedForSlave")
+     ),
+     slaveToMasterPatchToPatchInterpolatorPtr_(NULL),
+     slaveToMasterGgiInterpolatorPtr_(NULL),
+     masterFaceZonePatchInterpolatorPtr_
+     (
+         master_
+	 ?
+	 new PrimitivePatchInterpolation
+	 <
+             PrimitivePatch<face, Foam::List, pointField>
+	 >(*masterFaceZonePatchPtr_)
+	 :
+	 NULL
+     ),
+     slaveFaceZonePatchInterpolatorPtr_
+     (
+         master_
+	 ?
+         new PrimitivePatchInterpolation
+	 <
+             PrimitivePatch<face, Foam::List, pointField>
+	 >(*slaveFaceZonePatchPtr_)
+	 :
+	 NULL
+     ),
     oldMasterFaceZonePoints_
     (
      master_ ?
@@ -334,8 +356,8 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
           slaveToMasterPatchToPatchInterpolatorPtr_ =
               new PatchToPatchInterpolation
               <
-                  PrimitivePatch<face, List, pointField>,
-                  PrimitivePatch<face, List, pointField>
+                  PrimitivePatch<face, Foam::List, pointField>,
+                  PrimitivePatch<face, Foam::List, pointField>
               >
               (
                   *slaveFaceZonePatchPtr_, // from zone
@@ -349,7 +371,7 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
           Info << "\tInterpolation of traction from slave to master: ggi" << endl;
           slaveToMasterGgiInterpolatorPtr_ =
         // new ggiZoneInterpolation
-        new GGIInterpolation< PrimitivePatch< face, List, pointField >, PrimitivePatch< face, List, pointField > >
+        new GGIInterpolation< PrimitivePatch< face, Foam::List, pointField >, PrimitivePatch< face, Foam::List, pointField > >
         (
          // masterFaceZonePatch, // master zone
          // slaveFaceZonePatch, // slave zone
@@ -964,7 +986,7 @@ void solidContactFvPatchVectorField::moveFaceZonePatches()
 
   // create new face zone patches with deformed points
   masterFaceZonePatchPtr_ =
-    new PrimitivePatch<face, List, pointField>
+    new PrimitivePatch<face, Foam::List, pointField>
     (
      mesh.faceZones()[masterFaceZoneID_]().localFaces(),
      globalMasterNewPoints
@@ -978,7 +1000,7 @@ void solidContactFvPatchVectorField::moveFaceZonePatches()
   //    );
 
   slaveFaceZonePatchPtr_ =
-    new PrimitivePatch<face, List, pointField>
+    new PrimitivePatch<face, Foam::List, pointField>
     (
      mesh.faceZones()[slaveFaceZoneID_]().localFaces(),
      globalSlaveNewPoints
@@ -1019,7 +1041,7 @@ void solidContactFvPatchVectorField::moveFaceZonePatches()
     {
       delete slaveToMasterPatchToPatchInterpolatorPtr_;
       slaveToMasterPatchToPatchInterpolatorPtr_ =
-        new PatchToPatchInterpolation<PrimitivePatch<face, List, pointField>, PrimitivePatch<face, List, pointField> >
+        new PatchToPatchInterpolation<PrimitivePatch<face, Foam::List, pointField>, PrimitivePatch<face, Foam::List, pointField> >
         (
          *slaveFaceZonePatchPtr_, // from zone
          *masterFaceZonePatchPtr_, // to zone
@@ -1031,7 +1053,7 @@ void solidContactFvPatchVectorField::moveFaceZonePatches()
     {
       delete slaveToMasterGgiInterpolatorPtr_;
       slaveToMasterGgiInterpolatorPtr_ =
-        new GGIInterpolation< PrimitivePatch< face, List, pointField >, PrimitivePatch< face, List, pointField > >
+        new GGIInterpolation< PrimitivePatch< face, Foam::List, pointField >, PrimitivePatch< face, Foam::List, pointField > >
         (
          *masterFaceZonePatchPtr_, // master zone
          *slaveFaceZonePatchPtr_, // slave zone
@@ -1048,10 +1070,10 @@ void solidContactFvPatchVectorField::moveFaceZonePatches()
   // and primitive patch interpolators
   delete masterFaceZonePatchInterpolatorPtr_;
   masterFaceZonePatchInterpolatorPtr_ =
-    new PrimitivePatchInterpolation< PrimitivePatch<face, List, pointField> >(*masterFaceZonePatchPtr_);
+    new PrimitivePatchInterpolation< PrimitivePatch<face, Foam::List, pointField> >(*masterFaceZonePatchPtr_);
   delete slaveFaceZonePatchInterpolatorPtr_;
   slaveFaceZonePatchInterpolatorPtr_ =
-    new PrimitivePatchInterpolation< PrimitivePatch<face, List, pointField> >(*slaveFaceZonePatchPtr_);
+    new PrimitivePatchInterpolation< PrimitivePatch<face, Foam::List, pointField> >(*slaveFaceZonePatchPtr_);
 
   // Also maybe I should correct motion for 2D models
   // OK for now
