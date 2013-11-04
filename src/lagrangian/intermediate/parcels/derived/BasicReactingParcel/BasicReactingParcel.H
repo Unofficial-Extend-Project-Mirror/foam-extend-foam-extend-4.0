@@ -37,6 +37,7 @@ SourceFiles
 #ifndef BasicReactingParcel_H
 #define BasicReactingParcel_H
 
+#include "objectRegistry.H"
 #include "ReactingParcel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

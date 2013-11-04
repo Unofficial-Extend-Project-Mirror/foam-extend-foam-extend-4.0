@@ -27,10 +27,9 @@ License
 #include "solidTractionFvPatchVectorField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "volFields.H"
-//#include "rheologyModel.H"
-//#include "plasticityModel.H"
-//#include "thermalModel.H"
-#include "tractionBoundaryGradient.H"
+#include "rheologyModel.H"
+#include "plasticityModel.H"
+#include "thermalModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,7 +49,7 @@ solidTractionFvPatchVectorField
     fieldName_("undefined"),
     traction_(p.size(), vector::zero),
     pressure_(p.size(), 0.0),
-    nonLinear_(OFF),
+    nonLinear_(nonLinearGeometry::OFF),
     orthotropic_(false)
 {
     fvPatchVectorField::operator=(patchInternalField());
@@ -70,48 +69,50 @@ solidTractionFvPatchVectorField
     fieldName_(dimensionedInternalField().name()),
     traction_("traction", dict, p.size()),
     pressure_("pressure", dict, p.size()),
-    nonLinear_(OFF),
+    nonLinear_(nonLinearGeometry::OFF),
     orthotropic_(false)
 {
     fvPatchVectorField::operator=(patchInternalField());
     gradient() = vector::zero;
-    
+
     Info << "Patch " << patch().name()
-	 << "\tTraction boundary field: " << fieldName_ << endl;
+        << "\tTraction boundary field: " << fieldName_ << endl;
 
     //- check if traction boundary is for non linear solver
-    if(dict.found("nonLinear"))
-      {
-	nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));;
+    if (dict.found("nonLinear"))
+    {
+        nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));
 
-	if(nonLinear_ == UPDATED_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to updated Lagrangian"
-		 << endl;
-	  }
-	else if(nonLinear_ == TOTAL_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to total Lagrangian"
-		 << endl;
-	  }
-      }
-
-    if(dict.found("orthotropic"))
-      {
-	orthotropic_ = Switch(dict.lookup("orthotropic"));
-	Info << "\t\torthotropic set to " << orthotropic_ << endl;
-      }
+        if (nonLinear_ == UPDATED_LAGRANGIAN)
+        {
+            Info << "\tnonLinear set to updated Lagrangian"
+                << endl;
+        }
+        else if (nonLinear_ == TOTAL_LAGRANGIAN)
+        {
+            Info << "\tnonLinear set to total Lagrangian"
+                << endl;
+        }
+    }
 
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-    // if(Foam::word(dimensionedInternalField().mesh().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares"
-//        || Foam::word(dimensionedInternalField().mesh().gradScheme("grad(" + fieldName_ + ")")) != "leastSquaresSolidInterface")
-//       {
-// 	Warning << "The gradScheme for " << fieldName_
-// 		<< " should be \"extendedLeastSquares 0\" for the boundary "
-// 		<< "non-orthogonal correction to be right" << endl;
-//       }
+    if
+    (
+        Foam::word
+        (
+            dimensionedInternalField().mesh().schemesDict().gradScheme
+            (
+                "grad(" + fieldName_ + ")"
+            )
+        ) != "extendedLeastSquares"
+    )
+    {
+        Warning << "The gradScheme for " << fieldName_
+            << " should be \"extendedLeastSquares 0\" for the boundary "
+            << "non-orthogonal correction to be right" << endl;
+    }
 }
 
 
@@ -202,15 +203,159 @@ void solidTractionFvPatchVectorField::updateCoeffs()
         return;
     }
 
-    gradient() = tractionBoundaryGradient()
-      (
-       traction_,
-       pressure_,
-       word(fieldName_),
-       patch(),
-       orthotropic_,
-       NamedEnum<Foam::solidTractionFvPatchVectorField::nonLinearType, 3>::names[nonLinear_]
-       )();
+    //---------------------------//
+    //- material properties
+    //---------------------------//
+    const rheologyModel& rheology =
+	this->db().objectRegistry::lookupObject<rheologyModel>
+	(
+	    "rheologyProperties"
+	);
+
+    scalarField mu =
+	rheology.mu()().boundaryField()[patch().index()];
+    scalarField lambda =
+	rheology.lambda()().boundaryField()[patch().index()];
+
+    if(rheology.type() == plasticityModel::typeName)
+    {
+	const plasticityModel& plasticity =
+	    refCast<const plasticityModel>(rheology);
+
+	mu = plasticity.newMu().boundaryField()[patch().index()];
+	lambda = plasticity.newLambda().boundaryField()[patch().index()];
+    }
+
+
+    //---------------------------//
+    //- required fields
+    //---------------------------//
+    vectorField n = patch().nf();
+
+    //- gradient of the field
+    const fvPatchField<tensor>& gradField =
+	patch().lookupPatchField<volTensorField, tensor>
+        (
+            "grad(" + fieldName_ + ")"
+        );
+
+
+    //---------------------------//
+    //- calculate the traction to apply
+    //---------------------------//
+    vectorField Traction(n.size(),vector::zero);
+
+    //- total Lagrangian small strain
+    if (fieldName_ == "U" && nonLinear_ == nonLinearGeometry::OFF)
+    {
+	//- total traction
+	Traction = (traction_ - n*pressure_);
+    }
+    //- incremental total Lagrangian small strain
+    else if
+    (
+	fieldName_ == "DU"
+     && nonLinear_ == nonLinearGeometry::OFF
+    ) //- incremental small strain
+    {
+	const fvPatchField<symmTensor>& sigma =
+	    patch().lookupPatchField<volSymmTensorField, symmTensor>("sigma");
+
+	//- increment of traction
+	Traction = (traction_ - n*pressure_) - (n & sigma);
+    }
+    //- updated Lagrangian or total Lagrangian large strain
+    else if
+    (
+	nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN
+     || nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN
+    )
+    {
+	const fvPatchField<symmTensor>& sigma =
+	patch().lookupPatchField<volSymmTensorField, symmTensor>("sigma");
+
+	tensorField F = I + gradField;
+	tensorField Finv = inv(F);
+	scalarField J = det(F);
+	vectorField nCurrent = Finv & n;
+	nCurrent /= mag(nCurrent);
+	vectorField tractionCauchy = traction_ - nCurrent*pressure_;
+
+	if (nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
+	{
+	     //- increment of 2nd Piola-Kirchhoff traction
+	    Traction = (mag(J * Finv & n) * tractionCauchy & Finv)
+		- (n & sigma);
+	}
+	else if (nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
+	{
+	    //- total 2nd Piola-Kirchhoff traction
+	    Traction = mag(J * Finv & n) * tractionCauchy & Finv;
+	}
+    }
+    else
+    {
+	FatalErrorIn
+	(
+            "void solidTractionFvPatchVectorField::updateCoeffs()"
+	)   << "Field " << fieldName_ << " and " << nonLinear_
+	    << " nonLinear are not compatible!"
+	    << exit(FatalError);
+    }
+
+
+    //---------------------------//
+    //- calculate the normal gradient based on the traction
+    //---------------------------//
+    vectorField newGradient =
+	Traction
+      - (n & (mu*gradField.T() - (mu + lambda)*gradField))
+      - n*lambda*tr(gradField);
+
+    //- if there is plasticity
+    if(rheology.type() == plasticityModel::typeName)
+    {
+	const plasticityModel& plasticity =
+	    refCast<const plasticityModel>(rheology);
+
+	newGradient +=
+	    2*mu*(n & plasticity.DEpsilonP().boundaryField()[patch().index()]);
+    }
+
+    //- if there are thermal effects
+    if(this->db().objectRegistry::foundObject<thermalModel>("thermalProperties"))
+    {
+	const thermalModel& thermo =
+	    this->db().objectRegistry::lookupObject<thermalModel>("thermalProperties");
+
+	const fvPatchField<scalar>& T =
+	    patch().lookupPatchField<volScalarField, scalar>("T");
+
+	const fvPatchField<scalar>& threeKalpha =
+	    patch().lookupPatchField<volScalarField, scalar>("((threeK*rho)*alpha)");
+
+	const scalarField T0 = thermo.T0()().boundaryField()[patch().index()];
+
+	newGradient +=  (n*threeKalpha*(T - T0));
+    }
+
+    //- higher order non-linear terms
+    if
+    (
+	nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN
+     || nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN
+    )
+    {
+	newGradient -=
+	    (n & (mu*(gradField & gradField.T())))
+	  + 0.5*n*lambda*(gradField && gradField);
+	//- tensorial identity
+	//- tr(gradField & gradField.T())*I == (gradField && gradField)*I
+    }
+
+    newGradient /= (2.0*mu + lambda);
+
+    gradient() = newGradient;
 
     fixedGradientFvPatchVectorField::updateCoeffs();
 }
@@ -249,22 +394,15 @@ void solidTractionFvPatchVectorField::evaluate(const Pstream::commsTypes)
 void solidTractionFvPatchVectorField::write(Ostream& os) const
 {
     fvPatchVectorField::write(os);
-    os.writeKeyword("nonLinear") << nonLinearNames_[nonLinear_] << token::END_STATEMENT << nl;
+    os.writeKeyword("nonLinear")
+	 << nonLinearGeometry::nonLinearNames_[nonLinear_]
+	 << token::END_STATEMENT << nl;
+
     traction_.writeEntry("traction", os);
     pressure_.writeEntry("pressure", os);
     writeEntry("value", os);
 }
 
-template<>
-const char* Foam::NamedEnum<Foam::solidTractionFvPatchVectorField::nonLinearType, 3>::names[] =
-  {
-    "off",
-    "updatedLagrangian",
-    "totalLagrangian"
-  };
-
-const Foam::NamedEnum<Foam::solidTractionFvPatchVectorField::nonLinearType, 3>
-Foam::solidTractionFvPatchVectorField::nonLinearNames_;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

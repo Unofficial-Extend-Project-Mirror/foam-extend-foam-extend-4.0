@@ -36,7 +36,7 @@ SourceFiles
 #define outputFilterOutputControl_H
 
 #include "dictionary.H"
-#include "Time.H"
+#include "objectRegistry.H"
 #include "NamedEnum.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

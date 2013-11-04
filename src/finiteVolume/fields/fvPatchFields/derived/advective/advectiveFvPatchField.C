@@ -173,7 +173,7 @@ template<class Type>
 tmp<scalarField> advectiveFvPatchField<Type>::advectionSpeed() const
 {
     const surfaceScalarField& phi =
-        this->db().objectRegistry::lookupObject<surfaceScalarField>(phiName_);
+        this->db().objectRegistry::template lookupObject<surfaceScalarField>(phiName_);
 
     fvsPatchField<scalar> phip = this->lookupPatchField
     (
@@ -217,7 +217,7 @@ void advectiveFvPatchField<Type>::updateCoeffs()
     }
 
     const GeometricField<Type, fvPatchField, volMesh>& field =
-        this->db().objectRegistry::
+        this->db().objectRegistry::template
         lookupObject<GeometricField<Type, fvPatchField, volMesh> >
         (
             this->dimensionedInternalField().name()

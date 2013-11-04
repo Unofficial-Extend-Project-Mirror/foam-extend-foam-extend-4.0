@@ -113,9 +113,9 @@ public:
         (
             const fileName& pathname,
             ios_base::openmode mode = ios_base::out|ios_base::trunc,
-            streamFormat format=ASCII,
-            versionNumber version=currentVersion,
-            compressionType compression=UNCOMPRESSED
+            streamFormat format = ASCII,
+            versionNumber version = currentVersion,
+            compressionType compression = UNCOMPRESSED
         );
 
 

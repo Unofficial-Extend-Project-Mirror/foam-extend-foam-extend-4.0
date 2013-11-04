@@ -118,6 +118,12 @@ Foam::objectRegistry::~objectRegistry()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+const Foam::Time& Foam::objectRegistry::time() const
+{
+    return time_;
+}
+
+
 Foam::wordList Foam::objectRegistry::names() const
 {
     wordList objectNames(size());

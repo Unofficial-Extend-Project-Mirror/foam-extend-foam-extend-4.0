@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "cuttingPlane.H"
 #include "primitiveMesh.H"
 #include "linePointRef.H"

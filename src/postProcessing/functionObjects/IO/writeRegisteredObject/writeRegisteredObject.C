@@ -26,7 +26,7 @@ License
 
 #include "writeRegisteredObject.H"
 #include "dictionary.H"
-#include "Time.H"
+#include "objectRegistry.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 

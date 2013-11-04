@@ -49,11 +49,11 @@ namespace Foam
 
 class faceMesh
 :
-    public PrimitivePatch<face, List, pointField>
+    public PrimitivePatch<face, Foam::List, pointField>
 {
     // Private member functions
 
-        PrimitivePatch<face, List, pointField> read(Istream& is)
+        PrimitivePatch<face, Foam::List, pointField> read(Istream& is)
         {
             pointField points(is);
             faceList faces(is);

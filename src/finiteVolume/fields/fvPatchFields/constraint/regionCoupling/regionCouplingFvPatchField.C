@@ -182,7 +182,7 @@ regionCouplingFvPatchField<Type>::lookupShadowPatchField
     // Lookup neighbour field
     const LookupField& shadowField =
         regionCouplePatch_.shadowRegion().
-        objectRegistry::lookupObject<LookupField>(name);
+        objectRegistry::template lookupObject<LookupField>(name);
 
     return shadowField.boundaryField()[regionCouplePatch_.shadowIndex()];
 }

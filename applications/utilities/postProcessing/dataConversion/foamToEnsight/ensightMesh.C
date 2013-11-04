@@ -25,6 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "ensightMesh.H"
 #include "fvMesh.H"

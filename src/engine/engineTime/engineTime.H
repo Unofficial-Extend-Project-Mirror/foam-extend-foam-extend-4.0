@@ -54,6 +54,7 @@ SourceFiles
 #ifndef engineTime_H
 #define engineTime_H
 
+#include "objectRegistry.H"
 #include "Time.H"
 #include "dictionary.H"
 #include "dimensionedScalar.H"

@@ -142,8 +142,15 @@ public:
         {
             // Private data
 
+                //- Addressing
                 const labelListList& addressing_;
+
+                //- Weights
                 const scalarListList& weights_;
+
+                //- Size before mapping
+                label sizeBeforeMapping_;
+
 
         public:
 
@@ -151,16 +158,23 @@ public:
                 agglomPatchFieldMapper
                 (
                     const labelListList& addressing,
-                    const scalarListList& weights
+                    const scalarListList& weights,
+                    const label sizeBeforeMapping
                 )
                 :
                     addressing_(addressing),
-                    weights_(weights)
+                    weights_(weights),
+                    sizeBeforeMapping_(sizeBeforeMapping)
                 {}
 
                 virtual label size() const
                 {
                     return addressing_.size();
+                }
+
+                virtual label sizeBeforeMapping() const
+                {
+                    return sizeBeforeMapping_;
                 }
 
                 virtual bool direct() const

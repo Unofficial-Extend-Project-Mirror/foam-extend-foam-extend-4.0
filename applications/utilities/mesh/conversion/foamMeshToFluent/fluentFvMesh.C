@@ -30,6 +30,7 @@ License
 using std::ofstream;
 using std::ios;
 
+#include "objectRegistry.H"
 #include "Time.H"
 #include "fluentFvMesh.H"
 #include "primitiveMesh.H"

@@ -26,7 +26,7 @@ License
 
 #include "regIOobject.H"
 #include "IFstream.H"
-#include "Time.H"
+#include "objectRegistry.H"
 #include "PstreamReduceOps.H"
 
 

@@ -37,6 +37,7 @@ SourceFiles
 #ifndef CoalParcel_H
 #define CoalParcel_H
 
+#include "objectRegistry.H"
 #include "ReactingMultiphaseParcel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

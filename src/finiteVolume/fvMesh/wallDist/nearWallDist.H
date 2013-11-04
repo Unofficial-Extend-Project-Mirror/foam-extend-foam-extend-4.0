@@ -37,8 +37,8 @@ SourceFiles
 #ifndef nearWallDist_H
 #define nearWallDist_H
 
+#include "objectRegistry.H"
 #include "volFields.H"
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -86,9 +86,9 @@ BlockConstraint<Type>::BlockConstraint(const BlockConstraint& e)
 template<class Type>
 BlockConstraint<Type>::BlockConstraint(Istream& is)
 :
-    rowID_(is),
-    value_(is),
-    fixedComponents_(is),
+    rowID_(readLabel(is)),
+    value_(pTraits<Type>(is)),
+    fixedComponents_(pTraits<Type>(is)),
     matrixCoeffsSet_(false),
     upperCoeffsOwnerPtr_(NULL),
     upperCoeffsNeighbourPtr_(NULL),

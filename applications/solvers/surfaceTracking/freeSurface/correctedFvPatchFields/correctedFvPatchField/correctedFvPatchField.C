@@ -165,7 +165,7 @@ template<class Type>
 const GeometricField<Type, fvPatchField, volMesh>&
 correctedFvPatchField<Type>::volField() const
 {
-    return this->db().objectRegistry::lookupObject
+    return this->db().objectRegistry::template lookupObject
         <
             GeometricField<Type, fvPatchField, volMesh>
         >
@@ -276,14 +276,15 @@ template<class Type>
 const fvMeshSubset& correctedFvPatchField<Type>::patchSubMesh() const
 {
     bool foundPatchSubMesh =
-        this->db().objectRegistry::foundObject<fvMeshSubset>
+        this->db().objectRegistry::template foundObject<fvMeshSubset>
         (
             this->patch().name()
         );
 
     if(foundPatchSubMesh)
     {
-        return this->db().objectRegistry::lookupObject<fvMeshSubset>
+        return this->db().objectRegistry::template
+        lookupObject<fvMeshSubset>
         (
             this->patch().name()
         );

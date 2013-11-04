@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "sixDoFRigidBodyMotion.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

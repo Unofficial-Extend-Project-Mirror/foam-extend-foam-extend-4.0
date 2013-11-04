@@ -38,6 +38,7 @@ Description
 #include "dictionary.H"
 #include "autoPtr.H"
 #include "runTimeSelectionTables.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "injectorType.H"
 

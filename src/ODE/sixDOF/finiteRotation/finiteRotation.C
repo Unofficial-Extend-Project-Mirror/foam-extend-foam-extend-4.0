@@ -31,6 +31,7 @@ Author
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "finiteRotation.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

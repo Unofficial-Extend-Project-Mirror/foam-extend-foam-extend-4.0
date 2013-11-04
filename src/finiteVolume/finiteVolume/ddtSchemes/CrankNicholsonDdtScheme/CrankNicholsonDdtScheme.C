@@ -109,7 +109,7 @@ CrankNicholsonDdtScheme<Type>::ddt0_
     const dimensionSet& dims
 )
 {
-    if (!mesh().objectRegistry::foundObject<GeoField>(name))
+    if (!mesh().objectRegistry::template foundObject<GeoField>(name))
     {
         const Time& runTime = mesh().time();
         word startTimeName = runTime.timeName(runTime.startTime().value());
@@ -174,7 +174,7 @@ CrankNicholsonDdtScheme<Type>::ddt0_
     (
         const_cast<GeoField&>
         (
-            mesh().objectRegistry::lookupObject<GeoField>(name)
+            mesh().objectRegistry::template lookupObject<GeoField>(name)
         )
     );
 

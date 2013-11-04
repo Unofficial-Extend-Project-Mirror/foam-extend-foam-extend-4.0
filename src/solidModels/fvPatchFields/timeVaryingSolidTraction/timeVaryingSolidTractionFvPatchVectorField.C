@@ -23,7 +23,7 @@ License
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 \*---------------------------------------------------------------------------*/
-//#define DEBUG Pout<<"file "<<__FILE__<<" line "<<__LINE__<<endl;
+
 #include "timeVaryingSolidTractionFvPatchVectorField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "volFields.H"
@@ -55,31 +55,34 @@ timeVaryingSolidTractionFvPatchVectorField
     const dictionary& dict
 )
 :
-  solidTractionFvPatchVectorField(p, iF),
-  timeSeries_(dict)
+solidTractionFvPatchVectorField(p, iF),
+timeSeries_(dict)
 {
-  fieldName() = dimensionedInternalField().name();
-  traction() = vector::zero;
-  pressure() = 0.0;
+    fieldName() = dimensionedInternalField().name();
+    traction() = vector::zero;
+    pressure() = 0.0;
 
-  //- check if traction boundary is for non linear solver                                                                                                   
-  if(dict.found("nonLinear"))
-    {
-      nonLinear() = nonLinearNames().read(dict.lookup("nonLinear"));;
-
-      Info << "\tpatch is nonLinear"
-	   << endl;
-    }
+    nonLinear() =
+        nonLinearGeometry::nonLinearNames_.read(dict.lookup("nonLinear"));
 
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-//   if(Foam::word(dimensionedInternalField().mesh().gradScheme("grad(" + fieldName() + ")")) != "extendedLeastSquares")
-//       {
-// 	Warning << "The gradScheme for " << fieldName()
-// 		<< " should be \"extendedLeastSquares 0\" for the boundary "
-// 		<< "non-orthogonal correction to be right" << endl;
-//       }
+    if
+    (
+      Foam::word
+      (
+          dimensionedInternalField().mesh().schemesDict().gradScheme
+          (
+              "grad(" + fieldName() + ")"
+          )
+      ) != "extendedLeastSquares"
+    )
+    {
+        Warning << "The gradScheme for " << fieldName()
+            << " should be \"extendedLeastSquares 0\" for the boundary "
+            << "non-orthogonal correction to be right" << endl;
+    }
 }
 
 

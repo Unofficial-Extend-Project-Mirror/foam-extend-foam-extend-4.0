@@ -37,6 +37,7 @@ SourceFiles
 #define tetPointFieldReconstructor_H
 
 #include "PtrList.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "tetPolyMesh.H"
 #include "tetPointMesh.H"

@@ -25,6 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "boundaryMesh.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "polyMesh.H"
 #include "repatchPolyTopoChanger.H"

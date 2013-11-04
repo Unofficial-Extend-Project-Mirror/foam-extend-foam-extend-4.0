@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "dxSurfaceWriter.H"
 #include "surfaceWriters.H"
 #include "addToRunTimeSelectionTable.H"

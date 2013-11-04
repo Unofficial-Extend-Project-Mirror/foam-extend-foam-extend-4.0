@@ -75,7 +75,7 @@ void MapGeometricFields
 {
     HashTable<const GeometricField<Type, PatchField, GeoMesh>*> fields
     (
-        mapper.thisDb().objectRegistry::lookupClass
+        mapper.thisDb().objectRegistry::template lookupClass
             <GeometricField<Type, PatchField, GeoMesh> >()
     );
 

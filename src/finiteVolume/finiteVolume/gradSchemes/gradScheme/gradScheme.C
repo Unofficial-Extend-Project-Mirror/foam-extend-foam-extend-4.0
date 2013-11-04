@@ -29,7 +29,7 @@ Description
 
 #include "fv.H"
 #include "HashTable.H"
-#include "primitiveFieldsFwd.H"
+#include "primitiveFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

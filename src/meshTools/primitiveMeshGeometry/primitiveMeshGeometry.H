@@ -45,7 +45,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class primitiveMeshGeometry Declaration
+                     Class primitiveMeshGeometry Declaration
 \*---------------------------------------------------------------------------*/
 
 class primitiveMeshGeometry

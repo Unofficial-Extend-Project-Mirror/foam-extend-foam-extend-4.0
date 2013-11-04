@@ -25,7 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "solution.H"
-#include "Time.H"
+#include "objectRegistry.H"
 
 // These are for old syntax compatibility:
 #include "BICCG.H"

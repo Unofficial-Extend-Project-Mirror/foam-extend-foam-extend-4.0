@@ -33,6 +33,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "dictionary.H"
 #include "IFstream.H"

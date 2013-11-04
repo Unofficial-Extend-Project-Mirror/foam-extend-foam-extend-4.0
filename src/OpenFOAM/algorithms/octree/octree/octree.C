@@ -458,9 +458,6 @@ Foam::pointIndexHit Foam::octree<Type>::findLineAny
 
         // Inside treeLeaf find any intersection
 
-        // Vector from endPoint to entry point of leaf.
-        const vector edgeVec(end - p);
-
         const labelList& indices = leafPtr->indices();
 
         forAll(indices, elemI)

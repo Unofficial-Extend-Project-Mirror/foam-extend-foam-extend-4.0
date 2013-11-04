@@ -26,6 +26,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "interpolationCellPointFace.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -43,6 +43,7 @@ SourceFiles
 #ifndef solidBodyMotionFunction_H
 #define solidBodyMotionFunction_H
 
+#include "objectRegistry.H"
 #include "Time.H"
 #include "dictionary.H"
 #include "septernion.H"

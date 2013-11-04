@@ -36,6 +36,7 @@ SourceFiles
 #ifndef subCycleTime_H
 #define subCycleTime_H
 
+#include "objectRegistry.H"
 #include "Time.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

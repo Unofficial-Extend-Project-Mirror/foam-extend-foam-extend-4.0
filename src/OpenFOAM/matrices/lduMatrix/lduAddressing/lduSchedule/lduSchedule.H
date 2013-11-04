@@ -43,7 +43,7 @@ namespace Foam
 
 // Forward declaration of friend functions and operators
 
-class lduScheduleEntry;
+struct lduScheduleEntry;
 Ostream& operator<<(Ostream& os, const lduScheduleEntry& lb);
 
 

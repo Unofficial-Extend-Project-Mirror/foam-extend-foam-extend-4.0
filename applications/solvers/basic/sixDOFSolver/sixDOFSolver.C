@@ -34,6 +34,8 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
+#include "objectRegistry.H"
+#include "Time.H"
 #include "ODESolver.H"
 #include "sixDOFbodies.H"
 #include "OFstream.H"

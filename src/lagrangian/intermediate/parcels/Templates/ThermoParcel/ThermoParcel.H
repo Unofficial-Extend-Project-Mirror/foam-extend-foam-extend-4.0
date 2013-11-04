@@ -40,6 +40,7 @@ SourceFiles
 #ifndef ThermoParcel_H
 #define ThermoParcel_H
 
+#include "objectRegistry.H"
 #include "IOstream.H"
 #include "autoPtr.H"
 #include "interpolationCellPoint.H"

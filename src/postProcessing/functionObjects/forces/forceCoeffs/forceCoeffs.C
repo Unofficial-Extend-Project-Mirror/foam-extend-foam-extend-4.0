@@ -25,6 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "forceCoeffs.H"
+#include "objectRegistry.H"
 #include "dictionary.H"
 #include "Time.H"
 #include "Pstream.H"

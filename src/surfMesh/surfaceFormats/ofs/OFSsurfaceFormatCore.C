@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "OFSsurfaceFormatCore.H"
 #include "clock.H"
 

@@ -33,7 +33,7 @@ Description
     And non-orthogonal correction.
 
 Author
-   Philip Cardiff UCD
+   Philip Cardiff
 
 SourceFiles
     solidTractionFreeFvPatchVectorField.C
@@ -45,9 +45,8 @@ SourceFiles
 
 #include "fvPatchFields.H"
 #include "fixedGradientFvPatchFields.H"
-#include "NamedEnum.H"
+#include "nonLinearGeometry.H"
 #include "Switch.H"
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -70,19 +69,20 @@ class solidTractionFreeFvPatchVectorField
 
         //- non-linear solver options
         enum nonLinearType
-	  {
-	    OFF,
-	    UPDATED_LAGRANGIAN,
-	    TOTAL_LAGRANGIAN
-	  };
-  
+        {
+            OFF,
+            UPDATED_LAGRANGIAN,
+            TOTAL_LAGRANGIAN
+        };
+
         static const NamedEnum<nonLinearType, 3> nonLinearNames_;
 
         //- if it is a non linear solver
-        nonLinearType nonLinear_;
+        nonLinearGeometry::nonLinearType nonLinear_;
 
         //- if it is an orthropic solver
         Switch orthotropic_;
+
 
 public:
 
