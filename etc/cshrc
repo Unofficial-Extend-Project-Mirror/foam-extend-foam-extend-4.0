@@ -208,6 +208,9 @@ case Darwin:
     # this makes certain things easier
     setenv WM_ARCH_BASE darwin
 
+    # Remove limit on number of open files
+    ulimit -n 1000
+
     switch (`uname -p`)
     case powerpc:
         setenv WM_ARCH darwinPpc

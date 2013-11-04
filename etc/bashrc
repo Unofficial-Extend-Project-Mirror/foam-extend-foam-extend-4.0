@@ -118,7 +118,7 @@ done
 : ${WM_OSTYPE:=POSIX}; export WM_OSTYPE
 
 
-# Compiler: set to Gcc, Gcc43 or Icc (for Intel's icc)
+# Compiler: set to Gcc or Icc (for Intel's icc)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 : ${WM_COMPILER:=Gcc}; export WM_COMPILER
 
@@ -218,6 +218,9 @@ Linux)
 Darwin)
     # this makes certain things easier
     export WM_ARCH_BASE=darwin
+
+    # Remove limit of open files
+    ulimit -n 1000
 
     case `uname -p` in
     powerpc)
@@ -323,12 +326,6 @@ Darwin)
 	       unset ruleDir ruleDirBase
 	   fi
        fi
-    fi
-    if [ -z "$WM_CC" ]
-    then
-	# nobody set the compiler
-	export WM_CC="gcc"
-	export WM_CXX="g++"
     fi
     ;;
 
