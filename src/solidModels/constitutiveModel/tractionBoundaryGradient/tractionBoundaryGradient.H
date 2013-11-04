@@ -80,27 +80,29 @@ public:
 
     // Member functions
 
-        // Return the boundary Cauchy traction corresponding to the given gradient
+        //- Return the boundary Cauchy traction corresponding to
+        //  the given gradient
         tmp<vectorField> traction
-	(
-	 const tensorField& gradField,
-	 const word fieldName,
-	 const fvPatch& patch,
-	 Switch orthotropic,
-	 word nonLinear
-	 ) const;
+        (
+            const tensorField& gradField,
+            const word fieldName,
+            const fvPatch& patch,
+            Switch orthotropic,
+            word nonLinear
+        ) const;
+
 
     // Operators
 
         tmp<vectorField> operator()
-	(
-	 const vectorField& traction,
-	 const scalarField& pressure,
-	 const word fieldName,
-	 const fvPatch& patch,
-	 Switch orthotropic,
-	 word nonLinear
-	 ) const;
+        (
+            const vectorField& traction,
+            const scalarField& pressure,
+            const word fieldName,
+            const fvPatch& patch,
+            Switch orthotropic,
+            word nonLinear
+        ) const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

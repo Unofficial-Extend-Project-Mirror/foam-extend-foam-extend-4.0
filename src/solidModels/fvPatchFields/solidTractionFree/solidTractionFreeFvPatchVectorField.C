@@ -196,13 +196,13 @@ void solidTractionFreeFvPatchVectorField::updateCoeffs()
     }
 
     gradient() = tractionBoundaryGradient()
-      (
-       vectorField(patch().size(), vector::zero),
-       scalarField(patch().size(), 0.0),
-       word(fieldName_),
-       patch(),
-       orthotropic_,
-       NamedEnum<Foam::solidTractionFreeFvPatchVectorField::nonLinearType, 3>::names[nonLinear_]
+    (
+        vectorField(patch().size(), vector::zero),
+        scalarField(patch().size(), 0.0),
+        word(fieldName_),
+        patch(),
+        orthotropic_,
+        nonLinearGeometry::nonLinearNames_[nonLinear_]
        )();
 
     fixedGradientFvPatchVectorField::updateCoeffs();

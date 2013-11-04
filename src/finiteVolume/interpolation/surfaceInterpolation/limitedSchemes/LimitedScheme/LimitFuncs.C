@@ -87,8 +87,7 @@ inline tmp<volScalarField> rhoMagSqr<scalar>::operator()
 ) const
 {
     const volScalarField& rho =
-        phi.db().objectRegistry::template
-        lookupObject<volScalarField>("rho");
+        phi.db().objectRegistry::lookupObject<volScalarField>("rho");
 
     return phi/rho;
 }

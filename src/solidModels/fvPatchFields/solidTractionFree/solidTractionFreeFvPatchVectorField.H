@@ -67,20 +67,10 @@ class solidTractionFreeFvPatchVectorField
         //- Name of the displacement field
         const word fieldName_;
 
-        //- non-linear solver options
-        enum nonLinearType
-        {
-            OFF,
-            UPDATED_LAGRANGIAN,
-            TOTAL_LAGRANGIAN
-        };
-
-        static const NamedEnum<nonLinearType, 3> nonLinearNames_;
-
         //- if it is a non linear solver
         nonLinearGeometry::nonLinearType nonLinear_;
 
-        //- if it is an orthropic solver
+        //- Is it an orthropic solver
         Switch orthotropic_;
 
 
