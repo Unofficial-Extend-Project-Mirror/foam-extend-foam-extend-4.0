@@ -97,7 +97,7 @@ protected:
         //- Return reference to mesh
         const fvMesh& mesh() const
         {
-	  return patch_.boundaryMesh().mesh();
+          return patch_.boundaryMesh().mesh();
         }
 
 
@@ -116,14 +116,22 @@ public:
             dictionary,
             (
                 const word name,
-		const fvPatch& patch,
+                const fvPatch& patch,
                 const dictionary& dict,
-		const label masterPatchID,
-		const label slavePatchID,
-		const label masterFaceZoneID,
-		const label slaveFaceZoneID
+                const label masterPatchID,
+                const label slavePatchID,
+                const label masterFaceZoneID,
+                const label slaveFaceZoneID
             ),
-            (name, patch, dict, masterPatchID, slavePatchID, masterFaceZoneID, slaveFaceZoneID)
+            (
+                name,
+                patch,
+                dict,
+                masterPatchID,
+                slavePatchID,
+                masterFaceZoneID,
+                slaveFaceZoneID
+            )
         );
 
 
@@ -135,10 +143,10 @@ public:
             const word& name,
             const fvPatch& patch,
             const dictionary& dict,
-	    const label masterPatchID,
-	    const label slavePatchID,
-	    const label masterFaceZoneID,
-	    const label slaveFaceZoneID
+            const label masterPatchID,
+            const label slavePatchID,
+            const label masterFaceZoneID,
+            const label slaveFaceZoneID
         );
 
 
@@ -150,10 +158,10 @@ public:
             const word& name,
             const fvPatch& patch,
             const dictionary& dict,
-	    const label masterPatchID,
-	    const label slavePatchID,
-	    const label masterFaceZoneID,
-	    const label slaveFaceZoneID
+            const label masterPatchID,
+            const label slavePatchID,
+            const label masterFaceZoneID,
+            const label slaveFaceZoneID
         );
 
 
@@ -173,18 +181,18 @@ public:
 
         //- Correct contatc model
         virtual void correct
-	(
-	 const vectorField& slavePressure,
-	 const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
-	 const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch,
-	 const intersection::algorithm alg,
-	 const intersection::direction dir,
-	 const word interpolationMethod,
-	 const word fieldName,
-	 const Switch orthotropic,
-	 const word nonLinear,
-	 const vectorField& slaveFaceNormals
-	 ) = 0;
+        (
+            const vectorField& slavePressure,
+            const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
+            const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch,
+            const intersection::algorithm alg,
+            const intersection::direction dir,
+            const word interpolationMethod,
+            const word fieldName,
+            const Switch orthotropic,
+            const word nonLinear,
+            const vectorField& slaveFaceNormals
+        ) = 0;
 
         //- Return slave friction displacement
         virtual const vectorField& slaveDisp() const = 0;
@@ -198,33 +206,33 @@ public:
         //- Return master patch ID
         virtual label masterPatchID() const
         {
-	  return masterPatchID_;
-	}
+            return masterPatchID_;
+        }
 
         //- Return master patch ID
         virtual label slavePatchID() const
         {
-	  return slavePatchID_;
-	}
+            return slavePatchID_;
+        }
 
         //- Return master face zone ID
         virtual label masterFaceZoneID() const
         {
-	  return masterFaceZoneID_;
-	}
+            return masterFaceZoneID_;
+        }
 
         //- Return master face zone ID
         virtual label slaveFaceZoneID() const
         {
-	  return slaveFaceZoneID_;
-	}
+            return slaveFaceZoneID_;
+        }
 
         //- Return stick slip faces field
         // virtual volScalarField& stickSlipFaces()
         virtual scalarField& stickSlipFaces()
         {
-	  return stickSlipFaces_;
-	}
+            return stickSlipFaces_;
+        }
 
         //- Write model dictionary
         virtual void writeDict(Ostream& os) const {};

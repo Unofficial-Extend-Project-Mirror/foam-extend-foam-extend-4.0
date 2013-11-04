@@ -55,6 +55,7 @@ Author
 
 #include "fvPatchFields.H"
 #include "directionMixedFvPatchFields.H"
+#include "nonLinearGeometry.H"
 #include "interpolationTable.H"
 #include "Switch.H"
 
@@ -76,20 +77,10 @@ class timeVaryingFixedDisplacementZeroShearFvPatchVectorField
         //- Name of the displacement field
         const word fieldName_;
 
-        //- non-linear solver options
-        enum nonLinearType
-	  {
-	    OFF,
-	    UPDATED_LAGRANGIAN,
-	    TOTAL_LAGRANGIAN
-	  };
-  
-        static const NamedEnum<nonLinearType, 3> nonLinearNames_;
+        //- Is it a non linear solver
+        nonLinearGeometry::nonLinearType nonLinear_;
 
-        //- if it is a non linear solver
-        nonLinearType nonLinear_;
-
-        //- if it is an orthropic solver
+        //- Is it an orthropic solver
         Switch orthotropic_;  
 
         //- The time series being used, including the bounding treatment

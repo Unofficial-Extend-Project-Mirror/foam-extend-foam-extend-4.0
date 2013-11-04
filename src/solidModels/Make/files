@@ -67,6 +67,8 @@ finiteVolume = finiteVolume
 $(finiteVolume)/gradSchemes/leastSquaresSolidInterfaceGrad/leastSquaresSolidInterfaceGrads.C
 $(finiteVolume)/gradSchemes/leastSquaresSolidInterfaceGrad/leastSquaresSolidInterfaceVectors.C
 
+nonLinearGeometry/nonLinearGeometry.C
+
 rheologyLaws = $(constitutiveModel)/rheologyLaws
 $(rheologyLaws)/rheologyLaw/rheologyLaw.C
 $(rheologyLaws)/rheologyLaw/newRheologyLaw.C

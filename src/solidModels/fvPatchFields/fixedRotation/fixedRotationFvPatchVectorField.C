@@ -50,8 +50,8 @@ fixedRotationFvPatchVectorField::fixedRotationFvPatchVectorField
     rotationAngle_(0.0),
     rotationAxis_(vector::zero),
     rotationOrigin_(vector::zero),
-    origCf_(0,vector::zero),
-    nonLinear_(OFF)
+    origCf_(0, vector::zero),
+    nonLinear_(nonLinearGeometry::OFF)
 {}
 
 
@@ -69,7 +69,7 @@ fixedRotationFvPatchVectorField::fixedRotationFvPatchVectorField
     rotationAxis_(ptf.rotationAxis_),
     rotationOrigin_(ptf.rotationOrigin_),
     origCf_(ptf.origCf_),
-    nonLinear_(OFF)
+    nonLinear_(nonLinearGeometry::OFF)
 {}
 
 
@@ -86,33 +86,36 @@ fixedRotationFvPatchVectorField::fixedRotationFvPatchVectorField
     rotationAxis_(dict.lookup("rotationAxis")),
     rotationOrigin_(dict.lookup("rotationOrigin")),
     origCf_(patch().patch().faceCentres()),
-    nonLinear_(OFF)
+    nonLinear_(nonLinearGeometry::OFF)
 {
     //- check if traction boundary is for non linear solver
-    if(dict.found("nonLinear"))
-      {
-	nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));;
+    if (dict.found("nonLinear"))
+    {
+        nonLinear_ = nonLinearGeometry::nonLinearNames_.read
+        (
+            dict.lookup("nonLinear")
+        );
 
-	if(nonLinear_ == UPDATED_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to updated Lagrangian"
-		 << endl;
-	  }
-	else if(nonLinear_ == TOTAL_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to total Lagrangian"
-		 << endl;
-	  }
-      }
+        if (nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
+        {
+            Info<< "\tnonLinear set to updated Lagrangian"
+                << endl;
+        }
+        else if (nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
+        {
+            Info << "\tnonLinear set to total Lagrangian"
+                << endl;
+        }
+    }
 
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-    if(Foam::word(dimensionedInternalField().mesh().schemesDict().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares")
+    if (word(dimensionedInternalField().mesh().schemesDict().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares")
       {
-	Warning << "The gradScheme for " << fieldName_
-		<< " should be \"extendedLeastSquares 0\" for the boundary "
-		<< "non-orthogonal correction to be right" << endl;
+        Warning << "The gradScheme for " << fieldName_
+                << " should be \"extendedLeastSquares 0\" for the boundary "
+                << "non-orthogonal correction to be right" << endl;
       }
 }
 
@@ -155,7 +158,7 @@ snGrad() const
 {
   //- fixedValue snGrad with no correction
   //  return (*this - patchInternalField())*this->patch().deltaCoeffs();
-  
+
     const fvPatchField<tensor>& gradField =
         patch().lookupPatchField<volTensorField, tensor>
         (
@@ -168,9 +171,9 @@ snGrad() const
     //- correction vector
     vectorField k = delta - n*(n&delta);
 
-    return 
+    return
     (
-        *this 
+        *this
       - (patchInternalField() + (k&gradField.patchInternalField()))
       )*this->patch().deltaCoeffs();
 }
@@ -185,23 +188,23 @@ void fixedRotationFvPatchVectorField::updateCoeffs()
     tensor rotMat = RodriguesRotation(rotationAxis_, rotationAngle_);
 
     vectorField oldFaceCentres = dimensionedInternalField().mesh().C().boundaryField()[patch().index()];
-	  
+
     vectorField newFaceCentres = (rotMat & (oldFaceCentres - rotationOrigin_)) + rotationOrigin_;
 
     vectorField disp = newFaceCentres - oldFaceCentres;
 
-    if(fieldName_ == "DU")
+    if (fieldName_ == "DU")
       {
         const fvPatchField<vector>& U =
           patch().lookupPatchField<volVectorField, vector>("U");
         disp -= U;
       }
-    else if(fieldName_ != "U")
+    else if (fieldName_ != "U")
       {
         FatalError << "The displacement field should be U or DU"
                    << exit(FatalError);
       }
-    
+
     fvPatchField<vector>::operator==
     (
         disp
@@ -232,23 +235,19 @@ gradientBoundaryCoeffs() const
 void fixedRotationFvPatchVectorField::write(Ostream& os) const
 {
     fixedValueFvPatchVectorField::write(os);
-    os.writeKeyword("rotationAngle") << rotationAngle_ << token::END_STATEMENT << nl;
-    os.writeKeyword("rotationAxis") << rotationAxis_ << token::END_STATEMENT << nl;
-    os.writeKeyword("rotationOrigin") << rotationOrigin_ << token::END_STATEMENT << nl;
-    os.writeKeyword("nonLinear") << nonLinearNames_[nonLinear_] << token::END_STATEMENT << nl;
+    os.writeKeyword("rotationAngle")
+        << rotationAngle_
+        << token::END_STATEMENT << nl;
+    os.writeKeyword("rotationAxis")
+        << rotationAxis_
+        << token::END_STATEMENT << nl;
+    os.writeKeyword("rotationOrigin")
+        << rotationOrigin_
+        << token::END_STATEMENT << nl;
+    os.writeKeyword("nonLinear")
+        << nonLinearGeometry::nonLinearNames_[nonLinear_]
+        << token::END_STATEMENT << nl;
 }
-
-
-template<>
-const char* Foam::NamedEnum<Foam::fixedRotationFvPatchVectorField::nonLinearType, 3>::names[] =
-  {
-    "off",
-    "updatedLagrangian",
-    "totalLagrangian"
-  };
-
-const Foam::NamedEnum<Foam::fixedRotationFvPatchVectorField::nonLinearType, 3>
-Foam::fixedRotationFvPatchVectorField::nonLinearNames_;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

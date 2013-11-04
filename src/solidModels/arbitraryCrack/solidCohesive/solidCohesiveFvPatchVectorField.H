@@ -29,7 +29,7 @@ Description
     Cohesive law fv patch field for arbitrary crack procedure,
     where the mode mixity is allowed to vary depending on how
     the crack opens.
-    
+
     This procedure allows sigmaMax, tauMax, GIc, and GIIc
     to be independently specified.
 
@@ -37,11 +37,11 @@ Description
 
     The dissipated fracture energy is constantly monitored, by
     integrating in time.
-    
+
 Author
     Philip Cardiff UCD
     based on original Tukovic cohesive law boundary condition.
-    
+
 SourceFiles
     solidCohesiveFvPatchVectorField.C
 
@@ -52,6 +52,7 @@ SourceFiles
 
 #include "fvPatchFields.H"
 #include "directionMixedFvPatchFields.H"
+#include "nonLinearGeometry.H"
 #include "cohesiveFvPatch.H"
 #include "Switch.H"
 #include "tractionBoundaryGradient.H"
@@ -63,7 +64,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                   Class solidCohesiveFvPatch Declaration
+                      Class solidCohesiveFvPatch Declaration
 \*---------------------------------------------------------------------------*/
 
 class solidCohesiveFvPatchVectorField
@@ -115,7 +116,7 @@ class solidCohesiveFvPatchVectorField
         scalarField currentGII_;
         scalarField oldGII_;
 
-  
+
         //- Current time index
         label curTimeIndex_;
 
@@ -125,8 +126,8 @@ class solidCohesiveFvPatchVectorField
         scalar penaltyScale_;
         scalar frictionCoeff_; // Coulomb friction coefficient
 
-        // If yes, cohesive traction will be calculated                                                                                                      
-        // using old separation distance                                                                                                                     
+        // If yes, cohesive traction will be calculated
+        // using old separation distance
         Switch explicitSeparationDistance_;
         scalarField curDeltaN_;
         scalarField curDeltaS_;
@@ -135,18 +136,8 @@ class solidCohesiveFvPatchVectorField
         bool updateGlobalPatchMaterials_;
         scalarField globalPatchMaterials_;
 
-        //- non-linear solver options
-        enum nonLinearType
-	  {
-	    OFF,
-	    UPDATED_LAGRANGIAN,
-	    TOTAL_LAGRANGIAN
-	  };
-  
-        static const NamedEnum<nonLinearType, 3> nonLinearNames_;
-
-        //- if it is a non linear solver
-        nonLinearType nonLinear_;
+        //- Is it a non linear solver
+        nonLinearGeometry::nonLinearType nonLinear_;
 
         //- if it is an orthropic solver
         Switch orthotropic_;
@@ -158,13 +149,13 @@ class solidCohesiveFvPatchVectorField
         void calcPenaltyFactor();
         virtual scalar penaltyFactor()
         {
-	  if(!penaltyFactorPtr_)
-	    {
-	      calcPenaltyFactor();
-	    }
+            if(!penaltyFactorPtr_)
+            {
+                calcPenaltyFactor();
+            }
 
-	  return *penaltyFactorPtr_;
-	}
+            return *penaltyFactorPtr_;
+        }
 
 
 public:

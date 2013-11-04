@@ -48,6 +48,7 @@ Author
 
 #include "fvPatchFields.H"
 #include "directionMixedFvPatchFields.H"
+#include "nonLinearGeometry.H"
 #include "Switch.H"
 #include "interpolationTable.H"
 
@@ -78,18 +79,8 @@ class fixedDisplacementOrSolidTractionFvPatchVectorField
         //- Displacement
         vectorField displacement_;
 
-        //- non-linear solver options
-        enum nonLinearType
-	  {
-	    OFF,
-	    UPDATED_LAGRANGIAN,
-	    TOTAL_LAGRANGIAN
-	  };
-  
-        static const NamedEnum<nonLinearType, 3> nonLinearNames_;
-
-        //- if it is a non linear solver
-        nonLinearType nonLinear_;
+        //- Is it a non linear solver
+        nonLinearGeometry::nonLinearType nonLinear_;
 
         //- if it is an orthropic solver
         Switch orthotropic_;

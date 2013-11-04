@@ -42,6 +42,7 @@ Author
 
 #include "fvPatchFields.H"
 #include "fixedValueFvPatchFields.H"
+#include "nonLinearGeometry.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -49,7 +50,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                 Class fixedRotationFvPatch Declaration
+                      Class fixedRotationFvPatch Declaration
 \*---------------------------------------------------------------------------*/
 
 class fixedRotationFvPatchVectorField
@@ -74,18 +75,9 @@ class fixedRotationFvPatchVectorField
         //- Initial mesh position
         const vectorField origCf_;
 
-        //- non-linear solver options
-        enum nonLinearType
-	  {
-	    OFF,
-	    UPDATED_LAGRANGIAN,
-	    TOTAL_LAGRANGIAN
-	  };
-  
-        static const NamedEnum<nonLinearType, 3> nonLinearNames_;
+        //- Is it a non linear solver
+        nonLinearGeometry::nonLinearType nonLinear_;
 
-        //- if it is a non linear solver
-        nonLinearType nonLinear_;
 
 public:
 
@@ -160,15 +152,16 @@ public:
 
         // Access functions
 
-            virtual nonLinearType& nonLinear()
+            const nonLinearGeometry::nonLinearType& nonLinear() const
             {
                 return nonLinear_;
             }
 
-            virtual const NamedEnum<nonLinearType, 3>& nonLinearNames()
+            nonLinearGeometry::nonLinearType& nonLinear()
             {
-                return nonLinearNames_;
+                return nonLinear_;
             }
+
 
         // Evaluation functions
 

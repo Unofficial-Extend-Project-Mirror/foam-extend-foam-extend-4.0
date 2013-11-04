@@ -45,7 +45,8 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-timeVaryingFixedDisplacementZeroShearFvPatchVectorField::timeVaryingFixedDisplacementZeroShearFvPatchVectorField
+timeVaryingFixedDisplacementZeroShearFvPatchVectorField::
+timeVaryingFixedDisplacementZeroShearFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF
@@ -53,13 +54,14 @@ timeVaryingFixedDisplacementZeroShearFvPatchVectorField::timeVaryingFixedDisplac
 :
     directionMixedFvPatchVectorField(p, iF),
     fieldName_("undefined"),
-    nonLinear_(OFF),
+    nonLinear_(nonLinearGeometry::OFF),
     orthotropic_(false),
     timeSeries_()
 {}
 
 
-timeVaryingFixedDisplacementZeroShearFvPatchVectorField::timeVaryingFixedDisplacementZeroShearFvPatchVectorField
+timeVaryingFixedDisplacementZeroShearFvPatchVectorField::
+timeVaryingFixedDisplacementZeroShearFvPatchVectorField
 (
     const timeVaryingFixedDisplacementZeroShearFvPatchVectorField& ptf,
     const fvPatch& p,
@@ -75,7 +77,8 @@ timeVaryingFixedDisplacementZeroShearFvPatchVectorField::timeVaryingFixedDisplac
 {}
 
 
-timeVaryingFixedDisplacementZeroShearFvPatchVectorField::timeVaryingFixedDisplacementZeroShearFvPatchVectorField
+timeVaryingFixedDisplacementZeroShearFvPatchVectorField::
+timeVaryingFixedDisplacementZeroShearFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF,
@@ -84,21 +87,24 @@ timeVaryingFixedDisplacementZeroShearFvPatchVectorField::timeVaryingFixedDisplac
 :
     directionMixedFvPatchVectorField(p, iF),
     fieldName_(dimensionedInternalField().name()),
-    nonLinear_(OFF),
+    nonLinear_(nonLinearGeometry::OFF),
     orthotropic_(false),
     timeSeries_(dict)
 {
     //- check if traction boundary is for non linear solver
     if(dict.found("nonLinear"))
-      {
-	nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));;
+    {
+        nonLinear_ = nonLinearGeometry::nonLinearNames_.read
+        (
+            dict.lookup("nonLinear")
+        );
 
-	if(nonLinear_ == UPDATED_LAGRANGIAN)
+	if(nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
 	  {
 	    Info << "\tnonLinear set to updated Lagrangian"
 		 << endl;
 	  }
-	else if(nonLinear_ == TOTAL_LAGRANGIAN)
+	else if(nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
 	  {
 	    Info << "\tnonLinear set to total Lagrangian"
 		 << endl;
@@ -221,7 +227,7 @@ void timeVaryingFixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
        word(fieldName_),
        patch(),
        orthotropic_,
-       NamedEnum<Foam::timeVaryingFixedDisplacementZeroShearFvPatchVectorField::nonLinearType, 3>::names[nonLinear_]
+       nonLinearGeometry::nonLinearNames_[nonLinear_]
        )();
 
     directionMixedFvPatchVectorField::updateCoeffs();
@@ -229,28 +235,28 @@ void timeVaryingFixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
 
 
 // Write
-void timeVaryingFixedDisplacementZeroShearFvPatchVectorField::write(Ostream& os) const
+void
+timeVaryingFixedDisplacementZeroShearFvPatchVectorField::write
+(
+    Ostream& os
+) const
 {
     directionMixedFvPatchVectorField::write(os);
-    os.writeKeyword("nonLinear") << nonLinearNames_[nonLinear_] << token::END_STATEMENT << nl;
+    os.writeKeyword("nonLinear")
+        << nonLinearGeometry::nonLinearNames_[nonLinear_]
+        << token::END_STATEMENT << nl;
     timeSeries_.write(os);
 }
 
 
-template<>
-const char* Foam::NamedEnum<Foam::timeVaryingFixedDisplacementZeroShearFvPatchVectorField::nonLinearType, 3>::names[] =
-  {
-    "off",
-    "updatedLagrangian",
-    "totalLagrangian"
-  };
-
-const Foam::NamedEnum<Foam::timeVaryingFixedDisplacementZeroShearFvPatchVectorField::nonLinearType, 3>
-Foam::timeVaryingFixedDisplacementZeroShearFvPatchVectorField::nonLinearNames_;
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField(fvPatchVectorField, timeVaryingFixedDisplacementZeroShearFvPatchVectorField);
+makePatchTypeField
+(
+    fvPatchVectorField,
+    timeVaryingFixedDisplacementZeroShearFvPatchVectorField
+);
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

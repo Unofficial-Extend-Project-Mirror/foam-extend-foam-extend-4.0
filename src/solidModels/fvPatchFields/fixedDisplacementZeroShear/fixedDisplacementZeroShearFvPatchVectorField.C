@@ -43,7 +43,8 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-fixedDisplacementZeroShearFvPatchVectorField::fixedDisplacementZeroShearFvPatchVectorField
+fixedDisplacementZeroShearFvPatchVectorField::
+fixedDisplacementZeroShearFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF
@@ -51,12 +52,13 @@ fixedDisplacementZeroShearFvPatchVectorField::fixedDisplacementZeroShearFvPatchV
 :
     directionMixedFvPatchVectorField(p, iF),
     fieldName_("undefined"),
-    nonLinear_(OFF),
+    nonLinear_(nonLinearGeometry::OFF),
     orthotropic_(false)
 {}
 
 
-fixedDisplacementZeroShearFvPatchVectorField::fixedDisplacementZeroShearFvPatchVectorField
+fixedDisplacementZeroShearFvPatchVectorField::
+fixedDisplacementZeroShearFvPatchVectorField
 (
     const fixedDisplacementZeroShearFvPatchVectorField& ptf,
     const fvPatch& p,
@@ -71,7 +73,8 @@ fixedDisplacementZeroShearFvPatchVectorField::fixedDisplacementZeroShearFvPatchV
 {}
 
 
-fixedDisplacementZeroShearFvPatchVectorField::fixedDisplacementZeroShearFvPatchVectorField
+fixedDisplacementZeroShearFvPatchVectorField::
+fixedDisplacementZeroShearFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF,
@@ -80,45 +83,48 @@ fixedDisplacementZeroShearFvPatchVectorField::fixedDisplacementZeroShearFvPatchV
 :
     directionMixedFvPatchVectorField(p, iF),
     fieldName_(dimensionedInternalField().name()),
-    nonLinear_(OFF),
+    nonLinear_(nonLinearGeometry::OFF),
     orthotropic_(false)
 {
     //- check if traction boundary is for non linear solver
-    if(dict.found("nonLinear"))
-      {
-	nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));;
+    if (dict.found("nonLinear"))
+    {
+        nonLinear_ = nonLinearGeometry::nonLinearNames_.read
+        (
+            dict.lookup("nonLinear")
+        );
 
-	if(nonLinear_ == UPDATED_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to updated Lagrangian"
-		 << endl;
-	  }
-	else if(nonLinear_ == TOTAL_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to total Lagrangian"
-		 << endl;
-	  }
-      }
+        if (nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
+        {
+            Info<< "\tnonLinear set to updated Lagrangian"
+                << endl;
+        }
+        else if (nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
+        {
+            Info<< "\tnonLinear set to total Lagrangian"
+                << endl;
+        }
+    }
 
-    if(dict.found("orthotropic"))
-      {
-	orthotropic_ = Switch(dict.lookup("orthotropic"));
-	Info << "\t\torthotropic set to " << orthotropic_ << endl;
-      }
+    if (dict.found("orthotropic"))
+    {
+        orthotropic_ = Switch(dict.lookup("orthotropic"));
+        Info << "\t\torthotropic set to " << orthotropic_ << endl;
+    }
 
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-    // if(Foam::word(dimensionedInternalField().mesh()..schemesDict().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares")
+    // if (Foam::word(dimensionedInternalField().mesh()..schemesDict().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares")
 //       {
-// 	Warning << "The gradScheme for " << fieldName_
-// 		<< " should be \"extendedLeastSquares 0\" for the boundary "
-// 		<< "non-orthogonal correction to be right" << endl;
+//    Warning << "The gradScheme for " << fieldName_
+//        << " should be \"extendedLeastSquares 0\" for the boundary "
+//        << "non-orthogonal correction to be right" << endl;
 //       }
 
   this->refGrad() = vector::zero;
-  
-  vectorField n = patch().nf();      
+
+  vectorField n = patch().nf();
   this->valueFraction() = sqr(n);
 
   if (dict.found("value"))
@@ -128,18 +134,18 @@ fixedDisplacementZeroShearFvPatchVectorField::fixedDisplacementZeroShearFvPatchV
   else
     {
       FatalError << "value entry not found for patch " << patch().name()
-		 << exit(FatalError);
+         << exit(FatalError);
     }
   this->refValue() = *this;
 
   Field<vector> normalValue = transform(valueFraction(), refValue());
-  
+
   Field<vector> gradValue =
     this->patchInternalField() + refGrad()/this->patch().deltaCoeffs();
-  
+
   Field<vector> transformGradValue =
     transform(I - valueFraction(), gradValue);
-  
+
   Field<vector>::operator=(normalValue + transformGradValue);
 }
 
@@ -198,14 +204,14 @@ void fixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
 
     //- or fix deformed normal
     //- I should add an option to choose which normal to fix
-    // if(nonLinear_ != OFF)
+    // if (nonLinear_ != OFF)
     //   {
     //     tensorField F = I + gradField;
     //     tensorField Finv = inv(F);
-    // 	   scalarField J = det(F);
+    //    scalarField J = det(F);
     //     vectorField nCurrent = Finv & n;
     //     nCurrent /= mag(nCurrent);
-    // 	   this->valueFraction() = sqr(nCurrent);
+    //     this->valueFraction() = sqr(nCurrent);
     //   }
 
     refGrad() = tractionBoundaryGradient()
@@ -215,7 +221,7 @@ void fixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
        word(fieldName_),
        patch(),
        orthotropic_,
-       NamedEnum<Foam::fixedDisplacementZeroShearFvPatchVectorField::nonLinearType, 3>::names[nonLinear_]
+       nonLinearGeometry::nonLinearNames_[nonLinear_]
        )();
 
     directionMixedFvPatchVectorField::updateCoeffs();
@@ -226,24 +232,20 @@ void fixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
 void fixedDisplacementZeroShearFvPatchVectorField::write(Ostream& os) const
 {
     directionMixedFvPatchVectorField::write(os);
-    os.writeKeyword("nonLinear") << nonLinearNames_[nonLinear_] << token::END_STATEMENT << nl;
+    os.writeKeyword("nonLinear")
+        << nonLinearGeometry::nonLinearNames_[nonLinear_]
+        << token::END_STATEMENT << nl;
 }
 
 
-template<>
-const char* Foam::NamedEnum<Foam::fixedDisplacementZeroShearFvPatchVectorField::nonLinearType, 3>::names[] =
-  {
-    "off",
-    "updatedLagrangian",
-    "totalLagrangian"
-  };
-
-const Foam::NamedEnum<Foam::fixedDisplacementZeroShearFvPatchVectorField::nonLinearType, 3>
-Foam::fixedDisplacementZeroShearFvPatchVectorField::nonLinearNames_;
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField(fvPatchVectorField, fixedDisplacementZeroShearFvPatchVectorField);
+makePatchTypeField
+(
+    fvPatchVectorField,
+    fixedDisplacementZeroShearFvPatchVectorField
+);
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

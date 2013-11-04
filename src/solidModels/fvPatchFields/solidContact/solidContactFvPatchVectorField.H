@@ -46,6 +46,7 @@ Author
 
 #include "fvPatchFields.H"
 #include "directionMixedFvPatchFields.H"
+#include "nonLinearGeometry.H"
 #include "normalContactModel.H"
 #include "frictionContactModel.H"
 #include "primitivePatchInterpolation.H"
@@ -117,7 +118,7 @@ class solidContactFvPatchVectorField
         word interpolationMethod_;
 
        //- zoneToZone or ggiZone for interpolation of traction from slave to master
-       //zoneToZoneInterpolation* slaveToMasterPatchToPatchInterpolatorPtr_;  
+       //zoneToZoneInterpolation* slaveToMasterPatchToPatchInterpolatorPtr_;
        PatchToPatchInterpolation< PrimitivePatch<face, List, pointField>,
 				  PrimitivePatch<face, List, pointField>
 				  >* slaveToMasterPatchToPatchInterpolatorPtr_;
@@ -162,27 +163,17 @@ class solidContactFvPatchVectorField
        // Force correction of contact on next call
        bool forceCorrection_;
 
-       // if the solver uses a nonlinear approach
-       //- non-linear solver options
-       enum nonLinearType
-	 {
-	   OFF,
-	   UPDATED_LAGRANGIAN,
-	   TOTAL_LAGRANGIAN
-	 };
-  
-        static const NamedEnum<nonLinearType, 3> nonLinearNames_;
+      //- Is it a non linear solver
+      nonLinearGeometry::nonLinearType nonLinear_;
 
-        //- if it is a non linear solver
-        nonLinearType nonLinear_;
 
     // Private Member Functions
 
-            //  Move the contact face zone patches to the deformed position
-            virtual void moveFaceZonePatches();
+        //  Move the contact face zone patches to the deformed position
+        virtual void moveFaceZonePatches();
 
-            //  check shadow patch and face zones exist
-            virtual bool checkPatchAndFaceZones(const dictionary& dict) const;
+        //  check shadow patch and face zones exist
+        virtual bool checkPatchAndFaceZones(const dictionary& dict) const;
 
 
 public:
@@ -352,7 +343,7 @@ public:
             //- with non-orthogonal correction regardless of whether snGrad
             //- is corrected or not
             virtual tmp<Field<vector> > snGrad() const;
-    
+
 
         // Member functions
 
@@ -380,9 +371,9 @@ public:
 			     << " is NULL" << exit(FatalError);
 		}
 
-	      return stickSlipFieldPtr_->boundaryField()[patch().index()]; 
+	      return stickSlipFieldPtr_->boundaryField()[patch().index()];
 	    }
-  
+
             //- Write
             virtual void write(Ostream&) const;
 

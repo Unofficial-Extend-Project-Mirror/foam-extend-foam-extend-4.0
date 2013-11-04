@@ -23,7 +23,6 @@ License
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 \*---------------------------------------------------------------------------*/
-//#define DEBUG Info<<"In file "<<__FILE__<<" at line "<<__LINE__<<endl;
 
 #include "solidCohesiveFvPatchVectorField.H"
 #include "addToRunTimeSelectionTable.H"
@@ -75,7 +74,7 @@ solidCohesiveFvPatchVectorField::solidCohesiveFvPatchVectorField
     curDeltaS_(0, 0.0),
     updateGlobalPatchMaterials_(true),
     globalPatchMaterials_(0, 0.0),
-    nonLinear_(OFF),
+    nonLinear_(nonLinearGeometry::OFF),
     orthotropic_(false)
 {}
 
@@ -115,30 +114,33 @@ solidCohesiveFvPatchVectorField::solidCohesiveFvPatchVectorField
     curDeltaS_(p.size(), 0.0),
     updateGlobalPatchMaterials_(true),
     globalPatchMaterials_(0, 0.0),
-    nonLinear_(OFF),
+    nonLinear_(nonLinearGeometry::OFF),
     orthotropic_(false)
 {
   Info << "Creating solidCohesive patch" << nl
        << "\tOnly Dugdale law currently available!" << endl;
 
     //- check if traction boundary is for non linear solver
-    if(dict.found("nonLinear"))
-      {
-	nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));;
+    if (dict.found("nonLinear"))
+    {
+        nonLinear_ = nonLinearGeometry::nonLinearNames_.read
+        (
+            dict.lookup("nonLinear")
+        );
 
-	if(nonLinear_ == UPDATED_LAGRANGIAN)
+	if (nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
 	  {
 	    Info << "\tnonLinear set to updated Lagrangian"
 		 << endl;
 	  }
-	else if(nonLinear_ == TOTAL_LAGRANGIAN)
+	else if (nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
 	  {
 	    Info << "\tnonLinear set to total Lagrangian"
 		 << endl;
 	  }
       }
 
-    if(dict.found("orthotropic"))
+    if (dict.found("orthotropic"))
       {
 	orthotropic_ = Switch(dict.lookup("orthotropic"));
 	Info << "\t\torthotropic set to " << orthotropic_ << endl;
@@ -214,71 +216,71 @@ solidCohesiveFvPatchVectorField::solidCohesiveFvPatchVectorField
     //         vectorField("unloadingSeparationDistance", dict, p.size());
     // }
 
-    if(dict.found("cracked"))
+    if (dict.found("cracked"))
       {
 // 	cracked_ = Field<bool>("cracked", dict, p.size());
 	cracked_ = Field<scalar>("cracked", dict, p.size());
       }
 
-    if(dict.found("curTractionN"))
+    if (dict.found("curTractionN"))
       {
 	curTractionN_ = scalarField("curTractionN", dict, p.size());
       }
-    if(dict.found("curTractionS"))
+    if (dict.found("curTractionS"))
       {
 	curTractionS_ = scalarField("curTractionS", dict, p.size());
       }
-    if(dict.found("oldTractionN"))
+    if (dict.found("oldTractionN"))
       {
 	oldTractionN_ = scalarField("oldTractionN", dict, p.size());
       }
-    if(dict.found("oldTractionS"))
+    if (dict.found("oldTractionS"))
       {
 	oldTractionS_ = scalarField("oldTractionS", dict, p.size());
       }
 
-    if(dict.found("deltaN"))
+    if (dict.found("deltaN"))
       {
 	deltaN_ = scalarField("deltaN", dict, p.size());
       }
-    if(dict.found("deltaS"))
+    if (dict.found("deltaS"))
       {
 	deltaS_ = scalarField("deltaS", dict, p.size());
       }
-    if(dict.found("oldDeltaN"))
+    if (dict.found("oldDeltaN"))
       {
 	oldDeltaN_ = scalarField("oldDeltaN", dict, p.size());
       }
-    if(dict.found("oldDeltaS"))
+    if (dict.found("oldDeltaS"))
       {
 	oldDeltaS_ = scalarField("oldDeltaS", dict, p.size());
       }
-    if(dict.found("curDeltaN"))
+    if (dict.found("curDeltaN"))
       {
 	curDeltaN_ = scalarField("curDeltaN", dict, p.size());
       }
-    if(dict.found("curDeltaS"))
+    if (dict.found("curDeltaS"))
       {
 	curDeltaS_ = scalarField("curDeltaS", dict, p.size());
       }
-    if(dict.found("unloadingDeltaEff"))
+    if (dict.found("unloadingDeltaEff"))
       {
 	unloadingDeltaEff_ = scalarField("unloadingDeltaEff", dict, p.size());
       }
 
-    if(dict.found("currentGI"))
+    if (dict.found("currentGI"))
       {
 	currentGI_ = scalarField("currentGI", dict, p.size());
       }
-    if(dict.found("currentGII"))
+    if (dict.found("currentGII"))
       {
 	currentGII_ = scalarField("currentGII", dict, p.size());
       }
-    if(dict.found("oldGI"))
+    if (dict.found("oldGI"))
       {
 	oldGI_ = scalarField("oldGI", dict, p.size());
       }
-    if(dict.found("oldGII"))
+    if (dict.found("oldGII"))
       {
 	oldGII_ = scalarField("oldGII", dict, p.size());
       }
@@ -417,7 +419,7 @@ tmp<scalarField> solidCohesiveFvPatchVectorField::crackingAndDamage() const
 
     forAll(tcrackingAndDamage(), facei)
       {
-	if(cracked_[facei])
+	if (cracked_[facei])
 	  {
 	    tcrackingAndDamage()[facei] = 2.0;
 	  }
@@ -471,7 +473,7 @@ bool solidCohesiveFvPatchVectorField::cracking()
   label sumCracked = 0;
   forAll(globalCracked, facei)
     {
-      if(globalCracked[facei] > 0.0)
+      if (globalCracked[facei] > 0.0)
 	{
 	  sumCracked++;
 	}
@@ -689,7 +691,7 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
     {
       // we force the penalty factor to be calculated here for the first time
       // as all processors must call this at the same time
-      if(contact_ && patch().size() > 0)
+      if (contact_ && patch().size() > 0)
 	{
 	  // force calculation of penalty factor here
 	  penaltyFactor();
@@ -727,11 +729,11 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
     const crackerFvMesh& crackerMesh = refCast<const crackerFvMesh>(mesh);
 
     // global patch material field is needed for multimaterial cohesive laws
-    if(updateGlobalPatchMaterials_)
+    if (updateGlobalPatchMaterials_)
       {
 	updateGlobalPatchMaterials_ = false;
 	
-	if(mesh.objectRegistry::foundObject<volScalarField>("materials"))
+	if (mesh.objectRegistry::foundObject<volScalarField>("materials"))
 	  {
 	    scalarField localPatchMaterials =
 	      patch().lookupPatchField<volScalarField, scalar>("materials").patchInternalField();
@@ -755,7 +757,7 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
 
     // Patch displacement
     vectorField UPatch = *this;
-    if(fieldName_ == "DU")
+    if (fieldName_ == "DU")
       {
     	UPatch +=
     	  patch().lookupPatchField<volVectorField, vector>("U");
@@ -779,29 +781,18 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
         globalIndex++;
     }
 
-    // calculate the actual traction instead of using what was previously set
-    //     traction_ =
-    //       tractionBoundaryGradient().traction
-    //       (
-    //        patch().lookupPatchField<volTensorField, tensor>("grad("+fieldName_+")"),
-    //        fieldName_,
-    //        patch(),
-    //        orthotropic_,
-    //        NamedEnum<Foam::solidCohesiveFvPatchVectorField::nonLinearType, 3>::names[nonLinear_]
-    //        );
-
     //globalIndex = crackerMesh.localCrackStart();
     for(label i = 0; i < patch().size(); i++)
       {
 	// update deltas
 	curDeltaN_[i] = n[i] & delta[i];
 	curDeltaS_[i] = mag( (I - sqr(n[i])) & delta[i]); // shearing
-	if(explicitSeparationDistance_)
+	if (explicitSeparationDistance_)
 	  {
 	    deltaN_[i] = oldDeltaN_[i];
 	    deltaS_[i] = oldDeltaS_[i];
 	    
-	    if(mag(deltaN_[i]) < SMALL)
+	    if (mag(deltaN_[i]) < SMALL)
 	      {
 	    	deltaN_[i] = 2*SMALL;
 	      }
@@ -824,9 +815,9 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
 	// update energies
 	// stop calculating after cracking for convergence (because crack might jump in and out of damaged/failed
 	// only update energies if there is loading
-	if( !cracked_[i] && (deltaEff > (unloadingDeltaEff_[i]-SMALL)) )
+	if ( !cracked_[i] && (deltaEff > (unloadingDeltaEff_[i]-SMALL)) )
 	  {
-	    if((curTractionN_[i]+oldTractionN_[i]) > 0.0) // if the average normal stress is tensile
+	    if ((curTractionN_[i]+oldTractionN_[i]) > 0.0) // if the average normal stress is tensile
 	      {
 		// trapezoidal rule
 		currentGI_[i] = oldGI_[i] + ((0.5*(curTractionN_[i]+oldTractionN_[i]))*(deltaN_[i]-oldDeltaN_[i]));
@@ -856,16 +847,16 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
 	// loading
 	// if the effective delta is greater than unloadingDeltaEff then there is loading
 	// unloadingDeltaEff is the maximum previsouly reached deltaEff
-	if(deltaEff > (unloadingDeltaEff_[i]-SMALL) )
+	if (deltaEff > (unloadingDeltaEff_[i]-SMALL) )
 	  {
 	    // at the moment loading and unloading are the same
 	    // if total energy is dissipated, then fully crack face
-	    //if( currentG > GIc[i] || cracked_[i] ) //Gc )
+	    //if ( currentG > GIc[i] || cracked_[i] ) //Gc )
 	    // propagation
-	    if( ((currentGI_[i]/GIc[i]) + (currentGII_[i]/GIIc[i])) >= 1 )
+	    if ( ((currentGI_[i]/GIc[i]) + (currentGII_[i]/GIIc[i])) >= 1 )
 	      {
 		//Pout << "GIc[i] is " << GIc[i] << ", curG is " << currentG << endl;
-		if(!cracked_[i]) Pout << "Face " << i << " is fully cracked" << endl;
+		if (!cracked_[i]) Pout << "Face " << i << " is fully cracked" << endl;
 		
 		cracked_[i] = true;
 		
@@ -880,7 +871,7 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
 		// To-do: we must calculate actual distances
 		curNormalTraction = 0.0;
 		curTangentialTraction = vector::zero;
-		if( contact_ && deltaN_[i] <= 0.0 )
+		if ( contact_ && deltaN_[i] <= 0.0 )
 		  {
 		    curNormalTraction = deltaN_[i]*penaltyFactor();
 		    //Info << "penaltyFactor() is " << penaltyFactor() << endl;
@@ -901,9 +892,9 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
 	      }
 	    
 	    // damging face with positive normal delta
-	    else if( deltaN_[i] > 0.0 )
+	    else if ( deltaN_[i] > 0.0 )
 	      {
-		if(cracked_[i]) Pout << "Face " << i << " is un-cracked" << endl;
+		if (cracked_[i]) Pout << "Face " << i << " is un-cracked" << endl;
 		
 		cracked_[i] = false;
 		
@@ -937,7 +928,7 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
 	    // damaging faces with negative normal delta
 	    else
 	      {
-		if(cracked_[i]) Pout << "Face " << i << " is un-cracked" << endl;
+		if (cracked_[i]) Pout << "Face " << i << " is un-cracked" << endl;
 		
 		cracked_[i] = false;
 		//Pout << "Contact and shearing face " << i << endl;
@@ -952,7 +943,7 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
 				
 		// Simple penalty condition
 		scalar penaltyFac = 0.0;
-		if(contact_)
+		if (contact_)
 		  {
 		    penaltyFac = penaltyFactor();
 		  }
@@ -997,15 +988,15 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
     
     
     this->refGrad() =
-      tractionBoundaryGradient()
-      (
-       traction_,
-       scalarField(traction_.size(), 0.0),
-       word(fieldName_),
-       patch(),
-       orthotropic_,
-       NamedEnum<Foam::solidCohesiveFvPatchVectorField::nonLinearType, 3>::names[nonLinear_]
-       )();
+        tractionBoundaryGradient()
+        (
+            traction_,
+            scalarField(traction_.size(), 0.0),
+            word(fieldName_),
+            patch(),
+            orthotropic_,
+            nonLinearGeometry::nonLinearNames_[nonLinear_]
+        )();
 
     directionMixedFvPatchVectorField::updateCoeffs();
 }
@@ -1016,12 +1007,12 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
     // approx penaltyFactor from mechanical properties
     // this can then be scaled using the penaltyScale
     // to-do: write equivalent for orthotropic
-    if(orthotropic_)
-      {
-	FatalError << "solidCohesiveFvPatchVectorField::calcPenaltyFactor()"
-		   << " has yet to be written for orthotropic"
-		   << exit(FatalError);
-      }
+    if (orthotropic_)
+    {
+        FatalError << "solidCohesiveFvPatchVectorField::calcPenaltyFactor()"
+            << " has yet to be written for orthotropic"
+            << exit(FatalError);
+    }
 
     const label patchID = patch().index();
     const fvMesh& mesh = patch().boundaryMesh().mesh();
@@ -1080,21 +1071,10 @@ void solidCohesiveFvPatchVectorField::write(Ostream& os) const
     os.writeKeyword("curTimeIndex") << curTimeIndex_ << token::END_STATEMENT << nl;
     os.writeKeyword("contact") << contact_<< token::END_STATEMENT << nl;
     os.writeKeyword("penaltyScale") << penaltyScale_ << token::END_STATEMENT << nl;
-    os.writeKeyword("nonLinear") << nonLinearNames_[nonLinear_] << token::END_STATEMENT << nl;
+    os.writeKeyword("nonLinear") << nonLinearGeometry::nonLinearNames_[nonLinear_] << token::END_STATEMENT << nl;
     os.writeKeyword("orthotropic") << orthotropic_ << token::END_STATEMENT << nl;
 }
 
-
-template<>
-const char* Foam::NamedEnum<Foam::solidCohesiveFvPatchVectorField::nonLinearType, 3>::names[] =
-  {
-    "off",
-    "updatedLagrangian",
-    "totalLagrangian"
-  };
-
-const Foam::NamedEnum<Foam::solidCohesiveFvPatchVectorField::nonLinearType, 3>
-Foam::solidCohesiveFvPatchVectorField::nonLinearNames_;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
