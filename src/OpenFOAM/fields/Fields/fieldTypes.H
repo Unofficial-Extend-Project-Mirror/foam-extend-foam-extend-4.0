@@ -35,10 +35,10 @@ Description
 #include "scalar.H"
 #include "vector.H"
 #include "sphericalTensor.H"
-#include "symmTensor.H"
-#include "symmTensor4thOrder.H"
 #include "diagTensor.H"
+#include "symmTensor.H"
 #include "tensor.H"
+#include "symmTensor4thOrder.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
