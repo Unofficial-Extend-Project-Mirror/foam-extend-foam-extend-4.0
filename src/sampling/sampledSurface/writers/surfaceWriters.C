@@ -42,8 +42,10 @@ defineSurfaceWriterType(bool);
 defineSurfaceWriterType(scalar);
 defineSurfaceWriterType(vector);
 defineSurfaceWriterType(sphericalTensor);
+defineSurfaceWriterType(diagTensor);
 defineSurfaceWriterType(symmTensor);
 defineSurfaceWriterType(tensor);
+defineSurfaceWriterType(symmTensor4thOrder);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

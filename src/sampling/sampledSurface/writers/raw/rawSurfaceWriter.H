@@ -43,7 +43,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class raw Declaration
+                       Class rawSurfaceWriter Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -100,7 +100,25 @@ class rawSurfaceWriter
             const fileName& fieldName,
             const pointField& points,
             const faceList& faces,
+            const diagTensorField& values,
+            Ostream& os
+        );
+
+        static void writeData
+        (
+            const fileName& fieldName,
+            const pointField& points,
+            const faceList& faces,
             const symmTensorField& values,
+            Ostream& os
+        );
+
+        static void writeData
+        (
+            const fileName& fieldName,
+            const pointField& points,
+            const faceList& faces,
+            const symmTensor4thOrderField& values,
             Ostream& os
         );
 

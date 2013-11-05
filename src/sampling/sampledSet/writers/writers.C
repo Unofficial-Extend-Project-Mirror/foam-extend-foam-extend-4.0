@@ -40,8 +40,10 @@ namespace Foam
 defineSetWriterType(scalar);
 defineSetWriterType(vector);
 defineSetWriterType(sphericalTensor);
+defineSetWriterType(diagTensor);
 defineSetWriterType(symmTensor);
 defineSetWriterType(tensor);
+defineSetWriterType(symmTensor4thOrder);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

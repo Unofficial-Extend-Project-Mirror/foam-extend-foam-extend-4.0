@@ -211,7 +211,29 @@ Foam::Ostream& Foam::writer<Type>::write
 template<class Type>
 Foam::Ostream& Foam::writer<Type>::write
 (
+    const diagTensor& value,
+    Ostream& os
+) const
+{
+    return writeVS(value, os);
+}
+
+
+template<class Type>
+Foam::Ostream& Foam::writer<Type>::write
+(
     const symmTensor& value,
+    Ostream& os
+) const
+{
+    return writeVS(value, os);
+}
+
+
+template<class Type>
+Foam::Ostream& Foam::writer<Type>::write
+(
+    const symmTensor4thOrder& value,
     Ostream& os
 ) const
 {

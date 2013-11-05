@@ -64,7 +64,11 @@ SourceFiles
 #include "fileName.H"
 #include "wordList.H"
 #include "vector.H"
+#include "sphericalTensor.H"
+#include "diagTensor.H"
+#include "symmTensor.H"
 #include "tensor.H"
+#include "symmTensor4thOrder.H"
 #include "typeInfo.H"
 #include "runTimeSelectionTables.H"
 #include "autoPtr.H"
@@ -187,11 +191,18 @@ public:
         //- Write sphericalTensor. Tab separated ascii
         virtual Ostream& write(const sphericalTensor&, Ostream&) const;
 
+        //- Write diagTensor. Tab separated ascii
+        virtual Ostream& write(const diagTensor&, Ostream&) const;
+
         //- Write symmTensor. Tab separated ascii
         virtual Ostream& write(const symmTensor&, Ostream&) const;
 
         //- Write tensor. Tab separated ascii
         virtual Ostream& write(const tensor&, Ostream&) const;
+
+        //- Write symmTensor4thOrder. Tab separated ascii
+        virtual Ostream& write(const symmTensor4thOrder&, Ostream&) const;
+
 };
 
 

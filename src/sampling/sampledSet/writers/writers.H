@@ -38,7 +38,6 @@ SourceFiles
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Only used internally
 #define makeTypeSetWritersTypeName(typeWriter, dataType)                      \
                                                                               \
@@ -51,7 +50,8 @@ SourceFiles
     makeTypeSetWritersTypeName(typeWriter, vector);                           \
     makeTypeSetWritersTypeName(typeWriter, sphericalTensor);                  \
     makeTypeSetWritersTypeName(typeWriter, symmTensor);                       \
-    makeTypeSetWritersTypeName(typeWriter, tensor)
+    makeTypeSetWritersTypeName(typeWriter, tensor);                           \
+    makeTypeSetWritersTypeName(typeWriter, symmTensor4thOrder)
 
 // Define type info for single dataType template instantiation (eg, vector)
 #define makeSetWriterType(typeWriter, dataType)                               \
@@ -70,7 +70,8 @@ SourceFiles
     makeSetWriterType(typeWriter, vector);                                    \
     makeSetWriterType(typeWriter, sphericalTensor);                           \
     makeSetWriterType(typeWriter, symmTensor);                                \
-    makeSetWriterType(typeWriter, tensor)
+    makeSetWriterType(typeWriter, tensor);                                    \
+    makeSetWriterType(typeWriter, symmTensor4thOrder)
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -47,8 +47,10 @@ Description
     makeTypeSurfaceWritersTypeName(typeWriter, scalar);                      \
     makeTypeSurfaceWritersTypeName(typeWriter, vector);                      \
     makeTypeSurfaceWritersTypeName(typeWriter, sphericalTensor);             \
+    makeTypeSurfaceWritersTypeName(typeWriter, diagTensor);                  \
     makeTypeSurfaceWritersTypeName(typeWriter, symmTensor);                  \
-    makeTypeSurfaceWritersTypeName(typeWriter, tensor)
+    makeTypeSurfaceWritersTypeName(typeWriter, tensor);                      \
+    makeTypeSurfaceWritersTypeName(typeWriter, symmTensor4thOrder)
 
 // Define type info for single dataType template instantiation (eg, vector)
 #define makeSurfaceWriterType(typeWriter, dataType)                          \
@@ -66,8 +68,10 @@ Description
     makeSurfaceWriterType(typeWriter, scalar);                               \
     makeSurfaceWriterType(typeWriter, vector);                               \
     makeSurfaceWriterType(typeWriter, sphericalTensor);                      \
+    makeSurfaceWriterType(typeWriter, diagTensor);                           \
     makeSurfaceWriterType(typeWriter, symmTensor);                           \
-    makeSurfaceWriterType(typeWriter, tensor)
+    makeSurfaceWriterType(typeWriter, tensor);                               \
+    makeSurfaceWriterType(typeWriter, symmTensor4thOrder)
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
