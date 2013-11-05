@@ -437,23 +437,35 @@ public:
 
         // Access
 
-        //- Return reference to master addressing
-        const labelListList& masterAddr() const;
+            //- Reference to the master patch
+            const MasterPatch& masterPatch() const
+            {
+                return masterPatch_;
+            }
 
-        //- Return reference to master weights
-        const scalarListList& masterWeights() const;
+            //- Reference to the slave patch
+            const SlavePatch& slavePatch() const
+            {
+                return slavePatch_;
+            }
 
-        //- Return reference to slave addressing
-        const labelListList& slaveAddr() const;
+            //- Return reference to master addressing
+            const labelListList& masterAddr() const;
 
-        //- Return reference to slave weights
-        const scalarListList& slaveWeights() const;
+            //- Return reference to master weights
+            const scalarListList& masterWeights() const;
 
-        //- Return reference to the master list of non-overlap faces
-        const labelList& uncoveredMasterFaces() const;
+            //- Return reference to slave addressing
+            const labelListList& slaveAddr() const;
 
-        //- Return reference to the slave list of non-overlap faces
-        const labelList& uncoveredSlaveFaces() const;
+            //- Return reference to slave weights
+            const scalarListList& slaveWeights() const;
+
+            //- Return reference to the master list of non-overlap faces
+            const labelList& uncoveredMasterFaces() const;
+
+            //- Return reference to the slave list of non-overlap faces
+            const labelList& uncoveredSlaveFaces() const;
 
 
     // Interpolation functions
