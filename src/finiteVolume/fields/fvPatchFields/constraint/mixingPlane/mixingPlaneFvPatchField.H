@@ -261,6 +261,16 @@ public:
 
         // Matrix manipulation
 
+            //- Transform given patch component field
+            virtual void transformCoupleField
+            (
+                scalarField& f,
+                const direction cmpt
+            ) const
+            {
+                mixingPlaneLduInterfaceField::transformCoupleField(f,cmpt);
+            }
+
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate
             (

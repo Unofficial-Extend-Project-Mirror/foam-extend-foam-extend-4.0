@@ -59,13 +59,13 @@ const Type& Foam::MeshObject<Mesh, Type>::New
     const Mesh& mesh
 )
 {
-    if (!mesh.thisDb().objectRegistry::foundObject<Type>(Type::typeName))
+    if (!mesh.thisDb().objectRegistry::template foundObject<Type>(Type::typeName))
     {
         return store(new Type(mesh));
     }
     else
     {
-        return mesh.thisDb().objectRegistry::lookupObject<Type>
+        return mesh.thisDb().objectRegistry::template lookupObject<Type>
         (
             Type::typeName
         );
@@ -81,13 +81,13 @@ const Type& Foam::MeshObject<Mesh, Type>::New
     const Data1& d
 )
 {
-    if (!mesh.thisDb().objectRegistry::foundObject<Type>(Type::typeName))
+    if (!mesh.thisDb().objectRegistry::template foundObject<Type>(Type::typeName))
     {
         return store(new Type(mesh, d));
     }
     else
     {
-        return mesh.thisDb().objectRegistry::lookupObject<Type>
+        return mesh.thisDb().objectRegistry::template lookupObject<Type>
         (
             Type::typeName
         );
@@ -104,13 +104,13 @@ const Type& Foam::MeshObject<Mesh, Type>::New
     const Data2& d2
 )
 {
-    if (!mesh.thisDb().objectRegistry::foundObject<Type>(Type::typeName))
+    if (!mesh.thisDb().objectRegistry::template foundObject<Type>(Type::typeName))
     {
         return store(new Type(mesh, d1, d2));
     }
     else
     {
-        return mesh.thisDb().objectRegistry::lookupObject<Type>
+        return mesh.thisDb().objectRegistry::template lookupObject<Type>
         (
             Type::typeName
         );
@@ -128,13 +128,13 @@ const Type& Foam::MeshObject<Mesh, Type>::New
     const Data3& d3
 )
 {
-    if (!mesh.thisDb().objectRegistry::foundObject<Type>(Type::typeName))
+    if (!mesh.thisDb().objectRegistry::template foundObject<Type>(Type::typeName))
     {
         return store(new Type(mesh, d1, d2, d3));
     }
     else
     {
-        return mesh.thisDb().objectRegistry::lookupObject<Type>
+        return mesh.thisDb().objectRegistry::template lookupObject<Type>
         (
             Type::typeName
         );
@@ -153,13 +153,13 @@ const Type& Foam::MeshObject<Mesh, Type>::New
     const Data4& d4
 )
 {
-    if (!mesh.thisDb().objectRegistry::foundObject<Type>(Type::typeName))
+    if (!mesh.thisDb().objectRegistry::template foundObject<Type>(Type::typeName))
     {
         return store(new Type(mesh, d1, d2, d3, d4));
     }
     else
     {
-        return mesh.thisDb().objectRegistry::lookupObject<Type>
+        return mesh.thisDb().objectRegistry::template lookupObject<Type>
         (
             Type::typeName
         );
@@ -172,13 +172,13 @@ const Type& Foam::MeshObject<Mesh, Type>::New
 template<class Mesh, class Type>
 bool Foam::MeshObject<Mesh, Type>::Delete(const Mesh& mesh)
 {
-    if (mesh.thisDb().objectRegistry::foundObject<Type>(Type::typeName))
+    if (mesh.thisDb().objectRegistry::template foundObject<Type>(Type::typeName))
     {
         return mesh.thisDb().checkOut
         (
             const_cast<Type&>
             (
-                mesh.thisDb().objectRegistry::lookupObject<Type>
+                mesh.thisDb().objectRegistry::template lookupObject<Type>
                 (
                     Type::typeName
                 )

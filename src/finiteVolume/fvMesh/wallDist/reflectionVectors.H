@@ -35,6 +35,7 @@ SourceFiles
 #ifndef reflectionVectors_H
 #define reflectionVectors_H
 
+#include "objectRegistry.H"
 #include "volFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

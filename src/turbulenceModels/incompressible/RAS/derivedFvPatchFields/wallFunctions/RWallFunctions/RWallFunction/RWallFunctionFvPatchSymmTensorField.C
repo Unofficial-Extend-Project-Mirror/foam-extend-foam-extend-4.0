@@ -158,10 +158,10 @@ void RWallFunctionFvPatchSymmTensorField::evaluate
 )
 {
     const scalarField& nutw =
-        patch().lookupPatchField<volScalarField, scalar>(nutName_);
+        lookupPatchField<volScalarField, scalar>(nutName_);
 
     const fvPatchVectorField& Uw =
-        patch().lookupPatchField<volVectorField, vector>(UName_);
+        lookupPatchField<volVectorField, vector>(UName_);
 
     // Old treatment: anisotropy not enforced
     vectorField snGradU = Uw.snGrad();

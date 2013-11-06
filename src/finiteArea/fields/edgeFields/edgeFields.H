@@ -35,6 +35,7 @@ SourceFiles
 #ifndef edgeFields_H
 #define edgeFields_H
 
+#include "objectRegistry.H"
 #include "GeometricFields.H"
 #include "edgeMesh.H"
 #include "fieldTypes.H"

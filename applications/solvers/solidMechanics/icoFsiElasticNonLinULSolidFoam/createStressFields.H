@@ -19,14 +19,14 @@
     (
         IOobject
         (
-             "Usolid",
-             runTime.timeName(),
-             stressMesh,
-             IOobject::READ_IF_PRESENT,
-             IOobject::AUTO_WRITE
-        ),
-        DU
-    );
+	 "Usolid",
+	 runTime.timeName(),
+	 stressMesh,
+	 IOobject::READ_IF_PRESENT,
+	 IOobject::AUTO_WRITE
+	 ),
+	DU
+     );
 
 
     Info<< "Reading incremental displacement field DV\n" << endl;
@@ -91,7 +91,7 @@
         dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
     );
 
-    rheologyModel rheology(sigma);
+    constitutiveModel rheology(sigma, DU);
     volScalarField rho = rheology.rho();
     volScalarField mu = rheology.mu();
     volScalarField lambda = rheology.lambda();
@@ -103,7 +103,7 @@
 
     word solidDdtScheme
     (
-        stressMesh.schemesDict().ddtScheme("ddt(" + DU.name() +')')
+     stressMesh.schemesDict().ddtScheme("ddt(" + DU.name() +')')
     );
 
 //     if
@@ -122,17 +122,17 @@
 //     }
 
 
-    IOdictionary rheologyProp
-    (
-        IOobject
-        (
-            "rheologyProperties",
-            runTime.constant(),
-            stressMesh,
-            IOobject::MUST_READ,
-            IOobject::NO_WRITE
-        )
-    );
+//     IOdictionary rheologyProp
+//     (
+//         IOobject
+//         (
+//             "rheologyProperties",
+//             runTime.constant(),
+//             stressMesh,
+//             IOobject::MUST_READ,
+//             IOobject::NO_WRITE
+//         )
+//     );
 
 
 // dimensionedVector fb(rheologyProp.lookup("bodyForce"));

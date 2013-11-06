@@ -140,7 +140,7 @@ fi
 # hwloc
 if [ -z "$HWLOC_SYSTEM" ]
 then
-    ( rpm_make -p hwloc-1.7.1 -s hwloc-1.7.1.spec  -u http://www.open-mpi.org/software/hwloc/v1.7/downloads/hwloc-1.7.1.tar.gz )
+    ( rpm_make -p hwloc-1.7.2 -s hwloc-1.7.2.spec  -u http://www.open-mpi.org/software/hwloc/v1.7/downloads/hwloc-1.7.2.tar.gz )
 else
     echo "Using system installed hwloc"
     echo ""

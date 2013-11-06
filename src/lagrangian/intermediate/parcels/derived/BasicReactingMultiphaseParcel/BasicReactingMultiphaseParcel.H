@@ -37,6 +37,7 @@ SourceFiles
 #ifndef BasicReactingMultiphaseParcel_H
 #define BasicReactingMultiphaseParcel_H
 
+#include "objectRegistry.H"
 #include "ReactingMultiphaseParcel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

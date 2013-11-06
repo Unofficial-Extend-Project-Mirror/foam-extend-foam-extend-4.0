@@ -166,7 +166,7 @@ const typename GeometricField::PatchFieldType& Foam::fvsPatchField<Type>::lookup
 {
     return patch_.patchField<GeometricField, Type2>
     (
-        internalField_.db().objectRegistry::lookupObject<GeometricField>(name)
+        internalField_.db().objectRegistry::template lookupObject<GeometricField>(name)
     );
 }
 

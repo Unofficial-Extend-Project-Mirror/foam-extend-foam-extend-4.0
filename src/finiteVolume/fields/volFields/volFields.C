@@ -37,12 +37,16 @@ defineTemplateTypeNameAndDebug(volScalarField::DimensionedInternalField, 0);
 defineTemplateTypeNameAndDebug(volVectorField::DimensionedInternalField, 0);
 defineTemplateTypeNameAndDebug(volSphericalTensorField::DimensionedInternalField, 0);
 defineTemplateTypeNameAndDebug(volSymmTensorField::DimensionedInternalField, 0);
+defineTemplateTypeNameAndDebug(volSymmTensor4thOrderField::DimensionedInternalField, 0);
+defineTemplateTypeNameAndDebug(volDiagTensorField::DimensionedInternalField, 0);
 defineTemplateTypeNameAndDebug(volTensorField::DimensionedInternalField, 0);
 
 defineTemplateTypeNameAndDebug(volScalarField, 0);
 defineTemplateTypeNameAndDebug(volVectorField, 0);
 defineTemplateTypeNameAndDebug(volSphericalTensorField, 0);
 defineTemplateTypeNameAndDebug(volSymmTensorField, 0);
+defineTemplateTypeNameAndDebug(volSymmTensor4thOrderField, 0);
+defineTemplateTypeNameAndDebug(volDiagTensorField, 0);
 defineTemplateTypeNameAndDebug(volTensorField, 0);
 
 template<>

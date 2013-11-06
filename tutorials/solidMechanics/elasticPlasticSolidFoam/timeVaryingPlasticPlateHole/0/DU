@@ -28,9 +28,9 @@ boundaryField
 
     right
     {
-      type            timeVaryingSolidTraction;
+      type            timeVaryingFixedDisplacementZeroShear;
       outOfBounds     clamp;
-      fileName        "$FOAM_CASE/constant/timeVsRightTraction";
+      fileName        "$FOAM_CASE/constant/timeVsDisp";
     }
 
     down

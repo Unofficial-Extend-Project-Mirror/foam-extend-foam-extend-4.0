@@ -174,6 +174,14 @@ public:
 
         // Coupled interface functionality
 
+            //- Transform neighbour field
+            virtual void transformCoupleField
+            (
+                scalarField& pnf,
+                const direction cmpt
+            ) const
+            {}
+
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate
             (

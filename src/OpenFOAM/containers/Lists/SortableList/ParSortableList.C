@@ -114,7 +114,7 @@ void Foam::ParSortableList<Type>::checkAndSend
         }
 
         {
-            OPstream toSlave(destProcI);
+            OPstream toSlave(Pstream::blocking, destProcI);
             toSlave << values << indices;
         }
     }
@@ -311,7 +311,7 @@ void Foam::ParSortableList<Type>::sort()
                     Pout<< "Receiving from " << procI << endl;
                 }
 
-                IPstream fromSlave(procI);
+                IPstream fromSlave(Pstream::blocking, procI);
 
                 fromSlave >> recValues >> recIndices;
 

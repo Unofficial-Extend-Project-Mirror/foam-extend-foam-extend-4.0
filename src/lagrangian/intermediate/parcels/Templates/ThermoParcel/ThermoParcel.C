@@ -240,7 +240,9 @@ Foam::scalar Foam::ThermoParcel<ParcelType>::calcHeatTransfer
     if (td.cloud().radiation())
     {
         const scalarField& G =
-            td.cloud().mesh().objectRegistry::lookupObject<volScalarField>("G");
+            td.cloud().mesh().objectRegistry::template
+            lookupObject<volScalarField>("G");
+
         const scalar Gc = G[cellI];
         const scalar sigma = radiation::sigmaSB.value();
         const scalar epsilon = td.constProps().epsilon0();

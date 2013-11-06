@@ -45,8 +45,11 @@ inline Foam::janafThermo<equationOfState>::janafThermo
     Thigh_(Thigh),
     Tcommon_(Tcommon)
 {
-    highCpCoeffs_ == highCpCoeffs;
-    lowCpCoeffs_ == lowCpCoeffs;
+    for (register label coefLabel=0; coefLabel<nCoeffs_; coefLabel++)
+    {
+        highCpCoeffs_[coefLabel] = highCpCoeffs[coefLabel];
+        lowCpCoeffs_[coefLabel] = lowCpCoeffs[coefLabel];
+    }
 }
 
 

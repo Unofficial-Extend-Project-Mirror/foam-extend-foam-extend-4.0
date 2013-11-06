@@ -34,13 +34,8 @@ m4_define(grading, 1.0)
 
 FoamFile
 {
-    version         2.0;    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
+    version         2.0;
+    format          ascii;
     class           dictionary;
     object          blockMeshDict;
 }
@@ -108,7 +103,7 @@ patches
 (
     patch outflow
     (
-    ( B5 B7 C3 C1 )
+        ( B5 B7 C3 C1 )
     )
     patch inflow
     (
@@ -128,7 +123,7 @@ patches
 
     mixingPlane upstreamMixingPlanePatch
     (
-    ( B4 C0 C2 B6 )
+        ( B4 C0 C2 B6 )
     )
 
     mixingPlane downstreamMixingPlanePatch
@@ -139,14 +134,14 @@ patches
 
     symmetryPlane downstreamWall
     (
-    ( A0 A2 A3 A1 )
+        ( A0 A2 A3 A1 )
         ( B0 B1 B3 B2 )
     )
 
     symmetryPlane upstreamWall
     (
-    ( C1 C3 C2 C0)
-       (B4 B6 B7 B5)
+        ( C1 C3 C2 C0)
+        (B4 B6 B7 B5)
     )
 
     cyclicGgi downstreamPerio1
@@ -156,7 +151,7 @@ patches
 
     cyclicGgi downstreamPerio2
     (
-    (A2 B2 B3 A3)
+        (A2 B2 B3 A3)
     )
 
 );

@@ -1,0 +1,90 @@
+arbitraryCrack = arbitraryCrack
+$(arbitraryCrack)/faceCracker/faceCracker.C
+$(arbitraryCrack)/faceCracker/detachFaceCracker.C
+$(arbitraryCrack)/crackerFvMesh/crackerFvMesh.C
+$(arbitraryCrack)/solidCohesive/solidCohesiveFvPatchVectorField.C
+$(arbitraryCrack)/solidCohesiveFixedModeMix/solidCohesiveFixedModeMixFvPatchVectorField.C
+$(arbitraryCrack)/cohesive/cohesivePolyPatch.C
+
+boundaryConditions = fvPatchFields
+$(boundaryConditions)/analyticalPlateHoleTraction/analyticalPlateHoleTractionFvPatchVectorField.C
+$(boundaryConditions)/fixedDisplacement/fixedDisplacementFvPatchVectorField.C
+$(boundaryConditions)/fixedDisplacementFixedRotation/fixedDisplacementFixedRotationFvPatchVectorField.C
+$(boundaryConditions)/fixedDisplacementZeroShear/fixedDisplacementZeroShearFvPatchVectorField.C
+$(boundaryConditions)/fixedRotation/fixedRotationFvPatchVectorField.C
+$(boundaryConditions)/solidContact/solidContactFvPatchVectorField.C
+$(boundaryConditions)/solidDirectionMixed/solidDirectionMixedFvPatchVectorField.C
+$(boundaryConditions)/solidTraction/solidTractionFvPatchVectorField.C
+$(boundaryConditions)/solidTractionFree/solidTractionFreeFvPatchVectorField.C
+$(boundaryConditions)/solidSymmetry/solidSymmetryFvPatchVectorField.C
+$(boundaryConditions)/timeVaryingSolidTraction/timeVaryingSolidTractionFvPatchVectorField.C
+$(boundaryConditions)/timeVaryingFixedDisplacement/timeVaryingFixedDisplacementFvPatchVectorField.C
+$(boundaryConditions)/timeVaryingFixedDisplacementZeroShear/timeVaryingFixedDisplacementZeroShearFvPatchVectorField.C
+$(boundaryConditions)/timeVaryingFixedRotation/timeVaryingFixedRotationFvPatchVectorField.C
+$(boundaryConditions)/transitionalParabolicVelocity/transitionalParabolicVelocityFvPatchVectorField.C
+
+cohesiveLaws = $(constitutiveModel)/cohesiveLaws
+$(cohesiveLaws)/cohesiveLaw/cohesiveLaw.C
+$(cohesiveLaws)/cohesiveLaw/newCohesiveLaw.C
+$(cohesiveLaws)/multiMaterialCohesiveLaw/multiMaterialCohesiveLaw.C
+$(cohesiveLaws)/dugdaleCohesiveLaw/dugdaleCohesiveLaw.C
+$(cohesiveLaws)/linearCohesiveLaw/linearCohesiveLaw.C
+
+contactModels = contactModels
+$(contactModels)/normalContactModels/normalContactModel/normalContactModel.C
+$(contactModels)/normalContactModels/normalContactModel/newNormalContactModel.C
+$(contactModels)/normalContactModels/iterativePenalty/iterativePenalty.C
+$(contactModels)/normalContactModels/standardPenalty/standardPenalty.C
+$(contactModels)/normalContactModels/dirichletNeumann/dirichletNeumann.C
+$(contactModels)/frictionContactModels/frictionContactModel/frictionContactModel.C
+$(contactModels)/frictionContactModels/frictionContactModel/newFrictionContactModel.C
+$(contactModels)/frictionContactModels/frictionless/frictionless.C
+$(contactModels)/frictionContactModels/iterativePenaltyFriction/iterativePenaltyFriction.C
+$(contactModels)/frictionContactModels/standardPenaltyFriction/standardPenaltyFriction.C
+$(contactModels)/frictionContactModels/dirichletNeumannFriction/dirichletNeumannFriction.C
+$(contactModels)/frictionContactModels/frictionLaws/frictionLaw/frictionLaw.C
+$(contactModels)/frictionContactModels/frictionLaws/frictionLaw/newFrictionLaw.C
+$(contactModels)/frictionContactModels/frictionLaws/coulombFriction/coulombFriction.C
+
+constitutiveModel = constitutiveModel
+$(constitutiveModel)/constitutiveModel.C
+$(constitutiveModel)/plasticityStressReturnMethods/plasticityStressReturn/plasticityStressReturn.C
+$(constitutiveModel)/plasticityStressReturnMethods/plasticityStressReturn/newPlasticityStressReturn.Cr
+$(constitutiveModel)/plasticityStressReturnMethods/aravasMises/aravasMises.C
+$(constitutiveModel)/plasticityStressReturnMethods/yamadaMises/yamadaMises.C
+$(constitutiveModel)/solidInterfaces/solidInterface/solidInterface.C
+$(constitutiveModel)/solidInterfaces/solidInterface/newSolidInterface.C
+$(constitutiveModel)/solidInterfaces/smallStrain/smallStrainSolidInterface.C
+$(constitutiveModel)/solidInterfaces/smallStrainCorrected/smallStrainCorrectedSolidInterface.C
+$(constitutiveModel)/solidInterfaces/smallStrainOrthotropic/smallStrainOrthotropicSolidInterface.C
+$(constitutiveModel)/solidInterfaces/smallStrainOrthotropicCorrected/smallStrainOrthotropicCorrectedSolidInterface.C
+$(constitutiveModel)/solidInterfaces/largeStrainUL/largeStrainULSolidInterface.C
+$(constitutiveModel)/solidInterfaces/largeStrainULCorrected/largeStrainULCorrectedSolidInterface.C
+$(constitutiveModel)/solidInterfaces/none/noneSolidInterface.C
+$(constitutiveModel)/tractionBoundaryGradient/tractionBoundaryGradient.C
+
+finiteVolume = finiteVolume
+$(finiteVolume)/gradSchemes/leastSquaresSolidInterfaceGrad/leastSquaresSolidInterfaceGrads.C
+$(finiteVolume)/gradSchemes/leastSquaresSolidInterfaceGrad/leastSquaresSolidInterfaceVectors.C
+
+nonLinearGeometry/nonLinearGeometry.C
+
+rheologyLaws = $(constitutiveModel)/rheologyLaws
+$(rheologyLaws)/rheologyLaw/rheologyLaw.C
+$(rheologyLaws)/rheologyLaw/newRheologyLaw.C
+$(rheologyLaws)/linearElastic/linearElastic.C
+$(rheologyLaws)/elasticPlastic/elasticPlastic.C
+$(rheologyLaws)/linearElasticTabulatedPlastic/linearElasticTabulatedPlastic.C
+$(rheologyLaws)/multiMaterial/multiMaterial.C
+$(rheologyLaws)/orthotropicLinearElastic/orthotropicLinearElastic.C
+$(rheologyLaws)/PronyViscoelastic/PronyViscoelastic.C
+
+thermalModel/thermalModel.C
+thermalLaws = thermalModel/thermalLaws
+$(thermalLaws)/thermalLaw/thermalLaw.C
+$(thermalLaws)/thermalLaw/newThermalLaw.C
+$(thermalLaws)/constantThermal/constantThermal.C
+$(thermalLaws)/multiMaterialThermal/multiMaterialThermal.C
+
+
+LIB = $(FOAM_LIBBIN)/libsolidModels

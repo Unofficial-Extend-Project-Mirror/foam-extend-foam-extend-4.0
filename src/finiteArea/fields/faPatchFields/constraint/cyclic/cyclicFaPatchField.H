@@ -47,7 +47,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class cyclicFaPatch Declaration
+                   Class cyclicFaPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -154,6 +154,19 @@ public:
 
             //- Return neighbour coupled given internal cell data
             virtual tmp<Field<Type> > patchNeighbourField() const;
+
+
+        // Coupled interface functionality
+
+            //- Transform neighbour field
+            virtual void transformCoupleField
+            (
+                scalarField& f,
+                const direction cmpt
+            ) const
+            {
+                cyclicLduInterfaceField::transformCoupleField(f, cmpt);
+            }
 
             //- Update result field based on interface functionality
             virtual void updateInterfaceMatrix

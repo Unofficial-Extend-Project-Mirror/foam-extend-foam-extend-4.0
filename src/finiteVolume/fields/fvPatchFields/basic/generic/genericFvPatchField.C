@@ -514,6 +514,36 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
     }
 
     for
+      (
+       HashPtrTable<symmTensor4thOrderField>::const_iterator iter =
+	 ptf.symmTensor4thOrderFields_.begin();
+       iter != ptf.symmTensor4thOrderFields_.end();
+        ++iter
+       )
+      {
+        symmTensor4thOrderFields_.insert
+	  (
+	   iter.key(),
+	   new symmTensor4thOrderField(*iter(), mapper)
+	   );
+      }
+
+    for
+      (
+       HashPtrTable<diagTensorField>::const_iterator iter =
+	 ptf.diagTensorFields_.begin();
+       iter != ptf.diagTensorFields_.end();
+        ++iter
+       )
+      {
+        diagTensorFields_.insert
+	  (
+	   iter.key(),
+	   new diagTensorField(*iter(), mapper)
+	   );
+      }
+
+    for
     (
         HashPtrTable<tensorField>::const_iterator iter =
             ptf.tensorFields_.begin();

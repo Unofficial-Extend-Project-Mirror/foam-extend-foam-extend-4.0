@@ -21,26 +21,28 @@ solvers
     {
         solver          PCG;
         preconditioner  DIC;
-        tolerance       1e-13;
+        tolerance       1e-08;
         relTol          0.1;
     }
 }
 
-stressedFoam
+solidMechanics
 {
-    nCorrectors     10000;
-    U              1e-6;
-
-    divSigmaExp             surface;
-    divSigmaLargeStrainExp  surface;
-    //moveMeshMethod           inverseDistance;
-    moveMeshMethod           leastSquares;
-    solidInterface           no;
+    nCorrectors           10000;
+    U                     1e-07;
+    //divSigmaExp           standard;
+    divSigmaExp           surface;
+    //divSigmaExp           decompose;
+    //divSigmaExp           laplacian;
+    historyPatch          right;
+    solidInterfaceMethod  none;
+    predictor             yes;
+    infoFrequency         100;
+    aitkenRelaxation      yes;
 }
 
-// relaxationFactors
-// {
-//   U 0.9;
-//   divDSigmaExpLargeStrain 0.75;
-// }
+relaxationFactors
+{
+  //U   0.9;
+}
 // ************************************************************************* //

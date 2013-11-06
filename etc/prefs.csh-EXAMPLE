@@ -2,7 +2,7 @@
 # =========                 |
 # \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright (C) 2010-2010 OpenCFD Ltd.
+#   \\  /    A nd           | Copyright (C) 2013 Hrvoje Jasak
 #    \\/     M anipulation  |
 #------------------------------------------------------------------------------
 # License
@@ -61,6 +61,14 @@
 #     will always override these values.
 #     So build your ThirdParty directory accordingly.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# System installed CUDA
+#setenv CUDA_SYSTEM 1
+#setenv CUDA_DIR path_to_system_installed_cuda
+#setenv CUDA_BIN_DIR $CUDA_DIR/bin
+#setenv CUDA_LIB_DIR $CUDA_DIR/lib
+#setenv CUDA_INCLUDE_DIR $CUDA_DIR/include
+#setenv CUDA_ARCH sm_20
 
 # System installed Mesquite
 #setenv MESQUITE_SYSTEM 1

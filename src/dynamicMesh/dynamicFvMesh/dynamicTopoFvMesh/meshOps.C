@@ -33,8 +33,9 @@ Author
     University of Massachusetts Amherst
     All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "Time.H"
 #include "meshOps.H"
 #include "ListOps.H"
@@ -136,7 +137,7 @@ void constructHull
     const UList<label>& neighbour,
     const UList<labelList>& faceEdges,
     const UList<labelList>& edgeFaces,
-    const UList<labelList>& edgePoints,
+    const labelList& vertexHull,
     labelList& hullEdges,
     labelList& hullFaces,
     labelList& hullCells,
@@ -145,9 +146,9 @@ void constructHull
 {
     // [1] hullEdges is an ordered list of edge-labels around eIndex,
     //     but not connected to it.
-    //      - Ordering is in the same manner as edgePoints.
+    //      - Ordering is in the same manner as vertexHull.
     // [2] hullFaces is an ordered list of face-labels connected to eIndex.
-    //      - Ordering is in the same manner as edgePoints.
+    //      - Ordering is in the same manner as vertexHull.
     // [3] hullCells is an ordered list of cell-labels connected to eIndex.
     //      - For boundary hulls, the last cell label is -1
     // [4] ringEntities are edges and faces connected to eIndex[0] and eIndex[1]
@@ -162,7 +163,6 @@ void constructHull
     // Obtain a reference to this edge, and its edgeFaces
     const edge& edgeToCheck = edges[eIndex];
     const labelList& eFaces = edgeFaces[eIndex];
-    const labelList& hullVertices = edgePoints[eIndex];
 
     // Loop through all faces of this edge and add them to hullFaces
     forAll(eFaces, faceI)
@@ -170,7 +170,7 @@ void constructHull
         const face& faceToCheck = faces[eFaces[faceI]];
 
         // Find the isolated point on this face,
-        // and compare it with hullVertices
+        // and compare it with vertexHull
         meshOps::findIsolatedPoint
         (
             faceToCheck,
@@ -181,9 +181,9 @@ void constructHull
 
         found = false;
 
-        forAll(hullVertices, indexI)
+        forAll(vertexHull, indexI)
         {
-            if (hullVertices[indexI] == otherPoint)
+            if (vertexHull[indexI] == otherPoint)
             {
                 // Fill in the position of this face on the hull
                 hullFaces[indexI] = eFaces[faceI];
@@ -235,8 +235,8 @@ void constructHull
 
                 if (hullCells[indexI] != -1)
                 {
-                    label nextI = hullVertices.fcIndex(indexI);
-                    label nextHullPoint = hullVertices[nextI];
+                    label nextI = vertexHull.fcIndex(indexI);
+                    label nextHullPoint = vertexHull[nextI];
                     const cell& currCell = cells[hullCells[indexI]];
 
                     // Look for the ring-faces
@@ -316,7 +316,7 @@ void constructHull
                 << " edgeFaces connectivity is inconsistent. " << nl
                 << " Edge: " << eIndex << ":: " << edgeToCheck << nl
                 << " edgeFaces: " << eFaces << nl
-                << " edgePoints: " << hullVertices
+                << " vertexHull: " << vertexHull
                 << abort(FatalError);
         }
     }
@@ -480,7 +480,10 @@ void writeVTK
     const UList<edge>& edges,
     const UList<face>& faces,
     const UList<cell>& cells,
-    const UList<label>& owner
+    const UList<label>& owner,
+    const UList<scalar>& scalField,
+    const UList<label>& lablField,
+    const UList<vector>& vectField
 )
 {
     label nTotalCells = 0;
@@ -502,236 +505,320 @@ void writeVTK
             continue;
         }
 
-        // Are we looking at points?
-        if (primitiveType == 0)
+        bool isPolyhedron = false;
+
+        switch (primitiveType)
         {
-            // Size the list
-            cpList[nCells].setSize(1);
-
-            cpList[nCells] = cList[cellI];
-
-            nTotalCells++;
-        }
-
-        // Are we looking at edges?
-        if (primitiveType == 1)
-        {
-            // Size the list
-            cpList[nCells].setSize(2);
-
-            const edge& tEdge = edges[cList[cellI]];
-
-            cpList[nCells][0] = tEdge[0];
-            cpList[nCells][1] = tEdge[1];
-
-            nTotalCells += 2;
-        }
-
-        // Are we looking at faces?
-        if (primitiveType == 2)
-        {
-            const face& tFace = faces[cList[cellI]];
-
-            if (tFace.size() == 3)
+            // Are we looking at points?
+            case 0:
             {
                 // Size the list
-                cpList[nCells].setSize(3);
+                cpList[nCells].setSize(1);
 
-                // Write out in order
-                cpList[nCells][0] = tFace[0];
-                cpList[nCells][1] = tFace[1];
-                cpList[nCells][2] = tFace[2];
+                cpList[nCells] = cList[cellI];
 
-                nTotalCells += 3;
+                nTotalCells++;
+
+                break;
             }
-            else
-            if (tFace.size() == 4)
+
+            // Are we looking at edges?
+            case 1:
             {
                 // Size the list
-                cpList[nCells].setSize(4);
+                cpList[nCells].setSize(2);
 
-                // Write out in order
-                cpList[nCells][0] = tFace[0];
-                cpList[nCells][1] = tFace[1];
-                cpList[nCells][2] = tFace[2];
-                cpList[nCells][3] = tFace[3];
+                const edge& tEdge = edges[cList[cellI]];
 
-                nTotalCells += 4;
+                cpList[nCells][0] = tEdge[0];
+                cpList[nCells][1] = tEdge[1];
+
+                nTotalCells += 2;
+
+                break;
             }
-        }
 
-        // Are we looking at cells?
-        if (primitiveType == 3)
-        {
-            const cell& tCell = cells[cList[cellI]];
-
-            if (tCell.size() == 4)
+            // Are we looking at faces?
+            case 2:
             {
-                // Point-ordering for tetrahedra
-                const face& baseFace = faces[tCell[0]];
-                const face& checkFace = faces[tCell[1]];
+                const face& tFace = faces[cList[cellI]];
 
-                // Size the list
-                cpList[nCells].setSize(4);
+                // Size the list and assign
+                cpList[nCells] = tFace;
 
-                // Get the fourth point
-                label apexPoint =
-                (
-                    meshOps::findIsolatedPoint(baseFace, checkFace)
-                );
+                nTotalCells += tFace.size();
 
-                // Something's wrong with connectivity.
-                if (apexPoint == -1)
-                {
-                    FatalErrorIn
-                    (
-                        "void writeVTK\n"
-                        "(\n"
-                        "    const polyMesh& mesh,\n"
-                        "    const word& name,\n"
-                        "    const labelList& cList,\n"
-                        "    const label primitiveType,\n"
-                        "    const UList<point>& points,\n"
-                        "    const UList<edge>& edges,\n"
-                        "    const UList<face>& faces,\n"
-                        "    const UList<cell>& cells,\n"
-                        "    const UList<label>& owner\n"
-                        ") const\n"
-                    )
-                        << "Cell: " << cList[cellI]
-                        << ":: " << tCell
-                        << " has inconsistent connectivity."
-                        << abort(FatalError);
-                }
-
-                // Write-out in order
-                label ownCell = owner[tCell[0]];
-
-                if (ownCell == cList[cellI])
-                {
-                    cpList[nCells][0] = baseFace[2];
-                    cpList[nCells][1] = baseFace[1];
-                    cpList[nCells][2] = baseFace[0];
-                    cpList[nCells][3] = apexPoint;
-                }
-                else
-                {
-                    cpList[nCells][0] = baseFace[0];
-                    cpList[nCells][1] = baseFace[1];
-                    cpList[nCells][2] = baseFace[2];
-                    cpList[nCells][3] = apexPoint;
-                }
-
-                nTotalCells += 4;
+                break;
             }
-            else
-            if (tCell.size() == 5)
+
+            // Are we looking at cells?
+            case 3:
             {
-                // Point-ordering for wedge cells
-                label firstTriFace = -1;
+                const cell& tCell = cells[cList[cellI]];
 
-                // Size the list
-                cpList[nCells].setSize(6);
-
-                // Figure out triangle faces
-                forAll(tCell, faceI)
+                // Is face information provided?
+                if (faces.size())
                 {
-                    const face& cFace = faces[tCell[faceI]];
-
-                    if (cFace.size() == 3)
+                    if (tCell.size() == 4)
                     {
-                        if (firstTriFace == -1)
-                        {
-                            firstTriFace = tCell[faceI];
+                        // Point-ordering for tetrahedra
+                        const face& baseFace = faces[tCell[0]];
+                        const face& checkFace = faces[tCell[1]];
 
-                            // Right-handedness is assumed here.
-                            // Tri-faces are always on the boundary.
-                            cpList[nCells][0] = cFace[0];
-                            cpList[nCells][1] = cFace[1];
-                            cpList[nCells][2] = cFace[2];
+                        // Size the list
+                        cpList[nCells].setSize(4);
+
+                        // Get the fourth point
+                        label apexPoint =
+                        (
+                            meshOps::findIsolatedPoint(baseFace, checkFace)
+                        );
+
+                        // Something's wrong with connectivity.
+                        if (apexPoint == -1)
+                        {
+                            FatalErrorIn
+                            (
+                                "void meshOps::writeVTK\n"
+                                "(\n"
+                                "    const polyMesh& mesh,\n"
+                                "    const word& name,\n"
+                                "    const labelList& cList,\n"
+                                "    const label primitiveType,\n"
+                                "    const UList<point>& meshPoints,\n"
+                                "    const UList<edge>& edges,\n"
+                                "    const UList<face>& faces,\n"
+                                "    const UList<cell>& cells,\n"
+                                "    const UList<label>& owner\n"
+                                "    const UList<scalar>& scalField,\n"
+                                "    const UList<label>& lablField,\n"
+                                "    const UList<vector>& vectField\n"
+                                ")\n"
+                            )
+                                << "Cell: " << cList[cellI]
+                                << ":: " << tCell
+                                << " has inconsistent connectivity."
+                                << abort(FatalError);
+                        }
+
+                        // Write-out in order
+                        label ownCell = owner[tCell[0]];
+
+                        if (ownCell == cList[cellI])
+                        {
+                            cpList[nCells][0] = baseFace[2];
+                            cpList[nCells][1] = baseFace[1];
+                            cpList[nCells][2] = baseFace[0];
+                            cpList[nCells][3] = apexPoint;
                         }
                         else
                         {
-                            // Detect the three other points.
-                            forAll(tCell, faceJ)
+                            cpList[nCells][0] = baseFace[0];
+                            cpList[nCells][1] = baseFace[1];
+                            cpList[nCells][2] = baseFace[2];
+                            cpList[nCells][3] = apexPoint;
+                        }
+
+                        nTotalCells += 4;
+                    }
+                    else
+                    if (tCell.size() > 4)
+                    {
+                        // Point ordering for polyhedra
+                        isPolyhedron = true;
+
+                        // First obtain the face count
+                        label npF = 0;
+
+                        forAll(tCell, faceI)
+                        {
+                            npF += faces[tCell[faceI]].size();
+                        }
+
+                        // Size the list
+                        cpList[nCells].setSize(tCell.size() + npF + 1);
+
+                        // Fill in facePoints
+                        label nP = 0;
+
+                        // Fill in the number of faces
+                        cpList[nCells][nP++] = tCell.size();
+
+                        forAll(tCell, faceI)
+                        {
+                            const face& checkFace = faces[tCell[faceI]];
+
+                            if (checkFace.empty())
                             {
-                                const face& nFace = faces[tCell[faceJ]];
-
-                                if (nFace.size() == 4)
-                                {
-                                    // Search for vertices on cFace
-                                    // in this face.
-                                    forAll(cFace, I)
-                                    {
-                                        label i = nFace.which(cFace[I]);
-
-                                        if (i != -1)
-                                        {
-                                            label p = nFace.prevLabel(i);
-                                            label n = nFace.nextLabel(i);
-
-                                            if (p == cpList[nCells][0])
-                                            {
-                                                cpList[nCells][3] = cFace[I];
-                                            }
-
-                                            if (p == cpList[nCells][1])
-                                            {
-                                                cpList[nCells][4] = cFace[I];
-                                            }
-
-                                            if (p == cpList[nCells][2])
-                                            {
-                                                cpList[nCells][5] = cFace[I];
-                                            }
-
-                                            if (n == cpList[nCells][0])
-                                            {
-                                                cpList[nCells][3] = cFace[I];
-                                            }
-
-                                            if (n == cpList[nCells][1])
-                                            {
-                                                cpList[nCells][4] = cFace[I];
-                                            }
-
-                                            if (n == cpList[nCells][2])
-                                            {
-                                                cpList[nCells][5] = cFace[I];
-                                            }
-                                        }
-                                    }
-                                }
+                                FatalErrorIn("void meshOps::writeVTK()")
+                                    << " Empty face: " << tCell[faceI]
+                                    << abort(FatalError);
                             }
 
-                            break;
+                            // First fill in face size
+                            cpList[nCells][nP++] = checkFace.size();
+
+                            // Next fill in points in order
+                            if (owner[tCell[faceI]] == cList[cellI])
+                            {
+                                forAll(checkFace, pI)
+                                {
+                                    cpList[nCells][nP++] = checkFace[pI];
+                                }
+                            }
+                            else
+                            {
+                                forAllReverse(checkFace, pI)
+                                {
+                                    cpList[nCells][nP++] = checkFace[pI];
+                                }
+                            }
                         }
+
+                        nTotalCells += (tCell.size() + npF + 1);
+                    }
+                    else
+                    {
+                        FatalErrorIn("void meshOps::writeVTK()")
+                            << " Wrong cell size: " << tCell << nl
+                            << " Index: " << cList[cellI] << nl
+                            << abort(FatalError);
+                    }
+                }
+                else
+                {
+                    // No face information.
+                    // Assume cell-to-node information.
+                    if (tCell.size() == 4)
+                    {
+                        // Build a face out of first three points.
+                        triPointRef tpr
+                        (
+                            meshPoints[tCell[0]],
+                            meshPoints[tCell[1]],
+                            meshPoints[tCell[2]]
+                        );
+
+                        // Fetch fourth point
+                        const point& d = meshPoints[tCell[3]];
+
+                        scalar dDotN = ((d - tpr.a()) & tpr.normal());
+
+                        // Size the list
+                        cpList[nCells].setSize(4);
+
+                        if (dDotN > 0.0)
+                        {
+                            // Correct orientation
+                            cpList[nCells][0] = tCell[0];
+                            cpList[nCells][1] = tCell[1];
+                            cpList[nCells][2] = tCell[2];
+                            cpList[nCells][3] = tCell[3];
+                        }
+                        else
+                        {
+                            // Flip triangle
+                            cpList[nCells][0] = tCell[2];
+                            cpList[nCells][1] = tCell[1];
+                            cpList[nCells][2] = tCell[0];
+                            cpList[nCells][3] = tCell[3];
+                        }
+
+                        nTotalCells += 4;
+                    }
+                    else
+                    {
+                        FatalErrorIn("void meshOps::writeVTK()")
+                            << " Wrong cell size: " << tCell << nl
+                            << " Index: " << cList[cellI] << nl
+                            << abort(FatalError);
                     }
                 }
 
-                nTotalCells += 6;
+                break;
+            }
+
+            default:
+            {
+                FatalErrorIn("void meshOps::writeVTK() const")
+                    << " Incorrect primitiveType: "
+                    << primitiveType
+                    << abort(FatalError);
             }
         }
 
         // Renumber to local ordering
-        forAll(cpList[nCells], pointI)
+        if (isPolyhedron)
         {
-            // Check if this point was added to the map
-            if (!pointMap.found(cpList[nCells][pointI]))
+            // Polyhedra also contain face sizes, so use a different scheme
+            label pCtr = 0;
+
+            // Fetch number of faces
+            label npF = cpList[nCells][pCtr++];
+
+            for (label i = 0; i < npF; i++)
             {
-                // Point was not found, so add it
-                points[nPoints] = meshPoints[cpList[nCells][pointI]];
+                // Fetch number of points
+                label npP = cpList[nCells][pCtr++];
 
-                // Update the map
-                pointMap.insert(cpList[nCells][pointI], nPoints);
-                reversePointMap.insert(nPoints, cpList[nCells][pointI]);
+                // Read points in order
+                for (label j = 0; j < npP; j++)
+                {
+                    // Check if this point was added to the map
+                    if (!pointMap.found(cpList[nCells][pCtr]))
+                    {
+                        // Resize pointField if necessary
+                        if (nPoints >= points.size())
+                        {
+                            points.setSize(2 * nPoints);
+                        }
 
-                // Increment the number of points
-                nPoints++;
+                        // Point was not found, so add it
+                        points[nPoints] = meshPoints[cpList[nCells][pCtr]];
+
+                        // Update the map
+                        pointMap.insert(cpList[nCells][pCtr], nPoints);
+                        reversePointMap.insert(nPoints, cpList[nCells][pCtr]);
+
+                        // Increment the number of points
+                        nPoints++;
+                    }
+
+                    // Renumber it.
+                    cpList[nCells][pCtr] = pointMap[cpList[nCells][pCtr]];
+
+                    // Increment point counter
+                    pCtr++;
+                }
             }
+        }
+        else
+        {
+            forAll(cpList[nCells], pointI)
+            {
+                // Check if this point was added to the map
+                if (!pointMap.found(cpList[nCells][pointI]))
+                {
+                    // Resize pointField if necessary
+                    if (nPoints >= points.size())
+                    {
+                        points.setSize(2 * nPoints);
+                    }
 
-            // Renumber it.
-            cpList[nCells][pointI] = pointMap[cpList[nCells][pointI]];
+                    // Point was not found, so add it
+                    points[nPoints] = meshPoints[cpList[nCells][pointI]];
+
+                    // Update the map
+                    pointMap.insert(cpList[nCells][pointI], nPoints);
+                    reversePointMap.insert(nPoints, cpList[nCells][pointI]);
+
+                    // Increment the number of points
+                    nPoints++;
+                }
+
+                // Renumber it.
+                cpList[nCells][pointI] = pointMap[cpList[nCells][pointI]];
+            }
         }
 
         // Update the cell map.
@@ -752,7 +839,10 @@ void writeVTK
         cpList,
         primitiveType,
         reversePointMap,
-        reverseCellMap
+        reverseCellMap,
+        scalField,
+        lablField,
+        vectField
     );
 }
 
@@ -769,7 +859,10 @@ void writeVTK
     const labelListList& cpList,
     const label primitiveType,
     const Map<label>& reversePointMap,
-    const Map<label>& reverseCellMap
+    const Map<label>& reverseCellMap,
+    const UList<scalar>& scalField,
+    const UList<label>& lablField,
+    const UList<vector>& vectField
 )
 {
     // Make the directory
@@ -830,48 +923,54 @@ void writeVTK
     {
         forAll(cpList, i)
         {
-            if (cpList[i].size() == 1)
+            switch (primitiveType)
             {
                 // Vertex
-                file << "1" << nl;
-            }
+                case 0:
+                {
+                    file << "1" << nl;
+                    break;
+                }
 
-            if (cpList[i].size() == 2)
-            {
                 // Edge
-                file << "3" << nl;
-            }
+                case 1:
+                {
+                    file << "3" << nl;
+                    break;
+                }
 
-            if (cpList[i].size() == 3)
-            {
-                // Triangle face
-                file << "5" << nl;
-            }
+                // General Polygonal Face
+                case 2:
+                {
+                    file << "7" << nl;
+                    break;
+                }
 
-            if
-            (
-                (cpList[i].size() == 4) &&
-                (primitiveType == 2)
-            )
-            {
-                // Quad face
-                file << "9" << nl;
-            }
+                // Cell
+                case 3:
+                {
+                    if (cpList[i].size() == 4)
+                    {
+                        // Tetrahedron
+                        file << "10" << nl;
+                    }
+                    else
+                    if (cpList[i].size() > 4)
+                    {
+                        // Polyhedron
+                        file << "42" << nl;
+                    }
 
-            if
-            (
-                (cpList[i].size() == 4) &&
-                (primitiveType == 3)
-            )
-            {
-                // Tetrahedron
-                file << "10" << nl;
-            }
+                    break;
+                }
 
-            if (cpList[i].size() == 6)
-            {
-                // Wedge
-                file << "13" << nl;
+                default:
+                {
+                    FatalErrorIn("void meshOps::writeVTK() const")
+                        << " Incorrect primitiveType: "
+                        << primitiveType
+                        << abort(FatalError);
+                }
             }
         }
     }
@@ -885,43 +984,168 @@ void writeVTK
         }
     }
 
-    // Write out indices for visualization.
+    label nCellFields = 0, nPointFields = 0;
+
     if (reverseCellMap.size())
     {
-        file << "CELL_DATA " << nCells << endl;
+        nCellFields++;
+    }
 
-        file << "FIELD CellFields 1" << endl;
+    if (scalField.size() == nCells && scalField.size())
+    {
+        nCellFields++;
+    }
 
-        file << "CellIds 1 " << nCells << " int" << endl;
+    if (lablField.size() == nCells && lablField.size())
+    {
+        nCellFields++;
+    }
 
-        for (label i = 0; i < nCells; i++)
-        {
-            file << reverseCellMap[i] << ' ';
-        }
-
-        file << endl;
+    if (vectField.size() == nCells && vectField.size())
+    {
+        nCellFields++;
     }
 
     // Write out indices for visualization.
+    if (nCellFields)
+    {
+        file << "CELL_DATA " << nCells << endl;
+
+        file << "FIELD CellFields " << nCellFields << endl;
+
+        if (reverseCellMap.size())
+        {
+            file << "CellIds 1 " << nCells << " int" << endl;
+
+            for (label i = 0; i < nCells; i++)
+            {
+                file << reverseCellMap[i] << ' ';
+            }
+
+            file << endl;
+        }
+
+        if (scalField.size() == nCells)
+        {
+            file << "CellScalars 1 " << nCells << " double" << endl;
+
+            forAll(scalField, i)
+            {
+                file << scalField[i] << ' ';
+            }
+
+            file << endl;
+        }
+
+        if (lablField.size() == nCells)
+        {
+            file << "CellLabels 1 " << nCells << " int" << endl;
+
+            forAll(lablField, i)
+            {
+                file << lablField[i] << ' ';
+            }
+
+            file << endl;
+        }
+
+        if (vectField.size() == nCells)
+        {
+            file << "CellVectors 3 " << nCells << " double" << endl;
+
+            forAll(vectField, i)
+            {
+                file << vectField[i].x() << ' '
+                     << vectField[i].y() << ' '
+                     << vectField[i].z() << ' ';
+            }
+
+            file << endl;
+        }
+    }
+
     if (reversePointMap.size())
+    {
+        nPointFields++;
+    }
+
+    if (scalField.size() == nPoints && scalField.size())
+    {
+        nPointFields++;
+    }
+
+    if (lablField.size() == nPoints && lablField.size())
+    {
+        nPointFields++;
+    }
+
+    if (vectField.size() == nPoints && vectField.size())
+    {
+        nPointFields++;
+    }
+
+    // Write out indices for visualization.
+    if (nPointFields)
     {
         file << "POINT_DATA " << nPoints << endl;
 
-        file << "FIELD PointFields 1" << endl;
+        file << "FIELD PointFields " << nPointFields << endl;
 
-        file << "PointIds 1 " << nPoints << " int" << endl;
-
-        for (label i = 0; i < nPoints; i++)
+        if (reversePointMap.size())
         {
-            file << reversePointMap[i] << ' ';
+            file << "PointIds 1 " << nPoints << " int" << endl;
+
+            for (label i = 0; i < nPoints; i++)
+            {
+                file << reversePointMap[i] << ' ';
+            }
+
+            file << endl;
         }
 
-        file << endl;
+        if (scalField.size() == nPoints)
+        {
+            file << "PointScalars 1 " << nPoints << " double" << endl;
+
+            forAll(scalField, i)
+            {
+                file << scalField[i] << ' ';
+            }
+
+            file << endl;
+        }
+
+        if (lablField.size() == nPoints)
+        {
+            file << "PointLabels 1 " << nPoints << " int" << endl;
+
+            forAll(lablField, i)
+            {
+                file << lablField[i] << ' ';
+            }
+
+            file << endl;
+        }
+
+        if (vectField.size() == nPoints)
+        {
+            file << "PointVectors 3 " << nPoints << " double" << endl;
+
+            forAll(vectField, i)
+            {
+                file << vectField[i].x() << ' '
+                     << vectField[i].y() << ' '
+                     << vectField[i].z() << ' ';
+            }
+
+            file << endl;
+        }
     }
 }
 
 
 } // End namespace meshOps
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

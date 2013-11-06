@@ -4,6 +4,7 @@
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions
 
 cleanCase
-rm -rf VTK
-rm -f constant/polyMesh/boundary
-rm -rf constant/polyMesh/sets
+\rm -rf VTK
+\rm -rf 0/polyMesh
+\rm -f constant/polyMesh/boundary
+\rm -rf constant/polyMesh/sets

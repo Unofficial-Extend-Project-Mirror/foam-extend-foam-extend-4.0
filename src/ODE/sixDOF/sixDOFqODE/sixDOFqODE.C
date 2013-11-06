@@ -33,6 +33,7 @@ Author
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "sixDOFqODE.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

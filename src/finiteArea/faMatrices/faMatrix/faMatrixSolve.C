@@ -159,14 +159,26 @@ autoPtr<typename faMatrix<Type>::faSolver> faMatrix<Type>::solver()
 template<class Type>
 lduSolverPerformance faMatrix<Type>::faSolver::solve()
 {
-    return solve(psi_.mesh().solutionDict().solverDict(psi_.name()));
+    return solvei
+    (
+        faMat_.psi().mesh().solutionDict().solverDict
+        (
+            faMat_.psi().name()
+        )
+    );
 }
 
 
 template<class Type>
 lduSolverPerformance faMatrix<Type>::solve()
 {
-    return solve(psi_.mesh().solutionDict().solverDict(psi_.name()));
+    return solve
+    (
+        this->psi().mesh().solutionDict().solverDict
+        (
+            this->psi().name()
+        )
+    );
 }
 
 

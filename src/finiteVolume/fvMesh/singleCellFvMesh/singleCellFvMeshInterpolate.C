@@ -50,7 +50,7 @@ tmp<GeometricField<Type, fvPatchField, volMesh> > singleCellFvMesh::interpolate
         forAll(vf.boundaryField(), patchI)
         {
             const labelList& agglom = patchFaceAgglomeration_[patchI];
-            label nAgglom = max(agglom)+1;
+            label nAgglom = max(agglom) + 1;
 
             // Use inverse of agglomeration. This is from agglomeration to
             // original (fine) mesh patch face.
@@ -75,7 +75,7 @@ tmp<GeometricField<Type, fvPatchField, volMesh> > singleCellFvMesh::interpolate
                     vf.boundaryField()[patchI],
                     boundary()[patchI],
                     DimensionedField<Type, volMesh>::null(),
-                    agglomPatchFieldMapper(coarseToFine, coarseWeights)
+                    agglomPatchFieldMapper(coarseToFine, coarseWeights, agglom.size())
                 )
             );
         }
@@ -94,7 +94,7 @@ tmp<GeometricField<Type, fvPatchField, volMesh> > singleCellFvMesh::interpolate
                     vf.boundaryField()[patchI],
                     boundary()[patchI],
                     DimensionedField<Type, volMesh>::null(),
-                    directPatchFieldMapper(map)
+                    directPatchFieldMapper(map, map.size())
                 )
             );
         }

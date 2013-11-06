@@ -25,7 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "fvSchemes.H"
-#include "Time.H"
+#include "objectRegistry.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 

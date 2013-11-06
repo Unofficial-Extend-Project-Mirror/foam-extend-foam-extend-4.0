@@ -29,7 +29,6 @@ License
 #include "MeshedSurfaceProxy.H"
 #include "IFstream.H"
 #include "OFstream.H"
-#include "Time.H"
 #include "polyBoundaryMesh.H"
 #include "polyMesh.H"
 
@@ -56,7 +55,7 @@ bool Foam::UnsortedMeshedSurface<Face>::canReadType
     const bool verbose
 )
 {
-   return checkSupport
+   return fileFormats::surfaceFormatsCore::checkSupport
    (
        readTypes() | ParentType::readTypes(),
        ext,
@@ -73,7 +72,7 @@ bool Foam::UnsortedMeshedSurface<Face>::canWriteType
     const bool verbose
 )
 {
-    return checkSupport
+    return fileFormats::surfaceFormatsCore::checkSupport
     (
         writeTypes(),
         ext,

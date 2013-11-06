@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "NASsurfaceFormat.H"
 
 #include "addToRunTimeSelectionTable.H"

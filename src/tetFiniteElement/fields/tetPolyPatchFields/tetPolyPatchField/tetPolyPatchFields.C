@@ -53,6 +53,14 @@ typedef PointPatchField
     baseTetPolyPatchSymmTensorField;
 
 typedef PointPatchField
+<tetPolyPatchField, tetPointMesh, tetPolyPatch, tetFemMatrix, symmTensor4thOrder>
+    baseTetPolyPatchSymmTensor4thOrderField;
+
+typedef PointPatchField
+<tetPolyPatchField, tetPointMesh, tetPolyPatch, tetFemMatrix, diagTensor>
+    baseTetPolyPatchDiagTensorField;
+
+typedef PointPatchField
 <tetPolyPatchField, tetPointMesh, tetPolyPatch, tetFemMatrix, tensor>
     baseTetPolyPatchTensorField;
 
@@ -75,6 +83,16 @@ defineNamedTemplateTypeNameAndDebug(baseTetPolyPatchSymmTensorField, 0);
 defineTemplateRunTimeSelectionTable(baseTetPolyPatchSymmTensorField, PointPatch);
 defineTemplateRunTimeSelectionTable(baseTetPolyPatchSymmTensorField, patchMapper);
 defineTemplateRunTimeSelectionTable(baseTetPolyPatchSymmTensorField, dictionary);
+
+defineNamedTemplateTypeNameAndDebug(baseTetPolyPatchSymmTensor4thOrderField, 0);
+defineTemplateRunTimeSelectionTable(baseTetPolyPatchSymmTensor4thOrderField, PointPatch);
+defineTemplateRunTimeSelectionTable(baseTetPolyPatchSymmTensor4thOrderField, patchMapper);
+defineTemplateRunTimeSelectionTable(baseTetPolyPatchSymmTensor4thOrderField, dictionary);
+
+defineNamedTemplateTypeNameAndDebug(baseTetPolyPatchDiagTensorField, 0);
+defineTemplateRunTimeSelectionTable(baseTetPolyPatchDiagTensorField, PointPatch);
+defineTemplateRunTimeSelectionTable(baseTetPolyPatchDiagTensorField, patchMapper);
+defineTemplateRunTimeSelectionTable(baseTetPolyPatchDiagTensorField, dictionary);
 
 defineNamedTemplateTypeNameAndDebug(baseTetPolyPatchTensorField, 0);
 defineTemplateRunTimeSelectionTable(baseTetPolyPatchTensorField, PointPatch);

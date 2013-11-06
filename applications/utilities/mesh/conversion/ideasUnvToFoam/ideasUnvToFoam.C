@@ -448,7 +448,7 @@ void readPatches
 
             // Read one (for last face) or two entries from line.
             label nRead = 2;
-            if (nFaces == groupIndices.size()-1)
+            if (nFaces == groupIndices.size() - 1)
             {
                 nRead = 1;
             }

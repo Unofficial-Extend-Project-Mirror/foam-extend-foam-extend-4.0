@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "surfaceFormatsCore.H"
 
 #include "Time.H"

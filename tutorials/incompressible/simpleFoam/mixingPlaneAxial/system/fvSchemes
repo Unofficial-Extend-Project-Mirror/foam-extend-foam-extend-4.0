@@ -71,7 +71,7 @@ mixingPlane
 {
     default        areaAveraging;
     p              areaAveraging;
-    U              fluxAveraging;
+    U              areaAveraging;
 
     k              fluxAveraging;
     epsilon        fluxAveraging;

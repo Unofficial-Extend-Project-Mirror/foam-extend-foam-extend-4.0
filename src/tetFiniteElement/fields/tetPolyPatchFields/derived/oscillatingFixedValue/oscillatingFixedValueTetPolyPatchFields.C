@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "oscillatingFixedValueTetPolyPatchFields.H"
 #include "tetFemMatrices.H"
 #include "tetPolyPatchFields.H"

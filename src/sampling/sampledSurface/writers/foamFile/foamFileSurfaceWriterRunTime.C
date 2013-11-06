@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "foamFileSurfaceWriter.H"
 #include "surfaceWriters.H"
 #include "addToRunTimeSelectionTable.H"

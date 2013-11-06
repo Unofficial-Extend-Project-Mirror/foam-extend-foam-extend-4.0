@@ -169,7 +169,7 @@ public:
             );
 
             //- Clear constraints
-            void clearConstraints();
+            virtual void clearConstraints();
 
             //- Solve for motion
             virtual void solve() = 0;

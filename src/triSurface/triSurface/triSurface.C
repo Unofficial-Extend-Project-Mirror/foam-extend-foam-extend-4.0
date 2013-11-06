@@ -28,6 +28,7 @@ License
 #include "demandDrivenData.H"
 #include "IFstream.H"
 #include "OFstream.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "boundBox.H"
 #include "SortableList.H"

@@ -68,6 +68,14 @@ GeometricField<symmTensor, tetPolyPatchField, tetPointMesh>
     tetPointSymmTensorField;
 
 typedef
+GeometricField<symmTensor4thOrder, tetPolyPatchField, tetPointMesh>
+    tetPointSymmTensor4thOrderField;
+
+typedef
+GeometricField<diagTensor, tetPolyPatchField, tetPointMesh>
+    tetPointDiagTensorField;
+
+typedef
 GeometricField<tensor, tetPolyPatchField, tetPointMesh> tetPointTensorField;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

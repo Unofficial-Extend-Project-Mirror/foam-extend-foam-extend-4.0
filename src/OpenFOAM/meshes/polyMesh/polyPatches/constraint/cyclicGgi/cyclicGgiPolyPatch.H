@@ -188,14 +188,32 @@ public:
             return separationOffset_;
         }
 
+        //- Return access to separation offset
+        vector& separationOffset()
+        {
+            return separationOffset_;
+        }
+
         //- Return rotation axis
         const vector& rotationAxis() const
         {
             return rotationAxis_;
         }
 
+        //- Return access tp rotation axis
+        vector& rotationAxis()
+        {
+            return rotationAxis_;
+        }
+
         //- Return rotation angle
         const scalar& rotationAngle() const
+        {
+            return rotationAngle_;
+        }
+
+        //- Return access to rotation angle
+        scalar& rotationAngle()
         {
             return rotationAngle_;
         }

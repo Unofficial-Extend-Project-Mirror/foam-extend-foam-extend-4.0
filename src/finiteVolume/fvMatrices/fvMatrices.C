@@ -40,6 +40,8 @@ defineTemplateTypeNameAndDebug(fvScalarMatrix, 0);
 defineTemplateTypeNameAndDebug(fvVectorMatrix, 0);
 defineTemplateTypeNameAndDebug(fvSphericalTensorMatrix, 0);
 defineTemplateTypeNameAndDebug(fvSymmTensorMatrix, 0);
+defineTemplateTypeNameAndDebug(fvSymmTensor4thOrderMatrix, 0);
+defineTemplateTypeNameAndDebug(fvDiagTensorMatrix, 0);
 defineTemplateTypeNameAndDebug(fvTensorMatrix, 0);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

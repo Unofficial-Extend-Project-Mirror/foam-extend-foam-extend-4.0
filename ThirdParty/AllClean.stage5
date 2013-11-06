@@ -50,7 +50,7 @@ echo ========================================
 echo
 
 # swak4foam
-pkg=swak4Foam-0.2.0
+pkg=swak4Foam-0.2.4
 set -x
 rm -rf $WM_THIRD_PARTY_DIR/rpmBuild/BUILD/${pkg}*
 set +x

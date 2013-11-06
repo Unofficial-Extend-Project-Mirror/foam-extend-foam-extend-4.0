@@ -116,7 +116,17 @@ public:
             }
 
 
-        // Interface matrix update
+        // Coupled interface matrix update
+
+            //- Transform neighbour field
+            virtual void transformCoupleField
+            (
+                scalarField& pnf,
+                const direction cmpt
+            ) const
+            {
+                mixingPlaneLduInterfaceField::transformCoupleField(pnf, cmpt);
+            }
 
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate

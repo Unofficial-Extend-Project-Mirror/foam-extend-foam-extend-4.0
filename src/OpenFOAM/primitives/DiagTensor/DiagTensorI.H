@@ -319,6 +319,22 @@ public:
     typedef DiagTensor<Cmpt> type;
 };
 
+template<class Cmpt>
+class outerProduct<DiagTensor<Cmpt>, Cmpt>
+{
+public:
+  
+    typedef DiagTensor<Cmpt> type;
+};
+
+template<class Cmpt>
+class outerProduct<Cmpt, DiagTensor<Cmpt> >
+{
+public:
+
+    typedef DiagTensor<Cmpt> type;
+};
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

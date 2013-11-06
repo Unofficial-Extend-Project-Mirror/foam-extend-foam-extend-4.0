@@ -25,7 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "instantList.H"
-#include "Time.H"
+#include "objectRegistry.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 

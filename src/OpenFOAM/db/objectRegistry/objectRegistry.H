@@ -124,10 +124,7 @@ public:
         // Access
 
             //- Return time
-            const Time& time() const
-            {
-                return time_;
-            }
+            const Time& time() const;
 
             //- Return the parent objectRegistry
             const objectRegistry& parent() const

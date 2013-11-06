@@ -13,6 +13,7 @@ FoamFile
     location    "0";
     object      DU;
 }
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 dimensions      [0 1 0 0 0 0 0];
@@ -29,7 +30,6 @@ boundaryField
     right
     {
       type             timeVaryingSolidTraction;
-      nonLinear        off;
       outOfBounds      clamp;
       fileName         "$FOAM_CASE/constant/timeVsRightTraction";
     }

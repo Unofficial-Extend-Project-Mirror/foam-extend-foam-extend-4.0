@@ -5,6 +5,7 @@ equation/equationIO.C
 
 equationOperation/equationOperation.C
 
+equationReader/equationReader.C
 equationReader/equationReaders.C
 equationReader/equationReaderIO.C
 

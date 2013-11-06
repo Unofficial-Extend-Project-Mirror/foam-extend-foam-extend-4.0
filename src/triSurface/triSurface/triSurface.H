@@ -62,12 +62,13 @@ class triSurface
 {
     // Private typedefs
 
-    //- Typedefs for convenience
+        // Typedefs for convenience
         typedef labelledTri Face;
+
         typedef PrimitivePatch
         <
             labelledTri,
-            List,
+            Foam::List,
             pointField,
             point
         >

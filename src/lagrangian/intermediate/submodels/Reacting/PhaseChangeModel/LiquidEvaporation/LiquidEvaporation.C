@@ -74,7 +74,8 @@ Foam::LiquidEvaporation<CloudType>::LiquidEvaporation
     (
         liquidMixture::New
         (
-            owner.mesh().objectRegistry::lookupObject<dictionary>
+            owner.mesh().objectRegistry::template
+            lookupObject<dictionary>
             (
                 owner.carrierThermo().name()
             )

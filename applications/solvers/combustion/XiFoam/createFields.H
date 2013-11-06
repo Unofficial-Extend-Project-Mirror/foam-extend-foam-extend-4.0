@@ -30,7 +30,6 @@
 
     const volScalarField& T = thermo.T();
 
-
     Info<< "\nReading field U\n" << endl;
     volVectorField U
     (

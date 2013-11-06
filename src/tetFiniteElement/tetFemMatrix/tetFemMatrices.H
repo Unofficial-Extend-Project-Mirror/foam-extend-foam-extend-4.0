@@ -32,6 +32,7 @@ Description
 #ifndef tetFemMatrices_H
 #define tetFemMatrices_H
 
+#include "objectRegistry.H"
 #include "tetFemScalarMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

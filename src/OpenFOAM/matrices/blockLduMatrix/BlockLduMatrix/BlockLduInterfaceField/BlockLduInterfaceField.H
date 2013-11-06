@@ -97,6 +97,12 @@ public:
 
         // Block coupled interface matrix update
 
+            //- Transform neighbour field
+            virtual void transformCoupleField
+            (
+                Field<Type>& pnf
+            ) const = 0;
+
             // KRJ: 2013-02-08: Must be virtual!
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate

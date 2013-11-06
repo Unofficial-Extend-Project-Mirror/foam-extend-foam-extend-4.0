@@ -43,16 +43,13 @@ SourceFiles
 #ifndef topoSurfaceMapper_H
 #define topoSurfaceMapper_H
 
+#include "topoMapper.H"
 #include "morphFieldMapper.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// Class forward declarations
-class topoMapper;
-class mapPolyMesh;
 
 /*---------------------------------------------------------------------------*\
                         Class topoSurfaceMapper Declaration
@@ -75,6 +72,9 @@ class topoSurfaceMapper
 
         //- Is the mapping direct
         bool direct_;
+
+        //- Size before mapping
+        mutable label sizeBeforeMapping_;
 
     // Demand-driven private data
 
@@ -165,8 +165,10 @@ public:
 
 } // End namespace Foam
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #ifdef NoRepository
-#include "topoSurfaceMapper.C"
+#   include "topoSurfaceMapperTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

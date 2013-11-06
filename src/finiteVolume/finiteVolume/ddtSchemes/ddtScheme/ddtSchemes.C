@@ -46,6 +46,8 @@ defineTemplateRunTimeSelectionTable(ddtScheme<scalar>, Istream);
 defineTemplateRunTimeSelectionTable(ddtScheme<vector>, Istream);
 defineTemplateRunTimeSelectionTable(ddtScheme<sphericalTensor>, Istream);
 defineTemplateRunTimeSelectionTable(ddtScheme<symmTensor>, Istream);
+defineTemplateRunTimeSelectionTable(ddtScheme<symmTensor4thOrder>, Istream);
+defineTemplateRunTimeSelectionTable(ddtScheme<diagTensor>, Istream);
 defineTemplateRunTimeSelectionTable(ddtScheme<tensor>, Istream);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

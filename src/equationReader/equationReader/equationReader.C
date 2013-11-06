@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "equationReader.H"
 #include "mathematicalConstants.H"
 #include "dimensionedScalar.H"

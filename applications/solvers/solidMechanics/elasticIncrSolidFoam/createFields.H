@@ -24,7 +24,7 @@
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedVector("zero", dimLength, vector::zero)
+        dimensionedVector("zero", dimLength, vector::zero)	
     );
 
     volSymmTensorField DEpsilon
@@ -97,7 +97,7 @@
         dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
     );
 
-    rheologyModel rheology(sigma);
+    constitutiveModel rheology(sigma, DU);
 
     volScalarField rho = rheology.rho();
 

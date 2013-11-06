@@ -79,14 +79,16 @@ Foam::FieldActivatedInjection<CloudType>::FieldActivatedInjection
     factor_(readScalar(this->coeffDict().lookup("factor"))),
     referenceField_
     (
-        owner.db().objectRegistry::lookupObject<volScalarField>
+        owner.db().objectRegistry::template
+        lookupObject<volScalarField>
         (
             this->coeffDict().lookup("referenceField")
         )
     ),
     thresholdField_
     (
-        owner.db().objectRegistry::lookupObject<volScalarField>
+        owner.db().objectRegistry::template
+        lookupObject<volScalarField>
         (
             this->coeffDict().lookup("thresholdField")
         )

@@ -24,6 +24,8 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
+#include "Time.H"
 #include "primitiveMeshGeometry.H"
 #include "pyramidPointFaceRef.H"
 

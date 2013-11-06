@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "AC3DsurfaceFormatCore.H"
 #include "clock.H"
 #include "IFstream.H"

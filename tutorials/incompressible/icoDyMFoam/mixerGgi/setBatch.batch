@@ -1,0 +1,4 @@
+faceSet insideZone new patchToFace insideSlider
+faceSet outsideZone new patchToFace outsideSlider
+cellSet movingCells new cellToCell cellRegion0
+quit

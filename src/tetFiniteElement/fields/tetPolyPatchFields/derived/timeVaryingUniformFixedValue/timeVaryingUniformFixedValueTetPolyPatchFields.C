@@ -24,6 +24,8 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
+#include "Time.H"
 #include "timeVaryingUniformFixedValueTetPolyPatchFields.H"
 #include "tetFemMatrices.H"
 #include "tetPolyPatchFields.H"

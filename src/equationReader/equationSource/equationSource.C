@@ -501,7 +501,7 @@ Foam::dictionary Foam::equationSource<Type>::outputDictionary() const
         {
             tempDict.set
             (
-                "field" + geoIndex,
+                word("field" + name(geoIndex)),
                 fields_[sourceIndex][geoIndex]
             );
         }

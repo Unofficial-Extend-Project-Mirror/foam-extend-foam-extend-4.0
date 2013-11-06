@@ -25,8 +25,8 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "IOobject.H"
-#include "Time.H"
 #include "IFstream.H"
+#include "objectRegistry.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 

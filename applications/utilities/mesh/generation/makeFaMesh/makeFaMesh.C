@@ -30,6 +30,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "Time.H"
 #include "argList.H"
 #include "OSspecific.H"

@@ -24,8 +24,8 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "equationReader.H"
-#include "equationReader.C"
 
 // * * * * * * * * * * * * * scalar specializations  * * * * * * * * * * * * //
 

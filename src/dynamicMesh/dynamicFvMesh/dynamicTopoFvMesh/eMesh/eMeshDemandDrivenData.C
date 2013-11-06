@@ -24,6 +24,8 @@ License
 
 Description
 
+    Demand-driven edge mesh data
+
 \*---------------------------------------------------------------------------*/
 
 #include "eMesh.H"
@@ -179,12 +181,8 @@ void eMesh::calcEdgePoints() const
     // If a boundary point is present, that must begin the list.
     // NOTE: Will work only on tetrahedral meshes!
 
-#   ifdef FULLDEBUG
     bool found;
-#   endif
-
-    label faceIndex = -1;
-    label cellIndex = -1;
+    label faceIndex = -1, cellIndex = -1;
     const labelList& owner = mesh_.faceOwner();
     const labelList& neighbour = mesh_.faceNeighbour();
     const cellList& cells = mesh_.cells();
@@ -249,9 +247,7 @@ void eMesh::calcEdgePoints() const
 
             const cell& cellToCheck = cells[cellIndex];
 
-#           ifdef FULLDEBUG
             found = false;
-#           endif
 
             // Assuming tet-cells,
             // Loop through edgeFaces and get the next face
@@ -264,12 +260,7 @@ void eMesh::calcEdgePoints() const
                 )
                 {
                     faceIndex = cellToCheck[0];
-
-#                   ifdef FULLDEBUG
-                    found = true;
-#                   endif
-
-                    break;
+                    found = true; break;
                 }
 
                 if
@@ -279,12 +270,7 @@ void eMesh::calcEdgePoints() const
                 )
                 {
                     faceIndex = cellToCheck[1];
-
-#                   ifdef FULLDEBUG
-                    found = true;
-#                   endif
-
-                    break;
+                    found = true; break;
                 }
 
                 if
@@ -294,12 +280,7 @@ void eMesh::calcEdgePoints() const
                 )
                 {
                     faceIndex = cellToCheck[2];
-
-#                   ifdef FULLDEBUG
-                    found = true;
-#                   endif
-
-                    break;
+                    found = true; break;
                 }
 
                 if
@@ -309,12 +290,7 @@ void eMesh::calcEdgePoints() const
                 )
                 {
                     faceIndex = cellToCheck[3];
-
-#                   ifdef FULLDEBUG
-                    found = true;
-#                   endif
-
-                    break;
+                    found = true; break;
                 }
             }
 

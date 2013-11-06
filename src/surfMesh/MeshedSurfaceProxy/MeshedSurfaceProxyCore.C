@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "MeshedSurfaceProxy.H"
 #include "addToRunTimeSelectionTable.H"
 

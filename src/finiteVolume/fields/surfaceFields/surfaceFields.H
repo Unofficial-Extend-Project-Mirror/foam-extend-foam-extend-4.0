@@ -36,6 +36,7 @@ SourceFiles
 #ifndef surfaceFields_H
 #define surfaceFields_H
 
+#include "objectRegistry.H"
 #include "GeometricFields.H"
 #include "surfaceMesh.H"
 #include "fvMesh.H"

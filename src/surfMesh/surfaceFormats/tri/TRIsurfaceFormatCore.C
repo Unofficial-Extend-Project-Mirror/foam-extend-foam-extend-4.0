@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "TRIsurfaceFormat.H"
 #include "IFstream.H"
 #include "IOmanip.H"

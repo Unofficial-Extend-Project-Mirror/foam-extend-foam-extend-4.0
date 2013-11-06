@@ -35,6 +35,7 @@ Description
 #define calc_H
 
 #include "argList.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "fvMesh.H"
 

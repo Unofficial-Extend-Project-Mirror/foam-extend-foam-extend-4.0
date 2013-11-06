@@ -315,7 +315,6 @@ void Foam::thoboisSliding::prepareValveDetach()
 
 bool Foam::thoboisSliding::update()
 {
-
     tetMotionSolver& mSolver =
         refCast<tetMotionSolver>(msPtr_());
 

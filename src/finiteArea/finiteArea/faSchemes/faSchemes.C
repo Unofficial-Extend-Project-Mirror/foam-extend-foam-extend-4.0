@@ -27,9 +27,9 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
-#include "faSchemes.H"
+#include "objectRegistry.H"
 #include "Time.H"
+#include "faSchemes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

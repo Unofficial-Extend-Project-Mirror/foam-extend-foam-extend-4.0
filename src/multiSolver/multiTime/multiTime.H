@@ -39,7 +39,7 @@ Author
 #ifndef multiTime_H
 #define multiTime_H
 
-#include "Time.H"
+#include "objectRegistry.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

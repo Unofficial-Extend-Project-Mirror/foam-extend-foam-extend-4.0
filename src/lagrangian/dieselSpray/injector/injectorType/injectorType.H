@@ -39,6 +39,7 @@ SourceFiles
 #define injectorType_H
 
 #include "IOdictionary.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "autoPtr.H"
 #include "runTimeSelectionTables.H"

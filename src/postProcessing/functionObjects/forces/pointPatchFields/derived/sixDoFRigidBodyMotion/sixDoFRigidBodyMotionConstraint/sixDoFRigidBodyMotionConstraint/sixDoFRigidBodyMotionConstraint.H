@@ -44,6 +44,7 @@ SourceFiles
 #ifndef sixDoFRigidBodyMotionConstraint_H
 #define sixDoFRigidBodyMotionConstraint_H
 
+#include "objectRegistry.H"
 #include "Time.H"
 #include "dictionary.H"
 #include "autoPtr.H"

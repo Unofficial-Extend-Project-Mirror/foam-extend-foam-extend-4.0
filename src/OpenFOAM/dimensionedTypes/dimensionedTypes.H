@@ -34,6 +34,7 @@ License
 #include "dimensionedSphericalTensor.H"
 #include "dimensionedDiagTensor.H"
 #include "dimensionedSymmTensor.H"
+#include "dimensionedSymmTensor4thOrder.H"
 #include "dimensionedTensor.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

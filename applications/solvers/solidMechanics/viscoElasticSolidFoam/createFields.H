@@ -14,6 +14,9 @@
 
     volTensorField gradDU = fvc::grad(DU);
 
+// gradDU.checkOut();
+// gradDU.checkIn();
+
     Info<< "Reading velocity increment field DV\n" << endl;
     volVectorField DV
     (
@@ -45,26 +48,12 @@
     );
 
 
-    Info<< "Reading strain increment field DEpsilon\n" << endl;
-    volSymmTensorField DEpsilon
+    Info<< "Reading strain increment field Depsilon\n" << endl;
+    volSymmTensorField Depsilon
     (
         IOobject
         (
-            "DEpsilon",
-            runTime.timeName(),
-            mesh,
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedSymmTensor("zero", dimless, symmTensor::zero)
-    );
-
-    volSymmTensorField epsilon
-    (
-        IOobject
-        (
-            "epsilon",
+            "Depsilon",
             runTime.timeName(),
             mesh,
             IOobject::READ_IF_PRESENT,
@@ -122,6 +111,6 @@
         dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
     );
 
-    Info<< "Creating rheology\n" << endl;
-    rheologyModel rheology(sigma);
-    volScalarField rho = rheology.rho();
+    constitutiveModel rheology(sigma, DU);
+
+    volScalarField rho = rheology.rho(); 

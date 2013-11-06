@@ -57,6 +57,9 @@ typedef GeometricField<vector, fvPatchField, volMesh> volVectorField;
 typedef GeometricField<sphericalTensor, fvPatchField, volMesh>
     volSphericalTensorField;
 typedef GeometricField<symmTensor, fvPatchField, volMesh> volSymmTensorField;
+typedef GeometricField<symmTensor4thOrder, fvPatchField, volMesh>
+    volSymmTensor4thOrderField;
+typedef GeometricField<diagTensor, fvPatchField, volMesh> volDiagTensorField;
 typedef GeometricField<tensor, fvPatchField, volMesh> volTensorField;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

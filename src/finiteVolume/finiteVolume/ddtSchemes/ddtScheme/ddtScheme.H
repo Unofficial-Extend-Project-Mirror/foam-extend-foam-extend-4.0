@@ -256,7 +256,9 @@ makeFvDdtTypeScheme(SS, scalar)                                                \
 makeFvDdtTypeScheme(SS, vector)                                                \
 makeFvDdtTypeScheme(SS, sphericalTensor)                                       \
 makeFvDdtTypeScheme(SS, symmTensor)                                            \
-makeFvDdtTypeScheme(SS, tensor)                                                \
+makeFvDdtTypeScheme(SS, symmTensor4thOrder)                                    \
+makeFvDdtTypeScheme(SS, diagTensor)                                            \
+makeFvDdtTypeScheme(SS, tensor)	                                               \
                                                                                \
 template<>                                                                     \
 tmp<surfaceScalarField> SS<scalar>::fvcDdtPhiCorr                              \

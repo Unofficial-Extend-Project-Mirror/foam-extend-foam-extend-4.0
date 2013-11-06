@@ -38,6 +38,8 @@ SourceFiles
 
 #include "vector.H"
 #include "tensor.H"
+#include "symmTensor4thOrder.H"
+#include "diagTensor.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -76,6 +78,10 @@ public:
         sphericalTensor sphericalTensor01();
         //- symmTensor with every component scalar01
         symmTensor symmTensor01();
+        //- symmTensor4thOrder with every component scalar01
+        symmTensor4thOrder symmTensor4thOrder01();
+        //- diagTensor with every component scalar01
+         diagTensor diagTensor01();
         //- tensor with every component scalar01
         tensor tensor01();
         //- label [lower..upper]
@@ -87,6 +93,8 @@ public:
         void randomise(vector&);
         void randomise(sphericalTensor&);
         void randomise(symmTensor&);
+        void randomise(symmTensor4thOrder&);
+        void randomise(diagTensor&);
         void randomise(tensor&);
 
         //- Return a normal Gaussian random number

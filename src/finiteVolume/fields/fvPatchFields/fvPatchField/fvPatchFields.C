@@ -49,6 +49,8 @@ makeFvPatchField(fvPatchScalarField)
 makeFvPatchField(fvPatchVectorField)
 makeFvPatchField(fvPatchSphericalTensorField)
 makeFvPatchField(fvPatchSymmTensorField)
+makeFvPatchField(fvPatchSymmTensor4thOrderField)
+makeFvPatchField(fvPatchDiagTensorField)
 makeFvPatchField(fvPatchTensorField)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

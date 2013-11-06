@@ -170,6 +170,18 @@ public:
             //- Return patch-normal gradient
             virtual tmp<Field<Type> > snGrad() const;
 
+        // Coupled interface functionality
+
+            //- Transform neighbour field
+            virtual void transformCoupleField
+            (
+                scalarField& f,
+                const direction cmpt
+            ) const
+            {
+                processorLduInterfaceField::transformCoupleField(f, cmpt);
+            }
+
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate
             (

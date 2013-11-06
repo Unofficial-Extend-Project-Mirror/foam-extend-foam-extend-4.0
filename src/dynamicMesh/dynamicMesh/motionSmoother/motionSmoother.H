@@ -77,6 +77,8 @@ SourceFiles
 #ifndef motionSmoother_H
 #define motionSmoother_H
 
+#include "objectRegistry.H"
+#include "Time.H"
 #include "pointFields.H"
 #include "HashSet.H"
 #include "PackedBoolList.H"

@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "STARCDsurfaceFormat.H"
 
 #include "addToRunTimeSelectionTable.H"

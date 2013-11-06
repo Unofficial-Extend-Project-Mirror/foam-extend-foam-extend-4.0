@@ -1196,6 +1196,7 @@ void Foam::polyMesh::resetMotion() const
     deleteDemandDrivenData(oldPointsPtr_);
 }
 
+
 // Reset motion by deleting old points
 void Foam::polyMesh::setOldPoints
 (

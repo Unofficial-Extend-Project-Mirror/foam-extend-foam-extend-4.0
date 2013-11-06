@@ -58,6 +58,10 @@ typedef GeometricField<sphericalTensor, pointPatchField, pointMesh>
     pointSphericalTensorField;
 typedef GeometricField<symmTensor, pointPatchField, pointMesh>
     pointSymmTensorField;
+typedef GeometricField<symmTensor4thOrder, pointPatchField, pointMesh>
+  pointSymmTensor4thOrderField;
+typedef GeometricField<diagTensor, pointPatchField, pointMesh>
+  pointDiagTensorField;
 typedef GeometricField<tensor, pointPatchField, pointMesh> pointTensorField;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

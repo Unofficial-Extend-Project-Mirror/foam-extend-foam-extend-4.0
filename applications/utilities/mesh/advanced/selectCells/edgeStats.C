@@ -25,6 +25,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "edgeStats.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "polyMesh.H"
 #include "Ostream.H"

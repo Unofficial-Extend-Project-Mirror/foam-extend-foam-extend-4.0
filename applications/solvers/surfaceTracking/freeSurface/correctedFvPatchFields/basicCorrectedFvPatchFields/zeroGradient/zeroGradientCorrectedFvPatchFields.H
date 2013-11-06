@@ -51,6 +51,10 @@ typedef zeroGradientCorrectedFvPatchField<vector> zeroGradientCorrectedFvPatchVe
 typedef zeroGradientCorrectedFvPatchField<tensor> zeroGradientCorrectedFvPatchTensorField;
 typedef zeroGradientCorrectedFvPatchField<sphericalTensor> zeroGradientCorrectedFvPatchSphericalTensorField;
 typedef zeroGradientCorrectedFvPatchField<symmTensor> zeroGradientCorrectedFvPatchSymmTensorField;
+typedef zeroGradientCorrectedFvPatchField<symmTensor4thOrder>
+    zeroGradientCorrectedFvPatchSymmTensor4thOrderField;
+typedef zeroGradientCorrectedFvPatchField<diagTensor>
+    zeroGradientCorrectedFvPatchDiagTensorField;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

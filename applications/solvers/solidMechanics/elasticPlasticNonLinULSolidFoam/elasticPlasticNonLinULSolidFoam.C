@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2004-2007 Hrvoje Jasak
+    \\  /    A nd           | Copyright (C) 1991-2005 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -20,193 +20,188 @@ License
 
     You should have received a copy of the GNU General Public License
     along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Application
-    elasticPlasticSolidFoam
+    elasticPlasticNonLinULSolidFoam
 
 Description
-    Transient/steady-state segregated finite-volume solver for large strain
-    elastic plastic solid bodies.
+    Finite volume structural solver employing a incremental strain updated
+    Lagrangian approach.
+    
+    Valid for small strains, finite displacements and finite rotations.
 
-    Displacement increment field DU is solved for using an updated Lagrangian
-    approach, also generating the strain field epsilon, the plastic strain
-    field epsilonP and the stress tensor field sigma.
-
-    With optional multi-material solid interface correction ensuring
-    correct tractions on multi-material interfaces, HOWEVER, tractions
-    on interface will be incorrect when there is plasticity or large strain
-    in the interface cells. Correction needs to be derived for plasticity
-    and large strain.
-
+    Note: the reason the solver is not strictly valid for large strains is because
+    the constitutive stiffness tensor is not rotated.
+    For an updated Lagrangian solver which does rotate the stiffness tensor, and
+    hence is strictly Valid for large strains, use elasticOrthoNonLinULSolidFoam.
+    
 Author
-    Philip Cardiff
-    multi-material by Tukovic et al. 2012
+    Philip Cardiff UCD
+    Aitken relaxation by T. Tang DTU 
 
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "plasticityModel.H"
-#include "solidInterface.H"
+#include "constitutiveModel.H"
 #include "volPointInterpolation.H"
 #include "pointPatchInterpolation.H"
 #include "primitivePatchInterpolation.H"
-#include "twoDPointCorrector.H"
 #include "pointFields.H"
-#include "plane.H"
-#include "meshSearch.H"
+#include "twoDPointCorrector.H"
 #include "leastSquaresVolPointInterpolation.H"
+#include "transformGeometricField.H"
+#include "solidContactFvPatchVectorField.H"
+#include "pointMesh.H"
+#include "symmetryPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
-#   include "setRootCase.H"
+# include "setRootCase.H"
+# include "createTime.H"
+# include "createMesh.H"
+# include "createFields.H"
+# include "createHistory.H"
+# include "readDivDSigmaExpMethod.H"
+# include "readDivDSigmaNonLinExpMethod.H"
+# include "readMoveMeshMethod.H"
+# include "findGlobalFaceZones.H"
 
-#   include "createTime.H"
+//* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#   include "createMesh.H"
-
-#   include "createFields.H"
-
-#   include "readDivDSigmaExpMethod.H"
-
-#   include "readDivDSigmaLargeStrainExpMethod.H"
-
-#   include "readMoveMeshMethod.H"
-
-#   include "createSolidInterface.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-    Info << "\nStarting time loop\n" << endl;
-
-    for (runTime++; !runTime.end(); runTime++)
+  Info << "\nStarting time loop\n" << endl;
+  
+  for (runTime++; !runTime.end(); runTime++)
     {
-        Info<< "Time: " << runTime.timeName() << nl << endl;
+      Info<< "Time = " << runTime.timeName() << nl << endl;
+      	  
+#     include "readSolidMechanicsControls.H"
 
-#       include "readStressedFoamControls.H"
+      int iCorr = 0;
+      lduMatrix::solverPerformance solverPerf;
+      scalar initialResidual = 0;
+      scalar relativeResidual = GREAT;
+      lduMatrix::debug = 0;
 
-        int iCorr = 0;
-        lduMatrix::solverPerformance solverPerf;
-        scalar initialResidual = 0;
-        scalar relativeResidual = GREAT;
-        lduMatrix::debug = 0;
+      //- to minimise accumulation of errors
+      // volVectorField divSigmaOld = fvc::div(sigma);
+      
+      do
+	{ 
+	  DU.storePrevIter();
 
-        const volSymmTensorField& DEpsilonP = rheology.DEpsilonP();
+#         include "calculateDivDSigmaExp.H"	  
+#         include "calculateDivDSigmaNonLinExp.H"
 
-        do
-        {
-            DU.storePrevIter();
+	  //----------------------------------------------------//
+	  //- updated lagrangian large strain momentum equation
+	  //----------------------------------------------------//
+	  fvVectorMatrix DUEqn
+	    (
+	     fvm::d2dt2(rho,DU)
+	     ==
+	     fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
+	     + divDSigmaExp
+	     + divDSigmaNonLinExp
+	     //- fvc::div(2*mu*DEpsilonP, "div(sigma)")
+	     - fvc::div(2*muf*( mesh.Sf() & fvc::interpolate(DEpsilonP)) )
+	     );
+	  
+	  if(nonLinearSemiImplicit)
+	    {
+	      // experimental
+	      // we can treat the nonlinear term (gradDU & gradDU.T()) in a
+	      // semi-implicit over-relaxed manner
+	      // this should improve convergence when gradDU is large
+	      // but maybe not execution time
+	      DUEqn -=
+		fvm::laplacian((2*mu + lambda)*gradDU, DU, "laplacian(DDU,DU)")
+		- fvc::div( (2*mu + lambda)*(gradDU&gradDU), "div(sigma)");
+	    }
 
-            divDSigmaLargeStrainExp.storePrevIter();
+	  solverPerf = DUEqn.solve();
 
-#           include "calculateDivDSigmaExp.H"
-
-#           include "calculateDivDSigmaLargeStrainExp.H"
-
-            //----------------------------------------------------//
-            //- updated lagrangian large strain momentum equation
-            //----------------------------------------------------//
-            fvVectorMatrix DUEqn
-            (
-                fvm::d2dt2(rho, DU)
-              ==
-                fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
-              + divDSigmaExp
-              + divDSigmaLargeStrainExp
-              - fvc::div(2*muf*(mesh.Sf() & fvc::interpolate(DEpsilonP)))
-            );
-
-            if(solidInterfaceCorr)
+	  if(iCorr == 0)
             {
-                solidInterfacePtr->correct(DUEqn);
+	      initialResidual = solverPerf.initialResidual();
+            }
+	 
+          if(aitkenRelax)
+            {
+#             include "aitkenRelaxation.H"
+            }
+          else
+            {
+              DU.relax();
             }
 
-            solverPerf = DUEqn.solve();
+	  gradDU = fvc::grad(DU);
 
-            if(iCorr == 0)
+	  // correct plasticty term
+	  rheology.correct();
+
+	  // correct elastic properties
+	  // for nonlinear elastic materials
+	  //mu = rheology.newMu();
+	  //lambda = rheology.newLambda();
+	  //muf = fvc::interpolate(mu);
+	  //lambdaf = fvc::interpolate(lambda);
+	  
+#         include "calculateDEpsilonDSigma.H"
+#         include "calculateRelativeResidual.H"
+	  	  
+          if(iCorr % infoFrequency == 0)
             {
-                initialResidual = solverPerf.initialResidual();
+              Info << "\tTime " << runTime.value()
+                   << ", Corrector " << iCorr
+                   << ", Solving for " << DU.name()
+                   << " using " << solverPerf.solverName()
+                   << ", res = " << solverPerf.initialResidual()
+                   << ", rel res = " << relativeResidual;
+              if(aitkenRelax) Info << ", aitken = " << aitkenTheta;
+              Info << ", iters = " << solverPerf.nIterations() << endl;
             }
-
-            DU.relax();
-
-            if(solidInterfaceCorr)
-            {
-                gradDU = solidInterfacePtr->grad(DU);
-            }
-            else
-            {
-                gradDU = fvc::grad(DU);
-            }
-
-            DF = gradDU.T();
-
-#           include "calculateRelativeResidual.H"
-
-            rheology.correct();
-            mu = rheology.newMu();
-            lambda = rheology.newLambda();
-            muf = fvc::interpolate(rheology.newMu());
-            lambdaf = fvc::interpolate(rheology.newLambda());
-            if(solidInterfaceCorr)
-            {
-                solidInterfacePtr->modifyProperties(muf, lambdaf);
-            }
-
-#           include "calculateDEpsilonDSigma.H"
-
-            Info << "\tTime " << runTime.value()
-                << ", Corrector " << iCorr
-                << ", Solving for " << DU.name()
-                << " using " << solverPerf.solverName()
-                << ", residual = " << solverPerf.initialResidual()
-                << ", relative residual = " << relativeResidual << endl;
         }
-        while
+      while
         (
-            //relativeResidual
-            solverPerf.initialResidual() > convergenceTolerance
-            && ++iCorr < nCorr
-        );
+         iCorr++ < 2
+         ||
+         (//solverPerf.initialResidual() > convergenceTolerance
+          relativeResidual > convergenceTolerance
+          &&
+          iCorr < nCorr)
+	 );
 
-        Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name()
-            << ", Initial residual = " << initialResidual
-            << ", Final residual = " << solverPerf.initialResidual()
-            << ", No outer iterations " << iCorr << endl;
+      lduMatrix::debug = 1;
+            
+      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name() 
+	   << ", Initial residual = " << initialResidual 
+	   << ", Final residual = " << solverPerf.initialResidual()
+	   << ", Final rel residual = " << relativeResidual
+	   << ", No outer iterations " << iCorr << endl;
 
-        lduMatrix::debug = 1;
+      rheology.updateYieldStress();
 
-        U += DU;
+      U += DU;
+      epsilon += DEpsilon;
+      epsilonP += DEpsilonP;
+      sigma += DSigma;
 
-        epsilon += DEpsilon;
+#     include "moveMesh.H"
+#     include "rotateFields.H"
+#     include "writeFields.H"
+#     include "writeHistory.H"
 
-        epsilonP += DEpsilonP;
-
-        volSymmTensorField DEpsilonE = DEpsilon - DEpsilonP;
-
-        epsilonE += DEpsilonE;
-
-        sigma += DSigma;
-
-        rheology.updateYieldStress();
-
-#       include "rotateFields.H"
-
-#       include "moveMesh.H"
-
-#       include "writeFields.H"
-
-        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-            << nl << endl;
+      Info << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+	   << "  ClockTime = " << runTime.elapsedClockTime() << " s" 
+	   << endl;
     }
-
-    Info<< "End\n" << endl;
-
-    return(0);
+  
+  Info<< "End\n" << endl;
+  
+  return(0);
 }
-
 
 // ************************************************************************* //

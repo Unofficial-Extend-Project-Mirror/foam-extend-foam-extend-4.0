@@ -104,6 +104,7 @@ case OpenFOAM:
         _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.5.1/platforms/$WM_OPTIONS/etc/gcc-4.5.1.csh
     breaksw
     case Gcc44:
+        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS
         _foamSource  $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.csh
         _foamSource  $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.csh
         _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS/etc/gcc-4.4.5.csh
@@ -156,11 +157,11 @@ set mpi_version=unknown
 
 switch ("$WM_MPLIB")
 case OPENMPI:
-    if (-d $WM_THIRD_PARTY_DIR/packages/openmpi-1.6.3/platforms/$WM_OPTIONS ) then
-        set mpi_version=openmpi-1.6.3
+    if (-d $WM_THIRD_PARTY_DIR/packages/openmpi-1.6.5/platforms/$WM_OPTIONS ) then
+        set mpi_version=openmpi-1.6.5
 
         if ($?FOAM_VERBOSE && $?prompt) then
-            echo "Using openmpi-1.6.3 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
+            echo "Using openmpi-1.6.5 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
         endif
         _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
 
@@ -210,11 +211,11 @@ case SYSTEMOPENMPI:
          endif
     else
     # Here, we assume your environment is already set for running
-    # and developping with openmpi.
+    # and developing with openmpi.
     #
     # Initialize OPENMPI_BIN_DIR using the path to mpicc
         set mpicc_cmd=`which mpicc`
-    setenv OPENMPI_BIN_DIR `dirname $mpicc_cmd`
+        setenv OPENMPI_BIN_DIR `dirname $mpicc_cmd`
         unset mpicc_cmd
     endif
 
@@ -381,6 +382,23 @@ else
     setenv MPI_BUFFER_SIZE $minBufferSize
 endif
 
+# CUDA library
+# ~~~~~~~~~~~~
+if ( $?CUDA_SYSTEM == 0 && -e /usr/local/cuda-5.5/bin/nvcc ) then
+    setenv CUDA_DIR /usr/local/cuda-5.5
+    setenv CUDA_BIN_DIR $CUDA_DIR/bin
+    setenv CUDA_LIB_DIR $CUDA_DIR/lib64
+    setenv CUDA_INCLUDE_DIR $CUDA_DIR/include
+    setenv CUDA_ARCH sm_20
+endif
+
+if ( $?CUDA_BIN_DIR ) then
+    _foamAddPath $CUDA_BIN_DIR
+endif
+
+if ( $?CUDA_LIB_DIR ) then
+    _foamAddLib $CUDA_LIB_DIR
+endif
 
 # CGAL library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -435,8 +453,8 @@ endif
 
 # cmake
 # ~~~~~
-if ( $?CMAKE_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.11/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.11/platforms/$WM_OPTIONS/etc/cmake-2.8.11.csh
+if ( $?CMAKE_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.12/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.12/platforms/$WM_OPTIONS/etc/cmake-2.8.12.csh
 endif
 
 # Python
@@ -453,8 +471,8 @@ endif
 
 # hwloc
 # ~~~~~
-if ( $?HWLOC_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/hwloc-1.7.1/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.1/platforms/$WM_OPTIONS/etc/hwloc-1.7.1.csh
+if ( $?HWLOC_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/hwloc-1.7.2/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.2/platforms/$WM_OPTIONS/etc/hwloc-1.7.2.csh
 endif
 
 # QT

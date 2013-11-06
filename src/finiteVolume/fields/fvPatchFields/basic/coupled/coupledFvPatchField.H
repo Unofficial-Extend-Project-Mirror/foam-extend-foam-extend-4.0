@@ -180,6 +180,13 @@ public:
 
         // Coupled interface functionality
 
+            //- Transform given patch component field
+            virtual void transformCoupleField
+            (
+                scalarField& f,
+                const direction cmpt
+            ) const = 0;
+
             //- Update result field based on interface functionality
             virtual void updateInterfaceMatrix
             (
@@ -195,6 +202,18 @@ public:
 
         // Block coupled interface functionality
 
+            //- Transform given patch field
+            virtual void transformCoupleField
+            (
+                Field<Type>& f
+            ) const
+            {
+                notImplemented
+                (
+                    "coupledFvPatchField<Type>::transformCoupleField"
+                    "(Field<Type>& f) const"
+                );
+            }
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate
             (

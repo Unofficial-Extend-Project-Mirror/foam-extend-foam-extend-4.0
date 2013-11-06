@@ -38,10 +38,10 @@ solvers
       relTol          0.1;
       minIter         0;
       maxIter         1000;
-
+      
       //solver          PCG;
       //preconditioner  DIC;
-
+            
       solver                GAMG;
       smoother              GaussSeidel;
       nPreSweeps            0;
@@ -53,28 +53,23 @@ solvers
       nCellsInCoarsestLevel 20;
       agglomerator          faceAreaPair;
       mergeLevels           1;
-
-      /*
-      solver          amgSolver;
-      cycle           W-cycle;
-      policy          AAMG;
-      nPreSweeps      0;
-      nPostSweeps     2;
-      groupSize       4;
-      minCoarseEqns   20;
-      nMaxLevels      100;
-      scale           on;
-      smoother        ILU;
-      */
     }
 }
 
-stressedFoam
+solidMechanics
 {
     nCorrectors     10000;
-    U               1e-9;
+    U               1e-6;
 
-    sigmaExp        surface;
+    infoFrequency      10;
+    divSigmaExp        surface;
+    aitkenRelaxation   yes;
+}
+
+relaxationFactors
+{
+  //U  0.9;
+  T  0.9;
 }
 
 // ************************************************************************* //

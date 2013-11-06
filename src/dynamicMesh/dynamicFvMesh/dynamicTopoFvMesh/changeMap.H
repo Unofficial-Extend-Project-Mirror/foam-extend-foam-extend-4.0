@@ -41,109 +41,140 @@ SourceFiles
 #ifndef changeMap_H
 #define changeMap_H
 
+#include "objectMap.H"
 #include "labelList.H"
-#include "FixedList.H"
+#include "dictionary.H"
+#include "DynamicList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+// Class forward declarations
+class changeMap;
+
+// * * * * * * * * Forward declaration of friend fuctions  * * * * * * * * * //
+
+Ostream& operator<<(Ostream&, const changeMap&);
+
+
 /*---------------------------------------------------------------------------*\
                            Class changeMap Declaration
 \*---------------------------------------------------------------------------*/
 
 class changeMap
+:
+    public dictionary
 {
-    // Sliver type index.
-    //  Type 1: Sliver
-    //  Type 2: Cap
-    //  Type 3: Spade
-    //  Type 4: Wedge
+    // Entity index
+    label index_;
+
+    // Coupled patch index
+    label pIndex_;
+
+    // Type
     label type_;
 
-    // Data specific to sliver-type cells
-    label firstEdge_;
-    label secondEdge_;
-
-    // Data specific to cap-type cells
-    label apexPoint_;
-    label opposingFace_;
-
     // Entities that were added during the operation.
-    //  - Add a master mapping for slaves.
-    //  - Masters get a map of -1.
-    List<FixedList<label,2> > addedPoints_;
-    List<FixedList<label,2> > addedEdges_;
-    List<FixedList<label,2> > addedFaces_;
-    List<FixedList<label,2> > addedCells_;
+    DynamicList<objectMap> addedPoints_;
+    DynamicList<objectMap> addedEdges_;
+    DynamicList<objectMap> addedFaces_;
+    DynamicList<objectMap> addedCells_;
+
+    // Entities that were removed during the operation
+    DynamicList<label> removedPoints_;
+    DynamicList<label> removedEdges_;
+    DynamicList<label> removedFaces_;
+    DynamicList<label> removedCells_;
 
 public:
 
     // Constructor
     changeMap()
     :
+        index_(-1),
+        pIndex_(-1),
         type_(-1),
-        firstEdge_(-1),
-        secondEdge_(-1),
-        apexPoint_(-1),
-        opposingFace_(-1),
-        addedPoints_(0),
-        addedEdges_(0),
-        addedFaces_(0),
-        addedCells_(0)
+        addedPoints_(5),
+        addedEdges_(5),
+        addedFaces_(5),
+        addedCells_(5),
+        removedPoints_(5),
+        removedEdges_(5),
+        removedFaces_(5),
+        removedCells_(5)
     {}
 
     //- Access
+
+        // Entity index
+        inline label& index();
+        inline label index() const;
+
+        // Coupled patch index
+        inline label& patchIndex();
+        inline label patchIndex() const;
 
         // Type
         inline label& type();
         inline label type() const;
 
-        // For sliver-type cells, opposite edges
-        // are identified for removal.
-        inline label& firstEdge();
-        inline label& secondEdge();
-
-        // For cap-type cells, the face requiring splitting
-        // is identified for removal.
-        inline label& apexPoint();
-        inline label& opposingFace();
-
         // Added entities
         inline void addPoint
         (
             const label pIndex,
-            const label master = -1
+            const labelList& master = labelList()
         );
 
         inline void addEdge
         (
             const label eIndex,
-            const label master = -1
+            const labelList& master = labelList()
         );
 
         inline void addFace
         (
             const label fIndex,
-            const label master = -1
+            const labelList& master = labelList()
         );
 
         inline void addCell
         (
             const label cIndex,
-            const label master = -1
+            const labelList& master = labelList()
         );
 
         // Return the list of added entities
-        inline const List<FixedList<label,2> >& addedPointList() const;
-        inline const List<FixedList<label,2> >& addedEdgeList() const;
-        inline const List<FixedList<label,2> >& addedFaceList() const;
-        inline const List<FixedList<label,2> >& addedCellList() const;
+        inline const List<objectMap>& addedPointList() const;
+        inline const List<objectMap>& addedEdgeList() const;
+        inline const List<objectMap>& addedFaceList() const;
+        inline const List<objectMap>& addedCellList() const;
+
+        // Removed entities
+        inline void removePoint(const label pIndex);
+        inline void removeEdge(const label eIndex);
+        inline void removeFace(const label fIndex);
+        inline void removeCell(const label cIndex);
+
+        // Return the list of removed entities
+        inline const labelList& removedPointList() const;
+        inline const labelList& removedEdgeList() const;
+        inline const labelList& removedFaceList() const;
+        inline const labelList& removedCellList() const;
+
+    //- Edit
+
+        // Clear existing lists
+        inline void clear();
 
     //- Operators
 
         inline void operator=(const changeMap& rhs);
+
+    //- IOstream Operators
+
+        inline friend Ostream& operator<<(Ostream&, const changeMap&);
 };
 
 

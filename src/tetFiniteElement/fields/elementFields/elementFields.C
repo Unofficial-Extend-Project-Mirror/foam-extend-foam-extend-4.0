@@ -41,12 +41,16 @@ defineTemplateTypeNameAndDebug(elementScalarField::DimensionedInternalField, 0);
 defineTemplateTypeNameAndDebug(elementVectorField::DimensionedInternalField, 0);
 defineTemplateTypeNameAndDebug(elementSphericalTensorField::DimensionedInternalField, 0);
 defineTemplateTypeNameAndDebug(elementSymmTensorField::DimensionedInternalField, 0);
+defineTemplateTypeNameAndDebug(elementSymmTensor4thOrderField::DimensionedInternalField, 0);
+defineTemplateTypeNameAndDebug(elementDiagTensorField::DimensionedInternalField, 0);
 defineTemplateTypeNameAndDebug(elementTensorField::DimensionedInternalField, 0);
 
 defineTemplateTypeNameAndDebug(elementScalarField, 0);
 defineTemplateTypeNameAndDebug(elementVectorField, 0);
 defineTemplateTypeNameAndDebug(elementSphericalTensorField, 0);
 defineTemplateTypeNameAndDebug(elementSymmTensorField, 0);
+defineTemplateTypeNameAndDebug(elementSymmTensor4thOrderField, 0);
+defineTemplateTypeNameAndDebug(elementDiagTensorField, 0);
 defineTemplateTypeNameAndDebug(elementTensorField, 0);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

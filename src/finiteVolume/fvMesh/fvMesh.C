@@ -443,6 +443,12 @@ void  Foam::fvMesh::mapFields(const mapPolyMesh& meshMap) const
     MapGeometricFields<symmTensor, fvPatchField, fvMeshMapper, volMesh>
         (mapper);
 
+    MapGeometricFields<symmTensor4thOrder, fvPatchField, fvMeshMapper, volMesh>
+      (mapper);
+
+    MapGeometricFields<diagTensor, fvPatchField, fvMeshMapper, volMesh>
+      (mapper);
+
     MapGeometricFields<tensor, fvPatchField, fvMeshMapper, volMesh>(mapper);
 
     // Map all the surfaceFields in the objectRegistry
@@ -456,6 +462,12 @@ void  Foam::fvMesh::mapFields(const mapPolyMesh& meshMap) const
         <sphericalTensor, fvsPatchField, fvMeshMapper, surfaceMesh>(mapper);
     MapGeometricFields<symmTensor, fvsPatchField, fvMeshMapper, surfaceMesh>
         (mapper);
+
+    MapGeometricFields<symmTensor4thOrder, fvsPatchField, fvMeshMapper, surfaceMesh>
+      (mapper);
+
+    MapGeometricFields<diagTensor, fvsPatchField, fvMeshMapper, surfaceMesh>
+      (mapper);
 
     MapGeometricFields<tensor, fvsPatchField, fvMeshMapper, surfaceMesh>
         (mapper);

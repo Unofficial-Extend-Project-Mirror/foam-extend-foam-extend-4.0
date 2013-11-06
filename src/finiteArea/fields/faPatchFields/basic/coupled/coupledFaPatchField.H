@@ -45,7 +45,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Class coupledFaPatchField Declaration
+                      Class coupledFaPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -174,6 +174,13 @@ public:
 
 
         // Coupled interface functionality
+
+            //- Transform given patch component field
+            virtual void transformCoupleField
+            (
+                scalarField& f,
+                const direction cmpt
+            ) const = 0;
 
             //- Update result field based on interface functionality
             virtual void updateInterfaceMatrix

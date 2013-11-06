@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "volFields.H"
 #include "fluxFvPatchFields.H"
 #include "addToRunTimeSelectionTable.H"

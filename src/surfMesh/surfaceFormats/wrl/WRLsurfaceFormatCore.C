@@ -24,6 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "WRLsurfaceFormatCore.H"
 #include "clock.H"
 

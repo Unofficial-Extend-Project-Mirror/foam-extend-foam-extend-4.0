@@ -44,7 +44,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class fixedValueFvPatch Declaration
+                  Class fixedValueFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>

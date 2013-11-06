@@ -111,7 +111,30 @@ public:
             }
 
 
-        // Interface matrix update
+        // Block coupled interface matrix update
+
+            //- Transform given patch component field
+            virtual void transformCoupleField
+            (
+                scalarField& f,
+                const direction cmpt
+            ) const
+            {
+                processorBlockLduInterfaceField<Type>::transformCoupleField
+                (
+                    f,
+                    cmpt
+                );
+            }
+
+            //- Transform neighbour field
+            virtual void transformCoupleField
+            (
+                Field<Type>& f
+            ) const
+            {
+                processorBlockLduInterfaceField<Type>::transformCoupleField(f);
+            }
 
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate

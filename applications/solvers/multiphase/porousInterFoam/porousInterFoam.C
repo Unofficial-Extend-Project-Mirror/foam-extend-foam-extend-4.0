@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 #   include "createTime.H"
 #   include "createMesh.H"
 #   include "readGravitationalAcceleration.H"
-#   include "readPISOControls.H"
+#   include "readPIMPLEControls.H"
 #   include "initContinuityErrs.H"
 #   include "createFields.H"
 #   include "createPorousZones.H"
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-#       include "readPISOControls.H"
+#       include "readPIMPLEControls.H"
 #       include "readTimeControls.H"
 #       include "CourantNo.H"
 #       include "setDeltaT.H"
@@ -79,21 +79,26 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        twoPhaseProperties.correct();
-
-#       include "alphaEqnSubCycle.H"
-
-#       include "UEqn.H"
-
-        // --- PISO loop
-        for (int corr = 0; corr < nCorr; corr++)
+        // Pressure-velocity corrector
+        int oCorr = 0;
+        do
         {
-#           include "pEqn.H"
-        }
+            twoPhaseProperties.correct();
 
-#       include "continuityErrs.H"
+#           include "alphaEqnSubCycle.H"
 
-        turbulence->correct();
+#           include "UEqn.H"
+
+            // --- PISO loop
+            for (int corr = 0; corr < nCorr; corr++)
+            {
+#               include "pEqn.H"
+            }
+
+#           include "continuityErrs.H"
+
+            turbulence->correct();
+        } while (++oCorr < nOuterCorr);
 
         runTime.write();
 

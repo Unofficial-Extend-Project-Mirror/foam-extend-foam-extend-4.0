@@ -2,16 +2,30 @@
 //- rotate fields
 //--------------------------------------------------//
 {
-  Info << "Rotating Fields" << endl;
+  Info << "Rotating fields" << endl;
 
-  //- dF is calculated at the end of the momentum loop
-  F = I + DF;
+  volTensorField F = I + gradDU;
+  
   volTensorField Finv = inv(F);
-  J = det(F);
+
+  volScalarField J = det(F);
+  if(min(J.internalField()) < 0)  
+    {
+      FatalErrorIn(args.executable())
+        << "Negative Jacobian -> cell negative volumes!!!"
+        << exit(FatalError);      
+    }
 
   rho = rho/J;
-  sigma = 1/J * symm(F & sigma & F.T());
-  epsilon = symm(Finv.T() & epsilon & Finv);
-  epsilonP = symm(Finv.T() & epsilonP & Finv);
-  epsilonE = symm(Finv.T() & epsilonE & Finv);
+  n = mesh.Sf()/mesh.magSf();  
+
+  // rotate strain and stress fields
+  //epsilon = symm(Finv & epsilon & Finv.T());
+  epsilon = transform(Finv, epsilon);
+
+  //sigma  = 1/J * symm(F.T() & sigma & F);
+  sigma = (1/J)*transform(F.T(), sigma);
+
+  // Note: for strict large strain approach, the constitutive stiffness
+  // would be rotated here - see elasticOrthoNonLinULSolidFoam.
 }

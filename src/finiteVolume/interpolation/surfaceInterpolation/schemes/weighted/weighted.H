@@ -85,7 +85,7 @@ public:
             surfaceInterpolationScheme<Type>(mesh),
             weights_
             (
-                this->mesh().objectRegistry::
+                this->mesh().objectRegistry::template
                 lookupObject<const surfaceScalarField>(word(is))
             )
         {}
@@ -101,7 +101,7 @@ public:
             surfaceInterpolationScheme<Type>(mesh),
             weights_
             (
-                this->mesh().objectRegistry::
+                this->mesh().objectRegistry::template
                 lookupObject<const surfaceScalarField>
                 (
                     word(is)

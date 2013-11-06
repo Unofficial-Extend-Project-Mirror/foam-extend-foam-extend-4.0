@@ -1,0 +1,7 @@
+faceSet ggi1DomBZone new patchToFace ggi1DomB
+faceSet ggi1DomAZone new patchToFace ggi1DomA
+faceSet ggi2DomBZone new patchToFace ggi2DomB
+faceSet ggi2DomAZone new patchToFace ggi2DomA
+faceSet outletDomAZone new patchToFace outletDomA
+faceSet inletDomBZone new patchToFace inletDomB
+quit

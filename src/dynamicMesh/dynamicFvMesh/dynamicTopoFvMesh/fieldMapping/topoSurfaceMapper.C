@@ -33,7 +33,7 @@ Author
     University of Massachusetts Amherst
     All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "topoMapper.H"
 #include "mapPolyMesh.H"
@@ -157,11 +157,24 @@ topoSurfaceMapper::topoSurfaceMapper
     mpm_(mpm),
     tMapper_(mapper),
     direct_(false),
+    sizeBeforeMapping_(mpm.nOldInternalFaces()),
     directAddrPtr_(NULL),
     interpolationAddrPtr_(NULL),
     weightsPtr_(NULL),
     insertedFaceLabelsPtr_(NULL)
 {
+    // Fetch offset sizes from topoMapper
+    const labelList& sizes = tMapper_.faceSizes();
+
+    // Add offset sizes
+    if (sizes.size())
+    {
+        forAll(sizes, pI)
+        {
+            sizeBeforeMapping_ += sizes[pI];
+        }
+    }
+
     // Calculate the insertedFaces list
     calcInsertedFaceLabels();
 
@@ -188,7 +201,7 @@ label topoSurfaceMapper::size() const
 //- Return size before mapping
 label topoSurfaceMapper::sizeBeforeMapping() const
 {
-    return mpm_.nOldInternalFaces();
+    return sizeBeforeMapping_;
 }
 
 
@@ -288,61 +301,6 @@ const labelList& topoSurfaceMapper::insertedObjectLabels() const
 const labelHashSet& topoSurfaceMapper::flipFaceFlux() const
 {
     return mpm_.flipFaceFlux();
-}
-
-
-//- Map the internal field
-template <class Type>
-void topoSurfaceMapper::mapInternalField
-(
-    const word& fieldName,
-    Field<Type>& iF
-) const
-{
-    if (iF.size() != sizeBeforeMapping())
-    {
-        FatalErrorIn
-        (
-            "\n\n"
-            "void topoSurfaceMapper::mapInternalField<Type>\n"
-            "(\n"
-            "    Field<Type>& iF\n"
-            ") const\n"
-        )  << "Incompatible size before mapping." << nl
-           << " Field: " << fieldName << nl
-           << " Field size: " << iF.size() << nl
-           << " map size: " << sizeBeforeMapping() << nl
-           << abort(FatalError);
-    }
-
-    // Map the internal field
-    iF.autoMap(*this);
-
-    // Flip the flux
-    const labelList flipFaces = flipFaceFlux().toc();
-
-    forAll (flipFaces, i)
-    {
-        if (flipFaces[i] < iF.size())
-        {
-            iF[flipFaces[i]] *= -1.0;
-        }
-        else
-        {
-            FatalErrorIn
-            (
-                "\n\n"
-                "void topoSurfaceMapper::mapInternalField<Type>\n"
-                "(\n"
-                "    Field<Type>& iF\n"
-                ") const\n"
-            )  << "Cannot flip boundary face fluxes." << nl
-               << " Field: " << fieldName << nl
-               << " Field size: " << iF.size() << nl
-               << " Face flip index: " << flipFaces[i] << nl
-               << abort(FatalError);
-        }
-    }
 }
 
 
