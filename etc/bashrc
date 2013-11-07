@@ -310,38 +310,66 @@ Darwin)
 	   case $WM_COMPILER in
                Gcc42)
 		   export WM_MACPORT_VERSION=4.2
+                   export WM_BASE_COMPILER=Gcc
 		   ;;
                Gcc43)
 		   export WM_MACPORT_VERSION=4.3
+                   export WM_BASE_COMPILER=Gcc
 		   ;;
                Gcc44)
 		   export WM_MACPORT_VERSION=4.4
+                   export WM_BASE_COMPILER=Gcc
 		   ;;
                Gcc45)
 		   export WM_MACPORT_VERSION=4.5
+                   export WM_BASE_COMPILER=Gcc
 		   ;;
                Gcc46)
 		   export WM_MACPORT_VERSION=4.6
+                   export WM_BASE_COMPILER=Gcc
 		   ;;
                Gcc47)
 		   export WM_MACPORT_VERSION=4.7
+                   export WM_BASE_COMPILER=Gcc
 		   ;;
                Gcc48)
 		   export WM_MACPORT_VERSION=4.8
+                   export WM_BASE_COMPILER=Gcc
 		   ;;
+               Clang32)
+                   export WM_BASE_COMPILER=Clang
+                   export WM_MACPORT_VERSION=3.2
+                   ;;
+               Clang33)
+                   export WM_BASE_COMPILER=Clang
+                   export WM_MACPORT_VERSION=3.3
+                ;;
+               Clang34)
+                   export WM_BASE_COMPILER=Clang
+                   export WM_MACPORT_VERSION=3.4
+                ;;
                Gcc)
 		   ;;
                *)
 		   echo "Unsupported MacPorts-Compiler $WM_COMPILER"
 		   ;;
            esac
-	   if [ "$WM_COMPILER" != "Gcc" ]
+	   if [ "$WM_MACPORT_VERSION" != "" ]
 	   then
-               export WM_CC="gcc-mp-$WM_MACPORT_VERSION"
-               export WM_CXX="g++-mp-$WM_MACPORT_VERSION"
-               export WM_FC="gfortran-mp-$WM_MACPORT_VERSION"
+               if [ "$WM_BASE_COMPILER" == "Gcc" ]
+               then
+		   export WM_CC="gcc-mp-$WM_MACPORT_VERSION"
+		   export WM_CXX="g++-mp-$WM_MACPORT_VERSION"
+                   export WM_FC="gfortran-mp-$WM_MACPORT_VERSION"
+              else
+                   export WM_CC="clang-mp-$WM_MACPORT_VERSION"
+                   export WM_CXX="clang++-mp-$WM_MACPORT_VERSION"
 
-	       ruleDirBase=$WM_PROJECT_DIR/wmake/rules/${WM_ARCH}Gcc
+		   # hardcoded. Needed for ThirdParty
+                   export WM_FC="gfortran-mp-4.5"
+               fi
+
+	       ruleDirBase=$WM_PROJECT_DIR/wmake/rules/$WM_ARCH$WM_BASE_COMPILER
 	       ruleDir=$WM_PROJECT_DIR/wmake/rules/$WM_ARCH$WM_COMPILER
 	       if [ ! -e $ruleDir ]
 	       then

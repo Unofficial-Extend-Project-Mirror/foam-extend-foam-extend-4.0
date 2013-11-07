@@ -1,0 +1,11 @@
+CPP        = cpp --traditional-cpp $(GFLAGS)
+LD         = ld
+# LD         = /opt/local/libexec/llvm-3.3/bin/ld
+
+PROJECT_LIBS = -l$(WM_PROJECT) -ldl
+
+include $(GENERAL_RULES)/standard
+
+include $(RULES)/X
+include $(RULES)/c
+include $(RULES)/c++
