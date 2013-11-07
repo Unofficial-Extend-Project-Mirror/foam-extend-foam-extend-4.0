@@ -38,7 +38,8 @@ License
 namespace Foam
 {
     defineTypeNameAndDebug(dirichletNeumannFriction, 0);
-    addToRunTimeSelectionTable(frictionContactModel, dirichletNeumannFriction, dictionary);
+    addToRunTimeSelectionTable
+    (frictionContactModel, dirichletNeumannFriction, dictionary);
 }
 
 
@@ -59,7 +60,16 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
     const label slaveFaceZoneID
 )
 :
-  frictionContactModel(name, patch, dict, masterPatchID, slavePatchID, masterFaceZoneID, slaveFaceZoneID),
+  frictionContactModel
+  (
+      name,
+      patch,
+      dict,
+      masterPatchID,
+      slavePatchID,
+      masterFaceZoneID,
+      slaveFaceZoneID
+      ),
   frictionContactModelDict_(dict.subDict(name+"FrictionModelDict")),
   frictionLawPtr_(NULL),
   mesh_(patch.boundaryMesh().mesh()),
@@ -70,27 +80,29 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
   oldSlaveTraction_(slaveTraction_),
   slaveValueFrac_(mesh_.boundaryMesh()[slavePatchID].size(), symmTensor::zero),
   oldSlaveValueFrac_(slaveValueFrac_),
-  relaxationFactor_(readScalar(frictionContactModelDict_.lookup("relaxationFactor"))),
+  relaxationFactor_
+  (readScalar(frictionContactModelDict_.lookup("relaxationFactor"))),
   contactIterNum_(0),
   infoFreq_(readInt(frictionContactModelDict_.lookup("infoFrequency"))),
   oscillationCorr_(frictionContactModelDict_.lookup("oscillationCorrection")),
-  //oscillationCorrFac_(readScalar(frictionContactModelDict_.lookup("oscillationCorrectionFactor"))),
   smoothingSteps_(readInt(frictionContactModelDict_.lookup("smoothingSteps"))),
   oldStickSlip_(slaveDisp_.size(), 0.0),
   contactFilePtr_(NULL)
 {
   // create friction law
   frictionLawPtr_ = frictionLaw::New(
-				     frictionContactModelDict_.lookup("frictionLaw"),
-				     frictionContactModelDict_
-				     ).ptr();
+                     frictionContactModelDict_.lookup("frictionLaw"),
+                     frictionContactModelDict_
+                     ).ptr();
 
   // master proc open contact info file
-  if(Pstream::master())
+  if (Pstream::master())
     {
       word masterName = mesh_.boundary()[masterPatchID].name();
       word slaveName = mesh_.boundary()[slavePatchID].name();
-      contactFilePtr_ = new OFstream(fileName("frictionContact_"+masterName+"_"+slaveName+".txt"));
+      contactFilePtr_ =
+          new OFstream
+          (fileName("frictionContact_"+masterName+"_"+slaveName+".txt"));
       OFstream& contactFile = *contactFilePtr_;
       int width = 20;
       contactFile << "time";
@@ -125,128 +137,140 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
    )
   {
     const fvMesh& mesh = mesh_;
-    const label slavePatchIndex = slavePatchID(); 
-    const label masterPatchIndex = masterPatchID(); 
+    const label slavePatchIndex = slavePatchID();
+    const label masterPatchIndex = masterPatchID();
     contactIterNum_++;
-  
+
     // we have local masterDU and we want to interpolate it to the slave
-    // to get local masterDUInterpToSlave (i.e. masterDU interpolated to the slave)
+    // to get local masterDUInterpToSlave (i.e. masterDU interpolated
+    // to the slave)
     // so the method is:
     // create global masterDU field
-    // interpolate global masterDU from master global face zone to slave global zone
+    // interpolate global masterDU from master global face zone to
+    // slave global zone
     // then find local masterDUInterpToSlave from the global interpolated field
-    
-    vectorField masterDUInterpToSlave(mesh.boundaryMesh()[slavePatchIndex].size(), vector::zero);
+
+    vectorField masterDUInterpToSlave
+        (mesh.boundaryMesh()[slavePatchIndex].size(), vector::zero);
 
     // global master DU
     vectorField globalMasterDU(masterFaceZonePatch.size(), vector::zero);
-    
+
     // lookup current displacement field
     const volVectorField& dispField =
       mesh.objectRegistry::lookupObject<volVectorField>(fieldName);
-    
+
     // local master and slave DU increment
     vectorField masterDU = dispField.boundaryField()[masterPatchIndex];
     vectorField slaveDU = dispField.boundaryField()[slavePatchIndex];
-    
-    if(fieldName == "U")
+
+    if (fieldName == "U")
       {
-	// lookup old U
-	const volVectorField& dispOldField =
-	  mesh.objectRegistry::lookupObject<volVectorField>(fieldName+"_0");
-	
-	// subtract old U
-	masterDU -= dispOldField.boundaryField()[masterPatchIndex];
-	slaveDU -= dispOldField.boundaryField()[slavePatchIndex];
+    // lookup old U
+    const volVectorField& dispOldField =
+      mesh.objectRegistry::lookupObject<volVectorField>(fieldName+"_0");
+
+    // subtract old U
+    masterDU -= dispOldField.boundaryField()[masterPatchIndex];
+    slaveDU -= dispOldField.boundaryField()[slavePatchIndex];
       }
-    else if(fieldName != "DU")
+    else if (fieldName != "DU")
       {
-	FatalError << "dirichletNeumannFriction::correct()\n"
-	  " The displacement field must be called U or DU"
-		   << exit(FatalError);
+    FatalError << "dirichletNeumannFriction::correct()\n"
+      " The displacement field must be called U or DU"
+           << exit(FatalError);
       }
-    
+
     // put local masterDU into globalMasterDU
     const label masterPatchStart
       = mesh.boundaryMesh()[masterPatchIndex].start();
     forAll(masterDU, i)
       {
-	globalMasterDU[mesh.faceZones()[masterFaceZoneID()].whichFace(masterPatchStart + i)] =
-	  masterDU[i];
+          globalMasterDU[
+              mesh.faceZones()[masterFaceZoneID()
+                  ].whichFace(masterPatchStart + i)] =
+      masterDU[i];
       }
     //- exchange parallel data
-    reduce(globalMasterDU, sumOp<vectorField>()); // sum because each face is only on one proc
-    
+    // sum because each face is only on one proc
+    reduce(globalMasterDU, sumOp<vectorField>());
+
     // globalMasterDU is interpolated to the slave
-    vectorField globalMasterDUInterpToSlave(slaveFaceZonePatch.size(), vector::zero);
-    
+    vectorField globalMasterDUInterpToSlave
+        (slaveFaceZonePatch.size(), vector::zero);
+
     // interpolate DU from master to slave using inverse distance or ggi
-    if(interpolationMethod == "patchToPatch")
+    if (interpolationMethod == "patchToPatch")
       {
-	PatchToPatchInterpolation<
-	  PrimitivePatch<face, List, pointField>, PrimitivePatch<face, List, pointField>
-	  > masterToSlavePatchToPatchInterpolator
-	  (
-	   masterFaceZonePatch, // from zone
-	   slaveFaceZonePatch, // to zone
-	   alg,
-	   dir 
-	   );
-	globalMasterDUInterpToSlave =
-	  masterToSlavePatchToPatchInterpolator.faceInterpolate<vector>
-	  (
-	   globalMasterDU
-	   );
+    PatchToPatchInterpolation<
+      PrimitivePatch<
+          face, List, pointField
+          >, PrimitivePatch<face, List, pointField>
+      > masterToSlavePatchToPatchInterpolator
+      (
+       masterFaceZonePatch, // from zone
+       slaveFaceZonePatch, // to zone
+       alg,
+       dir
+       );
+    globalMasterDUInterpToSlave =
+      masterToSlavePatchToPatchInterpolator.faceInterpolate<vector>
+      (
+       globalMasterDU
+       );
       }
-    else if(interpolationMethod == "ggi")
+    else if (interpolationMethod == "ggi")
       {
-	GGIInterpolation<
-	  PrimitivePatch< face, List, pointField >, PrimitivePatch< face, List, pointField >
-	  > masterToSlaveGgiInterpolator
-	  (
-	   masterFaceZonePatch, // master zone
-	   slaveFaceZonePatch, // slave zone
-	   tensorField(0),
-	   tensorField(0),
-	   vectorField(0),
-	   0.0,
-	   0.0,
-	   true,
-	   ggiInterpolation::AABB
-	   );
-	globalMasterDUInterpToSlave =
-	  masterToSlaveGgiInterpolator.masterToSlave
-	  (
-	   globalMasterDU
-	   );
+    GGIInterpolation<
+        PrimitivePatch<
+            face, List, pointField
+            >, PrimitivePatch< face, List, pointField >
+      > masterToSlaveGgiInterpolator
+      (
+       masterFaceZonePatch, // master zone
+       slaveFaceZonePatch, // slave zone
+       tensorField(0),
+       tensorField(0),
+       vectorField(0),
+       0.0,
+       0.0,
+       true,
+       ggiInterpolation::AABB
+       );
+    globalMasterDUInterpToSlave =
+      masterToSlaveGgiInterpolator.masterToSlave
+      (
+       globalMasterDU
+       );
       }
     else
       {
-	FatalError << "dirichletNeumannFriction::correct()\n"
-	  "interpolationMethod " << interpolationMethod << " not known\n"
-	  "interpolationMethod must be patchToPatch or ggi"
-		   << exit(FatalError);
+    FatalError << "dirichletNeumannFriction::correct()\n"
+      "interpolationMethod " << interpolationMethod << " not known\n"
+      "interpolationMethod must be patchToPatch or ggi"
+           << exit(FatalError);
       }
-    
+
     // now put global back into local
     const label slavePatchStart
       = mesh.boundaryMesh()[slavePatchIndex].start();
-    
+
     forAll(masterDUInterpToSlave, i)
       {
-	masterDUInterpToSlave[i] =
-	  globalMasterDUInterpToSlave
-	  [
-	   mesh.faceZones()[slaveFaceZoneID()].whichFace(slavePatchStart + i)
-	   ];
+    masterDUInterpToSlave[i] =
+      globalMasterDUInterpToSlave
+      [
+       mesh.faceZones()[slaveFaceZoneID()].whichFace(slavePatchStart + i)
+       ];
       }
-    
+
     // Now masterDUInterpToSlave should have masterDU interpolated to the slave
-      
+
     // Calculate current slave shear traction from the normal gradient field
     const fvPatch& slavePatch = mesh.boundary()[slavePatchIndex];
     const fvPatchField<tensor>& gradField =
-      slavePatch.lookupPatchField<volTensorField, tensor>("grad("+fieldName+")");
+        slavePatch.lookupPatchField<volTensorField, tensor>
+        ("grad("+fieldName+")");
     vectorField slaveShearTraction =
       (I - sqr(slaveFaceNormals))
       &
@@ -259,7 +283,7 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
        nonLinear
        );
 
-    
+
     // algorithm
     // if the face pressure is negative/zero then the friction is zero
     // so set valueFrac to zero and traction to zero
@@ -269,25 +293,26 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
     // slip
     // if the face pressure is positive and the shear traction is greater
     // than fricCoeff*pressure then this is a slipping face so
-    // set the valueFrac to zero and set the shear traction to 
+    // set the valueFrac to zero and set the shear traction to
     // fricCoeff*pressure in the opposite direction to slip
     // if the shear traction on a slipping face is acting in the same
     // direction as the slip then this face should not be slipping
     // so we make it a sticking face
     // const volVectorField& prevSlaveDispField =
     //   mesh.objectRegistry::lookupObject<volVectorField>(fieldName);
-    const vectorField prevSlaveShearDisp =  (I - sqr(slaveFaceNormals)) & dispField.boundaryField()[slavePatchIndex];
+    const vectorField prevSlaveShearDisp =
+        (I - sqr(slaveFaceNormals))
+        & dispField.boundaryField()[slavePatchIndex];
     label numSlipFaces = 0;
     label numStickFaces = 0;
     scalarField& stickSlip = stickSlipFaces();
-    //const scalar maxMagSlavePressure = gMax(magSlavePressure);
-    // const scalarField magSlavePressure = -1.0*(slaveFaceNormals&slavePressure);
     const scalarField magSlavePressure = mag(slavePressure);
     scalar maxMagSlavePressure = 0.0;
-    if(slavePressure.size() > 0) maxMagSlavePressure = max(magSlavePressure);
+    if (slavePressure.size() > 0) maxMagSlavePressure = max(magSlavePressure);
     reduce(maxMagSlavePressure, maxOp<scalar>());
 
-    // slip is the difference between the master tangential DU and slave tangential DU
+    // slip is the difference between the master tangential DU
+    // and slave tangential DU
     vectorField slip =
       (I - sqr(slaveFaceNormals)) &
       ( slaveDU - masterDUInterpToSlave);
@@ -313,41 +338,42 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
     // new
     forAll(slaveDisp_, facei)
       {
-	if(mag(slavePressure[facei]) < pressureTol)
-	  {
-	    // not in contact
-    	    slaveDisp_[facei] = prevSlaveShearDisp[facei];
-    	    slaveTraction_[facei] = vector::zero;
-    	    slaveValueFrac_[facei] = symmTensor::zero;
+    if (mag(slavePressure[facei]) < pressureTol)
+      {
+        // not in contact
+            slaveDisp_[facei] = prevSlaveShearDisp[facei];
+            slaveTraction_[facei] = vector::zero;
+            slaveValueFrac_[facei] = symmTensor::zero;
 
-    	    stickSlip[facei] = -1;
-	  }
-	else if(
-		(mag(slaveShearTraction[facei]) > 0.999*slipTrac[facei])
-		&&
-		((slip[facei] & slaveShearTraction[facei]) < 0.0) // opposite directions
-		)
-	   {
-	     // slip
-    	     slaveDisp_[facei] = -slip[facei] + prevSlaveShearDisp[facei]; // better convergence
-	     slaveTraction_[facei] = -slipDir[facei] * slipTrac[facei];
-	     slaveValueFrac_[facei] = symmTensor::zero;
-    	     numSlipFaces++;
-	     
-	     stickSlip[facei] = 0;
-	   }
-	else 
-	   {
-	     // stick
-    	     slaveDisp_[facei] = -slip[facei] + prevSlaveShearDisp[facei];
-	     slaveTraction_[facei] = -slipDir[facei] * slipTrac[facei];
-	     //slaveTraction_[facei] = slaveShearTraction[facei];
-	     //slaveTraction_[facei] = vector::zero;
-	     slaveValueFrac_[facei] = (I - sqr(slaveFaceNormals[facei]));
-    	     numStickFaces++;
-	     
-	     stickSlip[facei] = 2;
-	   }
+            stickSlip[facei] = -1;
+      }
+    else if (
+        (mag(slaveShearTraction[facei]) > 0.999*slipTrac[facei])
+        &&
+        ((slip[facei] & slaveShearTraction[facei]) < 0.0) // opposite directions
+        )
+       {
+           // slip
+           slaveDisp_[facei] =
+               -slip[facei] + prevSlaveShearDisp[facei]; // better convergence
+         slaveTraction_[facei] = -slipDir[facei] * slipTrac[facei];
+         slaveValueFrac_[facei] = symmTensor::zero;
+             numSlipFaces++;
+
+         stickSlip[facei] = 0;
+       }
+    else
+       {
+         // stick
+             slaveDisp_[facei] = -slip[facei] + prevSlaveShearDisp[facei];
+         slaveTraction_[facei] = -slipDir[facei] * slipTrac[facei];
+         //slaveTraction_[facei] = slaveShearTraction[facei];
+         //slaveTraction_[facei] = vector::zero;
+         slaveValueFrac_[facei] = (I - sqr(slaveFaceNormals[facei]));
+             numStickFaces++;
+
+         stickSlip[facei] = 2;
+       }
       }
 
     // slaveTraction_ = -slipDir * slipTrac;
@@ -361,14 +387,14 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
     // const scalar pressureTol = 1e-3*maxMagSlavePressure;
     // forAll(slipFunc, facei)
     //   {
-    // 	if(slipFunc[facei] > pressureTol)
-    // 	  {
-    // 	    slipFunc[facei] = 1.0;
-    // 	  }
-    // 	else
-    // 	  {
-    // 	    slipFunc[facei] = 0.0;
-    // 	  }
+    //      if (slipFunc[facei] > pressureTol)
+    //        {
+    //          slipFunc[facei] = 1.0;
+    //        }
+    //      else
+    //        {
+    //          slipFunc[facei] = 0.0;
+    //        }
     //   }
 
     // // if the slip and trac are in the same direction then we will change
@@ -376,12 +402,12 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
     // // {
     // //   scalarField changeFace = slip & slaveTraction_;
     // //   forAll(changeFace, facei)
-    // // 	{
-    // // 	  if(changeFace[facei] > SMALL)
-    // // 	    {
-    // // 	      slipFunc[facei] = 0.0;
-    // // 	    }
-    // // 	}
+    // //   {
+    // //     if (changeFace[facei] > SMALL)
+    // //       {
+    // //         slipFunc[facei] = 0.0;
+    // //       }
+    // //   }
     // // }
 
     // // stickSlip
@@ -392,10 +418,10 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
     // // const scalar pressureTol = 1e-3*maxMagSlavePressure;
     // forAll(slip, facei)
     //   {
-    // 	if(magSlavePressure[facei] < pressureTol)
-    // 	  {
-    // 	    stickSlip[facei] = -1;
-    // 	  }
+    //      if (magSlavePressure[facei] < pressureTol)
+    //        {
+    //          stickSlip[facei] = -1;
+    //        }
     //   }
 
     // //slaveValueFrac_ = (1.0 - slipFunc) * (I - sqr(slaveFaceNormals));
@@ -406,66 +432,78 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
     // // on slipping faces
     // forAll(slip, facei)
     //   {
-    // 	if(magSlavePressure[facei] < pressureTol)
-    // 	  {
-    // 	    slaveDisp_[facei] = prevSlaveShearDisp[facei];
-    // 	    slaveTraction_[facei] = vector::zero;
-    // 	    slaveValueFrac_[facei] = symmTensor::zero;
-    // 	    if( mag(stickSlip[facei] + 1) > SMALL)
-    // 	      Info << "face " << facei << "changed to tracFree" << endl;
+    //      if (magSlavePressure[facei] < pressureTol)
+    //        {
+    //          slaveDisp_[facei] = prevSlaveShearDisp[facei];
+    //          slaveTraction_[facei] = vector::zero;
+    //          slaveValueFrac_[facei] = symmTensor::zero;
+    //          if ( mag(stickSlip[facei] + 1) > SMALL)
+    //            Info << "face " << facei << "changed to tracFree" << endl;
 
-    // 	    stickSlip[facei] = -1;
-    // 	  }
-    // 	else if(slipFunc[facei] > SMALL)
-    // 	  {
-    // 	    slaveDisp_[facei] = prevSlaveShearDisp[facei];
-    // 	    numSlipFaces++;
+    //          stickSlip[facei] = -1;
+    //        }
+    //      else if (slipFunc[facei] > SMALL)
+    //        {
+    //          slaveDisp_[facei] = prevSlaveShearDisp[facei];
+    //          numSlipFaces++;
 
-    // 	    if( mag(stickSlip[facei]) > SMALL)
-    // 	      Info << "face " << facei << "changed to slip" << endl;
+    //          if ( mag(stickSlip[facei]) > SMALL)
+    //            Info << "face " << facei << "changed to slip" << endl;
 
-    // 	    stickSlip[facei] = 0;
-    // 	  }
-    // 	else
-    // 	  {
-    // 	    //slaveTraction_[facei] = slaveShearTraction[facei];
-    // 	    numStickFaces++;
+    //          stickSlip[facei] = 0;
+    //        }
+    //      else
+    //        {
+    //          //slaveTraction_[facei] = slaveShearTraction[facei];
+    //          numStickFaces++;
 
-    // 	    if( mag(stickSlip[facei] - 1) > SMALL)
-    // 	      Info << "face " << facei << "changed to stick" << endl;
+    //          if ( mag(stickSlip[facei] - 1) > SMALL)
+    //            Info << "face " << facei << "changed to stick" << endl;
 
-    // 	    stickSlip[facei] = 1;
-    // 	  }
+    //          stickSlip[facei] = 1;
+    //        }
     //   }
-        
+
     // correct oscillations
-    if(oscillationCorr_)
+    if (oscillationCorr_)
       {
-	//correctOscillations(slaveFaceZonePatch);
+    //correctOscillations(slaveFaceZonePatch);
 
-	// interpolate face values to points then interpolate back
-	// this essentially smooths the field
-	primitivePatchInterpolation localSlaveInterpolator(mesh.boundaryMesh()[slavePatchIndex]);
-	vectorField slaveDispPoints(mesh.boundaryMesh()[slavePatchIndex].nPoints(), vector::zero);
-	
-	for(int i=0; i<smoothingSteps_; i++)
-	  {
-	    slaveDispPoints = localSlaveInterpolator.faceToPointInterpolate<vector>(slaveDisp_);
-	    slaveDisp_ = localSlaveInterpolator.pointToFaceInterpolate<vector>(slaveDispPoints);
+    // interpolate face values to points then interpolate back
+    // this essentially smooths the field
+    primitivePatchInterpolation localSlaveInterpolator
+        (mesh.boundaryMesh()[slavePatchIndex]);
+    vectorField slaveDispPoints
+        (mesh.boundaryMesh()[slavePatchIndex].nPoints(), vector::zero);
 
-	    // make sure no normal component
-	    slaveDisp_ = (I - sqr(slaveFaceNormals)) & slaveDisp_;
-	  }
+    for (int i=0; i<smoothingSteps_; i++)
+      {
+        slaveDispPoints =
+            localSlaveInterpolator.faceToPointInterpolate<vector>(slaveDisp_);
+        slaveDisp_ =
+            localSlaveInterpolator.pointToFaceInterpolate<vector>
+            (slaveDispPoints);
+
+        // make sure no normal component
+        slaveDisp_ = (I - sqr(slaveFaceNormals)) & slaveDisp_;
+      }
       }
 
     // under-relax traction
-    slaveDisp_ = relaxationFactor_*slaveDisp_ + (1.0 - relaxationFactor_)*prevSlaveShearDisp; //oldSlaveDisp_;
+    slaveDisp_ =
+        relaxationFactor_*slaveDisp_
+        + (1.0 - relaxationFactor_)*prevSlaveShearDisp; //oldSlaveDisp_;
     oldSlaveDisp_ = slaveDisp_;
-    slaveValueFrac_ = relaxationFactor_*slaveValueFrac_ + (1.0 - relaxationFactor_)*oldSlaveValueFrac_;
+    slaveValueFrac_ =
+        relaxationFactor_*slaveValueFrac_
+        + (1.0 - relaxationFactor_)*oldSlaveValueFrac_;
     oldSlaveValueFrac_ = slaveValueFrac_;
-    slaveTraction_ = relaxationFactor_*slaveTraction_ + (1.0 - relaxationFactor_)*oldSlaveTraction_;
+    slaveTraction_ =
+        relaxationFactor_*slaveTraction_
+        + (1.0 - relaxationFactor_)*oldSlaveTraction_;
     oldSlaveTraction_ = slaveTraction_;
-    stickSlip = relaxationFactor_*stickSlip + (1.0 - relaxationFactor_)*oldStickSlip_;
+    stickSlip =
+        relaxationFactor_*stickSlip + (1.0 - relaxationFactor_)*oldStickSlip_;
     oldStickSlip_ = stickSlip;
 
     // get global values
@@ -475,140 +513,39 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
     // of the slave faces
     //scalar maxMagMasterTraction = gMax(mag(slaveTraction_))
     scalar maxMagMasterTraction = 0.0;
-    if(slaveTraction_.size() > 0) maxMagMasterTraction = max(mag(slaveTraction_));
+    if (slaveTraction_.size() > 0)
+    {
+        maxMagMasterTraction = max(mag(slaveTraction_));
+    }
     reduce(maxMagMasterTraction, maxOp<scalar>());
     reduce(numSlipFaces, sumOp<int>());
     reduce(numStickFaces, sumOp<int>());
-    
+
     // master writes to contact info file
-    if(Pstream::master() && (contactIterNum_ %  infoFreq_ == 0))
-      { 
-	OFstream& contactFile = *contactFilePtr_;
-	int width = 20;
-	contactFile << mesh.time().value();
-	contactFile.width(width);
-	contactFile << contactIterNum_;
-	contactFile.width(width);
-	contactFile << relaxationFactor_;
-	contactFile.width(width);
-	contactFile << numSlipFaces;
-	contactFile.width(width);
-	contactFile << numStickFaces;
-	contactFile.width(width);
-	contactFile << maxMagMasterTraction << endl;
+    if (Pstream::master() && (contactIterNum_ %  infoFreq_ == 0))
+    {
+        OFstream& contactFile = *contactFilePtr_;
+    int width = 20;
+    contactFile << mesh.time().value();
+    contactFile.width(width);
+    contactFile << contactIterNum_;
+    contactFile.width(width);
+    contactFile << relaxationFactor_;
+    contactFile.width(width);
+    contactFile << numSlipFaces;
+    contactFile.width(width);
+    contactFile << numStickFaces;
+    contactFile.width(width);
+    contactFile << maxMagMasterTraction << endl;
       }
   }
 
-  // void Foam::dirichletNeumannFriction::correctOscillations
-  // (
-  //  const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch
-  //  )
-  // {
-  //   // oscillations sometimes appear in contact shear displacements/tractions
-  //   // so we will try to limit them here
-  //   // we will weight the current face slaveDisp/Traction with the average of the
-  //   // neighbours using the weight oscillationCorrectionFactor_
-    
-  //   //Pout << "Applying contact shear oscillation correction..." << flush;
-  
-  //   const fvMesh& mesh = mesh_;
-  //   const label slavePatchIndex = slavePatchID(); 
-  //   const labelListList& faceFaces = slaveFaceZonePatch.faceFaces();
-  //   const scalarField& stickSlip = stickSlipFaces();
-
-  //   // create global fields
-  //   //vectorField globalSlaveTraction(slaveFaceZonePatch.size(), vector::zero);
-  //   vectorField globalSlaveDisp(slaveFaceZonePatch.size(), vector::zero);
-  //   //    symmTensorField globalSlaveValueFrac(slaveFaceZonePatch.size(), symmTensor::zero);
-  //   scalarField globalStickSlip(slaveFaceZonePatch.size(), 0.0);
-  //   const label slavePatchStart
-  //     = mesh.boundaryMesh()[slavePatchIndex].start();
-  //   forAll(slaveTraction_, i)
-  //     {
-  // 	// globalSlaveTraction[mesh.faceZones()[slaveFaceZoneID()].whichFace(slavePatchStart + i)] =
-  // 	//   slaveTraction_[i];
-  // 	globalSlaveDisp[mesh.faceZones()[slaveFaceZoneID()].whichFace(slavePatchStart + i)] =
-  // 	  slaveDisp_[i];
-  // 	globalStickSlip[mesh.faceZones()[slaveFaceZoneID()].whichFace(slavePatchStart + i)] =
-  // 	  stickSlip[i];
-  //     }
-  //   // sum because each face is only on one proc
-  //   //reduce(globalSlaveTraction, sumOp<vectorField>());
-  //   reduce(globalSlaveDisp, sumOp<vectorField>());
-  //   reduce(globalStickSlip, sumOp<scalarField>());
-        
-  //   // smooth mag of slaveTraction with face face disps
-  //   forAll(faceFaces, facei)
-  //     {
-  // 	// only smooth sticking faces
-  // 	//if(mag(globalSlaveValueFrac[facei]) > SMALL)
-  // 	if(mag(globalStickSlip[facei] - 2.0) < SMALL)
-  // 	  {
-  // 	    //vector avTrac = vector::zero;
-  // 	    vector avDisp = vector::zero;
-  // 	    int numNei = 0;
-  // 	    forAll(faceFaces[facei], ffi)
-  // 	      {
-  // 		label faceFace = faceFaces[facei][ffi];
-		
-  // 		// only include other sticking faces
-  // 		if( mag(globalStickSlip[faceFace] - 2.0) < SMALL )
-  // 		  {
-  // 		    avDisp += globalSlaveDisp[faceFace];
-  // 		    numNei++;
-  // 		  }
-  // 	      }
-	    
-  // 	    // avTracMag /= numNei;
-  // 	    //avTrac /= numNei;
-  // 	    // if(numNei > 0)
-  // 	    if(numNei > 1)
-  // 	      {
-  // 		avDisp /= numNei;
-  // 	      }
-  // 	    else
-  // 	      {
-  // 		avDisp = globalSlaveDisp[facei];
-  // 	      }
-	    
-  // 	    // if(numFaceFaces == 1)
-  // 	    //   {
-  // 	    // 	// for corner/end faces, decrease the weight of the neighbours
-  // 	    // 	avTracMag += globalSlaveTraction[facei];
-  // 	    // 	avTracMag /= 2;
-  // 	    //   }
-	    
-  // 	    // weighted-average with face-faces
-  // 	    // globalSlaveTraction[facei] =
-  // 	    //   oscillationCorrFac_*globalSlaveTraction[facei] + (1.0-oscillationCorrFac_)*avTrac;
-  // 	    globalSlaveDisp[facei] =
-  // 	      oscillationCorrFac_*globalSlaveDisp[facei] + (1.0-oscillationCorrFac_)*avDisp;
-  // 	  }
-  //     }
-    
-  //   // convert global back to local
-  //   forAll(slaveTraction_, facei)
-  //     {
-  // 	// slaveTraction_[facei] =
-  // 	//   globalSlaveTraction
-  // 	//   [
-  // 	//    mesh.faceZones()[slaveFaceZoneID()].whichFace(slavePatchStart + facei)
-  // 	//    ];
-  // 	slaveDisp_[facei] =
-  // 	  globalSlaveDisp
-  // 	  [
-  // 	   mesh.faceZones()[slaveFaceZoneID()].whichFace(slavePatchStart + facei)
-  // 	   ];
-  //     }
-    
-  //   //Pout << "\tdone" << endl;
-  // }
 
 
   void Foam::dirichletNeumannFriction::writeDict(Ostream& os) const
   {
     word keyword(name()+"FrictionModelDict");
-    os.writeKeyword(keyword) 
+    os.writeKeyword(keyword)
       << frictionContactModelDict_;
   }
 

@@ -22,8 +22,6 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "linearElastic.H"
@@ -190,7 +188,8 @@ Foam::tmp<Foam::volScalarField> Foam::linearElastic::sigmaY() const
     );
 }
 
-Foam::scalar Foam::linearElastic::sigmaY(const scalar epsilonPEq, const label cellID) const
+Foam::scalar
+Foam::linearElastic::sigmaY(const scalar epsilonPEq, const label cellID) const
 {
   return GREAT;
 }

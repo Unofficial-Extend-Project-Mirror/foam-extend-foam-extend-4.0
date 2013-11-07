@@ -23,7 +23,7 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 \*---------------------------------------------------------------------------*/
-//#define DEBUG Pout<<"file "<<__FILE__<<" line "<<__LINE__<<endl;
+
 #include "fixedDisplacementFixedRotationFvPatchVectorField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "volFields.H"
@@ -39,7 +39,8 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-fixedDisplacementFixedRotationFvPatchVectorField::fixedDisplacementFixedRotationFvPatchVectorField
+fixedDisplacementFixedRotationFvPatchVectorField::
+fixedDisplacementFixedRotationFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF
@@ -54,7 +55,8 @@ fixedDisplacementFixedRotationFvPatchVectorField::fixedDisplacementFixedRotation
 {}
 
 
-fixedDisplacementFixedRotationFvPatchVectorField::fixedDisplacementFixedRotationFvPatchVectorField
+fixedDisplacementFixedRotationFvPatchVectorField::
+fixedDisplacementFixedRotationFvPatchVectorField
 (
     const fixedDisplacementFixedRotationFvPatchVectorField& ptf,
     const fvPatch& p,
@@ -71,7 +73,8 @@ fixedDisplacementFixedRotationFvPatchVectorField::fixedDisplacementFixedRotation
 {}
 
 
-fixedDisplacementFixedRotationFvPatchVectorField::fixedDisplacementFixedRotationFvPatchVectorField
+fixedDisplacementFixedRotationFvPatchVectorField::
+fixedDisplacementFixedRotationFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF,
@@ -83,7 +86,8 @@ fixedDisplacementFixedRotationFvPatchVectorField::fixedDisplacementFixedRotation
     displacementTimeSeries_(dict.subDict("timeVaryingDisplacement")),
     rotationAngleTimeSeries_(dict.subDict("timeVaryingRotation")),
     rotationAxis_(dict.subDict("timeVaryingRotation").lookup("rotationAxis")),
-    rotationOrigin_(dict.subDict("timeVaryingRotation").lookup("rotationOrigin"))
+    rotationOrigin_
+    (dict.subDict("timeVaryingRotation").lookup("rotationOrigin"))
 {
   Info << "fixedDisplacementFixedRotation boundary condition"
        << endl;
@@ -91,16 +95,26 @@ fixedDisplacementFixedRotationFvPatchVectorField::fixedDisplacementFixedRotation
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-  if(Foam::word(dimensionedInternalField().mesh().schemesDict().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares")
-      {
-	Warning << "The gradScheme for " << fieldName_
-		<< " should be \"extendedLeastSquares 0\" for the boundary "
-		<< "non-orthogonal correction to be right" << endl;
-      }
+    if
+    (
+        Foam::word
+        (
+            dimensionedInternalField().mesh().schemesDict().gradScheme
+            (
+                "grad(" + fieldName_ + ")"
+            )
+        ) != "extendedLeastSquares"
+    )
+    {
+        Warning << "The gradScheme for " << fieldName_
+            << " should be \"extendedLeastSquares 0\" for the boundary "
+            << "non-orthogonal correction to be right" << endl;
+    }
 }
 
 
-fixedDisplacementFixedRotationFvPatchVectorField::fixedDisplacementFixedRotationFvPatchVectorField
+fixedDisplacementFixedRotationFvPatchVectorField::
+fixedDisplacementFixedRotationFvPatchVectorField
 (
     const fixedDisplacementFixedRotationFvPatchVectorField& pivpvf
 )
@@ -114,7 +128,8 @@ fixedDisplacementFixedRotationFvPatchVectorField::fixedDisplacementFixedRotation
 {}
 
 
-fixedDisplacementFixedRotationFvPatchVectorField::fixedDisplacementFixedRotationFvPatchVectorField
+fixedDisplacementFixedRotationFvPatchVectorField::
+fixedDisplacementFixedRotationFvPatchVectorField
 (
     const fixedDisplacementFixedRotationFvPatchVectorField& pivpvf,
     const DimensionedField<vector, volMesh>& iF
@@ -140,52 +155,55 @@ void fixedDisplacementFixedRotationFvPatchVectorField::updateCoeffs()
 
     // Patch displacement is a superposition of a translation and a rotation
 
-    
+
     // Rotation
 
     // Look up angle depending on current time
-    scalar angle = rotationAngleTimeSeries_(this->db().time().timeOutputValue());
-    
-    tensor rotMat = RodriguesRotation(rotationAxis_, angle);
-    
-    vectorField oldFaceCentres = dimensionedInternalField().mesh().C().boundaryField()[patch().index()];
-    
-    vectorField newFaceCentres = (rotMat & (oldFaceCentres - rotationOrigin_)) + rotationOrigin_;
-    
-    vectorField disp = newFaceCentres - oldFaceCentres;
-	
-    if(fieldName_ == "DU")
-      {
-	const fvPatchField<vector>& U =
-	  patch().lookupPatchField<volVectorField, vector>("U");
-	disp -= U;
-      }
-    else if(fieldName_ != "U")
-      {
-	FatalError << "The displacement field should be U or DU"
-		   << exit(FatalError);
-      }
+    scalar angle =
+        rotationAngleTimeSeries_(this->db().time().timeOutputValue());
 
+    tensor rotMat = RodriguesRotation(rotationAxis_, angle);
+
+    vectorField oldFaceCentres =
+        dimensionedInternalField().mesh().C().boundaryField()[patch().index()];
+
+    vectorField newFaceCentres =
+        (rotMat & (oldFaceCentres - rotationOrigin_)) + rotationOrigin_;
+
+    vectorField disp = newFaceCentres - oldFaceCentres;
+
+    if (fieldName_ == "DU")
+      {
+          const fvPatchField<vector>& U =
+              patch().lookupPatchField<volVectorField, vector>("U");
+          disp -= U;
+      }
+    else if (fieldName_ != "U")
+    {
+        FatalError
+            << "The displacement field should be U or DU"
+            << exit(FatalError);
+      }
 
     // translation
     disp += displacementTimeSeries_(this->db().time().timeOutputValue());
 
-    
     fvPatchField<vector>::operator==
       (
        disp
        );
-    
+
     fixedValueFvPatchVectorField::updateCoeffs();
 }
 
 
-Foam::tmp<Foam::Field<vector> > fixedDisplacementFixedRotationFvPatchVectorField::
+Foam::tmp<Foam::Field<vector> >
+fixedDisplacementFixedRotationFvPatchVectorField::
 snGrad() const
 {
   //- fixedValue snGrad with no correction
   //  return (*this - patchInternalField())*this->patch().deltaCoeffs();
-  
+
     const fvPatchField<tensor>& gradField =
         patch().lookupPatchField<volTensorField, tensor>
         (
@@ -198,9 +216,9 @@ snGrad() const
     //- correction vector
     vectorField k = delta - n*(n&delta);
 
-    return 
+    return
     (
-        *this 
+        *this
       - (patchInternalField() + (k&gradField.patchInternalField()))
       )*this->patch().deltaCoeffs();
 }
@@ -236,8 +254,10 @@ void fixedDisplacementFixedRotationFvPatchVectorField::write(Ostream& os) const
     os.writeKeyword("timeVaryingRotation") << nl;
     os << token::BEGIN_BLOCK << nl;
     rotationAngleTimeSeries_.write(os);
-    os.writeKeyword("rotationAxis") << rotationAxis_ << token::END_STATEMENT << nl;
-    os.writeKeyword("rotationOrigin") << rotationOrigin_ << token::END_STATEMENT << nl;
+    os.writeKeyword("rotationAxis")
+        << rotationAxis_ << token::END_STATEMENT << nl;
+    os.writeKeyword("rotationOrigin")
+        << rotationOrigin_ << token::END_STATEMENT << nl;
     os << token::END_BLOCK << endl;
 }
 

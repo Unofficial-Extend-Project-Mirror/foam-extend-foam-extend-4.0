@@ -137,7 +137,7 @@ public:
 
         //- If the rheologyLaw needs plasticity procedures
         virtual bool plasticityModelNeeded() const;
-        
+
         //- Return modulus of plasticity
         virtual tmp<volScalarField> Ep() const;
 
@@ -147,7 +147,8 @@ public:
         virtual tmp<volScalarField> sigmaY() const;
 
         //- Return yield stress
-        virtual scalar sigmaY(const scalar epsilonPEq, const label cellID) const;
+        virtual scalar sigmaY
+        (const scalar epsilonPEq, const label cellID) const;
 
         //- Orthotropic linear elastic properties
         virtual tmp<volDiagTensorField> K() const;

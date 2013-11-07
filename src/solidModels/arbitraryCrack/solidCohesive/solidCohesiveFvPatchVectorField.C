@@ -128,22 +128,22 @@ solidCohesiveFvPatchVectorField::solidCohesiveFvPatchVectorField
             dict.lookup("nonLinear")
         );
 
-	if (nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to updated Lagrangian"
-		 << endl;
-	  }
-	else if (nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to total Lagrangian"
-		 << endl;
-	  }
+    if (nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
+      {
+        Info << "\tnonLinear set to updated Lagrangian"
+         << endl;
+      }
+    else if (nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
+      {
+        Info << "\tnonLinear set to total Lagrangian"
+         << endl;
+      }
       }
 
     if (dict.found("orthotropic"))
       {
-	orthotropic_ = Switch(dict.lookup("orthotropic"));
-	Info << "\t\torthotropic set to " << orthotropic_ << endl;
+    orthotropic_ = Switch(dict.lookup("orthotropic"));
+    Info << "\t\torthotropic set to " << orthotropic_ << endl;
       }
 
     // if (minUnloadingSeparationDistance_ < 0.001)
@@ -218,71 +218,71 @@ solidCohesiveFvPatchVectorField::solidCohesiveFvPatchVectorField
 
     if (dict.found("cracked"))
       {
-// 	cracked_ = Field<bool>("cracked", dict, p.size());
-	cracked_ = Field<scalar>("cracked", dict, p.size());
+//      cracked_ = Field<bool>("cracked", dict, p.size());
+    cracked_ = Field<scalar>("cracked", dict, p.size());
       }
 
     if (dict.found("curTractionN"))
       {
-	curTractionN_ = scalarField("curTractionN", dict, p.size());
+    curTractionN_ = scalarField("curTractionN", dict, p.size());
       }
     if (dict.found("curTractionS"))
       {
-	curTractionS_ = scalarField("curTractionS", dict, p.size());
+    curTractionS_ = scalarField("curTractionS", dict, p.size());
       }
     if (dict.found("oldTractionN"))
       {
-	oldTractionN_ = scalarField("oldTractionN", dict, p.size());
+    oldTractionN_ = scalarField("oldTractionN", dict, p.size());
       }
     if (dict.found("oldTractionS"))
       {
-	oldTractionS_ = scalarField("oldTractionS", dict, p.size());
+    oldTractionS_ = scalarField("oldTractionS", dict, p.size());
       }
 
     if (dict.found("deltaN"))
       {
-	deltaN_ = scalarField("deltaN", dict, p.size());
+    deltaN_ = scalarField("deltaN", dict, p.size());
       }
     if (dict.found("deltaS"))
       {
-	deltaS_ = scalarField("deltaS", dict, p.size());
+    deltaS_ = scalarField("deltaS", dict, p.size());
       }
     if (dict.found("oldDeltaN"))
       {
-	oldDeltaN_ = scalarField("oldDeltaN", dict, p.size());
+    oldDeltaN_ = scalarField("oldDeltaN", dict, p.size());
       }
     if (dict.found("oldDeltaS"))
       {
-	oldDeltaS_ = scalarField("oldDeltaS", dict, p.size());
+    oldDeltaS_ = scalarField("oldDeltaS", dict, p.size());
       }
     if (dict.found("curDeltaN"))
       {
-	curDeltaN_ = scalarField("curDeltaN", dict, p.size());
+    curDeltaN_ = scalarField("curDeltaN", dict, p.size());
       }
     if (dict.found("curDeltaS"))
       {
-	curDeltaS_ = scalarField("curDeltaS", dict, p.size());
+    curDeltaS_ = scalarField("curDeltaS", dict, p.size());
       }
     if (dict.found("unloadingDeltaEff"))
       {
-	unloadingDeltaEff_ = scalarField("unloadingDeltaEff", dict, p.size());
+    unloadingDeltaEff_ = scalarField("unloadingDeltaEff", dict, p.size());
       }
 
     if (dict.found("currentGI"))
       {
-	currentGI_ = scalarField("currentGI", dict, p.size());
+    currentGI_ = scalarField("currentGI", dict, p.size());
       }
     if (dict.found("currentGII"))
       {
-	currentGII_ = scalarField("currentGII", dict, p.size());
+    currentGII_ = scalarField("currentGII", dict, p.size());
       }
     if (dict.found("oldGI"))
       {
-	oldGI_ = scalarField("oldGI", dict, p.size());
+    oldGI_ = scalarField("oldGI", dict, p.size());
       }
     if (dict.found("oldGII"))
       {
-	oldGII_ = scalarField("oldGII", dict, p.size());
+    oldGII_ = scalarField("oldGII", dict, p.size());
       }
 }
 
@@ -419,10 +419,10 @@ tmp<scalarField> solidCohesiveFvPatchVectorField::crackingAndDamage() const
 
     forAll(tcrackingAndDamage(), facei)
       {
-	if (cracked_[facei])
-	  {
-	    tcrackingAndDamage()[facei] = 2.0;
-	  }
+    if (cracked_[facei])
+      {
+        tcrackingAndDamage()[facei] = 2.0;
+      }
       }
 
     return tcrackingAndDamage;
@@ -438,7 +438,7 @@ tmp<scalarField> solidCohesiveFvPatchVectorField::GI() const
 
     forAll(tGI(), facei)
       {
-	tGI()[facei] = currentGI_[facei];
+    tGI()[facei] = currentGI_[facei];
       }
 
     return tGI;
@@ -454,7 +454,7 @@ tmp<scalarField> solidCohesiveFvPatchVectorField::GII() const
 
     forAll(tGII(), facei)
       {
-	tGII()[facei] = currentGII_[facei];
+    tGII()[facei] = currentGII_[facei];
       }
 
     return tGII;
@@ -468,23 +468,23 @@ bool solidCohesiveFvPatchVectorField::cracking()
   // global fields
   Field<scalar> globalCracked =
     crackerMesh.globalCrackField(cracked_);
-  
+
   label sumDamaged = 0;
   label sumCracked = 0;
   forAll(globalCracked, facei)
     {
       if (globalCracked[facei] > 0.0)
-	{
-	  sumCracked++;
-	}
+    {
+      sumCracked++;
+    }
       else
-	{
-	  sumDamaged++;
-	}
+    {
+      sumDamaged++;
+    }
     }
   Info << "\t\tThere are " << sumDamaged << " damaged faces" << endl;
   Info << "\t\tThere are " << sumCracked << " cracked faces" << endl;
-  
+
   return false;
 }
 
@@ -539,23 +539,23 @@ void solidCohesiveFvPatchVectorField::autoMap
     {
         label i=0;
         this->valueFraction()[i] = symmTensor::zero;
-	traction_[i] = vector::zero;
-	cracked_[i] = false;
-	curTractionN_[i] = 0.0;
-	oldTractionN_[i] = 0.0;
-	curTractionS_[i] = 0.0;
-	oldTractionS_[i] = 0.0;
-	deltaN_[i] = 0.0;
-	oldDeltaN_[i] = 0.0;
-	deltaS_[i] = 0.0;
-	oldDeltaS_[i] = 0.0;
-	curDeltaN_[i] = 0.0;
-	curDeltaS_[i] = 0.0;
-	unloadingDeltaEff_[i] = 0.0;
-	currentGI_[i] = 0.0;
-	oldGI_[i] = 0.0;
-	currentGII_[i] = 0.0;
-	oldGII_[i] = 0.0;
+    traction_[i] = vector::zero;
+    cracked_[i] = false;
+    curTractionN_[i] = 0.0;
+    oldTractionN_[i] = 0.0;
+    curTractionS_[i] = 0.0;
+    oldTractionS_[i] = 0.0;
+    deltaN_[i] = 0.0;
+    oldDeltaN_[i] = 0.0;
+    deltaS_[i] = 0.0;
+    oldDeltaS_[i] = 0.0;
+    curDeltaN_[i] = 0.0;
+    curDeltaS_[i] = 0.0;
+    unloadingDeltaEff_[i] = 0.0;
+    currentGI_[i] = 0.0;
+    oldGI_[i] = 0.0;
+    currentGII_[i] = 0.0;
+    oldGII_[i] = 0.0;
     }
     else if ( (patch().size()==2) && (nNewFaces == 1) )
     {
@@ -563,46 +563,46 @@ void solidCohesiveFvPatchVectorField::autoMap
         this->valueFraction()[i] = symmTensor::zero;
         traction_[i] = vector::zero;
         cracked_[i] = false;
-	curTractionN_[i] = 0.0;
-	oldTractionN_[i] = 0.0;
-	curTractionS_[i] = 0.0;
-	oldTractionS_[i] = 0.0;
-	deltaN_[i] = 0.0;
-	oldDeltaN_[i] = 0.0;
-	deltaS_[i] = 0.0;
-	oldDeltaS_[i] = 0.0;
-	curDeltaN_[i] = 0.0;
-	curDeltaS_[i] = 0.0;
-	unloadingDeltaEff_[i] = 0.0;
-	currentGI_[i] = 0.0;
-	oldGI_[i] = 0.0;
-	currentGII_[i] = 0.0;
-	oldGII_[i] = 0.0;
+    curTractionN_[i] = 0.0;
+    oldTractionN_[i] = 0.0;
+    curTractionS_[i] = 0.0;
+    oldTractionS_[i] = 0.0;
+    deltaN_[i] = 0.0;
+    oldDeltaN_[i] = 0.0;
+    deltaS_[i] = 0.0;
+    oldDeltaS_[i] = 0.0;
+    curDeltaN_[i] = 0.0;
+    curDeltaS_[i] = 0.0;
+    unloadingDeltaEff_[i] = 0.0;
+    currentGI_[i] = 0.0;
+    oldGI_[i] = 0.0;
+    currentGII_[i] = 0.0;
+    oldGII_[i] = 0.0;
     }
     else if ( (patch().size()==2) && (nNewFaces == 2) )
     {
         label i=0;
         this->valueFraction()[i] = symmTensor::zero;
-        traction_[i] = vector::zero; 
+        traction_[i] = vector::zero;
         i=1;
         this->valueFraction()[i] = symmTensor::zero;
         traction_[i] = vector::zero;
-	cracked_[i] = false;
-	curTractionN_[i] = 0.0;
-	oldTractionN_[i] = 0.0;
-	curTractionS_[i] = 0.0;
-	oldTractionS_[i] = 0.0;
-	deltaN_[i] = 0.0;
-	oldDeltaN_[i] = 0.0;
-	deltaS_[i] = 0.0;
-	oldDeltaS_[i] = 0.0;
-	curDeltaN_[i] = 0.0;
-	curDeltaS_[i] = 0.0;
-	unloadingDeltaEff_[i] = 0.0;
-	currentGI_[i] = 0.0;
-	oldGI_[i] = 0.0;
-	currentGII_[i] = 0.0;
-	oldGII_[i] = 0.0;
+    cracked_[i] = false;
+    curTractionN_[i] = 0.0;
+    oldTractionN_[i] = 0.0;
+    curTractionS_[i] = 0.0;
+    oldTractionS_[i] = 0.0;
+    deltaN_[i] = 0.0;
+    oldDeltaN_[i] = 0.0;
+    deltaS_[i] = 0.0;
+    oldDeltaS_[i] = 0.0;
+    curDeltaN_[i] = 0.0;
+    curDeltaS_[i] = 0.0;
+    unloadingDeltaEff_[i] = 0.0;
+    currentGI_[i] = 0.0;
+    oldGI_[i] = 0.0;
+    currentGII_[i] = 0.0;
+    oldGII_[i] = 0.0;
     }
     else
     {
@@ -612,22 +612,22 @@ void solidCohesiveFvPatchVectorField::autoMap
             {
                 this->valueFraction()[i] = symmTensor::zero;
                 traction_[i] = vector::zero;
-		cracked_[i] = false;
-		curTractionN_[i] = 0.0;
-		oldTractionN_[i] = 0.0;
-		curTractionS_[i] = 0.0;
-		oldTractionS_[i] = 0.0;
-		deltaN_[i] = 0.0;
-		oldDeltaN_[i] = 0.0;
-		deltaS_[i] = 0.0;
-		oldDeltaS_[i] = 0.0;
-		curDeltaN_[i] = 0.0;
-		curDeltaS_[i] = 0.0;
-		unloadingDeltaEff_[i] = 0.0;
-		currentGI_[i] = 0.0;
-		oldGI_[i] = 0.0;
-		currentGII_[i] = 0.0;
-		oldGII_[i] = 0.0;
+        cracked_[i] = false;
+        curTractionN_[i] = 0.0;
+        oldTractionN_[i] = 0.0;
+        curTractionS_[i] = 0.0;
+        oldTractionS_[i] = 0.0;
+        deltaN_[i] = 0.0;
+        oldDeltaN_[i] = 0.0;
+        deltaS_[i] = 0.0;
+        oldDeltaS_[i] = 0.0;
+        curDeltaN_[i] = 0.0;
+        curDeltaS_[i] = 0.0;
+        unloadingDeltaEff_[i] = 0.0;
+        currentGI_[i] = 0.0;
+        oldGI_[i] = 0.0;
+        currentGII_[i] = 0.0;
+        oldGII_[i] = 0.0;
             }
         }
     }
@@ -679,12 +679,19 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
 
     // lookup cohesive properties from rheology
     const constitutiveModel& rheology =
-        this->db().objectRegistry::lookupObject<constitutiveModel>("rheologyProperties");
+        this->db().objectRegistry::lookupObject<constitutiveModel>
+        (
+            "rheologyProperties"
+            );
     label patchID = patch().index();
-    const scalarField sigmaMax = rheology.cohLaw().sigmaMax()().boundaryField()[patchID];
-    const scalarField tauMax = rheology.cohLaw().tauMax()().boundaryField()[patchID];
-    const scalarField GIc = rheology.cohLaw().GIc()().boundaryField()[patchID];
-    const scalarField GIIc = rheology.cohLaw().GIIc()().boundaryField()[patchID];
+    const scalarField sigmaMax =
+        rheology.cohLaw().sigmaMax()().boundaryField()[patchID];
+    const scalarField tauMax =
+        rheology.cohLaw().tauMax()().boundaryField()[patchID];
+    const scalarField GIc =
+        rheology.cohLaw().GIc()().boundaryField()[patchID];
+    const scalarField GIIc =
+        rheology.cohLaw().GIIc()().boundaryField()[patchID];
 
     // update old values
     if (curTimeIndex_ != this->db().time().timeIndex())
@@ -692,10 +699,10 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
       // we force the penalty factor to be calculated here for the first time
       // as all processors must call this at the same time
       if (contact_ && patch().size() > 0)
-	{
-	  // force calculation of penalty factor here
-	  penaltyFactor();
-	}
+    {
+      // force calculation of penalty factor here
+      penaltyFactor();
+    }
 
       oldDeltaN_ = deltaN_;
       oldDeltaS_ = deltaS_;
@@ -707,7 +714,12 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
       oldTractionS_ = curTractionS_;
       oldGI_ = currentGI_;
       oldGII_ = currentGII_;
-      unloadingDeltaEff_ = max(unloadingDeltaEff_, Foam::sqrt(max(deltaN_, 0.0)*max(deltaN_, 0.0) + deltaS_*deltaS_));
+      unloadingDeltaEff_ =
+          max
+          (
+              unloadingDeltaEff_,
+              Foam::sqrt(max(deltaN_, 0.0)*max(deltaN_, 0.0) + deltaS_*deltaS_)
+              );
 
       curTimeIndex_ = this->db().time().timeIndex();
     }
@@ -731,17 +743,19 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
     // global patch material field is needed for multimaterial cohesive laws
     if (updateGlobalPatchMaterials_)
       {
-	updateGlobalPatchMaterials_ = false;
-	
-	if (mesh.objectRegistry::foundObject<volScalarField>("materials"))
-	  {
-	    scalarField localPatchMaterials =
-	      patch().lookupPatchField<volScalarField, scalar>("materials").patchInternalField();
-	    scalarField newGlobalPatchMaterials = crackerMesh.globalCrackField(localPatchMaterials);
+    updateGlobalPatchMaterials_ = false;
 
-	    globalPatchMaterials_.setSize(newGlobalPatchMaterials.size());
-	    globalPatchMaterials_ = newGlobalPatchMaterials;
-	  }
+    if (mesh.objectRegistry::foundObject<volScalarField>("materials"))
+      {
+        scalarField localPatchMaterials =
+          patch().lookupPatchField<volScalarField, scalar>
+            ("materials").patchInternalField();
+        scalarField newGlobalPatchMaterials =
+            crackerMesh.globalCrackField(localPatchMaterials);
+
+        globalPatchMaterials_.setSize(newGlobalPatchMaterials.size());
+        globalPatchMaterials_ = newGlobalPatchMaterials;
+      }
       }
 
     const regionSplit& regions = crackerMesh.regions();
@@ -751,7 +765,7 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
     {
         faceCellRegion[faceI] = regions[faceCells[faceI]];
     }
-    labelField globalFaceCellRegion = 
+    labelField globalFaceCellRegion =
         crackerMesh.globalCrackField(faceCellRegion);
 
 
@@ -759,8 +773,8 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
     vectorField UPatch = *this;
     if (fieldName_ == "DU")
       {
-    	UPatch +=
-    	  patch().lookupPatchField<volVectorField, vector>("U");
+        UPatch +=
+          patch().lookupPatchField<volVectorField, vector>("U");
       }
 
     // Global displacement
@@ -771,222 +785,274 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
     vectorField delta(patch().size(), vector::zero);
     const labelList& gcfa = crackerMesh.globalCrackFaceAddressing();
     label globalIndex = crackerMesh.localCrackStart();
-    for(label i = 0; i < patch().size(); i++)
+    for (label i = 0; i < patch().size(); i++)
     {
-        // newSeparationDistance[i] = 
-        delta[i] = 
-            globalUPatch[gcfa[globalIndex]] 
+        // newSeparationDistance[i] =
+        delta[i] =
+            globalUPatch[gcfa[globalIndex]]
           - globalUPatch[globalIndex];
 
         globalIndex++;
     }
 
     //globalIndex = crackerMesh.localCrackStart();
-    for(label i = 0; i < patch().size(); i++)
+    for (label i = 0; i < patch().size(); i++)
       {
-	// update deltas
-	curDeltaN_[i] = n[i] & delta[i];
-	curDeltaS_[i] = mag( (I - sqr(n[i])) & delta[i]); // shearing
-	if (explicitSeparationDistance_)
-	  {
-	    deltaN_[i] = oldDeltaN_[i];
-	    deltaS_[i] = oldDeltaS_[i];
-	    
-	    if (mag(deltaN_[i]) < SMALL)
-	      {
-	    	deltaN_[i] = 2*SMALL;
-	      }
-	    FatalError << "explicitSeparationDistance_ is true!" << abort(FatalError);
-	  }
-	else
-	  {
-	    // relax
-	    deltaN_[i] = relaxationFactor_*curDeltaN_[i] + (1.0 - relaxationFactor_)*deltaN_[i];
-	    deltaS_[i] = relaxationFactor_*curDeltaS_[i] + (1.0 - relaxationFactor_)*deltaS_[i];
-	  }
+    // update deltas
+    curDeltaN_[i] = n[i] & delta[i];
+    curDeltaS_[i] = mag( (I - sqr(n[i])) & delta[i]); // shearing
+    if (explicitSeparationDistance_)
+      {
+        deltaN_[i] = oldDeltaN_[i];
+        deltaS_[i] = oldDeltaS_[i];
 
-	// update tractions
-	curTractionN_[i] = n[i] & traction_[i];
-	curTractionS_[i] = mag( (I-sqr(n[i])) & traction_[i] );
-
-	// effective delta - only positive deltaN is considered
-	const scalar deltaEff = ::sqrt(max(deltaN_[i], 0.0)*max(deltaN_[i], 0.0) + deltaS_[i]*deltaS_[i]);
-
-	// update energies
-	// stop calculating after cracking for convergence (because crack might jump in and out of damaged/failed
-	// only update energies if there is loading
-	if ( !cracked_[i] && (deltaEff > (unloadingDeltaEff_[i]-SMALL)) )
-	  {
-	    if ((curTractionN_[i]+oldTractionN_[i]) > 0.0) // if the average normal stress is tensile
-	      {
-		// trapezoidal rule
-		currentGI_[i] = oldGI_[i] + ((0.5*(curTractionN_[i]+oldTractionN_[i]))*(deltaN_[i]-oldDeltaN_[i]));
-	      }
-	    else
-	      {
-		// no modeI energy lost if in compression
-		currentGI_[i] = oldGI_[i];
-	      }
-	    // mode II - trapezoidal rule
-	    currentGII_[i] = oldGII_[i] + ((0.5*(curTractionS_[i]+oldTractionS_[i]))*(deltaS_[i]-oldDeltaS_[i]));
-	  }
-	//scalar currentG = currentGI_[i] + currentGII_[i];
-
-        // if 
-        // (
-	//  ( globalFaceCellRegion[globalIndex] 
-	//    == globalFaceCellRegion[gcfa[globalIndex]] )
-	//  ||
-	//  !cracked_[i]
-        //  )
-
-	// new tractions to be calculated
-        scalar curNormalTraction = 0;
-        vector curTangentialTraction = vector::zero;
-
-	// loading
-	// if the effective delta is greater than unloadingDeltaEff then there is loading
-	// unloadingDeltaEff is the maximum previsouly reached deltaEff
-	if (deltaEff > (unloadingDeltaEff_[i]-SMALL) )
-	  {
-	    // at the moment loading and unloading are the same
-	    // if total energy is dissipated, then fully crack face
-	    //if ( currentG > GIc[i] || cracked_[i] ) //Gc )
-	    // propagation
-	    if ( ((currentGI_[i]/GIc[i]) + (currentGII_[i]/GIIc[i])) >= 1 )
-	      {
-		//Pout << "GIc[i] is " << GIc[i] << ", curG is " << currentG << endl;
-		if (!cracked_[i]) Pout << "Face " << i << " is fully cracked" << endl;
-		
-		cracked_[i] = true;
-		
-
-		// failed faces might come in to contact so we need to deal with them here
-		// we could use the face delta values but that assumes that the opposing crack faces
-		// are aligned direclty opposite one another, which in general they are not.
-		// So we actually need to calculate the actual face penetration distances
-		// and then a standard penalty approach contact is probably fine.
-		// We will use simple assumption for now which is fine is the relative displacement
-		// of the opposing faces is not too large
-		// To-do: we must calculate actual distances
-		curNormalTraction = 0.0;
-		curTangentialTraction = vector::zero;
-		if ( contact_ && deltaN_[i] <= 0.0 )
-		  {
-		    curNormalTraction = deltaN_[i]*penaltyFactor();
-		    //Info << "penaltyFactor() is " << penaltyFactor() << endl;
-
-		    // friction
-		    vector sDir = (I - sqr(n[i]))&delta[i];
-		    sDir /= mag(sDir+vector(SMALL,SMALL,SMALL));
-		    scalar slip = mag(deltaS_[gcfa[i]] - deltaS_[i]);
-		    scalar fricMag = min(slip*penaltyFactor(), frictionCoeff_*curNormalTraction); // stick/slip
-		    curTangentialTraction = fricMag*sDir;
-		    //Info << "face " << i << " << norm " << curNormalTraction << " tang " << curTangentialTraction << endl;
-		  }
-
-		// relax tractions
-		curNormalTraction = relaxationFactor_*curNormalTraction + (1-relaxationFactor_)*(n[i] & traction_[i]);
-		curTangentialTraction = relaxationFactor_*curTangentialTraction + (1-relaxationFactor_)*( (I -sqr(n[i])) & traction_[i]);
-		traction_[i] = curNormalTraction*n[i] + curTangentialTraction;
-	      }
-	    
-	    // damging face with positive normal delta
-	    else if ( deltaN_[i] > 0.0 )
-	      {
-		if (cracked_[i]) Pout << "Face " << i << " is un-cracked" << endl;
-		
-		cracked_[i] = false;
-		
-		// set traction in a fixed point iteration manner to force
-		// (tN/sigmaMax)^2 + (tS/tauMax)^2 = 1
-		// while also allowing varying mode mix by assuming colinear traction and delta
-		// Dugdale version
-		// scalar tN =
-		//   sigmaMax[i] * deltaN_[i] /
-		//   (SMALL + ::sqrt( (deltaN_[i]*deltaN_[i]) + (deltaS_[i]*deltaS_[i])*(sigmaMax[i]*sigmaMax[i]/(tauMax[i]*tauMax[i])) ));
-		// scalar tS =
-		//   tauMax[i] * deltaS_[i] /
-		//   (SMALL + ::sqrt( (deltaS_[i]*deltaS_[i]) + (deltaN_[i]*deltaN_[i])*(tauMax[i]*tauMax[i]/(sigmaMax[i]*sigmaMax[i])) ));
-
-		// Given current deltaN and deltaS, the cohesive law (Dugdale, linear, etc) gives back current traction:
-		scalar tN = n[i] & traction_[i];
-		scalar tS = mag( (I - sqr(n[i])) & traction_[i] );
-		// Update tN and tS
-		rheology.cohLaw().damageTractions(tN, tS, deltaN_[i], deltaS_[i], currentGI_[i], currentGII_[i], i, globalPatchMaterials_);
-
-		// shear delta direction
-		vector sDir = (I - sqr(n[i]))&delta[i];
-		sDir /= mag(sDir+vector(SMALL,SMALL,SMALL));
-		
-		// relax tractions
-		curNormalTraction = relaxationFactor_*tN + (1-relaxationFactor_)*(n[i] & traction_[i]);
-		curTangentialTraction = relaxationFactor_*(tS*sDir) + (1-relaxationFactor_)*( (I -sqr(n[i])) & traction_[i]);
-		traction_[i] = curNormalTraction*n[i] + curTangentialTraction;
-	      }
-	    
-	    // damaging faces with negative normal delta
-	    else
-	      {
-		if (cracked_[i]) Pout << "Face " << i << " is un-cracked" << endl;
-		
-		cracked_[i] = false;
-		//Pout << "Contact and shearing face " << i << endl;
-		
-		//Pout << "Face " << i << " is damaging but in contact" << endl;
-		// set shear traction from cohesive law
-		// set normal traction to contact condition
-		scalar tS = tauMax[i];
-		
-		vector sDir = (I - sqr(n[i])) & delta[i];
-		sDir /= mag(sDir+vector(SMALL,SMALL,SMALL));
-				
-		// Simple penalty condition
-		scalar penaltyFac = 0.0;
-		if (contact_)
-		  {
-		    penaltyFac = penaltyFactor();
-		  }
-		scalar contactTN = deltaN_[i]*penaltyFac;
-		
-	      // relax tractions
-		curNormalTraction = relaxationFactor_*contactTN + (1-relaxationFactor_)*(n[i] & traction_[i]);
-		curTangentialTraction = relaxationFactor_*(tS*sDir) + (1-relaxationFactor_)*( (I -sqr(n[i])) & traction_[i]);
-		traction_[i] = curNormalTraction*n[i] + curTangentialTraction;
-	      }
-	  }
-	
-	else
-	  {
-	    // unloading
-	    // as the current effective delta is less than the old time effective delta
-
-	    // We have two choice for unloading:
-	    // (a) ductile approach
-	    //         unload with initial stiffness (which is infinite)
-	    //         similar to ductilve metal stress-strain curve
-	    //         as we use infinite intial stiffness, this means to elastic energy is recovered
-	    //         and we immediately start loading in opposite direction
-	    // (b) brittle approach
-	    //         unload straight back to the origin
-	    //         this means we recover elastic energy
-	    //
-	    // approach (b) is numerically "nicer"; however, for Dugdale cohesive zone this implys
-	    // that only half the energy is dissipated just before failure and then the other half
-	    // is dissipated at failure. This may not be an issue in practive but it does not
-	    // really make sense. Obviously it is fine for a linear cohesive zone as the energy
-	    // is smoothly dissipated up to failure.
-	    // for now, we will implement approach (b), but this requires more thinking...
-
-	    //Pout << "unloading face " << i << endl;
-
-	    // reduce traction linearly with the reduction in delta
-	    scalar scaleFactor = deltaEff/(unloadingDeltaEff_[i]);
-	    traction_[i] = relaxationFactor_*scaleFactor*traction_[i] + (1-relaxationFactor_)*traction_[i];
-	  }	
+        if (mag(deltaN_[i]) < SMALL)
+          {
+            deltaN_[i] = 2*SMALL;
+          }
+        FatalError
+            << "explicitSeparationDistance_ is true!" << abort(FatalError);
       }
-    
-    
+    else
+      {
+        // relax
+        deltaN_[i] =
+            relaxationFactor_*curDeltaN_[i]
+            + (1.0 - relaxationFactor_)*deltaN_[i];
+        deltaS_[i] =
+            relaxationFactor_*curDeltaS_[i]
+            + (1.0 - relaxationFactor_)*deltaS_[i];
+      }
+
+    // update tractions
+    curTractionN_[i] = n[i] & traction_[i];
+    curTractionS_[i] = mag( (I-sqr(n[i])) & traction_[i] );
+
+    // effective delta - only positive deltaN is considered
+    const scalar deltaEff =
+        ::sqrt(max(deltaN_[i], 0.0)*max(deltaN_[i], 0.0)
+               + deltaS_[i]*deltaS_[i]);
+
+    // update energies
+    // stop calculating after cracking for convergence
+    // because crack might jump in and out of damaged/failed
+    // only update energies if there is loading
+    if ( !cracked_[i] && (deltaEff > (unloadingDeltaEff_[i]-SMALL)) )
+    {
+        // if the average normal stress is tensile
+        if ((curTractionN_[i]+oldTractionN_[i]) > 0.0)
+        {
+            // trapezoidal rule
+            currentGI_[i] =
+                oldGI_[i]
+                + ((0.5*(curTractionN_[i]+oldTractionN_[i]))
+                   *(deltaN_[i]-oldDeltaN_[i]));
+        }
+        else
+        {
+            // no modeI energy lost if in compression
+            currentGI_[i] = oldGI_[i];
+        }
+        // mode II - trapezoidal rule
+        currentGII_[i] =
+            oldGII_[i]
+            + ((0.5*(curTractionS_[i]+oldTractionS_[i]))
+               *(deltaS_[i]-oldDeltaS_[i]));
+      }
+    //scalar currentG = currentGI_[i] + currentGII_[i];
+
+    // if
+    // (
+    //  ( globalFaceCellRegion[globalIndex]
+    //    == globalFaceCellRegion[gcfa[globalIndex]] )
+    //  ||
+    //  !cracked_[i]
+    //  )
+
+    // new tractions to be calculated
+    scalar curNormalTraction = 0;
+    vector curTangentialTraction = vector::zero;
+
+    // loading
+    // if the effective delta is greater than unloadingDeltaEff then
+    // there is loading
+    // unloadingDeltaEff is the maximum previsouly reached deltaEff
+    if (deltaEff > (unloadingDeltaEff_[i]-SMALL) )
+      {
+        // at the moment loading and unloading are the same
+        // if total energy is dissipated, then fully crack face
+        //if ( currentG > GIc[i] || cracked_[i] ) //Gc )
+        // propagation
+        if ( ((currentGI_[i]/GIc[i]) + (currentGII_[i]/GIIc[i])) >= 1 )
+          {
+        //Pout << "GIc[i] is " << GIc[i] << ", curG is " << currentG << endl;
+        if (!cracked_[i]) Pout << "Face " << i << " is fully cracked" << endl;
+
+        cracked_[i] = true;
+
+
+        // failed faces might come in to contact so we need to deal with them
+        // here we could use the face delta values but that assumes that the
+        // opposing crack faces are aligned direclty opposite one another, which
+        // in general they are not. So we actually need to calculate the actual
+        // face penetration distances and then a standard penalty approach
+        // contact is probably fine. We will use simple assumption for now which
+        // is fine is the relative displacement
+        // of the opposing faces is not too large
+        // To-do: we must calculate actual distances
+        curNormalTraction = 0.0;
+        curTangentialTraction = vector::zero;
+        if ( contact_ && deltaN_[i] <= 0.0 )
+          {
+            curNormalTraction = deltaN_[i]*penaltyFactor();
+            //Info << "penaltyFactor() is " << penaltyFactor() << endl;
+
+            // friction
+            vector sDir = (I - sqr(n[i]))&delta[i];
+            sDir /= mag(sDir+vector(SMALL,SMALL,SMALL));
+            scalar slip = mag(deltaS_[gcfa[i]] - deltaS_[i]);
+            scalar fricMag =
+                min
+                (
+                    slip*penaltyFactor(),
+                    frictionCoeff_*curNormalTraction // stick/slip
+                    );
+            curTangentialTraction = fricMag*sDir;
+          }
+
+        // relax tractions
+        curNormalTraction =
+            relaxationFactor_*curNormalTraction
+            + (1-relaxationFactor_)*(n[i] & traction_[i]);
+        curTangentialTraction =
+            relaxationFactor_*curTangentialTraction
+            + (1-relaxationFactor_)*( (I -sqr(n[i])) & traction_[i]);
+        traction_[i] = curNormalTraction*n[i] + curTangentialTraction;
+          }
+
+        // damging face with positive normal delta
+        else if ( deltaN_[i] > 0.0 )
+          {
+        if (cracked_[i]) Pout << "Face " << i << " is un-cracked" << endl;
+
+        cracked_[i] = false;
+
+        // set traction in a fixed point iteration manner to force
+        // (tN/sigmaMax)^2 + (tS/tauMax)^2 = 1
+        // while also allowing varying mode mix by assuming colinear traction
+        // and delta
+        // Dugdale version
+        // scalar tN =
+        //   sigmaMax[i] * deltaN_[i] /
+        //   (SMALL + ::sqrt( (deltaN_[i]*deltaN_[i])
+        // + (deltaS_[i]*deltaS_[i])*(sigmaMax[i]*sigmaMax[i]
+        // /(tauMax[i]*tauMax[i])) ));
+        // scalar tS =
+        //   tauMax[i] * deltaS_[i] /
+        //   (SMALL + ::sqrt( (deltaS_[i]*deltaS_[i])
+        // + (deltaN_[i]*deltaN_[i])*(tauMax[i]*tauMax[i]
+        // /(sigmaMax[i]*sigmaMax[i])) ));
+
+        // Given current deltaN and deltaS, the cohesive law
+        // (Dugdale, linear, etc)gives back current traction:
+        scalar tN = n[i] & traction_[i];
+        scalar tS = mag( (I - sqr(n[i])) & traction_[i] );
+        // Update tN and tS
+        rheology.cohLaw().damageTractions
+            (
+                tN,
+                tS,
+                deltaN_[i],
+                deltaS_[i],
+                currentGI_[i],
+                currentGII_[i],
+                i,
+                globalPatchMaterials_
+                );
+
+        // shear delta direction
+        vector sDir = (I - sqr(n[i]))&delta[i];
+        sDir /= mag(sDir+vector(SMALL,SMALL,SMALL));
+
+        // relax tractions
+        curNormalTraction =
+            relaxationFactor_*tN
+            + (1-relaxationFactor_)*(n[i] & traction_[i]);
+        curTangentialTraction =
+            relaxationFactor_*(tS*sDir)
+            + (1-relaxationFactor_)*( (I -sqr(n[i])) & traction_[i]);
+        traction_[i] = curNormalTraction*n[i] + curTangentialTraction;
+          }
+
+        // damaging faces with negative normal delta
+        else
+          {
+        if (cracked_[i]) Pout << "Face " << i << " is un-cracked" << endl;
+
+        cracked_[i] = false;
+        //Pout << "Contact and shearing face " << i << endl;
+
+        //Pout << "Face " << i << " is damaging but in contact" << endl;
+        // set shear traction from cohesive law
+        // set normal traction to contact condition
+        scalar tS = tauMax[i];
+
+        vector sDir = (I - sqr(n[i])) & delta[i];
+        sDir /= mag(sDir+vector(SMALL,SMALL,SMALL));
+
+        // Simple penalty condition
+        scalar penaltyFac = 0.0;
+        if (contact_)
+          {
+            penaltyFac = penaltyFactor();
+          }
+        scalar contactTN = deltaN_[i]*penaltyFac;
+
+          // relax tractions
+        curNormalTraction =
+            relaxationFactor_*contactTN
+            + (1-relaxationFactor_)*(n[i] & traction_[i]);
+        curTangentialTraction =
+            relaxationFactor_*(tS*sDir)
+            + (1-relaxationFactor_)*( (I -sqr(n[i])) & traction_[i]);
+        traction_[i] = curNormalTraction*n[i] + curTangentialTraction;
+          }
+      }
+
+    else
+    {
+        // unloading
+        // as the current effective delta is less than the old time
+        // effective delta
+
+        // We have two choice for unloading:
+        // (a) ductile approach
+        //         unload with initial stiffness (which is infinite)
+        //         similar to ductilve metal stress-strain curve
+        //         as we use infinite intial stiffness, this means to elastic
+        //         energy is recovered
+        //         and we immediately start loading in opposite direction
+        // (b) brittle approach
+        //         unload straight back to the origin
+        //         this means we recover elastic energy
+        //
+        // approach (b) is numerically "nicer"; however, for Dugdale cohesive
+        // zone this implys that only half the energy is dissipated just before
+        // failure and then the other half is dissipated at failure. This may
+        // not be an issue in practive but it does not really make sense.
+        // Obviously it is fine for a linear cohesive zone as the energy
+        // is smoothly dissipated up to failure. For now, we will implement
+        // approach (b), but this requires more thinking...
+
+       // reduce traction linearly with the reduction in delta
+        scalar scaleFactor = deltaEff/(unloadingDeltaEff_[i]);
+        traction_[i] =
+            relaxationFactor_*scaleFactor*traction_[i]
+            + (1-relaxationFactor_)*traction_[i];
+      }
+      }
+
+
     this->refGrad() =
         tractionBoundaryGradient()
         (
@@ -1018,31 +1084,34 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
     const fvMesh& mesh = patch().boundaryMesh().mesh();
 
     const scalarField& mu =
-      mesh.objectRegistry::lookupObject<volScalarField>("mu").boundaryField()[patchID];
+      mesh.objectRegistry::lookupObject<volScalarField>
+        ("mu").boundaryField()[patchID];
     const scalarField& lambda =
-      mesh.objectRegistry::lookupObject<volScalarField>("lambda").boundaryField()[patchID];
-    
+      mesh.objectRegistry::lookupObject<volScalarField>
+        ("lambda").boundaryField()[patchID];
+
     // avarage contact patch bulk modulus
     scalar bulkModulus = gAverage(lambda + (2.0/3.0)*mu);
-    
+
     // average contact patch face area
     scalar faceArea = gAverage(mesh.magSf().boundaryField()[patchID]);
-    
+
     // average contact patch cell volume
     scalar cellVolume = 0.0;
     const volScalarField::DimensionedInternalField & V = mesh.V();
     {
       const unallocLabelList& faceCells = mesh.boundary()[patchID].faceCells();
       forAll(mesh.boundary()[patchID], facei)
-	{
-	  cellVolume += V[faceCells[facei]];
-	}
+    {
+      cellVolume += V[faceCells[facei]];
+    }
     }
     cellVolume /= patch().size();
 
     // approximate penalty factor based on Hallquist et al.
     // we approximate penalty factor for traction instead of force
-    penaltyFactorPtr_ = new scalar(penaltyScale_*bulkModulus*faceArea/cellVolume);
+    penaltyFactorPtr_ =
+        new scalar(penaltyScale_*bulkModulus*faceArea/cellVolume);
   }
 
 
@@ -1051,7 +1120,8 @@ void solidCohesiveFvPatchVectorField::write(Ostream& os) const
 {
     directionMixedFvPatchVectorField::write(os);
     traction_.writeEntry("traction", os);
-    os.writeKeyword("relaxationFactor") << relaxationFactor_<< token::END_STATEMENT << nl;
+    os.writeKeyword("relaxationFactor")
+        << relaxationFactor_ << token::END_STATEMENT << nl;
 
     cracked_.writeEntry("cracked", os);
     curTractionN_.writeEntry("curTractionN", os);
@@ -1068,11 +1138,16 @@ void solidCohesiveFvPatchVectorField::write(Ostream& os) const
     oldGI_.writeEntry("oldGI", os);
     oldGII_.writeEntry("oldGII", os);
 
-    os.writeKeyword("curTimeIndex") << curTimeIndex_ << token::END_STATEMENT << nl;
+    os.writeKeyword("curTimeIndex")
+        << curTimeIndex_ << token::END_STATEMENT << nl;
     os.writeKeyword("contact") << contact_<< token::END_STATEMENT << nl;
-    os.writeKeyword("penaltyScale") << penaltyScale_ << token::END_STATEMENT << nl;
-    os.writeKeyword("nonLinear") << nonLinearGeometry::nonLinearNames_[nonLinear_] << token::END_STATEMENT << nl;
-    os.writeKeyword("orthotropic") << orthotropic_ << token::END_STATEMENT << nl;
+    os.writeKeyword("penaltyScale")
+        << penaltyScale_ << token::END_STATEMENT << nl;
+    os.writeKeyword("nonLinear")
+        << nonLinearGeometry::nonLinearNames_[nonLinear_]
+        << token::END_STATEMENT << nl;
+    os.writeKeyword("orthotropic")
+        << orthotropic_ << token::END_STATEMENT << nl;
 }
 
 

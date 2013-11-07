@@ -90,10 +90,10 @@ void Foam::crackerFvMesh::addZonesAndModifiers()
             0,
             faceZones()
         );
-        
+
         List<cellZone*> cz(0);
 
-        
+
         Info << "Adding point, face and cell zones" << endl;
         addZones(pz, fz, cz);
     }
@@ -102,7 +102,7 @@ void Foam::crackerFvMesh::addZonesAndModifiers()
 //         List<pointZone*> pz(0);
 //         List<faceZone*> fz(faceZones().size() + 1);
 
-//         fz[0] = 
+//         fz[0] =
 //             new faceZone
 //             (
 //                 crackPatchName + "Zone",
@@ -111,7 +111,7 @@ void Foam::crackerFvMesh::addZonesAndModifiers()
 //                 0,
 //                 faceZones()
 //             );
-        
+
 //         for (label i=0; i<faceZones().size(); i++)
 //         {
 //             fz[i+1] = new faceZone
@@ -144,14 +144,14 @@ void Foam::crackerFvMesh::addZonesAndModifiers()
 //         addZones(pz, fz, cz);
 
         FatalErrorIn("void crackerFvMesh::addZonesAndModifiers() const")
-	  << "Crack face zone must be added by hand" << nl
-	  << " crackZone " << nl
-	  << "{" << nl
-	  << "\ttype faceZone;" << nl
-	  << "\tfaceLabels      0();" << nl
-	  << "\t  flipMap         0();" << nl
-	  << "}" << nl
-	  << abort(FatalError);
+            << "Crack face zone must be added by hand" << nl
+            << " crackZone " << nl
+            << "{" << nl
+            << "\ttype faceZone;" << nl
+            << "\tfaceLabels      0();" << nl
+            << "\t  flipMap         0();" << nl
+            << "}" << nl
+            << abort(FatalError);
     }
     else
     {
@@ -176,7 +176,7 @@ void Foam::crackerFvMesh::addZonesAndModifiers()
                 openPatchName
             )
         );
-        
+
         topoChanger_.writeOpt() = IOobject::AUTO_WRITE;
     }
     else
@@ -241,7 +241,7 @@ void Foam::crackerFvMesh::makeGlobalCrackFaceCentresAndSizes() const
             << abort(FatalError);
     }
 
-    
+
     // Number of faces in global crack
     labelList sizes(Pstream::nProcs(), 0);
     sizes[Pstream::myProcNo()] = boundaryMesh()[crackPatchID_.index()].size();
@@ -287,11 +287,11 @@ void Foam::crackerFvMesh::makeGlobalCrackFaceCentresAndSizes() const
 
     label globalCrackSize = sum(sizes);
 
-    globalCrackFaceCentresPtr_ = 
+    globalCrackFaceCentresPtr_ =
         new vectorField(globalCrackSize, vector::zero);
     vectorField& globalCrackFaceCentres = *globalCrackFaceCentresPtr_;
 
-    globalCrackFaceSizesPtr_ = 
+    globalCrackFaceSizesPtr_ =
         new scalarField(globalCrackSize, 0);
     scalarField& globalCrackFaceSizes = *globalCrackFaceSizesPtr_;
 
@@ -301,20 +301,20 @@ void Foam::crackerFvMesh::makeGlobalCrackFaceCentresAndSizes() const
         localCrackStart_ += sizes[procI];
     }
 
-//     const vectorField& crackCf = 
+//     const vectorField& crackCf =
 //         boundaryMesh()[crackPatchID_.index()].faceCentres();
-    const vectorField::subField crackCf = 
+    const vectorField::subField crackCf =
         boundaryMesh()[crackPatchID_.index()].faceCentres();
 
     // Calc face sizes
-//     const vectorField& crackSf = 
+//     const vectorField& crackSf =
 //         boundaryMesh()[crackPatchID_.index()].faceAreas();
-    const vectorField::subField crackSf = 
+    const vectorField::subField crackSf =
         boundaryMesh()[crackPatchID_.index()].faceAreas();
 
     scalarField delta(crackSf.size(), 0);
 
-    if(nGeometricD() == 3)
+    if (nGeometricD() == 3)
     {
         delta = Foam::sqrt(mag(crackSf));
     }
@@ -347,7 +347,7 @@ void Foam::crackerFvMesh::makeGlobalCrackFaceCentresAndSizes() const
         j++;
     }
 
-    // Parallel data exchange: collect crack face centres and sizes 
+    // Parallel data exchange: collect crack face centres and sizes
     // on all processors
     reduce(globalCrackFaceCentres, sumOp<vectorField>());
     reduce(globalCrackFaceSizes, sumOp<scalarField>());
@@ -367,7 +367,7 @@ void Foam::crackerFvMesh::makeGlobalCrackFaceAddressing() const
 
     const vectorField& gcfc = globalCrackFaceCentres();
     const scalarField& gcfs = globalCrackFaceSizes();
-    
+
     globalCrackFaceAddressingPtr_ = new labelList(gcfc.size(), -1);
     labelList& gcfa = *globalCrackFaceAddressingPtr_;
 
@@ -492,7 +492,7 @@ bool Foam::crackerFvMesh::update()
 //         label size  = this->boundaryMesh()[patchI].size();
 
 //         Info << this->boundaryMesh()[patchI].name() << endl;
-//         for(label i=0;i<size;i++)
+//         for (label i=0;i<size;i++)
 //         {
 //             Info << faceMap[start+i] << endl;
 //         }

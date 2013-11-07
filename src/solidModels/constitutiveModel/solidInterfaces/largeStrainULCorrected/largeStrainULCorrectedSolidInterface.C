@@ -33,7 +33,8 @@ License
 namespace Foam
 {
     defineTypeNameAndDebug(largeStrainULCorrectedSolidInterface, 0);
-    addToRunTimeSelectionTable(solidInterface, largeStrainULCorrectedSolidInterface, dictionary);
+    addToRunTimeSelectionTable
+    (solidInterface, largeStrainULCorrectedSolidInterface, dictionary);
 }
 
 
@@ -56,7 +57,8 @@ Foam::largeStrainULCorrectedSolidInterface::largeStrainULCorrectedSolidInterface
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::largeStrainULCorrectedSolidInterface::~largeStrainULCorrectedSolidInterface()
+Foam::largeStrainULCorrectedSolidInterface::
+~largeStrainULCorrectedSolidInterface()
 {}
 
 
@@ -65,17 +67,17 @@ Foam::largeStrainULCorrectedSolidInterface::~largeStrainULCorrectedSolidInterfac
 void Foam::largeStrainULCorrectedSolidInterface::correct(fvVectorMatrix& UEqn)
 {
   const fvMesh& mesh = solidInterface::mesh();
-  
+
   const unallocLabelList& owner = mesh.owner();
   const unallocLabelList& neighbour = mesh.neighbour();
-  
+
   const volVectorField& U = UEqn.psi();
   const vectorField& UI = U.internalField();
 
-  const volTensorField& gradU = 
+  const volTensorField& gradU =
     mesh.lookupObject<volTensorField>("grad(" + U.name() + ')');
   const tensorField& gradUI = gradU.internalField();
-  
+
   const volScalarField& mu = mesh.lookupObject<volScalarField>("mu");
   const volScalarField& lambda = mesh.lookupObject<volScalarField>("lambda");
 
@@ -85,64 +87,64 @@ void Foam::largeStrainULCorrectedSolidInterface::correct(fvVectorMatrix& UEqn)
   const scalarField& w = mesh.weights().internalField();
   const vectorField& CI  = mesh.C().internalField();
   const vectorField& CfI  = mesh.Cf().internalField();
-  
+
   scalarField& diag = UEqn.diag();
   scalarField& upper = UEqn.upper();
   vectorField& source = UEqn.source();
   FieldField<Field, vector>& boundaryCoeffs = UEqn.boundaryCoeffs();
-  
+
   vectorField& interU = interfaceDisplacement();
 
   // Internal faces
   forAll(globalInterFaces(), faceI)
     {
       label curGlobalFace = globalInterFaces()[faceI];
-      
+
       label curOwner = owner[curGlobalFace];
       label curNeighbour = neighbour[curGlobalFace];
-      
+
       vector ownN = SI[curGlobalFace]/magSI[curGlobalFace];
-      
+
       scalar magS = magSI[curGlobalFace];
-      
+
       // the interface tangential gradient may be calculated
       // in one of three ways:
       //    1) extrapolation from adjoining cell centres
       //    2) inteprolation from adjoining cell centres
       //    3) directly calculated using the finite area method
-      
+
       // extrapolate tangential gradient
       tensor ownGradU = gradUI[curOwner];
       tensor ngbGradU = gradUI[curNeighbour];
 
-      scalar ownTrGradU = tr(ownGradU); 
-      scalar ngbTrGradU = tr(ngbGradU); 
-            
+      scalar ownTrGradU = tr(ownGradU);
+      scalar ngbTrGradU = tr(ngbGradU);
+
       scalar ngbDn = w[curGlobalFace]*(1.0/deltaCoeffs[curGlobalFace]);
       scalar ownDn = (1.0/deltaCoeffs[curGlobalFace]) - ngbDn;
-      
+
       scalar ownMu = mu.internalField()[curOwner];
       scalar ngbMu = mu.internalField()[curNeighbour];
-      
+
       scalar ownLambda = lambda.internalField()[curOwner];
       scalar ngbLambda = lambda.internalField()[curNeighbour];
-      
+
       scalar ownK = (2*ownMu + ownLambda);
       scalar ngbK = (2*ngbMu + ngbLambda);
-      
+
       // Interface displacement
       // no decomposition of traction - philipc
-      
+
       // explicit terms are lumped together in Q
       vector Qa =
-	ownMu*(ownN&ownGradU.T())
-	+ (ownLambda*ownTrGradU*ownN)
-	- (ownMu+ownLambda)*(ownN&ownGradU);
+    ownMu*(ownN&ownGradU.T())
+    + (ownLambda*ownTrGradU*ownN)
+    - (ownMu+ownLambda)*(ownN&ownGradU);
       vector Qb =
-	ngbMu*(ownN&ngbGradU.T())
-	+ (ngbLambda*ngbTrGradU*ownN)
-	- (ngbMu+ngbLambda)*(ownN&ngbGradU);
-      
+    ngbMu*(ownN&ngbGradU.T())
+    + (ngbLambda*ngbTrGradU*ownN)
+    - (ngbMu+ngbLambda)*(ownN&ngbGradU);
+
       // non orthogonal correction terms
 
       // delta vectors
@@ -154,7 +156,7 @@ void Foam::largeStrainULCorrectedSolidInterface::correct(fvVectorMatrix& UEqn)
       // non-orthogonality
       vector ownDelta = CfI[curGlobalFace] - CI[curOwner];
       vector ngbDelta = CI[curNeighbour] - CfI[curGlobalFace];
-      
+
       // correction vectors
       vector ownKcorr = pos(ownN & ownDelta)*(ownN - (ownDelta/ownDn));
       vector ngbKcorr = pos(ownN & ngbDelta)*(ownN - (ngbDelta/ngbDn));
@@ -162,206 +164,214 @@ void Foam::largeStrainULCorrectedSolidInterface::correct(fvVectorMatrix& UEqn)
       vector ngbCorrection = ngbKcorr & ngbGradU;
       Qa += (2.0*ownMu + ownLambda) * ( ownCorrection );
       Qb += (2.0*ngbMu + ngbLambda) * ( ngbCorrection );
-      
+
       // nonlinear terms
       tensor ownGradUGradUT = ownGradU & ownGradU.T();
       tensor ngbGradUGradUT = ngbGradU & ngbGradU.T();
-      	  
-      Qa += (ownMu*ownN&(ownGradUGradUT)) + (0.5*ownLambda*ownN*tr(ownGradUGradUT));
-      Qb += (ngbMu*ownN&(ngbGradUGradUT)) + (0.5*ngbLambda*ownN*tr(ngbGradUGradUT));
-      
+
+      Qa +=
+          (ownMu*ownN&(ownGradUGradUT))
+          + (0.5*ownLambda*ownN*tr(ownGradUGradUT));
+      Qb +=
+          (ngbMu*ownN&(ngbGradUGradUT))
+          + (0.5*ngbLambda*ownN*tr(ngbGradUGradUT));
+
       vector ownU = UI[curOwner];
       vector ngbU = UI[curNeighbour];
-      
+
       interU[faceI] =
-	(
-	 ownK*ngbDn*ownU + ngbK*ownDn*ngbU
-	 + (ownDn*ngbDn*(Qb - Qa))
-	 )
-	/(ownK*ngbDn + ngbK*ownDn);
-    
-      
+    (
+     ownK*ngbDn*ownU + ngbK*ownDn*ngbU
+     + (ownDn*ngbDn*(Qb - Qa))
+     )
+    /(ownK*ngbDn + ngbK*ownDn);
+
+
       // Implicit coupling
-      
+
       scalar wRevLin = 1.0 - w[curGlobalFace];
-      
+
       scalar Kf = 1.0/(wRevLin/ownK + (1.0-wRevLin)/ngbK);
-      
+
       scalar Dnf = 1.0/deltaCoeffs[curGlobalFace];
-      
+
       // Owner
       diag[curOwner] += Kf*magS/Dnf;
-      
+
       upper[curGlobalFace] -= Kf*magS/Dnf;
-            
+
       // philipc - no decomposition
       source[curOwner] +=
-	(
-	 ownK*ngbDn*Qb
-	 + ngbK*ownDn*Qa
-	 )*magS
-	/(ownK*ngbDn + ngbK*ownDn);
-      
+    (
+     ownK*ngbDn*Qb
+     + ngbK*ownDn*Qa
+     )*magS
+    /(ownK*ngbDn + ngbK*ownDn);
+
       // Neighbour
       diag[curNeighbour] += Kf*magS/Dnf;
-      
+
       // philipc - no decomposition
       source[curNeighbour] -=
-	(
-	 ownK*ngbDn*Qb 
-	 + ngbK*ownDn*Qa
-	 )*magS
-	/(ownK*ngbDn + ngbK*ownDn);
+    (
+     ownK*ngbDn*Qb
+     + ngbK*ownDn*Qa
+     )*magS
+    /(ownK*ngbDn + ngbK*ownDn);
     }
-  
-  
-  
+
+
+
   // Processor faces
   forAll(processorPatchFaces(), patchI)
     {
       label curPatch = processorPatches()[patchI];
-      
-      vectorField& curProcInterU = 
-	processorInterfaceDisplacement()[patchI];
-      
+
+      vectorField& curProcInterU =
+    processorInterfaceDisplacement()[patchI];
+
       const vectorField curProcOwnU =
-	U.boundaryField()[curPatch].patchInternalField();
+    U.boundaryField()[curPatch].patchInternalField();
       const vectorField curProcNgbU =
-	U.boundaryField()[curPatch].patchNeighbourField();
-      
+    U.boundaryField()[curPatch].patchNeighbourField();
+
       const tensorField curProcOwnGradU =
-	gradU.boundaryField()[curPatch].patchInternalField();
+    gradU.boundaryField()[curPatch].patchInternalField();
       const tensorField curProcNgbGradU =
-	gradU.boundaryField()[curPatch].patchNeighbourField();
-      
+    gradU.boundaryField()[curPatch].patchNeighbourField();
+
       const vectorField& curProcS =
-	mesh.Sf().boundaryField()[curPatch];
+    mesh.Sf().boundaryField()[curPatch];
       const scalarField& curProcMagS =
-	mesh.magSf().boundaryField()[curPatch];
+    mesh.magSf().boundaryField()[curPatch];
       const scalarField& curProcDeltaCoeffs =
-	mesh.deltaCoeffs().boundaryField()[curPatch];
+    mesh.deltaCoeffs().boundaryField()[curPatch];
       const scalarField& curProcW =
-	mesh.weights().boundaryField()[curPatch];
+    mesh.weights().boundaryField()[curPatch];
       const vectorField curProcOwnC =
-	mesh.C().boundaryField()[curPatch].patchInternalField();
+    mesh.C().boundaryField()[curPatch].patchInternalField();
       const vectorField curProcNgbC =
-	mesh.C().boundaryField()[curPatch].patchNeighbourField();
+    mesh.C().boundaryField()[curPatch].patchNeighbourField();
       const vectorField& curProcCfI =
-	mesh.Cf().boundaryField()[curPatch];
-      
+    mesh.Cf().boundaryField()[curPatch];
+
       const scalarField curProcOwnMu =
-	mu.boundaryField()[curPatch].patchInternalField();
+    mu.boundaryField()[curPatch].patchInternalField();
       const scalarField curProcNgbMu =
-	mu.boundaryField()[curPatch].patchNeighbourField();
-      
+    mu.boundaryField()[curPatch].patchNeighbourField();
+
       const scalarField curProcOwnLambda =
-	lambda.boundaryField()[curPatch].patchInternalField();
+    lambda.boundaryField()[curPatch].patchInternalField();
       const scalarField curProcNgbLambda =
-	lambda.boundaryField()[curPatch].patchNeighbourField();
-      
+    lambda.boundaryField()[curPatch].patchNeighbourField();
+
       const unallocLabelList& curProcFaceCells =
-	mesh.boundary()[curPatch].faceCells();
-      
+    mesh.boundary()[curPatch].faceCells();
+
       forAll(processorPatchFaces()[patchI], faceI)
         {
-	  label curFace = processorPatchFaces()[patchI][faceI];
-	  
-	  scalar ngbDn = curProcW[curFace]*(1.0/curProcDeltaCoeffs[curFace]);
-	  scalar ownDn = (1.0/curProcDeltaCoeffs[curFace]) - ngbDn;
-	  
-	  scalar magS = curProcMagS[curFace];
-	  
-	  scalar ownMu  = curProcOwnMu[curFace];
-	  scalar ngbMu  = curProcNgbMu[curFace];
-	  
-	  scalar ownLambda  = curProcOwnLambda[curFace];
-	  scalar ngbLambda  = curProcNgbLambda[curFace];
-	  
-	  vector ownN = curProcS[curFace]/curProcMagS[curFace];
-	  // vector ngbN = -ownN;
+      label curFace = processorPatchFaces()[patchI][faceI];
 
-	  // extrapolate tangential gradient
-	  tensor ownGradU = curProcOwnGradU[curFace];
-	  tensor ngbGradU = curProcNgbGradU[curFace];
-	  
-	  scalar ownTrGradU = tr(ownGradU); 
-	  scalar ngbTrGradU = tr(ngbGradU); 
-	  
-	  
-	  // Interface displacement
-	  
-	  scalar ownK = (2*ownMu + ownLambda);
-	  scalar ngbK = (2*ngbMu + ngbLambda);
-	  
-	  // explicit terms
-	  vector Qa =
-	    ownMu*(ownN&ownGradU.T())
-	    + (ownLambda*ownTrGradU*ownN)
-	    - (ownMu+ownLambda)*(ownN&ownGradU);
-	  vector Qb =
-	    ngbMu*(ownN&ngbGradU.T())
-	    + (ngbLambda*ngbTrGradU*ownN)
-	    - (ngbMu+ngbLambda)*(ownN&ngbGradU);
-	  
-	  // non orthogonal correction terms
-	  
-	  // delta vectors
-	  //vector delta = curProcNgbC[curFace] - curProcOwnC[curFace];
-	  //vector ownDelta = curProcW[curFace]*delta;
-	  //vector ngbDelta = delta - ownDelta;
-	  // it is more accurate to use the face to cell vectors
-	  // because cells either side of the interface have different
-	  // non-orthogonality
-	  vector ownDelta = curProcCfI[curFace] - curProcOwnC[curFace];
-	  vector ngbDelta = curProcNgbC[curFace] - curProcCfI[curFace];
-	  
-	  // correction vectors
-	  vector ownKcorr = pos(ownN & ownDelta)*(ownN - (ownDelta/ownDn));
-	  vector ngbKcorr = pos(ownN & ngbDelta)*(ownN - (ngbDelta/ngbDn));
-	  vector ownCorrection = ownKcorr & ownGradU;
-	  vector ngbCorrection = ngbKcorr & ngbGradU;
-	  Qa += (2.0*ownMu + ownLambda) * ( ownCorrection );
-	  Qb += (2.0*ngbMu + ngbLambda) * ( ngbCorrection );
+      scalar ngbDn = curProcW[curFace]*(1.0/curProcDeltaCoeffs[curFace]);
+      scalar ownDn = (1.0/curProcDeltaCoeffs[curFace]) - ngbDn;
 
-	  // nonlinear terms
-	  tensor ownGradUGradUT = ownGradU & ownGradU.T();
-	  tensor ngbGradUGradUT = ngbGradU & ngbGradU.T();
-	  
-	  // add on higher order terms
-	  Qa += (ownMu*ownN&(ownGradUGradUT)) + (0.5*ownLambda*ownN*tr(ownGradUGradUT));
-	  Qb += (ngbMu*ownN&(ngbGradUGradUT)) + (0.5*ngbLambda*ownN*tr(ngbGradUGradUT));
-	  
-	  vector ownU = curProcOwnU[curFace];
-	  vector ngbU = curProcNgbU[curFace];
-	  
-	  curProcInterU[faceI] =
-	    (
-	     ownK*ngbDn*ownU + ngbK*ownDn*ngbU
-	     + (ownDn*ngbDn*(Qb - Qa))
-	     )
-	    /(ownK*ngbDn + ngbK*ownDn);
-	  
-	  
-	  // Implicit coupling
-	  
-	  scalar wRevLin = 1.0 - curProcW[curFace];
-          
-	  scalar Kf = 1.0/(wRevLin/ownK + (1.0-wRevLin)/ngbK);
-          
-	  scalar Dnf = 1.0/curProcDeltaCoeffs[curFace];
-	  
-	  // Owner
-	  diag[curProcFaceCells[curFace]] += Kf*magS/Dnf;
-	  
-	  boundaryCoeffs[curPatch][curFace] += Kf*magS*vector::one/Dnf;
-	  
-	  // no decomposition
-	  source[curProcFaceCells[curFace]] +=
-	    (
-	     ownK*ngbDn*Qb 
-	     + ngbK*ownDn*Qa
-	     )*magS
-	    /(ownK*ngbDn + ngbK*ownDn);
+      scalar magS = curProcMagS[curFace];
+
+      scalar ownMu  = curProcOwnMu[curFace];
+      scalar ngbMu  = curProcNgbMu[curFace];
+
+      scalar ownLambda  = curProcOwnLambda[curFace];
+      scalar ngbLambda  = curProcNgbLambda[curFace];
+
+      vector ownN = curProcS[curFace]/curProcMagS[curFace];
+      // vector ngbN = -ownN;
+
+      // extrapolate tangential gradient
+      tensor ownGradU = curProcOwnGradU[curFace];
+      tensor ngbGradU = curProcNgbGradU[curFace];
+
+      scalar ownTrGradU = tr(ownGradU);
+      scalar ngbTrGradU = tr(ngbGradU);
+
+
+      // Interface displacement
+
+      scalar ownK = (2*ownMu + ownLambda);
+      scalar ngbK = (2*ngbMu + ngbLambda);
+
+      // explicit terms
+      vector Qa =
+        ownMu*(ownN&ownGradU.T())
+        + (ownLambda*ownTrGradU*ownN)
+        - (ownMu+ownLambda)*(ownN&ownGradU);
+      vector Qb =
+        ngbMu*(ownN&ngbGradU.T())
+        + (ngbLambda*ngbTrGradU*ownN)
+        - (ngbMu+ngbLambda)*(ownN&ngbGradU);
+
+      // non orthogonal correction terms
+
+      // delta vectors
+      //vector delta = curProcNgbC[curFace] - curProcOwnC[curFace];
+      //vector ownDelta = curProcW[curFace]*delta;
+      //vector ngbDelta = delta - ownDelta;
+      // it is more accurate to use the face to cell vectors
+      // because cells either side of the interface have different
+      // non-orthogonality
+      vector ownDelta = curProcCfI[curFace] - curProcOwnC[curFace];
+      vector ngbDelta = curProcNgbC[curFace] - curProcCfI[curFace];
+
+      // correction vectors
+      vector ownKcorr = pos(ownN & ownDelta)*(ownN - (ownDelta/ownDn));
+      vector ngbKcorr = pos(ownN & ngbDelta)*(ownN - (ngbDelta/ngbDn));
+      vector ownCorrection = ownKcorr & ownGradU;
+      vector ngbCorrection = ngbKcorr & ngbGradU;
+      Qa += (2.0*ownMu + ownLambda) * ( ownCorrection );
+      Qb += (2.0*ngbMu + ngbLambda) * ( ngbCorrection );
+
+      // nonlinear terms
+      tensor ownGradUGradUT = ownGradU & ownGradU.T();
+      tensor ngbGradUGradUT = ngbGradU & ngbGradU.T();
+
+      // add on higher order terms
+      Qa +=
+          (ownMu*ownN&(ownGradUGradUT))
+          + (0.5*ownLambda*ownN*tr(ownGradUGradUT));
+      Qb +=
+          (ngbMu*ownN&(ngbGradUGradUT))
+          + (0.5*ngbLambda*ownN*tr(ngbGradUGradUT));
+
+      vector ownU = curProcOwnU[curFace];
+      vector ngbU = curProcNgbU[curFace];
+
+      curProcInterU[faceI] =
+        (
+         ownK*ngbDn*ownU + ngbK*ownDn*ngbU
+         + (ownDn*ngbDn*(Qb - Qa))
+         )
+        /(ownK*ngbDn + ngbK*ownDn);
+
+
+      // Implicit coupling
+
+      scalar wRevLin = 1.0 - curProcW[curFace];
+
+      scalar Kf = 1.0/(wRevLin/ownK + (1.0-wRevLin)/ngbK);
+
+      scalar Dnf = 1.0/curProcDeltaCoeffs[curFace];
+
+      // Owner
+      diag[curProcFaceCells[curFace]] += Kf*magS/Dnf;
+
+      boundaryCoeffs[curPatch][curFace] += Kf*magS*vector::one/Dnf;
+
+      // no decomposition
+      source[curProcFaceCells[curFace]] +=
+        (
+         ownK*ngbDn*Qb
+         + ngbK*ownDn*Qa
+         )*magS
+        /(ownK*ngbDn + ngbK*ownDn);
         }
     }
 }

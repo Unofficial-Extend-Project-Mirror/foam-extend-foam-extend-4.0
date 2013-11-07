@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 # include "checkTimeOptions.H"
 
   runTime.setTime(Times[startTime], startTime);
-  
+
 # include "createMesh.H"
 
   bool noMeshUpdate = args.optionFound("noMeshUpdate");
@@ -64,9 +64,10 @@ int main(int argc, char *argv[])
 
   // check patch exists
   label patchID = mesh.boundaryMesh().findPatchID(patchName);
-  if(patchID == -1)
+  if (patchID == -1)
     {
-      FatalError << "Cannot find patch " << patchName << exit(FatalError);
+      FatalError
+          << "Cannot find patch " << patchName << exit(FatalError);
     }
 
   // open file
@@ -78,100 +79,105 @@ int main(int argc, char *argv[])
   forceDispFile << endl;
 
   for (label i=startTime; i<endTime; i++)
-    {
+  {
       runTime.setTime(Times[i], i);
 
       Info<< "Time = " << runTime.timeName() << endl;
 
-      if(!noMeshUpdate)
-	{
-	  mesh.readUpdate();
-	}
+      if (!noMeshUpdate)
+      {
+          mesh.readUpdate();
+      }
 
-        IOobject sigmaheader
-	  (
-	   "sigma",
-	   runTime.timeName(),
-	   mesh,
-	   IOobject::MUST_READ
-	   );
+      IOobject sigmaheader
+          (
+              "sigma",
+              runTime.timeName(),
+              mesh,
+              IOobject::MUST_READ
+              );
 
-        IOobject Uheader
-	  (
-	   "U",
-	   runTime.timeName(),
-	   mesh,
-	   IOobject::MUST_READ
-	   );
+      IOobject Uheader
+          (
+              "U",
+              runTime.timeName(),
+              mesh,
+              IOobject::MUST_READ
+              );
 
-        // Check sigma exists
-        if (sigmaheader.headerOk() && Uheader.headerOk())
-	  {
-            Info<< "    Reading sigma" << endl;
-            volSymmTensorField sigma(sigmaheader, mesh);
-            Info<< "    Reading U" << endl;
-            volVectorField U(Uheader, mesh);
-      
-	    Info << nl;
-      
-	    // calculate patch force
-	    const vectorField n = mesh.boundary()[patchID].nf();
-	    const vectorField& Sf = mesh.boundary()[patchID].Sf();
-	    const symmTensorField& sigmaPatch = sigma.boundaryField()[patchID];
-	    vector totalForce = vector::zero;
-	    scalar normalForce = 0.0;
-	    scalar shearForce = 0.0;
-	    if(nonLinear)
-	      {
-		// assuming sigma is the second Piola-Kirchhoff tensor
+      // Check sigma exists
+      if (sigmaheader.headerOk() && Uheader.headerOk())
+      {
+          Info<< "    Reading sigma" << endl;
+          volSymmTensorField sigma(sigmaheader, mesh);
+          Info<< "    Reading U" << endl;
+          volVectorField U(Uheader, mesh);
 
-		// get deformation gradient
-		volTensorField gradU
-		  (
-		   IOobject
-		       (
-			"grad(U)",
-			runTime.timeName(),
-			mesh,
-			IOobject::MUST_READ,
-			IOobject::NO_WRITE
-			),
-		   mesh
-		   );
-		tensorField F = I + gradU.boundaryField()[patchID];
-		vectorField force = Sf & (sigmaPatch & F);
-		tensorField Finv = inv(F);
-		vectorField nCur = Finv & n;
-		nCur /= mag(nCur);
-		normalForce = sum(nCur & force);
-		shearForce = sum( mag((I - sqr(nCur)) & force) );
-		totalForce = sum(force);
-	      }
-	    else
-	      {
-		// small strain or UL large strain (as the mesh is moved and sigma is Cauchy)
-		//Info << "\tSmall Strain Total Lagrangian"<<nl<<endl;
-		vectorField force = Sf & sigmaPatch;
-		normalForce = sum(n & force);
-		shearForce = sum( mag((I - sqr(n)) & force) );
-		totalForce = sum(force);
-	      }
+          Info << nl;
 
-	    // calculate average displacement
-	    // these should be a weighted average but OK for most models
-	    vector disp = average(U.boundaryField()[patchID]);
+          // calculate patch force
+          const vectorField n = mesh.boundary()[patchID].nf();
+          const vectorField& Sf = mesh.boundary()[patchID].Sf();
+          const symmTensorField& sigmaPatch = sigma.boundaryField()[patchID];
+          vector totalForce = vector::zero;
+          scalar normalForce = 0.0;
+          scalar shearForce = 0.0;
+          if (nonLinear)
+          {
+              // assuming sigma is the second Piola-Kirchhoff tensor
 
-	    // write to file
-	    forceDispFile << disp.x() << " " << disp.y() << " " << disp.z();
-	    forceDispFile.width(width);
-	    forceDispFile << totalForce.x() << " " << totalForce.y() << " " << totalForce.z();
-	    forceDispFile << " " << normalForce << " " << shearForce;
-	    forceDispFile << endl;
-	  }
-    }
-  
+              // get deformation gradient
+              volTensorField gradU
+                  (
+                      IOobject
+                      (
+                          "grad(U)",
+                          runTime.timeName(),
+                          mesh,
+                          IOobject::MUST_READ,
+                          IOobject::NO_WRITE
+                          ),
+                      mesh
+                      );
+              tensorField F = I + gradU.boundaryField()[patchID];
+              vectorField force = Sf & (sigmaPatch & F);
+              tensorField Finv = inv(F);
+              vectorField nCur = Finv & n;
+              nCur /= mag(nCur);
+              normalForce = sum(nCur & force);
+              shearForce = sum( mag((I - sqr(nCur)) & force) );
+              totalForce = sum(force);
+          }
+          else
+          {
+              // small strain or UL large strain
+              // (as the mesh is moved and sigma is Cauchy)
+              //Info << "\tSmall Strain Total Lagrangian"<<nl<<endl;
+              vectorField force = Sf & sigmaPatch;
+              normalForce = sum(n & force);
+              shearForce = sum( mag((I - sqr(n)) & force) );
+              totalForce = sum(force);
+          }
+
+          // calculate average displacement
+          // these should be a weighted average but OK for most models
+          vector disp = average(U.boundaryField()[patchID]);
+
+          // write to file
+          forceDispFile
+              << disp.x() << " " << disp.y() << " " << disp.z();
+          forceDispFile.width(width);
+          forceDispFile
+              << totalForce.x() << " " << totalForce.y()
+              << " " << totalForce.z();
+          forceDispFile
+              << " " << normalForce << " " << shearForce
+              << endl;
+      }
+  }
+
   Info << nl << "End" << endl;
-  
+
   return 0;
 }
 

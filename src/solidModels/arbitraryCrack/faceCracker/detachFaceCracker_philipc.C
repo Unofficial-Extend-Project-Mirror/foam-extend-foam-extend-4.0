@@ -90,9 +90,6 @@ void Foam::faceCracker::detachFaceCracker
 
         if (edgeIsInternal)
         {
-	  // Pout<< "Internal edge found: (" << mp[zoneLocalEdges[curEdgeID].start()] << " "
-	  //<< mp[zoneLocalEdges[curEdgeID].end()] << ")" << endl;
-
             // Reset the point creation
             addedPoints[zoneLocalEdges[curEdgeID].start()] =
                 mp[zoneLocalEdges[curEdgeID].start()];
@@ -119,7 +116,6 @@ void Foam::faceCracker::detachFaceCracker
                         true                       // supports a cell
                     )
                 );
-	    // Pout << "Adding point " << points[mp[pointI]] << " for original point " << mp[pointI] << endl;
         }
     }
 
@@ -183,9 +179,8 @@ void Foam::faceCracker::detachFaceCracker
                     false                           // zone flip
                 )
             );
-	    // Pout << "Flip.  Modifying face: " << faces[curFaceID].reverseFace()
-	    //<< " next to cell: " << nei[curFaceID] << " and adding face: " << newFace
-	    //<< " next to cell: " << own[curFaceID] << endl;
+        // Pout << "Flip.  Modifying face: " << faces[curFaceID].reverseFace()
+        //<< " next to cell: " << own[curFaceID] << endl;
         }
         else
         {
@@ -223,9 +218,8 @@ void Foam::faceCracker::detachFaceCracker
                     false                           // face flip in zone
                 )
             );
-	    // Pout << "No flip.  Modifying face: " << faces[curFaceID]
-	    //<< " next to cell: " << own[curFaceID] << " and adding face: " << newFace
-	    //<< " next to cell: " << nei[curFaceID] << endl;
+        // Pout << "No flip.  Modifying face: " << faces[curFaceID]
+        //<< " next to cell: " << nei[curFaceID] << endl;
         }
     }
 
@@ -281,29 +275,15 @@ void Foam::faceCracker::detachFaceCracker
         // faces to the map
         const labelList mcf = masterCellFaceMap.toc();
 
-	Info << "mcf.size() " << mcf.size() << endl;
-
-	// philipc debugging
-	  // {
-	  //   scalar ownCell = 12;
-	  //   Info << "adding ownCell 12" << endl;
-	  //   const cell& curFaces = cells[ownCell];
-	    
-	  //   forAll (curFaces, faceI)
-	  //     {
-	  // 	masterCellFaceMap.insert(curFaces[faceI]);
-	  //     }
-	  // }
-
         forAll (mcf, mcfI)
         {
-	  Info << nl << "mcf[mcfI] " << mcf[mcfI] << endl;
+      Info << nl << "mcf[mcfI] " << mcf[mcfI] << endl;
             // Do the owner side
             const label ownCell = own[mcf[mcfI]];
 
             if (!mcMap.found(ownCell))
             {
-	      Info << "ownCell " << ownCell << endl;
+          Info << "ownCell " << ownCell << endl;
                 // Cell not found. Add its faces to the map
                 const cell& curFaces = cells[ownCell];
 
@@ -316,13 +296,11 @@ void Foam::faceCracker::detachFaceCracker
             // Do the neighbour side if face is internal
             if (mesh.isInternalFace(mcf[mcfI]))
             {
-	      const label neiCell = nei[mcf[mcfI]];
+                const label neiCell = nei[mcf[mcfI]];
 
                 if (!mcMap.found(neiCell))
                 {
-		  Info << "neiCell " << neiCell << endl;
-                  
-		  // Cell not found. Add its faces to the map
+                    // Cell not found. Add its faces to the map
                     const cell& curFaces = cells[neiCell];
 
                     forAll (curFaces, faceI)
@@ -396,9 +374,6 @@ void Foam::faceCracker::detachFaceCracker
                         false                       // face zone flip
                     )
                 );
-		// Pout << "modifying stick-out face. Internal Old face: " << oldFace
-		//<< " new face: " << newFace << " own: " << own[curFaceID]
-		//<< " nei: " << nei[curFaceID] << endl;
             }
             else
             {
@@ -415,11 +390,8 @@ void Foam::faceCracker::detachFaceCracker
                         false,                        // remove from zone
                         -1,                           // zone for face
                         false                         // face zone flip
-                    )
-		 );
-		// Pout << "modifying stick-out face. Boundary Old face: " << oldFace
-		//<< " new face: " << newFace << " own: " << own[curFaceID]
-		//<< " patch: " << mesh.boundaryMesh().whichPatch(curFaceID) << endl;
+                        )
+                    );
             }
         }
     }

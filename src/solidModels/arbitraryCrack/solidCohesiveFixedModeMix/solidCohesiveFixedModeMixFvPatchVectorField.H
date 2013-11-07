@@ -32,7 +32,7 @@ Description
     Fixing the mode-mixity is only a valid approach when the
     it is clear that the mode-mixity does not change or if the
     damage zones are small.
-    
+
     This boundary was originally called cohesiveLawFvPatchVectorField.
     There are a couple of changes:
     cohesive law is looked up from constitutive model;
@@ -116,7 +116,7 @@ class solidCohesiveFixedModeMixFvPatchVectorField
         //  cohesive traction for the negative normal separation distance
         Switch contact_;
 
-        //- Constant which determins slope of negative (contact) 
+        //- Constant which determins slope of negative (contact)
         //  part of the traction separation curve
         scalar contactConstant_;
 

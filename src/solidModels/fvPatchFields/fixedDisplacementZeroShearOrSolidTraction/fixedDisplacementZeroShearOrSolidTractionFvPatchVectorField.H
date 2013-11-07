@@ -118,7 +118,8 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given fixedDisplacementZeroShearOrSolidTractionFvPatchVectorField
+        //- Construct by mapping given
+        // fixedDisplacementZeroShearOrSolidTractionFvPatchVectorField
         //  onto a new patch
         fixedDisplacementZeroShearOrSolidTractionFvPatchVectorField
         (
@@ -133,7 +134,10 @@ public:
         {
             return tmp<fvPatchField<vector> >
             (
-                new fixedDisplacementZeroShearOrSolidTractionFvPatchVectorField(*this)
+                new fixedDisplacementZeroShearOrSolidTractionFvPatchVectorField
+                (
+                    *this
+                    )
             );
         }
 
@@ -152,7 +156,11 @@ public:
         {
             return tmp<fvPatchField<vector> >
             (
-                new fixedDisplacementZeroShearOrSolidTractionFvPatchVectorField(*this, iF)
+                new fixedDisplacementZeroShearOrSolidTractionFvPatchVectorField
+                (
+                    *this,
+                    iF
+                    )
             );
         }
 

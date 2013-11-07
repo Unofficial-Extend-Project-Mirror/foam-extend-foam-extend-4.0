@@ -63,7 +63,9 @@ rheologyLaw::rheologyLaw
 
 Foam::tmp<Foam::volDiagTensorField> Foam::rheologyLaw::K() const
 {
-  volScalarField J = ( (1 - nu()*nu() - nu()*nu() - nu()*nu() - 2*nu()*nu()*nu()) / (E()*E()*E()) );
+  volScalarField J =
+      ( (1 - nu()*nu() - nu()*nu() - nu()*nu() - 2*nu()*nu()*nu())
+        /(E()*E()*E()) );
   volScalarField A11 = ( (1 - nu()*nu())/(J*E()*E()) );
   volScalarField A22 = ( (1 - nu()*nu())/(J*E()*E()) );
   volScalarField A33 = ( (1 - nu()*nu())/(J*E()*E()) );
@@ -81,7 +83,7 @@ Foam::tmp<Foam::volDiagTensorField> Foam::rheologyLaw::K() const
                 IOobject::NO_WRITE
             ),
             mesh(),
-	    dimensionedDiagTensor("K", A11.dimensions(), diagTensor::zero)
+        dimensionedDiagTensor("K", A11.dimensions(), diagTensor::zero)
         )
     );
 
@@ -104,13 +106,13 @@ Foam::tmp<Foam::volSymmTensor4thOrderField> Foam::rheologyLaw::C() const
   volScalarField twoMuLambda = twoMu + lambda;
 
   // symmTensor4thOrder C (
-  // 			2*mu + lambda, lambda, lambda,
-  // 			2*mu + lambda, lambda,
-  // 			2*mu + lambda,
-  // 			2*mu,
-  // 			2*mu,
-  // 			2*mu
-  // 			);
+  //            2*mu + lambda, lambda, lambda,
+  //            2*mu + lambda, lambda,
+  //            2*mu + lambda,
+  //            2*mu,
+  //            2*mu,
+  //            2*mu
+  //            );
 
   tmp<volSymmTensor4thOrderField> tresult
     (
@@ -125,7 +127,8 @@ Foam::tmp<Foam::volSymmTensor4thOrderField> Foam::rheologyLaw::C() const
                 IOobject::NO_WRITE
             ),
             mesh(),
-	    dimensionedSymmTensor4thOrder("C", twoMu.dimensions(), symmTensor4thOrder::zero)
+            dimensionedSymmTensor4thOrder
+            ("C", twoMu.dimensions(), symmTensor4thOrder::zero)
         )
     );
 
@@ -145,7 +148,7 @@ Foam::tmp<Foam::volSymmTensor4thOrderField> Foam::rheologyLaw::C() const
   result.replace(symmTensor4thOrder::ZXZX, twoMu);
 
   tresult().correctBoundaryConditions();
-  
+
   return tresult;
 }
 

@@ -85,7 +85,7 @@ class constitutiveModel
         //- Run-time selectable solidInterface method for correct discretisation
         // on bi-material interfaces
         autoPtr<solidInterface> solidInterfacePtr_;
-        
+
         // we use IOReferencer to allow lookup of solidInterface object in
         // the objectRegistry, for instance to be used by
         // leastSquaresSolidInterface gradScheme
@@ -121,8 +121,8 @@ public:
         //- Construct from components
         constitutiveModel
         (
-	   const volSymmTensorField& sigma,
-	   const volVectorField& U
+       const volSymmTensorField& sigma,
+       const volVectorField& U
         );
 
 
@@ -138,17 +138,17 @@ public:
         //- If plasticity is active
         bool plasticityActive() const
         {
-	  if(plasticityStressReturnPtr_.valid())
-	    {
-	      return plasticityStressReturnPtr_->plasticityActive();
-	    }
-	  return false;
+      if (plasticityStressReturnPtr_.valid())
+        {
+          return plasticityStressReturnPtr_->plasticityActive();
+        }
+      return false;
         }
 
         //- If visco effects are active
         bool viscoActive() const
         {
-	  return rheologyLawPtr_->viscoActive();
+      return rheologyLawPtr_->viscoActive();
         }
 
         //- Return reference to stress field
@@ -226,7 +226,7 @@ public:
 
         //- Return plastic strain increment
         const volSymmTensorField& DEpsilonP() const;
-    
+
         //- orthotropic tensorial diffusivity
         //- Note: this is not the bulk modulus
         tmp<volDiagTensorField> K() const;
@@ -242,14 +242,14 @@ public:
         //- Return reference to solidInterface
         virtual solidInterface& solInterface()
         {
-	  return solidInterfacePtr_();
-	}
+      return solidInterfacePtr_();
+    }
 
         //- Return true if solidInterface is active
         virtual bool solidInterfaceActive()
         {
-	  return solidInterfaceActive_;
-	}
+      return solidInterfaceActive_;
+    }
 
         //- Update yield stress
         void updateYieldStress();

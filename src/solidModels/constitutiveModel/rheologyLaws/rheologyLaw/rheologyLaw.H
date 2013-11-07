@@ -174,20 +174,22 @@ public:
         //- Return yield stress
         virtual tmp<volScalarField> sigmaY() const = 0;
 
-        //- Return yield stress for given cellID - cellID needed for multiple materials
-        virtual scalar sigmaY(const scalar epsilonPEq, const label cellID) const = 0;
+        //- Return yield stress for given cellID
+        // cellID needed for multiple materials
+        virtual scalar sigmaY
+        (const scalar epsilonPEq, const label cellID) const = 0;
 
         //- If the rheologyLaw needs plasticity procedures
         virtual bool plasticityModelNeeded() const
         {
-	  return false;
-	};
+            return false;
+        };
 
         //- If effects are active
         virtual bool viscoActive() const
         {
-	  return false;
-	};
+            return false;
+        };
 
         //- Return plastic modulus
         virtual tmp<volScalarField> Ep() const = 0;

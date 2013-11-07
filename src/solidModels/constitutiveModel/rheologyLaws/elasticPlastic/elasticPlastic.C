@@ -1,23 +1,28 @@
-// The FOAM Project // File: elasticPlastic.C
-/*
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright (C) 2004-2007 Hrvoje Jasak
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
- =========         | Class Implementation
- \\      /         |
-  \\    /          | Name:   elasticPlastic
-   \\  /           | Family: rheologyLaw
-    \\/            |
-    F ield         | FOAM version: 2.3
-    O peration     |
-    A and          | Copyright (C) 1991-2004 Nabla Ltd.
-    M anipulation  |          All Rights Reserved.
--------------------------------------------------------------------------------
-DESCRIPTION
+License
+    This file is part of OpenFOAM.
 
-AUTHOR
-    Hrvoje Jasak.
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
 
--------------------------------------------------------------------------------
-*/
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+\*---------------------------------------------------------------------------*/
 
 #include "elasticPlastic.H"
 #include "addToRunTimeSelectionTable.H"
@@ -149,7 +154,8 @@ Foam::tmp<Foam::volScalarField> Foam::elasticPlastic::sigmaY() const
     );
 }
 
-Foam::scalar Foam::elasticPlastic::sigmaY(const scalar epsilonPEq, const label cellID) const
+Foam::scalar
+Foam::elasticPlastic::sigmaY(const scalar epsilonPEq, const label cellID) const
 {
   return sigmaY_.value();
 }

@@ -37,7 +37,8 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-timeVaryingFixedDisplacementFvPatchVectorField::timeVaryingFixedDisplacementFvPatchVectorField
+timeVaryingFixedDisplacementFvPatchVectorField::
+timeVaryingFixedDisplacementFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF
@@ -48,7 +49,8 @@ timeVaryingFixedDisplacementFvPatchVectorField::timeVaryingFixedDisplacementFvPa
 {}
 
 
-timeVaryingFixedDisplacementFvPatchVectorField::timeVaryingFixedDisplacementFvPatchVectorField
+timeVaryingFixedDisplacementFvPatchVectorField::
+timeVaryingFixedDisplacementFvPatchVectorField
 (
     const timeVaryingFixedDisplacementFvPatchVectorField& ptf,
     const fvPatch& p,
@@ -61,7 +63,8 @@ timeVaryingFixedDisplacementFvPatchVectorField::timeVaryingFixedDisplacementFvPa
 {}
 
 
-timeVaryingFixedDisplacementFvPatchVectorField::timeVaryingFixedDisplacementFvPatchVectorField
+timeVaryingFixedDisplacementFvPatchVectorField::
+timeVaryingFixedDisplacementFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF,
@@ -73,7 +76,8 @@ timeVaryingFixedDisplacementFvPatchVectorField::timeVaryingFixedDisplacementFvPa
 {}
 
 
-timeVaryingFixedDisplacementFvPatchVectorField::timeVaryingFixedDisplacementFvPatchVectorField
+timeVaryingFixedDisplacementFvPatchVectorField::
+timeVaryingFixedDisplacementFvPatchVectorField
 (
     const timeVaryingFixedDisplacementFvPatchVectorField& tvfdpvf
 )
@@ -83,7 +87,8 @@ timeVaryingFixedDisplacementFvPatchVectorField::timeVaryingFixedDisplacementFvPa
 {}
 
 
-timeVaryingFixedDisplacementFvPatchVectorField::timeVaryingFixedDisplacementFvPatchVectorField
+timeVaryingFixedDisplacementFvPatchVectorField::
+timeVaryingFixedDisplacementFvPatchVectorField
 (
     const timeVaryingFixedDisplacementFvPatchVectorField& tvfdpvf,
     const DimensionedField<vector, volMesh>& iF
@@ -103,19 +108,24 @@ void timeVaryingFixedDisplacementFvPatchVectorField::updateCoeffs()
         return;
     }
 
-    vectorField disp(patch().size(), timeSeries_(this->db().time().timeOutputValue()));
-	  
-    if(fieldName() == "DU")
-      {
+    vectorField disp
+        (
+            patch().size(),
+            timeSeries_(this->db().time().timeOutputValue())
+            );
+
+    if (fieldName() == "DU")
+    {
         const fvPatchField<vector>& U =
           patch().lookupPatchField<volVectorField, vector>("U");
         disp -= U;
       }
-    else if(fieldName() != "U")
-      { 
-	FatalError << "The displacement field should be U or DU"
-                   << exit(FatalError);
-      }
+    else if (fieldName() != "U")
+    {
+        FatalError
+            << "The displacement field should be U or DU"
+            << exit(FatalError);
+    }
 
     fvPatchField<vector>::operator==
     (

@@ -72,7 +72,7 @@ scalar coulombFriction::slipTraction(const scalar pressure)
 void coulombFriction::writeDict(Ostream& os) const
 {
   word keyword("frictionLawDict");
-  os.writeKeyword(keyword) 
+  os.writeKeyword(keyword)
     << frictionLawDict_;
 }
 

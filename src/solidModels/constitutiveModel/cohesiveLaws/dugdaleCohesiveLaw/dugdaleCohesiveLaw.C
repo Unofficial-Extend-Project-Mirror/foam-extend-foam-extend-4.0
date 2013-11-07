@@ -71,7 +71,7 @@ Foam::dugdaleCohesiveLaw::~dugdaleCohesiveLaw()
 Foam::tmp<Foam::volScalarField> Foam::dugdaleCohesiveLaw::materials() const
 {
   notImplemented(type() + "::materials()");
-  
+
     return tmp<volScalarField>
     (
         new volScalarField
@@ -185,19 +185,27 @@ void Foam::dugdaleCohesiveLaw::damageTractions
 {
   // Update normal traction
   tN = (
-	sigmaMax_.value() * deltaN /
-	(SMALL + ::sqrt( (deltaN*deltaN) + (deltaS*deltaS)*(sigmaMax_.value()*sigmaMax_.value()/(tauMax_.value()*tauMax_.value())) ))
-	);
+    sigmaMax_.value() * deltaN /
+    (SMALL + ::sqrt( (deltaN*deltaN)
+                     + (deltaS*deltaS)*(sigmaMax_.value()*sigmaMax_.value()
+                                        /(tauMax_.value()*tauMax_.value()))
+        )
+        )
+    );
 
   // Update shear traction
   tS = (
-	tauMax_.value() * deltaS /
-	(SMALL + ::sqrt( (deltaS*deltaS) + (deltaN*deltaN)*(tauMax_.value()*tauMax_.value()/(sigmaMax_.value()*sigmaMax_.value())) ))
-	);
+    tauMax_.value() * deltaS /
+    (SMALL + ::sqrt( (deltaS*deltaS)
+                     + (deltaN*deltaN)*(tauMax_.value()*tauMax_.value()
+                                        /(sigmaMax_.value()*sigmaMax_.value()))
+        )
+        )
+    );
 }
 
 
-Foam::tmp<Foam::surfaceVectorField> 
+Foam::tmp<Foam::surfaceVectorField>
 Foam::dugdaleCohesiveLaw::interfaceTraction
 (
  surfaceVectorField n,
@@ -215,15 +223,15 @@ Foam::dugdaleCohesiveLaw::interfaceTraction
         (
             IOobject
             (
-	        "interfaceTraction",
-	        mesh().time().timeName(),
-	        mesh(),
-	        IOobject::NO_READ,
-	        IOobject::NO_WRITE
-	    ),
+            "interfaceTraction",
+            mesh().time().timeName(),
+            mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
             mesh(),
             dimensionedVector("zero", dimForce/dimArea, vector(0, 0, 0))
-	)
+    )
     );
 
     return tresult;

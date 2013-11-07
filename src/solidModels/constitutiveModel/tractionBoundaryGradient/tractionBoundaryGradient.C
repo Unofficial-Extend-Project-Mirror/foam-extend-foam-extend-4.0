@@ -65,23 +65,19 @@ tmp<vectorField> tractionBoundaryGradient::traction
     );
     vectorField& traction = ttraction();
 
-    if(orthotropic)
+    if (orthotropic)
     {
-    // for now, turn off orthotropic
-    FatalError << "tractionBoundaryGradient::traction is not written for orthotropic yet" << nl
-           << "you are probably trying to use solidContact boundaries with orthotropic solver" << nl
-           << "it should be straight-forward but I have not done it yet!"
-           << exit(FatalError);
-      }
+        // for now, turn off orthotropic
+        FatalError
+            << "tractionBoundaryGradient::traction is not written for"
+            << " orthotropic yet" << nl
+            << "you are probably trying to use solidContact boundaries "
+            << "with orthotropic solver" << nl
+            << "it should be straight-forward but I have not done it yet!"
+            << exit(FatalError);
+    }
     else
       {
-    // lookup material properties
-    // const constitutiveModel& rheology =
-    //   patch.boundaryMesh().mesh().objectRegistry::lookupObject<constitutiveModel>("rheologyProperties");
-    // scalarField mu =
-    //   rheology.mu()().boundaryField()[patch.index()];
-    // scalarField lambda =
-    //   rheology.lambda()().boundaryField()[patch.index()];
     // lookup material properties from the solver
     const fvPatchField<scalar>& mu =
       patch.lookupPatchField<volScalarField, scalar>("mu");
@@ -89,7 +85,7 @@ tmp<vectorField> tractionBoundaryGradient::traction
       patch.lookupPatchField<volScalarField, scalar>("lambda");
 
     // only for nonlinear elastic properties
-    // if(rheology.type() == plasticityModel::typeName)
+    // if (rheology.type() == plasticityModel::typeName)
     //   {
     //     const plasticityModel& plasticity =
     //       refCast<const plasticityModel>(rheology);
@@ -108,23 +104,27 @@ tmp<vectorField> tractionBoundaryGradient::traction
 
     //- if there is plasticity
     const constitutiveModel& rheology =
-      patch.boundaryMesh().mesh().objectRegistry::lookupObject<constitutiveModel>("rheologyProperties");
-    if(rheology.plasticityActive())
+      patch.boundaryMesh().mesh().objectRegistry::
+        lookupObject<constitutiveModel>("rheologyProperties");
+    if (rheology.plasticityActive())
       {
         traction -=
           2*mu*(n & rheology.DEpsilonP().boundaryField()[patch.index()]);
       }
 
     //- if there are thermal effects
-    if(patch.boundaryMesh().mesh().objectRegistry::foundObject<thermalModel>("thermalProperties"))
+    if (patch.boundaryMesh().mesh().objectRegistry::
+        foundObject<thermalModel>("thermalProperties"))
       {
         const thermalModel& thermo =
-          patch.boundaryMesh().mesh().objectRegistry::lookupObject<thermalModel>("thermalProperties");
+          patch.boundaryMesh().mesh().objectRegistry::
+            lookupObject<thermalModel>("thermalProperties");
 
         const fvPatchField<scalar>& threeKalpha =
-          patch.lookupPatchField<volScalarField, scalar>("((threeK*rho)*alpha)");
+          patch.lookupPatchField<volScalarField, scalar>
+            ("((threeK*rho)*alpha)");
 
-        if(fieldName == "DU")
+        if (fieldName == "DU")
           {
         const fvPatchField<scalar>& DT =
           patch.lookupPatchField<volScalarField, scalar>("DT");
@@ -149,7 +149,7 @@ tmp<vectorField> tractionBoundaryGradient::traction
           (n & (mu*(gradField & gradField.T())))
           + 0.5*n*lambda*(gradField && gradField);
 
-        if(fieldName == "DU" && nonLinear == "totalLagrangian")
+        if (fieldName == "DU" && nonLinear == "totalLagrangian")
           {
         // incremental total Lagrangian
         const fvPatchField<tensor>& gradU =
@@ -163,7 +163,7 @@ tmp<vectorField> tractionBoundaryGradient::traction
 
 
     //- add old stress for incremental approaches
-    if(fieldName == "DU")
+    if (fieldName == "DU")
       {
         // add on old traction
         const fvPatchField<symmTensor>& sigma =
@@ -172,7 +172,7 @@ tmp<vectorField> tractionBoundaryGradient::traction
       }
 
     //- visco-elastic
-    if(rheology.viscoActive())
+    if (rheology.viscoActive())
       {
         const fvPatchField<symmTensor>& DSigmaCorr =
           patch.lookupPatchField<volSymmTensorField, symmTensor>("DSigmaCorr");
@@ -184,7 +184,7 @@ tmp<vectorField> tractionBoundaryGradient::traction
     if (nonLinear == "updatedLagrangian" || nonLinear == "totalLagrangian")
       {
         tensorField F = I + gradField;
-        if(fieldName == "DU" && nonLinear == "totalLagrangian")
+        if (fieldName == "DU" && nonLinear == "totalLagrangian")
           {
         const fvPatchField<tensor>& gradU =
           patch.lookupPatchField<volTensorField, tensor>("grad(U)");
@@ -220,18 +220,15 @@ tmp<vectorField> tractionBoundaryGradient::traction
     // lookup switches
 
     // orthotropic solvers
-    if(orthotropic)
+    if (orthotropic)
       {
     // mechanical properties
     const constitutiveModel& rheology =
-      patch.boundaryMesh().mesh().objectRegistry::lookupObject<constitutiveModel>("rheologyProperties");
-    // these lookups return zero fields - must be a bug somewhere!
-    // const fvPatchField<diagTensor>& K =
-    //   patch.lookupPatchField<volDiagTensorField, tensor>("K");
-    // const fvPatchField<symmTensor4thOrder>& C =
-    //   patch.lookupPatchField<volSymmTensor4thOrderField, symmTensor4thOrder>("C");
+      patch.boundaryMesh().mesh().objectRegistry::
+        lookupObject<constitutiveModel>("rheologyProperties");
     const diagTensorField K = rheology.K()().boundaryField()[patch.index()];
-    const symmTensor4thOrderField C = rheology.C()().boundaryField()[patch.index()];
+    const symmTensor4thOrderField C =
+        rheology.C()().boundaryField()[patch.index()];
 
     // required fields
     vectorField n = patch.nf();
@@ -245,7 +242,7 @@ tmp<vectorField> tractionBoundaryGradient::traction
     tensorField sigmaExp(n.size(), tensor::zero);
 
     //- total Lagrangian small strain
-    if(fieldName == "U" && nonLinear == "off")
+    if (fieldName == "U" && nonLinear == "off")
       {
         //- total traction
         Traction = (traction - n*pressure);
@@ -253,7 +250,7 @@ tmp<vectorField> tractionBoundaryGradient::traction
         sigmaExp = (n*(n&(C && symm(gradField)))) - (K & gradField);
       }
     //- incremental total Lagrangian small strain
-    else if(fieldName == "DU" && nonLinear == "off") //- incremental small strain
+    else if (fieldName == "DU" && nonLinear == "off")
       {
         const fvPatchField<symmTensor>& sigma =
           patch.lookupPatchField<volSymmTensorField, symmTensor>("sigma");
@@ -283,8 +280,10 @@ tmp<vectorField> tractionBoundaryGradient::traction
       }
     else
       {
-        FatalError << "solidTractionOrtho boundary condition not suitable for "
-               << " field " << fieldName << " and " << nonLinear << abort(FatalError);
+        FatalError
+            << "solidTractionOrtho boundary condition not suitable for "
+            << " field " << fieldName << " and " << nonLinear
+            << abort(FatalError);
       }
 
     gradient =
@@ -297,13 +296,6 @@ tmp<vectorField> tractionBoundaryGradient::traction
     // standard isotropic solvers
     else
       {
-    // lookup material properties
-    // const constitutiveModel& rheology =
-    //   patch.boundaryMesh().mesh().objectRegistry::lookupObject<constitutiveModel>("rheologyProperties");
-    //scalarField mu =
-    //rheology.mu()().boundaryField()[patch.index()];
-    //scalarField lambda =
-    //rheology.lambda()().boundaryField()[patch.index()];
     // lookup material properties from the solver
     const fvPatchField<scalar>& mu =
       patch.lookupPatchField<volScalarField, scalar>("mu");
@@ -311,7 +303,7 @@ tmp<vectorField> tractionBoundaryGradient::traction
       patch.lookupPatchField<volScalarField, scalar>("lambda");
 
     // only for nonlinear elastic properties
-    // if(rheology.type() == plasticityModel::typeName)
+    // if (rheology.type() == plasticityModel::typeName)
     //   {
     //     const plasticityModel& plasticity =
     //       refCast<const plasticityModel>(rheology);
@@ -335,13 +327,13 @@ tmp<vectorField> tractionBoundaryGradient::traction
     vectorField Traction(n.size(),vector::zero);
 
     //- total Lagrangian small strain
-    if(fieldName == "U" && nonLinear == "off")
+    if (fieldName == "U" && nonLinear == "off")
       {
         //- total traction
         Traction = (traction - n*pressure);
       }
     //- incremental total Lagrangian small strain
-    else if(fieldName == "DU" && nonLinear == "off") //- incremental small strain
+    else if (fieldName == "DU" && nonLinear == "off")
       {
         const fvPatchField<symmTensor>& sigma =
           patch.lookupPatchField<volSymmTensorField, symmTensor>("sigma");
@@ -356,7 +348,7 @@ tmp<vectorField> tractionBoundaryGradient::traction
           patch.lookupPatchField<volSymmTensorField, symmTensor>("sigma");
 
         tensorField F = I + gradField;
-        if(fieldName == "DU" && nonLinear == "totalLagrangian") // for incr TL
+        if (fieldName == "DU" && nonLinear == "totalLagrangian") // for incr TL
           {
         const fvPatchField<tensor>& gradU =
           patch.lookupPatchField<volTensorField, tensor>("grad(U)");
@@ -370,7 +362,7 @@ tmp<vectorField> tractionBoundaryGradient::traction
 
         Traction = (mag(J * Finv & n) * tractionCauchy & Finv);
 
-        if(fieldName == "DU")
+        if (fieldName == "DU")
           {
         //- increment of 2nd Piola-Kirchhoff traction
         Traction -= (n & sigma);
@@ -378,14 +370,17 @@ tmp<vectorField> tractionBoundaryGradient::traction
       }
     else
       {
-        FatalError << "Field " << fieldName << " and " << nonLinear << " nonLinear are not compatible!"
-               << exit(FatalError);
+        FatalError
+            << "Field " << fieldName << " and " << nonLinear
+            << " nonLinear are not compatible!"
+            << exit(FatalError);
       }
 
     //- visco-elastic
     const constitutiveModel& rheology =
-      patch.boundaryMesh().mesh().objectRegistry::lookupObject<constitutiveModel>("rheologyProperties");
-    if(rheology.viscoActive())
+      patch.boundaryMesh().mesh().objectRegistry::
+        lookupObject<constitutiveModel>("rheologyProperties");
+    if (rheology.viscoActive())
       {
         //Info << "visco active" << endl;
         const fvPatchField<symmTensor>& DSigmaCorr =
@@ -403,7 +398,7 @@ tmp<vectorField> tractionBoundaryGradient::traction
       - n*lambda*tr(gradField);
 
     //- if there is plasticity
-    if(rheology.plasticityActive())
+    if (rheology.plasticityActive())
       {
         //Info << "plasticity is active" << endl;
         gradient +=
@@ -411,15 +406,18 @@ tmp<vectorField> tractionBoundaryGradient::traction
       }
 
     //- if there are thermal effects
-    if(patch.boundaryMesh().mesh().objectRegistry::foundObject<thermalModel>("thermalProperties"))
+    if (patch.boundaryMesh().mesh().objectRegistry::
+        foundObject<thermalModel>("thermalProperties"))
       {
         const thermalModel& thermo =
-          patch.boundaryMesh().mesh().objectRegistry::lookupObject<thermalModel>("thermalProperties");
+          patch.boundaryMesh().mesh().objectRegistry::
+            lookupObject<thermalModel>("thermalProperties");
 
         const fvPatchField<scalar>& threeKalpha =
-          patch.lookupPatchField<volScalarField, scalar>("((threeK*rho)*alpha)");
+          patch.lookupPatchField<volScalarField, scalar>
+            ("((threeK*rho)*alpha)");
 
-        if(fieldName == "DU")
+        if (fieldName == "DU")
           {
         const fvPatchField<scalar>& DT =
           patch.lookupPatchField<volScalarField, scalar>("DT");
@@ -438,136 +436,37 @@ tmp<vectorField> tractionBoundaryGradient::traction
       }
 
     //- higher order non-linear terms
-    if(nonLinear == "updatedLagrangian" || nonLinear == "totalLagrangian")
+    if (nonLinear == "updatedLagrangian" || nonLinear == "totalLagrangian")
       {
-        // apply further under-relation to non-higher order terms
+          // no extra relaxation
+          gradient -=
+              (n & (mu*(gradField & gradField.T())))
+              // + 0.5*n*lambda*(gradField && gradField);
+              + 0.5*n*lambda*tr(gradField & gradField.T());
+          //- tensorial identity
+          //- tr(gradField & gradField.T())*I == (gradField && gradField)*I
 
-//        const fvMesh& mesh = patch.boundaryMesh().mesh();
-
-        // lookup gradUPrevIter
-        // NOTE: grad(DU/U).storePrevIter() must be present in the solver
-        // if(mesh.relax("divDSigmaNonLinExp"))
-//          {
-//        const tensorField& gradFieldPrevIter =
-//          mesh.objectRegistry::lookupObject<volTensorField>("grad("+fieldName+")PrevIter").boundaryField()[patch.index()];
-
-//        // lookup relaxation factor
-//        //scalar relaxFactorNonLin = 1.0;
-//        //if(mesh.relax("divDSigmaNonLinExp"))
-//        //{
-//        scalar relaxFactorNonLin = mesh.relaxationFactor("divDSigmaNonLinExp");
-//            //Info << "relaxFactorNonLin is " << relaxFactorNonLin << endl;
-//        //  }
-
-//        vectorField newHigherOrderTerm =
-//          -(n & (mu*(gradField & gradField.T())))
-//          - 0.5*n*lambda*(gradField && gradField);
-
-//        vectorField prevHigherOrderTerm =
-//          -(n & (mu*(gradFieldPrevIter & gradFieldPrevIter.T())))
-//          - 0.5*n*lambda*(gradFieldPrevIter && gradFieldPrevIter);
-
-//        if(fieldName == "DU" && nonLinear == "totalLagrangian") // for incr TL
-//          {
-//            // gradU is const in a time step
-//            const fvPatchField<tensor>& gradU =
-//              patch.lookupPatchField<volTensorField, tensor>("grad(U)");
-
-//            // gradient -=
-//            //   (n &
-//            //    (mu*( (gradField & gradU.T())
-//            //     + (gradU & gradField.T()) ))
-//            //    )
-//            //   + 0.5*n*lambda*tr( (gradField & gradU.T())
-//            //             + (gradU & gradField.T()) );
-
-//            newHigherOrderTerm -=
-//              (n &
-//               (mu*( (gradField & gradU.T())
-//                 + (gradU & gradField.T()) ))
-//               )
-//              + 0.5*n*lambda*tr( (gradField & gradU.T())
-//                     + (gradU & gradField.T()) );
-
-//            prevHigherOrderTerm -=
-//              (n &
-//               (mu*( (gradFieldPrevIter & gradU.T())
-//                 + (gradU & gradFieldPrevIter.T()) ))
-//               )
-//              + 0.5*n*lambda*tr( (gradFieldPrevIter & gradU.T())
-//                     + (gradU & gradFieldPrevIter.T()) );
-//          }
-
-//        gradient += relaxFactorNonLin*newHigherOrderTerm + (1.0-relaxFactorNonLin)*prevHigherOrderTerm;
-//          }
-//        else
+          if (fieldName == "DU" && nonLinear == "totalLagrangian")
           {
-        // no extra relaxation
-        gradient -=
-          (n & (mu*(gradField & gradField.T())))
-          // + 0.5*n*lambda*(gradField && gradField);
-          + 0.5*n*lambda*tr(gradField & gradField.T());
-        //- tensorial identity
-        //- tr(gradField & gradField.T())*I == (gradField && gradField)*I
+              // gradU is const in a time step
+              const fvPatchField<tensor>& gradU =
+                  patch.lookupPatchField<volTensorField, tensor>("grad(U)");
 
-        if(fieldName == "DU" && nonLinear == "totalLagrangian") // for incr TL
-          {
-            // gradU is const in a time step
-            const fvPatchField<tensor>& gradU =
-              patch.lookupPatchField<volTensorField, tensor>("grad(U)");
-
-            gradient -=
-              (n &
-               (mu*( (gradField & gradU.T())
-                 + (gradU & gradField.T()) ))
-               )
-              + 0.5*n*lambda*tr( (gradField & gradU.T())
-                     + (gradU & gradField.T()) );
-          }
+              gradient -=
+                  (n &
+                   (mu*( (gradField & gradU.T())
+                         + (gradU & gradField.T()) ))
+                      )
+                  + 0.5*n*lambda*tr( (gradField & gradU.T())
+                                     + (gradU & gradField.T()) );
           }
       }
 
     gradient /= (2.0*mu + lambda);
-
-    /*if(fieldName == "DU" && nonLinear == "totalLagrangian") // for incr TL
-      {
-        // hmnn diffusivity is a tensor for incrTL
-        // so we could set the gradient using a similar method to
-        // the orthotropic solver i.e.
-        // symmTensorField sigmaExp = (n*(n&(C && symm(gradField)))) - (K & gradField);
-        // or it should also work using the standard isotropic approach.
-
-        const fvPatchField<tensor>& gradU =
-          patch.lookupPatchField<volTensorField, tensor>("grad(U)");
-
-        // tensorial diffusivity
-        tensorField K = (2*mu + lambda)*I + (2*mu + lambda)*gradU;
-        tensorField Kinv = hinv(K);
-
-        // explicit component of sigma
-        // this should be symmetric so maybe get symm of it
-        // to reduce calculations: OK for now
-        tensorField sigmaExp =
-          mu*( gradField.T()
-           + (gradU & gradField.T())
-           + (gradField & gradField.T()) )
-          + lambda*I*tr( gradField + 0.5*( (gradField & gradU.T()) + (gradU & gradField.T()) + (gradField & gradField.T()) ) )
-          - (mu + lambda)*gradField
-          - (mu + lambda)*(gradU & gradField);
-
-          gradient = n & ( Kinv & ( n*(Traction) - sigmaExp ) );
-
-        // use standard isotropic approach
-        gradient /= (2.0*mu + lambda);
-      }
-    else
-      {
-        gradient /= (2.0*mu + lambda);
-      }*/
       }
 
     return tgradient;
-  }
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

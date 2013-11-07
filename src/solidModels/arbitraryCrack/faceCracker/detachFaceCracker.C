@@ -90,8 +90,6 @@ void Foam::faceCracker::detachFaceCracker
 
         if (edgeIsInternal)
         {
-// Pout<< "Internal edge found: (" << mp[zoneLocalEdges[curEdgeID].start()] << " " << mp[zoneLocalEdges[curEdgeID].end()] << ")" << endl;
-
             // Reset the point creation
             addedPoints[zoneLocalEdges[curEdgeID].start()] =
                 mp[zoneLocalEdges[curEdgeID].start()];
@@ -118,7 +116,6 @@ void Foam::faceCracker::detachFaceCracker
                         true                       // supports a cell
                     )
                 );
-// Pout << "Adding point " << points[mp[pointI]] << " for original point " << mp[pointI] << endl;
         }
     }
 
@@ -182,7 +179,6 @@ void Foam::faceCracker::detachFaceCracker
                     false                           // zone flip
                 )
             );
-// Pout << "Flip.  Modifying face: " << faces[curFaceID].reverseFace() << " next to cell: " << nei[curFaceID] << " and adding face: " << newFace << " next to cell: " << own[curFaceID] << endl;
         }
         else
         {
@@ -220,7 +216,6 @@ void Foam::faceCracker::detachFaceCracker
                     false                           // face flip in zone
                 )
             );
-// Pout << "No flip.  Modifying face: " << faces[curFaceID] << " next to cell: " << own[curFaceID] << " and adding face: " << newFace << " next to cell: " << nei[curFaceID] << endl;
         }
     }
 
@@ -290,39 +285,39 @@ void Foam::faceCracker::detachFaceCracker
 
                 forAll (curFaces, faceI)
                 {
-		  masterCellFaceMap.insert(curFaces[faceI]);
+                    masterCellFaceMap.insert(curFaces[faceI]);
 
-		  //----------------extra loops--------------------------//
-		  // philipc 1/Sep/13: add other faces of adjacent cell
-		  const label otherFaceI = curFaces[faceI];
-		  const label otherOwnCell = own[otherFaceI];
-		  if (!mcMap.found(otherOwnCell))
-		    {
-		      // Cell not found. Add its faces to the map
-		      const cell& curOtherFaces = cells[otherOwnCell];
-		      forAll (curOtherFaces, oFaceI)
-			{
-			  masterCellFaceMap.insert(curOtherFaces[oFaceI]);
-			}
-		    }
+          //----------------extra loops--------------------------//
+          // philipc 1/Sep/13: add other faces of adjacent cell
+          const label otherFaceI = curFaces[faceI];
+          const label otherOwnCell = own[otherFaceI];
+          if (!mcMap.found(otherOwnCell))
+            {
+              // Cell not found. Add its faces to the map
+              const cell& curOtherFaces = cells[otherOwnCell];
+              forAll (curOtherFaces, oFaceI)
+            {
+              masterCellFaceMap.insert(curOtherFaces[oFaceI]);
+            }
+            }
 
-		  // Do the neighbour side if face is internal
-		  if (mesh.isInternalFace(otherFaceI))
-		    {
-		      const label otherNeiCell = nei[otherFaceI];
-		      
-		      if (!mcMap.found(otherNeiCell))
-			{
-			  // Cell not found. Add its faces to the map
-			  const cell& curOtherFaces = cells[otherNeiCell];
-			  
-			  forAll (curOtherFaces, oFaceI)
-			    {
-			      masterCellFaceMap.insert(curOtherFaces[oFaceI]);
-			    }
-			}
-		    }
-		  //----------------end of extra loops-------------------//
+          // Do the neighbour side if face is internal
+          if (mesh.isInternalFace(otherFaceI))
+            {
+              const label otherNeiCell = nei[otherFaceI];
+
+              if (!mcMap.found(otherNeiCell))
+            {
+              // Cell not found. Add its faces to the map
+              const cell& curOtherFaces = cells[otherNeiCell];
+
+              forAll (curOtherFaces, oFaceI)
+                {
+                  masterCellFaceMap.insert(curOtherFaces[oFaceI]);
+                }
+            }
+            }
+          //----------------end of extra loops-------------------//
                 }
             }
 
@@ -338,39 +333,39 @@ void Foam::faceCracker::detachFaceCracker
 
                     forAll (curFaces, faceI)
                     {
-		      masterCellFaceMap.insert(curFaces[faceI]);
+              masterCellFaceMap.insert(curFaces[faceI]);
 
-		      //----------------extra loops--------------------------//
-		      // philipc 1/Sep/13: add other faces of adjacent cell
-		      const label otherFaceI = curFaces[faceI];
-		      const label otherOwnCell = own[otherFaceI];
-		      if (!mcMap.found(otherOwnCell))
-			{
-			  // Cell not found. Add its faces to the map
-			  const cell& curOtherFaces = cells[otherOwnCell];
-			  forAll (curOtherFaces, oFaceI)
-			    {
-			      masterCellFaceMap.insert(curOtherFaces[oFaceI]);
-			    }
-			}
-		      
-		      // Do the neighbour side if face is internal
-		      if (mesh.isInternalFace(otherFaceI))
-			{
-			  const label otherNeiCell = nei[otherFaceI];
-			  
-			  if (!mcMap.found(otherNeiCell))
-			    {
-			      // Cell not found. Add its faces to the map
-			      const cell& curOtherFaces = cells[otherNeiCell];
-			      
-			      forAll (curOtherFaces, oFaceI)
-				{
-				  masterCellFaceMap.insert(curOtherFaces[oFaceI]);
-				}
-			    }
-			}
-		      //----------------end of extra loops-------------------//
+              //----------------extra loops--------------------------//
+              // philipc 1/Sep/13: add other faces of adjacent cell
+              const label otherFaceI = curFaces[faceI];
+              const label otherOwnCell = own[otherFaceI];
+              if (!mcMap.found(otherOwnCell))
+            {
+              // Cell not found. Add its faces to the map
+              const cell& curOtherFaces = cells[otherOwnCell];
+              forAll (curOtherFaces, oFaceI)
+                {
+                  masterCellFaceMap.insert(curOtherFaces[oFaceI]);
+                }
+            }
+
+              // Do the neighbour side if face is internal
+              if (mesh.isInternalFace(otherFaceI))
+            {
+              const label otherNeiCell = nei[otherFaceI];
+
+              if (!mcMap.found(otherNeiCell))
+                {
+                  // Cell not found. Add its faces to the map
+                  const cell& curOtherFaces = cells[otherNeiCell];
+
+                  forAll (curOtherFaces, oFaceI)
+                {
+                  masterCellFaceMap.insert(curOtherFaces[oFaceI]);
+                }
+                }
+            }
+              //----------------end of extra loops-------------------//
                     }
                 }
             }
@@ -398,7 +393,7 @@ void Foam::faceCracker::detachFaceCracker
 
     //     forAll(curMasterFacePoints, pointI)
     //     {
-    //         const labelList& curPointEdges = 
+    //         const labelList& curPointEdges =
     //             pointEdges[curMasterFacePoints[pointI]];
 
     //         forAll(curPointEdges, edgeI)
@@ -442,7 +437,7 @@ void Foam::faceCracker::detachFaceCracker
     //     forAll(mcEdges, edgeI)
     //     {
     //         const labelList& curEdgeCells = edgeCells[mcEdges[edgeI]];
-            
+
     //         forAll(curEdgeCells, cellI)
     //         {
     //             if (curEdgeCells[cellI] != mc[faceI])
@@ -456,7 +451,7 @@ void Foam::faceCracker::detachFaceCracker
     //     }
 
     //     labelList mcCells = masterCellCells.toc();
-    // 	Info << "mcCells " << mcCells << endl;
+    //     Info << "mcCells " << mcCells << endl;
 
     //     forAll(mcCells, cellI)
     //     {
@@ -532,7 +527,6 @@ void Foam::faceCracker::detachFaceCracker
                         false                       // face zone flip
                     )
                 );
-// Pout << "modifying stick-out face. Internal Old face: " << oldFace << " new face: " << newFace << " own: " << own[curFaceID] << " nei: " << nei[curFaceID] << endl;
             }
             else
             {
@@ -551,7 +545,6 @@ void Foam::faceCracker::detachFaceCracker
                         false                         // face zone flip
                     )
                 );
-// Pout << "modifying stick-out face. Boundary Old face: " << oldFace << " new face: " << newFace << " own: " << own[curFaceID] << " patch: " << mesh.boundaryMesh().whichPatch(curFaceID) << endl;
             }
         }
     }

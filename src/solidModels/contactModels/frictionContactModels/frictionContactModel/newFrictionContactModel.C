@@ -64,8 +64,8 @@ autoPtr<frictionContactModel> frictionContactModel::New
             "    const dictionary& dict,\n"
             "    const label masterPatchID,\n"
             "    const label slavePatchID,\n"
-	    "    const label masterFaceZoneID,\n"
-	    "    const label slaveFaceZoneID\n"
+        "    const label masterFaceZoneID,\n"
+        "    const label slaveFaceZoneID\n"
             ")",
             dict
         )   << "Unknown frictionContactModel type "
@@ -75,7 +75,19 @@ autoPtr<frictionContactModel> frictionContactModel::New
             << exit(FatalIOError);
     }
 
-    return autoPtr<frictionContactModel>(cstrIter()(name, patch, dict, masterPatchID, slavePatchID, masterFaceZoneID, slaveFaceZoneID));
+    return autoPtr<frictionContactModel>
+        (
+            cstrIter()
+            (
+                name,
+                patch,
+                dict,
+                masterPatchID,
+                slavePatchID,
+                masterFaceZoneID,
+                slaveFaceZoneID
+            )
+        );
 }
 
 

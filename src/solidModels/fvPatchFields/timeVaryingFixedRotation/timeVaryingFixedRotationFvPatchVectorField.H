@@ -106,7 +106,8 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given timeVaryingFixedRotationFvPatchVectorField
+        //- Construct by mapping given
+        // timeVaryingFixedRotationFvPatchVectorField
         //  onto a new patch
         timeVaryingFixedRotationFvPatchVectorField
         (
@@ -153,12 +154,13 @@ public:
 
 
     // Member functions
-  //- Return the time series used
-  const interpolationTable<scalar>& timeSeries() const
-  {
-    return timeSeries_;
-  }
-  
+
+              //- Return the time series used
+              const interpolationTable<scalar>& timeSeries() const
+              {
+                  return timeSeries_;
+              }
+
 
         // Evaluation functions
 
@@ -169,7 +171,7 @@ public:
 
             //- Update the coefficients associated with the patch field
             virtual void updateCoeffs();
-  
+
             //- Return the matrix source coefficients corresponding to the
             //  evaluation of the gradient of this patchField
             virtual tmp<Field<vector> > gradientBoundaryCoeffs() const;

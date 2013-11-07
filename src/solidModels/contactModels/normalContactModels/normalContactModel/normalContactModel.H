@@ -80,12 +80,15 @@ class normalContactModel
         //- contact point gap
         scalarField slaveContactPointGap_;
 
-       //- zoneToZoneInterpolation for the calculation of pointDistanceToIntersection
+       //- zoneToZoneInterpolation for the calculation of
+       // pointDistanceToIntersection
        //- and faceDistanceToIntersection
        //zoneToZoneInterpolation* masterToSlaveInterpolatorPtr_;
        PatchToPatchInterpolation<
-	 PrimitivePatch<face, List, pointField>, PrimitivePatch<face, List, pointField>
-	 >* masterToSlaveInterpolatorPtr_;
+           PrimitivePatch<
+               face, List, pointField
+               >, PrimitivePatch<face, List, pointField>
+           >* masterToSlaveInterpolatorPtr_;
 
     // Private Member Functions
 
@@ -101,7 +104,7 @@ protected:
         //- Return reference to mesh
         const fvMesh& mesh() const
         {
-	  return patch_.boundaryMesh().mesh();
+            return patch_.boundaryMesh().mesh();
         }
 
 
@@ -120,16 +123,28 @@ public:
             dictionary,
             (
                 const word name,
-		const fvPatch& patch,
+                const fvPatch& patch,
                 const dictionary& dict,
-		const label masterPatchID,
-		const label slavePatchID,
-		const label masterFaceZoneID,
-		const label slaveFaceZoneID,
-		const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
-		const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch
+                const label masterPatchID,
+                const label slavePatchID,
+                const label masterFaceZoneID,
+                const label slaveFaceZoneID,
+                const PrimitivePatch<
+                face, List, pointField
+                >& masterFaceZonePatch,
+                const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch
             ),
-            (name, patch, dict, masterPatchID, slavePatchID, masterFaceZoneID, slaveFaceZoneID, masterFaceZonePatch, slaveFaceZonePatch)
+            (
+                name,
+                patch,
+                dict,
+                masterPatchID,
+                slavePatchID,
+                masterFaceZoneID,
+                slaveFaceZoneID,
+                masterFaceZonePatch,
+                slaveFaceZonePatch
+                )
         );
 
 
@@ -141,12 +156,12 @@ public:
             const word& name,
             const fvPatch& patch,
             const dictionary& dict,
-	    const label masterPatchID,
-	    const label slavePatchID,
-	    const label masterFaceZoneID,
-	    const label slaveFaceZoneID,
-	    const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
-	    const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch
+            const label masterPatchID,
+            const label slavePatchID,
+            const label masterFaceZoneID,
+            const label slaveFaceZoneID,
+            const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
+            const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch
         );
 
 
@@ -158,12 +173,12 @@ public:
             const word& name,
             const fvPatch& patch,
             const dictionary& dict,
-	    const label masterPatchID,
-	    const label slavePatchID,
-	    const label masterFaceZoneID,
-	    const label slaveFaceZoneID,
-	    const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
-	    const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch
+            const label masterPatchID,
+            const label slavePatchID,
+            const label masterFaceZoneID,
+            const label slaveFaceZoneID,
+            const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
+            const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch
         );
 
 
@@ -189,19 +204,19 @@ public:
 
         //- Correct contact model
         virtual void correct
-	(
-	 const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
-	 const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch,
-	 const intersection::algorithm alg,
-	 const intersection::direction dir,
-	 word fieldName,
-	 const Switch orthotropic, 
-	 const word nonLinear,
-	 vectorField& slaveFaceNormals,
-	 GGIInterpolation< PrimitivePatch< face, List, pointField >,
-			   PrimitivePatch< face, List, pointField >
-			   >* ggiInterpolatorPtr
-	 ) = 0;
+        (
+            const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
+            const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch,
+            const intersection::algorithm alg,
+            const intersection::direction dir,
+            word fieldName,
+            const Switch orthotropic,
+            const word nonLinear,
+            vectorField& slaveFaceNormals,
+            GGIInterpolation< PrimitivePatch< face, List, pointField >,
+                              PrimitivePatch< face, List, pointField >
+                              >* ggiInterpolatorPtr
+            ) = 0;
 
         //- Return slave displacement
         virtual const vectorField& slaveDisp() const = 0;
@@ -215,32 +230,32 @@ public:
         //- Return master patch ID
         virtual label masterPatchID() const
         {
-	  return masterPatchID_;
-	}
+            return masterPatchID_;
+        }
 
         //- Return master patch ID
         virtual label slavePatchID() const
         {
-	  return slavePatchID_;
-	}
+            return slavePatchID_;
+        }
 
         //- Return master face zone ID
         virtual label masterFaceZoneID() const
         {
-	  return masterFaceZoneID_;
-	}
+            return masterFaceZoneID_;
+        }
 
         //- Return master face zone ID
         virtual label slaveFaceZoneID() const
         {
-	  return slaveFaceZoneID_;
-	}
+            return slaveFaceZoneID_;
+        }
 
         //- Return point gap field
         virtual scalarField& slaveContactPointGap()
         {
-	  return slaveContactPointGap_;
-	}
+            return slaveContactPointGap_;
+        }
 
         //- Write model dictionary
         virtual void writeDict(Ostream& os) const {};

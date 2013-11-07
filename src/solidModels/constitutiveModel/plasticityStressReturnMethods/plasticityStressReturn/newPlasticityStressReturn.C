@@ -53,27 +53,27 @@ autoPtr<plasticityStressReturn> plasticityStressReturn::New
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
       FatalIOErrorIn
-	(
-	 "plasticityStressReturn::New(\n"
-	 "    const word& name\n"
-	 "    constitutiveModel& constitutiveModel\n"
-	 ")",
-	 "constitutiveModelCoeffs"
-	 )
-	<< "Unknown plasticityStressReturn type "
-	<< name << endl << endl
-	<< "Valid  plasticityStressReturns methods are : " << endl
-	<< dictionaryConstructorTablePtr_->toc()
-	<< exit(FatalIOError);
+    (
+     "plasticityStressReturn::New(\n"
+     "    const word& name\n"
+     "    constitutiveModel& constitutiveModel\n"
+     ")",
+     "constitutiveModelCoeffs"
+     )
+    << "Unknown plasticityStressReturn type "
+    << name << endl << endl
+    << "Valid  plasticityStressReturns methods are : " << endl
+    << dictionaryConstructorTablePtr_->toc()
+    << exit(FatalIOError);
     }
 
     return autoPtr<plasticityStressReturn>
       (
        cstrIter()
        (
-	name,
-	constitutiveModel
-	)
+    name,
+    constitutiveModel
+    )
        );
 }
 

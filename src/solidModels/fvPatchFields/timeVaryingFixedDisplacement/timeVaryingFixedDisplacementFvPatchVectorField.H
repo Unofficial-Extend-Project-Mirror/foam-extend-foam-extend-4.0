@@ -98,7 +98,8 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given timeVaryingFixedDisplacementFvPatchVectorField
+        //- Construct by mapping given
+        // timeVaryingFixedDisplacementFvPatchVectorField
         //  onto a new patch
         timeVaryingFixedDisplacementFvPatchVectorField
         (

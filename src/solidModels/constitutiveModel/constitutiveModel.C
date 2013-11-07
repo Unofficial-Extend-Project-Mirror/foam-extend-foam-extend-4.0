@@ -71,75 +71,82 @@ constitutiveModel::constitutiveModel
 {
   Info << "Creating constitutive model" << endl;
 
-  if(rheologyLawPtr_->plasticityModelNeeded())
+  if (rheologyLawPtr_->plasticityModelNeeded())
     {
-      plasticityStressReturnPtr_ = 
-	plasticityStressReturn::New(lookup("plasticityModel"), *this);
+      plasticityStressReturnPtr_ =
+    plasticityStressReturn::New(lookup("plasticityModel"), *this);
     }
-  else if(found("plasticityModel"))
+  else if (found("plasticityModel"))
     {
       Warning << "plasticityModel is specified in rheologyProperties"
-	      << " but plasticity is not active in the current model"
-	      << endl;
+          << " but plasticity is not active in the current model"
+          << endl;
     }
 
   // create solidInterface if the case is multiMaterial
-  if(rheologyLawPtr_->type() == "multiMaterial")
+  if (rheologyLawPtr_->type() == "multiMaterial")
     {
       // we should figure it out automatically
       // for now we will ask the user
       //word solIntType("smallStrain");
       solidInterfaceActive_ = true;
 
-      word solIntType(sigma.mesh().solutionDict().subDict("solidMechanics").lookup("solidInterfaceMethod"));
-      solidInterfacePtr_ = 
-	solidInterface::New(solIntType, sigma.mesh(), *this);
+      word solIntType
+          (
+              sigma.mesh().solutionDict().subDict
+              (
+                  "solidMechanics"
+                  ).lookup("solidInterfaceMethod"));
+      solidInterfacePtr_ =
+    solidInterface::New(solIntType, sigma.mesh(), *this);
 
       solidInterfaceRefPtr_ =
-	new IOReferencer<solidInterface>
-	(
-	 IOobject
-	 (
-	  "solidInterface",
-	  sigma.time().timeName(),
-	  sigma.db(),
-	  IOobject::NO_READ,  /*must be NO_READ*/
-	  IOobject::NO_WRITE  /*must be NO_WRITE*/
-	  ),
-	 solidInterfacePtr_()
-	 );
+    new IOReferencer<solidInterface>
+    (
+     IOobject
+     (
+      "solidInterface",
+      sigma.time().timeName(),
+      sigma.db(),
+      IOobject::NO_READ,  /*must be NO_READ*/
+      IOobject::NO_WRITE  /*must be NO_WRITE*/
+      ),
+     solidInterfacePtr_()
+     );
     }
   // else
   //   {
   //     // create none solidInterface
-  //     solidInterfacePtr_ = 
-  // 	solidInterface::New("none", sigma.mesh(), *this);
+  //     solidInterfacePtr_ =
+  //    solidInterface::New("none", sigma.mesh(), *this);
   //   }
 
   // create cohesiveLaw if a solidCohesive patch
   forAll(U.boundaryField(), patchi)
     {
-      if(isA<solidCohesiveFvPatchVectorField>(U.boundaryField()[patchi])
-	  || isA<solidCohesiveFixedModeMixFvPatchVectorField>(U.boundaryField()[patchi]))
-	{
-	  Info << "Reading cohesiveProperties because a solidCohesive patch exists" << endl;
-	  cohesiveDictPtr_ = 
-	    new IOdictionary
-	    (
-	     IOobject
-	     (
-	      "cohesiveProperties",
-	      sigma.time().constant(),
-	      sigma.db(),
-	      IOobject::MUST_READ,
-	      IOobject::NO_WRITE
-	      )
-	     );
+      if (isA<solidCohesiveFvPatchVectorField>(U.boundaryField()[patchi])
+      || isA<solidCohesiveFixedModeMixFvPatchVectorField>
+         (U.boundaryField()[patchi]))
+    {
+      Info<< "Reading cohesiveProperties because "
+          << "a solidCohesive patch exists" << endl;
+      cohesiveDictPtr_ =
+        new IOdictionary
+        (
+         IOobject
+         (
+          "cohesiveProperties",
+          sigma.time().constant(),
+          sigma.db(),
+          IOobject::MUST_READ,
+          IOobject::NO_WRITE
+          )
+         );
 
-	  cohesiveLawPtr_ =
-	    cohesiveLaw::New("law", sigma_, cohesiveDictPtr_->subDict("cohesive"));
-	  break;
-	}
+      cohesiveLawPtr_ =
+        cohesiveLaw::New("law", sigma_, cohesiveDictPtr_->subDict("cohesive"));
+      break;
+    }
     }
 }
 
@@ -152,7 +159,7 @@ constitutiveModel::~constitutiveModel()
 
 void constitutiveModel::correct()
 {
-  if(plasticityStressReturnPtr_.valid())
+  if (plasticityStressReturnPtr_.valid())
     {
       plasticityStressReturnPtr_->correct();
     }
@@ -164,7 +171,7 @@ void constitutiveModel::correct()
 
 void constitutiveModel::updateYieldStress()
 {
-  if(plasticityStressReturnPtr_.valid())
+  if (plasticityStressReturnPtr_.valid())
     {
       plasticityStressReturnPtr_->updateYieldStress();
     }
@@ -458,12 +465,12 @@ tmp<surfaceScalarField> constitutiveModel::muf() const
       )
      );
   surfaceScalarField& muf = tresult();
-  
-  if(solidInterfaceActive_)
+
+  if (solidInterfaceActive_)
     {
       solidInterfacePtr_->modifyProperties(muf);
     }
-  
+
   return tresult;
 }
 
@@ -485,12 +492,12 @@ tmp<surfaceScalarField> constitutiveModel::lambdaf() const
       )
      );
   surfaceScalarField& lambdaf = tresult();
-  
-  if(solidInterfaceActive_)
+
+  if (solidInterfaceActive_)
     {
       solidInterfacePtr_->modifyProperties(lambdaf);
     }
-  
+
   return tresult;
 }
 
@@ -512,12 +519,12 @@ tmp<surfaceScalarField> constitutiveModel::threeKf() const
       )
      );
   surfaceScalarField& threeKf = tresult();
-  
-  if(solidInterfaceActive_)
+
+  if (solidInterfaceActive_)
     {
       solidInterfacePtr_->modifyProperties(threeKf);
     }
-  
+
   return tresult;
 }
 
@@ -539,12 +546,12 @@ tmp<surfaceDiagTensorField> constitutiveModel::Kf() const
       )
      );
   surfaceDiagTensorField& Kf = tresult();
-  
-  if(solidInterfaceActive_)
+
+  if (solidInterfaceActive_)
     {
       solidInterfacePtr_->modifyProperties(Kf);
     }
-  
+
   return tresult;
 }
 
@@ -566,12 +573,12 @@ tmp<surfaceSymmTensor4thOrderField> constitutiveModel::Cf() const
       )
      );
   surfaceSymmTensor4thOrderField& Cf = tresult();
-  
-  if(solidInterfaceActive_)
+
+  if (solidInterfaceActive_)
     {
       solidInterfacePtr_->modifyProperties(Cf);
     }
-  
+
   return tresult;
 }
 

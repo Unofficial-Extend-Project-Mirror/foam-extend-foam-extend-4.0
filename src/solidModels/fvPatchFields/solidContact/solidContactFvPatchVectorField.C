@@ -145,73 +145,103 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
     : // only the master reads the properties
     directionMixedFvPatchVectorField(p, iF),
     fieldName_(dimensionedInternalField().name()),
-    master_( checkPatchAndFaceZones(dict) ? dict.lookup("master") : dict.lookup("master")),
+    master_
+    (
+        checkPatchAndFaceZones(dict)
+        ? dict.lookup("master") : dict.lookup("master")
+        ),
     contactActive_(dict.lookup("contactActive")),
     rigidMaster_(false), //dict.lookup("rigidMaster")),
     normalContactModelPtr_(NULL),
     frictionContactModelPtr_(NULL),
-    shadowPatchID_(patch().patch().boundaryMesh().findPatchID(dict.lookup("shadowPatch"))),
-    patchInChargeOfCorrection_( bool(patch().index()<shadowPatchID_) ? true : false),
-    masterFaceZoneName_( master_ ? patch().name() + "FaceZone" : patch().boundaryMesh().mesh().boundary()[shadowPatchID_].name() + "FaceZone"),
-    slaveFaceZoneName_( master_ ? patch().boundaryMesh().mesh().boundary()[shadowPatchID_].name() + "FaceZone" : patch().name() + "FaceZone"),
-    masterFaceZoneID_(patch().boundaryMesh().mesh().faceZones().findZoneID(masterFaceZoneName_)),
-    slaveFaceZoneID_(patch().boundaryMesh().mesh().faceZones().findZoneID(slaveFaceZoneName_)),
+    shadowPatchID_
+    (
+        patch().patch().boundaryMesh().findPatchID(dict.lookup("shadowPatch"))
+        ),
+    patchInChargeOfCorrection_
+    ( bool(patch().index()<shadowPatchID_) ? true : false
+        ),
+    masterFaceZoneName_
+    (
+        master_
+        ? patch().name() + "FaceZone"
+        : patch().boundaryMesh().mesh().boundary()[shadowPatchID_].name()
+        + "FaceZone"
+        ),
+    slaveFaceZoneName_
+    (
+        master_
+        ? patch().boundaryMesh().mesh().boundary()[shadowPatchID_].name()
+        + "FaceZone"
+        : patch().name() + "FaceZone"
+        ),
+    masterFaceZoneID_
+    (
+        patch().boundaryMesh().mesh().faceZones().findZoneID
+        (
+            masterFaceZoneName_
+            )
+        ),
+    slaveFaceZoneID_
+    (
+        patch().boundaryMesh().mesh().faceZones().findZoneID(slaveFaceZoneName_)
+        ),
     masterFaceZonePatchPtr_
     (
          master_ ?
          new PrimitivePatch<face, Foam::List, pointField>
          (
              patch().boundaryMesh().mesh().faceZones()[masterFaceZoneID_]()
-	         .localFaces(),
+             .localFaces(),
              patch().boundaryMesh().mesh().faceZones()[masterFaceZoneID_]()
                  .localPoints()
-	  )
-	 :
-	 NULL
+      )
+     :
+     NULL
      ),
      slaveFaceZonePatchPtr_
      (
          master_ ?
-	 new PrimitivePatch<face, Foam::List, pointField>
+     new PrimitivePatch<face, Foam::List, pointField>
          (
              patch().boundaryMesh().mesh().faceZones()[slaveFaceZoneID_]()
-	         .localFaces(),
+             .localFaces(),
              patch().boundaryMesh().mesh().faceZones()[slaveFaceZoneID_]()
-	         .localPoints()
-	  )
-	 :
-	 NULL
+             .localPoints()
+      )
+     :
+     NULL
      ),
      interpolationMethod_
      (
          master_ ?
-	 dict.lookup("interpolationMethod")
-	 :
-	 word("interpolationMethodUndefinedForSlave")
+     dict.lookup("interpolationMethod")
+     :
+     word("interpolationMethodUndefinedForSlave")
      ),
      slaveToMasterPatchToPatchInterpolatorPtr_(NULL),
      slaveToMasterGgiInterpolatorPtr_(NULL),
      masterFaceZonePatchInterpolatorPtr_
      (
          master_
-	 ?
-	 new PrimitivePatchInterpolation
-	 <
+     ?
+     new PrimitivePatchInterpolation
+     <
              PrimitivePatch<face, Foam::List, pointField>
-	 >(*masterFaceZonePatchPtr_)
-	 :
-	 NULL
+     >(*masterFaceZonePatchPtr_)
+     :
+     NULL
      ),
      slaveFaceZonePatchInterpolatorPtr_
      (
          master_
-	 ?
+     ?
          new PrimitivePatchInterpolation
-	 <
+     <
              PrimitivePatch<face, Foam::List, pointField>
-	 >(*slaveFaceZonePatchPtr_)
-	 :
-	 NULL
+     >(*slaveFaceZonePatchPtr_)
+     :
+     NULL
      ),
     oldMasterFaceZonePoints_
     (
@@ -227,8 +257,21 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
      :
      vectorField(0,vector::zero)
      ),
-    alg_(master_ ? intersection::algorithmNames_.read(dict.lookup("projectionAlgo")) : Foam::intersection::VISIBLE),
-    dir_(master_ ? intersection::directionNames_.read(dict.lookup("projectionDir")) : Foam::intersection::CONTACT_SPHERE),
+    alg_
+    (
+        master_
+        ? intersection::algorithmNames_.read
+        (
+            dict.lookup("projectionAlgo")
+            ) : Foam::intersection::VISIBLE
+        ),
+    dir_(
+        master_
+        ? intersection::directionNames_.read
+        (
+            dict.lookup("projectionDir")
+            ) : Foam::intersection::CONTACT_SPHERE
+        ),
     curTimeIndex_(-1),
     iCorr_(0),
     correctionFreq_(master_ ? readInt(dict.lookup("correctionFrequency")) : 1),
@@ -237,7 +280,8 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
     (
      this->db().objectRegistry::foundObject<volScalarField>("stickSlipRegions")
      ?
-     &this->db().objectRegistry::lookupObject<volScalarField>("stickSlipRegions")
+     &this->db().objectRegistry::lookupObject<volScalarField>
+     ("stickSlipRegions")
      :
      new volScalarField
      (
@@ -262,7 +306,8 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
     // check shadow patch exists
     if (shadowPatchID_ == -1)
     {
-        FatalError << "\nCannot find shadowPatch called " << dict.lookup("shadowPatch")
+        FatalError
+            << "\nCannot find shadowPatch called " << dict.lookup("shadowPatch")
             << " for patch " << patch().name() << exit(FatalError);
     }
 
@@ -293,115 +338,128 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
 
   // master creates contact laws
   // and the slave grabs the contact law pointers in updateCoeffs
-  if (master_)
+    if (master_)
     {
-      rigidMaster_ = Switch(dict.lookup("rigidMaster"));
+        rigidMaster_ = Switch(dict.lookup("rigidMaster"));
 
-      if (contactActive_)
-    {
-      const fvMesh& mesh = patch().boundaryMesh().mesh();
-      label masterFaceZoneID = mesh.faceZones().findZoneID(masterFaceZoneName_);
-      label slaveFaceZoneID = mesh.faceZones().findZoneID(slaveFaceZoneName_);
-      if (masterFaceZoneID == -1)
+        if (contactActive_)
         {
-          FatalError << "face zone " << masterFaceZoneName_ << " not found!"
-             << exit(FatalError);
-        }
-      else if (slaveFaceZoneID == -1)
-        {
-          FatalError << "face zone " << masterFaceZoneName_ << " not found!"
-             << exit(FatalError);
-        }
+            const fvMesh& mesh = patch().boundaryMesh().mesh();
+            label masterFaceZoneID =
+                mesh.faceZones().findZoneID(masterFaceZoneName_);
+            label slaveFaceZoneID =
+                mesh.faceZones().findZoneID(slaveFaceZoneName_);
+            if (masterFaceZoneID == -1)
+            {
+                FatalError
+                    << "face zone " << masterFaceZoneName_ << " not found!"
+                    << exit(FatalError);
+            }
+            else if (slaveFaceZoneID == -1)
+            {
+                FatalError
+                    << "face zone " << masterFaceZoneName_ << " not found!"
+                    << exit(FatalError);
+            }
 
-      normalContactModelPtr_ =
-          normalContactModel::New
-          (
-              dict.lookup("normalContactModel"),
-              patch(),
-              dict,
-              patch().index(), // master
-              shadowPatchID_, // slave
-              masterFaceZoneID_, // master face zone ID
-              slaveFaceZoneID_, // slave face zone ID
-              *masterFaceZonePatchPtr_,
-              *slaveFaceZonePatchPtr_
-          ).ptr();
-      frictionContactModelPtr_ =
-          frictionContactModel::New
-          (
-              dict.lookup("frictionContactModel"),
-              patch(),
-              dict,
-              patch().index(), // master
-              shadowPatchID_, // slave
-              masterFaceZoneID_, // master face zone ID
-              slaveFaceZoneID_ // slave face zone ID
-          ).ptr();
+            normalContactModelPtr_ =
+                normalContactModel::New
+                (
+                    dict.lookup("normalContactModel"),
+                    patch(),
+                    dict,
+                    patch().index(), // master
+                    shadowPatchID_, // slave
+                    masterFaceZoneID_, // master face zone ID
+                    slaveFaceZoneID_, // slave face zone ID
+                    *masterFaceZonePatchPtr_,
+                    *slaveFaceZonePatchPtr_
+                    ).ptr();
+            frictionContactModelPtr_ =
+                frictionContactModel::New
+                (
+                    dict.lookup("frictionContactModel"),
+                    patch(),
+                    dict,
+                    patch().index(), // master
+                    shadowPatchID_, // slave
+                    masterFaceZoneID_, // master face zone ID
+                    slaveFaceZoneID_ // slave face zone ID
+                    ).ptr();
 
-      //- create zoneToZone or ggiZone for interpolation of traction from
-      //  slave to master only required if the contact is not rigid
-      if (interpolationMethod_ == "patchToPatch")
-      {
-          Info << "\tInterpolation of traction from slave to master: patchToPatch" << endl;
-          // slaveToMasterPatchToPatchInterpolatorPtr_ =
-          //   new zoneToZoneInterpolation
-          //   (
-          //    // slaveFaceZonePatch, // from zone
-          //    // masterFaceZonePatch, // to zone
-          //    *slaveFaceZonePatchPtr_, // from zone
-          //    *masterFaceZonePatchPtr_, // to zone
-          //    alg_,
-          //    dir_
-          //    );
-          slaveToMasterPatchToPatchInterpolatorPtr_ =
-              new PatchToPatchInterpolation
-              <
-                  PrimitivePatch<face, Foam::List, pointField>,
-                  PrimitivePatch<face, Foam::List, pointField>
-              >
-              (
-                  *slaveFaceZonePatchPtr_, // from zone
-                  *masterFaceZonePatchPtr_, // to zone
-                  alg_,
-                  dir_
-              );
-      }
-          else if (interpolationMethod_ == "ggi") // still created if master is rigid because it is used to interpolate normals
-          {
-          Info << "\tInterpolation of traction from slave to master: ggi" << endl;
-          slaveToMasterGgiInterpolatorPtr_ =
-        // new ggiZoneInterpolation
-        new GGIInterpolation< PrimitivePatch< face, Foam::List, pointField >, PrimitivePatch< face, Foam::List, pointField > >
-        (
-         // masterFaceZonePatch, // master zone
-         // slaveFaceZonePatch, // slave zone
-         *masterFaceZonePatchPtr_, // master zone
-         *slaveFaceZonePatchPtr_, // slave zone
-         tensorField(0),
-         tensorField(0),
-         vectorField(0),
-         0.0,
-         0.0,
-         true,
-         ggiInterpolation::AABB
-         );
+            //- create zoneToZone or ggiZone for interpolation of traction from
+            //  slave to master only required if the contact is not rigid
+            if (interpolationMethod_ == "patchToPatch")
+            {
+                Info<< "\tInterpolation of traction from slave to master:"
+                    << " patchToPatch"<< endl;
+                // slaveToMasterPatchToPatchInterpolatorPtr_ =
+                //   new zoneToZoneInterpolation
+                //   (
+                //    // slaveFaceZonePatch, // from zone
+                //    // masterFaceZonePatch, // to zone
+                //    *slaveFaceZonePatchPtr_, // from zone
+                //    *masterFaceZonePatchPtr_, // to zone
+                //    alg_,
+                //    dir_
+                //    );
+                slaveToMasterPatchToPatchInterpolatorPtr_ =
+                    new PatchToPatchInterpolation
+                    <
+                        PrimitivePatch<face, Foam::List, pointField>,
+                        PrimitivePatch<face, Foam::List, pointField>
+                        >
+                    (
+                        *slaveFaceZonePatchPtr_, // from zone
+                        *masterFaceZonePatchPtr_, // to zone
+                        alg_,
+                        dir_
+                        );
+            }
+            else if (interpolationMethod_ == "ggi")
+            {
+                // still created if master is rigid because it is used to
+                // interpolate normals
+                Info<< "\tInterpolation of traction from slave to master:"
+                    << " ggi" << endl;
+                slaveToMasterGgiInterpolatorPtr_ =
+                    // new ggiZoneInterpolation
+                    new GGIInterpolation<
+                        PrimitivePatch<
+                            face, Foam::List, pointField
+                            >, PrimitivePatch< face, Foam::List, pointField > >
+                    (
+                        // masterFaceZonePatch, // master zone
+                        // slaveFaceZonePatch, // slave zone
+                        *masterFaceZonePatchPtr_, // master zone
+                        *slaveFaceZonePatchPtr_, // slave zone
+                        tensorField(0),
+                        tensorField(0),
+                        vectorField(0),
+                        0.0,
+                        0.0,
+                        true,
+                        ggiInterpolation::AABB
+                        );
+            }
+            else
+            {
+                SeriousError
+                    << "\n\nTraction interpolation method '"
+                    << interpolationMethod_ << "' not found!\n"
+                    << "\nValid interpolation methods are:\n"
+                    << "ggi\n"
+                    << "patchToPatch"
+                    << endl
+                    << exit(FatalError);
+            }
         }
-      else
+        else
         {
-          SeriousError << "\n\nTraction interpolation method '"
-               << interpolationMethod_ << "' not found!\n"
-               << "\nValid interpolation methods are:\n"
-               << "ggi\n"
-               << "patchToPatch"
-               << endl
-               << exit(FatalError);
+            Info<< "\t**The contact is not active, contact patches treated "
+                << "as traction-free**" << endl;
+            valueFraction() = symmTensor::zero;
         }
-    }
-      else
-    {
-      Info << "\t**The contact is not active, contatc patches treated as traction-free**" << endl;
-      valueFraction() = symmTensor::zero;
-    }
     } // end of if master
 
   if (dict.found("refValue"))
@@ -478,9 +536,11 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
     masterFaceZonePatchPtr_(ptf.masterFaceZonePatchPtr_),
     slaveFaceZonePatchPtr_(ptf.slaveFaceZonePatchPtr_),
     interpolationMethod_(ptf.interpolationMethod_),
-    slaveToMasterPatchToPatchInterpolatorPtr_(ptf.slaveToMasterPatchToPatchInterpolatorPtr_),
+    slaveToMasterPatchToPatchInterpolatorPtr_
+    (ptf.slaveToMasterPatchToPatchInterpolatorPtr_),
     slaveToMasterGgiInterpolatorPtr_(ptf.slaveToMasterGgiInterpolatorPtr_),
-    masterFaceZonePatchInterpolatorPtr_(ptf.masterFaceZonePatchInterpolatorPtr_),
+    masterFaceZonePatchInterpolatorPtr_
+    (ptf.masterFaceZonePatchInterpolatorPtr_),
     slaveFaceZonePatchInterpolatorPtr_(ptf.slaveFaceZonePatchInterpolatorPtr_),
     oldMasterFaceZonePoints_(ptf.oldMasterFaceZonePoints_),
     oldSlaveFaceZonePoints_(ptf.oldSlaveFaceZonePoints_),
@@ -542,163 +602,196 @@ void solidContactFvPatchVectorField::updateCoeffs()
     {
         return;
     }
-    //Info << "updating contact patch " << patch().name() << " ..." << flush;
 
     if (contactActive_)
-      {
-     // for the first updateCoeffs, the slave needs to grab the conatct law pointers
-    if (!normalContactModelPtr_)
-      {
-        if (!master_)
-          {
-        // grab pointers
-        const volVectorField& Ufield =
-          this->db().objectRegistry::lookupObject<volVectorField>(fieldName_);
-
-        const solidContactFvPatchVectorField& Upatch =
-          refCast<const solidContactFvPatchVectorField>(Ufield.boundaryField()[shadowPatchID_]);
-        Info << "\tSlave contact patch " << patch().name() << " grabbing normalContactModel pointer from master" << endl;
-        normalContactModelPtr_ = Upatch.normalContactModelPtr();
-        if (!normalContactModelPtr_) FatalError << "\nThe patch " << patch().name() << " has a NULL normalContactModel pointer!" << exit(FatalError);
-
-        Info << "\tSlave contact patch " << patch().name() << " grabbing frictionContactModel pointer from master" << endl;
-        frictionContactModelPtr_ = Upatch.frictionContactModelPtr();
-        if (!frictionContactModelPtr_)
-          FatalError << "\nThe patch " << patch().name() << " has a NULL frictionContactModel pointer!" << exit(FatalError);
-
-        // lookup master's correction frequency
-        correctionFreq_ = Upatch.correctionFreq();
-
-        // get face zone patch pointers
-        masterFaceZonePatchPtr_ = Upatch.masterFaceZonePatchPtr();
-        slaveFaceZonePatchPtr_ = Upatch.slaveFaceZonePatchPtr();
-
-        // get patchToPatch and GGI interpolator pointers - one of them is NULL
-        slaveToMasterGgiInterpolatorPtr_ = Upatch.slaveToMasterGgiInterpolatorPtr();
-        slaveToMasterPatchToPatchInterpolatorPtr_ = Upatch.slaveToMasterPatchToPatchInterpolatorPtr();
-          }
-        else
-          {
-        FatalErrorIn("solidContactFvPatchVectorField::updateCoeff()")
-          << "NULL contactLaw\ncontactLaw not created by master."
-          << abort(FatalError);
-          }
-      }
-
-    // if it is a new time step then reset iCorr
-    if (curTimeIndex_ != this->db().time().timeIndex())
     {
-        curTimeIndex_ = this->db().time().timeIndex();
-        iCorr_ = 0;
+        // for the first updateCoeffs, the slave needs to grab the conatct
+        // law pointers
+        if (!normalContactModelPtr_)
+        {
+            if (!master_)
+            {
+                // grab pointers
+                const volVectorField& Ufield =
+                    this->db().objectRegistry::lookupObject<volVectorField>
+                    (
+                        fieldName_
+                        );
 
-        // update old face zone points
-        if (master_ && nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
-          {
-        oldMasterFaceZonePoints_ = masterFaceZonePatchPtr_->localPoints();
-        oldSlaveFaceZonePoints_ = slaveFaceZonePatchPtr_->localPoints();
-          }
-      }
+                const solidContactFvPatchVectorField& Upatch =
+                    refCast<const solidContactFvPatchVectorField>
+                    (
+                        Ufield.boundaryField()[shadowPatchID_]
+                        );
+                Info<< "\tSlave contact patch " << patch().name()
+                    << " grabbing normalContactModel pointer from master"
+                    << endl;
+                normalContactModelPtr_ = Upatch.normalContactModelPtr();
+                if (!normalContactModelPtr_)
+                {
+                    FatalError
+                        << "\nThe patch " << patch().name()
+                        << " has a NULL normalContactModel pointer!"
+                        << exit(FatalError);
+                }
 
-    // the time taken to correct the contact may not be negligible
-    // so reduce the correctiion frequency can speed up the simulation
-    if (iCorr_++ % correctionFreq_ == 0
-       || forceCorrection_ )
-      {
-        forceCorrection_ = false;
+                Info<< "\tSlave contact patch " << patch().name()
+                    << " grabbing frictionContactModel pointer from master"
+                    << endl;
+                frictionContactModelPtr_ = Upatch.frictionContactModelPtr();
+                if (!frictionContactModelPtr_)
+                {
+                    FatalError
+                        << "\nThe patch " << patch().name()
+                        << " has a NULL frictionContactModel pointer!"
+                        << exit(FatalError);
+                }
 
-        // master moves faceZone patches to the current deformed position
-        if (master_)
-          {
-        moveFaceZonePatches();
-          }
+                // lookup master's correction frequency
+                correctionFreq_ = Upatch.correctionFreq();
 
-        // just one of the patches updates the interpolators and
-        // corrects the contact laws
-        if (master_) //patchInChargeOfCorrection_) // hmmm the master needs to do the correction
-          {
-        // update interpolation classes
-        if (!rigidMaster_)
-          {
-            if (slaveToMasterGgiInterpolatorPtr_)
-              {
-            slaveToMasterGgiInterpolatorPtr_->movePoints();
-              }
-            else if (slaveToMasterPatchToPatchInterpolatorPtr_)
-              {
-            slaveToMasterPatchToPatchInterpolatorPtr_->movePoints();
-              }
+                // get face zone patch pointers
+                masterFaceZonePatchPtr_ = Upatch.masterFaceZonePatchPtr();
+                slaveFaceZonePatchPtr_ = Upatch.slaveFaceZonePatchPtr();
+
+                // get patchToPatch and GGI interpolator pointers
+                // one of them is NULL
+                slaveToMasterGgiInterpolatorPtr_ =
+                    Upatch.slaveToMasterGgiInterpolatorPtr();
+                slaveToMasterPatchToPatchInterpolatorPtr_ =
+                    Upatch.slaveToMasterPatchToPatchInterpolatorPtr();
+            }
             else
-              {
-            FatalErrorIn("solidContactFvPatchVectorField::updateCoeff()")
-              << "Neither patchToPatch or GGI interpolator found!"
-              << abort(FatalError);
-              }
-          }
+            {
+                FatalErrorIn("solidContactFvPatchVectorField::updateCoeff()")
+                    << "NULL contactLaw\ncontactLaw not created by master."
+                    << abort(FatalError);
+            }
+        }
 
-        // correct laws
-        // the normal model sets what face normal to use
-        // on the slave e.g. use actual face normals, or master normals
-        // interpolated to the slave, undeformed/deformed normals.
-        // the friction model then uses these face normals
-        vectorField slaveFaceNormals
-        (
-            patch().boundaryMesh().mesh().boundary()[shadowPatchID_].size(),
-            vector::zero
-        );
+        // if it is a new time step then reset iCorr
+        if (curTimeIndex_ != this->db().time().timeIndex())
+        {
+            curTimeIndex_ = this->db().time().timeIndex();
+            iCorr_ = 0;
 
-        normalContactModelPtr_->correct
-        (
-            *masterFaceZonePatchPtr_,
-            *slaveFaceZonePatchPtr_,
-            alg_,
-            dir_,
-            fieldName_,
-            orthotropic_,
-            nonLinearGeometry::nonLinearNames_[nonLinear_],
-            slaveFaceNormals,
-            slaveToMasterGgiInterpolatorPtr_
-        );
+            // update old face zone points
+            if (master_ && nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
+            {
+                oldMasterFaceZonePoints_ =
+                    masterFaceZonePatchPtr_->localPoints();
+                oldSlaveFaceZonePoints_ =
+                    slaveFaceZonePatchPtr_->localPoints();
+            }
+        }
 
-        frictionContactModelPtr_->correct
-        (
-            normalContactModelPtr_->slavePressure(),
-            *masterFaceZonePatchPtr_,
-            *slaveFaceZonePatchPtr_,
-            alg_,
-            dir_,
-            interpolationMethod_,
-            fieldName_,
-            orthotropic_,
-            nonLinearGeometry::nonLinearNames_[nonLinear_],
-            slaveFaceNormals
-        );
-          }
+        // the time taken to correct the contact may not be negligible
+        // so reduce the correctiion frequency can speed up the simulation
+        if (iCorr_++ % correctionFreq_ == 0
+            || forceCorrection_ )
+        {
+            forceCorrection_ = false;
+
+            // master moves faceZone patches to the current deformed position
+            if (master_)
+            {
+                moveFaceZonePatches();
+            }
+
+            // just one of the patches updates the interpolators and
+            // corrects the contact laws
+            if (master_)
+            {
+                // update interpolation classes
+                if (!rigidMaster_)
+                {
+                    if (slaveToMasterGgiInterpolatorPtr_)
+                    {
+                        slaveToMasterGgiInterpolatorPtr_->movePoints();
+                    }
+                    else if (slaveToMasterPatchToPatchInterpolatorPtr_)
+                    {
+                        slaveToMasterPatchToPatchInterpolatorPtr_->movePoints();
+                    }
+                    else
+                    {
+                        FatalErrorIn("solidContactFvPatchVectorField::"
+                                     "updateCoeff()")
+                            << "Neither patchToPatch or GGI interpolator found!"
+                            << abort(FatalError);
+                    }
+                }
+
+                // correct laws
+                // the normal model sets what face normal to use
+                // on the slave e.g. use actual face normals, or master normals
+                // interpolated to the slave, undeformed/deformed normals.
+                // the friction model then uses these face normals
+                vectorField slaveFaceNormals
+                    (
+                        patch().boundaryMesh().mesh().boundary()
+                        [shadowPatchID_].size(),
+                        vector::zero
+                        );
+
+                normalContactModelPtr_->correct
+                    (
+                        *masterFaceZonePatchPtr_,
+                        *slaveFaceZonePatchPtr_,
+                        alg_,
+                        dir_,
+                        fieldName_,
+                        orthotropic_,
+                        nonLinearGeometry::nonLinearNames_[nonLinear_],
+                        slaveFaceNormals,
+                        slaveToMasterGgiInterpolatorPtr_
+                        );
+
+                frictionContactModelPtr_->correct
+                    (
+                        normalContactModelPtr_->slavePressure(),
+                        *masterFaceZonePatchPtr_,
+                        *slaveFaceZonePatchPtr_,
+                        alg_,
+                        dir_,
+                        interpolationMethod_,
+                        fieldName_,
+                        orthotropic_,
+                        nonLinearGeometry::nonLinearNames_[nonLinear_],
+                        slaveFaceNormals
+                        );
+            }
 
             // set boundary conditions
             if (!master_)
-              {
+            {
                 // set refValue, refGrad and valueFraction
 
                 // refValue
-                refValue() = normalContactModelPtr_->slaveDisp() + frictionContactModelPtr_->slaveDisp();
+                refValue() =
+                    normalContactModelPtr_->slaveDisp()
+                    + frictionContactModelPtr_->slaveDisp();
 
                 //refGrad - set traction
                 refGrad() =
-                  tractionBoundaryGradient()
-                  (
-                   frictionContactModelPtr_->slaveTraction()+normalContactModelPtr_->slavePressure(),
-                   scalarField(patch().size(),0.0),
-                   word(fieldName_),
-                   patch(),
-                   orthotropic_,
-                   nonLinearGeometry::nonLinearNames_[nonLinear_]
-                   )();
+                    tractionBoundaryGradient()
+                    (
+                        frictionContactModelPtr_->slaveTraction()
+                        + normalContactModelPtr_->slavePressure(),
+                        scalarField(patch().size(),0.0),
+                        word(fieldName_),
+                        patch(),
+                        orthotropic_,
+                        nonLinearGeometry::nonLinearNames_[nonLinear_]
+                        )();
 
                 //valueFraction
-                valueFraction() = normalContactModelPtr_->slaveValueFrac() + frictionContactModelPtr_->slaveValueFrac();
-              }
+                valueFraction() =
+                    normalContactModelPtr_->slaveValueFrac()
+                    + frictionContactModelPtr_->slaveValueFrac();
+            }
             else
-              {
+            {
                 // master is always traction condition
                 // interpolate traction from slave
                 // Dirichlet-Neumann uses lagged traction
@@ -735,28 +828,27 @@ void solidContactFvPatchVectorField::updateCoeffs()
                             nonLinearGeometry::nonLinearNames_[nonLinear_]
                         )();
                 }
-              }
-      } // if correction freqeuncy
-      } // if contactActive
+            }
+        } // if correction freqeuncy
+    } // if contactActive
 
     // if the contact is not active then the patches behave as traction free
     else
-      {
+    {
         // set refGrad to traction free for master and slave
         refGrad() =
-          tractionBoundaryGradient()
-          (
-           vectorField(patch().size(),vector::zero),
-           scalarField(patch().size(),0.0),
-           word(fieldName_),
-           patch(),
-           orthotropic_,
-           nonLinearGeometry::nonLinearNames_[nonLinear_]
-           )();
-      }
+            tractionBoundaryGradient()
+            (
+                vectorField(patch().size(),vector::zero),
+                scalarField(patch().size(),0.0),
+                word(fieldName_),
+                patch(),
+                orthotropic_,
+                nonLinearGeometry::nonLinearNames_[nonLinear_]
+                )();
+    }
 
     directionMixedFvPatchVectorField::updateCoeffs();
-    //Info << " done" << endl;
 }
 
 // Interpolate traction from slave to master
@@ -767,14 +859,19 @@ tmp<vectorField> solidContactFvPatchVectorField::interpolateSlaveToMaster
 {
   if (!master_)
     {
-      FatalError << "only the master may call the function "
-        "solidContactFvPatchVectorField::interpolateSlaveToMaster"
-                 << exit(FatalError);
+      FatalError
+          << "only the master may call the function "
+          "solidContactFvPatchVectorField::interpolateSlaveToMaster"
+          << exit(FatalError);
     }
 
   const fvMesh& mesh = patch().boundaryMesh().mesh();
 
-  vectorField masterField(mesh.boundaryMesh()[patch().index()].size(), vector::zero);
+  vectorField masterField
+      (
+          mesh.boundaryMesh()[patch().index()].size(),
+          vector::zero
+          );
 
   // for now, the slave must be the slave
   const label slaveStart
@@ -786,43 +883,53 @@ tmp<vectorField> solidContactFvPatchVectorField::interpolateSlaveToMaster
   // put local slaveField into globalSlaveField
   forAll(slaveField, i)
     {
-      globalSlaveField[mesh.faceZones()[slaveFaceZoneID_].whichFace(slaveStart + i)] =
+      globalSlaveField[
+          mesh.faceZones()[slaveFaceZoneID_].whichFace(slaveStart + i)
+          ] =
         slaveField[i];
     }
 
   //- exchange parallel data
-  reduce(globalSlaveField, sumOp<vectorField>()); // sum because each face is only on one proc
+  // sum because each face is only on one proc
+  reduce(globalSlaveField, sumOp<vectorField>());
 
   // select interpolator - patchToPatch or GGI
-  vectorField globalMasterInterpField(masterFaceZonePatchPtr_->size(), vector::zero);
+  vectorField globalMasterInterpField
+      (
+          masterFaceZonePatchPtr_->size(),
+          vector::zero
+          );
   if (slaveToMasterPatchToPatchInterpolatorPtr_)
-    {
+  {
       globalMasterInterpField =
-        slaveToMasterPatchToPatchInterpolatorPtr_->faceInterpolate<vector>
-        (
-         globalSlaveField
-         );
-    }
+          slaveToMasterPatchToPatchInterpolatorPtr_->faceInterpolate<vector>
+          (
+              globalSlaveField
+              );
+  }
   else if (slaveToMasterGgiInterpolatorPtr_)
-    {
+  {
       globalMasterInterpField =
-        slaveToMasterGgiInterpolatorPtr_->slaveToMaster
-        (
-         globalSlaveField
-         );
-    }
+          slaveToMasterGgiInterpolatorPtr_->slaveToMaster
+          (
+              globalSlaveField
+              );
+  }
   else
-    {
+  {
       FatalErrorIn("solidContactFvPatchVectorField::interpolateSlaveToMaster()")
-        << "interpolationMethod is not patchToPatch or GGI!"
-        << abort(FatalError);
-    }
+          << "interpolationMethod is not patchToPatch or GGI!"
+          << abort(FatalError);
+  }
 
   // now put global back into local
   const label masterPatchStart
     = mesh.boundaryMesh()[patch().index()].start();
 
-  tmp<vectorField> tmasterInterpField(new vectorField(masterFaceZonePatchPtr_->size(), vector::zero));
+  tmp<vectorField> tmasterInterpField
+      (
+          new vectorField(masterFaceZonePatchPtr_->size(),vector::zero)
+          );
   vectorField& masterInterpField = tmasterInterpField();
 
   forAll(masterInterpField, i)
@@ -851,9 +958,10 @@ void solidContactFvPatchVectorField::moveFaceZonePatches()
   // should be in the same deformed position on all procs.
   if (!master_)
     {
-      FatalError << "Only the master may call the function "
-        "solidContactFvPatchVectorField::moveFaceZonePatches"
-                 << exit(FatalError);
+      FatalError
+          << "Only the master may call the function "
+          "solidContactFvPatchVectorField::moveFaceZonePatches"
+          << exit(FatalError);
     }
 
   // update face zone patch interpolators
@@ -897,20 +1005,17 @@ void solidContactFvPatchVectorField::moveFaceZonePatches()
   // put localMasterU field into globalMasterU
   forAll(localMasterU, i)
     {
-      globalMasterU[mesh.faceZones()[masterFaceZoneID_].whichFace(masterPatchStart + i)] =
-        localMasterU[i];
+      globalMasterU[
+          mesh.faceZones()[masterFaceZoneID_].whichFace(masterPatchStart + i)
+          ] = localMasterU[i];
     }
   // put localSlaveU field into globalSlaveU
   forAll(localSlaveU, i)
     {
-      globalSlaveU[mesh.faceZones()[slaveFaceZoneID_].whichFace(slavePatchStart + i)] =
-        localSlaveU[i];
+      globalSlaveU[
+          mesh.faceZones()[slaveFaceZoneID_].whichFace(slavePatchStart + i)
+          ] = localSlaveU[i];
     }
-
-  // if (Pstream::myProcNo() == 2) // && (facei == 20) )
-  //   {
-  //     Pout << nl << "localSlaveU[20] " << localSlaveU[20] << endl;
-  //   }
 
   //- exchange parallel data
   // sum because each face is only on one proc
@@ -934,7 +1039,8 @@ void solidContactFvPatchVectorField::moveFaceZonePatches()
   // globalMasterNewPoints = (I - sqr(iHat)) & globalMasterNewPoints;
 
   // Add displacement to undeformed mesh points
-  // globalMasterNewPoints += mesh.faceZones()[masterFaceZoneID_]().localPoints();
+  // globalMasterNewPoints +=
+  // mesh.faceZones()[masterFaceZoneID_]().localPoints();
   // globalSlaveNewPoints += mesh.faceZones()[slaveFaceZoneID_]().localPoints();
   // BUG FIX 13-08-13 - philipc
   // the faceZones keep with the mesh (mesh.faceZones()) are not moved correctly
@@ -944,37 +1050,15 @@ void solidContactFvPatchVectorField::moveFaceZonePatches()
 
   // find points which are on symmetryPlanes and force them
   // to stay exactly on the symmetryPlane - WIP
-  // const labelList& slaveBoundaryPoints = slaveFaceZonePatchPtr_->boundaryPoints();
+  // const labelList& slaveBoundaryPoints =
+  // slaveFaceZonePatchPtr_->boundaryPoints();
   // const labelList& slaveMeshPoints = slaveFaceZonePatchPtr_->meshPoints();
   // labelList slaveBoundaryPointsGlobalIndex(slaveBoundaryPoints.size(), -1);
   // forAll(slaveBoundaryPointsGlobalIndex, pointi)
   //   {
-  //     slaveBoundaryPointsGlobalIndex[pointi] = slaveMeshPoints[slaveBoundaryPoints[pointi]];
+  //     slaveBoundaryPointsGlobalIndex[pointi] =
+  // slaveMeshPoints[slaveBoundaryPoints[pointi]];
   //   }
-
-  // forAll(mesh.boundary(), patchi)
-  //   {
-  //     if (mesh.boundary()[patchi].type() == "symmetryPlane"
-  //          ||
-  //          mesh.boundary()[patchi].type() == "empty")
-  //         {
-  //           Info << "patch " << mesh.boundary()[patchi].name() << " is a symmetryPlane or empty"
-  //                << endl;
-
-  //           const labelList& meshPoints = mesh.boundary()[patchi].meshPoints();
-
-  //           forAll(slaveBoundaryPointsGlobalIndex, pointi)
-  //             {
-  //               label pointGlobalID = slaveBoundaryPointsGlobalIndex[pointi];
-  //               if (mesh.boundary()[patchi].whichPoint(pointGlobalID) > -1)
-  //                 {
-  //                   // remove normal component
-  //                   globalMasterNewPoints[pointGlobalID]
-  //                 }
-  //             }
-  //         }
-  //   }
-
 
   // as I can't figure out how to move the points
   // of the current face zone patches
@@ -1013,67 +1097,56 @@ void solidContactFvPatchVectorField::moveFaceZonePatches()
   //    slaveFaceZonePatchPtr_->localPoints()
   //    );
 
-
-  // if (mesh.time().value() > 0.00125)
-  //   {
-  //     masterFaceZonePatchPtr_->writeVTK
-  //         (
-  //          fileName("masterFaceZonePatch"+name(Pstream::myProcNo())),
-  //          masterFaceZonePatchPtr_->localFaces(),
-  //          masterFaceZonePatchPtr_->localPoints()
-  //          );
-
-  //     slaveFaceZonePatchPtr_->writeVTK
-  //         (
-  //          fileName("slaveFaceZonePatch"+name(Pstream::myProcNo())),
-  //          slaveFaceZonePatchPtr_->localFaces(),
-  //          slaveFaceZonePatchPtr_->localPoints()
-  //          );
-  //     scalar a = 3;
-  //     reduce(a, sumOp<scalar>());
-  //     FatalError << "end" << exit(FatalError);
-  //   }
-
   // The patchToPatch, GGI and primitivePatch interpolators point to the
   // old primitive patches so I must delete these interpolators
   // it would be much nicer if I could just move the faceZonePatch points...
   if (slaveToMasterPatchToPatchInterpolatorPtr_)
-    {
+  {
       delete slaveToMasterPatchToPatchInterpolatorPtr_;
       slaveToMasterPatchToPatchInterpolatorPtr_ =
-        new PatchToPatchInterpolation<PrimitivePatch<face, Foam::List, pointField>, PrimitivePatch<face, Foam::List, pointField> >
-        (
-         *slaveFaceZonePatchPtr_, // from zone
-         *masterFaceZonePatchPtr_, // to zone
-         alg_,
-         dir_
-         );
-    }
+          new PatchToPatchInterpolation<
+              PrimitivePatch<
+                  face, Foam::List, pointField
+                  >, PrimitivePatch<face, Foam::List, pointField> >
+          (
+              *slaveFaceZonePatchPtr_, // from zone
+              *masterFaceZonePatchPtr_, // to zone
+              alg_,
+              dir_
+              );
+  }
   else if (slaveToMasterGgiInterpolatorPtr_)
-    {
+  {
       delete slaveToMasterGgiInterpolatorPtr_;
       slaveToMasterGgiInterpolatorPtr_ =
-        new GGIInterpolation< PrimitivePatch< face, Foam::List, pointField >, PrimitivePatch< face, Foam::List, pointField > >
-        (
-         *masterFaceZonePatchPtr_, // master zone
-         *slaveFaceZonePatchPtr_, // slave zone
-         tensorField(0),
-         tensorField(0),
-         vectorField(0),
-         0.0,
-         0.0,
-         true,
-         ggiInterpolation::AABB
-         );
-    }
+        new GGIInterpolation<
+            PrimitivePatch<
+                face, Foam::List, pointField
+                >, PrimitivePatch< face, Foam::List, pointField > >
+          (
+              *masterFaceZonePatchPtr_, // master zone
+              *slaveFaceZonePatchPtr_, // slave zone
+              tensorField(0),
+              tensorField(0),
+              vectorField(0),
+              0.0,
+              0.0,
+              true,
+              ggiInterpolation::AABB
+              );
+  }
 
   // and primitive patch interpolators
   delete masterFaceZonePatchInterpolatorPtr_;
   masterFaceZonePatchInterpolatorPtr_ =
-    new PrimitivePatchInterpolation< PrimitivePatch<face, Foam::List, pointField> >(*masterFaceZonePatchPtr_);
+    new PrimitivePatchInterpolation<
+        PrimitivePatch<face, Foam::List, pointField>
+        >(*masterFaceZonePatchPtr_);
   delete slaveFaceZonePatchInterpolatorPtr_;
   slaveFaceZonePatchInterpolatorPtr_ =
-    new PrimitivePatchInterpolation< PrimitivePatch<face, Foam::List, pointField> >(*slaveFaceZonePatchPtr_);
+    new PrimitivePatchInterpolation<
+        PrimitivePatch<face, Foam::List, pointField>
+        >(*slaveFaceZonePatchPtr_);
 
   // Also maybe I should correct motion for 2D models
   // OK for now
@@ -1081,7 +1154,8 @@ void solidContactFvPatchVectorField::moveFaceZonePatches()
 
 
 // check shadow patch and face zones exist
-bool solidContactFvPatchVectorField::checkPatchAndFaceZones(const dictionary& dict) const
+bool solidContactFvPatchVectorField::checkPatchAndFaceZones
+(const dictionary& dict) const
 {
   // check shadow patch
   word shadowName = dict.lookup("shadowPatch");
@@ -1093,58 +1167,78 @@ bool solidContactFvPatchVectorField::checkPatchAndFaceZones(const dictionary& di
     }
 
   word curZoneName = patch().name()+"FaceZone";
-  word shadowZoneName = patch().boundaryMesh().mesh().boundary()[shadowPatchID].name() + "FaceZone";
+  word shadowZoneName =
+  patch().boundaryMesh().mesh().boundary()[shadowPatchID].name() + "FaceZone";
   label curPatchFaceZoneID =
     patch().boundaryMesh().mesh().faceZones().findZoneID(curZoneName);
   if (curPatchFaceZoneID == -1)
     {
-      FatalError << "faceZone " << curZoneName
-                 << " not found and is required for the solidContact boundaries\n"
-                 << "To create a faceZone from a patch, use the setSet and setsToZone utilities:\n"
-                 << "\tsetSet\n"
-                 << "\tfaceSet "<<curZoneName<<" new patchToFace "<<patch().name()<< nl
-                 << "\tfaceSet "<<shadowZoneName<<" new patchToFace "<<shadowName<<nl
-                 << "\tquit\n"
-                 << "\tsetsToZones -noFlipMap\n"
-                 << exit(FatalError);
+      FatalError
+          << "faceZone " << curZoneName
+          << " not found and is required for the solidContact boundaries\n"
+          << "To create a faceZone from a patch, use the setSet and "
+          << "setsToZone utilities:\n"
+          << "\tsetSet\n"
+          << "\tfaceSet "<<curZoneName<<" new patchToFace "<<patch().name()<< nl
+          << "\tfaceSet "<<shadowZoneName<<" new patchToFace "<<shadowName<<nl
+          << "\tquit\n"
+          << "\tsetsToZones -noFlipMap\n"
+          << exit(FatalError);
     }
 
   label shadowPatchFaceZoneID =
-    patch().boundaryMesh().mesh().faceZones().findZoneID(shadowZoneName);
+  patch().boundaryMesh().mesh().faceZones().findZoneID(shadowZoneName);
 
   if (shadowPatchFaceZoneID == -1)
-    {
-      FatalError << "faceZone " << shadowZoneName
-                 << " not found and is required for the solidContact boundaries\n"
-                 << "To create a faceZone from a patch, use the setSet and setsToZone utilities:\n"
-                 << "\tsetSet\n"
-                 << "\tfaceSet "<<curZoneName<<" new patchToFace "<<patch().name()<< nl
-                 << "\tfaceSet "<<shadowZoneName<<" new patchToFace "<<shadowName<<nl
-                 << "\tquit\n"
-                 << "\tcreate zones from sets\n"
-                 << "\tsetsToZones -noFlipMap\n"
-                 << exit(FatalError);
-    }
+  {
+      FatalError
+          << "faceZone " << shadowZoneName
+          << " not found and is required for the solidContact boundaries\n"
+          << "To create a faceZone from a patch, use the setSet and "
+          << "setsToZone utilities:\n"
+          << "\tsetSet\n"
+          << "\tfaceSet "<<curZoneName<<" new patchToFace "<<patch().name()<< nl
+          << "\tfaceSet "<<shadowZoneName<<" new patchToFace "<<shadowName<<nl
+          << "\tquit\n"
+          << "\tcreate zones from sets\n"
+          << "\tsetsToZones -noFlipMap\n"
+          << exit(FatalError);
+  }
 
-  // if the total amount of faces in the master or slave face zones is zero then something is
+  // if the total amount of faces in the master or slave face zones is zero
+  // then something is
   // wrong with the face zones - they were probably created wrong.
-  if (returnReduce(patch().boundaryMesh().mesh().faceZones()[curPatchFaceZoneID].size(), sumOp<label>()) < 1)
-    {
-      FatalError << "faceZone " << curZoneName
-                 << ", which is required for the solidContact boundaries,"
-                 << " has no faces!\n"
-                 << "You probably made a mistake creating the faceZones."
-                 << exit(FatalError);
-    }
+  if (
+      returnReduce
+      (
+          patch().boundaryMesh().mesh().faceZones()[curPatchFaceZoneID].size(),
+          sumOp<label>()
+          ) < 1
+      )
+  {
+      FatalError
+          << "faceZone " << curZoneName
+          << ", which is required for the solidContact boundaries,"
+          << " has no faces!\n"
+          << "You probably made a mistake creating the faceZones."
+          << exit(FatalError);
+  }
 
-  if (returnReduce(patch().boundaryMesh().mesh().faceZones()[shadowPatchFaceZoneID].size(), sumOp<label>()) < 1)
-    {
-      FatalError << "faceZone " << shadowZoneName
-                 << ", which is required for the solidContact boundaries,"
-                 << " has no faces!\n"
-                 << "You probably made a mistake creating the faceZones."
-                 << exit(FatalError);
-    }
+  if (
+      returnReduce
+      (
+          patch().boundaryMesh().mesh().faceZones()
+          [shadowPatchFaceZoneID].size(),
+          sumOp<label>()
+          ) < 1)
+  {
+      FatalError
+          << "faceZone " << shadowZoneName
+          << ", which is required for the solidContact boundaries,"
+          << " has no faces!\n"
+          << "You probably made a mistake creating the faceZones."
+          << exit(FatalError);
+  }
 
   return true;
 }
@@ -1241,7 +1335,8 @@ tmp<scalarField> solidContactFvPatchVectorField::Qc() const
       );
 
   vectorField Sf = patch().Sf();
-  if (nonLinear_ != nonLinearGeometry::OFF && nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
+  if (nonLinear_ != nonLinearGeometry::OFF
+      && nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
     {
       // current areas
       const fvPatchField<tensor>& gradU =
@@ -1305,26 +1400,47 @@ void solidContactFvPatchVectorField::write(Ostream& os) const
     directionMixedFvPatchVectorField::write(os);
 
     os.writeKeyword("master") << master_ << token::END_STATEMENT << nl;
-    os.writeKeyword("shadowPatch") << patch().boundaryMesh().mesh().boundary()[shadowPatchID_].name() << token::END_STATEMENT << nl;
-    os.writeKeyword("orthotropic") << orthotropic_ << token::END_STATEMENT << nl;
-    os.writeKeyword("nonLinear") << nonLinearGeometry::nonLinearNames_[nonLinear_] << token::END_STATEMENT << nl;
-    os.writeKeyword("contactActive") << contactActive_ << token::END_STATEMENT << nl;
+    os.writeKeyword("shadowPatch")
+        << patch().boundaryMesh().mesh().boundary()[shadowPatchID_].name()
+        << token::END_STATEMENT << nl;
+    os.writeKeyword("orthotropic") << orthotropic_
+                                   << token::END_STATEMENT << nl;
+    os.writeKeyword("nonLinear")
+        << nonLinearGeometry::nonLinearNames_[nonLinear_]
+        << token::END_STATEMENT << nl;
+    os.writeKeyword("contactActive")
+        << contactActive_ << token::END_STATEMENT << nl;
 
     if (master_)
       {
-        os.writeKeyword("rigidMaster") << rigidMaster_ << token::END_STATEMENT << nl;
+        os.writeKeyword("rigidMaster")
+            << rigidMaster_ << token::END_STATEMENT << nl;
         if (contactActive_)
           {
-            os.writeKeyword("normalContactModel") << normalContactModelPtr_->type()
-                                                  << token::END_STATEMENT << nl;
-            if (normalContactModelPtr_) normalContactModelPtr_->writeDict(os);
-            os.writeKeyword("frictionContactModel") << frictionContactModelPtr_->type()
-                                                    << token::END_STATEMENT << nl;
-            if (frictionContactModelPtr_) frictionContactModelPtr_->writeDict(os);
-            os.writeKeyword("interpolationMethod") << interpolationMethod_ << token::END_STATEMENT << nl;
-            os.writeKeyword("projectionAlgo") << intersection::algorithmNames_[alg_] << token::END_STATEMENT << nl;
-            os.writeKeyword("projectionDir") << intersection::directionNames_[dir_] << token::END_STATEMENT << nl;
-            os.writeKeyword("correctionFrequency") << correctionFreq_ << token::END_STATEMENT << nl;
+            os.writeKeyword("normalContactModel")
+                << normalContactModelPtr_->type()
+                << token::END_STATEMENT << nl;
+            if (normalContactModelPtr_)
+            {
+                normalContactModelPtr_->writeDict(os);
+            }
+            os.writeKeyword("frictionContactModel")
+                << frictionContactModelPtr_->type()
+                << token::END_STATEMENT << nl;
+            if (frictionContactModelPtr_)
+            {
+                frictionContactModelPtr_->writeDict(os);
+            }
+            os.writeKeyword("interpolationMethod")
+                << interpolationMethod_ << token::END_STATEMENT << nl;
+            os.writeKeyword("projectionAlgo")
+                << intersection::algorithmNames_[alg_]
+                << token::END_STATEMENT << nl;
+            os.writeKeyword("projectionDir")
+                << intersection::directionNames_[dir_]
+                << token::END_STATEMENT << nl;
+            os.writeKeyword("correctionFrequency")
+                << correctionFreq_ << token::END_STATEMENT << nl;
           }
       }
 

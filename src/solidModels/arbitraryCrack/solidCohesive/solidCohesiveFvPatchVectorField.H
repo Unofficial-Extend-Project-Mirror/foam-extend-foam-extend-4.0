@@ -149,7 +149,7 @@ class solidCohesiveFvPatchVectorField
         void calcPenaltyFactor();
         virtual scalar penaltyFactor()
         {
-            if(!penaltyFactorPtr_)
+            if (!penaltyFactorPtr_)
             {
                 calcPenaltyFactor();
             }

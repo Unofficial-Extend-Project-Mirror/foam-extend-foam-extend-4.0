@@ -101,12 +101,12 @@ Foam::tmp<Foam::volScalarField> Foam::PronyViscoelastic::E(scalar t) const
 
     E = k_[0];
 
-    for(int i=1; i<k_.size(); i++)
+    for (int i=1; i<k_.size(); i++)
     {
         E += k_[i]*exp(-t/tau_[i]);
     }
-    
-    if(t < 0)
+
+    if (t < 0)
     {
         E = 0;
     }
@@ -162,7 +162,7 @@ Foam::tmp<Foam::volScalarField> Foam::PronyViscoelastic::nu(scalar t) const
 Foam::tmp<Foam::volScalarField> Foam::PronyViscoelastic::J(scalar t) const
 {
     notImplemented(type() + "::J(scalar t)");
-    
+
     return 1.0/E(t);
 }
 

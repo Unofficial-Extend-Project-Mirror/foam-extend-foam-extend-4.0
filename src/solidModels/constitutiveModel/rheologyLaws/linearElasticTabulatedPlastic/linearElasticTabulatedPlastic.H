@@ -31,7 +31,7 @@ Description
 
 SourceFiles
     linearElasticTabulatedPlastic.C
-    
+
 Author
     Philip Cardiff UCD
     philip.cardiff@gmail.com
@@ -79,7 +79,7 @@ class linearElasticTabulatedPlastic
 
         //- Initial Yield stress
         dimensionedScalar sigmaY_;
-        
+
 
     // Private Member Functions
 
@@ -160,13 +160,14 @@ public:
         virtual tmp<volScalarField> sigmaY() const;
 
         //- Return yield stress
-        virtual scalar sigmaY(const scalar epsilonPEq, const label cellID) const;
+        virtual scalar sigmaY
+        (const scalar epsilonPEq, const label cellID) const;
 
         //- If the rheologyLaw needs plasticity procedures
         virtual bool plasticityModelNeeded() const
         {
-	  return true;
-	};
+            return true;
+        };
 
         //- Return plastic modulus
         virtual tmp<volScalarField> Ep() const;

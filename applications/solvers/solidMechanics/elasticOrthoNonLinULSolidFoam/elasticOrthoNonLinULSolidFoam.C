@@ -1,4 +1,4 @@
-/*---------------------------------------------------------------------------*	\
+/*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
@@ -75,110 +75,110 @@ int main(int argc, char *argv[])
   for (runTime++; !runTime.end(); runTime++)
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
-      
+
 #     include "readSolidMechanicsControls.H"
 
       int iCorr = 0;
       lduMatrix::solverPerformance solverPerf;
-      scalar initialResidual = 1.00;
+      scalar initialResidual = 1.0;
       lduMatrix::debug = 0;
 
       //- div(sigmaOld) should be zero but I will include
       //- it to make sure errors don't accumulate
       volVectorField* oldErrorPtr = NULL;
-      if(ensureTotalEquilibrium)
-        {
+      if (ensureTotalEquilibrium)
+      {
           oldErrorPtr = new volVectorField
-            (
-             fvc::d2dt2(rho.oldTime(), U.oldTime())
-             - fvc::div(sigma)
-             );
-        }
+              (
+                  fvc::d2dt2(rho.oldTime(), U.oldTime())
+                  - fvc::div(sigma)
+                  );
+      }
 
       do
-        {
-	  DU.storePrevIter();
+      {
+          DU.storePrevIter();
 
-	  //- updated lagrangian large strain momentum equation
-	  fvVectorMatrix DUEqn
-            (
-	     fvm::d2dt2(rho, DU)
-	     + fvc::d2dt2(rho, U)
-	     ==
- 	     fvm::laplacian(K, DU, "laplacian(K,DU)") 
- 	     + fvc::div(
-			DSigma
-			- (K & gradDU)
-			+ ( (sigma + DSigma) & gradDU ),
-			"div(sigma)"
-			)
- 	     //- fvc::laplacian(K, DU)
-	     );
+          //- Updated lagrangian momentum equation
+          fvVectorMatrix DUEqn
+              (
+                  fvm::d2dt2(rho, DU)
+                  + fvc::d2dt2(rho, U)
+                  ==
+                  fvm::laplacian(K, DU, "laplacian(K,DU)")
+                  + fvc::div(
+                      DSigma
+                      - (K & gradDU)
+                      + ( (sigma + DSigma) & gradDU ),
+                      "div(sigma)"
+                      )
+                  //- fvc::laplacian(K, DU)
+                  );
 
-          if(ensureTotalEquilibrium)
-            {
-	      //- to stop accumulation of errors
+          if (ensureTotalEquilibrium)
+          {
+              //- to stop accumulation of errors
               DUEqn += *oldErrorPtr;
-            }
+          }
 
-	  solverPerf = DUEqn.solve();
+          solverPerf = DUEqn.solve();
 
-	  if(iCorr == 0)
-	    {
-	      initialResidual = solverPerf.initialResidual();
-	    }
-	  
-	  DU.relax();
+          if (iCorr == 0)
+          {
+              initialResidual = solverPerf.initialResidual();
+          }
 
-	  gradDU = fvc::grad(DU);
+          DU.relax();
 
-	  //- for 2-D plane stress simulations, the zz component of gradDU
-	  //- ensures sigma.zz() is zero
-	  //- it is assumed that z is the empty direction
-	  //#         include "checkPlaneStress.H"
+          gradDU = fvc::grad(DU);
 
-	  //- sigma needs to be calculated inside the momentum loop as
-	  //- it is used in the momentum equation
-	  DEpsilon = symm(gradDU) + 0.5*symm(gradDU & gradDU.T());
-	  DSigma = C && DEpsilon;
+          //- for 2-D plane stress simulations, the zz component of gradDU
+          //- ensures sigma.zz() is zero
+          //- it is assumed that z is the empty direction
+          //#         include "checkPlaneStress.H"
 
-	  if(iCorr % infoFrequency == 0)
-	    {
-	      Info << "\tTime " << runTime.value()
-		   << ", Corr " << iCorr
-		   << ", Solving for " << DU.name()
-		   << " using " << solverPerf.solverName()
-		   << ", res = " << solverPerf.initialResidual()
-		//<< ", rel res = " << relativeResidual
-		   << ", inner iters " << solverPerf.nIterations() << endl;
-	    }
-        }
-	while
-	  (
-	   solverPerf.initialResidual() > convergenceTolerance
-	   &&
-	   ++iCorr < nCorr
-	   );
-	
-      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name() 
-	   << ", Initial residual = " << initialResidual 
-	   << ", Final residual = " << solverPerf.initialResidual()
-	   << ", No outer iterations " << iCorr
-	   << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	   << "  ClockTime = " << runTime.elapsedClockTime() << " s" 
-	   << endl;
-      
+          //- sigma needs to be calculated inside the momentum loop as
+          //- it is used in the momentum equation
+          DEpsilon = symm(gradDU) + 0.5*symm(gradDU & gradDU.T());
+          DSigma = C && DEpsilon;
+
+          if (iCorr % infoFrequency == 0)
+          {
+              Info << "\tTime " << runTime.value()
+                   << ", Corr " << iCorr
+                   << ", Solving for " << DU.name()
+                   << " using " << solverPerf.solverName()
+                   << ", res = " << solverPerf.initialResidual()
+                  //<< ", rel res = " << relativeResidual
+                   << ", inner iters " << solverPerf.nIterations() << endl;
+          }
+      }
+      while
+          (
+              solverPerf.initialResidual() > convergenceTolerance
+              &&
+              ++iCorr < nCorr
+              );
+
+      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name()
+           << ", Initial residual = " << initialResidual
+           << ", Final residual = " << solverPerf.initialResidual()
+           << ", No outer iterations " << iCorr
+           << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+           << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+           << endl;
+
 #     include "moveMeshLeastSquares.H"
 #     include "rotateFields.H"
 #     include "writeFields.H"
 
       Info<< "ExecutionTime = "
-	  << runTime.elapsedCpuTime()
-	  << " s\n\n" << endl;
+          << runTime.elapsedCpuTime()
+          << " s\n\n" << endl;
     }
 
   Info<< "End\n" << endl;
-  
+
   return(0);
 }
 

@@ -151,31 +151,31 @@ public:
         }
 
         //- Return materials
-	virtual tmp<volScalarField> materials() const = 0;
+    virtual tmp<volScalarField> materials() const = 0;
 
         //-  Return sigmaMax for interface given two material indicators
         virtual scalar interfaceSigmaMax(double mat1, double mat2) const
-	{
-	    return 0;  
-	}
+    {
+        return 0;
+    }
 
         //-  Return tauMax for interface given two material indicators
         virtual scalar interfaceTauMax(double mat1, double mat2) const
-	{
-	    return 0;  
-	}
+    {
+        return 0;
+    }
 
         //-  Return GIc for interface given two material indicators
         virtual scalar interfaceGIc(double mat1, double mat2) const
-	{
-	    return 0;  
-	}
+    {
+        return 0;
+    }
 
         //-  Return GIIc for interface given two material indicators
         virtual scalar interfaceGIIc(double mat1, double mat2) const
-	{
-	    return 0;  
-	}
+    {
+        return 0;
+    }
 
         //- Return opening cohesive strength - surface field
         virtual scalar sigmaMaxValue() const = 0;
@@ -193,35 +193,29 @@ public:
         virtual scalar GIIcValue() const = 0;
         virtual tmp<surfaceScalarField> GIIc() const = 0;
 
-        //- Return normal traction (during damage) given current deltas
-        // virtual scalar normalTraction(scalar deltaN, scalar deltaS) const = 0;
-
-        //- Return shear traction (during damage) given current deltas
-        // virtual scalar shearTraction(scalar deltaN, scalar deltaS) const = 0;
-
         //- Return tractions during damage given current deltas and Gs
         virtual void damageTractions
-	(
-	 scalar& tN, // current normal traction 
-	 scalar& tS, // current shear traction
-	 const scalar deltaN, // current deltaN 
-	 const scalar deltaS, // current deltaS 
-	 const scalar GI, // current dissipated GI 
-	 const scalar GII, // current dissipated GII
-	 const label faceID, // needed for multi-mat
-	 const scalarField& globalPatchMaterials
-	 ) const = 0;
+    (
+     scalar& tN, // current normal traction
+     scalar& tS, // current shear traction
+     const scalar deltaN, // current deltaN
+     const scalar deltaS, // current deltaS
+     const scalar GI, // current dissipated GI
+     const scalar GII, // current dissipated GII
+     const label faceID, // needed for multi-mat
+     const scalarField& globalPatchMaterials
+     ) const = 0;
 
-	//- Return interface traction
+    //- Return interface traction
         //- hmmnn this should not be here - maybe put in solidInterface
-	virtual tmp<surfaceVectorField> interfaceTraction
-	(
-	 surfaceVectorField n,
-	 volVectorField U,
-	 volTensorField gradU,
-	 volScalarField mu,
-	 volScalarField lambda
-	 ) const = 0;
+    virtual tmp<surfaceVectorField> interfaceTraction
+    (
+     surfaceVectorField n,
+     volVectorField U,
+     volTensorField gradU,
+     volScalarField mu,
+     volScalarField lambda
+     ) const = 0;
 
         //- Correct the rheological model
         virtual void correct() = 0;

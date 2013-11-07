@@ -113,8 +113,8 @@ public:
         //- Construct from dictionary
         yamadaMises
         (
-	 const word& name,
-	 constitutiveModel& constitutiveModel
+            const word& name,
+            constitutiveModel& constitutiveModel
         );
 
 
@@ -131,8 +131,8 @@ public:
         //- Return slave friction value fraction
         virtual const volSymmTensorField& DEpsilonP() const
         {
-	  return DEpsilonP_;
-	}
+            return DEpsilonP_;
+        }
 
         //- Return slave friction value fraction
         virtual void updateYieldStress();

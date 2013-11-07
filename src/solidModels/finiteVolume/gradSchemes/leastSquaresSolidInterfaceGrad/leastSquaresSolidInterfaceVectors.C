@@ -41,7 +41,8 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors * * * * * * * * * * * * * * //
 
-Foam::leastSquaresSolidInterfaceVectors::leastSquaresSolidInterfaceVectors(const fvMesh& mesh)
+Foam::leastSquaresSolidInterfaceVectors::leastSquaresSolidInterfaceVectors
+(const fvMesh& mesh)
 :
     MeshObject<fvMesh, leastSquaresSolidInterfaceVectors>(mesh),
     pVectorsPtr_(NULL),
@@ -112,9 +113,11 @@ void Foam::leastSquaresSolidInterfaceVectors::makeLeastSquaresVectors() const
 
     // interface fields
     const solidInterface& solInt =
-      mesh().objectRegistry::lookupObject<IOReferencer<solidInterface> >("solidInterface")();
+      mesh().objectRegistry::lookupObject<IOReferencer<solidInterface> >
+        ("solidInterface")();
     const labelList& interfaceFacesMap = solInt.indicatorFieldMap();
-    const labelListList& interfaceProcPatchFacesMap = solInt.processorPatchFacesMap();
+    const labelListList& interfaceProcPatchFacesMap =
+        solInt.processorPatchFacesMap();
 
     // Set up temporary storage for the dd tensor (before inversion)
     symmTensorField dd(mesh().nCells(), symmTensor::zero);
@@ -124,27 +127,27 @@ void Foam::leastSquaresSolidInterfaceVectors::makeLeastSquaresVectors() const
         label own = owner[facei];
         label nei = neighbour[facei];
 
-	if(interfaceFacesMap[facei] > -SMALL)
-	  {
-	    // for interface faces, we use the face centre value
-	    // instead of the neighbour cell centre
-	    vector ownD = Cf[facei] - C[own];
-	    vector neiD = C[nei] - Cf[facei];
-	    symmTensor ownWdd = (1.0/magSqr(ownD))*sqr(ownD);
-	    symmTensor neiWdd = (1.0/magSqr(neiD))*sqr(neiD);
+        if (interfaceFacesMap[facei] > -SMALL)
+        {
+            // for interface faces, we use the face centre value
+            // instead of the neighbour cell centre
+            vector ownD = Cf[facei] - C[own];
+            vector neiD = C[nei] - Cf[facei];
+            symmTensor ownWdd = (1.0/magSqr(ownD))*sqr(ownD);
+            symmTensor neiWdd = (1.0/magSqr(neiD))*sqr(neiD);
 
-	    dd[own] += ownWdd;
-	    dd[nei] += neiWdd;
-	  }
-	else
-	  {
-	    // standard method
-	    vector d = C[nei] - C[own];
-	    symmTensor wdd = (1.0/magSqr(d))*sqr(d);
+            dd[own] += ownWdd;
+            dd[nei] += neiWdd;
+        }
+        else
+        {
+            // standard method
+            vector d = C[nei] - C[own];
+            symmTensor wdd = (1.0/magSqr(d))*sqr(d);
 
-	    dd[own] += wdd;
-	    dd[nei] += wdd;
-	  }
+            dd[own] += wdd;
+            dd[nei] += wdd;
+        }
     }
 
 
@@ -153,7 +156,8 @@ void Foam::leastSquaresSolidInterfaceVectors::makeLeastSquaresVectors() const
         const fvsPatchScalarField& pw = w.boundaryField()[patchi];
         // Note: least squares in 1.4.1 and other OpenCFD versions
         // are wrong because of incorrect weighting.  HJ, 23/Oct/2008
-	//         const fvsPatchScalarField& pMagSf = magSf.boundaryField()[patchi];
+        //         const fvsPatchScalarField& pMagSf =
+        //magSf.boundaryField()[patchi];
 
         const fvPatch& p = pw.patch();
         const unallocLabelList& faceCells = p.patch().faceCells();
@@ -161,7 +165,7 @@ void Foam::leastSquaresSolidInterfaceVectors::makeLeastSquaresVectors() const
         // Build the d-vectors
 
         // Original version: closest distance to boundary
-	// vectorField pd =
+        // vectorField pd =
 //             mesh().Sf().boundaryField()[patchi]
 //            /(
 //                mesh().magSf().boundaryField()[patchi]
@@ -172,32 +176,34 @@ void Foam::leastSquaresSolidInterfaceVectors::makeLeastSquaresVectors() const
 //         {
 //             pd -= mesh().correctionVectors().boundaryField()[patchi]
 //                 /mesh().deltaCoeffs().boundaryField()[patchi];
-// 		}
+//          }
 
         // Better version of d-vectors: Zeljko Tukovic, 25/Apr/2010
         // Experimental: review fixed gradient condition.  HJ, 30/Sep/2010
-	// philipc - full delta vector imperative for solid mechanics
-	vectorField pd = p.delta();
+        // philipc - full delta vector imperative for solid mechanics
+        vectorField pd = p.delta();
 
         if (p.coupled())
         {
             forAll(pd, patchFacei)
             {
-	      // philipc: special treatment of solid inter faces
-	      if(interfaceProcPatchFacesMap[patchi][patchFacei] > -SMALL)
-		{
-		  // use face centre instead of neighbour
-		  const vector d = Cf.boundaryField()[patchi][patchFacei] - C[faceCells[patchFacei]];
+                // philipc: special treatment of solid inter faces
+                if (interfaceProcPatchFacesMap[patchi][patchFacei] > -SMALL)
+                {
+                    // use face centre instead of neighbour
+                    const vector d =
+                        Cf.boundaryField()[patchi][patchFacei]
+                        - C[faceCells[patchFacei]];
 
-		  dd[faceCells[patchFacei]] += (1.0/magSqr(d))*sqr(d);
-		}
-	      else
-		{
-		  // standard method
-		  const vector& d = pd[patchFacei];
-		  
-		  dd[faceCells[patchFacei]] += (1.0/magSqr(d))*sqr(d);
-		}
+                    dd[faceCells[patchFacei]] += (1.0/magSqr(d))*sqr(d);
+                }
+                else
+                {
+                    // standard method
+                    const vector& d = pd[patchFacei];
+
+                    dd[faceCells[patchFacei]] += (1.0/magSqr(d))*sqr(d);
+                }
             }
         }
         else
@@ -224,27 +230,27 @@ void Foam::leastSquaresSolidInterfaceVectors::makeLeastSquaresVectors() const
         label own = owner[facei];
         label nei = neighbour[facei];
 
-	if(interfaceFacesMap[facei] > -SMALL)
-	  {
-	    // for interface faces, we use the face centre value
-	    // instead of the neighbour cell centre
-	    vector ownD = Cf[facei] - C[own];
-	    vector neiD = C[nei] - Cf[facei];
-	    scalar ownMagSfByMagSqrd = 1.0/magSqr(ownD);
-	    scalar neiMagSfByMagSqrd = 1.0/magSqr(neiD);
-	    
-	    lsP[facei] = ownMagSfByMagSqrd*(invDd[own] & ownD);
-	    lsN[facei] = -neiMagSfByMagSqrd*(invDd[nei] & neiD);
-	  }
-	else
-	  {
-	    // standard method
-	    vector d = C[nei] - C[own];
-	    scalar magSfByMagSqrd = 1.0/magSqr(d);
-	    
-	    lsP[facei] = magSfByMagSqrd*(invDd[own] & d);
-	    lsN[facei] = -magSfByMagSqrd*(invDd[nei] & d);
-	  }
+        if (interfaceFacesMap[facei] > -SMALL)
+        {
+            // for interface faces, we use the face centre value
+            // instead of the neighbour cell centre
+            vector ownD = Cf[facei] - C[own];
+            vector neiD = C[nei] - Cf[facei];
+            scalar ownMagSfByMagSqrd = 1.0/magSqr(ownD);
+            scalar neiMagSfByMagSqrd = 1.0/magSqr(neiD);
+
+            lsP[facei] = ownMagSfByMagSqrd*(invDd[own] & ownD);
+            lsN[facei] = -neiMagSfByMagSqrd*(invDd[nei] & neiD);
+        }
+        else
+        {
+            // standard method
+            vector d = C[nei] - C[own];
+            scalar magSfByMagSqrd = 1.0/magSqr(d);
+
+            lsP[facei] = magSfByMagSqrd*(invDd[own] & d);
+            lsN[facei] = -magSfByMagSqrd*(invDd[nei] & d);
+        }
     }
 
     forAll(lsP.boundaryField(), patchi)
@@ -267,25 +273,27 @@ void Foam::leastSquaresSolidInterfaceVectors::makeLeastSquaresVectors() const
         {
             forAll(pd, patchFacei)
             {
-	      // philipc: special treatment of solid inter faces
-	      if(interfaceProcPatchFacesMap[patchi][patchFacei] > -SMALL)
-		{
-		  // use face centre instead of neighbour
-		  const vector d = Cf.boundaryField()[patchi][patchFacei] - C[faceCells[patchFacei]];
-		  
-		  patchLsP[patchFacei] =
-                    (1.0/magSqr(d))
-		    *(invDd[faceCells[patchFacei]] & d);
-		}
-	      else
-		{
-		  // standard method
-		  const vector& d = pd[patchFacei];
+                // philipc: special treatment of solid inter faces
+                if (interfaceProcPatchFacesMap[patchi][patchFacei] > -SMALL)
+                {
+                    // use face centre instead of neighbour
+                    const vector d =
+                        Cf.boundaryField()[patchi][patchFacei]
+                        - C[faceCells[patchFacei]];
 
-		  patchLsP[patchFacei] =
-                    (1.0/magSqr(d))
-		    *(invDd[faceCells[patchFacei]] & d);
-		}
+                    patchLsP[patchFacei] =
+                        (1.0/magSqr(d))
+                        *(invDd[faceCells[patchFacei]] & d);
+                }
+                else
+                {
+                    // standard method
+                    const vector& d = pd[patchFacei];
+
+                    patchLsP[patchFacei] =
+                        (1.0/magSqr(d))
+                        *(invDd[faceCells[patchFacei]] & d);
+                }
             }
         }
         else
@@ -310,7 +318,8 @@ void Foam::leastSquaresSolidInterfaceVectors::makeLeastSquaresVectors() const
 }
 
 
-const Foam::surfaceVectorField& Foam::leastSquaresSolidInterfaceVectors::pVectors() const
+const Foam::surfaceVectorField&
+Foam::leastSquaresSolidInterfaceVectors::pVectors() const
 {
     if (!pVectorsPtr_)
     {
@@ -321,7 +330,8 @@ const Foam::surfaceVectorField& Foam::leastSquaresSolidInterfaceVectors::pVector
 }
 
 
-const Foam::surfaceVectorField& Foam::leastSquaresSolidInterfaceVectors::nVectors() const
+const Foam::surfaceVectorField&
+Foam::leastSquaresSolidInterfaceVectors::nVectors() const
 {
     if (!nVectorsPtr_)
     {
@@ -346,11 +356,13 @@ bool Foam::leastSquaresSolidInterfaceVectors::movePoints() const
     return true;
 }
 
-bool Foam::leastSquaresSolidInterfaceVectors::updateMesh(const mapPolyMesh& mpm) const
+bool Foam::leastSquaresSolidInterfaceVectors::updateMesh
+(const mapPolyMesh& mpm) const
 {
     if (debug)
     {
-        InfoIn("bool leastSquaresSolidInterfaceVectors::updateMesh(const mapPolyMesh&) const")
+        InfoIn("bool leastSquaresSolidInterfaceVectors::updateMesh"
+               "(const mapPolyMesh&) const")
             << "Clearing least square data" << endl;
     }
 

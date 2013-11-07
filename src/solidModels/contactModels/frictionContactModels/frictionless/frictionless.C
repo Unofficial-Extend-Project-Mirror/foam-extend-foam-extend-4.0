@@ -56,7 +56,16 @@ Foam::frictionless::frictionless
     const label slaveFaceZoneID
 )
 :
-  frictionContactModel(name, patch, dict, masterPatchID, slavePatchID, masterFaceZoneID, slaveFaceZoneID),
+  frictionContactModel
+  (
+      name,
+      patch,
+      dict,
+      masterPatchID,
+      slavePatchID,
+      masterFaceZoneID,
+      slaveFaceZoneID
+  ),
   slaveDisp_(mesh().boundaryMesh()[slavePatchID].size(), vector::zero),
   slaveTraction_(mesh().boundaryMesh()[slavePatchID].size(), vector::zero),
   slaveValueFrac_(mesh().boundaryMesh()[slavePatchID].size(), symmTensor::zero)

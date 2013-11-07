@@ -90,8 +90,6 @@ void Foam::faceCracker::detachFaceCracker
 
         if (edgeIsInternal)
         {
-// Pout<< "Internal edge found: (" << mp[zoneLocalEdges[curEdgeID].start()] << " " << mp[zoneLocalEdges[curEdgeID].end()] << ")" << endl;
-
             // Reset the point creation
             addedPoints[zoneLocalEdges[curEdgeID].start()] =
                 mp[zoneLocalEdges[curEdgeID].start()];
@@ -100,7 +98,6 @@ void Foam::faceCracker::detachFaceCracker
                 mp[zoneLocalEdges[curEdgeID].end()];
         }
     }
-// Pout << "addedPoints before point creation: " << addedPoints << endl;
 
     // Create new points for face zone
     forAll (addedPoints, pointI)
@@ -118,7 +115,6 @@ void Foam::faceCracker::detachFaceCracker
                         true                       // supports a cell
                     )
                 );
-// Pout << "Adding point " << points[mp[pointI]] << " for original point " << mp[pointI] << endl;
         }
     }
 
@@ -182,7 +178,6 @@ void Foam::faceCracker::detachFaceCracker
                     false                           // zone flip
                 )
             );
-// Pout << "Flip.  Modifying face: " << faces[curFaceID].reverseFace() << " next to cell: " << nei[curFaceID] << " and adding face: " << newFace << " next to cell: " << own[curFaceID] << endl;
         }
         else
         {
@@ -220,7 +215,6 @@ void Foam::faceCracker::detachFaceCracker
                     false                           // face flip in zone
                 )
             );
-// Pout << "No flip.  Modifying face: " << faces[curFaceID] << " next to cell: " << own[curFaceID] << " and adding face: " << newFace << " next to cell: " << nei[curFaceID] << endl;
         }
     }
 
@@ -333,7 +327,7 @@ void Foam::faceCracker::detachFaceCracker
 
         forAll(curMasterFacePoints, pointI)
         {
-            const labelList& curPointEdges = 
+            const labelList& curPointEdges =
                 pointEdges[curMasterFacePoints[pointI]];
 
             forAll(curPointEdges, edgeI)
@@ -377,7 +371,7 @@ void Foam::faceCracker::detachFaceCracker
         forAll(mcEdges, edgeI)
         {
             const labelList& curEdgeCells = edgeCells[mcEdges[edgeI]];
-            
+
             forAll(curEdgeCells, cellI)
             {
                 if (curEdgeCells[cellI] != mc[faceI])
@@ -391,7 +385,6 @@ void Foam::faceCracker::detachFaceCracker
         }
 
         labelList mcCells = masterCellCells.toc();
-	Info << "mcCells " << mcCells << endl;
 
         forAll(mcCells, cellI)
         {
@@ -467,7 +460,6 @@ void Foam::faceCracker::detachFaceCracker
                         false                       // face zone flip
                     )
                 );
-// Pout << "modifying stick-out face. Internal Old face: " << oldFace << " new face: " << newFace << " own: " << own[curFaceID] << " nei: " << nei[curFaceID] << endl;
             }
             else
             {
@@ -486,7 +478,6 @@ void Foam::faceCracker::detachFaceCracker
                         false                         // face zone flip
                     )
                 );
-// Pout << "modifying stick-out face. Boundary Old face: " << oldFace << " new face: " << newFace << " own: " << own[curFaceID] << " patch: " << mesh.boundaryMesh().whichPatch(curFaceID) << endl;
             }
         }
     }

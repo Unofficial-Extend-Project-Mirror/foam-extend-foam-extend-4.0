@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
   while(runTime.loop())
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
-      
+
 #     include "readSolidMechanicsControls.H"
 
       int iCorr = 0;
@@ -76,125 +76,111 @@ int main(int argc, char *argv[])
 
       if (predictor)
         {
-	  Info << "\nPredicting U, gradU and snGradU based on V, gradV and snGradV\n" << endl;
-	  U += V*runTime.deltaT();
-	  gradU += gradV*runTime.deltaT();
-	  snGradU += snGradV*runTime.deltaT();
+            Info << "\nPredicting U, gradU and snGradU based on V,"
+                 << "gradV and snGradV\n" << endl;
+            U += V*runTime.deltaT();
+            gradU += gradV*runTime.deltaT();
+            snGradU += snGradV*runTime.deltaT();
         }
 
       do
         {
-	  U.storePrevIter();
+            U.storePrevIter();
 
 #         include "calculateDivSigmaExp.H"
 
-	  // linear momentum equation
-	  fvVectorMatrix UEqn
-            (
-	     rho*fvm::d2dt2(U)
-	     ==
-	     fvm::laplacian(2*muf + lambdaf, U, "laplacian(DU,U)")
-	     + divSigmaExp
-	     );
+            // linear momentum equation
+            fvVectorMatrix UEqn
+                (
+                    rho*fvm::d2dt2(U)
+                    ==
+                    fvm::laplacian(2*muf + lambdaf, U, "laplacian(DU,U)")
+                    + divSigmaExp
+                    );
 
-// 	  if(thirdOrderCorrection)
-// 	    {
-// #             include "calculateThirdOrderDissipativeTerm.H"
-// 	      UEqn -= divThirdOrderTerm;
-// 	    }
+            if (solidInterfaceCorr)
+            {
+                solidInterfacePtr->correct(UEqn);
+            }
 
-	  if(solidInterfaceCorr)
-	    {
-	      solidInterfacePtr->correct(UEqn);
-	    }
+//        if (relaxEqn)
+//          {
+//            UEqn.relax();
+//          }
 
-// 	  if(relaxEqn)
-// 	    {
-// 	      UEqn.relax();
-// 	    }
-	  
-	  solverPerf = UEqn.solve();
+            solverPerf = UEqn.solve();
 
-	  if(iCorr == 0)
-	    {
-	      initialResidual = solverPerf.initialResidual();
-	      aitkenInitialRes = gMax(mag(U.internalField()));
-	    }
-	  
-	  if(aitkenRelax)
-	    {
+            if (iCorr == 0)
+            {
+                initialResidual = solverPerf.initialResidual();
+                aitkenInitialRes = gMax(mag(U.internalField()));
+            }
+
+            if (aitkenRelax)
+            {
 #             include "aitkenRelaxation.H"
-	    }
-	  else
-	    {	  
-	      U.relax();
-	    }
+            }
+            else
+            {
+                U.relax();
+            }
 
-	  // now use out leastSquaresSolidInterface grad scheme
-	  // if(solidInterfaceCorr)
-// 	    {
-// 	      gradU = solidInterfacePtr->grad(U);
-// 	    }
-// 	  else
-// 	    {
-	      gradU = fvc::grad(U);
-	  //   }
-	  //gradU = solidInterfacePtr->grad(U);
-	  //gradU = fvc::grad(U);
+            gradU = fvc::grad(U);
 
 #         include "calculateRelativeResidual.H"
-	  
-	  if(iCorr % infoFrequency == 0)
-	    {
-	      Info << "\tTime " << runTime.value()
-		   << ", Corrector " << iCorr
-		   << ", Solving for " << U.name()
-		    << " using " << solverPerf.solverName()
-		   << ", res = " << solverPerf.initialResidual()
-                   << ", rel res = " << relativeResidual;
-	      if(aitkenRelax) Info << ", aitken = " << aitkenTheta;
-	      Info   << ", inner iters = " << solverPerf.nIterations() << endl;
-	    }
-	}
-      while
-	(
-         iCorr++ == 0
-         ||
-         (solverPerf.initialResidual() > convergenceTolerance
-          //relativeResidual > convergenceTolerance
-          &&
-          iCorr < nCorr)
-	 );
-	
-      Info << nl << "Time " << runTime.value() << ", Solving for " << U.name() 
-	   << ", Initial residual = " << initialResidual 
-	   << ", Final residual = " << solverPerf.initialResidual()
-	   << ", Relative residual = " << relativeResidual
-	   << ", No outer iterations " << iCorr
-	   << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	   << "  ClockTime = " << runTime.elapsedClockTime() << " s" 
-	   << endl;
-      
-      lduMatrix::debug=0;
 
-      if(predictor)
-	{
-	  V = fvc::ddt(U);
-	  gradV = fvc::ddt(gradU);
-	  snGradV = (snGradU - snGradU.oldTime())/runTime.deltaT();
-	}
+            if (iCorr % infoFrequency == 0)
+            {
+                Info<< "\tTime " << runTime.value()
+                    << ", Corrector " << iCorr
+                    << ", Solving for " << U.name()
+                    << " using " << solverPerf.solverName()
+                    << ", res = " << solverPerf.initialResidual()
+                    << ", rel res = " << relativeResidual;
+                if (aitkenRelax)
+                {
+                    Info<< ", aitken = " << aitkenTheta;
+                }
+                Info<< ", inner iters = " << solverPerf.nIterations() << endl;
+            }
+        }
+      while
+          (
+              iCorr++ == 0
+              ||
+              (solverPerf.initialResidual() > convergenceTolerance
+               //relativeResidual > convergenceTolerance
+               &&
+               iCorr < nCorr)
+              );
+
+      Info<< nl << "Time " << runTime.value() << ", Solving for " << U.name()
+          << ", Initial residual = " << initialResidual
+          << ", Final residual = " << solverPerf.initialResidual()
+          << ", Relative residual = " << relativeResidual
+          << ", No outer iterations " << iCorr
+          << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+          << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+          << endl;
+
+      if (predictor)
+      {
+          V = fvc::ddt(U);
+          gradV = fvc::ddt(gradU);
+          snGradV = (snGradU - snGradU.oldTime())/runTime.deltaT();
+      }
 
 #     include "calculateEpsilonSigma.H"
 #     include "writeFields.H"
 #     include "writeHistory.H"
 
       Info<< "ExecutionTime = "
-	  << runTime.elapsedCpuTime()
-	  << " s\n\n" << endl;
+          << runTime.elapsedCpuTime()
+          << " s\n\n" << endl;
     }
-  
+
   Info<< "End\n" << endl;
-  
+
   return(0);
 }
 

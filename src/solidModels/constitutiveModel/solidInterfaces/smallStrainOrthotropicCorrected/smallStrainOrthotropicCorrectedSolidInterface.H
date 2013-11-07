@@ -50,7 +50,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                         Class smallStrainOrthotropicCorrectedSolidInterface Declaration
+       Class smallStrainOrthotropicCorrectedSolidInterface Declaration
 \*---------------------------------------------------------------------------*/
 
 class smallStrainOrthotropicCorrectedSolidInterface
@@ -62,7 +62,8 @@ class smallStrainOrthotropicCorrectedSolidInterface
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        smallStrainOrthotropicCorrectedSolidInterface(const smallStrainOrthotropicCorrectedSolidInterface&);
+        smallStrainOrthotropicCorrectedSolidInterface
+        (const smallStrainOrthotropicCorrectedSolidInterface&);
 
         //- Disallow default bitwise assignment
         void operator=(const smallStrainOrthotropicCorrectedSolidInterface&);
@@ -80,9 +81,9 @@ public:
         //- Construct from dictionary
         smallStrainOrthotropicCorrectedSolidInterface
         (
-	 const word& name,
-	 const fvMesh& mesh,
-	 const constitutiveModel& rheology
+            const word& name,
+            const fvMesh& mesh,
+            const constitutiveModel& rheology
         );
 
 

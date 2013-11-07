@@ -60,10 +60,10 @@ int main(int argc, char *argv[])
   while(runTime.loop())
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
-      
+
 #     include "readSolidMechanicsControls.H"
-      
-      int iCorr = 0;
+
+     int iCorr = 0;
       scalar initialResidual = 1.0;
       scalar relResT = 1.0;
       scalar relResU = 1.0;
@@ -73,116 +73,121 @@ int main(int argc, char *argv[])
 
       // solve energy equation for temperature
       // the loop is for non-orthogonal corrections
-      Info << "Solving for " << T.name() << nl;
+      Info<< "Solving for " << T.name() << nl;
       do
-	{
-	  T.storePrevIter();
+      {
+          T.storePrevIter();
 
-	  fvScalarMatrix TEqn
-	    (
-	     rhoC*fvm::ddt(T) == fvm::laplacian(k, T, "laplacian(k,T)")
-	     );
-	  
-	  solverPerfT = TEqn.solve();
+          fvScalarMatrix TEqn
+              (
+                  rhoC*fvm::ddt(T) == fvm::laplacian(k, T, "laplacian(k,T)")
+                  );
 
-	  T.relax();
+          solverPerfT = TEqn.solve();
+
+          T.relax();
 
 #         include "calculateRelResT.H"
 
-          if(iCorr % infoFrequency == 0)
-            {
-	      Info << "\tCorrector " << iCorr
-		   << ", residual = " << solverPerfT.initialResidual()
-		   << ", relative res = " << relResT
-		   << ", inner iters = " << solverPerfT.nIterations() << endl;
-	    }
-	}
+          if (iCorr % infoFrequency == 0)
+          {
+              Info<< "\tCorrector " << iCorr
+                  << ", residual = " << solverPerfT.initialResidual()
+                  << ", relative res = " << relResT
+                  << ", inner iters = " << solverPerfT.nIterations() << endl;
+          }
+      }
       while
-	(
-	 relResT > convergenceToleranceT
-	 &&
-	 ++iCorr < nCorr
-	 );
+          (
+              relResT > convergenceToleranceT
+              &&
+              ++iCorr < nCorr
+              );
 
-      Info << "Solved for " << T.name()
-	   << " using " << solverPerfT.solverName()
-	   << " in " << iCorr << " iterations"
-	   << ", residual = " << solverPerfT.initialResidual()
-	   << ", relative res = " << relResT << nl
-	   << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	   << ", ClockTime = " << runTime.elapsedClockTime() << " s" 
-	   << endl;
-	
+      Info<< "Solved for " << T.name()
+          << " using " << solverPerfT.solverName()
+          << " in " << iCorr << " iterations"
+          << ", residual = " << solverPerfT.initialResidual()
+          << ", relative res = " << relResT << nl
+          << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+          << ", ClockTime = " << runTime.elapsedClockTime() << " s"
+          << endl;
+
       // solve momentum equation for displacement
       iCorr = 0;
-      volVectorField gradThreeKalphaDeltaT = fvc::grad(threeKalpha*(T-T0), "grad(threeKalphaDeltaT)");
-      surfaceVectorField threeKalphaDeltaTf = mesh.Sf()*threeKalphaf*fvc::interpolate(T-T0, "deltaT");
+      volVectorField gradThreeKalphaDeltaT =
+          fvc::grad(threeKalpha*(T-T0), "grad(threeKalphaDeltaT)");
+      surfaceVectorField threeKalphaDeltaTf =
+          mesh.Sf()*threeKalphaf*fvc::interpolate(T-T0, "deltaT");
 
-      Info << "Solving for " << U.name() << nl;
+      Info<< "Solving for " << U.name() << nl;
       do
         {
-	  U.storePrevIter();
+            U.storePrevIter();
 
 #         include "calculateDivSigmaExp.H"
 
-	  // linear momentum equaiton
-	  fvVectorMatrix UEqn
-            (
-	     rho*fvm::d2dt2(U)
-	     ==
-	     fvm::laplacian(2*muf + lambdaf, U, "laplacian(DU,U)")
-	     + divSigmaExp
-	     );
+            // Linear momentum equaiton
+            fvVectorMatrix UEqn
+                (
+                    rho*fvm::d2dt2(U)
+                    ==
+                    fvm::laplacian(2*muf + lambdaf, U, "laplacian(DU,U)")
+                    + divSigmaExp
+                    );
 
-	  solverPerfU = UEqn.solve();
+            solverPerfU = UEqn.solve();
 
-	  if(aitkenRelax)
+            if (aitkenRelax)
             {
 #             include "aitkenRelaxation.H"
             }
-          else
+            else
             {
-              U.relax();
+                U.relax();
             }
 
-	  gradU = fvc::grad(U);
+            gradU = fvc::grad(U);
 
 #         include "calculateRelResU.H"
 
-	  if(iCorr == 0)
-	    {
-	      initialResidual = solverPerfU.initialResidual();
-	    }
-
-          if(iCorr % infoFrequency == 0)
+            if (iCorr == 0)
             {
-	      Info << "\tCorrector " << iCorr
-		   << ", residual = " << solverPerfU.initialResidual()
-		   << ", relative res = " << relResU;
-              if(aitkenRelax) Info << ", aitken = " << aitkenTheta;
-              Info << ", inner iters = " << solverPerfU.nIterations() << endl;
-	    }
-	}
+                initialResidual = solverPerfU.initialResidual();
+            }
+
+            if (iCorr % infoFrequency == 0)
+            {
+                Info<< "\tCorrector " << iCorr
+                    << ", residual = " << solverPerfU.initialResidual()
+                    << ", relative res = " << relResU;
+                if (aitkenRelax)
+                {
+                    Info << ", aitken = " << aitkenTheta;
+                }
+                Info<< ", inner iters = " << solverPerfU.nIterations() << endl;
+            }
+        }
       while
-	(
-         iCorr++ == 0
-         ||
-         (//solverPerfU.initialResidual() > convergenceTolerance
-	  relResU > convergenceToleranceU
-	  &&
-          iCorr < nCorr)
-	 );
-	
-      Info << "Solved for " << U.name()
-	   << " using " << solverPerfU.solverName()
-	   << " in " << iCorr << " iterations"
-	   << ", initial res = " << initialResidual
-	   << ", final res = " << solverPerfU.initialResidual()
-	   << ", final rel res = " << relResU << nl
-	   << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	   << ", ClockTime = " << runTime.elapsedClockTime() << " s" 
-	   << endl;
-	
+          (
+              iCorr++ == 0
+              ||
+              (//solverPerfU.initialResidual() > convergenceTolerance
+                  relResU > convergenceToleranceU
+                  &&
+                  iCorr < nCorr)
+              );
+
+      Info<< "Solved for " << U.name()
+          << " using " << solverPerfU.solverName()
+          << " in " << iCorr << " iterations"
+          << ", initial res = " << initialResidual
+          << ", final res = " << solverPerfU.initialResidual()
+          << ", final rel res = " << relResU << nl
+          << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+          << ", ClockTime = " << runTime.elapsedClockTime() << " s"
+          << endl;
+
 #       include "calculateEpsilonSigma.H"
 #       include "writeFields.H"
 

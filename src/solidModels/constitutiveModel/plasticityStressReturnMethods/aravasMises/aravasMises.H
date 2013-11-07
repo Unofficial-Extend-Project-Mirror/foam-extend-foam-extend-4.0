@@ -105,34 +105,34 @@ class aravasMises
 
         scalar ebarfun
         (
-	 const scalar ebart,
-	 const scalar q,
-	 const scalar deq,
-	 const scalar s0
-	 ) const;
+            const scalar ebart,
+            const scalar q,
+            const scalar deq,
+            const scalar s0
+        ) const;
 
         // flow potential
         scalar gfun
-	(
-	 const scalar ebart,
-	 const scalar deq,
-	 const scalar qe,
-	 const scalar G,
-	 const label cellID
-	 ) const;
+    (
+     const scalar ebart,
+     const scalar deq,
+     const scalar qe,
+     const scalar G,
+     const label cellID
+     ) const;
 
         // Calculate plastic equivalent strain increment and new yield stress
         void aravasNewtonLoop
-	(
-	 scalar& deq,
-	 scalar& s0,
-	 const scalar s00,
-	 const scalar G,
-	 const scalar ebart,
-	 const scalar qe,
-	 const label cellID,
-	 const scalar maxMagDEpsilon
-	 ) const;
+    (
+     scalar& deq,
+     scalar& s0,
+     const scalar s00,
+     const scalar G,
+     const scalar ebart,
+     const scalar qe,
+     const label cellID,
+     const scalar maxMagDEpsilon
+     ) const;
 
 public:
 
@@ -147,8 +147,8 @@ public:
         //- Construct from dictionary
         aravasMises
         (
-	 const word& name,
-	 constitutiveModel& constitutiveModel
+     const word& name,
+     constitutiveModel& constitutiveModel
         );
 
 
@@ -165,8 +165,8 @@ public:
         //- Return slave friction value fraction
         virtual const volSymmTensorField& DEpsilonP() const
         {
-	  return DEpsilonP_;
-	}
+      return DEpsilonP_;
+    }
 
         //- Return slave friction value fraction
         virtual void updateYieldStress();

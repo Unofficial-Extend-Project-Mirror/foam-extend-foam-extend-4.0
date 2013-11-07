@@ -28,7 +28,7 @@ Class
 Description
     time varying fixed displacement boundary condition and
     time varying fixed rotation boundary condition.
-    
+
 SourceFiles
     fixedDisplacementFixedRotationFvPatchVectorField.C
 
@@ -100,8 +100,9 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given fixedDisplacementFixedRotationFvPatchVectorField
-        //  onto a new patch
+        //- Construct by mapping given
+        // fixedDisplacementFixedRotationFvPatchVectorField
+        // onto a new patch
         fixedDisplacementFixedRotationFvPatchVectorField
         (
             const fixedDisplacementFixedRotationFvPatchVectorField&,
@@ -153,8 +154,8 @@ public:
             //- field name
             word fieldName() const
             {
-	      return fieldName_;
-	    }
+                return fieldName_;
+            }
 
         // Evaluation functions
 

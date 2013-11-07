@@ -34,7 +34,7 @@ Description
 Author
     Philip Cardiff UCD
     Micheal Leonard UCD
-    
+
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
   while(runTime.loop())
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
-      
+
 #     include "readSolidMechanicsControls.H"
 
       int iCorr = 0;
@@ -67,67 +67,67 @@ int main(int argc, char *argv[])
 
       do
         {
-	  DU.storePrevIter();
-	  
-	  fvVectorMatrix DUEqn
+      DU.storePrevIter();
+
+      fvVectorMatrix DUEqn
             (
-	     fvm::d2dt2(rho, DU)
-	     ==
-	     fvm::laplacian(2*mu + lambda, DU, "laplacian(DDU,DU)")
-	     + fvc::div(
-			-( (mu + lambda) * gradDU )
-			+ ( mu * (
-				  gradDU.T()
-				  + (gradDU & gradU.T())
-				  + (gradU & gradDU.T())
-				  + (gradDU & gradDU.T())
-				  ) )
-			+ ( lambda * tr(DEpsilon) * I )
-			+ ( DSigma & gradU )
-			+ ( (sigma + DSigma) & gradDU ),
-			"div(sigma)"
-			)
-	     );
+         fvm::d2dt2(rho, DU)
+         ==
+         fvm::laplacian(2*mu + lambda, DU, "laplacian(DDU,DU)")
+         + fvc::div(
+            -( (mu + lambda) * gradDU )
+            + ( mu * (
+                  gradDU.T()
+                  + (gradDU & gradU.T())
+                  + (gradU & gradDU.T())
+                  + (gradDU & gradDU.T())
+                  ) )
+            + ( lambda * tr(DEpsilon) * I )
+            + ( DSigma & gradU )
+            + ( (sigma + DSigma) & gradDU ),
+            "div(sigma)"
+            )
+         );
 
-	  solverPerf = DUEqn.solve();
+      solverPerf = DUEqn.solve();
 
-	  if(iCorr == 0)
-	    {
-	      initialResidual = solverPerf.initialResidual();
-	    }
-	  
-	  DU.relax();
+      if (iCorr == 0)
+        {
+          initialResidual = solverPerf.initialResidual();
+        }
 
-	  gradDU = fvc::grad(DU);
+      DU.relax();
+
+      gradDU = fvc::grad(DU);
 
 #         include "calculateDEpsilonDSigma.H"
 #         include "calculateRelativeResidual.H"
-	  
-	  Info << "\tTime " << runTime.value()
-	       << ", Corrector " << iCorr
-	       << ", Solving for " << DU.name()
-	       << " using " << solverPerf.solverName()
-	       << ", residual = " << solverPerf.initialResidual()
-	       << ", relative residual = " << relativeResidual
-	       << ", inner iterations = " << solverPerf.nIterations() << endl;
-	}
+
+      Info << "\tTime " << runTime.value()
+           << ", Corrector " << iCorr
+           << ", Solving for " << DU.name()
+           << " using " << solverPerf.solverName()
+           << ", residual = " << solverPerf.initialResidual()
+           << ", relative residual = " << relativeResidual
+           << ", inner iterations = " << solverPerf.nIterations() << endl;
+    }
       while
-	(
-	 solverPerf.initialResidual() > convergenceTolerance
-	 //relativeResidual > convergenceTolerance
-	 &&
-	 ++iCorr < nCorr
-	 );
-      
-      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name() 
-	   << ", Initial residual = " << initialResidual 
-	   << ", Final residual = " << solverPerf.initialResidual()
-	   << ", Relative residual = " << relativeResidual
-	   << ", No outer iterations " << iCorr
-	   << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	   << "  ClockTime = " << runTime.elapsedClockTime() << " s" 
-	   << endl;
-      
+    (
+     solverPerf.initialResidual() > convergenceTolerance
+     //relativeResidual > convergenceTolerance
+     &&
+     ++iCorr < nCorr
+     );
+
+      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name()
+       << ", Initial residual = " << initialResidual
+       << ", Final residual = " << solverPerf.initialResidual()
+       << ", Relative residual = " << relativeResidual
+       << ", No outer iterations " << iCorr
+       << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+       << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+       << endl;
+
       U += DU;
       gradU += gradDU;
       epsilon += DEpsilon;
@@ -136,12 +136,12 @@ int main(int argc, char *argv[])
 #     include "writeFields.H"
 
       Info<< "ExecutionTime = "
-	  << runTime.elapsedCpuTime()
-	  << " s\n\n" << endl;
+      << runTime.elapsedCpuTime()
+      << " s\n\n" << endl;
     }
-  
+
   Info<< "End\n" << endl;
-  
+
   return(0);
 }
 

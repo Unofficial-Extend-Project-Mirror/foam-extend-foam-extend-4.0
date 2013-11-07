@@ -109,7 +109,7 @@ class orthotropicLinearElastic
         //- then I have to make the rotation field every time
         //- C is asked for
         volSymmTensor4thOrderField C_;
-  
+
         //- material directions tensor field
         //- (xx xy xz) is matDir1
         //- (yx yy yz) is matDir2
@@ -203,11 +203,12 @@ public:
         virtual tmp<volScalarField> sigmaY() const;
 
         //- Return yield stress given cellID
-        virtual scalar sigmaY(const scalar epsilonPEq, const label cellID) const;
+        virtual scalar sigmaY
+        (const scalar epsilonPEq, const label cellID) const;
 
         //- orthotropic linear elastic properties
         virtual tmp<volDiagTensorField> K() const;
-        
+
         //- elastic constitutive fourth order tensor
         virtual tmp<volSymmTensor4thOrderField> C() const;
 

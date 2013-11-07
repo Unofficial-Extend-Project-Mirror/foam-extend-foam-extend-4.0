@@ -25,8 +25,8 @@ License
 Description
     Calculates the total forces on a patch:
             total force vector
-	    total normal force
-	    total force in each direction (x, y and z)
+            total normal force
+            total force in each direction (x, y and z)
 
 Author
     philip.cardiff@ucd.ie
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 # include "checkTimeOptions.H"
 
   runTime.setTime(Times[startTime], startTime);
-  
+
 # include "createMesh.H"
 
   bool noMeshUpdate = args.optionFound("noMeshUpdate");
@@ -62,158 +62,166 @@ int main(int argc, char *argv[])
 
   word patchName(args.additionalArgs()[0]);
   label patchID = mesh.boundaryMesh().findPatchID(patchName);
-  if(patchID == -1)
-    {
+  if (patchID == -1)
+  {
       FatalError << "Cannot find patch " << patchName
-		 << exit(FatalError);
-    }
+                 << exit(FatalError);
+  }
 
   for (label i=startTime; i<endTime; i++)
-    {
+  {
       runTime.setTime(Times[i], i);
 
       Info<< "Time = " << runTime.timeName() << endl;
 
-      if(!noMeshUpdate)
-	{
-	  mesh.readUpdate();
-	}
+      if (!noMeshUpdate)
+      {
+          mesh.readUpdate();
+      }
 
-        IOobject sigmaheader
-	  (
-	   "sigma",
-	   runTime.timeName(),
-	   mesh,
-	   IOobject::MUST_READ
-	   );
+      IOobject sigmaheader
+          (
+              "sigma",
+              runTime.timeName(),
+              mesh,
+              IOobject::MUST_READ
+              );
 
-        // Check sigma exists
-        if (sigmaheader.headerOk())
-	  {
-            Info<< "\tReading sigma" << endl;
-            volSymmTensorField sigma(sigmaheader, mesh);
-      
-	    Info << nl;
-      	    
-	    // gradU needed for nonLinear
-	    volTensorField* gradUPtr = NULL;
-	    volSymmTensorField* sigmaCauchyPtr = NULL;
-	    if(nonLinear)
-	      {
-		gradUPtr = new volTensorField
-		  (
-		   IOobject
-		   (
-		    "grad(U)",
-		    runTime.timeName(),
-		    mesh,
-		    IOobject::MUST_READ,
-		    IOobject::NO_WRITE
-		    ),
-		   mesh
-		   );
-		
-		sigmaCauchyPtr = new volSymmTensorField
-		  (
-		   IOobject
-		   (
-		    "sigmaCauchy",
-		    runTime.timeName(),
-		    mesh,
-		    IOobject::MUST_READ,
-		    IOobject::NO_WRITE
-		    ),
-		   mesh
-		   );
-	      }
+      // Check sigma exists
+      if (sigmaheader.headerOk())
+      {
+          Info<< "\tReading sigma" << endl;
+          volSymmTensorField sigma(sigmaheader, mesh);
 
-	    //vector netForce = vector::zero;
-	    //vector netForceCauchy = vector::zero;
-	    //scalar maxPatchForce = 0.0;
-	    //forAll(mesh.boundary(), patchID)
-	      {
-		vectorField n = mesh.boundary()[patchID].nf();
-		const vectorField& Sf = mesh.boundary()[patchID].Sf();
-		const symmTensorField& sigmaPatch = sigma.boundaryField()[patchID];
+          Info<< nl;
 
-		vectorField totalForce(sigmaPatch.size(), vector::zero);
-		scalar totalNormalForce = 0.0;
-		vector totalShearForce = vector::zero;
+          // gradU needed for nonLinear
+          volTensorField* gradUPtr = NULL;
+          volSymmTensorField* sigmaCauchyPtr = NULL;
+          if (nonLinear)
+          {
+              gradUPtr = new volTensorField
+                  (
+                      IOobject
+                      (
+                          "grad(U)",
+                          runTime.timeName(),
+                          mesh,
+                          IOobject::MUST_READ,
+                          IOobject::NO_WRITE
+                          ),
+                      mesh
+                      );
 
-		vectorField totalForceCauchy(sigmaPatch.size(), vector::zero);
-		scalar totalNormalForceCauchy = 0.0;
-		vector totalShearForceCauchy = vector::zero;
-		if(nonLinear)
-		  {
-		    // Note: only for TL models, not correct for UL models yet - todo
+              sigmaCauchyPtr = new volSymmTensorField
+                  (
+                      IOobject
+                      (
+                          "sigmaCauchy",
+                          runTime.timeName(),
+                          mesh,
+                          IOobject::MUST_READ,
+                          IOobject::NO_WRITE
+                          ),
+                      mesh
+                      );
+          }
 
-		    // We use two separate methods to calculate the force
-		    // for the nonlinear models
-		    // both methods should be equivalent
-		    // they are both used just to check everything is as it should be
-		    // Force == currentAreas & sigmaCauchy == referenceArea & sigma2PK & deformationGradient
+          //vector netForce = vector::zero;
+          //vector netForceCauchy = vector::zero;
+          //scalar maxPatchForce = 0.0;
+          //forAll(mesh.boundary(), patchID)
+          {
+              vectorField n = mesh.boundary()[patchID].nf();
+              const vectorField& Sf = mesh.boundary()[patchID].Sf();
+              const symmTensorField& sigmaPatch =
+                  sigma.boundaryField()[patchID];
 
-		    // deformation gradient
-		    tensorField F = I + gradUPtr->boundaryField()[patchID];
+              vectorField totalForce(sigmaPatch.size(), vector::zero);
+              scalar totalNormalForce = 0.0;
+              vector totalShearForce = vector::zero;
 
-		    const scalarField J = det(F);
-		    const tensorField Finv = hinv(F);
-		    // current deformed patch area vectors are given by Nanson's formula
-		    const vectorField deformedSf = J * Finv & Sf;
-		    const vectorField deformedN = deformedSf/mag(deformedSf);
-		    const symmTensorField& sigmaCauchyPatch = sigmaCauchyPtr->boundaryField()[patchID];
+              vectorField totalForceCauchy(sigmaPatch.size(), vector::zero);
+              scalar totalNormalForceCauchy = 0.0;
+              vector totalShearForceCauchy = vector::zero;
+              if (nonLinear)
+              {
+                  // Note: only for TL models, not correct for UL
+                  // models yet - todo
 
-		    // reference areas and 2nd Piola-Kirchhoff stress
-		    totalForce = Sf & (sigmaPatch & F);
-		    totalNormalForce = sum(deformedN & (totalForce));
-		    totalShearForce = sum((I -sqr(deformedN)) & (totalForce));
+                  // We use two separate methods to calculate the force
+                  // for the nonlinear models
+                  // both methods should be equivalent
+                  // they are both used just to check everything is as it
+                  // should be
+                  // Force == currentAreas & sigmaCauchy ==
+                  // referenceArea & sigma2PK & deformationGradient
 
-		    // deformed normals and Cauchy stress
-		    totalForceCauchy = deformedSf & (sigmaCauchyPatch);
-		    totalNormalForceCauchy = sum(deformedN & (totalForceCauchy));
-		    totalShearForceCauchy = sum((I -sqr(deformedN)) & (totalForceCauchy));
-		    //netForceCauchy += sum(totalForceCauchy);
-		  }
-		else
-		  {
-		    // small strain
-		    totalForce = Sf & sigmaPatch;
-		    totalNormalForce = sum(n & (totalForce));
-		    totalShearForce = sum((I -sqr(n)) & (totalForce));
-		  }
-		//netForce += sum(totalForce);
-		// scalar totalNormalForce = sum(n & (totalForce));
-		// vector totalShearForce = sum((I -sqr(n)) & (totalForce));
-		
-		//maxPatchForce = max(maxPatchForce, mag(sum(totalForce)));
+                  // deformation gradient
+                  tensorField F = I + gradUPtr->boundaryField()[patchID];
 
-		Info << "Patch: " << mesh.boundary()[patchID].name() << nl
-		     << "\tTotal Force:\t\t" << sum(totalForce) << " N\n"
-		     << "\tTotal Normal Force:\t" << totalNormalForce <<  " N\n"
-		     << "\tTotal Shear Force:\t" << totalShearForce <<  " N\n";
-		if(nonLinear)
-		  {
-		    Info << "\tForces calculated with Cauchy stress\n"
-			 << "\tTotal Force:\t\t" << sum(totalForceCauchy) << " N\n"
-			 << "\tTotal Normal Force:\t" << totalNormalForceCauchy <<  " N\n"
-			 << "\tTotal Shear Force:\t" << totalShearForceCauchy <<  " N\n";
-		  }
-		Info << endl;
-	      }
-	    // scalar percentNetForce = 100.0*mag(netForce)/maxPatchForce;
-	    // scalar percentNetForceCauchy = 100.0*mag(netForceCauchy)/maxPatchForce;
-	    // Info << nl << "Net force on model is " << netForce << " N\twhich is "
-	    // 	 << percentNetForce << "% of maximum patch force";
-	    // if(nonLinear)
-	    //   Info << nl << "Net force (Cauchy method) on model is " << netForceCauchy << " N\twhich is "
-	    // 	   << percentNetForceCauchy << "% of maximum patch force";
+                  const scalarField J = det(F);
+                  const tensorField Finv = hinv(F);
+                  // current deformed patch area vectors are given by
+                  // Nanson's formula
+                  const vectorField deformedSf = J * Finv & Sf;
+                  const vectorField deformedN = deformedSf/mag(deformedSf);
+                  const symmTensorField& sigmaCauchyPatch =
+                      sigmaCauchyPtr->boundaryField()[patchID];
 
-	    Info << endl;
-	  }
-    }
-  
-  Info << nl << "End" << endl;
-  
+                  // reference areas and 2nd Piola-Kirchhoff stress
+                  totalForce = Sf & (sigmaPatch & F);
+                  totalNormalForce = sum(deformedN & (totalForce));
+                  totalShearForce = sum((I -sqr(deformedN)) & (totalForce));
+
+                  // deformed normals and Cauchy stress
+                  totalForceCauchy = deformedSf & (sigmaCauchyPatch);
+                  totalNormalForceCauchy = sum(deformedN & (totalForceCauchy));
+                  totalShearForceCauchy =
+                      sum((I -sqr(deformedN)) & (totalForceCauchy));
+                  //netForceCauchy += sum(totalForceCauchy);
+              }
+              else
+              {
+                  // small strain
+                  totalForce = Sf & sigmaPatch;
+                  totalNormalForce = sum(n & (totalForce));
+                  totalShearForce = sum((I -sqr(n)) & (totalForce));
+              }
+              //netForce += sum(totalForce);
+              // scalar totalNormalForce = sum(n & (totalForce));
+              // vector totalShearForce = sum((I -sqr(n)) & (totalForce));
+
+              //maxPatchForce = max(maxPatchForce, mag(sum(totalForce)));
+
+              Info<< "Patch: " << mesh.boundary()[patchID].name() << nl
+                  << "\tTotal Force:\t\t" << sum(totalForce) << " N\n"
+                  << "\tTotal Normal Force:\t" << totalNormalForce <<  " N\n"
+                  << "\tTotal Shear Force:\t" << totalShearForce <<  " N\n";
+              if (nonLinear)
+              {
+                  Info<< "\tForces calculated with Cauchy stress\n"
+                      << "\tTotal Force:\t\t" << sum(totalForceCauchy) << " N\n"
+                      << "\tTotal Normal Force:\t" << totalNormalForceCauchy
+                      <<  " N\n"
+                      << "\tTotal Shear Force:\t" << totalShearForceCauchy
+                      <<  " N\n";
+              }
+              Info<< endl;
+          }
+          // scalar percentNetForce = 100.0*mag(netForce)/maxPatchForce;
+          // scalar percentNetForceCauchy =
+          // 100.0*mag(netForceCauchy)/maxPatchForce;
+          // Info<< nl << "Net force on model is "
+          // << netForce << " N\twhich is "
+          //       << percentNetForce << "% of maximum patch force";
+
+          Info<< endl;
+      }
+  }
+
+  Info<< nl << "End" << endl;
+
   return 0;
 }
 

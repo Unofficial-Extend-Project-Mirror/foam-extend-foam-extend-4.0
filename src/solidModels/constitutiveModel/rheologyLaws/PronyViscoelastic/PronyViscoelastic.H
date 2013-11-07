@@ -155,14 +155,14 @@ public:
         //- Return yield stress
         virtual scalar sigmaY(const scalar epsilonPEq, const label cellID) const
         {
-	  return GREAT;
-	}
+            return GREAT;
+        }
 
         //- If effects are active
         virtual bool viscoActive() const
         {
-	  return true;
-	};
+            return true;
+        };
 
         //- Correct the rheological model
         virtual void correct()

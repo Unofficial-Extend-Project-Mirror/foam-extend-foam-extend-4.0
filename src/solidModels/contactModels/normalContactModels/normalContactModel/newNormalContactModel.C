@@ -64,12 +64,14 @@ autoPtr<normalContactModel> normalContactModel::New
             "    const word& name,\n"
             "    const fvPatch& patch,\n"
             "    const dictionary& dict,\n"
-	    "    const label masterPatchID,\n"
-	    "    const label slavePatchID,\n"
-	    "	 const label masterFaceZoneID,\n"
-	    "	 const label slaveFaceZoneID,\n"
-	    "    const const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,\n"
-	    "    const const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch\n"
+        "    const label masterPatchID,\n"
+        "    const label slavePatchID,\n"
+        "    const label masterFaceZoneID,\n"
+        "    const label slaveFaceZoneID,\n"
+        "    const const PrimitivePatch<face, List, pointField>& "
+            "masterFaceZonePatch,\n"
+        "    const const PrimitivePatch<face, List, pointField>& "
+            "slaveFaceZonePatch\n"
             ")",
             dict
         )   << "Unknown normalContactModel type "
@@ -83,16 +85,16 @@ autoPtr<normalContactModel> normalContactModel::New
       (
        cstrIter()
        (
-	name,
-	patch,
-	dict,
-	masterPatchID,
-	slavePatchID,
-	masterFaceZoneID,
-	slaveFaceZoneID,
-	masterFaceZonePatch,
-	slaveFaceZonePatch
-	)
+    name,
+    patch,
+    dict,
+    masterPatchID,
+    slavePatchID,
+    masterFaceZoneID,
+    slaveFaceZoneID,
+    masterFaceZonePatch,
+    slaveFaceZonePatch
+    )
        );
 }
 

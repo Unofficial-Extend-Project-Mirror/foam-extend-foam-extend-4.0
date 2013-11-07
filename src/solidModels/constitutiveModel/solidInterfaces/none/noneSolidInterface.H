@@ -79,9 +79,9 @@ public:
         //- Construct from dictionary
         noneSolidInterface
         (
-	 const word& name,
-	 const fvMesh& mesh,
-	 const constitutiveModel& rheology
+     const word& name,
+     const fvMesh& mesh,
+     const constitutiveModel& rheology
         );
 
 
@@ -97,38 +97,38 @@ public:
 
         // Modify properties does nothing
         virtual void modifyProperties
-	(
-	 surfaceScalarField& s
-	 ) const {}
-  
-        virtual void modifyProperties
-	(
-	 surfaceSymmTensor4thOrderField& st
-	 ) const {}
-  
-        virtual void modifyProperties
-	(
-	 surfaceDiagTensorField& dt
-	 ) const {}
-  
-        virtual void modifyProperties
-	(
-	 surfaceScalarField& mu,
-	 surfaceScalarField& lambda
-	 ) const {}
+    (
+     surfaceScalarField& s
+     ) const {}
 
         virtual void modifyProperties
-	(
-	 surfaceScalarField& mu, 
-	 surfaceScalarField& lambda,
-	 surfaceScalarField& threeKalpha
-	 ) const {}
+    (
+     surfaceSymmTensor4thOrderField& st
+     ) const {}
 
         virtual void modifyProperties
-	(
-	 surfaceSymmTensor4thOrderField& C,
-	 surfaceDiagTensorField& K
-	 ) const {}
+    (
+     surfaceDiagTensorField& dt
+     ) const {}
+
+        virtual void modifyProperties
+    (
+     surfaceScalarField& mu,
+     surfaceScalarField& lambda
+     ) const {}
+
+        virtual void modifyProperties
+    (
+     surfaceScalarField& mu,
+     surfaceScalarField& lambda,
+     surfaceScalarField& threeKalpha
+     ) const {}
+
+        virtual void modifyProperties
+    (
+     surfaceSymmTensor4thOrderField& C,
+     surfaceDiagTensorField& K
+     ) const {}
 };
 
 

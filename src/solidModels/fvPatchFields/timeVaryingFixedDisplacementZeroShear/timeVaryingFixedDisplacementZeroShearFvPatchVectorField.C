@@ -25,8 +25,6 @@ License
 Class
     timeVaryingFixedDisplacementZeroShearFvPatchVectorField
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "timeVaryingFixedDisplacementZeroShearFvPatchVectorField.H"
@@ -92,44 +90,53 @@ timeVaryingFixedDisplacementZeroShearFvPatchVectorField
     timeSeries_(dict)
 {
     //- check if traction boundary is for non linear solver
-    if(dict.found("nonLinear"))
+    if (dict.found("nonLinear"))
     {
         nonLinear_ = nonLinearGeometry::nonLinearNames_.read
         (
             dict.lookup("nonLinear")
         );
 
-	if(nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to updated Lagrangian"
-		 << endl;
-	  }
-	else if(nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to total Lagrangian"
-		 << endl;
-	  }
-      }
+        if (nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
+        {
+            Info << "\tnonLinear set to updated Lagrangian"
+                 << endl;
+        }
+        else if (nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
+        {
+            Info << "\tnonLinear set to total Lagrangian"
+                 << endl;
+        }
+    }
 
-    if(dict.found("orthotropic"))
-      {
-	orthotropic_ = Switch(dict.lookup("orthotropic"));
-	Info << "\t\torthotropic set to " << orthotropic_ << endl;
-      }
+    if (dict.found("orthotropic"))
+    {
+        orthotropic_ = Switch(dict.lookup("orthotropic"));
+        Info << "\t\torthotropic set to " << orthotropic_ << endl;
+    }
 
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-//     if(Foam::word(dimensionedInternalField().mesh().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares")
-//       {
-// 	Warning << "The gradScheme for " << fieldName_
-// 		<< " should be \"extendedLeastSquares 0\" for the boundary "
-// 		<< "non-orthogonal correction to be right" << endl;
-//       }
+    if
+    (
+        Foam::word
+        (
+            dimensionedInternalField().mesh().schemesDict().gradScheme
+            (
+                "grad(" + fieldName_ + ")"
+            )
+        ) != "extendedLeastSquares"
+    )
+    {
+        Warning << "The gradScheme for " << fieldName_
+            << " should be \"extendedLeastSquares 0\" for the boundary "
+            << "non-orthogonal correction to be right" << endl;
+    }
 
   this->refGrad() = vector::zero;
-  
-  vectorField n = patch().nf();      
+
+  vectorField n = patch().nf();
   this->valueFraction() = sqr(n);
 
   if (dict.found("value"))
@@ -138,24 +145,26 @@ timeVaryingFixedDisplacementZeroShearFvPatchVectorField
     }
   else
     {
-      FatalError << "value entry not found for patch " << patch().name() << endl;
+        FatalError
+            << "value entry not found for patch " << patch().name() << endl;
     }
   //this->refValue() = *this;
   this->refValue() = timeSeries_(this->db().time().timeOutputValue());
 
   Field<vector> normalValue = transform(valueFraction(), refValue());
-  
+
   Field<vector> gradValue =
     this->patchInternalField() + refGrad()/this->patch().deltaCoeffs();
-  
+
   Field<vector> transformGradValue =
     transform(I - valueFraction(), gradValue);
-  
+
   Field<vector>::operator=(normalValue + transformGradValue);
 }
 
 
-timeVaryingFixedDisplacementZeroShearFvPatchVectorField::timeVaryingFixedDisplacementZeroShearFvPatchVectorField
+timeVaryingFixedDisplacementZeroShearFvPatchVectorField::
+timeVaryingFixedDisplacementZeroShearFvPatchVectorField
 (
     const timeVaryingFixedDisplacementZeroShearFvPatchVectorField& ptf,
     const DimensionedField<vector, volMesh>& iF
@@ -200,18 +209,23 @@ void timeVaryingFixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
     }
 
     // set refValue
-    vectorField disp(patch().size(), timeSeries_(this->db().time().timeOutputValue()));
-    if(fieldName_ == "DU")
+    vectorField disp
+        (
+            patch().size(),
+            timeSeries_(this->db().time().timeOutputValue())
+            );
+    if (fieldName_ == "DU")
       {
-        const fvPatchField<vector>& U =
-          patch().lookupPatchField<volVectorField, vector>("U");
-	disp -= U;
+          const fvPatchField<vector>& U =
+              patch().lookupPatchField<volVectorField, vector>("U");
+          disp -= U;
       }
-    else if(fieldName_ != "U")
-      {
-        FatalError << "The displacement field should be U or DU"
-                   << exit(FatalError);
-      }
+    else if (fieldName_ != "U")
+    {
+        FatalError
+            << "The displacement field should be U or DU"
+            << exit(FatalError);
+    }
     this->refValue() = disp;
 
 

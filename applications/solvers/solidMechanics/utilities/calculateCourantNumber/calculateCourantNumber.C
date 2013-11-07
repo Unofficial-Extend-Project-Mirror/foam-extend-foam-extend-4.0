@@ -44,11 +44,11 @@ int main(int argc, char *argv[])
 # include "setRootCase.H"
 # include "createTime.H"
 # include "createMesh.H"
-		     
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
   Info<< "\nCalculating Courant number\n" << endl;
-  
+
   // Calculate Courant number for every face
 
   // Mechanical properties
@@ -82,36 +82,41 @@ int main(int argc, char *argv[])
   volScalarField mu = rheology.mu();
   volScalarField lambda = rheology.lambda();
   volScalarField rho = rheology.rho();
-  surfaceScalarField Ef = fvc::interpolate(mu*(3*lambda + 2*mu)/(lambda+mu), "E");
+  surfaceScalarField Ef =
+      fvc::interpolate(mu*(3*lambda + 2*mu)/(lambda+mu), "E");
   surfaceScalarField nuf = fvc::interpolate(lambda/(2*(lambda+mu)), "nu");
   surfaceScalarField rhof = fvc::interpolate(rho);
-  
+
   surfaceScalarField waveVelocity =
     Foam::sqrt(Ef*(1 - nuf)/(rhof*(1 + nuf)*(1 - 2*nuf)));
-  
+
   // Courant number
   scalarField Co =
     waveVelocity.internalField()*runTime.deltaT().value()
     *mesh.surfaceInterpolation::deltaCoeffs().internalField();
-  
+
   // Calculate required time-step for a Courant number of 1.0
   scalar requiredDeltaT = 1.0 /
-    gMax(mesh.surfaceInterpolation::deltaCoeffs().internalField()*waveVelocity.internalField());
-  
+    gMax
+      (
+          mesh.surfaceInterpolation::deltaCoeffs().internalField()
+          *waveVelocity.internalField()
+          );
+
   scalar averageCo = gAverage(Co);
   scalar maxCo = gMax(Co);
   scalar averageWaveVel = gAverage(waveVelocity);
   scalar maxWaveVel = gMax(waveVelocity);
 
-  Info << "\nCourant Number\n\tmean: " << averageCo
-       << "\n\tmax: " << maxCo << nl
-       << "Wave velocity magnitude\n\tmean " << averageWaveVel
-       << "\n\tmax: " << maxWaveVel << nl
-       << "Time step required for a maximum Courant number of 1.0 is "
-       << requiredDeltaT << endl;
-  
+  Info<< "\nCourant Number\n\tmean: " << averageCo
+      << "\n\tmax: " << maxCo << nl
+      << "Wave velocity magnitude\n\tmean " << averageWaveVel
+      << "\n\tmax: " << maxWaveVel << nl
+      << "Time step required for a maximum Courant number of 1.0 is "
+      << requiredDeltaT << endl;
+
   Info<< "\nEnd\n" << endl;
-  
+
   return(0);
 }
 

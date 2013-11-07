@@ -26,7 +26,7 @@ Class
     fixedDisplacementOrSolidTractionFvPatchVectorField
 
 \*---------------------------------------------------------------------------*/
-//#define DEBUG Pout<<"file "<<__FILE__<<" line "<<__LINE__<<endl;
+
 #include "fixedDisplacementOrSolidTractionFvPatchVectorField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "transformField.H"
@@ -43,7 +43,8 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-fixedDisplacementOrSolidTractionFvPatchVectorField::fixedDisplacementOrSolidTractionFvPatchVectorField
+fixedDisplacementOrSolidTractionFvPatchVectorField::
+fixedDisplacementOrSolidTractionFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF
@@ -60,7 +61,8 @@ fixedDisplacementOrSolidTractionFvPatchVectorField::fixedDisplacementOrSolidTrac
 {}
 
 
-fixedDisplacementOrSolidTractionFvPatchVectorField::fixedDisplacementOrSolidTractionFvPatchVectorField
+fixedDisplacementOrSolidTractionFvPatchVectorField::
+fixedDisplacementOrSolidTractionFvPatchVectorField
 (
     const fixedDisplacementOrSolidTractionFvPatchVectorField& ptf,
     const fvPatch& p,
@@ -79,7 +81,8 @@ fixedDisplacementOrSolidTractionFvPatchVectorField::fixedDisplacementOrSolidTrac
 {}
 
 
-fixedDisplacementOrSolidTractionFvPatchVectorField::fixedDisplacementOrSolidTractionFvPatchVectorField
+fixedDisplacementOrSolidTractionFvPatchVectorField::
+fixedDisplacementOrSolidTractionFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF,
@@ -95,51 +98,61 @@ fixedDisplacementOrSolidTractionFvPatchVectorField::fixedDisplacementOrSolidTrac
     orthotropic_(false),
     timeSeries_(dict)
 {
-  Info << "fixedDisplacementOrSolidTraction boundary condition"
+  Info<< "fixedDisplacementOrSolidTraction boundary condition"
        << endl;
 
     //- check if traction boundary is for non linear solver
-    if(dict.found("nonLinear"))
+    if (dict.found("nonLinear"))
       {
-	nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));;
+          nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));;
 
-	if(nonLinear_ == UPDATED_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to updated Lagrangian"
-		 << endl;
-	  }
-	else if(nonLinear_ == TOTAL_LAGRANGIAN)
-	  {
-	    Info << "\tnonLinear set to total Lagrangian"
-		 << endl;
-	  }
+          if (nonLinear_ == UPDATED_LAGRANGIAN)
+          {
+              Info<< "\tnonLinear set to updated Lagrangian"
+                   << endl;
+          }
+          else if (nonLinear_ == TOTAL_LAGRANGIAN)
+          {
+              Info<< "\tnonLinear set to total Lagrangian"
+                   << endl;
+          }
       }
 
-    if(dict.found("orthotropic"))
+    if (dict.found("orthotropic"))
       {
-	orthotropic_ = Switch(dict.lookup("orthotropic"));
-	Info << "\t\torthotropic set to " << orthotropic_ << endl;
+          orthotropic_ = Switch(dict.lookup("orthotropic"));
+          Info<< "\t\torthotropic set to " << orthotropic_ << endl;
       }
 
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-//     if(Foam::word(dimensionedInternalField().mesh().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares")
-//       {
-// 	Warning << "The gradScheme for " << fieldName_
-// 		<< " should be \"extendedLeastSquares 0\" for the boundary "
-// 		<< "non-orthogonal correction to be right" << endl;
-//       }
+    if
+    (
+        Foam::word
+        (
+            dimensionedInternalField().mesh().schemesDict().gradScheme
+            (
+                "grad(" + fieldName_ + ")"
+            )
+        ) != "extendedLeastSquares"
+    )
+    {
+        Warning << "The gradScheme for " << fieldName_
+            << " should be \"extendedLeastSquares 0\" for the boundary "
+            << "non-orthogonal correction to be right" << endl;
+    }
 
   this->refValue() = displacement_;
   this->refGrad() = vector::zero;
   this->valueFraction() = symmTensor(1,0,0,1,0,1);
-    
+
   Field<vector>::operator=(displacement_);
 }
 
 
-fixedDisplacementOrSolidTractionFvPatchVectorField::fixedDisplacementOrSolidTractionFvPatchVectorField
+fixedDisplacementOrSolidTractionFvPatchVectorField::
+fixedDisplacementOrSolidTractionFvPatchVectorField
 (
     const fixedDisplacementOrSolidTractionFvPatchVectorField& ptf,
     const DimensionedField<vector, volMesh>& iF
@@ -186,7 +199,7 @@ void fixedDisplacementOrSolidTractionFvPatchVectorField::updateCoeffs()
         return;
     }
 
-    if( mag(timeSeries_(this->db().time().timeOutputValue())) < SMALL)
+    if ( mag(timeSeries_(this->db().time().timeOutputValue())) < SMALL)
     {
       // traction boundary
 
@@ -195,24 +208,24 @@ void fixedDisplacementOrSolidTractionFvPatchVectorField::updateCoeffs()
 
       // set gradient to enfore specified traction
       refGrad() = tractionBoundaryGradient()
-	(
-	 traction_,
-	 pressure_,
-	 word(fieldName_),
-	 patch(),
-	 orthotropic_,
-	 NamedEnum<Foam::fixedDisplacementOrSolidTractionFvPatchVectorField::nonLinearType, 3>::names[nonLinear_]
-	 )();
+          (
+              traction_,
+              pressure_,
+              word(fieldName_),
+              patch(),
+              orthotropic_,
+              nonLinearGeometry::nonLinearNames_[nonLinear_]
+              )();
     }
     else
-      {
-	// fixed displacement
+    {
+        // fixed displacement
 
-	// set valueFraction to one
-	this->valueFraction() = symmTensor(1,0,0,1,0,1);
+        // set valueFraction to one
+        this->valueFraction() = symmTensor(1,0,0,1,0,1);
 
-	// set displacement
-	refValue() = displacement_;
+        // set displacement
+        refValue() = displacement_;
       }
 
     directionMixedFvPatchVectorField::updateCoeffs();
@@ -220,10 +233,13 @@ void fixedDisplacementOrSolidTractionFvPatchVectorField::updateCoeffs()
 
 
 // Write
-void fixedDisplacementOrSolidTractionFvPatchVectorField::write(Ostream& os) const
+void fixedDisplacementOrSolidTractionFvPatchVectorField::write
+(Ostream& os) const
 {
     directionMixedFvPatchVectorField::write(os);
-    os.writeKeyword("nonLinear") << nonLinearNames_[nonLinear_] << token::END_STATEMENT << nl;
+    os.writeKeyword("nonLinear")
+        << nonLinearGeometry::nonLinearNames_[nonLinear_]
+        << token::END_STATEMENT << nl;
     traction_.writeEntry("traction", os);
     pressure_.writeEntry("pressure", os);
     displacement_.writeEntry("displacement", os);
@@ -231,20 +247,13 @@ void fixedDisplacementOrSolidTractionFvPatchVectorField::write(Ostream& os) cons
 }
 
 
-template<>
-const char* Foam::NamedEnum<Foam::fixedDisplacementOrSolidTractionFvPatchVectorField::nonLinearType, 3>::names[] =
-  {
-    "off",
-    "updatedLagrangian",
-    "totalLagrangian"
-  };
-
-const Foam::NamedEnum<Foam::fixedDisplacementOrSolidTractionFvPatchVectorField::nonLinearType, 3>
-Foam::fixedDisplacementOrSolidTractionFvPatchVectorField::nonLinearNames_;
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField(fvPatchVectorField, fixedDisplacementOrSolidTractionFvPatchVectorField);
+makePatchTypeField
+(
+    fvPatchVectorField,
+    fixedDisplacementOrSolidTractionFvPatchVectorField
+);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

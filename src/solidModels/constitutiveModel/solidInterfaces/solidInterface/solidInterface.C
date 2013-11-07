@@ -73,8 +73,8 @@ void solidInterface::makeSubMesh() const
             << "sub-mesh already exist"
             << abort(FatalError);
     }
-    
-    const volScalarField& materials = 
+
+    const volScalarField& materials =
         mesh_.lookupObject<volScalarField>("materials");
 
     const scalarField& materialsI = materials.internalField();
@@ -86,9 +86,9 @@ void solidInterface::makeSubMesh() const
 
     forAll(neighbour, faceI)
     {
-        if 
+        if
         (
-            mag(materialsI[neighbour[faceI]] - materialsI[owner[faceI]]) 
+            mag(materialsI[neighbour[faceI]] - materialsI[owner[faceI]])
           > SMALL
         )
         {
@@ -107,7 +107,7 @@ void solidInterface::makeSubMesh() const
 
         forAll(curCells, cellI)
         {
-            if(!interfaceCellSet.found(curCells[cellI]))
+            if (!interfaceCellSet.found(curCells[cellI]))
             {
                 interfaceCellSet.insert(curCells[cellI]);
             }
@@ -148,10 +148,10 @@ void solidInterface::makeGlobalInterFaces() const
             << "global inter-faces addressing already exist"
             << abort(FatalError);
     }
-    
+
     if (mesh_.foundObject<volScalarField>("materials"))
     {
-        const volScalarField& materials = 
+        const volScalarField& materials =
             mesh_.lookupObject<volScalarField>("materials");
 
         const scalarField& materialsI = materials.internalField();
@@ -160,19 +160,19 @@ void solidInterface::makeGlobalInterFaces() const
         const unallocLabelList& neighbour = mesh_.neighbour();
 
         labelHashSet interFacesSet;
-        
+
         forAll(neighbour, faceI)
         {
-            if 
+            if
             (
-                mag(materialsI[neighbour[faceI]] - materialsI[owner[faceI]]) 
+                mag(materialsI[neighbour[faceI]] - materialsI[owner[faceI]])
               > SMALL
             )
             {
                 interFacesSet.insert(faceI);
             }
         }
-        
+
         globalInterFacesPtr_ = new labelList(interFacesSet.toc());
 
         faceSet faMeshSet(mesh_, "faMeshSet", interFacesSet);
@@ -202,8 +202,8 @@ void solidInterface::makeLocalInterFaces() const
             << "local inter-faces addressing already exist"
             << abort(FatalError);
     }
-    
-    const volScalarField& materials = 
+
+    const volScalarField& materials =
         mesh_.lookupObject<volScalarField>("materials");
 
     volScalarField subMaterials = subMesh().interpolate(materials);
@@ -219,9 +219,9 @@ void solidInterface::makeLocalInterFaces() const
 
     forAll(neighbour, faceI)
     {
-        if 
+        if
         (
-            mag(materialsI[neighbour[faceI]] - materialsI[owner[faceI]]) 
+            mag(materialsI[neighbour[faceI]] - materialsI[owner[faceI]])
           > SMALL
         )
         {
@@ -250,7 +250,7 @@ void solidInterface::makeInterfaceDisplacement() const
             << "interface displacement field already exist"
             << abort(FatalError);
     }
-    
+
     interfaceUPtr_ = new vectorField(globalInterFaces().size(), vector::zero);
 }
 
@@ -275,7 +275,7 @@ void solidInterface::makeProcessorPatches() const
 
     if (mesh_.foundObject<volScalarField>("materials"))
     {
-        const volScalarField& materials = 
+        const volScalarField& materials =
             mesh_.lookupObject<volScalarField>("materials");
 
         labelHashSet processorPatches;
@@ -284,7 +284,7 @@ void solidInterface::makeProcessorPatches() const
         {
             if (mesh_.boundary()[patchI].type() == processorFvPatch::typeName)
             {
-                scalarField ownMat = 
+                scalarField ownMat =
                     materials.boundaryField()[patchI].patchInternalField();
 
                 scalarField ngbMat =
@@ -335,17 +335,17 @@ void solidInterface::makeProcessorPatchFaces() const
 
     forAll(procPatches, patchI)
     {
-        const volScalarField& materials = 
+        const volScalarField& materials =
             mesh_.lookupObject<volScalarField>("materials");
 
         label curProcPatch = procPatches[patchI];
 
-        scalarField ownMat = 
+        scalarField ownMat =
             materials.boundaryField()[curProcPatch].patchInternalField();
 
         scalarField ngbMat =
             materials.boundaryField()[curProcPatch].patchNeighbourField();
-        
+
         labelHashSet curProcPatchFaces;
 
         forAll(ownMat, faceI)
@@ -353,7 +353,7 @@ void solidInterface::makeProcessorPatchFaces() const
             if (mag(ownMat[faceI] - ngbMat[faceI]) > SMALL)
             {
                 curProcPatchFaces.insert(faceI);
-            }    
+            }
         }
 
         processorPatchFaces[patchI] = labelList(curProcPatchFaces.toc());
@@ -365,7 +365,8 @@ void solidInterface::makeProcessorInterfaceDisplacement() const
 {
     if (debug)
     {
-        Info<< "void solidInterface::makeProcessorInterfaceDisplacement() const : "
+        Info<< "void solidInterface::"
+            << "makeProcessorInterfaceDisplacement() const : "
             << "creating processor inter-faces displacement"
             << endl;
     }
@@ -374,12 +375,13 @@ void solidInterface::makeProcessorInterfaceDisplacement() const
     // if the pointer is already set
     if (processorInterfaceUPtr_)
     {
-        FatalErrorIn("solidInterface::makeProcessorInterfaceDisplacement() const")
+        FatalErrorIn
+            ("solidInterface::makeProcessorInterfaceDisplacement() const")
             << "processor interface displacement already exist"
             << abort(FatalError);
     }
 
-    processorInterfaceUPtr_ = 
+    processorInterfaceUPtr_ =
         new FieldField<Field, vector>(processorPatches().size());
     FieldField<Field, vector>& processorInterfaceU = *processorInterfaceUPtr_;
 
@@ -387,7 +389,7 @@ void solidInterface::makeProcessorInterfaceDisplacement() const
     {
         processorInterfaceU.set
         (
-            patchI, 
+            patchI,
             new vectorField(processorPatchFaces()[patchI].size(), vector::zero)
         );
     }
@@ -412,17 +414,17 @@ void solidInterface::makeIndicator() const
             << abort(FatalError);
     }
 
-    indicatorPtr_ = 
+    indicatorPtr_ =
         new List<labelPair>(globalInterFaces().size(), labelPair(0, 0));
 
-    List<labelPair>& indicator = *indicatorPtr_;    
+    List<labelPair>& indicator = *indicatorPtr_;
 
     const unallocLabelList& owner = mesh_.owner();
     const unallocLabelList& neighbour = mesh_.neighbour();
 
     if (mesh_.foundObject<volScalarField>("materials"))
     {
-        const volScalarField& materials = 
+        const volScalarField& materials =
             mesh_.lookupObject<volScalarField>("materials");
 
         forAll(globalInterFaces(), faceI)
@@ -430,16 +432,16 @@ void solidInterface::makeIndicator() const
             label curFace = globalInterFaces()[faceI];
 
             labelPair& curPair = indicator[faceI];
-            
+
             if (materials[owner[curFace]] < materials[neighbour[curFace]])
             {
-	      curPair.first() = int(materials[owner[curFace]]);
-	      curPair.second() = int(materials[neighbour[curFace]]);
+          curPair.first() = int(materials[owner[curFace]]);
+          curPair.second() = int(materials[neighbour[curFace]]);
             }
             else
             {
-	      curPair.second() = int(materials[owner[curFace]]);
-	      curPair.first() = int(materials[neighbour[curFace]]);
+          curPair.second() = int(materials[owner[curFace]]);
+          curPair.first() = int(materials[neighbour[curFace]]);
             }
         }
     }
@@ -452,8 +454,8 @@ void solidInterface::makeIndicatorFieldMap() const
   if (indicatorFieldMapPtr_)
     {
       FatalErrorIn("solidInterface::makeIndicatorFieldMap() const")
-	<< "interface indicator field map already exists"
-	<< abort(FatalError);
+    << "interface indicator field map already exists"
+    << abort(FatalError);
     }
 
     indicatorFieldMapPtr_  =
@@ -468,7 +470,7 @@ void solidInterface::makeIndicatorFieldMap() const
       {
         label curGlobalFace = globalInterFaces()[faceI];
 
-	indicatorFieldMap[curGlobalFace] = faceI;
+    indicatorFieldMap[curGlobalFace] = faceI;
       }
 
 }
@@ -478,8 +480,8 @@ void solidInterface::makeProcessorPatchFacesMap() const
   if (processorPatchFacesMapPtr_)
     {
       FatalErrorIn("solidInterface::makeProcessorPatchFacesMap() const")
-	<< "processor interface indicator field map already exists"
-	<< abort(FatalError);
+    << "processor interface indicator field map already exists"
+    << abort(FatalError);
     }
 
     processorPatchFacesMapPtr_  =
@@ -498,24 +500,24 @@ void solidInterface::makeProcessorPatchFacesMap() const
     labelList& processorPatchMap = *processorPatchMapPtr_;
     forAll(mesh_.boundary(), patchI)
       {
-	processorPatchFacesMap[patchI].setSize
-	  (
-	   mesh_.boundary()[patchI].size(),
-	   -1
-	   );
+    processorPatchFacesMap[patchI].setSize
+      (
+       mesh_.boundary()[patchI].size(),
+       -1
+       );
       }
 
     forAll(processorPatchFaces(), patchI)
       {
-	label curPatch = processorPatches()[patchI];
+    label curPatch = processorPatches()[patchI];
 
-	processorPatchMap[curPatch] = patchI;
+    processorPatchMap[curPatch] = patchI;
 
         forAll(processorPatchFaces()[patchI], faceI)
-	  {
+      {
             label curFace = processorPatchFaces()[patchI][faceI];
-	    processorPatchFacesMap[curPatch][curFace] = faceI;
-	  }
+        processorPatchFacesMap[curPatch][curFace] = faceI;
+      }
     }
 }
 
@@ -557,24 +559,10 @@ solidInterface::solidInterface
   processorPatchFacesPtr_(NULL),
   processorInterfaceUPtr_(NULL),
   indicatorPtr_(NULL),
-  //nonOrthogonalCorrection_(mesh_.solutionDict().subDict("solidMechanics").subDict("solidInterfaceDict").lookup("nonOrthogonalCorrection")),
-  //thermalStress_(mesh_.solutionDict().subDict("solidMechanics").subDict("solidInterfaceDict").lookup("thermalStress")),
-  //nonLinear_(mesh_.solutionDict().subDict("solidMechanics").subDict("solidInterfaceDict").lookup("nonLinear")),
   indicatorFieldMapPtr_(NULL),
   processorPatchMapPtr_(NULL),
-  processorPatchFacesMapPtr_(NULL) //,
-  // tangGradMethod_
-  // (
-  //    tangGradMethodNames_.read(mesh_.solutionDict().subDict("solidMechanics").subDict("solidInterfaceDict").lookup("tangentialGradientMethod"))
-  //  )
-{
-  //muPtr_ = new volScalarField(rheology_.mu());
-  //lambdaPtr_ = new volScalarField(rheology_.lambda());
-    // Info << "\tsolidInterface corrected is " << nonOrthogonalCorrection_ << nl
-    // 	 << "\tsolidInterface thermalStress is " << thermalStress_ << nl     
-    // 	 << "\tsolidInterface nonLinear is " << nonLinear_ << nl     
-    // 	 << "\tsolidInterface extrapolationMethod is " << tangGradMethodNames_[tangGradMethod_] << endl;      
-}
+  processorPatchFacesMapPtr_(NULL)
+{}
 
 
 // * * * * * * * * * * * * * * * Destructor * * * * * * * * * * * * * * * * * //
@@ -694,7 +682,7 @@ void solidInterface::modifyProperties
     forAll(globalInterFaces(), faceI)
     {
         label curGlobalFace = globalInterFaces()[faceI];
-        
+
         s.internalField()[curGlobalFace] = 0;
     }
 
@@ -719,7 +707,7 @@ void solidInterface::modifyProperties
     forAll(globalInterFaces(), faceI)
     {
         label curGlobalFace = globalInterFaces()[faceI];
-        
+
         st.internalField()[curGlobalFace] = symmTensor4thOrder::zero;
     }
 
@@ -744,7 +732,7 @@ void solidInterface::modifyProperties
     forAll(globalInterFaces(), faceI)
     {
         label curGlobalFace = globalInterFaces()[faceI];
-        
+
         dt.internalField()[curGlobalFace] = diagTensor::zero;
     }
 
@@ -759,18 +747,18 @@ void solidInterface::modifyProperties
             dt.boundaryField()[curPatch][curFace] = diagTensor::zero;
         }
     }
-}  
+}
 
 void solidInterface::modifyProperties
 (
-    surfaceScalarField& mu, 
+    surfaceScalarField& mu,
     surfaceScalarField& lambda
 ) const
 {
     forAll(globalInterFaces(), faceI)
     {
         label curGlobalFace = globalInterFaces()[faceI];
-        
+
         mu.internalField()[curGlobalFace] = 0;
         lambda.internalField()[curGlobalFace] = 0;
     }
@@ -791,7 +779,7 @@ void solidInterface::modifyProperties
 
 void solidInterface::modifyProperties
 (
-    surfaceScalarField& mu, 
+    surfaceScalarField& mu,
     surfaceScalarField& lambda,
     surfaceScalarField& threeKalpha
 ) const
@@ -799,7 +787,7 @@ void solidInterface::modifyProperties
     forAll(globalInterFaces(), faceI)
     {
         label curGlobalFace = globalInterFaces()[faceI];
-        
+
         mu.internalField()[curGlobalFace] = 0;
         lambda.internalField()[curGlobalFace] = 0;
         threeKalpha.internalField()[curGlobalFace] = 0;
@@ -815,7 +803,7 @@ void solidInterface::modifyProperties
 
             mu.boundaryField()[curPatch][curFace] = 0;
             lambda.boundaryField()[curPatch][curFace] = 0;
-	    threeKalpha.boundaryField()[curPatch][curFace] = 0;
+        threeKalpha.boundaryField()[curPatch][curFace] = 0;
         }
     }
 }
@@ -823,14 +811,14 @@ void solidInterface::modifyProperties
 
 void solidInterface::modifyProperties
 (
-    surfaceSymmTensor4thOrderField& C, 
+    surfaceSymmTensor4thOrderField& C,
     surfaceDiagTensorField& K
 ) const
 {
     forAll(globalInterFaces(), faceI)
     {
         label curGlobalFace = globalInterFaces()[faceI];
-        
+
         C.internalField()[curGlobalFace] = symmTensor4thOrder::zero;
         K.internalField()[curGlobalFace] = diagTensor::zero;
     }
@@ -843,8 +831,8 @@ void solidInterface::modifyProperties
         {
             label curFace = processorPatchFaces()[patchI][faceI];
 
-	    C.boundaryField()[curPatch][curFace] = symmTensor4thOrder::zero;
-	    K.boundaryField()[curPatch][curFace] = diagTensor::zero;
+        C.boundaryField()[curPatch][curFace] = symmTensor4thOrder::zero;
+        K.boundaryField()[curPatch][curFace] = diagTensor::zero;
         }
     }
 }
@@ -865,7 +853,7 @@ void solidInterface::modifyProperties
 //                 IOobject::NO_WRITE
 //             ),
 //             mesh_,
-//             dimensionedTensor("zero", dimless, tensor::zero)        
+//             dimensionedTensor("zero", dimless, tensor::zero)
 //         )
 //     );
 //     volTensorField& gradU = tGradU();
@@ -879,10 +867,10 @@ void solidInterface::modifyProperties
 //     {
 //         const skewCorrectionVectors& scv = skewCorrectionVectors::New(mesh_);
 
-//         const volTensorField& gradU = 
+//         const volTensorField& gradU =
 //             mesh_.lookupObject<volTensorField>("grad(" + U.name() + ')');
 
-//         Uf += 
+//         Uf +=
 //         (
 //             scv()
 //           & linear<tensor>(mesh_).interpolate
@@ -891,7 +879,7 @@ void solidInterface::modifyProperties
 //             )
 //         );
 
-// //         Uf += 
+// //         Uf +=
 // //         (
 // //             scv()
 // //           & linear<tensor>(mesh_).interpolate

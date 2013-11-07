@@ -71,7 +71,7 @@ Foam::linearCohesiveLaw::~linearCohesiveLaw()
 Foam::tmp<Foam::volScalarField> Foam::linearCohesiveLaw::materials() const
 {
   notImplemented(type() + "::materials()");
-  
+
     return tmp<volScalarField>
     (
         new volScalarField
@@ -194,10 +194,10 @@ void Foam::linearCohesiveLaw::damageTractions
   // Calculate current B
   const scalar B = 1.0 /
     ::sqrt(
-	   (tN/sigmaMax_.value())*(tN/sigmaMax_.value())
-	   + (tS/tauMax_.value())*(tS/tauMax_.value())
-	   );
-  
+       (tN/sigmaMax_.value())*(tN/sigmaMax_.value())
+       + (tS/tauMax_.value())*(tS/tauMax_.value())
+       );
+
   // Calculate apparent initiation tractions
   const scalar tNia = B * tN;
   const scalar tSia = B * tS;
@@ -209,7 +209,7 @@ void Foam::linearCohesiveLaw::damageTractions
   // GIca = C * GII
   // GIIca = C * GII
   // where we term C the mode-mix constant
-  
+
   // Calculate C
   const scalar C = 1.0 /
     ( (GI/GIc_.value()) + (GII/GIIc_.value()) );
@@ -239,23 +239,25 @@ void Foam::linearCohesiveLaw::damageTractions
   // This essentially allows the mode-mixity
   // to vary depending on the deltas
   tN = (
-	(sigmaMax_.value()/B) * deltaN /
-	(SMALL + ::sqrt(
-			(deltaN*deltaN)
-			+ (deltaS*deltaS)*(sigmaMax_.value()*sigmaMax_.value()/(tauMax_.value()*tauMax_.value()))
-			))
-	);
+    (sigmaMax_.value()/B) * deltaN /
+    (SMALL + ::sqrt(
+            (deltaN*deltaN)
+            + (deltaS*deltaS)*(sigmaMax_.value()*sigmaMax_.value()
+                               /(tauMax_.value()*tauMax_.value()))
+            ))
+    );
   tS = (
-	(tauMax_.value()/B) * deltaS /
-	(SMALL + ::sqrt(
-			(deltaS*deltaS)
-			+ (deltaN*deltaN)*(tauMax_.value()*tauMax_.value()/(sigmaMax_.value()*sigmaMax_.value()))
-			))
-	);
+    (tauMax_.value()/B) * deltaS /
+    (SMALL + ::sqrt(
+            (deltaS*deltaS)
+            + (deltaN*deltaN)*(tauMax_.value()*tauMax_.value()
+                               /(sigmaMax_.value()*sigmaMax_.value()))
+            ))
+    );
 }
 
 
-Foam::tmp<Foam::surfaceVectorField> 
+Foam::tmp<Foam::surfaceVectorField>
 Foam::linearCohesiveLaw::interfaceTraction
 (
  surfaceVectorField n,
@@ -273,15 +275,15 @@ Foam::linearCohesiveLaw::interfaceTraction
         (
             IOobject
             (
-	        "interfaceTraction",
-	        mesh().time().timeName(),
-	        mesh(),
-	        IOobject::NO_READ,
-	        IOobject::NO_WRITE
-	    ),
+            "interfaceTraction",
+            mesh().time().timeName(),
+            mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
             mesh(),
             dimensionedVector("zero", dimForce/dimArea, vector(0, 0, 0))
-	)
+    )
     );
 
     return tresult;

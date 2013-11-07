@@ -89,7 +89,8 @@ leastSquaresSolidInterfaceGrad<Type>::grad
     GeometricField<GradType, fvPatchField, volMesh>& lsGrad = tlsGrad();
 
     // Get reference to least square vectors
-    const leastSquaresSolidInterfaceVectors& lsv = leastSquaresSolidInterfaceVectors::New(mesh);
+    const leastSquaresSolidInterfaceVectors& lsv =
+        leastSquaresSolidInterfaceVectors::New(mesh);
 
     const surfaceVectorField& ownLs = lsv.pVectors();
     const surfaceVectorField& neiLs = lsv.nVectors();
@@ -99,87 +100,82 @@ leastSquaresSolidInterfaceGrad<Type>::grad
 
     // interface fields
     const solidInterface& solInt =
-      mesh.objectRegistry::lookupObject<IOReferencer<solidInterface> >("solidInterface")();
+      mesh.objectRegistry::lookupObject<IOReferencer<solidInterface> >
+        ("solidInterface")();
     const labelList& interfaceFacesMap = solInt.indicatorFieldMap();
     const labelList& interfaceProcPatchMap = solInt.processorPatchMap();
-    const labelListList& interfaceProcPatchFacesMap = solInt.processorPatchFacesMap();
+    const labelListList& interfaceProcPatchFacesMap =
+        solInt.processorPatchFacesMap();
     const vectorField& interfaceDispVec = solInt.interfaceDisplacement();
-    const List<vectorField>& procInterDispVec = solInt.processorInterfaceDisplacement();
+    const List<vectorField>& procInterDispVec =
+        solInt.processorInterfaceDisplacement();
 
     // interface disp must be vector so
     // this is a quick hack
     Field<Type> interfaceDisp(interfaceDispVec.size(), pTraits<Type>::zero);
-    if(pTraits<Type>::typeName != vector::typeName)
+    if (pTraits<Type>::typeName != vector::typeName)
       {
-	FatalError << "leastSquaresSolidInterface::grad() may only be used "
-	  "with a volVectorField" << exit(FatalError);
+          FatalError
+              << "leastSquaresSolidInterface::grad() may only be used "
+              "with a volVectorField" << exit(FatalError);
       }
     for (direction cmpt = 0; cmpt < pTraits<vector>::nComponents; cmpt++)
       {
-	interfaceDisp.replace
-	  (
-	   cmpt,
-	   interfaceDispVec.component(cmpt)
-	   );
+          interfaceDisp.replace
+              (
+                  cmpt,
+                  interfaceDispVec.component(cmpt)
+                  );
       }
-    List<Field<Type> > procInterDisp(procInterDispVec.size(), Field<Type>(0, pTraits<Type>::zero));
+    List<Field<Type> > procInterDisp
+        (procInterDispVec.size(), Field<Type>(0, pTraits<Type>::zero));
     forAll(procInterDisp, patchi)
       {
-	procInterDisp[patchi].setSize(procInterDispVec[patchi].size(), pTraits<Type>::zero);
-	
-	for (direction cmpt = 0; cmpt < pTraits<vector>::nComponents; cmpt++)
-	  {
-	    procInterDisp[patchi].replace
-	      (
-	       cmpt,
-	       procInterDispVec[patchi].component(cmpt)
-	       );
-	  }
+          procInterDisp[patchi].setSize
+              (procInterDispVec[patchi].size(), pTraits<Type>::zero);
+
+          for (direction cmpt = 0; cmpt < pTraits<vector>::nComponents; cmpt++)
+          {
+              procInterDisp[patchi].replace
+                  (
+                      cmpt,
+                      procInterDispVec[patchi].component(cmpt)
+                      );
+          }
       }
-    
-    // forAll(interfaceProcPatchMap, patchi)
-    //   {
-    // 	Pout << "interfaceProcPatchMap["<<patchi<<"] is " << interfaceProcPatchMap[patchi] << endl;
-    //   }
-    // forAll(interfaceProcPatchFacesMap, patchi)
-    //   {
-    // 	forAll(interfaceProcPatchFacesMap[patchi], facei)
-    // 	  {
-    // 	    Pout << "interfaceProcPatchFacesMap["<<patchi<<"]["<<facei<<"] is " << interfaceProcPatchFacesMap[patchi][facei] << endl;
-    // 	  }
-    //   }
 
     forAll(own, facei)
     {
         register label ownFaceI = own[facei];
         register label neiFaceI = nei[facei];
 
-	if(interfaceFacesMap[facei] > -SMALL)
-	  {
-	    label interfaceFacei = interfaceFacesMap[facei];
-	    if(interfaceFacei == -1)
-	      {
-		FatalError << "leastSquaresSolidInterface::grad()"
-			   << "face " << facei << " is not on the interface"
-			   << exit(FatalError);
-	      }
-	    
-	    // for interface faces, we use the face centre value
-	    // instead of the neighbour cell centre
-	    Type ownDeltaVsf = interfaceDisp[interfaceFacei] - vsf[ownFaceI];
-	    Type neiDeltaVsf = vsf[neiFaceI] - interfaceDisp[interfaceFacei];
-	    
-	    lsGrad[ownFaceI] += ownLs[facei]*ownDeltaVsf;
-	    lsGrad[neiFaceI] -= neiLs[facei]*neiDeltaVsf;
-	  }
-	else
-	  {
-	    // standard method
-	    Type deltaVsf = vsf[neiFaceI] - vsf[ownFaceI];
-	    
-	    lsGrad[ownFaceI] += ownLs[facei]*deltaVsf;
-	    lsGrad[neiFaceI] -= neiLs[facei]*deltaVsf;
-	  }
+        if (interfaceFacesMap[facei] > -SMALL)
+        {
+            label interfaceFacei = interfaceFacesMap[facei];
+            if (interfaceFacei == -1)
+            {
+                FatalError
+                    << "leastSquaresSolidInterface::grad()"
+                    << "face " << facei << " is not on the interface"
+                    << exit(FatalError);
+            }
+
+            // for interface faces, we use the face centre value
+            // instead of the neighbour cell centre
+            Type ownDeltaVsf = interfaceDisp[interfaceFacei] - vsf[ownFaceI];
+            Type neiDeltaVsf = vsf[neiFaceI] - interfaceDisp[interfaceFacei];
+
+            lsGrad[ownFaceI] += ownLs[facei]*ownDeltaVsf;
+            lsGrad[neiFaceI] -= neiLs[facei]*neiDeltaVsf;
+        }
+        else
+        {
+            // standard method
+            Type deltaVsf = vsf[neiFaceI] - vsf[ownFaceI];
+
+            lsGrad[ownFaceI] += ownLs[facei]*deltaVsf;
+            lsGrad[neiFaceI] -= neiLs[facei]*deltaVsf;
+        }
     }
 
     // Boundary faces
@@ -197,29 +193,33 @@ leastSquaresSolidInterfaceGrad<Type>::grad
 
             forAll(neiVsf, patchFaceI)
             {
-	      // philipc: special treatment of solid inter faces
-	      if(interfaceProcPatchFacesMap[patchi][patchFaceI] > -SMALL)
-		{
-		  label curPatch = interfaceProcPatchMap[patchi];
-		  label curFace = interfaceProcPatchFacesMap[patchi][patchFaceI];
-		  if(curPatch == -1 || curFace == -1)
-		    {
-		      FatalError << "leastSquaresSolidInterface::grad()"
-				 << "proc face " << patchFaceI << " is not on the interface"
-				 << exit(FatalError);
-		    }
-		  // face is on solid interface
-		  lsGrad[faceCells[patchFaceI]] +=
-                    patchOwnLs[patchFaceI]
-		    *(procInterDisp[curPatch][curFace] - vsf[faceCells[patchFaceI]]);
-		}
-	      else
-		{
-		  // standard method
-		  lsGrad[faceCells[patchFaceI]] +=
-                    patchOwnLs[patchFaceI]
-		    *(neiVsf[patchFaceI] - vsf[faceCells[patchFaceI]]);
-		}
+                // philipc: special treatment of solid inter faces
+                if (interfaceProcPatchFacesMap[patchi][patchFaceI] > -SMALL)
+                {
+                    label curPatch = interfaceProcPatchMap[patchi];
+                    label curFace =
+                        interfaceProcPatchFacesMap[patchi][patchFaceI];
+                    if (curPatch == -1 || curFace == -1)
+                    {
+                        FatalError
+                            << "leastSquaresSolidInterface::grad()"
+                            << "proc face " << patchFaceI
+                            << " is not on the interface"
+                            << exit(FatalError);
+                    }
+                    // face is on solid interface
+                    lsGrad[faceCells[patchFaceI]] +=
+                        patchOwnLs[patchFaceI]
+                        *(procInterDisp[curPatch][curFace]
+                          - vsf[faceCells[patchFaceI]]);
+                }
+                else
+                {
+                    // standard method
+                    lsGrad[faceCells[patchFaceI]] +=
+                        patchOwnLs[patchFaceI]
+                        *(neiVsf[patchFaceI] - vsf[faceCells[patchFaceI]]);
+                }
             }
         }
         else

@@ -109,18 +109,27 @@ fixedDisplacementZeroShearFvPatchVectorField
     if (dict.found("orthotropic"))
     {
         orthotropic_ = Switch(dict.lookup("orthotropic"));
-        Info << "\t\torthotropic set to " << orthotropic_ << endl;
+        Info<< "\t\torthotropic set to " << orthotropic_ << endl;
     }
 
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-    // if (Foam::word(dimensionedInternalField().mesh()..schemesDict().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares")
-//       {
-//    Warning << "The gradScheme for " << fieldName_
-//        << " should be \"extendedLeastSquares 0\" for the boundary "
-//        << "non-orthogonal correction to be right" << endl;
-//       }
+    if
+    (
+        Foam::word
+        (
+            dimensionedInternalField().mesh().schemesDict().gradScheme
+            (
+                "grad(" + fieldName_ + ")"
+            )
+        ) != "extendedLeastSquares"
+    )
+    {
+        Warning << "The gradScheme for " << fieldName_
+            << " should be \"extendedLeastSquares 0\" for the boundary "
+            << "non-orthogonal correction to be right" << endl;
+    }
 
   this->refGrad() = vector::zero;
 
@@ -150,7 +159,8 @@ fixedDisplacementZeroShearFvPatchVectorField
 }
 
 
-fixedDisplacementZeroShearFvPatchVectorField::fixedDisplacementZeroShearFvPatchVectorField
+fixedDisplacementZeroShearFvPatchVectorField::
+fixedDisplacementZeroShearFvPatchVectorField
 (
     const fixedDisplacementZeroShearFvPatchVectorField& ptf,
     const DimensionedField<vector, volMesh>& iF

@@ -115,7 +115,8 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given fixedDisplacementOrSolidTractionFvPatchVectorField
+        //- Construct by mapping given
+        // fixedDisplacementOrSolidTractionFvPatchVectorField
         //  onto a new patch
         fixedDisplacementOrSolidTractionFvPatchVectorField
         (
@@ -149,7 +150,8 @@ public:
         {
             return tmp<fvPatchField<vector> >
             (
-                new fixedDisplacementOrSolidTractionFvPatchVectorField(*this, iF)
+                new fixedDisplacementOrSolidTractionFvPatchVectorField
+                (*this, iF)
             );
         }
 

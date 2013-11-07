@@ -67,9 +67,9 @@ void Foam::faceCracker::checkDefinition()
             "void Foam::faceCracker::checkDefinition()"
         )   << "Not all zones and patches needed in the definition "
             << "have been found.  Please check your mesh definition.\n"
-	    << "\tcrackZoneID_.active() is " << crackZoneID_.active() << nl
-	    << "\tcrackPatchID_.active() is " << crackPatchID_.active() << nl
-	    << "\topenPatchID_.active() is " << openPatchID_.active()
+        << "\tcrackZoneID_.active() is " << crackZoneID_.active() << nl
+        << "\tcrackPatchID_.active() is " << crackPatchID_.active() << nl
+        << "\topenPatchID_.active() is " << openPatchID_.active()
             << abort(FatalError);
     }
 
