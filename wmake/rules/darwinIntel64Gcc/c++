@@ -2,7 +2,7 @@
 
 c++WARN     = -Wall -Wextra -Wno-unused-parameter -Wold-style-cast -Wno-overloaded-virtual -Wno-unsequenced -Wno-c++11-extensions -Wno-unused-comparison
 
-CC          = $(WM_CXX) $(WM_CXXFLAGS)
+CC          = $(WM_CXX) $(WM_CXXFLAGS) -fsignaling-nans  -ftrapping-math
 
 include $(RULES)/c++$(WM_COMPILE_OPTION)
 
