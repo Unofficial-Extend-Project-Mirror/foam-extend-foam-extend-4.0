@@ -19,7 +19,7 @@ if(historyPatchID != -1)
      
      //vector force = sum( totalForce );
      
-     //scalar force = force[vector::Y];;
+     //scalar force = force[vector::Y];
      
      //- patchIntegrate utility integrates it this way but this is worng because the sigma tensor should
      //- be dotted with the surface normal to give the actual traction/force

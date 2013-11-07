@@ -104,7 +104,7 @@ fixedDisplacementOrSolidTractionFvPatchVectorField
     //- check if traction boundary is for non linear solver
     if (dict.found("nonLinear"))
       {
-          nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));;
+          nonLinear_ = nonLinearNames_.read(dict.lookup("nonLinear"));
 
           if (nonLinear_ == UPDATED_LAGRANGIAN)
           {
