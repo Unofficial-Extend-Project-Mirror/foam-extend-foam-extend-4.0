@@ -148,7 +148,8 @@ public:
         virtual tmp<volScalarField> sigmaY() const;
 
         //- Return yield stress given cellID
-        virtual scalar sigmaY(const scalar epsilonPEq, const label cellID) const;
+        virtual scalar sigmaY
+        (const scalar epsilonPEq, const label cellID) const;
 
         //- Correct the rheological model
         virtual void correct()

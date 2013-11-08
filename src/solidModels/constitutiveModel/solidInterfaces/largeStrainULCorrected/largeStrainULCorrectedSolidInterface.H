@@ -62,7 +62,8 @@ class largeStrainULCorrectedSolidInterface
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        largeStrainULCorrectedSolidInterface(const largeStrainULCorrectedSolidInterface&);
+        largeStrainULCorrectedSolidInterface
+        (const largeStrainULCorrectedSolidInterface&);
 
         //- Disallow default bitwise assignment
         void operator=(const largeStrainULCorrectedSolidInterface&);
@@ -80,9 +81,9 @@ public:
         //- Construct from dictionary
         largeStrainULCorrectedSolidInterface
         (
-	 const word& name,
-	 const fvMesh& mesh,
-	 const constitutiveModel& rheology
+            const word& name,
+            const fvMesh& mesh,
+            const constitutiveModel& rheology
         );
 
 

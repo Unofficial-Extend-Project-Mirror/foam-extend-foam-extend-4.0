@@ -25,8 +25,6 @@ License
 Class
     solidInterface
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "solidInterface.H"
@@ -47,26 +45,26 @@ autoPtr<solidInterface> solidInterface::New
  const constitutiveModel& rheology
  )
 {
-  Info<< "Selecting solidInterface procedure " << name << endl;
+    Info<< "Selecting solidInterface procedure " << name << endl;
 
-  dictionaryConstructorTable::iterator cstrIter =
-    dictionaryConstructorTablePtr_->find(name);
-  
+    dictionaryConstructorTable::iterator cstrIter =
+        dictionaryConstructorTablePtr_->find(name);
+
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
         FatalIOErrorIn
-        (
-            "solidInterface::New(\n"
-            "    const word& name,\n"
-            "    const fvMesh& mesh,\n"
-            "    const constitutiveModel& rheology" //,\n"
-            ")",
-	    rheology
-        )   << "Unknown solidInterfaceMethod "
-            << name << endl << endl
-            << "Valid  solidInterfaces are : " << endl
-            << dictionaryConstructorTablePtr_->toc()
-            << exit(FatalIOError);
+            (
+                "solidInterface::New(\n"
+                "    const word& name,\n"
+                "    const fvMesh& mesh,\n"
+                "    const constitutiveModel& rheology" //,\n"
+                ")",
+                rheology
+                )   << "Unknown solidInterfaceMethod "
+                    << name << endl << endl
+                    << "Valid  solidInterfaces are : " << endl
+                    << dictionaryConstructorTablePtr_->toc()
+                    << exit(FatalIOError);
     }
 
     return autoPtr<solidInterface>(cstrIter()(name, mesh, rheology));

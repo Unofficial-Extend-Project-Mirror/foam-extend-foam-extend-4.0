@@ -63,7 +63,8 @@ class smallStrainCorrectedSolidInterface
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        smallStrainCorrectedSolidInterface(const smallStrainCorrectedSolidInterface&);
+        smallStrainCorrectedSolidInterface
+        (const smallStrainCorrectedSolidInterface&);
 
         //- Disallow default bitwise assignment
         void operator=(const smallStrainCorrectedSolidInterface&);
@@ -81,9 +82,9 @@ public:
         //- Construct from dictionary
         smallStrainCorrectedSolidInterface
         (
-	 const word& name,
-	 const fvMesh& mesh,
-	 const constitutiveModel& rheology
+            const word& name,
+            const fvMesh& mesh,
+            const constitutiveModel& rheology
         );
 
 

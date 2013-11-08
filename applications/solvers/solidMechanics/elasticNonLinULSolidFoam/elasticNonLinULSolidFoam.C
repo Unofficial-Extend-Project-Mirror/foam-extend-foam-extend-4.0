@@ -28,9 +28,9 @@ Application
 Description
     Finite volume structural solver employing a incremental strain updated
     Lagrangian approach.
-    
+
     Valid for small strains, finite displacements and finite rotations.
-    
+
 Author
     Philip Cardiff UCD
 
@@ -66,11 +66,11 @@ int main(int argc, char *argv[])
 //* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
   Info << "\nStarting time loop\n" << endl;
-  
+
   for (runTime++; !runTime.end(); runTime++)
     {
       Info<< "Time = " << runTime.timeName() << nl << endl;
-      	  
+
 #     include "readSolidMechanicsControls.H"
 
       int iCorr = 0;
@@ -78,74 +78,74 @@ int main(int argc, char *argv[])
       scalar initialResidual = 1.0;
       scalar relativeResidual = 1.0;
       lduMatrix::debug = 0;
-      
+
       do
-	{ 
-	  DU.storePrevIter();
+      {
+          DU.storePrevIter();
 
 #         include "calculateDivDSigmaExp.H"
 #         include "calculateDivDSigmaLargeStrainExp.H"
 
-	  //- updated lagrangian large strain momentum equation
-	  fvVectorMatrix DUEqn
-	    (
-	     fvm::d2dt2(rho,DU)
-	     ==
-	     fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
-	     + divDSigmaExp
-	     + divDSigmaLargeStrainExp
-	     );
-	  
-	  if(solidInterfaceCorr)
-	    {
-	      solidInterfacePtr->correct(DUEqn);
-	    }
+          //- Updated lagrangian momentum equation
+          fvVectorMatrix DUEqn
+              (
+                  fvm::d2dt2(rho,DU)
+                  ==
+                  fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
+                  + divDSigmaExp
+                  + divDSigmaLargeStrainExp
+                  );
 
-	  solverPerf = DUEqn.solve();
+          if (solidInterfaceCorr)
+          {
+              solidInterfacePtr->correct(DUEqn);
+          }
 
-	  if(iCorr == 0)
-            {
-	      initialResidual = solverPerf.initialResidual();
-            }
-	 
-	  DU.relax();
-	  
-	  gradDU = fvc::grad(DU);
-	  
+          solverPerf = DUEqn.solve();
+
+          if (iCorr == 0)
+          {
+              initialResidual = solverPerf.initialResidual();
+          }
+
+          DU.relax();
+
+          gradDU = fvc::grad(DU);
+
 #         include "calculateDEpsilonDSigma.H"
 #         include "calculateRelativeResidual.H"
-	  	  
-	  Info << "\tTime " << runTime.value()
-	       << ", Corrector " << iCorr
-	       << ", Solving for " << DU.name()
-	       << " using " << solverPerf.solverName()
-	       << ", res = " << solverPerf.initialResidual()
-	       << ", rel res = " << relativeResidual
-	       << ", inner iters " << solverPerf.nIterations() << endl;
-        }
+
+          Info << "\tTime " << runTime.value()
+               << ", Corrector " << iCorr
+               << ", Solving for " << DU.name()
+               << " using " << solverPerf.solverName()
+               << ", res = " << solverPerf.initialResidual()
+               << ", rel res = " << relativeResidual
+               << ", inner iters " << solverPerf.nIterations() << endl;
+      }
       while
         (
-	 //solverPerf.initialResidual() > convergenceTolerance 
-	 relativeResidual > convergenceTolerance
-         && ++iCorr < nCorr
-	 );
-            
-      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name() 
-	   << ", Initial residual = " << initialResidual 
-	   << ", Final residual = " << solverPerf.initialResidual()
-	   << ", No outer iterations " << iCorr << endl;
-            
+            //solverPerf.initialResidual() > convergenceTolerance
+            relativeResidual > convergenceTolerance
+            && ++iCorr < nCorr
+            );
+
+      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name()
+           << ", Initial residual = " << initialResidual
+           << ", Final residual = " << solverPerf.initialResidual()
+           << ", No outer iterations " << iCorr << endl;
+
 #     include "moveMesh.H"
 #     include "rotateFields.H"
 #     include "writeFields.H"
 
-      Info << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	   << "  ClockTime = " << runTime.elapsedClockTime() << " s" 
-	   << endl;
+      Info<< nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+          << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+          << endl;
     }
-  
+
   Info<< "End\n" << endl;
-  
+
   return(0);
 }
 

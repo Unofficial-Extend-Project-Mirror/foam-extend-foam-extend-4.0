@@ -27,9 +27,6 @@ License
 #include "solidTractionFvPatchVectorField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "volFields.H"
-//#include "rheologyModel.H"
-//#include "plasticityModel.H"
-//#include "thermalModel.H"
 #include "tractionBoundaryGradient.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -100,11 +97,11 @@ solidTractionFvPatchVectorField
     }
 
 
-    if(dict.found("orthotropic"))
-      {
-	orthotropic_ = Switch(dict.lookup("orthotropic"));
-	Info << "\t\torthotropic set to " << orthotropic_ << endl;
-      }
+    if (dict.found("orthotropic"))
+    {
+        orthotropic_ = Switch(dict.lookup("orthotropic"));
+        Info<< "\t\torthotropic set to " << orthotropic_ << endl;
+    }
 
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
@@ -262,8 +259,8 @@ void solidTractionFvPatchVectorField::write(Ostream& os) const
 {
     fvPatchVectorField::write(os);
     os.writeKeyword("nonLinear")
-	 << nonLinearGeometry::nonLinearNames_[nonLinear_]
-	 << token::END_STATEMENT << nl;
+        << nonLinearGeometry::nonLinearNames_[nonLinear_]
+        << token::END_STATEMENT << nl;
 
     traction_.writeEntry("traction", os);
     pressure_.writeEntry("pressure", os);

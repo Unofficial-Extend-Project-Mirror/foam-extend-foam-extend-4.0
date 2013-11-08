@@ -64,14 +64,15 @@ Foam::tmp<Foam::scalarField> Foam::multiMaterial::indicator
 }
 
 
-Foam::scalar Foam::multiMaterial::indicator(const label index, const label cellID) const
+Foam::scalar
+Foam::multiMaterial::indicator(const label index, const label cellID) const
 {
     const scalar mat = materials_.internalField()[cellID];
     scalar result = 0.0;
 
     if (mat > index - SMALL && mat < index + 1 - SMALL)
       {
-	result = 1.0;
+    result = 1.0;
       }
 
     return result;
@@ -224,7 +225,8 @@ Foam::tmp<Foam::volScalarField> Foam::multiMaterial::E() const
 }
 
 
-Foam::tmp<Foam::volScalarField> Foam::multiMaterial::E(const volScalarField& epsEq) const
+Foam::tmp<Foam::volScalarField>
+Foam::multiMaterial::E(const volScalarField& epsEq) const
 {
     tmp<volScalarField> tresult
     (
@@ -259,7 +261,8 @@ Foam::tmp<Foam::volScalarField> Foam::multiMaterial::E(const volScalarField& eps
 //         forAll (laws, lawI)
 //         {
 //             result.boundaryField()[patchI] +=
-//                 indicator(lawI)().boundaryField()[patchI]*laws[lawI].E(t)().boundaryField()[patchI];
+//                 indicator(lawI)().boundaryField()[patchI]
+//                 *laws[lawI].E(t)().boundaryField()[patchI];
 //         }
 //     }
 
@@ -341,7 +344,8 @@ Foam::tmp<Foam::volScalarField> Foam::multiMaterial::Ep() const
 }
 
 
-Foam::tmp<Foam::volScalarField> Foam::multiMaterial::Ep(const volScalarField& epsEq) const
+Foam::tmp<Foam::volScalarField>
+Foam::multiMaterial::Ep(const volScalarField& epsEq) const
 {
     tmp<volScalarField> tresult
     (
@@ -376,7 +380,8 @@ Foam::tmp<Foam::volScalarField> Foam::multiMaterial::Ep(const volScalarField& ep
 //         forAll (laws, lawI)
 //         {
 //             result.boundaryField()[patchI] +=
-//                 indicator(lawI)().boundaryField()[patchI]*laws[lawI].E(t)().boundaryField()[patchI];
+//                 indicator(lawI)().boundaryField()[patchI]
+//                 *laws[lawI].E(t)().boundaryField()[patchI];
 //         }
 //     }
 
@@ -421,7 +426,8 @@ Foam::tmp<Foam::volScalarField> Foam::multiMaterial::sigmaY() const
     return tresult;
 }
 
-Foam::scalar Foam::multiMaterial::sigmaY(const scalar epsilonPEq, const label cellID) const
+Foam::scalar
+Foam::multiMaterial::sigmaY(const scalar epsilonPEq, const label cellID) const
 {
   // Accumulate data for all fields
   const PtrList<rheologyLaw>& laws = *this;
@@ -430,7 +436,7 @@ Foam::scalar Foam::multiMaterial::sigmaY(const scalar epsilonPEq, const label ce
   forAll (laws, lawI)
     {
       result +=
-       	indicator(lawI, cellID)*laws[lawI].sigmaY(epsilonPEq, cellID);
+            indicator(lawI, cellID)*laws[lawI].sigmaY(epsilonPEq, cellID);
     }
 
     return result;
@@ -442,13 +448,13 @@ bool Foam::multiMaterial::plasticityModelNeeded() const
   const PtrList<rheologyLaw>& laws = *this;
 
   bool active = false;
-  forAll (laws, lawI)
+  forAll(laws, lawI)
     {
-      if(laws[lawI].plasticityModelNeeded())
-	{
-	  active = true;
-	  break;
-	}
+      if (laws[lawI].plasticityModelNeeded())
+      {
+          active = true;
+          break;
+      }
     }
 
     return active;
@@ -480,10 +486,10 @@ Foam::tmp<Foam::volDiagTensorField> Foam::multiMaterial::K() const
 
     forAll (laws, lawI)
       {
-	result.internalField() +=
-	  indicator(lawI)*laws[lawI].K()().internalField();
+    result.internalField() +=
+      indicator(lawI)*laws[lawI].K()().internalField();
       }
-    
+
     result.correctBoundaryConditions();
 
     return tresult;
@@ -504,7 +510,8 @@ Foam::tmp<Foam::volSymmTensor4thOrderField> Foam::multiMaterial::C() const
                 IOobject::NO_WRITE
             ),
             mesh(),
-            dimensionedSymmTensor4thOrder("zeroC", dimForce/dimArea, symmTensor4thOrder::zero),
+            dimensionedSymmTensor4thOrder
+            ("zeroC", dimForce/dimArea, symmTensor4thOrder::zero),
             zeroGradientFvPatchScalarField::typeName
         )
     );
@@ -516,7 +523,7 @@ Foam::tmp<Foam::volSymmTensor4thOrderField> Foam::multiMaterial::C() const
     forAll (laws, lawI)
     {
         result.internalField() +=
-	  indicator(lawI)*laws[lawI].C()().internalField();
+      indicator(lawI)*laws[lawI].C()().internalField();
     }
 
     result.correctBoundaryConditions();

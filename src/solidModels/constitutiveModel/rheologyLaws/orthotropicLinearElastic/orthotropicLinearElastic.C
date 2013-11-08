@@ -35,7 +35,8 @@ License
 namespace Foam
 {
     defineTypeNameAndDebug(orthotropicLinearElastic, 0);
-    addToRunTimeSelectionTable(rheologyLaw, orthotropicLinearElastic, dictionary);
+    addToRunTimeSelectionTable
+    (rheologyLaw, orthotropicLinearElastic, dictionary);
 }
 
 
@@ -68,7 +69,10 @@ Foam::orthotropicLinearElastic::orthotropicLinearElastic
     Gxy_(dict.lookup("Gxy")),
     Gyz_(dict.lookup("Gyz")),
     Gzx_(dict.lookup("Gzx")),
-    J_( (1 - nuxy_*nuyx_ - nuyz_*nuzy_ - nuzx_*nuxz_ - 2*nuyx_*nuzy_*nuxz_) / (Ex_*Ey_*Ez_) ),
+    J_(
+        (1 - nuxy_*nuyx_ - nuyz_*nuzy_ - nuzx_*nuxz_ - 2*nuyx_*nuzy_*nuxz_)
+        / (Ex_*Ey_*Ez_)
+        ),
     A11_( (1 - nuyz_*nuzy_)/(J_*Ey_*Ez_) ),
     A22_( (1 - nuxz_*nuzx_)/(J_*Ex_*Ez_) ),
     A33_( (1 - nuyx_*nuxy_)/(J_*Ey_*Ex_) ),
@@ -81,64 +85,75 @@ Foam::orthotropicLinearElastic::orthotropicLinearElastic
     C_(
        IOobject
        (
-	"rheologyLawStoredC",
-	mesh().time().timeName(),
-	mesh(),
-	IOobject::NO_READ,
-	IOobject::NO_WRITE
-	),
+           "rheologyLawStoredC",
+           mesh().time().timeName(),
+           mesh(),
+           IOobject::NO_READ,
+           IOobject::NO_WRITE
+           ),
        mesh(),
-       dimensionedSymmTensor4thOrder("zero", dimForce/dimArea,
-       				     symmTensor4thOrder(A11_.value(), A12_.value(), A31_.value(),
-       							A22_.value(), A23_.value(),
-       							A33_.value(),
-       							A44_.value(),
-       							A55_.value(),
-       							A66_.value())
-       				     ),
+       dimensionedSymmTensor4thOrder
+       (
+           "zero",
+           dimForce/dimArea,
+           symmTensor4thOrder(A11_.value(), A12_.value(), A31_.value(),
+                              A22_.value(), A23_.value(),
+                              A33_.value(),
+                              A44_.value(),
+                              A55_.value(),
+                              A66_.value())
+           ),
        zeroGradientFvPatchSymmTensor4thOrderField::typeName
-	),
+        ),
     matDir_(
-	    IOobject
-	    (
-	     "materialDirections",
-	     mesh().time().timeName(),
-	     mesh(),
-	     IOobject::MUST_READ,
-	     IOobject::NO_WRITE
-	     ),
-	    mesh()
-	    )
+        IOobject
+        (
+            "materialDirections",
+         mesh().time().timeName(),
+         mesh(),
+         IOobject::MUST_READ,
+         IOobject::NO_WRITE
+         ),
+        mesh()
+        )
 {
   //- check material properties lie within physical constraints
   //- ref Abaqus analysis user's manual orthotropic material
-  Info << "\tChecking physical constraints on the orthotropic material properties" << endl;
+    Info<< "\tChecking physical constraints on the orthotropic"
+        << " material properties" << endl;
 
   //- E and G should be greater than zero
-  if(Ex_.value() < 0.0 || Ey_.value() < 0.0 || Ez_.value() < 0.0
+  if (Ex_.value() < 0.0 || Ey_.value() < 0.0 || Ez_.value() < 0.0
      || Gxy_.value() < 0.0 || Gyz_.value() < 0.0 || Gzx_.value() < 0.0)
     {
       FatalError << "Ex, Ey, Ez, Gxy, Gyz, Gzx should all be greater than zero!"
-		 << exit(FatalError);
-    } 
+         << exit(FatalError);
+    }
 
   //- restriction on Poisson's ratio
-  if(mag(nuxy_.value()) >= sqrt(Ex_.value()/Ey_.value())
+  if (mag(nuxy_.value()) >= sqrt(Ex_.value()/Ey_.value())
      || mag(nuyz_.value()) >= sqrt(Ey_.value()/Ez_.value())
      || mag(nuzx_.value()) >= sqrt(Ez_.value()/Ex_.value()))
     {
       FatalError << "mag(nuij) should be less sqrt(Ei/Ej)"
-		 << exit(FatalError);
+         << exit(FatalError);
     }
 
-  if( dimensionedScalar(1 - nuxy_*nuyx_ - nuyz_*nuzy_ - nuzx_*nuxz_ - 2*nuyx_*nuzy_*nuxz_).value() <= 0 )
+  if (
+      dimensionedScalar
+      (1 - nuxy_*nuyx_ - nuyz_*nuzy_
+       - nuzx_*nuxz_ - 2*nuyx_*nuzy_*nuxz_).value()
+      <= 0 )
     {
-      FatalError << "(1 - nuxy*nuyx - nuyz*nuzy - nuzx*nuxz - 2*nuyx*nuzy*nuxz) should be greater than zero!"
-		 << exit(FatalError);
+      FatalError
+          << "(1 - nuxy*nuyx - nuyz*nuzy "
+          << "- nuzx*nuxz - 2*nuyx*nuzy*nuxz) should be greater than zero!"
+         << exit(FatalError);
     }
 
-  
-  Info << "\tRotating local material properties to global coordinate system" << endl;
+
+  Info<< "\tRotating local material properties to global coordinate system"
+      << endl;
   //- rotate tensors
   volTensorField R
     (
@@ -159,25 +174,25 @@ Foam::orthotropicLinearElastic::orthotropicLinearElastic
   forAll(matDir_, celli)
     {
       {
-	scalar magVec =
-	  mag(vector(matDir_[celli][0], matDir_[celli][1], matDir_[celli][2]));
-	matDir_[celli][0] /= magVec;
-	matDir_[celli][1] /= magVec;
-	matDir_[celli][2] /= magVec;
+    scalar magVec =
+      mag(vector(matDir_[celli][0], matDir_[celli][1], matDir_[celli][2]));
+    matDir_[celli][0] /= magVec;
+    matDir_[celli][1] /= magVec;
+    matDir_[celli][2] /= magVec;
       }
       {
-	scalar magVec =
-	  mag(vector(matDir_[celli][3], matDir_[celli][4], matDir_[celli][5]));
-	matDir_[celli][3] /= magVec;
-	matDir_[celli][4] /= magVec;
-	matDir_[celli][5] /= magVec;
+    scalar magVec =
+      mag(vector(matDir_[celli][3], matDir_[celli][4], matDir_[celli][5]));
+    matDir_[celli][3] /= magVec;
+    matDir_[celli][4] /= magVec;
+    matDir_[celli][5] /= magVec;
       }
       {
-	scalar magVec =
-	  mag(vector(matDir_[celli][6], matDir_[celli][7], matDir_[celli][8]));
-	matDir_[celli][6] /= magVec;
-	matDir_[celli][7] /= magVec;
-	matDir_[celli][8] /= magVec;
+    scalar magVec =
+      mag(vector(matDir_[celli][6], matDir_[celli][7], matDir_[celli][8]));
+    matDir_[celli][6] /= magVec;
+    matDir_[celli][7] /= magVec;
+    matDir_[celli][8] /= magVec;
       }
     }
 
@@ -190,22 +205,22 @@ Foam::orthotropicLinearElastic::orthotropicLinearElastic
     {
       // R_ij = xold_i & xnew_i;
       {
-	vector mD(matDir_[celli][0], matDir_[celli][1], matDir_[celli][2]);
-	R[celli][0] = e0 & mD;
-	R[celli][1] = e1 & mD;
-	R[celli][2] = e2 & mD;
+    vector mD(matDir_[celli][0], matDir_[celli][1], matDir_[celli][2]);
+    R[celli][0] = e0 & mD;
+    R[celli][1] = e1 & mD;
+    R[celli][2] = e2 & mD;
       }
       {
-	vector mD(matDir_[celli][3], matDir_[celli][4], matDir_[celli][5]);
-	R[celli][3] = e0 & mD;
-	R[celli][4] = e1 & mD;
-	R[celli][5] = e2 & mD;
+    vector mD(matDir_[celli][3], matDir_[celli][4], matDir_[celli][5]);
+    R[celli][3] = e0 & mD;
+    R[celli][4] = e1 & mD;
+    R[celli][5] = e2 & mD;
       }
       {
-	vector mD(matDir_[celli][6], matDir_[celli][7], matDir_[celli][8]);
-	R[celli][6] = e0 & mD;
-	R[celli][7] = e1 & mD;
-	R[celli][8] = e2 & mD;
+    vector mD(matDir_[celli][6], matDir_[celli][7], matDir_[celli][8]);
+    R[celli][6] = e0 & mD;
+    R[celli][7] = e1 & mD;
+    R[celli][8] = e2 & mD;
       }
     }
 
@@ -351,7 +366,8 @@ Foam::tmp<Foam::volScalarField> Foam::orthotropicLinearElastic::sigmaY() const
     );
 }
 
-Foam::scalar Foam::orthotropicLinearElastic::sigmaY(const scalar epsilonPEq, const label cellID) const
+Foam::scalar Foam::orthotropicLinearElastic::sigmaY
+(const scalar epsilonPEq, const label cellID) const
 {
   return GREAT;
 }
@@ -376,7 +392,7 @@ Foam::tmp<Foam::volDiagTensorField> Foam::orthotropicLinearElastic::K() const
             zeroGradientFvPatchScalarField::typeName
         )
     );
-  
+
   volDiagTensorField& K = tresult();
 
   forAll(K, celli)
@@ -391,18 +407,19 @@ Foam::tmp<Foam::volDiagTensorField> Foam::orthotropicLinearElastic::K() const
   return tresult;
 }
 
-Foam::tmp<Foam::volSymmTensor4thOrderField> Foam::orthotropicLinearElastic::C() const
+Foam::tmp<Foam::volSymmTensor4thOrderField>
+Foam::orthotropicLinearElastic::C() const
 {
   tmp<volSymmTensor4thOrderField> tresult
     (
         new volSymmTensor4thOrderField
         (
-	 C_
-	 )
+     C_
+     )
     );
-  
+
   volSymmTensor4thOrderField& result = tresult();
-  
+
   result.correctBoundaryConditions();
 
   return tresult;

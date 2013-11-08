@@ -28,13 +28,13 @@ Application
 Description
     Finite volume structural solver employing a total strain total
     Lagrangian approach.
-    
+
     Valid for finite strains, finite displacements and finite rotations.
 
 Author
     Micheal Leonard
     Philip Cardiff
-    
+
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
   while(runTime.loop())
     {
       Info<< "Time: " << runTime.timeName() << nl << endl;
-      
+
 #     include "readSolidMechanicsControls.H"
 
       int iCorr = 0;
@@ -68,93 +68,94 @@ int main(int argc, char *argv[])
       lduMatrix::debug = 0;
 
       do
-        {
-	  U.storePrevIter();
-	  
-	  surfaceTensorField shearGradU =
-	    ((I - n*n)&fvc::interpolate(gradU));
+      {
+          U.storePrevIter();
 
-	  fvVectorMatrix UEqn
-            (
-	     fvm::d2dt2(rho, U)
-	     ==
-	     fvm::laplacian(2*muf + lambdaf, U, "laplacian(DU,U)")
-	     // + fvc::div(
-	     // 		-( (mu + lambda) * gradU )
-	     // 		+ ( mu * gradU.T() )
-	     // 		+ ( mu * (gradU & gradU.T()) )
-	     // 		+ ( lambda * tr(gradU) * I )
-	     // 		+ ( 0.5 * lambda * tr(gradU & gradU.T()) * I )
-	     // 		+ ( sigma & gradU ),
-	     // 		"div(sigma)"
-	     // 		)
-	     + fvc::div(
-			mesh.magSf()
-			*(
-			  - (muf + lambdaf)*(fvc::snGrad(U)&(I - n*n))
-			  + lambdaf*tr(shearGradU&(I - n*n))*n
-			  + muf*(shearGradU&n)
-			  + muf * (n & fvc::interpolate(gradU & gradU.T()))
-			  + 0.5*lambdaf * (n * tr(fvc::interpolate(gradU & gradU.T())))
-			  + (n & fvc::interpolate( sigma & gradU ))
-			  )
-			)
-	     );
+          surfaceTensorField shearGradU =
+              ((I - n*n)&fvc::interpolate(gradU));
 
-	  if(solidInterfaceCorr)
-	    {
-	      solidInterfacePtr->correct(UEqn);
-	    }
+          fvVectorMatrix UEqn
+              (
+                  fvm::d2dt2(rho, U)
+                  ==
+                  fvm::laplacian(2*muf + lambdaf, U, "laplacian(DU,U)")
+                  // + fvc::div(
+                  //         -( (mu + lambda) * gradU )
+                  //         + ( mu * gradU.T() )
+                  //         + ( mu * (gradU & gradU.T()) )
+                  //         + ( lambda * tr(gradU) * I )
+                  //         + ( 0.5 * lambda * tr(gradU & gradU.T()) * I )
+                  //         + ( sigma & gradU ),
+                  //         "div(sigma)"
+                  //         )
+                  + fvc::div(
+                      mesh.magSf()
+                      *(
+                          - (muf + lambdaf)*(fvc::snGrad(U)&(I - n*n))
+                          + lambdaf*tr(shearGradU&(I - n*n))*n
+                          + muf*(shearGradU&n)
+                          + muf * (n & fvc::interpolate(gradU & gradU.T()))
+                          + 0.5*lambdaf
+                          *(n * tr(fvc::interpolate(gradU & gradU.T())))
+                          + (n & fvc::interpolate( sigma & gradU ))
+                          )
+                      )
+                  );
 
-	  solverPerf = UEqn.solve();
+          if (solidInterfaceCorr)
+          {
+              solidInterfacePtr->correct(UEqn);
+          }
 
-	  if(iCorr == 0)
-	    {
-	      initialResidual = solverPerf.initialResidual();
-	    }
-	  
-	  U.relax();
+          solverPerf = UEqn.solve();
 
-	  //gradU = solidInterfacePtr->grad(U);
-	  gradU = fvc::grad(U);
+          if (iCorr == 0)
+          {
+              initialResidual = solverPerf.initialResidual();
+          }
+
+          U.relax();
+
+          //gradU = solidInterfacePtr->grad(U);
+          gradU = fvc::grad(U);
 
 #         include "calculateEpsilonSigma.H"
 #         include "calculateRelativeResidual.H"
-	  
-	  Info << "\tTime " << runTime.value()
-	       << ", Corrector " << iCorr
-	       << ", Solving for " << U.name()
-	       << " using " << solverPerf.solverName()
-	       << ", residual = " << solverPerf.initialResidual()
-	       << ", relative residual = " << relativeResidual
-	       << ", inner iterations " << solverPerf.nIterations() << endl;
-	}
+
+          Info<< "\tTime " << runTime.value()
+              << ", Corrector " << iCorr
+              << ", Solving for " << U.name()
+              << " using " << solverPerf.solverName()
+              << ", residual = " << solverPerf.initialResidual()
+              << ", relative residual = " << relativeResidual
+              << ", inner iterations " << solverPerf.nIterations() << endl;
+      }
       while
-	(
-	 solverPerf.initialResidual() > convergenceTolerance
-	 //relativeResidual > convergenceTolerance
-	 &&
-	 ++iCorr < nCorr
-	 );
-      
-      Info << nl << "Time " << runTime.value() << ", Solving for " << U.name() 
-	   << ", Initial residual = " << initialResidual 
-	   << ", Final residual = " << solverPerf.initialResidual()
-	   << ", Relative residual = " << relativeResidual
-	   << ", No outer iterations " << iCorr
-	   << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-	   << "  ClockTime = " << runTime.elapsedClockTime() << " s" 
-	   << endl;
-      
+          (
+              solverPerf.initialResidual() > convergenceTolerance
+              //relativeResidual > convergenceTolerance
+              &&
+              ++iCorr < nCorr
+              );
+
+      Info<< nl << "Time " << runTime.value() << ", Solving for " << U.name()
+          << ", Initial residual = " << initialResidual
+          << ", Final residual = " << solverPerf.initialResidual()
+          << ", Relative residual = " << relativeResidual
+          << ", No outer iterations " << iCorr
+          << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+          << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+          << endl;
+
 #     include "writeFields.H"
 
       Info<< "ExecutionTime = "
-	  << runTime.elapsedCpuTime()
-	  << " s\n\n" << endl;
+          << runTime.elapsedCpuTime()
+          << " s\n\n" << endl;
     }
-  
+
   Info<< "End\n" << endl;
-  
+
   return(0);
 }
 

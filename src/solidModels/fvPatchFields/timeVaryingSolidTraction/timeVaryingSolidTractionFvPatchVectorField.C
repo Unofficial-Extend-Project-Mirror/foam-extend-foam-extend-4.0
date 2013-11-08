@@ -168,7 +168,11 @@ void timeVaryingSolidTractionFvPatchVectorField::write(Ostream& os) const
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField(fvPatchVectorField, timeVaryingSolidTractionFvPatchVectorField);
+makePatchTypeField
+(
+    fvPatchVectorField,
+    timeVaryingSolidTractionFvPatchVectorField
+);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

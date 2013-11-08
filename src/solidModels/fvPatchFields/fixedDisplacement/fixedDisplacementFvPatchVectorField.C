@@ -74,12 +74,21 @@ fixedDisplacementFvPatchVectorField::fixedDisplacementFvPatchVectorField
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
     //- so the gradient scheme should be extendedLeastSquares
-    //if(Foam::word(dimensionedInternalField().mesh().gradScheme("grad(" + fieldName_ + ")")) != "extendedLeastSquares")
-  //{
-  //Warning << "The gradScheme for " << fieldName_
-  //	<< " should be \"extendedLeastSquares 0\" for the boundary "
-  //	<< "non-orthogonal correction to be right" << endl;
-  //  }
+    if
+    (
+        Foam::word
+        (
+            dimensionedInternalField().mesh().schemesDict().gradScheme
+            (
+                "grad(" + fieldName_ + ")"
+            )
+        ) != "extendedLeastSquares"
+    )
+    {
+        Warning << "The gradScheme for " << fieldName_
+            << " should be \"extendedLeastSquares 0\" for the boundary "
+            << "non-orthogonal correction to be right" << endl;
+    }
 }
 
 
@@ -111,7 +120,7 @@ snGrad() const
 {
   //- fixedValue snGrad with no correction
   //  return (*this - patchInternalField())*this->patch().deltaCoeffs();
-  
+
     const fvPatchField<tensor>& gradField =
         patch().lookupPatchField<volTensorField, tensor>
         (
@@ -124,29 +133,9 @@ snGrad() const
     //- correction vector
     vectorField k = delta - n*(n&delta);
 
-    //- velocity based solver
-    // if(fieldName_ == "V")
-    //   {
-    // 	// const volVectorField& oldUField =
-    // 	//   db().lookupObject<volVectorField>("U_0");
-    // 	// const vectorField& oldU = oldUField.boundaryField()[patch().index()];
-    // 	const vectorField velocity =
-    // 	  (*this)
-    // 	  //(*this - oldU)
-    // 	  / (patch().patch().boundaryMesh().mesh().time().deltaT().value());
-
-    // 	Info << "velocity " << velocity << endl;
-
-    // 	return
-    // 	  (
-    // 	   velocity
-    // 	   - (patchInternalField() + (k&gradField.patchInternalField()))
-    // 	   )*this->patch().deltaCoeffs();
-    //   }
-
-    return 
+    return
     (
-        *this 
+        *this
       - (patchInternalField() + (k&gradField.patchInternalField()))
       )*this->patch().deltaCoeffs();
 }

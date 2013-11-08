@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
                 fixedPoints[meshPoints[pointI]] = true;
             }
         }
-                
+
         scalarField residual(newPoints.size(), 0);
         label counter = 0;
         do
@@ -95,13 +95,13 @@ int main(int argc, char *argv[])
                 if (!fixedPoints[pointI])
                 {
                     vector curNewPoint = vector::zero;
-                
+
                     scalar sumW = 0;
 
                     forAll(pointEdges[pointI], eI)
                     {
                         label curEdgeIndex = pointEdges[pointI][eI];
-                                
+
                         const edge& curEdge = edges[curEdgeIndex];
 
                         vector d =
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
                         scalar w = 1.0;
 
                         curNewPoint += w*d;
-                        
+
                         sumW += w;
                     }
 
@@ -124,65 +124,66 @@ int main(int argc, char *argv[])
                     newPoints[pointI] = curNewPoint;
                 }
             }
-            
-	    // smoothed patch points independently
-	    // but we do not smooth points on the boundary of the patch
-	    // we reset these points
-	    // problem: we need to smooth feature edges separately
-	    // if(smoothPatches)
-	    //   {
-	    // 	forAll(mesh.boundaryMesh(), patchI)
-	    // 	  {
-	    // 	    const labelList& meshPoints =
-	    // 	      mesh.boundaryMesh()[patchI].meshPoints();
-		    
-	    // 	    forAll(meshPoints, pointI)
-	    // 	      {
-	    // 		label pointID = meshPoints[pointI];
-	    // 		vector curNewPoint = vector::zero;
-	    // 		scalar sumW = 0;
 
-	    // 		forAll(pointEdges[pointID], eI)
-	    // 		  {
-	    // 		    label curEdgeIndex = pointEdges[pointID][eI];
-	    // 		    const edge& curEdge = edges[curEdgeIndex];
-			    
-	    // 		    // use only boundary points
-	    // 		    label otherPointID = curEdge.otherVertex(pointID);
-	    // 		    if(fixedPoints[otherPointID])
-	    // 		      {
-	    // 			vector d =
-	    // 			  newPoints[otherPointID]
-	    // 			  - newPoints[pointID];
-				
-	    // 			scalar w = 1.0;
-	    // 			curNewPoint += w*d;
-	    // 			sumW += w;
-	    // 		      }
-	    // 		  }
+        // smoothed patch points independently
+        // but we do not smooth points on the boundary of the patch
+        // we reset these points
+        // problem: we need to smooth feature edges separately
+        // if(smoothPatches)
+        //   {
+        //      forAll(mesh.boundaryMesh(), patchI)
+        //        {
+        //          const labelList& meshPoints =
+        //            mesh.boundaryMesh()[patchI].meshPoints();
 
-	    // 		curNewPoint /= sumW;
-	    // 		curNewPoint += newPoints[pointID];
-	    // 		residual[pointID] = mag(curNewPoint - newPoints[pointID]);
-	    // 		newPoints[pointID] = curNewPoint;
-	    // 	      }
+        //          forAll(meshPoints, pointI)
+        //            {
+        //          label pointID = meshPoints[pointI];
+        //          vector curNewPoint = vector::zero;
+        //          scalar sumW = 0;
 
-	    // 	    // reset boundary points
-	    // 	    const labelList& boundaryPoints = mesh.boundaryMesh()[patchI].boundaryPoints();
-	    // 	    forAll(boundaryPoints, bpi)
-	    // 	      {
-	    // 		label boundaryPointID = meshPoints[boundaryPoints[bpi]];
-	    // 		newPoints[boundaryPointID] = oldPoints[boundaryPointID];
-	    // 		residual[boundaryPointID] = 0.0;
-	    // 	      }
-	    // 	  }
-	    //   }
+        //          forAll(pointEdges[pointID], eI)
+        //            {
+        //              label curEdgeIndex = pointEdges[pointID][eI];
+        //              const edge& curEdge = edges[curEdgeIndex];
+
+        //              // use only boundary points
+        //              label otherPointID = curEdge.otherVertex(pointID);
+        //              if(fixedPoints[otherPointID])
+        //                {
+        //              vector d =
+        //                newPoints[otherPointID]
+        //                - newPoints[pointID];
+
+        //              scalar w = 1.0;
+        //              curNewPoint += w*d;
+        //              sumW += w;
+        //                }
+        //            }
+
+        //          curNewPoint /= sumW;
+        //          curNewPoint += newPoints[pointID];
+        //          residual[pointID] = mag(curNewPoint - newPoints[pointID]);
+        //          newPoints[pointID] = curNewPoint;
+        //            }
+
+        //          // reset boundary points
+        //          const labelList& boundaryPoints =
+            // mesh.boundaryMesh()[patchI].boundaryPoints();
+        //          forAll(boundaryPoints, bpi)
+        //            {
+        //          label boundaryPointID = meshPoints[boundaryPoints[bpi]];
+        //          newPoints[boundaryPointID] = oldPoints[boundaryPointID];
+        //          residual[boundaryPointID] = 0.0;
+        //            }
+        //        }
+        //   }
 
             residual /= max(mag(newPoints - oldPoints) + SMALL);
         }
         while(max(residual) > 1e-3);
 
-        Info << "Internal points, max residual: " << max(residual) 
+        Info << "Internal points, max residual: " << max(residual)
             << ", num of iterations: " << counter << endl;
 
         twoDPointCorrector twoDCorrector(mesh);
@@ -200,10 +201,10 @@ int main(int argc, char *argv[])
              == emptyPolyPatch::typeName
             )
             {
-                const labelList& bPoints = 
+                const labelList& bPoints =
                     mesh.boundaryMesh()[patchI].boundaryPoints();
 
-                const vectorField& oldPatchPoints = 
+                const vectorField& oldPatchPoints =
                     mesh.boundaryMesh()[patchI].localPoints();
 
                 vectorField newPatchPoints = oldPatchPoints;
@@ -211,7 +212,7 @@ int main(int argc, char *argv[])
                 const labelListList& patchPointEdges =
                     mesh.boundaryMesh()[patchI].pointEdges();
 
-                const edgeList& patchEdges = 
+                const edgeList& patchEdges =
                     mesh.boundaryMesh()[patchI].edges();
 
                 boolList fixedPoints(newPatchPoints.size(), false);
@@ -226,55 +227,55 @@ int main(int argc, char *argv[])
                 do
                 {
                     counter++;
-                    
+
                     forAll(newPatchPoints, pointI)
                     {
                         if (!fixedPoints[pointI])
                         {
                             vector curNewPatchPoint = vector::zero;
-                
+
                             scalar sumW = 0;
 
                             forAll(patchPointEdges[pointI], eI)
                             {
-                                label curEdgeIndex = 
+                                label curEdgeIndex =
                                     patchPointEdges[pointI][eI];
-                                
+
                                 const edge& curEdge = patchEdges[curEdgeIndex];
 
                                 vector d =
                                     newPatchPoints[curEdge.otherVertex(pointI)]
                                   - newPatchPoints[pointI];
-                                
+
                                 scalar w = 1.0;
-                                
+
                                 curNewPatchPoint += w*d;
-                                
+
                                 sumW += w;
                             }
 
                             curNewPatchPoint /= sumW;
-                            
+
                             curNewPatchPoint += newPatchPoints[pointI];
 
-                            residual[pointI] = 
+                            residual[pointI] =
                                 mag(curNewPatchPoint - newPatchPoints[pointI]);
 
                             newPatchPoints[pointI] = curNewPatchPoint;
                         }
                     }
-            
-                    residual /= 
+
+                    residual /=
                         max(mag(newPatchPoints - oldPatchPoints) + SMALL);
                 }
                 while(max(residual) > 1e-6);
 
-                Info << "Empty points, max residual: " << max(residual) 
+                Info << "Empty points, max residual: " << max(residual)
                     << ", num of iterations: " << counter << endl;
 
-                const labelList& meshPoints = 
+                const labelList& meshPoints =
                     mesh.boundaryMesh()[patchI].meshPoints();
-                
+
                 forAll(meshPoints, pointI)
                 {
                     newPoints[meshPoints[pointI]] = newPatchPoints[pointI];
@@ -288,11 +289,11 @@ int main(int argc, char *argv[])
     twoDCorrector.correctPoints(newPoints);
 
     mesh.movePoints(newPoints);
-    
+
     runTime++;
 
     runTime.write();
-    
+
     Info<< "End\n" << endl;
 
     return 0;

@@ -37,7 +37,8 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-transitionalParabolicVelocityFvPatchVectorField::transitionalParabolicVelocityFvPatchVectorField
+transitionalParabolicVelocityFvPatchVectorField::
+transitionalParabolicVelocityFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF
@@ -53,7 +54,8 @@ transitionalParabolicVelocityFvPatchVectorField::transitionalParabolicVelocityFv
 {}
 
 
-transitionalParabolicVelocityFvPatchVectorField::transitionalParabolicVelocityFvPatchVectorField
+transitionalParabolicVelocityFvPatchVectorField::
+transitionalParabolicVelocityFvPatchVectorField
 (
     const transitionalParabolicVelocityFvPatchVectorField& ptf,
     const fvPatch& p,
@@ -71,7 +73,8 @@ transitionalParabolicVelocityFvPatchVectorField::transitionalParabolicVelocityFv
 {}
 
 
-transitionalParabolicVelocityFvPatchVectorField::transitionalParabolicVelocityFvPatchVectorField
+transitionalParabolicVelocityFvPatchVectorField::
+transitionalParabolicVelocityFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF,
@@ -105,7 +108,8 @@ transitionalParabolicVelocityFvPatchVectorField::transitionalParabolicVelocityFv
 }
 
 
-transitionalParabolicVelocityFvPatchVectorField::transitionalParabolicVelocityFvPatchVectorField
+transitionalParabolicVelocityFvPatchVectorField::
+transitionalParabolicVelocityFvPatchVectorField
 (
     const transitionalParabolicVelocityFvPatchVectorField& fcvpvf,
     const DimensionedField<vector, volMesh>& iF
@@ -140,7 +144,6 @@ void transitionalParabolicVelocityFvPatchVectorField::updateCoeffs()
 
 //     // Get range and orientation
 //     boundBox bb(patch().patch().localPoints(), true);
-    
 //     boundBox bb(vector(0, 0, -0.025334), vector(0, 0.41, 0.025334));
 
     vector ctr = 0.5*(boundBoxMax_ + boundBoxMin_);
@@ -176,7 +179,11 @@ void transitionalParabolicVelocityFvPatchVectorField::write(Ostream& os) const
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField(fvPatchVectorField, transitionalParabolicVelocityFvPatchVectorField);
+makePatchTypeField
+(
+    fvPatchVectorField,
+    transitionalParabolicVelocityFvPatchVectorField
+);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

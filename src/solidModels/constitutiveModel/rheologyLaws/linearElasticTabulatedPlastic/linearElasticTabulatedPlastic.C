@@ -36,7 +36,8 @@ Class
 namespace Foam
 {
     defineTypeNameAndDebug(linearElasticTabulatedPlastic, 0);
-    addToRunTimeSelectionTable(rheologyLaw, linearElasticTabulatedPlastic, dictionary);
+    addToRunTimeSelectionTable
+    (rheologyLaw, linearElasticTabulatedPlastic, dictionary);
 }
 
 
@@ -58,9 +59,12 @@ Foam::linearElasticTabulatedPlastic::linearElasticTabulatedPlastic
     E_(dict.lookup("E")),
     nu_(dict.lookup("nu")),
     stressPlasticStrainSeries_(dict),
-    numDiffDelta_(1e-6), //readScalar(dict.lookup("numericalDiffDelta"))),
-    //sigmaY_(dict.lookup("sigmaY")),
-    sigmaY_(dimensionedScalar("initialYieldStress", dimPressure, stressPlasticStrainSeries_(0.0))) // first value from table
+    numDiffDelta_(1e-6),
+    sigmaY_
+    (
+        dimensionedScalar
+        ("initialYieldStress", dimPressure, stressPlasticStrainSeries_(0.0))
+        )
 {}
 
 
@@ -138,7 +142,8 @@ Foam::tmp<Foam::volScalarField> Foam::linearElasticTabulatedPlastic::nu() const
 }
 
 
-Foam::tmp<Foam::volScalarField> Foam::linearElasticTabulatedPlastic::sigmaY() const
+Foam::tmp<Foam::volScalarField>
+Foam::linearElasticTabulatedPlastic::sigmaY() const
 {
     return tmp<volScalarField>
     (
@@ -161,7 +166,8 @@ Foam::tmp<Foam::volScalarField> Foam::linearElasticTabulatedPlastic::sigmaY() co
 
 
 //- Return yield stress - cellID needed for multiMaterial
-Foam::scalar Foam::linearElasticTabulatedPlastic::sigmaY(const scalar epsilonPEq, const label cellID) const
+Foam::scalar Foam::linearElasticTabulatedPlastic::
+sigmaY(const scalar epsilonPEq, const label cellID) const
 {
   return stressPlasticStrainSeries_(epsilonPEq);
 }
@@ -219,8 +225,9 @@ Foam::linearElasticTabulatedPlastic::Ep(const volScalarField& epsilonPEq) const
     // The user specifies a table of "Stress vs plasticStrain"
     // However, the plasticity return algorithm - in plasticityModel.correct() -
     // requires the plastic modulus at the current Mises stress
-    // Therefore, we need essentially need to differentiate the stressVsPlasticStrain
-    // curve. There are many ways we can do this, such as pre-smoothing the data
+    // Therefore, we need essentially need to differentiate the
+    // stressVsPlasticStrain curve. There are many ways we can do this,
+    // such as pre-smoothing the data
     // and then fitting least squares polynomials.
     // For now, we will keep it simple and assume that the input data is smooth
     // and that the strain increment is relatively small (at least 10 points
@@ -235,12 +242,13 @@ Foam::linearElasticTabulatedPlastic::Ep(const volScalarField& epsilonPEq) const
     // Correction: the current point (epsilonPEq, sigmaEq) may not lie exactly
     // on the yield surface, so we will apply a correction to make sure it
     // returns exactly to it
-    //const volScalarField& sigmaEq = 
+    //const volScalarField& sigmaEq =
     //mesh().objectRegistry::lookupObject<volScalarField>("sigmaEq");
-    //const volScalarField& oldSigmaEq = 
+    //const volScalarField& oldSigmaEq =
       //mesh().objectRegistry::lookupObject<volScalarField>("oldSigmaEq");
-    //const volScalarField& oldEpsilonPEq = 
-    //sigma().mesh().objectRegistry::lookupObject<volScalarField>("oldEpsilonPEq");
+    //const volScalarField& oldEpsilonPEq =
+    //sigma().mesh().objectRegistry::lookupObject<volScalarField>
+    // ("oldEpsilonPEq");
     //const scalarField& sigmaEqI = sigmaEq.internalField();
     //const scalarField& oldSigmaEqI = oldSigmaEq.internalField();
     //const scalarField& oldEpsilonPEqI = oldEpsilonPEq.internalField();
@@ -256,27 +264,23 @@ Foam::linearElasticTabulatedPlastic::Ep(const volScalarField& epsilonPEq) const
       // these value to calculate plastic modulus
       // This is a very basic method to calculate the modulus but is OK for now
       // assuming the data is relatively smooth
-      const scalar lowerEpsilonPEq = max(0.0,epsilonPEqi-numDiffDelta_); // can't be negative
+      const scalar lowerEpsilonPEq = max(0.0,epsilonPEqi-numDiffDelta_);
       const scalar higherEpsilonPEq = epsilonPEqi+numDiffDelta_;
       const scalar lowerSigmaY = stressPlasticStrainSeries_(lowerEpsilonPEq);
       const scalar higherSigmaY = stressPlasticStrainSeries_(higherEpsilonPEq);
 
-      // use actual sigmaEq value to correct any deviation from the yield surface
+      // use actual sigmaEq value to correct any deviation from the
+      // yield surface
       // const scalar lowerEpsilonPEq = oldEpsilonPEqI[celli];
       // const scalar higherEpsilonPEq = epsilonPEqi;
-      // const scalar lowerSigmaY = oldSigmaEqI[celli]; // may have deviated from yield surface
-      // const scalar higherSigmaY = stressPlasticStrainSeries_(higherEpsilonPEq); // exactly on yield surface
+      // const scalar lowerSigmaY = oldSigmaEqI[celli];
+      // const scalar higherSigmaY =
+      //stressPlasticStrainSeries_(higherEpsilonPEq);
 
       // Set plastic modulus
-      EpI[celli] = (higherSigmaY - lowerSigmaY)/max(SMALL, higherEpsilonPEq-lowerEpsilonPEq);
-      // if(celli == 0)
-      // 	{
-      // 	  Info << "EpI[celli] is " << EpI[celli] << nl
-      // 	       << "lowerEpsilon " << lowerEpsilonPEq << nl
-      // 	       << "higherEpsilon " << higherEpsilonPEq << nl
-      // 	       << "lowerSigmaY " << lowerSigmaY << nl
-      // 	       << "higherSigmaY " << higherSigmaY << endl;
-      // 	}
+      EpI[celli] =
+          (higherSigmaY - lowerSigmaY)
+          /max(SMALL, higherEpsilonPEq-lowerEpsilonPEq);
     }
 
     Ep.correctBoundaryConditions();

@@ -27,7 +27,6 @@ License
 #include "analyticalPlateHoleTractionFvPatchVectorField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "volFields.H"
-// #include "rheologyModel.H"
 #include "constitutiveModel.H"
 #include "volFields.H"
 #include "fvc.H"
@@ -142,14 +141,16 @@ void analyticalPlateHoleTractionFvPatchVectorField::updateCoeffs()
     vectorField n = patch().nf();
 
      const constitutiveModel& rheology =
-         this->db().objectRegistry::lookupObject<constitutiveModel>("rheologyProperties");
-    scalarField mu = 
+         this->db().objectRegistry::lookupObject<constitutiveModel>
+         ("rheologyProperties");
+    scalarField mu =
         rheology.mu()().boundaryField()[patch().index()];
     scalarField lambda =
         rheology.lambda()().boundaryField()[patch().index()];
 
     const fvPatchField<tensor>& gradU =
-        patch().lookupPatchField<volTensorField, tensor>("grad(" + UName_ + ")");
+        patch().lookupPatchField<volTensorField, tensor>
+        ("grad(" + UName_ + ")");
 
     vectorField Traction(n.size(),vector::zero);
 
@@ -157,23 +158,23 @@ void analyticalPlateHoleTractionFvPatchVectorField::updateCoeffs()
 
     forAll(Traction, faceI)
       {
-	vector curC(Cf[faceI].x(), Cf[faceI].y(), 0);
-	vector curN = n[faceI];
-        
-	if (patch().name() == "hole")
-	  {
-	    curC /= mag(curC);
-	    curC *= 0.5;
-	    
-	    curN = -curC/mag(curC);
-	  }
-	
-	Traction[faceI] = 
-	  (n[faceI] & plateHoleSolution(curC));
+    vector curC(Cf[faceI].x(), Cf[faceI].y(), 0);
+    vector curN = n[faceI];
+
+    if (patch().name() == "hole")
+      {
+        curC /= mag(curC);
+        curC *= 0.5;
+
+        curN = -curC/mag(curC);
+      }
+
+    Traction[faceI] =
+      (n[faceI] & plateHoleSolution(curC));
       }
 
     //- set patch gradient
-    vectorField newGradient = 
+    vectorField newGradient =
       Traction
       - (n & (mu*gradU.T() - (mu + lambda)*gradU))
       - n*lambda*tr(gradU);
@@ -186,7 +187,8 @@ void analyticalPlateHoleTractionFvPatchVectorField::updateCoeffs()
 }
 
 
-void analyticalPlateHoleTractionFvPatchVectorField::evaluate(const Pstream::commsTypes)
+void analyticalPlateHoleTractionFvPatchVectorField::evaluate
+(const Pstream::commsTypes)
 {
     if (!this->updated())
     {
@@ -221,7 +223,8 @@ void analyticalPlateHoleTractionFvPatchVectorField::write(Ostream& os) const
     writeEntry("value", os);
 }
 
-symmTensor analyticalPlateHoleTractionFvPatchVectorField::plateHoleSolution(const vector& C)
+symmTensor analyticalPlateHoleTractionFvPatchVectorField::plateHoleSolution
+(const vector& C)
 {
     tensor sigma = tensor::zero;
 
@@ -234,7 +237,7 @@ symmTensor analyticalPlateHoleTractionFvPatchVectorField::plateHoleSolution(cons
     coordinateSystem cs("polarCS", C, vector(0, 0, 1), C/mag(C));
 
     sigma.xx() =
-        T*(1 - sqr(a)/sqr(r))/2 
+        T*(1 - sqr(a)/sqr(r))/2
       + T*(1 + 3*pow(a,4)/pow(r,4) - 4*sqr(a)/sqr(r))*::cos(2*theta)/2;
 
     sigma.xy() =
@@ -243,7 +246,7 @@ symmTensor analyticalPlateHoleTractionFvPatchVectorField::plateHoleSolution(cons
     sigma.yx() = sigma.xy();
 
     sigma.yy() =
-        T*(1 + sqr(a)/sqr(r))/2 
+        T*(1 + sqr(a)/sqr(r))/2
       - T*(1 + 3*pow(a,4)/pow(r,4))*::cos(2*theta)/2;
 
 
@@ -255,13 +258,17 @@ symmTensor analyticalPlateHoleTractionFvPatchVectorField::plateHoleSolution(cons
     S.xx() = sigma.xx();
     S.xy() = sigma.xy();
     S.yy() = sigma.yy();
-    
+
     return S;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField(fvPatchVectorField, analyticalPlateHoleTractionFvPatchVectorField);
+makePatchTypeField
+(
+    fvPatchVectorField,
+    analyticalPlateHoleTractionFvPatchVectorField
+);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

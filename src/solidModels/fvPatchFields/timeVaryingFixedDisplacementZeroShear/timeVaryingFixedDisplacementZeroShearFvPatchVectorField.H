@@ -37,8 +37,9 @@ Description
         type            timeVaryingFixedDisplacementZeroShear;
         fileName        "$FOAM_CASE/time-series";
         outOfBounds     clamp;           // (error|warn|clamp|repeat)
-	nonLinear       updatedLagrangian; // (OFF|updatedLgrangian|totalLagrngian)
-	//- if nonLinear is not found, it is assumed OFF
+        nonLinear       updatedLagrangian;
+                             // (OFF|updatedLgrangian|totalLagrngian)
+        //- if nonLinear is not found, it is assumed OFF
     }
     @endverbatim
 
@@ -81,7 +82,7 @@ class timeVaryingFixedDisplacementZeroShearFvPatchVectorField
         nonLinearGeometry::nonLinearType nonLinear_;
 
         //- Is it an orthropic solver
-        Switch orthotropic_;  
+        Switch orthotropic_;
 
         //- The time series being used, including the bounding treatment
         interpolationTable<vector> timeSeries_;
@@ -113,7 +114,8 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given timeVaryingFixedDisplacementZeroShearFvPatchVectorField
+        //- Construct by mapping given
+        // timeVaryingFixedDisplacementZeroShearFvPatchVectorField
         //  onto a new patch
         timeVaryingFixedDisplacementZeroShearFvPatchVectorField
         (
@@ -128,7 +130,10 @@ public:
         {
             return tmp<fvPatchField<vector> >
             (
-                new timeVaryingFixedDisplacementZeroShearFvPatchVectorField(*this)
+                new timeVaryingFixedDisplacementZeroShearFvPatchVectorField
+                (
+                    *this
+                    )
             );
         }
 
@@ -147,7 +152,11 @@ public:
         {
             return tmp<fvPatchField<vector> >
             (
-                new timeVaryingFixedDisplacementZeroShearFvPatchVectorField(*this, iF)
+                new timeVaryingFixedDisplacementZeroShearFvPatchVectorField
+                (
+                    *this,
+                    iF
+                    )
             );
         }
 

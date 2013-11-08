@@ -27,9 +27,6 @@ License
 #include "solidTractionFreeFvPatchVectorField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "volFields.H"
-//#include "rheologyModel.H"
-//#include "plasticityModel.H"
-//#include "thermalModel.H"
 #include "tractionBoundaryGradient.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -72,34 +69,34 @@ solidTractionFreeFvPatchVectorField
     fvPatchVectorField::operator=(patchInternalField());
     gradient() = vector::zero;
 
-    Info << "Patch " << patch().name()
+    Info<< "Patch " << patch().name()
         << "\tTraction boundary field: " << fieldName_ << endl;
 
     //- check if traction boundary is for non linear solver
-    if(dict.found("nonLinear"))
+    if (dict.found("nonLinear"))
     {
         nonLinear_ = nonLinearGeometry::nonLinearNames_.read
-        (
-	     dict.lookup("nonLinear")
-	);
+            (
+                dict.lookup("nonLinear")
+                );
 
         if (nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
         {
-            Info << "\tnonLinear set to updated Lagrangian"
+            Info<< "\tnonLinear set to updated Lagrangian"
                 << endl;
         }
         else if (nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
         {
-            Info << "\tnonLinear set to total Lagrangian"
+            Info<< "\tnonLinear set to total Lagrangian"
                 << endl;
         }
     }
 
-    if(dict.found("orthotropic"))
-      {
-	orthotropic_ = Switch(dict.lookup("orthotropic"));
-	Info << "\t\torthotropic set to " << orthotropic_ << endl;
-      }
+    if (dict.found("orthotropic"))
+    {
+        orthotropic_ = Switch(dict.lookup("orthotropic"));
+        Info<< "\t\torthotropic set to " << orthotropic_ << endl;
+    }
 
     //- the leastSquares has zero non-orthogonal correction
     //- on the boundary
@@ -243,7 +240,7 @@ void solidTractionFreeFvPatchVectorField::write(Ostream& os) const
     fvPatchVectorField::write(os);
     os.writeKeyword("nonLinear")
         << nonLinearGeometry::nonLinearNames_[nonLinear_]
-	<< token::END_STATEMENT << nl;
+    << token::END_STATEMENT << nl;
     writeEntry("value", os);
 }
 

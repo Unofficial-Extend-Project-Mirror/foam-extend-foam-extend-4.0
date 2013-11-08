@@ -102,10 +102,10 @@ class iterativePenalty
        // current slave point tractions
        // IO to allow restarting
        vectorIOField totalSlavePointTrac_;
-  
+
        // contact gap tolerance
        scalar contactGapTol_;
-  
+
        // contact iteration number
        label contactIterNum_;
 
@@ -116,7 +116,7 @@ class iterativePenalty
        Switch oscillationCorr_;
        scalar oscillationCorrFac_;
 
-       // contact info file 
+       // contact info file
        OFstream* contactFilePtr_;
 
 
@@ -144,12 +144,12 @@ public:
             const word& name,
             const fvPatch& patch,
             const dictionary& dict,
-	    const label masterPatchID,
-	    const label slavePatchID,
-	    const label masterFaceZoneID,
-	    const label slaveFaceZoneID,
-	    const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
-	    const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch
+        const label masterPatchID,
+        const label slavePatchID,
+        const label masterFaceZoneID,
+        const label slaveFaceZoneID,
+        const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
+        const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch
         );
 
 
@@ -164,40 +164,40 @@ public:
 
         //- Correct contact model
         virtual void correct
-	(
-	 const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
-	 const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch,
-	 const intersection::algorithm alg,
-	 const intersection::direction dir,
-	 word fieldName,
-	 const Switch orthotropic, 
-	 const word nonLinear,
-	 vectorField& slaveFaceNormals,
-	 GGIInterpolation< PrimitivePatch< face, List, pointField >,
-			   PrimitivePatch< face, List, pointField >
-			   >* ggiInterpolatorPtr
-	 );
+    (
+     const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
+     const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch,
+     const intersection::algorithm alg,
+     const intersection::direction dir,
+     word fieldName,
+     const Switch orthotropic,
+     const word nonLinear,
+     vectorField& slaveFaceNormals,
+     GGIInterpolation< PrimitivePatch< face, List, pointField >,
+               PrimitivePatch< face, List, pointField >
+               >* ggiInterpolatorPtr
+     );
 
 
         //- Return slave displacement
         virtual const vectorField& slaveDisp() const
         {
-	  // not used for iterativePenalty 
-	  return slaveDisp_;
-	}
+      // not used for iterativePenalty
+      return slaveDisp_;
+    }
 
         //- Return slave pressure
         virtual const vectorField& slavePressure() const
         {
-	  return slavePressure_;
-	}
+      return slavePressure_;
+    }
 
         //- Return slave valueFraction
         virtual const symmTensorField& slaveValueFrac() const
         {
-	  // always zero for iterativePenalty 
-	  return slaveValueFrac_;
-	}
+      // always zero for iterativePenalty
+      return slaveValueFrac_;
+    }
 
         //- calculate slave point points
         void calcSlavePointPoints(const label slavePatchID);
@@ -208,33 +208,34 @@ public:
         //- Return penalty factor
         virtual scalar penaltyFactor()
         {
-	  if(!penaltyFactorPtr_)
-	    {
-	      calcPenaltyFactor();
-	    }
+            if (!penaltyFactorPtr_)
+            {
+                calcPenaltyFactor();
+            }
 
-	  return *penaltyFactorPtr_;
-	}
+            return *penaltyFactorPtr_;
+        }
 
         //- Return penalty factor
         // we reduce the traction at a different rate (probably more quickly)
         // on points which come out of contact
         virtual scalar returnPenaltyFactor()
         {
-	  if(!returnPenaltyFactorPtr_)
-	    {
-	      returnPenaltyFactorPtr_ = new scalar(returnScale_*penaltyFactor());
-	    }
-	  
-	  return *returnPenaltyFactorPtr_;
-	}
+            if (!returnPenaltyFactorPtr_)
+            {
+                returnPenaltyFactorPtr_ =
+                    new scalar(returnScale_*penaltyFactor());
+            }
+
+            return *returnPenaltyFactorPtr_;
+    }
 
         //- Correct oscillations in the contact pressure
         virtual void correctOscillations
-	(
-	 vectorField& slavePressure,
-	 const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch
-	 );
+        (
+            vectorField& slavePressure,
+            const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch
+            );
 
         //- Write model dictionary
         virtual void writeDict(Ostream& os) const;

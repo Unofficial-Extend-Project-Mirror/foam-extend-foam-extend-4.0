@@ -62,7 +62,8 @@ class smallStrainOrthotropicSolidInterface
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        smallStrainOrthotropicSolidInterface(const smallStrainOrthotropicSolidInterface&);
+        smallStrainOrthotropicSolidInterface
+        (const smallStrainOrthotropicSolidInterface&);
 
         //- Disallow default bitwise assignment
         void operator=(const smallStrainOrthotropicSolidInterface&);
@@ -80,9 +81,9 @@ public:
         //- Construct from dictionary
         smallStrainOrthotropicSolidInterface
         (
-	 const word& name,
-	 const fvMesh& mesh,
-	 const constitutiveModel& rheology
+            const word& name,
+            const fvMesh& mesh,
+            const constitutiveModel& rheology
         );
 
 

@@ -93,8 +93,8 @@ public:
             plasticityStressReturn,
             dictionary,
             (
-	     const word name,
-	     constitutiveModel& constitutiveModel
+         const word name,
+         constitutiveModel& constitutiveModel
             ),
             (name, constitutiveModel)
         );
@@ -105,8 +105,8 @@ public:
         //- Return a reference to the selected rheology model
         static autoPtr<plasticityStressReturn> New
         (
-	 const word& name,
-	 constitutiveModel& constitutiveModel
+     const word& name,
+     constitutiveModel& constitutiveModel
         );
 
 
@@ -115,9 +115,9 @@ public:
         //- Construct from dictionary
         plasticityStressReturn
         (
-	 const word& name,
-	 constitutiveModel& constitutiveModel
-	 );
+     const word& name,
+     constitutiveModel& constitutiveModel
+     );
 
 
     // Destructor
@@ -137,8 +137,8 @@ public:
         //- If plasticity is active
         virtual bool plasticityActive() const
         {
-	  return true;
-	}
+      return true;
+    }
 
         //- Increment of plastic strain
         virtual const volSymmTensorField& DEpsilonP() const = 0;

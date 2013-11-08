@@ -89,10 +89,10 @@ public:
             const word& name,
             const fvPatch& patch,
             const dictionary& dict,
-	    const label masterPatchID,
-	    const label slavePatchID,
-	    const label masterFaceZoneID,
-	    const label slaveFaceZoneID
+            const label masterPatchID,
+            const label slavePatchID,
+            const label masterFaceZoneID,
+            const label slaveFaceZoneID
         );
 
 
@@ -105,37 +105,37 @@ public:
 
         //- Correct the rheological model
         virtual void correct
-	(
-	 const vectorField& slavePressure,
-	 const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
-	 const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch,
-	 const intersection::algorithm alg,
-	 const intersection::direction dir,
-	 const word interpolationMethod,
-	 const word fieldName,
-	 const Switch orthotropic,
-	 const word nonLinear,
-	 const vectorField& slaveFaceNormals
-	 )
+        (
+            const vectorField& slavePressure,
+            const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
+            const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch,
+            const intersection::algorithm alg,
+            const intersection::direction dir,
+            const word interpolationMethod,
+            const word fieldName,
+            const Switch orthotropic,
+            const word nonLinear,
+            const vectorField& slaveFaceNormals
+            )
         {}
 
         //- Return slave friction displacement
         virtual const vectorField& slaveDisp() const
         {
-	  return slaveDisp_;
-	}
+            return slaveDisp_;
+        }
 
         //- Return slave friction traction
         virtual const vectorField& slaveTraction() const
         {
-	  return slaveTraction_;
-	}
+            return slaveTraction_;
+        }
 
         //- Return slave friction value fraction
         virtual const symmTensorField& slaveValueFrac() const
         {
-	  return slaveValueFrac_;
-	}
+            return slaveValueFrac_;
+        }
 
         //- Write law dictionary
         virtual void writeDict(Ostream& os) const {};

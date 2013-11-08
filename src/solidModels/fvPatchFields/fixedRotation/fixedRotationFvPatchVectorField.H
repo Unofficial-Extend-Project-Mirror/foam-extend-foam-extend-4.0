@@ -172,7 +172,7 @@ public:
 
             //- Update the coefficients associated with the patch field
             virtual void updateCoeffs();
-  
+
             //- Return the matrix source coefficients corresponding to the
             //  evaluation of the gradient of this patchField
             virtual tmp<Field<vector> > gradientBoundaryCoeffs() const;

@@ -48,126 +48,128 @@ int main(int argc, char *argv[])
 
   bool nonLinear = args.optionFound("nonLinear");
 
-  // Get times list                                                                                                                                         
+  // Get times list
   instantList Times = runTime.times();
 
-  // set startTime and endTime depending on -time and -latestTime options                                                                                   
+  // set startTime and endTime depending on -time and -latestTime options
 # include "checkTimeOptions.H"
 
   runTime.setTime(Times[startTime], startTime);
 
 # include "createMesh.H"
-  
+
   for (label i=startTime; i<endTime; i++)
-    {
+  {
       runTime.setTime(Times[i], i);
-      
+
       Info<< "Time = " << runTime.timeName() << endl;
-      
+
       mesh.readUpdate();
-      
+
       IOobject sigmaheader
-	(
-	 "sigma",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::MUST_READ
-	 );
-      
+          (
+              "sigma",
+              runTime.timeName(),
+              mesh,
+              IOobject::MUST_READ
+              );
+
       // Check sigma exists
       if (sigmaheader.headerOk())
-	{
-	  mesh.readUpdate();
-	  
-	  Info<< "    Reading sigma" << endl;
-	  volSymmTensorField sigma(sigmaheader, mesh);
-	  
-	  surfaceVectorField n = mesh.Sf()/mesh.magSf();
-	  
-	  volVectorField totalTraction
-	    (
-	     IOobject
-	     (
-	      "totalTraction",
-	      runTime.timeName(),
-	      mesh,
-	      IOobject::NO_READ,
-	      IOobject::AUTO_WRITE
-	      ),
-	     mesh,
-	     dimensionedVector("zero", dimForce/dimArea, vector::zero)
-	     );
-	  volScalarField normalTraction
-	    (
-	     IOobject
-	     (
-	      "normalTraction",
-	      runTime.timeName(),
-	      mesh,
-	      IOobject::NO_READ,
-	      IOobject::AUTO_WRITE
-	      ),
-	     mesh,
-	     dimensionedScalar("zero", dimForce/dimArea, 0.0)
-	     );
-	  volVectorField shearTraction
-	    (
-	     IOobject
-	     (
-	      "shearTraction",
-	      runTime.timeName(),
-	      mesh,
-	      IOobject::NO_READ,
-	      IOobject::AUTO_WRITE
-	      ),
-	     mesh,
-	     dimensionedVector("zero", dimForce/dimArea, vector::zero)
-	     );
-	  
-	  volTensorField* gradUPtr = NULL;
-	  if(nonLinear)
-	    {
-	      gradUPtr = new volTensorField
-		(
-		 IOobject
-		 (
-		  "grad(U)",
-		  runTime.timeName(),
-		  mesh,
-		  IOobject::MUST_READ,
-		  IOobject::NO_WRITE
-		  ),
-		 mesh
-		 );
-	    }
+      {
+          mesh.readUpdate();
 
-	  forAll(totalTraction.boundaryField(), patchi)
-	    {
-	      const vectorField& nb = n.boundaryField()[patchi];
-	      const symmTensorField& sigmab = sigma.boundaryField()[patchi];
-	      
-	      if(nonLinear)
-		{
-		  tensorField F = I + gradUPtr->boundaryField()[patchi];
-		  totalTraction.boundaryField()[patchi] = nb & (sigmab & F);
-		}
-	      else
-		{
-		  totalTraction.boundaryField()[patchi] = nb & sigmab;
-		}
-		  normalTraction.boundaryField()[patchi] = nb & totalTraction.boundaryField()[patchi];
-		  shearTraction.boundaryField()[patchi] = (I -sqr(nb)) & totalTraction.boundaryField()[patchi];
-		}
-	      totalTraction.write();    
-	      normalTraction.write();
-	      shearTraction.write();
-	}
+          Info<< "    Reading sigma" << endl;
+          volSymmTensorField sigma(sigmaheader, mesh);
+
+          surfaceVectorField n = mesh.Sf()/mesh.magSf();
+
+          volVectorField totalTraction
+              (
+                  IOobject
+                  (
+                      "totalTraction",
+                      runTime.timeName(),
+                      mesh,
+                      IOobject::NO_READ,
+                      IOobject::AUTO_WRITE
+                      ),
+                  mesh,
+                  dimensionedVector("zero", dimForce/dimArea, vector::zero)
+                  );
+          volScalarField normalTraction
+              (
+                  IOobject
+                  (
+                      "normalTraction",
+                      runTime.timeName(),
+                      mesh,
+                      IOobject::NO_READ,
+                      IOobject::AUTO_WRITE
+                      ),
+                  mesh,
+                  dimensionedScalar("zero", dimForce/dimArea, 0.0)
+                  );
+          volVectorField shearTraction
+              (
+                  IOobject
+                  (
+                      "shearTraction",
+                      runTime.timeName(),
+                      mesh,
+                      IOobject::NO_READ,
+                      IOobject::AUTO_WRITE
+                      ),
+                  mesh,
+                  dimensionedVector("zero", dimForce/dimArea, vector::zero)
+                  );
+
+          volTensorField* gradUPtr = NULL;
+          if (nonLinear)
+          {
+              gradUPtr = new volTensorField
+                  (
+                      IOobject
+                      (
+                          "grad(U)",
+                          runTime.timeName(),
+                          mesh,
+                          IOobject::MUST_READ,
+                          IOobject::NO_WRITE
+                          ),
+                      mesh
+                      );
+          }
+
+          forAll(totalTraction.boundaryField(), patchi)
+          {
+              const vectorField& nb = n.boundaryField()[patchi];
+              const symmTensorField& sigmab = sigma.boundaryField()[patchi];
+
+              if (nonLinear)
+              {
+                  tensorField F = I + gradUPtr->boundaryField()[patchi];
+                  totalTraction.boundaryField()[patchi] = nb & (sigmab & F);
+              }
+              else
+              {
+                  totalTraction.boundaryField()[patchi] = nb & sigmab;
+              }
+              normalTraction.boundaryField()[patchi] =
+                  nb & totalTraction.boundaryField()[patchi];
+              shearTraction.boundaryField()[patchi] =
+                  (I -sqr(nb)) & totalTraction.boundaryField()[patchi];
+          }
+          totalTraction.write();
+          normalTraction.write();
+          shearTraction.write();
+      }
       else
-	{
-	  Info<< "    No sigma field" << endl;
-	}
+      {
+          Info<< "    No sigma field" << endl;
+      }
       Info<< endl;
-    }
+  }
 
   Info<< "End" << endl;
 

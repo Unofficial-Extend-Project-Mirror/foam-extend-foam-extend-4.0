@@ -80,7 +80,7 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given solidSymmetryFvPatchVectorField 
+        //- Construct by mapping given solidSymmetryFvPatchVectorField
         //  onto a new patch
         solidSymmetryFvPatchVectorField
         (

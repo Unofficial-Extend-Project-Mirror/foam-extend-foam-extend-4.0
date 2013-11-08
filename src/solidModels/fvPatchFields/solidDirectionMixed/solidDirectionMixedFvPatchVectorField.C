@@ -80,7 +80,7 @@ solidDirectionMixedFvPatchVectorField::solidDirectionMixedFvPatchVectorField
 
   Field<vector> gradValue =
   this->patchInternalField() + refGrad()/this->patch().deltaCoeffs();
-  
+
   //- non-ortho corrected gradValue
   //- gradField will not have been created so I must do this during updateCoeffs
   /*const fvPatchField<tensor>& gradField =
@@ -95,7 +95,7 @@ solidDirectionMixedFvPatchVectorField::solidDirectionMixedFvPatchVectorField
 
   Field<vector> transformGradValue =
     transform(I - valueFraction(), gradValue);
-  
+
   Field<vector>::operator=(normalValue + transformGradValue);
 }
 
@@ -144,23 +144,26 @@ void solidDirectionMixedFvPatchVectorField::evaluate(const Pstream::commsTypes)
     {
         this->updateCoeffs();
     }
-    
+
     Field<vector> normalValue = transform(valueFraction(), refValue());
 
     //- no correction
     //Field<vector> gradValue =
     //this->patchInternalField() + refGrad()/this->patch().deltaCoeffs();
-    
+
     //- non-ortho corrected gradValue
     const fvPatchField<tensor>& gradField =
-      patch().lookupPatchField<volTensorField, tensor>("grad(" +fieldName_ + ")");
+      patch().lookupPatchField<volTensorField, tensor>
+        (
+            "grad(" +fieldName_ + ")"
+            );
     vectorField n = patch().nf();
     vectorField delta = patch().delta();
     vectorField k = delta - n*(n&delta);
     Field<vector> gradValue = this->patchInternalField()
       + (k&gradField.patchInternalField())
       + refGrad()/this->patch().deltaCoeffs();
-    
+
     Field<vector> transformGradValue =
       transform(I - valueFraction(), gradValue);
 
@@ -169,7 +172,8 @@ void solidDirectionMixedFvPatchVectorField::evaluate(const Pstream::commsTypes)
     fvPatchField<vector>::evaluate();
 }
 
-Foam::tmp<Foam::Field<vector> > solidDirectionMixedFvPatchVectorField::snGrad() const
+Foam::tmp<Foam::Field<vector> >
+solidDirectionMixedFvPatchVectorField::snGrad() const
 {
     Field<vector> pif = this->patchInternalField();
 
@@ -178,7 +182,10 @@ Foam::tmp<Foam::Field<vector> > solidDirectionMixedFvPatchVectorField::snGrad() 
       Field<vector> normalValue = transform(valueFraction(), refValue());
 
     const fvPatchField<tensor>& gradField =
-      patch().lookupPatchField<volTensorField, tensor>("grad(" +fieldName_ + ")");
+      patch().lookupPatchField<volTensorField, tensor>
+        (
+            "grad(" +fieldName_ + ")"
+            );
     vectorField n = this->patch().nf();
     vectorField delta = this->patch().delta();
     //- correction vector
@@ -188,13 +195,13 @@ Foam::tmp<Foam::Field<vector> > solidDirectionMixedFvPatchVectorField::snGrad() 
       (this->refGrad()/this->patch().deltaCoeffs())
       + (pif)
       + (k&gradField.patchInternalField());
-    
+
     Field<vector> transformGradValue =
       transform(I - (this->valueFraction()), gradValue);
 
     Field<vector> patchValue = normalValue + transformGradValue;
 
-    return 
+    return
       (
        patchValue
        - ((this->patchInternalField()) + (k&gradField.patchInternalField()))

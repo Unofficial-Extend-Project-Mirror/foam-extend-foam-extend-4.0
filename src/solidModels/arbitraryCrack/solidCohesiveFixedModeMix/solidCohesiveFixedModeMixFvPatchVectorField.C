@@ -23,12 +23,10 @@ License
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 \*---------------------------------------------------------------------------*/
-//#define DEBUG Info<<"In file "<<__FILE__<<" at line "<<__LINE__<<endl;
 
 #include "solidCohesiveFixedModeMixFvPatchVectorField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "volFields.H"
-// #include "rheologyModel.H"
 #include "constitutiveModel.H"
 #include "regionSplit.H"
 #include "crackerFvMesh.H"
@@ -40,7 +38,8 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-solidCohesiveFixedModeMixFvPatchVectorField::solidCohesiveFixedModeMixFvPatchVectorField
+solidCohesiveFixedModeMixFvPatchVectorField::
+solidCohesiveFixedModeMixFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF
@@ -48,8 +47,6 @@ solidCohesiveFixedModeMixFvPatchVectorField::solidCohesiveFixedModeMixFvPatchVec
 :
     directionMixedFvPatchVectorField(p, iF),
     fieldName_("undefined"),
-    //rheologyName_("undefined"),
-    //cohesiveLawPtr_(NULL),
     relaxationFactor_(1.0),
     traction_(p.size(), vector::zero),
     initiationTraction_(p.size(), vector::zero),
@@ -65,7 +62,8 @@ solidCohesiveFixedModeMixFvPatchVectorField::solidCohesiveFixedModeMixFvPatchVec
 {}
 
 
-solidCohesiveFixedModeMixFvPatchVectorField::solidCohesiveFixedModeMixFvPatchVectorField
+solidCohesiveFixedModeMixFvPatchVectorField::
+solidCohesiveFixedModeMixFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF,
@@ -73,12 +71,7 @@ solidCohesiveFixedModeMixFvPatchVectorField::solidCohesiveFixedModeMixFvPatchVec
 )
 :
     directionMixedFvPatchVectorField(p, iF),
-    fieldName_(dimensionedInternalField().name()), //(dict.lookup("U")),
-    //rheologyName_(dict.lookup("rheology")),
-    // cohesiveLawPtr_
-    // (
-    //     cohesiveLaw::New(dict.lookup("cohesiveLaw"), dict).ptr()
-    // ),
+    fieldName_(dimensionedInternalField().name()),
     relaxationFactor_(readScalar(dict.lookup("relaxationFactor"))),
     traction_(p.size(), vector::zero),
     initiationTraction_(p.size(), vector::zero),
@@ -202,15 +195,14 @@ solidCohesiveFixedModeMixFvPatchVectorField::solidCohesiveFixedModeMixFvPatchVec
 }
 
 
-solidCohesiveFixedModeMixFvPatchVectorField::solidCohesiveFixedModeMixFvPatchVectorField
+solidCohesiveFixedModeMixFvPatchVectorField::
+solidCohesiveFixedModeMixFvPatchVectorField
 (
     const solidCohesiveFixedModeMixFvPatchVectorField& cpf
 )
 :
     directionMixedFvPatchVectorField(cpf),
     fieldName_(cpf.fieldName_),
-    //rheologyName_(cpf.rheologyName_),
-    //cohesiveLawPtr_(cpf.cohesiveLawPtr_->clone().ptr()),
     relaxationFactor_(cpf.relaxationFactor_),
     traction_(cpf.traction_),
     initiationTraction_(cpf.initiationTraction_),
@@ -226,7 +218,8 @@ solidCohesiveFixedModeMixFvPatchVectorField::solidCohesiveFixedModeMixFvPatchVec
 {}
 
 
-solidCohesiveFixedModeMixFvPatchVectorField::solidCohesiveFixedModeMixFvPatchVectorField
+solidCohesiveFixedModeMixFvPatchVectorField::
+solidCohesiveFixedModeMixFvPatchVectorField
 (
     const solidCohesiveFixedModeMixFvPatchVectorField& cpf,
     const fvPatch& p,
@@ -236,8 +229,6 @@ solidCohesiveFixedModeMixFvPatchVectorField::solidCohesiveFixedModeMixFvPatchVec
 :
     directionMixedFvPatchVectorField(cpf, p, iF, mapper),
     fieldName_(cpf.fieldName_),
-    //rheologyName_(cpf.rheologyName_),
-    //cohesiveLawPtr_(cpf.cohesiveLawPtr_->clone().ptr()),
     relaxationFactor_(cpf.relaxationFactor_),
     traction_(cpf.traction_, mapper),
     initiationTraction_(cpf.initiationTraction_, mapper),
@@ -253,7 +244,8 @@ solidCohesiveFixedModeMixFvPatchVectorField::solidCohesiveFixedModeMixFvPatchVec
 {}
 
 
-solidCohesiveFixedModeMixFvPatchVectorField::solidCohesiveFixedModeMixFvPatchVectorField
+solidCohesiveFixedModeMixFvPatchVectorField::
+solidCohesiveFixedModeMixFvPatchVectorField
 (
     const solidCohesiveFixedModeMixFvPatchVectorField& cpf,
     const DimensionedField<vector, volMesh>& iF
@@ -261,8 +253,6 @@ solidCohesiveFixedModeMixFvPatchVectorField::solidCohesiveFixedModeMixFvPatchVec
 :
     directionMixedFvPatchVectorField(cpf, iF),
     fieldName_(cpf.fieldName_),
-    //rheologyName_(cpf.rheologyName_),
-    //cohesiveLawPtr_(cpf.cohesiveLawPtr_->clone().ptr()),
     relaxationFactor_(cpf.relaxationFactor_),
     traction_(cpf.traction_),
     initiationTraction_(cpf.initiationTraction_),
@@ -280,38 +270,6 @@ solidCohesiveFixedModeMixFvPatchVectorField::solidCohesiveFixedModeMixFvPatchVec
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// const cohesiveLaw& solidCohesiveFixedModeMixFvPatchVectorField::law() const
-// {
-//     if (!cohesiveLawPtr_)
-//     {
-//         FatalErrorIn
-//         (
-//             "const cohesiveLaw& solidCohesiveFixedModeMixFvPatchVectorField::law() const"
-//         )   << "Law pointer not set" << abort(FatalError);
-//     }
-
-//     return *cohesiveLawPtr_;
-// }
-
-
-// tmp<scalarField> solidCohesiveFixedModeMixFvPatchVectorField::normalTraction() const
-// {
-//     vectorField n = patch().nf();
-//     tmp<scalarField> tNormalTraction
-//     (
-//         new scalarField(size(), 0.0)
-//     );
-
-//     scalarField nt = (n&traction_);
-
-//     for (label i=0; i<size(); i++)
-//     {
-//         tNormalTraction()[i] = nt[i];
-//     }
-
-//     return tNormalTraction;
-// }
-
 
 tmp<scalarField>
 solidCohesiveFixedModeMixFvPatchVectorField::relativeSeparationDistance() const
@@ -324,9 +282,11 @@ solidCohesiveFixedModeMixFvPatchVectorField::relativeSeparationDistance() const
     vectorField n = patch().nf();
 
     const constitutiveModel& rheology =
-        this->db().objectRegistry::lookupObject<constitutiveModel>("rheologyProperties");
+        this->db().objectRegistry::lookupObject<constitutiveModel>
+        ("rheologyProperties");
     label patchID = patch().index();
-    const scalarField sigmaMax = rheology.cohLaw().sigmaMax()().boundaryField()[patchID];
+    const scalarField sigmaMax =
+        rheology.cohLaw().sigmaMax()().boundaryField()[patchID];
     const scalarField GIc = rheology.cohLaw().GIc()().boundaryField()[patchID];
     const scalarField deltaC = GIc/sigmaMax;
     int numCrackedFaces = 0;
@@ -345,77 +305,17 @@ solidCohesiveFixedModeMixFvPatchVectorField::relativeSeparationDistance() const
             // mag(curSepDist)/law().deltaC().value();
             mag(curSepDist)/deltaC[i];
 
-	if(tRelativeSeparationDistance()[i] > 1.0) numCrackedFaces++;
+    if (tRelativeSeparationDistance()[i] > 1.0) numCrackedFaces++;
     }
 
-    Info << "Relative separation distance, max: " << gMax(tRelativeSeparationDistance())
-	 << ", avr: " << gAverage(tRelativeSeparationDistance())
-	 << ", min: " << gMin(tRelativeSeparationDistance())
-	 << ", numCrackedFaces: " << numCrackedFaces << endl;
+    Info<< "Relative separation distance, max: "
+        << gMax(tRelativeSeparationDistance())
+     << ", avr: " << gAverage(tRelativeSeparationDistance())
+     << ", min: " << gMin(tRelativeSeparationDistance())
+     << ", numCrackedFaces: " << numCrackedFaces << endl;
 
     return tRelativeSeparationDistance;
 }
-
-
-// tmp<scalarField> solidCohesiveFixedModeMixFvPatchVectorField::effectiveTraction
-// (
-//     const vectorField& traction,
-//     const vectorField& normal
-// ) const
-// {
-//     scalarField normalTraction = (normal&traction);
-//     normalTraction *= pos(normalTraction);
-
-//     tmp<scalarField> effTraction
-//     (
-//         new scalarField(traction.size(), 0)
-//     );
-
-//     if (beta_ > SMALL)
-//     {
-//         effTraction() =
-//             sqrt
-//             (
-//                 magSqr((I - normal*normal)&traction)/sqr(beta_)
-//               + sqr(normalTraction)
-//             );
-//     }
-//     else
-//     {
-//         effTraction() = normalTraction;
-//     }
-
-//     return effTraction;
-// }
-
-
-// scalar solidCohesiveFixedModeMixFvPatchVectorField::effectiveTraction
-// (
-//     const vector& traction,
-//     const vector& normal
-// ) const
-// {
-//     scalar normalTraction = (normal&traction);
-//     normalTraction *= pos(normalTraction);
-
-//     scalar effTraction = 0;
-
-//     if (beta_ > SMALL)
-//     {
-//         effTraction =
-//             sqrt
-//             (
-//                 magSqr((I - normal*normal)&traction)/sqr(beta_)
-//               + sqr(normalTraction)
-//             );
-//     }
-//     else
-//     {
-//         effTraction = normalTraction;
-//     }
-
-//     return effTraction;
-// }
 
 
 void solidCohesiveFixedModeMixFvPatchVectorField::autoMap
@@ -450,8 +350,8 @@ void solidCohesiveFixedModeMixFvPatchVectorField::autoMap
     {
         label i=0;
         this->valueFraction()[i] = symmTensor::zero;
-        traction_[i] = vector::zero; //law().sigmaMax().value()*n[i]; // set in solver
-        initiationTraction_[i] = vector::zero; //law().sigmaMax().value()*n[i]; // set in solver
+        traction_[i] = vector::zero; // set in solver
+        initiationTraction_[i] = vector::zero; // set in solver
         separationDistance_[i] = vector::zero;
         oldSeparationDistance_[i] = vector::zero;
         unloadingSeparationDistance_[i] = vector::zero;
@@ -489,10 +389,10 @@ void solidCohesiveFixedModeMixFvPatchVectorField::autoMap
         {
             if (addressing[i] == 0)
             {
-	      //Info << "correcting automap for face " << i << " to zero" << endl;
+          //Info << "correcting automap for face " << i << " to zero" << endl;
                 this->valueFraction()[i] = symmTensor::zero;
                 traction_[i] = vector::zero; //law().sigmaMax().value()*n[i];
-                initiationTraction_[i] = vector::zero; //law().sigmaMax().value()*n[i];
+                initiationTraction_[i] = vector::zero;
                 separationDistance_[i] = vector::zero;
                 oldSeparationDistance_[i] = vector::zero;
                 unloadingSeparationDistance_[i] = vector::zero;
@@ -572,32 +472,23 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
         return;
     }
 
-    // debug
-    // if(patch().boundaryMesh().mesh().time().value() > 10.9)
-    // if(patch().size() > 0)
-    //   {
-    // 	forAll(traction_, facei)
-    // 	  {
-    // 	    if(mag(traction_[facei]) > 1e4)
-    // 	      {
-    // 		Info << "start trac[" << facei << "] is " << traction_[facei][vector::Y] << ", "
-    // 		     << "initTrac is " << initiationTraction_[facei][vector::Y] << endl;
-    // 	      }
-    // 	  }
-    //   }
-
     vectorField n = patch().nf();
 
     // lookup cohesive law from rheology
     // Note: this method only uses sigmaMax and GIc
     // tauMax and GIIc are ignored
     const constitutiveModel& rheology =
-        this->db().objectRegistry::lookupObject<constitutiveModel>("rheologyProperties");
+        this->db().objectRegistry::lookupObject<constitutiveModel>
+        ("rheologyProperties");
     label patchID = patch().index();
-    const scalarField sigmaMax = rheology.cohLaw().sigmaMax()().boundaryField()[patchID];
-    //const scalarField tauMax = rheology.cohLaw().tauMax()().boundaryField()[patchID];
-    const scalarField GIc = rheology.cohLaw().GIc()().boundaryField()[patchID];
-    //const scalarField GIIc = rheology.cohLaw().GIIc()().boundaryField()[patchID];
+    const scalarField sigmaMax =
+        rheology.cohLaw().sigmaMax()().boundaryField()[patchID];
+    //const scalarField tauMax =
+    //    rheology.cohLaw().tauMax()().boundaryField()[patchID];
+    const scalarField GIc =
+        rheology.cohLaw().GIc()().boundaryField()[patchID];
+    //const scalarField GIIc =
+    //    rheology.cohLaw().GIIc()().boundaryField()[patchID];
     const scalarField deltaC = GIc/sigmaMax;
 
     if (curTimeIndex_ != this->db().time().timeIndex())
@@ -628,7 +519,7 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
                 if
                 (
                     curNormalSepDist
-		    > minUnloadingSeparationDistance_*deltaC[faceI] //law().deltaC().value()
+                    > minUnloadingSeparationDistance_*deltaC[faceI]
                 )
                 {
                     if
@@ -637,7 +528,7 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
                       > mag(unloadingSeparationDistance_[faceI])
                     )
                     {
-                        unloadingSeparationDistance_[faceI] = 
+                        unloadingSeparationDistance_[faceI] =
                             curNormalSepDist*n[faceI];
                     }
                 }
@@ -647,14 +538,14 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
                 scalar curEffSepDist =
                     sqrt
                     (
-                        sqr(curNormalSepDist) 
+                        sqr(curNormalSepDist)
                       + sqr(beta_)*magSqr(curTangentialSepDist)
                     );
 
                 if
                 (
                     curEffSepDist
-		    > minUnloadingSeparationDistance_*deltaC[faceI] //law().deltaC().value()
+                    > minUnloadingSeparationDistance_*deltaC[faceI]
                 )
                 {
                     if
@@ -663,7 +554,7 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
                       > mag(unloadingSeparationDistance_[faceI])
                     )
                     {
-                        unloadingSeparationDistance_[faceI] = 
+                        unloadingSeparationDistance_[faceI] =
                             curNormalSepDist*n[faceI]
                           + beta_*curTangentialSepDist;
                     }
@@ -684,7 +575,8 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
     {
         FatalErrorIn
         (
-            "void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs() const"
+            "void solidCohesiveFixedModeMixFvPatchVectorField::"
+            "updateCoeffs() const"
         )   << "Mesh should be of type: " << crackerFvMesh::typeName
             << abort(FatalError);
     }
@@ -698,16 +590,10 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
     {
         faceCellRegion[faceI] = regions[faceCells[faceI]];
     }
-    labelField globalFaceCellRegion = 
+    labelField globalFaceCellRegion =
         crackerMesh.globalCrackField(faceCellRegion);
 
     // Looking up rheology
-    // const rheologyModel& rheology =
-    //     this->db().objectRegistry::lookupObject<rheologyModel>(rheologyName_);
-    // const scalarField mu =
-    //     rheology.mu()().boundaryField()[patch().index()];
-    // const scalarField lambda =
-    //     rheology.lambda()().boundaryField()[patch().index()];
     const fvPatchField<scalar>& mu =
       patch().lookupPatchField<volScalarField, scalar>("mu");
     const fvPatchField<scalar>& lambda =
@@ -726,17 +612,17 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
     vectorField newSeparationDistance(patch().size(), vector::zero);
     const labelList& gcfa = crackerMesh.globalCrackFaceAddressing();
     label globalIndex = crackerMesh.localCrackStart();
-    for(label i = 0; i < patch().size(); i++)
+    for (label i = 0; i < patch().size(); i++)
     {
-        newSeparationDistance[i] = 
-            globalUPatch[gcfa[globalIndex]] 
+        newSeparationDistance[i] =
+            globalUPatch[gcfa[globalIndex]]
           - globalUPatch[globalIndex];
 
         globalIndex++;
     }
 
 //     label sizeByTwo = patch().size()/2;
-//     for(label i = 0; i < sizeByTwo; i++)
+//     for (label i = 0; i < sizeByTwo; i++)
 //     {
 //         newSeparationDistance[i] = UPatch[sizeByTwo + i] - UPatch[i];
 //         newSeparationDistance[sizeByTwo + i] = -newSeparationDistance[i];
@@ -758,9 +644,9 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
            *(newSeparationDistance - separationDistance_);
     }
 
-//     for(label i=0; i<sizeByTwo; i++)
+//     for (label i=0; i<sizeByTwo; i++)
     globalIndex = crackerMesh.localCrackStart();
-    for(label i = 0; i < patch().size(); i++)
+    for (label i = 0; i < patch().size(); i++)
     {
         vector curSepDist = separationDistance_[i];
 
@@ -786,9 +672,9 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
         vector curTangentialTraction = vector::zero;
 
 //         if (faceCellRegion[i] == faceCellRegion[sizeByTwo+i])
-        if 
+        if
         (
-            globalFaceCellRegion[globalIndex] 
+            globalFaceCellRegion[globalIndex]
          == globalFaceCellRegion[gcfa[globalIndex]]
         )
         {
@@ -799,43 +685,43 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
                 scalar curEffSepDist =
                     sqrt
                     (
-                        sqr(curNormalSepDist) 
+                        sqr(curNormalSepDist)
                       + sqr(beta_)*mag(curTangentialSepDist)
                     );
 
                 if
                 (
-                    curEffSepDist 
+                    curEffSepDist
                   > (mag(unloadingSeparationDistance_[i]) - SMALL)
                 )
                 {
                     // Loading
 
-		    if(curEffSepDist > deltaC[i])
-		      {
-			curNormalTraction = 0.0;
-			curTangentialTraction = vector::zero; 
-		      }
-		    else
-		      {
-			curNormalTraction = (n[i]&initiationTraction_[i]);
-			curTangentialTraction = 
-			  ((I - n[i]*n[i])&initiationTraction_[i]);
-		      }
+            if (curEffSepDist > deltaC[i])
+              {
+            curNormalTraction = 0.0;
+            curTangentialTraction = vector::zero;
+              }
+            else
+              {
+            curNormalTraction = (n[i]&initiationTraction_[i]);
+            curTangentialTraction =
+              ((I - n[i]*n[i])&initiationTraction_[i]);
+              }
 
-		    // scale traction based on cohesive law
-		    // Not needed for Dugdale as traction stays at initiation value
+            // scale traction based on cohesive law
+            // Not needed for Dugdale as traction stays at initiation value
                     // if (curNormalTraction >= 0)
                     // {
                     //     // Tension
 
-                    //     curNormalTraction *= 
-		    // 	  /sigmaMax[i];
+                    //     curNormalTraction *=
+            //        /sigmaMax[i];
                     //        //  law().traction(curEffSepDist)
                     //        // /law().sigmaMax().value();
 
-                    //     curTangentialTraction *= 
-		    // 	  /sigmaMax[i];
+                    //     curTangentialTraction *=
+            //        /sigmaMax[i];
                     //        //  law().traction(curEffSepDist)
                     //        // /law().sigmaMax().value();
                     // }
@@ -843,7 +729,7 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
                     // {
                     //     // Compression
 
-                    //     curTangentialTraction *= 
+                    //     curTangentialTraction *=
                     //         law().traction(curEffSepDist)
                     //        /law().sigmaMax().value();
                     // }
@@ -852,36 +738,36 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
                 {
                     // Unloading
 
-                    scalar unloadingNormalTraction = 
+                    scalar unloadingNormalTraction =
                         (n[i]&initiationTraction_[i]);
-                    vector unloadingTangentialTraction = 
+                    vector unloadingTangentialTraction =
                         ((I - n[i]*n[i])&initiationTraction_[i]);
 
                     if (unloadingNormalTraction >= 0)
                     {
-		      // scaling not needed for Dugdale
-                        // unloadingNormalTraction *= 
+              // scaling not needed for Dugdale
+                        // unloadingNormalTraction *=
                         //     law().traction
                         //     (
                         //         mag(unloadingSeparationDistance_[i])
                         //     )
                         //    /law().sigmaMax().value();
 
-                        // unloadingTangentialTraction *= 
+                        // unloadingTangentialTraction *=
                         //     law().traction
                         //     (
                         //         mag(unloadingSeparationDistance_[i])
                         //     )
                         //    /law().sigmaMax().value();
 
-                        curNormalTraction = 
+                        curNormalTraction =
                             unloadingNormalTraction
                            *(
                                 curEffSepDist
                                /mag(unloadingSeparationDistance_[i])
                             );
 
-                        curTangentialTraction = 
+                        curTangentialTraction =
                             unloadingTangentialTraction
                            *(
                                 curEffSepDist
@@ -890,15 +776,15 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
                     }
                     else
                     {
-		      // scaling not needed for Dugdale
-                        // unloadingTangentialTraction *= 
+              // scaling not needed for Dugdale
+                        // unloadingTangentialTraction *=
                         //     law().traction
                         //     (
                         //         mag(unloadingSeparationDistance_[i])
                         //     )
                         //    /law().sigmaMax().value();
 
-                        curTangentialTraction = 
+                        curTangentialTraction =
                             unloadingTangentialTraction
                            *(
                                 curEffSepDist
@@ -913,7 +799,7 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
             {
                 // Mode I
 
-                if 
+                if
                 (
                     curNormalSepDist
                   > (mag(unloadingSeparationDistance_[i]) - SMALL)
@@ -921,26 +807,26 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
                 {
                     //Loading
 
-		    if(curNormalSepDist > deltaC[i])
-		      {
-			curNormalTraction = 0.0;
-			curTangentialTraction = vector::zero; 
-		      }
-		    else
-		      {
-			curNormalTraction =
-			  (n[i]&initiationTraction_[i]);
-			
-			curTangentialTraction =
-			  ((I - n[i]*n[i])&initiationTraction_[i]);
-		      }
+            if (curNormalSepDist > deltaC[i])
+              {
+            curNormalTraction = 0.0;
+            curTangentialTraction = vector::zero;
+              }
+            else
+              {
+            curNormalTraction =
+              (n[i]&initiationTraction_[i]);
 
-		      // scaling not needed for Dugdale
+            curTangentialTraction =
+              ((I - n[i]*n[i])&initiationTraction_[i]);
+              }
+
+              // scaling not needed for Dugdale
                     // curNormalTraction *=
                     //     law().traction(curNormalSepDist)
                     //    /law().sigmaMax().value();
 
-		      // scaling not needed for Dugdale
+              // scaling not needed for Dugdale
                     // curTangentialTraction *=
                     //     law().traction(curNormalSepDist)
                     //    /law().sigmaMax().value();
@@ -950,14 +836,14 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
                     // Unloading
 
                     scalar unloadingNormalTraction =
-		      (n[i]&initiationTraction_[i]);
-		      // scaling not needed for Dugdale
-		      //*law().traction(mag(unloadingSeparationDistance_[i]))
-		      ///law().sigmaMax().value();
+              (n[i]&initiationTraction_[i]);
+              // scaling not needed for Dugdale
+              //*law().traction(mag(unloadingSeparationDistance_[i]))
+              ///law().sigmaMax().value();
 
                     vector unloadingTangentialTraction =
-		      ((I - n[i]*n[i])&initiationTraction_[i]);
-		      // scaling not needed for Dugdale
+              ((I - n[i]*n[i])&initiationTraction_[i]);
+              // scaling not needed for Dugdale
                        // *law().traction(mag(unloadingSeparationDistance_[i]))
                        // /law().sigmaMax().value();
 
@@ -999,20 +885,20 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
         }
 
         // Contact
-        if(contact_ && (curNegNormalSepDist < 0))
+        if (contact_ && (curNegNormalSepDist < 0))
         {
-	  scalar m = 
-	    (1.0/(1.0-contactConstant_))
-	    *sigmaMax[i]/deltaC[i];
-	    //	    *law().sigmaMax().value()
-	  ///law().deltaC().value();
+      scalar m =
+        (1.0/(1.0-contactConstant_))
+        *sigmaMax[i]/deltaC[i];
+        //      *law().sigmaMax().value()
+      ///law().deltaC().value();
 
             curNormalTraction = m*curNegNormalSepDist;
-            
+
             // Info << "Contact: " << curNegNormalSepDist/law().deltaC().value()
             //     << ", " << curNormalTraction << endl;
             //Info << "Contact: " << curNegNormalSepDist/deltaC[i]
-	    //  << ", " << curNormalTraction << endl;
+        //  << ", " << curNormalTraction << endl;
         }
 
         traction_[i] = curNormalTraction*n[i] + curTangentialTraction;
@@ -1027,19 +913,6 @@ void solidCohesiveFixedModeMixFvPatchVectorField::updateCoeffs()
     )/(2.0*mu + lambda);
 
     directionMixedFvPatchVectorField::updateCoeffs();
-
-    // if(patch().size() > 0)
-    //   {
-    // 	forAll(traction_, facei)
-    // 	  {
-    // 	    if(mag(traction_[facei]) > 1e4)
-    // 	      {
-    // 		Info << "END trac[" << facei << "] is " << traction_[facei][vector::Y] << ", "
-    // 		     << "initTrac is " << initiationTraction_[facei][vector::Y] << endl;
-    // 	      }
-    // 	  }
-    //   }
-
 }
 
 
@@ -1068,15 +941,16 @@ void solidCohesiveFixedModeMixFvPatchVectorField::write(Ostream& os) const
     os.writeKeyword("minUnloadingSeparationDistance")
         << minUnloadingSeparationDistance_
             << token::END_STATEMENT << nl;
-    //law().writeDict(os);
-    //os.writeKeyword("U") << fieldName_ << token::END_STATEMENT << nl;
-    //os.writeKeyword("rheology") << rheologyName_ << token::END_STATEMENT << nl;
 }
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField(fvPatchVectorField, solidCohesiveFixedModeMixFvPatchVectorField);
+makePatchTypeField
+(
+    fvPatchVectorField,
+    solidCohesiveFixedModeMixFvPatchVectorField
+);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

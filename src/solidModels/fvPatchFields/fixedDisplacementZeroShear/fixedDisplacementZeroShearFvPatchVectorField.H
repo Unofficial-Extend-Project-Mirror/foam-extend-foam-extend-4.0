@@ -94,7 +94,8 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given fixedDisplacementZeroShearFvPatchVectorField
+        //- Construct by mapping given
+        // fixedDisplacementZeroShearFvPatchVectorField
         //  onto a new patch
         fixedDisplacementZeroShearFvPatchVectorField
         (

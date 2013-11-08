@@ -61,28 +61,29 @@ class multiMaterialCohesiveLaw
     public cohesiveLaw,
     public PtrList<cohesiveLaw>
 {
-  
+
 private:
-  
+
   // Private data
-  
+
        //- Material indicator field
        // we will read materials again; this will allow
        // the rheologyLaw to be a single material whereas the cohesiveLaw
        // be multiple materials
        //volScalarField materials_;
        const volScalarField& materials_;
-  
+
         // List of interface cohesive laws
         // number of interfaces is a triangular number
         // (this->.size()*(this->.size() - 1)/2)
         PtrList<cohesiveLaw> interfaceCohesiveLaws_;
 
         // indicator surface field
-        // for faces not on a multi-material interface the value is equal to 
+        // for faces not on a multi-material interface the value is equal to
         // the ID of the material in the cohesiveLaws list
         // for faces on a multi-material interface the value is equal to
-        // the ID of the material in the interfaceCohesiveLaws plus cohesiveLaws.size()
+        // the ID of the material in the interfaceCohesiveLaws plus
+        // cohesiveLaws.size()
         //surfaceScalarField materialsSurf_;
 
     // Private Member Functions
@@ -99,7 +100,8 @@ private:
         //- Calculate indicator field given index
         scalar indicator(const label index, const label cellID) const;
 
-        //- find interface ID (position in intefaceCohesiveLaws list) given two material indices
+        //- find interface ID (position in intefaceCohesiveLaws list)
+        // given two material indices
         scalar interfaceID(const label mat1, const label mat2) const;
 
 
@@ -130,7 +132,7 @@ public:
     // Member Functions
 
         //- return materials;
-	virtual tmp<volScalarField> materials() const;
+    virtual tmp<volScalarField> materials() const;
 
         //-  Return sigmaMax for interface given two material indicators
         virtual scalar interfaceSigmaMax(double mat1, double mat2) const;
@@ -147,33 +149,33 @@ public:
         //- Return opening cohesive strength - surface field
         virtual scalar sigmaMaxValue() const
         {
-	  notImplemented(type() + "::sigmaMaxValue()");
-	  return 0.0;
-	};
+      notImplemented(type() + "::sigmaMaxValue()");
+      return 0.0;
+    };
         virtual tmp<surfaceScalarField> sigmaMax() const;
 
         //- Return shearing cohesive strength - surface field
         virtual scalar tauMaxValue() const
         {
-	  notImplemented(type() + "::tauMaxValue()");
-	  return 0.0;
-	};
+      notImplemented(type() + "::tauMaxValue()");
+      return 0.0;
+    };
         virtual tmp<surfaceScalarField> tauMax() const;
 
         //-  Return Mode I fracture energy
         virtual scalar GIcValue() const
         {
-	  notImplemented(type() + "::GIcValue()");
-	  return 0.0;
-	};
+      notImplemented(type() + "::GIcValue()");
+      return 0.0;
+    };
         virtual tmp<surfaceScalarField> GIc() const;
 
         //-  Return Mode II fracture energy
         virtual scalar GIIcValue() const
         {
-	  notImplemented(type() + "::GIIcValue()");
-	  return 0.0;
-	};
+      notImplemented(type() + "::GIIcValue()");
+      return 0.0;
+    };
         virtual tmp<surfaceScalarField> GIIc() const;
 
         //- Return normal traction (during damage) given current deltas
@@ -184,27 +186,27 @@ public:
 
         //- Return tractions during damage given current deltas and Gs
         virtual void damageTractions
-	(
-	 scalar& tN, // current normal traction 
-	 scalar& tS, // current shear traction
-	 const scalar deltaN, // current deltaN 
-	 const scalar deltaS, // current deltaS 
-	 const scalar GI, // current dissipated GI 
-	 const scalar GII, // current dissipated GII
-	 const label faceID, // needed for multi-mat
-	 const scalarField& globalPatchMaterials
-	 ) const;
+    (
+     scalar& tN, // current normal traction
+     scalar& tS, // current shear traction
+     const scalar deltaN, // current deltaN
+     const scalar deltaS, // current deltaS
+     const scalar GI, // current dissipated GI
+     const scalar GII, // current dissipated GII
+     const label faceID, // needed for multi-mat
+     const scalarField& globalPatchMaterials
+     ) const;
 
-	//- Calculate tractions
+    //- Calculate tractions
         //- hmmnn this should not be here - maybe put in solidInterface
-	virtual tmp<surfaceVectorField> interfaceTraction
-	(
-	 surfaceVectorField n,
-	 volVectorField U,
-	 volTensorField gradU,
-	 volScalarField mu,
-	 volScalarField lambda
-	 ) const;
+    virtual tmp<surfaceVectorField> interfaceTraction
+    (
+     surfaceVectorField n,
+     volVectorField U,
+     volTensorField gradU,
+     volScalarField mu,
+     volScalarField lambda
+     ) const;
 
         //- Correct the rheological model
         virtual void correct();

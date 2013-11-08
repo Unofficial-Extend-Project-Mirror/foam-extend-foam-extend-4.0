@@ -131,7 +131,7 @@ public:
         // the traction that would cause slipping
         // for the given pressure
         virtual scalar slipTraction(const scalar pressure) = 0;
-      
+
         //- Return slip traction field
         // the traction that would cause slipping
         // for the given pressure

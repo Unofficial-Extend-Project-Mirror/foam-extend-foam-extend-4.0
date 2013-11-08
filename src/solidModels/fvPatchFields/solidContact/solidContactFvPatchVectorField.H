@@ -89,8 +89,10 @@ class solidContactFvPatchVectorField
         //- shadow patch ID
         const label shadowPatchID_;
 
-        //- either the mater of slave is in charge of correcting the contact laws
-        //- the patch with the lowest patchID is in charge of correcting the contact laws
+        //- either the mater of slave is in charge of correcting the
+        // contact laws
+        //- the patch with the lowest patchID is in charge of correcting
+        // the contact laws
         const Switch patchInChargeOfCorrection_;
 
         // master and slave face zone names and IDs
@@ -100,16 +102,18 @@ class solidContactFvPatchVectorField
         const label slaveFaceZoneID_;
 
         // the master will keep a copy of two global master and slave patches
-        // these patches will be moved to the deformed position prior to correction
-        // of the contact, and these patches are used to calculate
+        // these patches will be moved to the deformed position prior to
+        // correction of the contact, and these patches are used to calculate
         // contact gaps, interpolation of tractions, etc.
         // we keep a copy of the points and faces and move them
         // pointField masterFaceZonePatchPoints_;
         // pointField slaveFaceZonePatchPoints_;
         // faceList masterFaceZonePatchFaces_;
         // faceList slaveFaceZonePatchFaces_;
-        // PrimitivePatch<face, Foam::List, const pointField&>* masterFaceZonePatchPtr_;
-        // PrimitivePatch<face, Foam::List, const pointField&>* slaveFaceZonePatchPtr_;
+        // PrimitivePatch<face, Foam::List, const pointField&>*
+        // masterFaceZonePatchPtr_;
+        // PrimitivePatch<face, Foam::List, const pointField&>*
+        // slaveFaceZonePatchPtr_;
         // these patches keep a local copy of the points and faces
         PrimitivePatch<face, Foam::List, pointField>* masterFaceZonePatchPtr_;
         PrimitivePatch<face, Foam::List, pointField>* slaveFaceZonePatchPtr_;
@@ -117,23 +121,24 @@ class solidContactFvPatchVectorField
         // method to interpolate traction from slave to master
         word interpolationMethod_;
 
-       //- zoneToZone or ggiZone for interpolation of traction from slave to master
+       //- zoneToZone or ggiZone for interpolation of traction from slave to
+       // master
        //zoneToZoneInterpolation* slaveToMasterPatchToPatchInterpolatorPtr_;
        PatchToPatchInterpolation< PrimitivePatch<face, Foam::List, pointField>,
-				  PrimitivePatch<face, Foam::List, pointField>
-				  >* slaveToMasterPatchToPatchInterpolatorPtr_;
+                                  PrimitivePatch<face, Foam::List, pointField>
+                                  >* slaveToMasterPatchToPatchInterpolatorPtr_;
        // we call it slaveToMasterGgi but it can interpolate either direction
        // ggiZoneInterpolation* slaveToMasterGgiInterpolatorPtr_;
        GGIInterpolation< PrimitivePatch< face, Foam::List, pointField >,
-			 PrimitivePatch< face, Foam::List, pointField >
-			 >* slaveToMasterGgiInterpolatorPtr_;
+                         PrimitivePatch< face, Foam::List, pointField >
+                         >* slaveToMasterGgiInterpolatorPtr_;
 
        // To interpolate value for the face zone patch faces to vertices
        // and vice versa
        PrimitivePatchInterpolation< PrimitivePatch<face, Foam::List, pointField>
-				    >* masterFaceZonePatchInterpolatorPtr_;
+                                    >* masterFaceZonePatchInterpolatorPtr_;
        PrimitivePatchInterpolation< PrimitivePatch<face, Foam::List, pointField>
-				    >* slaveFaceZonePatchInterpolatorPtr_;
+                                    >* slaveFaceZonePatchInterpolatorPtr_;
 
         //- old face zone points
         vectorField oldMasterFaceZonePoints_;
@@ -257,60 +262,60 @@ public:
             //- Return if this patch is the master
             Switch master() const
             {
-	      return master_;
-	    }
+                return master_;
+            }
 
             //- Return contact normal law pointer
             normalContactModel* normalContactModelPtr() const
             {
-	      return normalContactModelPtr_;
-	    }
+                return normalContactModelPtr_;
+            }
 
             //- Return contact normal friction pointer
             frictionContactModel* frictionContactModelPtr() const
             {
-	      return frictionContactModelPtr_;
-	    }
+                return frictionContactModelPtr_;
+            }
 
             //- Return masterFaceZonePatch pointer
             PrimitivePatch<face, Foam::List, pointField>*
-	    masterFaceZonePatchPtr() const
+            masterFaceZonePatchPtr() const
             {
-	      return masterFaceZonePatchPtr_;
-	    }
+                return masterFaceZonePatchPtr_;
+            }
 
             //- Return masterFaceZonePatch pointer
             PrimitivePatch<face, Foam::List, pointField>*
-	    slaveFaceZonePatchPtr() const
+            slaveFaceZonePatchPtr() const
             {
-	      return slaveFaceZonePatchPtr_;
-	    }
+                return slaveFaceZonePatchPtr_;
+            }
 
             //- Return patchToPatch interpolator pointer
             PatchToPatchInterpolation
-	    <
-	         PrimitivePatch<face, Foam::List, pointField>,
-	         PrimitivePatch<face, Foam::List, pointField>
-	    >* slaveToMasterPatchToPatchInterpolatorPtr() const
+            <
+                PrimitivePatch<face, Foam::List, pointField>,
+                PrimitivePatch<face, Foam::List, pointField>
+                >* slaveToMasterPatchToPatchInterpolatorPtr() const
             {
-	        return slaveToMasterPatchToPatchInterpolatorPtr_;
-	    }
+                return slaveToMasterPatchToPatchInterpolatorPtr_;
+            }
 
             //- Return GGI interpolator pointer
             GGIInterpolation
-	    <
+            <
                 PrimitivePatch< face, Foam::List, pointField >,
-	        PrimitivePatch< face, Foam::List, pointField >
-            >* slaveToMasterGgiInterpolatorPtr() const
-            {
-	        return slaveToMasterGgiInterpolatorPtr_;
-	    }
+                PrimitivePatch< face, Foam::List, pointField >
+                >* slaveToMasterGgiInterpolatorPtr() const
+                {
+                    return slaveToMasterGgiInterpolatorPtr_;
+                }
 
             //- Return correction frequency
             label correctionFreq() const
             {
-	      return correctionFreq_;
-	    }
+                return correctionFreq_;
+            }
 
             //  Return contactActive
             virtual Switch contactActive() const
@@ -341,9 +346,9 @@ public:
 
             //- Evaluate the patch field
             virtual void evaluate
-	    (
-	     const Pstream::commsTypes commsType=Pstream::blocking
-	     );
+            (
+                const Pstream::commsTypes commsType=Pstream::blocking
+                );
 
             //- Return patch-normal gradient
             //- with non-orthogonal correction regardless of whether snGrad
@@ -355,15 +360,15 @@ public:
 
             // interpolate the given field from patch to patch in parallel
             virtual tmp<vectorField> interpolateSlaveToMaster
-	    (
-	     const vectorField slaveField
-	     );
+            (
+                const vectorField slaveField
+                );
 
             //- Force contact correction
             virtual void forceCorrection()
             {
-	      forceCorrection_ = true;
-	    }
+                forceCorrection_ = true;
+            }
 
             //- Dissipated energy due to friction
             virtual tmp<scalarField> Qc() const;
@@ -371,14 +376,14 @@ public:
             // Return const reference to stickSlipField
             const scalarField& stickSlipField() const
             {
-	        if (!stickSlipFieldPtr_)
-		{
-		  FatalError << "solidContact::stickSlipField() pointer"
-			     << " is NULL" << exit(FatalError);
-		}
+                if (!stickSlipFieldPtr_)
+                {
+                    FatalError << "solidContact::stickSlipField() pointer"
+                               << " is NULL" << exit(FatalError);
+                }
 
-		return stickSlipFieldPtr_->boundaryField()[patch().index()];
-	    }
+                return stickSlipFieldPtr_->boundaryField()[patch().index()];
+            }
 
             //- Write
             virtual void write(Ostream&) const;

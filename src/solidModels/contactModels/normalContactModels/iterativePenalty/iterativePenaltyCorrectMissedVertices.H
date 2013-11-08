@@ -10,34 +10,34 @@
     scalar bbFrac = 0.5*mesh.bounds().mag();
     forAll(slavePointPenetration_, pointi)
       {
-	// for points with a contactGap of GREAT, we will
-	// reset their gap to the average of their non-GREAT
-	// neighbours
-	if(slavePointPenetration_[pointi] > 0.9*GREAT)
-	  {
-	    numCorrectedPoints++;
-	    scalar averageNei = 0.0;
-	    label numNei = 0;
-	    forAll(pointPoints[pointi], ppi)
-	      {
-		if(slavePointPenetration_[pointPoints[pointi][ppi]] < 0.9*GREAT)
-		  {
-		    averageNei += slavePointPenetration_[pointPoints[pointi][ppi]];
-		    numNei++;
-		  }
-	      }
-	    if(numNei > SMALL)
-	      {
-		averageNei /= numNei;
-	      }
-	    else
-	      {
-		// limit max gap to fraction of mesh bounding box
-		averageNei = bbFrac;
-	      }
+    // for points with a contactGap of GREAT, we will
+    // reset their gap to the average of their non-GREAT
+    // neighbours
+    if (slavePointPenetration_[pointi] > 0.9*GREAT)
+      {
+        numCorrectedPoints++;
+        scalar averageNei = 0.0;
+        label numNei = 0;
+        forAll(pointPoints[pointi], ppi)
+          {
+        if (slavePointPenetration_[pointPoints[pointi][ppi]] < 0.9*GREAT)
+          {
+            averageNei += slavePointPenetration_[pointPoints[pointi][ppi]];
+            numNei++;
+          }
+          }
+        if (numNei > SMALL)
+          {
+        averageNei /= numNei;
+          }
+        else
+          {
+        // limit max gap to fraction of mesh bounding box
+        averageNei = bbFrac;
+          }
 
-	    newGap[pointi] = averageNei;
-	  }
+        newGap[pointi] = averageNei;
+      }
       }
 
     slavePointPenetration_ = newGap;
