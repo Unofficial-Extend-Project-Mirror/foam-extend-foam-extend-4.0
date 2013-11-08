@@ -32,9 +32,34 @@
 #
 #------------------------------------------------------------------------------
 
+unset WM_PROJECT_VERSION_ADDITION
+prefSettingFile=$0.preset
+if [ -f $prefSettingFile ]
+then
+    #    echo "Found presettings $prefSettingFile"
+    . $prefSettingFile
+fi
+unset prefSettingFile
+
 export WM_PROJECT=OpenFOAM
 export WM_PROJECT_VERSION=1.6-ext
 
+if [ -z "$WM_PROJECT_VERSION_ADDITION" ]
+then
+    thisScript="${BASH_SOURCE[0]}"
+    if [ ! -n "$thisScript" ]
+    then
+	# this is vor bash version < 4 and zsh
+	thisScript=$0
+    fi
+    export WM_PROJECT_VERSION_ADDITION=`python -c "from os.path import *;print abspath(join(curdir,'$thisScript')).split(sep)[-3][len('OpenFOAM-$WM_PROJECT_VERSION')+1:]"`
+    unset thisScript
+fi
+
+if [ -n "$WM_PROJECT_VERSION_ADDITION" ]
+then
+    export WM_PROJECT_VERSION=$WM_PROJECT_VERSION-$WM_PROJECT_VERSION_ADDITION
+fi
 
 # helps to easily write #ifdefs to detect a dev-version
 export FOAM_DEV=1
@@ -285,39 +310,67 @@ Darwin)
 	   case $WM_COMPILER in
                Gcc42)
 		   export WM_MACPORT_VERSION=4.2
+                   export WM_BASE_COMPILER=Gcc
 		   ;;
                Gcc43)
 		   export WM_MACPORT_VERSION=4.3
+                   export WM_BASE_COMPILER=Gcc
 		   ;;
                Gcc44)
 		   export WM_MACPORT_VERSION=4.4
+                   export WM_BASE_COMPILER=Gcc
 		   ;;
                Gcc45)
 		   export WM_MACPORT_VERSION=4.5
+                   export WM_BASE_COMPILER=Gcc
 		   ;;
                Gcc46)
 		   export WM_MACPORT_VERSION=4.6
+                   export WM_BASE_COMPILER=Gcc
 		   ;;
                Gcc47)
 		   export WM_MACPORT_VERSION=4.7
+                   export WM_BASE_COMPILER=Gcc
 		   ;;
                Gcc48)
 		   export WM_MACPORT_VERSION=4.8
+                   export WM_BASE_COMPILER=Gcc
 		   ;;
+               Clang32)
+                   export WM_BASE_COMPILER=Clang
+                   export WM_MACPORT_VERSION=3.2
+                   ;;
+               Clang33)
+                   export WM_BASE_COMPILER=Clang
+                   export WM_MACPORT_VERSION=3.3
+                ;;
+               Clang34)
+                   export WM_BASE_COMPILER=Clang
+                   export WM_MACPORT_VERSION=3.4
+                ;;
                Gcc)
 		   ;;
                *)
 		   echo "Unsupported MacPorts-Compiler $WM_COMPILER"
 		   ;;
            esac
-	   if [ "$WM_COMPILER" != "Gcc" ]
+	   if [ "$WM_MACPORT_VERSION" != "" ]
 	   then
-               export WM_CC="gcc-mp-$WM_MACPORT_VERSION"
-               export WM_CXX="g++-mp-$WM_MACPORT_VERSION"
-               export WM_FC="gfortran-mp-$WM_MACPORT_VERSION"
+               if [ "$WM_BASE_COMPILER" == "Gcc" ]
+               then
+		   export WM_CC="gcc-mp-$WM_MACPORT_VERSION"
+		   export WM_CXX="g++-mp-$WM_MACPORT_VERSION"
+                   export WM_FC="gfortran-mp-$WM_MACPORT_VERSION"
+              else
+                   export WM_CC="clang-mp-$WM_MACPORT_VERSION"
+                   export WM_CXX="clang++-mp-$WM_MACPORT_VERSION"
 
-	       ruleDirBase=$WM_PROJECT_DIR/wmake/rules/$WM_ARCH
-	       ruleDir=$ruleDirBase$WM_COMPILER
+		   # hardcoded. Needed for ThirdParty
+                   export WM_FC="gfortran-mp-4.5"
+               fi
+
+	       ruleDirBase=$WM_PROJECT_DIR/wmake/rules/$WM_ARCH$WM_BASE_COMPILER
+	       ruleDir=$WM_PROJECT_DIR/wmake/rules/$WM_ARCH$WM_COMPILER
 	       if [ ! -e $ruleDir ]
 	       then
 		   echo "Rule directory $ruleDir not existing. Linking to $ruleDirBase"

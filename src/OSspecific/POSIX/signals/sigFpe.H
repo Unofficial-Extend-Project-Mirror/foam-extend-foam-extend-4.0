@@ -55,6 +55,15 @@ SourceFiles
 #    define LINUX_GNUC
 #endif
 
+#ifdef __APPLE__
+#include <malloc/malloc.h>
+
+// these are defined by the mach-headers and would break compilation of Switch.H
+#undef TRUE
+#undef FALSE
+
+#endif
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -79,12 +88,20 @@ class sigFpe
             //- nan malloc function. From malloc_hook manpage.
             static void* my_malloc_hook(size_t size, const void *caller);
 
+#elif defined (__APPLE__)
+
+    //- pointer to the original malloc that is overrided
+    static void *(*system_malloc_)(malloc_zone_t *zone, size_t size);
+
+    //- the overriding handler
+    static void* nan_malloc_(malloc_zone_t *zone, size_t size);
+
 #       endif
 
 
     // Static data members
 
-#   ifdef LINUX_GNUC
+#   if defined(LINUX_GNUC) || defined(__APPLE__)
 
         //- Handler for caught signals
         static void sigFpeHandler(int);
