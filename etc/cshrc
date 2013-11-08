@@ -31,42 +31,10 @@
 #
 #------------------------------------------------------------------------------
 
-# make sure that this variable is set un purpose
-unset WM_PROJECT_VERSION_ADDITION
-unsetenv WM_PROJECT_VERSION_ADDITION
-
-set called=($_)
-if ( $#called > 1 ) then
-    # tcsh - csh doesn't know about the location
-    set thisScript=$called[2]
-    set prefSettingFile=$thisScript.preset
-
-    if ( -r $prefSettingFile ) then
-	#    echo "Found presettings $prefSettingFile"
-	source $prefSettingFile
-    endif
-else
-    echo "csh or tcsh called from .cshrc - WM_PROJECT_VERSION_ADDITION not supported"
-endif
+# csh or tcsh called from .cshrc - WM_PROJECT_VERSION_ADDITION not supported
 
 setenv WM_PROJECT OpenFOAM
 setenv WM_PROJECT_VERSION 1.6-ext
-
-if ( $#called > 1 ) then
-    if( ! $?WM_PROJECT_VERSION_ADDITION ) then
-	setenv WM_PROJECT_VERSION_ADDITION `python -c "from os.path import *;print abspath(join(curdir,'$thisScript')).split(sep)[-3][len('OpenFOAM-$WM_PROJECT_VERSION')+1:]"`
-	if ( "$WM_PROJECT_VERSION_ADDITION" == "" ) then
-	    unsetenv WM_PROJECT_VERSION_ADDITION
-	endif
-    endif
-    unset prefSettingFile thisScript
-endif
-
-unset called
-
-if ( $?WM_PROJECT_VERSION_ADDITION ) then
-    setenv WM_PROJECT_VERSION $WM_PROJECT_VERSION-$WM_PROJECT_VERSION_ADDITION
-endif
 
 # helps to easily write #ifdefs to detect a dev-version
 setenv FOAM_DEV 1
