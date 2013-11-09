@@ -297,6 +297,19 @@ void Foam::ggiPolyPatch::calcLocalParallel() const
     }
     else
     {
+        // Check that patch size is greater than the zone size.
+        // This is an indication of the error where the face zone is not global
+        // in a parallel run.  HJ, 9/Nov/2014
+        if (size() > zone().size())
+        {
+            FatalErrorIn("void ggiPolyPatch::calcLocalParallel() const")
+                << "Patch size is greater than zone size for GGI patch "
+                << name() << ".  This is not allowerd: "
+                << "the face zone must contain all patch faces and be "
+                << "global in parallel runs"
+                << abort(FatalError);
+        }
+
         // Calculate localisation on master and shadow
         emptyOrComplete =
             (
