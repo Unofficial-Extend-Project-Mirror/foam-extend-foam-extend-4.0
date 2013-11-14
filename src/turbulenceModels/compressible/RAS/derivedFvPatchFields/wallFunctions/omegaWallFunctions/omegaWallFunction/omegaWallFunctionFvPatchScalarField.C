@@ -187,6 +187,7 @@ void omegaWallFunctionFvPatchScalarField::updateCoeffs()
             << patch().name() << ".  Evaluating as zeroGradient"
             << endl;
 
+        fvPatchScalarField::updateCoeffs();
         zeroGradientFvPatchScalarField::evaluate();
 
         return;

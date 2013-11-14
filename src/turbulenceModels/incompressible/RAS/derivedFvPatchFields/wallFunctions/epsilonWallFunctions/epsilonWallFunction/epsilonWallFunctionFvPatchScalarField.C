@@ -177,6 +177,7 @@ void epsilonWallFunctionFvPatchScalarField::updateCoeffs()
             << patch().name() << ".  Evaluating as zeroGradient"
             << endl;
 
+        fvPatchScalarField::updateCoeffs();
         zeroGradientFvPatchScalarField::evaluate();
 
         return;
