@@ -5,7 +5,7 @@
       + turbulence->divDevReff(U)
     );
 
-    if (ocorr == nOuterCorr - 1)
+    if (oCorr == nOuterCorr - 1)
     {
         if (mesh.solutionDict().relax("UFinal"))
         {

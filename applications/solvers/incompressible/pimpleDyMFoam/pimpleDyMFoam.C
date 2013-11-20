@@ -58,35 +58,42 @@ int main(int argc, char *argv[])
     while (runTime.run())
     {
 #       include "readControls.H"
+#       include "CourantNo.H"
+#       include "setDeltaT.H"
 
         // Make the fluxes absolute
         fvc::makeAbsolute(phi, U);
-
-#       include "CourantNo.H"
-#       include "setDeltaT.H"
 
         runTime++;
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         bool meshChanged = mesh.update();
-        reduce(meshChanged, orOp<bool>());
 
-        if (correctPhi && meshChanged)
-        {
-#           include "correctPhi.H"
-        }
-
-        // Make the fluxes relative to the mesh motion
-        fvc::makeRelative(phi, U);
+#       include "volContinuity.H"
 
         if (checkMeshCourantNo)
         {
 #           include "meshCourantNo.H"
         }
 
+        // Mesh motion update
+        if (correctPhi && meshChanged)
+        {
+#           include "correctPhi.H"
+        }
+
+        if (meshChanged)
+        {
+#           include "CourantNo.H"
+        }
+
+        // Make the fluxes relative to the mesh motion
+        fvc::makeRelative(phi, U);
+
         // --- PIMPLE loop
-        for (int ocorr=0; ocorr<nOuterCorr; ocorr++)
+        label oCorr = 0;
+        do
         {
             if (nOuterCorr != 1)
             {
@@ -102,13 +109,9 @@ int main(int argc, char *argv[])
 
                 U = rAU*UEqn.H();
                 phi = (fvc::interpolate(U) & mesh.Sf());
+                // ddtPhiCorr does not work.  HJ, 20/Nov/2013
 
-                if (p.needReference())
-                {
-                    fvc::makeRelative(phi, U);
-                    adjustPhi(phi, U, p);
-                    fvc::makeAbsolute(phi, U);
-                }
+                adjustPhi(phi, U, p);
 
                 for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
                 {
@@ -121,8 +124,8 @@ int main(int argc, char *argv[])
 
                     if
                     (
-                        ocorr == nOuterCorr - 1
-                     && corr == nCorr - 1
+//                         oCorr == nOuterCorr - 1
+                        corr == nCorr - 1
                      && nonOrth == nNonOrthCorr
                     )
                     {
@@ -145,7 +148,7 @@ int main(int argc, char *argv[])
 #               include "continuityErrs.H"
 
                 // Explicitly relax pressure for momentum corrector
-                if (ocorr != nOuterCorr - 1)
+                if (oCorr != nOuterCorr - 1)
                 {
                     p.relax();
                 }
@@ -153,12 +156,14 @@ int main(int argc, char *argv[])
                 // Make the fluxes relative to the mesh motion
                 fvc::makeRelative(phi, U);
 
+#               include "movingMeshContinuityErrs.H"
+
                 U -= rAU*fvc::grad(p);
                 U.correctBoundaryConditions();
             }
 
             turbulence->correct();
-        }
+        } while (++oCorr < nOuterCorr);
 
         runTime.write();
 

@@ -1,25 +1,5 @@
 {
-    if (mesh.changing())
-    {
-        forAll(U.boundaryField(), patchi)
-        {
-            if (U.boundaryField()[patchi].fixesValue())
-            {
-                U.boundaryField()[patchi].initEvaluate();
-            }
-        }
-
-        forAll(U.boundaryField(), patchi)
-        {
-            if (U.boundaryField()[patchi].fixesValue())
-            {
-                U.boundaryField()[patchi].evaluate();
-
-                phi.boundaryField()[patchi] =
-                U.boundaryField()[patchi] & mesh.Sf().boundaryField()[patchi];
-            }
-        }
-    }
+#   include "continuityErrs.H"
 
     wordList pcorrTypes
     (
@@ -27,9 +7,9 @@
         zeroGradientFvPatchScalarField::typeName
     );
 
-    for (label i=0; i<p.boundaryField().size(); i++)
+    for (label i = 0; i < p.boundaryField().size(); i++)
     {
-        if(p.boundaryField()[i].fixesValue())
+        if (p.boundaryField()[i].fixesValue())
         {
             pcorrTypes[i] = fixedValueFvPatchScalarField::typeName;
         }
@@ -46,19 +26,14 @@
             IOobject::NO_WRITE
         ),
         mesh,
-        dimensionedScalar("pcorr", p.dimensions(), 0.0),
+        dimensionedScalar("pcorr", p.dimensions(), 0),
         pcorrTypes
     );
 
     // Initialise flux with interpolated velocity
     phi = fvc::interpolate(U) & mesh.Sf();
 
-    if (pcorr.needReference())
-    {
-        fvc::makeRelative(phi, U);
-        adjustPhi(phi, U, pcorr);
-        fvc::makeAbsolute(phi, U);
-    }
+    adjustPhi(phi, U, pcorr);
 
     for(int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
     {
@@ -74,7 +49,10 @@
         {
             phi -= pcorrEqn.flux();
         }
-    }
-}
 
-#include "continuityErrs.H"
+        // Fluxes are corrected to absolute velocity and further corrected
+        // later.  HJ, 6/Feb/2009
+    }
+
+#   include "continuityErrs.H"
+}
