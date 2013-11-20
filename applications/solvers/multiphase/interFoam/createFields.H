@@ -103,7 +103,13 @@
 
     label pdRefCell = 0;
     scalar pdRefValue = 0.0;
-    setRefCell(pd, mesh.solutionDict().subDict("PISO"), pdRefCell, pdRefValue);
+    setRefCell
+    (
+        pd,
+        mesh.solutionDict().subDict("PIMPLE"),
+        pdRefCell,
+        pdRefValue
+    );
 
     scalar pRefValue = 0.0;
 
@@ -111,7 +117,7 @@
     {
         pRefValue = readScalar
         (
-            mesh.solutionDict().subDict("PISO").lookup("pRefValue")
+            mesh.solutionDict().subDict("PIMPLE").lookup("pRefValue")
         );
 
         p += dimensionedScalar
