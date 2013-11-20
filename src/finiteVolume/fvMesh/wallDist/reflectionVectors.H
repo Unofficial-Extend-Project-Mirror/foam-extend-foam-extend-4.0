@@ -27,6 +27,7 @@ Class
 
 Description
     Container for reflection vectors (= unit normal of nearest wall)
+
 SourceFiles
     reflectionVectors.C
 
@@ -44,7 +45,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class reflectionVectors Declaration
+                       Class reflectionVectors Declaration
 \*---------------------------------------------------------------------------*/
 
 class reflectionVectors
@@ -54,6 +55,7 @@ protected:
 
     // Protected data
 
+        //- Unit normal vector for nearest wall
         volVectorField n_;
 
 

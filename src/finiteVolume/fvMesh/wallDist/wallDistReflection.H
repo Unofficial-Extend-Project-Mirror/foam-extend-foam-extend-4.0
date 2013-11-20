@@ -46,7 +46,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class wallDistReflection Declaration
+                     Class wallDistReflection Declaration
 \*---------------------------------------------------------------------------*/
 
 class wallDistReflection
