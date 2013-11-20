@@ -43,6 +43,8 @@ void Foam::probes::findCells(const fvMesh& mesh)
 {
     if (cellList_.empty())
     {
+        Info<< "Searching for probe point locations" << endl;
+
         cellList_.setSize(probeLocations_.size());
 
         forAll(probeLocations_, probeI)
@@ -309,7 +311,6 @@ Foam::probes::~probes()
 
 void Foam::probes::execute()
 {
-    // Do nothing - only valid on write
 }
 
 
@@ -321,6 +322,14 @@ void Foam::probes::end()
 
 void Foam::probes::write()
 {
+    // Check if the mesh is changing and if so, resample
+    const fvMesh& mesh = refCast<const fvMesh>(obr_);
+    if (mesh.moving() || mesh.changing())
+    {
+        cellList_.clear();
+        findCells(mesh);
+    }
+
     if (probeLocations_.size() && checkFieldTypes())
     {
         sampleAndWrite(scalarFields_);
