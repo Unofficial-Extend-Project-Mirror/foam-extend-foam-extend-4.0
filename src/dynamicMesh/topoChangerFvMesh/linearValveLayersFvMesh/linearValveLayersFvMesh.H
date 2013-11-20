@@ -79,8 +79,8 @@ class linearValveLayersFvMesh
         //- Return true if sliders are attached
         bool attached() const;
 
-        //- Return new point field
-        tmp<pointField> newPoints() const;
+        //- Return new point field with layering motion
+        tmp<pointField> newLayerPoints() const;
 
 
 public:

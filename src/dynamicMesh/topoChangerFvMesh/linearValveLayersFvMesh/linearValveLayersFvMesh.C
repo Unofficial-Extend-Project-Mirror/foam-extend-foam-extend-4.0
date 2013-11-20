@@ -233,7 +233,7 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
         "valveLayerZone",
         lpf,
         boolList(layerPatch.size(), true),
-        0,
+        nFz,
         faceZones()
     );
     nFz++;
@@ -406,14 +406,15 @@ bool Foam::linearValveLayersFvMesh::attached() const
 }
 
 
-Foam::tmp<Foam::pointField> Foam::linearValveLayersFvMesh::newPoints() const
+Foam::tmp<Foam::pointField>
+Foam::linearValveLayersFvMesh::newLayerPoints() const
 {
-    tmp<pointField> tnewPoints
+    tmp<pointField> tnewLayerPoints
     (
-        new pointField(points())
+        new pointField(allPoints())
     );
 
-    pointField& np = tnewPoints();
+    pointField& np = tnewLayerPoints();
 
     const word layerPatchName
     (
@@ -435,7 +436,7 @@ Foam::tmp<Foam::pointField> Foam::linearValveLayersFvMesh::newPoints() const
         np[patchPoints[ppI]] += vel*time().deltaT().value();
     }
 
-    return tnewPoints;
+    return tnewLayerPoints;
 }
 
 
@@ -486,6 +487,9 @@ bool Foam::linearValveLayersFvMesh::update()
 
         bool localMorphing1 = topoChangeMap1->morphing();
 
+        // Note: Since we are detaching, global morphing is always true
+        // HJ, 7/Mar/2011
+
         if (localMorphing1)
         {
             Info << "Topology change; executing pre-motion after "
@@ -511,46 +515,47 @@ bool Foam::linearValveLayersFvMesh::update()
     makeLayersLive();
 
     // Changing topology by hand
+    autoPtr<mapPolyMesh> topoChangeMap2 = topoChanger_.changeMesh();
+
+    bool localMorphing2 = topoChangeMap2->morphing();
+    bool globalMorphing2 = localMorphing2;
+
+    reduce(globalMorphing2, orOp<bool>());
+
+    // Work array for new points position.
+    pointField newPoints = allPoints();
+
+    if (globalMorphing2)
     {
-        autoPtr<mapPolyMesh> topoChangeMap2 = topoChanger_.changeMesh();
+        Info<< "Topology change; executing pre-motion after "
+            << "dynamic layering" << endl;
 
-        bool localMorphing2 = topoChangeMap2->morphing();
-        bool globalMorphing2 = localMorphing2;
-
-        reduce(globalMorphing2, orOp<bool>());
-
-        // Work array for new points position.
-        pointField newPoints = allPoints();
-
-        if (globalMorphing2)
+        if (localMorphing2)
         {
-            Info<< "Topology change; executing pre-motion after "
-                << "dynamic layering" << endl;
-
-            if (localMorphing2)
-            {
-                Info << "Topology change; executing pre-motion" << endl;
-                movePoints(topoChangeMap2->preMotionPoints());
-            }
-            else
-            {
-                movePoints(newPoints);
-            }
+            Info << "Topology change; executing pre-motion" << endl;
+            movePoints(topoChangeMap2->preMotionPoints());
+            newPoints = topoChangeMap2->preMotionPoints();
         }
+        else
+        {
+            movePoints(newPoints);
+        }
+
+        setV0();
+        resetMotion();
     }
 
     // Move points to change layer thickness
-    movePoints(newPoints());
-
-
-    // Attach the interface
-    Info << "Coupling sliding interfaces" << endl;
-    makeSlidersLive();
+    movePoints(newLayerPoints());
 
     // Changing topology by hand
     {
         // Grab old points to correct the motion
         pointField oldPointsNew = oldAllPoints();
+
+        // Attach the interface
+        Info << "Coupling sliding interfaces" << endl;
+        makeSlidersLive();
 
         autoPtr<mapPolyMesh> topoChangeMap3 = topoChanger_.changeMesh();
 
@@ -559,12 +564,22 @@ bool Foam::linearValveLayersFvMesh::update()
 
         reduce(globalMorphing3, orOp<bool>());
 
-        pointField newPoints = allPoints();
-
         if (globalMorphing3)
         {
+            Info<< "Topology change; executing pre-motion after "
+                << "sliding attach" << endl;
+
+            // Grab points
+            newPoints = allPoints();
+
             if (localMorphing3)
             {
+                // If there is layering, pick up correct points
+                if (topoChangeMap3->hasMotionPoints())
+                {
+                    newPoints = topoChangeMap3->preMotionPoints();
+                }
+
                 pointField mappedOldPointsNew(newPoints.size());
 
                 mappedOldPointsNew.map
@@ -576,17 +591,26 @@ bool Foam::linearValveLayersFvMesh::update()
                 // Solve the correct mesh motion to make sure motion fluxes
                 // are solved for and not mapped
                 movePoints(mappedOldPointsNew);
+
+                resetMotion();
+                setV0();
+
+                // Set new point motion
+                movePoints(newPoints);
             }
             else
             {
+                // No local topological change.  Execute double motion for
+                // sync with topological changes
+                movePoints(oldPointsNew);
+
+                resetMotion();
+                setV0();
+
+                // Set new point motion
                 movePoints(newPoints);
             }
         }
-
-        // Reset motion
-        resetMotion();
-        setV0();
-        movePoints(newPoints);
     }
 
     return true;
