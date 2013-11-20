@@ -31,6 +31,7 @@ License
 #include "pointField.H"
 #include "mapPolyMesh.H"
 #include "polyTopoChange.H"
+#include "pointZone.H"
 #include "volMesh.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -53,20 +54,30 @@ namespace Foam
 
 void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
 {
-    // Add zones and modifiers for motion action
+    // Inner slider
+    const word innerSliderName(motionDict_.subDict("slider").lookup("inside"));
+
+    // Outer slider
+    const word outerSliderName
+    (
+        motionDict_.subDict("slider").lookup("outside")
+    );
+
+    bool initialised = false;
+
+    // Check if zones and modifiers for motion action are present
+    label insideZoneID = faceZones().findZoneID(innerSliderName + "Zone");
+    label outsideZoneID = faceZones().findZoneID(outerSliderName + "Zone");
 
     if
     (
-        pointZones().size() > 0
-     || faceZones().size() > 0
-     || cellZones().size() > 0
+        insideZoneID > -1
+     || outsideZoneID > -1
     )
     {
-        Info<< "void linearValveLayersFvMesh::addZonesAndModifiers() : "
-            << "Zones and modifiers already present.  Skipping."
-            << endl;
+        // Zones found.  Check topo changer
 
-        if (topoChanger_.size() == 0)
+        if (topoChanger_.empty())
         {
             FatalErrorIn
             (
@@ -75,46 +86,67 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
                 << abort(FatalError);
         }
 
+        initialised = true;
+    }
+
+    // Check if slider has been initialised on any of the processors
+    reduce(initialised, orOp<bool>());
+
+    if (initialised)
+    {
+        InfoIn("void linearValveLayersFvMesh::addZonesAndModifiers()")
+            << "Zones and modifiers already present.  Skipping."
+            << endl;
+
         return;
     }
 
+    // Add zones and modifiers for motion action
     Info<< "Time = " << time().timeName() << endl
         << "Adding zones and modifiers to the mesh" << endl;
 
     // Add zones
-    List<pointZone*> pz(1);
-    List<faceZone*> fz(4);
+    label nPz = 0;
     label nFz = 0;
-    List<cellZone*> cz(0);
+    label nCz = 0;
+    List<pointZone*> pz(pointZones().size() + 1);
+    List<faceZone*> fz(faceZones().size() + 4);
+    List<cellZone*> cz(cellZones().size());
 
     // Add a topology modifier
     topoChanger_.setSize(2);
     label nTc = 0;
 
-    // Add an empty zone for cut points
+    // Copy existing point zones
+    forAll (pointZones(), zoneI)
+    {
+        pz[nPz] = pointZones()[zoneI].clone(pointZones()).ptr();
+        nPz++;
+    }  
 
-    pz[0] = new pointZone
-    (
-        "cutPointZone",
-        labelList(0),
-        0,
-        pointZones()
-    );
+    // Copy existing face zones
+    forAll (faceZones(), zoneI)
+    {
+        fz[nFz] = faceZones()[zoneI].clone(faceZones()).ptr();
+        nFz++;
+    }
+    
+    // Copy existing cell zones
+    forAll (cellZones(), zoneI)
+    {
+        cz[nCz] = cellZones()[zoneI].clone(cellZones()).ptr();
+        nCz++;
+    }
+
 
 
     // Do face zones for slider
 
     // Inner slider
-    const word innerSliderName(motionDict_.subDict("slider").lookup("inside"));
     const polyPatch& innerSlider =
         boundaryMesh()[boundaryMesh().findPatchID(innerSliderName)];
 
     // Outer slider
-    const word outerSliderName
-    (
-        motionDict_.subDict("slider").lookup("outside")
-    );
-
     const polyPatch& outerSlider =
         boundaryMesh()[boundaryMesh().findPatchID(outerSliderName)];
 
@@ -122,6 +154,18 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
     {
         Pout<< "Adding sliding interface between patches "
             << innerSliderName << " and " << outerSliderName << endl;
+
+
+        // Add an empty zone for cut points
+        pz[nPz] = new pointZone
+        (
+            "cutPointZone",
+            labelList(0),
+            nPz,
+            pointZones()
+        );
+        nPz++;
+
         labelList isf(innerSlider.size());
 
         forAll (isf, i)
@@ -129,14 +173,15 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
             isf[i] = innerSlider.start() + i;
         }
 
-        fz[0] = new faceZone
+        fz[nFz] = new faceZone
         (
             innerSliderName + "Zone",
             isf,
             boolList(innerSlider.size(), false),
-            0,
+            nFz,
             faceZones()
         );
+        nFz++;
 
         labelList osf(outerSlider.size());
 
@@ -145,30 +190,29 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
             osf[i] = outerSlider.start() + i;
         }
 
-        fz[1] = new faceZone
+        fz[nFz] = new faceZone
         (
             outerSliderName + "Zone",
             osf,
             boolList(outerSlider.size(), false),
-            1,
+            nFz,
             faceZones()
         );
+        nFz++;
 
         // Add empty zone for cut faces
-        fz[2] = new faceZone
+        fz[nFz] = new faceZone
         (
             "cutFaceZone",
             labelList(0),
             boolList(0, false),
-            2,
+            nFz,
             faceZones()
         );
-
-        // Set the number of face zones already used
-        nFz = 3;
+        nFz++;
     }
 
-    // Add face zone for layer addition
+    // Add face zone for layer addition.  This is present on all processors
     const word layerPatchName
     (
         motionDict_.subDict("layer").lookup("patch")
@@ -193,12 +237,14 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
         faceZones()
     );
     nFz++;
-    Pout<< "nFz = " << nFz << endl;
-    // Resize the number of live face zones
-    fz.setSize(nFz);
 
+    // Resize the number of live zones
+    pz.setSize(nPz);
+    fz.setSize(nFz);
+    // Cell zones remain unchanged
 
     Info << "Adding point and face zones" << endl;
+    removeZones();
     addZones(pz, fz, cz);
 
     if (!innerSlider.empty() && !outerSlider.empty())
@@ -257,6 +303,11 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
     topoChanger_.writeOpt() = IOobject::AUTO_WRITE;
     topoChanger_.write();
     write();
+
+    // Update the mesh for changes in zones.  This needs to
+    // happen after write, because mesh instance will be changed
+    // HJ and OP, 20/Nov/2013
+    syncUpdateMesh();
 }
 
 
