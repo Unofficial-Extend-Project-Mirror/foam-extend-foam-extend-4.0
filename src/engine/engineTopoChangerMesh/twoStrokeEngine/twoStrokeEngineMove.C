@@ -340,7 +340,7 @@ bool Foam::twoStrokeEngine::update()
 
     const scalarField& movingPointsM = movingPointsMask();
 
-    forAll(pistonPoints, i)
+    forAll (pistonPoints, i)
     {
         label pointI = pistonPoints[i];
         pistonPoint[pointI] = true;
@@ -353,7 +353,7 @@ bool Foam::twoStrokeEngine::update()
         }
     }
 
-    forAll(headPoints, i)
+    forAll (headPoints, i)
     {
         headPoint[headPoints[i]] = true;
         scaleDisp[headPoints[i]] = false;
@@ -362,7 +362,7 @@ bool Foam::twoStrokeEngine::update()
 
     if (realDeformation())
     {
-        forAll(scaleDisp, pointI)
+        forAll (scaleDisp, pointI)
         {
             point& p = newPoints[pointI];
 
@@ -385,7 +385,7 @@ bool Foam::twoStrokeEngine::update()
         // Always move piston
         scalar pistonTopZ = -GREAT;
 
-        forAll(pistonPoints, i)
+        forAll (pistonPoints, i)
         {
             point& p = newPoints[pistonPoints[i]];
             p.z() += deltaZ*movingPointsM[pistonPoints[i]];
@@ -397,7 +397,7 @@ bool Foam::twoStrokeEngine::update()
         if (deltaZ > 0.0)
         {
             // check if piston-points have moved beyond the layer above
-            forAll(newPoints, i)
+            forAll (newPoints, i)
             {
                 if (!pistonPoint[i])
                 {
@@ -419,6 +419,7 @@ bool Foam::twoStrokeEngine::update()
 
     pistonPosition() += deltaZ;
 
+    // Changing topology by hand
     {
         // Grab old points to correct the motion
         pointField oldPointsNew = oldAllPoints();
@@ -459,7 +460,7 @@ bool Foam::twoStrokeEngine::update()
                     oldPointsNew, topoChangeMap3->pointMap()
                 );
 
-                forAll(scavInPortPatches_, patchi)
+                forAll (scavInPortPatches_, patchi)
                 {
                     // Find cut point zone ID
                     const label cutPointZoneID = pointZones().findZoneID
@@ -472,13 +473,13 @@ bool Foam::twoStrokeEngine::update()
                         const labelList& cutPointsAddressing =
                             pointZones()[cutPointZoneID];
 
-                        forAll(cutPointsAddressing, i)
+                        forAll (cutPointsAddressing, i)
                         {
                             mappedOldPointsNew[cutPointsAddressing[i]] =
                                 newPoints[cutPointsAddressing[i]];
                         }
 
-                        forAll(cutPointsAddressing, i)
+                        forAll (cutPointsAddressing, i)
                         {
                             if
                             (
