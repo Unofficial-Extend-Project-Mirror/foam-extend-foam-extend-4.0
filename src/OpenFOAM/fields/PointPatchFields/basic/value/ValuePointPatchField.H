@@ -236,9 +236,9 @@ public:
 };
 
 
-// This function is added to overide the hack in PointPatchField.H which enables
-// simple backward compatability with verions using referenceLevel
-// in GeometicField
+// This function is added to overide the hack in PointPatchField.H which
+//  enables simple backward compatability with versions using referenceLevel
+// in GeometricField
 template
 <
     template<class> class PatchField,

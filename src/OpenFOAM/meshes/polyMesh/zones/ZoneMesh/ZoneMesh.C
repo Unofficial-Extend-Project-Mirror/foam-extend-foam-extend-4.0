@@ -244,13 +244,14 @@ label ZoneMesh<ZoneType, MeshType>::findZoneID(const word& zoneName) const
     // Zone not found
     if (debug)
     {
-        Info<< "label ZoneMesh<ZoneType>::findZoneID(const word& "
-            << "zoneName) const : "
-            << "Zone named " << zoneName << " not found.  "
+        InfoIn
+        (
+            "label ZoneMesh<ZoneType>::findZoneID(const word& zoneName) const"
+        )   << "Zone named " << zoneName << " not found.  "
             << "List of available zone names: " << names() << endl;
     }
 
-    // A dummy return to kep the compiler happy
+    // Return for zone not found
     return -1;
 }
 

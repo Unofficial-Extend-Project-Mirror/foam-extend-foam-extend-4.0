@@ -386,6 +386,7 @@ public:
                 return *this;
             }
 
+
         // Mesh motion
 
             //- Is mesh moving
@@ -431,6 +432,7 @@ public:
 
             //- Set old points without executing motion
             void setOldPoints(const pointField& setPoints);
+
 
         // Topological change
 
