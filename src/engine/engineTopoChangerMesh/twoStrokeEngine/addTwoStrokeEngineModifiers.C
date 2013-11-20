@@ -126,8 +126,6 @@ void Foam::twoStrokeEngine::addZonesAndModifiers()
                     boundaryMesh().findPatchID(scavInPortPatches_[patchi])
                 ];
 
-            Pout<< "A: " << innerScav.size() << " " << outerScav.size()
-                << endl;
             // Add zone if both patches has got faces
             if (!innerScav.empty() && !outerScav.empty())
             {

@@ -208,6 +208,9 @@ bool Foam::twoStrokeEngine::update()
     bool localMorphing2 = topoChangeMap2->morphing();
     bool globalMorphing2 = localMorphing2;
 
+    //HJ Is this reduce missing?  HJ, 19/Nov/2013
+    reduce(globalMorphing2, orOp<bool>());
+
     // Work array for new points position.
     pointField newPoints = allPoints();
 

@@ -109,7 +109,7 @@ Foam::twoStrokeEngine::twoStrokeEngine
                 << abort(FatalError);
     }
 
-    forAll(scavInPortPatches_, patchi)
+    forAll (scavInPortPatches_, patchi)
     {
         if(boundaryMesh().findPatchID(scavInPortPatches_[patchi]) == -1)
         {
@@ -122,7 +122,7 @@ Foam::twoStrokeEngine::twoStrokeEngine
         }
     }
 
-    forAll(scavInCylPatches_, patchi)
+    forAll (scavInCylPatches_, patchi)
     {
         if(boundaryMesh().findPatchID(scavInCylPatches_[patchi]) == -1)
         {
@@ -140,11 +140,7 @@ Foam::twoStrokeEngine::twoStrokeEngine
 }
 
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
 
 void Foam::twoStrokeEngine::setBoundaryVelocity(volVectorField& U)
 {
