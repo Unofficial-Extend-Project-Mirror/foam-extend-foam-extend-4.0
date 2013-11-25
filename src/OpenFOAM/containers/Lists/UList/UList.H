@@ -414,12 +414,12 @@ inline void reverse(UList<T>&);
  * @endcode
  * @sa forAllConstIter
 */
-#define forAllIter(Container,container,iter)                                   \
-    for                                                                        \
-    (                                                                          \
-        Container::iterator iter = (container).begin();                        \
-        iter != (container).end();                                             \
-        ++iter                                                                 \
+#define forAllIter(Container,container,iter)                                  \
+    for                                                                       \
+    (                                                                         \
+        Container::iterator iter = (container).begin();                       \
+        iter != (container).end();                                            \
+        ++iter                                                                \
     )
 
 /**
@@ -435,12 +435,12 @@ inline void reverse(UList<T>&);
  * @endcode
  * @sa forAllIter
 */
-#define forAllConstIter(Container,container,iter)                              \
-    for                                                                        \
-    (                                                                          \
-        Container::const_iterator iter = (container).begin();                  \
-        iter != (container).end();                                             \
-        ++iter                                                                 \
+#define forAllConstIter(Container,container,iter)                             \
+    for                                                                       \
+    (                                                                         \
+        Container::const_iterator iter = (container).begin();                 \
+        iter != (container).end();                                            \
+        ++iter                                                                \
     )
 
 
