@@ -77,13 +77,13 @@ class sixDOFqODE
         // Platform variables
 
             //- Spring equilibrium position for translation
-            const dimensionedVector Xequilibrium_;
+            dimensionedVector Xequilibrium_;
 
             //- Linear spring coeffs
-            const dimensionedDiagTensor linSpringCoeffs_;
+            dimensionedDiagTensor linSpringCoeffs_;
 
             //- Linear damping coeffs
-            const dimensionedDiagTensor linDampingCoeffs_;
+            dimensionedDiagTensor linDampingCoeffs_;
 
 
         // Initial body state variables
@@ -197,11 +197,20 @@ public:
         //- Return mass
         inline const dimensionedScalar& mass() const;
 
+        //- Return access to mass
+        inline dimensionedScalar& mass();
+
         //- Return moment of inertia
         inline const dimensionedDiagTensor& momentOfInertia() const;
 
+        //- Return access to moment of inertia
+        inline dimensionedDiagTensor& momentOfInertia();
+
         //- Return equilibrium position of origin
         inline const dimensionedVector& Xequilibrium() const;
+
+        //- Return access to equilibrium position of origin
+        inline dimensionedVector& Xequilibrium();
 
 
         // Variables in relative coordinate system (solved for)

@@ -41,13 +41,31 @@ const Foam::dimensionedScalar& Foam::sixDOFqODE::mass() const
 }
 
 
+Foam::dimensionedScalar& Foam::sixDOFqODE::mass()
+{
+    return mass_;
+}
+
+
 const Foam::dimensionedDiagTensor& Foam::sixDOFqODE::momentOfInertia() const
 {
     return momentOfInertia_;
 }
 
 
+Foam::dimensionedDiagTensor& Foam::sixDOFqODE::momentOfInertia()
+{
+    return momentOfInertia_;
+}
+
+
 const Foam::dimensionedVector& Foam::sixDOFqODE::Xequilibrium() const
+{
+    return Xequilibrium_;
+}
+
+
+Foam::dimensionedVector& Foam::sixDOFqODE::Xequilibrium()
 {
     return Xequilibrium_;
 }
