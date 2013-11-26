@@ -78,6 +78,7 @@ Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
 Patch0:         scotch-6.0.0_patch_0
+Patch1:         scotch-6.0.0_patch_darwin
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -87,7 +88,11 @@ Patch0:         scotch-6.0.0_patch_0
 %prep
 %setup -q -n %{name}_%{version}
 
+%ifos darwin
+%patch1 -p1
+%else
 %patch0 -p1
+%endif
 
 %build
     # export WM settings in a form that GNU configure recognizes

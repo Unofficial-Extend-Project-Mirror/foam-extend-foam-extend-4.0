@@ -1,6 +1,6 @@
 diff -ruN scotch_5.1.10b_orig/src/Make.inc/Makefile.inc.i686_mac_darwin10.shlib scotch_5.1.10b/src/Make.inc/Makefile.inc.i686_mac_darwin10.shlib
---- scotch_5.1.10b_orig/src/Make.inc/Makefile.inc.i686_mac_darwin10.shlib	1969-12-31 19:00:00.000000000 -0500
-+++ scotch_5.1.10b/src/Make.inc/Makefile.inc.i686_mac_darwin10.shlib	2010-10-31 15:44:58.000000000 -0400
+--- scotch_6.0.0/src/Make.inc/Makefile.inc.i686_mac_darwin10.shlib	1969-12-31 19:00:00.000000000 -0500
++++ scotch_6.0.0/src/Make.inc/Makefile.inc.i686_mac_darwin10.shlib	2010-10-31 15:44:58.000000000 -0400
 @@ -0,0 +1,22 @@
 +EXE	=
 +LIB	= .dylib

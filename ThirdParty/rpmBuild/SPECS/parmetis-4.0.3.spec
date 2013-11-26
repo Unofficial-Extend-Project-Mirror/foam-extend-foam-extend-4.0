@@ -89,7 +89,7 @@ Patch1:         ParMetis-3.1.1.patch
 %setup -q
 
 %ifos darwin
-%patch0 -p1
+#%patch0 -p1
 #%else
 #patch1 -p1
 %endif

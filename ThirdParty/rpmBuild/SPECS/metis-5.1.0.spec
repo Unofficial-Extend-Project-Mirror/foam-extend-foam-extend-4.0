@@ -77,7 +77,7 @@ URL:            http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
-Patch0:         metis-5.0pre2_patch_darwin
+Patch0:         metis-5.1.0_patch_darwin
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -88,7 +88,7 @@ Patch0:         metis-5.0pre2_patch_darwin
 %setup -q
 
 %ifos darwin
-%patch0 -p1
+#%patch0 -p1
 %endif
 
 %build
