@@ -1,0 +1,144 @@
+diff -ur scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_pc_linux2 scotch_6.0.0/src/Make.inc/Makefile.inc.i686_pc_linux2
+--- scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_pc_linux2	2013-11-26 01:39:06.886926953 +0100
++++ scotch_6.0.0/src/Make.inc/Makefile.inc.i686_pc_linux2	2013-11-26 02:01:19.338891116 +0100
+@@ -11,7 +11,7 @@
+ CCD		= gcc
+ CFLAGS		= -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME -DSCOTCH_PTHREAD -Drestrict=__restrict
+ CLIBFLAGS	=
+-LDFLAGS		= -lz -lm -lrt
++LDFLAGS		= -Xlinker --add-needed -Xlinker --no-as-needed -lz -lm -lrt
+ CP		= cp
+ LEX		= flex -Pscotchyy -olex.yy.c
+ LN		= ln
+diff -ur scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_pc_linux2.c99 scotch_6.0.0/src/Make.inc/Makefile.inc.i686_pc_linux2.c99
+--- scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_pc_linux2.c99	2013-11-26 01:39:06.886926953 +0100
++++ scotch_6.0.0/src/Make.inc/Makefile.inc.i686_pc_linux2.c99	2013-11-26 02:01:19.338891116 +0100
+@@ -11,7 +11,7 @@
+ CCD		= gcc
+ CFLAGS		= -std=c99 -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME -DSCOTCH_RENAME_PARSER -DSCOTCH_PTHREAD
+ CLIBFLAGS	=
+-LDFLAGS		= -lz -lm -lrt
++LDFLAGS		= -Xlinker --add-needed -Xlinker --no-as-needed -lz -lm -lrt
+ CP		= cp
+ LEX		= flex -Pscotchyy -D_XOPEN_SOURCE=600 -olex.yy.c
+ LN		= ln
+diff -ur scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_pc_linux2.debug scotch_6.0.0/src/Make.inc/Makefile.inc.i686_pc_linux2.debug
+--- scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_pc_linux2.debug	2013-11-26 01:39:06.890926953 +0100
++++ scotch_6.0.0/src/Make.inc/Makefile.inc.i686_pc_linux2.debug	2013-11-26 02:01:19.338891116 +0100
+@@ -11,7 +11,7 @@
+ CCD		= gcc
+ CFLAGS		= -g -O0 -Drestrict=__restrict -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DSCOTCH_DEBUG_ALL -DSCOTCH_DETERMINISTIC -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME
+ CLIBFLAGS	=
+-LDFLAGS		= -g -lz -lm -lrt
++LDFLAGS		= -g -Xlinker --add-needed -Xlinker --no-as-needed -lz -lm -lrt
+ CP		= cp
+ LEX		= flex -Pscotchyy -olex.yy.c
+ LN		= ln
+diff -ur scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_pc_linux2.nothreads scotch_6.0.0/src/Make.inc/Makefile.inc.i686_pc_linux2.nothreads
+--- scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_pc_linux2.nothreads	2013-11-26 01:39:06.882926953 +0100
++++ scotch_6.0.0/src/Make.inc/Makefile.inc.i686_pc_linux2.nothreads	2013-11-26 02:01:19.338891116 +0100
+@@ -11,7 +11,7 @@
+ CCD		= gcc
+ CFLAGS		= -O3 -Drestrict=__restrict -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME
+ CLIBFLAGS	=
+-LDFLAGS		= -lz -lm -lrt
++LDFLAGS		= -Xlinker --add-needed -Xlinker --no-as-needed -lz -lm -lrt
+ CP		= cp
+ LEX		= flex -Pscotchyy -olex.yy.c
+ LN		= ln
+diff -ur scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_pc_linux2.prof scotch_6.0.0/src/Make.inc/Makefile.inc.i686_pc_linux2.prof
+--- scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_pc_linux2.prof	2013-11-26 01:39:06.886926953 +0100
++++ scotch_6.0.0/src/Make.inc/Makefile.inc.i686_pc_linux2.prof	2013-11-26 02:01:19.338891116 +0100
+@@ -11,7 +11,7 @@
+ CCD		= gcc
+ CFLAGS		= -pg -O3 -Drestrict=__restrict -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_PTHREAD -DSCOTCH_RENAME
+ CLIBFLAGS	=
+-LDFLAGS		= -lz -lm -lrt
++LDFLAGS		= -Xlinker --add-needed -Xlinker --no-as-needed -lz -lm -lrt
+ CP		= cp
+ LEX		= flex -Pscotchyy -olex.yy.c
+ LN		= ln
+diff -ur scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib scotch_6.0.0/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib
+--- scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib	2013-11-26 01:39:06.886926953 +0100
++++ scotch_6.0.0/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib	2013-11-26 02:01:19.338891116 +0100
+@@ -11,7 +11,7 @@
+ CCD		= gcc
+ CFLAGS		= -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME -DSCOTCH_PTHREAD -Drestrict=__restrict
+ CLIBFLAGS	= -shared -fPIC
+-LDFLAGS		= -lz -lm -lrt
++LDFLAGS		= -Xlinker --add-needed -Xlinker --no-as-needed -lz -lm -lrt
+ CP		= cp
+ LEX		= flex -Pscotchyy -olex.yy.c
+ LN		= ln
+diff -ur scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib.debug scotch_6.0.0/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib.debug
+--- scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib.debug	2013-11-26 01:39:06.886926953 +0100
++++ scotch_6.0.0/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib.debug	2013-11-26 02:01:19.338891116 +0100
+@@ -11,7 +11,7 @@
+ CCD		= gcc
+ CFLAGS		= -g -O0 -Drestrict=__restrict -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DSCOTCH_DEBUG_ALL -DSCOTCH_DETERMINISTIC -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME
+ CLIBFLAGS	= -shared -fPIC
+-LDFLAGS		= -g -lz -lm -lrt
++LDFLAGS		= -g -Xlinker --add-needed -Xlinker --no-as-needed -lz -lm -lrt
+ CP		= cp
+ LEX		= flex -Pscotchyy -olex.yy.c
+ LN		= ln
+diff -ur scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_sun_solaris5 scotch_6.0.0/src/Make.inc/Makefile.inc.i686_sun_solaris5
+--- scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.i686_sun_solaris5	2013-11-26 01:39:06.882926953 +0100
++++ scotch_6.0.0/src/Make.inc/Makefile.inc.i686_sun_solaris5	2013-11-26 02:01:19.338891116 +0100
+@@ -11,7 +11,7 @@
+ CCD		= mpicc
+ CFLAGS		= -m64 -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_PTHREAD -DSCOTCH_RENAME -Du_int32_t=uint32_t -Du_int64_t=uint64_t
+ CLIBFLAGS	=
+-LDFLAGS		= -lz -lm -lrt
++LDFLAGS		= -Xlinker --add-needed -Xlinker --no-as-needed -lz -lm -lrt
+ CP		= cp
+ LEX		= flex -Pscotchyy -olex.yy.c
+ LN		= ln
+diff -ur scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.x86-64_pc_linux2 scotch_6.0.0/src/Make.inc/Makefile.inc.x86-64_pc_linux2
+--- scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.x86-64_pc_linux2	2013-11-26 01:39:06.902926953 +0100
++++ scotch_6.0.0/src/Make.inc/Makefile.inc.x86-64_pc_linux2	2013-11-26 02:01:19.342891116 +0100
+@@ -11,7 +11,7 @@
+ CCD		= gcc
+ CFLAGS		= -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME -DSCOTCH_PTHREAD -Drestrict=__restrict -DIDXSIZE64
+ CLIBFLAGS	=
+-LDFLAGS		= -lz -lm -lrt
++LDFLAGS		= -Xlinker --add-needed -Xlinker --no-as-needed -lz -lm -lrt
+ CP		= cp
+ LEX		= flex -Pscotchyy -olex.yy.c
+ LN		= ln
+diff -ur scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.x86-64_pc_linux2.icc scotch_6.0.0/src/Make.inc/Makefile.inc.x86-64_pc_linux2.icc
+--- scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.x86-64_pc_linux2.icc	2013-11-26 01:39:06.902926953 +0100
++++ scotch_6.0.0/src/Make.inc/Makefile.inc.x86-64_pc_linux2.icc	2013-11-26 02:01:19.342891116 +0100
+@@ -11,7 +11,7 @@
+ CCD		= icc
+ CFLAGS		= -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME -DSCOTCH_PTHREAD -restrict -DIDXSIZE64
+ CLIBFLAGS	=
+-LDFLAGS		= -g -lz -lm -lrt
++LDFLAGS		= -g -Xlinker --add-needed -Xlinker --no-as-needed -lz -lm -lrt
+ CP		= cp
+ LEX		= flex -Pscotchyy -olex.yy.c
+ LN		= ln
+diff -ur scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.x86-64_pc_linux2.icc.debug scotch_6.0.0/src/Make.inc/Makefile.inc.x86-64_pc_linux2.icc.debug
+--- scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.x86-64_pc_linux2.icc.debug	2013-11-26 01:39:06.898926953 +0100
++++ scotch_6.0.0/src/Make.inc/Makefile.inc.x86-64_pc_linux2.icc.debug	2013-11-26 02:01:19.342891116 +0100
+@@ -11,7 +11,7 @@
+ CCD		= icc
+ CFLAGS		= -g -O0 -fp-model strict -traceback -check-uninit -fp-stack-check -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_DEBUG_ALL -DSCOTCH_DETERMINISTIC -DSCOTCH_RENAME -restrict -DIDXSIZE64
+ CLIBFLAGS	=
+-LDFLAGS		= -g -lz -lm -lrt
++LDFLAGS		= -g -Xlinker --add-needed -Xlinker --no-as-needed -lz -lm -lrt
+ CP		= cp
+ LEX		= flex -Pscotchyy -olex.yy.c
+ LN		= ln
+diff -ur scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.x86-64_pc_linux2.shlib scotch_6.0.0/src/Make.inc/Makefile.inc.x86-64_pc_linux2.shlib
+--- scotch_6.0.0_unchanged/src/Make.inc/Makefile.inc.x86-64_pc_linux2.shlib	2013-11-26 01:39:06.898926953 +0100
++++ scotch_6.0.0/src/Make.inc/Makefile.inc.x86-64_pc_linux2.shlib	2013-11-26 02:01:19.342891116 +0100
+@@ -11,7 +11,7 @@
+ CCD		= gcc
+ CFLAGS		= -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME -DSCOTCH_PTHREAD -Drestrict=__restrict -DIDXSIZE64
+ CLIBFLAGS	= -shared -fPIC
+-LDFLAGS		= -lz -lm -lrt
++LDFLAGS		= -Xlinker --add-needed -Xlinker --no-as-needed -lz -lm -lrt
+ CP		= cp
+ LEX		= flex -Pscotchyy -olex.yy.c
+ LN		= ln
