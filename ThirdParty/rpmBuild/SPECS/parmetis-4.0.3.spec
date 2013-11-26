@@ -101,6 +101,8 @@ Patch1:         ParMetis-3.1.1.patch
     [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
+    [ -n "$WM_CXX" ]        &&  export OMPI_CXX="$WM_CXX"
+
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
     make config
     make -j $WM_NCOMPPROCS
@@ -108,11 +110,11 @@ Patch1:         ParMetis-3.1.1.patch
 
 %install
     # Manual installation
-    mkdir -p $RPM_BUILD_ROOT/%{_installPrefix}/include/ParMETISLib
+    mkdir -p $RPM_BUILD_ROOT/%{_installPrefix}/include
     mkdir -p $RPM_BUILD_ROOT/%{_installPrefix}/lib
 
+    cp metis/include/*.h $RPM_BUILD_ROOT/%{_installPrefix}/include
     cp include/*.h $RPM_BUILD_ROOT/%{_installPrefix}/include
-    cp metis/libmetis/*.h $RPM_BUILD_ROOT/%{_installPrefix}/include/ParMETISLib
 
     cp build/*/libparmetis/lib* $RPM_BUILD_ROOT/%{_installPrefix}/lib
     cp build/*/libmetis/lib*    $RPM_BUILD_ROOT/%{_installPrefix}/lib

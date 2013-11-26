@@ -98,6 +98,8 @@ Patch0:         metis-5.0pre2_patch_darwin
     [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
+    [ -n "$WM_CXX" ]        &&  export OMPI_CXX="$WM_CXX"
+
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
 
 %ifos darwin

@@ -5,6 +5,4 @@ EXE_INC = \
 
 LIB_LIBS = \
     -L$(FOAM_LIBBIN)/dummy \
-    -L$(METIS_LIB_DIR) -lmetis \
-    -L$(METIS_LIB_DIR) -lGKlib
-
+    -L$(METIS_LIB_DIR) -lmetis
