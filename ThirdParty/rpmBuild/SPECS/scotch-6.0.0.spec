@@ -30,7 +30,7 @@
 #
 # Author:
 #     Martin Beaudoin, Hydro-Quebec, (2010)
-#
+#     Modified for version 6.0.0: Dominik Christ, Wikki Ltd., (2013)
 #------------------------------------------------------------------------------
 
 # We grab the value of WM_THIRD_PARTY and WM_OPTIONS from the environment variable
@@ -91,11 +91,11 @@ Patch0:         scotch-6.0.0_patch_0
 
 %build
     # export WM settings in a form that GNU configure recognizes
-    [ -n "$WM_CC" ]         &&  export CC="$WM_CC"
-    [ -n "$WM_CXX" ]        &&  export CXX="$WM_CXX"
-    [ -n "$WM_CFLAGS" ]     &&  export CFLAGS="$WM_CFLAGS"
-    [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
-    [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
+   # [ -n "$WM_CC" ]         &&  export CC="$WM_CC"
+   # [ -n "$WM_CXX" ]        &&  export CXX="$WM_CXX"
+   # [ -n "$WM_CFLAGS" ]     &&  export CFLAGS="$WM_CFLAGS *****"
+   # [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
+   # [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
     cd src
     # Here, unfortunately, some hand tweaking might be necessary if your system is not running Linux or MacOS X
