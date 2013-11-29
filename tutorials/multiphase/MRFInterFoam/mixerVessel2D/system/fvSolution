@@ -53,10 +53,6 @@ solvers
 PISO
 {
     cAlpha          1;
-    pRefCell        0;
-    pdRefCell       0;
-    pRefValue       0;
-    pdRefValue      0;
 }
 
 PIMPLE
@@ -66,6 +62,11 @@ PIMPLE
     nNonOrthogonalCorrectors 0;
     nAlphaCorr      1;
     nAlphaSubCycles 2;
+
+    pRefCell        0;
+    pdRefCell       0;
+    pRefValue       0;
+    pdRefValue      0;
 }
 
 // ************************************************************************* //

@@ -5,10 +5,6 @@
 
 application=`getApplication`
 
-# Compile the MRFInterfoam application
-wmake ../$application
-wclean ../$application
-
 # Now run the tutorial case
 runApplication ./makeMesh
 runApplication $application
