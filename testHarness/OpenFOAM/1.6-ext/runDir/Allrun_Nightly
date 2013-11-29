@@ -71,6 +71,13 @@ then
     exit -1
 fi
 
+# Install Hydro-Quebec Tools if necessary
+command -v pyFoamChangeMixingPlaneBoundary.py >/dev/null
+if [ $? -ne 0 ];
+then
+    ${WM_THIRD_PARTY_DIR}/AllMake.stage6
+fi
+
 # Make sure the CMake and tutorials runtime files are updated
 # We need cmake version 2.8.0 at least
 cmake $WM_PROJECT_DIR
