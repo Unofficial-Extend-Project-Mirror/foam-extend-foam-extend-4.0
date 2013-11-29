@@ -9,12 +9,6 @@ FoamFile
 {
     version         2.0;
     format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
     class           dictionary;
     object          decomposeParDict;
 }
@@ -24,9 +18,7 @@ FoamFile
 
 numberOfSubdomains 4;
 
-//method          simple;
-//method          metis;
-method          parMetis;
+method          scotch;
 
 tolerance       1e-3;
 
