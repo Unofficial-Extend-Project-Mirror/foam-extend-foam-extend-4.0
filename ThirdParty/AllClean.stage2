@@ -54,6 +54,7 @@ uninstallPackage openmpi-1.4.1
 uninstallPackage openmpi-1.4.3
 uninstallPackage openmpi-1.5
 uninstallPackage openmpi-1.6.3
+uninstallPackage openmpi-1.6.5
 
 echo
 echo ========================================

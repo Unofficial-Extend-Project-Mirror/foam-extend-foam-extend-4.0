@@ -23,7 +23,7 @@
 #     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 # Script
-#     RPM spec file for libccmio-2.6.1
+#     RPM spec file for ParMetis-4.0.3
 #
 # Description
 #     RPM spec file for creating a relocatable RPM
@@ -46,8 +46,8 @@
 
 # Will install the package directly $WM_THIRD_PARTY_DIR
 #   Some comments about package relocation:
-#   By using this prefix for the Prefix:  parameter in this file, you will make this
-#   package relocatable.
+#   By using this prefix for the Prefix:  parameter in this file, you will make this 
+#   package relocatable. 
 #
 #   This is fine, as long as your software is itself relocatable.
 #
@@ -56,28 +56,29 @@
 #   Ref: http://sourceware.org/autobook/autobook/autobook_80.html
 #
 #   In that case, if you ever change the value of the $WM_THIRD_PARTY_DIR, you will
-#   not be able to reutilize this RPM, even though it is relocatable. You will need to
+#   not be able to reutilize this RPM, even though it is relocatable. You will need to 
 #   regenerate the RPM.
 #
 %define _prefix         %{_WM_THIRD_PARTY_DIR}
 
-%define name		libccmio
+%define name		parmetis
 %define release		%{_WM_OPTIONS}
-%define version 	2.6.1
+%define version 	4.0.3
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
-BuildRoot:	        %{buildroot}
-Summary: 		libccmio
+BuildRoot:	    %{buildroot}
+Summary: 		parmetis
 License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    https://wci.llnl.gov/codes/visit/3rd_party
+URL:            http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
-Patch0:                 libccmio-2.6.1.patch_0
+Patch0:         ParMetis-3.1.1.patch_darwin
+Patch1:         ParMetis-3.1.1.patch
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -86,52 +87,37 @@ Patch0:                 libccmio-2.6.1.patch_0
 
 %prep
 %setup -q
-%patch0 -p1
+
+%ifos darwin
+#%patch0 -p1
+#%else
+#patch1 -p1
+%endif
 
 %build
     [ -n "$WM_CC" ]         &&  export CC="$WM_CC"
-    [ -n "$WM_FC" ]         &&  export FC="$WM_FC"
     [ -n "$WM_CXX" ]        &&  export CXX="$WM_CXX"
     [ -n "$WM_CFLAGS" ]     &&  export CFLAGS="$WM_CFLAGS"
-    [ -n "$WM_FCFLAGS" ]    &&  export FCFLAGS="$WM_FCFLAGS"
     [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
+
+    [ -n "$WM_CXX" ]        &&  export OMPI_CXX="$WM_CXX"
+
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
+    make config
+    make -j $WM_NCOMPPROCS
 
-%ifos darwin
-    # Missing configuration files for Mac OS X
-    [ ! -d config/i386-apple-darwin10 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin10
-    [ ! -d config/i386-apple-darwin11 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin11
-    [ ! -d config/i386-apple-darwin12 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin12
-    [ ! -d config/i386-apple-darwin13 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin13
-%endif
-    # Warning:
-    #  1: The name of the ADF library will be renamed to libadf_ccmio since this
-    #     is an old version of ADF, and the author modified the source code
-    #  2: The name of the CGNS library will be renamed to libcgns_ccmio as well
-    #     since this is an old version of CGNS.
-    #
-    #  This way, the libraries libadf_ccmio and libcgns_ccmio will not get in
-    #  conflict with any other packages that might depend on a newer version
-    #  of libadf or libcgns
-    #
-    unset RELEASE
-    unset DEBUG
-    unset STATIC
-    unset SHARED
-    if [ -d libadf ];    then ( cd libadf;    RELEASE=1 SHARED=1 make -f Makefile.qmake all; ) fi
-    if [ -d libccmio ];  then ( cd libccmio;  RELEASE=1 SHARED=1 make -f Makefile.qmake all; ) fi
-
-    # We don't need libcgns_ccmio. We keep it here as a reference
-    #if [ -d libcgns ];    then cd libcgns;   RELEASE=1 SHARED=1 make -f Makefile.qmake all;  fi
 
 %install
     # Manual installation
-    mkdir -p $RPM_BUILD_ROOT/%{_installPrefix}/include/libccmio
+    mkdir -p $RPM_BUILD_ROOT/%{_installPrefix}/include
     mkdir -p $RPM_BUILD_ROOT/%{_installPrefix}/lib
-    libsdir=`find ./lib -name release-shared`
-    mv ${libsdir}/* $RPM_BUILD_ROOT/%{_installPrefix}/lib
-    cp libccmio/*.h $RPM_BUILD_ROOT/%{_installPrefix}/include/libccmio
+
+    cp metis/include/*.h $RPM_BUILD_ROOT/%{_installPrefix}/include
+    cp include/*.h $RPM_BUILD_ROOT/%{_installPrefix}/include
+
+    cp build/*/libparmetis/lib* $RPM_BUILD_ROOT/%{_installPrefix}/lib
+    cp build/*/libmetis/lib*    $RPM_BUILD_ROOT/%{_installPrefix}/lib
 
     # Creation of OpenFOAM specific .csh and .sh files"
 
@@ -146,14 +132,14 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export LIBCCMIO_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
-export LIBCCMIO_BIN_DIR=\$LIBCCMIO_DIR/bin
-export LIBCCMIO_LIB_DIR=\$LIBCCMIO_DIR/lib
-export LIBCCMIO_INCLUDE_DIR=\$LIBCCMIO_DIR/include
+export PARMETIS_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+export PARMETIS_BIN_DIR=\$PARMETIS_DIR/bin
+export PARMETIS_LIB_DIR=\$PARMETIS_DIR/lib
+export PARMETIS_INCLUDE_DIR=\$PARMETIS_DIR/include
 
-# Enable access to the package runtime applications and libraries
-[ -d \$LIBCCMIO_BIN_DIR ] && _foamAddPath \$LIBCCMIO_BIN_DIR
-[ -d \$LIBCCMIO_LIB_DIR ] && _foamAddLib  \$LIBCCMIO_LIB_DIR
+# Enable access to the runtime package applications and libraries
+[ -d \$PARMETIS_BIN_DIR ] && _foamAddPath \$PARMETIS_BIN_DIR
+[ -d \$PARMETIS_LIB_DIR ] && _foamAddLib  \$PARMETIS_LIB_DIR
 
 DOT_SH_EOF
 
@@ -163,17 +149,17 @@ DOT_SH_EOF
 cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.csh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-setenv LIBCCMIO_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
-setenv LIBCCMIO_BIN_DIR \$LIBCCMIO_DIR/bin
-setenv LIBCCMIO_LIB_DIR \$LIBCCMIO_DIR/lib
-setenv LIBCCMIO_INCLUDE_DIR \$LIBCCMIO_DIR/include
+setenv PARMETIS_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+setenv PARMETIS_BIN_DIR \$PARMETIS_DIR/bin
+setenv PARMETIS_LIB_DIR \$PARMETIS_DIR/lib
+setenv PARMETIS_INCLUDE_DIR \$PARMETIS_DIR/include
 
-if ( -e \$LIBCCMIO_BIN_DIR ) then
-    _foamAddPath \$LIBCCMIO_BIN_DIR
+if ( -e \$PARMETIS_BIN_DIR ) then
+    _foamAddPath \$PARMETIS_BIN_DIR
 endif
 
-if ( -e \$LIBCCMIO_LIB_DIR ) then
-    _foamAddLib \$LIBCCMIO_LIB_DIR
+if ( -e \$PARMETIS_LIB_DIR ) then
+    _foamAddLib \$PARMETIS_LIB_DIR
 endif
 DOT_CSH_EOF
 
@@ -188,3 +174,7 @@ rm -rf %{buildroot}
 %Files
 %defattr(-,root,root)
 %{_installPrefix}/*
+
+
+
+

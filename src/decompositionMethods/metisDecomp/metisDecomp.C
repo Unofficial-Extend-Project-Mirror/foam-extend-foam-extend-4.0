@@ -62,9 +62,6 @@ Foam::label Foam::metisDecomp::decompose
     List<int>& finalDecomp
 )
 {
-    // C style numbering
-    int numFlag = 0;
-
     // Method of decomposition
     // recursive: multi-level recursive bisection (default)
     // k-way: multi-level k-way
@@ -207,96 +204,57 @@ Foam::label Foam::metisDecomp::decompose
     int edgeCut = 0;
 
     // Vertex weight info
-    int wgtFlag = 0;
     int* vwgtPtr = NULL;
     int* adjwgtPtr = NULL;
 
     if (cellWeights.size())
     {
         vwgtPtr = cellWeights.begin();
-        wgtFlag += 2;       // Weights on vertices
     }
     if (faceWeights.size())
     {
         adjwgtPtr = faceWeights.begin();
-        wgtFlag += 1;       // Weights on edges
     }
+
+    int one = 1;
 
     if (method == "recursive")
     {
-        if (processorWeights.size())
-        {
-            METIS_WPartGraphRecursive
-            (
-                &numCells,         // num vertices in graph
-                const_cast<List<int>&>(xadj).begin(),   // indexing into adjncy
-                const_cast<List<int>&>(adjncy).begin(), // neighbour info
-                vwgtPtr,           // vertexweights
-                adjwgtPtr,         // no edgeweights
-                &wgtFlag,
-                &numFlag,
-                &nProcs,
-                processorWeights.begin(),
-                options.begin(),
-                &edgeCut,
-                finalDecomp.begin()
-            );
-        }
-        else
-        {
-            METIS_PartGraphRecursive
-            (
-                &numCells,         // num vertices in graph
-                const_cast<List<int>&>(xadj).begin(),   // indexing into adjncy
-                const_cast<List<int>&>(adjncy).begin(), // neighbour info
-                vwgtPtr,           // vertexweights
-                adjwgtPtr,         // no edgeweights
-                &wgtFlag,
-                &numFlag,
-                &nProcs,
-                options.begin(),
-                &edgeCut,
-                finalDecomp.begin()
-            );
-        }
+        METIS_PartGraphRecursive
+        (
+            &numCells,         // num vertices in graph
+            &one,
+            const_cast<List<int>&>(xadj).begin(),   // indexing into adjncy
+            const_cast<List<int>&>(adjncy).begin(), // neighbour info
+            vwgtPtr,           // vertexweights
+            NULL,
+            adjwgtPtr,         // no edgeweights
+            &nProcs,
+            processorWeights.begin(),
+            NULL,
+            options.begin(),
+            &edgeCut,
+            finalDecomp.begin()
+        );
     }
     else
     {
-        if (processorWeights.size())
-        {
-            METIS_WPartGraphKway
-            (
-                &numCells,         // num vertices in graph
-                const_cast<List<int>&>(xadj).begin(),   // indexing into adjncy
-                const_cast<List<int>&>(adjncy).begin(), // neighbour info
-                vwgtPtr,           // vertexweights
-                adjwgtPtr,         // no edgeweights
-                &wgtFlag,
-                &numFlag,
-                &nProcs,
-                processorWeights.begin(),
-                options.begin(),
-                &edgeCut,
-                finalDecomp.begin()
-            );
-        }
-        else
-        {
-            METIS_PartGraphKway
-            (
-                &numCells,         // num vertices in graph
-                const_cast<List<int>&>(xadj).begin(),   // indexing into adjncy
-                const_cast<List<int>&>(adjncy).begin(), // neighbour info
-                vwgtPtr,           // vertexweights
-                adjwgtPtr,         // no edgeweights
-                &wgtFlag,
-                &numFlag,
-                &nProcs,
-                options.begin(),
-                &edgeCut,
-                finalDecomp.begin()
-            );
-        }
+        METIS_PartGraphKway
+        (
+            &numCells,         // num vertices in graph
+            &one,
+            const_cast<List<int>&>(xadj).begin(),   // indexing into adjncy
+            const_cast<List<int>&>(adjncy).begin(), // neighbour info
+            vwgtPtr,           // vertexweights
+            NULL,
+            adjwgtPtr,         // no edgeweights
+            &nProcs,
+            processorWeights.begin(),
+            NULL,
+            options.begin(),
+            &edgeCut,
+            finalDecomp.begin()
+        );
     }
 
     return edgeCut;

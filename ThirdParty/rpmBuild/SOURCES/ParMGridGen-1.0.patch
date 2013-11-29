@@ -25,8 +25,8 @@ diff -ruN ParMGridGen-1.0_orig/Makefile.in ParMGridGen-1.0/Makefile.in
 -PARLIBS = -lparmgrid -lmgrid -lmpi -lm
 +LIBEXT = so
 +
-+LIBS = -lMGridGen -lm
-+PARLIBS = -lparmgrid -lMGridGen -lmpi -lm
++LIBS = -Xlinker --add-needed -Xlinker --no-as-needed -lMGridGen -lm
++PARLIBS = -Xlinker --add-needed -Xlinker --no-as-needed -lparmgrid -lMGridGen -lmpi -lm
  
  
  # What archiving to use

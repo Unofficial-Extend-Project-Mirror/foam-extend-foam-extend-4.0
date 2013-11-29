@@ -484,16 +484,16 @@ export MPI_BUFFER_SIZE
 
 # Load Metis library
 # ~~~~~~~~~~~~~~~~~~
-[ -z "$METIS_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS/etc/metis-5.0pre2.sh
+[ -z "$METIS_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/metis-5.1.0/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/metis-5.1.0/platforms/$WM_OPTIONS/etc/metis-5.1.0.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    METIS_DIR is initialized to: $METIS_DIR"
 
 
 # Load ParMetis library
 # ~~~~~~~~~~~~~~~~~~~~~
-[ -z "$PARMETIS_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1/platforms/$WM_OPTIONS ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1/platforms/$WM_OPTIONS/etc/ParMetis-3.1.1.sh
+[ -z "$PARMETIS_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/parmetis-4.0.3/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/parmetis-4.0.3/platforms/$WM_OPTIONS/etc/parmetis-4.0.3.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARMETIS_DIR is initialized to: $PARMETIS_DIR"
 
@@ -503,7 +503,7 @@ export MPI_BUFFER_SIZE
 [ -z "$PARMGRIDGEN_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS/etc/ParMGridGen-1.0.sh
 }
-[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARMGRIDGEN_DIR is initialized to: $PARMGRIDGEN_DIR"
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARMGR	IDGEN_DIR is initialized to: $PARMGRIDGEN_DIR"
 
 
 # Load Libccmio library
@@ -516,8 +516,8 @@ export MPI_BUFFER_SIZE
 
 # Load Scotch library
 # ~~~~~~~~~~~~~~~~~~~
-[ -z "$SCOTCH_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b/platforms/$WM_OPTIONS ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b/platforms/$WM_OPTIONS/etc/scotch-5.1.10b.sh
+[ -z "$SCOTCH_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/scotch-6.0.0/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/scotch-6.0.0/platforms/$WM_OPTIONS/etc/scotch-6.0.0.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    SCOTCH_DIR is initialized to: $SCOTCH_DIR"
 

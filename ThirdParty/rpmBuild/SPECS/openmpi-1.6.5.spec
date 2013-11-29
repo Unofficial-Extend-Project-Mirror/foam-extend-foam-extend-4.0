@@ -67,13 +67,13 @@
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
-BuildRoot:	        %{buildroot}
+BuildRoot:	    %{buildroot}
 Summary: 		openmpi
 License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://www.open-mpi.org/software/ompi/v1.6/downloads
+URL:            http://www.open-mpi.org/software/ompi/v1.6/downloads
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
