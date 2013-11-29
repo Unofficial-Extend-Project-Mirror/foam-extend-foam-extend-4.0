@@ -37,13 +37,13 @@ Description
 
 void Foam::polyMesh::updateMesh(const mapPolyMesh& mpm)
 {
-    // Update boundaryMesh (note that patches themselves are already ok)
-    boundary_.updateMesh();
-
     // Update zones
     pointZones_.updateMesh();
     faceZones_.updateMesh();
     cellZones_.updateMesh();
+
+    // Update boundaryMesh (note that patches themselves are already ok)
+    boundary_.updateMesh();
 
     // Clear out parallel data.  HJ, 27/Nov/2009
     deleteDemandDrivenData(globalMeshDataPtr_);
