@@ -161,6 +161,15 @@ void Foam::directMappedPatchBase::findSamples
     pointField& sampleLocations
 ) const
 {
+    // Check if region is available, can fail when called on mesh
+    // undergoing topological change. DC - 4 Nov 2013
+    if (!patch_.boundaryMesh().mesh().time().found(sampleRegion_))
+    {
+        // If region not present, return empty list and carry on
+        sampleLocations.setSize(0);
+        return;
+    }
+
     // Lookup the correct region
     const polyMesh& mesh = sampleMesh();
 

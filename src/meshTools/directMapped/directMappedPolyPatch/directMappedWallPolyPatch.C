@@ -26,6 +26,9 @@ License
 
 #include "directMappedWallPolyPatch.H"
 #include "addToRunTimeSelectionTable.H"
+#include "Time.H"
+#include "polyMesh.H"
+#include "polyBoundaryMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -194,7 +197,13 @@ void Foam::directMappedWallPolyPatch::initUpdateMesh()
     // Force recalculation of mapping with new point position
     // Note: this uses parallel communications.  HJ, 13/Mar/2012
     directMappedPatchBase::clearOut();
-    directMappedPatchBase::map();
+
+    // Only carry out mapping if the sampled region has been created already
+    // DC, 04/Nov/2013
+    if (boundaryMesh().mesh().time().found(sampleRegion()))
+    {
+        directMappedPatchBase::map();
+    }
 }
 
 //- Update of the patch topology
