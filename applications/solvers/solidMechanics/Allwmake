@@ -20,4 +20,5 @@ wmake elasticThermalSolidFoam
 wmake icoFsiElasticNonLinULSolidFoam
 wmake viscoElasticSolidFoam
 
-(cd utilities; wmake all)
+(cd utilities ; wmake all)
+(cd deprecatedSolvers ; ./Allwmake)
