@@ -27,7 +27,7 @@ boundaryField
     }
     right
     {
-      type            analyticalPlateHoleTraction;
+        type            analyticalPlateHoleTraction;
     }
 
     down
@@ -37,12 +37,12 @@ boundaryField
 
     up
     {
-      type            analyticalPlateHoleTraction;
+        type            analyticalPlateHoleTraction;
     }
 
     hole
     {
-      type            solidTractionFree;
+        type            solidTractionFree;
     }
     frontAndBack
     {

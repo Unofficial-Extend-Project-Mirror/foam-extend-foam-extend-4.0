@@ -27,9 +27,10 @@ boundaryField
     }
     right
     {
-      type            timeVaryingSolidTraction;
-      outOfBounds     clamp;
-      fileName        "$FOAM_CASE/constant/timeVsRightTraction";
+        type            timeVaryingSolidTraction;
+        outOfBounds     clamp;
+        nonLinear       off;
+        fileName        "$FOAM_CASE/constant/timeVsRightTraction";
     }
 
     down
@@ -38,11 +39,11 @@ boundaryField
     }
     up
     {
-      type            solidTractionFree;
+        type            solidTractionFree;
     }
     hole
     {
-      type            solidTractionFree;
+        type            solidTractionFree;
     }
     frontAndBack
     {
