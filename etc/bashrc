@@ -146,6 +146,7 @@ done
 # Compiler: set to Gcc or Icc (for Intel's icc)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 : ${WM_COMPILER:=Gcc}; export WM_COMPILER
+#: ${WM_COMPILER:=Icc}; export WM_COMPILER
 
 export WM_COMPILER_ARCH=
 export WM_COMPILER_LIB_ARCH=
