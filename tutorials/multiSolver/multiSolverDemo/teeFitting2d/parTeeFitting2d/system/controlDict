@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     multiSolverDemo
+application     multiSolverDemo;
 
 deltaT          0.01;
 
