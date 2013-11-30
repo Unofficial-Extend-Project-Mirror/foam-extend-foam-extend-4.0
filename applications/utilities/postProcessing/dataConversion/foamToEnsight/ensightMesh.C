@@ -396,11 +396,6 @@ void Foam::ensightMesh::writePrimsBinary
 {
     label po = pointOffset + 1;
 
-    // Create a temp int array
-    int numElem;
-
-    numElem = cellShapes.size();
-
     if (cellShapes.size())
     {
         // All the cellShapes have the same number of elements!

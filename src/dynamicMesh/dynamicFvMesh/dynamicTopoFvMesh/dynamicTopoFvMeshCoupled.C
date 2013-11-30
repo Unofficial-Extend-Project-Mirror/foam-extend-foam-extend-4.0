@@ -5433,6 +5433,10 @@ void dynamicTopoFvMesh::buildProcessorPatchMesh
     // Check if this is a direct neighbour
     const polyBoundaryMesh& boundary = boundaryMesh();
 
+/*
+    // unused code section - to be removed
+    // HR: 30/11/2013
+
     label patchIndex = -1;
 
     forAll(boundary, patchI)
@@ -5447,11 +5451,11 @@ void dynamicTopoFvMesh::buildProcessorPatchMesh
             if (pp.neighbProcNo() == proc)
             {
                 patchIndex = patchI;
-
                 break;
             }
         }
     }
+*/
 
     // Add sub-mesh points first.
     // Additional halo points will be added later.

@@ -199,9 +199,6 @@ Foam::labelList Foam::blockMesh::createMergeList()
                 << exit(FatalError);
         }
 
-
-        bool found = false;
-
         // N-squared point search over all points of all faces of
         // master block over all point of all faces of slave block
         forAll(blockPfaceFaces, blockPfaceFaceLabel)
@@ -215,7 +212,7 @@ Foam::labelList Foam::blockMesh::createMergeList()
 
             forAll(blockPfaceFacePoints, blockPfaceFacePointLabel)
             {
-                found = false;
+                bool found = false;
 
                 forAll(blockNfaceFaces, blockNfaceFaceLabel)
                 {
@@ -307,7 +304,6 @@ Foam::labelList Foam::blockMesh::createMergeList()
 
             const labelListList& curPairs = glueMergePairs[blockFaceLabel];
 
-            bool foundFace = false;
             label blockPfaceLabel;
             for
             (
@@ -322,12 +318,10 @@ Foam::labelList Foam::blockMesh::createMergeList()
                  == blockInternalFaces[blockFaceLabel]
                 )
                 {
-                    foundFace = true;
                     break;
                 }
             }
 
-            foundFace = false;
             label blockNfaceLabel;
             for
             (
@@ -342,7 +336,6 @@ Foam::labelList Foam::blockMesh::createMergeList()
                  == blockInternalFaces[blockFaceLabel]
                 )
                 {
-                    foundFace = true;
                     break;
                 }
             }

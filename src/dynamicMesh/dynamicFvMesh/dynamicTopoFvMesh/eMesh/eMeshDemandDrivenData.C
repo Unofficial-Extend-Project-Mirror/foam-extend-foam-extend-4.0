@@ -233,8 +233,7 @@ void eMesh::calcEdgePoints() const
                 // Counter-clockwise. Pick the owner.
                 cellIndex = owner[faceIndex];
             }
-            else
-            if (mesh_.isInternalFace(faceIndex))
+            else if (mesh_.isInternalFace(faceIndex))
             {
                 // Clockwise. Pick the neighbour.
                 cellIndex = neighbour[faceIndex];
@@ -260,7 +259,8 @@ void eMesh::calcEdgePoints() const
                 )
                 {
                     faceIndex = cellToCheck[0];
-                    found = true; break;
+                    found = true;
+                    break;
                 }
 
                 if
@@ -270,7 +270,8 @@ void eMesh::calcEdgePoints() const
                 )
                 {
                     faceIndex = cellToCheck[1];
-                    found = true; break;
+                    found = true;
+                    break;
                 }
 
                 if
@@ -280,7 +281,8 @@ void eMesh::calcEdgePoints() const
                 )
                 {
                     faceIndex = cellToCheck[2];
-                    found = true; break;
+                    found = true;
+                    break;
                 }
 
                 if
@@ -290,7 +292,8 @@ void eMesh::calcEdgePoints() const
                 )
                 {
                     faceIndex = cellToCheck[3];
-                    found = true; break;
+                    found = true;
+                    break;
                 }
             }
 
@@ -308,6 +311,9 @@ void eMesh::calcEdgePoints() const
                 << "edgeFaces: " << eFace
                 << abort(FatalError);
             }
+#           else
+            // dummy statement to quech compiler warning
+            found = found;
 #           endif
         }
     }

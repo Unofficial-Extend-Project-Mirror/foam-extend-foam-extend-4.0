@@ -188,10 +188,6 @@ endOfSection               {space}")"{space}
     // Data index
     label curNEntriesPerObject = 0;
 
-    // Dummy, not used
-    label nTimeLevels;
-    label nPhases;
-
     label curFirstID = 0;
     label curLastID = 0;
     label objI = 0;
@@ -320,8 +316,10 @@ endOfSection               {space}")"{space}
         nEntriesPerObject.append(curNEntriesPerObject);
 
         // Dummy, not used
-        nTimeLevels = readLabel(fieldDataStream);
-        nPhases = readLabel(fieldDataStream);
+        //nTimeLevels =
+        readLabel(fieldDataStream);
+        //nPhases =
+        readLabel(fieldDataStream);
 
         // Start and end of list
         curFirstID = readLabel(fieldDataStream);
