@@ -30,6 +30,7 @@ boundaryField
     right
     {
       type             timeVaryingSolidTraction;
+      nonLinear        off;
       outOfBounds      clamp;
       fileName         "$FOAM_CASE/constant/timeVsRightTraction";
     }
