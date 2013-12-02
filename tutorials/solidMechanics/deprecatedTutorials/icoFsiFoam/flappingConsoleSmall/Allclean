@@ -13,5 +13,9 @@ do
 done
 
 cd fluid
-rm -f constant/solid system/solid 0/solid
+\rm -f constant/solid system/solid 0/solid
+cd ..
+
+cd solid
+\rm -f 0/0 constant/constant
 cd ..
