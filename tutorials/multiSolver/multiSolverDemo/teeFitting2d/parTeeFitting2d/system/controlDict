@@ -15,15 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-writeFormat     ascii;
-
-writePrecision  6;
-
-writeCompression uncompressed;
-
-runTimeModifiable yes;
-
-application     icoFoam;
+application     multiSolverDemo;
 
 deltaT          0.01;
 
@@ -33,9 +25,9 @@ writeInterval   1;
 
 startFrom       startTime;
 
-startTime       0.1;
+startTime       0;
 
-stopAt          endTime;
+stopAt          noWriteNow;
 
 endTime         0.1;
 

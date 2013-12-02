@@ -87,7 +87,6 @@ void starMesh::readPoints(const scalar scaleFactor)
         if (pointsFile.good())
         {
             label pointLabel;
-            scalar x, y, z;
 
             maxLabel = -1;
             while (pointsFile)
@@ -98,9 +97,9 @@ void starMesh::readPoints(const scalar scaleFactor)
 
                 maxLabel = max(maxLabel, pointLabel);
 
-                x = readVtxCmpt(pointsFile);
-                y = readVtxCmpt(pointsFile);
-                z = readVtxCmpt(pointsFile);
+                readVtxCmpt(pointsFile);
+                readVtxCmpt(pointsFile);
+                readVtxCmpt(pointsFile);
 
                 readToNl(pointsFile);
 

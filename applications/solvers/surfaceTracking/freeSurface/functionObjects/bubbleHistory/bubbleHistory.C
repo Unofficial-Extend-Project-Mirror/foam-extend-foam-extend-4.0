@@ -212,17 +212,14 @@ bool Foam::bubbleHistory::start()
     vector F = fs.totalViscousForce() + fs.totalPressureForce();
 
     vector dragDir;
-    scalar Uref;
 
     if(mag(U.value()) > SMALL)
     {
         dragDir = -U.value()/mag(U.value());
-        Uref = mag(U.value());
     }
     else
     {
         dragDir = fs.g().value()/(mag(fs.g().value()) + SMALL);
-        Uref = SMALL;
     }
 
     scalar dragForce = (dragDir&F);
@@ -331,17 +328,14 @@ bool Foam::bubbleHistory::execute()
     vector F = fs.totalViscousForce() + fs.totalPressureForce();
 
     vector dragDir;
-    scalar Uref;
 
     if(mag(U.value()) > SMALL)
     {
         dragDir = -U.value()/mag(U.value());
-        Uref = mag(U.value());
     }
     else
     {
         dragDir = fs.g().value()/(mag(fs.g().value()) + SMALL);
-        Uref = SMALL;
     }
 
     scalar dragForce = (dragDir&F);

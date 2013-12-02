@@ -78,8 +78,8 @@ int main(int argc, char *argv[])
         scalar initialResidual = 1.0;
         scalar residual = 1.0;
         surfaceSymmTensorField DSigmaCorrf = fvc::interpolate(DSigmaCorr);
-    label nCrackedFaces = 0;
 
+    //label nCrackedFaces = 0;
     // cracking loop if you use cohesive boundaries
     //do
     //{

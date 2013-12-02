@@ -136,7 +136,7 @@ bool merge
     const bool literalRE
 )
 {
-    auto bool wildCardInMergeDict = false;
+    bool wildCardInMergeDict = false;
 
     bool changed = false;
 

@@ -76,9 +76,6 @@ int main(int argc, char *argv[])
     // Read required accuracy
     scalar eps = readScalar(PODsolverDict.lookup("eps"));
 
-    // Interpolation coefficients
-    scalarField& PODcoeffs = equation->coeffs();
-
     Info<< "\nStarting time loop\n" << endl;
 
     for (runTime++; !runTime.end(); runTime++)

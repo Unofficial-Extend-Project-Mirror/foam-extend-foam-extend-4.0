@@ -70,7 +70,8 @@ Foam::label Foam::metisDecomp::decompose
     int numCells = xadj.size()-1;
 
     // decomposition options. 0 = use defaults
-    List<int> options(5, 0);
+    idx_t options[METIS_NOPTIONS];
+    METIS_SetDefaultOptions(options);
 
     // processor weights initialised with no size, only used if specified in
     // a file
@@ -139,18 +140,24 @@ Foam::label Foam::metisDecomp::decompose
                 << nl << endl;
         }
 
-        if (metisCoeffs.readIfPresent("options", options))
+        List<int> mOptions;
+        if (metisCoeffs.readIfPresent("options", mOptions))
         {
-            if (options.size() != 5)
+            if (mOptions.size() != METIS_NOPTIONS)
             {
                 FatalErrorIn("metisDecomp::decompose()")
                     << "Number of options in metisCoeffs in dictionary : "
                     << decompositionDict_.name()
-                    << " should be 5"
+                    << " should be " << METIS_NOPTIONS
                     << exit(FatalError);
             }
 
-            Info<< "metisDecomp : Using Metis options     " << options
+            forAll(mOptions, i)
+            {
+                options[i] = mOptions[i];
+            }
+
+            Info<< "metisDecomp : Using Metis options     " << mOptions
                 << nl << endl;
         }
 
@@ -232,7 +239,7 @@ Foam::label Foam::metisDecomp::decompose
             &nProcs,
             processorWeights.begin(),
             NULL,
-            options.begin(),
+            options,
             &edgeCut,
             finalDecomp.begin()
         );
@@ -251,7 +258,7 @@ Foam::label Foam::metisDecomp::decompose
             &nProcs,
             processorWeights.begin(),
             NULL,
-            options.begin(),
+            options,
             &edgeCut,
             finalDecomp.begin()
         );

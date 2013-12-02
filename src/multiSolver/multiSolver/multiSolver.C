@@ -190,7 +190,7 @@ void Foam::multiSolver::synchronizeParallel() const
         // Recieve go signal
         {
             IPstream fromMaster(Pstream::blocking, Pstream::masterNo());
-            bool okayToGo(readBool(fromMaster));
+            readBool(fromMaster);
         }
     }
 }
