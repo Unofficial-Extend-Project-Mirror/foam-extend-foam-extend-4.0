@@ -105,7 +105,7 @@ wedgeFaPatchField<Type>::wedgeFaPatchField
             << exit(FatalIOError);
     }
 
-    evaluate();
+    this->evaluate();
 }
 
 
@@ -127,6 +127,7 @@ template<class Type>
 tmp<Field<Type> > wedgeFaPatchField<Type>::snGrad() const
 {
     Field<Type> pif = this->patchInternalField();
+
     return
     (
         transform(refCast<const wedgeFaPatch>(this->patch()).faceT(), pif)

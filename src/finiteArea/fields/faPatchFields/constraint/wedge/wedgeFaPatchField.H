@@ -125,7 +125,7 @@ public:
             //- Evaluate the patch field
             virtual void evaluate
             (
-                const Pstream::commsTypes commsType=Pstream::blocking
+                const Pstream::commsTypes commsType = Pstream::blocking
             );
 
 
@@ -137,7 +137,7 @@ public:
 // * * * * * * * * * * * Template Specialisations  * * * * * * * * * * * * * //
 
 template<>
-tmp<scalarField > wedgeFaPatchField<scalar>::snGrad() const;
+tmp<scalarField> wedgeFaPatchField<scalar>::snGrad() const;
 
 template<>
 void wedgeFaPatchField<scalar>::evaluate
