@@ -32,7 +32,6 @@ boundaryField
         nonLinear       off;
         fileName        "$FOAM_CASE/constant/timeVsRightTraction";
     }
-
     down
     {
         type            symmetryPlane;

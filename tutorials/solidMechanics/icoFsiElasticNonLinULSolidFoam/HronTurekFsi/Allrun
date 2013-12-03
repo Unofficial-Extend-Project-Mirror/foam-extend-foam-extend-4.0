@@ -5,19 +5,20 @@
 # Get application name from directory
 application="icoFsiElasticNonLinULSolidFoam"
 
-cd fluid;
+cd fluid
 runApplication fluent3DMeshToFoam fluid.msh
 runApplication changeDictionary
 runApplication setSet -batch batch.setSet
 runApplication setsToZones -noFlipMap
+cd ..
 
-cd ../solid;
+cd solid
 runApplication fluent3DMeshToFoam solid.msh
 runApplication changeDictionary
 runApplication setSet -batch batch.setSet
 runApplication setsToZones -noFlipMap
-
 cd ..
+
 ./makeSerialLinks fluid solid
 
-(cd fluid; runApplication $application)
+(cd fluid ; runApplication $application)
