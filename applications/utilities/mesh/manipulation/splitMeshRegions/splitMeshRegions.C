@@ -1093,6 +1093,7 @@ void createAndWriteRegion
     );
 
     // Moved map writing into createRegionMesh.  HJ, 20/May/2011
+    newMesh.objectRegistry::write();
 }
 
 
