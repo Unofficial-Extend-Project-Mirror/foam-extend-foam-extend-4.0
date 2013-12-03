@@ -77,7 +77,8 @@ smoluchowskiJumpTFvPatchScalarField::smoluchowskiJumpTFvPatchScalarField
 :
     mixedFvPatchScalarField(p, iF),
     accommodationCoeff_(readScalar(dict.lookup("accommodationCoeff"))),
-    Twall_("Twall", dict, p.size())
+    Twall_("Twall", dict, p.size()),
+    gamma_(readScalar(dict.lookup("gamma")))
 {
     if
     (

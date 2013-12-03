@@ -150,7 +150,11 @@ chtRcThermalDiffusivityFvPatchScalarField::calcThermalDiffusivity
     }
 
     {
-        Field<VectorN<scalar, 4> > lData(neighbour.size());
+        Field<VectorN<scalar, 4> > lData
+        (
+            neighbour.size(),
+            pTraits<VectorN<scalar, 4> >::zero
+        );
 
         const scalarField& lfNei = neighbour.originalPatchField();
         scalarField lTcNei = TwOwn.shadowPatchField().patchInternalField();
@@ -266,7 +270,11 @@ chtRcThermalDiffusivityFvPatchScalarField::calcTemperature
     }
 
     {
-        Field<VectorN<scalar, 4> > lData(neighbour.size());
+        Field<VectorN<scalar, 4> > lData
+        (
+            neighbour.size(),
+            pTraits<VectorN<scalar, 4> >::zero
+        );
 
         const scalarField& lfNei =
             ownerK.shadowPatchField().originalPatchField();

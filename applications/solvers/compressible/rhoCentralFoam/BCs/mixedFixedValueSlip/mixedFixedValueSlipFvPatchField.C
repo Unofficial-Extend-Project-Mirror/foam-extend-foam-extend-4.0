@@ -42,7 +42,7 @@ mixedFixedValueSlipFvPatchField<Type>::mixedFixedValueSlipFvPatchField
 )
 :
     transformFvPatchField<Type>(p, iF),
-    refValue_(p.size()),
+    refValue_(p.size(), pTraits<Type>::zero),
     valueFraction_(p.size(), 1.0)
 {}
 
