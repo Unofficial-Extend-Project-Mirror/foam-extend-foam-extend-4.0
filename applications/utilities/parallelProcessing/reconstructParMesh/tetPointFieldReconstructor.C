@@ -56,7 +56,6 @@ labelList tetPointFieldReconstructor::procAddressing
         nAddr++;
     }
 
-#   ifdef FACE_DECOMP
     // Insert face addressing.  Only for face decomposition
     const labelList& faceAddr = faceProcAddressing_[procNo];
 
@@ -69,7 +68,6 @@ labelList tetPointFieldReconstructor::procAddressing
         addr[nAddr] = faceOffset + mag(faceAddr[faceI]) - 1;
         nAddr++;
     }
-#   endif
 
     // Insert cell addressing
     const label cellOffset = mesh_.cellOffset();

@@ -64,7 +64,6 @@ void tetPointFieldDecomposer::calcAddressing() const
         nAddr++;
     }
 
-#   ifdef FACE_DECOMP
     // Insert face addressing.  Only for face decomposition
     const label faceOffset = originalMesh_.faceOffset();
 
@@ -75,7 +74,6 @@ void tetPointFieldDecomposer::calcAddressing() const
         addr[nAddr] = faceOffset + mag(faceAddressing_[faceI]) - 1;
         nAddr++;
     }
-#   endif
 
     // Insert cell addressing
     const label cellOffset = originalMesh_.cellOffset();

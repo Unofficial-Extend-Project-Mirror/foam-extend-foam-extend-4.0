@@ -82,7 +82,10 @@ public:
             // Private Member Functions
 
                 //- Disallow default bitwise copy construct
-                tetPolyPatchFieldDecomposer(const tetPolyPatchFieldDecomposer&);
+                tetPolyPatchFieldDecomposer
+                (
+                    const tetPolyPatchFieldDecomposer&
+                );
 
                 //- Disallow default bitwise assignment
                 void operator=(const tetPolyPatchFieldDecomposer&);
