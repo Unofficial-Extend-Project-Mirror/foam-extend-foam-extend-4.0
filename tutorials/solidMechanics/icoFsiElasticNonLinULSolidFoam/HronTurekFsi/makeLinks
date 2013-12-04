@@ -1,39 +1,29 @@
-#!/bin/tcsh
+#!/bin/bash
 
 # Check for proper number of command line args.
-if ($#argv != 2) then
+if [ "$#" -ne 2 ]; then
   echo "Usage: makeLinks fluidCase solidCase"
-  goto done
-endif
-
+  exit 1 
+fi
 
 echo changing into fluid directory
-cd $1
+cd $1/constant
 
-cd constant
 echo creating links
-
 ln -s ../../$2/constant solid
-
 cd ../system
-
 ln -s ../../$2/system solid
-
 cd ../0
-
 ln -s ../../$2/0 solid
-
 cd ..
 
 echo creating processor links
-foreach proc(processor*)
-cd $proc
-cd 0
-ln -s ../../../$2/$proc/0 solid
-cd ../constant
-ln -s ../../../$2/$proc/constant solid
-cd ../..
-end
-
-done:
-     exit 0
+for proc in processor*
+do
+  cd $proc
+  cd 0
+  ln -s ../../../$2/$proc/0 solid
+  cd ../constant
+  ln -s ../../../$2/$proc/constant solid
+  cd ../..
+done

@@ -287,16 +287,12 @@ vtkUnstructuredGrid* Foam::vtkPV3Foam::volumeVTKMesh
 
                 for (label quadi=0; quadi<nQuads; quadi++)
                 {
-                    label thisCellI = -1;
-
                     if (substituteCell)
                     {
-                        thisCellI = cellI;
                         substituteCell = false;
                     }
                     else
                     {
-                        thisCellI = mesh.nCells() + addCellI;
                         superCells[addCellI++] = cellI;
                     }
 
@@ -317,16 +313,12 @@ vtkUnstructuredGrid* Foam::vtkPV3Foam::volumeVTKMesh
 
                 if (nTris)
                 {
-                    label thisCellI = -1;
-
                     if (substituteCell)
                     {
-                        thisCellI = cellI;
                         substituteCell = false;
                     }
                     else
                     {
-                        thisCellI = mesh.nCells() + addCellI;
                         superCells[addCellI++] = cellI;
                     }
 

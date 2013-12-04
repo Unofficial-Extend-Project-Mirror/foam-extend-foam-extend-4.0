@@ -205,7 +205,7 @@ void Foam::FreeStream<CloudType>::inflow()
             // geometrical properties multiple times.
 
             labelList faceVertices = patch[f];
-
+            
             label nVertices = faceVertices.size();
 
             label globalFaceIndex = f + patch.start();
@@ -219,6 +219,8 @@ void Foam::FreeStream<CloudType>::inflow()
             // Cumulative triangle area fractions
             List<scalar> cTriAFracs(nVertices);
 
+            scalar previousCummulativeSum = 0.0;
+
             for (label v = 0; v < nVertices - 1; v++)
             {
                 const point& vA = mesh.points()[faceVertices[v]];
@@ -227,7 +229,9 @@ void Foam::FreeStream<CloudType>::inflow()
 
                 cTriAFracs[v] =
                     0.5*mag((vA - fC)^(vB - fC))/fA
-                  + cTriAFracs[max((v - 1), 0)];
+                  + previousCummulativeSum;
+
+                previousCummulativeSum = cTriAFracs[v];
             }
 
             // Force the last area fraction value to 1.0 to avoid any
