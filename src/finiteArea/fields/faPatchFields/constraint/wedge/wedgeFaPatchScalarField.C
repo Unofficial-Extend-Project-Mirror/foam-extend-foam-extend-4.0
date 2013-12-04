@@ -53,7 +53,7 @@ void wedgeFaPatchField<scalar>::evaluate(const Pstream::commsTypes)
         updateCoeffs();
     }
 
-    operator==(patchInternalField());
+    this->operator==(patchInternalField());
 }
 
 

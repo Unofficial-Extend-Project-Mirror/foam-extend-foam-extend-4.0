@@ -48,7 +48,7 @@ void engineTimeVaryingUniformFixedValueFvPatchField<scalar>::updateCoeffs()
 
     checkTable();
 
-    operator==
+    this->operator==
     (
         interpolateXY
         (
@@ -73,7 +73,7 @@ void engineTimeVaryingUniformFixedValueFvPatchField<vector>::updateCoeffs()
 
     checkTable();
 
-    operator==
+    this->operator==
     (
        -interpolateXY
         (
@@ -98,7 +98,7 @@ void engineTimeVaryingUniformFixedValueFvPatchField<sphericalTensor>::updateCoef
 
     checkTable();
 
-    operator==
+    this->operator==
     (
         interpolateXY
         (
@@ -123,7 +123,7 @@ void engineTimeVaryingUniformFixedValueFvPatchField<symmTensor>::updateCoeffs()
 
     checkTable();
 
-    operator==
+    this->operator==
     (
         interpolateXY
         (
@@ -164,7 +164,7 @@ void engineTimeVaryingUniformFixedValueFvPatchField<tensor>::updateCoeffs()
 
     checkTable();
 
-    operator==
+    this->operator==
     (
         interpolateXY
         (

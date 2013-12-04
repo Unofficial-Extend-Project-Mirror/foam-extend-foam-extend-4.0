@@ -54,7 +54,7 @@ void wedgeFvPatchField<Type>::evaluate(                                       \
         updateCoeffs();                                                       \
     }                                                                         \
                                                                               \
-    operator==(patchInternalField());                                         \
+    this->operator==(patchInternalField());                                   \
 }                                                                             \
                                                                               \
 template<>                                                                    \
