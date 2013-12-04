@@ -178,6 +178,7 @@ Foam::label Foam::hexRef8::addFace
             )
         );
     }
+
     return newFaceI;
 }
 
@@ -228,6 +229,9 @@ Foam::label Foam::hexRef8::addInternalFace
 
         // For now create out of nothing
 
+        // Map from zero face to achieve some initialisation and
+        // avoid uninitialised memory in mapping
+        // HJ, 4/Dec/2013
         return meshMod.setAction
         (
             polyAddFace
@@ -237,7 +241,7 @@ Foam::label Foam::hexRef8::addInternalFace
                 nei,                        // neighbour
                 -1,                         // master point
                 -1,                         // master edge
-                -1,                         // master face for addition
+                0,                          // master face for addition
                 false,                      // flux flip
                 -1,                         // patch for face
                 -1,                         // zone for face
@@ -355,10 +359,9 @@ Foam::scalar Foam::hexRef8::getLevel0EdgeLength() const
 
     const scalar GREAT2 = sqr(GREAT);
 
-    label nLevels = gMax(cellLevel_)+1;
+    label nLevels = gMax(cellLevel_) + 1;
 
     scalarField typEdgeLenSqr(nLevels, GREAT2);
-
 
     // 1. Look only at edges surrounded by cellLevel cells only.
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1743,7 +1746,7 @@ Foam::hexRef8::hexRef8(const polyMesh& mesh)
         )   << "Restarted from inconsistent cellLevel or pointLevel files."
             << endl
             << "Number of cells in mesh:" << mesh_.nCells()
-            << " does not equal size of cellLevel:" << cellLevel_.size() << endl
+            << " does not equal size of cellLevel:" << cellLevel_.size() << nl
             << "Number of points in mesh:" << mesh_.nPoints()
             << " does not equal size of pointLevel:" << pointLevel_.size()
             << abort(FatalError);

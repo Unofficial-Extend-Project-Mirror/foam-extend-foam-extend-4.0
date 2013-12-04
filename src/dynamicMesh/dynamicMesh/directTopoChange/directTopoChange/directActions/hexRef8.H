@@ -170,10 +170,13 @@ class hexRef8
 
         //- Get index of minimum pointlevel.
         label findMinLevel(const labelList& f) const;
+
         //- Get maximum pointlevel.
         label findMaxLevel(const labelList& f) const;
+
         //- Count number of vertices <= anchorLevel
         label countAnchors(const labelList&, const label) const;
+
         //- Find index of point with wantedLevel, starting from fp.
         label findLevel
         (
