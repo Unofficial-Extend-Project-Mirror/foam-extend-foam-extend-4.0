@@ -132,7 +132,8 @@ public:
                 return parent_;
             }
 
-            //- Local directory path of this objectRegistry relative to the time
+            //- Local directory path of this objectRegistry
+            //  relative to the time
             virtual const fileName& dbDir() const
             {
                 return dbDir_;
@@ -144,7 +145,7 @@ public:
             }
 
             //- Return mangled fileName
-            virtual fileName mangleFileName (const fileName&) const;
+            virtual fileName mangleFileName(const fileName&) const;
 
             //- Return the list of names of the IOobjects
             wordList names() const;

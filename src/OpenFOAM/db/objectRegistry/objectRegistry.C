@@ -157,7 +157,10 @@ Foam::wordList Foam::objectRegistry::names(const word& ClassName) const
 }
 
 
-Foam::fileName Foam::objectRegistry::mangleFileName(const fileName& fName) const
+Foam::fileName Foam::objectRegistry::mangleFileName
+(
+    const fileName& fName
+) const
 {
     return fName;
 }
