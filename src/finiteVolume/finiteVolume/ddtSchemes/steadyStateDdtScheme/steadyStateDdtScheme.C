@@ -267,58 +267,57 @@ steadyStateDdtScheme<Type>::fvcDdtPhiCorr
         U.dimensions() == dimVelocity
      && phi.dimensions() == dimVelocity*dimArea
     )
-	{
-		return tmp<fluxFieldType>
-		(
-		    new fluxFieldType
-		    (
-		        IOobject
-		        (
-		            "ddtPhiCorr("
-		          + rA.name() + ',' + rho.name()
-		          + ',' + U.name() + ',' + phi.name() + ')',
-		            mesh().time().timeName(),
-		            mesh()
-		        ),
-		        mesh(),
-		        dimensioned<typename flux<Type>::type>
-		        (
-		            "0",
-		            rA.dimensions()*rho.dimensions()*phi.dimensions()/dimTime,
-		            pTraits<typename flux<Type>::type>::zero
-		        )
-		    )
-		);
-	}
+    {
+        return tmp<fluxFieldType>
+        (
+            new fluxFieldType
+            (
+                IOobject
+                (
+                    "ddtPhiCorr("
+                  + rA.name() + ',' + rho.name()
+                  + ',' + U.name() + ',' + phi.name() + ')',
+                    mesh().time().timeName(),
+                    mesh()
+                ),
+                mesh(),
+                dimensioned<typename flux<Type>::type>
+                (
+                    "zero",
+                    rA.dimensions()*rho.dimensions()*phi.dimensions()/dimTime,
+                    pTraits<typename flux<Type>::type>::zero
+                )
+            )
+        );
+    }
     else if
     (
         U.dimensions() == dimVelocity
      && phi.dimensions() == rho.dimensions()*dimVelocity*dimArea
     )
-	{
-		return tmp<fluxFieldType>
-		(
-		    new fluxFieldType
-		    (
-		        IOobject
-		        (
-		            "ddtPhiCorr("
-		          + rA.name() + ',' + rho.name()
-		          + ',' + U.name() + ',' + phi.name() + ')',
-		            mesh().time().timeName(),
-		            mesh()
-		        ),
-		        mesh(),
-		        dimensioned<typename flux<Type>::type>
-		        (
-		            "0",
-		            rA.dimensions()*phi.dimensions()/dimTime,
-		            pTraits<typename flux<Type>::type>::zero
-		        )
-		    )
-		);
-	}
-
+    {
+        return tmp<fluxFieldType>
+        (
+            new fluxFieldType
+            (
+                IOobject
+                (
+                    "ddtPhiCorr("
+                  + rA.name() + ',' + rho.name()
+                  + ',' + U.name() + ',' + phi.name() + ')',
+                    mesh().time().timeName(),
+                    mesh()
+                ),
+                mesh(),
+                dimensioned<typename flux<Type>::type>
+                (
+                    "zero",
+                    rA.dimensions()*phi.dimensions()/dimTime,
+                    pTraits<typename flux<Type>::type>::zero
+                )
+            )
+        );
+    }
 }
 
 
