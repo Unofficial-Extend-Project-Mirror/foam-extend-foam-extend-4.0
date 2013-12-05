@@ -488,7 +488,12 @@ EulerDdtScheme<Type>::fvcDdtPhiCorr
             (
                 ddtIOobject,
                 rDeltaT
-               *this->fvcDdtPhiCoeff(rho.oldTime(), U.oldTime(), phiAbs.oldTime())
+               *this->fvcDdtPhiCoeff
+                (
+                    rho.oldTime(),
+                    U.oldTime(),
+                    phiAbs.oldTime()
+                )
                *(
                    fvc::interpolate(rA)*phiAbs.oldTime()
                  - (fvc::interpolate(rA*U.oldTime()) & mesh().Sf())

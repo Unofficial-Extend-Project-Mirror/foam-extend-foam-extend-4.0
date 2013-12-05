@@ -318,6 +318,16 @@ steadyStateDdtScheme<Type>::fvcDdtPhiCorr
             )
         );
     }
+    else
+    {
+        FatalErrorIn
+        (
+            "steadyStateDdtScheme<Type>::fvcDdtPhiCorr"
+        )   << "dimensions of phi are not correct"
+            << abort(FatalError);
+
+        return fluxFieldType::null();
+    }
 }
 
 
