@@ -1002,7 +1002,12 @@ void Foam::regionCouplePolyPatch::initMovePoints(const pointField& p)
     // Update interpolation for new relative position of GGI interfaces
     if (patchToPatchPtr_)
     {
-        patchToPatchPtr_->movePoints();
+        patchToPatchPtr_->movePoints
+        (
+            forwardT(),
+            reverseT(),
+            shadow().separation()
+        );
     }
 
     // Recalculate send and receive maps

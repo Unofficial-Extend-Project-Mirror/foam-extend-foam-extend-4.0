@@ -414,7 +414,7 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
                         *masterFaceZonePatchPtr_, // to zone
                         alg_,
                         dir_
-                        );
+                    );
             }
             else if (interpolationMethod_ == "ggi")
             {
@@ -440,7 +440,7 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
                         0.0,
                         true,
                         ggiInterpolation::AABB
-                        );
+                    );
             }
             else
             {
@@ -707,7 +707,12 @@ void solidContactFvPatchVectorField::updateCoeffs()
                 {
                     if (slaveToMasterGgiInterpolatorPtr_)
                     {
-                        slaveToMasterGgiInterpolatorPtr_->movePoints();
+                        slaveToMasterGgiInterpolatorPtr_->movePoints
+                        (
+                            tensorField(0),
+                            tensorField(0),
+                            vectorField(0)
+                        );
                     }
                     else if (slaveToMasterPatchToPatchInterpolatorPtr_)
                     {
@@ -898,14 +903,14 @@ tmp<vectorField> solidContactFvPatchVectorField::interpolateSlaveToMaster
       (
           masterFaceZonePatchPtr_->size(),
           vector::zero
-          );
+      );
   if (slaveToMasterPatchToPatchInterpolatorPtr_)
   {
       globalMasterInterpField =
           slaveToMasterPatchToPatchInterpolatorPtr_->faceInterpolate<vector>
           (
               globalSlaveField
-              );
+          );
   }
   else if (slaveToMasterGgiInterpolatorPtr_)
   {
@@ -913,7 +918,7 @@ tmp<vectorField> solidContactFvPatchVectorField::interpolateSlaveToMaster
           slaveToMasterGgiInterpolatorPtr_->slaveToMaster
           (
               globalSlaveField
-              );
+          );
   }
   else
   {
@@ -1113,7 +1118,7 @@ void solidContactFvPatchVectorField::moveFaceZonePatches()
               *masterFaceZonePatchPtr_, // to zone
               alg_,
               dir_
-              );
+          );
   }
   else if (slaveToMasterGgiInterpolatorPtr_)
   {
@@ -1133,7 +1138,7 @@ void solidContactFvPatchVectorField::moveFaceZonePatches()
               0.0,
               true,
               ggiInterpolation::AABB
-              );
+          );
   }
 
   // and primitive patch interpolators
