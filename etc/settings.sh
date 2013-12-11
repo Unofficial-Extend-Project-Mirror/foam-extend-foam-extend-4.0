@@ -503,7 +503,7 @@ export MPI_BUFFER_SIZE
 [ -z "$PARMGRIDGEN_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS/etc/ParMGridGen-1.0.sh
 }
-[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARMGR	IDGEN_DIR is initialized to: $PARMGRIDGEN_DIR"
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARMGRIDGEN_DIR is initialized to: $PARMGRIDGEN_DIR"
 
 
 # Load Libccmio library
@@ -590,8 +590,10 @@ export MPI_BUFFER_SIZE
 
 # Load ParaView
 # ~~~~~~~~~~~~~
-[ -z "$PARAVIEW_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.14.1/platforms/$WM_OPTIONS ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.14.1/platforms/$WM_OPTIONS/etc/ParaView-3.14.1.sh
+[ -z "$PARAVIEW_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-4.0.1/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-4.0.1/platforms/$WM_OPTIONS/etc/ParaView-4.0.1.sh
+#[ -z "$PARAVIEW_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.14.1/platforms/$WM_OPTIONS ] && {
+#    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.14.1/platforms/$WM_OPTIONS/etc/ParaView-3.14.1.sh
 #[ -z "$PARAVIEW_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS ] && {
 #    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.sh
 }

@@ -485,6 +485,9 @@ endif
 
 # PARAVIEW
 # ~~~~~
+if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-4.0.1/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-4.0.1/platforms/$WM_OPTIONS/etc/ParaView-4.0.1.csh
+
 if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.14.1/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.14.1/platforms/$WM_OPTIONS/etc/ParaView-3.14.1.csh
 
