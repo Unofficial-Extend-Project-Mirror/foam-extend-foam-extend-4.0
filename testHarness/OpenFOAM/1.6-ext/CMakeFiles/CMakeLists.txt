@@ -97,10 +97,10 @@ SET(BUILDNAME "${BUILDNAME}-$ENV{WM_CC}${COMPILER_VERSION}")
 #    DART_TESTING_TIMEOUT 14400
 #    CACHE STRING "Maximum time allowed (4 hours) before CTest will kill the test."
 #)
-# Timeout for running all this: 10 minutes : 600 seconds
+# Timeout for running all this: 20 minutes : 1200 seconds (for debug)
 SET(
-    DART_TESTING_TIMEOUT 600
-    CACHE STRING "Maximum time allowed (10 minutes) before CTest will kill the test."
+    DART_TESTING_TIMEOUT 1200
+    CACHE STRING "Maximum time allowed (20 minutes) before CTest will kill the test."
 )
 
 SET(
