@@ -217,7 +217,7 @@ Foam::fileName Foam::findEtcFile(const fileName& name, bool mandatory)
     // Search user files: deprecated.  HJ, 11/Dec/2013
 
     // Search site files:
-    searchDir = getEnv("WM_PROJECT_INST_DIR");
+    fileName searchDir = getEnv("WM_PROJECT_INST_DIR");
     if (isDir(searchDir))
     {
         // Check for site file in $WM_PROJECT_INST_DIR/site/VERSION
