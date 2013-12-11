@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:  3.0                                |
+|  \\    /   O peration     | Version:     3.0                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -12,7 +12,6 @@ FoamFile
     class       dictionary;
     object      blockMeshDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Parametrized test case for the ERCOFTAC diffuser.
@@ -43,8 +42,6 @@ m4_define(startAngleOffset, rad(60.0))
 m4_define(startAngleSectionA_BB, rad(startAngleOffset + 0.0))
 m4_define(stopAngleSectionA_BB,  rad(startAngleOffset + 60.0))
 m4_define(angleSpanSectionA_BB,  calc(stopAngleSectionA_BB - startAngleSectionA_BB))
-
-
 
 //Geometry
 m4_define(openingAngle, 10.0)
