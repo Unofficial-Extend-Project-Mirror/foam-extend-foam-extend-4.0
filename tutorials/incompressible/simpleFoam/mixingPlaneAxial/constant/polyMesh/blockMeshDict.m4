@@ -12,6 +12,43 @@ FoamFile
     class       dictionary;
     object      blockMeshDict;
 }
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//process this file using: m4 -P blockMeshDict.m4 > blockMeshDict
+
+//m4 definitions -----------------------------
+m4_changecom(//)m4_changequote([,])
+m4_define(calc, [m4_esyscmd(perl -e 'printf ($1)')])
+m4_define(pi, 3.14159265358979323844)
+m4_define(rad, [calc($1*pi/180.0)])
+m4_define(VCOUNT, 0)
+m4_define(vlabel, [[// ]Vertex $1 = VCOUNT m4_define($1, VCOUNT)m4_define([VCOUNT], m4_incr(VCOUNT))])
+
+//Geometry -----------------------------------
+// 2 planes levels
+m4_define(zA, 0.0)
+m4_define(zB, 0.1)
+
+// Angle span for inner block
+m4_define(angleB, rad(  60.0))
+m4_define(angleD, rad( 150.0))
+
+// Angle span for outer block
+m4_define(angleA, rad( 5.0))
+m4_define(angleC, rad(41.0))
+
+// Radial dimensions
+m4_define(r1, 1.0)
+m4_define(r2, 2.0)
+m4_define(r3, 3.0)
+
+// Mesh parameters
+m4_define(nCells, 5)
+m4_define(BLOCKSIZE_UPSTREAM,   25 17 1)
+m4_define(BLOCKSIZE_DOWNSTREAM, 25 27 1)
+m4_define(grading, 1.0)
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 convertToMeters 1;
