@@ -17,23 +17,20 @@
     Lesser General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    (lgpl.txt) along with this library; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+     This file is part of foam-extend.
 
-    diachin2@llnl.gov, djmelan@sandia.gov, mbrewer@sandia.gov,
-    pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
+     foam-extend is free software: you can redistribute it and/or modify it
+     under the terms of the GNU General Public License as published by the
+     Free Software Foundation, either version 3 of the License, or (at your
+     option) any later version.
 
-  ***************************************************************** */
-#ifndef MESQUITE_PATCHDATA_HPP
-#define MESQUITE_PATCHDATA_HPP
-/*!
-  \file   PatchData.hpp
-  \brief    This file contains the PatchData class and its associated mementos.
+     foam-extend is distributed in the hope that it will be useful, but
+     WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+     General Public License for more details.
 
-
-  The PatchData class provides the mesh information and functionality to Mesquite.
-  The PatchDataVerticesMemento class allows the state of a PatchData object to be saved
-  in order to later restore that object to its previous state.
+     You should have received a copy of the GNU General Public License
+     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
   \author Thomas Leurent
   \author Michael Brewer

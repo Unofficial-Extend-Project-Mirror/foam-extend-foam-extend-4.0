@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:  3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -17,7 +17,7 @@ FoamFile
 
 dimensions      [0 3 -1 0 0 0 0];
 
-internalField   nonuniform List<scalar> 
+internalField   nonuniform List<scalar>
 2106
 (
 0.0923669
@@ -2134,7 +2134,7 @@ boundaryField
     outflow
     {
         type            calculated;
-        value           nonuniform List<scalar> 
+        value           nonuniform List<scalar>
 27
 (
 0.0232702
@@ -2170,7 +2170,7 @@ boundaryField
     inflow
     {
         type            calculated;
-        value           nonuniform List<scalar> 
+        value           nonuniform List<scalar>
 17
 (
 -0.0923669
@@ -2196,7 +2196,7 @@ boundaryField
     upstreamPerio1
     {
         type            cyclicGgi;
-        value           nonuniform List<scalar> 
+        value           nonuniform List<scalar>
 25
 (
 -3.3879e-11
@@ -2230,7 +2230,7 @@ boundaryField
     upstreamPerio2
     {
         type            cyclicGgi;
-        value           nonuniform List<scalar> 
+        value           nonuniform List<scalar>
 25
 (
 3.42208e-10
@@ -2264,7 +2264,7 @@ boundaryField
     upstreamMixingPlanePatch
     {
         type            mixingPlane;
-        value           nonuniform List<scalar> 
+        value           nonuniform List<scalar>
 27
 (
 -0.02327
@@ -2300,7 +2300,7 @@ boundaryField
     downstreamMixingPlanePatch
     {
         type            mixingPlane;
-        value           nonuniform List<scalar> 
+        value           nonuniform List<scalar>
 17
 (
 0.0923649
@@ -2334,7 +2334,7 @@ boundaryField
     downstreamPerio1
     {
         type            cyclicGgi;
-        value           nonuniform List<scalar> 
+        value           nonuniform List<scalar>
 25
 (
 -6.72617e-09
@@ -2368,7 +2368,7 @@ boundaryField
     downstreamPerio2
     {
         type            cyclicGgi;
-        value           nonuniform List<scalar> 
+        value           nonuniform List<scalar>
 25
 (
 6.72617e-09
@@ -2400,6 +2400,5 @@ boundaryField
 ;
     }
 }
-
 
 // ************************************************************************* //

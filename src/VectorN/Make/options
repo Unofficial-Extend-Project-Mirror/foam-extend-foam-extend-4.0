@@ -1,5 +1,4 @@
 EXE_INC = \
-    -I$(FOAM_SRC)/OpenFOAM/lnInclude \
     -I$(FOAM_SRC)/finiteVolume/lnInclude
 
 LIB_LIBS =

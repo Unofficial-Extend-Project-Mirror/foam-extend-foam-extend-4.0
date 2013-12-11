@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext_mp                            |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:  3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -48,7 +48,7 @@ FoamFile
         startFace       50232;
         shadowPatch     inletDomB;
         zone            outletDomAZone;
-        coordinateSystem         
+        coordinateSystem
         {
             type            cylindrical;
             name            mixingCS;
@@ -56,7 +56,7 @@ FoamFile
             e1              (1 0 0);
             e3              (0 0 1);
         }
-        ribbonPatch     
+        ribbonPatch
         {
             sweepAxis       Theta;
             stackAxis       Z;

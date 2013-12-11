@@ -32,21 +32,24 @@ This file is part of cufflink.
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cufflink.  If not, see <http://www.gnu.org/licenses/>.
+     This file is part of foam-extend.
 
-    Author
-	Daniel P. Combest.  All rights reserved.
+     foam-extend is free software: you can redistribute it and/or modify it
+     under the terms of the GNU General Public License as published by the
+     Free Software Foundation, either version 3 of the License, or (at your
+     option) any later version.
 
-    Description
-	Builds normalization factor in exactly teh same way OpenFOAM® does
-	in order to normalize the residual to 1.  See provided
-	documentation for exact formulation of normalization factor
+     foam-extend is distributed in the hope that it will be useful, but
+     WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+     General Public License for more details.
 
-\**********************************************************************/
+     You should have received a copy of the GNU General Public License
+     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 
-// Build the normfactor as OF-1.6-ext does in file
-// ($FOAM_SRC/OpenFOAM/matrices/lduMatrix/lduMatrix/lduMatrixSolver.C)
+// Build the normfactor as foam-extend does in file
+// ($FOAM_SRC/foam/matrices/lduMatrix/lduMatrix/lduMatrixSolver.C)
 
 //all variables will be deleted once out of scope
 {

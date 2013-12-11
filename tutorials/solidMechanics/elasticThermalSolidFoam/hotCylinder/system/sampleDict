@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:  3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -13,7 +13,6 @@ FoamFile
     location    system;
     object      sampleDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Set output format : choice of
@@ -52,7 +51,6 @@ fields
  sigmazz
 );
 
-
 // Set sampling definition: choice of
 //      uniform             evenly distributed points on line
 //      face                one point per face intersection
@@ -87,9 +85,7 @@ sets
         nPoints     100;
     }
 
-
 );
-
 
 // Surface sampling definition: choice of
 //      plane : values on plane defined by point, normal.
@@ -102,6 +98,5 @@ surfaces
 (
 
 );
-
 
 // *********************************************************************** //

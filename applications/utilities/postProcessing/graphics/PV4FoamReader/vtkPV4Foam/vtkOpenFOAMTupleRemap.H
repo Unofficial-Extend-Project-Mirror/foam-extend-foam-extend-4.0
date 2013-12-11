@@ -1,50 +1,49 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 InClass
     vtkPV4Foam
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef vtkOpenFOAMTupleRemap_H
-#define vtkOpenFOAMTupleRemap_H
+#ifndef vtkFOAMTupleRemap_H
+#define vtkFOAMTupleRemap_H
 
-// OpenFOAM includes
+// FOAM includes
 #include "StaticAssert.H"
 #include "Swap.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class Type>
-inline void vtkOpenFOAMTupleRemap(float vec[]);
+inline void vtkFOAMTupleRemap(float vec[]);
 
 
-// a symmTensor specialization to remap OpenFOAM -> ParaView naming order
+// a symmTensor specialization to remap FOAM -> ParaView naming order
 // Qt/Core/pqScalarBarRepresentation.cxx defines this order
 //     { "XX", "YY", "ZZ", "XY", "YZ", "XZ" }
 // in pqScalarBarRepresentation::getDefaultComponentLabel()
-// whereas OpenFOAM uses this order
+// whereas FOAM uses this order
 //     { XX, XY, XZ, YY, YZ, ZZ }
 //
 // for extra safety, assert that symmTensor indeed has 6 components
@@ -53,7 +52,7 @@ StaticAssert(Foam::symmTensor::nComponents == 6);
 
 // Template specialization for symmTensor
 template<>
-inline void vtkOpenFOAMTupleRemap<Foam::symmTensor>(float vec[])
+inline void vtkFOAMTupleRemap<Foam::symmTensor>(float vec[])
 {
     Foam::Swap(vec[1], vec[3]);   // swap XY <-> YY
     Foam::Swap(vec[2], vec[5]);   // swap XZ <-> ZZ
@@ -61,7 +60,7 @@ inline void vtkOpenFOAMTupleRemap<Foam::symmTensor>(float vec[])
 
 
 template<class Type>
-inline void vtkOpenFOAMTupleRemap(float vec[])
+inline void vtkFOAMTupleRemap(float vec[])
 {}
 
 

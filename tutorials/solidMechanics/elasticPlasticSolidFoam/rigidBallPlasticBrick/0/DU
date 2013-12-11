@@ -1,9 +1,8 @@
-
-/*--------------------------------*- C++ -*----------------------------------* \
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:  3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -56,7 +55,7 @@ boundaryField
 	    aitkenRelaxation      no;
 	    infoFrequency         10;
 	    oscillationCorrection yes;
-	    smoothingSteps        1;	      
+	    smoothingSteps        1;	
 	  }
 	//frictionContactModel   frictionless;
 	frictionContactModel   dirichletNeumann;
@@ -65,8 +64,8 @@ boundaryField
 	    relaxationFactor      0.2;
 	    infoFrequency         10;
 	    oscillationCorrection yes;
-	    smoothingSteps        1;	      
-	    
+	    smoothingSteps        1;	
+	
 	    frictionLaw           coulomb;
 	    frictionLawDict
 	      {

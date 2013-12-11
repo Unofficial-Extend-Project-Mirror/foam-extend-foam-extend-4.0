@@ -32,15 +32,20 @@ This file is part of cufflink.
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cufflink.  If not, see <http://www.gnu.org/licenses/>.
+     This file is part of foam-extend.
 
-    Author
-        Daniel P. Combest.  All rights reserved.
+     foam-extend is free software: you can redistribute it and/or modify it
+     under the terms of the GNU General Public License as published by the
+     Free Software Foundation, either version 3 of the License, or (at your
+     option) any later version.
 
-    Description
-       Populate the COO matrix
+     foam-extend is distributed in the hope that it will be useful, but
+     WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+     General Public License for more details.
 
-\**********************************************************************/
+     You should have received a copy of the GNU General Public License
+     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 // Fill in the rest of the diag (rows and col),
 // upper and upper.rows and upper.cols

@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:  3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -30,14 +30,14 @@ boundaryField
 //       rotationAngle 1;
 //       rotationAxis (0 0 1);
 //       rotationOrigin (0 0 0);
-//       value uniform ( 0 0 0 );      
+//       value uniform ( 0 0 0 );
 
       type timeVaryingFixedRotation;
       rotationAxis (0 0 1);
       rotationOrigin (0 0 0);
       fileName "$FOAM_CASE/constant/timeVsOutsideAngle";
       outOfBounds clamp;
-      value uniform ( 0 0 0 );      
+      value uniform ( 0 0 0 );
 
 //        type            solidTractionOrtho;
 //        field           U;
@@ -54,13 +54,13 @@ boundaryField
 //       rotationOrigin (0 0 0);
 //       fileName "$FOAM_CASE/constant/timeVsInsideAngle";
 //       outOfBounds clamp;
-//       value uniform ( 0 0 0 );      
+//       value uniform ( 0 0 0 );
 
 //       type fixedRotation;
 //       rotationAngle 1;
 //       rotationAxis (0 0 1);
 //       rotationOrigin (0 0 0);
-//       value uniform ( 0 0 0 );      
+//       value uniform ( 0 0 0 );
 
       type            solidTraction;
       traction        uniform ( 0 0 0 );

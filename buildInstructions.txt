@@ -126,7 +126,7 @@ icoFoam
 wooster*101-> icoFoam
 /*---------------------------------------------------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
 |  \\    /   O peration     | Version:  1.4.1-dev                             |
 |   \\  /    A nd           | Web:      http://www.openfoam.org               |
 |    \\/     M anipulation  |                                                 |

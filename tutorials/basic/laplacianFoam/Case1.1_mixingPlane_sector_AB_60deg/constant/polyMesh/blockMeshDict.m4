@@ -1,106 +1,17 @@
-// Parametrized test case for the ERCOFTAC diffuser.
-
-// Created by Omar Bounous
-
-// Modified by Martin Beaudoin (11/2009)
-
-//Run using:
-//m4 -P blockMeshDict.m4 > blockMeshDict
-
-//m4 definitions:
-m4_changecom(//)m4_changequote([,])
-m4_define(calc, [m4_esyscmd(perl -e 'use Math::Trig; printf ($1)')])
-
-m4_define(pi, 3.14159265358979323844)
-m4_define(rad, [calc($1*pi/180.0)])
-m4_define(VCOUNT, 0)
-m4_define(vlabel, [[// ]Vertex $1 = VCOUNT m4_define($1, VCOUNT)m4_define([VCOUNT], m4_incr(VCOUNT))])
-
-//Mathematical constants:
-m4_define(sqr,0.707106781186548)
-
-// Make sure we are properly aligned for sampling inside the mesh volume
-m4_define(startAngleOffset, rad(60.0))
-
-// Angle span for section A_BB
-m4_define(startAngleSectionA_BB, rad(startAngleOffset + 0.0))
-m4_define(stopAngleSectionA_BB,  rad(startAngleOffset + 60.0))
-m4_define(angleSpanSectionA_BB,  calc(stopAngleSectionA_BB - startAngleSectionA_BB))
-
-
-
-//Geometry
-m4_define(openingAngle, 10.0)
-m4_define(diffuserLength, 0.51)
-m4_define(extensionLength, 0.59)
-m4_define(rIn,0.13)
-m4_define(rOut, calc(rIn+diffuserLength*tan(openingAngle*pi/180.0)))
-
-//Grid points (integers!):
-// For a better mesh resolution in the radial and tangential direction,
-// play with rNumberOfCells and tNumberOfCells
-m4_define(rNumberOfCells, 25)
-m4_define(tNumberOfCells, 20)
-//m4_define(rNumberOfCells, 3)
-//m4_define(tNumberOfCells, 4)
-//
-m4_define(zABnumberOfCells, 10)
-m4_define(zBCnumberOfCells, 4)
-m4_define(zCDnumberOfCells, 6)
-m4_define(zDEnumberOfCells, 30)
-m4_define(zEFnumberOfCells, 10)
-m4_define(rGrading, 0.2)
-
-//Plane A:
-m4_define(zA, -0.50)
-m4_define(rA, rIn)
-
-//Plane B:
-m4_define(zB, -0.10)
-m4_define(rB, rIn)
-
-//Plane BB:     // This is where we put the mixingPlane interface
-m4_define(zBB, -0.10)
-m4_define(rBB, rIn)
-
-//Plane C:
-m4_define(zC, -0.025)
-m4_define(rC, rIn)
-
-//Plane D:
-m4_define(zD, 0)
-m4_define(rD, rIn)
-
-//Plane E:
-m4_define(zE, diffuserLength)
-m4_define(rE, rOut)
-
-//Plane F:
-m4_define(zF, calc(diffuserLength+extensionLength))
-m4_define(rF, rOut)
-
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.5                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:  3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           dictionary;
-    object          blockMeshDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 convertToMeters 1;

@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:  3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -17,7 +17,7 @@ FoamFile
 
 dimensions      [0 1 -1 0 0 0 0];
 
-internalField   nonuniform List<vector> 
+internalField   nonuniform List<vector>
 1100
 (
 (4.50053 8.6999 -2.58726e-18)
@@ -1129,7 +1129,7 @@ boundaryField
     {
         type            inletOutlet;
         inletValue      uniform (0 0 0);
-        value           nonuniform List<vector> 
+        value           nonuniform List<vector>
 27
 (
 (3.339 0.331315 6.23548e-20)
@@ -1166,7 +1166,7 @@ boundaryField
     {
         type            surfaceNormalFixedValue;
         refValue        uniform -10;
-        value           nonuniform List<vector> 
+        value           nonuniform List<vector>
 17
 (
 (4.5947 8.88193 -0)
@@ -1192,7 +1192,7 @@ boundaryField
     upstreamPerio1
     {
         type            cyclicGgi;
-        value           nonuniform List<vector> 
+        value           nonuniform List<vector>
 25
 (
 (4.93064 0.431376 1.83307e-19)
@@ -1226,7 +1226,7 @@ boundaryField
     upstreamPerio2
     {
         type            cyclicGgi;
-        value           nonuniform List<vector> 
+        value           nonuniform List<vector>
 25
 (
 (3.73542 3.24715 1.83307e-19)
@@ -1260,7 +1260,7 @@ boundaryField
     upstreamMixingPlanePatch
     {
         type            mixingPlane;
-        value           nonuniform List<vector> 
+        value           nonuniform List<vector>
 27
 (
 (4.97469 0.493616 -9.07991e-20)
@@ -1296,7 +1296,7 @@ boundaryField
     downstreamMixingPlanePatch
     {
         type            mixingPlane;
-        value           nonuniform List<vector> 
+        value           nonuniform List<vector>
 17
 (
 (2.29695 4.44018 -9.07991e-20)
@@ -1330,7 +1330,7 @@ boundaryField
     downstreamPerio1
     {
         type            cyclicGgi;
-        value           nonuniform List<vector> 
+        value           nonuniform List<vector>
 25
 (
 (4.8923 8.47371 4.79355e-19)
@@ -1364,7 +1364,7 @@ boundaryField
     downstreamPerio2
     {
         type            cyclicGgi;
-        value           nonuniform List<vector> 
+        value           nonuniform List<vector>
 25
 (
 (-8.47371 4.8923 4.79355e-19)
@@ -1396,6 +1396,5 @@ boundaryField
 ;
     }
 }
-
 
 // ************************************************************************* //

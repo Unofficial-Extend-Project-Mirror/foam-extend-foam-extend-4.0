@@ -1,12 +1,12 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
+| \\      /  F ield         | foam-extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  3.0                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 #
-#+TITLE: *XPP_DE viscoelastic constitutive model README file for version 1.6-ext*
+#+TITLE: *XPP_DE viscoelastic constitutive model README file for version 3.0*
 #+AUTHOR: Jovani
 #+DATE:  05 October 2010
 
