@@ -21,6 +21,8 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
+\*---------------------------------------------------------------------------*/
+
 #include "backwardD2dt2Scheme.H"
 #include "fvcDiv.H"
 #include "fvMatrices.H"

@@ -21,6 +21,8 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
+\*---------------------------------------------------------------------------*/
+
 inline Foam::scalar Foam::C3H6O::rho(scalar p, scalar T) const
 {
     return rho_.f(p, T);

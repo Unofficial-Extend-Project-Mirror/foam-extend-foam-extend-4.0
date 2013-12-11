@@ -5,7 +5,6 @@ EXE_INC = \
     -I$(LIB_SRC)/lagrangian/basic/lnInclude
 
 LIB_LIBS = \
-    -lOpenFOAM \
     -lfiniteVolume \
     -llagrangian \
     $(PROJECT_LIBS)

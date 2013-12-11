@@ -12,6 +12,7 @@ EXE_LIBS = \
     -lerrorEstimation \
     -lfiniteVolume \
     -lfiniteArea \
+    -lfoam \
     -ltetFiniteElement \
     -ltetMotionSolver \
     -lforces \
@@ -30,7 +31,6 @@ EXE_LIBS = \
     -lliquids \
     -lmeshTools \
     -lODE \
-    -lOpenFOAM \
     -lpdf \
     -lphaseModel \
     -lradiation \
