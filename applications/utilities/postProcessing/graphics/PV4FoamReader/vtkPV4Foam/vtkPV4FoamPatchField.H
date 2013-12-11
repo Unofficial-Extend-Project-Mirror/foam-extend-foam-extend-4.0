@@ -36,7 +36,7 @@ InClass
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 
-#include "vtkFOAMTupleRemap.H"
+#include "vtkFoamTupleRemap.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -66,7 +66,7 @@ void Foam::vtkPV4Foam::convertPatchField
         {
             vec[d] = component(t, d);
         }
-        vtkFOAMTupleRemap<Type>(vec);
+        vtkFoamTupleRemap<Type>(vec);
 
         cellData->InsertTuple(i, vec);
     }
@@ -108,7 +108,7 @@ void Foam::vtkPV4Foam::convertPatchPointField
         {
             vec[d] = component(t, d);
         }
-        vtkFOAMTupleRemap<Type>(vec);
+        vtkFoamTupleRemap<Type>(vec);
 
         pointData->InsertTuple(i, vec);
     }

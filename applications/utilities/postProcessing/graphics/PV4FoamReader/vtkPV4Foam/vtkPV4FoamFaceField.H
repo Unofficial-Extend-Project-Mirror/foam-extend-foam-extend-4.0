@@ -35,7 +35,7 @@ InClass
 #include "vtkMultiBlockDataSet.h"
 #include "vtkPolyData.h"
 
-#include "vtkFOAMTupleRemap.H"
+#include "vtkFoamTupleRemap.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -104,7 +104,7 @@ void Foam::vtkPV4Foam::convertFaceField
                 vec[d] = 0;
             }
         }
-        vtkFOAMTupleRemap<Type>(vec);
+        vtkFoamTupleRemap<Type>(vec);
 
         cellData->InsertTuple(faceI, vec);
     }
@@ -186,7 +186,7 @@ void Foam::vtkPV4Foam::convertFaceField
                 vec[d] = 0;
             }
         }
-        vtkFOAMTupleRemap<Type>(vec);
+        vtkFoamTupleRemap<Type>(vec);
 
         cellData->InsertTuple(faceI, vec);
         ++faceI;

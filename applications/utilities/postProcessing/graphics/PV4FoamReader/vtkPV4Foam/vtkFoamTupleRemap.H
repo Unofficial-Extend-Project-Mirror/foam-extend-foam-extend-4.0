@@ -26,8 +26,8 @@ InClass
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef vtkFOAMTupleRemap_H
-#define vtkFOAMTupleRemap_H
+#ifndef vtkFoamTupleRemap_H
+#define vtkFoamTupleRemap_H
 
 // FOAM includes
 #include "StaticAssert.H"
@@ -36,7 +36,7 @@ InClass
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class Type>
-inline void vtkFOAMTupleRemap(float vec[]);
+inline void vtkFoamTupleRemap(float vec[]);
 
 
 // a symmTensor specialization to remap FOAM -> ParaView naming order
@@ -52,7 +52,7 @@ StaticAssert(Foam::symmTensor::nComponents == 6);
 
 // Template specialization for symmTensor
 template<>
-inline void vtkFOAMTupleRemap<Foam::symmTensor>(float vec[])
+inline void vtkFoamTupleRemap<Foam::symmTensor>(float vec[])
 {
     Foam::Swap(vec[1], vec[3]);   // swap XY <-> YY
     Foam::Swap(vec[2], vec[5]);   // swap XZ <-> ZZ
@@ -60,7 +60,7 @@ inline void vtkFOAMTupleRemap<Foam::symmTensor>(float vec[])
 
 
 template<class Type>
-inline void vtkFOAMTupleRemap(float vec[])
+inline void vtkFoamTupleRemap(float vec[])
 {}
 
 

@@ -38,7 +38,7 @@ InClass
 #include "vtkPV4FoamFaceField.H"
 #include "vtkPV4FoamPatchField.H"
 
-#include "vtkFOAMTupleRemap.H"
+#include "vtkFoamTupleRemap.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -355,7 +355,7 @@ void Foam::vtkPV4Foam::convertVolField
         {
             vec[d] = component(t, d);
         }
-        vtkFOAMTupleRemap<Type>(vec);
+        vtkFoamTupleRemap<Type>(vec);
 
         celldata->InsertTuple(i, vec);
     }

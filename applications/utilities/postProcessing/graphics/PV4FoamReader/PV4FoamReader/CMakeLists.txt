@@ -21,7 +21,7 @@ LINK_DIRECTORIES(
 )
 
 INCLUDE_DIRECTORIES(
-    $ENV{WM_PROJECT_DIR}/src/OpenFOAM/lnInclude
+    $ENV{WM_PROJECT_DIR}/src/foam/lnInclude
     $ENV{WM_PROJECT_DIR}/src/finiteVolume/lnInclude
     ${PROJECT_SOURCE_DIR}/../vtkPV4Foam
 )
@@ -53,7 +53,7 @@ ADD_PARAVIEW_PLUGIN(
 
 TARGET_LINK_LIBRARIES(
     PV4FoamReader_SM
-    OpenFOAM
+    foam
     finiteVolume
     vtkPV4Foam
     pqCore

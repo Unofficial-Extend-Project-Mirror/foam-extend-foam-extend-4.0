@@ -32,7 +32,7 @@ InClass
 // Foam includes
 #include "interpolatePointToCell.H"
 
-#include "vtkFOAMTupleRemap.H"
+#include "vtkFoamTupleRemap.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -215,7 +215,7 @@ void Foam::vtkPV4Foam::convertPointField
             {
                 vec[d] = component(t, d);
             }
-            vtkFOAMTupleRemap<Type>(vec);
+            vtkFoamTupleRemap<Type>(vec);
 
             pointData->InsertTuple(i, vec);
         }
@@ -229,7 +229,7 @@ void Foam::vtkPV4Foam::convertPointField
             {
                 vec[d] = component(t, d);
             }
-            vtkFOAMTupleRemap<Type>(vec);
+            vtkFoamTupleRemap<Type>(vec);
 
             pointData->InsertTuple(i, vec);
         }
@@ -247,7 +247,7 @@ void Foam::vtkPV4Foam::convertPointField
             {
                 vec[d] = component(t, d);
             }
-            vtkFOAMTupleRemap<Type>(vec);
+            vtkFoamTupleRemap<Type>(vec);
 
             pointData->InsertTuple(i++, vec);
         }
@@ -261,7 +261,7 @@ void Foam::vtkPV4Foam::convertPointField
             {
                 vec[d] = component(t, d);
             }
-            vtkFOAMTupleRemap<Type>(vec);
+            vtkFoamTupleRemap<Type>(vec);
 
             pointData->InsertTuple(i++, vec);
         }
