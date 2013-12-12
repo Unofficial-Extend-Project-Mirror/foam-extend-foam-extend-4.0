@@ -19,7 +19,7 @@ thermoType      hsPsiMixtureThermo<reactingMixture<gasThermoPhysics>>;
 
 CHEMKINFile     "$FOAM_CASE/chemkin/chem.inp";
 
-//HJ test CHEMKINThermoFile "~OpenFOAM/thermoData/therm.dat";
+CHEMKINThermoFile "$FOAM_CASE/chemkin/therm.dat";
 
 inertSpecie     N2;
 

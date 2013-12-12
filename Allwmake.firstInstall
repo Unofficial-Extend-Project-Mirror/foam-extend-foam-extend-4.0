@@ -25,8 +25,8 @@ then
     echo
     echo "Examples: "
     echo "    Ubuntu:   \"export QT_BIN_DIR=/usr/bin\""
-    echo "    Fedora:   \"export QT_BIN_DIR=????\""
-    echo "    openSuse: \"export QT_BIN_DIR=????\""
+    echo "    Fedora:   \"export QT_BIN_DIR=/usr/lib64/qt4/bin\""
+    echo "    openSuse: \"export QT_BIN_DIR=/usr/bin\""
     echo 
     read -r -p "Proceed without compiling ParaView [Y/n] " response
     if [[ $response =~ ^([nN][oO]|[nN])$ ]]
