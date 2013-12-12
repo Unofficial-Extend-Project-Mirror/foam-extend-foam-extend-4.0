@@ -329,7 +329,7 @@ bool Foam::layerAdditionRemoval::changeTopology() const
 
     if (debug)
     {
-        Pout<< "bool layerAdditionRemoval::changeTopology() const "
+        Info<< "bool layerAdditionRemoval::changeTopology() const "
             << " for object " << name() << " : " << nl
             << "Layer thickness: min: " << minDelta
             << " max: " << maxDelta << " avg: " << avgDelta
@@ -346,7 +346,7 @@ bool Foam::layerAdditionRemoval::changeTopology() const
     {
         if (debug)
         {
-            Pout << "First step. No addition/removal" << endl;
+            Info<< "First step. No addition/removal" << endl;
         }
 
         // No topological changes allowed before first mesh motion
@@ -373,7 +373,7 @@ bool Foam::layerAdditionRemoval::changeTopology() const
 
                     if (debug)
                     {
-                        Pout<< "bool layerAdditionRemoval::changeTopology() "
+                        Info<< "bool layerAdditionRemoval::changeTopology() "
                             << " const for object " << name() << " : "
                             << "Triggering layer removal" << endl;
                     }
@@ -405,7 +405,7 @@ bool Foam::layerAdditionRemoval::changeTopology() const
         {
             if (debug)
             {
-                Pout<< "bool layerAdditionRemoval::changeTopology() const "
+                Info<< "bool layerAdditionRemoval::changeTopology() const "
                     << " for object " << name() << " : "
                     << "Triggering layer addition" << endl;
             }
@@ -440,7 +440,7 @@ void Foam::layerAdditionRemoval::setRefinement(polyTopoChange& ref) const
         // Clear addressing.  This also resets the addition/removal data
         if (debug)
         {
-            Pout<< "layerAdditionRemoval::setRefinement(polyTopoChange& ref) "
+            Info<< "layerAdditionRemoval::setRefinement(polyTopoChange& ref) "
                 << " for object " << name() << " : "
                 << "Clearing addressing after layer removal. " << endl;
         }
@@ -456,7 +456,7 @@ void Foam::layerAdditionRemoval::setRefinement(polyTopoChange& ref) const
         // Clear addressing.  This also resets the addition/removal data
         if (debug)
         {
-            Pout<< "layerAdditionRemoval::setRefinement(polyTopoChange& ref) "
+            Info<< "layerAdditionRemoval::setRefinement(polyTopoChange& ref) "
                 << " for object " << name() << " : "
                 << "Clearing addressing after layer addition. " << endl;
         }
@@ -471,17 +471,17 @@ void Foam::layerAdditionRemoval::updateMesh(const mapPolyMesh&)
 {
     if (debug)
     {
-        Pout<< "layerAdditionRemoval::updateMesh(const mapPolyMesh&) "
+        Info<< "layerAdditionRemoval::updateMesh(const mapPolyMesh&) "
             << " for object " << name() << " : "
             << "Clearing addressing on external request. ";
 
         if (pointsPairingPtr_ || facesPairingPtr_)
         {
-            Pout << "Pointers set." << endl;
+            Info << "Pointers set." << endl;
         }
         else
         {
-            Pout << "Pointers not set." << endl;
+            Info << "Pointers not set." << endl;
         }
     }
 

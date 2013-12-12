@@ -53,7 +53,7 @@ void Foam::layerAdditionRemoval::addCellLayer
 
     if (debug)
     {
-        Pout<< "void layerAdditionRemoval::addCellLayer("
+        Info<< "void layerAdditionRemoval::addCellLayer("
             << "polyTopoChange& ref) const for object " << name() << " : "
             << "Adding cell layer" << endl;
     }
@@ -75,7 +75,7 @@ void Foam::layerAdditionRemoval::addCellLayer
     {
         if (debug)
         {
-            Pout<< "void layerAdditionRemoval::addCellLayer("
+            Info<< "void layerAdditionRemoval::addCellLayer("
                 << "polyTopoChange& ref) const "
                 << " for object " << name() << " : "
                 << "Using edges for point insertion" << endl;
@@ -94,7 +94,7 @@ void Foam::layerAdditionRemoval::addCellLayer
     {
         if (debug)
         {
-            Pout<< "void layerAdditionRemoval::addCellLayer("
+            Info<< "void layerAdditionRemoval::addCellLayer("
                 << "polyTopoChange& ref) const "
                 << " for object " << name() << " : "
                 << "A valid layer could not be found in front of "
@@ -551,7 +551,7 @@ void Foam::layerAdditionRemoval::addCellLayer
 
     if (debug)
     {
-        Pout<< "void layerAdditionRemoval::addCellLayer("
+        Info<< "void layerAdditionRemoval::addCellLayer("
             << "polyTopoChange& ref) const "
             << " for object " << name() << " : "
             << "Finished adding cell layer" << endl;

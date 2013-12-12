@@ -124,10 +124,14 @@ bool Foam::layerAdditionRemoval::setLayerPairing() const
 //     << "curLocalFace: " << curLocalFace << nl
 //     << "lidFace: " << lidFace
 //     << " master index: " << lidFace.masterIndex()
-//     << " oppositeIndex: " << lidFace.oppositeIndex() << endl;
+//     << " oppositeIndex: " << lidFace.oppositeIndex() << nl
+//     << "faces[oppositeIndex]: " << faces[lidFace.oppositeIndex()] << endl;
 
         // Grab the opposite face for face collapse addressing
         ftc[faceI] = lidFace.oppositeIndex();
+
+        // lidFace is only valid in simple cases
+        const face& lidFace2 = faces[lidFace.oppositeIndex()];
 
         // Using the local face insert the points into the lid list
         forAll (curLocalFace, pointI)
@@ -150,25 +154,25 @@ bool Foam::layerAdditionRemoval::setLayerPairing() const
                     // arbitray polyhedra!
                     // HR, 1/May/2011
 
-                    label curPoint = faces[mf[faceI]][pointI];
+                    const label curPoint = faces[mf[faceI]][pointI];
 
                     const labelListList& ppAddr = mesh.pointPoints();
 
-                    const labelList& p1List = ppAddr[lidFace[pointI]];
+                    const labelList& p1List = ppAddr[lidFace2[pointI]];
                     const labelList& p2List = ppAddr[ptc[clp]];
 
                     bool found = false;
-                    forAll(p1List, p1I)
+                    forAll (p1List, p1I)
                     {
-                        label p1 = p1List[p1I];
+                        const label p1 = p1List[p1I];
 
                         if (p1 != curPoint)
                         {
-                            forAll(p2List, p2I)
+                            forAll (p2List, p2I)
                             {
                                 label p2 = p2List[p2I];
 
-                                if(p1 == p2)
+                                if (p1 == p2)
                                 {
                                     ptc[clp] = p1;
                                     found = true;
@@ -177,7 +181,10 @@ bool Foam::layerAdditionRemoval::setLayerPairing() const
                             }
                         }
 
-                        if(found) { break; }
+                        if (found)
+                        {
+                            break;
+                        }
                     }
 
                     if (!found)

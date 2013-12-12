@@ -96,7 +96,7 @@ public:
         //- Does the opposite face exist?
         inline bool found() const
         {
-            return oppositeIndex_ >= 0;
+            return size() > 0;
         }
 };
 

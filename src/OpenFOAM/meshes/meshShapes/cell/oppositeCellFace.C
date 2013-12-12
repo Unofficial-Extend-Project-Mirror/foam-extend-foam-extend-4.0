@@ -69,7 +69,7 @@ Foam::label Foam::cell::opposingFaceLabel
         {
             bool sharedPoint = false;
 
-            // Compare every vertex of the current face agains the
+            // Compare every vertex of the current face against the
             // vertices of the master face
             forAll (curFace, pointI)
             {
@@ -104,6 +104,7 @@ Foam::label Foam::cell::opposingFaceLabel
                         Info<< "Multiple faces not sharing vertex: "
                             << oppositeFaceLabel << " and "
                             << curFaceLabels[faceI] << endl;
+
                         return -1;
                     }
                 }
@@ -180,6 +181,9 @@ Foam::oppositeFace Foam::cell::opposingFace
                                 break;
                             }
                         }
+
+                        // None of them matches, return a failure
+                        return oppositeFace(face(0), masterFaceLabel, oppFaceLabel);
                     }
                 }
             }
