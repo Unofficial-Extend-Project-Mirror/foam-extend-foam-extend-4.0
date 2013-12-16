@@ -202,8 +202,17 @@ GGIInterpolation<MasterPatch, SlavePatch>::uncoveredSlaveFaces() const
 
 
 template<class MasterPatch, class SlavePatch>
-bool GGIInterpolation<MasterPatch, SlavePatch>::movePoints()
+bool GGIInterpolation<MasterPatch, SlavePatch>::movePoints
+(
+    const tensorField& forwardT,
+    const tensorField& reverseT,
+    const vectorField& forwardSep
+)
 {
+    this->forwardT_ = forwardT;
+    this->reverseT_ = reverseT;
+    this->forwardSep_ = forwardSep;
+
     clearOut();
 
     return true;

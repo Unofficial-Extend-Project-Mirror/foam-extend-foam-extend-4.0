@@ -833,7 +833,12 @@ void Foam::ggiPolyPatch::initMovePoints(const pointField& p)
     // Update interpolation for new relative position of GGI interfaces
     if (patchToPatchPtr_)
     {
-        patchToPatchPtr_->movePoints();
+        patchToPatchPtr_->movePoints
+        (
+            forwardT(),
+            reverseT(),
+            -separation()
+        );
     }
 
     // Recalculate send and receive maps

@@ -199,11 +199,13 @@ void Foam::processorPolyPatch::calcGeometry()
             scalar nbrMagSf = mag(neighbFaceAreas_[facei]);
             scalar avSf = (magSf + nbrMagSf)/2.0;
 
-            if (magSf < ROOTVSMALL && nbrMagSf < ROOTVSMALL)
+            if (magSf < SMALL && nbrMagSf < SMALL)
             {
                 // Undetermined normal. Use dummy normal to force separation
-                // check. (note use of sqrt(VSMALL) since that is how mag
-                // scales)
+                // check.
+                // (note use of sqrt(VSMALL) since that is how mag scales)
+                // HR, 11/12/2013: Found a face with area = 1e-21 before
+                // topo deflation. Hence must use SMALL here.
                 faceNormals[facei] = point(1, 0, 0);
                 nbrFaceNormals[facei] = faceNormals[facei];
             }

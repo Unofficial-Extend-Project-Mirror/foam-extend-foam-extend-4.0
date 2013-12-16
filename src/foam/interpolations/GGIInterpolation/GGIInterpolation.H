@@ -133,18 +133,18 @@ class GGIInterpolation
         //  master plane.  Size equals number of slave faces; zero length
         //  indicates no transform.  Size 1 indicates constant transform
         //  HJ, 6/Jan/2009
-        const tensorField forwardT_;
+        tensorField forwardT_;
 
         //- Master-to-slave transformation tensor.  Transforms slave data to
         //  master plane.  Size equals number of master faces; zero length
         //  indicates no transform.  Size 1 indicates constant transform
         //  HJ, 6/Jan/2009
-        const tensorField reverseT_;
+        tensorField reverseT_;
 
         //- Slave-to-master separation vector. Translation of slave data to
         //  master plane.  Size equals number of slave faces; zero length
         //  indicates no translation.  MB, 28/Jan/2009
-        const vectorField forwardSep_;
+        vectorField forwardSep_;
 
         //- Master non-overlap face tolerance factor
         const scalar masterNonOverlapFaceTol_;
@@ -552,7 +552,12 @@ public:
     // Edit
 
         //- Correct weighting factors for moving mesh.
-        bool movePoints();
+        bool movePoints
+        (
+            const tensorField& forwardT,
+            const tensorField& reverseT,
+            const vectorField& forwardSep
+        );
 };
 
 
