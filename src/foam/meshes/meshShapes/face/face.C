@@ -479,6 +479,12 @@ Foam::point Foam::face::centre(const pointField& meshPoints) const
 {
     // Calculate the centre by breaking the face into triangles and
     // area-weighted averaging their centres
+    if (size() < 3)
+    {
+        FatalErrorIn("point face::centre(const pointField& meshPoints) const")
+            << "Face with fewer than 3 points detected: " << *this
+            << abort(FatalError);
+    }
 
     // If the face is a triangle, do a direct calculation
     if (size() == 3)
@@ -495,7 +501,7 @@ Foam::point Foam::face::centre(const pointField& meshPoints) const
     label nPoints = size();
 
     point centrePoint = point::zero;
-    for (register label pI=0; pI<nPoints; pI++)
+    for (register label pI = 0; pI < nPoints; pI++)
     {
         centrePoint += meshPoints[operator[](pI)];
     }
@@ -504,7 +510,7 @@ Foam::point Foam::face::centre(const pointField& meshPoints) const
     scalar sumA = 0;
     vector sumAc = vector::zero;
 
-    for (register label pI=0; pI<nPoints; pI++)
+    for (register label pI = 0; pI < nPoints; pI++)
     {
         const point& nextPoint = meshPoints[operator[]((pI + 1) % nPoints)];
 
