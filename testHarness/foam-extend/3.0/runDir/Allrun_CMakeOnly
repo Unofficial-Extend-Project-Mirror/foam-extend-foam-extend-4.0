@@ -23,7 +23,8 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Description
-#        Allrun file for running the OpenFOAM test harness
+#        Allrun file for running the FOAM test harness
+#        This script will only initialize the test harness using CMake
 #
 # Author
 #        Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved
@@ -45,7 +46,7 @@ if [ -z "$WM_PROJECT_DIR" ]
 then
     echo "Warning:"
     echo "  Missing environment variable \$WM_PROJECT_DIR. Stopping."
-    echo "  Please make sure your OpenFOAM environment is properly set up."
+    echo "  Please make sure your FOAM environment is properly set up."
     exit -1
 fi
 
@@ -55,7 +56,7 @@ then
     echo "Warning:"
     echo "  Missing file: CMakeLists.txt under \$WM_PROJECT_DIR. Stopping."
     echo "  A copy of CMakeLists.txt is available under $FOAM_TEST_HARNESS_DIR/CMakeFiles."
-    echo "  Please make a copy of this file under your OpenFOAM installation directory \$WM_PROJECT_DIR."
+    echo "  Please make a copy of this file under your FOAM installation directory \$WM_PROJECT_DIR."
     exit -1
 fi
 
@@ -70,13 +71,6 @@ then
     exit -1
 fi
 
-# Install Hydro-Quebec Tools if necessary
-command -v pyFoamChangeMixingPlaneBoundary.py >/dev/null
-if [ $? -ne 0 ];
-then
-    ${WM_THIRD_PARTY_DIR}/AllMake.stage6
-fi
-
 # Make sure the CMake and tutorials runtime files are updated
 # We need cmake version 2.8.0 at least
 cmake $WM_PROJECT_DIR
@@ -87,7 +81,7 @@ cmake $WM_PROJECT_DIR
 #
 # User-demand testing.
 # Will do: ExperimentalConfigure + ExperimentalBuild + ExperimentalTest + ExperimentalSubmit
-make Experimental
+#make Experimental
 
 # Nightly testing
 # Will do: NightlyUpdate + NightylConfigure + NightlyBuild + NightlyTest + NightlySubmit

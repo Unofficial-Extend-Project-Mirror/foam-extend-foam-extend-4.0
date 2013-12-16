@@ -1,10 +1,10 @@
-# /*---------------------------------------------------------------------------*\
+# /*-------------------------------------------------------------------------*\
 #   =========                 |
 #   \\      /  F ield         | foam-extend: Open Source CFD
 #    \\    /   O peration     |
 #     \\  /    A nd           | For copyright notice see file Copyright
 #      \\/     M anipulation  |
-# -------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # License
 #     This file is part of foam-extend.
 #
@@ -22,12 +22,12 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Description
-#        CMake/CTest script for running the OpenFOAM tutorials
+#        CMake/CTest script for running the FOAM tutorials
 #
 # Author
 #        Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved
 #
-# \*---------------------------------------------------------------------------*/
+# \*-------------------------------------------------------------------------*/
 
 # Take care of tests specific variables
 IF(NOT DEFINED testIdSuffix)
@@ -40,7 +40,7 @@ ENDIF(NOT DEFINED  testRunTimeDirectory)
 
 # Use the current directory for running the test cases
 SET (TEST_CASE_DIR $ENV{PWD}/${testRunTimeDirectory}
-    CACHE INTERNAL "OpenFOAM test case directory."
+    CACHE INTERNAL "FOAM test case directory."
     )
 
 # Create the runTime directory for the test cases

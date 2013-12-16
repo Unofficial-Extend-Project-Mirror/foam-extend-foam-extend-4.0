@@ -1,10 +1,10 @@
-# /*---------------------------------------------------------------------------*\
+# /*-------------------------------------------------------------------------*\
 #   =========                 |
 #   \\      /  F ield         | foam-extend: Open Source CFD
 #    \\    /   O peration     |
 #     \\  /    A nd           | For copyright notice see file Copyright
 #      \\/     M anipulation  |
-# -------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # License
 #     This file is part of foam-extend.
 #
@@ -22,13 +22,14 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Description:
-#              README file for the CMake/CTest/CDash test harness for OpenFOAM.
+      README file for the CMake/CTest/CDash test harness for FOAM.
 #
 # Author:
-#              Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved.
-# \*---------------------------------------------------------------------------*/
+#     Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved.
+#
+# \*-------------------------------------------------------------------------*/
 
-Warning #1: Make sure your OpenFOAM environment is properly initialized before
+Warning #1: Make sure your FOAM environment is properly initialized before
             running the test harness.
 
 Warning #2: It is recommended to use cmake version 2.8.0 or newer for
@@ -73,5 +74,5 @@ To submit your results to the CDash server on openfoam-extend, just use
 the file CTestConfig.cmake.openfoam-extend.
 
 If submitted to the CDash server on openfoam-extend, your results will be displayed here:
-http://openfoam-extend.sourceforge.net/CDash/index.php?project=OpenFOAM-1.6-ext
+http://openfoam-extend.sourceforge.net/CDash/index.php?project=foam-extend-3.0
 

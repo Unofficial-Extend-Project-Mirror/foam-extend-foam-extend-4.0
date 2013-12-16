@@ -1,10 +1,10 @@
-# /*---------------------------------------------------------------------------*\
+# /*-------------------------------------------------------------------------*\
 #   =========                 |
 #   \\      /  F ield         | foam-extend: Open Source CFD
 #    \\    /   O peration     |
 #     \\  /    A nd           | For copyright notice see file Copyright
 #      \\/     M anipulation  |
-# -------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # License
 #     This file is part of foam-extend.
 #
@@ -27,17 +27,11 @@
 #
 # Author:
 #              Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved.
-# \*---------------------------------------------------------------------------*/
+#
+# \*-------------------------------------------------------------------------*/
 
 
-
-
-MAJOR WARNING: THIS TEST HARNESS IS NOT READY YET FOR OPENFOAM-1.6-EXT
-----------------------------------------------------------------------
-
-
-
-Warning #1: Make sure your OpenFOAM environment is properly initialized before
+Warning #1: Make sure your FOAM environment is properly initialized before
             running the test harness.
 
 Warning #2: Make sure to create an environment variable called $BREEDER_15_DIR

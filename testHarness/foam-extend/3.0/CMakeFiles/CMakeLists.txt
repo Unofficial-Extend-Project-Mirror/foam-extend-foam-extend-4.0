@@ -23,7 +23,7 @@
 #
 # Description
 #     CMakeLists.txt file for implementing a test harness for the compilation
-#     and test of OpenFOAM-1.6-ext using Kitware CTest./CMake/CDash
+#     and test of foam-extend-3.0 using Kitware CTest./CMake/CDash
 #
 #     The results will be submitted to the CDash server identified by the file
 #     CTestConfig.cmake
@@ -36,7 +36,7 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-PROJECT(OpenFOAM_1.6-ext)
+PROJECT(foam-extend-3.0)
 
 #-----------------------------------------------------------------------------
 # Initialization of CTest specific variables
@@ -65,10 +65,10 @@ SET(
     CACHE STRING "Name of the local site"
 )
 
-#Grab the OpenFOAM installation directory.
+#Grab the FOAM installation directory.
 SET(
     OF_ROOT $ENV{WM_PROJECT_DIR}
-    CACHE INTERNAL  "OpenFOAM root directory."
+    CACHE INTERNAL  "FOAM root directory."
 )
 
 # Construct the build name.
@@ -144,20 +144,20 @@ string(REPLACE "/" "_" SITE ${SITE})
 # Build section
 #-----------------------------------------------------------------------------
 
-# Compile OpenFOAM, libs and apps
-add_custom_target (OpenFOAM-$ENV{WM_PROJECT_VERSION} ALL
+# Compile FOAM, libs and apps
+add_custom_target (foam-extend-$ENV{WM_PROJECT_VERSION} ALL
   ${OF_ROOT}/Allwmake
 )
 
 set_property(
-  TARGET          OpenFOAM-$ENV{WM_PROJECT_VERSION}
-  PROPERTY LABELS OpenFOAM-$ENV{WM_PROJECT_VERSION}
+  TARGET          foam-extend-$ENV{WM_PROJECT_VERSION}
+  PROPERTY LABELS foam-extend-$ENV{WM_PROJECT_VERSION}
 )
 
-# Compile the OpenFOAM unit tests located under applications/test
+# Compile the FOAM unit tests located under applications/test
 # This part will not be compiled and run by default.
 # This would be a good candidate for a sub-project
-add_custom_target (OpenFOAM-$ENV{WM_PROJECT_VERSION}_unitTests
+add_custom_target (foam-extend-$ENV{WM_PROJECT_VERSION}_unitTests
   wmake all ${OF_ROOT}/applications/test
 )
 
@@ -191,15 +191,15 @@ IF(BUILD_TESTING)
         SET(testIdSuffix "_oneTimeStep")
     ENDIF(RUN_FROM_ONE_TIMESTEP)
 
-    # OpenFOAM will run against this test suite:
+    # FOAM will run against this test suite:
 
-    # Add the suite of OpenFOAM tutorials
+    # Add the suite of FOAM tutorials
     #
-    INCLUDE($ENV{FOAM_TEST_HARNESS_DIR}/CMakeFiles/OpenFOAM_Tutorials.cmake)
+    INCLUDE($ENV{FOAM_TEST_HARNESS_DIR}/CMakeFiles/FOAM_Tutorials.cmake)
 
     # Add a dummy test (/bin/true, just for debugging)
     ADD_TEST(
-        OpenFOAM-$ENV{WM_PROJECT_VERSION}_Dummy_Test true
+        foam-extend-$ENV{WM_PROJECT_VERSION}_Dummy_Test true
     )
 
     IF(RUN_FROM_ONE_TIMESTEP)

@@ -23,7 +23,7 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Description
-#        Allrun file for running the OpenFOAM Turbomachinery OSIG test harness
+#        Allrun file for running the FOAM Turbomachinery OSIG test harness
 #
 # Author
 #        Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved
@@ -65,7 +65,7 @@ if [ -z "$WM_PROJECT_DIR" ]
 then
     echo "Warning:"
     echo "  Missing environment variable \$WM_PROJECT_DIR. Stopping."
-    echo "  Please make sure your OpenFOAM environment is properly set up."
+    echo "  Please make sure your FOAM environment is properly set up."
     exit -1
 fi
 
