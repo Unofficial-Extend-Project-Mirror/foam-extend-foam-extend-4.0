@@ -2,7 +2,7 @@
 
 cWARN        = -Wall
 
-cc          = $(WM_CC) $(WM_CXXFLAGS) -fsignaling-nans  -ftrapping-math
+cc          = $(WM_CC) $(WM_CXXFLAGS) -ftrapping-math
 
 include $(RULES)/c$(WM_COMPILE_OPTION)
 
