@@ -28,6 +28,7 @@ Author
 
 #include "RBFMotionFunctionObject.H"
 #include "addToRunTimeSelectionTable.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "RBFMotionSolver.H"
 
