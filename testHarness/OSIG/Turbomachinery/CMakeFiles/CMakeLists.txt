@@ -1,10 +1,10 @@
-# /*---------------------------------------------------------------------------*\
+# /*-------------------------------------------------------------------------*\
 #   =========                 |
 #   \\      /  F ield         | foam-extend: Open Source CFD
 #    \\    /   O peration     |
 #     \\  /    A nd           | For copyright notice see file Copyright
 #      \\/     M anipulation  |
-# -------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # License
 #     This file is part of foam-extend.
 #
@@ -25,14 +25,14 @@
 #        CMakeLists.txt file for implementing a test harness for the
 #        Turbomachinery OSIG test cases
 #
-#        The results will be submitted to the CDash server identified by the file
+#        The results will be submitted to the CDash server identified by
 #        CTestConfig.cmake
 #
 # Author
 #        Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved
 #
 #
-# \*---------------------------------------------------------------------------*/
+# \*-------------------------------------------------------------------------*/
 
 cmake_minimum_required (VERSION 2.8)
 
