@@ -1,26 +1,26 @@
+
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -91,7 +91,8 @@ template<class Type>
 tmp<volScalarField> SLTSDdtScheme<Type>::SLrDeltaT() const
 {
     const surfaceScalarField& phi =
-        mesh().objectRegistry::lookupObject<surfaceScalarField>(phiName_);
+        mesh().objectRegistry::template
+        lookupObject<surfaceScalarField>(phiName_);
 
     const dimensionedScalar& deltaT = mesh().time().deltaT();
 
@@ -126,7 +127,8 @@ tmp<volScalarField> SLTSDdtScheme<Type>::SLrDeltaT() const
     else if (phi.dimensions() == dimensionSet(1, 0, -1, 0, 0))
     {
         const volScalarField& rho =
-            mesh().objectRegistry::lookupObject<volScalarField>(rhoName_)
+            mesh().objectRegistry::template
+            lookupObject<volScalarField>(rhoName_)
            .oldTime();
 
         rDeltaT.internalField() = max
@@ -385,7 +387,7 @@ SLTSDdtScheme<Type>::fvmDdt
 
     scalarField rDeltaT = SLrDeltaT()().internalField();
 
-    Info<< "max/min rDeltaT " << max(rDeltaT) << " " << min(rDeltaT) << endl;
+    Info<< "max/min rDeltaT " << gMax(rDeltaT) << " " << gMin(rDeltaT) << endl;
 
     fvm.diag() = rDeltaT*mesh().V();
 
@@ -520,7 +522,7 @@ SLTSDdtScheme<Type>::fvcDdtPhiCorr
             new fluxFieldType
             (
                 ddtIOobject,
-                fvcDdtPhiCoeff(U.oldTime(), phi.oldTime())*
+                this->fvcDdtPhiCoeff(U.oldTime(), phi.oldTime())*
                 (
                     fvc::interpolate(rDeltaT*rA)*phi.oldTime()
                   - (fvc::interpolate(rDeltaT*rA*U.oldTime()) & mesh().Sf())
@@ -581,7 +583,7 @@ SLTSDdtScheme<Type>::fvcDdtPhiCorr
                 new fluxFieldType
                 (
                     ddtIOobject,
-                    fvcDdtPhiCoeff(U.oldTime(), phi.oldTime())
+                    this->fvcDdtPhiCoeff(U.oldTime(), phi.oldTime())
                    *(
                         fvc::interpolate(rDeltaT*rA*rho.oldTime())*phi.oldTime()
                       - (fvc::interpolate(rDeltaT*rA*rho.oldTime()*U.oldTime())
@@ -601,7 +603,7 @@ SLTSDdtScheme<Type>::fvcDdtPhiCorr
                 new fluxFieldType
                 (
                     ddtIOobject,
-                    fvcDdtPhiCoeff
+                    this->fvcDdtPhiCoeff
                     (
                         U.oldTime(),
                         phi.oldTime()/fvc::interpolate(rho.oldTime())
@@ -619,7 +621,7 @@ SLTSDdtScheme<Type>::fvcDdtPhiCorr
                 )
             );
         }
-        else if 
+        else if
         (
             U.dimensions() == dimDensity*dimVelocity
          && phi.dimensions() == dimDensity*dimVelocity*dimArea
@@ -630,7 +632,7 @@ SLTSDdtScheme<Type>::fvcDdtPhiCorr
                 new fluxFieldType
                 (
                     ddtIOobject,
-                    fvcDdtPhiCoeff(rho.oldTime(), U.oldTime(), phi.oldTime())
+                    this->fvcDdtPhiCoeff(rho.oldTime(), U.oldTime(), phi.oldTime())
                    *(
                         fvc::interpolate(rDeltaT*rA)*phi.oldTime()
                       - (

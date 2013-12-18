@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
     Fourth-order Kaps-Rentrop scheme with adjustive time-step size
@@ -41,11 +40,11 @@ namespace Foam
 {
     addToRunTimeSelectionTable(ODESolver, KRR4, ODE);
 
-const scalar 
+const scalar
     KRR4::safety = 0.9, KRR4::grow = 1.5, KRR4::pgrow = -0.25,
     KRR4::shrink = 0.5, KRR4::pshrink = (-1.0/3.0), KRR4::errcon = 0.1296;
 
-const scalar 
+const scalar
     KRR4::gamma = 1.0/2.0,
     KRR4::a21 = 2.0, KRR4::a31 = 48.0/25.0, KRR4::a32 = 6.0/25.0,
     KRR4::c21 = -8.0, KRR4::c31 = 372.0/25.0, KRR4::c32 = 12.0/5.0,
@@ -85,8 +84,8 @@ void Foam::KRR4::solve
 (
     scalar& x,
     scalarField& y,
-    scalarField& dydx, 
-    const scalar eps, 
+    scalarField& dydx,
+    const scalar eps,
     const scalarField& yScale,
     const scalar hTry,
     scalar& hDid,

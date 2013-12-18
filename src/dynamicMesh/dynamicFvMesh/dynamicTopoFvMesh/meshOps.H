@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     meshOps
@@ -34,8 +33,8 @@ Author
     All rights reserved
 
 SourceFiles
-    meshOpsI.H
     meshOps.C
+    meshOpsTemplates.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -43,7 +42,6 @@ SourceFiles
 #define meshOps_H
 
 #include "Map.H"
-#include "line.H"
 #include "point.H"
 #include "label.H"
 #include "scalar.H"
@@ -51,8 +49,10 @@ SourceFiles
 #include "cellList.H"
 #include "edgeList.H"
 #include "faceList.H"
-#include "triangle.H"
+#include "triPointRef.H"
+#include "tetPointRef.H"
 #include "vectorField.H"
+#include "linePointRef.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -117,7 +117,7 @@ namespace meshOps
         const UList<label>& neighbour,
         const UList<labelList>& faceEdges,
         const UList<labelList>& edgeFaces,
-        const UList<labelList>& edgePoints,
+        const labelList& hullVertices,
         labelList& hullEdges,
         labelList& hullFaces,
         labelList& hullCells,
@@ -147,12 +147,12 @@ namespace meshOps
     (
         const label cIndex,
         const label fIndex,
-        const UList<face> faces,
-        const UList<cell> cells
+        const UList<face>& faces,
+        const UList<cell>& cells
     );
 
     // Given a cell index, find the centroid / volume of a cell.
-    inline bool cellCentreAndVolume
+    inline void cellCentreAndVolume
     (
         const label cIndex,
         const vectorField& points,
@@ -160,28 +160,23 @@ namespace meshOps
         const UList<cell>& cells,
         const UList<label>& owner,
         vector& centre,
-        scalar& volume,
-        bool checkClosed = false
+        scalar& volume
     );
 
     // Determine whether a segment intersects a triangular face
-    template <class T>
     inline bool segmentTriFaceIntersection
     (
-        const triangle<Vector<T>, const Vector<T>&>& faceToCheck,
-        const line<Vector<T>, const Vector<T>&>& edgeToCheck,
-        const T& matchTol,
-        Vector<T>& intPoint
+        const triPointRef& faceToCheck,
+        const linePointRef& edgeToCheck,
+        vector& intPoint
     );
 
     // Determine whether the particular point lies
     // inside the given triangular face
-    template <class T>
     inline bool pointInTriFace
     (
-        const triangle<Vector<T>, const Vector<T>&>& faceToCheck,
-        const Vector<T>& checkPoint,
-        const T& matchTol,
+        const triPointRef& faceToCheck,
+        const vector& checkPoint,
         bool testCoplanarity
     );
 
@@ -193,17 +188,6 @@ namespace meshOps
         const label startPoint,
         const label endPoint,
         Map<label>& pi
-    );
-
-    // Method to insert labels in a face, so that
-    // right-handedness is preserved.
-    template <class T>
-    inline void insertPointLabels
-    (
-        const Vector<T>& refNorm,
-        const Field<Vector<T> >& points,
-        const labelHashSet& pLabels,
-        face& modFace
     );
 
     // Method to insert a label between two labels in a list
@@ -247,6 +231,55 @@ namespace meshOps
         List<Type>& list
     );
 
+    // Parallel send
+    inline void pWrite
+    (
+        const label toID,
+        const label& data
+    );
+
+    // Parallel send (for fixed lists)
+    template <class Type, unsigned Size>
+    inline void pWrite
+    (
+        const label toID,
+        const FixedList<Type,Size>& data
+    );
+
+    // Parallel send (for lists)
+    template <class Type>
+    inline void pWrite
+    (
+        const label toID,
+        const UList<Type>& data
+    );
+
+    // Parallel receive
+    inline void pRead
+    (
+        const label fromID,
+        label& data
+    );
+
+    // Parallel receive (for fixed lists)
+    template <class Type, unsigned Size>
+    inline void pRead
+    (
+        const label fromID,
+        FixedList<Type,Size>& data
+    );
+
+    // Parallel receive (for lists)
+    template <class Type>
+    inline void pRead
+    (
+        const label fromID,
+        UList<Type>& data
+    );
+
+    // Wait for buffer transfer completion.
+    inline void waitForBuffers();
+
     // Select a list of elements from connectivity,
     // and output to a VTK format
     void writeVTK
@@ -256,10 +289,13 @@ namespace meshOps
         const labelList& cList,
         const label primitiveType,
         const UList<point>& meshPoints,
-        const UList<edge>& edges,
-        const UList<face>& faces,
-        const UList<cell>& cells,
-        const UList<label>& owner
+        const UList<edge>& edges = List<edge>(0),
+        const UList<face>& faces = List<face>(0),
+        const UList<cell>& cells = List<cell>(0),
+        const UList<label>& owner = List<label>(0),
+        const UList<scalar>& scalField = UList<scalar>(),
+        const UList<label>& lablField = UList<label>(),
+        const UList<vector>& vectField = UList<vector>()
     );
 
     // Actual routine to write out the VTK file
@@ -274,7 +310,10 @@ namespace meshOps
         const labelListList& cpList = labelListList(0),
         const label primitiveType = 3,
         const Map<label>& reversePointMap = Map<label>(),
-        const Map<label>& reverseCellMap = Map<label>()
+        const Map<label>& reverseCellMap = Map<label>(),
+        const UList<scalar>& scalField = UList<scalar>(),
+        const UList<label>& lablField = UList<label>(),
+        const UList<vector>& vectField = UList<vector>()
     );
 
 } // End namespace meshOps
@@ -286,6 +325,10 @@ namespace meshOps
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "meshOpsI.H"
+
+#ifdef NoRepository
+#    include "meshOpsTemplates.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

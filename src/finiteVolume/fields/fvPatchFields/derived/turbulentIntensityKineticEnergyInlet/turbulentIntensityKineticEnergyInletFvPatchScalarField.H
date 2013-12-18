@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField
@@ -30,7 +29,7 @@ Description
     fraction of the mean velocity
 
     Example of the boundary condition specification:
-    @verbatim
+    \verbatim
         inlet
         {
             type        turbulentIntensityKineticEnergyInlet;
@@ -38,7 +37,7 @@ Description
             intensity   0.05;           // 5% turbulence
             value       uniform 1;      // placeholder
         }
-    @endverbatim
+    \endverbatim
 
 SourceFiles
     turbulentIntensityKineticEnergyInletFvPatchScalarField.C
@@ -48,7 +47,7 @@ SourceFiles
 #ifndef turbulentIntensityKineticEnergyInletFvPatchScalarField_H
 #define turbulentIntensityKineticEnergyInletFvPatchScalarField_H
 
-#include "fixedValueFvPatchFields.H"
+#include "inletOutletFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -61,15 +60,18 @@ namespace Foam
 
 class turbulentIntensityKineticEnergyInletFvPatchScalarField
 :
-    public fixedValueFvPatchScalarField
+    public inletOutletFvPatchScalarField
 {
     // Private data
 
-        //- Name of velocity field
-        word UName_;
-
         //- Turbulent intensity as fraction of mean velocity
         scalar intensity_;
+
+        //- Name of the velocity field
+        word UName_;
+
+        //- Name of the flux field
+        word phiName_;
 
 
 public:

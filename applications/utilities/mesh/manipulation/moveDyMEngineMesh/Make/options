@@ -1,14 +1,18 @@
 EXE_INC = \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/dynamicMesh/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/dynamicFvMesh/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
-    -I$(LIB_SRC)/engine/lnInclude \
-    -I$(LIB_SRC)/finiteVolume/lnInclude
+    -I$(LIB_SRC)/engine/lnInclude
 
 EXE_LIBS = \
     -lfiniteVolume \
+    -ldynamicMesh \
     -ldynamicFvMesh \
     -lmeshTools \
-    -ldynamicMesh \
     -lengine \
-    -lmeshTools
+    -lmeshTools \
+    -ltetFiniteElement \
+    -ltetMotionSolver \
+    -llduSolvers \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -31,6 +30,7 @@ License
 #include "nutLowReWallFunctionFvPatchScalarField.H"
 #include "epsilonWallFunctionFvPatchScalarField.H"
 #include "kqRWallFunctionFvPatchField.H"
+#include "RWallFunctionFvPatchSymmTensorField.H"
 #include "omegaWallFunctionFvPatchScalarField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -45,14 +45,15 @@ namespace incompressible
 tmp<volScalarField> autoCreateNut
 (
     const word& fieldName,
-    const fvMesh& mesh
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 {
     IOobject nutHeader
     (
         fieldName,
         mesh.time().timeName(),
-        mesh,
+        obj,
         IOobject::MUST_READ,
         IOobject::NO_WRITE,
         false
@@ -112,17 +113,28 @@ tmp<volScalarField> autoCreateNut
 }
 
 
-tmp<volScalarField> autoCreateLowReNut
+tmp<volScalarField> autoCreateNut
 (
     const word& fieldName,
     const fvMesh& mesh
+)
+{
+    return autoCreateNut(fieldName, mesh, mesh);
+}
+
+
+tmp<volScalarField> autoCreateLowReNut
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 {
     IOobject nutHeader
     (
         fieldName,
         mesh.time().timeName(),
-        mesh,
+        obj,
         IOobject::MUST_READ,
         IOobject::NO_WRITE,
         false
@@ -182,6 +194,37 @@ tmp<volScalarField> autoCreateLowReNut
 }
 
 
+tmp<volScalarField> autoCreateLowReNut
+(
+    const word& fieldName,
+    const fvMesh& mesh
+)
+{
+    return autoCreateLowReNut(fieldName, mesh, mesh);
+}
+
+
+tmp<volScalarField> autoCreateEpsilon
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+{
+    return
+        autoCreateWallFunctionField
+        <
+            scalar,
+            RASModels::epsilonWallFunctionFvPatchScalarField
+        >
+        (
+            fieldName,
+            mesh,
+            obj
+        );
+}
+
+
 tmp<volScalarField> autoCreateEpsilon
 (
     const word& fieldName,
@@ -196,7 +239,29 @@ tmp<volScalarField> autoCreateEpsilon
         >
         (
             fieldName,
+            mesh,
             mesh
+        );
+}
+
+
+tmp<volScalarField> autoCreateOmega
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+{
+    return
+        autoCreateWallFunctionField
+        <
+            scalar,
+            RASModels::omegaWallFunctionFvPatchScalarField
+        >
+        (
+            fieldName,
+            mesh,
+            obj
         );
 }
 
@@ -215,7 +280,29 @@ tmp<volScalarField> autoCreateOmega
         >
         (
             fieldName,
+            mesh,
             mesh
+        );
+}
+
+
+tmp<volScalarField> autoCreateK
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+{
+    return
+        autoCreateWallFunctionField
+        <
+            scalar,
+            RASModels::kqRWallFunctionFvPatchField<scalar>
+        >
+        (
+            fieldName,
+            mesh,
+            obj
         );
 }
 
@@ -234,7 +321,29 @@ tmp<volScalarField> autoCreateK
         >
         (
             fieldName,
+            mesh,
             mesh
+        );
+}
+
+
+tmp<volScalarField> autoCreateQ
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+{
+    return
+        autoCreateWallFunctionField
+        <
+            scalar,
+            RASModels::kqRWallFunctionFvPatchField<scalar>
+        >
+        (
+            fieldName,
+            mesh,
+            obj
         );
 }
 
@@ -253,7 +362,29 @@ tmp<volScalarField> autoCreateQ
         >
         (
             fieldName,
+            mesh,
             mesh
+        );
+}
+
+
+tmp<volSymmTensorField> autoCreateR
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+{
+    return
+        autoCreateWallFunctionField
+        <
+            symmTensor,
+            RASModels::kqRWallFunctionFvPatchField<symmTensor>
+        >
+        (
+            fieldName,
+            mesh,
+            obj
         );
 }
 
@@ -268,10 +399,12 @@ tmp<volSymmTensorField> autoCreateR
         autoCreateWallFunctionField
         <
             symmTensor,
-            RASModels::kqRWallFunctionFvPatchField<symmTensor>
+            // New wall functions for R.  HJ, 14/Dec/2011
+            RASModels::RWallFunctionFvPatchSymmTensorField
         >
         (
             fieldName,
+            mesh,
             mesh
         );
 }

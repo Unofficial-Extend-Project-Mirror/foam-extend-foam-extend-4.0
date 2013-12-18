@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Author
     Martin Beaudoin, Hydro-Quebec, (2008)
@@ -228,7 +227,8 @@ void cyclicGgiFvPatchField<Type>::initInterfaceMatrixUpdate
     const lduMatrix&,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     // Communication is allowed either before or after processor
@@ -256,9 +256,19 @@ void cyclicGgiFvPatchField<Type>::initInterfaceMatrixUpdate
     // Multiply the field by coefficients and add into the result
     const unallocLabelList& fc = cyclicGgiPatch_.faceCells();
 
-    forAll(fc, elemI)
+    if (switchToLhs)
     {
-        result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
+        forAll(fc, elemI)
+        {
+            result[fc[elemI]] += coeffs[elemI]*pnf[elemI];
+        }
+    }
+    else
+    {
+        forAll(fc, elemI)
+        {
+            result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
+        }
     }
 }
 
@@ -272,9 +282,39 @@ void cyclicGgiFvPatchField<Type>::updateInterfaceMatrix
     const lduMatrix&,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes
+    const Pstream::commsTypes,
+    const bool switchToLhs
 ) const
 {}
+
+
+template<class Type>
+void cyclicGgiFvPatchField<Type>::initInterfaceMatrixUpdate
+(
+    const Field<Type>& psiInternal,
+    Field<Type>& result,
+    const BlockLduMatrix<Type>& m,
+    const CoeffField<Type>& coeffs,
+    const Pstream::commsTypes commsType
+) const
+{
+    notImplemented("void cyclicGgiFvPatchField::initInterfaceMatrixUpdate"
+        " for block-coupled matrices of tensor types"
+    )
+}
+
+
+template<class Type>
+void cyclicGgiFvPatchField<Type>::updateInterfaceMatrix
+(
+    const Field<Type>&,
+    Field<Type>&,
+    const BlockLduMatrix<Type>&,
+    const CoeffField<Type>&,
+    const Pstream::commsTypes commsType
+) const
+{
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

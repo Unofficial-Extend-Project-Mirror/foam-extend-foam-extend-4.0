@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
     icoDyMFoam
@@ -56,22 +55,23 @@ int main(int argc, char *argv[])
     {
 #       include "readControls.H"
 #       include "checkTotalVolume.H"
-#       include "CourantNo.H"
-
-#       include "setDeltaT.H"
 
         // Make the fluxes absolute
         fvc::makeAbsolute(phi, U);
+
+#       include "CourantNo.H"
+#       include "setDeltaT.H"
 
         runTime++;
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         bool meshChanged = mesh.update();
+        reduce(meshChanged, orOp<bool>());
 
 #       include "volContinuity.H"
 
-        if (correctPhi && meshChanged)
+        if (correctPhi && (mesh.moving() || meshChanged))
         {
             // Fluxes will be corrected to absolute velocity
             // HJ, 6/Feb/2009
@@ -81,16 +81,16 @@ int main(int argc, char *argv[])
         // Make the fluxes relative to the mesh motion
         fvc::makeRelative(phi, U);
 
-        if (meshChanged)
+        if (mesh.moving() && checkMeshCourantNo)
         {
-#           include "CourantNo.H"
+#           include "meshCourantNo.H"
         }
 
 #       include "UEqn.H"
 
         // --- PISO loop
 
-        for (int corr=0; corr<nCorr; corr++)
+        for (int corr = 0; corr < nCorr; corr++)
         {
             rAU = 1.0/UEqn.A();
 
@@ -111,11 +111,11 @@ int main(int argc, char *argv[])
 
                 if (corr == nCorr - 1 && nonOrth == nNonOrthCorr)
                 {
-                    pEqn.solve(mesh.solver(p.name() + "Final"));
+                    pEqn.solve(mesh.solutionDict().solver(p.name() + "Final"));
                 }
                 else
                 {
-                    pEqn.solve(mesh.solver(p.name()));
+                    pEqn.solve(mesh.solutionDict().solver(p.name()));
                 }
 
                 if (nonOrth == nNonOrthCorr)

@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
@@ -140,13 +139,31 @@ ggiFvPatchField<Type>::ggiFvPatchField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Return neighbour field
+template<class Type>
+const ggiFvPatchField<Type>& ggiFvPatchField<Type>::shadowPatchField() const
+{
+    const GeometricField<Type, fvPatchField, volMesh>& fld =
+    static_cast<const GeometricField<Type, fvPatchField, volMesh>&>
+    (
+        this->internalField()
+    );
+
+    return refCast<const ggiFvPatchField<Type> >
+    (
+        fld.boundaryField()[ggiPatch_.shadowIndex()]
+    );
+}
+
+
 template<class Type>
 tmp<Field<Type> > ggiFvPatchField<Type>::patchNeighbourField() const
 {
     const Field<Type>& iField = this->internalField();
 
     // Get shadow face-cells and assemble shadow field
+    // This is a patchInternalField of neighbour but access is inconvenient.
+    // Assemble by hand.
+    // HJ, 27/Sep/2011
     const unallocLabelList& sfc = ggiPatch_.shadow().faceCells();
 
     Field<Type> sField(sfc.size());
@@ -198,11 +215,10 @@ void ggiFvPatchField<Type>::initEvaluate
         // Symmetry treatment used for overlap
         vectorField nHat = this->patch().nf();
 
+        Field<Type> pif = this->patchInternalField();
+
         Field<Type> bridgeField =
-        (
-            this->patchInternalField()
-          + transform(I - 2.0*sqr(nHat), this->patchInternalField())
-        )/2.0;
+            0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
 
         ggiPatch_.bridge(bridgeField, pf);
     }
@@ -217,10 +233,7 @@ void ggiFvPatchField<Type>::evaluate
     const Pstream::commsTypes
 )
 {
-    if (!this->updated())
-    {
-        this->updateCoeffs();
-    }
+    fvPatchField<Type>::evaluate();
 }
 
 
@@ -232,7 +245,8 @@ void ggiFvPatchField<Type>::initInterfaceMatrixUpdate
     const lduMatrix&,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes commsType
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
 ) const
 {
     // Communication is allowed either before or after processor
@@ -253,9 +267,19 @@ void ggiFvPatchField<Type>::initInterfaceMatrixUpdate
     // Multiply the field by coefficients and add into the result
     const unallocLabelList& fc = ggiPatch_.faceCells();
 
-    forAll(fc, elemI)
+    if (switchToLhs)
     {
-        result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
+        forAll(fc, elemI)
+        {
+            result[fc[elemI]] += coeffs[elemI]*pnf[elemI];
+        }
+    }
+    else
+    {
+        forAll(fc, elemI)
+        {
+            result[fc[elemI]] -= coeffs[elemI]*pnf[elemI];
+        }
     }
 }
 
@@ -268,7 +292,8 @@ void ggiFvPatchField<Type>::updateInterfaceMatrix
     const lduMatrix&,
     const scalarField& coeffs,
     const direction cmpt,
-    const Pstream::commsTypes
+    const Pstream::commsTypes,
+    const bool switchToLhs
 ) const
 {}
 

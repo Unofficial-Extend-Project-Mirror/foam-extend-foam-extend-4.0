@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -49,15 +49,18 @@ solvers
         relTol          0;
     }
 }
-
 PISO
 {
+    cAlpha          1;
+}
+PIMPLE
+{
     momentumPredictor yes;
-    nCorrectors     3;
+    nOuterCorrectors 1;
+    nCorrectors     4;
     nNonOrthogonalCorrectors 0;
     nAlphaCorr      1;
     nAlphaSubCycles 2;
-    cAlpha          1;
 }
 
 // ************************************************************************* //

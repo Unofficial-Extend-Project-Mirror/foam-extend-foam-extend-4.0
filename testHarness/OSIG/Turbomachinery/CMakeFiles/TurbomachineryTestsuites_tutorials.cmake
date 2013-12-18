@@ -1,26 +1,25 @@
 # /*---------------------------------------------------------------------------*\
 #   =========                 |
-#   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#   \\      /  F ield         | foam-extend: Open Source CFD
 #    \\    /   O peration     |
-#     \\  /    A nd           | Copyright held by original author
+#     \\  /    A nd           | For copyright notice see file Copyright
 #      \\/     M anipulation  |
 # -------------------------------------------------------------------------------
 # License
-#     This file is part of OpenFOAM.
+#     This file is part of foam-extend.
 #
-#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     foam-extend is free software: you can redistribute it and/or modify it
 #     under the terms of the GNU General Public License as published by the
-#     Free Software Foundation; either version 2 of the License, or (at your
+#     Free Software Foundation, either version 3 of the License, or (at your
 #     option) any later version.
 #
-#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-#     for more details.
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with OpenFOAM; if not, write to the Free Software Foundation,
-#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Description
 #        CMake/CTest script for running the Turbomachinery OSIG testsuites
@@ -63,7 +62,7 @@ SET(TESTCASES_SUBDIR ".")
 #ADD_TEST(${testId} bash -c "cd ${TEST_CASE_DIR}/${TESTCASES_SUBDIR}; ./Allclean")
 
 # Next, recurse through the case root directory,
-# find all the Allrun files, and execute them 
+# find all the Allrun files, and execute them
 FILE(GLOB_RECURSE listofCasesWithAllrun ${TEST_CASE_DIR}/${TESTCASES_SUBDIR}/Allrun*)
 LIST(SORT listofCasesWithAllrun)
 
@@ -73,7 +72,7 @@ FOREACH(caseWithAllrun ${listofCasesWithAllrun})
   get_filename_component(thisCaseAllrunName ${caseWithAllrun} NAME)
 
   # We need to skip the .svn files
-  IF(NOT ${thisCasePath} MATCHES .svn) 
+  IF(NOT ${thisCasePath} MATCHES .svn)
     MESSAGE("Found Allrun file in directory: ${thisCasePath}")
 
     # Grab the parent name of the case directory
@@ -89,7 +88,7 @@ FOREACH(caseWithAllrun ${listofCasesWithAllrun})
     # Use this entry instead for testing
     #ADD_TEST(${testId} bash -c "cd ${thisCasePath}; true")
 
-  ENDIF(NOT ${thisCasePath} MATCHES .svn) 
+  ENDIF(NOT ${thisCasePath} MATCHES .svn)
 ENDFOREACH(caseWithAllrun)
 
 # Modify the cases Allrun file for additional shell functions

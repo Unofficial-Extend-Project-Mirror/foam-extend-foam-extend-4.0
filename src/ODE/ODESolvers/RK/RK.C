@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
     Fifth-order Cash-Karp embedded Runge-Kutta scheme with error control and
@@ -90,28 +89,28 @@ void Foam::RK::solve
 {
     forAll(yTemp_, i)
     {
-    	yTemp_[i] = y[i] + b21*h*dydx[i];
+        yTemp_[i] = y[i] + b21*h*dydx[i];
     }
 
     ode_.derivatives(x + a2*h, yTemp_, ak2_);
 
     forAll(yTemp_, i)
     {
-    	yTemp_[i] = y[i] + h*(b31*dydx[i] + b32*ak2_[i]);
+        yTemp_[i] = y[i] + h*(b31*dydx[i] + b32*ak2_[i]);
     }
 
     ode_.derivatives(x + a3*h, yTemp_, ak3_);
 
     forAll(yTemp_, i)
     {
-    	yTemp_[i] = y[i] + h*(b41*dydx[i] + b42*ak2_[i] + b43*ak3_[i]);
+        yTemp_[i] = y[i] + h*(b41*dydx[i] + b42*ak2_[i] + b43*ak3_[i]);
     }
 
     ode_.derivatives(x + a4*h, yTemp_, ak4_);
 
     forAll(yTemp_, i)
     {
-    	yTemp_[i] = y[i]
+        yTemp_[i] = y[i]
           + h*(b51*dydx[i] + b52*ak2_[i] + b53*ak3_[i] + b54*ak4_[i]);
     }
 
@@ -119,7 +118,7 @@ void Foam::RK::solve
 
     forAll(yTemp_, i)
     {
-    	yTemp_[i] = y[i]
+        yTemp_[i] = y[i]
           + h*
             (
                 b61*dydx[i] + b62*ak2_[i] + b63*ak3_[i]
@@ -131,13 +130,13 @@ void Foam::RK::solve
 
     forAll(yout, i)
     {
-    	yout[i] = y[i]
+        yout[i] = y[i]
           + h*(c1*dydx[i] + c3*ak3_[i] + c4*ak4_[i] + c6*ak6_[i]);
     }
 
     forAll(yerr, i)
     {
-    	yerr[i] = 
+        yerr[i] =
             h*
             (
                 dc1*dydx[i] + dc3*ak3_[i] + dc4*ak4_[i]
@@ -164,16 +163,16 @@ void Foam::RK::solve
 
     for (;;)
     {
-    	solve(x, y, dydx, h, yTemp2_, yErr_);
+        solve(x, y, dydx, h, yTemp2_, yErr_);
 
-    	maxErr = 0.0;
-    	for (register label i=0; i<ode_.nEqns(); i++)
+        maxErr = 0.0;
+        for (register label i=0; i<ode_.nEqns(); i++)
         {
             maxErr = max(maxErr, mag(yErr_[i]/yScale[i]));
         }
-    	maxErr /= eps;
+        maxErr /= eps;
 
-    	if (maxErr <= 1.0)
+        if (maxErr <= 1.0)
         {
             break;
         }
@@ -183,7 +182,7 @@ void Foam::RK::solve
             h = (h >= 0.0 ? max(hTemp, 0.1*h) : min(hTemp, 0.1*h));
         }
 
-    	if (h < VSMALL)
+        if (h < VSMALL)
         {
             FatalErrorIn("RK::solve")
                 << "stepsize underflow"

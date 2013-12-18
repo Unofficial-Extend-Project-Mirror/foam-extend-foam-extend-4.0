@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -31,6 +30,7 @@ License
 #include "pointField.H"
 #include "mapPolyMesh.H"
 #include "polyTopoChange.H"
+#include "pointZone.H"
 #include "volMesh.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -53,20 +53,30 @@ namespace Foam
 
 void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
 {
-    // Add zones and modifiers for motion action
+    // Inner slider
+    const word innerSliderName(motionDict_.subDict("slider").lookup("inside"));
+
+    // Outer slider
+    const word outerSliderName
+    (
+        motionDict_.subDict("slider").lookup("outside")
+    );
+
+    bool initialised = false;
+
+    // Check if zones and modifiers for motion action are present
+    label insideZoneID = faceZones().findZoneID(innerSliderName + "Zone");
+    label outsideZoneID = faceZones().findZoneID(outerSliderName + "Zone");
 
     if
     (
-        pointZones().size() > 0
-     || faceZones().size() > 0
-     || cellZones().size() > 0
+        insideZoneID > -1
+     || outsideZoneID > -1
     )
     {
-        Info<< "void linearValveLayersFvMesh::addZonesAndModifiers() : "
-            << "Zones and modifiers already present.  Skipping."
-            << endl;
+        // Zones found.  Check topo changer
 
-        if (topoChanger_.size() == 0)
+        if (topoChanger_.empty())
         {
             FatalErrorIn
             (
@@ -75,88 +85,133 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
                 << abort(FatalError);
         }
 
+        initialised = true;
+    }
+
+    // Check if slider has been initialised on any of the processors
+    reduce(initialised, orOp<bool>());
+
+    if (initialised)
+    {
+        InfoIn("void linearValveLayersFvMesh::addZonesAndModifiers()")
+            << "Zones and modifiers already present.  Skipping."
+            << endl;
+
         return;
     }
 
+    // Add zones and modifiers for motion action
     Info<< "Time = " << time().timeName() << endl
         << "Adding zones and modifiers to the mesh" << endl;
 
     // Add zones
-    List<pointZone*> pz(1);
-    List<faceZone*> fz(4);
-    List<cellZone*> cz(0);
+    label nPz = 0;
+    label nFz = 0;
+    label nCz = 0;
+    List<pointZone*> pz(pointZones().size() + 1);
+    List<faceZone*> fz(faceZones().size() + 4);
+    List<cellZone*> cz(cellZones().size());
 
+    // Add a topology modifier
+    topoChanger_.setSize(2);
+    label nTc = 0;
 
-    // Add an empty zone for cut points
+    // Copy existing point zones
+    forAll (pointZones(), zoneI)
+    {
+        pz[nPz] = pointZones()[zoneI].clone(pointZones()).ptr();
+        nPz++;
+    }  
 
-    pz[0] = new pointZone
-    (
-        "cutPointZone",
-        labelList(0),
-        0,
-        pointZones()
-    );
+    // Copy existing face zones
+    forAll (faceZones(), zoneI)
+    {
+        fz[nFz] = faceZones()[zoneI].clone(faceZones()).ptr();
+        nFz++;
+    }
+    
+    // Copy existing cell zones
+    forAll (cellZones(), zoneI)
+    {
+        cz[nCz] = cellZones()[zoneI].clone(cellZones()).ptr();
+        nCz++;
+    }
+
 
 
     // Do face zones for slider
 
     // Inner slider
-    const word innerSliderName(motionDict_.subDict("slider").lookup("inside"));
     const polyPatch& innerSlider =
         boundaryMesh()[boundaryMesh().findPatchID(innerSliderName)];
 
-    labelList isf(innerSlider.size());
-
-    forAll (isf, i)
-    {
-        isf[i] = innerSlider.start() + i;
-    }
-
-    fz[0] = new faceZone
-    (
-        "insideSliderZone",
-        isf,
-        boolList(innerSlider.size(), false),
-        0,
-        faceZones()
-    );
-
     // Outer slider
-    const word outerSliderName
-    (
-        motionDict_.subDict("slider").lookup("outside")
-    );
-
     const polyPatch& outerSlider =
         boundaryMesh()[boundaryMesh().findPatchID(outerSliderName)];
 
-    labelList osf(outerSlider.size());
-
-    forAll (osf, i)
+    if (!innerSlider.empty() && !outerSlider.empty())
     {
-        osf[i] = outerSlider.start() + i;
+        Pout<< "Adding sliding interface between patches "
+            << innerSliderName << " and " << outerSliderName << endl;
+
+
+        // Add an empty zone for cut points
+        pz[nPz] = new pointZone
+        (
+            "cutPointZone",
+            labelList(0),
+            nPz,
+            pointZones()
+        );
+        nPz++;
+
+        labelList isf(innerSlider.size());
+
+        forAll (isf, i)
+        {
+            isf[i] = innerSlider.start() + i;
+        }
+
+        fz[nFz] = new faceZone
+        (
+            innerSliderName + "Zone",
+            isf,
+            boolList(innerSlider.size(), false),
+            nFz,
+            faceZones()
+        );
+        nFz++;
+
+        labelList osf(outerSlider.size());
+
+        forAll (osf, i)
+        {
+            osf[i] = outerSlider.start() + i;
+        }
+
+        fz[nFz] = new faceZone
+        (
+            outerSliderName + "Zone",
+            osf,
+            boolList(outerSlider.size(), false),
+            nFz,
+            faceZones()
+        );
+        nFz++;
+
+        // Add empty zone for cut faces
+        fz[nFz] = new faceZone
+        (
+            "cutFaceZone",
+            labelList(0),
+            boolList(0, false),
+            nFz,
+            faceZones()
+        );
+        nFz++;
     }
 
-    fz[1] = new faceZone
-    (
-        "outsideSliderZone",
-        osf,
-        boolList(outerSlider.size(), false),
-        1,
-        faceZones()
-    );
-
-    // Add empty zone for cut faces
-    fz[2] = new faceZone
-    (
-        "cutFaceZone",
-        labelList(0),
-        boolList(0, false),
-        2,
-        faceZones()
-    );
-
-    // Add face zone for layer addition
+    // Add face zone for layer addition.  This is present on all processors
     const word layerPatchName
     (
         motionDict_.subDict("layer").lookup("patch")
@@ -172,48 +227,60 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
         lpf[i] = layerPatch.start() + i;
     }
 
-    fz[3] = new faceZone
+    fz[nFz] = new faceZone
     (
         "valveLayerZone",
         lpf,
         boolList(layerPatch.size(), true),
-        0,
+        nFz,
         faceZones()
     );
+    nFz++;
 
+    // Resize the number of live zones
+    pz.setSize(nPz);
+    fz.setSize(nFz);
+    // Cell zones remain unchanged
 
     Info << "Adding point and face zones" << endl;
+    removeZones();
     addZones(pz, fz, cz);
 
-    // Add a topology modifier
-    topoChanger_.setSize(2);
-    topoChanger_.set
-    (
-        0,
-        new slidingInterface
+    if (!innerSlider.empty() && !outerSlider.empty())
+    {
+        // Set the topo changer for sliding interface
+        topoChanger_.set
         (
-            "valveSlider",
             0,
-            topoChanger_,
-            outerSliderName + "Zone",
-            innerSliderName + "Zone",
-            "cutPointZone",
-            "cutFaceZone",
-            outerSliderName,
-            innerSliderName,
-            slidingInterface::INTEGRAL,   // Edge matching algorithm
-            true,                         // Attach-detach action
-            intersection::VISIBLE         // Projection algorithm
-        )
-    );
+            new slidingInterface
+            (
+                "valveSlider",
+                0,
+                topoChanger_,
+                outerSliderName + "Zone",
+                innerSliderName + "Zone",
+                "cutPointZone",
+                "cutFaceZone",
+                outerSliderName,
+                innerSliderName,
+                slidingInterface::INTEGRAL,   // Edge matching algorithm
+                true,                         // Attach-detach action
+                intersection::VISIBLE         // Projection algorithm
+            )
+        );
 
+        // Record one added topo modifyer
+        nTc = 1;
+    }
+
+    // Add the layer addition-removal topo modifyer
     topoChanger_.set
     (
-        1,
+        nTc,
         new layerAdditionRemoval
         (
             "valveLayer",
-            1,
+            nTc,
             topoChanger_,
             "valveLayerZone",
             readScalar
@@ -226,11 +293,20 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
             )
         )
     );
+    nTc++;
 
+    // Reset the size of mesh modifiers
+    topoChanger_.setSize(nTc);
+    Pout<< nTc << " topology modifiers on processor" << endl;
     // Write mesh and modifiers
     topoChanger_.writeOpt() = IOobject::AUTO_WRITE;
     topoChanger_.write();
     write();
+
+    // Update the mesh for changes in zones.  This needs to
+    // happen after write, because mesh instance will be changed
+    // HJ and OP, 20/Nov/2013
+    syncUpdateMesh();
 }
 
 
@@ -302,7 +378,7 @@ bool Foam::linearValveLayersFvMesh::attached() const
         }
     }
 
-    // Check thal all sliders are in sync (debug only)
+    // Check that all sliders are in sync (debug only)
     forAll (topoChanges, modI)
     {
         if (isA<slidingInterface>(topoChanges[modI]))
@@ -322,18 +398,22 @@ bool Foam::linearValveLayersFvMesh::attached() const
         }
     }
 
+    // Sync across processors
+    reduce(result, orOp<bool>());
+
     return result;
 }
 
 
-Foam::tmp<Foam::pointField> Foam::linearValveLayersFvMesh::newPoints() const
+Foam::tmp<Foam::pointField>
+Foam::linearValveLayersFvMesh::newLayerPoints() const
 {
-    tmp<pointField> tnewPoints
+    tmp<pointField> tnewLayerPoints
     (
-        new pointField(points())
+        new pointField(allPoints())
     );
 
-    pointField& np = tnewPoints();
+    pointField& np = tnewLayerPoints();
 
     const word layerPatchName
     (
@@ -355,7 +435,7 @@ Foam::tmp<Foam::pointField> Foam::linearValveLayersFvMesh::newPoints() const
         np[patchPoints[ppI]] += vel*time().deltaT().value();
     }
 
-    return tnewPoints;
+    return tnewLayerPoints;
 }
 
 
@@ -398,66 +478,137 @@ bool Foam::linearValveLayersFvMesh::update()
     // Detaching the interface
     if (attached())
     {
-        Info << "Decoupling sliding interfaces" << endl;
+        Info<< "Decoupling sliding interfaces" << endl;
         makeSlidersLive();
 
         // Changing topology by hand
-        topoChanger_.changeMesh();
+        autoPtr<mapPolyMesh> topoChangeMap1 = topoChanger_.changeMesh();
+
+        bool localMorphing1 = topoChangeMap1->morphing();
+
+        // Note: Since we are detaching, global morphing is always true
+        // HJ, 7/Mar/2011
+
+        if (localMorphing1)
+        {
+            Info << "Topology change; executing pre-motion after "
+                << "sliding detach" << endl;
+            movePoints(topoChangeMap1->preMotionPoints());
+        }
+        else
+        {
+            pointField newPoints = allPoints();
+
+            // Dummy motion
+            movePoints(newPoints);
+        }
+
+        Info<< "sliding interfaces successfully decoupled!!!" << endl;
     }
     else
     {
-        Info << "Sliding interfaces decoupled" << endl;
+        Info<< "Sliding interfaces decoupled" << endl;
     }
 
     // Perform layer action and mesh motion
     makeLayersLive();
 
     // Changing topology by hand
-    {
-        autoPtr<mapPolyMesh> topoChangeMap2 = topoChanger_.changeMesh();
+    autoPtr<mapPolyMesh> topoChangeMap2 = topoChanger_.changeMesh();
 
-        if (topoChangeMap2->morphing())
+    bool localMorphing2 = topoChangeMap2->morphing();
+    bool globalMorphing2 = localMorphing2;
+
+    reduce(globalMorphing2, orOp<bool>());
+
+    // Work array for new points position.
+    pointField newPoints = allPoints();
+
+    if (globalMorphing2)
+    {
+        Info<< "Topology change; executing pre-motion after "
+            << "dynamic layering" << endl;
+
+        if (localMorphing2)
         {
-            if (topoChangeMap2->hasMotionPoints())
-            {
-                Info << "Topology change; executing pre-motion" << endl;
-                movePoints(topoChangeMap2->preMotionPoints());
-            }
+            Info << "Topology change; executing pre-motion" << endl;
+            movePoints(topoChangeMap2->preMotionPoints());
+            newPoints = topoChangeMap2->preMotionPoints();
         }
+        else
+        {
+            movePoints(newPoints);
+        }
+
+        setV0();
+        resetMotion();
     }
 
-    // Move points
-    movePoints(newPoints());
-
-    // Attach the interface
-    Info << "Coupling sliding interfaces" << endl;
-    makeSlidersLive();
+    // Move points to change layer thickness
+    movePoints(newLayerPoints());
 
     // Changing topology by hand
     {
         // Grab old points to correct the motion
         pointField oldPointsNew = oldAllPoints();
 
+        // Attach the interface
+        Info << "Coupling sliding interfaces" << endl;
+        makeSlidersLive();
+
         autoPtr<mapPolyMesh> topoChangeMap3 = topoChanger_.changeMesh();
 
-        if (topoChangeMap3->morphing())
+        bool localMorphing3 = topoChangeMap3->morphing();
+        bool globalMorphing3 = localMorphing3;
+
+        reduce(globalMorphing3, orOp<bool>());
+
+        if (globalMorphing3)
         {
-            if (debug)
+            Info<< "Topology change; executing pre-motion after "
+                << "sliding attach" << endl;
+
+            // Grab points
+            newPoints = allPoints();
+
+            if (localMorphing3)
             {
-                Info << "Moving points post slider attach" << endl;
+                // If there is layering, pick up correct points
+                if (topoChangeMap3->hasMotionPoints())
+                {
+                    newPoints = topoChangeMap3->preMotionPoints();
+                }
+
+                pointField mappedOldPointsNew(newPoints.size());
+
+                mappedOldPointsNew.map
+                (
+                    oldPointsNew,
+                    topoChangeMap3->pointMap()
+                );
+
+                // Solve the correct mesh motion to make sure motion fluxes
+                // are solved for and not mapped
+                movePoints(mappedOldPointsNew);
+
+                resetMotion();
+                setV0();
+
+                // Set new point motion
+                movePoints(newPoints);
             }
+            else
+            {
+                // No local topological change.  Execute double motion for
+                // sync with topological changes
+                movePoints(oldPointsNew);
 
-            pointField newPoints = allPoints();
-            pointField mappedOldPointsNew(newPoints.size());
+                resetMotion();
+                setV0();
 
-            mappedOldPointsNew.map(oldPointsNew, topoChangeMap3->pointMap());
-
-            // Solve the correct mesh motion to make sure motion fluxes
-            // are solved for and not mapped
-            movePoints(mappedOldPointsNew);
-            resetMotion();
-            setV0();
-            movePoints(newPoints);
+                // Set new point motion
+                movePoints(newPoints);
+            }
         }
     }
 
@@ -466,4 +617,3 @@ bool Foam::linearValveLayersFvMesh::update()
 
 
 // ************************************************************************* //
-

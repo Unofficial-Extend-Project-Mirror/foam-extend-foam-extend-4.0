@@ -3,12 +3,12 @@
 
     dimensionedScalar totalMass = fvc::domainIntegrate(rho);
 
-    scalar sumLocalContErr = 
+    scalar sumLocalContErr =
     (
         fvc::domainIntegrate(mag(rho - thermoRho))/totalMass
     ).value();
 
-    scalar globalContErr = 
+    scalar globalContErr =
     (
         fvc::domainIntegrate(rho - thermoRho)/totalMass
     ).value();

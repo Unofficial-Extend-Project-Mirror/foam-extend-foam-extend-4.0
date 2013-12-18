@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -84,6 +83,7 @@ RASModel::RASModel
     epsilonSmall_("epsilonSmall", epsilon0_.dimensions(), SMALL),
     omega0_("omega0", dimless/dimTime, SMALL),
     omegaSmall_("omegaSmall", omega0_.dimensions(), SMALL),
+    nuRatio_(lookupOrDefault<scalar>("nuRatio", 1e4)),
 
     y_(mesh_)
 {
@@ -161,6 +161,15 @@ scalar RASModel::yPlusLam(const scalar kappa, const scalar E) const
 }
 
 
+tmp<volScalarField> RASModel::nuEff() const
+{
+    return tmp<volScalarField>
+    (
+        new volScalarField("nuEff", nut() + nu())
+    );
+}
+
+
 tmp<scalarField> RASModel::yPlus(const label patchNo, const scalar Cmu) const
 {
     const fvPatch& curPatch = mesh_.boundary()[patchNo];
@@ -217,6 +226,7 @@ bool RASModel::read()
         epsilonSmall_.readIfPresent(*this);
         omega0_.readIfPresent(*this);
         omegaSmall_.readIfPresent(*this);
+        readIfPresent("nuRatio", nuRatio_);
 
         return true;
     }

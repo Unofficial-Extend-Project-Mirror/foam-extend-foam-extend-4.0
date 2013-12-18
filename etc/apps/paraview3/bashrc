@@ -1,26 +1,25 @@
 #----------------------------------*-sh-*--------------------------------------
 # =========                 |
-# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+# \\      /  F ield         | foam-extend: Open Source CFD
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright held by original author
+#   \\  /    A nd           | For copyright notice see file Copyright
 #    \\/     M anipulation  |
 #------------------------------------------------------------------------------
 # License
-#     This file is part of OpenFOAM.
+#     This file is part of foam-extend.
 #
-#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     foam-extend is free software: you can redistribute it and/or modify it
 #     under the terms of the GNU General Public License as published by the
-#     Free Software Foundation; either version 2 of the License, or (at your
+#     Free Software Foundation, either version 3 of the License, or (at your
 #     option) any later version.
 #
-#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-#     for more details.
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with OpenFOAM; if not, write to the Free Software Foundation,
-#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
 #     paraview3/bashrc
@@ -70,7 +69,7 @@ if [ "$PYTHONPATH" ]; then
 else
     export PYTHONPATH=$ParaView_DIR/Utilities/VTKPythonWrapping
 fi
-if [ "$WM_ARCH_BASE" = "darwin" ]	    
+if [ "$WM_ARCH_BASE" = "darwin" ]
 then
     export PYTHONPATH=$PYTHONPATH:$ParaView_DIR/bin
 fi
@@ -80,23 +79,23 @@ then
     export PATH=$ParaView_DIR/bin:$PATH
     export PV_PLUGIN_PATH=$FOAM_LIBBIN
     if [ "$WM_ARCH_BASE" == "darwin" ]
- 	then
-	export PATH=$ParaView_DIR/bin/paraview.app/Contents/MacOS:$PATH
- 	export DYLD_LIBRARY_PATH=$ParaView_DIR/bin:$DYLD_LIBRARY_PATH
- 	export DYLD_LIBRARY_PATH=$ParaView_DIR/lib/$ParaView_MAJOR:$DYLD_LIBRARY_PATH
+    then
+        export PATH=$ParaView_DIR/bin/paraview.app/Contents/MacOS:$PATH
+        export DYLD_LIBRARY_PATH=$ParaView_DIR/bin:$DYLD_LIBRARY_PATH
+        export DYLD_LIBRARY_PATH=$ParaView_DIR/lib/$ParaView_MAJOR:$DYLD_LIBRARY_PATH
 
-	# Move plugins to a separate directory because paraview crashes 
-	# when it tries to load one of the other libraries in $FOAM_LIBBIN as a plugin
- 	export PV_PLUGIN_PATH=$FOAM_LIBBIN/paraview
- 	if [ ! -e $PV_PLUGIN_PATH ]
- 	    then
- 	    echo "Creating $PV_PLUGIN_PATH"
- 	    mkdir $PV_PLUGIN_PATH
- 	fi
- 	for i in $(find $FOAM_LIBBIN -depth 1 -name "libPV*")
-	  do
- 	  ln -sf $i $PV_PLUGIN_PATH
- 	done
+        # Move plugins to a separate directory because paraview crashes
+        # when it tries to load one of the other libraries in $FOAM_LIBBIN as a plugin
+        export PV_PLUGIN_PATH=$FOAM_LIBBIN/paraview
+        if [ ! -e $PV_PLUGIN_PATH ]
+        then
+            echo "Creating $PV_PLUGIN_PATH"
+            mkdir $PV_PLUGIN_PATH
+        fi
+        for i in $(find $FOAM_LIBBIN -depth 1 -name "libPV*")
+        do
+            ln -sf $i $PV_PLUGIN_PATH
+        done
     fi
 fi
 

@@ -1,14 +1,14 @@
 // use tetrahedral decomposition of the engine mesh
 
 {
-    
+
     Info << "setting valve motion b.c." << endl;
 
     tetPointVectorField& motionU = mSolver.motionU();
 
-    
+
     // set piston motion boundary conditions
-    
+
     // Set piston velocity
     if (piston().patchID().active())
     {
@@ -23,16 +23,16 @@
         motionU.boundaryField()[piston().patchID().index()] == pistonVel;
 
     }
-    
+
     // Set valve velocity
     forAll (valves_, valveI)
     {
-        
+
         vector valveVel =
             valves_[valveI].curVelocity()*valves_[valveI].cs().axis();
-        
+
         Info << "Valve n. " << valveI + 1 << " velocity = " <<  valves_[valveI].curVelocity() << endl;
-        
+
         // If valve is present in geometry, set the motion
         if (valves_[valveI].bottomPatchID().active())
         {
@@ -44,7 +44,7 @@
 
         if (valves_[valveI].poppetPatchID().active())
         {
-                            
+
             if(valves_[valveI].curLift() < valves_[valveI].deformationLift())
             {
                 // Top of the valve does not move
@@ -57,7 +57,7 @@
                 motionU.boundaryField()[valves_[valveI].poppetPatchID().index()] ==
                     vector::zero;
             }
-        
+
         }
 
         if (valves_[valveI].sidePatchID().active())
@@ -66,7 +66,7 @@
             motionU.boundaryField()[valves_[valveI].sidePatchID().index()] ==
                 valveVel;
         }
-        
+
         if (valves_[valveI].detachInPortPatchID().active())
         {
             motionU.boundaryField()[valves_[valveI].detachInPortPatchID().index()] == vector::zero;
@@ -77,7 +77,7 @@
             motionU.boundaryField()[valves_[valveI].detachInCylinderPatchID().index()] == vector::zero;
         }
 
-        if 
+        if
         (
             valves_[valveI].curtainInPortPatchID().active()
             &&
@@ -93,45 +93,45 @@
 
             label curtainInCylIndex = valves_[valveI].curtainInCylinderPatchID().index();
             label bottomIndex = valves_[valveI].bottomPatchID().index();
-            
+
 //            label poppetIndex = valves_[valveI].poppetPatchID().index();
 //            label curtainInCylIndex = valves_[valveI].curtainInCylinderPatchID().index();
-            
+
             const coordinateSystem& cSysV = valves_[valveI].cs();
-                        
-            const pointField& curtainInCylGlobal = 
+
+            const pointField& curtainInCylGlobal =
                     motionU.boundaryField()[curtainInCylIndex].patch().localPoints();
 
-            const pointField& bottomGlobal = 
+            const pointField& bottomGlobal =
                     motionU.boundaryField()[bottomIndex].patch().localPoints();
-            
-            scalarField curtainInCylLocal = cSysV.localPosition(curtainInCylGlobal)().component(vector::Z);               
+
+            scalarField curtainInCylLocal = cSysV.localPosition(curtainInCylGlobal)().component(vector::Z);
 
             scalarField bottomLocal = cSysV.localPosition(bottomGlobal)().component(vector::Z);
-                    
-                
+
+
             scalar maxCurtain = max(curtainInCylLocal);
 
             scalar minCurtain = min(curtainInCylLocal);
 //            scalar minCurtain = max(bottomLocal);
             scalar maxBottom = max(bottomLocal);
 
-            
+
             Info << "minCurtain = " << minCurtain << endl;
             Info << "maxBottom = " << max(bottomLocal) << endl;
-            
-                				
+
+
 //            motionU.boundaryField()[curtainInCylIndex] == (pos(curtainInCylLocal - minCurtain))*valveVel*(maxCurtain -
 //            curtainInCylLocal)/(maxCurtain-minCurtain);
-            
 
-/*            
+
+/*
             forAll(motionU.boundaryField()[curtainInCylIndex], pointi)
             {
                 if(curtainInCylLocal[pointi] > maxBottom)
                 {
-                    motionU.boundaryField()[curtainInCylIndex][pointi] 
-                    == 
+                    motionU.boundaryField()[curtainInCylIndex][pointi]
+                    ==
                     valveVel*
                     (maxCurtain - curtainInCylLocal[pointi])
                     /
@@ -139,8 +139,8 @@
                 }
                 else
                 {
-                    motionU.boundaryField()[curtainInCylIndex][pointi] 
-                    == 
+                    motionU.boundaryField()[curtainInCylIndex][pointi]
+                    ==
                     valveVel;
                 }
             }
@@ -155,17 +155,17 @@
             curtainInCylLocal)/(maxCurtain-minCurtain) + (1.0 - pos(curtainInCylLocal - maxBottom)) * valveVel;
 
 //            Info << "motionU" << motionU.boundaryField()[curtainInCylIndex] << endl;
-            
+
             Info << "valveVel" << valveVel << endl;
-                        
-//            Info << "motionU.boundaryField()[curtainInCylIndex]" << 
+
+//            Info << "motionU.boundaryField()[curtainInCylIndex]" <<
 //            motionU.boundaryField()[curtainInCylIndex] << endl;
 
         }
-		
-	}
+
+    }
 
 //  Setting the boundary position
     Info << "valve motion boundary conditions set" << endl;
-    
+
 }

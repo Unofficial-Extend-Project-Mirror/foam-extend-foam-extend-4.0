@@ -63,7 +63,7 @@ Order Routines are called
 
 The various main operations are given basically in the order they will
 be performed.  Within each operation, the order the routines will be
-called is given.  
+called is given.
 
 10. To see if materials in the model
 
@@ -96,7 +96,7 @@ called is given.
         USERD_get_part_elements_by_type
 
           If any nsided elements:
-  
+
             USERD_get_nsided_conn
 
           If any nfaced elements:
@@ -106,7 +106,7 @@ called is given.
 
         USERD_get_part_coords
         USERD_get_part_node_ids
- 
+
          .
          .
          .
@@ -119,7 +119,7 @@ Detailed Specifications
 Include files:
 --------------
 The following header file is required in any file containing these library
-routines. 
+routines.
 
        #include "global_extern.h"
 
@@ -136,7 +136,7 @@ Also, Make sure the api version in the USERD_get_reader_version routine is set
 to "2.03" or larger.
 
 Make sure your reader has access to the global_extern_proto.h   This is a new
-file which is access from the new global_extern.h    
+file which is access from the new global_extern.h
 
 *******************************************************************************
 *******************************************************************************
@@ -336,7 +336,7 @@ USERD_get_matf_set_info
    int USERD_get_matf_set_info(int *mat_set_ids,
                                char **mat_set_name)
 
-   Returns: 
+   Returns:
    -------
    Z_OK  if successful
    Z_ERR if not successful
@@ -603,7 +603,7 @@ USERD_load_matf_data
                                (Float array will have been allocated
                                 the appropriate size, as returned in
                                 USERD_size_matf_data for mat_type Z_MIX_VALUE)
-  
+
    Notes:
    -----
   * See USERD_get_number_of_material_sets header for explanatory example
@@ -635,30 +635,30 @@ USERD_get_nsided_conn -
    (IN)  part_number         = the part number
 
    (OUT) nsided_conn_array   = 1D array of nsided connectivies
-  
+
                                (int array will have been allocated long enough
                                 to hold all the nsided connectivities. Which is
                                 the sum of all the nodes_per_element values in
                                 the conn_array of USERD_get_part_elements_by_type)
-  
+
 
    Notes:
    -----
    * Will not be called unless there are some nsided elements in the the part.
 
    * Providing nsided information to Ensight:
-  
+
      1. In USERD_get_gold_part_build_info, provide the number of nsided
         elements in the part.
-  
+
      2. In USERD_get_part_elements_by_type, provide (in the conn_array),
         the number of nodes per nsided element. (as if connectivity
         length of an nsided element is one)
-  
+
      3. In this routine, provide the streamed connectivities for each of the
         nsided elements.
-  
-  
+
+
      Simple example:         5        6
                             +--------+
      3 nsided elements:    /|         \
@@ -675,7 +675,7 @@ USERD_get_nsided_conn -
                       |     |          /
                       |1    |2        /9
                       +-----+--------+
-  
+
       1. In USERD_get_gold_part_build_info:
               number_of_elements[Z_NSIDED] = 3
                                              .
@@ -683,27 +683,27 @@ USERD_get_nsided_conn -
                                              |
       2. In USERD_get_part_elements_by_type:
           length of conn_array will be:      3 x 1
-  
+
           for element_type of Z_NSIDED:
               conn_array[0][0] = 4           (for the 4-sided element)
               conn_array[1][0] = 3           (for the 3-sided element)
               conn_array[2][0] = 7           (for the 7-sided element)
-  
+
                            Sum  ===
                                  14    <---------+
                                                  |
       3. In this routine:                        |
            length of nsided_conn_array will be:  14
-  
+
               nsided_conn_array[0]  = 1      (connectivity of 4-sided element)
               nsided_conn_array[1]  = 2
               nsided_conn_array[2]  = 4
               nsided_conn_array[3]  = 3
-  
+
               nsided_conn_array[4]  = 3      (connectivity of 3-sided element)
               nsided_conn_array[5]  = 4
               nsided_conn_array[6]  = 5
-  
+
               nsided_conn_array[7]  = 2      (connectivity of 7-sided element)
               nsided_conn_array[8]  = 9
               nsided_conn_array[9]  = 8
@@ -738,7 +738,7 @@ USERD_get_nfaced_nodes_per_face -
 
    (OUT) nfaced_npf_array  = 1D array of nodes per face for all faces of
                              nfaced elements
- 
+
                              (int array will have been allocated long enough
                               to hold all the nodes_per_face values. Which is
                               the sum of all the number of faces per element
@@ -751,18 +751,18 @@ USERD_get_nfaced_nodes_per_face -
      the part
 
    * Providing nfaced information to Ensight:
-  
+
      1. In USERD_get_gold_part_build_info, provide the number of nfaced
         polyhedral elements in the part.
-  
+
      2. In USERD_get_part_elements_by_type, provide (in the conn_array),
         the number of faces per nfaced element. (as if connectivity
         length of an nfaced element is one)
-  
+
      3. In this routine, provide the streamed number of nodes per face
         for each of the faces of the nfaced elements.
-  
-  
+
+
      Simple example:         11        10   12
                             +--------+-----+
      2 nfaced elements:    /|        |\   /|
@@ -779,7 +779,7 @@ USERD_get_nfaced_nodes_per_face -
                       | /         |    /
                       |/1         |2 /
                       +-----------+/
-  
+
       1. In USERD_get_gold_part_build_info:
               number_of_elements[Z_NFACED] = 2
                                              .
@@ -790,13 +790,13 @@ USERD_get_nfaced_nodes_per_face -
           for element_type of Z_NFACED:
               conn_array[0][0] = 7           (for the 7-faced element)
               conn_array[1][0] = 5           (for the 5-faced element)
-  
+
                                 ==
                            Sum  12    <---------+
                                                 |
       3. In this routine:                       |
            length of nfaced_npf_array will be:  12
-  
+
             nfaced_npf_array[0]  = 5  (5-noded top face of 7-faced element)
             nfaced_npf_array[1]  = 5  (5-noded bot face of 7-faced element)
             nfaced_npf_array[2]  = 4  (4-noded front face of 7-faced element)
@@ -804,74 +804,74 @@ USERD_get_nfaced_nodes_per_face -
             nfaced_npf_array[4]  = 4  (4-noded back face of 7-faced element)
             nfaced_npf_array[5]  = 4  (4-noded right front face of 7-faced element)
             nfaced_npf_array[6]  = 4  (4-noded right back face of 7-faced element)
-  
+
             nfaced_npf_array[7]  = 3  (3-noded top face of 5-faced element)
             nfaced_npf_array[8]  = 3  (3-noded bot face of 5-faced element)
             nfaced_npf_array[9]  = 4  (4-noded back face of 5-faced element)
             nfaced_npf_array[10] = 4  (4-noded right face of 5-faced element)
             nfaced_npf_array[11] = 4  (4-noded left front face of 5-faced element)
-  
+
                                    ==
                              Sum   48   <-------------+
                                                       |
       4. In USERD_get_nfaced_conn:                    |
             length of the nfaced_conn_array will be:  48
-  
+
             nsided_conn_array[0] = 7   (conn of 5-noded top face of 7-faced elem)
             nsided_conn_array[1] = 8
             nsided_conn_array[2] = 9
             nsided_conn_array[3] = 10
             nsided_conn_array[4] = 11
-  
+
             nsided_conn_array[5] = 1   (conn of 5-noded bot face of 7-faced elem)
             nsided_conn_array[6] = 5
             nsided_conn_array[7] = 4
             nsided_conn_array[8] = 3
             nsided_conn_array[9] = 2
-  
+
             nsided_conn_array[10] = 1  (conn of 4-noded front face of 7-faced elem)
             nsided_conn_array[11] = 2
             nsided_conn_array[12] = 8
             nsided_conn_array[13] = 7
-  
+
             nsided_conn_array[14] = 5  (conn of 4-noded left face of 7-faced elem)
             nsided_conn_array[15] = 1
             nsided_conn_array[16] = 7
             nsided_conn_array[17] = 11
-  
+
             nsided_conn_array[18] = 4  (conn of 4-noded back face of 7-faced elem)
             nsided_conn_array[19] = 5
             nsided_conn_array[20] = 11
             nsided_conn_array[21] = 10
-  
+
             nsided_conn_array[22] = 2  (conn of 4-noded right front face of 7-faced)
             nsided_conn_array[23] = 3
             nsided_conn_array[24] = 9
             nsided_conn_array[25] = 8
-  
+
             nsided_conn_array[26] = 3  (conn of 4-noded right back face of 7-faced)
             nsided_conn_array[27] = 4
             nsided_conn_array[28] = 10
             nsided_conn_array[29] = 9
-  
+
             nsided_conn_array[30] = 9  (conn of 3-noded top face of 5-faced elem)
             nsided_conn_array[32] = 12
             nsided_conn_array[32] = 10
-  
+
             nsided_conn_array[33] = 3  (conn of 3-noded bot face of 5-faced elem)
             nsided_conn_array[34] = 4
             nsided_conn_array[35] = 6
-  
+
             nsided_conn_array[36] = 6  (conn of 4-noded back face of 5-faced elem)
             nsided_conn_array[37] = 4
             nsided_conn_array[38] = 10
             nsided_conn_array[39] = 12
-  
+
             nsided_conn_array[40] = 3  (conn of 4-noded right face of 5-faced elem)
             nsided_conn_array[41] = 6
             nsided_conn_array[42] = 12
             nsided_conn_array[43] = 9
-  
+
             nsided_conn_array[44] = 4  (conn of 4-noded left front face of 5-faced)
             nsided_conn_array[45] = 3
             nsided_conn_array[46] = 9
@@ -913,18 +913,18 @@ USERD_get_nfaced_conn
  * Will not be called unless there are some nfaced elements in the part
 
  * Providing nfaced information to Ensight:
-  
+
      1. In USERD_get_gold_part_build_info, provide the number of nfaced
         polyhedral elements in the part.
-  
+
      2. In USERD_get_part_elements_by_type, provide (in the conn_array),
         the number of faces per nfaced element. (as if connectivity
         length of an nfaced element is one)
-  
+
      3. In this routine, provide the streamed number of nodes per face
         for each of the faces of the nfaced elements.
-  
-  
+
+
      Simple example:         11        10   12
                             +--------+-----+
      2 nfaced elements:    /|        |\   /|
@@ -941,7 +941,7 @@ USERD_get_nfaced_conn
                       | /         |    /
                       |/1         |2 /
                       +-----------+/
-  
+
       1. In USERD_get_gold_part_build_info:
               number_of_elements[Z_NFACED] = 2
                                              .
@@ -952,13 +952,13 @@ USERD_get_nfaced_conn
           for element_type of Z_NFACED:
               conn_array[0][0] = 7           (for the 7-faced element)
               conn_array[1][0] = 5           (for the 5-faced element)
-  
+
                                 ==
                            Sum  12    <---------+
                                                 |
       3. In USERD_get_faced_nodes_per_face:     |
            length of nfaced_npf_array will be:  12
-  
+
             nfaced_npf_array[0]  = 5  (5-noded top face of 7-faced element)
             nfaced_npf_array[1]  = 5  (5-noded bot face of 7-faced element)
             nfaced_npf_array[2]  = 4  (4-noded front face of 7-faced element)
@@ -966,74 +966,74 @@ USERD_get_nfaced_conn
             nfaced_npf_array[4]  = 4  (4-noded back face of 7-faced element)
             nfaced_npf_array[5]  = 4  (4-noded right front face of 7-faced element)
             nfaced_npf_array[6]  = 4  (4-noded right back face of 7-faced element)
-  
+
             nfaced_npf_array[7]  = 3  (3-noded top face of 5-faced element)
             nfaced_npf_array[8]  = 3  (3-noded bot face of 5-faced element)
             nfaced_npf_array[9]  = 4  (4-noded back face of 5-faced element)
             nfaced_npf_array[10] = 4  (4-noded right face of 5-faced element)
             nfaced_npf_array[11] = 4  (4-noded left front face of 5-faced element)
-  
+
                                    ==
                              Sum   48   <-------------+
                                                       |
       4. In this function:                            |
             length of the nfaced_conn_array will be:  48
-  
+
             nsided_conn_array[0] = 7   (conn of 5-noded top face of 7-faced elem)
             nsided_conn_array[1] = 8
             nsided_conn_array[2] = 9
             nsided_conn_array[3] = 10
             nsided_conn_array[4] = 11
-  
+
             nsided_conn_array[5] = 1   (conn of 5-noded bot face of 7-faced elem)
             nsided_conn_array[6] = 5
             nsided_conn_array[7] = 4
             nsided_conn_array[8] = 3
             nsided_conn_array[9] = 2
-  
+
             nsided_conn_array[10] = 1  (conn of 4-noded front face of 7-faced elem)
             nsided_conn_array[11] = 2
             nsided_conn_array[12] = 8
             nsided_conn_array[13] = 7
-  
+
             nsided_conn_array[14] = 5  (conn of 4-noded left face of 7-faced elem)
             nsided_conn_array[15] = 1
             nsided_conn_array[16] = 7
             nsided_conn_array[17] = 11
-  
+
             nsided_conn_array[18] = 4  (conn of 4-noded back face of 7-faced elem)
             nsided_conn_array[19] = 5
             nsided_conn_array[20] = 11
             nsided_conn_array[21] = 10
-  
+
             nsided_conn_array[22] = 2  (conn of 4-noded right front face of 7-faced)
             nsided_conn_array[23] = 3
             nsided_conn_array[24] = 9
             nsided_conn_array[25] = 8
-  
+
             nsided_conn_array[26] = 3  (conn of 4-noded right back face of 7-faced)
             nsided_conn_array[27] = 4
             nsided_conn_array[28] = 10
             nsided_conn_array[29] = 9
-  
+
             nsided_conn_array[30] = 9  (conn of 3-noded top face of 5-faced elem)
             nsided_conn_array[32] = 12
             nsided_conn_array[32] = 10
-  
+
             nsided_conn_array[33] = 3  (conn of 3-noded bot face of 5-faced elem)
             nsided_conn_array[34] = 4
             nsided_conn_array[35] = 6
-  
+
             nsided_conn_array[36] = 6  (conn of 4-noded back face of 5-faced elem)
             nsided_conn_array[37] = 4
             nsided_conn_array[38] = 10
             nsided_conn_array[39] = 12
-  
+
             nsided_conn_array[40] = 3  (conn of 4-noded right face of 5-faced elem)
             nsided_conn_array[41] = 6
             nsided_conn_array[42] = 12
             nsided_conn_array[43] = 9
-  
+
             nsided_conn_array[44] = 4  (conn of 4-noded left front face of 5-faced)
             nsided_conn_array[45] = 3
             nsided_conn_array[46] = 9
@@ -1073,30 +1073,30 @@ USERD_get_gold_part_build_info
    ---------
    (OUT) part_id                = Array containing the external part
                                   ids for each of the model parts.
- 
+
                                   IMPORTANT:
                                    Parts numbers must be >= 1, because
                                    of the way they are used in the GUI
- 
+
               *******************************************
                The ids provided here are the numbers by
                which the parts will be referred to in the
                GUI (if possible). They are basically
                labels as far as you are concerned.
- 
+
                Note: The part numbers you pass to routines
                which receive a part_number or block_number
                or which_part as an argument are the 1-based
                table index of the parts!
- 
+
                example:  If Numparts_available = 3
- 
+
                          Table index        part_id
                          -----------        -------
                           1                  13
                           2                  57
                           3                  125
- 
+
                           ^                   ^
                           |                   |
                           |                    These are placed in:
@@ -1108,7 +1108,7 @@ USERD_get_gold_part_build_info
                            These implied table indices are the part_number,
                            block_number, or which_part numbers that you would
                            pass to routines like:
- 
+
                           USERD_get_part_coords(int part_number,...
                           USERD_get_part_node_ids(int part_number,...
                           USERD_get_part_elements_by_type(int part_number,...
@@ -1125,38 +1125,38 @@ USERD_get_gold_part_build_info
                                                           int which_node_or_elem,
                                                           int which_part,...
               ********************************************
- 
+
                                    (Array will have been allocated
                                     Numparts_available long)
- 
+
    (OUT) part_types             = Array containing one of the
                                   following for each model part:
- 
+
                                         Z_UNSTRUCTURED or
                                         Z_STRUCTURED  or
                                         Z_IBLANKED
- 
+
                                    (Array will have been allocated
                                     Numparts_available long)
- 
+
    (OUT) part_description       = Array containing a description
                                   for each of the model parts
- 
+
                                    (Array will have been allocated
                                     Numparts_available by Z_BUFL
                                     long)
- 
+
    (OUT) number_of_nodes        = Number of unstructured nodes in the part
- 
+
                                    (Array will have been allocated
                                     Numparts_available long)
- 
+
    (OUT) number_of_elements     = 2D array containing number of
                                   each type of element for each
                                   unstructured model part.
                                   ------------
                                   Possible types are:
- 
+
                                  Z_POINT   =  point
                                  Z_BAR02   =  2-noded bar
                                  Z_BAR03   =  3-noded bar
@@ -1172,7 +1172,7 @@ USERD_get_gold_part_build_info
                                  Z_PEN15   = 15-noded pentahedron
                                  Z_HEX08   =  8-noded hexahedron
                                  Z_HEX20   = 20-noded hexahedron
- 
+
     Starting at API 2.01:
     ====================
                                  Z_G_POINT    ghost node point element
@@ -1190,61 +1190,61 @@ USERD_get_gold_part_build_info
                                  Z_G_PEN15   15 node ghost pentahedron
                                  Z_G_HEX08    8 node ghost hexahedron
                                  Z_G_HEX20   20 node ghost hexahedron
- 
+
     Starting at API 2.02:
     ====================
                                  Z_NSIDED     n node nsided polygon
                                  Z_NFACED     n face nfaced polyhedron
                                  Z_G_NSIDED   n node ghost nsided polygon
                                  Z_G_NFACED   n face ghost nfaced polyhedron
- 
+
                                 (Ignored unless Z_UNSTRUCTURED type)
- 
+
                                    (Array will have been allocated
                                     Numparts_available by
                                     Z_MAXTYPE long)
- 
+
    (OUT) ijk_dimensions         = 2D array containing ijk dimension info
                                   for structured blocks
- 
+
                                   For Z_UNSTRUCTURED - is ignored
- 
+
                                   For Z_STRUCTURED or Z_IBLANKED
- 
+
         Prior to version 2.03:
         ----------------------
                                    (Array will have been allocated
                                     Numparts_available by 3 long)
- 
+
                               ijk_dimensions[][0] = I dimension
                               ijk_dimensions[][1] = J dimension
                               ijk_dimensions[][2] = K dimension
- 
- 
+
+
         Starting at version 2.03:
         ------------------------
                                    (Array will have been allocated
                                     Numparts_available by 9 long)
- 
+
                               There are two ways to do this:
                               ------------------------------
                               1. The simple one, without ranges.
- 
+
                                    This is good for all structured models
                                    that will NOT be used in EnSight's
                                    Server of Servers
- 
+
                                    Simply provide the ijk dimensions in the
                                    first three slots and place a -1 in
                                    the 4th slot.  (The remaining slots will
                                    be ignored).
- 
+
                               Thus,
                               ijk_dimensions[][0] = I dimension of block
                               ijk_dimensions[][1] = J dimension of block
                               ijk_dimensions[][2] = K dimension of block
                               ijk_dimensions[][3] = -1
- 
+
                         (J planes)
                             4 *-------*-------*
                               |       |       |    ijk_dimension[0][0] = 3
@@ -1260,36 +1260,36 @@ USERD_get_gold_part_build_info
                               |       |       |
                             1 *-------*-------*
                               1       2       3  (I planes)
- 
- 
- 
+
+
+
                               2. Using ranges.
- 
+
                                   This one can be used anytime, but MUST
                                   be used if EnSight's Server of Servers
                                   is to be used!
- 
+
                                   The first 3 slots contain the ijk dimension
                                   of the complete block (of which this may be
                                   a portion).  The last 6 slots contain the
                                   ijk min and max ranges within the complete.
- 
+
                               Thus,
                               ijk_dimensions[][0] = I dim of complete block
                               ijk_dimensions[][1] = J dim of complete block
                               ijk_dimensions[][2] = K dim of complete block
- 
+
                               ijk_dimensions[][3] = Imin of portion (1-based)
                               ijk_dimensions[][4] = Imax of portion (1-based)
                               ijk_dimensions[][5] = Jmin of portion (1-based)
                               ijk_dimensions[][6] = Jmax of portion (1-based)
                               ijk_dimensions[][7] = Kmin of portion (1-based)
                               ijk_dimensions[][8] = Kmax of portion (1-based)
- 
- 
+
+
                               example1: (Model has one part, a simple 2D block,
                                          and want whole thing)
- 
+
                         (J planes)
                             4 *-------*-------*
                               |       |       |    ijk_dimension[0][0] = 3
@@ -1305,11 +1305,11 @@ USERD_get_gold_part_build_info
                               |       |       |
                             1 *-------*-------*
                               1       2       3  (I planes)
- 
- 
+
+
                               example2: (Want to have the block represented
                                          in two portions - 2 parts)
- 
+
                         (J planes)                 top portion
                             4 *-------*-------*
                               |       |       |    ijk_dimension[0][0] = 3
@@ -1325,8 +1325,8 @@ USERD_get_gold_part_build_info
                               .       .       .
                             1 .................
                               1       2       3  (I planes)
- 
- 
+
+
                         (J planes)                 bottom portion
                             4 .................
                               .       .       .    ijk_dimension[1][0] = 3
@@ -1342,23 +1342,23 @@ USERD_get_gold_part_build_info
                               |       |       |
                             1 *-------*-------*
                               1       2       3  (I planes)
- 
- 
+
+
         And note that if you were partioning this block for
         EnSight's Server of Servers, you would only have one part,
         instead of two.  Each SOS server would return its appropriate
         ranges in the last 6 slots. The first 3 slots would remain constant.
- 
- 
+
+
    (OUT) iblanking_options      = 2D array containing iblanking
                                   options possible for each
                                   structured model part.
                                   ----------
                                   (Ignored unless Z_IBLANKED type)
- 
+
                                   (Array will have been allocated
                                    Numparts_available by 6 long)
- 
+
        iblanking_options[][Z_EXT]     = TRUE if external (outside)
                         [][Z_INT]     = TRUE if internal (inside)
                         [][Z_BND]     = TRUE if boundary
@@ -1370,5 +1370,5 @@ USERD_get_gold_part_build_info
    -----
    If you haven't built a table of pointers to the different parts,
    you might want to do so here as you gather the needed info.
- 
+
    This will be based on Current_time_step

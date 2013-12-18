@@ -6,7 +6,7 @@ EXE_INC = \
     -IinterfacialModels/lnInclude \
     -IphaseModel/lnInclude \
     -Iaveraging
-        
+
 EXE_LIBS = \
     -lEulerianInterfacialModels \
     -lfiniteVolume \

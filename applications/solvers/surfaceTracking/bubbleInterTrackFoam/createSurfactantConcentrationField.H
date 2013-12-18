@@ -21,7 +21,7 @@ if(!interface.cleanInterface() && interface.surfactant().soluble())
 
     if(runTime.timeIndex() == 0)
     {
-        const dimensionedScalar& CA = 
+        const dimensionedScalar& CA =
             interface.surfactant().surfactBulkConc();
 
         dimensionedScalar CB("CB", CA.dimensions(), 0);
@@ -40,7 +40,7 @@ if(!interface.cleanInterface() && interface.surfactant().soluble())
                     CPtr->boundaryField()[spacePatchID]
                 );
 
-            spaceC.refValue() = CA.value();            
+            spaceC.refValue() = CA.value();
         }
         else
         {
@@ -50,7 +50,7 @@ if(!interface.cleanInterface() && interface.surfactant().soluble())
                     << inletOutletFvPatchScalarField::typeName
                     << abort(FatalError);
         }
-        
+
         CPtr->correctBoundaryConditions();
 
         CPtr->write();

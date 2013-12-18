@@ -20,4 +20,5 @@ EXE_LIBS = \
     -lmeshTools \
     -ldynamicFvMesh \
     -ltopoChangerFvMesh \
-    -llduSolvers
+    -llduSolvers \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

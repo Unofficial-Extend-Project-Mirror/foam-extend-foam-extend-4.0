@@ -1,0 +1,206 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// equationReaderDemo makes these variables available to your equations:
+//
+//  t       time
+//  C.x     x co-ordinate
+//  C.y     y co-ordinate
+//  C.z     z co-ordinate
+//  V       cell volume
+//  p       pressure
+//  U.x     velocity x
+//  U.y     velocity y
+//  U.z     velocity z
+//  R_.xx   Reynolds stress tensor xx
+//  R_.xy   Reynolds stress tensor xy
+//  R_.xz   Reynolds stress tensor xz
+//  R_.yy   Reynolds stress tensor yy
+//  R_.yz   Reynolds stress tensor yz
+//  R_.zz   Reynolds stress tensor zz
+//  scalar sources:
+//      sA, sB, sC
+//  DimensionedScalarSources:
+//      dsA, dsB, dsC
+//  scalarField sources (cannot be used for GeometricField output equations)
+//      sfA, sfB, sfC
+//  volScalarField sources
+//      vsfA, vsfB, vsfC
+//  vector sources
+//      vA.x, vA.y, vA.z
+//      vB.x, vB.y, vB.z
+//      vC.x, vC.y, vC.z
+//  DimensionedVectorSources:
+//      dvA.x, dvA.y, dvA.z
+//      dvB.x, dvB.y, dvB.z
+//      dvC.x, dvC.y, dvC.z
+//  vectorField sources (cannot be used for GeometricField output equations)
+//      vfA.x, vfA.y, vfA.z
+//      vfB.x, vfB.y, vfB.z
+//      vfC.x, vfC.y, vfC.z
+//  volVectorField sources
+//      vvfA.x, vvfA.y, vvfA.z
+//      vvfB.x, vvfB.y, vvfB.z
+//      vvfC.x, vvfC.y, vvfC.z
+//  tensor sources
+//      tA.xx, tA.xy, tA.xz, tA.yx, tA.yy, tA.yz, tA.zx, tA.zy, tA.zz
+//      tB.xx, tB.xy, tB.xz, tB.yx, tB.yy, tB.yz, tB.zx, tB.zy, tB.zz
+//      tC.xx, tC.xy, tC.xz, tC.yx, tC.yy, tC.yz, tC.zx, tC.zy, tC.zz
+//  DimensionedTensorSources:
+//      dtA.xx, dtA.xy, dtA.xz, dtA.yx, dtA.yy, dtA.yz, dtA.zx, dtA.zy, dtA.zz
+//      dtB.xx, dtB.xy, dtB.xz, dtB.yx, dtB.yy, dtB.yz, dtB.zx, dtB.zy, dtB.zz
+//      dtC.xx, dtC.xy, dtC.xz, dtC.yx, dtC.yy, dtC.yz, dtC.zx, dtC.zy, dtC.zz
+//  tensorField sources (cannot be used for GeometricField output equations)
+//      tfA.xx, tfA.xy, tfA.xz, tfA.yx, tfA.yy, tfA.yz, tfA.zx, tfA.zy, tfA.zz
+//      tfB.xx, tfB.xy, tfB.xz, tfB.yx, tfB.yy, tfB.yz, tfB.zx, tfB.zy, tfB.zz
+//      tfC.xx, tfC.xy, tfC.xz, tfC.yx, tfC.yy, tfC.yz, tfC.zx, tfC.zy, tfC.zz
+//  volVectorField sources
+//      vtfA.xx, vtfA.xy, vtfA.xz, vtfA.yx, vtfA.yy, vtfA.yz, vtfA.zx, vtfA.zy,
+//          vtfA.zz
+//      vtfB.xx, vtfB.xy, vtfB.xz, vtfB.yx, vtfB.yy, vtfB.yz, vtfB.zx, vtfB.zy,
+//          vtfB.zz
+//      vtfC.xx, vtfC.xy, vtfC.xz, vtfC.yx, vtfC.yy, vtfC.yz, vtfC.zx, vtfC.zy,
+//          vtfC.zz
+//  Also, this dictionary is, itself, a "source", so you can define your own
+//  variables, including:
+//      scalars
+//      dimensionedScalars
+//      other equations
+
+// * * * * * * * * * * * * * * Scalar Equations  * * * * * * * * * * * * * * //
+// scalar
+//  You can use any variables on single scalars.  If a field is used, equation
+//  reader will take the value at cell index 0 unless you tell it otherwise.
+//  You can mix types, provided you give a valid component.  This equation is
+//  for a scalar, so it ignores dimensions.
+sOut    "sA + dsB + vC.x + tA.yz";
+
+// dimensionedScalar
+//  This equation will be evaluated twice: once for the scalar value, and once
+//  for the dimensionSet.  If the dimensions don't match, it will fail.  You
+//  can subscribe a dimensionSet.  This will disable dimension-checking, and
+//  force the outcome to the dimensions you give it - this is shown for dsfOut.
+dsOut   "sqrt(sqr(vB.x) + sqr(vB.y) + sqr(vB.z))";
+
+// dimenionedScalarField
+//  You can use any variables on fields.  If single variables appear, they are
+//  assumed uniform throughout the field.  If GeometricFields appear, the
+//  boundary field is ignored.  If another field is given, its size must match.
+//  Index checking is slow, so it is only available in FULLDEBUG mode.  In this
+//  equation, we define a dimensionSet.  This forces the outcome to the
+//  prescribed dimension.
+dsfOut  [0 0 0 0 0 0 0] "V / C.x * t";
+
+// volScalarField
+//  This is for a GeometricField.  GeometricField equations are very picky
+//  about their source data.  They can either use single-element sources, such
+//  as scalars, tensors, etc., or other GeometricFields.  The GeometricFields
+//  must have the same sizes.
+volSfOut    "sOut * vsfA + max(vtfA.yz, vtfA.zy)";
+
+// * * * * * * * * * * * * * * Vector Equations  * * * * * * * * * * * * * * //
+// vector
+//  You can't define vector or tensor equations.  equationReader only works
+//  with scalars.  To get it to work, you have to evaluate them one component
+//  at a time.  To use a constant built-in to OpenFOAM, append _ to the name.
+//vOut.x  "U.x / stabilise(C.x, VSMALL_) * t";
+//vOut.y  "U.y / stabilise(C.y, VSMALL_) * t";
+//vOut.z  "U.z / stabilise(C.z, VSMALL_) * t";
+vOut.x  [0 0 0 0 0 0 0] "R_.xx"; //"R_.xx * C.x / dsC";
+vOut.y  [0 0 0 0 0 0 0] "C.x"; //"R_.xx * C.x / dsC";
+vOut.z  [0 0 0 0 0 0 0] "R_.xx * C.x / dsC"; //"R_.xx * C.x / dsC";
+
+// dimensionedVector
+//  To simplify an equation, you can create your own additional equations.
+//  equationReader will find and evaluate them on-the-fly when needed. This
+//  only works in dictionaries that are data sources to the equationReader.
+dvOut.x "U.x / velocityMagnitude";
+dvOut.y "U.y / velocityMagnitude";
+dvOut.z "U.z / velocityMagnitude";
+velocityMagnitude   "sqrt(sqr(U.x) + sqr(U.y) + sqr(U.z))";
+
+// dimensionedVectorField
+//  Any amount of white space is okay.  Use a backslash to break a line.  The
+//  equation can use +, -, *, /, and any functions I could find available to
+//  scalar or dimensioned scalar.  Use the pow(a,b) instead of a^b.  Use
+//  parentheses to any depth you wish.
+dvfOut.x    [0 0 0 0 0 0 0] "R_.xx * log ( C.x / dsC +   4 ) + 2 * pi_ / 360 \
+             - max( \
+             C.x, C.y) * dvOut.x";
+dvfOut.y    [0 0 0 0 0 0 0] "   max \
+                                (\
+                                    C.x, \
+                                    max \
+                                    ( \
+                                        C.y, \
+                                        C.z \
+                                    ) \
+                                )";
+dvfOut.z    "1 + 2 * pow(3, pow(2, pow((2*3*4/(7*(8+4))), 3)))";
+
+// You get the idea.
+
+// volVectorField
+volVfOut.x  "1";
+volVfOut.y  "1";
+volVfOut.z  "1";
+
+// * * * * * * * * * * * * * * Tensor Equations  * * * * * * * * * * * * * * //
+// tensor
+tOut.xx "1";
+tOut.xy "1";
+tOut.xz "1";
+tOut.yx "1";
+tOut.yy "1";
+tOut.yz "1";
+tOut.zx "1";
+tOut.zy "1";
+tOut.zz "1";
+
+// dimensionedTensor
+dtOut.xx    "1";
+dtOut.xy    "1";
+dtOut.xz    "1";
+dtOut.yx    "1";
+dtOut.yy    "1";
+dtOut.yz    "1";
+dtOut.zx    "1";
+dtOut.zy    "1";
+dtOut.zz    "1";
+
+// dimensionedTensorField
+dtfOut.xx   "1";
+dtfOut.xy   "1";
+dtfOut.xz   "1";
+dtfOut.yx   "1";
+dtfOut.yy   "1";
+dtfOut.yz   "1";
+dtfOut.zx   "1";
+dtfOut.zy   "1";
+dtfOut.zz   "1";
+
+// volTensorField
+volTfOut.xx "1";
+volTfOut.xy "1";
+volTfOut.xz "1";
+volTfOut.yx "1";
+volTfOut.yy "1";
+volTfOut.yz "1";
+volTfOut.zx "1";
+volTfOut.zy "1";
+volTfOut.zz "1";
+
+// ************************************************************************* //

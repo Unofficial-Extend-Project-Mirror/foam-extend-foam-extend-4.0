@@ -1,6 +1,6 @@
 IOobject ioPoints
 (
-    "points", 
+    "points",
     runTime.timeName(),
     mesh.name(),
     mesh
@@ -22,6 +22,6 @@ if (ioPoints.headerOk())
             IOobject::NO_WRITE
         )
     );
-    
+
     mesh.movePoints(newPoints);
 }

@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     topoCellMapper
@@ -33,9 +32,8 @@ Author
     University of Massachusetts Amherst
     All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
-#include "IOmanip.H"
 #include "topoMapper.H"
 #include "mapPolyMesh.H"
 #include "topoCellMapper.H"
@@ -306,6 +304,7 @@ const List<vectorField>& topoCellMapper::intersectionCentres() const
     return *centresPtr_;
 }
 
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
@@ -319,6 +318,7 @@ topoCellMapper::topoCellMapper
     mpm_(mpm),
     tMapper_(mapper),
     direct_(false),
+    sizeBeforeMapping_(mpm.nOldCells()),
     directAddrPtr_(NULL),
     interpolationAddrPtr_(NULL),
     weightsPtr_(NULL),
@@ -326,6 +326,18 @@ topoCellMapper::topoCellMapper
     volumesPtr_(NULL),
     centresPtr_(NULL)
 {
+    // Fetch offset sizes from topoMapper
+    const labelList& sizes = tMapper_.cellSizes();
+
+    // Add offset sizes
+    if (sizes.size())
+    {
+        forAll(sizes, pI)
+        {
+            sizeBeforeMapping_ += sizes[pI];
+        }
+    }
+
     // Check for possibility of direct mapping
     if
     (
@@ -363,7 +375,7 @@ label topoCellMapper::size() const
 //- Return size before mapping
 label topoCellMapper::sizeBeforeMapping() const
 {
-    return mpm_.nOldCells();
+    return sizeBeforeMapping_;
 }
 
 
@@ -456,99 +468,6 @@ const labelList& topoCellMapper::insertedObjectLabels() const
     }
 
     return *insertedCellLabelsPtr_;
-}
-
-
-//- Conservatively map the internal field
-template <class Type, class gradType>
-void topoCellMapper::mapInternalField
-(
-    const word& fieldName,
-    const Field<gradType>& gF,
-    Field<Type>& iF
-) const
-{
-    if (iF.size() != sizeBeforeMapping() || gF.size() != sizeBeforeMapping())
-    {
-        FatalErrorIn
-        (
-            "\n\n"
-            "void topoCellMapper::mapInternalField<Type>\n"
-            "(\n"
-            "    const word& fieldName,\n"
-            "    const Field<gradType>& gF,\n"
-            "    Field<Type>& iF\n"
-            ") const\n"
-        )  << "Incompatible size before mapping." << nl
-           << " Field: " << fieldName << nl
-           << " Field size: " << iF.size() << nl
-           << " Gradient Field size: " << gF.size() << nl
-           << " map size: " << sizeBeforeMapping() << nl
-           << abort(FatalError);
-    }
-
-    // Fetch addressing
-    const labelListList& cAddressing = addressing();
-    const List<scalarField>& wC = intersectionWeights();
-    const List<vectorField>& xC = intersectionCentres();
-
-    // Fetch geometry
-    const vectorField& centres = tMapper_.internalCentres();
-
-    // Compute the integral of the source field
-    Type intSource = sum(iF * tMapper_.cellVolumes());
-
-    // Copy the original field
-    Field<Type> fieldCpy(iF);
-
-    // Resize to current dimensions
-    iF.setSize(size());
-
-    // Map the internal field
-    forAll(iF, cellI)
-    {
-        const labelList& addr = cAddressing[cellI];
-
-        iF[cellI] = pTraits<Type>::zero;
-
-        forAll(addr, cellJ)
-        {
-            // Accumulate volume-weighted Taylor-series interpolate
-            iF[cellI] +=
-            (
-                wC[cellI][cellJ] *
-                (
-                    fieldCpy[addr[cellJ]]
-                  + (
-                        gF[addr[cellJ]] &
-                        (
-                            xC[cellI][cellJ]
-                          - centres[addr[cellJ]]
-                        )
-                    )
-                )
-            );
-        }
-    }
-
-    // Compute the integral of the target field
-    Type intTarget = sum(iF * mesh_.cellVolumes());
-
-    if (polyMesh::debug)
-    {
-        int oldP = Info().precision();
-
-        // Compare the global integral
-        Info << " Field : " << fieldName
-             << " integral errors : "
-             << setprecision(15)
-             << " source : " << mag(intSource)
-             << " target : " << mag(intTarget)
-             << " norm : "
-             << (mag(intTarget - intSource) / (mag(intSource) + VSMALL))
-             << setprecision(oldP)
-             << endl;
-    }
 }
 
 

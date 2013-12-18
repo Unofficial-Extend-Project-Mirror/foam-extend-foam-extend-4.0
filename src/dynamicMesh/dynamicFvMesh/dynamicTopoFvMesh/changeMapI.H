@@ -1,26 +1,36 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+
+Class
+    changeMap
+
+Description
+    Accumulate topology change statistics
+
+Author
+    Sandeep Menon
+    University of Massachusetts Amherst
+    All rights reserved
 
 \*---------------------------------------------------------------------------*/
 
@@ -28,6 +38,32 @@ namespace Foam
 {
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+// Entity index
+inline label& changeMap::index()
+{
+    return index_;
+}
+
+
+inline label changeMap::index() const
+{
+    return index_;
+}
+
+
+// Coupled patch index
+inline label& changeMap::patchIndex()
+{
+    return pIndex_;
+}
+
+
+inline label changeMap::patchIndex() const
+{
+    return pIndex_;
+}
+
 
 // Type
 inline label& changeMap::type()
@@ -42,139 +78,240 @@ inline label changeMap::type() const
 }
 
 
-// For sliver-type cells, opposite edges
-// are identified for removal.
-inline label& changeMap::firstEdge()
-{
-    return firstEdge_;
-}
-
-
-inline label& changeMap::secondEdge()
-{
-    return secondEdge_;
-}
-
-
-// For cap-type cells, the face requiring splitting
-// is identified for removal.
-inline label& changeMap::apexPoint()
-{
-    return apexPoint_;
-}
-
-
-inline label& changeMap::opposingFace()
-{
-    return opposingFace_;
-}
-
-
-// Added entities
 inline void changeMap::addPoint
 (
     const label pIndex,
-    const label master
+    const labelList& master
 )
 {
-    label curSize = addedPoints_.size();
-
-    addedPoints_.setSize(curSize + 1);
-
-    addedPoints_[curSize][0] = pIndex;
-    addedPoints_[curSize][1] = master;
+    addedPoints_.append(objectMap(pIndex, master));
 }
 
 
 inline void changeMap::addEdge
 (
     const label eIndex,
-    const label master
+    const labelList& master
 )
 {
-    label curSize = addedEdges_.size();
-
-    addedEdges_.setSize(curSize + 1);
-
-    addedEdges_[curSize][0] = eIndex;
-    addedEdges_[curSize][1] = master;
+    addedEdges_.append(objectMap(eIndex, master));
 }
 
 
 inline void changeMap::addFace
 (
     const label fIndex,
-    const label master
+    const labelList& master
 )
 {
-    label curSize = addedFaces_.size();
-
-    addedFaces_.setSize(curSize + 1);
-
-    addedFaces_[curSize][0] = fIndex;
-    addedFaces_[curSize][1] = master;
+    addedFaces_.append(objectMap(fIndex, master));
 }
 
 
 inline void changeMap::addCell
 (
     const label cIndex,
-    const label master
+    const labelList& master
 )
 {
-    label curSize = addedCells_.size();
-
-    addedCells_.setSize(curSize + 1);
-
-    addedCells_[curSize][0] = cIndex;
-    addedCells_[curSize][1] = master;
+    addedCells_.append(objectMap(cIndex, master));
 }
 
 
-// Return an added point
-inline const List<FixedList<label,2> >&
+inline const List<objectMap>&
 changeMap::addedPointList() const
 {
     return addedPoints_;
 }
 
 
-// Return the list of added entities
-inline const List<FixedList<label,2> >&
+inline const List<objectMap>&
 changeMap::addedEdgeList() const
 {
     return addedEdges_;
 }
 
 
-inline const List<FixedList<label,2> >&
+inline const List<objectMap>&
 changeMap::addedFaceList() const
 {
     return addedFaces_;
 }
 
 
-inline const List<FixedList<label,2> >&
+inline const List<objectMap>&
 changeMap::addedCellList() const
 {
     return addedCells_;
 }
 
 
+inline void changeMap::removePoint(const label pIndex)
+{
+    removedPoints_.append(pIndex);
+}
+
+
+inline void changeMap::removeEdge(const label eIndex)
+{
+    removedEdges_.append(eIndex);
+}
+
+
+inline void changeMap::removeFace(const label fIndex)
+{
+    removedFaces_.append(fIndex);
+}
+
+
+inline void changeMap::removeCell(const label cIndex)
+{
+    removedCells_.append(cIndex);
+}
+
+
+inline const labelList&
+changeMap::removedPointList() const
+{
+    return removedPoints_;
+}
+
+
+inline const labelList&
+changeMap::removedEdgeList() const
+{
+    return removedEdges_;
+}
+
+
+inline const labelList&
+changeMap::removedFaceList() const
+{
+    return removedFaces_;
+}
+
+
+inline const labelList&
+changeMap::removedCellList() const
+{
+    return removedCells_;
+}
+
+
+// Clear existing lists
+inline void changeMap::clear()
+{
+    // Clear base dictionary
+    dictionary::clear();
+
+    index_ = -1;
+    pIndex_ = -1;
+
+    type_ = -1;
+
+    // Clear added entities
+    addedPoints_.clear();
+    addedEdges_.clear();
+    addedFaces_.clear();
+    addedCells_.clear();
+
+    // Clear removed entities
+    removedPoints_.clear();
+    removedEdges_.clear();
+    removedFaces_.clear();
+    removedCells_.clear();
+}
+
+
 inline void changeMap::operator=(const changeMap& rhs)
 {
+    // Copy base dictionary
+    dictionary::operator=(rhs);
+
+    index_ = rhs.index_;
+    pIndex_ = rhs.pIndex_;
+
     type_ = rhs.type_;
 
-    firstEdge_    = rhs.firstEdge_;
-    secondEdge_   = rhs.secondEdge_;
-    apexPoint_    = rhs.apexPoint_;
-    opposingFace_ = rhs.opposingFace_;
+    // Copy maps
+    addedPoints_.setSize(rhs.addedPoints_.size());
 
-    addedPoints_  = rhs.addedPoints_;
-    addedEdges_   = rhs.addedEdges_;
-    addedFaces_   = rhs.addedFaces_;
-    addedCells_   = rhs.addedCells_;
+    forAll(addedPoints_, indexI)
+    {
+        addedPoints_[indexI].index() = rhs.addedPoints_[indexI].index();
+
+        addedPoints_[indexI].masterObjects() =
+        (
+            rhs.addedPoints_[indexI].masterObjects()
+        );
+    }
+
+    addedEdges_.setSize(rhs.addedEdges_.size());
+
+    forAll(addedEdges_, indexI)
+    {
+        addedEdges_[indexI].index() = rhs.addedEdges_[indexI].index();
+
+        addedEdges_[indexI].masterObjects() =
+        (
+            rhs.addedEdges_[indexI].masterObjects()
+        );
+    }
+
+    addedFaces_.setSize(rhs.addedFaces_.size());
+
+    forAll(addedFaces_, indexI)
+    {
+        addedFaces_[indexI].index() = rhs.addedFaces_[indexI].index();
+
+        addedFaces_[indexI].masterObjects() =
+        (
+            rhs.addedFaces_[indexI].masterObjects()
+        );
+    }
+
+    addedCells_.setSize(rhs.addedCells_.size());
+
+    forAll(addedCells_, indexI)
+    {
+        addedCells_[indexI].index() = rhs.addedCells_[indexI].index();
+
+        addedCells_[indexI].masterObjects() =
+        (
+            rhs.addedCells_[indexI].masterObjects()
+        );
+    }
+
+    removedPoints_ = rhs.removedPoints_;
+    removedEdges_ = rhs.removedEdges_;
+    removedFaces_ = rhs.removedFaces_;
+    removedCells_ = rhs.removedCells_;
 }
+
+
+inline Ostream& operator<<(Ostream& os, const changeMap& cm)
+{
+    // Write base dictionary
+    os << static_cast<const dictionary&>(cm) << endl;
+
+    os << " index: " << cm.index_ << nl
+       << " patchIndex: " << cm.pIndex_ << nl
+       << " type: " << cm.type_ << nl
+       << " addedPoints: " << cm.addedPoints_ << nl
+       << " addedEdges: " << cm.addedEdges_ << nl
+       << " addedFaces: " << cm.addedFaces_ << nl
+       << " addedCells: " << cm.addedCells_ << nl
+       << " removedPoints: " << cm.removedPoints_ << nl
+       << " removedEdges: " << cm.removedEdges_ << nl
+       << " removedFaces: " << cm.removedFaces_ << nl
+       << " removedCells: " << cm.removedCells_ << endl;
+
+    // Check state of IOstream
+    os.check("Ostream& operator<<(Ostream&, changeMap&)");
+
+    return os;
+}
+
 
 } // End namespace Foam
 

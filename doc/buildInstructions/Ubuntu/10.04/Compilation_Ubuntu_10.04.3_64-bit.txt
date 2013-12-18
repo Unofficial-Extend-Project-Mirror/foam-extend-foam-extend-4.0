@@ -11,7 +11,7 @@ git:   sudo apt-get install git-core
 flex:  sudo apt-get install flex
 bison: sudo apt-get install bison
 rpm:   sudo apt-get install rpm
-g++:   sudo apt-get install g++ 
+g++:   sudo apt-get install g++
 libz:  sudo apt-get install zlib1g-dev
 binutils-dev : sudo apt-get install binutils-dev
 qt4:   sudo apt-get install libqt4-dev qt4-dev-tools
@@ -49,7 +49,7 @@ rm -rf /tmp/tmp_dir
 # Download OpenFOAM-1.6-ext
 mkdir ~/OpenFOAM
 cd ~/OpenFOAM
-git clone git://openfoam-extend.git.sourceforge.net/gitroot/openfoam-extend/OpenFOAM-1.6-ext
+git clone git://git.code.sf.net/p/openfoam-extend/OpenFOAM-1.6-ext
 
 --------------------------------------------------------------------------------
 
@@ -86,15 +86,15 @@ tail -f log.AllMake   # To keep an eye on the compilation process
 
 # Compile OpenFOAM-1.6-ext
 cd $WM_PROJECT_DIR
-./Allwmake >& log.Allwmake &  
+./Allwmake >& log.Allwmake &
 tail -f log.Allwmake          # To keep an eye on the compilation process
 
 --------------------------------------------------------------------------------
 
 # Execute Allwmake a second time because of a bad library building sequence for
-# the library -lfaceDecompositionMotionSolver 
+# the library -lfaceDecompositionMotionSolver
 
-./Allwmake >& log.Allwmake2 & 
+./Allwmake >& log.Allwmake2 &
 tail -f log.Allwmake2          # To keep an eye on the compilation process
 
 --------------------------------------------------------------------------------

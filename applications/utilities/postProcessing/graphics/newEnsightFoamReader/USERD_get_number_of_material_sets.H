@@ -1,14 +1,14 @@
 
 int USERD_get_number_of_material_sets
-( 
-    void 
+(
+    void
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_number_of_material_sets" << endl 
+    Info << "Entering: USERD_get_number_of_material_sets" << endl
         << flush;
 #endif
 
     // No materials
-    return 0; 
+    return 0;
 }

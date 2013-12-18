@@ -2,7 +2,6 @@ include $(RULES)/mplib$(WM_MPLIB)
 
 EXE_INC = \
     $(PFLAGS) $(PINC) \
-    -I$(PARMETIS_INCLUDE_DIR)/ParMETISLib \
     -I$(PARMETIS_INCLUDE_DIR) \
     -I../decompositionMethods/lnInclude \
     -I../metisDecomp/lnInclude \
@@ -10,5 +9,4 @@ EXE_INC = \
 
 LIB_LIBS = \
     -L$(FOAM_MPI_LIBBIN) \
-    -L$(PARMETIS_LIB_DIR) -lmetis-parmetis \
     -L$(PARMETIS_LIB_DIR) -lparmetis

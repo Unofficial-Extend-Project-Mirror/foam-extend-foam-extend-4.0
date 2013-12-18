@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -158,7 +157,7 @@ void Foam::triSurfaceTools::greenRefine
 }
 
 
-// Refine all triangles marked for refinement. 
+// Refine all triangles marked for refinement.
 Foam::triSurface Foam::triSurfaceTools::doRefine
 (
     const triSurface& surf,
@@ -358,7 +357,7 @@ void Foam::triSurfaceTools::protectNeighbours
         forAll(myFaces, myFaceI)
         {
             label faceI = myFaces[myFaceI];
- 
+
             if ((faceStatus[faceI] == ANYEDGE) || (faceStatus[faceI] >= 0))
             {
                 faceStatus[faceI] = NOEDGE;
@@ -392,10 +391,10 @@ Foam::labelHashSet Foam::triSurfaceTools::getCollapsedFaces
     {
         facesToBeCollapsed.insert(myFaces[myFaceI]);
     }
-    
+
     // From faces using v1 check if they share an edge with faces
     // using v2.
-    //  - share edge: are part of 'splay' tree and will collapse if edge    
+    //  - share edge: are part of 'splay' tree and will collapse if edge
     //    collapses
     const labelList& v1Faces = surf.pointFaces()[v1];
 
@@ -795,7 +794,7 @@ bool Foam::triSurfaceTools::collapseCreatesFold
 //
 //    // Now neighbours contains first layer of triangles outside of
 //    // collapseFaces
-//    // There should be 
+//    // There should be
 //    // -two if edgeI is a boundary edge
 //    // since the outside 'edge' of collapseFaces should
 //    // form a triangle and the face connected to edgeI is not inserted.
@@ -816,7 +815,7 @@ bool Foam::triSurfaceTools::collapseCreatesFold
 //        for (label j = i+1; j < neighbourList.size(); i++)
 //        {
 //            const labelList& faceJEdges = surf.faceEdges()[neighbourList[j]];
-//            
+//
 //            // Check if faceI and faceJ share an edge
 //            forAll(faceIEdges, fI)
 //            {
@@ -1194,7 +1193,7 @@ Foam::surfaceLocation Foam::triSurfaceTools::visitFaces
                 nearest.setHit();
                 nearest.triangle() = triI;
                 break;
-            }            
+            }
             else
             {
                // Which edge is cut.
@@ -1913,7 +1912,7 @@ Foam::triSurface Foam::triSurfaceTools::greenRefine
 
     // Storage for new faces
     DynamicList<labelledTri> newFaces(0);
-    
+
     pointField newPoints(surf.localPoints());
     newPoints.setSize(surf.nPoints() + surf.nEdges());
     label newPointI = surf.nPoints();
@@ -2635,7 +2634,7 @@ Foam::triSurface Foam::triSurfaceTools::delaunay2D(const List<vector2D>& pts)
 //    // ~~~~~~~~~~~~~~~
 //
 //    label vertI = 0;
-//    for 
+//    for
 //    (
 //        Vertex_iterator it = T.vertices_begin();
 //        it != T.vertices_end();
@@ -2849,7 +2848,7 @@ Foam::surfaceLocation Foam::triSurfaceTools::classify
 
     // Nearest point could be on point or edge. Retest.
     label index, elemType;
-    //bool inside = 
+    //bool inside =
     triPointRef(s[triI].tri(s.points())).classify
     (
         trianglePoint,
@@ -2865,7 +2864,7 @@ Foam::surfaceLocation Foam::triSurfaceTools::classify
         nearest.setHit();
         nearest.setIndex(triI);
         nearest.elementType() = triPointRef::NONE;
-    }    
+    }
     else if (elemType == triPointRef::EDGE)
     {
         nearest.setMiss();

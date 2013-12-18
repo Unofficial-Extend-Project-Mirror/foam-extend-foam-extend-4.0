@@ -1,26 +1,26 @@
 #!/bin/bash
 #------------------------------------------------------------------------------
 # =========                 |
-# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+# \\      /  F ield         | foam-extend: Open Source CFD
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright held by original author
+#   \\  /    A nd           | For copyright notice see file Copyright
 #    \\/     M anipulation  |
 #------------------------------------------------------------------------------
 # License
-#     This file is part of OpenFOAM.
+#     This file is part of foam-extend.
 #
-#     OpenFOAM is free software: you can redistribute it and/or modify it
-#     under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
+#     foam-extend is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation, either version 3 of the License, or (at your
+#     option) any later version.
 #
-#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-#     for more details.
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
 #     AllMake.stage4
@@ -73,12 +73,12 @@ then
 
     if [ -d "$QT_BIN_DIR" -a -r "$QT_BIN_DIR"/qmake ]
     then
-        ( rpm_make -p ParaView-3.12.0 -s ParaView-3.12.0.spec -u http://www.paraview.org/files/v3.12/ParaView-3.12.0.tar.gz \
-            -a --define='_qmakePath $QT_BIN_DIR/qmake'
+        ( rpm_make -p ParaView-4.0.1 -s ParaView-4.0.1.spec -u http://www.paraview.org/files/v4.0/ParaView-v4.0.1-source.tgz \
+            -f --define='_qmakePath $QT_BIN_DIR/qmake'
         )
     else
         echo "WARNING: "
-        echo "WARNING: Skipping the installation of ParaView-3.12.0."
+        echo "WARNING: Skipping the installation of ParaView-4.0.1."
         echo "WARNING: Please make sure the QT_BIN_DIR environment variable properly"
         echo "WARNING: initialized in the file prefs.sh or prefs.csh"
         echo "WARNING: The command \$QT_BIN_DIR/qmake needs to be valid"

@@ -1,27 +1,26 @@
 #!/bin/sh
 #------------------------------------------------------------------------------
 # =========                 |
-# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+# \\      /  F ield         | foam-extend: Open Source CFD
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright held by original author
+#   \\  /    A nd           | For copyright notice see file Copyright
 #    \\/     M anipulation  |
 #------------------------------------------------------------------------------
 # License
-#     This file is part of OpenFOAM.
+#     This file is part of foam-extend.
 #
-#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     foam-extend is free software: you can redistribute it and/or modify it
 #     under the terms of the GNU General Public License as published by the
-#     Free Software Foundation; either version 2 of the License, or (at your
+#     Free Software Foundation, either version 3 of the License, or (at your
 #     option) any later version.
 #
-#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-#     for more details.
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with OpenFOAM; if not, write to the Free Software Foundation,
-#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
 #     foamExec
@@ -46,21 +45,21 @@ usage() {
 usage: ${0##*/} [OPTION] <application> ...
 
 options:
-  -v ver        specify OpenFOAM version
+  -v ver        specify foam version
   -help         this usage
 
-* run a particular OpenFOAM version of <application>
+* run a particular foam version of <application>
 
 USAGE
     exit 1
 }
 
 
-# This script should exist in <foamInstall>/OpenFOAM-<VERSION>/bin/
+# This script should exist in <foamInstall>/foam-extend-<VERSION>/bin/
 # extract the <foamInstall> and <version> elements
 # using a function preserves the command args
 getDefaults() {
-    set -- $(echo $0 | sed -e 's@/OpenFOAM-\([^/]*\)/bin/[^/]*$@ \1@')
+    set -- $(echo $0 | sed -e 's@/foam-extend-\([^/]*\)/bin/[^/]*$@ \1@')
     foamInstall=$1
     version=$2
 }
@@ -99,8 +98,8 @@ fi
 
 unset foamDotFile
 
-# Check user-specific OpenFOAM bashrc file
-foamDotFile="$HOME/.OpenFOAM/$version/bashrc"
+# Check user-specific foam-extend bashrc file
+foamDotFile="$HOME/.foam-extend-$version/bashrc"
 if [ -f $foamDotFile ]
 then
     . $foamDotFile
@@ -109,7 +108,7 @@ else
     # Use the FOAM_INST_DIR variable for locating the installed version
     for FOAM_INST_DIR in $foamInstall $WM_PROJECT_INST_DIR
     do
-        foamDotFile="$FOAM_INST_DIR/OpenFOAM-$version/etc/bashrc"
+        foamDotFile="$FOAM_INST_DIR/foam-extend-$version/etc/bashrc"
         if [ -f $foamDotFile ]
         then
             . $foamDotFile
@@ -122,7 +121,7 @@ fi
 
 if [ "$foamDotFile" != okay ]
 then
-    echo "Error : bashrc file could not be found for OpenFOAM-$version" 1>&2
+    echo "Error : bashrc file could not be found for foam-extend-$version" 1>&2
     exit 1
 fi
 

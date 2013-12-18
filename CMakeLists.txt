@@ -1,30 +1,29 @@
 # /*-------------------------------------------------------------------------*\
 #   =========                 |
-#   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#   \\      /  F ield         | foam-extend: Open Source CFD
 #    \\    /   O peration     |
-#     \\  /    A nd           | Copyright held by original author
+#     \\  /    A nd           | For copyright notice see file Copyright
 #      \\/     M anipulation  |
 # -----------------------------------------------------------------------------
 # License
-#     This file is part of OpenFOAM.
+#     This file is part of foam-extend.
 #
-#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     foam-extend is free software: you can redistribute it and/or modify it
 #     under the terms of the GNU General Public License as published by the
-#     Free Software Foundation; either version 2 of the License, or (at your
+#     Free Software Foundation, either version 3 of the License, or (at your
 #     option) any later version.
 #
-#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-#     for more details.
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with OpenFOAM; if not, write to the Free Software Foundation,
-#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Description
 #     CMakeLists.txt file for implementing a test harness for the compilation
-#     and test of OpenFOAM-1.6-ext using Kitware CTest./CMake/CDash
+#     and test of foam-extend-3.0 using Kitware CTest./CMake/CDash
 #
 #     The results will be submitted to the CDash server identified by the file
 #     CTestConfig.cmake
@@ -37,7 +36,7 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-PROJECT(OpenFOAM_1.6-ext)
+PROJECT(foam-extend-3.0)
 
 #-----------------------------------------------------------------------------
 # Initialization of CTest specific variables
@@ -49,7 +48,7 @@ IF (NOT $ENV{CDASH_SUBMIT_LOCAL_HOST_ID} STREQUAL "")
     # $CDASH_SUBMIT_LOCAL_HOST_ID
     SET(
           SITENAME $ENV{CDASH_SUBMIT_LOCAL_HOST_ID}
-	  CACHE STRING "Name of the local site"
+          CACHE STRING "Name of the local site"
     )
 ELSE (NOT $ENV{CDASH_SUBMIT_LOCAL_HOST_ID} STREQUAL "")
     # Grab the hostname FQN; will be used for the sitename
@@ -66,10 +65,10 @@ SET(
     CACHE STRING "Name of the local site"
 )
 
-#Grab the OpenFOAM installation directory.
+#Grab the FOAM installation directory.
 SET(
     OF_ROOT $ENV{WM_PROJECT_DIR}
-    CACHE INTERNAL  "OpenFOAM root directory."
+    CACHE INTERNAL  "FOAM root directory."
 )
 
 # Construct the build name.
@@ -81,16 +80,16 @@ SET(
 )
 
 # Find out the version of the compiler being used.
-# Add this information to the buildname 
+# Add this information to the buildname
 # This is for gcc or icc because they both support the -dumpversion option
 EXEC_PROGRAM($ENV{WM_CC}
   ARGS -dumpversion
   OUTPUT_VARIABLE COMPILER_VERSION
 )
-SET(BUILDNAME "${BUILDNAME}-$ENV{WM_CC}${COMPILER_VERSION}")  
+SET(BUILDNAME "${BUILDNAME}-$ENV{WM_CC}${COMPILER_VERSION}")
 #
 # We will support more compilers eventually.
-# 
+#
 
 # Timeout for running every single test: 4 hours: 4 x 3600 seconds
 #SET(
@@ -128,12 +127,12 @@ if(GIT_FOUND)
     if (GIT_BRANCH_NAME STREQUAL "")
        message("No git-branch. Mercurial?")
        EXEC_PROGRAM(hg
-	 ARGS branch
+         ARGS branch
          OUTPUT_VARIABLE GIT_BRANCH_NAME
        )
        message("Git branch (mercurial): ${GIT_BRANCH_NAME}")
     endif()
-    SET(BUILDNAME "${BUILDNAME}-git-branch=${GIT_BRANCH_NAME}")  
+    SET(BUILDNAME "${BUILDNAME}-git-branch=${GIT_BRANCH_NAME}")
 endif()
 
 # Some last minute cleanup
@@ -145,20 +144,20 @@ string(REPLACE "/" "_" SITE ${SITE})
 # Build section
 #-----------------------------------------------------------------------------
 
-# Compile OpenFOAM, libs and apps
-add_custom_target (OpenFOAM-$ENV{WM_PROJECT_VERSION} ALL
+# Compile FOAM, libs and apps
+add_custom_target (foam-extend-$ENV{WM_PROJECT_VERSION} ALL
   ${OF_ROOT}/Allwmake
 )
 
 set_property(
-  TARGET          OpenFOAM-$ENV{WM_PROJECT_VERSION}
-  PROPERTY LABELS OpenFOAM-$ENV{WM_PROJECT_VERSION}
+  TARGET          foam-extend-$ENV{WM_PROJECT_VERSION}
+  PROPERTY LABELS foam-extend-$ENV{WM_PROJECT_VERSION}
 )
 
-# Compile the OpenFOAM unit tests located under applications/test
+# Compile the FOAM unit tests located under applications/test
 # This part will not be compiled and run by default.
 # This would be a good candidate for a sub-project
-add_custom_target (OpenFOAM-$ENV{WM_PROJECT_VERSION}_unitTests 
+add_custom_target (foam-extend-$ENV{WM_PROJECT_VERSION}_unitTests
   wmake all ${OF_ROOT}/applications/test
 )
 
@@ -184,7 +183,7 @@ IF(BUILD_TESTING)
 
     # Modify this variable if you want the full length test case simulations
     # Beware, this might take a long time to execute.
-    # Otherwise, the default behaviour is to run each tutorial for 1 "timestep" 
+    # Otherwise, the default behaviour is to run each tutorial for 1 "timestep"
     #SET(RUN_FROM_ONE_TIMESTEP 0)
     SET(RUN_FROM_ONE_TIMESTEP 1)
 
@@ -192,15 +191,15 @@ IF(BUILD_TESTING)
         SET(testIdSuffix "_oneTimeStep")
     ENDIF(RUN_FROM_ONE_TIMESTEP)
 
-    # OpenFOAM will run against this test suite:
+    # FOAM will run against this test suite:
 
-    # Add the suite of OpenFOAM tutorials
+    # Add the suite of FOAM tutorials
     #
-    INCLUDE($ENV{FOAM_TEST_HARNESS_DIR}/CMakeFiles/OpenFOAM_Tutorials.cmake)
+    INCLUDE($ENV{FOAM_TEST_HARNESS_DIR}/CMakeFiles/FOAM_Tutorials.cmake)
 
     # Add a dummy test (/bin/true, just for debugging)
     ADD_TEST(
-        OpenFOAM-$ENV{WM_PROJECT_VERSION}_Dummy_Test true
+        foam-extend-$ENV{WM_PROJECT_VERSION}_Dummy_Test true
     )
 
     IF(RUN_FROM_ONE_TIMESTEP)

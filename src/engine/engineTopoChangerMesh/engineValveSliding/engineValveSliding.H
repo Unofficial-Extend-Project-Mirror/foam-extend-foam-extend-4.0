@@ -1,29 +1,28 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2005-2010 Tommaso Lucchini
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-        
+
 
 Description
 
@@ -31,8 +30,8 @@ Description
 SourceFiles
 
 Author
-	Tommaso Lucchini
-	
+    Tommaso Lucchini
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef engineValveSliding_H
@@ -67,19 +66,19 @@ class engineValveSliding
 
         //- Piston patch
         enginePiston piston_;
-        
+
         //- vertical valves
         thoboisSlidingValveBank valves_;
-                         
+
         //- Layering-to-deformation switch in crank-angle degrees
         scalar deformSwitch_;
-        
+
         //- Top valve tolerance, when valve lift < tol, valve top layering is disabled
         scalar valveTopTol_;
 
         //- Piston Position
         scalar pistonPosition_;
-        
+
         //- Virtual position of the bottom of the valves
         scalarField valveBottomPosition_;
 
@@ -88,22 +87,22 @@ class engineValveSliding
 
         //- deckHeight
         scalar deckHeight_;
-        
+
         //- min valveHead z
         scalarField minValveZ_;
-                        
+
         //- tolerance for valve poppet faces (used to create a faceZone)
         scalar poppetValveTol_;
-        
+
         //- tolerance for valve poppet faces (used to create a faceZone)
         scalar bottomValveTol_;
-        
+
         //- Motion solver
         autoPtr<motionSolver> msPtr_;
-        
+
         //- Is the valve really closed
         boolList isReallyClosed_;
-       
+
         //- correct points motion after attach
         Switch correctPointsMotion_;
 
@@ -123,7 +122,7 @@ class engineValveSliding
 
         //- Is the sliding interface attached?
         bool attached() const;
-        
+
         //- Prepare valve attach/detach
         void valveDetach();
 
@@ -133,23 +132,23 @@ class engineValveSliding
         //- Prepare valve attach/detach
         void prepareValveDetach();
 
-        //- Check if all patches exist, then calculate virtualPistonPosition, 
+        //- Check if all patches exist, then calculate virtualPistonPosition,
         //- pistonPosition and deckHeight for the first time
         void checkAndCalculate();
-        
-        //- Calculate the virtualPistonPosition, 
+
+        //- Calculate the virtualPistonPosition,
         void setVirtualPositions();
-        
-        //- Correct the vertical motion for the points below the "virtual piston", 
+
+        //- Correct the vertical motion for the points below the "virtual piston",
         void correctVerticalMotion();
-        
+
         bool realDeformation() const;
-                        
+
         bool inValve(const point& p, const label& i) const;
         bool inPiston(const point& p) const;
 
         bool isACylinderHeadFace(const labelList& cylHeadFaces, const label face);
-                        
+
 public:
 
     //- Runtime type information
@@ -189,7 +188,7 @@ public:
                 engTime().thetaRevolution() > -deformSwitch_
              && engTime().thetaRevolution() < deformSwitch_;
         }
-        
+
         //- Return number of valves
         label nValves() const
         {
@@ -201,10 +200,10 @@ public:
 
         //- Move and morph
         virtual bool update();
-        
+
         //- Set boundary velocities
         void setBoundaryVelocity(volVectorField& U);
-        
+
 };
 
 

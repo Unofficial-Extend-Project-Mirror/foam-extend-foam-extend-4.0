@@ -43,7 +43,7 @@ vtkPVFoamSelectTimeSet::vtkPVFoamSelectTimeSet()
 {
   this->LabeledFrame = vtkKWLabeledFrame::New();
   this->LabeledFrame->SetParent(this);
-  
+
   this->TimeLabel = vtkKWLabel::New();
   this->TimeLabel->SetParent(this->LabeledFrame->GetFrame());
 
@@ -56,11 +56,11 @@ vtkPVFoamSelectTimeSet::vtkPVFoamSelectTimeSet()
   this->TimeValue = 0.0;
 
   this->FrameLabel = 0;
-  
+
   this->TimeSets = vtkDataArrayCollection::New();
-  
+
   this->Property = 0;
-  
+
   this->SetCommand = 0;
   this->ServerSideID.ID = 0;
 }
@@ -117,7 +117,7 @@ void vtkPVFoamSelectTimeSet::Create(vtkKWApplication *pvApp)
     this->SetTraceName("FoamSelectTimeSet");
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
-  
+
   this->LabeledFrame->Create(this->GetApplication(), 0);
   if (this->FrameLabel)
     {
@@ -129,11 +129,11 @@ void vtkPVFoamSelectTimeSet::Create(vtkKWApplication *pvApp)
   sprintf(label, "Time value: %12.5e", 0.0);
   this->TimeLabel->SetLabel(label);
   this->Script("pack %s", this->TimeLabel->GetWidgetName());
-  
-  this->TreeFrame->Create(this->GetApplication(), "ScrolledWindow", 
+
+  this->TreeFrame->Create(this->GetApplication(), "ScrolledWindow",
                           "-relief sunken -bd 2");
 
-  this->Tree->Create(this->GetApplication(), "Tree", 
+  this->Tree->Create(this->GetApplication(), "Tree",
                      "-background white -bd 0 -width 15 -padx 2 "
                      "-redraw 1 -relief flat -selectbackground red");
   this->Script("%s bindText <ButtonPress-1>  {%s SetTimeValueCallback}",
@@ -143,7 +143,7 @@ void vtkPVFoamSelectTimeSet::Create(vtkKWApplication *pvApp)
 
   this->Script("pack %s -expand t -fill x", this->TreeFrame->GetWidgetName());
 
-  this->Script("pack %s -side top -expand t -fill x", 
+  this->Script("pack %s -side top -expand t -fill x",
                this->LabeledFrame->GetWidgetName());
 
 }
@@ -154,14 +154,14 @@ void vtkPVFoamSelectTimeSet::SetTimeValue(float time)
   if (this->TimeValue != time ||
       !this->TimeLabel->GetLabel() ||
       !strcmp(this->TimeLabel->GetLabel(), "No timesets available."))
-    { 
-    this->TimeValue = time; 
-    
+    {
+    this->TimeValue = time;
+
     char label[32];
     sprintf(label, "Time value: %12.5e", time);
     this->TimeLabel->SetLabel(label);
-    this->Modified(); 
-    } 
+    this->Modified();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -175,7 +175,7 @@ void vtkPVFoamSelectTimeSet::SetTimeValueCallback(const char* item)
   if ( strncmp(item, "timeset", strlen("timeset")) == 0 )
     {
     this->Script("if [%s itemcget %s -open] "
-                 "{%s closetree %s} else {%s opentree %s}", 
+                 "{%s closetree %s} else {%s opentree %s}",
                  this->Tree->GetWidgetName(), item,
                  this->Tree->GetWidgetName(), item,
                  this->Tree->GetWidgetName(), item);
@@ -212,14 +212,14 @@ void vtkPVFoamSelectTimeSet::AddRootNode(const char* name, const char* text)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVFoamSelectTimeSet::AddChildNode(const char* parent, const char* name, 
+void vtkPVFoamSelectTimeSet::AddChildNode(const char* parent, const char* name,
                                       const char* text, const char* data)
 {
   if (!this->GetApplication())
     {
     return;
     }
-  this->Script("%s insert end %s %s -text {%s} -data %s", 
+  this->Script("%s insert end %s %s -text {%s} -data %s",
                this->Tree->GetWidgetName(), parent, name, text, data);
 }
 
@@ -227,7 +227,7 @@ void vtkPVFoamSelectTimeSet::AddChildNode(const char* parent, const char* name,
 //-----------------------------------------------------------------------------
 void vtkPVFoamSelectTimeSet::SaveInBatchScript(ofstream *file)
 {
-  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0)
         <<  " GetProperty " << this->SetCommand << "] SetElements1 "
         << this->Property->GetScalar(0) << endl;
 }
@@ -238,8 +238,8 @@ void vtkPVFoamSelectTimeSet::AcceptInternal(vtkClientServerID sourceID)
   if (this->ModifiedFlag)
     {
     this->Script("%s selection get", this->Tree->GetWidgetName());
-    this->AddTraceEntry("$kw(%s) SetTimeValueCallback {%s}", 
-                        this->GetTclName(), 
+    this->AddTraceEntry("$kw(%s) SetTimeValueCallback {%s}",
+                        this->GetTclName(),
                         this->GetApplication()->GetMainInterp()->result);
     }
 
@@ -280,7 +280,7 @@ void vtkPVFoamSelectTimeSet::ResetInternal()
 
   this->Script("%s delete [%s nodes root]", this->Tree->GetWidgetName(),
                this->Tree->GetWidgetName());
-  
+
   this->SetTimeSetsFromReader();
 
   int timeSetId=0;
@@ -314,9 +314,9 @@ void vtkPVFoamSelectTimeSet::ResetInternal()
     {
     timeSetId++;
     sprintf(timeSetName,"timeset%d", timeSetId);
-    sprintf(timeSetText,"Time Set %d", timeSetId); 
+    sprintf(timeSetText,"Time Set %d", timeSetId);
     this->AddRootNode(timeSetName, timeSetText);
-    
+
     vtkIdType tuple;
     for(tuple=0; tuple<da->GetNumberOfTuples(); tuple++)
       {
@@ -337,21 +337,21 @@ void vtkPVFoamSelectTimeSet::ResetInternal()
       }
     if (timeSetId == 1)
       {
-      this->Script("%s opentree %s", this->Tree->GetWidgetName(), 
+      this->Script("%s opentree %s", this->Tree->GetWidgetName(),
                    timeSetName);
       }
     }
-  
+
   this->SetTimeValue(actualTimeValue);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVFoamSelectTimeSet::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
+void vtkPVFoamSelectTimeSet::AddAnimationScriptsToMenu(vtkKWMenu *menu,
                                                    vtkPVAnimationInterfaceEntry *ai)
 {
   char methodAndArgs[500];
 
-  sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
+  sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName());
   // I do not under stand why the trace name is used for the
   // menu entry, but Berk must know.
   menu->AddCommand(this->GetTraceName(), this, methodAndArgs, 0, "");
@@ -365,10 +365,10 @@ void vtkPVFoamSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterfaceEntry 
 {
   if (ai->InitializeTrace(NULL))
     {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
+    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
                         this->GetTclName(), ai->GetTclName());
     }
-  
+
   // I do not under stand why the trace name is used for the
   // menu entry, but Berk must know.
   ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());
@@ -387,7 +387,7 @@ vtkPVFoamSelectTimeSet* vtkPVFoamSelectTimeSet::ClonePrototype(vtkPVSource* pvSo
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVFoamSelectTimeSet::CopyProperties(vtkPVWidget* clone, 
+void vtkPVFoamSelectTimeSet::CopyProperties(vtkPVWidget* clone,
                                       vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -398,7 +398,7 @@ void vtkPVFoamSelectTimeSet::CopyProperties(vtkPVWidget* clone,
     pvts->SetLabel(this->FrameLabel);
     pvts->SetSetCommand(this->SetCommand);
     }
-  else 
+  else
     {
     vtkErrorMacro(
       "Internal error. Could not downcast clone to PVFoamSelectTimeSet.");
@@ -410,16 +410,16 @@ int vtkPVFoamSelectTimeSet::ReadXMLAttributes(vtkPVXMLElement* element,
                                         vtkPVXMLPackageParser* parser)
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
-  
+
   // Setup the Label.
   const char* label = element->GetAttribute("label");
   if(label)
     {
     this->SetLabel(label);
     }
-  
+
   this->SetSetCommand(element->GetAttribute("set_command"));
-  
+
   return 1;
 }
 
@@ -471,7 +471,7 @@ void vtkPVFoamSelectTimeSet::SetTimeSetsFromReader()
     this->TimeSets->AddItem(timeSet);
     timeSet->Delete();
     }
-  
+
   if (this->Property->GetNumberOfScalars() == 0 &&
       this->TimeSets->GetNumberOfItems() > 0)
     {
@@ -490,7 +490,7 @@ void vtkPVFoamSelectTimeSet::SaveInBatchScriptForPart(ofstream *file,
     vtkErrorMacro(<< this->GetClassName()
                   << " must not have SaveInBatchScript method.");
     return;
-    } 
+    }
 
   *file << "\t" << "pvTemp" << sourceID
         << " SetTimeValue " << this->GetTimeValue()

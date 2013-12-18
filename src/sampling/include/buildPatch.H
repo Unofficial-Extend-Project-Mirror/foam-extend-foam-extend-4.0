@@ -54,7 +54,7 @@ if (!targetPatchNamePresent)
 }
 else
 {
-    Serr << "Target patch name: " << patches[targetPatchNumber].name() 
+    Serr << "Target patch name: " << patches[targetPatchNumber].name()
          << endl;
 }
 

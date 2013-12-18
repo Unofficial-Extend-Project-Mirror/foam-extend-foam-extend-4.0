@@ -1,0 +1,131 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 1;
+
+vertices
+(
+//Plane A:
+//Bottom of curved block
+(0.499999999999998 0.86602540378444 0.0) // Vertex A0 = 0
+(0.999999999999996 1.73205080756888 0.0) // Vertex A1 = 1
+(-0.866025403784436 0.500000000000004 0.0) // Vertex A2 = 2
+(-1.73205080756887 1.00000000000001 0.0) // Vertex A3 = 3
+
+//Plane B:
+//Top of curved block
+(0.499999999999998 0.86602540378444 0.1) // Vertex B0 = 4
+(0.999999999999996 1.73205080756888 0.1) // Vertex B1 = 5
+(-0.866025403784436 0.500000000000004 0.1) // Vertex B2 = 6
+(-1.73205080756887 1.00000000000001 0.1) // Vertex B3 = 7
+
+//Plane A: Bottom of straight block
+(1.99238939618349 0.174311485495316 0.0) // Vertex B4 = 8
+(2.98858409427524 0.261467228242975 0.0) // Vertex B5 = 9
+(1.50941916044554 1.31211805798101 0.0) // Vertex B6 = 10
+(2.26412874066832 1.96817708697152 0.0) // Vertex B7 = 11
+
+//Plane B: Top of straight block
+(1.99238939618349 0.174311485495316 0.1) // Vertex C0 = 12
+(2.98858409427524 0.261467228242975 0.1) // Vertex C1 = 13
+(1.50941916044554 1.31211805798101 0.1) // Vertex C2 = 14
+(2.26412874066832 1.96817708697152 0.1) // Vertex C3 = 15
+
+);
+
+blocks
+(
+    hex ( 0 1 3 2 4 5 7 6 ) (25 17 1)   simpleGrading (1 1 1.0)
+    hex ( 8 9 11 10 12 13 15 14 ) (25 27 1) simpleGrading (1 1 1.0)
+);
+
+edges
+(
+    // --- PLANE A: Bottom of curved block
+    arc  0 2  (-0.25881904510252 0.965925826289069 0.0)
+    arc  1 3  (-0.517638090205039 1.93185165257814 0.0)
+
+    // --- PLANE B: Top of curved block
+    arc  4 6  (-0.25881904510252 0.965925826289069  0.1)
+    arc  5 7  (-0.517638090205039 1.93185165257814 0.1)
+
+    // --- PLANE A: Bottom of straight block
+    arc  8 10  (1.84100970690488 0.781462256978547 0.0)
+    arc  9 11  (2.76151456035732 1.17219338546782 0.0)
+
+    // --- PLANE B: Top of straight block
+    arc  12 14  (1.84100970690488 0.781462256978547 0.1)
+    arc  13 15  (2.76151456035732 1.17219338546782 0.1)
+);
+
+patches
+(
+    patch outflow
+    (
+        ( 9 11 15 13 )
+    )
+    patch inflow
+    (
+        ( 0 4 6 2 )
+    )
+
+    cyclicGgi upstreamPerio1
+    (
+        (8 9 13 12)
+    )
+
+    cyclicGgi upstreamPerio2
+    (
+        (10 14 15 11)
+    )
+
+    mixingPlane upstreamMixingPlanePatch
+    (
+        ( 8 12 14 10 )
+    )
+
+    mixingPlane downstreamMixingPlanePatch
+    (
+        ( 1 3 7 5 )
+    )
+
+    symmetryPlane downstreamWall
+    (
+        ( 0 2 3 1 )
+        ( 4 5 7 6 )
+    )
+
+    symmetryPlane upstreamWall
+    (
+        ( 13 15 14 12)
+        (8 10 11 9)
+    )
+
+    cyclicGgi downstreamPerio1
+    (
+        (0 1 5 4)
+    )
+
+    cyclicGgi downstreamPerio2
+    (
+        (2 6 7 3)
+    )
+
+);
+
+mergePatchPairs
+(
+);

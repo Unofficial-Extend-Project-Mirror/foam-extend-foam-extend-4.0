@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2005-2010 Tommaso Lucchini
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     verticalValvesGambit
@@ -62,8 +61,6 @@ void Foam::pistonSliding::calcMovingMaskTop(const label i) const
 
     const labelList& cellTopVAddr =
         cellZones()[cellZones().findZoneID("movingCellsTopZoneV"+ Foam::name(i+1))];
-    
-    bool foundOne(false);
 
     forAll (cellTopVAddr, cellI)
     {
@@ -76,23 +73,14 @@ void Foam::pistonSliding::calcMovingMaskTop(const label i) const
 
             forAll (curFace, pointI)
             {
-                
-
-                {
-                    foundOne = true;  
-                    movingPointsMaskTop[curFace[pointI]] = 1;
-                }
-                
-                
+                movingPointsMaskTop[curFace[pointI]] = 1;
             }
-            
         }
-        
     }
-    
+
     const labelList& cellTopAddr =
         cellZones()[cellZones().findZoneID("movingCellsZoneV"+ Foam::name(i+1))];
-    
+
     forAll (cellTopAddr, cellI)
     {
         const cell& curCell = c[cellTopAddr[cellI]];
@@ -104,23 +92,14 @@ void Foam::pistonSliding::calcMovingMaskTop(const label i) const
 
             forAll (curFace, pointI)
             {
-                
-
-                {
-                    foundOne = true;  
-                    movingPointsMaskTop[curFace[pointI]] = 1;
-                }
-                
-                
+                movingPointsMaskTop[curFace[pointI]] = 1;
             }
-            
         }
-        
     }
-    
-    
-    
-/*    
+
+
+
+/*
     if(valves_[i].poppetPatchID().active())
     {
 
@@ -141,9 +120,9 @@ void Foam::pistonSliding::calcMovingMaskTop(const label i) const
                 movingPointsMaskTop[curFace[pointI]] = 0;
             }
         }
-    
+
     }
-*/    
+*/
 }
 
 // Return moving points mask.  Moving points marked with 1
@@ -153,7 +132,7 @@ const Foam::scalarField& Foam::pistonSliding::movingPointsMaskTop(const label i)
     {
         movingPointsMaskTopPtr_ = NULL;
     }
-    
+
     if (!movingPointsMaskTopPtr_)
     {
         calcMovingMaskTop(i);
@@ -200,14 +179,12 @@ void Foam::pistonSliding::calcMovingMaskBottom(const label i) const
 
             forAll (curFace, pointI)
             {
-                {
-                    movingPointsMaskBottom[curFace[pointI]] = 1;
-                }
+                movingPointsMaskBottom[curFace[pointI]] = 1;
             }
         }
     }
 
-/*    
+/*
     if(valves_[i].bottomPatchID().active())
     {
 
@@ -228,9 +205,9 @@ void Foam::pistonSliding::calcMovingMaskBottom(const label i) const
                 movingPointsMaskBottom[curFace[pointI]] = 0;
             }
         }
-    
+
     }
-*/    
+*/
 }
 
 // Return moving points mask.  Moving points marked with 1
@@ -240,7 +217,7 @@ const Foam::scalarField& Foam::pistonSliding::movingPointsMaskBottom(const label
     {
         movingPointsMaskBottomPtr_ = NULL;
     }
-    
+
     if (!movingPointsMaskBottomPtr_)
     {
         calcMovingMaskBottom(i);
@@ -275,8 +252,6 @@ void Foam::pistonSliding::calcMovingMaskPiston() const
 
     const labelList& cellAddr =
         cellZones()[cellZones().findZoneID("movingCellsPiston")];
-    
-    bool foundOne(false);
 
     forAll (cellAddr, cellI)
     {
@@ -289,21 +264,10 @@ void Foam::pistonSliding::calcMovingMaskPiston() const
 
             forAll (curFace, pointI)
             {
-                
-
-                {
-                    foundOne = true;  
-                    movingPointsMaskPiston[curFace[pointI]] = 1;
-                }
-                
-                
+                movingPointsMaskPiston[curFace[pointI]] = 1;
             }
-            
         }
-        
     }
-    
-        
 }
 
 // Return moving points mask.  Moving points marked with 1
@@ -313,7 +277,7 @@ const Foam::scalarField& Foam::pistonSliding::movingPointsMaskPiston() const
     {
         movingPointsMaskPistonPtr_ = NULL;
     }
-    
+
     if (!movingPointsMaskPistonPtr_)
     {
         calcMovingMaskPiston();
@@ -349,8 +313,6 @@ void Foam::pistonSliding::calcMovingMaskPistonValves(const label i) const
 
     const labelList& cellAddr =
         cellZones()[cellZones().findZoneID("movingCellsPistonV" + Foam::name(i+1))];
-    
-    bool foundOne(false);
 
     forAll (cellAddr, cellI)
     {
@@ -363,21 +325,10 @@ void Foam::pistonSliding::calcMovingMaskPistonValves(const label i) const
 
             forAll (curFace, pointI)
             {
-                
-
-                {
-                    foundOne = true;  
-                    movingPointsMaskPistonValves[curFace[pointI]] = 1;
-                }
-                
-                
+                movingPointsMaskPistonValves[curFace[pointI]] = 1;
             }
-            
         }
-        
     }
-
-        
 }
 
 // Return moving points mask.  Moving points marked with 1
@@ -387,7 +338,7 @@ const Foam::scalarField& Foam::pistonSliding::movingPointsMaskPistonValves(const
     {
         movingPointsMaskPistonValvesPtr_ = NULL;
     }
-    
+
     if (!movingPointsMaskPistonValvesPtr_)
     {
         calcMovingMaskPistonValves(i);

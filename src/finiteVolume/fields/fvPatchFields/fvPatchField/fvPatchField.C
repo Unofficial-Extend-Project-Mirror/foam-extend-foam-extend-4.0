@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -28,6 +27,7 @@ License
 #include "dictionary.H"
 #include "fvMesh.H"
 #include "fvPatchFieldMapper.H"
+#include "GeometricField.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -157,7 +157,25 @@ Foam::fvPatchField<Type>::fvPatchField
 template<class Type>
 const Foam::objectRegistry& Foam::fvPatchField<Type>::db() const
 {
-    return patch_.boundaryMesh().mesh();
+    //HR 12.3.10: Lookup fields from the field DB rather than the mesh
+    return internalField_.db();
+}
+
+
+template<class Type>
+template<class GeometricField, class Type2>
+const typename GeometricField::PatchFieldType&
+Foam::fvPatchField<Type>::lookupPatchField
+(
+    const word& name,
+    const GeometricField*,
+    const Type2*
+) const
+{
+    return patch_.patchField<GeometricField, Type2>
+    (
+        internalField_.db().objectRegistry::template lookupObject<GeometricField>(name)
+    );
 }
 
 
@@ -227,6 +245,102 @@ template<class Type>
 void Foam::fvPatchField<Type>::manipulateMatrix(fvMatrix<Type>& matrix)
 {
     // do nothing
+}
+
+
+template<class Type>
+void Foam::fvPatchField<Type>::patchInterpolate
+(
+    GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+    const scalarField& pL
+) const
+{
+    // Code moved from surfaceInterpolationScheme.C
+    // HJ, 29/May/2013
+    const label patchI = this->patch().index();
+
+     // Virtual function for patch face interpolate.  HJ, 13/Jun/2013
+     if (this->coupled())
+     {
+         // Coupled patch
+         fField.boundaryField()[patchI] =
+             pL*this->patchInternalField()
+           + (1 - pL)*this->patchNeighbourField();
+     }
+     else
+     {
+         // Uncoupled patch, re-use face values
+         fField.boundaryField()[patchI] = *this;
+     }
+}
+
+
+template<class Type>
+void Foam::fvPatchField<Type>::patchInterpolate
+(
+    GeometricField<Type, fvsPatchField, surfaceMesh>& fField,
+    const scalarField& pL,
+    const scalarField& pY
+) const
+{
+    // Code moved from surfaceInterpolationScheme.C
+    // HJ, 29/May/2013
+    const label patchI = this->patch().index();
+
+    // Virtual function for patch face interpolate.  HJ, 13/Jun/2013
+    if (this->coupled())
+    {
+        // Coupled patch
+        fField.boundaryField()[patchI] =
+            pL*this->patchInternalField()
+          + pY*this->patchNeighbourField();
+    }
+    else
+    {
+        // Uncoupled patch, re-used face values
+        fField.boundaryField()[patchI] = *this;
+    }
+}
+
+
+template<class Type>
+void Foam::fvPatchField<Type>::patchFlux
+(
+    GeometricField<Type, fvsPatchField, surfaceMesh>& flux,
+    const fvMatrix<Type>& matrix
+) const
+{
+    // Code moved from fvMatrix.C
+    // HJ, 29/May/2013
+    const label patchI = this->patch().index();
+
+    // Virtual function for patch flux.  HJ, 29/May/2013
+    if (this->coupled())
+    {
+        // Coupled patch
+        flux.boundaryField()[patchI] =
+            cmptMultiply
+            (
+                matrix.internalCoeffs()[patchI],
+                this->patchInternalField()
+            )
+          - cmptMultiply
+            (
+                matrix.boundaryCoeffs()[patchI],
+                this->patchNeighbourField()
+            );
+    }
+    else
+    {
+        // Uncoupled patch
+        flux.boundaryField()[patchI] =
+            cmptMultiply
+            (
+                matrix.internalCoeffs()[patchI],
+                this->patchInternalField()
+            )
+          - matrix.boundaryCoeffs()[patchI];
+    }
 }
 
 

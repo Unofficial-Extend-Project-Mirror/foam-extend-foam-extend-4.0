@@ -11,6 +11,10 @@ EXE_LIBS = \
     -lengine \
     -lerrorEstimation \
     -lfiniteVolume \
+    -lfiniteArea \
+    -lfoam \
+    -ltetFiniteElement \
+    -ltetMotionSolver \
     -lforces \
     -lfvMotionSolver \
     -lincompressibleLESModels \
@@ -27,7 +31,6 @@ EXE_LIBS = \
     -lliquids \
     -lmeshTools \
     -lODE \
-    -lOpenFOAM \
     -lpdf \
     -lphaseModel \
     -lradiation \
@@ -39,4 +42,5 @@ EXE_LIBS = \
     -lthermophysicalFunctions \
     -ltopoChangerFvMesh \
     -ltriSurface \
-    -lautoMesh
+    -lautoMesh \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -180,7 +179,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "R",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -192,7 +191,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "k",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -204,7 +203,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "epsilon",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -216,7 +215,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
         (
             "nut",
             runTime_.timeName(),
-            mesh_,
+            U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -254,7 +253,7 @@ tmp<volSymmTensorField> LaunderGibsonRSTM::devReff() const
             (
                 "devRhoReff",
                 runTime_.timeName(),
-                mesh_,
+                U_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
@@ -345,6 +344,7 @@ void LaunderGibsonRSTM::correct()
     }
 
     volSymmTensorField P = -twoSymm(R_ & fvc::grad(U_));
+    volSymmTensorField C = -fvc::div(phi_, R_);
     volScalarField G("RASModel::G", 0.5*mag(tr(P)));
 
     // Update epsilon and G at the wall
@@ -365,7 +365,9 @@ void LaunderGibsonRSTM::correct()
 
     epsEqn().relax();
 
-    epsEqn().boundaryManipulate(epsilon_.boundaryField());
+    // No longer needed: matrix completes at the point of solution
+    // HJ, 17/Apr/2012
+//     epsEqn().completeAssembly();
 
     solve(epsEqn);
     bound(epsilon_, epsilon0_);
@@ -403,7 +405,10 @@ void LaunderGibsonRSTM::correct()
       ==
         P
       + (2.0/3.0*(Clg1_ - 1)*I)*epsilon_
-      - Clg2_*dev(P)
+        // Change for consistency with Fluent implementation.
+        // Emil Baric, NUMAP-FOAM 2011
+        // HJ, 13/Dec/2011
+      - Clg2_*(dev(P) - dev(C))
 
         // wall reflection terms
       + symm
@@ -441,42 +446,8 @@ void LaunderGibsonRSTM::correct()
     nut_.correctBoundaryConditions();
 
 
-    // Correct wall shear stresses
-
-    forAll(patches, patchi)
-    {
-        const fvPatch& curPatch = patches[patchi];
-
-        if (curPatch.isWall())
-        {
-            symmTensorField& Rw = R_.boundaryField()[patchi];
-
-            const scalarField& nutw = nut_.boundaryField()[patchi];
-
-            vectorField snGradU = U_.boundaryField()[patchi].snGrad();
-
-            const vectorField& faceAreas
-                = mesh_.Sf().boundaryField()[patchi];
-
-            const scalarField& magFaceAreas
-                = mesh_.magSf().boundaryField()[patchi];
-
-            forAll(curPatch, facei)
-            {
-                // Calculate near-wall velocity gradient
-                tensor gradUw
-                    = (faceAreas[facei]/magFaceAreas[facei])*snGradU[facei];
-
-                // Calculate near-wall shear-stress tensor
-                tensor tauw = -nutw[facei]*2*symm(gradUw);
-
-                // Reset the shear components of the stress tensor
-                Rw[facei].xy() = tauw.xy();
-                Rw[facei].xz() = tauw.xz();
-                Rw[facei].yz() = tauw.yz();
-            }
-        }
-    }
+    // Correct wall shear stresses.  Moved to wall functions with anisotropy
+    // HJ, 14/Dec/2011
 }
 
 

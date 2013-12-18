@@ -4,10 +4,12 @@ EXE_INC = \
     -I$(LIB_SRC)/dynamicMesh/dynamicMesh/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/dynamicFvMesh/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
-    -I$(LIB_SRC)/turbulenceModels/compressible/turbulenceModel
+    -I$(LIB_SRC)/turbulenceModels/compressible/turbulenceModel \
+    -I$(LIB_SRC)/engine/lnInclude
 
 EXE_LIBS = \
     -lengine \
+    -lfiniteVolume \
     -ldynamicFvMesh \
     -ldynamicMesh \
     -ltopoChangerFvMesh \
@@ -17,6 +19,7 @@ EXE_LIBS = \
     -lbasicThermophysicalModels \
     -lspecie \
     -lmeshTools \
-    -lfiniteVolume \
-    $(WM_DECOMP_LIBS) \
-    -llduSolvers
+    -ltetFiniteElement \
+    -ltetMotionSolver \
+    -llduSolvers \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

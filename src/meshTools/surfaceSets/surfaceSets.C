@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -67,7 +66,7 @@ Description
 //}
 //
 //
-//// Returns true if cell uses at least one selected point 
+//// Returns true if cell uses at least one selected point
 //bool Foam::surfaceSets::usesPoint
 //(
 //    const primitiveMesh& mesh,
@@ -149,7 +148,7 @@ Description
 //                    newPoints[pointI] = tnearest()[0];
 //                }
 //            }
-//        }               
+//        }
 //    }
 //
 //
@@ -163,7 +162,7 @@ Description
 //    )
 //    {
 //        label cellI = iter.key();
-//    
+//
 //        const cell& cll = cells[cellI];
 //
 //        scalar newVol = cll.mag(newPoints, faces);
@@ -286,7 +285,7 @@ void Foam::surfaceSets::getSurfaceSets
         cellType.trimCutCells
         (
             nCutLayers,
-            cellClassification::OUTSIDE, 
+            cellClassification::OUTSIDE,
             cellClassification::INSIDE
         );
     }
@@ -505,7 +504,7 @@ Foam::labelHashSet Foam::surfaceSets::getHangingCells
 //        mesh,
 //        surfName,
 //        surf,
-//        querySurf, 
+//        querySurf,
 //        outsidePts,
 //        false,          // includeCut
 //        false,          // includeInside
@@ -628,7 +627,7 @@ Foam::labelHashSet Foam::surfaceSets::getHangingCells
 //            << endl;
 //    }
 //    while (nRemoved != 0);
-//    
+//
 //
 //    //
 //    // Write
@@ -644,7 +643,7 @@ Foam::labelHashSet Foam::surfaceSets::getHangingCells
 //    Pout<< "Writing outside cells (" << outside.size() << ") to cellSet "
 //        << outside.instance()/outside.local()/outside.name()
 //        << endl << endl;
-//    
+//
 //    outside.write();
 //}
 

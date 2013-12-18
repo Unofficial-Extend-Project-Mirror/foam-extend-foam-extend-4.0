@@ -14,13 +14,10 @@
 
         if(valves_[valveI].curLift() >= valves_[valveI].deformationLift())
         {
-            bool isMoving(false);
-
             if(mag(valves_[valveI].curVelocity()) > 0)
             {
                 Info<< "Valve n. " << valveI << " is moving with velocity = "
                     << valves_[valveI].curVelocity() << endl;
-                isMoving = true;
             }
 
             Info<< "Valve displacement for valve " << valveI << " = "
@@ -52,7 +49,7 @@
 
                     valveTopPoint[layeringVPoints[i]] = true;
                 }
-*/                
+*/
 
                 label layeringVCellsIndex =
                     cellZones().findZoneID
@@ -62,11 +59,11 @@
 
                 const labelList& layeringVCells =
                     cellZones()[layeringVCellsIndex];
-                
+
                 labelList layeringVPoints;
-                
+
                 boolList count(newPoints.size(), false);
-            
+
                 forAll(layeringVCells, cellI)
                 {
                     const labelList& curCellPoints = cp[layeringVCells[cellI]];
@@ -99,7 +96,7 @@
                         nCounted++;
                     }
                 }
-                
+
 
                 forAll(layeringVPoints, i)
                 {
@@ -109,7 +106,7 @@
 
                     valveTopPoint[layeringVPoints[i]] = true;
                 }
-                
+
 /*
                 label movingTopPtsVIndex =
                     pointZones().findZoneID
@@ -144,7 +141,7 @@
                 labelList movingTopPointsV;
 
                 boolList count2(newPoints.size(), false);
-            
+
                 forAll(movingTopCellsV, cellI)
                 {
                     const labelList& curCellPoints = cp[movingTopCellsV[cellI]];
@@ -189,7 +186,7 @@
                     }
                 }
 
-                
+
             }
             else
             {

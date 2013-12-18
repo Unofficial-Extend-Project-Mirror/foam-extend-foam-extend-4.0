@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     meshOps
@@ -216,8 +215,8 @@ inline label tetApexPoint
 (
     const label cIndex,
     const label fIndex,
-    const UList<face> faces,
-    const UList<cell> cells
+    const UList<face>& faces,
+    const UList<cell>& cells
 )
 {
     label apexPoint = -1;
@@ -241,13 +240,13 @@ inline label tetApexPoint
 
     if (!foundApex)
     {
-        Info << "fIndex: " << fIndex << ":: " << faces[fIndex] << endl;
-        Info << "cIndex: " << cIndex << ":: " << cellToCheck << endl;
+        Pout<< "fIndex: " << fIndex << ":: " << faces[fIndex] << endl;
+        Pout<< "cIndex: " << cIndex << ":: " << cellToCheck << endl;
 
         forAll(cellToCheck, faceI)
         {
-            Info << '\t' << cellToCheck[faceI] << ":: "
-                 << faces[cellToCheck[faceI]] << endl;
+            Pout<< '\t' << cellToCheck[faceI] << ":: "
+                << faces[cellToCheck[faceI]] << endl;
         }
 
         FatalErrorIn
@@ -257,8 +256,8 @@ inline label tetApexPoint
             "(\n"
             "    const label cIndex,\n"
             "    const label fIndex,\n"
-            "    const UList<face> faces,\n"
-            "    const UList<cell> cells\n"
+            "    const UList<face>& faces,\n"
+            "    const UList<cell>& cells\n"
             ")\n"
         )
             << "Could not find an apex point in cell: " << cIndex
@@ -272,7 +271,7 @@ inline label tetApexPoint
 
 // Given a cell index, find the centroid / volume of a cell.
 //  - If checking is enabled, return whether the cell is closed
-inline bool cellCentreAndVolume
+inline void cellCentreAndVolume
 (
     const label cIndex,
     const vectorField& points,
@@ -280,8 +279,7 @@ inline bool cellCentreAndVolume
     const UList<cell>& cells,
     const UList<label>& owner,
     vector& centre,
-    scalar& volume,
-    bool checkClosed
+    scalar& volume
 )
 {
     // Reset inputs
@@ -291,17 +289,11 @@ inline bool cellCentreAndVolume
     const cell& cellToCheck = cells[cIndex];
 
     // Average face-centres to get an estimate centroid
-    vector cEst(vector::zero), fCentre(vector::zero), fArea(vector::zero);
-    vector sumClosed(vector::zero), sumMagClosed(vector::zero);
+    vector cEst(vector::zero), fCentre(vector::zero);
 
     forAll(cellToCheck, faceI)
     {
         const face& checkFace = faces[cellToCheck[faceI]];
-
-        if (checkFace.empty())
-        {
-            continue;
-        }
 
         cEst += checkFace.centre(points);
     }
@@ -312,93 +304,82 @@ inline bool cellCentreAndVolume
     {
         const face& checkFace = faces[cellToCheck[faceI]];
 
-        if (checkFace.empty())
+        if (checkFace.size() == 3)
         {
-            continue;
-        }
-
-        fArea = checkFace.normal(points);
-        fCentre = checkFace.centre(points);
-
-        // Flip if necessary
-        if (owner[cellToCheck[faceI]] != cIndex)
-        {
-            fArea *= -1.0;
-        }
-
-        // Calculate 3*face-pyramid volume
-        scalar pyr3Vol = fArea & (fCentre - cEst);
-
-        // Calculate face-pyramid centre
-        vector pc = ((3.0 / 4.0) * fCentre) + ((1.0 / 4.0) * cEst);
-
-        // Accumulate volume-weighted face-pyramid centre
-        centre += pyr3Vol*pc;
-
-        // Accumulate face-pyramid volume
-        volume += pyr3Vol;
-
-        // Accumulate areas, if necessary
-        if (checkClosed)
-        {
-            sumClosed += fArea;
-            sumMagClosed += cmptMag(fArea);
-        }
-    }
-
-    centre /= volume + VSMALL;
-    volume *= (1.0 / 3.0);
-
-    if (checkClosed)
-    {
-        // Check the sum across components
-        scalar closed = 0.0;
-
-        for (direction cmpt = 0; cmpt < vector::nComponents; cmpt++)
-        {
-            closed =
+            tetPointRef tpr
             (
-                mag(sumClosed[cmpt]) / (sumMagClosed[cmpt] + VSMALL)
+                points[checkFace[2]],
+                points[checkFace[1]],
+                points[checkFace[0]],
+                cEst
             );
 
-            if (closed > 1e-06)
+            scalar tetVol = tpr.mag();
+
+            // Flip if necessary
+            if (owner[cellToCheck[faceI]] != cIndex)
             {
-                // Volume is invalid
-                return false;
+                tetVol *= -1.0;
+            }
+
+            // Accumulate volume-weighted tet centre
+            centre += tetVol*tpr.centre();
+
+            // Accumulate tet volume
+            volume += tetVol;
+        }
+        else
+        {
+            forAll(checkFace, pI)
+            {
+                tetPointRef tpr
+                (
+                    points[checkFace[pI]],
+                    points[checkFace.prevLabel(pI)],
+                    checkFace.centre(points),
+                    cEst
+                );
+
+                scalar tetVol = tpr.mag();
+
+                // Flip if necessary
+                if (owner[cellToCheck[faceI]] != cIndex)
+                {
+                    tetVol *= -1.0;
+                }
+
+                // Accumulate volume-weighted tet centre
+                centre += tetVol*tpr.centre();
+
+                // Accumulate tet volume
+                volume += tetVol;
             }
         }
     }
 
-    // Volume is valid
-    return true;
+    centre /= volume + VSMALL;
 }
 
 
 // Determine whether a segment intersects a triangular face
-template <class T>
 inline bool segmentTriFaceIntersection
 (
-    const triangle<Vector<T>, const Vector<T>&>& faceToCheck,
-    const line<Vector<T>, const Vector<T>&>& edgeToCheck,
-    const T& matchTol,
-    Vector<T>& intPoint
+    const triPointRef& faceToCheck,
+    const linePointRef& edgeToCheck,
+    vector& intPoint
 )
 {
     // Fetch references
-    const Vector<T>& p1 = edgeToCheck.start();
-    const Vector<T>& p2 = edgeToCheck.end();
+    const vector& p1 = edgeToCheck.start();
+    const vector& p2 = edgeToCheck.end();
 
-    const Vector<T>& a = faceToCheck.a();
-    const Vector<T>& b = faceToCheck.b();
-    const Vector<T>& c = faceToCheck.c();
-
-    // Define custom face-normal
-    Vector<T> n = (T(0.5) * ((b - a)^(c - a)));
+    // Define face-normal
+    vector n = faceToCheck.normal();
     n /= mag(n) + VSMALL;
 
     // Compute uValue
-    T numerator = n & (a - p1);
-    T denominator = n & (p2 - p1);
+    scalar numerator = n & (faceToCheck.a() - p1);
+    scalar denominator = n & (p2 - p1);
 
     // Check if the edge is parallel to the face
     if (mag(denominator) < VSMALL)
@@ -406,17 +387,16 @@ inline bool segmentTriFaceIntersection
         return false;
     }
 
-    T u = (numerator / denominator);
-    T tolerance = (matchTol * mag(p2 - p1));
+    scalar u = (numerator / denominator);
 
     // Check for intersection along line.
-    if ((u > tolerance) && (u < (pTraits<T>::one - tolerance)))
+    if ((u >= 0.0) && (u <= 1.0))
     {
         // Compute point of intersection
         intPoint = p1 + u*(p2 - p1);
 
         // Also make sure that intPoint lies within the face
-        if (pointInTriFace(faceToCheck, intPoint, matchTol, false))
+        if (pointInTriFace(faceToCheck, intPoint, false))
         {
             return true;
         }
@@ -429,49 +409,45 @@ inline bool segmentTriFaceIntersection
 
 // Determine whether the particular point lies
 // inside the given triangular face
-template <class T>
 inline bool pointInTriFace
 (
-    const triangle<Vector<T>, const Vector<T>&>& faceToCheck,
-    const Vector<T>& cP,
-    const T& matchTol,
+    const triPointRef& faceToCheck,
+    const vector& cP,
     bool testCoplanarity
 )
 {
     // Copy inputs
-    const Vector<T>& a = faceToCheck.a();
-    const Vector<T>& b = faceToCheck.b();
-    const Vector<T>& c = faceToCheck.c();
-
-    const T pointFive(0.5);
+    const vector& a = faceToCheck.a();
+    const vector& b = faceToCheck.b();
+    const vector& c = faceToCheck.c();
 
     // Compute the normal
-    Vector<T> nf = (pointFive * ((b - a)^(c - a)));
+    vector nf = faceToCheck.normal();
 
-    if ( ((pointFive * ((b - a)^(cP - a))) & nf) < pTraits<T>::zero)
+    if ( ((0.5 * ((b - a)^(cP - a))) & nf) < 0.0)
     {
         return false;
     }
 
-    if ( ((pointFive * ((c - b)^(cP - b))) & nf) < pTraits<T>::zero)
+    if ( ((0.5 * ((c - b)^(cP - b))) & nf) < 0.0)
     {
         return false;
     }
 
-    if ( ((pointFive * ((a - c)^(cP - c))) & nf) < pTraits<T>::zero)
+    if ( ((0.5 * ((a - c)^(cP - c))) & nf) < 0.0)
     {
         return false;
     }
 
     if (testCoplanarity)
     {
-        Vector<T> ftp(a - cP);
+        vector ftp(a - cP);
 
         // Normalize vectors
         nf /= mag(nf) + VSMALL;
         ftp /= mag(ftp) + VSMALL;
 
-        if (mag(ftp & nf) > matchTol)
+        if (mag(ftp & nf) > VSMALL)
         {
             return false;
         }
@@ -482,53 +458,47 @@ inline bool pointInTriFace
 }
 
 
-// Method to insert labels in a face, so that
-// right-handedness is preserved.
-template <class T>
-inline void insertPointLabels
+// Parallel blocking send
+inline void pWrite
 (
-    const Vector<T>& refNorm,
-    const Field<Vector<T> >& points,
-    const labelHashSet& pLabels,
-    face& modFace
+    const label toID,
+    const label& data
 )
 {
-    // Need to configure a new face.
-    face newFace(modFace);
+    OPstream::write
+    (
+        Pstream::blocking,
+        toID,
+        reinterpret_cast<const char*>(&data),
+        sizeof(label)
+    );
+}
 
-    const T pointFive(0.5);
 
-    forAllConstIter(labelHashSet, pLabels, pIter)
+// Parallel blocking receive
+inline void pRead
+(
+    const label fromID,
+    label& data
+)
+{
+    IPstream::read
+    (
+        Pstream::blocking,
+        fromID,
+        reinterpret_cast<char*>(&data),
+        sizeof(label)
+    );
+}
+
+
+inline void waitForBuffers()
+{
+    if (Pstream::parRun())
     {
-        forAll(newFace, pI)
-        {
-            label nI = newFace.fcIndex(pI);
-
-            const Vector<T>& a = points[newFace[pI]];
-            const Vector<T>& b = points[pIter.key()];
-            const Vector<T>& c = points[newFace[nI]];
-
-            // Compute the normal.
-            Vector<T> newNorm = (pointFive * ((b - a)^(c - a)));
-
-            if ((refNorm & newNorm) > pTraits<T>::zero)
-            {
-                // Insert the point.
-                meshOps::insertLabel
-                (
-                    pIter.key(),
-                    newFace[pI],
-                    newFace[nI],
-                    newFace
-                );
-
-                break;
-            }
-        }
+        OPstream::waitRequests();
+        IPstream::waitRequests();
     }
-
-    // Take over storage
-    modFace.transfer(newFace);
 }
 
 
@@ -615,76 +585,6 @@ inline void replaceLabel
             << " was not used in replacement."
             << abort(FatalError);
     }
-}
-
-
-// Utility method to size-up the list to include an item
-template <class Type>
-inline void sizeUpList
-(
-    const Type& item,
-    List<Type>& list
-)
-{
-    list.setSize(list.size() + 1, item);
-}
-
-
-// Utility method to size-down the list to remove an item
-template <class Type>
-inline void sizeDownList
-(
-    const Type& item,
-    List<Type>& list
-)
-{
-    label index = -1;
-
-    if ((index = findIndex(list, item)) > -1)
-    {
-        meshOps::removeIndex(index, list);
-    }
-    else
-    {
-        FatalErrorIn
-        (
-            "inline void meshOps::sizeDownList"
-            "(const Type& item, List<Type>& list)"
-        )
-            << nl << "Item: " << item
-            << " was not found in list. " << nl
-            << " List: " << nl << list
-            << abort(FatalError);
-    }
-}
-
-
-// Remove an item at a particular index in the list
-template <class Type>
-inline void removeIndex
-(
-    const label index,
-    List<Type>& list
-)
-{
-    // Create a new list
-    List<Type> newList(list.size() - 1);
-
-    // Copy individual items
-    label n = 0;
-
-    forAll(list, itemI)
-    {
-        if (itemI == index)
-        {
-            continue;
-        }
-
-        newList[n++] = list[itemI];
-    }
-
-    // Overwrite
-    list.transfer(newList);
 }
 
 

@@ -1,0 +1,3 @@
+forceDisp.C
+
+EXE = $(FOAM_APPBIN)/forceDisp

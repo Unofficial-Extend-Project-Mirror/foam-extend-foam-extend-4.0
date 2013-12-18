@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -443,6 +442,12 @@ void  Foam::fvMesh::mapFields(const mapPolyMesh& meshMap) const
     MapGeometricFields<symmTensor, fvPatchField, fvMeshMapper, volMesh>
         (mapper);
 
+    MapGeometricFields<symmTensor4thOrder, fvPatchField, fvMeshMapper, volMesh>
+      (mapper);
+
+    MapGeometricFields<diagTensor, fvPatchField, fvMeshMapper, volMesh>
+      (mapper);
+
     MapGeometricFields<tensor, fvPatchField, fvMeshMapper, volMesh>(mapper);
 
     // Map all the surfaceFields in the objectRegistry
@@ -456,6 +461,12 @@ void  Foam::fvMesh::mapFields(const mapPolyMesh& meshMap) const
         <sphericalTensor, fvsPatchField, fvMeshMapper, surfaceMesh>(mapper);
     MapGeometricFields<symmTensor, fvsPatchField, fvMeshMapper, surfaceMesh>
         (mapper);
+
+    MapGeometricFields<symmTensor4thOrder, fvsPatchField, fvMeshMapper, surfaceMesh>
+      (mapper);
+
+    MapGeometricFields<diagTensor, fvsPatchField, fvMeshMapper, surfaceMesh>
+      (mapper);
 
     MapGeometricFields<tensor, fvsPatchField, fvMeshMapper, surfaceMesh>
         (mapper);
@@ -483,7 +494,7 @@ void Foam::fvMesh::mapOldVolumes(const mapPolyMesh& meshMap)
         scalarField savedV0(V0);
         V0.setSize(nCells());
 
-        forAll(V0, i)
+        forAll (V0, i)
         {
             if (cellMap[i] > -1)
             {
@@ -510,7 +521,7 @@ void Foam::fvMesh::mapOldVolumes(const mapPolyMesh& meshMap)
         scalarField savedV00(V00);
         V00.setSize(nCells());
 
-        forAll(V00, i)
+        forAll (V00, i)
         {
             if (cellMap[i] > -1)
             {
@@ -541,7 +552,7 @@ void  Foam::fvMesh::updateMesh(const mapPolyMesh& mpm)
 
     clearAddressing();
 
-    // handleMorph() should also clear out the surfaceInterpolation.
+    // Mesh morphing should also clear out the surfaceInterpolation.
     // This is a temporary solution
     surfaceInterpolation::movePoints();
 
@@ -580,7 +591,7 @@ Foam::tmp<Foam::scalarField> Foam::fvMesh::movePoints(const pointField& p)
         {
             if (debug)
             {
-                InfoIn("void fvMesh::movePoints(const mapPolyMesh& meshMap)")
+                InfoIn("void fvMesh::movePoints(const pointField& p)")
                     << "Grabbing old-old cell volumes." << endl;
             }
 
@@ -591,7 +602,7 @@ Foam::tmp<Foam::scalarField> Foam::fvMesh::movePoints(const pointField& p)
         {
             if (debug)
             {
-                InfoIn("void fvMesh::movePoints(const mapPolyMesh& meshMap)")
+                InfoIn("void fvMesh::movePoints(const pointField& p)")
                     << "Grabbing old cell volumes." << endl;
             }
 
@@ -601,7 +612,7 @@ Foam::tmp<Foam::scalarField> Foam::fvMesh::movePoints(const pointField& p)
         {
             if (debug)
             {
-                InfoIn("void fvMesh::movePoints(const mapPolyMesh& meshMap)")
+                InfoIn("void fvMesh::movePoints(const pointField& p)")
                     << "Creating old cell volumes." << endl;
             }
 

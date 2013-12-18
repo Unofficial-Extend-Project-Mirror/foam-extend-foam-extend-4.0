@@ -1,32 +1,31 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
     fluentDataToFoam
 
 Description
-    Converts Fluent data to OpenFOAM format
+    Converts Fluent data to FOAM format
 
 \*---------------------------------------------------------------------------*/
 
@@ -188,10 +187,6 @@ endOfSection               {space}")"{space}
     // Data index
     label curNEntriesPerObject = 0;
 
-    // Dummy, not used
-    label nTimeLevels;
-    label nPhases;
-
     label curFirstID = 0;
     label curLastID = 0;
     label objI = 0;
@@ -200,11 +195,11 @@ endOfSection               {space}")"{space}
 %}
 
 
- /* ------------------------------------------------------------------------- *\
+ /* ------------------------------------------------------------------------ *\
                             ------ Start Lexing ------
- \* ------------------------------------------------------------------------- */
+ \* ------------------------------------------------------------------------ */
 
- /*                      ------ Reading control header ------                 */
+ /*                     ------ Reading control header ------                 */
 
 {comment} {
         yy_push_state(readComment);
@@ -320,8 +315,10 @@ endOfSection               {space}")"{space}
         nEntriesPerObject.append(curNEntriesPerObject);
 
         // Dummy, not used
-        nTimeLevels = readLabel(fieldDataStream);
-        nPhases = readLabel(fieldDataStream);
+        //nTimeLevels =
+        readLabel(fieldDataStream);
+        //nPhases =
+        readLabel(fieldDataStream);
 
         // Start and end of list
         curFirstID = readLabel(fieldDataStream);
@@ -469,7 +466,7 @@ int main(int argc, char *argv[])
 
     Info<< "\n\nFINISHED LEXING\n\n\n";
 
-    // Re-package the fields into OpenFOAM data
+    // Re-package the fields into foam data
 
     // Warning: syncronous iterators, check size
     // HJ, 25/May/2009
@@ -668,7 +665,7 @@ int main(int argc, char *argv[])
         {
             U.replace
             (
-                vector::X, 
+                vector::X,
                 fdc.convertField
                 (
                     "Ux",   // field name
@@ -682,7 +679,7 @@ int main(int argc, char *argv[])
         {
             U.replace
             (
-                vector::Y, 
+                vector::Y,
                 fdc.convertField
                 (
                     "Uy",   // field name
@@ -696,7 +693,7 @@ int main(int argc, char *argv[])
         {
             U.replace
             (
-                vector::Z, 
+                vector::Z,
                 fdc.convertField
                 (
                     "Uz",   // field name

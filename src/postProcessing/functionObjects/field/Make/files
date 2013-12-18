@@ -7,6 +7,7 @@ fieldMinMax/fieldMinMax.C
 fieldMinMax/fieldMinMaxFunctionObject.C
 
 minMaxField/minMaxField.C
+maxFieldCell/maxFieldCell.C
 
 fieldValues/fieldValue/fieldValue.C
 fieldValues/faceSource/faceSource.C

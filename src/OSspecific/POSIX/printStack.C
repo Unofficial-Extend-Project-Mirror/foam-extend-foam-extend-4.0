@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -168,11 +167,11 @@ void printSourceFileAndLine
 // After an idea published by Rush Manbert at http://lists.apple.com/archives/xcode-users/2006/Apr/msg00528.html
 
 template<int level>
-void *getStackAddress() 
+void *getStackAddress()
 {
     const unsigned int stackLevel=level;
     return (
-        __builtin_frame_address(level) 
+        __builtin_frame_address(level)
         ? __builtin_return_address(stackLevel)
         : (void *)0
     );
@@ -213,7 +212,7 @@ void *getStackAddress(int level)
     }
 }
 
-unsigned backtrace(void **bt, unsigned maxAddrs) 
+unsigned backtrace(void **bt, unsigned maxAddrs)
 {
     unsigned valid=0;
     bool ok=true;
@@ -221,7 +220,7 @@ unsigned backtrace(void **bt, unsigned maxAddrs)
     for(int level=0;level<maxAddrs;level++) {
         if(ok) {
             bt[level]=getStackAddress(level);
-            
+
             if(bt[level]!=(void *)0) {
                 valid=level;
             } else {
@@ -236,7 +235,7 @@ unsigned backtrace(void **bt, unsigned maxAddrs)
 }
 
 // This function is a potential memory leak. But I don't care because the program is terminating anyway
-char **backtrace_symbols(void **bt,unsigned nr) 
+char **backtrace_symbols(void **bt,unsigned nr)
 {
     char **strings=(char **)malloc(sizeof(char *)*nr);
 
@@ -303,7 +302,7 @@ void error::printStack(Ostream& os)
     // from the /proc/pid/maps-file
     // I'm afraid this works only for Linux 2.6-Kernels (may work on 2.4)
     // Note2: the filenames in here will have softlinks resolved so will
-    // go wrong when having e.g. OpenFOAM installed under a softlink.
+    // go wrong when having e.g. FOAM installed under a softlink.
 
     HashTable<label, fileName> addressMap;
     {

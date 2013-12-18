@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
     pimpleDyMFoam.C
@@ -59,11 +58,10 @@ int main(int argc, char *argv[])
     {
 #       include "readControls.H"
 #       include "CourantNo.H"
+#       include "setDeltaT.H"
 
         // Make the fluxes absolute
         fvc::makeAbsolute(phi, U);
-
-#       include "setDeltaT.H"
 
         runTime++;
 
@@ -71,21 +69,30 @@ int main(int argc, char *argv[])
 
         bool meshChanged = mesh.update();
 
-        if (correctPhi && (mesh.moving() || meshChanged))
+#       include "volContinuity.H"
+
+        if (checkMeshCourantNo)
+        {
+#           include "meshCourantNo.H"
+        }
+
+        // Mesh motion update
+        if (correctPhi && meshChanged)
         {
 #           include "correctPhi.H"
+        }
+
+        if (meshChanged)
+        {
+#           include "CourantNo.H"
         }
 
         // Make the fluxes relative to the mesh motion
         fvc::makeRelative(phi, U);
 
-        if (mesh.moving() && checkMeshCourantNo)
-        {
-#           include "meshCourantNo.H"
-        }
-
         // --- PIMPLE loop
-        for (int ocorr=0; ocorr<nOuterCorr; ocorr++)
+        label oCorr = 0;
+        do
         {
             if (nOuterCorr != 1)
             {
@@ -95,19 +102,15 @@ int main(int argc, char *argv[])
 #           include "UEqn.H"
 
             // --- PISO loop
-            for (int corr=0; corr<nCorr; corr++)
+            for (int corr = 0; corr < nCorr; corr++)
             {
                 rAU = 1.0/UEqn.A();
 
                 U = rAU*UEqn.H();
                 phi = (fvc::interpolate(U) & mesh.Sf());
+                // ddtPhiCorr does not work.  HJ, 20/Nov/2013
 
-                if (p.needReference())
-                {
-                    fvc::makeRelative(phi, U);
-                    adjustPhi(phi, U, p);
-                    fvc::makeAbsolute(phi, U);
-                }
+                adjustPhi(phi, U, p);
 
                 for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
                 {
@@ -120,16 +123,19 @@ int main(int argc, char *argv[])
 
                     if
                     (
-                        ocorr == nOuterCorr-1
-                     && corr == nCorr-1
+//                         oCorr == nOuterCorr - 1
+                        corr == nCorr - 1
                      && nonOrth == nNonOrthCorr
                     )
                     {
-                        pEqn.solve(mesh.solver(p.name() + "Final"));
+                        pEqn.solve
+                        (
+                            mesh.solutionDict().solver(p.name() + "Final")
+                        );
                     }
                     else
                     {
-                        pEqn.solve(mesh.solver(p.name()));
+                        pEqn.solve(mesh.solutionDict().solver(p.name()));
                     }
 
                     if (nonOrth == nNonOrthCorr)
@@ -141,7 +147,7 @@ int main(int argc, char *argv[])
 #               include "continuityErrs.H"
 
                 // Explicitly relax pressure for momentum corrector
-                if (ocorr != nOuterCorr-1)
+                if (oCorr != nOuterCorr - 1)
                 {
                     p.relax();
                 }
@@ -149,12 +155,14 @@ int main(int argc, char *argv[])
                 // Make the fluxes relative to the mesh motion
                 fvc::makeRelative(phi, U);
 
+#               include "movingMeshContinuityErrs.H"
+
                 U -= rAU*fvc::grad(p);
                 U.correctBoundaryConditions();
             }
 
             turbulence->correct();
-        }
+        } while (++oCorr < nOuterCorr);
 
         runTime.write();
 

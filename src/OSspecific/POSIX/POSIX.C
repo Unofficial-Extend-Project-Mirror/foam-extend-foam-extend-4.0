@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
     POSIX versions of the functions declared in OSspecific.H
@@ -215,30 +214,10 @@ bool Foam::chDir(const fileName& dir)
 
 Foam::fileName Foam::findEtcFile(const fileName& name, bool mandatory)
 {
-    // Search user files:
-    // ~~~~~~~~~~~~~~~~~~
-    fileName searchDir = home()/".OpenFOAM";
-    if (isDir(searchDir))
-    {
-        // Check for user file in ~/.OpenFOAM/VERSION
-        fileName fullName = searchDir/FOAMversion/name;
-        if (isFile(fullName))
-        {
-            return fullName;
-        }
-
-        // Check for version-independent user file in ~/.OpenFOAM
-        fullName = searchDir/name;
-        if (isFile(fullName))
-        {
-            return fullName;
-        }
-    }
-
+    // Search user files: deprecated.  HJ, 11/Dec/2013
 
     // Search site files:
-    // ~~~~~~~~~~~~~~~~~~
-    searchDir = getEnv("WM_PROJECT_INST_DIR");
+    fileName searchDir = getEnv("WM_PROJECT_INST_DIR");
     if (isDir(searchDir))
     {
         // Check for site file in $WM_PROJECT_INST_DIR/site/VERSION
@@ -257,11 +236,10 @@ Foam::fileName Foam::findEtcFile(const fileName& name, bool mandatory)
     }
 
     // Search installation files:
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~
     searchDir = getEnv("WM_PROJECT_DIR");
     if (isDir(searchDir))
     {
-        // Check for shipped OpenFOAM file in $WM_PROJECT_DIR/etc
+        // Check for shipped FOAM file in $WM_PROJECT_DIR/etc
         fileName fullName = searchDir/"etc"/name;
         if (isFile(fullName))
         {
@@ -571,7 +549,7 @@ Foam::fileNameList Foam::readDir
         {
             fileName fName(list->d_name);
 
-            // ignore files begining with ., i.e. '.', '..' and '.*'
+            // Ignore files begining with ., i.e. '.', '..' and '.*'
             if (fName.size() && fName[0] != '.')
             {
                 word fExt = fName.ext();
@@ -582,7 +560,8 @@ Foam::fileNameList Foam::readDir
                  ||
                     (
                         type == fileName::FILE
-                     && fName[fName.size()-1] != '~'
+                     && fName[fName.size() - 1] != '~'
+                     && fExt != "vtk"
                      && fExt != "bak"
                      && fExt != "BAK"
                      && fExt != "old"

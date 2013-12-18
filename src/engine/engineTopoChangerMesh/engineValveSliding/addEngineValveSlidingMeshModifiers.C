@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2005-2010 Tommaso Lucchini
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     verticalValvesGambit
@@ -46,20 +45,20 @@ void Foam::engineValveSliding::addZonesAndModifiers()
      || faceZones().size() > 0
      || cellZones().size() > 0
      || topoChanger_.size() > 0
-    ) 
+    )
     {
         Info<< "Time = " << engTime().theta() << endl;
         Info<< "void Foam::verticalValvesGambit::addZonesAndModifiers() : "
             << "Zones and modifiers already present.  Skipping."
             << endl;
-        
+
         setVirtualPositions();
 //        checkAndCalculate();
 
         Info << "Point zones found = " << pointZones().size() << endl;
         Info << "Face zones found = " << faceZones().size() << endl;
         Info << "Cell zones found = " << cellZones().size() << endl;
-        
+
         return;
 
     }
@@ -75,13 +74,13 @@ void Foam::engineValveSliding::addZonesAndModifiers()
     1) Cut point zone for liner in head
 
     nValves*
-    1) cutPointsV            
+    1) cutPointsV
     2) valveTopPoints
     3) valveBottomPoints
 */
-    
+
     DynamicList<pointZone*> pz;
- 
+
 /*
     Face zones
     1) Piston layer faces
@@ -110,15 +109,15 @@ void Foam::engineValveSliding::addZonesAndModifiers()
     label nFaceZones = 0;
     label nCellZones = 0;
 
-/* 
+/*
     Adding the following faces zones:
     1:  pistonLayerFaces
     nV: pistonLayerFacesV
-    
+
     Adding the following cell zones:
     1:  movingCellsPiston
     nV:  movingCellsPistonV
-    
+
     Adding the following point zones:
     1: pistonPoints
     nV: valvePistonPointsV
@@ -129,25 +128,25 @@ void Foam::engineValveSliding::addZonesAndModifiers()
 
 /*
     Adding the following face zones:
-    
+
     nV: curtainCylZoneV
     nV: curtainPortZoneV
     nV: cutFaceZoneV
     nV: poppetZoneV
     nV: bottomZoneV
-    
+
     Adding the following point zones:
 
     nV: cutPointsV
-    
+
 */
 
 #   include "addValvesFacesPointZonesEngineValveSliding.H"
 
 /*
-    
+
     Adding the following point zones:
-    
+
     nV: valveTopPointsV
     nV: valveBottomPointsV
 

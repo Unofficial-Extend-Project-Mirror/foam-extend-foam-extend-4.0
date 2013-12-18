@@ -1,34 +1,33 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
     Add pointZones/faceZones/cellZones to the mesh from similar named
     pointSets/faceSets/cellSets.
 
-    There is one catch: for faceZones you also need to specify a flip
-    condition which basically denotes the side of the face. In this application
-    it reads a cellSet (xxxCells if 'xxx' is the name of the faceSet) which
+    For faceZones the user needs to specify a flip
+    condition which denotes the side of the face.  This application
+    reads a cellSet (xxxMasterCells if 'xxx' is the name of the faceSet) which
     is the masterCells of the zone.  Master cell is the one IN FRONT of the
     face, ie. the one into which the face normal points.  If master cells are
     not found, take faces without a flip
@@ -39,6 +38,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "polyMesh.H"
 #include "IStringStream.H"
@@ -163,7 +163,8 @@ int main(int argc, char *argv[])
             word setName(set.name() + "MasterCells");
 
             Info<< "Using cellSet " << setName
-                << " to determine the master side of the zone." << nl
+                << " to determine the master side of the face zone "
+                << set.name() << nl
                 << endl;
 
             // Load corresponding cells
@@ -208,7 +209,7 @@ int main(int argc, char *argv[])
                         else
                         {
                             FatalErrorIn(args.executable())
-                                << "Pwner or neighbour of internal face "
+                                << "Owner or neighbour of internal face "
                                 << faceI << " should be in cellSet "
                                 << cells.name()
                                 << " to be able to determine orientation."
@@ -331,10 +332,10 @@ int main(int argc, char *argv[])
                     sz,
                     new cellZone
                     (
-                        set.name(),             //name
-                        cellLabels,             //addressing
-                        sz,                     //index
-                        mesh.cellZones()        //pointZoneMesh
+                        set.name(),             // name
+                        cellLabels,             // addressing
+                        sz,                     // index
+                        mesh.cellZones()        // pointZoneMesh
                     )
                 );
                 mesh.cellZones().writeOpt() = IOobject::AUTO_WRITE;
@@ -350,7 +351,6 @@ int main(int argc, char *argv[])
             }
         }
     }
-
 
 
     Info<< "Writing mesh." << endl;

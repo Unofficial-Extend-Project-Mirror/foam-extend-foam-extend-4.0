@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -197,7 +196,7 @@ static void splitTri
 // Insert scalar into sortedVerts/sortedWeights so the weights are in
 // incrementing order.
 static bool insertSorted
-(   
+(
     const label vertI,
     const scalar weight,
 
@@ -243,7 +242,7 @@ static bool insertSorted
         }
     }
 
-    
+
     label sz = sortedWeights.size();
 
     sortedWeights.setSize(sz + 1);
@@ -292,7 +291,7 @@ static void markCollapsedFaces
             // Check distance of vertex to edge.
             label opposite0 =
                 triSurfaceTools::oppositeVertex
-                (   
+                (
                     surf,
                     faceI,
                     edgeI
@@ -481,7 +480,7 @@ static label edgeType
     {
         if (usesRegion == -1)
         {
-            FatalErrorIn("edgeRegion") << abort(FatalError); 
+            FatalErrorIn("edgeRegion") << abort(FatalError);
             return -2;
         }
         else
@@ -750,9 +749,9 @@ label collapseBase(triSurface& surf, const scalar minLen)
         // Find regions of connected collapsed faces
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        // per face -1 or region 
+        // per face -1 or region
         labelList collapseRegion(surf.size(), -1);
-        
+
         label nRegions = markRegions(surf, faceToEdge, collapseRegion);
 
         Pout<< "Detected " << nRegions << " regions of faces to be collapsed"
@@ -783,7 +782,7 @@ label collapseBase(triSurface& surf, const scalar minLen)
             (
                 surf,
                 outsideVerts[regionI],
-                spanPoints[regionI], 
+                spanPoints[regionI],
                 orderedVertices[regionI],
                 orderedWeights[regionI]
             );
@@ -862,7 +861,7 @@ label collapseBase(triSurface& surf, const scalar minLen)
 
                 if (splitVerts.size())
                 {
-                    // Split edge using splitVerts. All non-collapsed triangles 
+                    // Split edge using splitVerts. All non-collapsed triangles
                     // using edge will get split.
 
 

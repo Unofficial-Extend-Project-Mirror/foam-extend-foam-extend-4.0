@@ -1,0 +1,82 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      cohesiveProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+cohesive
+{
+  type      multiMaterial;
+
+  laws
+    (
+     bottomSubstrate
+     {
+       type            dugdale;
+       sigmaMax        sigmaMax [1 -1 -2 0 0 0 0] 100e6;
+       tauMax          tauMax [1 -1 -2 0 0 0 0] 100e6;
+       GIc             GIc [1 0 -2 0 0 0 0] 200;
+       GIIc            GIIc [1 0 -2 0 0 0 0] 200;
+     }
+
+     adhesive
+     {
+       type            dugdale;
+       sigmaMax        sigmaMax [1 -1 -2 0 0 0 0] 10e6;
+       tauMax          tauMax [1 -1 -2 0 0 0 0] 10e6;
+       GIc             GIc [1 0 -2 0 0 0 0] 200;
+       GIIc            GIIc [1 0 -2 0 0 0 0] 200;
+     }
+
+     topSubstrate
+     {
+       type            dugdale;
+       sigmaMax        sigmaMax [1 -1 -2 0 0 0 0] 100e6;
+       tauMax          tauMax [1 -1 -2 0 0 0 0] 100e6;
+       GIc             GIc [1 0 -2 0 0 0 0] 200;
+       GIIc            GIIc [1 0 -2 0 0 0 0] 200;
+     }
+     );
+
+  interfaceLaws
+    (
+     interface_bottomSubstrate_adhesive
+     {
+       type            dugdale;
+       sigmaMax        sigmaMax [1 -1 -2 0 0 0 0] 10e6;
+       tauMax          tauMax [1 -1 -2 0 0 0 0] 10e6;
+       GIc             GIc [1 0 -2 0 0 0 0] 20;
+       GIIc            GIIc [1 0 -2 0 0 0 0] 20;
+     }
+
+     interface_bottomSubstrate_topSubstrate
+     {
+       type            dugdale;
+       sigmaMax        sigmaMax [1 -1 -2 0 0 0 0] 10e6;
+       tauMax          tauMax [1 -1 -2 0 0 0 0] 10e6;
+       GIc             GIc [1 0 -2 0 0 0 0] 20;
+       GIIc            GIIc [1 0 -2 0 0 0 0] 20;
+     }
+
+     interface_adhesive_topSubstrate
+     {
+       type            dugdale;
+       sigmaMax        sigmaMax [1 -1 -2 0 0 0 0] 10e6;
+       tauMax          tauMax [1 -1 -2 0 0 0 0] 10e6;
+       GIc             GIc [1 0 -2 0 0 0 0] 20;
+       GIIc            GIIc [1 0 -2 0 0 0 0] 20;
+     }
+     );
+}
+// ************************************************************************* //

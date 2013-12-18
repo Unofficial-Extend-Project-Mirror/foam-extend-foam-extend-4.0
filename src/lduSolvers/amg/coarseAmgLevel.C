@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2004-6 H. Jasak All rights reserved
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     coarseAmgLevel
@@ -35,8 +34,7 @@ Author
 
 #include "coarseAmgLevel.H"
 #include "SubField.H"
-#include "ICCG.H"
-#include "BICCG.H"
+#include "gmresSolver.H"
 #include "vector2D.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -141,7 +139,7 @@ void Foam::coarseAmgLevel::restrictResidual
         // Calculate residual
         scalarField::subField resBuf(xBuffer, x.size());
 
-        scalarField& res = reinterpret_cast<scalarField&>(resBuf);
+        scalarField& res = const_cast<scalarField&>(resBuf.operator const scalarField&());
 
         residual(x, b, cmpt, res);
 
@@ -188,31 +186,71 @@ void Foam::coarseAmgLevel::solve
 {
     lduSolverPerformance coarseSolverPerf;
 
+    label maxIter = Foam::min(2*policyPtr_->minCoarseEqns(), 1000);
+
+    dictionary topLevelDict;
+    topLevelDict.add("nDirections", "5");
+    topLevelDict.add("minIter", 1);
+    topLevelDict.add("maxIter", maxIter);
+    topLevelDict.add("tolerance", tolerance);
+    topLevelDict.add("relTol", relTol);
+
+    // Avoid issues with round-off on strict tolerance setup
+    // HJ, 27/Jun/2013
+    x = b/matrixPtr_->matrix().diag();
+
+    // Do not solve if the number of equations is smaller than 5
+    if (policyPtr_->minCoarseEqns() < 5)
+    {
+        return;
+    }
+
+
     if (matrixPtr_->matrix().symmetric())
     {
-        coarseSolverPerf = ICCG
+        topLevelDict.add("preconditioner", "Cholesky");
+
+        coarseSolverPerf = gmresSolver
         (
             "topLevelCorr",
             matrixPtr_->matrix(),
             matrixPtr_->coupleBouCoeffs(),
             matrixPtr_->coupleIntCoeffs(),
             matrixPtr_->interfaceFields(),
-            tolerance,
-            relTol
+            topLevelDict
         ).solve(x, b, cmpt);
     }
     else
     {
-        coarseSolverPerf = BICCG
+        topLevelDict.add("preconditioner", "ILU0");
+
+        coarseSolverPerf = gmresSolver
         (
             "topLevelCorr",
             matrixPtr_->matrix(),
             matrixPtr_->coupleBouCoeffs(),
             matrixPtr_->coupleIntCoeffs(),
             matrixPtr_->interfaceFields(),
-            tolerance,
-            relTol
+            topLevelDict
         ).solve(x, b, cmpt);
+    }
+
+    // Escape cases of solver divergence
+    if
+    (
+        coarseSolverPerf.nIterations() == maxIter
+     && (
+            coarseSolverPerf.finalResidual()
+         >= coarseSolverPerf.initialResidual()
+        )
+    )
+    {
+        // Top-level solution failed.  Attempt rescue
+        // HJ, 27/Jul/2013
+        x = b/matrixPtr_->matrix().diag();
+
+        // Print top level correction failure as info for user
+        coarseSolverPerf.print();
     }
 
     if (lduMatrix::debug >= 2)
@@ -235,7 +273,7 @@ void Foam::coarseAmgLevel::scaleX
 
     matrixPtr_->matrix().Amul
     (
-        reinterpret_cast<scalarField&>(Ax),
+        const_cast<scalarField&>(Ax.operator const scalarField&()),
         x,
         matrixPtr_->coupleBouCoeffs(),
         matrixPtr_->interfaceFields(),

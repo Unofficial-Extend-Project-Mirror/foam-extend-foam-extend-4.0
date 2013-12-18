@@ -9,7 +9,7 @@ int USERD_get_maxsize_info
     Info << "Entering: USERD_get_maxsize_info" << endl << flush;
 #endif
 
-    return Z_ERR; 
+    return Z_ERR;
 
     label maxNPoints = 0;
     label maxNParcels = 0;

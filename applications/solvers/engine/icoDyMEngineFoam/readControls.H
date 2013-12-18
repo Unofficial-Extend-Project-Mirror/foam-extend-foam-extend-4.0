@@ -1,12 +1,6 @@
 #   include "readTimeControls.H"
 #   include "readPISOControls.H"
 
-    bool correctPhi = false;
-    if (piso.found("correctPhi"))
-    {
-        correctPhi = Switch(piso.lookup("correctPhi"));
-    }
-
     bool checkMeshCourantNo = false;
     if (piso.found("checkMeshCourantNo"))
     {

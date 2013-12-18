@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     dynamicTopoFvMesh
@@ -37,6 +36,7 @@ SourceFiles
     dynamicTopoFvMesh.C
     dynamicTopoFvMeshI.H
     dynamicTopoFvMeshCheck.C
+    dynamicTopoFvMeshCoupled.C
     dynamicTopoFvMeshReOrder.C
     dynamicTopoFvMeshMapping.C
     edgeBisect.C
@@ -50,6 +50,7 @@ SourceFiles
 
 #include "Switch.H"
 #include "tetMetric.H"
+#include "topoMapper.H"
 #include "DynamicField.H"
 #include "threadHandler.H"
 #include "dynamicFvMesh.H"
@@ -64,8 +65,9 @@ class eMesh;
 class Stack;
 class changeMap;
 class objectMap;
-class topoMapper;
+class coupledInfo;
 class motionSolver;
+class convexSetAlgorithm;
 class lengthScaleEstimator;
 
 /*---------------------------------------------------------------------------*\
@@ -78,8 +80,17 @@ class dynamicTopoFvMesh
 {
     // Private data
 
+        //- Reference to base mesh
+        const dynamicTopoFvMesh& baseMesh_;
+
+        //- Number of boundary patches
+        label nPatches_;
+
         //- Topology change flag
         bool topoChangeFlag_;
+
+        //- Is this a subMesh?
+        bool isSubMesh_;
 
         //- Dynamic mesh dictionary
         IOdictionary dict_;
@@ -94,8 +105,14 @@ class dynamicTopoFvMesh
         //- Edge refinement switch
         Switch edgeRefinement_;
 
+        //- Load motion solver
+        Switch loadMotionSolver_;
+
         //- Switch for cell-bandwidth reduction
         Switch bandWidthReduction_;
+
+        //- Coupled modification switch
+        mutable Switch coupledModification_;
 
         //- Specify the re-meshing interval
         label interval_;
@@ -119,27 +136,21 @@ class dynamicTopoFvMesh
         //     support template typedefs,
         //     so this is a work-around
         template <class T>
-        class resizableList
+        class resizable
         {
         public:
-            typedef DynamicList<T, 0, 11, 10> Type;
+            typedef DynamicList<T, 0, 11, 10> ListType;
+            typedef DynamicField<T, 0, 11, 10> FieldType;
         };
 
-        template <class T>
-        class resizableField
-        {
-        public:
-            typedef DynamicField<T> Type;
-        };
-
-        resizableField<point>::Type oldPoints_, points_;
-        resizableList<face>::Type faces_;
-        resizableList<label>::Type owner_, neighbour_;
-        resizableList<cell>::Type cells_;
-        resizableList<edge>::Type edges_;
-        resizableList<labelList>::Type pointEdges_, edgePoints_;
-        resizableList<labelList>::Type edgeFaces_, faceEdges_;
-        resizableList<scalar>::Type lengthScale_;
+        resizable<point>::FieldType oldPoints_, points_;
+        resizable<face>::ListType faces_;
+        resizable<label>::ListType owner_, neighbour_;
+        resizable<cell>::ListType cells_;
+        resizable<edge>::ListType edges_;
+        resizable<labelList>::ListType pointEdges_;
+        resizable<labelList>::ListType edgeFaces_, faceEdges_;
+        resizable<scalar>::ListType lengthScale_;
 
         //- Size information
         labelList oldPatchSizes_, patchSizes_;
@@ -181,6 +192,7 @@ class dynamicTopoFvMesh
         Map<labelList> faceParents_;
         List<scalarField> faceWeights_;
         List<vectorField> faceCentres_;
+
         Map<labelList> cellParents_;
         List<scalarField> cellWeights_;
         List<vectorField> cellCentres_;
@@ -201,9 +213,8 @@ class dynamicTopoFvMesh
         labelHashSet deletedFaces_;
         labelHashSet deletedCells_;
 
-        //- List of flipped faces / modified old-points
+        //- List of flipped faces
         labelHashSet flipFaces_;
-        Map<labelList> modPoints_;
 
         //- Run-time statistics
         label maxModifications_;
@@ -237,10 +248,41 @@ class dynamicTopoFvMesh
         // in multi-threaded reOrdering
         FixedList<Mutex, 4> entityMutex_;
 
+        // Local coupled patch information
+        PtrList<coupledInfo> patchCoupling_;
+
+        // List of processors that this sub-domain talks to
+        labelList procIndices_;
+
+        // Sub-Mesh pointers
+        PtrList<coupledInfo> sendMeshes_;
+        PtrList<coupledInfo> recvMeshes_;
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
         dynamicTopoFvMesh(const dynamicTopoFvMesh&);
+
+        //- Construct from components
+        //- Used for subMeshes only.
+        dynamicTopoFvMesh
+        (
+            const dynamicTopoFvMesh& mesh,
+            const IOobject& io,
+            const Xfer<pointField>& points,
+            const Xfer<pointField>& oldPoints,
+            const Xfer<edgeList>& edges,
+            const Xfer<faceList>& faces,
+            const Xfer<labelListList>& faceEdges,
+            const Xfer<labelList>& owner,
+            const Xfer<labelList>& neighbour,
+            const labelList& faceStarts,
+            const labelList& faceSizes,
+            const labelList& edgeStarts,
+            const labelList& edgeSizes,
+            const wordList& patchNames,
+            const dictionary& patchDict
+        );
 
         //- Disallow default bitwise assignment
         void operator=(const dynamicTopoFvMesh&);
@@ -256,6 +298,7 @@ class dynamicTopoFvMesh
         (
             const scalar matchTol,
             const bool skipMapping,
+            const bool mappingOutput,
             const label faceStart,
             const label faceSize,
             const label cellStart,
@@ -265,19 +308,13 @@ class dynamicTopoFvMesh
         // Static equivalent for multiThreading
         static void computeMappingThread(void *argument);
 
-        // Compute parents for inverse-distance weighting
-        void computeParents
-        (
-            const label index,
-            const labelList& mapCandidates,
-            const labelListList& oldNeighbourList,
-            const vectorField& oldCentres,
-            const label dimension,
-            labelList& parents
-        ) const;
-
         // Routine to invoke threaded mapping
-        void threadedMapping(scalar matchTol, bool skipMapping);
+        void threadedMapping
+        (
+            scalar matchTol,
+            bool skipMapping,
+            bool mappingOutput
+        );
 
         // Initialize mesh edges and related connectivity lists
         void initEdges();
@@ -316,11 +353,21 @@ class dynamicTopoFvMesh
         // contains a triangular face.
         inline label getTriBoundaryEdge(const label fIndex) const;
 
+        // Given an input quad-face, determine checkEdges from mesh
+        static void getCheckEdges
+        (
+            const label fIndex,
+            const dynamicTopoFvMesh& mesh,
+            changeMap& map,
+            FixedList<edge,4>& checkEdge,
+            FixedList<label,4>& checkEdgeIndex
+        );
+
         // Return length-scale at an face-location in the mesh [2D]
-        inline scalar faceLengthScale(const label fIndex) const;
+        scalar faceLengthScale(const label fIndex) const;
 
         // Return length-scale at an edge-location in the mesh [3D]
-        inline scalar edgeLengthScale(const label eIndex) const;
+        scalar edgeLengthScale(const label eIndex) const;
 
         // Check for bisection
         inline bool checkBisection(const label index) const;
@@ -348,6 +395,13 @@ class dynamicTopoFvMesh
 
         // Initialize stacks
         inline void initStacks(const labelHashSet& entities);
+
+        // Initialize the coupled stack
+        void initCoupledStack
+        (
+            const labelHashSet& entities,
+            bool useEntities
+        );
 
         // Method to determine the boundary patch index for a given face
         inline label whichPatch(const label index) const;
@@ -385,13 +439,6 @@ class dynamicTopoFvMesh
             bool forceOp = false
         );
 
-        // Method for the swapping of an edge in 3D
-        void swapEdge
-        (
-            const label eIndex,
-            bool forceOp = false
-        );
-
         // Method for the bisection of an edge in 3D
         const changeMap
         bisectEdge
@@ -420,6 +467,9 @@ class dynamicTopoFvMesh
             bool forceOp = false
         );
 
+        // Slice the mesh at a particular location
+        void sliceMesh(const labelPair& pointPair);
+
         // Utility method to check for invalid face-bisection.
         bool checkBisection
         (
@@ -429,8 +479,9 @@ class dynamicTopoFvMesh
         ) const;
 
         // Utility method to check for invalid face-collapse.
-        bool checkCollapse
+        static bool checkCollapse
         (
+            const dynamicTopoFvMesh& mesh,
             const labelList& triFaces,
             const FixedList<label,2>& c0BdyIndex,
             const FixedList<label,2>& c1BdyIndex,
@@ -440,7 +491,7 @@ class dynamicTopoFvMesh
             scalar& collapseQuality,
             const bool checkNeighbour,
             bool forceOp = false
-        ) const;
+        );
 
         // Utility method to check for invalid edge-collapse.
         bool checkCollapse
@@ -449,7 +500,7 @@ class dynamicTopoFvMesh
             const point& oldPoint,
             const label pointIndex,
             const label cellIndex,
-            labelHashSet& cellsChecked,
+            DynamicList<label>& cellsChecked,
             scalar& collapseQuality,
             bool forceOp = false
         ) const;
@@ -491,7 +542,9 @@ class dynamicTopoFvMesh
         removeCells
         (
             const labelList& cList,
-            const label patch
+            const label patch,
+            const word& rcName,
+            bool checkOnly = false
         );
 
         // Remove the specified cell from the mesh
@@ -525,13 +578,19 @@ class dynamicTopoFvMesh
             const Map<bool>& cellColors
         );
 
+        // Merge a set of boundary faces into internal
+        const changeMap
+        mergeBoundaryFaces
+        (
+            const labelList& mergeFaces
+        );
+
         // Insert the specified edge to the mesh
         label insertEdge
         (
             const label patch,
             const edge& newEdge,
-            const labelList& edgeFaces,
-            const labelList& edgePoints = labelList::null()
+            const labelList& edgeFaces
         );
 
         // Remove the specified edge from the mesh
@@ -555,12 +614,13 @@ class dynamicTopoFvMesh
             const label pIndex
         );
 
-        // Utility method to build edgePoints for an edge [3D]
-        void buildEdgePoints
+        // Utility method to build vertexHull for an edge [3D]
+        void buildVertexHull
         (
             const label eIndex,
+            labelList& vertexHull,
             const label checkIndex = 0
-        );
+        ) const;
 
         // Utility to check whether points of an edge lie on a boundary
         const FixedList<bool,2> checkEdgeBoundary(const label eIndex) const;
@@ -569,7 +629,20 @@ class dynamicTopoFvMesh
         inline void setFlip(const label fIndex);
 
         // Utility method to compute the minimum quality of a vertex hull
-        scalar computeMinQuality(const label eIndex) const;
+        scalar computeMinQuality
+        (
+            const label eIndex,
+            labelList& hullVertices
+        ) const;
+
+        // Compute minQuality given addressing
+        scalar computeMinQuality
+        (
+            const edge& edgeToCheck,
+            const labelList& hullVertices,
+            const UList<point>& points,
+            bool closedRing = false
+        ) const;
 
         // Utility method to compute the quality of a vertex hull
         // around an edge after bisection.
@@ -580,7 +653,12 @@ class dynamicTopoFvMesh
         scalar computeTrisectionQuality(const label fIndex) const;
 
         // Check whether the given edge is on a bounding curve
-        bool checkBoundingCurve(const label eIndex) const;
+        bool checkBoundingCurve
+        (
+            const label eIndex,
+            const bool overRidePurityCheck = false,
+            label* nProcCurves = NULL
+        ) const;
 
         // Allocate dynamic programming tables
         void initTables
@@ -606,12 +684,26 @@ class dynamicTopoFvMesh
         bool fillTables
         (
             const label eIndex,
-            const scalar minQuality,
+            scalar& minQuality,
             labelList& m,
+            labelList& hullVertices,
             PtrList<scalarListList>& Q,
             PtrList<labelListList>& K,
             PtrList<labelListList>& triangulations,
             const label checkIndex = 0
+        ) const;
+
+        // Fill tables given addressing
+        void fillTables
+        (
+            const edge& edgeToCheck,
+            const scalar minQuality,
+            const label m,
+            const labelList& hullVertices,
+            const UList<point>& points,
+            scalarListList& Q,
+            labelListList& K,
+            labelListList& triangulations
         ) const;
 
         // Print out tables for debugging
@@ -629,7 +721,9 @@ class dynamicTopoFvMesh
         (
             const label eIndex,
             const scalar minQuality,
-            const PtrList<labelListList>& K,
+            const labelList& hullVertices,
+            PtrList<scalarListList>& Q,
+            PtrList<labelListList>& K,
             PtrList<labelListList>& triangulations,
             const label checkIndex = 0
         );
@@ -649,7 +743,8 @@ class dynamicTopoFvMesh
         (
             const label eIndex,
             const labelList& hullVertices,
-            const labelListList& triangulations
+            const labelListList& triangulations,
+            bool output = false
         ) const;
 
         // Check old-volumes for the configuration.
@@ -781,6 +876,9 @@ class dynamicTopoFvMesh
         // Reset the mesh and generate mapping information
         bool resetMesh();
 
+        // Write out connectivity for an edge
+        void writeEdgeConnectivity(const label eIndex) const;
+
         // Output an entity as a VTK file
         void writeVTK
         (
@@ -798,7 +896,9 @@ class dynamicTopoFvMesh
             const labelList& cList,
             const label primitiveType = 3,
             const bool useOldConnectivity = false,
-            const bool useOldPoints = false
+            const bool useOldPoints = false,
+            const UList<scalar>& scalField = UList<scalar>(),
+            const UList<label>& lablField = UList<label>()
         ) const;
 
         // Return the status report interval
@@ -806,6 +906,18 @@ class dynamicTopoFvMesh
 
         // Check the state of local connectivity lists
         void checkConnectivity(const label maxErrors = 0) const;
+
+        // Handle mesh slicing events.
+        void handleMeshSlicing();
+
+        // Handle layer addition / removal events
+        void handleLayerAdditionRemoval();
+
+        // Add cell layer above specified patch
+        const changeMap addCellLayer(const label patchID);
+
+        // Remove cell layer above specified patch
+        const changeMap removeCellLayer(const label patchID);
 
         // Test an edge / face for proximity with other non-neighbouring faces.
         // Return the scalar distance to the nearest face.
@@ -818,8 +930,164 @@ class dynamicTopoFvMesh
         // Calculate the edge length-scale for the mesh
         void calculateLengthScale(bool dump = false);
 
+        // Fill buffers with length-scale info
+        // and exchange across processors.
+        void exchangeLengthBuffers();
+
+        // Implementing the fillTables operation for coupled edges
+        bool coupledFillTables
+        (
+            const label eIndex,
+            scalar& minQuality,
+            labelList& m,
+            PtrList<scalarListList>& Q,
+            PtrList<labelListList>& K,
+            PtrList<labelListList>& triangulations
+        ) const;
+
+        // Additional mapping contributions for coupled entities
+        void computeCoupledWeights
+        (
+            const label index,
+            const label dimension,
+            labelList& parents,
+            scalarField& weights,
+            vectorField& centres,
+            bool output = false
+        );
+
+        // Fetch length-scale info for processor entities
+        scalar processorLengthScale(const label index) const;
+
+        // Method to determine whether the master entity is locally coupled
+        bool locallyCoupledEntity
+        (
+            const label index,
+            bool checkSlaves = false,
+            bool checkProcs = true,
+            bool checkFace = false
+        ) const;
+
+        // Method to determine the locally coupled patch index
+        label locallyCoupledEdgePatch(const label eIndex) const;
+
+        // Method to determine if the entity is on a processor boundary
+        bool processorCoupledEntity
+        (
+            const label index,
+            bool checkFace = false,
+            bool checkEdge = false,
+            bool checkPure = false,
+            FixedList<label, 2>* patchLabels = NULL,
+            FixedList<vector, 2>* patchNormals = NULL
+        ) const;
+
         // Read optional dictionary parameters
         void readOptionalParameters(bool reRead = false);
+
+        // Execute load balancing operations on the mesh
+        void executeLoadBalancing(const dictionary& balanceDict);
+
+        // Identify coupled patches.
+        bool identifyCoupledPatches();
+
+        // Read coupled patch information from dictionary.
+        void readCoupledPatches();
+
+        // Initialize coupled patch connectivity for topology modifications.
+        static void initCoupledConnectivity(void *argument);
+
+        // Move coupled subMesh points
+        void moveCoupledSubMeshes();
+
+        // Build a list of entities that need to be avoided
+        // by regular topo-changes.
+        void buildEntitiesToAvoid
+        (
+            labelHashSet& entities,
+            bool checkSubMesh
+        );
+
+        // Check whether the specified edge is a coupled master edge.
+        bool isCoupledMaster(const label eIndex) const;
+
+        // Set coupled modification
+        void setCoupledModification() const;
+
+        // Unset coupled modification
+        void unsetCoupledModification() const;
+
+        // Insert the cells around the coupled master entity to the mesh
+        const changeMap insertCells(const label mIndex);
+
+        // Handle topology changes for coupled patches
+        void handleCoupledPatches(labelHashSet& entities);
+
+        // Synchronize topology operations across processors
+        void syncCoupledPatches(labelHashSet& entities);
+
+        // Check the state of coupled boundaries
+        bool checkCoupledBoundaries(bool report = true) const;
+
+        // Build patch sub-meshes for processor patches
+        void buildProcessorPatchMeshes();
+
+        // Build patch sub-mesh for a specified processor
+        void buildProcessorPatchMesh
+        (
+            coupledInfo& subMesh,
+            Map<labelList>& commonCells
+        );
+
+        // Build coupled maps for locally coupled patches
+        void buildLocalCoupledMaps();
+
+        // Build coupled maps for coupled processor patches
+        void buildProcessorCoupledMaps();
+
+        // Introduce a new processor patch to the mesh
+        label createProcessorPatch(const label proc);
+
+        // If a patch is of processor type,
+        // get the neighbouring processor ID
+        label getNeighbourProcessor(const label patch) const;
+
+        // If the number of patches have changed during run-time,
+        // reset boundaries with new processor patches
+        void resetBoundaries();
+
+        // Initialize subMesh field transfers for mapping
+        void initFieldTransfers
+        (
+            wordList& fieldTypes,
+            List<wordList>& fieldNames,
+            List<List<char> >& sendBuffer,
+            List<List<char> >& recvBuffer
+        );
+
+        // Synchronize field transfers for mapping
+        void syncFieldTransfers
+        (
+            wordList& fieldTypes,
+            List<wordList>& fieldNames,
+            List<List<char> >& recvBuffer
+        );
+
+        // Initialize coupled boundary ordering
+        void initCoupledBoundaryOrdering
+        (
+            List<pointField>& centres,
+            List<pointField>& anchors
+        ) const;
+
+        // Synchronize coupled boundary ordering
+        bool syncCoupledBoundaryOrdering
+        (
+            List<pointField>& centres,
+            List<pointField>& anchors,
+            labelListList& faceMaps,
+            labelListList& rotations
+        ) const;
 
         // Dump cell-quality statistics
         bool meshQuality(bool outputOption);
@@ -840,8 +1108,11 @@ public:
 
     // Member Functions
 
+        //- Update mesh corresponding to the given map
+        virtual void updateMesh(const mapPolyMesh& mpm);
+
         // Map all fields in time using a customized mapper
-        virtual void mapFields(const mapPolyMesh& meshMap) const;
+        virtual void mapFields(const mapPolyMesh& mpm) const;
 
         // Update the mesh for motion / topology changes
         // Return true if topology changes have occurred

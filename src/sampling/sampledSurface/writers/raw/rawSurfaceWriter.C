@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -179,6 +178,53 @@ void Foam::rawSurfaceWriter<Type>::writeData
 }
 
 
+// Write diagTensorField in raw format
+template<class Type>
+void Foam::rawSurfaceWriter<Type>::writeData
+(
+    const fileName& fieldName,
+    const pointField& points,
+    const faceList& faces,
+    const diagTensorField& values,
+    Ostream& os
+)
+{
+    // header
+    os  << "#  xx  yy  yz ";
+    for(int i=0; i<3; i++)
+    {
+        os << fieldName << "_" << i << "  ";
+    }
+    os << endl;
+
+    // Write data
+    if (values.size() == points.size())
+    {
+        forAll(values, elemI)
+        {
+            writeGeometry(points, elemI, os);
+
+            const diagTensor& v = values[elemI];
+
+            os  << v[0] << ' ' << v[1] << ' ' << v[2] << ' '
+                << nl;
+        }
+    }
+    else
+    {
+        forAll(values, elemI)
+        {
+            writeGeometry(points, faces, elemI, os);
+
+            const diagTensor& v = values[elemI];
+
+            os  << v[0] << ' ' << v[1] << ' ' << v[2] << ' '
+                << nl;
+        }
+    }
+}
+
+
 // Write symmTensorField in raw format
 template<class Type>
 void Foam::rawSurfaceWriter<Type>::writeData
@@ -222,6 +268,57 @@ void Foam::rawSurfaceWriter<Type>::writeData
 
             os  << v[0] << ' ' << v[1] << ' ' << v[2] << ' '
                 << v[3] << ' ' << v[4] << ' ' << v[5] << ' '
+                << nl;
+        }
+    }
+}
+
+
+// Write symmTensor4thOrderField in raw format
+template<class Type>
+void Foam::rawSurfaceWriter<Type>::writeData
+(
+    const fileName& fieldName,
+    const pointField& points,
+    const faceList& faces,
+    const symmTensor4thOrderField& values,
+    Ostream& os
+)
+{
+    // header
+    os  << "#  xxxx  xxyy  xxzz  yyyy  yyzz  xyxy  yzyz  zxzx ";
+    for(int i=0; i<8; i++)
+    {
+        os << fieldName << "_" << i << "  ";
+    }
+    os << endl;
+
+    // Write data
+    if (values.size() == points.size())
+    {
+        forAll(values, elemI)
+        {
+            writeGeometry(points, elemI, os);
+
+            const symmTensor4thOrder& v = values[elemI];
+
+            os  << v[0] << ' ' << v[1] << ' ' << v[2] << ' '
+                << v[3] << ' ' << v[4] << ' ' << v[5] << ' '
+                << v[6] << ' ' << v[7] << ' ' << v[8] << ' '
+                << nl;
+        }
+    }
+    else
+    {
+        forAll(values, elemI)
+        {
+            writeGeometry(points, faces, elemI, os);
+
+            const symmTensor4thOrder& v = values[elemI];
+
+            os  << v[0] << ' ' << v[1] << ' ' << v[2] << ' '
+                << v[3] << ' ' << v[4] << ' ' << v[5] << ' '
+                << v[6] << ' ' << v[7] << ' ' << v[8] << ' '
                 << nl;
         }
     }

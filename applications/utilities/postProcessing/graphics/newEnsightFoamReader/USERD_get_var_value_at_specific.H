@@ -11,7 +11,7 @@ int USERD_get_var_value_at_specific
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_var_value_at_specific" << endl 
+    Info << "Entering: USERD_get_var_value_at_specific" << endl
         << flush;
 #endif
     // Not sure if it is 0 or 1 based
@@ -21,9 +21,9 @@ int USERD_get_var_value_at_specific
 
     fvMesh& mesh = *meshPtr;
 
-    if 
+    if
     (
-        nVar < Num_variables - nSprayVariables 
+        nVar < Num_variables - nSprayVariables
       - nSecondMeshVariables - nFaMeshVariables
     )
     {
@@ -67,7 +67,7 @@ int USERD_get_var_value_at_specific
 
 
 #ifdef ENSIGHTDEBUG
-    Info << "Leaving: USERD_get_var_value_at_specific" << endl 
+    Info << "Leaving: USERD_get_var_value_at_specific" << endl
         << flush;
 #endif
     return Z_OK;

@@ -1,0 +1,46 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      setFieldsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+defaultFieldValues
+(
+    volScalarFieldValue materials 0
+//    volVectorFieldValue U (0 0 0)
+);
+
+regions
+(
+    boxToCell
+    {
+        box	(0 0 0) (1 1 1);
+
+        fieldValues
+        (
+            volScalarFieldValue materials 2
+        );
+    }
+    boxToCell
+    {
+        box	(0 -0.002 -1) (1 0.002 1);
+
+        fieldValues
+        (
+            volScalarFieldValue materials 1
+        );
+    }
+);
+
+// ************************************************************************* //

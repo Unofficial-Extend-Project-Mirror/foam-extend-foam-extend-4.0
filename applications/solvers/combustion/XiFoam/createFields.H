@@ -30,6 +30,9 @@
 
     const volScalarField& T = thermo.T();
 
+    // dummy statement to quench compiler warning
+    // Note: T is used in engineFoam
+    T.size();
 
     Info<< "\nReading field U\n" << endl;
     volVectorField U

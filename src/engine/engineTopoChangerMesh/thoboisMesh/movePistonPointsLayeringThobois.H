@@ -3,7 +3,7 @@
 
     // Mesh in three parts:
     // - pistonPoints - move with deltaZ
-    
+
     const pointZoneMesh& pZones = pointZones();
     label pistonPtsIndex = pZones.findZoneID("pistonPoints");
     const labelList& pistonPoints = pZones[pistonPtsIndex];
@@ -19,14 +19,14 @@
         label pointI = pistonPoints[i];
         pistonPoint[pointI] = true;
         point& p = newPoints[pointI];
-                
+
         if (p.z() < pistonPosition() - 1.0e-6)
         {
             scaleDisp[pointI] = false;
             nScaled--;
         }
     }
-    
+
 
 
     {
@@ -60,7 +60,7 @@
 
 //    movePoints(newPoints);
 //    vpi_.movePoints();
-            
+
     pistonPosition() += deltaZ;
     scalar pistonSpeed = deltaZ/engTime().deltaT().value();
 

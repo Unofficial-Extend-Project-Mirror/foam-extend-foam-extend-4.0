@@ -2,39 +2,35 @@
         forAll(valves(), valveI)
         {
             scalar valveDeltaZ = valves_[valveI].curVelocity()*engTime().deltaT().value() ;
-            bool isMoving(false);
-        
+
             if(mag(valves_[valveI].curVelocity()) > 0)
             {
                 Info << "Valve n. " << valveI << " is moving" << endl;
-                isMoving = true;
             }
-            
+
             if(valves_[valveI].poppetPatchID().active() && valves_[valveI].isOpen())
             {
-                
                 if(valves_[valveI].curLift() > valves_[valveI].deformationLift())
                 {
                     const scalarField& movingPointsTop = movingPointsMaskTop(valveI);
-                        
-                    {
 
+                    {
                         List<bool> valveTopPoint(newPoints.size(), false);
 
                         labelList valveTopPoints;
-                
-                        {   
+
+                        {
                             label valveTopCellsIndex = cellZones().findZoneID("movingCellsTopV"+ Foam::name(valveI+1));
-                
+
                             if (valveTopCellsIndex < 0)
-                            {      
+                            {
                                 FatalErrorIn("bool verticalValves::update()")
                                     << "movingCellsTopV"+ Foam::name(valveI+1)
                                     << abort(FatalError);
                             }
 
                             const labelList& movingCellsTopV = cellZones()[valveTopCellsIndex];
-    
+
                             const labelListList& cp = cellPoints();
 
                             boolList count(newPoints.size(), false);
@@ -71,7 +67,6 @@
                                     nCounted++;
                                 }
                             }
-                            
                         }
 
 
@@ -83,8 +78,8 @@
                             label pointI = valveTopPoints[i];
                             valveTopPoint[pointI] = true;
                         }
-        
-                
+
+
                         forAll(valveTopPoints, i)
                         {
                             point& p = newPoints[valveTopPoints[i]];
@@ -92,9 +87,8 @@
                                 (valves_[valveI].cs().axis().z()/mag(valves_[valveI].cs().axis()))*
                                 movingPointsTop[valveTopPoints[i]];
                         }
-
                     }
-            
+
                     deleteDemandDrivenData(movingPointsMaskTopPtr_);
                 }
                 else

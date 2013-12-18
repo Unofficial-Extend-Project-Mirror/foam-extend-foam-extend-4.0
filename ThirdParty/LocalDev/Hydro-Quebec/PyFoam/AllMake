@@ -1,0 +1,85 @@
+#!/bin/bash
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | foam-extend: Open Source CFD
+#  \\    /   O peration     |
+#   \\  /    A nd           | For copyright notice see file Copyright
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of foam-extend.
+#
+#     foam-extend is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation, either version 3 of the License, or (at your
+#     option) any later version.
+#
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Script
+#     AllMake
+#
+# Description
+#     Installation script for local development
+#
+# Author:
+#     Martin Beaudoin, Hydro-Quebec, (2012)
+#
+#------------------------------------------------------------------------------
+
+command -v python -V >/dev/null
+if [ ! $? -eq 0 ];
+then
+    echo "Error: You need to install python in order to run these PyFoam scripts" 
+    exit -1
+fi
+
+if [ -z "$PYFOAM_DIR" ] 
+then
+    echo "Error: Missing environment variable \$PYFOAM_DIR."
+    echo "       Please execute the script ThirdParty/AllMake.stage5 to install PyFoam."  
+    echo "       Then, make sure to freshen your OpenFOAM environment by sourcing your main"
+    echo "       OpenFOAM configuration file."
+    exit -1
+fi
+
+pythonVersion=$(python -V 2>&1 | awk -F ' ' {'print $2'} |  awk -F \. {'print $1 "." $2'})
+
+set -x 
+
+# pyFoamChangeMixingPlaneBoundary.py
+cp pyFoamChangeMixingPlaneBoundary.py $PYFOAM_DIR/bin
+cp ChangeMixingPlaneBoundary.py $PYFOAM_DIR/lib/python$pythonVersion/site-packages/PyFoam/Applications
+
+# pyFoamChangeGGIBoundary.py
+# Same as pyFoamModifyGGIBoundary.py. We just harmonize the name with rest of PyFoam
+cp pyFoamChangeGGIBoundary.py $PYFOAM_DIR/bin
+cp ChangeGGIBoundary.py $PYFOAM_DIR/lib/python$pythonVersion/site-packages/PyFoam/Applications
+
+# pyFoamInitializeMixingPlane.py
+cp pyFoamInitMixingPlaneInterface.py $PYFOAM_DIR/bin
+cp InitMixingPlaneInterface.py $PYFOAM_DIR/lib/python$pythonVersion/site-packages/PyFoam/Applications
+
+# pyFoamInitializeGGI.py
+cp pyFoamInitGgiInterface.py $PYFOAM_DIR/bin
+cp InitGgiInterface.py $PYFOAM_DIR/lib/python$pythonVersion/site-packages/PyFoam/Applications
+
+# pyFoamConvertMixingPlaneBoundaryToNewSyntax.py
+cp pyFoamConvertMixingPlaneBoundaryToNewSyntax.py $PYFOAM_DIR/bin
+cp ConvertMixingPlaneBoundaryToNewSyntax.py $PYFOAM_DIR/lib/python$pythonVersion/site-packages/PyFoam/Applications
+
+set +x
+echo ========================================
+echo Done
+echo ========================================
+echo
+
+# ----------------------------------------------------------------- end-of-file
+
+

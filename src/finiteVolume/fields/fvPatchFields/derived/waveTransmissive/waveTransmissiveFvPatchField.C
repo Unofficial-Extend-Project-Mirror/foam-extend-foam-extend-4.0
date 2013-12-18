@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -114,7 +113,7 @@ template<class Type>
 tmp<scalarField> waveTransmissiveFvPatchField<Type>::advectionSpeed() const
 {
     // Lookup the velocity and compressibility of the patch
-    const fvPatchField<scalar>& psip = this->patch().lookupPatchField
+    const fvPatchField<scalar>& psip = this->lookupPatchField
     (
         psiName_,
         reinterpret_cast<const volScalarField*>(0),
@@ -122,10 +121,10 @@ tmp<scalarField> waveTransmissiveFvPatchField<Type>::advectionSpeed() const
     );
 
     const surfaceScalarField& phi =
-        this->db().objectRegistry::lookupObject<surfaceScalarField>
+        this->db().objectRegistry::template lookupObject<surfaceScalarField>
         (this->phiName_);
 
-    fvsPatchField<scalar> phip = this->patch().lookupPatchField
+    fvsPatchField<scalar> phip = this->lookupPatchField
     (
         this->phiName_,
         reinterpret_cast<const surfaceScalarField*>(0),
@@ -134,7 +133,7 @@ tmp<scalarField> waveTransmissiveFvPatchField<Type>::advectionSpeed() const
 
     if (phi.dimensions() == dimDensity*dimVelocity*dimArea)
     {
-        const fvPatchScalarField& rhop = this->patch().lookupPatchField
+        const fvPatchScalarField& rhop = this->lookupPatchField
         (
             this->rhoName_,
             reinterpret_cast<const volScalarField*>(0),
@@ -155,7 +154,7 @@ template<class Type>
 tmp<scalarField> waveTransmissiveFvPatchField<Type>::supercritical() const
 {
     // Lookup the velocity and compressibility of the patch
-    const fvPatchField<scalar>& psip = this->patch().lookupPatchField
+    const fvPatchField<scalar>& psip = this->lookupPatchField
     (
         psiName_,
         reinterpret_cast<const volScalarField*>(NULL),
@@ -163,7 +162,7 @@ tmp<scalarField> waveTransmissiveFvPatchField<Type>::supercritical() const
     );
 
     const fvPatchVectorField& U =
-        this->patch().lookupPatchField
+        this->lookupPatchField
         (
             UName_,
             reinterpret_cast<const volVectorField*>(NULL),
@@ -185,34 +184,11 @@ template<class Type>
 void waveTransmissiveFvPatchField<Type>::write(Ostream& os) const
 {
     advectiveFvPatchField<Type>::write(os);
-    if (this->phiName_ != "phi")
-    {
-        os.writeKeyword("phi") << this->phiName_ << token::END_STATEMENT << nl;
-    }
-    if (this->rhoName_ != "rho")
-    {
-        os.writeKeyword("rho") << this->rhoName_ << token::END_STATEMENT << nl;
-    }
-    if (this->UName_ != "U")
-    {
-        os.writeKeyword("U") << this->UName_ << token::END_STATEMENT << nl;
-    }
-    if (psiName_ != "psi")
-    {
-        os.writeKeyword("psi") << psiName_ << token::END_STATEMENT << nl;
-    }
+
+    this->writeEntryIfDifferent(os, "U", word("U"), UName_);
+    this->writeEntryIfDifferent(os, "psi", word("psi"), psiName_);
 
     os.writeKeyword("gamma") << gamma_ << token::END_STATEMENT << nl;
-
-    if (this->lInf_ > SMALL)
-    {
-        os.writeKeyword("fieldInf") << this->fieldInf_
-            << token::END_STATEMENT << nl;
-        os.writeKeyword("lInf") << this->lInf_
-            << token::END_STATEMENT << nl;
-    }
-
-    this->writeEntry("value", os);
 }
 
 

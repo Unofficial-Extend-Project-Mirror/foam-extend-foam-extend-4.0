@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -50,22 +49,6 @@ mixedFvPatchField<Type>::mixedFvPatchField
 template<class Type>
 mixedFvPatchField<Type>::mixedFvPatchField
 (
-    const mixedFvPatchField<Type>& ptf,
-    const fvPatch& p,
-    const DimensionedField<Type, volMesh>& iF,
-    const fvPatchFieldMapper& mapper
-)
-:
-    fvPatchField<Type>(ptf, p, iF, mapper),
-    refValue_(ptf.refValue_, mapper),
-    refGrad_(ptf.refGrad_, mapper),
-    valueFraction_(ptf.valueFraction_, mapper)
-{}
-
-
-template<class Type>
-mixedFvPatchField<Type>::mixedFvPatchField
-(
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
     const dictionary& dict
@@ -78,6 +61,22 @@ mixedFvPatchField<Type>::mixedFvPatchField
 {
     evaluate();
 }
+
+
+template<class Type>
+mixedFvPatchField<Type>::mixedFvPatchField
+(
+    const mixedFvPatchField<Type>& ptf,
+    const fvPatch& p,
+    const DimensionedField<Type, volMesh>& iF,
+    const fvPatchFieldMapper& mapper
+)
+:
+    fvPatchField<Type>(ptf, p, iF, mapper),
+    refValue_(ptf.refValue_, mapper),
+    refGrad_(ptf.refGrad_, mapper),
+    valueFraction_(ptf.valueFraction_, mapper)
+{}
 
 
 template<class Type>
@@ -180,7 +179,7 @@ tmp<Field<Type> > mixedFvPatchField<Type>::valueInternalCoeffs
     const tmp<scalarField>&
 ) const
 {
-    return Type(pTraits<Type>::one)*(1.0 - valueFraction_);
+    return pTraits<Type>::one*(1.0 - valueFraction_);
 
 }
 
@@ -200,7 +199,7 @@ tmp<Field<Type> > mixedFvPatchField<Type>::valueBoundaryCoeffs
 template<class Type>
 tmp<Field<Type> > mixedFvPatchField<Type>::gradientInternalCoeffs() const
 {
-    return -Type(pTraits<Type>::one)*valueFraction_*this->patch().deltaCoeffs();
+    return -pTraits<Type>::one*valueFraction_*this->patch().deltaCoeffs();
 }
 
 

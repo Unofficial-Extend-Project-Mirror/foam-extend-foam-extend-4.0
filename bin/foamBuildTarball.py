@@ -3,7 +3,7 @@
 import sys,re
 from os import path
 from subprocess import Popen,PIPE,call
-import tarfile 
+import tarfile
 
 if len(sys.argv)!=2:
     print "Error: SVN-Url is needed"
@@ -27,7 +27,7 @@ for l in child_stdout.readlines():
 if revision<0:
     print "Invalid URL or stuff"
     sys.exit(-1)
-    
+
 fullname="%s.r%d" % (name,revision)
 l
 print "Generating",fullname

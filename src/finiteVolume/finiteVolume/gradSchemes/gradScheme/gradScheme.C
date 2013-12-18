@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
     Abstract base class for finite volume calculus gradient schemes.
@@ -29,6 +28,7 @@ Description
 
 #include "fv.H"
 #include "HashTable.H"
+#include "primitiveFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -94,6 +94,39 @@ tmp<gradScheme<Type> > gradScheme<Type>::New
 template<class Type>
 gradScheme<Type>::~gradScheme()
 {}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+void gradScheme<Type>::correctBoundaryConditions
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vsf,
+    GeometricField
+    <
+        typename outerProduct<vector, Type>::type, fvPatchField, volMesh
+    >& gGrad
+)
+{
+    forAll (vsf.boundaryField(), patchi)
+    {
+        if (!vsf.boundaryField()[patchi].coupled())
+        {
+            vectorField n = vsf.mesh().boundary()[patchi].nf();
+
+            gGrad.boundaryField()[patchi] += n*
+            (
+                vsf.boundaryField()[patchi].snGrad()
+              - (n & gGrad.boundaryField()[patchi])
+            );
+        }
+    }
+
+    // Note: coupled boundaries provide patchNeighbourField, which is only
+    // updated on correct boundary conditions.  Therefore, evaluateCoupled()
+    // should be called here. HJ, Apr/2013
+    gGrad.boundaryField().evaluateCoupled();
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

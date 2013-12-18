@@ -83,6 +83,6 @@
         momentumPredictor = false;
 #       include "UEqn.H"
         momentumPredictor = momentumPredictorSave;
-        
+
         rUA = 1.0/UEqn.A();
     }

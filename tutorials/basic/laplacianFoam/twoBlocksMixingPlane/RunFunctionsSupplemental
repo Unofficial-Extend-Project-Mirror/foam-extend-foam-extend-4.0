@@ -1,0 +1,65 @@
+#---------------------------------*- sh -*-------------------------------------
+# =========                 |
+# \\      /  F ield         | foam-extend: Open Source CFD
+#  \\    /   O peration     |
+#   \\  /    A nd           | For copyright notice see file Copyright
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of foam-extend.
+#
+#     foam-extend is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation, either version 3 of the License, or (at your
+#     option) any later version.
+#
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Script
+#     RunFunctionsSupplemental
+#
+# Description
+#    Additionnal run functions, based on the original RunFunctions
+#
+# Author:
+#    Martin Beaudoin, Hydro-Quebec. All rights reserved
+#
+#------------------------------------------------------------------------------
+
+# Exception handler: dump the tail of the log file on error
+verbose_report_on_runApplication_error()
+{
+   if [ "$reportOnErrorOnlyOnce" ] ; then
+       echo "Error running $APP_RUN..."
+       if [ -f log.$APP_RUN ] ; then
+           tail log.$APP_RUN
+       fi
+   fi
+
+   # Do not report again when exiting
+   unset reportOnErrorOnlyOnce
+}
+
+# Variation of runApplication with exception handling
+runApplicationAndReportOnError ()
+{
+    trap 'verbose_report_on_runApplication_error' ERR
+
+    APP_RUN=$1; shift
+
+    reportOnErrorOnlyOnce=1
+
+    if [ -f log.$APP_RUN ] ; then
+        echo "$APP_RUN already run on $PWD: remove log file to run"
+    else
+        echo "Running $APP_RUN on $PWD"
+        $APP_RUN $* > log.$APP_RUN 2>&1
+    fi
+}
+

@@ -1,20 +1,20 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
+| \\      /  F ield         | foam-extend Project: Open source CFD        |
+|  \\    /   O peration     | Version:  3.0                               |
 |   \\  /    A nd           | Web:      www.extend-project.de                 |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 #
-#+TITLE: *Oldroyd-B viscoelastic constitutive model README file for version 1.6-ext* 
-#+AUTHOR: Jovani                
+#+TITLE: *Oldroyd-B viscoelastic constitutive model README file for version 3.0*
+#+AUTHOR: Jovani
 #+DATE:  05 October 2010
 
 
 
 * This is a simulation case for a viscoelastic fluid described by the Oldroyd-B
   constitutive model (PTT-Linear).
-  The geometry was the 4:1 plane contraction. This is a well studied 
+  The geometry was the 4:1 plane contraction. This is a well studied
   geometry in viscoelastic fluid flow research.
 
   More details about the model or parameters used can be found at:

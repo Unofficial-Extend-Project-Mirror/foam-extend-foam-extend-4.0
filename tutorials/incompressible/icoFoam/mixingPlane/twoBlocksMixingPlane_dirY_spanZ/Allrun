@@ -1,0 +1,306 @@
+#!/bin/bash
+#
+#set -x
+
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | foam-extend: Open Source CFD
+#  \\    /   O peration     |
+#   \\  /    A nd           | For copyright notice see file Copyright
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of foam-extend.
+#
+#     foam-extend is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation, either version 3 of the License, or (at your
+#     option) any later version.
+#
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Description
+#    Additionnal run functions, based on the original RunFunctions file
+#
+# Author:
+#    Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved
+#
+#------------------------------------------------------------------------------
+
+# Exception handler: dump the tail of the log file on error
+verbose_report_on_runApplication_error()
+{
+   ecode=$?
+   if [ "$reportOnErrorOnlyOnce" ] ; then
+       echo " "
+       echo " => Error running $APP_RUN..."
+       echo " => Here are the last 50 lines of the log file log.$APP_RUN..."
+       echo " "
+       if [ -f log.$APP_RUN ] ; then
+           tail -50 log.$APP_RUN
+           exit $ecode;
+       fi
+   fi
+
+   # Do not report again when exiting
+   unset reportOnErrorOnlyOnce
+}
+
+# Variation of runApplication with exception handling
+runApplicationAndReportOnError ()
+{
+    trap 'verbose_report_on_runApplication_error' ERR
+
+    LOG_NAME=
+    while getopts "l:" OPTFLAG ; do
+        LOG_NAME=$OPTARG
+        shift $((OPTIND-1)) ; OPTIND=1
+    done
+
+    APP_RUN=$1; shift
+    APP_NAME=${APP_RUN##*/}
+
+    if [ -z $LOG_NAME ] ; then
+        LOG_NAME=log.$APP_NAME
+    fi
+
+    reportOnErrorOnlyOnce=1
+
+    if [ -f $LOG_NAME ] ; then
+        echo "$APP_NAME already run on $PWD: remove log file to run"
+        exit 1;
+    else
+        echo "Running $APP_NAME on $PWD"
+        $APP_RUN $* > $LOG_NAME 2>&1
+    fi
+}
+
+# We force the display of a stack trace if we encounter problems
+export FOAM_ABORT=1
+
+# Load additional RunFunctions
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | foam-extend: Open Source CFD
+#  \\    /   O peration     |
+#   \\  /    A nd           | For copyright notice see file Copyright
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation; either version 2 of the License, or (at your
+#     option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM; if not, write to the Free Software Foundation,
+#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Description
+#    Additionnal run functions, based on the original RunFunctions file
+#
+# Author:
+#    Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved
+#
+#------------------------------------------------------------------------------
+
+# Exception handler: dump the tail of the log file on error
+verbose_report_on_runApplication_error()
+{
+   ecode=$?
+   if [ "$reportOnErrorOnlyOnce" ] ; then
+       echo " "
+       echo " => Error running $APP_RUN..."
+       echo " => Here are the last 50 lines of the log file log.$APP_RUN..."
+       echo " "
+       if [ -f log.$APP_RUN ] ; then
+           tail -50 log.$APP_RUN
+           exit $ecode;
+       fi
+   fi
+
+   # Do not report again when exiting
+   unset reportOnErrorOnlyOnce
+}
+
+# Variation of runApplication with exception handling
+runApplicationAndReportOnError ()
+{
+    trap 'verbose_report_on_runApplication_error' ERR
+
+    LOG_NAME=
+    while getopts "l:" OPTFLAG ; do
+        LOG_NAME=$OPTARG
+        shift $((OPTIND-1)) ; OPTIND=1
+    done
+
+    APP_RUN=$1; shift
+    APP_NAME=${APP_RUN##*/}
+
+    if [ -z $LOG_NAME ] ; then
+        LOG_NAME=log.$APP_NAME
+    fi
+
+    reportOnErrorOnlyOnce=1
+
+    if [ -f $LOG_NAME ] ; then
+        echo "$APP_NAME already run on $PWD: remove log file to run"
+        exit 1;
+    else
+        echo "Running $APP_NAME on $PWD"
+        $APP_RUN $* > $LOG_NAME 2>&1
+    fi
+}
+
+# We force the display of a stack trace if we encounter problems
+export FOAM_ABORT=1
+. ./RunFunctionsSupplemental
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation; either version 2 of the License, or (at your
+#     option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM; if not, write to the Free Software Foundation,
+#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Description
+#    Additionnal run functions, based on the original RunFunctions file
+#
+# Author:
+#    Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved
+#
+#------------------------------------------------------------------------------
+
+# Exception handler: dump the tail of the log file on error
+verbose_report_on_runApplication_error()
+{
+   ecode=$?
+   if [ "$reportOnErrorOnlyOnce" ] ; then
+       echo " "
+       echo " => Error running $APP_RUN..."
+       echo " => Here are the last 50 lines of the log file log.$APP_RUN..."
+       echo " "
+       if [ -f log.$APP_RUN ] ; then
+           tail -50 log.$APP_RUN
+           exit $ecode;
+       fi
+   fi
+
+   # Do not report again when exiting
+   unset reportOnErrorOnlyOnce
+}
+
+# Variation of runApplication with exception handling
+runApplicationAndReportOnError ()
+{
+    trap 'verbose_report_on_runApplication_error' ERR
+
+    LOG_NAME=
+    while getopts "l:" OPTFLAG ; do
+        LOG_NAME=$OPTARG
+        shift $((OPTIND-1)) ; OPTIND=1
+    done
+
+    APP_RUN=$1; shift
+    APP_NAME=${APP_RUN##*/}
+
+    if [ -z $LOG_NAME ] ; then
+        LOG_NAME=log.$APP_NAME
+    fi
+
+    reportOnErrorOnlyOnce=1
+
+    if [ -f $LOG_NAME ] ; then
+        echo "$APP_NAME already run on $PWD: remove log file to run"
+        exit 1;
+    else
+        echo "Running $APP_NAME on $PWD"
+        $APP_RUN $* > $LOG_NAME 2>&1
+    fi
+}
+
+# We force the display of a stack trace if we encounter problems
+export FOAM_ABORT=1
+
+export caseName=`basename $PWD`
+
+#We stop this script when we encounter a problem
+#trap "exit -1" ERR
+
+echo "$caseName: Running blockMesh"
+runApplicationAndReportOnError blockMesh
+
+echo "$caseName: Updating the boundary file"
+# Let's see if pyFoamChangeMixingPlaneBoundary.py is available
+command -v pyFoamChangeMixingPlaneBoundary.py >/dev/null
+if [ $? -eq 0 ];
+then
+    echo "Using pyFoamChangeMixingPlaneBoundary.py"
+    pyFoamChangeMixingPlaneBoundary.py . mixpLeftOut  \
+    --shadowPatch                    mixpRightIn      \
+    --zone                           mixpLeftOutZone  \
+    --ribbonPatchDiscretisation      bothPatches      \
+    --ribbonPatchStackAxis           Y                \
+    --ribbonPatchSweepAxis           Z                \
+    --coordinateSystemType           coordinateSystem \
+    --coordinateSystemOrigin         "(0 0 0.005)"    \
+    --coordinateSystemE1             "(1 0 0)"        \
+    --coordinateSystemE3             "(0 0 1)"
+
+    pyFoamChangeMixingPlaneBoundary.py . mixpRightIn  \
+    --shadowPatch                    mixpLeftOut      \
+    --zone                           mixpRightInZone  \
+    --ribbonPatchDiscretisation      bothPatches      \
+    --ribbonPatchStackAxis           Y                \
+    --ribbonPatchSweepAxis           Z                \
+    --coordinateSystemType           coordinateSystem \
+    --coordinateSystemOrigin         "(0 0 0.005)"    \
+    --coordinateSystemE1             "(1 0 0)"        \
+    --coordinateSystemE3             "(0 0 1)"
+else
+    echo "pyFoamChangeMixingPlaneBoundary.py is missing. Using the file constant/polyMesh/boundary.preconfigured"
+    cp constant/polyMesh/boundary.preconfigured constant/polyMesh/boundary
+fi
+
+echo "$caseName: Creating zones for the mixingPlane"
+runApplicationAndReportOnError setSet -batch setBatch
+runApplicationAndReportOnError setsToZones -noFlipMap
+
+echo "$caseName: Creating the starting time directory"
+cp -r 0_orig 0
+
+echo "$caseName: Running icoFoam"
+runApplicationAndReportOnError icoFoam
+
+
+

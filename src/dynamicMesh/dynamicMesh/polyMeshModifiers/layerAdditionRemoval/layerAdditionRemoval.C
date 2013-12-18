@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
     Cell layer addition/removal mesh modifier
@@ -167,7 +166,8 @@ Foam::layerAdditionRemoval::layerAdditionRemoval
     const polyTopoChanger& mme,
     const word& zoneName,
     const scalar minThickness,
-    const scalar maxThickness
+    const scalar maxThickness,
+    const label cellZone
 )
 :
     polyMeshModifier(name, index, mme, true),
@@ -178,7 +178,8 @@ Foam::layerAdditionRemoval::layerAdditionRemoval
     pointsPairingPtr_(NULL),
     facesPairingPtr_(NULL),
     triggerRemoval_(-1),
-    triggerAddition_(-1)
+    triggerAddition_(-1),
+    cellZone_(cellZone)
 {
     checkDefinition();
 }
@@ -201,7 +202,8 @@ Foam::layerAdditionRemoval::layerAdditionRemoval
     pointsPairingPtr_(NULL),
     facesPairingPtr_(NULL),
     triggerRemoval_(-1),
-    triggerAddition_(-1)
+    triggerAddition_(-1),
+    cellZone_(-1)
 {
     checkDefinition();
 }
@@ -326,7 +328,7 @@ bool Foam::layerAdditionRemoval::changeTopology() const
 
     if (debug)
     {
-        Pout<< "bool layerAdditionRemoval::changeTopology() const "
+        Info<< "bool layerAdditionRemoval::changeTopology() const "
             << " for object " << name() << " : " << nl
             << "Layer thickness: min: " << minDelta
             << " max: " << maxDelta << " avg: " << avgDelta
@@ -343,7 +345,7 @@ bool Foam::layerAdditionRemoval::changeTopology() const
     {
         if (debug)
         {
-            Pout << "First step. No addition/removal" << endl;
+            Info<< "First step. No addition/removal" << endl;
         }
 
         // No topological changes allowed before first mesh motion
@@ -370,7 +372,7 @@ bool Foam::layerAdditionRemoval::changeTopology() const
 
                     if (debug)
                     {
-                        Pout<< "bool layerAdditionRemoval::changeTopology() "
+                        Info<< "bool layerAdditionRemoval::changeTopology() "
                             << " const for object " << name() << " : "
                             << "Triggering layer removal" << endl;
                     }
@@ -402,7 +404,7 @@ bool Foam::layerAdditionRemoval::changeTopology() const
         {
             if (debug)
             {
-                Pout<< "bool layerAdditionRemoval::changeTopology() const "
+                Info<< "bool layerAdditionRemoval::changeTopology() const "
                     << " for object " << name() << " : "
                     << "Triggering layer addition" << endl;
             }
@@ -437,7 +439,7 @@ void Foam::layerAdditionRemoval::setRefinement(polyTopoChange& ref) const
         // Clear addressing.  This also resets the addition/removal data
         if (debug)
         {
-            Pout<< "layerAdditionRemoval::setRefinement(polyTopoChange& ref) "
+            Info<< "layerAdditionRemoval::setRefinement(polyTopoChange& ref) "
                 << " for object " << name() << " : "
                 << "Clearing addressing after layer removal. " << endl;
         }
@@ -453,7 +455,7 @@ void Foam::layerAdditionRemoval::setRefinement(polyTopoChange& ref) const
         // Clear addressing.  This also resets the addition/removal data
         if (debug)
         {
-            Pout<< "layerAdditionRemoval::setRefinement(polyTopoChange& ref) "
+            Info<< "layerAdditionRemoval::setRefinement(polyTopoChange& ref) "
                 << " for object " << name() << " : "
                 << "Clearing addressing after layer addition. " << endl;
         }
@@ -468,17 +470,17 @@ void Foam::layerAdditionRemoval::updateMesh(const mapPolyMesh&)
 {
     if (debug)
     {
-        Pout<< "layerAdditionRemoval::updateMesh(const mapPolyMesh&) "
+        Info<< "layerAdditionRemoval::updateMesh(const mapPolyMesh&) "
             << " for object " << name() << " : "
             << "Clearing addressing on external request. ";
 
         if (pointsPairingPtr_ || facesPairingPtr_)
         {
-            Pout << "Pointers set." << endl;
+            Info << "Pointers set." << endl;
         }
         else
         {
-            Pout << "Pointers not set." << endl;
+            Info << "Pointers not set." << endl;
         }
     }
 

@@ -1,0 +1,141 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       polyBoundaryMesh;
+    location    "2/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+13
+(
+    bladeDomB
+    {
+        type            wall;
+        nFaces          176;
+        startFace       49680;
+    }
+    bladeDomA
+    {
+        type            wall;
+        nFaces          176;
+        startFace       49856;
+    }
+    outletDomB
+    {
+        type            patch;
+        nFaces          100;
+        startFace       50032;
+    }
+    inletDomA
+    {
+        type            patch;
+        nFaces          100;
+        startFace       50132;
+    }
+    outletDomA
+    {
+        type            mixingPlane;
+        nFaces          100;
+        startFace       50232;
+        shadowPatch     inletDomB;
+        zone            outletDomAZone;
+        coordinateSystem
+        {
+            type            cylindrical;
+            name            mixingCS;
+            origin          (0 0 0);
+            e1              (1 0 0);
+            e3              (0 0 1);
+        }
+        ribbonPatch
+        {
+            sweepAxis       Theta;
+            stackAxis       Z;
+            discretisation  bothPatches;
+        }
+
+    }
+    inletDomB
+    {
+        type            mixingPlane;
+        nFaces          100;
+        startFace       50332;
+        shadowPatch     outletDomA;
+        zone            inletDomBZone;
+    }
+    ggi1DomB
+    {
+        type            ggi;
+        nFaces          128;
+        startFace       50432;
+        shadowPatch     ggi2DomB;
+        zone            ggi1DomBZone;
+        bridgeOverlap   false;
+    }
+    ggi1DomA
+    {
+        type            ggi;
+        nFaces          128;
+        startFace       50560;
+        shadowPatch     ggi2DomA;
+        zone            ggi1DomAZone;
+        bridgeOverlap   false;
+    }
+    ggi2DomB
+    {
+        type            ggi;
+        nFaces          176;
+        startFace       50688;
+        shadowPatch     ggi1DomB;
+        zone            ggi2DomBZone;
+        bridgeOverlap   false;
+    }
+    ggi2DomA
+    {
+        type            ggi;
+        nFaces          176;
+        startFace       50864;
+        shadowPatch     ggi1DomA;
+        zone            ggi2DomAZone;
+        bridgeOverlap   false;
+    }
+    topAndBottom
+    {
+        type            empty;
+        nFaces          50560;
+        startFace       51040;
+    }
+    cyclicDomA
+    {
+        type            cyclic;
+        nFaces          212;
+        startFace       101600;
+        featureCos      0.9;
+        transform       rotational;
+        rotationAxis    (0 0 1);
+        rotationCentre  (0 0 0);
+        rotationAngle   6;
+    }
+    cyclicDomB
+    {
+        type            cyclic;
+        nFaces          188;
+        startFace       101812;
+        featureCos      0.9;
+        transform       rotational;
+        rotationAxis    (0 0 1);
+        rotationCentre  (0 0 0);
+        rotationAngle   6;
+    }
+)
+
+// ************************************************************************* //

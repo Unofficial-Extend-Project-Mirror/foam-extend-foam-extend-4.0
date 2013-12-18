@@ -1,0 +1,37 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      rheologyProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+planeStress     no;
+
+plasticityModel yamadaMises;
+
+rheology
+{
+  type            elasticPlastic;
+  rho             rho [1 -3 0 0 0 0 0] 7800;
+  E               E [1 -1 -2 0 0 0 0] 200e+09;
+  nu              nu [0 0 0 0 0 0 0] 0.3;
+  sigmaY          sigmaY [1 -1 -2 0 0 0 0] 100e+06;
+  Ep              Ep [1 -1 -2 0 0 0 0] 0;
+
+  //- The plastic modulus, Ep, is given by:
+  //- Ep = E_total / (1 - (E_total/E_elastic))
+  //- where E_total is the total modulus post yield
+  //- and E_elastic is the elastic modulus
+}
+
+// ************************************************************************* //

@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -87,23 +86,23 @@ void breakupModel::updateParcelProperties
 
     if(includeOscillation_)
     {
-    
+
         scalar T = p.T();
         scalar pc = spray_.p()[p.cell()];
         scalar r = 0.5 * p.d();
         scalar r2 = r*r;
         scalar r3 = r*r2;
-    
+
         scalar rho = fuels.rho(pc, T, p.X());
         scalar sigma = fuels.sigma(pc, T, p.X());
         scalar mu = fuels.mu(pc, T, p.X());
-    
-        // inverse of characteristic viscous damping time    
+
+        // inverse of characteristic viscous damping time
         scalar rtd = 0.5*TABCmu_*mu/(rho*r2);
-        
+
         // oscillation frequency (squared)
         scalar omega2 = TABComega_ * sigma /(rho*r3) - rtd*rtd;
-        
+
         if(omega2 > 0)
         {
 
@@ -114,20 +113,20 @@ void breakupModel::updateParcelProperties
 
             scalar y1 = p.dev() - Wetmp;
             scalar y2 = p.ddev()/omega;
-                       
+
             // update distortion parameters
             scalar c = cos(omega*deltaT);
             scalar s = sin(omega*deltaT);
             scalar e = exp(-rtd*deltaT);
             y2 = (p.ddev() + y1*rtd)/omega;
-            
+
             p.dev() = Wetmp + e*(y1*c + y2*s);
             if (p.dev() < 0)
             {
                 p.dev() = 0.0;
                 p.ddev() = 0.0;
             }
-            else 
+            else
             {
                 p.ddev() = (Wetmp-p.dev())*rtd + e*omega*(y2*c - y1*s);
             }
@@ -140,7 +139,7 @@ void breakupModel::updateParcelProperties
         }
 
     }
-    
+
 }
 
 

@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
     Finite-Area matrix
@@ -352,10 +351,15 @@ void faMatrix<Type>::setValues
 {
     const faMesh& mesh = psi_.mesh();
 
-    //    const faceList& faces = mesh.faces();
+    // Record face labels of eliminated equations
+    forAll (faceLabels, i)
+    {
+        eliminatedEqns().insert(faceLabels[i]);
+    }
+
+    const labelListList& edges = mesh.patch().faceEdges();
     const unallocLabelList& own = mesh.owner();
     const unallocLabelList& nei = mesh.neighbour();
-    const labelListList& edges=mesh.patch().faceEdges();
 
     scalarField& Diag = diag();
 
@@ -368,8 +372,7 @@ void faMatrix<Type>::setValues
 
         if (symmetric() || asymmetric())
         {
-	  //            const face& c = faces[facei];
-	    const labelList &c=edges[facei];
+            const labelList& c= edges[facei];
 
             forAll(c, j)
             {
@@ -411,10 +414,10 @@ void faMatrix<Type>::setValues
 
                     if (internalCoeffs_[patchi].size())
                     {
-                        label patchEdgei = 
+                        label patchEdgei =
                             mesh.boundary()[patchi].whichEdge(edgei);
 
-                        internalCoeffs_[patchi][patchEdgei] = 
+                        internalCoeffs_[patchi][patchEdgei] =
                             pTraits<Type>::zero;
 
                         boundaryCoeffs_[patchi][patchEdgei] =
@@ -541,9 +544,9 @@ void faMatrix<Type>::relax()
 {
     scalar alpha = 0;
 
-    if (psi_.mesh().relax(psi_.name()))
+    if (psi_.mesh().solutionDict().relax(psi_.name()))
     {
-        alpha = psi_.mesh().relaxationFactor(psi_.name());
+        alpha = psi_.mesh().solutionDict().relaxationFactor(psi_.name());
     }
 
     if (alpha > 0)
@@ -634,11 +637,11 @@ template<class Type>
 tmp<GeometricField<Type, faePatchField, edgeMesh> > faMatrix<Type>::
 flux() const
 {
-    if (!psi_.mesh().fluxRequired(psi_.name()))
+    if (!psi_.mesh().schemesDict().fluxRequired(psi_.name()))
     {
         FatalErrorIn("faMatrix<Type>::flux()")
             << "flux requested but " << psi_.name()
-            << " not specified in the fluxRequired sub-dictionary of faSchemes."
+            << " not specified in the fluxRequired sub-dictionary of faSchemes"
             << abort(FatalError);
     }
 
@@ -697,7 +700,7 @@ flux() const
 
     forAll(fieldFlux.boundaryField(), patchI)
     {
-        fieldFlux.boundaryField()[patchI] = 
+        fieldFlux.boundaryField()[patchI] =
             InternalContrib[patchI] - NeighbourContrib[patchI];
     }
 
@@ -1058,7 +1061,7 @@ lduSolverPerformance solve
     Istream& solverControls
 )
 {
-    lduSolverPerformance solverPerf = 
+    lduSolverPerformance solverPerf =
         const_cast<faMatrix<Type>&>(tfam()).solve(solverControls);
 
     tfam.clear();

@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Namespace
     Foam::incompressible::RASModels
@@ -100,6 +99,9 @@ protected:
 
         //- Small omega value used to avoid divide by zero
         dimensionedScalar omegaSmall_;
+
+        //- Laminar to turbulent viscosity ratio
+        scalar nuRatio_;
 
         //- Near wall distance boundary field
         nearWallDist y_;
@@ -211,6 +213,12 @@ public:
                 return omegaSmall_;
             }
 
+            //- Return maximum allowed ratio of laminar to turbulent viscosity
+            scalar nuRatio() const
+            {
+                return nuRatio_;
+            }
+
             //- Allow k0 to be changed
             dimensionedScalar& k0()
             {
@@ -241,6 +249,12 @@ public:
                 return omegaSmall_;
             }
 
+            //- Allow nuRatio to be modified
+            scalar& nuRatio()
+            {
+                return nuRatio_;
+            }
+
             //- Return the near wall distances
             const nearWallDist& y() const
             {
@@ -260,13 +274,7 @@ public:
         virtual tmp<volScalarField> nut() const = 0;
 
         //- Return the effective viscosity
-        virtual tmp<volScalarField> nuEff() const
-        {
-            return tmp<volScalarField>
-            (
-                new volScalarField("nuEff", nut() + nu())
-            );
-        }
+        virtual tmp<volScalarField> nuEff() const;
 
         //- Return the turbulence kinetic energy
         virtual tmp<volScalarField> k() const = 0;

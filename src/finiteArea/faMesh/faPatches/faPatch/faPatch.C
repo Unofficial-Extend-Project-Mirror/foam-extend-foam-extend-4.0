@@ -1,28 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-Description
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -34,23 +31,30 @@ Description
 #include "edgeFields.H"
 #include "polyMesh.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    defineTypeNameAndDebug(faPatch, 0);
+    defineRunTimeSelectionTable(faPatch, dictionary);
+    addToRunTimeSelectionTable(faPatch, faPatch, dictionary);
+}
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(faPatch, 0);
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-defineRunTimeSelectionTable(faPatch, dictionary);
+void Foam::faPatch::clearOut()
+{
+    deleteDemandDrivenData(edgeFacesPtr_);
+    deleteDemandDrivenData(pointLabelsPtr_);
+    deleteDemandDrivenData(pointEdgesPtr_);
+}
 
-addToRunTimeSelectionTable(faPatch, faPatch, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-faPatch::faPatch
+Foam::faPatch::faPatch
 (
     const word& name,
     const labelList& edgeLabels,
@@ -70,7 +74,7 @@ faPatch::faPatch
 
 
 // Construct from dictionary
-faPatch::faPatch
+Foam::faPatch::faPatch
 (
     const word& name,
     const dictionary& dict,
@@ -87,7 +91,7 @@ faPatch::faPatch
     pointEdgesPtr_(NULL)
 {}
 
-faPatch::faPatch(const faPatch& p, const faBoundaryMesh& bm)
+Foam::faPatch::faPatch(const faPatch& p, const faBoundaryMesh& bm)
 :
     labelList(p),
     patchIdentifier(p, p.index()),
@@ -101,34 +105,32 @@ faPatch::faPatch(const faPatch& p, const faBoundaryMesh& bm)
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-faPatch::~faPatch()
+Foam::faPatch::~faPatch()
 {
-    deleteDemandDrivenData(edgeFacesPtr_);
-    deleteDemandDrivenData(pointLabelsPtr_);
-    deleteDemandDrivenData(pointEdgesPtr_);
+    clearOut();
 }
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-label faPatch::ngbPolyPatchIndex() const
+Foam::label Foam::faPatch::ngbPolyPatchIndex() const
 {
     return ngbPolyPatchIndex_;
 }
 
-const faBoundaryMesh& faPatch::boundaryMesh() const
+const Foam::faBoundaryMesh& Foam::faPatch::boundaryMesh() const
 {
     return boundaryMesh_;
 }
 
 
-label faPatch::start() const
+Foam::label Foam::faPatch::start() const
 {
     return boundaryMesh().mesh().patchStarts()[index()];
 }
 
 
-const labelList& faPatch::pointLabels() const
+const Foam::labelList& Foam::faPatch::pointLabels() const
 {
     if (!pointLabelsPtr_)
     {
@@ -139,7 +141,7 @@ const labelList& faPatch::pointLabels() const
 }
 
 
-void faPatch::calcPointLabels() const
+void Foam::faPatch::calcPointLabels() const
 {
     SLList<label> labels;
 
@@ -184,11 +186,11 @@ void faPatch::calcPointLabels() const
 }
 
 
-void faPatch::calcPointEdges() const
+void Foam::faPatch::calcPointEdges() const
 {
     labelList points = pointLabels();
 
-    const edgeList::subList e = 
+    const edgeList::subList e =
         patchSlice(boundaryMesh().mesh().edges());
 
     // set up storage for pointEdges
@@ -229,7 +231,7 @@ void faPatch::calcPointEdges() const
 }
 
 
-const labelListList& faPatch::pointEdges() const
+const Foam::labelListList& Foam::faPatch::pointEdges() const
 {
     if (!pointEdgesPtr_)
     {
@@ -240,10 +242,10 @@ const labelListList& faPatch::pointEdges() const
 }
 
 
-labelList faPatch::ngbPolyPatchFaces() const
+Foam::labelList Foam::faPatch::ngbPolyPatchFaces() const
 {
     labelList ngbFaces;
-    
+
     if(ngbPolyPatchIndex() == -1)
     {
         return ngbFaces;
@@ -273,7 +275,7 @@ labelList faPatch::ngbPolyPatchFaces() const
             pMesh.cellEdges(),
             faceCells
         );
-    
+
     forAll(ngbFaces, edgeI)
     {
         ngbFaces[edgeI] = -1;
@@ -291,7 +293,7 @@ labelList faPatch::ngbPolyPatchFaces() const
             if (curPatchID == ngbPolyPatchIndex())
             {
                 ngbFaces[edgeI] = curFace;
-            }            
+            }
         }
 
         if(ngbFaces[edgeI] == -1)
@@ -305,7 +307,7 @@ labelList faPatch::ngbPolyPatchFaces() const
 }
 
 
-tmp<vectorField> faPatch::ngbPolyPatchFaceNormals() const
+Foam::tmp<Foam::vectorField> Foam::faPatch::ngbPolyPatchFaceNormals() const
 {
     tmp<vectorField> fN(new vectorField());
 
@@ -329,11 +331,11 @@ tmp<vectorField> faPatch::ngbPolyPatchFaceNormals() const
             /faces[ngbFaces[faceI]].mag(points);
     }
 
-    return fN;    
+    return fN;
 }
 
 
-tmp<vectorField> faPatch::ngbPolyPatchPointNormals() const
+Foam::tmp<Foam::vectorField> Foam::faPatch::ngbPolyPatchPointNormals() const
 {
     if (ngbPolyPatchIndex() == -1)
     {
@@ -360,7 +362,7 @@ tmp<vectorField> faPatch::ngbPolyPatchPointNormals() const
 }
 
 
-const unallocLabelList& faPatch::edgeFaces() const
+const Foam::unallocLabelList& Foam::faPatch::edgeFaces() const
 {
     if (!edgeFacesPtr_)
     {
@@ -375,28 +377,28 @@ const unallocLabelList& faPatch::edgeFaces() const
 
 
 // Return the patch edge centres
-const vectorField& faPatch::edgeCentres() const
+const Foam::vectorField& Foam::faPatch::edgeCentres() const
 {
     return boundaryMesh().mesh().edgeCentres().boundaryField()[index()];
 }
 
 
 // Return the patch edges length vectors
-const vectorField& faPatch::edgeLengths() const
+const Foam::vectorField& Foam::faPatch::edgeLengths() const
 {
     return boundaryMesh().mesh().Le().boundaryField()[index()];
 }
 
 
 // Return the patch edge length magnitudes
-const scalarField& faPatch::magEdgeLengths() const
+const Foam::scalarField& Foam::faPatch::magEdgeLengths() const
 {
     return boundaryMesh().mesh().magLe().boundaryField()[index()];
 }
 
 
 // Return the patch edge unit normals
-tmp<vectorField> faPatch::edgeNormals() const
+Foam::tmp<Foam::vectorField> Foam::faPatch::edgeNormals() const
 {
     tmp<vectorField> eN(new vectorField(size()));
 
@@ -407,7 +409,7 @@ tmp<vectorField> faPatch::edgeNormals() const
 
 
 // Return the patch edge neighbour face centres
-tmp<vectorField> faPatch::edgeFaceCentres() const
+Foam::tmp<Foam::vectorField> Foam::faPatch::edgeFaceCentres() const
 {
     tmp<vectorField> tfc(new vectorField(size()));
     vectorField& fc = tfc();
@@ -428,43 +430,52 @@ tmp<vectorField> faPatch::edgeFaceCentres() const
 
 
 // Return cell-centre to face-centre vector
-tmp<vectorField> faPatch::delta() const
+Foam::tmp<Foam::vectorField> Foam::faPatch::delta() const
 {
     return edgeCentres() - edgeFaceCentres();
 }
 
 
 // Make delta coefficients as patch face - neighbour cell distances
-void faPatch::makeDeltaCoeffs(scalarField& dc) const
+void Foam::faPatch::makeDeltaCoeffs(scalarField& dc) const
 {
     dc = 1.0/(edgeNormals() & delta());
 }
 
 
 // Return delta coefficients
-const scalarField& faPatch::deltaCoeffs() const
+const Foam::scalarField& Foam::faPatch::deltaCoeffs() const
 {
     return boundaryMesh().mesh().deltaCoeffs().boundaryField()[index()];
 }
 
 
-void faPatch::makeWeights(scalarField& w) const
+void Foam::faPatch::makeWeights(scalarField& w) const
 {
     w = 1.0;
 }
 
 
-const scalarField& faPatch::weights() const
+const Foam::scalarField& Foam::faPatch::weights() const
 {
     return boundaryMesh().mesh().weights().boundaryField()[index()];
 }
 
 
-void faPatch::movePoints(const pointField& points)
+void Foam::faPatch::movePoints(const pointField& points)
 {}
 
 
-void faPatch::write(Ostream& os) const
+void Foam::faPatch::resetEdges(const labelList& newEdges)
+{
+    Info<< "Resetting patch edges" << endl;
+    labelList::operator=(newEdges);
+
+    clearOut();
+}
+
+
+void Foam::faPatch::write(Ostream& os) const
 {
     os.writeKeyword("type") << type() << token::END_STATEMENT << nl;
     patchIdentifier::write(os);
@@ -478,16 +489,12 @@ void faPatch::write(Ostream& os) const
 
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
-Ostream& operator<<(Ostream& os, const faPatch& p)
+Foam::Ostream& Foam::operator<<(Ostream& os, const faPatch& p)
 {
     p.write(os);
     os.check("Ostream& operator<<(Ostream& f, const faPatch& p)");
     return os;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

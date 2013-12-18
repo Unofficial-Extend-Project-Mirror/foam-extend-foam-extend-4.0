@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     mesquiteMotionSolver
@@ -42,9 +41,16 @@ SourceFiles
 #include "Map.H"
 #include "Switch.H"
 #include "edgeList.H"
+#include "labelPair.H"
 #include "pointIOField.H"
 #include "MeshObject.H"
 #include "HashSet.H"
+
+// Have gcc ignore certain warnings while including mesquite headers
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#   pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
+
 #include "Mesquite_all_headers.hpp"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -113,13 +119,16 @@ class mesquiteMotionSolver
         scalar relax_;
 
         //- Vertex coordinate array passed into Mesquite
-        mutable double* vtxCoords_;
+        mutable List<double> vtxCoords_;
 
         //- Connectivity array passed into mesquite
-        mutable unsigned long* cellToNode_;
+        mutable List<unsigned long> cellToNode_;
 
         //- Flag array for vertices (fixed/free)
-        mutable int* fixFlags_;
+        mutable List<int> fixFlags_;
+
+        //- Array with element types
+        mutable List<Mesquite::EntityTopology> mixedTypes_;
 
         //- Reference points
         mutable pointIOField refPoints_;
@@ -127,8 +136,8 @@ class mesquiteMotionSolver
         //- Original points prior to surface-smoothing
         mutable pointField origPoints_;
 
-        //- The quality metric
-        word qMetric_;
+        //- Quality metric list
+        wordList qMetrics_;
 
         //- Pointers to base element metric class
         HashTable<autoPtr<Mesquite::QualityMetric> > qMetricTable_;
@@ -155,7 +164,9 @@ class mesquiteMotionSolver
         labelList procIndices_;
         scalarField pointFractions_;
         labelListList procPointLabels_;
+        List<List<labelPair> > globalProcPoints_;
 
+        List<Map<label> > unmatchedRecvPoints_;
         List<vectorField> sendSurfFields_, recvSurfFields_;
         List<Map<label> > sendSurfPointMap_, recvSurfPointMap_;
 
@@ -207,7 +218,7 @@ class mesquiteMotionSolver
         // Component-wise sumMag
         scalar cmptSumMag(const vectorField& field);
 
-        // Transfer buffers after divergence compute.
+        // Transfer buffers for surface point fields
         void transferBuffers(vectorField &field);
 
         // Apply boundary conditions
@@ -283,9 +294,6 @@ class mesquiteMotionSolver
             scalar& beta
         );
 
-        // Clear out addressing
-        void clearOut();
-
         // Update on topology change
         void update(const mapPolyMesh&);
 
@@ -341,4 +349,3 @@ public:
 #endif
 
 // ************************************************************************* //
-

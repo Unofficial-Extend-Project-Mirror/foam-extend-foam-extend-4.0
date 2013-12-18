@@ -1,0 +1,78 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    location    "0";
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    bottomLoading
+    {
+        type           timeVaryingFixedDisplacement;
+	fileName       "$FOAM_CASE/constant/timeVsBottomDisp";
+	outOfBounds    clamp;
+        value          uniform (0 0 0);
+    }
+
+    topLoading
+    {
+        type           timeVaryingFixedDisplacement;
+	fileName       "$FOAM_CASE/constant/timeVsTopDisp";
+	outOfBounds    clamp;
+        value          uniform (0 0 0);
+    }
+
+    tractionFree
+    {
+        type            solidTraction;
+        traction        uniform (0 0 0);
+        pressure        uniform 0;
+        value           uniform (0 0 0);
+    }
+
+    notch
+    {
+        type            solidTraction;
+        traction        uniform (0 0 0);
+        pressure        uniform 0;
+        value           uniform (0 0 0);
+    }
+
+    front
+    {
+        type empty;
+    }
+
+    back
+    {
+        type empty;
+    }
+
+    crack
+    {
+      type                       solidCohesive;
+      relaxationFactor           0.01;
+      contact                    no;
+      penaltyScale               1;
+      frictionCoeff              0.1;
+      explicitSeparationDistance no;
+      value                      uniform ( 0 0 0 );
+    }
+}
+
+// ************************************************************************* //

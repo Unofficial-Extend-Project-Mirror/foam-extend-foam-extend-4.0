@@ -9,7 +9,14 @@ tmp<fvVectorMatrix> UEqn
 
 if (oCorr == nOuterCorr-1)
 {
-    UEqn().relax(1);
+    if (mesh.solutionDict().relax("UFinal"))
+    {
+        UEqn().relax(mesh.solutionDict().relaxationFactor("UFinal"));
+    }
+    else
+    {
+        UEqn().relax(1);
+    }
 }
 else
 {
@@ -25,7 +32,7 @@ if (momentumPredictor)
 {
     if (oCorr == nOuterCorr-1)
     {
-        solve(UEqn() == -fvc::grad(p), mesh.solver("UFinal"));
+        solve(UEqn() == -fvc::grad(p), mesh.solutionDict().solver("UFinal"));
     }
     else
     {

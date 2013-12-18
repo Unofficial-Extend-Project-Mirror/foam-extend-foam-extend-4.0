@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
     reconstructParMesh
@@ -144,8 +143,50 @@ int main(int argc, char *argv[])
 
     // Mesh write will be controlled by hand
     meshPtr->write();
+    procMeshes.writeAddressing();
     meshPtr->setMotionWriteOpt(IOobject::NO_WRITE);
     meshPtr->setTopoWriteOpt(IOobject::NO_WRITE);
+
+    // Write cell decomposition
+    if (writeCellDist)
+    {
+        // Write as volScalarField for post-processing
+        Info<< "Writing cellDist to time " << runTime.timeName()
+            << endl;
+        volScalarField cellDist
+        (
+            IOobject
+            (
+                "cellDist",
+                runTime.timeName(),
+                meshPtr(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            meshPtr(),
+            dimensionedScalar("cellDist", dimless, 0),
+            zeroGradientFvPatchScalarField::typeName
+        );
+        scalarField& cellDistIn = cellDist.internalField();
+
+        label cellI = 0;
+
+        forAll (procMeshes.meshes(), procI)
+        {
+            for
+            (
+                label i = 0;
+                i < procMeshes.meshes()[procI].nCells();
+                i++
+            )
+            {
+                cellDistIn[cellI] = procI;
+                cellI++;
+            }
+        }
+
+        cellDist.write();
+    }
 
     // Get region prefix for lagrangian
     fileName regionPrefix = "";
@@ -221,7 +262,9 @@ int main(int argc, char *argv[])
 
             if (writeCellDist)
             {
-                // Write as volScalarField for postprocessing.
+                // Write as volScalarField for post-processing
+                Info<< "Writing cellDist to time " << runTime.timeName()
+                    << endl;
                 volScalarField cellDist
                 (
                     IOobject

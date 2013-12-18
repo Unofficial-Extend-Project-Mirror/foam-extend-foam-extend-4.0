@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     edgeInterpolation
@@ -56,35 +55,41 @@ class polyMesh;
 \*---------------------------------------------------------------------------*/
 
 class edgeInterpolation
-:
-    public faSchemes,
-    public faSolution
 {
     // Private data
 
         // Reference to faMesh
         const faMesh& faMesh_;
 
-        //- Geodesic distance between centroides of neighbour finite areas
-        mutable edgeScalarField* lPN_;
+        //- Discretisation schemes
+        faSchemes schemesDict_;
 
-        //- Cenral-differencing weighting factors
-        mutable edgeScalarField* weightingFactors_;
+        //- Solver settings
+        faSolution solutionDict_;
 
-        //- Face-gradient difference factors
-        mutable edgeScalarField* differenceFactors_;
 
-        //- Is mesh orthogonal
-        mutable bool orthogonal_;
+        // Demand-driven data
 
-        //- Non-orthogonality correction vectors
-        mutable edgeVectorField* correctionVectors_;
+            //- Geodesic distance between centroides of neighbour finite areas
+            mutable edgeScalarField* lPN_;
 
-        //- Is mesh skew
-        mutable bool skew_;
+            //- Cenral-differencing weighting factors
+            mutable edgeScalarField* weightingFactors_;
 
-        //- Skew correction vectors
-        mutable edgeVectorField* skewCorrectionVectors_;
+            //- Face-gradient difference factors
+            mutable edgeScalarField* differenceFactors_;
+
+            //- Is mesh orthogonal
+            mutable bool orthogonal_;
+
+            //- Non-orthogonality correction vectors
+            mutable edgeVectorField* correctionVectors_;
+
+            //- Is mesh skew
+            mutable bool skew_;
+
+            //- Skew correction vectors
+            mutable edgeVectorField* skewCorrectionVectors_;
 
 
     // Private member functions
@@ -143,6 +148,30 @@ public:
             return faMesh_;
         }
 
+        //- Return schemes
+        const faSchemes& schemesDict() const
+        {
+            return schemesDict_;
+        }
+
+        //- Return access to schemes
+        faSchemes& schemesDict()
+        {
+            return schemesDict_;
+        }
+
+        //- Return solver settings
+        const faSolution& solutionDict() const
+        {
+            return solutionDict_;
+        }
+
+        //- Return access to solver settings
+        faSolution& solutionDict()
+        {
+            return solutionDict_;
+        }
+
         //- Return reference to PN geodesic distance
         const edgeScalarField& lPN() const;
 
@@ -166,7 +195,7 @@ public:
 
 
         //- Do what is neccessary if the mesh has moved
-        bool movePoints();
+        bool movePoints() const;
 };
 
 

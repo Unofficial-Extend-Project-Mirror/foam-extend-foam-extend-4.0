@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Check for proper number of command line args.
+if [ "$#" -ne 2 ]; then
+  echo "Usage: removeSerialLinks fluidCase solidCase"
+  exit 1 
+fi
+
+cd $1
+rm -rf 0/solid
+rm -rf constant/solid
+rm -rf system/solid
+cd ..

@@ -1,4 +1,5 @@
 ggiCheck/ggiCheckFunctionObject.C
 meshCheck/meshCheckFunctionObject.C
+mixingPlaneCheck/mixingPlaneCheckFunctionObject.C
 
 LIB = $(FOAM_LIBBIN)/libcheckFunctionObjects

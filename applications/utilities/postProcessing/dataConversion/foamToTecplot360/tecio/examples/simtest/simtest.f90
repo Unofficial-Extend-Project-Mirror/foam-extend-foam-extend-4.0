@@ -44,7 +44,7 @@
       FNMode = 0
       ShrConn = 0
 !
-!... Open the file and write the tecplot datafile 
+!... Open the file and write the tecplot datafile
 !... header information.
 !
       I = TecIni112('SIMPLE DATASET'//NULLCHR, &

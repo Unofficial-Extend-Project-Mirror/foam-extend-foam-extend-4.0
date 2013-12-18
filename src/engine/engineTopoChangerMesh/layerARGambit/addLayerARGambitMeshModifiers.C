@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -62,7 +61,7 @@ void Foam::layerARGambit::addZonesAndModifiers()
     }
 
     checkAndCalculate();
-    
+
 
     Info<< "Time = " << engTime().theta() << endl
         << "Adding zones to the engine mesh" << endl;
@@ -82,11 +81,11 @@ void Foam::layerARGambit::addZonesAndModifiers()
     {
 
         // Piston position
-        
+
         label pistonPatchID = piston().patchID().index();
-        
+
         scalar zPist = max(boundary()[pistonPatchID].patch().localPoints()).z();
-        
+
         scalar zPistV = zPist + offSet();
 
         labelList zone1(faceCentres().size());
@@ -95,7 +94,6 @@ void Foam::layerARGambit::addZonesAndModifiers()
 
         bool foundAtLeastOne = false;
         scalar zHigher = GREAT;
-        scalar zLower = GREAT;
         scalar dh = GREAT;
         scalar dl = GREAT;
 
@@ -109,16 +107,15 @@ void Foam::layerARGambit::addZonesAndModifiers()
             {
                 if (zPistV - zc > 0 && zPistV - zc < dl)
                 {
-                    zLower = zc;
                     dl = zPistV - zc;
                 }
-            
+
                 if (zc - zPistV > 0 && zc - zPistV < dh)
                 {
                     zHigher = zc;
                     dh = zc - zHigher;
                 }
-            
+
                 if
                 (
                     zc > zPistV - delta()
@@ -130,17 +127,17 @@ void Foam::layerARGambit::addZonesAndModifiers()
                     {
                         flipZone1[nZoneFaces1] = true;
                     }
-                
+
                     zone1[nZoneFaces1] = faceI;
                     nZoneFaces1++;
                 }
             }
         }
-        
+
         // if no cut was found use the layer above
         if (!foundAtLeastOne)
         {
-                        
+
             zPistV = zHigher;
 
             forAll (faceCentres(), faceI)
@@ -161,7 +158,7 @@ void Foam::layerARGambit::addZonesAndModifiers()
                         {
                             flipZone1[nZoneFaces1] = true;
                         }
-                    
+
                         zone1[nZoneFaces1] = faceI;
                         nZoneFaces1++;
                     }
@@ -172,7 +169,7 @@ void Foam::layerARGambit::addZonesAndModifiers()
 
         zone1.setSize(nZoneFaces1);
         flipZone1.setSize(nZoneFaces1);
-    
+
         fz[nFaceZones]=
             new faceZone
             (
@@ -182,21 +179,21 @@ void Foam::layerARGambit::addZonesAndModifiers()
                 nFaceZones,
                 faceZones()
             );
-        
+
         nFaceZones++;
 
 
         // Construct point zones
 
-            
+
         // Points which don't move (= cylinder head)
         DynamicList<label> headPoints(nPoints() / 10);
 
         // Points below the piston which moves with the piston displacement
         DynamicList<label> pistonPoints(nPoints() / 10);
-        
+
         label nHeadPoints = 0;
-            
+
         forAll (points(), pointI)
         {
             scalar zCoord = points()[pointI].z();
@@ -204,18 +201,18 @@ void Foam::layerARGambit::addZonesAndModifiers()
             if (zCoord > deckHeight() - delta())
             {
                 headPoints.append(pointI);
-                nHeadPoints++; 
+                nHeadPoints++;
             }
             else if (zCoord < zPistV + delta())
             {
                 pistonPoints.append(pointI);
             }
         }
-        
+
         Info << "Number of head points = " << nHeadPoints << endl;
-            
-            
-        pz[nPointZones] = 
+
+
+        pz[nPointZones] =
             new pointZone
             (
                 "headPoints",
@@ -241,7 +238,7 @@ void Foam::layerARGambit::addZonesAndModifiers()
     else if(piston().patchID().active() && offSet() <= SMALL)
     {
         label pistonPatchID = piston().patchID().index();
-        
+
         const polyPatch& pistonPatch =
             boundaryMesh()[piston().patchID().index()];
 
@@ -265,15 +262,15 @@ void Foam::layerARGambit::addZonesAndModifiers()
         // Construct point zones
 
         scalar zPistV = max(boundary()[pistonPatchID].patch().localPoints()).z();
-            
+
         // Points which don't move (= cylinder head)
         DynamicList<label> headPoints(nPoints() / 10);
 
         // Points below the piston which moves with the piston displacement
         DynamicList<label> pistonPoints(nPoints() / 10);
-        
+
         label nHeadPoints = 0;
-            
+
         forAll (points(), pointI)
         {
             scalar zCoord = points()[pointI].z();
@@ -281,7 +278,7 @@ void Foam::layerARGambit::addZonesAndModifiers()
             if (zCoord > deckHeight() - delta())
             {
                 headPoints.append(pointI);
-                nHeadPoints++; 
+                nHeadPoints++;
                 //Info<< "HeadPoint:" << pointI << " coord:" << points[pointI]
                 //   << endl;
             }
@@ -292,11 +289,11 @@ void Foam::layerARGambit::addZonesAndModifiers()
                 //    << endl;
             }
         }
-        
+
         Info << "Number of head points = " << nHeadPoints << endl;
-            
-            
-        pz[nPointZones] = 
+
+
+        pz[nPointZones] =
             new pointZone
             (
                 "headPoints",

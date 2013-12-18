@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -63,12 +63,12 @@ functions
         translationAmplitude    (0.0 3.0 0.0);
         translationFrequency    (0.0 0.25 0.0);
         initialRotationOrigin    (0.0 0.0 0.0);
-// 		rotationAmplitude		0.707;
-// 		rotationFrequency		0.25;
-// 		translationAmplitude	(0.0 5.0 0.0);
-// 		translationFrequency	(0.0 0.25 0.0);
-// 		initialRotationOrigin	(0.0 0.0 0.0);
-	}
+//         rotationAmplitude        0.707;
+//         rotationFrequency        0.25;
+//         translationAmplitude    (0.0 5.0 0.0);
+//         translationFrequency    (0.0 0.25 0.0);
+//         initialRotationOrigin    (0.0 0.0 0.0);
+    }
 );
 
 // ************************************************************************* //

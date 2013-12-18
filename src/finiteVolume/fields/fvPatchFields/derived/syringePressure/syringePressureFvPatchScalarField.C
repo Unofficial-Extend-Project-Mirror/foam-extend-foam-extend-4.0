@@ -1,34 +1,31 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
+#include "fvPatchFields.H"
 #include "syringePressureFvPatchScalarField.H"
-#include "volMesh.H"
 #include "addToRunTimeSelectionTable.H"
-#include "fvPatchFieldMapper.H"
-#include "surfaceFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -151,31 +148,31 @@ scalar syringePressureFvPatchScalarField::Vs(const scalar t) const
     }
     else if (t < tae_)
     {
-        return 
+        return
             VsI_
           + 0.5*Ap_*Sp_*sqr(t - tas_)/(tae_ - tas_);
     }
     else if (t < tds_)
     {
-        return 
-            VsI_ 
+        return
+            VsI_
           + 0.5*Ap_*Sp_*(tae_ - tas_)
           + Ap_*Sp_*(t - tae_);
     }
     else if (t < tde_)
     {
-        return 
-            VsI_ 
-          + 0.5*Ap_*Sp_*(tae_ - tas_) 
+        return
+            VsI_
+          + 0.5*Ap_*Sp_*(tae_ - tas_)
           + Ap_*Sp_*(tds_ - tae_)
           + Ap_*Sp_*(t - tds_)
           - 0.5*Ap_*Sp_*sqr(t - tds_)/(tde_ - tds_);
     }
     else
     {
-        return 
-            VsI_ 
-          + 0.5*Ap_*Sp_*(tae_ - tas_) 
+        return
+            VsI_
+          + 0.5*Ap_*Sp_*(tae_ - tas_)
           + Ap_*Sp_*(tds_ - tae_)
           + 0.5*Ap_*Sp_*(tde_ - tds_);
     }

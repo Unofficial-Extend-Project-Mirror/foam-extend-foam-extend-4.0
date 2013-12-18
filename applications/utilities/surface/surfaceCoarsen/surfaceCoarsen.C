@@ -1,34 +1,33 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
     Surface coarsening using 'bunnylod':
 
-	Polygon Reduction Demo
-	By Stan Melax (c) 1998
-	mailto:melax@cs.ualberta.ca
-	http://www.cs.ualberta.ca/~melax
+    Polygon Reduction Demo
+    By Stan Melax (c) 1998
+    mailto:melax@cs.ualberta.ca
+    http://www.cs.ualberta.ca/~melax
 
 
 \*---------------------------------------------------------------------------*/
@@ -54,8 +53,8 @@ int mapVertex(::List<int>& collapse_map, int a, int mx)
         return 0;
     }
     while (a >= mx)
-    {  
-	a = collapse_map[a];
+    {
+        a = collapse_map[a];
     }
     return a;
 }
@@ -122,14 +121,14 @@ int main(int argc, char *argv[])
         td.v[1]=f[1];
         td.v[2]=f[2];
         tri.Add(td);
-    }        
+    }
 
     ::List<int> collapse_map;   // to which neighbor each vertex collapses
     ::List<int> permutation;
 
     ::ProgressiveMesh(vert,tri,collapse_map,permutation);
 
-    // rearrange the vertex list 
+    // rearrange the vertex list
     ::List< ::Vector> temp_list;
     for(int i=0;i<vert.num;i++)
     {
@@ -167,7 +166,7 @@ int main(int argc, char *argv[])
         int p2 = mapVertex(collapse_map, tri[i].v[2], render_num);
 
         // note:  serious optimization opportunity here,
-        //  by sorting the triangles the following "continue" 
+        //  by sorting the triangles the following "continue"
         //  could have been made into a "break" statement.
         if (p0 == p1 || p1 == p2 || p2 == p0)
         {

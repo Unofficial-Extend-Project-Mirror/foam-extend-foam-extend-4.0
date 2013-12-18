@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     Foam::hCombustionThermo
@@ -75,26 +74,32 @@ public:
         autoPtr,
         hCombustionThermo,
         fvMesh,
-        (const fvMesh& mesh),
-        (mesh)
+        (const fvMesh& mesh, const objectRegistry& obj),
+        (mesh, obj)
     );
 
 
     // Constructors
 
         //- Construct from dictionary and mesh
-        hCombustionThermo(const fvMesh&);
+        hCombustionThermo(const fvMesh&, const objectRegistry&);
 
 
     // Selectors
 
         //- Standard selection based on fvMesh
-        static autoPtr<hCombustionThermo> New(const fvMesh&);
+        static autoPtr<hCombustionThermo> New(const fvMesh&, const objectRegistry&);
+
+        static autoPtr<hCombustionThermo> New(const fvMesh& mesh)
+        {
+            return New(mesh, mesh);
+        }
 
         //- Select and check that package contains 'thermoType'
         static autoPtr<hCombustionThermo> NewType
         (
             const fvMesh&,
+            const objectRegistry&,
             const word& thermoType
         );
 

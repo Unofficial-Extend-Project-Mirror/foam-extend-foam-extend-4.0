@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 
 \*---------------------------------------------------------------------------*/
@@ -170,7 +169,7 @@ Foam::label Foam::directionInfo::edgeToFaceIndex
         {
             // Both not in face.
             // e is on opposite face. Determine corresponding edge on this face:
-            // - determine two faces using edge (one is the opposite face, 
+            // - determine two faces using edge (one is the opposite face,
             //   one is 'side' face
             // - walk on both these faces to opposite edge
             // - check if this opposite edge is on faceI
@@ -264,7 +263,7 @@ bool Foam::directionInfo::updateCell
             const edge& e = mesh.edges()[edgeI];
 
             // Find face connected to face through edgeI and on same cell.
-            label faceI = 
+            label faceI =
                 meshTools::otherFace
                 (
                     mesh,
@@ -304,7 +303,7 @@ bool Foam::directionInfo::updateCell
     n_ = neighbourInfo.n();
 
     return true;
-}    
+}
 
 
 // Update this face with neighbouring cell information
@@ -351,7 +350,7 @@ bool Foam::directionInfo::updateFace
     n_ = neighbourInfo.n();
 
     return true;
-}    
+}
 
 
 // Merge this with information on same face
@@ -376,7 +375,7 @@ bool Foam::directionInfo::updateFace
 
         return true;
     }
-}    
+}
 
 
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //

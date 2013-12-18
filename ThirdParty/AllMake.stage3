@@ -1,26 +1,26 @@
 #!/bin/bash
 #------------------------------------------------------------------------------
 # =========                 |
-# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+# \\      /  F ield         | foam-extend: Open Source CFD
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright held by original author
+#   \\  /    A nd           | For copyright notice see file Copyright
 #    \\/     M anipulation  |
 #------------------------------------------------------------------------------
 # License
-#     This file is part of OpenFOAM.
+#     This file is part of foam-extend.
 #
-#     OpenFOAM is free software: you can redistribute it and/or modify it
-#     under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
+#     foam-extend is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation, either version 3 of the License, or (at your
+#     option) any later version.
 #
-#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-#     for more details.
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
 #     AllMake.stage3
@@ -59,7 +59,7 @@ echo
 # Metis
 if [ -z "$METIS_SYSTEM" ]
 then
-    ( rpm_make -p metis-5.0pre2 -s metis-5.0pre2.spec -u http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/OLD/metis-5.0pre2.tar.gz      )
+    ( rpm_make -p metis-5.1.0 -s metis-5.1.0.spec -u http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz      )
 else
     echo "Using system installed Metis"
     echo ""
@@ -68,7 +68,8 @@ fi
 # ParMGridGen
 if [ -z "$PARMGRIDGEN_SYSTEM" ]
 then
-    ( rpm_make -p ParMGridGen-1.0 -s ParMGridGen-1.0.spec -u http://www.mgnet.org/mgnet/Codes/parmgridgen/ParMGridGen-1.0.tar.gz       )
+    #( rpm_make -p ParMGridGen-1.0 -s ParMGridGen-1.0.spec -u http://www.mgnet.org/mgnet/Codes/parmgridgen/ParMGridGen-1.0.tar.gz       )
+    ( rpm_make -p ParMGridGen-1.0 -s ParMGridGen-1.0.spec -u ftp://ftp.proxad.net/.mirrors1/ftp.freebsd.org/ports/distfiles/ParMGridGen-1.0.tar.gz       )
 else
     echo "Using system installed ParMGridGen"
     echo ""
@@ -101,7 +102,7 @@ fi
 # Scotch
 if [ -z "$SCOTCH_SYSTEM" ]
 then
-    ( rpm_make -p scotch-5.1.10b -s scotch-5.1.10b.spec -u https://gforge.inria.fr/frs/download.php/27583/scotch-5.1.10b.tar.gz  )
+    ( rpm_make -p scotch-6.0.0 -s scotch-6.0.0.spec -u https://gforge.inria.fr/frs/download.php/31831/scotch-6.0.0.tar.gz  )
 else
     echo "Using system installed Scotch"
     echo ""
@@ -110,7 +111,7 @@ fi
 # ParMetis
 if [ -z "$PARMETIS_SYSTEM" ]
 then
-    ( rpm_make -p ParMetis-3.1.1 -s ParMetis-3.1.1.spec -u http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis/OLD/ParMetis-3.1.1.tar.gz )
+    ( rpm_make -p parmetis-4.0.3 -s parmetis-4.0.3.spec -u http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis/parmetis-4.0.3.tar.gz )
 else
     echo "Using system installed ParMetis"
     echo ""
@@ -119,11 +120,31 @@ fi
 ## Zoltan
 #if [ -z "$ZOLTAN_SYSTEM" ]
 #then
-#    ( rpm_make -p zoltan-3.5 -s zoltan-3.5.spec -u http://www.cs.sandia.gov/~kddevin/Zoltan_Distributions/zoltan_distrib_v3.5.tar.gz )
+#    ( rpm_make -p zoltan-3.6 -s zoltan-3.6.spec -u http://www.cs.sandia.gov/~kddevin/Zoltan_Distributions/zoltan_distrib_v3.6.tar.gz )
 #else
 #    echo "Using system installed Zoltan"
 #    echo ""
 #fi
+
+# PyFoam
+if [ -z "$PYFOAM_SYSTEM" ]
+then
+#   ( rpm_make -p PyFoam-0.5.6 -s PyFoam-0.5.6.spec  -u http://openfoamwiki.net/images/b/b8/PyFoam-0.5.6.tar.gz -n PyFoam-0.5.6-1.noarch -a noarch)
+#   ( rpm_make -p PyFoam-0.5.7 -s PyFoam-0.5.7.spec  -u http://openfoamwiki.net/images/d/dc/PyFoam-0.5.7.tar.gz -n PyFoam-0.5.7-1.noarch -a noarch)
+    ( rpm_make -p PyFoam-0.6.1 -s PyFoam-0.6.1.spec  -u http://openfoamwiki.net/images/3/33/PyFoam-0.6.1.tar.gz -n PyFoam-0.6.1-1.noarch -a noarch)
+else
+    echo "Using system installed PyFoam"
+    echo ""
+fi
+
+# hwloc
+if [ -z "$HWLOC_SYSTEM" ]
+then
+    ( rpm_make -p hwloc-1.7.2 -s hwloc-1.7.2.spec  -u http://www.open-mpi.org/software/hwloc/v1.7/downloads/hwloc-1.7.2.tar.gz )
+else
+    echo "Using system installed hwloc"
+    echo ""
+fi
 
 echo ========================================
 echo Done ThirdParty AllMake: Stage3

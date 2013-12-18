@@ -1,0 +1,105 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      sampleDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+interpolationScheme cellPoint;
+//interpolationScheme cellPointFace;
+//interpolationScheme cell;
+
+//setFormat     xmgr;
+//setFormat     gnuplot;
+setFormat     raw;
+//setFormat     jplot;
+
+sets
+(
+    Comp-25_Y //Resulting file name
+    {
+        type            uniform;
+        axis            y;         //x-axis in plot
+        start           (0 0.13 -0.025);
+        end             (0 0 -0.025);
+        nPoints         100;
+    }
+    Comp025_Y //Resulting file name
+    {
+        type            uniform;
+        axis            y;         //x-axis in plot
+        start           (0.00000000e+00 1.34341204e-01 2.4620194e-02);
+        end             (0.00000000e+00 0.00000000e+00 4.8308173e-02);
+        nPoints         100;
+    }
+    Comp060_Y //Resulting file name
+    {
+        type            uniform;
+        axis            y;         //x-axis in plot
+        start           (0.00000000e+00 1.40418891e-01 5.9088465e-02);
+        end             (0.00000000e+00 0.00000000e+00 8.3848104e-02);
+        nPoints         100;
+    }
+    Comp100_Y //Resulting file name
+    {
+        type            uniform;
+        axis            y;         //x-axis in plot
+        start           (0.00000000e+00 1.47364818e-01 9.8480775e-02);
+        end             (0.00000000e+00 0.00000000e+00 1.24465168e-01);
+        nPoints         100;
+    }
+    Comp175_Y //Resulting file name
+    {
+        type            uniform;
+        axis            y;         //x-axis in plot
+        start           (0.00000000e+00 1.60388431e-01 1.723413577e-01);
+        end             (0.00000000e+00 0.00000000e+00 2.00622165e-01);
+        nPoints         100;
+    }
+    Comp250_Y //Resulting file name
+    {
+        type            uniform;
+        axis            y;         //x-axis in plot
+        start           (0.00000000e+00 1.73412044e-01 2.46201938e-01);
+        end             (0.00000000e+00 0.00000000e-00 2.767791604e-01);
+        nPoints         100;
+    }
+    Comp330_Y //Resulting file name
+    {
+        type            uniform;
+        axis            y;         //x-axis in plot
+        start           (0.00000000e+00 1.87303899e-01 3.24986558e-01);
+        end             (0.00000000e+00 0.00000000e+00 3.58013289e-01);
+        nPoints         100;
+    }
+    Comp405_Y //Resulting file name
+    {
+        type            uniform;
+        axis            y;         //x-axis in plot
+        start           (0.00000000e+00 2.00327512e-01 3.98847140e-01);
+        end             (0.00000000e+00 0.00000000e+00 4.34170285e-01);
+        nPoints         100;
+    }
+);
+
+surfaces
+();
+
+fields
+(
+    U
+    p
+    k
+    epsilon
+);
+
+// ************************************************************************* //

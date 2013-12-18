@@ -1,4 +1,0 @@
-#!/bin/sh
-
-wmake libso . Make.cellDecomp
-wmake libso . Make.faceDecomp

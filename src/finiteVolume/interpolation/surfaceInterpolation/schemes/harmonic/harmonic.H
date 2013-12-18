@@ -1,26 +1,25 @@
-/*---------------------------------------------------------------------------*\
+/*---------------------------------------------------------------------------* \
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     Foam::harmonic
@@ -42,6 +41,7 @@ SourceFiles
 #include "surfaceInterpolationScheme.H"
 #include "volFields.H"
 #include "surfaceFields.H"
+#include "magLongDelta.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -107,96 +107,28 @@ public:
         virtual tmp<surfaceScalarField> weights
         (
             const GeometricField<Type, fvPatchField, volMesh>& phi
-        ) const
-        {
-            tmp<surfaceScalarField> tw
-            (
-                new surfaceScalarField
-                (
-                    IOobject
-                    (
-                        "harmonicWeightingFactors" + phi.name(),
-                        this->mesh().time().timeName(),
-                        this->mesh()
-                    ),
-                    this->mesh() ,
-                    dimless
-                )
-            );
+        ) const;
 
-            surfaceScalarField& w = tw();
+        //- Return the interpolation weighting factors for a patch
+        tmp<scalarField> weights
+        (
+            const Field<Type>& fOwn,
+            const Field<Type>& fNei,
+            const fvPatch& patch
+        ) const;
 
-            const unallocLabelList& owner = this->mesh().owner();
-            const unallocLabelList& neighbour = this->mesh().neighbour();
-
-            scalarField magPhi = mag(phi);
-
-            scalarField& wIn = w.internalField();
-
-            // Calculate internal weights using field magnitude
-            forAll (owner, faceI)
-            {
-                scalar mOwn = magPhi[owner[faceI]];
-                scalar mNei = magPhi[neighbour[faceI]];
-
-                scalar den = mOwn - mNei;
-
-                if (mag(den) > SMALL)
-                {
-                    scalar mean = 2.0*mOwn*mNei/(mOwn + mNei);
-                    wIn[faceI] = (mean - mNei)/den;
-                }
-                else
-                {
-                    wIn[faceI] = 0.5;
-                }
-            }
-
-            forAll (phi.boundaryField(), pi)
-            {
-                fvsPatchScalarField& wp = w.boundaryField()[pi];
-
-                const fvPatchField<Type>& patchPhi = phi.boundaryField()[pi];
-
-                if (patchPhi.coupled())
-                {
-                    scalarField magPhiOwn = mag(patchPhi.patchInternalField());
-                    scalarField magPhiNei = mag(patchPhi.patchNeighbourField());
-
-                    // Calculate internal weights using field magnitude
-                    forAll (patchPhi, faceI)
-                    {
-                        scalar mOwn = magPhiOwn[faceI];
-                        scalar mNei = magPhiNei[faceI];
-
-                        scalar den = mOwn - mNei;
-
-                        if (mag(den) > SMALL)
-                        {
-                             scalar mean = 2.0*mOwn*mNei/(mOwn + mNei);
-                             wp[faceI] = (mean - mNei)/den;
-                        }
-                        else
-                        {
-                             wp[faceI] = 0.5;
-                        }
-                    }
-                }
-                else
-                {
-                    // Boundary weights for uncoupled patches are 1
-                    wp = 1;
-                }
-            }
-
-            return tw;
-        }
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "harmonicTemplates.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

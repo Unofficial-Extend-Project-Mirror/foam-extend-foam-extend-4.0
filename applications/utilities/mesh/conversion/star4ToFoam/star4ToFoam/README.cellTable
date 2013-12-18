@@ -1,5 +1,5 @@
 Star-CD uses a so-called 'cell table' to organize properties.
-The ccm and star4 converters preserve this information as a dictionary of 
+The ccm and star4 converters preserve this information as a dictionary of
 dictionaries under "constant/cellTable" and as cell data under "0/cellTableId".
 
 The combination of both files allows subsequent creating of cellSets
@@ -16,7 +16,7 @@ that they are unique and start with a character in the set [A-Za-z].
 Here is a sample sub-dictionary:
 
 
-<word>	                        // arbitrary tag - must be unique
+<word>                            // arbitrary tag - must be unique
 {
     Id              <int>;      // mandatory - must be unique
     Label           <word>;     // optional

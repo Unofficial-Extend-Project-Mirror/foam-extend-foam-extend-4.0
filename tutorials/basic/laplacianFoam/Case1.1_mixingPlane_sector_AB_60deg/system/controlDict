@@ -1,0 +1,100 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application laplacianFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         20;
+
+deltaT          1;
+
+writeControl    timeStep;
+
+writeInterval   10;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression compressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+functions
+(
+//     trackDictionaryContent
+//     {
+
+//         type trackDictionary;
+
+//         // Where to load it from (if not already in solver)
+//         functionObjectLibs ("libsimpleFunctionObjects.so");
+
+//         // Names of dictionaries to track.
+//         dictionaryNameList
+//         (
+//             "system/controlDict"
+//             "system/fvSchemes"
+//             "system/fvSolution"
+//             "constant/transportProperties"
+//             "constant/RASProperties"
+//         );
+
+//         // Section separators (optional)
+//         // If the string "_sectionIdToken_" explicitely appears in the
+//         // specification of the following section separators, this token
+//         // string will be replaced by the name of the dictionary beeing
+//         // dumped to the console, plus the file modification date and time.
+//         sectionStartSeparator "############ Start of: _sectionIdToken_ ############";
+//         sectionEndSeparator   "############ End of: _sectionIdToken_ ############";
+//
+//         echoControlDictDebugSwitches off;
+//         echoControlDictInfoSwitches off;
+//         echoControlDictTolerances off;
+//         echoControlDictOptimisationSwitches off;
+//         echoControlDictDimensionedConstants off;
+//     }
+
+    // Compute the flux value on each side of a mixingPlane interface
+    mixPCheck_phi
+    {
+        // Type of functionObject
+        type mixingPlaneCheck;
+
+        masterPatchName         B_UPSTREAM;
+        masterPatchScaleFactor  1;
+        shadowPatchScaleFactor  1;
+        phi                     phi;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libcheckFunctionObjects.so");
+    }
+
+);
+
+//libs ( "libOpenFOAM.so" "libmixingPlane.so" );
+// ************************************************************************* //

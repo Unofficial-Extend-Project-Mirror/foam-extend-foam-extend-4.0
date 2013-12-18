@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     faGlobalMeshData
@@ -68,13 +67,13 @@ const Foam::faMesh& Foam::faGlobalMeshData::mesh() const
 // Update all data after morph
 void Foam::faGlobalMeshData::updateMesh()
 {
-    label polyMeshNGlobalPoints = 
+    label polyMeshNGlobalPoints =
         mesh_().globalData().nGlobalPoints();
 
-    const labelList& polyMeshSharedPointLabels = 
+    const labelList& polyMeshSharedPointLabels =
         mesh_().globalData().sharedPointLabels();
 
-    const labelList& polyMeshSharedPointAddr = 
+    const labelList& polyMeshSharedPointAddr =
         mesh_().globalData().sharedPointAddr();
 
     labelHashSet sharedPointLabels;
@@ -85,15 +84,15 @@ void Foam::faGlobalMeshData::updateMesh()
     {
         if(mesh_.boundary()[patchI].type() == processorFaPatch::typeName)
         {
-            const labelList& localPointLabels = 
+            const labelList& localPointLabels =
                 mesh_.boundary()[patchI].pointLabels();
 
             forAll(localPointLabels, pointI)
             {
-                label polyMeshPoint = 
+                label polyMeshPoint =
                     mesh_.patch().meshPoints()[localPointLabels[pointI]];
-                
-                label sharedPolyMeshPoint = 
+
+                label sharedPolyMeshPoint =
                     findIndex(polyMeshSharedPointLabels, polyMeshPoint);
 
                 if
@@ -102,7 +101,7 @@ void Foam::faGlobalMeshData::updateMesh()
                  && !sharedPointLabels.found(localPointLabels[pointI])
                 )
                 {
-                    globalList[polyMeshSharedPointAddr[sharedPolyMeshPoint]] 
+                    globalList[polyMeshSharedPointAddr[sharedPolyMeshPoint]]
                         += 1;
 
                     sharedPointLabels.insert(localPointLabels[pointI]);
@@ -134,7 +133,7 @@ void Foam::faGlobalMeshData::updateMesh()
         );
 
         sharedPointAddr_[pointI] =
-            globalList[polyMeshSharedPointAddr[polyMeshSharedPointIndex]] 
+            globalList[polyMeshSharedPointAddr[polyMeshSharedPointIndex]]
           - 1;
     }
 }

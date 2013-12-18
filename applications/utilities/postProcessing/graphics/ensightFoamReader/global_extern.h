@@ -44,7 +44,7 @@
 
 #define Z_NOT_IMPLEMENTED       (3)          /*Routine not implemented*/
                                              /*(currently only checked for */
-                                             /* get_var_value_at_specific routine)*/ 
+                                             /* get_var_value_at_specific routine)*/
 #ifndef TRUE
 # define TRUE                   (1)
 # define FALSE                  (0)
@@ -82,9 +82,9 @@ typedef struct {
 }CRD;
 #endif
 
-/*----------------*/ 
+/*----------------*/
 /* Variable Types */
-/*----------------*/ 
+/*----------------*/
 enum z_var_type
 {
   Z_CONSTANT,
@@ -275,7 +275,7 @@ enum  z_material_file_index
 #if defined DO_READER
 #include "global_extern_proto.h"
 #endif
-     
+
 /*--------------------------------------------------------------------*/
 #endif /*GLOBAL_EXTERN_H*/
 

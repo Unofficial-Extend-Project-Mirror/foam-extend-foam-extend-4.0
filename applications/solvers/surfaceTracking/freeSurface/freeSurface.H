@@ -1,32 +1,31 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     freeSurface
 
 Description
-    Implementation of Free surface (interface) tracking method 
+    Implementation of Free surface (interface) tracking method
     based on moving mesh.
 
 SourceFiles
@@ -64,8 +63,8 @@ class freeSurface
     public IOdictionary
 {
     // Private data
-    
-        //- Reference to fvMesh 
+
+        //- Reference to fvMesh
         dynamicFvMesh& mesh_;
 
         //- Reference to density field
@@ -91,29 +90,29 @@ class freeSurface
         Switch normalMotionDir_;
 
         //- Free-surface points displacement direction
-        //  if not normal motion direction 
+        //  if not normal motion direction
         vector motionDir_;
 
         //- Is it free-surface clean of surfactant
         Switch cleanInterface_;
 
-        //- ID of the fvMesh patch which represents 
+        //- ID of the fvMesh patch which represents
         //  A side of the free-surface
-        label aPatchID_; 
+        label aPatchID_;
 
-        //- ID of the fvMesh patch which represents 
+        //- ID of the fvMesh patch which represents
         //  B side of the free-surface
-        label bPatchID_; 
+        label bPatchID_;
 
         //- Viscosity of fluid A
         dimensionedScalar muFluidA_;
-    
+
         //- Viscosity of fluid B
         dimensionedScalar muFluidB_;
 
         //- Density of fluid A
         dimensionedScalar rhoFluidA_;
-    
+
         //- Density of fluid B
         dimensionedScalar rhoFluidB_;
 
@@ -126,7 +125,7 @@ class freeSurface
         //- Free surface patches which do not move
         wordList fixedFreeSurfacePatches_;
 
-        //- Free surface patches for witch point normals 
+        //- Free surface patches for witch point normals
         //  must be corrected
         wordList pointNormalsCorrectionPatches_;
 
@@ -139,12 +138,12 @@ class freeSurface
     // Demand-driven data
 
         //- Patch to patch interpolation object which deals with
-        //  interpolation of flow variables between two free-surface 
+        //  interpolation of flow variables between two free-surface
         //  (interface) patches
         mutable IOpatchToPatchInterpolation* interpolatorABPtr_;
-    
+
         //- Patch to patch interpolation object which deals with
-        //  interpolation of flow variables between two free-surface 
+        //  interpolation of flow variables between two free-surface
         //  (interface) patches
         mutable IOpatchToPatchInterpolation* interpolatorBAPtr_;
 
@@ -152,7 +151,7 @@ class freeSurface
         //  and which defines the free-surface shape
         mutable vectorIOField* controlPointsPtr_;
 
-        //- Field which additionally determines 
+        //- Field which additionally determines
         //  the motion of free-surface points
         mutable labelList* motionPointsMaskPtr_;
 
@@ -162,7 +161,7 @@ class freeSurface
         //- Displacement direction of free-surface control points
         mutable vectorField* facesDisplacementDirPtr_;
 
-        //- Total displacement of free-surface points 
+        //- Total displacement of free-surface points
         //  in one time step
         mutable vectorIOField* totalDisplacementPtr_;
 
@@ -242,15 +241,15 @@ public:
     (
         dynamicFvMesh& m,
         const volScalarField& rho,
-        volVectorField& Ub, 
-        volScalarField& Pb, 
+        volVectorField& Ub,
+        volScalarField& Pb,
         const surfaceScalarField& phi
     );
 
 
     // Destructor
 
-    ~freeSurface();  
+    ~freeSurface();
 
 
     // Member Functions
@@ -462,7 +461,7 @@ public:
         //- Update free-surface flux
         void updateSurfaceFlux();
 
-        //- Update free-surface surfactant concentration 
+        //- Update free-surface surfactant concentration
         void updateSurfactantConcentration();
 
         //- Correct surface velocity boundary conditions

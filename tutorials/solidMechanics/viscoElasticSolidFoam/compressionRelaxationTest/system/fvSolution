@@ -1,0 +1,49 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    DU
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-07;
+        relTol          0.1;
+    }
+}
+
+solidMechanics
+{
+    nCorrectors           10000;
+    DU                     1e-06;
+    //divSigmaExp           standard;
+    divSigmaExp           surface;
+    //divSigmaExp           decompose;
+    //divSigmaExp           laplacian;
+    historyPatch          loading;
+    solidInterfaceMethod  none;
+    predictor             yes;
+    infoFrequency         100;
+    aitkenRelaxation      yes;
+    gravity               ( 0 -9.81 0 );
+}
+
+relaxationFactors
+{
+  //DU   0.9;
+}
+// ************************************************************************* //

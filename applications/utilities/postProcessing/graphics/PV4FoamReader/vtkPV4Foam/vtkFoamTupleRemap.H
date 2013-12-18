@@ -1,0 +1,71 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of foam-extend.
+
+    foam-extend is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+
+InClass
+    vtkPV4Foam
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef vtkFoamTupleRemap_H
+#define vtkFoamTupleRemap_H
+
+// FOAM includes
+#include "StaticAssert.H"
+#include "Swap.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+template<class Type>
+inline void vtkFoamTupleRemap(float vec[]);
+
+
+// a symmTensor specialization to remap FOAM -> ParaView naming order
+// Qt/Core/pqScalarBarRepresentation.cxx defines this order
+//     { "XX", "YY", "ZZ", "XY", "YZ", "XZ" }
+// in pqScalarBarRepresentation::getDefaultComponentLabel()
+// whereas FOAM uses this order
+//     { XX, XY, XZ, YY, YZ, ZZ }
+//
+// for extra safety, assert that symmTensor indeed has 6 components
+StaticAssert(Foam::symmTensor::nComponents == 6);
+
+
+// Template specialization for symmTensor
+template<>
+inline void vtkFoamTupleRemap<Foam::symmTensor>(float vec[])
+{
+    Foam::Swap(vec[1], vec[3]);   // swap XY <-> YY
+    Foam::Swap(vec[2], vec[5]);   // swap XZ <-> ZZ
+}
+
+
+template<class Type>
+inline void vtkFoamTupleRemap(float vec[])
+{}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

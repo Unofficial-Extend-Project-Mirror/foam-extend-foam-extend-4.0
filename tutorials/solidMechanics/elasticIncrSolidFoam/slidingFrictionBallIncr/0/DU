@@ -1,0 +1,130 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    location    "0";
+    object      DU;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    topBrickUp
+    {
+      type            timeVaryingFixedDisplacement;
+      outOfBounds     clamp;
+      fileName        "$FOAM_CASE/constant/timeVsTopDisp";
+      value           uniform (0 0 0);
+    }
+
+    bottomBrickUp
+    {
+        type                 solidContact;
+	master               yes;
+	contactActive        yes;
+	rigidMaster          no;
+	shadowPatch          topBrickDown;
+	interpolationMethod  ggi;
+	//interpolationMethod  patchToPatch;
+	projectionAlgo       visible;
+	projectionDir        contactSphere;
+	correctionFrequency  10;
+	normalContactModel   standardPenalty;;
+	standardPenaltyNormalModelDict
+	  {
+	    penaltyScale          1;
+	    relaxationFactor      0.01;
+	    infoFrequency         10;
+	    limitPenetration      no;
+	    penetrationLimit      -0.03;
+	    limitPressure         no;
+	    pressureLimit         1e9;
+	    correctMissedVertices yes;
+	    distanceMethod        point;
+	    oscillationCorrection yes;
+	    smoothingSteps        1;
+	  }
+	frictionContactModel   standardPenalty;
+	standardPenaltyFrictionModelDict
+	  {
+	    penaltyScale          0.5;
+	    relaxationFactor      0.1;
+	    infoFrequency         10;
+	    oscillationCorrection yes;
+	    smoothingSteps        1;
+	    frictionLaw           coulomb;
+	    frictionLawDict
+	      {
+		frictionCoeff  0.3;
+	      }
+	  }
+	value                uniform (0 0 0);
+    }
+
+    topBrickDown
+    {
+        type                 solidContact;
+	master               no;
+	contactActive        yes;
+	shadowPatch          bottomBrickUp;
+        value                uniform (0 0 0);
+    }
+
+    bottomBrickDown
+    {
+        type            fixedDisplacement;
+        value           uniform (0 0 0);
+    }
+
+    bottomBrickLeft
+    {
+        type            solidTraction;
+        traction        uniform ( 0 0 0 );
+        pressure        uniform 0;
+        value           uniform (0 0 0);
+    }
+
+    bottomBrickRight
+    {
+        type            solidTraction;
+        traction        uniform ( 0 0 0 );
+        pressure        uniform 0;
+        value           uniform (0 0 0);
+    }
+    topBrickLeft
+    {
+        type            solidTraction;
+        traction        uniform ( 0 0 0 );
+        pressure        uniform 0;
+        value           uniform (0 0 0);
+    }
+    topBrickRight
+    {
+        type            solidTraction;
+	traction        uniform ( 0 0 0 );
+        pressure        uniform 0;
+        value           uniform (0 0 0);
+    }
+    back
+    {
+        type            empty;
+    }
+    front
+    {
+        type            empty;
+    }
+}
+
+// ************************************************************************* //

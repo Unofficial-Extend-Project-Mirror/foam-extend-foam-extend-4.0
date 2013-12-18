@@ -1,0 +1,93 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of foam-extend.
+
+    foam-extend is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+
+Class
+    elementMesh
+
+Description
+    Mesh data needed to do the Finite Element discretisation.
+    Element-based fields.
+
+    In this setup, the finite element is considered to be the complete cell
+    and the decomposition into tets is done just as an auxiliary tool.
+    Therefore, all element-based fields are defined "per polyhedron" rather
+    that per-tet.
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef elementMesh_H
+#define elementMesh_H
+
+#include "GeoMesh.H"
+#include "tetPolyMesh.H"
+#include "tetPolyBoundaryMesh.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+/*---------------------------------------------------------------------------*\
+                           Class elementMesh Declaration
+\*---------------------------------------------------------------------------*/
+
+class elementMesh
+:
+    public GeoMesh<tetPolyMesh>
+{
+public:
+
+    // Constructors
+
+        //- Construct from tetPolyMesh
+        elementMesh(const tetPolyMesh& mesh)
+        :
+            GeoMesh<tetPolyMesh>(mesh)
+        {}
+
+
+    // Member Functions
+
+        //- Return size
+        label size() const
+        {
+            return size(mesh_);
+        }
+
+        //- Return size
+        static label size(const Mesh& mesh)
+        {
+            return mesh.nCells();
+        }
+};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

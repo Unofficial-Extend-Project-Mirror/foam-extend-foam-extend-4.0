@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     faMesh
@@ -38,6 +37,7 @@ SourceFiles
 #define faMesh_H
 
 #include "GeoMesh.H"
+#include "MeshObject.H"
 #include "polyMesh.H"
 #include "lduMesh.H"
 #include "faBoundaryMesh.H"
@@ -61,14 +61,16 @@ namespace Foam
 
 // Class forward declarations
 class faMeshLduAddressing;
+class faMeshMapper;
 
 /*---------------------------------------------------------------------------*\
-                           Class faMesh Declaration
+                             Class faMesh Declaration
 \*---------------------------------------------------------------------------*/
 
 class faMesh
 :
     public GeoMesh<polyMesh>,
+    public MeshObject<polyMesh, faMesh>,
     public lduMesh,
     public edgeInterpolation
 {
@@ -116,6 +118,12 @@ class faMesh
         //- Ldu addressing data
         mutable faMeshLduAddressing* lduPtr_;
 
+        //- Current time index for motion
+        //  Note.  The whole mechanism will be replaced once the
+        //  dimensionedField is created and the dimensionedField
+        //  will take care of the old-time levels.
+        mutable label curTimeIndex_;
+
         //- Face areas
         mutable DimensionedField<scalar, areaMesh>* SPtr_;
 
@@ -162,14 +170,6 @@ class faMesh
 
             //- Parallel info
             mutable faGlobalMeshData* globalMeshDataPtr_;
-
-            // Mesh motion
-
-                //- Is the mesh moving
-                bool moving_;
-
-                //- Current time index for mesh motion
-                mutable label curMotionTimeIndex_;
 
 
     // Static Private Data
@@ -301,6 +301,12 @@ public:
 
         // Database
 
+            //- Return access to polyMesh
+            const polyMesh& mesh() const
+            {
+                return MeshObject<polyMesh, faMesh>::mesh();
+            }
+
             //- Return the local mesh directory (dbDir()/meshSubDir)
             fileName meshDir() const;
 
@@ -409,16 +415,28 @@ public:
             }
 
 
-        // Mesh motion
+        // Mesh motion and mophing
 
             //- Is mesh moving
             bool moving() const
             {
-                return moving_;
+                return mesh().moving();
             }
 
-            //- Move points, returns volumes swept by faces in motion
-            virtual tmp<scalarField> movePoints(const vectorField&);
+            //- Update after mesh motion
+            virtual bool movePoints() const;
+
+            //- Update after topo change
+            virtual bool updateMesh(const mapPolyMesh&) const;
+
+
+        // Mapping
+
+            //- Map all fields in time using given map.
+            virtual void mapFields(const faMeshMapper& mapper) const;
+
+            //- Map face areas in time using given map.
+            virtual void mapOldAreas(const faMeshMapper& mapper) const;
 
 
         // Demand-driven data

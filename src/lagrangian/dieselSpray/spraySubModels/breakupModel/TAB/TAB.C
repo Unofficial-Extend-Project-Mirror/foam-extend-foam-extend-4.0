@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -101,7 +100,7 @@ void TAB::breakupParcel
 
     // inverse of characteristic viscous damping time
     scalar rtd = 0.5*Cmu_*mu/(rho*r2);
-    
+
     // oscillation frequency (squared)
     scalar omega2 = Comega_*sigma/(rho*r3) - rtd*rtd;
 
@@ -132,9 +131,9 @@ void TAB::breakupParcel
             {
                 phi = 2*mathematicalConstant::pi - phit;
             }
-            
+
             scalar tb = 0;
-            
+
             if (mag(p.dev()) < 1.0)
             {
                 scalar coste = 1.0;
@@ -146,9 +145,9 @@ void TAB::breakupParcel
                 {
                     coste = -1.0;
                 }
-                
+
                 scalar theta = acos((coste-Wetmp)/a);
-                
+
                 if (theta < phi)
                 {
                     if (2*mathematicalConstant::pi-theta >= phi)
@@ -173,11 +172,11 @@ void TAB::breakupParcel
             {
                 scalar rs = r/
                 (
-                    1 
+                    1
                   + (4.0/3.0)*pow(p.dev(), 2)
                   + rho*r3/(8*sigma)*pow(p.ddev(), 2)
                 );
-                
+
                 label n = 0;
                 bool found = false;
                 scalar random = rndGen_.scalar01();
@@ -201,7 +200,7 @@ void TAB::breakupParcel
             }
 
         }
-       
+
     }
     else
     {

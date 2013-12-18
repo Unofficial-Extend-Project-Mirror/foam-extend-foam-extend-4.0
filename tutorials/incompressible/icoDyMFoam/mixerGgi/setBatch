@@ -1,3 +1,0 @@
-faceSet insideZone new patchToFace insideSlider
-faceSet outsideZone new patchToFace outsideSlider
-quit

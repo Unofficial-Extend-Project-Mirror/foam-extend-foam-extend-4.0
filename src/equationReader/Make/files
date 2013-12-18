@@ -1,0 +1,15 @@
+equationSource/equationSources.C
+
+equation/equation.C
+equation/equationIO.C
+
+equationOperation/equationOperation.C
+
+equationReader/equationReader.C
+equationReader/equationReaders.C
+equationReader/equationReaderIO.C
+
+IOEquationReader/IOEquationReader.C
+IOEquationReader/IOEquationReaderIO.C
+
+LIB = $(FOAM_LIBBIN)/libequationReader

@@ -7,7 +7,7 @@ int USERD_get_matf_var_info
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_matf_var_info" << endl 
+    Info << "Entering: USERD_get_matf_var_info" << endl
         << flush;
 #endif
 

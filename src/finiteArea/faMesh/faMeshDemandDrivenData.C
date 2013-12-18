@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -122,9 +121,9 @@ void faMesh::calcLe() const
             IOobject
             (
                 "Le",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimLength
@@ -226,9 +225,9 @@ void faMesh::calcMagLe() const
             IOobject
             (
                 "magLe",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimLength
@@ -287,9 +286,9 @@ void faMesh::calcAreaCentres() const
             IOobject
             (
                 "centres",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimLength
@@ -319,6 +318,7 @@ void faMesh::calcAreaCentres() const
 
     forAll(centres.boundaryField(), patchI)
     {
+        //HJ: this is wrong!  5/Aug/2011
         if
         (
             isA<processorFaPatchVectorField>
@@ -328,7 +328,7 @@ void faMesh::calcAreaCentres() const
         )
         {
             centres.boundaryField()[patchI].initEvaluate();
-            centres.boundaryField()[patchI].evaluate();            
+            centres.boundaryField()[patchI].evaluate();
         }
     }
 }
@@ -357,9 +357,9 @@ void faMesh::calcEdgeCentres() const
             IOobject
             (
                 "edgeCentres",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimLength
@@ -417,12 +417,12 @@ void faMesh::calcS() const
         (
             "S",
             time().timeName(),
-            mesh_,
+            mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
         *this,
-        dimVolume
+        dimArea
     );
     DimensionedField<scalar, areaMesh>& S = *SPtr_;
 
@@ -459,9 +459,9 @@ void faMesh::calcFaceAreaNormals() const
             IOobject
             (
                 "faceAreaNormals",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimless
@@ -488,7 +488,7 @@ void faMesh::calcFaceAreaNormals() const
 
     forAll(faceAreaNormals.boundaryField(), patchI)
     {
-        if 
+        if
         (
             isA<processorFaPatchVectorField>
             (
@@ -497,7 +497,7 @@ void faMesh::calcFaceAreaNormals() const
         )
         {
             faceAreaNormals.boundaryField()[patchI].initEvaluate();
-            faceAreaNormals.boundaryField()[patchI].evaluate();            
+            faceAreaNormals.boundaryField()[patchI].evaluate();
         }
     }
 }
@@ -526,9 +526,9 @@ void faMesh::calcEdgeAreaNormals() const
             IOobject
             (
                 "edgeAreaNormals",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimless
@@ -666,9 +666,9 @@ void faMesh::calcFaceCurvatures() const
             IOobject
             (
                 "faceCurvatures",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimless/dimLength
@@ -1293,11 +1293,11 @@ void faMesh::calcPointAreaNormals() const
             if (boundary()[patchI].ngbPolyPatchIndex() == -1)
             {
                 FatalErrorIn
-                    (
-                        "void faMesh::calcPointAreaNormals const"
-                    )   << "Neighbour polyPatch index is not defined "
-                        << "for faPatch " << boundary()[patchI].name()
-                        << abort(FatalError);
+                (
+                    "void faMesh::calcPointAreaNormals const"
+                )   << "Neighbour polyPatch index is not defined "
+                    << "for faPatch " << boundary()[patchI].name()
+                    << abort(FatalError);
             }
 
             labelList patchPoints = boundary()[patchI].pointLabels();
@@ -1373,11 +1373,11 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
             {
                 const labelList& curFaceFaces =
                     patch().faceFaces()[curFaces[faceI]];
-                
+
                 forAll(curFaceFaces, fI)
                 {
                     label curFaceFace = curFaceFaces[fI];
-                        
+
                     if(!faceSet.found(curFaceFace))
                     {
                         faceSet.insert(curFaceFace);
@@ -1489,7 +1489,7 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
             labelList toNgbProcLsPointStarts(patchPointLabels.size(), 0);
             vectorField toNgbProcLsPoints
             (
-                10*patchPointLabels.size(), 
+                10*patchPointLabels.size(),
                 vector::zero
             );
             label nPoints = 0;
@@ -1526,13 +1526,13 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
 
                 for (label i=0; i<curPoints.size(); i++)
                 {
-                    toNgbProcLsPoints[nPoints++] = 
+                    toNgbProcLsPoints[nPoints++] =
                         points[curPoints[i]];
                 }
             }
 
             toNgbProcLsPoints.setSize(nPoints);
-            
+
             {
                 OPstream toNeighbProc
                 (
@@ -1560,7 +1560,7 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
 
             labelList fromNgbProcLsPointStarts(patchPointLabels.size(), 0);
             vectorField fromNgbProcLsPoints;
-                
+
             {
                 IPstream fromNeighbProc
                 (
@@ -1580,11 +1580,11 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
 
             forAll(nonGlobalPatchPoints, pointI)
             {
-                label curPoint = 
+                label curPoint =
                     patchPointLabels[nonGlobalPatchPoints[pointI]];
-                label curNgbPoint = 
+                label curNgbPoint =
                     procPatch.neighbPoints()[nonGlobalPatchPoints[pointI]];
-                
+
                 labelHashSet faceSet;
                 forAll(pointFaces[curPoint], faceI)
                 {
@@ -1635,8 +1635,8 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                 {
                     for
                     (
-                        label i=fromNgbProcLsPointStarts[curNgbPoint]; 
-                        i<fromNgbProcLsPoints.size(); 
+                        label i=fromNgbProcLsPointStarts[curNgbPoint];
+                        i<fromNgbProcLsPoints.size();
                         i++
                     )
                     {
@@ -1647,8 +1647,8 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                 {
                     for
                     (
-                        label i=fromNgbProcLsPointStarts[curNgbPoint]; 
-                        i<fromNgbProcLsPointStarts[curNgbPoint+1]; 
+                        label i=fromNgbProcLsPointStarts[curNgbPoint];
+                        i<fromNgbProcLsPointStarts[curNgbPoint+1];
                         i++
                     )
                     {
@@ -1671,7 +1671,7 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                         (
                             mag
                             (
-                                allPoints[i] 
+                                allPoints[i]
                               - allPointsExt[pI]
                             )
                           < tol
@@ -1824,11 +1824,11 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
 
             Pstream::gatherList(procLsPoints);
             Pstream::scatterList(procLsPoints);
-                
+
             if (curSharedPointIndex != -1)
             {
                 label curPoint = spLabels[curSharedPointIndex];
-                
+
                 label nAllPoints = 0;
                 forAll(procLsPoints, procI)
                 {
@@ -1849,7 +1849,7 @@ void faMesh::calcPointAreaNormalsByQuadricsFit() const
                             (
                                 mag
                                 (
-                                    allPoints[i] 
+                                    allPoints[i]
                                   - procLsPoints[procI][pointI]
                                 )
                               < tol
@@ -1968,9 +1968,9 @@ tmp<edgeScalarField> faMesh::edgeLengthCorrection() const
             IOobject
             (
                 "edgeLengthCorrection",
-                mesh_.pointsInstance(),
+                mesh().pointsInstance(),
                 meshSubDir,
-                mesh_
+                mesh()
             ),
             *this,
             dimless
@@ -2015,8 +2015,7 @@ tmp<edgeScalarField> faMesh::edgeLengthCorrection() const
         }
     }
 
-
-	return tcorrection;
+    return tcorrection;
 }
 
 

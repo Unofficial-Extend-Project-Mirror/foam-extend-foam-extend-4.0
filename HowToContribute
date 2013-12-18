@@ -10,7 +10,7 @@ git Repository:       Henrik Rusche (h.rusche@wikki.co.uk)
                       Martin Beaudoin (beaudoin.martin@ireq.ca)
 
 1. SourceForge Access
-   ~~~~~~~~~~~~~~~~~~ 
+   ~~~~~~~~~~~~~~~~~~
 
    To make contributions to the -extend project, you should first obtain an
    account at SourceForge.net. (SourceForge will suggest a username
@@ -46,7 +46,7 @@ git Repository:       Henrik Rusche (h.rusche@wikki.co.uk)
 
    The article listed above should be considered mandatory reading material
    for those planning to make contributions to the repository. Some links about
-   the general usage of GIT can be found in Section 8. 
+   the general usage of GIT can be found in Section 8.
 
    Please do not hesitate to ask one of the "git Repository" contacts at the top
    of this document if you are not sure about specific operation relative to the git
@@ -81,14 +81,14 @@ git Repository:       Henrik Rusche (h.rusche@wikki.co.uk)
    + git checkout -b my-feature-branch
 
    Feature branches should be named after the fix or feature that they contain,
-   *not* named after the author. There may be more than one author, after all, and 
+   *not* named after the author. There may be more than one author, after all, and
    this information is recorded in the commit anyway. As an example, a bug fix
    to the mesquite package should be committed to a branch named "hotfix/mesquite".
 
    Carefully organized commits and branches, clear commit messages, and well-chosen
    branch names will make it easier for the release committee to review and merge
-   each contribution. 
-           
+   each contribution.
+
    When you have a feature branch that is ready to be merged, push it to the server
    using a command such as this:
 
@@ -125,7 +125,7 @@ git Repository:       Henrik Rusche (h.rusche@wikki.co.uk)
 
    The feature branches provided by users will be merged by the release committee
    into an integration branch called "nextRelease", and then both the local
-   and remote copy of the feature branch will be deleted. The merge will be performed 
+   and remote copy of the feature branch will be deleted. The merge will be performed
    using a "git merge --no-ff" command, which forces the creation of a merge commit
    even in the case where the merge could be accomplished by fast-forward.
    Note that the automated test loop will be run off of this integration branch.
@@ -136,7 +136,7 @@ git Repository:       Henrik Rusche (h.rusche@wikki.co.uk)
    and hotfixes.
 
    Note that hotfixes should be branched off of the master branch and should be merged
-   twice - once into the integration branch and once into the master branch - in order to 
+   twice - once into the integration branch and once into the master branch - in order to
    guarantee that a merge of the integration branch into the master branch can be
    accomplished by a fast-forward.
 

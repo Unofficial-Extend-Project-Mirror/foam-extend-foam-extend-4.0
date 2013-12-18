@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Check for proper number of command line args.
+if [ "$#" -ne 2 ]; then
+  echo "Usage: makeSerialLinks fluidCase solidCase"
+  exit 1 
+fi
+
+cd $1
+cd constant
+ln -s ../../$2/constant solid
+cd ../system
+ln -s ../../$2/system solid
+cd ../0
+ln -s ../../$2/0 solid
+cd ../..

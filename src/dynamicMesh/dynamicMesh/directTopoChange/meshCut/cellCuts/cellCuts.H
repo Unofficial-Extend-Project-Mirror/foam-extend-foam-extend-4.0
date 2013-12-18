@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     Foam::cellCuts
@@ -61,7 +60,7 @@ Description
       - cellAnchorPoints : per cell the vertices on one side which are
         considered the anchor points.
 
-    AnchorPoints: connected loops have to be oriented in the same way to 
+    AnchorPoints: connected loops have to be oriented in the same way to
     be able to grow new internal faces out of the same bottom faces.
     (limitation of the mapping procedure). The loop is cellLoop is oriented
     such that the normal of it points towards the anchorPoints.
@@ -435,7 +434,7 @@ class cellCuts
 
             //- Set orientation of loops
             void orientPlanesAndLoops();
-            
+
             //- top level driver: adressing calculation and loop detection
             void calcLoopsAndAddressing(const labelList& cutCells);
 
@@ -592,7 +591,7 @@ public:
             //- Returns coordinates of points on loop for given cell.
             //  Uses cellLoops_ and edgeWeight_
             pointField loopPoints(const label cellI) const;
-  
+
             //- Invert anchor point selection.
             labelList nonAnchorPoints
             (

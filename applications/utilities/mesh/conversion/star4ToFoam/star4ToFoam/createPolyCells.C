@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
     create cellPolys
@@ -107,10 +106,10 @@ void meshReader::createPolyCells()
         forAll(curNeighbours, neiI)
         {
             label curNei = curNeighbours[neiI];
-        
+
             // get the list of search faces
             const faceList& searchFaces = cFaces[curNei];
-        
+
             forAll(searchFaces, neiFaceI)
             {
                 if (searchFaces[neiFaceI] == curFace)
@@ -122,11 +121,11 @@ void meshReader::createPolyCells()
                     // - attached faces with the opposite normal as the baffle
 
                     label side = 0;
-                    if (curFace[1] == searchFaces[neiFaceI][1]) 
+                    if (curFace[1] == searchFaces[neiFaceI][1])
                     {
                         side = 1;
                     }
-            
+
 #ifdef DEBUG_FACE_ORDERING
                     Info<< "match " << baffleI
                         << " against cell " << curNei
@@ -158,14 +157,14 @@ void meshReader::createPolyCells()
             {
                 label neiCell = baffleCellIds_[baffleI][side];
                 label neiFace = baffleFaceIds_[baffleI][side];
-        
+
                 if (neiCell >= 0 && neiFace >= 0)
                 {
                     cellPolys_[neiCell][neiFace] = cellI;
                 }
             }
         }
-        else 
+        else
         {
             Info<< "drop baffle " << baffleI
                 << " (original cell "
@@ -177,7 +176,7 @@ void meshReader::createPolyCells()
             baffleFaceIds_[baffleI].clear();
         }
     }
-    
+
 #ifdef DEBUG_CELLPOLY
     Info<< "cellPolys_" << cellPolys_ << endl;
     Info<< "baffleFaces_" << baffleFaces_ << endl;
@@ -232,7 +231,7 @@ void meshReader::createPolyCells()
                     label curNei = curNeighbours[neiI];
 
                     // reject neighbours with the lower label. This should
-                    // also reject current cell. 
+                    // also reject current cell.
                     if (curNei > cellI)
                     {
                         // get the list of search faces
@@ -314,7 +313,7 @@ void meshReader::createPolyCells()
 #ifdef DEBUG_CELLPOLY
     Info<< "cellPolys = " << cellPolys_ << endl;
 #endif
-    
+
     // I won't reset the size of internal faces, because more faces will be
     // added in createPolyBoundary()
 }

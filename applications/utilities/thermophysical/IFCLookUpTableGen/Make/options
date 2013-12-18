@@ -9,5 +9,4 @@ EXE_INC = \
 EXE_LIBS = \
     -lspecie \
     -lmeshTools \
-    -lOpenFOAM \
     -lfiniteVolume

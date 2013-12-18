@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -116,7 +115,7 @@ Foam::label Foam::meshCutter::findCutCell
             return cellI;
         }
     }
-    return -1;        
+    return -1;
 }
 
 
@@ -769,7 +768,7 @@ void Foam::meshCutter::setRefinement
 
         // Renumber face to include split edges.
         face newFace(addEdgeCutsToFace(faceI));
-        
+
         // Edge splitting the face. Convert cuts to new vertex numbering.
         const edge& splitEdge = iter();
 
@@ -935,7 +934,7 @@ void Foam::meshCutter::setRefinement
         {
             const labelList& eFaces = mesh().edgeFaces()[edgeI];
 
-            forAll(eFaces, i)    
+            forAll(eFaces, i)
             {
                 label faceI = eFaces[i];
 
@@ -991,7 +990,7 @@ void Foam::meshCutter::setRefinement
                             ", directTopoChange&)"
                         )   << "Problem: edges added to face which does "
                             << " not use a marked cut" << endl
-                            << "faceI:" << faceI << endl    
+                            << "faceI:" << faceI << endl
                             << "face:" << f << endl
                             << "newFace:" << addEdgeCutsToFace(faceI)
                             << abort(FatalError);
@@ -1000,7 +999,7 @@ void Foam::meshCutter::setRefinement
                     // Get (new or original) owner and neighbour of faceI
                     label own, nei;
                     faceCells(cuts, faceI, own, nei);
-                    
+
                     modFace
                     (
                         meshMod,
@@ -1142,7 +1141,7 @@ void Foam::meshCutter::updateMesh(const mapPolyMesh& morphMap)
                     (debug & 2)
                  && (e != newE || newAddedPointI != addedPointI)
                 )
-                {        
+                {
                     Pout<< "meshCutter::updateMesh :"
                         << " updating addedPoints for edge " << e
                         << " from " << addedPointI

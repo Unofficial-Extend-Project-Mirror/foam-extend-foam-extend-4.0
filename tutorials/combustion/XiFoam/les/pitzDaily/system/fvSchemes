@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -17,7 +17,7 @@ FoamFile
 
 ddtSchemes
 {
-    default         backward;
+    default         Euler;
 }
 
 gradSchemes
@@ -28,18 +28,18 @@ gradSchemes
 divSchemes
 {
     default         none;
-    div(phi,U)      Gauss linear;
-    div(phiU,p)     Gauss linear;
-    div(phi,k)      Gauss limitedLinear 0.1;
-    div(phiXi,Xi)   Gauss limitedLinear01 0.1;
-    div(phiXi,Su)   Gauss limitedLinear01 0.1;
-    div(phiSt,b)    Gauss limitedLinear01 0.1;
+    div(phi,U)      Gauss upwind;
+    div(phiU,p)     Gauss upwind;
+    div(phi,k)      Gauss vanLeer;
+    div(phiXi,Xi)   Gauss vanLeer01;
+    div(phiXi,Su)   Gauss vanLeer01;
+    div(phiSt,b)    Gauss vanLeer01;
     div(phi,ft_b_h_hu) Gauss multivariateSelection
     {
-        ft limitedLinear01 0.1;
-        b limitedLinear01 0.1;
-        h limitedLinear 0.1;
-        hu limitedLinear 0.1;
+        ft vanLeer01;
+        b  vanLeer01;
+        h  vanLeer;
+        hu vanLeer;
     };
     div(U)          Gauss linear;
     div((Su*grad(b))) Gauss linear;

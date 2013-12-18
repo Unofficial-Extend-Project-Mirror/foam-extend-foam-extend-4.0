@@ -1,0 +1,88 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of foam-extend.
+
+    foam-extend is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+
+Class
+    tetPointFields
+
+Description
+    Point-based fields for the FEM discretisation.
+
+SourceFiles
+    tetPointFields.C
+
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef tetPointFieldsFwd_H
+#define tetPointFieldsFwd_H
+
+#include "fieldTypes.H"
+#include "tetPointMesh.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+template<class Type>
+class tetPolyPatchField;
+
+template<class Type, template<class> class PatchField, class GeoMesh>
+class GeometricField;
+
+typedef
+GeometricField<scalar, tetPolyPatchField, tetPointMesh> tetPointScalarField;
+
+typedef
+GeometricField<vector, tetPolyPatchField, tetPointMesh> tetPointVectorField;
+
+typedef
+GeometricField<sphericalTensor, tetPolyPatchField, tetPointMesh>
+    tetPointSphericalTensorField;
+
+typedef
+GeometricField<symmTensor, tetPolyPatchField, tetPointMesh>
+    tetPointSymmTensorField;
+
+typedef
+GeometricField<symmTensor4thOrder, tetPolyPatchField, tetPointMesh>
+    tetPointSymmTensor4thOrderField;
+
+typedef
+GeometricField<diagTensor, tetPolyPatchField, tetPointMesh>
+    tetPointDiagTensorField;
+
+typedef
+GeometricField<tensor, tetPolyPatchField, tetPointMesh> tetPointTensorField;
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

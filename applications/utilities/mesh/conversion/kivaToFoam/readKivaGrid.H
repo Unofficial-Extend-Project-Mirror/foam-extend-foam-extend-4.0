@@ -223,7 +223,7 @@ const char* kivaPatchNames[nBCs] =
     "cylinderHead",
     "axis",
     "wedge",
-    "inflow", 
+    "inflow",
     "outflow",
     "presin",
     "presout",

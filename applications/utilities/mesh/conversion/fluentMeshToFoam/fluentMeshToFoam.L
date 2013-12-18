@@ -1,32 +1,31 @@
 /*--------------------------------*- C++ -*----------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
     fluentMeshToFoam
 
 Description
-    Converts a Fluent mesh to OpenFOAM format
+    Converts a Fluent mesh to FOAM format
     including multiple region and region boundary handling.
 
 \*---------------------------------------------------------------------------*/
@@ -40,6 +39,7 @@ Description
 \* ------------------------------------------------------------------------- */
 
 #include "argList.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "IStringStream.H"
 #include "polyMesh.H"
@@ -132,7 +132,7 @@ quote                      \"
 dash                       "-"
 dotColonDash               [.:-]
 
-schemeSpecialInitial       [!$%&*/:<=>?~_^#.]
+schemeSpecialInitial       [!$%&*/\\:<=>?~_^#.@']
 schemeSpecialSubsequent    [.+-]
 schemeSymbol               (({some_space}|{alpha}|{quote}|{schemeSpecialInitial})({alpha}|{quote}|{digit}|{schemeSpecialInitial}|{schemeSpecialSubsequent})*)
 
@@ -142,7 +142,7 @@ integer                    {decDigit}+
 label                      [1-9]{decDigit}*
 hexLabel                   {hexDigit}+
 zeroLabel                  {digit}*
-
+signedInteger              [-+]?{integer}
 word                       ({alpha}|{digit}|{dotColonDash})*
 
 exponent_part              [eE][-+]?{digit}+
@@ -252,11 +252,11 @@ endOfSection               {space}")"{space}
 %}
 
 
- /* ------------------------------------------------------------------------- *\
+ /* ------------------------------------------------------------------------ *\
                             ------ Start Lexing ------
- \* ------------------------------------------------------------------------- */
+ \* ------------------------------------------------------------------------ */
 
- /*                      ------ Reading control header ------                 */
+ /*                     ------ Reading control header ------                 */
 
 {comment} {
         yy_push_state(readComment);
@@ -1773,8 +1773,8 @@ int main(int argc, char *argv[])
 
             for (; cg != cellGroupZoneID.end(); ++cg, ++start, ++end)
             {
-                const word& name=patchNameIDs[cg()];
-                const word& type=patchTypeIDs[cg()];
+                const word& name = patchNameIDs[cg()];
+                const word& type = patchTypeIDs[cg()];
 
                 Info<< "Writing cell set: " << name
                     << " of type " << type << " starting at " << start() - 1

@@ -1,0 +1,61 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+startTime           0;
+
+startFrom           startTime;
+
+endTime             50.0;
+
+stopAt              endTime;
+
+deltaT              0.1;
+
+adjustTimeStep      no;
+
+maxCo               0.8;
+
+writeControl        timeStep;
+
+writeInterval       1;
+
+writeFormat         ascii;
+
+writeCompression    uncompressed;
+
+timeFormat          general;
+
+//timePrecision       15;
+
+//writePrecision      11;
+
+runTimeModifiable   yes;
+
+//functions
+//(
+//    meshFluxes
+//    {
+        // Type of functionObject
+//        type meshFluxes;
+
+        // Where to load it from (if not already in solver)
+//        functionObjectLibs ("libmeshFluxes.so");
+//    }
+//);
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+

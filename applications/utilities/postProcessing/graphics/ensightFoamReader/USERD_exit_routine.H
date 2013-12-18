@@ -5,7 +5,7 @@ void USERD_exit_routine
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_exit_routine" << endl 
+    Info << "Entering: USERD_exit_routine" << endl
         << flush;
 #endif
 

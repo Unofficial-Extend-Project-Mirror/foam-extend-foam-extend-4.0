@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     regionCoupleFvPatch
@@ -41,7 +40,7 @@ SourceFiles
 #define regionCoupleFvPatch_H
 
 #include "coupledFvPatch.H"
-#include "regionCoupleLduInterface.H"
+#include "ggiLduInterface.H"
 #include "regionCouplePolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -58,15 +57,12 @@ class fvMesh;
 class regionCoupleFvPatch
 :
     public coupledFvPatch,
-    public regionCoupleLduInterface
+    public ggiLduInterface
 {
     // Private Data
 
         //- Reference to polyPatch
         const regionCouplePolyPatch& rcPolyPatch_;
-
-        //- Transfer buffer
-        mutable labelField transferBuffer_;
 
 
 protected:
@@ -79,11 +75,8 @@ protected:
         //- Make patch face - neighbour cell distances
         virtual void makeDeltaCoeffs(scalarField&) const;
 
-        //- Return contents of transfer buffer
-        const labelField& transferBuffer() const
-        {
-            return transferBuffer_;
-        }
+        //- Make patch face non-orthogonality correction vectors
+        virtual void makeCorrVecs(vectorField&) const;
 
 
 public:
@@ -98,52 +91,107 @@ public:
         regionCoupleFvPatch(const polyPatch& patch, const fvBoundaryMesh& bm)
         :
             coupledFvPatch(patch, bm),
-            rcPolyPatch_(refCast<const regionCouplePolyPatch>(patch)),
-            transferBuffer_()
+            rcPolyPatch_(refCast<const regionCouplePolyPatch>(patch))
         {}
 
 
     // Destructor
 
-        virtual ~regionCoupleFvPatch()
-        {}
+        virtual ~regionCoupleFvPatch();
 
 
     // Member functions
 
-        //- Return true if coupled
-        virtual bool coupled() const;
+        // Access
 
-        //- Return shadow patch index
-        int shadowIndex() const
-        {
-            return rcPolyPatch_.shadowIndex();
-        }
+            //- Return true if coupled
+            virtual bool coupled() const;
 
-        //- Return shadow region
-        const fvMesh& shadowRegion() const;
+            //- Return shadow patch
+            const fvMesh& shadowRegion() const;
 
-        //- Return shadow patch
-        const regionCoupleFvPatch& shadow() const;
+            //- Return shadow patch
+            const regionCoupleFvPatch& shadow() const;
 
-        //- Interpolate face field
-        template<class Type>
-        tmp<Field<Type> > interpolate(const Field<Type>& pf) const
-        {
-            return rcPolyPatch_.interpolate(pf);
-        }
+            //- Use bridging to fix overlap error in interpolation
+            bool bridgeOverlap() const
+            {
+                return rcPolyPatch_.bridgeOverlap();
+            }
 
-        template<class Type>
-        tmp<Field<Type> > interpolate(const tmp<Field<Type> >& tpf) const
-        {
-            return rcPolyPatch_.interpolate(tpf);
-        }
+            //- Return delta (P to N) vectors across coupled patch
+            virtual tmp<vectorField> delta() const;
 
-        //- Return delta (P to N) vectors across coupled patch
-        virtual tmp<vectorField> delta() const;
+
+        // Interpolation
+
+            //- Interpolate face field
+            template<class Type>
+            tmp<Field<Type> > interpolate(const Field<Type>& pf) const
+            {
+                return rcPolyPatch_.interpolate(pf);
+            }
+
+            template<class Type>
+            tmp<Field<Type> > interpolate(const tmp<Field<Type> >& tpf) const
+            {
+                return rcPolyPatch_.interpolate(tpf);
+            }
+
+            //- Bridge interpolated face field for uncovered faces
+            template<class Type>
+            void bridge
+            (
+                const Field<Type>& bridgeField,
+                Field<Type>& ff
+            ) const
+            {
+                return rcPolyPatch_.bridge(bridgeField, ff);
+            }
 
 
         // Interface transfer functions
+
+            //- Is this the master side?
+            virtual bool master() const;
+
+            //- Is this the fine level?
+            virtual bool fineLevel() const;
+
+            //- Return shadow patch index
+            virtual label shadowIndex() const;
+
+            //- Return shadow interface
+            virtual const ggiLduInterface& shadowInterface() const;
+
+            //- Return zone size
+            virtual label zoneSize() const;
+
+            //- Return zone addressing
+            virtual const labelList& zoneAddressing() const;
+
+            //- Return addressing.  Master side returns own addressing and
+            //  slave side returns addressing from master
+            virtual const labelListList& addressing() const;
+
+            //- Is the patch localised on a single processor
+            virtual bool localParallel() const;
+
+            //- Return weights.  Master side returns own weights and
+            //  slave side returns weights from master
+            virtual const scalarListList& weights() const;
+
+            //- Return face transformation tensor
+            virtual const tensorField& forwardT() const
+            {
+                return coupledFvPatch::forwardT();
+            }
+
+            //- Return neighbour-cell transformation tensor
+            virtual const tensorField& reverseT() const
+            {
+                return coupledFvPatch::reverseT();
+            }
 
             //- Return the values of the given internal data adjacent to
             //  the interface as a field

@@ -18,4 +18,5 @@ EXE_LIBS = \
     -lspecie \
     -llaminarFlameSpeedModels \
     -lfiniteVolume \
-    -llduSolvers
+    -llduSolvers \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

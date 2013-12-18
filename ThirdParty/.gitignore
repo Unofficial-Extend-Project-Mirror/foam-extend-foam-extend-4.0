@@ -1,0 +1,20 @@
+# git-ls-files --others --exclude-from=.git/info/exclude
+# Lines that start with '#' are comments.
+
+# editor and misc backup files - anywhere
+*~
+.*~
+*.bak
+*.bak[0-9][0-9]
+*.orig
+*.orig[0-9][0-9]
+\#*\#
+
+# ignore the build
+rpmBuild/BUILD
+rpmBuild/RPMS
+rpmBuild/rpmDB
+packages
+rpmBuild/tmp
+
+# end-of-file

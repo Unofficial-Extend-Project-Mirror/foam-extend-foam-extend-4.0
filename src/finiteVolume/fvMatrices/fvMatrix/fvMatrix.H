@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     Foam::fvMatrix
@@ -132,6 +131,8 @@ class fvMatrix
         //  for boundary cells
         FieldField<Field, Type> boundaryCoeffs_;
 
+        //- Has assembly been completed?
+        bool assemblyCompleted_;
 
         //- Face flux field for non-orthogonal correction
         mutable GeometricField<Type, fvsPatchField, surfaceMesh>
@@ -276,6 +277,13 @@ public:
                 return source_;
             }
 
+            //- Access to fvBoundary scalar field containing
+            //  pseudo-matrix coeffs for internal cells
+            const FieldField<Field, Type>& internalCoeffs() const
+            {
+                return internalCoeffs_;
+            }
+
             //- fvBoundary scalar field containing pseudo-matrix coeffs
             //  for internal cells
             FieldField<Field, Type>& internalCoeffs()
@@ -283,11 +291,24 @@ public:
                 return internalCoeffs_;
             }
 
+            //- Access to fvBoundary scalar field containing
+            //  pseudo-matrix coeffs for boundary cells
+            const FieldField<Field, Type>& boundaryCoeffs() const
+            {
+                return boundaryCoeffs_;
+            }
+
             //- fvBoundary scalar field containing pseudo-matrix coeffs
             //  for boundary cells
             FieldField<Field, Type>& boundaryCoeffs()
             {
                 return boundaryCoeffs_;
+            }
+
+            //- Return true if matrix assemble has been completed
+            bool assemblyCompleted() const
+            {
+                return assemblyCompleted_;
             }
 
 
@@ -304,6 +325,7 @@ public:
 
         // Matrix completion functionality
 
+            //- Add the diagonal contribution from boundary
             void addBoundaryDiag
             (
                 scalarField& diag,
@@ -312,12 +334,21 @@ public:
 
             void addCmptAvBoundaryDiag(scalarField& diag) const;
 
+            //- Add the source coefficient from boundary
             void addBoundarySource
             (
                 Field<Type>& source,
-                const bool couples=true
+                const bool couples = true
             ) const;
 
+            //- Correct the boundary source by removing the implicit part
+            //  of boundary source for the solving component
+            void correctImplicitBoundarySource
+            (
+                const FieldField<Field, scalar>& bouCoeffsCmpt,
+                scalarField& sourceCmpt,
+                const direction cmpt
+            ) const;
 
         // Operations
 
@@ -357,12 +388,9 @@ public:
             //  alpha is read from controlDict
             void relax();
 
-            //- Manipulate based on a boundary field
-            void boundaryManipulate
-            (
-                typename GeometricField<Type, fvPatchField, volMesh>::
-                    GeometricBoundaryField& values
-            );
+            //- Complete matrix assembly for solution:
+            //  Manipulate based on a boundary field
+            void completeAssembly();
 
             //- Construct and return the solver
             //  Use the given solver controls

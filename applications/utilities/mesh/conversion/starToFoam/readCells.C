@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
     Create intermediate mesh from Prostar files
@@ -125,7 +124,7 @@ void starMesh::addSAMMcell
 {
     // get type, reg and permutation flag
     label typeFlag = labels[21];
-//     label regularityFlag = labels[22];  // Not used. 
+//     label regularityFlag = labels[22];  // Not used.  HJ, 10/Jul/2001
     label permutationFlag = labels[23];
 
     // grab the shape from the table
@@ -239,7 +238,7 @@ void starMesh::readCells()
                 }
 
                 // backward compatibility: number of trailing rubbish in
-                // STAR is unknown. 
+                // STAR is unknown.  HJ, 11/Jun/2001
                 // Fixed to cope with missing \n on last line.
                 readToNl(cellsFile);
             }
@@ -265,7 +264,7 @@ void starMesh::readCells()
     }
 
     starCellLabelLookup_.setSize(maxLabel+1);
-    
+
     // reset point labels to invalid value
     forAll (starCellLabelLookup_, i)
     {
@@ -285,7 +284,7 @@ void starMesh::readCells()
 
             label addOnToCell = 0;
 
-            // reset the labels to -1. Debugging. 
+            // reset the labels to -1. Debugging.
             forAll (labels, i)
             {
                 labels[i] = -1;
@@ -342,7 +341,7 @@ void starMesh::readCells()
                 }
 
                 // backward compatibility: number of trailing rubbish in
-                // STAR is unknown. 
+                // STAR is unknown.
                 readToNl(cellsFile);
 
                 addOnToCell--;
@@ -373,7 +372,7 @@ void starMesh::readCells()
                 {
                     FatalErrorIn("starMesh::readCells()")
                         << "Invalid vertex found in cell " << cellI
-                        << ". STAR cell no: " << lineLabel 
+                        << ". STAR cell no: " << lineLabel
                         << " labels: " << curShapeLabels
                         << abort(FatalError);
                 }

@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
@@ -77,13 +76,13 @@ Foam::bubbleHistory::bubbleHistory
         if (!time_.processorCase())
         {
             mkDir
-            ( 
+            (
                 time_.path()
                /"history"
                /time_.timeName()
             );
-        
-            historyFilePtr_ = 
+
+            historyFilePtr_ =
                 new OFstream
                 (
                     time_.path()
@@ -95,12 +94,12 @@ Foam::bubbleHistory::bubbleHistory
         else
         {
             mkDir
-            ( 
+            (
                 time_.path()/".."/"history"
                /time_.timeName()
             );
-        
-            historyFilePtr_ = 
+
+            historyFilePtr_ =
                 new OFstream
                 (
                     time_.path()/".."
@@ -110,8 +109,8 @@ Foam::bubbleHistory::bubbleHistory
                 );
         }
 
-        (*historyFilePtr_) 
-            << "Time" << tab 
+        (*historyFilePtr_)
+            << "Time" << tab
                 << "Cx" << tab
                 << "Cy" << tab
                 << "Cz" << tab
@@ -139,18 +138,18 @@ Foam::bubbleHistory::bubbleHistory
     }
 
     const fvMesh& mesh = time_.lookupObject<fvMesh>(regionName_);
-    
-    const volScalarField& fluidIndicator = 
+
+    const volScalarField& fluidIndicator =
         mesh.lookupObject<volScalarField>("fluidIndicator");
 
     V0_ = gSum((1 - fluidIndicator.internalField())*mesh.V().field());
 
-    const freeSurface& fs = 
+    const freeSurface& fs =
         mesh.lookupObject<freeSurface>("freeSurfaceProperties");
 
     if (!fs.twoFluids())
     {
-        V0_ = 
+        V0_ =
           - gSum
             (
                 mesh.Cf().boundaryField()[fs.aPatchID()]
@@ -176,10 +175,10 @@ bool Foam::bubbleHistory::start()
     const fvMesh& mesh =
         time_.lookupObject<fvMesh>(regionName_);
 
-    const volScalarField& fluidIndicator = 
+    const volScalarField& fluidIndicator =
         mesh.lookupObject<volScalarField>("fluidIndicator");
 
-    const freeSurface& fs = 
+    const freeSurface& fs =
         mesh.lookupObject<freeSurface>("freeSurfaceProperties");
 
     scalar V = gSum((1 - fluidIndicator.internalField())*mesh.V().field());
@@ -202,7 +201,7 @@ bool Foam::bubbleHistory::start()
         }
     }
 
-    const IOdictionary& mrf = 
+    const IOdictionary& mrf =
         mesh.lookupObject<IOdictionary>("movingReferenceFrame");
 
     dimensionedVector C(mrf.lookup("XF"));
@@ -212,17 +211,14 @@ bool Foam::bubbleHistory::start()
     vector F = fs.totalViscousForce() + fs.totalPressureForce();
 
     vector dragDir;
-    scalar Uref;
 
     if(mag(U.value()) > SMALL)
     {
         dragDir = -U.value()/mag(U.value());
-        Uref = mag(U.value());
     }
     else
     {
         dragDir = fs.g().value()/(mag(fs.g().value()) + SMALL);
-        Uref = SMALL;
     }
 
     scalar dragForce = (dragDir&F);
@@ -233,14 +229,14 @@ bool Foam::bubbleHistory::start()
 
     scalar Ug = -(U.value()&(fs.g().value()/(mag(fs.g().value()) + SMALL)));
 
-    scalar CD = 
+    scalar CD =
         (4.0/3.0)*(fs.rhoFluidA().value() - fs.rhoFluidB().value())
        *mag(fs.g().value())*Deq
        /(fs.rhoFluidA().value()*mag(U.value())*Ug + SMALL);
 
     scalar ag = -(a.value()&(fs.g().value()/(mag(fs.g().value()) + SMALL)));
 
-    scalar CVM = 
+    scalar CVM =
         (fs.rhoFluidA().value() - fs.rhoFluidB().value())*mag(fs.g().value())
        /(fs.rhoFluidA().value()*ag + SMALL)
       - (fs.rhoFluidB().value()/(fs.rhoFluidA().value() + SMALL));
@@ -256,7 +252,7 @@ bool Foam::bubbleHistory::start()
     {
         historyFilePtr_->precision(12);
 
-        (*historyFilePtr_) << time_.value() << tab 
+        (*historyFilePtr_) << time_.value() << tab
             << C.value().x() << tab
             << C.value().y() << tab
             << C.value().z() << tab
@@ -294,10 +290,10 @@ bool Foam::bubbleHistory::execute()
     const fvMesh& mesh =
         time_.lookupObject<fvMesh>(regionName_);
 
-    const volScalarField& fluidIndicator = 
+    const volScalarField& fluidIndicator =
         mesh.lookupObject<volScalarField>("fluidIndicator");
 
-    const freeSurface& fs = 
+    const freeSurface& fs =
         mesh.lookupObject<freeSurface>("freeSurfaceProperties");
 
     scalar V = gSum((1 - fluidIndicator.internalField())*mesh.V().field());
@@ -320,7 +316,7 @@ bool Foam::bubbleHistory::execute()
         }
     }
 
-    const IOdictionary& mrf = 
+    const IOdictionary& mrf =
         mesh.lookupObject<IOdictionary>("movingReferenceFrame");
 
     dimensionedVector C(mrf.lookup("XF"));
@@ -331,17 +327,14 @@ bool Foam::bubbleHistory::execute()
     vector F = fs.totalViscousForce() + fs.totalPressureForce();
 
     vector dragDir;
-    scalar Uref;
 
     if(mag(U.value()) > SMALL)
     {
         dragDir = -U.value()/mag(U.value());
-        Uref = mag(U.value());
     }
     else
     {
         dragDir = fs.g().value()/(mag(fs.g().value()) + SMALL);
-        Uref = SMALL;
     }
 
     scalar dragForce = (dragDir&F);
@@ -352,14 +345,14 @@ bool Foam::bubbleHistory::execute()
 
     scalar Ug = -(U.value()&(fs.g().value()/(mag(fs.g().value()) + SMALL)));
 
-    scalar CD = 
+    scalar CD =
         (4.0/3.0)*(fs.rhoFluidA().value() - fs.rhoFluidB().value())
        *mag(fs.g().value())*Deq
        /(fs.rhoFluidA().value()*mag(U.value())*Ug + SMALL);
 
     scalar ag = -(a.value()&(fs.g().value()/(mag(fs.g().value()) + SMALL)));
 
-    scalar CVM = 
+    scalar CVM =
         (fs.rhoFluidA().value() - fs.rhoFluidB().value())*mag(fs.g().value())
        /(fs.rhoFluidA().value()*ag + SMALL)
       - (fs.rhoFluidB().value()/(fs.rhoFluidA().value() + SMALL));
@@ -375,7 +368,7 @@ bool Foam::bubbleHistory::execute()
     {
         historyFilePtr_->precision(12);
 
-        (*historyFilePtr_) << time_.value() << tab 
+        (*historyFilePtr_) << time_.value() << tab
             << C.value().x() << tab
             << C.value().y() << tab
             << C.value().z() << tab

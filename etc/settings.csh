@@ -1,26 +1,25 @@
 #----------------------------------*-sh-*--------------------------------------
 # =========                 |
-# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+# \\      /  F ield         | foam-extend: Open Source CFD
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright held by original author
+#   \\  /    A nd           | For copyright notice see file Copyright
 #    \\/     M anipulation  |
 #------------------------------------------------------------------------------
 # License
-#     This file is part of OpenFOAM.
+#     This file is part of foam-extend.
 #
-#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     foam-extend is free software: you can redistribute it and/or modify it
 #     under the terms of the GNU General Public License as published by the
-#     Free Software Foundation; either version 2 of the License, or (at your
+#     Free Software Foundation, either version 3 of the License, or (at your
 #     option) any later version.
 #
-#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-#     for more details.
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with OpenFOAM; if not, write to the Free Software Foundation,
-#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
 #     etc/settings.csh
@@ -44,11 +43,6 @@ setenv WM_DIR $WM_PROJECT_DIR/wmake
 setenv WM_LINK_LANGUAGE c++
 setenv WM_OPTIONS $WM_ARCH$WM_COMPILER$WM_PRECISION_OPTION$WM_COMPILE_OPTION
 set path=($WM_DIR $path)
-
-#setenv WM_DECOMP_INC -DCELL_DECOMP
-#setenv WM_DECOMP_LIBS "-lcellDecompFiniteElement -lcellDecompositionMotionSolver"
-setenv WM_DECOMP_INC -DFACE_DECOMP
-setenv WM_DECOMP_LIBS "-lfaceDecompFiniteElement -lfaceDecompositionMotionSolver"
 
 # base configuration
 setenv FOAM_APP $WM_PROJECT_DIR/applications
@@ -101,13 +95,6 @@ case OpenFOAM:
         _foamAddLib $WM_THIRD_PARTY_DIR/mpfr-2.4.1/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
         _foamAddLib $WM_THIRD_PARTY_DIR/gmp-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
     breaksw
-    case Gcc46:
-        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.6.4/platforms/$WM_OPTIONS
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/gmp-5.1.2/platforms/$WM_OPTIONS/etc/gmp-5.1.2.csh
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/mpfr-3.1.2/platforms/$WM_OPTIONS/etc/mpfr-3.1.2.csh
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/mpc-1.0.1/platforms/$WM_OPTIONS/etc/mpc-1.0.1.csh
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.6.4/platforms/$WM_OPTIONS/etc/gcc-4.6.4.csh
-    breaksw
     case Gcc45:
         setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.5.1/platforms/$WM_OPTIONS
         _foamSource  $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.csh
@@ -116,6 +103,7 @@ case OpenFOAM:
         _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.5.1/platforms/$WM_OPTIONS/etc/gcc-4.5.1.csh
     breaksw
     case Gcc44:
+        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS
         _foamSource  $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.csh
         _foamSource  $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.csh
         _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS/etc/gcc-4.4.5.csh
@@ -168,21 +156,29 @@ set mpi_version=unknown
 
 switch ("$WM_MPLIB")
 case OPENMPI:
-    if (-d $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3/platforms/$WM_OPTIONS ) then
-	set mpi_version=openmpi-1.4.3
+    if (-d $WM_THIRD_PARTY_DIR/packages/openmpi-1.6.5/platforms/$WM_OPTIONS ) then
+        set mpi_version=openmpi-1.6.5
 
-	if ($?FOAM_VERBOSE && $?prompt) then
+        if ($?FOAM_VERBOSE && $?prompt) then
+            echo "Using openmpi-1.6.5 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
+        endif
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
+
+    else if (-d $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3/platforms/$WM_OPTIONS ) then
+        set mpi_version=openmpi-1.4.3
+
+        if ($?FOAM_VERBOSE && $?prompt) then
             echo "Using openmpi-1.4.3 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
         endif
-	_foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
 
     else if (-d $WM_THIRD_PARTY_DIR/packages/openmpi-1.5/platforms/$WM_OPTIONS ) then
-	set mpi_version=openmpi-1.5
+        set mpi_version=openmpi-1.5
 
-	if ($?FOAM_VERBOSE && $?prompt) then
+        if ($?FOAM_VERBOSE && $?prompt) then
             echo "Using openmpi-1.5 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
         endif
-	_foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
     endif
 
     setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/$mpi_version
@@ -192,40 +188,40 @@ case OPENMPI:
 case SYSTEMOPENMPI:
     set mpi_version=openmpi-system
 
-    # make sure not the "old" mpi is used 
+    # make sure not the "old" mpi is used
     # Not sure if this is necessary anymore.
     # export OPAL_PREFIX=
 
     # Make sure OPENMPI_BIN_DIR is set and valid
-    if ($?OPENMPI_BIN_DIR != 0 ) then 
+    if ($?OPENMPI_BIN_DIR != 0 ) then
         if (-d "${OPENMPI_BIN_DIR}" ) then
-	    # User defined value specified for OPENMPI_BIN_DIR
-	    #
-	    # WARNING:
-	    #          We assume this path specified by $OPENMPI_BIN_DIR is valid
-	    #          We assume the command mpicc is located somewhere under this path
-	    #          We assume the file mpi.h is located somewhere under this path
-	    #
+        # User defined value specified for OPENMPI_BIN_DIR
+        #
+        # WARNING:
+        #          We assume this path specified by $OPENMPI_BIN_DIR is valid
+        #          We assume the command mpicc is located somewhere under this path
+        #          We assume the file mpi.h is located somewhere under this path
+        #
             #          Otherwise, please double check your openmpi installation, you are
-	    #          probably missing the openmpi runtime and/or development packages
-	    #          available for your system.
-	    #
-	    _foamAddPath $OPENMPI_BIN_DIR
+        #          probably missing the openmpi runtime and/or development packages
+        #          available for your system.
+        #
+        _foamAddPath $OPENMPI_BIN_DIR
          endif
     else
-	# Here, we assume your environment is already set for running
-	# and developping with openmpi.
-	#
-	# Initialize OPENMPI_BIN_DIR using the path to mpicc
+    # Here, we assume your environment is already set for running
+    # and developing with openmpi.
+    #
+    # Initialize OPENMPI_BIN_DIR using the path to mpicc
         set mpicc_cmd=`which mpicc`
-	setenv OPENMPI_BIN_DIR `dirname $mpicc_cmd`
+        setenv OPENMPI_BIN_DIR `dirname $mpicc_cmd`
         unset mpicc_cmd
     endif
 
     # Make sure OPENMPI_LIB_DIR is set
     if ( $?OPENMPI_LIB_DIR == 0 ) then
-	# Initialize OPENMPI_LIB_DIR using the path to mpicc 
-	setenv OPENMPI_LIB_DIR "`mpicc --showme:libdirs`"
+        # Initialize OPENMPI_LIB_DIR using the path to mpicc
+        setenv OPENMPI_LIB_DIR "`mpicc --showme:libdirs`"
     endif
 
     # Make sure the dynamic libraries are accessible
@@ -385,6 +381,23 @@ else
     setenv MPI_BUFFER_SIZE $minBufferSize
 endif
 
+# CUDA library
+# ~~~~~~~~~~~~
+if ( $?CUDA_SYSTEM == 0 && -e /usr/local/cuda-5.5/bin/nvcc ) then
+    setenv CUDA_DIR /usr/local/cuda-5.5
+    setenv CUDA_BIN_DIR $CUDA_DIR/bin
+    setenv CUDA_LIB_DIR $CUDA_DIR/lib64
+    setenv CUDA_INCLUDE_DIR $CUDA_DIR/include
+    setenv CUDA_ARCH sm_20
+endif
+
+if ( $?CUDA_BIN_DIR ) then
+    _foamAddPath $CUDA_BIN_DIR
+endif
+
+if ( $?CUDA_LIB_DIR ) then
+    _foamAddLib $CUDA_LIB_DIR
+endif
 
 # CGAL library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -400,14 +413,14 @@ endif
 
 # Metis library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
-if ( $?METIS_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/metis-5.0pre2/platforms/$WM_OPTIONS/etc/metis-5.0pre2.csh
+if ( $?METIS_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/metis-5.1.0/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/metis-5.1.0/platforms/$WM_OPTIONS/etc/metis-5.1.0.csh
 endif
 
 # ParMetis library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if ( $?PARMETIS_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/ParMetis-3.1.1/platforms/$WM_OPTIONS/etc/ParMetis-3.1.1.csh
+if ( $?PARMETIS_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/parmetis-4.0.3/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/parmetis-4.0.3/platforms/$WM_OPTIONS/etc/parmetis-4.0.3.csh
 endif
 
 # ParMGridGen library if available
@@ -416,7 +429,7 @@ if ( $?PARMGRIDGEN_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS/etc/ParMGridGen-1.0.csh
 endif
 
-# Load Libccmio library 
+# Load Libccmio library
 # ~~~~~~~~~~~~~~~~~~~~~
 if ( $?LIBCCMIO_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1/platforms/$WM_OPTIONS/etc/libccmio-2.6.1.csh
@@ -425,8 +438,8 @@ endif
 
 # Scotch library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if ( $?SCOTCH_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/scotch-5.1.10b/platforms/$WM_OPTIONS/etc/scotch-5.1.10b.csh
+if ( $?SCOTCH_SYSTEM == 0 && -e $WM_THIRD_PARTY_DIR/packages/scotch-6.0.0/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/scotch-6.0.0/platforms/$WM_OPTIONS/etc/scotch-6.0.0.csh
 endif
 
 # Switch on the hoard memory allocator if available
@@ -439,8 +452,8 @@ endif
 
 # cmake
 # ~~~~~
-if ( $?CMAKE_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.11/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.11/platforms/$WM_OPTIONS/etc/cmake-2.8.11.csh
+if ( $?CMAKE_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.12/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.12/platforms/$WM_OPTIONS/etc/cmake-2.8.12.csh
 endif
 
 # Python
@@ -449,18 +462,39 @@ if ( $?PYTHON_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/Python-2.7/platfo
     _foamSource $WM_THIRD_PARTY_DIR/packages/Python-2.7/platforms/$WM_OPTIONS/etc/Python-2.7.csh
 endif
 
+# PyFoam
+# ~~~~~~
+if ( $?PYFOAM_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.6.1/platforms/noarch ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.1/platforms/noarch/etc/PyFoam-0.6.1.csh
+endif
+
+# hwloc
+# ~~~~~
+if ( $?HWLOC_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/hwloc-1.7.2/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.2/platforms/$WM_OPTIONS/etc/hwloc-1.7.2.csh
+endif
+
 # QT
 # ~~~~~
 if ( $?QT_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-opensource-src-4.7.4/platforms/$WM_OPTIONS )then
     _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.4/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.7.4.csh
+#if ( $?QT_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-opensource-src-4.7.0/platforms/$WM_OPTIONS )then
+#    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.0/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.7.0.csh
 endif
 
 # PARAVIEW
 # ~~~~~
-if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.12.0/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.12.0/platforms/$WM_OPTIONS/etc/ParaView-3.12.0.csh
+if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-4.0.1/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-4.0.1/platforms/$WM_OPTIONS/etc/ParaView-4.0.1.csh
+
+#if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.14.1/platforms/$WM_OPTIONS ) then
+#   _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.14.1/platforms/$WM_OPTIONS/etc/ParaView-3.14.1.csh
+
 #if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.8.1/platforms/$WM_OPTIONS ) then
 #    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.csh
+
+#if ( $?PARAVIEW_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/ParaView-3.14.1/platforms/$WM_OPTIONS ) then
+#    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.14.1/platforms/$WM_OPTIONS/etc/ParaView-3.14.1.csh
 endif
 
 if ( $WM_ARCH == "darwinIntel" || $WM_ARCH == "darwinIntel64" ) then

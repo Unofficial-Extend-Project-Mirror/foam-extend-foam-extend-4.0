@@ -1,0 +1,89 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    location    "0";
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    outside
+    {
+//       type fixedDisplacement;
+//       value uniform ( 0 0 0 );
+
+//       type fixedRotation;
+//       rotationAngle 1;
+//       rotationAxis (0 0 1);
+//       rotationOrigin (0 0 0);
+//       value uniform ( 0 0 0 );
+
+      type timeVaryingFixedRotation;
+      rotationAxis (0 0 1);
+      rotationOrigin (0 0 0);
+      fileName "$FOAM_CASE/constant/timeVsOutsideAngle";
+      outOfBounds clamp;
+      value uniform ( 0 0 0 );
+
+//        type            solidTractionOrtho;
+//        field           U;
+//        traction        uniform ( 0 0 0 );
+//        pressure        uniform 0;
+//        value           uniform (0 0 0);
+    }
+
+    inside
+    {
+//       type timeVaryingFixedRotation;
+//       rotationAngle 1;
+//       rotationAxis (0 0 1);
+//       rotationOrigin (0 0 0);
+//       fileName "$FOAM_CASE/constant/timeVsInsideAngle";
+//       outOfBounds clamp;
+//       value uniform ( 0 0 0 );
+
+//       type fixedRotation;
+//       rotationAngle 1;
+//       rotationAxis (0 0 1);
+//       rotationOrigin (0 0 0);
+//       value uniform ( 0 0 0 );
+
+      type            solidTraction;
+      traction        uniform ( 0 0 0 );
+      pressure        uniform 1e6;
+      nonLinear       updatedLagrangian;
+      orthotropic     yes;
+      value           uniform (0 0 0);
+    }
+
+    front
+    {
+      type empty;
+//        type            solidTractionOrtho;
+//        field           U;
+//        traction        uniform ( 0 0 0 );
+//        pressure        uniform 0;
+//        value           uniform (0 0 0);
+    }
+
+    back
+    {
+        type            empty;
+    }
+}
+
+// ************************************************************************* //

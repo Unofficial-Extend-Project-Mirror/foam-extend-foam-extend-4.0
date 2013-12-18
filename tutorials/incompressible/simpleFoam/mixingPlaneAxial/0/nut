@@ -1,0 +1,74 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      nut;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -1 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    outflow
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    inflow
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    upstreamPerio1
+    {
+        type            cyclicGgi;
+        value           uniform 0;
+    }
+    upstreamPerio2
+    {
+        type            cyclicGgi;
+        value           uniform 0;
+    }
+    upstreamMixingPlanePatch
+    {
+        type            mixingPlane;
+        value           uniform 0;
+    }
+    downstreamMixingPlanePatch
+    {
+        type            mixingPlane;
+        value           uniform 0;
+    }
+    downstreamWall
+    {
+        type            symmetryPlane;
+    }
+    upstreamWall
+    {
+        type            symmetryPlane;
+    }
+    downstreamPerio1
+    {
+        type            cyclicGgi;
+        value           uniform 0;
+    }
+    downstreamPerio2
+    {
+        type            cyclicGgi;
+        value           uniform 0;
+    }
+}
+
+// ************************************************************************* //

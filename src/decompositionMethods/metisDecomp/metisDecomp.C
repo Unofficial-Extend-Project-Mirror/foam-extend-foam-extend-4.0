@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -62,9 +61,6 @@ Foam::label Foam::metisDecomp::decompose
     List<int>& finalDecomp
 )
 {
-    // C style numbering
-    int numFlag = 0;
-
     // Method of decomposition
     // recursive: multi-level recursive bisection (default)
     // k-way: multi-level k-way
@@ -73,7 +69,8 @@ Foam::label Foam::metisDecomp::decompose
     int numCells = xadj.size()-1;
 
     // decomposition options. 0 = use defaults
-    List<int> options(5, 0);
+    idx_t options[METIS_NOPTIONS];
+    METIS_SetDefaultOptions(options);
 
     // processor weights initialised with no size, only used if specified in
     // a file
@@ -142,18 +139,24 @@ Foam::label Foam::metisDecomp::decompose
                 << nl << endl;
         }
 
-        if (metisCoeffs.readIfPresent("options", options))
+        List<int> mOptions;
+        if (metisCoeffs.readIfPresent("options", mOptions))
         {
-            if (options.size() != 5)
+            if (mOptions.size() != METIS_NOPTIONS)
             {
                 FatalErrorIn("metisDecomp::decompose()")
                     << "Number of options in metisCoeffs in dictionary : "
                     << decompositionDict_.name()
-                    << " should be 5"
+                    << " should be " << METIS_NOPTIONS
                     << exit(FatalError);
             }
 
-            Info<< "metisDecomp : Using Metis options     " << options
+            forAll(mOptions, i)
+            {
+                options[i] = mOptions[i];
+            }
+
+            Info<< "metisDecomp : Using Metis options     " << mOptions
                 << nl << endl;
         }
 
@@ -207,96 +210,57 @@ Foam::label Foam::metisDecomp::decompose
     int edgeCut = 0;
 
     // Vertex weight info
-    int wgtFlag = 0;
     int* vwgtPtr = NULL;
     int* adjwgtPtr = NULL;
 
     if (cellWeights.size())
     {
         vwgtPtr = cellWeights.begin();
-        wgtFlag += 2;       // Weights on vertices
     }
     if (faceWeights.size())
     {
         adjwgtPtr = faceWeights.begin();
-        wgtFlag += 1;       // Weights on edges
     }
+
+    int one = 1;
 
     if (method == "recursive")
     {
-        if (processorWeights.size())
-        {
-            METIS_WPartGraphRecursive
-            (
-                &numCells,         // num vertices in graph
-                const_cast<List<int>&>(xadj).begin(),   // indexing into adjncy
-                const_cast<List<int>&>(adjncy).begin(), // neighbour info
-                vwgtPtr,           // vertexweights
-                adjwgtPtr,         // no edgeweights
-                &wgtFlag,
-                &numFlag,
-                &nProcs,
-                processorWeights.begin(),
-                options.begin(),
-                &edgeCut,
-                finalDecomp.begin()
-            );
-        }
-        else
-        {
-            METIS_PartGraphRecursive
-            (
-                &numCells,         // num vertices in graph
-                const_cast<List<int>&>(xadj).begin(),   // indexing into adjncy
-                const_cast<List<int>&>(adjncy).begin(), // neighbour info
-                vwgtPtr,           // vertexweights
-                adjwgtPtr,         // no edgeweights
-                &wgtFlag,
-                &numFlag,
-                &nProcs,
-                options.begin(),
-                &edgeCut,
-                finalDecomp.begin()
-            );
-        }
+        METIS_PartGraphRecursive
+        (
+            &numCells,         // num vertices in graph
+            &one,
+            const_cast<List<int>&>(xadj).begin(),   // indexing into adjncy
+            const_cast<List<int>&>(adjncy).begin(), // neighbour info
+            vwgtPtr,           // vertexweights
+            NULL,
+            adjwgtPtr,         // no edgeweights
+            &nProcs,
+            processorWeights.begin(),
+            NULL,
+            options,
+            &edgeCut,
+            finalDecomp.begin()
+        );
     }
     else
     {
-        if (processorWeights.size())
-        {
-            METIS_WPartGraphKway
-            (
-                &numCells,         // num vertices in graph
-                const_cast<List<int>&>(xadj).begin(),   // indexing into adjncy
-                const_cast<List<int>&>(adjncy).begin(), // neighbour info
-                vwgtPtr,           // vertexweights
-                adjwgtPtr,         // no edgeweights
-                &wgtFlag,
-                &numFlag,
-                &nProcs,
-                processorWeights.begin(),
-                options.begin(),
-                &edgeCut,
-                finalDecomp.begin()
-            );
-        }
-        else
-        {
-            METIS_PartGraphKway
-            (
-                &numCells,         // num vertices in graph
-                const_cast<List<int>&>(xadj).begin(),   // indexing into adjncy
-                const_cast<List<int>&>(adjncy).begin(), // neighbour info
-                vwgtPtr,           // vertexweights
-                adjwgtPtr,         // no edgeweights
-                &wgtFlag,
-                &numFlag,
-                &nProcs,
-                options.begin(),
-                &edgeCut,
-                finalDecomp.begin()
-            );
-        }
+        METIS_PartGraphKway
+        (
+            &numCells,         // num vertices in graph
+            &one,
+            const_cast<List<int>&>(xadj).begin(),   // indexing into adjncy
+            const_cast<List<int>&>(adjncy).begin(), // neighbour info
+            vwgtPtr,           // vertexweights
+            NULL,
+            adjwgtPtr,         // no edgeweights
+            &nProcs,
+            processorWeights.begin(),
+            NULL,
+            options,
+            &edgeCut,
+            finalDecomp.begin()
+        );
     }
 
     return edgeCut;

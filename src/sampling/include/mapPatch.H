@@ -49,7 +49,7 @@
              )
          );
 
-         U.boundaryField()[targetPatchNumber] == 
+         U.boundaryField()[targetPatchNumber] ==
          toPatchInter.pointToFaceInterpolate
          (
              interPatch.pointInterpolate
@@ -62,7 +62,7 @@
          );
 
 */
-          
+
         scalar Q = sum
         (
             mesh.Sf().boundaryField()[targetPatchNumber]
@@ -74,11 +74,11 @@
             mesh.Sf().boundaryField()[targetPatchNumber] &
             Ubar.value()
         );
-                
+
         U.boundaryField()[targetPatchNumber] ==
             U.boundaryField()[targetPatchNumber] * (Qbar/Q);
-        
-        Info << "Mass flux correction factor: " << (Qbar/Q) << endl; 
+
+        Info << "Mass flux correction factor: " << (Qbar/Q) << endl;
 
         phi.boundaryField()[targetPatchNumber] ==
         (

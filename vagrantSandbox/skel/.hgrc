@@ -1,0 +1,35 @@
+[ui]
+merge = emacs
+editor = emacs
+
+[extensions]
+color =
+fetch =
+graphlog =
+hgk =
+keyword =
+pager =
+transplant =
+purge =
+rebase =
+bookmarks =
+extdiff =
+interhg =
+highlight =
+progress =
+
+[diff]
+git=1
+nodates=1
+
+[pager]
+pager = LESS='FSRX' less
+attend = help,annotate, cat, diff, export, glog, log, qdiff, incoming, outgoing,interdiff,slog,rlog
+
+[merge-tools]
+emacs.args = -q --eval "(require 'ediff)" --eval "(setq ediff-window-setup-function 'ediff-setup-windows-plain)" --eval "(add-hook 'ediff-quit-hook 'save-buffers-kill-emacs)" --eval "(ediff-merge-with-ancestor \""$local"\" \""$other"\" \""$base"\" nil \""$output"\")"
+
+[alias]
+slog = log --template '{rev}:{node|short} {date|age} {author|email}: {desc|firstline}\n'
+rlog = log -r : --template '{rev}:{node|short} {date|shortdate} {author|user}:       Statistics: {diffstat}\n{desc}\n\n'
+

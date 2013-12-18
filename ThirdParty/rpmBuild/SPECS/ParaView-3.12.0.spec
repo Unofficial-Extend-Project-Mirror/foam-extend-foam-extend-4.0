@@ -1,26 +1,25 @@
 #------------------------------------------------------------------------------
 # =========                 |
-# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+# \\      /  F ield         | foam-extend: Open Source CFD
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright held by original author
+#   \\  /    A nd           | For copyright notice see file Copyright
 #    \\/     M anipulation  |
 #------------------------------------------------------------------------------
 # License
-#     This file is part of OpenFOAM.
+#     This file is part of foam-extend.
 #
-#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     foam-extend is free software: you can redistribute it and/or modify it
 #     under the terms of the GNU General Public License as published by the
-#     Free Software Foundation; either version 2 of the License, or (at your
+#     Free Software Foundation, either version 3 of the License, or (at your
 #     option) any later version.
 #
-#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-#     for more details.
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with OpenFOAM; if not, write to the Free Software Foundation,
-#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
 #     RPM spec file for ParaView-3.12.0
@@ -46,7 +45,7 @@
 
 # Will install the package directly $WM_THIRD_PARTY_DIR
 #   Some comments about package relocation:
-#   By using this prefix for the Prefix:  parameter in thi file, you will make this 
+#   By using this prefix for the Prefix:  parameter in this file, you will make this 
 #   package relocatable. 
 #
 #   This is fine, as long as your software is itself relocatable.
@@ -73,11 +72,12 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://www.paraview.org/files/v3.12/
+URL:            http://www.paraview.org/files/v3.12/
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
-Patch0:                 ParaView-3.12.0.patch_darwin
+Patch0:         ParaView-3.12.0.patch_darwin
+Patch1:         paraview-gcc47.patch
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -108,6 +108,8 @@ Patch0:                 ParaView-3.12.0.patch_darwin
 %ifos darwin
 %patch0 -p1
 %endif
+
+%patch1 -p1
 
 %build
 #
@@ -164,6 +166,16 @@ Patch0:                 ParaView-3.12.0.patch_darwin
     addCMakeVariable  QT_QMAKE_EXECUTABLE:FILEPATH=%{_qmakePath}
 
     echo "CMAKE_VARIABLES: $CMAKE_VARIABLES"
+
+%ifos darwin
+    # For Mac OSX:
+    # The configuration of Paraview will be using the environment variable MACOSX_DEPLOYMENT_TARGET.
+    # This variable was initialized using 'sw_vers -productVersion' in etc/bashrc.
+    # We need to get rid of the revision number from this string. eg turn "10.7.5" into "10.7"
+    v=( ${MACOSX_DEPLOYMENT_TARGET//./ } )
+    export MACOSX_DEPLOYMENT_TARGET="${v[0]}.${v[1]}"
+    echo "Resetting MACOSX_DEPLOYMENT_TARGET to ${MACOSX_DEPLOYMENT_TARGET}"
+%endif
 
     mkdir -p ./buildObj
     cd ./buildObj

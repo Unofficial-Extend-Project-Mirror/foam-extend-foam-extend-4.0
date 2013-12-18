@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -95,7 +94,7 @@ greyDiffusiveRadiationMixedFvPatchScalarField
         // No value given. Restart as fixedValue b.c.
 
         const scalarField& Tp =
-            patch().lookupPatchField<volScalarField, scalar>(TName_);
+            lookupPatchField<volScalarField, scalar>(TName_);
 
         refValue() =
             emissivity_*4.0*radiation::sigmaSB.value()*pow4(Tp)
@@ -145,7 +144,7 @@ updateCoeffs()
     }
 
     const scalarField& Tp =
-        patch().lookupPatchField<volScalarField, scalar>(TName_);
+        lookupPatchField<volScalarField, scalar>(TName_);
 
     const radiationModel& radiation =
         db().lookupObject<radiationModel>("radiationProperties");
@@ -174,7 +173,7 @@ updateCoeffs()
     radiativeIntensityRay& ray =
         const_cast<radiativeIntensityRay&>(dom.IRay(rayId));
 
-    ray.Qr().boundaryField()[patchI] += Iw*(-n & ray.dAve());
+    ray.Qr().boundaryField()[patchI] += Iw*(n & ray.dAve());
 
     forAll(Iw, faceI)
     {

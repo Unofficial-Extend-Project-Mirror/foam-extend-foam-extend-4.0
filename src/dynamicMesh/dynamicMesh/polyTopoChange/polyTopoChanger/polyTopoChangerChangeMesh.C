@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
     Change topology of a polyMesh and create mesh-to-mesh mapping information
@@ -91,7 +90,7 @@ bool Foam::polyTopoChanger::reorderCoupledPatches
 
     // faceMap = identity(faces.size());
     // faceMap for boundary faces will be forwarded to polyPatch::order(...)
-    for(label i=0; i<patchStarts[0]; i++)
+    for (label i = 0; i < patchStarts[0]; i++)
     {
         faceMap[i] = i;
     }
@@ -459,7 +458,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
         cfLabels(cells.size() + ref.addedCells().size());
 
     // Insert untouched internal faces
-    for(label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
+    for (label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
     {
         if (!removedFaces.found(faceI))
         {
@@ -1014,8 +1013,10 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
                 )   << "Face " << faceI << " in the new mesh is not "
                     << "mapped correctly." << nl
                     << "It uses a removed or a non-existing vertex or "
-                    << "has been skipped ." << nl
-                    << "Face before mapping: " << oldFace << nl
+                    << "has been skipped." << nl
+                    << "Face before mapping: " << oldFace << " with points "
+                    << oldFace.points(newPointsZeroVol) << nl
+                    << mesh.allPoints().size() << nl
                     << "Face after mapping: " << renumberedFace << nl
                     << "Max new vertex index: "
                     << newPointsZeroVol.size() - 1 << "." << nl
@@ -1098,6 +1099,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
 
             if (rotate != 0)
             {
+                Info<< "Rotating face" << endl;
                 newFaces[faceI] = rotateFace(newFaces[faceI], rotate);
             }
         }

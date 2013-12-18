@@ -1,0 +1,103 @@
+tetPolyMesh           = tetPolyMesh
+tetPolyBoundaryMesh   = $(tetPolyMesh)/tetPolyBoundaryMesh
+tetPolyPatches        = $(tetPolyMesh)/tetPolyPatches
+tetPolyPatch          = $(tetPolyPatches)/tetPolyPatch
+faceTetPolyPatch      = $(tetPolyPatches)/faceTetPolyPatch
+basicTetPolyPatches   = $(tetPolyPatches)/basic
+constraintTetPolyPatches = $(tetPolyPatches)/constraint
+derivedTetPolyPatches = $(tetPolyPatches)/derived
+coupledTetPolyPatch   = $(basicTetPolyPatches)/coupled
+coupledFaceTetPolyPatch = $(basicTetPolyPatches)/coupledFace
+emptyTetPolyPatch     = $(constraintTetPolyPatches)/empty
+symmetryTetPolyPatch  = $(constraintTetPolyPatches)/symmetry
+wedgeTetPolyPatch     = $(constraintTetPolyPatches)/wedge
+processorTetPolyPatch = $(constraintTetPolyPatches)/processor
+ggiTetPolyPatch       = $(constraintTetPolyPatches)/ggi
+cyclicGgiTetPolyPatch = $(constraintTetPolyPatches)/cyclicGgi
+mixingPlaneTetPolyPatch = $(constraintTetPolyPatches)/mixingPlane
+globalTetPolyPatch    = $(constraintTetPolyPatches)/global
+wallTetPolyPatch      = $(derivedTetPolyPatches)/wall
+
+MapTetFemFields       = $(tetPolyMesh)/MapTetFemFields
+
+tetPolyPatchInterpolation = tetPolyPatchInterpolation
+
+$(tetPolyPatch)/tetPolyPatch.C
+$(faceTetPolyPatch)/faceTetPolyPatch.C
+$(faceTetPolyPatch)/newFaceTetPolyPatch.C
+$(coupledTetPolyPatch)/coupledTetPolyPatch.C
+$(emptyTetPolyPatch)/emptyTetPolyPatch.C
+$(symmetryTetPolyPatch)/symmetryTetPolyPatch.C
+$(wedgeTetPolyPatch)/wedgeTetPolyPatch.C
+$(coupledFaceTetPolyPatch)/coupledFaceTetPolyPatch.C
+$(processorTetPolyPatch)/processorTetPolyPatchM.C
+$(processorTetPolyPatch)/calcProcessorTetPolyPatchAddr.C
+$(processorTetPolyPatch)/calcProcessorTetPolyPatchPointAddr.C
+$(ggiTetPolyPatch)/ggiTetPolyPatch.C
+$(cyclicGgiTetPolyPatch)/cyclicGgiTetPolyPatch.C
+$(mixingPlaneTetPolyPatch)/mixingPlaneTetPolyPatch.C
+$(globalTetPolyPatch)/globalTetPolyPatch.C
+$(globalTetPolyPatch)/calcGlobalTetPolyPatchAddr.C
+$(wallTetPolyPatch)/wallTetPolyPatch.C
+$(tetPolyBoundaryMesh)/tetPolyBoundaryMesh.C
+$(tetPolyMesh)/tetPolyMeshLduAddressing.C
+$(tetPolyMesh)/tetPolyMesh.C
+$(tetPolyMesh)/calcTetPolyMeshGeometry.C
+$(tetPolyMesh)/calcTetPolyMeshAddressing.C
+$(tetPolyMesh)/addParallelPointPatch.C
+$(tetPolyMesh)/calcTetPolyMeshParPointData.C
+
+$(MapTetFemFields)/tetPointMapper.C
+$(MapTetFemFields)/tetPolyPatchMapper.C
+$(tetPolyPatchInterpolation)/tetPolyPatchInterpolation.C
+
+tetPolyPatchFields = fields/tetPolyPatchFields
+$(tetPolyPatchFields)/tetPolyPatchField/tetPolyPatchFields.C
+
+basicTetPolyPatchFields = $(tetPolyPatchFields)/basic
+$(basicTetPolyPatchFields)/calculated/calculatedTetPolyPatchFields.C
+$(basicTetPolyPatchFields)/coupled/coupledTetPolyPatchFields.C
+$(basicTetPolyPatchFields)/coupledFace/coupledFaceTetPolyPatchFields.C
+$(basicTetPolyPatchFields)/generic/genericTetPolyPatchFields.C
+$(basicTetPolyPatchFields)/value/valueTetPolyPatchFields.C
+$(basicTetPolyPatchFields)/fixedValue/fixedValueTetPolyPatchFields.C
+$(basicTetPolyPatchFields)/mixed/mixedTetPolyPatchFields.C
+$(basicTetPolyPatchFields)/zeroGradient/zeroGradientTetPolyPatchFields.C
+
+constraintTetPolyPatchFields = $(tetPolyPatchFields)/constraint
+$(constraintTetPolyPatchFields)/empty/emptyTetPolyPatchFields.C
+$(constraintTetPolyPatchFields)/wedge/wedgeTetPolyPatchFields.C
+$(constraintTetPolyPatchFields)/symmetry/symmetryTetPolyPatchFields.C
+$(constraintTetPolyPatchFields)/processor/processorTetPolyPatchFields.C
+
+derivedTetPolyPatchFields = $(tetPolyPatchFields)/derived
+$(derivedTetPolyPatchFields)/global/globalTetPolyPatchFields.C
+$(derivedTetPolyPatchFields)/componentMixed/componentMixedTetPolyPatchVectorField.C
+$(derivedTetPolyPatchFields)/oscillatingFixedValue/oscillatingFixedValueTetPolyPatchFields.C
+$(derivedTetPolyPatchFields)/timeVaryingUniformFixedValue/timeVaryingUniformFixedValueTetPolyPatchFields.C
+$(derivedTetPolyPatchFields)/slip/slipTetPolyPatchFields.C
+
+elementPatchFields = fields/elementPatchFields
+$(elementPatchFields)/elementPatchField/elementPatchFields.C
+
+basicElementPatchFields = $(elementPatchFields)/basic
+$(basicElementPatchFields)/calculated/calculatedElementPatchFields.C
+$(basicElementPatchFields)/coupled/coupledElementPatchFields.C
+$(basicElementPatchFields)/coupledFace/coupledFaceElementPatchFields.C
+$(basicElementPatchFields)/value/valueElementPatchFields.C
+
+constraintElementPatchFields = $(elementPatchFields)/constraint
+$(constraintElementPatchFields)/empty/emptyElementPatchFields.C
+$(constraintElementPatchFields)/wedge/wedgeElementPatchFields.C
+$(constraintElementPatchFields)/symmetry/symmetryElementPatchFields.C
+$(constraintElementPatchFields)/processor/processorElementPatchFields.C
+$(constraintElementPatchFields)/global/globalElementPatchFields.C
+
+
+fields/tetPointFields/tetPointFields.C
+fields/elementFields/elementFields.C
+
+tetFemMatrix/tetFemScalarMatrix.C
+tetFemMatrix/tetFemMatrices.C
+
+LIB = $(FOAM_LIBBIN)/libtetFiniteElement

@@ -1,0 +1,132 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    location    "0";
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    topBrickUp
+    {
+      type            timeVaryingFixedDisplacement;
+      outOfBounds     clamp;
+      fileName        "$FOAM_CASE/constant/timeVsTopDisp";
+      value           uniform (0 0 0);
+    }
+
+    topBrickDown
+    {
+        type                 solidContact;
+	master               yes;
+	contactActive        yes;
+	rigidMaster          yes;
+	shadowPatch          bottomBrickUp;
+	interpolationMethod  ggi;
+	//interpolationMethod  patchToPatch;
+	projectionAlgo       visible;
+	projectionDir        contactSphere;
+	correctionFrequency  50;
+	normalContactModel    dirichletNeumann;
+	dirichletNeumannNormalModelDict
+	  {
+	    relaxationFactor      0.9;
+	    contactGapTol         1e-10;
+	    limitPenetration      no;
+	    penetrationLimit      -0.03;
+	    limitPressure         no;
+	    pressureLimit         1e9;
+	    correctMissedVertices no;
+	    distanceMethod        point;
+	    aitkenRelaxation      no;
+	    infoFrequency         10;
+	    oscillationCorrection yes;
+	    smoothingSteps        1;	
+	  }
+	//frictionContactModel   frictionless;
+	frictionContactModel   dirichletNeumann;
+	dirichletNeumannFrictionModelDict
+	  {
+	    relaxationFactor      0.2;
+	    infoFrequency         10;
+	    oscillationCorrection yes;
+	    smoothingSteps        1;	
+	
+	    frictionLaw           coulomb;
+	    frictionLawDict
+	      {
+		frictionCoeff         0.01;
+	      }
+	  }
+	value                uniform (0 0 0);
+    }
+
+    bottomBrickUp
+    {
+        type                 solidContact;
+	master               no;
+	contactActive        yes;
+	shadowPatch          topBrickDown;
+        value                uniform (0 0 0);
+    }
+
+    bottomBrickDown
+    {
+        type            fixedDisplacement;
+        value           uniform (0 0 0);
+    }
+
+    bottomBrickLeft
+    {
+        type            solidTraction;
+        traction        uniform ( 0 0 0 );
+        pressure        uniform 0;
+        value           uniform (0 0 0);
+    }
+
+    bottomBrickRight
+    {
+        type            solidTraction;
+        traction        uniform ( 0 0 0 );
+        pressure        uniform 0;
+        value           uniform (0 0 0);
+    }
+    topBrickLeft
+    {
+        type            solidTraction;
+        traction        uniform ( 0 0 0 );
+        pressure        uniform 0;
+        value           uniform (0 0 0);
+    }
+    topBrickRight
+    {
+        type            solidTraction;
+	traction        uniform ( 0 0 0 );
+        pressure        uniform 0;
+        value           uniform (0 0 0);
+    }
+    back
+    {
+        type            empty;
+    }
+    front
+    {
+        type            empty;
+    }
+}
+
+// ************************************************************************* //

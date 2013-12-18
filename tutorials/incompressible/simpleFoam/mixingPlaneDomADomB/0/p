@@ -1,0 +1,85 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "2000";
+    object      pFluxAvg;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -2 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    bladeDomB
+    {
+        type            zeroGradient;
+    }
+    bladeDomA
+    {
+        type            zeroGradient;
+    }
+    outletDomB
+    {
+        type            fixedValue;
+        value           uniform 0;
+    }
+    inletDomA
+    {
+        type            zeroGradient;
+    }
+    outletDomA
+    {
+        type            mixingPlane;
+        fluxAveraging   false;
+        surfaceAveraging false;
+        value           uniform 0;
+    }
+    inletDomB
+    {
+        type            mixingPlane;
+        fluxAveraging   false;
+        surfaceAveraging false;
+        value           uniform 0;
+    }
+    ggi1DomB
+    {
+        type            ggi;
+    }
+    ggi1DomA
+    {
+        type            ggi;
+    }
+    ggi2DomB
+    {
+        type            ggi;
+    }
+    ggi2DomA
+    {
+        type            ggi;
+    }
+    topAndBottom
+    {
+        type            empty;
+    }
+    cyclicDomA
+    {
+        type            cyclic;
+    }
+    cyclicDomB
+    {
+        type            cyclic;
+    }
+}
+
+// ************************************************************************* //

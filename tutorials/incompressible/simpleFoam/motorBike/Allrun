@@ -3,6 +3,8 @@
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
 runApplication blockMesh
-runApplication snappyHexMesh -overwrite
+runApplication snappyHexMesh
+\rm -rf constant/polyMesh
+\mv 3/polyMesh constant
+\rm -rf 1 2 3
 runApplication simpleFoam
-

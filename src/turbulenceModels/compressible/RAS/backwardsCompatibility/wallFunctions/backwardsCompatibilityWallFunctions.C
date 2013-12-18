@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -46,14 +45,15 @@ namespace compressible
 tmp<volScalarField> autoCreateAlphat
 (
     const word& fieldName,
-    const fvMesh& mesh
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 {
     IOobject alphatHeader
     (
         fieldName,
         mesh.time().timeName(),
-        mesh,
+        obj,
         IOobject::MUST_READ,
         IOobject::NO_WRITE,
         false
@@ -94,7 +94,7 @@ tmp<volScalarField> autoCreateAlphat
                 (
                     fieldName,
                     mesh.time().timeName(),
-                    mesh,
+                    obj,
                     IOobject::NO_READ,
                     IOobject::NO_WRITE,
                     false
@@ -113,17 +113,28 @@ tmp<volScalarField> autoCreateAlphat
 }
 
 
-tmp<volScalarField> autoCreateMut
+tmp<volScalarField> autoCreateAlphat
 (
     const word& fieldName,
     const fvMesh& mesh
+)
+{
+    return autoCreateAlphat(fieldName, mesh, mesh);
+}
+
+
+tmp<volScalarField> autoCreateMut
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 {
     IOobject mutHeader
     (
         fieldName,
         mesh.time().timeName(),
-        mesh,
+        obj,
         IOobject::MUST_READ,
         IOobject::NO_WRITE,
         false
@@ -164,7 +175,7 @@ tmp<volScalarField> autoCreateMut
                 (
                     fieldName,
                     mesh.time().timeName(),
-                    mesh,
+                    obj,
                     IOobject::NO_READ,
                     IOobject::NO_WRITE,
                     false
@@ -183,17 +194,28 @@ tmp<volScalarField> autoCreateMut
 }
 
 
-tmp<volScalarField> autoCreateLowReMut
+tmp<volScalarField> autoCreateMut
 (
     const word& fieldName,
     const fvMesh& mesh
+)
+{
+    return autoCreateMut(fieldName, mesh, mesh);
+}
+
+
+tmp<volScalarField> autoCreateLowReMut
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
 )
 {
     IOobject mutHeader
     (
         fieldName,
         mesh.time().timeName(),
-        mesh,
+        obj,
         IOobject::MUST_READ,
         IOobject::NO_WRITE,
         false
@@ -234,7 +256,7 @@ tmp<volScalarField> autoCreateLowReMut
                 (
                     fieldName,
                     mesh.time().timeName(),
-                    mesh,
+                    obj,
                     IOobject::NO_READ,
                     IOobject::NO_WRITE,
                     false
@@ -253,6 +275,37 @@ tmp<volScalarField> autoCreateLowReMut
 }
 
 
+tmp<volScalarField> autoCreateLowReMut
+(
+    const word& fieldName,
+    const fvMesh& mesh
+)
+{
+    return autoCreateLowReMut(fieldName, mesh, mesh);
+}
+
+
+tmp<volScalarField> autoCreateEpsilon
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+{
+    return
+        autoCreateWallFunctionField
+        <
+            scalar,
+            RASModels::epsilonWallFunctionFvPatchScalarField
+        >
+        (
+            fieldName,
+            mesh,
+            obj
+        );
+}
+
+
 tmp<volScalarField> autoCreateEpsilon
 (
     const word& fieldName,
@@ -267,7 +320,29 @@ tmp<volScalarField> autoCreateEpsilon
         >
         (
             fieldName,
+            mesh,
             mesh
+        );
+}
+
+
+tmp<volScalarField> autoCreateOmega
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+{
+    return
+        autoCreateWallFunctionField
+        <
+            scalar,
+            RASModels::omegaWallFunctionFvPatchScalarField
+        >
+        (
+            fieldName,
+            mesh,
+            obj
         );
 }
 
@@ -286,7 +361,29 @@ tmp<volScalarField> autoCreateOmega
         >
         (
             fieldName,
+            mesh,
             mesh
+        );
+}
+
+
+tmp<volScalarField> autoCreateK
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+{
+    return
+        autoCreateWallFunctionField
+        <
+            scalar,
+            RASModels::kqRWallFunctionFvPatchField<scalar>
+        >
+        (
+            fieldName,
+            mesh,
+            obj
         );
 }
 
@@ -305,7 +402,29 @@ tmp<volScalarField> autoCreateK
         >
         (
             fieldName,
+            mesh,
             mesh
+        );
+}
+
+
+tmp<volScalarField> autoCreateQ
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+{
+    return
+        autoCreateWallFunctionField
+        <
+            scalar,
+            RASModels::kqRWallFunctionFvPatchField<scalar>
+        >
+        (
+            fieldName,
+            mesh,
+            obj
         );
 }
 
@@ -324,7 +443,29 @@ tmp<volScalarField> autoCreateQ
         >
         (
             fieldName,
+            mesh,
             mesh
+        );
+}
+
+
+tmp<volSymmTensorField> autoCreateR
+(
+    const word& fieldName,
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+{
+    return
+        autoCreateWallFunctionField
+        <
+            symmTensor,
+            RASModels::kqRWallFunctionFvPatchField<symmTensor>
+        >
+        (
+            fieldName,
+            mesh,
+            obj
         );
 }
 
@@ -343,6 +484,7 @@ tmp<volSymmTensorField> autoCreateR
         >
         (
             fieldName,
+            mesh,
             mesh
         );
 }

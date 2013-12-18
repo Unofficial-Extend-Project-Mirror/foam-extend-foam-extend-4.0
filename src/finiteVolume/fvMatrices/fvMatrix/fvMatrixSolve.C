@@ -1,28 +1,29 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
+
+#include "profiling.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -56,12 +57,17 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve
     const dictionary& solverControls
 )
 {
+    profilingTrigger profSolve("fvMatrix::solve_"+psi_.name());
+
     if (debug)
     {
         Info<< "fvMatrix<Type>::solve(const dictionary&) : "
                "solving fvMatrix<Type>"
             << endl;
     }
+
+    // Complete matrix assembly.  HJ, 17/Apr/2012
+    this->completeAssembly();
 
     lduSolverPerformance solverPerfVec
     (
@@ -74,8 +80,13 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve
     Field<Type> source = source_;
 
     // At this point include the boundary source from the coupled boundaries.
-    // This is corrected for the implicit part by updateMatrixInterfaces within
-    // the component loop.
+    // This is corrected for the implicit part by correctCmptBoundarySource
+    // within the component loop.
+
+    // Note: this is related to non-parallel coupled implicit boundaries
+    // such as cyclic or cyclicGGI, which include transformation.
+    // See also correctImplicitBoundarySource below.
+    // HJ, 31/May/2013
     addBoundarySource(source);
 
     typename Type::labelType validComponents
@@ -112,23 +123,15 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve
             internalCoeffs_.component(cmpt)
         );
 
-        // Use the initMatrixInterfaces and updateMatrixInterfaces to correct
-        // bouCoeffsCmpt for the explicit part of the coupled boundary
-        // conditions
-        initMatrixInterfaces
+        // Correct component boundary source for the explicit part of the
+        // coupled boundary conditions.  At the moment, the whole
+        // coefficient-field product hass been added into the source,
+        // but the implicit part for the current element needs to be taken out
+        // (because it is implicit).
+        // HJ, 31/May/2013
+        correctImplicitBoundarySource
         (
             bouCoeffsCmpt,
-            interfaces,
-            psiCmpt,
-            sourceCmpt,
-            cmpt
-        );
-
-        updateMatrixInterfaces
-        (
-            bouCoeffsCmpt,
-            interfaces,
-            psiCmpt,
             sourceCmpt,
             cmpt
         );
@@ -171,26 +174,37 @@ template<class Type>
 Foam::autoPtr<typename Foam::fvMatrix<Type>::fvSolver>
 Foam::fvMatrix<Type>::solver()
 {
-    return solver(psi_.mesh().solverDict(psi_.name()));
+    return solver(psi_.mesh().solutionDict().solverDict(psi_.name()));
 }
+
 
 template<class Type>
 Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::fvSolver::solve()
 {
-    return solve(psi_.mesh().solverDict(psi_.name()));
+    return solve
+    (
+        fvMat_.psi().mesh().solutionDict().solverDict
+        (
+            fvMat_.psi().name()
+        )
+    );
 }
 
 
 template<class Type>
 Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve()
 {
-    return solve(psi_.mesh().solverDict(psi_.name()));
+    return solve(psi_.mesh().solutionDict().solverDict(psi_.name()));
 }
 
 
 template<class Type>
 Foam::tmp<Foam::Field<Type> > Foam::fvMatrix<Type>::residual() const
 {
+    // Complete matrix assembly.  HJ, 17/Apr/2012
+    fvMatrix& m = const_cast<fvMatrix&>(*this);
+    m.completeAssembly();
+
     // Bug fix: Creating a tmp out of a const reference will change the field
     // HJ, 15/Apr/2011
     tmp<Field<Type> > tres(new Field<Type>(source_));

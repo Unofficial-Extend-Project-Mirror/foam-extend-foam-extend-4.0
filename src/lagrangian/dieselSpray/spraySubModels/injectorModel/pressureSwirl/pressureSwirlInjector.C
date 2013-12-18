@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -93,7 +92,7 @@ pressureSwirlInjector::~pressureSwirlInjector()
 
 scalar pressureSwirlInjector::d0
 (
-    const label n, 
+    const label n,
     const scalar t
 ) const
 {
@@ -105,18 +104,18 @@ scalar pressureSwirlInjector::d0
     angle_ *= mathematicalConstant::pi/360.0;
 
     scalar injectedMassFlow = it.massFlowRate(t);
-    
-    scalar cosAngle = cos(angle_);   
 
-    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), it.T(t), it.X()); 
-    scalar injectorDiameter = it.d();  
-     
+    scalar cosAngle = cos(angle_);
+
+    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), it.T(t), it.X());
+    scalar injectorDiameter = it.d();
+
     scalar deltaPressure = deltaPressureInj(t,n);
     scalar kV = kv(n, injectedMassFlow, deltaPressure);
-    scalar v = kV * sqrt(2.0*deltaPressure/rhoFuel);    
+    scalar v = kV * sqrt(2.0*deltaPressure/rhoFuel);
 
     u_ = v * cosAngle;
-    
+
     scalar A = injectedMassFlow/(mathematicalConstant::pi*rhoFuel*u_);
 
     return (injectorDiameter-sqrt(pow(injectorDiameter,2)-4.0*A))/2.0;
@@ -137,7 +136,7 @@ vector pressureSwirlInjector::direction
 
     // randomly distributed vector normal to the injection vector
     vector normal = vector::zero;
-    
+
     if (sm_.twoD())
     {
         scalar reduce = 0.01;
@@ -160,7 +159,7 @@ vector pressureSwirlInjector::direction
             injectors_[n].properties()->tan2(hole)*sin(beta)
         );
     }
-    
+
     // set the direction of injection by adding the normal vector
     vector dir = dcorr*injectors_[n].properties()->direction(hole, time) + normal;
     dir /= mag(dir);
@@ -182,7 +181,7 @@ scalar pressureSwirlInjector::averageVelocity
 (
     const label i
 ) const
-{    
+{
 
     const injectorType& it = sm_.injectors()[i].properties();
 
@@ -193,7 +192,7 @@ scalar pressureSwirlInjector::averageVelocity
     scalar injectionPressure = averagePressure(i);
 
     scalar Tav = it.integrateTable(it.T())/dt;
-    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), Tav, it.X());  
+    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), Tav, it.X());
 
     scalar kV = kv(i, injectedMassFlow, injectionPressure);
 
@@ -218,12 +217,12 @@ scalar pressureSwirlInjector::kv
     scalar cosAngle = cos(coneAngle);
     scalar Tav = it.integrateTable(it.T())/(it.teoi()-it.tsoi());
 
-    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), Tav, it.X()); 
-    scalar injectorDiameter = it.d();  
-     
+    scalar rhoFuel = sm_.fuels().rho(sm_.ambientPressure(), Tav, it.X());
+    scalar injectorDiameter = it.d();
+
     scalar kv = max
     (
-        maxKv_[inj], 
+        maxKv_[inj],
         4.0*massFlow
         *
         sqrt(rhoFuel/2.0/dPressure)
@@ -231,7 +230,7 @@ scalar pressureSwirlInjector::kv
         (mathematicalConstant::pi*pow(injectorDiameter, 2.0)*rhoFuel*cosAngle)
     );
 
-    return min(1.0, kv);   
+    return min(1.0, kv);
 }
 
 
@@ -239,7 +238,7 @@ scalar pressureSwirlInjector::kv
 
 scalar pressureSwirlInjector::deltaPressureInj(const scalar time, const label inj) const
 {
-    return injectors_[inj].properties()->injectionPressure(time) - sm_.ambientPressure();   
+    return injectors_[inj].properties()->injectionPressure(time) - sm_.ambientPressure();
 }
 
 scalar pressureSwirlInjector::averagePressure(const label inj) const

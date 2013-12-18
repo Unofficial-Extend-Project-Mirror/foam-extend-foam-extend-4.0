@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2005-2010 Tommaso Lucchini
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     verticalValves
@@ -48,7 +47,7 @@ Class
 #include "wedgeFvPatch.H"
 #include "emptyFvPatch.H"
 #include "zeroGradientTetPolyPatchFields.H"
-#include "tetDecompositionMotionSolver.H"
+#include "tetMotionSolver.H"
 
 #include "fixedValueTetPolyPatchFields.H"
 #include "mixedTetPolyPatchFields.H"
@@ -61,7 +60,7 @@ Class
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void Foam::verticalValves::makeLayersLive()
-{ 
+{
     // Enable layering
     forAll (topoChanger_, modI)
     {
@@ -89,7 +88,7 @@ void Foam::verticalValves::makeLayersLive()
 
 void Foam::verticalValves::makeSlidersLive()
 {
- 
+
     // Enable sliding interface
     forAll (topoChanger_, modI)
     {
@@ -139,7 +138,7 @@ bool Foam::verticalValves::attached() const
         {
             if
             (
-                result 
+                result
              != refCast<const slidingInterface>(morphs[modI]).attached()
             )
             {
@@ -200,7 +199,7 @@ void Foam::verticalValves::valveDetach()
             }
 
             ad.setDetach();
-            
+
         }
     }
 }
@@ -251,7 +250,7 @@ void Foam::verticalValves::valveAttach()
             }
 
             ad.setAttach();
-            
+
         }
     }
 }
@@ -317,8 +316,8 @@ void Foam::verticalValves::prepareValveDetach()
 bool Foam::verticalValves::update()
 {
 
-    tetDecompositionMotionSolver& mSolver =
-        refCast<tetDecompositionMotionSolver>(msPtr_());
+    tetMotionSolver& mSolver =
+        refCast<tetMotionSolver>(msPtr_());
 
     // Detaching the interface
     if (attached())

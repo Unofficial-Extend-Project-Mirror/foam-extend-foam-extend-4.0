@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -182,6 +181,12 @@ void omegaWallFunctionFvPatchScalarField::updateCoeffs()
     // HJ, 20/Mar/2011
     if (!db().foundObject<volScalarField>(GName_))
     {
+        InfoIn("void omegaWallFunctionFvPatchScalarField::updateCoeffs()")
+            << "Cannot access " << GName_ << " field.  for patch "
+            << patch().name() << ".  Evaluating as zeroGradient"
+            << endl;
+
+        fvPatchScalarField::updateCoeffs();
         zeroGradientFvPatchScalarField::evaluate();
 
         return;
@@ -196,29 +201,32 @@ void omegaWallFunctionFvPatchScalarField::updateCoeffs()
     volScalarField& G = const_cast<volScalarField&>
         (db().lookupObject<volScalarField>(GName_));
 
-    volScalarField& omega = const_cast<volScalarField&>
-        (db().lookupObject<volScalarField>(dimensionedInternalField().name()));
+    // Note: omega is now a refValue and set in fixedInternalValueFvPatchField
+    // HJ, 3/Aug/2011
+    scalarField& omega = refValue();
 
     const scalarField& k = db().lookupObject<volScalarField>(kName_);
 
     const scalarField& rhow =
-        patch().lookupPatchField<volScalarField, scalar>(rhoName_);
+        lookupPatchField<volScalarField, scalar>(rhoName_);
 
     const scalarField& muw =
-        patch().lookupPatchField<volScalarField, scalar>(muName_);
+        lookupPatchField<volScalarField, scalar>(muName_);
 
     const scalarField& mutw =
-        patch().lookupPatchField<volScalarField, scalar>(mutName_);
+        lookupPatchField<volScalarField, scalar>(mutName_);
 
     const fvPatchVectorField& Uw =
-        patch().lookupPatchField<volVectorField, vector>(UName_);
+        lookupPatchField<volVectorField, vector>(UName_);
 
     const scalarField magGradUw = mag(Uw.snGrad());
+
+    const labelList& faceCells = patch().faceCells();
 
     // Set omega and G
     forAll(mutw, faceI)
     {
-        label faceCellI = patch().faceCells()[faceI];
+        label faceCellI = faceCells[faceI];
 
         scalar yPlus =
             Cmu25*y[faceI]*sqrt(k[faceCellI])
@@ -228,7 +236,10 @@ void omegaWallFunctionFvPatchScalarField::updateCoeffs()
 
         scalar omegaLog = sqrt(k[faceCellI])/(Cmu25*kappa_*y[faceI]);
 
-        omega[faceCellI] = sqrt(sqr(omegaVis) + sqr(omegaLog));
+        // Note: omega is now a refValue and set in
+        // fixedInternalValueFvPatchField
+        // HJ, 3/Aug/2011
+        omega[faceI] = sqrt(sqr(omegaVis) + sqr(omegaLog));
 
         if (yPlus > yPlusLam)
         {
@@ -263,7 +274,6 @@ void omegaWallFunctionFvPatchScalarField::write(Ostream& os) const
     os.writeKeyword("kappa") << kappa_ << token::END_STATEMENT << nl;
     os.writeKeyword("E") << E_ << token::END_STATEMENT << nl;
     os.writeKeyword("beta1") << beta1_ << token::END_STATEMENT << nl;
-    writeEntry("value", os);
 }
 
 

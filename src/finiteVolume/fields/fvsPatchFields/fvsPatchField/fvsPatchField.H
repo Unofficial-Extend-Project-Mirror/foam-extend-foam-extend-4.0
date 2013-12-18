@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     Foam::fvsPatchField
@@ -60,6 +59,8 @@ class dictionary;
 class fvPatchFieldMapper;
 class surfaceMesh;
 
+template<class Type>
+class fvPatchField;
 
 // Forward declaration of friend functions and operators
 
@@ -260,6 +261,19 @@ public:
             //- Return local objectRegistry
             const objectRegistry& db() const;
 
+            //- Lookup and return the patchField of the named field from the
+            //  field's objectRegistry.
+            //  N.B.  The dummy pointer arguments are used if this function is
+            //  instantiated within a templated function to avoid a bug in gcc.
+            //  See inletOutletFvPatchField.C and outletInletFvPatchField.C
+            template<class GeometricField, class Type2>
+            const typename GeometricField::PatchFieldType& lookupPatchField
+            (
+                const word& name,
+                const GeometricField* = NULL,
+                const Type2* = NULL
+            ) const;
+
             //- Return patch
             const fvPatch& patch() const
             {
@@ -313,6 +327,23 @@ public:
             );
 
 
+        // Evaluation functions
+
+            //- Initialise the evaluation of the patch field
+            virtual void initEvaluate
+            (
+                const Pstream::commsTypes commsType=Pstream::blocking
+            )
+            {}
+
+            //- Evaluate the patch field, sets Updated to false
+            virtual void evaluate
+            (
+                const Pstream::commsTypes commsType=Pstream::blocking
+            )
+            {}
+
+
         //- Write
         virtual void write(Ostream&) const;
 
@@ -321,6 +352,9 @@ public:
 
             //- Check fvsPatchField<Type> against given fvsPatchField<Type>
             void check(const fvsPatchField<Type>&) const;
+
+            //- Check fvsPatchField<Type> against given fvPatchField<Type>
+            void check(const fvPatchField<Type>&) const;
 
 
     // Member operators
@@ -332,6 +366,8 @@ public:
         virtual void operator-=(const fvsPatchField<Type>&);
         virtual void operator*=(const fvsPatchField<scalar>&);
         virtual void operator/=(const fvsPatchField<scalar>&);
+
+        virtual void operator=(const fvPatchField<Type>&);
 
         virtual void operator+=(const Field<Type>&);
         virtual void operator-=(const Field<Type>&);
@@ -387,6 +423,8 @@ makeFvsPatchTypeFieldTypeName(type##FvsPatchScalarField);                  \
 makeFvsPatchTypeFieldTypeName(type##FvsPatchVectorField);                  \
 makeFvsPatchTypeFieldTypeName(type##FvsPatchSphericalTensorField);         \
 makeFvsPatchTypeFieldTypeName(type##FvsPatchSymmTensorField);              \
+makeFvsPatchTypeFieldTypeName(type##FvsPatchSymmTensor4thOrderField);      \
+makeFvsPatchTypeFieldTypeName(type##FvsPatchDiagTensorField);              \
 makeFvsPatchTypeFieldTypeName(type##FvsPatchTensorField);
 
 #define makeFvsPatchTypeField(PatchTypeField, typePatchTypeField)          \
@@ -421,6 +459,16 @@ makeFvsPatchTypeField                                                      \
     type##FvsPatchSphericalTensorField                                     \
 );                                                                         \
 makeFvsPatchTypeField(fvsPatchSymmTensorField, type##FvsPatchSymmTensorField); \
+makeFvsPatchTypeField                                                      \
+(                                                                          \
+    fvsPatchSymmTensor4thOrderField,                                       \
+    type##FvsPatchSymmTensor4thOrderField                                  \
+);                                                                         \
+makeFvsPatchTypeField                                                      \
+(                                                                          \
+    fvsPatchDiagTensorField,                                               \
+    type##FvsPatchDiagTensorField                                          \
+);                                                                         \
 makeFvsPatchTypeField(fvsPatchTensorField, type##FvsPatchTensorField);
 
 
@@ -431,6 +479,10 @@ typedef type##FvsPatchField<vector> type##FvsPatchVectorField;             \
 typedef type##FvsPatchField<sphericalTensor>                               \
     type##FvsPatchSphericalTensorField;                                    \
 typedef type##FvsPatchField<symmTensor> type##FvsPatchSymmTensorField;     \
+typedef type##FvsPatchField<symmTensor4thOrder>                            \
+    type##FvsPatchSymmTensor4thOrderField;                                 \
+typedef type##FvsPatchField<diagTensor>                                    \
+    type##FvsPatchDiagTensorField;                                         \
 typedef type##FvsPatchField<tensor> type##FvsPatchTensorField;
 
 

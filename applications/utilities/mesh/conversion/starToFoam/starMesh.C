@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -87,7 +86,7 @@ const label starMesh::sammAddressingTable[9][12] =
 // (first index) and STAR face number
 // - first column is always -1
 // - last column is -1 for all but hexagonal prism
-// WARNING: Possible bug for sammTrim2 
+// WARNING: Possible bug for sammTrim2
 // The lookup table for SAMM shapes is based on the rotation of the
 // shape. This would imply that the table below needs to be split between
 // the regular shapes (3-9), which are OK, and the SAMM shapes, for which
@@ -95,7 +94,7 @@ const label starMesh::sammAddressingTable[9][12] =
 // cell, firts find out the face index in the normal rotation using the cell
 // face permutation table and then use the index from the shape face lookup.
 // Additionally, have in mind that this silliness does not allow matches
-// on face 7 and 8 of the samm cell. 
+// on face 7 and 8 of the samm cell.
 
 const label starMesh::sammFacePermutationTable[24][8] =
 {
@@ -180,7 +179,7 @@ const label starMesh::shapeFaceLookup[19][9] =
 // samm trim 8:
 // star number: 1 2 3 4 5 6 7 8  In ROTATION 0
 // foam number: 2 5 4 7 1 0 3 6
-// confirmed:   1 0 6 
+// confirmed:   1 0 6
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

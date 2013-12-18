@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -31,6 +30,8 @@ License
 #include "slicedVolFields.H"
 #include "slicedSurfaceFields.H"
 #include "SubField.H"
+#include "cyclicFvPatchFields.H"
+#include "cyclicGgiFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -147,7 +148,25 @@ void fvMesh::makeC() const
         faceCentres()
     );
 
-/* HJ, I think this is wrong.  HJ, 6/Jul/2010
+    // This piece of code is necessary for cyclic and cyclicGgi interfaces
+    // using a separationOffset transform.
+    // Those two interfaces will be using the method ::patchNeighbourField()
+    // to evaluate the field C on the shadow patch. For cyclic and cyclicGgi
+    // translational-only interfaces, the separationOffset transform is never
+    // applied directly in ::patchNeighbourField() because this transform is
+    // only pertinent for 3D coordinates, and the method ::patchNeighbourField()
+    // does not discriminate the type of field it is operating on.
+    // So, because the separationOffset transform is not applied, the evaluation
+    // of a 3D position field like 'C' will always be wrong on the shadow patches
+    // of translational cyclic and cyclicGgi interfaces.
+    // For cyclic and cyclicGgi interfaces using a rotational transform, the
+    // evaluation of the field C will be valid, but since we are only
+    // interested in the patch face centers for these interfaces, we can override
+    // those values as well.
+    // See also:
+    //    https://sourceforge.net/apps/mantisbt/openfoam-extend/view.php?id=42
+    // MB, 12/Dec/2010
+    //
     // Need to correct for cyclics transformation since absolute quantity.
     // Ok on processor patches since hold opposite cell centre (no
     // transformation)
@@ -155,7 +174,11 @@ void fvMesh::makeC() const
 
     forAll(C.boundaryField(), patchi)
     {
-        if (isA<cyclicFvPatchVectorField>(C.boundaryField()[patchi]))
+        if
+        (
+            isA<cyclicFvPatchVectorField>(C.boundaryField()[patchi])
+         || isA<cyclicGgiFvPatchVectorField>(C.boundaryField()[patchi])
+        )
         {
             // Note: cyclic is not slice but proper field
             C.boundaryField()[patchi] == static_cast<const vectorField&>
@@ -167,7 +190,6 @@ void fvMesh::makeC() const
             );
         }
     }
-*/
 }
 
 
@@ -227,7 +249,7 @@ void fvMesh::makePhi() const
             << abort(FatalError);
     }
 
-    // Reading old time mesh motion flux if it exists and 
+    // Reading old time mesh motion flux if it exists and
     // creating zero current time mesh motion flux
 
     scalar t0 = this->time().value() - this->time().deltaT().value();
@@ -529,7 +551,7 @@ const surfaceScalarField& fvMesh::phi() const
         makePhi();
     }
 
-    // Set zero current time 
+    // Set zero current time
     // mesh motion fluxes if the time has been incremented
     if (phiPtr_->timeIndex() != time().timeIndex())
     {

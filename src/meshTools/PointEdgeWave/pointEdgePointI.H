@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -46,7 +45,7 @@ inline bool Foam::pointEdgePoint::update
         origin_ = w2.origin();
 
         return true;
-    }        
+    }
 
     scalar diff = distSqr_ - dist2;
 
@@ -71,7 +70,7 @@ inline bool Foam::pointEdgePoint::update
     }
 }
 
-    
+
 // Update this with w2 (information on same point)
 inline bool Foam::pointEdgePoint::update
 (
@@ -86,7 +85,7 @@ inline bool Foam::pointEdgePoint::update
         origin_ = w2.origin();
 
         return true;
-    }        
+    }
 
     scalar diff = distSqr_ - w2.distSqr();
 
@@ -124,7 +123,7 @@ inline Foam::pointEdgePoint::pointEdgePoint()
 // Construct from origin, distance
 inline Foam::pointEdgePoint::pointEdgePoint
 (
-    const point& origin, 
+    const point& origin,
     const scalar distSqr
 )
 :
@@ -229,14 +228,14 @@ inline bool Foam::pointEdgePoint::updatePoint
     const scalar tol
 )
 {
-    return 
+    return
         update
         (
-            mesh.points()[pointI],
+            mesh.allPoints()[pointI],
             edgeInfo,
             tol
         );
-    }    
+    }
 
 
 // Update this with new information on same point
@@ -251,11 +250,11 @@ inline bool Foam::pointEdgePoint::updatePoint
     return
         update
         (
-            mesh.points()[pointI],
+            mesh.allPoints()[pointI],
             newPointInfo,
             tol
         );
-}    
+}
 
 
 // Update this with new information on same point. No extra information.
@@ -266,7 +265,7 @@ inline bool Foam::pointEdgePoint::updatePoint
 )
 {
     return update(newPointInfo, tol);
-}    
+}
 
 
 // Update this with information from connected point
@@ -292,7 +291,7 @@ inline bool Foam::pointEdgePoint::updateEdge
             pointInfo,
             tol
         );
-}    
+}
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //

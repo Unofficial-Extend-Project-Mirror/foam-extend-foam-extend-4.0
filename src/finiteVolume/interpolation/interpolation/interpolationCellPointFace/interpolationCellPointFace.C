@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -75,38 +74,38 @@ Type interpolationCellPointFace<Type>::interpolate
     {
         const vector& cellCentre = this->pMesh_.cellCentres()[nCell];
         const labelList& cellFaces = this->pMesh_.cells()[nCell];
-        
+
         vector projection = position - cellCentre;
         tetPoints[3] = cellCentre;
-        
+
         // *********************************************************************
         // project the cell-center through the point onto the face
         // and get the closest face, ...
         // *********************************************************************
-        
+
         bool foundTet = false;
         label closestFace = -1;
         scalar minDistance = GREAT;
-        
+
         forAll(cellFaces, facei)
         {
             label nFace = cellFaces[facei];
-        
+
             vector normal = this->pMeshFaceAreas_[nFace];
             normal /= mag(normal);
-        
+
             const vector& faceCentreTmp = this->pMeshFaceCentres_[nFace];
-        
+
             scalar multiplierNumerator = (faceCentreTmp - cellCentre) & normal;
             scalar multiplierDenominator = projection & normal;
-        
+
             // if normal and projection are not orthogonal this could be the one...
             if (mag(multiplierDenominator) > SMALL)
             {
                 scalar multiplier = multiplierNumerator/multiplierDenominator;
                 vector iPoint = cellCentre + multiplier*projection;
                 scalar dist = mag(position - iPoint);
-        
+
                 if (dist < minDistance)
                 {
                     closestFace = nFace;
@@ -114,13 +113,13 @@ Type interpolationCellPointFace<Type>::interpolate
                 }
             }
         }
-        
+
         // *********************************************************************
         // find the tetrahedron containing 'position'
         // from the cell center, face center and
         // two other points on the face
         // *********************************************************************
-        
+
         minDistance = GREAT;
         if (closestFace != -1)
         {
@@ -138,7 +137,7 @@ Type interpolationCellPointFace<Type>::interpolate
                 minDistance
             );
         }
-        
+
         if (!foundTet)
         {
             // check if the position is 'just' outside a tet
@@ -153,15 +152,15 @@ Type interpolationCellPointFace<Type>::interpolate
                 tetPointLabels[1] = tetLabelCandidate[1];
             }
         }
-        
+
         // *********************************************************************
         // if the search failed check all the cell-faces
         // *********************************************************************
-        
+
         if (!foundTet)
         {
             minDistance = GREAT;
-        
+
             label facei = 0;
             while (facei < cellFaces.size() && !foundTet)
             {
@@ -184,7 +183,7 @@ Type interpolationCellPointFace<Type>::interpolate
                 facei++;
             }
         }
-        
+
         if (!foundTet)
         {
             // check if the position is 'just' outside a tet
@@ -200,19 +199,19 @@ Type interpolationCellPointFace<Type>::interpolate
                 tetPointLabels[1] = tetLabelCandidate[1];
             }
         }
-        
+
         // *********************************************************************
         // if the tet was found do the interpolation,
         // otherwise use the closest face value
         // *********************************************************************
-        
+
         if (foundTet)
         {
             for (label i=0; i<2; i++)
             {
                 ts[i] = psip_[tetPointLabels[i]];
             }
-        
+
             if (closestFace < psis_.size())
             {
                 ts[2] = psis_[closestFace];
@@ -220,7 +219,7 @@ Type interpolationCellPointFace<Type>::interpolate
             else
             {
                 label patchi = this->pMesh_.boundaryMesh().whichPatch(closestFace);
-        
+
                 // If the boundary patch is not empty use the face value
                 // else use the cell value
                 if (this->psi_.boundaryField()[patchi].size())
@@ -233,14 +232,14 @@ Type interpolationCellPointFace<Type>::interpolate
                     ts[2] = this->psi_[nCell];
                 }
             }
-            
+
             ts[3] = this->psi_[nCell];
-            
+
             for (label n=0; n<4; n++)
             {
                 phi[n] = min(1.0, phi[n]);
                 phi[n] = max(0.0, phi[n]);
-        
+
                 t += phi[n]*ts[n];
             }
         }
@@ -251,7 +250,7 @@ Type interpolationCellPointFace<Type>::interpolate
                 << "search failed; using closest cellFace value" << endl
                 << "cell number " << nCell << tab
                 << "position " << position << endl;
-        
+
             if (closestFace < psis_.size())
             {
                 t = psis_[closestFace];
@@ -259,7 +258,7 @@ Type interpolationCellPointFace<Type>::interpolate
             else
             {
                 label patchi = this->pMesh_.boundaryMesh().whichPatch(closestFace);
-        
+
                 // If the boundary patch is not empty use the face value
                 // else use the cell value
                 if (this->psi_.boundaryField()[patchi].size())
@@ -301,7 +300,7 @@ Type interpolationCellPointFace<Type>::interpolate
             else
             {
                 label patchi = this->pMesh_.boundaryMesh().whichPatch(facei);
-                
+
                 // If the boundary patch is not empty use the face value
                 // else use the cell value
                 if (this->psi_.boundaryField()[patchi].size())
@@ -325,7 +324,7 @@ Type interpolationCellPointFace<Type>::interpolate
             else
             {
                 label patchi = this->pMesh_.boundaryMesh().whichPatch(facei);
-                
+
                 // If the boundary patch is not empty use the face value
                 // else use the cell value
                 if (this->psi_.boundaryField()[patchi].size())

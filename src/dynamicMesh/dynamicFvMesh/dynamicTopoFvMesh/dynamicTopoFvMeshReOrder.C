@@ -1,30 +1,31 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
 #include "objectMap.H"
+#include "objectRegistry.H"
+#include "coupledInfo.H"
 #include "dynamicTopoFvMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -51,10 +52,10 @@ void dynamicTopoFvMesh::reOrderPoints
     {
         if (threaded)
         {
-            Info << "Thread: " << self() << ": ";
+            Info<< "Thread: " << self() << ": ";
         }
 
-        Info << "ReOrdering points..." << flush;
+        Info<< "ReOrdering points..." << flush;
     }
 
     // Allocate for the mapping information
@@ -204,6 +205,52 @@ void dynamicTopoFvMesh::reOrderPoints
     // Reset all zones
     pointZones.updateMesh();
 
+    // Loop through all local coupling maps, and renumber points.
+    forAll(patchCoupling_, patchI)
+    {
+        if (!patchCoupling_(patchI))
+        {
+            continue;
+        }
+
+        const coupleMap& cMap = patchCoupling_[patchI].map();
+
+        // Obtain references
+        Map<label>& mtsMap = cMap.entityMap(coupleMap::POINT);
+
+        Map<label> newMtsMap, newStmMap;
+
+        forAllIter(Map<label>, mtsMap, pIter)
+        {
+            label newMaster = -1, newSlave = -1;
+
+            if (pIter.key() < nOldPoints_)
+            {
+                newMaster = reversePointMap_[pIter.key()];
+            }
+            else
+            {
+                newMaster = addedPointRenumbering_[pIter.key()];
+            }
+
+            if (pIter() < nOldPoints_)
+            {
+                newSlave = reversePointMap_[pIter()];
+            }
+            else
+            {
+                newSlave = addedPointRenumbering_[pIter()];
+            }
+
+            // Update the map.
+            newMtsMap.insert(newMaster, newSlave);
+            newStmMap.insert(newSlave, newMaster);
+        }
+
+        // Overwrite the old maps.
+        cMap.transferMaps(coupleMap::POINT, newMtsMap, newStmMap);
+    }
+
     // Clear local point copies
     points_.clear();
     oldPoints_.clear();
@@ -214,7 +261,7 @@ void dynamicTopoFvMesh::reOrderPoints
 
     if (debug)
     {
-        Info << "Done." << endl;
+        Info<< "Done." << endl;
     }
 }
 
@@ -274,10 +321,10 @@ void dynamicTopoFvMesh::reOrderEdges
     {
         if (threaded)
         {
-            Info << "Thread: " << self() << ": ";
+            Info<< "Thread: " << self() << ": ";
         }
 
-        Info << "ReOrdering edges..." << flush;
+        Info<< "ReOrdering edges..." << flush;
     }
 
     // Allocate for mapping information
@@ -286,10 +333,8 @@ void dynamicTopoFvMesh::reOrderEdges
     label edgeInOrder = 0, allEdges = edges_.size();
     edgeList oldEdges(allEdges);
     labelListList oldEdgeFaces(allEdges);
-    labelListList oldEdgePoints(allEdges);
 
     addedEdgeRenumbering_.clear();
-    Map<label> addedEdgeReverseRenumbering;
 
     // Transfer old edge-based lists, and clear them
     forAll(edges_, edgeI)
@@ -300,20 +345,10 @@ void dynamicTopoFvMesh::reOrderEdges
 
     edges_.setSize(nEdges_); edgeFaces_.setSize(nEdges_);
 
-    if (!twoDMesh_)
-    {
-        forAll(edgePoints_, edgeI)
-        {
-            oldEdgePoints[edgeI].transfer(edgePoints_[edgeI]);
-        }
-
-        edgePoints_.setSize(nEdges_);
-    }
-
     // Keep track of inserted boundary edge indices
     labelList boundaryPatchIndices(edgePatchStarts_);
 
-    // Loop through all edges and add internal ones first
+    // Loop through all edges and add them
     forAll(oldEdges, edgeI)
     {
         // Ensure that we're adding valid edges
@@ -325,8 +360,10 @@ void dynamicTopoFvMesh::reOrderEdges
         // Determine which patch this edge belongs to
         label patch = whichEdgePatch(edgeI);
 
-        // Update maps for boundary edges. Edge insertion for
-        // boundaries will be done after internal edges.
+        // Obtain references
+        edge& thisEdge = oldEdges[edgeI];
+        labelList& thisEF = oldEdgeFaces[edgeI];
+
         if (patch >= 0)
         {
             label bEdgeIndex = boundaryPatchIndices[patch]++;
@@ -339,18 +376,20 @@ void dynamicTopoFvMesh::reOrderEdges
             }
             else
             {
-                addedEdgeRenumbering_.insert(edgeI, bEdgeIndex);
-                addedEdgeReverseRenumbering.insert(bEdgeIndex, edgeI);
-
                 edgeMap_[bEdgeIndex] = -1;
+                addedEdgeRenumbering_.insert(edgeI, bEdgeIndex);
             }
+
+            // Insert entities into local lists...
+            edges_[bEdgeIndex] = thisEdge;
+            edgeFaces_[bEdgeIndex] = thisEF;
+
+            // Insert entities into mesh-reset lists
+            edges[bEdgeIndex] = thisEdge;
+            edgeFaces[bEdgeIndex].transfer(thisEF);
         }
         else
         {
-            // Obtain references
-            edge& thisEdge = oldEdges[edgeI];
-            labelList& thisEF = oldEdgeFaces[edgeI];
-
             // Renumber internal edges and add normally.
             if (edgeI < nOldEdges_)
             {
@@ -370,44 +409,8 @@ void dynamicTopoFvMesh::reOrderEdges
             edges[edgeInOrder] = thisEdge;
             edgeFaces[edgeInOrder].transfer(thisEF);
 
-            if (!twoDMesh_)
-            {
-                edgePoints_[edgeInOrder].transfer(oldEdgePoints[edgeI]);
-            }
-
             edgeInOrder++;
         }
-    }
-
-    // All internal edges have been inserted. Now insert boundary edges.
-    label oldIndex;
-
-    for(label i = nInternalEdges_; i < nEdges_; i++)
-    {
-        if (edgeMap_[i] == -1)
-        {
-            // This boundary edge was added during the topology change
-            oldIndex = addedEdgeReverseRenumbering[i];
-        }
-        else
-        {
-            oldIndex = edgeMap_[i];
-        }
-
-        // Insert entities into local Lists...
-        edges_[edgeInOrder] = oldEdges[oldIndex];
-        edgeFaces_[edgeInOrder] = oldEdgeFaces[oldIndex];
-
-        // Insert entities into mesh-reset lists
-        edges[edgeInOrder] = oldEdges[oldIndex];
-        edgeFaces[edgeInOrder].transfer(oldEdgeFaces[oldIndex]);
-
-        if (!twoDMesh_)
-        {
-            edgePoints_[edgeInOrder].transfer(oldEdgePoints[oldIndex]);
-        }
-
-        edgeInOrder++;
     }
 
     // Now that we're done with edges, unlock it
@@ -417,15 +420,15 @@ void dynamicTopoFvMesh::reOrderEdges
     }
 
     // Final check to ensure everything went okay
-    if (edgeInOrder != nEdges_)
+    if (edgeInOrder != nInternalEdges_)
     {
         FatalErrorIn("dynamicTopoFvMesh::reOrderEdges()") << nl
-                << " Algorithm did not visit every edge in the mesh."
-                << " Something's messed up." << nl
-                << abort(FatalError);
+            << " Algorithm did not visit every internal edge in the mesh."
+            << " Something's messed up." << nl
+            << abort(FatalError);
     }
 
-    // Renumber all edges / edgePoints with updated point information
+    // Renumber all edges with updated point information
     label pIndex = -1;
 
     if (threaded)
@@ -463,24 +466,6 @@ void dynamicTopoFvMesh::reOrderEdges
 
         thisEdge[1] = pIndex;
         thisREdge[1] = pIndex;
-
-        // Renumber edgePoints
-        if (!twoDMesh_)
-        {
-            labelList& ePoints = edgePoints_[edgeI];
-
-            forAll(ePoints, pointI)
-            {
-                if (ePoints[pointI] < nOldPoints_)
-                {
-                    ePoints[pointI] = reversePointMap_[ePoints[pointI]];
-                }
-                else
-                {
-                    ePoints[pointI] = addedPointRenumbering_[ePoints[pointI]];
-                }
-            }
-        }
     }
 
     if (threaded)
@@ -553,11 +538,56 @@ void dynamicTopoFvMesh::reOrderEdges
     {
         // Invert edges to obtain pointEdges
         pointEdges_ = invertManyToMany<edge, labelList>(nPoints_, edges_);
+
+        // Loop through all local coupling maps, and renumber edges.
+        forAll(patchCoupling_, patchI)
+        {
+            if (!patchCoupling_(patchI))
+            {
+                continue;
+            }
+
+            // Obtain references
+            const coupleMap& cMap = patchCoupling_[patchI].map();
+            const Map<label>& mtsMap = cMap.entityMap(coupleMap::EDGE);
+
+            Map<label> newMtsMap, newStmMap;
+
+            forAllConstIter(Map<label>, mtsMap, mIter)
+            {
+                label newMaster = -1, newSlave = -1;
+
+                if (mIter.key() < nOldEdges_)
+                {
+                    newMaster = reverseEdgeMap_[mIter.key()];
+                }
+                else
+                {
+                    newMaster = addedEdgeRenumbering_[mIter.key()];
+                }
+
+                if (mIter() < nOldEdges_)
+                {
+                    newSlave = reverseEdgeMap_[mIter()];
+                }
+                else
+                {
+                    newSlave = addedEdgeRenumbering_[mIter()];
+                }
+
+                // Update the map.
+                newMtsMap.insert(newMaster, newSlave);
+                newStmMap.insert(newSlave, newMaster);
+            }
+
+            // Overwrite the old maps.
+            cMap.transferMaps(coupleMap::EDGE, newMtsMap, newStmMap);
+        }
     }
 
     if (debug)
     {
-        Info << "Done." << endl;
+        Info<< "Done." << endl;
     }
 }
 
@@ -624,10 +654,10 @@ void dynamicTopoFvMesh::reOrderFaces
     {
         if (threaded)
         {
-            Info << "Thread: " << self() << ": ";
+            Info<< "Thread: " << self() << ": ";
         }
 
-        Info << "ReOrdering faces..." << flush;
+        Info<< "ReOrdering faces..." << flush;
     }
 
     // Allocate for mapping information
@@ -639,6 +669,9 @@ void dynamicTopoFvMesh::reOrderFaces
     labelListList oldFaceEdges(allFaces);
 
     addedFaceRenumbering_.clear();
+
+    // Track reverse renumbering for added faces.
+    //  - Required during coupled patch re-ordering.
     Map<label> addedFaceReverseRenumbering;
 
     // Make a copy of the old face-based lists, and clear them
@@ -709,7 +742,6 @@ void dynamicTopoFvMesh::reOrderFaces
 
     // Handle boundaries first. If any coupled interfaces need to be
     // updated, they can be reshuffled after interior faces are done.
-    // Update maps for boundaries now.
     for (label faceI = nOldInternalFaces_; faceI < allFaces; faceI++)
     {
         if (visited[faceI] == -1)
@@ -725,17 +757,45 @@ void dynamicTopoFvMesh::reOrderFaces
             }
             else
             {
-                addedFaceRenumbering_.insert(faceI, bFaceIndex);
-
-                addedFaceReverseRenumbering.insert(bFaceIndex, faceI);
-
                 faceMap_[bFaceIndex] = -1;
+                addedFaceRenumbering_.insert(faceI, bFaceIndex);
+                addedFaceReverseRenumbering.insert(bFaceIndex, faceI);
             }
+
+            // Renumber owner
+            label ownerRenumber =
+            (
+                oldOwner[faceI] < nOldCells_
+              ? reverseCellMap_[oldOwner[faceI]]
+              : addedCellRenumbering_[oldOwner[faceI]]
+            );
+
+            // Insert entities into local lists...
+            owner_[bFaceIndex] = ownerRenumber;
+            neighbour_[bFaceIndex] = -1;
+            faces_[bFaceIndex] = oldFaces[faceI];
+            faceEdges_[bFaceIndex] = oldFaceEdges[faceI];
+
+            // Insert entities into mesh-reset lists...
+            owner[bFaceIndex] = ownerRenumber;
+            faces[bFaceIndex].transfer(oldFaces[faceI]);
+            faceEdges[bFaceIndex].transfer(oldFaceEdges[faceI]);
 
             // Mark this face as visited
             visited[faceI] = 0;
         }
     }
+
+    // Prepare centres and anchors for coupled interfaces
+    List<pointField> centres(nPatches_), anchors(nPatches_);
+
+    // Now that points and boundary faces are up-to-date,
+    // send and receive centres and anchor points for coupled patches
+    initCoupledBoundaryOrdering
+    (
+        centres,
+        anchors
+    );
 
     // Upper-triangular ordering of internal faces:
 
@@ -885,43 +945,105 @@ void dynamicTopoFvMesh::reOrderFaces
         }
     }
 
-    // All internal faces have been inserted. Now insert boundary faces.
-    label oldIndex;
+    // Prepare faceMaps and rotations for coupled interfaces
+    labelListList patchMaps(nPatches_), rotations(nPatches_);
 
-    for (label i = nInternalFaces_; i < nFaces_; i++)
-    {
-        if (faceMap_[i] == -1)
-        {
-            // This boundary face was added during the topology change
-            oldIndex = addedFaceReverseRenumbering[i];
-        }
-        else
-        {
-            oldIndex = faceMap_[i];
-        }
-
-        // Renumber owner/neighbour
-        label ownerRenumber =
+    // Now compute patchMaps for coupled interfaces
+    bool anyChange =
+    (
+        syncCoupledBoundaryOrdering
         (
-            oldOwner[oldIndex] < nOldCells_
-          ? reverseCellMap_[oldOwner[oldIndex]]
-          : addedCellRenumbering_[oldOwner[oldIndex]]
-        );
+            centres,
+            anchors,
+            patchMaps,
+            rotations
+        )
+    );
 
-        // Insert entities into local listsLists...
-        faces_[faceInOrder] = oldFaces[oldIndex];
-        owner_[faceInOrder] = ownerRenumber;
-        neighbour_[faceInOrder] = -1;
-        faceEdges_[faceInOrder] = oldFaceEdges[oldIndex];
+    if (anyChange)
+    {
+        forAll(patchMaps, pI)
+        {
+            const labelList& patchMap = patchMaps[pI];
 
-        // Insert entities into mesh-reset lists
-        // NOTE: From OF-1.5 onwards, neighbour array
-        //       does not store -1 for boundary faces
-        faces[faceInOrder].transfer(oldFaces[oldIndex]);
-        owner[faceInOrder] = ownerRenumber;
-        faceEdges[faceInOrder].transfer(oldFaceEdges[oldIndex]);
+            if (patchMap.size())
+            {
+                // Faces in this patch need to be shuffled
+                label pStart = patchStarts_[pI];
 
-        faceInOrder++;
+                forAll(patchMap, fI)
+                {
+                    label oldPos = fI + pStart;
+                    label newPos = patchMap[fI] + pStart;
+
+                    // Rotate the face in-place
+                    const face& oldFace = faces_[oldPos];
+
+                    // Copy the old face, and rotate if necessary
+                    face newFace(oldFace);
+                    label nPos = rotations[pI][fI];
+
+                    if (nPos != 0)
+                    {
+                        forAll(oldFace, fpI)
+                        {
+                            label nfpI = (fpI + nPos) % oldFace.size();
+
+                            if (nfpI < 0)
+                            {
+                                nfpI += oldFace.size();
+                            }
+
+                            newFace[nfpI] = oldFace[fpI];
+                        }
+                    }
+
+                    // Map to new locations, using the
+                    // 'old' lists as temporaries.
+                    //  - All boundary neighbours are '-1',
+                    //    so use that as a faceMap temporary
+                    oldNeighbour[newPos] = faceMap_[oldPos];
+
+                    // Check if this face was added
+                    if (faceMap_[oldPos] == -1)
+                    {
+                        // Fetch the index for the new face
+                        label addedIndex = addedFaceReverseRenumbering[oldPos];
+
+                        // Renumber for the added index
+                        addedFaceRenumbering_[addedIndex] = newPos;
+                    }
+                    else
+                    {
+                        // Fetch the index for the existing face
+                        label existIndex = faceMap_[oldPos];
+
+                        // Renumber the reverse map
+                        reverseFaceMap_[existIndex] = newPos;
+                    }
+
+                    oldOwner[newPos] = owner_[oldPos];
+                    oldFaces[newPos].transfer(newFace);
+                    oldFaceEdges[newPos].transfer(faceEdges_[oldPos]);
+                }
+
+                // Now copy / transfer back to original lists
+                forAll(patchMap, fI)
+                {
+                    label index = (fI + pStart);
+
+                    faceMap_[index] = oldNeighbour[index];
+
+                    owner_[index] = oldOwner[index];
+                    faces_[index] = oldFaces[index];
+                    faceEdges_[index] = oldFaceEdges[index];
+
+                    owner[index] = oldOwner[index];
+                    faces[index].transfer(oldFaces[index]);
+                    faceEdges[index].transfer(oldFaceEdges[index]);
+                }
+            }
+        }
     }
 
     // Now that we're done with faces, unlock it
@@ -1104,9 +1226,54 @@ void dynamicTopoFvMesh::reOrderFaces
     // Reset all zones
     faceZones.updateMesh();
 
+    // Loop through all local coupling maps, and renumber faces.
+    forAll(patchCoupling_, patchI)
+    {
+        if (!patchCoupling_(patchI))
+        {
+            continue;
+        }
+
+        // Obtain references
+        const coupleMap& cMap = patchCoupling_[patchI].map();
+        const Map<label>& mtsMap = cMap.entityMap(coupleMap::FACE);
+
+        Map<label> newMtsMap, newStmMap;
+
+        forAllConstIter(Map<label>, mtsMap, mIter)
+        {
+            label newMaster = -1, newSlave = -1;
+
+            if (mIter.key() < nOldFaces_)
+            {
+                newMaster = reverseFaceMap_[mIter.key()];
+            }
+            else
+            {
+                newMaster = addedFaceRenumbering_[mIter.key()];
+            }
+
+            if (mIter() < nOldFaces_)
+            {
+                newSlave = reverseFaceMap_[mIter()];
+            }
+            else
+            {
+                newSlave = addedFaceRenumbering_[mIter()];
+            }
+
+            // Update the map.
+            newMtsMap.insert(newMaster, newSlave);
+            newStmMap.insert(newSlave, newMaster);
+        }
+
+        // Overwrite the old maps.
+        cMap.transferMaps(coupleMap::FACE, newMtsMap, newStmMap);
+    }
+
     if (debug)
     {
-        Info << "Done." << endl;
+        Info<< "Done." << endl;
     }
 }
 
@@ -1184,10 +1351,10 @@ void dynamicTopoFvMesh::reOrderCells
     {
         if (threaded)
         {
-            Info << "Thread: " << self() << ": ";
+            Info<< "Thread: " << self() << ": ";
         }
 
-        Info << "ReOrdering cells..." << flush;
+        Info<< "ReOrdering cells..." << flush;
     }
 
     // Allocate for mapping information
@@ -1507,7 +1674,7 @@ void dynamicTopoFvMesh::reOrderCells
 
     if (debug)
     {
-        Info << "Done." << endl;
+        Info<< "Done." << endl;
     }
 }
 
@@ -1558,47 +1725,53 @@ void dynamicTopoFvMesh::reOrderMesh
 {
     if (debug)
     {
-        Info << endl;
-        Info << "=================" << endl;
-        Info << " Mesh reOrdering " << endl;
-        Info << "=================" << endl;
-        Info << "Mesh Info [n]:" << endl;
-        Info << "Points: " << nOldPoints_ << endl;
-        Info << "Edges: " << nOldEdges_ << endl;
-        Info << "Faces: " << nOldFaces_ << endl;
-        Info << "Cells: " << nOldCells_ << endl;
-        Info << "Internal Edges: " << nOldInternalEdges_ << endl;
-        Info << "Internal Faces: " << nOldInternalFaces_ << endl;
+        Info<< nl
+            << "=================" << nl
+            << " Mesh reOrdering " << nl
+            << "=================" << nl
+            << " Mesh Info [n]:" << nl
+            << " Points: " << nOldPoints_ << nl
+            << " Edges: " << nOldEdges_ << nl
+            << " Faces: " << nOldFaces_ << nl
+            << " Cells: " << nOldCells_ << nl
+            << " Internal Edges: " << nOldInternalEdges_ << nl
+            << " Internal Faces: " << nOldInternalFaces_ << nl
+            << " nPatches: " << nPatches_ << nl;
+
         if (debug > 1)
         {
-            Info << "Patch Starts [Face]: " << oldPatchStarts_ << endl;
-            Info << "Patch Sizes  [Face]: " << oldPatchSizes_ << endl;
-            Info << "Patch Starts [Edge]: " << oldEdgePatchStarts_ << endl;
-            Info << "Patch Sizes  [Edge]: " << oldEdgePatchSizes_ << endl;
+            Info<< " Patch Starts [Face]: " << oldPatchStarts_ << nl
+                << " Patch Sizes  [Face]: " << oldPatchSizes_ << nl
+                << " Patch Starts [Edge]: " << oldEdgePatchStarts_ << nl
+                << " Patch Sizes  [Edge]: " << oldEdgePatchSizes_ << nl;
         }
-        Info << "=================" << endl;
-        Info << "Mesh Info [n+1]:" << endl;
-        Info << "Points: " << nPoints_ << endl;
-        Info << "Edges: " << nEdges_ << endl;
-        Info << "Faces: " << nFaces_ << endl;
-        Info << "Cells: " << nCells_ << endl;
-        Info << "Internal Edges: " << nInternalEdges_ << endl;
-        Info << "Internal Faces: " << nInternalFaces_ << endl;
+
+        Info<< "=================" << nl
+            << " Mesh Info [n+1]:" << nl
+            << " Points: " << nPoints_ << nl
+            << " Edges: " << nEdges_ << nl
+            << " Faces: " << nFaces_ << nl
+            << " Cells: " << nCells_ << nl
+            << " Internal Edges: " << nInternalEdges_ << nl
+            << " Internal Faces: " << nInternalFaces_ << nl
+            << " nPatches: " << nPatches_ << nl;
+
         if (debug > 1)
         {
-            Info << "Patch Starts [Face]: " << patchStarts_ << endl;
-            Info << "Patch Sizes: [Face]: " << patchSizes_ << endl;
-            Info << "Patch Starts [Edge]: " << edgePatchStarts_ << endl;
-            Info << "Patch Sizes: [Edge]: " << edgePatchSizes_ << endl;
+            Info<< " Patch Starts [Face]: " << patchStarts_ << nl
+                << " Patch Sizes: [Face]: " << patchSizes_ << nl
+                << " Patch Starts [Edge]: " << edgePatchStarts_ << nl
+                << " Patch Sizes: [Edge]: " << edgePatchSizes_ << nl;
         }
-        Info << "=================" << endl;
+
+        Info<< "=================" << endl;
 
         // Check connectivity structures for consistency
         // before entering the reOrdering phase.
         checkConnectivity();
     }
 
-    if (threader_->multiThreaded())
+    if (threader_->multiThreaded() && !Pstream::parRun())
     {
         // Initialize multi-threaded reOrdering
         threadedMeshReOrdering

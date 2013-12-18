@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     Foam::PointEdgeWave
@@ -74,7 +73,7 @@ namespace Foam
 
 // Forward declaration of classes
 class polyMesh;
-
+class ggiPolyPatch;
 
 /*---------------------------------------------------------------------------*\
                         Class PointEdgeWaveName Declaration
@@ -127,6 +126,9 @@ class PointEdgeWave
 
         //- Number of cyclic patches
         bool nCyclicPatches_;
+
+        //- Number of cyclic patches
+        bool nGgiPatches_;
 
         //- For every cyclic patch two primitivePatches
         PtrList<primitivePatch> cycHalves_;
@@ -228,6 +230,16 @@ class PointEdgeWave
                 List<Type>& patchInfo
             );
 
+            //- Merge data from patch into overall data
+            void updateFromPatchInfo
+            (
+                const ggiPolyPatch& to,
+                const labelListList& addr,
+                const labelList& owner,
+                const labelList& ownerIndex,
+                List<Type>& patchInfo
+            );
+
             //- Merge data from across processor boundaries
             void handleProcPatches();
 
@@ -236,6 +248,9 @@ class PointEdgeWave
 
             //- Merge data from across cyclic boundaries
             void handleCyclicPatches();
+
+            //- Merge data from across cyclic boundaries
+            void handleGgiPatches();
 
 
         //- Disallow default bitwise copy construct
@@ -351,8 +366,21 @@ public:
     }
 };
 
-} // End namespace Foam
 
+//- List update operation
+template <class Type>
+class listAppendOp
+{
+
+public:
+
+    void operator()(List<Type>& x, const List<Type>& y) const
+    {
+        x.append(y);
+    }
+};
+
+} // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -6,9 +6,9 @@ int USERD_get_nfaced_nodes_per_face
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_nfaced_nodes_per_face" 
+    Info << "Entering: USERD_get_nfaced_nodes_per_face"
         << ", part_number = " << part_number
-        << endl 
+        << endl
         << flush;
 #endif
 
@@ -56,7 +56,7 @@ int USERD_get_nfaced_nodes_per_face
                 }
             }
         }
-        
+
     }
     else if (part_number < nPatches+2)
     {
@@ -66,7 +66,7 @@ int USERD_get_nfaced_nodes_per_face
     {
         return Z_ERR;
     }
-    else if 
+    else if
     (
         secondMeshPtr
      && part_number == secondMeshPartNum
@@ -136,7 +136,7 @@ int USERD_get_nfaced_nodes_per_face
         return Z_ERR;
     }
 #ifdef ENSIGHTDEBUG
-    Info << "Exiting: USERD_get_nfaced_nodes_per_face" << endl 
+    Info << "Exiting: USERD_get_nfaced_nodes_per_face" << endl
         << flush;
 #endif
     return Z_OK;

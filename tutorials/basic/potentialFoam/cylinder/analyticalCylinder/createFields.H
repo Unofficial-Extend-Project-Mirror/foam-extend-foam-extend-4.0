@@ -23,12 +23,12 @@ dimensionedScalar uInfX
 Info << "U at inlet = " << uInfX.value() << " m/s" << endl;
 
 dimensionedScalar radius
-( 
+(
     "radius",
     dimensionSet(0, 1, 0, 0, 0),
     mag(U.mesh().boundary()[4].Cf()[0])
 );
-    
+
 Info << "Cylinder radius = " << radius.value() << " m" << endl;
 
 volVectorField UA

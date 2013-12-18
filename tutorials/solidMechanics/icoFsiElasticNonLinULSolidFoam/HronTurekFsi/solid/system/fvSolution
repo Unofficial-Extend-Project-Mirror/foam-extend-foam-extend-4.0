@@ -1,0 +1,79 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    DU
+    {
+	solver GAMG;
+        tolerance        1e-8;
+        relTol           0.01;
+        minIter          1;
+        maxIter          1000;
+
+        smoother         GaussSeidel;
+        nPreSweeps       0;
+        nPostSweeps      2;
+        nFinestSweeps    2;
+
+	scaleCorrection true;
+        directSolveCoarsest false;
+			   		
+
+        cacheAgglomeration true;
+
+        nCellsInCoarsestLevel 20;
+        agglomerator     faceAreaPair;
+        mergeLevels      1;
+    };
+
+//    DU
+//    {
+//	  solver amgSolver;
+//        cycle           W-cycle;
+//        policy          AAMG;
+//        nPreSweeps      0;
+//        nPostSweeps     2;
+//        groupSize       4;
+//        minCoarseEqns   20;
+//        nMaxLevels      100;
+//        scale           on;
+//        smoother        ILU;
+
+//        minIter           0;
+//        maxIter           1000;
+//        tolerance         1e-6;
+//        relTol            0.01;
+//    };
+
+//    DU               AMG 1e-06 0.01 100;
+//    DU               ICCG 1e-07 0.01;
+}
+
+solidMechanics
+{
+    nCorrectors     	1000;
+    DU               	1e-06;
+    historyPointID	62;
+}
+
+relaxationFactors
+{
+    DU 0.9;
+}
+
+// ************************************************************************* //

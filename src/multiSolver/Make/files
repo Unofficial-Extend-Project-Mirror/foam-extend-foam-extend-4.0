@@ -1,0 +1,7 @@
+dummyControlDict/dummyControlDict.C
+multiTime/multiTime.C
+multiSolver/multiSolver.C
+timeCluster/timeCluster.C
+timeCluster/timeClusterList.C
+
+LIB = $(FOAM_LIBBIN)/libmultiSolver

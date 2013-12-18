@@ -1,25 +1,25 @@
 #---------------------------------*- sh -*-------------------------------------
 # =========                 |
-# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+# \\      /  F ield         | foam-extend: Open Source CFD
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright held by original author
+#   \\  /    A nd           | For copyright notice see file Copyright
 #    \\/     M anipulation  |
 #------------------------------------------------------------------------------
 # License
-#     This file is part of OpenFOAM.
+#     This file is part of foam-extend.
 #
-#     OpenFOAM is free software: you can redistribute it and/or modify it
-#     under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
+#     foam-extend is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation, either version 3 of the License, or (at your
+#     option) any later version.
 #
-#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-#     for more details.
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # File
 #     makeThirdPartyFunctionsForRPM
@@ -33,8 +33,8 @@
 buildBase=$WM_THIRD_PARTY_DIR/rpmBuild
 architecture=`rpm --eval "%{_target_cpu}"`
 
-RPM_CMD='rpm' 
-RPM_CMD_XTRA_OPTIONS='' 
+RPM_CMD='rpm'
+RPM_CMD_XTRA_OPTIONS=''
 
 # Adjust the rpm command options on Ubuntu/Debian based systems
 ${RPM_CMD} --force-debian >& /dev/null
@@ -53,14 +53,15 @@ rpm_make()
 {
     # Avoid word splitting on 'space'
     IFS=$'\n'
- 
+
     # sort arguments
     _PACKAGE=''
     _SPECFILE=''
     _PACKAGE_URL=''
     _ADDITIONALFLAGS=''
+    _RPMFILENAME=''
 
-    while getopts p:s:u:a: flags
+    while getopts p:s:u:f:n:a: flags
       do
       case $flags in
 	  p)  _PACKAGE=$OPTARG
@@ -69,7 +70,11 @@ rpm_make()
 	      ;;
 	  s)  _SPECFILE=$OPTARG
 	      ;;
-	  a)  _ADDITIONALFLAGS=$OPTARG
+	  f)  _ADDITIONALFLAGS=$OPTARG
+	      ;;
+	  n)  _RPMFILENAME=$OPTARG
+	      ;;
+	  a)  architecture=$OPTARG
 	      ;;
       esac
     done
@@ -83,11 +88,19 @@ rpm_make()
     shift `expr $OPTIND - 1`
 
     # Make sure the ThirdParty environment is up-to-date
-    echo "Updating the ThirdParty environment variables before building package $_PACKAGE" 
+    echo "Updating the ThirdParty environment variables before building package $_PACKAGE"
     . $WM_PROJECT_DIR/etc/settings.sh
 
-    rpmName=$_PACKAGE-$WM_OPTIONS.$architecture
+    if [ "$_RPMFILENAME" = "" ]; then
+	rpmName=$_PACKAGE-$WM_OPTIONS.$architecture
+    else
+	# Filename for the RPM was overridden from the command line
+	rpmName=$_RPMFILENAME
+    fi
+
     rpmFile=$buildBase/RPMS/$architecture/$rpmName.rpm
+
+    echo "RPM file name     : $rpmFile"
 
     # We check immediatly if the RPM binary package is available in the local RPMs vault.
     # If so, we basically uninstall/reinstall the package. This is handy for installation
@@ -97,13 +110,13 @@ rpm_make()
     #
     if [ ! -e "$rpmFile" ]; then
         #
-        # The package's RPM is absent. We build from the package source tarball 
+        # The package's RPM is absent. We build from the package source tarball
         #
 	cd $buildBase
 
         #
         # Do we need to download the package using the supplied URL
-	if [ -n "$_PACKAGE_URL" ]; then  
+	if [ -n "$_PACKAGE_URL" ]; then
             packageTarBall=`basename $_PACKAGE_URL`
 
             if [ ! -e "SOURCES/$packageTarBall" ]; then
@@ -117,10 +130,16 @@ rpm_make()
     fi
 
     # Install RPM package if not done already
-    if [ ! -e "$WM_THIRD_PARTY_DIR/packages/$_PACKAGE/platforms/$WM_OPTIONS" ]; then
+    if [ "$architecture" = "noarch" ]; then
+	installDir=$WM_THIRD_PARTY_DIR/packages/$_PACKAGE/platforms/noarch
+    else
+	installDir=$WM_THIRD_PARTY_DIR/packages/$_PACKAGE/platforms/$WM_OPTIONS
+    fi
+
+    if [ ! -e "$installDir" ]; then
         echo "Installing package: $_PACKAGE"
-        rpm_uninstall $_PACKAGE
-        rpm_install   $_PACKAGE
+        rpm_uninstall $_PACKAGE $rpmName
+        rpm_install   $_PACKAGE $rpmName $rpmFile
     else
         echo "Package $_PACKAGE is already installed"
     fi
@@ -129,6 +148,7 @@ rpm_make()
     unset _SPECFILE
     unset _PACKAGE_URL
     unset _ADDITIONALFLAGS
+    unset _RPMFILENAME
 
     echo "Done installing package $_PACKAGE"
     echo ""
@@ -146,8 +166,8 @@ rpm_build()
     cd $buildBase
 
     [ -e ./SPECS/$specFile ] || {
-        echo "rpm_build: missing SPEC file for package $package. Aborting."
-        return 1
+        echo "rpm_build: Error: missing SPEC file for package $package. Aborting."
+        exit -1
     }
 
     #Build RPM package
@@ -164,7 +184,7 @@ rpm_build()
 rpm_uninstall()
 {
     package="$1"
-    rpmName=$package-$WM_OPTIONS.$architecture
+    rpmName="$2"
 
     cd $buildBase
 
@@ -184,14 +204,13 @@ rpm_uninstall()
 rpm_install()
 {
     package="$1";
-    rpmName=$package-$WM_OPTIONS.$architecture;
-    rpmFile=$buildBase/RPMS/$architecture/$rpmName.rpm;
+    rpmName="$2";
+    rpmFile="$3";
 
     echo "  Installing $package using RPM file: $rpmFile";
     ${RPM_CMD} ${RPM_CMD_XTRA_OPTIONS} -ivh              \
 	$rpmFile          \
 	--dbpath $buildBase/rpmDB --force --nodeps;
-
 }
 
 #
@@ -203,7 +222,7 @@ rpm_populateRPMvault()
 
     echo " Local RPM vault location: $rpmVault"
     echo ""
-    echo " Moving the following RPMs to the local RPM vault: `echo $@`" 
+    echo " Moving the following RPMs to the local RPM vault: `echo $@`"
 
     mkdir -p $rpmVault
     mv $@ $rpmVault
@@ -214,4 +233,22 @@ rpm_populateRPMvault()
     echo ""
 
 }
+#
+# Remove an installed package
+#
+uninstallPackage()
+{
+    pkg="$1";
+    if [ -d $WM_THIRD_PARTY_DIR/packages/${pkg} ]; then
+	set -x
+	rm -f  $WM_THIRD_PARTY_DIR/rpmBuild/RPMS/$architecture/${pkg}*.rpm
+	rm -f  $WM_THIRD_PARTY_DIR/rpmBuild/TGZS/$architecture/${pkg}.tgz
+	rm -rf $WM_THIRD_PARTY_DIR/rpmBuild/BUILD/${pkg}*
+	rm -rf $WM_THIRD_PARTY_DIR/packages/$pkg
+	set +x
+    else
+	echo "Package ${pkg} is already removed."
+    fi
+}
+
 # ----------------------------------------------------------------- end-of-file

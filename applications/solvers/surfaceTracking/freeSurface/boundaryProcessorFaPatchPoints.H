@@ -19,7 +19,7 @@
 
                 if (index != -1)
                 {
-                    if 
+                    if
                     (
                         aMesh().boundary()[patchI].type()
                      != processorFaPatch::typeName

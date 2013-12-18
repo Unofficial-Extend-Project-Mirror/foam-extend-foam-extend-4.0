@@ -1,0 +1,51 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      rheologyProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+planeStress     no;
+
+rheology
+{
+    type                    multiMaterial;
+
+    laws
+    (
+        corticalBone
+        {
+            type            linearElastic;
+            rho             rho [1 -3 0 0 0 0 0] 7800;
+            E               E [1 -1 -2 0 0 0 0] 17e+9;
+            nu              nu [0 0 0 0 0 0 0] 0.3;
+        }
+
+        composite
+        {
+	  type            orthotropicLinearElastic;
+	  rho             rho [1 -3 0 0 0 0 0] 7854;
+	  Ex              Ex [1 -1 -2 0 0 0 0] 200e+9;
+	  Ey              Ey [1 -1 -2 0 0 0 0] 200e+9;
+	  Ez              Ez [1 -1 -2 0 0 0 0] 200e+9;
+	  nuxy            nuxy [0 0 0 0 0 0 0] 0.3;
+	  nuyz            nuyz [0 0 0 0 0 0 0] 0.3;
+	  nuzx            nuzx [0 0 0 0 0 0 0] 0.3;
+	  Gxy             Gxy [1 -1 -2 0 0 0 0] 76.923076923e9;
+	  Gyz             Gyz [1 -1 -2 0 0 0 0] 76.923076923e9;
+	  Gzx             Gzx [1 -1 -2 0 0 0 0] 76.923076923e9;
+	}
+    );
+}
+
+// ************************************************************************* //

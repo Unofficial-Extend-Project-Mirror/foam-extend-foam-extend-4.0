@@ -1,11 +1,6 @@
    #include "readPISOControls.H"
    #include "readTimeControls.H"
 
-    label nAlphaCorr
-    (
-        readLabel(piso.lookup("nAlphaCorr"))
-    );
-
     label nAlphaSubCycles
     (
         readLabel(piso.lookup("nAlphaSubCycles"))

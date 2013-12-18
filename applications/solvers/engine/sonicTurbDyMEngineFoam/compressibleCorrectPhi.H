@@ -28,7 +28,7 @@
     pcorr.oldTime() == p.oldTime();
 
     phi = fvc::interpolate(rho)
-        *((fvc::interpolate(U) & mesh.Sf()) - fvc::meshPhi(rho, U)); 
+        *((fvc::interpolate(U) & mesh.Sf()) - fvc::meshPhi(rho, U));
 
     for(int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
     {
@@ -43,7 +43,7 @@
 
         if (nonOrth == nNonOrthCorr)
         {
-            phi += pcorrEqn.flux(); 
+            phi += pcorrEqn.flux();
         }
     }
 }

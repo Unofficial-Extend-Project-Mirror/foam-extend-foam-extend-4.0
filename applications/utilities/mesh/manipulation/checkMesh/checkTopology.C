@@ -253,6 +253,7 @@ Foam::label Foam::checkTopology
         }
     }
 
+    // Serial checks
     if (!Pstream::parRun())
     {
         Pout<< "\nChecking patch topology for multiply connected surfaces ..."
@@ -274,7 +275,9 @@ Foam::label Foam::checkTopology
             << setw(20) << "Patch"
             << setw(9) << "Faces"
             << setw(9) << "Points"
+            << setw(12) << "Area [m^2]"
             << setw(34) << "Surface topology";
+
         if (allGeometry)
         {
             Pout<< " Bounding box";
@@ -288,7 +291,8 @@ Foam::label Foam::checkTopology
                 Pout<< "    "
                     << setw(20) << pp.name()
                     << setw(9) << pp.size()
-                    << setw(9) << pp.nPoints();
+                    << setw(9) << pp.nPoints()
+                    << setw(12) << sumMag(pp.faceAreas()) ;
 
 
             primitivePatch::surfaceTopo pTyp = pp.surfaceType();

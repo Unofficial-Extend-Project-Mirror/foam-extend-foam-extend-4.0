@@ -1,0 +1,41 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      decomposeParDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// numberOfSubdomains 2;
+// method          simple;
+
+numberOfSubdomains 4;
+method          simple;
+
+// numberOfSubdomains 5;
+// method    metis;
+
+//- Keep owner and neighbour on same processor for faces in zones:
+// preserveFaceZones ( leftZone rightZone );
+
+simpleCoeffs
+{
+//     n               ( 2 1 1 );
+    n               ( 2 2 1 );
+    delta           0.001;
+}
+
+distributed     no;
+
+roots           ( );
+
+// ************************************************************************* //

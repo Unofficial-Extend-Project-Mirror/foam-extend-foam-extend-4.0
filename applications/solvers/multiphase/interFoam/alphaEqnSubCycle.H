@@ -1,11 +1,11 @@
 label nAlphaCorr
 (
-    readLabel(piso.lookup("nAlphaCorr"))
+    readLabel(pimple.lookup("nAlphaCorr"))
 );
 
 label nAlphaSubCycles
 (
-    readLabel(piso.lookup("nAlphaSubCycles"))
+    readLabel(pimple.lookup("nAlphaSubCycles"))
 );
 
 if (nAlphaSubCycles > 1)

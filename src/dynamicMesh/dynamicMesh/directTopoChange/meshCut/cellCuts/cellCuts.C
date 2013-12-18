@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -379,7 +378,7 @@ void Foam::cellCuts::calcFaceCuts() const
         label cutI = 0;
 
         // Do point-edge-point walk over face and collect all cuts.
-        // Problem is that we want to start from one of the endpoints of a 
+        // Problem is that we want to start from one of the endpoints of a
         // string of connected cuts; we don't want to start somewhere in the
         // middle.
 
@@ -395,7 +394,7 @@ void Foam::cellCuts::calcFaceCuts() const
                 label fpMin1 = (fp == 0 ? f.size()-1 : fp-1);
                 label vMin1 = f[fpMin1];
 
-                if 
+                if
                 (
                     !pointIsCut_[vMin1]
                  && !edgeIsCut_[findEdge(faceI, v0, vMin1)]
@@ -664,7 +663,7 @@ bool Foam::cellCuts::crossEdge
         return true;
     }
     else
-    {    
+    {
         // No success. Restore state (i.e. backtrack)
         nVisited = oldNVisited;
 
@@ -799,7 +798,7 @@ bool Foam::cellCuts::walkFace
 
 
 
-// Walk across cuts (cut edges or cut vertices) of cell. Stops when hit cut 
+// Walk across cuts (cut edges or cut vertices) of cell. Stops when hit cut
 // already visited. Returns true when loop of 3 or more vertices found.
 bool Foam::cellCuts::walkCell
 (
@@ -1207,7 +1206,7 @@ Foam::labelList Foam::cellCuts::nonAnchorPoints
 
         if
         (
-            findIndex(anchorPoints, pointI) == -1 
+            findIndex(anchorPoints, pointI) == -1
          && findIndex(loop, vertToEVert(pointI)) == -1
         )
         {
@@ -1561,7 +1560,7 @@ bool Foam::cellCuts::calcAnchors
                 }
                 prevStat = eStat;
             }
-        }        
+        }
     }
 
 
@@ -2140,7 +2139,7 @@ bool Foam::cellCuts::setFromCellLoop
         // Storage for points on one side of cell
         labelList anchorPoints;
 
-        okLoop = 
+        okLoop =
             validLoop(cellI, loop, loopWeights, faceSplitCuts, anchorPoints);
 
         if (okLoop)
@@ -3016,7 +3015,7 @@ void Foam::cellCuts::flip(const label cellI)
             mesh().cellPoints()[cellI],
             cellAnchorPoints_[cellI],
             loop
-        );  
+        );
 }
 
 

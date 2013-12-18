@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -68,7 +67,7 @@ bool validTri(const bool verbose, const triSurface& surf, const label faceI)
         return false;
     }
 
-    // duplicate triangle check
+    // Duplicate triangle check
 
     const labelList& fFaces = surf.faceFaces()[faceI];
 
@@ -187,6 +186,7 @@ int main(int argc, char *argv[])
     // ~~~~
 
     triSurface surf(surfFileName);
+    const pointField& surfPoints = surf.points();
 
 
     Pout<< "Statistics:" << endl;
@@ -199,6 +199,7 @@ int main(int argc, char *argv[])
 
     {
         labelList regionSize(surf.patches().size(), 0);
+        scalarField regionSumArea(surf.patches().size(), 0);
 
         forAll(surf, faceI)
         {
@@ -208,22 +209,24 @@ int main(int argc, char *argv[])
             {
                 WarningIn(args.executable())
                     << "Triangle " << faceI << " vertices " << surf[faceI]
-                    << " has region " << region << " which is outside the range"
-                    << " of regions 0.." << surf.patches().size()-1
+                    << " has region " << region
+                    << " which is outside the range"
+                    << " of regions 0.." << surf.patches().size() - 1
                     << endl;
             }
             else
             {
                 regionSize[region]++;
+                regionSumArea[region] += surf[faceI].mag(surfPoints);
             }
         }
 
-        Pout<< "Region\tSize" << nl
-            << "------\t----" << nl;
+        Pout<< "Region\tSize\tArea" << nl
+            << "------\t----\t----" << nl;
         forAll(surf.patches(), patchI)
         {
-            Pout<< surf.patches()[patchI].name() << '\t'
-                << regionSize[patchI] << nl;
+            Pout<< surf.patches()[patchI].name() << tab
+                << regionSize[patchI] << tab << regionSumArea[patchI] << nl;
         }
         Pout<< nl << endl;
     }

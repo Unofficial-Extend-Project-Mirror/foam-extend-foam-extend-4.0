@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Check for proper number of command line args.
+if [ "$#" -ne 2 ]; then
+  echo "Usage: makeLinks fluidCase solidCase"
+  exit 1 
+fi
+
+echo changing into fluid directory
+cd $1/constant
+
+echo creating links
+ln -s ../../$2/constant solid
+cd ../system
+ln -s ../../$2/system solid
+cd ../0
+ln -s ../../$2/0 solid
+cd ..
+
+echo creating processor links
+for proc in processor*
+do
+  cd $proc
+  cd 0
+  ln -s ../../../$2/$proc/0 solid
+  cd ../constant
+  ln -s ../../../$2/$proc/constant solid
+  cd ../..
+done

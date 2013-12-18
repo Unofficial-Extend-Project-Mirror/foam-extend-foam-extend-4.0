@@ -4,7 +4,7 @@ int USERD_get_number_of_timesets
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_number_of_timesets" << endl 
+    Info << "Entering: USERD_get_number_of_timesets" << endl
         << flush;
 #endif
 

@@ -1,0 +1,71 @@
+                                     |---------------------.
+                                     | David L. F. Gaden's |
+                    .----------------|---------------------'
+                    | equationReader |  Version:    0.6.0
+                    '----------------|
+
+Description
+===========
+An extension to OpenFOAM that allows you to read equations from a dictionary
+file and (optionally) have them evaluated at every time step.
+
+Original Author
+===============
+David L. F. Gaden (dlfgaden@gmail.com)
+
+Current Maintainer
+==================
+David L. F. Gaden (dlfgaden@gmail.com)
+
+Contributors
+============
+David L. F. Gaden : base version
+
+Documentation
+=============
+github.com/Marupio/equationReader/wiki
+
+Installation/Compilation
+========================
+Refer to the documentation.
+
+Contents
+========
+ - src - the library source files
+ - applications - a demo application that uses equationReader
+ - tutorials - a sample case that runs the demo application
+
+Required OpenFOAM-Version (Known to work with)
+==============================================
+3.0
+2.1.x
+2.2.x
+
+History
+=======
+
+ 2010-07-21: Initial import
+ 2010-08-05: Differentiated versions for OpenFOAM 1.5.x/1.5-dev and
+    OpenFOAM 1.6+
+ 2010-08-12:
+    * Added IOobject support for automatic output - IOEquationReader
+    * Removed need for pointers
+    * Added support for scalarLists as a data source
+    * Cleaned up available functions
+ 2010-10-16:
+    * Added full support for fields - equationReader can now operate across the
+        entire mesh.
+    * Bug fixes:
+        * Dimension-checking for min and max functions
+        * Moved IOobjects to db directory
+ 2011-09-25: Version 0.5.0
+    * Improved treatment of fields - now approximately 10x faster
+    * Introduced version numbers to keep track of changes
+ 2012-10-25: Version 0.5.1
+    * Moved to git
+    * Bug fixes:
+        * Circular reference detection now working
+ 2013-08-29: Version 0.6.0
+    * Uploaded to github and OpenFOAM-extend
+    * Restructured applications and tutorials directories for consistency
+    * Made opening splash optional

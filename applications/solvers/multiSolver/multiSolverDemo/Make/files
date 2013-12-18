@@ -1,0 +1,3 @@
+multiSolverDemo.C
+
+EXE = $(FOAM_APPBIN)/multiSolverDemo

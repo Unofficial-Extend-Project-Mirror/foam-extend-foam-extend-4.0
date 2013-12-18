@@ -1,0 +1,85 @@
+#!/bin/bash
+cd ${0%/*} || exit 1    # run from this directory
+
+if [ "$PWD" != "$WM_PROJECT_DIR" ]
+then
+    echo
+    echo "Error: Current directory is not \$WM_PROJECT_DIR"
+    echo "    The environment variables are not consistent with the installation."
+    echo "    Please source configuration files."
+    echo 
+    echo "Examples:"
+    echo "    bash: . etc/bashrc"
+    echo "    tcsh: source etc/cshrc"
+    echo 
+    echo "    If you sourced the configuration files, please check the 'foamInstall' entry."   
+    echo
+    exit 1
+fi
+
+if [ -z "$PARAVIEW_SYSTEM" ] && [ -z "$QT_BIN_DIR" ]
+then
+    echo 
+    echo "\$QT_BIN_DIR not set. To compile Paraview from sources"
+    echo "the command \$QT_BIN_DIR/qmake needs to be valid."
+    echo
+    echo "Examples: "
+    echo "    Ubuntu:   \"export QT_BIN_DIR=/usr/bin\""
+    echo "    Fedora:   \"export QT_BIN_DIR=/usr/lib64/qt4/bin\""
+    echo "    openSuse: \"export QT_BIN_DIR=/usr/bin\""
+    echo 
+    read -r -p "Proceed without compiling ParaView [Y/n] " response
+    if [[ $response =~ ^([nN][oO]|[nN])$ ]]
+    then
+        exit 0
+    fi
+fi 
+
+# Check whether we will be compiling cudaSolvers
+if [ -f $CUDA_BIN_DIR/nvcc ]
+then
+    echo
+    echo "Cuda compiler detected at $CUDA_BIN_DIR/nvcc;"
+    echo "cudaSolvers will be compiled by default."
+    echo
+
+    # If yes, check presence of $CUDA_ARCH 
+    if [ -z "$CUDA_ARCH" ]
+    then
+        echo
+        echo "\$CUDA_ARCH is required by nvcc compiler but not set."
+        echo "Check section '-gpu-architecture' in 'man nvcc' for details." 
+        echo
+        read -r -p "Proceed without compiling cudaSolvers? [Y/n] " response
+        if [[ $response =~ ^([nN][oO]|[nN])$ ]]
+        then
+            exit 0
+        fi
+        export CUDA_IGNORE
+    fi
+    echo "Cuda architecture set to: $CUDA_ARCH"
+fi
+
+# wmake is required for subsequent targets
+( cd wmake/src && make )
+
+# build ThirdParty sources
+( cd $WM_THIRD_PARTY_DIR && ./AllMake.pre )
+
+# We make sure the ThirdParty packages environment variables are up-to-date
+# before compiling the rest of OpenFOAM
+. $WM_PROJECT_DIR/etc/settings.sh
+
+# build OpenFOAM libraries and applications
+src/Allwmake
+applications/Allwmake
+
+if [ "$1" = doc ]
+then
+    doc/Allwmake
+fi
+
+# build ThirdParty sources that depend on main installation
+( cd $WM_THIRD_PARTY_DIR && ./AllMake.post )
+
+# ----------------------------------------------------------------- end-of-file

@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -91,7 +90,7 @@ bool reflectParcel::wallTreatment
         {
             // static mesh
             scalar Un = p.U() & Sf;
-            
+
             if (Un > 0)
             {
                 p.U() -= (1.0 + elasticity_)*Un*Sf;
@@ -126,7 +125,7 @@ bool reflectParcel::wallTreatment
             scalar magSfDiff = mag(Sf - Sf0);
 
             vector Ub = Ub0 + p.stepFraction()*(Ub1 - Ub0);
-                
+
             if (magSfDiff > SMALL)
             {
                 // rotation + translation
@@ -135,17 +134,17 @@ bool reflectParcel::wallTreatment
                 vector omega = Sf0 ^ Sf;
                 scalar magOmega = mag(omega);
                 omega /= magOmega+SMALL;
-                    
+
                 scalar phiVel = ::asin(magOmega)/dt;
-                    
+
                 scalar dist = (p.position() - Cf) & Sfp;
                 vector pos = p.position() - dist*Sfp;
                 vector vrot = phiVel*(omega ^ (pos - Cf));
 
                 vector v = Ub + vrot;
-                
+
                 scalar Un = ((p.U() - v) & Sfp);
-                
+
                 if (Un > 0.0)
                 {
                     p.U() -= (1.0 + elasticity_)*Un*Sfp;
@@ -180,7 +179,7 @@ bool reflectParcel::wallTreatment
     {
         FatalError
             << "bool reflectParcel::wallTreatment(parcel& parcel) const "
-                << " parcel has hit a boundary " 
+                << " parcel has hit a boundary "
                 << mesh_.boundary()[patchi].type()
                 << " which not yet has been implemented."
             << abort(FatalError);

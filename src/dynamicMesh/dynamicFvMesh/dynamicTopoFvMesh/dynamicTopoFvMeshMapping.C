@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     dynamicTopoFvMesh
@@ -37,13 +36,20 @@ Author
 
 #include "dynamicTopoFvMesh.H"
 
+#include "Time.H"
 #include "meshOps.H"
 #include "IOmanip.H"
 #include "triFace.H"
 #include "objectMap.H"
+#include "faceSetAlgorithm.H"
+#include "cellSetAlgorithm.H"
 
 namespace Foam
 {
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+defineTemplateTypeNameAndDebugWithName(IOList<objectMap>, "objectMapIOList", 0);
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -52,77 +58,397 @@ void dynamicTopoFvMesh::computeMapping
 (
     const scalar matchTol,
     const bool skipMapping,
+    const bool mappingOutput,
     const label faceStart,
     const label faceSize,
     const label cellStart,
     const label cellSize
 )
 {
+    // Convex-set algorithm for cells
+    cellSetAlgorithm cellAlgorithm
+    (
+        (*this),
+        oldPoints_,
+        edges_,
+        faces_,
+        cells_,
+        owner_,
+        neighbour_
+    );
+
+    label nInconsistencies = 0;
+    scalar maxFaceError = 0.0, maxCellError = 0.0;
+    DynamicList<scalar> cellErrors(10), faceErrors(10);
+    DynamicList<objectMap> failedCells(10), failedFaces(10);
+
     // Compute cell mapping
     for (label cellI = cellStart; cellI < (cellStart + cellSize); cellI++)
     {
         label cIndex = cellsFromCells_[cellI].index();
+        labelList& masterObjects = cellsFromCells_[cellI].masterObjects();
 
         if (skipMapping)
         {
-            // Set empty mapping parameters
-            const labelList& mo = cellParents_[cIndex];
-
-            cellsFromCells_[cellI].masterObjects() = mo;
-            cellWeights_[cellI].setSize(mo.size(), (1.0/(mo.size() + VSMALL)));
-            cellCentres_[cellI].setSize(mo.size(), vector::zero);
+            // Dummy map from cell[0]
+            masterObjects = labelList(1, 0);
+            cellWeights_[cellI].setSize(1, 1.0);
+            cellCentres_[cellI].setSize(1, vector::zero);
         }
         else
         {
-            // Compute master objects for inverse-distance weighting
-            computeParents
+            // Obtain weighting factors for this cell.
+            cellAlgorithm.computeWeights
             (
                 cIndex,
+                0,
                 cellParents_[cIndex],
                 polyMesh::cellCells(),
-                polyMesh::cellCentres(),
-                3,
-                cellsFromCells_[cellI].masterObjects()
+                masterObjects,
+                cellWeights_[cellI],
+                cellCentres_[cellI]
             );
+
+            // Add contributions from subMeshes, if any.
+            computeCoupledWeights
+            (
+                cIndex,
+                cellAlgorithm.dimension(),
+                masterObjects,
+                cellWeights_[cellI],
+                cellCentres_[cellI]
+            );
+
+            // Compute error
+            scalar error = mag(1.0 - sum(cellWeights_[cellI]));
+
+            if (error > matchTol)
+            {
+                bool consistent = false;
+
+                // Check whether any edges lie on boundary patches.
+                // These cells can have relaxed weights to account
+                // for mild convexity.
+                const cell& cellToCheck = cells_[cIndex];
+
+                if (twoDMesh_)
+                {
+                    const labelList& parents = cellParents_[cIndex];
+
+                    forAll(parents, cI)
+                    {
+                        const cell& pCell = polyMesh::cells()[parents[cI]];
+
+                        forAll(pCell, fI)
+                        {
+                            const face& pFace = polyMesh::faces()[pCell[fI]];
+
+                            if (pFace.size() == 3)
+                            {
+                                continue;
+                            }
+
+                            label fP = boundaryMesh().whichPatch(pCell[fI]);
+
+                            // Disregard processor patches
+                            if (getNeighbourProcessor(fP) > -1)
+                            {
+                                continue;
+                            }
+
+                            if (fP > -1)
+                            {
+                                consistent = true;
+                                break;
+                            }
+                        }
+
+                        if (consistent)
+                        {
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    forAll(cellToCheck, fI)
+                    {
+                        const labelList& fE = faceEdges_[cellToCheck[fI]];
+
+                        forAll(fE, eI)
+                        {
+                            label eP = whichEdgePatch(fE[eI]);
+
+                            // Disregard processor patches
+                            if (getNeighbourProcessor(eP) > -1)
+                            {
+                                continue;
+                            }
+
+                            if (eP > -1)
+                            {
+                                consistent = true;
+                                break;
+                            }
+                        }
+
+                        if (consistent)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                if (!consistent)
+                {
+                    nInconsistencies++;
+
+                    // Add to list
+                    cellErrors.append(error);
+
+                    // Accumulate error stats
+                    maxCellError = Foam::max(maxCellError, error);
+
+                    failedCells.append
+                    (
+                        objectMap
+                        (
+                            cIndex,
+                            cellParents_[cIndex]
+                        )
+                    );
+                }
+            }
         }
     }
+
+    // Convex-set algorithm for faces
+    faceSetAlgorithm faceAlgorithm
+    (
+        (*this),
+        oldPoints_,
+        edges_,
+        faces_,
+        cells_,
+        owner_,
+        neighbour_
+    );
 
     // Compute face mapping
     for (label faceI = faceStart; faceI < (faceStart + faceSize); faceI++)
     {
         label fIndex = facesFromFaces_[faceI].index();
-        label patchIndex = whichPatch(fIndex);
+        labelList& masterObjects = facesFromFaces_[faceI].masterObjects();
 
-        // Skip mapping for internal faces.
-        if (patchIndex == -1)
+        label patchIndex = whichPatch(fIndex);
+        label neiProc = getNeighbourProcessor(patchIndex);
+
+        // Skip mapping for internal / processor faces.
+        if (patchIndex == -1 || neiProc > -1)
         {
             // Set dummy masters, so that the conventional
-            // faceMapper doesn't incur a seg-fault.
-            facesFromFaces_[faceI].masterObjects() = labelList(1, 0);
+            // faceMapper doesn't crash-and-burn
+            masterObjects = labelList(1, 0);
+
             continue;
         }
 
         if (skipMapping)
         {
-            // Set empty mapping parameters
-            const labelList& mo = faceParents_[fIndex];
-
-            facesFromFaces_[faceI].masterObjects() = mo;
-            faceWeights_[faceI].setSize(mo.size(), (1.0/(mo.size() + VSMALL)));
-            faceCentres_[faceI].setSize(mo.size(), vector::zero);
+            // Dummy map from patch[0]
+            masterObjects = labelList(1, 0);
+            faceWeights_[faceI].setSize(1, 1.0);
+            faceCentres_[faceI].setSize(1, vector::zero);
         }
         else
         {
-            // Compute master objects for inverse-distance weighting
-            computeParents
+            // Obtain weighting factors for this face.
+            faceAlgorithm.computeWeights
             (
                 fIndex,
+                boundaryMesh()[patchIndex].start(),
                 faceParents_[fIndex],
                 boundaryMesh()[patchIndex].faceFaces(),
-                boundaryMesh()[patchIndex].faceCentres(),
-                2,
-                facesFromFaces_[faceI].masterObjects()
+                masterObjects,
+                faceWeights_[faceI],
+                faceCentres_[faceI]
             );
+
+            // Add contributions from subMeshes, if any.
+            computeCoupledWeights
+            (
+                fIndex,
+                faceAlgorithm.dimension(),
+                masterObjects,
+                faceWeights_[faceI],
+                faceCentres_[faceI]
+            );
+
+            // Compute error
+            scalar error = mag(1.0 - sum(faceWeights_[faceI]));
+
+            if (error > matchTol)
+            {
+                bool consistent = false;
+
+                // Check whether any edges lie on bounding curves.
+                // These faces can have relaxed weights to account
+                // for addressing into patches on the other side
+                // of the curve.
+                const labelList& fEdges = faceEdges_[fIndex];
+
+                forAll(fEdges, eI)
+                {
+                    if (checkBoundingCurve(fEdges[eI]))
+                    {
+                        consistent = true;
+                    }
+                }
+
+                if (!consistent)
+                {
+                    nInconsistencies++;
+
+                    // Add to list
+                    faceErrors.append(error);
+
+                    // Accumulate error stats
+                    maxFaceError = Foam::max(maxFaceError, error);
+
+                    failedFaces.append
+                    (
+                        objectMap
+                        (
+                            fIndex,
+                            faceParents_[fIndex]
+                        )
+                    );
+                }
+            }
+        }
+    }
+
+    if (nInconsistencies)
+    {
+        Pout<< " Mapping errors: "
+            << " max cell error: " << maxCellError
+            << " max face error: " << maxFaceError
+            << endl;
+
+        if (debug || mappingOutput)
+        {
+            if (failedCells.size())
+            {
+                Pout<< " failedCells: " << endl;
+
+                forAll(failedCells, cellI)
+                {
+                    label index = failedCells[cellI].index();
+
+                    Pout<< "  Cell: " << index
+                        << "  Error: " << cellErrors[cellI]
+                        << endl;
+                }
+            }
+
+            if (failedFaces.size())
+            {
+                Pout<< " failedFaces: " << endl;
+
+                forAll(failedFaces, faceI)
+                {
+                    label index = failedFaces[faceI].index();
+                    label patchIndex = whichPatch(index);
+
+                    const polyBoundaryMesh& boundary = boundaryMesh();
+
+                    Pout<< "  Face: " << index
+                        << "  Patch: " << boundary[patchIndex].name()
+                        << "  Error: " << faceErrors[faceI]
+                        << endl;
+                }
+            }
+
+            if (debug > 3 || mappingOutput)
+            {
+                // Prepare lists
+                labelList objects;
+                scalarField weights;
+                vectorField centres;
+
+                if (failedCells.size())
+                {
+                    forAll(failedCells, cellI)
+                    {
+                        label cIndex = failedCells[cellI].index();
+
+                        cellAlgorithm.computeWeights
+                        (
+                            cIndex,
+                            0,
+                            cellParents_[cIndex],
+                            polyMesh::cellCells(),
+                            objects,
+                            weights,
+                            centres,
+                            true
+                        );
+
+                        computeCoupledWeights
+                        (
+                            cIndex,
+                            cellAlgorithm.dimension(),
+                            objects,
+                            weights,
+                            centres,
+                            true
+                        );
+
+                        // Clear lists
+                        objects.clear();
+                        weights.clear();
+                        centres.clear();
+                    }
+                }
+
+                if (failedFaces.size())
+                {
+                    forAll(failedFaces, faceI)
+                    {
+                        label fIndex = failedFaces[faceI].index();
+                        label patchIndex = whichPatch(fIndex);
+
+                        const polyBoundaryMesh& boundary = boundaryMesh();
+
+                        faceAlgorithm.computeWeights
+                        (
+                            fIndex,
+                            boundary[patchIndex].start(),
+                            faceParents_[fIndex],
+                            boundary[patchIndex].faceFaces(),
+                            objects,
+                            weights,
+                            centres,
+                            true
+                        );
+
+                        computeCoupledWeights
+                        (
+                            fIndex,
+                            faceAlgorithm.dimension(),
+                            objects,
+                            weights,
+                            centres,
+                            true
+                        );
+
+                        // Clear lists
+                        objects.clear();
+                        weights.clear();
+                        centres.clear();
+                    }
+                }
+            }
         }
     }
 }
@@ -144,16 +470,18 @@ void dynamicTopoFvMesh::computeMappingThread(void *argument)
     // Recast the pointers for the argument
     scalar& matchTol  = *(static_cast<scalar*>(thread->operator()(0)));
     bool& skipMapping = *(static_cast<bool*>(thread->operator()(1)));
-    label& faceStart  = *(static_cast<label*>(thread->operator()(2)));
-    label& faceSize   = *(static_cast<label*>(thread->operator()(3)));
-    label& cellStart  = *(static_cast<label*>(thread->operator()(4)));
-    label& cellSize   = *(static_cast<label*>(thread->operator()(5)));
+    bool& mappingOutput = *(static_cast<bool*>(thread->operator()(2)));
+    label& faceStart = *(static_cast<label*>(thread->operator()(3)));
+    label& faceSize = *(static_cast<label*>(thread->operator()(4)));
+    label& cellStart = *(static_cast<label*>(thread->operator()(5)));
+    label& cellSize = *(static_cast<label*>(thread->operator()(6)));
 
     // Now calculate addressing
     mesh.computeMapping
     (
         matchTol,
         skipMapping,
+        mappingOutput,
         faceStart, faceSize,
         cellStart, cellSize
     );
@@ -169,7 +497,8 @@ void dynamicTopoFvMesh::computeMappingThread(void *argument)
 void dynamicTopoFvMesh::threadedMapping
 (
     scalar matchTol,
-    bool skipMapping
+    bool skipMapping,
+    bool mappingOutput
 )
 {
     label nThreads = threader_->getNumThreads();
@@ -177,7 +506,7 @@ void dynamicTopoFvMesh::threadedMapping
     // If mapping is being skipped, issue a warning.
     if (skipMapping)
     {
-        Info << " *** Mapping is being skipped *** " << endl;
+        Info<< " *** Mapping is being skipped *** " << endl;
     }
 
     // Check if single-threaded
@@ -187,6 +516,7 @@ void dynamicTopoFvMesh::threadedMapping
         (
             matchTol,
             skipMapping,
+            mappingOutput,
             0, facesFromFaces_.size(),
             0, cellsFromCells_.size()
         );
@@ -212,8 +542,8 @@ void dynamicTopoFvMesh::threadedMapping
 
     if (debug > 2)
     {
-        Info << " Mapping Faces: " << index[0] << endl;
-        Info << " Mapping Cells: " << index[1] << endl;
+        Pout<< " Mapping Faces: " << index[0] << nl
+            << " Mapping Cells: " << index[1] << endl;
     }
 
     forAll(index, indexI)
@@ -234,8 +564,8 @@ void dynamicTopoFvMesh::threadedMapping
 
         if (debug > 2)
         {
-            Info << " Load starts: " << tStarts[indexI] << endl;
-            Info << " Load sizes: " << tSizes[indexI] << endl;
+            Pout<< " Load starts: " << tStarts[indexI] << nl
+                << " Load sizes: " << tSizes[indexI] << endl;
         }
     }
 
@@ -243,7 +573,7 @@ void dynamicTopoFvMesh::threadedMapping
     forAll(hdl, i)
     {
         // Size up the argument list
-        hdl[i].setSize(6);
+        hdl[i].setSize(7);
 
         // Set match tolerance
         hdl[i].set(0, &matchTol);
@@ -251,153 +581,30 @@ void dynamicTopoFvMesh::threadedMapping
         // Set the skipMapping flag
         hdl[i].set(1, &skipMapping);
 
+        // Set the mappingOutput flag
+        hdl[i].set(2, &mappingOutput);
+
         // Set the start/size indices
-        hdl[i].set(2, &(tStarts[0][i]));
-        hdl[i].set(3, &(tSizes[0][i]));
-        hdl[i].set(4, &(tStarts[1][i]));
-        hdl[i].set(5, &(tSizes[1][i]));
+        hdl[i].set(3, &(tStarts[0][i]));
+        hdl[i].set(4, &(tSizes[0][i]));
+        hdl[i].set(5, &(tStarts[1][i]));
+        hdl[i].set(6, &(tSizes[1][i]));
     }
 
     // Prior to multi-threaded operation,
     // force calculation of demand-driven data.
     polyMesh::cells();
     primitiveMesh::cellCells();
-    primitiveMesh::cellCentres();
 
     const polyBoundaryMesh& boundary = boundaryMesh();
 
     forAll(boundary, patchI)
     {
         boundary[patchI].faceFaces();
-        boundary[patchI].faceCentres();
     }
 
     // Execute threads in linear sequence
     executeThreads(identity(nThreads), hdl, &computeMappingThread);
-}
-
-
-// Compute parents for inverse-distance weighting
-void dynamicTopoFvMesh::computeParents
-(
-    const label index,
-    const labelList& mapCandidates,
-    const labelListList& oldNeighbourList,
-    const vectorField& oldCentres,
-    const label dimension,
-    labelList& parents
-) const
-{
-    if (parents.size())
-    {
-        FatalErrorIn
-        (
-            "\n\n"
-            "void dynamicTopoFvMesh::computeParents\n"
-            "(\n"
-            "    const label index,\n"
-            "    const labelList& mapCandidates,\n"
-            "    const labelListList& oldNeighbourList,\n"
-            "    const vectorField& oldCentres,\n"
-            "    const label dimension,\n"
-            "    labelList& parents\n"
-            ") const\n"
-        )
-            << " Addressing has already been calculated." << nl
-            << " Index: " << index << nl
-            << " Type: " << (dimension == 2 ? "Face" : "Cell") << nl
-            << " mapCandidates: " << mapCandidates << nl
-            << " Parents: " << parents << nl
-            << abort(FatalError);
-    }
-
-    // Figure out the patch offset and centre
-    label offset = -1;
-    vector centre = vector::zero;
-
-    if (dimension == 2)
-    {
-        offset = boundaryMesh()[whichPatch(index)].start();
-
-        centre = faces_[index].centre(oldPoints_);
-    }
-    else
-    if (dimension == 3)
-    {
-        offset = 0;
-        scalar dummyVol = 0.0;
-
-        meshOps::cellCentreAndVolume
-        (
-            index,
-            oldPoints_,
-            faces_,
-            cells_,
-            owner_,
-            centre,
-            dummyVol
-        );
-    }
-
-    // Maintain a check-list
-    labelHashSet checked;
-
-    // Insert candidates first
-    forAll(mapCandidates, indexI)
-    {
-        checked.insert(mapCandidates[indexI] - offset);
-    }
-
-    // Loop for three outward levels from candidates
-    for (label i = 0; i < 3; i++)
-    {
-        // Fetch the set of candidates
-        const labelList checkList = checked.toc();
-
-        forAll(checkList, indexI)
-        {
-            const labelList& oldNei = oldNeighbourList[checkList[indexI]];
-
-            forAll(oldNei, entityI)
-            {
-                if (!checked.found(oldNei[entityI]))
-                {
-                    checked.insert(oldNei[entityI]);
-                }
-            }
-        }
-    }
-
-    // Loop through accumulated candidates and fetch the nearest one.
-    scalar minDist = GREAT;
-    label minLocation = -1;
-
-    const labelList checkList = checked.toc();
-
-    forAll(checkList, indexI)
-    {
-        scalar dist = magSqr(oldCentres[checkList[indexI]] - centre);
-
-        if (dist < minDist)
-        {
-            minDist = dist;
-            minLocation = checkList[indexI];
-        }
-    }
-
-    // Set the final list
-    const labelList& neiList = oldNeighbourList[minLocation];
-
-    parents.setSize(neiList.size() + 1, -1);
-
-    // Fill indices
-    forAll(neiList, indexI)
-    {
-        parents[indexI] = neiList[indexI] + offset;
-    }
-
-    // Set final index
-    parents[neiList.size()] = minLocation + offset;
 }
 
 
@@ -413,9 +620,9 @@ void dynamicTopoFvMesh::setCellMapping
     {
         if (debug > 3)
         {
-            Info << "Inserting mapping cell: " << cIndex << nl
-                 << " mapCells: " << mapCells
-                 << endl;
+            Pout<< "Inserting mapping cell: " << cIndex
+                << " mapCells: " << mapCells
+                << endl;
         }
 
         // Insert index into the list, and overwrite if necessary
@@ -445,7 +652,7 @@ void dynamicTopoFvMesh::setCellMapping
     }
 
     // Update cell-parents information
-    labelHashSet masterCells;
+    DynamicList<label> masterCells(5);
 
     forAll(mapCells, cellI)
     {
@@ -456,7 +663,10 @@ void dynamicTopoFvMesh::setCellMapping
 
         if (mapCells[cellI] < nOldCells_)
         {
-            masterCells.insert(mapCells[cellI]);
+            if (findIndex(masterCells, mapCells[cellI]) == -1)
+            {
+                masterCells.append(mapCells[cellI]);
+            }
         }
         else
         if (cellParents_.found(mapCells[cellI]))
@@ -465,12 +675,15 @@ void dynamicTopoFvMesh::setCellMapping
 
             forAll(nParents, cI)
             {
-                masterCells.insert(nParents[cI]);
+                if (findIndex(masterCells, nParents[cI]) == -1)
+                {
+                    masterCells.append(nParents[cI]);
+                }
             }
         }
     }
 
-    cellParents_.set(cIndex, masterCells.toc());
+    cellParents_.set(cIndex, masterCells);
 }
 
 
@@ -482,13 +695,33 @@ void dynamicTopoFvMesh::setFaceMapping
 )
 {
     label patch = whichPatch(fIndex);
+    label neiProc = getNeighbourProcessor(patch);
 
     if (debug > 3)
     {
-        Info << "Inserting mapping face: " << fIndex << nl
-             << " patch: " << patch << nl
-             << " mapFaces: " << mapFaces
-             << endl;
+        const polyBoundaryMesh& boundary = boundaryMesh();
+
+        word pName;
+
+        if (patch == -1)
+        {
+            pName = "Internal";
+        }
+        else
+        if (patch < boundary.size())
+        {
+            pName = boundaryMesh()[patch].name();
+        }
+        else
+        {
+            pName = "New patch: " + Foam::name(patch);
+        }
+
+        Pout<< "Inserting mapping face: " << fIndex
+            << " patch: " << pName
+            << " mapFaces: " << mapFaces
+            << " neiProc: "  << neiProc
+            << endl;
     }
 
     bool foundError = false;
@@ -500,15 +733,16 @@ void dynamicTopoFvMesh::setFaceMapping
         foundError = true;
     }
 
-    // Check to ensure that boundary faces map
-    // only from other faces on the same patch
-    if (patch > -1 && mapFaces.empty())
+    // Check to ensure that mapFaces is non-empty for physical patches
+    if (patch > -1 && mapFaces.empty() && neiProc == -1)
     {
         foundError = true;
     }
 
     if (foundError)
     {
+        writeVTK("mapFace_" + Foam::name(fIndex), fIndex, 2);
+
         FatalErrorIn
         (
             "\n"
@@ -524,7 +758,8 @@ void dynamicTopoFvMesh::setFaceMapping
             << "    2. Mapping specified for an internal face, " << nl
             << "       when none was expected." << nl << nl
             << " Face: " << fIndex << nl
-            << " Patch: " << patch << nl
+            << " Patch: "
+            << (patch > -1 ? boundaryMesh()[patch].name() : "Internal") << nl
             << " Owner: " << owner_[fIndex] << nl
             << " Neighbour: " << neighbour_[fIndex] << nl
             << " mapFaces: " << mapFaces << nl
@@ -556,14 +791,14 @@ void dynamicTopoFvMesh::setFaceMapping
         facesFromFaces_[index].masterObjects() = labelList(0);
     }
 
-    // For internal faces, set dummy maps / weights, and bail out
-    if (patch == -1)
+    // For internal / processor faces, bail out
+    if (patch == -1 || neiProc > -1)
     {
         return;
     }
 
     // Update face-parents information
-    labelHashSet masterFaces;
+    DynamicList<label> masterFaces(5);
 
     forAll(mapFaces, faceI)
     {
@@ -574,7 +809,10 @@ void dynamicTopoFvMesh::setFaceMapping
 
         if (mapFaces[faceI] < nOldFaces_)
         {
-            masterFaces.insert(mapFaces[faceI]);
+            if (findIndex(masterFaces, mapFaces[faceI]) == -1)
+            {
+                masterFaces.append(mapFaces[faceI]);
+            }
         }
         else
         if (faceParents_.found(mapFaces[faceI]))
@@ -583,12 +821,15 @@ void dynamicTopoFvMesh::setFaceMapping
 
             forAll(nParents, fI)
             {
-                masterFaces.insert(nParents[fI]);
+                if (findIndex(masterFaces, nParents[fI]) == -1)
+                {
+                    masterFaces.append(nParents[fI]);
+                }
             }
         }
     }
 
-    faceParents_.set(fIndex, masterFaces.toc());
+    faceParents_.set(fIndex, masterFaces);
 }
 
 

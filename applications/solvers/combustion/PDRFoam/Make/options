@@ -29,4 +29,5 @@ EXE_LIBS = \
     -llaminarFlameSpeedModels \
     -lfiniteVolume \
     -ldynamicFvMesh \
-    -llduSolvers
+    -llduSolvers \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

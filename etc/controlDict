@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -39,6 +39,8 @@ DebugSwitches
     CircumferentialAveragingInterpolation 0;
     mixingPlane                           0;
     MixingPlaneInterpolation              0;
+
+    tetFemVectorMatrix        0;
 
     overlapGgi          0;
     cyclicGgi           0;
@@ -629,6 +631,7 @@ DebugSwitches
     nutWallFunction     0;
     obj                 0;
     objectRegistry      0;
+    postfixedSubRegistry 0;
     octree              0;
     octreeDataEdges     0;
     octreeDataFace      0;

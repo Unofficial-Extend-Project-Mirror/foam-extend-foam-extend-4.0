@@ -83,8 +83,28 @@ doc/[Dd]oxygen/man
 etc/cshrc
 etc/bashrc
 etc/settings.csh
-etc/setteings.sh
+etc/settings.sh
+etc/pref.csh
+etc/pref.sh
 
+# make sure that this settings file is not used
+etc/bashrc.preset
+
+# The following files are blacklisted because of a DMCA complaint by ANSYS.
+src/lduSolvers/tools/PriorityArray.C
+src/lduSolvers/tools/PriorityArray.H
+src/lduSolvers/amg/amgPolicy/samgPolicy.C
+src/lduSolvers/amg/amgPolicy/samgPolicy.H
+src/lduSolvers/amg/amgPolicy/aamgPolicy.C
+src/lduSolvers/amg/amgPolicy/aamgPolicy.H
+
+# The following files are blacklisted because of a DMCA complaint by ANSYS.
+src/lduSolvers/tools/PriorityArray.C
+src/lduSolvers/tools/PriorityArray.H
+src/lduSolvers/amg/amgPolicy/samgPolicy.C
+src/lduSolvers/amg/amgPolicy/samgPolicy.H
+src/lduSolvers/amg/amgPolicy/aamgPolicy.C
+src/lduSolvers/amg/amgPolicy/aamgPolicy.H
 
 # The following files are blacklisted because of a DMCA complaint by ANSYS.
 src/lduSolvers/tools/PriorityArray.C

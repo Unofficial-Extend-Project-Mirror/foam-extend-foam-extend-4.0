@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2004-6 H. Jasak All rights reserved
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     fineAmgLevel
@@ -35,8 +34,8 @@ Author
 
 #include "fineAmgLevel.H"
 #include "coarseAmgLevel.H"
-#include "ICCG.H"
-#include "BICCG.H"
+#include "cgSolver.H"
+#include "bicgStabSolver.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -183,30 +182,42 @@ void Foam::fineAmgLevel::solve
 
     lduSolverPerformance coarseSolverPerf;
 
+    dictionary fineLevelDict;
+    fineLevelDict.add("minIter", 1);
+    fineLevelDict.add("maxIter", 1000);
+    fineLevelDict.add("tolerance", tolerance);
+    fineLevelDict.add("relTol", relTol);
+
+    // Avoid issues with round-off on strict tolerance setup
+    // HJ, 27/Jun/2013
+    x = b/matrix_.diag();
+
     if (matrix_.symmetric())
     {
-        coarseSolverPerf = ICCG
+        fineLevelDict.add("preconditioner", "Cholesky");
+
+        coarseSolverPerf = cgSolver
         (
-            "topLevelCorr",
+            "fineLevelCorr",
             matrix_,
             coupleBouCoeffs_,
             coupleIntCoeffs_,
             interfaceFields_,
-            tolerance,
-            relTol
+            fineLevelDict
         ).solve(x, b, cmpt);
     }
     else
     {
-        coarseSolverPerf = BICCG
+        fineLevelDict.add("preconditioner", "ILU0");
+
+        coarseSolverPerf = bicgStabSolver
         (
-            "topLevelCorr",
+            "fineLevelCorr",
             matrix_,
             coupleBouCoeffs_,
             coupleIntCoeffs_,
             interfaceFields_,
-            tolerance,
-            relTol
+            fineLevelDict
         ).solve(x, b, cmpt);
     }
 

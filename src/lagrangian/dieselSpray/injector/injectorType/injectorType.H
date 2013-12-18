@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     Foam::injectorType
@@ -39,6 +38,7 @@ SourceFiles
 #define injectorType_H
 
 #include "IOdictionary.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "autoPtr.H"
 #include "runTimeSelectionTables.H"
@@ -79,7 +79,7 @@ public:
             (t, dict)
         );
 
-    
+
     // Constructors
 
         //- Construct from components
@@ -105,7 +105,7 @@ public:
 
 
     // Member Functions
-    
+
         //- Return number of particles to inject
         virtual label nParcelsToInject
         (
@@ -131,14 +131,14 @@ public:
 
         //- Return the number of holes
         virtual label nHoles() const = 0;
-    
+
         //- Return the injector diameter
         virtual scalar d() const = 0;
 
         //- Return the injection direction for hole i
         virtual const vector& direction
         (
-            const label i, 
+            const label i,
             const scalar time
         ) const = 0;
 
@@ -172,7 +172,7 @@ public:
         //- Return the instantaneous velocity
         virtual scalar velocity(const scalar time) const = 0;
 
-        //- Return the discharge coefficient        
+        //- Return the discharge coefficient
         virtual List<pair> CdProfile() const = 0;
 
         //- Return the instantaneous discharge coefficient

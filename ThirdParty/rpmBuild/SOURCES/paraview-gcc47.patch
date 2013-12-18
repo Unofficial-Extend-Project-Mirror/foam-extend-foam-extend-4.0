@@ -1,0 +1,24 @@
+diff -up ParaView-3.12.0/Qt/Core/pqServerManagerSelectionModel.h.gcc47 ParaView-3.12.0/Qt/Core/pqServerManagerSelectionModel.h
+--- ParaView-3.12.0/Qt/Core/pqServerManagerSelectionModel.h.gcc47	2012-01-27 12:12:55.623530977 -0700
++++ ParaView-3.12.0/Qt/Core/pqServerManagerSelectionModel.h	2012-01-30 15:26:33.107335300 -0700
+@@ -72,7 +72,7 @@ public:
+     Clear          = QItemSelectionModel::Clear,
+     Select         = QItemSelectionModel::Select,
+     Deselect       = QItemSelectionModel::Deselect, 
+-    ClearAndSelect = Clear | Select
++    ClearAndSelect = static_cast<int>(Clear) | static_cast<int>(Select)
+   };
+   Q_DECLARE_FLAGS(SelectionFlags, SelectionFlag)
+ 
+diff -up ParaView-3.12.0/Utilities/Xdmf2/vtk/Testing/Cxx/XdmfTestVTKIO.cxx.gcc47 ParaView-3.12.0/Utilities/Xdmf2/vtk/Testing/Cxx/XdmfTestVTKIO.cxx
+--- ParaView-3.12.0/Utilities/Xdmf2/vtk/Testing/Cxx/XdmfTestVTKIO.cxx.gcc47	2011-11-08 13:56:29.000000000 -0700
++++ ParaView-3.12.0/Utilities/Xdmf2/vtk/Testing/Cxx/XdmfTestVTKIO.cxx	2012-01-27 09:30:00.088542888 -0700
+@@ -37,6 +37,8 @@
+ #include "vtkTimeSourceExample.h"
+ #include "vtkXdmfReader.h"
+ 
++#include <unistd.h>
++
+ #define NUMTESTS 20
+ 
+ const char testobject[NUMTESTS][40] = {

@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     topoPatchMapper
@@ -33,9 +32,10 @@ Author
     University of Massachusetts Amherst
     All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "IOmanip.H"
+#include "meshOps.H"
 #include "topoMapper.H"
 #include "mapPolyMesh.H"
 #include "topoPatchMapper.H"
@@ -73,9 +73,17 @@ void topoPatchMapper::calcInsertedFaceAddressing() const
     }
 
     // Information from the old patch
-    const label oldPatchSize = mpm_.oldPatchSizes()[patch_.index()];
+    const label oldPatchSize = sizeBeforeMapping();
     const label oldPatchStart = mpm_.oldPatchStarts()[patch_.index()];
-    const label oldPatchEnd = oldPatchStart + oldPatchSize;
+
+    if (oldPatchSize == 0)
+    {
+        // Nothing to map from. Return empty.
+        insertedFaceLabelsPtr_ = new labelList(0);
+        insertedFaceIndexMapPtr_ = new labelList(0);
+        insertedFaceAddressingPtr_ = new labelListList(0);
+        return;
+    }
 
     // Allocate for inserted face labels and addressing
     label nInsertedFaces = 0;
@@ -108,6 +116,19 @@ void topoPatchMapper::calcInsertedFaceAddressing() const
         {
             if (fffI.masterObjects().empty())
             {
+                // Write out for post-processing
+                meshOps::writeVTK
+                (
+                    mpm_.mesh(),
+                    "patchFaceInsError_"
+                  + Foam::name(fffI.index()),
+                    labelList(1, fffI.index()),
+                    2,
+                    mpm_.mesh().points(),
+                    List<edge>(0),
+                    mpm_.mesh().faces()
+                );
+
                 FatalErrorIn
                 (
                     "void topoPatchMapper::"
@@ -130,23 +151,26 @@ void topoPatchMapper::calcInsertedFaceAddressing() const
                 // Make an entry for addressing
                 labelList& addr = insertedAddressing[nInsertedFaces];
 
-                // Renumber addressing to patch.
-                // Also, check mapping for hits into
-                // other patches / internal faces.
+                // Check for illegal addressing
                 addr = fffI.masterObjects();
 
                 forAll(addr, faceI)
                 {
-                    if
-                    (
-                        addr[faceI] >= oldPatchStart
-                     && addr[faceI] < oldPatchEnd
-                    )
+                    if (addr[faceI] < 0 || addr[faceI] >= oldPatchSize)
                     {
-                        addr[faceI] -= oldPatchStart;
-                    }
-                    else
-                    {
+                        // Write out for post-processing
+                        meshOps::writeVTK
+                        (
+                            mpm_.mesh(),
+                            "patchFacePatchError_"
+                          + Foam::name(fffI.index()),
+                            labelList(1, fffI.index()),
+                            2,
+                            mpm_.mesh().points(),
+                            List<edge>(0),
+                            mpm_.mesh().faces()
+                        );
+
                         FatalErrorIn
                         (
                             "void topoPatchMapper::"
@@ -154,10 +178,13 @@ void topoPatchMapper::calcInsertedFaceAddressing() const
                         )
                             << "Addressing into another patch is not allowed."
                             << nl << " Patch face index: " << faceI
+                            << nl << " Patch: " << patch_.name()
+                            << nl << " fffI.index: " << fffI.index()
+                            << nl << " pStart: " << pStart
+                            << nl << " addr: " << addr
                             << nl << " addr[faceI]: " << addr[faceI]
                             << nl << " oldPatchStart: " << oldPatchStart
                             << nl << " oldPatchSize: " << oldPatchSize
-                            << nl << " oldPatchEnd: " << oldPatchEnd
                             << abort(FatalError);
                     }
                 }
@@ -185,21 +212,31 @@ void topoPatchMapper::calcAddressing() const
     }
 
     // Information from the old patch
-    const label oldPatchSize = mpm_.oldPatchSizes()[patch_.index()];
+    const label oldPatchSize = sizeBeforeMapping();
     const label oldPatchStart = mpm_.oldPatchStarts()[patch_.index()];
     const label oldPatchEnd = oldPatchStart + oldPatchSize;
 
     // Assemble the maps: slice to patch
     if (direct())
     {
+        if (oldPatchSize == 0)
+        {
+            // Nothing to map from. Return empty.
+            directAddrPtr_ = new labelList(0);
+            return;
+        }
+
         // Direct mapping - slice to size
-        directAddrPtr_ = new labelList(patch_.patch().patchSlice(mpm_.faceMap()));
+        directAddrPtr_ =
+        (
+            new labelList(patch_.patch().patchSlice(mpm_.faceMap()))
+        );
 
         labelList& addr = *directAddrPtr_;
 
         // Shift to local patch indices.
         // Also, check mapping for hits into other patches / internal faces.
-        forAll (addr, faceI)
+        forAll(addr, faceI)
         {
             if
             (
@@ -211,22 +248,55 @@ void topoPatchMapper::calcAddressing() const
             }
             else
             {
+                // Relax addressing requirement for
+                // processor patch faces. These require
+                // cell-to-face interpolation anyway.
+                if (isA<processorPolyPatch>(patch_.patch()))
+                {
+                    // Artificially map from face[0] of this patch.
+                    addr[faceI] = 0;
+                    continue;
+                }
+
+                // Write out for post-processing
+                meshOps::writeVTK
+                (
+                    mpm_.mesh(),
+                    "patchFacePatchError_"
+                  + Foam::name(faceI),
+                    labelList(1, faceI),
+                    2,
+                    mpm_.mesh().points(),
+                    List<edge>(0),
+                    mpm_.mesh().faces()
+                );
+
                 FatalErrorIn
                 (
                     "void topoPatchMapper::calcAddressing() const"
                 )
                     << "Addressing into another patch is not allowed."
+                    << nl << " Patch: " << patch_.name()
+                    << nl << " Patch index: " << patch_.index()
                     << nl << " Patch face index: " << faceI
                     << nl << " addr[faceI]: " << addr[faceI]
                     << nl << " oldPatchStart: " << oldPatchStart
                     << nl << " oldPatchSize: " << oldPatchSize
                     << nl << " oldPatchEnd: " << oldPatchEnd
+                    << nl << " nInserted: " << insertedObjectLabels().size()
                     << abort(FatalError);
             }
         }
     }
     else
     {
+        if (oldPatchSize == 0)
+        {
+            // Nothing to map from. Return empty.
+            interpolationAddrPtr_ = new labelListList(0);
+            return;
+        }
+
         // Interpolative addressing
         interpolationAddrPtr_ = new labelListList(patchSize(), labelList(0));
         labelListList& addr = *interpolationAddrPtr_;
@@ -267,6 +337,8 @@ void topoPatchMapper::calcAddressing() const
                         "void topoPatchMapper::calcAddressing() const"
                     )
                         << "Addressing into another patch is not allowed."
+                        << nl << " Patch: " << patch_.name()
+                        << nl << " Patch index: " << patch_.index()
                         << nl << " Patch face index: " << faceI
                         << nl << " faceMap[faceI]: " << oldFace
                         << nl << " oldPatchStart: " << oldPatchStart
@@ -284,6 +356,17 @@ void topoPatchMapper::calcAddressing() const
         {
             if (addr[faceI].empty())
             {
+                // Relax addressing requirement for
+                // processor patch faces. These require
+                // cell-to-face interpolation anyway.
+                if (isA<processorPolyPatch>(patch_.patch()))
+                {
+                    // Artificially map from face[0] of this patch.
+                    addr[faceI] = labelList(1, 0);
+
+                    continue;
+                }
+
                 FatalErrorIn
                 (
                     "void topoPatchMapper::calcAddressing() const"
@@ -315,6 +398,13 @@ void topoPatchMapper::calcInverseDistanceWeights() const
 
     // Fetch interpolative addressing
     const labelListList& addr = addressing();
+
+    if (addr.empty())
+    {
+        // Nothing to map from. Return empty.
+        weightsPtr_ = new scalarListList(0);
+        return;
+    }
 
     // Allocate memory
     weightsPtr_ = new scalarListList(patchSize());
@@ -386,12 +476,20 @@ void topoPatchMapper::calcIntersectionWeightsAndCentres() const
     // Fetch interpolative addressing
     const labelListList& addr = addressing();
 
-    // Allocate memory
-    areasPtr_ = new List<scalarField>(patchSize(), scalarField(0));
-    List<scalarField>& a = *areasPtr_;
+    if (addr.empty())
+    {
+        // Nothing to map from. Return empty.
+        areasPtr_ = new List<scalarList>(0);
+        centresPtr_ = new List<vectorList>(0);
+        return;
+    }
 
-    centresPtr_ = new List<vectorField>(patchSize(), vectorField(0));
-    List<vectorField>& x = *centresPtr_;
+    // Allocate memory
+    areasPtr_ = new List<scalarList>(patchSize(), scalarList(0));
+    List<scalarList>& a = *areasPtr_;
+
+    centresPtr_ = new List<vectorList>(patchSize(), vectorList(0));
+    List<vectorList>& x = *centresPtr_;
 
     // Obtain stored face-centres
     const vectorField& faceCentres = tMapper_.patchCentres(patch_.index());
@@ -418,8 +516,8 @@ void topoPatchMapper::calcIntersectionWeightsAndCentres() const
         // Check if this is indeed a mapped face
         if (mo.size() == 1 && x[faceI].empty() && a[faceI].empty())
         {
-            x[faceI] = vectorField(1, faceCentres[mo[0]]);
-            a[faceI] = scalarField(1, 1.0);
+            x[faceI] = vectorList(1, faceCentres[mo[0]]);
+            a[faceI] = scalarList(1, 1.0);
         }
     }
 
@@ -441,13 +539,13 @@ void topoPatchMapper::calcIntersectionWeightsAndCentres() const
 }
 
 
-const List<scalarField>& topoPatchMapper::intersectionWeights() const
+const List<scalarList>& topoPatchMapper::intersectionWeights() const
 {
     if (direct())
     {
         FatalErrorIn
         (
-            "const List<scalarField>& "
+            "const List<scalarList>& "
             "topoPatchMapper::intersectionWeights() const"
         )   << "Requested interpolative weights for a direct mapper."
             << abort(FatalError);
@@ -462,13 +560,13 @@ const List<scalarField>& topoPatchMapper::intersectionWeights() const
 }
 
 
-const List<vectorField>& topoPatchMapper::intersectionCentres() const
+const List<vectorList>& topoPatchMapper::intersectionCentres() const
 {
     if (direct())
     {
         FatalErrorIn
         (
-            "const List<vectorField>& "
+            "const List<vectorList>& "
             "topoPatchMapper::intersectionCentres() const"
         )   << "Requested interpolative weights for a direct mapper."
             << abort(FatalError);
@@ -497,6 +595,8 @@ topoPatchMapper::topoPatchMapper
     mpm_(mpm),
     tMapper_(mapper),
     direct_(false),
+    sizeBeforeMapping_(0),
+    conservative_(false),
     directAddrPtr_(NULL),
     interpolationAddrPtr_(NULL),
     weightsPtr_(NULL),
@@ -506,6 +606,39 @@ topoPatchMapper::topoPatchMapper
     areasPtr_(NULL),
     centresPtr_(NULL)
 {
+    // Compute sizeBeforeMapping.
+    // - This needs to be done before insertedObjects
+    //   is computed to determine direct mapping
+    if (isA<emptyPolyPatch>(patch_.patch()))
+    {
+        sizeBeforeMapping_ = 0;
+    }
+    else
+    {
+        label patchIndex = patch_.index();
+        label totalSize = mpm_.oldPatchSizes()[patchIndex];
+
+        // Fetch offset sizes from topoMapper
+        const labelListList& sizes = tMapper_.patchSizes();
+
+        // Add offset sizes
+        if (sizes.size())
+        {
+            // Fetch number of physical patches
+            label nPhysical = sizes[0].size();
+
+            if (patchIndex < nPhysical)
+            {
+                forAll(sizes, pI)
+                {
+                    totalSize += sizes[pI][patchIndex];
+                }
+            }
+        }
+
+        sizeBeforeMapping_ = totalSize;
+    }
+
     // Check for the possibility of direct mapping
     if (insertedObjects())
     {
@@ -543,12 +676,7 @@ label topoPatchMapper::size() const
 //- Return size before mapping
 label topoPatchMapper::sizeBeforeMapping() const
 {
-    if (patch_.type() == "empty")
-    {
-        return 0;
-    }
-
-    return mpm_.oldPatchSizes()[patch_.index()];
+    return sizeBeforeMapping_;
 }
 
 
@@ -616,6 +744,16 @@ const scalarListList& topoPatchMapper::weights() const
             << abort(FatalError);
     }
 
+    if (conservative_)
+    {
+        if (!areasPtr_ && !centresPtr_)
+        {
+            calcIntersectionWeightsAndCentres();
+        }
+
+        return *areasPtr_;
+    }
+
     if (!weightsPtr_)
     {
         calcInverseDistanceWeights();
@@ -665,96 +803,6 @@ const labelListList& topoPatchMapper::insertedFaceAddressing() const
     }
 
     return *insertedFaceAddressingPtr_;
-}
-
-
-//- Map the patch field
-template <class Type>
-void topoPatchMapper::mapPatchField
-(
-    const word& fieldName,
-    Field<Type>& pF
-) const
-{
-    // To invoke inverse-distance weighting, use this:
-    // pF.autoMap(*this);
-
-    // Check for possibility of direct mapping
-    if (direct())
-    {
-        pF.autoMap(*this);
-    }
-    else
-    {
-        if (pF.size() != sizeBeforeMapping())
-        {
-            FatalErrorIn
-            (
-                "\n\n"
-                "void topoCellMapper::mapPatchField<Type>\n"
-                "(\n"
-                "    const word& fieldName,\n"
-                "    Field<Type>& iF\n"
-                ") const\n"
-            )  << "Incompatible size before mapping." << nl
-               << " Field: " << fieldName << nl
-               << " Field size: " << pF.size() << nl
-               << " map size: " << sizeBeforeMapping() << nl
-               << abort(FatalError);
-        }
-
-        // Fetch addressing
-        const labelListList& pAddressing = addressing();
-        const List<scalarField>& wF = intersectionWeights();
-
-        // Compute the integral of the source field
-        Type intSource = sum(pF * tMapper_.patchAreas(patch_.index()));
-
-        // Copy the original field
-        Field<Type> fieldCpy(pF);
-
-        // Resize to current dimensions
-        pF.setSize(size());
-
-        // Map the patch field
-        forAll(pF, faceI)
-        {
-            const labelList& addr = pAddressing[faceI];
-
-            pF[faceI] = pTraits<Type>::zero;
-
-            // Accumulate area-weighted interpolate
-            forAll(addr, faceJ)
-            {
-                pF[faceI] +=
-                (
-                    wF[faceI][faceJ] * fieldCpy[addr[faceJ]]
-                );
-            }
-        }
-
-        // Compute the integral of the target field
-        const polyPatch& ppI = mpm_.mesh().boundaryMesh()[patch_.index()];
-
-        Type intTarget = sum(pF * mag(ppI.faceAreas()));
-
-        if (polyMesh::debug)
-        {
-            int oldP = Info().precision();
-
-            // Compare the global integral
-            Info << " Field : " << fieldName
-                 << " Patch : " << ppI.name()
-                 << " integral errors : "
-                 << setprecision(15)
-                 << " source : " << mag(intSource)
-                 << " target : " << mag(intTarget)
-                 << " norm : "
-                 << (mag(intTarget - intSource) / (mag(intSource) + VSMALL))
-                 << setprecision(oldP)
-                 << endl;
-        }
-    }
 }
 
 

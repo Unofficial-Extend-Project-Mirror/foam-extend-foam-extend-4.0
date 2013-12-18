@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
     makeFaMesh
@@ -30,6 +29,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "Time.H"
 #include "argList.H"
 #include "OSspecific.H"
@@ -99,22 +99,33 @@ int main(int argc, char *argv[])
 
         faPatches[patchI].name_ = faPatchNames[patchI];
 
-        faPatches[patchI].type_ = 
+        faPatches[patchI].type_ =
             word(curPatchDict.lookup("type"));
 
+        word ownName = curPatchDict.lookup("ownerPolyPatch");
+
         faPatches[patchI].ownPolyPatchID_ =
-            mesh.boundaryMesh().findPatchID
-            (
-                word(curPatchDict.lookup("ownerPolyPatch"))
-            );
+            mesh.boundaryMesh().findPatchID(ownName);
+
+        if ( faPatches[patchI].ownPolyPatchID_ < 0 )
+        {
+            FatalErrorIn("makeFaMesh:")
+                << "neighbourPolyPatch " << ownName << " does not exist"
+                << exit(FatalError);
+        }
+
+        word neiName = curPatchDict.lookup("neighbourPolyPatch");
 
         faPatches[patchI].ngbPolyPatchID_  =
-            mesh.boundaryMesh().findPatchID
-            (
-                word(curPatchDict.lookup("neighbourPolyPatch"))
-            );
-    }
+            mesh.boundaryMesh().findPatchID(neiName);
 
+        if ( faPatches[patchI].ngbPolyPatchID_ < 0 )
+        {
+            FatalErrorIn("makeFaMesh:")
+                << "neighbourPolyPatch " << neiName << " does not exist"
+                << exit(FatalError);
+        }
+    }
 
     // Setting faceLabels list size
     label size = 0;
@@ -125,6 +136,13 @@ int main(int argc, char *argv[])
     {
         patchIDs[patchI] =
             mesh.boundaryMesh().findPatchID(polyMeshPatches[patchI]);
+
+        if ( patchIDs[patchI] < 0 )
+        {
+            FatalErrorIn("makeFaMesh:")
+                << "Patch " << polyMeshPatches[patchI] << " does not exist"
+                << exit(FatalError);
+        }
 
         size += mesh.boundaryMesh()[patchIDs[patchI]].size();
     }
@@ -140,7 +158,7 @@ int main(int argc, char *argv[])
     forAll (polyMeshPatches, patchI)
     {
         label start = mesh.boundaryMesh()[patchIDs[patchI]].start();
-        
+
         label size  = mesh.boundaryMesh()[patchIDs[patchI]].size();
 
         for(label i = 0; i < size; i++)

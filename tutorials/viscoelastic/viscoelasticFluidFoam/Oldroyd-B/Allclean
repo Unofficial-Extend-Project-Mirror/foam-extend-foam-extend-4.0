@@ -4,5 +4,5 @@
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions
 
 cleanCase
-rm -R -f sets 
+rm -R -f sets
 

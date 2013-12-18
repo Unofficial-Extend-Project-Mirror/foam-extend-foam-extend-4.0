@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -22,47 +22,49 @@ solvers
         preconditioner   DIC;
         tolerance        1e-06;
         relTol           0.01;
-    };
+    }
     U
     {
         solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
-    };
+    }
     k
     {
         solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
-    };
+    }
     epsilon
     {
         solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
-    };
+    }
     R
     {
         solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
-    };
+    }
     nuTilda
     {
         solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
-    };
+    }
 }
 
 SIMPLE
 {
     nNonOrthogonalCorrectors 0;
+
+    convergence          1e-4;
 }
 
 relaxationFactors

@@ -19,7 +19,7 @@ sudo zypper install -t  pattern devel_qt4
 
 mkdir ~/OpenFOAM
 cd ~/OpenFOAM
-git clone git://openfoam-extend.git.sourceforge.net/gitroot/openfoam-extend/OpenFOAM-1.6-ext
+git clone git://git.code.sf.net/p/openfoam-extend/OpenFOAM-1.6-ext
 
 
 --------------------------------------------------------------------------------
@@ -79,9 +79,9 @@ export QT_BIN_DIR=$QT_DIR/bin
 # Compile the ThirdParty packages
 
 cd $WM_PROJECT_DIR/ThirdParty
-./AllMake.stage1 >& log.AllMake.stage1 
-./AllMake.stage3 >& log.AllMake.stage3 
-./AllMake.stage4 >& log.AllMake.stage4 
+./AllMake.stage1 >& log.AllMake.stage1
+./AllMake.stage3 >& log.AllMake.stage3
+./AllMake.stage4 >& log.AllMake.stage4
 
 # You can keep an eye on the compilation process with the command tail e.g:
 # tail -f log.AllMake.stage1
@@ -96,16 +96,16 @@ cd $WM_PROJECT_DIR/ThirdParty
 # Compile OpenFOAM-1.6-ext
 
 cd $WM_PROJECT_DIR
-./Allwmake >& log.Allwmake &  
+./Allwmake >& log.Allwmake &
 tail -f log.Allwmake          # To keep an eye on the compilation process
 
 --------------------------------------------------------------------------------
 
 # Execute Allwmake a second time because of a bad library building sequence for
 # the library -lfaceDecompositionMotionSolver
-# Warning: Not sure if this is still necessary... MB 05/2012 
+# Warning: Not sure if this is still necessary... MB 05/2012
 
-./Allwmake >& log.Allwmake2 & 
+./Allwmake >& log.Allwmake2 &
 tail -f log.Allwmake2          # To keep an eye on the compilation process
 
 --------------------------------------------------------------------------------

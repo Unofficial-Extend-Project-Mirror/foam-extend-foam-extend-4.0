@@ -1,0 +1,135 @@
+#!/bin/bash
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | Copyright held by original author
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation; either version 2 of the License, or (at your
+#     option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM; if not, write to the Free Software Foundation,
+#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Script
+#     foamProbe
+#
+# Description
+#     Proccess a scalar, vetorial or tensorial field of OpenFOAM 
+#     probe file (for monitoring points). The original file will not be changed
+#     and the fields of each monitoring point will be stored in a new
+#      directory named probe<Name> (where <Name> is the field name) in the
+#     directory where are the original probes files.
+#     The fourth optional parameter can be used to create xmgrace sequentially
+#     graphs (case is 0)  
+#     for monitoring points or automatically create eps figures (case is 1).
+
+#
+# Author: 
+#     Jovani L. Favero, J. F. Mitre (2009) 
+#
+#------------------------------------------------------------------------------
+
+if [ $# -lt 3 ]; then
+ echo "Usage: foamProbe [<probes files directory>  <numbers of monitoring points>  <field name>  <optional value: 0 - open in xmgrace, 1 - save to eps file>]"
+ exit 1
+fi
+
+# File name, NAME.
+NAME=$(basename "$1")
+DNAME="$1"
+shift
+
+# Number of points, P.
+P="$1"
+shift
+
+NAME=$(basename "$1")
+CNAME="$1"
+shift
+xmgrace=0
+
+if [ $# -eq 1 ]; then
+# Choose to save eps.
+ save="$1"
+ xmgrace=1
+fi
+
+if [ ! -d "$DNAME" ]; then
+ echo "Directory $DNAME does not exist."
+ exit 1
+fi
+
+if [ $P -lt 1 ]; then
+ echo "Can not be less than 1 single monitoring point."
+ exit 1
+fi
+
+cd $DNAME
+
+if [ ! -f "$CNAME" ]; then
+ echo "Field $CNAME does not exist."
+ exit 1
+fi
+
+# Screen information
+echo ""
+echo "Wait: Processing $P point(s) in $CNAME file ...."
+
+# Base directory to place processed files
+DIR="./probe$NAME/"
+if [ ! -d "$DIR" ]; then
+ mkdir "$DIR"
+fi
+sed -e "s/ *(/\t/g" -e 's/)//g' "$CNAME" >"$DIR/$NAME"
+cd $DIR
+column=1
+while [ "$column" -le "$P" ]; do
+  point=$column
+  column=`expr $column + 1`
+  cut -f 1,$column "$NAME" |sed -e "s/\t/ /g" -e '/^#/d' >$NAME.base
+  echo -e "#     Time \t    Point_$point" >$NAME\_$point
+  cat $NAME.base >>$NAME\_$point
+  rm -f $NAME.base
+done
+cd - &>/dev/null
+
+if [ "$xmgrace" = 1 ]; then
+  cd probe$CNAME/
+  field=1
+  underscore=_
+  while [ "$field" -le "$P" ]; do
+    point=$field
+    field=`expr $field + 1`
+    echo " Opening file $CNAME$underscore$point"
+    if [ "$save" = 0 ]; then
+     echo " Opened $CNAME$underscore$point"
+     xmgrace -nxy $CNAME\_$point -noask 
+    fi
+
+    if [ "$save" -ne 0 ]; then
+     xmgrace -nxy $CNAME\_$point -hardcopy -printfile $CNAME\_$point.eps -hdevice EPS
+     echo "   Saving file $CNAME$underscore$point.eps"
+    fi
+  echo " Closing file $CNAME$underscore$point"
+  echo ""
+ done
+fi
+
+echo ""
+echo "Done!!!"
+echo ""
+
+exit 0

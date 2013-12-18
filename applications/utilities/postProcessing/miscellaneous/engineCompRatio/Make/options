@@ -5,4 +5,6 @@ EXE_INC = \
 EXE_LIBS = \
     -lfiniteVolume \
     -lengine \
-    -ldynamicMesh
+    -ldynamicMesh \
+    -L$(MESQUITE_LIB_DIR) -lmesquite
+

@@ -105,8 +105,8 @@ int main()
         Z[Count] = Phi + 1.0;
         Count++;
 
-        X[Count] = -X[Count - 1];	
-        Y[Count] = -Y[Count - 1];	
+        X[Count] = -X[Count - 1];
+        Y[Count] = -Y[Count - 1];
         Z[Count] = -Z[Count - 1];
         Count++;
 
@@ -115,18 +115,18 @@ int main()
         Z[Count] = Phi - 1.0;
         Count++;
 
-        X[Count] = -X[Count - 1];	
-        Y[Count] = -Y[Count - 1];	
+        X[Count] = -X[Count - 1];
+        Y[Count] = -Y[Count - 1];
         Z[Count] = -Z[Count - 1];
         Count++;
     }
 
     INTEGER4  IsDouble = 1;
-    
+
     I = TECDAT112(&NumPts, X, &IsDouble);
     I = TECDAT112(&NumPts, Y, &IsDouble);
     I = TECDAT112(&NumPts, Z, &IsDouble);
-    
+
     delete X;
     delete Y;
     delete Z;
@@ -371,6 +371,6 @@ int main()
         I = TECEND112();
         /* DOCEND */
     }
-        
+
     return 0;
 }

@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -220,7 +219,7 @@ void engineTimeVaryingTotalPressureFvPatchScalarField::updateCoeffs(const vector
     {
         return;
     }
-    
+
     checkTable();
 
     p0_=
@@ -234,7 +233,7 @@ void engineTimeVaryingTotalPressureFvPatchScalarField::updateCoeffs(const vector
     );
 
     const fvsPatchField<scalar>& phip =
-        patch().lookupPatchField<surfaceScalarField, scalar>(phiName_);
+        lookupPatchField<surfaceScalarField, scalar>(phiName_);
 
     if (psiName_ == "none" && rhoName_ == "none")
     {
@@ -243,7 +242,7 @@ void engineTimeVaryingTotalPressureFvPatchScalarField::updateCoeffs(const vector
     else if (rhoName_ == "none")
     {
         const fvPatchField<scalar>& psip =
-            patch().lookupPatchField<volScalarField, scalar>(psiName_);
+            lookupPatchField<volScalarField, scalar>(psiName_);
 
         if (gamma_ > 1.0)
         {
@@ -267,7 +266,7 @@ void engineTimeVaryingTotalPressureFvPatchScalarField::updateCoeffs(const vector
     else if (psiName_ == "none")
     {
         const fvPatchField<scalar>& rho =
-            patch().lookupPatchField<volScalarField, scalar>(rhoName_);
+            lookupPatchField<volScalarField, scalar>(rhoName_);
 
         operator==(p0_ - 0.5*rho*(1.0 - pos(phip))*magSqr(Up));
     }
@@ -293,7 +292,7 @@ void engineTimeVaryingTotalPressureFvPatchScalarField::updateCoeffs(const vector
 
 void engineTimeVaryingTotalPressureFvPatchScalarField::updateCoeffs()
 {
-    updateCoeffs(patch().lookupPatchField<volVectorField, vector>(UName_));
+    updateCoeffs(lookupPatchField<volVectorField, vector>(UName_));
 }
 
 

@@ -6,9 +6,9 @@ int USERD_get_nfaced_conn
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_nfaced_conn" 
+    Info << "Entering: USERD_get_nfaced_conn"
         << ", part_number = " << part_number
-        << endl 
+        << endl
         << flush;
 #endif
 
@@ -60,20 +60,20 @@ int USERD_get_nfaced_conn
                 }
             }
         }
-        
+
     }
     else if (part_number < nPatches+2)
     {
-        
+
     }
     else if (sprayPtr && part_number == nPatches+2)
     {
         return Z_ERR;
     }
-    else if 
+    else if
     (
         secondMeshPtr
-     && part_number == secondMeshPartNum 
+     && part_number == secondMeshPartNum
     )
     {
         label nPoint = 0;
@@ -143,7 +143,7 @@ int USERD_get_nfaced_conn
     }
 
 #ifdef ENSIGHTDEBUG
-    Info << "Exiting: USERD_get_nfaced_conn" << endl 
+    Info << "Exiting: USERD_get_nfaced_conn" << endl
         << flush;
 #endif
     return Z_OK;

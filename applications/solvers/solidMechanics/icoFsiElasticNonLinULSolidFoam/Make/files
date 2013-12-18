@@ -1,0 +1,3 @@
+icoFsiElasticNonLinULSolidFoam.C
+
+EXE = $(FOAM_APPBIN)/icoFsiElasticNonLinULSolidFoam

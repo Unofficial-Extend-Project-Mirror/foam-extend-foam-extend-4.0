@@ -9,7 +9,7 @@ int USERD_get_descrip_lines
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_descrip_lines" << endl 
+    Info << "Entering: USERD_get_descrip_lines" << endl
         << flush;
 #endif
 
@@ -24,7 +24,7 @@ int USERD_get_descrip_lines
     }
 
 #ifdef ENSIGHTDEBUG
-    Info << "Leaving: USERD_get_descrip_lines" << endl 
+    Info << "Leaving: USERD_get_descrip_lines" << endl
         << flush;
 #endif
     return Z_OK;

@@ -26,7 +26,8 @@
 
     phi = phiU +
         (
-            fvc::interpolate(interface.sigmaK())*fvc::snGrad(alpha1)*mesh.magSf()
+            fvc::interpolate(interface.sigmaK())*
+            fvc::snGrad(alpha1)*mesh.magSf()
           + fvc::interpolate(rho)*(g & mesh.Sf())
         )*rUAf;
 
@@ -53,7 +54,7 @@
                 )
                *pEqnComp()
               + pEqnIncomp,
-                mesh.solver(p.name() + "Final")
+                mesh.solutionDict().solver(p.name() + "Final")
             );
         }
         else

@@ -4,9 +4,9 @@ int USERD_get_timeset_description
     char timeset_description[Z_BUFL]
 )
 {
-   
+
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_timeset_description" << endl 
+    Info << "Entering: USERD_get_timeset_description" << endl
         << flush;
 #endif
 
@@ -20,7 +20,7 @@ int USERD_get_timeset_description
     }
 
 #ifdef ENSIGHTDEBUG
-    Info << "Leaving: USERD_get_timeset_description" << endl 
+    Info << "Leaving: USERD_get_timeset_description" << endl
         << flush;
 #endif
 

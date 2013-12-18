@@ -1,26 +1,26 @@
 #!/bin/bash
 #------------------------------------------------------------------------------
 # =========                 |
-# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+# \\      /  F ield         | foam-extend: Open Source CFD
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright held by original author
+#   \\  /    A nd           | For copyright notice see file Copyright
 #    \\/     M anipulation  |
 #------------------------------------------------------------------------------
 # License
-#     This file is part of OpenFOAM.
+#     This file is part of foam-extend.
 #
-#     OpenFOAM is free software: you can redistribute it and/or modify it
-#     under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
+#     foam-extend is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation, either version 3 of the License, or (at your
+#     option) any later version.
 #
-#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-#     for more details.
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
 #     AllMake.stage1
@@ -33,7 +33,7 @@
 #     Once this stage is built, you would normally re-initialize your
 #     OpenFOAM environment in order to use the new compilers and tools
 #
-#     NOTE: This stage is optional. Use it only if you want to override 
+#     NOTE: This stage is optional. Use it only if you want to override
 #           your system pre-installed compilers and tools
 #
 # Requirements:
@@ -62,29 +62,27 @@ echo
 
 # Gcc and companion libraries
 #
-# You need gmp and mpfr for gcc-4.4.5
-# Uncomment the following 3 lines for gcc-4.4.5
+# Uncomment the following 3 lines for gcc-4.4.5. You need gmp and mpfr for gcc-4.4.5
 #( rpm_make -p gmp-5.0.1   -s gmp-5.0.1.spec  -u ftp://ftp.gnu.org/gnu/gmp/gmp-5.0.1.tar.gz                  )
 #( rpm_make -p mpfr-3.0.1  -s mpfr-3.0.1.spec -u ftp://ftp.gnu.org/gnu/mpfr/mpfr-3.0.1.tar.gz                )
 #( rpm_make -p gcc-4.4.5   -s gcc-4.4.5.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.4.5/gcc-4.4.5.tar.gz        )
 #
-# You need gmp, mpfr and mpc for gcc-4.5.1
-# Uncomment the following 4 lines for gcc-4.5.1
+# Uncomment the following 4 lines for gcc-4.5.1. You need gmp, mpfr and mpc for gcc-4.5.1
 #( rpm_make -p gmp-5.0.1  -s gmp-5.0.1.spec  -u ftp://ftp.gnu.org/gnu/gmp/gmp-5.0.1.tar.gz                  )
 #( rpm_make -p mpfr-3.0.1 -s mpfr-3.0.1.spec -u ftp://ftp.gnu.org/gnu/mpfr/mpfr-3.0.1.tar.gz                )
 #( rpm_make -p mpc-0.8.2  -s mpc-0.8.2.spec  -u http://www.multiprecision.org/mpc/download/mpc-0.8.2.tar.gz )
 #( rpm_make -p gcc-4.5.1  -s gcc-4.5.1.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.5.1/gcc-4.5.1.tar.gz        )
 
-# Uncomment the following 4 lines for gcc-4.6.4. You need gmp, mpfr and mpc for gcc-4.6.4
-#( rpm_make -p gmp-5.1.2  -s gmp-5.1.2.spec  -u ftp://ftp.gnu.org/gnu/gmp/gmp-5.1.2.tar.bz2                 )
-#( rpm_make -p mpfr-3.1.2 -s mpfr-3.1.2.spec -u http://www.mpfr.org/mpfr-current/mpfr-3.1.2.tar.gz          )
-#( rpm_make -p mpc-1.0.1  -s mpc-1.0.1.spec  -u http://www.multiprecision.org/mpc/download/mpc-1.0.1.tar.gz )
-#( rpm_make -p gcc-4.6.4  -s gcc-4.6.4.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.6.4/gcc-4.6.4.tar.gz        )
+# Uncomment the following 4 lines for gcc-4.6.3. You need gmp, mpfr and mpc for gcc-4.6.3
+#( rpm_make -p gmp-5.0.5  -s gmp-5.0.5.spec  -u ftp://ftp.gnu.org/gnu/gmp/gmp-5.0.5.tar.bz2                 )
+#( rpm_make -p mpfr-3.1.0 -s mpfr-3.1.0.spec -u ftp://ftp.gnu.org/gnu/mpfr/mpfr-3.1.0.tar.gz                )
+#( rpm_make -p mpc-0.9    -s mpc-0.9.spec    -u http://www.multiprecision.org/mpc/download/mpc-0.9.tar.gz   )
+#( rpm_make -p gcc-4.6.3  -s gcc-4.6.3.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.6.3/gcc-4.6.3.tar.gz        )
 
 # Python
 #( rpm_make -p Python-2.7  -s Python-2.7.spec -u http://www.python.org/ftp/python/2.7/Python-2.7.tgz        )
 
-# m4 
+# m4
 # You need a recent version of m4 in order to compile a recent version of bison
 #( rpm_make -p m4-1.4.16  -s m4-1.4.16.spec   -u http://ftp.gnu.org/gnu/m4/m4-1.4.16.tar.gz               )
 
@@ -95,7 +93,7 @@ echo
 #( rpm_make -p flex-2.5.35 -s flex-2.5.35.spec -u http://downloads.sourceforge.net/project/flex/flex/flex-2.5.35/flex-2.5.35.tar.gz )
 
 # cmake
-( rpm_make -p cmake-2.8.11 -s cmake-2.8.11.spec -u http://www.cmake.org/files/v2.8/cmake-2.8.11.tar.gz        )
+( rpm_make -p cmake-2.8.12 -s cmake-2.8.12.spec -u http://www.cmake.org/files/v2.8/cmake-2.8.12.tar.gz        )
 
 echo ========================================
 echo Done ThirdParty AllMake: Stage1

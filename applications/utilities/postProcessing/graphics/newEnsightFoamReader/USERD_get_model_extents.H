@@ -7,7 +7,7 @@ int USERD_get_model_extents
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_get_model_extents" << endl 
+    Info << "Entering: USERD_get_model_extents" << endl
         << flush;
 #endif
 

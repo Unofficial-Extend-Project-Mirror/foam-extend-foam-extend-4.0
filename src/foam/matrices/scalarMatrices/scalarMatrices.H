@@ -1,0 +1,94 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of foam-extend.
+
+    foam-extend is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+
+Class
+    scalarMatrices
+
+Description
+    Scalar matrices
+
+SourceFiles
+    scalarMatrices.C
+    scalarMatricesTemplates.C
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef scalarMatrices_H
+#define scalarMatrices_H
+
+#include "RectangularMatrix.H"
+#include "SquareMatrix.H"
+#include "DiagonalMatrix.H"
+
+#include "scalarSquareMatrix.H"
+#include "scalarField.H"
+#include "labelList.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+typedef RectangularMatrix<scalar> scalarRectangularMatrix;
+typedef DiagonalMatrix<scalar> scalarDiagonalMatrix;
+
+void multiply
+(
+    scalarRectangularMatrix& answer,         // value changed in return
+    const scalarRectangularMatrix& A,
+    const scalarRectangularMatrix& B
+);
+
+void multiply
+(
+    scalarRectangularMatrix& answer,         // value changed in return
+    const scalarRectangularMatrix& A,
+    const scalarRectangularMatrix& B,
+    const scalarRectangularMatrix& C
+);
+
+void multiply
+(
+    scalarRectangularMatrix& answer,         // value changed in return
+    const scalarRectangularMatrix& A,
+    const scalarDiagonalMatrix& B,
+    const scalarRectangularMatrix& C
+);
+
+//- Return the inverse of matrix A using SVD
+scalarRectangularMatrix SVDinv
+(
+    const scalarRectangularMatrix& A,
+    scalar minCondition = 0
+);
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

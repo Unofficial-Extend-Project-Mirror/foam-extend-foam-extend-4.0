@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -28,6 +27,7 @@ License
 #include "polyMesh.H"
 #include "processorPolyPatch.H"
 #include "cyclicPolyPatch.H"
+#include "ggiPolyPatch.H"
 #include "OPstream.H"
 #include "IPstream.H"
 #include "PstreamCombineReduceOps.H"
@@ -359,6 +359,9 @@ void Foam::PointEdgeWave<Type>::getChangedPatchPoints
         if (changedPoint_[meshPointI])
         {
             patchInfo.append(allPointInfo_[meshPointI]);
+
+            //Pout << "Sending " << meshPointI << " " << mesh_.points()[meshPointI] << " o = " << patchInfo[patchInfo.size()-1].origin() << " " << allPointInfo_[meshPointI] << endl;
+
             patchPoints.append(patchPointI);
 
             label patchFaceI = pointFaces[patchPointI][0];
@@ -678,6 +681,235 @@ void Foam::PointEdgeWave<Type>::handleCyclicPatches()
 }
 
 
+// Update overall for changed patch points
+template <class Type>
+void Foam::PointEdgeWave<Type>::updateFromPatchInfo
+(
+    const ggiPolyPatch& to,
+    const labelListList& shadowAddr,
+    const labelList& owner,
+    const labelList& ownerIndex,
+    List<Type>& patchInfo
+)
+{
+    //const labelList& meshPoints = to.meshPoints();
+    const pointField& points = to.points();
+    const List<face>& allFaces = mesh_.allFaces();
+
+    forAll(patchInfo, i)
+    {
+        label fID = to.shadow().zone()[owner[i]];
+        label pID = allFaces[fID][ownerIndex[i]];
+        point p = points[pID];
+
+        // Update in sending zone without propagation
+        if(fID >= mesh_.nFaces())
+        {
+            allPointInfo_[pID].updatePoint
+            (
+                mesh_,
+                pID,
+                patchInfo[i],
+                propagationTol_
+            );
+        }
+
+        const labelList& addr = shadowAddr[owner[i]];
+
+        if(addr.size() > 0)
+        {
+            label nearestPoint = -1;
+            label nearestFace = -1;
+            scalar dist = GREAT;
+
+            forAll(addr, saI)
+            {
+                label fID2 = to.zone()[addr[saI]];
+
+                const face& f = allFaces[fID2];
+                forAll(f, pI)
+                {
+                    label pID2 = f[pI];
+
+                    scalar d = magSqr(points[pID2] - p);
+
+                    if(d < dist)
+                    {
+                        nearestFace = fID2;
+                        nearestPoint = pID2;
+                        dist = d;
+                    }
+                    else if(nearestPoint == pID2 && fID2 < mesh_.nFaces())
+                    {
+                        // Choose face in patch over face in zone
+                        nearestFace = fID2;
+                    }
+                }
+            }
+
+            patchInfo[i].enterDomain(to, nearestPoint, points[nearestPoint]);
+
+            if(nearestFace < mesh_.nFaces())
+            {
+                // Update in receiving patch with propagation
+                updatePoint
+                (
+                    nearestPoint,
+                    patchInfo[i],
+                    propagationTol_,
+                    allPointInfo_[nearestPoint]
+                );
+            }
+            else
+            {
+                // Update in receiving zone without propagation
+                allPointInfo_[nearestPoint].updatePoint
+                (
+                    mesh_,
+                    nearestPoint,
+                    patchInfo[i],
+                    propagationTol_
+                );
+            }
+        }
+    }
+}
+
+
+// Transfer all the information to/from neighbouring processors
+template <class Type>
+void Foam::PointEdgeWave<Type>::handleGgiPatches()
+{
+    forAll(mesh_.boundaryMesh(), patchI)
+    {
+        const polyPatch& patch = mesh_.boundaryMesh()[patchI];
+
+        if (isA<ggiPolyPatch>(patch))
+        {
+            const ggiPolyPatch& master = refCast<const ggiPolyPatch>(patch);
+            const ggiPolyPatch& slave = master.shadow();
+
+            if(master.master() && (master.localParallel() || master.size()))
+            {
+                // 1. Collect all point info on master side
+                DynamicList<Type> masterInfo(master.nPoints());
+                DynamicList<label> masterOwner(master.nPoints());
+                DynamicList<label> masterOwnerIndex(master.nPoints());
+
+                {
+                    DynamicList<label> patchPoints(master.nPoints());
+
+                    // Get all changed points in relative addressing
+                    getChangedPatchPoints
+                    (
+                        master,
+                        masterInfo,
+                        patchPoints,
+                        masterOwner,
+                        masterOwnerIndex
+                    );
+
+                    forAll(masterOwner, i)
+                    {
+                        masterOwner[i] =
+                            master.zoneAddressing()[masterOwner[i]];
+                    }
+
+                    // Adapt for leaving domain
+                    leaveDomain(master, master, patchPoints, masterInfo);
+
+                    if (debug)
+                    {
+                        Pout<< "Ggi patch " << master.index() << ' ' << master.name()
+                            << "  Sending:" << masterInfo.size() << endl;
+                    }
+                }
+
+                // 2. Collect all point info on slave side
+                DynamicList<Type> slaveInfo(slave.nPoints());
+                DynamicList<label> slaveOwner(slave.nPoints());
+                DynamicList<label> slaveOwnerIndex(slave.nPoints());
+
+                {
+                    DynamicList<label> patchPoints(slave.nPoints());
+
+                    // Get all changed points in relative addressing
+                    getChangedPatchPoints
+                    (
+                        slave,
+                        slaveInfo,
+                        patchPoints,
+                        slaveOwner,
+                        slaveOwnerIndex
+                    );
+
+                    forAll(slaveOwner, i)
+                    {
+                        slaveOwner[i] =
+                            slave.zoneAddressing()[slaveOwner[i]];
+                    }
+
+                    // Adapt for leaving domain
+                    leaveDomain(slave, slave, patchPoints, slaveInfo);
+
+                    if (debug)
+                    {
+                        Pout<< "Ggi patch " << slave.index() << ' ' << slave.name()
+                            << "  Sending:" << slaveInfo.size() << endl;
+                    }
+
+                }
+
+                if(!master.localParallel())
+                {
+                    combineReduce(masterInfo, listAppendOp<Type>());
+                    combineReduce(slaveInfo, listAppendOp<Type>());
+                    combineReduce(masterOwner, listAppendOp<label>());
+                    combineReduce(slaveOwner, listAppendOp<label>());
+                    combineReduce(masterOwnerIndex, listAppendOp<label>());
+                    combineReduce(slaveOwnerIndex, listAppendOp<label>());
+                }
+
+                // 3. Apply point info on master & slave side
+
+                if (debug)
+                {
+                    Pout<< "Ggi patch " << slave.index() << ' ' << slave.name()
+                        << "  Received:" << masterInfo.size() << endl;
+                    Pout<< "Ggi patch " << master.index() << ' ' << master.name()
+                        << "  Received:" << slaveInfo.size() << endl;
+                }
+
+                // Apply transform to received data for non-parallel planes
+                if (!master.parallel())
+                {
+                    transform(master.forwardT(), masterInfo);
+                    transform(slave.forwardT(), slaveInfo);
+                }
+
+                updateFromPatchInfo
+                (
+                    slave,
+                    master.patchToPatch().masterAddr(),
+                    masterOwner,
+                    masterOwnerIndex,
+                    masterInfo
+                );
+
+                updateFromPatchInfo
+                (
+                    master,
+                    master.patchToPatch().slaveAddr(),
+                    slaveOwner,
+                    slaveOwnerIndex,
+                    slaveInfo
+                );
+            }
+        }
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Iterate, propagating changedPointsInfo across mesh, until no change (or
@@ -705,12 +937,17 @@ Foam::PointEdgeWave<Type>::PointEdgeWave
     changedEdges_(mesh_.nEdges()),
     nChangedEdges_(0),
     nCyclicPatches_(countPatchType<cyclicPolyPatch>()),
+    nGgiPatches_(countPatchType<ggiPolyPatch>()),
     cycHalves_(2*nCyclicPatches_),
     nEvals_(0),
     nUnvisitedPoints_(mesh_.nPoints()),
     nUnvisitedEdges_(mesh_.nEdges())
 {
-    if (allPointInfo_.size() != mesh_.nPoints())
+    if
+    (
+        allPointInfo_.size() != mesh_.nPoints()
+        && allPointInfo_.size() != mesh_.allPoints().size()
+    )
     {
         FatalErrorIn
         (
@@ -887,6 +1124,11 @@ Foam::label Foam::PointEdgeWave<Type>::edgeToPoint()
         // Transfer changed points across cyclic halves
         handleCyclicPatches();
     }
+    if (nGgiPatches_ > 0)
+    {
+        // Transfer changed points across cyclic halves
+        handleGgiPatches();
+    }
     if (Pstream::parRun())
     {
         // Transfer changed points from neighbouring processors.
@@ -984,6 +1226,11 @@ Foam::label Foam::PointEdgeWave<Type>::iterate(const label maxIter)
     {
         // Transfer changed points across cyclic halves
         handleCyclicPatches();
+    }
+    if (nGgiPatches_ > 0)
+    {
+        // Transfer changed points across ggi patches
+        handleGgiPatches();
     }
     if (Pstream::parRun())
     {

@@ -4,7 +4,7 @@ c++WARN     = -Wall -W -Wno-unused-parameter
 
 include $(RULES)/c++$(WM_COMPILE_OPTION)
 
-ptFLAGS     = -DNoRepository -ftemplate-depth-30
+ptFLAGS     = -DNoRepository -ftemplate-depth-200
 
 c++FLAGS    = $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) $(LIB_HEADER_DIRS) -fPIC $(PTHREAD_CFLAGS)
 

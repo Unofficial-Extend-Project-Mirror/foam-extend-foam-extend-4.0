@@ -13,5 +13,7 @@ EXE_LIBS = \
     -ltopoChangerFvMesh \
     -lmeshTools \
     -lfiniteVolume \
-    $(WM_DECOMP_LIBS) \
-    -llduSolvers
+    -ltetFiniteElement \
+    -ltetMotionSolver \
+    -llduSolvers \
+    -L$(MESQUITE_LIB_DIR) -lmesquite

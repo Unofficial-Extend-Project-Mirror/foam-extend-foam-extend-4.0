@@ -2,7 +2,7 @@
     <ProxyGroup name="sources">
     <SourceProxy
 
-        name="FoamReader" 
+        name="FoamReader"
         class="vtkFoamReader">
 
         <StringVectorProperty
@@ -12,23 +12,23 @@
             <StringListDomain name="files"/>
         </StringVectorProperty>
 
-        <IntVectorProperty 
-            name="UpdateGUI" 
-            command="SetUpdateGUI" 
+        <IntVectorProperty
+            name="UpdateGUI"
+            command="SetUpdateGUI"
             number_of_elements="1"
-            default_values="0"> 
+            default_values="0">
             <BooleanDomain name="bool"/>
         </IntVectorProperty>
 
-        <IntVectorProperty 
-            name="CacheMesh" 
-            command="SetCacheMesh" 
+        <IntVectorProperty
+            name="CacheMesh"
+            command="SetCacheMesh"
             number_of_elements="1"
             default_values="1">
             <BooleanDomain name="bool"/>
         </IntVectorProperty>
 
-        <IntVectorProperty 
+        <IntVectorProperty
             name="TimeStepRangeInfo"
             command="GetTimeStepRange"
             information_only="1">
@@ -47,7 +47,7 @@
             </IntRangeDomain>
         </IntVectorProperty>
 
-        <IntVectorProperty 
+        <IntVectorProperty
             name="TimeStepLimitsInfo"
             command="GetTimeStepLimits"
             information_only="1">
@@ -65,7 +65,7 @@
             </IntRangeDomain>
         </IntVectorProperty>
 
-        <StringVectorProperty 
+        <StringVectorProperty
             name="TimeArrayInfo"
             information_only="1">
             <ArraySelectionInformationHelper attribute_name="Time"/>
@@ -73,11 +73,11 @@
         <StringVectorProperty
             name="TimeStatus"
             command="SetTimeArrayStatus"
-            number_of_elements="0" 
+            number_of_elements="0"
             repeat_command="1"
             number_of_elements_per_command="2"
             element_types="2 0"
-    	    information_property="TimeArrayInfo">
+            information_property="TimeArrayInfo">
             <ArraySelectionDomain name="array_list">
                 <RequiredProperties>
                     <Property name="TimeArrayInfo"
@@ -86,7 +86,7 @@
             </ArraySelectionDomain>
         </StringVectorProperty>
 
-        <StringVectorProperty 
+        <StringVectorProperty
             name="RegionArrayInfo"
             information_only="1">
             <ArraySelectionInformationHelper attribute_name="Region"/>
@@ -94,11 +94,11 @@
         <StringVectorProperty
             name="RegionStatus"
             command="SetRegionArrayStatus"
-            number_of_elements="0" 
+            number_of_elements="0"
             repeat_command="1"
             number_of_elements_per_command="2"
             element_types="2 0"
-    	    information_property="RegionArrayInfo">
+            information_property="RegionArrayInfo">
             <ArraySelectionDomain name="array_list">
                 <RequiredProperties>
                     <Property name="RegionArrayInfo"
@@ -107,7 +107,7 @@
             </ArraySelectionDomain>
         </StringVectorProperty>
 
-        <StringVectorProperty 
+        <StringVectorProperty
             name="VolFieldArrayInfo"
             information_only="1">
             <ArraySelectionInformationHelper attribute_name="VolField"/>
@@ -115,11 +115,11 @@
         <StringVectorProperty
             name="VolFieldStatus"
             command="SetVolFieldArrayStatus"
-            number_of_elements="0" 
+            number_of_elements="0"
             repeat_command="1"
             number_of_elements_per_command="2"
             element_types="2 0"
-    	    information_property="VolFieldArrayInfo">
+            information_property="VolFieldArrayInfo">
             <ArraySelectionDomain name="array_list">
                 <RequiredProperties>
                     <Property name="VolFieldArrayInfo"
@@ -128,7 +128,7 @@
             </ArraySelectionDomain>
         </StringVectorProperty>
 
-        <StringVectorProperty 
+        <StringVectorProperty
             name="PointFieldArrayInfo"
             information_only="1">
             <ArraySelectionInformationHelper attribute_name="PointField"/>
@@ -136,11 +136,11 @@
         <StringVectorProperty
             name="PointFieldStatus"
             command="SetPointFieldArrayStatus"
-            number_of_elements="0" 
+            number_of_elements="0"
             repeat_command="1"
             number_of_elements_per_command="2"
             element_types="2 0"
-	        information_property="PointFieldArrayInfo">
+            information_property="PointFieldArrayInfo">
             <ArraySelectionDomain name="array_list">
                 <RequiredProperties>
                     <Property name="PointFieldArrayInfo"

@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2006-7 H. Jasak All rights reserved
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -255,17 +254,30 @@ Foam::mixerGgiFvMesh::mixerGgiFvMesh
             )
         ).subDict(typeName + "Coeffs")
     ),
-    csPtr_
+    cs_
     (
-        coordinateSystem::New
-        (
-            "coordinateSystem",
-            dict_.subDict("coordinateSystem")
-        )
+        "coordinateSystem",
+        dict_.subDict("coordinateSystem")
     ),
     rpm_(readScalar(dict_.lookup("rpm"))),
     movingPointsMaskPtr_(NULL)
 {
+    // Make sure the coordinate system does not operate in degrees
+    // Bug fix, HJ, 3/Oct/2011
+    if (!cs_.inDegrees())
+    {
+        WarningIn("mixerGgiFvMesh::mixerGgiFvMesh(const IOobject& io)")
+            << "Mixer coordinate system is set to operate in radians.  "
+            << "Changing to rad for correct calculation of angular velocity."
+            << nl
+            << "To remove this message please add entry" << nl << nl
+            << "inDegrees true;" << nl << nl
+            << "to the specification of the coordinate system"
+            << endl;
+
+        cs_.inDegrees() = true;
+    }
+
     addZonesAndModifiers();
 
     Info<< "Mixer mesh:" << nl
@@ -299,12 +311,12 @@ const Foam::scalarField& Foam::mixerGgiFvMesh::movingPointsMask() const
 
 bool Foam::mixerGgiFvMesh::update()
 {
-     // Rotational speed needs to be converted from rpm
+    // Rotational speed needs to be converted from rpm
     movePoints
     (
-        csPtr_->globalPosition
+        cs_.globalPosition
         (
-            csPtr_->localPosition(allPoints())
+            cs_.localPosition(allPoints())
           + vector(0, rpm_*360.0*time().deltaT().value()/60.0, 0)
             *movingPointsMask()
         )

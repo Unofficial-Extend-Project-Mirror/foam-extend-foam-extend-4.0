@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -44,6 +43,12 @@ License
 #elif defined(sgiN32) || defined(sgiN32Gcc)
 
 #   include <sigfpe.h>
+
+#elif defined(__APPLE__)
+
+// #   include <fenv.h>
+#include <xmmintrin.h>
+#include <mach/mach.h>
 
 #endif
 
@@ -102,10 +107,40 @@ void* Foam::sigFpe::my_malloc_hook(size_t size, const void *caller)
     return result;
 }
 
+#elif defined(__APPLE__)
+
+void *(*Foam::sigFpe::system_malloc_)(malloc_zone_t *zone, size_t size)=NULL;
+
+void* Foam::sigFpe::nan_malloc_(malloc_zone_t *zone, size_t size)
+{
+    void *result=system_malloc_(zone,size);
+
+    // initialize to signalling NaN
+#   ifdef WM_SP
+
+    const uint32_t sNAN = 0x7ff7fffflu;
+    uint32_t* dPtr = reinterpret_cast<uint32_t*>(result);
+
+#   else
+
+    const uint64_t sNAN = 0x7ff7ffffffffffffllu;
+    uint64_t* dPtr = reinterpret_cast<uint64_t*>(result);
+
+#   endif
+
+    const size_t nScalars = size/sizeof(scalar);
+    for (size_t i = 0; i < nScalars; ++i)
+    {
+        *dPtr++ = sNAN;
+    }
+
+    return result;
+}
+
 #endif
 
 
-#ifdef LINUX_GNUC
+#if defined(LINUX_GNUC) || defined(__APPLE__)
 
 void Foam::sigFpe::sigFpeHandler(int)
 {
@@ -170,6 +205,44 @@ Foam::sigFpe::~sigFpe()
             __malloc_hook = old_malloc_hook;
         }
 
+            #       elif defined(__APPLE__)
+
+        if(system_malloc_!=NULL) {
+            malloc_zone_t *zone = malloc_default_zone();
+            if(zone==NULL) {
+                FatalErrorIn("Foam__sigFpe::set")
+                    << "Could not get malloc_default_zone()." << endl
+                        << "Seems like this version of Mac OS X doesn't support FOAM_SETNAN"
+                        << endl
+                        << exit(FatalError);
+
+            }
+
+            if(zone->version>=8)
+            {
+                vm_protect(
+                    mach_task_self(),
+                    (uintptr_t)zone,
+                    sizeof(malloc_zone_t),
+                    0,
+                    VM_PROT_READ | VM_PROT_WRITE
+                );//remove the write protection
+            }
+            zone->malloc=system_malloc_;
+            system_malloc_=NULL;
+            if(zone->version==8)
+            {
+                vm_protect(
+                    mach_task_self(),
+                    (uintptr_t)zone,
+                    sizeof(malloc_zone_t),
+                    0,
+                    VM_PROT_READ
+                );//put the write protection back
+            }
+
+        }
+
 #       endif
     }
 }
@@ -192,7 +265,7 @@ void Foam::sigFpe::set(const bool verbose)
     {
         if (verbose)
         {
-            Info<< "SigFpe : Enabling floating point exception trapping"
+            Info<< "SigFpe   : Enabling floating point exception trapping"
                 << " (FOAM_SIGFPE)." << endl;
         }
 
@@ -240,6 +313,26 @@ void Foam::sigFpe::set(const bool verbose)
             NULL
         );
 
+#       elif defined(__APPLE__)
+
+        struct sigaction newAction;
+        newAction.sa_handler = sigFpeHandler;
+        newAction.sa_flags = SA_NODEFER;
+        sigemptyset(&newAction.sa_mask);
+        if (sigaction(SIGFPE, &newAction, &oldAction_) < 0)
+        {
+            FatalErrorIn
+            (
+                "Foam::sigFpe::set()"
+            )   << "Cannot set SIGFPE trapping"
+                << abort(FatalError);
+        }
+        _MM_SET_EXCEPTION_MASK(_MM_GET_EXCEPTION_MASK() & ~_MM_MASK_INVALID);
+        _MM_SET_EXCEPTION_MASK(_MM_GET_EXCEPTION_MASK() & ~_MM_MASK_DIV_ZERO);
+
+        _mm_setcsr( _MM_MASK_MASK &~
+        (_MM_MASK_OVERFLOW|_MM_MASK_INVALID|_MM_MASK_DIV_ZERO) );
+
 #       endif
     }
 
@@ -256,6 +349,48 @@ void Foam::sigFpe::set(const bool verbose)
 
         // Set our malloc
         __malloc_hook = Foam::sigFpe::my_malloc_hook;
+
+#elif defined(__APPLE__)
+
+        if(system_malloc_!=NULL) {
+            FatalErrorIn("Foam__sigFpe::set")
+                << "system_malloc_ already reset." << endl
+                    << "This should never happen"
+                    << endl
+                    << exit(FatalError);
+        }
+
+        malloc_zone_t *zone = malloc_default_zone();
+        if(zone==NULL) {
+            FatalErrorIn("Foam__sigFpe::set")
+                << "Could not get malloc_default_zone()." << endl
+                    << "Seems like this version of Mac OS X doesn't support FOAM_SETNAN"
+                    << endl
+                    << exit(FatalError);
+        }
+        // According to http://bkdc.ubiquity.ro/2011/07/how-to-set-malloc-hooks-in-osx-lion-107.html
+        if(zone->version>=8)
+        {
+            vm_protect(
+                mach_task_self(),
+                (uintptr_t)zone,
+                sizeof(malloc_zone_t),
+                0,
+                VM_PROT_READ | VM_PROT_WRITE
+            );//remove the write protection
+        }
+        system_malloc_=zone->malloc;
+        zone->malloc=Foam::sigFpe::nan_malloc_;
+        if(zone->version==8)
+        {
+            vm_protect(
+                mach_task_self(),
+                (uintptr_t)zone,
+                sizeof(malloc_zone_t),
+                0,
+                VM_PROT_READ
+            );//put the write protection back
+        }
 
 #       endif
     }

@@ -1,0 +1,33 @@
+#!/bin/bash
+#
+# Source clean functions
+. $WM_PROJECT_DIR/bin/tools/CleanFunctions
+
+#set -x
+
+cleanBoundary ()
+{
+  rm -f ./constant/polyMesh/boundary > /dev/null 2>&1
+}
+
+cleanTimeZero ()
+{
+  rm -rf 0 > /dev/null 2>&1
+}
+
+cleanPyFoam ()
+{
+  rm PlyParser_FoamFileParser_parsetab.* > /dev/null 2>&1
+}
+
+cleanVTK ()
+{
+  rm -rf VTK > /dev/null 2>&1
+}
+
+# Cleaning up the case
+cleanCase
+cleanBoundary
+cleanTimeZero
+cleanPyFoam
+cleanVTK

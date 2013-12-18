@@ -5,11 +5,11 @@ int USERD_size_matf_data
     int part_id,
     int wtyp,
     int mat_type,
-    int *matf_size 
+    int *matf_size
 )
 {
 #ifdef ENSIGHTDEBUG
-    Info << "Entering: USERD_size_matf_data" << endl 
+    Info << "Entering: USERD_size_matf_data" << endl
         << flush;
 #endif
 

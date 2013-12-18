@@ -58,7 +58,7 @@ USERD_get_block_vector_values_by_component(int block_number,
 W32IMPORT int
 USERD_get_name_of_reader(char reader_name[Z_MAX_USERD_NAME],
                          int *two_fields);
-     
+
 W32IMPORT int
 USERD_get_reader_descrip(char descrip[Z_MAXFILENP]);
 
@@ -67,13 +67,13 @@ USERD_set_filenames(char filename_1[],
                     char filename_2[],
                     char the_path[],
                     int swapbytes);
-     
+
 W32IMPORT int
 USERD_get_number_of_files_in_dataset( void );
 
 W32IMPORT int
 USERD_get_dataset_query_file_info(Z_QFILES *qfiles);
-     
+
 W32IMPORT int
 USERD_get_changing_geometry_status( void );
 
@@ -102,13 +102,13 @@ USERD_bkup(FILE *archive_file,
 
 W32IMPORT int
 USERD_get_number_of_global_nodes( void );
-     
+
 W32IMPORT int
 USERD_get_global_coords(CRD *coord_array);
-     
+
 W32IMPORT int
 USERD_get_global_node_ids(int *nodeid_array);
-     
+
 W32IMPORT int
 USERD_get_element_connectivities_for_part(int part_number,
                                           int **conn_array[Z_MAXTYPE]);
@@ -122,7 +122,7 @@ USERD_get_vector_values(int which_vector,
                         int which_part,
                         int which_type,
                         float *vector_array);
-     
+
 W32IMPORT int
 USERD_get_part_build_info(int *part_id,
                           int *part_types,
@@ -183,7 +183,7 @@ USERD_get_part_coords(int part_number,
 W32IMPORT int
 USERD_get_part_node_ids(int part_number,
                         int *nodeid_array);
-     
+
 W32IMPORT int
 USERD_get_part_elements_by_type(int part_number,
                                 int element_type,
@@ -192,7 +192,7 @@ W32IMPORT int
 USERD_get_part_element_ids_by_type(int part_number,
                                    int element_type,
                                    int *elemid_array);
-     
+
 W32IMPORT int
 USERD_get_reader_version(char version_number[Z_MAX_USERD_NAME]);
 
@@ -376,7 +376,7 @@ USERD_get_nfaced_conn( int part_number,
 
 #endif
 
-     
+
 /*--------------------------------------------------------------------*/
 #endif /*GLOBAL_EXTERN_PROTO_H*/
 

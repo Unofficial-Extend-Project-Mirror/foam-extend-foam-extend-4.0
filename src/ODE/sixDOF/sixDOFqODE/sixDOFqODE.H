@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     sixDOFqODE
@@ -77,13 +76,13 @@ class sixDOFqODE
         // Platform variables
 
             //- Spring equilibrium position for translation
-            const dimensionedVector Xequilibrium_;
+            dimensionedVector Xequilibrium_;
 
             //- Linear spring coeffs
-            const dimensionedDiagTensor linSpringCoeffs_;
+            dimensionedDiagTensor linSpringCoeffs_;
 
             //- Linear damping coeffs
-            const dimensionedDiagTensor linDampingCoeffs_;
+            dimensionedDiagTensor linDampingCoeffs_;
 
 
         // Initial body state variables
@@ -142,7 +141,7 @@ class sixDOFqODE
 
 
         //- Set ODE coefficients from position and rotation
-        void setCoeffs(); 
+        void setCoeffs();
 
 
         // Variables in relative coordinate system (solved for)
@@ -161,7 +160,7 @@ class sixDOFqODE
             //  given current values for relative rotational velocity
             dimensionedVector OmegaDot
             (
-			    const HamiltonRodriguezRot& rotation,
+                const HamiltonRodriguezRot& rotation,
                 const dimensionedVector& omega
             ) const;
 
@@ -197,11 +196,20 @@ public:
         //- Return mass
         inline const dimensionedScalar& mass() const;
 
+        //- Return access to mass
+        inline dimensionedScalar& mass();
+
         //- Return moment of inertia
         inline const dimensionedDiagTensor& momentOfInertia() const;
 
+        //- Return access to moment of inertia
+        inline dimensionedDiagTensor& momentOfInertia();
+
         //- Return equilibrium position of origin
         inline const dimensionedVector& Xequilibrium() const;
+
+        //- Return access to equilibrium position of origin
+        inline dimensionedVector& Xequilibrium();
 
 
         // Variables in relative coordinate system (solved for)

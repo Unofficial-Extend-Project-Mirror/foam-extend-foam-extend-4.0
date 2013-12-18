@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+  \\      /  F ield         | foam-extend: Open Source CFD
    \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
+    \\  /    A nd           | For copyright notice see file Copyright
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -62,7 +61,7 @@ void processorFaPatch::makeNonGlobalPatchPoints() const
     // create a 1->1 map
 
     // Can not use faGlobalMeshData at this point yet
-    
+
     if
     (
         !Pstream::parRun()
@@ -89,7 +88,7 @@ void processorFaPatch::makeNonGlobalPatchPoints() const
 
         const labelList& faMeshPatchPoints = pointLabels();
 
-        const labelList& meshPoints = 
+        const labelList& meshPoints =
             boundaryMesh().mesh().patch().meshPoints();
 
         label noFiltPoints = 0;
@@ -164,7 +163,7 @@ void processorFaPatch::initGeometry()
         OPstream toNeighbProc
         (
             Pstream::blocking,
-            neighbProcNo(), 
+            neighbProcNo(),
             3*(sizeof(label) + size()*sizeof(vector))
         );
 
@@ -184,7 +183,7 @@ void processorFaPatch::calcGeometry()
             IPstream fromNeighbProc
             (
                 Pstream::blocking,
-                neighbProcNo(), 
+                neighbProcNo(),
                 3*(sizeof(label) + size()*sizeof(vector))
             );
             fromNeighbProc
@@ -250,7 +249,7 @@ void processorFaPatch::initUpdateMesh()
         labelList patchEdge(nPoints());
         labelList indexInEdge(nPoints());
 
-        const edgeList::subList patchEdges = 
+        const edgeList::subList patchEdges =
             patchSlice(boundaryMesh().mesh().edges());
 
         const labelListList& ptEdges = pointEdges();
@@ -263,7 +262,7 @@ void processorFaPatch::initUpdateMesh()
 
             const edge& e = patchEdges[edgeI];
 
-            indexInEdge[patchPointI] = 
+            indexInEdge[patchPointI] =
                 findIndex
                 (
                     e,
@@ -316,7 +315,7 @@ void processorFaPatch::updateMesh()
             neighbPointsPtr_ = new labelList(nPoints());
             labelList& neighbPoints = *neighbPointsPtr_;
 
-            const edgeList::subList patchEdges = 
+            const edgeList::subList patchEdges =
                 patchSlice(boundaryMesh().mesh().edges());
 
             forAll(nbrPatchEdge, nbrPointI)
@@ -359,7 +358,7 @@ const labelList& processorFaPatch::neighbPoints() const
             << " part of a cyclic patch."
             << abort(FatalError);
     }
- 
+
    return *neighbPointsPtr_;
 }
 
