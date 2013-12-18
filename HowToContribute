@@ -1,185 +1,45 @@
-How to Contribute
-~~~~~~~~~~~~~~~~~
+Guide to contribute code to OpenFOAM-extend project
 
-Contacts:
-
-Release Committee:    Hrvoje Jasak (h.jasak@wikki.co.uk)
-SourceForge Accounts: Bernhard Gschaider (Bernhard.Gschaider@ice-sf.at)
-                      Martin Beaudoin (beaudoin.martin@ireq.ca)
-git Repository:       Henrik Rusche (h.rusche@wikki.co.uk)
-                      Martin Beaudoin (beaudoin.martin@ireq.ca)
-
-1. SourceForge Access
-   ~~~~~~~~~~~~~~~~~~
-
-   To make contributions to the -extend project, you should first obtain an
-   account at SourceForge.net. (SourceForge will suggest a username
-   of firstnamelastname, but a username of firstname_lastname may
-   be a better choice.) After you obtain your account at SourceForge, you will
-   still need to be granted specific access to the -extend project. Make a request
-   to the "SourceForge Accounts" contact at the top of this document for access to
-   the project.
+You have developed a new top-level solver or utility.  You have implemented a further turbulence model, interface to a material properties library or created a really useful boundary condition?  This guide shows the ways to share this code with the OpenFOAM® communinity.
 
 
-2. Access to the git Repository
-   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Why should I share my code?
 
-   For a read-only copy of the repository, use the following command:
-   + git clone git://openfoam-extend.git.sourceforge.net/gitroot/openfoam-extend/OpenFOAM-1.6-ext
+Depending on your background, motivations for contributing code to OpenFOAM® via the FOAM-extend project will differ. 
 
-   To obtain a copy of the repository with write access, use the following command:
-   + git clone ssh://username@openfoam-extend.git.sourceforge.net/gitroot/openfoam-extend/OpenFOAM-1.6-ext
+With an industrial background you may find it a cost-advantage compared to keeping everything in-house.  Code contributed to the source-core will be maintained along with the complete project source code.  This saves you the cost of porting your code to each new release.  Furthermore, your code will be reviewed by experts with relevant OpenFOAM® experience, who will be able to spot design improvements that lead to increased speed of execution, better convergence, improved robustness, stability or all of the above.  If you plan to deploy your code to clients, the extend-bazaar gives you a unified platform that is simple to use, easy to access and gives you maximum freedom in presenting your code.
 
-   Also see:
-   http://openfoam-extend.git.sourceforge.net/git/gitweb.cgi?p=openfoam-extend
+In academia, many OpenFOAM® developments are carried out within publicly funded projects, often as part of PhD studies.  Unfortunately, much of this work is not re-used and developed further.  A time-saving option to share this work is the extend-bazaar, where working code and example cases can be simply uploaded with a brief description. This can be expanded and may even form the base for a journal publication; a good example for this is the waves2Foam package by Niels Jacobsen LINK. Contributing gives the code visibility in the OpenFOAM® community and harvests public recognition long after the project has been completed.
 
+In both cases, the credit for your work, its authorship, and Copyright remains with you.  We do not require contributors to give up the rights to their work.
 
-3. git Commit Policies and Workflow (Introduction)
-   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+What is the difference between contibuting to source-core and to extend-bazaar?
 
-   A formal procedure for contributions has been established for the project with
-   regard to branching and commits in the git repository. The workflow proposed
-   by Hrv Jasak and Henrik Rusche for contributing to the git repository is described
-   in the following document:
+The \BOLD{source-core}  of FOAM-extend meets the high quality standards of a software package that is deployed for production use. A contribution will be therefore reviewed by an experiened OpenFOAM®-extend maintainer. The code must adhere to OpenFOAM® coding style guideline LINK. The contribution procedure is:
+* Check your code, especially regarding coding style and trailing whitespace
+* Contact the maintainers of FOAM-extend repository to get write access , ???@???.org.
+* Use git to make a local feature branch, move your contribution into this branch and push the branch to the repository. See details of the FOAM-extend branching model LINK and git usage LINK.
+* Contact the maintainers and ask for review and merge of your code. Experience shows this involves a few iterative steps.
+* Your code is merged and becomes part of FOAM-extend. You are added to the list of contributors FOAM-extend.
+* Maintainance of your case is now part of the general development
 
-   http://nvie.com/posts/a-successful-git-branching-model/
+The \BOLD{extend-bazaar} has been created to minimize the effort for sharing your code. It is ideal for solvers and utilities that can live in the user-directory. The required steps are:
 
-   The article listed above should be considered mandatory reading material
-   for those planning to make contributions to the repository. Some links about
-   the general usage of GIT can be found in Section 8.
-
-   Please do not hesitate to ask one of the "git Repository" contacts at the top
-   of this document if you are not sure about specific operation relative to the git
-   repository.
-
-
-4. git Commit Policies and Workflow (User Perspective)
-   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-   The document listed in Section 3 above from nvie.com provides an excellent conceptual
-   description of the policies that will be used for the -extend repository. More
-   detailed instructions for users who wish to make contributions are spelled out in
-   this section.
-
-   Before making any commits to the git repository, be sure to configure git with your
-   username and e-mail address, which helps to ensure that you receive proper credit
-   in the git repository for work you contribute.
-
-   The author's name and e-mail address can be provided to git using commands such
-   as these:
-
-   + git config --global user.name "John Doe"
-   + git config --global user.email john.doe@xxx.com
-
-   Afterwards, the provided information will be contained in a file named .gitconfig
-   in the user's home directory.
-
-   All contributions to the project repository will be contained in a new feature branch
-   created by the contributor. The recommended way of creating branches is to create one
-   branch for each new specific fix or feature using a command such as this:
-
-   + git checkout -b my-feature-branch
-
-   Feature branches should be named after the fix or feature that they contain,
-   *not* named after the author. There may be more than one author, after all, and
-   this information is recorded in the commit anyway. As an example, a bug fix
-   to the mesquite package should be committed to a branch named "hotfix/mesquite".
-
-   Carefully organized commits and branches, clear commit messages, and well-chosen
-   branch names will make it easier for the release committee to review and merge
-   each contribution.
-
-   When you have a feature branch that is ready to be merged, push it to the server
-   using a command such as this:
-
-   + git push origin my-feature-branch
-
-   Next, notify the "Release Committee" point-of-contact listed at the top of this
-   document that the feature branch has been pushed to the server and is ready to be
-   merged. A release committee member will review your contribution, merge your
-   branch, and then delete the branch from the server, as it is no longer needed once
-   it has been merged.
-
-   If you need to delete the branch from the server or are requested to do so, the proper
-   command is
-
-   + git push origin :my-feature-branch
-
-   To delete the same branch from your local repository requires the command
-
-   + git branch -d my-feature-branch
-
-   Finally, to clean your local repository of tracking branches that have been deleted
-   from the server requires the command
-
-   + git remote prune origin
-
-5. git Commit Policies and Workflow (Committee Perspective)
-   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-   The -extend project "release committee" (initially comprised of Hrv Jasak) will be
-   solely responsible for merging user contributions into the master and nextRelease branches.
-
-   User contributions will be contained in feature branches, with a new feature branch for
-   each new fix or feature, as described in Section 4 above.
-
-   The feature branches provided by users will be merged by the release committee
-   into an integration branch called "nextRelease", and then both the local
-   and remote copy of the feature branch will be deleted. The merge will be performed
-   using a "git merge --no-ff" command, which forces the creation of a merge commit
-   even in the case where the merge could be accomplished by fast-forward.
-   Note that the automated test loop will be run off of this integration branch.
-
-   When the next release is ready, the release committee will merge the
-   integration branch into the master branch, again using a "git merge --no-ff" command.
-   Consistent with the proposed workflow, the master branch will only contain releases
-   and hotfixes.
-
-   Note that hotfixes should be branched off of the master branch and should be merged
-   twice - once into the integration branch and once into the master branch - in order to
-   guarantee that a merge of the integration branch into the master branch can be
-   accomplished by a fast-forward.
+* Create a user account on the OpenFOAM® Wiki.
+* Go to the extend-bazaar page and find a category for your contribution.
+* Create a new sub-page in the category and write a brief description/documentation for your contribution. Templates LINK exist that you can re-use.
+* Upload your code. Options are:
+    * For small packages that will not change much in the future, you can upload a .tgz archive to your wiki page directly.
+    * For larger packages that contain for example big meshes, use a file-hoster and add a link to your wiki page.
+    * If your contribution is under active development, create a repository for example on sourceforge LINK or github LINK. Add a link to the repository on the wiki page.
+* Implementing bug fixes, new features or ports to a new FOAM-extend release is at your discretion
 
 
-6. Specific Usage Instructions
-   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-   In case you find out that something that should be a hotfix ended up in
-   your local feature branch, follow the steps below to ensure that the hotfix is
-   properly committed to the integration and master branches:
-
-   a. Single out the SHA-1 of the commit that contains the hotfix (e.g. 13e5d2f)
-
-   c. Create a new hotfix branch; e.g.
-
-      + git checkout master
-      + git checkout -b hotfix/my-hotfix-topic
-
-   b. Single out the commit and base it on the master branch; e.g.
-
-      # The fix is in a single commit, but localBranch has advanced
-      + git cherry-pick commitID
-
-      OR
-
-      # The fix is small, but the commit contains other changes
-      + git checkout localBranch file
-      + git commit
-
-   d. Contact the "Release Committee" point-of-contact at the top of this document
-      and request that the hotfix be merged into the integration and master branches.
 
 
-7. Acknowledgements & Copyright
-   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-   Your authorship is tracked by the version control system (git). You may also document
-   your authorship in the header of the files. Furthermore, the release committee will
-   update the list of contributors in the README file with every release.
 
 
-8. Background Reading on git
-   ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   http://openfoamwiki.net/index.php/Starting_points_for_using_GIT
+ 
 
+http://www.openfoam.org/contrib/code-style.php
