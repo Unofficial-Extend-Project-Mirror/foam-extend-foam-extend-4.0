@@ -15,15 +15,15 @@ do
     fi
 done
 
-OFDIR=/home/vagrant/OpenFOAM/
+OFDIR=/home/vagrant/foam/
 
 mkdir -vp $OFDIR
 chown -R vagrant:vagrant $OFDIR
 
-OFClone=$OFDIR/OpenFOAM-1.6-ext
-OFReference=$OFDIR/OpenFOAM-1.6-ext-parent
+OFClone=$OFDIR/foam-extend-3.0
+OFReference=$OFClone-parent
 
-OFParent=/OpenFOAM-sources
+OFParent=/FOAM-sources
 
 if [ ! -e $OFClone ]
 then
