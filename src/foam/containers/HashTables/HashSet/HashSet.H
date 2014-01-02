@@ -128,10 +128,26 @@ public:
             return HashTable<nil, Key, Hash>::insert(key, nil());
         }
 
+        //- Insert keys from a UList of Key
+        //  Return the number of new elements inserted
+        label insert(const UList<Key>&);
+
         //- Same as insert (cannot overwrite nil content)
         bool set(const Key& key)
         {
-            return HashTable<nil, Key, Hash>::insert(key, nil());
+            return insert(key);
+        }
+
+        //- Same as insert (cannot overwrite nil content)
+        label set(const UList<Key>& lst)
+        {
+            return insert(lst);
+        }
+
+        //- Unset the specified key - same as erase
+        bool unset(const Key& key)
+        {
+            return HashTable<nil, Key, Hash>::erase(key);
         }
 
 

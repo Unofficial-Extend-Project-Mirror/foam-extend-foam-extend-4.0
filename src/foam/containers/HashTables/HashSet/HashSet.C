@@ -52,6 +52,24 @@ Foam::HashSet<Key, Hash>::HashSet
 }
 
 
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Key, class Hash>
+Foam::label Foam::HashSet<Key, Hash>::insert(const UList<Key>& lst)
+{
+    label count = 0;
+    forAll(lst, elemI)
+    {
+        if (this->insert(lst[elemI]))
+        {
+            ++count;
+        }
+    }
+
+    return count;
+}
+
+
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class Key, class Hash>
@@ -89,7 +107,7 @@ bool Foam::HashSet<Key, Hash>::operator==(const HashSet<Key, Hash>& rhs) const
 template<class Key, class Hash>
 bool Foam::HashSet<Key, Hash>::operator!=(const HashSet<Key, Hash>& rhs) const
 {
-    return !(this->operator==(rhs));
+    return !(operator==(rhs));
 }
 
 
@@ -124,7 +142,7 @@ void Foam::HashSet<Key, Hash>::operator^=(const HashSet<Key, Hash>& rhs)
     // Add missed rhs elements, remove duplicate elements
     for (const_iterator iter = rhs.cbegin(); iter != rhs.cend(); ++iter)
     {
-        if (found(iter.key()))
+        if (this->found(iter.key()))
         {
             this->erase(iter.key());
         }

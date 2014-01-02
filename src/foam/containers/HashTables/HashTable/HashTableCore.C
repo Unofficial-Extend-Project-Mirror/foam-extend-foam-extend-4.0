@@ -23,10 +23,49 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "StaticHashTable.H"
+#include "HashTable.H"
+#include "uLabel.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::StaticHashTableName, 0);
+namespace Foam
+{
+defineTypeNameAndDebug(HashTableCore, 0);
+}
+
+const Foam::label Foam::HashTableCore::maxTableSize
+(
+    Foam::HashTableCore::canonicalSize
+    (
+        Foam::labelMax/2
+    )
+);
+
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+Foam::label Foam::HashTableCore::canonicalSize(const label size)
+{
+    if (size < 1)
+    {
+        return 0;
+    }
+
+    // enforce power of two
+    uLabel goodSize = size;
+
+    if (goodSize & (goodSize - 1))
+    {
+        // brute-force is fast enough
+        goodSize = 1;
+        while (goodSize < unsigned(size))
+        {
+            goodSize <<= 1;
+        }
+    }
+
+    return goodSize;
+}
+
 
 // ************************************************************************* //

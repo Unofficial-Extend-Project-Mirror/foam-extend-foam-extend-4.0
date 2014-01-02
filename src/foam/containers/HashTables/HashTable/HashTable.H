@@ -70,23 +70,59 @@ Ostream& operator<<(Ostream&, const HashTable<T, Key, Hash>&);
 
 
 /*---------------------------------------------------------------------------*\
-                        Class HashTableName Declaration
+                         Class HashTableCore Declaration
 \*---------------------------------------------------------------------------*/
 
-TemplateName(HashTable);
+//- Template-invariant bits for HashTable
+struct HashTableCore
+{
+    //- Return a canonical (power-of-two) size
+    static label canonicalSize(const label);
+
+    //- Maximum allowable table size
+    static const label maxTableSize;
+
+    //- Construct null
+    HashTableCore()
+    {}
+
+    //- Define template name and debug
+    ClassName("HashTable");
+
+    //- A zero-sized end iterator
+    struct iteratorEnd
+    {
+        //- Construct null
+        iteratorEnd()
+        {}
+    };
+
+    //- iteratorEnd set to beyond the end of any HashTable
+    inline static iteratorEnd cend()
+    {
+        return iteratorEnd();
+    }
+
+    //- iteratorEnd set to beyond the end of any HashTable
+    inline static iteratorEnd end()
+    {
+        return iteratorEnd();
+    }
+};
 
 
 /*---------------------------------------------------------------------------*\
-                          Class HashTable Declaration
+                           Class HashTable Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class T, class Key=word, class Hash=string::hash>
 class HashTable
 :
-    public HashTableName
+    public HashTableCore
 {
     // Private data type for table entries
 
+        //- Structure to hold a hashed entry with SLList for collisions
         struct hashedEntry
         {
             //- The lookup key
@@ -98,18 +134,17 @@ class HashTable
             //- The data object
             T obj_;
 
-            //- Constructors
+            //- Construct from key, next pointer and object
+            inline hashedEntry(const Key&, hashedEntry* next, const T&);
 
-                //- Construct given key, next pointer and object
-                inline hashedEntry
-                (
-                    const Key&,
-                    hashedEntry* next,
-                    const T& newEntry
-                );
 
-                //- Dissallow construction as copy
-                hashedEntry(const hashedEntry&);
+        private:
+
+            //- Disallow default bitwise copy construct
+            hashedEntry(const hashedEntry&);
+
+            //- Disallow default bitwise assignment
+            void operator=(const hashedEntry&);
         };
 
 
@@ -118,7 +153,7 @@ class HashTable
         //- The current number of elements in table
         label nElmts_;
 
-        //- Number of primary entries allocated in table (not necessarily used)
+        //- Number of primary entries allocated in table
         label tableSize_;
 
         //- The table of primary entries
@@ -137,27 +172,32 @@ class HashTable
         //- Assign a new hashedEntry to a possibly already existing key
         bool set(const Key&, const T& newElmt, bool protect);
 
-
 public:
+
+    // Forward declaration of iterators
+
+        class iteratorBase;
+        class iterator;
+        class const_iterator;
 
         //- Declare friendship with the HashPtrTable class
         template<class T2, class Key2, class Hash2>
         friend class HashPtrTable;
 
+        //- Declare friendship with the iteratorBase
+        friend class iteratorBase;
 
-    // Forward declaration of STL iterators
-
-        class iterator;
+        //- Declare friendship with the iterator
         friend class iterator;
 
-        class const_iterator;
+        //- Declare friendship with the const_iterator
         friend class const_iterator;
 
 
     // Constructors
 
         //- Construct given initial table size
-        HashTable(const label size = 128);
+        explicit HashTable(const label size = 128);
 
         //- Construct from Istream
         HashTable(Istream&, const label size = 128);
@@ -169,16 +209,18 @@ public:
         HashTable(const Xfer<HashTable<T, Key, Hash> >&);
 
 
-    // Destructor
-
-        ~HashTable();
+    //- Destructor
+    ~HashTable();
 
 
     // Member Functions
 
         // Access
 
-            //- Return number of elements in table.
+            //- The size of the underlying table
+            inline label capacity() const;
+
+            //- Return number of elements in table
             inline label size() const;
 
             //- Return true if the hash table is empty
@@ -198,8 +240,12 @@ public:
             //- Return the table of contents
             List<Key> toc() const;
 
+            //- Return the table of contents as a sorted list
+            List<Key> sortedToc() const;
+
             //- Print information
             Ostream& printInfo(Ostream&) const;
+
 
         // Edit
 
@@ -209,10 +255,11 @@ public:
             //- Assign a new hashedEntry, overwriting existing entries
             inline bool set(const Key&, const T& newElmt);
 
-            //- Erase an hashedEntry specified by given iterator
+            //- Erase a hashedEntry specified by given iterator
+            //  This invalidates the iterator until the next operator++
             bool erase(const iterator&);
 
-            //- Erase an hashedEntry specified by given key if in table
+            //- Erase a hashedEntry specified by the given key
             bool erase(const Key&);
 
             //- Remove entries given by the listed keys from this HashTable
@@ -236,8 +283,11 @@ public:
             //  Equivalent to clear() followed by resize(0)
             void clearStorage();
 
+            //- Shrink the allocated table to approx. twice number of elements
+            void shrink();
+
             //- Transfer the contents of the argument table into this table
-            //  and annull the argument table.
+            //  and annul the argument table.
             void transfer(HashTable<T, Key, Hash>&);
 
             //- Transfer contents to the Xfer container
@@ -246,25 +296,25 @@ public:
 
     // Member Operators
 
-        //- Find and return an hashedEntry
+        //- Find and return a hashedEntry
         inline T& operator[](const Key&);
 
-        //- Find and return an hashedEntry
+        //- Find and return a hashedEntry
         inline const T& operator[](const Key&) const;
 
-        //- Find and return an hashedEntry, create it null if not present.
+        //- Find and return a hashedEntry, create it null if not present
         inline T& operator()(const Key&);
 
         //- Assignment
         void operator=(const HashTable<T, Key, Hash>&);
 
-        //- Equality. Two hash tables are equal if all contents of first are
-        //  also in second and vice versa. So does not depend on table size or
-        //  order!
+        //- Equality. Hash tables are equal if the keys and values are equal.
+        //  Independent of table storage size and table order.
         bool operator==(const HashTable<T, Key, Hash>&) const;
 
         //- The opposite of the equality operation. Takes linear time.
         bool operator!=(const HashTable<T, Key, Hash>&) const;
+
 
 
     // STL type definitions
@@ -285,138 +335,198 @@ public:
         typedef label size_type;
 
 
-    // STL iterator
+    // Iterators and helpers
 
-        //- An STL-conforming iterator
-        class iterator
+        //- The iterator base for HashTable
+        //  Note: data and functions are protected, to allow reuse by iterator
+        //  and prevent most external usage.
+        //  iterator and const_iterator have the same size, allowing
+        //  us to reinterpret_cast between them (if desired)
+        class iteratorBase
         {
-            friend class HashTable;
-            friend class const_iterator;
+            // Private Data
 
-            // Private data
-
-                //- Reference to the HashTable this is an iterator for
-                HashTable<T, Key, Hash>& hashTable_;
+                //- Pointer to the HashTable for which this is an iterator
+                //  This also lets us use the default bitwise copy/assignment
+                HashTable<T, Key, Hash>* hashTable_;
 
                 //- Current element
-                hashedEntry* elmtPtr_;
+                hashedEntry* entryPtr_;
 
                 //- Current hash index
                 label hashIndex_;
+
+
+        protected:
+
+            // Constructors
+
+                //- Construct null - equivalent to an 'end' position
+                inline iteratorBase();
+
+                //- Construct from hash table, moving to its 'begin' position
+                inline explicit iteratorBase
+                (
+                    const HashTable<T, Key, Hash>* curHashTable
+                );
+
+                //- Construct from hash table, element and hash index
+                inline explicit iteratorBase
+                (
+                    const HashTable<T, Key, Hash>* curHashTable,
+                    const hashedEntry* elmt,
+                    const label hashIndex
+                );
+
+
+            // Protected Member Functions
+
+                //- Increment to the next position
+                inline void increment();
+
+                //- Erase the HashTable element at the current position
+                bool erase();
+
+                //- Return non-const access to referenced object
+                inline T& object();
+
+                //- Return const access to referenced object
+                inline const T& cobject() const;
+
+
+        public:
+
+            // Member operators
+
+                // Access
+
+                //- Return the Key corresponding to the iterator
+                inline const Key& key() const;
+
+                //- Compare hashedEntry element pointers
+                inline bool operator==(const iteratorBase&) const;
+                inline bool operator!=(const iteratorBase&) const;
+
+                //- Compare hashedEntry to iteratorEnd pointers
+                inline bool operator==(const iteratorEnd& unused) const;
+                inline bool operator!=(const iteratorEnd& unused) const;
+        };
+
+
+        //- An STL-conforming iterator
+        class iterator
+        :
+            public iteratorBase
+        {
+            friend class HashTable;
+
+            // Private Member Functions
+
+                //- Construct from hash table, moving to its 'begin' position
+                inline explicit iterator
+                (
+                    HashTable<T, Key, Hash>* curHashTable
+                );
+
+                //- Construct from hash table, element and hash index
+                inline explicit iterator
+                (
+                    HashTable<T, Key, Hash>* curHashTable,
+                    hashedEntry* elmt,
+                    const label hashIndex
+                );
+
 
         public:
 
             // Constructors
 
-                //- Construct from hash table, element and hash index
-                inline iterator
-                (
-                    HashTable<T, Key, Hash>& curHashTable,
-                    hashedEntry* elmt,
-                    label hashIndex
-                );
+                //- Construct null (end iterator)
+                inline iterator();
+
+                //- Construct end iterator
+                inline iterator(const iteratorEnd& unused);
+
 
             // Member operators
 
-                inline void operator=(const iterator&);
-
-                inline bool operator==(const iterator&) const;
-                inline bool operator!=(const iterator&) const;
-
-                inline bool operator==(const const_iterator&) const;
-                inline bool operator!=(const const_iterator&) const;
-
+                //- Return referenced hash value
                 inline T& operator*();
                 inline T& operator()();
 
+                //- Return referenced hash value
                 inline const T& operator*() const;
                 inline const T& operator()() const;
 
                 inline iterator& operator++();
                 inline iterator operator++(int);
-
-                inline const Key& key() const;
         };
 
-
-        //- iterator set to the begining of the HashTable
+        //- iterator set to the beginning of the HashTable
         inline iterator begin();
-
-        //- iterator set to beyond the end of the HashTable
-        inline const iterator& end();
 
 
     // STL const_iterator
 
         //- An STL-conforming const_iterator
         class const_iterator
+        :
+            public iteratorBase
         {
-            friend class iterator;
+            friend class HashTable;
 
-            // Private data
+            // Private Member Functions
 
-                //- Reference to the HashTable this is an iterator for
-                const HashTable<T, Key, Hash>& hashTable_;
+                //- Construct from hash table, moving to its 'begin' position
+                inline explicit const_iterator
+                (
+                    const HashTable<T, Key, Hash>* curHashTable
+                );
 
-                //- Current element
-                const hashedEntry* elmtPtr_;
-
-                //- Current hash index
-                label hashIndex_;
+                //- Construct from hash table, element and hash index
+                inline explicit const_iterator
+                (
+                    const HashTable<T, Key, Hash>* curHashTable,
+                    const hashedEntry* elmt,
+                    const label hashIndex
+                );
 
 
         public:
 
             // Constructors
 
-                //- Construct from hash table, element and hash index
-                inline const_iterator
-                (
-                    const HashTable<T, Key, Hash>& curHashTable,
-                    const hashedEntry* elmt,
-                    label hashIndex
-                );
+                //- Construct null (end iterator)
+                inline const_iterator();
 
-                //- Construct from the non-const iterator
+                //- Construct from iterator
                 inline const_iterator(const iterator&);
+
+                //- Construct end iterator
+                inline const_iterator(const iteratorEnd& unused);
 
 
             // Member operators
 
-                inline void operator=(const const_iterator&);
-
-                inline bool operator==(const const_iterator&) const;
-                inline bool operator!=(const const_iterator&) const;
-
-                inline bool operator==(const iterator&) const;
-                inline bool operator!=(const iterator&) const;
-
+                //- Return referenced hash value
                 inline const T& operator*() const;
                 inline const T& operator()() const;
 
                 inline const_iterator& operator++();
                 inline const_iterator operator++(int);
 
-                inline const Key& key() const;
         };
 
 
         //- const_iterator set to the beginning of the HashTable
         inline const_iterator cbegin() const;
 
-        //- const_iterator set to beyond the end of the HashTable
-        inline const const_iterator& cend() const;
-
         //- const_iterator set to the beginning of the HashTable
         inline const_iterator begin() const;
-
-        //- const_iterator set to beyond the end of the HashTable
-        inline const const_iterator& end() const;
 
 
     // IOstream Operator
 
-#ifndef SWIG
         friend Istream& operator>> <T, Key, Hash>
         (
             Istream&,
@@ -428,16 +538,6 @@ public:
             Ostream&,
             const HashTable<T, Key, Hash>&
         );
-#endif
-
-
-private:
-
-        //- iterator returned by end()
-        iterator endIter_;
-
-        //- const_iterator returned by end()
-        const_iterator endConstIter_;
 };
 
 

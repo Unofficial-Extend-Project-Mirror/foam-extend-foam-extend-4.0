@@ -78,7 +78,7 @@ inline bool Foam::StaticHashTable<T, Key, Hash>::set
 
 
 template<class T, class Key, class Hash>
-inline Foam::Xfer< Foam::StaticHashTable<T, Key, Hash> >
+inline Foam::Xfer<Foam::StaticHashTable<T, Key, Hash> >
 Foam::StaticHashTable<T, Key, Hash>::xfer()
 {
     return xferMove(*this);
@@ -266,8 +266,13 @@ Foam::StaticHashTable<T, Key, Hash>::Iterator
     TableRef
 >::operator++()
 {
-    // Check for special value from erase. (sets hashIndex to -1)
-    if (hashIndex_ >= 0)
+    // A negative index is a special value from erase
+    // (see notes in HashTable)
+    if (hashIndex_ < 0)
+    {
+        hashIndex_ = -(hashIndex_+1) - 1;
+    }
+    else
     {
         // Try the next element on the local list
         elemIndex_++;
@@ -410,7 +415,5 @@ Foam::StaticHashTable<T, Key, Hash>::end() const
     return StaticHashTable<T, Key, Hash>::endConstIter_;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // ************************************************************************* //
