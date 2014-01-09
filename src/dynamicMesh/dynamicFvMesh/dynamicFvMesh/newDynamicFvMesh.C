@@ -31,6 +31,22 @@ License
 
 Foam::autoPtr<Foam::dynamicFvMesh> Foam::dynamicFvMesh::New(const IOobject& io)
 {
+    wordList libNames(1);
+    libNames[0]=word("mesquiteMotionSolver");
+
+    forAll(libNames,i) {
+        const word libName("lib"+libNames[i]+".so");
+
+        bool ok=dlLibraryTable::open(libName);
+        if(!ok) {
+            WarningIn("dynamicFvMesh::New(const IOobject& io)")
+                << "Loading of dynamic mesh library " << libName
+                    << " unsuccesful. Some dynamic mesh  methods may not be "
+                    << " available"
+                    << endl;
+        }
+    }
+
     // Enclose the creation of the dynamicMesh to ensure it is
     // deleted before the dynamicFvMesh is created otherwise the dictionary
     // is entered in the database twice

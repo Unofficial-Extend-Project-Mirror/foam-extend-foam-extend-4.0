@@ -31,6 +31,7 @@ apt-get -y install g++
 apt-get -y install make
 #apt-get -y install python-dev
 apt-get -y install ccache
+apt-get -y install cmake
 
 # test scripts with different shells
 apt-get -y install csh

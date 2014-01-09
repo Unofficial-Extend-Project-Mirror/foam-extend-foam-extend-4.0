@@ -216,6 +216,22 @@ rpm_install()
 #
 # Populate the local RPM vault with comand-line supplied list of RPMs
 #
+rpm_makeRPMvault()
+{
+    rpmVault=$buildBase/RPMS/$architecture
+
+    if [ ! -e $rpmVault ]; then
+	echo ""
+	echo "Making directory for RPM-files $rpmVault"
+	echo ""
+
+	mkdir -p $rpmVault
+    fi
+}
+
+#
+# Populate the local RPM vault with comand-line supplied list of RPMs
+#
 rpm_populateRPMvault()
 {
     rpmVault=$buildBase/RPMS/$architecture
@@ -224,7 +240,6 @@ rpm_populateRPMvault()
     echo ""
     echo " Moving the following RPMs to the local RPM vault: `echo $@`"
 
-    mkdir -p $rpmVault
     mv $@ $rpmVault
 
     echo ""

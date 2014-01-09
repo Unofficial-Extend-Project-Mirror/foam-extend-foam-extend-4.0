@@ -31,9 +31,9 @@
 #     Populate the local RPM vault
 #
 #     NOTE: This stage is optional. Use it only if you want to move some RPMs
-#           to the appropriate location for your architcture so the other stage scripts 
+#           to the appropriate location for your architcture so the other stage scripts
 #           will be able to pick them up
-#    
+#
 #     Usage: ./AllMake.stage0 file_1.rpm file_2.rpm ... file_n.rpm
 #
 # Author:
@@ -59,7 +59,8 @@ echo ========================================
 echo
 
 (
-  
+  rpm_makeRPMvault
+
   [ "$#" -gt 0 ] && {
       rpm_populateRPMvault "$@"
   }
@@ -71,5 +72,3 @@ echo ========================================
 echo
 
 # ----------------------------------------------------------------- end-of-file
-
-

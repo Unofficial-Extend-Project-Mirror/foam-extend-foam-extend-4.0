@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.synced_folder "..", "/OpenFOAM-sources"
+  config.vm.synced_folder "..", "/FOAM-sources"
 
   config.vm.provider :virtualbox do |vb|
     #   # Don't boot with headless mode
