@@ -168,54 +168,8 @@
 * Instructions on how to contribute
   http://www.extend-project.de/project-final/how-to-contribute
 
-* List of Contributors
-    Henry Weller
-    Hrvoje Jasak
-    Mattijs Janssens
-    Zeljko Tukovic
-    Bernhard Gschaider
-    Tommaso Lucchini
-    Martin Beaudoin
-    Sandeep Menon
-    Niklas Nordin
-    Eugene De Villiers
-    Henrik Rusche
-    Ivor Clifford
-    Philiposse Rajan
-    Gavin Tabor
-    Jovani Favero
-    Frank Bos
-    David Hill
-    Niklas Wikstrom
-    Dubravko Matijasevic
-    Darrin Stephens
-    Christian Beck
-    Oliver Borm
-    James Criner
-    Hua Shan
-    David Boner
-    Pierre-Olivier Dallaire
-    Norman Del Puppo
-    Dennis Kingsley
-    Frank Albina
-    Flavio Galeazzo
-    Hannes Kroger
-    Olivier Petit
-    David Schmidt
-    Andreas Feymark
-    Luca Mangani
-    Daniel Schmode
-    Christoph Goniva
-    Takuya Oshima
-    Juho Peltola
-    Eric Paterson
-    Fabian Peng Karrholm
-    Aleksandar Karac
-    Maria Garcia Camprubi
-    Chris Greenshields
-    Mark Olesen
-    Hilary Spencer
-    Andy Heather
+* List of Contributors: See file ListOfContributors
+
 #                            -*- mode: org; -*-
 #
 #+TITLE:             *OpenFOAM README for version 1.6-ext*
