@@ -245,6 +245,8 @@ MACPORTOPENMPI)
        # include files and libraries.
        export MPI_ARCH_PATH="${libDir%/*}"
 
+       export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
+
        _foamAddLib     $libDir
        unset libDir
        ;;

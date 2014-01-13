@@ -376,6 +376,8 @@ Foam::autoPtr<Foam::decompositionMethod> Foam::decompositionMethod::New
     const dictionary& decompositionDict
 )
 {
+    loadExternalLibraries();
+
     word decompositionMethodTypeName(decompositionDict.lookup("method"));
 
     Info<< "Selecting decompositionMethod "
@@ -407,6 +409,8 @@ Foam::autoPtr<Foam::decompositionMethod> Foam::decompositionMethod::New
     const polyMesh& mesh
 )
 {
+    loadExternalLibraries();
+
     word decompositionMethodTypeName(decompositionDict.lookup("method"));
 
     Info<< "Selecting decompositionMethod "
@@ -432,6 +436,28 @@ Foam::autoPtr<Foam::decompositionMethod> Foam::decompositionMethod::New
     return autoPtr<decompositionMethod>(cstrIter()(decompositionDict, mesh));
 }
 
+void Foam::decompositionMethod::loadExternalLibraries()
+{
+    wordList libNames(3);
+    libNames[0]=word("scotchDecomp");
+    libNames[1]=word("metisDecomp");
+    libNames[2]=word("parMetisDecomp");
+
+    forAll(libNames,i) {
+        const word libName("lib"+libNames[i]+".so");
+
+        //        Info << "Loading " << libName << endl;
+
+        bool ok=dlLibraryTable::open(libName);
+        if(!ok) {
+            WarningIn("decompositionMethod::loadExternalLibraries()")
+                << "Loading of decomposition library " << libName
+                    << " unsuccesful. Some decomposition methods may not be "
+                    << " available"
+                    << endl;
+        }
+    }
+}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 

@@ -21,6 +21,7 @@
 *.la
 *.so
 *.jar
+*.dylib
 
 # derived files
 lex.yy.c
@@ -33,6 +34,9 @@ core
 
 # lnInclude (symlink) folders - anywhere
 lnInclude
+
+# A hidden file created by the Mac OS X Finder.
+.DS_Store
 
 # build folders - anywhere
 linux*Gcc*/
@@ -63,6 +67,21 @@ doc/[Dd]oxygen/man
 # generated files in the main directory (e.g. ReleaseNotes-?.?.html)
 /*.html
 
+# patch residue
+*.orig
+*.rej
+
+# pyFoam-stuff
+PlyParser_FoamFileParser_parsetab.py
+
+# python-compile
+*.pyc
+
+# other stuff
+.build
+.hgignore
+.timeStamp
+
 # source packages - anywhere
 *.tar.bz2
 *.tar.gz
@@ -90,21 +109,7 @@ etc/pref.sh
 # make sure that this settings file is not used
 etc/bashrc.preset
 
-# The following files are blacklisted because of a DMCA complaint by ANSYS.
-src/lduSolvers/tools/PriorityArray.C
-src/lduSolvers/tools/PriorityArray.H
-src/lduSolvers/amg/amgPolicy/samgPolicy.C
-src/lduSolvers/amg/amgPolicy/samgPolicy.H
-src/lduSolvers/amg/amgPolicy/aamgPolicy.C
-src/lduSolvers/amg/amgPolicy/aamgPolicy.H
-
-# The following files are blacklisted because of a DMCA complaint by ANSYS.
-src/lduSolvers/tools/PriorityArray.C
-src/lduSolvers/tools/PriorityArray.H
-src/lduSolvers/amg/amgPolicy/samgPolicy.C
-src/lduSolvers/amg/amgPolicy/samgPolicy.H
-src/lduSolvers/amg/amgPolicy/aamgPolicy.C
-src/lduSolvers/amg/amgPolicy/aamgPolicy.H
+#Test-Harness generated stuff
 
 # The following files are blacklisted because of a DMCA complaint by ANSYS.
 src/lduSolvers/tools/PriorityArray.C
