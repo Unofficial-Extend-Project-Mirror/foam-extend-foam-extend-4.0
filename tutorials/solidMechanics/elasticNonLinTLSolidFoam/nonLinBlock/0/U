@@ -22,37 +22,38 @@ internalField   uniform (0 0 0);
 boundaryField
 {
     top
-      {
-	type            timeVaryingFixedDisplacementZeroShear;
- 	nonLinear       totalLagrangian;
-	fileName        "$FOAM_CASE/constant/timeVsDisp";
-	outOfBounds     clamp;
-	value           uniform ( 0 0.1 0 );
-      }
+    {
+        type            timeVaryingFixedDisplacementZeroShear;
+        nonLinear       totalLagrangian;
+        fileName        "$FOAM_CASE/constant/timeVsDisp";
+        outOfBounds     clamp;
+        value           uniform ( 0 0 0 );
+    }
 
     bottom
-      {
-	type            symmetryPlane;
-      }
+    {
+        type            symmetryPlane;
+    }
 
     left
-      {
-	type            symmetryPlane;
-      }
+    {
+        type            symmetryPlane;
+    }
 
     right
-      {
-	type            solidTraction;
-	nonLinear       totalLagrangian;
-	traction        uniform (0 0 0);
-	pressure        uniform 0;
-	value           uniform (0 0 0);
-      }
+    {
+        type            solidTraction;
+        nonLinear       totalLagrangian;
+        traction        uniform (0 0 0);
+        pressure        uniform 0;
+        value           uniform (0 0 0);
+    }
 
     frontAndBack
-      {
-	type empty;
-      }
+    {
+        type empty;
+    }
 }
+
 
 // ************************************************************************* //

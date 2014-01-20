@@ -7,3 +7,4 @@ application="elasticNonLinTLSolidFoam"
 
 runApplication blockMesh
 runApplication $application
+runApplication deformedGeom 1
