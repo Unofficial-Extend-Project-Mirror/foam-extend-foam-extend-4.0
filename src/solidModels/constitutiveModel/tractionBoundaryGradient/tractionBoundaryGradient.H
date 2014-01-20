@@ -54,7 +54,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                         Class tractionBoundaryGradient Declaration
+                   Class tractionBoundaryGradient Declaration
 \*---------------------------------------------------------------------------*/
 
 class tractionBoundaryGradient
