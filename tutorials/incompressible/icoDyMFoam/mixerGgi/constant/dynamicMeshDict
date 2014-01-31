@@ -27,7 +27,8 @@ mixerGgiFvMeshCoeffs
         direction       (1 0 0);
     }
 
-    rpm             60;
+    // Rotational speed in revolutions per minute
+    rpm                 60;
 
     slider
     {
