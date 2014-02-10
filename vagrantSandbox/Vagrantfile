@@ -48,4 +48,33 @@ Vagrant.configure("2") do |config|
     end
   end
 
+  config.vm.define :freebsd92 do |freebsd92|
+    freebsd92.vm.box = "freebsd92"
+#     freebsd92.vm.box_url = "https://wunki.org/files/freebsd-9.2-amd64-wunki.box"
+    freebsd92.vm.box_url = "http://iris.hosting.lv/freebsd-9.2-i386.box"
+    freebsd92.vm.provision :shell do |s|
+      s.args   = "freebsd92"
+      s.path   = "initFreeBSDScript.sh"
+    end
+  end
+
+  config.vm.define :freebsd10 do |freebsd10|
+    freebsd10.vm.box = "freebsd10"
+#     freebsd10.vm.box_url = "https://wunki.org/files/freebsd-10.0-amd64-wunki.box"
+    freebsd10.vm.box_url = "http://iris.hosting.lv/freebsd-10.0-i386.box"
+    freebsd10.vm.provision :shell do |s|
+      s.args   = "freebsd10"
+      s.path   = "initFreeBSDScript.sh"
+    end
+  end
+
+  config.vm.define :opensuse12 do |opensuse12|
+    opensuse12.vm.box = "opensuse12"
+    opensuse12.vm.box_url = "http://sourceforge.net/projects/opensusevagrant/files/12.3/opensuse-12.3-64.box/download"
+    opensuse12.vm.provision :shell do |s|
+      s.args   = "opensuse12"
+      s.path   = "initOpenSUSEScript.sh"
+    end
+  end
+
 end
