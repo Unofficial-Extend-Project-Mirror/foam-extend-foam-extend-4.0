@@ -44,10 +44,12 @@ then
 	echo
 	echo "Parent is mercurial. Hello Bernhard"
 	echo
-	branchName=`hg branch -R $OFParent`
+#	branchName=`hg branch -R $OFParent`
+	idName=`hg id -i -R $OFParent | sed -e "s/\+//"`
+	# sed removes + in case of a 'tainted' parent
 
-	echo "Parent is on branch $branchName"
-	su vagrant - -c "hg clone -u $branchName $OFParent $OFClone"
+	echo "Parent is on id $idName"
+	su vagrant - -c "hg clone -u $idName $OFParent $OFClone"
 	echo
     else
 	echo
