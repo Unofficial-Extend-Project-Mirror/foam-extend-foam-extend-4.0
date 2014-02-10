@@ -39,9 +39,10 @@
                 =lucid=-machine. Not yet working
   - centos65 :: A CentOS 6.5 machine with preinstalled development
                 tools
-  - freebsd92 :: FreeBSD 9.2 32-bit machine. Untested
-  - freebsd10 :: FreeBSD 10.0 32-big machine. Currently does not boot
-                 properly
+  - freebsd92 :: FreeBSD 9.2 32-bit machine. Does not work because
+                 FreeBSD does not support shared folders
+  - freebsd10 :: FreeBSD 10.0 32-big machine. Tries to set up shared
+                 folders via NFS. Currently not working
   - opensuse12 :: OpenSUSE 12.3 machine. Boots but is not provisioned
   Some machines (read: the BSD-boxes) need the =VirtualBox Extension
   Pack= installed (because they have USB 2.0)
