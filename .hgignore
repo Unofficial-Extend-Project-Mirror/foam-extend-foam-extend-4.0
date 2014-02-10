@@ -108,4 +108,7 @@ src/lduSolvers/amg/amgPolicy/samgPolicy.H
 src/lduSolvers/amg/amgPolicy/aamgPolicy.C
 src/lduSolvers/amg/amgPolicy/aamgPolicy.H
 
+# vagrant stuff
+vagrantSandbox/.vagrant/
+
 # end-of-file

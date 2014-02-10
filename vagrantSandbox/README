@@ -16,11 +16,11 @@
   One can then connect to the virtual machine with
 : vagrant ssh <machinName>
   and will be in the =$HOME= directory of the user =vagrant= where in
-  the directory =~/OpenFOAM/OpenFOAM-1.6-ext= the sources are
+  the directory =~/foam/foam-extend-3.0= the sources are
   available. Modifications can be pushed "outside" the virtual machine
   with
 : hg push
-  There is also a symbolic link =~/OpenFOAM/OpenFOAM-1.6-ext-parent=
+  There is also a symbolic link =~/foam/foam-extend-3.0-parent=
   to the sources if you want to edit there directly. Use with care
   and don't compile in that directory unless you know what you're
   doing
@@ -32,3 +32,10 @@
              =postfix=-package)
   - maverick :: Tries to fix the problems with the
                 =lucid=-machine. Not yet working
+  - centos65 :: A CentOS 6.5 machine with preinstalled development
+                tools
+* Scripts
+  In the home directory these scripts are found
+  - bootstrapFoam.sh :: A script whose aim it is to compile Foam and
+       the ThirdParty-packages in one go (no paraview and QT). If this
+       works the box is considered operational
