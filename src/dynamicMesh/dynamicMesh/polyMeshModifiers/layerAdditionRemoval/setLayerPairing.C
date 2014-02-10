@@ -129,8 +129,7 @@ bool Foam::layerAdditionRemoval::setLayerPairing() const
         // Grab the opposite face for face collapse addressing
         ftc[faceI] = lidFace.oppositeIndex();
 
-        // lidFace is only valid in simple cases
-        const face& lidFace2 = faces[lidFace.oppositeIndex()];
+        // Taken out lidFace2: fails normal layering.  HJ, 10/Feb/2014
 
         // Using the local face insert the points into the lid list
         forAll (curLocalFace, pointI)
@@ -157,7 +156,7 @@ bool Foam::layerAdditionRemoval::setLayerPairing() const
 
                     const labelListList& ppAddr = mesh.pointPoints();
 
-                    const labelList& p1List = ppAddr[lidFace2[pointI]];
+                    const labelList& p1List = ppAddr[lidFace[pointI]];
                     const labelList& p2List = ppAddr[ptc[clp]];
 
                     bool found = false;
