@@ -4,6 +4,11 @@
   These virtual machines require
   - VirtualBox :: for running from [[https://www.virtualbox.org]]
   - Vagrant :: to automatically set them up from [[http://www.vagrantup.com]]
+  To make sure that for the boxes the have the newest
+  VirtualBox-additions do
+: vagrant plugin install vagrant-vbguest
+  This installs a plugin that tries to update the guest addition if
+  they are for an older version of VirtualBox
 * Starting
   A virtual machine is set up with
 : vagrant up <machineName>
@@ -38,6 +43,8 @@
   - freebsd10 :: FreeBSD 10.0 32-big machine. Currently does not boot
                  properly
   - opensuse12 :: OpenSUSE 12.3 machine. Boots but is not provisioned
+  Some machines (read: the BSD-boxes) need the =VirtualBox Extension
+  Pack= installed (because they have USB 2.0)
 * Scripts
   In the home directory these scripts are found
   - bootstrapFoam.sh :: A script whose aim it is to compile Foam and

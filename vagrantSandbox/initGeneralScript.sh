@@ -20,6 +20,9 @@ OFDIR=/home/vagrant/foam/
 mkdir -vp $OFDIR
 chown -R vagrant:vagrant $OFDIR
 
+# for distros that don't have group vagrant
+chown -R vagrant $OFDIR
+
 OFClone=$OFDIR/foam-extend-3.0
 OFReference=$OFClone-parent
 
