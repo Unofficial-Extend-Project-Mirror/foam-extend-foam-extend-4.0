@@ -8,7 +8,7 @@ echo
 
 # some of these packages are already installed. But lets be sure
 
-neededPackages=(gcc-g++ mercurial git flex bison make ccache rpm-build wget zlib-devel)
+neededPackages=(gcc-g++ mercurial git flex bison make ccache rpm-build wget zlib-devel binutils-devel)
 bonusPackages=(emacs csh tcsh zsh)
 
 for p in ${neededPackages[@]}; do

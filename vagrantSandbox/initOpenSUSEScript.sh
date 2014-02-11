@@ -11,7 +11,7 @@ zypper -n remove patterns-openSUSE-minimal_base-conflicts
 
 # patterns-openSUSE-devel_python
 
-neededPackages=(gcc-c++ mercurial git flex bison make ccache zlib-devel rpm-build)
+neededPackages=(gcc-c++ mercurial git flex bison make ccache zlib-devel rpm-build binutils-devel)
 bonusPackages=(emacs csh tcsh zsh)
 
 for p in ${neededPackages[@]}; do

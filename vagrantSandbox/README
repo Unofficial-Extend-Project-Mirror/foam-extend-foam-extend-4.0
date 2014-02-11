@@ -43,7 +43,8 @@
                  FreeBSD does not support shared folders
   - freebsd10 :: FreeBSD 10.0 32-big machine. Tries to set up shared
                  folders via NFS. Currently not working
-  - opensuse12 :: OpenSUSE 12.3 machine. Boots but is not provisioned
+  - opensuse12 :: OpenSUSE 12.3 machine. Currently not completely
+                  compiling Foam
   Some machines (read: the BSD-boxes) need the =VirtualBox Extension
   Pack= installed (because they have USB 2.0)
 * Scripts
