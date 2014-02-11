@@ -47,8 +47,14 @@
                   compiling Foam
   Some machines (read: the BSD-boxes) need the =VirtualBox Extension
   Pack= installed (because they have USB 2.0)
-* Scripts
+* Scripts in the machine
   In the home directory these scripts are found
   - bootstrapFoam.sh :: A script whose aim it is to compile Foam and
        the ThirdParty-packages in one go (no paraview and QT). If this
        works the box is considered operational
+* Provisioning scripts
+  Every "family" of machines has a specific script that makes sure
+  that the software packages necessary to compile =Foam= are installed
+  into the machine. In the end these scripts should call
+  =initGeneralScript.sh= which gets the sources into the machine. It
+  needs =git=, =mercurial= and =ccache= for that.

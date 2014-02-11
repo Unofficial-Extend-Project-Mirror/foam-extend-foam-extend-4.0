@@ -24,22 +24,16 @@ echo
 echo "Installing additional packages"
 echo
 
-apt-get -y install mercurial
-apt-get -y install bison
-apt-get -y install flex
-apt-get -y install g++
-apt-get -y install make
-#apt-get -y install python-dev
-apt-get -y install ccache
-apt-get -y install cmake
+neededPackages=(g++ bison flex mercurial git make ccache cmake rpm)
+bonusPackages=(emacs csh tcsh zsh)
 
-# test scripts with different shells
-apt-get -y install csh
-apt-get -y install tcsh
-apt-get -y install zsh
+for p in ${neededPackages[@]}; do
+    apt-get -y install $p
+done
 
-# to make the ThirdParty-Stuff work
-apt-get -y install rpm
+for p in ${bonusPackages[@]}; do
+    apt-get -y install $p
+done
 
 # this is needed for the packaging stuff
 echo
@@ -59,13 +53,10 @@ echo
 echo "Tools for packaging"
 echo
 
-# Needed for packaging
-apt-get -y install default-mta
-apt-get -y install dpkg-dev
-apt-get -y install debhelper devscripts cdbs
-
-# Not needed. Just to keep Bernhard happy
-apt-get -y install emacs
+packagingPackages=(default-mta dpkg-dev debhelper devscripts cdbs binutils-dev)
+for p in ${packagingPackages[@]}; do
+    apt-get -y install $p
+done
 
 echo
 echo "Ubuntu-specific ended. Now doing general stuff"
