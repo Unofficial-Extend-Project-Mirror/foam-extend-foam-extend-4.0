@@ -44,14 +44,60 @@ template<class Type>
 tmp<fvMatrix<Type> >
 d2dt2
 (
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const word& name
 )
 {
     return fv::d2dt2Scheme<Type>::New
     (
         vf.mesh(),
-        vf.mesh().schemesDict().d2dt2Scheme("d2dt2(" + vf.name() + ')')
+        vf.mesh().schemesDict().d2dt2Scheme(name)
     )().fvmD2dt2(vf);
+}
+
+
+template<class Type>
+tmp<fvMatrix<Type> >
+d2dt2
+(
+    const dimensionedScalar& rho,
+    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const word& name
+)
+{
+    return fv::d2dt2Scheme<Type>::New
+    (
+        vf.mesh(),
+        vf.mesh().schemesDict().d2dt2Scheme(name)
+    )().fvmD2dt2(rho, vf);
+}
+
+
+template<class Type>
+tmp<fvMatrix<Type> >
+d2dt2
+(
+    const volScalarField& rho,
+    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const word& name
+)
+{
+    return fv::d2dt2Scheme<Type>::New
+    (
+        vf.mesh(),
+        vf.mesh().schemesDict().d2dt2Scheme(name)
+    )().fvmD2dt2(rho, vf);
+}
+
+
+template<class Type>
+tmp<fvMatrix<Type> >
+d2dt2
+(
+    GeometricField<Type, fvPatchField, volMesh>& vf
+)
+{
+    return fvm::d2dt2(vf, "d2dt2(" + vf.name() + ')');
 }
 
 
@@ -63,14 +109,7 @@ d2dt2
     GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
-    return fv::d2dt2Scheme<Type>::New
-    (
-        vf.mesh(),
-        vf.mesh().schemesDict().d2dt2Scheme
-        (
-            "d2dt2(" + rho.name() + ',' + vf.name() + ')'
-        )
-    )().fvmD2dt2(rho, vf);
+    return fvm::d2dt2(rho, vf, "d2dt2(" + rho.name() + ',' + vf.name() + ')');
 }
 
 
@@ -82,14 +121,7 @@ d2dt2
     GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
-    return fv::d2dt2Scheme<Type>::New
-    (
-        vf.mesh(),
-        vf.mesh().schemesDict().d2dt2Scheme
-        (
-            "d2dt2(" + rho.name() + ',' + vf.name() + ')'
-        )
-    )().fvmD2dt2(rho, vf);
+    return fvm::d2dt2(rho, vf, "d2dt2(" + rho.name() + ',' + vf.name() + ')');
 }
 
 
