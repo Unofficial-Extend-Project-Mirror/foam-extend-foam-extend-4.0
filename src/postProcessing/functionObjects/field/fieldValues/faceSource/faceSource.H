@@ -31,7 +31,7 @@ Description
     faceObj1                        // Name also used to identify output folder
     {
         type            faceSource;
-        functionObjectLibs ("libfieldValueFunctionObjects.so");
+        functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
         outputControl   outputTime;
         log             true;       // log to screen?

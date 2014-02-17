@@ -31,7 +31,7 @@ Description
     cellObj1                        // Name also used to identify output folder
     {
         type            cellSource;
-        functionObjectLibs ("libfieldValueFunctionObjects.so");
+        functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
         outputControl   outputTime;
         log             true;       // log to screen?
