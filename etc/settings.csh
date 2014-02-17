@@ -476,10 +476,8 @@ endif
 
 # QT
 # ~~~~~
-if ( $?QT_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-opensource-src-4.7.4/platforms/$WM_OPTIONS )then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.4/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.7.4.csh
-#if ( $?QT_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-opensource-src-4.7.0/platforms/$WM_OPTIONS )then
-#    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.0/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.7.0.csh
+if ( $?QT_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-opensource-src-4.8.5/platforms/$WM_OPTIONS )then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.8.5/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.8.5.csh
 endif
 
 # PARAVIEW
