@@ -12,7 +12,7 @@ cufflink is a library for linking numerical methods based on Nvidia's
 Compute Unified Device Architecture (CUDA™) C/C++ programming language
 and OpenFOAM®.
 
-Please note that cufflink is not approved or endorsed by OpenCFD®
+Please note that cufflink is not approved or endorsed by ESI-OpenCFD®
 Limited, the owner of the OpenFOAM® and OpenCFD® trademarks and
 producer of OpenFOAM® software.
 
@@ -32,20 +32,17 @@ This file is part of cufflink.
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-     This file is part of foam-extend.
+    along with cufflink.  If not, see <http://www.gnu.org/licenses/>.
 
-     foam-extend is free software: you can redistribute it and/or modify it
-     under the terms of the GNU General Public License as published by the
-     Free Software Foundation, either version 3 of the License, or (at your
-     option) any later version.
+    Author
+    Daniel P. Combest.  All rights reserved.
+    Modifications by Dominik Christ, Wikki Ltd.
 
-     foam-extend is distributed in the hope that it will be useful, but
-     WITHOUT ANY WARRANTY; without even the implied warranty of
-     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-     General Public License for more details.
+    Description
+    diagonal preconditioned conjugate gradient
+    solver for symmetric Matrices using a CUSP CUDA™ based solver.
 
-     You should have received a copy of the GNU General Public License
-     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+\**********************************************************************/
 
 
 // Build the normfactor as foam-extend does in file
