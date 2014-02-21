@@ -244,6 +244,7 @@ MACPORTOPENMPI)
 	#	libDir=`mpicc-openmpi-$WM_MACPORT_MPI_VERSION --showme:libdirs`
 	libDir=/opt/local/lib/openmpi-$WM_MACPORT_MPI_VERSION
 
+	export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$FOAM_MPI
 	_foamAddLib     $libDir
 	unset libDir
 	;;
@@ -252,6 +253,7 @@ MACPORTMPICH)
     export FOAM_MPI=mpich-macports-$WM_MACPORT_MPI_VERSION
     export MPI_HOME=$WM_THIRD_PARTY_DIR/$FOAM_MPI
 
+    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$FOAM_MPI
     libDir=/opt/local/lib/mpich-$WM_MACPORT_MPI_VERSION
 
     _foamAddLib     $libDir

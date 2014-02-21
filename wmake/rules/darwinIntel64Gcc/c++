@@ -19,4 +19,4 @@ LINK_LIBS   = $(c++DBUG) -lpthread
 
 LINKLIBSO   = $(CC) $(c++FLAGS) -lpthread -dynamiclib -undefined dynamic_lookup
 # LINKEXE     = $(CC) $(c++FLAGS) -lpthread -L$(FOAM_LIBBIN) -lfoam -L$(FOAM_MPI_LIBBIN) -lPstream
-LINKEXE     = $(CC) $(c++FLAGS) -lpthread -L$(FOAM_MPI_LIBBIN) -lPstream
+LINKEXE     = $(CC) $(c++FLAGS) -lpthread -L$(FOAM_LIBBIN)/$(FOAM_MPI)  -lPstream
