@@ -27,19 +27,20 @@ boundaryField
     }
     right
     {
-        type            analyticalPlateHoleTraction;
+//         type            analyticalPlateHoleTraction;
+        type            solidTraction;
+        traction        uniform (0 0 0);
+        pressure        uniform 1e7;
     }
-
     down
     {
         type            symmetryPlane;
     }
-
     up
     {
-        type            analyticalPlateHoleTraction;
+//         type            analyticalPlateHoleTraction;
+        type            solidTractionFree;
     }
-
     hole
     {
         type            solidTractionFree;

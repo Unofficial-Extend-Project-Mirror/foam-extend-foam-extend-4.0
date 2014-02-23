@@ -117,57 +117,59 @@ dirichletNeumann::dirichletNeumann
   contactFilePtr_(NULL)
 {
   // master proc open contact info file
-  if (Pstream::master())
+    if (Pstream::master())
     {
-      word masterName = mesh_.boundary()[masterPatchID].name();
-      word slaveName = mesh_.boundary()[slavePatchID].name();
-      contactFilePtr_ =
-          new OFstream
-          (fileName("normalContact_"+masterName+"_"+slaveName+".txt"));
-      OFstream& contactFile = *contactFilePtr_;
-      int width = 20;
-      contactFile << "time";
-      contactFile.width(width);
-      contactFile << "iter";
-      contactFile.width(width);
-      contactFile << "contactFaces";
-      contactFile.width(width);
-      contactFile << "settledFaces";
-      contactFile.width(width);
-      contactFile << "minPen";
-      contactFile.width(width);
-      contactFile << "maxPress";
-      contactFile.width(width);
-      contactFile << "corrPoints" << endl;
-   }
+        word masterName = mesh_.boundary()[masterPatchID].name();
+        word slaveName = mesh_.boundary()[slavePatchID].name();
+        contactFilePtr_ =
+            new OFstream
+            (fileName("normalContact_"+masterName+"_"+slaveName+".txt"));
+        OFstream& contactFile = *contactFilePtr_;
+        int width = 20;
+        contactFile << "time";
+        contactFile.width(width);
+        contactFile << "iter";
+        contactFile.width(width);
+        contactFile << "contactFaces";
+        contactFile.width(width);
+        contactFile << "settledFaces";
+        contactFile.width(width);
+        contactFile << "minPen";
+        contactFile.width(width);
+        contactFile << "maxPress";
+        contactFile.width(width);
+        contactFile << "corrPoints" << endl;
+    }
 
-  // calc point points for missed vertices
-  if (correctMissedVertices_)
+    // calc point points for missed vertices
+    if (correctMissedVertices_)
     {
-      calcSlavePointPoints(slavePatchID);
+        calcSlavePointPoints(slavePatchID);
     }
 }
 
 
-// * * * * * * * * * * * * * * Member Functions * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-  void dirichletNeumann::correct
-  (
-   const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
-   const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch,
-   const intersection::algorithm alg,
-   const intersection::direction dir,
-   word fieldName,
-   const Switch orthotropic,
-   const word nonLinear,
-   vectorField& slaveFaceNormals,
-   GGIInterpolation< PrimitivePatch< face, List, pointField >,
-             PrimitivePatch< face, List, pointField >
-             >* ggiInterpolatorPtr
-   )
-  {
+void dirichletNeumann::correct
+(
+    const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,
+    const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch,
+    const intersection::algorithm alg,
+    const intersection::direction dir,
+    word fieldName,
+    const Switch orthotropic,
+    const word nonLinear,
+    vectorField& slaveFaceNormals,
+    GGIInterpolation
+    <
+        PrimitivePatch< face, List, pointField >,
+        PrimitivePatch< face, List, pointField >
+    >* ggiInterpolatorPtr
+)
+{
     if (!settleContact_ || (iCorr_ < settleIterationNumber_))
-      {
+    {
 
     //Info << "Correcting contact..." << flush;
     const fvMesh& mesh = mesh_;
@@ -186,11 +188,11 @@ dirichletNeumann::dirichletNeumann
          >, PrimitivePatch<face, List, pointField>
        > masterToSlavePatchToPatchInterpolator
        (
-    masterFaceZonePatch, // from zone
-    slaveFaceZonePatch, // to zone
-    alg,
-    dir
-    );
+           masterFaceZonePatch, // from zone
+           slaveFaceZonePatch, // to zone
+           alg,
+           dir
+       );
 
    //- calculate intersection distances
    //- this is the slowest part of the contact correction
@@ -205,43 +207,40 @@ dirichletNeumann::dirichletNeumann
        (mesh.boundaryMesh()[slavePatchID()].nPoints(), 0.0);
    label numCorrectedPoints = 0;
    if (distanceMethod_ == "point")
-     {
+   {
        // pointDistanceToIntersection() sometimes gives a seg fault when the
        // momentum equation diverges
 
-       globalSlavePointPenetration
-     = masterToSlavePatchToPatchInterpolator.pointDistanceToIntersection();
+       globalSlavePointPenetration =
+           masterToSlavePatchToPatchInterpolator.pointDistanceToIntersection();
 
        // get local point values from global values
        forAll(slavePointPenetration, pointI)
-     {
-       // the local point values seem to be kept at the start
-       // of the global field
-       slavePointPenetration[pointI] =
-         globalSlavePointPenetration
-         [
-          pointI
-          ];
+       {
+           // the local point values seem to be kept at the start
+           // of the global field
+           slavePointPenetration[pointI] =
+               globalSlavePointPenetration[pointI];
 
-       //- when the master surface surrounds the slave (like the pelvis and
-       // femur head) then
-       //- the slave penetration can sometimes calculate the distance through
-       // the femur head
-       //- to the pelvis which is wrong so I limit slavePenetration here
-       if (limitPenetration_)
-         {
-           if (slavePointPenetration[pointI] < penetrationLimit_)
-         {
-           slavePointPenetration[pointI] = 0.0;
-         }
-         }
-     }
+           //- when the master surface surrounds the slave (like the pelvis and
+           // femur head) then
+           //- the slave penetration can sometimes calculate the distance through
+           // the femur head
+           //- to the pelvis which is wrong so I limit slavePenetration here
+           if (limitPenetration_)
+           {
+               if (slavePointPenetration[pointI] < penetrationLimit_)
+               {
+                   slavePointPenetration[pointI] = 0.0;
+               }
+           }
+       }
 
        if (correctMissedVertices_)
-     {
-       scalarField& slavePointPenetration_ = slavePointPenetration;
+       {
+           scalarField& slavePointPenetration_ = slavePointPenetration;
 #          include "iterativePenaltyCorrectMissedVertices.H"
-     }
+       }
 
        minSlavePointPenetration = gMin(globalSlavePointPenetration);
 
@@ -485,7 +484,7 @@ dirichletNeumann::dirichletNeumann
    // remove tengential component
    slaveDisp_ = slaveFaceNormals*(slaveFaceNormals & slaveDisp_);
 
-  //--------Try to remove any oscillations----------//
+   //--------Try to remove any oscillations----------//
    if (oscillationCorr_)
    {
      if (smoothingSteps_ < 1)
@@ -502,15 +501,16 @@ dirichletNeumann::dirichletNeumann
          (mesh.boundaryMesh()[slavePatchIndex].nPoints(), vector::zero);
 
      for (int i=0; i<smoothingSteps_; i++)
-       {
-     slaveDispPoints =
-         localSlaveInterpolator.faceToPointInterpolate<vector>(slaveDisp_);
-     slaveDisp_ =
-         localSlaveInterpolator.pointToFaceInterpolate<vector>(slaveDispPoints);
+     {
+         slaveDispPoints =
+             localSlaveInterpolator.faceToPointInterpolate<vector>(slaveDisp_);
 
-     // make sure no tangential component
-     slaveDisp_ = slaveFaceNormals*(slaveFaceNormals & slaveDisp_);
-       }
+         slaveDisp_ = localSlaveInterpolator.pointToFaceInterpolate<vector>
+             (slaveDispPoints);
+
+         // make sure no tangential component
+         slaveDisp_ = slaveFaceNormals*(slaveFaceNormals & slaveDisp_);
+     }
    }
 
 
@@ -530,66 +530,80 @@ dirichletNeumann::dirichletNeumann
 
    // calculate current slave traction
    {
-     const fvPatch& slavePatch = mesh.boundary()[slavePatchIndex];
-     const fvPatchField<tensor>& gradField =
-       slavePatch.lookupPatchField<volTensorField, tensor>
-         ("grad("+fieldName+")");
-     slavePressure_ = tractionBoundaryGradient().traction
+       const fvPatch& slavePatch = mesh.boundary()[slavePatchIndex];
+       const fvPatchField<tensor>& gradField =
+           slavePatch.lookupPatchField<volTensorField, tensor>
+           (
+               "grad(" + fieldName + ")"
+           );
+
+       bool incremental(fieldName == "DU");
+
+       slavePressure_ = tractionBoundaryGradient::traction
        (
-    gradField,
-    fieldName,
-    slavePatch,
-    orthotropic,
-    nonLinear
-    );
+           gradField,
+           fieldName,
+           "U",
+           slavePatch,
+           orthotropic,
+           nonLinearGeometry::nonLinearNames_[nonLinear],
+           incremental
+       );
 
-     // set traction to zero on faces not in contact
-     // and set tensile stresses to zero
-     //const scalar maxMagSlavePressure = gMax(mag(slavePressure_));
-     scalar maxMagSlavePressure = 0.0;
-     if (slavePressure_.size() > 0)
-     {
-         maxMagSlavePressure = max(mag(slavePressure_));
-     }
-     reduce(maxMagSlavePressure, maxOp<scalar>());
-
-     forAll(touchFraction_, facei)
+       // set traction to zero on faces not in contact
+       // and set tensile stresses to zero
+       //const scalar maxMagSlavePressure = gMax(mag(slavePressure_));
+       scalar maxMagSlavePressure = 0.0;
+       if (slavePressure_.size() > 0)
        {
-     if (touchFraction_[facei] < SMALL
-        ||
-        ( (slaveFaceNormals[facei] & slavePressure_[facei])
-          > 1e-3*maxMagSlavePressure)
-        )
-       {
-         slavePressure_[facei] = vector::zero;
-         slaveValueFrac_[facei] = symmTensor::zero;
-         slaveDisp_[facei] =
-             slaveFaceNormals[facei]
-             *(slaveFaceNormals[facei]&oldSlaveDisp[facei]);
+           maxMagSlavePressure = max(mag(slavePressure_));
        }
-       }
+       reduce(maxMagSlavePressure, maxOp<scalar>());
 
-     // relax traction
-     slavePressure_ =
-         relaxFactor_*slavePressure_ + (1-relaxFactor_)*oldSlavePressure_;
-
-     // remove any shears
-     slavePressure_ = slaveFaceNormals*(slaveFaceNormals & slavePressure_);
-
-     // limit pressure to help convergence
-     if (limitPressure_)
+       forAll(touchFraction_, facei)
        {
-     forAll(slavePressure_, facei)
-       {
-         if ( (slaveFaceNormals[facei]&slavePressure_[facei]) < -pressureLimit_)
+           if
+           (
+               touchFraction_[facei] < SMALL
+            || (
+                  (slaveFaceNormals[facei] & slavePressure_[facei])
+                > 1e-3*maxMagSlavePressure
+            )
+           )
            {
-         slavePressure_[facei] = -pressureLimit_*slaveFaceNormals[facei];
+               slavePressure_[facei] = vector::zero;
+               slaveValueFrac_[facei] = symmTensor::zero;
+               slaveDisp_[facei] = slaveFaceNormals[facei]
+                   *(slaveFaceNormals[facei]&oldSlaveDisp[facei]);
            }
        }
+
+       // relax traction
+       slavePressure_ =
+           relaxFactor_*slavePressure_ + (1-relaxFactor_)*oldSlavePressure_;
+
+       // remove any shears
+       slavePressure_ = slaveFaceNormals*(slaveFaceNormals & slavePressure_);
+
+       // limit pressure to help convergence
+       if (limitPressure_)
+       {
+           forAll(slavePressure_, facei)
+           {
+               if
+               (
+                   (slaveFaceNormals[facei] & slavePressure_[facei])
+                < -pressureLimit_
+               )
+               {
+                   slavePressure_[facei] =
+                       -pressureLimit_*slaveFaceNormals[facei];
+               }
+           }
        }
 
-     // update old slave traction
-     oldSlavePressure_ = slavePressure_;
+       // update old slave traction
+       oldSlavePressure_ = slavePressure_;
    }
 
    // in parallel, the log is poluted with warnings that
@@ -604,36 +618,36 @@ dirichletNeumann::dirichletNeumann
    }
    reduce(maxMagMasterTraction, maxOp<scalar>());
 
-  // under-relax value fraction
-  slaveValueFrac_ =
-      relaxFactor_*slaveValueFrac_ + (1-relaxFactor_)*oldSlaveValueFrac_;
-  oldSlaveValueFrac_ = slaveValueFrac_;
+   // under-relax value fraction
+   slaveValueFrac_ =
+       relaxFactor_*slaveValueFrac_ + (1-relaxFactor_)*oldSlaveValueFrac_;
+   oldSlaveValueFrac_ = slaveValueFrac_;
 
-  //--------MASTER PROCS WRITES CONTACT INFO FILE----------//
-  if (Pstream::master() && (contactIterNum_ %  infoFreq_ == 0))
-    {
-      OFstream& contactFile = *contactFilePtr_;
-      int width = 20;
-      contactFile << mesh.time().value();
-      contactFile.width(width);
-      contactFile << contactIterNum_;
-      contactFile.width(width);
-      contactFile << numSlaveContactFaces;
-      contactFile.width(width);
-      contactFile << numSlaveSettledFaces;
-      contactFile.width(width);
-      contactFile << minSlavePointPenetration;
-      contactFile.width(width);
-      contactFile << maxMagMasterTraction;
-      contactFile.width(width);
-      contactFile << numCorrectedPoints;
-      if (aitkenRelaxation_)
-    {
-      contactFile.width(width);
-      contactFile << aitkenTheta_;
-    }
-      contactFile << endl;
-    }
+   //--------MASTER PROCS WRITES CONTACT INFO FILE----------//
+   if (Pstream::master() && (contactIterNum_ %  infoFreq_ == 0))
+   {
+       OFstream& contactFile = *contactFilePtr_;
+       int width = 20;
+       contactFile << mesh.time().value();
+       contactFile.width(width);
+       contactFile << contactIterNum_;
+       contactFile.width(width);
+       contactFile << numSlaveContactFaces;
+       contactFile.width(width);
+       contactFile << numSlaveSettledFaces;
+       contactFile.width(width);
+       contactFile << minSlavePointPenetration;
+       contactFile.width(width);
+       contactFile << maxMagMasterTraction;
+       contactFile.width(width);
+       contactFile << numCorrectedPoints;
+       if (aitkenRelaxation_)
+       {
+           contactFile.width(width);
+           contactFile << aitkenTheta_;
+       }
+       contactFile << endl;
+   }
   //Info << "\tdone" << endl;
 
       }

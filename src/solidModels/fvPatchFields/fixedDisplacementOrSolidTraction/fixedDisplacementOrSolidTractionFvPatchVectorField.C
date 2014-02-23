@@ -200,21 +200,22 @@ void fixedDisplacementOrSolidTractionFvPatchVectorField::updateCoeffs()
 
     if ( mag(timeSeries_(this->db().time().timeOutputValue())) < SMALL)
     {
-      // traction boundary
+        // traction boundary
 
-      // set valueFraction to zero
-      this->valueFraction() = symmTensor::zero;
+        // set valueFraction to zero
+        this->valueFraction() = symmTensor::zero;
 
-      // set gradient to enfore specified traction
-      refGrad() = tractionBoundaryGradient()
-          (
-              traction_,
-              pressure_,
-              word(fieldName_),
-              patch(),
-              orthotropic_,
-              nonLinearGeometry::nonLinearNames_[nonLinear_]
-              )();
+        // set gradient to enfore specified traction
+        refGrad() = tractionBoundaryGradient::snGrad
+        (
+            traction_,
+            pressure_,
+            fieldName_,
+            "U",
+            patch(),
+            orthotropic_,
+            nonLinearGeometry::nonLinearNames_[nonLinear_]
+        );
     }
     else
     {

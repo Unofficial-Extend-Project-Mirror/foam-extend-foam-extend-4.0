@@ -53,7 +53,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-             Class solidTractionFvPatchVectorField Declaration
+                Class solidTractionFvPatchVectorField Declaration
 \*---------------------------------------------------------------------------*/
 
 class solidTractionFvPatchVectorField

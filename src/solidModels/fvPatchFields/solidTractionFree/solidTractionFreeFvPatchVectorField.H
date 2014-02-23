@@ -66,7 +66,7 @@ class solidTractionFreeFvPatchVectorField
         //- Name of the displacement field
         const word fieldName_;
 
-        //- if it is a non linear solver
+        //- Is it a non linear solver
         nonLinearGeometry::nonLinearType nonLinear_;
 
         //- Is it an orthropic solver

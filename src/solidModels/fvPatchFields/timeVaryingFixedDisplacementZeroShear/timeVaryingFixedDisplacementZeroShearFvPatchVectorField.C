@@ -233,14 +233,18 @@ void timeVaryingFixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
     //vectorField n = patch().nf();
     //this->valueFraction() = sqr(n);
 
-    refGrad() = tractionBoundaryGradient()
+    bool incremental(fieldName_ == "DU");
+
+    refGrad() = tractionBoundaryGradient::snGrad
     (
         vectorField(patch().size(), vector::zero),
         scalarField(patch().size(), 0),
-        word(fieldName_),
+        fieldName_,
+        "U",
         patch(),
         orthotropic_,
-        nonLinearGeometry::nonLinearNames_[nonLinear_]
+        nonLinear_,
+        incremental
     );
 
     directionMixedFvPatchVectorField::updateCoeffs();

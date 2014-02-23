@@ -35,6 +35,7 @@ SourceFiles
 
 Author
     Philip Cardiff UCD
+    Clean-up and re-factoring Hrvoje Jasak
 
 \*---------------------------------------------------------------------------*/
 
@@ -47,6 +48,7 @@ Author
 #include "volFields.H"
 #include "tmp.H"
 #include "rheologyLaw.H"
+#include "nonLinearGeometry.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,49 +61,38 @@ namespace Foam
 
 class tractionBoundaryGradient
 {
-
 public:
 
-    //- Runtime type information
-    TypeName("tractionBoundaryGradient");
-
-    // Constructors
-
-        tractionBoundaryGradient()
-        {}
-
-
-    // Destructor
-
-        virtual ~tractionBoundaryGradient()
-        {}
-
-
-    // Member functions
+    // Static member functions
 
         //- Return the boundary Cauchy traction corresponding to
         //  the given gradient
-        tmp<vectorField> traction
+        static tmp<vectorField> traction
         (
             const tensorField& gradField,
-            const word fieldName,
+            const word& workingFieldName,   // Working variable
+            const word& integralFieldName,  // Integrated displacement
             const fvPatch& patch,
-            Switch orthotropic,
-            word nonLinear
-        ) const;
+            const bool orthotropic,
+            const nonLinearGeometry::nonLinearType& nonLinear,
+            const bool incremental
+        );
 
 
     // Operators
 
-        tmp<vectorField> operator()
+        //- Return surface-normal gradient given traction and pressure
+        static tmp<vectorField> snGrad
         (
             const vectorField& traction,
             const scalarField& pressure,
-            const word fieldName,
+            const word& workingFieldName,   // Working variable
+            const word& integralFieldName,  // Integrated displacement
             const fvPatch& patch,
-            Switch orthotropic,
-            word nonLinear
-        ) const;
+            const bool orthotropic,
+            const nonLinearGeometry::nonLinearType& nonLinear,
+            const bool incremental
+        );
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
