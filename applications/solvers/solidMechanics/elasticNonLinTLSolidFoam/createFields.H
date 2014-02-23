@@ -25,11 +25,11 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-	mesh,
-	dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+        mesh,
+        dimensionedSymmTensor("zero", dimless, symmTensor::zero)
     );
 
-    //- second Piola-Kirchhoff stress tensor
+    //- Second Piola-Kirchhoff stress tensor
     volSymmTensorField sigma
     (
         IOobject

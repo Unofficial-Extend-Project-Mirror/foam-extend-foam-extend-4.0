@@ -16,7 +16,6 @@
             (
                 DU.internalField()
               - DU.prevIter().internalField()
-            )
-           /magDU
+            )/magDU
         );
 }
