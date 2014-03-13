@@ -37,8 +37,12 @@ then
     then
 	echo
 	echo "Parent is git"
+	echo "Cloning. This may take some time"
 	echo
+
+	# su -c not correctly working on FreeBSD
 	su vagrant - -c "git clone $OFParent $OFClone"
+
 	echo
 	echo "Git cloned: TODO: set same branch as parent"
 	echo
@@ -52,6 +56,7 @@ then
 	# sed removes + in case of a 'tainted' parent
 
 	echo "Parent is on id $idName"
+	echo "Cloning. This may take some time"
 	su vagrant - -c "hg clone -u $idName $OFParent $OFClone"
 	echo
     else

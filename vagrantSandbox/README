@@ -3,7 +3,10 @@
 * Prerequisites
   These virtual machines require
   - VirtualBox :: for running from [[https://www.virtualbox.org]]
-  - Vagrant :: to automatically set them up from [[http://www.vagrantup.com]]
+  - Vagrant :: to automatically set them up from
+               [[http://www.vagrantup.com]] Make sure that you have at
+               least version 1.5 to be able to use the base boxes from
+               https://vagrantcloud.com/
   To make sure that for the boxes the have the newest
   VirtualBox-additions do
 : vagrant plugin install vagrant-vbguest
@@ -31,7 +34,7 @@
   doing
 * Virtual machines
   Currently existing virtual machines are
-  - precise :: Latest LTS Ubuntu.
+  - precise :: Latest LTS Ubuntu. Currently the default machine to use
   - lucid :: Previous LTS Ubuntu. Currently problems
              with automatic setting up (something with the
              =postfix=-package)
@@ -39,8 +42,13 @@
                 =lucid=-machine. Not yet working
   - centos65 :: A CentOS 6.5 machine with preinstalled development
                 tools
-  - freebsd92 :: FreeBSD 9.2 32-bit machine. Does not work because
-                 FreeBSD does not support shared folders
+  - freebsd92 :: FreeBSD 9.2 64-bit machine. Currently this machine
+                 does not provision automatically. After the first
+                 failure log in and do
+: sudo pkg_add -r rsync
+: sudo pkg_add -r bash
+                 then halt the machine and bring it up again (with the
+                 =--provision=-option)
   - freebsd10 :: FreeBSD 10.0 32-big machine. Tries to set up shared
                  folders via NFS. Currently not working
   - opensuse12 :: OpenSUSE 12.3 machine. Currently not completely
