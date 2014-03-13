@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 echo
 echo "Copying stuff from skeleton"

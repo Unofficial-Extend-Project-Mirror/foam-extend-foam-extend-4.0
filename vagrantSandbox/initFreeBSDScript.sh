@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 boxName=$1
 
@@ -8,7 +8,7 @@ echo
 
 pkg install -fy virtualbox-ose-additions
 
-neededPackages=(mercurial git flex bison ccache rpm wget)
+neededPackages=(mercurial git flex bison ccache rpm4 wget)
 bonusPackages=(emacs24  zsh)
 
 for p in ${neededPackages[@]}; do

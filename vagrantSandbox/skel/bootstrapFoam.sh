@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 # Just to be sure
 export WM_SCHEDULER=ccache
