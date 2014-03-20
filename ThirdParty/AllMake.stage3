@@ -87,7 +87,7 @@ fi
 # Mesquite
 if [ -z "$MESQUITE_SYSTEM" ]
 then
-    ( rpm_make -p mesquite-2.1.2 -s mesquite-2.1.2.spec -u http://software.sandia.gov/~jakraft/mesquite-2.1.2.tar.gz                 )
+    ( rpm_make -p mesquite-2.1.2 -s mesquite-2.1.2.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.0/ThirdParty/mesquite-2.1.2.tar.gz )
 else
     echo "Using system installed Mesquite"
     echo ""
