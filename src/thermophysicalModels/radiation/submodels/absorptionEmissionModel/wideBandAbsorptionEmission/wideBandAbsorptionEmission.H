@@ -232,14 +232,6 @@ public:
             return iBands_[i];
         }
 
-        //- Add contribution of ILambda to the total radiative intensity in
-        //  direction i
-        tmp<volScalarField> addIntensity
-        (
-            const label i,
-            const volScalarField& ILambda
-        ) const;
-
         void correct
         (
             volScalarField& a_,
