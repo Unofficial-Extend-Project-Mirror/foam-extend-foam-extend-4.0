@@ -93,15 +93,15 @@ greyDiffusiveRadiationMixedFvPatchScalarField
     {
         // No value given. Restart as fixedValue b.c.
 
-        const scalarField& Tp =
-            lookupPatchField<volScalarField, scalar>(TName_);
+        // Bugfix: Do not initialize from temperautre because it is unavailable
+        // when running, e.g. decomposePar and loading radiation as
+        // shared library. Initialize to zero instead.
+        // 26 Mar 2014 - DC
 
-        refValue() =
-            emissivity_*4.0*radiation::sigmaSB.value()*pow4(Tp)
-           /Foam::mathematicalConstant::pi;
+        refValue() = 0;
 
-        refGrad() = 0.0;
-        valueFraction() = 1.0;
+        refGrad() = 0;
+        valueFraction() = 1;
 
         fvPatchScalarField::operator=(refValue());
     }
