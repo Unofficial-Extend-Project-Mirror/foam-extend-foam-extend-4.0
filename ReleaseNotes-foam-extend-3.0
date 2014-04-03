@@ -47,9 +47,11 @@ Contents:
     Apple Mac OS X.
 
     ** From source
-        Please refer to doc/buildInstructions/ for details. If you have
-        improvements or build instructions for a new system, please share them 
-        with the community (see section "How to contribute", below).
+        Please refer to doc/buildInstructions/ for details. Further
+        installation instruction are available on the unofficial OpenFOAM Wiki:
+        http://openfoamwiki.net/index.php/Installation/Linux/foam-extend-3.0
+        If you have improvements or build instructions for a new system, please
+        share them with the community (see section "How to contribute", below).
         
     ** Binary packages
         Binary packages are available for download at 

@@ -26,13 +26,13 @@
 #     foamInstallationTest
 #
 # Description
-#     Checks the machine system, the installation of OpenFOAM, and the user's
-#     personal configuration for running OpenFOAM.
+#     Checks the machine system, the installation of foam-extend, and the user's
+#     personal configuration for running foam-extend.
 #
 #------------------------------------------------------------------------------
 
 # Base settings
-FOAM_VERSION=1.6-ext
+FOAM_VERSION=foam-extend-3.0
 SUPPLIED_VERSION_GCC=4.3.3
 MIN_VERSION_GCC=4.3.1
 
@@ -255,7 +255,7 @@ reportExecutable () {
                 | cut -d" " -f3`
             if [ ! "$VERSION" = "$SUPPLIED_VERSION_GCC" ]; then
                 echo "WARNING: gcc version does not match gcc supplied" \
-                     "with this release of OpenFOAM"
+                     "with this release of foam-extend"
                 echo "         Supplied version: $SUPPLIED_VERSION_GCC"
                 echo "         User version    : $VERSION"
                 echo "         Minimum required: $MIN_VERSION_GCC"
@@ -284,7 +284,7 @@ reportExecutable () {
     else
         echo "`fixlen "$1" 9` `fixlen "$VERSION" 10`"
         echo "WARNING:  Conflicting installations:"
-        echo "          OpenFOAM settings        : $APP_SPEC"
+        echo "          foam-extend settings        : $APP_SPEC"
         echo "          current path             : $APP_PATH"
         case $1 in
             icoFoam)
@@ -381,14 +381,14 @@ checkSsh () {
 }
 
 
-checkOpenFOAMEnvironment() {
+checkFoamEnvironment() {
     [ -d "$WM_PROJECT_INST_DIR" ] && [ -d "$WM_THIRD_PARTY_DIR" ] || {
         echo ""
-        echo "FATAL ERROR: OpenFOAM environment not configured."
+        echo "FATAL ERROR: foam-extend environment not configured."
         echo ""
-        echo "    Please refer to the installation section of the README file:"
-        echo "    <OpenFOAM installation dir>/OpenFOAM-${FOAM_VERSION}/README"
-        echo "    to source the OpenFOAM environment."
+        echo "    Please refer to the installation section of the file:"
+        echo "    <foam installation dir>/${FOAM_VERSION}/ReleaseNotes-${FOAM_VERSION}"
+        echo "    to source the foam-extend environment."
         echo ""
         exit 1
     }
@@ -409,7 +409,7 @@ checkUserShell() {
             # USER_CONFIG_TYPE=""
             echo "`fixlen "Shell:" $WIDTH` ${SHELL##*/}"
             echo "FATAL ERROR: Cannot identify the shell you are running."
-            echo "             OpenFOAM ${FOAM_VERSION} is compatible with "
+            echo "             ${FOAM_VERSION} is compatible with "
             echo "             csh, tcsh, ksh and bash."
             echo
             FATALERROR=`expr $FATALERROR + 1`;;
@@ -422,7 +422,7 @@ checkHostName() {
         echo "`fixlen "Host:" $WIDTH` ${HOST_NAME}"
         echo "FATAL ERROR: Cannot stat hostname."
         echo "             Contact your system administrator, "
-        echo "             OpenFOAM ${FOAM_VERSION} needs a valid "
+        echo "             ${FOAM_VERSION} needs a valid "
         echo "             hostname to function."
         echo
         FATALERROR=`expr $FATALERROR + 1`
@@ -439,7 +439,7 @@ checkOS () {
         ;;
     *)
         echo "FATAL ERROR: Incompatible operating system \"$OS\"."
-        echo "             OpenFOAM ${FOAM_VERSION} is currently "
+        echo "             ${FOAM_VERSION} is currently "
         echo "             available for Linux and SunOS only."
         echo
         FATALERROR=`expr $FATALERROR + 1`
@@ -457,14 +457,14 @@ echo "Executing $0:"
 #------------------------------------------------------------------------------
 heading "Checking basic setup..."
 hline
-checkOpenFOAMEnvironment
+checkFoamEnvironment
 checkUserShell
 checkHostName
 checkOS
 hline
 
 #------------------------------------------------------------------------------
-heading "Checking main OpenFOAM env variables..."
+heading "Checking main foam-extend env variables..."
 COL1=`fixlen "Environment_variable" 21`
 COL2=`fixlen "Set_to_file_or_directory" 40`
 COL3="Valid"
@@ -479,7 +479,7 @@ reportEnv '$WM_THIRD_PARTY_DIR'  'noPath' "yes"
 hline
 
 #------------------------------------------------------------------------------
-heading "Checking the OpenFOAM env variables set on the PATH..."
+heading "Checking the foam-extend env variables set on the PATH..."
 hline
 echo "$COL1 $COL2 $COL3 $COL4 $COL5"
 hline
@@ -492,7 +492,7 @@ reportEnv '$WM_DIR'           '$PATH' "yes"
 hline
 
 #------------------------------------------------------------------------------
-heading "Checking the OpenFOAM env variables set on the LD_LIBRARY_PATH..."
+heading "Checking the foam-extend env variables set on the LD_LIBRARY_PATH..."
 hline
 echo "$COL1 $COL2 $COL3 $COL4 $COL5"
 hline
