@@ -81,11 +81,13 @@ greyDiffusiveRadiationMixedFvPatchScalarField
 {
     if (dict.found("refValue"))
     {
+        refValue() = scalarField("value", dict, p.size());
+
         fvPatchScalarField::operator=
         (
-            scalarField("value", dict, p.size())
+            refValue()
         );
-        refValue() = scalarField("refValue", dict, p.size());
+
         refGrad() = scalarField("refGradient", dict, p.size());
         valueFraction() = scalarField("valueFraction", dict, p.size());
     }
