@@ -3,6 +3,8 @@ cd ${0%/*} || exit 1    # run from this directory
 set -x
 
 wmake libso conjugateHeatTransfer
-wmake
 
+wmake blockCoupledScalarTransportFoam  
+wmake conjugateHeatFoam
+wmake conjugateHeatSimpleFoam  
 # ----------------------------------------------------------------- end-of-file
