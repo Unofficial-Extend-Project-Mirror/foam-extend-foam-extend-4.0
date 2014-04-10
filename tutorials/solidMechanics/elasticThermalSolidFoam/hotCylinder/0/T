@@ -32,27 +32,23 @@ boundaryField
 
     inside
     {
-      type              fixedValue;
-      value             uniform 100;
+        type            fixedValue;
+        value           uniform 100;
     }
-
     outside
     {
-      type              fixedValue;
-      value             uniform 100;
+        type            fixedValue;
+        value           uniform 100;
     }
-
     front
     {
-       type            empty;
-       //type            symmetryPlane;
+        type            empty;
     }
-
     back
     {
-      type            empty;
-      //type            symmetryPlane;
+        type            empty;
     }
 }
+
 
 // ************************************************************************* //
