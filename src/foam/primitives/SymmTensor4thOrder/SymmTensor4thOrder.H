@@ -85,6 +85,8 @@ public:
             rank = 2 // Hacked by PC: Actual rank of SymmTensor4thOrder is 4
         };
 
+        //HJ, reconsider and fix.  HJ, 23/Feb/2014
+
 
     // Static data members
 
@@ -172,22 +174,22 @@ public:
 };
 
 
-// template<class Cmpt>
-// class typeOfRank<Cmpt, 4>
-// {
-// public:
+template<class Cmpt>
+class typeOfRank<Cmpt, 4>
+{
+public:
 
-//     typedef SymmTensor4thOrder<Cmpt> type;
-// };
+    typedef SymmTensor4thOrder<Cmpt> type;
+};
 
 
-// template<class Cmpt>
-// class symmTypeOfRank<Cmpt, 4>
-// {
-// public:
+template<class Cmpt>
+class symmTypeOfRank<Cmpt, 4>
+{
+public:
 
-//     typedef SymmTensor4thOrder<Cmpt> type;
-// };
+    typedef SymmTensor4thOrder<Cmpt> type;
+};
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
