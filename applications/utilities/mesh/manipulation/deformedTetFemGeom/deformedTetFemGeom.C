@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
 #   include "setRootCase.H"
 
-    scalar scaleFactor(readScalar(IStringStream(args.args()[3])()));
+    scalar scaleFactor(readScalar(IStringStream(args.additionalArgs()[0])()));
 
 #   include "createTime.H"
 #   include "createPolyMesh.H"
