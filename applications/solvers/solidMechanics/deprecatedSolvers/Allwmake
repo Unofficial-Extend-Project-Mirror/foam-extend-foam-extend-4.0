@@ -11,8 +11,6 @@ wmake contactStressFoam
 wmake newStressedFoam
 wmake newContactStressFoam
 
-wmake stressFemFoam
-
 wmake icoFsiFoam
 
 wmake solidDisplacementFoam

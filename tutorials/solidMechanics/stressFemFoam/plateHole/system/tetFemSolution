@@ -19,11 +19,15 @@ solvers
 {
     U
     {
-        solver          PCG;
-        preconditioner  DIC;
+        solver          CG;
+        preconditioner  Cholesky;
+        minIter         1;
+        maxIter         2000;
+
         tolerance       1e-06;
-        relTol          0.1;
+        relTol          0;
     }
 }
+
 
 // ************************************************************************* //

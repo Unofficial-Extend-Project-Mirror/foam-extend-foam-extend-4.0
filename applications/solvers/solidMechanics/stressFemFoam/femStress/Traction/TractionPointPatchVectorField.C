@@ -46,8 +46,9 @@ template
     class PointPatch,
     template<class> class MatrixType
 >
-void TractionPointPatchVectorField<PatchField, Mesh, PointPatch, MatrixType>
-::checkFieldSize() const
+void
+TractionPointPatchVectorField<PatchField, Mesh, PointPatch, MatrixType>::
+checkFieldSize() const
 {
     if
     (
@@ -229,7 +230,7 @@ addBoundarySourceDiag
     const vectorField& pointNormals = this->patch().pointNormals();
     const label nFaces = this->patch().nFaces();
 
-    vectorField& source = matrix.source();
+    vectorField& b = matrix.b();
 
     for (label faceI = 0; faceI < nFaces; faceI++)
     {
@@ -240,7 +241,7 @@ addBoundarySourceDiag
         {
             const triFace& tri = faceTriangles[triI];
 
-            source[meshPoints[tri[0]]] +=
+            b[meshPoints[tri[0]]] +=
                 tri.mag(points)*
                 (
                     traction_[faceI]/6.0
@@ -251,7 +252,7 @@ addBoundarySourceDiag
                   - pressure_[faceI]*pointNormals[tri[2]]/12.0
                 );
 
-            source[meshPoints[tri[1]]] +=
+            b[meshPoints[tri[1]]] +=
                 tri.mag(points)*
                 (
                     traction_[faceI]/6.0
@@ -262,7 +263,7 @@ addBoundarySourceDiag
                   - pressure_[faceI]*pointNormals[tri[0]]/12.0
                 );
 
-            source[meshPoints[tri[2]]] +=
+            b[meshPoints[tri[2]]] +=
                 tri.mag(points)*
                 (
                     traction_[faceI]/6.0

@@ -36,6 +36,8 @@ Description
 
 #include "fvCFD.H"
 
+#include "pointMesh.H"
+#include "pointFields.H"
 #include "tetPolyMesh.H"
 #include "tetPointFields.H"
 #include "tetFem.H"
@@ -69,7 +71,7 @@ int main(int argc, char *argv[])
           + tetFem::laplacianTrace(lambda, U)
         );
 
-        solve(UEqn);
+        UEqn.solve();
 
 #       include "calculateStress.H"
 
