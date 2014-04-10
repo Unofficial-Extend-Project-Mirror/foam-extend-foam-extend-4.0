@@ -230,7 +230,7 @@ addBoundarySourceDiag
     const vectorField& pointNormals = this->patch().pointNormals();
     const label nFaces = this->patch().nFaces();
 
-    vectorField& b = matrix.b();
+    vectorField& b = matrix.source();
 
     for (label faceI = 0; faceI < nFaces; faceI++)
     {
