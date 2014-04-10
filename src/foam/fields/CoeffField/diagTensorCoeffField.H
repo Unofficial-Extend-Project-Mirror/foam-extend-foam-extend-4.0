@@ -22,40 +22,72 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    coeffFields
+    CoeffField<T>
 
 Description
-    Typedefs for coefficient field
+    Template specialisation for diagTensor coefficients
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
+SourceFiles
+    diagTensorCoeffField.C
+
 \*---------------------------------------------------------------------------*/
 
-#ifndef coeffFields_H
-#define coeffFields_H
+#ifndef diagTensorCoeffField_H
+#define diagTensorCoeffField_H
 
-#include "scalarCoeffField.H"
-#include "sphericalTensorCoeffField.H"
-#include "diagTensorCoeffField.H"
-#include "symmTensorCoeffField.H"
-#include "tensorCoeffField.H"
-#include "symmTensor4thOrderCoeffField.H"
+#include "CoeffField.H"
+#include "DecoupledCoeffField.H"
+#include "diagTensor.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+template<>
+class CoeffField<diagTensor>
+:
+    public DecoupledCoeffField<diagTensor>
+{
+public:
 
-typedef CoeffField<scalar> scalarCoeffField;
-typedef CoeffField<vector> vectorCoeffField;
-typedef CoeffField<sphericalTensor> sphericalTensorCoeffField;
-typedef CoeffField<symmTensor> diagTensorCoeffField;
-typedef CoeffField<symmTensor> symmTensorCoeffField;
-typedef CoeffField<tensor> tensorCoeffField;
-typedef CoeffField<symmTensor4thOrder> symmTensor4thOrderCoeffField;
+    // Constructors
+
+        //- Construct given size
+        explicit CoeffField(const label);
+
+        //- Construct as copy
+        CoeffField(const CoeffField<diagTensor>&);
+
+        //- Construct as copy of base
+        explicit CoeffField(const DecoupledCoeffField<diagTensor>&);
+
+        //- Construct as copy of base
+        explicit CoeffField(const tmp<DecoupledCoeffField<diagTensor> >&);
+
+        //- Construct from Istream
+        explicit CoeffField(Istream&);
+
+
+    // Member operators
+
+        void operator=(const CoeffField<diagTensor>&);
+        void operator=(const tmp<CoeffField<diagTensor> >&);
+
+        void operator=(const scalarTypeField&);
+        void operator=(const tmp<scalarTypeField>&);
+        void operator=(const linearTypeField&);
+        void operator=(const tmp<linearTypeField>&);
+
+};
+
+
+/* * * * * * * * * * * * * * * * Global functions  * * * * * * * * * * * * * */
+
+tmp<CoeffField<diagTensor> > inv(const CoeffField<diagTensor>& f);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
