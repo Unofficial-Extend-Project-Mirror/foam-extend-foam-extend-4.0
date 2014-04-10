@@ -182,7 +182,7 @@ Foam::basicThermo::basicThermo(const fvMesh& mesh, const objectRegistry& obj)
             IOobject::NO_WRITE
         ),
         mesh,
-        dimensionSet(0, -2, 2, 0, 0)
+        dimensionSet(0, -2, 2, 0, 0, 0, 0)
     ),
 
     T_
