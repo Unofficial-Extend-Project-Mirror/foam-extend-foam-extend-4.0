@@ -285,16 +285,6 @@ Foam::radiation::wideBandAbsorptionEmission::ECont(const label bandI) const
     return E;
 }
 
-Foam::tmp<Foam::volScalarField>
-Foam::radiation::wideBandAbsorptionEmission::addIntensity
-(
-    const label i,
-    const volScalarField& ILambda
-) const
-{
-    return ILambda*(iBands_[i][1] - iBands_[i][0])/totalWaveLength_;
-}
-
 
 void Foam::radiation::wideBandAbsorptionEmission::correct
 (

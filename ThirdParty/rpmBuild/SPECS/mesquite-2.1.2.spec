@@ -75,7 +75,7 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://software.sandia.gov/~jakraft
+URL:                    http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.0/ThirdParty/
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
