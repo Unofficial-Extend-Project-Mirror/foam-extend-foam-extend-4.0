@@ -175,7 +175,8 @@ void constraint<Type>::eliminateEquation
     const unallocLabelList& owner = matrix.psi().mesh().lduAddr().lowerAddr();
     const unallocLabelList& neighbour =
         matrix.psi().mesh().lduAddr().upperAddr();
-    const unallocLabelList& losort = matrix.psi().mesh().lduAddr().losortAddr();
+    const unallocLabelList& losort =
+        matrix.psi().mesh().lduAddr().losortAddr();
 
     // My index =  rowID
     if (matrix.symmetric())
