@@ -28,6 +28,7 @@ License
 #include "calculatedFvPatchFields.H"
 #include "zeroGradientFvPatchFields.H"
 #include "coupledFvPatchFields.H"
+#include "transformField.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -163,8 +164,7 @@ void Foam::fvMatrix<Type>::addBoundarySource
         }
         else if (couples)
         {
-            tmp<Field<Type> > tpnf = ptf.patchNeighbourField();
-            const Field<Type>& pnf = tpnf();
+            Field<Type> pnf = ptf.patchNeighbourField();
 
             const unallocLabelList& addr = lduAddr().patchAddr(patchI);
 
@@ -192,11 +192,36 @@ void Foam::fvMatrix<Type>::correctImplicitBoundarySource
 
         if (ptf.coupled())
         {
-            scalarField pnf = ptf.patchNeighbourField()().component(cmpt);
-
+            // Get access to transformation data
             const lduInterfaceField& lf =
                 refCast<const lduInterfaceField>(ptf);
 
+            const coupledFvPatch& cfvp =
+                refCast<const coupledFvPatch>(ptf.patch());
+
+            // Get the component of "other side" field that will be handled
+            // implicitly.  Note that patchNeighbourField function gives
+            // the neighbour field AFTER transform, where the implicit
+            // components are mis-aligned: it needs to be transformed back
+            // HJ, 10/Apr/2014
+            scalarField pnf;
+
+            if (cfvp.parallel())
+            {
+                // No transformation needed
+                pnf = ptf.patchNeighbourField()().component(cmpt);
+            }
+            else
+            {
+                // Transform back to this side to get the implicit component
+                pnf = transform
+                (
+                    cfvp.reverseT(),
+                    ptf.patchNeighbourField()
+                )().component(cmpt);
+            }
+
+            // Identical implicitness transformation (back)
             lf.transformCoupleField(pnf, cmpt);
 
             const unallocLabelList& addr = lduAddr().patchAddr(patchI);
@@ -526,7 +551,7 @@ void Foam::fvMatrix<Type>::setReference
     if ((forceReference || psi_.needReference()) && celli >= 0)
     {
         // HR, 9/Jul/2013
-        // Very early versions could produce memory violations if celli is read 
+        // Very early versions could produce memory violations if celli is read
         // from dictionary, however, the proposed fix produced unpredictable
         // results in parallel. Keeping in mind that topologically changing
         // meshes will complicate the matter to level that cannot possibly be
