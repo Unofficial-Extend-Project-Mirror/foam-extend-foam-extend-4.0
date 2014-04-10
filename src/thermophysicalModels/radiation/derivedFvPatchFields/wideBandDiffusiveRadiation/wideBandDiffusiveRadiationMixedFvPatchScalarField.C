@@ -81,11 +81,12 @@ wideBandDiffusiveRadiationMixedFvPatchScalarField
 {
     if (dict.found("value"))
     {
+        refValue() = scalarField("value", dict, p.size());
+
         fvPatchScalarField::operator=
         (
-            scalarField("value", dict, p.size())
+            refValue()
         );
-        refValue() = scalarField("value", dict, p.size());
 
         refGrad() = 0;
         valueFraction() = 1;
