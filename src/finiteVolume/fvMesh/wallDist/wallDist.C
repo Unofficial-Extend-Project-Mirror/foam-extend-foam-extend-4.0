@@ -69,7 +69,8 @@ void Foam::wallDist::correct()
     // AJ: make sure to pick up all patches that are specified as a wall
     const polyBoundaryMesh& bMesh = cellDistFuncs::mesh().boundaryMesh();
     labelHashSet wallPatchIDs(bMesh.size());
-    forAll(bMesh, patchI)
+
+    forAll (bMesh, patchI)
     {
         if (bMesh[patchI].isWall())
         {
@@ -87,7 +88,7 @@ void Foam::wallDist::correct()
     transfer(wave.distance());
 
     // Transfer values on patches into boundaryField of *this
-    forAll(boundaryField(), patchI)
+    forAll (boundaryField(), patchI)
     {
         if (!isA<emptyFvPatchScalarField>(boundaryField()[patchI]))
         {

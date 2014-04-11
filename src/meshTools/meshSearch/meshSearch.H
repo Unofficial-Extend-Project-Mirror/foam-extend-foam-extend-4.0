@@ -135,7 +135,7 @@ class meshSearch
             ) const;
 
             //- Calculate offset vector in direction dir with as length a
-            //  fraction of the cell size (of the cell straddling boundary face)
+            //  fraction of the cell size of the cell straddling boundary face
             vector offset
             (
                 const point& bPoint,
@@ -183,14 +183,14 @@ public:
                 return mesh_;
             }
 
-            //- Get (demand driven) reference to octree holding all
+            //- Get demand driven reference to octree holding all
             //  boundary faces
             const indexedOctree<treeDataFace>& boundaryTree() const;
 
-            //- Get (demand driven) reference to octree holding all cells
+            //- Get demand driven reference to octree holding all cells
             const indexedOctree<treeDataCell>& cellTree() const;
 
-            //- Get (demand driven) reference to octree holding all cell centres
+            //- Get demand driven reference to octree holding all cell centres
             const indexedOctree<treeDataPoint>& cellCentreTree() const;
 
 

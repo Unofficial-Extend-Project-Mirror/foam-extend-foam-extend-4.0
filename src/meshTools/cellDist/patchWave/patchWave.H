@@ -109,6 +109,7 @@ public:
             bool correctWalls = true
         );
 
+
     // Destructor
 
         virtual ~patchWave();
@@ -145,7 +146,6 @@ public:
         {
             return patchDistance_;
         }
-
 };
 
 
