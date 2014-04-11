@@ -43,10 +43,15 @@ int main(int argc, char *argv[])
     argList::noParallel();
 #   include "addRegionOption.H"
 
+    // Add option to write empty sets
+    argList::validOptions.insert("writeEmptySets", "");
+
 #   include "setRootCase.H"
 #   include "createTime.H"
 
     Info<< "Time = " << runTime.timeName() << endl;
+
+    bool writeEmptySets = args.optionFound("writeEmptySets");
 
     // Determine the processor count directly
     label nProcs = 0;
@@ -133,7 +138,7 @@ int main(int argc, char *argv[])
                 }
             }
 
-            if (!procSet.empty())
+            if (!procSet.empty() || writeEmptySets)
             {
                 // Set created, write it
                 Info<< "Writing point set " << set.name()
@@ -179,7 +184,7 @@ int main(int argc, char *argv[])
                 }
             }
 
-            if (!procSet.empty())
+            if (!procSet.empty() || writeEmptySets)
             {
                 // Set created, write it
                 Info<< "Writing face set " << set.name()
@@ -223,7 +228,7 @@ int main(int argc, char *argv[])
                 }
             }
 
-            if (!procSet.empty())
+            if (!procSet.empty() || writeEmptySets)
             {
                 // Set created, write it
                 Info<< "Writing cell set " << set.name()
