@@ -87,9 +87,7 @@ then
             if [ $? -eq 0 ];
             then
                 echo "Using Subversion/svn to download the source code for swak4Foam"
-                echo "Error: current Subversion-version does not support foam3. Please install mercurial"
-                exit -1
-                (cd ./rpmBuild/BUILD; svn checkout svn://svn.code.sf.net/p/openfoam-extend/svn/trunk/Breeder_1.7/libraries/swak4Foam swak4Foam-$SWAK_RELEASE_VERSION)
+                (cd ./rpmBuild/BUILD; svn checkout svn://svn.code.sf.net/p/openfoam-extend/svn/trunk/Breeder_2.0/libraries/swak4Foam swak4Foam-$SWAK_RELEASE_VERSION)
             else
                 echo "Error: Please install either a Mercurial or Subversion client in order to download the source code for swak4Foam"
                 exit -1
