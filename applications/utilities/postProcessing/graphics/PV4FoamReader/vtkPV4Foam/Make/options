@@ -6,6 +6,7 @@ EXE_INC = \
     -I../PV4FoamReader
 
 LIB_LIBS = \
+    -l$(WM_PROJECT) \
     -lfiniteVolume \
     -llagrangian \
     -lmeshTools \
