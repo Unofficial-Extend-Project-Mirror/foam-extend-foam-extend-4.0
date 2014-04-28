@@ -25,7 +25,9 @@ Class
     Foam::greyDiffusiveRadiationMixedFvPatchScalarField
 
 Description
-    Radiation temperature specified
+    Radiation boundary will diffusive reflection and black body emission.
+    See Modest "Radiative heat transfer", Capter 16.6 "The finite volume method"
+    Eq.16.63
 
 SourceFiles
     greyDiffusiveRadiationMixedFvPatchScalarField.C
@@ -58,6 +60,15 @@ class greyDiffusiveRadiationMixedFvPatchScalarField
 
         //- Emissivity
         scalar emissivity_;
+
+        //- Sum of cosine factors of all outgoing rays (lazy evaluated)
+        mutable scalarField *sumOutgoingAnglesPtr_;
+
+
+    // Private member functions
+
+        //- Calculate sum of cosine factors of all outgoing rays
+        void calcSumOutgoingAngles() const;
 
 
 public:
@@ -156,6 +167,9 @@ public:
             {
                 return emissivity_;
             }
+
+            //- Return sum of cosine factors of all outgoing rays
+            const scalarField& sumOutgoingAngles() const;
 
 
         // Evaluation functions

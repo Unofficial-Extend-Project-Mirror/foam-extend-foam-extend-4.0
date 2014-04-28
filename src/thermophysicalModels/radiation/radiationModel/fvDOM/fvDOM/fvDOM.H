@@ -80,17 +80,8 @@ class fvDOM
         //- Incident radiation  [W/m2]
         volScalarField G_;
 
-        //- Total radiative heat flux [W/m2]
-        volScalarField Qr_;
-
         //- Total absorption coefficient [1/m]
         volScalarField a_;
-
-        //- Total emission coefficient [1/m]
-        volScalarField e_;
-
-        //- Emission contribution [Kg/m/s^3]
-        volScalarField E_;
 
         //- Number of solid angles in theta
         label nTheta_;
@@ -113,11 +104,26 @@ class fvDOM
         //- List of pointers to radiative intensity rays
         PtrList<radiativeIntensityRay> IRay_;
 
+        //- Emmited radiative heat flux [W/m2], per band
+        PtrList<volScalarField::GeometricBoundaryField> Qem_;
+
+        //- Incidet radiative heat flux [W/m2], per band
+        PtrList<volScalarField::GeometricBoundaryField> Qin_;
+
         //- Convergence criterion
         scalar convergence_;
 
         //- Maximum number of iterations
         scalar maxIter_;
+
+        //- List of cached fvMatrices for rays
+        List<PtrList<fvScalarMatrix> >fvRayDiv_;
+
+        //- Cache convection div matrix
+        bool cacheDiv_;
+
+        //- Maximum omega weight
+        scalar omegaMax_;
 
 
     // Private member functions
@@ -150,31 +156,41 @@ public:
 
     // Member functions
 
-        // Edit
+        //- Total incident radiative heat flux field
+        tmp<volScalarField::GeometricBoundaryField> Qin() const;
 
-            //- Solve radiation equation(s)
-            void calculate();
+        //- Total emitted radiative heat flux field
+        tmp<volScalarField::GeometricBoundaryField> Qem() const;
 
-            //- Read radiation properties dictionary
-            bool read();
+        //- Total radiative heat flux as difference of Qem and Qin
+        tmp<volScalarField::GeometricBoundaryField> Qr() const;
 
-            //- Update G and calculate total heat flux on boundary
-            void updateG();
+        //- Band-wise radiative heat flux as difference of Qem and Qin
+        tmp<volScalarField::GeometricBoundaryField> Qr(scalar lambda) const;
 
-            //- Set the rayId and lambdaId from by decomposing an intensity
-            //  field name
-            void setRayIdLambdaId
-            (
-                const word& name,
-                label& rayId,
-                label& lambdaId
-            ) const;
+        //- Solve radiation equation(s)
+        void calculate();
 
-            //- Source term component (for power of T^4)
-            virtual tmp<volScalarField> Rp() const;
+        //- Read radiation properties dictionary
+        bool read();
 
-            //- Source term component (constant)
-            virtual tmp<DimensionedField<scalar, volMesh> > Ru() const;
+        //- Update G and calculate total heat flux on boundary
+        void updateG();
+
+        //- Set the rayId and lambdaId from by decomposing an intensity
+        //  field name
+        void setRayIdLambdaId
+        (
+            const word& name,
+            label& rayId,
+            label& lambdaId
+        ) const;
+
+        //- Source term component (for power of T^4)
+        virtual tmp<volScalarField> Rp() const;
+
+        //- Source term component (constant)
+        virtual tmp<DimensionedField<scalar, volMesh> > Ru() const;
 
 
         // Access
@@ -210,17 +226,40 @@ public:
             //- Const access to incident radiation field
             inline const volScalarField& G() const;
 
-            //- Const access to total radiative heat flux field
-            inline const volScalarField& Qr() const;
+            //- Const access to band wise emitted radiative heat flux field
+            inline const volScalarField::GeometricBoundaryField& Qem
+            (
+                scalar lambda
+            ) const;
+
+            //- Const access to band wise incident radiative heat flux field
+            inline const volScalarField::GeometricBoundaryField& Qin
+            (
+                scalar lambda
+            ) const;
 
             //- Const access to black body
             inline const blackBodyEmission& blackBody() const;
+
+            //- Const access to cached fvMatrix
+            inline const fvScalarMatrix& fvRayDiv
+            (
+                const label lambdaI,
+                const label rayId
+            ) const;
+
+            //- Caching div(Ji, Ilamda)
+            inline bool cacheDiv() const;
+
+            //- Return omegaMax
+            inline scalar omegaMax() const;
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "fvDOMI.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

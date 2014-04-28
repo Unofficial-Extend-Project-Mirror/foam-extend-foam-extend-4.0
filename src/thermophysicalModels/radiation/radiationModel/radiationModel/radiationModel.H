@@ -168,6 +168,12 @@ public:
 
         // Access
 
+            //- Const access to mesh
+            const fvMesh& mesh() const
+            {
+                return mesh_;
+            };
+
             //- Source term component (for power of T^4)
             virtual tmp<volScalarField> Rp() const = 0;
 

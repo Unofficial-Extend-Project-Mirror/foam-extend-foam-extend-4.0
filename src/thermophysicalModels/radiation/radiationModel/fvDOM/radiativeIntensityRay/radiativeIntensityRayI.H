@@ -29,18 +29,6 @@ inline const Foam::volScalarField& Foam::radiation::radiativeIntensityRay::I() c
 }
 
 
-inline const Foam::volScalarField& Foam::radiation::radiativeIntensityRay::Qr() const
-{
-    return Qr_;
-}
-
-
-inline Foam::volScalarField& Foam::radiation::radiativeIntensityRay::Qr()
-{
-    return Qr_;
-}
-
-
 inline const Foam::vector& Foam::radiation::radiativeIntensityRay::d() const
 {
     return d_;
@@ -76,8 +64,17 @@ inline Foam::scalar Foam::radiation::radiativeIntensityRay::omega() const
     return omega_;
 }
 
+inline Foam::volScalarField&
+Foam::radiation::radiativeIntensityRay::ILambda
+(
+    const label lambdaI
+)
+{
+    return ILambda_[lambdaI];
+}
 
-inline const Foam::volScalarField& Foam::radiation::radiativeIntensityRay::ILambda
+inline const Foam::volScalarField&
+Foam::radiation::radiativeIntensityRay::ILambda
 (
     const label lambdaI
 ) const
