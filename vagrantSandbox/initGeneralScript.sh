@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 echo
 echo "Copying stuff from skeleton"
@@ -20,6 +20,9 @@ OFDIR=/home/vagrant/foam/
 mkdir -vp $OFDIR
 chown -R vagrant:vagrant $OFDIR
 
+# for distros that don't have group vagrant
+chown -R vagrant $OFDIR
+
 OFClone=$OFDIR/foam-extend-3.0
 OFReference=$OFClone-parent
 
@@ -34,8 +37,12 @@ then
     then
 	echo
 	echo "Parent is git"
+	echo "Cloning. This may take some time"
 	echo
+
+	# su -c not correctly working on FreeBSD
 	su vagrant - -c "git clone $OFParent $OFClone"
+
 	echo
 	echo "Git cloned: TODO: set same branch as parent"
 	echo
@@ -44,10 +51,13 @@ then
 	echo
 	echo "Parent is mercurial. Hello Bernhard"
 	echo
-	branchName=`hg branch -R $OFParent`
+#	branchName=`hg branch -R $OFParent`
+	idName=`hg id -i -R $OFParent | sed -e "s/\+//"`
+	# sed removes + in case of a 'tainted' parent
 
-	echo "Parent is on branch $branchName"
-	su vagrant - -c "hg clone -u $branchName $OFParent $OFClone"
+	echo "Parent is on id $idName"
+	echo "Cloning. This may take some time"
+	su vagrant - -c "hg clone -u $idName $OFParent $OFClone"
 	echo
     else
 	echo

@@ -3,7 +3,15 @@
 * Prerequisites
   These virtual machines require
   - VirtualBox :: for running from [[https://www.virtualbox.org]]
-  - Vagrant :: to automatically set them up from [[http://www.vagrantup.com]]
+  - Vagrant :: to automatically set them up from
+               [[http://www.vagrantup.com]] Make sure that you have at
+               least version 1.5 to be able to use the base boxes from
+               https://vagrantcloud.com/
+  To make sure that for the boxes the have the newest
+  VirtualBox-additions do
+: vagrant plugin install vagrant-vbguest
+  This installs a plugin that tries to update the guest addition if
+  they are for an older version of VirtualBox
 * Starting
   A virtual machine is set up with
 : vagrant up <machineName>
@@ -16,19 +24,45 @@
   One can then connect to the virtual machine with
 : vagrant ssh <machinName>
   and will be in the =$HOME= directory of the user =vagrant= where in
-  the directory =~/OpenFOAM/OpenFOAM-1.6-ext= the sources are
+  the directory =~/foam/foam-extend-3.0= the sources are
   available. Modifications can be pushed "outside" the virtual machine
   with
 : hg push
-  There is also a symbolic link =~/OpenFOAM/OpenFOAM-1.6-ext-parent=
+  There is also a symbolic link =~/foam/foam-extend-3.0-parent=
   to the sources if you want to edit there directly. Use with care
   and don't compile in that directory unless you know what you're
   doing
 * Virtual machines
   Currently existing virtual machines are
-  - precise :: Latest LTS Ubuntu.
+  - precise :: Latest LTS Ubuntu. Currently the default machine to use
   - lucid :: Previous LTS Ubuntu. Currently problems
              with automatic setting up (something with the
              =postfix=-package)
   - maverick :: Tries to fix the problems with the
                 =lucid=-machine. Not yet working
+  - centos65 :: A CentOS 6.5 machine with preinstalled development
+                tools
+  - freebsd92 :: FreeBSD 9.2 64-bit machine. Currently this machine
+                 does not provision automatically. After the first
+                 failure log in and do
+: sudo pkg_add -r rsync
+: sudo pkg_add -r bash
+                 then halt the machine and bring it up again (with the
+                 =--provision=-option)
+  - freebsd10 :: FreeBSD 10.0 32-big machine. Tries to set up shared
+                 folders via NFS. Currently not working
+  - opensuse12 :: OpenSUSE 12.3 machine. Currently not completely
+                  compiling Foam
+  Some machines (read: the BSD-boxes) need the =VirtualBox Extension
+  Pack= installed (because they have USB 2.0)
+* Scripts in the machine
+  In the home directory these scripts are found
+  - bootstrapFoam.sh :: A script whose aim it is to compile Foam and
+       the ThirdParty-packages in one go (no paraview and QT). If this
+       works the box is considered operational
+* Provisioning scripts
+  Every "family" of machines has a specific script that makes sure
+  that the software packages necessary to compile =Foam= are installed
+  into the machine. In the end these scripts should call
+  =initGeneralScript.sh= which gets the sources into the machine. It
+  needs =git=, =mercurial= and =ccache= for that.
