@@ -282,6 +282,36 @@ case SYSTEMOPENMPI:
     unset mpi_version
     breaksw
 
+case MVAPICH2:
+    set mpi_version=mvapich2
+
+    if ($?MVAPICH2_BIN_DIR != 0) then
+        if (-d "${MVAPICH2_BIN_DIR}" ) then
+        _foamAddPath $MVAPICH2_BIN_DIR
+        endif
+    else
+        set mpicc_cmd=`which mpicc`
+        setenv MVAPICH2_BIN_DIR `dirname $mpicc_cmd`
+        unset mpicc_cmd
+    endif
+
+    setenv MPI_HOME `dirname $MVAPICH2_BIN_DIR`
+    setenv MPI_ARCH_PATH $MPI_HOME
+
+    setenv  PINC "`mpicc -show -cc= -nativelinking`"
+    setenv  PLIBS "`mpicc -show -cc= | sed "s%$PINC%%"`"
+
+    if ($?FOAM_VERBOSE && $?prompt) then
+        echo "  Environment variables defined for MVAPICH2:"
+        echo "    MPI_ARCH_PATH         : $MPI_ARCH_PATH"
+        echo "    PINC                  : $PINC"
+        echo "    PLIBS                 : $PLIBS"
+    endif
+
+    setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/$mpi_version
+    unset mpi_version
+    breaksw
+
 case MPICH:
     set mpi_version=mpich-1.2.4
     setenv MPI_HOME $WM_THIRD_PARTY_DIR/$mpi_version
