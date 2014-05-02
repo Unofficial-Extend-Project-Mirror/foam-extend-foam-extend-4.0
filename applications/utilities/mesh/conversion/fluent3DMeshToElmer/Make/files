@@ -1,0 +1,3 @@
+fluent3DMeshToElmer.L
+
+EXE = $(FOAM_APPBIN)/fluent3DMeshToElmer

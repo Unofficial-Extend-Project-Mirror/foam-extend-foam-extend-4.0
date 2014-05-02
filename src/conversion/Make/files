@@ -18,6 +18,7 @@ meshReader/starcd/STARCDMeshReader.C
 
 meshWriter/meshWriter.C
 meshWriter/starcd/STARCDMeshWriter.C
+meshWriter/elmer/ElmerMeshWriter.C
 
 polyDualMesh/polyDualMesh.C
 
