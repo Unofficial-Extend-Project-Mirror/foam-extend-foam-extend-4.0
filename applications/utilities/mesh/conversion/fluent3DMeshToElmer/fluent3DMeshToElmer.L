@@ -1380,9 +1380,10 @@ int main(int argc, char *argv[])
     excludePattern.compile(wordRe::DETECT_NOCASE);
 
     Info<< nl << "Writing Elmer mesh ..." << endl;
-    meshWriters::Elmer writer(mesh,scaleFactor,&excludePattern);
+    meshWriters::Elmer writer(mesh, excludePattern, scaleFactor);
     writer.write("elmerMesh");
     Info<< nl << "End" << endl;
+
     return 0;
 }
 

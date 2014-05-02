@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     argList::noParallel();
     timeSelector::addOptions();
 
-    argList::validOptions.insert("scale"  , "factor"  );
+    argList::validOptions.insert("scale", "factor");
     argList::validOptions.insert("exclude", "pattern");
 
 #   include "setRootCase.H"
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 
         if (!timeI || state != polyMesh::UNCHANGED)
         {
-            meshWriters::Elmer writer(mesh, scaleFactor,&excludePattern);
+            meshWriters::Elmer writer(mesh, excludePattern, scaleFactor);
             fileName dirName("elmerMesh");
             if (state != polyMesh::UNCHANGED)
             {
@@ -108,7 +108,9 @@ int main(int argc, char *argv[])
             }
 
             if (!writer.write(dirName))
+            {
                 break; // Conversion failed
+            }
         }
 
         Info << nl << endl;

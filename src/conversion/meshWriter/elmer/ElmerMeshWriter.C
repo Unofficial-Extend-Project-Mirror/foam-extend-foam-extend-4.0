@@ -145,10 +145,12 @@ void Foam::meshWriters::Elmer::getCellTable()
     }
 }
 
-//
-// Get the Elmer face element type ID based on the number of vertices of a face
-//
-Foam::label Foam::meshWriters::Elmer::getFaceType(const label nvert, const word &zname) const
+
+Foam::label Foam::meshWriters::Elmer::getFaceType
+(
+    const label nvert,
+    const word& zname
+) const
 {
     switch(nvert)
     {
@@ -167,17 +169,14 @@ Foam::label Foam::meshWriters::Elmer::getFaceType(const label nvert, const word 
 }
 
 
-//
-// Save the mesh.names file containing the names of all zones & patches
-//
 void Foam::meshWriters::Elmer::writeNames() const
 {
     OFstream os("mesh.names");
 
-    const cellZoneMesh&     czones  = mesh_.cellZones();
-    const faceZoneMesh&     fzones  = mesh_.faceZones();
+    const cellZoneMesh& czones = mesh_.cellZones();
+    const faceZoneMesh& fzones = mesh_.faceZones();
     const polyBoundaryMesh& patches = mesh_.boundaryMesh();
-    label                   boundaryID = 0;
+    label boundaryID = 0;
 
 
     Info<< "Writing " << os.name() << "." << endl;
@@ -197,37 +196,31 @@ void Foam::meshWriters::Elmer::writeNames() const
     os << "! ----- Names for interior boundaries -----" << nl;
     forAll(fzones, fzoneI)
     {
-        if (!faceZoneExcludePattern || !faceZoneExcludePattern->match(fzones[fzoneI].name()))
+        if (!faceZoneExcludePattern.match(fzones[fzoneI].name()))
         {
             os  << "$ " << fzones[fzoneI].name() << " = " << ++boundaryID << nl;
         }
     }
-    os.flush();
 }
 
 
-//
-// Save the mesh.header file containing the global counters
-//
 bool Foam::meshWriters::Elmer::writeHeader() const
 {
-    OFstream os("mesh.header");
-
-    const pointField&       points   = mesh_.points();
-    const cellList&         cells    = mesh_.cells();
-    const faceList&         faces    = mesh_.faces();
-    const polyBoundaryMesh& patches  = mesh_.boundaryMesh();
-    const faceZoneMesh&     fzones   = mesh_.faceZones();
-    label                   extZones = 0; // Count exterior boundary zones
-    label                   extFaces = 0; // Count exterior boundary faces
-    label                   intZones = 0; // Used interior boundary zones
-    label                   intFaces = 0; // Used interior boundary faces
+    const pointField& points = mesh_.points();
+    const cellList& cells = mesh_.cells();
+    const faceList& faces = mesh_.faces();
+    const polyBoundaryMesh& patches = mesh_.boundaryMesh();
+    const faceZoneMesh& fzones = mesh_.faceZones();
+    label extZones = 0; // Count exterior boundary zones
+    label extFaces = 0; // Count exterior boundary faces
+    label intZones = 0; // Used interior boundary zones
+    label intFaces = 0; // Used interior boundary faces
 
     // Count the different cell types
-    hexMatcher   hex;
+    hexMatcher hex;
     prismMatcher pri;
-    pyrMatcher   pyr;
-    tetMatcher   tet;
+    pyrMatcher pyr;
+    tetMatcher tet;
 
     label nHex = 0;
     label nPri = 0;
@@ -238,14 +231,11 @@ bool Foam::meshWriters::Elmer::writeHeader() const
     label nBad = 0;
 
 
-
-    Info<< "Writing " << os.name() << "." << endl;
-
     // Count all exterior boundary zone + faces + the types
     forAll(patches, patchI)
     {
         const label patchStart = patches[patchI].start();
-        const label patchEnd   = patchStart + patches[patchI].size();
+        const label patchEnd = patchStart + patches[patchI].size();
 
         extZones++;
         extFaces += patches[patchI].size();
@@ -264,11 +254,14 @@ bool Foam::meshWriters::Elmer::writeHeader() const
         }
     }
 
-    // Count all interior boundary zones + faces with names not matching the exclude pattern
+    // Count all interior boundary zones + faces with names not matching
+    // the exclude pattern
     forAll(fzones, fzoneI)
     {
-        if (faceZoneExcludePattern && faceZoneExcludePattern->match(fzones[fzoneI].name()))
+        if (faceZoneExcludePattern.match(fzones[fzoneI].name()))
+        {
            continue;
+        }
 
         const faceZone& fzone = fzones[fzoneI];
 
@@ -289,22 +282,42 @@ bool Foam::meshWriters::Elmer::writeHeader() const
         }
     }
 
-    os  << points.size() << " "
-        << cells.size()  << " "
-        << extFaces+intFaces << nl;
-
     // Count the volume element types
     for(label cellI = 0; cellI < mesh_.nCells(); cellI++)
     {
-             if (hex.isA(mesh_, cellI)) nHex++;
-        else if (tet.isA(mesh_, cellI)) nTet++;
-        else if (pyr.isA(mesh_, cellI)) nPyr++;
-        else if (pri.isA(mesh_, cellI)) nPri++;
-        else                            nBad++; // No valid element type for Elmer
+        if (hex.isA(mesh_, cellI))
+        {
+            nHex++;
+        }
+        else if (tet.isA(mesh_, cellI))
+        {
+            nTet++;
+        }
+        else if (pyr.isA(mesh_, cellI))
+        {
+            nPyr++;
+        }
+        else if (pri.isA(mesh_, cellI))
+        {
+            nPri++;
+        }
+        else
+        {
+            nBad++; // Not a valid element type for Elmer
+        }
     }
 
+    OFstream os("mesh.header");
+
+    os << points.size() << " "
+       << cells.size()  << " "
+       << extFaces+intFaces << nl;
+
+    Info<< "Writing " << os.name() << "." << endl;
+
     // Save the number of different element types used
-    os  << (nTet>0) + (nPri>0) + (nPyr>0) + (nHex>0) + (nQua>0) + (nTri>0) + (nBad>0) << endl;
+    os  << (nTet>0) + (nPri>0) + (nPyr>0) +
+           (nHex>0) + (nQua>0) + (nTri>0) + (nBad>0) << endl;
 
     // Save type and count if count > 0
     if (nTet > 0) os << ELMER_ETYPE_TET   << " " << nTet << endl;
@@ -324,20 +337,18 @@ bool Foam::meshWriters::Elmer::writeHeader() const
         << "        Tetrahedra : " << nTet << nl
         << "        Polyhedra  : " << nBad << nl
         << "    Regions        : " << mesh_.cellZones().size() << nl
-        << "    Ext. boundaries: " << extZones << ", " << extFaces << " faces" << nl
-        << "    Int. boundaries: " << intZones << ", " << intFaces << " faces" << nl
+        << "    Ext. boundaries: " << extZones << ", "
+        << extFaces << " faces" << nl
+        << "    Int. boundaries: " << intZones << ", "
+        << intFaces << " faces" << nl
         << "        Tri faces  : " << nTri << nl
         << "        Quad faces : " << nQua << nl
         << endl;
 
-    os.flush();
-    return (!nBad); // Conversion impossble if nBad > 0
+    return !nBad;
 }
 
 
-//
-// Save the mesh.nodes file
-//
 void Foam::meshWriters::Elmer::writeNodes() const
 {
     OFstream os("mesh.nodes");
@@ -354,32 +365,27 @@ void Foam::meshWriters::Elmer::writeNodes() const
 
     forAll(points, ptI)
     {
-        os  << ptI + 1 << " -1 "
-            << scaleFactor_ * points[ptI].x() << " "
-            << scaleFactor_ * points[ptI].y() << " "
-            << scaleFactor_ * points[ptI].z() << nl;
+        os << ptI + 1 << " -1 "
+           << scaleFactor_ * points[ptI].x() << " "
+           << scaleFactor_ * points[ptI].y() << " "
+           << scaleFactor_ * points[ptI].z() << nl;
     }
-    os.flush();
 }
 
 
-//
-// Save the mesh.elements file. This file contains only the volume elements, not the
-// faces on the boundaries
-//
 void Foam::meshWriters::Elmer::writeElements() const
 {
     OFstream os("mesh.elements");
 
     // map foam cellModeller index -> Elmer element types
     Map<label> shapeLookupIndex;
-    shapeLookupIndex.insert(tetModel->index()  , ELMER_ETYPE_TET  );
+    shapeLookupIndex.insert(tetModel->index(), ELMER_ETYPE_TET  );
     shapeLookupIndex.insert(prismModel->index(), ELMER_ETYPE_PRISM);
-    shapeLookupIndex.insert(pyrModel->index()  , ELMER_ETYPE_PYRAM);
-    shapeLookupIndex.insert(hexModel->index()  , ELMER_ETYPE_HEX  );
+    shapeLookupIndex.insert(pyrModel->index(), ELMER_ETYPE_PYRAM);
+    shapeLookupIndex.insert(hexModel->index(), ELMER_ETYPE_HEX  );
 
     const cellShapeList& shapes = mesh_.cellShapes();
-    const cellList&      cells  = mesh_.cells();
+    const cellList& cells  = mesh_.cells();
 
     Info<< "Writing " << os.name() << "." << endl;
 
@@ -391,7 +397,9 @@ void Foam::meshWriters::Elmer::writeElements() const
         // a registered primitive type
         if (shapeLookupIndex.found(mapIndex))
         {
-            os << cellId+1 << " " << cellTableId_[cellId] << " " << shapeLookupIndex[mapIndex];
+            os << cellId+1 << " "
+               << cellTableId_[cellId] << " "
+               << shapeLookupIndex[mapIndex];
 
             const labelList& vrtList = shapes[cellId];
             forAll(vrtList, i)
@@ -405,13 +413,9 @@ void Foam::meshWriters::Elmer::writeElements() const
             Info<< "***WARNING: polyhedron " << cellId << " ignored." << endl;
         }
     }
-    os.flush();
 }
 
 
-//
-// Save the mesh.boundary file. This file contains only the faces elements on boundaries.
-//
 void Foam::meshWriters::Elmer::writeBoundary() const
 {
     OFstream os("mesh.boundary");
@@ -425,69 +429,66 @@ void Foam::meshWriters::Elmer::writeBoundary() const
 
     Info<< "Writing " << os.name() << "." << endl;
 
-    //
     // Write all patches == exterior boundary faces
-    //
     forAll(patches, patchI)
     {
-        const word& pname      = patches[patchI].name();
+        const word& pname = patches[patchI].name();
         const label patchStart = patches[patchI].start();
-        const label patchEnd   = patchStart + patches[patchI].size();
+        const label patchEnd = patchStart + patches[patchI].size();
 
         boundaryID++;
         for(label faceI = patchStart; faceI < patchEnd; ++faceI)
         {
             const labelList& vrtList = faces[faceI];
 
-            os  << ++bfaceID
-                << " " << boundaryID
-                << " " << owner[faceI] + 1  // ID of parent cell
-                << " 0 "                    // 0 == exterior boundary face
-                << getFaceType(vrtList.size(),pname);
+            os << ++bfaceID
+               << " " << boundaryID
+               << " " << owner[faceI] + 1  // ID of parent cell
+               << " 0 "                    // 0 == exterior boundary face
+               << getFaceType(vrtList.size(),pname);
 
             forAll(vrtList, i)
             {
-                os  << " " << vrtList[i] + 1;
+                os << " " << vrtList[i] + 1;
             }
-            os  << endl;
+            os << endl;
         }
     }
 
 
-    //
-    // Write face zones (== interior boundary faces) with names not matching the exclude pattern
-    //
+    // Write face zones (== interior boundary faces) with names not matching
+    // the exclude pattern
     const faceZoneMesh& fzones = mesh_.faceZones();
     forAll(fzones, fzoneI)
     {
-        if (faceZoneExcludePattern && faceZoneExcludePattern->match(fzones[fzoneI].name()))
+        if(faceZoneExcludePattern.match(fzones[fzoneI].name()))
+        {
            continue;
+        }
 
-        const faceZone&  fzone  = fzones[fzoneI];
+        const faceZone& fzone = fzones[fzoneI];
         const labelList& master = fzone.masterCells();
-        const labelList& slave  = fzone.slaveCells();
-        const word&      zname  = fzone.name();
+        const labelList& slave = fzone.slaveCells();
+        const word& zname = fzone.name();
 
         boundaryID++;
         forAll(fzone, i)
         {
             const labelList& vrtList = faces[fzone[i]];
 
-            os  << ++bfaceID
-                    << " " << boundaryID
-                    << " " << master[i] + 1 // ID of parent cell
-                    << " " << slave[i]  + 1 // ID of neigbour cell
-                    << " " << getFaceType(vrtList.size(),zname);
+            os << ++bfaceID
+               << " " << boundaryID
+               << " " << master[i] + 1 // ID of parent cell
+               << " " << slave[i]  + 1 // ID of neigbour cell
+               << " " << getFaceType(vrtList.size(),zname);
 
             forAll(vrtList, j)
             {
-                os  << " " << vrtList[j] + 1;
+                os << " " << vrtList[j] + 1;
             }
-            os  << endl;
+            os << endl;
         }
     }
-
-    os.flush();
 }
 
 
@@ -496,11 +497,12 @@ void Foam::meshWriters::Elmer::writeBoundary() const
 Foam::meshWriters::Elmer::Elmer
 (
     const polyMesh& mesh,
-    const scalar scaleFactor,
-    const wordRe* excludePattern
+    const wordRe& excludePattern,
+    const scalar scaleFactor
 )
 :
-    meshWriter(mesh, scaleFactor), faceZoneExcludePattern(excludePattern)
+    meshWriter(mesh, scaleFactor),
+    faceZoneExcludePattern(excludePattern)
 {
     boundaryRegion_.readDict(mesh_);
     cellTable_.readDict(mesh_);
@@ -520,7 +522,6 @@ Foam::meshWriters::Elmer::~Elmer()
 bool Foam::meshWriters::Elmer::write(const fileName& dirName) const
 {
     fileName baseName(dirName);
-    bool     success;
 
     if (baseName.empty())
     {
@@ -539,19 +540,25 @@ bool Foam::meshWriters::Elmer::write(const fileName& dirName) const
     // Create the mesh directory (elemerMesh), chdir into and cleanup
     mkDir(baseName);
     chDir(baseName);
-    rm("mesh.header"  );
-    rm("mesh.nodes"   );
+    rm("mesh.header");
+    rm("mesh.nodes");
     rm("mesh.elements");
     rm("mesh.boundary");
-    rm("mesh.names"   );
-    success = writeHeader();
+    rm("mesh.names");
+
+    bool success = writeHeader();
     if (success)
     {
-        writeNodes   ();
+        writeNodes();
         writeElements();
         writeBoundary();
-        writeNames   ();
+        writeNames();
     }
+    else
+    {
+        rm("mesh.header");
+    }
+
     chDir("..");
 
     return success;

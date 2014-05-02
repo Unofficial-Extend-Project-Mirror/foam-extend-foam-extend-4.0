@@ -52,41 +52,86 @@ namespace Foam
 
 namespace meshWriters
 {
-class Elmer: public meshWriter
+
+class Elmer
+:
+    public meshWriter
 {
+
 private:
-        // Elmer element type labels
-        #define ELMER_ETYPE_BAD    0   // Not a valid element type
-        #define ELMER_ETYPE_TRIA   303
-        #define ELMER_ETYPE_QUAD   404
-        #define ELMER_ETYPE_TET    504
-        #define ELMER_ETYPE_PRISM  706
-        #define ELMER_ETYPE_PYRAM  605
-        #define ELMER_ETYPE_HEX    808
 
-        const wordRe* faceZoneExcludePattern;
+    // Elmer element type labels
+    #define ELMER_ETYPE_BAD    0   // Not a valid element type
+    #define ELMER_ETYPE_TRIA   303
+    #define ELMER_ETYPE_QUAD   404
+    #define ELMER_ETYPE_TET    504
+    #define ELMER_ETYPE_PRISM  706
+    #define ELMER_ETYPE_PYRAM  605
+    #define ELMER_ETYPE_HEX    808
 
-        //- Disallow default bitwise copy construct
-        Elmer(const Elmer&);
+    const wordRe& faceZoneExcludePattern;
 
-        //- Disallow default bitwise assignment
-        void operator=(const Elmer&);
+    //- Disallow default bitwise copy construct
+    Elmer(const Elmer&);
 
-        label getFaceType(const label nvert, const word &zname) const;
-        bool  writeHeader   () const;
-        void  writeNames    () const;
-        void  writeNodes    () const;
-        void  writeElements () const;
-        void  writeBoundary () const;
-        void  getCellTable  ();
+    //- Disallow default bitwise assignment
+    void operator=(const Elmer&);
+
+    //- Get the Elmer face element type ID based on the number of vertices of a face
+    label getFaceType(const label nvert, const word &zname) const;
+
+    //- Save the mesh.header file containing the global counters
+    bool writeHeader() const;
+
+    //- Save the mesh.names file containing the names of all zones & patches
+    void writeNames() const;
+
+    //- Save the mesh.nodes file
+    void writeNodes() const;
+
+    //- Save the mesh.elements file. This file contains only the volume
+    //- elements, not the faces on the boundaries
+    void writeElements () const;
+
+    //- Save the mesh.boundary file. This file contains only the faces elements
+    //- on boundaries.
+    void writeBoundary () const;
+
+    //- Build the cell table information
+    void getCellTable ();
+
 
 public:
-        Elmer(const polyMesh&, const scalar scaleFactor = 1.0, const wordRe* excludePattern = 0);
+
+    // Constructors
+
+        //- Construct from polyMesh and option arguments.
+        Elmer
+        (
+            const polyMesh&,
+            const wordRe& excludePattern,
+            const scalar scaleFactor = 1.0
+        );
+
+    // Destructor
+
         virtual ~Elmer();
+
+    // Member Functions
+
+        //- Write mesh in elmer format
         virtual bool write(const fileName& dirName = fileName::null) const;
+
 };
-}
-}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+}  // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+}  // End namespace meshWriters
+
 
 #endif
 
