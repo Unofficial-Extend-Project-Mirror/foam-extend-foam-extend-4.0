@@ -73,7 +73,7 @@ Foam::label Foam::metisDecomp::decompose
     METIS_SetDefaultOptions(options);
 
     // processor weights initialised with no size, only used if specified in
-    // a file
+    // a file - use the data type that metis expects here
     Field<real_t> processorWeights;
 
     // cell weights (so on the vertices of the dual)
