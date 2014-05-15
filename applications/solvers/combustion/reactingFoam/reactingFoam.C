@@ -88,8 +88,6 @@ int main(int argc, char *argv[])
             chemistry.dQ()().write();
         }
 
-        runTime.write();
-
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;

@@ -81,8 +81,8 @@ class constitutiveModel
         //- Plane stress
         Switch planeStress_;
 
-        //- Run-time selectable solidInterface method for correct discretisation
-        // on bi-material interfaces
+        //- Run-time selectable solidInterface method for correct
+        //  discretisation on bi-material interfaces
         autoPtr<solidInterface> solidInterfacePtr_;
 
         // we use IOReferencer to allow lookup of solidInterface object in
@@ -137,17 +137,18 @@ public:
         //- If plasticity is active
         bool plasticityActive() const
         {
-      if (plasticityStressReturnPtr_.valid())
-        {
-          return plasticityStressReturnPtr_->plasticityActive();
-        }
-      return false;
+            if (plasticityStressReturnPtr_.valid())
+            {
+                return plasticityStressReturnPtr_->plasticityActive();
+            }
+
+            return false;
         }
 
         //- If visco effects are active
         bool viscoActive() const
         {
-      return rheologyLawPtr_->viscoActive();
+            return rheologyLawPtr_->viscoActive();
         }
 
         //- Return reference to stress field
@@ -241,14 +242,14 @@ public:
         //- Return reference to solidInterface
         virtual solidInterface& solInterface()
         {
-      return solidInterfacePtr_();
-    }
+            return solidInterfacePtr_();
+        }
 
         //- Return true if solidInterface is active
         virtual bool solidInterfaceActive()
         {
-      return solidInterfaceActive_;
-    }
+            return solidInterfaceActive_;
+        }
 
         //- Update yield stress
         void updateYieldStress();

@@ -97,7 +97,7 @@ Foam::linearUpwind<Type>::correction
     {
         fvsPatchField<Type>& pSfCorr = bSfCorr[patchi];
 
-        if (pSfCorr.coupled() && pSfCorr.size())
+        if (pSfCorr.coupled())
         {
             const fvPatch& p = mesh.boundary()[patchi];
 

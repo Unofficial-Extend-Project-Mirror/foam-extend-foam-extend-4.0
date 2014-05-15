@@ -12,21 +12,20 @@
         mesh
     );
 
-    //     volTensorField gradU = fvc::grad(U);
     volTensorField gradU
     (
         IOobject
         (
-	 "grad(U)",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::NO_READ,
-	 IOobject::NO_WRITE
-	 ),
+            "grad(U)",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
         mesh,
         dimensionedTensor("zero", dimless, tensor::zero)
-     );
-    //surfaceVectorField snGradU = fvc::snGrad(U);
+    );
+
     surfaceVectorField snGradU
     (
         IOobject
@@ -38,7 +37,7 @@
             IOobject::NO_WRITE
         ),
         mesh,
-	dimensionedVector("zero", dimless, vector::zero)
+        dimensionedVector("zero", dimless, vector::zero)
     );
 
     volVectorField V
@@ -85,19 +84,19 @@
         dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
     );
 
-      volVectorField divSigmaExp
-      (
+    volVectorField divSigmaExp
+    (
         IOobject
         (
-	 "divSigmaExp",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::NO_READ,
-	 IOobject::NO_WRITE
-	 ),
+            "divSigmaExp",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
         mesh,
         dimensionedVector("zero", dimForce/dimVolume, vector::zero)
-       );
+    );
 
     constitutiveModel rheology(sigma, U);
 
@@ -127,18 +126,20 @@
 
    // for aitken relaxation
    volVectorField aitkenDelta
-    (
-        IOobject
-        (
-            "aitkenDelta",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh,
-	dimensionedVector("zero", dimLength, vector::zero)
-    );
+   (
+       IOobject
+       (
+           "aitkenDelta",
+           runTime.timeName(),
+           mesh,
+           IOobject::NO_READ,
+           IOobject::NO_WRITE
+       ),
+       mesh,
+       dimensionedVector("zero", dimLength, vector::zero)
+   );
+
+
 // aitken relaxation factor
 scalar aitkenInitialRes = 1.0;
 scalar aitkenTheta = 0.1;

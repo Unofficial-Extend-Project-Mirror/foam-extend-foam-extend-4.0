@@ -47,9 +47,11 @@ Contents:
     Apple Mac OS X.
 
     ** From source
-        Please refer to doc/buildInstructions/ for details. If you have
-        improvements or build instructions for a new system, please share them 
-        with the community (see section "How to contribute", below).
+        Please refer to doc/buildInstructions/ for details. Further
+        installation instruction are available on the unofficial OpenFOAM Wiki:
+        http://openfoamwiki.net/index.php/Installation/Linux/foam-extend-3.0
+        If you have improvements or build instructions for a new system, please
+        share them with the community (see section "How to contribute", below).
         
     ** Binary packages
         Binary packages are available for download at 
@@ -280,57 +282,4 @@ Contents:
     models; bug fixes; documentation. The many ways of contributing and the 
     contribution process are described in detail in the file "HowToContribute".
 
-* List of Contributors 
-    (If your name is missing in the list, please contact the maintainers at 
-    and it will be added asap.)
-    Henry Weller
-    Hrvoje Jasak
-    Mattijs Janssens
-    Zeljko Tukovic
-    Bernhard Gschaider
-    Tommaso Lucchini
-    Martin Beaudoin
-    Sandeep Menon
-    Niklas Nordin
-    Eugene De Villiers
-    Henrik Rusche
-    Ivor Clifford
-    Philiposse Rajan
-    Gavin Tabor
-    Jovani Favero
-    Frank Bos
-    David Hill
-    Niklas Wikstrom
-    Dubravko Matijasevic
-    Darrin Stephens
-    Christian Beck
-    Oliver Borm
-    James Criner
-    Hua Shan
-    David Boner
-    Pierre-Olivier Dallaire
-    Norman Del Puppo
-    Dennis Kingsley
-    Frank Albina
-    Flavio Galeazzo
-    Hannes Kroger
-    Olivier Petit
-    David Schmidt
-    Andreas Feymark
-    Luca Mangani
-    Daniel Schmode
-    Christoph Goniva
-    Takuya Oshima
-    Juho Peltola
-    Eric Paterson
-    Fabian Peng Karrholm
-    Aleksandar Karac
-    Maria Garcia Camprubi
-    Chris Greenshields
-    Mark Olesen
-    Hilary Spencer
-    Andy Heather
-    Dominik Christ
-    Peter Janas
-    Niels Linnemann
-    Nikola Kornev
+* List of Contributors: See file ListOfContributors

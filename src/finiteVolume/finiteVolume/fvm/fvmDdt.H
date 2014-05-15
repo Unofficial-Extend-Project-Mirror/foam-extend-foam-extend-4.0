@@ -53,6 +53,37 @@ namespace fvm
     template<class Type>
     tmp<fvMatrix<Type> > ddt
     (
+        GeometricField<Type, fvPatchField, volMesh>&,
+        const word& name
+    );
+
+    template<class Type>
+    tmp<fvMatrix<Type> > ddt
+    (
+        const geometricOneField&,
+        GeometricField<Type, fvPatchField, volMesh>&,
+        const word& name
+    );
+
+    template<class Type>
+    tmp<fvMatrix<Type> > ddt
+    (
+        const dimensionedScalar&,
+        GeometricField<Type, fvPatchField, volMesh>&,
+        const word& name
+    );
+
+    template<class Type>
+    tmp<fvMatrix<Type> > ddt
+    (
+        const volScalarField&,
+        GeometricField<Type, fvPatchField, volMesh>&,
+        const word& name
+    );
+
+    template<class Type>
+    tmp<fvMatrix<Type> > ddt
+    (
         GeometricField<Type, fvPatchField, volMesh>&
     );
 

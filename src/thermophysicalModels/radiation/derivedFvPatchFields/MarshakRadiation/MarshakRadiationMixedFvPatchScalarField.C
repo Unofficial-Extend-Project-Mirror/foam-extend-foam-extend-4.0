@@ -75,21 +75,31 @@ Foam::MarshakRadiationFvPatchScalarField::MarshakRadiationFvPatchScalarField
     TName_(dict.lookup("T")),
     emissivity_(readScalar(dict.lookup("emissivity")))
 {
-    const scalarField& Tp =
-        lookupPatchField<volScalarField, scalar>(TName_);
-
-    refValue() = 4.0*radiation::sigmaSB.value()*pow4(Tp);
-    refGrad() = 0.0;
-
     if (dict.found("value"))
     {
+        refValue() = scalarField("value", dict, p.size());
+
         fvPatchScalarField::operator=
         (
-            scalarField("value", dict, p.size())
+            refValue()
         );
+
+        refGrad() = 0;
+        valueFraction() = 1;
     }
     else
     {
+        // No value given. Restart as fixedValue b.c.
+
+        // Bugfix: Do not initialize from temperautre because it is unavailable
+        // when running, e.g. decomposePar and loading radiation as
+        // shared library. Initialize to zero instead.
+        // 26 Mar 2014 - DC
+        refValue() = 0;
+
+        refGrad() = 0;
+        valueFraction() = 0;
+
         fvPatchScalarField::operator=(refValue());
     }
 }

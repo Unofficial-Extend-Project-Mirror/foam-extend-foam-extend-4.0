@@ -210,15 +210,19 @@ void solidTractionFvPatchVectorField::updateCoeffs()
         return;
     }
 
-    gradient() = tractionBoundaryGradient()
-      (
-       traction_,
-       pressure_,
-       word(fieldName_),
-       patch(),
-       orthotropic_,
-       nonLinearGeometry::nonLinearNames_[nonLinear_]
-       )();
+    bool incremental(fieldName_ == "DU");
+
+    gradient() = tractionBoundaryGradient::snGrad
+    (
+        traction_,
+        pressure_,
+        fieldName_,
+        "U",
+        patch(),
+        orthotropic_,
+        nonLinear_,
+        incremental
+    );
 
     fixedGradientFvPatchVectorField::updateCoeffs();
 }
@@ -243,14 +247,14 @@ void solidTractionFvPatchVectorField::evaluate(const Pstream::commsTypes)
     //- non-orthogonal correction vectors
     vectorField k = delta - n*(n&delta);
 
-    Field<vector>::operator=
+    vectorField::operator=
     (
         this->patchInternalField()
       + (k&gradField.patchInternalField())
       + gradient()/this->patch().deltaCoeffs()
     );
 
-    fvPatchField<vector>::evaluate();
+    fvPatchVectorField::evaluate();
 }
 
 // Write

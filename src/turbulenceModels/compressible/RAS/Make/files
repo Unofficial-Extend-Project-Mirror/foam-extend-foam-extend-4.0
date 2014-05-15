@@ -9,7 +9,6 @@ LaunderGibsonRSTM/LaunderGibsonRSTM.C
 realizableKE/realizableKE.C
 SpalartAllmaras/SpalartAllmaras.C
 kOmegaSST/kOmegaSST.C
-kOmegaSST_LowRe/kOmegaSST_LowRe.C
 
 /* Wall functions */
 wallFunctions = derivedFvPatchFields/wallFunctions

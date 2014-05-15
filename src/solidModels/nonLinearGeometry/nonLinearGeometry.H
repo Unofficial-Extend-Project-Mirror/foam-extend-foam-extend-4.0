@@ -53,7 +53,7 @@ class nonLinearGeometry
 {
 public:
 
-        //- non-linear solver options
+        //- Non-linear solver options
         enum nonLinearType
         {
             OFF,

@@ -71,6 +71,7 @@ class wallPoint
         //- normal distance (squared) from cellcenter to origin
         scalar distSqr_;
 
+
     // Private Member Functions
 
         //- Evaluate distance to point. Update distSqr, origin from whomever
@@ -88,7 +89,7 @@ public:
 
     // Static data members
 
-        //- initial point far away.
+        //- Initial point far away
         static point greatPoint;
 
 
@@ -130,7 +131,8 @@ public:
             //  still contains original (invalid) value.
             inline bool valid() const;
 
-            //- Check for identical geometrical data. Used for cyclics checking.
+            //- Check for identical geometrical data
+            //  Used for cyclics checking
             inline bool sameGeometry
             (
                 const polyMesh&,
@@ -138,7 +140,7 @@ public:
                 const scalar
             ) const;
 
-            //- Convert any absolute coordinates into relative to (patch)face
+            //- Convert any absolute coordinates into relative to (patch) face
             //  centre
             inline void leaveDomain
             (

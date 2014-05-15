@@ -298,7 +298,9 @@ void cyclicGgiFvPatchField<Type>::initInterfaceMatrixUpdate
     const Pstream::commsTypes commsType
 ) const
 {
-    notImplemented("void cyclicGgiFvPatchField::initInterfaceMatrixUpdate"
+    notImplemented
+    (
+        "void cyclicGgiFvPatchField::initInterfaceMatrixUpdate"
         " for block-coupled matrices of tensor types"
     )
 }

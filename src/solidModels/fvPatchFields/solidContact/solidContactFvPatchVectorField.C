@@ -767,6 +767,8 @@ void solidContactFvPatchVectorField::updateCoeffs()
             }
 
             // set boundary conditions
+            bool incremental(fieldName_ == "DU");
+
             if (!master_)
             {
                 // set refValue, refGrad and valueFraction
@@ -778,16 +780,18 @@ void solidContactFvPatchVectorField::updateCoeffs()
 
                 //refGrad - set traction
                 refGrad() =
-                    tractionBoundaryGradient()
+                    tractionBoundaryGradient::snGrad
                     (
                         frictionContactModelPtr_->slaveTraction()
                         + normalContactModelPtr_->slavePressure(),
                         scalarField(patch().size(),0.0),
-                        word(fieldName_),
+                        fieldName_,
+                        "U",
                         patch(),
                         orthotropic_,
-                        nonLinearGeometry::nonLinearNames_[nonLinear_]
-                        )();
+                        nonLinear_,
+                        incremental
+                    );
 
                 //valueFraction
                 valueFraction() =
@@ -805,32 +809,35 @@ void solidContactFvPatchVectorField::updateCoeffs()
                 {
                     // set to master to traction free if it is rigid
                     refGrad() =
-                        tractionBoundaryGradient()
+                        tractionBoundaryGradient::snGrad
                         (
                             vectorField(patch().size(),vector::zero),
                             scalarField(patch().size(),0.0),
-                            word(fieldName_),
+                            fieldName_,
+                            "U",
                             patch(),
                             orthotropic_,
-                            nonLinearGeometry::nonLinearNames_[nonLinear_]
-                        )();
+                            nonLinear_,
+                            incremental
+                        );
                 }
                 else
                 {
-                    refGrad() =
-                        tractionBoundaryGradient()
+                    refGrad() = tractionBoundaryGradient::snGrad
+                    (
+                        interpolateSlaveToMaster
                         (
-                            interpolateSlaveToMaster
-                            (
-                                -frictionContactModelPtr_->slaveTraction()
-                                -normalContactModelPtr_->slavePressure()
-                            ),
-                            scalarField(patch().size(),0.0),
-                            word(fieldName_),
-                            patch(),
-                            orthotropic_,
-                            nonLinearGeometry::nonLinearNames_[nonLinear_]
-                        )();
+                            -frictionContactModelPtr_->slaveTraction()
+                            -normalContactModelPtr_->slavePressure()
+                        ),
+                        scalarField(patch().size(),0.0),
+                        fieldName_,
+                        "U",
+                        patch(),
+                        orthotropic_,
+                        nonLinear_,
+                        incremental
+                    );
                 }
             }
         } // if correction freqeuncy
@@ -840,20 +847,25 @@ void solidContactFvPatchVectorField::updateCoeffs()
     else
     {
         // set refGrad to traction free for master and slave
+        bool incremental(fieldName_ == "DU");
+
         refGrad() =
-            tractionBoundaryGradient()
+            tractionBoundaryGradient::snGrad
             (
                 vectorField(patch().size(),vector::zero),
                 scalarField(patch().size(),0.0),
-                word(fieldName_),
+                fieldName_,
+                "U",
                 patch(),
                 orthotropic_,
-                nonLinearGeometry::nonLinearNames_[nonLinear_]
-                )();
+                nonLinear_,
+                incremental
+            );
     }
 
     directionMixedFvPatchVectorField::updateCoeffs();
 }
+
 
 // Interpolate traction from slave to master
 tmp<vectorField> solidContactFvPatchVectorField::interpolateSlaveToMaster
@@ -861,7 +873,7 @@ tmp<vectorField> solidContactFvPatchVectorField::interpolateSlaveToMaster
  const vectorField slaveField
 )
 {
-  if (!master_)
+    if (!master_)
     {
       FatalError
           << "only the master may call the function "
@@ -1315,85 +1327,96 @@ snGrad() const
 //- Increment of dissipated energy due to friction
 tmp<scalarField> solidContactFvPatchVectorField::Qc() const
 {
-  tmp<scalarField> tQc(new scalarField(patch().size(), 0.0));
-  scalarField& Qc = tQc();
+    tmp<scalarField> tQc(new scalarField(patch().size(), 0.0));
+    scalarField& Qc = tQc();
 
-  // Integrate energy using trapezoidal rule
-  // 0.5*averageForce*incrementOfDisplacement
+    // Integrate energy using trapezoidal rule
+    // 0.5*averageForce*incrementOfDisplacement
 
-  // displacement increment
-  const vectorField& curDU = *this;
+    // displacement increment
+    const vectorField& curDU = *this;
 
-  // average force
-  const fvPatchField<tensor>& gradField =
-    patch().lookupPatchField<volTensorField, tensor>("grad("+fieldName_+")");
-  // current Cauchy traction for nonlinear
-  const vectorField curTrac =
-      tractionBoundaryGradient().traction
-      (
-          gradField,
-          fieldName_,
-          patch(),
-          orthotropic_,
-          word(nonLinearGeometry::nonLinearNames_[nonLinear_])
-      );
+    // average force
+    const fvPatchField<tensor>& gradField =
+        patch().lookupPatchField<volTensorField, tensor>
+        (
+            "grad(" + fieldName_ + ")"
+        );
 
-  vectorField Sf = patch().Sf();
-  if (nonLinear_ != nonLinearGeometry::OFF
-      && nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
+    // current Cauchy traction for nonlinear
+    bool incremental(fieldName_ == "DU");
+
+    const vectorField curTrac =
+        tractionBoundaryGradient::traction
+        (
+            gradField,
+            fieldName_,
+            "U",
+            patch(),
+            orthotropic_,
+            nonLinear_,
+            incremental
+        );
+
+    vectorField Sf = patch().Sf();
+    if
+    (
+        nonLinear_ != nonLinearGeometry::OFF
+     && nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN
+    )
     {
-      // current areas
-      const fvPatchField<tensor>& gradU =
-        patch().lookupPatchField<volTensorField, tensor>("grad(U)");
-      tensorField F = I + gradField + gradU;
-      tensorField Finv = inv(F);
-      scalarField J = det(F);
-      Sf = J*(Finv & Sf);
-    }
-  const scalarField magSf = mag(Sf);
-
-  const vectorField curForce = magSf * curTrac;
-
-  const fvPatchField<symmTensor>& oldSigma =
-    patch().lookupPatchField<volSymmTensorField, symmTensor>("sigma_0");
-
-  vectorField oldSf = patch().Sf();
-  if (nonLinear_ != nonLinearGeometry::OFF)
-    {
-      // current areas
-      //tensorField F = I + gradField;
-      if (nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
-        {
-          const fvPatchField<tensor>& gradU =
+        // current areas
+        const fvPatchField<tensor>& gradU =
             patch().lookupPatchField<volTensorField, tensor>("grad(U)");
-          tensorField F = I + gradU;
-          tensorField Finv = inv(F);
-          scalarField J = det(F);
-          // rotate initial reference area to area of previous time-step
-          oldSf = J*(Finv & Sf);
-        }
-      else if (nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
+        tensorField F = I + gradField + gradU;
+        tensorField Finv = inv(F);
+        scalarField J = det(F);
+        Sf = J*(Finv & Sf);
+    }
+    const scalarField magSf = mag(Sf);
+
+    const vectorField curForce = magSf*curTrac;
+
+    const fvPatchField<symmTensor>& oldSigma =
+        patch().lookupPatchField<volSymmTensorField, symmTensor>("sigma_0");
+
+    vectorField oldSf = patch().Sf();
+    if (nonLinear_ != nonLinearGeometry::OFF)
+    {
+        // current areas
+        //tensorField F = I + gradField;
+        if (nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
         {
-          tensorField F = I + gradField;
-          tensorField Finv = inv(F);
-          scalarField J = det(F);
-          // rotate current area to area of previous time-step
-          oldSf = (F & Sf)/J;
+            const fvPatchField<tensor>& gradU =
+                patch().lookupPatchField<volTensorField, tensor>("grad(U)");
+            tensorField F = I + gradU;
+            tensorField Finv = inv(F);
+            scalarField J = det(F);
+            // rotate initial reference area to area of previous time-step
+            oldSf = J*(Finv & Sf);
         }
-      else
+        else if (nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
         {
-          FatalError << "solidContact::Qc() nonLinear type not known!"
-                     << exit(FatalError);
+            tensorField F = I + gradField;
+            tensorField Finv = inv(F);
+            scalarField J = det(F);
+            // rotate current area to area of previous time-step
+            oldSf = (F & Sf)/J;
+        }
+        else
+        {
+            FatalError << "solidContact::Qc() nonLinear type not known!"
+                << exit(FatalError);
         }
     }
 
-  const vectorField oldForce = oldSf & oldSigma;
-  const vectorField avForce = 0.5*(oldForce + curForce);
+    const vectorField oldForce = oldSf & oldSigma;
+    const vectorField avForce = 0.5*(oldForce + curForce);
 
-  // Increment of dissiptaed frictional energy for this timestep
-  Qc = mag(0.5*(avForce & curDU));
+    // Increment of dissiptaed frictional energy for this timestep
+    Qc = mag(0.5*(avForce & curDU));
 
-  return tQc;
+    return tQc;
 }
 
 

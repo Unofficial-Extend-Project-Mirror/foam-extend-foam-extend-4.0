@@ -80,6 +80,7 @@ then
 fi
 
 # build ThirdParty sources that depend on main installation
+export WM_NCOMPPROCS=1
 ( cd $WM_THIRD_PARTY_DIR && ./AllMake.post )
 
 # ----------------------------------------------------------------- end-of-file

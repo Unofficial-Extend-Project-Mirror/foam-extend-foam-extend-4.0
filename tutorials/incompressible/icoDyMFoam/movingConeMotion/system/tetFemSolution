@@ -18,14 +18,14 @@ solvers
 {
     motionU
     {
-        solver           PCG;
-        preconditioner   DIC;
+        solver           CG;
+        preconditioner   Cholesky;
 
         minIter          0;
         maxIter          1000;
         tolerance        1e-6;
-        relTol           0.01;
-    };
+        relTol           0.0;
+    }
 //     motionU
 //     {
 //         solver          amgSolver;
@@ -43,7 +43,7 @@ solvers
 //         maxIter         500;
 //         tolerance       1e-8;
 //         relTol          0.0;
-//     };
+//     }
 }
 
 // ************************************************************************* //

@@ -129,6 +129,15 @@ public:
 
     // Member functions
 
+        // Access
+
+            //- Return access to cyclic ggi patch
+            const cyclicGgiFvPatch& cyclicGgiPatch() const
+            {
+                return cyclicGgiPatch_;
+            }
+
+
         // Evaluation functions
 
             //- Return neighbour field

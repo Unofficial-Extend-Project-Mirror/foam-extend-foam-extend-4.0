@@ -14,7 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application icoDyMFoam;
+application     icoDyMFoam;
 
 startFrom       startTime;
 
@@ -28,7 +28,7 @@ deltaT          2e-05;
 
 writeControl    timeStep;
 
-writeInterval   10;
+writeInterval   1;
 
 purgeWrite      0;
 

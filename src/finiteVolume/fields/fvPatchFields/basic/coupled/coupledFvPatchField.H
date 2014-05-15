@@ -213,6 +213,7 @@ public:
                     "(Field<Type>& f) const"
                 );
             }
+
             //- Initialise neighbour matrix update
             virtual void initInterfaceMatrixUpdate
             (

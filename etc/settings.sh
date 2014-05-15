@@ -1,3 +1,4 @@
+#!/bin/bash
 #----------------------------------*-sh-*--------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
@@ -343,6 +344,42 @@ SYSTEMOPENMPI)
     unset mpi_version
     ;;
 
+MVAPICH2)
+    mpi_version=mvapich2
+
+    if [ -n "${MVAPICH2_BIN_DIR}" ] && [ -d "${MVAPICH2_BIN_DIR}" ]
+    then
+        _foamAddPath $MVAPICH2_BIN_DIR
+    else
+        MVAPICH2_BIN_DIR=$(dirname `which mpicc`)
+    fi
+
+    if which mpicc >/dev/null
+    then
+        mpicc -v 2>/dev/null | grep -q "mpicc for MVAPICH2" ||
+            echo "Warning: `which mpicc` does not appear to be for MVAPICH2"
+    else
+        echo "Warning: mpicc not available"
+    fi
+
+    export MPI_HOME=`dirname $MVAPICH2_BIN_DIR`
+    export MPI_ARCH_PATH=$MPI_HOME
+
+    export PINC="`mpicc -show -cc= -nativelinking`"
+    export PLIBS="`mpicc -show -cc= | sed "s%$PINC%%"`"
+
+    if [ "$FOAM_VERBOSE" -a "$PS1" ]
+    then
+        echo "  Environment variables defined for MVAPICH2:"
+        echo "    MPI_ARCH_PATH         : $MPI_ARCH_PATH"
+        echo "    PINC                  : $PINC"
+        echo "    PLIBS                 : $PLIBS"
+    fi
+
+    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
+    unset mpi_version
+    ;;
+
 MPICH)
     mpi_version=mpich-1.2.4
     export MPI_HOME=$WM_THIRD_PARTY_DIR/$mpi_version
@@ -593,8 +630,8 @@ export MPI_BUFFER_SIZE
 
 # Load QT
 # ~~~~~~~
-[ ! -z "$QT_THIRD_PARTY" ] && [ -e $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.4/platforms/$WM_OPTIONS ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.7.4/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.7.4.sh
+[ ! -z "$QT_THIRD_PARTY" ] && [ -e $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.8.5/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.8.5/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.8.5.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    QT_DIR is initialized to: $QT_DIR"
 

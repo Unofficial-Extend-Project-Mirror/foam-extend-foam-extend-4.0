@@ -181,8 +181,7 @@ Foam::oppositeFace Foam::cell::opposingFace
                             }
                         }
 
-                        // None of them matches, return a failure
-                        return oppositeFace(face(0), masterFaceLabel, oppFaceLabel);
+                        // Removed: fails normal layering.  HJ, 10/Feb/2014
                     }
                 }
             }

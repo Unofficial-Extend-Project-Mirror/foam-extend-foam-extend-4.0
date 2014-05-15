@@ -72,7 +72,8 @@ Foam::wallDistData<TransferType>::~wallDistData()
 template<class TransferType>
 void Foam::wallDistData<TransferType>::correct()
 {
-  Info<< "wallDistData.correct() called" << endl;
+    Info<< "wallDistData.correct() called" << endl;
+
     const polyMesh& mesh = cellDistFuncs::mesh();
 
     //

@@ -44,14 +44,73 @@ template<class Type>
 tmp<fvMatrix<Type> >
 ddt
 (
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const word& name
 )
 {
     return fv::ddtScheme<Type>::New
     (
         vf.mesh(),
-        vf.mesh().schemesDict().ddtScheme("ddt(" + vf.name() + ')')
+        vf.mesh().schemesDict().ddtScheme(name)
     )().fvmDdt(vf);
+}
+
+
+template<class Type>
+tmp<fvMatrix<Type> >
+ddt
+(
+    const geometricOneField&,
+    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const word& name
+)
+{
+    return fvm::ddt(vf, name);
+}
+
+
+template<class Type>
+tmp<fvMatrix<Type> >
+ddt
+(
+    const dimensionedScalar& rho,
+    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const word& name
+)
+{
+    return fv::ddtScheme<Type>::New
+    (
+        vf.mesh(),
+        vf.mesh().schemesDict().ddtScheme(name)
+    )().fvmDdt(rho, vf);
+}
+
+
+template<class Type>
+tmp<fvMatrix<Type> >
+ddt
+(
+    const volScalarField& rho,
+    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const word& name
+)
+{
+    return fv::ddtScheme<Type>::New
+    (
+        vf.mesh(),
+        vf.mesh().schemesDict().ddtScheme(name)
+    )().fvmDdt(rho, vf);
+}
+
+
+template<class Type>
+tmp<fvMatrix<Type> >
+ddt
+(
+    GeometricField<Type, fvPatchField, volMesh>& vf
+)
+{
+    return fvm::ddt(vf, "ddt(" + vf.name() + ')');
 }
 
 
@@ -63,7 +122,7 @@ ddt
     GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
-    return ddt(vf);
+    return fvm::ddt(vf);
 }
 
 
@@ -75,14 +134,7 @@ ddt
     GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
-    return fv::ddtScheme<Type>::New
-    (
-        vf.mesh(),
-        vf.mesh().schemesDict().ddtScheme
-        (
-            "ddt(" + rho.name() + ',' + vf.name() + ')'
-        )
-    )().fvmDdt(rho, vf);
+    return fvm::ddt(rho, vf, "ddt(" + rho.name() + ',' + vf.name() + ')');
 }
 
 
@@ -94,14 +146,7 @@ ddt
     GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
-    return fv::ddtScheme<Type>::New
-    (
-        vf.mesh(),
-        vf.mesh().schemesDict().ddtScheme
-        (
-            "ddt(" + rho.name() + ',' + vf.name() + ')'
-        )
-    )().fvmDdt(rho, vf);
+    return fvm::ddt(rho, vf, "ddt(" + rho.name() + ',' + vf.name() + ')');
 }
 
 

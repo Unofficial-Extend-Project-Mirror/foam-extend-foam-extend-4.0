@@ -1,0 +1,55 @@
+Below are build instructions for Fedora 19: 
+
+These instructions assume that you install in the default location, which is 
+~/foam/ . Create this folder with:
+
+    cd ~
+    mkdir foam
+
+
+* Obtain and unpack source code (if you read this, you probably already have):
+
+The recommended way is to get the source code through git source code 
+management system. This way, you can get updates and bugfixes easily by running
+"git pull". To install into the default location run: 
+
+    cd ~/foam
+    git clone git://git.code.sf.net/p/openfoam-extend/foam-extend-3.0 
+
+
+Alternatively, you can download a snapshot (.tgz) of the source code from:
+http://sourceforge.net/projects/openfoam-extend/files/foam-extend-3.0/
+
+
+* Install required packages:
+
+    sudo yum groupinstall "Development Tools"
+    sudo yum install gcc-c++ binutils-devel bison flex m4 zlib-devel \
+    qt-devel qtwebkit-devel mercurial
+
+* Set environment variables:
+
+    cd ~/foam/foam-extend-3.0
+    . etc/bashrc
+
+Optionally, set environment variable for Qt to compile ParaView: 
+
+    export QT_BIN_DIR=/usr/lib64/qt4/bin
+
+Optionally, set environment variable for compiling Cuda solvers, for example
+(replace "sm_30" with value according to your GPU architecture): 
+
+    export CUDA_ARCH=sm_30
+
+
+* Compile:
+
+    ./Allwmake.firstInstall
+
+
+* Create user directory:
+
+    mkdir -p $FOAM_RUN
+
+
+And you are ready to start.

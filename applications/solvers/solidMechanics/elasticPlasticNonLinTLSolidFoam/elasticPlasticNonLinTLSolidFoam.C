@@ -66,114 +66,116 @@ int main(int argc, char *argv[])
       scalar initialResidual = 0;
       lduMatrix::solverPerformance solverPerf;
       scalar relativeResidual = GREAT;
-      lduMatrix::debug=0;
+      lduMatrix::debug = 0;
 
       do
-        {
-            DU.storePrevIter();
+      {
+          DU.storePrevIter();
 
 #         include "calculateDivDSigmaExp.H"
 #         include "calculateDivDSigmaNonLinExp.H"
 
-            // Incremental form of the
-            // linear momentum conservation
-            // ensuring conservation of total momentum
-            fvVectorMatrix DUEqn
-                (
-                    fvm::d2dt2(rho, DU)
-                    ==
-                    fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
-                    + divDSigmaExp
-                    + divDSigmaNonLinExp
-                    //- fvc::div(2*mu*DEpsilonP, "div(sigma)")
-                    - fvc::div
-                    (
-                        2*muf*( mesh.Sf() & fvc::interpolate(DEpsilonP))
-                        )
-                    );
+          // Incremental form of the
+          // linear momentum conservation
+          // ensuring conservation of total momentum
+          fvVectorMatrix DUEqn
+          (
+              fvm::d2dt2(rho, DU)
+           ==
+              fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
+            + divDSigmaExp
+            + divDSigmaNonLinExp
+          //- fvc::div(2*mu*DEpsilonP, "div(sigma)")
+            - fvc::div
+              (
+                  2*muf*(mesh.Sf() & fvc::interpolate(DEpsilonP))
+              )
+          );
 
-            if (largeStrainOverRelax)
-            {
-                // the terms (gradDU & gradU.T()) and (gradU & gradDU.T())
-                // are linearly dependent of DU and represent initial
-                // displacement effect
-                // which can cause convergence difficulties when treated
-                // explicitly
-                // so we implicitly over-relax with gradU & gradDU here
-                // which tends to help convergence
-                // this should improve convergence when gradU is large
-                // but maybe not execution time
-                DUEqn -=
-                    fvm::laplacian
-                    (
-                        (2*mu + lambda)*gradU, DU, "laplacian(DDU,DU)"
-                        )
-                    - fvc::div( (2*mu + lambda)*(gradU&gradDU), "div(sigma)");
-        }
+          if (largeStrainOverRelax)
+          {
+              // the terms (gradDU & gradU.T()) and (gradU & gradDU.T())
+              // are linearly dependent of DU and represent initial
+              // displacement effect
+              // which can cause convergence difficulties when treated
+              // explicitly
+              // so we implicitly over-relax with gradU & gradDU here
+              // which tends to help convergence
+              // this should improve convergence when gradU is large
+              // but maybe not execution time
+              DUEqn -=
+                  fvm::laplacian
+                  (
+                      (2*mu + lambda)*gradU, DU, "laplacian(DDU,DU)"
+                  )
+                - fvc::div((2*mu + lambda)*(gradU & gradDU), "div(sigma)");
+          }
 
-            if (nonLinearSemiImplicit)
-            {
-                // experimental
-                // we can treat the nonlinear term (gradDU & gradDU.T()) in a
-                // semi-implicit over-relaxed manner
-                // this should improve convergence when gradDU is large
-                // but maybe not execution time
-                DUEqn -=
-                    fvm::laplacian
-                    (
-                        (2*mu + lambda)*gradDU, DU, "laplacian(DDU,DU)"
-                        )
-                    - fvc::div( (2*mu + lambda)*(gradDU&gradDU), "div(sigma)");
-        }
+          if (nonLinearSemiImplicit)
+          {
+              // experimental
+              // we can treat the nonlinear term (gradDU & gradDU.T()) in a
+              // semi-implicit over-relaxed manner
+              // this should improve convergence when gradDU is large
+              // but maybe not execution time
+              DUEqn -=
+                  fvm::laplacian
+                  (
+                      (2*mu + lambda)*gradDU, DU, "laplacian(DDU,DU)"
+                  )
+                - fvc::div((2*mu + lambda)*(gradDU & gradDU), "div(sigma)");
+          }
 
-            solverPerf = DUEqn.solve();
+          solverPerf = DUEqn.solve();
 
-            if (iCorr == 0)
-            {
-                initialResidual = solverPerf.initialResidual();
-            }
+          if (iCorr == 0)
+          {
+              initialResidual = solverPerf.initialResidual();
+          }
 
-            if (aitkenRelax)
-            {
+          if (aitkenRelax)
+          {
 #             include "aitkenRelaxation.H"
-            }
-            else
-            {
-                DU.relax();
-            }
+          }
+          else
+          {
+              DU.relax();
+          }
 
-            gradDU = fvc::grad(DU);
+          gradDU = fvc::grad(DU);
 
-            // correct plasticty term
-            rheology.correct();
+          // correct plasticty term
+          rheology.correct();
 
 #         include "calculateDEpsilonDSigma.H"
 #         include "calculateRelativeResidual.H"
 
-            if (iCorr % infoFrequency == 0)
-            {
-                Info << "\tTime " << runTime.value()
-                     << ", Corrector " << iCorr
-                     << ", Solving for " << DU.name()
-                     << " using " << solverPerf.solverName()
-                     << ", res = " << solverPerf.initialResidual()
-                     << ", rel res = " << relativeResidual;
-                if (aitkenRelax)
-                {
-                    Info << ", aitken = " << aitkenTheta;
-                }
-                Info << ", iters = " << solverPerf.nIterations() << endl;
-            }
-        }
+          if (iCorr % infoFrequency == 0)
+          {
+              Info<< "\tTime " << runTime.value()
+                  << ", Corrector " << iCorr
+                  << ", Solving for " << DU.name()
+                  << " using " << solverPerf.solverName()
+                  << ", res = " << solverPerf.initialResidual()
+                  << ", rel res = " << relativeResidual;
+
+              if (aitkenRelax)
+              {
+                  Info << ", aitken = " << aitkenTheta;
+              }
+              Info << ", iters = " << solverPerf.nIterations() << endl;
+          }
+      }
       while
+      (
+          iCorr++ == 0
+       ||
           (
-              iCorr++ == 0
-              ||
-              (//solverPerf.initialResidual() > convergenceTolerance
-                  relativeResidual > convergenceTolerance
-                  &&
-                  iCorr < nCorr)
-              );
+              //solverPerf.initialResidual() > convergenceTolerance
+              relativeResidual > convergenceTolerance
+           && iCorr < nCorr
+          )
+      );
 
       Info<< nl << "Time " << runTime.value() << ", Solving for " << DU.name()
           << ", Initial residual = " << initialResidual

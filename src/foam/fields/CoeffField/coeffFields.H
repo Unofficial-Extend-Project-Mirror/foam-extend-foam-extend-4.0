@@ -37,8 +37,10 @@ Author
 
 #include "scalarCoeffField.H"
 #include "sphericalTensorCoeffField.H"
+#include "diagTensorCoeffField.H"
 #include "symmTensorCoeffField.H"
 #include "tensorCoeffField.H"
+#include "symmTensor4thOrderCoeffField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,8 +52,10 @@ namespace Foam
 typedef CoeffField<scalar> scalarCoeffField;
 typedef CoeffField<vector> vectorCoeffField;
 typedef CoeffField<sphericalTensor> sphericalTensorCoeffField;
+typedef CoeffField<symmTensor> diagTensorCoeffField;
 typedef CoeffField<symmTensor> symmTensorCoeffField;
 typedef CoeffField<tensor> tensorCoeffField;
+typedef CoeffField<symmTensor4thOrder> symmTensor4thOrderCoeffField;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

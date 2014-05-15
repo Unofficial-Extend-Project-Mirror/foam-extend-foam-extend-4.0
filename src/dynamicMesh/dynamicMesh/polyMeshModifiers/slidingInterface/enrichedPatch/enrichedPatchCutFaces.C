@@ -238,18 +238,21 @@ void Foam::enrichedPatch::calcCutFaces() const
                             (magNewDir - magCorrNewDir)/magNewDir;
 //                         Pout << " corrected: " << corrNewDir << " mag: " << magCorrNewDir << " out of plane: " << outOfPlane << flush;
 
+                        // Bug fix for cutting around corners
+                        // ZT, 5 May 2014
                         if (magCorrNewDir < SMALL)
                         {
-                            FatalErrorIn
-                            (
-                                "void enrichedPatch::"
-                                "calcCutFaces() const"
-                            )   << "Zero length edge detected.  Probable "
-                                << "projection error: slave patch probably "
-                                << "does not project onto master.  "
-                                << "Please switch on "
-                                << "enriched patch debug for more info"
-                                << abort(FatalError);
+                            continue;
+//                             FatalErrorIn
+//                             (
+//                                 "void enrichedPatch::"
+//                                 "calcCutFaces() const"
+//                             )   << "Zero length edge detected.  Probable "
+//                                 << "projection error: slave patch probably "
+//                                 << "does not project onto master.  "
+//                                 << "Please switch on "
+//                                 << "enriched patch debug for more info"
+//                                 << abort(FatalError);
                         }
 
                         corrNewDir /= magCorrNewDir;
