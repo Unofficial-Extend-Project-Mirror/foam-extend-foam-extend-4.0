@@ -4,12 +4,29 @@
 Vagrant.configure("2") do |config|
   config.vm.synced_folder "..", "/FOAM-sources"
 
+  config.vm.hostname="vagrant."+ENV["HOSTNAME"]
+
+  nrCPU=1
+  if ENV["WM_VAGRANT_CPUS"]
+    nrCPU=ENV["WM_VAGRANT_CPUS"].to_i
+  else
+    if ENV["WM_NCOMPPROCS"]
+      nrCPU=ENV["WM_NCOMPPROCS"].to_i/2
+    end
+  end
+  if nrCPU<1
+    nrCPU=1
+  end
+
   config.vm.provider :virtualbox do |vb|
     #   # Don't boot with headless mode
     #   vb.gui = true
     #
     #   # Use VBoxManage to customize the VM. For example to change memory:
-    vb.customize ["modifyvm", :id, "--memory", "1024"]
+    #     vb.customize ["modifyvm", :id, "--memory", "1024"]
+    vb.cpus=nrCPU
+    # make sure each CPU has enough memory
+    vb.memory=512*(1+nrCPU)
   end
 
   # default
