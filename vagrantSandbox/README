@@ -73,7 +73,8 @@
   In the home directory these scripts are found
   - bootstrapFoam.sh :: A script whose aim it is to compile Foam and
        the ThirdParty-packages in one go (no paraview and QT). If this
-       works the box is considered operational
+       works the box is considered operational. The script leaves a
+       log file =bootstrapFoam-log= in the home directory
 * Provisioning scripts
   Every "family" of machines has a specific script that makes sure
   that the software packages necessary to compile =Foam= are installed
