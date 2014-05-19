@@ -578,7 +578,7 @@ tmp<pointField> GGIInterpolation<MasterPatch, SlavePatch>::projectPointsOnPlane
 
     scalarField dist(lpoints.size(), 0.0);
 
-    if (lpoints.size() > 3)
+    if (lpoints.size() > 3 && mag(normalVector) > SMALL)
     {
         // Construct the plane
         plane projectionPlane(planeOrig, normalVector);
