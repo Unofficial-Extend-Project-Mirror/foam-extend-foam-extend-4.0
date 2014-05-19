@@ -1,14 +1,14 @@
 if(divSigmaExpMethod == "standard")
-  {
+{
     divSigmaExp = fvc::div
       (
        mu*gradU.T() + lambda*(I*tr(gradU)) - (mu + lambda)*gradU,
        "div(sigma)"
        )
       - gradThreeKalphaDeltaT;
-  }
- else if(divSigmaExpMethod == "surface")
-   { 
+}
+else if(divSigmaExpMethod == "surface")
+{ 
      divSigmaExp = fvc::div
        (
 	muf*(mesh.Sf() & fvc::interpolate(gradU.T()))
@@ -16,27 +16,27 @@ if(divSigmaExpMethod == "standard")
 	- (muf + lambdaf)*(mesh.Sf() & fvc::interpolate(gradU))
 	- threeKalphaDeltaTf
 	);
-   }
- else if(divSigmaExpMethod == "decompose")
-   {
-     snGradU = fvc::snGrad(U);
+}
+else if(divSigmaExpMethod == "decompose")
+{
+    snGradU = fvc::snGrad(U);
 
-     surfaceTensorField shearGradU =
-       ((I - n*n)&fvc::interpolate(gradU));
+    surfaceTensorField shearGradU =
+        ((I - n*n)&fvc::interpolate(gradU));
      
-     divSigmaExp = fvc::div
-       (
-	(
-	 mesh.magSf()
-	 *(
-	   - (muf + lambdaf)*(snGradU&(I - n*n))
-	   + lambdaf*tr(shearGradU&(I - n*n))*n
-	   + muf*(shearGradU&n)
-	   )
-	 )
-	- threeKalphaDeltaTf	  
+    divSigmaExp = fvc::div
+    (
+        (
+            mesh.magSf()*
+            (
+                - (muf + lambdaf)*(snGradU & (I - n*n))
+                + lambdaf*tr(shearGradU & (I - n*n))*n
+                + muf*(shearGradU & n)
+            )
+        )
+      - threeKalphaDeltaTf	  
 	);
-   }
+}
 /* else if(divSigmaExpMethod == "expLaplacian")
    {
      divSigmaExp =
@@ -48,7 +48,8 @@ if(divSigmaExpMethod == "standard")
 	"div(sigma)"
 	);
 	}*/
- else
-   {
-     FatalError << "divSigmaExp method " << divSigmaExpMethod << " not found!" << endl;
-   }
+else
+{
+    FatalErrorIn(args.executable())
+        << "divSigmaExp method " << divSigmaExpMethod << " not found!" << endl;
+}
