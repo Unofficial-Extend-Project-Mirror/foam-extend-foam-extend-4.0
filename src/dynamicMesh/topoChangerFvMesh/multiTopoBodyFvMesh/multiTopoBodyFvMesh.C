@@ -228,7 +228,10 @@ bool Foam::multiTopoBodyFvMesh::update()
 
     if (localMeshChanged)
     {
-//         // Map old points onto the new mesh
+        // Map old points onto the new mesh
+        // Not needed: only a single motion in time-step so old points
+        // are already in the correct postion for mesh motion.
+        // HJ, 19/May/2014
 //         pointField mappedOldPointsNew(allPoints().size());
 //         mappedOldPointsNew.map(oldPointsNew, topoChangeMap->pointMap());
 
