@@ -187,6 +187,12 @@ void Foam::ggiPolyPatch::calcPatchToPatch() const
 
     if (master())
     {
+        if (debug)
+        {
+            InfoIn("void ggiPolyPatch::calcPatchToPatch() const")
+                << "Calculating patch to patch interpolation" << endl;
+        }
+
         // Create interpolation for zones
         patchToPatchPtr_ =
             new ggiZoneInterpolation
