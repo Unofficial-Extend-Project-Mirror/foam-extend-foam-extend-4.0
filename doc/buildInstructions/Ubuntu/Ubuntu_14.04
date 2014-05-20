@@ -1,4 +1,4 @@
-Below are build instructions for Fedora 19: 
+Below are build instructions for Ubuntu 14.04.
 
 These instructions assume that you install in the default location, which is 
 ~/foam/ . Create this folder with:
@@ -23,9 +23,13 @@ http://sourceforge.net/projects/openfoam-extend/files/foam-extend-3.0/
 
 * Install required packages:
 
-    sudo yum groupinstall "Development Tools"
-    sudo yum install gcc-c++ binutils-devel bison flex m4 zlib-devel \
-    qt-devel qtwebkit-devel mercurial graphviz
+    sudo apt-get install git-core build-essential binutils-dev flex bison \ 
+    zlib1g-dev qt4-dev-tools libqt4-dev libncurses5-dev libiberty-dev \
+    libxt-dev rpm mercurial graphviz
+
+Make an additional link:
+
+    sudo ln -s /usr/bin/make /usr/bin/gmake
 
 * Set environment variables:
 
@@ -34,7 +38,7 @@ http://sourceforge.net/projects/openfoam-extend/files/foam-extend-3.0/
 
 Optionally, set environment variable for Qt to compile ParaView: 
 
-    export QT_BIN_DIR=/usr/lib64/qt4/bin
+    export QT_BIN_DIR=/usr/bin
 
 Optionally, set environment variable for compiling Cuda solvers, for example
 (replace "sm_30" with value according to your GPU architecture): 
