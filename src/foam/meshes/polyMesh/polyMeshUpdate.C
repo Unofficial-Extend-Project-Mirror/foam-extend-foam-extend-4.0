@@ -36,7 +36,8 @@ Description
 
 void Foam::polyMesh::updateMesh(const mapPolyMesh& mpm)
 {
-    // Update zones
+    // Update zones.  Since boundary depends on zones, they need to be
+    // updated first.  HJ, 20/May/2014
     pointZones_.updateMesh();
     faceZones_.updateMesh();
     cellZones_.updateMesh();
@@ -83,13 +84,14 @@ void Foam::polyMesh::updateMesh(const mapPolyMesh& mpm)
 // Sync mesh update with changes on other processors
 void Foam::polyMesh::syncUpdateMesh()
 {
-    // Update boundaryMesh (note that patches themselves already ok)
-    boundary_.updateMesh();
-
-    // Update zones
+    // Update zones.  Since boundary depends on zones, they need to be
+    // updated first.  HJ, 20/May/2014
     pointZones_.updateMesh();
     faceZones_.updateMesh();
     cellZones_.updateMesh();
+
+    // Update boundaryMesh (note that patches themselves already ok)
+    boundary_.updateMesh();
 
     // Clear out parallel data.  HJ, 27/Nov/2009
     deleteDemandDrivenData(globalMeshDataPtr_);
