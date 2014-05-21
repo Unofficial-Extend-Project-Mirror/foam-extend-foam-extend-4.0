@@ -225,9 +225,6 @@ Darwin)
     # this makes certain things easier
     export WM_ARCH_BASE=darwin
 
-    # Remove limit of open files
-    ulimit -n 1000
-
     case `uname -p` in
     powerpc)
         export WM_ARCH=darwinPpc
@@ -258,109 +255,113 @@ Darwin)
     ;;
     esac
 
-    # Make sure that binaries use the best features of the used OS-Version
-    # We need to get rid of the revision number from this string. eg turn "10.7.5" into "10.7"
-    export MACOSX_DEPLOYMENT_TARGET=`sw_vers -productVersion | sed -e "s/\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)/\1.\2/g"`
-
     which -s port >/dev/null
     if [ $? -eq "0" -a -d '/opt/local/etc/macports' ]
     then
-       if [ "$FOAM_VERBOSE" -a "$PS1" ]
-       then
-           echo "Using Macports binaries"
-       fi
+	if [ "$FOAM_VERBOSE" -a "$PS1" ]
+	then
+	    echo "Using Macports binaries"
+	fi
 
-       export WM_USE_MACPORT=1
+	export WM_USE_MACPORT=1
+	export WM_BASE_COMPILER=`echo $WM_COMPILER | tr -d "[:digit:]"`
+	export WM_MACPORT_MPI_VERSION=`echo $WM_COMPILER | tr "[:upper:]" "[:lower:]"`
+	export WM_MACPORT_VERSION=`echo $WM_MACPORT_MPI_VERSION | tr -d "[:alpha:]" | sed -e "s/\(.\)\(.\)/\1\.\2/"`
 
-       if [ -e '/opt/local/bin/openmpicc' ]
-       then
-           export WM_MPLIB=MACPORTOPENMPI
-       else
-           if [ -z "$WM_CHOSEN_MAC_MPI" ]
-           then
-               echo "WM_CHOSEN_MAC_MPI unset. Using OPENMPI"
-               export WM_MPLIB=OPENMPI
-           else
-               export WM_MPLIB=$WM_CHOSEN_MAC_MPI
-           fi
-        fi
+	if [ -z "$WM_CHOSEN_MAC_MPI" ]
+	then
+	    if [ -e '/opt/local/bin/mpicc' ]
+	    then
+		readlink /opt/local/bin/mpicc | grep openmpi >/dev/null
+		if [ $? -eq "0" ]
+		then
+		    export WM_MPLIB=MACPORTOPENMPI
+		    if [ "$FOAM_VERBOSE" -a "$PS1" ]
+		    then
+			echo "Using OpenMPI from MacPorts"
+		    fi
+		else
+		    readlink /opt/local/bin/mpicc | grep mpich >/dev/null
+		    if [ $? -eq "0" ]
+		    then
+			export WM_MPLIB=MACPORTMPICH
+			if [ "$FOAM_VERBOSE" -a "$PS1" ]
+			then
+			    echo "Using MPICH from MacPorts"
+			fi
+		    else
+			echo "/opt/local/bin/mpicc neither OpenMPI nor MPICH. Confused. Defaulting to OPENMPI"
+			export WM_MPLIB=OPENMPI
+		    fi
+		fi
+	    fi
+	else
+	    export WM_MPLIB=$WM_CHOSEN_MAC_MPI
+	    if [ "$FOAM_VERBOSE" -a "$PS1" ]
+	    then
+		echo "User chose WM_CHOSEN_MAC_MPI=$WM_CHOSEN_MAC_MPI"
+	    fi
+	fi
 
-       if [ "$compilerInstall" == "System" ]
-       then
-           # Use Mac-Ports-Compiler instead of Apple-gcc-4.2
-	   case $WM_COMPILER in
-               Gcc42)
-		   export WM_MACPORT_VERSION=4.2
-                   export WM_BASE_COMPILER=Gcc
-		   ;;
-               Gcc43)
-		   export WM_MACPORT_VERSION=4.3
-                   export WM_BASE_COMPILER=Gcc
-		   ;;
-               Gcc44)
-		   export WM_MACPORT_VERSION=4.4
-                   export WM_BASE_COMPILER=Gcc
-		   ;;
-               Gcc45)
-		   export WM_MACPORT_VERSION=4.5
-                   export WM_BASE_COMPILER=Gcc
-		   ;;
-               Gcc46)
-		   export WM_MACPORT_VERSION=4.6
-                   export WM_BASE_COMPILER=Gcc
-		   ;;
-               Gcc47)
-		   export WM_MACPORT_VERSION=4.7
-                   export WM_BASE_COMPILER=Gcc
-		   ;;
-               Gcc48)
-		   export WM_MACPORT_VERSION=4.8
-                   export WM_BASE_COMPILER=Gcc
-		   ;;
-               Clang32)
-                   export WM_BASE_COMPILER=Clang
-                   export WM_MACPORT_VERSION=3.2
-                   ;;
-               Clang33)
-                   export WM_BASE_COMPILER=Clang
-                   export WM_MACPORT_VERSION=3.3
-                ;;
-               Clang34)
-                   export WM_BASE_COMPILER=Clang
-                   export WM_MACPORT_VERSION=3.4
-                ;;
-               Gcc)
-		   ;;
-               *)
-		   echo "Unsupported MacPorts-Compiler $WM_COMPILER"
-		   ;;
-           esac
-	   if [ "$WM_MACPORT_VERSION" != "" ]
-	   then
-               if [ "$WM_BASE_COMPILER" == "Gcc" ]
-               then
-		   export WM_CC="gcc-mp-$WM_MACPORT_VERSION"
-		   export WM_CXX="g++-mp-$WM_MACPORT_VERSION"
-                   export WM_FC="gfortran-mp-$WM_MACPORT_VERSION"
-              else
-                   export WM_CC="clang-mp-$WM_MACPORT_VERSION"
-                   export WM_CXX="clang++-mp-$WM_MACPORT_VERSION"
+	if [ "$WM_MPLIB" == "MACPORTOPENMPI" ]
+	then
+	    if [ ! -e "/opt/local/lib/openmpi-$WM_MACPORT_MPI_VERSION" ]
+	    then
+		export WM_MACPORT_MPI_VERSION=mp
+		if [ ! -e "/opt/local/lib/openmpi-$WM_MACPORT_MPI_VERSION" ]
+		then
+		    echo "Proper OpenMPI not installed. Either do 'port install openmpi-$WM_MACPORT_MPI_VERSION' or 'port install openmpi-default'"
+		fi
+	    fi
+	else
+	    if [ "$WM_MPLIB" == "MACPORTMPICH" ]
+	    then
+		if [ ! -e "/opt/local/lib/mpich-$WM_MACPORT_MPI_VERSION" ]
+		then
+		    echo "MPICH wants the same version as the used compiler. Do 'port install mpich-$WM_MACPORT_MPI_VERSION'"
+		fi
+	    fi
+	fi
 
-		   # hardcoded. Needed for ThirdParty
-                   export WM_FC="gfortran-mp-4.5"
-               fi
+	if [ "$WM_COMPILER" != "Gcc" ]
+	then
+	    if [ "$WM_BASE_COMPILER" == "Gcc" ]
+	    then
+		export WM_CC="gcc-mp-$WM_MACPORT_VERSION"
+		export WM_CXX="g++-mp-$WM_MACPORT_VERSION"
+	    elif [ "$WM_BASE_COMPILER" == "Clang" ]
+	    then
+		export WM_CC="clang-mp-$WM_MACPORT_VERSION"
+		export WM_CXX="clang++-mp-$WM_MACPORT_VERSION"
+	    elif [ "$WM_BASE_COMPILER" == "Dragonegg" ]
+	    then
+		export WM_CC="dragonegg-$WM_MACPORT_VERSION-gcc"
+		export WM_CXX="dragonegg-$WM_MACPORT_VERSION-g++"
+	    else
+		echo "Unknown base compiler $WM_BASE_COMPILER"
+	    fi
 
-	       ruleDirBase=$WM_PROJECT_DIR/wmake/rules/$WM_ARCH$WM_BASE_COMPILER
-	       ruleDir=$WM_PROJECT_DIR/wmake/rules/$WM_ARCH$WM_COMPILER
-	       if [ ! -e $ruleDir ]
-	       then
-		   echo "Rule directory $ruleDir not existing. Linking to $ruleDirBase"
-		   ln -s $ruleDirBase $ruleDir
-	       fi
-	       unset ruleDir ruleDirBase
-	   fi
-       fi
+	    ruleDirBase=$WM_PROJECT_DIR/wmake/rules/$WM_ARCH
+	    ruleDirTarget=$ruleDirBase$WM_BASE_COMPILER
+	    ruleDir=$ruleDirBase$WM_COMPILER
+	    if [ ! -e $ruleDir ]
+	    then
+		echo "Rule directory $ruleDir not existing. Linking to $ruleDirTarget"
+		ln -s $ruleDirTarget $ruleDir
+	    fi
+	    unset ruleDir ruleDirBase
+	fi
+    else
+	echo "Seems you're not using MacPorts. This is currently not supported/tested. Find this line in 'etc/config/settings.sh', modify it accordingly and send patches to Bernhard"
+        export WM_COMPILER=
+        export WM_MPLIB=OPENMPI
     fi
+
+    # Make sure that binaries use the best features of the used OS-Version
+    # We need to get rid of the revision number from this string. eg turn "10.7.5" into "10.7"
+    #    v=(`sw_vers -productVersion | sed 's/\./ /g'`)
+    #    export MACOSX_DEPLOYMENT_TARGET="${v[1]}.${v[2]}"
+    export MACOSX_DEPLOYMENT_TARGET=`sw_vers -productVersion | sed -e "s/\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)/\1.\2/g"`
     ;;
 
 SunOS)
@@ -438,6 +439,14 @@ then
     export LD_PRELOAD
 fi
 
+if [[ `uname -s` == "Darwin" ]]
+then
+    if [[ `ulimit -n` == "unlimited" || `ulimit -n` < 8192 ]]
+    then
+	# higher limit needed for wmkdeps
+	ulimit -n 8192
+    fi
+fi
 
 # cleanup environment:
 # ~~~~~~~~~~~~~~~~~~~~

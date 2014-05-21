@@ -4,27 +4,46 @@ import sys
 filename=sys.argv[1]
 address=sys.argv[2]
 import re
+from os import environ,path
 
-import subprocess
+fullFile=None
+if path.exists(filename):
+    fullFile=filename
 
-p = subprocess.Popen("gdb -batch -x /dev/stdin",
-                     shell=True,
-                     bufsize=0,
-                     stdin=subprocess.PIPE,
-                     stdout=subprocess.PIPE,
-                     close_fds=True)
+for v in ["PATH","LD_LIBRARY_PATH"]:
+    if not fullFile:
+        for d in environ[v].split(':'):
+            if path.exists(path.join(d,filename)):
+                fullFile=path.join(d,filename)
+                break
 
-(child_stdin, child_stdout) = (p.stdin, p.stdout)
-child_stdin.write("set sharedlibrary preload-libraries no\n")
-child_stdin.write("file "+filename+"\n")
-child_stdin.write("info line *"+address+"\n")
-result=child_stdout.readline()
+if not fullFile:
+    fullFile=filename
 
 answer="??:0"
 
-match=re.compile('Line (.+) of "(.+)" starts at').match(result)
-if match:
-    answer=match.group(2)+":"+match.group(1)
+if path.exists(fullFile):
+    import subprocess
+
+    result=subprocess.Popen(["xcrun", "atos",
+                             "-o",fullFile,
+                             address],
+                            stdout=subprocess.PIPE
+                        ).communicate()[0]
+    match=re.compile('.+ \((.+)\) \((.+)\)').match(result)
+    if match:
+        answer=match.group(2)+" "+match.group(1)
+    else:
+        import os
+        result=subprocess.Popen(["xcrun", "atos",
+                                 "-p",str(os.getppid()),
+                                 address],
+                                stdout=subprocess.PIPE
+                            ).communicate()[0]
+        match=re.compile('.+ \((.+)\) \((.+)\)').match(result)
+        if match:
+            answer=match.group(2)+" "+match.group(1)
+
 print answer,
 
 sys.exit(255)

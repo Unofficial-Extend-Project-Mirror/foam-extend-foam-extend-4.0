@@ -100,8 +100,8 @@ Foam::label Foam::parMetisDecomp::decompose
     }
     cellOffsets[Pstream::nProcs()] = nGlobalCells;
 
-    // Convert pointField into float
-    Field<floatScalar> xyz(3*cellCentres.size());
+    // Convert pointField into the data type parMetis expects (float or double)
+    Field<real_t> xyz(3*cellCentres.size());
     int compI = 0;
     forAll(cellCentres, cellI)
     {
@@ -139,7 +139,7 @@ Foam::label Foam::parMetisDecomp::decompose
 
         Field<int> prevXadj(fromPrevProc);
         Field<int> prevAdjncy(fromPrevProc);
-        Field<floatScalar> prevXyz(fromPrevProc);
+        Field<real_t> prevXyz(fromPrevProc);
         Field<int> prevCellWeights(fromPrevProc);
         Field<int> prevFaceWeights(fromPrevProc);
 
@@ -182,7 +182,7 @@ Foam::label Foam::parMetisDecomp::decompose
         toNextProc
             << Field<int>::subField(xadj, nCells, startCell)-startFace
             << Field<int>::subField(adjncy, nFaces, startFace)
-            << SubField<floatScalar>(xyz, nDims*nCells, nDims*startCell)
+            << SubField<real_t>(xyz, nDims*nCells, nDims*startCell)
             <<
             (
                 cellWeights.size()
@@ -267,9 +267,9 @@ Foam::label Foam::parMetisDecomp::decompose
     // Number of weights or balance constraints
     int nCon = 1;
     // Per processor, per constraint the weight
-    Field<floatScalar> tpwgts(nCon*nProcessors_, 1./nProcessors_);
+    Field<real_t> tpwgts(nCon*nProcessors_, 1./nProcessors_);
     // Imbalance tolerance
-    Field<floatScalar> ubvec(nCon, 1.02);
+    Field<real_t> ubvec(nCon, 1.02);
     if (nProcessors_ == 1)
     {
         // If only one processor there is no imbalance.

@@ -31,10 +31,13 @@ License
 #include "readHexLabel.H"
 
 #include <cxxabi.h>
-#ifndef darwin
 #include <execinfo.h>
-#endif
 #include <dlfcn.h>
+#include <string.h>
+
+#ifdef darwin
+#include <mach-o/dyld.h>
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -126,14 +129,17 @@ void printSourceFileAndLine
         myAddress = nStream.str();
     }
 
+#ifndef darwin
     if (filename[0] == '/')
+#else
+    if (1)
+#endif
     {
         string line = pOpen
         (
 #ifndef darwin
             "addr2line -f --demangle=auto --exe "
 #else
-            //            "gaddr2line -f --inline --demangle=auto --exe "
             "addr2line4Mac.py "
 #endif
           + filename
@@ -144,119 +150,22 @@ void printSourceFileAndLine
 
         if (line == "")
         {
-            os << " addr2line failed";
+            os  << " addr2line failed";
         }
         else if (line == "??:0")
         {
-            os << " in " << filename;
+            os  << " in " << filename;
         }
         else
         {
             string cwdLine(line.replaceAll(cwd() + '/', ""));
-
             string homeLine(cwdLine.replaceAll(home(), '~'));
 
-            os << " at " << homeLine.c_str();
+            os  << " at " << homeLine.c_str();
         }
     }
 }
 
-#ifdef darwin
-
-// Trying to emulate the original backtrace and backtrace_symbol from the glibc
-// After an idea published by Rush Manbert at http://lists.apple.com/archives/xcode-users/2006/Apr/msg00528.html
-
-template<int level>
-void *getStackAddress()
-{
-    const unsigned int stackLevel=level;
-    return (
-        __builtin_frame_address(level)
-        ? __builtin_return_address(stackLevel)
-        : (void *)0
-    );
-};
-
-#define GET_STACK_ADDRESS(lvl)              \
-    case lvl: {return getStackAddress<lvl>(); break; }
-
-// please don't laugh. For some reason this is necessary (the compiler won't accept it otherwise)
-void *getStackAddress(int level)
-{
-    switch(level) {
-        GET_STACK_ADDRESS(0);
-        GET_STACK_ADDRESS(1);
-        GET_STACK_ADDRESS(2);
-        GET_STACK_ADDRESS(3);
-        GET_STACK_ADDRESS(4);
-        GET_STACK_ADDRESS(5);
-        GET_STACK_ADDRESS(6);
-        GET_STACK_ADDRESS(7);
-        GET_STACK_ADDRESS(8);
-        GET_STACK_ADDRESS(9);
-        GET_STACK_ADDRESS(10);
-        GET_STACK_ADDRESS(11);
-        GET_STACK_ADDRESS(12);
-        GET_STACK_ADDRESS(13);
-        GET_STACK_ADDRESS(14);
-        GET_STACK_ADDRESS(15);
-        GET_STACK_ADDRESS(16);
-        GET_STACK_ADDRESS(17);
-        GET_STACK_ADDRESS(18);
-        GET_STACK_ADDRESS(19);
-        GET_STACK_ADDRESS(20);
-        GET_STACK_ADDRESS(21);
-        default:
-            return (void *)0;
-            break;
-    }
-}
-
-unsigned backtrace(void **bt, unsigned maxAddrs)
-{
-    unsigned valid=0;
-    bool ok=true;
-
-    for(int level=0;level<maxAddrs;level++) {
-        if(ok) {
-            bt[level]=getStackAddress(level);
-
-            if(bt[level]!=(void *)0) {
-                valid=level;
-            } else {
-                ok=false;
-            }
-        } else {
-            bt[level]=(void *)0;
-        }
-    }
-
-    return valid;
-}
-
-// This function is a potential memory leak. But I don't care because the program is terminating anyway
-char **backtrace_symbols(void **bt,unsigned nr)
-{
-    char **strings=(char **)malloc(sizeof(char *)*nr);
-
-    for(unsigned i=0;i<nr;i++) {
-        Dl_info info;
-        int result=dladdr(bt[i],&info);
-
-        char tmp[1000];
-#ifdef darwinIntel64
-        sprintf(tmp,"%s(%s+%p) [%p]",info.dli_fname,info.dli_sname,(void *)((unsigned long)bt[i]-(unsigned long)info.dli_saddr),bt[i]);
-#else
-        sprintf(tmp,"%s(%s+%p) [%p]",info.dli_fname,info.dli_sname,(void *)((unsigned int)bt[i]-(unsigned int)info.dli_saddr),bt[i]);
-#endif
-        strings[i]=(char *)malloc(strlen(tmp)+1);
-        strcpy(strings[i],tmp);
-    }
-
-    return strings;
-}
-
-#endif
 
 void getSymbolForRaw
 (
@@ -273,7 +182,6 @@ void getSymbolForRaw
 #ifndef darwin
             "addr2line -f --demangle=auto --exe "
 #else
-            //            "gaddr2line -f --inline --demangle=auto --exe "
             "addr2line4Mac.py "
 #endif
           + filename
@@ -283,11 +191,11 @@ void getSymbolForRaw
 
         if (fcnt != "")
         {
-            os << fcnt.c_str();
+            os  << fcnt.c_str();
             return;
         }
     }
-    os << "Uninterpreted: " << raw.c_str();
+    os  << "Uninterpreted: " << raw.c_str();
 }
 
 void error::printStack(Ostream& os)
@@ -308,7 +216,7 @@ void error::printStack(Ostream& os)
     {
         IFstream is("/proc/" + name(pid()) + "/maps");
 
-        while(is.good())
+        while (is.good())
         {
             string line;
             is.getLine(line);
@@ -340,13 +248,14 @@ void error::printStack(Ostream& os)
         fileName programFile;
         word address;
 
-        os << '#' << label(i) << "  ";
-        //os << "Raw   : " << msg << "\n\t";
+        os  << '#' << label(i) << "  ";
+        //os  << "Raw   : " << msg << "\n\t";
+#ifndef darwin
         {
             string::size_type lPos = msg.find('[');
             string::size_type rPos = msg.find(']');
 
-            if (lPos != string::npos && rPos != string::npos && lPos<rPos)
+            if (lPos != string::npos && rPos != string::npos && lPos < rPos)
             {
                 address = msg.substr(lPos+1, rPos-lPos-1);
                 msg = msg.substr(0, lPos);
@@ -371,7 +280,38 @@ void error::printStack(Ostream& os)
         }
 
         string::size_type bracketPos = msg.find('(');
-
+#else
+        string::size_type counter=0;
+        while(msg[counter]!=' ') {
+            counter++;
+        }
+        while(msg[counter]==' ') {
+            counter++;
+        }
+        string::size_type fileStart=counter;
+        while(msg[counter]!=' ') {
+            counter++;
+        }
+        programFile = msg.substr(fileStart,counter-fileStart);
+        if(programFile=="???") {
+            char path[1024];
+            uint32_t size = sizeof(path);
+            if (_NSGetExecutablePath(path, &size) == 0) {
+                programFile=path;
+            } else {
+                programFile="unknownFile";
+            }
+        }
+        while(msg[counter]==' ') {
+            counter++;
+        }
+        string::size_type addrStart=counter;
+        while(msg[counter]!=' ') {
+            counter++;
+        }
+        address = msg.substr(addrStart,counter-addrStart);
+#endif
+#ifndef darwin
         if (bracketPos != string::npos)
         {
             string::size_type start = bracketPos+1;
@@ -381,7 +321,21 @@ void error::printStack(Ostream& os)
             if (plusPos != string::npos)
             {
                 string cName(msg.substr(start, plusPos-start));
+#else
+        if(1){
+            while(msg[counter]==' ') {
+                counter++;
+            }
+            string::size_type nameStart=counter;
+            while(msg[counter]!=' ') {
+                counter++;
+            }
 
+            string::size_type start = counter;
+
+            if(1) {
+                string cName(msg.substr(nameStart,counter-nameStart));
+#endif
                 int status;
                 char* cplusNamePtr = abi::__cxa_demangle
                 (
@@ -393,12 +347,12 @@ void error::printStack(Ostream& os)
 
                 if (status == 0 && cplusNamePtr)
                 {
-                    os << cplusNamePtr;
+                    os  << cplusNamePtr;
                     free(cplusNamePtr);
                 }
                 else
                 {
-                    os << cName.c_str();
+                    os  << cName.c_str();
                 }
             }
             else
@@ -409,7 +363,7 @@ void error::printStack(Ostream& os)
                 {
                     string fullName(msg.substr(start, endBracketPos-start));
 
-                    os << fullName.c_str() << nl;
+                    os  << fullName.c_str() << nl;
                 }
                 else
                 {
@@ -426,7 +380,7 @@ void error::printStack(Ostream& os)
 
         printSourceFileAndLine(os, addressMap, programFile, address);
 
-        os << nl;
+        os  << nl;
     }
 
     free(strings);
