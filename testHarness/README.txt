@@ -47,7 +47,7 @@ Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved.
 
 7:   Next, running the test loop is pretty simple:
 
-   cd $WM_PROJECT_DIR/testHarness/foam-extend-3.0/runDir # you should already be there...
+   cd $WM_PROJECT_DIR/testHarness/foam-extend/3.0/runDir # you should already be there...
    ./Allclean
    ./Allrun_Experimental
 
