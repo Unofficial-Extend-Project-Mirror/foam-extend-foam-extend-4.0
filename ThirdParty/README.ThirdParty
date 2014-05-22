@@ -136,7 +136,7 @@ through when starting the compilation from scratch:
           - The .rpm files will be located under the directory
             $WM_THIRD_PARTY_DIR/rpmBuild/RPMS 
 
-	  - The .tgz files will be located under the directory
+          - The .tgz files will be located under the directory
             $WM_THIRD_PARTY_DIR/rpmBuild/TGZS 
 
     e: The default installation root directory is "$WM_THIRD_PARTY_DIR".
@@ -158,7 +158,7 @@ Warning: This section is a bit advanced, and as of yet, I have no evidence that
          this feature has ever been used by anybody. So please feel free to skip
          this section if you don't need to relocate your ThirdParty packages
          installation directory, which you should not have do on most
-	 installation anyway. 
+         installation anyway. 
 
     a: All the generated RPMs can be relocated, meaning that you can override
        the hard-coded root installation directory when using those RPMs for
