@@ -141,10 +141,7 @@ Contents:
 
 * New features in foam-extend-3.0
   The list of features is a result of the work of numerous contributors. The 
-  maintainers of foam-extend would formally like to thank them all. Features
-  listed below have are new with regard to OpenFOAM-1.6-ext. For a list of 
-  extension features in OpenFOAM-1.6-ext, please refer to file 
-  "ReleaseNotes-1.6-ext".
+  maintainers of foam-extend would formally like to thank them all.
 
     ** Core library
 
