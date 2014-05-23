@@ -6,5 +6,6 @@ wmake libso conjugateHeatTransfer
 
 wmake blockCoupledScalarTransportFoam  
 wmake conjugateHeatFoam
-wmake conjugateHeatSimpleFoam  
+wmake conjugateHeatSimpleFoam 
+wmake pUCoupledFoam
 # ----------------------------------------------------------------- end-of-file

@@ -26,6 +26,7 @@ License
 #include "fvmDiv.H"
 #include "fvMesh.H"
 #include "convectionScheme.H"
+#include "divScheme.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -83,6 +84,7 @@ div
     return fvm::div(flux, vf, "div("+flux.name()+','+vf.name()+')');
 }
 
+
 template<class Type>
 tmp<fvMatrix<Type> >
 div
@@ -94,6 +96,34 @@ div
     tmp<fvMatrix<Type> > Div(fvm::div(tflux(), vf));
     tflux.clear();
     return Div;
+}
+
+template<class Type>
+tmp<BlockLduMatrix<vector> > div
+(
+    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const word& name
+)
+{
+    return fv::divScheme<Type>::New
+    (
+        vf.mesh(),
+        vf.mesh().schemesDict().divScheme(name)
+    )().fvmDiv(vf);
+}
+
+
+template<class Type>
+tmp<BlockLduMatrix<vector> > div
+(
+    GeometricField<Type, fvPatchField, volMesh>& vf
+)
+{
+    return fvm::div
+    (
+        vf,
+        "div(" + vf.name() + ')'
+    );
 }
 
 
