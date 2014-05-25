@@ -1,0 +1,5 @@
+#!/bin/sh
+
+m4 < constant/polyMesh/blockMeshDict.m4 > constant/polyMesh/blockMeshDict
+blockMesh
+transformPoints -cylToCart "((0 0 0) (0 0 1) (1 0 0))"

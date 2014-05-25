@@ -1,0 +1,11 @@
+faceSet GVCYCLIC1Zone new patchToFace GVCYCLIC1
+faceSet GVCYCLIC2Zone new patchToFace GVCYCLIC2
+faceSet RUCYCLIC1Zone new patchToFace RUCYCLIC1
+faceSet RUCYCLIC2Zone new patchToFace RUCYCLIC2
+faceSet DTCYCLIC1Zone new patchToFace DTCYCLIC1
+faceSet DTCYCLIC2Zone new patchToFace DTCYCLIC2
+faceSet GVOUTLETZone new patchToFace GVOUTLET
+faceSet RUINLETZone new patchToFace RUINLET
+faceSet RUOUTLETZone new patchToFace RUOUTLET
+faceSet DTINLETZone new patchToFace DTINLET
+quit
