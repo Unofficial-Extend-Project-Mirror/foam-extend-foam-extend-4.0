@@ -1,0 +1,260 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      changeDictionaryDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dictionaryReplacement
+{
+    epsilon
+    {
+        boundaryField
+        {
+            GVOUTLET
+            {
+                type            mixingPlane;
+            }
+            RUINLET
+            {
+                type            mixingPlane;
+            }
+            RUOUTLET
+            {
+                type            mixingPlane;
+            }
+            DTINLET
+            {
+                type            mixingPlane;
+            }
+        }
+    }
+    k
+    {
+        boundaryField
+        {
+            GVOUTLET
+            {
+                type            mixingPlane;
+            }
+            RUINLET
+            {
+                type            mixingPlane;
+            }
+            RUOUTLET
+            {
+                type            mixingPlane;
+            }
+            DTINLET
+            {
+                type            mixingPlane;
+            }
+        }
+    }
+    U
+    {
+        boundaryField
+        {
+            GVOUTLET
+            {
+                type            mixingPlane;
+            }
+            RUINLET
+            {
+                type            mixingPlane;
+            }
+            RUOUTLET
+            {
+                type            mixingPlane;
+            }
+            DTINLET
+            {
+                type            mixingPlane;
+            }
+        }
+    }
+    p
+    {
+        boundaryField
+        {
+            GVOUTLET
+            {
+                type            mixingPlane;
+            }
+            RUINLET
+            {
+                type            mixingPlane;
+            }
+            RUOUTLET
+            {
+                type            mixingPlane;
+            }
+            DTINLET
+            {
+                type            mixingPlane;
+            }
+        }
+    }
+    boundary
+    {
+        GVINLET
+        {
+            type            patch;
+        }
+        GVCYCLIC1
+        {
+            type            cyclicGgi;
+            shadowPatch     GVCYCLIC2;
+            zone            GVCYCLIC1Zone;
+            bridgeOverlap   false;
+            rotationAxis    (0 0 1);
+            rotationAngle   72;
+            separationOffset (0 0 0);
+        }
+        GVCYCLIC2
+        {
+            type            cyclicGgi;
+            shadowPatch     GVCYCLIC1;
+            zone            GVCYCLIC2Zone;
+            bridgeOverlap   false;
+            rotationAxis    (0 0 1);
+            rotationAngle   -72;
+            separationOffset (0 0 0);
+        }
+        RUCYCLIC1
+        {
+            type            cyclicGgi;
+            shadowPatch     RUCYCLIC2;
+            zone            RUCYCLIC1Zone;
+            bridgeOverlap   false;
+            rotationAxis    (0 0 1);
+            rotationAngle   72;
+            separationOffset (0 0 0);
+        }
+        RUCYCLIC2
+        {
+            type            cyclicGgi;
+            shadowPatch     RUCYCLIC1;
+            zone            RUCYCLIC2Zone;
+            bridgeOverlap   false;
+            rotationAxis    (0 0 1);
+            rotationAngle   -72;
+            separationOffset (0 0 0);
+        }
+        DTCYCLIC1
+        {
+            type            cyclicGgi;
+            shadowPatch     DTCYCLIC2;
+            zone            DTCYCLIC1Zone;
+            bridgeOverlap   false;
+            rotationAxis    (0 0 1);
+            rotationAngle   72;
+            separationOffset (0 0 0);
+        }
+        DTCYCLIC2
+        {
+            type            cyclicGgi;
+            shadowPatch     DTCYCLIC1;
+            zone            DTCYCLIC2Zone;
+            bridgeOverlap   false;
+            rotationAxis    (0 0 1);
+            rotationAngle   -72;
+            separationOffset (0 0 0);
+        }
+        GVOUTLET
+        {
+            type            mixingPlane;
+            shadowPatch     RUINLET;
+            zone            GVOUTLETZone;
+            coordinateSystem
+            {
+                type            cylindrical;
+                //name            mixingCS;
+                origin          (0 0 0);
+                e1              (1 0 0);
+                e3              (0 0 1);
+            }
+            ribbonPatch
+            {
+                sweepAxis       Theta;
+                stackAxis       R;
+                discretisation  bothPatches;
+            }
+        }
+        RUINLET
+        {
+            type            mixingPlane;
+            shadowPatch     GVOUTLET;
+            zone            RUINLETZone;
+            coordinateSystem
+            {
+                type            cylindrical;
+                //name            mixingCS;
+                origin          (0 0 0);
+                e1              (1 0 0);
+                e3              (0 0 1);
+            }
+            ribbonPatch
+            {
+                sweepAxis       Theta;
+                stackAxis       R;
+                discretisation  bothPatches;
+            }
+        }
+        RUOUTLET
+        {
+            type            mixingPlane;
+            shadowPatch     DTINLET;
+            zone            RUOUTLETZone;
+            coordinateSystem
+            {
+                type            cylindrical;
+                //name            mixingCS;
+                origin          (0 0 0);
+                e1              (1 0 0);
+                e3              (0 0 1);
+            }
+            ribbonPatch
+            {
+                sweepAxis       Theta;
+                stackAxis       R;
+                discretisation  bothPatches;
+            }
+        }
+        DTINLET
+        {
+            type            mixingPlane;
+            shadowPatch     RUOUTLET;
+            zone            DTINLETZone;
+            coordinateSystem
+            {
+                type            cylindrical;
+                //name            mixingCS;
+                origin          (0 0 0);
+                e1              (1 0 0);
+                e3              (0 0 1);
+            }
+            ribbonPatch
+            {
+                sweepAxis       Theta;
+                stackAxis       R;
+                discretisation  bothPatches;
+            }
+        }
+        DTOUTLET
+        {
+            type            patch;
+        }
+    }
+}
+
+// ************************************************************************* //

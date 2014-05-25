@@ -9,12 +9,16 @@ application="MRFSimpleFoam"
 #Create the mesh:
 ./makeMesh
 
-#Fix constant/boundary:
-changeDictionary
-
 # Set 0-directory and create GGI set:
 cp -r 0_orig 0
 setSet -batch setBatchGgi
 setsToZones -noFlipMap
+
+#Fix constant/boundary:
+cp system/changeDictionaryDict_mixingPlane system/changeDictionaryDict
+changeDictionary
+
+#Pick settings:
+cp system/fvSolution_mixingPlane system/fvSolution
 
 runApplication $application

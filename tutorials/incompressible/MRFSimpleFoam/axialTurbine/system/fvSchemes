@@ -61,4 +61,11 @@ fluxRequired
     p;
 }
 
+mixingPlane
+{
+    default         areaAveraging;
+    //U               fluxAveragingAdjustMassFlow;
+    //p               zeroGradientAreaAveragingMix;
+}
+
 // ************************************************************************* //
