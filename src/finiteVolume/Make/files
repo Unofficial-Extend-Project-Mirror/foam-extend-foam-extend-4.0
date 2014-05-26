@@ -169,6 +169,10 @@ $(derivedFvPatchFields)/turbulentIntensityKineticEnergyInlet/turbulentIntensityK
 $(derivedFvPatchFields)/uniformFixedValue/uniformFixedValueFvPatchFields.C
 $(derivedFvPatchFields)/waveTransmissive/waveTransmissiveFvPatchFields.C
 $(derivedFvPatchFields)/uniformDensityHydrostaticPressure/uniformDensityHydrostaticPressureFvPatchScalarField.C
+$(derivedFvPatchFields)/pulseFixedValue/pulseFixedValueFvPatchFields.C                        
+$(derivedFvPatchFields)/waveTransmissiveInlet/waveTransmissiveInletFvPatchFields.C
+
+
 
 fvsPatchFields = fields/fvsPatchFields
 $(fvsPatchFields)/fvsPatchField/fvsPatchFields.C
@@ -302,6 +306,7 @@ $(ddtSchemes)/backwardDdtScheme/backwardDdtSchemes.C
 $(ddtSchemes)/boundedBackwardDdtScheme/boundedBackwardDdtScheme.C
 $(ddtSchemes)/boundedBackwardDdtScheme/boundedBackwardDdtSchemes.C
 $(ddtSchemes)/CrankNicholsonDdtScheme/CrankNicholsonDdtSchemes.C
+$(ddtSchemes)/steadyInertialDdtScheme/steadyInertialDdtSchemes.C
 
 d2dt2Schemes = finiteVolume/d2dt2Schemes
 $(d2dt2Schemes)/d2dt2Scheme/d2dt2Schemes.C
@@ -378,6 +383,10 @@ $(SRF)/SRFModel/SRFModel/SRFModel.C
 $(SRF)/SRFModel/SRFModel/newSRFModel.C
 $(SRF)/SRFModel/rpm/rpm.C
 $(SRF)/derivedFvPatchFields/SRFVelocityFvPatchVectorField/SRFVelocityFvPatchVectorField.C
+$(SRF)/derivedFvPatchFields/SRFSurfaceNormalVelocityFvPatchVectorField/SRFSurfaceNormalVelocityFvPatchVectorField.C
+$(SRF)/derivedFvPatchFields/SRFTotalTemperature/SRFTotalTemperatureFvPatchScalarField.C
+$(SRF)/derivedFvPatchFields/SRFFlowRateInletVelocity/SRFFlowRateInletVelocityFvPatchVectorField.C
+$(SRF)/derivedFvPatchFields/SRFTotalPressure/SRFTotalPressureFvPatchScalarField.C               
 
 fieldSources = $(general)/fieldSources
 $(fieldSources)/pressureGradientExplicitSource/pressureGradientExplicitSource.C

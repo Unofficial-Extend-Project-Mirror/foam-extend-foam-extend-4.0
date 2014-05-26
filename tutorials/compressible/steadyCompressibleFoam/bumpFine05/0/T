@@ -1,0 +1,74 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 300;
+
+boundaryField
+{
+    INLE1
+    {
+        type            fixedValue;
+        value           $internalField;
+
+//         type            waveTransmissiveInlet;
+//         phi             phi;
+//         rho             rho;
+//         psi             psi;
+//         U               U;
+//         gamma           1.4;
+//         inletOutlet     false;
+//         correctSupercritical false;
+//         lInf            0.01;//HJ
+//         fieldInf        300;
+//         value           $internalField;
+    }
+
+    PRES2
+    {
+//        type            zeroGradient;
+
+         type            waveTransmissive;
+         phi             phi;
+         rho             rho;
+         psi             psi;
+         U               U;
+         gamma           1.4;
+         inletOutlet     true;
+         correctSupercritical false;
+         lInf            0.5;
+         fieldInf        300;
+         value           $internalField;
+    }
+
+    WALL3
+    {
+        type            zeroGradient;
+    }
+
+    WALL4
+    {
+        type            zeroGradient;
+    }
+
+    defaultFaces
+    {
+        type            empty;
+    }
+}
+
+// ************************************************************************* //
