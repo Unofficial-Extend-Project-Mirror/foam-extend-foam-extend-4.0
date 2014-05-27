@@ -72,10 +72,31 @@ template<class T, class Key, class Hash> Ostream& operator<<
 
 
 /*---------------------------------------------------------------------------*\
-                     Class StaticHashTableName Declaration
+                     Class StaticHashTableCore Declaration
 \*---------------------------------------------------------------------------*/
 
-TemplateName(StaticHashTable);
+//- Template-invariant bits for StaticHashTable
+struct StaticHashTableCore
+{
+    //- Return a canonical (power-of-two) size
+    static label canonicalSize(const label);
+
+    //- Construct null
+    StaticHashTableCore()
+    {}
+
+    //- Define template name and debug
+    ClassName("StaticHashTable");
+
+    //- A zero-sized end iterator
+    struct iteratorEnd
+    {
+        //- Construct null
+        iteratorEnd()
+        {}
+    };
+};
+
 
 
 /*---------------------------------------------------------------------------*\
@@ -85,7 +106,7 @@ TemplateName(StaticHashTable);
 template<class T, class Key=word, class Hash=string::hash>
 class StaticHashTable
 :
-    public StaticHashTableName
+    public StaticHashTableCore
 {
     // Private data type for table entries
 
@@ -107,6 +128,7 @@ class StaticHashTable
 
         //- Assign a new hashed entry to a possibly already existing key
         bool set(const Key&, const T& newElmt, bool protect);
+
 
 public:
 
@@ -156,11 +178,11 @@ public:
         StaticHashTable(const StaticHashTable<T, Key, Hash>&);
 
         //- Construct by transferring the parameter contents
-        StaticHashTable(const Xfer< StaticHashTable<T, Key, Hash> >&);
+        StaticHashTable(const Xfer<StaticHashTable<T, Key, Hash> >&);
 
-    // Destructor
 
-        ~StaticHashTable();
+    //- Destructor
+    ~StaticHashTable();
 
 
     // Member Functions
@@ -220,11 +242,11 @@ public:
             void clearStorage();
 
             //- Transfer the contents of the argument table into this table
-            //  and annull the argument table.
+            //  and annul the argument table.
             void transfer(StaticHashTable<T, Key, Hash>&);
 
             //- Transfer contents to the Xfer container
-            inline Xfer< StaticHashTable<T, Key, Hash> > xfer();
+            inline Xfer<StaticHashTable<T, Key, Hash> > xfer();
 
 
     // Member Operators
@@ -247,6 +269,7 @@ public:
 
         //- The opposite of the equality operation.
         bool operator!=(const StaticHashTable<T, Key, Hash>&) const;
+
 
     // STL type definitions
 
@@ -289,6 +312,7 @@ public:
 
                 //- Index of current element at hashIndex
                 label elemIndex_;
+
 
         public:
 

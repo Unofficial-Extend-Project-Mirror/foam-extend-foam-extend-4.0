@@ -24,19 +24,13 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
 #include "HashPtrTable.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct given initial table size
 template<class T, class Key, class Hash>
-HashPtrTable<T, Key, Hash>::HashPtrTable(label size)
+Foam::HashPtrTable<T, Key, Hash>::HashPtrTable(const label size)
 :
     HashTable<T*, Key, Hash>(size)
 {}
@@ -44,14 +38,16 @@ HashPtrTable<T, Key, Hash>::HashPtrTable(label size)
 
 // Construct as copy
 template<class T, class Key, class Hash>
-HashPtrTable<T, Key, Hash>::HashPtrTable(const HashPtrTable<T, Key, Hash>& ht)
+Foam::HashPtrTable<T, Key, Hash>::HashPtrTable
+(
+    const HashPtrTable<T, Key, Hash>& ht
+)
 :
     HashTable<T*, Key, Hash>()
 {
     for (const_iterator iter = ht.begin(); iter != ht.end(); ++iter)
     {
-        // Bug fix, Microsoft port.  HJ, 21/Mar/2011
-        this->insert(iter.key(), iter()->clone().ptr());
+        this->insert(iter.key(), new T(**iter));
     }
 }
 
@@ -59,7 +55,7 @@ HashPtrTable<T, Key, Hash>::HashPtrTable(const HashPtrTable<T, Key, Hash>& ht)
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class T, class Key, class Hash>
-HashPtrTable<T, Key, Hash>::~HashPtrTable()
+Foam::HashPtrTable<T, Key, Hash>::~HashPtrTable()
 {
     clear();
 }
@@ -68,7 +64,7 @@ HashPtrTable<T, Key, Hash>::~HashPtrTable()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class T, class Key, class Hash>
-T* HashPtrTable<T, Key, Hash>::remove(iterator& it)
+T* Foam::HashPtrTable<T, Key, Hash>::remove(iterator& it)
 {
     T* elemPtr = *it;
     HashTable<T*, Key, Hash>::erase(it);
@@ -77,7 +73,7 @@ T* HashPtrTable<T, Key, Hash>::remove(iterator& it)
 
 
 template<class T, class Key, class Hash>
-bool HashPtrTable<T, Key, Hash>::erase(iterator& it)
+bool Foam::HashPtrTable<T, Key, Hash>::erase(iterator& it)
 {
     T* elemPtr = *it;
 
@@ -98,7 +94,7 @@ bool HashPtrTable<T, Key, Hash>::erase(iterator& it)
 
 
 template<class T, class Key, class Hash>
-void HashPtrTable<T, Key, Hash>::clear()
+void Foam::HashPtrTable<T, Key, Hash>::clear()
 {
     for
     (
@@ -117,13 +113,13 @@ void HashPtrTable<T, Key, Hash>::clear()
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class T, class Key, class Hash>
-void HashPtrTable<T, Key, Hash>::operator=
+void Foam::HashPtrTable<T, Key, Hash>::operator=
 (
-    const HashPtrTable<T, Key, Hash>& ht
+    const HashPtrTable<T, Key, Hash>& rhs
 )
 {
     // Check for assignment to self
-    if (this == &ht)
+    if (this == &rhs)
     {
         FatalErrorIn
         (
@@ -133,19 +129,13 @@ void HashPtrTable<T, Key, Hash>::operator=
             << abort(FatalError);
     }
 
-    clear();
+    this->clear();
 
-    for(const_iterator iter = ht.begin(); iter != ht.end(); ++iter)
+    for (const_iterator iter = rhs.begin(); iter != rhs.end(); ++iter)
     {
-        // Bug fix, Microsoft port.  HJ, 21/Mar/2011
-        insert(iter.key(), iter()->clone().ptr());
+        this->insert(iter.key(), new T(**iter));
     }
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
