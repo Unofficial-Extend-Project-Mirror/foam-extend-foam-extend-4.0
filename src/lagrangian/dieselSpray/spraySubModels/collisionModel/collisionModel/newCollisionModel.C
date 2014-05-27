@@ -66,7 +66,7 @@ autoPtr<collisionModel> collisionModel::New
             << ", constructor not in hash table" << endl << endl
             << "    Valid collisionModel types are :"
             << endl;
-        Info<< dictionaryConstructorTablePtr_->toc()
+        Info<< dictionaryConstructorTablePtr_->sortedToc()
             << abort(FatalError);
     }
 

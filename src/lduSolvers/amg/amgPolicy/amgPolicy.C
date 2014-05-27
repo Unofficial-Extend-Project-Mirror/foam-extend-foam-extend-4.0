@@ -74,7 +74,7 @@ Foam::autoPtr<Foam::amgPolicy> Foam::amgPolicy::New
         )   << "Unknown AMG policy " << policyType
             << endl << endl
             << "Valid AMG policies are :" << endl
-            << matrixConstructorTablePtr_->toc()
+            << matrixConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 

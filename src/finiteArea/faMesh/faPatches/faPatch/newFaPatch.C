@@ -64,7 +64,7 @@ autoPtr<faPatch> faPatch::New
             dict
         )   << "Unknown faPatch type " << patchType << endl << endl
             << "Valid faPatch types are :" << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

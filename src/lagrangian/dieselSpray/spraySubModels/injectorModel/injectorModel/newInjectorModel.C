@@ -60,7 +60,7 @@ autoPtr<injectorModel> injectorModel::New
             << injectorModelType
             << ", constructor not in hash table" << endl << endl
             << "    Valid injectorModel types are :" << endl;
-        Info<< dictionaryConstructorTablePtr_->toc() << abort(FatalError);
+        Info<< dictionaryConstructorTablePtr_->sortedToc() << abort(FatalError);
     }
 
     return autoPtr<injectorModel>(cstrIter()(dict, sm));

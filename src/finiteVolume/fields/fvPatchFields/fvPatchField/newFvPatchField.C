@@ -54,7 +54,7 @@ Foam::tmp<Foam::fvPatchField<Type> > Foam::fvPatchField<Type>::New
         )   << "Unknown patch field type " << patchFieldType
             << endl << endl
             << "Valid patchField types are :" << endl
-            << patchConstructorTablePtr_->toc()
+            << patchConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 
@@ -111,7 +111,7 @@ Foam::tmp<Foam::fvPatchField<Type> > Foam::fvPatchField<Type>::New
             )   << "Unknown patch field type " << patchFieldType
                 << " for patch type " << p.type() << endl << endl
                 << "Valid patch field types are :" << endl
-                << dictionaryConstructorTablePtr_->toc()
+                << dictionaryConstructorTablePtr_->sortedToc()
                 << exit(FatalIOError);
         }
     }
@@ -179,7 +179,7 @@ Foam::tmp<Foam::fvPatchField<Type> > Foam::fvPatchField<Type>::New
             "const fvPatchFieldMapper&)"
         )   << "unknown patch field type " << ptf.type() << endl << endl
             << "Valid patchField types are :" << endl
-            << patchMapperConstructorTablePtr_->toc()
+            << patchMapperConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 

@@ -75,7 +75,7 @@ Foam::autoPtr<Foam::BlockLduSmoother<Type> > Foam::BlockLduSmoother<Type>::New
         )   << "Unknown matrix smoother " << smootherName
             << endl << endl
             << "Valid matrix smoothers are :" << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

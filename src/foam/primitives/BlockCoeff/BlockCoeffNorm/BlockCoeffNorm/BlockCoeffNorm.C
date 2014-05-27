@@ -71,7 +71,7 @@ Foam::BlockCoeffNorm<Type>::New
         )   << "Unknown norm " << normName
             << endl << endl
             << "Valid matrix norms are :" << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

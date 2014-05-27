@@ -108,7 +108,7 @@ Foam::autoPtr<Foam::coupledLduSmoother> Foam::coupledLduSmoother::New
         )   << "Unknown matrix smoother " << smootherName
             << endl << endl
             << "Valid matrix smoothers are :" << endl
-            << wordConstructorTablePtr_->toc()
+            << wordConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 

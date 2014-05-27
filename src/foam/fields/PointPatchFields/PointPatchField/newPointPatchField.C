@@ -77,7 +77,7 @@ PointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>::New
                 << patchFieldType
                 << endl << endl
                 << "Valid patchField types are :" << endl
-                << PointPatchConstructorTablePtr_->toc()
+                << PointPatchConstructorTablePtr_->sortedToc()
                 << exit(FatalError);
         }
     }
@@ -149,7 +149,7 @@ PointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>::New
             )   << "unknown patchTypefield type "
                 << ptf.type() << endl << endl
                 << "Valid patchField types are :" << endl
-                << patchMapperConstructorTablePtr_->toc()
+                << patchMapperConstructorTablePtr_->sortedToc()
                 << exit(FatalError);
         }
     }
@@ -220,7 +220,7 @@ PointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>::New
             )   << "Unknown patchField type " << patchFieldType
                 << " for patch type " << p.type() << endl << endl
                 << "Valid patchField types are :" << endl
-                << dictionaryConstructorTablePtr_->toc()
+                << dictionaryConstructorTablePtr_->sortedToc()
                 << exit(FatalIOError);
         }
     }

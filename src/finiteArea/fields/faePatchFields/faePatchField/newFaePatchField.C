@@ -58,7 +58,7 @@ tmp<faePatchField<Type> > faePatchField<Type>::New
         )   << "Unknown patchTypefield type " << patchFieldType
             << endl << endl
             << "Valid patchField types are :" << endl
-            << patchConstructorTablePtr_->toc()
+            << patchConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 
@@ -116,7 +116,7 @@ tmp<faePatchField<Type> > faePatchField<Type>::New
             )   << "Unknown patchField type " << patchFieldType
                 << " for patch type " << p.type() << endl << endl
                 << "Valid patchField types are :" << endl
-                << dictionaryConstructorTablePtr_->toc()
+                << dictionaryConstructorTablePtr_->sortedToc()
                 << exit(FatalIOError);
         }
     }
@@ -178,7 +178,7 @@ tmp<faePatchField<Type> > faePatchField<Type>::New
             "const faPatchFieldMapper&)"
         )   << "unknown patchTypefield type " << ptf.type() << endl << endl
             << "Valid patchField types are :" << endl
-            << patchMapperConstructorTablePtr_->toc()
+            << patchMapperConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 
