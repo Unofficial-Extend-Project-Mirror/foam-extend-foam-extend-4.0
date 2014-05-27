@@ -46,8 +46,8 @@ License
 // KRJ: 2012-12-15: Multigrid solver
 #include "blockAmgSolvers.H"
 #include "blockAmgPrecons.H"
-#include "blockAmgPolicies.H"
-#include "blockAamgPolicies.H"
+#include "blockMatrixCoarsenings.H"
+#include "blockMatrixAgglomerations.H"
 #include "blockCoeffNorms.H"
 #include "blockCoeffTwoNorms.H"
 #include "blockCoeffMaxNorms.H"
@@ -131,12 +131,12 @@ makeBlockSolverTypeName(block##Type##GMRESSolver);                            \
 addSolverToBlockMatrix(Type, block##Type##GMRESSolver, symMatrix);            \
 addSolverToBlockMatrix(Type, block##Type##GMRESSolver, asymMatrix);           \
                                                                               \
-typedef BlockAmgPolicy<type > block##Type##AmgPolicy;                         \
-defineNamedTemplateTypeNameAndDebug(block##Type##AmgPolicy, 0);               \
-defineTemplateRunTimeSelectionTable(block##Type##AmgPolicy, matrix);          \
+typedef BlockMatrixCoarsening<type > block##Type##MatrixCoarsening;                         \
+defineNamedTemplateTypeNameAndDebug(block##Type##MatrixCoarsening, 0);               \
+defineTemplateRunTimeSelectionTable(block##Type##MatrixCoarsening, matrix);          \
                                                                               \
-typedef BlockAamgPolicy<type > block##Type##AamgPolicy;                       \
-makeBlockAmgPolicy(block##Type##AmgPolicy, block##Type##AamgPolicy);          \
+typedef BlockMatrixAgglomeration<type > block##Type##MatrixAgglomeration;                       \
+makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixAgglomeration);          \
                                                                               \
 typedef BlockCoeffNorm<type > block##Type##CoeffNorm;                         \
 defineNamedTemplateTypeNameAndDebug(block##Type##CoeffNorm, 0);               \

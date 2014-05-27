@@ -25,7 +25,7 @@ Class
     BlockAmgSolver
 
 Description
-    Algebraic Multigrid solver with run-time selection of policy and cycle
+    Algebraic Multigrid solver with run-time selection of coarsening and cycle
     adjusted for BlockLduMatrix.
 
 Author
