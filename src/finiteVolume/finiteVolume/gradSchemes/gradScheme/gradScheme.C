@@ -99,6 +99,33 @@ gradScheme<Type>::~gradScheme()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
+tmp<blockVectorMatrix> gradScheme<Type>::fvmGrad
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
+{
+    FatalIOErrorIn
+    (
+        "tmp<blockVectorMatrix> fvmGrad\n",
+        "(\n"
+        "    GeometricField<Type, fvPatchField, volMesh>&" 
+        ")\n"
+    )   << "Implicit gradient operator currently defined only for Gauss grad."
+        << abort(FatalIOError);
+
+    tmp<blockVectorMatrix> tbm
+    (
+        new blockVectorMatrix
+        (
+           vf.mesh()
+        )
+    );
+
+    return tbm;
+}
+
+
+template<class Type>
 void gradScheme<Type>::correctBoundaryConditions
 (
     const GeometricField<Type, fvPatchField, volMesh>& vsf,

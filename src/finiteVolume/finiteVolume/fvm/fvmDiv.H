@@ -39,6 +39,7 @@ SourceFiles
 #include "surfaceFieldsFwd.H"
 #include "surfaceInterpolationScheme.H"
 #include "fvMatrices.H"
+#include "blockLduMatrices.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -79,6 +80,20 @@ namespace fvm
     tmp<fvMatrix<Type> > div
     (
         const tmp<surfaceScalarField>&,
+        GeometricField<Type, fvPatchField, volMesh>&
+    );
+
+    // Implicit div operator for block systems
+    template<class Type>
+    tmp<blockVectorMatrix> div
+    (
+        GeometricField<Type, fvPatchField, volMesh>&,
+        const word&
+    );
+
+    template<class Type>
+    tmp<blockVectorMatrix> div
+    (
         GeometricField<Type, fvPatchField, volMesh>&
     );
 }

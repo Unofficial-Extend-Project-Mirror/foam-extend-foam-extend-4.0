@@ -68,6 +68,42 @@ gaussDivScheme<Type>::fvcDiv
 }
 
 
+template<class Type>
+tmp<blockVectorMatrix> gaussDivScheme<Type>::fvmDiv
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
+{
+    tmp<surfaceScalarField> tweights = this->tinterpScheme_().weights(vf);
+    const scalarField& wIn = tweights().internalField();
+
+    const fvMesh& mesh = vf.mesh();
+
+    tmp<blockVectorMatrix> tbm
+    (
+        new blockVectorMatrix
+        (
+           mesh
+        )
+    );
+    blockVectorMatrix& bm = tbm();
+
+    // Grab ldu parts of block matrix as linear always
+    typename CoeffField<vector>::linearTypeField& u = bm.upper().asLinear();
+    typename CoeffField<vector>::linearTypeField& l = bm.lower().asLinear();
+
+    const vectorField& SfIn = mesh.Sf().internalField();
+
+    l = -wIn*SfIn;
+    u = l + SfIn;
+    bm.negSumDiag();
+
+    // Interpolation schemes with corrections not accounted for
+
+    return tbm;
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace fv
