@@ -1,0 +1,106 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      p;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -2 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    GVINLET
+    {
+        type            zeroGradient;
+    }
+    GVOUTLET
+    {
+        type            overlapGgi;
+    }
+    GVCYCLIC1
+    {
+        type            cyclicGgi;
+    }
+    GVCYCLIC2
+    {
+        type            cyclicGgi;
+    }
+    GVBLADE
+    {
+        type            zeroGradient;
+    }
+    GVHUB
+    {
+        type            zeroGradient;
+    }
+    GVSHROUD
+    {
+        type            zeroGradient;
+    }
+    RUINLET
+    {
+        type            overlapGgi;
+    }
+    RUOUTLET
+    {
+        type            overlapGgi;
+    }
+    RUCYCLIC1
+    {
+        type            cyclicGgi;
+    }
+    RUCYCLIC2
+    {
+        type            cyclicGgi;
+    }
+    RUBLADE
+    {
+        type            zeroGradient;
+    }
+    RUHUB
+    {
+        type            zeroGradient;
+    }
+    RUSHROUD
+    {
+        type            zeroGradient;
+    }
+    DTINLET
+    {
+        type            overlapGgi;
+    }
+    DTOUTLET
+    {
+        type            fixedValue;
+        value           uniform 0;
+    }
+    DTCYCLIC1
+    {
+        type            cyclicGgi;
+    }
+    DTCYCLIC2
+    {
+        type            cyclicGgi;
+    }
+    DTHUB
+    {
+        type            zeroGradient;
+    }
+    DTSHROUD
+    {
+        type            zeroGradient;
+    }
+}
+
+// ************************************************************************* //
