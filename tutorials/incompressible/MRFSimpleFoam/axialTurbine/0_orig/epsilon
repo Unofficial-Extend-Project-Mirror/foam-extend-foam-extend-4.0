@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:  3.0                                   |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -10,6 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
+    location    "0";
     object      epsilon;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -28,82 +29,96 @@ boundaryField
     GVOUTLET
     {
         type            ggi;
+        value           uniform 14.855;
     }
     GVCYCLIC1
     {
         type            cyclicGgi;
+        value           uniform 14.855;
     }
     GVCYCLIC2
     {
         type            cyclicGgi;
+        value           uniform 14.855;
     }
     GVBLADE
     {
         type            epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        value           uniform 14.855;
     }
     GVHUB
     {
         type            epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        value           uniform 14.855;
     }
     GVSHROUD
     {
         type            epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        value           uniform 14.855;
     }
     RUINLET
     {
         type            ggi;
+        value           uniform 14.855;
     }
     RUOUTLET
     {
         type            ggi;
+        value           uniform 14.855;
     }
     RUCYCLIC1
     {
         type            cyclicGgi;
+        value           uniform 14.855;
     }
     RUCYCLIC2
     {
         type            cyclicGgi;
+        value           uniform 14.855;
     }
     RUBLADE
     {
         type            epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        value           uniform 14.855;
     }
     RUHUB
     {
         type            epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        value           uniform 14.855;
     }
     RUSHROUD
     {
         type            epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        value           uniform 14.855;
     }
     DTINLET
     {
         type            ggi;
+        value           uniform 14.855;
     }
     DTOUTLET
     {
@@ -112,27 +127,32 @@ boundaryField
     DTCYCLIC1
     {
         type            cyclicGgi;
+        value           uniform 14.855;
     }
     DTCYCLIC2
     {
         type            cyclicGgi;
+        value           uniform 14.855;
     }
     DTHUB
     {
         type            epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        value           uniform 14.855;
     }
     DTSHROUD
     {
         type            epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        value           uniform 14.855;
     }
 }
+
 
 // ************************************************************************* //

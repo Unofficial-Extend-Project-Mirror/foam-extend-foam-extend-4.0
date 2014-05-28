@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:  3.0                                   |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -10,6 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
+    location    "0";
     object      k;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -28,14 +29,17 @@ boundaryField
     GVOUTLET
     {
         type            ggi;
+        value           uniform 0.375;
     }
     GVCYCLIC1
     {
         type            cyclicGgi;
+        value           uniform 0.375;
     }
     GVCYCLIC2
     {
         type            cyclicGgi;
+        value           uniform 0.375;
     }
     GVBLADE
     {
@@ -55,18 +59,22 @@ boundaryField
     RUINLET
     {
         type            ggi;
+        value           uniform 0.375;
     }
     RUOUTLET
     {
         type            ggi;
+        value           uniform 0.375;
     }
     RUCYCLIC1
     {
         type            cyclicGgi;
+        value           uniform 0.375;
     }
     RUCYCLIC2
     {
         type            cyclicGgi;
+        value           uniform 0.375;
     }
     RUBLADE
     {
@@ -86,6 +94,7 @@ boundaryField
     DTINLET
     {
         type            ggi;
+        value           uniform 0.375;
     }
     DTOUTLET
     {
@@ -94,10 +103,12 @@ boundaryField
     DTCYCLIC1
     {
         type            cyclicGgi;
+        value           uniform 0.375;
     }
     DTCYCLIC2
     {
         type            cyclicGgi;
+        value           uniform 0.375;
     }
     DTHUB
     {
@@ -110,5 +121,6 @@ boundaryField
         value           uniform 0.375;
     }
 }
+
 
 // ************************************************************************* //
