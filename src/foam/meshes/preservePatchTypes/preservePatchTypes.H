@@ -37,6 +37,7 @@ SourceFiles
 
 #include "fileName.H"
 #include "wordList.H"
+#include "dictionary.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -52,10 +53,9 @@ void preservePatchTypes
     const word& meshInstance,
     const fileName& meshDir,
     const wordList& patchNames,
-    wordList& patchTypes,
+    PtrList<dictionary>& patchDicts,
     const word& defaultFacesName,
-    word& defaultFacesType,
-    wordList& patchPhysicalTypes
+    word& defaultFacesType
 );
 
 } // End namespace Foam

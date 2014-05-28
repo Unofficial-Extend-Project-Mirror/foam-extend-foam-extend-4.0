@@ -20,7 +20,7 @@ pointField points(nPoints);
 label i4;
 labelList idface(nPoints), fv(nPoints);
 
-for(label i=0; i<nPoints; i++)
+for (label i=0; i<nPoints; i++)
 {
     scalar ffv;
     kivaFile
@@ -44,7 +44,7 @@ labelList i1tab(nPoints), i3tab(nPoints), i8tab(nPoints), idreg(nPoints),
 
 label nBfaces = 0;
 
-for(label i=0; i<nPoints; i++)
+for (label i=0; i<nPoints; i++)
 {
     label i1, i3, i8;
     scalar ff, fbcl, fbcf, fbcb;
@@ -85,7 +85,7 @@ if (mTable == 0)
 
 labelList imtab(nPoints), jmtab(nPoints), kmtab(nPoints);
 
-for(label i=0; i<nPoints; i++)
+for (label i=0; i<nPoints; i++)
 {
     label im, jm, km;
     kivaFile >> i4 >> im >> jm >> km;
@@ -109,13 +109,13 @@ label activeCells = 0;
 // Create and set the collocated point collapse map
 labelList pointMap(nPoints);
 
-forAll (pointMap, i)
+forAll(pointMap, i)
 {
     pointMap[i] = i;
 }
 
 // Initialise all cells to hex and search and set map for collocated points
-for(label i=0; i<nPoints; i++)
+for (label i=0; i<nPoints; i++)
 {
     if (f[i] > 0.0)
     {
@@ -132,7 +132,7 @@ for(label i=0; i<nPoints; i++)
 
         edgeList edges = cellShapes[activeCells].edges();
 
-        forAll (edges, ei)
+        forAll(edges, ei)
         {
             if (edges[ei].mag(points) < SMALL)
             {
@@ -167,11 +167,11 @@ cellZoning.setSize(activeCells);
 
 // Map collocated points to refer to the same point and collapse cell shape
 // to the corresponding hex-degenerate.
-forAll (cellShapes, celli)
+forAll(cellShapes, celli)
 {
     cellShape& cs = cellShapes[celli];
 
-    forAll (cs, i)
+    forAll(cs, i)
     {
         cs[i] = pointMap[cs[i]];
     }
@@ -237,7 +237,7 @@ List<SLList<face> > pFaces[nBCs];
 face quadFace(4);
 face triFace(3);
 
-for(label i=0; i<nPoints; i++)
+for (label i=0; i<nPoints; i++)
 {
     if (f[i] > 0)
     {
@@ -315,7 +315,7 @@ for(label i=0; i<nPoints; i++)
     }
 }
 
-// Tranfer liner faces that are above the minimum cylinder-head z height
+// Transfer liner faces that are above the minimum cylinder-head z height
 // into the cylinder-head region
 if
 (
@@ -327,16 +327,11 @@ if
 {
     scalar minz = GREAT;
 
-    for
-    (
-        SLList<face>::iterator iter = pFaces[CYLINDERHEAD][0].begin();
-        iter != pFaces[CYLINDERHEAD][0].end();
-        ++iter
-    )
+    forAllConstIter(SLList<face>, pFaces[CYLINDERHEAD][0], iter)
     {
         const face& pf = iter();
 
-        forAll (pf, pfi)
+        forAll(pf, pfi)
         {
             minz = min(minz, points[pf[pfi]].z());
         }
@@ -346,17 +341,12 @@ if
 
     SLList<face> newLinerFaces;
 
-    for
-    (
-        SLList<face>::iterator iter = pFaces[LINER][0].begin();
-        iter != pFaces[LINER][0].end();
-        ++iter
-    )
+    forAllConstIter(SLList<face>, pFaces[LINER][0], iter)
     {
         const face& pf = iter();
 
         scalar minfz = GREAT;
-        forAll (pf, pfi)
+        forAll(pf, pfi)
         {
             minfz = min(minfz, points[pf[pfi]].z());
         }
@@ -380,17 +370,12 @@ if
 
     SLList<face> newCylinderHeadFaces;
 
-    for
-    (
-        SLList<face>::iterator iter = pFaces[CYLINDERHEAD][0].begin();
-        iter != pFaces[CYLINDERHEAD][0].end();
-        ++iter
-    )
+    forAllConstIter(SLList<face>, pFaces[CYLINDERHEAD][0], iter)
     {
         const face& pf = iter();
 
         scalar minfz = GREAT;
-        forAll (pf, pfi)
+        forAll(pf, pfi)
         {
             minfz = min(minfz, points[pf[pfi]].z());
         }
@@ -417,7 +402,7 @@ if
 label nPatches = 0;
 for (int bci=0; bci<nBCs; bci++)
 {
-    forAll (pFaces[bci], rgi)
+    forAll(pFaces[bci], rgi)
     {
         if (pFaces[bci][rgi].size())
         {
@@ -434,7 +419,7 @@ if (pFaces[WEDGE].size() && pFaces[WEDGE][0].size())
     {
         // Distribute the points to be +/- 2.5deg from the x-z plane
 
-        scalar tanTheta = Foam::tan(2.5*mathematicalConstant::pi/180.0);
+        scalar tanTheta = Foam::tan(degToRad(2.5));
 
         SLList<face>::iterator iterf = pFaces[WEDGE][0].begin();
         SLList<face>::iterator iterb = pFaces[WEDGE][1].begin();
@@ -456,12 +441,7 @@ if (pFaces[WEDGE].size() && pFaces[WEDGE][0].size())
     {
         pFaces[CYCLIC].setSize(1);
         pFaces[CYCLIC][0] = pFaces[WEDGE][0];
-        for
-        (
-            SLList<face>::iterator iterb = pFaces[WEDGE][1].begin();
-            iterb != pFaces[WEDGE][1].end();
-            ++iterb
-        )
+        forAllIter(SLList<face>, pFaces[WEDGE][1], iterb)
         {
             pFaces[CYCLIC][0].append(iterb());
         }
@@ -479,13 +459,12 @@ wordList patchNames(nPatches);
 wordList patchTypes(nPatches);
 word defaultFacesName = "defaultFaces";
 word defaultFacesType = emptyPolyPatch::typeName;
-wordList patchPhysicalTypes(nPatches);
 
 label nAddedPatches = 0;
 
 for (int bci=0; bci<nBCs; bci++)
 {
-    forAll (pFaces[bci], rgi)
+    forAll(pFaces[bci], rgi)
     {
         if (pFaces[bci][rgi].size())
         {
@@ -510,9 +489,9 @@ for (int bci=0; bci<nBCs; bci++)
 labelList pointLabels(nPoints, -1);
 
 // Scan cells for used points
-forAll (cellShapes, celli)
+forAll(cellShapes, celli)
 {
-    forAll (cellShapes[celli], i)
+    forAll(cellShapes[celli], i)
     {
         pointLabels[cellShapes[celli][i]] = 1;
     }
@@ -520,7 +499,7 @@ forAll (cellShapes, celli)
 
 // Create addressing for used points and pack points array
 label newPointi = 0;
-forAll (pointLabels, pointi)
+forAll(pointLabels, pointi)
 {
     if (pointLabels[pointi] != -1)
     {
@@ -531,41 +510,51 @@ forAll (pointLabels, pointi)
 points.setSize(newPointi);
 
 // Reset cell point labels
-forAll (cellShapes, celli)
+forAll(cellShapes, celli)
 {
     cellShape& cs = cellShapes[celli];
 
-    forAll (cs, i)
+    forAll(cs, i)
     {
         cs[i] = pointLabels[cs[i]];
     }
 }
 
 // Reset boundary-face point labels
-forAll (boundary, patchi)
+forAll(boundary, patchi)
 {
-    forAll (boundary[patchi], facei)
+    forAll(boundary[patchi], facei)
     {
         face& f = boundary[patchi][facei];
 
-        forAll (f, i)
+        forAll(f, i)
         {
             f[i] = pointLabels[f[i]];
         }
     }
 }
 
+PtrList<dictionary> patchDicts;
 preservePatchTypes
 (
     runTime,
     runTime.constant(),
-    polyMesh::defaultRegion,
+    polyMesh::meshSubDir,
     patchNames,
-    patchTypes,
+    patchDicts,
     defaultFacesName,
-    defaultFacesType,
-    patchPhysicalTypes
+    defaultFacesType
 );
+// Add information to dictionary
+forAll(patchNames, patchI)
+{
+    if (!patchDicts.set(patchI))
+    {
+        patchDicts.set(patchI, new dictionary());
+    }
+    // Add but not overwrite
+    patchDicts[patchI].add("type", patchTypes[patchI], false);
+}
 
 // Build the mesh and write it out
 polyMesh pShapeMesh
@@ -580,10 +569,9 @@ polyMesh pShapeMesh
     cellShapes,
     boundary,
     patchNames,
-    patchTypes,
+    patchDicts,
     defaultFacesName,
-    defaultFacesType,
-    patchPhysicalTypes
+    defaultFacesType
 );
 
 Info << "Writing polyMesh" << endl;

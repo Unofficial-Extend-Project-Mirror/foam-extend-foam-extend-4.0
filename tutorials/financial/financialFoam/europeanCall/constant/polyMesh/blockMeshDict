@@ -37,16 +37,24 @@ edges
 (
 );
 
-patches
+boundary
 (
-    patch lowValue
-    (
-        (0 4 7 3)
-    )
-    patch highValue
-    (
-        (2 6 5 1)
-    )
+    lowValue
+    {
+        type patch;
+        faces
+        (
+            (0 4 7 3)
+        );
+    }
+    highValue
+    {
+        type patch;
+        faces
+        (
+            (2 6 5 1)
+        );
+    }
 );
 
 mergePatchPairs

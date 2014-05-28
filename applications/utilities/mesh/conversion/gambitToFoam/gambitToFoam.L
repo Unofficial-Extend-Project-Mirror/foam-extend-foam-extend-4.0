@@ -40,10 +40,12 @@ Description
 #include "scalarList.H"
 #include "IStringStream.H"
 
+// For EOF only
+#include <cstdio>
+
 using namespace Foam;
 
 #include "argList.H"
-#include "objectRegistry.H"
 #include "Time.H"
 #include "polyMesh.H"
 #include "emptyPolyPatch.H"
@@ -92,24 +94,14 @@ int yyFlexLexer::yywrap()
 one_space             [ \t\f\r]
 space                 {one_space}*
 some_space            {one_space}+
-cspace                ","{space}
 spaceNl               ({space}|\n)*
 
 alpha                 [_[:alpha:]]
 digit                 [[:digit:]]
-dec_digit             [[:digit:]]
-octal_digit           [0-7]
-hex_digit             [[:xdigit:]]
 
-lbrac                      "("
-rbrac                      ")"
-quote                      \"
-dash                       "-"
-dotColonDash               [.:-]
+dotColonDash          [.:-]
 
-identifier            {alpha}({alpha}|{digit})*
-integer               {dec_digit}+
-label                 [0-9]{dec_digit}*
+label                 [0-9]{digit}*
 zeroLabel             {digit}*
 
 word                  ({alpha}|{digit}|{dotColonDash})*
@@ -117,14 +109,14 @@ word                  ({alpha}|{digit}|{dotColonDash})*
 exponent_part         [eE][-+]?{digit}+
 fractional_constant   [-+]?(({digit}*"."{digit}+)|({digit}+"."?))
 
-double                ((({fractional_constant}{exponent_part}?)|({digit}+{exponent_part}))|0)
+floatNum              ((({fractional_constant}{exponent_part}?)|({digit}+{exponent_part}))|0)
 
-x                     {double}
-y                     {double}
-z                     {double}
-scalar                {double}
+x                     {floatNum}
+y                     {floatNum}
+z                     {floatNum}
+
 labelListElement      {space}{zeroLabel}
-scalarListElement     {space}{double}
+scalarListElement     {space}{floatNum}
 labelList             ({labelListElement}+{space})
 scalarList            ({scalarListElement}+{space})
 
@@ -230,7 +222,7 @@ mtype                 {space}"MTYPE:"{space}
 
 <readProgramID>{space}{word} {
 
-        Info << "Written by " << YYText() << " ";
+        Info<< "Written by " << YYText() << " ";
         BEGIN(controlInfo);
     }
 
@@ -242,20 +234,20 @@ mtype                 {space}"MTYPE:"{space}
 
 <readVersionID>{space}{versionNumber} {
 
-        Info << " version " << YYText() << endl;
+        Info<< " version " << YYText() << endl;
         BEGIN(controlInfo);
     }
 
 
 <controlInfo>{space}{dateDDMonYYYY}{space}{time} {
 
-        Info << "File written on " << YYText() << endl;
+        Info<< "File written on " << YYText() << endl;
     }
 
 
 <controlInfo>{space}{dateDDMMYYYY}{space}{time} {
 
-        Info << "File written on " << YYText() << endl;
+        Info<< "File written on " << YYText() << endl;
     }
 
 
@@ -301,7 +293,7 @@ mtype                 {space}"MTYPE:"{space}
 {nodalCoords}{spaceNl} {
 
         curNumberOfNodes = 0;
-        Info << "Reading nodal coordinates" << endl;
+        Info<< "Reading nodal coordinates" << endl;
         BEGIN(nodalCoords);
     }
 
@@ -329,7 +321,7 @@ mtype                 {space}"MTYPE:"{space}
 {cellsAndElements}{spaceNl} {
 
         curNumberOfCells = 0;
-        Info << "Reading cells" << endl;
+        Info<< "Reading cells" << endl;
         BEGIN(cellsAndElements);
     }
 
@@ -419,7 +411,7 @@ mtype                 {space}"MTYPE:"{space}
  /*             ------ Reading element group information ------               */
 
 {cellStreams}{spaceNl} {
-        Info << "Reading cell streams" << endl;
+        Info<< "Reading cell streams" << endl;
         BEGIN(cellStreams);
     }
 
@@ -441,7 +433,7 @@ mtype                 {space}"MTYPE:"{space}
         }
         else
         {
-            curGroupID = readLabel(groupStream);;
+            curGroupID = readLabel(groupStream);
         }
 
         BEGIN(cellStreams);
@@ -501,7 +493,7 @@ mtype                 {space}"MTYPE:"{space}
 
 
 <cellStreamFlags>{labelList} {
-        Info << "Reading cell stream labels" << endl;
+        Info<< "Reading cell stream labels" << endl;
         BEGIN(cellStreamLabels);
     }
 
@@ -526,7 +518,7 @@ mtype                 {space}"MTYPE:"{space}
 
 <cellStreamLabels>{endOfSection}\n {
 
-        Info << "Finished reading cell stream labels" << endl;
+        Info<< "Finished reading cell stream labels" << endl;
 
         // reset current group ID and a number of flags
         curGroupID = 0;
@@ -538,7 +530,7 @@ mtype                 {space}"MTYPE:"{space}
 
 {boundaryPatch}{spaceNl} {
         curPatchFace = 0;
-        Info << "Reading patches" << endl;
+        Info<< "Reading patches" << endl;
         BEGIN(boundaryPatchParams);
     }
 
@@ -580,7 +572,7 @@ mtype                 {space}"MTYPE:"{space}
         {
             scalarList patchFaceValues(nValuesForPatchFaces);
 
-            forAll (patchFaceValues, fI)
+            forAll(patchFaceValues, fI)
             {
                 patchFaceValues[fI] = readScalar(patchFacesStream);
             }
@@ -662,15 +654,15 @@ int main(int argc, char *argv[])
     }
 
     yyFlexLexer lexer(&gambitStream);
-    while(lexer.yylex() != 0)
+    while (lexer.yylex() != 0)
     {}
 
-    Info << "Finished lexing" << endl;
+    Info<< "Finished lexing" << endl;
 
     // make a point mapping array
     label maxPointIndex = 0;
 
-    forAll (pointMap, pointI)
+    forAll(pointMap, pointI)
     {
         if (pointMap[pointI] > maxPointIndex)
         {
@@ -681,7 +673,7 @@ int main(int argc, char *argv[])
 
     labelList pointLookup(maxPointIndex + 1, -1);
 
-    forAll (pointMap, pointI)
+    forAll(pointMap, pointI)
     {
         pointLookup[pointMap[pointI] ] = pointI;
     }
@@ -689,7 +681,7 @@ int main(int argc, char *argv[])
     // make a cell mapping array
     label maxCellIndex = 0;
 
-    forAll (cellMap, cellI)
+    forAll(cellMap, cellI)
     {
         if (cellMap[cellI] > maxCellIndex)
         {
@@ -699,7 +691,7 @@ int main(int argc, char *argv[])
 
     labelList cellLookup(maxCellIndex + 1);
 
-    forAll (cellMap, cellI)
+    forAll(cellMap, cellI)
     {
         cellLookup[cellMap[cellI] ] = cellI;
     }
@@ -716,7 +708,7 @@ int main(int argc, char *argv[])
 
     cellShapeList cells(cellLabels.size());
 
-    forAll (cellTypes, cellI)
+    forAll(cellTypes, cellI)
     {
         const labelList& curCellLabels = cellLabels[cellI];
 
@@ -795,7 +787,7 @@ int main(int argc, char *argv[])
         faceList& patchFaces = boundary[patchI];
         patchFaces.setSize(curCells.size());
 
-        forAll (curCells, faceI)
+        forAll(curCells, faceI)
         {
             patchFaces[faceI] =
                 cells[cellLookup[curCells[faceI] ] ].faces()
@@ -812,7 +804,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    Info << "gambitToFoam: " << endl
+    Info<< "gambitToFoam: " << endl
         << "Gambit file format does not provide information about the type of "
         << "the patch (eg. wall, symmetry plane, cyclic etc)." << endl
         << "All the patches have been created "
@@ -822,24 +814,32 @@ int main(int argc, char *argv[])
     // Scale points
     points *= scaleFactor;
 
-    wordList patchTypes(boundary.size(), polyPatch::typeName);
+    PtrList<dictionary> patchDicts(boundary.size());
     word defaultFacesName = "defaultFaces";
     word defaultFacesType = emptyPolyPatch::typeName;
-    wordList patchPhysicalTypes(boundary.size());
 
     preservePatchTypes
     (
         runTime,
         runTime.constant(),
-        polyMesh::defaultRegion,
+        polyMesh::meshSubDir,
         patchNames,
-        patchTypes,
+        patchDicts,
         defaultFacesName,
-        defaultFacesType,
-        patchPhysicalTypes
+        defaultFacesType
     );
 
-    // Mesh will auto-write on construction
+    // Add information to dictionary
+    forAll(patchNames, patchI)
+    {
+        if (!patchDicts.set(patchI))
+        {
+            patchDicts.set(patchI, new dictionary());
+        }
+        // Add but not overwrite
+        patchDicts[patchI].add("type", polyPatch::typeName, false);
+    }
+
     polyMesh pShapeMesh
     (
         IOobject
@@ -852,19 +852,18 @@ int main(int argc, char *argv[])
         cells,
         boundary,
         patchNames,
-        patchTypes,
+        patchDicts,
         defaultFacesName,
-        defaultFacesType,
-        patchPhysicalTypes
+        defaultFacesType
     );
 
     // Set the precision of the points data to 10
-    IOstream::defaultPrecision(10);
+    IOstream::defaultPrecision(max(10u, IOstream::defaultPrecision()));
 
-    Info << "Writing polyMesh" << endl;
+    Info<< "Writing polyMesh" << endl;
     pShapeMesh.write();
 
-    Info<< nl << "End" << endl;
+    Info<< "\nEnd\n" << endl;
     return 0;
 }
 
