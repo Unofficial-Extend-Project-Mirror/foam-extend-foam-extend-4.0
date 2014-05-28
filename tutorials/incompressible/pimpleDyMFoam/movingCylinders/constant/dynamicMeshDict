@@ -1,0 +1,71 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      dynamicMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// dynamicFvMesh      staticFvMesh;
+ dynamicFvMesh      multiTopoBodyFvMesh;
+
+multiTopoBodyFvMeshCoeffs
+{
+    bodies
+    (
+        frontCyl
+        {
+            movingCells     cyl1;
+            layerFaces
+            (
+                topLayerCyl1
+                botLayerCyl1
+            );
+
+            solidBodyMotionFunction   linearOscillation;
+            linearOscillationCoeffs
+            {
+                amplitude   (0 0.028 0);
+                period      2;
+            }
+
+            minThickness     0.0015;
+            maxThickness     0.004;
+
+            invertMask       true;
+        }
+
+        backCyl
+        {
+            movingCells     cyl2;
+            layerFaces
+            (
+                topLayerCyl2
+                botLayerCyl2
+            );
+
+            solidBodyMotionFunction   linearOscillation;
+            linearOscillationCoeffs
+            {
+                amplitude   (0 -0.028 0);
+                period      3;
+            }
+
+            minThickness     0.0015;
+            maxThickness     0.004;
+
+            invertMask       true;
+        }
+    );
+}
+
+
+// ************************************************************************* //

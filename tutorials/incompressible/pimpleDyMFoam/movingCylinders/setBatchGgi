@@ -1,0 +1,7 @@
+faceSet frontInZone new patchToFace frontIn
+faceSet frontOutZone new patchToFace frontOut
+faceSet middleInZone new patchToFace middleIn
+faceSet middleOutZone new patchToFace middleOut
+faceSet backInZone new patchToFace backIn
+faceSet backOutZone new patchToFace backOut
+quit
