@@ -110,12 +110,12 @@ int main(int argc, char *argv[])
 
         phi = (fvc::interpolate(U) & mesh.Sf()) + pEqn.flux() + presSource;
 
+#       include "continuityErrs.H"
+
         p.relax();
 
         turbulence->correct();
         runTime.write();
-
-#       include "continuityErrs.H"
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
