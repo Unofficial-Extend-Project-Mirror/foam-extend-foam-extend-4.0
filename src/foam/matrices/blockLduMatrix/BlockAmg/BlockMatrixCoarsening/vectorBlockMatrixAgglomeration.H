@@ -22,22 +22,22 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockAamgPolicy
+    BlockMatrixAgglomeration
 
 Description
-    Specialisation of the BlockAamgPolicy for tensors.
+    Specialisation of the BlockMatrixAgglomeration for vectors.
 
 Author
     Klas Jareteg, 2013-01-31
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef tensorBlockAamgPolicy_H
-#define tensorBlockAamgPolicy_H
+#ifndef vectorBlockMatrixAgglomeration_H
+#define vectorBlockMatrixAgglomeration_H
 
-#include "blockAmgPolicies.H"
-#include "blockAamgPolicies.H"
-#include "BlockAamgPolicy.H"
+#include "blockMatrixCoarsenings.H"
+#include "blockMatrixAgglomerations.H"
+#include "BlockMatrixAgglomeration.H"
 #include "runTimeSelectionTables.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -46,24 +46,25 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class BlockAamgPolicy Declaration
+                        Class BlockMatrixAgglomeration Declaration
 \*---------------------------------------------------------------------------*/
 
 //- Restrict matrix
 
 template<>
-inline autoPtr<BlockLduMatrix<tensor> > BlockAamgPolicy<tensor>::restrictMatrix
+inline autoPtr<BlockLduMatrix<vector> >
+BlockMatrixAgglomeration<vector>::restrictMatrix
 () const
 {
     FatalErrorIn
     (
-        "autoPtr<BlockLduMatrix<tensor> > BlockAamgPolicy<Type>::"
+        "autoPtr<BlockLduMatrix<vector> > BlockMatrixAgglomeration<Type>::"
         "restrictMatrix() const"
-    )   << "Function not implemented for Type=tensor. " << endl
+    )   << "Function not implemented for Type=vector. " << endl
         << abort(FatalError);
 
     // Dummy return to keep compiler happy
-    return autoPtr<BlockLduMatrix<tensor> >(NULL);
+    return autoPtr<BlockLduMatrix<vector> >(NULL);
 }
 
 

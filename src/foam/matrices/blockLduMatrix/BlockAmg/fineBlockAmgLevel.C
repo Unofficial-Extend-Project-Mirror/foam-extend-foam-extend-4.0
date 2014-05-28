@@ -49,7 +49,7 @@ Foam::fineBlockAmgLevel<Type>::fineBlockAmgLevel
 (
     const BlockLduMatrix<Type>& matrix,
     const dictionary& dict,
-    const word& policyType,
+    const word& coarseningType,
     const label groupSize,
     const label minCoarseEqns,
     const word& smootherType
@@ -57,11 +57,11 @@ Foam::fineBlockAmgLevel<Type>::fineBlockAmgLevel
 :
     matrix_(matrix),
     dict_(dict),
-    policyPtr_
+    coarseningPtr_
     (
-        BlockAmgPolicy<Type>::New
+        BlockMatrixCoarsening<Type>::New
         (
-            policyType,
+            coarseningType,
             matrix_,
             dict_,
             groupSize,
@@ -145,7 +145,7 @@ void Foam::fineBlockAmgLevel<Type>::restrictResidual
 
     // Here x != 0.  It is assumed that the buffer will contain the residual
     // if no pre-sweeps have been done.  HJ, 4/Sep/2006
-    policyPtr_->restrictResidual(xBuffer, coarseRes);
+    coarseningPtr_->restrictResidual(xBuffer, coarseRes);
 }
 
 
@@ -156,7 +156,7 @@ void Foam::fineBlockAmgLevel<Type>::prolongateCorrection
     const Field<Type>& coarseX
 ) const
 {
-    policyPtr_->prolongateCorrection(x, coarseX);
+    coarseningPtr_->prolongateCorrection(x, coarseX);
 }
 
 
@@ -267,17 +267,17 @@ template<class Type>
 Foam::autoPtr<Foam::BlockAmgLevel<Type> >
 Foam::fineBlockAmgLevel<Type>::makeNextLevel() const
 {
-    if (policyPtr_->coarsen())
+    if (coarseningPtr_->coarsen())
     {
         return autoPtr<Foam::BlockAmgLevel<Type> >
         (
             new coarseBlockAmgLevel<Type>
             (
-                policyPtr_->restrictMatrix(),
+                coarseningPtr_->restrictMatrix(),
                 dict(),
-                policyPtr_->type(),
-                policyPtr_->groupSize(),
-                policyPtr_->minCoarseEqns(),
+                coarseningPtr_->type(),
+                coarseningPtr_->groupSize(),
+                coarseningPtr_->minCoarseEqns(),
                 smootherPtr_->type()
             )
         );

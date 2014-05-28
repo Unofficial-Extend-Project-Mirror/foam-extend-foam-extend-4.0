@@ -22,50 +22,55 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockAamgPolicy
+    BlockMatrixAgglomeration
 
 Description
-    Specialisation of the BlockAamgPolicy for vectors.
+    Specialisation of the BlockMatrixAgglomeration for scalars.
 
 Author
     Klas Jareteg, 2013-01-31
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef vectorBlockAamgPolicy_H
-#define vectorBlockAamgPolicy_H
+#ifndef scalarBlockMatrixAgglomeration_H
+#define scalarBlockMatrixAgglomeration_H
 
-#include "blockAmgPolicies.H"
-#include "blockAamgPolicies.H"
-#include "BlockAamgPolicy.H"
+#include "blockMatrixCoarsenings.H"
+#include "blockMatrixAgglomerations.H"
+#include "BlockMatrixAgglomeration.H"
+#include "BlockMatrixCoarsening.H"
 #include "runTimeSelectionTables.H"
+#include "scalarBlockLduMatrix.H"
+#include "scalarBlockConstraint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+// * * * * * * Forward declaration of template friend fuctions * * * * * * * //
+
+
 /*---------------------------------------------------------------------------*\
-                        Class BlockAamgPolicy Declaration
+                        Class BlockMatrixAgglomeration Declaration
 \*---------------------------------------------------------------------------*/
 
 //- Restrict matrix
 
 template<>
-inline autoPtr<BlockLduMatrix<vector> > BlockAamgPolicy<vector>::restrictMatrix
-() const
+inline autoPtr<BlockLduMatrix<scalar> >
+BlockMatrixAgglomeration<scalar>::restrictMatrix() const
 {
     FatalErrorIn
     (
-        "autoPtr<BlockLduMatrix<vector> > BlockAamgPolicy<Type>::"
-        "restrictMatrix() const"
-    )   << "Function not implemented for Type=vector. " << endl
+        "autoPtr<BlockLduMatrix<scalar> > "
+        "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
+    )   << "Function not implemented for Type=scalar. " << endl
         << abort(FatalError);
 
     // Dummy return to keep compiler happy
-    return autoPtr<BlockLduMatrix<vector> >(NULL);
+    return autoPtr<BlockLduMatrix<scalar> >(NULL);
 }
-
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -68,7 +68,7 @@ Foam::BlockAmgPrecon<Type>::BlockAmgPrecon
                 (
                     matrix,
                     dict,
-                    dict.lookup("policy"),
+                    dict.lookup("coarseningType"),
                     readLabel(dict.lookup("groupSize")),
                     readLabel(dict.lookup("minCoarseEqns")),
                     dict.lookup("smoother")

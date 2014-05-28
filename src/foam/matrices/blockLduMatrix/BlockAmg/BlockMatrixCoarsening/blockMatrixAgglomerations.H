@@ -22,27 +22,27 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockAamgPolicy
+    BlockMatrixAgglomeration
 
 Description
-    Typedefs for block AMG policies.
+    Typedefs for block matrix AMG coarsening.
 
 Author
     Klas Jareteg, 2012-12-15
 
 SourceFiles
-    blockAamgPolicies.C
+    blockMatrixAgglomeration.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef blockAamgPolicies_H
-#define blockAamgPolicies_H
+#ifndef blockMatrixAgglomerations_H
+#define blockMatrixAgglomerations_H
 
 // Disabled instantiation for primitive types by force. HJ, 15/Apr/2013
-#include "scalarBlockAamgPolicy.H"
-#include "vectorBlockAamgPolicy.H"
-#include "tensorBlockAamgPolicy.H"
-#include "BlockAamgPolicy.H"
+#include "scalarBlockMatrixAgglomeration.H"
+#include "vectorBlockMatrixAgglomeration.H"
+#include "tensorBlockMatrixAgglomeration.H"
+#include "BlockMatrixAgglomeration.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -51,9 +51,9 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-typedef BlockAamgPolicy<scalar> blockAamgPolicyScalar;
-typedef BlockAamgPolicy<vector> blockAamgPolicyVector;
-typedef BlockAamgPolicy<tensor> blockAamgPolicyTensor;
+typedef BlockMatrixAgglomeration<scalar> blockMatrixAgglomerationScalar;
+typedef BlockMatrixAgglomeration<vector> blockMatrixAgglomerationVector;
+typedef BlockMatrixAgglomeration<tensor> blockMatrixAgglomerationTensor;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

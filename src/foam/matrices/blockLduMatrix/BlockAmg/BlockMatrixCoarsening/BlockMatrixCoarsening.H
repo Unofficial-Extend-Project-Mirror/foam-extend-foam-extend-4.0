@@ -22,22 +22,22 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockAmgPolicy
+    BlockMatrixCoarsening
 
 Description
-    Virtual base class for AMG coarsening policy, implemented for
+    Virtual base class for block matrix AMG coarsening, implemented for
     BlockLduMatrix
 
 Author
     Klas Jareteg, 2012-12-15
 
 SourceFiles
-    BlockAmgPolicy.C
+    BlockMatrixCoarsening.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef BlockAmgPolicy_H
-#define BlockAmgPolicy_H
+#ifndef BlockMatrixCoarsening_H
+#define BlockMatrixCoarsening_H
 
 #include "runTimeSelectionTables.H"
 #include "primitiveFieldsFwd.H"
@@ -62,11 +62,11 @@ template<class Type>
 class BlockAmgLevel;
 
 /*---------------------------------------------------------------------------*\
-                           Class BlockAmgPolicy Declaration
+                           Class BlockMatrixCoarsening Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class BlockAmgPolicy
+class BlockMatrixCoarsening
 {
     // Private Data
 
@@ -82,16 +82,16 @@ class BlockAmgPolicy
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        BlockAmgPolicy(const BlockAmgPolicy&);
+        BlockMatrixCoarsening(const BlockMatrixCoarsening&);
 
         //- Disallow default bitwise assignment
-        void operator=(const BlockAmgPolicy&);
+        void operator=(const BlockMatrixCoarsening&);
 
 
 public:
 
         //- Runtime type information
-        TypeName("BlockAmgPolicy");
+        TypeName("BlockMatrixCoarsening");
 
         // KRJ: 2012-12-15: Replaced by the above function
         //- Runtime type information
@@ -103,7 +103,7 @@ public:
             declareRunTimeSelectionTable
             (
                 autoPtr,
-                BlockAmgPolicy,
+                BlockMatrixCoarsening,
                 matrix,
                 (
                     const BlockLduMatrix<Type>& matrix,
@@ -118,9 +118,9 @@ public:
     // Selectors
 
         //- Select given name, group size and matrix
-        static autoPtr<BlockAmgPolicy<Type> > New
+        static autoPtr<BlockMatrixCoarsening<Type> > New
         (
-            const word& policyType,
+            const word& coarseningType,
             const BlockLduMatrix<Type>& matrix,
             const dictionary& dict,
             const label groupSize,
@@ -131,7 +131,7 @@ public:
     // Constructors
 
         //- Construct from components
-        BlockAmgPolicy
+        BlockMatrixCoarsening
         (
             const BlockLduMatrix<Type>& matrix,
             const dictionary& dict,
@@ -147,7 +147,7 @@ public:
 
     // Destructor
 
-        virtual ~BlockAmgPolicy()
+        virtual ~BlockMatrixCoarsening()
         {}
 
 
@@ -196,20 +196,20 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "BlockAmgPolicy.C"
+#   include "BlockMatrixCoarsening.C"
 #endif
 
-#define makeBlockAmgPolicy(BlockAmgPolicyType, typeBlockAmgPolicyType) \
+#define makeBlockMatrixCoarsening(BlockMatrixCoarseningType, typeBlockMatrixCoarseningType) \
                                                                              \
-defineNamedTemplateTypeNameAndDebug(typeBlockAmgPolicyType, 0);              \
+defineNamedTemplateTypeNameAndDebug(typeBlockMatrixCoarseningType, 0);              \
                                                                              \
-addToRunTimeSelectionTable(BlockAmgPolicyType, typeBlockAmgPolicyType, matrix);
+addToRunTimeSelectionTable(BlockMatrixCoarseningType, typeBlockMatrixCoarseningType, matrix);
 
-#define makeBlockAmgPolicys(blockAmgPolicyType)                               \
+#define makeBlockMatrixCoarsenings(blockAmgCoarseningType)                               \
                                                                              \
-makeBlockAmgPolicy(blockScalarAmgPolicy, blockAmgPolicyType##Scalar);         \
-makeBlockAmgPolicy(blockVectorAmgPolicy, blockAmgPolicyType##Vector);         \
-makeBlockAmgPolicy(blockTensorAmgPolicy, blockAmgPolicyType##Tensor);
+makeBlockMatrixCoarsening(blockScalarMatrixCoarsening, blockAmgCoarseningType##Scalar);         \
+makeBlockMatrixCoarsening(blockVectorMatrixCoarsening, blockAmgCoarseningType##Vector);         \
+makeBlockMatrixCoarsening(blockTensorMatrixCoarsening, blockAmgCoarseningType##Tensor);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
