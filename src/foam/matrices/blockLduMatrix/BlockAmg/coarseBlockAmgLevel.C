@@ -198,6 +198,7 @@ void Foam::coarseBlockAmgLevel<Type>::solve
 
     label maxIter = Foam::min(2*coarseningPtr_->minCoarseEqns(), 1000);
 
+    // Create artificial dictionary for top-level solution
     dictionary topLevelDict;
     topLevelDict.add("nDirections", "5");
     topLevelDict.add("minIter", 1);
@@ -233,15 +234,10 @@ void Foam::coarseBlockAmgLevel<Type>::solve
             matrixPtr_,
             topLevelDict
         ).solve(x, b);
-
-        if (BlockLduMatrix<Type>::debug >= 2)
-        {
-            coarseSolverPerf.print();
-        }
     }
     else
     {
-        topLevelDict.add("preconditioner", "ILU0");
+        topLevelDict.add("preconditioner", "Cholesky");
 
         coarseSolverPerf =
         //BlockGaussSeidelSolver<Type>
@@ -252,13 +248,30 @@ void Foam::coarseBlockAmgLevel<Type>::solve
             matrixPtr_,
             topLevelDict
         ).solve(x, b);
-
-        if (BlockLduMatrix<Type>::debug >= 2)
-        {
-            coarseSolverPerf.print();
-        }
     }
 
+    // Escape cases of top-level solver divergence
+    if
+    (
+        coarseSolverPerf.nIterations() == maxIter
+     && (
+            coarseSolverPerf.finalResidual()
+         >= coarseSolverPerf.initialResidual()
+        )
+    )
+    {
+        // Top-level solution failed.  Attempt rescue
+        // HJ, 27/Jul/2013
+        multiply(x, invDiag, b);
+
+        // Print top level correction failure as info for user
+        coarseSolverPerf.print();
+    }
+
+    if (BlockLduMatrix<Type>::debug >= 2)
+    {
+        coarseSolverPerf.print();
+    }
 }
 
 

@@ -25,7 +25,7 @@ Class
     BlockMatrixAgglomeration
 
 Description
-    Agglomerative block matrix AMG corsening, adjusted for BlockLduMatrix
+    Agglomerative block matrix AMG corsening
 
 Author
     Klas Jareteg, 2012-12-13
@@ -33,6 +33,7 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "BlockMatrixAgglomeration.H"
+#include "boolList.H"
 #include "coeffFields.H"
 #include "addToRunTimeSelectionTable.H"
 #include "BlockGAMGInterfaceField.H"
@@ -41,13 +42,19 @@ Author
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class Type>
+const Foam::scalar Foam::BlockMatrixAgglomeration<Type>::diagFactor_
+(
+    debug::tolerances("aamgDiagFactor", 1e-8)
+);
+
+template<class Type>
 const Foam::scalar Foam::BlockMatrixAgglomeration<Type>::weightFactor_ = 0.65;
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
-void Foam::BlockMatrixAgglomeration<Type>::calcChild()
+void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
 {
     // Algorithm:
     // 1) Create temporary equation addressing using a double-pass algorithm.
@@ -96,9 +103,9 @@ void Foam::BlockMatrixAgglomeration<Type>::calcChild()
 
     // Create column and coefficient index array
     {
-        // Use child array to count number of entries per row.
+        // Use agglomIndex to count number of entries per row.
         // Reset the list for counting
-        labelList& nPerRow = child_;
+        labelList& nPerRow = agglomIndex_;
         nPerRow = 0;
 
         forAll (upperAddr, coeffI)
@@ -123,8 +130,8 @@ void Foam::BlockMatrixAgglomeration<Type>::calcChild()
             nPerRow[lowerAddr[coeffI]]++;
         }
 
-        // Reset child array
-        child_ = -1;
+        // Reset agglomeration index array
+        agglomIndex_ = -1;
     }
 
 
@@ -132,43 +139,122 @@ void Foam::BlockMatrixAgglomeration<Type>::calcChild()
 
     // Get matrix coefficients
     const CoeffField<Type>& diag = matrix_.diag();
-    const CoeffField<Type>& upper = matrix_.upper();
+
+    // Coefficient magnitudes are pre-calculated
+    scalarField magDiag(diag.size());
+    scalarField magOffDiag(upperAddr.size());
+
+    normPtr_->coeffMag(diag, magDiag);
+
+    if (matrix_.asymmetric())
+    {
+        scalarField magUpper(upperAddr.size());
+        scalarField magLower(upperAddr.size());
+
+        normPtr_->coeffMag(matrix_.upper(), magUpper);
+        normPtr_->coeffMag(matrix_.lower(), magLower);
+
+        magOffDiag = Foam::max(magUpper, magLower);
+    }
+    else if (matrix_.symmetric())
+    {
+        normPtr_->coeffMag(matrix_.upper(), magOffDiag);
+    }
+    else
+    {
+        // Diag only matrix.  Reset and return
+        agglomIndex_ = 0;
+        nCoarseEqns_ = 1;
+
+        return;
+    }
 
     labelList sizeOfGroups(nRows, 0);
 
     nCoarseEqns_ = 0;
 
-    label indexU, indexG, colI, curEqn, nextEqn, groupPassI;
+    // Gather disconnected and weakly connected equations into cluster zero
+    // Weak connection is assumed to be the one where the off-diagonal
+    // coefficient is smaller than diagFactor_*diag
+    {
+        // Algorithm
+        // Mark all cells to belong to zero cluster
+        // Go through all upper and lower coefficients and for the ones
+        // larger than threshold mark the equations out of cluster zero
 
-    scalar magRowDiag, magColDiag, weight, weightU, weightG;
+        scalarField magScaledDiag = diagFactor_*magDiag;
 
-    // Magnitudes pre-calculated
-    Field<scalar> magDiag(diag.size());
-    Field<scalar> magUpper(upper.size());
+        boolList zeroCluster(diag.size(), true);
 
-    normPtr_->coeffMag(diag,magDiag);
-    normPtr_->coeffMag(upper,magUpper);
+        forAll (magOffDiag, coeffI)
+        {
+            if (magOffDiag[coeffI] > magScaledDiag[upperAddr[coeffI]])
+            {
+                zeroCluster[upperAddr[coeffI]] = false;
+            }
+
+            if (magOffDiag[coeffI] > magScaledDiag[lowerAddr[coeffI]])
+            {
+                zeroCluster[lowerAddr[coeffI]] = false;
+            }
+        }
+
+        // Collect solo equations
+        label nSolo = 0;
+
+        forAll (zeroCluster, eqnI)
+        {
+            if (zeroCluster[eqnI])
+            {
+                // Found solo equation
+                nSolo++;
+
+                agglomIndex_[eqnI] = nCoarseEqns_;
+            }
+        }
+
+        reduce(nSolo, sumOp<label>());
+
+        if (nSolo > 0)
+        {
+            // Found solo equations
+            nCoarseEqns_++;
+
+            if (BlockLduMatrix<Type>::debug >= 2)
+            {
+                Info<< "Found " << nSolo << " weakly connected equations."
+                    << endl;
+            }
+        }
+    }
+
+    // Go through the off-diagonal and create clusters, marking the child array
+    label indexUngrouped, indexGrouped;
+    label colI, curEqn, nextEqn, groupPassI;
+
+    scalar magRowDiag, magColDiag;
+    scalar weight, weightUngrouped, weightGrouped;
 
     for (label eqnI = 0; eqnI < nRows; eqnI++)
     {
-        if (child_[eqnI] == -1)
+        if (agglomIndex_[eqnI] == -1)
         {
             curEqn = eqnI;
 
-            indexU = -1;
-            indexG = -1;
+            indexUngrouped = -1;
+            indexGrouped = -1;
 
-            child_[curEqn] = nCoarseEqns_;
+            agglomIndex_[curEqn] = nCoarseEqns_;
 
             magRowDiag = magDiag[curEqn];
 
             for (groupPassI = 1; groupPassI < groupSize_; groupPassI++)
             {
-                weightU = 0;
-                weightG = 0;
+                weightUngrouped = 0;
+                weightGrouped = 0;
 
-                indexU = -1;
-                indexG = -1;
+                indexUngrouped = -1;
+                indexGrouped = -1;
 
                 for
                 (
@@ -181,40 +267,42 @@ void Foam::BlockMatrixAgglomeration<Type>::calcChild()
 
                     magColDiag = magDiag[colI];
 
-                    weight = (magUpper[cIndex[rowCoeffI]]
-                        / max(magRowDiag, magColDiag));
+                    weight = magOffDiag[cIndex[rowCoeffI]]/max(magRowDiag, magColDiag);
 
-                    if (child_[colI] == -1)
+                    if (agglomIndex_[colI] == -1)
                     {
-                        if (indexU == -1 || weight > weightU)
+                        if (indexUngrouped == -1 || weight > weightUngrouped)
                         {
-                            indexU = rowCoeffI;
-                            weightU = weight;
+                            indexUngrouped = rowCoeffI;
+                            weightUngrouped = weight;
                         }
                     }
-                    else if (child_[curEqn] != child_[colI])
+                    else if (agglomIndex_[curEqn] != agglomIndex_[colI])
                     {
-                        if (indexG == -1 || weight > weightG)
+                        if (indexGrouped == -1 || weight > weightGrouped)
                         {
-                            indexG = rowCoeffI;
-                            weightG = weight;
+                            indexGrouped = rowCoeffI;
+                            weightGrouped = weight;
                         }
                     }
                 }
 
                 if
                 (
-                    indexU != -1
-                 && (indexG == -1 || weightU >= weightFactor_*weightG)
+                    indexUngrouped != -1
+                 && (
+                        indexGrouped == -1
+                     || weightUngrouped >= weightFactor_*weightGrouped
+                    )
                 )
                 {
                     // Found new element of group.  Add it and use as
                     // start of next search
 
-                    nextEqn = cols[indexU];
+                    nextEqn = cols[indexUngrouped];
 
-                    child_[nextEqn] = child_[curEqn];
-                    sizeOfGroups[child_[curEqn]];
+                    agglomIndex_[nextEqn] = agglomIndex_[curEqn];
+                    sizeOfGroups[agglomIndex_[curEqn]];
 
                     curEqn = nextEqn;
                 }
@@ -228,17 +316,20 @@ void Foam::BlockMatrixAgglomeration<Type>::calcChild()
             if
             (
                 groupPassI > 1
-             || indexG == -1
-             || sizeOfGroups[child_[cols[indexG]]] > (groupSize_ + 2)
+             || indexGrouped == -1
+             || (
+                    sizeOfGroups[agglomIndex_[cols[indexGrouped]]]
+                  > (groupSize_ + 2)
+                )
             )
             {
-                sizeOfGroups[child_[eqnI]]++;
+                sizeOfGroups[agglomIndex_[eqnI]]++;
                 nCoarseEqns_++;
             }
             else
             {
-                child_[eqnI] = child_[cols[indexG]];
-                sizeOfGroups[child_[cols[indexG]]]++;
+                agglomIndex_[eqnI] = agglomIndex_[cols[indexGrouped]];
+                sizeOfGroups[agglomIndex_[cols[indexGrouped]]]++;
             }
         }
     }
@@ -258,6 +349,19 @@ void Foam::BlockMatrixAgglomeration<Type>::calcChild()
 
     reduce(coarsen_, andOp<bool>());
 
+    if (BlockLduMatrix<Type>::debug >= 2)
+    {
+        Pout << "Coarse level size: " << nCoarseEqns_;
+
+        if (coarsen_)
+        {
+            Pout << ".  Accepted" << endl;
+        }
+        else
+        {
+            Pout << ".  Rejected" << endl;
+        }
+    }
 }
 
 
@@ -274,19 +378,13 @@ Foam::BlockMatrixAgglomeration<Type>::BlockMatrixAgglomeration
 :
     BlockMatrixCoarsening<Type>(matrix, dict, groupSize, minCoarseEqns),
     matrix_(matrix),
-    normPtr_
-    (
-        BlockCoeffNorm<Type>::New
-        (
-            dict
-        )
-    ),
-    child_(matrix_.lduAddr().size()),
+    normPtr_(BlockCoeffNorm<Type>::New(dict)),
+    agglomIndex_(matrix_.lduAddr().size()),
     groupSize_(groupSize),
     nCoarseEqns_(0),
     coarsen_(false)
 {
-    calcChild();
+    calcAgglomeration();
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -314,7 +412,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
 
     // Construct the coarse matrix and ldu addressing for the next level
     // Algorithm:
-    // 1) Loop through all fine coeffs. If the child labels on two sides are
+    // 1) Loop through all fine coeffs.  If the agglom labels on two sides are
     //    different, this creates a coarse coeff. Define owner and neighbour
     //    for this coeff based on cluster IDs.
     // 2) Check if the coeff has been seen before. If yes, add the coefficient
@@ -332,14 +430,14 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     const label nFineCoeffs = upperAddr.size();
 
 #   ifdef FULLDEBUG
-    if (child_.size() != matrix_.lduAddr().size())
+    if (agglomIndex_.size() != matrix_.lduAddr().size())
     {
         FatalErrorIn
         (
             "autoPtr<BlockLduMatrix<Type> > BlockMatrixAgglomeration<Type>::"
             "restrictMatrix() const"
-        )   << "Child array does not correspond to fine level. " << endl
-            << " Child size: " << child_.size()
+        )   << "agglomIndex array does not correspond to fine level. " << endl
+            << " Size: " << agglomIndex_.size()
             << " number of equations: " << matrix_.lduAddr().size()
             << abort(FatalError);
     }
@@ -369,8 +467,8 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     // Loop through all fine coeffs
     forAll (upperAddr, fineCoeffi)
     {
-        label rmUpperAddr = child_[upperAddr[fineCoeffi]];
-        label rmLowerAddr = child_[lowerAddr[fineCoeffi]];
+        label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffi]];
+        label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffi]];
 
         if (rmUpperAddr == rmLowerAddr)
         {
@@ -480,6 +578,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     initCoarseNeighb.setSize(0);
     coarseCoeffMap.setSize(0);
 
+
     // Create coarse-level coupled interfaces
 
     // Create coarse interfaces, addressing and coefficients
@@ -517,7 +616,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             interfaceFields[intI].interface().initInternalFieldTransfer
             (
                 Pstream::blocking,
-                child_
+                agglomIndex_
             );
         }
     }
@@ -541,7 +640,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
                     fineInterface.internalFieldTransfer
                     (
                         Pstream::blocking,
-                        child_
+                        agglomIndex_
                     )
                 )
             );
@@ -563,7 +662,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
                 (
                     *coarseAddrPtr,
                     fineInterface,
-                    fineInterface.interfaceInternalField(child_),
+                    fineInterface.interfaceInternalField(agglomIndex_),
                     fineInterfaceAddr[intI]
                 ).ptr()
             );
@@ -664,7 +763,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
                 squareTypeField& activeCoarseLower = coarseLower.asSquare();
                 const squareTypeField& activeFineLower = fineLower.asSquare();
 
-                restrictResidual(fineDiag, coarseDiag);
+                restrictDiag(fineDiag, coarseDiag);
 
                 forAll(coeffRestrictAddr, fineCoeffI)
                 {
@@ -688,27 +787,41 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             }
             else if (fineUpper.activeType() == blockCoeffBase::LINEAR)
             {
-                FatalErrorIn("autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::restrictMatrix() const")
-                    << "Matrix diagonal of square type and upper of linear type is not implemented"
+                FatalErrorIn
+                (
+                    "autoPtr<amgMatrix>"
+                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
+                )   << "Matrix diagonal of square type and upper of "
+                    << "linear type is not implemented"
                     << abort(FatalError);
             }
             else
             {
-                FatalErrorIn("autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::restrictMatrix() const")
-                    << "Matrix diagonal of square type and upper of scalar type is not implemented"
+                FatalErrorIn
+                (
+                    "autoPtr<amgMatrix>"
+                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
+                )   << "Matrix diagonal of square type and upper of "
+                    << "scalar type is not implemented"
                     << abort(FatalError);
             }
         }
         else if (fineDiag.activeType() == blockCoeffBase::LINEAR)
         {
-                FatalErrorIn("autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::restrictMatrix() const")
-                    << "Matrix diagonal of linear type not implemented"
+                FatalErrorIn
+                (
+                    "autoPtr<amgMatrix>"
+                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
+                )   << "Matrix diagonal of linear type not implemented"
                     << abort(FatalError);
         }
         else
         {
-                FatalErrorIn("autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::restrictMatrix() const")
-                    << "Matrix diagonal of scalar type not implemented"
+                FatalErrorIn
+                (
+                    "autoPtr<amgMatrix>"
+                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
+                )   << "Matrix diagonal of scalar type not implemented"
                     << abort(FatalError);
         }
     }
@@ -722,7 +835,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
                 squareTypeField& activeCoarseDiag = coarseDiag.asSquare();
                 const squareTypeField& activeFineUpper = fineUpper.asSquare();
 
-                restrictResidual(fineDiag, coarseDiag);
+                restrictDiag(fineDiag, coarseDiag);
 
                 forAll(coeffRestrictAddr, fineCoeffI)
                 {
@@ -730,27 +843,38 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
 
                     if (cCoeff >= 0)
                     {
-                        activeCoarseUpper[cCoeff]
-                            += activeFineUpper[fineCoeffI];
+                        activeCoarseUpper[cCoeff] +=
+                            activeFineUpper[fineCoeffI];
                     }
                     else
                     {
-                        // Add the fine face coefficient into the diagonal.
-                        activeCoarseDiag[-1 - cCoeff]
-                            += 2*activeFineUpper[fineCoeffI];
+                        // Add the fine face coefficient into the diagonal
+                        // Note: upper and lower coeffs are transpose of
+                        // each other.  HJ, 28/May/2014
+                        activeCoarseDiag[-1 - cCoeff] +=
+                            activeFineUpper[fineCoeffI]
+                          + activeFineUpper[fineCoeffI].T();
                     }
                 }
             }
             else if (fineUpper.activeType() == blockCoeffBase::LINEAR)
             {
-                FatalErrorIn("autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::restrictMatrix() const")
-                    << "Matrix diagonal of square type and upper of linear type is not implemented"
+                FatalErrorIn
+                (
+                    "autoPtr<amgMatrix>"
+                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
+                )   << "Matrix diagonal of square type and upper of "
+                    << "linear type is not implemented"
                     << abort(FatalError);
             }
             else
             {
-                FatalErrorIn("autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::restrictMatrix() const")
-                    << "Matrix diagonal of square type and upper of scalar type is not implemented"
+                FatalErrorIn
+                (
+                    "autoPtr<amgMatrix>"
+                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
+                )   << "Matrix diagonal of square type and upper of "
+                    << "scalar type is not implemented"
                     << abort(FatalError);
             }
 
@@ -775,48 +899,47 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         }
     }
 
-    return autoPtr<BlockLduMatrix<Type> >
-    (
-        new BlockLduMatrix<Type>
-        (
-            coarseMatrix
-        )
-    );
+    return autoPtr<BlockLduMatrix<Type> >(coarseMatrixPtr);
 }
 
 
 template<class Type>
-void Foam::BlockMatrixAgglomeration<Type>::restrictResidual
+void Foam::BlockMatrixAgglomeration<Type>::restrictDiag
 (
-    const CoeffField<Type>& res,
-    CoeffField<Type>& coarseRes
+    const CoeffField<Type>& Coeff,
+    CoeffField<Type>& coarseCoeff
 ) const
 {
     typedef CoeffField<Type> TypeCoeffField;
 
-    if (res.activeType() == blockCoeffBase::SQUARE &&
-            coarseRes.activeType() == blockCoeffBase::SQUARE)
+    if
+    (
+        Coeff.activeType() == blockCoeffBase::SQUARE
+     && coarseCoeff.activeType() == blockCoeffBase::SQUARE
+    )
     {
+        typedef typename TypeCoeffField::squareType squareType;
         typedef typename TypeCoeffField::squareTypeField squareTypeField;
 
-        squareTypeField& activeCoarseRes = coarseRes.asSquare();
-        const squareTypeField& activeRes = res.asSquare();
+        squareTypeField& activeCoarseCoeff = coarseCoeff.asSquare();
+        const squareTypeField& activeCoeff = Coeff.asSquare();
 
-        // KRJ: 2013-02-05: To be done by correct pTraits?
-        forAll (coarseRes, i)
+        forAll (coarseCoeff, i)
         {
-            activeCoarseRes[i] *= 0.0;
+            activeCoarseCoeff[i] = pTraits<squareType>::zero;
         }
 
-        forAll (res, i)
+        forAll (Coeff, i)
         {
-            activeCoarseRes[child_[i]] += activeRes[i];
+            activeCoarseCoeff[agglomIndex_[i]] += activeCoeff[i];
         }
     }
     else
     {
-        FatalErrorIn("void  BlockMatrixAgglomeration<Type>::restrictResidual() const")
-            << "Only present for square type coeff type"
+        FatalErrorIn
+        (
+            "void  BlockMatrixAgglomeration<Type>::restrictDiag() const"
+        )   << "Only present for square type coeff type"
             << abort(FatalError);
     }
 }
@@ -833,7 +956,7 @@ void Foam::BlockMatrixAgglomeration<Type>::restrictResidual
 
     forAll (res, i)
     {
-        coarseRes[child_[i]] += res[i];
+        coarseRes[agglomIndex_[i]] += res[i];
     }
 }
 
@@ -847,7 +970,7 @@ void Foam::BlockMatrixAgglomeration<Type>::prolongateCorrection
 {
     forAll (x, i)
     {
-        x[i] += coarseX[child_[i]];
+        x[i] += coarseX[agglomIndex_[i]];
     }
 }
 

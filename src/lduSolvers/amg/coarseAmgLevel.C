@@ -237,7 +237,7 @@ void Foam::coarseAmgLevel::solve
         ).solve(x, b, cmpt);
     }
 
-    // Escape cases of solver divergence
+    // Escape cases of top-level solver divergence
     if
     (
         coarseSolverPerf.nIterations() == maxIter
