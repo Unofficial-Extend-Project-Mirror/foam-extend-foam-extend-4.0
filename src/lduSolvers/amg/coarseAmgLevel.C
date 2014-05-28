@@ -139,7 +139,10 @@ void Foam::coarseAmgLevel::restrictResidual
         // Calculate residual
         scalarField::subField resBuf(xBuffer, x.size());
 
-        scalarField& res = const_cast<scalarField&>(resBuf.operator const scalarField&());
+        scalarField& res = const_cast<scalarField&>
+        (
+            resBuf.operator const scalarField&()
+        );
 
         residual(x, b, cmpt, res);
 
@@ -204,7 +207,6 @@ void Foam::coarseAmgLevel::solve
     {
         return;
     }
-
 
     if (matrixPtr_->matrix().symmetric())
     {
