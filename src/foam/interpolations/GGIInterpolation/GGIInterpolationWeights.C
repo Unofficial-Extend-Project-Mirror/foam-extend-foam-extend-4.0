@@ -531,22 +531,22 @@ void GGIInterpolation<MasterPatch, SlavePatch>::rescaleWeightingFactors() const
     scalar curMWC = 0;
 
     // Rescaling the slave weights
-    if(debug)
-      {
-	if
-	  (
-	   uncoveredMasterFaces().size() > 0
-	   || uncoveredSlaveFaces().size() > 0
-	   )
-	  {
-	    InfoIn
-	      (
-	       "void GGIInterpolation<MasterPatch, SlavePatch>::"
-	       "rescaleWeightingFactors() const"
-	       )   << "Uncovered faces found.  On master: "
-		   << uncoveredMasterFaces().size()
-		   << " on slave: " << uncoveredSlaveFaces().size() << endl;
-	  }
+    if (debug)
+    {
+        if
+        (
+            uncoveredMasterFaces().size() > 0
+         || uncoveredSlaveFaces().size() > 0
+        )
+        {
+            InfoIn
+            (
+                "void GGIInterpolation<MasterPatch, SlavePatch>::"
+                "rescaleWeightingFactors() const"
+            )   << "Uncovered faces found.  On master: "
+                << uncoveredMasterFaces().size()
+                << " on slave: " << uncoveredSlaveFaces().size() << endl;
+        }
       }
 
     forAll (saW, saWi)

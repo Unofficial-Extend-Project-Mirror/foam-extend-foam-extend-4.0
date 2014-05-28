@@ -35,8 +35,8 @@ SourceFiles
 #ifndef meshTools_H
 #define meshTools_H
 
-#include "label.H"
 #include "vector.H"
+#include "label.H"
 #include "labelList.H"
 #include "pointField.H"
 #include "faceList.H"

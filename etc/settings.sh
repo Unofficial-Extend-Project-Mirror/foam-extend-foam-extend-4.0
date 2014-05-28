@@ -237,20 +237,30 @@ OPENMPI)
     ;;
 
 MACPORTOPENMPI)
-       unset OPAL_PREFIX
+	unset OPAL_PREFIX
 
-       export FOAM_MPI=openmpi-macport
-       libDir=`openmpicc --showme:link | sed -e 's/.*-L\([^ ]*\).*/\1/'`
+	export FOAM_MPI=openmpi-macport-$WM_MACPORT_MPI_VERSION
 
-       # Bit of a hack: strip off 'lib' and hope this is the path to openmpi
-       # include files and libraries.
-       export MPI_ARCH_PATH="${libDir%/*}"
+	# Currently not correctly working on MacPorts
+	#	libDir=`mpicc-openmpi-$WM_MACPORT_MPI_VERSION --showme:libdirs`
+	libDir=/opt/local/lib/openmpi-$WM_MACPORT_MPI_VERSION
 
-       export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
+	export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$FOAM_MPI
+	_foamAddLib     $libDir
+	unset libDir
+	;;
 
-       _foamAddLib     $libDir
-       unset libDir
-       ;;
+MACPORTMPICH)
+    export FOAM_MPI=mpich-macports-$WM_MACPORT_MPI_VERSION
+    export MPI_HOME=$WM_THIRD_PARTY_DIR/$FOAM_MPI
+
+    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$FOAM_MPI
+    libDir=/opt/local/lib/mpich-$WM_MACPORT_MPI_VERSION
+
+    _foamAddLib     $libDir
+    unset libDir
+
+    ;;
 
 SYSTEMOPENMPI)
     mpi_version=openmpi-system

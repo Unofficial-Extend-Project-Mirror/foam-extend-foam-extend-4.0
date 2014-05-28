@@ -312,6 +312,7 @@ public:
             //- Return interpolation face zone
             const faceZone& zone() const;
 
+
         // Interpolation data
 
             //- Is this the master side?
