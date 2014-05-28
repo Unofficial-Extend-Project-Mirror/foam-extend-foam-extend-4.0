@@ -72,7 +72,7 @@ Foam::scalar Foam::BlockCoeffTwoNorm<Type>::normalize
     }
 
     // Dummy return
-    return scalar(0);
+    return 0;
 }
 
 
