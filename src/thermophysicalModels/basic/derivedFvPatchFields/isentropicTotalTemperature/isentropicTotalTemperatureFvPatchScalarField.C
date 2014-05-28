@@ -32,14 +32,10 @@ License
 
 #include "basicThermo.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-isentropicTotalTemperatureFvPatchScalarField::isentropicTotalTemperatureFvPatchScalarField
+Foam::isentropicTotalTemperatureFvPatchScalarField::
+isentropicTotalTemperatureFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
@@ -52,7 +48,8 @@ isentropicTotalTemperatureFvPatchScalarField::isentropicTotalTemperatureFvPatchS
 {}
 
 
-isentropicTotalTemperatureFvPatchScalarField::isentropicTotalTemperatureFvPatchScalarField
+Foam::isentropicTotalTemperatureFvPatchScalarField::
+isentropicTotalTemperatureFvPatchScalarField
 (
     const isentropicTotalTemperatureFvPatchScalarField& ptf,
     const fvPatch& p,
@@ -67,7 +64,8 @@ isentropicTotalTemperatureFvPatchScalarField::isentropicTotalTemperatureFvPatchS
 {}
 
 
-isentropicTotalTemperatureFvPatchScalarField::isentropicTotalTemperatureFvPatchScalarField
+Foam::isentropicTotalTemperatureFvPatchScalarField::
+isentropicTotalTemperatureFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -93,7 +91,8 @@ isentropicTotalTemperatureFvPatchScalarField::isentropicTotalTemperatureFvPatchS
 }
 
 
-isentropicTotalTemperatureFvPatchScalarField::isentropicTotalTemperatureFvPatchScalarField
+Foam::isentropicTotalTemperatureFvPatchScalarField::
+isentropicTotalTemperatureFvPatchScalarField
 (
     const isentropicTotalTemperatureFvPatchScalarField& tppsf
 )
@@ -105,7 +104,8 @@ isentropicTotalTemperatureFvPatchScalarField::isentropicTotalTemperatureFvPatchS
 {}
 
 
-isentropicTotalTemperatureFvPatchScalarField::isentropicTotalTemperatureFvPatchScalarField
+Foam::isentropicTotalTemperatureFvPatchScalarField::
+isentropicTotalTemperatureFvPatchScalarField
 (
     const isentropicTotalTemperatureFvPatchScalarField& tppsf,
     const DimensionedField<scalar, volMesh>& iF
@@ -120,17 +120,18 @@ isentropicTotalTemperatureFvPatchScalarField::isentropicTotalTemperatureFvPatchS
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void isentropicTotalTemperatureFvPatchScalarField::autoMap
+void Foam::isentropicTotalTemperatureFvPatchScalarField::autoMap
 (
     const fvPatchFieldMapper& m
 )
 {
     fixedValueFvPatchScalarField::autoMap(m);
     T0_.autoMap(m);
+    p0_.autoMap(m);
 }
 
 
-void isentropicTotalTemperatureFvPatchScalarField::rmap
+void Foam::isentropicTotalTemperatureFvPatchScalarField::rmap
 (
     const fvPatchScalarField& ptf,
     const labelList& addr
@@ -142,10 +143,11 @@ void isentropicTotalTemperatureFvPatchScalarField::rmap
         refCast<const isentropicTotalTemperatureFvPatchScalarField>(ptf);
 
     T0_.rmap(tiptf.T0_, addr);
+    p0_.rmap(tiptf.p0_, addr);
 }
 
 
-void isentropicTotalTemperatureFvPatchScalarField::updateCoeffs()
+void Foam::isentropicTotalTemperatureFvPatchScalarField::updateCoeffs()
 {
     if (updated())
     {
@@ -169,28 +171,39 @@ void isentropicTotalTemperatureFvPatchScalarField::updateCoeffs()
     fixedValueFvPatchScalarField::updateCoeffs();
 }
 
-void isentropicTotalTemperatureFvPatchScalarField::updateCoeffs(const vectorField& Up)
+void Foam::isentropicTotalTemperatureFvPatchScalarField::updateCoeffs
+(
+    const vectorField& Up
+)
 {
     updateCoeffs();
 }
 
 
-void isentropicTotalTemperatureFvPatchScalarField::write(Ostream& os) const
+void Foam::isentropicTotalTemperatureFvPatchScalarField::write
+(
+    Ostream& os
+) const
 {
-    fvPatchScalarField::write(os);
+    fixedValueFvPatchScalarField::write(os);
     os.writeKeyword("p") << pName_ << token::END_STATEMENT << nl;
     T0_.writeEntry("T0", os);
     p0_.writeEntry("p0", os);
-    writeEntry("value", os);
 }
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField(fvPatchScalarField, isentropicTotalTemperatureFvPatchScalarField);
+namespace Foam
+{
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+makePatchTypeField
+(
+    fvPatchScalarField,
+    isentropicTotalTemperatureFvPatchScalarField
+);
 
 } // End namespace Foam
+
 
 // ************************************************************************* //
