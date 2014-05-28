@@ -1,0 +1,93 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      p;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [1 -1 -2 0 0 0 0];
+
+internalField   uniform 101325;
+
+boundaryField
+{
+    inlet
+    {
+        type         zeroGradient;
+
+//         type            waveTransmissiveInlet;
+//         phi             phi;
+//         rho             rho;
+//         psi             psi;
+//         U               U;
+//         gamma           1.4;
+//         inletOutlet     false;
+//         correctSupercritical false;
+//         lInf            0.0;
+//         fieldInf        101325;
+//         value           uniform 101325;
+    }
+
+    outlet
+    {
+//         type            fixedValue;
+
+        type            waveTransmissive;
+        phi             phi;
+        rho             rho;
+        psi             psi;
+        U               U;
+        gamma           1.4;
+        inletOutlet     false;
+        correctSupercritical true;
+        lInf            0.1;
+        fieldInf        101325;
+        value           uniform 101325;
+    }
+
+    bladeRotor
+    {
+        type            zeroGradient;
+    }
+
+    shaftRotor
+    {
+        type            zeroGradient;
+    }
+
+    shroudRotor
+    {
+        type            zeroGradient;
+    }
+
+    bladeStator
+    {
+        type            zeroGradient;
+    }
+
+    shaftStator
+    {
+        type            zeroGradient;
+    }
+
+    shroudStator
+    {
+        type            zeroGradient;
+    }
+
+    frontAndBack
+    {
+        type            cyclic;
+    }
+}
+
+// ************************************************************************* //

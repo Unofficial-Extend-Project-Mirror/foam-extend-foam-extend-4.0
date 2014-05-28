@@ -1,0 +1,76 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.0                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    p
+    {
+        solver           BiCGStab;
+        preconditioner   DILU;
+
+        minIter          0;
+        maxIter          1000;
+        tolerance        1e-8;
+        relTol           0.0;
+    };
+    U
+    {
+        solver           BiCGStab;
+        preconditioner   DILU;
+
+        minIter           0;
+        maxIter           1000;
+        tolerance        1e-8;
+        relTol           0.0;
+    };
+    h
+    {
+        solver           BiCGStab;
+        preconditioner   DILU;
+
+        minIter           0;
+        maxIter           1000;
+        tolerance        1e-8;
+        relTol           0.0;
+    };
+}
+
+PIMPLE
+{
+    nOuterCorrectors         1;
+    nCorrectors              3;
+    nNonOrthogonalCorrectors 0;
+}
+
+relaxationFactors
+{
+    // Note: under-relaxation factors used in wave-transmissive schemes
+    U               0.4;
+    p               0.2;
+    h               0.5;
+    rho             0.5;
+    T               1;
+}
+
+fieldBounds
+{
+    // With bounding
+    p      50     1e6;
+    T      20    3000;
+    U    1000;
+}
+
+// ************************************************************************* //
